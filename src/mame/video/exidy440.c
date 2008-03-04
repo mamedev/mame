@@ -14,9 +14,9 @@
 /* globals */
 UINT8 *exidy440_scanline;
 UINT8 *exidy440_imageram;
-UINT8 exidy440_firq_vblank;
-UINT8 exidy440_firq_beam;
-UINT8 topsecex_yscroll;
+UINT8  exidy440_firq_vblank;
+UINT8  exidy440_firq_beam;
+UINT8 *topsecex_yscroll;
 
 /* local allocated storage */
 static UINT8 exidy440_latched_x;
@@ -28,9 +28,10 @@ static UINT8 firq_enable;
 static UINT8 firq_select;
 static UINT8 palettebank_io;
 static UINT8 palettebank_vis;
+static UINT8 is_topsecex;
 
 /* function prototypes */
-static void exidy440_update_firq(void);
+static void exidy440_update_firq(running_machine *machine);
 
 
 
@@ -50,8 +51,14 @@ VIDEO_START( exidy440 )
 	exidy440_firq_vblank = 0;
 	exidy440_firq_beam = 0;
 
-	/* reset Top Secret scroll position */
-	topsecex_yscroll = 0;
+	/* if Top Secret, reset scroll position */
+	if (topsecex_yscroll != NULL)
+	{
+		is_topsecex = TRUE;
+		*topsecex_yscroll = 0;
+	}
+	else
+		is_topsecex = FALSE;
 
 	/* allocate a buffer for VRAM */
 	local_videoram = auto_malloc(256 * 256 * 2);
@@ -133,7 +140,7 @@ READ8_HANDLER( exidy440_horizontal_pos_r )
 {
 	/* clear the FIRQ on a read here */
 	exidy440_firq_beam = 0;
-	exidy440_update_firq();
+	exidy440_update_firq(Machine);
 
 	/* according to the schems, this value is only latched on an FIRQ
      * caused by collision or beam */
@@ -187,7 +194,7 @@ WRITE8_HANDLER( exidy440_control_w )
 	palettebank_vis = data & 1;
 
 	/* update the FIRQ in case we enabled something */
-	exidy440_update_firq();
+	exidy440_update_firq(Machine);
 
 	/* if we're swapping palettes, change all the colors */
 	if (oldvis != palettebank_vis)
@@ -210,7 +217,7 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 {
 	/* clear the VBLANK FIRQ on a write here */
 	exidy440_firq_vblank = 0;
-	exidy440_update_firq();
+	exidy440_update_firq(Machine);
 }
 
 
@@ -221,12 +228,12 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
  *
  *************************************/
 
-static void exidy440_update_firq(void)
+static void exidy440_update_firq(running_machine *machine)
 {
 	if (exidy440_firq_vblank || (firq_enable && exidy440_firq_beam))
-		cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 }
 
 
@@ -234,7 +241,7 @@ INTERRUPT_GEN( exidy440_vblank_interrupt )
 {
 	/* set the FIRQ line on a VBLANK */
 	exidy440_firq_vblank = 1;
-	exidy440_update_firq();
+	exidy440_update_firq(machine);
 }
 
 
@@ -251,7 +258,7 @@ static TIMER_CALLBACK( beam_firq_callback )
 	if (firq_select && firq_enable)
 	{
 		exidy440_firq_beam = 1;
-		exidy440_update_firq();
+		exidy440_update_firq(machine);
 	}
 
 	/* round the x value to the nearest byte */
@@ -268,7 +275,7 @@ static TIMER_CALLBACK( collide_firq_callback )
 	if (!firq_select && firq_enable)
 	{
 		exidy440_firq_beam = 1;
-		exidy440_update_firq();
+		exidy440_update_firq(machine);
 	}
 
 	/* round the x value to the nearest byte */
@@ -294,7 +301,7 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
 	UINT8 *palette = &local_paletteram[palettebank_vis * 512];
 
 	/* start the count high for topsecret, which doesn't use collision flags */
-	int count = exidy440_topsecret ? 128 : 0;
+	int count = is_topsecex ? 128 : 0;
 
 	/* draw the sprite images, checking for collisions along the way */
 	UINT8 *sprite = spriteram + (SPRITE_COUNT - 1) * 4;
@@ -418,8 +425,8 @@ static void update_screen(running_machine *machine, bitmap_t *bitmap, const rect
 VIDEO_UPDATE( exidy440 )
 {
 	/* redraw the screen */
-	if (exidy440_topsecret)
-		update_screen(machine, bitmap, cliprect, topsecex_yscroll);
+	if (is_topsecex)
+		update_screen(machine, bitmap, cliprect, *topsecex_yscroll);
 	else
 		update_screen(machine, bitmap, cliprect, 0);
 
@@ -437,7 +444,7 @@ VIDEO_UPDATE( exidy440 )
 VIDEO_EOF( exidy440 )
 {
 	/* generate an interrupt once/frame for the beam */
-	if (!exidy440_topsecret)
+	if (!is_topsecex)
 	{
 		attotime time;
 		attoseconds_t increment;

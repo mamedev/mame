@@ -219,19 +219,8 @@
 #include "exidy440.h"
 
 
-/* globals */
-UINT8 exidy440_topsecret;
-
-
 /* local variables */
 static UINT8 exidy440_bank;
-static UINT8 port_0_xor;
-static UINT8 port_2_xor;
-static UINT8 port_3_xor;
-static UINT8 mirror_vblank_bit;
-static UINT8 mirror_trigger_bit;
-static UINT8 copy_protection_read;
-static UINT8 last_coins;
 
 static const UINT8 *showdown_bank_data[2];
 static INT8 showdown_bank_select;
@@ -264,63 +253,42 @@ static NVRAM_HANDLER( exidy440 )
 
 /*************************************
  *
- *  Interrupt handling
+ *  Coin handling
  *
  *************************************/
 
-static void handle_coins(running_machine *machine)
+static INPUT_CHANGED( coin_inserted )
 {
-	int coins;
-
 	/* if we got a coin, set the IRQ on the main CPU */
-	coins = readinputport(3) & 3;
-	if (((coins ^ last_coins) & 0x01) && (coins & 0x01) == 0)
+	if (newval == 0)
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	if (((coins ^ last_coins) & 0x02) && (coins & 0x02) == 0)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	last_coins = coins;
-}
-
-
-static INTERRUPT_GEN( main_interrupt )
-{
-	/* generate coin interrupts */
-	handle_coins(machine);
-	exidy440_vblank_interrupt(machine, cpunum);
-}
-
-
-static MACHINE_RESET( exidy440 )
-{
-	exidy440_bank = 0xff;
-	exidy440_bank_select(0);
-	last_coins = input_port_3_r(0) & 3;
 }
 
 
 
 /*************************************
  *
- *  Primary input port read
+ *  Primary input port special bits
  *
  *************************************/
 
-static READ8_HANDLER( input_r )
+static CUSTOM_INPUT( firq_beam_r )
 {
-	int result = input_port_0_r(offset);
+	return exidy440_firq_beam;
+}
 
-	/* the FIRQ cause is reflected in the upper 2 bits */
-	if (exidy440_firq_vblank) result ^= 0x80;
-	if (exidy440_firq_beam) result ^= 0x40;
 
-	/* Whodunit needs the VBLANK bit mirrored to bit 0 */
-	if (mirror_vblank_bit && exidy440_firq_vblank) result ^= 0x01;
+static CUSTOM_INPUT( firq_vblank_r )
+{
+	return exidy440_firq_vblank;
+}
 
-	/* Hit'N Miss needs the trigger bit mirrored to bit 0 */
-	if (mirror_trigger_bit) result = (result & 0xfe) | ((result >> 1) & 1);
 
-	/* return with the appropriate XOR */
-	return result ^ port_0_xor;
+static CUSTOM_INPUT( hitnmiss_button1_r )
+{
+	/* button 1 shows up in two bits */
+	UINT32 button1 = readinputportbytag("HITNMISS_BUTTON1");
+	return (button1 << 1) | button1;
 }
 
 
@@ -368,57 +336,18 @@ static WRITE8_HANDLER( bankram_w )
  *
  *************************************/
 
-static READ8_HANDLER( io_r )
+static READ8_HANDLER( exidy440_input_port_3_r )
 {
-	int result = 0xff;
+	/* I/O1 accesses clear the CIRQ flip/flop */
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	return readinputport(3);
+}
 
-	switch (offset & 0xe0)
-	{
-		case 0x00:										/* sound command */
-			result = exidy440_sound_command;
-			break;
 
-		case 0x20:										/* coin bits I/O1 */
-			result = readinputport(3) ^ port_3_xor;
-
-			/* I/O1 accesses clear the CIRQ flip/flop */
-			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
-			break;
-
-		case 0x40:										/* clear coin counters I/O2 */
-			break;
-
-		case 0x60:										/* dip switches (8) */
-			result = input_port_1_r(offset);
-			break;
-
-		case 0x80:										/* player control bits */
-			result = input_port_2_r(offset) ^ port_2_xor;
-			break;
-
-		case 0xa0:										/* coin bits I/O5 */
-			/* sound command acknowledgements come on bit 3 here */
-			if (exidy440_sound_command_ack)
-				result ^= 0x08;
-			break;
-
-		case 0xc0:
-			/* for Clay Pigeon and Top Secret */
-			if (offset < 0xc4)
-				return copy_protection_read;
-
-			/* for Top Secret only */
-			if (offset == 0xc5)
-				return (input_port_5_r(offset) & 1) ? 0x01 : 0x02;
-			else if (offset == 0xc6)
-				return input_port_4_r(offset);
-			else if (offset == 0xc7)
-				return input_port_6_r(offset);
-			else
-				return 0;
-	}
-
-	return result;
+static READ8_HANDLER( sound_command_ack_r )
+{
+	/* sound command acknowledgements come on bit 3 here */
+	return exidy440_sound_command_ack ? 0xf7 : 0xff;
 }
 
 
@@ -431,7 +360,7 @@ static READ8_HANDLER( io_r )
 
 static TIMER_CALLBACK( delayed_sound_command_w )
 {
-	exidy440_sound_command = param;
+	*exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
 
 	/* cause an FIRQ on the sound CPU */
@@ -439,42 +368,22 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 }
 
 
-static WRITE8_HANDLER( io_w )
+static WRITE8_HANDLER( sound_command_w )
 {
-	logerror("W I/O1[%02X]=%02X\n", offset, data);
+	timer_call_after_resynch(NULL, data, delayed_sound_command_w);
+}
 
-	/* switch off the upper 4 bits of the offset */
-	switch (offset & 0xe0)
-	{
-		case 0x00:										/* sound command */
-			timer_call_after_resynch(NULL, data, delayed_sound_command_w);
-			break;
 
-		case 0x20:										/* coin bits I/O1 */
+static WRITE8_HANDLER( exidy440_input_port_3_w )
+{
+	/* I/O1 accesses clear the CIRQ flip/flop */
+	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+}
 
-			/* accesses here clear the CIRQ flip/flop */
-			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
-			break;
 
-		case 0x40:										/* coin counter I/O2 */
-			coin_counter_w(0, data & 1);
-			break;
-
-		case 0x60:										/* dip switches (8) */
-			break;
-
-		case 0x80:										/* player control bits */
-			break;
-
-		case 0xa0:										/* coin bits I/O3 */
-			break;
-
-		case 0xc0:
-			/* for Top Secret only */
-			if (offset == 0xc1)
-				topsecex_yscroll = data;
-			break;
-	}
+static WRITE8_HANDLER( exidy440_coin_counter_w )
+{
+	coin_counter_w(0, data & 1);
 }
 
 
@@ -514,6 +423,38 @@ static READ8_HANDLER( showdown_bank0_r )
 }
 
 
+static READ8_HANDLER( claypign_protection_r )
+{
+	return 0x76;
+}
+
+
+static READ8_HANDLER( topsecex_input_port_5_r )
+{
+	return (input_port_5_r(offset) & 1) ? 0x01 : 0x02;
+}
+
+
+static WRITE8_HANDLER( topsecex_yscroll_w )
+{
+	*topsecex_yscroll = data;
+}
+
+
+
+/*************************************
+ *
+ *  Reset
+ *
+ *************************************/
+
+static MACHINE_RESET( exidy440 )
+{
+	exidy440_bank = 0xff;
+	exidy440_bank_select(0);
+}
+
+
 
 /*************************************
  *
@@ -529,9 +470,15 @@ static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2b00, 0x2b00) AM_READ(exidy440_vertical_pos_r)
 	AM_RANGE(0x2b01, 0x2b01) AM_READWRITE(exidy440_horizontal_pos_r, exidy440_interrupt_clear_w)
 	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(&exidy440_scanline)
-	AM_RANGE(0x2b03, 0x2b03) AM_READWRITE(input_r, exidy440_control_w)
+	AM_RANGE(0x2b03, 0x2b03) AM_READWRITE(input_port_0_r, exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
-	AM_RANGE(0x2e00, 0x2eff) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x2e00, 0x2e1f) AM_READWRITE(MRA8_RAM, sound_command_w) AM_BASE(&exidy440_sound_command)
+	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
+	AM_RANGE(0x2e40, 0x2e5f) AM_READWRITE(MRA8_NOP, exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
+	AM_RANGE(0x2e60, 0x2e7f) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x2e80, 0x2e9f) AM_READWRITE(input_port_2_r, MWA8_NOP)
+	AM_RANGE(0x2ea0, 0x2ebf) AM_READWRITE(sound_command_ack_r, MWA8_NOP)
+	AM_RANGE(0x2ec0, 0x2eff) AM_NOP
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK1, bankram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -579,7 +526,8 @@ static INPUT_PORTS_START( crossbow )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -593,8 +541,8 @@ static INPUT_PORTS_START( crossbow )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
@@ -607,19 +555,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cheyenne )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -633,8 +582,8 @@ static INPUT_PORTS_START( cheyenne )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
@@ -647,19 +596,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( combat )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -669,12 +619,12 @@ static INPUT_PORTS_START( combat )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
@@ -687,19 +637,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( catch22 )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPSETTING(    0x04, "6" )
-	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPSETTING(    0x08, "6" )
+	PORT_DIPSETTING(    0x0c, "7" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -709,13 +660,14 @@ static INPUT_PORTS_START( catch22 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -727,19 +679,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cracksht )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, "Seconds" )
-	PORT_DIPSETTING(    0x08, "20" )
-	PORT_DIPSETTING(    0x0c, "30" )
-	PORT_DIPSETTING(    0x04, "40" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x00, "30" )
+	PORT_DIPSETTING(    0x08, "40" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -749,13 +702,14 @@ static INPUT_PORTS_START( cracksht )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -767,15 +721,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( claypign )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -785,13 +740,14 @@ static INPUT_PORTS_START( claypign )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -803,32 +759,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chiller )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, "Seconds" )
-	PORT_DIPSETTING(    0x08, "30" )
-	PORT_DIPSETTING(    0x0c, "45" )
-	PORT_DIPSETTING(    0x04, "60" )
-	PORT_DIPSETTING(    0x00, "70" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
+	PORT_DIPSETTING(    0x04, "30" )
+	PORT_DIPSETTING(    0x00, "45" )
+	PORT_DIPSETTING(    0x08, "60" )
+	PORT_DIPSETTING(    0x0c, "70" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -840,32 +798,34 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( topsecex )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x0c, "4" )
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPSETTING(    0x00, "6" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x0c, "6" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
@@ -887,19 +847,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hitnmiss )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, "Seconds" )
-	PORT_DIPSETTING(    0x08, "20" )
-	PORT_DIPSETTING(    0x0c, "30" )
-	PORT_DIPSETTING(    0x04, "40" )
-	PORT_DIPSETTING(    0x00, "50" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(hitnmiss_button1_r, 0)
+	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x00, "30" )
+	PORT_DIPSETTING(    0x08, "40" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -909,50 +869,56 @@ static INPUT_PORTS_START( hitnmiss )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
 	PORT_START				/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
+
+	PORT_START_TAG("HITNMISS_BUTTON1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( whodunit )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -964,19 +930,20 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( showdown )
 	PORT_START				/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x0c, 0x0c, "Hands" )
-	PORT_DIPSETTING(    0x08, "1" )
-	PORT_DIPSETTING(    0x0c, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0c, 0x00, "Hands" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
 	PORT_START 				/* audio board dips */
 	COINAGE
@@ -994,19 +961,20 @@ static INPUT_PORTS_START( showdown )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START				/* start button */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Action")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet-All")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Gold")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Blue")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Red")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("White")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Action")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Bet-All")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gold")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Blue")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Red")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("White")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START				/* coin counters */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START				/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
@@ -1028,7 +996,7 @@ static MACHINE_DRIVER_START( exidy440 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,EXIDY440_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(exidy440_map,0)
-	MDRV_CPU_VBLANK_INT("main", main_interrupt)
+	MDRV_CPU_VBLANK_INT("main", exidy440_vblank_interrupt)
 
 	MDRV_MACHINE_RESET(exidy440)
 	MDRV_NVRAM_HANDLER(exidy440)
@@ -1963,25 +1931,33 @@ ROM_END
  *
  *************************************/
 
-#define SET_PARAMS(top,p0,p2,p3,mv,mt,cpr) \
-	showdown_bank_data[0] = showdown_bank_data[1] = NULL;\
-	exidy440_topsecret 		= top;\
-	port_0_xor 				= p0;\
-	port_2_xor 				= p2;\
-	port_3_xor				= p3;\
-	mirror_vblank_bit 		= mv;\
-	mirror_trigger_bit 		= mt;\
-	copy_protection_read 	= cpr
+static DRIVER_INIT( exidy440 )
+{
+	topsecex_yscroll = NULL;
+	showdown_bank_data[0] = showdown_bank_data[1] = NULL;
+}
 
-static DRIVER_INIT( crossbow ) { SET_PARAMS(0, 0x00, 0x00, 0x00, 0, 0, 0x00); }
-static DRIVER_INIT( cheyenne ) { SET_PARAMS(0, 0xff, 0x00, 0x00, 0, 0, 0x00); }
-static DRIVER_INIT( combat )   { SET_PARAMS(0, 0xff, 0xff, 0x00, 0, 0, 0x00); }
-static DRIVER_INIT( cracksht ) { SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00); }
-static DRIVER_INIT( claypign ) { SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x76); }
-static DRIVER_INIT( chiller )  { SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00); }
-static DRIVER_INIT( topsecex ) { SET_PARAMS(1, 0xff, 0xff, 0x04, 0, 0, 0x00); }
-static DRIVER_INIT( hitnmiss ) { SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 1, 0x00); }
-static DRIVER_INIT( whodunit ) { SET_PARAMS(0, 0xff, 0xff, 0x04, 1, 0, 0x00); }
+
+static DRIVER_INIT( claypign )
+{
+	DRIVER_INIT_CALL(exidy440);
+
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
+}
+
+
+static DRIVER_INIT( topsecex )
+{
+	DRIVER_INIT_CALL(exidy440);
+
+	/* extra input ports and scrolling */
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec6, 0x2ec6, 0, 0, input_port_4_r);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec7, 0x2ec7, 0, 0, input_port_6_r);
+
+	topsecex_yscroll = memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
+}
+
 
 static DRIVER_INIT( showdown )
 {
@@ -1997,12 +1973,14 @@ static DRIVER_INIT( showdown )
 		0x46,0xd2,0x98,0x59,0x91,0x08,0xc8,0x41,
 		0xc5,0x8c,0x4e,0x86,0x1a,0xda,0x50,0xd1
 	};
-	SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00);
+
+	DRIVER_INIT_CALL(exidy440);
 
 	/* set up the fake PLD */
 	showdown_bank_data[0] = bankdata0;
 	showdown_bank_data[1] = bankdata1;
 }
+
 
 static DRIVER_INIT( yukon )
 {
@@ -2018,7 +1996,8 @@ static DRIVER_INIT( yukon )
 		0x52,0xe2,0xa4,0x65,0xa1,0x04,0xc4,0x41,
 		0xd1,0x94,0x56,0x92,0x26,0xe6,0x60,0xe1
 	};
-	SET_PARAMS(0, 0xff, 0xff, 0x04, 0, 0, 0x00);
+
+	DRIVER_INIT_CALL(exidy440);
 
 	/* set up the fake PLD */
 	showdown_bank_data[0] = bankdata0;
@@ -2033,17 +2012,17 @@ static DRIVER_INIT( yukon )
  *
  *************************************/
 
-GAME( 1983, crossbow, 0,        exidy440, crossbow, crossbow, ROT0, "Exidy", "Crossbow (version 2.0)", 0 )
-GAME( 1984, cheyenne, 0,        exidy440, cheyenne, cheyenne, ROT0, "Exidy", "Cheyenne (version 1.0)", 0 )
-GAME( 1985, combat,   0,        exidy440, combat,   combat,   ROT0, "Exidy", "Combat (version 3.0)", 0 )
-GAME( 1985, catch22,  combat,   exidy440, catch22,  combat,   ROT0, "Exidy", "Catch-22 (version 8.0)", 0 )
-GAME( 1985, cracksht, 0,        exidy440, cracksht, cracksht, ROT0, "Exidy", "Crackshot (version 2.0)", 0 )
+GAME( 1983, crossbow, 0,        exidy440, crossbow, exidy440, ROT0, "Exidy", "Crossbow (version 2.0)", 0 )
+GAME( 1984, cheyenne, 0,        exidy440, cheyenne, exidy440, ROT0, "Exidy", "Cheyenne (version 1.0)", 0 )
+GAME( 1985, combat,   0,        exidy440, combat,   exidy440, ROT0, "Exidy", "Combat (version 3.0)", 0 )
+GAME( 1985, catch22,  combat,   exidy440, catch22,  exidy440, ROT0, "Exidy", "Catch-22 (version 8.0)", 0 )
+GAME( 1985, cracksht, 0,        exidy440, cracksht, exidy440, ROT0, "Exidy", "Crackshot (version 2.0)", 0 )
 GAME( 1986, claypign, 0,        exidy440, claypign, claypign, ROT0, "Exidy", "Clay Pigeon (version 2.0)", 0 )
-GAME( 1986, chiller,  0,        exidy440, chiller,  chiller,  ROT0, "Exidy", "Chiller (version 3.0)", 0 )
+GAME( 1986, chiller,  0,        exidy440, chiller,  exidy440, ROT0, "Exidy", "Chiller (version 3.0)", 0 )
 GAME( 1986, topsecex, 0,        topsecex, topsecex, topsecex, ROT0, "Exidy", "Top Secret (Exidy) (version 1.0)", 0 )
-GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 )
-GAME( 1987, hitnmis2, hitnmiss, exidy440, hitnmiss, hitnmiss, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
-GAME( 1988, whodunit, 0,        exidy440, whodunit, whodunit, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
+GAME( 1987, hitnmiss, 0,        exidy440, hitnmiss, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 3.0)", 0 )
+GAME( 1987, hitnmis2, hitnmiss, exidy440, hitnmiss, exidy440, ROT0, "Exidy", "Hit 'n Miss (version 2.0)", 0 )
+GAME( 1988, whodunit, 0,        exidy440, whodunit, exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)", 0 )
 GAME( 1988, showdown, 0,        exidy440, showdown, showdown, ROT0, "Exidy", "Showdown (version 5.0)", 0 )
 GAME( 1989, yukon,    0,        exidy440, showdown, yukon,    ROT0, "Exidy", "Yukon (version 2.0)", 0 )
 GAME( 1989, yukon1,   yukon,    exidy440, showdown, yukon,    ROT0, "Exidy", "Yukon (version 1.0)", 0 )
