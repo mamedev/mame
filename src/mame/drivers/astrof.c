@@ -123,21 +123,18 @@ static void start_irq_timer(void)
  *
  *************************************/
 
-static INTERRUPT_GEN( coin_nmi )
+static INPUT_CHANGED( coin_inserted )
 {
-	UINT32 coin = readinputportbytag("COIN");
-	UINT32 service = readinputportbytag("SERVICE");
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	coin_counter_w(0, newval);
+}
 
-	/* both the coin input and the serice credit generates an NMI */
-	if (coin || service)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
-	/* the coin input is also connected to the coin counter */
-	if (coin)
-	{
-		coin_counter_w(0, 1);
-		coin_counter_w(0, 0);
-	}
+static INPUT_CHANGED( service_coin_inserted )
+{
+	/* service coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -614,11 +611,8 @@ static INPUT_PORTS_START( astrof )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START_TAG("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(service_coin_inserted, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("FLIP")
@@ -676,11 +670,8 @@ static INPUT_PORTS_START( abattle )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START_TAG("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(service_coin_inserted, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("FLIP")
@@ -739,11 +730,8 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START_TAG("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(service_coin_inserted, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("FLIP")
@@ -802,11 +790,8 @@ static INPUT_PORTS_START( spfgmk22 )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START_TAG("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(service_coin_inserted, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("FLIP")
@@ -856,11 +841,8 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
 	PORT_START_TAG("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START_TAG("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(service_coin_inserted, 0)
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START_TAG("FLIP")
@@ -882,7 +864,6 @@ static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_VBLANK_INT("main", coin_nmi)
 
 	MDRV_MACHINE_RESET(astrof)
 
@@ -892,7 +873,6 @@ static MACHINE_DRIVER_START( base )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-
 MACHINE_DRIVER_END
 
 
@@ -910,7 +890,6 @@ static MACHINE_DRIVER_START( astrof )
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(astrof_audio)
-
 MACHINE_DRIVER_END
 
 
@@ -921,7 +900,6 @@ static MACHINE_DRIVER_START( abattle )
 
 	MDRV_MACHINE_START(abattle)
 	MDRV_MACHINE_RESET(abattle)
-
 MACHINE_DRIVER_END
 
 
@@ -939,7 +917,6 @@ static MACHINE_DRIVER_START( spfghmk2 )
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(spfghmk2_audio)
-
 MACHINE_DRIVER_END
 
 
@@ -957,7 +934,6 @@ static MACHINE_DRIVER_START( tomahawk )
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(tomahawk_audio)
-
 MACHINE_DRIVER_END
 
 

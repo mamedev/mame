@@ -2,7 +2,7 @@
  Universal Cheeky Mouse Driver
  (c)Lee Taylor May/June 1998, All rights reserved.
 
- For use only in offical Mame releases.
+ For use only in offical MAME releases.
  Not to be distributed as part of any commerical work.
 **************************************************************************/
 
@@ -10,37 +10,40 @@
 #include "sound/dac.h"
 
 
+extern UINT8 *cheekyms_videoram;
+extern UINT8 *cheekyms_spriteram;
+extern UINT8 *cheekyms_port_80;
 
 PALETTE_INIT( cheekyms );
+VIDEO_START( cheekyms );
 VIDEO_UPDATE( cheekyms );
-WRITE8_HANDLER( cheekyms_sprite_w );
 WRITE8_HANDLER( cheekyms_port_40_w );
 WRITE8_HANDLER( cheekyms_port_80_w );
 
 
-static ADDRESS_MAP_START( addressmap, ADDRESS_SPACE_PROGRAM, 8 )
+
+static INPUT_CHANGED( coin_inserted )
+{
+	/* this starts a 556 one-shot timer (and triggers a sound effect) */
+	if (newval)
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE(&cheekyms_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x20, 0x3f) AM_WRITE(cheekyms_sprite_w)
+	AM_RANGE(0x20, 0x3f) AM_WRITE(MWA8_RAM) AM_BASE(&cheekyms_spriteram)
 	AM_RANGE(0x40, 0x40) AM_WRITE(cheekyms_port_40_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_BASE(&cheekyms_port_80)
 ADDRESS_MAP_END
-
-
-static INTERRUPT_GEN( cheekyms_interrupt )
-{
-	if (readinputport(2) & 1)	/* Coin */
-		nmi_line_pulse(machine, cpunum);
-	else
-		irq0_line_hold(machine, cpunum);
-}
 
 
 static INPUT_PORTS_START( cheekyms )
@@ -54,7 +57,7 @@ static INPUT_PORTS_START( cheekyms )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-//PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+  //PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -78,12 +81,7 @@ static INPUT_PORTS_START( cheekyms )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START	/* FAKE */
-	/* The coin slots are not memory mapped. Coin  causes a NMI, */
-	/* This fake input port is used by the interrupt */
-	/* handler to be notified of coin insertions. We use IMPULSE to */
-	/* trigger exactly one interrupt, without having to check when the */
-	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -123,9 +121,9 @@ static MACHINE_DRIVER_START( cheekyms )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,5000000/2)  /* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(addressmap,0)
-	MDRV_CPU_IO_MAP(portmap,0)
-	MDRV_CPU_VBLANK_INT("main", cheekyms_interrupt)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -139,9 +137,10 @@ static MACHINE_DRIVER_START( cheekyms )
 	MDRV_PALETTE_LENGTH(0xc0)
 
 	MDRV_PALETTE_INIT(cheekyms)
+	MDRV_VIDEO_START(cheekyms)
 	MDRV_VIDEO_UPDATE(cheekyms)
 
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(DAC, 0)
@@ -180,4 +179,4 @@ ROM_END
 
 
 
-GAME( 1980?, cheekyms, 0, cheekyms, cheekyms, 0, ROT270, "Universal", "Cheeky Mouse", GAME_IMPERFECT_SOUND )
+GAME( 1980, cheekyms, 0, cheekyms, cheekyms, 0, ROT270, "Universal", "Cheeky Mouse", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
