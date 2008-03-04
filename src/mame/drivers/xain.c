@@ -267,29 +267,23 @@ static INTERRUPT_GEN( xain_interrupt )
 		vblank=0;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(xain_sharedram_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(xain_sharedram_r, xain_sharedram_w) AM_BASE(&xain_sharedram)
 	AM_RANGE(0x2000, 0x37ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3a00, 0x3a00) AM_READ(input_port_0_r)
-	AM_RANGE(0x3a01, 0x3a01) AM_READ(input_port_1_r)
-	AM_RANGE(0x3a02, 0x3a02) AM_READ(input_port_2_r)
-	AM_RANGE(0x3a03, 0x3a03) AM_READ(input_port_3_r)
-	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)	/* from the 68705 */
-	AM_RANGE(0x3a05, 0x3a05) AM_READ(xain_input_port_4_r)
-//  AM_RANGE(0x3a06, 0x3a06) AM_READ(MRA8_NOP)  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(xain_sharedram_w) AM_BASE(&xain_sharedram)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(xain_charram_w) AM_BASE(&xain_charram)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(xain_bgram1_w) AM_BASE(&xain_bgram1)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(xain_bgram0_w) AM_BASE(&xain_bgram0)
-	AM_RANGE(0x3800, 0x397f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3800, 0x397f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3a00, 0x3a00) AM_READ(input_port_0_r)
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(xain_scrollxP1_w)
+	AM_RANGE(0x3a01, 0x3a01) AM_READ(input_port_1_r)
+	AM_RANGE(0x3a02, 0x3a02) AM_READ(input_port_2_r)
 	AM_RANGE(0x3a02, 0x3a03) AM_WRITE(xain_scrollyP1_w)
+	AM_RANGE(0x3a03, 0x3a03) AM_READ(input_port_3_r)
+	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)	/* from the 68705 */
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(xain_scrollxP0_w)
+	AM_RANGE(0x3a05, 0x3a05) AM_READ(xain_input_port_4_r)
+//  AM_RANGE(0x3a06, 0x3a06) AM_READ(MRA8_NOP)  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(xain_scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)
@@ -298,51 +292,35 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmemB, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(xain_sharedram_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writememB, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(xain_sharedram_w)
+static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(xain_sharedram_r, xain_sharedram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0010, 0x007f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(MWA8_ROM)
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x2801, 0x2801) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
-
-
 
 static INPUT_PORTS_START( xsleena )
 	PORT_START_TAG("IN0")
@@ -477,18 +455,18 @@ static MACHINE_DRIVER_START( xsleena )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809, 1500000)	/* Confirmed 1.5MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xain_interrupt,256)
 
 	MDRV_CPU_ADD(M6809, 1500000)	/* Confirmed 1.5MHz */
-	MDRV_CPU_PROGRAM_MAP(readmemB,writememB)
+	MDRV_CPU_PROGRAM_MAP(cpu_map_B,0)
 
 	MDRV_CPU_ADD(M6809, 1500000)	/* Confirmed 1.5MHz */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 //  MDRV_CPU_ADD(M68705, 3000000)    /* Confirmed 3MHz */
-//  MDRV_CPU_PROGRAM_MAP(mcu_readmem,mcu_writemem)
+//  MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_MACHINE_START(xsleena)
 

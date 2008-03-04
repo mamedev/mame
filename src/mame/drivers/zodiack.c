@@ -49,53 +49,35 @@ static WRITE8_HANDLER( zodiack_control_w )
 	/* Bit 2 - ???? */
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x5800, 0x5fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6081, 0x6081) AM_READ(input_port_0_r)
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x4fff) AM_ROM
+	AM_RANGE(0x5800, 0x5fff) AM_RAM
+	AM_RANGE(0x6081, 0x6081) AM_READWRITE(input_port_0_r, zodiack_control_w)
 	AM_RANGE(0x6082, 0x6082) AM_READ(input_port_1_r)
 	AM_RANGE(0x6083, 0x6083) AM_READ(input_port_2_r)
 	AM_RANGE(0x6084, 0x6084) AM_READ(input_port_3_r)
-	AM_RANGE(0x6090, 0x6090) AM_READ(soundlatch_r)
-	AM_RANGE(0x7000, 0x7000) AM_READ(MRA8_NOP)  /* ??? */
-	AM_RANGE(0x9000, 0x93ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xa3ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xb000, 0xb3ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x4fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6081, 0x6081) AM_WRITE(zodiack_control_w)
-	AM_RANGE(0x6090, 0x6090) AM_WRITE(zodiac_master_soundlatch_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiac_master_soundlatch_w)
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(MRA8_NOP,watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_WRITE(zodiack_attributes_w) AM_BASE(&zodiack_attributesram)
-	AM_RANGE(0x9040, 0x905f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_WRITE(MWA8_RAM) AM_BASE(&zodiack_bulletsram) AM_SIZE(&zodiack_bulletsram_size)
-	AM_RANGE(0x9080, 0x93ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(zodiack_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xb000, 0xb3ff) AM_WRITE(zodiack_videoram2_w) AM_BASE(&zodiack_videoram2)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, zodiack_attributes_w) AM_BASE(&zodiack_attributesram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(&zodiack_bulletsram) AM_SIZE(&zodiack_bulletsram_size)
+	AM_RANGE(0x9080, 0x93ff) AM_RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(MRA8_RAM, zodiack_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb000, 0xb3ff) AM_READWRITE(MRA8_RAM, zodiack_videoram2_w) AM_BASE(&zodiack_videoram2)
+	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(MWA8_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_enable_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
@@ -476,12 +458,12 @@ static MACHINE_DRIVER_START( zodiack )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 4000000)        /* 4.00 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
 	MDRV_CPU_ADD(Z80, 14318000/8)	/* 1.78975 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(0,sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(zodiack)

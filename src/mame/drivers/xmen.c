@@ -170,156 +170,103 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_READ(K053247_word_r)
-	AM_RANGE(0x101000, 0x101fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x104000, 0x104fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x10a002, 0x10a003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x10a004, 0x10a005) AM_READ(eeprom_r)
-	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r)
-	AM_RANGE(0x110000, 0x113fff) AM_READ(MRA16_RAM)	/* main RAM */
-	AM_RANGE(0x18c000, 0x197fff) AM_READ(K052109_lsb_r)
-
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x080000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(K053247_word_w)
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x104000, 0x104fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(K053247_word_r, K053247_word_w)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM
+	AM_RANGE(0x104000, 0x104fff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_WRITE(K053246_word_w)
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
 	AM_RANGE(0x108060, 0x10807f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x110000, 0x113fff) AM_WRITE(MWA16_RAM)	/* main RAM */
+	AM_RANGE(0x10a000, 0x10a001) AM_READWRITE(input_port_0_word_r, watchdog_reset16_w)
+	AM_RANGE(0x10a002, 0x10a003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x10a004, 0x10a005) AM_READ(eeprom_r)
+	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r)
+	AM_RANGE(0x110000, 0x113fff) AM_RAM		/* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-	AM_RANGE(0x18c000, 0x197fff) AM_WRITE(K052109_lsb_w)
-
+	AM_RANGE(0x18c000, 0x197fff) AM_READWRITE(K052109_lsb_r, K052109_lsb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK4)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_READ(K054539_0_r)
-	AM_RANGE(0xec01, 0xec01) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_WRITE(K054539_0_w)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe22f) AM_READWRITE(K054539_0_r, K054539_0_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xec01, 0xec01) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
+
 /* 6p version */
-
-static ADDRESS_MAP_START( readmem6p, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_READ(MRA16_RAM) /* 1st sprite list on 6p */
-	AM_RANGE(0x101000, 0x101fff) AM_READ(MRA16_RAM)
-
-
-	AM_RANGE(0x102000, 0x102fff) AM_READ(MRA16_RAM) /* 2nd sprite list on 6p */
-	AM_RANGE(0x102000, 0x103fff) AM_READ(MRA16_RAM) /* 6p - a buffer? */
-
-
-	AM_RANGE(0x104000, 0x104fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
-	AM_RANGE(0x10a000, 0x10a001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x10a002, 0x10a003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x10a004, 0x10a005) AM_READ(xmen6p_eeprom_r)
-	AM_RANGE(0x10a006, 0x10a007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r) /* sprites */
-	AM_RANGE(0x110000, 0x113fff) AM_READ(MRA16_RAM)	/* main RAM */
-	AM_RANGE(0x18c000, 0x197fff) AM_READ(MRA16_RAM) /* left tilemap */
-
-/*
-    AM_RANGE(0x1ac000, 0x1af7ff) AM_READ(MRA16_RAM)
-    AM_RANGE(0x1b0000, 0x1b37ff) AM_READ(MRA16_RAM)
-    AM_RANGE(0x1b4000, 0x1b77ff) AM_READ(MRA16_RAM)
-*/
-	AM_RANGE(0x1ac000, 0x1b7fff) AM_READ(MRA16_RAM) /* right tilemap */
-
-
-	/* what are the regions below buffers? (used by hw or software?) */
-/*
-    AM_RANGE(0x1cc000, 0x1cf7ff) AM_READ(MRA16_RAM)
-    AM_RANGE(0x1d0000, 0x1d37ff) AM_READ(MRA16_RAM)
-*/
-	AM_RANGE(0x1cc000, 0x1d7fff) AM_READ(MRA16_RAM) /* tilemap ?*/
-
-/*
-    AM_RANGE(0x1ec000, 0x1ef7ff) AM_READ(MRA16_RAM)
-    AM_RANGE(0x1f0000, 0x1f37ff) AM_READ(MRA16_RAM)
-    AM_RANGE(0x1f4000, 0x1f77ff) AM_READ(MRA16_RAM)
-*/
-	AM_RANGE(0x1ec000, 0x1f7fff) AM_READ(MRA16_RAM) /* tilemap ?*/
-
-ADDRESS_MAP_END
-
 UINT16*xmen6p_spriteramleft;
 UINT16*xmen6p_spriteramright;
 UINT16*xmen6p_tilemapleft;
 UINT16*xmen6p_tilemapright;
 
-static ADDRESS_MAP_START( writemem6p, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x080000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(MWA16_RAM) AM_BASE(&xmen6p_spriteramleft) /* sprites (screen 1) */
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(MWA16_RAM)
-
-	AM_RANGE(0x102000, 0x102fff) AM_WRITE(MWA16_RAM) AM_BASE(&xmen6p_spriteramright)/* sprites (screen 2) */
-	AM_RANGE(0x103000, 0x103fff) AM_WRITE(MWA16_RAM)
-
-	AM_RANGE(0x104000, 0x104fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(&xmen6p_spriteramleft)	/* sprites (screen 1) */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM
+	AM_RANGE(0x102000, 0x102fff) AM_RAM AM_BASE(&xmen6p_spriteramright)	/* sprites (screen 2) */
+	AM_RANGE(0x103000, 0x103fff) AM_RAM		/* 6p - a buffer? */
+	AM_RANGE(0x104000, 0x104fff) AM_READWRITE(MRA16_RAM,paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x108000, 0x108001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x108020, 0x108027) AM_WRITE(K053246_word_w) /* sprites */
 	AM_RANGE(0x10804c, 0x10804d) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x10804e, 0x10804f) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x108054, 0x108055) AM_READ(sound_status_r)
 	AM_RANGE(0x108060, 0x10807f) AM_WRITE(K053251_lsb_w)
-	AM_RANGE(0x10a000, 0x10a001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x110000, 0x113fff) AM_WRITE(MWA16_RAM)	/* main RAM */
+	AM_RANGE(0x10a000, 0x10a001) AM_READWRITE(input_port_0_word_r,watchdog_reset16_w)
+	AM_RANGE(0x10a002, 0x10a003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x10a004, 0x10a005) AM_READ(xmen6p_eeprom_r)
+	AM_RANGE(0x10a006, 0x10a007) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r) /* sprites */
+	AM_RANGE(0x110000, 0x113fff) AM_RAM		/* main RAM */
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
-	AM_RANGE(0x18c000, 0x197fff) AM_WRITE(MWA16_RAM/*K052109_lsb_w*/) AM_BASE(&xmen6p_tilemapleft) /* left tilemap (p1,p2,p3 counters) */
-
+/*	AM_RANGE(0x18c000, 0x197fff) AM_WRITE(K052109_lsb_w) AM_BASE(&xmen6p_tilemapleft) */
+	AM_RANGE(0x18c000, 0x197fff) AM_RAM AM_BASE(&xmen6p_tilemapleft) /* left tilemap (p1,p2,p3 counters) */
 /*
+    AM_RANGE(0x1ac000, 0x1af7ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1ac000, 0x1af7ff) AM_WRITE(MWA16_RAM)
+
+	AM_RANGE(0x1b0000, 0x1b37ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1b0000, 0x1b37ff) AM_WRITE(MWA16_RAM)
+
+	AM_RANGE(0x1b4000, 0x1b77ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1b4000, 0x1b77ff) AM_WRITE(MWA16_RAM)
 */
-	AM_RANGE(0x1ac000, 0x1b7fff) AM_WRITE(MWA16_RAM) AM_BASE(&xmen6p_tilemapright)/* tilemap right side (p4,p5,p6 counters) */
+	AM_RANGE(0x1ac000, 0x1b7fff) AM_RAM AM_BASE(&xmen6p_tilemapright) /* right tilemap */
 
-	/* whats the stuff below, buffers? */
-
+	/* what are the regions below buffers? (used by hw or software?) */
 /*
+    AM_RANGE(0x1cc000, 0x1cf7ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1cc000, 0x1cf7ff) AM_WRITE(MWA16_RAM)
+
+	AM_RANGE(0x1d0000, 0x1d37ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1d0000, 0x1d37ff) AM_WRITE(MWA16_RAM)
 */
-	AM_RANGE(0x1cc000, 0x1d7fff) AM_WRITE(MWA16_RAM) /* tilemap? */
+	AM_RANGE(0x1cc000, 0x1d7fff) AM_RAM /* tilemap ? */
 
+	/* whats the stuff below, buffers? */
 /*
+    AM_RANGE(0x1ec000, 0x1ef7ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1ec000, 0x1ef7ff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x1f0000, 0x1f37ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1f0000, 0x1f37ff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x1f4000, 0x1f77ff) AM_READ(MRA16_RAM)
     AM_RANGE(0x1f4000, 0x1f77ff) AM_WRITE(MWA16_RAM)
 */
-	AM_RANGE(0x1ec000, 0x1f7fff) AM_WRITE(MWA16_RAM) /*  tilemap? */
-
+	AM_RANGE(0x1ec000, 0x1f7fff) AM_RAM /* tilemap ? */
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( xmen )
@@ -523,12 +470,12 @@ static MACHINE_DRIVER_START( xmen )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xmen_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,8000000)	/* verified with M1, guessed but accurate */
 	/* audio CPU */	/* ????? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	MDRV_MACHINE_START(xmen)
 
@@ -591,12 +538,12 @@ static MACHINE_DRIVER_START( xmen6p )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(readmem6p,writemem6p)
+	MDRV_CPU_PROGRAM_MAP(6p_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(xmen6p_interrupt,2)
 
 	MDRV_CPU_ADD(Z80,8000000)	/* verified with M1, guessed but accurate */
 	/* audio CPU */	/* ????? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 
 	MDRV_NVRAM_HANDLER(xmen)

@@ -123,38 +123,28 @@ static WRITE16_HANDLER( yunsun16_sound_bank_w )
 	}
 }
 
-static ADDRESS_MAP_START( yunsun16_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM					)	// ROM
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM					)	// RAM
-	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r		)	// P1 + P2
-	AM_RANGE(0x800018, 0x800019) AM_READ(input_port_1_word_r		)	// Coins
-	AM_RANGE(0x80001a, 0x80001b) AM_READ(input_port_2_word_r		)	// DSW1
-	AM_RANGE(0x80001c, 0x80001d) AM_READ(input_port_3_word_r		)	// DSW2
-	AM_RANGE(0x800188, 0x800189) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
-	AM_RANGE(0x900000, 0x903fff) AM_READ(MRA16_RAM					)	// Palette
-	AM_RANGE(0x908000, 0x90bfff) AM_READ(MRA16_RAM					)	// Layer 1
-	AM_RANGE(0x90c000, 0x90ffff) AM_READ(MRA16_RAM					)	// Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_READ(MRA16_RAM					)	// Sprites
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( yunsun16_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM					)	// ROM
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM					)	// RAM
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(MWA16_NOP					)	// ? (value: don't care)
-	AM_RANGE(0x800100, 0x800101) AM_WRITE(MWA16_NOP					)	// ? $9100
-	AM_RANGE(0x800102, 0x800103) AM_WRITE(MWA16_NOP					)	// ? $9080
-	AM_RANGE(0x800104, 0x800105) AM_WRITE(MWA16_NOP					)	// ? $90c0
-	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(MWA16_NOP					)	// ? $9000
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r					)	// P1 + P2
+	AM_RANGE(0x800018, 0x800019) AM_READ(input_port_1_word_r					)	// Coins
+	AM_RANGE(0x80001a, 0x80001b) AM_READ(input_port_2_word_r					)	// DSW1
+	AM_RANGE(0x80001c, 0x80001d) AM_READ(input_port_3_word_r					)	// DSW2
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(MWA16_NOP								)	// ? (value: don't care)
+	AM_RANGE(0x800100, 0x800101) AM_WRITE(MWA16_NOP								)	// ? $9100
+	AM_RANGE(0x800102, 0x800103) AM_WRITE(MWA16_NOP								)	// ? $9080
+	AM_RANGE(0x800104, 0x800105) AM_WRITE(MWA16_NOP								)	// ? $90c0
+	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(MWA16_NOP								)	// ? $9000
 	AM_RANGE(0x80010c, 0x80010f) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_scroll_1	)	// Scrolling
-	AM_RANGE(0x800114, 0x800117) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_scroll_0	)	//
+	AM_RANGE(0x800114, 0x800117) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_scroll_0	)	// Scrolling
 	AM_RANGE(0x800154, 0x800155) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_priority	)	// Priority
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w		)	// Sound
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(OKIM6295_data_0_lsb_w		)	//
-	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(MWA16_NOP					)	// ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x908000, 0x90bfff) AM_WRITE(yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1		)	// Layer 1
-	AM_RANGE(0x90c000, 0x90ffff) AM_WRITE(yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0		)	// Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w					)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// Sound
+	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(MWA16_NOP												)	// ? 0 (during int)
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x908000, 0x90bfff) AM_READWRITE(MRA16_RAM, yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
+	AM_RANGE(0x90c000, 0x90ffff) AM_READWRITE(MRA16_RAM, yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
+	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE(&spriteram16) AM_SIZE(&spriteram_size					)	// Sprites
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -188,28 +178,17 @@ static DRIVER_INIT( magicbub )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( yunsun16_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(MRA8_ROM		)	// ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM		)	// RAM
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yunsun16_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(MWA8_ROM		)	// ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM		)	// RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( yunsun16_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x10, 0x10) AM_READ(YM3812_status_port_0_r	)	// YM3812
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r				)	// From Main CPU
-	AM_RANGE(0x1c, 0x1c) AM_READ(OKIM6295_status_0_r		)	// M6295
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( yunsun16_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
-	AM_RANGE(0x10, 0x10) AM_WRITE(YM3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0x11, 0x11) AM_WRITE(YM3812_write_port_0_w		)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(OKIM6295_data_0_w			)	// M6295
+	AM_RANGE(0x10, 0x10) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w	)	// YM3812
+	AM_RANGE(0x11, 0x11) AM_WRITE(YM3812_write_port_0_w									)
+	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r											)	// From Main CPU
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w			)	// M6295
 ADDRESS_MAP_END
 
 
@@ -529,13 +508,13 @@ static MACHINE_DRIVER_START( magicbub )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(yunsun16_readmem,yunsun16_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD(Z80, 3000000)
 	/* audio CPU */	/* ? */
-	MDRV_CPU_PROGRAM_MAP(yunsun16_sound_readmem,yunsun16_sound_writemem)
-	MDRV_CPU_IO_MAP(yunsun16_sound_readport,yunsun16_sound_writeport)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_port_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -574,7 +553,7 @@ static MACHINE_DRIVER_START( shocking )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(yunsun16_readmem,yunsun16_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	/* video hardware */
