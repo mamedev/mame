@@ -113,6 +113,7 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #define SYS_A_CPU_CLOCK		(XTAL_12MHz / 2)	/* clock for main 68000 */
 #define SYS_B_CPU_CLOCK		XTAL_8MHz		/* clock for main 68000 */
 #define SYS_C_CPU_CLOCK		(XTAL_24MHz / 2)	/* clock for main 68000 */
+#define SYS_D_CPU_CLOCK		XTAL_8MHz		/* clock for main 68000 */
 #define SOUND_CPU_CLOCK		XTAL_7MHz		/* clock for sound 68000 */
 #define OKI4_SOUND_CLOCK	XTAL_4MHz
 
@@ -663,7 +664,7 @@ static MACHINE_DRIVER_START( system_A )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD(YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz verified */
+	MDRV_SOUND_ADD(YM2151, SOUND_CPU_CLOCK/2) /* 3.5MHz (7MHz / 2) verified */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
@@ -735,7 +736,7 @@ MACHINE_DRIVER_END
 
                               1x68000 1xM6295
 
-KLOV entry for peekaboo: Jaleco board no. PB-92127A. Main CPU: Motorola 68000P10
+                                OSC: 8MHz
 
 ***************************************************************************/
 
@@ -743,7 +744,7 @@ KLOV entry for peekaboo: Jaleco board no. PB-92127A. Main CPU: Motorola 68000P10
 static MACHINE_DRIVER_START( system_D )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 8000000)	/* 8MHz?? */
+	MDRV_CPU_ADD(M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_D,writemem_D)
 	MDRV_CPU_VBLANK_INT("main", interrupt_D)
 
@@ -767,8 +768,8 @@ static MACHINE_DRIVER_START( system_D )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("OKI1",OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD_TAG("OKI1",OKIM6295, SYS_D_CPU_CLOCK/4)	/* 2MHz (8MHz / 4) */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2741,6 +2742,13 @@ INPUT_PORTS_END
 
                             [ Peek-a-Boo! ]
 
+Jaleco board no. PB-92127A
+
+  CPU: Motorola 68000P10
+Sound: OKI M6295
+  OSC: 8Mhz
+  MCU: MO-90233 (unknown type with internal rom)
+
 interrupts:
     1]      506>    rte
     2]      50a>    move.w  #$ffff, $1f0006.l
@@ -2827,7 +2835,7 @@ ROM_START( peekaboo )
 	ROM_LOAD16_BYTE( "j2", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
 
 	ROM_REGION( 0x40000, REGION_CPU2, 0 ) /* MCU Internal Code */
-	ROM_LOAD( "peekaboo.mcu", 0x000000, 0x40000, NO_DUMP )
+	ROM_LOAD( "mO-90233.mcu", 0x000000, 0x40000, NO_DUMP )
 
 	ROM_REGION( 0x080000, REGION_GFX1, ROMREGION_DISPOSE ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
