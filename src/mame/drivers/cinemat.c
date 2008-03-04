@@ -46,7 +46,6 @@
 static UINT16 *rambase;
 
 static UINT8 coin_detected;
-static UINT8 coin_last_input;
 static UINT8 coin_last_reset;
 
 static UINT8 mux_select;
@@ -62,7 +61,6 @@ static UINT8 mux_select;
 static MACHINE_START( cinemat )
 {
 	state_save_register_global(coin_detected);
-	state_save_register_global(coin_last_input);
 	state_save_register_global(coin_last_reset);
 	state_save_register_global(mux_select);
 }
@@ -72,7 +70,6 @@ MACHINE_RESET( cinemat )
 {
 	/* reset the coin states */
 	coin_detected = 0;
-	coin_last_input = 0x80;
 	coin_last_reset = 0;
 
 	/* reset mux select */
@@ -107,14 +104,11 @@ static READ8_HANDLER( switches_r )
  *
  *************************************/
 
-static INTERRUPT_GEN( check_coins )
+static INPUT_CHANGED( coin_inserted )
 {
-	UINT8 new_input = readinputportbytag("SWITCHES") & 0x80;
-
 	/* on the falling edge of a new coin, set the coin_detected flag */
-	if (coin_last_input != new_input && new_input == 0x00)
+	if (newval == 0)
 		coin_detected = 1;
-	coin_last_input = new_input;
 }
 
 
@@ -277,7 +271,7 @@ static READ8_HANDLER( qb3_frame_r )
 	attotime next_update = video_screen_get_time_until_update(0);
 	attotime frame_period = video_screen_get_frame_period(0);
 	int percent = next_update.attoseconds / (frame_period.attoseconds / 100);
-	
+
 	/* note this is just an approximation... */
 	return (percent >= 10);
 }
@@ -377,7 +371,7 @@ static INPUT_PORTS_START( spacewar )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -422,7 +416,7 @@ static INPUT_PORTS_START( barrier )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -455,7 +449,7 @@ static INPUT_PORTS_START( speedfrk )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("WHEEL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_RESET
@@ -500,7 +494,7 @@ static INPUT_PORTS_START( starhawk )
 	PORT_DIPNAME( 0x40,	0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -544,7 +538,7 @@ static INPUT_PORTS_START( sundance )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("PAD1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Pad 1") PORT_CODE(KEYCODE_7_PAD) PORT_PLAYER(1)
@@ -600,7 +594,7 @@ static INPUT_PORTS_START( tailg )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("ANALOGX")
 	PORT_BIT( 0xfff, 0x800, IPT_AD_STICK_X ) PORT_MINMAX(0x200,0xe00) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
@@ -645,7 +639,7 @@ static INPUT_PORTS_START( warrior )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -681,7 +675,7 @@ static INPUT_PORTS_START( armora )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -717,7 +711,7 @@ static INPUT_PORTS_START( ripoff )
 	PORT_DIPSETTING(	0x00, "Individual" )
 	PORT_DIPSETTING(	0x20, "Combined" )
 	PORT_SERVICE( 0x40,	IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -754,7 +748,7 @@ static INPUT_PORTS_START( starcas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -788,7 +782,7 @@ static INPUT_PORTS_START( solarq )
 	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40,	IP_ACTIVE_HIGH )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -824,7 +818,7 @@ static INPUT_PORTS_START( boxingb )
 	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40,	IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START_TAG("DIAL")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_REVERSE PORT_SENSITIVITY(100) PORT_KEYDELTA(5)
@@ -866,7 +860,7 @@ static INPUT_PORTS_START( wotw )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -908,7 +902,7 @@ static INPUT_PORTS_START( demon )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -954,7 +948,7 @@ static INPUT_PORTS_START( qb3 )
 	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40,	IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -995,14 +989,13 @@ static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 	MDRV_CPU_PROGRAM_MAP(program_map_4k,0)
 	MDRV_CPU_DATA_MAP(data_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", check_coins)
 
 	MDRV_MACHINE_START(cinemat)
 	MDRV_MACHINE_RESET(cinemat)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	
+
 	MDRV_SCREEN_ADD("main", VECTOR)
 	MDRV_SCREEN_REFRESH_RATE(MASTER_CLOCK/4/16/16/16/16/2)
 	MDRV_SCREEN_SIZE(1024, 768)
