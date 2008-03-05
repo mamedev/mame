@@ -1940,10 +1940,10 @@ static int remove_clear_extent(const render_bounds *bounds)
 	INT32 *max = &clear_extents[MAX_CLEAR_EXTENTS];
 	INT32 *last = &clear_extents[clear_extent_count];
 	INT32 *ext = &clear_extents[0];
-	INT32 boundsx0 = (UINT32) ceil(bounds->x0);
-	INT32 boundsx1 = (INT32) floor(bounds->x1);
-	INT32 boundsy0 = (INT32) ceil(bounds->y0);
-	INT32 boundsy1 = (INT32) floor(bounds->y1);
+	INT32 boundsx0 = ceil(bounds->x0);
+	INT32 boundsx1 = floor(bounds->x1);
+	INT32 boundsy0 = ceil(bounds->y0);
+	INT32 boundsy1 = floor(bounds->y1);
 	INT32 y0, y1 = 0;
 
 	/* loop over Y extents */
