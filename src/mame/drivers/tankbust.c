@@ -91,7 +91,7 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	switch (offset)
 	{
 	case 0:	/* 0xe000 interrupt enable */
-		interrupt_enable_w(0,data);
+		interrupt_enable_w(machine,0,data);
 	break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */

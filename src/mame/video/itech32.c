@@ -1410,22 +1410,22 @@ READ16_HANDLER( itech32_video_r )
 
 WRITE16_HANDLER( bloodstm_video_w )
 {
-	itech32_video_w(offset / 2, data, mem_mask);
+	itech32_video_w(machine, offset / 2, data, mem_mask);
 }
 
 
 READ16_HANDLER( bloodstm_video_r )
 {
-	return itech32_video_r(offset / 2,0);
+	return itech32_video_r(machine, offset / 2,0);
 }
 
 
 WRITE32_HANDLER( itech020_video_w )
 {
 	if (ACCESSING_MSW32)
-		itech32_video_w(offset, data >> 16, mem_mask >> 16);
+		itech32_video_w(machine, offset, data >> 16, mem_mask >> 16);
 	else
-		itech32_video_w(offset, data, mem_mask);
+		itech32_video_w(machine, offset, data, mem_mask);
 }
 
 
@@ -1438,7 +1438,7 @@ WRITE32_HANDLER( drivedge_zbuf_control_w )
 
 READ32_HANDLER( itech020_video_r )
 {
-	int result = itech32_video_r(offset,0);
+	int result = itech32_video_r(machine,offset,0);
 	return (result << 16) | result;
 }
 

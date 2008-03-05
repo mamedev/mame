@@ -45,9 +45,9 @@ static WRITE8_HANDLER( bankedram_w )
 	if (videobank & 0x01)
 	{
 		if (videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	}
 	else
 		ram[offset] = data;
@@ -56,17 +56,17 @@ static WRITE8_HANDLER( bankedram_w )
 static READ8_HANDLER( parodius_052109_053245_r )
 {
 	if (videobank & 0x02)
-		return K053245_r(offset);
+		return K053245_r(machine,offset);
 	else
-		return K052109_r(offset);
+		return K052109_r(machine,offset);
 }
 
 static WRITE8_HANDLER( parodius_052109_053245_w )
 {
 	if (videobank & 0x02)
-		K053245_w(offset,data);
+		K053245_w(machine,offset,data);
 	else
-		K052109_w(offset,data);
+		K052109_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( parodius_videobank_w )
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( parodius_3fc0_w )
 
 static READ8_HANDLER( parodius_sound_r )
 {
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine,2 + offset);
 }
 
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )

@@ -347,8 +347,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_LSB)
 	{
 		pending_command = 1;
-		soundlatch_w(0, data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine, 0, data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

@@ -599,9 +599,9 @@ static int active_8910,port0a;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return AY8910_read_port_0_r(0);
+		return AY8910_read_port_0_r(machine,0);
 	else
-		return AY8910_read_port_1_r(0);
+		return AY8910_read_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -619,9 +619,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			AY8910_control_port_0_w(0,port0a);
+			AY8910_control_port_0_w(machine,0,port0a);
 		else
-			AY8910_write_port_0_w(0,port0a);
+			AY8910_write_port_0_w(machine,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -634,9 +634,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			AY8910_control_port_1_w(0,port0a);
+			AY8910_control_port_1_w(machine,0,port0a);
 		else
-			AY8910_write_port_1_w(0,port0a);
+			AY8910_write_port_1_w(machine,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -683,7 +683,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	static int toggle;
 
-	pia_0_cb1_w(0,toggle & 1);
+	pia_0_cb1_w(machine,0,toggle & 1);
 	toggle ^= 1;
 }
 

@@ -149,13 +149,13 @@ WRITE16_HANDLER( btoads_scroll1_w )
 
 WRITE16_HANDLER( btoads_paletteram_w )
 {
-	tlc34076_lsb_w(offset/2, data, mem_mask);
+	tlc34076_lsb_w(machine, offset/2, data, mem_mask);
 }
 
 
 READ16_HANDLER( btoads_paletteram_r )
 {
-	return tlc34076_lsb_r(offset/2, mem_mask);
+	return tlc34076_lsb_r(machine, offset/2, mem_mask);
 }
 
 

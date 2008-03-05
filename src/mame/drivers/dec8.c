@@ -95,7 +95,7 @@ static int msm5205next;
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static VIDEO_EOF( dec8 )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }
 
 static READ8_HANDLER( i8751_h_r )
@@ -426,14 +426,14 @@ static WRITE8_HANDLER( csilver_control_w )
 
 static WRITE8_HANDLER( dec8_sound_w )
 {
- 	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+ 	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER( oscar_sound_w )
 {
- 	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+ 	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static void csilver_adpcm_int(int data)

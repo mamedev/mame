@@ -99,8 +99,8 @@ static READ8_HANDLER( exprraid_protection_r )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-    soundlatch_w(0,data);
-    cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+    soundlatch_w(machine,0,data);
+    cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )

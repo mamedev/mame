@@ -97,26 +97,26 @@ static WRITE8_HANDLER( outport24_w )
 static WRITE8_HANDLER( hvymetal_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(0, data);
+	system1_videomode_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( brain_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(0, data);
+	system1_videomode_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( chplft_videomode_w )
 {
 	memory_set_bank(1, (data & 0x0c)>>2);
-	system1_videomode_w(0, data);
+	system1_videomode_w(machine, 0, data);
 }
 
 
 static WRITE8_HANDLER( system1_soundport_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }
@@ -4789,7 +4789,7 @@ static READ8_HANDLER( dakkochn_port_04_r )
 static WRITE8_HANDLER( dakkochn_port_15_w )
 {
 	dakkochn_control = data; // check if any control multiplex bits are in here!
-	chplft_videomode_w(offset,data);
+	chplft_videomode_w(machine,offset,data);
 }
 
 static DRIVER_INIT( dakkochn )

@@ -144,6 +144,7 @@ REF. 970429
 
 #include "driver.h"
 #include "deprecat.h"
+#include "memconv.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -252,7 +253,7 @@ static WRITE16_HANDLER( irq_ack_w )
 {
 	cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 }
-static WRITE32_HANDLER( irq_ack_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0000) irq_ack_w(offset, data >> 16, mem_mask >> 16); }
+static WRITE32_HANDLER( irq_ack_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0000) irq_ack_w(machine, offset, data >> 16, mem_mask >> 16); }
 
 
 
@@ -270,7 +271,7 @@ static READ16_HANDLER( eeprom_data_r )
 	logerror("eeprom_data_r(%02X)\n", result);
 	return result;
 }
-static READ32_HANDLER( eeprom_data_020_r ) { return eeprom_data_r(offset, mem_mask) << 16; }
+static READ32_HANDLER( eeprom_data_020_r ) { return eeprom_data_r(machine, offset, mem_mask) << 16; }
 
 
 static WRITE16_HANDLER( eeprom_data_w )
@@ -278,7 +279,7 @@ static WRITE16_HANDLER( eeprom_data_w )
 	if (!(mem_mask & 0xff))
 		EEPROM_write_bit(data & 0x01);
 }
-static WRITE32_HANDLER( eeprom_data_020_w ) { if ((mem_mask & 0xffff) != 0xffff) eeprom_data_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( eeprom_data_020_w ) { if ((mem_mask & 0xffff) != 0xffff) eeprom_data_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( eeprom_clock_w )
@@ -286,7 +287,7 @@ static WRITE16_HANDLER( eeprom_clock_w )
 	if (!(mem_mask & 0xff))
 		EEPROM_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
-static WRITE32_HANDLER( eeprom_clock_020_w ) { if ((mem_mask & 0xffff) != 0xffff) eeprom_clock_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( eeprom_clock_020_w ) { if ((mem_mask & 0xffff) != 0xffff) eeprom_clock_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( eeprom_cs_w )
@@ -294,7 +295,7 @@ static WRITE16_HANDLER( eeprom_cs_w )
 	if (!(mem_mask & 0xff))
 		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( eeprom_cs_020_w ) { if ((mem_mask & 0xffff) != 0xffff) eeprom_cs_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( eeprom_cs_020_w ) { if ((mem_mask & 0xffff) != 0xffff) eeprom_cs_w(machine, offset, data, mem_mask); }
 
 
 
@@ -318,7 +319,7 @@ static WRITE16_HANDLER( sound_data_w )
 	if (!(mem_mask & 0xff))
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
-static WRITE32_HANDLER( sound_data_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0000) sound_data_w(offset, data >> 16, mem_mask >> 16); }
+static WRITE32_HANDLER( sound_data_020_w ) { if ((mem_mask & 0xffff0000) != 0xffff0000) sound_data_w(machine, offset, data >> 16, mem_mask >> 16); }
 
 
 static READ16_HANDLER( sound_data_r )
@@ -336,7 +337,7 @@ static READ16_HANDLER( sound_status_r )
 		return sound_status;
 	return 0xffff;
 }
-static READ32_HANDLER( sound_status_020_r ) { if ((mem_mask & 0x0000ffff) != 0x0000ffff) return sound_status_r(offset, mem_mask); return ~0; }
+static READ32_HANDLER( sound_status_020_r ) { if ((mem_mask & 0x0000ffff) != 0x0000ffff) return sound_status_r(machine, offset, mem_mask); return ~0; }
 
 
 static WRITE16_HANDLER( sound_status_w )
@@ -361,7 +362,7 @@ static READ32_HANDLER( input_port_3_020_r ) { return readinputport(3) << 16; }
 
 static CUSTOM_INPUT( analog_bit_r )
 {
-	int which = (FPTR)param;
+	int which = (FPTR)machine;
 	return (analog_ports[which] >> 7) & 0x01;
 }
 
@@ -382,7 +383,7 @@ static WRITE16_HANDLER( analog_port_clock_w )
 	else
 		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( analog_port_clock_020_w ) { if ((mem_mask & 0xffff) != 0xffff) analog_port_clock_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( analog_port_clock_020_w ) { if ((mem_mask & 0xffff) != 0xffff) analog_port_clock_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( analog_port_latch_w )
@@ -401,7 +402,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 	else
 		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( analog_port_latch_020_w ) { if ((mem_mask & 0xffff) != 0xffff) analog_port_latch_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( analog_port_latch_020_w ) { if ((mem_mask & 0xffff) != 0xffff) analog_port_latch_w(machine, offset, data, mem_mask); }
 
 
 
@@ -445,7 +446,7 @@ static WRITE16_HANDLER( tms_reset_w )
 	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( tms_reset_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_reset_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( tms_reset_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_reset_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_irq_w )
@@ -456,14 +457,14 @@ static WRITE16_HANDLER( tms_irq_w )
 	if (!(mem_mask & 0xff))
 		cpunum_set_input_line(Machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( tms_irq_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_irq_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( tms_irq_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_irq_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_control3_w )
 {
 	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( tms_control3_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_control3_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( tms_control3_020_w ) { if ((mem_mask & 0xffff) != 0xffff) tms_control3_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_comm_w )
@@ -471,11 +472,7 @@ static WRITE16_HANDLER( tms_comm_w )
 	COMBINE_DATA(&tms_comm_base[offset ^ tms_offset_xor]);
 	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset*2, data, ~mem_mask);
 }
-static WRITE32_HANDLER( tms_comm_020_w )
-{
-	if ((mem_mask & 0xffff0000) != 0xffff0000) tms_comm_w(offset * 2 + 0, data >> 16, mem_mask >> 16);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff) tms_comm_w(offset * 2 + 1, data, mem_mask);
-}
+static WRITE32_HANDLER( tms_comm_020_w ) { write32be_with_16be_handler(tms_comm_w, machine, offset, data, mem_mask); }
 
 
 
@@ -711,7 +708,7 @@ static WRITE16_HANDLER( led_0_w )
 	if (!(mem_mask & 0xff))
 		set_led_status(0, data != 0);
 }
-static WRITE32_HANDLER( led_0_020_w ) { if ((mem_mask & 0xffff) != 0xffff) led_0_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( led_0_020_w ) { if ((mem_mask & 0xffff) != 0xffff) led_0_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( led_1_w )
@@ -720,7 +717,7 @@ static WRITE16_HANDLER( led_1_w )
 	if (!(mem_mask & 0xff))
 		set_led_status(1, data != 0);
 }
-static WRITE32_HANDLER( led_1_020_w ) { if ((mem_mask & 0xffff) != 0xffff) led_1_w(offset, data, mem_mask); }
+static WRITE32_HANDLER( led_1_020_w ) { if ((mem_mask & 0xffff) != 0xffff) led_1_w(machine, offset, data, mem_mask); }
 
 
 

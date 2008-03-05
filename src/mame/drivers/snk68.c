@@ -127,8 +127,8 @@ static WRITE16_HANDLER( protection_w )
 
 static WRITE16_HANDLER( sound_w )
 {
-	soundlatch_w(0,(data>>8)&0xff);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,0,(data>>8)&0xff);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 /*******************************************************************************/

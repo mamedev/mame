@@ -349,7 +349,7 @@ VIDEO_UPDATE( undrfire )
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
 
-	if (input_port_7_word_r(0,0) & 0x1)	/* Fake DSW */
+	if (input_port_7_word_r(machine,0,0) & 0x1)	/* Fake DSW */
 	{
 		popmessage("Gunsights on");
 	}

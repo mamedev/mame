@@ -853,14 +853,14 @@ static READ32_HANDLER( spi_unknown_r )
 static WRITE32_HANDLER( ds2404_reset_w )
 {
 	if( ACCESSING_LSB32 ) {
-		DS2404_1W_reset_w(offset, data);
+		DS2404_1W_reset_w(machine, offset, data);
 	}
 }
 
 static READ32_HANDLER( ds2404_data_r )
 {
 	if( ACCESSING_LSB32 ) {
-		return DS2404_data_r(offset);
+		return DS2404_data_r(machine, offset);
 	}
 	return 0;
 }
@@ -868,14 +868,14 @@ static READ32_HANDLER( ds2404_data_r )
 static WRITE32_HANDLER( ds2404_data_w )
 {
 	if( ACCESSING_LSB32 ) {
-		DS2404_data_w(offset, data);
+		DS2404_data_w(machine, offset, data);
 	}
 }
 
 static WRITE32_HANDLER( ds2404_clk_w )
 {
 	if( ACCESSING_LSB32 ) {
-		DS2404_clk_w(offset, data);
+		DS2404_clk_w(machine, offset, data);
 	}
 }
 
@@ -938,25 +938,25 @@ static READ32_HANDLER( spi_controls2_r )
 
 static READ32_HANDLER( spi_6295_0_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine, 0);
 }
 
 static READ32_HANDLER( spi_6295_1_r )
 {
-	return OKIM6295_status_1_r(0);
+	return OKIM6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER( spi_6295_0_w )
 {
 	if( ACCESSING_LSB32 ) {
-		OKIM6295_data_0_w(0, data & 0xff);
+		OKIM6295_data_0_w(machine, 0, data & 0xff);
 	}
 }
 
 static WRITE32_HANDLER( spi_6295_1_w )
 {
 	if( ACCESSING_LSB32 ) {
-		OKIM6295_data_1_w(0, data & 0xff);
+		OKIM6295_data_1_w(machine, 0, data & 0xff);
 	}
 }
 

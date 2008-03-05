@@ -72,7 +72,7 @@ static WRITE8_HANDLER( aso_scroll_sync_w )
 	aso_scroll_sync[offset] = data;
 }
 
-static void hal21_sound_scheduler(int mode, int data)
+static void hal21_sound_scheduler(running_machine *machine, int mode, int data)
 {
 	static int busy, hold, ffcount, ffhead, fftail;
 
@@ -116,8 +116,8 @@ static void hal21_sound_scheduler(int mode, int data)
 	}
 
 	snk_sound_busy_bit = 0x20;
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /**************************************************************************/
@@ -551,28 +551,28 @@ GFXDECODE_END
 
 static READ8_HANDLER( CPUC_ready_r ) { snk_sound_busy_bit = 0; return 0; }
 
-static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_0_r(0) | snk_sound_busy_bit; }
+static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_0_r(machine,0) | snk_sound_busy_bit; }
 
-static WRITE8_HANDLER( hal21_soundcommand_w ) { hal21_sound_scheduler(1, data); }
-static WRITE8_HANDLER( hal21_soundack_w ) { hal21_sound_scheduler(2, data); }
+static WRITE8_HANDLER( hal21_soundcommand_w ) { hal21_sound_scheduler(machine, 1, data); }
+static WRITE8_HANDLER( hal21_soundack_w ) { hal21_sound_scheduler(machine,2, data); }
 
 static READ8_HANDLER( hal21_soundcommand_r )
 {
-	int data = soundlatch_r(0);
-	soundlatch_clear_w(0, 0);
+	int data = soundlatch_r(machine, 0);
+	soundlatch_clear_w(machine, 0, 0);
 	return data;
 }
 
 static WRITE8_HANDLER( aso_soundcommand_w )
 {
 	snk_sound_busy_bit = 0x20;
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE );
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
 }
 
 static INTERRUPT_GEN( hal21_sound_interrupt )
 {
-	hal21_sound_scheduler(3, 0);
+	hal21_sound_scheduler(machine, 3, 0);
 }
 
 /**************************************************************************/
@@ -691,7 +691,7 @@ static DRIVER_INIT( hal21 )
 static MACHINE_RESET( aso )
 {
 	memset(hal21_vreg, 0, 8);
-	hal21_sound_scheduler(0, 0);
+	hal21_sound_scheduler(machine, 0, 0);
 	snk_sound_busy_bit = 0;
 }
 

@@ -97,12 +97,12 @@ static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 	upd7759_reset_w(0, data & 2);
 	upd7759_start_w(0, data & 1);
 
-	interrupt_enable_w(0,data & 4);
+	interrupt_enable_w(machine,0,data & 4);
 }
 
 static WRITE8_HANDLER( devstor_sh_irqcontrol_w )
 {
-interrupt_enable_w(0,data & 4);
+	interrupt_enable_w(machine,0,data & 4);
 }
 
 static WRITE8_HANDLER( mainevt_sh_bankswitch_w )

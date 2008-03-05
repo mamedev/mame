@@ -280,7 +280,7 @@ static WRITE8_HANDLER( vsnormal_vrom_banking )
 	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
 
 	/* move along */
-	vsnes_in0_w( offset, data );
+	vsnes_in0_w( machine, offset, data );
 }
 
 /* Most games switch VROM Banks in controller 0 write */
@@ -295,14 +295,13 @@ static WRITE8_HANDLER( ppuRC2C05_protection )
 {
 	/* This PPU has registers mapped at $2000 and $2001 inverted */
 	/* and no remapped color */
-
 	if ( offset == 0 )
 	{
-		ppu2c0x_0_w( 1, data );
+		ppu2c0x_0_w( machine, 1, data );
 		return;
 	}
 
-	ppu2c0x_0_w( 0, data );
+	ppu2c0x_0_w( machine, 0, data );
 }
 
 /**********************************************************************************/
@@ -498,7 +497,7 @@ DRIVER_INIT( hogalley )
 static READ8_HANDLER( vsgshoe_security_r )
 {
 	/* low part must be 0x1c */
-	return ppu2c0x_0_r( 2 ) | 0x1c;
+	return ppu2c0x_0_r( machine, 2 ) | 0x1c;
 }
 
 static WRITE8_HANDLER( vsgshoe_gun_in0_w )
@@ -512,7 +511,7 @@ static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 		memcpy (&memory_region( REGION_CPU1 )[0x08000], &memory_region( REGION_CPU1 )[addr], 0x2000);
 	}
 
-	gun_in0_w(offset, data);
+	gun_in0_w(machine, offset, data);
 }
 
 DRIVER_INIT( vsgshoe )
@@ -773,7 +772,7 @@ DRIVER_INIT( cstlevna )
 static READ8_HANDLER( topgun_security_r )
 {
 	/* low part must be 0x1b */
-	return ppu2c0x_0_r( 2 ) | 0x1b;
+	return ppu2c0x_0_r( machine, 2 ) | 0x1b;
 }
 
 DRIVER_INIT( topgun )
@@ -1212,7 +1211,7 @@ DRIVER_INIT( bnglngby )
 static READ8_HANDLER( jajamaru_security_r )
 {
 	/* low part must be 0x40 */
-	return ppu2c0x_0_r( 2 ) | 0x40;
+	return ppu2c0x_0_r( machine, 2 ) | 0x40;
 }
 
 DRIVER_INIT( jajamaru )
@@ -1239,7 +1238,7 @@ DRIVER_INIT( jajamaru )
 static READ8_HANDLER( mightybj_security_r )
 {
 	/* low part must be 0x3d */
-	return ppu2c0x_0_r( 2 ) | 0x3d;
+	return ppu2c0x_0_r( machine, 2 ) | 0x3d;
 }
 
 DRIVER_INIT( mightybj )
@@ -1267,9 +1266,9 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 
 	/* move along */
 	if ( cpu_getactivecpu() == 0 )
-		vsnes_in0_w( offset, data );
+		vsnes_in0_w( machine, offset, data );
 	else
-		vsnes_in0_1_w( offset, data );
+		vsnes_in0_1_w( machine, offset, data );
 }
 
 DRIVER_INIT( vstennis )

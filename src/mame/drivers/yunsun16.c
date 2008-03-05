@@ -158,8 +158,8 @@ number 0 on each voice. That sample is 00000-00000.
 */
 		if ((data&0xff)!=0x3a)
 		{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }

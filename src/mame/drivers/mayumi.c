@@ -41,7 +41,7 @@ static WRITE8_HANDLER( bank_sel_w )
 
 static MACHINE_RESET( mayumi )
 {
-	bank_sel_w(0,0);
+	bank_sel_w(machine,0,0);
 }
 
 static WRITE8_HANDLER( input_sel_w )

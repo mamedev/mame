@@ -277,11 +277,11 @@ logerror("%04x: write %02x to port 80\n",activecpu_get_pc(),data);
 
 		for (offs = 0; offs < videoram_size; offs++)
 		{
-			galivan_videoram_w(offs, 0x20);
+			galivan_videoram_w(machine, offs, 0x20);
 		}
 		for (offs = 0; offs < videoram_size; offs++)
 		{
-			galivan_colorram_w(offs, 0x03);
+			galivan_colorram_w(machine, offs, 0x03);
 		}
 	}
 

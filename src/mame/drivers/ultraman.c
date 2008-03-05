@@ -24,82 +24,82 @@ VIDEO_UPDATE( ultraman );
 
 static READ16_HANDLER( ultraman_K051937_r )
 {
-	return K051937_r(offset);
+	return K051937_r(machine, offset);
 }
 
 static READ16_HANDLER( ultraman_K051960_r )
 {
-	return K051960_r(offset);
+	return K051960_r(machine, offset);
 }
 
 static READ16_HANDLER( ultraman_K051316_0_r )
 {
-	return K051316_0_r(offset);
+	return K051316_0_r(machine, offset);
 }
 
 static READ16_HANDLER( ultraman_K051316_1_r )
 {
-	return K051316_1_r(offset);
+	return K051316_1_r(machine, offset);
 }
 
 static READ16_HANDLER( ultraman_K051316_2_r )
 {
-	return K051316_2_r(offset);
+	return K051316_2_r(machine, offset);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_0_w )
 {
 	if (ACCESSING_LSB)
-		K051316_0_w(offset, data & 0xff);
+		K051316_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_1_w )
 {
 	if (ACCESSING_LSB)
-		K051316_1_w(offset, data & 0xff);
+		K051316_1_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_2_w )
 {
 	if (ACCESSING_LSB)
-		K051316_2_w(offset, data & 0xff);
+		K051316_2_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_0_w )
 {
 	if (ACCESSING_LSB)
-		K051316_ctrl_0_w(offset, data & 0xff);
+		K051316_ctrl_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_1_w )
 {
 	if (ACCESSING_LSB)
-		K051316_ctrl_1_w(offset, data & 0xff);
+		K051316_ctrl_1_w(machine, offset, data & 0xff);
 
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_2_w )
 {
 	if (ACCESSING_LSB)
-		K051316_ctrl_2_w(offset, data & 0xff);
+		K051316_ctrl_2_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051937_w )
 {
 	if (ACCESSING_LSB)
-		K051937_w(offset, data & 0xff);
+		K051937_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051960_w )
 {
 	if (ACCESSING_LSB)
-		K051960_w(offset, data & 0xff);
+		K051960_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_irq_trigger_w )

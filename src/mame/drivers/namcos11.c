@@ -765,7 +765,7 @@ ADDRESS_MAP_END
 static const struct
 {
 	const char *s_name;
-	read32_handler keycus_r;
+	read32_machine_func keycus_r;
 	int n_daughterboard;
 } namcos11_config_table[] =
 {

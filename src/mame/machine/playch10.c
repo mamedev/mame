@@ -44,8 +44,8 @@ MACHINE_RESET( pc10 )
 
 	/* reset the security chip */
 	RP5H01_enable_w( 0, 0 );
-	RP5H01_0_reset_w( 0, 0 );
-	RP5H01_0_reset_w( 0, 1 );
+	RP5H01_0_reset_w( machine, 0, 0 );
+	RP5H01_0_reset_w( machine, 0, 1 );
 	RP5H01_enable_w( 0, 1 );
 
 	/* reset the ppu */
@@ -142,10 +142,10 @@ READ8_HANDLER( pc10_prot_r )
 	/* we only support a single cart connected at slot 0 */
 	if ( cart_sel == 0 )
 	{
-		RP5H01_0_enable_w( 0, 0 );
+		RP5H01_0_enable_w( machine, 0, 0 );
 		data |= ( ( ~RP5H01_counter_r( 0 ) ) << 4 ) & 0x10;	/* D4 */
 		data |= ( ( RP5H01_data_r( 0 ) ) << 3 ) & 0x08;		/* D3 */
-		RP5H01_0_enable_w( 0, 1 );
+		RP5H01_0_enable_w( machine, 0, 1 );
 	}
 	return data;
 }
@@ -155,18 +155,18 @@ WRITE8_HANDLER( pc10_prot_w )
 	/* we only support a single cart connected at slot 0 */
 	if ( cart_sel == 0 )
 	{
-		RP5H01_0_enable_w( 0, 0 );
-		RP5H01_0_test_w( 0, data & 0x10 );		/* D4 */
-		RP5H01_0_clock_w( 0, data & 0x08 );		/* D3 */
-		RP5H01_0_reset_w( 0, ~data & 0x01 );	/* D0 */
-		RP5H01_0_enable_w( 0, 1 );
+		RP5H01_0_enable_w( machine, 0, 0 );
+		RP5H01_0_test_w( machine, 0, data & 0x10 );		/* D4 */
+		RP5H01_0_clock_w( machine, 0, data & 0x08 );		/* D3 */
+		RP5H01_0_reset_w( machine, 0, ~data & 0x01 );	/* D0 */
+		RP5H01_0_enable_w( machine, 0, 1 );
 
 		/* this thing gets dense at some point                      */
 		/* it wants to jump and execute an opcode at $ffff, wich    */
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		memory_region( REGION_CPU1 )[0xffff] = pc10_prot_r(0);
+		memory_region( REGION_CPU1 )[0xffff] = pc10_prot_r(machine,0);
 	}
 }
 

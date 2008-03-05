@@ -89,7 +89,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(0,data);
+	soundlatch_w(machine,0,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( victnine_port_5_r )
 {
-	return (victnine_mcu_status_r(0) & 3) | (readinputport(5) & ~3);
+	return (victnine_mcu_status_r(machine,0) & 3) | (readinputport(5) & ~3);
 }
 
 static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )

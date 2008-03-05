@@ -306,7 +306,7 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 WRITE16_HANDLER( midxunit_paletteram_w )
 {
 	if (!(offset & 1))
-		midtunit_paletteram_w(offset / 2, data, mem_mask);
+		midtunit_paletteram_w(machine, offset / 2, data, mem_mask);
 }
 
 

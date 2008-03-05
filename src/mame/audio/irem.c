@@ -38,9 +38,9 @@ static SOUND_START( irem_audio )
 WRITE8_HANDLER( irem_sound_cmd_w )
 {
 	if ((data & 0x80) == 0)
-		soundlatch_w(0, data & 0x7f);
+		soundlatch_w(machine, 0, data & 0x7f);
 	else
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 }
 
 
@@ -59,6 +59,7 @@ static WRITE8_HANDLER( m6803_port1_w )
 
 static WRITE8_HANDLER( m6803_port2_w )
 {
+
 	/* write latch */
 	if ((port2 & 0x01) && !(data & 0x01))
 	{
@@ -67,17 +68,17 @@ static WRITE8_HANDLER( m6803_port2_w )
 		{
 			/* PSG 0 or 1? */
 			if (port2 & 0x08)
-				AY8910_control_port_0_w(0,port1);
+				AY8910_control_port_0_w(machine, 0, port1);
 			if (port2 & 0x10)
-				AY8910_control_port_1_w(0,port1);
+				AY8910_control_port_1_w(machine, 0, port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
 			if (port2 & 0x08)
-				AY8910_write_port_0_w(0,port1);
+				AY8910_write_port_0_w(machine, 0, port1);
 			if (port2 & 0x10)
-				AY8910_write_port_1_w(0,port1);
+				AY8910_write_port_1_w(machine, 0, port1);
 		}
 	}
 	port2 = data;
@@ -95,9 +96,9 @@ static READ8_HANDLER( m6803_port1_r )
 {
 	/* PSG 0 or 1? */
 	if (port2 & 0x08)
-		return AY8910_read_port_0_r(0);
+		return AY8910_read_port_0_r(machine, 0);
 	if (port2 & 0x10)
-		return AY8910_read_port_1_r(0);
+		return AY8910_read_port_1_r(machine, 0);
 	return 0xff;
 }
 

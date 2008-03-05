@@ -611,8 +611,8 @@ WRITE8_HANDLER( dec0_pf3_control_8bit_w )
 	offset&=0xffe;
 	myword=buffer[offset] + (buffer[offset+1]<<8);
 
-	if (offset<0x10) dec0_pf3_control_0_w(offset/2,myword,0);
-	else dec0_pf3_control_1_w((offset-0x10)/2,myword,0);
+	if (offset<0x10) dec0_pf3_control_0_w(machine,offset/2,myword,0);
+	else dec0_pf3_control_1_w(machine,(offset-0x10)/2,myword,0);
 }
 
 WRITE8_HANDLER( dec0_pf3_data_8bit_w )

@@ -100,11 +100,11 @@ WRITE8_HANDLER( deco16_io_w )
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			cpunum_set_input_line(Machine, 0,DECO16_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,DECO16_IRQ_LINE,CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(0,data);
-			cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+			soundlatch_w(machine,0,data);
+			cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 	}
 }
@@ -147,7 +147,7 @@ VIDEO_START( liberate )
 WRITE8_HANDLER( prosport_paletteram_w )
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(offset,~data);
+	paletteram_BBGGGRRR_w(machine,offset,~data);
 }
 
 PALETTE_INIT( liberate )

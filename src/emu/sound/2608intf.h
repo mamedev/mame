@@ -5,10 +5,10 @@
 
 struct YM2608interface
 {
-	read8_handler portAread;
-	read8_handler portBread;
-	write8_handler portAwrite;
-	write8_handler portBwrite;
+	read8_machine_func portAread;
+	read8_machine_func portBread;
+	write8_machine_func portAwrite;
+	write8_machine_func portBwrite;
 	void ( *handler )( int irq );	/* IRQ handler for the YM2608 */
 	int pcmrom;		/* Delta-T memory region ram/rom */
 };

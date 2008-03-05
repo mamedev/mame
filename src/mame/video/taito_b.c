@@ -157,12 +157,12 @@ WRITE16_HANDLER( hitice_pixel_scroll_w )
 	COMBINE_DATA(&pixel_scroll[offset]);
 }
 
-static void hitice_clear_pixel_bitmap(void)
+static void hitice_clear_pixel_bitmap(running_machine *machine)
 {
 	int i;
 
     for (i = 0;i < 0x40000;i++)
-		hitice_pixelram_w(i,0,0);
+		hitice_pixelram_w(machine,i,0,0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -285,7 +285,7 @@ VIDEO_START( hitice )
 VIDEO_RESET( hitice )
 {
 	/* kludge: clear the bitmap on startup */
-	hitice_clear_pixel_bitmap();
+	hitice_clear_pixel_bitmap(machine);
 }
 
 

@@ -278,7 +278,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 	if (ACCESSING_MSW32)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",activecpu_get_pc(),data,mem_mask);
-		soundlatch_word_w(0,data >> 16,0);
+		soundlatch_word_w(machine,0,data >> 16,0);
 		sndpending = 1;
 		cpunum_set_input_line(Machine, 1,2,HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
@@ -290,7 +290,7 @@ static READ16_HANDLER( macrossp_soundcmd_r )
 {
 //  logerror("%06x read soundcmd\n",activecpu_get_pc());
 	sndpending = 0;
-	return soundlatch_word_r(offset,mem_mask);
+	return soundlatch_word_r(machine,offset,mem_mask);
 }
 
 

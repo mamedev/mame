@@ -111,7 +111,7 @@ static VIDEO_UPDATE( alg )
 
 	/* update the Amiga video */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		amiga_render_scanline(amiga_bitmap, y);
+		amiga_render_scanline(machine, amiga_bitmap, y);
 
 	/* at the end of the frame, composite the video */
 	if (!video_skip_this_frame() && (cliprect->max_y == machine->screen[screen].visarea.max_y))

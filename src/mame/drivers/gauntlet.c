@@ -168,7 +168,7 @@ static void scanline_update(running_machine *machine, int scrnum, int scanline)
 	if (scanline & 32)
 		atarigen_6502_irq_gen(machine, 0);
 	else
-		atarigen_6502_irq_ack_r(0);
+		atarigen_6502_irq_ack_r(machine, 0);
 }
 
 
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 		case 1:	/* speech write, bit D7, active low */
 			if (((data ^ last_speech_write) & 0x80) && (data & 0x80))
-				tms5220_data_w(0, speech_val);
+				tms5220_data_w(machine, 0, speech_val);
 			last_speech_write = data;
 			break;
 

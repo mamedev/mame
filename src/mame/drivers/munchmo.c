@@ -58,8 +58,8 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
-	soundlatch_w( offset, data );
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
+	soundlatch_w( machine, offset, data );
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_ack_w )

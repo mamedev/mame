@@ -443,7 +443,7 @@ VIDEO_UPDATE( centiped )
 
 VIDEO_UPDATE( warlords )
 {
-	int upright_mode = input_port_0_r(0) & 0x80;
+	int upright_mode = input_port_0_r(machine, 0) & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */

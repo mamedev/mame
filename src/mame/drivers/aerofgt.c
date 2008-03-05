@@ -108,8 +108,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_LSB)
 	{
 		pending_command = 1;
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -118,8 +118,8 @@ static WRITE16_HANDLER( turbofrc_sound_command_w )
 	if (ACCESSING_MSB)
 	{
 		pending_command = 1;
-		soundlatch_w(offset,(data >> 8) & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,offset,(data >> 8) & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -127,8 +127,8 @@ static WRITE16_HANDLER( aerfboot_soundlatch_w )
 {
 	if(data & 0x8000)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -151,7 +151,7 @@ static WRITE8_HANDLER( aerofgt_sh_bankswitch_w )
 
 static MACHINE_RESET( aerofgt )
 {
-	aerofgt_sh_bankswitch_w(0,0);	/* needed by spinlbrk */
+	aerofgt_sh_bankswitch_w(machine,0,0);	/* needed by spinlbrk */
 }
 
 

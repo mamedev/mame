@@ -70,34 +70,34 @@ static READ16_HANDLER( bishi_mirror_r )
 
 static READ16_HANDLER( bishi_sound_r )
 {
-	return YMZ280B_status_0_r(offset)<<8;
+	return YMZ280B_status_0_r(machine, offset)<<8;
 }
 
 static WRITE16_HANDLER( bishi_sound_w )
 {
  	if (offset)
 	{
-		YMZ280B_data_0_w(offset, data>>8);
+		YMZ280B_data_0_w(machine, offset, data>>8);
 	}
  	else
 	{
-		YMZ280B_register_0_w(offset, data>>8);
+		YMZ280B_register_0_w(machine, offset, data>>8);
 	}
 }
 
 static READ16_HANDLER( dipsw_r )	// dips
 {
-	return input_port_1_r(0) | (input_port_5_r(0)<<8);
+	return input_port_1_r(machine,0) | (input_port_5_r(machine,0)<<8);
 }
 
 static READ16_HANDLER( player1_r ) 	// players 1 and 3
 {
-	return 0xff | (input_port_2_r(0)<<8);
+	return 0xff | (input_port_2_r(machine,0)<<8);
 }
 
 static READ16_HANDLER( player2_r )	// players 2 and 4
 {
-	return input_port_3_r(0) | (input_port_4_r(0)<<8);
+	return input_port_3_r(machine,0) | (input_port_4_r(machine,0)<<8);
 }
 
 static READ16_HANDLER( bishi_K056832_rom_r )
@@ -115,7 +115,7 @@ static READ16_HANDLER( bishi_K056832_rom_r )
 		ouroffs += 4;
 	}
 
-	return K056832_bishi_rom_word_r(ouroffs, mem_mask);
+	return K056832_bishi_rom_word_r(machine, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )

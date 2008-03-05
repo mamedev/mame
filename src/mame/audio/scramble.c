@@ -157,13 +157,13 @@ static void sfx_sh_7474_callback(void)
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( hotshock_soundlatch_r )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
-	return soundlatch_r(0);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	return soundlatch_r(machine,0);
 }
 
 static void filter_w(int chip, int channel, int data)
@@ -323,8 +323,8 @@ static TIMER_CALLBACK( ad2083_step )
 	if (ctrl & 0x40)
 		speech_rom_address = 0;
 
-	tms5110_CTL_w(0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
-	tms5110_PDC_w(0, ctrl & 0x02 ? 0 : 1);
+	tms5110_CTL_w(machine, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
+	tms5110_PDC_w(machine, 0, ctrl & 0x02 ? 0 : 1);
 
 	if (!(ctrl & 0x80))
 		timer_set(ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);

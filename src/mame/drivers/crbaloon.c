@@ -166,7 +166,7 @@ static WRITE8_HANDLER( port_sound_w )
 	sound_global_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable((data & 0x04) ? TRUE : FALSE);
+	crbaloon_audio_set_music_enable(machine, (data & 0x04) ? TRUE : FALSE);
 
 	/* D3 - EXPLOSION */
 	crbaloon_audio_set_explosion_enable((data & 0x08) ? TRUE : FALSE);
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( port_sound_w )
 	crbaloon_audio_set_appear_enable((data & 0x20) ? TRUE : FALSE);
 
 	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable((data & 0x40) ? TRUE : FALSE);
+	crbaloon_audio_set_laugh_enable(machine, (data & 0x40) ? TRUE : FALSE);
 
 	/* D7 - unlabeled - goes to PC3259 pin 16 */
 
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( port_sound_w )
 
 static WRITE8_HANDLER( port_music_w )
 {
-	crbaloon_audio_set_music_freq(data);
+	crbaloon_audio_set_music_freq(machine, data);
 }
 
 
@@ -347,8 +347,8 @@ GFXDECODE_END
 static MACHINE_RESET( crballoon )
 {
 	pc3092_reset();
-	port_sound_w(0, 0);
-	port_music_w(0, 0);
+	port_sound_w(machine, 0, 0);
+	port_music_w(machine, 0, 0);
 }
 
 

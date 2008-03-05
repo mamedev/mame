@@ -107,10 +107,10 @@ static UINT8 *palette_ram;
 static UINT8 *empty_ram;
 static UINT8 *shared_ram;
 
-static read8_handler porte0_r;
-static read8_handler porte1_r;
-static read8_handler portf0_r;
-static read8_handler portf1_r;
+static read8_machine_func porte0_r;
+static read8_machine_func porte1_r;
+static read8_machine_func portf0_r;
+static read8_machine_func portf1_r;
 
 static void palette_notifier(int addr)
 {
@@ -446,26 +446,26 @@ static int extport;
 
 static READ8_HANDLER( portA_r )
 {
-	if (extport == 0) return porte0_r(0);
-	else return porte1_r(0);
+	if (extport == 0) return porte0_r(machine,0);
+	else return porte1_r(machine,0);
 }
 
 static READ8_HANDLER( portB_r )
 {
-	if (extport == 0) return portf0_r(0);
-	else return portf1_r(0);
+	if (extport == 0) return portf0_r(machine,0);
+	else return portf1_r(machine,0);
 }
 
 static READ8_HANDLER( ym2203_data0_r )
 {
 	extport = 0;
-	return YM2203_read_port_0_r(offset);
+	return YM2203_read_port_0_r(machine,offset);
 }
 
 static READ8_HANDLER( ym2203_data1_r )
 {
 	extport = 1;
-	return YM2203_read_port_0_r(offset);
+	return YM2203_read_port_0_r(machine,offset);
 }
 
 static const UINT8 *mcu_reply;
@@ -533,15 +533,15 @@ static READ8_HANDLER( mux_r )
 	switch(mux_ctrl)
 	{
 	case 0:
-		return input_port_0_r(0);
+		return input_port_0_r(machine,0);
 	case 1:
-		return input_port_1_r(0);
+		return input_port_1_r(machine,0);
 	case 2:
-		return input_port_2_r(0);
+		return input_port_2_r(machine,0);
 	case 3:
-		return input_port_3_r(0);
+		return input_port_3_r(machine,0);
 	case 7:
-		return input_port_4_r(0);
+		return input_port_4_r(machine,0);
 	default:
 		logerror("Mux read from unknown port %d (%04x)\n", mux_ctrl, activecpu_get_pc());
 		return 0xff;
@@ -553,7 +553,7 @@ static WRITE8_HANDLER( mux_w )
 	switch(mux_ctrl)
 	{
 	case 4:
-		control2_w(0, data);
+		control2_w(machine,0, data);
 		break;
 	default:
 		logerror("Mux write to unknown port %d, %02x (%04x)\n", mux_ctrl, data, activecpu_get_pc());

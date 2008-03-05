@@ -250,7 +250,7 @@ static READ8_HANDLER( devram_r )
            that would reset the main cpu. We avoid this and patch
            the rom instead (main cpu has to be reset once at startup) */
 		case 0xfe0:
-			return watchdog_reset_r(0);
+			return watchdog_reset_r(machine,0);
 
 		/* Reading a word at eff2 probably yelds the product
            of the words written to eff0 and eff2 */
@@ -319,25 +319,25 @@ static READ8_HANDLER( soundcommand_status_r )
 static READ8_HANDLER( soundcommand_r )
 {
 	soundlatch_status = 0;	// soundlatch has been read
-	return soundlatch_r(0);
+	return soundlatch_r(machine,0);
 }
 
 static READ8_HANDLER( soundcommand2_r )
 {
 	soundlatch2_status = 0;	// soundlatch2 has been read
-	return soundlatch2_r(0);
+	return soundlatch2_r(machine,0);
 }
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(machine, 0, data);
 	soundlatch_status = 1;	// soundlatch has been written
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
 {
-	soundlatch2_w(0, data);
+	soundlatch2_w(machine, 0, data);
 	soundlatch2_status = 1;	// soundlatch2 has been written
 }
 
@@ -587,9 +587,9 @@ static INTERRUPT_GEN( slave_interrupt )
 static MACHINE_RESET( airbustr )
 {
 	soundlatch_status = soundlatch2_status = 0;
-	master_bankswitch_w(0, 0x02);
-	slave_bankswitch_w(0, 0x02);
-	sound_bankswitch_w(0, 0x02);
+	master_bankswitch_w(machine, 0, 0x02);
+	slave_bankswitch_w(machine, 0, 0x02);
+	sound_bankswitch_w(machine, 0, 0x02);
 }
 
 /* Machine Driver */

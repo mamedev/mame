@@ -143,7 +143,7 @@ WRITE8_HANDLER( dogfgt_bitmapram_w )
 		return;
 	}
 
-	internal_bitmapram_w(offset + BITMAPRAM_SIZE/3 * bm_plane,data);
+	internal_bitmapram_w(machine,offset + BITMAPRAM_SIZE/3 * bm_plane,data);
 }
 
 WRITE8_HANDLER( dogfgt_bgvideoram_w )
@@ -230,7 +230,7 @@ VIDEO_UPDATE( dogfgt )
 		lastpixcolor = pixcolor;
 
 		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)
-			internal_bitmapram_w(offs,bitmapram[offs]);
+			internal_bitmapram_w(machine,offs,bitmapram[offs]);
 	}
 
 

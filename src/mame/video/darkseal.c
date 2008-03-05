@@ -251,7 +251,7 @@ WRITE16_HANDLER( darkseal_pf3_data_w )
 
 WRITE16_HANDLER( darkseal_pf3b_data_w ) /* Mirror */
 {
-	darkseal_pf3_data_w(offset+0x800,data,mem_mask);
+	darkseal_pf3_data_w(machine,offset+0x800,data,mem_mask);
 }
 
 WRITE16_HANDLER( darkseal_control_0_w )

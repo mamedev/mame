@@ -390,8 +390,8 @@ TO DO :
 /* Send sound data to the sound cpu and cause an nmi */
 static WRITE8_HANDLER( checkman_sound_command_w )
 {
-	soundlatch_w (0,data);
-	cpunum_set_input_line (Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w (machine,0,data);
+	cpunum_set_input_line (machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( drivfrcg_port0_r )
@@ -891,12 +891,12 @@ static WRITE8_HANDLER( zigzag_8910_latch_w )
 
 static WRITE8_HANDLER( zigzag_8910_data_trigger_w )
 {
-	AY8910_write_port_0_w(0,latch);
+	AY8910_write_port_0_w(machine,0,latch);
 }
 
 static WRITE8_HANDLER( zigzag_8910_control_trigger_w )
 {
-	AY8910_control_port_0_w(0,latch);
+	AY8910_control_port_0_w(machine,0,latch);
 }
 
 static ADDRESS_MAP_START( zigzag_readmem, ADDRESS_SPACE_PROGRAM, 8 )

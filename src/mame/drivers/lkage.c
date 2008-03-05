@@ -62,7 +62,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( lkage_sound_command_w )
 {
-	soundlatch_w(offset,data);
+	soundlatch_w(machine,offset,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 

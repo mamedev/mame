@@ -76,19 +76,19 @@ WRITE8_HANDLER( gottlieb_sh_w )
 			}
 		}
 
-		soundlatch_w(offset,data);
+		soundlatch_w(machine,offset,data);
 
 		switch (cpu_gettotalcpu())
 		{
 		case 2:
 			/* Revision 1 sound board */
-			cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 		case 3:
 		case 4:
 			/* Revision 2 & 3 sound board */
-			cpunum_set_input_line(Machine, cpu_gettotalcpu()-1,M6502_IRQ_LINE,HOLD_LINE);
-			cpunum_set_input_line(Machine, cpu_gettotalcpu()-2,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(machine, cpu_gettotalcpu()-1,M6502_IRQ_LINE,HOLD_LINE);
+			cpunum_set_input_line(machine, cpu_gettotalcpu()-2,M6502_IRQ_LINE,HOLD_LINE);
 			break;
 		}
 	}
@@ -175,7 +175,7 @@ READ8_HANDLER( gottlieb_riot_r )
 {
     switch (offset) {
 	case 0: /* port A */
-		return soundlatch_r(0) ^ 0xff;	/* invert command */
+		return soundlatch_r(machine,0) ^ 0xff;	/* invert command */
 	case 2: /* port B */
 		return 0x40;    /* say that PB6 is 1 (test SW1 not pressed) */
 	case 5: /* interrupt register */
@@ -253,7 +253,7 @@ WRITE8_HANDLER( stooges_sound_control_w )
 {
 	static int last;
 
-	common_sound_control_w(offset, data);
+	common_sound_control_w(machine, offset, data);
 
 	/* bit 2 goes to 8913 BDIR pin  */
 	if ((last & 0x04) == 0x04 && (data & 0x04) == 0x00)
@@ -263,17 +263,17 @@ WRITE8_HANDLER( stooges_sound_control_w )
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				AY8910_control_port_0_w(0,psg_latch);
+				AY8910_control_port_0_w(machine,0,psg_latch);
 			else
-				AY8910_write_port_0_w(0,psg_latch);
+				AY8910_write_port_0_w(machine,0,psg_latch);
 		}
 		else
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				AY8910_control_port_1_w(0,psg_latch);
+				AY8910_control_port_1_w(machine,0,psg_latch);
 			else
-				AY8910_write_port_1_w(0,psg_latch);
+				AY8910_write_port_1_w(machine,0,psg_latch);
 		}
 	}
 
@@ -282,7 +282,7 @@ WRITE8_HANDLER( stooges_sound_control_w )
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((last & 0x40) == 0x40 && (data & 0x40) == 0x00)
 	{
-		sp0250_w(0,sp0250_latch);
+		sp0250_w(machine,0,sp0250_latch);
 	}
 
 	/* bit 7 goes to the speech chip RESET pin */

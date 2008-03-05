@@ -61,16 +61,16 @@ GFXDECODE_END
 static WRITE8_HANDLER( sgladiat_soundlatch_w )
 {
 	snk_sound_busy_bit = 0x20;
-	soundlatch_w( offset, data );
+	soundlatch_w( machine, offset, data );
 
 	/* trigger NMI on sound CPU */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// safer because NMI can be lost in rare occations
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// safer because NMI can be lost in rare occations
 }
 
 static READ8_HANDLER( sgladiat_soundlatch_r )
 {
 	snk_sound_busy_bit = 0;
-	return(soundlatch_r(0));
+	return(soundlatch_r(machine,0));
 }
 
 static READ8_HANDLER( sgladiat_sound_nmi_ack_r )

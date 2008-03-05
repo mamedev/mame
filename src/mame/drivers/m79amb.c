@@ -111,12 +111,12 @@ static const int ControllerTable[32] = {
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-    return (input_port_2_r(0) & 0xe0) | (~ControllerTable[input_port_2_r(0) & 0x1f] & 0x1f);
+    return (input_port_2_r(machine,0) & 0xe0) | (~ControllerTable[input_port_2_r(machine,0) & 0x1f] & 0x1f);
 }
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-    return (input_port_3_r(0) & 0xe0) | (~ControllerTable[input_port_3_r(0) & 0x1f] & 0x1f);
+    return (input_port_3_r(machine,0) & 0xe0) | (~ControllerTable[input_port_3_r(machine,0) & 0x1f] & 0x1f);
 }
 
 static WRITE8_HANDLER( sound_w )

@@ -77,13 +77,13 @@ WRITE8_HANDLER( slapfight_port_01_w )
 /* Disable and clear hardware interrupt */
 WRITE8_HANDLER( slapfight_port_06_w )
 {
-	interrupt_enable_w(0,0);
+	interrupt_enable_w(machine,0,0);
 }
 
 /* Enable hardware interrupt */
 WRITE8_HANDLER( slapfight_port_07_w )
 {
-	interrupt_enable_w(0,1);
+	interrupt_enable_w(machine,0,1);
 }
 
 WRITE8_HANDLER( slapfight_port_08_w )

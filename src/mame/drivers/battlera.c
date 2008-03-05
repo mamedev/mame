@@ -47,8 +47,8 @@ static int control_port_select;
 static WRITE8_HANDLER( battlera_sound_w )
 {
 	if (offset==0) {
-		soundlatch_w(0,data);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		soundlatch_w(machine,0,data);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -104,8 +104,8 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
-	case 0: YM2203_control_port_0_w(0,data); break;
-	case 1: YM2203_write_port_0_w(0,data); break;
+	case 0: YM2203_control_port_0_w(machine,0,data); break;
+	case 1: YM2203_write_port_0_w(machine,0,data); break;
 	}
 }
 

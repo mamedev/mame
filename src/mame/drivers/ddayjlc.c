@@ -114,7 +114,7 @@ static const UINT8 protData[0x10]=
 
 static READ8_HANDLER(prot_r)
 {
-	return (input_port_1_r(0)&0x1f)|protData[protAdr];
+	return (input_port_1_r(machine,0)&0x1f)|protData[protAdr];
 }
 
 static WRITE8_HANDLER(prot_w)
@@ -171,8 +171,8 @@ static WRITE8_HANDLER(bg2_w)
 
 static WRITE8_HANDLER( sound_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )

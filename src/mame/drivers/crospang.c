@@ -54,7 +54,7 @@ static WRITE16_HANDLER ( crospang_soundlatch_w )
 {
 	if(ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 	}
 }
 

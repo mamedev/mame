@@ -128,7 +128,7 @@ static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r )
 static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram16_xxxxBBBBGGGGRRRR_word_w (offset, data, mem_mask);
+	paletteram16_xxxxBBBBGGGGRRRR_word_w (machine, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -199,8 +199,8 @@ static WRITE8_HANDLER( oki_bankswitch_w )
 
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
 {
-	soundlatch_w(1,data & 0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(machine,1,data & 0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************
@@ -393,7 +393,7 @@ static const struct YM2151interface ym2151_interface =
 
 static VIDEO_EOF( wwfwfest )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 /*******************************************************************************

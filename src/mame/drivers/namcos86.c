@@ -283,7 +283,7 @@ static WRITE8_HANDLER( watchdog1_w )
 	if (wdog == 3)
 	{
 		wdog = 0;
-		watchdog_reset_w(0,0);
+		watchdog_reset_w(machine,0,0);
 	}
 }
 
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( watchdog2_w )
 	if (wdog == 3)
 	{
 		wdog = 0;
-		watchdog_reset_w(0,0);
+		watchdog_reset_w(machine,0,0);
 	}
 }
 
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( cus115_w )
 			break;
 
 		case 4:
-			bankswitch1_ext_w(0,data);
+			bankswitch1_ext_w(machine,0,data);
 			break;
 
 		case 5:	// not used?

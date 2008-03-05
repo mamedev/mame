@@ -103,8 +103,8 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 
 static WRITE8_HANDLER(speedspn_sound_w)
 {
-	soundlatch_w(1,data);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,1,data);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( oki_banking_w )

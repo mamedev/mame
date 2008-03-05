@@ -166,7 +166,7 @@ static INTERRUPT_GEN(polygonet_interrupt)
 
 static READ32_HANDLER( sound_r )
 {
-	int latch = soundlatch3_r(0);
+	int latch = soundlatch3_r(machine, 0);
 
 	if (latch == 0xe) latch = 0xf;	/* hack: until 54539 NMI disable found */
 
@@ -177,11 +177,11 @@ static WRITE32_HANDLER( sound_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0, (data>>8)&0xff);
+		soundlatch_w(machine, 0, (data>>8)&0xff);
 	}
 	else
 	{
-		soundlatch2_w(0, data&0xff);
+		soundlatch2_w(machine, 0, data&0xff);
 	}
 }
 

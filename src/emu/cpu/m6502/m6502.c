@@ -72,8 +72,8 @@ typedef struct
 	UINT8	irq_state;
 	UINT8   so_state;
 	int 	(*irq_callback)(int irqline);	/* IRQ callback */
-	read8_handler rdmem_id;					/* readmem callback for indexed instructions */
-	write8_handler wrmem_id;				/* writemem callback for indexed instructions */
+	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	UINT8    ddr;
@@ -88,6 +88,9 @@ static int m6502_IntOccured = 0;
 static int m6502_ICount = 0;
 
 static m6502_Regs m6502;
+
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8(offset); }
+static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8(offset, data); }
 
 /***************************************************************
  * include the opcode macros, functions and tables
@@ -130,8 +133,8 @@ static void m6502_common_init(int index, int clock, const void *config, int (*ir
 	m6502.irq_callback = irqcallback;
 	m6502.subtype = subtype;
 	m6502.insn = insn;
-	m6502.rdmem_id = program_read_byte_8;
-	m6502.wrmem_id = program_write_byte_8;
+	m6502.rdmem_id = default_rdmem_id;
+	m6502.wrmem_id = default_wdmem_id;
 
 	state_save_register_item(type, index, m6502.pc.w.l);
 	state_save_register_item(type, index, m6502.sp.w.l);
@@ -680,8 +683,8 @@ static void m6502_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M6502_ZP:			m6502.zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502.rdmem_id = (read8_handler) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502.wrmem_id = (write8_handler) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502.rdmem_id = (read8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502.wrmem_id = (write8_machine_func) info->f; break;
 	}
 }
 

@@ -147,8 +147,8 @@ static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
 {
-	soundlatch_w( offset, data );
-	cpunum_set_input_line(Machine, 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	soundlatch_w( machine, offset, data );
+	cpunum_set_input_line(machine, 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )

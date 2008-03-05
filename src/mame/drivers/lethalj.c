@@ -64,7 +64,7 @@ Note 2: Lethal Justice uses a TMS34010FNL-50 instead of the TMS34010FNL-40
 
 static CUSTOM_INPUT( ticket_status )
 {
-	return ticket_dispenser_0_r(0) >> 7;
+	return ticket_dispenser_0_r(machine, 0) >> 7;
 }
 
 
@@ -85,14 +85,14 @@ static CUSTOM_INPUT( cclownz_paddle )
 static WRITE16_HANDLER( ripribit_control_w )
 {
 	coin_counter_w(0, data & 1);
-	ticket_dispenser_0_w(0, ((data >> 1) & 1) << 7);
+	ticket_dispenser_0_w(machine, 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
 static WRITE16_HANDLER( cfarm_control_w )
 {
-	ticket_dispenser_0_w(0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_0_w(machine, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
@@ -102,7 +102,7 @@ static WRITE16_HANDLER( cfarm_control_w )
 
 static WRITE16_HANDLER( cclownz_control_w )
 {
-	ticket_dispenser_0_w(0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_0_w(machine, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);

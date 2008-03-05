@@ -72,7 +72,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 				ffcount--;
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
-				soundlatch_w(0, latch_data);
+				soundlatch_w(machine, 0, latch_data);
 				cpunum_set_input_line(machine, 2, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;

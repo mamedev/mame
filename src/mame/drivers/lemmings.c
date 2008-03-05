@@ -74,8 +74,8 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 
 static WRITE16_HANDLER( lemmings_sound_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 1,1,HOLD_LINE);
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 1,1,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )

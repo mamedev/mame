@@ -67,10 +67,10 @@
  *****************************************************************************/
 
 struct POKEYinterface {
-	read8_handler pot_r[8];
-	read8_handler allpot_r;
-	read8_handler serin_r;
-	write8_handler serout_w;
+	read8_machine_func pot_r[8];
+	read8_machine_func allpot_r;
+	read8_machine_func serin_r;
+	write8_machine_func serout_w;
 	void (*interrupt_cb)(int mask);
 };
 

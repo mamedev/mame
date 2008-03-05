@@ -259,9 +259,9 @@ static READ8_HANDLER( cavelon_banksw_r )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_0_r(offset - 0x0100);
+		return ppi8255_0_r(machine, offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_1_r(offset - 0x0200);
+		return ppi8255_1_r(machine, offset - 0x0200);
 
 	return 0xff;
 }
@@ -271,9 +271,9 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_0_w(offset - 0x0100, data);
+		ppi8255_0_w(machine, offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_1_w(offset - 0x0200, data);
+		ppi8255_1_w(machine, offset - 0x0200, data);
 }
 
 

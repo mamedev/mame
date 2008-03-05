@@ -329,17 +329,17 @@ READ16_HANDLER(equites_8404_r)
 WRITE8_HANDLER(equites_5232_w)
 {
 	if (offset < 0x08 && data) data |= 0x80; // gets around a current 5232 emulation restriction
-	MSM5232_0_w(offset, data);
+	MSM5232_0_w(machine, offset, data);
 }
 
 WRITE8_HANDLER(equites_8910control_w)
 {
-	AY8910_control_port_0_w(0, data);
+	AY8910_control_port_0_w(machine, 0, data);
 }
 
 WRITE8_HANDLER(equites_8910data_w)
 {
-	AY8910_write_port_0_w(0, data);
+	AY8910_write_port_0_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER(equites_8910porta_w)

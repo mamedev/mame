@@ -181,7 +181,7 @@ WRITE16_HANDLER( ginganin_vregs16_w )
 		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
-		soundlatch_w(0,data);
+		soundlatch_w(machine,0,data);
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:

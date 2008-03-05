@@ -22,12 +22,12 @@ Audio handlers
 
 WRITE8_HANDLER( qix_dac_w )
 {
-	discrete_sound_w(QIX_DAC_DATA, data);
+	discrete_sound_w(machine, QIX_DAC_DATA, data);
 }
 
 WRITE8_HANDLER( qix_vol_w )
 {
-	discrete_sound_w(QIX_VOL_DATA, data);
+	discrete_sound_w(machine, QIX_VOL_DATA, data);
 }
 
 

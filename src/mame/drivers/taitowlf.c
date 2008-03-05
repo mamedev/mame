@@ -86,22 +86,22 @@ static VIDEO_UPDATE(taitowlf)
 
 static READ8_HANDLER(at_dma8237_1_r)
 {
-	return dma8237_1_r(offset / 2);
+	return dma8237_1_r(machine, offset / 2);
 }
 
 static WRITE8_HANDLER(at_dma8237_1_w)
 {
-	dma8237_1_w(offset / 2, data);
+	dma8237_1_w(machine, offset / 2, data);
 }
 
 static READ32_HANDLER(at32_dma8237_1_r)
 {
-	return read32le_with_read8_handler(at_dma8237_1_r, offset, mem_mask);
+	return read32le_with_read8_handler(at_dma8237_1_r, machine, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(at32_dma8237_1_w)
 {
-	write32le_with_write8_handler(at_dma8237_1_w, offset, data, mem_mask);
+	write32le_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
 }
 
 
@@ -269,23 +269,23 @@ static WRITE32_HANDLER( pnp_data_w )
 
 static READ32_HANDLER( ide0_r )
 {
-	return ide_controller32_0_r(0x1f0/4 + offset, mem_mask);
+	return ide_controller32_0_r(machine, 0x1f0/4 + offset, mem_mask);
 }
 
 static WRITE32_HANDLER( ide0_w )
 {
-	ide_controller32_0_w(0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_0_w(machine, 0x1f0/4 + offset, data, mem_mask);
 }
 
 static READ32_HANDLER( fdc_r )
 {
-	return ide_controller32_0_r(0x3f0/4 + offset, mem_mask);
+	return ide_controller32_0_r(machine, 0x3f0/4 + offset, mem_mask);
 }
 
 static WRITE32_HANDLER( fdc_w )
 {
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_0_w(0x3f0/4 + offset, data, mem_mask);
+	ide_controller32_0_w(machine, 0x3f0/4 + offset, data, mem_mask);
 }
 
 

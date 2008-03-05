@@ -95,7 +95,7 @@ WRITE8_HANDLER( jedi_audio_latch_w )
 
 static READ8_HANDLER( audio_latch_r )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	*state->audio_comm_stat &= ~0x80;
 	return state->audio_latch;
@@ -105,7 +105,6 @@ static READ8_HANDLER( audio_latch_r )
 CUSTOM_INPUT( jedi_audio_comm_stat_r )
 {
 	jedi_state *state = machine->driver_data;
-
 	return *state->audio_comm_stat >> 6;
 }
 
@@ -119,7 +118,7 @@ CUSTOM_INPUT( jedi_audio_comm_stat_r )
 
 READ8_HANDLER( jedi_audio_ack_latch_r )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	*state->audio_comm_stat &= ~0x40;
 	return state->audio_ack_latch;
@@ -128,7 +127,7 @@ READ8_HANDLER( jedi_audio_ack_latch_r )
 
 static WRITE8_HANDLER( audio_ack_latch_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->audio_ack_latch = data;
 	*state->audio_comm_stat |= 0x40;
@@ -144,11 +143,11 @@ static WRITE8_HANDLER( audio_ack_latch_w )
 
 static WRITE8_HANDLER( speech_strobe_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 	int new_speech_strobe_state = (~offset >> 8) & 1;
 
 	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
-		tms5220_data_w(0, *state->speech_data);
+		tms5220_data_w(machine, 0, *state->speech_data);
 	state->speech_strobe_state = new_speech_strobe_state;
 }
 

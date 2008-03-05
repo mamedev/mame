@@ -230,7 +230,7 @@ static NVRAM_HANDLER( lethalen )
 
 static READ8_HANDLER( control2_r )
 {
-	return 0x02 | EEPROM_read_bit() | (input_port_1_r(0) & 0xf0);
+	return 0x02 | EEPROM_read_bit() | (input_port_1_r(machine,0) & 0xf0);
 }
 
 static WRITE8_HANDLER( control2_w )
@@ -257,7 +257,7 @@ static INTERRUPT_GEN(lethalen_interrupt)
 
 static WRITE8_HANDLER( sound_cmd_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( sound_irq_w )
@@ -301,7 +301,7 @@ static READ8_HANDLER( le_4800_r )
 				case 0x44:
 				case 0x45:
 				case 0x46:
-					return K053244_r(offset-0x40);
+					return K053244_r(machine,offset-0x40);
 					break;
 
 				case 0x80:
@@ -336,24 +336,24 @@ static READ8_HANDLER( le_4800_r )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return K054000_r(offset-0x80);
+					return K054000_r(machine,offset-0x80);
 					break;
 
 				case 0xca:
-					return sound_status_r(0);
+					return sound_status_r(machine,0);
 					break;
 			}
 		}
 		else if (offset < 0x1800)
-			return K053245_r((offset - 0x0800) & 0x07ff);
+			return K053245_r(machine,(offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return K056832_ram_code_lo_r(offset - 0x1800);
+			return K056832_ram_code_lo_r(machine,offset - 0x1800);
 		else if (offset < 0x2800)
-			return K056832_ram_code_hi_r(offset - 0x2000);
+			return K056832_ram_code_hi_r(machine,offset - 0x2000);
 		else if (offset < 0x3000)
-			return K056832_ram_attr_lo_r(offset - 0x2800);
+			return K056832_ram_attr_lo_r(machine,offset - 0x2800);
 		else // (offset < 0x3800)
-			return K056832_ram_attr_hi_r(offset - 0x3000);
+			return K056832_ram_attr_hi_r(machine,offset - 0x3000);
 	}
 
 	return 0;
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( le_4800_w )
 {
 	if (cur_control2 & 0x10)	// RAM enable
 	{
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	}
 	else
 	{
@@ -372,11 +372,11 @@ static WRITE8_HANDLER( le_4800_w )
 			switch (offset)
 			{
 				case 0xc6:
-					sound_cmd_w(0, data);
+					sound_cmd_w(machine, 0, data);
 					break;
 
 				case 0xc7:
-					sound_irq_w(0, data);
+					sound_irq_w(machine, 0, data);
 					break;
 
 				case 0x40:
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x44:
 				case 0x45:
 				case 0x46:
-					K053244_w(offset-0x40, data);
+					K053244_w(machine, offset-0x40, data);
 					break;
 
 				case 0x80:
@@ -421,7 +421,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					K054000_w(offset-0x80, data);
+					K054000_w(machine, offset-0x80, data);
 					break;
 
 				default:
@@ -431,24 +431,24 @@ static WRITE8_HANDLER( le_4800_w )
 		}
 		else if (offset < 0x1800)
 		{
-			K053245_w((offset - 0x0800) & 0x07ff, data);
+			K053245_w(machine, (offset - 0x0800) & 0x07ff, data);
 
 		}
 		else if (offset < 0x2000)
-			K056832_ram_code_lo_w(offset - 0x1800, data);
+			K056832_ram_code_lo_w(machine, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			K056832_ram_code_hi_w(offset - 0x2000, data);
+			K056832_ram_code_hi_w(machine, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			K056832_ram_attr_lo_w(offset - 0x2800, data);
+			K056832_ram_attr_lo_w(machine, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			K056832_ram_attr_hi_w(offset - 0x3000, data);
+			K056832_ram_attr_hi_w(machine, offset - 0x3000, data);
 	}
 }
 
 // use one more palette entry for the BG color
 static WRITE8_HANDLER(le_bgcolor_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_be_w(0x3800+offset, data);
+	paletteram_xBBBBBGGGGGRRRRR_be_w(machine,0x3800+offset, data);
 }
 
 static READ8_HANDLER(guns_r)

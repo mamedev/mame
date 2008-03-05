@@ -406,7 +406,7 @@ VIDEO_UPDATE( madcrash )
 		if( scroll_attributes & 1 ) sprite_scrollx += 256;
 		if( scroll_attributes & 2 ) fg_scrollx += 256;
 
-		marvins_palette_bank_w(0, program_read_byte(0xc800+madcrash_vreg));
+		marvins_palette_bank_w(machine, 0, program_read_byte(0xc800+madcrash_vreg));
 		update_palette(machine, 1);
 
 		if( flipscreen != (attributes&0x80) )

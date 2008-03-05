@@ -84,26 +84,26 @@ static void niyanpai_soundbank_w(int data)
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static int niyanpai_sound_r(int offset)
+static int niyanpai_sound_r(running_machine *machine, int offset)
 {
-	return soundlatch_r(0);
+	return soundlatch_r(machine, 0);
 }
 
 static WRITE16_HANDLER( niyanpai_sound_w )
 {
-	soundlatch_w(0, ((data >> 8) & 0xff));
+	soundlatch_w(machine, 0, ((data >> 8) & 0xff));
 }
 
-static void niyanpai_soundclr_w(int offset, int data)
+static void niyanpai_soundclr_w(running_machine *machine, int offset, int data)
 {
-	soundlatch_clear_w(0, 0);
+	soundlatch_clear_w(machine, 0, 0);
 }
 
 
 /* TMPZ84C011 PIO emulation */
 static UINT8 pio_dir[5], pio_latch[5];
 
-static int tmpz84c011_pio_r(int offset)
+static int tmpz84c011_pio_r(running_machine *machine, int offset)
 {
 	int portdata;
 
@@ -119,7 +119,7 @@ static int tmpz84c011_pio_r(int offset)
 			portdata = 0xff;
 			break;
 		case 3:			/* PD_0 */
-			portdata = niyanpai_sound_r(0);
+			portdata = niyanpai_sound_r(machine, 0);
 			break;
 		case 4:			/* PE_0 */
 			portdata = 0xff;
@@ -134,7 +134,7 @@ static int tmpz84c011_pio_r(int offset)
 	return portdata;
 }
 
-static void tmpz84c011_pio_w(int offset, int data)
+static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 {
 	switch (offset)
 	{
@@ -142,15 +142,15 @@ static void tmpz84c011_pio_w(int offset, int data)
 			niyanpai_soundbank_w(data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_1_WRITE(0, data);
+			DAC_1_WRITE(machine, 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_0_WRITE(0, data);
+			DAC_0_WRITE(machine, 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
 		case 4:			/* PE_0 */
-			if (!(data & 0x01)) niyanpai_soundclr_w(0, 0);
+			if (!(data & 0x01)) niyanpai_soundclr_w(machine, 0, 0);
 			break;
 
 		default:
@@ -160,17 +160,17 @@ static void tmpz84c011_pio_w(int offset, int data)
 }
 
 /* CPU interface */
-static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
-static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
-static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
-static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
-static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
+static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(machine,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
+static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(machine,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
+static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(machine,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
+static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(machine,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
+static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(machine,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(0, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(1, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(2, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(3, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(4, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(machine, 0, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(machine, 1, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(machine, 2, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(machine, 3, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(machine, 4, data); }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )	{ return pio_dir[0]; }
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )	{ return pio_dir[1]; }
@@ -215,7 +215,7 @@ static MACHINE_RESET( niyanpai )
 	for (i = 0; i < 5; i++)
 	{
 		pio_dir[i] = pio_latch[i] = 0;
-		tmpz84c011_pio_w(i, 0);
+		tmpz84c011_pio_w(machine, i, 0);
 	}
 }
 
@@ -295,7 +295,7 @@ static READ16_HANDLER( musobana_inputport_1_r )
 	//  bit 2   motor on
 	//  bit 3   coin lock
 
-	if (tmp68301_parallel_interface_r(0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
+	if (tmp68301_parallel_interface_r(machine, 0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
 	else musobana_outcoin_flag = 1;
 
 	return (((readinputport(2) & 0xdf) | ((musobana_outcoin_flag & 0x01) << 5)) << 8);

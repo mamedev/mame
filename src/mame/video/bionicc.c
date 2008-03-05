@@ -135,7 +135,7 @@ WRITE16_HANDLER( bionicc_paletteram_w )
     when intensity is zero the colour is not reduced to pure black, (the sky should stay
     at dark blue rather than absolute black) */
 	data = COMBINE_DATA(&paletteram16[offset]);
-	paletteram16_RRRRGGGGBBBBIIII_word_w(offset,(data & 0xfff0) | ((data & 0x0007) << 1) | 1, 0);
+	paletteram16_RRRRGGGGBBBBIIII_word_w(machine,offset,(data & 0xfff0) | ((data & 0x0007) << 1) | 1, 0);
 }
 
 WRITE16_HANDLER( bionicc_scroll_w )
@@ -231,5 +231,5 @@ VIDEO_UPDATE( bionicc )
 
 VIDEO_EOF( bionicc )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }

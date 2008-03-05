@@ -1242,7 +1242,7 @@ WRITE8_HANDLER( avgdvg_go_w )
 
 WRITE16_HANDLER( avgdvg_go_word_w )
 {
-	avgdvg_go_w(offset, data);
+	avgdvg_go_w(machine, offset, data);
 }
 
 
@@ -1260,12 +1260,12 @@ WRITE8_HANDLER( avgdvg_reset_w )
 
 WRITE16_HANDLER( avgdvg_reset_word_w )
 {
-	avgdvg_reset_w (0,0);
+	avgdvg_reset_w (machine,0,0);
 }
 
 MACHINE_RESET( avgdvg )
 {
-	avgdvg_reset_w (0,0);
+	avgdvg_reset_w (machine,0,0);
 }
 
 

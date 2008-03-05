@@ -161,7 +161,7 @@ WRITE16_HANDLER( vertigo_wsot_w )
 
 static TIMER_CALLBACK( sound_command_w )
 {
-	exidy440_sound_command = param;
+	*exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
 	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, ASSERT_LINE);
 

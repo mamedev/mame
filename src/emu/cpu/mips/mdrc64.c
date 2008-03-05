@@ -365,7 +365,7 @@ static const char *const x86regname[] = {"rax", "rcx", "rdx", "rbx", "rsp", "rbp
     bounds callback for later
 -------------------------------------------------*/
 
-INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback_funcs callback, const compiler_state *compiler, const opcode_desc *desc, void *param)
+INLINE void oob_request_callback(drc_core *drc, UINT8 condition, oob_callback_func callback, const compiler_state *compiler, const opcode_desc *desc, void *param)
 {
 	oob_handler *oob = &mips3.drcdata->ooblist[mips3.drcdata->oobcount++];
 

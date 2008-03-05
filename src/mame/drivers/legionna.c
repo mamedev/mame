@@ -543,27 +543,27 @@ static READ16_HANDLER( mcu_r )
 		/* Non-protection reads */
 
 		case (0x708/2):	/* seibu sound: these three around $b10 on */
-			return seibu_main_word_r(2,0);
+			return seibu_main_word_r(machine,2,0);
 
 		case (0x70c/2):
-			return seibu_main_word_r(3,0);
+			return seibu_main_word_r(machine,3,0);
 
 		case (0x714/2):
-			return seibu_main_word_r(5,0);
+			return seibu_main_word_r(machine,5,0);
 
 		/* Inputs */
 
 		case (0x740/2):	/* code at $b00 sticks waiting for bit 6 hi */
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x744/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x748/2):	/* code at $f4a reads this 4 times in _weird_ fashion */
-			return input_port_0_word_r(0,0);
+			return input_port_0_word_r(machine,0,0);
 
 		case (0x74c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 	}
 //logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
@@ -699,22 +699,22 @@ static WRITE16_HANDLER( mcu_w )
 		}
 		case (0x700/2):	/* seibu(0) */
 		{
-			seibu_main_word_w(0,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,0,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x704/2):	/* seibu(1) */
 		{
-			seibu_main_word_w(1,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,1,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x710/2):	/* seibu(4) */
 		{
-			seibu_main_word_w(4,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,4,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x718/2):	/* seibu(6) */
 		{
-			seibu_main_word_w(6,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,6,mcu_ram[offset],0xff00);
 			break;
 		}
 //      default:
@@ -1129,27 +1129,27 @@ static READ16_HANDLER( cop2_mcu_r )
 		/* Non-protection reads */
 
 		case (0x7c8/2):	/* seibu sound */
-			return seibu_main_word_r(2,0);
+			return seibu_main_word_r(machine,2,0);
 
 		case (0x7cc/2):
-			return seibu_main_word_r(3,0);
+			return seibu_main_word_r(machine,3,0);
 
 		case (0x7d4/2):
-			return seibu_main_word_r(5,0);
+			return seibu_main_word_r(machine,5,0);
 
 		/* Inputs */
 
 		case (0x740/2):
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x744/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x748/2):
-			return input_port_4_word_r(0,0);
+			return input_port_4_word_r(machine,0,0);
 
 		case (0x74c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 	}
 //logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
@@ -1359,22 +1359,22 @@ static WRITE16_HANDLER( cop2_mcu_w )
 		}
 		case (0x7c0/2):	/* seibu(0) */
 		{
-			seibu_main_word_w(0,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,0,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x7c4/2):	/* seibu(1) */
 		{
-			seibu_main_word_w(1,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,1,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x7d0/2):	/* seibu(4) */
 		{
-			seibu_main_word_w(4,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,4,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x7d8/2):	/* seibu(6) */
 		{
-			seibu_main_word_w(6,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,6,mcu_ram[offset],0xff00);
 			break;
 		}
 		default:
@@ -1443,30 +1443,30 @@ static READ16_HANDLER( sdgndmrb_cop_mcu_r )
 
 		/* Non-protection reads */
 		case (0x708/2):	/* seibu sound */
-			return seibu_main_word_r(2,0);
+			return seibu_main_word_r(machine,2,0);
 
 		case (0x70c/2):
-			return seibu_main_word_r(3,0);
+			return seibu_main_word_r(machine,3,0);
 
 		case (0x714/2):
-			return seibu_main_word_r(5,0);
+			return seibu_main_word_r(machine,5,0);
 
 		/* Inputs */
 
 		case (0x740/2):
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x744/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x748/2):
-			return input_port_4_word_r(0,0);
+			return input_port_4_word_r(machine,0,0);
 
 		case (0x74c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 		case (0x75c/2):
-			return input_port_5_word_r(0,0);
+			return input_port_5_word_r(machine,0,0);
 	}
 //  return mame_rand(Machine);
   	if(offset > (0x500/2) && offset < (0x600/2))
@@ -1822,22 +1822,22 @@ static WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 
 		case (0x700/2):	/* seibu(0) */
 		{
-			seibu_main_word_w(0,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,0,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x704/2):	/* seibu(1) */
 		{
-			seibu_main_word_w(1,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,1,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x710/2):	/* seibu(4) */
 		{
-			seibu_main_word_w(4,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,4,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x718/2):	/* seibu(6) */
 		{
-			seibu_main_word_w(6,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,6,mcu_ram[offset],0xff00);
 			break;
 		}
 
@@ -1885,27 +1885,27 @@ static READ16_HANDLER( denjinmk_cop_mcu_r )
 		/* Non-protection reads */
 
 		case (0x708/2):	/* seibu sound */
-			return seibu_main_word_r(2,0);
+			return seibu_main_word_r(machine,2,0);
 
 		case (0x70c/2):
-			return seibu_main_word_r(3,0);
+			return seibu_main_word_r(machine,3,0);
 
 		case (0x714/2):
-			return seibu_main_word_r(5,0);
+			return seibu_main_word_r(machine,5,0);
 
 		/* Inputs */
 
 		case (0x740/2):
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x744/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x748/2):
-			return input_port_4_word_r(0,0);
+			return input_port_4_word_r(machine,0,0);
 
 		case (0x74c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 	}
 //logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
@@ -1967,22 +1967,22 @@ static WRITE16_HANDLER( denjinmk_cop_mcu_w )
 		}
 		case (0x700/2):	/* seibu(0) */
 		{
-			seibu_main_word_w(0,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,0,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x704/2):	/* seibu(1) */
 		{
-			seibu_main_word_w(1,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,1,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x710/2):	/* seibu(4) */
 		{
-			seibu_main_word_w(4,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,4,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x718/2):	/* seibu(6) */
 		{
-			seibu_main_word_w(6,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,6,mcu_ram[offset],0xff00);
 			break;
 		}
 	    //  default:
@@ -2029,27 +2029,27 @@ static READ16_HANDLER( godzilla_cop_mcu_r )
 		/* Non-protection reads */
 
 		case (0x7c8/2):	/* seibu sound */
-			return seibu_main_word_r(2,0);
+			return seibu_main_word_r(machine,2,0);
 
 		case (0x7cc/2):
-			return seibu_main_word_r(3,0);
+			return seibu_main_word_r(machine,3,0);
 
 		case (0x7d4/2):
-			return seibu_main_word_r(5,0);
+			return seibu_main_word_r(machine,5,0);
 
 		/* Inputs */
 
 		case (0x740/2):
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x744/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x748/2):
-			return input_port_4_word_r(0,0);
+			return input_port_4_word_r(machine,0,0);
 
 		case (0x74c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 	}
 //  if(offset >= (0x400/2) && offset < (0x600/2) && offset != (0x5a4/2))
@@ -2129,22 +2129,22 @@ static WRITE16_HANDLER( godzilla_cop_mcu_w )
 
 		case (0x7c0/2):	/* seibu(0) */
 		{
-			seibu_main_word_w(0,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,0,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x7c4/2):	/* seibu(1) */
 		{
-			seibu_main_word_w(1,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,1,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x7d0/2):	/* seibu(4) */
 		{
-			seibu_main_word_w(4,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,4,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x7d8/2):	/* seibu(6) */
 		{
-			seibu_main_word_w(6,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,6,mcu_ram[offset],0xff00);
 			break;
 		}
 //      default:
@@ -2162,26 +2162,26 @@ static READ16_HANDLER( copdx_0_r )
 		//  return mcu_ram[offset];
 
 		case (0x700/2):
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x704/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x708/2):
-			return input_port_4_word_r(0,0);
+			return input_port_4_word_r(machine,0,0);
 
 		case (0x70c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 		case (0x71c/2):
-			return input_port_5_word_r(0,0);
+			return input_port_5_word_r(machine,0,0);
 
 		case (0x748/2):	/* seibu sound */
-			return seibu_main_word_r(2,0);
+			return seibu_main_word_r(machine,2,0);
 		case (0x74c/2):
-			return seibu_main_word_r(3,0);
+			return seibu_main_word_r(machine,3,0);
 		case (0x754/2):
-			return seibu_main_word_r(5,0);
+			return seibu_main_word_r(machine,5,0);
 
 	}
 
@@ -2386,22 +2386,22 @@ static WRITE16_HANDLER( copdx_0_w )
 
 		case (0x740/2):	/* seibu(0) */
 		{
-			seibu_main_word_w(0,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,0,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x744/2):	/* seibu(1) */
 		{
-			seibu_main_word_w(1,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,1,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x750/2):	/* seibu(4) */
 		{
-			seibu_main_word_w(4,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,4,mcu_ram[offset],0xff00);
 			break;
 		}
 		case (0x758/2):	/* seibu(6) */
 		{
-			seibu_main_word_w(6,mcu_ram[offset],0xff00);
+			seibu_main_word_w(machine,6,mcu_ram[offset],0xff00);
 			break;
 		}
 	}
@@ -2418,19 +2418,19 @@ static READ16_HANDLER( copdxbl_0_r )
 		//  return mcu_ram[offset];
 
 		case (0x700/2):
-			return input_port_1_word_r(0,0);
+			return input_port_1_word_r(machine,0,0);
 
 		case (0x704/2):
-			return input_port_2_word_r(0,0);
+			return input_port_2_word_r(machine,0,0);
 
 		case (0x708/2):
-			return input_port_4_word_r(0,0);
+			return input_port_4_word_r(machine,0,0);
 
 		case (0x70c/2):
-			return input_port_3_word_r(0,0);
+			return input_port_3_word_r(machine,0,0);
 
 		case (0x71c/2):
-			return input_port_5_word_r(0,0);
+			return input_port_5_word_r(machine,0,0);
 #if 0
 		case (0x748/2):	/* seibu sound */
 			return seibu_main_word_r(2,0);
@@ -2564,8 +2564,8 @@ static WRITE16_HANDLER( copdxbl_0_w )
 		/*WRONG*/
 		case (0x65c/2):
 		{
-			soundlatch_w(1,data&0xff);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+			soundlatch_w(machine,1,data&0xff);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
 		/*video regs (not scrollram,something else)*/

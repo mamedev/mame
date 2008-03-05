@@ -111,7 +111,7 @@ static void do_pen_lookup(jedi_state *state, bitmap_t *bitmap, const rectangle *
 
 WRITE8_HANDLER( jedi_vscroll_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->vscroll = data | (offset << 8);
 }
@@ -119,7 +119,7 @@ WRITE8_HANDLER( jedi_vscroll_w )
 
 WRITE8_HANDLER( jedi_hscroll_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->hscroll = data | (offset << 8);
 }

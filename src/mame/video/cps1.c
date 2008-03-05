@@ -537,7 +537,7 @@ READ16_HANDLER( cps1_output_r )
 
 	/* Pang 3 EEPROM interface */
 	if (cps1_game_config->kludge == 5 && offset == 0x7a/2)
-		return cps1_eeprom_port_r(0,mem_mask);
+		return cps1_eeprom_port_r(machine,0,mem_mask);
 
 	return cps1_output[offset];
 }
@@ -547,7 +547,7 @@ WRITE16_HANDLER( cps1_output_w )
 	/* Pang 3 EEPROM interface */
 	if (cps1_game_config->kludge == 5 && offset == 0x7a/2)
 	{
-		cps1_eeprom_port_w(0,data,mem_mask);
+		cps1_eeprom_port_w(machine,0,data,mem_mask);
 		return;
 	}
 

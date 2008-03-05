@@ -202,8 +202,8 @@ static WRITE16_HANDLER( nvram_data_w )
 
 static WRITE16_HANDLER( nvram_thrash_data_w )
 {
-	nvram_data_w(offset, data, mem_mask);
-	nvram_thrash_w(offset, data, mem_mask);
+	nvram_data_w(machine, offset, data, mem_mask);
+	nvram_thrash_w(machine, offset, data, mem_mask);
 }
 
 

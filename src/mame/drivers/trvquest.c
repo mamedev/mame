@@ -196,8 +196,8 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	via_2_ca1_w(0,1);
-	via_2_ca1_w(0,0);
+	via_2_ca1_w(machine,0,1);
+	via_2_ca1_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( trvquest )

@@ -604,24 +604,24 @@ WRITE16_HANDLER(sys24_char_w)
 
 READ32_HANDLER(sys24_tile32_r)
 {
-	return sys24_tile_r(offset*2, mem_mask&0xffff) | sys24_tile_r((offset*2)+1, mem_mask>>16)<<16;
+	return sys24_tile_r(machine, offset*2, mem_mask&0xffff) | sys24_tile_r(machine, (offset*2)+1, mem_mask>>16)<<16;
 }
 
 READ32_HANDLER(sys24_char32_r)
 {
-	return sys24_char_r(offset*2, mem_mask&0xffff) | sys24_char_r((offset*2)+1, mem_mask>>16)<<16;
+	return sys24_char_r(machine, offset*2, mem_mask&0xffff) | sys24_char_r(machine, (offset*2)+1, mem_mask>>16)<<16;
 }
 
 WRITE32_HANDLER(sys24_tile32_w)
 {
-	sys24_tile_w(offset*2, data&0xffff, mem_mask&0xffff);
-	sys24_tile_w((offset*2)+1, data>>16, mem_mask>>16);
+	sys24_tile_w(machine, offset*2, data&0xffff, mem_mask&0xffff);
+	sys24_tile_w(machine, (offset*2)+1, data>>16, mem_mask>>16);
 }
 
 WRITE32_HANDLER(sys24_char32_w)
 {
-	sys24_char_w(offset*2, data&0xffff, mem_mask&0xffff);
-	sys24_char_w((offset*2)+1, data>>16, mem_mask>>16);
+	sys24_char_w(machine,offset*2, data&0xffff, mem_mask&0xffff);
+	sys24_char_w(machine,(offset*2)+1, data>>16, mem_mask>>16);
 }
 
 // - System 24

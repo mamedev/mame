@@ -72,14 +72,14 @@ INLINE int swap_bits_5_6(int data)
 }
 
 static WRITE8_HANDLER( ram_w )        { decrypted[0x0000 + offset] = swap_bits_5_6(data); decocass_rambase[0x0000 + offset] = data;  }
-static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(offset, data); }
-static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(offset, data); }
-static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(offset, data); }
-static WRITE8_HANDLER( tileram_w )    { decrypted[0xd000 + offset] = swap_bits_5_6(data); decocass_tileram_w(offset, data); }
-static WRITE8_HANDLER( objectram_w )  { decrypted[0xd800 + offset] = swap_bits_5_6(data); decocass_objectram_w(offset, data); }
+static WRITE8_HANDLER( charram_w )    { decrypted[0x6000 + offset] = swap_bits_5_6(data); decocass_charram_w(machine, offset, data); }
+static WRITE8_HANDLER( fgvideoram_w ) { decrypted[0xc000 + offset] = swap_bits_5_6(data); decocass_fgvideoram_w(machine, offset, data); }
+static WRITE8_HANDLER( fgcolorram_w ) { decrypted[0xc400 + offset] = swap_bits_5_6(data); decocass_colorram_w(machine, offset, data); }
+static WRITE8_HANDLER( tileram_w )    { decrypted[0xd000 + offset] = swap_bits_5_6(data); decocass_tileram_w(machine, offset, data); }
+static WRITE8_HANDLER( objectram_w )  { decrypted[0xd800 + offset] = swap_bits_5_6(data); decocass_objectram_w(machine, offset, data); }
 
-static WRITE8_HANDLER( mirrorvideoram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(offset, data); }
-static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(offset, data); }
+static WRITE8_HANDLER( mirrorvideoram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgvideoram_w(machine, offset, data); }
+static WRITE8_HANDLER( mirrorcolorram_w ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); fgcolorram_w(machine, offset, data); }
 static READ8_HANDLER( mirrorvideoram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_fgvideoram[offset]; }
 static READ8_HANDLER( mirrorcolorram_r ) { offset = ((offset >> 5) & 0x1f) | ((offset & 0x1f) << 5); return decocass_colorram[offset]; }
 

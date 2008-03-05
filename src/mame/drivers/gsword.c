@@ -331,12 +331,12 @@ static WRITE8_HANDLER( josvolly_nmi_enable_w )
 
 static WRITE8_HANDLER( gsword_AY8910_control_port_0_w )
 {
-	AY8910_control_port_0_w(offset,data);
+	AY8910_control_port_0_w(machine,offset,data);
 	fake8910_0 = data;
 }
 static WRITE8_HANDLER( gsword_AY8910_control_port_1_w )
 {
-	AY8910_control_port_1_w(offset,data);
+	AY8910_control_port_1_w(machine,offset,data);
 	fake8910_1 = data;
 }
 
@@ -358,8 +358,8 @@ static WRITE8_HANDLER( gsword_adpcm_data_w )
 
 static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, 0 , 8 )

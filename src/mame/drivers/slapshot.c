@@ -202,11 +202,11 @@ static READ16_HANDLER( slapshot_service_input_r )
 	switch (offset)
 	{
 		case 0x03:
-			return ((input_port_3_word_r(0,0) & 0xef) |
-				  (input_port_5_word_r(0,0) & 0x10))  << 8;	/* IN3 + service switch */
+			return ((input_port_3_word_r(machine,0,0) & 0xef) |
+				  (input_port_5_word_r(machine,0,0) & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
-			return TC0640FIO_r(offset) << 8;
+			return TC0640FIO_r(machine,offset) << 8;
 	}
 }
 
@@ -248,9 +248,9 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static WRITE16_HANDLER( slapshot_msb_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (0,(data >> 8) & 0xff);
+		taitosound_port_w (machine,0,(data >> 8) & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (0,(data >> 8) & 0xff);
+		taitosound_comm_w (machine,0,(data >> 8) & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff)
@@ -261,7 +261,7 @@ static WRITE16_HANDLER( slapshot_msb_sound_w )
 static READ16_HANDLER( slapshot_msb_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (0) & 0xff) << 8);
+		return ((taitosound_comm_r (machine, 0) & 0xff) << 8);
 	else return 0;
 }
 

@@ -221,7 +221,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 {
 //  sound_flag1 = 1;
 //  sound_flag2 = 1;
-	soundlatch_word_w(offset,data,mem_mask);
+	soundlatch_word_w(machine,offset,data,mem_mask);
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
@@ -230,14 +230,14 @@ static WRITE16_HANDLER( sound_cmd_w )
 static READ8_HANDLER( soundlatch_lo_r )
 {
 //  sound_flag1 = 0;
-	return soundlatch_word_r(offset,0) & 0xff;
+	return soundlatch_word_r(machine,offset,0) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 static READ8_HANDLER( soundlatch_hi_r )
 {
 //  sound_flag2 = 0;
-	return soundlatch_word_r(offset,0) >> 8;
+	return soundlatch_word_r(machine,offset,0) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
@@ -273,15 +273,15 @@ static WRITE16_HANDLER( cave_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		if (offset)	YMZ280B_data_0_w     (offset, data & 0xff);
-		else		YMZ280B_register_0_w (offset, data & 0xff);
+		if (offset)	YMZ280B_data_0_w     (machine, offset, data & 0xff);
+		else		YMZ280B_register_0_w (machine, offset, data & 0xff);
 	}
 }
 
 /* Handles reads from the YMZ280B */
 static READ16_HANDLER( cave_sound_r )
 {
-	return YMZ280B_status_0_r(offset);
+	return YMZ280B_status_0_r(machine,offset);
 }
 
 
@@ -350,7 +350,7 @@ static WRITE16_HANDLER( cave_eeprom_msb_w )
 static WRITE16_HANDLER( sailormn_eeprom_msb_w )
 {
 	sailormn_tilebank_w    ( data &  0x0100 );
-	cave_eeprom_msb_w(offset,data & ~0x0100,mem_mask);
+	cave_eeprom_msb_w(machine,offset,data & ~0x0100,mem_mask);
 }
 
 static WRITE16_HANDLER( hotdogst_eeprom_msb_w )
@@ -578,7 +578,7 @@ static READ16_HANDLER( donpachi_videoregs_r )
 		case 0:
 		case 1:
 		case 2:
-		case 3:	return cave_irq_cause_r(offset,0);
+		case 3:	return cave_irq_cause_r(machine,offset,0);
 
 		default:	return 0x0000;
 	}
@@ -1082,7 +1082,7 @@ static READ16_HANDLER( sailormn_input0_r )
 
 static READ16_HANDLER( agallet_irq_cause_r )
 {
-	UINT16 irq_cause = cave_irq_cause_r(offset,mem_mask);
+	UINT16 irq_cause = cave_irq_cause_r(machine,offset,mem_mask);
 
 	if (offset == 0)
 	{

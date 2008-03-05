@@ -343,7 +343,7 @@ static WRITE8_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
-		DAC_0_data_w(0, data );
+		DAC_0_data_w(machine, 0, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -435,8 +435,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line_and_vector(Machine, 2,0,HOLD_LINE,0xff);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )

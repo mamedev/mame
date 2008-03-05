@@ -59,14 +59,14 @@ static UINT16 *cninja_ram;
 
 static WRITE16_HANDLER( cninja_sound_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 static WRITE16_HANDLER( stoneage_sound_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( interrupt_gen )

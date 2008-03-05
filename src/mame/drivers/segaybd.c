@@ -210,7 +210,7 @@ static void sound_cpu_irq(int state)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(0, param);
+	soundlatch_w(machine, 0, param);
 	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -224,8 +224,8 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(Machine, 3, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(offset);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(machine,offset);
 }
 
 
@@ -314,7 +314,7 @@ static WRITE16_HANDLER( io_chip_w )
                 D1-D0 = ADC0-1
             */
 			segaic16_set_display_enable(data & 0x80);
-			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(0,0);
+			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(machine,0,0);
 			cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);

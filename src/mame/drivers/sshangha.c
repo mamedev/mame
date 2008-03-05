@@ -89,8 +89,8 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 
 static WRITE16_HANDLER( sshangha_sound_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -142,7 +142,7 @@ static MACHINE_RESET( sshangha )
          orientation when entering the "test mode"
          (check the game code from 0x0006b8 to 0x0006f0).
        I can't tell however if this is accurate or not. */
-	sshangha_control_0_w(0, 0x10, 0xff00);
+	sshangha_control_0_w(machine, 0, 0x10, 0xff00);
 }
 
 /******************************************************************************/

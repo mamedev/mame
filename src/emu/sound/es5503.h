@@ -4,7 +4,7 @@
 struct ES5503interface
 {
 	void (*irq_callback)(int state);
-	read8_handler adc_read;
+	read8_machine_func adc_read;
 	UINT8 *wave_memory;
 };
 

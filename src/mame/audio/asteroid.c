@@ -280,7 +280,7 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( asteroid_explode_w )
 {
-	discrete_sound_w(ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);				// Volume
+	discrete_sound_w(machine,ASTEROID_EXPLODE_DATA,(data&0x3c)>>2);				// Volume
 	/* We will modify the pitch data to send the divider value. */
 	switch ((data&0xc0))
 	{
@@ -297,27 +297,27 @@ WRITE8_HANDLER( asteroid_explode_w )
 			data = 5;
 			break;
 	}
-	discrete_sound_w(ASTEROID_EXPLODE_PITCH, data);
+	discrete_sound_w(machine,ASTEROID_EXPLODE_PITCH, data);
 }
 
 WRITE8_HANDLER( asteroid_thump_w )
 {
-	discrete_sound_w(ASTEROID_THUMP_EN,   data & 0x10);
-	discrete_sound_w(ASTEROID_THUMP_DATA, data & 0x0f);
+	discrete_sound_w(machine, ASTEROID_THUMP_EN,   data & 0x10);
+	discrete_sound_w(machine, ASTEROID_THUMP_DATA, data & 0x0f);
 }
 
 WRITE8_HANDLER( asteroid_sounds_w )
 {
-	discrete_sound_w(ASTEROID_SAUCER_SND_EN + offset, data & 0x80);
+	discrete_sound_w(machine, ASTEROID_SAUCER_SND_EN + offset, data & 0x80);
 }
 
 WRITE8_HANDLER( astdelux_sounds_w )
 {
 	/* Only ever activates the thrusters in Astdelux */
-	discrete_sound_w(ASTEROID_THRUST_EN, data & 0x80);
+	discrete_sound_w(machine, ASTEROID_THRUST_EN, data & 0x80);
 }
 
 WRITE8_HANDLER( asteroid_noise_reset_w )
 {
-	discrete_sound_w(ASTEROID_NOISE_RESET, 0);
+	discrete_sound_w(machine, ASTEROID_NOISE_RESET, 0);
 }

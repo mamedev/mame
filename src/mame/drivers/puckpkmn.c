@@ -92,7 +92,7 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( puckpkmn_YM3438_r )
 {
-	return	YM3438_status_port_0_A_r(0) << 8;
+	return	YM3438_status_port_0_A_r(machine, 0) << 8;
 }
 
 static WRITE16_HANDLER( puckpkmn_YM3438_w )
@@ -100,12 +100,12 @@ static WRITE16_HANDLER( puckpkmn_YM3438_w )
 	switch (offset)
 	{
 		case 0:
-			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_A_w		(0,	(data >> 0) & 0xff);
+			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				YM3438_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		case 1:
-			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(0,	(data >> 8) & 0xff);
-			else 				YM3438_data_port_0_B_w		(0,	(data >> 0) & 0xff);
+			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+			else 				YM3438_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 	}
 }

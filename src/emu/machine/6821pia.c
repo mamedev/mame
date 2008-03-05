@@ -249,7 +249,7 @@ static UINT8 get_in_a_value(int which)
 
 	/* update the input */
 	if (p->intf->in_a_func)
-		port_a_data = p->intf->in_a_func(0);
+		port_a_data = p->intf->in_a_func(Machine, 0);
 	else
 	{
 		if (p->in_a_pushed)
@@ -292,7 +292,7 @@ static UINT8 get_in_b_value(int which)
 
 		/* update the input */
 		if (p->intf->in_b_func)
-			port_b_data = p->intf->in_b_func(0);
+			port_b_data = p->intf->in_b_func(Machine, 0);
 		else
 		{
 			if (p->in_b_pushed)
@@ -368,7 +368,7 @@ static void set_out_ca2(int which, int data)
 
 		/* send to output function */
 		if (p->intf->out_ca2_func)
-			p->intf->out_ca2_func(0, p->out_ca2);
+			p->intf->out_ca2_func(Machine, 0, p->out_ca2);
 		else
 		{
 			if (p->out_ca2_needs_pulled)
@@ -393,7 +393,7 @@ static void set_out_cb2(int which, int data)
 
 		/* send to output function */
 		if (p->intf->out_cb2_func)
-			p->intf->out_cb2_func(0, p->out_cb2);
+			p->intf->out_cb2_func(Machine, 0, p->out_cb2);
 		else
 		{
 			if (p->out_cb2_needs_pulled)
@@ -495,7 +495,7 @@ static UINT8 control_a_r(int which)
 
 	/* update CA1 & CA2 if callback exists, these in turn may update IRQ's */
 	if (p->intf->in_ca1_func)
-		pia_set_input_ca1(which, p->intf->in_ca1_func(0));
+		pia_set_input_ca1(which, p->intf->in_ca1_func(Machine, 0));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA1 read handler. Assuming pin not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
@@ -503,7 +503,7 @@ static UINT8 control_a_r(int which)
 	}
 
 	if (p->intf->in_ca2_func)
-		pia_set_input_ca2(which, p->intf->in_ca2_func(0));
+		pia_set_input_ca2(which, p->intf->in_ca2_func(Machine, 0));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA2 read handler. Assuming pin not connected\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
@@ -533,7 +533,7 @@ static UINT8 control_b_r(int which)
 
 	/* update CB1 & CB2 if callback exists, these in turn may update IRQ's */
 	if (p->intf->in_cb1_func)
-		pia_set_input_cb1(which, p->intf->in_cb1_func(0));
+		pia_set_input_cb1(which, p->intf->in_cb1_func(Machine, 0));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Error! no CB1 read handler. Three-state pin is undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
@@ -541,7 +541,7 @@ static UINT8 control_b_r(int which)
 	}
 
 	if (p->intf->in_cb2_func)
-		pia_set_input_cb2(which, p->intf->in_cb2_func(0));
+		pia_set_input_cb2(which, p->intf->in_cb2_func(Machine, 0));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
 		logerror("cpu #%d (PC=%08X): PIA #%d: Error! No CB2 read handler. Three-state pin is undefined\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which);
@@ -630,7 +630,7 @@ static void send_to_out_a_func(int which, const char* message)
 	LOG(("cpu #%d (PC=%08X): PIA #%d: %s = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, message, data));
 
 	if (p->intf->out_a_func)
-		p->intf->out_a_func(0, data);
+		p->intf->out_a_func(Machine, 0, data);
 	else
 	{
 		if (p->out_a_needs_pulled)
@@ -651,7 +651,7 @@ static void send_to_out_b_func(int which, const char* message)
 	LOG(("cpu #%d (PC=%08X): PIA #%d: %s = %02X\n", cpu_getactivecpu(), safe_activecpu_get_pc(), which, message, data));
 
 	if (p->intf->out_b_func)
-		p->intf->out_b_func(0, data);
+		p->intf->out_b_func(Machine, 0, data);
 	else
 	{
 		if (p->out_b_needs_pulled)

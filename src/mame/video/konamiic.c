@@ -2246,26 +2246,26 @@ WRITE8_HANDLER( K052109_w )
 
 READ16_HANDLER( K052109_word_r )
 {
-	return K052109_r(offset + 0x2000) | (K052109_r(offset) << 8);
+	return K052109_r(machine,offset + 0x2000) | (K052109_r(machine,offset) << 8);
 }
 
 WRITE16_HANDLER( K052109_word_w )
 {
 	if (ACCESSING_MSB)
-		K052109_w(offset,(data >> 8) & 0xff);
+		K052109_w(machine,offset,(data >> 8) & 0xff);
 	if (ACCESSING_LSB)
-		K052109_w(offset + 0x2000,data & 0xff);
+		K052109_w(machine,offset + 0x2000,data & 0xff);
 }
 
 READ16_HANDLER(K052109_lsb_r)
 {
-	return K052109_r(offset);
+	return K052109_r(machine,offset);
 }
 
 WRITE16_HANDLER(K052109_lsb_w)
 {
 	if(ACCESSING_LSB)
-		K052109_w(offset, data & 0xff);
+		K052109_w(machine, offset, data & 0xff);
 }
 
 void K052109_set_RMRD_line(int state)
@@ -2612,15 +2612,15 @@ WRITE8_HANDLER( K051960_w )
 
 READ16_HANDLER( K051960_word_r )
 {
-	return K051960_r(offset*2 + 1) | (K051960_r(offset*2) << 8);
+	return K051960_r(machine,offset*2 + 1) | (K051960_r(machine,offset*2) << 8);
 }
 
 WRITE16_HANDLER( K051960_word_w )
 {
 	if (ACCESSING_MSB)
-		K051960_w(offset*2,(data >> 8) & 0xff);
+		K051960_w(machine,offset*2,(data >> 8) & 0xff);
 	if (ACCESSING_LSB)
-		K051960_w(offset*2 + 1,data & 0xff);
+		K051960_w(machine,offset*2 + 1,data & 0xff);
 }
 
 READ8_HANDLER( K051937_r )
@@ -2685,15 +2685,15 @@ WRITE8_HANDLER( K051937_w )
 
 READ16_HANDLER( K051937_word_r )
 {
-	return K051937_r(offset*2 + 1) | (K051937_r(offset*2) << 8);
+	return K051937_r(machine,offset*2 + 1) | (K051937_r(machine,offset*2) << 8);
 }
 
 WRITE16_HANDLER( K051937_word_w )
 {
 	if (ACCESSING_MSB)
-		K051937_w(offset*2,(data >> 8) & 0xff);
+		K051937_w(machine,offset*2,(data >> 8) & 0xff);
 	if (ACCESSING_LSB)
-		K051937_w(offset*2 + 1,data & 0xff);
+		K051937_w(machine,offset*2 + 1,data & 0xff);
 }
 
 
@@ -2926,23 +2926,23 @@ READ8_HANDLER( K052109_051960_r )
 	if (K052109_RMRD_line == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return K051937_r(offset - 0x3800);
+			return K051937_r(machine,offset - 0x3800);
 		else if (offset < 0x3c00)
-			return K052109_r(offset);
+			return K052109_r(machine,offset);
 		else
-			return K051960_r(offset - 0x3c00);
+			return K051960_r(machine,offset - 0x3c00);
 	}
-	else return K052109_r(offset);
+	else return K052109_r(machine,offset);
 }
 
 WRITE8_HANDLER( K052109_051960_w )
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		K051937_w(offset - 0x3800,data);
+		K051937_w(machine,offset - 0x3800,data);
 	else if (offset < 0x3c00)
-		K052109_w(offset,data);
+		K052109_w(machine,offset,data);
 	else
-		K051960_w(offset - 0x3c00,data);
+		K051960_w(machine,offset - 0x3c00,data);
 }
 
 
@@ -3188,26 +3188,26 @@ WRITE8_HANDLER( K053244_1_w )
 
 READ16_HANDLER( K053244_lsb_r )
 {
-	return K053244_r(offset);
+	return K053244_r(machine, offset);
 }
 
 WRITE16_HANDLER( K053244_lsb_w )
 {
 	if (ACCESSING_LSB)
-		K053244_w(offset, data & 0xff);
+		K053244_w(machine, offset, data & 0xff);
 }
 
 READ16_HANDLER( K053244_word_r )
 {
-	return (K053244_r(offset*2)<<8)|K053244_r(offset*2+1);
+	return (K053244_r(machine, offset*2)<<8)|K053244_r(machine, offset*2+1);
 }
 
 WRITE16_HANDLER( K053244_word_w )
 {
 	if (ACCESSING_MSB)
-		K053244_w(offset*2, (data >> 8) & 0xff);
+		K053244_w(machine, offset*2, (data >> 8) & 0xff);
 	if (ACCESSING_LSB)
-		K053244_w(offset*2+1, data & 0xff);
+		K053244_w(machine, offset*2+1, data & 0xff);
 }
 
 void K053244_bankselect(int chip, int bank)
@@ -4128,28 +4128,28 @@ WRITE8_HANDLER( K053246_w )
 READ16_HANDLER( K053246_word_r )
 {
 	offset <<= 1;
-	return K053246_r(offset + 1) | (K053246_r(offset) << 8);
+	return K053246_r(machine, offset + 1) | (K053246_r(machine, offset) << 8);
 }
 
 WRITE16_HANDLER( K053246_word_w )
 {
 	if (ACCESSING_MSB)
-		K053246_w(offset<<1,(data >> 8) & 0xff);
+		K053246_w(machine, offset<<1,(data >> 8) & 0xff);
 	if (ACCESSING_LSB)
-		K053246_w((offset<<1) + 1,data & 0xff);
+		K053246_w(machine, (offset<<1) + 1,data & 0xff);
 }
 
 READ32_HANDLER( K053246_long_r )
 {
 	offset <<= 1;
-	return (K053246_word_r(offset+1, 0xffff) | K053246_word_r(offset, 0xffff)<<16);
+	return (K053246_word_r(machine, offset+1, 0xffff) | K053246_word_r(machine, offset, 0xffff)<<16);
 }
 
 WRITE32_HANDLER( K053246_long_w )
 {
 	offset <<= 1;
-	K053246_word_w(offset, data>>16, mem_mask >> 16);
-	K053246_word_w(offset+1, data, mem_mask);
+	K053246_word_w(machine, offset, data>>16, mem_mask >> 16);
+	K053246_word_w(machine, offset+1, data, mem_mask);
 }
 
 void K053246_set_OBJCHA_line(int state)
@@ -5155,13 +5155,13 @@ WRITE8_HANDLER( K053251_w )
 WRITE16_HANDLER( K053251_lsb_w )
 {
 	if (ACCESSING_LSB)
-		K053251_w(offset, data & 0xff);
+		K053251_w(machine, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( K053251_msb_w )
 {
 	if (ACCESSING_MSB)
-		K053251_w(offset, (data >> 8) & 0xff);
+		K053251_w(machine, offset, (data >> 8) & 0xff);
 }
 
 int K053251_get_priority(int ci)
@@ -5230,13 +5230,13 @@ if (K054000_ram[0x0c] == 0xff) Acy+=3;
 
 READ16_HANDLER( K054000_lsb_r )
 {
-	return K054000_r(offset);
+	return K054000_r(machine, offset);
 }
 
 WRITE16_HANDLER( K054000_lsb_w )
 {
 	if (ACCESSING_LSB)
-		K054000_w(offset, data & 0xff);
+		K054000_w(machine, offset, data & 0xff);
 }
 
 
@@ -6074,7 +6074,7 @@ READ16_HANDLER( K056832_old_rom_word_r )
 READ32_HANDLER( K056832_rom_long_r )
 {
 	offset <<= 1;
-	return (K056832_rom_word_r(offset+1, 0xffff) | (K056832_rom_word_r(offset, 0xffff)<<16));
+	return (K056832_rom_word_r(machine, offset+1, 0xffff) | (K056832_rom_word_r(machine, offset, 0xffff)<<16));
 }
 
 /* only one page is mapped to videoram at a time through a window */
@@ -6383,8 +6383,8 @@ WRITE32_HANDLER( K056832_long_w )
 	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
 	// are used to the tilemap bank register.
 	offset <<= 1;
-	K056832_word_w(offset, data>>16, mem_mask >> 16);
-	K056832_word_w(offset+1, data, mem_mask);
+	K056832_word_w(machine, offset, data>>16, mem_mask >> 16);
+	K056832_word_w(machine, offset+1, data, mem_mask);
 }
 
 WRITE16_HANDLER( K056832_b_word_w )
@@ -6396,11 +6396,11 @@ WRITE8_HANDLER( K056832_w )
 {
 	if (offset & 1)
 	{
-		K056832_word_w((offset>>1), data, 0xff00);
+		K056832_word_w(machine, (offset>>1), data, 0xff00);
 	}
 	else
 	{
-		K056832_word_w((offset>>1), data<<8, 0x00ff);
+		K056832_word_w(machine, (offset>>1), data<<8, 0x00ff);
 	}
 }
 
@@ -6408,11 +6408,11 @@ WRITE8_HANDLER( K056832_b_w )
 {
 	if (offset & 1)
 	{
-		K056832_b_word_w((offset>>1), data, 0xff00);
+		K056832_b_word_w(machine, (offset>>1), data, 0xff00);
 	}
 	else
 	{
-		K056832_b_word_w((offset>>1), data<<8, 0x00ff);
+		K056832_b_word_w(machine, (offset>>1), data<<8, 0x00ff);
 	}
 }
 
@@ -6420,11 +6420,11 @@ WRITE32_HANDLER( K056832_b_long_w )
 {
 	if (ACCESSING_MSW32)
 	{
-		K056832_b_word_w(offset<<1, data>>16, mem_mask >> 16);
+		K056832_b_word_w(machine, offset<<1, data>>16, mem_mask >> 16);
 	}
 	if (ACCESSING_LSW32)
 	{
-		K056832_b_word_w((offset<<1)+1, data, mem_mask);
+		K056832_b_word_w(machine, (offset<<1)+1, data, mem_mask);
 	}
 }
 
@@ -7241,8 +7241,8 @@ WRITE16_HANDLER( K054338_word_w )
 WRITE32_HANDLER( K054338_long_w )
 {
 	offset <<= 1;
-	K054338_word_w(offset, data>>16, mem_mask>>16);
-	K054338_word_w(offset+1, data, mem_mask);
+	K054338_word_w(machine, offset, data>>16, mem_mask>>16);
+	K054338_word_w(machine, offset+1, data, mem_mask);
 }
 
 // returns a 16-bit '338 register
@@ -8373,8 +8373,8 @@ WRITE16_HANDLER( K053252_word_w )
 WRITE32_HANDLER( K053252_long_w )
 {
 	offset <<= 1;
-	K053252_word_w(offset, data>>16, mem_mask>>16);
-	K053252_word_w(offset+1, data, mem_mask);
+	K053252_word_w(machine, offset, data>>16, mem_mask>>16);
+	K053252_word_w(machine, offset+1, data, mem_mask);
 }
 
 
@@ -8392,19 +8392,19 @@ READ16_HANDLER( K055555_word_r ) { return(k55555_regs[offset]<<8); }	// PCU2
 READ32_HANDLER( K056832_long_r )
 {
 	offset <<= 1;
-	return (K056832_word_r(offset+1, 0xffff) | K056832_word_r(offset, 0xffff)<<16);
+	return (K056832_word_r(machine, offset+1, 0xffff) | K056832_word_r(machine, offset, 0xffff)<<16);
 }
 
 READ32_HANDLER( K053247_reg_long_r )
 {
 	offset <<= 1;
-	return (K053247_reg_word_r(offset+1, 0xffff) | K053247_reg_word_r(offset, 0xffff)<<16);
+	return (K053247_reg_word_r(machine, offset+1, 0xffff) | K053247_reg_word_r(machine, offset, 0xffff)<<16);
 }
 
 READ32_HANDLER( K055555_long_r )
 {
 	offset <<= 1;
-	return (K055555_word_r(offset+1, 0xffff) | K055555_word_r(offset, 0xffff)<<16);
+	return (K055555_word_r(machine, offset+1, 0xffff) | K055555_word_r(machine, offset, 0xffff)<<16);
 }
 
 READ16_HANDLER( K053244_reg_word_r ) { return(K053244_regs[0][offset*2]<<8|K053244_regs[0][offset*2+1]); }

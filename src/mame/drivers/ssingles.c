@@ -159,7 +159,7 @@ static WRITE8_HANDLER(c001_w)
 static READ8_HANDLER(controls_r)
 {
 	int data=7;
-	switch(input_port_1_r(0)) //multiplexed
+	switch(input_port_1_r(machine,0)) //multiplexed
 	{
 		case 0x01: data=1; break;
 		case 0x02: data=2; break;
@@ -169,7 +169,7 @@ static READ8_HANDLER(controls_r)
 		case 0x20: data=6; break;
 		case 0x40: data=0; break;
 	}
-	return (input_port_0_r(0)&(~0x1c))|(data<<2);
+	return (input_port_0_r(machine,0)&(~0x1c))|(data<<2);
 }
 
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )

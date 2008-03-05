@@ -196,22 +196,22 @@ WRITE8_HANDLER( thief_blit_w ){
 				if( addr<0x2000*3 ) data = gfx_rom[addr];
 			}
 			offs = (y*32+x/8+i)&0x1fff;
-			old_data = thief_videoram_r( offs );
+			old_data = thief_videoram_r( machine,offs );
 			if( xor_blit ){
-				thief_videoram_w( offs, old_data^(data>>xoffset) );
+				thief_videoram_w( machine,offs, old_data^(data>>xoffset) );
 			}
 			else {
-				thief_videoram_w( offs,
+				thief_videoram_w( machine,offs,
 					(old_data&(0xff00>>xoffset)) | (data>>xoffset)
 				);
 			}
 			offs = (offs+1)&0x1fff;
-			old_data = thief_videoram_r( offs );
+			old_data = thief_videoram_r( machine,offs );
 			if( xor_blit ){
-				thief_videoram_w( offs, old_data^((data<<(8-xoffset))&0xff) );
+				thief_videoram_w( machine,offs, old_data^((data<<(8-xoffset))&0xff) );
 			}
 			else {
-				thief_videoram_w( offs,
+				thief_videoram_w( machine,offs,
 					(old_data&(0xff>>xoffset)) | ((data<<(8-xoffset))&0xff)
 				);
 			}

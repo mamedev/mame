@@ -105,8 +105,8 @@ static WRITE16_HANDLER( heberpop_sound_command_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);	/* RST 38h */
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);	/* RST 38h */
 	}
 }
 

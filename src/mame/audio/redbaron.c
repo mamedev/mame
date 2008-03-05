@@ -59,7 +59,7 @@ WRITE8_HANDLER( redbaron_sounds_w )
 WRITE8_HANDLER( redbaron_pokey_w )
 {
     if( latch & 0x20 )
-        pokey1_w (offset, data);
+        pokey1_w(machine, offset, data);
 }
 
 static void redbaron_sound_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)

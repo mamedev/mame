@@ -128,8 +128,8 @@ static WRITE8_HANDLER( sound_control_w ) {
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( 0, data );
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
+	soundlatch_w( machine, 0, data );
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
 }
 
 static int msm_data = 0;

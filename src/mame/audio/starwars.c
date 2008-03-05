@@ -119,7 +119,7 @@ WRITE8_HANDLER( starwars_m6532_w )
 			{
 				port_A = (port_A&(~port_A_ddr))|(data&port_A_ddr);
 				if ((port_A&0x01)==0)
-					tms5220_data_w(0,port_B);
+					tms5220_data_w(machine,0,port_B);
 			}
 			else
 				port_A = (port_A&(~port_A_ddr))|(data&port_A_ddr);

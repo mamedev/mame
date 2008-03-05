@@ -715,7 +715,7 @@ BDIR BC1       |
 */
 /* PSG function selected */
 
-static void update_ay(void)
+static void update_ay(running_machine *machine)
 {
 	if (!pia_get_output_cb2(2))
 	{
@@ -733,13 +733,13 @@ static void update_ay(void)
 		  	}
 		  	case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-	  			AY8910_write_port_0_w(0, pia_get_output_a(3));
+	  			AY8910_write_port_0_w(machine, 0, pia_get_output_a(3));
 				LOG(("AY Chip Write \n"));
 				break;
 	  		}
 		  	case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-	  			AY8910_control_port_0_w(0, pia_get_output_a(3));
+	  			AY8910_control_port_0_w(machine, 0, pia_get_output_a(3));
 				LOG(("AY Chip Select \n"));
 				break;
 	  		}
@@ -754,7 +754,7 @@ static void update_ay(void)
 
 static WRITE8_HANDLER( pia_ic5_cb2_w )
 {
-    update_ay();
+    update_ay(machine);
 }
 
 static const pia6821_interface pia_ic5_intf =
@@ -789,7 +789,7 @@ static WRITE8_HANDLER( pia_ic6_porta_w )
 	if (mod_number <4)
 	{
 	  	aydata = data;
-	    update_ay();
+	    update_ay(machine);
 	}
 }
 
@@ -800,7 +800,7 @@ static WRITE8_HANDLER( pia_ic6_ca2_w )
 	{
 		if ( data ) ay8913_address |=  0x01;
 		else        ay8913_address &= ~0x01;
-		update_ay();
+		update_ay(machine);
 	}
 }
 
@@ -811,7 +811,7 @@ static WRITE8_HANDLER( pia_ic6_cb2_w )
 	{
 		if ( data ) ay8913_address |=  0x02;
 		else        ay8913_address &= ~0x02;
-		update_ay();
+		update_ay(machine);
 	}
 }
 

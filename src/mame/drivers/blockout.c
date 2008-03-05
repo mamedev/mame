@@ -36,8 +36,8 @@ static WRITE16_HANDLER( blockout_sound_command_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

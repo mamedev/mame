@@ -144,6 +144,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "memconv.h"
 #include "includes/jaguar.h"
 #include "cpu/jaguar/jaguar.h"
 #include "sound/dac.h"
@@ -340,16 +341,13 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 
 READ32_HANDLER( jaguar_jerry_regs32_r )
 {
-	return (jaguar_jerry_regs_r(offset * 2, 0) << 16) | jaguar_jerry_regs_r(offset * 2 + 1, 0);
+	return read32be_with_16be_handler(jaguar_jerry_regs_r, machine, offset, mem_mask);
 }
 
 
 WRITE32_HANDLER( jaguar_jerry_regs32_w )
 {
-	if (ACCESSING_MSW32)
-		jaguar_jerry_regs_w(offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)
-		jaguar_jerry_regs_w(offset * 2 + 1, data, mem_mask);
+	write32be_with_16be_handler(jaguar_jerry_regs_w, machine, offset, data, mem_mask);
 }
 
 

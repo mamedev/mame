@@ -158,7 +158,7 @@ VIDEO_UPDATE( subs )
 	}
 
 	/* Update sound */
-	discrete_sound_w(SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
-	discrete_sound_w(SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
+	discrete_sound_w(machine, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
+	discrete_sound_w(machine, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
 	return 0;
 }

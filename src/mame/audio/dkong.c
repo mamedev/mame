@@ -36,16 +36,16 @@
 
 /* Needed for dkongjr ... FIXME */
 //#define I8035_T_R(N) ((portT >> (N)) & 1)
-#define I8035_T_R(N) ((soundlatch2_r(0) >> (N)) & 1)
-#define I8035_T_W_AL(N,D) do { state->portT = ACTIVELOW_PORT_BIT(state->portT,N,D); soundlatch2_w(0, state->portT); } while (0)
+#define I8035_T_R(M,N) ((soundlatch2_r(machine,0) >> (N)) & 1)
+#define I8035_T_W_AL(M,N,D) do { state->portT = ACTIVELOW_PORT_BIT(state->portT,N,D); soundlatch2_w(machine, 0, state->portT); } while (0)
 
-#define I8035_P1_R() (soundlatch3_r(0))
-#define I8035_P2_R() (soundlatch4_r(0))
-#define I8035_P1_W(D) soundlatch3_w(0,D)
-#define I8035_P2_W(D) soundlatch4_w(0,D)
+#define I8035_P1_R(M) (soundlatch3_r(M,0))
+#define I8035_P2_R(M) (soundlatch4_r(M,0))
+#define I8035_P1_W(M,D) soundlatch3_w(M,0,D)
+#define I8035_P2_W(M,D) soundlatch4_w(M,0,D)
 
-#define I8035_P1_W_AL(B,D) I8035_P1_W(ACTIVELOW_PORT_BIT(I8035_P1_R(),B,(D)))
-#define I8035_P2_W_AL(B,D) I8035_P2_W(ACTIVELOW_PORT_BIT(I8035_P2_R(),B,(D)))
+#define I8035_P1_W_AL(M,B,D) I8035_P1_W(M,ACTIVELOW_PORT_BIT(I8035_P1_R(M),B,(D)))
+#define I8035_P2_W_AL(M,B,D) I8035_P2_W(M,ACTIVELOW_PORT_BIT(I8035_P2_R(M),B,(D)))
 
 
 /****************************************************************
@@ -895,17 +895,17 @@ static SOUND_RESET( dkong )
 	state->page = 0x47;
 	state->portT = 0;
 
-	I8035_T_W_AL(0,0);
-	I8035_T_W_AL(1,0);
-	I8035_P1_W(0xFF);
-	I8035_P2_W(0xFF);
-	soundlatch_w(0,0x0F);
+	I8035_T_W_AL(machine,0,0);
+	I8035_T_W_AL(machine,1,0);
+	I8035_P1_W(machine,0xFF);
+	I8035_P2_W(machine,0xFF);
+	soundlatch_w(machine,0,0x0F);
 }
 
 static SOUND_RESET( dkongjr )
 {
 	SOUND_RESET_CALL(dkong);
-	soundlatch_w(0,0x00);
+	soundlatch_w(machine,0,0x00);
 }
 
 /****************************************************************
@@ -1004,8 +1004,8 @@ static WRITE8_HANDLER( M58817_command_w )
 {
 	logerror("PA Write %x\n", data);
 
-	tms5110_CTL_w(0, data & 0x0f);
-	tms5110_PDC_w(0, (data>>4) & 0x01);
+	tms5110_CTL_w(machine, 0, data & 0x0f);
+	tms5110_PDC_w(machine, 0, (data>>4) & 0x01);
 	// FIXME 0x20 is CS
 }
 
@@ -1017,22 +1017,22 @@ static WRITE8_HANDLER( M58817_command_w )
 
 static READ8_HANDLER( dkong_sh_p1_r )
 {
-	return I8035_P1_R();
+	return I8035_P1_R(machine);
 }
 
 static READ8_HANDLER( dkong_sh_p2_r )
 {
-	return I8035_P2_R();
+	return I8035_P2_R(machine);
 }
 
 static READ8_HANDLER( dkong_sh_t0_r )
 {
-	return I8035_T_R(0);
+	return I8035_T_R(machine,0);
 }
 
 static READ8_HANDLER( dkong_sh_t1_r )
 {
-	return I8035_T_R(1);
+	return I8035_T_R(machine,1);
 }
 
 static WRITE8_HANDLER( dkong_voice_w )
@@ -1053,12 +1053,12 @@ static READ8_HANDLER( dkong_voice_status_r )
 
 static READ8_HANDLER( dkong_sh_tune_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 	UINT8 *SND = memory_region(REGION_CPU2);
 
 	if ( state->page & 0x40 )
 	{
-		return (soundlatch_r(0) & 0x0F) | (dkong_voice_status_r(0)<<4);
+		return (soundlatch_r(machine,0) & 0x0F) | (dkong_voice_status_r(machine,0)<<4);
 	}
 	else
 	{
@@ -1069,12 +1069,12 @@ static READ8_HANDLER( dkong_sh_tune_r )
 
 static READ8_HANDLER( dkongjr_sh_tune_r )
 {
-	return soundlatch_r(0) & 0x01F;
+	return soundlatch_r(machine,0) & 0x01F;
 }
 
 static WRITE8_HANDLER( dkong_sh_p1_w )
 {
-	discrete_sound_w(DS_DAC,data);
+	discrete_sound_w(machine,DS_DAC,data);
 }
 
 
@@ -1082,13 +1082,13 @@ static READ8_HANDLER( radarsc1_sh_p1_r )
 {
 	int r;
 
-	r = (I8035_P1_R() & 0x80) | (tms5110_status_r(0)<<6);
+	r = (I8035_P1_R(machine) & 0x80) | (tms5110_status_r(machine,0)<<6);
 	return r;
 }
 
 static WRITE8_HANDLER( dkong_sh_p2_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
      *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
@@ -1098,10 +1098,10 @@ static WRITE8_HANDLER( dkong_sh_p2_w )
      */
 
 	state->mcustatus = ((~data & 0x10) >> 4);
-	radarsc1_ansn_w(0, (data & 0x20) >> 5);
+	radarsc1_ansn_w(machine, 0, (data & 0x20) >> 5);
 	state->page = (data & 0x47);
 
-	discrete_sound_w(DS_DAC_DISCHARGE, (data & 0x80) ? 0 : 1 );
+	discrete_sound_w(machine,DS_DAC_DISCHARGE, (data & 0x80) ? 0 : 1 );
 }
 
 
@@ -1113,18 +1113,18 @@ static WRITE8_HANDLER( dkong_sh_p2_w )
 
 WRITE8_HANDLER( dkongjr_sh_test6_w )
 {
-	I8035_P2_W_AL(6,data & 1);
+	I8035_P2_W_AL(machine,6,data & 1);
 }
 
 
 WRITE8_HANDLER( dkongjr_sh_tuneselect_w )
 {
-	soundlatch_w(offset,data);
+	soundlatch_w(machine,offset,data);
 }
 
 READ8_HANDLER( dkong_audio_status_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	return state->mcustatus;
 }
@@ -1132,45 +1132,45 @@ READ8_HANDLER( dkong_audio_status_r )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( dkong_snd_disc_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	switch (offset)
 	{
 		case 0:
-			discrete_sound_w(DS_SOUND0_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND0_INP,data & 1);
 			break;
 		case 1:
-			discrete_sound_w(DS_SOUND1_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND1_INP,data & 1);
 			break;
 		case 2:
-			discrete_sound_w(DS_SOUND2_INP,data & 1);
-			radarscp_snd02_w(0, data & 1);
+			discrete_sound_w(machine,DS_SOUND2_INP,data & 1);
+			radarscp_snd02_w(machine, 0, data & 1);
 			break;
 		case 3:
 			if (state->hardware_type == HARDWARE_TRS01)
 				//SOUND3 ==> PA7
-				I8035_P1_W_AL(7,data & 1);
+				I8035_P1_W_AL(machine,7,data & 1);
 			else
-				I8035_P2_W_AL(5,data & 1);
+				I8035_P2_W_AL(machine,5,data & 1);
 			break;
 		case 4:
-			I8035_T_W_AL(1, data & 1);
+			I8035_T_W_AL(machine, 1, data & 1);
 			break;
 		case 5:
-			I8035_T_W_AL(0, data & 1);
+			I8035_T_W_AL(machine, 0, data & 1);
 			break;
 		case 6:
-			discrete_sound_w(DS_SOUND6_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND6_INP,data & 1);
 			break;
 		case 7:
-			discrete_sound_w(DS_SOUND7_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND7_INP,data & 1);
 			break;
  	}
 	return;
@@ -1178,38 +1178,38 @@ WRITE8_HANDLER( dkong_snd_disc_w )
 
 WRITE8_HANDLER( dkong_sh_tuneselect_w )
 {
-	soundlatch_w(offset,data ^ 0x0f);
+	soundlatch_w(machine,offset,data ^ 0x0f);
 }
 
 WRITE8_HANDLER( dkongjr_snd_w1 )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	switch (offset)
 	{
 		case 0:			/* climb */
-			discrete_sound_w(DS_SOUND0_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND0_INP,data & 1);
 			break;
 		case 1:			/* jump */
-			discrete_sound_w(DS_SOUND1_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND1_INP,data & 1);
 			break;
 		case 2:			/* land */
-			discrete_sound_w(DS_SOUND2_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND2_INP,data & 1);
 			break;
 		case 3: /* Port 3 write ==> PB 5 */
-			I8035_P2_W_AL(5,data & 1);
+			I8035_P2_W_AL(machine,5,data & 1);
 			break;
 		case 4:			/* Port 4 write */
-			I8035_T_W_AL(1, data & 1);
+			I8035_T_W_AL(machine,1, data & 1);
 			break;
 		case 5:			/* Port 5 write */
-			I8035_T_W_AL(0, data & 1);
+			I8035_T_W_AL(machine,0, data & 1);
 			break;
 		case 6:			/* Port 6 write ==> PB 4 */
-			I8035_P2_W_AL(4,data & 1);
+			I8035_P2_W_AL(machine,4,data & 1);
 			break;
 		case 7:			/* walk */
-			discrete_sound_w(DS_SOUND7_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND7_INP,data & 1);
 			break;
 	}
 }
@@ -1219,7 +1219,7 @@ WRITE8_HANDLER( dkongjr_snd_w2 )
 	switch (offset)
 	{
 	case 0:			/* S9 - drop */
-		discrete_sound_w(DS_SOUND9_INP,data & 1);
+		discrete_sound_w(machine,DS_SOUND9_INP,data & 1);
 		break;
 	}
 }

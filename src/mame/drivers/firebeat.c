@@ -1221,19 +1221,19 @@ static READ32_HANDLER( comm_uart_r )
 
 	if (!(mem_mask & 0xff000000))
 	{
-		r |= pc16552d_0_r((offset*4)+0) << 24;
+		r |= pc16552d_0_r(machine, (offset*4)+0) << 24;
 	}
 	if (!(mem_mask & 0x00ff0000))
 	{
-		r |= pc16552d_0_r((offset*4)+1) << 16;
+		r |= pc16552d_0_r(machine, (offset*4)+1) << 16;
 	}
 	if (!(mem_mask & 0x0000ff00))
 	{
-		r |= pc16552d_0_r((offset*4)+2) << 8;
+		r |= pc16552d_0_r(machine, (offset*4)+2) << 8;
 	}
 	if (!(mem_mask & 0x000000ff))
 	{
-		r |= pc16552d_0_r((offset*4)+3) << 0;
+		r |= pc16552d_0_r(machine, (offset*4)+3) << 0;
 	}
 
 	return r;
@@ -1243,19 +1243,19 @@ static WRITE32_HANDLER( comm_uart_w )
 {
 	if (!(mem_mask & 0xff000000))
 	{
-		pc16552d_0_w((offset*4)+0, (data >> 24) & 0xff);
+		pc16552d_0_w(machine, (offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (!(mem_mask & 0x00ff0000))
 	{
-		pc16552d_0_w((offset*4)+1, (data >> 16) & 0xff);
+		pc16552d_0_w(machine, (offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (!(mem_mask & 0x0000ff00))
 	{
-		pc16552d_0_w((offset*4)+2, (data >> 8) & 0xff);
+		pc16552d_0_w(machine, (offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (!(mem_mask & 0x000000ff))
 	{
-		pc16552d_0_w((offset*4)+3, (data >> 0) & 0xff);
+		pc16552d_0_w(machine, (offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
@@ -1324,11 +1324,11 @@ static READ32_HANDLER( sound_r )
 
 	if (!(mem_mask & 0xff000000))	/* External RAM read */
 	{
-		r |= YMZ280B_data_0_r(offset) << 24;
+		r |= YMZ280B_data_0_r(machine, offset) << 24;
 	}
 	if (!(mem_mask & 0x00ff0000))
 	{
-		r |= YMZ280B_status_0_r(offset) << 16;
+		r |= YMZ280B_status_0_r(machine, offset) << 16;
 	}
 
 	return r;
@@ -1337,14 +1337,13 @@ static READ32_HANDLER( sound_r )
 static WRITE32_HANDLER( sound_w )
 {
 //  printf("sound_w: %08X, %08X, %08X\n", offset, data, mem_mask);
-
 	if (!(mem_mask & 0xff000000))
 	{
-		YMZ280B_register_0_w(offset, (data >> 24) & 0xff);
+		YMZ280B_register_0_w(machine, offset, (data >> 24) & 0xff);
 	}
 	if (!(mem_mask & 0x00ff0000))
 	{
-		YMZ280B_data_0_w(offset, (data >> 16) & 0xff);
+		YMZ280B_data_0_w(machine, offset, (data >> 16) & 0xff);
 	}
 }
 
@@ -1397,7 +1396,7 @@ static READ32_HANDLER( midi_uart_r )
 
 	if (!(mem_mask & 0xff000000))
 	{
-		r |= pc16552d_1_r(offset >> 6) << 24;
+		r |= pc16552d_1_r(machine, offset >> 6) << 24;
 	}
 
 	return r;
@@ -1407,7 +1406,7 @@ static WRITE32_HANDLER( midi_uart_w )
 {
 	if (!(mem_mask & 0xff000000))
 	{
-		pc16552d_1_w(offset >> 6, (data >> 24) & 0xff);
+		pc16552d_1_w(machine, offset >> 6, (data >> 24) & 0xff);
 	}
 }
 
@@ -1558,7 +1557,7 @@ static WRITE32_HANDLER( lamp_output_w )
 
 static WRITE32_HANDLER( lamp_output_kbm_w )
 {
-	lamp_output_w(offset, data, mem_mask);
+	lamp_output_w(machine, offset, data, mem_mask);
 
 	if (!(mem_mask & 0xff000000))
 	{
@@ -1577,7 +1576,7 @@ static WRITE32_HANDLER( lamp_output_kbm_w )
 
 static WRITE32_HANDLER( lamp_output_ppp_w )
 {
-	lamp_output_w(offset, data, mem_mask);
+	lamp_output_w(machine, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00000100 Left
@@ -1624,7 +1623,7 @@ static WRITE32_HANDLER( lamp_output2_w )
 
 static WRITE32_HANDLER( lamp_output2_ppp_w )
 {
-	lamp_output2_w(offset, data, mem_mask);
+	lamp_output2_w(machine, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Top LED 0
@@ -1658,7 +1657,7 @@ static WRITE32_HANDLER( lamp_output3_w )
 
 static WRITE32_HANDLER( lamp_output3_ppp_w )
 {
-	lamp_output3_w(offset, data, mem_mask);
+	lamp_output3_w(machine, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Lamp 0
@@ -2235,7 +2234,7 @@ static void security_w(UINT8 data)
 
 /*****************************************************************************/
 
-static void init_lights(write32_handler out1, write32_handler out2, write32_handler out3)
+static void init_lights(write32_machine_func out1, write32_machine_func out2, write32_machine_func out3)
 {
 	if(!out1) out1 = lamp_output_w;
 	if(!out2) out1 = lamp_output2_w;

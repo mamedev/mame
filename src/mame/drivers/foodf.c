@@ -180,9 +180,9 @@ static WRITE16_HANDLER( digital_w )
 		/* bit 1 = UPDATE */
 
 		if (!(data & 0x04))
-			atarigen_scanline_int_ack_w(0,0,0);
+			atarigen_scanline_int_ack_w(machine,0,0,0);
 		if (!(data & 0x08))
-			atarigen_video_int_ack_w(0,0,0);
+			atarigen_video_int_ack_w(machine,0,0,0);
 
 		output_set_led_value(0, (data >> 4) & 1);
 		output_set_led_value(1, (data >> 5) & 1);
@@ -219,13 +219,13 @@ static WRITE16_HANDLER( analog_w )
  *
  *************************************/
 
-static READ16_HANDLER( pokey1_word_r ) { return pokey1_r(offset); }
-static READ16_HANDLER( pokey2_word_r ) { return pokey2_r(offset); }
-static READ16_HANDLER( pokey3_word_r ) { return pokey3_r(offset); }
+static READ16_HANDLER( pokey1_word_r ) { return pokey1_r(machine, offset); }
+static READ16_HANDLER( pokey2_word_r ) { return pokey2_r(machine, offset); }
+static READ16_HANDLER( pokey3_word_r ) { return pokey3_r(machine, offset); }
 
-static WRITE16_HANDLER( pokey1_word_w ) { if (ACCESSING_LSB) pokey1_w(offset, data & 0xff); }
-static WRITE16_HANDLER( pokey2_word_w ) { if (ACCESSING_LSB) pokey2_w(offset, data & 0xff); }
-static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_LSB) pokey3_w(offset, data & 0xff); }
+static WRITE16_HANDLER( pokey1_word_w ) { if (ACCESSING_LSB) pokey1_w(machine, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey2_word_w ) { if (ACCESSING_LSB) pokey2_w(machine, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_LSB) pokey3_w(machine, offset, data & 0xff); }
 
 
 

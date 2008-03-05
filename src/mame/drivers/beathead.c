@@ -304,21 +304,21 @@ static READ32_HANDLER( input_3_r )
 
 static READ32_HANDLER( sound_data_r )
 {
-	return atarigen_sound_r(offset,0);
+	return atarigen_sound_r(machine,offset,0);
 }
 
 
 static WRITE32_HANDLER( sound_data_w )
 {
 	if (ACCESSING_LSB32)
-		atarigen_sound_w(offset, data, mem_mask);
+		atarigen_sound_w(machine,offset, data, mem_mask);
 }
 
 
 static WRITE32_HANDLER( sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

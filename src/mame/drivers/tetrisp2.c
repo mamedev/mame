@@ -143,15 +143,15 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 
 static READ16_HANDLER( tetrisp2_sound_r )
 {
-	return YMZ280B_status_0_r(offset);
+	return YMZ280B_status_0_r(machine,offset);
 }
 
 static WRITE16_HANDLER( tetrisp2_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		if (offset)	YMZ280B_data_0_w     (offset, data & 0xff);
-		else		YMZ280B_register_0_w (offset, data & 0xff);
+		if (offset)	YMZ280B_data_0_w     (machine, offset, data & 0xff);
+		else		YMZ280B_register_0_w (machine, offset, data & 0xff);
 	}
 }
 

@@ -484,8 +484,8 @@ static struct dynamic_address
 {
 	offs_t			start;
 	offs_t			end;
-	read32_handler	read;
-	write32_handler	write;
+	read32_machine_func	read;
+	write32_machine_func	write;
 	const char *	rdname;
 	const char *	wrname;
 } dynamic[MAX_DYNAMIC_ADDRESSES];
@@ -1086,7 +1086,7 @@ static READ32_HANDLER( nile_r )
 		case NREG_BAR7:
 		case NREG_BAR8:
 		case NREG_BARB:
-			result = pci_bridge_r(offset & 0x3f, mem_mask);
+			result = pci_bridge_r(machine, offset & 0x3f, mem_mask);
 			break;
 
 	}
@@ -1235,7 +1235,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_BAR7:
 		case NREG_BAR8:
 		case NREG_BARB:
-			pci_bridge_w(offset & 0x3f, data, mem_mask);
+			pci_bridge_w(machine, offset & 0x3f, data, mem_mask);
 			break;
 
 		case NREG_DCS2:
@@ -1482,25 +1482,25 @@ static WRITE32_HANDLER( asic_fifo_w )
 
 static READ32_HANDLER( ide_main_r )
 {
-	return ide_controller32_0_r(0x1f0/4 + offset, mem_mask);
+	return ide_controller32_0_r(machine, 0x1f0/4 + offset, mem_mask);
 }
 
 
 static WRITE32_HANDLER( ide_main_w )
 {
-	ide_controller32_0_w(0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_0_w(machine, 0x1f0/4 + offset, data, mem_mask);
 }
 
 
 static READ32_HANDLER( ide_alt_r )
 {
-	return ide_controller32_0_r(0x3f4/4 + offset, mem_mask);
+	return ide_controller32_0_r(machine, 0x3f4/4 + offset, mem_mask);
 }
 
 
 static WRITE32_HANDLER( ide_alt_w )
 {
-	ide_controller32_0_w(0x3f4/4 + offset, data, mem_mask);
+	ide_controller32_0_w(machine, 0x3f4/4 + offset, data, mem_mask);
 }
 
 
@@ -1508,9 +1508,9 @@ static READ32_HANDLER( ethernet_r )
 {
 	UINT32 result = 0;
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= smc91c94_r(offset * 2 + 0, mem_mask);
+		result |= smc91c94_r(machine, offset * 2 + 0, mem_mask);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= smc91c94_r(offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= smc91c94_r(machine, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
@@ -1518,9 +1518,9 @@ static READ32_HANDLER( ethernet_r )
 static WRITE32_HANDLER( ethernet_w )
 {
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		smc91c94_w(offset * 2 + 0, data, mem_mask);
+		smc91c94_w(machine, offset * 2 + 0, data, mem_mask);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		smc91c94_w(offset * 2 + 1, data >> 16, mem_mask >> 16);
+		smc91c94_w(machine, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -1539,7 +1539,7 @@ static WRITE32_HANDLER( dcs3_fifo_full_w )
 
 #define add_dynamic_address(s,e,r,w)	_add_dynamic_address(s,e,r,w,#r,#w)
 
-INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_handler read, write32_handler write, const char *rdname, const char *wrname)
+INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_machine_func read, write32_machine_func write, const char *rdname, const char *wrname)
 {
 	dynamic[dynamic_count].start = start;
 	dynamic[dynamic_count].end = end;

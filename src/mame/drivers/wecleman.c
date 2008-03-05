@@ -408,9 +408,9 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch ( (wecleman_selected_ip >> 5) & 3 )
 	{												// From WEC Le Mans Schems:
-		case 0:  return input_port_4_r(offset);		// Accel - Schems: Accelevr
+		case 0:  return input_port_4_r(machine, offset);		// Accel - Schems: Accelevr
 		case 1:  return ~0;							// ????? - Schems: Not Used
-		case 2:  return input_port_5_r(offset);		// Wheel - Schems: Handlevr
+		case 2:  return input_port_5_r(machine, offset);		// Wheel - Schems: Handlevr
 		case 3:  return ~0;							// Table - Schems: Turnvr
 
 		default: return ~0;
@@ -563,32 +563,32 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( hotchase_K051316_0_r )
 {
-	return K051316_0_r(offset) & 0xff;
+	return K051316_0_r(machine, offset) & 0xff;
 }
 
 static READ16_HANDLER( hotchase_K051316_1_r )
 {
-	return K051316_1_r(offset) & 0xff;
+	return K051316_1_r(machine, offset) & 0xff;
 }
 
 static WRITE16_HANDLER( hotchase_K051316_0_w )
 {
-	if (ACCESSING_LSB)      K051316_0_w(offset, data & 0xff);
+	if (ACCESSING_LSB)      K051316_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_1_w )
 {
-	if (ACCESSING_LSB)      K051316_1_w(offset, data & 0xff);
+	if (ACCESSING_LSB)      K051316_1_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_ctrl_0_w )
 {
-	if (ACCESSING_LSB)      K051316_ctrl_0_w(offset, data & 0xff);
+	if (ACCESSING_LSB)      K051316_ctrl_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_ctrl_1_w )
 {
-	if (ACCESSING_LSB)      K051316_ctrl_1_w(offset, data & 0xff);
+	if (ACCESSING_LSB)      K051316_ctrl_1_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_soundlatch_w );
@@ -651,8 +651,8 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xFF);
-		cpunum_set_input_line(Machine, 2,0, HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xFF);
+		cpunum_set_input_line(machine, 2,0, HOLD_LINE);
 	}
 }
 
@@ -719,8 +719,8 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xFF);
-		cpunum_set_input_line(Machine, 2,M6809_IRQ_LINE, HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xFF);
+		cpunum_set_input_line(machine, 2,M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -791,11 +791,11 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 #define HOTCHASE_K007232_RW(_chip_) \
 static READ8_HANDLER( hotchase_K007232_##_chip_##_r ) \
 { \
-	return K007232_read_port_##_chip_##_r(offset ^ 1); \
+	return K007232_read_port_##_chip_##_r(machine, offset ^ 1); \
 } \
 static WRITE8_HANDLER( hotchase_K007232_##_chip_##_w ) \
 { \
-	K007232_write_port_##_chip_##_w(offset ^ 1, data); \
+	K007232_write_port_##_chip_##_w(machine, offset ^ 1, data); \
 } \
 
 /* 3 x K007232 */

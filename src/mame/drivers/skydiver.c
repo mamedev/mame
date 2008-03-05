@@ -145,11 +145,11 @@ static WRITE8_HANDLER( skydiver_nmion_w )
 static INTERRUPT_GEN( skydiver_interrupt )
 {
 	/* Convert range data to divide value and write to sound */
-	discrete_sound_w(SKYDIVER_RANGE_DATA, (0x01 << (~skydiver_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
+	discrete_sound_w(machine, SKYDIVER_RANGE_DATA, (0x01 << (~skydiver_videoram[0x394] & 0x07)) & 0xff);	// Range 0-2
 
-	discrete_sound_w(SKYDIVER_RANGE3_EN,  skydiver_videoram[0x394] & 0x08);		// Range 3 - note disable
-	discrete_sound_w(SKYDIVER_NOTE_DATA, ~skydiver_videoram[0x395] & 0xff);		// Note - freq
-	discrete_sound_w(SKYDIVER_NOISE_DATA,  skydiver_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
+	discrete_sound_w(machine, SKYDIVER_RANGE3_EN,  skydiver_videoram[0x394] & 0x08);		// Range 3 - note disable
+	discrete_sound_w(machine, SKYDIVER_NOTE_DATA, ~skydiver_videoram[0x395] & 0xff);		// Note - freq
+	discrete_sound_w(machine, SKYDIVER_NOISE_DATA,  skydiver_videoram[0x396] & 0x0f);	// NAM - Noise Amplitude
 
 	if (skydiver_nmion)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
@@ -165,12 +165,12 @@ static INTERRUPT_GEN( skydiver_interrupt )
 
 static WRITE8_HANDLER( skydiver_sound_enable_w )
 {
-	discrete_sound_w(SKYDIVER_SOUND_EN, offset);
+	discrete_sound_w(machine, SKYDIVER_SOUND_EN, offset);
 }
 
 static WRITE8_HANDLER( skydiver_whistle_w )
 {
-	discrete_sound_w(SKYDIVER_WHISTLE1_EN + (offset >> 1), offset & 0x01);
+	discrete_sound_w(machine, SKYDIVER_WHISTLE1_EN + (offset >> 1), offset & 0x01);
 }
 
 

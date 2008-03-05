@@ -193,5 +193,5 @@ WRITE32_HANDLER(pci_32le_w)
 
 
 
-READ64_HANDLER(pci_64be_r) { return read64be_with_32le_handler(pci_32le_r, offset, mem_mask); }
-WRITE64_HANDLER(pci_64be_w) { write64be_with_32le_handler(pci_32le_w, offset, data, mem_mask); }
+READ64_HANDLER(pci_64be_r) { return read64be_with_32le_handler(pci_32le_r, machine, offset, mem_mask); }
+WRITE64_HANDLER(pci_64be_w) { write64be_with_32le_handler(pci_32le_w, machine, offset, data, mem_mask); }

@@ -10,12 +10,12 @@ Crazy Ballooon
 
 /*----------- defined in audio/crbaloon.c -----------*/
 
-void crbaloon_audio_set_music_freq(UINT8 freq);
-void crbaloon_audio_set_music_enable(int enabled);
+void crbaloon_audio_set_music_freq(running_machine *machine, UINT8 freq);
+void crbaloon_audio_set_music_enable(running_machine *machine, int enabled);
 void crbaloon_audio_set_explosion_enable(int enabled);
 void crbaloon_audio_set_breath_enable(int enabled);
 void crbaloon_audio_set_appear_enable(int enabled);
-void crbaloon_audio_set_laugh_enable(int enabled);
+void crbaloon_audio_set_laugh_enable(running_machine *machine, int enabled);
 
 MACHINE_DRIVER_EXTERN( crbaloon_audio );
 

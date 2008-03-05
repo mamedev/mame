@@ -42,7 +42,7 @@ static INTERRUPT_GEN( fastlane_interrupt )
 static WRITE8_HANDLER( k007121_registers_w )
 {
 	if (offset < 8)
-		K007121_ctrl_0_w(offset,data);
+		K007121_ctrl_0_w(machine,offset,data);
 	else	/* scroll registers */
 		fastlane_k007121_regs[offset] = data;
 }
@@ -71,19 +71,19 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 
 static READ8_HANDLER( fastlane_K007232_read_port_0_r )
 {
-	return K007232_read_port_0_r(offset ^ 1);
+	return K007232_read_port_0_r(machine, offset ^ 1);
 }
 static WRITE8_HANDLER( fastlane_K007232_write_port_0_w )
 {
-	K007232_write_port_0_w(offset ^ 1, data);
+	K007232_write_port_0_w(machine, offset ^ 1, data);
 }
 static READ8_HANDLER( fastlane_K007232_read_port_1_r )
 {
-	return K007232_read_port_1_r(offset ^ 1);
+	return K007232_read_port_1_r(machine, offset ^ 1);
 }
 static WRITE8_HANDLER( fastlane_K007232_write_port_1_w )
 {
-	K007232_write_port_1_w(offset ^ 1, data);
+	K007232_write_port_1_w(machine, offset ^ 1, data);
 }
 
 

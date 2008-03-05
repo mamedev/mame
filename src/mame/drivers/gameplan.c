@@ -141,12 +141,12 @@ static WRITE8_HANDLER( audio_cmd_w )
 
 static WRITE8_HANDLER( audio_trigger_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	UINT8 cmd = (data << 7) | (state->audio_cmd & 0x7f);
 
-	soundlatch_w(0, cmd);
-	r6532_0_porta_w(0, cmd);
+	soundlatch_w(machine, 0, cmd);
+	r6532_0_porta_w(machine, 0, cmd);
 }
 
 

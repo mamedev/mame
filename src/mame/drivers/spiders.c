@@ -273,13 +273,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_1_ca1_w(0, input_port_0_r(0) & 0x02);
+	pia_1_ca1_w(machine, 0, input_port_0_r(machine, 0) & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_1_ca2_w(0, input_port_0_r(0) & 0x01);
+	pia_1_ca2_w(machine, 0, input_port_0_r(machine, 0) & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(0, input_port_5_r(0));
+	pia_1_cb1_w(machine, 0, input_port_5_r(machine, 0));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -345,7 +345,7 @@ static const pia6821_interface pia_4_intf =
 
 static void ic60_74123_output_changed(int output)
 {
-	pia_2_ca1_w(0, output);
+	pia_2_ca1_w(Machine, 0, output);
 }
 
 

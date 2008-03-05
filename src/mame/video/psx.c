@@ -3915,7 +3915,7 @@ INTERRUPT_GEN( psx_vblank )
 
 void psx_gpu_reset( void )
 {
-	psx_gpu_w( 1, 0, 0 );
+	psx_gpu_w( Machine, 1, 0, 0 );
 }
 
 void psx_lightgun_set( int n_x, int n_y )

@@ -55,14 +55,14 @@ static const struct namco_interface snkwave_interface =
 static WRITE8_HANDLER( sound_command_w )
 {
 	sound_cpu_busy = 0x20;
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sound_command_r )
 {
 	sound_cpu_busy = 0;
-	return(soundlatch_r(0));
+	return(soundlatch_r(machine,0));
 }
 
 static READ8_HANDLER( sound_nmi_ack_r )
@@ -73,7 +73,7 @@ static READ8_HANDLER( sound_nmi_ack_r )
 
 static READ8_HANDLER( jcross_port_0_r )
 {
-	return(input_port_0_r(0) | sound_cpu_busy);
+	return(input_port_0_r(machine,0) | sound_cpu_busy);
 }
 
 static WRITE8_HANDLER(jcross_vregs0_w){jcross_vregs[0]=data;}

@@ -327,7 +327,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 		case 0x00:	/* IRQON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -338,8 +338,8 @@ static WRITE8_HANDLER( polepos_latch_w )
 			polepos_sound_enable(bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(0,0);
-				polepos_engine_sound_msb_w(0,0);
+				polepos_engine_sound_lsb_w(machine,0,0);
+				polepos_engine_sound_msb_w(machine,0,0);
 			}
 			break;
 
@@ -348,11 +348,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x04:	/* RESB */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -360,7 +360,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x07:	/* CHACL */
-			polepos_chacl_w(offset,data);
+			polepos_chacl_w(machine,offset,data);
 			break;
 	}
 }
@@ -417,7 +417,7 @@ static MACHINE_RESET( polepos )
 
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
-		polepos_latch_w(i,0);
+		polepos_latch_w(machine,i,0);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,

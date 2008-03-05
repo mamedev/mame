@@ -201,7 +201,7 @@ static WRITE8_HANDLER( nmi_sub_enable_w )
 
 static WRITE8_HANDLER(sound_w)
 {
-	soundlatch_w(0,data);
+	soundlatch_w(machine,0,data);
 }
 
 
@@ -441,7 +441,7 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 static MACHINE_RESET( pturn )
 {
-	soundlatch_clear_w(0,0);
+	soundlatch_clear_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( pturn )

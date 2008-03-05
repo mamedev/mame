@@ -135,14 +135,14 @@ static WRITE16_HANDLER( audio_volume_w )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return OKIM6295_status_0_r(offset) | 0xff00;
+	return OKIM6295_status_0_r(machine, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_LSB)
-		OKIM6295_data_0_w(offset, data & 0xff);
+		OKIM6295_data_0_w(machine, offset, data & 0xff);
 }
 
 
@@ -158,9 +158,9 @@ static WRITE16_HANDLER( ym2413_w )
 	if (ACCESSING_LSB)
 	{
 		if (offset & 1)
-			YM2413_data_port_0_w(0, data & 0xff);
+			YM2413_data_port_0_w(machine, 0, data & 0xff);
 		else
-			YM2413_register_port_0_w(0, data & 0xff);
+			YM2413_register_port_0_w(machine, 0, data & 0xff);
 	}
 }
 

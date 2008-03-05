@@ -121,7 +121,7 @@ WRITE8_HANDLER( arkanoid_68705_ddrC_w )
 
 READ8_HANDLER( arkanoid_68705_input_0_r )
 {
-	int res = input_port_0_r(offset) & 0x3f;
+	int res = input_port_0_r(machine,offset) & 0x3f;
 
 	/* bit 0x40 comes from the sticky bit */
 	if (!z80write) res |= 0x40;
@@ -136,11 +136,11 @@ READ8_HANDLER( arkanoid_input_2_r )
 {
 	if (arkanoid_paddle_select)
 	{
-		arkanoid_paddle_value = input_port_3_r(offset);
+		arkanoid_paddle_value = input_port_3_r(machine,offset);
 	}
 	else
 	{
-		arkanoid_paddle_value = input_port_2_r(offset);
+		arkanoid_paddle_value = input_port_2_r(machine,offset);
 	}
 
 	return arkanoid_paddle_value;

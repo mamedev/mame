@@ -1491,7 +1491,6 @@ static WRITE16_HANDLER( sharedram_68000_w )
 static WRITE16_HANDLER( sub_ctrl_w )
 {
 	static int old_data = 0;
-
 	switch(offset)
 	{
 		case 0/2:	// bit 0: reset sub cpu?
@@ -1507,11 +1506,11 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			break;
 
 		case 4/2:	// not sure
-			if (ACCESSING_LSB)	soundlatch_w(0, data & 0xff);
+			if (ACCESSING_LSB)	soundlatch_w(machine, 0, data & 0xff);
 			break;
 
 		case 6/2:	// not sure
-			if (ACCESSING_LSB)	soundlatch2_w(0, data & 0xff);
+			if (ACCESSING_LSB)	soundlatch2_w(machine, 0, data & 0xff);
 			break;
 	}
 
@@ -1680,8 +1679,8 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_word_w(0,data,mem_mask);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_word_w(machine,0,data,mem_mask);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 	}
 }
@@ -2438,7 +2437,7 @@ static WRITE16_HANDLER( msgundam_vregs_w )
 		case 1:	offset = 2;	break;
 		case 2:	offset = 1;	break;
 	}
-	seta_vregs_w(offset,data,mem_mask);
+	seta_vregs_w(machine,offset,data,mem_mask);
 }
 
 /* Mirror RAM is necessary or startup, to clear Work RAM after the test */
@@ -2595,7 +2594,7 @@ static WRITE16_HANDLER( kiwame_nvram_w )
 
 static READ16_HANDLER( kiwame_input_r )
 {
-	int row_select = kiwame_nvram_r( 0x10a/2,0 ) & 0x1f;
+	int row_select = kiwame_nvram_r( machine,0x10a/2,0 ) & 0x1f;
 	int i;
 
 	for(i = 0; i < 5; i++)
@@ -2763,8 +2762,8 @@ static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
-		soundlatch_w(0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
 	}
 }
 
@@ -2817,7 +2816,7 @@ static WRITE8_HANDLER( sub_bankswitch_w )
 
 static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 {
-	sub_bankswitch_w(offset,data);
+	sub_bankswitch_w(machine,offset,data);
 	seta_coin_lockout_w(data);
 }
 
@@ -2931,7 +2930,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
-	soundlatch2_w(0,data);
+	soundlatch2_w(machine,0,data);
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
@@ -3065,8 +3064,8 @@ ADDRESS_MAP_END
                             Crazy Fight
 ***************************************************************************/
 
-static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_LSB)	YM3812_control_port_0_w(0, data & 0xff);	}
-static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_LSB)	YM3812_write_port_0_w(0, data & 0xff);		}
+static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_LSB)	YM3812_control_port_0_w(machine, 0, data & 0xff);	}
+static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_LSB)	YM3812_write_port_0_w(machine, 0, data & 0xff);		}
 
 static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM

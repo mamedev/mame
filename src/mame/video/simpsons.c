@@ -59,12 +59,12 @@ VIDEO_START( simpsons )
 
 static READ8_HANDLER( simpsons_K052109_r )
 {
-	return K052109_r(offset + 0x2000);
+	return K052109_r(machine,offset + 0x2000);
 }
 
 static WRITE8_HANDLER( simpsons_K052109_w )
 {
-	K052109_w(offset + 0x2000,data);
+	K052109_w(machine,offset + 0x2000,data);
 }
 
 static READ8_HANDLER( simpsons_K053247_r )

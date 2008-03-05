@@ -168,8 +168,8 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	tutankhm_flip_screen_x_w(0, data);
-	tutankhm_flip_screen_y_w(0, data);
+	tutankhm_flip_screen_x_w(machine, 0, data);
+	tutankhm_flip_screen_y_w(machine, 0, data);
 }
 
 

@@ -170,8 +170,8 @@ static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset
 
 static WRITE16_HANDLER(cyclwarr_sound_w)
 {
-	soundlatch_w(0, data >> 8);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data >> 8);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/

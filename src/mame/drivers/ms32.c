@@ -275,8 +275,8 @@ static READ32_HANDLER ( ms32_read_inputs3 )
 
 static WRITE32_HANDLER( ms32_sound_w )
 {
-	soundlatch_w(0, data & 0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	soundlatch_w(machine,0, data & 0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -1306,8 +1306,8 @@ static INTERRUPT_GEN(ms32_interrupt)
 
 static READ8_HANDLER( latch_r )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(0)^0xff;
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(machine,0)^0xff;
 }
 
 static WRITE8_HANDLER( ms32_snd_bank_w )

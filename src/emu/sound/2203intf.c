@@ -296,17 +296,17 @@ WRITE16_HANDLER( YM2203_write_port_4_lsb_w )
 WRITE8_HANDLER( YM2203_word_0_w )
 {
 	if (offset)
-		YM2203_write_port_0_w(0,data);
+		YM2203_write_port_0_w(machine,0,data);
 	else
-		YM2203_control_port_0_w(0,data);
+		YM2203_control_port_0_w(machine,0,data);
 }
 
 WRITE8_HANDLER( YM2203_word_1_w )
 {
 	if (offset)
-		YM2203_write_port_1_w(0,data);
+		YM2203_write_port_1_w(machine,0,data);
 	else
-		YM2203_control_port_1_w(0,data);
+		YM2203_control_port_1_w(machine,0,data);
 }
 
 

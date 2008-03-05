@@ -74,8 +74,8 @@ typedef struct {
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	int 	(*irq_callback)(int irqline);	/* IRQ callback */
-	read8_handler rdmem_id;					/* readmem callback for indexed instructions */
-	write8_handler wrmem_id;				/* writemem callback for indexed instructions */
+	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 }	m65ce02_Regs;
 
 
@@ -260,8 +260,8 @@ static void m65ce02_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M65CE02_ZP: m65ce02.zp.b.l = info->i; break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (read8_handler) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (write8_handler) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (read8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (write8_machine_func) info->f; break;
 	}
 }
 

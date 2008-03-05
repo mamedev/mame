@@ -102,14 +102,14 @@ static READ16_HANDLER( leta_r )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return OKIM6295_status_0_r(offset) | 0xff00;
+	return OKIM6295_status_0_r(machine, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_LSB)
-		OKIM6295_data_0_w(offset, data & 0xff);
+		OKIM6295_data_0_w(machine, offset, data & 0xff);
 }
 
 

@@ -659,7 +659,7 @@ static WRITE8_HANDLER( brickzn_palettebank_w )
 	if (data & ~0x02) 	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",activecpu_get_pc(),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
-	soundlatch_w(0,data);
+	soundlatch_w(machine,0,data);
 }
 
 /*
@@ -1736,7 +1736,7 @@ static INTERRUPT_GEN( hardhea2_interrupt )
 
 static MACHINE_RESET( hardhea2 )
 {
-	hardhea2_rambank_0_w(0,0);
+	hardhea2_rambank_0_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( hardhea2 )

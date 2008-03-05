@@ -244,23 +244,23 @@ WRITE8_HANDLER( tlc34076_w )
 
 READ16_HANDLER( tlc34076_lsb_r )
 {
-	return tlc34076_r(offset);
+	return tlc34076_r(machine, offset);
 }
 
 WRITE16_HANDLER( tlc34076_lsb_w )
 {
 	if (ACCESSING_LSB)
-		tlc34076_w(offset, data);
+		tlc34076_w(machine, offset, data);
 }
 
 READ16_HANDLER( tlc34076_msb_r )
 {
-	return tlc34076_r(offset) << 8;
+	return tlc34076_r(machine, offset) << 8;
 }
 
 WRITE16_HANDLER( tlc34076_msb_w )
 {
 	if (ACCESSING_MSB)
-		tlc34076_w(offset, data >> 8);
+		tlc34076_w(machine, offset, data >> 8);
 }
 

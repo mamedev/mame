@@ -8922,7 +8922,7 @@ static void RestoreRegionBackup(SearchRegion * region)
 
 static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region, SearchInfo * info)
 {
-	write8_handler		handler = region->writeHandler->write.handler8;
+	write8_machine_func		handler = region->writeHandler->write.handler8;
 	FPTR				handlerAddress = (FPTR)handler;
 
 	switch(info->searchSpeed)

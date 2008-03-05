@@ -208,7 +208,7 @@ static READ8_HANDLER( jsa1_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(offset);
+			result = atarigen_6502_sound_r(machine, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -230,7 +230,7 @@ static READ8_HANDLER( jsa1_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(offset, data);
+			atarigen_6502_sound_w(machine, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 				int count;
 
 				if (((data ^ last_ctl) & 0x02) && (data & 0x02))
-					tms5220_data_w(0, speech_data);
+					tms5220_data_w(machine, 0, speech_data);
 				count = 5 | ((data >> 2) & 2);
 				tms5220_set_frequency(JSA_MASTER_CLOCK*2 / (16 - count));
 			}
@@ -308,7 +308,7 @@ static WRITE8_HANDLER( jsa1_io_w )
 			tms5220_volume = ((data >> 6) & 3) * 100 / 3;
 			pokey_volume = ((data >> 4) & 3) * 100 / 3;
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
-			update_all_volumes(Machine);
+			update_all_volumes(machine);
 			break;
 	}
 }
@@ -329,13 +329,13 @@ static READ8_HANDLER( jsa2_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (has_oki6295)
-				result = OKIM6295_status_0_r(offset);
+				result = OKIM6295_status_0_r(machine, offset);
 			else
 				logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(offset);
+			result = atarigen_6502_sound_r(machine, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -356,7 +356,7 @@ static READ8_HANDLER( jsa2_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -382,18 +382,18 @@ static WRITE8_HANDLER( jsa2_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /WRV */
 			if (has_oki6295)
-				OKIM6295_data_0_w(offset, data);
+				OKIM6295_data_0_w(machine, offset, data);
 			else
 				logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(offset, data);
+			atarigen_6502_sound_w(machine, offset, data);
 			break;
 
 		case 0x204:		/* /WRIO */
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( jsa2_io_w )
             */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
-			update_all_volumes(Machine);
+			update_all_volumes(machine);
 			break;
 	}
 }
@@ -450,11 +450,11 @@ static READ8_HANDLER( jsa3_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (has_oki6295)
-				result = OKIM6295_status_0_r(offset);
+				result = OKIM6295_status_0_r(machine, offset);
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(offset);
+			result = atarigen_6502_sound_r(machine, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -475,7 +475,7 @@ static READ8_HANDLER( jsa3_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -496,7 +496,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 	{
 		case 0x000:		/* /RDV */
 			overall_volume = data * 100 / 127;
-			update_all_volumes(Machine);
+			update_all_volumes(machine);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -505,16 +505,16 @@ static WRITE8_HANDLER( jsa3_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /WRV */
 			if (has_oki6295)
-				OKIM6295_data_0_w(offset, data);
+				OKIM6295_data_0_w(machine, offset, data);
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(offset, data);
+			atarigen_6502_sound_w(machine, offset, data);
 			break;
 
 		case 0x204:		/* /WRIO */
@@ -561,7 +561,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
-			update_all_volumes(Machine);
+			update_all_volumes(machine);
 			break;
 	}
 }
@@ -584,14 +584,14 @@ static READ8_HANDLER( jsa3s_io_r )
 			if (has_oki6295)
 			{
 				if (offset & 1)
-					result = OKIM6295_status_1_r(offset);
+					result = OKIM6295_status_1_r(machine, offset);
 				else
-					result = OKIM6295_status_0_r(offset);
+					result = OKIM6295_status_0_r(machine, offset);
 			}
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(offset);
+			result = atarigen_6502_sound_r(machine, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -612,7 +612,7 @@ static READ8_HANDLER( jsa3s_io_r )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /WRV */
@@ -633,7 +633,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 	{
 		case 0x000:		/* /RDV */
 			overall_volume = data * 100 / 127;
-			update_all_volumes(Machine);
+			update_all_volumes(machine);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -642,21 +642,21 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(0);
+			atarigen_6502_irq_ack_r(machine, 0);
 			break;
 
 		case 0x200:		/* /WRV */
 			if (has_oki6295)
 			{
 				if (offset & 1)
-					OKIM6295_data_1_w(offset, data);
+					OKIM6295_data_1_w(machine, offset, data);
 				else
-					OKIM6295_data_0_w(offset, data);
+					OKIM6295_data_0_w(machine, offset, data);
 			}
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(offset, data);
+			atarigen_6502_sound_w(machine, offset, data);
 			break;
 
 		case 0x204:		/* /WRIO */
@@ -704,7 +704,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
 			oki6295_volume = 50 + (data & 1) * 50;
-			update_all_volumes(Machine);
+			update_all_volumes(machine);
 			break;
 	}
 }

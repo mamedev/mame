@@ -46,8 +46,8 @@ extern VIDEO_UPDATE( tagteam );
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 }
 
 

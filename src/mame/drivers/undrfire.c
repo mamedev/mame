@@ -222,13 +222,13 @@ static READ32_HANDLER( undrfire_input_r )
 	{
 		case 0x00:
 		{
-			return (input_port_0_word_r(0,0) << 16) | input_port_1_word_r(0,0) |
+			return (input_port_0_word_r(machine,0,0) << 16) | input_port_1_word_r(machine,0,0) |
 				  (EEPROM_read_bit() << 7) | frame_counter;
 		}
 
 		case 0x01:
 		{
-			return input_port_2_word_r(0,0) | (coin_word << 16);
+			return input_port_2_word_r(machine,0,0) | (coin_word << 16);
 		}
  	}
 
@@ -243,7 +243,7 @@ static WRITE32_HANDLER( undrfire_input_w )
 		{
 			if (ACCESSING_MSB32)	/* $500000 is watchdog */
 			{
-				watchdog_reset_w(0,data >> 24);
+				watchdog_reset(machine);
 			}
 
 			if (ACCESSING_LSB32)
@@ -313,8 +313,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x00:	/* P1 */
 		{
-			x = input_port_3_word_r(0,0) << 6;
-			y = input_port_4_word_r(0,0) << 6;
+			x = input_port_3_word_r(machine,0,0) << 6;
+			y = input_port_4_word_r(machine,0,0) << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -322,8 +322,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x01:	/* P2 */
 		{
-			x = input_port_5_word_r(0,0) << 6;
-			y = input_port_6_word_r(0,0) << 6;
+			x = input_port_5_word_r(machine,0,0) << 6;
+			y = input_port_6_word_r(machine,0,0) << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;

@@ -150,12 +150,12 @@ WRITE8_HANDLER( frogs_audio_w )
 	int new_croak = data & 0x08;
 	int new_buzzz = data & 0x10;
 
-//  discrete_sound_w(FROGS_HOP_EN, data & 0x01);
-//  discrete_sound_w(FROGS_JUMP_EN, data & 0x02);
-	discrete_sound_w(FROGS_TONGUE_EN, data & 0x04);
-//  discrete_sound_w(FROGS_CAPTURE_EN, data & 0x08);
-//  discrete_sound_w(FROGS_FLY_EN, data & 0x10);
-//  discrete_sound_w(FROGS_SPLASH_EN, data & 0x80);
+//  discrete_sound_w(machine, FROGS_HOP_EN, data & 0x01);
+//  discrete_sound_w(machine, FROGS_JUMP_EN, data & 0x02);
+	discrete_sound_w(machine, FROGS_TONGUE_EN, data & 0x04);
+//  discrete_sound_w(machine, FROGS_CAPTURE_EN, data & 0x08);
+//  discrete_sound_w(machine, FROGS_FLY_EN, data & 0x10);
+//  discrete_sound_w(machine, FROGS_SPLASH_EN, data & 0x80);
 
 	if (data & 0x01)
 		sample_start (3, 3, 0);	// Hop
@@ -447,13 +447,13 @@ WRITE8_HANDLER( headon_audio_w )
 {
 	if (!sndti_exists(SOUND_DISCRETE, 0))
 		return;
-	discrete_sound_w(HEADON_HISPEED_PC_EN, data & 0x01);
-	discrete_sound_w(HEADON_SCREECH1_EN, data & 0x02);
-	discrete_sound_w(HEADON_CRASH_EN, data & 0x04);
-	discrete_sound_w(HEADON_HISPEED_CC_EN, data & 0x08);
-	discrete_sound_w(HEADON_SCREECH2_EN, data & 0x10);
-	discrete_sound_w(HEADON_BONUS_EN, data & 0x20);
-	discrete_sound_w(HEADON_CAR_ON_EN, data & 0x40);
+	discrete_sound_w(machine, HEADON_HISPEED_PC_EN, data & 0x01);
+	discrete_sound_w(machine, HEADON_SCREECH1_EN, data & 0x02);
+	discrete_sound_w(machine, HEADON_CRASH_EN, data & 0x04);
+	discrete_sound_w(machine, HEADON_HISPEED_CC_EN, data & 0x08);
+	discrete_sound_w(machine, HEADON_SCREECH2_EN, data & 0x10);
+	discrete_sound_w(machine, HEADON_BONUS_EN, data & 0x20);
+	discrete_sound_w(machine, HEADON_CAR_ON_EN, data & 0x40);
 
 }
 
@@ -461,13 +461,13 @@ WRITE8_HANDLER( invho2_audio_w )
 {
 	if (!sndti_exists(SOUND_DISCRETE, 0))
 		return;
-	discrete_sound_w(HEADON_HISPEED_PC_EN, data & 0x10);
-	discrete_sound_w(HEADON_SCREECH1_EN, data & 0x08);
-	discrete_sound_w(HEADON_CRASH_EN, data & 0x80);
-	discrete_sound_w(HEADON_HISPEED_CC_EN, data & 0x40);
-	discrete_sound_w(HEADON_SCREECH2_EN, data & 0x04);
-	discrete_sound_w(HEADON_BONUS_EN, data & 0x02);
-	discrete_sound_w(HEADON_CAR_ON_EN, data & 0x20);
+	discrete_sound_w(machine, HEADON_HISPEED_PC_EN, data & 0x10);
+	discrete_sound_w(machine, HEADON_SCREECH1_EN, data & 0x08);
+	discrete_sound_w(machine, HEADON_CRASH_EN, data & 0x80);
+	discrete_sound_w(machine, HEADON_HISPEED_CC_EN, data & 0x40);
+	discrete_sound_w(machine, HEADON_SCREECH2_EN, data & 0x04);
+	discrete_sound_w(machine, HEADON_BONUS_EN, data & 0x02);
+	discrete_sound_w(machine, HEADON_CAR_ON_EN, data & 0x20);
 
 }
 

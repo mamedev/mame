@@ -268,7 +268,7 @@ WRITE8_HANDLER( taitosj_characterram_w )
 
 WRITE8_HANDLER( junglhbr_characterram_w )
 {
-	taitosj_characterram_w(offset, data ^ 0xfc);
+	taitosj_characterram_w(machine, offset, data ^ 0xfc);
 }
 
 

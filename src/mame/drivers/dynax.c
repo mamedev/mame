@@ -295,7 +295,7 @@ static int palbank;
 static WRITE8_HANDLER( hnoridur_palbank_w )
 {
 	palbank = data & 0x0f;
-	dynax_blit_palbank_w(0,data);
+	dynax_blit_palbank_w(machine,0,data);
 }
 
 static WRITE8_HANDLER( hnoridur_palette_w )
@@ -338,7 +338,6 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 static WRITE8_HANDLER( yarunara_palette_w )
 {
 	int addr = 512*palbank + offset;
-
 	switch (hnoridur_bank)
 	{
 		case 0x10:
@@ -346,7 +345,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 			break;
 
 		case 0x1c:	// RTC
-			msm6242_w(offset,data);
+			msm6242_w(machine,offset,data);
 			return;
 
 		default:
@@ -360,7 +359,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(Machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -444,11 +443,11 @@ static MACHINE_RESET( adpcm )
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
 {
-	hanamai_layer_half_w(0,data >> 1);
+	hanamai_layer_half_w(machine,0,data >> 1);
 }
 static WRITE8_HANDLER( yarunara_layer_half2_w )
 {
-	hnoridur_layer_half2_w(0,data >> 1);
+	hnoridur_layer_half2_w(machine,0,data >> 1);
 }
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -657,18 +656,18 @@ static WRITE8_HANDLER( yarunara_rombank_w )
 
 static WRITE8_HANDLER( yarunara_flipscreen_w )
 {
-	dynax_flipscreen_w(0,(data&2)?1:0);
+	dynax_flipscreen_w(machine,0,(data&2)?1:0);
 }
 
 static WRITE8_HANDLER( yarunara_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(0,0);	return;
-		case 0x01:	dynax_blit_romregion_w(0,1);	return;
-		case 0x80:	dynax_blit_romregion_w(0,2);	return;
-		case 0x81:	dynax_blit_romregion_w(0,3);	return;
-		case 0x82:	dynax_blit_romregion_w(0,4);	return;	// mjcomv1
+		case 0x00:	dynax_blit_romregion_w(machine,0,0);	return;
+		case 0x01:	dynax_blit_romregion_w(machine,0,1);	return;
+		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
+		case 0x81:	dynax_blit_romregion_w(machine,0,3);	return;
+		case 0x82:	dynax_blit_romregion_w(machine,0,4);	return;	// mjcomv1
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }
@@ -955,7 +954,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjelctrn_keyboard_1_r )
 {
-	return (hanamai_keyboard_1_r(0) & 0x3f) | (readinputport(15) ? 0x40 : 0);
+	return (hanamai_keyboard_1_r(machine,0) & 0x3f) | (readinputport(15) ? 0x40 : 0);
 }
 
 static READ8_HANDLER( mjelctrn_dsw_r )
@@ -1098,9 +1097,9 @@ static WRITE8_HANDLER( htengoku_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x80:	dynax_blit_romregion_w(0,0);	return;
-		case 0x81:	dynax_blit_romregion_w(0,1);	return;
-		case 0x00:	dynax_blit_romregion_w(0,2);	return;
+		case 0x80:	dynax_blit_romregion_w(machine,0,0);	return;
+		case 0x81:	dynax_blit_romregion_w(machine,0,1);	return;
+		case 0x00:	dynax_blit_romregion_w(machine,0,2);	return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }
@@ -1328,11 +1327,11 @@ static READ8_HANDLER( tenkai_8000_r )
 	}
 	else if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		return msm6242_r(offset);
+		return msm6242_r(machine,offset);
 	}
 	else if (rombank == 0x12)
 	{
-		return tenkai_palette_r(offset);
+		return tenkai_palette_r(machine,offset);
 	}
 
 	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",activecpu_get_pc(),offset,rombank);
@@ -1343,12 +1342,12 @@ static WRITE8_HANDLER( tenkai_8000_w )
 {
 	if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		msm6242_w(offset,data);
+		msm6242_w(machine,offset,data);
 		return;
 	}
 	else if (rombank == 0x12)
 	{
-		tenkai_palette_w(offset,data);
+		tenkai_palette_w(machine,offset,data);
 		return;
 	}
 
@@ -1375,9 +1374,9 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(0,0);	return;
-		case 0x83:	dynax_blit_romregion_w(0,1);	return;
-		case 0x80:	dynax_blit_romregion_w(0,2);	return;
+		case 0x00:	dynax_blit_romregion_w(machine,0,0);	return;
+		case 0x83:	dynax_blit_romregion_w(machine,0,1);	return;
+		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
 	}
 	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
 }

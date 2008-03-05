@@ -87,7 +87,7 @@ typedef struct
 	uint ir;			/* Instruction Register */
 	uint irq_delay;		/* delay 1 instruction before checking irq */
 	int (*int_ack)(int); /* Interrupt Acknowledge */
-	read8_handler read_vector;	/* Read vector override */
+	read8_machine_func read_vector;	/* Read vector override */
 	uint stopped;		/* Sets how the CPU is stopped */
 	void (*const *opcodes)(void);
 	uint (*get_reg)(int regnum);

@@ -30,9 +30,9 @@ WRITE8_HANDLER( hyhoo_blitter_w )
 	switch (offset)
 	{
 		case 0x00:	blitter_src_addr = (blitter_src_addr & 0xff00) | data;
-					nb1413m3_gfxradr_l_w(0, data); break;
+					nb1413m3_gfxradr_l_w(machine, 0, data); break;
 		case 0x01:	blitter_src_addr = (blitter_src_addr & 0x00ff) | (data << 8);
-					nb1413m3_gfxradr_h_w(0, data); break;
+					nb1413m3_gfxradr_h_w(machine, 0, data); break;
 		case 0x02:	blitter_destx = data; break;
 		case 0x03:	blitter_desty = data; break;
 		case 0x04:	blitter_sizex = data; break;
@@ -54,7 +54,7 @@ WRITE8_HANDLER( hyhoo_romsel_w )
 {
 	hyhoo_gfxrom = (((data & 0xc0) >> 4) + (data & 0x03));
 	hyhoo_highcolorflag = data;
-	nb1413m3_gfxrombank_w(0, data);
+	nb1413m3_gfxrombank_w(machine, 0, data);
 
 	if ((0x20000 * hyhoo_gfxrom) > (memory_region_length(REGION_GFX1) - 1))
 	{

@@ -135,10 +135,10 @@ static INTERRUPT_GEN( fromanc2_interrupt )
 
 static WRITE16_HANDLER( fromanc2_sndcmd_w )
 {
-	soundlatch_w(offset, (data >> 8) & 0xff);	// 1P (LEFT)
-	soundlatch2_w(offset, data & 0xff);			// 2P (RIGHT)
+	soundlatch_w(machine, offset, (data >> 8) & 0xff);	// 1P (LEFT)
+	soundlatch2_w(machine, offset, data & 0xff);			// 2P (RIGHT)
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_sndcpu_nmi_flag = 0;
 }
 

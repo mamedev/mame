@@ -1499,7 +1499,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(0, latch_data);
+				soundlatch_w(machine, 0, latch_data);
 				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			}
 
@@ -1539,7 +1539,7 @@ static INTERRUPT_GEN( benberob_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(0, latch_data);
+				soundlatch_w(machine, 0, latch_data);
 				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;

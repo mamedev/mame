@@ -53,7 +53,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 static MACHINE_RESET( srumbler )
 {
 	/* initialize banked ROM pointers */
-	srumbler_bankswitch_w(0,0);
+	srumbler_bankswitch_w(machine,0,0);
 }
 
 static INTERRUPT_GEN( srumbler_interrupt )

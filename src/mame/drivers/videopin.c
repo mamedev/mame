@@ -72,8 +72,8 @@ static MACHINE_RESET( videopin )
 
 	/* both output latches are cleared on reset */
 
-	videopin_out1_w(0, 0);
-	videopin_out2_w(0, 0);
+	videopin_out1_w(machine, 0, 0);
+	videopin_out2_w(machine, 0, 0);
 }
 
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( videopin_led_w )
 	if (i == 7)
 		set_led_status(0, data & 8);   /* start button */
 
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -152,12 +152,12 @@ static WRITE8_HANDLER( videopin_out1_w )
 	mask = ~data & 0x10;
 
 	if (mask)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
-	discrete_sound_w(VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
+	discrete_sound_w(machine, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
 }
 
 
@@ -174,17 +174,17 @@ static WRITE8_HANDLER( videopin_out2_w )
 
 	coin_counter_w(0, data & 0x10);
 
-	discrete_sound_w(VIDEOPIN_BELL_EN, data & 0x40);	// Bell
-	discrete_sound_w(VIDEOPIN_BONG_EN, data & 0x20);	// Bong
-	discrete_sound_w(VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
-	discrete_sound_w(VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
+	discrete_sound_w(machine, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
+	discrete_sound_w(machine, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
+	discrete_sound_w(machine, VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
+	discrete_sound_w(machine, VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
 }
 
 
 static WRITE8_HANDLER( videopin_note_dvsr_w )
 {
 	/* note data */
-	discrete_sound_w(VIDEOPIN_NOTE_DATA, ~data &0xff);
+	discrete_sound_w(machine, VIDEOPIN_NOTE_DATA, ~data &0xff);
 }
 
 

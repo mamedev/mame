@@ -137,7 +137,7 @@ static READ16_HANDLER( wbeachvl_port0_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_0_r(0) & 0x7f) | bit;
+	return (input_port_0_r(machine,0) & 0x7f) | bit;
 }
 
 static READ16_HANDLER( hotmind_port2_r )
@@ -146,7 +146,7 @@ static READ16_HANDLER( hotmind_port2_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_2_r(0) & 0x7f) | bit;
+	return (input_port_2_r(machine,0) & 0x7f) | bit;
 }
 
 static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
@@ -202,7 +202,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 //      logerror("PortB reading %02x from the 68K\n",data);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (OKIM6295_status_0_r(0) & 0x0f);
+		data = (OKIM6295_status_0_r(machine,0) & 0x0f);
 //      logerror("PortB reading %02x from the OKI status port\n",data);
 	}
 
@@ -255,13 +255,12 @@ static WRITE8_HANDLER( playmark_snd_control_w )
         1   Not used
         0   Not used
     */
-
 	playmark_oki_control = data;
 
 	if ((data & 0x38) == 0x18)
 	{
 //      logerror("Writing %02x to OKI1, PortC=%02x, Code=%02x\n",playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		OKIM6295_data_0_w(0, playmark_oki_command);
+		OKIM6295_data_0_w(machine, 0, playmark_oki_command);
 	}
 }
 

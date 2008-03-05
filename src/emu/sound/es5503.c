@@ -35,6 +35,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "cpuintrf.h"
 #include "es5503.h"
 #include "streams.h"
@@ -69,7 +70,7 @@ typedef struct
 
 	void (*irq_callback)(int);	// IRQ callback
 
-	read8_handler adc_read;		// callback for the 5503's built-in analog to digital converter
+	read8_machine_func adc_read;		// callback for the 5503's built-in analog to digital converter
 
 	INT8  oscsenabled;		// # of oscillators enabled
 
@@ -376,7 +377,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 			case 0xe2:	// A/D converter
 				if (chip->adc_read)
 				{
-					return chip->adc_read(0);
+					return chip->adc_read(Machine, 0);
 				}
 				break;
 		}

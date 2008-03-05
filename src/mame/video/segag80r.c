@@ -450,7 +450,7 @@ WRITE8_HANDLER( monsterb_videoram_w )
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(offset, data);
+	segag80r_videoram_w(machine, offset, data);
 }
 
 
@@ -519,7 +519,7 @@ WRITE8_HANDLER( pignewt_videoram_w )
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(offset, data);
+	segag80r_videoram_w(machine, offset, data);
 }
 
 
@@ -602,7 +602,7 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 	}
 
 	/* handle everything else */
-	segag80r_videoram_w(offset, data);
+	segag80r_videoram_w(machine, offset, data);
 }
 
 

@@ -274,7 +274,7 @@ static double totalspeed;
     PORT HANDLER TABLES
 ***************************************************************************/
 
-static const read8_handler port_handler8[] =
+static const read8_machine_func port_handler8[] =
 {
 	input_port_0_r,			input_port_1_r,			input_port_2_r,			input_port_3_r,
 	input_port_4_r,			input_port_5_r,			input_port_6_r,			input_port_7_r,
@@ -287,7 +287,7 @@ static const read8_handler port_handler8[] =
 };
 
 
-static const read16_handler port_handler16[] =
+static const read16_machine_func port_handler16[] =
 {
 	input_port_0_word_r,	input_port_1_word_r,	input_port_2_word_r,	input_port_3_word_r,
 	input_port_4_word_r,	input_port_5_word_r,	input_port_6_word_r,	input_port_7_word_r,
@@ -300,7 +300,7 @@ static const read16_handler port_handler16[] =
 };
 
 
-static const read32_handler port_handler32[] =
+static const read32_machine_func port_handler32[] =
 {
 	input_port_0_dword_r,	input_port_1_dword_r,	input_port_2_dword_r,	input_port_3_dword_r,
 	input_port_4_dword_r,	input_port_5_dword_r,	input_port_6_dword_r,	input_port_7_dword_r,
@@ -2575,28 +2575,28 @@ int port_tag_to_index(const char *tag)
 }
 
 
-read8_handler port_tag_to_handler8(const char *tag)
+read8_machine_func port_tag_to_handler8(const char *tag)
 {
 	int port = port_tag_to_index(tag);
 	return (port == -1) ? MRA8_NOP : port_handler8[port];
 }
 
 
-read16_handler port_tag_to_handler16(const char *tag)
+read16_machine_func port_tag_to_handler16(const char *tag)
 {
 	int port = port_tag_to_index(tag);
 	return (port == -1) ? MRA16_NOP : port_handler16[port];
 }
 
 
-read32_handler port_tag_to_handler32(const char *tag)
+read32_machine_func port_tag_to_handler32(const char *tag)
 {
 	int port = port_tag_to_index(tag);
 	return (port == -1) ? MRA32_NOP : port_handler32[port];
 }
 
 
-read64_handler port_tag_to_handler64(const char *tag)
+read64_machine_func port_tag_to_handler64(const char *tag)
 {
 	return MRA64_NOP;
 }

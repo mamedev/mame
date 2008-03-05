@@ -163,17 +163,17 @@ WRITE16_HANDLER( gaiden_flip_w );
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {
-	if (ACCESSING_LSB) soundlatch_w(0,data & 0xff);	/* Ninja Gaiden */
-	if (ACCESSING_MSB) soundlatch_w(0,data >> 8);	/* Tecmo Knight */
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	if (ACCESSING_LSB) soundlatch_w(machine,0,data & 0xff);	/* Ninja Gaiden */
+	if (ACCESSING_MSB) soundlatch_w(machine,0,data >> 8);	/* Tecmo Knight */
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0,data >> 8);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data >> 8);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 

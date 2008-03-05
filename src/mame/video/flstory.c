@@ -74,9 +74,9 @@ WRITE8_HANDLER( flstory_videoram_w )
 WRITE8_HANDLER( flstory_palette_w )
 {
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w((offset & 0xff) + (palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_split2_w(machine, (offset & 0xff) + (palette_bank << 8),data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w((offset & 0xff) + (palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_split1_w(machine, (offset & 0xff) + (palette_bank << 8),data);
 }
 
 READ8_HANDLER( flstory_palette_r )

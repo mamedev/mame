@@ -127,7 +127,7 @@ WRITE8_HANDLER( shrike_sprite_select_w )
 		sprite_data = sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 
-	shrike_shared_6809_w( 1, data );
+	shrike_shared_6809_w( machine, 1, data );
 }
 
 

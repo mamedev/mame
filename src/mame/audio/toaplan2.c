@@ -70,77 +70,77 @@ static const UINT8 fixeight_cmd_snd[128] =
 /*78*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void play_oki_sound(int game_sound, int data)
+static void play_oki_sound(running_machine *machine, int game_sound, int data)
 {
-	int status = OKIM6295_status_0_r(0);
+	int status = OKIM6295_status_0_r(machine,0);
 
 	logerror("Playing sample %02x from command %02x\n",game_sound,data);
 
 	if (game_sound != 0)
 	{
 		if ((status & 0x01) == 0) {
-			OKIM6295_data_0_w(0,(0x80 | game_sound));
-			OKIM6295_data_0_w(0,0x11);
+			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
+			OKIM6295_data_0_w(machine,0,0x11);
 		}
 		else if ((status & 0x02) == 0) {
-			OKIM6295_data_0_w(0,(0x80 | game_sound));
-			OKIM6295_data_0_w(0,0x21);
+			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
+			OKIM6295_data_0_w(machine,0,0x21);
 		}
 		else if ((status & 0x04) == 0) {
-			OKIM6295_data_0_w(0,(0x80 | game_sound));
-			OKIM6295_data_0_w(0,0x41);
+			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
+			OKIM6295_data_0_w(machine,0,0x41);
 		}
 		else if ((status & 0x08) == 0) {
-			OKIM6295_data_0_w(0,(0x80 | game_sound));
-			OKIM6295_data_0_w(0,0x81);
+			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
+			OKIM6295_data_0_w(machine,0,0x81);
 		}
 	}
 }
 
-void dogyuun_okisnd_w(int data)
+void dogyuun_okisnd_w(running_machine *machine, int data)
 {
 	/* Need a board to determine the sound commands */
 //  popmessage("Writing %04x to Sound CPU",data);
 }
 
-void kbash_okisnd_w(int data)
+void kbash_okisnd_w(running_machine *machine, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
 	if (data == 0)
 	{
-		OKIM6295_data_0_w(0,0x78);		/* Stop playing effects */
+		OKIM6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 128))
 	{
-		play_oki_sound(kbash_cmd_snd[data], data);
+		play_oki_sound(machine, kbash_cmd_snd[data], data);
 	}
 }
 
-void fixeight_okisnd_w(int data)
+void fixeight_okisnd_w(running_machine *machine, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
 	if (data == 0)
 	{
-		OKIM6295_data_0_w(0,0x78);		/* Stop playing effects */
+		OKIM6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 128))
 	{
-		play_oki_sound(fixeight_cmd_snd[data], data);
+		play_oki_sound(machine, fixeight_cmd_snd[data], data);
 	}
 }
 
-void batsugun_okisnd_w(int data)
+void batsugun_okisnd_w(running_machine *machine, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
 	if (data == 0)
 	{
-		OKIM6295_data_0_w(0,0x78);		/* Stop playing effects */
+		OKIM6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 64))
 	{
-		play_oki_sound(batsugun_cmd_snd[data], data);
+		play_oki_sound(machine, batsugun_cmd_snd[data], data);
 	}
 }

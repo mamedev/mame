@@ -89,15 +89,15 @@ static WRITE8_HANDLER ( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		AY8910_write_port_0_w(0, draco_ay_latch);
+		AY8910_write_port_0_w(machine, 0, draco_ay_latch);
 		break;
 
 	case 0x02:
-		draco_ay_latch = AY8910_read_port_0_r(0);
+		draco_ay_latch = AY8910_read_port_0_r(machine, 0);
 		break;
 
 	case 0x03:
-		AY8910_control_port_0_w(0, draco_ay_latch);
+		AY8910_control_port_0_w(machine, 0, draco_ay_latch);
 		break;
 	}
 }
@@ -217,14 +217,14 @@ static WRITE8_HANDLER ( cidelsa_charram_w )
 {
 	int addr = cdp1869_get_cma(offset);
 	cidelsa_pcb[addr] = activecpu_get_reg(CDP1802_Q);
-	cdp1869_charram_w(offset, data);
+	cdp1869_charram_w(machine, offset, data);
 }
 
 static READ8_HANDLER ( cidelsa_charram_r )
 {
 	int addr = cdp1869_get_cma(offset);
 	cdp1869_pcb = cidelsa_pcb[addr];
-	return cdp1869_charram_r(offset);
+	return cdp1869_charram_r(machine,offset);
 }
 
 /* Memory Maps */

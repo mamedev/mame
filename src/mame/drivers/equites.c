@@ -308,7 +308,7 @@ static READ16_HANDLER(hvoltage_debug_r)
 static WRITE16_HANDLER(splndrbt_flip0_w)
 {
 	if (ACCESSING_LSB) splndrbt_flip = 0;
-	if (ACCESSING_MSB) equites_bgcolor_w(offset, data, 0x00ff);
+	if (ACCESSING_MSB) equites_bgcolor_w(machine, offset, data, 0x00ff);
 }
 
 static WRITE16_HANDLER(splndrbt_flip1_w)

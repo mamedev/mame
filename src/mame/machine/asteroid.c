@@ -170,8 +170,8 @@ WRITE8_HANDLER( astdelux_led_w )
 
 MACHINE_RESET( asteroid )
 {
-	asteroid_bank_switch_w (0,0);
-	avgdvg_reset_w (0,0);
+	asteroid_bank_switch_w(machine,0,0);
+	avgdvg_reset_w(machine,0,0);
 }
 
 

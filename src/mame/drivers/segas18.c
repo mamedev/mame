@@ -61,8 +61,8 @@ static UINT8 rom_board;
 static UINT8 misc_io_data[0x10];
 static UINT8 mcu_data;
 
-static read16_handler custom_io_r;
-static write16_handler custom_io_w;
+static read16_machine_func custom_io_r;
+static write16_machine_func custom_io_w;
 
 static UINT8 wwally_last_x[3], wwally_last_y[3];
 static UINT8 lghost_value, lghost_select;
@@ -149,7 +149,7 @@ static const struct segaic16_memory_map_entry *const region_info_list[] =
 
 static void sound_w(UINT8 data)
 {
-	soundlatch_w(0, data & 0xff);
+	soundlatch_w(Machine, 0, data & 0xff);
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -326,16 +326,16 @@ static READ16_HANDLER( misc_io_r )
 		/* I/O chip */
 		case 0x0000/2:
 		case 0x1000/2:
-			return io_chip_r(offset, mem_mask);
+			return io_chip_r(machine, offset, mem_mask);
 
 		/* video control latch */
 		case 0x2000/2:
 			return readinputport(4 + (offset & 1));
 	}
 	if (custom_io_r)
-		return custom_io_r(offset, mem_mask);
+		return custom_io_r(machine, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -349,7 +349,7 @@ static WRITE16_HANDLER( misc_io_w )
 		case 0x1000/2:
 			if (ACCESSING_LSB)
 			{
-				io_chip_w(offset, data, mem_mask);
+				io_chip_w(machine, offset, data, mem_mask);
 				return;
 			}
 			break;
@@ -365,7 +365,7 @@ static WRITE16_HANDLER( misc_io_w )
 	}
 	if (custom_io_w)
 	{
-		custom_io_w(offset, data, mem_mask);
+		custom_io_w(machine, offset, data, mem_mask);
 		return;
 	}
 	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
@@ -427,7 +427,7 @@ static READ16_HANDLER( ddcrew_custom_io_r )
 		case 0x3024/2:
 			return readinputportbytag("P34START");
 	}
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -451,7 +451,7 @@ static READ16_HANDLER( lghost_custom_io_r )
 			lghost_value <<= 1;
 			return result;
 	}
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -511,7 +511,7 @@ static READ16_HANDLER( wwally_custom_io_r )
 		case 0x3014/2:
 			return (readinputportbytag("TRACKY3") - wwally_last_y[2]) & 0xff;
 	}
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 

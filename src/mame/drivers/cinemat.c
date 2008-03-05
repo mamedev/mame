@@ -137,7 +137,7 @@ static WRITE8_HANDLER( coin_reset_w )
 static WRITE8_HANDLER( mux_select_w )
 {
 	mux_select = data;
-	cinemat_sound_control_w(0x07, data);
+	cinemat_sound_control_w(machine, 0x07, data);
 }
 
 

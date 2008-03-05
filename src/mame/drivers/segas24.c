@@ -506,7 +506,7 @@ static WRITE16_HANDLER( fdc_ctrl_w )
 
 // I/O Mappers
 
-static UINT8 hotrod_io_r(int port)
+static UINT8 hotrod_io_r(running_machine *machine, int port)
 {
 	switch(port) {
 	case 0:
@@ -529,7 +529,7 @@ static UINT8 hotrod_io_r(int port)
 	return 0x00;
 }
 
-static UINT8 dcclub_io_r(int port)
+static UINT8 dcclub_io_r(running_machine *machine, int port)
 {
 	switch(port) {
 	case 0: {
@@ -556,7 +556,7 @@ static UINT8 dcclub_io_r(int port)
 
 static int cur_input_line;
 
-static UINT8 mahmajn_io_r(int port)
+static UINT8 mahmajn_io_r(running_machine *machine, int port)
 {
 	switch(port) {
 	case 0:
@@ -579,7 +579,7 @@ static UINT8 mahmajn_io_r(int port)
 	return 0x00;
 }
 
-static UINT8 gground_io_r(int port)
+static UINT8 gground_io_r(running_machine *machine, int port)
 {
 	switch(port) {
 	case 0:
@@ -602,7 +602,7 @@ static UINT8 gground_io_r(int port)
 	return 0x00;
 }
 
-static void mahmajn_io_w(int port, UINT8 data)
+static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 {
 	switch(port) {
 	case 3:
@@ -610,20 +610,20 @@ static void mahmajn_io_w(int port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		DAC_0_signed_data_w(0, data);
+		DAC_0_signed_data_w(machine, 0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
 	}
 }
 
-static void hotrod_io_w(int port, UINT8 data)
+static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 {
 	switch(port) {
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		DAC_0_signed_data_w(0, data);
+		DAC_0_signed_data_w(machine,0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -746,19 +746,19 @@ static WRITE16_HANDLER( curbank_w )
 
 static READ16_HANDLER( ym_status_r )
 {
-	return YM2151_status_port_0_r(0);
+	return YM2151_status_port_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( ym_register_w )
 {
 	if(ACCESSING_LSB)
-		YM2151_register_port_0_w(0, data);
+		YM2151_register_port_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( ym_data_w )
 {
 	if(ACCESSING_LSB)
-		YM2151_data_port_0_w(0, data);
+		YM2151_data_port_0_w(machine, 0, data);
 }
 
 

@@ -119,14 +119,14 @@ READ8_HANDLER( mgakuen_objram_r )
 
 WRITE8_HANDLER( pang_videoram_w )
 {
-	if (video_bank) mgakuen_objram_w(offset,data);
-	else mgakuen_videoram_w(offset,data);
+	if (video_bank) mgakuen_objram_w(machine,offset,data);
+	else mgakuen_videoram_w(machine,offset,data);
 }
 
 READ8_HANDLER( pang_videoram_r )
 {
-	if (video_bank) return mgakuen_objram_r(offset);
-	else return mgakuen_videoram_r(offset);
+	if (video_bank) return mgakuen_objram_r(machine,offset);
+	else return mgakuen_videoram_r(machine,offset);
 }
 
 /***************************************************************************
@@ -223,8 +223,8 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 
 WRITE8_HANDLER( pang_paletteram_w )
 {
-	if (paletteram_bank) paletteram_xxxxRRRRGGGGBBBB_le_w(offset + 0x800,data);
-	else paletteram_xxxxRRRRGGGGBBBB_le_w(offset,data);
+	if (paletteram_bank) paletteram_xxxxRRRRGGGGBBBB_le_w(machine,offset + 0x800,data);
+	else paletteram_xxxxRRRRGGGGBBBB_le_w(machine,offset,data);
 }
 
 READ8_HANDLER( pang_paletteram_r )
@@ -235,7 +235,7 @@ READ8_HANDLER( pang_paletteram_r )
 
 WRITE8_HANDLER( mgakuen_paletteram_w )
 {
-	paletteram_xxxxRRRRGGGGBBBB_le_w(offset,data);
+	paletteram_xxxxRRRRGGGGBBBB_le_w(machine,offset,data);
 }
 
 READ8_HANDLER( mgakuen_paletteram_r )

@@ -40,7 +40,7 @@ static UINT16 latch,new_latch=0;
 static WRITE16_HANDLER( pushman_control_w )
 {
 	if (ACCESSING_MSB)
-		soundlatch_w(0,(data>>8)&0xff);
+		soundlatch_w(machine,0,(data>>8)&0xff);
 }
 
 static READ16_HANDLER( pushman_68705_r )

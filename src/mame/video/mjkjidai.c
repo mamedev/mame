@@ -56,7 +56,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 //  logerror("%04x: port c0 = %02x\n",activecpu_get_pc(),data);
 
 	/* bit 0 = NMI enable */
-	interrupt_enable_w(0,data & 1);
+	interrupt_enable_w(machine,0,data & 1);
 
 	/* bit 1 = flip screen */
 	flip_screen_set(data & 0x02);

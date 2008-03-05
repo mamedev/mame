@@ -208,9 +208,9 @@ static MACHINE_START( spacefb )
 static MACHINE_RESET( spacefb )
 {
 	/* the 3 output ports are cleared on reset */
-	spacefb_port_0_w(0, 0);
-	spacefb_port_1_w(0, 0);
-	spacefb_port_2_w(0, 0);
+	spacefb_port_0_w(machine, 0, 0);
+	spacefb_port_1_w(machine, 0, 0);
+	spacefb_port_2_w(machine, 0, 0);
 
 	start_interrupt_timer();
 }

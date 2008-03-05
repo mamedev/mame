@@ -57,17 +57,15 @@ static WRITE8_HANDLER( madalien_output_w )
 
 static WRITE8_HANDLER( madalien_sound_command_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
-
-	soundlatch_w(offset, data);
+	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	soundlatch_w(machine, offset, data);
 }
 
 
 static READ8_HANDLER(madalien_sound_command_r )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
-
-	return soundlatch_r(offset);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	return soundlatch_r(machine, offset);
 }
 
 

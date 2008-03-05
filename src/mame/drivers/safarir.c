@@ -125,7 +125,7 @@ static PALETTE_INIT( safarir )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int color;
-	UINT8 code = ram_r(tile_index | 0x400);
+	UINT8 code = ram_r(machine,tile_index | 0x400);
 
 	/* this is wrong */
 	if (code & 0x80)
@@ -140,7 +140,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int color, flags;
-	UINT8 code = ram_r(tile_index);
+	UINT8 code = ram_r(machine,tile_index);
 
 	if (code & 0x80)
 		color = 7;	/* white */

@@ -130,7 +130,7 @@ WRITE8_HANDLER( pbillian_0410_w )
 	bankaddress = 0x10000 + ((data & 0x08) >> 3) * 0x4000;
 	memory_set_bankptr(1,&rom[bankaddress]);
 
-	interrupt_enable_w(0,data & 0x10);
+	interrupt_enable_w(machine,0,data & 0x10);
 	flip_screen_set(data & 0x20);
 }
 
@@ -150,7 +150,7 @@ WRITE8_HANDLER( superqix_0410_w )
 	show_bitmap = (data & 0x04) >> 2;
 
 	/* bit 3 enables NMI */
-	interrupt_enable_w(offset,data & 0x08);
+	interrupt_enable_w(machine,offset,data & 0x08);
 
 	/* bits 4-5 control ROM bank */
 	bankaddress = 0x10000 + ((data & 0x30) >> 4) * 0x4000;

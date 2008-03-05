@@ -386,7 +386,7 @@ WRITE8_HANDLER (v9938_command_w)
 			{
 			vdp.address_latch =
 				(((UINT16)data << 8) | vdp.cmd_write) & 0x3fff;
-			if ( !(data & 0x40) ) v9938_vram_r (0); /* read ahead! */
+			if ( !(data & 0x40) ) v9938_vram_r (machine,0); /* read ahead! */
 			}
 
 		vdp.cmd_write_first = 0;

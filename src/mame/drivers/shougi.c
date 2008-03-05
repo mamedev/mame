@@ -221,7 +221,7 @@ static WRITE8_HANDLER ( cpu_shared_ctrl_main_w )
 
 static WRITE8_HANDLER( shougi_watchdog_reset_w )
 {
-	watchdog_reset_w(0,data);
+	watchdog_reset_w(machine,0,data);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_off_w )

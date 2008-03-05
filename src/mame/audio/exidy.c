@@ -460,13 +460,13 @@ static WRITE8_HANDLER( exidy_shriot_w )
 				{
 					if (!(data & 0x01) && (riot_portb_data & 0x01))
 					{
-						riot_porta_data = tms5220_status_r(0);
+						riot_porta_data = tms5220_status_r(machine, 0);
 						logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
 					}
 					if (!(data & 0x02) && (riot_portb_data & 0x02))
 					{
 						logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot_porta_data);
-						tms5220_data_w(0, riot_porta_data);
+						tms5220_data_w(machine, 0, riot_porta_data);
 					}
 				}
 				riot_portb_data = (riot_portb_data & ~riot_portb_ddr) | (data & riot_portb_ddr);

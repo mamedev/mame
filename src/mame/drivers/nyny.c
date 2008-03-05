@@ -139,13 +139,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia_1_ca1_w(0, input_port_0_r(0) & 0x01);
+	pia_1_ca1_w(machine, 0, input_port_0_r(machine, 0) & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia_1_ca2_w(0, input_port_0_r(0) & 0x02);
+	pia_1_ca2_w(machine, 0, input_port_0_r(machine, 0) & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(0, input_port_5_r(0));
+	pia_1_cb1_w(machine, 0, input_port_5_r(machine, 0));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( pia_2_port_b_w )
 	star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(0, data & 0xe0);
+	audio_2_command_w(machine, 0, data & 0xe0);
 }
 
 
@@ -208,7 +208,7 @@ static const pia6821_interface pia_2_intf =
 
 static void ic48_1_74123_output_changed(int output)
 {
-	pia_2_ca1_w(0, output);
+	pia_2_ca1_w(Machine, 0, output);
 }
 
 
@@ -451,15 +451,15 @@ static VIDEO_UPDATE( nyny )
 
 static WRITE8_HANDLER( audio_1_command_w )
 {
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 1, M6802_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 1, M6802_IRQ_LINE, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_1_answer_w )
 {
-	soundlatch3_w(0, data);
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch3_w(machine, 0, data);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -502,8 +502,8 @@ static const struct AY8910interface ay8910_64_interface =
 
 static WRITE8_HANDLER( audio_2_command_w )
 {
-	soundlatch2_w(0, (data & 0x60) >> 5);
-	cpunum_set_input_line(Machine, 2, M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	soundlatch2_w(machine, 0, (data & 0x60) >> 5);
+	cpunum_set_input_line(machine, 2, M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -519,8 +519,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  ret = pia_1_r(offset & 0x03);
-	if (offset & 0x08)  ret = pia_2_alt_r(offset & 0x03);
+	if (offset & 0x04)  ret = pia_1_r(machine, offset & 0x03);
+	if (offset & 0x08)  ret = pia_2_alt_r(machine, offset & 0x03);
 
 	return ret;
 }
@@ -529,8 +529,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 static WRITE8_HANDLER( nyny_pia_1_2_w )
 {
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  pia_1_w(offset & 0x03, data);
-	if (offset & 0x08)  pia_2_alt_w(offset & 0x03, data);
+	if (offset & 0x04)  pia_1_w(machine, offset & 0x03, data);
+	if (offset & 0x08)  pia_2_alt_w(machine, offset & 0x03, data);
 }
 
 

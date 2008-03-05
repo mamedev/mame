@@ -43,8 +43,8 @@ static WRITE16_HANDLER( madmotor_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 
@@ -89,10 +89,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -101,10 +101,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(0,data);
+		YM2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(0,data);
+		YM2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }

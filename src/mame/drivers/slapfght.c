@@ -341,7 +341,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(tigerh_status_r)
 {
-	return (slapfight_port_00_r(0)&0xf9)| ((tigerh_mcu_status_r(0)));
+	return (slapfight_port_00_r(machine,0)&0xf9)| ((tigerh_mcu_status_r(machine,0)));
 }
 
 static ADDRESS_MAP_START( tigerh_readport, ADDRESS_SPACE_IO, 8 )
@@ -834,7 +834,7 @@ static const struct AY8910interface ay8910_interface_2 =
 
 static VIDEO_EOF( perfrman )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }
 
 static MACHINE_DRIVER_START( perfrman )

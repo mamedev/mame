@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "ay8910.h"
@@ -26,10 +27,10 @@ struct AY8910
 	int streams;
 	int ready;
 	sound_stream *Channel;
-	read8_handler PortAread;
-	read8_handler PortBread;
-	write8_handler PortAwrite;
-	write8_handler PortBwrite;
+	read8_machine_func PortAread;
+	read8_machine_func PortBread;
+	write8_machine_func PortAwrite;
+	write8_machine_func PortBwrite;
 	INT32 register_latch;
 	UINT8 Regs[16];
 	INT32 lastEnable;
@@ -124,7 +125,7 @@ static void _AYWriteReg(struct AY8910 *PSG, int r, int v)
 		{
 			/* write out 0xff if port set to input */
 			if (PSG->PortAwrite)
-				(*PSG->PortAwrite)(0, (PSG->Regs[AY_ENABLE] & 0x40) ? PSG->Regs[AY_PORTA] : 0xff);
+				(*PSG->PortAwrite)(Machine, 0, (PSG->Regs[AY_ENABLE] & 0x40) ? PSG->Regs[AY_PORTA] : 0xff);
 		}
 
 		if ((PSG->lastEnable == -1) ||
@@ -132,7 +133,7 @@ static void _AYWriteReg(struct AY8910 *PSG, int r, int v)
 		{
 			/* write out 0xff if port set to input */
 			if (PSG->PortBwrite)
-				(*PSG->PortBwrite)(0, (PSG->Regs[AY_ENABLE] & 0x80) ? PSG->Regs[AY_PORTB] : 0xff);
+				(*PSG->PortBwrite)(Machine, 0, (PSG->Regs[AY_ENABLE] & 0x80) ? PSG->Regs[AY_PORTB] : 0xff);
 		}
 
 		PSG->lastEnable = PSG->Regs[AY_ENABLE];
@@ -212,7 +213,7 @@ static void _AYWriteReg(struct AY8910 *PSG, int r, int v)
 		if (PSG->Regs[AY_ENABLE] & 0x40)
 		{
 			if (PSG->PortAwrite)
-				(*PSG->PortAwrite)(0, PSG->Regs[AY_PORTA]);
+				(*PSG->PortAwrite)(Machine, 0, PSG->Regs[AY_PORTA]);
 			else
 				logerror("warning - write %02x to 8910 #%d Port A\n",PSG->Regs[AY_PORTA],PSG->index);
 		}
@@ -225,7 +226,7 @@ static void _AYWriteReg(struct AY8910 *PSG, int r, int v)
 		if (PSG->Regs[AY_ENABLE] & 0x80)
 		{
 			if (PSG->PortBwrite)
-				(*PSG->PortBwrite)(0, PSG->Regs[AY_PORTB]);
+				(*PSG->PortBwrite)(Machine, 0, PSG->Regs[AY_PORTB]);
 			else
 				logerror("warning - write %02x to 8910 #%d Port B\n",PSG->Regs[AY_PORTB],PSG->index);
 		}
@@ -613,8 +614,8 @@ static void build_mixer_table(struct AY8910 *PSG)
 
 static void AY8910_init(struct AY8910 *PSG, int streams,
 		int clock,int sample_rate,
-		read8_handler portAread,read8_handler portBread,
-		write8_handler portAwrite,write8_handler portBwrite)
+		read8_machine_func portAread,read8_machine_func portBread,
+		write8_machine_func portAwrite,write8_machine_func portBwrite)
 {
 	PSG->PortAread = portAread;
 	PSG->PortBread = portBread;
@@ -673,8 +674,8 @@ static void AY8910_statesave(struct AY8910 *PSG, int sndindex)
 
 
 void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, int streams,
-		read8_handler portAread, read8_handler portBread,
-		write8_handler portAwrite, write8_handler portBwrite)
+		read8_machine_func portAread, read8_machine_func portBread,
+		write8_machine_func portAwrite, write8_machine_func portBwrite)
 {
 	struct AY8910 *info;
 
@@ -765,13 +766,13 @@ int ay8910_read_ym(void *chip)
            even if the port is set as output, we still need to return the external
            data. Some games, like kidniki, need this to work.
          */
-		if (PSG->PortAread) PSG->Regs[AY_PORTA] = (*PSG->PortAread)(0);
+		if (PSG->PortAread) PSG->Regs[AY_PORTA] = (*PSG->PortAread)(Machine, 0);
 		else logerror("PC %04x: warning - read 8910 #%d Port A\n",activecpu_get_pc(),PSG->index);
 		break;
 	case AY_PORTB:
 		if ((PSG->Regs[AY_ENABLE] & 0x80) != 0)
 			logerror("warning: read from 8910 #%d Port B set as output\n",PSG->index);
-		if (PSG->PortBread) PSG->Regs[AY_PORTB] = (*PSG->PortBread)(0);
+		if (PSG->PortBread) PSG->Regs[AY_PORTB] = (*PSG->PortBread)(Machine, 0);
 		else logerror("PC %04x: warning - read 8910 #%d Port B\n",activecpu_get_pc(),PSG->index);
 		break;
 	}

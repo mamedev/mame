@@ -809,7 +809,7 @@ READ16_HANDLER( neogeo_video_register_r )
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0xff00)
-		ret = neogeo_unmapped_r(0, 0) & 0x00ff;
+		ret = neogeo_unmapped_r(machine, 0, 0) & 0x00ff;
 	else
 	{
 		switch (offset)

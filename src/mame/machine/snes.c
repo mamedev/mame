@@ -276,7 +276,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(0, nextscan, 0), 0);
 }
 
-static void snes_init_ram(void)
+static void snes_init_ram(running_machine *machine)
 {
 	int i;
 
@@ -333,7 +333,7 @@ static void snes_init_ram(void)
 	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(0, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
 
 	// check if DSP1 is present (maybe not 100%?)
-	has_dsp1 = ((snes_r_bank1(0xffd6) >= 3) && (snes_r_bank1(0xffd6) <= 5)) ? 1 : 0;
+	has_dsp1 = ((snes_r_bank1(machine,0xffd6) >= 3) && (snes_r_bank1(machine,0xffd6) <= 5)) ? 1 : 0;
 
 	// init frame counter so first line is 0
 	if( ATTOSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59 )
@@ -376,7 +376,7 @@ MACHINE_START( snes )
 
 MACHINE_RESET( snes )
 {
-	snes_init_ram();
+	snes_init_ram(machine);
 
 	/* Set STAT78 to NTSC or PAL */
 	if( ATTOSECONDS_TO_HZ(machine->screen[0].refresh) >= 59.0f )
@@ -449,7 +449,7 @@ READ8_HANDLER( snes_r_bank1 )
 	}
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
 	{
-		return snes_r_io( address );
+		return snes_r_io( machine, address );
 	}
 	else if( address >= 0x6000 && address <= 0x7fff )	/* Reserved */
 	{
@@ -499,7 +499,7 @@ READ8_HANDLER( snes_r_bank2 )
 	if( address <= 0x1fff )								/* Mirror of Low RAM */
 		return program_read_byte(0x7e0000 + address );
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
-		return snes_r_io( address );
+		return snes_r_io( machine, address );
 	else if( address >= 0x6000 && address <= 0x7fff )
 	{
 		if( snes_cart.mode == SNES_MODE_20 )
@@ -600,7 +600,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	if( address <= 0x1fff )								/* Mirror of Low RAM */
 		program_write_byte(0x7e0000 + address, data );
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
-		snes_w_io( address, data );
+		snes_w_io( machine, address, data );
 	else if( address >= 0x6000 && address <= 0x7fff )	/* Reserved */
 		if( snes_cart.mode == SNES_MODE_20 )
 		logerror( "Attempt to write to reserved address: %X\n", offset );
@@ -627,7 +627,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	if( address <= 0x1fff )								/* Mirror of Low RAM */
 		program_write_byte(0x7e0000 + address, data );
 	else if( address >= 0x2000 && address <= 0x5fff )	/* I/O */
-		snes_w_io( address, data );
+		snes_w_io( machine, address, data );
 	else if( address >= 0x6000 && address <= 0x7fff )
 	{
 		if( snes_cart.mode == SNES_MODE_20 )			/* Reserved */
@@ -666,16 +666,16 @@ WRITE8_HANDLER( snes_w_bank4 )
 	if( snes_cart.mode == SNES_MODE_20 )
 	{
 		if( offset <= 0x2fffff )
-			snes_w_bank1( offset, data );
+			snes_w_bank1( machine, offset, data );
 		else if( offset >= 0x300000 && offset <= 0x3fffff )
-			snes_w_bank2( offset - 0x300000, data );
+			snes_w_bank2( machine, offset - 0x300000, data );
 	}
 	else /* MODE_21 */
 	{
 		if( offset <= 0x2fffff )
-			snes_w_bank1( offset, data );
+			snes_w_bank1( machine, offset, data );
 		else if( offset >= 0x300000 && offset <= 0x3fffff )
-			snes_w_bank2( offset - 0x300000, data );
+			snes_w_bank2( machine, offset - 0x300000, data );
 		else
 			logerror( "Attempt to write to ROM address: %X\n", offset );
 	}
@@ -1577,7 +1577,7 @@ DRIVER_INIT( snes )
 	}
 
 	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(0x00ffd8);
+	snes_cart.sram = snes_r_bank1(machine,0x00ffd8);
 	if( snes_cart.sram > 0 )
 	{
 		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);
@@ -1617,7 +1617,7 @@ DRIVER_INIT( snes_hirom )
 	}
 
 	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(0x00ffd8);
+	snes_cart.sram = snes_r_bank1(machine,0x00ffd8);
 	if( snes_cart.sram > 0 )
 	{
 		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);

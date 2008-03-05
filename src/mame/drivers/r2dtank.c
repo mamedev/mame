@@ -91,7 +91,7 @@ static void main_cpu_irq(int state)
 
 static READ8_HANDLER( audio_command_r )
 {
-	UINT8 ret = soundlatch_r(0);
+	UINT8 ret = soundlatch_r(machine, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", safe_activecpu_get_pc(), ret);
 
@@ -101,8 +101,8 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", safe_activ
 
 static WRITE8_HANDLER( audio_command_w )
 {
-	soundlatch_w(0, ~data);
-	cpunum_set_input_line(Machine, 1, M6802_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(machine, 0, ~data);
+	cpunum_set_input_line(machine, 1, M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", safe_activecpu_get_pc(), data^0xff);
 }
@@ -110,7 +110,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", safe_act
 
 static READ8_HANDLER( audio_answer_r )
 {
-	UINT8 ret = soundlatch2_r(0);
+	UINT8 ret = soundlatch2_r(machine, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", safe_activecpu_get_pc(), ret);
 
 	return ret;
@@ -123,8 +123,8 @@ static WRITE8_HANDLER( audio_answer_w )
 	if (safe_activecpu_get_pc() == 0xfb12)
 		data = 0x00;
 
-	soundlatch2_w(0, data);
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch2_w(machine, 0, data);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", safe_activecpu_get_pc(), data);
 }
@@ -151,12 +151,12 @@ static READ8_HANDLER( AY8910_port_r )
 
 	if (AY8910_selected & 0x08)
 {
-		ret = AY8910_read_port_0_r(offset);
+		ret = AY8910_read_port_0_r(machine, offset);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Read: %x\n", safe_activecpu_get_pc(), ret);}
 
 	if (AY8910_selected & 0x10)
 {
-		ret = AY8910_read_port_1_r(offset);
+		ret = AY8910_read_port_1_r(machine, offset);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Read: %x\n", safe_activecpu_get_pc(), ret);}
 
 	return ret;
@@ -169,23 +169,23 @@ static WRITE8_HANDLER( AY8910_port_w )
 	{
 		if (AY8910_selected & 0x08)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Control Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_control_port_0_w(offset, data);
+			AY8910_control_port_0_w(machine, offset, data);
 }
 		if (AY8910_selected & 0x10)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Control Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_control_port_1_w(offset, data);
+			AY8910_control_port_1_w(machine, offset, data);
 }
 	}
 	else
 	{
 		if (AY8910_selected & 0x08)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_write_port_0_w(offset, data);
+			AY8910_write_port_0_w(machine, offset, data);
 }
 
 		if (AY8910_selected & 0x10)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_write_port_1_w(offset, data);
+			AY8910_write_port_1_w(machine, offset, data);
 }
 	}
 }
@@ -220,7 +220,7 @@ static const struct AY8910interface ay8910_2_interface =
 
 static void ttl74123_output_changed(int output)
 {
-	pia_0_ca1_w(0, output);
+	pia_0_ca1_w(Machine, 0, output);
 	ttl74123_output = output;
 }
 
@@ -429,7 +429,7 @@ static VIDEO_UPDATE( r2dtank )
 
 static WRITE8_HANDLER( pia_comp_0_w )
 {
-	pia_0_w(offset, ~data);
+	pia_0_w(machine, offset, ~data);
 }
 
 

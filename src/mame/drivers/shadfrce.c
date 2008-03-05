@@ -212,8 +212,8 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(1,data >> 8);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(machine,1,data >> 8);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -221,7 +221,7 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_brightness(Machine,i,brt);
+			palette_set_brightness(machine,i,brt);
 	}
 }
 

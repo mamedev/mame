@@ -463,7 +463,7 @@ DRIVER_INIT( mkyawdim )
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(write16_handler hack_w)
+static void term2_init_common(write16_machine_func hack_w)
 {
 	/* protection */
 	static const struct protection_data term2_protection_data =
@@ -579,7 +579,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 				break;
 
 			case SOUND_YAWDIM:
-				soundlatch_w(0, data);
+				soundlatch_w(machine, 0, data);
 				cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}

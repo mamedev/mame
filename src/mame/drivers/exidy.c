@@ -1413,7 +1413,7 @@ static DRIVER_INIT( fax )
 	exidy_video_config(0x04, 0x04, TRUE);
 
 	/* reset the ROM bank */
-	fax_bank_select_w(0,0);
+	fax_bank_select_w(machine,0,0);
 }
 
 

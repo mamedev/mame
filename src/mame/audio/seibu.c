@@ -459,12 +459,12 @@ WRITE16_HANDLER( seibu_main_word_w )
 
 READ8_HANDLER( seibu_main_v30_r )
 {
-	return seibu_main_word_r(offset/2,0) >> (8 * (offset & 1));
+	return seibu_main_word_r(machine,offset/2,0) >> (8 * (offset & 1));
 }
 
 WRITE8_HANDLER( seibu_main_v30_w )
 {
-	seibu_main_word_w(offset/2,data << (8 * (offset & 1)),0xff00 >> (8 * (offset & 1)));
+	seibu_main_word_w(machine,offset/2,data << (8 * (offset & 1)),0xff00 >> (8 * (offset & 1)));
 }
 
 WRITE16_HANDLER( seibu_main_mustb_w )

@@ -40,7 +40,7 @@ MACHINE_RESET( kyugo )
 {
 	// must start with interrupts and sub CPU disabled
 	cpu_interrupt_enable(0, 0);
-	kyugo_sub_cpu_control_w(0, 0);
+	kyugo_sub_cpu_control_w(machine, 0, 0);
 }
 
 

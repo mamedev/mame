@@ -245,5 +245,5 @@ VIDEO_UPDATE( dynduke )
 
 VIDEO_EOF( dynduke )
 {
-	buffer_spriteram16_w(0,0,0); // Could be a memory location instead
+	buffer_spriteram16_w(machine,0,0,0); // Could be a memory location instead
 }

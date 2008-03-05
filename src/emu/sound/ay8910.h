@@ -18,10 +18,10 @@ YMZ294: 0 I/O port
 
 struct AY8910interface
 {
-	read8_handler portAread;
-	read8_handler portBread;
-	write8_handler portAwrite;
-	write8_handler portBwrite;
+	read8_machine_func portAread;
+	read8_machine_func portBread;
+	write8_machine_func portAwrite;
+	write8_machine_func portBwrite;
 };
 
 void AY8910_set_volume(int chip,int channel,int volume);
@@ -78,8 +78,8 @@ WRITE16_HANDLER( AY8910_write_port_4_msb_w );
 /*********** An interface for SSG of YM2203 ***********/
 
 void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, int streams,
-		read8_handler portAread, read8_handler portBread,
-		write8_handler portAwrite, write8_handler portBwrite);
+		read8_machine_func portAread, read8_machine_func portBread,
+		write8_machine_func portAwrite, write8_machine_func portBwrite);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);

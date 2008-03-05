@@ -212,9 +212,9 @@ D5 = SKID2
 ***************************************************************************/
 WRITE8_HANDLER( nitedrvr_out0_w )
 {
-	discrete_sound_w(NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
-	discrete_sound_w(NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
-	discrete_sound_w(NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
+	discrete_sound_w(machine, NITEDRVR_MOTOR_DATA, data & 0x0f);	// Motor freq data
+	discrete_sound_w(machine, NITEDRVR_SKID1_EN, data & 0x10);	// Skid1 enable
+	discrete_sound_w(machine, NITEDRVR_SKID2_EN, data & 0x20);	// Skid2 enable
 }
 
 /***************************************************************************
@@ -232,8 +232,8 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 	set_led_status(0,data & 0x10);
 
 	nitedrvr_crash_en = data & 0x01;
-	discrete_sound_w(NITEDRVR_CRASH_EN, nitedrvr_crash_en);	// Crash enable
-	discrete_sound_w(NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
+	discrete_sound_w(machine, NITEDRVR_CRASH_EN, nitedrvr_crash_en);	// Crash enable
+	discrete_sound_w(machine, NITEDRVR_ATTRACT_EN, data & 0x02);		// Attract enable (sound disable)
 
 	if (!nitedrvr_crash_en)
 	{
@@ -241,10 +241,10 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 		nitedrvr_crash_data_en = 1;
 		nitedrvr_crash_data = 0x0f;
 		/* Invert video */
-		palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
-		palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
+		palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* BLACK */
+		palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* WHITE */
 	}
-	discrete_sound_w(NITEDRVR_BANG_DATA, nitedrvr_crash_data_en ? nitedrvr_crash_data : 0);	// Crash Volume
+	discrete_sound_w(machine, NITEDRVR_BANG_DATA, nitedrvr_crash_data_en ? nitedrvr_crash_data : 0);	// Crash Volume
 }
 
 
@@ -253,7 +253,7 @@ void nitedrvr_crash_toggle(running_machine *machine)
 	if (nitedrvr_crash_en && nitedrvr_crash_data_en)
 	{
 		nitedrvr_crash_data--;
-		discrete_sound_w(NITEDRVR_BANG_DATA, nitedrvr_crash_data);	// Crash Volume
+		discrete_sound_w(machine, NITEDRVR_BANG_DATA, nitedrvr_crash_data);	// Crash Volume
 		if (!nitedrvr_crash_data) nitedrvr_crash_data_en = 0;	// Done counting?
 		if (nitedrvr_crash_data & 0x01)
 		{

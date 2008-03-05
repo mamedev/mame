@@ -120,8 +120,8 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 VIDEO_UPDATE( gradius3 )
 {
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
-	K052109_w(0x1d80,0x10);
-	K052109_w(0x1f00,0x32);
+	K052109_w(machine,0x1d80,0x10);
+	K052109_w(machine,0x1f00,0x32);
 
 	if (dirtygfx)
 	{

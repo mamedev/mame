@@ -258,19 +258,19 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 static WRITE32_HANDLER( OKIM6295_data_0_msb32_w )
 {
 	if (ACCESSING_MSB32)
-		OKIM6295_data_0_msb_w(offset, data >> 16, mem_mask >> 16);
+		OKIM6295_data_0_msb_w(machine, offset, data >> 16, mem_mask >> 16);
 }
 
 static READ32_HANDLER( OKIM6295_status_0_msb32_r )
 {
-	return OKIM6295_status_0_msb_r(offset, mem_mask >> 16) << 16;
+	return OKIM6295_status_0_msb_r(machine, offset, mem_mask >> 16) << 16;
 }
 
 static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_MSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset*2+1, data, mem_mask);
+	if (ACCESSING_MSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_LSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 static UINT32 input_sel;

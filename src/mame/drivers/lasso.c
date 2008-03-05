@@ -45,14 +45,14 @@ static UINT8 *lasso_chip_data;
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1, 0, PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1, 0, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -66,10 +66,10 @@ static WRITE8_HANDLER( sound_select_w )
 	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		SN76496_0_w(0, to_write);
+		SN76496_0_w(machine, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		SN76496_1_w(0, to_write);
+		SN76496_1_w(machine, 0, to_write);
 }
 
 

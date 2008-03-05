@@ -78,7 +78,7 @@ static void draw_sgx_overscan_line(int line);
 static void pce_refresh_line(int which, int line, int external_input, UINT8 *drawn, UINT16 *line_buffer);
 static void pce_refresh_sprites(running_machine *machine, int which, int line, UINT8 *drawn, UINT16 *line_buffer);
 static void vdc_do_dma(int which);
-static void vpc_init( void );
+static void vpc_init( running_machine *machine );
 
 INTERRUPT_GEN( pce_interrupt )
 {
@@ -366,7 +366,7 @@ VIDEO_START( pce )
 	vdc[0].inc = 1;
 	vdc[1].inc = 1;
 
-	vpc_init();
+	vpc_init(machine);
 }
 
 
@@ -1069,9 +1069,9 @@ READ8_HANDLER( vpc_r ) {
 	return data;
 }
 
-static void vpc_init( void ) {
-	vpc_w( 0, 0x11 );
-	vpc_w( 1, 0x11 );
+static void vpc_init( running_machine *machine ) {
+	vpc_w( machine, 0, 0x11 );
+	vpc_w( machine, 1, 0x11 );
 	vpc.window1.w = 0;
 	vpc.window2.w = 0;
 	vpc.vdc_select = 0;
@@ -1079,13 +1079,13 @@ static void vpc_init( void ) {
 
 WRITE8_HANDLER( sgx_vdc_w ) {
 	if ( vpc.vdc_select ) {
-		vdc_1_w( offset, data );
+		vdc_1_w( machine, offset, data );
 	} else {
-		vdc_0_w( offset, data );
+		vdc_0_w( machine, offset, data );
 	}
 }
 
 READ8_HANDLER( sgx_vdc_r ) {
-	return ( vpc.vdc_select ) ? vdc_1_r( offset ) : vdc_0_r( offset );
+	return ( vpc.vdc_select ) ? vdc_1_r( machine, offset ) : vdc_0_r( machine, offset );
 }
 

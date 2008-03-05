@@ -97,7 +97,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 8  is EEPROM data */
 	/* bit 9  is EEPROM ready */
 	/* bit 11 is service button */
-	res = (EEPROM_read_bit()<<8) | input_port_0_word_r(0,0);
+	res = (EEPROM_read_bit()<<8) | input_port_0_word_r(machine,0,0);
 
 	if (init_eeprom_count)
 	{
@@ -185,18 +185,18 @@ static WRITE16_HANDLER( sound_cmd_w )
 {
 	if(ACCESSING_LSB) {
 		data &= 0xff;
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch2_r(0);
+	return soundlatch2_r(machine,0);
 }
 
 static void sound_nmi(void)

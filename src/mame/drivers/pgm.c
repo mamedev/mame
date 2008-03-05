@@ -445,15 +445,15 @@ static WRITE16_HANDLER ( m68k_l1_w )
 {
 	if(ACCESSING_LSB) {
 		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, activecpu_get_pc());
-		soundlatch_w(0, data);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(machine, 0, data);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
 static WRITE8_HANDLER( z80_l3_w )
 {
 	if (PGMLOGERROR) logerror("SL 3 z80.w %02x (%04x)\n", data, activecpu_get_pc());
-	soundlatch3_w(0, data);
+	soundlatch3_w(machine, 0, data);
 }
 
 static void sound_irq(int level)

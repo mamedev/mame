@@ -61,8 +61,8 @@ static WRITE8_HANDLER( shootout_bankswitch_w )
 
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
-	soundlatch_w( offset, data );
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w( machine, offset, data );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( shootout_flipscreen_w )

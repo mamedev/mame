@@ -186,9 +186,9 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	int sample = m72_sample_r(0);
+	int sample = m72_sample_r(machine,0);
 	if (sample)
-		m72_sample_w(0,sample);
+		m72_sample_w(machine,0,sample);
 }
 
 

@@ -853,9 +853,9 @@ static WRITE32_HANDLER( skns_v3t_w )
 static WRITE32_HANDLER( skns_ymz280_w )
 {
 	if ((mem_mask & 0xff000000) == 0)
-		YMZ280B_register_0_w(offset,(data >> 24) & 0xff);
+		YMZ280B_register_0_w(machine,offset,(data >> 24) & 0xff);
 	if ((mem_mask & 0x00ff0000) == 0)
-		YMZ280B_data_0_w(offset,(data >> 16) & 0xff);
+		YMZ280B_data_0_w(machine,offset,(data >> 16) & 0xff);
 }
 
 static ADDRESS_MAP_START( skns_readmem, ADDRESS_SPACE_PROGRAM, 32 )

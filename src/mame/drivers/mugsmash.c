@@ -62,8 +62,8 @@ static WRITE16_HANDLER( mugsmash_reg2_w )
 	switch (offset)
 	{
 	case 1:
-		soundlatch_w(1,data&0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(machine,1,data&0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:

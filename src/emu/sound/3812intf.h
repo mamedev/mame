@@ -15,10 +15,10 @@ struct Y8950interface
 
 	int rom_region; /* delta-T ADPCM ROM/RAM region */
 
-	read8_handler keyboardread;
-	write8_handler keyboardwrite;
-	read8_handler portread;
-	write8_handler portwrite;
+	read8_machine_func keyboardread;
+	write8_machine_func keyboardwrite;
+	read8_machine_func portread;
+	write8_machine_func portwrite;
 };
 
 

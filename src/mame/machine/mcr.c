@@ -424,15 +424,15 @@ INTERRUPT_GEN( mcr_interrupt )
 {
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
-	z80ctc_0_trg2_w(0, 1);
-	z80ctc_0_trg2_w(0, 0);
+	z80ctc_0_trg2_w(machine, 0, 1);
+	z80ctc_0_trg2_w(machine, 0, 0);
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
 	if (cpu_getiloops() == 0)
 	{
-		z80ctc_0_trg3_w(0, 1);
-		z80ctc_0_trg3_w(0, 0);
+		z80ctc_0_trg3_w(machine, 0, 1);
+		z80ctc_0_trg3_w(machine, 0, 0);
 	}
 }
 
@@ -443,8 +443,8 @@ INTERRUPT_GEN( mcr_ipu_interrupt )
 	/* frame at 30Hz */
 	if (cpu_getiloops() == 0)
 	{
-		z80ctc_1_trg3_w(0, 1);
-		z80ctc_1_trg3_w(0, 0);
+		z80ctc_1_trg3_w(machine, 0, 1);
+		z80ctc_1_trg3_w(machine, 0, 0);
 	}
 }
 
@@ -585,7 +585,7 @@ WRITE8_HANDLER( mcr_scroll_value_w )
 WRITE8_HANDLER( zwackery_pia_2_w )
 {
 	/* bit 7 is the watchdog */
-	if (!(data & 0x80)) watchdog_reset_w(offset, data);
+	if (!(data & 0x80)) watchdog_reset_w(machine, offset, data);
 
 	/* bits 5 and 6 control hflip/vflip */
 	/* bits 3 and 4 control coin counters? */
@@ -601,7 +601,7 @@ WRITE8_HANDLER( zwackery_pia_3_w )
 
 WRITE8_HANDLER( zwackery_ca2_w )
 {
-	csdeluxe_data_w(offset, (data << 4) | zwackery_sound_data);
+	csdeluxe_data_w(machine, offset, (data << 4) | zwackery_sound_data);
 }
 
 
@@ -614,13 +614,13 @@ static void zwackery_pia_irq(int state)
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	pia_2_ca1_w(0, 0);
+	pia_2_ca1_w(machine, 0, 0);
 }
 
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	pia_2_ca1_w(0, 1);
+	pia_2_ca1_w(machine, 0, 1);
 	timer_set(video_screen_get_scan_period(0), NULL, 0, zwackery_493_off_callback);
 }
 
@@ -903,26 +903,26 @@ static READ16_HANDLER( mcr68_6840_r_common )
 WRITE16_HANDLER( mcr68_6840_upper_w )
 {
 	if (ACCESSING_MSB)
-		mcr68_6840_w_common(offset, (data >> 8) & 0xff);
+		mcr68_6840_w_common(machine, offset, (data >> 8) & 0xff);
 }
 
 
 WRITE16_HANDLER( mcr68_6840_lower_w )
 {
 	if (ACCESSING_LSB)
-		mcr68_6840_w_common(offset, data & 0xff);
+		mcr68_6840_w_common(machine, offset, data & 0xff);
 }
 
 
 READ16_HANDLER( mcr68_6840_upper_r )
 {
-	return (mcr68_6840_r_common(offset,0) << 8) | 0x00ff;
+	return (mcr68_6840_r_common(machine,offset,0) << 8) | 0x00ff;
 }
 
 
 READ16_HANDLER( mcr68_6840_lower_r )
 {
-	return mcr68_6840_r_common(offset,0) | 0xff00;
+	return mcr68_6840_r_common(machine,offset,0) | 0xff00;
 }
 
 
@@ -1023,5 +1023,5 @@ READ8_HANDLER( mcr_ipu_watchdog_r )
 
 WRITE8_HANDLER( mcr_ipu_watchdog_w )
 {
-	mcr_ipu_watchdog_r(0);
+	mcr_ipu_watchdog_r(machine,0);
 }

@@ -237,7 +237,7 @@ static emu_timer *combasc_interleave_timer;
 static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 {
 	static int boost = 1;
-	int status = YM2203_status_port_0_r(0);
+	int status = YM2203_status_port_0_r(machine,0);
 
 	if (activecpu_get_pc() == 0x334)
 	{

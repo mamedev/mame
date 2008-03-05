@@ -323,8 +323,8 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 			break;
 
 		case 3: /* 380e - SND irq */
-			soundlatch_w(0, data);
-			cpunum_set_input_line(Machine, snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			soundlatch_w(machine, 0, data);
+			cpunum_set_input_line(machine, snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */

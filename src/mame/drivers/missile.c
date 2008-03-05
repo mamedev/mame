@@ -591,7 +591,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey1_w(offset & 0x0f, data);
+		pokey1_w(machine, offset & 0x0f, data);
 
 	/* OUT0 */
 	else if (offset < 0x4900)
@@ -650,7 +650,7 @@ static READ8_HANDLER( missile_r )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey1_r(offset & 0x0f);
+		result = pokey1_r(machine, offset & 0x0f);
 
 	/* IN0 */
 	else if (offset < 0x4900)

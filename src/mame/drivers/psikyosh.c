@@ -463,29 +463,29 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 
 static READ32_HANDLER( psh_ymf_fm_r )
 {
-	return YMF278B_status_port_0_r(0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
+	return YMF278B_status_port_0_r(machine,0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
 }
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
 	if (!(mem_mask & 0xff000000))	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
-		YMF278B_control_port_0_A_w(0, data>>24);
+		YMF278B_control_port_0_A_w(machine, 0, data>>24);
 	}
 
 	if (!(mem_mask & 0x00ff0000))	// FM bank 1 data
 	{
-		YMF278B_data_port_0_A_w(0, data>>16);
+		YMF278B_data_port_0_A_w(machine, 0, data>>16);
 	}
 
 	if (!(mem_mask & 0x0000ff00))	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
-		YMF278B_control_port_0_B_w(0, data>>8);
+		YMF278B_control_port_0_B_w(machine, 0, data>>8);
 	}
 
 	if (!(mem_mask & 0x000000ff))	// FM bank 2 data
 	{
-		YMF278B_data_port_0_B_w(0, data);
+		YMF278B_data_port_0_B_w(machine, 0, data);
 	}
 }
 
@@ -493,7 +493,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
 	if (!(mem_mask & 0xff000000))	// PCM address (OPL4/YMF 278B extended)
 	{
-		YMF278B_control_port_0_C_w(0, data>>24);
+		YMF278B_control_port_0_C_w(machine, 0, data>>24);
 
 #if ROMTEST
 		if (data>>24 == 0x06)	// Reset Sample reading (They always write this code immediately before reading data)
@@ -505,7 +505,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 
 	if (!(mem_mask & 0x00ff0000))	// PCM data
 	{
-		YMF278B_data_port_0_C_w(0, data>>16);
+		YMF278B_data_port_0_C_w(machine, 0, data>>16);
 	}
 }
 

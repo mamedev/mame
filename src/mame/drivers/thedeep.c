@@ -44,8 +44,8 @@ static WRITE8_HANDLER( thedeep_nmi_w )
 
 static WRITE8_HANDLER( thedeep_sound_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 protection_command, protection_data;

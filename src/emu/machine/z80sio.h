@@ -24,10 +24,10 @@ struct _z80sio_interface
 {
 	int baseclock;
 	void (*irq_cb)(int state);
-	write8_handler dtr_changed_cb;
-	write8_handler rts_changed_cb;
-	write8_handler break_changed_cb;
-	write8_handler transmit_cb;
+	write8_machine_func dtr_changed_cb;
+	write8_machine_func rts_changed_cb;
+	write8_machine_func break_changed_cb;
+	write8_machine_func transmit_cb;
 	int (*receive_poll_cb)(int which);
 };
 

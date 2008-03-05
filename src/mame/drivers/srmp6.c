@@ -535,7 +535,7 @@ static WRITE16_HANDLER(tileram_w)
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
 	{
 		offset &=0x1f;
-		srmp6_dma_w(offset,data,mem_mask);
+		srmp6_dma_w(machine,offset,data,mem_mask);
 	}
 }
 
@@ -544,7 +544,7 @@ static WRITE16_HANDLER(paletteram_w)
 	INT8 r, g, b;
 	int brg = brightness - 0x60;
 
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(offset, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset, data, mem_mask);
 
 	if(brg)
 	{

@@ -236,7 +236,7 @@ static WRITE8_HANDLER( ddenlovr_bgcolor2_w )
 static WRITE16_HANDLER( ddenlovr16_bgcolor_w )
 {
 	if (ACCESSING_LSB)
-		ddenlovr_bgcolor_w(offset,data);
+		ddenlovr_bgcolor_w(machine,offset,data);
 }
 
 
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( ddenlovr_priority2_w )
 static WRITE16_HANDLER( ddenlovr16_priority_w )
 {
 	if (ACCESSING_LSB)
-		ddenlovr_priority_w(offset,data);
+		ddenlovr_priority_w(machine,offset,data);
 }
 
 
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( ddenlovr_layer_enable2_w )
 static WRITE16_HANDLER( ddenlovr16_layer_enable_w )
 {
 	if (ACCESSING_LSB)
-		ddenlovr_layer_enable_w(offset,data);
+		ddenlovr_layer_enable_w(machine,offset,data);
 }
 
 
@@ -1062,11 +1062,11 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		case 0xe4:
-			ddenlovr_priority_w(0,data);
+			ddenlovr_priority_w(machine,0,data);
 			break;
 
 		case 0xe6:
-			ddenlovr_layer_enable_w(0,data);
+			ddenlovr_layer_enable_w(machine,0,data);
 			break;
 
 		case 0xe8:
@@ -1171,7 +1171,7 @@ static READ8_HANDLER( rongrong_gfxrom_r )
 
 static READ16_HANDLER( ddenlovr_gfxrom_r )
 {
-	return rongrong_gfxrom_r(offset);
+	return rongrong_gfxrom_r(machine, offset);
 }
 
 
@@ -1358,13 +1358,13 @@ static WRITE8_HANDLER( rongrong_palette_w )
 	/* what were they smoking??? */
 	b = ((d1 & 0xe0) >> 5) | (d2 & 0xc0) >> 3;
 
-	palette_set_color_rgb(Machine,indx,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine,indx,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static WRITE16_HANDLER( ddenlovr_palette_w )
 {
 	if (ACCESSING_LSB)
-		rongrong_palette_w(offset,data & 0xff);
+		rongrong_palette_w(machine,offset,data & 0xff);
 }
 
 
@@ -1471,7 +1471,7 @@ static READ8_HANDLER( unk_r )
 
 static READ16_HANDLER( unk16_r )
 {
-	return unk_r(offset);
+	return unk_r(machine,offset);
 }
 
 
@@ -1965,8 +1965,8 @@ static WRITE8_HANDLER( mmpanic_rombank_w )
 
 static WRITE8_HANDLER( mmpanic_soundlatch_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
@@ -2503,8 +2503,8 @@ static READ8_HANDLER( mjchuuka_keyb_r )
 
 static WRITE8_HANDLER( mjchuuka_blitter_w )
 {
-	hanakanz_blitter_reg_w(0,offset >> 8);
-	hanakanz_blitter_data_w(0,data);
+	hanakanz_blitter_reg_w(machine,0,offset >> 8);
+	hanakanz_blitter_data_w(machine,0,data);
 }
 
 static UINT8 mjchuuka_romdata[2];
@@ -2763,7 +2763,7 @@ static READ8_HANDLER( hginga_protection_r )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	if (hginga_rombank & 0x10)
-		return hanakanz_rand_r(0);
+		return hanakanz_rand_r(machine,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xf601 - 0x8000];
 }
 
@@ -2985,7 +2985,7 @@ static READ8_HANDLER( hgokou_protection_r )
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	if (hginga_rombank == 0)
-		return hanakanz_rand_r(0);
+		return hanakanz_rand_r(machine,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xe601 - 0x8000];
 }
 

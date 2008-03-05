@@ -31,7 +31,7 @@ static UINT8 *exerion_ram;
 static READ8_HANDLER( exerion_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return exerion_cocktail_flip ? input_port_1_r(offset) : input_port_0_r(offset);
+	return exerion_cocktail_flip ? input_port_1_r(machine,offset) : input_port_0_r(machine,offset);
 }
 
 

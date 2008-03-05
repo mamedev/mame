@@ -56,8 +56,8 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(offset,(data >> 8) & 0xff);
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(machine,offset,(data >> 8) & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -81,13 +81,13 @@ static MACHINE_RESET( deniam )
 static WRITE16_HANDLER( YM3812_control_port_0_msb_w )
 {
 	if (ACCESSING_MSB)
-		YM3812_control_port_0_w(0,(data >> 8) & 0xff);
+		YM3812_control_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 
 static WRITE16_HANDLER( YM3812_write_port_0_msb_w )
 {
 	if (ACCESSING_MSB)
-		YM3812_write_port_0_w(0,(data >> 8) & 0xff);
+		YM3812_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 
 

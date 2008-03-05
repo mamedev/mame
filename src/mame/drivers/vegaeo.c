@@ -26,20 +26,20 @@ static WRITE32_HANDLER( vega_vram_w )
 	switch(mem_mask)
 	{
 		case 0:
-			vega_vram_w(offset,data,0x00ffffff);
-			vega_vram_w(offset,data,0xff00ffff);
-			vega_vram_w(offset,data,0xffff00ff);
-			vega_vram_w(offset,data,0xffffff00);
+			vega_vram_w(machine,offset,data,0x00ffffff);
+			vega_vram_w(machine,offset,data,0xff00ffff);
+			vega_vram_w(machine,offset,data,0xffff00ff);
+			vega_vram_w(machine,offset,data,0xffffff00);
 			return;
 
 		case 0x0000ffff:
-			vega_vram_w(offset,data,0x00ffffff);
-			vega_vram_w(offset,data,0xff00ffff);
+			vega_vram_w(machine,offset,data,0x00ffffff);
+			vega_vram_w(machine,offset,data,0xff00ffff);
 			return;
 
 		case 0xffff0000:
-			vega_vram_w(offset,data,0xffff00ff);
-			vega_vram_w(offset,data,0xffffff00);
+			vega_vram_w(machine,offset,data,0xffff00ff);
+			vega_vram_w(machine,offset,data,0xffffff00);
 			return;
 
 		default:

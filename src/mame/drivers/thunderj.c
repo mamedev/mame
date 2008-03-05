@@ -180,7 +180,7 @@ static READ16_HANDLER( thunderj_video_control_r )
     if (cpu_readmem24bew_word(0x163482) > 0xfff)
         mame_printf_debug("You're screwed!");*/
 
-	return atarivc_r(offset,0);
+	return atarivc_r(machine,offset,0);
 }
 
 

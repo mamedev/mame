@@ -18,16 +18,16 @@
 #define ACTIVELOW_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | ((D ^ 1) << A))
 #define ACTIVEHIGH_PORT_BIT(P,A,D)   ((P & (~(1 << A))) | (D << A))
 
-#define I8035_T_R(N) ((soundlatch2_r(0) >> (N)) & 1)
-#define I8035_T_W_AH(N,D) do { state->portT = ACTIVEHIGH_PORT_BIT(state->portT,N,D); soundlatch2_w(0, state->portT); } while (0)
+#define I8035_T_R(M,N) ((soundlatch2_r(M,0) >> (N)) & 1)
+#define I8035_T_W_AH(M,N,D) do { state->portT = ACTIVEHIGH_PORT_BIT(state->portT,N,D); soundlatch2_w(M, 0, state->portT); } while (0)
 
-#define I8035_P1_R() (soundlatch3_r(0))
-#define I8035_P2_R() (soundlatch4_r(0))
-#define I8035_P1_W(D) soundlatch3_w(0,D)
-#define I8035_P2_W(D) soundlatch4_w(0,D)
+#define I8035_P1_R(M) (soundlatch3_r(M,0))
+#define I8035_P2_R(M) (soundlatch4_r(M,0))
+#define I8035_P1_W(M,D) soundlatch3_w(M,0,D)
+#define I8035_P2_W(M,D) soundlatch4_w(M,0,D)
 
-#define I8035_P1_W_AH(B,D) I8035_P1_W(ACTIVEHIGH_PORT_BIT(I8035_P1_R(),B,(D)))
-#define I8035_P2_W_AH(B,D) I8035_P2_W(ACTIVEHIGH_PORT_BIT(I8035_P2_R(),B,(D)))
+#define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
+#define I8035_P2_W_AH(M,B,D) I8035_P2_W(M,ACTIVEHIGH_PORT_BIT(I8035_P2_R(M),B,(D)))
 
 /****************************************************************
  *
@@ -251,12 +251,12 @@ static SOUND_RESET( mario )
 {
 	mario_state	*state = machine->driver_data;
 
-	soundlatch_clear_w(0,0);
-	soundlatch2_clear_w(0,0);
-	soundlatch3_clear_w(0,0);
-	soundlatch4_clear_w(0,0);
-	I8035_P1_W(0x00); /* Input port */
-	I8035_P2_W(0xff); /* Port is in high impedance state after reset */
+	soundlatch_clear_w(machine,0,0);
+	soundlatch2_clear_w(machine,0,0);
+	soundlatch3_clear_w(machine,0,0);
+	soundlatch4_clear_w(machine,0,0);
+	I8035_P1_W(machine,0x00); /* Input port */
+	I8035_P2_W(machine,0xff); /* Port is in high impedance state after reset */
 
 	state->last = 0;
 }
@@ -269,22 +269,22 @@ static SOUND_RESET( mario )
 
 static READ8_HANDLER( mario_sh_p1_r )
 {
-	return I8035_P1_R();
+	return I8035_P1_R(machine);
 }
 
 static READ8_HANDLER( mario_sh_p2_r )
 {
-	return I8035_P2_R() & 0xEF; /* Bit 4 connected to GND! */
+	return I8035_P2_R(machine) & 0xEF; /* Bit 4 connected to GND! */
 }
 
 static READ8_HANDLER( mario_sh_t0_r )
 {
-	return I8035_T_R(0);
+	return I8035_T_R(machine,0);
 }
 
 static READ8_HANDLER( mario_sh_t1_r )
 {
-	return I8035_T_R(1);
+	return I8035_T_R(machine,1);
 }
 
 static READ8_HANDLER( mario_sh_ea_r )
@@ -292,7 +292,7 @@ static READ8_HANDLER( mario_sh_ea_r )
 #if USE_8039
 	return 1;
 #else
-	int p2 = (I8035_P2_R() >> 5) & 1;
+	int p2 = (I8035_P2_R(machine) >> 5) & 1;
 	return p2 ^ 1;
 #endif
 }
@@ -301,27 +301,27 @@ static READ8_HANDLER( mario_sh_tune_r )
 {
 	UINT8 *SND = memory_region(REGION_CPU2);
 	UINT16 mask = memory_region_length(REGION_CPU2)-1;
-	UINT8 p2 = I8035_P2_R();
+	UINT8 p2 = I8035_P2_R(machine);
 
 	if ((p2 >> 7) & 1)
-		return soundlatch_r(offset);
+		return soundlatch_r(machine,offset);
 	else
 		return (SND[(0x1000 + (p2 & 0x0f)*256+offset) & mask]);
 }
 
 static WRITE8_HANDLER( mario_sh_sound_w )
 {
-	discrete_sound_w(DS_DAC,data);
+	discrete_sound_w(machine,DS_DAC,data);
 }
 
 static WRITE8_HANDLER( mario_sh_p1_w )
 {
-	I8035_P1_W(data);
+	I8035_P1_W(machine,data);
 }
 
 static WRITE8_HANDLER( mario_sh_p2_w )
 {
-	I8035_P2_W(data);
+	I8035_P2_W(machine,data);
 }
 
 /****************************************************************
@@ -332,12 +332,12 @@ static WRITE8_HANDLER( mario_sh_p2_w )
 
 WRITE8_HANDLER( masao_sh_irqtrigger_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	if (state->last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 	}
 
 	state->last = data;
@@ -345,54 +345,54 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 
 WRITE8_HANDLER( mario_sh_tuneselect_w )
 {
-	soundlatch_w(offset,data);
+	soundlatch_w(machine,offset,data);
 }
 
 /* Mario running sample */
 WRITE8_HANDLER( mario_sh1_w )
 {
-	discrete_sound_w(DS_SOUND0_INP,data & 1);
+	discrete_sound_w(machine,DS_SOUND0_INP,data & 1);
 }
 
 /* Luigi running sample */
 WRITE8_HANDLER( mario_sh2_w )
 {
-	discrete_sound_w(DS_SOUND1_INP,data & 1);
+	discrete_sound_w(machine,DS_SOUND1_INP,data & 1);
 }
 
 /* Misc samples */
 WRITE8_HANDLER( mario_sh3_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	switch (offset)
 	{
 		case 0: /* death */
 			if (data)
-				cpunum_set_input_line(Machine, 1,0,ASSERT_LINE);
+				cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
 			else
-				cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
+				cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
-			I8035_T_W_AH(0,data & 1);
+			I8035_T_W_AH(machine,0,data & 1);
 			break;
 		case 2: /* ice */
-			I8035_T_W_AH(1,data & 1);
+			I8035_T_W_AH(machine,1,data & 1);
 			break;
 		case 3: /* crab */
-			I8035_P1_W_AH(0,data & 1);
+			I8035_P1_W_AH(machine,0,data & 1);
 			break;
 		case 4: /* turtle */
-			I8035_P1_W_AH(1,data & 1);
+			I8035_P1_W_AH(machine,1,data & 1);
 			break;
 		case 5: /* fly */
-			I8035_P1_W_AH(2,data & 1);
+			I8035_P1_W_AH(machine,2,data & 1);
 			break;
 		case 6: /* coin */
-			I8035_P1_W_AH(3,data & 1);
+			I8035_P1_W_AH(machine,3,data & 1);
 			break;
 		case 7: /* skid */
-			discrete_sound_w(DS_SOUND7_INP,data & 1);
+			discrete_sound_w(machine,DS_SOUND7_INP,data & 1);
 			break;
 	}
 }

@@ -39,12 +39,12 @@ WRITE16_HANDLER( toki_control_w )
 
 VIDEO_EOF( toki )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 VIDEO_EOF( tokib )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

@@ -83,7 +83,7 @@ WRITE8_HANDLER( yiear_control_w )
 
 	/* bit 2 is IRQ enable */
 
-	interrupt_enable_w(0, data & 0x04);
+	interrupt_enable_w(machine, 0, data & 0x04);
 
 	/* bits 3 and 4 are coin counters */
 

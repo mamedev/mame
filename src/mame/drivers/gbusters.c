@@ -44,7 +44,7 @@ static READ8_HANDLER( bankedram_r )
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	else
 		ram[offset] = data;
 }

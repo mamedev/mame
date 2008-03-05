@@ -323,20 +323,20 @@ static READ16_HANDLER( jongbou_inputs_r )
 static WRITE16_HANDLER( kyros_sound_w )
 {
 	if(ACCESSING_MSB)
-		soundlatch_w(0, (data>>8)&0xff);
+		soundlatch_w(machine, 0, (data>>8)&0xff);
 }
 
 static WRITE16_HANDLER( alpha68k_II_sound_w )
 {
 	if(ACCESSING_LSB)
-		soundlatch_w(0, data&0xff);
+		soundlatch_w(machine, 0, data&0xff);
 }
 
 static WRITE16_HANDLER( alpha68k_V_sound_w )
 {
 	/* Sound & fix bank select are in the same word */
 	if(ACCESSING_LSB)
-		soundlatch_w(0,data&0xff);
+		soundlatch_w(machine,0,data&0xff);
 	if(ACCESSING_MSB)
 		alpha68k_V_video_bank_w((data>>8)&0xff);
 }
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
@@ -354,7 +354,7 @@ static WRITE16_HANDLER( tnexspce_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }

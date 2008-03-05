@@ -123,9 +123,9 @@ static const int nusiz[8][3] =
 	{ 1, 4, 0 }
 };
 
-static read16_handler	tia_read_input_port;
-static read8_handler	tia_get_databus;
-static write16_handler	tia_vsync_callback;
+static read16_machine_func	tia_read_input_port;
+static read8_machine_func	tia_get_databus;
+static write16_machine_func	tia_vsync_callback;
 
 static void extend_palette(running_machine *machine) {
 	int	i,j;
@@ -877,7 +877,7 @@ static WRITE8_HANDLER( VSYNC_w )
 					Machine->screen[0].height);
 
 			if ( tia_vsync_callback ) {
-				tia_vsync_callback( 0, curr_y, 0xFFFF );
+				tia_vsync_callback( machine, 0, curr_y, 0xFFFF );
 			}
 
 			prev_y = 0;
@@ -1361,11 +1361,11 @@ static WRITE8_HANDLER( NUSIZ1_w )
 
 static WRITE8_HANDLER( HMCLR_w )
 {
-	HMP0_w( offset, 0 );
-	HMP1_w( offset, 0 );
-	HMM0_w( offset, 0 );
-	HMM1_w( offset, 0 );
-	HMBL_w( offset, 0 );
+	HMP0_w( machine, offset, 0 );
+	HMP1_w( machine, offset, 0 );
+	HMM0_w( machine, offset, 0 );
+	HMM1_w( machine, offset, 0 );
+	HMBL_w( machine, offset, 0 );
 }
 
 
@@ -1650,10 +1650,9 @@ static READ8_HANDLER( INPT_r )
 {
 	UINT64 elapsed = activecpu_gettotalcycles() - paddle_cycles;
 	int input = TIA_INPUT_PORT_ALWAYS_ON;
-
 	if ( tia_read_input_port )
 	{
-		input = tia_read_input_port(offset & 3, 0xFFFF);
+		input = tia_read_input_port(machine, offset & 3, 0xFFFF);
 	}
 
 	if ( input == TIA_INPUT_PORT_ALWAYS_ON )
@@ -1676,7 +1675,7 @@ READ8_HANDLER( tia_r )
 
 	if ( tia_get_databus )
 	{
-		data = tia_get_databus(offset) & 0x3f;
+		data = tia_get_databus(machine, offset) & 0x3f;
 	}
 
 	if (!(offset & 0x8))
@@ -1703,22 +1702,22 @@ READ8_HANDLER( tia_r )
 	case 0x7:
 		return data | CXPPMM;
 	case 0x8:
-		return data | INPT_r(0);
+		return data | INPT_r(machine,0);
 	case 0x9:
-		return data | INPT_r(1);
+		return data | INPT_r(machine,1);
 	case 0xA:
-		return data | INPT_r(2);
+		return data | INPT_r(machine,2);
 	case 0xB:
-		return data | INPT_r(3);
+		return data | INPT_r(machine,3);
 	case 0xC:
 		{
-			int	button = tia_read_input_port ? ( tia_read_input_port(4,0xFFFF) & 0x80 ) : 0x80;
+			int	button = tia_read_input_port ? ( tia_read_input_port(machine,4,0xFFFF) & 0x80 ) : 0x80;
 			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
 		}
 		return data | INPT4;
 	case 0xD:
 		{
-			int button = tia_read_input_port ? ( tia_read_input_port(5,0xFFFF) & 0x80 ) : 0x80;
+			int button = tia_read_input_port ? ( tia_read_input_port(machine,5,0xFFFF) & 0x80 ) : 0x80;
 			INPT5 = ( VBLANK & 0x40) ? ( INPT5 & button ) : button;
 		}
 		return data | INPT5;
@@ -1778,7 +1777,6 @@ WRITE8_HANDLER( tia_w )
 		 0,	// HMCLR
 		 0,	// CXCLR
 	};
-
 	int curr_x = current_x();
 	int curr_y = current_y();
 
@@ -1797,22 +1795,22 @@ WRITE8_HANDLER( tia_w )
 	switch (offset)
 	{
 	case 0x00:
-		VSYNC_w(offset, data);
+		VSYNC_w(machine, offset, data);
 		break;
 	case 0x01:
-		VBLANK_w(offset, data);
+		VBLANK_w(machine, offset, data);
 		break;
 	case 0x02:
-		WSYNC_w(offset, data);
+		WSYNC_w(machine, offset, data);
 		break;
 	case 0x03:
-		RSYNC_w(offset, data);
+		RSYNC_w(machine, offset, data);
 		break;
 	case 0x04:
-		NUSIZ0_w(offset, data);
+		NUSIZ0_w(machine, offset, data);
 		break;
 	case 0x05:
-		NUSIZ1_w(offset, data);
+		NUSIZ1_w(machine, offset, data);
 		break;
 	case 0x06:
 		COLUP0 = data;
@@ -1827,7 +1825,7 @@ WRITE8_HANDLER( tia_w )
 		COLUBK = data;
 		break;
 	case 0x0A:
-		CTRLPF_w(offset, data);
+		CTRLPF_w(machine, offset, data);
 		break;
 	case 0x0B:
 		REFP0 = data;
@@ -1845,19 +1843,19 @@ WRITE8_HANDLER( tia_w )
 		PF2 = data;
 		break;
 	case 0x10:
-		RESP0_w(offset, data);
+		RESP0_w(machine, offset, data);
 		break;
 	case 0x11:
-		RESP1_w(offset, data);
+		RESP1_w(machine, offset, data);
 		break;
 	case 0x12:
-		RESM0_w(offset, data);
+		RESM0_w(machine, offset, data);
 		break;
 	case 0x13:
-		RESM1_w(offset, data);
+		RESM1_w(machine, offset, data);
 		break;
 	case 0x14:
-		RESBL_w(offset, data);
+		RESBL_w(machine, offset, data);
 		break;
 
 	case 0x15: /* AUDC0 */
@@ -1866,14 +1864,14 @@ WRITE8_HANDLER( tia_w )
 	case 0x18: /* AUDF1 */
 	case 0x19: /* AUDV0 */
 	case 0x1A: /* AUDV1 */
-		tia_sound_w(offset, data);
+		tia_sound_w(machine, offset, data);
 		break;
 
 	case 0x1B:
-		GRP0_w(offset, data);
+		GRP0_w(machine, offset, data);
 		break;
 	case 0x1C:
-		GRP1_w(offset, data);
+		GRP1_w(machine, offset, data);
 		break;
 	case 0x1D:
 		ENAM0 = data;
@@ -1885,19 +1883,19 @@ WRITE8_HANDLER( tia_w )
 		ENABL = data;
 		break;
 	case 0x20:
-		HMP0_w(offset, data);
+		HMP0_w(machine, offset, data);
 		break;
 	case 0x21:
-		HMP1_w(offset, data);
+		HMP1_w(machine, offset, data);
 		break;
 	case 0x22:
-		HMM0_w(offset, data);
+		HMM0_w(machine, offset, data);
 		break;
 	case 0x23:
-		HMM1_w(offset, data);
+		HMM1_w(machine, offset, data);
 		break;
 	case 0x24:
-		HMBL_w(offset, data);
+		HMBL_w(machine, offset, data);
 		break;
 	case 0x25:
 		VDELP0 = data;
@@ -1909,19 +1907,19 @@ WRITE8_HANDLER( tia_w )
 		VDELBL = data;
 		break;
 	case 0x28:
-		RESMP0_w(offset, data);
+		RESMP0_w(machine, offset, data);
 		break;
 	case 0x29:
-		RESMP1_w(offset, data);
+		RESMP1_w(machine, offset, data);
 		break;
 	case 0x2A:
-		HMOVE_w(offset, data);
+		HMOVE_w(machine, offset, data);
 		break;
 	case 0x2B:
-		HMCLR_w(offset, data);
+		HMCLR_w(machine, offset, data);
 		break;
 	case 0x2C:
-		CXCLR_w(offset, 0);
+		CXCLR_w(machine, offset, 0);
 		break;
 	}
 }

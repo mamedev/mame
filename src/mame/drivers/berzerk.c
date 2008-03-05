@@ -521,12 +521,12 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
-		exidy_sfxctrl_w(data >> 6, data);
+		exidy_sfxctrl_w(machine, data >> 6, data);
 		break;
 
 	/* everything else writes to the 6840 */
 	default:
-		exidy_sh6840_w(offset, data);
+		exidy_sh6840_w(machine, offset, data);
 		break;
 
 	}
@@ -543,7 +543,7 @@ static READ8_HANDLER( berzerk_audio_r )
 static SOUND_RESET(berzerk)
 {
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
-	berzerk_audio_w(4, 0x40);
+	berzerk_audio_w(machine, 4, 0x40);
 }
 
 

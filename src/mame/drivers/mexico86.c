@@ -72,7 +72,7 @@ VIDEO_UPDATE( kikikai );
 //AT
 static READ8_HANDLER( kiki_2203_r )
 {
-	return(YM2203_status_port_0_r(0) & 0x7f);
+	return(YM2203_status_port_0_r(machine,0) & 0x7f);
 }
 //ZT
 

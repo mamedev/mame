@@ -105,7 +105,7 @@ static READ16_HANDLER( track_r )
 
 static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 {
-	seibu_main_word_w(4,data,mem_mask);
+	seibu_main_word_w(machine,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));

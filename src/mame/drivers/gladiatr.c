@@ -309,14 +309,14 @@ static WRITE8_HANDLER( glad_adpcm_w )
 
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( glad_cpu_sound_command_r )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(0);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(machine,0);
 }
 
 static WRITE8_HANDLER( gladiatr_flipscreen_w )

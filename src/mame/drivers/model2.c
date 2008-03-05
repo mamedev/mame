@@ -944,7 +944,7 @@ static WRITE32_HANDLER( model2_serial_w )
 {
 	if (((mem_mask & 0xff) == 0) && (offset == 0))
 	{
-		SCSP_MidiIn(0, data&0xff, 0);
+		SCSP_MidiIn(machine, 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -1578,12 +1578,12 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return MultiPCM_reg_0_r(0);
+	return MultiPCM_reg_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	MultiPCM_reg_0_w(offset, data);
+	MultiPCM_reg_0_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
@@ -1593,12 +1593,12 @@ static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return MultiPCM_reg_1_r(0);
+	return MultiPCM_reg_1_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	MultiPCM_reg_1_w(offset, data);
+	MultiPCM_reg_1_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
@@ -1608,7 +1608,7 @@ static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 
 static READ16_HANDLER( m1_snd_ym_r )
 {
-	return YM3438_status_port_0_A_r(0);
+	return YM3438_status_port_0_A_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_ym_w )
@@ -1616,19 +1616,19 @@ static WRITE16_HANDLER( m1_snd_ym_w )
 	switch (offset)
 	{
 		case 0:
-			YM3438_control_port_0_A_w(0, data);
+			YM3438_control_port_0_A_w(machine, 0, data);
 			break;
 
 		case 1:
-			YM3438_data_port_0_A_w(0, data);
+			YM3438_data_port_0_A_w(machine, 0, data);
 			break;
 
 		case 2:
-			YM3438_control_port_0_B_w(0, data);
+			YM3438_control_port_0_B_w(machine, 0, data);
 			break;
 
 		case 3:
-			YM3438_data_port_0_B_w(0, data);
+			YM3438_data_port_0_B_w(machine, 0, data);
 			break;
 	}
 }

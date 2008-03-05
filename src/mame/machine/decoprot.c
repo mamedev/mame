@@ -110,8 +110,8 @@ void decoprot_reset(void)
 WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
 	if (offset==(0x150/2)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 
@@ -228,8 +228,8 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 WRITE16_HANDLER( deco16_60_prot_w ) /* Edward Randy */
 {
 	if (offset==(0x64/2)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
@@ -417,8 +417,8 @@ static int mutantf_port_0e_hack=0, mutantf_port_6a_hack=0,mutantf_port_e8_hack=0
 WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 {
 	if (offset==(0x64/2)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 
@@ -603,8 +603,8 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 WRITE16_HANDLER( deco16_104_cninja_prot_w )
 {
 	if (offset==(0xa8/2)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 
@@ -665,8 +665,8 @@ WRITE16_HANDLER( deco16_146_funkyjet_prot_w )
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 
 	if (offset == (0x10a >> 1)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 }
@@ -778,15 +778,14 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
         There doesn't appear to be any way to detect what bank is currently selected - it
         seems game code must maintain this state (if it matters).
     */
-
 	if (decoprot_buffer_ram_selected)
 		COMBINE_DATA(&decoprot_buffer_ram[offset]);
 	else
 		COMBINE_DATA(&deco16_prot_ram[offset]);
 
 	if (offset==(0xa8/2)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 
@@ -1214,10 +1213,9 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 	const int sndport=0x260;
 	const int xorport=0x340;
 	const int maskport=0x6c0;
-
 	if (writeport==sndport) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 
@@ -1644,7 +1642,7 @@ WRITE32_HANDLER( deco16_146_fghthist_prot_w )
 	decoprot_last_write=addr;
 	decoprot_last_write_val=data>>16;
 
-	deco16_146_core_prot_w(addr, data>>16, mem_mask>>16);
+	deco16_146_core_prot_w(machine, addr, data>>16, mem_mask>>16);
 }
 
 READ32_HANDLER( deco16_146_fghthist_prot_r )
@@ -1669,7 +1667,7 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 	}
 	decoprot_last_write=-1;
 
-	val=deco16_146_core_prot_r(addr, mem_mask>>16);
+	val=deco16_146_core_prot_r(machine, addr, mem_mask>>16);
 
 	if (addr!=0x7b6 && addr!=0x1c && addr!=0x1e0 && addr!=0x1d4
 		&& addr!=0x2c4 && addr!=0x7a4 && addr!=0x30 // confirmed
@@ -1716,15 +1714,13 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 WRITE16_HANDLER( deco16_146_nitroball_prot_w )
 {
 	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-
-	deco16_146_core_prot_w(addr, data, mem_mask);
+	deco16_146_core_prot_w(machine, addr, data, mem_mask);
 }
 
 READ16_HANDLER( deco16_146_nitroball_prot_r )
 {
 	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-
-	return deco16_146_core_prot_r(addr, mem_mask);
+	return deco16_146_core_prot_r(machine, addr, mem_mask);
 }
 
 /**********************************************************************************/
@@ -1733,9 +1729,9 @@ READ16_HANDLER( dietgo_104_prot_r )
 {
 	switch (offset * 2)
 	{
-	case 0x298: return input_port_0_word_r(0, 0);
-	case 0x342: return input_port_1_word_r(0, 0);
-	case 0x506: return input_port_2_word_r(0, 0);
+	case 0x298: return input_port_0_word_r(machine, 0, 0);
+	case 0x342: return input_port_1_word_r(machine, 0, 0);
+	case 0x506: return input_port_2_word_r(machine, 0, 0);
 	}
 
 	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset<<1);
@@ -1746,8 +1742,8 @@ READ16_HANDLER( dietgo_104_prot_r )
 WRITE16_HANDLER( dietgo_104_prot_w )
 {
 	if (offset==(0x380/2)) {
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		return;
 	}
 	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",activecpu_get_pc(),offset<<1,data);
@@ -1758,12 +1754,11 @@ WRITE16_HANDLER( dietgo_104_prot_w )
 READ16_HANDLER( deco16_104_pktgaldx_prot_r )
 {
 	const UINT16* prot_ram=deco16_prot_ram;
-
 	switch (offset * 2)
 	{
-	case 0x5b2: return input_port_0_word_r(0, 0);
-	case 0x44c: return input_port_1_word_r(0, 0);
-	case 0x042: return input_port_2_word_r(0, 0);
+	case 0x5b2: return input_port_0_word_r(machine, 0, 0);
+	case 0x44c: return input_port_1_word_r(machine, 0, 0);
+	case 0x042: return input_port_2_word_r(machine, 0, 0);
 
 	case 0x510: return DECO_PORT(0);
 	case 0x51a: return DECO_PORT(2);

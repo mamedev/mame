@@ -412,7 +412,7 @@ VIDEO_UPDATE( amiga );
 UINT32 amiga_gethvpos(void);
 void copper_setpc(UINT32 pc);
 void amiga_set_genlock_color(UINT16 color);
-void amiga_render_scanline(bitmap_t *bitmap, int scanline);
+void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);
 void amiga_sprite_dma_reset(int which);
 void amiga_sprite_enable_comparitor(int which, int enable);
 

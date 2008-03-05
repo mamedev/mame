@@ -62,7 +62,7 @@ static WRITE8_HANDLER( pandoras_int_control_w ){
 					break;
 		case 0x03:	coin_counter_w(1,data & 0x01);
 					break;
-		case 0x05:	pandoras_flipscreen_w(0, data);
+		case 0x05:	pandoras_flipscreen_w(machine, 0, data);
 					break;
 		case 0x06:	if (!data) cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 					irq_enable_b = data;

@@ -48,7 +48,7 @@ static UINT8 *finalgdr_backupram;
 static READ16_HANDLER( oki_r )
 {
 	if(offset)
-		return OKIM6295_status_0_r(0);
+		return OKIM6295_status_0_r(machine, 0);
 	else
 		return 0;
 }
@@ -56,23 +56,23 @@ static READ16_HANDLER( oki_r )
 static WRITE16_HANDLER( oki_w )
 {
 	if(offset)
-		OKIM6295_data_0_w(0, data);
+		OKIM6295_data_0_w(machine, 0, data);
 }
 
 static READ32_HANDLER( oki32_r )
 {
-	return OKIM6295_status_0_r(0) << 8;
+	return OKIM6295_status_0_r(machine, 0) << 8;
 }
 
 static WRITE32_HANDLER( oki32_w )
 {
-	OKIM6295_data_0_w(0, (data >> 8) & 0xff);
+	OKIM6295_data_0_w(machine, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( ym2151_status_r )
 {
 	if(offset)
-		return YM2151_status_port_0_r(0);
+		return YM2151_status_port_0_r(machine, 0);
 	else
 		return 0;
 }
@@ -80,28 +80,28 @@ static READ16_HANDLER( ym2151_status_r )
 static WRITE16_HANDLER( ym2151_data_w )
 {
 	if(offset)
-		YM2151_data_port_0_w(0, data);
+		YM2151_data_port_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( ym2151_register_w )
 {
 	if(offset)
-		YM2151_register_port_0_w(0, data);
+		YM2151_register_port_0_w(machine, 0, data);
 }
 
 static READ32_HANDLER( ym2151_status32_r )
 {
-	return YM2151_status_port_0_r(0) << 8;
+	return YM2151_status_port_0_r(machine, 0) << 8;
 }
 
 static WRITE32_HANDLER( ym2151_data32_w )
 {
-	YM2151_data_port_0_w(0, (data >> 8) & 0xff);
+	YM2151_data_port_0_w(machine, 0, (data >> 8) & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register32_w )
 {
-	YM2151_register_port_0_w(0, (data >> 8) & 0xff);
+	YM2151_register_port_0_w(machine, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( eeprom_r )

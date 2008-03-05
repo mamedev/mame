@@ -215,7 +215,7 @@ WRITE16_HANDLER( toobin_slip_w )
 		video_screen_update_partial(0, video_screen_get_vpos(0));
 
 	/* update the data */
-	atarimo_0_slipram_w(offset, data, mem_mask);
+	atarimo_0_slipram_w(machine, offset, data, mem_mask);
 }
 
 

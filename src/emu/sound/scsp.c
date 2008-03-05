@@ -712,7 +712,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			SCSP_MidiIn(0, SCSP->udata.data[0x6/2]&0xff, 0);
+			SCSP_MidiIn(Machine, 0, SCSP->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:

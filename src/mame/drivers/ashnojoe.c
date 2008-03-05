@@ -109,9 +109,9 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 {
 	if(ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 		//needed?
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 

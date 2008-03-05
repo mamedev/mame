@@ -229,13 +229,13 @@ static WRITE8_HANDLER( snddata_w )
 {
 	int num_ays = (sndti_exists(SOUND_AY8910, 1)) ? 2 : 1;
 	if ((p2 & 0xf0) == 0xe0)
-		AY8910_control_port_0_w(0,offset);
+		AY8910_control_port_0_w(machine,0,offset);
 	else if ((p2 & 0xf0) == 0xa0)
-		AY8910_write_port_0_w(0,offset);
+		AY8910_write_port_0_w(machine,0,offset);
 	else if (num_ays == 2 && (p1 & 0xe0) == 0x60)
-		AY8910_control_port_1_w(0,offset);
+		AY8910_control_port_1_w(machine,0,offset);
 	else if (num_ays == 2 && (p1 & 0xe0) == 0x40)
-		AY8910_write_port_1_w(0,offset);
+		AY8910_write_port_1_w(machine,0,offset);
 	else // if ((p2 & 0xf0) != 0x70)
 		/* the port address is the data, while the data seems to be control bits */
 		logerror("%04x: snddata_w ctrl = %02x, p1 = %02x, p2 = %02x, data = %02x\n",activecpu_get_pc(),data,p1,p2,offset);

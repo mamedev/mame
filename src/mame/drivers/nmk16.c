@@ -277,8 +277,8 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0, HOLD_LINE);
 	}
 }
 
@@ -330,18 +330,18 @@ static READ16_HANDLER( tharrier_mcu_r )
 		return res << 8;
 	}
 	else
-		return ~input_port_1_word_r(0,0);
+		return ~input_port_1_word_r(machine,0,0);
 }
 
 static WRITE16_HANDLER( macross2_sound_command_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 }
 
 static READ16_HANDLER( macross2_sound_result_r )
 {
-	return soundlatch2_r(0);
+	return soundlatch2_r(machine,0);
 }
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
@@ -373,8 +373,8 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data&0xff);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		soundlatch_w(machine,0,data&0xff);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 

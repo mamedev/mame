@@ -78,8 +78,8 @@ typedef struct {
 	UINT8	irq_state;
 	UINT8	so_state;
 	int 	(*irq_callback)(int irqline);	/* IRQ callback */
-	read8_handler rdmem_id;					/* readmem callback for indexed instructions */
-	write8_handler wrmem_id;				/* readmem callback for indexed instructions */
+	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_machine_func wrmem_id;				/* readmem callback for indexed instructions */
 }	m6509_Regs;
 
 static int m6502_ICount = 0;
@@ -119,10 +119,13 @@ static ADDRESS_MAP_START(m6509_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8(offset); }
+static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8(offset, data); }
+
 static void m6509_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m6509.rdmem_id = program_read_byte_8;
-	m6509.wrmem_id = program_write_byte_8;
+	m6509.rdmem_id = default_rdmem_id;
+	m6509.wrmem_id = default_wdmem_id;
 	m6509.irq_callback = irqcallback;
 }
 
@@ -304,8 +307,8 @@ static void m6509_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M6509_ZP:			m6509.zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509.rdmem_id = (read8_handler) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509.wrmem_id = (write8_handler) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509.rdmem_id = (read8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509.wrmem_id = (write8_machine_func) info->f; break;
 	}
 }
 

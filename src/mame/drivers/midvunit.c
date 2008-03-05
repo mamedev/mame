@@ -219,7 +219,7 @@ static WRITE32_HANDLER( midvunit_control_w )
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ control_data) & 0x0008)
-		watchdog_reset_w(0, 0);
+		watchdog_reset_w(machine, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
 	dcs_reset_w((~control_data >> 1) & 1);
@@ -240,7 +240,7 @@ static WRITE32_HANDLER( crusnwld_control_w )
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ control_data) & 0x0200)
-		watchdog_reset_w(0, 0);
+		watchdog_reset_w(machine, 0, 0);
 
 	/* bit 8 is the LED */
 
@@ -386,7 +386,7 @@ static WRITE32_HANDLER( bit_reset_w )
 static READ32_HANDLER( offroadc_serial_status_r )
 {
 	int status = midway_serial_pic2_status_r();
-	return (port1_r(offset, mem_mask) & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (port1_r(machine, offset, mem_mask) & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -447,7 +447,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ midvplus_misc[offset]) & 0x0010)
 			{
-				watchdog_reset_w(0, 0);
+				watchdog_reset_w(machine, 0, 0);
 				logit = 0;
 			}
 			break;

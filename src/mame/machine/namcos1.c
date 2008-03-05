@@ -32,8 +32,8 @@ static UINT8 *s1ram;
 /* Bank handler definitions */
 typedef struct
 {
-	read8_handler bank_handler_r;
-	write8_handler bank_handler_w;
+	read8_machine_func bank_handler_r;
+	write8_machine_func bank_handler_w;
 	int           bank_offset;
 	UINT8 *bank_pointer;
 } bankhandler;
@@ -42,41 +42,41 @@ typedef struct
 static bankhandler namcos1_bank_element[NAMCOS1_MAX_BANK];
 static bankhandler namcos1_active_bank[16];
 
-static READ8_HANDLER( bank1_r )  { return (*namcos1_active_bank[0].bank_handler_r )(offset + namcos1_active_bank[0].bank_offset); }
-static READ8_HANDLER( bank2_r )  { return (*namcos1_active_bank[1].bank_handler_r )(offset + namcos1_active_bank[1].bank_offset); }
-static READ8_HANDLER( bank3_r )  { return (*namcos1_active_bank[2].bank_handler_r )(offset + namcos1_active_bank[2].bank_offset); }
-static READ8_HANDLER( bank4_r )  { return (*namcos1_active_bank[3].bank_handler_r )(offset + namcos1_active_bank[3].bank_offset); }
-static READ8_HANDLER( bank5_r )  { return (*namcos1_active_bank[4].bank_handler_r )(offset + namcos1_active_bank[4].bank_offset); }
-static READ8_HANDLER( bank6_r )  { return (*namcos1_active_bank[5].bank_handler_r )(offset + namcos1_active_bank[5].bank_offset); }
-static READ8_HANDLER( bank7_r )  { return (*namcos1_active_bank[6].bank_handler_r )(offset + namcos1_active_bank[6].bank_offset); }
-static READ8_HANDLER( bank8_r )  { return (*namcos1_active_bank[7].bank_handler_r )(offset + namcos1_active_bank[7].bank_offset); }
-static READ8_HANDLER( bank9_r )  { return (*namcos1_active_bank[8].bank_handler_r )(offset + namcos1_active_bank[8].bank_offset); }
-static READ8_HANDLER( bank10_r ) { return (*namcos1_active_bank[9].bank_handler_r )(offset + namcos1_active_bank[9].bank_offset); }
-static READ8_HANDLER( bank11_r ) { return (*namcos1_active_bank[10].bank_handler_r)(offset + namcos1_active_bank[10].bank_offset); }
-static READ8_HANDLER( bank12_r ) { return (*namcos1_active_bank[11].bank_handler_r)(offset + namcos1_active_bank[11].bank_offset); }
-static READ8_HANDLER( bank13_r ) { return (*namcos1_active_bank[12].bank_handler_r)(offset + namcos1_active_bank[12].bank_offset); }
-static READ8_HANDLER( bank14_r ) { return (*namcos1_active_bank[13].bank_handler_r)(offset + namcos1_active_bank[13].bank_offset); }
-static READ8_HANDLER( bank15_r ) { return (*namcos1_active_bank[14].bank_handler_r)(offset + namcos1_active_bank[14].bank_offset); }
-static READ8_HANDLER( bank16_r ) { return (*namcos1_active_bank[15].bank_handler_r)(offset + namcos1_active_bank[15].bank_offset); }
+static READ8_HANDLER( bank1_r )  { return (*namcos1_active_bank[0].bank_handler_r )(machine, offset + namcos1_active_bank[0].bank_offset); }
+static READ8_HANDLER( bank2_r )  { return (*namcos1_active_bank[1].bank_handler_r )(machine, offset + namcos1_active_bank[1].bank_offset); }
+static READ8_HANDLER( bank3_r )  { return (*namcos1_active_bank[2].bank_handler_r )(machine, offset + namcos1_active_bank[2].bank_offset); }
+static READ8_HANDLER( bank4_r )  { return (*namcos1_active_bank[3].bank_handler_r )(machine, offset + namcos1_active_bank[3].bank_offset); }
+static READ8_HANDLER( bank5_r )  { return (*namcos1_active_bank[4].bank_handler_r )(machine, offset + namcos1_active_bank[4].bank_offset); }
+static READ8_HANDLER( bank6_r )  { return (*namcos1_active_bank[5].bank_handler_r )(machine, offset + namcos1_active_bank[5].bank_offset); }
+static READ8_HANDLER( bank7_r )  { return (*namcos1_active_bank[6].bank_handler_r )(machine, offset + namcos1_active_bank[6].bank_offset); }
+static READ8_HANDLER( bank8_r )  { return (*namcos1_active_bank[7].bank_handler_r )(machine, offset + namcos1_active_bank[7].bank_offset); }
+static READ8_HANDLER( bank9_r )  { return (*namcos1_active_bank[8].bank_handler_r )(machine, offset + namcos1_active_bank[8].bank_offset); }
+static READ8_HANDLER( bank10_r ) { return (*namcos1_active_bank[9].bank_handler_r )(machine, offset + namcos1_active_bank[9].bank_offset); }
+static READ8_HANDLER( bank11_r ) { return (*namcos1_active_bank[10].bank_handler_r)(machine, offset + namcos1_active_bank[10].bank_offset); }
+static READ8_HANDLER( bank12_r ) { return (*namcos1_active_bank[11].bank_handler_r)(machine, offset + namcos1_active_bank[11].bank_offset); }
+static READ8_HANDLER( bank13_r ) { return (*namcos1_active_bank[12].bank_handler_r)(machine, offset + namcos1_active_bank[12].bank_offset); }
+static READ8_HANDLER( bank14_r ) { return (*namcos1_active_bank[13].bank_handler_r)(machine, offset + namcos1_active_bank[13].bank_offset); }
+static READ8_HANDLER( bank15_r ) { return (*namcos1_active_bank[14].bank_handler_r)(machine, offset + namcos1_active_bank[14].bank_offset); }
+static READ8_HANDLER( bank16_r ) { return (*namcos1_active_bank[15].bank_handler_r)(machine, offset + namcos1_active_bank[15].bank_offset); }
 
-static WRITE8_HANDLER( bank1_w )  { (*namcos1_active_bank[0].bank_handler_w )(offset + namcos1_active_bank[0].bank_offset, data); }
-static WRITE8_HANDLER( bank2_w )  { (*namcos1_active_bank[1].bank_handler_w )(offset + namcos1_active_bank[1].bank_offset, data); }
-static WRITE8_HANDLER( bank3_w )  { (*namcos1_active_bank[2].bank_handler_w )(offset + namcos1_active_bank[2].bank_offset, data); }
-static WRITE8_HANDLER( bank4_w )  { (*namcos1_active_bank[3].bank_handler_w )(offset + namcos1_active_bank[3].bank_offset, data); }
-static WRITE8_HANDLER( bank5_w )  { (*namcos1_active_bank[4].bank_handler_w )(offset + namcos1_active_bank[4].bank_offset, data); }
-static WRITE8_HANDLER( bank6_w )  { (*namcos1_active_bank[5].bank_handler_w )(offset + namcos1_active_bank[5].bank_offset, data); }
-static WRITE8_HANDLER( bank7_w )  { (*namcos1_active_bank[6].bank_handler_w )(offset + namcos1_active_bank[6].bank_offset, data); }
-static WRITE8_HANDLER( bank8_w )  { (*namcos1_active_bank[7].bank_handler_w )(offset + namcos1_active_bank[7].bank_offset, data); }
-static WRITE8_HANDLER( bank9_w )  { (*namcos1_active_bank[8].bank_handler_w )(offset + namcos1_active_bank[8].bank_offset, data); }
-static WRITE8_HANDLER( bank10_w ) { (*namcos1_active_bank[9].bank_handler_w )(offset + namcos1_active_bank[9].bank_offset, data); }
-static WRITE8_HANDLER( bank11_w ) { (*namcos1_active_bank[10].bank_handler_w)(offset + namcos1_active_bank[10].bank_offset, data); }
-static WRITE8_HANDLER( bank12_w ) { (*namcos1_active_bank[11].bank_handler_w)(offset + namcos1_active_bank[11].bank_offset, data); }
-static WRITE8_HANDLER( bank13_w ) { (*namcos1_active_bank[12].bank_handler_w)(offset + namcos1_active_bank[12].bank_offset, data); }
-static WRITE8_HANDLER( bank14_w ) { (*namcos1_active_bank[13].bank_handler_w)(offset + namcos1_active_bank[13].bank_offset, data); }
-static WRITE8_HANDLER( bank15_w ) { (*namcos1_active_bank[14].bank_handler_w)(offset + namcos1_active_bank[14].bank_offset, data); }
-static WRITE8_HANDLER( bank16_w ) { (*namcos1_active_bank[15].bank_handler_w)(offset + namcos1_active_bank[15].bank_offset, data); }
+static WRITE8_HANDLER( bank1_w )  { (*namcos1_active_bank[0].bank_handler_w )(machine, offset + namcos1_active_bank[0].bank_offset, data); }
+static WRITE8_HANDLER( bank2_w )  { (*namcos1_active_bank[1].bank_handler_w )(machine, offset + namcos1_active_bank[1].bank_offset, data); }
+static WRITE8_HANDLER( bank3_w )  { (*namcos1_active_bank[2].bank_handler_w )(machine, offset + namcos1_active_bank[2].bank_offset, data); }
+static WRITE8_HANDLER( bank4_w )  { (*namcos1_active_bank[3].bank_handler_w )(machine, offset + namcos1_active_bank[3].bank_offset, data); }
+static WRITE8_HANDLER( bank5_w )  { (*namcos1_active_bank[4].bank_handler_w )(machine, offset + namcos1_active_bank[4].bank_offset, data); }
+static WRITE8_HANDLER( bank6_w )  { (*namcos1_active_bank[5].bank_handler_w )(machine, offset + namcos1_active_bank[5].bank_offset, data); }
+static WRITE8_HANDLER( bank7_w )  { (*namcos1_active_bank[6].bank_handler_w )(machine, offset + namcos1_active_bank[6].bank_offset, data); }
+static WRITE8_HANDLER( bank8_w )  { (*namcos1_active_bank[7].bank_handler_w )(machine, offset + namcos1_active_bank[7].bank_offset, data); }
+static WRITE8_HANDLER( bank9_w )  { (*namcos1_active_bank[8].bank_handler_w )(machine, offset + namcos1_active_bank[8].bank_offset, data); }
+static WRITE8_HANDLER( bank10_w ) { (*namcos1_active_bank[9].bank_handler_w )(machine, offset + namcos1_active_bank[9].bank_offset, data); }
+static WRITE8_HANDLER( bank11_w ) { (*namcos1_active_bank[10].bank_handler_w)(machine, offset + namcos1_active_bank[10].bank_offset, data); }
+static WRITE8_HANDLER( bank12_w ) { (*namcos1_active_bank[11].bank_handler_w)(machine, offset + namcos1_active_bank[11].bank_offset, data); }
+static WRITE8_HANDLER( bank13_w ) { (*namcos1_active_bank[12].bank_handler_w)(machine, offset + namcos1_active_bank[12].bank_offset, data); }
+static WRITE8_HANDLER( bank14_w ) { (*namcos1_active_bank[13].bank_handler_w)(machine, offset + namcos1_active_bank[13].bank_offset, data); }
+static WRITE8_HANDLER( bank15_w ) { (*namcos1_active_bank[14].bank_handler_w)(machine, offset + namcos1_active_bank[14].bank_offset, data); }
+static WRITE8_HANDLER( bank16_w ) { (*namcos1_active_bank[15].bank_handler_w)(machine, offset + namcos1_active_bank[15].bank_offset, data); }
 
-static const read8_handler ram_bank_handler_r[16] =
+static const read8_machine_func ram_bank_handler_r[16] =
 {
 	MRA8_BANK1 ,MRA8_BANK2 ,MRA8_BANK3 ,MRA8_BANK4 ,
 	MRA8_BANK5 ,MRA8_BANK6 ,MRA8_BANK7 ,MRA8_BANK8 ,
@@ -84,7 +84,7 @@ static const read8_handler ram_bank_handler_r[16] =
 	MRA8_BANK13,MRA8_BANK14,MRA8_BANK15,MRA8_BANK16
 };
 
-static const write8_handler ram_bank_handler_w[16] =
+static const write8_machine_func ram_bank_handler_w[16] =
 {
 	MWA8_BANK1 ,MWA8_BANK2 ,MWA8_BANK3 ,MWA8_BANK4 ,
 	MWA8_BANK5 ,MWA8_BANK6 ,MWA8_BANK7 ,MWA8_BANK8 ,
@@ -92,7 +92,7 @@ static const write8_handler ram_bank_handler_w[16] =
 	MWA8_BANK13,MWA8_BANK14,MWA8_BANK15,MWA8_BANK16
 };
 
-static const read8_handler io_bank_handler_r[16] =
+static const read8_machine_func io_bank_handler_r[16] =
 {
 	bank1_r, bank2_r, bank3_r, bank4_r,
 	bank5_r, bank6_r, bank7_r, bank8_r,
@@ -100,7 +100,7 @@ static const read8_handler io_bank_handler_r[16] =
 	bank13_r, bank14_r, bank15_r, bank16_r
 };
 
-static const write8_handler io_bank_handler_w[16] =
+static const write8_machine_func io_bank_handler_w[16] =
 {
 	bank1_w, bank2_w, bank3_w, bank4_w,
 	bank5_w, bank6_w, bank7_w, bank8_w,
@@ -599,7 +599,7 @@ WRITE8_HANDLER( namcos1_watchdog_w )
 	if (wdog == 7 || !namcos1_reset)
 	{
 		wdog = 0;
-		watchdog_reset_w(0,0);
+		watchdog_reset_w(machine,0,0);
 	}
 }
 
@@ -612,7 +612,7 @@ static READ8_HANDLER( soundram_r )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		return namcos1_cus30_r(offset);
+		return namcos1_cus30_r(machine,offset);
 	}
 	else
 	{
@@ -630,7 +630,7 @@ static WRITE8_HANDLER( soundram_w )
 		offset &= 0x3ff;
 
 		/* CUS 30 */
-		namcos1_cus30_w(offset,data);
+		namcos1_cus30_w(machine,offset,data);
 	}
 	else
 	{
@@ -755,7 +755,7 @@ WRITE8_HANDLER( namcos1_subcpu_bank_w )
 *                                                                              *
 *******************************************************************************/
 
-static void namcos1_install_bank(int start,int end,read8_handler hr,write8_handler hw,
+static void namcos1_install_bank(int start,int end,read8_machine_func hr,write8_machine_func hw,
 			  int offset,UINT8 *pointer)
 {
 	int i;
@@ -772,7 +772,7 @@ static void namcos1_install_bank(int start,int end,read8_handler hr,write8_handl
 
 
 
-static void namcos1_build_banks(read8_handler key_r,write8_handler key_w)
+static void namcos1_build_banks(read8_machine_func key_r,write8_machine_func key_w)
 {
 	int i;
 
@@ -944,8 +944,8 @@ WRITE8_HANDLER( namcos1_mcu_patch_w )
 struct namcos1_specific
 {
 	/* keychip */
-	read8_handler key_r;
-	write8_handler key_w;
+	read8_machine_func key_r;
+	write8_machine_func key_w;
 	int key_id;
 	int key_reg1;
 	int key_reg2;

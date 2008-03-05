@@ -243,5 +243,5 @@ VIDEO_UPDATE( exedexes )
 
 VIDEO_EOF( exedexes )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }

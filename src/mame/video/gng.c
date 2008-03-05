@@ -156,5 +156,5 @@ VIDEO_UPDATE( gng )
 
 VIDEO_EOF( gng )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }

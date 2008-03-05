@@ -81,7 +81,7 @@ struct _z80ctc
 	attotime period16;			/* 16/system clock */
 	attotime period256;		/* 256/system clock */
 	void (*intr)(int which);	/* interrupt callback */
-	write8_handler zc[4];		/* zero crossing callbacks */
+	write8_machine_func zc[4];		/* zero crossing callbacks */
 	UINT8 notimer;				/* no timer masks */
 	UINT16 mode[4];				/* current mode */
 	UINT16 tconst[4];			/* time constant */
@@ -132,8 +132,8 @@ static TIMER_CALLBACK( timercallback )
 	/* generate the clock pulse */
 	if (ctc->zc[ch])
 	{
-		(*ctc->zc[ch])(0,1);
-		(*ctc->zc[ch])(0,0);
+		(*ctc->zc[ch])(machine,0,1);
+		(*ctc->zc[ch])(machine,0,0);
 	}
 
 	/* reset the down counter */

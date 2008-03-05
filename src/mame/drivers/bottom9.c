@@ -34,32 +34,32 @@ static int zoomreadroms,K052109_selected;
 static READ8_HANDLER( bottom9_bankedram1_r )
 {
 	if (K052109_selected)
-		return K052109_051960_r(offset);
+		return K052109_051960_r(machine,offset);
 	else
 	{
 		if (zoomreadroms)
-			return K051316_rom_0_r(offset);
+			return K051316_rom_0_r(machine,offset);
 		else
-			return K051316_0_r(offset);
+			return K051316_0_r(machine,offset);
 	}
 }
 
 static WRITE8_HANDLER( bottom9_bankedram1_w )
 {
-	if (K052109_selected) K052109_051960_w(offset,data);
-	else K051316_0_w(offset,data);
+	if (K052109_selected) K052109_051960_w(machine,offset,data);
+	else K051316_0_w(machine,offset,data);
 }
 
 static READ8_HANDLER( bottom9_bankedram2_r )
 {
-	if (K052109_selected) return K052109_051960_r(offset + 0x2000);
+	if (K052109_selected) return K052109_051960_r(machine,offset + 0x2000);
 	else return paletteram[offset];
 }
 
 static WRITE8_HANDLER( bottom9_bankedram2_w )
 {
-	if (K052109_selected) K052109_051960_w(offset + 0x2000,data);
-	else paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+	if (K052109_selected) K052109_051960_w(machine,offset + 0x2000,data);
+	else paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( bankswitch_w )

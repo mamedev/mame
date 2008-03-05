@@ -218,14 +218,14 @@ UINT8 line;
 
 MACHINE_RESET( bagman )
 {
-	bagman_pal16r6_w(0,1);	/*pin 2*/
-	bagman_pal16r6_w(1,1);	/*pin 3*/
-	bagman_pal16r6_w(2,1);	/*pin 4*/
-	bagman_pal16r6_w(3,1);	/*pin 5*/
-	bagman_pal16r6_w(4,1);	/*pin 6*/
-	bagman_pal16r6_w(5,1);	/*pin 7*/
-	bagman_pal16r6_w(6,1);	/*pin 8*/
-	bagman_pal16r6_w(7,1);	/*pin 9*/
+	bagman_pal16r6_w(machine,0,1);	/*pin 2*/
+	bagman_pal16r6_w(machine,1,1);	/*pin 3*/
+	bagman_pal16r6_w(machine,2,1);	/*pin 4*/
+	bagman_pal16r6_w(machine,3,1);	/*pin 5*/
+	bagman_pal16r6_w(machine,4,1);	/*pin 6*/
+	bagman_pal16r6_w(machine,5,1);	/*pin 7*/
+	bagman_pal16r6_w(machine,6,1);	/*pin 8*/
+	bagman_pal16r6_w(machine,7,1);	/*pin 9*/
 	update_pal();
 }
 

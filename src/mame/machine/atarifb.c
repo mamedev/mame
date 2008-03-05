@@ -20,10 +20,10 @@ WRITE8_HANDLER( atarifb_out1_w )
 {
 	CTRLD = data;
 
-	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 }
 
 
@@ -31,10 +31,10 @@ WRITE8_HANDLER( atarifb4_out1_w )
 {
 	CTRLD = data;
 
-	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 	coin_counter_w (1, data & 0x80);
 }
@@ -44,22 +44,22 @@ WRITE8_HANDLER( abaseb_out1_w )
 {
 	CTRLD = data;
 
-	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 	if (data & 0x80)
 	{
 		/* Invert video */
-		palette_set_color(Machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-		palette_set_color(Machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+		palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+		palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 	}
 	else
 	{
 		/* Regular video */
-		palette_set_color(Machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-		palette_set_color(Machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+		palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+		palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 	}
 }
 
@@ -76,10 +76,10 @@ WRITE8_HANDLER( soccer_out1_w )
 	/* bit 5-6 = trackball CTRL bits */
 	/* bit 7 = Rule LED */
 
-	discrete_sound_w(ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 //  set_led_status(0,data & 0x10);  // !!!!!!!!!! Is this correct????
 	set_led_status(1,data & 0x80);
@@ -88,7 +88,7 @@ WRITE8_HANDLER( soccer_out1_w )
 
 WRITE8_HANDLER( atarifb_out2_w )
 {
-	discrete_sound_w(ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(machine, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
 }
@@ -96,7 +96,7 @@ WRITE8_HANDLER( atarifb_out2_w )
 
 WRITE8_HANDLER( soccer_out2_w )
 {
-	discrete_sound_w(ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(machine, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
 	coin_counter_w (1, data & 0x20);
@@ -152,7 +152,7 @@ READ8_HANDLER( atarifb_in0_r )
 			  (sign_x_2 >> 6) |
 			  (sign_y_1 >> 5) |
 			  (sign_x_1 >> 4) |
-			  input_port_0_r(offset);
+			  input_port_0_r(machine, offset);
 		return val;
 	}
 	else
@@ -184,7 +184,7 @@ READ8_HANDLER( atarifb_in2_r )
 {
 	if ((CTRLD & 0x20)==0x00)
 	{
-		return input_port_1_r(offset);
+		return input_port_1_r(machine, offset);
 	}
 	else
 	{
@@ -282,7 +282,7 @@ READ8_HANDLER( atarifb4_in2_r )
 {
 	if ((CTRLD & 0x40)==0x00)
 	{
-		return input_port_2_r(offset);
+		return input_port_2_r(machine, offset);
 	}
 	else if ((CTRLD & 0x60) == 0x60)
 	/* LD1 and LD2 both high, return Team 2 right player (player 3) */

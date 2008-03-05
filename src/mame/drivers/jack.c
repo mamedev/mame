@@ -72,8 +72,8 @@ static READ8_HANDLER( timer_r )
 
 static WRITE8_HANDLER( jack_sh_command_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 

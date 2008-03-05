@@ -448,7 +448,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 static void profbank_banksw_restore(void)
 {
-	profpac_banksw_w(0, profpac_bank);
+	profpac_banksw_w(Machine, 0, profpac_bank);
 }
 
 
@@ -524,8 +524,8 @@ static MACHINE_START( tenpindx )
 
 static WRITE8_HANDLER( tenpindx_sound_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1725,7 +1725,7 @@ static DRIVER_INIT( profpac )
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
 
 	/* reset banking */
-	profpac_banksw_w(0, 0);
+	profpac_banksw_w(machine, 0, 0);
 	state_save_register_func_postload(profbank_banksw_restore);
 }
 
@@ -1739,7 +1739,7 @@ static DRIVER_INIT( demndrgn )
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
 
 	/* reset banking */
-	profpac_banksw_w(0, 0);
+	profpac_banksw_w(machine, 0, 0);
 	state_save_register_func_postload(profbank_banksw_restore);
 }
 
@@ -1758,7 +1758,7 @@ static DRIVER_INIT( tenpindx )
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
 
 	/* reset banking */
-	profpac_banksw_w(0, 0);
+	profpac_banksw_w(machine, 0, 0);
 	state_save_register_func_postload(profbank_banksw_restore);
 }
 

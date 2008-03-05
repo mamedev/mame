@@ -88,7 +88,7 @@ static void mquake_cia_0_portb_w(UINT8 data)
 
 static READ16_HANDLER( es5503_word_lsb_r )
 {
-	return (ACCESSING_LSB) ? (ES5503_reg_0_r(offset) | 0xff00) : 0xffff;
+	return (ACCESSING_LSB) ? (ES5503_reg_0_r(machine, offset) | 0xff00) : 0xffff;
 }
 
 static WRITE16_HANDLER( es5503_word_lsb_w )
@@ -109,7 +109,7 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 			}
 		}
 
-		ES5503_reg_0_w(offset, data);
+		ES5503_reg_0_w(machine, offset, data);
 	}
 }
 

@@ -172,7 +172,7 @@ static void timer_ack_callback(void)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(0, param);
+	soundlatch_w(machine, 0, param);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -191,8 +191,8 @@ static void sound_cpu_irq(int state)
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(offset);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(machine, offset);
 }
 
 
@@ -350,7 +350,7 @@ static WRITE16_HANDLER( iochip_0_w )
                 D1: (CONT) - affects sprite hardware
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(0,0);
+			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(machine,0,0);
 			segaic16_set_display_enable(data & 0x20);
 			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;

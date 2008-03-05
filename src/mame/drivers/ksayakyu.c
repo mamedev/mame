@@ -91,7 +91,7 @@ static WRITE8_HANDLER( bank_select_w )
 static WRITE8_HANDLER( latch_w )
 {
 	sound_status&=~0x80;
-	soundlatch_w(0,data|0x80);
+	soundlatch_w(machine,0,data|0x80);
 }
 
 static READ8_HANDLER (sound_status_r)

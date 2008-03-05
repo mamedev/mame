@@ -198,7 +198,7 @@ WRITE8_HANDLER( mjsikaku_romsel_w )
 WRITE8_HANDLER( secolove_romsel_w )
 {
 	mjsikaku_gfxrom = ((data & 0xc0) >> 4) + (data & 0x03);
-	mjsikaku_gfxflag2_w(0, data);
+	mjsikaku_gfxflag2_w(machine, 0, data);
 
 	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
 	{
@@ -212,7 +212,7 @@ WRITE8_HANDLER( secolove_romsel_w )
 WRITE8_HANDLER( crystalg_romsel_w )
 {
 	mjsikaku_gfxrom = (data & 0x03);
-	mjsikaku_gfxflag2_w(0, data);
+	mjsikaku_gfxflag2_w(machine, 0, data);
 
 	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
 	{
@@ -226,7 +226,7 @@ WRITE8_HANDLER( crystalg_romsel_w )
 WRITE8_HANDLER( seiha_romsel_w )
 {
 	mjsikaku_gfxrom = (data & 0x1f);
-	mjsikaku_gfxflag3_w(0, data);
+	mjsikaku_gfxflag3_w(machine, 0, data);
 
 	if ((mjsikaku_gfxrom << 17) > (memory_region_length(REGION_GFX1) - 1))
 	{

@@ -123,7 +123,7 @@ WRITE8_HANDLER( dynax_blit2_dest_w )
 }
 WRITE8_HANDLER( tenkai_blit_dest_w )
 {
-	dynax_blit_dest_w(0, BITSWAP8(data, 7,6,5,4, 0,1,2,3));
+	dynax_blit_dest_w(machine, 0, BITSWAP8(data, 7,6,5,4, 0,1,2,3));
 }
 
 /* Background Color */
@@ -656,7 +656,7 @@ WRITE8_HANDLER( dynax_blitter_rev2_w )
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit_scroll_w(0,data); break;
+		case 6: dynax_blit_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -671,7 +671,7 @@ WRITE8_HANDLER( tenkai_blitter_rev2_w )
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: tenkai_blit_scroll_w(0,data); break;
+		case 6: tenkai_blit_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -686,7 +686,7 @@ WRITE8_HANDLER( jantouki_blitter_rev2_w )
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit_scroll_w(0,data); break;
+		case 6: dynax_blit_scroll_w(machine,0,data); break;
 	}
 }
 
@@ -700,7 +700,7 @@ WRITE8_HANDLER( jantouki_blitter2_rev2_w )
 		case 3:	blit2_src	=	(blit2_src & 0xffff00) | (data << 0); break;
 		case 4: blit2_src	=	(blit2_src & 0xff00ff) | (data << 8); break;
 		case 5: blit2_src	=	(blit2_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit2_scroll_w(0,data); break;
+		case 6: dynax_blit2_scroll_w(machine,0,data); break;
 	}
 }
 

@@ -230,7 +230,7 @@ static offs_t decrypt_offset(offs_t offset)
 }
 
 static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(offset)] = data; }
-static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(decrypt_offset(offset), data); }
+static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(machine, decrypt_offset(offset), data); }
 static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(offset)] = data; }
 
 

@@ -170,8 +170,8 @@ static READ16_HANDLER( dassault_sub_control_r )
 
 static WRITE16_HANDLER( dassault_sound_w )
 {
-	soundlatch_w(0,data&0xff);
-	cpunum_set_input_line(Machine, 2,0,HOLD_LINE); /* IRQ1 */
+	soundlatch_w(machine,0,data&0xff);
+	cpunum_set_input_line(machine, 2,0,HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */

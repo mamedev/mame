@@ -105,7 +105,7 @@ static READ8_HANDLER( redalert_interrupt_clear_r )
 
 static WRITE8_HANDLER( redalert_interrupt_clear_w )
 {
-	redalert_interrupt_clear_r(0);
+	redalert_interrupt_clear_r(machine, 0);
 }
 
 

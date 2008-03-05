@@ -54,7 +54,7 @@ static READ8_HANDLER( scontra_bankedram_r )
 static WRITE8_HANDLER( scontra_bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	else
 		ram[offset] = data;
 }
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( thunderx_bankedram_w )
 			logerror("%04x pmc internal ram %04x = %02x\n",activecpu_get_pc(),offset,data);
 	}
 	else
-		paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 }
 
 /*

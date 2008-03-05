@@ -61,21 +61,21 @@ static WRITE8_HANDLER( sprite_shared_w ) {
 }
 
 static WRITE8_HANDLER( video_interrupt_w ) {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( sprite_interrupt_w ) {
-	cpunum_set_input_line_and_vector(Machine, 2, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 2, 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w ) {
-	sprite_interrupt_w( offset, data );
+	sprite_interrupt_w( machine, offset, data );
 	*kingofb_scroll_y = data;
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( 0, data );
-	cpunum_set_input_line_and_vector(Machine, 3, 0, HOLD_LINE, 0xff );
+	soundlatch_w( machine, 0, data );
+	cpunum_set_input_line_and_vector(machine, 3, 0, HOLD_LINE, 0xff );
 }
 
 

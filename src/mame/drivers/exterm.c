@@ -135,7 +135,7 @@ static READ16_HANDLER( exterm_host_data_r )
  *
  *************************************/
 
-static UINT16 exterm_trackball_port_r(int which, UINT16 mem_mask)
+static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT16 mem_mask)
 {
 	UINT16 port;
 
@@ -156,8 +156,8 @@ static UINT16 exterm_trackball_port_r(int which, UINT16 mem_mask)
 	aimpos[which] = (aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_1_word_r(0, mem_mask) :
-				   input_port_0_word_r(0, mem_mask);
+	port = which ? input_port_1_word_r(machine, 0, mem_mask) :
+				   input_port_0_word_r(machine, 0, mem_mask);
 
 	return (port & 0xc0ff) | (aimpos[which] << 8);
 }
@@ -165,13 +165,13 @@ static UINT16 exterm_trackball_port_r(int which, UINT16 mem_mask)
 
 static READ16_HANDLER( exterm_input_port_0_r )
 {
-	return exterm_trackball_port_r(0, mem_mask);
+	return exterm_trackball_port_r(machine, 0, mem_mask);
 }
 
 
 static READ16_HANDLER( exterm_input_port_1_r )
 {
-	return exterm_trackball_port_r(1, mem_mask);
+	return exterm_trackball_port_r(machine, 1, mem_mask);
 }
 
 
@@ -246,9 +246,9 @@ static WRITE8_HANDLER( ym2151_data_latch_w )
 {
 	/* bit 7 of the sound control selects which port */
 	if (sound_control & 0x80)
-		YM2151_data_port_0_w(offset, data);
+		YM2151_data_port_0_w(machine, offset, data);
 	else
-		YM2151_register_port_0_w(offset, data);
+		YM2151_register_port_0_w(machine, offset, data);
 }
 
 

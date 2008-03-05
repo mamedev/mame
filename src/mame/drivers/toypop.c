@@ -137,7 +137,7 @@ static READ8_HANDLER( toypop_sound_sharedram_r )
 static WRITE8_HANDLER( toypop_sound_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(offset,data);
+		namco_15xx_w(machine,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }

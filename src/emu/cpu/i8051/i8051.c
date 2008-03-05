@@ -208,32 +208,32 @@ static READ32_HANDLER((*hold_eram_iaddr_callback));
 /***************************************************************
  * Read/Write a byte from/to the Internal RAM
  ***************************************************************/
-#define IRAM_R(a)		internal_ram_read(a)
-#define IRAM_W(a,v)		internal_ram_write(a,v)
+#define IRAM_R(a)		internal_ram_read(Machine,a)
+#define IRAM_W(a,v)		internal_ram_write(Machine,a,v)
 /***************************************************************
  * Read/Write a byte from/to the Internal RAM indirectly (called from indirect addressing)
  ***************************************************************/
-#define IRAM_IR(a)		internal_ram_iread(a)
-#define IRAM_IW(a,v)		internal_ram_iwrite(a,v)
+#define IRAM_IR(a)		internal_ram_iread(Machine,a)
+#define IRAM_IW(a,v)	internal_ram_iwrite(Machine,a,v)
 /***************************************************************
  * Form an Address to Read/Write to External RAM indirectly (called from indirect addressing)
  ***************************************************************/
-#define ERAM_ADDR(a,m)		external_ram_iaddr(a,m)
+#define ERAM_ADDR(a,m)	external_ram_iaddr(Machine,a,m)
 /***************************************************************
  * Read/Write a byte from/to the SFR Registers
  ***************************************************************/
-#define SFR_R(a)		sfr_read(a)
-#define SFR_W(a,v)		sfr_write(a,v)
+#define SFR_R(a)		sfr_read(Machine,a)
+#define SFR_W(a,v)		sfr_write(Machine,a,v)
 /***************************************************************
  * Read/Write a bit from Bit Addressable Memory
  ***************************************************************/
-#define BIT_R(a)		bit_address_r(a)
-#define BIT_W(a,v)		bit_address_w(a,v)
+#define BIT_R(a)		bit_address_r(Machine,a)
+#define BIT_W(a,v)		bit_address_w(Machine,a,v)
 /***************************************************************
  * Input/Output a byte from given I/O port
  ***************************************************************/
 #define IN(port)		((UINT8)io_read_byte(port))
-#define OUT(port,value) 	io_write_byte(port,value)
+#define OUT(port,value) io_write_byte(port,value)
 /***************************************************************
  * Access the 4 banks of R registers (R0...R7)
  ***************************************************************/
@@ -1785,14 +1785,14 @@ static WRITE8_HANDLER(internal_ram_write)
 /* Different chip types handle differently, for speed, simply call the chip's handler */
 static READ8_HANDLER(internal_ram_iread)
 {
-	return i8051.iram_iread(offset);
+	return i8051.iram_iread(Machine,offset);
 }
 
 /* Writes the contents of the Internal RAM memory (BUT CALLED FROM AN INDIRECT ADDRESSING MODE)   */
 /* Different chip types handle differently, for speed, simply call the chip's handler */
 static WRITE8_HANDLER(internal_ram_iwrite)
 {
-	i8051.iram_iwrite(offset,data);
+	i8051.iram_iwrite(Machine,offset,data);
 }
 
 /*Generate an external ram address for read/writing using indirect addressing mode */
@@ -1804,7 +1804,7 @@ static WRITE8_HANDLER(internal_ram_iwrite)
 static READ32_HANDLER(external_ram_iaddr)
 {
     if(i8051.eram_iaddr_callback)
-        return i8051.eram_iaddr_callback(offset,mem_mask);
+        return i8051.eram_iaddr_callback(Machine,offset,mem_mask);
     else
         LOG(("i8051 #%d: external ram address requested (8 bit offset=%02x), but no callback available! at PC:%04x\n", cpu_getactivecpu(), offset, PC));
 

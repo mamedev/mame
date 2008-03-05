@@ -80,9 +80,9 @@ static WRITE8_HANDLER( sn_nmi_enable_w )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(0,data);
+	soundlatch_w(machine,0,data);
 	if (sn_nmi_enable)
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1, ADDRESS_SPACE_PROGRAM, 8 )

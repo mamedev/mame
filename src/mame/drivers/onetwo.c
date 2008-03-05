@@ -68,15 +68,15 @@ static WRITE8_HANDLER( onetwo_cpubank_w )
 
 static WRITE8_HANDLER( onetwo_coin_counters_w )
 {
-	watchdog_reset_w(0, data & 0x01);
+	watchdog_reset(machine);
 	coin_counter_w(0, data & 0x02);
 	coin_counter_w(1, data & 0x04);
 }
 
 static WRITE8_HANDLER( onetwo_soundlatch_w )
 {
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void setColor(int offset)

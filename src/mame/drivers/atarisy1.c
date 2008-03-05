@@ -366,11 +366,11 @@ static WRITE8_HANDLER( via_pb_w )
 
 	/* write strobe */
 	if (!(old & 1) && (tms5220_ctl & 1))
-		tms5220_data_w(0, tms5220_out_data);
+		tms5220_data_w(machine, 0, tms5220_out_data);
 
 	/* read strobe */
 	if (!(old & 2) && (tms5220_ctl & 2))
-		tms5220_in_data = tms5220_status_r(0);
+		tms5220_in_data = tms5220_status_r(machine, 0);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);
@@ -417,7 +417,6 @@ static WRITE8_HANDLER( led_w )
 static OPBASE_HANDLER( indytemp_setopbase )
 {
 	int prevpc = activecpu_get_previouspc();
-
 	/*
      *  This is a slightly ugly kludge for Indiana Jones & the Temple of Doom because it jumps
      *  directly to code in the slapstic.  The general order of things is this:
@@ -437,9 +436,9 @@ static OPBASE_HANDLER( indytemp_setopbase )
      */
 
 	if (address & 0x80000)
-		atarigen_slapstic_r(0,0);
+		atarigen_slapstic_r(machine,0,0);
 	else if (prevpc & 0x80000)
-		atarigen_slapstic_r((prevpc >> 1) & 0x3fff,0);
+		atarigen_slapstic_r(machine,(prevpc >> 1) & 0x3fff,0);
 
 	return address;
 }

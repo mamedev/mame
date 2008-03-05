@@ -53,8 +53,8 @@ static WRITE16_HANDLER( soundcmd_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset,data & 0xff);
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(machine,offset,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -123,8 +123,8 @@ static WRITE16_HANDLER( protection_w )
 			program_write_word(0xffc00c, 0xc0);
 			program_write_word(0xffc00e, 0);
 
-			sf_fg_scroll_w(0, d1, 0);
-			sf_bg_scroll_w(0, d2, 0);
+			sf_fg_scroll_w(machine, 0, d1, 0);
+			sf_fg_scroll_w(machine, 0, d2, 0);
 			break;
 		}
 	case 4:
@@ -144,7 +144,7 @@ static WRITE16_HANDLER( protection_w )
 				}
 				program_write_word(0xffc682, d1);
 				program_write_word(0xffc00e, off);
-				sf_bg_scroll_w(0, d1, 0);
+				sf_fg_scroll_w(machine, 0, d1, 0);
 			}
 			break;
 		}
@@ -166,12 +166,12 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
-	return (scale[input_port_7_r(0)]<<8)|scale[input_port_5_r(0)];
+	return (scale[input_port_7_r(machine,0)]<<8)|scale[input_port_5_r(machine,0)];
 }
 
 static READ16_HANDLER( button2_r )
 {
-	return (scale[input_port_8_r(0)]<<8)|scale[input_port_6_r(0)];
+	return (scale[input_port_8_r(machine,0)]<<8)|scale[input_port_6_r(machine,0)];
 }
 
 

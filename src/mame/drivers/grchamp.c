@@ -118,7 +118,7 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
 
 static WRITE8_HANDLER( cpu0_outputs_w )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->cpu0_out[offset];
 	state->cpu0_out[offset] = data;
 
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			/* bit 6: FOG OUT */
 			/* bit 7: RADARON */
 			if ((diff & 0x01) && !(data & 0x01))
-				cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
 				state->collide = state->collmode = 0;
 			break;
@@ -186,13 +186,13 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			break;
 
 		case 0x0d:	/* OUT13 */
-			watchdog_reset(Machine);
+			watchdog_reset(machine);
 			break;
 
 		case 0x0e:	/* OUT14 */
 			/* O-21 connector */
-			soundlatch_w(0, data);
-			cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+			soundlatch_w(machine, 0, data);
+			cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( led_board_w )
 
 static WRITE8_HANDLER( cpu1_outputs_w )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->cpu1_out[offset];
 	state->cpu1_out[offset] = data;
 
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 		case 0x04:	/* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
-				cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 			break;
 
 		case 0x05:	/* OUT5 - unused */
@@ -308,18 +308,18 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 			/* bit 2-4: ATTACK UP 1-3 */
 			/* bit 5-6: SIFT 1-2 */
 			/* bit 7:   ENGINE CS */
-			discrete_sound_w(GRCHAMP_ENGINE_CS_EN, data & 0x80);
-			discrete_sound_w(GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
-			discrete_sound_w(GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
-			discrete_sound_w(GRCHAMP_IDLING_EN, data & 0x02);
-			discrete_sound_w(GRCHAMP_FOG_EN, data & 0x01);
+			discrete_sound_w(machine, GRCHAMP_ENGINE_CS_EN, data & 0x80);
+			discrete_sound_w(machine, GRCHAMP_SIFT_DATA, (data >> 5) & 0x03);
+			discrete_sound_w(machine, GRCHAMP_ATTACK_UP_DATA, (data >> 2) & 0x07);
+			discrete_sound_w(machine, GRCHAMP_IDLING_EN, data & 0x02);
+			discrete_sound_w(machine, GRCHAMP_FOG_EN, data & 0x01);
 			break;
 
 		case 0x0d: /* OUTD */
 			/* bit 0-3: ATTACK SPEED 1-4 */
 			/* bit 4-7: PLAYER SPEED 1-4 */
-			discrete_sound_w(GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
-			discrete_sound_w(GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
+			discrete_sound_w(machine, GRCHAMP_PLAYER_SPEED_DATA, (data >> 4) & 0x0f);
+			discrete_sound_w(machine, GRCHAMP_ATTACK_SPEED_DATA,  data & 0x0f);
 			break;
 
 		default:
@@ -424,12 +424,12 @@ static READ8_HANDLER( main_to_sub_comm_r )
 
 static WRITE8_HANDLER( grchamp_portA_0_w )
 {
-	discrete_sound_w(GRCHAMP_A_DATA, data);
+	discrete_sound_w(machine, GRCHAMP_A_DATA, data);
 }
 
 static WRITE8_HANDLER( grchamp_portB_0_w )
 {
-	discrete_sound_w(GRCHAMP_B_DATA, 255-data);
+	discrete_sound_w(machine, GRCHAMP_B_DATA, 255-data);
 }
 
 static WRITE8_HANDLER( grchamp_portA_2_w )

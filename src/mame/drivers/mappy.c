@@ -691,7 +691,7 @@ static DRIVER_INIT( 58_56 )
 static WRITE8_HANDLER( mappy_snd_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(offset,data);
+		namco_15xx_w(machine,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }
@@ -833,7 +833,7 @@ static MACHINE_RESET( superpac )
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		superpac_latch_w(i,0);
+		superpac_latch_w(machine,i,0);
 }
 
 static MACHINE_RESET( phozon )
@@ -842,7 +842,7 @@ static MACHINE_RESET( phozon )
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		phozon_latch_w(i,0);
+		phozon_latch_w(machine,i,0);
 }
 
 static MACHINE_RESET( mappy )
@@ -851,7 +851,7 @@ static MACHINE_RESET( mappy )
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		mappy_latch_w(i,0);
+		mappy_latch_w(machine,i,0);
 }
 
 static INTERRUPT_GEN( mappy_interrupt_1 )

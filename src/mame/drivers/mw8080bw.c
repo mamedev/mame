@@ -141,6 +141,7 @@
 ****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "rendlay.h"
 #include "rescap.h"
 #include "mw8080bw.h"
@@ -163,7 +164,7 @@ static UINT8 rev_shift_res;
 
 static READ8_HANDLER( mw8080bw_shift_result_rev_r )
 {
-	UINT8 ret = mb14241_0_shift_result_r(0);
+	UINT8 ret = mb14241_0_shift_result_r(machine, 0);
 
 	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
 }
@@ -175,11 +176,11 @@ static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
 
 	if (rev_shift_res)
 	{
-		ret = mw8080bw_shift_result_rev_r(0);
+		ret = mw8080bw_shift_result_rev_r(machine, 0);
 	}
 	else
 	{
-		ret = mb14241_0_shift_result_r(0);
+		ret = mb14241_0_shift_result_r(machine, 0);
 	}
 
 	return ret;
@@ -187,7 +188,7 @@ static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
 
 static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
 {
-	mb14241_0_shift_count_w(offset, data);
+	mb14241_0_shift_count_w(machine, offset, data);
 
 	rev_shift_res = data & 0x08;
 }
@@ -421,11 +422,11 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( gunfight_io_w )
 {
-	if (offset & 0x01)  gunfight_audio_w(0, data);
+	if (offset & 0x01)  gunfight_audio_w(machine, 0, data);
 
-	if (offset & 0x02)  mb14241_0_shift_count_w(0, data);
+	if (offset & 0x02)  mb14241_0_shift_count_w(machine, 0, data);
 
-	if (offset & 0x04)  mb14241_0_shift_data_w(0, data);
+	if (offset & 0x04)  mb14241_0_shift_data_w(machine, 0, data);
 }
 
 
@@ -610,11 +611,11 @@ static CUSTOM_INPUT( tornbase_score_input_r )
 
 static WRITE8_HANDLER( tornbase_io_w )
 {
-	if (offset & 0x01)  tornbase_audio_w(0, data);
+	if (offset & 0x01)  tornbase_audio_w(machine, 0, data);
 
-	if (offset & 0x02)  mb14241_0_shift_count_w(0, data);
+	if (offset & 0x02)  mb14241_0_shift_count_w(machine, 0, data);
 
-	if (offset & 0x04)  mb14241_0_shift_data_w(0, data);
+	if (offset & 0x04)  mb14241_0_shift_data_w(machine, 0, data);
 }
 
 
@@ -858,14 +859,14 @@ static UINT8 maze_tone_timing_state;
 
 static void maze_update_discrete(void)
 {
-	maze_write_discrete(maze_tone_timing_state);
+	maze_write_discrete(Machine, maze_tone_timing_state);
 }
 
 
 static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 {
 	maze_tone_timing_state = !maze_tone_timing_state;
-	maze_write_discrete(maze_tone_timing_state);
+	maze_write_discrete(machine, maze_tone_timing_state);
 }
 
 
@@ -895,9 +896,9 @@ static WRITE8_HANDLER( maze_coin_counter_w )
 
 static WRITE8_HANDLER( maze_io_w )
 {
-	if (offset & 0x01)  maze_coin_counter_w(0, data);
+	if (offset & 0x01)  maze_coin_counter_w(machine, 0, data);
 
-	if (offset & 0x02)  watchdog_reset_w(0, data);
+	if (offset & 0x02)  watchdog_reset_w(machine, 0, data);
 }
 
 
@@ -1054,9 +1055,9 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( checkmat_io_w )
 {
-	if (offset & 0x01)  checkmat_audio_w(0, data);
+	if (offset & 0x01)  checkmat_audio_w(machine, 0, data);
 
-	if (offset & 0x02)  watchdog_reset_w(0, data);
+	if (offset & 0x02)  watchdog_reset_w(machine, 0, data);
 }
 
 
@@ -2095,19 +2096,19 @@ static WRITE8_HANDLER( spcenctr_io_w )
 {										/* A7 A6 A5 A4 A3 A2 A1 A0 */
 	if ((offset & 0x07) == 0x02)
 	{
-		watchdog_reset_w(0, data);		/* -  -  -  -  -  0  1  0 */
+		watchdog_reset_w(machine, 0, data);		/* -  -  -  -  -  0  1  0 */
 	}
 	else if ((offset & 0x5f) == 0x01)
 	{
-		spcenctr_audio_1_w(0, data);	/* -  0  -  0  0  0  0  1 */
+		spcenctr_audio_1_w(machine, 0, data);	/* -  0  -  0  0  0  0  1 */
 	}
 	else if ((offset & 0x5f) == 0x09)
 	{
-		spcenctr_audio_2_w(0, data);	/* -  0  -  0  1  0  0  1 */
+		spcenctr_audio_2_w(machine, 0, data);	/* -  0  -  0  1  0  0  1 */
 	}
 	else if ((offset & 0x5f) == 0x11)
 	{
-		spcenctr_audio_3_w(0, data);	/* -  0  -  1  0  0  0  1 */
+		spcenctr_audio_3_w(machine, 0, data);	/* -  0  -  1  0  0  0  1 */
 	}
 	else if ((offset & 0x07) == 0x03)
 	{									/* -  -  -  -  -  0  1  1 */
@@ -2324,7 +2325,7 @@ static READ8_HANDLER( bowler_shift_result_r )
        anything unusual on the schematics that would cause
        the bits to flip */
 
-	return ~mb14241_0_shift_result_r(0);
+	return ~mb14241_0_shift_result_r(machine,0);
 }
 
 

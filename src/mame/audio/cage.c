@@ -483,7 +483,7 @@ static WRITE32_HANDLER( cage_to_main_w )
 {
 	if (LOG_COMM)
 		logerror("%06X:Data from CAGE = %04X\n", activecpu_get_pc(), data);
-	soundlatch_word_w(0, data, mem_mask);
+	soundlatch_word_w(machine, 0, data, mem_mask);
 	cage_to_cpu_ready = 1;
 	update_control_lines();
 }
@@ -503,10 +503,10 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 main_from_cage_r(void)
 {
 	if (LOG_COMM)
-		logerror("%06X:main read data = %04X\n", activecpu_get_pc(), soundlatch_word_r(0, 0));
+		logerror("%06X:main read data = %04X\n", activecpu_get_pc(), soundlatch_word_r(Machine, 0, 0));
 	cage_to_cpu_ready = 0;
 	update_control_lines();
-	return soundlatch_word_r(0, 0);
+	return soundlatch_word_r(Machine, 0, 0);
 }
 
 

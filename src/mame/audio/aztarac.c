@@ -21,10 +21,10 @@ WRITE16_HANDLER( aztarac_sound_w )
 	if (ACCESSING_LSB)
 	{
 		data &= 0xff;
-		soundlatch_w(offset, data);
+		soundlatch_w(machine, offset, data);
 		sound_status ^= 0x21;
 		if (sound_status & 0x20)
-			cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -32,7 +32,7 @@ READ8_HANDLER( aztarac_snd_command_r )
 {
     sound_status |= 0x01;
     sound_status &= ~0x20;
-    return soundlatch_r(offset);
+    return soundlatch_r(machine,offset);
 }
 
 READ8_HANDLER( aztarac_snd_status_r )

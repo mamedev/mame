@@ -578,7 +578,7 @@ INLINE void taitoic_drawscanline(
 /* Note: various assumptions are made in these routines, typically that
    only CPU#0 is of interest. If in doubt, check the routine. */
 
-static int has_write_handler(int cpunum, write16_handler handler)
+static int has_write_handler(int cpunum, write16_machine_func handler)
 {
 	const address_map *map;
 	for (map = memory_get_map(cpunum, ADDRESS_SPACE_PROGRAM); map && !IS_AMENTRY_END(map); map++)
@@ -1695,7 +1695,7 @@ WRITE16_HANDLER( TC0080VCO_word_w )
 	else if (offset < 0x20800/2)	/* sprite ram */
 	{}
 	else if (offset < 0x20fff/2)
-		TC0080VCO_scrollram_w(offset-(0x20800/2),TC0080VCO_ram[offset],mem_mask);
+		TC0080VCO_scrollram_w(machine,offset-(0x20800/2),TC0080VCO_ram[offset],mem_mask);
 }
 
 
@@ -2492,15 +2492,15 @@ WRITE16_HANDLER( TC0100SCN_word_2_w )
 
 WRITE16_HANDLER( TC0100SCN_dual_screen_w )
 {
-	TC0100SCN_word_0_w(offset,data,mem_mask);
-	TC0100SCN_word_1_w(offset,data,mem_mask);
+	TC0100SCN_word_0_w(machine,offset,data,mem_mask);
+	TC0100SCN_word_1_w(machine,offset,data,mem_mask);
 }
 
 WRITE16_HANDLER( TC0100SCN_triple_screen_w )
 {
-	TC0100SCN_word_0_w(offset,data,mem_mask);
-	TC0100SCN_word_1_w(offset,data,mem_mask);
-	TC0100SCN_word_2_w(offset,data,mem_mask);
+	TC0100SCN_word_0_w(machine,offset,data,mem_mask);
+	TC0100SCN_word_1_w(machine,offset,data,mem_mask);
+	TC0100SCN_word_2_w(machine,offset,data,mem_mask);
 }
 
 
@@ -2605,7 +2605,7 @@ WRITE16_HANDLER( TC0100SCN_ctrl_word_2_w )
 
 READ32_HANDLER( TC0100SCN_ctrl_long_r )
 {
-	return (TC0100SCN_ctrl_word_0_r(offset*2,0)<<16)|TC0100SCN_ctrl_word_0_r(offset*2+1,0);
+	return (TC0100SCN_ctrl_word_0_r(machine,offset*2,0)<<16)|TC0100SCN_ctrl_word_0_r(machine,offset*2+1,0);
 }
 
 WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
@@ -2616,30 +2616,30 @@ WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
 
 READ32_HANDLER( TC0100SCN_long_r )
 {
-	return (TC0100SCN_word_0_r(offset*2,0)<<16)|TC0100SCN_word_0_r(offset*2+1,0);
+	return (TC0100SCN_word_0_r(machine,offset*2,0)<<16)|TC0100SCN_word_0_r(machine,offset*2+1,0);
 }
 
 WRITE32_HANDLER( TC0100SCN_long_w )
 {
 	if (((mem_mask & 0xff000000) == 0) || ((mem_mask & 0x00ff0000) == 0))
 	{
-		int oldword = TC0100SCN_word_0_r(offset*2,0);
+		int oldword = TC0100SCN_word_0_r(machine,offset*2,0);
 		int newword = data>>16;
 		if ((mem_mask & 0x00ff0000) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0xff000000) != 0)
 			newword |= (oldword &0xff00);
-		TC0100SCN_word_0_w(offset*2,newword,0);
+		TC0100SCN_word_0_w(machine,offset*2,newword,0);
 	}
 	if (((mem_mask & 0x0000ff00) == 0) || ((mem_mask & 0x000000ff) == 0))
 	{
-		int oldword = TC0100SCN_word_0_r((offset*2)+1,0);
+		int oldword = TC0100SCN_word_0_r(machine,(offset*2)+1,0);
 		int newword = data&0xffff;
 		if ((mem_mask & 0x000000ff) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0x0000ff00) != 0)
 			newword |= (oldword &0xff00);
-		TC0100SCN_word_0_w((offset*2)+1,newword,0);
+		TC0100SCN_word_0_w(machine,(offset*2)+1,newword,0);
 	}
 }
 
@@ -2810,7 +2810,7 @@ READ16_HANDLER( TC0280GRD_word_r )
 
 READ16_HANDLER( TC0430GRW_word_r )
 {
-	return TC0280GRD_word_r(offset,mem_mask);
+	return TC0280GRD_word_r(machine,offset,mem_mask);
 }
 
 WRITE16_HANDLER( TC0280GRD_word_w )
@@ -2821,7 +2821,7 @@ WRITE16_HANDLER( TC0280GRD_word_w )
 
 WRITE16_HANDLER( TC0430GRW_word_w )
 {
-	TC0280GRD_word_w(offset,data,mem_mask);
+	TC0280GRD_word_w(machine,offset,data,mem_mask);
 }
 
 WRITE16_HANDLER( TC0280GRD_ctrl_word_w )
@@ -2831,7 +2831,7 @@ WRITE16_HANDLER( TC0280GRD_ctrl_word_w )
 
 WRITE16_HANDLER( TC0430GRW_ctrl_word_w )
 {
-	TC0280GRD_ctrl_word_w(offset,data,mem_mask);
+	TC0280GRD_ctrl_word_w(machine,offset,data,mem_mask);
 }
 
 void TC0280GRD_tilemap_update(int base_color)
@@ -2914,7 +2914,7 @@ WRITE16_HANDLER( TC0360PRI_halfword_w )
 {
 	if (ACCESSING_LSB)
 	{
-		TC0360PRI_w(offset,data & 0xff);
+		TC0360PRI_w(machine,offset,data & 0xff);
 #if 0
 if (data & 0xff00)
 { logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
@@ -2928,7 +2928,7 @@ WRITE16_HANDLER( TC0360PRI_halfword_swap_w )
 {
 	if (ACCESSING_MSB)
 	{
-		TC0360PRI_w(offset,(data >> 8) & 0xff);
+		TC0360PRI_w(machine,offset,(data >> 8) & 0xff);
 #if 0
 if (data & 0xff)
 { logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
@@ -3270,43 +3270,43 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 
 READ32_HANDLER( TC0480SCP_ctrl_long_r )
 {
-	return (TC0480SCP_ctrl_word_r(offset*2,0)<<16)|TC0480SCP_ctrl_word_r(offset*2+1,0);
+	return (TC0480SCP_ctrl_word_r(machine,offset*2,0)<<16)|TC0480SCP_ctrl_word_r(machine,offset*2+1,0);
 }
 
 /* TODO: byte access ? */
 
 WRITE32_HANDLER( TC0480SCP_ctrl_long_w )
 {
-	if (ACCESSING_MSW32) TC0480SCP_ctrl_word_w(offset*2,data>>16,mem_mask>>16);
-	if (ACCESSING_LSW32) TC0480SCP_ctrl_word_w((offset*2)+1,data&0xffff,mem_mask&0xffff);
+	if (ACCESSING_MSW32) TC0480SCP_ctrl_word_w(machine,offset*2,data>>16,mem_mask>>16);
+	if (ACCESSING_LSW32) TC0480SCP_ctrl_word_w(machine,(offset*2)+1,data&0xffff,mem_mask&0xffff);
 }
 
 READ32_HANDLER( TC0480SCP_long_r )
 {
-	return (TC0480SCP_word_r(offset*2,0)<<16)|TC0480SCP_word_r(offset*2+1,0);
+	return (TC0480SCP_word_r(machine,offset*2,0)<<16)|TC0480SCP_word_r(machine,offset*2+1,0);
 }
 
 WRITE32_HANDLER( TC0480SCP_long_w )
 {
 	if (((mem_mask & 0xff000000) == 0) || ((mem_mask & 0x00ff0000) == 0))
 	{
-		int oldword = TC0480SCP_word_r(offset*2,0);
+		int oldword = TC0480SCP_word_r(machine,offset*2,0);
 		int newword = data>>16;
 		if ((mem_mask & 0x00ff0000) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0xff000000) != 0)
 			newword |= (oldword &0xff00);
-		TC0480SCP_word_w(offset*2,newword,0);
+		TC0480SCP_word_w(machine,offset*2,newword,0);
 	}
 	if (((mem_mask & 0x0000ff00) == 0) || ((mem_mask & 0x000000ff) == 0))
 	{
-		int oldword = TC0480SCP_word_r((offset*2)+1,0);
+		int oldword = TC0480SCP_word_r(machine,(offset*2)+1,0);
 		int newword = data&0xffff;
 		if ((mem_mask & 0x000000ff) != 0)
 			newword |= (oldword &0x00ff);
 		if ((mem_mask & 0x0000ff00) != 0)
 			newword |= (oldword &0xff00);
-		TC0480SCP_word_w((offset*2)+1,newword,0);
+		TC0480SCP_word_w(machine,(offset*2)+1,newword,0);
 	}
 }
 
@@ -4940,22 +4940,22 @@ READ8_HANDLER( TC0220IOC_r )
 	switch (offset)
 	{
 		case 0x00:	/* IN00-07 (DSA) */
-			return input_port_0_r(0);
+			return input_port_0_r(machine,0);
 
 		case 0x01:	/* IN08-15 (DSB) */
-			return input_port_1_r(0);
+			return input_port_1_r(machine,0);
 
 		case 0x02:	/* IN16-23 (1P) */
-			return input_port_2_r(0);
+			return input_port_2_r(machine,0);
 
 		case 0x03:	/* IN24-31 (2P) */
-			return input_port_3_r(0);
+			return input_port_3_r(machine,0);
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0220IOC_regs[4];
 
 		case 0x07:	/* INB0-7 (coin) */
-			return input_port_4_r(0);
+			return input_port_4_r(machine,0);
 
 		default:
 logerror("PC %06x: warning - read TC0220IOC address %02x\n",activecpu_get_pc(),offset);
@@ -4970,7 +4970,7 @@ WRITE8_HANDLER( TC0220IOC_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset_w(offset,data);
+			watchdog_reset(machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout, hi nibble irrelevant */
@@ -5002,71 +5002,71 @@ WRITE8_HANDLER( TC0220IOC_port_w )
 
 READ8_HANDLER( TC0220IOC_portreg_r )
 {
-	return TC0220IOC_r(TC0220IOC_port);
+	return TC0220IOC_r(machine, TC0220IOC_port);
 }
 
 WRITE8_HANDLER( TC0220IOC_portreg_w )
 {
-	TC0220IOC_w(TC0220IOC_port, data);
+	TC0220IOC_w(machine, TC0220IOC_port, data);
 }
 
 READ16_HANDLER( TC0220IOC_halfword_port_r )
 {
-	return TC0220IOC_port_r( offset );
+	return TC0220IOC_port_r( machine, offset );
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_port_w )
 {
 	if (ACCESSING_LSB)
-		TC0220IOC_port_w( offset, data & 0xff );
+		TC0220IOC_port_w( machine, offset, data & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_portreg_r )
 {
-	return TC0220IOC_portreg_r( offset );
+	return TC0220IOC_portreg_r( machine, offset );
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_portreg_w )
 {
 	if (ACCESSING_LSB)
-		TC0220IOC_portreg_w( offset, data & 0xff );
+		TC0220IOC_portreg_w( machine, offset, data & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_port_r )
 {
-	return TC0220IOC_port_r( offset ) << 8;
+	return TC0220IOC_port_r( machine, offset ) << 8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_port_w )
 {
 	if (ACCESSING_MSB)
-		TC0220IOC_port_w( offset, (data>>8) & 0xff );
+		TC0220IOC_port_w( machine, offset, (data>>8) & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_portreg_r )
 {
-	return TC0220IOC_portreg_r( offset )<<8;
+	return TC0220IOC_portreg_r( machine, offset )<<8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_portreg_w )
 {
 	if (ACCESSING_MSB)
-		TC0220IOC_portreg_w( offset, (data>>8) & 0xff );
+		TC0220IOC_portreg_w( machine, offset, (data>>8) & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_r )
 {
-	return TC0220IOC_r(offset);
+	return TC0220IOC_r(machine,offset);
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_w )
 {
 	if (ACCESSING_LSB)
-		TC0220IOC_w(offset,data & 0xff);
+		TC0220IOC_w(machine,offset,data & 0xff);
 	else
 	{
 		/* qtorimon writes here the coin counters - bug? */
-		TC0220IOC_w(offset,(data >> 8) & 0xff);
+		TC0220IOC_w(machine,offset,(data >> 8) & 0xff);
 
 		if (offset)		/* ainferno writes watchdog in msb */
 logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
@@ -5075,16 +5075,16 @@ logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",ac
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_r )
 {
-	return TC0220IOC_halfword_r(offset,mem_mask) << 8;
+	return TC0220IOC_halfword_r(machine,offset,mem_mask) << 8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w )
 {
 	if (ACCESSING_MSB)
-		TC0220IOC_w(offset,(data >> 8) & 0xff);
+		TC0220IOC_w(machine,offset,(data >> 8) & 0xff);
 	else
 	{
-		TC0220IOC_w(offset,data & 0xff);
+		TC0220IOC_w(machine,offset,data & 0xff);
 
 logerror("CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
 	}
@@ -5101,22 +5101,22 @@ READ8_HANDLER( TC0510NIO_r )
 	switch (offset)
 	{
 		case 0x00:	/* DSA */
-			return input_port_0_r(0);
+			return input_port_0_r(machine,0);
 
 		case 0x01:	/* DSB */
-			return input_port_1_r(0);
+			return input_port_1_r(machine,0);
 
 		case 0x02:	/* 1P */
-			return input_port_2_r(0);
+			return input_port_2_r(machine,0);
 
 		case 0x03:	/* 2P */
-			return input_port_3_r(0);
+			return input_port_3_r(machine,0);
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0510NIO_regs[4];
 
 		case 0x07:	/* coin */
-			return input_port_4_r(0);
+			return input_port_4_r(machine,0);
 
 		default:
 logerror("PC %06x: warning - read TC0510NIO address %02x\n",activecpu_get_pc(),offset);
@@ -5131,7 +5131,7 @@ WRITE8_HANDLER( TC0510NIO_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset_w(offset,data);
+			watchdog_reset(machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout */
@@ -5149,29 +5149,29 @@ logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",activecpu_g
 
 READ16_HANDLER( TC0510NIO_halfword_r )
 {
-	return TC0510NIO_r(offset);
+	return TC0510NIO_r(machine,offset);
 }
 
 WRITE16_HANDLER( TC0510NIO_halfword_w )
 {
 	if (ACCESSING_LSB)
-		TC0510NIO_w(offset,data & 0xff);
+		TC0510NIO_w(machine,offset,data & 0xff);
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
 logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",activecpu_get_pc(),offset);
-		TC0510NIO_w(offset,(data >> 8) & 0xff);
+		TC0510NIO_w(machine,offset,(data >> 8) & 0xff);
 	}
 }
 
 READ16_HANDLER( TC0510NIO_halfword_wordswap_r )
 {
-	return TC0510NIO_halfword_r(offset ^ 1,mem_mask);
+	return TC0510NIO_halfword_r(machine,offset ^ 1,mem_mask);
 }
 
 WRITE16_HANDLER( TC0510NIO_halfword_wordswap_w )
 {
-	TC0510NIO_halfword_w(offset ^ 1,data,mem_mask);
+	TC0510NIO_halfword_w(machine,offset ^ 1,data,mem_mask);
 }
 
 
@@ -5184,22 +5184,22 @@ READ8_HANDLER( TC0640FIO_r )
 	switch (offset)
 	{
 		case 0x00:	/* DSA */
-			return input_port_0_r(0);
+			return input_port_0_r(machine,0);
 
 		case 0x01:	/* DSB */
-			return input_port_1_r(0);
+			return input_port_1_r(machine,0);
 
 		case 0x02:	/* 1P */
-			return input_port_2_r(0);
+			return input_port_2_r(machine,0);
 
 		case 0x03:	/* 2P */
-			return input_port_3_r(0);
+			return input_port_3_r(machine,0);
 
 		case 0x04:	/* coin counters and lockout */
 			return TC0640FIO_regs[4];
 
 		case 0x07:	/* coin */
-			return input_port_4_r(0);
+			return input_port_4_r(machine,0);
 
 		default:
 logerror("PC %06x: warning - read TC0640FIO address %02x\n",activecpu_get_pc(),offset);
@@ -5214,7 +5214,7 @@ WRITE8_HANDLER( TC0640FIO_w )
 	switch (offset)
 	{
 		case 0x00:
-			watchdog_reset_w(offset,data);
+			watchdog_reset(machine);
 			break;
 
 		case 0x04:	/* coin counters and lockout */
@@ -5232,32 +5232,32 @@ logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",activecpu_g
 
 READ16_HANDLER( TC0640FIO_halfword_r )
 {
-	return TC0640FIO_r(offset);
+	return TC0640FIO_r(machine,offset);
 }
 
 WRITE16_HANDLER( TC0640FIO_halfword_w )
 {
 	if (ACCESSING_LSB)
-		TC0640FIO_w(offset,data & 0xff);
+		TC0640FIO_w(machine,offset,data & 0xff);
 	else
 	{
-		TC0640FIO_w(offset,(data >> 8) & 0xff);
+		TC0640FIO_w(machine,offset,(data >> 8) & 0xff);
 logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 	}
 }
 
 READ16_HANDLER( TC0640FIO_halfword_byteswap_r )
 {
-	return TC0640FIO_halfword_r(offset,mem_mask) << 8;
+	return TC0640FIO_halfword_r(machine,offset,mem_mask) << 8;
 }
 
 WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w )
 {
 	if (ACCESSING_MSB)
-		TC0640FIO_w(offset,(data >> 8) & 0xff);
+		TC0640FIO_w(machine,offset,(data >> 8) & 0xff);
 	else
 	{
-		TC0640FIO_w(offset,data & 0xff);
+		TC0640FIO_w(machine,offset,data & 0xff);
 logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
 	}
 }

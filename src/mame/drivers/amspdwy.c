@@ -63,13 +63,13 @@ AMSPDWY_WHEEL_R( 1 )
 
 static READ8_HANDLER( amspdwy_sound_r )
 {
-	return (YM2151_status_port_0_r(0) & ~ 0x30) | readinputport(4);
+	return (YM2151_status_port_0_r(machine,0) & ~ 0x30) | readinputport(4);
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )

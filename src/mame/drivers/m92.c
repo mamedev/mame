@@ -333,7 +333,7 @@ static TIMER_CALLBACK( setvector_callback )
 static WRITE16_HANDLER( m92_soundlatch_w )
 {
 	timer_call_after_resynch(NULL, V30_ASSERT, setvector_callback);
-	soundlatch_w(0, data & 0xff);
+	soundlatch_w(machine, 0, data & 0xff);
 }
 
 static READ16_HANDLER( m92_sound_status_r )
@@ -344,7 +344,7 @@ static READ16_HANDLER( m92_sound_status_r )
 
 static READ16_HANDLER( m92_soundlatch_r )
 {
-	return soundlatch_r(offset) | 0xff00;
+	return soundlatch_r(machine, offset) | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_sound_irq_ack_w )

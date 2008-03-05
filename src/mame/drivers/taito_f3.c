@@ -86,7 +86,7 @@ static WRITE32_HANDLER( f3_control_w )
 	switch (offset)
 	{
 		case 0x00: /* Watchdog */
-			watchdog_reset_w(0,0);
+			watchdog_reset(machine);
 			return;
 		case 0x01: /* Coin counters & lockouts */
 			if (ACCESSING_MSB32) {

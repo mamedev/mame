@@ -92,7 +92,7 @@ static READ16_HANDLER( zwackery_6840_r )
 	/* make this happen, we must assume that reads from the */
 	/* 6840 take 14 additional cycles                       */
 	activecpu_adjust_icount(-14);
-	return mcr68_6840_upper_r(offset,0);
+	return mcr68_6840_upper_r(machine,offset,0);
 }
 
 
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( xenophobe_control_w )
 {
 	COMBINE_DATA(&control_word);
 /*  soundsgood_reset_w(~control_word & 0x0020);*/
-	soundsgood_data_w(offset, ((control_word & 0x000f) << 1) | ((control_word & 0x0010) >> 4));
+	soundsgood_data_w(machine, offset, ((control_word & 0x000f) << 1) | ((control_word & 0x0010) >> 4));
 }
 
 
@@ -122,7 +122,7 @@ static WRITE16_HANDLER( blasted_control_w )
 {
 	COMBINE_DATA(&control_word);
 /*  soundsgood_reset_w(~control_word & 0x0020);*/
-	soundsgood_data_w(offset, (control_word >> 8) & 0x1f);
+	soundsgood_data_w(machine, offset, (control_word >> 8) & 0x1f);
 }
 
 
@@ -138,14 +138,14 @@ static READ16_HANDLER( spyhunt2_port_0_r )
 	int result = readinputportbytag("IN0");
 	int which = (control_word >> 3) & 3;
 	int analog = readinputport(3 + which);
-	return result | ((soundsgood_status_r(0) & 1) << 5) | (analog << 8);
+	return result | ((soundsgood_status_r(machine, 0) & 1) << 5) | (analog << 8);
 }
 
 
 static READ16_HANDLER( spyhunt2_port_1_r )
 {
 	int result = readinputportbytag("IN1");
-	return result | ((turbocs_status_r(0) & 1) << 7);
+	return result | ((turbocs_status_r(machine, 0) & 1) << 7);
 }
 
 
@@ -154,10 +154,10 @@ static WRITE16_HANDLER( spyhunt2_control_w )
 	COMBINE_DATA(&control_word);
 
 /*  turbocs_reset_w(~control_word & 0x0080);*/
-	turbocs_data_w(offset, (control_word >> 8) & 0x001f);
+	turbocs_data_w(machine, offset, (control_word >> 8) & 0x001f);
 
 	soundsgood_reset_w(~control_word & 0x2000);
-	soundsgood_data_w(offset, (control_word >> 8) & 0x001f);
+	soundsgood_data_w(machine, offset, (control_word >> 8) & 0x001f);
 }
 
 

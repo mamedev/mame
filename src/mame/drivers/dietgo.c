@@ -43,10 +43,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine,0,data);
 		break;
 	}
 }

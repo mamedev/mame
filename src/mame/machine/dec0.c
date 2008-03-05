@@ -168,14 +168,14 @@ WRITE16_HANDLER( slyspy_240000_w )
 {
 	switch (slyspy_state) {
 		case 0x3:
-			dec0_pf1_data_w(offset,data,mem_mask);
+			dec0_pf1_data_w(machine,offset,data,mem_mask);
 			return;
 		case 0x2:
-			dec0_pf2_data_w(offset,data,mem_mask);
+			dec0_pf2_data_w(machine,offset,data,mem_mask);
 			return;
 		case 0x0:
-			if (offset<0x8) dec0_pf2_control_0_w(offset,data,mem_mask);
-			else if (offset<0x10) dec0_pf2_control_1_w(offset-0x8,data,mem_mask);
+			if (offset<0x8) dec0_pf2_control_0_w(machine,offset,data,mem_mask);
+			else if (offset<0x10) dec0_pf2_control_1_w(machine,offset-0x8,data,mem_mask);
 			return;
 	}
 	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
@@ -185,7 +185,7 @@ WRITE16_HANDLER( slyspy_242000_w )
 {
 	switch (slyspy_state) {
 		case 0x2: /* Trap A */
-			dec0_pf1_data_w(offset,data,mem_mask);
+			dec0_pf1_data_w(machine,offset,data,mem_mask);
 			return;
 		case 0x0: /* Trap C */
 			if (offset<0x40) COMBINE_DATA(&dec0_pf2_colscroll[offset]);
@@ -199,7 +199,7 @@ WRITE16_HANDLER( slyspy_246000_w )
 {
 	switch (slyspy_state) {
 		case 0x0:
-			dec0_pf2_data_w(offset,data,mem_mask);
+			dec0_pf2_data_w(machine,offset,data,mem_mask);
 			return;
 	}
 	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
@@ -209,14 +209,14 @@ WRITE16_HANDLER( slyspy_248000_w )
 {
 	switch (slyspy_state) {
 		case 0x1:
-			dec0_pf1_data_w(offset,data,mem_mask);
+			dec0_pf1_data_w(machine,offset,data,mem_mask);
 			return;
 		case 0x3:
-			dec0_pf2_data_w(offset,data,mem_mask);
+			dec0_pf2_data_w(machine,offset,data,mem_mask);
 			return;
 		case 0x0:
-			if (offset<0x8) dec0_pf1_control_0_w(offset,data,mem_mask);
-			else if (offset<0x10) dec0_pf1_control_1_w(offset-0x8,data,mem_mask);
+			if (offset<0x8) dec0_pf1_control_0_w(machine,offset,data,mem_mask);
+			else if (offset<0x10) dec0_pf1_control_1_w(machine,offset-0x8,data,mem_mask);
 			return;
 	}
 	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
@@ -226,7 +226,7 @@ WRITE16_HANDLER( slyspy_24c000_w )
 {
 	switch (slyspy_state) {
 		case 0x1: /* Trap 9 */
-			dec0_pf2_data_w(offset,data,mem_mask);
+			dec0_pf2_data_w(machine,offset,data,mem_mask);
 			return;
 		case 0x0: /* Trap C */
 			if (offset<0x40) COMBINE_DATA(&dec0_pf1_colscroll[offset]);
@@ -241,7 +241,7 @@ WRITE16_HANDLER( slyspy_24e000_w )
 	switch (slyspy_state) {
 		case 0x2:
 		case 0x0:
-			dec0_pf1_data_w(offset,data,mem_mask);
+			dec0_pf1_data_w(machine,offset,data,mem_mask);
 			return;
 	}
 	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);

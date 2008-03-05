@@ -796,11 +796,11 @@ switch(offset)
 
                     if(data & 0x10)
                     {
-                    	upd7759_0_reset_w(0,0);
+                    	upd7759_0_reset_w(machine,0,0);
                     }
                     else
                     {
-                    	upd7759_0_reset_w(0,1);
+                    	upd7759_0_reset_w(machine,0,1);
                     }
                     break;
 }
@@ -812,7 +812,7 @@ static READ8_HANDLER(sound_io_r)
 switch(offset)
 {
         case 0x01:  return readinputport(3);                           /* Test push switch */
-        case 0x03:  return (int)(upd7759_0_busy_r(0))<<3;
+        case 0x03:  return (int)(upd7759_0_busy_r(machine,0))<<3;
         default:    return 0;
 }
 

@@ -560,7 +560,7 @@ WRITE32_HANDLER(nwk_fifo_0_w)
 	}
 	else
 	{
-		voodoo_0_w(offset ^ 0x80000, data, mem_mask);
+		voodoo_0_w(machine, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -577,7 +577,7 @@ WRITE32_HANDLER(nwk_fifo_1_w)
 	}
 	else
 	{
-		voodoo_1_w(offset ^ 0x80000, data, mem_mask);
+		voodoo_1_w(machine, offset ^ 0x80000, data, mem_mask);
 	}
 }
 
@@ -589,7 +589,7 @@ READ32_HANDLER(nwk_voodoo_0_r)
 	}
 	else
 	{
-		return voodoo_0_r(offset, mem_mask);
+		return voodoo_0_r(machine, offset, mem_mask);
 	}
 }
 
@@ -601,7 +601,7 @@ READ32_HANDLER(nwk_voodoo_1_r)
 	}
 	else
 	{
-		return voodoo_1_r(offset, mem_mask);
+		return voodoo_1_r(machine, offset, mem_mask);
 	}
 }
 
@@ -618,7 +618,7 @@ WRITE32_HANDLER(nwk_voodoo_0_w)
 	}
 	else
 	{
-		voodoo_0_w(offset, data, mem_mask);
+		voodoo_0_w(machine, offset, data, mem_mask);
 	}
 }
 
@@ -635,7 +635,7 @@ WRITE32_HANDLER(nwk_voodoo_1_w)
 	}
 	else
 	{
-		voodoo_1_w(offset, data, mem_mask);
+		voodoo_1_w(machine, offset, data, mem_mask);
 	}
 }
 

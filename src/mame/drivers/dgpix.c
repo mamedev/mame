@@ -163,8 +163,8 @@ static WRITE32_HANDLER( vram_w )
 	switch(mem_mask)
 	{
 		case 0:
-			vram_w(offset,data,0x0000ffff);
-			vram_w(offset,data,0xffff0000);
+			vram_w(machine,offset,data,0x0000ffff);
+			vram_w(machine,offset,data,0xffff0000);
 			return;
 
 		case 0xffff:
@@ -217,7 +217,7 @@ static READ32_HANDLER( vblank_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	activecpu_adjust_icount(-100);
-	return input_port_0_dword_r(offset, 0);
+	return input_port_0_dword_r(machine, offset, 0);
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )

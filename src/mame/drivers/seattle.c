@@ -469,7 +469,7 @@ static void vblank_assert(int state);
 static void update_vblank_irq(void);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
-static void galileo_perform_dma(int which);
+static void galileo_perform_dma(running_machine *machine, int which);
 static void voodoo_stall(int stall);
 static void widget_reset(void);
 static void update_widget_irq(void);
@@ -652,7 +652,7 @@ static READ32_HANDLER( interrupt_state_r )
 
 static READ32_HANDLER( interrupt_state2_r )
 {
-	UINT32 result = interrupt_state_r(offset, mem_mask);
+	UINT32 result = interrupt_state_r(machine, offset, mem_mask);
 	result |= vblank_state << 8;
 	return result;
 }
@@ -973,7 +973,7 @@ static int galileo_dma_fetch_next(int which)
 }
 
 
-static void galileo_perform_dma(int which)
+static void galileo_perform_dma(running_machine *machine, int which)
 {
 	do
 	{
@@ -1024,7 +1024,7 @@ static void galileo_perform_dma(int which)
 				}
 
 				/* write the data and advance */
-				voodoo_0_w((dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0);
+				voodoo_0_w(machine, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1188,7 +1188,7 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* if enabling, start the DMA */
 			if (!(oldata & 0x1000) && (data & 0x1000))
-				galileo_perform_dma(which);
+				galileo_perform_dma(machine, which);
 			break;
 		}
 
@@ -1306,7 +1306,7 @@ static WRITE32_HANDLER( seattle_voodoo_w )
 	/* if we're not stalled, just write and get out */
 	if (!voodoo_stalled)
 	{
-		voodoo_0_w(offset, data, mem_mask);
+		voodoo_0_w(machine, offset, data, mem_mask);
 		return;
 	}
 
@@ -1362,7 +1362,7 @@ static void voodoo_stall(int stall)
 
 				/* resume execution */
 				cpuintrf_push_context(0);
-				galileo_perform_dma(which);
+				galileo_perform_dma(Machine, which);
 				cpuintrf_pop_context();
 				break;
 			}
@@ -1372,7 +1372,7 @@ static void voodoo_stall(int stall)
 		{
 			/* if the CPU had a pending write, do it now */
 			if (cpu_stalled_on_voodoo)
-				voodoo_0_w(cpu_stalled_offset, cpu_stalled_data, cpu_stalled_mem_mask);
+				voodoo_0_w(Machine, cpu_stalled_offset, cpu_stalled_data, cpu_stalled_mem_mask);
 			cpu_stalled_on_voodoo = FALSE;
 
 			/* resume CPU execution */
@@ -1473,18 +1473,18 @@ static WRITE32_HANDLER( carnevil_gun_w )
 static READ32_HANDLER( ethernet_r )
 {
 	if (!(offset & 8))
-		return smc91c94_r(offset & 7, mem_mask | 0x0000);
+		return smc91c94_r(machine, offset & 7, mem_mask | 0x0000);
 	else
-		return smc91c94_r(offset & 7, mem_mask | 0xff00);
+		return smc91c94_r(machine, offset & 7, mem_mask | 0xff00);
 }
 
 
 static WRITE32_HANDLER( ethernet_w )
 {
 	if (!(offset & 8))
-		smc91c94_w(offset & 7, data & 0xffff, mem_mask | 0x0000);
+		smc91c94_w(machine, offset & 7, data & 0xffff, mem_mask | 0x0000);
 	else
-		smc91c94_w(offset & 7, data & 0x00ff, mem_mask | 0xff00);
+		smc91c94_w(machine, offset & 7, data & 0x00ff, mem_mask | 0xff00);
 }
 
 
@@ -1532,11 +1532,11 @@ static READ32_HANDLER( widget_r )
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(0, mem_mask);
+			result = analog_port_r(machine, 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
-			result = smc91c94_r(widget.ethernet_addr & 7, mem_mask & 0xffff);
+			result = smc91c94_r(machine, widget.ethernet_addr & 7, mem_mask & 0xffff);
 			break;
 	}
 
@@ -1563,11 +1563,11 @@ static WRITE32_HANDLER( widget_w )
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(0, data, mem_mask);
+			analog_port_w(machine, 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
-			smc91c94_w(widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
+			smc91c94_w(machine, widget.ethernet_addr & 7, data & 0xffff, mem_mask & 0xffff);
 			break;
 	}
 }

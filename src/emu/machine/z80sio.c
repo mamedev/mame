@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "z80sio.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -180,10 +181,10 @@ struct _z80sio
 	UINT8		int_state[8];		/* interrupt states */
 
 	void (*irq_cb)(int state);
-	write8_handler dtr_changed_cb;
-	write8_handler rts_changed_cb;
-	write8_handler break_changed_cb;
-	write8_handler transmit_cb;
+	write8_machine_func dtr_changed_cb;
+	write8_machine_func rts_changed_cb;
+	write8_machine_func break_changed_cb;
+	write8_machine_func transmit_cb;
 	int (*receive_poll_cb)(int which);
 };
 
@@ -418,11 +419,11 @@ void z80sio_c_w(int which, int ch, UINT8 data)
 		/* SIO write register 5 */
 		case 5:
 			if (((old ^ data) & SIO_WR5_DTR) && sio->dtr_changed_cb)
-				(*sio->dtr_changed_cb)(ch, (data & SIO_WR5_DTR) != 0);
+				(*sio->dtr_changed_cb)(Machine, ch, (data & SIO_WR5_DTR) != 0);
 			if (((old ^ data) & SIO_WR5_SEND_BREAK) && sio->break_changed_cb)
-				(*sio->break_changed_cb)(ch, (data & SIO_WR5_SEND_BREAK) != 0);
+				(*sio->break_changed_cb)(Machine, ch, (data & SIO_WR5_SEND_BREAK) != 0);
 			if (((old ^ data) & SIO_WR5_RTS) && sio->rts_changed_cb)
-				(*sio->rts_changed_cb)(ch, (data & SIO_WR5_RTS) != 0);
+				(*sio->rts_changed_cb)(Machine, ch, (data & SIO_WR5_RTS) != 0);
 			break;
 	}
 }
@@ -641,7 +642,7 @@ static TIMER_CALLBACK( serial_callback )
 
 		/* actually transmit the character */
 		if (sio->transmit_cb != NULL)
-			(*sio->transmit_cb)(ch, chan->outbuf);
+			(*sio->transmit_cb)(machine, ch, chan->outbuf);
 
 		/* update the status register */
 		chan->status[0] |= SIO_RR0_TX_BUFFER_EMPTY;

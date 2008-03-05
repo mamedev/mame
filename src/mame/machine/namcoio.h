@@ -23,8 +23,8 @@ enum
 
 struct namcoio_interface
 {
-	read8_handler in[4];	/* read handlers for ports A-D */
-	write8_handler out[2];	/* write handlers for ports A-B */
+	read8_machine_func in[4];	/* read handlers for ports A-D */
+	write8_machine_func out[2];	/* write handlers for ports A-B */
 };
 
 

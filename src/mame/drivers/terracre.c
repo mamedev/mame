@@ -159,12 +159,12 @@ static READ16_HANDLER( horekid_IN2_r )
 
 static WRITE16_HANDLER( amazon_sound_w )
 {
-	soundlatch_w(0,((data & 0x7f) << 1) | 1);
+	soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
 }
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(0,0);
+	soundlatch_clear_w(machine,0,0);
 	return 0;
 }
 

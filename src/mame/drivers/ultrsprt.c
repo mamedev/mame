@@ -137,11 +137,11 @@ static READ16_HANDLER(sound_r)
 
 	if (ACCESSING_MSB16)
 	{
-		r |= K054539_0_r(reg+0) << 8;
+		r |= K054539_0_r(machine, reg+0) << 8;
 	}
 	if (ACCESSING_LSB16)
 	{
-		r |= K054539_0_r(reg+1) << 0;
+		r |= K054539_0_r(machine, reg+1) << 0;
 	}
 
 	return r;
@@ -153,11 +153,11 @@ static WRITE16_HANDLER(sound_w)
 
 	if (ACCESSING_MSB16)
 	{
-		K054539_0_w(reg+0, (data >> 8) & 0xff);
+		K054539_0_w(machine, reg+0, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_LSB16)
 	{
-		K054539_0_w(reg+1, (data >> 0) & 0xff);
+		K054539_0_w(machine, reg+1, (data >> 0) & 0xff);
 	}
 }
 
@@ -167,11 +167,11 @@ static READ16_HANDLER(K056800_68k_r)
 
 	if (!(mem_mask & 0xff00))
 	{
-		r |= K056800_sound_r((offset*2)+0, 0xffff) << 8;
+		r |= K056800_sound_r(machine, (offset*2)+0, 0xffff) << 8;
 	}
 	if (!(mem_mask & 0x00ff))
 	{
-		r |= K056800_sound_r((offset*2)+1, 0xffff) << 0;
+		r |= K056800_sound_r(machine, (offset*2)+1, 0xffff) << 0;
 	}
 
 	return r;
@@ -181,11 +181,11 @@ static WRITE16_HANDLER(K056800_68k_w)
 {
 	if (!(mem_mask & 0xff00))
 	{
-		K056800_sound_w((offset*2)+0, (data >> 8) & 0xff, 0xffff);
+		K056800_sound_w(machine, (offset*2)+0, (data >> 8) & 0xff, 0xffff);
 	}
 	if (!(mem_mask & 0x00ff))
 	{
-		K056800_sound_w((offset*2)+1, (data >> 0) & 0xff, 0xffff);
+		K056800_sound_w(machine, (offset*2)+1, (data >> 0) & 0xff, 0xffff);
 	}
 }
 

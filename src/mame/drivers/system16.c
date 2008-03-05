@@ -411,8 +411,8 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if( ACCESSING_LSB )
 {
-		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
+		soundlatch_w( machine,0,data&0xff );
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
 	}
 }
 
@@ -420,8 +420,8 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 {
 	if( ACCESSING_LSB )
 {
-		soundlatch_w( 0,data&0xff );
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w( machine,0,data&0xff );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1205,7 +1205,7 @@ static READ16_HANDLER( ga_io_players_r ) {
 }
 static READ16_HANDLER( ga_io_service_r )
 {
-	return (input_port_2_word_r(0,0) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
+	return (input_port_2_word_r(machine,0,0) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
 }
 
 static ADDRESS_MAP_START( goldnaxe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1230,7 +1230,7 @@ static WRITE16_HANDLER( ga_sound_command_w )
 	COMBINE_DATA( &sys16_workingram[(0xecfc-0xc000)/2] );
 	if( ACCESSING_MSB )
 {
-		soundlatch_w( 0,data>>8 );
+		soundlatch_w( machine,0,data>>8 );
 		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
 	}
 }
@@ -1400,7 +1400,7 @@ static int passht4b_io3_val;
 
 static READ16_HANDLER( passht4b_service_r )
 {
-	UINT16 val=input_port_2_word_r(offset,0);
+	UINT16 val=input_port_2_word_r(machine,offset,0);
 	if(!(readinputport(0) & 0x40)) val&=0xef;
 	if(!(readinputport(1) & 0x40)) val&=0xdf;
 	if(!(readinputport(5) & 0x40)) val&=0xbf;
@@ -1908,11 +1908,11 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( tt_io_player1_r )
-{ return input_port_0_r( offset ) << 8; }
+{ return input_port_0_r( machine, offset ) << 8; }
 static READ16_HANDLER( tt_io_player2_r )
-{ return input_port_1_r( offset ) << 8; }
+{ return input_port_1_r( machine, offset ) << 8; }
 static READ16_HANDLER( tt_io_service_r )
-{ return input_port_2_r( offset ) << 8; }
+{ return input_port_2_r( machine, offset ) << 8; }
 
 
 

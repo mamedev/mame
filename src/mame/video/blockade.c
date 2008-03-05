@@ -8,7 +8,7 @@ WRITE8_HANDLER( blockade_videoram_w )
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 
-	if (input_port_3_r(0) & 0x80)
+	if (input_port_3_r(machine,0) & 0x80)
 	{
 		logerror("blockade_videoram_w: scanline %d\n", video_screen_get_vpos(0));
 		cpu_spinuntil_int();

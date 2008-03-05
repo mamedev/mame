@@ -103,9 +103,9 @@ static INTERRUPT_GEN( sprint2 )
 		}
 	}
 
-	discrete_sound_w(SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
-	discrete_sound_w(SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
-	discrete_sound_w(SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	discrete_sound_w(machine, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(machine, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
+	discrete_sound_w(machine, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -217,25 +217,25 @@ static WRITE8_HANDLER( sprint2_attract_w )
 	attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(SPRINT2_ATTRACT_EN, attract);
+	discrete_sound_w(machine, SPRINT2_ATTRACT_EN, attract);
 }
 
 
 static WRITE8_HANDLER( sprint2_noise_reset_w )
 {
-	discrete_sound_w(SPRINT2_NOISE_RESET, 0);
+	discrete_sound_w(machine, SPRINT2_NOISE_RESET, 0);
 }
 
 
 static WRITE8_HANDLER( sprint2_skid1_w )
 {
 	// also DOMINOS_TUMBLE_EN
-	discrete_sound_w(SPRINT2_SKIDSND1_EN, offset & 1);
+	discrete_sound_w(machine, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
 static WRITE8_HANDLER( sprint2_skid2_w )
 {
-	discrete_sound_w(SPRINT2_SKIDSND2_EN, offset & 1);
+	discrete_sound_w(machine, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
 

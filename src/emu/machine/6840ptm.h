@@ -18,7 +18,7 @@ struct _ptm6840_interface
 	int internal_clock;
 	int external_clock[3];
 
-	write8_handler	out_func[3];	// function to call when output[idx] changes
+	write8_machine_func	out_func[3];	// function to call when output[idx] changes
 
 	void (*irq_func)(int state);	// function called if IRQ line changes
 };

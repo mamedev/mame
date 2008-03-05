@@ -52,7 +52,7 @@ READ8_HANDLER( xxmissio_bgram_r )
 
 WRITE8_HANDLER( xxmissio_paletteram_w )
 {
-	paletteram_BBGGRRII_w(offset,data);
+	paletteram_BBGGRRII_w(machine,offset,data);
 }
 
 /****************************************************************************/

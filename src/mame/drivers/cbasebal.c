@@ -51,7 +51,7 @@ static WRITE8_HANDLER( cbasebal_bankswitch_w )
 static READ8_HANDLER( bankedram_r )
 {
 	if (rambank == 2)
-		return cbasebal_textram_r(offset);	/* VRAM */
+		return cbasebal_textram_r(machine,offset);	/* VRAM */
 	else if (rambank == 1)
 	{
 		if (offset < 0x800)
@@ -60,21 +60,21 @@ static READ8_HANDLER( bankedram_r )
 	}
 	else
 	{
-		return cbasebal_scrollram_r(offset);	/* SCROLL */
+		return cbasebal_scrollram_r(machine,offset);	/* SCROLL */
 	}
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (rambank == 2)
-		cbasebal_textram_w(offset,data);
+		cbasebal_textram_w(machine,offset,data);
 	else if (rambank == 1)
 	{
 		if (offset < 0x800)
-			paletteram_xxxxBBBBRRRRGGGG_le_w(offset,data);
+			paletteram_xxxxBBBBRRRRGGGG_le_w(machine,offset,data);
 	}
 	else
-		cbasebal_scrollram_w(offset,data);
+		cbasebal_scrollram_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( cbasebal_coinctrl_w )
@@ -122,7 +122,7 @@ static READ8_HANDLER( eeprom_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_2_r(0) & 0x7f) | bit;
+	return (input_port_2_r(machine,0) & 0x7f) | bit;
 }
 
 static WRITE8_HANDLER( eeprom_cs_w )

@@ -889,8 +889,6 @@ static void megadriv_vdp_ctrl_port_w(int data)
 
 static WRITE16_HANDLER( megadriv_vdp_w )
 {
-
-
 	switch (offset<<1)
 	{
 		case 0x00:
@@ -925,8 +923,8 @@ static WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_LSB) SN76496_0_w(0, data & 0xff);
-			//if (ACCESSING_MSB) SN76496_0_w(0, (data >>8) & 0xff);
+			if (ACCESSING_LSB) SN76496_0_w(machine, 0, data & 0xff);
+			//if (ACCESSING_MSB) SN76496_0_w(machine, 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1334,12 +1332,12 @@ static READ16_HANDLER( megadriv_68k_YM2612_read)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_MSB)	 return YM2612_status_port_0_A_r(0) << 8;
-				else 				 return YM2612_status_port_0_A_r(0);
+				if (ACCESSING_MSB)	 return YM2612_status_port_0_A_r(machine, 0) << 8;
+				else 				 return YM2612_status_port_0_A_r(machine, 0);
 				break;
 			case 1:
-				if (ACCESSING_MSB)	return YM2612_status_port_0_A_r(0) << 8;
-				else 				return YM2612_status_port_0_A_r(0);
+				if (ACCESSING_MSB)	return YM2612_status_port_0_A_r(machine, 0) << 8;
+				else 				return YM2612_status_port_0_A_r(machine, 0);
 				break;
 		}
 	}
@@ -1362,12 +1360,12 @@ static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_MSB)	YM2612_control_port_0_A_w	(0,	(data >> 8) & 0xff);
-				else 				YM2612_data_port_0_A_w		(0,	(data >> 0) & 0xff);
+				if (ACCESSING_MSB)	YM2612_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+				else 				YM2612_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 				break;
 			case 1:
-				if (ACCESSING_MSB)	YM2612_control_port_0_B_w	(0,	(data >> 8) & 0xff);
-				else 				YM2612_data_port_0_B_w		(0,	(data >> 0) & 0xff);
+				if (ACCESSING_MSB)	YM2612_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+				else 				YM2612_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 				break;
 		}
 	}
@@ -1381,10 +1379,10 @@ static READ8_HANDLER( megadriv_z80_YM2612_read )
 {
 	switch (offset)
 	{
-		case 0: return YM2612_status_port_0_A_r(0);
-		case 1: return YM2612_status_port_0_A_r(0);
-		case 2: return YM2612_status_port_0_A_r(0);
-		case 3: return YM2612_status_port_0_A_r(0);
+		case 0: return YM2612_status_port_0_A_r(machine,0);
+		case 1: return YM2612_status_port_0_A_r(machine,0);
+		case 2: return YM2612_status_port_0_A_r(machine,0);
+		case 3: return YM2612_status_port_0_A_r(machine,0);
 
 	}
 
@@ -1396,10 +1394,10 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 	//mame_printf_debug("megadriv_z80_YM2612_write %02x %02x\n",offset,data);
 	switch (offset)
 	{
-		case 0: YM2612_control_port_0_A_w(0, data); break;
-		case 1: YM2612_data_port_0_A_w(0, data); break;
-		case 2: YM2612_control_port_0_B_w(0, data); break;
-		case 3: YM2612_data_port_0_B_w(0, data); break;
+		case 0: YM2612_control_port_0_A_w(machine, 0, data); break;
+		case 1: YM2612_data_port_0_A_w(machine, 0, data); break;
+		case 2: YM2612_control_port_0_B_w(machine, 0, data); break;
+		case 3: YM2612_data_port_0_B_w(machine, 0, data); break;
 	}
 }
 
@@ -2373,15 +2371,13 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 
 static WRITE8_HANDLER( megadriv_z80_vdp_write )
 {
-
-
 	switch (offset)
 	{
 		case 0x11:
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			SN76496_0_w(0, data);
+			SN76496_0_w(machine, 0, data);
 			break;
 
 		default:
@@ -2412,7 +2408,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		SN76496_0_w(0, data);
+		SN76496_0_w(machine, 0, data);
 	}
 	else
 	{

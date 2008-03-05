@@ -71,9 +71,9 @@ static WRITE8_HANDLER( sound_control_w )
 	if ((last & 0x04) == 0x04 && (data & 0x4) == 0x00)
 	{
 		if (last & 0x01)
-			AY8910_control_port_0_w(0,soundlatch);
+			AY8910_control_port_0_w(machine,0,soundlatch);
 		else
-			AY8910_write_port_0_w(0,soundlatch);
+			AY8910_write_port_0_w(machine,0,soundlatch);
 	}
 	last=data;
 }

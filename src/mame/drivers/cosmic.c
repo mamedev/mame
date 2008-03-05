@@ -112,7 +112,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 
 static WRITE8_HANDLER( panic_sound_output2_w )
 {
-	panic_sound_output_w(offset+15, data);
+	panic_sound_output_w(machine, offset+15, data);
 }
 
 static WRITE8_HANDLER( cosmicg_output_w )
@@ -189,8 +189,8 @@ static INTERRUPT_GEN( panic_interrupt )
         /* mostly not noticed since sound is */
 		/* only enabled if game in progress! */
 
-    	if ((input_port_3_r(0) & 0xc0) != 0xc0)
-        	panic_sound_output_w(17,1);
+    	if ((input_port_3_r(machine,0) & 0xc0) != 0xc0)
+        	panic_sound_output_w(machine,17,1);
 
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
     }
@@ -228,16 +228,16 @@ static INTERRUPT_GEN( cosmicg_interrupt )
 static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
-	if (input_port_4_r(0) & 0x01)
+	if (input_port_4_r(machine,0) & 0x01)
   		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else if (input_port_4_r(0) & 0x02)
+	else if (input_port_4_r(machine,0) & 0x02)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
-	if (input_port_4_r(0) & 0x01)
+	if (input_port_4_r(machine,0) & 0x01)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -252,12 +252,12 @@ static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 
-	return (input_port_0_r(0) & 0xf0) | ((video_screen_get_vpos(0) & 0xf0) >> 4);
+	return (input_port_0_r(machine,0) & 0xf0) | ((video_screen_get_vpos(0) & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_5_r(0) & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_5_r(machine,0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -266,12 +266,12 @@ static READ8_HANDLER( magspot_coinage_dip_r )
 static READ8_HANDLER( nomnlnd_port_0_1_r )
 {
 	int control;
-    int fire = input_port_3_r(0);
+    int fire = input_port_3_r(machine,0);
 
 	if (offset)
-		control = input_port_1_r(0);
+		control = input_port_1_r(machine,0);
     else
-		control = input_port_0_r(0);
+		control = input_port_0_r(machine,0);
 
     /* If firing - stop tank */
 

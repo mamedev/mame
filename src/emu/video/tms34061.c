@@ -395,7 +395,7 @@ static READ8_HANDLER( xypixel_r )
  *
  *************************************/
 
-void tms34061_w(int col, int row, int func, UINT8 data)
+void tms34061_w(running_machine *machine, int col, int row, int func, UINT8 data)
 {
 	offs_t offs;
 
@@ -405,12 +405,12 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			register_w(col, data);
+			register_w(machine, col, data);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			xypixel_w(col, data);
+			xypixel_w(machine, col, data);
 			break;
 
 		/* function 3 maps to direct access */
@@ -454,7 +454,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 }
 
 
-UINT8 tms34061_r(int col, int row, int func)
+UINT8 tms34061_r(running_machine *machine, int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;
@@ -465,12 +465,12 @@ UINT8 tms34061_r(int col, int row, int func)
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			result = register_r(col);
+			result = register_r(machine, col);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			result = xypixel_r(col);
+			result = xypixel_r(machine, col);
 			break;
 
 		/* funtion 3 maps to direct access */

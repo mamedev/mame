@@ -568,9 +568,9 @@ READ32_HANDLER( multi32_videoram_r )
 WRITE32_HANDLER( multi32_videoram_w )
 {
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		system32_videoram_w(offset*2+0, data, mem_mask);
+		system32_videoram_w(machine, offset*2+0, data, mem_mask);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		system32_videoram_w(offset*2+1, data >> 16, mem_mask >> 16);
+		system32_videoram_w(machine, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -648,17 +648,17 @@ WRITE16_HANDLER( system32_sprite_control_w )
 
 READ32_HANDLER( multi32_sprite_control_r )
 {
-	return system32_sprite_control_r(offset*2+0, mem_mask) |
-	      (system32_sprite_control_r(offset*2+1, mem_mask >> 16) << 16);
+	return system32_sprite_control_r(machine, offset*2+0, mem_mask) |
+	      (system32_sprite_control_r(machine, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
 WRITE32_HANDLER( multi32_sprite_control_w )
 {
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		system32_sprite_control_w(offset*2+0, data, mem_mask);
+		system32_sprite_control_w(machine, offset*2+0, data, mem_mask);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		system32_sprite_control_w(offset*2+1, data >> 16, mem_mask >> 16);
+		system32_sprite_control_w(machine, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 

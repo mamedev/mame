@@ -200,7 +200,7 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8	port = TC0220IOC_port_r(0);	/* read port number */
+	UINT8	port = TC0220IOC_port_r(machine,0);	/* read port number */
 
 	switch( port )
 	{
@@ -241,7 +241,7 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 				return 0x00;
 
 		default:
-			return TC0220IOC_portreg_r( offset );
+			return TC0220IOC_portreg_r( machine,offset );
 	}
 }
 

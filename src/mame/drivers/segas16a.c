@@ -163,10 +163,10 @@ static UINT16 *workram;
 static UINT8 video_control;
 static UINT8 mj_input_num;
 
-static read16_handler custom_io_r;
-static write16_handler custom_io_w;
+static read16_machine_func custom_io_r;
+static write16_machine_func custom_io_w;
 static void (*lamp_changed_w)(UINT8 changed, UINT8 newval);
-static void (*i8751_vblank_hook)(void);
+static void (*i8751_vblank_hook)(running_machine *machine);
 
 static UINT8 n7751_command;
 static UINT32 n7751_rom_address;
@@ -266,7 +266,7 @@ static MACHINE_RESET( system16a )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	ppi8255_0_w(param >> 8, param & 0xff);
+	ppi8255_0_w(machine, param >> 8, param & 0xff);
 }
 
 
@@ -276,7 +276,7 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return ppi8255_0_r(offset & 3);
+			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x1000/2:
 			return readinputport(offset & 3);
@@ -308,18 +308,18 @@ static WRITE16_HANDLER( standard_io_w )
 static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
-		return (*custom_io_r)(offset, mem_mask);
+		return (*custom_io_r)(machine, offset, mem_mask);
 	else
-		return standard_io_r(offset, mem_mask);
+		return standard_io_r(machine, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( misc_io_w )
 {
 	if (custom_io_w)
-		(*custom_io_w)(offset, data, mem_mask);
+		(*custom_io_w)(machine, offset, data, mem_mask);
 	else
-		standard_io_w(offset, data, mem_mask);
+		standard_io_w(machine, offset, data, mem_mask);
 }
 
 
@@ -397,7 +397,7 @@ static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
 	ppi8255_set_portC(0, 0x00);
-	return soundlatch_r(offset);
+	return soundlatch_r(machine, offset);
 }
 
 
@@ -491,7 +491,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
-		(*i8751_vblank_hook)();
+		(*i8751_vblank_hook)(machine);
 }
 
 
@@ -502,7 +502,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
  *
  *************************************/
 
-static void bodyslam_i8751_sim(void)
+static void bodyslam_i8751_sim(running_machine *machine)
 {
 	UINT8 flag = workram[0x200/2] >> 8;
 	UINT8 tick = workram[0x200/2] & 0xff;
@@ -510,7 +510,7 @@ static void bodyslam_i8751_sim(void)
 	UINT8 min = workram[0x202/2] & 0xff;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* out of time? set the flag */
 	if (tick == 0 && sec == 0 && min == 0)
@@ -547,18 +547,18 @@ static void bodyslam_i8751_sim(void)
 }
 
 
-static void quartet_i8751_sim(void)
+static void quartet_i8751_sim(running_machine *machine)
 {
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* X scroll values */
-	segaic16_textram_0_w(0xff8/2, workram[0x0d14/2], 0);
-	segaic16_textram_0_w(0xffa/2, workram[0x0d18/2], 0);
+	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0);
+	segaic16_textram_0_w(machine, 0xffa/2, workram[0x0d18/2], 0);
 
 	/* page values */
-	segaic16_textram_0_w(0xe9e/2, workram[0x0d1c/2], 0);
-	segaic16_textram_0_w(0xe9c/2, workram[0x0d1e/2], 0);
+	segaic16_textram_0_w(machine, 0xe9e/2, workram[0x0d1c/2], 0);
+	segaic16_textram_0_w(machine, 0xe9c/2, workram[0x0d1e/2], 0);
 }
 
 
@@ -606,7 +606,7 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 			break;
 	}
 
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
@@ -690,7 +690,7 @@ static READ16_HANDLER( mjleague_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 /*************************************
@@ -702,7 +702,6 @@ static READ16_HANDLER( mjleague_custom_io_r )
 static READ16_HANDLER( pshot16a_custom_io_r )
 {
 	static int read_port = 0;
-
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
@@ -725,7 +724,7 @@ static READ16_HANDLER( pshot16a_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 /*************************************
@@ -746,7 +745,7 @@ static READ16_HANDLER( sdi_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
@@ -760,7 +759,6 @@ static READ16_HANDLER( sdi_custom_io_r )
 static READ16_HANDLER( sjryuko_custom_io_r )
 {
 	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
-
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
@@ -776,7 +774,7 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 

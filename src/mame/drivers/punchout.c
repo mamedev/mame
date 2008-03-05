@@ -136,7 +136,7 @@ DRIVER_INIT( armwrest );
 
 static READ8_HANDLER( punchout_input_3_r )
 {
-	int data = input_port_3_r(offset);
+	int data = input_port_3_r(machine, offset);
 	/* bit 4 is busy pin level */
 	if( VLM5030_BSY() ) data &= ~0x10;
 	else data |= 0x10;
@@ -305,90 +305,90 @@ static WRITE8_HANDLER( spunchout_prot_w ) {
 }
 
 static READ8_HANDLER( spunchout_prot_0_r ) {
-	return spunchout_prot_r( 0 );
+	return spunchout_prot_r( machine, 0 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_0_w ) {
-	spunchout_prot_w( 0, data );
+	spunchout_prot_w( machine, 0, data );
 }
 
 static READ8_HANDLER( spunchout_prot_1_r ) {
-	return spunchout_prot_r( 1 );
+	return spunchout_prot_r( machine, 1 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_1_w ) {
-	spunchout_prot_w( 1, data );
+	spunchout_prot_w( machine, 1, data );
 }
 
 static READ8_HANDLER( spunchout_prot_2_r ) {
-	return spunchout_prot_r( 2 );
+	return spunchout_prot_r( machine, 2 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_2_w ) {
-	spunchout_prot_w( 2, data );
+	spunchout_prot_w( machine, 2, data );
 }
 
 static READ8_HANDLER( spunchout_prot_3_r ) {
-	return spunchout_prot_r( 3 );
+	return spunchout_prot_r( machine, 3 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_3_w ) {
-	spunchout_prot_w( 3, data );
+	spunchout_prot_w( machine, 3, data );
 }
 
 static READ8_HANDLER( spunchout_prot_5_r ) {
-	return spunchout_prot_r( 5 );
+	return spunchout_prot_r( machine, 5 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_5_w ) {
-	spunchout_prot_w( 5, data );
+	spunchout_prot_w( machine, 5, data );
 }
 
 
 static READ8_HANDLER( spunchout_prot_6_r ) {
-	return spunchout_prot_r( 6 );
+	return spunchout_prot_r( machine, 6 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_6_w ) {
-	spunchout_prot_w( 6, data );
+	spunchout_prot_w( machine, 6, data );
 }
 
 static READ8_HANDLER( spunchout_prot_9_r ) {
-	return spunchout_prot_r( 9 );
+	return spunchout_prot_r( machine, 9 );
 }
 
 static READ8_HANDLER( spunchout_prot_b_r ) {
-	return spunchout_prot_r( 11 );
+	return spunchout_prot_r( machine, 11 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_b_w ) {
-	spunchout_prot_w( 11, data );
+	spunchout_prot_w( machine, 11, data );
 }
 
 static READ8_HANDLER( spunchout_prot_c_r ) {
-	return spunchout_prot_r( 12 );
+	return spunchout_prot_r( machine, 12 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_d_w ) {
-	spunchout_prot_w( 13, data );
+	spunchout_prot_w( machine, 13, data );
 }
 
 static READ8_HANDLER( spunchout_prot_a_r ) {
-	return spunchout_prot_r( 10 );
+	return spunchout_prot_r( machine, 10 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_a_w ) {
-	spunchout_prot_w( 10, data );
+	spunchout_prot_w( machine, 10, data );
 }
 
 #if 0
 static READ8_HANDLER( spunchout_prot_f_r ) {
-	return spunchout_prot_r( 15 );
+	return spunchout_prot_r( machine, 15 );
 }
 #endif
 
 static WRITE8_HANDLER( spunchout_prot_f_w ) {
-	spunchout_prot_w( 15, data );
+	spunchout_prot_w( machine, 15, data );
 }
 
 

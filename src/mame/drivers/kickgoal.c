@@ -226,7 +226,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 		case 0xfd:	OKIM6295_set_bank_base(0, (2 * 0x40000)); break;
 		case 0xfe:	OKIM6295_set_bank_base(0, (1 * 0x40000)); break;
 		case 0xff:	OKIM6295_set_bank_base(0, (3 * 0x40000)); break;
-		case 0x78:	OKIM6295_data_0_w(0,data);
+		case 0x78:	OKIM6295_data_0_w(machine,0,data);
 					snd_sam[0]=00; snd_sam[1]=00; snd_sam[2]=00; snd_sam[3]=00;
 					break;
 		default:	if (snd_new) /* Play new sample */
@@ -234,44 +234,44 @@ static WRITE16_HANDLER( actionhw_snd_w )
 						if ((data & 0x80) && (snd_sam[3] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(0) & 0x08) != 0x08)
+							if ((OKIM6295_status_0_r(machine,0) & 0x08) != 0x08)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(0,snd_new);
-								OKIM6295_data_0_w(0,data);
+								OKIM6295_data_0_w(machine,0,snd_new);
+								OKIM6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x40) && (snd_sam[2] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(0) & 0x04) != 0x04)
+							if ((OKIM6295_status_0_r(machine,0) & 0x04) != 0x04)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(0,snd_new);
-								OKIM6295_data_0_w(0,data);
+								OKIM6295_data_0_w(machine,0,snd_new);
+								OKIM6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x20) && (snd_sam[1] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(0) & 0x02) != 0x02)
+							if ((OKIM6295_status_0_r(machine,0) & 0x02) != 0x02)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(0,snd_new);
-								OKIM6295_data_0_w(0,data);
+								OKIM6295_data_0_w(machine,0,snd_new);
+								OKIM6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x10) && (snd_sam[0] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(0) & 0x01) != 0x01)
+							if ((OKIM6295_status_0_r(machine,0) & 0x01) != 0x01)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(0,snd_new);
-								OKIM6295_data_0_w(0,data);
+								OKIM6295_data_0_w(machine,0,snd_new);
+								OKIM6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 					else /* Turn a channel off */
 					{
 						logerror("Turning channel %02x off\n",data);
-						OKIM6295_data_0_w(0,data);
+						OKIM6295_data_0_w(machine,0,data);
 						if (data & 0x40) snd_sam[3] = 00;
 						if (data & 0x20) snd_sam[2] = 00;
 						if (data & 0x10) snd_sam[1] = 00;
@@ -305,7 +305,7 @@ static int m6295_bank;
 static UINT16 m6295_key_delay;
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	if ((OKIM6295_status_0_r(0) & 0x08) == 0)
+	if ((OKIM6295_status_0_r(machine,0) & 0x08) == 0)
 	{
 		switch(kickgoal_melody_loop)
 		{
@@ -334,8 +334,8 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		if (kickgoal_melody_loop)
 		{
 //          logerror("Changing to sample %02x\n",kickgoal_melody_loop);
-			OKIM6295_data_0_w(0,((0x80 | kickgoal_melody_loop) & 0xff));
-			OKIM6295_data_0_w(0,0x81);
+			OKIM6295_data_0_w(machine,0,((0x80 | kickgoal_melody_loop) & 0xff));
+			OKIM6295_data_0_w(machine,0,0x81);
 		}
 	}
 	if ( input_code_pressed_once(KEYCODE_PGUP) )
@@ -412,9 +412,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 	{
 		if (m6295_key_delay >= (0x80 * oki_time_base))
 		{
-			OKIM6295_data_0_w(0,0x78);
-			OKIM6295_data_0_w(0,(0x80 | m6295_comm));
-			OKIM6295_data_0_w(0,0x11);
+			OKIM6295_data_0_w(machine,0,0x78);
+			OKIM6295_data_0_w(machine,0,(0x80 | m6295_comm));
+			OKIM6295_data_0_w(machine,0,0x11);
 
 			popmessage("Playing sound %02x on Bank %02x",m6295_comm,m6295_bank);
 

@@ -61,7 +61,7 @@ static WRITE8_HANDLER( contra_coin_counter_w )
 
 static WRITE8_HANDLER( cpu_sound_command_w )
 {
-	soundlatch_w(offset,data);
+	soundlatch_w(machine,offset,data);
 }
 
 

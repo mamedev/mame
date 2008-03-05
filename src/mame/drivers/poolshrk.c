@@ -65,7 +65,7 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 {
 	if ((offset & 3) == 3)
 	{
-		watchdog_reset_w(0, 0);
+		watchdog_reset_w(machine, 0, 0);
 	}
 }
 
@@ -82,7 +82,7 @@ static READ8_HANDLER( poolshrk_input_r )
 
 	if ((offset & 3) == 3)
 	{
-		watchdog_reset_r(0);
+		watchdog_reset_r(machine, 0);
 	}
 
 	return val;

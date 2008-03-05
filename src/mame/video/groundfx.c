@@ -261,12 +261,12 @@ VIDEO_UPDATE( groundfx )
         it's contents the usual way.
 
     */
-	if (TC0100SCN_long_r(0x4090/4,0) || TC0480SCP_long_r(0x20/4,0)==0x240866) { /* Anything in text layer - really stupid hack */
+	if (TC0100SCN_long_r(machine,0x4090/4,0) || TC0480SCP_long_r(machine,0x20/4,0)==0x240866) { /* Anything in text layer - really stupid hack */
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
 //      TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[2],0,0);
-		if (TC0480SCP_long_r(0x20/4,0)!=0x240866) /* Stupid hack for start of race */
+		if (TC0480SCP_long_r(machine,0x20/4,0)!=0x240866) /* Stupid hack for start of race */
 			TC0480SCP_tilemap_draw(bitmap,&hack_cliprect,layer[0],0,0);
 		draw_sprites(machine,bitmap,cliprect,1,44,-574);
 	} else {

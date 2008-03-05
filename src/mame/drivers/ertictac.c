@@ -42,7 +42,7 @@ static WRITE32_HANDLER(video_fifo_w)
 
 static READ32_HANDLER(IOCR_r)
 {
-	return (input_port_5_r(0)&0x80)|0x34;
+	return (input_port_5_r(machine,0)&0x80)|0x34;
 }
 
 static WRITE32_HANDLER(IOCR_w)

@@ -199,8 +199,8 @@ static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 
 static WRITE8_HANDLER( xain_sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 2,M6809_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 2,M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( xain_main_irq_w )
@@ -446,8 +446,8 @@ static const struct YM2203interface ym2203_interface =
 static MACHINE_START( xsleena )
 {
 	/* initialize the bank pointers */
-	xainCPUA_bankswitch_w(0,0);
-	xainCPUB_bankswitch_w(0,0);
+	xainCPUA_bankswitch_w(machine,0,0);
+	xainCPUB_bankswitch_w(machine,0,0);
 }
 
 

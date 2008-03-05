@@ -7,6 +7,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "ym2151.h"
 
@@ -165,7 +166,7 @@ typedef struct
 	UINT32		noise_tab[32];			/* 17bit Noise Generator periods */
 
 	void (*irqhandler)(int irq);		/* IRQ function handler */
-	write8_handler porthandler;		/* port write function handler */
+	write8_machine_func porthandler;		/* port write function handler */
 
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
 	unsigned int sampfreq;				/* sampling frequency in Hz (passed from 2151intf.c) */
@@ -1195,7 +1196,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 		case 0x1b:	/* CT2, CT1, LFO waveform */
 			chip->ct = v >> 6;
 			chip->lfo_wsel = v & 3;
-			if (chip->porthandler) (*chip->porthandler)(0 , chip->ct );
+			if (chip->porthandler) (*chip->porthandler)(Machine, 0 , chip->ct );
 			break;
 
 		default:
@@ -2497,7 +2498,7 @@ void YM2151SetIrqHandler(void *chip, void(*handler)(int irq))
 	PSG->irqhandler = handler;
 }
 
-void YM2151SetPortWriteHandler(void *chip, write8_handler handler)
+void YM2151SetPortWriteHandler(void *chip, write8_machine_func handler)
 {
 	YM2151 *PSG = chip;
 	PSG->porthandler = handler;

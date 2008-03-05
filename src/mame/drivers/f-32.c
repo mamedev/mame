@@ -20,27 +20,27 @@ static UINT32 *mosaicf2_videoram;
 
 static READ32_HANDLER( oki_32bit_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki_32bit_w )
 {
-	OKIM6295_data_0_w(0, data & 0xff);
+	OKIM6295_data_0_w(machine, 0, data & 0xff);
 }
 
 static READ32_HANDLER( ym2151_status_32bit_r )
 {
-	return YM2151_status_port_0_r(0);
+	return YM2151_status_port_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( ym2151_data_32bit_w )
 {
-	YM2151_data_port_0_w(0, data & 0xff);
+	YM2151_data_port_0_w(machine, 0, data & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register_32bit_w )
 {
-	YM2151_register_port_0_w(0,data & 0xff);
+	YM2151_register_port_0_w(machine,0,data & 0xff);
 }
 
 static READ32_HANDLER( eeprom_r )
@@ -98,7 +98,7 @@ static READ32_HANDLER( f32_input_port_1_r )
 	if ((activecpu_get_pc() == 0x000379de) ||
 	    (activecpu_get_pc() == 0x000379cc) ) activecpu_adjust_icount(-100);
 	//else printf("PC %08x\n", activecpu_get_pc() );
-	return input_port_1_dword_r(0, 0);
+	return input_port_1_dword_r(machine, 0, 0);
 }
 
 

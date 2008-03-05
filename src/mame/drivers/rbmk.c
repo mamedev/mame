@@ -88,7 +88,7 @@ static WRITE16_HANDLER( gms_write3 )
 
 static READ16_HANDLER( eeprom_r )
 {
-	return (EEPROM_read_bit() << 15)|(input_port_3_word_r(0,0)&0x7fff);
+	return (EEPROM_read_bit() << 15)|(input_port_3_word_r(machine,0,0)&0x7fff);
 }
 
 static WRITE16_HANDLER( eeprom_w )

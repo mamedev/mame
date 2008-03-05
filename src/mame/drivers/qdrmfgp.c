@@ -47,16 +47,15 @@ static INT32 gp2_irq_control;
 static READ16_HANDLER( i_port1_r )
 {
 	if (control & 0x0080)
-		return input_port_0_word_r(0,0);
+		return input_port_0_word_r(machine,0,0);
 	else
-		return input_port_1_word_r(0,0);
+		return input_port_1_word_r(machine,0,0);
 }
 
 static READ16_HANDLER( i_port2_r )
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
-
-	return (input_port_2_word_r(0,0) & 0xfffc) | 0x0003;
+	return (input_port_2_word_r(machine,0,0) & 0xfffc) | 0x0003;
 }
 
 
@@ -129,7 +128,7 @@ static WRITE16_HANDLER( gp2_control_w )
 static READ16_HANDLER( v_rom_r )
 {
 	UINT8 *mem8 = memory_region(REGION_GFX1);
-	int bank = K056832_word_r(0x34/2, 0xffff);
+	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
@@ -143,33 +142,33 @@ static READ16_HANDLER( v_rom_r )
 static READ16_HANDLER( gp2_vram_r )
 {
 	if (offset < 0x1000/2)
-		return K056832_ram_word_r(offset*2+1, mem_mask);
+		return K056832_ram_word_r(machine, offset*2+1, mem_mask);
 	else
-		return K056832_ram_word_r((offset-0x1000/2)*2, mem_mask);
+		return K056832_ram_word_r(machine, (offset-0x1000/2)*2, mem_mask);
 }
 
 static READ16_HANDLER( gp2_vram_mirror_r )
 {
 	if (offset < 0x1000/2)
-		return K056832_ram_word_r(offset*2, mem_mask);
+		return K056832_ram_word_r(machine, offset*2, mem_mask);
 	else
-		return K056832_ram_word_r((offset-0x1000/2)*2+1, mem_mask);
+		return K056832_ram_word_r(machine, (offset-0x1000/2)*2+1, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_w )
 {
 	if (offset < 0x1000/2)
-		K056832_ram_word_w(offset*2+1, data, mem_mask);
+		K056832_ram_word_w(machine, offset*2+1, data, mem_mask);
 	else
-		K056832_ram_word_w((offset-0x1000/2)*2, data, mem_mask);
+		K056832_ram_word_w(machine, (offset-0x1000/2)*2, data, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_mirror_w )
 {
 	if (offset < 0x1000/2)
-		K056832_ram_word_w(offset*2, data, mem_mask);
+		K056832_ram_word_w(machine, offset*2, data, mem_mask);
 	else
-		K056832_ram_word_w((offset-0x1000/2)*2+1, data, mem_mask);
+		K056832_ram_word_w(machine, (offset-0x1000/2)*2+1, data, mem_mask);
 }
 
 
@@ -196,7 +195,7 @@ static WRITE16_HANDLER( sndram_w )
 static READ16_HANDLER( k054539_word_r )
 {
 	if (ACCESSING_LSB16)
-		return K054539_0_r(offset);
+		return K054539_0_r(machine, offset);
 
 	return 0;
 }
@@ -204,7 +203,7 @@ static READ16_HANDLER( k054539_word_r )
 static WRITE16_HANDLER( k054539_word_w )
 {
 	if (ACCESSING_LSB16)
-		K054539_0_w(offset, data);
+		K054539_0_w(machine, offset, data);
 }
 
 /*************/
@@ -215,23 +214,23 @@ static WRITE16_HANDLER( k054539_word_w )
 static READ16_HANDLER( ide_std_r )
 {
 	if (offset & 0x01)
-		return ide_controller16_0_r(IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
+		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
 	else
-		return ide_controller16_0_r(IDE_STD_OFFSET + offset/2, 0x0000);
+		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x0000);
 }
 
 static WRITE16_HANDLER( ide_std_w )
 {
 	if (offset & 0x01)
-		ide_controller16_0_w(IDE_STD_OFFSET + offset/2, data << 8, 0x00ff);
+		ide_controller16_0_w(machine, IDE_STD_OFFSET + offset/2, data << 8, 0x00ff);
 	else
-		ide_controller16_0_w(IDE_STD_OFFSET + offset/2, data, 0x0000);
+		ide_controller16_0_w(machine, IDE_STD_OFFSET + offset/2, data, 0x0000);
 }
 
 static READ16_HANDLER( ide_alt_r )
 {
 	if (offset == 0)
-		return ide_controller16_0_r(IDE_ALT_OFFSET, 0xff00);
+		return ide_controller16_0_r(machine, IDE_ALT_OFFSET, 0xff00);
 
 	return 0;
 }
@@ -239,7 +238,7 @@ static READ16_HANDLER( ide_alt_r )
 static WRITE16_HANDLER( ide_alt_w )
 {
 	if (offset == 0)
-		ide_controller16_0_w(IDE_ALT_OFFSET, data, 0xff00);
+		ide_controller16_0_w(machine, IDE_ALT_OFFSET, data, 0xff00);
 }
 
 
@@ -261,9 +260,9 @@ static READ16_HANDLER( gp2_ide_std_r )
 					break;
 			}
 		}
-		return ide_controller16_0_r(IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
+		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
 	} else {
-		return ide_controller16_0_r(IDE_STD_OFFSET + offset/2, 0x0000);
+		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x0000);
 	}
 }
 

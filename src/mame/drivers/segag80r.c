@@ -201,11 +201,11 @@ static offs_t decrypt_offset(offs_t offset)
 }
 
 static WRITE8_HANDLER( mainram_w )         { mainram[decrypt_offset(offset)] = data; }
-static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(decrypt_offset(offset), data); }
-static WRITE8_HANDLER( monsterb_vidram_w ) { monsterb_videoram_w(decrypt_offset(offset), data); }
-static WRITE8_HANDLER( pignewt_vidram_w )  { pignewt_videoram_w(decrypt_offset(offset), data); }
-static WRITE8_HANDLER( sindbadm_vidram_w ) { sindbadm_videoram_w(decrypt_offset(offset), data); }
-static WRITE8_HANDLER( usb_ram_w )         { sega_usb_ram_w(decrypt_offset(offset), data); }
+static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(machine, decrypt_offset(offset), data); }
+static WRITE8_HANDLER( monsterb_vidram_w ) { monsterb_videoram_w(machine, decrypt_offset(offset), data); }
+static WRITE8_HANDLER( pignewt_vidram_w )  { pignewt_videoram_w(machine, decrypt_offset(offset), data); }
+static WRITE8_HANDLER( sindbadm_vidram_w ) { sindbadm_videoram_w(machine, decrypt_offset(offset), data); }
+static WRITE8_HANDLER( usb_ram_w )         { sega_usb_ram_w(machine, decrypt_offset(offset), data); }
 
 
 
@@ -302,8 +302,8 @@ static WRITE8_HANDLER( coin_count_w )
 
 static WRITE8_HANDLER( sindbadm_soundport_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
@@ -318,13 +318,13 @@ static WRITE8_HANDLER( sindbadm_misc_w )
 /* the data lines are flipped */
 static WRITE8_HANDLER( sindbadm_SN76496_0_w )
 {
-	SN76496_0_w(offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+	SN76496_0_w(machine, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
 
 static WRITE8_HANDLER( sindbadm_SN76496_1_w )
 {
-	SN76496_1_w(offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
+	SN76496_1_w(machine, offset, BITSWAP8(data, 0,1,2,3,4,5,6,7));
 }
 
 

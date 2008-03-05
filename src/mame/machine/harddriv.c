@@ -737,10 +737,10 @@ WRITE16_HANDLER( hdgsp_io_w )
 	}
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
-	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(offset, 0))
+	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(machine, offset, 0))
 		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
 
-	tms34010_io_register_w(offset, data, mem_mask);
+	tms34010_io_register_w(machine, offset, data, mem_mask);
 }
 
 

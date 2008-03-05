@@ -46,8 +46,8 @@ static int adpcm_pos[2],adpcm_end[2],adpcm_idle[2];
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( spd_adpcm_w )

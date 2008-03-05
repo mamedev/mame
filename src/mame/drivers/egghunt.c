@@ -173,8 +173,8 @@ static WRITE8_HANDLER( egghunt_vidram_bank_w )
 
 static WRITE8_HANDLER( egghunt_soundlatch_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 static READ8_HANDLER( egghunt_okibanking_r )

@@ -228,7 +228,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* BANG */
-			rallyx_bang_w(0,bit);
+			rallyx_bang_w(machine,0,bit);
 			break;
 
 		case 0x01:	/* INT ON */
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* SOUNDON */
-			timeplt_sh_irqtrigger_w(0,bit);
+			timeplt_sh_irqtrigger_w(machine,0,bit);
 			break;
 
 		case 0x01:	/* INTST */
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x07:	/* STARSON */
-			tactcian_starson_w(offset,bit);
+			tactcian_starson_w(machine,offset,bit);
 			break;
 	}
 }

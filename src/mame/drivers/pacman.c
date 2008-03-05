@@ -522,11 +522,11 @@ static WRITE8_HANDLER( alibaba_sound_w )
 	/* since the sound region in Ali Baba is not contiguous, translate the
        offset into the 0-0x1f range */
  	if (offset < 0x10)
-		pacman_sound_w(offset, data);
+		pacman_sound_w(machine, offset, data);
 	else if (offset < 0x20)
 		spriteram_2[offset - 0x10] = data;
 	else
-		pacman_sound_w(offset - 0x10, data);
+		pacman_sound_w(machine, offset - 0x10, data);
 }
 
 
@@ -557,7 +557,7 @@ static READ8_HANDLER( alibaba_mystery_2_r )
 
 static READ8_HANDLER( maketrax_special_port2_r )
 {
-	int data = input_port_2_r(offset);
+	int data = input_port_2_r(machine,offset);
 	int pc = activecpu_get_previouspc();
 
 	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
@@ -600,7 +600,7 @@ static READ8_HANDLER( maketrax_special_port3_r )
 
 static READ8_HANDLER( korosuke_special_port2_r )
 {
-	int data = input_port_2_r(offset);
+	int data = input_port_2_r(machine,offset);
 	int pc = activecpu_get_previouspc();
 
 	if ((pc == 0x196e) || (pc == 0x2387)) return data | 0x40;

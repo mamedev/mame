@@ -68,7 +68,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 8  is EEPROM data */
 	/* bit 9  is EEPROM ready */
 	/* bit 10 is service button */
-	res = (EEPROM_read_bit()<<8) | input_port_1_word_r(0,0);
+	res = (EEPROM_read_bit()<<8) | input_port_1_word_r(machine,0,0);
 
 	if (init_eeprom_count)
 	{
@@ -117,7 +117,7 @@ static INTERRUPT_GEN( asterix_interrupt )
 
 static READ16_HANDLER( asterix_sound_r )
 {
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine,2 + offset);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -127,13 +127,13 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(5), NULL,0,nmi_callback);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 // Check the routine at 7f30 in the ead version.

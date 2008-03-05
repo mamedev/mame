@@ -80,8 +80,8 @@ static WRITE8_HANDLER ( funybubl_cpurombank_w )
 
 static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1,0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( funybubl_oki_bank_sw )

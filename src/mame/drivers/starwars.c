@@ -61,7 +61,7 @@ static MACHINE_RESET( starwars )
 		memcpy(slapstic_base, &slapstic_source[current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
-		starwars_out_w(4, 0);
+		starwars_out_w(machine, 4, 0);
 	}
 
 	/* reset the matrix processor */
@@ -136,7 +136,7 @@ static OPBASE_HANDLER( esb_setopbase )
 	/* if we're jumping into the slapstic region, tweak the new PC */
 	if ((address & 0xe000) == 0x8000)
 	{
-		esb_slapstic_r(address & 0x1fff);
+		esb_slapstic_r(machine, address & 0x1fff);
 
 		/* make sure we catch the next branch as well */
 		catch_nextBranch();
@@ -147,7 +147,7 @@ static OPBASE_HANDLER( esb_setopbase )
 	else if ((prevpc & 0xe000) == 0x8000)
 	{
 		if (prevpc != 0x8080 && prevpc != 0x8090 && prevpc != 0x80a0 && prevpc != 0x80b0)
-			esb_slapstic_r(prevpc & 0x1fff);
+			esb_slapstic_r(machine, prevpc & 0x1fff);
 	}
 
 	return address;

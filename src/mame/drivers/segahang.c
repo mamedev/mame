@@ -138,7 +138,7 @@ static INTERRUPT_GEN( hangon_irq )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	ppi8255_0_w(param >> 8, param & 0xff);
+	ppi8255_0_w(machine, param >> 8, param & 0xff);
 }
 
 
@@ -147,20 +147,20 @@ static READ16_HANDLER( hangon_io_r )
 	switch (offset & 0x3020/2)
 	{
 		case 0x0000/2: /* PPI @ 4B */
-			return ppi8255_0_r(offset & 3);
+			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x1000/2: /* Input ports and DIP switches */
 			return readinputport(offset & 3);
 
 		case 0x3000/2: /* PPI @ 4C */
-			return ppi8255_1_r(offset & 3);
+			return ppi8255_1_r(machine, offset & 3);
 
 		case 0x3020/2: /* ADC0804 data output */
 			return readinputport(4 + adc_select);
 	}
 
 	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -176,7 +176,7 @@ static WRITE16_HANDLER( hangon_io_w )
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
-				ppi8255_1_w(offset & 3, data & 0xff);
+				ppi8255_1_w(machine, offset & 3, data & 0xff);
 				return;
 
 			case 0x3020/2: /* ADC0804 */
@@ -192,21 +192,21 @@ static READ16_HANDLER( sharrier_io_r )
 	switch (offset & 0x0030/2)
 	{
 		case 0x0000/2:
-			return ppi8255_0_r(offset & 3);
+			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x0010/2: /* Input ports and DIP switches */
 			return readinputport(offset & 3);
 
 		case 0x0020/2: /* PPI @ 4C */
 			if (offset == 2) return 0;
-			return ppi8255_1_r(offset & 3);
+			return ppi8255_1_r(machine, offset & 3);
 
 		case 0x0030/2: /* ADC0804 data output */
 			return readinputport(4 + adc_select);
 	}
 
 	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -222,7 +222,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
-				ppi8255_1_w(offset & 3, data & 0xff);
+				ppi8255_1_w(machine, offset & 3, data & 0xff);
 				return;
 
 			case 0x0030/2: /* ADC0804 */
@@ -347,7 +347,7 @@ static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
 	ppi8255_set_portC(0, 0x00);
-	return soundlatch_r(offset);
+	return soundlatch_r(machine, offset);
 }
 
 

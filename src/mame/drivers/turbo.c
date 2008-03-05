@@ -639,7 +639,7 @@ static READ8_HANDLER( buckrog_port_3_r )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-    ppi8255_0_w(param >> 8, param & 0xff);
+    ppi8255_0_w(machine, param >> 8, param & 0xff);
 }
 
 

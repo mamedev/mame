@@ -351,5 +351,5 @@ VIDEO_UPDATE( armedf )
 
 VIDEO_EOF( armedf )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }

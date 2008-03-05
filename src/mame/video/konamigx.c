@@ -420,7 +420,7 @@ WRITE32_HANDLER( konamigx_palette_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE32_HANDLER( konamigx_palette2_w )
@@ -437,7 +437,7 @@ WRITE32_HANDLER( konamigx_palette2_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 // main monitor for type 3
@@ -447,9 +447,9 @@ WRITE32_HANDLER( konamigx_555_palette_w )
 
 	paletteram16 = (UINT16 *)paletteram32;
 	if (ACCESSING_MSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2, data >> 16, mem_mask >> 16);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_LSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2+1, data, mem_mask);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 // sub monitor for type 3
@@ -463,9 +463,9 @@ WRITE32_HANDLER( konamigx_555_palette2_w )
 
 	paletteram16 = (UINT16 *)paletteram32;
 	if (ACCESSING_MSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2, data >> 16, mem_mask >> 16);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_LSW32)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(offset*2+1, data, mem_mask);
+		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 WRITE32_HANDLER( konamigx_tilebank_w )

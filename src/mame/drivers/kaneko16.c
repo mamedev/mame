@@ -272,8 +272,8 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 {
 	if (ACCESSING_MSB)
 	{
-		soundlatch_w(0, (data & 0xff00) >> 8 );
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine, 0, (data & 0xff00) >> 8 );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -282,31 +282,31 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 static READ16_HANDLER( kaneko16_YM2149_0_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_0_w(0,offset);
-	return AY8910_read_port_0_r(0);
+	AY8910_control_port_0_w(machine,0,offset);
+	return AY8910_read_port_0_r(machine,0);
 }
 static READ16_HANDLER( kaneko16_YM2149_1_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_1_w(0,offset);
-	return AY8910_read_port_1_r(0);
+	AY8910_control_port_1_w(machine,0,offset);
+	return AY8910_read_port_1_r(machine,0);
 }
 
 static WRITE16_HANDLER( kaneko16_YM2149_0_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_0_w(0,offset);
+	AY8910_control_port_0_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_LSB)	AY8910_write_port_0_w(0, data       & 0xff);
-	else				AY8910_write_port_0_w(0,(data >> 8) & 0xff);
+	if (ACCESSING_LSB)	AY8910_write_port_0_w(machine,0, data       & 0xff);
+	else				AY8910_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_1_w(0,offset);
+	AY8910_control_port_1_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_LSB)	AY8910_write_port_1_w(0, data       & 0xff);
-	else				AY8910_write_port_1_w(0,(data >> 8) & 0xff);
+	if (ACCESSING_LSB)	AY8910_write_port_1_w(machine,0, data       & 0xff);
+	else				AY8910_write_port_1_w(machine,0,(data >> 8) & 0xff);
 }
 
 
@@ -631,7 +631,7 @@ static WRITE16_HANDLER( gtmr_oki_0_data_w )
 {
 	if (ACCESSING_LSB)
 	{
-		OKIM6295_data_0_w(0,data);
+		OKIM6295_data_0_w(machine,0,data);
 //      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",activecpu_get_pc(),data);
 	}
 }
@@ -640,7 +640,7 @@ static WRITE16_HANDLER( gtmr_oki_1_data_w )
 {
 	if (ACCESSING_LSB)
 	{
-		OKIM6295_data_1_w(0,data);
+		OKIM6295_data_1_w(machine,0,data);
 //      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",activecpu_get_pc(),data);
 	}
 }

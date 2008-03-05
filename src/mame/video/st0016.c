@@ -196,7 +196,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 			if( srcadr < (memory_region_length(REGION_CPU1)-0x10000) && (dstadr < ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE))
 			{
 				st0016_char_bank=dstadr>>5;
-				st0016_character_ram_w(dstadr&0x1f,memory_region(REGION_CPU1)[0x10000+srcadr]);
+				st0016_character_ram_w(machine,dstadr&0x1f,memory_region(REGION_CPU1)[0x10000+srcadr]);
 				srcadr++;
 				dstadr++;
 				length--;
@@ -421,7 +421,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static void st0016_postload(void)
 {
 	int i;
-	st0016_rom_bank_w(0,st0016_rom_bank);
+	st0016_rom_bank_w(Machine,0,st0016_rom_bank);
 	for(i=0;i<ST0016_MAX_CHAR_BANK;i++)
 		decodechar(Machine->gfx[st0016_ramgfx], i,(UINT8 *) st0016_charram);
 }

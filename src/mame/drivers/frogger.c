@@ -43,22 +43,22 @@ GFXDECODE_END
 
 static READ8_HANDLER(frogger_ppi8255_0_r)
 {
-	return ppi8255_0_r(offset >> 1);
+	return ppi8255_0_r(machine, offset >> 1);
 }
 
 static READ8_HANDLER(frogger_ppi8255_1_r)
 {
-	return ppi8255_1_r(offset >> 1);
+	return ppi8255_1_r(machine, offset >> 1);
 }
 
 static WRITE8_HANDLER(frogger_ppi8255_0_w)
 {
-	ppi8255_0_w(offset >> 1, data);
+	ppi8255_0_w(machine, offset >> 1, data);
 }
 
 static WRITE8_HANDLER(frogger_ppi8255_1_w)
 {
-	ppi8255_1_w(offset >> 1, data);
+	ppi8255_1_w(machine, offset >> 1, data);
 }
 
 

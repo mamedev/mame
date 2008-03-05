@@ -93,6 +93,7 @@ typedef UINT32 (*video_update_func)(running_machine *machine, int screen, bitmap
 
 #include "cpuintrf.h"
 #include "sndintrf.h"
+#include "devintrf.h"
 #include "fileio.h"
 #include "drawgfx.h"
 #include "emupal.h"

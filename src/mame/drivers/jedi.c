@@ -210,7 +210,7 @@ static WRITE8_HANDLER( rom_banksel_w )
 
 static READ8_HANDLER( a2d_data_r )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 	UINT8 ret = 0;
 
 	switch (state->a2d_select)
@@ -225,7 +225,7 @@ static READ8_HANDLER( a2d_data_r )
 
 static WRITE8_HANDLER( a2d_select_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->a2d_select = offset;
 }
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( jedi_coin_counter_w )
 
 static WRITE8_HANDLER( nvram_data_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	if (state->nvram_enabled)
 		generic_nvram[offset] = data;
@@ -255,7 +255,7 @@ static WRITE8_HANDLER( nvram_data_w )
 
 static WRITE8_HANDLER( nvram_enable_w )
 {
-	jedi_state *state = Machine->driver_data;
+	jedi_state *state = machine->driver_data;
 
 	state->nvram_enabled = ~offset & 1;
 }

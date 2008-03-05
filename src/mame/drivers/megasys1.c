@@ -274,11 +274,11 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return coins_r(0,0);	break;
-			case 1 :	return player1_r(0,0);	break;
-			case 2 :	return player2_r(0,0);	break;
-			case 3 :	return dsw1_r(0,0);		break;
-			case 4 :	return dsw2_r(0,0);		break;
+			case 0 :	return coins_r(machine,0,0);	break;
+			case 1 :	return player1_r(machine,0,0);	break;
+			case 2 :	return player2_r(machine,0,0);	break;
+			case 3 :	return dsw1_r(machine,0,0);		break;
+			case 4 :	return dsw2_r(machine,0,0);		break;
 			default	 :	return 0x0006;
 	}
 }
@@ -467,7 +467,7 @@ static READ16_HANDLER( oki_status_0_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return OKIM6295_status_0_lsb_r(offset,mem_mask);
+		return OKIM6295_status_0_lsb_r(machine,offset,mem_mask);
 }
 
 static READ16_HANDLER( oki_status_1_r )
@@ -475,7 +475,7 @@ static READ16_HANDLER( oki_status_1_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return OKIM6295_status_1_lsb_r(offset,mem_mask);
+		return OKIM6295_status_1_lsb_r(machine,offset,mem_mask);
 }
 
 /***************************************************************************
@@ -2931,8 +2931,8 @@ static READ16_HANDLER( protection_peekaboo_r )
 	switch (protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return player1_r(0,0);
-		case 0x52:	return player2_r(0,0);
+		case 0x51:	return player1_r(machine,0,0);
+		case 0x52:	return player2_r(machine,0,0);
 		default:	return protection_val;
 	}
 }
@@ -3859,13 +3859,13 @@ static DRIVER_INIT( iganinju )
 
 static WRITE16_HANDLER( OKIM6295_data_0_both_w )
 {
-	if (ACCESSING_LSB)	OKIM6295_data_0_w(0, (data >> 0) & 0xff );
-	else				OKIM6295_data_0_w(0, (data >> 8) & 0xff );
+	if (ACCESSING_LSB)	OKIM6295_data_0_w(machine, 0, (data >> 0) & 0xff );
+	else				OKIM6295_data_0_w(machine, 0, (data >> 8) & 0xff );
 }
 static WRITE16_HANDLER( OKIM6295_data_1_both_w )
 {
-	if (ACCESSING_LSB)	OKIM6295_data_1_w(0, (data >> 0) & 0xff );
-	else				OKIM6295_data_1_w(0, (data >> 8) & 0xff );
+	if (ACCESSING_LSB)	OKIM6295_data_1_w(machine, 0, (data >> 0) & 0xff );
+	else				OKIM6295_data_1_w(machine, 0, (data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )

@@ -273,11 +273,11 @@ static VIDEO_UPDATE( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
-	supertnk_bankswitch_0_w(0, 0);
-	supertnk_bankswitch_1_w(0, 0);
+	supertnk_bankswitch_0_w(machine, 0, 0);
+	supertnk_bankswitch_1_w(machine, 0, 0);
 
-	supertnk_bitplane_select_0_w(0, 0);
-	supertnk_bitplane_select_1_w(0, 0);
+	supertnk_bitplane_select_0_w(machine, 0, 0);
+	supertnk_bitplane_select_1_w(machine, 0, 0);
 }
 
 

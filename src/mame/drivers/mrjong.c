@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( io_0x00_w )
 {
-	mrjong_flipscreen_w(0, ((data & 0x04) > 2));
+	mrjong_flipscreen_w(machine, 0, ((data & 0x04) > 2));
 }
 
 static READ8_HANDLER( io_0x03_r )

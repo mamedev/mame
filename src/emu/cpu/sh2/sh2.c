@@ -189,7 +189,7 @@ static TIMER_CALLBACK( sh2_timer_callback );
 INLINE UINT8 RB(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r((A & 0x1fc)>>2, ~(0xff << (((~A) & 3)*8))) >> (((~A) & 3)*8);
+		return sh2_internal_r(Machine, (A & 0x1fc)>>2, ~(0xff << (((~A) & 3)*8))) >> (((~A) & 3)*8);
 
 	if (A >= 0xc0000000)
 		return program_read_byte_32be(A);
@@ -203,7 +203,7 @@ INLINE UINT8 RB(offs_t A)
 INLINE UINT16 RW(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r((A & 0x1fc)>>2, ~(0xffff << (((~A) & 2)*8))) >> (((~A) & 2)*8);
+		return sh2_internal_r(Machine, (A & 0x1fc)>>2, ~(0xffff << (((~A) & 2)*8))) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
 		return program_read_word_32be(A);
@@ -217,7 +217,7 @@ INLINE UINT16 RW(offs_t A)
 INLINE UINT32 RL(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r((A & 0x1fc)>>2, 0);
+		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0);
 
 	if (A >= 0xc0000000)
 		return program_read_dword_32be(A);
@@ -233,7 +233,7 @@ INLINE void WB(offs_t A, UINT8 V)
 
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w((A & 0x1fc)>>2, V << (((~A) & 3)*8), ~(0xff << (((~A) & 3)*8)));
+		sh2_internal_w(Machine, (A & 0x1fc)>>2, V << (((~A) & 3)*8), ~(0xff << (((~A) & 3)*8)));
 		return;
 	}
 
@@ -253,7 +253,7 @@ INLINE void WW(offs_t A, UINT16 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w((A & 0x1fc)>>2, V << (((~A) & 2)*8), ~(0xffff << (((~A) & 2)*8)));
+		sh2_internal_w(Machine, (A & 0x1fc)>>2, V << (((~A) & 2)*8), ~(0xffff << (((~A) & 2)*8)));
 		return;
 	}
 
@@ -273,7 +273,7 @@ INLINE void WL(offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w((A & 0x1fc)>>2, V, 0);
+		sh2_internal_w(Machine, (A & 0x1fc)>>2, V, 0);
 		return;
 	}
 

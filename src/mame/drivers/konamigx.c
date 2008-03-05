@@ -919,12 +919,12 @@ static READ32_HANDLER( players_r )
 
 static READ32_HANDLER( gx5bppspr_r )
 {
-	return (K055673_rom_word_r(offset*2+1, 0xffff) | K055673_rom_word_r(offset*2, 0xffff)<<16);
+	return (K055673_rom_word_r(machine, offset*2+1, 0xffff) | K055673_rom_word_r(machine, offset*2, 0xffff)<<16);
 }
 
 static READ32_HANDLER( gx6bppspr_r )
 {
-	return (K055673_GX6bpp_rom_word_r(offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(offset*2, 0xffff)<<16);
+	return (K055673_GX6bpp_rom_word_r(machine, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(machine, offset*2, 0xffff)<<16);
 }
 
 static READ32_HANDLER( type1_roz_r1 )
@@ -1208,9 +1208,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_LSB16)
-		ret |= K054539_1_r(offset);
+		ret |= K054539_1_r(machine, offset);
 	if (ACCESSING_MSB16)
-		ret |= K054539_0_r(offset)<<8;
+		ret |= K054539_0_r(machine, offset)<<8;
 
 	return ret;
 }
@@ -1218,9 +1218,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_LSB16)
-		K054539_1_w(offset, data);
+		K054539_1_w(machine, offset, data);
 	if (ACCESSING_MSB16)
-		K054539_0_w(offset, data>>8);
+		K054539_0_w(machine, offset, data>>8);
 }
 
 static READ16_HANDLER( sndcomm68k_r )

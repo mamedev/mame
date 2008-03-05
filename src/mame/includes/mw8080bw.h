@@ -93,7 +93,7 @@ WRITE8_HANDLER( zzzap_audio_1_w );
 WRITE8_HANDLER( zzzap_audio_2_w );
 
 MACHINE_DRIVER_EXTERN( maze_audio );
-void maze_write_discrete(UINT8 maze_tone_timing_state);
+void maze_write_discrete(running_machine *machine, UINT8 maze_tone_timing_state);
 
 MACHINE_DRIVER_EXTERN( boothill_audio );
 WRITE8_HANDLER( boothill_audio_w );

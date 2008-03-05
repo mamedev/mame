@@ -18,18 +18,18 @@ static int width = 0;
 MACHINE_RESET( skydiver )
 {
 	/* reset all latches */
-	skydiver_start_lamp_1_w(0, 0);
-	skydiver_start_lamp_2_w(0, 0);
-	skydiver_lamp_s_w(0, 0);
-	skydiver_lamp_k_w(0, 0);
-	skydiver_lamp_y_w(0, 0);
-	skydiver_lamp_d_w(0, 0);
+	skydiver_start_lamp_1_w(machine, 0, 0);
+	skydiver_start_lamp_2_w(machine, 0, 0);
+	skydiver_lamp_s_w(machine, 0, 0);
+	skydiver_lamp_k_w(machine, 0, 0);
+	skydiver_lamp_y_w(machine, 0, 0);
+	skydiver_lamp_d_w(machine, 0, 0);
 	output_set_value("lampi", 0);
 	output_set_value("lampv", 0);
 	output_set_value("lampe", 0);
 	output_set_value("lampr", 0);
-	skydiver_width_w(0, 0);
-	skydiver_coin_lockout_w(0, 0);
+	skydiver_width_w(machine, 0, 0);
+	skydiver_coin_lockout_w(machine, 0, 0);
 }
 
 
@@ -130,7 +130,7 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
 {
 	int bit = offset & 0x01;
 
-	watchdog_reset_w(0,0);
+	watchdog_reset_w(machine,0,0);
 
 	switch (offset & 0x0e)
 	{
@@ -147,13 +147,13 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
 			output_set_value("lampr", bit);
 			break;
 		case (0x0a):
-			discrete_sound_w(SKYDIVER_OCT1_EN, bit);
+			discrete_sound_w(machine, SKYDIVER_OCT1_EN, bit);
 			break;
 		case (0x0c):
-			discrete_sound_w(SKYDIVER_OCT2_EN, bit);
+			discrete_sound_w(machine, SKYDIVER_OCT2_EN, bit);
 			break;
 		case (0x0e):
-			discrete_sound_w(SKYDIVER_NOISE_RST, bit);
+			discrete_sound_w(machine, SKYDIVER_NOISE_RST, bit);
 			break;
 	}
 }

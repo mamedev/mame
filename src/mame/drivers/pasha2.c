@@ -141,8 +141,8 @@ static WRITE16_HANDLER( bitmap_1_w )
 	switch(mem_mask)
 	{
 		case 0:
-			bitmap_1_w(offset,data,0x00ff);
-			bitmap_1_w(offset,data,0xff00);
+			bitmap_1_w(machine,offset,data,0x00ff);
+			bitmap_1_w(machine,offset,data,0xff00);
 			return;
 
 		case 0x00ff:
@@ -162,7 +162,7 @@ static WRITE16_HANDLER( bitmap_1_w )
 static READ16_HANDLER( oki_0_r )
 {
 	if(offset)
-		return OKIM6295_status_0_r(0);
+		return OKIM6295_status_0_r(machine, 0);
 	else
 		return 0;
 }
@@ -170,19 +170,19 @@ static READ16_HANDLER( oki_0_r )
 static WRITE16_HANDLER( oki_0_w )
 {
 	if(offset)
-		OKIM6295_data_0_w(0, data);
+		OKIM6295_data_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( oki_1_w )
 {
 	if(offset)
-		OKIM6295_data_1_w(0, data);
+		OKIM6295_data_1_w(machine, 0, data);
 }
 
 static READ16_HANDLER( oki_1_r )
 {
 	if(offset)
-		return OKIM6295_status_1_r(0);
+		return OKIM6295_status_1_r(machine, 0);
 	else
 		return 0;
 }

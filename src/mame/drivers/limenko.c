@@ -94,7 +94,7 @@ static WRITE32_HANDLER( fg_videoram_w )
 
 static WRITE32_HANDLER( spotty_soundlatch_w )
 {
-	soundlatch_w(0, (data >> 16) & 0xff);
+	soundlatch_w(machine, 0, (data >> 16) & 0xff);
 }
 
 /*****************************************************************************************************

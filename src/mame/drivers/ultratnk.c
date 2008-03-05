@@ -133,19 +133,19 @@ static WRITE8_HANDLER( ultratnk_lockout_w )
 
 static WRITE8_HANDLER( ultratnk_fire_1_w )
 {
-	discrete_sound_w(ULTRATNK_FIRE_EN_1, offset & 1);
+	discrete_sound_w(machine, ULTRATNK_FIRE_EN_1, offset & 1);
 }
 static WRITE8_HANDLER( ultratnk_fire_2_w )
 {
-	discrete_sound_w(ULTRATNK_FIRE_EN_2, offset & 1);
+	discrete_sound_w(machine, ULTRATNK_FIRE_EN_2, offset & 1);
 }
 static WRITE8_HANDLER( ultratnk_attract_w )
 {
-	discrete_sound_w(ULTRATNK_ATTRACT_EN, data & 1);
+	discrete_sound_w(machine, ULTRATNK_ATTRACT_EN, data & 1);
 }
 static WRITE8_HANDLER( ultratnk_explosion_w )
 {
-	discrete_sound_w(ULTRATNK_EXPLOSION_DATA, data & 15);
+	discrete_sound_w(machine, ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 

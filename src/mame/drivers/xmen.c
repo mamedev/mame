@@ -76,7 +76,7 @@ logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (EEPROM_read_bit() << 6) | input_port_2_word_r(0,0);
+	res = (EEPROM_read_bit() << 6) | input_port_2_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -93,7 +93,7 @@ logerror("%06x xmen6p_eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (EEPROM_read_bit() << 6) | input_port_2_word_r(0,0);
+	res = (EEPROM_read_bit() << 6) | input_port_2_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -129,20 +129,20 @@ logerror("%06x: write %04x to 108000\n",activecpu_get_pc(),data);
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch2_r(0);
+	return soundlatch2_r(machine,0);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
 	if (ACCESSING_LSB) {
 		data &= 0xff;
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 //int xmen_irqenabled;
@@ -151,7 +151,7 @@ static WRITE16_HANDLER( xmen_18fa00_w )
 {
 	if(ACCESSING_LSB) {
 		/* bit 2 is interrupt enable */
-		interrupt_enable_w(0,data & 0x04);
+		interrupt_enable_w(machine,0,data & 0x04);
 	//  xmen_irqenabled = data;
 	}
 }

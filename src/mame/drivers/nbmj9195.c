@@ -86,19 +86,19 @@ static void nbmj9195_soundbank_w(int data)
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static int nbmj9195_sound_r(int offset)
+static int nbmj9195_sound_r(running_machine *machine, int offset)
 {
-	return soundlatch_r(0);
+	return soundlatch_r(machine, 0);
 }
 
 static WRITE8_HANDLER( nbmj9195_sound_w )
 {
-	soundlatch_w(0, data);
+	soundlatch_w(machine, 0, data);
 }
 
-static void nbmj9195_soundclr_w(int offset, int data)
+static void nbmj9195_soundclr_w(running_machine *machine, int offset, int data)
 {
-	soundlatch_clear_w(0, 0);
+	soundlatch_clear_w(machine, 0, 0);
 }
 
 static void nbmj9195_outcoin_flag_w(int data)
@@ -169,7 +169,7 @@ static READ8_HANDLER( mscoutm_dipsw_1_r )
 
 static UINT8 pio_dir[5 * 2], pio_latch[5 * 2];
 
-static int tmpz84c011_pio_r(int offset)
+static int tmpz84c011_pio_r(running_machine *machine, int offset)
 {
 	int portdata;
 
@@ -249,7 +249,7 @@ static int tmpz84c011_pio_r(int offset)
 				portdata = 0xff;
 				break;
 			case 8:			/* PD_1 */
-				portdata = nbmj9195_sound_r(0);
+				portdata = nbmj9195_sound_r(machine, 0);
 				break;
 			case 9:			/* PE_1 */
 				portdata = 0xff;
@@ -334,7 +334,7 @@ static int tmpz84c011_pio_r(int offset)
 				portdata = 0xff;
 				break;
 			case 8:			/* PD_1 */
-				portdata = nbmj9195_sound_r(0);
+				portdata = nbmj9195_sound_r(machine, 0);
 				break;
 			case 9:			/* PE_1 */
 				portdata = 0xff;
@@ -350,7 +350,7 @@ static int tmpz84c011_pio_r(int offset)
 	return portdata;
 }
 
-static void tmpz84c011_pio_w(int offset, int data)
+static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 {
 	if ((!strcmp(Machine->gamedrv->name, "imekura")) ||
 		(!strcmp(Machine->gamedrv->name, "mscoutm")) ||
@@ -377,15 +377,15 @@ static void tmpz84c011_pio_w(int offset, int data)
 				nbmj9195_soundbank_w(data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_1_WRITE(0, data);
+				DAC_1_WRITE(machine, 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_0_WRITE(0, data);
+				DAC_0_WRITE(machine, 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
 			case 9:			/* PE_1 */
-				if (!(data & 0x01)) nbmj9195_soundclr_w(0, 0);
+				if (!(data & 0x01)) nbmj9195_soundclr_w(machine, 0, 0);
 				break;
 
 			default:
@@ -415,15 +415,15 @@ static void tmpz84c011_pio_w(int offset, int data)
 				nbmj9195_soundbank_w(data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_1_WRITE(0, data);
+				DAC_1_WRITE(machine, 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_0_WRITE(0, data);
+				DAC_0_WRITE(machine, 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
 			case 9:			/* PE_1 */
-				if (!(data & 0x01)) nbmj9195_soundclr_w(0, 0);
+				if (!(data & 0x01)) nbmj9195_soundclr_w(machine, 0, 0);
 				break;
 
 			default:
@@ -437,17 +437,17 @@ static void tmpz84c011_pio_w(int offset, int data)
 /* CPU interface */
 
 /* device 0 */
-static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
-static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
-static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
-static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
-static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
+static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(machine,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
+static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(machine,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
+static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(machine,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
+static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(machine,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
+static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(machine,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(0, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(1, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(2, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(3, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(4, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(machine, 0, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(machine, 1, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(machine, 2, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(machine, 3, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(machine, 4, data); }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )	{ return pio_dir[0]; }
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )	{ return pio_dir[1]; }
@@ -462,17 +462,17 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )	{ pio_dir[3] = data; }
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )	{ pio_dir[4] = data; }
 
 /* device 1 */
-static READ8_HANDLER( tmpz84c011_1_pa_r )	{ return (tmpz84c011_pio_r(5) & ~pio_dir[5]) | (pio_latch[5] & pio_dir[5]); }
-static READ8_HANDLER( tmpz84c011_1_pb_r )	{ return (tmpz84c011_pio_r(6) & ~pio_dir[6]) | (pio_latch[6] & pio_dir[6]); }
-static READ8_HANDLER( tmpz84c011_1_pc_r )	{ return (tmpz84c011_pio_r(7) & ~pio_dir[7]) | (pio_latch[7] & pio_dir[7]); }
-static READ8_HANDLER( tmpz84c011_1_pd_r )	{ return (tmpz84c011_pio_r(8) & ~pio_dir[8]) | (pio_latch[8] & pio_dir[8]); }
-static READ8_HANDLER( tmpz84c011_1_pe_r )	{ return (tmpz84c011_pio_r(9) & ~pio_dir[9]) | (pio_latch[9] & pio_dir[9]); }
+static READ8_HANDLER( tmpz84c011_1_pa_r )	{ return (tmpz84c011_pio_r(machine,5) & ~pio_dir[5]) | (pio_latch[5] & pio_dir[5]); }
+static READ8_HANDLER( tmpz84c011_1_pb_r )	{ return (tmpz84c011_pio_r(machine,6) & ~pio_dir[6]) | (pio_latch[6] & pio_dir[6]); }
+static READ8_HANDLER( tmpz84c011_1_pc_r )	{ return (tmpz84c011_pio_r(machine,7) & ~pio_dir[7]) | (pio_latch[7] & pio_dir[7]); }
+static READ8_HANDLER( tmpz84c011_1_pd_r )	{ return (tmpz84c011_pio_r(machine,8) & ~pio_dir[8]) | (pio_latch[8] & pio_dir[8]); }
+static READ8_HANDLER( tmpz84c011_1_pe_r )	{ return (tmpz84c011_pio_r(machine,9) & ~pio_dir[9]) | (pio_latch[9] & pio_dir[9]); }
 
-static WRITE8_HANDLER( tmpz84c011_1_pa_w )	{ pio_latch[5] = data; tmpz84c011_pio_w(5, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pb_w )	{ pio_latch[6] = data; tmpz84c011_pio_w(6, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pc_w )	{ pio_latch[7] = data; tmpz84c011_pio_w(7, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pd_w )	{ pio_latch[8] = data; tmpz84c011_pio_w(8, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pe_w )	{ pio_latch[9] = data; tmpz84c011_pio_w(9, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pa_w )	{ pio_latch[5] = data; tmpz84c011_pio_w(machine, 5, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pb_w )	{ pio_latch[6] = data; tmpz84c011_pio_w(machine, 6, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pc_w )	{ pio_latch[7] = data; tmpz84c011_pio_w(machine, 7, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pd_w )	{ pio_latch[8] = data; tmpz84c011_pio_w(machine, 8, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pe_w )	{ pio_latch[9] = data; tmpz84c011_pio_w(machine, 9, data); }
 
 static READ8_HANDLER( tmpz84c011_1_dir_pa_r )	{ return pio_dir[5]; }
 static READ8_HANDLER( tmpz84c011_1_dir_pb_r )	{ return pio_dir[6]; }
@@ -500,8 +500,8 @@ static void ctc1_interrupt(int state)
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
-	z80ctc_0_trg1_w(0, 1);
-	z80ctc_0_trg1_w(0, 0);
+	z80ctc_0_trg1_w(machine, 0, 1);
+	z80ctc_0_trg1_w(machine, 0, 0);
 }
 
 static z80ctc_interface ctc_intf_1 =
@@ -541,7 +541,7 @@ static MACHINE_RESET( sailorws )
 	for (i = 0; i < (5 * 2); i++)
 	{
 		pio_dir[i] = pio_latch[i] = 0;
-		tmpz84c011_pio_w(i, 0);
+		tmpz84c011_pio_w(machine, i, 0);
 	}
 }
 

@@ -328,35 +328,35 @@ static INTERRUPT_GEN( sbm_interrupt )//5
 
 static READ16_HANDLER( tracky1_hi_r )
 {
-	return input_port_5_word_r(0,0);
+	return input_port_5_word_r(machine,0,0);
 }
 static READ16_HANDLER( tracky1_lo_r )
 {
-	return (input_port_5_word_r(0,0) & 0xff) <<8;
+	return (input_port_5_word_r(machine,0,0) & 0xff) <<8;
 }
 static READ16_HANDLER( trackx1_hi_r )
 {
-	return input_port_6_word_r(0,0);
+	return input_port_6_word_r(machine,0,0);
 }
 static READ16_HANDLER( trackx1_lo_r )
 {
-	return (input_port_6_word_r(0,0) & 0xff) <<8;
+	return (input_port_6_word_r(machine,0,0) & 0xff) <<8;
 }
 static READ16_HANDLER( tracky2_hi_r )
 {
-	return input_port_7_word_r(0,0);
+	return input_port_7_word_r(machine,0,0);
 }
 static READ16_HANDLER( tracky2_lo_r )
 {
-	return (input_port_7_word_r(0,0) & 0xff) <<8;
+	return (input_port_7_word_r(machine,0,0) & 0xff) <<8;
 }
 static READ16_HANDLER( trackx2_hi_r )
 {
-	return input_port_8_word_r(0,0);
+	return input_port_8_word_r(machine,0,0);
 }
 static READ16_HANDLER( trackx2_lo_r )
 {
-	return (input_port_8_word_r(0,0) & 0xff) <<8;
+	return (input_port_8_word_r(machine,0,0) & 0xff) <<8;
 }
 
 
@@ -413,7 +413,7 @@ static READ16_HANDLER( eeprom_r )
 	int res;
 
 	res = (EEPROM_read_bit() & 0x01);
-	res |= input_port_1_word_r(0,0) & 0xfe; /* coin inputs */
+	res |= input_port_1_word_r(machine,0,0) & 0xfe; /* coin inputs */
 
 	return res;
 }
@@ -482,10 +482,10 @@ static READ16_HANDLER( pbobble_input_bypass_r )
 	switch (offset)
 	{
 		case 0x01:
-			return eeprom_r(0,mem_mask) << 8;
+			return eeprom_r(machine,0,mem_mask) << 8;
 
 		default:
-			return TC0640FIO_r( offset ) << 8;
+			return TC0640FIO_r( machine,offset ) << 8;
 	}
 }
 

@@ -221,9 +221,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_0_r(offset);
+		result &= ppi8255_0_r(machine, offset);
 	if (!(offset & 8))
-		result &= ppi8255_1_r(offset);
+		result &= ppi8255_1_r(machine, offset);
 	return result;
 }
 
@@ -232,9 +232,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_0_w(offset, data);
+		ppi8255_0_w(machine, offset, data);
 	if (!(offset & 8))
-		ppi8255_1_w(offset, data);
+		ppi8255_1_w(machine, offset, data);
 }
 
 

@@ -71,19 +71,19 @@ static WRITE8_HANDLER( fantland_nmi_enable_w )
 static WRITE16_HANDLER( fantland_nmi_enable_16_w )
 {
 	if (ACCESSING_LSB)
-		fantland_nmi_enable_w(offset*2,data);
+		fantland_nmi_enable_w(machine,offset*2,data);
 }
 
 static WRITE8_HANDLER( fantland_soundlatch_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE16_HANDLER( fantland_soundlatch_16_w )
 {
 	if (ACCESSING_LSB)
-		fantland_soundlatch_w(offset*2, data);
+		fantland_soundlatch_w(machine, offset*2, data);
 }
 
 /***************************************************************************

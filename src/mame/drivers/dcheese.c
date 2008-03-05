@@ -134,7 +134,7 @@ static READ16_HANDLER( port_0_r )
 
 static READ16_HANDLER( port_2_r )
 {
-	return (readinputport(2) & 0xff1f) | (!soundlatch_full << 7) | (ticket_dispenser_r(0) >> 2);
+	return (readinputport(2) & 0xff1f) | (!soundlatch_full << 7) | (ticket_dispenser_r(machine, 0) >> 2);
 }
 
 
@@ -147,7 +147,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 		EEPROM_set_cs_line(~data & 8);
 		EEPROM_write_bit(data & 2);
 		EEPROM_set_clock_line(data & 4);
-		ticket_dispenser_w(0, (data & 1) << 7);
+		ticket_dispenser_w(machine, 0, (data & 1) << 7);
 	}
 }
 
@@ -158,8 +158,8 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
-		soundlatch_w(0, data & 0xff);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		soundlatch_w(machine, 0, data & 0xff);
 	}
 }
 
@@ -175,8 +175,8 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* read the latch and clear the IRQ */
 	soundlatch_full = 0;
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
-	return soundlatch_r(0);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	return soundlatch_r(machine, 0);
 }
 
 
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( bsmt_data_w )
 	if (offset % 2 == 0)
 		sound_msb_latch = data;
 	else
-		BSMT2000_data_0_w(offset/2, (sound_msb_latch << 8) | data, 0);
+		BSMT2000_data_0_w(machine, offset/2, (sound_msb_latch << 8) | data, 0);
 }
 
 

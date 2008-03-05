@@ -320,7 +320,7 @@ static void amiga_m68k_reset(void)
 	}
 	else
 	{
-		amiga_cia_w(0x1001/2, 1, 0);
+		amiga_cia_w(Machine, 0x1001/2, 1, 0);
 	}
 
 	if (activecpu_get_pc() < 0x80000)
@@ -345,7 +345,7 @@ MACHINE_RESET( amiga )
 	}
 	else
 	{
-		amiga_cia_w(0x1001/2, 1, 0);
+		amiga_cia_w(machine, 0x1001/2, 1, 0);
 	}
 
 	/* call the system-specific callback */
@@ -372,7 +372,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_VERTB, 0);
+		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_VERTB, 0);
 
 		/* clock the first CIA TOD */
 		cia_clock_tod(0);
@@ -387,7 +387,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* render up to this scanline */
 	if (scanline < machine->screen[0].visarea.min_y)
-		amiga_render_scanline(NULL, scanline);
+		amiga_render_scanline(machine, NULL, scanline);
 	else
 		video_screen_update_partial(0, scanline);
 
@@ -984,7 +984,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_BLIT, 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_BLIT, 0);
 
 	/* reset the blitter timer */
 	timer_reset( amiga_blitter_timer, attotime_never);
@@ -1137,13 +1137,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 static void amiga_cia_0_irq(int state)
 {
-	amiga_custom_w(REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0);
+	amiga_custom_w(Machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0);
 }
 
 
 static void amiga_cia_1_irq(int state)
 {
-	amiga_custom_w(REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0);
+	amiga_custom_w(Machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0);
 }
 
 
@@ -1288,7 +1288,7 @@ static TIMER_CALLBACK( finish_serial_write )
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_TBE, 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_TBE, 0);
 }
 
 
@@ -1524,7 +1524,7 @@ void amiga_serial_in_w(UINT16 data)
 	}
 
 	/* signal an interrupt */
-	amiga_custom_w(REG_INTREQ, 0x8000 | INTENA_RBF, 0);
+	amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_RBF, 0);
 }
 
 

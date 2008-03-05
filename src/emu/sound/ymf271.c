@@ -14,6 +14,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "ymf271.h"
 
@@ -107,8 +108,8 @@ typedef struct
 	UINT8 ext_read;
 
 	const UINT8 *rom;
-	read8_handler ext_mem_read;
-	write8_handler ext_mem_write;
+	read8_machine_func ext_mem_read;
+	write8_machine_func ext_mem_write;
 	void (*irq_callback)(int);
 
 	int index;
@@ -1375,7 +1376,7 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
 	if( chip->ext_mem_read ) {
-		return chip->ext_mem_read(address);
+		return chip->ext_mem_read(Machine,address);
 	} else {
 		if( address < 0x800000)
 			return chip->rom[address];
@@ -1386,7 +1387,7 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
 	if( chip->ext_mem_write ) {
-		chip->ext_mem_write(address, data);
+		chip->ext_mem_write(Machine, address, data);
 	}
 }
 
@@ -1725,7 +1726,7 @@ static void init_state(YMF271Chip *chip)
 	state_save_register_item("ymf271", chip->index, chip->ext_read);
 }
 
-static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(int), read8_handler ext_read, write8_handler ext_write)
+static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(int), read8_machine_func ext_read, write8_machine_func ext_write)
 {
 	chip->timA = timer_alloc(ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(ymf271_timer_b_tick, chip);

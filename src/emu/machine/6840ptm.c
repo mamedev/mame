@@ -340,7 +340,7 @@ static void reload_count(int which, int idx)
 	if ((currptr->mode[idx] == 4)||(currptr->mode[idx] == 6))
 	{
 		currptr->output[idx] = 1;
-		if ( currptr->intf->out_func[idx] ) currptr->intf->out_func[idx](0, currptr->output[idx]);
+		if ( currptr->intf->out_func[idx] ) currptr->intf->out_func[idx](Machine, 0, currptr->output[idx]);
 	}
 
 	/* set the timer */
@@ -549,7 +549,7 @@ void ptm6840_write (int which, int offset, int data)
 			{ // output cleared
 				if ( currptr->intf )
 				{
-					if ( currptr->intf->out_func[idx] ) currptr->intf->out_func[idx](0, 0);
+					if ( currptr->intf->out_func[idx] ) currptr->intf->out_func[idx](Machine, 0, 0);
 				}
 			}
 			/* reset? */
@@ -644,7 +644,7 @@ static void ptm6840_timeout(int which, int idx)
 			{
 				p->output[idx] = p->output[idx]?0:1;
 				PLOG(("**ptm6840 %d t%d output %d **\n", which, idx+1, p->output[idx]));
-				if ( p->intf->out_func[idx] ) p->intf->out_func[idx](0, p->output[idx]);
+				if ( p->intf->out_func[idx] ) p->intf->out_func[idx](Machine, 0, p->output[idx]);
 			}
 			if ((p->mode[idx] == 4)||(p->mode[idx] == 6))
 			{
@@ -652,7 +652,7 @@ static void ptm6840_timeout(int which, int idx)
 				{
 					p->output[idx] = 1;
 					PLOG(("**ptm6840 %d t%d output %d **\n", which, idx+1, p->output[idx]));
-					if ( p->intf->out_func[idx] ) p->intf->out_func[idx](0, p->output[idx]);
+					if ( p->intf->out_func[idx] ) p->intf->out_func[idx](Machine, 0, p->output[idx]);
 					p->fired[idx]=1;//no changes in output until reinit
 				}
 			}

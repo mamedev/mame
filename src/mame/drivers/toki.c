@@ -61,8 +61,8 @@ WRITE16_HANDLER( toki_foreground_videoram16_w );
 
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
-	soundlatch_w(0,data & 0xff);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine,0,data & 0xff);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )

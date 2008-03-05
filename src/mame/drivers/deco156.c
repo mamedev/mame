@@ -175,23 +175,23 @@ static WRITE32_HANDLER( hvysmsh_oki_0_bank_w )
 
 static READ32_HANDLER(hvysmsh_oki_0_r)
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER(hvysmsh_oki_0_w)
 {
 //  data & 0xff00 is written sometimes too. game bug or needed data?
-	OKIM6295_data_0_w(0,data&0xff);
+	OKIM6295_data_0_w(machine,0,data&0xff);
 }
 
 static READ32_HANDLER(hvysmsh_oki_1_r)
 {
-	return OKIM6295_status_1_r(0);
+	return OKIM6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER(hvysmsh_oki_1_w)
 {
-	OKIM6295_data_1_w(0,data&0xff);
+	OKIM6295_data_1_w(machine,0,data&0xff);
 }
 
 static READ32_HANDLER(wcvol95_eeprom_r)
@@ -211,21 +211,21 @@ static WRITE32_HANDLER(wcvol95_eeprom_w)
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 
 static READ32_HANDLER( deco156_snd_r )
 {
-	return YMZ280B_status_0_r(0);
+	return YMZ280B_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( deco156_snd_w )
 {
 	if (offset)
-		YMZ280B_data_0_w(0, data);
+		YMZ280B_data_0_w(machine, 0, data);
 	else
-		YMZ280B_register_0_w(0, data);
+		YMZ280B_register_0_w(machine, 0, data);
 }
 
 /***************************************************************************/
@@ -237,8 +237,8 @@ static READ32_HANDLER ( wcvol95_pf12_control_r ) { return deco16_pf12_control[of
 static WRITE32_HANDLER( wcvol95_pf12_control_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; COMBINE_DATA(&deco16_pf12_control[offset]); }
 static READ32_HANDLER( wcvol95_pf1_data_r ) {	return deco16_pf1_data[offset]^0xffff0000; }
 static READ32_HANDLER( wcvol95_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
-static WRITE32_HANDLER( wcvol95_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( wcvol95_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(offset,data,mem_mask); }
+static WRITE32_HANDLER( wcvol95_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( wcvol95_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(machine,offset,data,mem_mask); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )

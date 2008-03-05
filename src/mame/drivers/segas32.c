@@ -359,8 +359,8 @@ static UINT16 sound_bank;
 
 /* I/O chips and custom I/O */
 static UINT8 misc_io_data[2][0x10];
-static read16_handler custom_io_r[2];
-static write16_handler custom_io_w[2];
+static read16_machine_func custom_io_r[2];
+static write16_machine_func custom_io_w[2];
 static UINT8 analog_bank;
 static UINT8 analog_value[4];
 static UINT8 sonic_last[6];
@@ -752,7 +752,7 @@ static WRITE32_HANDLER( io_chip_1_w )
 static READ16_HANDLER( io_expansion_r )
 {
 	if (custom_io_r[0])
-		return (*custom_io_r[0])(offset, mem_mask);
+		return (*custom_io_r[0])(machine, offset, mem_mask);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
 	return 0xffff;
@@ -766,7 +766,7 @@ static WRITE16_HANDLER( io_expansion_w )
 		return;
 
 	if (custom_io_w[0])
-		(*custom_io_w[0])(offset, data, mem_mask);
+		(*custom_io_w[0])(machine, offset, data, mem_mask);
 	else
 		logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 }
@@ -775,8 +775,8 @@ static WRITE16_HANDLER( io_expansion_w )
 static READ32_HANDLER( io_expansion_0_r )
 {
 	if (custom_io_r[0])
-		return (*custom_io_r[0])(offset*2+0, mem_mask) |
-			  ((*custom_io_r[0])(offset*2+1, mem_mask >> 16) << 16);
+		return (*custom_io_r[0])(machine, offset*2+0, mem_mask) |
+			  ((*custom_io_r[0])(machine, offset*2+1, mem_mask >> 16) << 16);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
 	return 0xffffffff;
@@ -789,14 +789,14 @@ static WRITE32_HANDLER( io_expansion_0_w )
 	if ((mem_mask & 0x000000ff) != 0x000000ff)
 	{
 		if (custom_io_w[0])
-			(*custom_io_w[0])(offset*2+0, data, mem_mask);
+			(*custom_io_w[0])(machine, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
 	if ((mem_mask & 0x00ff0000) != 0x00ff0000)
 	{
 		if (custom_io_w[0])
-			(*custom_io_w[0])(offset*2+1, data >> 16, mem_mask >> 16);
+			(*custom_io_w[0])(machine, offset*2+1, data >> 16, mem_mask >> 16);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
@@ -806,8 +806,8 @@ static WRITE32_HANDLER( io_expansion_0_w )
 static READ32_HANDLER( io_expansion_1_r )
 {
 	if (custom_io_r[1])
-		return (*custom_io_r[1])(offset*2+0, mem_mask) |
-			  ((*custom_io_r[1])(offset*2+1, mem_mask >> 16) << 16);
+		return (*custom_io_r[1])(machine, offset*2+0, mem_mask) |
+			  ((*custom_io_r[1])(machine, offset*2+1, mem_mask >> 16) << 16);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", activecpu_get_pc(), offset);
 	return 0xffffffff;
@@ -820,14 +820,14 @@ static WRITE32_HANDLER( io_expansion_1_w )
 	if ((mem_mask & 0x000000ff) != 0x000000ff)
 	{
 		if (custom_io_w[1])
-			(*custom_io_w[1])(offset*2+0, data, mem_mask);
+			(*custom_io_w[1])(machine, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
 	if ((mem_mask & 0x00ff0000) != 0x00ff0000)
 	{
 		if (custom_io_w[1])
-			(*custom_io_w[1])(offset*2+1, data >> 16, mem_mask >> 16);
+			(*custom_io_w[1])(machine, offset*2+1, data >> 16, mem_mask >> 16);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
@@ -3772,7 +3772,7 @@ ROM_END
  *
  *************************************/
 
-static void segas32_common_init(read16_handler custom_r, write16_handler custom_w, const UINT8 *default_eeprom)
+static void segas32_common_init(read16_machine_func custom_r, write16_machine_func custom_w, const UINT8 *default_eeprom)
 {
 	/* reset the custom handlers and other pointers */
 	custom_io_r[0] = custom_r;

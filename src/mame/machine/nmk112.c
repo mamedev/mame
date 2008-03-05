@@ -56,6 +56,6 @@ WRITE16_HANDLER( NMK112_okibank_lsb_w )
 {
 	if (ACCESSING_LSB)
 	{
-		NMK112_okibank_w(offset, data & 0xff);
+		NMK112_okibank_w(machine, offset, data & 0xff);
 	}
 }

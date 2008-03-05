@@ -187,7 +187,7 @@ static WRITE16_HANDLER( sandscrp_latchstatus_word_w )
 static READ16_HANDLER( sandscrp_soundlatch_word_r )
 {
 	latch2_full = 0;
-	return soundlatch2_r(0);
+	return soundlatch2_r(machine,0);
 }
 
 static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
@@ -195,8 +195,8 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 	if (ACCESSING_LSB)
 	{
 		latch1_full = 1;
-		soundlatch_w(0, data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine, 0, data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
 	}
 }
@@ -253,13 +253,13 @@ static READ8_HANDLER( sandscrp_latchstatus_r )
 static READ8_HANDLER( sandscrp_soundlatch_r )
 {
 	latch1_full = 0;
-	return soundlatch_r(0);
+	return soundlatch_r(machine,0);
 }
 
 static WRITE8_HANDLER( sandscrp_soundlatch_w )
 {
 	latch2_full = 1;
-	soundlatch2_w(0,data);
+	soundlatch2_w(machine,0,data);
 }
 
 static ADDRESS_MAP_START( sandscrp_soundmem, ADDRESS_SPACE_PROGRAM, 8 )

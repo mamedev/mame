@@ -51,7 +51,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 	switch (offset)
 	{
 		case 0x00/2: // watchdog
-			return watchdog_reset_r(0);
+			return watchdog_reset_r(machine,0);
 
 		case 0x02/2: // unknown (yet!), used by *MANY* games !!!
 			//popmessage("unknown collision reg");

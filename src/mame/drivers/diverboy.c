@@ -61,8 +61,8 @@ static WRITE16_HANDLER( soundcmd_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 

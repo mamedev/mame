@@ -90,42 +90,42 @@ static const struct AY8910interface hustler_ay8910_interface =
 
 static READ8_HANDLER(scobra_type2_ppi8255_0_r)
 {
-	return ppi8255_0_r(offset >> 2);
+	return ppi8255_0_r(machine, offset >> 2);
 }
 
 static READ8_HANDLER(scobra_type2_ppi8255_1_r)
 {
-	return ppi8255_1_r(offset >> 2);
+	return ppi8255_1_r(machine, offset >> 2);
 }
 
 static WRITE8_HANDLER(scobra_type2_ppi8255_0_w)
 {
-	ppi8255_0_w(offset >> 2, data);
+	ppi8255_0_w(machine, offset >> 2, data);
 }
 
 static WRITE8_HANDLER(scobra_type2_ppi8255_1_w)
 {
-	ppi8255_1_w(offset >> 2, data);
+	ppi8255_1_w(machine, offset >> 2, data);
 }
 
 static READ8_HANDLER(hustler_ppi8255_0_r)
 {
-	return ppi8255_0_r(offset >> 3);
+	return ppi8255_0_r(machine, offset >> 3);
 }
 
 static READ8_HANDLER(hustler_ppi8255_1_r)
 {
-	return ppi8255_1_r(offset >> 3);
+	return ppi8255_1_r(machine, offset >> 3);
 }
 
 static WRITE8_HANDLER(hustler_ppi8255_0_w)
 {
-	ppi8255_0_w(offset >> 3, data);
+	ppi8255_0_w(machine, offset >> 3, data);
 }
 
 static WRITE8_HANDLER(hustler_ppi8255_1_w)
 {
-	ppi8255_1_w(offset >> 3, data);
+	ppi8255_1_w(machine, offset >> 3, data);
 }
 
 static ADDRESS_MAP_START( type1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -267,57 +267,57 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( anteatg_ppi8255_0_reg0_r )
 {
-	return ppi8255_0_r(0);
+	return ppi8255_0_r(machine, 0);
 }
 
 static READ8_HANDLER( anteatg_ppi8255_0_reg1_r )
 {
-	return ppi8255_0_r(1);
+	return ppi8255_0_r(machine, 1);
 }
 
 static READ8_HANDLER( anteatg_ppi8255_0_reg2_r )
 {
-	return ppi8255_0_r(2);
+	return ppi8255_0_r(machine, 2);
 }
 
 static READ8_HANDLER( anteatg_ppi8255_0_reg3_r )
 {
-	return ppi8255_0_r(3);
+	return ppi8255_0_r(machine, 3);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_0_reg0_w )
 {
-	ppi8255_0_w(0, data);
+	ppi8255_0_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_0_reg1_w )
 {
-	ppi8255_0_w(1, data);
+	ppi8255_0_w(machine, 1, data);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_0_reg2_w )
 {
-	ppi8255_0_w(2, data);
+	ppi8255_0_w(machine, 2, data);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_0_reg3_w )
 {
-	ppi8255_0_w(3, data);
+	ppi8255_0_w(machine, 3, data);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_1_reg0_w )
 {
-	ppi8255_1_w(0, data);
+	ppi8255_1_w(machine, 0, data);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_1_reg1_w )
 {
-	ppi8255_1_w(1, data);
+	ppi8255_1_w(machine, 1, data);
 }
 
 static WRITE8_HANDLER( anteatg_ppi8255_1_reg3_w )
 {
-	ppi8255_1_w(3, data);
+	ppi8255_1_w(machine, 3, data);
 }
 
 static ADDRESS_MAP_START( anteatg_readmem, ADDRESS_SPACE_PROGRAM, 8 )

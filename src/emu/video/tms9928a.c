@@ -292,7 +292,7 @@ WRITE8_HANDLER (TMS9928A_register_w) {
             tms.Addr = ((UINT16)data << 8 | tms.FirstByte) & (tms.vramsize - 1);
             if ( !(data & 0x40) ) {
 				/* read ahead */
-				TMS9928A_vram_r	(0);
+				TMS9928A_vram_r	(machine,0);
             }
         }
         tms.latch = 0;

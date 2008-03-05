@@ -140,23 +140,23 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 	switch ((offset & 0x01c0) >> 6){
 		case 0x00:	/* NSFIRQ + AFR */
 			if (offset)
-				watchdog_reset_w(0, data);
+				watchdog_reset_w(machine, 0, data);
 			else{
 				if (firq_enable)	/* Cause interrupt on slave CPU */
-					cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, HOLD_LINE);
+					cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+			cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
-			soundlatch_w(offset,data);
+			soundlatch_w(machine,offset,data);
 			break;
 		case 0x03:	/* Bankswitch + coin counters + priority*/
-			ajax_bankswitch_w(0, data);
+			ajax_bankswitch_w(machine, 0, data);
 			break;
 		case 0x05:	/* Lamps + Joystick vibration + Control panel quaking */
-			ajax_lamps_w(0, data);
+			ajax_lamps_w(machine, 0, data);
 			break;
 
 		default:

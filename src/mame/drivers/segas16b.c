@@ -893,14 +893,14 @@ static int atomicp_sound_rate;
 
 static UINT8 has_sound_cpu;
 
-static read16_handler custom_io_r;
-static write16_handler custom_io_w;
+static read16_machine_func custom_io_r;
+static write16_machine_func custom_io_w;
 
 static UINT8 disable_screen_blanking;
 static UINT8 mj_input_num;
 static UINT8 hwc_input_value;
 
-static void (*i8751_vblank_hook)(void);
+static void (*i8751_vblank_hook)(running_machine *machine);
 static const UINT8 *i8751_initial_config;
 
 
@@ -1022,7 +1022,7 @@ static void sound_w(UINT8 data)
 {
 	if (has_sound_cpu)
 	{
-		soundlatch_w(0, data & 0xff);
+		soundlatch_w(Machine, 0, data & 0xff);
 		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 	}
 }
@@ -1126,7 +1126,7 @@ static READ16_HANDLER( standard_io_r )
 			return readinputport(4 + (offset & 1));
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -1163,18 +1163,18 @@ static WRITE16_HANDLER( standard_io_w )
 static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
-		return (*custom_io_r)(offset, mem_mask);
+		return (*custom_io_r)(machine, offset, mem_mask);
 	else
-		return standard_io_r(offset, mem_mask);
+		return standard_io_r(machine, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( misc_io_w )
 {
 	if (custom_io_w)
-		(*custom_io_w)(offset, data, mem_mask);
+		(*custom_io_w)(machine, offset, data, mem_mask);
 	else
-		standard_io_w(offset, data, mem_mask);
+		standard_io_w(machine, offset, data, mem_mask);
 }
 
 
@@ -1199,13 +1199,13 @@ static READ16_HANDLER( rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			return segaic16_multiply_0_r(offset & 3, mem_mask);
+			return segaic16_multiply_0_r(machine, offset & 3, mem_mask);
 
 		case 0x1000/2:
 			/* compare registers */
-			return segaic16_compare_timer_0_r(offset & 7, mem_mask);
+			return segaic16_compare_timer_0_r(machine, offset & 7, mem_mask);
 	}
-	return segaic16_open_bus_r(0,0);
+	return segaic16_open_bus_r(machine,0,0);
 }
 
 
@@ -1216,12 +1216,12 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			segaic16_multiply_0_w(offset & 3, data, mem_mask);
+			segaic16_multiply_0_w(machine, offset & 3, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			/* compare registers */
-			segaic16_compare_timer_0_w(offset & 7, data, mem_mask);
+			segaic16_compare_timer_0_w(machine, offset & 7, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1235,14 +1235,14 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 static READ16_HANDLER( unknown_rgn2_r )
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return segaic16_compare_timer_1_r(offset & 7, mem_mask);
+	return segaic16_compare_timer_1_r(machine, offset & 7, mem_mask);
 }
 
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask ^ 0xffff);
-	segaic16_compare_timer_1_w(offset & 7, data, mem_mask);
+	segaic16_compare_timer_1_w(machine, offset & 7, data, mem_mask);
 }
 
 
@@ -1349,7 +1349,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
-		(*i8751_vblank_hook)();
+		(*i8751_vblank_hook)(machine);
 }
 
 
@@ -1360,21 +1360,21 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
  *
  *************************************/
 
-static void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs)
+static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs, offs_t inputoffs)
 {
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* set tile banks */
-	rom_5704_bank_w(1, workram[0x3094/2] & 0x00ff, 0xff00);
+	rom_5704_bank_w(machine, 1, workram[0x3094/2] & 0x00ff, 0xff00);
 
 	/* process any new sound data */
 	temp = workram[soundoffs];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(0x03, temp >> 8);
+		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
 		workram[soundoffs] = temp & 0x00ff;
 	}
 
@@ -1382,40 +1382,40 @@ static void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs)
 	workram[inputoffs] = ~readinputport(0) << 8;
 }
 
-static void altbeasj_i8751_sim(void)
+static void altbeasj_i8751_sim(running_machine *machine)
 {
-	altbeast_common_i8751_sim(0x30d4/2, 0x30d0/2);
+	altbeast_common_i8751_sim(machine, 0x30d4/2, 0x30d0/2);
 }
 
-static void altbeas5_i8751_sim(void)
+static void altbeas5_i8751_sim(running_machine *machine)
 {
-	altbeast_common_i8751_sim(0x3098/2, 0x3096/2);
+	altbeast_common_i8751_sim(machine, 0x3098/2, 0x3096/2);
 }
 
-static void altbeast_i8751_sim(void)
+static void altbeast_i8751_sim(running_machine *machine)
 {
-	altbeast_common_i8751_sim(0x30c4/2, 0x30c2/2);
+	altbeast_common_i8751_sim(machine, 0x30c4/2, 0x30c2/2);
 }
 
 
-static void ddux_i8751_sim(void)
+static void ddux_i8751_sim(running_machine *machine)
 {
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0bd0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(0x03, temp >> 8);
+		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
 		workram[0x0bd0/2] = temp & 0x00ff;
 	}
 }
 
 
-static void goldnaxe_i8751_init(void)
+static void goldnaxe_i8751_init(running_machine *machine)
 {
 	static const UINT8 memory_control_5704[0x10] =
 		{ 0x02,0x00, 0x02,0x08, 0x00,0x1f, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
@@ -1433,12 +1433,12 @@ static void goldnaxe_i8751_init(void)
 	}
 }
 
-static void goldnaxe_i8751_sim(void)
+static void goldnaxe_i8751_sim(running_machine *machine)
 {
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* they periodically clear the data at 2cd8,2cda,2cdc,2cde and expect the MCU to fill it in */
 	if (workram[0x2cd8/2] == 0 && workram[0x2cda/2] == 0 && workram[0x2cdc/2] == 0 && workram[0x2cde/2] == 0)
@@ -1453,7 +1453,7 @@ static void goldnaxe_i8751_sim(void)
 	temp = workram[0x2cfc/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(0x03, temp >> 8);
+		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
 		workram[0x2cfc/2] = temp & 0x00ff;
 	}
 
@@ -1463,18 +1463,18 @@ static void goldnaxe_i8751_sim(void)
 }
 
 
-static void tturf_i8751_sim(void)
+static void tturf_i8751_sim(running_machine *machine)
 {
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x01d0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(0x03, temp);
+		segaic16_memory_mapper_w(machine, 0x03, temp);
 		workram[0x01d0/2] = temp & 0x00ff;
 	}
 
@@ -1485,35 +1485,35 @@ static void tturf_i8751_sim(void)
 }
 
 
-static void wb3_i8751_sim(void)
+static void wb3_i8751_sim(running_machine *machine)
 {
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0008/2];
 	if ((temp & 0x00ff) != 0x0000)
 	{
-		segaic16_memory_mapper_w(0x03, temp >> 8);
+		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
 		workram[0x0008/2] = temp & 0xff00;
 	}
 }
 
 
-static void wrestwar_i8751_sim(void)
+static void wrestwar_i8751_sim(running_machine *machine)
 {
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x208e/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(0x03, temp);
+		segaic16_memory_mapper_w(machine, 0x03, temp);
 		workram[0x208e/2] = temp & 0x00ff;
 	}
 
@@ -1534,8 +1534,8 @@ static WRITE16_HANDLER( atomicp_sound_w )
 	if (ACCESSING_MSB)
 		switch (offset & 1)
 		{
-			case 0:	YM2413_register_port_0_w(0, data >> 8);	break;
-			case 1:	YM2413_data_port_0_w(0, data >> 8);		break;
+			case 0:	YM2413_register_port_0_w(machine, 0, data >> 8);	break;
+			case 1:	YM2413_data_port_0_w(machine, 0, data >> 8);		break;
 		}
 }
 
@@ -1565,7 +1565,7 @@ static READ16_HANDLER( dunkshot_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
@@ -1592,14 +1592,13 @@ static READ16_HANDLER( hwchamp_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( hwchamp_custom_io_w )
 {
 	static const char *const portname[4] = { "MONITOR", "LEFT", "RIGHT", "DUMMY" };
-
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
@@ -1620,7 +1619,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			}
 			break;
 	}
-	standard_io_w(offset, data, mem_mask);
+	standard_io_w(machine, offset, data, mem_mask);
 }
 
 
@@ -1645,7 +1644,7 @@ static READ16_HANDLER( passshtj_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
@@ -1670,7 +1669,7 @@ static READ16_HANDLER( sdi_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
@@ -1684,7 +1683,6 @@ static READ16_HANDLER( sdi_custom_io_r )
 static READ16_HANDLER( sjryuko_custom_io_r )
 {
 	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
-
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
@@ -1700,14 +1698,13 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(offset, mem_mask);
+	return standard_io_r(machine, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( sjryuko_custom_io_w )
 {
 	static UINT8 last_val;
-
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
@@ -1715,7 +1712,7 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
 				mj_input_num = (mj_input_num + 1) % 6;
 			break;
 	}
-	standard_io_w(offset, data, mem_mask);
+	standard_io_w(machine, offset, data, mem_mask);
 }
 
 
@@ -6166,7 +6163,7 @@ static DRIVER_INIT( exctleag_5358 )
 static DRIVER_INIT( goldnaxe_5704 )
 {
 	DRIVER_INIT_CALL(generic_5704);
-	goldnaxe_i8751_init();
+	goldnaxe_i8751_init(machine);
 	i8751_vblank_hook = goldnaxe_i8751_sim;
 }
 
@@ -6174,7 +6171,7 @@ static DRIVER_INIT( goldnaxe_5704 )
 static DRIVER_INIT( goldnaxe_5797 )
 {
 	DRIVER_INIT_CALL(generic_5797);
-	goldnaxe_i8751_init();
+	goldnaxe_i8751_init(machine);
 	i8751_vblank_hook = goldnaxe_i8751_sim;
 }
 

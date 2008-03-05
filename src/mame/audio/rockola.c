@@ -715,7 +715,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		tone_channels[2].mask = 0xff;
 
-		rockola_flipscreen_w(0, data);
+		rockola_flipscreen_w(machine, 0, data);
 		break;
 	}
 }

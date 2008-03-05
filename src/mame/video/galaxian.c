@@ -1091,19 +1091,19 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 
 WRITE8_HANDLER( gteikob2_flip_screen_x_w )
 {
-	galaxian_flip_screen_x_w(offset, ~data);
+	galaxian_flip_screen_x_w(machine, offset, ~data);
 }
 
 WRITE8_HANDLER( gteikob2_flip_screen_y_w )
 {
-	galaxian_flip_screen_y_w(offset, ~data);
+	galaxian_flip_screen_y_w(machine, offset, ~data);
 }
 
 
 WRITE8_HANDLER( hotshock_flip_screen_w )
 {
-	galaxian_flip_screen_x_w(offset, data);
-	galaxian_flip_screen_y_w(offset, data);
+	galaxian_flip_screen_x_w(machine, offset, data);
+	galaxian_flip_screen_y_w(machine, offset, data);
 }
 
 

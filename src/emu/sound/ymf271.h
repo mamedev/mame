@@ -4,8 +4,8 @@
 struct YMF271interface
 {
 	int region;			/* memory region of sample ROMs */
-	read8_handler ext_read;		/* external memory read */
-	write8_handler ext_write;	/* external memory write */
+	read8_machine_func ext_read;		/* external memory read */
+	write8_machine_func ext_write;	/* external memory write */
 	void (*irq_callback)(int state);	/* irq callback */
 };
 

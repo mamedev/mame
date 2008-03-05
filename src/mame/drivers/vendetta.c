@@ -188,15 +188,15 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 
 /********************************************/
 
-static READ8_HANDLER( vendetta_K052109_r ) { return K052109_r( offset + 0x2000 ); }
-//static WRITE8_HANDLER( vendetta_K052109_w ) { K052109_w( offset + 0x2000, data ); }
+static READ8_HANDLER( vendetta_K052109_r ) { return K052109_r( machine, offset + 0x2000 ); }
+//static WRITE8_HANDLER( vendetta_K052109_w ) { K052109_w( machine, offset + 0x2000, data ); }
 static WRITE8_HANDLER( vendetta_K052109_w ) {
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
-	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )		K052109_w( offset, data );
-	K052109_w( offset + 0x2000, data );
+	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )		K052109_w( machine, offset, data );
+	K052109_w( machine, offset + 0x2000, data );
 }
 
 static offs_t video_banking_base;
@@ -240,25 +240,25 @@ static TIMER_CALLBACK( z80_nmi_callback )
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE );
 
 	timer_set( ATTOTIME_IN_USEC( 25 ), NULL, 0, z80_nmi_callback );
 }
 
 static WRITE8_HANDLER( z80_irq_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
 }
 
 static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff );
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
 static READ8_HANDLER( vendetta_sound_r )
 {
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine, 2 + offset);
 }
 
 /********************************************/

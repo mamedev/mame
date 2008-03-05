@@ -454,6 +454,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
+#include "memconv.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
@@ -692,7 +693,7 @@ static WRITE8_HANDLER( blitter_w )
 		memory_set_bankptr(1, &memory_region(REGION_CPU1)[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
-	itech8_blitter_w(offset, data);
+	itech8_blitter_w(machine, offset, data);
 }
 
 
@@ -751,7 +752,7 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	pia_portb_data = data;
-	ticket_dispenser_w(0, (data & 0x10) << 3);
+	ticket_dispenser_w(machine, 0, (data & 0x10) << 3);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -765,7 +766,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(0, data & 0x80);
+	ticket_dispenser_w(machine, 0, data & 0x80);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -833,7 +834,7 @@ static void via_irq(int state)
 
 static READ16_HANDLER( blitter16_r )
 {
-	return (itech8_blitter_r(offset * 2 + 0) << 8) + itech8_blitter_r(offset * 2 + 1);
+	return read16be_with_read8_handler(itech8_blitter_r, machine, offset, mem_mask);
 }
 
 
@@ -844,18 +845,18 @@ static READ16_HANDLER( tms34061_16_r )
 	/* bit doesn't matter in XY addressing mode */
 	if ((offset & 0x700) == 0x100)
 	{
-		int result = itech8_tms34061_r(offset * 2);
+		int result = itech8_tms34061_r(machine, offset * 2);
 		return (result << 8) | result;
 	}
 	else
-		return (itech8_tms34061_r(offset * 2 + 0) << 8) + itech8_tms34061_r(offset * 2 + 1);
+		return (itech8_tms34061_r(machine, offset * 2 + 0) << 8) + itech8_tms34061_r(machine, offset * 2 + 1);
 }
 
 
 static WRITE16_HANDLER( sound_data16_w )
 {
 	if (ACCESSING_MSB)
-		sound_data_w(0, data >> 8);
+		sound_data_w(machine, 0, data >> 8);
 }
 
 
@@ -869,39 +870,33 @@ static WRITE16_HANDLER( grom_bank16_w )
 static WRITE16_HANDLER( display_page16_w )
 {
 	if (ACCESSING_MSB)
-		itech8_page_w(0, ~data >> 8);
+		itech8_page_w(machine, 0, ~data >> 8);
 }
 
 
 static WRITE16_HANDLER( tms34061_latch16_w )
 {
 	if (ACCESSING_MSB)
-		tms34061_latch_w(0, data >> 8);
+		tms34061_latch_w(machine, 0, data >> 8);
 }
 
 
 static WRITE16_HANDLER( blitter16_w )
 {
-	if (ACCESSING_MSB)
-		itech8_blitter_w(offset * 2 + 0, data >> 8);
-	if (ACCESSING_LSB)
-		itech8_blitter_w(offset * 2 + 1, data);
+	write16be_with_write8_handler(itech8_blitter_w, machine, offset, data, mem_mask);
 }
 
 
 static WRITE16_HANDLER( palette16_w )
 {
 	if (ACCESSING_MSB)
-		itech8_palette_w(offset / 8, data >> 8);
+		itech8_palette_w(machine, offset / 8, data >> 8);
 }
 
 
 static WRITE16_HANDLER( tms34061_16_w )
 {
-	if (ACCESSING_MSB)
-		itech8_tms34061_w(offset * 2 + 0, data >> 8);
-	else if (ACCESSING_LSB)
-		itech8_tms34061_w(offset * 2 + 1, data);
+	write16be_with_write8_handler(itech8_tms34061_w, machine, offset, data, mem_mask);
 }
 
 

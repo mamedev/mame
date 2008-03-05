@@ -377,7 +377,7 @@ static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 
     */
 	bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(0) | (readinputport(1) & 3) | bit5; /* bit 0 and bit 1 - coin inputs */
+	return bigevglf_mcu_status_r(machine,0) | (readinputport(1) & 3) | bit5; /* bit 0 and bit 1 - coin inputs */
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_readport, ADDRESS_SPACE_IO, 8 )

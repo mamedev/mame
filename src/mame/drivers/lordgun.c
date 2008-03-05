@@ -152,11 +152,11 @@ static WRITE16_HANDLER( lordgun_priority_w )
 //  popmessage("PR: %04x", data);
 }
 
-static READ16_HANDLER( lordgun_ppi8255_0_r )	{	return ppi8255_0_r(offset);	}
-static READ16_HANDLER( lordgun_ppi8255_1_r )	{	return ppi8255_1_r(offset);	}
+static READ16_HANDLER( lordgun_ppi8255_0_r )	{	return ppi8255_0_r(machine, offset);	}
+static READ16_HANDLER( lordgun_ppi8255_1_r )	{	return ppi8255_1_r(machine, offset);	}
 
-static WRITE16_HANDLER( lordgun_ppi8255_0_w )	{	ppi8255_0_w(offset, data & 0xff);	}
-static WRITE16_HANDLER( lordgun_ppi8255_1_w )	{	ppi8255_1_w(offset, data & 0xff);	}
+static WRITE16_HANDLER( lordgun_ppi8255_0_w )	{	ppi8255_0_w(machine, offset, data & 0xff);	}
+static WRITE16_HANDLER( lordgun_ppi8255_1_w )	{	ppi8255_1_w(machine, offset, data & 0xff);	}
 
 static READ16_HANDLER( lordgun_gun_0_x_r )		{ return lordgun_gun[0].hw_x; }
 static READ16_HANDLER( lordgun_gun_0_y_r )		{ return lordgun_gun[0].hw_y; }
@@ -166,10 +166,10 @@ static READ16_HANDLER( lordgun_gun_1_y_r )		{ return lordgun_gun[1].hw_y; }
 
 static WRITE16_HANDLER( lordgun_soundlatch_w )
 {
-	if (ACCESSING_LSB)	soundlatch_w (0, (data >> 0) & 0xff);
-	if (ACCESSING_MSB)	soundlatch2_w(0, (data >> 8) & 0xff);
+	if (ACCESSING_LSB)	soundlatch_w (machine, 0, (data >> 0) & 0xff);
+	if (ACCESSING_MSB)	soundlatch2_w(machine, 0, (data >> 8) & 0xff);
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )

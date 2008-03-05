@@ -305,7 +305,7 @@ static WRITE8_HANDLER( cntsteer_int_w )
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
- 	soundlatch_w(0,data);
+ 	soundlatch_w(machine,0,data);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )

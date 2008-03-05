@@ -232,11 +232,11 @@ static UINT32 get_cop0_reg(int reg)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		return (config->sp_reg_r)(reg, 0x00000000);
+		return (config->sp_reg_r)(Machine, reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (config->dp_reg_r)(reg - 8, 0x00000000);
+		return (config->dp_reg_r)(Machine, reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -248,11 +248,11 @@ static void set_cop0_reg(int reg, UINT32 data)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		(config->sp_reg_w)(reg, data, 0x00000000);
+		(config->sp_reg_w)(Machine, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(config->dp_reg_w)(reg - 8, data, 0x00000000);
+		(config->dp_reg_w)(Machine, reg - 8, data, 0x00000000);
 	}
 	else
 	{

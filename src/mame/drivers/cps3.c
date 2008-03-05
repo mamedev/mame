@@ -1914,17 +1914,16 @@ static WRITE32_HANDLER( cps3_eeprom_w )
 
 static READ32_HANDLER( cps3_cdrom_r )
 {
-
 	UINT32 retval = 0;
 
 	if (ACCESSING_MSB32)
 	{
-		retval |= ((UINT16)wd33c93_r(0))<<16;
+		retval |= ((UINT16)wd33c93_r(machine,0))<<16;
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		retval |= (UINT16)wd33c93_r(1);
+		retval |= (UINT16)wd33c93_r(machine,1);
 	}
 
 	return retval;
@@ -1934,12 +1933,12 @@ static WRITE32_HANDLER( cps3_cdrom_w )
 {
 	if (ACCESSING_MSB32)
 	{
-		wd33c93_w(0,(data & 0x00ff0000)>>16);
+		wd33c93_w(machine,0,(data & 0x00ff0000)>>16);
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		wd33c93_w(1,(data & 0x000000ff)>>0);
+		wd33c93_w(machine,1,(data & 0x000000ff)>>0);
 	}
 }
 

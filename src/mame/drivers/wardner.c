@@ -174,8 +174,8 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 void wardner_restore_bank(void)
 {
-	wardner_ramrom_bank_sw(0,1);	/* Dummy value to ensure restoration */
-	wardner_ramrom_bank_sw(0,wardner_membank);
+	wardner_ramrom_bank_sw(Machine,0,1);	/* Dummy value to ensure restoration */
+	wardner_ramrom_bank_sw(Machine,0,wardner_membank);
 }
 
 

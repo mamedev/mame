@@ -50,6 +50,7 @@
  *****************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "pokey.h"
@@ -180,10 +181,10 @@ struct POKEYregisters
 	int timer_param[3];		/* computed parameters for these timers */
 	emu_timer *rtimer;     /* timer for calculating the random offset */
 	emu_timer *ptimer[8];	/* pot timers */
-	read8_handler pot_r[8];
-	read8_handler allpot_r;
-	read8_handler serin_r;
-	write8_handler serout_w;
+	read8_machine_func pot_r[8];
+	read8_machine_func allpot_r;
+	read8_machine_func serin_r;
+	write8_machine_func serout_w;
 	void (*interrupt_cb)(int mask);
     UINT8 AUDF[4];          /* AUDFx (D200, D202, D204, D206) */
 	UINT8 AUDC[4];			/* AUDCx (D201, D203, D205, D207) */
@@ -809,7 +810,7 @@ static void pokey_potgo(struct POKEYregisters *p)
 		p->POTx[pot] = 0xff;
 		if( p->pot_r[pot] )
 		{
-			int r = (*p->pot_r[pot])(pot);
+			int r = (*p->pot_r[pot])(Machine, pot);
 
 			LOG(("POKEY #%d pot_r(%d) returned $%02x\n", p->index, pot, r));
 			if( r != -1 )
@@ -878,7 +879,7 @@ static int pokey_register_r(int chip, int offs)
 		}
 		else if( p->allpot_r )
 		{
-			data = (*p->allpot_r)(offs);
+			data = (*p->allpot_r)(Machine, offs);
 			LOG(("POKEY #%d ALLPOT callback $%02x\n", chip, data));
 		}
 		else
@@ -931,7 +932,7 @@ static int pokey_register_r(int chip, int offs)
 
 	case SERIN_C:
 		if( p->serin_r )
-			p->SERIN = (*p->serin_r)(offs);
+			p->SERIN = (*p->serin_r)(Machine, offs);
 		data = p->SERIN;
 		LOG(("POKEY #%d SERIN  $%02x\n", chip, data));
 		break;
@@ -1178,7 +1179,7 @@ static void pokey_register_w(int chip, int offs, int data)
     case SEROUT_C:
 		LOG(("POKEY #%d SEROUT $%02x\n", chip, data));
 		if (p->serout_w)
-			(*p->serout_w)(offs, data);
+			(*p->serout_w)(Machine, offs, data);
 		p->SKSTAT |= SK_SEROUT;
         /*
          * These are arbitrary values, tested with some custom boot

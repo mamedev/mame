@@ -165,8 +165,8 @@ static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( reset_callback )
@@ -176,7 +176,7 @@ static TIMER_CALLBACK( reset_callback )
 
 static WRITE8_HANDLER( sound_answer_w )
 {
-	soundlatch2_w(0,data);
+	soundlatch2_w(machine,0,data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */

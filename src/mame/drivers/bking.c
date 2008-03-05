@@ -84,8 +84,8 @@ static WRITE8_HANDLER( bking_soundlatch_w )
 	for (i = 0;i < 8;i++)
 		if (data & (1 << i)) code |= 0x80 >> i;
 
-	soundlatch_w(offset,code);
-	if (sndnmi_enable) cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine,offset,code);
+	if (sndnmi_enable) cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( bking3_addr_l_w )

@@ -262,19 +262,19 @@ static WRITE16_HANDLER( karnov_control_w )
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset<<1) {
 		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			cpunum_set_input_line(Machine, 0,6,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,6,CLEAR_LINE);
 
 			if (i8751_needs_ack) {
 				/* If a command and coin insert happen at once, then the i8751 will queue the
                     coin command until the previous command is ACK'd */
 				if (i8751_coin_pending) {
 					i8751_return=i8751_coin_pending;
-					cpunum_set_input_line(Machine, 0,6,HOLD_LINE);
+					cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 					i8751_coin_pending=0;
 				} else if (i8751_command_queue) {
 					/* Pending control command - just write it back as SECREQ */
 					i8751_needs_ack=0;
-					karnov_control_w(3,i8751_command_queue,0xffff);
+					karnov_control_w(machine,3,i8751_command_queue,0xffff);
 					i8751_command_queue=0;
 				} else {
 					i8751_needs_ack=0;
@@ -283,12 +283,12 @@ static WRITE16_HANDLER( karnov_control_w )
 			return;
 
 		case 2: /* SONREQ (Sound CPU byte) */
-			soundlatch_w(0,data&0xff);
-			cpunum_set_input_line (Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+			soundlatch_w(machine,0,data&0xff);
+			cpunum_set_input_line (machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
-			buffer_spriteram16_w(0,0,0);
+			buffer_spriteram16_w(machine,0,0,0);
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */

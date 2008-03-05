@@ -24,15 +24,15 @@ WRITE16_HANDLER( system24temp_sys16_shared_ram_w )
      range
 */
 
-static UINT8  (*system24temp_sys16_io_io_r)(int port);
-static void   (*system24temp_sys16_io_io_w)(int port, UINT8 data);
+static UINT8  (*system24temp_sys16_io_io_r)(running_machine *machine, int port);
+static void   (*system24temp_sys16_io_io_w)(running_machine *machine, int port, UINT8 data);
 static void   (*system24temp_sys16_io_cnt_w)(UINT8 data);
 static READ16_HANDLER ((*system24temp_sys16_io_iod_r));
 static WRITE16_HANDLER((*system24temp_sys16_io_iod_w));
 static UINT8 system24temp_sys16_io_cnt, system24temp_sys16_io_dir;
 
-void system24temp_sys16_io_set_callbacks(UINT8 (*io_r)(int port),
-							  void  (*io_w)(int port, UINT8 data),
+void system24temp_sys16_io_set_callbacks(UINT8 (*io_r)(running_machine *machine, int port),
+							  void  (*io_w)(running_machine *machine, int port, UINT8 data),
 							  void  (*cnt_w)(UINT8 data),
 							  READ16_HANDLER ((*iod_r)),
 							  WRITE16_HANDLER((*iod_w)))
@@ -50,7 +50,7 @@ READ16_HANDLER ( system24temp_sys16_io_r )
 {
 	//  logerror("IO read %02x (%d:%x)\n", offset, cpu_getactivecpu(), activecpu_get_pc());
 	if(offset < 8)
-		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(offset) : 0xff;
+		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(machine,offset) : 0xff;
 	else if (offset < 0x20) {
 		switch(offset) {
 		case 0x8:
@@ -70,12 +70,12 @@ READ16_HANDLER ( system24temp_sys16_io_r )
 			return 0xff;
 		}
 	} else
-		return system24temp_sys16_io_iod_r ? system24temp_sys16_io_iod_r(offset & 0x1f, mem_mask) : 0xff;
+		return system24temp_sys16_io_iod_r ? system24temp_sys16_io_iod_r(machine, offset & 0x1f, mem_mask) : 0xff;
 }
 
 READ32_HANDLER(system24temp_sys16_io_dword_r)
 {
-	return system24temp_sys16_io_r(2*offset, mem_mask)|(system24temp_sys16_io_r(2*offset+1, mem_mask>>16)<<16);
+	return system24temp_sys16_io_r(machine, 2*offset, mem_mask)|(system24temp_sys16_io_r(machine,2*offset+1, mem_mask>>16)<<16);
 }
 
 
@@ -88,7 +88,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 				return;
 			}
 			if(system24temp_sys16_io_io_w)
-				system24temp_sys16_io_io_w(offset, data);
+				system24temp_sys16_io_io_w(machine, offset, data);
 		} else if (offset < 0x20) {
 			switch(offset) {
 			case 0xe:
@@ -105,5 +105,5 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 		}
 	}
 	if(offset >= 0x20 && system24temp_sys16_io_iod_w)
-		system24temp_sys16_io_iod_w(offset & 0x1f, data, mem_mask);
+		system24temp_sys16_io_iod_w(machine, offset & 0x1f, data, mem_mask);
 }

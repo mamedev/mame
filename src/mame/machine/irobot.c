@@ -209,8 +209,8 @@ MACHINE_RESET( irobot )
 	/* set an initial timer to go off on scanline 0 */
 	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, scanline_callback);
 
-	irobot_rom_banksel_w(0,0);
-	irobot_out0_w(0,0);
+	irobot_rom_banksel_w(machine,0,0);
+	irobot_out0_w(machine,0,0);
 	irobot_combase = comRAM[0];
 	irobot_combase_mb = comRAM[1];
 	irobot_outx = 0;

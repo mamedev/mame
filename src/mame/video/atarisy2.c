@@ -302,7 +302,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
 			video_screen_update_partial(0, video_screen_get_vpos(0));
-		atarimo_0_spriteram_w(offs - 0x0c00, data, mem_mask);
+		atarimo_0_spriteram_w(machine, offs - 0x0c00, data, mem_mask);
 	}
 
 	/* playfieldram? */

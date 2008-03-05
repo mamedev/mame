@@ -221,26 +221,26 @@ static WRITE8_HANDLER( input_port_select_w )
 
 static READ8_HANDLER( royalmah_player_1_port_r )
 {
-	int ret = (input_port_0_r(offset) & 0xc0) | 0x3f;
+	int ret = (input_port_0_r(machine,offset) & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_0_r(offset);
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_1_r(offset);
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_2_r(offset);
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_3_r(offset);
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_4_r(offset);
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_0_r(machine,offset);
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_1_r(machine,offset);
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_2_r(machine,offset);
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_3_r(machine,offset);
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_4_r(machine,offset);
 
 	return ret;
 }
 
 static READ8_HANDLER( royalmah_player_2_port_r )
 {
-	int ret = (input_port_5_r(offset) & 0xc0) | 0x3f;
+	int ret = (input_port_5_r(machine,offset) & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_5_r(offset);
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_6_r(offset);
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_7_r(offset);
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_8_r(offset);
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_9_r(offset);
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_5_r(machine,offset);
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_6_r(machine,offset);
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_7_r(machine,offset);
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_8_r(machine,offset);
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_9_r(machine,offset);
 
 	return ret;
 }
@@ -574,7 +574,7 @@ static READ8_HANDLER( mjifb_rom_io_r )
 	{
 		case 0x8000:	return readinputport(14);		// dsw 4
 		case 0x8200:	return readinputport(13);		// dsw 3
-		case 0x9001:	return AY8910_read_port_0_r(0);	// inputs
+		case 0x9001:	return AY8910_read_port_0_r(machine,0);	// inputs
 		case 0x9011:	return readinputport(10);
 	}
 
@@ -595,12 +595,12 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 	switch(offset)
 	{
 		case 0x8e00:	palette_base = data & 0x1f;	return;
-		case 0x9002:	AY8910_write_port_0_w(0,data);			return;
-		case 0x9003:	AY8910_control_port_0_w(0,data);		return;
+		case 0x9002:	AY8910_write_port_0_w(machine,0,data);			return;
+		case 0x9003:	AY8910_control_port_0_w(machine,0,data);		return;
 		case 0x9010:
-			mjifb_coin_counter_w(0,data);
+			mjifb_coin_counter_w(machine,0,data);
 			return;
-		case 0x9011:	input_port_select_w(0,data);	return;
+		case 0x9011:	input_port_select_w(machine,0,data);	return;
 		case 0x9013:
 //          if (data)   popmessage("%02x",data);
 			return;
@@ -681,7 +681,7 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 	{
 		case 0x8000:	return readinputport(14);		// dsw 2
 		case 0x8001:	return readinputport(13);		// dsw 1
-		case 0x9001:	return AY8910_read_port_0_r(0);	// inputs
+		case 0x9001:	return AY8910_read_port_0_r(machine,0);	// inputs
 		case 0x9011:	return readinputport(10);
 	}
 
@@ -700,11 +700,11 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 	offset += 0x8000;
 	switch(offset)
 	{
-		case 0x8802:	palette_base = data & 0x1f;			return;
-		case 0x9002:	AY8910_write_port_0_w(0,data);		return;
-		case 0x9003:	AY8910_control_port_0_w(0,data);	return;
-		case 0x9010:	mjifb_coin_counter_w(0,data);		return;
-		case 0x9011:	input_port_select_w(0,data);		return;
+		case 0x8802:	palette_base = data & 0x1f;					return;
+		case 0x9002:	AY8910_write_port_0_w(machine,0,data);		return;
+		case 0x9003:	AY8910_control_port_0_w(machine,0,data);	return;
+		case 0x9010:	mjifb_coin_counter_w(machine,0,data);		return;
+		case 0x9011:	input_port_select_w(machine,0,data);		return;
 		case 0x9013:
 //          if (data)   popmessage("%02x",data);
 			return;

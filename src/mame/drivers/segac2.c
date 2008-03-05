@@ -180,9 +180,9 @@ static READ16_HANDLER( ym3438_r )
 {
 	switch (offset)
 	{
-		case 0: return YM3438_status_port_0_A_r(0);
-		case 1: return YM3438_read_port_0_r(0);
-		case 2: return YM3438_status_port_0_B_r(0);
+		case 0: return YM3438_status_port_0_A_r(machine, 0);
+		case 1: return YM3438_read_port_0_r(machine, 0);
+		case 2: return YM3438_status_port_0_B_r(machine, 0);
 	}
 	return 0xff;
 }
@@ -205,10 +205,10 @@ static WRITE16_HANDLER( ym3438_w )
 
 		switch (offset)
 		{
-			case 0: YM3438_control_port_0_A_w(0, data & 0xff);	last_port = data;	break;
-			case 1: YM3438_data_port_0_A_w(0, data & 0xff);							break;
-			case 2: YM3438_control_port_0_B_w(0, data & 0xff);	last_port = data;	break;
-			case 3: YM3438_data_port_0_B_w(0, data & 0xff);							break;
+			case 0: YM3438_control_port_0_A_w(machine, 0, data & 0xff);	last_port = data;	break;
+			case 1: YM3438_data_port_0_A_w(machine, 0, data & 0xff);							break;
+			case 2: YM3438_control_port_0_B_w(machine, 0, data & 0xff);	last_port = data;	break;
+			case 3: YM3438_data_port_0_B_w(machine, 0, data & 0xff);							break;
 		}
 	}
 }
@@ -372,7 +372,7 @@ static READ16_HANDLER( io_chip_r )
 
 			/* otherwise, return an input port */
 			if (offset == 0x04/2 && sound_banks)
-				return (readinputport(offset) & 0xbf) | (upd7759_0_busy_r(0) << 6);
+				return (readinputport(offset) & 0xbf) | (upd7759_0_busy_r(machine,0) << 6);
 			return readinputport(offset);
 
 		/* 'SEGA' protection */

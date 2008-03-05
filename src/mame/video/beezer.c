@@ -8,7 +8,7 @@ static int scanline=0;
 INTERRUPT_GEN( beezer_interrupt )
 {
 	scanline = (scanline + 1) % 0x80;
-	via_0_ca2_w (0, scanline & 0x10);
+	via_0_ca2_w (machine, 0, scanline & 0x10);
 	if ((scanline & 0x78) == 0x78)
 		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 	else

@@ -2097,12 +2097,12 @@ static READ16_HANDLER( r2_playerin_r )
 }
 static READ16_HANDLER( rdx_v33_oki_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine,0);
 }
 
 static WRITE16_HANDLER( rdx_v33_oki_w )
 {
-	if (ACCESSING_LSB) OKIM6295_data_0_w(0, data & 0x00ff);
+	if (ACCESSING_LSB) OKIM6295_data_0_w(machine, 0, data & 0x00ff);
 	if (ACCESSING_MSB) logerror("rdx_v33_oki_w MSB %04x\n",data);
 }
 

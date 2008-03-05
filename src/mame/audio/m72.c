@@ -125,14 +125,14 @@ WRITE16_HANDLER( m72_sound_command_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(offset,data);
+		soundlatch_w(machine,offset,data);
 		timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_command_byte_w )
 {
-	soundlatch_w(offset,data);
+	soundlatch_w(machine,offset,data);
 	timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);
 }
 

@@ -67,7 +67,7 @@ static INTERRUPT_GEN( blockade_interrupt )
 {
 	cpunum_resume(0, SUSPEND_ANY_REASON);
 
-	if ((input_port_0_r(0) & 0x80) == 0)
+	if ((input_port_0_r(machine,0) & 0x80) == 0)
 	{
 		just_been_reset = 1;
 		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
@@ -78,7 +78,7 @@ static READ8_HANDLER( blockade_input_port_0_r )
 {
     /* coin latch is bit 7 */
 
-    UINT8 temp = (input_port_0_r(0)&0x7f);
+    UINT8 temp = (input_port_0_r(machine,0)&0x7f);
     return (coin_latch<<7) | (temp);
 }
 

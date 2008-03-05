@@ -163,7 +163,7 @@ logerror("banksw %d\n",bank);
 
 static MACHINE_RESET( themj )
 {
-	themj_rombank_w(0,0);
+	themj_rombank_w(machine,0,0);
 }
 
 

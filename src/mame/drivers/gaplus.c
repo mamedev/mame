@@ -264,7 +264,7 @@ static READ8_HANDLER( gaplus_snd_sharedram_r )
 static WRITE8_HANDLER( gaplus_snd_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(offset,data);
+		namco_15xx_w(machine,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }

@@ -29,7 +29,7 @@ subs_interrupt
 INTERRUPT_GEN( subs_interrupt )
 {
 	/* only do NMI interrupt if not in TEST mode */
-	if ((input_port_2_r(0) & 0x40)==0x40)
+	if ((input_port_2_r(machine, 0) & 0x40)==0x40)
 		cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -40,13 +40,13 @@ When D7 is high, the steering wheel has moved.
 If D6 is high, it moved left.  If D6 is low, it moved right.
 Be sure to keep returning a direction until steer_reset is called.
 ***************************************************************************/
-static int subs_steering_1(void)
+static int subs_steering_1(running_machine *machine)
 {
 	static int last_val=0;
 	int this_val;
 	int delta;
 
-	this_val=input_port_3_r(0);
+	this_val=input_port_3_r(machine, 0);
 
 	delta=this_val-last_val;
 	last_val=this_val;
@@ -69,13 +69,13 @@ static int subs_steering_1(void)
 	return subs_steering_val1;
 }
 
-static int subs_steering_2(void)
+static int subs_steering_2(running_machine *machine)
 {
 	static int last_val=0;
 	int this_val;
 	int delta;
 
-	this_val=input_port_4_r(0);
+	this_val=input_port_4_r(machine,0);
 
 	delta=this_val-last_val;
 	last_val=this_val;
@@ -112,7 +112,7 @@ subs_control_r
 ***************************************************************************/
 READ8_HANDLER( subs_control_r )
 {
-	int inport = input_port_1_r(offset);
+	int inport = input_port_1_r(machine, offset);
 
 	switch (offset & 0x07)
 	{
@@ -120,10 +120,10 @@ READ8_HANDLER( subs_control_r )
 		case 0x01:		return ((inport & 0x02) << 6);	/* diag hold */
 		case 0x02:		return ((inport & 0x04) << 5);	/* slam */
 		case 0x03:		return ((inport & 0x08) << 4);	/* spare */
-		case 0x04:		return ((subs_steering_1() & 0x40) << 1);	/* steer dir 1 */
-		case 0x05:		return ((subs_steering_1() & 0x80) << 0);	/* steer flag 1 */
-		case 0x06:		return ((subs_steering_2() & 0x40) << 1);	/* steer dir 2 */
-		case 0x07:		return ((subs_steering_2() & 0x80) << 0);	/* steer flag 2 */
+		case 0x04:		return ((subs_steering_1(machine) & 0x40) << 1);	/* steer dir 1 */
+		case 0x05:		return ((subs_steering_1(machine) & 0x80) << 0);	/* steer flag 1 */
+		case 0x06:		return ((subs_steering_2(machine) & 0x40) << 1);	/* steer dir 2 */
+		case 0x07:		return ((subs_steering_2(machine) & 0x80) << 0);	/* steer flag 2 */
 	}
 
 	return 0;
@@ -134,7 +134,7 @@ subs_coin_r
 ***************************************************************************/
 READ8_HANDLER( subs_coin_r )
 {
-	int inport = input_port_2_r(offset);
+	int inport = input_port_2_r(machine, offset);
 
 	switch (offset & 0x07)
 	{
@@ -156,7 +156,7 @@ subs_options_r
 ***************************************************************************/
 READ8_HANDLER( subs_options_r )
 {
-	int opts = input_port_0_r(offset);
+	int opts = input_port_0_r(machine, offset);
 
 	switch (offset & 0x03)
 	{

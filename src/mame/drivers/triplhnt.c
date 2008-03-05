@@ -36,7 +36,7 @@ void triplhnt_set_collision(int code)
 }
 
 
-static void triplhnt_update_misc(int offset)
+static void triplhnt_update_misc(running_machine *machine, int offset)
 {
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
@@ -72,9 +72,9 @@ static void triplhnt_update_misc(int offset)
 	coin_lockout_w(0, !(triplhnt_misc_flags & 0x08));
 	coin_lockout_w(1, !(triplhnt_misc_flags & 0x08));
 
-	discrete_sound_w(TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
-	discrete_sound_w(TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
-	discrete_sound_w(TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
+	discrete_sound_w(machine, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
+	discrete_sound_w(machine, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
+	discrete_sound_w(machine, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
 
 	is_witch_hunt = readinputport(2) == 0x40;
 	bit = ~triplhnt_misc_flags & 0x40;
@@ -93,7 +93,7 @@ static void triplhnt_update_misc(int offset)
 
 static WRITE8_HANDLER( triplhnt_misc_w )
 {
-	triplhnt_update_misc(offset);
+	triplhnt_update_misc(machine, offset);
 }
 
 
@@ -107,16 +107,14 @@ static READ8_HANDLER( triplhnt_cmos_r )
 
 static READ8_HANDLER( triplhnt_input_port_4_r )
 {
-	watchdog_reset_w(0, 0);
-
+	watchdog_reset_w(machine, 0, 0);
 	return readinputport(4);
 }
 
 
 static READ8_HANDLER( triplhnt_misc_r )
 {
-	triplhnt_update_misc(offset);
-
+	triplhnt_update_misc(machine, offset);
 	return readinputport(7) | triplhnt_hit_code;
 }
 

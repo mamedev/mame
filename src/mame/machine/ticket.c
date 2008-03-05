@@ -66,7 +66,7 @@ void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
 ***************************************************************************/
 READ8_HANDLER( ticket_dispenser_r )
 {
-	return ticket_dispenser_0_r(offset);
+	return ticket_dispenser_0_r(machine, offset);
 }
 
 READ8_HANDLER( ticket_dispenser_0_r )
@@ -86,7 +86,7 @@ READ8_HANDLER( ticket_dispenser_1_r )
 ***************************************************************************/
 WRITE8_HANDLER( ticket_dispenser_w )
 {
-	ticket_dispenser_0_w(offset, data);
+	ticket_dispenser_0_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( ticket_dispenser_0_w )

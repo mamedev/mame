@@ -161,8 +161,8 @@ static READ16_HANDLER( mcatadv_dsw_r )
 
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -180,7 +180,7 @@ static WRITE16_HANDLER( mcat_coin_w )
 
 static READ16_HANDLER( mcat_wd_r )
 {
-	watchdog_reset_r(0);
+	watchdog_reset_r(machine,0);
 	return 0xc00;
 }
 

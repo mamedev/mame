@@ -89,8 +89,8 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
-	soundlatch_w(offset, data);
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(machine, offset, data);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 

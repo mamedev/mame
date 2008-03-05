@@ -198,7 +198,7 @@ VIDEO_EOF( xmen6p )
 		for (offset=0;offset<(0xc000/2);offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(offset,xmen6p_tilemapright[offset]&0x00ff);
+			K052109_w(machine,offset,xmen6p_tilemapright[offset]&0x00ff);
 		}
 
 
@@ -217,7 +217,7 @@ VIDEO_EOF( xmen6p )
 		for (offset=0;offset<(0xc000/2);offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(offset,xmen6p_tilemapleft[offset]&0x00ff);
+			K052109_w(machine,offset,xmen6p_tilemapleft[offset]&0x00ff);
 		}
 
 

@@ -85,8 +85,8 @@ static WRITE8_HANDLER( darwin_0803_w )
 
 static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )

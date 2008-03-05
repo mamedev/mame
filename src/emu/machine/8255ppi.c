@@ -91,6 +91,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "8255ppi.h"
 #include "memconv.h"
 
@@ -99,8 +100,8 @@ static int num;
 
 typedef struct
 {
-	read8_handler port_read[3];
-	write8_handler port_write[3];
+	read8_machine_func port_read[3];
+	write8_machine_func port_write[3];
 
 	/* mode flags */
 	UINT8 groupA_mode;
@@ -142,7 +143,7 @@ void ppi8255_init( const ppi8255_interface *intfce )
 		ppi8255 *chip = &chips[i];
 
 		memset(chip, 0, sizeof(*chip));
-
+		
 		chip->port_read[0] = intfce->portAread[i];
 		chip->port_read[1] = intfce->portBread[i];
 		chip->port_read[2] = intfce->portCread[i];
@@ -268,7 +269,7 @@ static UINT8 ppi8255_read_port(ppi8255 *chip, int port)
 	if (chip->in_mask[port])
 	{
 		if (chip->port_read[port])
-			ppi8255_input(chip, port, chip->port_read[port](0));
+			ppi8255_input(chip, port, chip->port_read[port](Machine, 0));
 
 		result |= chip->read[port] & chip->in_mask[port];
 	}
@@ -328,7 +329,7 @@ static void ppi8255_write_port(ppi8255 *chip, int port)
 
 	chip->output[port] = write_data;
 	if (chip->port_write[port])
-		chip->port_write[port](0, write_data);
+		chip->port_write[port](Machine, 0, write_data);
 }
 
 
@@ -427,33 +428,33 @@ UINT8 ppi8255_peek( int which, offs_t offset )
 #endif
 
 
-void ppi8255_set_portAread(int which, read8_handler portAread)
+void ppi8255_set_portAread(int which, read8_machine_func portAread)
 {
 	chips[which].port_read[0] = portAread;
 }
 
-void ppi8255_set_portBread(int which, read8_handler portBread)
+void ppi8255_set_portBread(int which, read8_machine_func portBread)
 {
 	chips[which].port_read[1] = portBread;
 }
 
-void ppi8255_set_portCread(int which, read8_handler portCread)
+void ppi8255_set_portCread(int which, read8_machine_func portCread)
 {
 	chips[which].port_read[2] = portCread;
 }
 
 
-void ppi8255_set_portAwrite(int which, write8_handler portAwrite)
+void ppi8255_set_portAwrite(int which, write8_machine_func portAwrite)
 {
 	chips[which].port_write[0] = portAwrite;
 }
 
-void ppi8255_set_portBwrite(int which, write8_handler portBwrite)
+void ppi8255_set_portBwrite(int which, write8_machine_func portBwrite)
 {
 	chips[which].port_write[1] = portBwrite;
 }
 
-void ppi8255_set_portCwrite(int which, write8_handler portCwrite)
+void ppi8255_set_portCwrite(int which, write8_machine_func portCwrite)
 {
 	chips[which].port_write[2] = portCwrite;
 }
@@ -571,19 +572,19 @@ WRITE8_HANDLER( ppi8255_5_w ) { ppi8255_w( 5, offset, data ); }
 WRITE8_HANDLER( ppi8255_6_w ) { ppi8255_w( 6, offset, data ); }
 WRITE8_HANDLER( ppi8255_7_w ) { ppi8255_w( 7, offset, data ); }
 
-READ16_HANDLER( ppi8255_16le_0_r ) { return read16le_with_read8_handler(ppi8255_0_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_1_r ) { return read16le_with_read8_handler(ppi8255_1_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_2_r ) { return read16le_with_read8_handler(ppi8255_2_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_3_r ) { return read16le_with_read8_handler(ppi8255_3_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_4_r ) { return read16le_with_read8_handler(ppi8255_4_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_5_r ) { return read16le_with_read8_handler(ppi8255_5_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_6_r ) { return read16le_with_read8_handler(ppi8255_6_r, offset, mem_mask); }
-READ16_HANDLER( ppi8255_16le_7_r ) { return read16le_with_read8_handler(ppi8255_7_r, offset, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_0_w ) { write16le_with_write8_handler(ppi8255_0_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_1_w ) { write16le_with_write8_handler(ppi8255_1_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_2_w ) { write16le_with_write8_handler(ppi8255_2_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_3_w ) { write16le_with_write8_handler(ppi8255_3_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_4_w ) { write16le_with_write8_handler(ppi8255_4_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_5_w ) { write16le_with_write8_handler(ppi8255_5_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_6_w ) { write16le_with_write8_handler(ppi8255_6_w, offset, data, mem_mask); }
-WRITE16_HANDLER( ppi8255_16le_7_w ) { write16le_with_write8_handler(ppi8255_7_w, offset, data, mem_mask); }
+READ16_HANDLER( ppi8255_16le_0_r ) { return read16le_with_read8_handler(ppi8255_0_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_1_r ) { return read16le_with_read8_handler(ppi8255_1_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_2_r ) { return read16le_with_read8_handler(ppi8255_2_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_3_r ) { return read16le_with_read8_handler(ppi8255_3_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_4_r ) { return read16le_with_read8_handler(ppi8255_4_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_5_r ) { return read16le_with_read8_handler(ppi8255_5_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_6_r ) { return read16le_with_read8_handler(ppi8255_6_r, machine, offset, mem_mask); }
+READ16_HANDLER( ppi8255_16le_7_r ) { return read16le_with_read8_handler(ppi8255_7_r, machine, offset, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_0_w ) { write16le_with_write8_handler(ppi8255_0_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_1_w ) { write16le_with_write8_handler(ppi8255_1_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_2_w ) { write16le_with_write8_handler(ppi8255_2_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_3_w ) { write16le_with_write8_handler(ppi8255_3_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_4_w ) { write16le_with_write8_handler(ppi8255_4_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_5_w ) { write16le_with_write8_handler(ppi8255_5_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_6_w ) { write16le_with_write8_handler(ppi8255_6_w, machine, offset, data, mem_mask); }
+WRITE16_HANDLER( ppi8255_16le_7_w ) { write16le_with_write8_handler(ppi8255_7_w, machine, offset, data, mem_mask); }

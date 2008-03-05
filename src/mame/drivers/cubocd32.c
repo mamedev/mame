@@ -45,47 +45,29 @@
 */
 
 #include "driver.h"
+#include "memconv.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
 
-//READWRITE16BETO32BE(amiga_cia32,amiga_cia_r,amiga_cia_w)
-//READWRITE16BETO32BE(amiga_custom32,amiga_custom_r,amiga_custom_w)
-
 static READ32_HANDLER( amiga_cia32_r )
 {
-	UINT32 result = 0;
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= amiga_cia_r(offset * 2 + 0, mem_mask >> 16) << 16;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= amiga_cia_r(offset * 2 + 1, mem_mask) << 0;
-	return result;
+	return read32be_with_16be_handler(amiga_cia_r, machine, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( amiga_cia32_w )
 {
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		amiga_cia_w( offset * 2 + 0, data >> 16, mem_mask >> 16);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		amiga_cia_w( offset * 2 + 1, data, mem_mask);
+	write32be_with_16be_handler(amiga_cia_w, machine, offset, data, mem_mask);
 }
 
 static READ32_HANDLER( amiga_custom32_r )
 {
-	UINT32 result = 0;
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= amiga_custom_r(offset * 2 + 0, mem_mask >> 16) << 16;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= amiga_custom_r(offset * 2 + 1, mem_mask) << 0;
-	return result;
+	return read32be_with_16be_handler(amiga_custom_r, machine, offset, mem_mask);
 }
 
 static WRITE32_HANDLER( amiga_custom32_w )
 {
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		amiga_custom_w( offset * 2 + 0, data >> 16, mem_mask >> 16);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		amiga_custom_w( offset * 2 + 1, data, mem_mask);
+	write32be_with_16be_handler(amiga_custom_w, machine, offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( aga_overlay_w )

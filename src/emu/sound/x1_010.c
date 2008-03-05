@@ -270,7 +270,7 @@ READ16_HANDLER( seta_sound_word_r )
 	UINT16	ret;
 
 	ret = info->HI_WORD_BUF[offset]<<8;
-	ret += (seta_sound_r( offset )&0xff);
+	ret += (seta_sound_r( machine, offset )&0xff);
 	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, ret ));
 	return ret;
 }
@@ -279,7 +279,7 @@ WRITE16_HANDLER( seta_sound_word_w )
 {
 	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
 	info->HI_WORD_BUF[offset] = (data>>8)&0xff;
-	seta_sound_w( offset, data&0xff );
+	seta_sound_w( machine, offset, data&0xff );
 	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", activecpu_get_pc(), offset, data ));
 }
 

@@ -78,16 +78,16 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 {
 	switch ((offset & 0x1c) >> 2){
 		case 0x04:	/* bankswitch */
-			flkatck_bankswitch_w(0, data);
+			flkatck_bankswitch_w(machine, 0, data);
 			break;
 		case 0x05:	/* sound code number */
-			soundlatch_w(0, data);
+			soundlatch_w(machine, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+			cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
-			watchdog_reset_w(0, data);
+			watchdog_reset_w(machine, 0, data);
 			break;
 	}
 }

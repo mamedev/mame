@@ -63,7 +63,7 @@ WRITE8_HANDLER( cheekyms_port_80_w )
 	*cheekyms_port_80 = data;
 
 	/* d2 - interrupt enable */
-	interrupt_enable_w(offset, data & 0x04);
+	interrupt_enable_w(machine, offset, data & 0x04);
 }
 
 

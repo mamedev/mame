@@ -771,7 +771,7 @@ WRITE8_HANDLER( namcos1_cus30_w )
 		}
 	}
 	else if (offset < 0x140)
-		namcos1_sound_w(offset - 0x100,data);
+		namcos1_sound_w(machine, offset - 0x100,data);
 	else
 		namco_wavedata[offset] = data;
 }

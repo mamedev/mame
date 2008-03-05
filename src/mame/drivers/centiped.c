@@ -657,15 +657,15 @@ static WRITE8_HANDLER( bullsdrt_coin_count_w )
 
 static WRITE8_HANDLER( caterplr_AY8910_w )
 {
-	AY8910_control_port_0_w(0, offset);
-	AY8910_write_port_0_w(0, data);
+	AY8910_control_port_0_w(machine, 0, offset);
+	AY8910_write_port_0_w(machine, 0, data);
 }
 
 
 static READ8_HANDLER( caterplr_AY8910_r )
 {
-	AY8910_control_port_0_w(0, offset);
-	return AY8910_read_port_0_r(0);
+	AY8910_control_port_0_w(machine, 0, offset);
+	return AY8910_read_port_0_r(machine, 0);
 }
 
 

@@ -14,12 +14,12 @@
 typedef struct
 {
 	int num;							 /* number of PPIs to emulate */
-	read8_handler portAread[MAX_8255];
-	read8_handler portBread[MAX_8255];
-	read8_handler portCread[MAX_8255];
-	write8_handler portAwrite[MAX_8255];
-	write8_handler portBwrite[MAX_8255];
-	write8_handler portCwrite[MAX_8255];
+	read8_machine_func portAread[MAX_8255];
+	read8_machine_func portBread[MAX_8255];
+	read8_machine_func portCread[MAX_8255];
+	write8_machine_func portAwrite[MAX_8255];
+	write8_machine_func portBwrite[MAX_8255];
+	write8_machine_func portCwrite[MAX_8255];
 } ppi8255_interface;
 
 
@@ -30,13 +30,13 @@ void ppi8255_init( const ppi8255_interface *intfce);
 UINT8 ppi8255_r ( int which, offs_t offset );
 void ppi8255_w( int which, offs_t offset, UINT8 data );
 
-void ppi8255_set_portAread( int which, read8_handler portAread);
-void ppi8255_set_portBread( int which, read8_handler portBread);
-void ppi8255_set_portCread( int which, read8_handler portCread);
+void ppi8255_set_portAread( int which, read8_machine_func portAread);
+void ppi8255_set_portBread( int which, read8_machine_func portBread);
+void ppi8255_set_portCread( int which, read8_machine_func portCread);
 
-void ppi8255_set_portAwrite( int which, write8_handler portAwrite);
-void ppi8255_set_portBwrite( int which, write8_handler portBwrite);
-void ppi8255_set_portCwrite( int which, write8_handler portCwrite);
+void ppi8255_set_portAwrite( int which, write8_machine_func portAwrite);
+void ppi8255_set_portBwrite( int which, write8_machine_func portBwrite);
+void ppi8255_set_portCwrite( int which, write8_machine_func portCwrite);
 
 void ppi8255_set_portA( int which, UINT8 data );
 void ppi8255_set_portB( int which, UINT8 data );

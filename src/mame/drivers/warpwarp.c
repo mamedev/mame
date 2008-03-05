@@ -176,7 +176,7 @@ static WRITE8_HANDLER( geebee_out6_w )
 			/* n.c. */
 			break;
 		case 3:
-			geebee_sound_w(0,data);
+			geebee_sound_w(machine,0,data);
 			break;
 	}
 }
@@ -255,10 +255,10 @@ static WRITE8_HANDLER( warpwarp_out0_w )
 			warpwarp_ball_v = data;
 			break;
 		case 2:
-			warpwarp_sound_w(0,data);
+			warpwarp_sound_w(machine,0,data);
 			break;
 		case 3:
-			watchdog_reset_w(0,data);
+			watchdog_reset_w(machine,0,data);
 			break;
 	}
 }

@@ -61,22 +61,22 @@ static const struct AY8910interface amidar_ay8910_interface_2 =
 
 static READ8_HANDLER(amidar_ppi8255_0_r)
 {
-	return ppi8255_0_r(offset >> 4);
+	return ppi8255_0_r(machine, offset >> 4);
 }
 
 static READ8_HANDLER(amidar_ppi8255_1_r)
 {
-	return ppi8255_1_r(offset >> 4);
+	return ppi8255_1_r(machine, offset >> 4);
 }
 
 static WRITE8_HANDLER(amidar_ppi8255_0_w)
 {
-	ppi8255_0_w(offset >> 4, data);
+	ppi8255_0_w(machine, offset >> 4, data);
 }
 
 static WRITE8_HANDLER(amidar_ppi8255_1_w)
 {
-	ppi8255_1_w(offset >> 4, data);
+	ppi8255_1_w(machine, offset >> 4, data);
 }
 
 

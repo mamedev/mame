@@ -86,14 +86,14 @@ static MACHINE_RESET( rampart )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return (OKIM6295_status_0_r(offset) << 8) | 0x00ff;
+	return (OKIM6295_status_0_r(machine, offset) << 8) | 0x00ff;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_MSB)
-		OKIM6295_data_0_w(offset, (data >> 8) & 0xff);
+		OKIM6295_data_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 
@@ -109,9 +109,9 @@ static WRITE16_HANDLER( ym2413_w )
 	if (ACCESSING_MSB)
 	{
 		if (offset & 1)
-			YM2413_data_port_0_w(0, (data >> 8) & 0xff);
+			YM2413_data_port_0_w(machine, 0, (data >> 8) & 0xff);
 		else
-			YM2413_register_port_0_w(0, (data >> 8) & 0xff);
+			YM2413_register_port_0_w(machine, 0, (data >> 8) & 0xff);
 	}
 }
 

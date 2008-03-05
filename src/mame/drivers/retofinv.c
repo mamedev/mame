@@ -93,8 +93,8 @@ static READ8_HANDLER( cpu0_mf800_r )
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-      soundlatch_w(0, data);
-      cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+      soundlatch_w(machine, 0, data);
+      cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( irq0_ack_w )

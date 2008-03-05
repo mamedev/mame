@@ -193,22 +193,22 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 static READ32_HANDLER( oki_r )
 {
-	return OKIM6295_status_0_r(0);
+	return OKIM6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki_w )
 {
-	OKIM6295_data_0_w(0, data & 0xff);
+	OKIM6295_data_0_w(machine, 0, data & 0xff);
 }
 
 static READ32_HANDLER( oki2_r )
 {
-	return OKIM6295_status_1_r(0);
+	return OKIM6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki2_w )
 {
-	OKIM6295_data_1_w(0, data & 0xff);
+	OKIM6295_data_1_w(machine, 0, data & 0xff);
 }
 
 /* we need to throw away bits for all ram accesses as the devices are connected as 16-bit */
@@ -292,7 +292,7 @@ static WRITE32_HANDLER( simpl156_pf1_data_w )
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
 
-	deco16_pf1_data_w(offset,data,mem_mask);
+	deco16_pf1_data_w(machine,offset,data,mem_mask);
 }
 
 static READ32_HANDLER( simpl156_pf2_data_r )
@@ -305,7 +305,7 @@ static WRITE32_HANDLER( simpl156_pf2_data_w )
 {
 	data &=0x0000ffff;
 	mem_mask &=0x0000ffff;
-	deco16_pf2_data_w(offset,data,mem_mask);
+	deco16_pf2_data_w(machine,offset,data,mem_mask);
 }
 
 /* Memory Map controled by PALs */

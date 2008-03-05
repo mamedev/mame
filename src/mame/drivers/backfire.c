@@ -264,21 +264,21 @@ static WRITE32_HANDLER(backfire_eeprom_w)
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 
 static READ32_HANDLER( deco156_snd_r )
 {
-	return YMZ280B_status_0_r(0);
+	return YMZ280B_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( deco156_snd_w )
 {
 	if (offset)
-		YMZ280B_data_0_w(0, data);
+		YMZ280B_data_0_w(machine, 0, data);
 	else
-		YMZ280B_register_0_w(0, data);
+		YMZ280B_register_0_w(machine, 0, data);
 }
 
 /* map 32-bit writes to 16-bit */
@@ -299,10 +299,10 @@ static READ32_HANDLER( backfire_pf1_data_r ) {	return deco16_pf1_data[offset]^0x
 static READ32_HANDLER( backfire_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
 static READ32_HANDLER( backfire_pf3_data_r ) {	return deco16_pf3_data[offset]^0xffff0000; }
 static READ32_HANDLER( backfire_pf4_data_r ) {	return deco16_pf4_data[offset]^0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(machine,offset,data,mem_mask); }
 
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )

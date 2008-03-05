@@ -130,11 +130,11 @@ WRITE8_HANDLER( msm6242_w )
 
 READ16_HANDLER( msm6242_lsb_r )
 {
-	return msm6242_r(offset);
+	return msm6242_r(machine, offset);
 }
 
 WRITE16_HANDLER( msm6242_lsb_w )
 {
 	if (ACCESSING_LSB)
-		msm6242_w(offset,data);
+		msm6242_w(machine, offset, data);
 }

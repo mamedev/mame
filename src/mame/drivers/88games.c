@@ -40,16 +40,16 @@ static READ8_HANDLER( bankedram_r )
 	else
 	{
 		if (zoomreadroms)
-			return K051316_rom_0_r(offset);
+			return K051316_rom_0_r(machine,offset);
 		else
-			return K051316_0_r(offset);
+			return K051316_0_r(machine,offset);
 	}
 }
 
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (videobank) ram[offset] = data;
-	else K051316_0_w(offset,data);
+	else K051316_0_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( k88games_5f84_w )

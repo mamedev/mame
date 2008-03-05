@@ -496,7 +496,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 	/* watchdog sometimes stop to work */
 	if (( (data >> 3) & 0x01) == 0)		/* check for refresh value (0x08h) */
 	{
-		watchdog_reset_w(0,0);
+		watchdog_reset(machine);
 //      fprintf(stdout,"Watchdog\n");
 	}
 }

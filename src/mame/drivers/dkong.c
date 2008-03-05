@@ -604,7 +604,7 @@ static READ8_HANDLER( dkong_in2_r )
 		dkongjr_snd_w2(ui_snd-8, (readinputportbytag("TST") & 0x02)>>1);
 #endif
 
-	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(0) << 6);
+	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(machine,0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coint */

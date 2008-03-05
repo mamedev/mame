@@ -1013,13 +1013,13 @@ static READ16_HANDLER( xymg_magic_r )
 static WRITE16_HANDLER( igs_YM3812_control_port_0_w )
 {
 	if (ACCESSING_LSB)
-		YM3812_control_port_0_w(0,data);
+		YM3812_control_port_0_w(machine,0,data);
 }
 
 static WRITE16_HANDLER( igs_YM3812_write_port_0_w )
 {
 	if (ACCESSING_LSB)
-		YM3812_write_port_0_w(0,data);
+		YM3812_write_port_0_w(machine,0,data);
 }
 
 static ADDRESS_MAP_START( chindrag_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1158,9 +1158,9 @@ static READ16_HANDLER( ics2115_0_word_r )
 {
 	switch(offset)
 	{
-		case 0:	return ics2115_r(0);
-		case 1:	return ics2115_r(1);
-		case 2:	return (ics2115_r(3) << 8) | ics2115_r(2);
+		case 0:	return ics2115_r(machine,0);
+		case 1:	return ics2115_r(machine,1);
+		case 2:	return (ics2115_r(machine,3) << 8) | ics2115_r(machine,2);
 	}
 	return 0xff;
 }
@@ -1170,11 +1170,11 @@ static WRITE16_HANDLER( ics2115_0_word_w )
 	switch(offset)
 	{
 		case 1:
-			if (ACCESSING_LSB)	ics2115_w(1,data);
+			if (ACCESSING_LSB)	ics2115_w(machine,1,data);
 			break;
 		case 2:
-			if (ACCESSING_LSB)	ics2115_w(2,data);
-			if (ACCESSING_MSB)	ics2115_w(3,data>>8);
+			if (ACCESSING_LSB)	ics2115_w(machine,2,data);
+			if (ACCESSING_MSB)	ics2115_w(machine,3,data>>8);
 			break;
 	}
 }

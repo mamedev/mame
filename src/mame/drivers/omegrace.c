@@ -235,7 +235,7 @@
 static MACHINE_RESET( omegrace )
 {
 	/* Omega Race expects the vector processor to be ready. */
-	avgdvg_reset_w (0, 0);
+	avgdvg_reset_w (machine,0, 0);
 }
 
 
@@ -248,7 +248,7 @@ static MACHINE_RESET( omegrace )
 
 static READ8_HANDLER( omegrace_vg_go_r )
 {
-	avgdvg_go_w(0,0);
+	avgdvg_go_w(machine,0,0);
 	return 0;
 }
 
@@ -322,8 +322,8 @@ static WRITE8_HANDLER( omegrace_leds_w )
 
 static WRITE8_HANDLER( omegrace_soundlatch_w )
 {
-	soundlatch_w (offset, data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w (machine, offset, data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 

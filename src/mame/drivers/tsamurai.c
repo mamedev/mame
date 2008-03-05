@@ -384,8 +384,8 @@ static READ8_HANDLER( vsgongf_a100_r ){
 }
 
 static WRITE8_HANDLER( vsgongf_sound_command_w ){
-	soundlatch_w( offset, data );
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w( machine, offset, data );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static ADDRESS_MAP_START( readmem_vsgongf, ADDRESS_SPACE_PROGRAM, 8 )

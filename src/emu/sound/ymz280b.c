@@ -24,6 +24,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "ymz280b.h"
 
@@ -91,8 +92,8 @@ struct YMZ280BChip
 	void (*irq_callback)(int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
-	read8_handler ext_ram_read;		/* external RAM read handler */
-	write8_handler ext_ram_write;	/* external RAM write handler */
+	read8_machine_func ext_ram_read;		/* external RAM read handler */
+	write8_machine_func ext_ram_write;	/* external RAM write handler */
 
 #if MAKE_WAVS
 	void *		wavresample;			/* resampled waveform */
@@ -864,7 +865,7 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 
 			case 0x87:		/* RAM write */
 				if (chip->ext_ram_write)
-					chip->ext_ram_write(chip->rom_readback_addr, data);
+					chip->ext_ram_write(Machine, chip->rom_readback_addr, data);
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
 				break;
@@ -1074,7 +1075,7 @@ READ8_HANDLER( YMZ280B_data_0_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	data = chip->ext_ram_read(chip->rom_readback_addr - 1);
+	data = chip->ext_ram_read(machine, chip->rom_readback_addr - 1);
 	chip->rom_readback_addr++;
 	return data;
 }
@@ -1083,7 +1084,7 @@ READ8_HANDLER( YMZ280B_data_1_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	data = chip->ext_ram_read(chip->rom_readback_addr - 1);
+	data = chip->ext_ram_read(machine, chip->rom_readback_addr - 1);
 	chip->rom_readback_addr++;
 	return data;
 }

@@ -177,8 +177,8 @@ MACHINE_RESET( balsente )
 	grudge_steering_result = 0;
 
 	/* reset the 6850 chips */
-	balsente_m6850_w(0, 3);
-	balsente_m6850_sound_w(0, 3);
+	balsente_m6850_w(machine, 0, 3);
+	balsente_m6850_sound_w(machine, 0, 3);
 
 	/* reset the noise generator */
 	memset(noise_position, 0, sizeof(noise_position));
@@ -1101,8 +1101,8 @@ WRITE8_HANDLER( balsente_dac_data_w )
 	if ((chip_select & 0x3f) != 0x3f)
 	{
 		UINT8 temp = chip_select;
-		balsente_chip_select_w(0, 0x3f);
-		balsente_chip_select_w(0, temp);
+		balsente_chip_select_w(machine, 0, 0x3f);
+		balsente_chip_select_w(machine, 0, temp);
 	}
 }
 

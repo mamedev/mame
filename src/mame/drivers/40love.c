@@ -266,7 +266,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(0,data);
+	soundlatch_w(machine,0,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -297,17 +297,17 @@ static WRITE8_HANDLER( fortyl_coin_counter_w )
 
 static READ8_HANDLER( fortyl_mcu_r )
 {
-	return buggychl_mcu_r(offset);
+	return buggychl_mcu_r(machine,offset);
 }
 
 static READ8_HANDLER( fortyl_mcu_status_r )
 {
-	return buggychl_mcu_status_r(offset);
+	return buggychl_mcu_status_r(machine,offset);
 }
 
 static WRITE8_HANDLER( fortyl_mcu_w )
 {
-	buggychl_mcu_w(offset,data);
+	buggychl_mcu_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( bank_select_w )

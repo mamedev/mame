@@ -25,7 +25,7 @@ WRITE8_HANDLER( jack_colorram_w )
 WRITE8_HANDLER( jack_paletteram_w )
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(offset,~data);
+	paletteram_BBGGGRRR_w(machine,offset,~data);
 }
 
 READ8_HANDLER( jack_flipscreen_r )

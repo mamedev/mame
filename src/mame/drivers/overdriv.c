@@ -35,46 +35,46 @@ VIDEO_UPDATE( overdriv );
 
 static READ16_HANDLER( K051316_0_msb_r )
 {
-	return K051316_0_r(offset) << 8;
+	return K051316_0_r(machine,offset) << 8;
 }
 
 static READ16_HANDLER( K051316_1_msb_r )
 {
-	return K051316_1_r(offset) << 8;
+	return K051316_1_r(machine,offset) << 8;
 }
 
 static READ16_HANDLER( K051316_rom_0_msb_r )
 {
-	return K051316_rom_0_r(offset) << 8;
+	return K051316_rom_0_r(machine,offset) << 8;
 }
 
 static READ16_HANDLER( K051316_rom_1_msb_r )
 {
-	return K051316_rom_1_r(offset) << 8;
+	return K051316_rom_1_r(machine,offset) << 8;
 }
 
 static WRITE16_HANDLER( K051316_0_msb_w )
 {
 	if (ACCESSING_MSB)
-		K051316_0_w(offset,data >> 8);
+		K051316_0_w(machine,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_1_msb_w )
 {
 	if (ACCESSING_MSB)
-		K051316_1_w(offset,data >> 8);
+		K051316_1_w(machine,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_ctrl_0_msb_w )
 {
 	if (ACCESSING_MSB)
-		K051316_ctrl_0_w(offset,data >> 8);
+		K051316_ctrl_0_w(machine,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_ctrl_1_msb_w )
 {
 	if (ACCESSING_MSB)
-		K051316_ctrl_1_w(offset,data >> 8);
+		K051316_ctrl_1_w(machine,offset,data >> 8);
 }
 
 
@@ -129,7 +129,7 @@ static READ16_HANDLER( eeprom_r )
 
 //logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
-	res = (EEPROM_read_bit() << 6) | input_port_0_word_r(0,0);
+	res = (EEPROM_read_bit() << 6) | input_port_0_word_r(machine,0,0);
 
 	return res;
 }
@@ -227,12 +227,12 @@ static WRITE16_HANDLER( sharedram_w )
 
 static READ16_HANDLER( overdriv_sound_0_r )
 {
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine,2 + offset);
 }
 
 static READ16_HANDLER( overdriv_sound_1_r )
 {
-	return K053260_1_r(2 + offset);
+	return K053260_1_r(machine,2 + offset);
 }
 
 static WRITE16_HANDLER( overdriv_soundirq_w )

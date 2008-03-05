@@ -56,7 +56,7 @@ static MACHINE_RESET(ssrj)
 
 static READ8_HANDLER(ssrj_wheel_r)
 {
-	int port= input_port_1_r(0) -0x80;
+	int port= input_port_1_r(machine,0) -0x80;
 	int retval=port-oldport;
 	oldport=port;
 	return retval;

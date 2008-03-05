@@ -155,7 +155,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 	memory_set_bank(1, data & 0x7);
 
 	/* map to the fromance gfx register */
-	fromance_gfxreg_w(offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	fromance_gfxreg_w(machine, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 

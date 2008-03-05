@@ -228,7 +228,7 @@ static INTERRUPT_GEN( raiden_interrupt )
 
 static VIDEO_EOF( raiden )
 {
-	buffer_spriteram16_w(0,0,0); /* Could be a memory location instead */
+	buffer_spriteram16_w(machine,0,0,0); /* Could be a memory location instead */
 }
 
 static MACHINE_DRIVER_START( raiden )

@@ -98,7 +98,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
 	/* bits 4-7 are DIP switches */
-	res = EEPROM_read_bit() | input_port_1_r(0);
+	res = EEPROM_read_bit() | input_port_1_r(machine,0);
 
 	if (init_eeprom_count)
 	{
@@ -202,25 +202,25 @@ static WRITE16_HANDLER( sound_cmd1_w )
 {
 	if((data & 0x00ff0000) == 0) {
 		data &= 0xff;
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if((data & 0x00ff0000) == 0) {
-		soundlatch2_w(0, data & 0xff);
+		soundlatch2_w(machine, 0, data & 0xff);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch3_r(0);
+	return soundlatch3_r(machine,0);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -240,7 +240,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(offset,mem_mask);
+		return K053247_word_r(machine,offset,mem_mask);
 	}
 }
 
@@ -252,7 +252,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(offset,data,mem_mask);
+		K053247_word_w(machine,offset,data,mem_mask);
 	}
 }
 
@@ -261,12 +261,12 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static READ16_HANDLER( player1_r ) 	// players 1 and 3
 {
-	return input_port_2_r(0) | (input_port_4_r(0)<<8);
+	return input_port_2_r(machine,0) | (input_port_4_r(machine,0)<<8);
 }
 
 static READ16_HANDLER( player2_r )	// players 2 and 4
 {
-	return input_port_3_r(0) | (input_port_5_r(0)<<8);
+	return input_port_3_r(machine,0) | (input_port_5_r(machine,0)<<8);
 }
 
 static WRITE16_HANDLER( moo_prot_w )

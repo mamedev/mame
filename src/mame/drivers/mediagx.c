@@ -352,44 +352,44 @@ static WRITE32_HANDLER( disp_ctrl_w )
 
 static READ8_HANDLER(at_dma8237_1_r)
 {
-	return dma8237_1_r(offset / 2);
+	return dma8237_1_r(machine, offset / 2);
 }
 
 static WRITE8_HANDLER(at_dma8237_1_w)
 {
-	dma8237_1_w(offset / 2, data);
+	dma8237_1_w(machine, offset / 2, data);
 }
 
 static READ32_HANDLER(at32_dma8237_1_r)
 {
-	return read32le_with_read8_handler(at_dma8237_1_r, offset, mem_mask);
+	return read32le_with_read8_handler(at_dma8237_1_r, machine, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(at32_dma8237_1_w)
 {
-	write32le_with_write8_handler(at_dma8237_1_w, offset, data, mem_mask);
+	write32le_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
 }
 
 
 
 static READ32_HANDLER( ide0_r )
 {
-	return ide_controller32_0_r(0x1f0/4 + offset, mem_mask);
+	return ide_controller32_0_r(machine, 0x1f0/4 + offset, mem_mask);
 }
 
 static WRITE32_HANDLER( ide0_w )
 {
-	ide_controller32_0_w(0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_0_w(machine, 0x1f0/4 + offset, data, mem_mask);
 }
 
 static READ32_HANDLER( fdc_r )
 {
-	return ide_controller32_0_r(0x3f0/4 + offset, mem_mask);
+	return ide_controller32_0_r(machine, 0x3f0/4 + offset, mem_mask);
 }
 
 static WRITE32_HANDLER( fdc_w )
 {
-	ide_controller32_0_w(0x3f0/4 + offset, data, mem_mask);
+	ide_controller32_0_w(machine, 0x3f0/4 + offset, data, mem_mask);
 }
 
 
@@ -469,7 +469,7 @@ static READ32_HANDLER( io20_r )
 	// 0x20 - 0x21, PIC
 	if ((mem_mask & 0x0000ffff) != 0xffff)
 	{
-		r |= pic8259_32le_0_r(offset, mem_mask);
+		r |= pic8259_32le_0_r(machine, offset, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -489,7 +489,7 @@ static WRITE32_HANDLER( io20_w )
 	// 0x20 - 0x21, PIC
 	if ((mem_mask & 0x0000ffff) != 0xffff)
 	{
-		pic8259_32le_0_w(offset, data, mem_mask);
+		pic8259_32le_0_w(machine, offset, data, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -976,7 +976,7 @@ static READ32_HANDLER( speedup9_r ) { return generic_speedup(&speedup_table[9]);
 static READ32_HANDLER( speedup10_r ) { return generic_speedup(&speedup_table[10]); }
 static READ32_HANDLER( speedup11_r ) { return generic_speedup(&speedup_table[11]); }
 
-static const read32_handler speedup_handlers[] =
+static const read32_machine_func speedup_handlers[] =
 {
 	speedup0_r,		speedup1_r,		speedup2_r,		speedup3_r,
 	speedup4_r,		speedup5_r,		speedup6_r,		speedup7_r,

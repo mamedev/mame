@@ -92,8 +92,8 @@ MACHINE_RESET( mhavoc )
 	memory_configure_bank(2, 0, 4,  memory_region(REGION_CPU1) + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
-	mhavoc_ram_banksel_w(0, 0);
-	mhavoc_rom_banksel_w(0, 0);
+	mhavoc_ram_banksel_w(machine, 0, 0);
+	mhavoc_rom_banksel_w(machine, 0, 0);
 
 	/* reset alpha comm status */
 	alpha_data = 0;

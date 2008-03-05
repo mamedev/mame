@@ -69,7 +69,7 @@ static unsigned deposits1=0, deposits2=0, credits=0;
 static WRITE16_HANDLER( sound_w )
 {
 	if(ACCESSING_LSB)
-		soundlatch_w(0, data&0xff);
+		soundlatch_w(machine, 0, data&0xff);
 }
 
 static READ16_HANDLER( alpha_mcu_r )

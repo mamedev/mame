@@ -158,7 +158,7 @@ void asic65_reset(int state)
 		else if (!state && asic65_reset_state)
 		{
 			if (asic65_command != -1)
-				asic65_data_w(1, asic65_command, 0);
+				asic65_data_w(Machine, 1, asic65_command, 0);
 		}
 
 		/* update the state */

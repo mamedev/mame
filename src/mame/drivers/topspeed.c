@@ -330,7 +330,7 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 
 static READ16_HANDLER( topspeed_input_bypass_r )
 {
-	UINT8 port = TC0220IOC_port_r(0);	/* read port number */
+	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
 	int analogue_steer = readinputportbytag_safe(STEER_PORT_TAG,0x00);
 	int fake = readinputportbytag_safe(FAKE_PORT_TAG,0x00);
@@ -367,7 +367,7 @@ static READ16_HANDLER( topspeed_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r(offset);
+			return TC0220IOC_portreg_r(machine,offset);
 	}
 }
 

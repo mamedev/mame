@@ -34,7 +34,7 @@ static INTERRUPT_GEN( orbit_interrupt )
 }
 
 
-static void update_misc_flags(UINT8 val)
+static void update_misc_flags(running_machine *machine, UINT8 val)
 {
 	orbit_misc_flags = val;
 
@@ -48,7 +48,7 @@ static void update_misc_flags(UINT8 val)
 	/* BIT7 => WARNING SND  */
 
 	orbit_nmi_enable = (orbit_misc_flags >> 2) & 1;
-	discrete_sound_w(ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
+	discrete_sound_w(machine, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
 
 	set_led_status(0, orbit_misc_flags & 0x08);
 	set_led_status(1, orbit_misc_flags & 0x40);
@@ -60,7 +60,7 @@ static void update_misc_flags(UINT8 val)
 
 static MACHINE_RESET( orbit )
 {
-	update_misc_flags(0);
+	update_misc_flags(machine, 0);
 }
 
 
@@ -70,11 +70,11 @@ static WRITE8_HANDLER( orbit_misc_w )
 
 	if (offset & 1)
 	{
-		update_misc_flags(orbit_misc_flags | (1 << bit));
+		update_misc_flags(machine, orbit_misc_flags | (1 << bit));
 	}
 	else
 	{
-		update_misc_flags(orbit_misc_flags & ~(1 << bit));
+		update_misc_flags(machine, orbit_misc_flags & ~(1 << bit));
 	}
 }
 

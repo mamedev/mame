@@ -321,7 +321,7 @@ static READ8_HANDLER(read_a00x)
 	case 0x02: return reg_a002;
 	case 0x04: return readinputportbytag("A004");
   case 0x05: return readinputportbytag("A005");
-  case 0x0c: return input_port_0_r(0); // stats / reset
+  case 0x0c: return input_port_0_r(machine,0); // stats / reset
 	case 0x0e: return readinputportbytag("A00E");// coin/reset
  }
 
@@ -331,11 +331,11 @@ static READ8_HANDLER(read_a00x)
     switch(reg_a002&0x3f)
     {
       case 0x3b:
-        return input_port_2_r(0);//bet10 / pay out
+        return input_port_2_r(machine,0);//bet10 / pay out
       case 0x3e:
-        return input_port_3_r(0);//TODO : trace f564
+        return input_port_3_r(machine,0);//TODO : trace f564
       case 0x3d:
-      	return input_port_4_r(0);
+      	return input_port_4_r(machine,0);
       default:
         logerror("A000 read with mux=0x%02x\n",reg_a002&0x3f);
     }

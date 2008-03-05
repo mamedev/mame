@@ -37,9 +37,9 @@ Year + Game         PCB             Notes
 
 ***************************************************************************/
 
-static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return YM3812_status_port_0_r(0) << 8;	}
-static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_MSB)	YM3812_control_port_0_w(0,data >> 8);	}
-static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_MSB)	YM3812_write_port_0_w(0,data >> 8);		}
+static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return YM3812_status_port_0_r(machine,0) << 8;	}
+static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_MSB)	YM3812_control_port_0_w(machine,0,data >> 8);	}
+static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_MSB)	YM3812_write_port_0_w(machine,0,data >> 8);		}
 
 
 /*
@@ -219,19 +219,19 @@ static READ32_HANDLER( zeropnt2_dsw1_r )			{ return (readinputportbytag("DSW1") 
 static READ32_HANDLER( zeropnt2_dsw2_r )			{ return (readinputportbytag("DSW2") << 16) | 0xffff; }
 static READ32_HANDLER( zeropnt2_buttons_r )			{ return ((readinputportbytag("IN7") | ((EEPROM_read_bit() & 0x01) << 7)) << 16) | 0xffff; }
 
-static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(0,0)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(0,0)+0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(0,0)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(0,0)+0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(machine,0,0)-0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(machine,0,0)+0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(machine,0,0)-0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(machine,0,0)+0x0800) << 16; }
 
-static READ32_HANDLER ( zeropnt2_oki0_r )			{ return OKIM6295_status_0_r(0) << 16; }
-static READ32_HANDLER ( zeropnt2_oki1_r )			{ return OKIM6295_status_1_r(0) << 16; }
-static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if ((mem_mask & 0x00ff0000) == 0)	OKIM6295_data_0_w(0,(data >> 16) & 0xff); }
-static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if ((mem_mask & 0x00ff0000) == 0)	OKIM6295_data_1_w(0,(data >> 16) & 0xff); }
+static READ32_HANDLER ( zeropnt2_oki0_r )			{ return OKIM6295_status_0_r(machine,0) << 16; }
+static READ32_HANDLER ( zeropnt2_oki1_r )			{ return OKIM6295_status_1_r(machine,0) << 16; }
+static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if ((mem_mask & 0x00ff0000) == 0)	OKIM6295_data_0_w(machine,0,(data >> 16) & 0xff); }
+static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if ((mem_mask & 0x00ff0000) == 0)	OKIM6295_data_1_w(machine,0,(data >> 16) & 0xff); }
 
-static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return YM2151_status_port_0_r(0) << 16; }
-static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if ((mem_mask & 0x00ff0000) == 0)	YM2151_register_port_0_w(0,(data >> 16) & 0xff); }
-static WRITE32_HANDLER( zeropnt2_ym2151_data_w )	{ if ((mem_mask & 0x00ff0000) == 0)	YM2151_data_port_0_w(0,(data >> 16) & 0xff); }
+static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return YM2151_status_port_0_r(machine,0) << 16; }
+static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if ((mem_mask & 0x00ff0000) == 0)	YM2151_register_port_0_w(machine,0,(data >> 16) & 0xff); }
+static WRITE32_HANDLER( zeropnt2_ym2151_data_w )	{ if ((mem_mask & 0x00ff0000) == 0)	YM2151_data_port_0_w(machine,0,(data >> 16) & 0xff); }
 
 static WRITE32_HANDLER( zeropnt2_sound_bank_w )
 {

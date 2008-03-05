@@ -161,7 +161,7 @@ static WRITE16_HANDLER( inten_w )
 
 static WRITE16_HANDLER( emres_w )
 {
-	watchdog_reset_r(0);
+	watchdog_reset(machine);
 	lockon_main_inten = 0;
 }
 

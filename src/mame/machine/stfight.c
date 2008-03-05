@@ -82,7 +82,7 @@ DRIVER_INIT( stfight )
 MACHINE_RESET( stfight )
 {
     // initialise rom bank
-    stfight_bank_w( 0, 0 );
+    stfight_bank_w( machine, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out

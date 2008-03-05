@@ -692,7 +692,7 @@ static void tms34010_reset(void)
 	/* the first time we are run */
 	state.reset_deferred = state.config->halt_on_reset;
 	if (state.config->halt_on_reset)
-		tms34010_io_register_w(REG_HSTCTLH, 0x8000, 0);
+		tms34010_io_register_w(Machine, REG_HSTCTLH, 0x8000, 0);
 }
 
 #if (HAS_TMS34020)
@@ -1653,8 +1653,8 @@ void tms34010_host_w(int cpunum, int reg, int data)
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 			external_host_access = TRUE;
-			tms34010_io_register_w(REG_HSTCTLH, data & 0xff00, 0);
-			tms34010_io_register_w(REG_HSTCTLL, data & 0x00ff, 0);
+			tms34010_io_register_w(Machine, REG_HSTCTLH, data & 0xff00, 0);
+			tms34010_io_register_w(Machine, REG_HSTCTLL, data & 0x00ff, 0);
 			external_host_access = FALSE;
 			break;
 

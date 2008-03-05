@@ -233,7 +233,7 @@ WRITE8_HANDLER( skyskipr_bitmap_w )
 	if (data & 0x80)
 		offset |= 0x40;
 
-	popeye_bitmap_w(offset,data);
+	popeye_bitmap_w(machine,offset,data);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -280,7 +280,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	if (lastflip != flip_screen_get())
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
-			popeye_bitmap_w(offs,popeye_bitmapram[offs]);
+			popeye_bitmap_w(machine,offs,popeye_bitmapram[offs]);
 
 		lastflip = flip_screen_get();
 	}

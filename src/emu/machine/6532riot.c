@@ -124,7 +124,7 @@ void r6532_write(int which, offs_t offset, UINT8 data)
 			{
 				UINT8 write_data = ( r6532[which].ddr_a & r6532[which].out_a ) | ( ~r6532[which].ddr_a & 0xFF );
 				if (r6532[which].intf->out_a_func)
-					r6532[which].intf->out_a_func(0, write_data);
+					r6532[which].intf->out_a_func(Machine, 0, write_data);
 				else
 					logerror("6532RIOT chip #%d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 				/* Check for PA7 change */
@@ -141,7 +141,7 @@ void r6532_write(int which, offs_t offset, UINT8 data)
 			{
 				UINT8 write_data = ( r6532[which].ddr_b & r6532[which].out_b ) | ( ~r6532[which].ddr_b & 0xFF );
 				if (r6532[which].intf->out_b_func)
-					r6532[which].intf->out_b_func(0, write_data);
+					r6532[which].intf->out_b_func(Machine, 0, write_data);
 				else
 					logerror("6532RIOT chip #%d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 			}
@@ -236,7 +236,7 @@ UINT8 r6532_read(int which, offs_t offset)
 	{
 	case 0:
 		if (r6532[which].intf->in_a_func)
-			r6532[which].in_a = r6532[which].intf->in_a_func(0);
+			r6532[which].in_a = r6532[which].intf->in_a_func(Machine, 0);
 		else
 			logerror("6532RIOT chip #%d: Port A is being read but has no handler.  PC: %08X\n", which, safe_activecpu_get_pc());
 		val = ( r6532[which].ddr_a & r6532[which].out_a ) | ( ~r6532[which].ddr_a & r6532[which].in_a );
@@ -248,7 +248,7 @@ UINT8 r6532_read(int which, offs_t offset)
 		break;
 	case 2:
 		if (r6532[which].intf->in_b_func)
-			r6532[which].in_b = r6532[which].intf->in_b_func(0);
+			r6532[which].in_b = r6532[which].intf->in_b_func(Machine, 0);
 		else
 			logerror("6532RIOT chip #%d: Port B is being read but has no handler.  PC: %08X\n", which, safe_activecpu_get_pc());
 

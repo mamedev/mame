@@ -171,19 +171,19 @@ READ8_HANDLER( psychic5_paged_ram_r )
 			switch(offset)
 			{
 				case 0x00:
-					val = input_port_0_r(0);
+					val = input_port_0_r(machine,0);
 					break;
 				case 0x01:
-					val = input_port_1_r(0);
+					val = input_port_1_r(machine,0);
 					break;
 				case 0x02:
-					val = input_port_2_r(0);
+					val = input_port_2_r(machine,0);
 					break;
 				case 0x03:
-					val = input_port_3_r(0);
+					val = input_port_3_r(machine,0);
 					break;
 				case 0x04:
-					val = input_port_4_r(0);
+					val = input_port_4_r(machine,0);
 					break;
 				default:
 					val = ps5_io_ram[offset];
@@ -206,7 +206,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 	if (!ps5_vram_page)
 	{
 		if (offset < 0x1000)
-			psychic5_bg_videoram_w(offset,data);
+			psychic5_bg_videoram_w(machine,offset,data);
 		else
 			ps5_dummy_bg_ram[offset & 0xfff] = data;
 	}
@@ -238,7 +238,7 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 		}
 		else
 		{
-			psychic5_fg_videoram_w(offset & 0xfff, data);
+			psychic5_fg_videoram_w(machine, offset & 0xfff, data);
 		}
 	}
 }

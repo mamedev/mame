@@ -385,8 +385,8 @@ static WRITE16_HANDLER(io_data_w)
 
 static WRITE16_HANDLER(sound_w)
 {
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1, I8051_INT0_LINE, HOLD_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, I8051_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )

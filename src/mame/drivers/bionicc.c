@@ -112,7 +112,7 @@ static UINT16 soundcommand;
 static WRITE16_HANDLER( hacked_soundcommand_w )
 {
 	COMBINE_DATA(&soundcommand);
-	soundlatch_w(0,soundcommand & 0xff);
+	soundlatch_w(machine,0,soundcommand & 0xff);
 }
 
 static READ16_HANDLER( hacked_soundcommand_r )

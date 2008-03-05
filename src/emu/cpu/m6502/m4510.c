@@ -141,8 +141,8 @@ typedef struct {
 	UINT16  low, high;
 	UINT32	mem[8];
 	int 	(*irq_callback)(int irqline);	/* IRQ callback */
-	read8_handler rdmem_id;					/* readmem callback for indexed instructions */
-	write8_handler wrmem_id;				/* writemem callback for indexed instructions */
+	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
 	UINT8    port;
@@ -173,10 +173,13 @@ INLINE int m4510_cpu_readop_arg(void)
 #define M4510
 #include "t65ce02.c"
 
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8(offset); }
+static WRITE8_HANDLER( default_wrmem_id ) { program_write_byte_8(offset, data); }
+
 static void m4510_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	m4510.rdmem_id = program_read_byte_8;
-	m4510.wrmem_id = program_write_byte_8;
+	m4510.rdmem_id = default_rdmem_id;
+	m4510.wrmem_id = default_wrmem_id;
 	m4510.irq_callback = irqcallback;
 }
 
@@ -412,8 +415,8 @@ static void m4510_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M4510_MEM7:			m4510.mem[7] = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m4510.rdmem_id = (read8_handler) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m4510.wrmem_id = (write8_handler) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m4510.rdmem_id = (read8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m4510.wrmem_id = (write8_machine_func) info->f; break;
 		case CPUINFO_PTR_M6510_PORTREAD:				m4510.port_read = (UINT8 (*)(void)) info->f; break;
 		case CPUINFO_PTR_M6510_PORTWRITE:				m4510.port_write = (void (*)(UINT8)) info->f; break;
 	}

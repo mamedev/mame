@@ -108,9 +108,9 @@ static int active_8910,port0a,acs;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return AY8910_read_port_0_r(0);
+		return AY8910_read_port_0_r(machine,0);
 	else
-		return AY8910_read_port_1_r(0);
+		return AY8910_read_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -128,9 +128,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			AY8910_control_port_0_w(0,port0a);
+			AY8910_control_port_0_w(machine,0,port0a);
 		else
-			AY8910_write_port_0_w(0,port0a);
+			AY8910_write_port_0_w(machine,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -143,9 +143,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			AY8910_control_port_1_w(0,port0a);
+			AY8910_control_port_1_w(machine,0,port0a);
 		else
-			AY8910_write_port_1_w(0,port0a);
+			AY8910_write_port_1_w(machine,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -161,7 +161,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	static int toggle;
 
-	pia_0_cb1_w(0,toggle & 1);
+	pia_0_cb1_w(machine,0,toggle & 1);
 	toggle ^= 1;
 }
 
@@ -171,7 +171,7 @@ static int port1a,port1b;
 
 static READ8_HANDLER( zaccaria_port1a_r )
 {
-	if (~port1b & 1) return tms5220_status_r(0);
+	if (~port1b & 1) return tms5220_status_r(machine,0);
 	else return port1a;
 }
 
@@ -187,7 +187,7 @@ static WRITE8_HANDLER( zaccaria_port1b_w )
 	// bit 0 = /RS
 
 	// bit 1 = /WS
-	if (~data & 2) tms5220_data_w(0,port1a);
+	if (~data & 2) tms5220_data_w(machine,0,port1a);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
 	acs = ~data & 0x08;
@@ -210,7 +210,7 @@ return counter;
 
 static void tms5220_irq_handler(int state)
 {
-	pia_1_cb1_w(0,state ? 0 : 1);
+	pia_1_cb1_w(Machine,0,state ? 0 : 1);
 }
 
 
@@ -257,14 +257,14 @@ static MACHINE_RESET( zaccaria )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(0,data);
-	cpunum_set_input_line(Machine, 2,0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	soundlatch_w(machine,0,data);
+	cpunum_set_input_line(machine, 2,0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	pia_0_ca1_w(0,data & 0x80);
-	soundlatch2_w(0,data);
+	pia_0_ca1_w(machine,0,data & 0x80);
+	soundlatch2_w(machine,0,data);
 }
 
 static WRITE8_HANDLER( mc1408_data_w )
@@ -300,7 +300,7 @@ static READ8_HANDLER( zaccaria_prot2_r )
 	switch (offset)
 	{
 		case 0:
-			return (input_port_6_r(0) & 0x07) | (acs & 0x08);   /* bits 4 and 5 must be 0 in Jack Rabbit */
+			return (input_port_6_r(machine,0) & 0x07) | (acs & 0x08);   /* bits 4 and 5 must be 0 in Jack Rabbit */
 
 		case 2:
 			return 0x10;    /* Jack Rabbit */
@@ -324,7 +324,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( nmienable_w )
 {
-	interrupt_enable_w(0,data & 1);
+	interrupt_enable_w(machine,0,data & 1);
 }
 
 

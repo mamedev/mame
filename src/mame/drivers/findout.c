@@ -66,7 +66,7 @@ static READ8_HANDLER( portC_r )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_1_r(0) | (ticket_dispenser_0_r(0) >> 5);
+	return input_port_1_r(machine, 0) | (ticket_dispenser_0_r(machine, 0) >> 5);
 }
 
 static WRITE8_HANDLER( lamps_w )
@@ -90,10 +90,10 @@ static WRITE8_HANDLER( sound_w )
 	set_led_status(9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(0, (data & 0x20)<< 2);
+	ticket_dispenser_w(machine, 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(0,data & 0x40);
+	interrupt_enable_w(machine, 0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
 	DAC_data_w(0,((data & 0x80) >> 7) * 255);

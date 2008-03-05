@@ -50,7 +50,7 @@ starfira has one less rom in total than starfire but everything passes as
 
 
 static UINT8 fireone_select;
-static read8_handler input_read;
+static read8_machine_func input_read;
 
 
 
@@ -67,8 +67,8 @@ static WRITE8_HANDLER( starfire_scratch_w )
 	{
 		switch (offset & 7)
 		{
-			case 0:	starfire_vidctrl_w(0, data); break;
-			case 1: starfire_vidctrl1_w(0, data); break;
+			case 0:	starfire_vidctrl_w(machine, 0, data); break;
+			case 1: starfire_vidctrl1_w(machine, 0, data); break;
 			case 2:
 				/* Sounds */
 				fireone_select = (data & 0x8) ? 0 : 1;
@@ -86,7 +86,7 @@ static READ8_HANDLER( starfire_scratch_r )
 {
 	/* A11 selects input ports */
 	if (offset & 0x800)
-		return (*input_read)(offset);
+		return (*input_read)(machine, offset);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
@@ -105,11 +105,11 @@ static READ8_HANDLER( starfire_input_r )
 {
 	switch (offset & 15)
 	{
-		case 0:	return input_port_0_r(0);
-		case 1:	return input_port_1_r(0);	/* Note: need to loopback sounds lengths on that one */
-		case 5: return input_port_4_r(0);
-		case 6:	return input_port_2_r(0);
-		case 7:	return input_port_3_r(0);
+		case 0:	return input_port_0_r(machine,0);
+		case 1:	return input_port_1_r(machine,0);	/* Note: need to loopback sounds lengths on that one */
+		case 5: return input_port_4_r(machine,0);
+		case 6:	return input_port_2_r(machine,0);
+		case 7:	return input_port_3_r(machine,0);
 		default: return 0xff;
 	}
 }
@@ -132,10 +132,10 @@ static READ8_HANDLER( fireone_input_r )
 
 	switch (offset & 15)
 	{
-		case 0:	return input_port_0_r(0);
-		case 1: return input_port_1_r(0);
+		case 0:	return input_port_0_r(machine,0);
+		case 1: return input_port_1_r(machine,0);
 		case 2:
-			temp = fireone_select ? input_port_2_r(0) : input_port_3_r(0);
+			temp = fireone_select ? input_port_2_r(machine,0) : input_port_3_r(machine,0);
 			temp = (temp & 0xc0) | fireone_paddle_map[temp & 0x3f];
 			return temp;
 		default: return 0xff;

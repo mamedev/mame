@@ -208,7 +208,7 @@ static WRITE16_HANDLER( vmetal_es8712_w )
     16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
     */
 
-	ES8712_data_0_lsb_w(offset, data, mem_mask);
+	ES8712_data_0_lsb_w(machine, offset, data, mem_mask);
 	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",activecpu_get_previouspc(),data,offset);
 }
 

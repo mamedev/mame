@@ -109,8 +109,8 @@ static WRITE16_HANDLER( inufuku_soundcommand_w )
 		if (data == 0x08) return;
 
 		pending_command = 1;
-		soundlatch_w(0, data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine, 0, data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -141,7 +141,7 @@ static MACHINE_RESET( inufuku )
 static DRIVER_INIT( inufuku )
 {
 	pending_command = 1;
-	inufuku_soundrombank_w(0, 0);
+	inufuku_soundrombank_w(machine, 0, 0);
 }
 
 

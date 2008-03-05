@@ -266,31 +266,31 @@ READ8_HANDLER( taitosound_slave_comm_r )
 WRITE16_HANDLER( taitosound_port16_lsb_w )
 {
 	if (ACCESSING_LSB)
-		taitosound_port_w(0,data & 0xff);
+		taitosound_port_w(machine,0,data & 0xff);
 }
 WRITE16_HANDLER( taitosound_comm16_lsb_w )
 {
 	if (ACCESSING_LSB)
-		taitosound_comm_w(0,data & 0xff);
+		taitosound_comm_w(machine,0,data & 0xff);
 }
 READ16_HANDLER( taitosound_comm16_lsb_r )
 {
-	return taitosound_comm_r(0);
+	return taitosound_comm_r(machine,0);
 }
 
 
 WRITE16_HANDLER( taitosound_port16_msb_w )
 {
 	if (ACCESSING_MSB)
-		taitosound_port_w(0,data >> 8);
+		taitosound_port_w(machine,0,data >> 8);
 }
 WRITE16_HANDLER( taitosound_comm16_msb_w )
 {
 	if (ACCESSING_MSB)
-		taitosound_comm_w(0,data >> 8);
+		taitosound_comm_w(machine,0,data >> 8);
 }
 READ16_HANDLER( taitosound_comm16_msb_r )
 {
-	return taitosound_comm_r(0) << 8;
+	return taitosound_comm_r(machine,0) << 8;
 }
 

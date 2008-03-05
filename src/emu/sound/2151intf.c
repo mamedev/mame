@@ -135,69 +135,69 @@ WRITE8_HANDLER( YM2151_data_port_2_w )
 WRITE8_HANDLER( YM2151_word_0_w )
 {
 	if (offset)
-		YM2151_data_port_0_w(0,data);
+		YM2151_data_port_0_w(machine,0,data);
 	else
-		YM2151_register_port_0_w(0,data);
+		YM2151_register_port_0_w(machine,0,data);
 }
 
 WRITE8_HANDLER( YM2151_word_1_w )
 {
 	if (offset)
-		YM2151_data_port_1_w(0,data);
+		YM2151_data_port_1_w(machine,0,data);
 	else
-		YM2151_register_port_1_w(0,data);
+		YM2151_register_port_1_w(machine,0,data);
 }
 
 READ16_HANDLER( YM2151_status_port_0_lsb_r )
 {
-	return YM2151_status_port_0_r(0);
+	return YM2151_status_port_0_r(machine,0);
 }
 
 READ16_HANDLER( YM2151_status_port_1_lsb_r )
 {
-	return YM2151_status_port_1_r(0);
+	return YM2151_status_port_1_r(machine,0);
 }
 
 READ16_HANDLER( YM2151_status_port_2_lsb_r )
 {
-	return YM2151_status_port_2_r(0);
+	return YM2151_status_port_2_r(machine,0);
 }
 
 
 WRITE16_HANDLER( YM2151_register_port_0_lsb_w )
 {
 	if (ACCESSING_LSB)
-		YM2151_register_port_0_w(0, data & 0xff);
+		YM2151_register_port_0_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_register_port_1_lsb_w )
 {
 	if (ACCESSING_LSB)
-		YM2151_register_port_1_w(0, data & 0xff);
+		YM2151_register_port_1_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_register_port_2_lsb_w )
 {
 	if (ACCESSING_LSB)
-		YM2151_register_port_2_w(0, data & 0xff);
+		YM2151_register_port_2_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_data_port_0_lsb_w )
 {
 	if (ACCESSING_LSB)
-		YM2151_data_port_0_w(0, data & 0xff);
+		YM2151_data_port_0_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_data_port_1_lsb_w )
 {
 	if (ACCESSING_LSB)
-		YM2151_data_port_1_w(0, data & 0xff);
+		YM2151_data_port_1_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_data_port_2_lsb_w )
 {
 	if (ACCESSING_LSB)
-		YM2151_data_port_2_w(0, data & 0xff);
+		YM2151_data_port_2_w(machine, 0, data & 0xff);
 }
 
 

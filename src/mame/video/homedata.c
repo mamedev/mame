@@ -49,7 +49,7 @@ static tilemap *bg_tilemap[2][4];
 
 ***************************************************************************/
 
-static void mrokumei_handleblit( int rom_base )
+static void mrokumei_handleblit( running_machine *machine, int rom_base )
 {
 	int i;
 	int DestParam;
@@ -117,7 +117,7 @@ static void mrokumei_handleblit( int rom_base )
 			} /* i!=0 */
 
 			if (data)	/* 00 is a nop */
-				mrokumei_videoram_w( BaseAddr + DestAddr, data );
+				mrokumei_videoram_w( machine, BaseAddr + DestAddr, data );
 
 			if (homedata_vreg[1] & 0x80)	/* flip screen */
 			{
@@ -136,7 +136,7 @@ finish:
 	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
-static void reikaids_handleblit( int rom_base )
+static void reikaids_handleblit( running_machine *machine, int rom_base )
 {
 	int i;
 	UINT16 DestParam;
@@ -221,7 +221,7 @@ static void reikaids_handleblit( int rom_base )
 						addr ^= 0x007c;
 					}
 
-					reikaids_videoram_w( addr, dat );
+					reikaids_videoram_w( machine, addr, dat );
 				}
 			}
 
@@ -236,7 +236,7 @@ finish:
 	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
-static void pteacher_handleblit( int rom_base )
+static void pteacher_handleblit( running_machine *machine, int rom_base )
 {
 	int i;
 	int DestParam;
@@ -309,7 +309,7 @@ static void pteacher_handleblit( int rom_base )
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
-					pteacher_videoram_w( addr, data );
+					pteacher_videoram_w( machine, addr, data );
 				}
 			}
 
@@ -651,7 +651,7 @@ WRITE8_HANDLER( pteacher_blitter_bank_w )
 
 WRITE8_HANDLER( mrokumei_blitter_start_w )
 {
-	if (data & 0x80) mrokumei_handleblit(((blitter_bank & 0x04) >> 2) * 0x10000);
+	if (data & 0x80) mrokumei_handleblit(machine, ((blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
        optional service mode ROM (not available in current dump) */
@@ -659,12 +659,12 @@ WRITE8_HANDLER( mrokumei_blitter_start_w )
 
 WRITE8_HANDLER( reikaids_blitter_start_w )
 {
-	reikaids_handleblit((blitter_bank & 3) * 0x10000);
+	reikaids_handleblit(machine, (blitter_bank & 3) * 0x10000);
 }
 
 WRITE8_HANDLER( pteacher_blitter_start_w )
 {
-	pteacher_handleblit((blitter_bank >> 5) * 0x10000 & (memory_region_length(REGION_USER1) - 1));
+	pteacher_handleblit(machine, (blitter_bank >> 5) * 0x10000 & (memory_region_length(REGION_USER1) - 1));
 }
 
 

@@ -120,18 +120,18 @@ static WRITE16_HANDLER( led_w )
 static WRITE16_HANDLER( pokey_word_w )
 {
 	if (offset & 0x10) /* A5 selects chip */
-		pokey2_w(offset & 0x0f, data);
+		pokey2_w(machine, offset & 0x0f, data);
 	else
-		pokey1_w(offset & 0x0f, data);
+		pokey1_w(machine, offset & 0x0f, data);
 }
 
 
 static READ16_HANDLER( pokey_word_r )
 {
 	if (offset & 0x10)
-		return pokey2_r(offset & 0x0f);
+		return pokey2_r(machine, offset & 0x0f);
 	else
-		return pokey1_r(offset & 0x0f);
+		return pokey1_r(machine, offset & 0x0f);
 }
 
 

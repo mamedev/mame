@@ -3,10 +3,10 @@
 
 struct _rsp_config
 {
-	read32_handler dp_reg_r;
-	write32_handler dp_reg_w;
-	read32_handler sp_reg_r;
-	write32_handler sp_reg_w;
+	read32_machine_func dp_reg_r;
+	write32_machine_func dp_reg_w;
+	read32_machine_func sp_reg_r;
+	write32_machine_func sp_reg_w;
 	void (*sp_set_status)(UINT32 status);
 };
 typedef struct _rsp_config rsp_config;

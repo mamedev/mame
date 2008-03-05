@@ -160,7 +160,7 @@ static MACHINE_RESET( tiamc1 )
 	tiamc1_spriteram_n = video_ram + 0x3020;
 	tiamc1_spriteram_a = video_ram + 0x3030;
 
-	tiamc1_bankswitch_w(0, 0);
+	tiamc1_bankswitch_w(machine, 0, 0);
 
 	state_save_register_global_pointer(video_ram, 0x3040);
 }

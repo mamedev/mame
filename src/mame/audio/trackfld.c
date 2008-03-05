@@ -105,7 +105,7 @@ WRITE8_HANDLER( konami_SN76496_latch_w )
 
 WRITE8_HANDLER( konami_SN76496_0_w )
 {
-    SN76496_0_w(offset, SN76496_latch);
+    SN76496_0_w(machine, offset, SN76496_latch);
 }
 
 

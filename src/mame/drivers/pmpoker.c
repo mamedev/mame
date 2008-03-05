@@ -902,10 +902,10 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( mux_data&0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_0_r(0);
-		case 0x20: return input_port_1_r(0);
-		case 0x40: return input_port_2_r(0);
-		case 0x80: return input_port_3_r(0);
+		case 0x10: return input_port_0_r(machine,0);
+		case 0x20: return input_port_1_r(machine,0);
+		case 0x40: return input_port_2_r(machine,0);
+		case 0x80: return input_port_3_r(machine,0);
 	}
 	return 0xff;
 }

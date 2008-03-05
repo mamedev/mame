@@ -358,9 +358,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_LSB16)
-		ret |= K054539_1_r(offset);
+		ret |= K054539_1_r(machine, offset);
 	if (ACCESSING_MSB16)
-		ret |= K054539_0_r(offset)<<8;
+		ret |= K054539_0_r(machine, offset)<<8;
 
 	return ret;
 }
@@ -368,9 +368,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_LSB16)
-		K054539_1_w(offset, data);
+		K054539_1_w(machine, offset, data);
 	if (ACCESSING_MSB16)
-		K054539_0_w(offset, data>>8);
+		K054539_0_w(machine, offset, data>>8);
 }
 
 static ADDRESS_MAP_START( sound_memmap, ADDRESS_SPACE_PROGRAM, 16 )

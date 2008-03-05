@@ -64,8 +64,8 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 		break;
 
 		case 1: /* soundlatch_w */
-		soundlatch_w(1,reg[1]&0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(machine,1,reg[1]&0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:

@@ -210,7 +210,7 @@ void copper_setpc(UINT32 pc)
 }
 
 
-static int copper_execute_next(int xpos)
+static int copper_execute_next(running_machine *machine, int xpos)
 {
 	int word0, word1;
 
@@ -224,7 +224,7 @@ static int copper_execute_next(int xpos)
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", last_scanline, xpos / 2, amiga_custom_names[copper_pending_offset & 0xff], copper_pending_data);
 
-		amiga_custom_w(copper_pending_offset, copper_pending_data, 0);
+		amiga_custom_w(machine, copper_pending_offset, copper_pending_data, 0);
 		copper_pending_offset = 0;
 	}
 
@@ -607,7 +607,7 @@ INLINE int update_ham(int newpix)
  *
  *************************************/
 
-void amiga_render_scanline(bitmap_t *bitmap, int scanline)
+void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
 {
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
@@ -659,7 +659,7 @@ void amiga_render_scanline(bitmap_t *bitmap, int scanline)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = copper_execute_next(x);
+			next_copper_x = copper_execute_next(machine, x);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = genlock_color;
@@ -984,7 +984,7 @@ VIDEO_UPDATE( amiga )
 
 	/* render each scanline in the visible region */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		amiga_render_scanline(bitmap, y);
+		amiga_render_scanline(machine, bitmap, y);
 
 	return 0;
 }

@@ -63,8 +63,8 @@
 
 #define PPC m6502.ppc.d
 
-#define RDMEM_ID	m6502.rdmem_id
-#define WRMEM_ID	m6502.wrmem_id
+#define RDMEM_ID(a)		m6502.rdmem_id(Machine,a)
+#define WRMEM_ID(a,d)	m6502.wrmem_id(Machine,a,d)
 
 #define CHANGE_PC change_pc(PCD)
 

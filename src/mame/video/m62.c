@@ -800,8 +800,8 @@ VIDEO_START( spelunkr )
 
 WRITE8_HANDLER( spelunk2_gfxport_w )
 {
-	m62_hscroll_high_w(0,(data&2)>>1);
-	m62_vscroll_high_w(0,(data&1));
+	m62_hscroll_high_w(machine,0,(data&2)>>1);
+	m62_vscroll_high_w(machine,0,(data&1));
 	if (spelunkr_palbank != ((data & 0x0c) >> 2))
 	{
 		spelunkr_palbank = (data & 0x0c) >> 2;

@@ -103,7 +103,7 @@ static WRITE8_HANDLER( shangkid_sound_enable_w )
 static WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
 {
 	bbx_AY8910_control = data;
-	AY8910_control_port_0_w( offset, data );
+	AY8910_control_port_0_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 		break;
 
 	default:
-		AY8910_write_port_0_w( offset, data );
+		AY8910_write_port_0_w( machine, offset, data );
 		break;
 	}
 }
@@ -149,7 +149,7 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		break;
 
 	default:
-		AY8910_write_port_0_w( offset, data );
+		AY8910_write_port_0_w( machine, offset, data );
 		break;
 	}
 }

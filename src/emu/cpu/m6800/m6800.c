@@ -1965,12 +1965,12 @@ static WRITE8_HANDLER( m6803_internal_registers_w );
 
 READ8_HANDLER( hd63701_internal_registers_r )
 {
-	return m6803_internal_registers_r(offset);
+	return m6803_internal_registers_r(Machine, offset);
 }
 
 WRITE8_HANDLER( hd63701_internal_registers_w )
 {
-	m6803_internal_registers_w(offset,data);
+	m6803_internal_registers_w(Machine, offset,data);
 }
 #endif
 

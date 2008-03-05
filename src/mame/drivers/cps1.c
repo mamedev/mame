@@ -250,7 +250,7 @@ static READ8_HANDLER( cps1_snd_fade_timer_r )
 static WRITE16_HANDLER( cps1_sound_command_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 }
 
 WRITE16_HANDLER( cps1_coinctrl_w )

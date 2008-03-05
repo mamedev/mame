@@ -466,8 +466,8 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 
 static READ32_HANDLER( trackball32_4bit_combined_r )
 {
-	return trackball32_4bit_r(offset, mem_mask) |
-			(trackball32_4bit_p2_r(offset, mem_mask) << 8);
+	return trackball32_4bit_r(machine, offset, mem_mask) |
+			(trackball32_4bit_p2_r(machine, offset, mem_mask) << 8);
 }
 
 
@@ -601,7 +601,7 @@ static WRITE8_HANDLER( drivedge_portb_out )
 	set_led_status(1, data & 0x01);
 	set_led_status(2, data & 0x02);
 	set_led_status(3, data & 0x04);
-	ticket_dispenser_w(0, (data & 0x10) << 3);
+	ticket_dispenser_w(machine, 0, (data & 0x10) << 3);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	ticket_dispenser_w(0, (data & 0x10) << 3);
+	ticket_dispenser_w(machine, 0, (data & 0x10) << 3);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -759,32 +759,32 @@ static READ32_HANDLER( drivedge_tms2_speedup_r )
 
 static READ32_HANDLER( input_port_0_msw_r )
 {
-	return input_port_0_word_r(offset,0) << 16;
+	return input_port_0_word_r(machine,offset,0) << 16;
 }
 
 static READ32_HANDLER( input_port_1_msw_r )
 {
-	return input_port_1_word_r(offset,0) << 16;
+	return input_port_1_word_r(machine,offset,0) << 16;
 }
 
 static READ32_HANDLER( input_port_2_msw_r )
 {
-	return input_port_2_word_r(offset,0) << 16;
+	return input_port_2_word_r(machine,offset,0) << 16;
 }
 
 static READ32_HANDLER( input_port_3_msw_r )
 {
-	return input_port_3_word_r(offset,0) << 16;
+	return input_port_3_word_r(machine,offset,0) << 16;
 }
 
 static READ32_HANDLER( input_port_4_msw_r )
 {
-	return special_port4_r(offset,0) << 16;
+	return special_port4_r(machine,offset,0) << 16;
 }
 
 static WRITE32_HANDLER( int1_ack32_w )
 {
-	int1_ack_w(offset, data, mem_mask);
+	int1_ack_w(machine, offset, data, mem_mask);
 }
 
 

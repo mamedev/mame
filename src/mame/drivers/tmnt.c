@@ -119,7 +119,7 @@ static READ16_HANDLER( K052109_word_noA12_r )
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return K052109_word_r(offset,mem_mask);
+	return K052109_word_r(machine,offset,mem_mask);
 }
 
 static WRITE16_HANDLER( K052109_word_noA12_w )
@@ -127,7 +127,7 @@ static WRITE16_HANDLER( K052109_word_noA12_w )
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	K052109_word_w(offset,data,mem_mask);
+	K052109_word_w(machine,offset,data,mem_mask);
 }
 
 static WRITE16_HANDLER( punkshot_K052109_word_w )
@@ -135,9 +135,9 @@ static WRITE16_HANDLER( punkshot_K052109_word_w )
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_MSB)
-		K052109_w(offset,(data >> 8) & 0xff);
+		K052109_w(machine,offset,(data >> 8) & 0xff);
 	else if (ACCESSING_LSB)
-		K052109_w(offset + 0x2000,data & 0xff);
+		K052109_w(machine,offset + 0x2000,data & 0xff);
 }
 
 static WRITE16_HANDLER( punkshot_K052109_word_noA12_w )
@@ -145,7 +145,7 @@ static WRITE16_HANDLER( punkshot_K052109_word_noA12_w )
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	punkshot_K052109_word_w(offset,data,mem_mask);
+	punkshot_K052109_word_w(machine,offset,data,mem_mask);
 }
 
 
@@ -159,7 +159,7 @@ static READ16_HANDLER( K053245_scattered_word_r )
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return K053245_word_r(offset,mem_mask);
+		return K053245_word_r(machine,offset,mem_mask);
 	}
 }
 
@@ -170,7 +170,7 @@ static WRITE16_HANDLER( K053245_scattered_word_w )
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		K053245_word_w(offset,data,mem_mask);
+		K053245_word_w(machine,offset,data,mem_mask);
 	}
 }
 
@@ -178,7 +178,7 @@ static READ16_HANDLER( K053244_word_noA1_r )
 {
 	offset &= ~1;	/* handle mirror address */
 
-	return K053244_r(offset + 1) | (K053244_r(offset) << 8);
+	return K053244_r(machine,offset + 1) | (K053244_r(machine,offset) << 8);
 }
 
 static WRITE16_HANDLER( K053244_word_noA1_w )
@@ -186,9 +186,9 @@ static WRITE16_HANDLER( K053244_word_noA1_w )
 	offset &= ~1;	/* handle mirror address */
 
 	if (ACCESSING_MSB)
-		K053244_w(offset,(data >> 8) & 0xff);
+		K053244_w(machine,offset,(data >> 8) & 0xff);
 	if (ACCESSING_LSB)
-		K053244_w(offset + 1,data & 0xff);
+		K053244_w(machine,offset + 1,data & 0xff);
 }
 
 static INTERRUPT_GEN(cuebrick_interrupt)
@@ -224,42 +224,42 @@ static INTERRUPT_GEN( lgtnfght_interrupt )
 static WRITE16_HANDLER( tmnt_sound_command_w )
 {
 	if (ACCESSING_LSB)
-		soundlatch_w(0,data & 0xff);
+		soundlatch_w(machine,0,data & 0xff);
 }
 
 static READ16_HANDLER( punkshot_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine,2 + offset);
 }
 
 static READ16_HANDLER( blswhstl_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine,2 + offset);
 }
 
 static READ16_HANDLER( glfgreat_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(2 + offset) << 8;
+	return K053260_0_r(machine,2 + offset) << 8;
 }
 
 static WRITE16_HANDLER( glfgreat_sound_w )
 {
 	if (ACCESSING_MSB)
-		K053260_0_w(offset, (data >> 8) & 0xff);
+		K053260_0_w(machine, offset, (data >> 8) & 0xff);
 
 	if (offset)
-		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static READ16_HANDLER( prmrsocr_sound_r )
 {
-	return soundlatch3_r(0);
+	return soundlatch3_r(machine,0);
 }
 
 static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
@@ -267,14 +267,14 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 	if (ACCESSING_LSB)
 	{
 		data &= 0xff;
-		if (offset == 0) soundlatch_w(0,data);
-		else soundlatch2_w(0,data);
+		if (offset == 0) soundlatch_w(machine,0,data);
+		else soundlatch2_w(machine,0,data);
 	}
 }
 
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 
 static READ16_HANDLER( tmnt2_sound_r )
 {
-	return K053260_0_r(2 + offset);
+	return K053260_0_r(machine, 2 + offset);
 }
 
 static READ8_HANDLER( tmnt_sres_r )
@@ -410,7 +410,7 @@ static READ16_HANDLER( ssriders_protection_r )
 			data = -program_read_word(0x105818);
 			data = ((data / 8 - 4) & 0x1f) * 0x40;
 			data += ((program_read_word(0x105cb0) +
-						256*K052109_r(0x1a01) + K052109_r(0x1a00) - 6) / 8 + 12) & 0x3f;
+						256*K052109_r(machine,0x1a01) + K052109_r(machine,0x1a00) - 6) / 8 + 12) & 0x3f;
 			return data;
 
 		default:
@@ -436,7 +436,7 @@ static WRITE16_HANDLER( ssriders_protection_w )
 			{
 				if ((program_read_word(0x180006 + 128*i) >> 8) == logical_pri)
 				{
-					K053245_word_w(8*i,hardware_pri,0xff00);
+					K053245_word_w(machine,8*i,hardware_pri,0xff00);
 					hardware_pri++;
 				}
 			}
@@ -491,7 +491,7 @@ static READ16_HANDLER( blswhstl_coin_r )
 
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
-	res = input_port_2_word_r(0,0);
+	res = input_port_2_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -507,7 +507,7 @@ static READ16_HANDLER( blswhstl_eeprom_r )
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
-	res = EEPROM_read_bit() | input_port_3_word_r(0,0);
+	res = EEPROM_read_bit() | input_port_3_word_r(machine,0,0);
 	return res;
 }
 
@@ -520,7 +520,7 @@ static READ16_HANDLER( ssriders_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = EEPROM_read_bit() | input_port_3_word_r(0,0);
+	res = EEPROM_read_bit() | input_port_3_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -539,7 +539,7 @@ static READ16_HANDLER( sunsetbl_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
-	res = EEPROM_read_bit() | input_port_3_word_r(0,0);
+	res = EEPROM_read_bit() | input_port_3_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -598,7 +598,7 @@ static READ16_HANDLER( thndrx2_in0_r )
 {
 	int res;
 
-	res = input_port_0_word_r(0,0);
+	res = input_port_0_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -616,7 +616,7 @@ static READ16_HANDLER( thndrx2_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = (EEPROM_read_bit() << 8) | input_port_1_word_r(0,0);
+	res = (EEPROM_read_bit() << 8) | input_port_1_word_r(machine,0,0);
 	toggle ^= 0x0800;
 	return (res ^ toggle);
 }
@@ -650,7 +650,7 @@ static READ16_HANDLER( prmrsocr_IN0_r )
 	/* bit 9 is service button */
 	int res;
 
-	res = input_port_0_word_r(0,0);
+	res = input_port_0_word_r(machine,0,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -663,14 +663,14 @@ static READ16_HANDLER( prmrsocr_eeprom_r )
 {
 	/* bit 8 is EEPROM data */
 	/* bit 9 is EEPROM ready */
-	return (EEPROM_read_bit() << 8) | input_port_1_word_r(0,0);
+	return (EEPROM_read_bit() << 8) | input_port_1_word_r(machine,0,0);
 }
 
 static WRITE16_HANDLER( prmrsocr_eeprom_w )
 {
 	if (ACCESSING_LSB)
 	{
-		prmrsocr_122000_w(offset,data,mem_mask);
+		prmrsocr_122000_w(machine,offset,data,mem_mask);
 	}
 
 	if (ACCESSING_MSB)
@@ -686,18 +686,18 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 
 static READ16_HANDLER( cuebrick_snd_r )
 {
-	return YM2151_status_port_0_r(0)<<8;
+	return YM2151_status_port_0_r(machine,0)<<8;
 }
 
 static WRITE16_HANDLER( cuebrick_snd_w )
 {
 	if (offset)
 	{
-		YM2151_data_port_0_w(0, data>>8);
+		YM2151_data_port_0_w(machine, 0, data>>8);
 	}
 	else
 	{
-		YM2151_register_port_0_w(0, data>>8);
+		YM2151_register_port_0_w(machine, 0, data>>8);
 	}
 }
 
@@ -906,7 +906,7 @@ INLINE UINT32 tmnt2_get_word(UINT32 addr)
 	return(0);
 }
 
-static void tmnt2_put_word(UINT32 addr, UINT16 data)
+static void tmnt2_put_word(running_machine *machine, UINT32 addr, UINT16 data)
 {
 	UINT32 offs;
 	if (addr >= 0x180000/2 && addr <= 0x183fff/2)
@@ -916,7 +916,7 @@ static void tmnt2_put_word(UINT32 addr, UINT16 data)
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			K053245_word_w(offs, data, 0);
+			K053245_word_w(machine, offs, data, 0);
 		}
 	}
 	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;
@@ -1031,11 +1031,11 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	xoffs += xmod;
 	yoffs += ymod;
 
-	tmnt2_put_word(dst_addr +  0, attr1);
-	tmnt2_put_word(dst_addr +  2, code);
-	tmnt2_put_word(dst_addr +  4, (UINT32)yoffs);
-	tmnt2_put_word(dst_addr +  6, (UINT32)xoffs);
-	tmnt2_put_word(dst_addr + 12, attr2 | color);
+	tmnt2_put_word(machine, dst_addr +  0, attr1);
+	tmnt2_put_word(machine, dst_addr +  2, code);
+	tmnt2_put_word(machine, dst_addr +  4, (UINT32)yoffs);
+	tmnt2_put_word(machine, dst_addr +  6, (UINT32)xoffs);
+	tmnt2_put_word(machine, dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
 static WRITE16_HANDLER( tmnt2_1c0800_w )
@@ -1295,11 +1295,11 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( K054539_0_ctrl_r )
 {
-	return K054539_0_r(0x200+offset);
+	return K054539_0_r(machine,0x200+offset);
 }
 static WRITE8_HANDLER( K054539_0_ctrl_w )
 {
-	K054539_0_w(0x200+offset,data);
+	K054539_0_w(machine,0x200+offset,data);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2399,8 +2399,8 @@ MACHINE_DRIVER_END
 static MACHINE_RESET( tmnt )
 {
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
-	upd7759_0_start_w(0, 0);
-	upd7759_0_reset_w(0, 1);
+	upd7759_0_start_w(machine, 0, 0);
+	upd7759_0_reset_w(machine, 0, 1);
 }
 
 static MACHINE_DRIVER_START( tmnt )

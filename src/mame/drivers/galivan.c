@@ -59,15 +59,15 @@ static MACHINE_RESET( galivan )
 
 static WRITE8_HANDLER( galivan_sound_command_w )
 {
-	soundlatch_w(offset,(data << 1) | 1);
+	soundlatch_w(machine,offset,(data << 1) | 1);
 }
 
 static READ8_HANDLER( galivan_sound_command_r )
 {
 	int data;
 
-	data = soundlatch_r(offset);
-	soundlatch_clear_w(0,0);
+	data = soundlatch_r(machine,offset);
+	soundlatch_clear_w(machine,0,0);
 	return data;
 }
 
@@ -83,16 +83,16 @@ static WRITE8_HANDLER( ninjemak_videoreg_w )
 	switch (offset)
 	{
 		case	0x0b:
-			ninjemak_scrolly_w(0, data);
+			ninjemak_scrolly_w(machine, 0, data);
 			break;
 		case	0x0c:
-			ninjemak_scrolly_w(1, data);
+			ninjemak_scrolly_w(machine, 1, data);
 			break;
 		case	0x0d:
-			ninjemak_scrollx_w(0, data);
+			ninjemak_scrollx_w(machine, 0, data);
 			break;
 		case	0x0e:
-			ninjemak_scrollx_w(1, data);
+			ninjemak_scrollx_w(machine, 1, data);
 			break;
 		default:
 			break;

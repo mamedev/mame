@@ -40,7 +40,7 @@ static MACHINE_RESET( dragrace )
 	timer_pulse(video_screen_get_frame_period(0), NULL, 0, dragrace_frame_callback);
 }
 
-static void dragrace_update_misc_flags(void)
+static void dragrace_update_misc_flags(running_machine *machine)
 {
 	/* 0x0900 = set 3SPEED1         0x00000001
      * 0x0901 = set 4SPEED1         0x00000002
@@ -76,21 +76,21 @@ static void dragrace_update_misc_flags(void)
 	set_led_status(0, dragrace_misc_flags & 0x00008000);
 	set_led_status(1, dragrace_misc_flags & 0x80000000);
 
-	discrete_sound_w(DRAGRACE_MOTOR1_DATA,  ~dragrace_misc_flags & 0x0000001f);		// Speed1 data*
-	discrete_sound_w(DRAGRACE_EXPLODE1_EN, (dragrace_misc_flags & 0x00000020) ? 1: 0);	// Explosion1 enable
-	discrete_sound_w(DRAGRACE_SCREECH1_EN, (dragrace_misc_flags & 0x00000040) ? 1: 0);	// Screech1 enable
-	discrete_sound_w(DRAGRACE_KLEXPL1_EN, (dragrace_misc_flags & 0x00000200) ? 1: 0);	// KLEXPL1 enable
-	discrete_sound_w(DRAGRACE_MOTOR1_EN, (dragrace_misc_flags & 0x00000800) ? 1: 0);	// Motor1 enable
+	discrete_sound_w(machine, DRAGRACE_MOTOR1_DATA,  ~dragrace_misc_flags & 0x0000001f);		// Speed1 data*
+	discrete_sound_w(machine, DRAGRACE_EXPLODE1_EN, (dragrace_misc_flags & 0x00000020) ? 1: 0);	// Explosion1 enable
+	discrete_sound_w(machine, DRAGRACE_SCREECH1_EN, (dragrace_misc_flags & 0x00000040) ? 1: 0);	// Screech1 enable
+	discrete_sound_w(machine, DRAGRACE_KLEXPL1_EN, (dragrace_misc_flags & 0x00000200) ? 1: 0);	// KLEXPL1 enable
+	discrete_sound_w(machine, DRAGRACE_MOTOR1_EN, (dragrace_misc_flags & 0x00000800) ? 1: 0);	// Motor1 enable
 
-	discrete_sound_w(DRAGRACE_MOTOR2_DATA, (~dragrace_misc_flags & 0x001f0000) >> 0x10);	// Speed2 data*
-	discrete_sound_w(DRAGRACE_EXPLODE2_EN, (dragrace_misc_flags & 0x00200000) ? 1: 0);	// Explosion2 enable
-	discrete_sound_w(DRAGRACE_SCREECH2_EN, (dragrace_misc_flags & 0x00400000) ? 1: 0);	// Screech2 enable
-	discrete_sound_w(DRAGRACE_KLEXPL2_EN, (dragrace_misc_flags & 0x02000000) ? 1: 0);	// KLEXPL2 enable
-	discrete_sound_w(DRAGRACE_MOTOR2_EN, (dragrace_misc_flags & 0x08000000) ? 1: 0);	// Motor2 enable
+	discrete_sound_w(machine, DRAGRACE_MOTOR2_DATA, (~dragrace_misc_flags & 0x001f0000) >> 0x10);	// Speed2 data*
+	discrete_sound_w(machine, DRAGRACE_EXPLODE2_EN, (dragrace_misc_flags & 0x00200000) ? 1: 0);	// Explosion2 enable
+	discrete_sound_w(machine, DRAGRACE_SCREECH2_EN, (dragrace_misc_flags & 0x00400000) ? 1: 0);	// Screech2 enable
+	discrete_sound_w(machine, DRAGRACE_KLEXPL2_EN, (dragrace_misc_flags & 0x02000000) ? 1: 0);	// KLEXPL2 enable
+	discrete_sound_w(machine, DRAGRACE_MOTOR2_EN, (dragrace_misc_flags & 0x08000000) ? 1: 0);	// Motor2 enable
 
-	discrete_sound_w(DRAGRACE_ATTRACT_EN, (dragrace_misc_flags & 0x00001000) ? 1: 0);	// Attract enable
-	discrete_sound_w(DRAGRACE_LOTONE_EN, (dragrace_misc_flags & 0x00002000) ? 1: 0);	// LoTone enable
-	discrete_sound_w(DRAGRACE_HITONE_EN, (dragrace_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
+	discrete_sound_w(machine, DRAGRACE_ATTRACT_EN, (dragrace_misc_flags & 0x00001000) ? 1: 0);	// Attract enable
+	discrete_sound_w(machine, DRAGRACE_LOTONE_EN, (dragrace_misc_flags & 0x00002000) ? 1: 0);	// LoTone enable
+	discrete_sound_w(machine, DRAGRACE_HITONE_EN, (dragrace_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
 }
 
 static WRITE8_HANDLER( dragrace_misc_w )
@@ -102,8 +102,8 @@ static WRITE8_HANDLER( dragrace_misc_w )
 	else
 		dragrace_misc_flags &= (~mask);
 	logerror("Set   %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0900+offset, mask, dragrace_misc_flags, data & 0x01);
-	dragrace_update_misc_flags();
-	}
+	dragrace_update_misc_flags(machine);
+}
 
 static WRITE8_HANDLER( dragrace_misc_clear_w )
 {
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( dragrace_misc_clear_w )
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
 	dragrace_misc_flags &= (~mask);
 	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920+offset, mask, dragrace_misc_flags, data & 0x01);
-	dragrace_update_misc_flags();
+	dragrace_update_misc_flags(machine);
 }
 
 static READ8_HANDLER( dragrace_input_r )

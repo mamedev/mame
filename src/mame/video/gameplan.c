@@ -144,13 +144,13 @@ static WRITE8_HANDLER( leprechn_video_command_w )
 static TIMER_CALLBACK( clear_screen_done_callback )
 {
 	/* indicate that the we are done clearing the screen */
-	via_0_ca1_w(0, 0);
+	via_0_ca1_w(machine, 0, 0);
 }
 
 
 static WRITE8_HANDLER( video_command_trigger_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	if (data == 0)
 	{
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( video_command_trigger_w )
 		/* clear screen */
 		case 3:
 			/* indicate that the we are busy */
-			via_0_ca1_w(0, 1);
+			via_0_ca1_w(machine, 0, 1);
 
 			memset(state->videoram, state->video_data & 0x0f, state->videoram_size);
 
@@ -265,7 +265,7 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	gameplan_state *state = machine->driver_data;
 
 	/* !VBLANK is connected to CA1 */
-	via_0_ca1_w(0, (UINT8)param);
+	via_0_ca1_w(machine, 0, (UINT8)param);
 
 	if (param)
 		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);

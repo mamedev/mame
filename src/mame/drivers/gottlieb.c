@@ -197,19 +197,19 @@ static int track[2];
 
 static READ8_HANDLER( gottlieb_track_0_r )
 {
-	return input_port_2_r(offset) - track[0];
+	return input_port_2_r(machine, offset) - track[0];
 }
 
 static READ8_HANDLER( gottlieb_track_1_r )
 {
-	return input_port_3_r(offset) - track[1];
+	return input_port_3_r(machine, offset) - track[1];
 }
 
 static WRITE8_HANDLER( gottlieb_track_reset_w )
 {
 	/* reset the trackball counters */
-	track[0] = input_port_2_r(offset);
-	track[1] = input_port_3_r(offset);
+	track[0] = input_port_2_r(machine, offset);
+	track[1] = input_port_3_r(machine, offset);
 }
 
 static int joympx;
@@ -240,13 +240,13 @@ static WRITE8_HANDLER( reactor_output_w )
 	set_led_status(0,data & 0x20);
 	set_led_status(1,data & 0x40);
 	set_led_status(2,data & 0x80);
-	gottlieb_video_outputs_w(offset,data);
+	gottlieb_video_outputs_w(machine,offset,data);
 }
 
 static WRITE8_HANDLER( stooges_output_w )
 {
 	joympx = (data >> 5) & 0x03;
-	gottlieb_video_outputs_w(offset,data);
+	gottlieb_video_outputs_w(machine,offset,data);
 }
 
 

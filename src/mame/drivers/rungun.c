@@ -119,7 +119,7 @@ static READ16_HANDLER( rng_sysregs_r )
                 bit8 : freeze
                 bit9 : joysticks layout(auto detect???)
             */
-			return(input_port_0_word_r(0, 0));
+			return(input_port_0_word_r(machine, 0, 0));
 		break;
 
 		case 0x06/2:
@@ -181,13 +181,13 @@ static WRITE16_HANDLER( rng_sysregs_w )
 static WRITE16_HANDLER( sound_cmd1_w )
 {
 	if (ACCESSING_MSB)
-		soundlatch_w(0, data>>8);
+		soundlatch_w(machine, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if (ACCESSING_MSB)
-		soundlatch2_w(0, data>>8);
+		soundlatch2_w(machine, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_irq_w )

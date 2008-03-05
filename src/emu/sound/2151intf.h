@@ -4,7 +4,7 @@
 struct YM2151interface
 {
 	void (*irqhandler)(int irq);
-	write8_handler portwritehandler;
+	write8_machine_func portwritehandler;
 };
 
 READ8_HANDLER( YM2151_status_port_0_r );

@@ -100,7 +100,7 @@ WRITE8_HANDLER( pastelg_romsel_w )
 {
 	pastelg_gfxrom = ((data & 0xc0) >> 6);
 	pastelg_palbank = ((data & 0x10) >> 4);
-	nb1413m3_sndrombank1_w(0, data);
+	nb1413m3_sndrombank1_w(machine, 0, data);
 
 	if ((pastelg_gfxrom << 16) > (memory_region_length(REGION_GFX1) - 1))
 	{

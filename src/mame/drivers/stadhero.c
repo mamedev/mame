@@ -52,8 +52,8 @@ static WRITE16_HANDLER( stadhero_control_w )
 		case 4: /* Interrupt ack (VBL - IRQ 5) */
 			break;
 		case 6: /* 6502 sound cpu */
-			soundlatch_w(0,data & 0xff);
-			cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+			soundlatch_w(machine,0,data & 0xff);
+			cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 			break;
 		default:
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",activecpu_get_pc(),data,0x30c010+offset);
@@ -82,10 +82,10 @@ static WRITE8_HANDLER( YM3812_w )
 {
 	switch (offset) {
 	case 0:
-		YM3812_control_port_0_w(0,data);
+		YM3812_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM3812_write_port_0_w(0,data);
+		YM3812_write_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -94,10 +94,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(0,data);
+		YM2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(0,data);
+		YM2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }

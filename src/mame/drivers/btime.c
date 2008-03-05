@@ -149,13 +149,13 @@ static void btime_decrypt(void)
 static WRITE8_HANDLER( lnc_w )
 {
 	if      (offset <= 0x3bff)                       ;
-	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(offset - 0x3c00,data); return; }
-	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(offset - 0x7c00,data); return; }
+	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(machine,offset - 0x3c00,data); return; }
+	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(machine,offset - 0x7c00,data); return; }
 	else if (offset == 0x8000)                     { return; }  /* MWA8_NOP */
-	else if (offset == 0x8001)                     { lnc_video_control_w(0,data); return; }
+	else if (offset == 0x8001)                     { lnc_video_control_w(machine,0,data); return; }
 	else if (offset == 0x8003)                       ;
 	else if (offset == 0x9000)                     { return; }  /* MWA8_NOP */
-	else if (offset == 0x9002)                     { audio_command_w(0,data); return; }
+	else if (offset == 0x9002)                     { audio_command_w(machine,0,data); return; }
 	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
@@ -168,13 +168,13 @@ static WRITE8_HANDLER( lnc_w )
 static WRITE8_HANDLER( mmonkey_w )
 {
 	if      (offset <= 0x3bff)                       ;
-	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(offset - 0x3c00,data); return; }
-	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(offset - 0x7c00,data); return; }
-	else if (offset == 0x8001)                     { lnc_video_control_w(0,data); return; }
+	else if (offset >= 0x3c00 && offset <= 0x3fff) { lnc_videoram_w(machine,offset - 0x3c00,data); return; }
+	else if (offset >= 0x7c00 && offset <= 0x7fff) { lnc_mirrorvideoram_w(machine,offset - 0x7c00,data); return; }
+	else if (offset == 0x8001)                     { lnc_video_control_w(machine,0,data); return; }
 	else if (offset == 0x8003)                       ;
 	else if (offset == 0x9000)                     { return; }  /* MWA8_NOP */
-	else if (offset == 0x9002)                     { audio_command_w(0,data); return; }
-	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(offset - 0xb000, data); return; }
+	else if (offset == 0x9002)                     { audio_command_w(machine,0,data); return; }
+	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(machine,offset - 0xb000, data); return; }
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
 	rambase[offset] = data;
@@ -186,13 +186,13 @@ static WRITE8_HANDLER( mmonkey_w )
 static WRITE8_HANDLER( btime_w )
 {
 	if      (offset <= 0x07ff)                     ;
-	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(offset - 0x0c00,data);
+	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(machine,offset - 0x0c00,data);
 	else if (offset >= 0x1000 && offset <= 0x17ff) ;
-	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(offset - 0x1800,data);
-	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(offset - 0x1c00,data);
-	else if (offset == 0x4002)                     btime_video_control_w(0,data);
-	else if (offset == 0x4003)                     audio_command_w(0,data);
-	else if (offset == 0x4004)                     bnj_scroll1_w(0,data);
+	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(machine,offset - 0x1800,data);
+	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(machine,offset - 0x1c00,data);
+	else if (offset == 0x4002)                     btime_video_control_w(machine,0,data);
+	else if (offset == 0x4003)                     audio_command_w(machine,0,data);
+	else if (offset == 0x4004)                     bnj_scroll1_w(machine,0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
 	rambase[offset] = data;
@@ -204,13 +204,13 @@ static WRITE8_HANDLER( zoar_w )
 {
 	if      (offset <= 0x07ff) 					   ;
 	else if (offset >= 0x8000 && offset <= 0x87ff) ;
-	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(offset - 0x8800,data);
-	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(offset - 0x8c00,data);
-	else if (offset == 0x9000)					   zoar_video_control_w(0, data);
+	else if (offset >= 0x8800 && offset <= 0x8bff) btime_mirrorvideoram_w(machine,offset - 0x8800,data);
+	else if (offset >= 0x8c00 && offset <= 0x8fff) btime_mirrorcolorram_w(machine,offset - 0x8c00,data);
+	else if (offset == 0x9000)					   zoar_video_control_w(machine,0, data);
 	else if (offset >= 0x9800 && offset <= 0x9803) ;
-	else if (offset == 0x9804)                     bnj_scroll2_w(0,data);
-	else if (offset == 0x9805)                     bnj_scroll1_w(0,data);
-	else if (offset == 0x9806)                     audio_command_w(0,data);
+	else if (offset == 0x9804)                     bnj_scroll2_w(machine,0,data);
+	else if (offset == 0x9805)                     bnj_scroll1_w(machine,0,data);
+	else if (offset == 0x9806)                     audio_command_w(machine,0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
 	rambase[offset] = data;
@@ -221,10 +221,10 @@ static WRITE8_HANDLER( zoar_w )
 static WRITE8_HANDLER( disco_w )
 {
 	if      (offset <= 0x04ff)                     ;
-	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(offset - 0x2000,data);
+	else if (offset >= 0x2000 && offset <= 0x7fff) deco_charram_w(machine,offset - 0x2000,data);
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
-	else if (offset == 0x9a00)                     audio_command_w(0,data);
-	else if (offset == 0x9c00)                     disco_video_control_w(0,data);
+	else if (offset == 0x9a00)                     audio_command_w(machine,0,data);
+	else if (offset == 0x9c00)                     disco_video_control_w(machine,0,data);
 	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 
 	rambase[offset] = data;
@@ -403,8 +403,8 @@ static INPUT_CHANGED( coin_inserted_nmi_lo )
 
 static WRITE8_HANDLER( audio_command_w )
 {
-	soundlatch_w(offset,data);
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	soundlatch_w(machine,offset,data);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 #define COMMON_INPUTS\

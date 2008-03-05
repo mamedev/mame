@@ -735,7 +735,7 @@ static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 			break;
 		case 0x8:
 		case 0x9:
-			AICA_MidiIn(0, AICA->udata.data[0x8/2]&0xff, 0);
+			AICA_MidiIn(Machine, 0, AICA->udata.data[0x8/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:

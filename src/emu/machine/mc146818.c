@@ -364,30 +364,30 @@ WRITE8_HANDLER(mc146818_port_w)
 
 READ16_HANDLER(mc146818_port16le_r)
 {
-	return read16le_with_read8_handler(mc146818_port_r, offset, mem_mask);
+	return read16le_with_read8_handler(mc146818_port_r, machine, offset, mem_mask);
 }
 
 WRITE16_HANDLER(mc146818_port16le_w)
 {
-	write16le_with_write8_handler(mc146818_port_w, offset, data, mem_mask);
+	write16le_with_write8_handler(mc146818_port_w, machine, offset, data, mem_mask);
 }
 
 READ32_HANDLER(mc146818_port32le_r)
 {
-	return read32le_with_read8_handler(mc146818_port_r, offset, mem_mask);
+	return read32le_with_read8_handler(mc146818_port_r, machine, offset, mem_mask);
 }
 
 WRITE32_HANDLER(mc146818_port32le_w)
 {
-	write32le_with_write8_handler(mc146818_port_w, offset, data, mem_mask);
+	write32le_with_write8_handler(mc146818_port_w, machine, offset, data, mem_mask);
 }
 
 READ64_HANDLER(mc146818_port64be_r)
 {
-	return read64be_with_read8_handler(mc146818_port_r, offset, mem_mask);
+	return read64be_with_read8_handler(mc146818_port_r, machine, offset, mem_mask);
 }
 
 WRITE64_HANDLER(mc146818_port64be_w)
 {
-	write64be_with_write8_handler(mc146818_port_w, offset, data, mem_mask);
+	write64be_with_write8_handler(mc146818_port_w, machine, offset, data, mem_mask);
 }

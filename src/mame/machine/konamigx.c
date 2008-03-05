@@ -146,22 +146,22 @@ READ8_HANDLER( tms57002_data_r )
 
 READ16_HANDLER( tms57002_data_word_r )
 {
-	return(tms57002_data_r(0));
+	return(tms57002_data_r(machine,0));
 }
 
 READ16_HANDLER( tms57002_status_word_r )
 {
-	return(tms57002_status_r(0));
+	return(tms57002_status_r(machine,0));
 }
 
 WRITE16_HANDLER( tms57002_control_word_w )
 {
-	tms57002_control_w(0, data);
+	tms57002_control_w(machine, 0, data);
 }
 
 WRITE16_HANDLER( tms57002_data_word_w )
 {
-	tms57002_data_w(0, data);
+	tms57002_data_w(machine, 0, data);
 }
 
 

@@ -157,7 +157,7 @@ static void update_irq_state(void)
 {
 	/*  Get the pending IRQs (only the enabled ones, e.g. where
         irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(0,0) & ~*metro_irq_enable;
+	UINT16 irq = metro_irq_cause_r(Machine,0,0) & ~*metro_irq_enable;
 
 	if (irq_line == -1)	/* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
@@ -344,9 +344,9 @@ static int metro_io_callback(int ioline, int state)
     switch ( ioline )
 	{
 		case UPD7810_RXD:	/* read the RxD line */
-			data = soundlatch_r(0);
+			data = soundlatch_r(Machine,0);
 			state = data & 1;
-			soundlatch_w(0, data >> 1);
+			soundlatch_w(Machine, 0, data >> 1);
 			break;
 		default:
 			logerror("upd7810 ioline %d not handled\n", ioline);
@@ -359,8 +359,8 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0,data & 0xff);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		cpu_spinuntil_int();
 		busy_sndcpu = 1;
 	}
@@ -443,9 +443,9 @@ static WRITE8_HANDLER( metro_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				YM2413_data_port_0_w(0,porta);
+				YM2413_data_port_0_w(machine,0,porta);
 			else
-				YM2413_register_port_0_w(0,porta);
+				YM2413_register_port_0_w(machine,0,porta);
 		}
 		portb = data;
 		return;
@@ -455,7 +455,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			OKIM6295_data_0_w(0,porta);
+			OKIM6295_data_0_w(machine,0,porta);
 	}
 	portb = data;
 }
@@ -487,15 +487,15 @@ static WRITE8_HANDLER( daitorid_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				YM2151_data_port_0_w(0,porta);
+				YM2151_data_port_0_w(machine,0,porta);
 			else
-				YM2151_register_port_0_w(0,porta);
+				YM2151_register_port_0_w(machine,0,porta);
 		}
 		if (!BIT(data,3))
 		{
 			/* read */
 			if (BIT(data,1))
-				porta = YM2151_status_port_0_r(0);
+				porta = YM2151_status_port_0_r(machine,0);
 		}
 		portb = data;
 		return;
@@ -505,13 +505,13 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			OKIM6295_data_0_w(0,porta);
+			OKIM6295_data_0_w(machine,0,porta);
 	}
 	if (BIT(portb,3) && !BIT(data,3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data,4))
-			porta = OKIM6295_status_0_r(0);
+			porta = OKIM6295_status_0_r(machine,0);
 	}
 	portb = data;
 }
@@ -529,7 +529,7 @@ static const struct YM2151interface ym2151_interface =
 
 static READ16_HANDLER( ymf278b_r )
 {
-	return YMF278B_status_port_0_r(0);
+	return YMF278B_status_port_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( ymf278b_w )
@@ -538,22 +538,22 @@ static WRITE16_HANDLER( ymf278b_w )
 		switch(offset)
 		{
 			case 0:
-				YMF278B_control_port_0_A_w(0, data);
+				YMF278B_control_port_0_A_w(machine, 0, data);
 				break;
 			case 1:
-				YMF278B_data_port_0_A_w(0, data);
+				YMF278B_data_port_0_A_w(machine, 0, data);
 				break;
 			case 2:
-				YMF278B_control_port_0_B_w(0, data);
+				YMF278B_control_port_0_B_w(machine, 0, data);
 				break;
 			case 3:
-				YMF278B_data_port_0_B_w(0, data);
+				YMF278B_data_port_0_B_w(machine, 0, data);
 				break;
 			case 4:
-				YMF278B_control_port_0_C_w(0, data);
+				YMF278B_control_port_0_C_w(machine, 0, data);
 				break;
 			case 5:
-				YMF278B_data_port_0_C_w(0, data);
+				YMF278B_data_port_0_C_w(machine, 0, data);
 				break;
 		}
 }
@@ -689,13 +689,13 @@ INLINE int blt_read(const UINT8 *ROM, const int offs)
 	return ROM[offs] ^ 0xff;
 }
 
-INLINE void blt_write(const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
+INLINE void blt_write(running_machine *machine, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
 {
 	switch( tmap )
 	{
-		case 1:	metro_vram_0_w(offs,data,mask);	break;
-		case 2:	metro_vram_1_w(offs,data,mask);	break;
-		case 3:	metro_vram_2_w(offs,data,mask);	break;
+		case 1:	metro_vram_0_w(machine,offs,data,mask);	break;
+		case 2:	metro_vram_1_w(machine,offs,data,mask);	break;
+		case 3:	metro_vram_2_w(machine,offs,data,mask);	break;
 	}
 //  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",activecpu_get_pc(),tmap,offs,data,mask);
 }
@@ -770,7 +770,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(tmap,dst_offs,b2,mask);
+						blt_write(machine,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -786,7 +786,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(tmap,dst_offs,b2<<shift,mask);
+						blt_write(machine,tmap,dst_offs,b2<<shift,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 						b2++;
 					}
@@ -803,7 +803,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(tmap,dst_offs,b2,mask);
+						blt_write(machine,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -1184,7 +1184,7 @@ static READ16_HANDLER( karatour_vram_##_n_##_r ) \
 } \
 static WRITE16_HANDLER( karatour_vram_##_n_##_w ) \
 { \
-	metro_vram_##_n_##_w(KARATOUR_OFFS(offset),data,mem_mask); \
+	metro_vram_##_n_##_w(machine,KARATOUR_OFFS(offset),data,mem_mask); \
 }
 
 KARATOUR_VRAM( 0 )
@@ -1928,8 +1928,8 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
-	soundlatch_w(offset, data>>8);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, offset, data>>8);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
@@ -2151,12 +2151,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( puzzlet_port7_r )
 {
-	return input_port_2_word_r(0,0);
+	return input_port_2_word_r(machine,0,0);
 }
 
 static READ8_HANDLER( puzzlet_serB_r )
 {
-	return input_port_0_word_r(0,0);	// coin
+	return input_port_0_word_r(machine,0,0);	// coin
 }
 
 static WRITE8_HANDLER( puzzlet_portb_w )
@@ -4767,7 +4767,7 @@ static DRIVER_INIT( metro )
 	porta = 0x00;
 	portb = 0x00;
 	busy_sndcpu = 0;
-	metro_sound_rombank_w(0, 0x00);
+	metro_sound_rombank_w(machine, 0, 0x00);
 }
 
 static DRIVER_INIT( karatour )
@@ -4790,7 +4790,7 @@ static DRIVER_INIT( daitorid )
 	porta = 0x00;
 	portb = 0x00;
 	busy_sndcpu = 0;
-	daitorid_sound_rombank_w(0, 0x00);
+	daitorid_sound_rombank_w(machine, 0, 0x00);
 }
 
 

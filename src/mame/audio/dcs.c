@@ -1572,7 +1572,7 @@ static WRITE16_HANDLER( input_latch_ack_w )
 static READ16_HANDLER( input_latch_r )
 {
 	if (dcs.auto_ack)
-		input_latch_ack_w(0,0,0);
+		input_latch_ack_w(machine,0,0,0);
 	if (LOG_DCS_IO)
 		logerror("%08X:input_latch_r(%04X)\n", activecpu_get_pc(), dcs.input_data);
 	return dcs.input_data;
@@ -2080,7 +2080,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 		timer_set(ATTOTIME_IN_USEC(1), NULL, param, s1_ack_callback2);
 		return;
 	}
-	output_latch_w(0, 0x000a, 0);
+	output_latch_w(machine, 0, 0x000a, 0);
 }
 
 
@@ -2092,7 +2092,7 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 		timer_set(ATTOTIME_IN_USEC(1), NULL, param, s1_ack_callback1);
 		return;
 	}
-	output_latch_w(0, param, 0);
+	output_latch_w(machine, 0, param, 0);
 
 	/* chain to the next word we need to write back */
 	timer_set(ATTOTIME_IN_USEC(1), NULL, 0, s1_ack_callback2);
@@ -2230,8 +2230,8 @@ static TIMER_CALLBACK( s2_ack_callback )
 		timer_set(ATTOTIME_IN_USEC(1), NULL, param, s2_ack_callback);
 		return;
 	}
-	output_latch_w(0, param, 0);
-	output_control_w(0, (dcs.output_control & ~0xff00) | 0x0300, 0);
+	output_latch_w(machine, 0, param, 0);
+	output_control_w(machine, 0, (dcs.output_control & ~0xff00) | 0x0300, 0);
 }
 
 

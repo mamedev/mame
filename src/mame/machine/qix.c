@@ -263,13 +263,13 @@ MACHINE_START( slither )
 
 static TIMER_CALLBACK( vblank_stop )
 {
-	pia_3_cb1_w(0, 0);
+	pia_3_cb1_w(machine, 0, 0);
 }
 
 
 INTERRUPT_GEN( qix_vblank_start )
 {
-	pia_3_cb1_w(0, 1);
+	pia_3_cb1_w(machine, 0, 1);
 	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, vblank_stop);
 }
 
@@ -285,7 +285,7 @@ WRITE8_HANDLER( zookeep_bankswitch_w )
 {
 	memory_set_bank(1, (data >> 2) & 1);
 	/* not necessary, but technically correct */
-	qix_palettebank_w(offset, data);
+	qix_palettebank_w(machine, offset, data);
 }
 
 
@@ -364,7 +364,7 @@ READ8_HANDLER( qix_video_firq_ack_r )
 
 static TIMER_CALLBACK( deferred_pia_4_porta_w )
 {
-	pia_4_porta_w(0, param);
+	pia_4_porta_w(machine, 0, param);
 }
 
 
@@ -532,7 +532,7 @@ WRITE8_HANDLER( qix_68705_portC_w )
 
 static TIMER_CALLBACK( pia_0_w_callback )
 {
-	pia_0_w(param >> 8, param & 0xff);
+	pia_0_w(machine, param >> 8, param & 0xff);
 }
 
 
@@ -575,22 +575,22 @@ static WRITE8_HANDLER( slither_coinctl_w )
 static WRITE8_HANDLER( slither_76489_0_w )
 {
 	/* write to the sound chip */
-	SN76496_0_w(0, data);
+	SN76496_0_w(machine, 0, data);
 
 	/* clock the ready line going back into CB1 */
-	pia_1_cb1_w(0, 0);
-	pia_1_cb1_w(0, 1);
+	pia_1_cb1_w(machine, 0, 0);
+	pia_1_cb1_w(machine, 0, 1);
 }
 
 
 static WRITE8_HANDLER( slither_76489_1_w )
 {
 	/* write to the sound chip */
-	SN76496_1_w(0, data);
+	SN76496_1_w(machine, 0, data);
 
 	/* clock the ready line going back into CB1 */
-	pia_2_cb1_w(0, 0);
-	pia_2_cb1_w(0, 1);
+	pia_2_cb1_w(machine, 0, 0);
+	pia_2_cb1_w(machine, 0, 1);
 }
 
 

@@ -105,7 +105,7 @@ MACHINE_RESET( namcos2 )
 	mFinalLapProtCount = 0;
 
 	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(0,0); /* Page in bank 0 */
+	namcos2_sound_bankselect_w(machine,0,0); /* Page in bank 0 */
 
 	cpunum_set_input_line(machine, CPU_SOUND, INPUT_LINE_RESET, ASSERT_LINE );
 
@@ -743,28 +743,28 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		switch((data>>2)&0x07)
 		{
 		case 0:
-			namcos2_mcu_analog_data=input_port_2_r(0);
+			namcos2_mcu_analog_data=input_port_2_r(machine,0);
 			break;
 		case 1:
-			namcos2_mcu_analog_data=input_port_3_r(0);
+			namcos2_mcu_analog_data=input_port_3_r(machine,0);
 			break;
 		case 2:
-			namcos2_mcu_analog_data=input_port_4_r(0);
+			namcos2_mcu_analog_data=input_port_4_r(machine,0);
 			break;
 		case 3:
-			namcos2_mcu_analog_data=input_port_5_r(0);
+			namcos2_mcu_analog_data=input_port_5_r(machine,0);
 			break;
 		case 4:
-			namcos2_mcu_analog_data=input_port_6_r(0);
+			namcos2_mcu_analog_data=input_port_6_r(machine,0);
 			break;
 		case 5:
-			namcos2_mcu_analog_data=input_port_7_r(0);
+			namcos2_mcu_analog_data=input_port_7_r(machine,0);
 			break;
 		case 6:
-			namcos2_mcu_analog_data=input_port_8_r(0);
+			namcos2_mcu_analog_data=input_port_8_r(machine,0);
 			break;
 		case 7:
-			namcos2_mcu_analog_data=input_port_9_r(0);
+			namcos2_mcu_analog_data=input_port_9_r(machine,0);
 			break;
 		}
 #if 0
@@ -820,14 +820,14 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 	int data=0;
 
 	/* Read/convert the bits one at a time */
-	if(input_port_2_r(0)>threshold) data|=0x01;
-	if(input_port_3_r(0)>threshold) data|=0x02;
-	if(input_port_4_r(0)>threshold) data|=0x04;
-	if(input_port_5_r(0)>threshold) data|=0x08;
-	if(input_port_6_r(0)>threshold) data|=0x10;
-	if(input_port_7_r(0)>threshold) data|=0x20;
-	if(input_port_8_r(0)>threshold) data|=0x40;
-	if(input_port_9_r(0)>threshold) data|=0x80;
+	if(input_port_2_r(machine,0)>threshold) data|=0x01;
+	if(input_port_3_r(machine,0)>threshold) data|=0x02;
+	if(input_port_4_r(machine,0)>threshold) data|=0x04;
+	if(input_port_5_r(machine,0)>threshold) data|=0x08;
+	if(input_port_6_r(machine,0)>threshold) data|=0x10;
+	if(input_port_7_r(machine,0)>threshold) data|=0x20;
+	if(input_port_8_r(machine,0)>threshold) data|=0x40;
+	if(input_port_9_r(machine,0)>threshold) data|=0x80;
 
 	/* Return the result */
 	return data;

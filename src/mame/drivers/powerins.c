@@ -77,7 +77,7 @@ static WRITE16_HANDLER( powerins_soundlatch_w )
 {
 	if (ACCESSING_LSB)
 	{
-		soundlatch_w(0, data & 0xff);
+		soundlatch_w(machine, 0, data & 0xff);
 	}
 }
 static READ8_HANDLER( powerinb_fake_ym2203_r )

@@ -487,7 +487,7 @@ void williams_cvsd_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		cvsd_bank_select_w(0, 0);
+		cvsd_bank_select_w(Machine, 0, 0);
 		init_audio_state(Machine);
 		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 	}
@@ -516,23 +516,23 @@ static WRITE8_HANDLER( narc_slave_bank_select_w )
 
 static READ8_HANDLER( narc_command_r )
 {
-	cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
 	williams_sound_int_state = 0;
-	return soundlatch_r(0);
+	return soundlatch_r(machine, 0);
 }
 
 
 static WRITE8_HANDLER( narc_command2_w )
 {
-	soundlatch2_w(0, data & 0xff);
-	cpunum_set_input_line(Machine, soundalt_cpunum, M6809_FIRQ_LINE, ASSERT_LINE);
+	soundlatch2_w(machine, 0, data & 0xff);
+	cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( narc_command2_r )
 {
-	cpunum_set_input_line(Machine, soundalt_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
-	return soundlatch2_r(0);
+	cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
+	return soundlatch2_r(machine, 0);
 }
 
 
@@ -577,7 +577,7 @@ static WRITE8_HANDLER( narc_slave_sync_w )
 
 void williams_narc_data_w(int data)
 {
-	soundlatch_w(0, data & 0xff);
+	soundlatch_w(Machine, 0, data & 0xff);
 	cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x200))
 	{
@@ -592,8 +592,8 @@ void williams_narc_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		narc_master_bank_select_w(0, 0);
-		narc_slave_bank_select_w(0, 0);
+		narc_master_bank_select_w(Machine, 0, 0);
+		narc_slave_bank_select_w(Machine, 0, 0);
 		init_audio_state(Machine);
 		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 		cpunum_set_input_line(Machine, soundalt_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
@@ -638,12 +638,12 @@ static TIMER_CALLBACK( clear_irq_state )
 
 static READ8_HANDLER( adpcm_command_r )
 {
-	cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
-	return soundlatch_r(0);
+	return soundlatch_r(machine, 0);
 }
 
 
@@ -661,7 +661,7 @@ static WRITE8_HANDLER( adpcm_talkback_w )
 
 void williams_adpcm_data_w(int data)
 {
-	soundlatch_w(0, data & 0xff);
+	soundlatch_w(Machine, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
 		cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
@@ -676,7 +676,7 @@ void williams_adpcm_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		adpcm_bank_select_w(0, 0);
+		adpcm_bank_select_w(Machine, 0, 0);
 		init_audio_state(Machine);
 		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 	}

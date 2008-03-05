@@ -1143,7 +1143,7 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 
 VIDEO_EOF( psikyosh )
 {
-	buffer_spriteram32_w(0,0,0);
+	buffer_spriteram32_w(machine,0,0,0);
 }
 
 /*popmessage   ("Regs %08x %08x %08x\n     %08x %08x %08x",

@@ -1013,7 +1013,7 @@ static WRITE16_HANDLER( spacegun_output_bypass_w )
 			break;
 
 		default:
-			TC0220IOC_w( offset,data );	/* might be a 510NIO ! */
+			TC0220IOC_w( machine,offset,data );	/* might be a 510NIO ! */
 	}
 }
 
@@ -1026,14 +1026,14 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8 port = TC0220IOC_port_r(0);	/* read port number */
+	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_6_word_r(0,0);
+	int fake = input_port_6_word_r(machine,0,0);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_5_word_r(0,0) - 0x80) * 0xc0) / 0x100;
+		steer = ((input_port_5_word_r(machine,0,0) - 0x80) * 0xc0) / 0x100;
 
 	}
 	else	/* Digital steer */
@@ -1057,7 +1057,7 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r( offset );
+			return TC0220IOC_portreg_r( machine,offset );
 	}
 }
 
@@ -1066,14 +1066,14 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	UINT8 port = TC0220IOC_port_r(0);	/* read port number */
+	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_10_word_r(0,0);
+	int fake = input_port_10_word_r(machine,0,0);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero */
-		steer = input_port_9_word_r(0,0) - 0x80;
+		steer = input_port_9_word_r(machine,0,0) - 0x80;
 	}
 	else	/* Digital steer */
 	{
@@ -1090,16 +1090,16 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 	switch (port)
 	{
 		case 0x08:
-			return input_port_5_word_r(0,mem_mask);
+			return input_port_5_word_r(machine,0,mem_mask);
 
 		case 0x09:
-			return input_port_6_word_r(0,mem_mask);
+			return input_port_6_word_r(machine,0,mem_mask);
 
 		case 0x0a:
-			return input_port_7_word_r(0,mem_mask);
+			return input_port_7_word_r(machine,0,mem_mask);
 
 		case 0x0b:
-			return input_port_8_word_r(0,mem_mask);
+			return input_port_8_word_r(machine,0,mem_mask);
 
 		case 0x0c:
 			return steer &0xff;
@@ -1108,7 +1108,7 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return TC0220IOC_portreg_r( offset );
+			return TC0220IOC_portreg_r( machine, offset );
 	}
 }
 
@@ -1118,16 +1118,16 @@ static READ16_HANDLER( bshark_stick_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_5_word_r(0,mem_mask);
+			return input_port_5_word_r(machine,0,mem_mask);
 
 		case 0x01:
-			return input_port_6_word_r(0,mem_mask);
+			return input_port_6_word_r(machine,0,mem_mask);
 
 		case 0x02:
-			return input_port_7_word_r(0,mem_mask);
+			return input_port_7_word_r(machine,0,mem_mask);
 
 		case 0x03:
-			return input_port_8_word_r(0,mem_mask);
+			return input_port_8_word_r(machine,0,mem_mask);
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n",activecpu_get_pc(),offset);
@@ -1151,16 +1151,16 @@ static READ16_HANDLER( nightstr_stick_r )
 	switch (offset)
 	{
 		case 0x00:
-			return nightstr_stick[(input_port_5_word_r(0,mem_mask) * 0x64) / 0x100];
+			return nightstr_stick[(input_port_5_word_r(machine,0,mem_mask) * 0x64) / 0x100];
 
 		case 0x01:
-			return nightstr_stick[(input_port_6_word_r(0,mem_mask) * 0x64) / 0x100];
+			return nightstr_stick[(input_port_6_word_r(machine,0,mem_mask) * 0x64) / 0x100];
 
 		case 0x02:
-			return input_port_7_word_r(0,mem_mask);
+			return input_port_7_word_r(machine,0,mem_mask);
 
 		case 0x03:
-			return input_port_8_word_r(0,mem_mask);
+			return input_port_8_word_r(machine,0,mem_mask);
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n",activecpu_get_pc(),offset);
@@ -1183,12 +1183,12 @@ static WRITE16_HANDLER( bshark_stick_w )
 static READ16_HANDLER( sci_steer_input_r )
 {
 	int steer = 0;
-	int fake = input_port_6_word_r(0,0);
+	int fake = input_port_6_word_r(machine,0,0);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_5_word_r(0,0) - 0x80) * 0xc0) / 0x100;
+		steer = ((input_port_5_word_r(machine,0,0) - 0x80) * 0xc0) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -1225,7 +1225,7 @@ static READ16_HANDLER( spacegun_input_bypass_r )
 			return eeprom_r();
 
 		default:
-			return TC0220IOC_r( offset );	/* might be a 510NIO ! */
+			return TC0220IOC_r( machine, offset );	/* might be a 510NIO ! */
 	}
 }
 
@@ -1234,16 +1234,16 @@ static READ16_HANDLER( spacegun_lightgun_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_5_word_r(0,mem_mask);	/* P1X */
+			return input_port_5_word_r(machine,0,mem_mask);	/* P1X */
 
 		case 0x01:
-			return input_port_6_word_r(0,mem_mask);	/* P1Y */
+			return input_port_6_word_r(machine,0,mem_mask);	/* P1Y */
 
 		case 0x02:
-			return input_port_7_word_r(0,mem_mask);	/* P2X */
+			return input_port_7_word_r(machine,0,mem_mask);	/* P2X */
 
 		case 0x03:
-			return input_port_8_word_r(0,mem_mask);	/* P2Y */
+			return input_port_8_word_r(machine,0,mem_mask);	/* P2Y */
 	}
 
 	return 0x0;
@@ -1266,12 +1266,12 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
 static READ16_HANDLER( dblaxle_steer_input_r )
 {
 	int steer = 0;
-	int fake = input_port_6_word_r(0,0);
+	int fake = input_port_6_word_r(machine,0,0);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0x80 */
-		steer = ((input_port_5_word_r(0,0) - 0x80) * 0x80) / 0x100;
+		steer = ((input_port_5_word_r(machine,0,0) - 0x80) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -1349,9 +1349,9 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static WRITE16_HANDLER( taitoz_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (0, data & 0xff);
+		taitosound_port_w (machine, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (0, data & 0xff);
+		taitosound_comm_w (machine, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 //  if (data & 0xff00)
@@ -1367,7 +1367,7 @@ static WRITE16_HANDLER( taitoz_sound_w )
 static READ16_HANDLER( taitoz_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (0) & 0xff));
+		return ((taitosound_comm_r (machine,0) & 0xff));
 	else return 0;
 }
 

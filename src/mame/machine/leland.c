@@ -372,7 +372,7 @@ MACHINE_RESET( leland )
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
-	leland_sound_port_w(0, 0xff);
+	leland_sound_port_w(machine, 0, 0xff);
 	wcol_enable = 0;
 
 	dangerz_x = 512;
@@ -515,7 +515,7 @@ WRITE8_HANDLER( leland_master_alt_bankswitch_w )
 	(*leland_update_master_bank)();
 
 	/* sound control is in the rest */
-	leland_80186_control_w(offset, data);
+	leland_80186_control_w(machine, offset, data);
 }
 
 
@@ -1156,12 +1156,12 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x02:	/* /GIN2 */
 		case 0x12:
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 0x03:	/* /IGID */
 		case 0x13:
-			result = AY8910_read_port_0_r(offset);
+			result = AY8910_read_port_0_r(machine, offset);
 			break;
 
 		case 0x10:	/* /GIN0 */
@@ -1187,10 +1187,10 @@ WRITE8_HANDLER( leland_master_output_w )
 	switch (offset)
 	{
 		case 0x09:	/* /MCONT */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			wcol_enable = (data & 0x02);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(Machine, 1, 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_activecpu_get_pc(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
@@ -1200,18 +1200,18 @@ WRITE8_HANDLER( leland_master_output_w )
 			break;
 
 		case 0x0a:	/* /OGIA */
-			AY8910_control_port_0_w(0, data);
+			AY8910_control_port_0_w(machine, 0, data);
 			break;
 
 		case 0x0b:	/* /OGID */
-			AY8910_write_port_0_w(0, data);
+			AY8910_write_port_0_w(machine, 0, data);
 			break;
 
 		case 0x0c:	/* /BKXL */
 		case 0x0d:	/* /BKXH */
 		case 0x0e:	/* /BKYL */
 		case 0x0f:	/* /BKYH */
-			leland_scroll_w(offset - 0x0c, data);
+			leland_scroll_w(machine, offset - 0x0c, data);
 			break;
 
 		default:
@@ -1253,7 +1253,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 		case 0x01:	/* /BKXH */
 		case 0x02:	/* /BKYL */
 		case 0x03:	/* /BKYH */
-			leland_scroll_w(offset, data);
+			leland_scroll_w(machine, offset, data);
 			break;
 
 		case 0x04:	/* /MBNK */
@@ -1265,9 +1265,9 @@ WRITE8_HANDLER( ataxx_master_output_w )
 			break;
 
 		case 0x05:	/* /SLV0 */
-			cpunum_set_input_line(Machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x08:	/*  */
@@ -1291,7 +1291,7 @@ WRITE8_HANDLER( ataxx_master_output_w )
 WRITE8_HANDLER( leland_gated_paletteram_w )
 {
 	if (wcol_enable)
-		paletteram_BBGGGRRR_w(offset, data);
+		paletteram_BBGGGRRR_w(machine, offset, data);
 }
 
 
@@ -1306,9 +1306,9 @@ READ8_HANDLER( leland_gated_paletteram_r )
 WRITE8_HANDLER( ataxx_paletteram_and_misc_w )
 {
 	if (wcol_enable)
-		paletteram_xxxxRRRRGGGGBBBB_le_w(offset, data);
+		paletteram_xxxxRRRRGGGGBBBB_le_w(machine, offset, data);
 	else if (offset == 0x7f8 || offset == 0x7f9)
-		leland_master_video_addr_w(offset - 0x7f8, data);
+		leland_master_video_addr_w(machine, offset - 0x7f8, data);
 	else if (offset == 0x7fc)
 	{
 		xrom1_addr = (xrom1_addr & 0xff00) | (data & 0x00ff);
@@ -1371,7 +1371,7 @@ READ8_HANDLER( leland_sound_port_r )
 WRITE8_HANDLER( leland_sound_port_w )
 {
     /* update the graphics banking */
-   	leland_gfx_port_w(0, data);
+   	leland_gfx_port_w(machine, 0, data);
 
 	/* set the new value */
     leland_gfx_control = data;

@@ -63,8 +63,8 @@ static UINT8 ssio_duty_cycle[2][3];
 static UINT8 ssio_ayvolume_lookup[16];
 static UINT8 ssio_custom_input_mask[5];
 static UINT8 ssio_custom_output_mask[2];
-static read8_handler ssio_custom_input[5];
-static write8_handler ssio_custom_output[2];
+static read8_machine_func ssio_custom_input[5];
+static write8_machine_func ssio_custom_output[2];
 
 /* Chip Squeak Deluxe-specific globals */
 static UINT8 csdeluxe_sound_cpu;
@@ -417,7 +417,7 @@ READ8_HANDLER( ssio_input_port_r )
 	UINT8 result = readinputportbytag_safe(port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
-		         ((*ssio_custom_input[offset])(offset) & ssio_custom_input_mask[offset]);
+		         ((*ssio_custom_input[offset])(machine, offset) & ssio_custom_input_mask[offset]);
 	return result;
 }
 
@@ -425,18 +425,18 @@ WRITE8_HANDLER( ssio_output_port_w )
 {
 	int which = offset >> 2;
 	if (which == 0)
-		mcr_control_port_w(offset, data);
+		mcr_control_port_w(machine, offset, data);
 	if (ssio_custom_output[which])
-		(*ssio_custom_output[which])(offset, data & ssio_custom_output_mask[which]);
+		(*ssio_custom_output[which])(machine, offset, data & ssio_custom_output_mask[which]);
 }
 
-void ssio_set_custom_input(int which, int mask, read8_handler handler)
+void ssio_set_custom_input(int which, int mask, read8_machine_func handler)
 {
 	ssio_custom_input[which] = handler;
 	ssio_custom_input_mask[which] = mask;
 }
 
-void ssio_set_custom_output(int which, int mask, write8_handler handler)
+void ssio_set_custom_output(int which, int mask, write8_machine_func handler)
 {
 	ssio_custom_output[which/4] = handler;
 	ssio_custom_output_mask[which/4] = mask;
@@ -535,8 +535,8 @@ static void csdeluxe_irq(int state)
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	pia_0_portb_w(0, param & 0x0f);
-	pia_0_ca1_w(0, ~param & 0x10);
+	pia_0_portb_w(machine, 0, param & 0x0f);
+	pia_0_ca1_w(machine, 0, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -550,17 +550,17 @@ static READ16_HANDLER( csdeluxe_pia_r )
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
 	if (ACCESSING_MSB)
-		return pia_0_alt_r(offset) << 8;
+		return pia_0_alt_r(machine, offset) << 8;
 	else
-		return pia_0_alt_r(offset);
+		return pia_0_alt_r(machine, offset);
 }
 
 static WRITE16_HANDLER( csdeluxe_pia_w )
 {
 	if (ACCESSING_MSB)
-		pia_0_alt_w(offset, data >> 8);
+		pia_0_alt_w(machine, offset, data >> 8);
 	else
-		pia_0_alt_w(offset, data);
+		pia_0_alt_w(machine, offset, data);
 }
 
 
@@ -657,8 +657,8 @@ static void soundsgood_irq(int state)
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	pia_1_portb_w(0, (param >> 1) & 0x0f);
-	pia_1_ca1_w(0, ~param & 0x01);
+	pia_1_portb_w(machine, 0, (param >> 1) & 0x0f);
+	pia_1_ca1_w(machine, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -750,8 +750,8 @@ static void turbocs_irq(int state)
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	pia_0_portb_w(0, (param >> 1) & 0x0f);
-	pia_0_ca1_w(0, ~param & 0x01);
+	pia_0_portb_w(machine, 0, (param >> 1) & 0x0f);
+	pia_0_ca1_w(machine, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -853,21 +853,21 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 	/* write strobe -- pass the current command to the TMS5200 */
 	if (((data ^ squawkntalk_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		tms5220_data_w(offset, squawkntalk_tms_command);
+		tms5220_data_w(machine, offset, squawkntalk_tms_command);
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(0, 1);
-		pia_1_ca2_w(0, 0);
+		pia_1_ca2_w(machine, 0, 1);
+		pia_1_ca2_w(machine, 0, 0);
 	}
 
 	/* read strobe -- read the current status from the TMS5200 */
 	else if (((data ^ squawkntalk_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		pia_1_porta_w(0, tms5220_status_r(offset));
+		pia_1_porta_w(machine, 0, tms5220_status_r(machine, offset));
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(0, 1);
-		pia_1_ca2_w(0, 0);
+		pia_1_ca2_w(machine, 0, 1);
+		pia_1_ca2_w(machine, 0, 0);
 	}
 
 	/* remember the state */
@@ -883,8 +883,8 @@ static void squawkntalk_irq(int state)
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	pia_0_porta_w(0, ~param & 0x0f);
-	pia_0_cb1_w(0, ~param & 0x10);
+	pia_0_porta_w(machine, 0, ~param & 0x0f);
+	pia_0_cb1_w(machine, 0, ~param & 0x10);
 }
 
 

@@ -81,22 +81,22 @@ static void mpc8240_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 
 static READ64_HANDLER( pci_config_addr_r )
 {
-	return pci_64be_r(0, U64(0x00000000ffffffff));
+	return pci_64be_r(machine, 0, U64(0x00000000ffffffff));
 }
 
 static WRITE64_HANDLER( pci_config_addr_w )
 {
-	pci_64be_w(0, data, U64(0x00000000ffffffff));
+	pci_64be_w(machine, 0, data, U64(0x00000000ffffffff));
 }
 
 static READ64_HANDLER( pci_config_data_r )
 {
-	return pci_64be_r(1, U64(0xffffffff00000000)) << 32;
+	return pci_64be_r(machine, 1, U64(0xffffffff00000000)) << 32;
 }
 
 static WRITE64_HANDLER( pci_config_data_w )
 {
-	pci_64be_w(1, data >> 32, U64(0xffffffff00000000));
+	pci_64be_w(machine, 1, data >> 32, U64(0xffffffff00000000));
 }
 
 
@@ -153,11 +153,11 @@ static WRITE32_HANDLER( epic_w )
 
 static READ64_HANDLER(epic_64be_r)
 {
-	return read64be_with_32le_handler(epic_r, offset, mem_mask);
+	return read64be_with_32le_handler(epic_r, machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(epic_64be_w)
 {
-	write64be_with_32le_handler(epic_w, offset, data, mem_mask);
+	write64be_with_32le_handler(epic_w, machine, offset, data, mem_mask);
 }
 
 
@@ -529,32 +529,32 @@ static void voodoo3_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 
 static READ64_HANDLER(voodoo3_io_r)
 {
-	return read64be_with_32le_handler(banshee_io_0_r, offset, mem_mask);
+	return read64be_with_32le_handler(banshee_io_0_r, machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(voodoo3_io_w)
 {
 //  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
-	write64be_with_32le_handler(banshee_io_0_w, offset, data, mem_mask);
+	write64be_with_32le_handler(banshee_io_0_w, machine, offset, data, mem_mask);
 }
 
 static READ64_HANDLER(voodoo3_r)
 {
-	return read64be_with_32le_handler(banshee_0_r, offset, mem_mask);
+	return read64be_with_32le_handler(banshee_0_r, machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(voodoo3_w)
 {
 //  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
-	write64be_with_32le_handler(banshee_0_w, offset, data, mem_mask);
+	write64be_with_32le_handler(banshee_0_w, machine,  offset, data, mem_mask);
 }
 
 static READ64_HANDLER(voodoo3_lfb_r)
 {
-	return read64be_with_32le_handler(banshee_fb_0_r, offset, mem_mask);
+	return read64be_with_32le_handler(banshee_fb_0_r, machine, offset, mem_mask);
 }
 static WRITE64_HANDLER(voodoo3_lfb_w)
 {
 //  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, activecpu_get_pc());
-	write64be_with_32le_handler(banshee_fb_0_w, offset, data, mem_mask);
+	write64be_with_32le_handler(banshee_fb_0_w, machine, offset, data, mem_mask);
 }
 
 
@@ -565,11 +565,11 @@ static READ64_HANDLER(m48t58_r)
 
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
 	{
-		r |= (UINT64)timekeeper_0_32be_r((offset * 2) + 0, (UINT32)(mem_mask >> 32)) << 32;
+		r |= (UINT64)timekeeper_0_32be_r(machine, (offset * 2) + 0, (UINT32)(mem_mask >> 32)) << 32;
 	}
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
 	{
-		r |= timekeeper_0_32be_r((offset * 2) + 1, (UINT32)(mem_mask));
+		r |= timekeeper_0_32be_r(machine, (offset * 2) + 1, (UINT32)(mem_mask));
 	}
 
 	return r;
@@ -579,11 +579,11 @@ static WRITE64_HANDLER(m48t58_w)
 {
 	if (!(mem_mask & U64(0xffffffff00000000)))
 	{
-		timekeeper_0_32be_w((offset * 2) + 0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
+		timekeeper_0_32be_w(machine, (offset * 2) + 0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
 	if (!(mem_mask & U64(0x00000000ffffffff)))
 	{
-		timekeeper_0_32be_w((offset * 2) + 1, (UINT32)(data), (UINT32)(mem_mask));
+		timekeeper_0_32be_w(machine, (offset * 2) + 1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
 

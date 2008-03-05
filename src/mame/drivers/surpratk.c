@@ -39,7 +39,7 @@ static READ8_HANDLER( bankedram_r )
 			return paletteram[offset];
 	}
 	else if (videobank & 0x01)
-		return K053245_r(offset);
+		return K053245_r(machine,offset);
 	else
 		return ram[offset];
 }
@@ -49,12 +49,12 @@ static WRITE8_HANDLER( bankedram_w )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
 	}
 	else if (videobank & 0x01)
-		K053245_w(offset,data);
+		K053245_w(machine,offset,data);
 	else
 		ram[offset] = data;
 }

@@ -245,5 +245,5 @@ VIDEO_UPDATE( blktiger )
 
 VIDEO_EOF( blktiger )
 {
-	buffer_spriteram_w(0,0);
+	buffer_spriteram_w(machine,0,0);
 }

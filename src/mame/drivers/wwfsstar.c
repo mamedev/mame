@@ -144,8 +144,8 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 
 static WRITE16_HANDLER ( wwfsstar_soundwrite )
 {
-	soundlatch_w(1,data & 0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(machine,1,data & 0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )

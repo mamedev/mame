@@ -87,7 +87,7 @@ static MACHINE_RESET( aquarium )
 static READ16_HANDLER( aquarium_coins_r )
 {
 	int data;
-	data = (input_port_2_word_r(0,mem_mask) & 0x7fff);	/* IN1 */
+	data = (input_port_2_word_r(machine,0,mem_mask) & 0x7fff);	/* IN1 */
 	data |= aquarium_snd_ack;
 	aquarium_snd_ack = 0;
 	return data;
@@ -102,8 +102,8 @@ static WRITE16_HANDLER( aquarium_sound_w )
 {
 //  popmessage("sound write %04x",data);
 
-	soundlatch_w(1,data&0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(machine,1,data&0xff);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
@@ -132,13 +132,13 @@ static UINT8 aquarium_snd_bitswap(UINT8 scrambled_data)
 
 static READ8_HANDLER( aquarium_oki_r )
 {
-	return (aquarium_snd_bitswap(OKIM6295_status_0_r(0)) );
+	return (aquarium_snd_bitswap(OKIM6295_status_0_r(machine,0)) );
 }
 
 static WRITE8_HANDLER( aquarium_oki_w )
 {
 	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",activecpu_get_previouspc(),aquarium_snd_bitswap(data));
-	OKIM6295_data_0_w( 0, (aquarium_snd_bitswap(data)) );
+	OKIM6295_data_0_w( machine, 0, (aquarium_snd_bitswap(data)) );
 }
 
 
@@ -343,7 +343,7 @@ static DRIVER_INIT( aquarium )
 	}
 
 	/* reset the sound bank */
-	aquarium_z80_bank_w(0, 0);
+	aquarium_z80_bank_w(machine, 0, 0);
 }
 
 

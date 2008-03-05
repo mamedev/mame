@@ -81,7 +81,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
 	destroyr_cursor = data;
 
-	watchdog_reset_w(offset, data);
+	watchdog_reset_w(machine, offset, data);
 }
 
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( destroyr_output_w )
 		/* bit 0 => low explosion */
 		break;
 	case 8:
-		destroyr_misc_w(offset, data);
+		destroyr_misc_w(machine, offset, data);
 		break;
 	default:
 		logerror("unmapped output port %d\n", offset);

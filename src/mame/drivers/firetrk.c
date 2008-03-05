@@ -42,7 +42,7 @@ static INPUT_CHANGED( service_mode_switch_changed )
 
 static INPUT_CHANGED( firetrk_horn_changed )
 {
-	discrete_sound_w(FIRETRUCK_HORN_EN, newval);
+	discrete_sound_w(machine, FIRETRUCK_HORN_EN, newval);
 }
 
 
@@ -56,7 +56,7 @@ static INPUT_CHANGED( gear_changed )
 static INTERRUPT_GEN( firetrk_interrupt )
 {
 	/* Super Bug - ASR - when is this used and what is an ASR? */
-//	discrete_sound_w(SUPERBUG_ASR_EN, 0);
+//	discrete_sound_w(machine, SUPERBUG_ASR_EN, 0);
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!in_service_mode)
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 	set_led_status(3, !(data & 0x08));
 
 	/* BIT4 => ATTRACT     */
-	discrete_sound_w(FIRETRUCK_ATTRACT_EN, data & 0x10);
+	discrete_sound_w(machine, FIRETRUCK_ATTRACT_EN, data & 0x10);
 	coin_lockout_w(0, !(data & 0x10));
 	coin_lockout_w(1, !(data & 0x10));
 
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 	/* BIT6 => UNUSED      */
 
 	/* BIT7 => BELL OUT    */
-	discrete_sound_w(FIRETRUCK_BELL_EN, data & 0x80);
+	discrete_sound_w(machine, FIRETRUCK_BELL_EN, data & 0x80);
 }
 
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( superbug_output_w )
 	set_led_status(0, offset & 0x01);
 
 	/* BIT1 => ATTRACT    */
-	discrete_sound_w(SUPERBUG_ATTRACT_EN, offset & 0x02);
+	discrete_sound_w(machine, SUPERBUG_ATTRACT_EN, offset & 0x02);
 	coin_lockout_w(0, !(offset & 0x02));
 	coin_lockout_w(1, !(offset & 0x02));
 
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( montecar_output_1_w )
 	set_led_status(1, !(data & 0x02));
 
 	/* BIT2 => ATTRACT       */
-	discrete_sound_w(MONTECAR_ATTRACT_INV, data & 0x04);
+	discrete_sound_w(machine, MONTECAR_ATTRACT_INV, data & 0x04);
 
 	/* BIT3 => UNUSED        */
 	/* BIT4 => UNUSED        */
@@ -156,8 +156,8 @@ static WRITE8_HANDLER( montecar_output_2_w )
 {
 	firetrk_flash = data & 0x80;
 
-	discrete_sound_w(MONTECAR_BEEPER_EN, data & 0x10);
-	discrete_sound_w(MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
+	discrete_sound_w(machine, MONTECAR_BEEPER_EN, data & 0x10);
+	discrete_sound_w(machine, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
 }
 
 
@@ -266,7 +266,7 @@ static READ8_HANDLER( firetrk_input_r )
 
 static READ8_HANDLER( montecar_input_r )
 {
-	UINT8 ret = firetrk_input_r(offset);
+	UINT8 ret = firetrk_input_r(machine, offset);
 
 	if (firetrk_crash[0])
 		ret |= 0x02;

@@ -142,7 +142,7 @@ VIDEO_UPDATE( triplhnt )
 
 	draw_sprites(machine, bitmap, cliprect);
 
-	discrete_sound_w(TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
-	discrete_sound_w(TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);
+	discrete_sound_w(machine, TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
+	discrete_sound_w(machine, TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);
 	return 0;
 }

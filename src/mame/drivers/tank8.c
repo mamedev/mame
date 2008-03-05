@@ -41,22 +41,22 @@ static WRITE8_HANDLER( tank8_int_reset_w )
 {
 	collision_index &= ~0x3f;
 
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tank8_crash_w )
 {
-	discrete_sound_w(TANK8_CRASH_EN, data);
+	discrete_sound_w(machine, TANK8_CRASH_EN, data);
 }
 
 static WRITE8_HANDLER( tank8_explosion_w )
 {
-	discrete_sound_w(TANK8_EXPLOSION_EN, data);
+	discrete_sound_w(machine, TANK8_EXPLOSION_EN, data);
 }
 
 static WRITE8_HANDLER( tank8_bugle_w )
 {
-	discrete_sound_w(TANK8_BUGLE_EN, data);
+	discrete_sound_w(machine, TANK8_BUGLE_EN, data);
 }
 
 static WRITE8_HANDLER( tank8_bug_w )
@@ -64,20 +64,20 @@ static WRITE8_HANDLER( tank8_bug_w )
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
-			discrete_sound_w(TANK8_BUGLE_DATA1,8.0);
-			discrete_sound_w(TANK8_BUGLE_DATA2,4.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA1,8.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA2,4.0);
 			break;
 		case 1:
-			discrete_sound_w(TANK8_BUGLE_DATA1,8.0);
-			discrete_sound_w(TANK8_BUGLE_DATA2,7.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA1,8.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA2,7.0);
 			break;
 		case 2:
-			discrete_sound_w(TANK8_BUGLE_DATA1,8.0);
-			discrete_sound_w(TANK8_BUGLE_DATA2,2.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA1,8.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA2,2.0);
 			break;
 		case 3:
-			discrete_sound_w(TANK8_BUGLE_DATA1,16.0);
-			discrete_sound_w(TANK8_BUGLE_DATA2,4.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA1,16.0);
+			discrete_sound_w(machine, TANK8_BUGLE_DATA2,4.0);
 			break;
 	}
 
@@ -85,12 +85,12 @@ static WRITE8_HANDLER( tank8_bug_w )
 
 static WRITE8_HANDLER( tank8_attract_w )
 {
-	discrete_sound_w(TANK8_ATTRACT_EN, data);
+	discrete_sound_w(machine, TANK8_ATTRACT_EN, data);
 }
 
 static WRITE8_HANDLER( tank8_motor_w )
 {
-	discrete_sound_w(TANK8_MOTOR1_EN+offset, data);
+	discrete_sound_w(machine, TANK8_MOTOR1_EN+offset, data);
 }
 
 static ADDRESS_MAP_START( tank8_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )

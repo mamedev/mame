@@ -813,7 +813,7 @@ static READ16_HANDLER( namcona1_vreg_r )
 } /* namcona1_vreg_r */
 
 static int
-transfer_dword( UINT32 dest, UINT32 source )
+transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 {
 	UINT16 data;
 
@@ -836,15 +836,15 @@ transfer_dword( UINT32 dest, UINT32 source )
 	}
 	if( dest>=0xf00000 && dest<=0xf02000 )
 	{
-		namcona1_paletteram_w( (dest-0xf00000)/2, data, 0x0000 );
+		namcona1_paletteram_w( machine, (dest-0xf00000)/2, data, 0x0000 );
 	}
 	else if( dest>=0xf40000 && dest<=0xf80000 )
 	{
-		namcona1_gfxram_w( (dest-0xf40000)/2, data, 0x0000 );
+		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0x0000 );
 	}
 	else if( dest>=0xff0000 && dest<0xff8000 )
 	{
-		namcona1_videoram_w( (dest-0xff0000)/2, data, 0x0000 );
+		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0x0000 );
 	}
 	else if( dest>=0xff8000 && dest<=0xffdfff )
 	{
@@ -957,7 +957,7 @@ Emeralda:
 $efff80:    0048 0177 0020 0100 0000 00fd 0000 GFXE
 */
 
-static void namcona1_blit( void )
+static void namcona1_blit( running_machine *machine )
 {
 	int src0 = namcona1_vreg[0x0];
 	int src1 = namcona1_vreg[0x1];
@@ -1009,7 +1009,7 @@ static void namcona1_blit( void )
 
 	while( num_bytes>0 )
 	{
-		if( transfer_dword(
+		if( transfer_dword(machine,
 			dst_baseaddr + dest_offset,
 			src_baseaddr + source_offset ) )
 		{
@@ -1041,7 +1041,7 @@ static WRITE16_HANDLER( namcona1_vreg_w )
 	switch( offset )
 	{
 	case 0x18/2:
-		namcona1_blit();
+		namcona1_blit(machine);
 		/* see also 0x1e */
 		break;
 
@@ -1154,19 +1154,19 @@ static WRITE16_HANDLER( na1mcu_shared_w )
 
 static READ16_HANDLER(snd_r)
 {
-	return C140_r(offset*2+1) | C140_r(offset*2)<<8;
+	return C140_r(machine,offset*2+1) | C140_r(machine,offset*2)<<8;
 }
 
 static WRITE16_HANDLER(snd_w)
 {
 	if (ACCESSING_LSB16)
 	{
-		C140_w((offset*2)+1, data);
+		C140_w(machine,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_MSB16)
 	{
-		C140_w((offset*2), data>>8);
+		C140_w(machine,(offset*2), data>>8);
 	}
 }
 

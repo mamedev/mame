@@ -221,14 +221,14 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 
 static READ32_HANDLER(dreamwld_6295_0_r)
 {
-	return OKIM6295_status_0_r(0)<<24;
+	return OKIM6295_status_0_r(machine, 0)<<24;
 }
 
 static WRITE32_HANDLER(dreamwld_6295_0_w)
 {
 	if (!(mem_mask & 0xff000000))
 	{
-		OKIM6295_data_0_w(0, (data>>24) & 0xff);
+		OKIM6295_data_0_w(machine, 0, (data>>24) & 0xff);
 	}
 	else
 	{
@@ -260,14 +260,14 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 
 static READ32_HANDLER(dreamwld_6295_1_r)
 {
-	return OKIM6295_status_1_r(0)<<24;
+	return OKIM6295_status_1_r(machine, 0)<<24;
 }
 
 static WRITE32_HANDLER(dreamwld_6295_1_w)
 {
 	if (!(mem_mask & 0xff000000))
 	{
-		OKIM6295_data_1_w(0, (data>>24) & 0xff);
+		OKIM6295_data_1_w(machine, 0, (data>>24) & 0xff);
 	}
 	else
 	{

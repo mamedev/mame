@@ -166,5 +166,5 @@ VIDEO_UPDATE( tigeroad )
 
 VIDEO_EOF( tigeroad )
 {
-	buffer_spriteram16_w(0,0,0);
+	buffer_spriteram16_w(machine,0,0,0);
 }

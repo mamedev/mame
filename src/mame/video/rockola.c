@@ -275,7 +275,7 @@ WRITE8_HANDLER( satansat_b002_w )
 	/* it controls only IRQs, not NMIs. Here I am affecting both, which */
 	/* is wrong. */
 
-	interrupt_enable_w(0,data & 0x02);
+	interrupt_enable_w(machine,0,data & 0x02);
 
 	/* other bits unused */
 }

@@ -189,15 +189,15 @@ static WRITE8_HANDLER( output_port_0_w )
 	attotime duration = attotime_make(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data+1));
 	timeout_time = attotime_add(timer_get_time(), duration);
 
-	discrete_sound_w(HITME_DOWNCOUNT_VAL, data);
-	discrete_sound_w(HITME_OUT0, 1);
+	discrete_sound_w(machine, HITME_DOWNCOUNT_VAL, data);
+	discrete_sound_w(machine, HITME_OUT0, 1);
 }
 
 
 static WRITE8_HANDLER( output_port_1_w )
 {
-	discrete_sound_w(HITME_ENABLE_VAL, data);
-	discrete_sound_w(HITME_OUT1, 1);
+	discrete_sound_w(machine, HITME_ENABLE_VAL, data);
+	discrete_sound_w(machine, HITME_OUT1, 1);
 }
 
 

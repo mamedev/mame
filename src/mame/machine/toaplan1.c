@@ -160,14 +160,14 @@ READ16_HANDLER( samesame_port_6_word_r )
 {
 	/* Bit 0x80 is secondary CPU (HD647180) ready signal */
 	logerror("PC:%04x Warning !!! IO reading from $14000a\n",activecpu_get_previouspc());
-	return (0x80 | input_port_6_word_r(0,0)) & 0xff;
+	return (0x80 | input_port_6_word_r(machine,0,0)) & 0xff;
 }
 
 READ16_HANDLER( vimana_input_port_5_word_r )
 {
 	int data, p;
 
-	p = input_port_5_word_r(0,0);
+	p = input_port_5_word_r(machine,0,0);
 	vimana_latch ^= p;
 	data = (vimana_latch & p );
 
@@ -283,7 +283,7 @@ WRITE16_HANDLER( samesame_coin_w )
 {
 	if (ACCESSING_LSB)
 	{
-		toaplan1_coin_w(offset, data & 0xff);
+		toaplan1_coin_w(machine, offset, data & 0xff);
 	}
 	if (ACCESSING_MSB && (data&0xff00))
 	{

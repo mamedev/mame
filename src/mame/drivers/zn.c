@@ -624,8 +624,8 @@ static INTERRUPT_GEN( qsound_interrupt )
 
 static WRITE32_HANDLER( zn_qsound_w )
 {
-	soundlatch_w(0, data);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(machine, 0, data);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static DRIVER_INIT( coh1000c )
@@ -1197,18 +1197,18 @@ static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	return taitosound_comm_r(0)<<16;
+	return taitosound_comm_r(machine, 0)<<16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
 	if (mem_mask == 0xffff0000)
 	{
-		taitosound_port_w(0, data&0xff);
+		taitosound_port_w(machine, 0, data&0xff);
 	}
 	else
 	{
-		taitosound_comm_w(0, (data>>16)&0xff);
+		taitosound_comm_w(machine, 0, (data>>16)&0xff);
 	}
 }
 
@@ -1705,7 +1705,7 @@ static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
 	n_size <<= 2;
 	while( n_size > 0 )
 	{
-		psxwritebyte( n_address, ide_controller32_0_r( 0x1f0 / 4, 0xffffff00 ) );
+		psxwritebyte( n_address, ide_controller32_0_r( Machine, 0x1f0 / 4, 0xffffff00 ) );
 		n_address++;
 		n_size--;
 	}
@@ -1899,7 +1899,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1002e_bank_w )
 {
-	znsecsel_w( offset, data, mem_mask );
+	znsecsel_w( machine, offset, data, mem_mask );
 
 	memory_set_bankptr( 1, memory_region( REGION_USER2 ) + ( ( data & 3 ) * 0x800000 ) );
 }
@@ -1907,9 +1907,9 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 static WRITE32_HANDLER( coh1002e_latch_w )
 {
 	if (offset)
-		cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);	// irq 2 on the 68k
+		cpunum_set_input_line(machine, 1, 2, HOLD_LINE);	// irq 2 on the 68k
 	else
-		soundlatch_w(0, data);
+		soundlatch_w(machine, 0, data);
 }
 
 static DRIVER_INIT( coh1002e )
@@ -1929,17 +1929,17 @@ static MACHINE_RESET( coh1002e )
 
 static READ16_HANDLER( psarc_ymf_r )
 {
-	return YMF271_0_r(0);
+	return YMF271_0_r(machine,0);
 }
 
 static WRITE16_HANDLER( psarc_ymf_w )
 {
-	YMF271_0_w(offset, data);
+	YMF271_0_w(machine, offset, data);
 }
 
 static READ16_HANDLER( psarc_latch_r )
 {
-	return soundlatch_r(0);
+	return soundlatch_r(machine,0);
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2664,7 +2664,7 @@ static READ32_HANDLER( cbaj_z80_r )
 
 	cbaj_to_r3k &= ~2;
 
-	return soundlatch2_r(0) | ready<<24;
+	return soundlatch2_r(machine,0) | ready<<24;
 }
 
 static WRITE32_HANDLER( cbaj_z80_w )
@@ -2698,7 +2698,7 @@ static READ8_HANDLER( cbaj_z80_latch_r )
 static WRITE8_HANDLER( cbaj_z80_latch_w )
 {
 	cbaj_to_r3k |= 2;
-	soundlatch2_w(0, data);
+	soundlatch2_w(machine, 0, data);
 }
 
 static READ8_HANDLER( cbaj_z80_ready_r )

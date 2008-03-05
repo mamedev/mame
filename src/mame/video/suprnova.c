@@ -970,5 +970,5 @@ VIDEO_UPDATE(skns)
 
 VIDEO_EOF(skns)
 {
-	buffer_spriteram32_w(0,0,0);
+	buffer_spriteram32_w(machine,0,0,0);
 }
