@@ -1834,7 +1834,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gtmr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("gtmr", M68000, 16000000)	/* ? Most likely a 68000-HC16 */
+	MDRV_CPU_ADD_TAG("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gtmr_readmem,gtmr_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM)
 
@@ -1859,12 +1859,12 @@ static MACHINE_DRIVER_START( gtmr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD(OKIM6295, 1980000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, XTAL_16MHz/8)	/* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_DRIVER_END
 

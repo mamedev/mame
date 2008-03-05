@@ -930,7 +930,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( galpanic )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", M68000, 8000000)
+	MDRV_CPU_ADD_TAG("main", M68000, XTAL_12MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(galpanic,0)
 	MDRV_CPU_VBLANK_INT_HACK(galpanic_interrupt,2)
 
@@ -953,8 +953,8 @@ static MACHINE_DRIVER_START( galpanic )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD_TAG("oki", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD_TAG("oki", OKIM6295, XTAL_12MHz/6) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

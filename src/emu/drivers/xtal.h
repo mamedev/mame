@@ -90,7 +90,7 @@ enum
 	XTAL_18MHz   		= 18000000,		/* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz  	= 18432000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_19_923MHz		= 19923000,		/* Cinematronics vectors */
-	XTAL_19_968MHz  	= 19968000,		/* Used mostly by Space Invaders games by Taito/Midway and clones */
+	XTAL_19_968MHz  	= 19968000,		/* Used mostly by some Taito games */
 	XTAL_20MHz   		= 20000000,
 	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz  		= 21300000,
@@ -106,7 +106,7 @@ enum
 	XTAL_27_164MHz  	= 27164000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_28MHz   		= 28000000,
 	XTAL_28_37516MHz	= 28375160,		/* Amiga PAL systems */
-	XTAL_28_63636MHz  	= 28636360,		/* later Leland games and Atari GT, Amiga NTSC */
+	XTAL_28_63636MHz  	= 28636360,		/* later Leland games and Atari GT, Amiga NTSC , Raiden2 h/w */
 	XTAL_30_4761MHz  	= 30476100,		/* Taito JC */
 	XTAL_32MHz   		= 32000000,
 	XTAL_32_22MHz  		= 32220000,		/* Typically used on 90's Data East PCBs */
