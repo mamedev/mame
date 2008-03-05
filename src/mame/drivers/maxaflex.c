@@ -223,12 +223,10 @@ static MACHINE_RESET(supervisor_board)
 	output_set_digit_value(2, 0x00);
 }
 
-static INTERRUPT_GEN( supervisor_board_check_coin_input )
+static INPUT_CHANGED( coin_inserted )
 {
-	if ( !readinputport(4) )
-	{
+	if (!newval)
 		cpunum_set_input_line(machine, 1, M6805_IRQ_LINE, HOLD_LINE );
-	}
 }
 
 int atari_input_disabled(void)
@@ -308,7 +306,7 @@ static INPUT_PORTS_START( a600xl )
 
 	/* Max-A-Flex specific ports */
 	PORT_START	/* IN4 coin */
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START	/* IN5 DSW */
 	PORT_DIPNAME(0xf, 0x9, "Coin/Time" )
@@ -437,7 +435,6 @@ static MACHINE_DRIVER_START( a600xl )
 
 	MDRV_CPU_ADD(M68705, 3579545)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem,0)
-	MDRV_CPU_PERIODIC_INT( supervisor_board_check_coin_input, 10 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

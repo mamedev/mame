@@ -31,30 +31,11 @@ Notes:
 #include "sound/ay8910.h"
 
 
-/* IRQ = VBlank, NMI = Coin Insertion */
-
-static UINT8 coins_old;
-
-static INTERRUPT_GEN( lasso_interrupt )
+static INPUT_CHANGED( coin_inserted )
 {
-	// VBlank
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else
-	{
-		UINT8 coins_new;
-
-		// Coins
-		coins_new = ~readinputport(3) & 0x30;
-
-		if ( ((coins_new & 0x10) && !(coins_old & 0x10)) ||
-			 ((coins_new & 0x20) && !(coins_old & 0x20)) )
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-
-		coins_old = coins_new;
-	}
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
-
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
@@ -89,12 +70,6 @@ static WRITE8_HANDLER( sound_select_w )
 
 	if (~data & 0x02)	/* chip #1 */
 		SN76496_1_w(0, to_write);
-}
-
-static MACHINE_START( lasso )
-{
-	/* register for saving */
-	state_save_register_global(coins_old);
 }
 
 
@@ -290,8 +265,8 @@ static INPUT_PORTS_START( lasso )
 	PORT_DIPNAME( 0x08, 0x00, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1  )
 INPUT_PORTS_END
@@ -355,8 +330,8 @@ static INPUT_PORTS_START( chameleo )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2    ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1  )
 INPUT_PORTS_END
@@ -421,8 +396,8 @@ static INPUT_PORTS_START( wwjgtin )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	/* probably unused */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1  )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2  )
 INPUT_PORTS_END
@@ -486,8 +461,8 @@ static INPUT_PORTS_START( pinbo )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2   )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1   )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN2  ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN1  ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 INPUT_PORTS_END
@@ -573,14 +548,12 @@ static MACHINE_DRIVER_START( base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, 11289000/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lasso_main_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD_TAG("audio", M6502, 600000)
 	MDRV_CPU_PROGRAM_MAP(lasso_audio_map, 0)
 
-	MDRV_CPU_VBLANK_INT_HACK(lasso_interrupt,2)		/* IRQ = VBlank, NMI = Coin Insertion */
 	MDRV_INTERLEAVE(100)
-
-	MDRV_MACHINE_START(lasso)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

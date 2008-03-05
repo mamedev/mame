@@ -427,6 +427,13 @@ static READ8_HANDLER( m11_a700_r )
  *
  *************************************/
 
+static INPUT_CHANGED( coin_inserted )
+{
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 static TIMER_CALLBACK( interrupt_callback )
 {
     if (param==0)
@@ -446,32 +453,19 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static INTERRUPT_GEN( m11_interrupt )
 {
-	if (readinputport(2) & 1)	/* Left Coin */
-        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-    else
-    {
-    	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
-    }
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
 {
-	if (readinputport(2) & 1)	/* Left Coin */
-        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-    else
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( m15_interrupt )
 {
-	if (readinputport(2) & 1)	/* Left Coin */
-        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-    else
-    {
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
-    }
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+   	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
 }
 
 /*************************************
@@ -576,7 +570,7 @@ static INPUT_PORTS_START( skychut )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -617,7 +611,7 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -645,7 +639,7 @@ static INPUT_PORTS_START( spacbeam )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
 	PORT_START	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START	/* IN3 */
 	PORT_BIT( 0x03, 0, IPT_UNUSED )
@@ -682,7 +676,7 @@ static INPUT_PORTS_START( headoni )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
 	PORT_START	/* FAKE */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
 	PORT_START	/* IN3 */
 	PORT_BIT( 0x03, 0, IPT_UNUSED )
