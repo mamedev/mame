@@ -296,7 +296,6 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* add callback for breaking on VBLANK */
-fprintf(stderr,"Debug 1\n");
 	video_screen_register_vbl_cb(machine, NULL, on_vblank);
 
 	add_exit_callback(machine, debug_cpu_exit);

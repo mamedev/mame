@@ -86,7 +86,7 @@ static TIMER_CALLBACK( watchdog_callback )
 static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
 {
 	/* VBLANK starting */
-	if (vblank_state)
+	if (vblank_state && watchdog_enabled)
 	{
 		/* check the watchdog */
 		if (machine->config->watchdog_vblank_count != 0 && --watchdog_counter == 0)
