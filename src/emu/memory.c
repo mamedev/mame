@@ -1205,13 +1205,13 @@ void construct_address_map(address_map *map, const machine_config *drv, int cpun
 
 	/* start by constructing the internal CPU map */
 	if (internal_map)
-		map = (*internal_map)(map);
+		map = (*internal_map)(Machine, map);
 
 	/* construct the standard map */
 	if (drv->cpu[cpunum].construct_map[spacenum][0])
-		map = (*drv->cpu[cpunum].construct_map[spacenum][0])(map);
+		map = (*drv->cpu[cpunum].construct_map[spacenum][0])(Machine, map);
 	if (drv->cpu[cpunum].construct_map[spacenum][1])
-		map = (*drv->cpu[cpunum].construct_map[spacenum][1])(map);
+		map = (*drv->cpu[cpunum].construct_map[spacenum][1])(Machine, map);
 }
 
 

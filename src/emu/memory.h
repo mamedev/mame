@@ -608,15 +608,15 @@ struct _address_space
 void construct_address_map(address_map *map, const machine_config *drv, int cpunum, int spacenum);
 
 /* ----- a typedef for pointers to these functions ----- */
-typedef address_map *(*construct_map_t)(address_map *map);
+typedef address_map *(*construct_map_t)(running_machine *machine, address_map *map);
 
 /* use this to declare external references to a machine driver */
 #define ADDRESS_MAP_EXTERN(_name)										\
-address_map *construct_map_##_name(address_map *map)					\
+address_map *construct_map_##_name(running_machine *machine, address_map *map)					\
 
 /* ----- macros for starting, ending, and setting map flags ----- */
 #define ADDRESS_MAP_START(_name,_space,_bits)							\
-address_map *construct_map_##_name(address_map *map)					\
+address_map *construct_map_##_name(running_machine *machine, address_map *map)					\
 {																		\
 	extern read##_bits##_machine_func port_tag_to_handler##_bits(const char *); \
 	typedef read##_bits##_machine_func _rmf_t;							\
@@ -700,15 +700,15 @@ address_map *construct_map_##_name(address_map *map)					\
 	map->base = (void **)(base = _base);								\
 
 #define AM_BASE_MEMBER(_struct, _member)								\
-	if (Machine != NULL && Machine->driver_data != NULL)				\
-		map->base = (void **)(base = &((_struct *)Machine->driver_data)->_member);\
+	if (machine != NULL && machine->driver_data != NULL)				\
+		map->base = (void **)(base = &((_struct *)machine->driver_data)->_member);\
 
 #define AM_SIZE(_size)													\
 	map->size = _size;													\
 
 #define AM_SIZE_MEMBER(_struct, _member)								\
-	if (Machine != NULL && Machine->driver_data != NULL)				\
-		map->size = &((_struct *)Machine->driver_data)->_member;		\
+	if (machine != NULL && machine->driver_data != NULL)				\
+		map->size = &((_struct *)machine->driver_data)->_member;		\
 
 /* ----- common shortcuts ----- */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
