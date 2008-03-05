@@ -161,7 +161,11 @@ struct _device_config
 	device_reset_func		reset;					/* quick pointer to reset callback */
 	const void *			static_config;			/* static device configuration */
 	void *					inline_config;			/* inline device configuration */
+
+	/* these two fields are only valid if the device is live */
 	void *					token;					/* token if device is live */
+	running_machine *		machine;				/* machine if device is live */
+
 	char					tag[1];					/* tag for this instance */
 };
 

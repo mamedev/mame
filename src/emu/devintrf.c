@@ -446,6 +446,7 @@ void device_list_start(running_machine *machine)
 		assert(config->start != NULL);
 
 		/* call the start function */
+		config->machine = machine;
 		config->token = (*config->start)(machine, config->tag, config->static_config, config->inline_config);
 		assert(config->token != NULL);
 
@@ -477,6 +478,7 @@ static void device_list_stop(running_machine *machine)
 
 		/* clear the token to indicate we are finished */
 		config->token = NULL;
+		config->machine = NULL;
 	}
 }
 
