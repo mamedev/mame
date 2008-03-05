@@ -454,6 +454,11 @@ static WRITE8_HANDLER( bankswitch_w )
 	memory_set_bank(1,data & 0x07);
 }
 
+static READ8_HANDLER( bankswitch_r )
+{
+	return memory_get_bank(1);
+}
+
 // IC2 6840 PTM handler ///////////////////////////////////////////////////////
 
 static WRITE8_HANDLER( ic2_o1_callback )
@@ -1325,7 +1330,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0810) AM_WRITE(characteriser_w)
 	AM_RANGE(0x0800, 0x0810) AM_READ( characteriser_r)
 
-	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	// write bank (rom page select)
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
 //  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
