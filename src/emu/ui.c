@@ -1124,10 +1124,10 @@ int sprintf_game_info(char *buffer)
 				bufptr += sprintf(bufptr, "Vector\n");
 			else
 				bufptr += sprintf(bufptr, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
-						scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1,
-						scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1,
+						Machine->screen[index].visarea.max_x - Machine->screen[index].visarea.min_x + 1,
+						Machine->screen[index].visarea.max_y - Machine->screen[index].visarea.min_y + 1,
 						(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+						ATTOSECONDS_TO_HZ(Machine->screen[index].refresh));
 		}
 	}
 
