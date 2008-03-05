@@ -29,28 +29,17 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #define MONTECAR_BEEPER_EN			FIRETRUCK_XTNDPLY_EN
 #define MONTECAR_ATTRACT_INV		FIRETRUCK_ATTRACT_EN
 
-#define GAME_IS_FIRETRUCK   (firetrk_game == 1)
-#define GAME_IS_SUPERBUG    (firetrk_game == 2)
-#define GAME_IS_MONTECARLO  (firetrk_game == 3)
-
-
-/*----------- defined in drivers/firetrk.c -----------*/
-
-extern int firetrk_game;
-
-extern UINT32 firetrk_color1_mask;
-extern UINT32 firetrk_color2_mask;
-
 
 /*----------- defined in audio/firetrk.c -----------*/
 
 WRITE8_HANDLER( firetrk_skid_reset_w );
+WRITE8_HANDLER( montecar_skid_reset_w );
 WRITE8_HANDLER( firetrk_crash_snd_w );
 WRITE8_HANDLER( firetrk_skid_snd_w );
 WRITE8_HANDLER( firetrk_motor_snd_w );
+WRITE8_HANDLER( superbug_motor_snd_w );
 WRITE8_HANDLER( firetrk_xtndply_w );
-WRITE8_HANDLER( firetrk_asr_w );
-WRITE8_HANDLER( firetrk_out2_w );
+WRITE8_HANDLER( superbug_asr_w );
 
 DISCRETE_SOUND_EXTERN( firetrk );
 DISCRETE_SOUND_EXTERN( superbug );
@@ -59,23 +48,25 @@ DISCRETE_SOUND_EXTERN( montecar );
 
 /*----------- defined in video/firetrk.c -----------*/
 
-extern VIDEO_UPDATE( firetrk );
-extern VIDEO_START( firetrk );
-extern VIDEO_EOF( firetrk );
+PALETTE_INIT( firetrk );
+PALETTE_INIT( montecar );
+VIDEO_START( firetrk );
+VIDEO_START( superbug );
+VIDEO_START( montecar );
+VIDEO_UPDATE( firetrk );
+VIDEO_UPDATE( superbug );
+VIDEO_UPDATE( montecar );
 
-extern WRITE8_HANDLER( firetrk_vert_w );
-extern WRITE8_HANDLER( firetrk_horz_w );
-extern WRITE8_HANDLER( firetrk_drone_hpos_w );
-extern WRITE8_HANDLER( firetrk_drone_vpos_w );
-extern WRITE8_HANDLER( firetrk_drone_rot_w );
-extern WRITE8_HANDLER( firetrk_playfield_w );
-extern WRITE8_HANDLER( firetrk_car_rot_w );
+extern UINT8 *firetrk_alpha_num_ram;
+extern UINT8 *firetrk_playfield_ram;
+extern UINT8 *firetrk_scroll_x;
+extern UINT8 *firetrk_scroll_y;
+extern UINT8 *firetrk_car_rot;
+extern UINT8 *firetrk_drone_rot;
+extern UINT8 *firetrk_drone_x;
+extern UINT8 *firetrk_drone_y;
+extern UINT8 *firetrk_blink;
+extern UINT8  firetrk_flash;
 
-extern void firetrk_set_flash(int flag);
-extern void firetrk_set_blink(int flag);
-
-extern UINT8* firetrk_alpha_num_ram;
-extern UINT8* firetrk_playfield_ram;
-
-extern int firetrk_crash[2];
-extern int firetrk_skid[2];
+extern UINT8 firetrk_crash[2];
+extern UINT8 firetrk_skid[2];

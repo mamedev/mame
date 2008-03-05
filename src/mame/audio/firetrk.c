@@ -11,14 +11,17 @@
 
 WRITE8_HANDLER( firetrk_skid_reset_w )
 {
-	if (GAME_IS_FIRETRUCK || GAME_IS_SUPERBUG)
-	{
-		firetrk_skid[0] = 0;
-		firetrk_skid[1] = 0;
-	}
+	firetrk_skid[0] = 0;
+	firetrk_skid[1] = 0;
 
-	// also SUPERBUG_SKID_EN and MONTECAR_SKID_EN
+	// also SUPERBUG_SKID_EN
 	discrete_sound_w(FIRETRUCK_SKID_EN, 1);
+}
+
+
+WRITE8_HANDLER( montecar_skid_reset_w )
+{
+	discrete_sound_w(MONTECAR_SKID_EN, 1);
 }
 
 
@@ -38,14 +41,17 @@ WRITE8_HANDLER( firetrk_skid_snd_w )
 
 WRITE8_HANDLER( firetrk_motor_snd_w )
 {
-	if (GAME_IS_FIRETRUCK || GAME_IS_MONTECARLO)
-	{
-		// also MONTECAR_DRONE_MOTOR_DATA
-		discrete_sound_w(FIRETRUCK_SIREN_DATA, data >> 4);
-	}
+	// also MONTECAR_DRONE_MOTOR_DATA
+	discrete_sound_w(FIRETRUCK_SIREN_DATA, data >> 4);
 
-		// also SUPERBUG_SPEED_DATA and MONTECAR_MOTOR_DATA
-		discrete_sound_w(FIRETRUCK_MOTOR_DATA, data & 0x0f);
+	// also MONTECAR_MOTOR_DATA
+	discrete_sound_w(FIRETRUCK_MOTOR_DATA, data & 0x0f);
+}
+
+
+WRITE8_HANDLER( superbug_motor_snd_w )
+{
+	discrete_sound_w(SUPERBUG_SPEED_DATA, data & 0x0f);
 }
 
 
@@ -55,24 +61,10 @@ WRITE8_HANDLER( firetrk_xtndply_w )
 }
 
 
-WRITE8_HANDLER( firetrk_asr_w )
+WRITE8_HANDLER( superbug_asr_w )
 {
-	if (GAME_IS_SUPERBUG)
-	{
+popmessage("ASR");
 		discrete_sound_w(SUPERBUG_ASR_EN, 1);	/* ASR */
-	}
-}
-
-
-WRITE8_HANDLER( firetrk_out2_w )
-{
-	firetrk_set_flash(data & 0x80);
-
-	if (GAME_IS_MONTECARLO)
-	{
-		discrete_sound_w(MONTECAR_BEEPER_EN, data & 0x10);	/* Beep */
-		discrete_sound_w(MONTECAR_DRONE_LOUD_DATA, data & 0x0f);	/* Drone Motor Volume */
-	}
 }
 
 
