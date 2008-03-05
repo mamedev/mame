@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/resnet.h"
 
 #include "includes/mario.h"
@@ -80,7 +79,7 @@ PALETTE_INIT( mario )
 
 WRITE8_HANDLER( mario_videoram_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -88,7 +87,7 @@ WRITE8_HANDLER( mario_videoram_w )
 
 WRITE8_HANDLER( mario_gfxbank_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	if (state->gfx_bank != (data & 0x01))
 	{
@@ -99,7 +98,7 @@ WRITE8_HANDLER( mario_gfxbank_w )
 
 WRITE8_HANDLER( mario_palettebank_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	if (state->palette_bank != (data & 0x01))
 	{
@@ -110,14 +109,14 @@ WRITE8_HANDLER( mario_palettebank_w )
 
 WRITE8_HANDLER( mario_scroll_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	state->gfx_scroll = data + 17;
 }
 
 WRITE8_HANDLER( mario_flip_w )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 
 	if (state->flip != (data & 0x01))
 	{
@@ -132,7 +131,7 @@ WRITE8_HANDLER( mario_flip_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 	int code = state->videoram[tile_index] + 256 * state->gfx_bank;
 	int color;
 
@@ -164,7 +163,7 @@ VIDEO_START( mario )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	mario_state	*state = Machine->driver_data;
+	mario_state	*state = machine->driver_data;
 	int offs;
 
 	for (offs = 0;offs < state->spriteram_size;offs += 4)
