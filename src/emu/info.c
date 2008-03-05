@@ -998,7 +998,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST chip type (cpu|audio) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST chip clock CDATA #IMPLIED>\n"
 		"\t\t<!ELEMENT display EMPTY>\n"
-		"\t\t\t<!ATTLIST display type (raster|vector) #REQUIRED>\n"
+		"\t\t\t<!ATTLIST display type (raster|vector|lcd|unknown) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST display rotate (0|90|180|270) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST display flipx (yes|no) \"no\">\n"
 		"\t\t\t<!ATTLIST display width CDATA #IMPLIED>\n"
