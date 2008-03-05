@@ -299,12 +299,13 @@ Donkey Kong Junior Notes
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/dkong.h"
 #include "machine/8257dma.h"
 #include "machine/z80dma.h"
+
+#include "deprecat.h"
 
 /*************************************
  *
@@ -632,7 +633,7 @@ static WRITE8_HANDLER( hunchbkd_mirror_w )
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	if (offset & 0x01)
 	{
@@ -661,14 +662,14 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( hunchbkd_data_w )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	state->hunchloopback = data;
 }
 
 static READ8_HANDLER( hunchbkd_port0_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 #if DEBUG_PROTECTION
 	logerror("port 0 : pc = %4x\n",activecpu_get_pc());
 #endif
@@ -685,7 +686,7 @@ static READ8_HANDLER( hunchbkd_port0_r )
 
 static READ8_HANDLER( hunchbkd_port1_r )
 {
-	dkong_state *state = Machine->driver_data;
+	dkong_state *state = machine->driver_data;
 
 	return state->hunchloopback;
 }
@@ -739,13 +740,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
