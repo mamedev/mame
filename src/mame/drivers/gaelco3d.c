@@ -362,7 +362,7 @@ static READ32_HANDLER( input_port_3_020_r ) { return readinputport(3) << 16; }
 
 static CUSTOM_INPUT( analog_bit_r )
 {
-	int which = (FPTR)machine;
+	int which = (FPTR)param;
 	return (analog_ports[which] >> 7) & 0x01;
 }
 
