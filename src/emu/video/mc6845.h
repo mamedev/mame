@@ -83,16 +83,16 @@ DEVICE_GET_INFO( r6545_1 );
 DEVICE_GET_INFO( c6545_1 );
 
 /* select one of the registers for reading or writing */
-void mc6845_address_w(mc6845_t *mc6845, UINT8 data);
+WRITE8_DEVICE_HANDLER( mc6845_address_w );
 
 /* read from the status register */
-UINT8 mc6845_status_r(mc6845_t *mc6845);
+READ8_DEVICE_HANDLER( mc6845_status_r );
 
 /* read from the currently selected register */
-UINT8 mc6845_register_r(mc6845_t *mc6845);
+READ8_DEVICE_HANDLER( mc6845_register_r );
 
 /* write to the currently selected register */
-void mc6845_register_w(mc6845_t *mc6845, UINT8 data);
+WRITE8_DEVICE_HANDLER( mc6845_register_w );
 
 /* return the current value on the MA0-MA13 pins */
 UINT16 mc6845_get_ma(mc6845_t *mc6845);

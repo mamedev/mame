@@ -21,8 +21,4 @@ extern UINT8 *madalien_edge1_pos;
 extern UINT8 *madalien_edge2_pos;
 extern UINT8 *madalien_headlight_pos;
 
-WRITE8_HANDLER( madalien_mc6845_address_w );
-READ8_HANDLER( madalien_mc6845_register_r );
-WRITE8_HANDLER( madalien_mc6845_register_w );
-
 MACHINE_DRIVER_EXTERN( madalien_video );

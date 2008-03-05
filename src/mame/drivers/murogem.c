@@ -101,21 +101,10 @@ static mc6845_t *mc6845;
 static UINT8 *murogem_videoram;
 
 
-static WRITE8_HANDLER( murogem_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static WRITE8_HANDLER( murogem_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(murogem_mc6845_address_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(murogem_mc6845_register_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(MWA8_NOP) // sound? payout?

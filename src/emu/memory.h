@@ -619,15 +619,19 @@ address_map *construct_map_##_name(address_map *map)					\
 address_map *construct_map_##_name(address_map *map)					\
 {																		\
 	extern read##_bits##_machine_func port_tag_to_handler##_bits(const char *); \
-	typedef read##_bits##_machine_func _rh_t;							\
-	typedef write##_bits##_machine_func _wh_t;							\
-	_rh_t read;															\
-	_wh_t write;														\
-	_rh_t (*port_tag_to_handler)(const char *) = port_tag_to_handler##_bits; \
+	typedef read##_bits##_machine_func _rmf_t;							\
+	typedef write##_bits##_machine_func _wmf_t;							\
+	typedef read##_bits##_device_func _rdf_t;							\
+	typedef write##_bits##_device_func _wdf_t;							\
+	_rmf_t readm;														\
+	_wmf_t writem;														\
+	_rdf_t readd;														\
+	_wdf_t writed;														\
+	_rmf_t (*port_tag_to_handler)(const char *) = port_tag_to_handler##_bits; \
 	UINT##_bits **base;													\
 																		\
-	(void)read; (void)write; (void)base;								\
-	(void)port_tag_to_handler; \
+	(void)readm; (void)writem; (void)readd; (void)writed; (void)base;	\
+	(void)port_tag_to_handler; 											\
 	map->flags = AM_FLAGS_EXTENDED;										\
 	map->start = AMEF_DBITS(_bits) | AMEF_SPACE(_space);				\
 
@@ -663,15 +667,27 @@ address_map *construct_map_##_name(address_map *map)					\
 	map->mirror = (_mirror);											\
 
 #define AM_READ(_handler)												\
-	map->read.handler = (genf *)(read = _handler);						\
+	map->read.handler = (genf *)(readm = _handler);						\
 	map->read_name = #_handler;											\
 
-#define AM_READ_PORT(_tag) \
-	AM_READ((*port_tag_to_handler)(_tag))
+#define AM_READ_PORT(_tag) 												\
+	AM_READ((*port_tag_to_handler)(_tag))								\
+
+#define AM_DEVREAD(_type, _tag, _handler)								\
+	map->read.handler = (genf *)(readd = _handler);						\
+	map->read_name = #_handler;											\
+	map->read_devtype = _type;											\
+	map->read_devtag = _tag;											\
 
 #define AM_WRITE(_handler)												\
-	map->write.handler = (genf *)(write = _handler);					\
+	map->write.handler = (genf *)(writem = _handler);					\
 	map->write_name = #_handler;										\
+
+#define AM_DEVWRITE(_type, _tag, _handler)								\
+	map->write.handler = (genf *)(writed = _handler);					\
+	map->write_name = #_handler;										\
+	map->write_devtype = _type;											\
+	map->write_devtag = _tag;											\
 
 #define AM_REGION(_region, _offs)										\
 	map->region = (_region);											\
@@ -696,15 +712,16 @@ address_map *construct_map_##_name(address_map *map)					\
 
 /* ----- common shortcuts ----- */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
-#define AM_ROM								AM_READ((_rh_t)STATIC_ROM)
-#define AM_RAM								AM_READWRITE((_rh_t)STATIC_RAM, (_wh_t)STATIC_RAM)
-#define AM_WRITEONLY						AM_WRITE((_wh_t)STATIC_RAM)
-#define AM_UNMAP							AM_READWRITE((_rh_t)STATIC_UNMAP, (_wh_t)STATIC_UNMAP)
-#define AM_ROMBANK(_bank)					AM_READ((_rh_t)(STATIC_BANK1 + (_bank) - 1))
-#define AM_RAMBANK(_bank)					AM_READWRITE((_rh_t)(STATIC_BANK1 + (_bank) - 1), (_wh_t)(STATIC_BANK1 + (_bank) - 1))
-#define AM_NOP								AM_READWRITE((_rh_t)STATIC_NOP, (_wh_t)STATIC_NOP)
-#define AM_READNOP							AM_READ((_rh_t)STATIC_NOP)
-#define AM_WRITENOP							AM_WRITE((_wh_t)STATIC_NOP)
+#define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
+#define AM_ROM								AM_READ((_rmf_t)STATIC_ROM)
+#define AM_RAM								AM_READWRITE((_rmf_t)STATIC_RAM, (_wmf_t)STATIC_RAM)
+#define AM_WRITEONLY						AM_WRITE((_wmf_t)STATIC_RAM)
+#define AM_UNMAP							AM_READWRITE((_rmf_t)STATIC_UNMAP, (_wmf_t)STATIC_UNMAP)
+#define AM_ROMBANK(_bank)					AM_READ((_rmf_t)(STATIC_BANK1 + (_bank) - 1))
+#define AM_RAMBANK(_bank)					AM_READWRITE((_rmf_t)(STATIC_BANK1 + (_bank) - 1), (_wmf_t)(STATIC_BANK1 + (_bank) - 1))
+#define AM_NOP								AM_READWRITE((_rmf_t)STATIC_NOP, (_wmf_t)STATIC_NOP)
+#define AM_READNOP							AM_READ((_rmf_t)STATIC_NOP)
+#define AM_WRITENOP							AM_WRITE((_wmf_t)STATIC_NOP)
 
 
 

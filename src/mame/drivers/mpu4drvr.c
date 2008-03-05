@@ -1495,21 +1495,6 @@ GFXDECODE_END
 
 static UINT8 *dealem_videoram;
 
-static WRITE8_HANDLER( dealem_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static READ8_HANDLER( dealem_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-static WRITE8_HANDLER( dealem_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -1585,8 +1570,8 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(dealem_mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(dealem_mc6845_register_r, dealem_mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 
 //  AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w) // write bank (rom page select)
 

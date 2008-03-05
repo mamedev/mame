@@ -113,16 +113,19 @@ static void mc6845_state_save_postload(void *param)
 }
 
 
-void mc6845_address_w(mc6845_t *mc6845, UINT8 data)
+WRITE8_DEVICE_HANDLER( mc6845_address_w )
 {
+	mc6845_t *mc6845 = device->token;
+
 	assert(mc6845 != NULL);
 
 	mc6845->register_address_latch = data & 0x1f;
 }
 
 
-UINT8 mc6845_status_r(mc6845_t *mc6845)
+READ8_DEVICE_HANDLER( mc6845_status_r )
 {
+	mc6845_t *mc6845 = device->token;
 	UINT8 ret = 0;
 
 	assert(mc6845 != NULL);
@@ -140,8 +143,9 @@ UINT8 mc6845_status_r(mc6845_t *mc6845)
 }
 
 
-UINT8 mc6845_register_r(mc6845_t *mc6845)
+READ8_DEVICE_HANDLER( mc6845_register_r )
 {
+	mc6845_t *mc6845 = device->token;
 	UINT8 ret = 0;
 
 	assert(mc6845 != NULL);
@@ -163,8 +167,10 @@ UINT8 mc6845_register_r(mc6845_t *mc6845)
 }
 
 
-void mc6845_register_w(mc6845_t *mc6845, UINT8 data)
+WRITE8_DEVICE_HANDLER( mc6845_register_w )
 {
+	mc6845_t *mc6845 = device->token;
+
 	assert(mc6845 != NULL);
 
 	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->register_address_latch, data);

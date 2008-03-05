@@ -687,51 +687,61 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 					UINT32 start = SPACE_SHIFT(map->start);
 					UINT32 end = ismatchmask ? SPACE_SHIFT(map->end) : SPACE_SHIFT_END(map->end);
 
+					/* look for inverted start/end pairs */
+					if (end < start)
 					{
-						/* look for inverted start/end pairs */
-						if (end < start)
+						mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
+						error = TRUE;
+					}
+
+					/* look for misaligned entries */
+					if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+					{
+						mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
+						error = TRUE;
+					}
+
+					/* if this is a program space, auto-assign implicit ROM entries */
+					if ((FPTR)map->read.handler == STATIC_ROM && !map->region)
+					{
+						map->region = REGION_CPU1 + cpunum;
+						map->region_offs = map->start;
+					}
+
+					/* if this entry references a memory region, validate it */
+					if (map->region && map->share == 0)
+					{
+						offs_t length = region_length[map->region];
+
+						if (length == 0)
 						{
-							mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
+							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
 							error = TRUE;
 						}
-
-						/* look for misaligned entries */
-						if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+						else if (map->region_offs + (end - start + 1) > length)
 						{
-							mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
+							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
 							error = TRUE;
 						}
+					}
 
-						/* if this is a program space, auto-assign implicit ROM entries */
-						if ((FPTR)map->read.handler == STATIC_ROM && !map->region)
-						{
-							map->region = REGION_CPU1 + cpunum;
-							map->region_offs = map->start;
-						}
-
-						/* if this entry references a memory region, validate it */
-						if (map->region && map->share == 0)
-						{
-							offs_t length = region_length[map->region];
-
-							if (length == 0)
-							{
-								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-								error = TRUE;
-							}
-							else if (map->region_offs + (end - start + 1) > length)
-							{
-								mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
-								error = TRUE;
-							}
-						}
-
-						/* If this is a match/mask, make sure the match bits are present in the mask */
-						if (ismatchmask && (start & end) != start)
-						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry match %X contains bits not in mask %X for region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-							error = TRUE;
-						}
+					/* If this is a match/mask, make sure the match bits are present in the mask */
+					if (ismatchmask && (start & end) != start)
+					{
+						mame_printf_error("%s: %s CPU %d space %d memory map entry match %X contains bits not in mask %X for region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
+						error = TRUE;
+					}
+					
+					/* make sure all devices exist */
+					if (map->read_devtype != NULL && device_list_find_by_tag(config->devicelist, map->read_devtype, map->read_devtag) == NULL)
+					{
+						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->read_devtype), map->read_devtag);
+						error = TRUE;
+					}
+					if (map->write_devtype != NULL && device_list_find_by_tag(config->devicelist, map->write_devtype, map->write_devtag) == NULL)
+					{
+						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->write_devtype), map->write_devtag);
+						error = TRUE;
 					}
 				}
 				else

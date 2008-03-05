@@ -288,37 +288,6 @@ static void get_pens(qix_state *state, pen_t *pens)
 
 /*************************************
  *
- *  M6845 access
- *
- *************************************/
-
-static WRITE8_HANDLER( qix_mc6845_address_w )
-{
-	qix_state *state = Machine->driver_data;
-
-	mc6845_address_w(state->mc6845, data);
-}
-
-
-static READ8_HANDLER( qix_mc6845_register_r )
-{
-	qix_state *state = Machine->driver_data;
-
-	return mc6845_register_r(state->mc6845);
-}
-
-
-static WRITE8_HANDLER( qix_mc6845_register_w )
-{
-	qix_state *state = Machine->driver_data;
-
-	mc6845_register_w(state->mc6845, data);
-}
-
-
-
-/*************************************
- *
  *  M6845 callbacks for updating
  *  the screen
  *
@@ -397,8 +366,8 @@ static ADDRESS_MAP_START( qix_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -415,8 +384,8 @@ static ADDRESS_MAP_START( zookeep_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x9400) AM_MIRROR(0x03fc) AM_READWRITE(qix_addresslatch_r, qix_addresslatch_w)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -434,8 +403,8 @@ static ADDRESS_MAP_START( slither_video_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9401, 0x9401) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_mask)
 	AM_RANGE(0x9402, 0x9403) AM_MIRROR(0x03fc) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(qix_state, videoram_address)
 	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READ(MRA8_RAM) AM_BASE_MEMBER(qix_state, scanline_latch)
-	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_WRITE(qix_mc6845_address_w)
-	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_READWRITE(qix_mc6845_register_r, qix_mc6845_register_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_MIRROR(0x03fe) AM_DEVWRITE(MC6845, "vid-u18", mc6845_address_w)
+	AM_RANGE(0x9c01, 0x9c01) AM_MIRROR(0x03fe) AM_DEVREADWRITE(MC6845, "vid-u18", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

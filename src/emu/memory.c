@@ -1510,13 +1510,23 @@ static void populate_memory(void)
 							if (map->read.handler != NULL)
 							{
 								void *object = Machine;
-								if (map->read_devtype != NULL) object = (void *)device_list_find_by_tag(Machine->config->devicelist, map->read_devtype, map->read_devtag);
+								if (map->read_devtype != NULL)
+								{
+									object = (void *)device_list_find_by_tag(Machine->config->devicelist, map->read_devtype, map->read_devtag);
+									if (object == NULL)
+										fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(map->read_devtype), map->read_devtag);
+								}
 								install_mem_handler_private(space, 0, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->read.handler, isfixed, object, map->read_name);
 							}
 							if (map->write.handler != NULL)
 							{
 								void *object = Machine;
-								if (map->write_devtype != NULL) object = (void *)device_list_find_by_tag(Machine->config->devicelist, map->write_devtype, map->write_devtag);
+								if (map->write_devtype != NULL)
+								{
+									object = (void *)device_list_find_by_tag(Machine->config->devicelist, map->write_devtype, map->write_devtag);
+									if (object == NULL)
+										fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(map->write_devtype), map->write_devtag);
+								}
 								install_mem_handler_private(space, 1, space->dbits, ismatchmask, map->start, map->end, map->mask, map->mirror, map->write.handler, isfixed, object, map->write_name);
 							}
 						}

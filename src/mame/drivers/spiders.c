@@ -410,24 +410,6 @@ static MACHINE_RESET( spiders )
 #define NUM_PENS	(8)
 
 
-static WRITE8_HANDLER( spiders_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-static READ8_HANDLER( spiders_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-
-static WRITE8_HANDLER( spiders_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 static WRITE8_HANDLER( flipscreen_w )
 {
 	flipscreen = data;
@@ -591,8 +573,8 @@ static READ8_HANDLER( gfx_rom_r )
 
 static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spiders_mc6845_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(spiders_mc6845_register_r, spiders_mc6845_register_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc044, 0xc047) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc048, 0xc04b) AM_READWRITE(pia_2_alt_r, pia_2_alt_w)

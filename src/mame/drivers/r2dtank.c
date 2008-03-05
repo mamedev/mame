@@ -304,18 +304,6 @@ static MACHINE_RESET( r2dtank )
 #define NUM_PENS	(8)
 
 
-static WRITE8_HANDLER( r2dtank_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-static WRITE8_HANDLER( r2dtank_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 static WRITE8_HANDLER( flipscreen_w )
 {
 	flipscreen = !data;
@@ -440,8 +428,8 @@ static ADDRESS_MAP_START( r2dtank_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_READWRITE(pia_0_r, pia_comp_0_w)
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(r2dtank_mc6845_address_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(r2dtank_mc6845_register_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0xc000, 0xc007) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END

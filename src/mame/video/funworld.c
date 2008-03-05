@@ -125,21 +125,6 @@ WRITE8_HANDLER( funworld_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-WRITE8_HANDLER( funworld_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-READ8_HANDLER( funworld_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-WRITE8_HANDLER( funworld_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 /**** normal hardware limit ****
     - bits -
     7654 3210

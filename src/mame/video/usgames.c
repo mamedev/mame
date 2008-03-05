@@ -72,18 +72,6 @@ WRITE8_HANDLER( usgames_charram_w )
 }
 
 
-WRITE8_HANDLER( usgames_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-WRITE8_HANDLER( usgames_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 VIDEO_UPDATE(usgames)
 {
 	tilemap_draw(bitmap,cliprect,usgames_tilemap,0,0);

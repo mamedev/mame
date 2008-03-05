@@ -115,18 +115,6 @@ WRITE8_HANDLER( rockola_charram_w )
 }
 
 
-WRITE8_HANDLER( rockola_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-WRITE8_HANDLER( rockola_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 WRITE8_HANDLER( rockola_flipscreen_w )
 {
 	int bank;

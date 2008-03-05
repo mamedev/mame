@@ -50,21 +50,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-WRITE8_HANDLER( calomega_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-READ8_HANDLER( calomega_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-WRITE8_HANDLER( calomega_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 VIDEO_START( calomega )
 {
 	mc6845 = devtag_get_token(machine, MC6845, "crtc");

@@ -383,21 +383,6 @@
 static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
-static WRITE8_HANDLER( pmpoker_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static READ8_HANDLER( pmpoker_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-static WRITE8_HANDLER( pmpoker_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 static WRITE8_HANDLER( pmpoker_videoram_w )
 {
 	videoram[offset] = data;
@@ -484,8 +469,8 @@ static PALETTE_INIT( pottnpkr )
 
 static ADDRESS_MAP_START( pmpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(pmpoker_mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(pmpoker_mc6845_register_r, pmpoker_mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
@@ -496,8 +481,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jokerpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* battery backed RAM */
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(pmpoker_mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(pmpoker_mc6845_register_r, pmpoker_mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)

@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
+#include "video/mc6845.h"
 #include "madalien.h"
 
 
@@ -86,8 +87,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x67ff) AM_RAM
 	AM_RANGE(0x6800, 0x7fff) AM_RAM AM_BASE(&madalien_charram)
 
-	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_WRITE(madalien_mc6845_address_w)
-	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_READWRITE(madalien_mc6845_register_r, madalien_mc6845_register_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0ff0) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x0ff0) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x8004, 0x8004) AM_MIRROR(0x0ff0) AM_WRITE(MWA8_RAM) AM_BASE(&madalien_video_control)
 	AM_RANGE(0x8005, 0x8005) AM_MIRROR(0x0ff0) AM_WRITE(madalien_output_w)
 	AM_RANGE(0x8006, 0x8006) AM_MIRROR(0x0ff0) AM_READWRITE(soundlatch2_r, madalien_sound_command_w)

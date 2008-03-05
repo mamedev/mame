@@ -84,22 +84,6 @@ static PALETTE_INIT( madalien )
 }
 
 
-WRITE8_HANDLER( madalien_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-READ8_HANDLER( madalien_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-WRITE8_HANDLER( madalien_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
-
 INLINE int scan_helper(int col, int row, int section)
 {
 	return (section << 8) | ((~col & 0x0f) << 3) | row;

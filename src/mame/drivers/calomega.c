@@ -491,9 +491,6 @@
 /* from video */
 WRITE8_HANDLER( calomega_videoram_w );
 WRITE8_HANDLER( calomega_colorram_w );
-WRITE8_HANDLER( calomega_mc6845_address_w );
-READ8_HANDLER( calomega_mc6845_register_r );
-WRITE8_HANDLER( calomega_mc6845_register_w );
 PALETTE_INIT( calomega );
 VIDEO_START( calomega );
 VIDEO_UPDATE( calomega );
@@ -507,8 +504,8 @@ static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0840, 0x0840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0841, 0x0841) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0880, 0x0880) AM_WRITE(calomega_mc6845_address_w)
-	AM_RANGE(0x0881, 0x0881) AM_READWRITE(calomega_mc6845_register_r, calomega_mc6845_register_w)
+	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
@@ -520,8 +517,8 @@ static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0880, 0x0880) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x0881, 0x0881) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x1080, 0x1080) AM_WRITE(calomega_mc6845_address_w)
-	AM_RANGE(0x1081, 0x1081) AM_READWRITE(calomega_mc6845_register_r, calomega_mc6845_register_w)
+	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x10c8, 0x10cb) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_WRITE(calomega_videoram_w) AM_BASE(&videoram)

@@ -146,21 +146,6 @@ static WRITE8_HANDLER( miniboy7_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-static WRITE8_HANDLER( miniboy7_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static READ8_HANDLER( miniboy7_mc6845_register_r )
-{
-	return mc6845_register_r(mc6845);
-}
-
-static WRITE8_HANDLER( miniboy7_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 static TILE_GET_INFO( get_bg_tile_info )
 {
 /*  - bits -
@@ -203,8 +188,8 @@ static ADDRESS_MAP_START( miniboy7_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_WRITE(miniboy7_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(miniboy7_mc6845_address_w)
-	AM_RANGE(0x2801, 0x2801) AM_READWRITE(miniboy7_mc6845_register_r, miniboy7_mc6845_register_w)
+	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 //  AM_RANGE(0x3000, 0x3001) ????? R/W
 //  AM_RANGE(0x3080, 0x3083) AM_READWRITE(pia_0_r, pia_0_w)
 //  AM_RANGE(0x3800, 0x3800) ????? R

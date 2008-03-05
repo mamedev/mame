@@ -54,16 +54,6 @@ x-x- ---- ---- ---- extra tile number.
 ---- ---- xxxx xxxx tile number
 */
 
-static WRITE8_HANDLER( couple_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-static WRITE8_HANDLER( couple_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT16 vram_data = (((vram_hi[tile_index] & 0xff) << 8) | (vram_lo[tile_index] & 0xff));
@@ -158,8 +148,8 @@ static ADDRESS_MAP_START( merit_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0xc000, 0xc00f ) AM_READ(dummy_inputs_r)
 //  AM_RANGE( 0xc008, 0xc008 ) AM_READ(input_port_0_r)
 //  AM_RANGE( 0xc00a, 0xc00a ) AM_READ(input_port_1_r)
-  	AM_RANGE( 0xe000, 0xe000 ) AM_WRITE(couple_mc6845_address_w)
-  	AM_RANGE( 0xe001, 0xe001 ) AM_WRITE(couple_mc6845_register_w)
+  	AM_RANGE( 0xe000, 0xe000 ) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+  	AM_RANGE( 0xe001, 0xe001 ) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE( 0xe800, 0xefff ) AM_READWRITE(MRA8_RAM, couple_vram_hi_w) AM_BASE(&vram_hi)
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(MRA8_RAM, couple_vram_lo_w) AM_BASE(&vram_lo)
 	AM_RANGE( 0xf800, 0xfbff ) AM_RAM /*extra VRAM?*/

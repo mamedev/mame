@@ -106,17 +106,6 @@ static WRITE8_HANDLER(ssingles_colorram_w)
 	ssingles_colorram[offset]=data;
 }
 
-static WRITE8_HANDLER( ssingles_mc6845_address_w )
-{
-	mc6845_address_w(mc6845, data);
-}
-
-
-static WRITE8_HANDLER( ssingles_mc6845_register_w )
-{
-	mc6845_register_w(mc6845, data);
-}
-
 
 static VIDEO_START(ssingles)
 {
@@ -193,8 +182,8 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_READ(input_port_3_r)
 	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(ssingles_mc6845_address_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(ssingles_mc6845_register_w)
+	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 
 ADDRESS_MAP_END
 
