@@ -175,6 +175,9 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 {
 	qix_state *state = Machine->driver_data;
 
+	/* update the screen in case the game is writing "behind" the beam */
+	video_screen_update_now(0);
+
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
 
@@ -186,6 +189,9 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 static WRITE8_HANDLER( slither_addresslatch_w )
 {
 	qix_state *state = Machine->driver_data;
+
+	/* update the screen in case the game is writing "behind" the beam */
+	video_screen_update_now(0);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -312,7 +318,6 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 
 static MC6845_UPDATE_ROW( update_row )
-
 {
 	qix_state *state = machine->driver_data;
 	UINT16 x;
@@ -426,7 +431,7 @@ static const mc6845_interface mc6845_intf =
 	NULL,					/* after pixel update callback */
 	display_enable_changed,	/* callback for display state changes */
 	NULL,					/* HSYNC callback */
-	NULL					/* VSYNC callback */
+	qix_vsync_changed		/* VSYNC callback */
 };
 
 

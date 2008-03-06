@@ -66,7 +66,7 @@ WRITE8_HANDLER( qix_68705_portC_w );
 
 WRITE8_HANDLER( qix_pia_0_w );
 
-INTERRUPT_GEN( qix_vblank_start );
+MC6845_ON_VSYNC_CHANGED( qix_vsync_changed );
 
 
 /*----------- defined in video/qix.c -----------*/

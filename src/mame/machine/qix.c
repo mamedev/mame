@@ -257,20 +257,13 @@ MACHINE_START( slither )
 
 /*************************************
  *
- *  VSYNC interrupt handling
+ *  VSYNC change callback
  *
  *************************************/
 
-static TIMER_CALLBACK( vblank_stop )
+MC6845_ON_VSYNC_CHANGED( qix_vsync_changed )
 {
-	pia_3_cb1_w(machine, 0, 0);
-}
-
-
-INTERRUPT_GEN( qix_vblank_start )
-{
-	pia_3_cb1_w(machine, 0, 1);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, vblank_stop);
+	pia_3_cb1_w(machine, 0, vsync);
 }
 
 
