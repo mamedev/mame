@@ -628,23 +628,23 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 
 /* device interface */
-static void *common_start(running_machine *machine, const char *tag, const void *static_config, const void *inline_config, int device_type)
+static void *common_start(const device_config *device, int device_type)
 {
 	mc6845_t *mc6845;
 	char unique_tag[30];
 
 	/* validate arguments */
-	assert(machine != NULL);
-	assert(tag != NULL);
-	assert(strlen(tag) < 20);
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
 	/* allocate the object that holds the state */
 	mc6845 = auto_malloc(sizeof(*mc6845));
 	memset(mc6845, 0, sizeof(*mc6845));
 
 	mc6845->device_type = device_type;
-	mc6845->machine = machine;
-	mc6845->intf = static_config;
+	mc6845->machine = device->machine;
+	mc6845->intf = device->static_config;
 
 	/* create the timers */
 	if (mc6845->intf != NULL)
@@ -668,7 +668,7 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, mc6845);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], tag);
+	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
 
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
@@ -697,35 +697,35 @@ static void *common_start(running_machine *machine, const char *tag, const void 
 
 static DEVICE_START( mc6845 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_MC6845);
+	return common_start(device, TYPE_MC6845);
 }
 
 static DEVICE_START( c6545_1 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_C6545_1);
+	return common_start(device, TYPE_C6545_1);
 }
 
 static DEVICE_START( r6545_1 )
 {
-	return common_start(machine, tag, static_config, inline_config, TYPE_R6545_1);
+	return common_start(device, TYPE_R6545_1);
 }
 
 
 static DEVICE_RESET( mc6845 )
 {
-	mc6845_t *mc6845 = token;
+	mc6845_t *mc6845 = device->token;
 
 	/* internal registers other than status remain unchanged, all outputs go low */
 	if (mc6845->intf != NULL)
 	{
 		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->intf->on_de_changed(machine, mc6845, FALSE);
+			mc6845->intf->on_de_changed(device->machine, mc6845, FALSE);
 
 		if (mc6845->intf->on_hsync_changed != NULL)
-			mc6845->intf->on_hsync_changed(machine, mc6845, FALSE);
+			mc6845->intf->on_hsync_changed(device->machine, mc6845, FALSE);
 
 		if (mc6845->intf->on_vsync_changed != NULL)
-			mc6845->intf->on_vsync_changed(machine, mc6845, FALSE);
+			mc6845->intf->on_vsync_changed(device->machine, mc6845, FALSE);
 	}
 
 	mc6845->light_pen_latched = FALSE;

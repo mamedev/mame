@@ -1158,8 +1158,8 @@ void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank
 
 static DEVICE_START( video_screen )
 {
-	int scrindex = device_list_index(machine->config->devicelist, VIDEO_SCREEN, tag);
-	return &machine->screen[scrindex];
+	int scrindex = device_list_index(device->machine->config->devicelist, VIDEO_SCREEN, device->tag);
+	return &device->machine->screen[scrindex];
 }
 
 

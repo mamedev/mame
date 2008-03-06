@@ -794,8 +794,8 @@ static DEVICE_START( speaker_output )
 	memset(info, 0, sizeof(*info));
 
 	/* copy in all the relevant info */
-	info->speaker = inline_config;
-	info->tag = tag;
+	info->speaker = device->inline_config;
+	info->tag = device->tag;
 	return info;
 }
 

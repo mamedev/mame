@@ -411,21 +411,21 @@ static DEVICE_START( z80dma )
 	char unique_tag[30];
 
 	/* validate arguments */
-	assert(machine != NULL);
-	assert(tag != NULL);
-	assert(strlen(tag) < 20);
+	assert(device != NULL);
+	assert(device->tag != NULL);
+	assert(strlen(device->tag) < 20);
 
 	/* allocate the object that holds the state */
 	z80dma = auto_malloc(sizeof(*z80dma));
 	memset(z80dma, 0, sizeof(*z80dma));
 
 	//z80dma->device_type = device_type;
-	z80dma->machine = machine;
-	z80dma->intf = static_config;
+	z80dma->machine = device->machine;
+	z80dma->intf = device->static_config;
 
 	z80dma->timer = timer_alloc(z80dma_timerproc, z80dma);
 
-	state_save_combine_module_and_tag(unique_tag, "z80dma", tag);
+	state_save_combine_module_and_tag(unique_tag, "z80dma", device->tag);
 
 	state_save_register_item_array(unique_tag, 0, z80dma->regs);
 	state_save_register_item_array(unique_tag, 0, z80dma->regs_follow);
@@ -448,7 +448,7 @@ static DEVICE_START( z80dma )
 
 static DEVICE_RESET( z80dma )
 {
-	z80dma_t *z80dma = token;
+	z80dma_t *z80dma = device->token;
 
 	z80dma->status = 0;
 	z80dma->rdy = 0;

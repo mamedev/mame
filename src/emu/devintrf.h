@@ -92,24 +92,24 @@ enum
 ***************************************************************************/
 
 #define DEVICE_GET_INFO_NAME(name)	device_get_info_##name
-#define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(running_machine *machine, void *token, UINT32 state, deviceinfo *info)
-#define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(machine, token, state, info)
+#define DEVICE_GET_INFO(name)		void DEVICE_GET_INFO_NAME(name)(const device_config *device, UINT32 state, deviceinfo *info)
+#define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_SET_INFO_NAME(name)	device_set_info_##name
-#define DEVICE_SET_INFO(name)		void DEVICE_SET_INFO_NAME(name)(running_machine *machine, void *token, UINT32 state, const deviceinfo *info)
-#define DEVICE_SET_INFO_CALL(name)	DEVICE_SET_INFO_NAME(name)(machine, token, state, info)
+#define DEVICE_SET_INFO(name)		void DEVICE_SET_INFO_NAME(name)(const device_config *device, UINT32 state, const deviceinfo *info)
+#define DEVICE_SET_INFO_CALL(name)	DEVICE_SET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_START_NAME(name)		device_start_##name
-#define DEVICE_START(name)			void *DEVICE_START_NAME(name)(running_machine *machine, const char *tag, const void *static_config, const void *inline_config)
-#define DEVICE_START_CALL(name)		DEVICE_START_NAME(name)(machine, tag, static_config, inline_config)
+#define DEVICE_START(name)			void *DEVICE_START_NAME(name)(const device_config *device)
+#define DEVICE_START_CALL(name)		DEVICE_START_NAME(name)(device)
 
 #define DEVICE_STOP_NAME(name)		device_stop_##name
-#define DEVICE_STOP(name)			void DEVICE_STOP_NAME(name)(running_machine *machine, void *token)
-#define DEVICE_STOP_CALL(name)		DEVICE_STOP_NAME(name)(machine, token)
+#define DEVICE_STOP(name)			void DEVICE_STOP_NAME(name)(const device_config *device)
+#define DEVICE_STOP_CALL(name)		DEVICE_STOP_NAME(name)(device)
 
 #define DEVICE_RESET_NAME(name)		device_reset_##name
-#define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(running_machine *machine, void *token)
-#define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(machine, token)
+#define DEVICE_RESET(name)			void DEVICE_RESET_NAME(name)(const device_config *device)
+#define DEVICE_RESET_CALL(name)		DEVICE_RESET_NAME(name)(device)
 
 
 
@@ -117,16 +117,17 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* forward-declare this type */
+/* forward-declare these types */
 typedef union _deviceinfo deviceinfo;
+typedef struct _device_config device_config;
 
 
 /* device interface function types */
-typedef void (*device_get_info_func)(running_machine *machine, void *token, UINT32 state, deviceinfo *info);
-typedef void (*device_set_info_func)(running_machine *machine, void *token, UINT32 state, const deviceinfo *info);
-typedef void *(*device_start_func)(running_machine *machine, const char *tag, const void *static_config, const void *inline_config);
-typedef void (*device_stop_func)(running_machine *machine, void *token);
-typedef void (*device_reset_func)(running_machine *machine, void *token);
+typedef void (*device_get_info_func)(const device_config *device, UINT32 state, deviceinfo *info);
+typedef void (*device_set_info_func)(const device_config *device, UINT32 state, const deviceinfo *info);
+typedef void *(*device_start_func)(const device_config *device);
+typedef void (*device_stop_func)(const device_config *device);
+typedef void (*device_reset_func)(const device_config *device);
 
 
 /* a device_type is simply a pointer to its get_info function */
@@ -149,7 +150,6 @@ union _deviceinfo
 
 
 /* the configuration for a general device */
-typedef struct _device_config device_config;
 struct _device_config
 {
 	device_config *			next;					/* next device */
@@ -236,7 +236,7 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 void device_list_start(running_machine *machine);
 
 /* reset a device based on an allocated device_config */
-void device_reset(running_machine *machine, const device_config *config);
+void device_reset(const device_config *device);
 void devtag_reset(running_machine *machine, device_type type, const char *tag);
 
 
@@ -253,19 +253,19 @@ const void *devtag_get_static_config(running_machine *machine, device_type type,
 const void *devtag_get_inline_config(running_machine *machine, device_type type, const char *tag);
 
 /* return an integer state value from an allocated device */
-INT64 device_get_info_int(running_machine *machine, const device_config *config, UINT32 state);
+INT64 device_get_info_int(const device_config *device, UINT32 state);
 INT64 devtag_get_info_int(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 /* return a pointer state value from an allocated device */
-void *device_get_info_ptr(running_machine *machine, const device_config *config, UINT32 state);
+void *device_get_info_ptr(const device_config *device, UINT32 state);
 void *devtag_get_info_ptr(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 /* return a function pointer state value from an allocated device */
-genf *device_get_info_fct(running_machine *machine, const device_config *config, UINT32 state);
+genf *device_get_info_fct(const device_config *device, UINT32 state);
 genf *devtag_get_info_fct(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 /* return a string value from an allocated device */
-const char *device_get_info_string(running_machine *machine, const device_config *config, UINT32 state);
+const char *device_get_info_string(const device_config *device, UINT32 state);
 const char *devtag_get_info_string(running_machine *machine, device_type type, const char *tag, UINT32 state);
 
 
@@ -283,15 +283,15 @@ const char *devtype_get_info_string(device_type type, UINT32 state);
 /* ----- device information setters ----- */
 
 /* set an integer state value for an allocated device */
-void device_set_info_int(running_machine *machine, const device_config *config, UINT32 state, INT64 data);
+void device_set_info_int(const device_config *device, UINT32 state, INT64 data);
 void devtag_set_info_int(running_machine *machine, device_type type, const char *tag, UINT32 state, INT64 data);
 
 /* set a pointer state value for an allocated device */
-void device_set_info_ptr(running_machine *machine, const device_config *config, UINT32 state, void *data);
+void device_set_info_ptr(const device_config *device, UINT32 state, void *data);
 void devtag_set_info_ptr(running_machine *machine, device_type type, const char *tag, UINT32 state, void *data);
 
 /* set a function pointer state value for an allocated device */
-void device_set_info_fct(running_machine *machine, const device_config *config, UINT32 state, genf *data);
+void device_set_info_fct(const device_config *device, UINT32 state, genf *data);
 void devtag_set_info_fct(running_machine *machine, device_type type, const char *tag, UINT32 state, genf *data);
 
 
