@@ -2237,6 +2237,7 @@ src/mame/includes/midwunit.h svneol=native#text/plain
 src/mame/includes/midyunit.h svneol=native#text/plain
 src/mame/includes/midzeus.h svneol=native#text/plain
 src/mame/includes/mw8080bw.h svneol=native#text/plain
+src/mame/includes/mystston.h svneol=native#text/plain
 src/mame/includes/n64.h svneol=native#text/plain
 src/mame/includes/n8080.h svneol=native#text/plain
 src/mame/includes/nam_cust.h svneol=native#text/plain

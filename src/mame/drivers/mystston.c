@@ -1,124 +1,145 @@
 /***************************************************************************
 
-Mysterious Stones
+    Technos Mysterious Stones hardware
 
-driver by Nicola Salmoria
+    driver by Nicola Salmoria
 
-Notes:
-- The subtitle of the two sets is slightly different:
-  "dr john s adventure" vs. "dr kick in adventure".
-  The Dr John's is a bug fix. See the routine at 4376/4384 for example. The
-  old set thrashes the Y register, the new one saves in on the stack. The
-  newer set also resets the sound chips more often.
+    Notes:
+        * The subtitle of the two sets is slightly different:
+          "Dr. John's Adventure" vs. "Dr. Kick in Adventure".
+          The Dr John's is a bug fix. See the routine at 4376/4384 for example.
+          The old set thrashes the Y register, the new one saves in on
+          the stack. The newer set also resets the audio chips more often.
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
+#include "mystston.h"
 
 
-extern UINT8 *mystston_videoram2;
 
-extern WRITE8_HANDLER( mystston_videoram_w );
-extern WRITE8_HANDLER( mystston_videoram2_w );
-extern WRITE8_HANDLER( mystston_scroll_w );
-extern WRITE8_HANDLER( mystston_control_w );
+/*************************************
+ *
+ *  Clocks
+ *
+ *************************************/
 
-extern PALETTE_INIT( mystston );
-extern VIDEO_START( mystston );
-extern VIDEO_UPDATE( mystston );
-
-
-static int VBLK = 0x80;
-static int soundlatch;
+#define CPU_CLOCK		(MYSTSTON_MASTER_CLOCK / 8)
+#define AY8910_CLOCK	(MYSTSTON_MASTER_CLOCK / 8)
 
 
-static WRITE8_HANDLER( mystston_soundlatch_w )
+
+/*************************************
+ *
+ *  Interrupt system
+ *
+ *************************************/
+
+void mystston_on_scanline_interrupt(running_machine *machine)
 {
-	soundlatch = data;
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( mystston_soundcontrol_w )
-{
-	static int last;
 
-	/* bit 5 goes to 8910 #0 BDIR pin  */
-	if ((last & 0x20) == 0x20 && (data & 0x20) == 0x00)
+static WRITE8_HANDLER( irq_clear_w )
+{
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  Coin handling
+ *
+ *************************************/
+
+static INPUT_CHANGED( coin_inserted )
+{
+	/* coin insertion causes an NMI */
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+
+/*************************************
+ *
+ *  AY-8910 memory interface
+ *
+ *************************************/
+
+static WRITE8_HANDLER( mystston_ay8910_select_w )
+{
+	mystston_state *state = machine->driver_data;
+
+	/* bit 5 goes to 8910 #0 BDIR pin */
+	if (((*state->ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
-		if (last & 0x10)
-			AY8910_control_port_0_w(machine,0,soundlatch);
+		if (*state->ay8910_select & 0x10)
+			AY8910_control_port_0_w(machine, 0, *state->ay8910_data);
 		else
-			AY8910_write_port_0_w(machine,0,soundlatch);
+			AY8910_write_port_0_w(machine, 0, *state->ay8910_data);
 	}
-	/* bit 7 goes to 8910 #1 BDIR pin  */
-	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
+
+	/* bit 7 goes to 8910 #1 BDIR pin */
+	if (((*state->ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
-		if (last & 0x40)
-			AY8910_control_port_1_w(machine,0,soundlatch);
+		if (*state->ay8910_select & 0x40)
+			AY8910_control_port_1_w(machine, 0, *state->ay8910_data);
 		else
-			AY8910_write_port_1_w(machine,0,soundlatch);
+			AY8910_write_port_1_w(machine, 0, *state->ay8910_data);
 	}
 
-	last = data;
-}
-
-static READ8_HANDLER( port3_r )
-{
-	int port = readinputport(3);
-
-	return port | VBLK;
-}
-
-static WRITE8_HANDLER( mystston_irq_reset_w )
-{
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	*state->ay8910_select = data;
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x077f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(MRA8_RAM)	/* work RAM? */
-	AM_RANGE(0x1000, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_0_r)
-	AM_RANGE(0x2010, 0x2010) AM_READ(input_port_1_r)
-	AM_RANGE(0x2020, 0x2020) AM_READ(input_port_2_r)
-	AM_RANGE(0x2030, 0x2030) AM_READ(port3_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(MRA8_ROM)
+
+/*************************************
+ *
+ *  Memory map
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x077f) AM_RAM
+	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_MEMBER(mystston_state, spriteram)
+	AM_RANGE(0x07e0, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(mystston_state, fg_videoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_BASE_MEMBER(mystston_state, bg_videoram)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READWRITE(port_tag_to_handler8("IN0"),  mystston_video_control_w) AM_BASE_MEMBER(mystston_state, video_control)
+	AM_RANGE(0x2010, 0x2010) AM_MIRROR(0x1f8f) AM_READWRITE(port_tag_to_handler8("IN1"),  irq_clear_w)
+	AM_RANGE(0x2020, 0x2020) AM_MIRROR(0x1f8f) AM_READWRITE(port_tag_to_handler8("DSW0"), MWA8_RAM) AM_BASE_MEMBER(mystston_state, scroll)
+	AM_RANGE(0x2030, 0x2030) AM_MIRROR(0x1f8f) AM_READWRITE(port_tag_to_handler8("DSW1"), MWA8_RAM) AM_BASE_MEMBER(mystston_state, ay8910_data)
+	AM_RANGE(0x2040, 0x2040) AM_MIRROR(0x1f8f) AM_READWRITE(MRA8_NOP, mystston_ay8910_select_w) AM_BASE_MEMBER(mystston_state, ay8910_select)
+	AM_RANGE(0x2050, 0x2050) AM_MIRROR(0x1f8f) AM_NOP
+	AM_RANGE(0x2060, 0x207f) AM_MIRROR(0x1f80) AM_RAM AM_BASE_MEMBER(mystston_state, paletteram)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x077f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0780, 0x07df) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x07e0, 0x07ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(MWA8_RAM)	/* work RAM? */
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(mystston_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(mystston_videoram2_w) AM_BASE(&mystston_videoram2)
-	AM_RANGE(0x1c00, 0x1fff) AM_WRITE(MWA8_RAM)	/* work RAM? This gets copied to videoram */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(mystston_control_w)	/* text color, flip screen & coin counters */
-	AM_RANGE(0x2010, 0x2010) AM_WRITE(mystston_irq_reset_w)
-	AM_RANGE(0x2020, 0x2020) AM_WRITE(mystston_scroll_w)
-	AM_RANGE(0x2030, 0x2030) AM_WRITE(mystston_soundlatch_w)
-	AM_RANGE(0x2040, 0x2040) AM_WRITE(mystston_soundcontrol_w)
-	AM_RANGE(0x2060, 0x2077) AM_WRITE(paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
-ADDRESS_MAP_END
 
+
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( mystston )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -128,7 +149,7 @@ static INPUT_PORTS_START( mystston )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* DSW1 */
+	PORT_START_TAG("DSW0")
 	PORT_DIPNAME(0x01, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(   0x01, "3" )
 	PORT_DIPSETTING(   0x00, "5" )
@@ -154,7 +175,7 @@ static INPUT_PORTS_START( mystston )
 	PORT_DIPSETTING(   0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
 
-	PORT_START	/* DSW2 */
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME(0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(   0x03, DEF_STR( 1C_1C ) )
@@ -174,105 +195,45 @@ static INPUT_PORTS_START( mystston )
 	PORT_DIPNAME(0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(   0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// VBLANK
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
 
-static const gfx_layout charlayout =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
-	{ 16*8+0, 16*8+1, 16*8+2, 16*8+3, 16*8+4, 16*8+5, 16*8+6, 16*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
-	32*8
-};
-
-static GFXDECODE_START( mystston )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout,   3*8, 4 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 2*8, 1 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, spritelayout, 0*8, 2 )
-GFXDECODE_END
-
-
-static INTERRUPT_GEN( mystston_interrupt )
-{
-	int scanline = 271 - cpu_getiloops();
-	static int coin;
-
-	/* Inserting a coin triggers an NMI */
-	if ((readinputport(0) & 0xc0) != 0xc0)
-	{
-		if (coin == 0)
-		{
-			coin = 1;
-			nmi_line_pulse(machine, cpunum);
-			return;
-		}
-	}
-	else coin = 0;
-
-	/* VBLK is lowered on scanline 8 */
-	if (scanline == 8)
-		VBLK = 0;
-
-	/* VBLK is raised on scanline 248 */
-	if (scanline == 248)
-		VBLK = 0x80;
-
-	/* IMS is triggered every time VLOC line 3 is raised,
-       as VLOC counter starts at 16, effectively every 16 scanlines */
-	if ((scanline % 16) == 0)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-}
-
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( mystston )
 
+	MDRV_DRIVER_DATA(mystston_state)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502, 12000000/8)	// 1.5 MHz
-	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_VBLANK_INT_HACK(mystston_interrupt, 272)
+	MDRV_CPU_ADD(M6502, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(((12000000.0 / 256.0) / 3.0) / 272.0)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MDRV_IMPORT_FROM(mystston_video)
 
-	MDRV_GFXDECODE(mystston)
-	MDRV_PALETTE_LENGTH(24+32)
-
-	MDRV_PALETTE_INIT(mystston)
-	MDRV_VIDEO_START(mystston)
-	MDRV_VIDEO_UPDATE(mystston)
-
-	/* sound hardware */
+	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD(AY8910, AY8910_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 12000000/8)
+	MDRV_SOUND_ADD(AY8910, AY8910_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( mystston )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -302,6 +263,7 @@ ROM_START( mystston )
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "ic61",         0x0000, 0x0020, CRC(e802d6cf) SHA1(233ceb9e3a91939e1925766a696bc65ab0dffa50) )
 ROM_END
+
 
 ROM_START( myststno )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -333,5 +295,12 @@ ROM_START( myststno )
 ROM_END
 
 
-GAME( 1984, mystston, 0,        mystston, mystston, 0, ROT270, "Technos", "Mysterious Stones - Dr. John's Adventure", 0 )
-GAME( 1984, myststno, mystston, mystston, mystston, 0, ROT270, "Technos", "Mysterious Stones - Dr. Kick in Adventure", 0 )
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
+
+GAME( 1984, mystston, 0,        mystston, mystston, 0, ROT270, "Technos", "Mysterious Stones - Dr. John's Adventure", GAME_SUPPORTS_SAVE )
+GAME( 1984, myststno, mystston, mystston, mystston, 0, ROT270, "Technos", "Mysterious Stones - Dr. Kick in Adventure", GAME_SUPPORTS_SAVE )
