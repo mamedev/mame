@@ -1122,23 +1122,24 @@ INLINE void execute_one(int opcode)
 			I.IREQ &= ~I.ISRV;
 			/* reset serviced IRQ */
 			I.ISRV = 0;
-			if( I.irq_state[0] != CLEAR_LINE ) {
+			if( I.irq_state[I8085_INTR_LINE] != CLEAR_LINE ) {
 				LOG(("i8085 EI sets INTR\n"));
 				I.IREQ |= IM_INTR;
 				I.INTR = I8085_INTR;
 			}
 			if( I.cputype ) {
-				if( I.irq_state[1] != CLEAR_LINE ) {
+				if( I.irq_state[I8085_RST55_LINE] != CLEAR_LINE ) {
 					LOG(("i8085 EI sets RST5.5\n"));
 					I.IREQ |= IM_RST55;
 				}
-				if( I.irq_state[2] != CLEAR_LINE ) {
+				if( I.irq_state[I8085_RST65_LINE] != CLEAR_LINE ) {
 					LOG(("i8085 EI sets RST6.5\n"));
 					I.IREQ |= IM_RST65;
 				}
-				if( I.irq_state[3] != CLEAR_LINE ) {
+				if( I.irq_state[I8085_RST75_LINE] != CLEAR_LINE ) {
 					LOG(("i8085 EI sets RST7.5\n"));
 					I.IREQ |= IM_RST75;
+					I.irq_state[I8085_RST75_LINE] = CLEAR_LINE;	/* clear latch */
 				}
 				/* find highest priority IREQ flag with
                    IM enabled and schedule for execution */
@@ -1419,6 +1420,7 @@ static void i8085_set_RST75(int state)
 	{
 
 		I.IREQ |= IM_RST75; 			/* request RST7.5 */
+		I.irq_state[I8085_RST75_LINE] = CLEAR_LINE;	/* clear latch */
 		if( I.IM & IM_RST75 ) return;	/* if masked, ignore it for now */
 		if( !I.ISRV )					/* if no higher priority IREQ is serviced */
 		{
@@ -1506,7 +1508,14 @@ static void i8085_set_irq_line(int irqline, int state)
 	}
 	else if (irqline < 4)
 	{
-		I.irq_state[irqline] = state;
+		if (irqline == I8085_RST75_LINE)	/* RST7.5 is latched on rising edge, the others are sampled */
+		{
+			if( state != CLEAR_LINE )
+				I.irq_state[irqline] = state;
+		}
+		else
+			I.irq_state[irqline] = state;
+
 		if (state == CLEAR_LINE)
 		{
 			if( !(I.IM & IM_IEN) )
