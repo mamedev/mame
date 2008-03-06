@@ -144,7 +144,7 @@ int mame_debug_is_active(void)
     on_vblank - called when a VBLANK hits
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+static void on_vblank(running_machine *machine, const device_config *device, int vblank_state)
 {
 	/* if we're configured to stop on VBLANK, break */
 	if (vblank_state && break_on_vblank)

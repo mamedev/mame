@@ -808,7 +808,7 @@ static DEVICE_START( speaker_output )
 static DEVICE_STOP( speaker_output )
 {
 #ifdef MAME_DEBUG
-	speaker_info *info = token;
+	speaker_info *info = device->token;
 
 	/* log the maximum sample values for all speakers */
 	if (info->max_sample > 0)
