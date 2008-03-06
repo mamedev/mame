@@ -221,7 +221,6 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("DSW0"))
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("IN0"))
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ(pc3259_r)
-//  AM_SPACE(0x02, 0x03) AM_READ(pc3259_r) crashes if not at the end
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("IN1"))
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* not connected */
