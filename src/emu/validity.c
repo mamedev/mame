@@ -683,9 +683,8 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 			for ( ; !IS_AMENTRY_END(map); map++)
 				if (!IS_AMENTRY_EXTENDED(map))
 				{
-					int ismatchmask = ((map->flags & AM_FLAGS_MATCH_MASK) != 0);
 					UINT32 start = SPACE_SHIFT(map->start);
-					UINT32 end = ismatchmask ? SPACE_SHIFT(map->end) : SPACE_SHIFT_END(map->end);
+					UINT32 end = SPACE_SHIFT_END(map->end);
 
 					/* look for inverted start/end pairs */
 					if (end < start)
@@ -725,13 +724,6 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 						}
 					}
 
-					/* If this is a match/mask, make sure the match bits are present in the mask */
-					if (ismatchmask && (start & end) != start)
-					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry match %X contains bits not in mask %X for region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-						error = TRUE;
-					}
-					
 					/* make sure all devices exist */
 					if (map->read_devtype != NULL && device_list_find_by_tag(config->devicelist, map->read_devtype, map->read_devtag) == NULL)
 					{

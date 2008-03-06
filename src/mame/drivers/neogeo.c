@@ -1085,10 +1085,10 @@ static ADDRESS_MAP_START( auido_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff00) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff00) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-	AM_SPACE(0x08, 0x0f) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
-	AM_SPACE(0x09, 0x0f) AM_READ(audio_cpu_bank_select_e000_efff_r)
-	AM_SPACE(0x0a, 0x0f) AM_READ(audio_cpu_bank_select_c000_dfff_r)
-	AM_SPACE(0x0b, 0x0f) AM_READ(audio_cpu_bank_select_8000_bfff_r)
+	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+	AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
+	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
+	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END

@@ -2602,8 +2602,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjchuuka_writeport, ADDRESS_SPACE_IO, 8 )	// 16 bit I/O
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_WRITE( hanakanz_rombank_w			)
-	AM_SPACE(0x20, 0xff)                   AM_WRITE( mjchuuka_blitter_w			)
-	AM_SPACE(0x21, 0xff)                   AM_WRITE( mjchuuka_palette_w			)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE( mjchuuka_blitter_w			)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE( mjchuuka_palette_w			)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE( mjchuuka_coincounter_w		)
 	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff00) AM_WRITE( hanakanz_keyb_w			)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_WRITE( OKIM6295_data_0_w			)
