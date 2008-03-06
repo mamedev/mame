@@ -291,26 +291,26 @@ WRITE8_HANDLER( zookeep_bankswitch_w )
 
 WRITE8_HANDLER( qix_data_firq_w )
 {
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_HANDLER( qix_data_firq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 READ8_HANDLER( qix_data_firq_r )
 {
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
 READ8_HANDLER( qix_data_firq_ack_r )
 {
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -324,26 +324,26 @@ READ8_HANDLER( qix_data_firq_ack_r )
 
 WRITE8_HANDLER( qix_video_firq_w )
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_HANDLER( qix_video_firq_ack_w )
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 READ8_HANDLER( qix_video_firq_r )
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
 READ8_HANDLER( qix_video_firq_ack_r )
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -402,7 +402,7 @@ static void qix_pia_sint(int state)
 
 READ8_HANDLER( qixmcu_coin_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	logerror("6809:qixmcu_coin_r = %02X\n", state->_68705_port_out[0]);
 	return state->_68705_port_out[0];
@@ -411,7 +411,7 @@ READ8_HANDLER( qixmcu_coin_r )
 
 static WRITE8_HANDLER( qixmcu_coin_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	logerror("6809:qixmcu_coin_w = %02X\n", data);
 	/* this is a callback called by pia_0_w(), so I don't need to synchronize */
@@ -422,17 +422,17 @@ static WRITE8_HANDLER( qixmcu_coin_w )
 
 static WRITE8_HANDLER( qixmcu_coinctrl_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	if (!(data & 0x04))
 	{
-		cpunum_set_input_line(Machine, 3, M68705_IRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 3, M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 	}
 	else
-		cpunum_set_input_line(Machine, 3, M68705_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 3, M68705_IRQ_LINE, CLEAR_LINE);
 
 	/* this is a callback called by pia_0_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_0_w() */
@@ -450,7 +450,7 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 
 READ8_HANDLER( qix_68705_portA_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	UINT8 ddr = state->_68705_ddr[0];
 	UINT8 out = state->_68705_port_out[0];
@@ -462,7 +462,7 @@ READ8_HANDLER( qix_68705_portA_r )
 
 READ8_HANDLER( qix_68705_portB_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	UINT8 ddr = state->_68705_ddr[1];
 	UINT8 out = state->_68705_port_out[1];
@@ -473,7 +473,7 @@ READ8_HANDLER( qix_68705_portB_r )
 
 READ8_HANDLER( qix_68705_portC_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	UINT8 ddr = state->_68705_ddr[2];
 	UINT8 out = state->_68705_port_out[2];
@@ -491,7 +491,7 @@ READ8_HANDLER( qix_68705_portC_r )
 
 WRITE8_HANDLER( qix_68705_portA_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	logerror("68705:portA_w = %02X\n", data);
 	state->_68705_port_out[0] = data;
@@ -500,7 +500,7 @@ WRITE8_HANDLER( qix_68705_portA_w )
 
 WRITE8_HANDLER( qix_68705_portB_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	state->_68705_port_out[1] = data;
 	coin_lockout_w(0, (~data >> 6) & 1);
@@ -510,7 +510,7 @@ WRITE8_HANDLER( qix_68705_portB_w )
 
 WRITE8_HANDLER( qix_68705_portC_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	state->_68705_port_out[2] = data;
 }
@@ -596,7 +596,7 @@ static WRITE8_HANDLER( slither_76489_1_w )
 
 static READ8_HANDLER( slither_trak_lr_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	return readinputport(state->flip ? 6 : 4);
 }
@@ -604,7 +604,7 @@ static READ8_HANDLER( slither_trak_lr_r )
 
 static READ8_HANDLER( slither_trak_ud_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	return readinputport(state->flip ? 5 : 3);
 }

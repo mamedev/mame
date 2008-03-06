@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/mc6845.h"
 #include "qix.h"
 
@@ -81,7 +80,7 @@ static MC6845_ON_DE_CHANGED( display_enable_changed )
 
 WRITE8_HANDLER( qix_flip_screen_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	state->flip = data;
 }
@@ -105,7 +104,7 @@ WRITE8_HANDLER( qix_flip_screen_w )
 
 static READ8_HANDLER( qix_videoram_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -115,7 +114,7 @@ static READ8_HANDLER( qix_videoram_r )
 
 static WRITE8_HANDLER( qix_videoram_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
@@ -131,7 +130,7 @@ static WRITE8_HANDLER( qix_videoram_w )
 
 static WRITE8_HANDLER( slither_videoram_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
@@ -163,7 +162,7 @@ static WRITE8_HANDLER( slither_videoram_w )
 
 static READ8_HANDLER( qix_addresslatch_r )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -173,7 +172,7 @@ static READ8_HANDLER( qix_addresslatch_r )
 
 static WRITE8_HANDLER( qix_addresslatch_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
 	video_screen_update_now(0);
@@ -188,7 +187,7 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 
 static WRITE8_HANDLER( slither_addresslatch_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
 	video_screen_update_now(0);
@@ -213,7 +212,7 @@ static WRITE8_HANDLER( slither_addresslatch_w )
 
 static WRITE8_HANDLER( qix_paletteram_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	UINT8 old_data = state->paletteram[offset];
 
@@ -229,7 +228,7 @@ static WRITE8_HANDLER( qix_paletteram_w )
 
 WRITE8_HANDLER( qix_palettebank_w )
 {
-	qix_state *state = Machine->driver_data;
+	qix_state *state = machine->driver_data;
 
 	/* set the bank value */
 	if (state->palette_bank != (data & 3))
