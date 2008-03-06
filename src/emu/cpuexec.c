@@ -785,21 +785,12 @@ int cpu_getiloops(void)
     for this screen
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+static void on_vblank(running_machine *machine, const device_config *device, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state)
 	{
 		int cpunum;
-		const char *screen_tag = NULL;
-		const device_config *device;
-
-		/* get the screen's tag */
-		for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
-			if (device->token == screen)
-				screen_tag = device->tag;
-
-		assert(screen_tag != NULL);
 
 		/* find any CPUs that have this screen as their VBLANK interrupt source */
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -813,13 +804,13 @@ static void on_vblank(running_machine *machine, screen_state *screen, int vblank
 			else
 				cpu[cpunum].iloops = -1;
 
-			/* the hack style VBLANK decleration uses the first screen always */
+			/* the hack style VBLANK decleration always uses the first screen */
 			if (config->vblank_interrupts_per_frame > 1)
 				cpu_interested = TRUE;
 
 			/* for new style decleration, we need to compare the tags */
 			else if (config->vblank_interrupts_per_frame == 1)
-				cpu_interested = (strcmp(config->vblank_interrupt_screen, screen_tag) == 0);
+				cpu_interested = (strcmp(config->vblank_interrupt_screen, device->tag) == 0);
 
 			/* no VBLANK interrupt, not interested */
 			else

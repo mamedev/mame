@@ -50,7 +50,7 @@ struct _internal_screen_info
 {
 	/* pointers to screen configuration and state */
 	int						scrnum;					/* the screen index */
-	const screen_config *	config;					/* pointer to the configuration in the Machine->config */
+	const device_config *	device;					/* pointer to screen device configuration */
 	screen_state *			state;					/* pointer to visible state in Machine structure */
 
 	/* textures and bitmaps */
@@ -75,7 +75,7 @@ struct _internal_screen_info
 
 	/* VBLANK callbacks */
 	int vbl_cb_count;								/* # of callbacks installed */
-	vblank_state_changed_func		vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
+	vblank_state_changed_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 
 	/* movie recording */
 	mame_file *				movie_file;				/* handle to the open movie file */
@@ -313,6 +313,7 @@ void video_init(running_machine *machine)
 		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
 		render_container *container = render_container_get_screen(scrnum);
 		internal_screen_info *info = &viddata->scrinfo[scrnum];
+		screen_config *config = device->inline_config;
 
 		/* allocate the VBLANK timers */
 		info->vblank_begin_timer = timer_alloc(vblank_begin_callback, info);
@@ -323,21 +324,21 @@ void video_init(running_machine *machine)
 
 		/* make pointers back to the config and state */
 		info->scrnum = scrnum;
-		info->config = device->inline_config;
+		info->device = device;
 		info->state = &machine->screen[scrnum];
 
 		/* configure the screen with the default parameters */
 		video_screen_configure(scrnum, info->state->width, info->state->height, &info->state->visarea, info->state->refresh);
 
 		/* configure the default cliparea */
-		if (info->config->xoffset != 0)
-			render_container_set_xoffset(container, info->config->xoffset);
-		if (info->config->yoffset != 0)
-			render_container_set_yoffset(container, info->config->yoffset);
-		if (info->config->xscale != 0)
-			render_container_set_xscale(container, info->config->xscale);
-		if (info->config->yscale != 0)
-			render_container_set_yscale(container, info->config->yscale);
+		if (config->xoffset != 0)
+			render_container_set_xoffset(container, config->xoffset);
+		if (config->yoffset != 0)
+			render_container_set_yoffset(container, config->yoffset);
+		if (config->xscale != 0)
+			render_container_set_xscale(container, config->xscale);
+		if (config->yscale != 0)
+			render_container_set_yscale(container, config->yscale);
 
 		/* reset VBLANK timing */
 		info->vblank_time = attotime_zero;
@@ -1223,7 +1224,7 @@ static void call_vb_callbacks(running_machine *machine, internal_screen_info *sc
 	scrinfo->vblank_state = vblank_state;
 
 	for (i = 0; i < scrinfo->vbl_cb_count; i++)
-		scrinfo->vbl_cbs[i](machine, scrinfo->state, vblank_state);
+		scrinfo->vbl_cbs[i](machine, scrinfo->device, vblank_state);
 }
 
 

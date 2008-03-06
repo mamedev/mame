@@ -94,7 +94,7 @@ struct _screen_config
     the VBLANK state
 -------------------------------------------------*/
 
-typedef void (*vblank_state_changed_func)(running_machine *machine, screen_state *screen, int vblank_state);
+typedef void (*vblank_state_changed_func)(running_machine *machine, const device_config *device, int vblank_state);
 
 
 

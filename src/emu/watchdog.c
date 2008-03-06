@@ -83,7 +83,7 @@ static TIMER_CALLBACK( watchdog_callback )
     timers
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, screen_state *screen, int vblank_state)
+static void on_vblank(running_machine *machine, const device_config *device, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state && watchdog_enabled)
