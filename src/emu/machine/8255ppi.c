@@ -143,7 +143,7 @@ void ppi8255_init( const ppi8255_interface *intfce )
 		ppi8255 *chip = &chips[i];
 
 		memset(chip, 0, sizeof(*chip));
-		
+
 		chip->port_read[0] = intfce->portAread[i];
 		chip->port_read[1] = intfce->portBread[i];
 		chip->port_read[2] = intfce->portCread[i];

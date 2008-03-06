@@ -496,14 +496,14 @@ READ8_HANDLER( z80dma_0_r )
 {
 	z80dma_t	*z80dma = devtag_get_token(Machine, Z80DMA, Z80DMA_DEV_0_TAG);
 
-	return z80dma_read(z80dma); 
+	return z80dma_read(z80dma);
 }
 
 READ8_HANDLER( z80dma_1_r )
 {
 	z80dma_t	*z80dma = devtag_get_token(Machine, Z80DMA, Z80DMA_DEV_1_TAG);
 
-	return z80dma_read(z80dma); 
+	return z80dma_read(z80dma);
 }
 
 WRITE8_HANDLER( z80dma_0_w )

@@ -1573,7 +1573,7 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 
-// 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	// write bank (rom page select)
+//  AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)    // write bank (rom page select)
 
 //  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
 //  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)

@@ -224,7 +224,7 @@ VIDEO_UPDATE( cinemat )
 {
 	VIDEO_UPDATE_CALL(vector);
 	vector_clear_list();
-	
+
 	cpuintrf_push_context(0);
 	ccpu_wdt_timer_trigger();
 	cpuintrf_pop_context();

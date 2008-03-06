@@ -56,7 +56,7 @@ static INPUT_CHANGED( gear_changed )
 static INTERRUPT_GEN( firetrk_interrupt )
 {
 	/* Super Bug - ASR - when is this used and what is an ASR? */
-//	discrete_sound_w(machine, SUPERBUG_ASR_EN, 0);
+//  discrete_sound_w(machine, SUPERBUG_ASR_EN, 0);
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!in_service_mode)

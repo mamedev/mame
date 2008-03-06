@@ -348,7 +348,7 @@ static int bitmap_to_chars(bitmap_t *bitmap, render_font *font)
 			if (ch->width <= 0)
 			{
 				/* print info */
-// 		        printf("  Character %X - width = %d\n", chstart, colend - colstart + 1);
+//              printf("  Character %X - width = %d\n", chstart, colend - colstart + 1);
 
 				/* allocate a bitmap */
 				ch->bitmap = bitmap_alloc(colend - colstart + 1, font->height, BITMAP_FORMAT_ARGB32);

@@ -6,7 +6,7 @@
     - No FM mode
     - A third sample format (ADPCM) has been added
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
-    
+
     init:
 
 */
@@ -869,7 +869,7 @@ static void AICA_UpdateRegR(struct _AICA *AICA, int reg)
 		case 0x10:	// LP check
 		case 0x11:
 			{
-				//int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f;	// which slot are we monitoring?
+				//int MSLC = (AICA->udata.data[0xc/2]>>8) & 0x3f;   // which slot are we monitoring?
 			}
 			break;
 
@@ -1205,8 +1205,8 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 		sample=(sample*EG_Update(slot))>>SHIFT;
 	else
 		sample=(sample*EG_TABLE[EG_Update(slot)>>(SHIFT-10)])>>SHIFT;
-		
-	if(slot->mslc) 
+
+	if(slot->mslc)
 	{
 		AICA->udata.data[0x12/2] = addr1;
 		if (!(AFSEL(AICA)))

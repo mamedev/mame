@@ -252,49 +252,49 @@ Changes:
 Donkey Kong Junior Notes
 ========================
 
-	DJR-03  Donkey Kong Modification Kits                 02-23-83
-	--------------------------------------------------------------
-	Nintendo Service Department Bulletin # DJR-03         02-23-83
-	GAME: Donkey Kong Junior
-	SUBJECT: Play Time
-	
-	It has come to our attention that play time on Donkey Kong
-	Junior is, in some cases, excessive, while in other cases
-	there is concern over the ability of players to learn the
-	game and thereby retain an interest in playing.
-	
-	We are making available, through our Nintendo Distributors,
-	two EPROM change kits, designated DJR1-E and DJR1-P.
-	
-	The E kit consists of four (4) chips and is an easier version
-	of the program.  it presents the board sequence in a way which
-	familiarizes the players with the game faster.  The board
-	order is vines, springboard, Mario's hideout and keys.
-	
-	The P kit is a more difficult version consisting of two chips.
-	The order remains the same while more and faster 
-	obstacles (snapjaws, nitpickers, etc.) are presented.
-	--------------------------------------------------------------
-	
-	E-Kit - roms
-	------------------------------------------------
-	Filename    Label          Type   Loc/PCB  CSum
-	----------- -------------- ------ -------  ---- --
-	2732.5Ae    DJR1-C-5A e    2732   5A(CPU)  68E9
-	2764.5Be    DJR1-C-5B e    2764   5B(CPU)  B0CF
-	2764.5Ce    DJR1-C-5C e    2764   5C(CPU)  FC64
-	2764.5Ee    DJR1-C-5E e    2764   5E(CPU)  7CC6
-	------------------------------------------------
-	
-	P-Kit roms (Still looking for these, suffix is
-	more than likely P. :)
-	------------------------------------------------
-	Filename    Label          Type   Loc/PCB  CSum
-	----------- -------------- ------ -------  ---- --
-	empty       ---------      ----   5A(CPU)  ----
-	2764.5Bp    DJR1-C-5B p    2764   5B(CPU)  1B58
-	2764.5Cp    DJR1-C-5C p    2764   5C(CPU)  F4FE
-	------------------------------------------------    
+    DJR-03  Donkey Kong Modification Kits                 02-23-83
+    --------------------------------------------------------------
+    Nintendo Service Department Bulletin # DJR-03         02-23-83
+    GAME: Donkey Kong Junior
+    SUBJECT: Play Time
+
+    It has come to our attention that play time on Donkey Kong
+    Junior is, in some cases, excessive, while in other cases
+    there is concern over the ability of players to learn the
+    game and thereby retain an interest in playing.
+
+    We are making available, through our Nintendo Distributors,
+    two EPROM change kits, designated DJR1-E and DJR1-P.
+
+    The E kit consists of four (4) chips and is an easier version
+    of the program.  it presents the board sequence in a way which
+    familiarizes the players with the game faster.  The board
+    order is vines, springboard, Mario's hideout and keys.
+
+    The P kit is a more difficult version consisting of two chips.
+    The order remains the same while more and faster
+    obstacles (snapjaws, nitpickers, etc.) are presented.
+    --------------------------------------------------------------
+
+    E-Kit - roms
+    ------------------------------------------------
+    Filename    Label          Type   Loc/PCB  CSum
+    ----------- -------------- ------ -------  ---- --
+    2732.5Ae    DJR1-C-5A e    2732   5A(CPU)  68E9
+    2764.5Be    DJR1-C-5B e    2764   5B(CPU)  B0CF
+    2764.5Ce    DJR1-C-5C e    2764   5C(CPU)  FC64
+    2764.5Ee    DJR1-C-5E e    2764   5E(CPU)  7CC6
+    ------------------------------------------------
+
+    P-Kit roms (Still looking for these, suffix is
+    more than likely P. :)
+    ------------------------------------------------
+    Filename    Label          Type   Loc/PCB  CSum
+    ----------- -------------- ------ -------  ---- --
+    empty       ---------      ----   5A(CPU)  ----
+    2764.5Bp    DJR1-C-5B p    2764   5B(CPU)  1B58
+    2764.5Cp    DJR1-C-5C p    2764   5C(CPU)  F4FE
+    ------------------------------------------------
 
 ***************************************************************************/
 

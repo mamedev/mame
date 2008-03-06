@@ -72,7 +72,7 @@ static void MODEL2_FUNC_NAME(void *dest, INT32 scanline, const poly_extent *exte
 	UINT8	luma;
 	UINT32	tr, tg, tb;
 	int		x;
-#endif 
+#endif
 	/* if it's translucent, there's nothing to render */
 #if defined( MODEL2_TRANSLUCENT)
 	return;

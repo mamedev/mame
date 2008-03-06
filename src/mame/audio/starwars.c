@@ -94,7 +94,7 @@ READ8_HANDLER( starwars_m6532_r )
 			return temp;
 
 		default:
-			return 0; 
+			return 0;
 	}
 
 }

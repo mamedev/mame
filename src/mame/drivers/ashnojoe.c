@@ -144,10 +144,10 @@ static READ8_HANDLER(fake_6_r)
 	ret ^= 1;
 	return ret;
 	/* FIXME: earlier attemts to remove ?
-	return 1;
-	return 0;
-	return mame_rand(Machine);
-	*/
+    return 1;
+    return 0;
+    return mame_rand(Machine);
+    */
 }
 
 static WRITE8_HANDLER( adpcm_data_w )

@@ -11246,14 +11246,14 @@ static void cheat_periodicOperation(CheatAction * action)
 
 		case kOperation_AddSubtract:
 		{
-			//INT32	temp, bound;
+			//INT32 temp, bound;
 
 			/* ----- if extend data field is invalid, direct return ----- */
 			//if(action->flags & kActionFlag_IgnoreMask)
 				return;
 
 			/* FIXME: AddSubstract looks seriously broken
-			 *        and being worked on. */
+             *        and being worked on. */
 #if 0
 			temp = ReadData(action);
 

@@ -63,7 +63,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			color = spriteram16[offs+2];
 			size = 1 << (color & 0x0003); // 1,2,4,8
 			color = (color & 0x00f0) >> 4;
-//			sx = spriteram16[offs+4] + screenscroll;
+//          sx = spriteram16[offs+4] + screenscroll;
 			sx = spriteram16[offs+4];
 			sy = spriteram16[offs+3];
 			flipx = attr & 0x0001;
@@ -92,7 +92,7 @@ static void draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	offs_t offs;
 
-//	int screenscroll = 4 - (galspnbl_scroll[0] & 0xff);
+//  int screenscroll = 4 - (galspnbl_scroll[0] & 0xff);
 
 	for (offs = 0; offs < 0x20000; offs++)
 	{
@@ -129,7 +129,7 @@ VIDEO_UPDATE( galspnbl )
 					code,
 					color,
 					0,0,
-//					16*sx + screenscroll,8*sy,
+//                  16*sx + screenscroll,8*sy,
 					16*sx,8*sy,
 					cliprect,TRANSPARENCY_PEN,0);
 		}

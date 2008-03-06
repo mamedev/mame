@@ -448,11 +448,11 @@ static VIDEO_UPDATE( exidy440 )
 		int beamy = ((input_port_5_r(machine, 0) & 0xff) * (VBSTART - VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
-			and then wait about 650 cycles, clear the old FIRQ, and wait a
-			very short period of time (~130 cycles) for another one to come in.
-			From this, it appears that they are expecting to get beams over
-			a 12 scanline period, and trying to pick roughly the middle one.
-			This is how it is implemented. */
+            and then wait about 650 cycles, clear the old FIRQ, and wait a
+            very short period of time (~130 cycles) for another one to come in.
+            From this, it appears that they are expecting to get beams over
+            a 12 scanline period, and trying to pick roughly the middle one.
+            This is how it is implemented. */
 		attoseconds_t increment = attotime_to_attoseconds(video_screen_get_scan_period(0));
 		attotime time = attotime_sub(video_screen_get_time_until_pos(0, beamy, beamx), attotime_make(0, increment * 6));
 		for (i = 0; i <= 12; i++)

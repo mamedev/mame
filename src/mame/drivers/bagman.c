@@ -55,7 +55,7 @@ I/O C  ;AY-3-8910 Data Read Reg.
         Port B of the 8910 is connected to IN1
 
 DIP locations verified for:
-	- bagman (manual)
+    - bagman (manual)
 
 ***************************************************************************/
 
@@ -338,7 +338,7 @@ static INPUT_PORTS_START( sbagman )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pickin )
-	PORT_INCLUDE( bagman )	
+	PORT_INCLUDE( bagman )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:1")
@@ -360,7 +360,7 @@ static INPUT_PORTS_START( pickin )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( botanic )
-	PORT_INCLUDE( bagman )	
+	PORT_INCLUDE( bagman )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x08, 0x08, "Invulnerability Fruits" )	PORT_DIPLOCATION("SW1:4")

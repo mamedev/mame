@@ -215,7 +215,7 @@
 ***************************************************************************
 
 DIP locations verified for:
-	- stompin (manual)
+    - stompin (manual)
 
 ***************************************************************************/
 
@@ -457,7 +457,7 @@ static INPUT_PORTS_START( gghost )
 	/* Player 2 Trackball */
 	PORT_MODIFY("AN0")
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_PLAYER(2)
-	
+
 	PORT_MODIFY("AN1")
     PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
 
@@ -846,7 +846,7 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
-	   the crosshair controls */
+       the crosshair controls */
 	PORT_MODIFY("AN3")
     PORT_BIT( 0xff, 0, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
     				PORT_CODE_DEC(KEYCODE_S) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(KEYCODE_F) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH) PORT_RESET PORT_PLAYER(2)

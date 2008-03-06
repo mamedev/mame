@@ -961,7 +961,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( csprint )
-	PORT_INCLUDE( ssprint )	
+	PORT_INCLUDE( ssprint )
 
 	PORT_MODIFY("1840")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1024,15 +1024,15 @@ static INPUT_PORTS_START( apb )
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "25" )
 	PORT_DIPSETTING(    0x06, "199" )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("5/6A:!5,!4,!3")	/* No. Of Demerits Allowed	Bonus Inc. Every x Pts	Perfect Day Bonus	*/
-	PORT_DIPSETTING(    0x38, DEF_STR( Easiest ) )											/* 11						5000					Yes					*/
-	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy ) )										/* 10						6000					Yes					*/
-	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )												/* 9						8000					Yes					*/
-	PORT_DIPSETTING(    0x00, "Medium Easy" )												/* 8						10000					Yes					*/
-	PORT_DIPSETTING(    0x20, "Medium Hard" )												/* 7						11000					Yes					*/
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )												/* 6						13000					Yes					*/
-	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )										/* 5						15000					No					*/
-	PORT_DIPSETTING(    0x18, DEF_STR( Hardest ) )											/* 4						18000					No					*/
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("5/6A:!5,!4,!3")	/* No. Of Demerits Allowed  Bonus Inc. Every x Pts  Perfect Day Bonus   */
+	PORT_DIPSETTING(    0x38, DEF_STR( Easiest ) )											/* 11                       5000                    Yes                 */
+	PORT_DIPSETTING(    0x30, DEF_STR( Very_Easy ) )										/* 10                       6000                    Yes                 */
+	PORT_DIPSETTING(    0x28, DEF_STR( Easy ) )												/* 9                        8000                    Yes                 */
+	PORT_DIPSETTING(    0x00, "Medium Easy" )												/* 8                        10000                   Yes                 */
+	PORT_DIPSETTING(    0x20, "Medium Hard" )												/* 7                        11000                   Yes                 */
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )												/* 6                        13000                   Yes                 */
+	PORT_DIPSETTING(    0x08, DEF_STR( Very_Hard ) )										/* 5                        15000                   No                  */
+	PORT_DIPSETTING(    0x18, DEF_STR( Hardest ) )											/* 4                        18000                   No                  */
 	PORT_DIPNAME( 0xc0, 0x00, "Coins Required" )		PORT_DIPLOCATION("5/6A:!2,!1")
 	PORT_DIPSETTING(    0x80, "3 To Start, 2 To Continue" )
 	PORT_DIPSETTING(    0xc0, "3 To Start, 1 To Continue" )

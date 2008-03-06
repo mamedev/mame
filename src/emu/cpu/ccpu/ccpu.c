@@ -576,8 +576,8 @@ static int ccpu_execute(int cycles)
 				ccpu_icount = -1;
 
 				/* some games repeat the FRM opcode twice; it apparently does not cause
-				   a second wait, so we make sure we skip any duplicate opcode at this
-				   point */
+                   a second wait, so we make sure we skip any duplicate opcode at this
+                   point */
 				if (READOP(ccpu.PC) == opcode)
 					ccpu.PC++;
 				break;

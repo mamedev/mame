@@ -38,8 +38,8 @@
         Specifies a mask for the addresses in the current bucket. This mask
         is applied after a positive hit in the bucket specified by AM_RANGE
         or AM_SPACE, and is computed before accessing the RAM or calling
-        through to the read/write handler. If you use AM_MIRROR, below, the 
-        mask is ANDed implicitly with the logical NOT of the mirror. The 
+        through to the read/write handler. If you use AM_MIRROR, below, the
+        mask is ANDed implicitly with the logical NOT of the mirror. The
         mask specified by this macro is ANDed against any implicit masks.
 
     AM_MIRROR(mirror)

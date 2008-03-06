@@ -319,7 +319,7 @@ int device_list_class_items(const device_config *listhead, device_class class)
 
 
 /*-------------------------------------------------
-    device_list_class_first - return the first 
+    device_list_class_first - return the first
     device in the list of a given class
 -------------------------------------------------*/
 
@@ -337,7 +337,7 @@ const device_config *device_list_class_first(const device_config *listhead, devi
 
 
 /*-------------------------------------------------
-    device_list_class_next - return the next 
+    device_list_class_next - return the next
     device in the list of a given class
 -------------------------------------------------*/
 
@@ -357,7 +357,7 @@ const device_config *device_list_class_next(const device_config *prevdevice, dev
 
 
 /*-------------------------------------------------
-    device_list_class_find_by_tag - retrieve a 
+    device_list_class_find_by_tag - retrieve a
     device configuration based on a class and tag
 -------------------------------------------------*/
 
@@ -401,8 +401,8 @@ int device_list_class_index(const device_config *listhead, device_class class, c
 
 
 /*-------------------------------------------------
-    device_list_class_find_by_index - retrieve a 
-    device configuration based on a class and 
+    device_list_class_find_by_index - retrieve a
+    device configuration based on a class and
     index
 -------------------------------------------------*/
 
