@@ -7578,14 +7578,14 @@ Other Sun games
 	DRIVER( findout )	/* (c) 1987 [Elettronolo] */
 	DRIVER( quiz )		/* (c) 1986 Italian bootleg */
 	DRIVER( quiz211 )	/* (c) 1986 Italian bootleg */
-	DRIVER( m075 )		/* (c) 1982 Greyhound Electronics */
+	DRIVER( jokpoker )	/* (c) 1982 Greyhound Electronics */
 	DRIVER( superbwl )	/* (c) 1982 Greyhound Electronics */
+	DRIVER( amuse )	    /* (c) 1982 Greyhound Electronics */
 	DRIVER( gs4002 )	/* (c) 1982 G.E.I. */
 	DRIVER( gs4002a )	/* (c) 1982 G.E.I. */
 	DRIVER( gepoker )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gepoker1 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gepoker2 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gepoker3 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt102c )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt102b )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt101c )	/* (c) 1984 Greyhound Electronics */
