@@ -47,7 +47,6 @@ Emulation Notes:
 #include "video/mc6845.h"
 
 static UINT8* carrera_tileram;
-static mc6845_t *mc6845;
 
 
 
@@ -246,11 +245,6 @@ static GFXDECODE_START( carrera )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static VIDEO_START(carrera)
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
 static VIDEO_UPDATE(carrera)
 {
 
@@ -309,7 +303,7 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_GFXDECODE(carrera)
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(carrera)
-	MDRV_VIDEO_START(carrera)
+
 	MDRV_VIDEO_UPDATE(carrera)
 
 	MDRV_DEVICE_ADD("crtc", MC6845)

@@ -39,7 +39,6 @@ Provided to you by Thierry (ShinobiZ) & Gerald (COY)
 #include "video/mc6845.h"
 
 static tilemap *bg_tilemap;
-static mc6845_t *mc6845;
 static UINT8 *vram_lo,*vram_hi;
 static UINT8 *backup_ram;
 
@@ -66,7 +65,6 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( couple )
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 

@@ -1,11 +1,9 @@
 #include "driver.h"
-#include "video/mc6845.h"
 #include "deprecat.h"
 
 UINT8 *usgames_videoram,*usgames_charram;
 
 
-static mc6845_t *mc6845;
 static tilemap *usgames_tilemap;
 
 
@@ -51,7 +49,6 @@ static TILE_GET_INFO( get_usgames_tile_info )
 
 VIDEO_START(usgames)
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	usgames_tilemap = tilemap_create(get_usgames_tile_info,tilemap_scan_rows, 8, 8,64,32);
 }
 

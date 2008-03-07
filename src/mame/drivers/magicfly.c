@@ -321,7 +321,6 @@
 *     Video Hardware     *
 *************************/
 
-static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
 static WRITE8_HANDLER( magicfly_videoram_w )
@@ -364,7 +363,6 @@ static TILE_GET_INFO( get_magicfly_tile_info )
 
 static VIDEO_START(magicfly)
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_magicfly_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 
@@ -396,7 +394,6 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
 
 static VIDEO_START( 7mezzo )
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_7mezzo_tile_info, tilemap_scan_rows, 8, 8, 32, 29);
 }
 

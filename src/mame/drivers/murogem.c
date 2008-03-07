@@ -97,7 +97,6 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "driver.h"
 #include "video/mc6845.h"
 
-static mc6845_t *mc6845;
 static UINT8 *murogem_videoram;
 
 
@@ -167,11 +166,6 @@ GFXDECODE_END
 static PALETTE_INIT(murogem)
 {}
 
-static VIDEO_START(murogem)
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
 static VIDEO_UPDATE(murogem)
 {
 	int xx,yy,count;
@@ -216,7 +210,6 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(murogem)
-	MDRV_VIDEO_START(murogem)
 	MDRV_VIDEO_UPDATE(murogem)
 
 	MDRV_DEVICE_ADD("crtc", MC6845)

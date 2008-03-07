@@ -14,9 +14,7 @@
 
 
 #include "driver.h"
-#include "video/mc6845.h"
 
-static mc6845_t *mc6845;
 static tilemap *bg_tilemap;
 
 WRITE8_HANDLER( calomega_videoram_w )
@@ -52,7 +50,6 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( calomega )
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 31);
 }
 

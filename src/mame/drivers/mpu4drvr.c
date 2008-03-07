@@ -178,7 +178,6 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 #include "cpu/m68000/m68000.h"
 #include "machine/6850acia.h"
 #include "sound/saa1099.h"
-//Deal 'Em
 #include "video/mc6845.h"
 
 #ifdef MAME_DEBUG
@@ -190,8 +189,6 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 #define LOGSTUFF(x) do { if (MPU4VIDVERBOSE) logerror x; } while (0)
 
 #define VIDEO_MASTER_CLOCK (10000000)
-
-static mc6845_t *mc6845;
 
 static UINT8 m6840_irq_state;
 static UINT8 m6850_irq_state;
@@ -1543,11 +1540,6 @@ static PALETTE_INIT( dealem )
 
 }
 
-static VIDEO_START(dealem)
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
 static VIDEO_UPDATE(dealem)
 {
 	int x,y;
@@ -1676,7 +1668,6 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from MC6845 init, registers 01 & 06 */
 	MDRV_SCREEN_REFRESH_RATE(56)							//Measured accurately from the flip-flop
 
-	MDRV_VIDEO_START( dealem)
 	MDRV_GFXDECODE(dealem)
 	MDRV_VIDEO_UPDATE(dealem)
 
