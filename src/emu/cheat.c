@@ -1500,7 +1500,7 @@ void cheat_init(running_machine *machine)
 	InitStringTable();
 
 	periodic_timer = timer_alloc(cheat_periodic, NULL);
-	timer_adjust_periodic(periodic_timer, attotime_make(0, machine->screen[0].refresh), 0, attotime_make(0, machine->screen[0].refresh));
+	timer_adjust_periodic(periodic_timer, video_screen_get_frame_period(0), 0, video_screen_get_frame_period(0));
 
 	add_exit_callback(machine, cheat_exit);
 }
@@ -11403,7 +11403,7 @@ static void cheat_periodicAction(running_machine *machine, CheatAction * action)
 				/* ----- keep if one shot + restore prevous value + delay !=0 ----- */
 				cheat_periodicOperation(action);
 
-				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(machine->screen[0].refresh)))
+				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds)))
 				{
 					action->frameTimer = 0;
 
@@ -11415,7 +11415,7 @@ static void cheat_periodicAction(running_machine *machine, CheatAction * action)
 			else
 			{
 				/* ----- otherwise, delay ----- */
-				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(machine->screen[0].refresh)))
+				if(action->frameTimer >= (parameter * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds)))
 				{
 					action->frameTimer = 0;
 
@@ -11454,7 +11454,7 @@ static void cheat_periodicAction(running_machine *machine, CheatAction * action)
 
 				if(currentValue != action->lastValue)
 				{
-					action->frameTimer = parameter * ATTOSECONDS_TO_HZ(machine->screen[0].refresh);
+					action->frameTimer = parameter * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds);
 
 					action->flags |= kActionFlag_WasModified;
 				}

@@ -951,7 +951,7 @@ static void cpu_inittimers(running_machine *machine)
 	ipf = machine->config->cpu_slices_per_frame;
 	if (ipf <= 0)
 		ipf = 1;
-	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : machine->screen[0].refresh;
+	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : video_screen_get_frame_period(0).attoseconds;
 	timeslice_period = attotime_make(0, refresh_attosecs / ipf);
 	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
 	timer_adjust_periodic(timeslice_timer, timeslice_period, 0, timeslice_period);

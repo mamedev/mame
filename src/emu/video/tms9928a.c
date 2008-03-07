@@ -195,7 +195,7 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
 
 	/* configure the screen if we weren't overridden */
 	if (machine->screen[0].width == LEFT_BORDER+32*8+RIGHT_BORDER && machine->screen[0].height == TOP_BORDER_60HZ+24*8+BOTTOM_BORDER_60HZ)
-		video_screen_configure(0, LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, &tms.visarea, machine->screen[0].refresh);
+		video_screen_configure(0, LEFT_BORDER + 32*8 + RIGHT_BORDER, tms.top_border + 24*8 + tms.bottom_border, &tms.visarea, video_screen_get_frame_period(0).attoseconds);
 
     /* Video RAM */
     tms.vramsize = intf->vram;

@@ -84,5 +84,5 @@ void senjyo_sh_start(void)
 	sample_set_volume(0,0);
 	sample_start_raw(0,_single,SINGLE_LENGTH,single_rate,1);
 
-	timer_pulse(attotime_make(0, Machine->screen[0].refresh), NULL, 0, senjyo_sh_update);
+	timer_pulse(video_screen_get_frame_period(0), NULL, 0, senjyo_sh_update);
 }

@@ -174,7 +174,7 @@ const char *profiler_get_text(void)
 		}
 		if (computed || showdelay[i])
 		{
-			if (computed) showdelay[i] = ATTOSECONDS_TO_HZ(Machine->screen[0].refresh);
+			if (computed) showdelay[i] = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds);
 			showdelay[i]--;
 
 			if (i < PROFILER_PROFILER)

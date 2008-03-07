@@ -62,10 +62,11 @@ struct _internal_screen_state
 	INT32					last_partial_scan;		/* scanline of last partial update */
 
 	/* screen timing */
+	attoseconds_t			frame_period;			/* attoseconds per frame */
 	attoseconds_t			scantime;				/* attoseconds per scanline */
 	attoseconds_t			pixeltime;				/* attoseconds per pixel */
 	attoseconds_t 			vblank_period;			/* attoseconds per VBLANK period */
-	attotime 				vblank_time;			/* time of last VBLANK start */
+	attotime 				vblank_start_time;		/* time of last VBLANK start */
 	UINT8					vblank_state;			/* 1 = in VBLANK region, 0 = outside */
 	emu_timer *				vblank_begin_timer;		/* timer to signal VBLANK start */
 	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
@@ -354,7 +355,7 @@ void video_init(running_machine *machine)
 			render_container_set_yscale(container, config->yscale);
 
 		/* reset VBLANK timing */
-		internal_state->vblank_time = attotime_zero;
+		internal_state->vblank_start_time = attotime_zero;
 
 		/* allocate a timer to generate per-scanline updates */
 		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
@@ -367,8 +368,8 @@ void video_init(running_machine *machine)
 		assert(strlen(device->tag) < 30);
 		state_save_combine_module_and_tag(unique_tag, "video_screen", device->tag);
 
-		state_save_register_item(unique_tag, 0, internal_state->vblank_time.seconds);
-		state_save_register_item(unique_tag, 0, internal_state->vblank_time.attoseconds);
+		state_save_register_item(unique_tag, 0, internal_state->vblank_start_time.seconds);
+		state_save_register_item(unique_tag, 0, internal_state->vblank_start_time.attoseconds);
 		state_save_register_item(unique_tag, 0, internal_state->frame_number);
 	}
 
@@ -434,15 +435,15 @@ static void video_exit(running_machine *machine)
 	/* free all the textures and bitmaps */
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 	{
-		internal_screen_state *info = get_internal_state(machine, scrnum);
-		if (info->texture[0] != NULL)
-			render_texture_free(info->texture[0]);
-		if (info->texture[1] != NULL)
-			render_texture_free(info->texture[1]);
-		if (info->bitmap[0] != NULL)
-			bitmap_free(info->bitmap[0]);
-		if (info->bitmap[1] != NULL)
-			bitmap_free(info->bitmap[1]);
+		internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+		if (internal_state->texture[0] != NULL)
+			render_texture_free(internal_state->texture[0]);
+		if (internal_state->texture[1] != NULL)
+			render_texture_free(internal_state->texture[1]);
+		if (internal_state->bitmap[0] != NULL)
+			bitmap_free(internal_state->bitmap[0]);
+		if (internal_state->bitmap[1] != NULL)
+			bitmap_free(internal_state->bitmap[1]);
 	}
 
 	/* free the snapshot target */
@@ -681,7 +682,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
     of a screen
 -------------------------------------------------*/
 
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh)
+void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
 {
 	const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
 	screen_state *state = &Machine->screen[scrnum];
@@ -749,16 +750,16 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	state->width = width;
 	state->height = height;
 	state->visarea = *visarea;
-	state->refresh = refresh;
 
 	/* compute timing parameters */
-	internal_state->scantime = refresh / height;
-	internal_state->pixeltime = refresh / (height * width);
+	internal_state->frame_period = frame_period;
+	internal_state->scantime = frame_period / height;
+	internal_state->pixeltime = frame_period / (height * width);
 
 	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
        from the visible area, otherwise just used the supplied value */
 	if ((scrconfig->vblank == 0) && !scrconfig->oldstyle_vblank_supplied)
-		internal_state->vblank_period = (state->refresh / state->height) * (state->height - (state->visarea.max_y + 1 - state->visarea.min_y));
+		internal_state->vblank_period = (frame_period / height) * (height - (visarea->max_y + 1 - visarea->min_y));
 	else
 		internal_state->vblank_period = scrconfig->vblank;
 
@@ -768,7 +769,7 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 		float minrefresh = render_get_max_update_rate();
 		if (minrefresh != 0)
 		{
-			UINT32 target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(refresh));
+			UINT32 target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(frame_period));
 			target_speed = MIN(target_speed, global.original_speed);
 			if (target_speed != global.speed)
 			{
@@ -798,6 +799,7 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int max_y)
 {
 	screen_state *state = &Machine->screen[scrnum];
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
 	rectangle visarea;
 
 	visarea.min_x = min_x;
@@ -805,7 +807,7 @@ void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int m
 	visarea.min_y = min_y;
 	visarea.max_y = max_y;
 
-	video_screen_configure(scrnum, state->width, state->height, &visarea, state->refresh);
+	video_screen_configure(scrnum, state->width, state->height, &visarea, internal_state->frame_period);
 }
 
 
@@ -937,7 +939,7 @@ int video_screen_get_vpos(int scrnum)
 {
 	screen_state *state = &Machine->screen[scrnum];
 	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_time));
+	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	int vpos;
 
 	/* round to the nearest pixel */
@@ -960,7 +962,7 @@ int video_screen_get_vpos(int scrnum)
 int video_screen_get_hpos(int scrnum)
 {
 	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_time));
+	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	int vpos;
 
 	/* round to the nearest pixel */
@@ -1012,7 +1014,7 @@ attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 {
 	screen_state *state = &Machine->screen[scrnum];
 	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_time));
+	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	attoseconds_t targetdelta;
 
 	/* since we measure time relative to VBLANK, compute the scanline offset from VBLANK */
@@ -1024,9 +1026,9 @@ attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 
 	/* if we're past that time (within 1/2 of a pixel), head to the next frame */
 	if (targetdelta <= curdelta + internal_state->pixeltime / 2)
-		targetdelta += state->refresh;
+		targetdelta += internal_state->frame_period;
 	while (targetdelta <= curdelta)
-		targetdelta += state->refresh;
+		targetdelta += internal_state->frame_period;
 
 	/* return the difference */
 	return attotime_make(0, targetdelta - curdelta);
@@ -1081,8 +1083,8 @@ attotime video_screen_get_time_until_update(int scrnum)
 
 attotime video_screen_get_scan_period(int scrnum)
 {
-	internal_screen_state *info = get_internal_state(Machine, scrnum);
-	return attotime_make(0, info->scantime);
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	return attotime_make(0, internal_state->scantime);
 }
 
 
@@ -1094,7 +1096,8 @@ attotime video_screen_get_scan_period(int scrnum)
 
 attotime video_screen_get_frame_period(int scrnum)
 {
-	return attotime_make(0, Machine->screen[scrnum].refresh);
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	return attotime_make(0, internal_state->frame_period);
 }
 
 
@@ -1106,8 +1109,8 @@ attotime video_screen_get_frame_period(int scrnum)
 
 UINT64 video_screen_get_frame_number(int scrnum)
 {
-	internal_screen_state *info = get_internal_state(Machine, scrnum);
-	return info->frame_number;
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	return internal_state->frame_number;
 }
 
 
@@ -1254,7 +1257,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* reset the starting VBLANK time */
-	internal_state->vblank_time = timer_get_time();
+	internal_state->vblank_start_time = timer_get_time();
 
 	/* mark as being in VBLANK */
 	internal_state->vblank_state = TRUE;
@@ -1273,7 +1276,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 		video_frame_update(machine, FALSE);
 
 	/* reset the timers */
-	timer_adjust_oneshot(internal_state->vblank_begin_timer, attotime_make(0, state->refresh), 0);
+	timer_adjust_oneshot(internal_state->vblank_begin_timer, attotime_make(0, internal_state->frame_period), 0);
 	timer_adjust_oneshot(internal_state->vblank_end_timer, attotime_make(0, internal_state->vblank_period), 0);
 }
 
@@ -2186,7 +2189,6 @@ void video_movie_end_recording(running_machine *machine, int scrnum)
 
 static void movie_record_frame(running_machine *machine, int scrnum)
 {
-	screen_state *state = &machine->screen[scrnum];
 	internal_screen_state *internal_state = get_internal_state(machine, scrnum);
 	const rgb_t *palette;
 
@@ -2213,7 +2215,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 			png_add_text(&pnginfo, "System", text);
 
 			/* start the capture */
-			error = mng_capture_start(mame_core_file(internal_state->movie_file), global.snap_bitmap, ATTOSECONDS_TO_HZ(state->refresh));
+			error = mng_capture_start(mame_core_file(internal_state->movie_file), global.snap_bitmap, ATTOSECONDS_TO_HZ(internal_state->frame_period));
 			if (error != PNGERR_NONE)
 			{
 				png_free(&pnginfo);

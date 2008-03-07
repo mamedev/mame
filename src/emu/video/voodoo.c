@@ -2610,7 +2610,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					int vvis = (v->reg[videoDimensions].u >> 16) & 0x3ff;
 					int hbp = (v->reg[backPorch].u & 0xff) + 2;
 					int vbp = (v->reg[backPorch].u >> 16) & 0xff;
-					screen_state *state = &Machine->screen[v->scrnum];
+					attoseconds_t refresh = video_screen_get_frame_period(v->scrnum).attoseconds;
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -2631,11 +2631,11 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					vgaperiod = HZ_TO_ATTOSECONDS(31500) * vtotal;
 
 					/* compute a diff against the current refresh period */
-					stddiff = stdperiod - state->refresh;
+					stddiff = stdperiod - refresh;
 					if (stddiff < 0) stddiff = -stddiff;
-					meddiff = medperiod - state->refresh;
+					meddiff = medperiod - refresh;
 					if (meddiff < 0) meddiff = -meddiff;
-					vgadiff = vgaperiod - state->refresh;
+					vgadiff = vgaperiod - refresh;
 					if (vgadiff < 0) vgadiff = -vgadiff;
 
 					mame_printf_debug("hSync=%08X  vSync=%08X  backPorch=%08X  videoDimensions=%08X\n",

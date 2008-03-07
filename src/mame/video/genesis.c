@@ -672,10 +672,11 @@ static void vdp_register_w(int data, int vblank)
 			{
 				screen_state *state = &Machine->screen[genesis_screen_number];
 				rectangle visarea = state->visarea;
+				attoseconds_t refresh = video_screen_get_frame_period(genesis_screen_number).attoseconds;
 
 				/* this gets called from the init! */
 				visarea.max_x = scrwidth*8-1;
-				video_screen_configure(genesis_screen_number, scrwidth*8, state->height, &visarea, state->refresh);
+				video_screen_configure(genesis_screen_number, scrwidth*8, state->height, &visarea, refresh);
 			}
 			break;
 

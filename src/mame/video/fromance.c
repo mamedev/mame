@@ -295,7 +295,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(crtc_timer, attotime_make(0, machine->screen[0].refresh / param), 0, attotime_make(0, machine->screen[0].refresh / param));
+		timer_adjust_periodic(crtc_timer, attotime_div(video_screen_get_frame_period(0), param), 0, attotime_div(video_screen_get_frame_period(0), param));
 }
 
 

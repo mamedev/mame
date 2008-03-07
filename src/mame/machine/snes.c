@@ -336,7 +336,7 @@ static void snes_init_ram(running_machine *machine)
 	has_dsp1 = ((snes_r_bank1(machine,0xffd6) >= 3) && (snes_r_bank1(machine,0xffd6) <= 5)) ? 1 : 0;
 
 	// init frame counter so first line is 0
-	if( ATTOSECONDS_TO_HZ(Machine->screen[0].refresh) >= 59 )
+	if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) >= 59 )
 	{
 		snes_ppu.beam.current_vert = SNES_VTOTAL_NTSC;
 	}
@@ -379,9 +379,9 @@ MACHINE_RESET( snes )
 	snes_init_ram(machine);
 
 	/* Set STAT78 to NTSC or PAL */
-	if( ATTOSECONDS_TO_HZ(machine->screen[0].refresh) >= 59.0f )
+	if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) >= 59.0f )
 		snes_ram[STAT78] = SNES_NTSC;
-	else /* if( machine->screen[0].refresh == 50 ) */
+	else /* if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) == 50.0f ) */
 		snes_ram[STAT78] = SNES_PAL;
 
 	// reset does this to these registers
@@ -1110,11 +1110,11 @@ WRITE8_HANDLER( snes_w_io )
 
 				if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
 				{
-					video_screen_configure(0, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, Machine->screen[0].refresh);
+					video_screen_configure(0, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, video_screen_get_frame_period(0).attoseconds);
 				}
 				else
 				{
-					video_screen_configure(0, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, Machine->screen[0].refresh);
+					video_screen_configure(0, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(0).attoseconds);
 				}
 			}
 

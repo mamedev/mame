@@ -219,7 +219,7 @@ static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const r
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		video_screen_configure(0, width, height * 262 / 240, &visarea, machine->screen[0].refresh);
+		video_screen_configure(0, width, height * 262 / 240, &visarea, video_screen_get_frame_period(0).attoseconds);
 	}
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
