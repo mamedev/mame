@@ -1485,7 +1485,6 @@ static void prepare_machine(running_machine *machine)
 
 	/* reset the global MAME data and clear the other privates */
 	memset(machine->mame_data, 0, sizeof(*machine->mame_data));
-	machine->video_data = NULL;
 	machine->palette_data = NULL;
 	machine->streams_data = NULL;
 

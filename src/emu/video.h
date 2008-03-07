@@ -70,6 +70,7 @@ struct _screen_state
 	attoseconds_t	refresh;					/* refresh period */
 	attoseconds_t	vblank;						/* duration of a VBLANK */
 	bitmap_format	format;						/* bitmap format */
+	void *			private_data;				/* pointer to the private data structure */
 };
 
 
