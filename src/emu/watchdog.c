@@ -83,18 +83,18 @@ static TIMER_CALLBACK( watchdog_callback )
     timers
 -------------------------------------------------*/
 
-static void on_vblank(const device_config *device, int vblank_state)
+static void on_vblank(running_machine *machine, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state && watchdog_enabled)
 	{
 		/* check the watchdog */
-		if (device->machine->config->watchdog_vblank_count != 0)
+		if (machine->config->watchdog_vblank_count != 0)
 		{
 			watchdog_counter = watchdog_counter - 1;
 
 			if (watchdog_counter == 0)
-				watchdog_callback(device->machine, NULL, 0);
+				watchdog_callback(machine, NULL, 0);
 		}
 	}
 }
@@ -116,7 +116,7 @@ void watchdog_reset(running_machine *machine)
 		watchdog_counter = machine->config->watchdog_vblank_count;
 
 		/* register a global VBLANK callback */
-		video_screen_register_vbl_cb(machine, NULL, on_vblank);
+		video_screen_register_global_vbl_cb(on_vblank);
 	}
 
 	/* timer-based watchdog? */

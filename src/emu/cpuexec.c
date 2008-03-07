@@ -968,27 +968,26 @@ static void cpu_inittimers(running_machine *machine)
 		/* VBLANK interrupts */
 		if (config->vblank_interrupts_per_frame > 0)
 		{
-			const char *screen_tag;
-			screen_state *screen;
+			const device_config *screen;
 
 			/* get the screen that will trigger the VBLANK */
 
 			/* new style - use screen tag directly */
 			if (config->vblank_interrupts_per_frame == 1)
-				screen_tag = config->vblank_interrupt_screen;
+				screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, config->vblank_interrupt_screen);
 
 			/* old style 'hack' setup - use screen #0 */
 			else
 			{
-				const device_config *config = device_list_first(machine->config->devicelist, VIDEO_SCREEN);
-				screen_tag = config->tag;
+				screen = device_list_first(machine->config->devicelist, VIDEO_SCREEN);
 
 				/* allocate timer that will trigger the partial frame updates */
 				cpu[cpunum].partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, 0);
 			}
 
-			screen = devtag_get_token(machine, VIDEO_SCREEN, screen_tag);
-			video_screen_register_vbl_cb(machine, screen, on_vblank);
+			assert(screen != NULL);
+
+			video_screen_register_vbl_cb(screen, on_vblank);
 		}
 
 		/* periodic interrupts */

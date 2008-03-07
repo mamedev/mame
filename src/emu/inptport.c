@@ -1032,7 +1032,7 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void on_vblank(const device_config *device, int vblank_state);
+static void on_vblank(running_machine *machine, int vblank_state);
 static void setup_playback(running_machine *machine);
 static void setup_record(running_machine *machine);
 static void input_port_exit(running_machine *machine);
@@ -1142,7 +1142,7 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 void input_port_post_init(running_machine *machine)
 {
 	/* set up callback for updating the ports */
-	video_screen_register_vbl_cb(machine, NULL, on_vblank);
+	video_screen_register_global_vbl_cb(on_vblank);
 }
 
 
@@ -1153,11 +1153,11 @@ void input_port_post_init(running_machine *machine)
  *
  *************************************/
 
-static void on_vblank(const device_config *device, int vblank_state)
+static void on_vblank(running_machine *machine, int vblank_state)
 {
 	/* VBLANK starting - read keyboard & update the status of the input ports */
 	if (vblank_state)
-		input_port_vblank_start(device->machine);
+		input_port_vblank_start(machine);
 
 	/* VBLANK ending - update IPT_VBLANK input ports */
 	else

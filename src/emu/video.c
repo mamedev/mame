@@ -73,7 +73,6 @@ struct _internal_screen_state
 	UINT64					frame_number;			/* the current frame number */
 
 	/* screen specific VBLANK callbacks */
-	int						vbl_cb_count;
 	vblank_state_changed_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 
 	/* movie recording */
@@ -132,6 +131,9 @@ struct _video_global
 	UINT8 					crosshair_animate;	/* animation frame index */
 	UINT8 					crosshair_visible;	/* crosshair visible mask */
 	UINT8 					crosshair_needed;	/* crosshair needed mask */
+
+	/* global VBLANK callbacks */
+	vblank_state_changed_global_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 };
 
 
@@ -218,7 +220,7 @@ INLINE screen_state *get_safe_token(const device_config *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == DEVICE_GET_INFO_NAME(video_screen));
+	assert(device->type == VIDEO_SCREEN);
 
 	return (screen_state *)device->token;
 }
@@ -1103,53 +1105,64 @@ UINT64 video_screen_get_frame_number(int scrnum)
     VBLANK callback for a specific screen
 -------------------------------------------------*/
 
-void video_screen_register_vbl_cb(running_machine *machine, void *screen, vblank_state_changed_func vbl_cb)
+void video_screen_register_vbl_cb(const device_config *screen, vblank_state_changed_func vbl_cb)
 {
 	int i, found;
-	internal_screen_state *internal_state = NULL;
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* validate arguments */
-	assert(machine != NULL);
-	assert(machine->config != NULL);
-	assert(machine->config->devicelist != NULL);
 	assert(vbl_cb != NULL);
-
-	/* if the screen is NULL, grab the first screen -- we are installing a "global" handler */
-	if (screen == NULL)
-	{
-		if (video_screen_count(machine->config) > 0)
-		{
-			const char *screen_tag = video_screen_first(machine->config)->tag;
-			screen = devtag_get_token(machine, VIDEO_SCREEN, screen_tag);
-		}
-		else
-		{
-			/* we need to do something for screenless games */
-			assert(screen != NULL);
-		}
-	}
-
-	/* find the screen info structure for the given token - there should only be one */
-	for (i = 0; i < MAX_SCREENS; i++)
-		if (machine->screen[i].private_data == ((screen_state *)screen)->private_data)
-			internal_state = get_internal_state(machine, i);
-
-	/* make sure we still have room for the callback */
-	assert(internal_state != NULL);
-	assert(internal_state->vbl_cb_count != MAX_VBL_CB);
 
 	/* check if we already have this callback registered */
 	found = FALSE;
-	for (i = 0; i < internal_state->vbl_cb_count; i++)
+	for (i = 0; i < MAX_VBL_CB; i++)
+	{
+		if (internal_state->vbl_cbs[i] == NULL)
+			break;
+
 		if (internal_state->vbl_cbs[i] == vbl_cb)
 			found = TRUE;
+	}
+
+	/* check that there is room */
+	assert(i != MAX_VBL_CB);
 
 	/* if not found, register and increment count */
 	if (!found)
+		internal_state->vbl_cbs[i] = vbl_cb;
+}
+
+
+/*-------------------------------------------------
+    video_screen_register_global_vbl_cb - registers a
+    VBLANK callback for a specific screen
+-------------------------------------------------*/
+
+void video_screen_register_global_vbl_cb(vblank_state_changed_global_func vbl_cb)
+{
+	int i, found;
+
+	/* validate arguments */
+	assert(vbl_cb != NULL);
+
+	/* check if we already have this callback registered */
+	found = FALSE;
+	for (i = 0; i < MAX_VBL_CB; i++)
 	{
-		internal_state->vbl_cbs[internal_state->vbl_cb_count] = vbl_cb;
-		internal_state->vbl_cb_count++;
+		if (global.vbl_cbs[i] == NULL)
+			break;
+
+		if (global.vbl_cbs[i] == vbl_cb)
+			found = TRUE;
 	}
+
+	/* check that there is room */
+	assert(i != MAX_VBL_CB);
+
+	/* if not found, register and increment count */
+	if (!found)
+		global.vbl_cbs[i] = vbl_cb;
 }
 
 
@@ -1219,29 +1232,13 @@ DEVICE_GET_INFO( video_screen )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    call_vb_callbacks - call any external VBLANK
-    callsbacks with the given state
--------------------------------------------------*/
-
-static void call_vb_callbacks(internal_screen_state *scrinfo, int vblank_state)
-{
-	int i;
-
-	/* set it in the state structure */
-	scrinfo->vblank_state = vblank_state;
-
-	for (i = 0; scrinfo->vbl_cbs[i] != NULL; i++)
-		scrinfo->vbl_cbs[i](scrinfo->device, vblank_state);
-}
-
-
-/*-------------------------------------------------
     vblank_begin_callback - call any external
     callbacks to signal the VBLANK period has begun
 -------------------------------------------------*/
 
 static TIMER_CALLBACK( vblank_begin_callback )
 {
+	int i;
 	attoseconds_t vblank_period;
 	screen_state *state = ptr;
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
@@ -1249,8 +1246,17 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	/* reset the starting VBLANK time */
 	internal_state->vblank_time = timer_get_time();
 
-	/* call the external callbacks */
-	call_vb_callbacks(internal_state, TRUE);
+	/* mark as being in VBLANK */
+	internal_state->vblank_state = TRUE;
+
+	/* call the screen specific callbacks */
+	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
+		internal_state->vbl_cbs[i](internal_state->device, TRUE);
+
+	/* for the first screen, call the global callbacks */
+	if (internal_state->scrnum == 0)
+		for (i = 0; global.vbl_cbs[i] != NULL; i++)
+			global.vbl_cbs[i](machine, TRUE);
 
 	/* do we update the screen now? - only do it for the first screen */
 	if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (internal_state->scrnum == 0))
@@ -1276,14 +1282,24 @@ static TIMER_CALLBACK( vblank_begin_callback )
 
 static TIMER_CALLBACK( vblank_end_callback )
 {
+	int i;
 	internal_screen_state *internal_state = ptr;
 
 	/* update the first screen if we didn't before */
 	if ((machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (internal_state->scrnum == 0))
 		video_frame_update(machine, FALSE);
 
-	/* let any external parties know that the VBLANK is over */
-	call_vb_callbacks(internal_state, FALSE);
+	/* mark as not being in VBLANK */
+	internal_state->vblank_state = FALSE;
+
+	/* call the screen specific callbacks */
+	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
+		internal_state->vbl_cbs[i](internal_state->device, FALSE);
+
+	/* for the first screen, call the global callbacks */
+	if (internal_state->scrnum == 0)
+		for (i = 0; global.vbl_cbs[i] != NULL; i++)
+			global.vbl_cbs[i](machine, FALSE);
 
 	/* increment the frame number counter */
 	internal_state->frame_number++;
