@@ -39,6 +39,7 @@ enum
 	NUM_TYPES
 };
 
+
 /* tags for state saving */
 const char * const device_tags[NUM_TYPES] = { "mc6845", "c6545-1", "r6545-1" };
 
@@ -49,10 +50,10 @@ static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,  TRUE,  TRUE }
 static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
 
 
+typedef struct _mc6845_t mc6845_t;
 struct _mc6845_t
 {
 	int device_type;
-	running_machine *machine;
 	const mc6845_interface *intf;
 
 	/* register file */
@@ -107,6 +108,19 @@ static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
 
 
+/* makes sure that the passed in device is the right type */
+INLINE mc6845_t *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert((device->type == DEVICE_GET_INFO_NAME(mc6845)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(c6545_1)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(r6545_1)));
+
+	return (mc6845_t *)device->token;
+}
+
+
 static void mc6845_state_save_postload(void *param)
 {
 	recompute_parameters(param, TRUE);
@@ -115,9 +129,7 @@ static void mc6845_state_save_postload(void *param)
 
 WRITE8_DEVICE_HANDLER( mc6845_address_w )
 {
-	mc6845_t *mc6845 = device->token;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845->register_address_latch = data & 0x1f;
 }
@@ -125,10 +137,8 @@ WRITE8_DEVICE_HANDLER( mc6845_address_w )
 
 READ8_DEVICE_HANDLER( mc6845_status_r )
 {
-	mc6845_t *mc6845 = device->token;
+	mc6845_t *mc6845 = get_safe_token(device);
 	UINT8 ret = 0;
-
-	assert(mc6845 != NULL);
 
 	/* VBLANK bit */
 	if (supports_status_reg_d5[mc6845->device_type] &&
@@ -145,10 +155,8 @@ READ8_DEVICE_HANDLER( mc6845_status_r )
 
 READ8_DEVICE_HANDLER( mc6845_register_r )
 {
-	mc6845_t *mc6845 = device->token;
+	mc6845_t *mc6845 = get_safe_token(device);
 	UINT8 ret = 0;
-
-	assert(mc6845 != NULL);
 
 	switch (mc6845->register_address_latch)
 	{
@@ -169,9 +177,7 @@ READ8_DEVICE_HANDLER( mc6845_register_r )
 
 WRITE8_DEVICE_HANDLER( mc6845_register_w )
 {
-	mc6845_t *mc6845 = device->token;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (LOG)  logerror("M6845 PC %04x: reg 0x%02x = 0x%02x\n", activecpu_get_pc(), mc6845->register_address_latch, data);
 
@@ -387,10 +393,11 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 
 static TIMER_CALLBACK( de_changed_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_de_changed(mc6845->machine, mc6845, is_display_enabled(mc6845));
+	mc6845->intf->on_de_changed(device, is_display_enabled(mc6845));
 
 	update_de_changed_timer(mc6845);
 }
@@ -398,19 +405,21 @@ static TIMER_CALLBACK( de_changed_timer_cb )
 
 static TIMER_CALLBACK( vsync_on_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_vsync_changed(mc6845->machine, mc6845, TRUE);
+	mc6845->intf->on_vsync_changed(device, TRUE);
 }
 
 
 static TIMER_CALLBACK( vsync_off_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_vsync_changed(mc6845->machine, mc6845, FALSE);
+	mc6845->intf->on_vsync_changed(device, FALSE);
 
 	update_vsync_changed_timers(mc6845);
 }
@@ -418,30 +427,31 @@ static TIMER_CALLBACK( vsync_off_timer_cb )
 
 static TIMER_CALLBACK( hsync_on_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_hsync_changed(mc6845->machine, mc6845, TRUE);
+	mc6845->intf->on_hsync_changed(device, TRUE);
 }
 
 
 static TIMER_CALLBACK( hsync_off_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* call the callback function -- we know it exists */
-	mc6845->intf->on_hsync_changed(mc6845->machine, mc6845, FALSE);
+	mc6845->intf->on_hsync_changed(device, FALSE);
 
 	update_hsync_changed_timers(mc6845);
 }
 
 
 
-UINT16 mc6845_get_ma(mc6845_t *mc6845)
+UINT16 mc6845_get_ma(const device_config *device)
 {
 	UINT16 ret;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->has_valid_parameters)
 	{
@@ -468,11 +478,10 @@ UINT16 mc6845_get_ma(mc6845_t *mc6845)
 }
 
 
-UINT8 mc6845_get_ra(mc6845_t *mc6845)
+UINT8 mc6845_get_ra(const device_config *device)
 {
 	UINT8 ret;
-
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->has_valid_parameters)
 	{
@@ -493,19 +502,20 @@ UINT8 mc6845_get_ra(mc6845_t *mc6845)
 
 static TIMER_CALLBACK( light_pen_latch_timer_cb )
 {
-	mc6845_t *mc6845 = ptr;
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
 
-	mc6845->light_pen_addr = mc6845_get_ma(mc6845);
+	mc6845->light_pen_addr = mc6845_get_ma(device);
 	mc6845->light_pen_latched = TRUE;
 }
 
 
-void mc6845_assert_light_pen_input(mc6845_t *mc6845)
+void mc6845_assert_light_pen_input(const device_config *device)
 {
 	int y, x;
 	int char_x;
 
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	if (mc6845->has_valid_parameters)
 	{
@@ -564,9 +574,9 @@ static void update_cursor_state(mc6845_t *mc6845)
 }
 
 
-void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect)
+void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	assert(mc6845 != NULL);
+	mc6845_t *mc6845 = get_safe_token(device);
 	assert(bitmap != NULL);
 	assert(cliprect != NULL);
 
@@ -581,7 +591,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 		/* call the set up function if any */
 		if (mc6845->intf->begin_update != NULL)
-			param = mc6845->intf->begin_update(mc6845->machine, mc6845, bitmap, cliprect);
+			param = mc6845->intf->begin_update(device, bitmap, cliprect);
 
 		if (cliprect->min_y == 0)
 		{
@@ -609,7 +619,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_disp_addr) : -1;
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(mc6845->machine, mc6845, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
+			mc6845->intf->update_row(device, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
@@ -618,7 +628,7 @@ void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect
 
 		/* call the tear down function if any */
 		if (mc6845->intf->end_update != NULL)
-			mc6845->intf->end_update(mc6845->machine, mc6845, bitmap, cliprect, param);
+			mc6845->intf->end_update(device, bitmap, cliprect, param);
 
 		popmessage(NULL);
 	}
@@ -643,29 +653,28 @@ static void *common_start(const device_config *device, int device_type)
 	memset(mc6845, 0, sizeof(*mc6845));
 
 	mc6845->device_type = device_type;
-	mc6845->machine = device->machine;
 	mc6845->intf = device->static_config;
 
 	/* create the timers */
 	if (mc6845->intf != NULL)
 	{
 		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, mc6845);
+			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, (void *)device);
 
 		if (mc6845->intf->on_hsync_changed != NULL)
 		{
-			mc6845->hsync_on_timer = timer_alloc(hsync_on_timer_cb, mc6845);
-			mc6845->hsync_off_timer = timer_alloc(hsync_off_timer_cb, mc6845);
+			mc6845->hsync_on_timer = timer_alloc(hsync_on_timer_cb, (void *)device);
+			mc6845->hsync_off_timer = timer_alloc(hsync_off_timer_cb, (void *)device);
 		}
 
 		if (mc6845->intf->on_vsync_changed != NULL)
 		{
-			mc6845->vsync_on_timer = timer_alloc(vsync_on_timer_cb, mc6845);
-			mc6845->vsync_off_timer = timer_alloc(vsync_off_timer_cb, mc6845);
+			mc6845->vsync_on_timer = timer_alloc(vsync_on_timer_cb, (void *)device);
+			mc6845->vsync_off_timer = timer_alloc(vsync_off_timer_cb, (void *)device);
 		}
 	}
 
-	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, mc6845);
+	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, (void *)device);
 
 	/* register for state saving */
 	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
@@ -713,19 +722,19 @@ static DEVICE_START( r6545_1 )
 
 static DEVICE_RESET( mc6845 )
 {
-	mc6845_t *mc6845 = device->token;
+	mc6845_t *mc6845 = get_safe_token(device);
 
 	/* internal registers other than status remain unchanged, all outputs go low */
 	if (mc6845->intf != NULL)
 	{
 		if (mc6845->intf->on_de_changed != NULL)
-			mc6845->intf->on_de_changed(device->machine, mc6845, FALSE);
+			mc6845->intf->on_de_changed(device, FALSE);
 
 		if (mc6845->intf->on_hsync_changed != NULL)
-			mc6845->intf->on_hsync_changed(device->machine, mc6845, FALSE);
+			mc6845->intf->on_hsync_changed(device, FALSE);
 
 		if (mc6845->intf->on_vsync_changed != NULL)
-			mc6845->intf->on_vsync_changed(device->machine, mc6845, FALSE);
+			mc6845->intf->on_vsync_changed(device, FALSE);
 	}
 
 	mc6845->light_pen_latched = FALSE;

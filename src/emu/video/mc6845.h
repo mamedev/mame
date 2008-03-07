@@ -11,41 +11,37 @@
 #define __MC6845__
 
 
-typedef struct _mc6845_t mc6845_t;
-typedef struct _mc6845_interface mc6845_interface;
-
 #define MC6845		DEVICE_GET_INFO_NAME(mc6845)
 #define R6545_1		DEVICE_GET_INFO_NAME(r6545_1)
 #define C6545_1 	DEVICE_GET_INFO_NAME(c6545_1)
 
 
 /* callback definitions */
-typedef void * (*mc6845_begin_update_func)(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect);
-#define MC6845_BEGIN_UPDATE(name)	void *name(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect)
+typedef void * (*mc6845_begin_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
+#define MC6845_BEGIN_UPDATE(name)	void *name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect)
 
-typedef void (*mc6845_update_row_func)(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap,
+typedef void (*mc6845_update_row_func)(const device_config *device, bitmap_t *bitmap,
 					   				   const rectangle *cliprect, UINT16 ma, UINT8 ra,
 					   				   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
-#define MC6845_UPDATE_ROW(name)		void name(running_machine *machine, mc6845_t *mc6845, bitmap_t *bitmap,	\
+#define MC6845_UPDATE_ROW(name)		void name(const device_config *device, bitmap_t *bitmap,	\
 					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,					\
 					   						  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
-typedef void (*mc6845_end_update_func)(running_machine *machine, mc6845_t *mc6845,
-					   				   bitmap_t *bitmap, const rectangle *cliprect, void *param);
-#define MC6845_END_UPDATE(name)		void name(running_machine *machine, mc6845_t *mc6845,						\
-					   						  bitmap_t *bitmap, const rectangle *cliprect, void *param)
+typedef void (*mc6845_end_update_func)(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param);
+#define MC6845_END_UPDATE(name)		void name(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect, void *param)
 
-typedef void (*mc6845_on_de_changed_func)(running_machine *machine, mc6845_t *mc6845, int display_enabled);
-#define MC6845_ON_DE_CHANGED(name)	void name(running_machine *machine, mc6845_t *mc6845, int display_enabled)
+typedef void (*mc6845_on_de_changed_func)(const device_config *device, int display_enabled);
+#define MC6845_ON_DE_CHANGED(name)	void name(const device_config *device, int display_enabled)
 
-typedef void (*mc6845_on_hsync_changed_func)(running_machine *machine, mc6845_t *mc6845, int hsync);
-#define MC6845_ON_HSYNC_CHANGED(name)	void name(running_machine *machine, mc6845_t *mc6845, int hsync)
+typedef void (*mc6845_on_hsync_changed_func)(const device_config *device, int hsync);
+#define MC6845_ON_HSYNC_CHANGED(name)	void name(const device_config *device, int hsync)
 
-typedef void (*mc6845_on_vsync_changed_func)(running_machine *machine, mc6845_t *mc6845, int vsync);
-#define MC6845_ON_VSYNC_CHANGED(name)	void name(running_machine *machine, mc6845_t *mc6845, int vsync)
+typedef void (*mc6845_on_vsync_changed_func)(const device_config *device, int vsync);
+#define MC6845_ON_VSYNC_CHANGED(name)	void name(const device_config *device, int vsync)
 
 
 /* interface */
+typedef struct _mc6845_interface mc6845_interface;
 struct _mc6845_interface
 {
 	int scrnum;					/* screen we are acting on */
@@ -95,18 +91,18 @@ READ8_DEVICE_HANDLER( mc6845_register_r );
 WRITE8_DEVICE_HANDLER( mc6845_register_w );
 
 /* return the current value on the MA0-MA13 pins */
-UINT16 mc6845_get_ma(mc6845_t *mc6845);
+UINT16 mc6845_get_ma(const device_config *device);
 
 /* return the current value on the RA0-RA4 pins */
-UINT8 mc6845_get_ra(mc6845_t *mc6845);
+UINT8 mc6845_get_ra(const device_config *device);
 
 /* simulates the LO->HI clocking of the light pen pin (pin 3) */
-void mc6845_assert_light_pen_input(mc6845_t *mc6845);
+void mc6845_assert_light_pen_input(const device_config *device);
 
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */
-void mc6845_update(mc6845_t *mc6845, bitmap_t *bitmap, const rectangle *cliprect);
+void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 
 #endif

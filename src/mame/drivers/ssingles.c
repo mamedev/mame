@@ -25,7 +25,6 @@
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
-static mc6845_t *mc6845;
 static UINT8 *ssingles_videoram;
 static UINT8 *ssingles_colorram;
 static UINT8 prot_data;
@@ -109,8 +108,6 @@ static WRITE8_HANDLER(ssingles_colorram_w)
 
 static VIDEO_START(ssingles)
 {
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-
 	{
 		int i;
 		for(i=0;i<NUM_PENS;++i)
@@ -123,6 +120,7 @@ static VIDEO_START(ssingles)
 
 static VIDEO_UPDATE( ssingles )
 {
+	const device_config *mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

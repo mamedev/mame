@@ -83,7 +83,6 @@
 #define AUDIO_CPU_2_CLOCK		(AUDIO_2_MASTER_CLOCK)
 
 
-static mc6845_t *mc6845;
 static UINT8 *nyny_videoram_1;
 static UINT8 *nyny_videoram_2;
 static UINT8 *nyny_colorram_1;
@@ -416,14 +415,9 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static VIDEO_START( nyny )
-{
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
-}
-
-
 static VIDEO_UPDATE( nyny )
 {
+	const device_config *mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
@@ -680,7 +674,6 @@ static MACHINE_DRIVER_START( nyny )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_VIDEO_START(nyny)
 	MDRV_VIDEO_UPDATE(nyny)
 
 	MDRV_SCREEN_ADD("main", RASTER)

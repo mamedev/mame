@@ -26,7 +26,6 @@ struct _qix_state
 	UINT8  coinctrl;
 
 	/* video state */
-	mc6845_t *mc6845;
 	UINT8 *videoram;
 	UINT8 *videoram_address;
 	UINT8 *videoram_mask;

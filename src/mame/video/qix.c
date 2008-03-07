@@ -14,6 +14,16 @@
 
 /*************************************
  *
+ *  Device tag
+ *
+ *************************************/
+
+#define MC6845_TAG		("vid-u18")
+
+
+
+/*************************************
+ *
  *  Static function prototypes
  *
  *************************************/
@@ -33,9 +43,6 @@ static MC6845_ON_DE_CHANGED( display_enable_changed );
 static VIDEO_START( qix )
 {
 	qix_state *state = machine->driver_data;
-
-	/* get the pointer to the mc6845 object */
-	state->mc6845 = devtag_get_token(machine, MC6845, "vid-u18");
 
 	/* allocate memory for the full video RAM */
 	state->videoram = auto_malloc(256 * 256);
@@ -57,13 +64,13 @@ static VIDEO_START( qix )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 
 	/* on the rising edge, latch the scanline */
 	if (display_enabled)
 	{
-		UINT16 ma = mc6845_get_ma(mc6845);
-		UINT8 ra = mc6845_get_ra(mc6845);
+		UINT16 ma = mc6845_get_ma(device);
+		UINT8 ra = mc6845_get_ra(device);
 
 		/* RA0-RA2 goes to D0-D2 and MA5-MA9 goes to D3-D7 */
 		*state->scanline_latch = ((ma >> 2) & 0xf8) | (ra & 0x07);
@@ -300,7 +307,7 @@ static void get_pens(qix_state *state, pen_t *pens)
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 
 #if 0
 	// note the confusing bit order!
@@ -318,7 +325,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 
 static MC6845_UPDATE_ROW( update_row )
 {
-	qix_state *state = machine->driver_data;
+	qix_state *state = device->machine->driver_data;
 	UINT16 x;
 	UINT8 scanline[256];
 
@@ -344,9 +351,8 @@ static MC6845_UPDATE_ROW( update_row )
 
 static VIDEO_UPDATE( qix )
 {
-	qix_state *state = machine->driver_data;
-
-	mc6845_update(state->mc6845, bitmap, cliprect);
+	const device_config *mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, MC6845_TAG);
+	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;
 }
@@ -441,7 +447,7 @@ MACHINE_DRIVER_START( qix_video )
 	MDRV_VIDEO_START(qix)
 	MDRV_VIDEO_UPDATE(qix)
 
-	MDRV_DEVICE_ADD("vid-u18", MC6845)
+	MDRV_DEVICE_ADD(MC6845_TAG, MC6845)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
 
 	MDRV_SCREEN_ADD("main", RASTER)

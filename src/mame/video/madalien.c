@@ -24,8 +24,6 @@ UINT8 *madalien_edge1_pos;
 UINT8 *madalien_edge2_pos;
 UINT8 *madalien_headlight_pos;
 
-static mc6845_t *mc6845;
-
 static tilemap *tilemap_fg;
 
 static tilemap *tilemap_edge1[4];
@@ -143,8 +141,6 @@ static VIDEO_START( madalien )
 	{
 		16, 16, 32, 32
 	};
-
-	mc6845 = devtag_get_token(machine, MC6845, "crtc");
 
 	tilemap_fg = tilemap_create(get_tile_info_FG, tilemap_scan_cols_flip_x, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(tilemap_fg, 0);
@@ -395,8 +391,6 @@ static const mc6845_interface mc6845_intf =
 
 
 MACHINE_DRIVER_START( madalien_video )
-
-
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 336, 0, 256, 288, 0, 256)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

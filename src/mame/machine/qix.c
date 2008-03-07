@@ -263,7 +263,7 @@ MACHINE_START( slither )
 
 MC6845_ON_VSYNC_CHANGED( qix_vsync_changed )
 {
-	pia_3_cb1_w(machine, 0, vsync);
+	pia_3_cb1_w(device->machine, 0, vsync);
 }
 
 
