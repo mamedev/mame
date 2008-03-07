@@ -130,10 +130,7 @@ WRITE8_HANDLER( kncljoe_videoram_w )
 WRITE8_HANDLER( kncljoe_control_w )
 {
 	int i;
-
-	switch(offset)
-	{
-		/*
+	/*
             0x01    screen flip
             0x02    coin counter#1
             0x04    sprite bank
@@ -142,34 +139,25 @@ WRITE8_HANDLER( kncljoe_control_w )
 
             reset when IN0 - Coin 1 goes low (active)
             set after IN0 - Coin 1 goes high AND the credit has been added
-        */
-		case 0:
-			flipscreen = data & 0x01;
-			tilemap_set_flip(ALL_TILEMAPS,flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+   */
+	flipscreen = data & 0x01;
+	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? TILEMAP_FLIPX : TILEMAP_FLIPY);
 
-			coin_counter_w(0,data & 0x02);
-			coin_counter_w(1,data & 0x20);
+	coin_counter_w(0,data & 0x02);
+	coin_counter_w(1,data & 0x20);
 
-			i = (data & 0x10) >> 4;
-			if (tile_bank != i)
-			{
-				tile_bank = i;
-				tilemap_mark_all_tiles_dirty(bg_tilemap);
-			}
+	i = (data & 0x10) >> 4;
+	if (tile_bank != i)
+	{
+		tile_bank = i;
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
+	}
 
-			i = (data & 0x04) >> 2;
-			if (sprite_bank != i)
-			{
-				sprite_bank = i;
-				memset(memory_region(REGION_CPU1)+0xf100, 0, 0x180);
-			}
-		break;
-		case 1:
-			// ???
-		break;
-		case 2:
-			// ???
-		break;
+	i = (data & 0x04) >> 2;
+	if (sprite_bank != i)
+	{
+		sprite_bank = i;
+		memset(memory_region(REGION_CPU1)+0xf100, 0, 0x180);
 	}
 }
 

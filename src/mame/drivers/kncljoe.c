@@ -6,14 +6,17 @@ driver by Ernesto Corvi
 
 Notes:
 This board seems to be an Irem design.
-The sound hardware is definitely the 6803-based one used by the classic Irem
-games, and the video hardware is pretty much like Irem games too. The only
+The sound hardware is modified the 6803-based one used by the classic Irem
+games. There's only one AY 3-8910 chip and no MSM5205. There are also two 
+SN76489 controlled directly by main(!) cpu, and used only for in-game music.
+The video hardware is pretty much like Irem games too. The only
 strange thing is that the screen is flipped vertically.
 
 TODO:
 - sprite vs. sprite priority especially on ground level
 
 Updates:
+- proper sound hw emulation(TS 070308)
 - you can't play anymore after you die(clock speed too low, check XTAL)
 - scrolling in bike levels(scroll register overflow)
 - sprites disappearing at left screen edge(bad clipping)
@@ -23,8 +26,10 @@ Updates:
 ***************************************************************************/
 
 #include "driver.h"
-#include "audio/irem.h"
+#include "deprecat.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/ay8910.h"
+#include "sound/sn76496.h"
 
 
 /* from video */
@@ -36,6 +41,17 @@ extern WRITE8_HANDLER(kncljoe_control_w);
 extern WRITE8_HANDLER(kncljoe_scroll_w);
 extern UINT8 *kncljoe_scrollregs;
 
+static UINT8 port1, port2;
+
+
+WRITE8_HANDLER( sound_cmd_w )
+{
+	if ((data & 0x80) == 0)
+		soundlatch_w(machine, 0, data & 0x7f);
+	else
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+}
+
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -46,13 +62,76 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd802, 0xd802) AM_READ(input_port_2_r) /* IN 2 */
 	AM_RANGE(0xd803, 0xd803) AM_READ(input_port_3_r)	/* DSW A */
 	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)	/* DSW B */
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd801, 0xd803) AM_WRITE(kncljoe_control_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
+	AM_RANGE(0xd802, 0xd802) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0xd803, 0xd803) AM_WRITE(SN76496_1_w)
 	AM_RANGE(0xd807, 0xd807) AM_READ(MRA8_NOP)		/* unknown read */
 	AM_RANGE(0xd817, 0xd817) AM_READ(MRA8_NOP)		/* unknown read */
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
+static WRITE8_HANDLER( m6803_port1_w )
+{
+	port1 = data;
+}
+
+static WRITE8_HANDLER( m6803_port2_w )
+{
+
+	/* write latch */
+	if ((port2 & 0x01) && !(data & 0x01))
+	{
+		/* control or data port? */
+		if (port2 & 0x04)
+		{
+			if (port2 & 0x08)
+				AY8910_control_port_0_w(machine, 0, port1);
+		}
+		else
+		{
+			if (port2 & 0x08)
+				AY8910_write_port_0_w(machine, 0, port1);
+		}
+	}
+	port2 = data;
+}
+
+static READ8_HANDLER( m6803_port1_r )
+{
+	if (port2 & 0x08)
+		return AY8910_read_port_0_r(machine, 0);
+	return 0xff;
+}
+
+static READ8_HANDLER( m6803_port2_r )
+{
+	return 0;
+}
+
+static WRITE8_HANDLER( sound_irq_ack_w )
+{
+	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+}
+
+static WRITE8_HANDLER(unused_w)
+{
+	//unused - no MSM on the pcb
+}
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	AM_RANGE(0x0000, 0x0fff) AM_WRITENOP
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
+	AM_RANGE(0x2000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
+ADDRESS_MAP_END
+
 
 /******************************************************************************/
 
@@ -136,7 +215,6 @@ static INPUT_PORTS_START( kncljoe )
 INPUT_PORTS_END
 
 
-
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -167,15 +245,32 @@ static GFXDECODE_START( kncljoe )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout, 0x80, 16 )
 GFXDECODE_END
 
+static const struct AY8910interface ay8910_interface =
+{
+	soundlatch_r,
+	0,
+	0,
+	unused_w
+};
 
+INTERRUPT_GEN (sound_nmi)
+{
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_DRIVER_START( kncljoe )
 
 	/* basic machine hardware */
-//  MDRV_CPU_ADD(Z80, 4000000) /* 4 MHz */
-	MDRV_CPU_ADD(Z80, 5500000) /* 4 MHz is too low. The game loop never finishes a frame in time. */
+
+	MDRV_CPU_ADD(Z80, XTAL_6MHz)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	
+	MDRV_CPU_ADD_TAG("sound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
+	MDRV_CPU_PERIODIC_INT(sound_nmi, (double)3970) //measured 3.970 kHz
+
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -195,7 +290,17 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_VIDEO_UPDATE(kncljoe)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_small_audio)
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	
+	MDRV_SOUND_ADD(SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+
+	MDRV_SOUND_ADD(SN76489, XTAL_3_579545MHz) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 
