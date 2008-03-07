@@ -785,7 +785,7 @@ int cpu_getiloops(void)
     for this screen
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, const device_config *device, int vblank_state)
+static void on_vblank(const device_config *device, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state)
@@ -796,7 +796,7 @@ static void on_vblank(running_machine *machine, const device_config *device, int
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		{
 			int cpu_interested;
-			const cpu_config *config = machine->config->cpu + cpunum;
+			const cpu_config *config = device->machine->config->cpu + cpunum;
 
 			/* start the interrupt counter */
 			if (!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
@@ -822,7 +822,7 @@ static void on_vblank(running_machine *machine, const device_config *device, int
 				if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 				{
 					cpuintrf_push_context(cpunum);
-					(*machine->config->cpu[cpunum].vblank_interrupt)(machine, cpunum);
+					(*device->machine->config->cpu[cpunum].vblank_interrupt)(device->machine, cpunum);
 					cpuintrf_pop_context();
 				}
 

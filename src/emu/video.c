@@ -190,21 +190,21 @@ static TIMER_CALLBACK( scanline_update_callback );
 static int finish_screen_updates(running_machine *machine);
 
 /* throttling/frameskipping/performance */
-static void update_throttle(attotime emutime);
-static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks);
+static void update_throttle(running_machine *machine, attotime emutime);
+static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t target_ticks);
 static void update_frameskip(void);
-static void recompute_speed(attotime emutime);
+static void recompute_speed(running_machine *machine, attotime emutime);
 
 /* screen snapshots */
 static bitmap_t *get_snapshot_bitmap(running_machine *machine, int scrnum);
-static file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file);
+static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file);
 
 /* movie recording */
 static void movie_record_frame(running_machine *machine, int scrnum);
 
 /* crosshair rendering */
-static void crosshair_init(video_private *viddata);
-static void crosshair_render(video_private *viddata);
+static void crosshair_init(running_machine *machine, video_private *viddata);
+static void crosshair_render(running_machine *machine, video_private *viddata);
 static void crosshair_free(video_private *viddata);
 
 /* software rendering */
@@ -389,7 +389,7 @@ void video_init(running_machine *machine)
 	}
 
 	/* create crosshairs */
-	crosshair_init(viddata);
+	crosshair_init(machine, viddata);
 
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
@@ -1216,7 +1216,7 @@ DEVICE_GET_INFO( video_screen )
     callsbacks with the given state
 -------------------------------------------------*/
 
-static void call_vb_callbacks(running_machine *machine, internal_screen_info *scrinfo, int vblank_state)
+static void call_vb_callbacks(internal_screen_info *scrinfo, int vblank_state)
 {
 	int i;
 
@@ -1224,7 +1224,7 @@ static void call_vb_callbacks(running_machine *machine, internal_screen_info *sc
 	scrinfo->vblank_state = vblank_state;
 
 	for (i = 0; i < scrinfo->vbl_cb_count; i++)
-		scrinfo->vbl_cbs[i](machine, scrinfo->device, vblank_state);
+		scrinfo->vbl_cbs[i](scrinfo->device, vblank_state);
 }
 
 
@@ -1242,7 +1242,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	scrinfo->vblank_time = timer_get_time();
 
 	/* call the external callbacks */
-	call_vb_callbacks(machine, scrinfo, TRUE);
+	call_vb_callbacks(scrinfo, TRUE);
 
 	/* do we update the screen now? - only do it for the first screen */
 	if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (scrinfo->scrnum == 0))
@@ -1275,7 +1275,7 @@ static TIMER_CALLBACK( vblank_end_callback )
 		video_frame_update(machine, FALSE);
 
 	/* let any external parties know that the VBLANK is over */
-	call_vb_callbacks(machine, scrinfo, FALSE);
+	call_vb_callbacks(scrinfo, FALSE);
 
 	/* increment the frame number counter */
 	scrinfo->frame_number++;
@@ -1332,12 +1332,12 @@ void video_frame_update(running_machine *machine, int debug)
 {
 	attotime current_time = timer_get_time();
 	int skipped_it = global.skipping_this_frame;
-	int phase = mame_get_phase(Machine);
+	int phase = mame_get_phase(machine);
 
 	/* only render sound and video if we're in the running phase */
-	if (phase == MAME_PHASE_RUNNING && (!mame_is_paused(Machine) || global.update_in_pause))
+	if (phase == MAME_PHASE_RUNNING && (!mame_is_paused(machine) || global.update_in_pause))
 	{
-		int anything_changed = finish_screen_updates(Machine);
+		int anything_changed = finish_screen_updates(machine);
 
 		/* if none of the screens changed and we haven't skipped too many frames in a row,
            mark this frame as skipped to prevent throttling; this helps for games that
@@ -1353,7 +1353,7 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* if we're throttling, synchronize before rendering */
 	if (!debug && !skipped_it && effective_throttle())
-		update_throttle(current_time);
+		update_throttle(machine, current_time);
 
 	/* ask the OSD to update */
 	profiler_mark(PROFILER_BLIT);
@@ -1362,7 +1362,7 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* perform tasks for this frame */
 	if (!debug)
-		mame_frame_update(Machine);
+		mame_frame_update(machine);
 
 	/* update frameskipping */
 	if (!debug)
@@ -1370,20 +1370,20 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* update speed computations */
 	if (!debug && !skipped_it)
-		recompute_speed(current_time);
+		recompute_speed(machine, current_time);
 
 	/* call the end-of-frame callback */
 	if (phase == MAME_PHASE_RUNNING)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
-		if (video_screen_exists(0) && (mame_is_paused(Machine) || debug || mame_debug_is_active()))
-			scanline0_callback(Machine, NULL, 0);
+		if (video_screen_exists(0) && (mame_is_paused(machine) || debug || mame_debug_is_active()))
+			scanline0_callback(machine, NULL, 0);
 
 		/* otherwise, call the video EOF callback */
-		else if (Machine->config->video_eof != NULL)
+		else if (machine->config->video_eof != NULL)
 		{
 			profiler_mark(PROFILER_VIDEO);
-			(*Machine->config->video_eof)(Machine);
+			(*machine->config->video_eof)(machine);
 			profiler_mark(PROFILER_END);
 		}
 	}
@@ -1419,7 +1419,7 @@ static int finish_screen_updates(running_machine *machine)
 		/* only update if live */
 		if (livemask & (1 << scrnum))
 		{
-			const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
+			const screen_config *scrconfig = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
 
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
 			if (scrconfig->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
@@ -1453,7 +1453,7 @@ static int finish_screen_updates(running_machine *machine)
 	}
 
 	/* draw any crosshairs */
-	crosshair_render(viddata);
+	crosshair_render(machine, viddata);
 	return anything_changed;
 }
 
@@ -1625,7 +1625,7 @@ void video_set_fastforward(int _fastforward)
     natural speed
 -------------------------------------------------*/
 
-static void update_throttle(attotime emutime)
+static void update_throttle(running_machine *machine, attotime emutime)
 {
 /*
 
@@ -1695,7 +1695,7 @@ static void update_throttle(attotime emutime)
        and explicitly reset our tracked real and emulated timers to that value ...
        this means we pretend that the last update was exactly 1/60th of a second
        ago, and was in sync in both real and emulated time */
-	if (mame_is_paused(Machine))
+	if (mame_is_paused(machine))
 	{
 		global.throttle_emutime = attotime_sub_attoseconds(emutime, ATTOSECONDS_PER_SECOND / PAUSED_REFRESH_RATE);
 		global.throttle_realtime = global.throttle_emutime;
@@ -1762,7 +1762,7 @@ static void update_throttle(attotime emutime)
 	target_ticks = global.throttle_last_ticks + real_is_ahead_attoseconds / attoseconds_per_tick;
 
 	/* throttle until we read the target, and update real time to match the final time */
-	diff_ticks = throttle_until_ticks(target_ticks) - global.throttle_last_ticks;
+	diff_ticks = throttle_until_ticks(machine, target_ticks) - global.throttle_last_ticks;
 	global.throttle_last_ticks += diff_ticks;
 	global.throttle_realtime = attotime_add_attoseconds(global.throttle_realtime, diff_ticks * attoseconds_per_tick);
 	return;
@@ -1779,7 +1779,7 @@ resync:
     to sleep if possible
 -------------------------------------------------*/
 
-static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks)
+static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t target_ticks)
 {
 	osd_ticks_t minimum_sleep = osd_ticks_per_second() / 1000;
 	osd_ticks_t current_ticks = osd_ticks();
@@ -1788,7 +1788,7 @@ static osd_ticks_t throttle_until_ticks(osd_ticks_t target_ticks)
 
 	/* we're allowed to sleep via the OSD code only if we're configured to do so
        and we're not frameskipping due to autoframeskip, or if we're paused */
-	allowed_to_sleep = mame_is_paused(Machine) ||
+	allowed_to_sleep = mame_is_paused(machine) ||
 		(global.sleep && (!effective_autoframeskip() || effective_frameskip() == 0));
 
 	/* loop until we reach our target */
@@ -1893,12 +1893,12 @@ static void update_frameskip(void)
     if we did not skip a frame
 -------------------------------------------------*/
 
-static void recompute_speed(attotime emutime)
+static void recompute_speed(running_machine *machine, attotime emutime)
 {
 	attoseconds_t delta_emutime;
 
 	/* if we don't have a starting time yet, or if we're paused, reset our starting point */
-	if (global.speed_last_realtime == 0 || mame_is_paused(Machine))
+	if (global.speed_last_realtime == 0 || mame_is_paused(machine))
 	{
 		global.speed_last_realtime = osd_ticks();
 		global.speed_last_emutime = emutime;
@@ -1941,7 +1941,7 @@ static void recompute_speed(attotime emutime)
 	/* if we're past the "time-to-execute" requested, signal an exit */
 	if (global.seconds_to_run != 0 && emutime.seconds >= global.seconds_to_run)
 	{
-		astring *fname = astring_assemble_2(astring_alloc(), Machine->basename, PATH_SEPARATOR "final.png");
+		astring *fname = astring_assemble_2(astring_alloc(), machine->basename, PATH_SEPARATOR "final.png");
 		file_error filerr;
 		mame_file *file;
 
@@ -1949,13 +1949,13 @@ static void recompute_speed(attotime emutime)
 		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
 		{
-			video_screen_save_snapshot(Machine, file, 0);
+			video_screen_save_snapshot(machine, file, 0);
 			mame_fclose(file);
 		}
 		astring_free(fname);
 
 		/* schedule our demise */
-		mame_schedule_exit(Machine);
+		mame_schedule_exit(machine);
 	}
 }
 
@@ -2012,7 +2012,7 @@ void video_save_active_screen_snapshots(running_machine *machine)
 	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
 		if (screenmask & (1 << scrnum))
 		{
-			file_error filerr = mame_fopen_next(SEARCHPATH_SCREENSHOT, "png", &fp);
+			file_error filerr = mame_fopen_next(machine, SEARCHPATH_SCREENSHOT, "png", &fp);
 			if (filerr == FILERR_NONE)
 			{
 				video_screen_save_snapshot(machine, fp, scrnum);
@@ -2073,19 +2073,19 @@ static bitmap_t *get_snapshot_bitmap(running_machine *machine, int scrnum)
     numbering scheme
 -------------------------------------------------*/
 
-static file_error mame_fopen_next(const char *pathoption, const char *extension, mame_file **file)
+static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file)
 {
 	file_error filerr;
 	char *fname;
 	int seq;
 
 	/* allocate temp space for the name */
-	fname = malloc_or_die(strlen(Machine->basename) + 1 + 10 + strlen(extension) + 1);
+	fname = malloc_or_die(strlen(machine->basename) + 1 + 10 + strlen(extension) + 1);
 
 	/* try until we succeed */
 	for (seq = 0; ; seq++)
 	{
-		sprintf(fname, "%s" PATH_SEPARATOR "%04d.%s", Machine->basename, seq, extension);
+		sprintf(fname, "%s" PATH_SEPARATOR "%04d.%s", machine->basename, seq, extension);
 		filerr = mame_fopen(pathoption, fname, OPEN_FLAG_READ, file);
 		if (filerr != FILERR_NONE)
 			break;
@@ -2138,7 +2138,7 @@ void video_movie_begin_recording(running_machine *machine, int scrnum, const cha
 	if (name != NULL)
 		filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &info->movie_file);
 	else
-		filerr = mame_fopen_next(SEARCHPATH_MOVIE, "mng", &info->movie_file);
+		filerr = mame_fopen_next(machine, SEARCHPATH_MOVIE, "mng", &info->movie_file);
 	info->movie_frame = 0;
 }
 
@@ -2307,14 +2307,14 @@ static const rgb_t crosshair_colors[] =
     bitmaps and such
 -------------------------------------------------*/
 
-static void crosshair_init(video_private *viddata)
+static void crosshair_init(running_machine *machine, video_private *viddata)
 {
 	input_port_entry *ipt;
 	int player;
 
 	/* determine who needs crosshairs */
 	viddata->crosshair_needed = 0x00;
-	for (ipt = Machine->input_ports; ipt->type != IPT_END; ipt++)
+	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
 		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
 			viddata->crosshair_needed |= 1 << ipt->player;
 
@@ -2403,7 +2403,7 @@ static UINT32 get_crosshair_screen_mask(video_private *viddata, int player)
     crosshair_render - render the crosshairs
 -------------------------------------------------*/
 
-static void crosshair_render(video_private *viddata)
+static void crosshair_render(running_machine *machine, video_private *viddata)
 {
 	float x[MAX_PLAYERS], y[MAX_PLAYERS];
 	input_port_entry *ipt;
@@ -2425,7 +2425,7 @@ static void crosshair_render(video_private *viddata)
 		tscale = 0xa0 + (0x60 * (~viddata->crosshair_animate & 0x7f) / 0x80);
 
 	/* read all the lightgun values */
-	for (ipt = Machine->input_ports; ipt->type != IPT_END; ipt++)
+	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
 	{
 		/* keep track of the port number */
 		if (ipt->type == IPT_PORT)
