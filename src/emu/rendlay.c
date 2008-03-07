@@ -1361,8 +1361,8 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			num = scrconfig->defstate.visarea.max_x + 1 - scrconfig->defstate.visarea.min_x;
-			den = scrconfig->defstate.visarea.max_y + 1 - scrconfig->defstate.visarea.min_y;
+			num = scrconfig->visarea.max_x + 1 - scrconfig->visarea.min_x;
+			den = scrconfig->visarea.max_y + 1 - scrconfig->visarea.min_y;
 			reduce_fraction(&num, &den);
 			*outputptr += sprintf(*outputptr, "%d", num);
 			return strlen(temp);
@@ -1372,8 +1372,8 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dnativeyaspect~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			num = scrconfig->defstate.visarea.max_x + 1 - scrconfig->defstate.visarea.min_x;
-			den = scrconfig->defstate.visarea.max_y + 1 - scrconfig->defstate.visarea.min_y;
+			num = scrconfig->visarea.max_x + 1 - scrconfig->visarea.min_x;
+			den = scrconfig->visarea.max_y + 1 - scrconfig->visarea.min_y;
 			reduce_fraction(&num, &den);
 			*outputptr += sprintf(*outputptr, "%d", den);
 			return strlen(temp);
@@ -1383,7 +1383,7 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dwidth~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", scrconfig->defstate.visarea.max_x + 1 - scrconfig->defstate.visarea.min_x);
+			*outputptr += sprintf(*outputptr, "%d", scrconfig->visarea.max_x + 1 - scrconfig->visarea.min_x);
 			return strlen(temp);
 		}
 
@@ -1391,7 +1391,7 @@ static int get_variable_value(const char *string, char **outputptr)
 		sprintf(temp, "~scr%dheight~", scrnum);
 		if (!strncmp(string, temp, strlen(temp)))
 		{
-			*outputptr += sprintf(*outputptr, "%d", scrconfig->defstate.visarea.max_y + 1 - scrconfig->defstate.visarea.min_y);
+			*outputptr += sprintf(*outputptr, "%d", scrconfig->visarea.max_y + 1 - scrconfig->visarea.min_y);
 			return strlen(temp);
 		}
 	}

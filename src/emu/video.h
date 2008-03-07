@@ -64,12 +64,10 @@ enum
 typedef struct _screen_state screen_state;
 struct _screen_state
 {
-	int				width, height;				/* total width/height (HTOTAL, VTOTAL) */
-	rectangle		visarea;					/* visible area (HBLANK end/start, VBLANK end/start) */
-	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
-	attoseconds_t	refresh;					/* refresh period */
-	attoseconds_t	vblank;						/* duration of a VBLANK */
-	bitmap_format	format;						/* bitmap format */
+	int				width, height;				/* current total width/height (HTOTAL, VTOTAL) */
+	rectangle		visarea;					/* current visible area (HBLANK end/start, VBLANK end/start) */
+	attoseconds_t	refresh;					/* current refresh period */
+	bitmap_format	format;						/* bitmap format (a copy of screen_config) */
 	void *			private_data;				/* pointer to the private data structure */
 };
 
@@ -83,7 +81,12 @@ typedef struct _screen_config screen_config;
 struct _screen_config
 {
 	int				type;						/* type of screen */
-	screen_state	defstate;					/* default state */
+	int				width, height;				/* default total width/height (HTOTAL, VTOTAL) */
+	rectangle		visarea;					/* default visible area (HBLANK end/start, VBLANK end/start) */
+	UINT8			oldstyle_vblank_supplied;	/* MDRV_SCREEN_VBLANK_TIME macro used */
+	attoseconds_t	refresh;					/* default refresh period */
+	attoseconds_t	vblank;						/* duration of a VBLANK */
+	bitmap_format	format;						/* bitmap format */
 	float			xoffset, yoffset;			/* default X/Y offsets */
 	float			xscale, yscale;				/* default X/Y scale factor */
 };

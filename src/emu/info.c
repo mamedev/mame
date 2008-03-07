@@ -730,30 +730,29 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 		/* output width and height only for games that are not vector */
 		if (scrconfig->type != SCREEN_TYPE_VECTOR)
 		{
-			int dx = scrconfig->defstate.visarea.max_x - scrconfig->defstate.visarea.min_x + 1;
-			int dy = scrconfig->defstate.visarea.max_y - scrconfig->defstate.visarea.min_y + 1;
+			int dx = scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1;
+			int dy = scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1;
 
 			fprintf(out, " width=\"%d\"", dx);
 			fprintf(out, " height=\"%d\"", dy);
 		}
 
 		/* output refresh rate */
-		fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh));
+		fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(scrconfig->refresh));
 
 		/* output raw video parameters only for games that are not vector */
 		/* and had raw parameters specified                               */
-		if ((scrconfig->type != SCREEN_TYPE_VECTOR) && !scrconfig->defstate.oldstyle_vblank_supplied)
+		if ((scrconfig->type != SCREEN_TYPE_VECTOR) && !scrconfig->oldstyle_vblank_supplied)
 		{
-			int pixclock = scrconfig->defstate.width * scrconfig->defstate.height
-			  				* ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh);
+			int pixclock = scrconfig->width * scrconfig->height * ATTOSECONDS_TO_HZ(scrconfig->refresh);
 
 			fprintf(out, " pixclock=\"%d\"", pixclock);
-			fprintf(out, " htotal=\"%d\"", scrconfig->defstate.width);
-			fprintf(out, " hbend=\"%d\"", scrconfig->defstate.visarea.min_x);
-			fprintf(out, " hbstart=\"%d\"", scrconfig->defstate.visarea.max_x+1);
-			fprintf(out, " vtotal=\"%d\"", scrconfig->defstate.height);
-			fprintf(out, " vbend=\"%d\"", scrconfig->defstate.visarea.min_y);
-			fprintf(out, " vbstart=\"%d\"", scrconfig->defstate.visarea.max_y+1);
+			fprintf(out, " htotal=\"%d\"", scrconfig->width);
+			fprintf(out, " hbend=\"%d\"", scrconfig->visarea.min_x);
+			fprintf(out, " hbstart=\"%d\"", scrconfig->visarea.max_x+1);
+			fprintf(out, " vtotal=\"%d\"", scrconfig->height);
+			fprintf(out, " vbend=\"%d\"", scrconfig->visarea.min_y);
+			fprintf(out, " vbstart=\"%d\"", scrconfig->visarea.max_y+1);
 		}
 		fprintf(out, " />\n");
 	}

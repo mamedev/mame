@@ -1736,7 +1736,7 @@ static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buff
 static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
 	const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, arg)->inline_config;
-	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->defstate.refresh);
+	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->refresh);
 	double refresh;
 
 	if (buffer != NULL)

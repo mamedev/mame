@@ -2904,11 +2904,7 @@ profiler_mark(PROFILER_INPUT);
 		portinfo->vblank = 0;
 		for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->port; bitnum++, info++)
 			if (info->port->type == IPT_VBLANK)
-			{
 				portinfo->vblank ^= info->port->mask;
-				if (machine->screen[0].vblank == 0)
-					logerror("Warning: you are using IPT_VBLANK with vblank_time = 0. You need to increase vblank_time for IPT_VBLANK to work.\n");
-			}
 
 		/* now loop back and modify based on the inputs */
 		portinfo->digital = 0;

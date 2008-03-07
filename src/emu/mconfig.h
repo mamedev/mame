@@ -378,37 +378,37 @@ union _machine_config_token
 	MDRV_DEVICE_MODIFY(_tag, VIDEO_SCREEN)
 
 #define MDRV_SCREEN_FORMAT(_format) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.format, _format)
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, format, _format)
 
 #define MDRV_SCREEN_TYPE(_type) \
 	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
 
 #define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.width, _htotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.height, _vtotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_x, _hbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_x, (_hbstart) - 1) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_y, _vbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_y, (_vbstart) - 1)
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _htotal)	\
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _vtotal)	\
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _hbend) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, (_hbstart) - 1) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _vbend) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, (_vbstart) - 1)
 
 #define MDRV_SCREEN_REFRESH_RATE(_rate) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.refresh, HZ_TO_ATTOSECONDS(_rate))
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_rate))
 
 #define MDRV_SCREEN_VBLANK_TIME(_time) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, defstate.vblank, _time) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.oldstyle_vblank_supplied, TRUE)
+	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, _time) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, oldstyle_vblank_supplied, TRUE)
 
 #define MDRV_SCREEN_SIZE(_width, _height) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.width, _width) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.height, _height)
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _width) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _height)
 
 #define MDRV_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_x, _minx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_x, _maxx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.min_y, _miny) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, defstate.visarea.max_y, _maxy)
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _minx) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, _maxx) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _miny) \
+	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, _maxy)
 
 #define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
 	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xoffset, _xoffs, 24) \

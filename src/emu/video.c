@@ -57,15 +57,16 @@ struct _internal_screen_state
 	bitmap_t *				bitmap[2];				/* 2x bitmaps for rendering */
 	UINT8					curbitmap;				/* current bitmap index */
 	UINT8					curtexture;				/* current texture index */
-	bitmap_format			format;					/* format of bitmap for this screen */
+	bitmap_format			texture_format;			/* texture format of bitmap for this screen */
 	UINT8					changed;				/* has this bitmap changed? */
 	INT32					last_partial_scan;		/* scanline of last partial update */
-	UINT8					vblank_state;			/* 1 = in VBLANK region, 0 = outside */
 
 	/* screen timing */
 	attoseconds_t			scantime;				/* attoseconds per scanline */
 	attoseconds_t			pixeltime;				/* attoseconds per pixel */
+	attoseconds_t 			vblank_period;			/* attoseconds per VBLANK period */
 	attotime 				vblank_time;			/* time of last VBLANK start */
+	UINT8					vblank_state;			/* 1 = in VBLANK region, 0 = outside */
 	emu_timer *				vblank_begin_timer;		/* timer to signal VBLANK start */
 	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
 	emu_timer *				scanline0_timer;		/* scanline 0 timer */
@@ -312,17 +313,20 @@ void video_init(running_machine *machine)
 	/* request a callback upon exiting */
 	add_exit_callback(machine, video_exit);
 
-	/* configure all of the screens */
 	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
+		char unique_tag[40];
+
 		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+
 		render_container *container = render_container_get_screen(scrnum);
 		screen_config *config = device->inline_config;
 		screen_state *state = &machine->screen[scrnum];
 
-		/* allocate the private state */
+		/* allocate the private state and hook it up to the public structure */
 		internal_screen_state *internal_state = auto_malloc(sizeof(*internal_state));
 		memset(internal_state, 0, sizeof(*internal_state));
+		state->private_data = internal_state;
 
 		/* allocate the VBLANK timers */
 		internal_state->vblank_begin_timer = timer_alloc(vblank_begin_callback, state);
@@ -335,11 +339,9 @@ void video_init(running_machine *machine)
 		internal_state->scrnum = scrnum;
 		internal_state->device = device;
 
-		/* hook up our private state structure */
-		state->private_data = internal_state;
-
 		/* configure the screen with the default parameters */
-		video_screen_configure(scrnum, state->width, state->height, &state->visarea, state->refresh);
+		state->format = config->format;
+		video_screen_configure(scrnum, config->width, config->height, &config->visarea, config->refresh);
 
 		/* configure the default cliparea */
 		if (config->xoffset != 0)
@@ -362,9 +364,12 @@ void video_init(running_machine *machine)
 		}
 
 		/* register for save states */
-		state_save_register_item("video", scrnum, internal_state->vblank_time.seconds);
-		state_save_register_item("video", scrnum, internal_state->vblank_time.attoseconds);
-		state_save_register_item("video", scrnum, internal_state->frame_number);
+		assert(strlen(device->tag) < 30);
+		state_save_combine_module_and_tag(unique_tag, "video_screen", device->tag);
+
+		state_save_register_item(unique_tag, 0, internal_state->vblank_time.seconds);
+		state_save_register_item(unique_tag, 0, internal_state->vblank_time.attoseconds);
+		state_save_register_item(unique_tag, 0, internal_state->frame_number);
 	}
 
 	/* create spriteram buffers if necessary */
@@ -717,13 +722,12 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 			curwidth = MAX(width, curwidth);
 			curheight = MAX(height, curheight);
 
-			/* choose the texture format */
-			/* convert the screen format to a texture format */
+			/* choose the texture format - convert the screen format to a texture format */
 			switch (screen_format)
 			{
-				case BITMAP_FORMAT_INDEXED16:	internal_state->format = TEXFORMAT_PALETTE16;		break;
-				case BITMAP_FORMAT_RGB15:		internal_state->format = TEXFORMAT_RGB15;			break;
-				case BITMAP_FORMAT_RGB32:		internal_state->format = TEXFORMAT_RGB32;			break;
+				case BITMAP_FORMAT_INDEXED16:	internal_state->texture_format = TEXFORMAT_PALETTE16;		break;
+				case BITMAP_FORMAT_RGB15:		internal_state->texture_format = TEXFORMAT_RGB15;			break;
+				case BITMAP_FORMAT_RGB32:		internal_state->texture_format = TEXFORMAT_RGB32;			break;
 				default:						fatalerror("Invalid bitmap format!");	break;
 			}
 
@@ -735,9 +739,9 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 
 			/* allocate textures */
 			internal_state->texture[0] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(internal_state->texture[0], internal_state->bitmap[0], visarea, 0, internal_state->format);
+			render_texture_set_bitmap(internal_state->texture[0], internal_state->bitmap[0], visarea, 0, internal_state->texture_format);
 			internal_state->texture[1] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(internal_state->texture[1], internal_state->bitmap[1], visarea, 0, internal_state->format);
+			render_texture_set_bitmap(internal_state->texture[1], internal_state->bitmap[1], visarea, 0, internal_state->texture_format);
 		}
 	}
 
@@ -750,6 +754,13 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 	/* compute timing parameters */
 	internal_state->scantime = refresh / height;
 	internal_state->pixeltime = refresh / (height * width);
+
+	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
+       from the visible area, otherwise just used the supplied value */
+	if ((scrconfig->vblank == 0) && !scrconfig->oldstyle_vblank_supplied)
+		internal_state->vblank_period = (state->refresh / state->height) * (state->height - (state->visarea.max_y + 1 - state->visarea.min_y));
+	else
+		internal_state->vblank_period = scrconfig->vblank;
 
 	/* adjust speed if necessary */
 	if (global.refresh_speed)
@@ -1239,7 +1250,6 @@ DEVICE_GET_INFO( video_screen )
 static TIMER_CALLBACK( vblank_begin_callback )
 {
 	int i;
-	attoseconds_t vblank_period;
 	screen_state *state = ptr;
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
@@ -1262,16 +1272,9 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (internal_state->scrnum == 0))
 		video_frame_update(machine, FALSE);
 
-	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
-       from the visible area, otherwise just used the supplied value */
-	if ((state->vblank == 0) && !state->oldstyle_vblank_supplied)
-		vblank_period = (state->refresh / state->height) * (state->height - (state->visarea.max_y + 1 - state->visarea.min_y));
-	else
-		vblank_period = state->vblank;
-
 	/* reset the timers */
 	timer_adjust_oneshot(internal_state->vblank_begin_timer, attotime_make(0, state->refresh), 0);
-	timer_adjust_oneshot(internal_state->vblank_end_timer, attotime_make(0, vblank_period), 0);
+	timer_adjust_oneshot(internal_state->vblank_end_timer, attotime_make(0, internal_state->vblank_period), 0);
 }
 
 
@@ -1453,7 +1456,7 @@ static int finish_screen_updates(running_machine *machine)
 					rectangle fixedvis = machine->screen[scrnum].visarea;
 					fixedvis.max_x++;
 					fixedvis.max_y++;
-					render_texture_set_bitmap(internal_state->texture[internal_state->curbitmap], bitmap, &fixedvis, 0, internal_state->format);
+					render_texture_set_bitmap(internal_state->texture[internal_state->curbitmap], bitmap, &fixedvis, 0, internal_state->texture_format);
 					internal_state->curtexture = internal_state->curbitmap;
 					internal_state->curbitmap = 1 - internal_state->curbitmap;
 				}

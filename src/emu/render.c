@@ -1379,7 +1379,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				else if (Machine->screen[item->index].visarea.max_x > Machine->screen[item->index].visarea.min_x)
 					visarea = &Machine->screen[item->index].visarea;
 				else
-					visarea = &scrconfig->defstate.visarea;
+					visarea = &scrconfig->visarea;
 
 				/* apply target orientation to the bounds */
 				bounds = item->bounds;

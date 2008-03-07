@@ -1451,18 +1451,10 @@ error:
 
 static void prepare_machine(running_machine *machine)
 {
-	const device_config *device;
-
 	/* reset most portions of the machine */
 
-	/* video-related information */
+	/* graphics layout */
 	memset(machine->gfx, 0, sizeof(machine->gfx));
-	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
-	{
-		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
-		const screen_config *scrconfig = device->inline_config;
-		machine->screen[scrnum] = scrconfig->defstate;
-	}
 
 	/* palette-related information */
 	machine->pens = NULL;

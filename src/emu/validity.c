@@ -830,7 +830,7 @@ static int validate_display(int drivnum, const machine_config *config)
 		const screen_config *scrconfig = device->inline_config;
 
 		/* sanity check dimensions */
-		if ((scrconfig->defstate.width <= 0) || (scrconfig->defstate.height <= 0))
+		if ((scrconfig->width <= 0) || (scrconfig->height <= 0))
 		{
 			mame_printf_error("%s: %s screen \"%s\" has invalid display dimensions\n", driver->source_file, driver->name, device->tag);
 			error = TRUE;
@@ -839,29 +839,29 @@ static int validate_display(int drivnum, const machine_config *config)
 		/* sanity check display area */
 		if (scrconfig->type != SCREEN_TYPE_VECTOR)
 		{
-			if ((scrconfig->defstate.visarea.max_x < scrconfig->defstate.visarea.min_x)
-				|| (scrconfig->defstate.visarea.max_y < scrconfig->defstate.visarea.min_y)
-				|| (scrconfig->defstate.visarea.max_x >= scrconfig->defstate.width)
-				|| (scrconfig->defstate.visarea.max_y >= scrconfig->defstate.height))
+			if ((scrconfig->visarea.max_x < scrconfig->visarea.min_x) ||
+				(scrconfig->visarea.max_y < scrconfig->visarea.min_y) ||
+				(scrconfig->visarea.max_x >= scrconfig->width) ||
+				(scrconfig->visarea.max_y >= scrconfig->height))
 			{
 				mame_printf_error("%s: %s screen \"%s\" has an invalid display area\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
 
 			/* sanity check screen formats */
-			if (scrconfig->defstate.format != BITMAP_FORMAT_INDEXED16 &&
-				scrconfig->defstate.format != BITMAP_FORMAT_RGB15 &&
-				scrconfig->defstate.format != BITMAP_FORMAT_RGB32)
+			if (scrconfig->format != BITMAP_FORMAT_INDEXED16 &&
+				scrconfig->format != BITMAP_FORMAT_RGB15 &&
+				scrconfig->format != BITMAP_FORMAT_RGB32)
 			{
 				mame_printf_error("%s: %s screen \"%s\" has unsupported format\n", driver->source_file, driver->name, device->tag);
 				error = TRUE;
 			}
-			if (scrconfig->defstate.format == BITMAP_FORMAT_INDEXED16)
+			if (scrconfig->format == BITMAP_FORMAT_INDEXED16)
 				palette_modes = TRUE;
 		}
 
 		/* check for zero frame rate */
-		if (scrconfig->defstate.refresh == 0)
+		if (scrconfig->refresh == 0)
 		{
 			mame_printf_error("%s: %s screen \"%s\" has a zero refresh rate\n", driver->source_file, driver->name, device->tag);
 			error = TRUE;
