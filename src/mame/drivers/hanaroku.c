@@ -68,7 +68,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static VIDEO_UPDATE(hanaroku)
 {
 	fillbitmap(bitmap, 0x1f0, cliprect);	// ???
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 

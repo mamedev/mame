@@ -132,7 +132,7 @@ VIDEO_START( m15 )
 ***************************************************************************/
 VIDEO_UPDATE( m10 )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = screen->machine->driver_data;
 	int offs;
 	static const int color[4]= { 3, 3, 5, 5 };
 	static const int xpos[4] = { 4*8, 26*8, 7*8, 6*8};
@@ -172,7 +172,7 @@ VIDEO_UPDATE( m10 )
 ***************************************************************************/
 VIDEO_UPDATE( m15 )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = screen->machine->driver_data;
 	int offs;
 
 	for (offs = videoram_size - 1;offs >= 0;offs--)

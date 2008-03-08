@@ -245,7 +245,7 @@ VIDEO_UPDATE( tankbust )
 #endif
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 
 	tilemap_draw(bitmap, cliprect, txt_tilemap, 0,0);

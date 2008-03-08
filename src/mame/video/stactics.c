@@ -391,7 +391,7 @@ static VIDEO_START( stactics )
 
 static VIDEO_UPDATE( stactics )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = screen->machine->driver_data;
 
 	update_beam(state);
 	draw_background(state, bitmap, cliprect);

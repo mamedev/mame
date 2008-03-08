@@ -226,7 +226,7 @@ static void superqix_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 VIDEO_UPDATE( pbillian )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	pbillian_draw_sprites(machine, bitmap,cliprect);
+	pbillian_draw_sprites(screen->machine, bitmap,cliprect);
 
 	if (pbillian_show_power)
 	{
@@ -254,7 +254,7 @@ VIDEO_UPDATE( superqix )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap_trans(bitmap,fg_bitmap[show_bitmap],flip_screen_get(),flip_screen_get(),0,0,cliprect,0);
-	superqix_draw_sprites(machine, bitmap,cliprect);
+	superqix_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

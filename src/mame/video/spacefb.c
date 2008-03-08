@@ -462,7 +462,7 @@ static void draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( spacefb )
 {
 	draw_objects(bitmap, cliprect);
-	draw_starfield(machine, screen, bitmap, cliprect);
+	draw_starfield(screen->machine, scrnum, bitmap, cliprect);
 
 	return 0;
 }

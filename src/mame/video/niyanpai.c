@@ -408,9 +408,9 @@ VIDEO_UPDATE( niyanpai )
 	{
 		niyanpai_screen_refresh = 0;
 
-		for (y = 0; y < machine->screen[0].height; y++)
+		for (y = 0; y < screen->machine->screen[0].height; y++)
 		{
-			for (x = 0; x < machine->screen[0].width; x++)
+			for (x = 0; x < screen->machine->screen[0].width; x++)
 			{
 				update_pixel(0, x, y);
 				update_pixel(1, x, y);

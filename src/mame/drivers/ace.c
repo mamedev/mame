@@ -64,34 +64,34 @@ static VIDEO_UPDATE( ace )
 {
 	int offs;
 
-	decodechar(machine->gfx[1], 0, ace_characterram);
-	decodechar(machine->gfx[2], 0, ace_characterram);
-	decodechar(machine->gfx[3], 0, ace_characterram);
+	decodechar(screen->machine->gfx[1], 0, ace_characterram);
+	decodechar(screen->machine->gfx[2], 0, ace_characterram);
+	decodechar(screen->machine->gfx[3], 0, ace_characterram);
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		decodechar(machine->gfx[4], offs, ace_scoreram);
+		decodechar(screen->machine->gfx[4], offs, ace_scoreram);
 	}
 
 	/* first of all, fill the screen with the background color */
 	fillbitmap(bitmap, 0, cliprect);
 
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 				0,
 				0,
 				0,0,
 				objpos[0],objpos[1],
 				cliprect,TRANSPARENCY_NONE,0);
 
-		drawgfx(bitmap,machine->gfx[2],
+		drawgfx(bitmap,screen->machine->gfx[2],
 				0,
 				0,
 				0,0,
 				objpos[2],objpos[3],
 				cliprect,TRANSPARENCY_NONE,0);
 
-		drawgfx(bitmap,machine->gfx[3],
+		drawgfx(bitmap,screen->machine->gfx[3],
 				0,
 				0,
 				0,0,
@@ -100,7 +100,7 @@ static VIDEO_UPDATE( ace )
 
 	for (offs = 0; offs < 8; offs++)
 	{
-		drawgfx(bitmap,machine->gfx[4],
+		drawgfx(bitmap,screen->machine->gfx[4],
 				offs,
 				0,
 				0,0,

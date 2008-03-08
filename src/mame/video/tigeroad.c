@@ -157,9 +157,9 @@ VIDEO_START( tigeroad )
 VIDEO_UPDATE( tigeroad )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 1);
-	//draw_sprites(machine, bitmap, cliprect, 1); draw priority sprites?
+	//draw_sprites(screen->machine, bitmap, cliprect, 1); draw priority sprites?
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
 	return 0;
 }

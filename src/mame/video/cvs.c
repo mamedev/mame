@@ -214,7 +214,7 @@ VIDEO_UPDATE( cvs )
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	/* create our background character set, which is a software
        selectable mixture of RAM and ROM based tiles */
@@ -223,11 +223,11 @@ VIDEO_UPDATE( cvs )
 
 	/* ROM based tiles first */
 	for (code = 0; code < ram_based_char_start_indices[character_banking_mode]; code++)
-		decodechar(machine->gfx[0], code, memory_region(REGION_GFX1));
+		decodechar(screen->machine->gfx[0], code, memory_region(REGION_GFX1));
 
 	/* now the RAM based ones */
 	for (; code < 0x100; code++)
-		decodechar(machine->gfx[0], code, cvs_character_ram);
+		decodechar(screen->machine->gfx[0], code, cvs_character_ram);
 
 	/* draw the background */
 	for (offs = 0; offs < 0x0400; offs++)
@@ -240,7 +240,7 @@ VIDEO_UPDATE( cvs )
 		UINT8 x = offs << 3;
 		UINT8 y = offs >> 5 << 3;
 
-		drawgfx(background_bitmap, machine->gfx[0],
+		drawgfx(background_bitmap, screen->machine->gfx[0],
 				code, color,
 				0, 0,
 				x, y,
@@ -257,7 +257,7 @@ VIDEO_UPDATE( cvs )
 				collision_color = 0x102;
 		}
 
-		drawgfx(cvs_collision_background, machine->gfx[0],
+		drawgfx(cvs_collision_background, screen->machine->gfx[0],
 				code, collision_color,
 				0, 0,
 				x, y,
@@ -301,7 +301,7 @@ VIDEO_UPDATE( cvs )
 					cvs_collision_register |= 0x08;
 
             	/* Bullet/Background Collision */
-				if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, offs, bx)))
+				if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, offs, bx)))
                    	cvs_collision_register |= 0x80;
 
 				*BITMAP_ADDR16(bitmap, offs, bx) = BULLET_STAR_PEN;
@@ -336,7 +336,7 @@ VIDEO_UPDATE( cvs )
 					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x04;
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, y, x)))
+					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(scrolled_collision_background, y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) cvs_collision_register |= 0x10;
 						if (S2636_IS_PIXEL_DRAWN(pixel1)) cvs_collision_register |= 0x20;
@@ -357,8 +357,8 @@ VIDEO_UPDATE( cvs )
 			UINT8 x = (stars[offs].x + stars_scroll) >> 1;
 			UINT8 y = stars[offs].y + ((stars_scroll + stars[offs].x) >> 9);
 
-			if (y >= machine->screen[0].visarea.min_y &&
-				y <= machine->screen[0].visarea.max_y)
+			if (y >= screen->machine->screen[0].visarea.min_y &&
+				y <= screen->machine->screen[0].visarea.max_y)
 			{
 				if ((y & 1) ^ ((x >> 4) & 1))
 				{
@@ -368,7 +368,7 @@ VIDEO_UPDATE( cvs )
 					if (flip_screen_y_get())
 						y = ~y;
 
-					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0)
+					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0)
 						*BITMAP_ADDR16(bitmap, y, x) = BULLET_STAR_PEN;
 				}
 			}

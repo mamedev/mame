@@ -373,7 +373,7 @@ WRITE8_HANDLER( arabian_videoram_w )
 
 VIDEO_UPDATE( arabian )
 {
-	const pen_t *pens = &machine->pens[(arabian_video_control >> 3) << 8];
+	const pen_t *pens = &screen->machine->pens[(arabian_video_control >> 3) << 8];
 	int y;
 
 	/* render the screen from the bitmap */

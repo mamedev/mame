@@ -224,6 +224,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 VIDEO_UPDATE( tinvader )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap);
+	draw_sprites(screen->machine, bitmap);
 	return 0;
 }

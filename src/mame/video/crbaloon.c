@@ -154,7 +154,7 @@ VIDEO_UPDATE( crbaloon )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	draw_sprite_and_check_collision(machine, bitmap);
+	draw_sprite_and_check_collision(screen->machine, bitmap);
 
 	return 0;
 }

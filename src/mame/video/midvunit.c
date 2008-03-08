@@ -572,7 +572,7 @@ VIDEO_UPDATE( midvunit )
 
 	/* adjust the offset */
 	offset += xoffs;
-	offset += 512 * (cliprect->min_y - machine->screen[0].visarea.min_y);
+	offset += 512 * (cliprect->min_y - screen->machine->screen[0].visarea.min_y);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

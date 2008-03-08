@@ -66,7 +66,7 @@ VIDEO_UPDATE( rollrace )
 	int col;
 
 	/* fill in background colour*/
-	fillbitmap(bitmap,ra_bkgpen,&machine->screen[0].visarea);
+	fillbitmap(bitmap,ra_bkgpen,cliprect);
 
 	/* draw road */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
@@ -87,13 +87,13 @@ VIDEO_UPDATE( rollrace )
 				sy = 31-sy ;
 
 			drawgfx(bitmap,
-				machine->gfx[RA_BGCHAR_BASE],
+				screen->machine->gfx[RA_BGCHAR_BASE],
 				memory_region(REGION_USER1)[offs + ( ra_bkgpage * 1024 )] \
 				+ ((( memory_region(REGION_USER1)[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
 				ra_bkgcol,
 				ra_flipx,(ra_bkgflip^ra_flipy),
 				sx*8,sy*8,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 
 
 		}
@@ -126,12 +126,12 @@ VIDEO_UPDATE( rollrace )
 		if(bank)
 			bank += ra_spritebank;
 
-		drawgfx(bitmap, machine->gfx[ RA_SP_BASE + bank ],
+		drawgfx(bitmap, screen->machine->gfx[ RA_SP_BASE + bank ],
 			spriteram[offs+1] & 0x3f ,
 			spriteram[offs+2] & 0x1f,
 			ra_flipx,!(s_flipy^ra_flipy),
 			sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 
@@ -155,12 +155,12 @@ VIDEO_UPDATE( rollrace )
 
 		if (ra_flipx) sx = 31 - sx;
 
-		drawgfx(bitmap,machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
+		drawgfx(bitmap,screen->machine->gfx[RA_FGCHAR_BASE + ra_chrbank]  ,
 			videoram[ offs ]  ,
 			col,
 			ra_flipx,ra_flipy,
 			8*sx,scroll,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 
 	}
 

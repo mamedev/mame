@@ -177,7 +177,7 @@ VIDEO_UPDATE( ikki )
 		bank = (color & 0xe0) << 3;
 		color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 			videoram[offs*2+1] + bank,
 			color,
 			ikki_flipscreen,ikki_flipscreen,
@@ -185,7 +185,7 @@ VIDEO_UPDATE( ikki )
 			cliprect,TRANSPARENCY_NONE,0);
 	}
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* mask sprites */
 
@@ -213,7 +213,7 @@ VIDEO_UPDATE( ikki )
 			bank = (color & 0xe0) << 3;
 			color = ((color & 0x1f)<<0) | ((color & 0x80) >> 2);
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 				videoram[offs*2+1] + bank,
 				color,
 				ikki_flipscreen,ikki_flipscreen,

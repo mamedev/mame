@@ -256,6 +256,6 @@ VIDEO_UPDATE( m90 )
 			tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

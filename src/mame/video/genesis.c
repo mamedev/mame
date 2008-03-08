@@ -271,7 +271,7 @@ VIDEO_UPDATE( genesis )
 VIDEO_UPDATE( segac2 )
 {
 	if (!display_enable)
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	else
 		VIDEO_UPDATE_CALL(genesis);
 	return 0;

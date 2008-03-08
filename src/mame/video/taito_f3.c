@@ -3247,7 +3247,7 @@ VIDEO_UPDATE( f3 )
 	if (vram_changed)
 		for (tile = 0;tile < 256;tile++)
 			if (vram_dirty[tile]) {
-				decodechar(machine->gfx[0],tile,(UINT8 *)f3_vram);
+				decodechar(screen->machine->gfx[0],tile,(UINT8 *)f3_vram);
 				tilemap_mark_all_tiles_dirty(vram_layer); // TODO
 				//tilemap_mark_tile_dirty(vram_layer,tile);
 				vram_dirty[tile]=0;
@@ -3257,7 +3257,7 @@ VIDEO_UPDATE( f3 )
 	if (pivot_changed)
 		for (tile = 0;tile < 2048;tile++)
 			if (pivot_dirty[tile]) {
-				decodechar(machine->gfx[3],tile,(UINT8 *)f3_pivot_ram);
+				decodechar(screen->machine->gfx[3],tile,(UINT8 *)f3_pivot_ram);
 				tilemap_mark_tile_dirty(pixel_layer,tile);
 				pivot_dirty[tile]=0;
 			}
@@ -3298,23 +3298,23 @@ VIDEO_UPDATE( f3 )
 
 	/* sprites */
 	if (sprite_lag==0)
-		get_sprite_info(machine, spriteram32);
+		get_sprite_info(screen->machine, spriteram32);
 
 	/* Update sprite buffer */
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	/* Parse sprite, alpha & clipping parts of lineram */
 	get_spritealphaclip_info();
 
 	/* Parse playfield effects */
-	get_line_ram_info(machine, pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
-	get_line_ram_info(machine, pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);
-	get_line_ram_info(machine, pf3_tilemap,sx_fix[2],sy_fix[2],2,f3_pf_data_3);
-	get_line_ram_info(machine, pf4_tilemap,sx_fix[3],sy_fix[3],3,f3_pf_data_4);
+	get_line_ram_info(screen->machine, pf1_tilemap,sx_fix[0],sy_fix[0],0,f3_pf_data_1);
+	get_line_ram_info(screen->machine, pf2_tilemap,sx_fix[1],sy_fix[1],1,f3_pf_data_2);
+	get_line_ram_info(screen->machine, pf3_tilemap,sx_fix[2],sy_fix[2],2,f3_pf_data_3);
+	get_line_ram_info(screen->machine, pf4_tilemap,sx_fix[3],sy_fix[3],3,f3_pf_data_4);
 	get_vram_info(vram_layer,pixel_layer,sx_fix[4],sy_fix[4]);
 
 	/* Draw final framebuffer */
-	scanline_draw(machine, bitmap,cliprect);
+	scanline_draw(screen->machine, bitmap,cliprect);
 
 	if (VERBOSE)
 		print_debug_info(bitmap);

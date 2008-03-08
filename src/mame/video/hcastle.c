@@ -210,7 +210,7 @@ VIDEO_UPDATE( hcastle )
 {
 	static int old_pf1,old_pf2;
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	pf1_bankbase = 0x0000;
 	pf2_bankbase = 0x4000 * ((gfx_bank & 2) >> 1);
@@ -237,16 +237,16 @@ VIDEO_UPDATE( hcastle )
 	if ((gfx_bank & 0x04) == 0)
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites( machine,bitmap,cliprect, buffered_spriteram, 0 );
-		draw_sprites( machine,bitmap,cliprect, buffered_spriteram_2, 1 );
+		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram, 0 );
+		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram_2, 1 );
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-		draw_sprites( machine,bitmap,cliprect, buffered_spriteram, 0 );
-		draw_sprites( machine,bitmap,cliprect, buffered_spriteram_2, 1 );
+		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram, 0 );
+		draw_sprites(screen->machine,bitmap,cliprect, buffered_spriteram_2, 1 );
 	}
 	return 0;
 }

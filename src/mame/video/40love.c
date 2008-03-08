@@ -345,6 +345,6 @@ VIDEO_UPDATE( fortyl )
 	tilemap_set_scrolldy(background,-fortyl_video_ctrl[1]+1,-fortyl_video_ctrl[1]-1 );
 	tilemap_draw(bitmap,cliprect,background,0,0);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

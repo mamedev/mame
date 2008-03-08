@@ -341,7 +341,7 @@ VIDEO_UPDATE( clshroad )
 
 	tilemap_draw(bitmap,cliprect,tilemap_0a,0,0);	// Opaque
 	tilemap_draw(bitmap,cliprect,tilemap_0b,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	return 0;
 }

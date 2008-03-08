@@ -160,29 +160,29 @@ VIDEO_UPDATE( vaportra )
 	if (pri==0) {
 		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
-		draw_sprites(machine, bitmap,cliprect,0);
+		draw_sprites(screen->machine, bitmap,cliprect,0);
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
 	}
 	else if (pri==1) {
 		deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 		deco16_tilemap_4_draw(bitmap,cliprect,0,0);
-		draw_sprites(machine, bitmap,cliprect,0);
+		draw_sprites(screen->machine, bitmap,cliprect,0);
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
 	}
 	else if (pri==2) {
 		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-		draw_sprites(machine, bitmap,cliprect,0);
+		draw_sprites(screen->machine, bitmap,cliprect,0);
 		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
 	}
 	else {
 		deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-		draw_sprites(machine, bitmap,cliprect,0);
+		draw_sprites(screen->machine, bitmap,cliprect,0);
 		deco16_tilemap_4_draw(bitmap,cliprect,0,0);
 	}
 
-	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }

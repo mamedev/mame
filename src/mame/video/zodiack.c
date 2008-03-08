@@ -201,7 +201,7 @@ VIDEO_UPDATE( zodiack )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	draw_bullets(machine, bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_bullets(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -608,13 +608,13 @@ VIDEO_UPDATE( decocass )
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
-	if (0xc0 != (input_port_2_r(machine, 0) & 0xc0))  /* coin slots assert an NMI */
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	if (0xc0 != (input_port_2_r(screen->machine, 0) & 0xc0))  /* coin slots assert an NMI */
+		cpunum_set_input_line(screen->machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (watchdog_flip & 0x04))
-		watchdog_reset_w (machine,0,0);
+		watchdog_reset(screen->machine);
 	else if (watchdog_count-- > 0)
-		watchdog_reset_w (machine,0,0);
+		watchdog_reset(screen->machine);
 
 #if TAPE_UI_DISPLAY
 	if (tape_timer)
@@ -648,9 +648,9 @@ VIDEO_UPDATE( decocass )
 	}
 #endif
 
-	fillbitmap( bitmap, machine->pens[0], cliprect );
+	fillbitmap( bitmap, 0, cliprect );
 
-	decode_modified(machine, decocass_fgvideoram, 0x20 );
+	decode_modified(screen->machine, decocass_fgvideoram, 0x20 );
 
 	scrolly_l = back_vl_shift;
 	scrolly_r = 256 - back_vr_shift;
@@ -689,12 +689,12 @@ VIDEO_UPDATE( decocass )
 
 	if (mode_set & 0x20)
 	{
-		draw_object(machine,bitmap,cliprect);
+		draw_object(screen->machine,bitmap,cliprect);
 		draw_center(bitmap,cliprect);
 	}
 	else
 	{
-		draw_object(machine,bitmap,cliprect);
+		draw_object(screen->machine,bitmap,cliprect);
 		draw_center(bitmap,cliprect);
 		if (mode_set & 0x08)	/* bkg_ena on ? */
 		{
@@ -708,7 +708,7 @@ VIDEO_UPDATE( decocass )
 		}
 	}
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
-	draw_sprites(machine,bitmap,cliprect, (color_center_bot >> 1) & 1, 0, 0, decocass_fgvideoram, 0x20);
+	draw_sprites(screen->machine,bitmap,cliprect, (color_center_bot >> 1) & 1, 0, 0, decocass_fgvideoram, 0x20);
 	draw_missiles(bitmap,cliprect, 1, 0, decocass_colorram, 0x20);
 	return 0;
 }

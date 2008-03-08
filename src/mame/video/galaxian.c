@@ -2147,12 +2147,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, UINT8 *spri
 
 VIDEO_UPDATE( galaxian )
 {
-	draw_background(machine, bitmap);
+	draw_background(screen->machine, bitmap);
 
 
 	if (galaxian_stars_on)
 	{
-		draw_stars(machine, bitmap);
+		draw_stars(screen->machine, bitmap);
 	}
 
 
@@ -2161,15 +2161,15 @@ VIDEO_UPDATE( galaxian )
 
 	if (draw_bullets)
 	{
-		draw_bullets_common(machine, bitmap);
+		draw_bullets_common(screen->machine, bitmap);
 	}
 
 
-	draw_sprites(machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
+	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
 
 	if (spriteram2_present)
 	{
-		draw_sprites(machine, bitmap, galaxian_spriteram2, galaxian_spriteram2_size);
+		draw_sprites(screen->machine, bitmap, galaxian_spriteram2, galaxian_spriteram2_size);
 	}
 	return 0;
 }
@@ -2180,24 +2180,24 @@ VIDEO_UPDATE( dambustr )
 	int i, j;
 	UINT8 color;
 
-	draw_background(machine, bitmap);
+	draw_background(screen->machine, bitmap);
 
 	if (galaxian_stars_on)
 	{
-		draw_stars(machine, bitmap);
+		draw_stars(screen->machine, bitmap);
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
-	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &machine->screen[0].visarea);
+	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &screen->machine->screen[0].visarea);
 
 	tilemap_draw(bitmap, 0, bg_tilemap, 0, 0);
 
 	if (draw_bullets)
 	{
-		draw_bullets_common(machine, bitmap);
+		draw_bullets_common(screen->machine, bitmap);
 	}
 
-	draw_sprites(machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
+	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
 
 	if (dambustr_bg_priority)
 	{

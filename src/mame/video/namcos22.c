@@ -2268,11 +2268,11 @@ VIDEO_UPDATE( namcos22s )
 	UpdateVideoMixer();
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
    fillbitmap( bitmap, bgColor, cliprect );
-   UpdatePaletteS(machine);
-   DrawCharacterLayer(machine, bitmap, cliprect );
+   UpdatePaletteS(screen->machine);
+   DrawCharacterLayer(screen->machine, bitmap, cliprect );
 	DrawPolygons( bitmap );
    DrawSprites( bitmap, cliprect );
-   RenderScene(machine, bitmap );
+   RenderScene(screen->machine, bitmap );
 	DrawTranslucentCharacters( bitmap, cliprect );
 	ApplyGamma( bitmap );
 
@@ -2316,11 +2316,11 @@ VIDEO_UPDATE( namcos22s )
 VIDEO_UPDATE( namcos22 )
 {
 	UpdateVideoMixer();
-   fillbitmap( bitmap, get_black_pen(machine), cliprect );
-	UpdatePalette(machine);
-	DrawCharacterLayer(machine, bitmap, cliprect );
+   fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	UpdatePalette(screen->machine);
+	DrawCharacterLayer(screen->machine, bitmap, cliprect );
    DrawPolygons( bitmap );
-   RenderScene(machine, bitmap);
+   RenderScene(screen->machine, bitmap);
 	DrawTranslucentCharacters( bitmap, cliprect );
 	ApplyGamma( bitmap );
 

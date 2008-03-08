@@ -633,13 +633,13 @@ VIDEO_UPDATE( cclimber )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -667,13 +667,13 @@ VIDEO_UPDATE( yamato )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		cclimber_draw_sprites(bitmap, machine->gfx, cliprect);
+		cclimber_draw_sprites(bitmap, screen->machine->gfx, cliprect);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -683,7 +683,7 @@ VIDEO_UPDATE( yamato )
 
 VIDEO_UPDATE( swimmer )
 {
-	swimmer_set_background_pen(machine);
+	swimmer_set_background_pen(screen->machine);
 
 	if (*swimmer_side_background_enabled & 0x01)
 	{
@@ -719,13 +719,13 @@ VIDEO_UPDATE( swimmer )
 	if ((cclimber_bigsprite_control[0] & 0x01))
 	{
 		cclimber_draw_bigsprite(bitmap, cliprect);
-		swimmer_draw_sprites(bitmap, machine->gfx, cliprect);
+		swimmer_draw_sprites(bitmap, screen->machine->gfx, cliprect);
 	}
 
 	/* draw the "big sprite" over the regular sprites */
 	else
 	{
-		swimmer_draw_sprites(bitmap, machine->gfx, cliprect);
+		swimmer_draw_sprites(bitmap, screen->machine->gfx, cliprect);
 		cclimber_draw_bigsprite(bitmap, cliprect);
 	}
 
@@ -750,7 +750,7 @@ VIDEO_UPDATE( toprollr )
 	/* draw the "big sprite" over the regular sprites */
 	if ((cclimber_bigsprite_control[1] & 0x20))
 	{
-		cclimber_draw_sprites(bitmap, machine->gfx, &scroll_area_clip);
+		cclimber_draw_sprites(bitmap, screen->machine->gfx, &scroll_area_clip);
 		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
 	}
 
@@ -758,7 +758,7 @@ VIDEO_UPDATE( toprollr )
 	else
 	{
 		toprollr_draw_bigsprite(bitmap, &scroll_area_clip);
-		cclimber_draw_sprites(bitmap, machine->gfx, &scroll_area_clip);
+		cclimber_draw_sprites(bitmap, screen->machine->gfx, &scroll_area_clip);
 	}
 
 	tilemap_mark_all_tiles_dirty(pf_tilemap);

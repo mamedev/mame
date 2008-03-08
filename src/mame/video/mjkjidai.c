@@ -129,13 +129,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 VIDEO_UPDATE( mjkjidai )
 {
 	if (!display_enable)
-	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	}
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	else
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 	}
 	return 0;
 }

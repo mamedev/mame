@@ -314,6 +314,9 @@ void video_init(running_machine *machine)
 	/* request a callback upon exiting */
 	add_exit_callback(machine, video_exit);
 
+	/* set the first screen device as the primary - this will set NULL if screenless */
+	machine->primary_screen = video_screen_first(machine->config);
+
 	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
 		char unique_tag[40];
@@ -889,7 +892,7 @@ void video_screen_update_partial(int scrnum, int scanline)
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
 		if (Machine->config->video_update != NULL)
-			flags = (*Machine->config->video_update)(Machine, scrnum, internal_state->bitmap[internal_state->curbitmap], &clip);
+			flags = (*Machine->config->video_update)(internal_state->device, scrnum, internal_state->bitmap[internal_state->curbitmap], &clip);
 		global.partial_updates_this_frame++;
 		profiler_mark(PROFILER_END);
 

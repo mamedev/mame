@@ -887,9 +887,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 /* For games without tilemaps */
 VIDEO_UPDATE( seta_no_layers )
 {
-	set_pens(machine);
+	set_pens(screen->machine);
 	fillbitmap(bitmap,0x1f0,cliprect);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -903,7 +903,7 @@ static VIDEO_UPDATE( seta_layers )
 	int order	= 	0;
 	int flip	=	(spriteram16[ 0x600/2 ] & 0x40) >> 6;
 
-	int vis_dimy = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1;
+	int vis_dimy = screen->machine->screen[0].visarea.max_y - screen->machine->screen[0].visarea.min_y + 1;
 
 	flip ^= tilemaps_flip;
 
@@ -989,7 +989,7 @@ if (input_code_pressed(KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	draw_sprites(machine,bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(screen->machine,bitmap,cliprect);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  0, 0);
 		}
@@ -997,7 +997,7 @@ if (input_code_pressed(KEYCODE_Z))
 		{
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_0,  0, 0);
 			if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tilemap_1,  0, 0);
-			if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}
 	else
@@ -1007,7 +1007,7 @@ if (input_code_pressed(KEYCODE_Z))
 
 		if (order & 2)	// layer-sprite priority?
 		{
-			if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 
 			if (tilemap_2)
 			{
@@ -1023,7 +1023,7 @@ if (input_code_pressed(KEYCODE_Z))
 				if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tilemap_3,  0, 0);
 			}
 
-			if (layers_ctrl & 8)	draw_sprites(machine, bitmap,cliprect);
+			if (layers_ctrl & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 		}
 	}
 	return 0;
@@ -1032,14 +1032,14 @@ if (input_code_pressed(KEYCODE_Z))
 
 VIDEO_UPDATE( seta )
 {
-	set_pens(machine);
+	set_pens(screen->machine);
 	return VIDEO_UPDATE_CALL(seta_layers);
 }
 
 
 VIDEO_UPDATE( usclssic )
 {
-	usclssic_set_pens(machine->colortable);
+	usclssic_set_pens(screen->machine->colortable);
 	return VIDEO_UPDATE_CALL(seta_layers);
 }
 

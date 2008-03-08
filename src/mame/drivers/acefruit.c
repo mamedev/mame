@@ -78,7 +78,7 @@ static VIDEO_UPDATE( acefruit )
 
 			if( color < 0x4 )
 			{
-				drawgfx( bitmap, machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8, cliprect, TRANSPARENCY_NONE, 0 );
+				drawgfx( bitmap, screen->machine->gfx[ 1 ], code, color, 0, 0, col * 16, row * 8, cliprect, TRANSPARENCY_NONE, 0 );
 			}
 			else if( color >= 0x5 && color <= 0x7 )
 			{
@@ -86,7 +86,7 @@ static VIDEO_UPDATE( acefruit )
 				int x;
 				static const int spriteskip[] = { 1, 2, 4 };
 				int spritesize = spriteskip[ color - 5 ];
-				const gfx_element *gfx = machine->gfx[ 0 ];
+				const gfx_element *gfx = screen->machine->gfx[ 0 ];
 
 				for( x = 0; x < 16; x++ )
 				{

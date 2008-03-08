@@ -109,7 +109,7 @@ VIDEO_UPDATE( galpanic )
 
 	draw_fgbitmap(bitmap, cliprect);
 
-	pandora_update(machine,bitmap,cliprect);
+	pandora_update(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
@@ -125,12 +125,12 @@ VIDEO_UPDATE( comad )
 //  if(galpanic_clear_sprites)
 	{
 		fillbitmap(sprites_bitmap,0,cliprect);
-		comad_draw_sprites(machine,bitmap,cliprect);
+		comad_draw_sprites(screen->machine,bitmap,cliprect);
 	}
 //  else
 //  {
 //      /* keep sprites on the bitmap without clearing them */
-//      comad_draw_sprites(machine,sprites_bitmap,0);
+//      comad_draw_sprites(screen->machine,sprites_bitmap,0);
 //      copybitmap_trans(bitmap,sprites_bitmap,0,0,0,0,cliprect,0);
 //  }
 	return 0;

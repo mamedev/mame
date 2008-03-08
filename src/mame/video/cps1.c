@@ -1815,7 +1815,7 @@ VIDEO_UPDATE( cps1 )
         cps2_find_last_sprite();
     }
 	/* Build palette */
-	cps1_build_palette(machine);
+	cps1_build_palette(screen->machine);
 
 	cps1_update_transmasks();
 
@@ -1858,13 +1858,13 @@ VIDEO_UPDATE( cps1 )
 
 	if (cps_version == 1)
 	{
-		cps1_render_layer(machine,bitmap,cliprect,l0,0);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l0,0);
 		if (l1 == 0) cps1_render_high_layer(bitmap,cliprect,l0); /* prepare mask for sprites */
-		cps1_render_layer(machine,bitmap,cliprect,l1,0);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l1,0);
 		if (l2 == 0) cps1_render_high_layer(bitmap,cliprect,l1); /* prepare mask for sprites */
-		cps1_render_layer(machine,bitmap,cliprect,l2,0);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l2,0);
 		if (l3 == 0) cps1_render_high_layer(bitmap,cliprect,l2); /* prepare mask for sprites */
-		cps1_render_layer(machine,bitmap,cliprect,l3,0);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l3,0);
 	}
 	else
 	{
@@ -1915,10 +1915,10 @@ if (0 && input_code_pressed(KEYCODE_Z))
 			}
 		}
 
-		cps1_render_layer(machine,bitmap,cliprect,l0,1);
-		cps1_render_layer(machine,bitmap,cliprect,l1,2);
-		cps1_render_layer(machine,bitmap,cliprect,l2,4);
-		cps2_render_sprites(machine,bitmap,cliprect,primasks);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l0,1);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l1,2);
+		cps1_render_layer(screen->machine,bitmap,cliprect,l2,4);
+		cps2_render_sprites(screen->machine,bitmap,cliprect,primasks);
 	}
 
 #if CPS1_DUMP_VIDEO

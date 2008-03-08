@@ -234,18 +234,18 @@ VIDEO_UPDATE( sshangha )
 	tilemap_set_scrolly( pf1_16x16_tilemap,0, sshangha_control_0[2] );
 
 	if ((sshangha_control_0[5]&0x8000)==0)
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	/* Super Shanghai has a mode where the two tilemaps are combined to
     produce a 6bpp tilemap.  We can't precompute this as any tiles can be
     used in any tilemap, so we plot it on the fly */
 	if ((sshangha_video_control&4)==0) {
 		sshangha_tilemap_draw(bitmap, cliprect);
-		draw_sprites(machine, bitmap, cliprect, spriteram16,0x4000,0x4000);
+		draw_sprites(screen->machine, bitmap, cliprect, spriteram16,0x4000,0x4000);
 	}
 	else {
 		tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-		draw_sprites(machine, bitmap, cliprect, spriteram16,0x4000,0x4000);
+		draw_sprites(screen->machine, bitmap, cliprect, spriteram16,0x4000,0x4000);
 
 		if (sshangha_control_0[6]&0x80)
 			tilemap_draw(bitmap,cliprect,pf1_8x8_tilemap,0,0);
@@ -253,7 +253,7 @@ VIDEO_UPDATE( sshangha )
 			tilemap_draw(bitmap,cliprect,pf1_16x16_tilemap,0,0);
 	}
 
-	draw_sprites(machine, bitmap, cliprect, spriteram16_2,0x0000,0x0000);
-	draw_sprites(machine, bitmap, cliprect, spriteram16,0x4000,0x0000);
+	draw_sprites(screen->machine, bitmap, cliprect, spriteram16_2,0x0000,0x0000);
+	draw_sprites(screen->machine, bitmap, cliprect, spriteram16,0x4000,0x0000);
 	return 0;
 }

@@ -66,7 +66,7 @@ VIDEO_UPDATE( goldstar )
 		sx = offs % 64;
 		sy = offs / 64;
 
-		drawgfx(tmpbitmap4,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				videoram[offs] + ((colorram[offs] & 0xf0) << 4),
 				colorram[offs] & 0x0f,
 				0,0,
@@ -83,21 +83,21 @@ VIDEO_UPDATE( goldstar )
 		int sy = offs / 64;
 
 
-		drawgfx(tmpbitmap1,machine->gfx[1],
+		drawgfx(tmpbitmap1,screen->machine->gfx[1],
 				goldstar_video1[offs],
 				bgcolor,
 				0,0,
 				sx*8,sy*32,
 				0,TRANSPARENCY_NONE,0);
 
-		drawgfx(tmpbitmap2,machine->gfx[1],
+		drawgfx(tmpbitmap2,screen->machine->gfx[1],
 				goldstar_video2[offs],
 				bgcolor,
 				0,0,
 				sx*8,sy*32,
 				0,TRANSPARENCY_NONE,0);
 
-		drawgfx(tmpbitmap3,machine->gfx[1],
+		drawgfx(tmpbitmap3,screen->machine->gfx[1],
 				goldstar_video3[offs],
 				bgcolor,
 				0,0,

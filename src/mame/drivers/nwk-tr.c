@@ -537,11 +537,11 @@ static VIDEO_START( nwktr )
 
 static VIDEO_UPDATE( nwktr )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	voodoo_update(0, bitmap, cliprect);
 
-	K001604_tile_update(machine, 0);
+	K001604_tile_update(screen->machine, 0);
 	K001604_draw_front_layer(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);

@@ -377,7 +377,7 @@ VIDEO_UPDATE( ladybug )
 	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -415,9 +415,9 @@ VIDEO_UPDATE( sraider )
 		redclash_draw_stars(bitmap,cliprect,0x60,1,0x00,0xd8);
 
 	// draw the gridlines
-	colortable_palette_set_color(machine->colortable, 0x40, MAKE_RGB(sraider_grid_color & 0x40 ? 0xff : 0,
-		              					  							 sraider_grid_color & 0x20 ? 0xff : 0,
-		              					  							 sraider_grid_color & 0x10 ? 0xff : 0));
+	colortable_palette_set_color(screen->machine->colortable, 0x40, MAKE_RGB(sraider_grid_color & 0x40 ? 0xff : 0,
+		              					  									 sraider_grid_color & 0x20 ? 0xff : 0,
+		              					  									 sraider_grid_color & 0x10 ? 0xff : 0));
 	tilemap_draw(bitmap, cliprect, grid_tilemap, 0, flip_screen_get());
 
 	for (i = 0; i < 0x100; i++)
@@ -439,7 +439,7 @@ VIDEO_UPDATE( sraider )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, flip_screen_get());
 
 	// now the sprites
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

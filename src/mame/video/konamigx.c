@@ -402,9 +402,9 @@ VIDEO_UPDATE(konamigx)
 	if (dirty) K056832_MarkAllTilemapsDirty();
 
 	if (gx_rozenable)
-		konamigx_mixer(machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
+		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, gx_psac_tilemap, GXSUB_8BPP, 0);
 	else
-		konamigx_mixer(machine, bitmap, cliprect, 0, 0, 0, 0, 0);
+		konamigx_mixer(screen->machine, bitmap, cliprect, 0, 0, 0, 0, 0);
 
 	return 0;
 }

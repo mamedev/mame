@@ -308,19 +308,19 @@ VIDEO_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	draw_stars(machine, bitmap,cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	draw_stars(screen->machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,0,0);
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	/* draw the high priority characters */
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,1,0);
 	tilemap_draw(bitmap,&fg_clip,fg_tilemap,1,0);
 
-	draw_bullets(machine, bitmap,cliprect);
+	draw_bullets(screen->machine, bitmap,cliprect);
 
 	return 0;
 }

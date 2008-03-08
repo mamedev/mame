@@ -283,9 +283,9 @@ VIDEO_UPDATE( rpunch )
 	effbins = (bins > gins) ? gins : bins;
 
 	tilemap_draw(bitmap,cliprect, background[0], 0,0);
-	draw_sprites(machine, bitmap,cliprect, 0, effbins);
+	draw_sprites(screen->machine, bitmap,cliprect, 0, effbins);
 	tilemap_draw(bitmap,cliprect, background[1], 0,0);
-	draw_sprites(machine, bitmap,cliprect, effbins, gins);
+	draw_sprites(screen->machine, bitmap,cliprect, effbins, gins);
 	if (rpunch_bitmapram)
 		draw_bitmap(bitmap,cliprect);
 	return 0;

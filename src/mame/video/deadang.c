@@ -147,12 +147,12 @@ VIDEO_UPDATE( deadang )
 	tilemap_set_enable(pf2_layer,!(deadang_scroll_ram[0x34]&4));
 	flip_screen_set( deadang_scroll_ram[0x34]&0x40 );
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);
 	tilemap_draw(bitmap,cliprect,pf3_layer,0,1);
 	tilemap_draw(bitmap,cliprect,pf1_layer,0,2);
 	tilemap_draw(bitmap,cliprect,pf2_layer,0,4);
-	if (!(deadang_scroll_ram[0x34]&0x10)) draw_sprites(machine,bitmap,cliprect);
+	if (!(deadang_scroll_ram[0x34]&0x10)) draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

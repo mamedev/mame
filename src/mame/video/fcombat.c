@@ -177,7 +177,7 @@ tilemap_mark_all_tiles_dirty(bgmap);
 		int code2 = code;
 
 		int color = ((flags >> 1) & 0x03) | ((code >> 5) & 0x04) | (code & 0x08) | (sprite_palette * 16);
-				const gfx_element *gfx =  machine->gfx[1];
+				const gfx_element *gfx =  screen->machine->gfx[1];
 
 		if (fcombat_cocktail_flip)
 		{
@@ -229,7 +229,7 @@ tilemap_mark_all_tiles_dirty(bgmap);
 			int y = fcombat_cocktail_flip ? (31*8 - 8*sy) : 8*sy;
 
 			offs = sx + sy * 64;
-			drawgfx(bitmap, machine->gfx[0],
+			drawgfx(bitmap, screen->machine->gfx[0],
 				videoram[offs] + 256 * char_bank,
 				((videoram[offs] & 0xf0) >> 4) + char_palette * 16,
 				fcombat_cocktail_flip, fcombat_cocktail_flip, x, y,

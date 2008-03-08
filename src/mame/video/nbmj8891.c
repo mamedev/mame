@@ -527,18 +527,18 @@ VIDEO_UPDATE( nbmj8891 )
 	if (nbmj8891_screen_refresh)
 	{
 		nbmj8891_screen_refresh = 0;
-		for (y = 0; y < machine->screen[0].height; y++)
+		for (y = 0; y < screen->machine->screen[0].height; y++)
 		{
-			for (x = 0; x < machine->screen[0].width; x++)
+			for (x = 0; x < screen->machine->screen[0].width; x++)
 			{
 				update_pixel0(x, y);
 			}
 		}
 		if (gfxdraw_mode)
 		{
-			for (y = 0; y < machine->screen[0].height; y++)
+			for (y = 0; y < screen->machine->screen[0].height; y++)
 			{
-				for (x = 0; x < machine->screen[0].width; x++)
+				for (x = 0; x < screen->machine->screen[0].width; x++)
 				{
 					update_pixel1(x, y);
 				}

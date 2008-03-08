@@ -283,27 +283,27 @@ VIDEO_UPDATE( vigilant )
 		g = (paletteram[0x500 + 16 * rear_color + i] << 3) & 0xFF;
 		b = (paletteram[0x600 + 16 * rear_color + i] << 3) & 0xFF;
 
-		palette_set_color(machine,512 + i,MAKE_RGB(r,g,b));
+		palette_set_color(screen->machine,512 + i,MAKE_RGB(r,g,b));
 
 		r = (paletteram[0x400 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 		g = (paletteram[0x500 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 		b = (paletteram[0x600 + 16 * rear_color + 32 + i] << 3) & 0xFF;
 
-		palette_set_color(machine,512 + 16 + i,MAKE_RGB(r,g,b));
+		palette_set_color(screen->machine,512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
 	if (rear_disable)	 /* opaque foreground */
 	{
-		draw_foreground(machine,bitmap,cliprect,0,1);
-		draw_sprites(machine,bitmap,&bottomvisiblearea);
-		draw_foreground(machine,bitmap,cliprect,1,0);
+		draw_foreground(screen->machine,bitmap,cliprect,0,1);
+		draw_sprites(screen->machine,bitmap,&bottomvisiblearea);
+		draw_foreground(screen->machine,bitmap,cliprect,1,0);
 	}
 	else
 	{
-		draw_background(machine,bitmap,cliprect);
-		draw_foreground(machine,bitmap,cliprect,0,0);
-		draw_sprites(machine,bitmap,&bottomvisiblearea);
-		draw_foreground(machine,bitmap,cliprect,1,0); // priority tiles
+		draw_background(screen->machine,bitmap,cliprect);
+		draw_foreground(screen->machine,bitmap,cliprect,0,0);
+		draw_sprites(screen->machine,bitmap,&bottomvisiblearea);
+		draw_foreground(screen->machine,bitmap,cliprect,1,0); // priority tiles
 	}
 	return 0;
 }
@@ -321,7 +321,7 @@ VIDEO_UPDATE( kikcubic )
 		int color = (attributes & 0xF0) >> 4;
 		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				tile_number,
 				color,
 				0,0,
@@ -329,6 +329,6 @@ VIDEO_UPDATE( kikcubic )
 				cliprect,TRANSPARENCY_NONE,0);
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

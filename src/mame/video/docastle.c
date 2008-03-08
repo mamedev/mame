@@ -219,7 +219,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( docastle )
 {
 	tilemap_draw(bitmap, cliprect, docastle_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, docastle_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

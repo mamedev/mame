@@ -110,7 +110,7 @@ VIDEO_UPDATE( galspnbl )
 
 	draw_background(bitmap, cliprect);
 
-	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	for (offs = 0;offs < 0x1000/2;offs++)
 	{
@@ -125,7 +125,7 @@ VIDEO_UPDATE( galspnbl )
 		/* What is this? A priority/half transparency marker? */
 		if (!(attr & 0x0008))
 		{
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 					code,
 					color,
 					0,0,
@@ -135,6 +135,6 @@ VIDEO_UPDATE( galspnbl )
 		}
 	}
 
-	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 	return 0;
 }

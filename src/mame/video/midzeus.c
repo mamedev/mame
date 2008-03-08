@@ -318,7 +318,7 @@ VIDEO_UPDATE( midzeus )
 	if (!input_code_pressed(KEYCODE_W))
 	{
 		const void *base = waveram1_ptr_from_expanded_addr(zeusbase[0xcc]);
-		int xoffs = machine->screen[screen].visarea.min_x;
+		int xoffs = screen->machine->screen[scrnum].visarea.min_x;
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
 			UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;

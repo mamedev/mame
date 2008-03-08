@@ -27,14 +27,14 @@ VIDEO_UPDATE(system24)
 	int order[12], spri[4];
 
 	if(sys24_mixer_get_reg(13) & 1) {
-		fillbitmap(bitmap, get_black_pen(machine), 0);
+		fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 		return 0;
 	}
 
-	sys24_tile_update(machine);
+	sys24_tile_update(screen->machine);
 
 	fillbitmap(priority_bitmap, 0, 0);
-	fillbitmap(bitmap, 0, &machine->screen[0].visarea);
+	fillbitmap(bitmap, 0, cliprect);
 
 	for(i=0; i<12; i++)
 		order[i] = i;
@@ -43,7 +43,7 @@ VIDEO_UPDATE(system24)
 	level = 0;
 	for(i=0; i<12; i++)
 		if(order[i] < 8)
-			sys24_tile_draw(machine, bitmap, cliprect, order[i], level, 0);
+			sys24_tile_draw(screen->machine, bitmap, cliprect, order[i], level, 0);
 		else {
 			spri[order[i]-8] = level;
 			level++;

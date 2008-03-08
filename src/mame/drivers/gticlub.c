@@ -102,14 +102,14 @@ static VIDEO_START( hangplt )
 
 static VIDEO_UPDATE( hangplt )
 {
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	K001604_tile_update(screen);
+	K001604_tile_update(scrnum);
 //  K001604_draw_back_layer(bitmap, cliprect);
 
-	voodoo_update(screen, bitmap, cliprect);
+	voodoo_update(scrnum, bitmap, cliprect);
 
-	K001604_draw_front_layer(screen, bitmap, cliprect);
+	K001604_draw_front_layer(scrnum, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);

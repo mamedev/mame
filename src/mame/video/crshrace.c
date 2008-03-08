@@ -187,7 +187,7 @@ VIDEO_UPDATE( crshrace )
 {
 	if (gfxctrl & 0x04)	/* display disable? */
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -196,7 +196,7 @@ VIDEO_UPDATE( crshrace )
 	switch (gfxctrl & 0xfb)
 	{
 		case 0x00:	/* high score screen */
-			draw_sprites(machine,bitmap,cliprect);
+			draw_sprites(screen->machine,bitmap,cliprect);
 			draw_bg(bitmap,cliprect);
 			draw_fg(bitmap,cliprect);
 			break;
@@ -204,7 +204,7 @@ VIDEO_UPDATE( crshrace )
 		case 0x02:
 			draw_bg(bitmap,cliprect);
 			draw_fg(bitmap,cliprect);
-			draw_sprites(machine,bitmap,cliprect);
+			draw_sprites(screen->machine,bitmap,cliprect);
 			break;
 		default:
 popmessage("gfxctrl = %02x",gfxctrl);

@@ -951,13 +951,13 @@ static VIDEO_UPDATE( common )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	kaneko16_prepare_first_tilemap_chip(machine, bitmap, cliprect);
-	kaneko16_prepare_second_tilemap_chip(machine, bitmap, cliprect);
+	kaneko16_prepare_first_tilemap_chip(screen->machine, bitmap, cliprect);
+	kaneko16_prepare_second_tilemap_chip(screen->machine, bitmap, cliprect);
 
 	for ( i = 0; i < 8; i++ )
 	{
-		kaneko16_render_first_tilemap_chip(machine,bitmap,cliprect,i);
-		kaneko16_render_second_tilemap_chip(machine,bitmap,cliprect,i);
+		kaneko16_render_first_tilemap_chip(screen->machine,bitmap,cliprect,i);
+		kaneko16_render_second_tilemap_chip(screen->machine,bitmap,cliprect,i);
 	}
 
 	return 0;
@@ -966,13 +966,13 @@ static VIDEO_UPDATE( common )
 VIDEO_UPDATE(berlwall)
 {
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
-	kaneko16_render_15bpp_bitmap(machine,bitmap,cliprect);
+	kaneko16_render_15bpp_bitmap(screen->machine,bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
 
 	VIDEO_UPDATE_CALL(common);
-	kaneko16_render_sprites(machine,bitmap,cliprect);
+	kaneko16_render_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -980,19 +980,19 @@ VIDEO_UPDATE(berlwall)
 
 VIDEO_UPDATE( kaneko16 )
 {
-	kaneko16_fill_bitmap(machine,bitmap,cliprect);
+	kaneko16_fill_bitmap(screen->machine,bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
 
 	VIDEO_UPDATE_CALL(common);
-	kaneko16_render_sprites(machine,bitmap,cliprect);
+	kaneko16_render_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE( galsnew )
 {
-//  kaneko16_fill_bitmap(machine,bitmap,cliprect);
+//  kaneko16_fill_bitmap(screen->machine,bitmap,cliprect);
 	int y,x;
 	int count;
 
@@ -1033,14 +1033,14 @@ VIDEO_UPDATE( galsnew )
 
 	VIDEO_UPDATE_CALL(common);
 
-	kaneko16_render_sprites(machine,bitmap,cliprect);
+	kaneko16_render_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
 
 VIDEO_UPDATE( sandscrp )
 {
-	kaneko16_fill_bitmap(machine,bitmap,cliprect);
+	kaneko16_fill_bitmap(screen->machine,bitmap,cliprect);
 
 	// if the display is disabled, do nothing?
 	if (!kaneko16_disp_enable) return 0;
@@ -1048,7 +1048,7 @@ VIDEO_UPDATE( sandscrp )
 	VIDEO_UPDATE_CALL(common);
 
 	// copy sprite bitmap to screen
-	pandora_update(machine,bitmap,cliprect);
+	pandora_update(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

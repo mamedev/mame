@@ -868,8 +868,8 @@ VIDEO_UPDATE( metro )
 		}
 	}
 
-	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - machine->screen[0].width  / 2;
-	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - machine->screen[0].height / 2;
+	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - screen->machine->screen[0].width  / 2;
+	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - screen->machine->screen[0].height / 2;
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
@@ -929,9 +929,9 @@ if (input_code_pressed(KEYCODE_Z))
 
 
 	for (pri=3; pri>=0; pri--)
-		draw_layers(machine, bitmap,cliprect,pri,layers_ctrl);
+		draw_layers(screen->machine, bitmap,cliprect,pri,layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(machine, bitmap,cliprect);
+		metro_draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

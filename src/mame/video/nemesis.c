@@ -385,7 +385,7 @@ VIDEO_UPDATE( nemesis )
 {
 	int offs;
 
-	update_gfx(machine);
+	update_gfx(screen->machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,0,cliprect);
@@ -405,7 +405,7 @@ VIDEO_UPDATE( nemesis )
 	tilemap_draw(bitmap,cliprect,background,1,4);
 	tilemap_draw(bitmap,cliprect,foreground,1,8);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -414,7 +414,7 @@ VIDEO_UPDATE( salamand )
 	int offs;
 	rectangle clip;
 
-	update_gfx(machine);
+	update_gfx(screen->machine);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	fillbitmap(bitmap,0,cliprect);
@@ -449,6 +449,6 @@ VIDEO_UPDATE( salamand )
 		tilemap_draw(bitmap,&clip,background,1,8);
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

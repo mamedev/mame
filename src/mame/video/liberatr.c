@@ -371,7 +371,7 @@ VIDEO_UPDATE( liberatr )
 
 	liberatr_draw_planet(bitmap, pens);
 
-	liberatr_draw_bitmap(machine, bitmap, pens);
+	liberatr_draw_bitmap(screen->machine, bitmap, pens);
 
 	return 0;
 }

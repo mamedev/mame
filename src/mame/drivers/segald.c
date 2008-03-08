@@ -82,7 +82,7 @@ static VIDEO_UPDATE( astron )
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	astron_draw_characters(machine, bitmap, cliprect);
+	astron_draw_characters(screen->machine, bitmap, cliprect);
 	astron_draw_sprites(bitmap, cliprect);
 
 	/* display disc information */

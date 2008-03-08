@@ -274,10 +274,10 @@ VIDEO_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, bgmap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	// draw low priority sprites
-	draw_sprites(machine, bitmap, cliprect, buffered_spriteram, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram, 0);
 
 	// draw foreground
 	if (!(mapmask & 2))
@@ -291,7 +291,7 @@ VIDEO_UPDATE( bwing )
 	}
 
 	// draw high priority sprites
-	draw_sprites(machine, bitmap, cliprect, buffered_spriteram, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram, 1);
 
 	// draw text layer
 //  if (mapmask & 4)

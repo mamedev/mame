@@ -308,13 +308,13 @@ VIDEO_UPDATE( mcr68 )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	/* draw the low-priority sprites */
-	mcr68_update_sprites(machine, bitmap, cliprect, 0);
+	mcr68_update_sprites(screen->machine, bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	mcr68_update_sprites(machine, bitmap, cliprect, 1);
+	mcr68_update_sprites(screen->machine, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -325,12 +325,12 @@ VIDEO_UPDATE( zwackery )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the low-priority sprites */
-	zwackery_update_sprites(machine, bitmap, cliprect, 0);
+	zwackery_update_sprites(screen->machine, bitmap, cliprect, 0);
 
     /* redraw tiles with priority over sprites */
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 1, 0);
 
 	/* draw the high-priority sprites */
-	zwackery_update_sprites(machine, bitmap, cliprect, 1);
+	zwackery_update_sprites(screen->machine, bitmap, cliprect, 1);
 	return 0;
 }

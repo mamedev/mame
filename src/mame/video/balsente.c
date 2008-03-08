@@ -223,18 +223,16 @@ static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( balsente )
 {
-	const pen_t *pens = &machine->pens[palettebank_vis * 256];
+	const pen_t *pens = &screen->machine->pens[palettebank_vis * 256];
 	int y, i;
 
 	/* draw scanlines from the VRAM directly */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-	{
 		draw_scanline8(bitmap, 0, y, 256, &local_videoram[(y - BALSENTE_VBEND) * 256], pens, -1);
-	}
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
-		draw_one_sprite(machine, bitmap, cliprect, &spriteram[(0xe0 + i * 4) & 0xff]);
+		draw_one_sprite(screen->machine, bitmap, cliprect, &spriteram[(0xe0 + i * 4) & 0xff]);
 
 	return 0;
 }

@@ -74,7 +74,7 @@ VIDEO_UPDATE( djboy )
 	scroll = djboy_scrolly | ((djboy_videoreg&0x20)<<3);
 	tilemap_set_scrolly( background, 0, scroll );
 	tilemap_draw( bitmap, cliprect,background,0,0 );
-	pandora_update(machine,bitmap,cliprect);
+	pandora_update(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

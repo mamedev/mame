@@ -324,12 +324,12 @@ VIDEO_UPDATE( gaplus )
 
 	fillbitmap(bitmap, 0, cliprect);
 
-	starfield_render(machine, bitmap);
+	starfield_render(screen->machine, bitmap);
 
 	/* draw the low priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */

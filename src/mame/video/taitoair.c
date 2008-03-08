@@ -364,27 +364,27 @@ static void fill_poly(bitmap_t *bitmap, const struct poly *q)
 
 VIDEO_UPDATE( taitoair )
 {
-	TC0080VCO_tilemap_update(machine);
+	TC0080VCO_tilemap_update(screen->machine);
 
 	fillbitmap(bitmap, 0x41, cliprect);
 
 #ifdef MAME_DEBUG
 	if ( !input_code_pressed(KEYCODE_A) )
-		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,0,0);
+		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
 	if ( !input_code_pressed(KEYCODE_S) )
 		draw_sprites(bitmap,cliprect,0);
 	if ( !input_code_pressed(KEYCODE_D) )
-		TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
+		TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
 	if ( !input_code_pressed(KEYCODE_F) )
 		draw_sprites(bitmap,cliprect,1);
 #else
-	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,0,0,0);
+	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,0,0,0);
 	draw_sprites (bitmap,cliprect,0);
-	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,1,0,0);
+	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,1,0,0);
 	draw_sprites (bitmap,cliprect,1);
 #endif
 
-	TC0080VCO_tilemap_draw(machine,bitmap,cliprect,2,0,0);
+	TC0080VCO_tilemap_draw(screen->machine,bitmap,cliprect,2,0,0);
 
 	if(taitoair_line_ram[0x3fff]) {
 		int adr = 0x3fff;

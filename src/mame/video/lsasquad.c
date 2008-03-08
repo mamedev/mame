@@ -203,10 +203,10 @@ VIDEO_UPDATE( lsasquad )
 {
 	fillbitmap(bitmap,511,cliprect);
 
-	draw_layer(machine,bitmap,cliprect,lsasquad_scrollram + 0x000);
-	draw_layer(machine,bitmap,cliprect,lsasquad_scrollram + 0x080);
-	draw_sprites(machine,bitmap,cliprect);
-	draw_layer(machine,bitmap,cliprect,lsasquad_scrollram + 0x100);
+	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x000);
+	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x080);
+	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x100);
 	return 0;
 }
 
@@ -214,8 +214,8 @@ VIDEO_UPDATE( lsasquad )
 VIDEO_UPDATE( daikaiju )
 {
 	fillbitmap(bitmap,511,cliprect);
-	drawbg(machine,bitmap,cliprect,0); // bottom
-	draw_sprites(machine,bitmap,cliprect);
-	drawbg(machine,bitmap,cliprect,1);	// top = pallete $d ?
+	drawbg(screen->machine,bitmap,cliprect,0); // bottom
+	draw_sprites(screen->machine,bitmap,cliprect);
+	drawbg(screen->machine,bitmap,cliprect,1);	// top = pallete $d ?
 	return 0;
 }

@@ -91,7 +91,7 @@ VIDEO_START( mrflea ){
 
 VIDEO_UPDATE( mrflea )
 {
-	draw_background(machine, bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_background(screen->machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

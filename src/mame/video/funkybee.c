@@ -169,7 +169,7 @@ VIDEO_UPDATE( funkybee )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
-	draw_columns(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_columns(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -112,14 +112,14 @@ VIDEO_START( rockrage )
 
 VIDEO_UPDATE( rockrage )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	K007342_tilemap_update();
 
-	K007342_tilemap_draw( bitmap,cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
-	K007420_sprites_draw( bitmap,cliprect );
-	K007342_tilemap_draw( bitmap,cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
-	K007342_tilemap_draw( bitmap,cliprect, 1, 0 ,0);
-	K007342_tilemap_draw( bitmap,cliprect, 1, 1 ,0);
+	K007342_tilemap_draw(bitmap,cliprect, 0, TILEMAP_DRAW_OPAQUE ,0);
+	K007420_sprites_draw(bitmap,cliprect );
+	K007342_tilemap_draw(bitmap,cliprect, 0, 1 | TILEMAP_DRAW_OPAQUE ,0);
+	K007342_tilemap_draw(bitmap,cliprect, 1, 0 ,0);
+	K007342_tilemap_draw(bitmap,cliprect, 1, 1 ,0);
 	return 0;
 }

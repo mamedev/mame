@@ -59,11 +59,11 @@ VIDEO_START( qdrmfgp2 )
 
 VIDEO_UPDATE( qdrmfgp )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
-	K056832_tilemap_draw(machine, bitmap,cliprect, 3, 0, 1);
-	K056832_tilemap_draw(machine, bitmap,cliprect, 2, 0, 2);
-	K056832_tilemap_draw(machine, bitmap,cliprect, 1, 0, 4);
-	K056832_tilemap_draw(machine, bitmap,cliprect, 0, 0, 8);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, 3, 0, 1);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, 2, 0, 2);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, 1, 0, 4);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, 0, 0, 8);
 	return 0;
 }

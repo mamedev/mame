@@ -471,7 +471,7 @@ VIDEO_UPDATE( starcrus )
 
 	/* Draw ship 1 */
     drawgfx(bitmap,
-            machine->gfx[8+((s1_sprite&0x04)>>2)],
+            screen->machine->gfx[8+((s1_sprite&0x04)>>2)],
             (s1_sprite&0x03)^0x03,
             0,
             (s1_sprite&0x08)>>3,(s1_sprite&0x10)>>4,
@@ -482,7 +482,7 @@ VIDEO_UPDATE( starcrus )
 
 	/* Draw ship 2 */
     drawgfx(bitmap,
-            machine->gfx[10+((s2_sprite&0x04)>>2)],
+            screen->machine->gfx[10+((s2_sprite&0x04)>>2)],
             (s2_sprite&0x03)^0x03,
             0,
             (s2_sprite&0x08)>>3,(s2_sprite&0x10)>>4,
@@ -493,7 +493,7 @@ VIDEO_UPDATE( starcrus )
 
 	/* Draw score/projectile 1 */
 	drawgfx(bitmap,
-            machine->gfx[(p1_sprite&0x0c)>>2],
+            screen->machine->gfx[(p1_sprite&0x0c)>>2],
             (p1_sprite&0x03)^0x03,
             0,
             0,0,
@@ -504,7 +504,7 @@ VIDEO_UPDATE( starcrus )
 
 	/* Draw score/projectile 2 */
 	drawgfx(bitmap,
-            machine->gfx[4+((p2_sprite&0x0c)>>2)],
+            screen->machine->gfx[4+((p2_sprite&0x0c)>>2)],
             (p2_sprite&0x03)^0x03,
             0,
             0,0,
@@ -514,28 +514,28 @@ VIDEO_UPDATE( starcrus )
             0);
 
     /* Collision detection */
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
 	{
 		collision_reg = 0x00;
 
 		/* Check for collisions between ship1 and ship2 */
-		if (collision_check_s1s2(machine))
+		if (collision_check_s1s2(screen->machine))
 		{
 			collision_reg |= 0x08;
 		}
 		/* Check for collisions between ship1 and projectiles */
-		if (collision_check_s1p1p2(machine))
+		if (collision_check_s1p1p2(screen->machine))
 		{
 			collision_reg |= 0x02;
 		}
 		/* Check for collisions between ship1 and projectiles */
-		if (collision_check_s2p1p2(machine))
+		if (collision_check_s2p1p2(screen->machine))
 		{
 			collision_reg |= 0x01;
 		}
 		/* Check for collisions between ship1 and projectiles */
 		/* Note: I don't think this is used by the game */
-		if (collision_check_p1p2(machine))
+		if (collision_check_p1p2(screen->machine))
 		{
 			collision_reg |= 0x04;
 		}

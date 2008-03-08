@@ -230,13 +230,13 @@ VIDEO_UPDATE( dogfgt )
 		lastpixcolor = pixcolor;
 
 		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)
-			internal_bitmapram_w(machine,offs,bitmapram[offs]);
+			internal_bitmapram_w(screen->machine,offs,bitmapram[offs]);
 	}
 
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	copybitmap_trans(bitmap,pixbitmap,0,0,0,0,cliprect,PIXMAP_COLOR_BASE + 8*pixcolor);
 	return 0;

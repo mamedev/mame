@@ -127,7 +127,7 @@ VIDEO_UPDATE( kickgoal )
 	tilemap_draw(bitmap,cliprect,kickgoal_bg2tm,0,0);
 	tilemap_draw(bitmap,cliprect,kickgoal_bgtm,0,0);
 
-	kickgoal_draw_sprites(machine,bitmap,cliprect);
+	kickgoal_draw_sprites(screen->machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,kickgoal_fgtm,0,0);
 
@@ -250,7 +250,7 @@ VIDEO_UPDATE( actionhw )
 	tilemap_draw(bitmap,cliprect,kickgoal_bg2tm,0,0);
 	tilemap_draw(bitmap,cliprect,kickgoal_bgtm,0,0);
 
-	actionhw_draw_sprites(machine,bitmap,cliprect);
+	actionhw_draw_sprites(screen->machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,kickgoal_fgtm,0,0);
 	return 0;

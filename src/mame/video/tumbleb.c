@@ -559,7 +559,7 @@ VIDEO_UPDATE( tumblepb )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	tumblepb_draw_sprites(machine,bitmap,cliprect);
+	tumblepb_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -584,7 +584,7 @@ VIDEO_UPDATE( jumpkids )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -609,7 +609,7 @@ VIDEO_UPDATE( semicom )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -635,7 +635,7 @@ VIDEO_UPDATE( semicom_altoffsets )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -660,7 +660,7 @@ VIDEO_UPDATE( bcstory )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -687,7 +687,7 @@ VIDEO_UPDATE( semibase )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -714,7 +714,7 @@ VIDEO_UPDATE( sdfight )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -741,14 +741,14 @@ VIDEO_UPDATE( fncywld )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	fncywld_draw_sprites(machine,bitmap,cliprect);
+	fncywld_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
 
 VIDEO_UPDATE( jumppop )
 {
-//  fillbitmap(bitmap, get_black_pen(machine), cliprect);
+//  fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	tilemap_set_scrollx( pf1_tilemap,0, jumppop_control[2]-0x3a0 );
 	tilemap_set_scrolly( pf1_tilemap,0, jumppop_control[3] );
@@ -771,7 +771,7 @@ VIDEO_UPDATE( jumppop )
 
 //popmessage("%04x %04x %04x %04x %04x %04x %04x %04x", jumppop_control[0],jumppop_control[1],jumppop_control[2],jumppop_control[3],jumppop_control[4],jumppop_control[5],jumppop_control[6],jumppop_control[7]);
 
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -786,7 +786,7 @@ VIDEO_UPDATE( suprtrio )
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
 
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 #if 0
 popmessage("%04x %04x %04x %04x %04x %04x %04x %04x",
  suprtrio_control[0],
@@ -823,7 +823,7 @@ VIDEO_UPDATE( pangpang )
 		tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	else
 		tilemap_draw(bitmap,cliprect,pf1_alt_tilemap,0,0);
-	jumpkids_draw_sprites(machine,bitmap,cliprect);
+	jumpkids_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

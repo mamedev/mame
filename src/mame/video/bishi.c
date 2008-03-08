@@ -72,8 +72,8 @@ VIDEO_UPDATE(bishi)
 	static const int pris[4] = { K55_PRIINP_0, K55_PRIINP_3, K55_PRIINP_6, K55_PRIINP_7 };
 	static const int enables[4] = { K55_INP_VRAM_A, K55_INP_VRAM_B, K55_INP_VRAM_C, K55_INP_VRAM_D };
 
-	K054338_update_all_shadows(machine);
-	K054338_fill_backcolor(machine, bitmap, 0);
+	K054338_update_all_shadows(screen->machine);
+	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
 	for (i = 0; i < 4; i++)
 	{
@@ -89,7 +89,7 @@ VIDEO_UPDATE(bishi)
 	{
 		if (K055555_read_register(K55_INPUT_ENABLES) & enables[layers[i]])
 		{
-			K056832_tilemap_draw(machine, bitmap, cliprect, layers[i], 0, 1<<i);
+			K056832_tilemap_draw(screen->machine, bitmap, cliprect, layers[i], 0, 1<<i);
 		}
 	}
 	return 0;

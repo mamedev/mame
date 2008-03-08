@@ -1214,14 +1214,14 @@ VIDEO_UPDATE( jantouki )
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
-	if (screen==0)
+	if (scrnum==0)
 	{
 	//  if (layers_ctrl & 0x01) jantouki_copylayer( bitmap, cliprect, 3, 0 );
 		if (layers_ctrl & 0x02)	jantouki_copylayer( bitmap, cliprect, 2, 0 );
 		if (layers_ctrl & 0x04)	jantouki_copylayer( bitmap, cliprect, 1, 0 );
 		if (layers_ctrl & 0x08)	jantouki_copylayer( bitmap, cliprect, 0, 0 );
 	}
-	else if (screen==1)
+	else if (scrnum==1)
 	{
 		if (layers_ctrl & 0x01)	jantouki_copylayer( bitmap, cliprect, 3, 0 );
 		if (layers_ctrl & 0x10)	jantouki_copylayer( bitmap, cliprect, 7, 0 );

@@ -109,8 +109,8 @@ VIDEO_UPDATE( xexex )
 
 	sortlayers(layer, layerpri);
 
-	K054338_update_all_shadows(machine);
-	K054338_fill_backcolor(machine, bitmap, 0);
+	K054338_update_all_shadows(screen->machine);
+	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
 	fillbitmap(priority_bitmap, 0, cliprect);
 
@@ -118,15 +118,15 @@ VIDEO_UPDATE( xexex )
 	{
 		if (layer[plane] < 0)
 		{
-			K053250_draw(machine, bitmap, cliprect, 0, bg_colorbase, 0, 1<<plane);
+			K053250_draw(screen->machine, bitmap, cliprect, 0, bg_colorbase, 0, 1<<plane);
 		}
 		else if (!cur_alpha || layer[plane] != 1)
 		{
-			K056832_tilemap_draw(machine, bitmap, cliprect, layer[plane], 0, 1<<plane);
+			K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[plane], 0, 1<<plane);
 		}
 	}
 
-	K053247_sprites_draw(machine, bitmap, cliprect);
+	K053247_sprites_draw(screen->machine, bitmap, cliprect);
 
 	if (cur_alpha)
 	{
@@ -134,10 +134,10 @@ VIDEO_UPDATE( xexex )
 
 		if (alpha > 0)
 		{
-			K056832_tilemap_draw(machine, bitmap, cliprect, 1, (alpha >= 255) ? 0 : TILEMAP_DRAW_ALPHA, 0);
+			K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, (alpha >= 255) ? 0 : TILEMAP_DRAW_ALPHA, 0);
 		}
 	}
 
-	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
 	return 0;
 }

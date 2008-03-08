@@ -47,7 +47,7 @@ VIDEO_UPDATE( asuka )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update(machine);
+	TC0100SCN_tilemap_update(screen->machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -58,12 +58,12 @@ VIDEO_UPDATE( asuka )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, 0, cliprect);
 
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	/* Sprites may be over or under top bg layer */
-	PC090OJ_draw_sprites(machine,bitmap,cliprect,2);
+	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,2);
 	return 0;
 }
 
@@ -72,7 +72,7 @@ VIDEO_UPDATE( bonzeadv )
 {
 	UINT8 layer[3];
 
-	TC0100SCN_tilemap_update(machine);
+	TC0100SCN_tilemap_update(screen->machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -83,11 +83,11 @@ VIDEO_UPDATE( bonzeadv )
 	/* Ensure screen blanked even when bottom layer not drawn due to disable bit */
 	fillbitmap(bitmap, 0, cliprect);
 
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,2);
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,4);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,2);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,4);
 
 	/* Sprites are always over both bg layers */
-	PC090OJ_draw_sprites(machine,bitmap,cliprect,0);
+	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,0);
 	return 0;
 }

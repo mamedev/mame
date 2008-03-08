@@ -294,7 +294,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( stfight )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
@@ -304,7 +304,7 @@ VIDEO_UPDATE( stfight )
 
 	/* Draw sprites (may be obscured by foreground layer) */
 	if (stfight_vh_latch_ram[0x07] & 0x40)
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

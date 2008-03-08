@@ -503,11 +503,11 @@ VIDEO_UPDATE( toaplan0 )
 	fillbitmap(bitmap,0,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(machine, bitmap,cliprect,0x0400);
+	draw_sprites(screen->machine, bitmap,cliprect,0x0400);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,0x0800);
+	draw_sprites(screen->machine, bitmap,cliprect,0x0800);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,0x0c00);
+	draw_sprites(screen->machine, bitmap,cliprect,0x0c00);
 	return 0;
 }
 

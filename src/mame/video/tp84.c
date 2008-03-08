@@ -184,7 +184,7 @@ VIDEO_UPDATE( tp84 )
 {
 	rectangle clip = *cliprect;
 
-	if (cliprect->min_y == machine->screen[screen].visarea.min_y)
+	if (cliprect->min_y == screen->machine->screen[scrnum].visarea.min_y)
 	{
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 
@@ -196,16 +196,16 @@ VIDEO_UPDATE( tp84 )
 	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	/* draw top status region */
-	clip.min_x = machine->screen[0].visarea.min_x;
-	clip.max_x = machine->screen[0].visarea.min_x + 15;
+	clip.min_x = screen->machine->screen[0].visarea.min_x;
+	clip.max_x = screen->machine->screen[0].visarea.min_x + 15;
 	tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
 
 	/* draw bottom status region */
-	clip.min_x = machine->screen[0].visarea.max_x - 15;
-	clip.max_x = machine->screen[0].visarea.max_x;
+	clip.min_x = screen->machine->screen[0].visarea.max_x - 15;
+	clip.max_x = screen->machine->screen[0].visarea.max_x;
 	tilemap_draw(bitmap, &clip, fg_tilemap, 0, 0);
 
 	return 0;

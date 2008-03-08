@@ -199,11 +199,11 @@ VIDEO_START( amazon )
 VIDEO_UPDATE( amazon )
 {
 	if( xscroll&0x2000 )
-		fillbitmap( bitmap,get_black_pen(machine),cliprect );
+		fillbitmap( bitmap,get_black_pen(screen->machine),cliprect );
 	else
 		tilemap_draw( bitmap,cliprect, background, 0, 0 );
 
-	draw_sprites( machine, bitmap,cliprect );
+	draw_sprites(screen->machine, bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect, foreground, 0, 0 );
 	return 0;
 }

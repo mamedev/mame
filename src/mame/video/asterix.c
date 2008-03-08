@@ -119,13 +119,13 @@ VIDEO_UPDATE( asterix )
 	fillbitmap(priority_bitmap, 0, cliprect);
 	fillbitmap(bitmap, 0, cliprect);
 
-	K056832_tilemap_draw(machine, bitmap, cliprect, layer[0], 0, 1);
-	K056832_tilemap_draw(machine, bitmap, cliprect, layer[1], 0, 2);
-	K056832_tilemap_draw(machine, bitmap, cliprect, layer[2], 0, 4);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[0], 0, 1);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[1], 0, 2);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, layer[2], 0, 4);
 
 	pdrawgfx_shadow_lowpri = 1;	/* fix shadows in front of feet */
 	K053245_sprites_draw(0, bitmap, cliprect);
 
-	K056832_tilemap_draw(machine, bitmap, cliprect, 2, 0, 0);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 2, 0, 0);
 	return 0;
 }

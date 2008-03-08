@@ -370,7 +370,7 @@ VIDEO_UPDATE( prosoccr )
 		fillbitmap(bitmap,32,cliprect);
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
-	boomrang_draw_sprites(machine,bitmap,cliprect,0);
+	boomrang_draw_sprites(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
@@ -381,7 +381,7 @@ VIDEO_UPDATE( prosport )
 
 	fillbitmap(bitmap,0,cliprect);
 
-	prosport_draw_sprites(machine,bitmap,cliprect);
+	prosport_draw_sprites(screen->machine,bitmap,cliprect);
 
 	for (offs = 0;offs < 0x400;offs++) {
 		tile=videoram[offs+0x400]+((videoram[offs]&0x3)<<8);
@@ -394,7 +394,7 @@ VIDEO_UPDATE( prosport )
 		my = (offs) % 32;
 		mx = (offs) / 32;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				tile,1,0,0,248-8*mx,8*my,
 				cliprect,TRANSPARENCY_PEN,0);
 	}
@@ -411,10 +411,10 @@ VIDEO_UPDATE( boomrang )
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_DRAW_LAYER1,0);
 
-	boomrang_draw_sprites(machine,bitmap,cliprect,8);
+	boomrang_draw_sprites(screen->machine,bitmap,cliprect,8);
 	if (!background_disable)
 		tilemap_draw(bitmap,cliprect,background_tilemap,TILEMAP_DRAW_LAYER0,0);
-	boomrang_draw_sprites(machine,bitmap,cliprect,0);
+	boomrang_draw_sprites(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }
@@ -429,7 +429,7 @@ VIDEO_UPDATE( liberate )
 	else
 		tilemap_draw(bitmap,cliprect,background_tilemap,0,0);
 
-	liberate_draw_sprites(machine,bitmap,cliprect);
+	liberate_draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
 }

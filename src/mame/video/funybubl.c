@@ -82,7 +82,7 @@ VIDEO_UPDATE(funybubl)
 
 	offs = 0;
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */
@@ -93,12 +93,12 @@ VIDEO_UPDATE(funybubl)
 			int data;
 
 			data = funybubl_banked_videoram[offs] | (funybubl_banked_videoram[offs+1] << 8);
-			drawgfx(bitmap,machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],data&0x7fff,(data&0x8000)?2:1,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			offs+=2;
 		}
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 /*
     if ( input_code_pressed_once(KEYCODE_W) )

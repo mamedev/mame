@@ -168,14 +168,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( oneshot )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	tilemap_set_scrollx(oneshot_mid_tilemap,0, oneshot_scroll[0]-0x1f5);
 	tilemap_set_scrolly(oneshot_mid_tilemap,0, oneshot_scroll[1]);
 
 	tilemap_draw(bitmap,cliprect,oneshot_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_mid_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,oneshot_fg_tilemap,0,0);
 	draw_crosshairs(bitmap,cliprect);
 	return 0;
@@ -183,14 +183,14 @@ VIDEO_UPDATE( oneshot )
 
 VIDEO_UPDATE( maddonna )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	tilemap_set_scrolly(oneshot_mid_tilemap,0, oneshot_scroll[1]); // other registers aren't used so we don't know which layers they relate to
 
 	tilemap_draw(bitmap,cliprect,oneshot_mid_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_fg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_bg_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 //  draw_crosshairs(bitmap,cliprect); // not a gun game
 
 //  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", oneshot_scroll[0],oneshot_scroll[1],oneshot_scroll[2],oneshot_scroll[3],oneshot_scroll[4],oneshot_scroll[5],oneshot_scroll[6],oneshot_scroll[7]);

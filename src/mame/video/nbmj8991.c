@@ -311,9 +311,9 @@ VIDEO_UPDATE( nbmj8991_type1 )
 	{
 		nbmj8991_screen_refresh = 0;
 
-		for (y = 0; y < machine->screen[0].height; y++)
+		for (y = 0; y < screen->machine->screen[0].height; y++)
 		{
-			for (x = 0; x < machine->screen[0].width; x++)
+			for (x = 0; x < screen->machine->screen[0].width; x++)
 			{
 				update_pixel(x, y);
 			}
@@ -351,9 +351,9 @@ VIDEO_UPDATE( nbmj8991_type2 )
 	{
 		nbmj8991_screen_refresh = 0;
 
-		for (y = 0; y < machine->screen[0].height; y++)
+		for (y = 0; y < screen->machine->screen[0].height; y++)
 		{
-			for (x = 0; x < machine->screen[0].width; x++)
+			for (x = 0; x < screen->machine->screen[0].width; x++)
 			{
 				update_pixel(x, y);
 			}

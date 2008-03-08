@@ -307,7 +307,7 @@ VIDEO_UPDATE( yard )
 	tilemap_set_scrolly(bg_tilemap, 0, *yard_scroll_y_low);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
-	draw_panel(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_panel(screen->machine, bitmap, cliprect);
 	return 0;
 }

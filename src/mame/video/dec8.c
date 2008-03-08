@@ -451,9 +451,9 @@ VIDEO_UPDATE( cobracom )
 	flip_screen_set(dec8_pf0_control[0]>>7);
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,0,0);
-	draw_sprites2(machine,bitmap,cliprect,1);
+	draw_sprites2(screen->machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,dec8_pf1_tilemap,0,0);
-	draw_sprites2(machine,bitmap,cliprect,2);
+	draw_sprites2(screen->machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
 }
@@ -539,7 +539,7 @@ VIDEO_UPDATE( ghostb )
 	tilemap_set_scrolly( dec8_pf0_tilemap,0, (dec8_pf0_control[0x12]<<8)+dec8_pf0_control[0x13] );
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,0,0);
-	draw_sprites1(machine,bitmap,cliprect,0);
+	draw_sprites1(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
 }
@@ -578,7 +578,7 @@ VIDEO_UPDATE( oscar )
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1 | 0,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1 | 1,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER0 | 0,0);
-	draw_sprites2(machine,bitmap,cliprect,0);
+	draw_sprites2(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER0 | 1,0);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
@@ -617,7 +617,7 @@ VIDEO_UPDATE( lastmiss )
 	tilemap_set_scrolly( dec8_pf0_tilemap,0, ((scroll2[2]<<8)+scroll2[3]) );
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,0,0);
-	draw_sprites1(machine,bitmap,cliprect,0);
+	draw_sprites1(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
 }
@@ -630,7 +630,7 @@ VIDEO_UPDATE( shackled )
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1 | 0,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1 | 1,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER0 | 0,0);
-	draw_sprites1(machine,bitmap,cliprect,0);
+	draw_sprites1(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER0 | 1,0);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
@@ -696,9 +696,9 @@ VIDEO_UPDATE( srdarwin )
 	tilemap_set_scrollx( dec8_pf0_tilemap,0, (scroll2[0]<<8)+scroll2[1] );
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1,0);
-	srdarwin_draw_sprites(machine,bitmap,cliprect,0); //* (srdarwin37b5gre)
+	srdarwin_draw_sprites(screen->machine,bitmap,cliprect,0); //* (srdarwin37b5gre)
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER0,0);
-	srdarwin_draw_sprites(machine,bitmap,cliprect,1);
+	srdarwin_draw_sprites(screen->machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
 }
@@ -755,9 +755,9 @@ VIDEO_UPDATE( gondo )
 	tilemap_set_scrolly( dec8_pf0_tilemap,0, ((scroll2[2]<<8)+scroll2[3]) );
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER1,0);
-	draw_sprites1(machine,bitmap,cliprect,2);
+	draw_sprites1(screen->machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,TILEMAP_DRAW_LAYER0,0);
-	draw_sprites1(machine,bitmap,cliprect,1);
+	draw_sprites1(screen->machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;
 }
@@ -768,7 +768,7 @@ VIDEO_UPDATE( garyoret )
 	tilemap_set_scrolly( dec8_pf0_tilemap,0, ((scroll2[2]<<8)+scroll2[3]) );
 
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,0,0);
-	draw_sprites1(machine,bitmap,cliprect,0);
+	draw_sprites1(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,dec8_pf0_tilemap,1,0);
 	tilemap_draw(bitmap,cliprect,dec8_fix_tilemap,0,0);
 	return 0;

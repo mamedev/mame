@@ -215,7 +215,7 @@ static UINT16 led0;
 static VIDEO_UPDATE( acommand )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect,0,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
 	#if SHOW_LEDS

@@ -266,7 +266,7 @@ static VIDEO_UPDATE( madalien )
 
 	fillbitmap(bitmap, 0, cliprect);
 	draw_edges(bitmap, cliprect, flip, scroll_mode);
-	draw_foreground(machine, bitmap, cliprect, flip);
+	draw_foreground(screen->machine, bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels) */
 

@@ -113,7 +113,7 @@ VIDEO_UPDATE( pushman )
 	tilemap_set_scrolly( bg_tilemap,0, 0xf00-control[1] );
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }

@@ -635,11 +635,11 @@ VIDEO_UPDATE( namcona1 )
 			/* palette updates are delayed when graphics are disabled */
 			for( which=0; which<0x1000; which++ )
 			{
-				UpdatePalette(machine, which );
+				UpdatePalette(screen->machine, which );
 			}
 			palette_is_dirty = 0;
 		}
-		update_gfx(machine);
+		update_gfx(screen->machine);
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
 			static int tilemap_color;
@@ -658,11 +658,11 @@ VIDEO_UPDATE( namcona1 )
 			{
 				if( (namcona1_vreg[0x50+which]&0x7) == priority )
 				{
-					draw_background(machine,bitmap,cliprect,which,pri_mask[priority] );
+					draw_background(screen->machine,bitmap,cliprect,which,pri_mask[priority] );
 				}
 			} /* next tilemap */
 		} /* next priority level */
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 	} /* gfx enabled */
 	return 0;
 }

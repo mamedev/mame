@@ -247,14 +247,14 @@ VIDEO_UPDATE( buggychl )
 	/* decode modified characters */
 	for (code = 0;code < 256;code++)
 		if (dirtychar[code])
-			decodechar(machine->gfx[0],code,buggychl_character_ram);
+			decodechar(screen->machine->gfx[0],code,buggychl_character_ram);
 
 	if (bg_on)
-		draw_bg(machine, bitmap, cliprect);
+		draw_bg(screen->machine, bitmap, cliprect);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
-	draw_fg(machine, bitmap, cliprect);
+	draw_fg(screen->machine, bitmap, cliprect);
 
 	for (code = 0;code < 256;code++)
 		dirtychar[code] = 0;

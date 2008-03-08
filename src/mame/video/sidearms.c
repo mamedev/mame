@@ -351,7 +351,7 @@ VIDEO_UPDATE( sidearms )
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	if (objon)
-		draw_sprites(machine, bitmap, cliprect);
+		draw_sprites(screen->machine, bitmap, cliprect);
 
 	if (charon)
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

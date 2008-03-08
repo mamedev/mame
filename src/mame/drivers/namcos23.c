@@ -468,7 +468,7 @@ DrawPoly( bitmap_t *bitmap, const UINT32 *pSource, int n, int bNew )
 
 static VIDEO_UPDATE( ss23 )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);

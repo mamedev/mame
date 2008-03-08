@@ -31,8 +31,7 @@ VIDEO_UPDATE( mexico86 )
 	/* and sprites) are stored in the same memory region, and information on */
 	/* the background character columns is stored inthe area dd00-dd3f */
 
-	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,255,&machine->screen[0].visarea);
+	fillbitmap(bitmap,255,cliprect);
 
 	sx = 0;
 /* the score display seems to be outside of the main objectram. */
@@ -88,12 +87,12 @@ if (offs >= mexico86_objectram_size+0x1c0) continue;
 				x = (sx + xc * 8) & 0xff;
 				y = (sy + yc * 8) & 0xff;
 
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,
 						x,y,
-						&machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+						cliprect,TRANSPARENCY_PEN,15);
 			}
 		}
 	}
@@ -190,7 +189,7 @@ VIDEO_UPDATE( kikikai )
 	int goffs,code,color,y;
 	int tx, ty;
 
-	fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	sx = 0;
 	for (offs=0; offs<mexico86_objectram_size; offs+=4)
 	{
@@ -226,22 +225,22 @@ VIDEO_UPDATE( kikikai )
 			color = (mexico86_videoram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 					code,
 					color,
 					0,0,
 					sx&0xff,y,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+					cliprect,TRANSPARENCY_PEN,15);
 
 			code = mexico86_videoram[goffs] + ((mexico86_videoram[goffs + 1] & 0x1f) << 8);
 			color = (mexico86_videoram[goffs + 1] & 0xe0) >> 5;
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 					code,
 					color,
 					0,0,
 					(sx+8)&0xff,y,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN,15);
+					cliprect,TRANSPARENCY_PEN,15);
 		}
 	}
 	return 0;

@@ -260,10 +260,8 @@ VIDEO_START( sspeedr )
 VIDEO_UPDATE( sspeedr )
 {
 	draw_track(bitmap);
-
-	draw_drones(machine, bitmap, cliprect);
-
-	draw_driver(machine, bitmap, cliprect);
+	draw_drones(screen->machine, bitmap, cliprect);
+	draw_driver(screen->machine, bitmap, cliprect);
 	return 0;
 }
 

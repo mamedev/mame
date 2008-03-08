@@ -93,7 +93,7 @@ VIDEO_UPDATE( stadhero )
 	tilemap_set_scrolly( pf2_tilemap,0, stadhero_pf2_control_1[1] );
 
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,0x00,0x00);
+	draw_sprites(screen->machine, bitmap,cliprect,0x00,0x00);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }

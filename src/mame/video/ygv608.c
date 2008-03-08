@@ -746,9 +746,9 @@ VIDEO_UPDATE( ygv608 )
 
 	// clip to the current bitmap
 	finalclip.min_x = 0;
-	finalclip.max_x = machine->screen[0].width - 1;
+	finalclip.max_x = screen->machine->screen[0].width - 1;
 	finalclip.min_y = 0;
-	finalclip.max_y = machine->screen[0].height - 1;
+	finalclip.max_y = screen->machine->screen[0].height - 1;
 	sect_rect(&finalclip, cliprect);
 	cliprect = &finalclip;
 
@@ -770,8 +770,8 @@ VIDEO_UPDATE( ygv608 )
 
 		if( work_bitmap )
 			bitmap_free( work_bitmap );
-		work_bitmap = bitmap_alloc( machine->screen[0].width,
-										  machine->screen[0].height, machine->screen[0].format );
+		work_bitmap = bitmap_alloc( screen->machine->screen[0].width,
+										  screen->machine->screen[0].height, screen->machine->screen[0].format );
 
 		// reset resize flag
 		ygv608.screen_resize = 0;
@@ -884,10 +884,10 @@ VIDEO_UPDATE( ygv608 )
 
   if( ygv608.regs.s.zron )
     copyrozbitmap( bitmap, work_bitmap,
-                   ( machine->screen[0].visarea.min_x << 16 ) +
+                   ( screen->machine->screen[0].visarea.min_x << 16 ) +
                     ygv608.ax + 0x10000 * r *
                     ( -sin( alpha ) * cos_theta + cos( alpha ) * sin_theta ),
-                   ( machine->screen[0].visarea.min_y << 16 ) +
+                   ( screen->machine->screen[0].visarea.min_y << 16 ) +
                     ygv608.ay + 0x10000 * r *
                     ( cos( alpha ) * cos_theta + sin( alpha ) * sin_theta ),
                    ygv608.dx, ygv608.dxy, ygv608.dyx, ygv608.dy, 0,
@@ -900,11 +900,11 @@ VIDEO_UPDATE( ygv608 )
   // for some reason we can't use an opaque tilemap_A
   // so use a transparent but clear the work bitmap first
   // - look at why this is the case?!?
-  fillbitmap( work_bitmap,0,&machine->screen[0].visarea );
+  fillbitmap( work_bitmap,0,&screen->machine->screen[0].visarea );
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_ASBDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_ASEBDX )
-		draw_sprites(machine, bitmap,cliprect );
+		draw_sprites(screen->machine, bitmap,cliprect );
 
 	tilemap_draw( work_bitmap,cliprect, tilemap_A, 0, 0 );
 
@@ -922,7 +922,7 @@ VIDEO_UPDATE( ygv608 )
 
 	if ((ygv608.regs.s.r11 & r11_prm) == PRM_SABDEX ||
 		(ygv608.regs.s.r11 & r11_prm) == PRM_SEABDX)
-		draw_sprites(machine, bitmap,cliprect );
+		draw_sprites(screen->machine, bitmap,cliprect );
 
 
 #ifdef _SHOW_VIDEO_DEBUG

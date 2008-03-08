@@ -277,7 +277,7 @@ VIDEO_UPDATE( pitnrun )
 		tilemap_draw(bitmap,&myclip,bg, 0,0);
 	}
 
-	draw_sprites(machine,bitmap,&myclip);
+	draw_sprites(screen->machine,bitmap,&myclip);
 
 	if(pitnrun_ha&4)
 		copybitmap_trans(bitmap,tmp_bitmap[pitnrun_ha&3],flip_screen_x_get(),flip_screen_y_get(),dx,dy,&myclip, 1);

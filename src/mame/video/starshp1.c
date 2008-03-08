@@ -377,20 +377,20 @@ static int circle_collision(rectangle *rect)
 
 VIDEO_UPDATE( starshp1 )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	fillbitmap(bitmap, 0, cliprect);
 
 	if (starshp1_starfield_kill == 0)
 		draw_starfield(bitmap);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	if (starshp1_circle_kill == 0 && starshp1_circle_mod != 0)
 		draw_circle(bitmap);
 
 	if (starshp1_attract == 0)
-		draw_spaceship(machine, bitmap, cliprect);
+		draw_spaceship(screen->machine, bitmap, cliprect);
 
 	if (starshp1_circle_kill == 0 && starshp1_circle_mod == 0)
 		draw_circle(bitmap);

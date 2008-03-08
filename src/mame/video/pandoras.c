@@ -169,8 +169,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( pandoras )
 {
-	tilemap_draw( bitmap,cliprect, layer0, 1 ,0);
-	draw_sprites( machine, bitmap,cliprect, &spriteram[0x800] );
-	tilemap_draw( bitmap,cliprect, layer0, 0 ,0);
+	tilemap_draw(bitmap,cliprect, layer0, 1 ,0);
+	draw_sprites(screen->machine, bitmap,cliprect, &spriteram[0x800] );
+	tilemap_draw(bitmap,cliprect, layer0, 0 ,0);
 	return 0;
 }

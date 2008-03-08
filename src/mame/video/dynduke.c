@@ -230,14 +230,14 @@ VIDEO_UPDATE( dynduke )
 	tilemap_set_enable( tx_layer,txt_enable);
 
 
-	draw_background(machine, bitmap, cliprect,0x00);
-	draw_sprites(machine,bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
-	draw_sprites(machine,bitmap,cliprect,1);
-	draw_background(machine, bitmap, cliprect,0x20);
+	draw_background(screen->machine, bitmap, cliprect,0x00);
+	draw_sprites(screen->machine,bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
+	draw_sprites(screen->machine,bitmap,cliprect,1);
+	draw_background(screen->machine, bitmap, cliprect,0x20);
 
-	draw_sprites(machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect,3);
+	draw_sprites(screen->machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 
 	return 0;

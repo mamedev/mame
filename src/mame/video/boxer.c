@@ -73,7 +73,7 @@ VIDEO_UPDATE( boxer )
 		{
 			UINT8 code = boxer_tile_ram[32 * i + j];
 
-			drawgfx(bitmap, machine->gfx[2],
+			drawgfx(bitmap, screen->machine->gfx[2],
 				code,
 				0,
 				code & 0x40, code & 0x40,
@@ -84,6 +84,6 @@ VIDEO_UPDATE( boxer )
 		}
 	}
 
-	draw_boxer(machine, bitmap, cliprect);
+	draw_boxer(screen->machine, bitmap, cliprect);
 	return 0;
 }

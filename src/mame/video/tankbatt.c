@@ -102,6 +102,6 @@ static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( tankbatt )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_bullets(machine, bitmap, cliprect);
+	draw_bullets(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -160,7 +160,7 @@ VIDEO_UPDATE( shootout )
 
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	tilemap_draw(bitmap,cliprect,foreground,0,1);
-	draw_sprites(machine, bitmap,cliprect,3/*bank bits */);
+	draw_sprites(screen->machine, bitmap,cliprect,3/*bank bits */);
 	return 0;
 }
 
@@ -170,6 +170,6 @@ VIDEO_UPDATE( shootouj )
 
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	tilemap_draw(bitmap,cliprect,foreground,0,1);
-	draw_sprites(machine, bitmap,cliprect,2/*bank bits*/);
+	draw_sprites(screen->machine, bitmap,cliprect,2/*bank bits*/);
 	return 0;
 }

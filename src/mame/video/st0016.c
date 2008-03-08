@@ -635,7 +635,7 @@ VIDEO_UPDATE( st0016 )
 		//super eagle shot
 		int x,y,dy;
 
-		fillbitmap(speglsht_bitmap,0,&machine->screen[0].visarea);
+		fillbitmap(speglsht_bitmap,0,&screen->machine->screen[0].visarea);
 		dy=(speglsht_videoreg&0x20)?(256*512):0; //visible frame
 
 		for(y=0;y<256;y++)
@@ -648,9 +648,9 @@ VIDEO_UPDATE( st0016 )
 		}
 
 		//draw st0016 gfx to temporary bitmap (indexed 16)
-		draw_bgmap(machine, speglsht_bitmap,cliprect,0);
- 		draw_sprites(machine, speglsht_bitmap,cliprect);
-		draw_bgmap(machine, speglsht_bitmap,cliprect,1);
+		draw_bgmap(screen->machine, speglsht_bitmap,cliprect,0);
+ 		draw_sprites(screen->machine, speglsht_bitmap,cliprect);
+		draw_bgmap(screen->machine, speglsht_bitmap,cliprect,1);
 
 		//copy temporary bitmap to rgb 32 bit bitmap
 		for(y=cliprect->min_y; y<cliprect->max_y;y++)
@@ -660,7 +660,7 @@ VIDEO_UPDATE( st0016 )
 			{
 				if(srcline[x])
 				{
-					rgb_t color=palette_get_color(machine, srcline[x]);
+					rgb_t color=palette_get_color(screen->machine, srcline[x]);
 					PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
 				}
 			}
@@ -676,10 +676,10 @@ VIDEO_UPDATE( st0016 )
 			}
 		}
 
-		fillbitmap(bitmap,UNUSED_PEN,&machine->screen[0].visarea);
-		draw_bgmap(machine, bitmap,cliprect,0);
- 		draw_sprites(machine, bitmap,cliprect);
-		draw_bgmap(machine, bitmap,cliprect,1);
+		fillbitmap(bitmap,UNUSED_PEN,cliprect);
+		draw_bgmap(screen->machine, bitmap,cliprect,0);
+ 		draw_sprites(screen->machine, bitmap,cliprect);
+		draw_bgmap(screen->machine, bitmap,cliprect,1);
 	}
 	return 0;
 }

@@ -240,7 +240,7 @@ VIDEO_UPDATE( inufuku )
 {
 	int i;
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	fillbitmap(priority_bitmap, 0, NULL);
 
 	if (inufuku_bg_raster) {
@@ -258,6 +258,6 @@ VIDEO_UPDATE( inufuku )
 	tilemap_set_scrolly(inufuku_text_tilemap, 0, inufuku_text_scrolly);
 	tilemap_draw(bitmap, cliprect, inufuku_text_tilemap, 0, 4);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

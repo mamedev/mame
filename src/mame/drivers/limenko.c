@@ -304,7 +304,7 @@ static VIDEO_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 
 	if(limenko_videoreg[0] & 8)
-		draw_sprites(machine, bitmap, cliprect);
+		draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

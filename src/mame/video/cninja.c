@@ -408,7 +408,7 @@ VIDEO_UPDATE( cninja )
 	deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0,4);
-	cninja_draw_sprites(machine,bitmap,cliprect);
+	cninja_draw_sprites(screen->machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -427,7 +427,7 @@ VIDEO_UPDATE( edrandy )
 	else
 		deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,0,4);
-	cninja_draw_sprites(machine,bitmap,cliprect);
+	cninja_draw_sprites(screen->machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -475,7 +475,7 @@ VIDEO_UPDATE( robocop2 )
 			break;
 	}
 
-	robocop2_draw_sprites(machine,bitmap,cliprect);
+	robocop2_draw_sprites(screen->machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -512,14 +512,14 @@ VIDEO_UPDATE( mutantf )
         transparent against the background, rather than 50% */
 	if (deco16_priority&1) {
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,4);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
 	} else {
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,4);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
 		fillbitmap(priority_bitmap,0,cliprect);
-		mutantf_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3);
+		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
 	}
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;

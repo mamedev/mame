@@ -338,7 +338,7 @@ static VIDEO_UPDATE(wheelfir)
 			r = wheelfir_palette[x];
 			g = wheelfir_palette[x+1];
 			b = wheelfir_palette[x+2];
-			palette_set_color(machine,x/3,MAKE_RGB(r,g,b));
+			palette_set_color(screen->machine,x/3,MAKE_RGB(r,g,b));
 		}
 	}
 /*

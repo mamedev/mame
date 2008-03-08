@@ -1439,7 +1439,7 @@ VIDEO_UPDATE( cave )
 	int pri, pri2;
 	int layers_ctrl = -1;
 
-	set_pens(machine);
+	set_pens(screen->machine);
 
 	blit.baseaddr = bitmap->base;
 	blit.line_offset = bitmap->rowpixels * bitmap->bpp / 8;
@@ -1523,7 +1523,7 @@ VIDEO_UPDATE( cave )
 }
 #endif
 
-	cave_sprite_check(machine, cliprect);
+	cave_sprite_check(screen->machine, cliprect);
 
 	fillbitmap(bitmap,background_color,cliprect);
 

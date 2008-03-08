@@ -93,7 +93,7 @@ static void jack_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 VIDEO_UPDATE( jack )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	jack_draw_sprites(machine, bitmap, cliprect);
+	jack_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -174,6 +174,6 @@ static void joinem_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 VIDEO_UPDATE( joinem )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	joinem_draw_sprites(machine, bitmap, cliprect);
+	joinem_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

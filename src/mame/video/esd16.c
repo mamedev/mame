@@ -329,7 +329,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
 
-	if (layers_ctrl & 4)	esd16_draw_sprites(machine,bitmap,cliprect);
+	if (layers_ctrl & 4)	esd16_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -372,7 +372,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 	}
 
-	if (layers_ctrl & 4)	hedpanic_draw_sprites(machine,bitmap,cliprect);
+	if (layers_ctrl & 4)	hedpanic_draw_sprites(screen->machine,bitmap,cliprect);
 
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);

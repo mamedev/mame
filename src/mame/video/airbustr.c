@@ -138,7 +138,7 @@ VIDEO_UPDATE( airbustr )
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	// copy the sprite bitmap to the screen
-	pandora_update(machine, bitmap, cliprect);
+	pandora_update(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

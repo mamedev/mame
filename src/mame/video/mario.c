@@ -209,7 +209,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( mario )
 {
-	mario_state	*state = machine->driver_data;
+	mario_state	*state = screen->machine->driver_data;
 	int t;
 
 	t = readinputportbytag("MONITOR");
@@ -223,7 +223,7 @@ VIDEO_UPDATE( mario )
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->gfx_scroll - (state->flip ? 8 : 0));
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

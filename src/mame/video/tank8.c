@@ -202,10 +202,10 @@ static TIMER_CALLBACK( tank8_collision_callback )
 
 VIDEO_UPDATE( tank8 )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 	tilemap_draw(bitmap, cliprect, tank8_tilemap, 0, 0);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);
 	return 0;
 }

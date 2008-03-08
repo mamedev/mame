@@ -466,7 +466,7 @@ VIDEO_UPDATE( pipedrm )
 	tilemap_draw(bitmap,cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 
-	draw_sprites(machine,bitmap,cliprect, 0);
-	draw_sprites(machine,bitmap,cliprect, 1);
+	draw_sprites(screen->machine,bitmap,cliprect, 0);
+	draw_sprites(screen->machine,bitmap,cliprect, 1);
 	return 0;
 }

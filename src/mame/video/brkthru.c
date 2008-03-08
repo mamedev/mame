@@ -266,13 +266,13 @@ VIDEO_UPDATE( brkthru )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
 	/* low priority sprites */
-	draw_sprites(machine, bitmap, cliprect, 0x01 );
+	draw_sprites(screen->machine, bitmap, cliprect, 0x01 );
 
 	/* draw background over low priority sprites */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	/* high priority sprites */
-	draw_sprites(machine, bitmap, cliprect, 0x09 );
+	draw_sprites(screen->machine, bitmap, cliprect, 0x09 );
 
 	/* fg layer */
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

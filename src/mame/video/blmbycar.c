@@ -256,6 +256,6 @@ if (input_code_pressed(KEYCODE_Z))
 			tilemap_draw(bitmap, cliprect, tilemap_1, i, i);
 
 	if (layers_ctrl&8)
-		draw_sprites(machine, bitmap, cliprect);
+		draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

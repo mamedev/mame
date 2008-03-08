@@ -177,7 +177,7 @@ static VIDEO_UPDATE(srmp6)
 		UINT16 b;
 	} temp;
 
-	fillbitmap(bitmap,0,&machine->screen[0].visarea);
+	fillbitmap(bitmap,0,cliprect);
 
 #if 0
 	/* debug */
@@ -273,11 +273,11 @@ static VIDEO_UPDATE(srmp6)
 
 						if (dirty_tileram[tileno])
 						{
-							decodechar(machine->gfx[0], tileno, (UINT8*)tileram);
+							decodechar(screen->machine->gfx[0], tileno, (UINT8*)tileram);
 							dirty_tileram[tileno] = 0;
 						}
 
-						drawgfx(bitmap,machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,cliprect,trans,0);
+						drawgfx(bitmap,screen->machine->gfx[0],tileno,global_pal,flip_x,flip_y,xb,yb,cliprect,trans,0);
 						tileno++;
 		 			}
 				}

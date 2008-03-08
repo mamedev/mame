@@ -147,7 +147,7 @@ VIDEO_UPDATE( xxmissio )
 	tilemap_set_scrolly(bg_tilemap, 0, yscroll);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(bitmap, machine->gfx, cliprect);
+	draw_sprites(bitmap, screen->machine->gfx, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	return 0;

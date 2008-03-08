@@ -537,7 +537,7 @@ VIDEO_UPDATE( superpac )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
-	mappy_draw_sprites(machine,sprite_bitmap,cliprect,0,0,15);
+	mappy_draw_sprites(screen->machine,sprite_bitmap,cliprect,0,0,15);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 
 	/* Redraw the high priority characters */
@@ -563,7 +563,7 @@ VIDEO_UPDATE( phozon )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
-	phozon_draw_sprites(machine,bitmap,cliprect);
+	phozon_draw_sprites(screen->machine,bitmap,cliprect);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
@@ -580,7 +580,7 @@ VIDEO_UPDATE( mappy )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
 
-	mappy_draw_sprites(machine,bitmap,cliprect,0,0,15);
+	mappy_draw_sprites(screen->machine,bitmap,cliprect,0,0,15);
 
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);

@@ -83,7 +83,7 @@ VIDEO_UPDATE( bublbobl )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						code,
 						color,
 						flipx,flipy,

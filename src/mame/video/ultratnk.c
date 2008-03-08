@@ -78,7 +78,7 @@ VIDEO_UPDATE( ultratnk )
 
 		if (!(attr & 0x80))
 		{
-			drawgfx(bitmap, machine->gfx[1],
+			drawgfx(bitmap, screen->machine->gfx[1],
 				(code >> 3) | bank,
 				i,
 				0, 0,

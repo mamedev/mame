@@ -153,7 +153,7 @@ VIDEO_UPDATE( fastlane )
 	sect_rect(&finalclip0, cliprect);
 	sect_rect(&finalclip1, cliprect);
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	/* set scroll registers */
 	xoffs = K007121_ctrlram[0][0x00];
@@ -163,7 +163,7 @@ VIDEO_UPDATE( fastlane )
 	tilemap_set_scrolly( layer0, 0, K007121_ctrlram[0][0x02] );
 
 	tilemap_draw(bitmap,&finalclip0,layer0,0,0);
-	K007121_sprites_draw(0,bitmap,machine->gfx,machine->colortable,cliprect,spriteram,0,40,0,-1);
+	K007121_sprites_draw(0,bitmap,screen->machine->gfx,screen->machine->colortable,cliprect,spriteram,0,40,0,-1);
 	tilemap_draw(bitmap,&finalclip1,layer1,0,0);
 	return 0;
 }

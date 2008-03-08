@@ -171,14 +171,14 @@ VIDEO_UPDATE( lemmings )
 	/* Decode any characters that have changed in vram */
 	for (i=0; i<2048; i++) {
 		if (vram_dirty[i]) {
-			decodechar(machine->gfx[2],i,vram_buffer);
+			decodechar(screen->machine->gfx[2],i,vram_buffer);
 			tilemap_mark_tile_dirty(vram_tilemap,i);
 			vram_dirty[i]=0;
 		}
 	}
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x0000);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((lemmings_control_data[6]&2)==0) {
@@ -191,9 +191,9 @@ VIDEO_UPDATE( lemmings )
 		rect.min_x=160;
 		copyscrollbitmap_trans(bitmap,bitmap0,1,&x1,1,&y,&rect,0x100);
 	}
-	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x0000);
-	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x2000);
+	draw_sprites(screen->machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x0000);
+	draw_sprites(screen->machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x2000);
 	tilemap_draw(bitmap,cliprect,vram_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x2000);
+	draw_sprites(screen->machine,bitmap,cliprect,sprite_triple_buffer_0,0,0x2000);
 	return 0;
 }

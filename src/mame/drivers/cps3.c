@@ -1049,7 +1049,7 @@ static VIDEO_UPDATE(cps3)
 	{
 		if (cps3_screenwidth!=496)
 		{
-			screen_state *state = &machine->screen[0];
+			screen_state *state = &screen->machine->screen[0];
 			rectangle visarea = state->visarea;
 			cps3_screenwidth = 496;
 			visarea.min_x = 0; visarea.max_x = 496-1;
@@ -1061,7 +1061,7 @@ static VIDEO_UPDATE(cps3)
 	{
 		if (cps3_screenwidth!=384)
 		{
-			screen_state *state = &machine->screen[0];
+			screen_state *state = &screen->machine->screen[0];
 			rectangle visarea = state->visarea;
 			cps3_screenwidth = 384;
 			visarea.min_x = 0; visarea.max_x = 384-1;
@@ -1256,13 +1256,13 @@ static VIDEO_UPDATE(cps3)
 								/* use the bpp value from the main list or the sublists? */
 								if (whichbpp)
 								{
-									if (!global_bpp) machine->gfx[1]->color_granularity=256;
-									else machine->gfx[1]->color_granularity=64;
+									if (!global_bpp) screen->machine->gfx[1]->color_granularity=256;
+									else screen->machine->gfx[1]->color_granularity=64;
 								}
 								else
 								{
-									if (!bpp) machine->gfx[1]->color_granularity=256;
-									else machine->gfx[1]->color_granularity=64;
+									if (!bpp) screen->machine->gfx[1]->color_granularity=256;
+									else screen->machine->gfx[1]->color_granularity=64;
 								}
 
 								{
@@ -1270,17 +1270,17 @@ static VIDEO_UPDATE(cps3)
 
 									if (cps3_char_ram_dirty[realtileno])
 									{
-										decodechar(machine->gfx[1], realtileno, (UINT8*)cps3_char_ram);
+										decodechar(screen->machine->gfx[1], realtileno, (UINT8*)cps3_char_ram);
 										cps3_char_ram_dirty[realtileno] = 0;
 									}
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(renderbuffer_bitmap, machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(renderbuffer_bitmap, machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1349,11 +1349,11 @@ static VIDEO_UPDATE(cps3)
 
 				if (cps3_ss_ram_dirty[tile])
 				{
-					decodechar(machine->gfx[0], tile, (UINT8*)cps3_ss_ram);
+					decodechar(screen->machine->gfx[0], tile, (UINT8*)cps3_ss_ram);
 					cps3_ss_ram_dirty[tile] = 0;
 				}
 
-				cps3_drawgfxzoom(bitmap, machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,cliprect,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(bitmap, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,cliprect,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
 				count++;
 			}
 		}

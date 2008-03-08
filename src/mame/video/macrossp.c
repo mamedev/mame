@@ -370,7 +370,7 @@ VIDEO_UPDATE(macrossp)
 	int layers[3],layerpri[3];
 
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	layers[0] = 0;
 	layerpri[0] = (macrossp_scra_videoregs[0] & 0x0000c000) >> 14;
@@ -382,12 +382,12 @@ VIDEO_UPDATE(macrossp)
 	sortlayers(layers, layerpri);
 
 	draw_layer(bitmap,cliprect,layers[0]);
-	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 	draw_layer(bitmap,cliprect,layers[1]);
-	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 	draw_layer(bitmap,cliprect,layers[2]);
-	draw_sprites(machine,bitmap,cliprect,2);
-	draw_sprites(machine,bitmap,cliprect,3);
+	draw_sprites(screen->machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,macrossp_text_tilemap,0,0);
 
 #if 0

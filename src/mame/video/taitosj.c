@@ -817,11 +817,11 @@ static int video_update_common(running_machine *machine, bitmap_t *bitmap,
 
 VIDEO_UPDATE( taitosj )
 {
-	return video_update_common(machine, bitmap, cliprect, taitosj_copy_layer);
+	return video_update_common(screen->machine, bitmap, cliprect, taitosj_copy_layer);
 }
 
 
 VIDEO_UPDATE( kikstart )
 {
-	return video_update_common(machine, bitmap, cliprect, kikstart_copy_layer);
+	return video_update_common(screen->machine, bitmap, cliprect, kikstart_copy_layer);
 }

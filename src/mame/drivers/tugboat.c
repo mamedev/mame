@@ -119,8 +119,8 @@ static VIDEO_UPDATE( tugboat )
 	int startaddr1 = hd46505_1_reg[0x0c]*256 + hd46505_1_reg[0x0d];
 
 
-	draw_tilemap(machine, bitmap,cliprect,startaddr0,0,1,TRANSPARENCY_NONE);
-	draw_tilemap(machine, bitmap,cliprect,startaddr1,2,3,TRANSPARENCY_PEN);
+	draw_tilemap(screen->machine, bitmap,cliprect,startaddr0,0,1,TRANSPARENCY_NONE);
+	draw_tilemap(screen->machine, bitmap,cliprect,startaddr1,2,3,TRANSPARENCY_PEN);
 	return 0;
 }
 

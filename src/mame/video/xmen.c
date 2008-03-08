@@ -124,7 +124,7 @@ VIDEO_UPDATE( xmen )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
 	pdrawgfx_shadow_lowpri = 1;	/* fix shadows of boulders in front of feet */
-	K053247_sprites_draw(machine, bitmap,cliprect);
+	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }
 
@@ -150,7 +150,7 @@ VIDEO_UPDATE( xmen6p )
 			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
 			UINT16* line_src;
 
-			if (screen==0) line_src = BITMAP_ADDR16(screen_left, y, 0);
+			if (scrnum==0) line_src = BITMAP_ADDR16(screen_left, y, 0);
 			else line_src = BITMAP_ADDR16(screen_right, y, 0);
 
 			for (x=12*8;x<52*8;x++)

@@ -206,7 +206,7 @@ static VIDEO_UPDATE( gpworld )
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	gpworld_draw_tiles(machine, bitmap, cliprect);
+	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
 	gpworld_draw_sprites(bitmap, cliprect);
 
 	/* display disc information */

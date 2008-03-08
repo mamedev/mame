@@ -36,11 +36,11 @@ static VIDEO_UPDATE( ultrsprt )
 				if (p1 == 0)
 				{
 					UINT8 p2 = ram[BYTE4_XOR_BE(fb_index + i)];
-					bmp[i] = machine->pens[0x000 + p2];
+					bmp[i] = screen->machine->pens[0x000 + p2];
 				}
 				else
 				{
-					bmp[i] = machine->pens[0x100 + p1];
+					bmp[i] = screen->machine->pens[0x100 + p1];
 				}
 			}
 		}

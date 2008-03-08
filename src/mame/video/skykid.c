@@ -248,11 +248,11 @@ VIDEO_UPDATE( skykid )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
 	if ((priority & 0xf0) != 0x50)
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
 	if ((priority & 0xf0) == 0x50)
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

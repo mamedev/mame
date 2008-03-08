@@ -86,12 +86,12 @@ VIDEO_UPDATE( canyon )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	draw_bombs(bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(machine, !(readinputport(2) & 0x10));
+	watchdog_enable(screen->machine, !(readinputport(2) & 0x10));
 
 	return 0;
 }

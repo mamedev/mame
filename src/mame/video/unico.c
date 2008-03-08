@@ -367,7 +367,7 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	unico_draw_sprites(machine, bitmap,cliprect);
+	if (layers_ctrl & 8)	unico_draw_sprites(screen->machine, bitmap,cliprect);
 
 	return 0;
 }
@@ -406,7 +406,7 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect,tilemap_2,0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)	zeropnt2_draw_sprites(machine, bitmap,cliprect);
+	if (layers_ctrl & 8)	zeropnt2_draw_sprites(screen->machine, bitmap,cliprect);
 
 	return 0;
 }

@@ -134,14 +134,14 @@ VIDEO_UPDATE( darkmist)
 
 #define DM_GETSCROLL(n) (((darkmist_scroll[(n)]<<1)&0xff) + ((darkmist_scroll[(n)]&0x80)?1:0) +( ((darkmist_scroll[(n)-1]<<4) | (darkmist_scroll[(n)-1]<<12) )&0xff00))
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	tilemap_set_scrollx(bgtilemap, 0, DM_GETSCROLL(0x2));
 	tilemap_set_scrolly(bgtilemap, 0, DM_GETSCROLL(0x6));
 	tilemap_set_scrollx(fgtilemap, 0, DM_GETSCROLL(0xa));
 	tilemap_set_scrolly(fgtilemap, 0, DM_GETSCROLL(0xe));
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	if(darkmist_hw & DISPLAY_BG)
 		tilemap_draw(bitmap,cliprect,bgtilemap, 0,0);
@@ -176,12 +176,12 @@ VIDEO_UPDATE( darkmist)
 		palette=((spriteram[i+1])>>1)&0xf;
 
 		if(spriteram[i+1]&0x1)
-			palette=mame_rand(machine)&15;
+			palette=mame_rand(screen->machine)&15;
 
 		palette+=32;
 
 		drawgfx(
-               bitmap,machine->gfx[2],
+               bitmap,screen->machine->gfx[2],
                tile,
                palette,
                fx,fy,

@@ -57,14 +57,14 @@ VIDEO_UPDATE( polyplay )
 
 		if (dirtycharacter[code])
 		{
-			decodechar(machine->gfx[1], code & 0x7f, polyplay_characterram);
+			decodechar(screen->machine->gfx[1], code & 0x7f, polyplay_characterram);
 
 			dirtycharacter[code] = 0;
 		}
 
-		drawgfx(bitmap,machine->gfx[(code >> 7) & 0x01],
+		drawgfx(bitmap,screen->machine->gfx[(code >> 7) & 0x01],
 				code, 0, 0, 0, sx, sy,
-				&machine->screen[0].visarea, TRANSPARENCY_NONE, 0);
+				cliprect, TRANSPARENCY_NONE, 0);
 	}
 
 	return 0;

@@ -271,10 +271,10 @@ VIDEO_UPDATE( wolfpack )
 	if (wolfpack_ship_size & 0x40) color += 0x3a;
 	if (wolfpack_ship_size & 0x80) color += 0x48;
 
-	colortable_palette_set_color(machine->colortable, 3, MAKE_RGB(color,color,color));
-	colortable_palette_set_color(machine->colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
-																  color < 0xb8 ? color + 0x48 : 0xff,
-																  color < 0xb8 ? color + 0x48 : 0xff));
+	colortable_palette_set_color(screen->machine->colortable, 3, MAKE_RGB(color,color,color));
+	colortable_palette_set_color(screen->machine->colortable, 7, MAKE_RGB(color < 0xb8 ? color + 0x48 : 0xff,
+																		  color < 0xb8 ? color + 0x48 : 0xff,
+																		  color < 0xb8 ? color + 0x48 : 0xff));
 
 	fillbitmap(bitmap, wolfpack_video_invert, cliprect);
 
@@ -283,7 +283,7 @@ VIDEO_UPDATE( wolfpack )
 		{
 			int code = wolfpack_alpha_num_ram[32 * i + j];
 
-			drawgfx(bitmap, machine->gfx[0],
+			drawgfx(bitmap, screen->machine->gfx[0],
 				code,
 				wolfpack_video_invert,
 				0, 0,
@@ -293,10 +293,10 @@ VIDEO_UPDATE( wolfpack )
 				TRANSPARENCY_NONE, 0);
 		}
 
-	draw_pt(machine, bitmap, cliprect);
-	draw_ship(machine, bitmap, cliprect);
-	draw_torpedo(machine, bitmap, cliprect);
-	draw_water(machine->colortable, bitmap, cliprect);
+	draw_pt(screen->machine, bitmap, cliprect);
+	draw_ship(screen->machine, bitmap, cliprect);
+	draw_torpedo(screen->machine, bitmap, cliprect);
+	draw_water(screen->machine->colortable, bitmap, cliprect);
 	return 0;
 }
 

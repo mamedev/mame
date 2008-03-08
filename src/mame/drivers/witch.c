@@ -751,7 +751,7 @@ static VIDEO_UPDATE(witch)
 
 	tilemap_draw(bitmap,cliprect,gfx1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,gfx0a_tilemap,0,0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,gfx0b_tilemap,0,0);
 	return 0;
 }

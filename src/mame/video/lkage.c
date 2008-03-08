@@ -205,6 +205,6 @@ VIDEO_UPDATE( lkage )
 	{
 		tilemap_draw( bitmap,cliprect,tx_tilemap,TILEMAP_DRAW_OPAQUE,0);
 	}
-	draw_sprites(machine, bitmap,cliprect );
+	draw_sprites(screen->machine, bitmap,cliprect );
 	return 0;
 }

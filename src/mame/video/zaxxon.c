@@ -453,8 +453,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( zaxxon )
 {
-	draw_background(machine, bitmap, cliprect, TRUE);
-	draw_sprites(machine, bitmap, cliprect, 0x140, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, TRUE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -462,8 +462,8 @@ VIDEO_UPDATE( zaxxon )
 
 VIDEO_UPDATE( futspy )
 {
-	draw_background(machine, bitmap, cliprect, TRUE);
-	draw_sprites(machine, bitmap, cliprect, 0x180, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, TRUE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x180, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -471,8 +471,8 @@ VIDEO_UPDATE( futspy )
 
 VIDEO_UPDATE( razmataz )
 {
-	draw_background(machine, bitmap, cliprect, FALSE);
-	draw_sprites(machine, bitmap, cliprect, 0x140, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, FALSE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x140, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -480,8 +480,8 @@ VIDEO_UPDATE( razmataz )
 
 VIDEO_UPDATE( congo )
 {
-	draw_background(machine, bitmap, cliprect, TRUE);
-	draw_sprites(machine, bitmap, cliprect, 0x280, 0x180);
+	draw_background(screen->machine, bitmap, cliprect, TRUE);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x280, 0x180);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

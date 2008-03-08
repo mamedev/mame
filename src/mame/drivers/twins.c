@@ -102,7 +102,7 @@ static VIDEO_UPDATE(twins)
 	int i;
 	static int xxx=320,yyy=204;
 
-	fillbitmap(bitmap, get_black_pen(machine), 0);
+	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 
 	for (i=0;i<0x100;i++)
 	{
@@ -118,7 +118,7 @@ static VIDEO_UPDATE(twins)
 		b = (dat>>10) & 0x1f;
 		b = BITSWAP8(b,7,6,5,0,1,2,3,4);
 
-		palette_set_color_rgb(machine,i, pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(screen->machine,i, pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
 	count=0;
@@ -205,7 +205,7 @@ static VIDEO_UPDATE(twinsa)
 	int i;
 	static int xxx=320,yyy=204;
 
-	fillbitmap(bitmap, get_black_pen(machine), 0);
+	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 
 	for (i=0;i<0x1000-3;i+=3)
 	{
@@ -214,7 +214,7 @@ static VIDEO_UPDATE(twinsa)
 		g = twins_pal[i+1];
 		b = twins_pal[i+2];
 
-		palette_set_color_rgb(machine,i/3, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(screen->machine,i/3, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	count=0;

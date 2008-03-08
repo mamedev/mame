@@ -95,7 +95,7 @@ static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangl
 static VIDEO_UPDATE(gamecstl)
 {
 	int i, j;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT32 *cga = cga_ram;
 	int index = 0;
 
@@ -110,8 +110,8 @@ static VIDEO_UPDATE(gamecstl)
 			int att1 = (cga[index] >> 24) & 0xff;
 			int ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(screen->machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
+			draw_char(screen->machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
 			index++;
 		}
 	}

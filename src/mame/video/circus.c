@@ -118,7 +118,7 @@ static void circus_draw_fg(running_machine *machine, bitmap_t *bitmap, const rec
 VIDEO_UPDATE( circus )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	circus_draw_fg(machine, bitmap, cliprect);
+	circus_draw_fg(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -170,7 +170,7 @@ VIDEO_UPDATE( robotbwl )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	robotbwl_draw_scoreboard(bitmap, cliprect);
 	robotbwl_draw_bowling_alley(bitmap, cliprect);
-	robotbwl_draw_ball(machine, bitmap, cliprect);
+	robotbwl_draw_ball(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -187,7 +187,7 @@ static void crash_draw_car(running_machine *machine, bitmap_t *bitmap, const rec
 VIDEO_UPDATE( crash )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	crash_draw_car(machine, bitmap, cliprect);
+	crash_draw_car(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -256,6 +256,6 @@ static void ripcord_draw_skydiver(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE( ripcord )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	ripcord_draw_skydiver(machine, bitmap, cliprect);
+	ripcord_draw_skydiver(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -282,7 +282,7 @@ VIDEO_UPDATE( ssrj )
 	tilemap_set_scrolly(tilemap1 , 0, 0xff-ssrj_scrollram[2] );
 	tilemap_set_scrollx(tilemap1 , 0, ssrj_scrollram[0] );
 	tilemap_draw(bitmap,cliprect,tilemap1, 0,0);
-	draw_objects(machine, bitmap,cliprect);
+	draw_objects(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tilemap2, 0,0);
 
 	if(ssrj_scrollram[0x101]==0xb)tilemap_draw(bitmap,cliprect,tilemap4, 0,0);/* hack to display 4th tilemap */

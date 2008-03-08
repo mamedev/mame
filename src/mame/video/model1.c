@@ -459,10 +459,10 @@ static void draw_quads(bitmap_t *bitmap, const rectangle *cliprect)
 
 		fill_quad(bitmap, q);
 #if 0
-		draw_line(bitmap, get_black_pen(machine), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
-		draw_line(bitmap, get_black_pen(machine), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
-		draw_line(bitmap, get_black_pen(machine), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
-		draw_line(bitmap, get_black_pen(machine), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine), q->p[0]->s.x, q->p[0]->s.y, q->p[1]->s.x, q->p[1]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine), q->p[1]->s.x, q->p[1]->s.y, q->p[2]->s.x, q->p[2]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine), q->p[2]->s.x, q->p[2]->s.y, q->p[3]->s.x, q->p[3]->s.y);
+		draw_line(bitmap, get_black_pen(screen->machine), q->p[3]->s.x, q->p[3]->s.y, q->p[0]->s.x, q->p[0]->s.y);
 #endif
 	}
 
@@ -1458,7 +1458,7 @@ VIDEO_START(model1)
 
 VIDEO_UPDATE(model1)
 {
-	sys24_tile_update(machine);
+	sys24_tile_update(screen->machine);
 #if 0
 	{
 		int mod = 0;
@@ -1506,19 +1506,19 @@ VIDEO_UPDATE(model1)
 	ayys = sin(ayy);
 
 	fillbitmap(priority_bitmap, 0, NULL);
-	fillbitmap(bitmap, machine->pens[0], &machine->screen[0].visarea);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	sys24_tile_draw(machine, bitmap, cliprect, 6, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 4, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 2, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 0, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 6, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 4, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 2, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
 
 	tgp_render(bitmap, cliprect);
 
-	sys24_tile_draw(machine, bitmap, cliprect, 7, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 5, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 3, 0, 0);
-	sys24_tile_draw(machine, bitmap, cliprect, 1, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 7, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 5, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 3, 0, 0);
+	sys24_tile_draw(screen->machine, bitmap, cliprect, 1, 0, 0);
 
 	return 0;
 }

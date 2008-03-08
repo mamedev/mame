@@ -120,7 +120,7 @@ static VIDEO_START(ssingles)
 
 static VIDEO_UPDATE( ssingles )
 {
-	const device_config *mc6845 = device_list_find_by_tag(machine->config->devicelist, MC6845, "crtc");
+	const device_config *mc6845 = device_list_find_by_tag(screen->machine->config->devicelist, MC6845, "crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 
 	return 0;

@@ -253,7 +253,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( ppking )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
@@ -301,10 +301,10 @@ VIDEO_UPDATE( gladiatr )
 		tilemap_set_scrolly(fg_tilemap, 0, fg_scrolly);
 
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else
-		fillbitmap( bitmap, get_black_pen(machine), cliprect );
+		fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	return 0;
 }

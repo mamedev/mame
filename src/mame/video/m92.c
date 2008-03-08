@@ -460,7 +460,7 @@ static void m92_screenrefresh(running_machine *machine, bitmap_t *bitmap,const r
 VIDEO_UPDATE( m92 )
 {
 	m92_update_scroll_positions();
-	m92_screenrefresh(machine, bitmap, cliprect);
+	m92_screenrefresh(screen->machine, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
 	if (readinputportbytag("DIPS21") & 0x100)

@@ -212,7 +212,7 @@ VIDEO_UPDATE( cop01 )
 	tilemap_set_scrolly(bg_tilemap,0,mightguy_vreg[3]);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0 );
 	return 0;

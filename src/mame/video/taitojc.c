@@ -275,7 +275,7 @@ VIDEO_UPDATE( taitojc )
 		}
 	}
 
-	taitojc_tile_update(machine);
+	taitojc_tile_update(screen->machine);
 	tilemap_draw(bitmap, cliprect, taitojc_tilemap, 0,0);
 
 	/*

@@ -919,7 +919,7 @@ VIDEO_START( dkong )
 
 VIDEO_UPDATE( dkong )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = screen->machine->driver_data;
 
 	tilemap_set_flip(ALL_TILEMAPS, state->flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->flip ?  0 : 0);
@@ -929,15 +929,15 @@ VIDEO_UPDATE( dkong )
 	{
 		case HARDWARE_TKG02:
 		case HARDWARE_TKG04:
-			check_palette(machine);
+			check_palette(screen->machine);
 			tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-			draw_sprites(machine, bitmap, cliprect, 0x40, 1);
+			draw_sprites(screen->machine, bitmap, cliprect, 0x40, 1);
 			break;
 		case HARDWARE_TRS01:
 		case HARDWARE_TRS02:
 			tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-			draw_sprites(machine, bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(machine, bitmap, cliprect);
+			draw_sprites(screen->machine, bitmap, cliprect, 0x40, 1);
+			radarscp_draw_background(screen->machine, bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update");
@@ -947,7 +947,7 @@ VIDEO_UPDATE( dkong )
 
 VIDEO_UPDATE( pestplce )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = screen->machine->driver_data;
 	int offs;
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -957,7 +957,7 @@ VIDEO_UPDATE( pestplce )
 	{
 		if (state->sprite_ram[offs])
 		{
-			drawgfx(bitmap,machine->gfx[1],
+			drawgfx(bitmap,screen->machine->gfx[1],
 					state->sprite_ram[offs + 2],
 					(state->sprite_ram[offs + 1] & 0x0f) + 16 * state->palette_bank,
 					state->sprite_ram[offs + 1] & 0x80,state->sprite_ram[offs + 1] & 0x40,
@@ -970,11 +970,11 @@ VIDEO_UPDATE( pestplce )
 
 VIDEO_UPDATE( spclforc )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = screen->machine->driver_data;
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* it uses sprite_ram[offs + 2] & 0x10 for sprite bank */
-	draw_sprites(machine, bitmap, cliprect, 0x10, 3);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x10, 3);
 	return 0;
 }

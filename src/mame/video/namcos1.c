@@ -350,7 +350,7 @@ VIDEO_UPDATE( namcos1 )
 
 
 	/* background color */
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
 	i = ((namcos1_cus116[0] << 8) | namcos1_cus116[1]) - 1;			// min x
@@ -402,7 +402,7 @@ VIDEO_UPDATE( namcos1 )
 		}
 	}
 
-	draw_sprites(machine, bitmap, &new_clip);
+	draw_sprites(screen->machine, bitmap, &new_clip);
 	return 0;
 }
 

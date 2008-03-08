@@ -424,7 +424,7 @@ static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 VIDEO_UPDATE( punchout )
 {
-	if (screen == 1)
+	if (scrnum == 1)
 	{
 		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
@@ -443,7 +443,7 @@ VIDEO_UPDATE( punchout )
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
 			draw_big_sprite(bitmap, cliprect);
-		drawbs2(machine, bitmap, cliprect);
+		drawbs2(screen->machine, bitmap, cliprect);
 	}
 	return 0;
 }
@@ -451,7 +451,7 @@ VIDEO_UPDATE( punchout )
 
 VIDEO_UPDATE( armwrest )
 {
-	if (screen == 1)
+	if (scrnum == 1)
 	{
 		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
@@ -464,7 +464,7 @@ VIDEO_UPDATE( armwrest )
 
 		if (punchout_bigsprite1[7] & 2)	/* display in bottom monitor */
 			armwrest_draw_big_sprite(bitmap, cliprect);
-		drawbs2(machine, bitmap, cliprect);
+		drawbs2(screen->machine, bitmap, cliprect);
 
 		tilemap_draw(bitmap, cliprect, fgtilemap, 0, 0);
 	}

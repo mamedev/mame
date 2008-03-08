@@ -2448,20 +2448,20 @@ VIDEO_UPDATE( system32 )
 
 	/* update the visible area */
 	if (system32_videoram[0x1ff00/2] & 0x8000)
-		video_screen_set_visarea(screen, 0, 52*8-1, 0, 28*8-1);
+		video_screen_set_visarea(scrnum, 0, 52*8-1, 0, 28*8-1);
 	else
-		video_screen_set_visarea(screen, 0, 40*8-1, 0, 28*8-1);
+		video_screen_set_visarea(scrnum, 0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
-	if (!system32_displayenable[screen])
+	if (!system32_displayenable[scrnum])
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 		return 0;
 	}
 
 	/* update the tilemaps */
 	profiler_mark(PROFILER_USER1);
-	enablemask = update_tilemaps(machine, screen, cliprect);
+	enablemask = update_tilemaps(screen->machine, scrnum, cliprect);
 	profiler_mark(PROFILER_END);
 
 	/* debugging */
@@ -2486,50 +2486,50 @@ VIDEO_UPDATE( system32 )
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
-		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
+		for (y = screen->machine->screen[screen].visarea.min_y; y <= screen->machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_SPRITES, y);
-			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
+			for (x = screen->machine->screen[screen].visarea.min_x; x <= screen->machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg0.txt", "w");
-		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
+		for (y = screen->machine->screen[screen].visarea.min_y; y <= screen->machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG0, y);
-			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
+			for (x = screen->machine->screen[screen].visarea.min_x; x <= screen->machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg1.txt", "w");
-		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
+		for (y = screen->machine->screen[screen].visarea.min_y; y <= screen->machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG1, y);
-			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
+			for (x = screen->machine->screen[screen].visarea.min_x; x <= screen->machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg2.txt", "w");
-		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
+		for (y = screen->machine->screen[screen].visarea.min_y; y <= screen->machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG2, y);
-			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
+			for (x = screen->machine->screen[screen].visarea.min_x; x <= screen->machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
 		fclose(f);
 
 		f = fopen("nbg3.txt", "w");
-		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
+		for (y = screen->machine->screen[screen].visarea.min_y; y <= screen->machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_NBG3, y);
-			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
+			for (x = screen->machine->screen[screen].visarea.min_x; x <= screen->machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}
@@ -2580,7 +2580,7 @@ for (showclip = 0; showclip < 4; showclip++)
 				if (clips & (1 << i))
 				{
 					rectangle rect;
-					pen_t white = get_white_pen(machine);
+					pen_t white = get_white_pen(screen->machine);
 					if (!flip)
 					{
 						rect.min_x = system32_videoram[0x1ff60/2 + i * 4] & 0x1ff;
@@ -2590,12 +2590,12 @@ for (showclip = 0; showclip < 4; showclip++)
 					}
 					else
 					{
-						rect.max_x = (machine->screen[screen].visarea.max_x + 1) - (system32_videoram[0x1ff60/2 + i * 4] & 0x1ff);
-						rect.max_y = (machine->screen[screen].visarea.max_y + 1) - (system32_videoram[0x1ff62/2 + i * 4] & 0x0ff);
-						rect.min_x = (machine->screen[screen].visarea.max_x + 1) - ((system32_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
-						rect.min_y = (machine->screen[screen].visarea.max_y + 1) - ((system32_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
+						rect.max_x = (screen->machine->screen[screen].visarea.max_x + 1) - (system32_videoram[0x1ff60/2 + i * 4] & 0x1ff);
+						rect.max_y = (screen->machine->screen[screen].visarea.max_y + 1) - (system32_videoram[0x1ff62/2 + i * 4] & 0x0ff);
+						rect.min_x = (screen->machine->screen[screen].visarea.max_x + 1) - ((system32_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
+						rect.min_y = (screen->machine->screen[screen].visarea.max_y + 1) - ((system32_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 					}
-					sect_rect(&rect, &machine->screen[screen].visarea);
+					sect_rect(&rect, &screen->machine->screen[screen].visarea);
 
 					if (rect.min_y <= rect.max_y && rect.min_x <= rect.max_x)
 					{
@@ -2627,20 +2627,20 @@ VIDEO_UPDATE( multi32 )
 
 	/* update the visible area */
 	if (system32_videoram[0x1ff00/2] & 0x8000)
-		video_screen_set_visarea(screen, 0, 52*8-1, 0, 28*8-1);
+		video_screen_set_visarea(scrnum, 0, 52*8-1, 0, 28*8-1);
 	else
-		video_screen_set_visarea(screen, 0, 40*8-1, 0, 28*8-1);
+		video_screen_set_visarea(scrnum, 0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
-	if (!system32_displayenable[screen])
+	if (!system32_displayenable[scrnum])
 	{
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 		return 0;
 	}
 
 	/* update the tilemaps */
 	profiler_mark(PROFILER_USER1);
-	enablemask = update_tilemaps(machine, screen, cliprect);
+	enablemask = update_tilemaps(screen->machine, scrnum, cliprect);
 	profiler_mark(PROFILER_END);
 
 	/* debugging */
@@ -2655,7 +2655,7 @@ VIDEO_UPDATE( multi32 )
 
 	/* do the mixing */
 	profiler_mark(PROFILER_USER3);
-	mix_all_layers(screen, 0, bitmap, cliprect, enablemask);
+	mix_all_layers(scrnum, 0, bitmap, cliprect, enablemask);
 	profiler_mark(PROFILER_END);
 
 	if (!input_code_pressed(KEYCODE_M)) print_mixer_data(0);
@@ -2667,10 +2667,10 @@ VIDEO_UPDATE( multi32 )
 		FILE *f = fopen("sprite.txt", "w");
 		int x, y;
 
-		for (y = machine->screen[screen].visarea.min_y; y <= machine->screen[screen].visarea.max_y; y++)
+		for (y = screen->machine->screen[screen].visarea.min_y; y <= screen->machine->screen[screen].visarea.max_y; y++)
 		{
 			UINT16 *src = get_layer_scanline(MIXER_LAYER_SPRITES, y);
-			for (x = machine->screen[screen].visarea.min_x; x <= machine->screen[screen].visarea.max_x; x++)
+			for (x = screen->machine->screen[screen].visarea.min_x; x <= screen->machine->screen[screen].visarea.max_x; x++)
 				fprintf(f, "%04X ", *src++);
 			fprintf(f, "\n");
 		}

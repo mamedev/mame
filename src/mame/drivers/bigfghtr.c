@@ -256,14 +256,14 @@ static VIDEO_UPDATE( bigfghtr )
 	}
 	else
 	{
-		fillbitmap( bitmap, get_black_pen(machine), cliprect );
+		fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	}
 
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 2 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 2 );
 	tilemap_draw( bitmap, cliprect, fg_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 1 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 1 );
 	tilemap_draw( bitmap, cliprect, tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 0 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 0 );
 
 	return 0;
 }

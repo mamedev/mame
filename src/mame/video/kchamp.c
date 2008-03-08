@@ -125,13 +125,13 @@ static void kchampvs_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE( kchamp )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	kchamp_draw_sprites(machine, bitmap, cliprect);
+	kchamp_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE( kchampvs )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	kchampvs_draw_sprites(machine, bitmap, cliprect);
+	kchampvs_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

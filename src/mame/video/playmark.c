@@ -416,7 +416,7 @@ VIDEO_UPDATE( bigtwin )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	if (bg_enable)
 		draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap,cliprect,4);
+	draw_sprites(screen->machine, bitmap,cliprect,4);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -429,7 +429,7 @@ VIDEO_UPDATE( excelsr )
 	if (bg_enable)
 		draw_bitmap(bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,4);
-	draw_sprites(machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,2);
 	return 0;
 }
 
@@ -453,7 +453,7 @@ VIDEO_UPDATE( wbeachvl )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
-	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
@@ -467,12 +467,10 @@ VIDEO_UPDATE( hrdtimes )
 	{
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
-		draw_sprites(machine,bitmap,cliprect,2);
+		draw_sprites(screen->machine,bitmap,cliprect,2);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}
 	else
-	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
-	}
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	return 0;
 }

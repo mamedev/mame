@@ -360,7 +360,7 @@ VIDEO_UPDATE( namcos86 )
 
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	fillbitmap(bitmap,machine->gfx[0]->color_base + 8*backcolor+7,cliprect);
+	fillbitmap(bitmap,screen->machine->gfx[0]->color_base + 8*backcolor+7,cliprect);
 
 	for (layer = 0;layer < 8;layer++)
 	{
@@ -373,7 +373,7 @@ VIDEO_UPDATE( namcos86 )
 		}
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

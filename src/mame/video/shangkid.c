@@ -172,7 +172,7 @@ VIDEO_UPDATE( shangkid )
 	tilemap_set_scrolly( background,0,shangkid_videoreg[2]+0x10 );
 
 	tilemap_draw( bitmap,cliprect,background,0,0 );
-	shangkid_draw_sprites( machine, bitmap,cliprect );
+	shangkid_draw_sprites(screen->machine, bitmap,cliprect );
 	tilemap_draw( bitmap,cliprect,background,1,0 ); /* high priority tiles */
 	return 0;
 }
@@ -300,8 +300,8 @@ static void dynamski_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( dynamski )
 {
-	dynamski_draw_background( machine, bitmap,cliprect, 0 );
-	dynamski_draw_sprites(machine, bitmap,cliprect );
-	dynamski_draw_background( machine, bitmap,cliprect, 1 );
+	dynamski_draw_background(screen->machine, bitmap,cliprect, 0 );
+	dynamski_draw_sprites(screen->machine, bitmap,cliprect );
+	dynamski_draw_background(screen->machine, bitmap,cliprect, 1 );
 	return 0;
 }

@@ -138,20 +138,20 @@ static void freekick_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE(gigas)
 {
 	tilemap_draw(bitmap,cliprect,freek_tilemap,0,0);
-	gigas_draw_sprites(machine,bitmap,cliprect);
+	gigas_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE(pbillrd)
 {
 	tilemap_draw(bitmap,cliprect,freek_tilemap,0,0);
-	pbillrd_draw_sprites(machine,bitmap,cliprect);
+	pbillrd_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
 VIDEO_UPDATE(freekick)
 {
 	tilemap_draw(bitmap,cliprect,freek_tilemap,0,0);
-	freekick_draw_sprites(machine,bitmap,cliprect);
+	freekick_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

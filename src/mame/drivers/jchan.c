@@ -422,9 +422,8 @@ extern void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 
 static VIDEO_UPDATE(jchan)
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
-
-	skns_draw_sprites(machine,bitmap,cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	skns_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

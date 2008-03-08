@@ -931,8 +931,8 @@ VIDEO_UPDATE( eaglshot )
 			{
 				eaglshot_dirty_tile[tile] = 0;
 
-				decodechar(machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram);
-				decodechar(machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram);
+				decodechar(screen->machine->gfx[0], tile, (UINT8 *)eaglshot_gfxram);
+				decodechar(screen->machine->gfx[1], tile, (UINT8 *)eaglshot_gfxram);
 			}
 		}
 	}
@@ -1121,13 +1121,13 @@ VIDEO_UPDATE( gdfs )
 			{
 				eaglshot_dirty_tile[tile] = 0;
 
-				decodechar(machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram);
+				decodechar(screen->machine->gfx[2], tile, (UINT8 *)eaglshot_gfxram);
 			}
 		}
 	}
 
 	for (pri = 0; pri <= 0xf; pri++)
-		gdfs_draw_zooming_sprites(machine, bitmap, cliprect, pri);
+		gdfs_draw_zooming_sprites(screen->machine, bitmap, cliprect, pri);
 
 	tilemap_set_scrollx(gdfs_tmap,0,gdfs_tmapscroll[0x0c/2]);
 	tilemap_set_scrolly(gdfs_tmap,0,gdfs_tmapscroll[0x10/2]);
@@ -1163,8 +1163,8 @@ VIDEO_UPDATE( ssv )
 
 	if (!enable_video)	return 0;
 
-	draw_layer(machine, bitmap, cliprect, 0);	// "background layer"
+	draw_layer(screen->machine, bitmap, cliprect, 0);	// "background layer"
 
-	draw_sprites(machine, bitmap, cliprect);	// sprites list
+	draw_sprites(screen->machine, bitmap, cliprect);	// sprites list
 	return 0;
 }

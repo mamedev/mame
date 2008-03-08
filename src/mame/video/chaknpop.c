@@ -280,7 +280,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( chaknpop )
 {
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	draw_bitmap(bitmap,cliprect);
 	return 0;
 }

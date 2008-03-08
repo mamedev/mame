@@ -300,13 +300,13 @@ VIDEO_UPDATE( thepit )
 	tilemap_draw(bitmap, cliprect, thepit_tilemap, 0, 0);
 
 	/* low priority sprites */
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	/* high priority tiles */
 	tilemap_draw(bitmap, cliprect, thepit_solid_tilemap, 1, 1);
 
 	/* high priority sprites */
-	draw_sprites(machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
 
 	return 0;
 }

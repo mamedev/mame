@@ -379,7 +379,7 @@ VIDEO_UPDATE( seta2 )
 
 	if (seta2_vregs[0x30/2] & 1)	return 0;		// BLANK SCREEN
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

@@ -699,7 +699,7 @@ VIDEO_UPDATE( wgp )
 		tilemap_set_scrolly(wgp_piv_tilemap[i], 0, wgp_piv_scrolly[i]);
 	}
 
-	TC0100SCN_tilemap_update(machine);
+	TC0100SCN_tilemap_update(screen->machine);
 
 	fillbitmap(bitmap, 0, cliprect);
 
@@ -730,7 +730,7 @@ VIDEO_UPDATE( wgp )
 #endif
 	wgp_piv_layer_draw(bitmap,cliprect,layer[2],0,4);
 
-	draw_sprites(machine, bitmap,cliprect,16);
+	draw_sprites(screen->machine, bitmap,cliprect,16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to
    the bitmap before we draw the TC0100SCN layers on it */
@@ -739,13 +739,13 @@ VIDEO_UPDATE( wgp )
 	layer[1] = layer[0]^1;
 	layer[2] = 2;
 
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[0],0,0);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[0],0,0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[3]==0)
 #endif
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[1],0,0);
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,layer[2],0,0);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[1],0,0);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,layer[2],0,0);
 
 #if 0
 	{

@@ -527,13 +527,13 @@ VIDEO_UPDATE( system1 )
 	int drawn;
 
 
-	system1_draw_bg(machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
+	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(machine, bitmap, cliprect, 0);
+	if (drawn) system1_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	system1_draw_bg(machine, bitmap, cliprect, 1);
-	system1_draw_fg(machine, bitmap, cliprect, 1);
+	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -668,13 +668,13 @@ VIDEO_UPDATE( choplifter )
 	int drawn;
 
 
-	chplft_draw_bg(machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
+	chplft_draw_bg(screen->machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) chplft_draw_bg(machine, bitmap, cliprect, 0);
+	if (drawn) chplft_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	chplft_draw_bg(machine, bitmap, cliprect, 1);
-	system1_draw_fg(machine, bitmap, cliprect, 1);
+	chplft_draw_bg(screen->machine, bitmap, cliprect, 1);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -802,10 +802,10 @@ static void wbml_draw_fg(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( wbml )
 {
-	wbml_draw_bg(machine, bitmap, cliprect, 0);
+	wbml_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	wbml_draw_bg(machine, bitmap, cliprect, 1);
-	wbml_draw_fg(machine, bitmap, cliprect);
+	wbml_draw_bg(screen->machine, bitmap, cliprect, 1);
+	wbml_draw_fg(screen->machine, bitmap, cliprect);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -872,10 +872,10 @@ static void ufosensi_draw_bg(running_machine *machine, bitmap_t *bitmap, const r
 
 VIDEO_UPDATE( ufosensi )
 {
-	ufosensi_draw_bg(machine, bitmap, cliprect, 0);
+	ufosensi_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	ufosensi_draw_bg(machine, bitmap, cliprect, 1);
-	wbml_draw_fg(machine, bitmap, cliprect);
+	ufosensi_draw_bg(screen->machine, bitmap, cliprect, 1);
+	wbml_draw_fg(screen->machine, bitmap, cliprect);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
@@ -890,13 +890,13 @@ VIDEO_UPDATE( blockgal )
 
 	blockgal_kludgeoffset = -8;
 
-	system1_draw_bg(machine, bitmap, cliprect, -1);
-	drawn = system1_draw_fg(machine, bitmap, cliprect, 0);
+	system1_draw_bg(screen->machine, bitmap, cliprect, -1);
+	drawn = system1_draw_fg(screen->machine, bitmap, cliprect, 0);
 	/* redraw low priority bg tiles if necessary */
-	if (drawn) system1_draw_bg(machine, bitmap, cliprect, 0);
+	if (drawn) system1_draw_bg(screen->machine, bitmap, cliprect, 0);
 	draw_sprites(bitmap);
-	system1_draw_bg(machine, bitmap, cliprect, 1);
-	system1_draw_fg(machine, bitmap, cliprect, 1);
+	system1_draw_bg(screen->machine, bitmap, cliprect, 1);
+	system1_draw_fg(screen->machine, bitmap, cliprect, 1);
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */

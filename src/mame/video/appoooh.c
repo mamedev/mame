@@ -281,16 +281,16 @@ VIDEO_UPDATE( appoooh )
 	if (priority == 1)
 	{
 		/* sprite set #1 */
-		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 		/* sprite set #2 */
-		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 		/* sprite set #1 */
-		appoooh_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
+		appoooh_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 	}
 
 	if (priority != 0)	/* fg in front of sprites */
@@ -309,16 +309,16 @@ VIDEO_UPDATE( robowres )
 	if (priority == 1)
 	{
 		/* sprite set #1 */
-		robowres_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 		/* sprite set #2 */
-		robowres_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 	}
 	else
 	{
 		/* sprite set #2 */
-		robowres_draw_sprites( bitmap, cliprect, machine->gfx[3],spriteram_2);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[3],spriteram_2);
 		/* sprite set #1 */
-		robowres_draw_sprites( bitmap, cliprect, machine->gfx[2],spriteram);
+		robowres_draw_sprites( bitmap, cliprect, screen->machine->gfx[2],spriteram);
 	}
 
 	if (priority != 0)	/* fg in front of sprites */

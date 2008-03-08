@@ -179,7 +179,7 @@ VIDEO_UPDATE( cska )
 			sx = offs % 64;
 			sy = offs / 64;
 
-			drawgfx(bitmap,machine->gfx[1+(offs % 4)],
+			drawgfx(bitmap,screen->machine->gfx[1+(offs % 4)],
 					cpk_expram[offs],
 					0,
 					0,0,
@@ -199,7 +199,7 @@ VIDEO_UPDATE( cska )
 		sx = offs % 64;
 		sy = offs / 64;
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				tile,
 				color,
 				0,0,

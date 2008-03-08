@@ -369,7 +369,7 @@ VIDEO_UPDATE( grchamp )
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	grchamp_state *state = machine->driver_data;
+	grchamp_state *state = screen->machine->driver_data;
 	const UINT8 *amedata = memory_region(REGION_GFX5);
 	const UINT8 *headdata = memory_region(REGION_GFX6);
 	const UINT8 *pldata = memory_region(REGION_GFX7);
@@ -412,7 +412,7 @@ VIDEO_UPDATE( grchamp )
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(machine, state, y, objdata);
+		draw_objects(screen->machine, state, y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)

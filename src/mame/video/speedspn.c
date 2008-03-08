@@ -94,7 +94,7 @@ VIDEO_UPDATE(speedspn)
 {
 	if (speedspn_display_disable)
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -108,6 +108,6 @@ VIDEO_UPDATE(speedspn)
 #endif
 	tilemap_set_scrollx(speedspn_tilemap,0, 0x100); // verify
 	tilemap_draw(bitmap,cliprect,speedspn_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

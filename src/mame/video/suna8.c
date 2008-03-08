@@ -443,8 +443,8 @@ VIDEO_UPDATE( suna8 )
 #endif
 #endif
 	{
-		draw_normal_sprites(machine ,bitmap,cliprect);
-		draw_text_sprites(machine, bitmap,cliprect);
+		draw_normal_sprites(screen->machine ,bitmap,cliprect);
+		draw_text_sprites(screen->machine, bitmap,cliprect);
 	}
 	return 0;
 }

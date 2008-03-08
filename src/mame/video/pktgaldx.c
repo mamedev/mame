@@ -92,7 +92,7 @@ VIDEO_UPDATE(pktgaldx)
 	fillbitmap(priority_bitmap,0,NULL);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
 }
@@ -109,7 +109,7 @@ VIDEO_UPDATE(pktgaldb)
 	int tileno;
 	int colour;
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* the bootleg seems to treat the tilemaps as sprites */
 	for (offset = 0;offset<0x1600/2;offset+=8)
@@ -123,7 +123,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,machine->gfx[0],tileno^0x1000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,screen->machine->gfx[0],tileno^0x1000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	for (offset = 0x1600/2;offset<0x2000/2;offset+=8)
@@ -137,7 +137,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,machine->gfx[0],tileno^0x4000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,screen->machine->gfx[0],tileno^0x4000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	for (offset = 0x2000/2;offset<0x4000/2;offset+=8)
@@ -151,7 +151,7 @@ VIDEO_UPDATE(pktgaldb)
 		y&=0x1ff;
 		y-=8;
 
-		drawgfx(bitmap,machine->gfx[0],tileno^0x3000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,screen->machine->gfx[0],tileno^0x3000,colour,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	return 0;

@@ -131,7 +131,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 
 VIDEO_UPDATE( gridlee )
 {
-	const pen_t *pens = &machine->pens[palettebank_vis * 32];
+	const pen_t *pens = &screen->machine->pens[palettebank_vis * 32];
 	int x, y, i;
 
 	/* draw scanlines from the VRAM directly */

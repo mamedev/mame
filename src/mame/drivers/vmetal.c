@@ -406,7 +406,7 @@ static VIDEO_START(varia)
 
 static VIDEO_UPDATE(varia)
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	tilemap_set_scrollx(vmetal_mid2tilemap,0, vmetal_videoregs[0x06a/2]-64 /*+ vmetal_videoregs[0x066/2]*/);
@@ -419,7 +419,7 @@ static VIDEO_UPDATE(varia)
 
 	tilemap_draw(bitmap,cliprect,vmetal_mid1tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,vmetal_mid2tilemap,0,0);
-	metro_draw_sprites(machine, bitmap,cliprect);
+	metro_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,vmetal_texttilemap,0,0);
 	return 0;
 }

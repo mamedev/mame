@@ -304,7 +304,7 @@ VIDEO_UPDATE( darkseal )
 
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,pf1_tilemap,0,0);
 	return 0;
 }

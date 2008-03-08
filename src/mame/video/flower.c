@@ -171,7 +171,7 @@ VIDEO_UPDATE( flower )
 	tilemap_draw(bitmap,cliprect,flower_bg0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,flower_bg1_tilemap,0,0);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 	if(flip_screen_get())
 	{

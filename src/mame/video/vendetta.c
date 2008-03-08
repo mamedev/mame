@@ -119,6 +119,6 @@ VIDEO_UPDATE( vendetta )
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);
 
-	K053247_sprites_draw(machine, bitmap,cliprect);
+	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }

@@ -489,15 +489,13 @@ VIDEO_UPDATE( combasc )
 {
 	int i;
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	if (K007121_ctrlram[0][0x01] & 0x02)
 	{
 		tilemap_set_scroll_rows(bg_tilemap[0],32);
 		for (i = 0;i < 32;i++)
-		{
 			tilemap_set_scrollx(bg_tilemap[0],i,combasc_scrollram0[i]);
-		}
 	}
 	else
 	{
@@ -509,9 +507,7 @@ VIDEO_UPDATE( combasc )
 	{
 		tilemap_set_scroll_rows(bg_tilemap[1],32);
 		for (i = 0;i < 32;i++)
-		{
 			tilemap_set_scrollx(bg_tilemap[1],i,combasc_scrollram1[i]);
-		}
 	}
 	else
 	{
@@ -532,8 +528,8 @@ VIDEO_UPDATE( combasc )
 		tilemap_draw(bitmap,cliprect,bg_tilemap[0],1,2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(machine,bitmap,cliprect,private_spriteram[1],1,0x0f00);
-		draw_sprites(machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
+		draw_sprites(screen->machine,bitmap,cliprect,private_spriteram[1],1,0x0f00);
+		draw_sprites(screen->machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
 	}
 	else
 	{
@@ -543,8 +539,8 @@ VIDEO_UPDATE( combasc )
 		tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(machine,bitmap,cliprect,private_spriteram[1],1,0x0f00);
-		draw_sprites(machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
+		draw_sprites(screen->machine,bitmap,cliprect,private_spriteram[1],1,0x0f00);
+		draw_sprites(screen->machine,bitmap,cliprect,private_spriteram[0],0,0x4444);
 	}
 
 	if (K007121_ctrlram[0][0x01] & 0x08)
@@ -649,7 +645,7 @@ VIDEO_UPDATE( combascb )
 {
 	int i;
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	for( i=0; i<32; i++ )
 	{
@@ -662,16 +658,16 @@ VIDEO_UPDATE( combascb )
 	if (priority == 0)
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],TILEMAP_DRAW_OPAQUE,0);
-		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[0], 0 );
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
 		tilemap_draw( bitmap,cliprect,bg_tilemap[0],0 ,0);
-		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[1], 1 );
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[1], 1 );
 	}
 	else
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap[0],TILEMAP_DRAW_OPAQUE,0);
-		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[0], 0 );
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[0], 0 );
 		tilemap_draw( bitmap,cliprect,bg_tilemap[1],0 ,0);
-		bootleg_draw_sprites(machine, bitmap,cliprect, combasc_page[1], 1 );
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, combasc_page[1], 1 );
 	}
 
 	tilemap_draw( bitmap,cliprect,textlayer,0,0);

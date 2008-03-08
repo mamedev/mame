@@ -471,7 +471,7 @@ static VIDEO_UPDATE(mastboy)
 	{
 		int coldat = mastboy_colram[i+1] |  (mastboy_colram[i+0]<<8);
 
-		palette_set_color_rgb(machine,i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
+		palette_set_color_rgb(screen->machine,i/2,pal4bit(coldat>>8),pal4bit(coldat>>12),pal4bit(coldat>>4));
 	}
 
 	for (y=0;y<32;y++)
@@ -485,12 +485,12 @@ static VIDEO_UPDATE(mastboy)
 
 			if (tileno&0x800)
 			{
-				gfx = machine->gfx[1];
+				gfx = screen->machine->gfx[1];
 				tileno &=0x7ff;
 			}
 			else
 			{
-				gfx = machine->gfx[0];
+				gfx = screen->machine->gfx[0];
 			}
 
 

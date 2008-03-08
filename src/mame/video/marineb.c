@@ -193,7 +193,7 @@ VIDEO_UPDATE( marineb )
 
 		if (!flipscreen_y)
 		{
-			sy = 256 - machine->gfx[gfx]->width - sy;
+			sy = 256 - screen->machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -202,7 +202,7 @@ VIDEO_UPDATE( marineb )
 			sx++;
 		}
 
-		drawgfx(bitmap,machine->gfx[gfx],
+		drawgfx(bitmap,screen->machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
@@ -239,7 +239,7 @@ VIDEO_UPDATE( changes )
 
 		if (!flipscreen_y)
 		{
-			sy = 256 - machine->gfx[1]->width - sy;
+			sy = 256 - screen->machine->gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -248,7 +248,7 @@ VIDEO_UPDATE( changes )
 			sx++;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -267,7 +267,7 @@ VIDEO_UPDATE( changes )
 
 	if (!flipscreen_y)
 	{
-		sy = 256 - machine->gfx[2]->width - sy;
+		sy = 256 - screen->machine->gfx[2]->width - sy;
 		flipy = !flipy;
 	}
 
@@ -278,7 +278,7 @@ VIDEO_UPDATE( changes )
 
 	code >>= 4;
 
-	drawgfx(bitmap,machine->gfx[2],
+	drawgfx(bitmap,screen->machine->gfx[2],
 			code,
 			col,
 			flipx,flipy,
@@ -287,7 +287,7 @@ VIDEO_UPDATE( changes )
 
 	/* draw again for wrap around */
 
-	drawgfx(bitmap,machine->gfx[2],
+	drawgfx(bitmap,screen->machine->gfx[2],
 			code,
 			col,
 			flipx,flipy,
@@ -341,7 +341,7 @@ VIDEO_UPDATE( springer )
 
 		if (!flipscreen_y)
 		{
-			sy = 256 - machine->gfx[gfx]->width - sy;
+			sy = 256 - screen->machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -350,7 +350,7 @@ VIDEO_UPDATE( springer )
 			sx--;
 		}
 
-		drawgfx(bitmap,machine->gfx[gfx],
+		drawgfx(bitmap,screen->machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,
@@ -388,17 +388,17 @@ VIDEO_UPDATE( hoccer )
 
 		if (!flipscreen_y)
 		{
-			sy = 256 - machine->gfx[1]->width - sy;
+			sy = 256 - screen->machine->gfx[1]->width - sy;
 			flipy = !flipy;
 		}
 
 		if (flipscreen_x)
 		{
-			sx = 256 - machine->gfx[1]->width - sx;
+			sx = 256 - screen->machine->gfx[1]->width - sx;
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 				code >> 2,
 				col,
 				flipx,flipy,
@@ -452,7 +452,7 @@ VIDEO_UPDATE( hopprobo )
 
 		if (!flipscreen_y)
 		{
-			sy = 256 - machine->gfx[gfx]->width - sy;
+			sy = 256 - screen->machine->gfx[gfx]->width - sy;
 			flipy = !flipy;
 		}
 
@@ -461,7 +461,7 @@ VIDEO_UPDATE( hopprobo )
 			sx--;
 		}
 
-		drawgfx(bitmap,machine->gfx[gfx],
+		drawgfx(bitmap,screen->machine->gfx[gfx],
 				code,
 				col,
 				flipx,flipy,

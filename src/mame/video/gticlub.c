@@ -965,7 +965,7 @@ static int debug_tex_palette = 0;
 
 VIDEO_UPDATE( gticlub )
 {
-	K001604_tile_update(machine, 0);
+	K001604_tile_update(screen->machine, 0);
 	K001604_draw_back_layer(0, bitmap, cliprect);
 
 	K001005_draw(bitmap, cliprect);
@@ -1025,7 +1025,7 @@ VIDEO_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
 
-	//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+	//cpunum_set_input_line(screen->machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
 	cpuintrf_push_context(2);
 	sharc_set_flag_input(1, ASSERT_LINE);
 	cpuintrf_pop_context();

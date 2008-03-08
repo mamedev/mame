@@ -200,10 +200,10 @@ VIDEO_UPDATE( tnzs )
 	fillbitmap(bitmap, 0x1f0, cliprect);
 
 	/* Redraw the background tiles (c400-c5ff) */
-	draw_background(machine, bitmap, cliprect, tnzs_objram + 0x400);
+	draw_background(screen->machine, bitmap, cliprect, tnzs_objram + 0x400);
 
 	/* Draw the sprites on top */
-	draw_foreground(machine, bitmap, cliprect,
+	draw_foreground(screen->machine, bitmap, cliprect,
 					tnzs_objram + 0x0000, /*  chars : c000 */
 					tnzs_objram + 0x0200, /*      x : c200 */
 					tnzs_vdcram + 0x0000, /*      y : f000 */

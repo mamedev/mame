@@ -132,7 +132,7 @@ static VIDEO_UPDATE(fortecar)
 
 			tile = fortecar_ram[0x800+(count*4)+1];
 
-			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 
 		}

@@ -610,13 +610,13 @@ static VIDEO_START(mtnew)
 //attotime_never
 static VIDEO_UPDATE(mtnew)
 {
-	if (screen ==0)
+	if (scrnum ==0)
 	{
 		/* if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip */
 		if (!current_game_is_sms) VIDEO_UPDATE_CALL(megadriv);
 		else VIDEO_UPDATE_CALL(megatech_md_sms);
 	}
-	else if (screen ==1) VIDEO_UPDATE_CALL(megatech_bios);
+	else if (scrnum ==1) VIDEO_UPDATE_CALL(megatech_bios);
 	return 0;
 }
 

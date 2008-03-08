@@ -217,7 +217,7 @@ VIDEO_UPDATE( tnk3 )
 		int bg_scrolly = -ram[0xcb00] + 8;
 		if(attributes & 0x02) bg_scrollx += 256;
 		if(attributes & 0x10) bg_scrolly += 256;
-		tnk3_draw_background( machine, bitmap, cliprect, bg_scrollx, bg_scrolly, 64, 64, 0 );
+		tnk3_draw_background(screen->machine, bitmap, cliprect, bg_scrollx, bg_scrolly, 64, 64, 0 );
 	}
 
 	{
@@ -225,14 +225,14 @@ VIDEO_UPDATE( tnk3 )
 		int sp_scrolly = ram[0xc900] + 9;
 		if(attributes & 0x01) sp_scrollx += 256;
 		if(attributes & 0x08) sp_scrolly += 256;
-		tnk3_draw_sprites( machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
+		tnk3_draw_sprites(screen->machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
 	}
 
 	{
 		int bank = (attributes & 0x40) ? 1:0;
 
-		tnk3_draw_text( machine, bitmap, cliprect, bank, &ram[0xf800] );
-		tnk3_draw_status( machine, bitmap, cliprect, bank, &ram[0xfc00] );
+		tnk3_draw_text(screen->machine, bitmap, cliprect, bank, &ram[0xf800] );
+		tnk3_draw_status(screen->machine, bitmap, cliprect, bank, &ram[0xfc00] );
 	}
 	return 0;
 }
@@ -276,15 +276,15 @@ VIDEO_UPDATE( sgladiat )
 	scrolly = -pMem[0xd600];
 	scrollx += 15;
 	scrolly += 8;
-	sgladiat_draw_background( machine, bitmap, cliprect, scrollx, scrolly );
+	sgladiat_draw_background(screen->machine, bitmap, cliprect, scrollx, scrolly );
 
 	scrollx = pMem[0xd500] + ((attributes & 1) ? 256:0);
 	scrolly = pMem[0xd400];
 	scrollx += 29;
 	scrolly += 9;
-	tnk3_draw_sprites( machine, bitmap, cliprect, scrollx, scrolly );
+	tnk3_draw_sprites(screen->machine, bitmap, cliprect, scrollx, scrolly );
 
-	tnk3_draw_text( machine, bitmap, cliprect, 0, &pMem[0xf000] );
+	tnk3_draw_text(screen->machine, bitmap, cliprect, 0, &pMem[0xf000] );
 	return 0;
 }
 
@@ -336,7 +336,7 @@ VIDEO_UPDATE( ikari )
 		int attributes = ram[0xc900];
 		int scrolly =  8-ram[0xc800] - ((attributes & 0x01) ? 256:0);
 		int scrollx = 13-ram[0xc880] - ((attributes & 0x02) ? 256:0);
-		tnk3_draw_background( machine, bitmap, cliprect, scrollx, scrolly, 32, 32, 1 );
+		tnk3_draw_background(screen->machine, bitmap, cliprect, scrollx, scrolly, 32, 32, 1 );
 	}
 
 	{
@@ -348,13 +348,13 @@ VIDEO_UPDATE( ikari )
 		int sp32_scrolly =  9 + ram[0xcb00] + ((attributes & 0x08) ? 256:0);
 		int sp32_scrollx = 28 + ram[0xcb80] + ((attributes & 0x20) ? 256:0);
 
-		ikari_draw_sprites( machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
-		ikari_draw_sprites( machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, &ram[0xe000], 3 );
-		ikari_draw_sprites( machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
+		ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
+		ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, &ram[0xe000], 3 );
+		ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
 	}
 
-	tnk3_draw_text( machine, bitmap, cliprect, -1, &ram[0xf800] );
-	tnk3_draw_status( machine, bitmap, cliprect, -1, &ram[0xfc00] );
+	tnk3_draw_text(screen->machine, bitmap, cliprect, -1, &ram[0xf800] );
+	tnk3_draw_status(screen->machine, bitmap, cliprect, -1, &ram[0xfc00] );
 	return 0;
 }
 
@@ -519,19 +519,19 @@ VIDEO_UPDATE( tdfever )
 			sp_scroll_x += 40;
 			sp_scroll_y += -31;
 	}
-	tdfever_draw_bg( machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
+	tdfever_draw_bg(screen->machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
 
 	if (snk_gamegroup == 5) // tdfeverj
 	{
 		gfx_drawmode_table[13] = DRAWMODE_SHADOW;
 		gfx_drawmode_table[14] = DRAWMODE_SOURCE;
 
-		for (i=0x10e; i<0x200; i+=0x10) palette_set_color(machine,i,MAKE_RGB(snk_blink_parity,snk_blink_parity,snk_blink_parity));
+		for (i=0x10e; i<0x200; i+=0x10) palette_set_color(screen->machine,i,MAKE_RGB(snk_blink_parity,snk_blink_parity,snk_blink_parity));
 		snk_blink_parity ^= 0x7f;
 	}
-	tdfever_draw_sp( machine, bitmap, cliprect, sp_scroll_x, sp_scroll_y, 0 );
+	tdfever_draw_sp(screen->machine, bitmap, cliprect, sp_scroll_x, sp_scroll_y, 0 );
 
-	tdfever_draw_tx( machine, bitmap, cliprect, tx_attributes, 0, 0, 0xf800 );
+	tdfever_draw_tx(screen->machine, bitmap, cliprect, tx_attributes, 0, 0, 0xf800 );
 	return 0;
 }
 
@@ -563,7 +563,7 @@ VIDEO_UPDATE( gwar )
 		bg_scroll_x += (bg_attribute & 2) ? 256:0;
  		bg_scroll_y += (bg_attribute & 1) ? 256:0;
 
-		tdfever_draw_bg( machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
+		tdfever_draw_bg(screen->machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
 	}
 
 	{
@@ -591,19 +591,19 @@ VIDEO_UPDATE( gwar )
 
 		if(sp_attribute & 0xf8) // improves priority
 		{
-			tdfever_draw_sp( machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
-			tdfever_draw_sp( machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
 		}
 		else
 		{
-			tdfever_draw_sp( machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
-			tdfever_draw_sp( machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
 		}
 	}
 
 	{
 		UINT8 text_attribute = ram[gwar_sp_baseaddr+0x8c0];
-		tdfever_draw_tx( machine, bitmap, cliprect, text_attribute, 0, 0, gwar_tx_baseaddr );
+		tdfever_draw_tx(screen->machine, bitmap, cliprect, text_attribute, 0, 0, gwar_tx_baseaddr );
 	}
 	return 0;
 }

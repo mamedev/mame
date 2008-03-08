@@ -1022,7 +1022,7 @@ VIDEO_UPDATE ( wecleman )
 	int cloud_sx, cloud_sy;
 	int i, j, k;
 
-	mrct = machine->pens;
+	mrct = screen->machine->pens;
 
 	video_on = wecleman_irqctrl & 0x40;
 
@@ -1054,12 +1054,12 @@ VIDEO_UPDATE ( wecleman )
 	/* palette hacks! */
 	((pen_t *)mrct)[0x27] = mrct[0x24];
 
-	get_sprite_info(machine);
+	get_sprite_info(screen->machine);
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* Draw the road (lines which have priority 0x02) */
-	if (video_on) wecleman_draw_road(machine, bitmap, cliprect, 0x02);
+	if (video_on) wecleman_draw_road(screen->machine, bitmap, cliprect, 0x02);
 
 	/* Draw the background */
 	if (video_on) tilemap_draw(bitmap,cliprect, bg_tilemap, 0, 0);
@@ -1071,9 +1071,9 @@ VIDEO_UPDATE ( wecleman )
 		((pen_t *)mrct)[0] = ((pen_t *)mrct)[0x40] = ((pen_t *)mrct)[0x200] = ((pen_t *)mrct)[0x205];
 
 		if (video_on)
-			draw_cloud(machine,
+			draw_cloud(screen->machine,
 			bitmap,
-			machine->gfx[0],
+			screen->machine->gfx[0],
 			wecleman_pageram+0x1800,
 			BMP_PAD, BMP_PAD,
 			41, 20,
@@ -1093,7 +1093,7 @@ VIDEO_UPDATE ( wecleman )
 	if (video_on) tilemap_draw(bitmap,cliprect, fg_tilemap, 0, 0);
 
 	/* Draw the road (lines which have priority 0x04) */
-	if (video_on) wecleman_draw_road(machine, bitmap,cliprect, 0x04);
+	if (video_on) wecleman_draw_road(screen->machine, bitmap,cliprect, 0x04);
 
 	/* Draw the sprites */
 	if (video_on) sprite_draw(bitmap,cliprect);
@@ -1115,15 +1115,15 @@ VIDEO_UPDATE( hotchase )
 
 	set_led_status(0, wecleman_selected_ip & 0x04);	// Start lamp
 
-	get_sprite_info(machine);
+	get_sprite_info(screen->machine);
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	/* Draw the background */
 	if (video_on) K051316_zoom_draw_0(bitmap,cliprect, 0, 0);
 
 	/* Draw the road */
-	if (video_on) hotchase_draw_road(machine, bitmap, cliprect);
+	if (video_on) hotchase_draw_road(screen->machine, bitmap, cliprect);
 
 	/* Draw the sprites */
 	if (video_on) sprite_draw(bitmap,cliprect);

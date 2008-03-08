@@ -377,9 +377,9 @@ static void equites_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 VIDEO_UPDATE( equites )
 {
-	equites_update_clut(machine);
-	equites_draw_scroll(machine, bitmap, cliprect);
-	equites_draw_sprites(machine, bitmap, cliprect);
+	equites_update_clut(screen->machine);
+	equites_draw_scroll(screen->machine, bitmap, cliprect);
+	equites_draw_sprites(screen->machine, bitmap, cliprect);
 	plot_box(bitmap, cliprect->min_x, cliprect->min_y, maskwidth, maskheight, maskcolor);
 	plot_box(bitmap, cliprect->max_x-maskwidth+1, cliprect->min_y, maskwidth, maskheight, maskcolor);
 	tilemap_draw(bitmap, cliprect, charmap0, 0, 0);
@@ -538,9 +538,9 @@ static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( splndrbt )
 {
-	splndrbt_update_clut(machine);
+	splndrbt_update_clut(screen->machine);
 	fillbitmap(bitmap, *bgcolor, &halfclip);
-	splndrbt_draw_scroll(machine, tmpbitmap);
+	splndrbt_draw_scroll(screen->machine, tmpbitmap);
 
 	splndrbt_slantcopy(
 		tmpbitmap, bitmap, cliprect,
@@ -548,7 +548,7 @@ VIDEO_UPDATE( splndrbt )
 		BMW, 434, 96, 480, prestep);
 
 	tilemap_draw(bitmap, cliprect, charmap1, 0, 0);
-	splndrbt_draw_sprites(machine, bitmap, cliprect);
+	splndrbt_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, charmap0, 0, 0);
 	return 0;
 }

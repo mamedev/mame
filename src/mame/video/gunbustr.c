@@ -221,7 +221,7 @@ VIDEO_UPDATE( gunbustr )
 	UINT16 priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
 
-	TC0480SCP_tilemap_update(machine);
+	TC0480SCP_tilemap_update(screen->machine);
 
 	priority = TC0480SCP_get_bg_priority();
 	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
@@ -241,14 +241,14 @@ VIDEO_UPDATE( gunbustr )
 	if (!input_code_pressed (KEYCODE_C)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
 	if (!input_code_pressed (KEYCODE_V)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
 	if (!input_code_pressed (KEYCODE_B)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);
-	if (!input_code_pressed (KEYCODE_N)) draw_sprites(machine,bitmap,cliprect,primasks,48,-116);
+	if (!input_code_pressed (KEYCODE_N)) draw_sprites(screen->machine,bitmap,cliprect,primasks,48,-116);
 #else
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,1);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,2);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,4);
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,8);	/* text layer */
-	draw_sprites(machine,bitmap,cliprect,primasks,48,-116);
+	draw_sprites(screen->machine,bitmap,cliprect,primasks,48,-116);
 #endif
 	return 0;
 }

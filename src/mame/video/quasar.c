@@ -136,7 +136,7 @@ VIDEO_UPDATE( quasar )
 
 		/* Main Screen */
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				code,
 				cvs_color_ram[offs] & 0x3f,
 				0,0,
@@ -148,7 +148,7 @@ VIDEO_UPDATE( quasar )
 
 		if((cvs_color_ram[offs] & 7) == 0)
 		{
-			drawgfx(cvs_collision_background,machine->gfx[0],
+			drawgfx(cvs_collision_background,screen->machine->gfx[0],
 					code,
 					64,
 					0,0,
@@ -203,7 +203,7 @@ VIDEO_UPDATE( quasar )
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel);
 
 					/* S2636 vs. background collision detection */
-					if (colortable_entry_get_value(machine->colortable, *BITMAP_ADDR16(cvs_collision_background, y, x)))
+					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(cvs_collision_background, y, x)))
 					{
 						if (S2636_IS_PIXEL_DRAWN(pixel0)) cvs_collision_register |= 0x01;
 						if (S2636_IS_PIXEL_DRAWN(pixel2)) cvs_collision_register |= 0x02;

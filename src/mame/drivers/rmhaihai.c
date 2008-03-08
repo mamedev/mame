@@ -64,7 +64,7 @@ static VIDEO_START( rmhaihai )
 
 static VIDEO_UPDATE( rmhaihai )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }
 

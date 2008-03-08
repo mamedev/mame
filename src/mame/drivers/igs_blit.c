@@ -135,7 +135,7 @@ static VIDEO_UPDATE(igs)
 
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
-				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(machine);
+				*BITMAP_ADDR16(bitmap, y, x) = get_black_pen(screen->machine);
 			else
 #endif
 				*BITMAP_ADDR16(bitmap, y, x) = layer[l][scr_addr] | (l << 8);

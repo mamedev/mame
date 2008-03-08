@@ -463,25 +463,25 @@ VIDEO_START( fromanc4 )
 
 VIDEO_UPDATE( fromanc2 )
 {
-	if (fromanc2_tilemap[screen][0]) {
-		tilemap_set_scrollx(fromanc2_tilemap[screen][0], 0, -fromanc2_scrollx[screen][0]);
-		tilemap_set_scrolly(fromanc2_tilemap[screen][0], 0, -fromanc2_scrolly[screen][0]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[screen][0], 0, 0);
+	if (fromanc2_tilemap[scrnum][0]) {
+		tilemap_set_scrollx(fromanc2_tilemap[scrnum][0], 0, -fromanc2_scrollx[scrnum][0]);
+		tilemap_set_scrolly(fromanc2_tilemap[scrnum][0], 0, -fromanc2_scrolly[scrnum][0]);
+	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][0], 0, 0);
 	}
-	if (fromanc2_tilemap[screen][1]) {
-		tilemap_set_scrollx(fromanc2_tilemap[screen][1], 0, -fromanc2_scrollx[screen][1]);
-		tilemap_set_scrolly(fromanc2_tilemap[screen][1], 0, -fromanc2_scrolly[screen][1]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[screen][1], 0, 0);
+	if (fromanc2_tilemap[scrnum][1]) {
+		tilemap_set_scrollx(fromanc2_tilemap[scrnum][1], 0, -fromanc2_scrollx[scrnum][1]);
+		tilemap_set_scrolly(fromanc2_tilemap[scrnum][1], 0, -fromanc2_scrolly[scrnum][1]);
+	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][1], 0, 0);
 	}
-	if (fromanc2_tilemap[screen][2]) {
-		tilemap_set_scrollx(fromanc2_tilemap[screen][2], 0, -fromanc2_scrollx[screen][2]);
-		tilemap_set_scrolly(fromanc2_tilemap[screen][2], 0, -fromanc2_scrolly[screen][2]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[screen][2], 0, 0);
+	if (fromanc2_tilemap[scrnum][2]) {
+		tilemap_set_scrollx(fromanc2_tilemap[scrnum][2], 0, -fromanc2_scrollx[scrnum][2]);
+		tilemap_set_scrolly(fromanc2_tilemap[scrnum][2], 0, -fromanc2_scrolly[scrnum][2]);
+	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][2], 0, 0);
 	}
-	if (fromanc2_tilemap[screen][3]) {
-		tilemap_set_scrollx(fromanc2_tilemap[screen][3], 0, -fromanc2_scrollx[screen][3]);
-		tilemap_set_scrolly(fromanc2_tilemap[screen][3], 0, -fromanc2_scrolly[screen][3]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[screen][3], 0, 0);
+	if (fromanc2_tilemap[scrnum][3]) {
+		tilemap_set_scrollx(fromanc2_tilemap[scrnum][3], 0, -fromanc2_scrollx[scrnum][3]);
+		tilemap_set_scrolly(fromanc2_tilemap[scrnum][3], 0, -fromanc2_scrolly[scrnum][3]);
+	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][3], 0, 0);
 	}
 
 	return 0;

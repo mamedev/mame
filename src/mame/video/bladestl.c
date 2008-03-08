@@ -90,7 +90,7 @@ VIDEO_START( bladestl )
 
 VIDEO_UPDATE( bladestl )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	K007342_tilemap_update();
 

@@ -185,7 +185,7 @@ VIDEO_UPDATE( gotya )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, -(*gotya_scroll + (scroll_bit_8 * 256)) - 2 * 8);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
-	draw_status(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
+	draw_status(screen->machine, bitmap, cliprect);
 	return 0;
 }

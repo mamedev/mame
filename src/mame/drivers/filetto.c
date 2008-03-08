@@ -250,16 +250,16 @@ static VIDEO_UPDATE( filetto )
 	if(vga_mode[0] & 8)
 	{
 		if(vga_mode[0] & 2)
-			cga_graphic_bitmap(machine,bitmap,cliprect,0,0x18000);
+			cga_graphic_bitmap(screen->machine,bitmap,cliprect,0,0x18000);
 		else
 		{
 			switch(vga_mode[0] & 1)
 			{
 				case 0x00:
-					cga_alphanumeric_tilemap(machine,bitmap,cliprect,RES_320x200,0x18000);
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000);
 					break;
 				case 0x01:
-					cga_alphanumeric_tilemap(machine,bitmap,cliprect,RES_640x200,0x18000);
+					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_640x200,0x18000);
 					break;
 			}
 		}

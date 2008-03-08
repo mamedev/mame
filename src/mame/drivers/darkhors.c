@@ -165,7 +165,7 @@ static VIDEO_UPDATE( darkhors )
 	}
 #endif
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	tilemap_set_scrollx(darkhors_tmap,0, (darkhors_tmapscroll[0] >> 16) - 5);
 	tilemap_set_scrolly(darkhors_tmap,0, (darkhors_tmapscroll[0] & 0xffff) - 0xff );
@@ -175,7 +175,7 @@ static VIDEO_UPDATE( darkhors )
 	tilemap_set_scrolly(darkhors_tmap2,0, (darkhors_tmapscroll2[0] & 0xffff) - 0xff );
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, darkhors_tmap2, 0, 0);
 
-	if (layers_ctrl & 4)	draw_sprites(machine,bitmap,cliprect);
+	if (layers_ctrl & 4)	draw_sprites(screen->machine,bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0

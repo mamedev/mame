@@ -165,7 +165,7 @@ VIDEO_UPDATE(sslam)
 {
 	if(!(sslam_regs[6] & 1))
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -194,7 +194,7 @@ VIDEO_UPDATE(sslam)
 		tilemap_draw(bitmap,cliprect,sslam_md_tilemap,0,0);
 	}
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,sslam_tx_tilemap,0,0);
 	return 0;
 }
@@ -203,7 +203,7 @@ VIDEO_UPDATE(powerbls)
 {
 	if(!(sslam_regs[6] & 1))
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -211,6 +211,6 @@ VIDEO_UPDATE(powerbls)
 	tilemap_set_scrolly(sslam_bg_tilemap,0, sslam_regs[1]-240);
 
 	tilemap_draw(bitmap,cliprect,sslam_bg_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

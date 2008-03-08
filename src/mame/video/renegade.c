@@ -137,7 +137,7 @@ VIDEO_UPDATE( renegade )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, renegade_scrollx);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0 , 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0 , 0);
 	return 0;
 }

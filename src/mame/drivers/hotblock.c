@@ -126,12 +126,12 @@ static VIDEO_UPDATE(hotblock)
 	int i;
 	static int xxx=320,yyy=204;
 
-	fillbitmap(bitmap, get_black_pen(machine), 0);
+	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 
 	for (i=0;i<256;i++)
 	{
 		int dat=(hotblock_pal[i*2+1]<<8)|hotblock_pal[i*2];
-		palette_set_color_rgb(machine,i,pal5bit(dat>>0),pal5bit(dat>>5),pal5bit(dat>>10));
+		palette_set_color_rgb(screen->machine,i,pal5bit(dat>>0),pal5bit(dat>>5),pal5bit(dat>>10));
 	}
 
 	count=0;

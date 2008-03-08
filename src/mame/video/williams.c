@@ -258,7 +258,7 @@ VIDEO_UPDATE( blaster )
 		pens[x] = palette_lookup[paletteram[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect->min_y == machine->screen[0].visarea.min_y || !(blaster_video_control & 1))
+	if (cliprect->min_y == screen->machine->screen[0].visarea.min_y || !(blaster_video_control & 1))
 		blaster_color0 = pens[0];
 
 	/* loop over rows */
@@ -300,7 +300,7 @@ VIDEO_UPDATE( williams2 )
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
-		pens[x] = palette_get_color(machine, williams2_fg_color * 16 + x);
+		pens[x] = palette_get_color(screen->machine, williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

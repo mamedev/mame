@@ -155,7 +155,7 @@ VIDEO_UPDATE( shadfrce )
 	tilemap_draw(bitmap,cliprect,shadfrce_bg1tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,shadfrce_bg0tilemap,0,1);
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,shadfrce_fgtilemap, 0,0);
 

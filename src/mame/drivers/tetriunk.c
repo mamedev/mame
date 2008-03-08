@@ -119,9 +119,9 @@ static VIDEO_UPDATE(tetriunk)
 			int color2 = (tetriunk_attribram[count<<1]>>4)&7;
 			if(color2!=0)
 			{
-				drawgfx(bitmap,machine->gfx[0],0x100,color2,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_NONE,0);
+				drawgfx(bitmap,screen->machine->gfx[0],0x100,color2,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_NONE,0);
 			}
-			drawgfx(bitmap,machine->gfx[0],tile&0xff,color,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile&0xff,color,0,0,x<<3,y<<3,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 	}

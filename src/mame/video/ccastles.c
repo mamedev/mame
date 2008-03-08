@@ -277,7 +277,7 @@ VIDEO_UPDATE( ccastles )
 {
 	UINT8 *spriteaddr = &spriteram[video_control[7] * 0x100];	/* BUF1/BUF2 */
 	int flip = video_control[4] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(machine);
+	pen_t black = get_black_pen(screen->machine);
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -289,7 +289,7 @@ VIDEO_UPDATE( ccastles )
 		int which = spriteaddr[offs];
 		int color = spriteaddr[offs+2] >> 7;
 
-		drawgfx(spritebitmap, machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
+		drawgfx(spritebitmap, screen->machine->gfx[0], which, color, flip, flip, x, y, cliprect, TRANSPARENCY_PEN, 7);
 	}
 
 	/* draw the bitmap to the screen, looping over Y */

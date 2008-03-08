@@ -201,7 +201,7 @@ VIDEO_UPDATE( aeroboto )
 	tilemap_set_scrolly(bg_tilemap,0,*aeroboto_vscroll);
 	tilemap_draw(bitmap,&splitrect2,bg_tilemap,0,0);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	tilemap_set_scrolly(bg_tilemap,0,0);

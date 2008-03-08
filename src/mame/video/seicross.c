@@ -139,11 +139,9 @@ VIDEO_UPDATE( seicross )
 	int col;
 
 	for (col = 0; col < 32; col++)
-	{
 		tilemap_set_scrolly(bg_tilemap, col, seicross_row_scroll[col]);
-	}
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -469,12 +469,12 @@ static int tick = 0;
 static int layer = 0;
 static VIDEO_UPDATE(firebeat)
 {
-	int chip = screen;
+	int chip = scrnum;
 	//int i;
 
 	fillbitmap(bitmap, 0, cliprect);
 
-	if (mame_stricmp(machine->gamedrv->name, "popn7") == 0)
+	if (mame_stricmp(screen->machine->gamedrv->name, "popn7") == 0)
 	{
 		gcu_exec_display_list(chip, bitmap, cliprect, 0x1f80000);
 	}

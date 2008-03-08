@@ -390,13 +390,13 @@ void TMS9928A_set_spriteslimit (int limit) {
 VIDEO_UPDATE( tms9928a )
 {
     INT32 BackColour = tms.Regs[7] & 15; if (!BackColour) BackColour=1;
-    palette_set_color(machine, 0, TMS9928A_palette[BackColour]);
+    palette_set_color(screen->machine, 0, TMS9928A_palette[BackColour]);
 
 	if (! (tms.Regs[1] & 0x40))
-		fillbitmap(bitmap, machine->pens[BackColour], cliprect);
+		fillbitmap(bitmap, screen->machine->pens[BackColour], cliprect);
 	else
 	{
-		(*ModeHandlers[TMS_MODE])(machine, tms.tmpbmp, cliprect);
+		(*ModeHandlers[TMS_MODE])(screen->machine, tms.tmpbmp, cliprect);
 
 		copybitmap(bitmap, tms.tmpbmp, 0, 0, LEFT_BORDER, TOP_BORDER, cliprect);
 		{
@@ -416,7 +416,7 @@ VIDEO_UPDATE( tms9928a )
 			fillbitmap (bitmap, BackColour, &rt);
 	    }
 		if (TMS_SPRITES_ENABLED)
-			draw_sprites(machine, bitmap, cliprect);
+			draw_sprites(screen->machine, bitmap, cliprect);
 	}
 
 	return 0;

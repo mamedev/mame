@@ -243,7 +243,7 @@ VIDEO_UPDATE( carpolo )
 	plot_box(bitmap,0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,FIELD_PEN);
 
 	/* car 1 */
-	draw_sprite(machine, bitmap, cliprect,
+	draw_sprite(screen->machine, bitmap, cliprect,
 				carpolo_spriteram[0x00], carpolo_spriteram[0x01],
 				0, carpolo_spriteram[0x0c] & 0x0f, CAR1_COLOR);
 
@@ -254,28 +254,28 @@ VIDEO_UPDATE( carpolo )
 	plot_box(bitmap,RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
 
 	/* car 4 */
-	draw_sprite(machine, bitmap, cliprect,
+	draw_sprite(screen->machine, bitmap, cliprect,
 				carpolo_spriteram[0x06], carpolo_spriteram[0x07],
 				0, carpolo_spriteram[0x0d] >> 4, CAR4_COLOR);
 
 	/* car 3 */
-	draw_sprite(machine, bitmap, cliprect,
+	draw_sprite(screen->machine, bitmap, cliprect,
 				carpolo_spriteram[0x04], carpolo_spriteram[0x05],
 				0, carpolo_spriteram[0x0d] & 0x0f, CAR3_COLOR);
 
 	/* car 2 */
-	draw_sprite(machine, bitmap, cliprect,
+	draw_sprite(screen->machine, bitmap, cliprect,
 				carpolo_spriteram[0x02], carpolo_spriteram[0x03],
 				0, carpolo_spriteram[0x0c] >> 4, CAR2_COLOR);
 
 	/* ball */
-	draw_sprite(machine, bitmap, cliprect,
+	draw_sprite(screen->machine, bitmap, cliprect,
 				carpolo_spriteram[0x08], carpolo_spriteram[0x09],
 				1, carpolo_spriteram[0x0e] & 0x0f, BALL_COLOR);
 
 	/* left goal - position determined by bit 6 of the
        horizontal and vertical timing PROMs */
-	drawgfxzoom(bitmap,machine->gfx[1],
+	drawgfxzoom(bitmap,screen->machine->gfx[1],
 				0,0,
 				0,0,
 				LEFT_GOAL_X,GOAL_Y,
@@ -283,7 +283,7 @@ VIDEO_UPDATE( carpolo )
 				0x20000,0x20000);
 
 	/* right goal */
-	drawgfxzoom(bitmap,machine->gfx[1],
+	drawgfxzoom(bitmap,screen->machine->gfx[1],
 				0,1,
 				1,0,
 				RIGHT_GOAL_X,GOAL_Y,
@@ -296,7 +296,7 @@ VIDEO_UPDATE( carpolo )
 		popmessage("WIDE!\n");
 
 	if (carpolo_spriteram[0x0f] & 0x01)
-		draw_sprite(machine, bitmap, cliprect,
+		draw_sprite(screen->machine, bitmap, cliprect,
 					carpolo_spriteram[0x0a], carpolo_spriteram[0x0b],
 					1, carpolo_spriteram[0x0e] >> 4, SPECIAL_CHAR_COLOR);
 
@@ -307,14 +307,14 @@ VIDEO_UPDATE( carpolo )
        and bit 3 of the vertical timing PROM controls in
        which quadrant the line will actually appear */
 
-	draw_alpha_line(machine, bitmap, cliprect, 0, (0*4+0)*2  );
-	draw_alpha_line(machine, bitmap, cliprect, 1, (0*4+0)*2+1);
-	draw_alpha_line(machine, bitmap, cliprect, 2, (3*4+1)*2  );
-	draw_alpha_line(machine, bitmap, cliprect, 3, (3*4+1)*2+1);
-	draw_alpha_line(machine, bitmap, cliprect, 4, (1*4+2)*2  );
-	draw_alpha_line(machine, bitmap, cliprect, 5, (1*4+2)*2+1);
-	draw_alpha_line(machine, bitmap, cliprect, 6, (0*4+3)*2  );
-	draw_alpha_line(machine, bitmap, cliprect, 7, (0*4+3)*2+1);
+	draw_alpha_line(screen->machine, bitmap, cliprect, 0, (0*4+0)*2  );
+	draw_alpha_line(screen->machine, bitmap, cliprect, 1, (0*4+0)*2+1);
+	draw_alpha_line(screen->machine, bitmap, cliprect, 2, (3*4+1)*2  );
+	draw_alpha_line(screen->machine, bitmap, cliprect, 3, (3*4+1)*2+1);
+	draw_alpha_line(screen->machine, bitmap, cliprect, 4, (1*4+2)*2  );
+	draw_alpha_line(screen->machine, bitmap, cliprect, 5, (1*4+2)*2+1);
+	draw_alpha_line(screen->machine, bitmap, cliprect, 6, (0*4+3)*2  );
+	draw_alpha_line(screen->machine, bitmap, cliprect, 7, (0*4+3)*2+1);
 
 	return 0;
 }

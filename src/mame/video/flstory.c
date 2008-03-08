@@ -187,9 +187,9 @@ VIDEO_UPDATE( flstory )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_LAYER1,0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_LAYER1,0);
-	flstory_draw_sprites(machine,bitmap,cliprect,0x00);
+	flstory_draw_sprites(screen->machine,bitmap,cliprect,0x00);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_LAYER0,0);
-	flstory_draw_sprites(machine,bitmap,cliprect,0x80);
+	flstory_draw_sprites(screen->machine,bitmap,cliprect,0x80);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
@@ -243,6 +243,6 @@ static void victnine_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE( victnine )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	victnine_draw_sprites(machine,bitmap,cliprect);
+	victnine_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

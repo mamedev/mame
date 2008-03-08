@@ -461,10 +461,10 @@ static VIDEO_UPDATE( mpu4_vid )
 	{
 		if (mpu4_vid_vidram_is_dirty[i]==1)
 		{
-			decodechar(machine->gfx[mpu4_gfx_index+0], i, (UINT8 *)mpu4_vid_vidram);
-			decodechar(machine->gfx[mpu4_gfx_index+1], i, (UINT8 *)mpu4_vid_vidram);
-			decodechar(machine->gfx[mpu4_gfx_index+2], i, (UINT8 *)mpu4_vid_vidram);
-			decodechar(machine->gfx[mpu4_gfx_index+3], i, (UINT8 *)mpu4_vid_vidram);
+			decodechar(screen->machine->gfx[mpu4_gfx_index+0], i, (UINT8 *)mpu4_vid_vidram);
+			decodechar(screen->machine->gfx[mpu4_gfx_index+1], i, (UINT8 *)mpu4_vid_vidram);
+			decodechar(screen->machine->gfx[mpu4_gfx_index+2], i, (UINT8 *)mpu4_vid_vidram);
+			decodechar(screen->machine->gfx[mpu4_gfx_index+3], i, (UINT8 *)mpu4_vid_vidram);
 			mpu4_vid_vidram_is_dirty[i]=0;
 		}
 	}
@@ -497,7 +497,7 @@ static VIDEO_UPDATE( mpu4_vid )
 			colattr = tiledat >>12;
 			tiledat &= 0x0fff;
 
-			drawgfx(bitmap,machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[gfxregion],tiledat,colattr,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 
 			count++;
 		}
@@ -1551,7 +1551,7 @@ static VIDEO_UPDATE(dealem)
 		{
 			int tile = dealem_videoram[count+0x1000] | (dealem_videoram[count] << 8);
 			count++;
-			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 		}
 	}
 

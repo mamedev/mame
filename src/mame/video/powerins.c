@@ -368,7 +368,7 @@ if (input_code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl&1)		tilemap_draw(bitmap,cliprect, tilemap_0, 0, 0);
 	else					fillbitmap(bitmap,0,cliprect);
-	if (layers_ctrl&8)		draw_sprites(machine,bitmap,cliprect);
+	if (layers_ctrl&8)		draw_sprites(screen->machine,bitmap,cliprect);
 	if (layers_ctrl&2)		tilemap_draw(bitmap,cliprect, tilemap_1, 0, 0);
 	return 0;
 }

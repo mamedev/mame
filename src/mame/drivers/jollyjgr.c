@@ -352,7 +352,7 @@ static VIDEO_UPDATE( jollyjgr )
 
 		if (offs < 3*4)  sy++;
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 				code,color,
 				flipx,flipy,
 				sx,sy,

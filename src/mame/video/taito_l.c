@@ -326,12 +326,12 @@ VIDEO_UPDATE( taitol )
 			tilemap_draw(bitmap,cliprect,bg18_tilemap,0,0);
 		else					/* split priority */
 			tilemap_draw(bitmap,cliprect,bg18_tilemap,0,1);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 
 		tilemap_draw(bitmap,cliprect,ch1a_tilemap,0,0);
 	}
 	else
-		fillbitmap(bitmap,machine->pens[0],cliprect);
+		fillbitmap(bitmap,screen->machine->pens[0],cliprect);
 	return 0;
 }
 

@@ -881,33 +881,33 @@ static VIDEO_UPDATE( nmg5 )
 
 	if(priority_reg == 0)
 	{
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 		draw_bitmap(bitmap);
 	}
 	else if(priority_reg == 1)
 	{
 		draw_bitmap(bitmap);
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else if(priority_reg == 2)
 	{
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 		draw_bitmap(bitmap);
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	}
 	else if(priority_reg == 3)
 	{
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 		draw_bitmap(bitmap);
 	}
 	else if(priority_reg == 7)
 	{
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 		draw_bitmap(bitmap);
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 	}
 	return 0;
 }

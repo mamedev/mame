@@ -544,10 +544,10 @@ VIDEO_UPDATE( macross )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -685,10 +685,10 @@ VIDEO_UPDATE( tdragon )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -702,10 +702,10 @@ VIDEO_UPDATE( hachamf )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -717,10 +717,10 @@ VIDEO_UPDATE( manybloc )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -735,10 +735,10 @@ VIDEO_UPDATE( tharrier )
 	tilemap_set_scrollx(bg_tilemap,0,tharrier_scroll);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -778,7 +778,7 @@ VIDEO_UPDATE( bioship )
 				int numtile = data&0xfff;
 				int color = (data&0xf000)>>12;
 
-				drawgfx(background_bitmap,machine->gfx[3],
+				drawgfx(background_bitmap,screen->machine->gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -788,7 +788,7 @@ VIDEO_UPDATE( bioship )
 				data = tilerom[offs+0x1000+bank];
 				numtile = data&0xfff;
 				color = (data&0xf000)>>12;
-				drawgfx(background_bitmap,machine->gfx[3],
+				drawgfx(background_bitmap,screen->machine->gfx[3],
 						numtile,
 						color,
 						0,0,   /* no flip */
@@ -803,10 +803,10 @@ VIDEO_UPDATE( bioship )
 	copyscrollbitmap(bitmap,background_bitmap,1,&scrollx,1,&scrolly,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -819,10 +819,10 @@ VIDEO_UPDATE( strahl )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
-	nmk16_draw_sprites(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
@@ -834,10 +834,10 @@ VIDEO_UPDATE( bjtwin )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	nmk16_draw_sprites(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
 
 	return 0;
 }
@@ -1073,9 +1073,9 @@ static void video_update(running_machine *machine, bitmap_t *bitmap, const recta
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 }
 
-VIDEO_UPDATE( afega )		{	video_update(machine,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
-VIDEO_UPDATE( bubl2000 )	{	video_update(machine,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
-VIDEO_UPDATE( redhawkb )	{	video_update(machine,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+VIDEO_UPDATE( afega )		{	video_update(screen->machine,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
+VIDEO_UPDATE( bubl2000 )	{	video_update(screen->machine,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
+VIDEO_UPDATE( redhawkb )	{	video_update(screen->machine,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
 
 VIDEO_UPDATE( firehawk )
 {
@@ -1086,10 +1086,10 @@ VIDEO_UPDATE( firehawk )
 
 	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
 
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,3);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,2);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,1);
-	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(screen->machine, bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	return 0;

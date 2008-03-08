@@ -104,7 +104,7 @@ static VIDEO_UPDATE( lastfght )
 
 		count = base;
 
-		fillbitmap( bitmap, get_black_pen(machine), cliprect );
+		fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 		for ( y = 0 ; y < 256; y++ )
 		{
 			for ( x = 0; x < 512; x++ )

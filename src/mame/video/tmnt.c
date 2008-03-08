@@ -751,21 +751,21 @@ VIDEO_UPDATE( tmnt2 )
 
 		// dim all colors before it
 		for (i=0; i<cb; i++)
-			palette_set_brightness(machine,i,brt);
+			palette_set_brightness(screen->machine,i,brt);
 
 		// reset all colors in range
 		for (i=cb; i<ce; i++)
-			palette_set_brightness(machine,i,1.0);
+			palette_set_brightness(screen->machine,i,1.0);
 
 		// dim all colors after it
 		for (i=ce; i<2048; i++)
-			palette_set_brightness(machine,i,brt);
+			palette_set_brightness(screen->machine,i,brt);
 
 		// toggle shadow/highlight
 		if (~dim_c & 0x10)
-			palette_set_shadow_mode(machine, 1);
+			palette_set_shadow_mode(screen->machine, 1);
 		else
-			palette_set_shadow_mode(machine, 0);
+			palette_set_shadow_mode(screen->machine, 0);
 	}
 
 	VIDEO_UPDATE_CALL(lgtnfght);

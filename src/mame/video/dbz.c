@@ -175,20 +175,14 @@ VIDEO_UPDATE( dbz )
 		}
 
 		if(layer[plane] == 4)
-		{
 			K053936_1_zoom_draw(bitmap,cliprect,dbz_bg1_tilemap,flag,pri);
-		}
 		else if(layer[plane] == 5)
-		{
 			K053936_0_zoom_draw(bitmap,cliprect,dbz_bg2_tilemap,flag,pri);
-		}
 		else
-		{
-			K056832_tilemap_draw(machine, bitmap,cliprect,layer[plane],flag,pri);
-		}
+			K056832_tilemap_draw(screen->machine, bitmap,cliprect,layer[plane],flag,pri);
 	}
 
-	K053247_sprites_draw(machine, bitmap, cliprect);
+	K053247_sprites_draw(screen->machine, bitmap, cliprect);
 	return 0;
 }
 

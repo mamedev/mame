@@ -480,7 +480,7 @@ static void update_rohga(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( rohga )
 {
-	update_rohga(machine, bitmap, cliprect, 0);
+	update_rohga(screen->machine, bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -488,7 +488,7 @@ VIDEO_UPDATE( schmeisr )
 {
 	// The Schmeisr pcb has wire mods which seem to remap sprite palette indices.
 	// Otherwise video update is the same as Rohga.
-	update_rohga(machine, bitmap, cliprect, 1);
+	update_rohga(screen->machine, bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -500,12 +500,12 @@ VIDEO_UPDATE( wizdfire )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	fillbitmap(bitmap,machine->pens[512],&machine->screen[0].visarea);
+	fillbitmap(bitmap,screen->machine->pens[512],&screen->machine->screen[0].visarea);
 
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,4,3);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,4,3);
 	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3,3);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3,3);
 
 	if ((deco16_priority&0x1f)==0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
 		deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_DRAW_ALPHA,0);
@@ -513,9 +513,9 @@ VIDEO_UPDATE( wizdfire )
 		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
 
 	/* See notes in wizdfire_draw_sprites about this */
-	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,0,3);
-	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,2,4);
-	wizdfire_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,1,4);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,0,3);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,2,4);
+	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,1,4);
 
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;
@@ -529,7 +529,7 @@ VIDEO_UPDATE( nitrobal )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	fillbitmap(bitmap,machine->pens[512],&machine->screen[0].visarea);
+	fillbitmap(bitmap,screen->machine->pens[512],&screen->machine->screen[0].visarea);
 	fillbitmap(priority_bitmap,0,NULL);
 	deco16_clear_sprite_priority_bitmap();
 
@@ -537,8 +537,8 @@ VIDEO_UPDATE( nitrobal )
 	deco16_tilemap_34_combine_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,16);
-	nitrobal_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16,3);
-	nitrobal_draw_sprites(machine,bitmap,cliprect,buffered_spriteram16_2,4);
+	nitrobal_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
+	nitrobal_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
 
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
 	return 0;

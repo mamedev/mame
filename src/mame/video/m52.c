@@ -365,13 +365,13 @@ VIDEO_UPDATE( m52 )
 	if (!(bgcontrol & 0x20))
 	{
 		if (!(bgcontrol & 0x10))
-			draw_background(machine, bitmap, cliprect, bg2xpos, bg2ypos, 2); /* distant mountains */
+			draw_background(screen->machine, bitmap, cliprect, bg2xpos, bg2ypos, 2); /* distant mountains */
 
 		if (!(bgcontrol & 0x02))
-			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 3); /* hills */
+			draw_background(screen->machine, bitmap, cliprect, bg1xpos, bg1ypos, 3); /* hills */
 
 		if (!(bgcontrol & 0x04))
-			draw_background(machine, bitmap, cliprect, bg1xpos, bg1ypos, 4); /* cityscape */
+			draw_background(screen->machine, bitmap, cliprect, bg1xpos, bg1ypos, 4); /* cityscape */
 	}
 
 	tilemap_set_flip(bg_tilemap, flip_screen_get() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -418,10 +418,10 @@ VIDEO_UPDATE( m52 )
 		clip = *cliprect;
 #endif
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			code, color, flipx, flipy, sx, sy,
 			&clip, TRANSPARENCY_PENS,
-			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 512+32));
+			colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 512+32));
 	}
 	return 0;
 }

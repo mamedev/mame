@@ -156,14 +156,14 @@ static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *c
 
 VIDEO_UPDATE( gyruss )
 {
-	if (cliprect->min_y == machine->screen[screen].visarea.min_y)
+	if (cliprect->min_y == screen->machine->screen[scrnum].visarea.min_y)
 	{
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		tilemap_set_flip(ALL_TILEMAPS, (*gyruss_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(machine->gfx, bitmap, cliprect);
+	draw_sprites(screen->machine->gfx, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, gyruss_tilemap, 0, 0);
 
 	return 0;

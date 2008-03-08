@@ -350,12 +350,12 @@ VIDEO_UPDATE( hbarrel )
 	flip_screen_set(dec0_pf1_control_0[0]&0x80);
 
 	dec0_pf3_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
-	draw_sprites(machine,bitmap,cliprect,0x08,0x08);
+	draw_sprites(screen->machine,bitmap,cliprect,0x08,0x08);
 	dec0_pf2_draw(bitmap,cliprect,0);
 
 	/* HB always keeps pf2 on top of pf3, no need explicitly support priority register */
 
-	draw_sprites(machine,bitmap,cliprect,0x08,0x00);
+	draw_sprites(screen->machine,bitmap,cliprect,0x08,0x00);
 	dec0_pf1_draw(bitmap,cliprect,0);
 	return 0;
 }
@@ -375,7 +375,7 @@ VIDEO_UPDATE( baddudes )
 		if (dec0_pri & 2)
 			dec0_pf2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
 
-		draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 		if (dec0_pri & 4)
 			dec0_pf3_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
@@ -388,7 +388,7 @@ VIDEO_UPDATE( baddudes )
 		if (dec0_pri & 2)
 			dec0_pf3_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
 
-		draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 		if (dec0_pri & 4)
 			dec0_pf2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
@@ -420,7 +420,7 @@ VIDEO_UPDATE( robocop )
 		dec0_pf2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER1|TILEMAP_DRAW_OPAQUE);
 
 		if (dec0_pri & 0x02)
-			draw_sprites(machine,bitmap,cliprect,0x08,trans);
+			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf3_draw(bitmap,cliprect,0);
 	}
@@ -429,15 +429,15 @@ VIDEO_UPDATE( robocop )
 		dec0_pf3_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 
 		if (dec0_pri & 0x02)
-			draw_sprites(machine,bitmap,cliprect,0x08,trans);
+			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf2_draw(bitmap,cliprect,0);
 	}
 
 	if (dec0_pri & 0x02)
-		draw_sprites(machine,bitmap,cliprect,0x08,trans ^ 0x08);
+		draw_sprites(screen->machine,bitmap,cliprect,0x08,trans ^ 0x08);
 	else
-		draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 	dec0_pf1_draw(bitmap,cliprect,0);
 	return 0;
@@ -451,9 +451,9 @@ VIDEO_UPDATE( birdtry )
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
-	fillbitmap(bitmap,machine->pens[768],cliprect);
+	fillbitmap(bitmap,screen->machine->pens[768],cliprect);
 	dec0_pf2_draw(bitmap,cliprect,0);
-	draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 	dec0_pf1_draw(bitmap,cliprect,0);
 	return 0;
 }
@@ -475,7 +475,7 @@ VIDEO_UPDATE( hippodrm )
 		dec0_pf2_draw(bitmap,cliprect,0);
 	}
 
-	draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 	dec0_pf1_draw(bitmap,cliprect,0);
 	return 0;
 }
@@ -489,7 +489,7 @@ VIDEO_UPDATE( slyspy )
 	dec0_pf3_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 	dec0_pf2_draw(bitmap,cliprect,0);
 
-	draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
 	if (dec0_pri&0x80)
@@ -516,7 +516,7 @@ VIDEO_UPDATE( midres )
 		dec0_pf2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 
 		if (dec0_pri & 0x02)
-			draw_sprites(machine,bitmap,cliprect,0x08,trans);
+			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf3_draw(bitmap,cliprect,0);
 	}
@@ -525,15 +525,15 @@ VIDEO_UPDATE( midres )
 		dec0_pf3_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
 
 		if (dec0_pri & 0x02)
-			draw_sprites(machine,bitmap,cliprect,0x08,trans);
+			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
 		dec0_pf2_draw(bitmap,cliprect,0);
 	}
 
 	if (dec0_pri & 0x02)
-		draw_sprites(machine,bitmap,cliprect,0x08,trans ^ 0x08);
+		draw_sprites(screen->machine,bitmap,cliprect,0x08,trans ^ 0x08);
 	else
-		draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 	dec0_pf1_draw(bitmap,cliprect,0);
 	return 0;

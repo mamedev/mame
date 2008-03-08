@@ -345,7 +345,7 @@ VIDEO_UPDATE( nova2001 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	nova2001_draw_sprites(machine, bitmap, cliprect);
+	nova2001_draw_sprites(screen->machine, bitmap, cliprect);
 
 	// according to the schematics, fg category 0 should be drawn behind sprites,
 	// but it doesn't look right that way
@@ -360,7 +360,7 @@ VIDEO_UPDATE( pkunwar )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 
-	pkunwar_draw_sprites(machine, bitmap, cliprect);
+	pkunwar_draw_sprites(screen->machine, bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 
@@ -373,7 +373,7 @@ VIDEO_UPDATE( ninjakun )
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 1, 0);
 
-	nova2001_draw_sprites(machine, bitmap, cliprect);
+	nova2001_draw_sprites(screen->machine, bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
@@ -384,7 +384,7 @@ VIDEO_UPDATE( raiders5 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	pkunwar_draw_sprites(machine, bitmap, cliprect);
+	pkunwar_draw_sprites(screen->machine, bitmap, cliprect);
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 

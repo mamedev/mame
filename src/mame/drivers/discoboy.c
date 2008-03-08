@@ -120,7 +120,7 @@ static VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine, i/2, MAKE_RGB(r, g, b));
+		palette_set_color(screen->machine, i/2, MAKE_RGB(r, g, b));
 	}
 
 	for (i=0;i<0x800;i+=2)
@@ -133,7 +133,7 @@ static VIDEO_UPDATE( discoboy )
 		g = ((pal >> 4) & 0xf) << 4;
 		r = ((pal >> 8) & 0xf) << 4;
 
-		palette_set_color(machine, (i/2)+0x400, MAKE_RGB(r, g, b));
+		palette_set_color(screen->machine, (i/2)+0x400, MAKE_RGB(r, g, b));
 	}
 
 	fillbitmap(bitmap, 0x3ff, cliprect);
@@ -154,12 +154,12 @@ static VIDEO_UPDATE( discoboy )
 
 			}
 
-			drawgfx(bitmap,machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[1], tileno ,discoboy_ram_att[count/2],0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count+=2;
 		}
 	}
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }

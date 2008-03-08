@@ -348,7 +348,7 @@ VIDEO_UPDATE( namcos2_default )
 	int pri;
 
 	UpdatePalette();
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -364,7 +364,7 @@ VIDEO_UPDATE( namcos2_default )
 			{
 				DrawROZ(bitmap,&clip);
 			}
-			namcos2_draw_sprites(machine, bitmap, &clip, pri/2, namcos2_gfx_ctrl );
+			namcos2_draw_sprites(screen->machine, bitmap, &clip, pri/2, namcos2_gfx_ctrl );
 		}
 	}
 	return 0;
@@ -385,7 +385,7 @@ VIDEO_UPDATE( finallap )
 	int pri;
 
 	UpdatePalette();
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -394,8 +394,8 @@ VIDEO_UPDATE( finallap )
 		{
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
-		namco_road_draw(machine, bitmap,&clip,pri );
-		namcos2_draw_sprites(machine, bitmap,&clip,pri,namcos2_gfx_ctrl );
+		namco_road_draw(screen->machine, bitmap,&clip,pri );
+		namcos2_draw_sprites(screen->machine, bitmap,&clip,pri,namcos2_gfx_ctrl );
 	}
 	return 0;
 }
@@ -422,7 +422,7 @@ VIDEO_UPDATE( luckywld )
 	int pri;
 
 	UpdatePalette();
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -431,12 +431,12 @@ VIDEO_UPDATE( luckywld )
 		{
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
-		namco_road_draw(machine, bitmap,&clip,pri );
+		namco_road_draw(screen->machine, bitmap,&clip,pri );
 		if( namcos2_gametype==NAMCOS2_LUCKY_AND_WILD )
 		{
 			namco_roz_draw( bitmap, &clip, pri );
 		}
-		namco_obj_draw(machine, bitmap, &clip, pri );
+		namco_obj_draw(screen->machine, bitmap, &clip, pri );
 	}
 	return 0;
 }
@@ -455,13 +455,13 @@ VIDEO_UPDATE( sgunner )
 	int pri;
 
 	UpdatePalette();
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<8; pri++ )
 	{
 		namco_tilemap_draw( bitmap, &clip, pri );
-		namco_obj_draw(machine, bitmap, &clip, pri );
+		namco_obj_draw(screen->machine, bitmap, &clip, pri );
 	}
 	return 0;
 }
@@ -481,7 +481,7 @@ VIDEO_UPDATE( metlhawk )
 	int pri;
 
 	UpdatePalette();
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -491,7 +491,7 @@ VIDEO_UPDATE( metlhawk )
 			namco_tilemap_draw( bitmap, &clip, pri/2 );
 		}
 		namco_roz_draw( bitmap, &clip, pri );
-		namcos2_draw_sprites_metalhawk(machine, bitmap,&clip,pri );
+		namcos2_draw_sprites_metalhawk(screen->machine, bitmap,&clip,pri );
 	}
 	return 0;
 }

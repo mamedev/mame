@@ -229,7 +229,6 @@ VIDEO_UPDATE( toypop )
 {
 	draw_background(bitmap);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-
-	mappy_draw_sprites(machine, bitmap, cliprect, -31, -8, 0xff);
+	mappy_draw_sprites(screen->machine, bitmap, cliprect, -31, -8, 0xff);
 	return 0;
 }

@@ -233,7 +233,7 @@ VIDEO_UPDATE( sf )
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
 	if (sf_active & 0x80)
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

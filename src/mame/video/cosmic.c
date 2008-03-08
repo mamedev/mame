@@ -555,7 +555,7 @@ VIDEO_UPDATE( panic )
 {
 	fillbitmap(bitmap, 0, cliprect);
 	draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0x07, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 1);
 	return 0;
 }
 
@@ -565,7 +565,7 @@ VIDEO_UPDATE( cosmica )
 	fillbitmap(bitmap, 0, cliprect);
 	cosmica_draw_starfield(bitmap, cliprect);
 	draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0x0f, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0);
 	return 0;
 }
 
@@ -574,7 +574,7 @@ VIDEO_UPDATE( magspot )
 {
 	fillbitmap(bitmap, 0, cliprect);
 	draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0x07, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 	return 0;
 }
 
@@ -587,7 +587,7 @@ VIDEO_UPDATE( devzone )
     	devzone_draw_grid(bitmap, cliprect);
 
 	draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0x07, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 	return 0;
 }
 
@@ -599,7 +599,7 @@ VIDEO_UPDATE( nomnlnd )
 
 	fillbitmap(bitmap, 0, cliprect);
 	draw_bitmap(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0x07, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 
 	if (background_enable)
 		nomnlnd_draw_background(bitmap, cliprect);

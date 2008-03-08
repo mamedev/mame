@@ -407,6 +407,6 @@ static void update_one_screen(running_machine* machine, int screen, bitmap_t *bi
 
 VIDEO_UPDATE( cyberbal )
 {
-	update_one_screen(machine, screen, bitmap, cliprect);
+	update_one_screen(screen->machine, scrnum, bitmap, cliprect);
 	return 0;
 }

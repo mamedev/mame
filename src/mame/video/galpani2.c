@@ -200,6 +200,6 @@ if (input_code_pressed(KEYCODE_Z))
 							   cliprect,0x4000 + 0);
 	}
 
-	if (layers_ctrl & 0x8)	kaneko16_draw_sprites(machine, bitmap, cliprect);
+	if (layers_ctrl & 0x8)	kaneko16_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

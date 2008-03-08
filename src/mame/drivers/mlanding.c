@@ -210,9 +210,9 @@ static VIDEO_START(mlanding)
 
 static VIDEO_UPDATE(mlanding)
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
-	updateChars(machine);
+	updateChars(screen->machine);
 
 	{
 		int i,dx,dy,j,k,num;
@@ -245,7 +245,7 @@ static VIDEO_UPDATE(mlanding)
 				//test
 					if(code)
 					{
-						drawgfx(ml_bitmap[num],machine->gfx[0],
+						drawgfx(ml_bitmap[num],screen->machine->gfx[0],
 							code++,
 							0,
 							0,0,

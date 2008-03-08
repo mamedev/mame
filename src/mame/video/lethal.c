@@ -120,14 +120,14 @@ VIDEO_UPDATE(lethalen)
 	fillbitmap(bitmap, 7168, cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	K056832_tilemap_draw(machine, bitmap, cliprect, 3, 0, 1);
-	K056832_tilemap_draw(machine, bitmap, cliprect, 2, 0, 2);
-	K056832_tilemap_draw(machine, bitmap, cliprect, 1, 0, 4);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 3, 0, 1);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 2, 0, 2);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 1, 0, 4);
 
-	K053245_sprites_draw_lethal(machine,0, bitmap, cliprect);
+	K053245_sprites_draw_lethal(screen->machine,0, bitmap, cliprect);
 
 	// force "A" layer over top of everything
-	K056832_tilemap_draw(machine, bitmap, cliprect, 0, 0, 0);
+	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 0, 0, 0);
 
 
 #if 0

@@ -116,7 +116,7 @@ VIDEO_UPDATE( relief )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield2_tilemap, 0, 1);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(machine, 0, cliprect, &rectlist);
+	mobitmap = atarimo_render(screen->machine, 0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

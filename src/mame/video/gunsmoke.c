@@ -188,9 +188,9 @@ VIDEO_UPDATE( gunsmoke )
 	if (bgon)
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
-	if (objon) draw_sprites(machine, bitmap, cliprect);
+	if (objon) draw_sprites(screen->machine, bitmap, cliprect);
 	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

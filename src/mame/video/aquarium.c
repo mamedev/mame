@@ -173,7 +173,7 @@ VIDEO_UPDATE(aquarium)
 	tilemap_draw(bitmap,cliprect,aquarium_bak_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,aquarium_mid_tilemap,0,0);
 
-	draw_sprites(machine, bitmap,cliprect,16);
+	draw_sprites(screen->machine, bitmap,cliprect,16);
 
 	tilemap_draw(bitmap,cliprect,aquarium_bak_tilemap,1,0);
 	tilemap_draw(bitmap,cliprect,aquarium_mid_tilemap,1,0);

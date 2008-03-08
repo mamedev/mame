@@ -1178,8 +1178,8 @@ VIDEO_UPDATE( bigrun )
 
 	for (i = 7; i >= 4; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (megasys1_active_layers & 0x10)	cischeat_draw_road(machine,bitmap,cliprect,0,i,i,TRANSPARENCY_NONE);
-		if (megasys1_active_layers & 0x20)	cischeat_draw_road(machine,bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
+		if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,i,i,TRANSPARENCY_NONE);
+		if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
 	}
 
 	flag = 0;
@@ -1188,11 +1188,11 @@ VIDEO_UPDATE( bigrun )
 
 	for (i = 3; i >= 0; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
-		if (megasys1_active_layers & 0x10)	cischeat_draw_road(machine,bitmap,cliprect,0,i,i,TRANSPARENCY_PEN);
-		if (megasys1_active_layers & 0x20)	cischeat_draw_road(machine,bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
+		if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,i,i,TRANSPARENCY_PEN);
+		if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,i,i,TRANSPARENCY_PEN);
 	}
 
-	if (megasys1_active_layers & 0x08)	bigrun_draw_sprites(machine,bitmap,cliprect,15,0);
+	if (megasys1_active_layers & 0x08)	bigrun_draw_sprites(screen->machine,bitmap,cliprect,15,0);
 
 	cischeat_tmap_DRAW(2)
 
@@ -1230,25 +1230,25 @@ VIDEO_UPDATE( cischeat )
 	fillbitmap(bitmap,0,cliprect);
 
 										/* bitmap, road, priority, transparency */
-	if (megasys1_active_layers & 0x10)	cischeat_draw_road(machine,bitmap,cliprect,0,7,5,TRANSPARENCY_NONE);
-	if (megasys1_active_layers & 0x20)	cischeat_draw_road(machine,bitmap,cliprect,1,7,5,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,7,5,TRANSPARENCY_NONE);
+	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,7,5,TRANSPARENCY_PEN);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
 //  else fillbitmap(bitmap,0,cliprect);
 	cischeat_tmap_DRAW(1)
 
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,15,3);
-	if (megasys1_active_layers & 0x10)	cischeat_draw_road(machine,bitmap,cliprect,0,4,1,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x20)	cischeat_draw_road(machine,bitmap,cliprect,1,4,1,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,2,2);
-	if (megasys1_active_layers & 0x10)	cischeat_draw_road(machine,bitmap,cliprect,0,0,0,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x20)	cischeat_draw_road(machine,bitmap,cliprect,1,0,0,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,1,0);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,15,3);
+	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,4,1,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,4,1,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,2,2);
+	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,0,0,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	cischeat_draw_road(screen->machine,bitmap,cliprect,1,0,0,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,1,0);
 	cischeat_tmap_DRAW(2)
 
 	/* for the map screen */
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,0+16,0+16);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,0+16,0+16);
 
 
 	megasys1_active_layers = megasys1_active_layers1;
@@ -1288,8 +1288,8 @@ VIDEO_UPDATE( f1gpstar )
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(machine,bitmap,cliprect,1,6,7,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(machine,bitmap,cliprect,0,6,7,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,6,7,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,6,7,TRANSPARENCY_PEN);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -1297,18 +1297,18 @@ VIDEO_UPDATE( f1gpstar )
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(machine,bitmap,cliprect,1,1,5,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(machine,bitmap,cliprect,0,1,5,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,1,5,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,1,5,TRANSPARENCY_PEN);
 
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,15,2);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,15,2);
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
-	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(machine,bitmap,cliprect,1,0,0,TRANSPARENCY_PEN);
-	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(machine,bitmap,cliprect,0,0,0,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x20)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,1,0,0,TRANSPARENCY_PEN);
+	if (megasys1_active_layers & 0x10)	f1gpstar_draw_road(screen->machine,bitmap,cliprect,0,0,0,TRANSPARENCY_PEN);
 
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,1,1);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,1,1);
 	cischeat_tmap_DRAW(2)
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,0,0);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,0,0);
 
 
 	megasys1_active_layers = megasys1_active_layers1;
@@ -1350,9 +1350,9 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 #if 1
 	popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
 						scudhamm_motor_command,
-						scudhamm_motor_pos_r(machine,0,0),
-						scudhamm_motor_status_r(machine,0,0),
-						scudhamm_analog_r(machine,0,0) );
+						scudhamm_motor_pos_r(screen->machine,0,0),
+						scudhamm_motor_status_r(screen->machine,0,0),
+						scudhamm_analog_r(screen->machine,0,0) );
 #endif
 
 }
@@ -1368,7 +1368,7 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 	cischeat_tmap_DRAW(0)
 //  else fillbitmap(bitmap,0,cliprect);
 //  cischeat_tmap_DRAW(1)
-	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(machine,bitmap,cliprect,0,15);
+	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,0,15);
 	cischeat_tmap_DRAW(2)
 
 	megasys1_active_layers = megasys1_active_layers1;

@@ -371,21 +371,21 @@ VIDEO_UPDATE( firetrk )
 
 	fillbitmap(bitmap, 0, cliprect);
 	tilemap_draw(bitmap, &playfield_window, tilemap1, 0, 0);
-	firetrk_draw_car(machine->gfx, bitmap, &playfield_window, 0, firetrk_flash);
-	firetrk_draw_car(machine->gfx, bitmap, &playfield_window, 1, firetrk_flash);
-	draw_text(machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
-	draw_text(machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x10,   8, 0x10, 0x10);
+	firetrk_draw_car(screen->machine->gfx, bitmap, &playfield_window, 0, firetrk_flash);
+	firetrk_draw_car(screen->machine->gfx, bitmap, &playfield_window, 1, firetrk_flash);
+	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
+	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
 		fillbitmap(helper2, 0xff, &playfield_window);
-		firetrk_draw_car(machine->gfx, helper2, &playfield_window, 0, FALSE);
+		firetrk_draw_car(screen->machine->gfx, helper2, &playfield_window, 0, FALSE);
 		check_collision(0);
 
 		fillbitmap(helper2, 0xff, &playfield_window);
-		firetrk_draw_car(machine->gfx, helper2, &playfield_window, 1, FALSE);
+		firetrk_draw_car(screen->machine->gfx, helper2, &playfield_window, 1, FALSE);
 		check_collision(1);
 
 		*firetrk_blink = FALSE;
@@ -405,16 +405,16 @@ VIDEO_UPDATE( superbug )
 
 	fillbitmap(bitmap, 0, cliprect);
 	tilemap_draw(bitmap, &playfield_window, tilemap1, 0, 0);
-	superbug_draw_car(machine->gfx, bitmap, &playfield_window, firetrk_flash);
-	draw_text(machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
-	draw_text(machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x10,   8, 0x10, 0x10);
+	superbug_draw_car(screen->machine->gfx, bitmap, &playfield_window, firetrk_flash);
+	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
+	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
 		fillbitmap(helper2, 0xff, &playfield_window);
-		superbug_draw_car(machine->gfx, helper2, &playfield_window, FALSE);
+		superbug_draw_car(screen->machine->gfx, helper2, &playfield_window, FALSE);
 		check_collision(0);
 
 		*firetrk_blink = FALSE;
@@ -434,21 +434,21 @@ VIDEO_UPDATE( montecar )
 
 	fillbitmap(bitmap, 0x2c, cliprect);
 	tilemap_draw(bitmap, &playfield_window, tilemap1, 0, 0);
-	montecar_draw_car(machine->gfx, bitmap, &playfield_window, 0, FALSE);
-	montecar_draw_car(machine->gfx, bitmap, &playfield_window, 1, FALSE);
-	draw_text(machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 24, 0x20, 0x08);
-	draw_text(machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x20, 16, 0x20, 0x08);
+	montecar_draw_car(screen->machine->gfx, bitmap, &playfield_window, 0, FALSE);
+	montecar_draw_car(screen->machine->gfx, bitmap, &playfield_window, 1, FALSE);
+	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 24, 0x20, 0x08);
+	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
 		fillbitmap(helper2, 0xff, &playfield_window);
-		montecar_draw_car(machine->gfx, helper2, &playfield_window, 0, TRUE);
+		montecar_draw_car(screen->machine->gfx, helper2, &playfield_window, 0, TRUE);
 		check_collision(0);
 
 		fillbitmap(helper2, 0xff, &playfield_window);
-		montecar_draw_car(machine->gfx, helper2, &playfield_window, 1, TRUE);
+		montecar_draw_car(screen->machine->gfx, helper2, &playfield_window, 1, TRUE);
 		check_collision(1);
 	}
 

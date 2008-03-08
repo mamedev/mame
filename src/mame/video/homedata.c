@@ -682,7 +682,7 @@ VIDEO_UPDATE( mrokumei )
 	/* blank screen */
 	if (homedata_vreg[0x3] == 0xc1 && homedata_vreg[0x4] == 0xc0 && homedata_vreg[0x5] == 0xff)
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 
@@ -744,7 +744,7 @@ VIDEO_UPDATE( reikaids )
     }
 
 
-    fillbitmap(bitmap,get_black_pen(machine),cliprect);
+    fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
     pri = (blitter_bank & 0x70) >> 4;
     for (i = 0;i < 4;i++)
@@ -790,7 +790,7 @@ VIDEO_UPDATE( reikaids )
 	}
 
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	pri = (blitter_bank & 0x70) >> 4;
 	for (i = 0;i < 4;i++)
@@ -807,7 +807,7 @@ VIDEO_UPDATE( pteacher )
 	/* blank screen */
 	if (homedata_vreg[0x3] == 0xc1 && homedata_vreg[0x4] == 0xc0 && homedata_vreg[0x5] == 0xff)
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 		return 0;
 	}
 

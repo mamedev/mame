@@ -57,7 +57,7 @@ VIDEO_UPDATE( lazercmd )
 {
 	int i,x,y;
 
-	int video_inverted = input_port_2_r(machine,0) & 0x20;
+	int video_inverted = readinputport(2) & 0x20;
 
 	/* The first row of characters are invisible */
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)
@@ -70,16 +70,16 @@ VIDEO_UPDATE( lazercmd )
 		sx *= HORZ_CHR;
 		sy *= VERT_CHR;
 
-		drawgfx(bitmap, machine->gfx[0],
+		drawgfx(bitmap, screen->machine->gfx[0],
 				videoram[i], video_inverted ? 1 : 0,
 				0,0,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+				cliprect,TRANSPARENCY_NONE,0);
 	}
 
 	x = marker_x - 1;             /* normal video lags marker by 1 pixel */
 	y = vert_scale(marker_y) - VERT_CHR; /* first line used as scratch pad */
-	plot_pattern(machine, bitmap,x,y);
+	plot_pattern(screen->machine, bitmap,x,y);
 
 	return 0;
 }

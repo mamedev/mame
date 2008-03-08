@@ -179,7 +179,7 @@ VIDEO_UPDATE( cbasebal )
 		fillbitmap(bitmap,768,cliprect);
 
 	if (obj_on)
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 
 	if (text_on)
 		tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

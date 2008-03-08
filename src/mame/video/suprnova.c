@@ -877,7 +877,7 @@ VIDEO_UPDATE(skns)
 	UINT8 *btiles;
 
 
-	palette_update(machine);
+	palette_update(screen->machine);
 
 	btiles = memory_region (REGION_GFX3);
 
@@ -899,7 +899,7 @@ VIDEO_UPDATE(skns)
 			{
 				if (skns_v3t_dirty[i] == 1)
 				{
-					decodechar(machine->gfx[1], i, (UINT8*)btiles);
+					decodechar(screen->machine->gfx[1], i, (UINT8*)btiles);
 
 					skns_v3t_dirty[i] = 0;
 				}
@@ -925,7 +925,7 @@ VIDEO_UPDATE(skns)
 			{
 				if (skns_v3t_4bppdirty[i] == 1)
 				{
-					decodechar(machine->gfx[3], i, (UINT8*)btiles);
+					decodechar(screen->machine->gfx[3], i, (UINT8*)btiles);
 
 					skns_v3t_4bppdirty[i] = 0;
 				}
@@ -933,7 +933,7 @@ VIDEO_UPDATE(skns)
 		}
 	}
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	{
 		int supernova_pri_a;
@@ -945,10 +945,10 @@ VIDEO_UPDATE(skns)
 
 
 		/* needed until we have the per tile priorities sorted out */
-		if (!strcmp(machine->gamedrv->name,"vblokbrk") ||
-			!strcmp(machine->gamedrv->name,"sarukani") ||
-			!strcmp(machine->gamedrv->name,"sengekis") ||
-			!strcmp(machine->gamedrv->name,"sengekij"))
+		if (!strcmp(screen->machine->gamedrv->name,"vblokbrk") ||
+			!strcmp(screen->machine->gamedrv->name,"sarukani") ||
+			!strcmp(screen->machine->gamedrv->name,"sengekis") ||
+			!strcmp(screen->machine->gamedrv->name,"sengekij"))
 		{
 			supernova_pri_b = 0;
 			supernova_pri_a = 1;
@@ -964,7 +964,7 @@ VIDEO_UPDATE(skns)
 	}
 
 
-	skns_draw_sprites(machine, bitmap, cliprect);
+	skns_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 

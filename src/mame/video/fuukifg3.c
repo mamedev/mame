@@ -373,7 +373,7 @@ VIDEO_UPDATE( fuuki32 )
 	fuuki32_draw_layer(bitmap,cliprect, tm_middle, 0, 2);
 	fuuki32_draw_layer(bitmap,cliprect, tm_front,  0, 4);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

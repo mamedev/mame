@@ -127,7 +127,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( darius )
 {
-	int xoffs = 36*8*screen;
+	int xoffs = 36*8*scrnum;
 
 	PC080SN_tilemap_update();
 
@@ -135,12 +135,12 @@ VIDEO_UPDATE( darius )
  	PC080SN_tilemap_draw_offset(bitmap,cliprect,0,0,TILEMAP_DRAW_OPAQUE,0,-xoffs,0);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(machine,bitmap,cliprect,0,xoffs,-8); // draw sprites with priority 0 which are under the mid layer
+	draw_sprites(screen->machine,bitmap,cliprect,0,xoffs,-8); // draw sprites with priority 0 which are under the mid layer
 
 	// draw middle layer
 	PC080SN_tilemap_draw_offset(bitmap,cliprect,0,1,0,0,-xoffs,0);
 
-	draw_sprites(machine,bitmap,cliprect,1,xoffs,-8); // draw sprites with priority 1 which are over the mid layer
+	draw_sprites(screen->machine,bitmap,cliprect,1,xoffs,-8); // draw sprites with priority 1 which are over the mid layer
 
 	/* top(text) layer is in fixed position */
 	tilemap_set_scrollx(fg_tilemap,0,0+xoffs);

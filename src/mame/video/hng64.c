@@ -1237,7 +1237,7 @@ static void hng64_drawtilemap1( bitmap_t *bitmap, const rectangle *cliprect )
 
 VIDEO_UPDATE( hng64 )
 {
-	fillbitmap(bitmap, get_black_pen(machine), 0);
+	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 
 	// Debug
 //  for (int iii = 0; iii < 0x0f; iii++)
@@ -1264,16 +1264,16 @@ VIDEO_UPDATE( hng64 )
 	//   (there are neato alpha effects on a real board, etc)
 	hng64_drawtilemap2(bitmap,cliprect);
 	hng64_drawtilemap1(bitmap,cliprect);
-	hng64_drawtilemap3(machine, bitmap,cliprect);						// Draw the ground last...
+	hng64_drawtilemap3(screen->machine, bitmap,cliprect);						// Draw the ground last...
 
 	// !!! This tilemap has the same flags as the 'previous' three, but they're not used in fatfurwa !!!
 	//     (in other words, we should make a similar hng64_drawtilemap0() function for this tilemap)
 	tilemap_draw(bitmap,cliprect,hng64_tilemap0,0,0);
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	// 3d really shouldn't be last, but you don't see some cool stuff right now if it's put before sprites :)...
-	draw3d(machine, bitmap, cliprect);
+	draw3d(screen->machine, bitmap, cliprect);
 
 	/* hack to enable 2nd cpu when key is pressed */
 //  if ( input_code_pressed_once(KEYCODE_L) )
@@ -1285,7 +1285,7 @@ VIDEO_UPDATE( hng64 )
 	/* AJG */
 	// if(input_code_pressed(KEYCODE_D))
 
-	transition_control(machine, bitmap) ;
+	transition_control(screen->machine, bitmap) ;
 
 //  mame_printf_debug("FRAME DONE %d\n", frameCount) ;
 	frameCount++ ;

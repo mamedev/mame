@@ -186,15 +186,15 @@ VIDEO_UPDATE( namcos21 )
 
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		namco_obj_draw( machine, bitmap, cliprect, 2 );
+		namco_obj_draw(screen->machine, bitmap, cliprect, 2 );
 	}
 
 	CopyVisiblePolyFrameBuffer( bitmap, cliprect,0x7fc0,0x7ffe );
 
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */
-		namco_obj_draw( machine, bitmap, cliprect, 0 );
-		namco_obj_draw( machine, bitmap, cliprect, 1 );
+		namco_obj_draw(screen->machine, bitmap, cliprect, 0 );
+		namco_obj_draw(screen->machine, bitmap, cliprect, 1 );
 	}
 
 	CopyVisiblePolyFrameBuffer( bitmap, cliprect,0,0x7fbf );
@@ -204,7 +204,7 @@ VIDEO_UPDATE( namcos21 )
 	{ /* draw high priority 2d sprites */
 		for( pri=pivot; pri<8; pri++ )
 		{
-			namco_obj_draw( machine, bitmap, cliprect, pri );
+			namco_obj_draw(screen->machine, bitmap, cliprect, pri );
 		}
 	}
 	else

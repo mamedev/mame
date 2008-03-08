@@ -107,7 +107,7 @@ VIDEO_UPDATE( rastan )
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
-	PC090OJ_draw_sprites(machine,bitmap,cliprect,0);
+	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,0);
 	return 0;
 }
 
@@ -127,7 +127,7 @@ VIDEO_UPDATE( opwolf )
  	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
-	PC090OJ_draw_sprites(machine,bitmap,cliprect,1);
+	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,1);
 
 //  if (input_port_5_word_r(0,0xffff))
 
@@ -152,7 +152,7 @@ VIDEO_UPDATE( rainbow )
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[0],TILEMAP_DRAW_OPAQUE,1);
 	PC080SN_tilemap_draw(bitmap,cliprect,0,layer[1],0,2);
 
-	PC090OJ_draw_sprites(machine,bitmap,cliprect,1);
+	PC090OJ_draw_sprites(screen->machine,bitmap,cliprect,1);
 	return 0;
 }
 
@@ -187,7 +187,7 @@ VIDEO_UPDATE( jumping )
 	for (offs = spriteram_size/2-8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram16[offs];
-		if (tile < machine->gfx[1]->total_elements)
+		if (tile < screen->machine->gfx[1]->total_elements)
 		{
 			int sx,sy,color,data1;
 
@@ -199,7 +199,7 @@ VIDEO_UPDATE( jumping )
 			data1 = spriteram16[offs+3];
 			color = (spriteram16[offs+4] & 0x0f) | sprite_colbank;
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 					tile,
 					color,
 					data1 & 0x40, data1 & 0x80,

@@ -374,17 +374,17 @@ static void check_collision(running_machine *machine)
 VIDEO_UPDATE( exidy )
 {
 	/* refresh the colors from the palette (static or dynamic) */
-	set_colors(machine);
+	set_colors(screen->machine);
 
 	/* update the background and draw it */
 	draw_background();
 	copybitmap(bitmap, background_bitmap, 0, 0, 0, 0, cliprect);
 
 	/* draw the sprites */
-	draw_sprites(machine, bitmap, NULL);
+	draw_sprites(screen->machine, bitmap, NULL);
 
 	/* check for collision, this will set the appropriate bits in collision_mask */
-	check_collision(machine);
+	check_collision(screen->machine);
 
 	return 0;
 }

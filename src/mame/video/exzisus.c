@@ -144,7 +144,7 @@ VIDEO_UPDATE( exzisus )
 					y = 248 - y;
 				}
 
-				drawgfx(bitmap, machine->gfx[0],
+				drawgfx(bitmap, screen->machine->gfx[0],
 						code & 0x3fff,
 						color,
 						flip_screen_get(), flip_screen_get(),
@@ -214,7 +214,7 @@ VIDEO_UPDATE( exzisus )
 					y = 248 - y;
 				}
 
-				drawgfx(bitmap, machine->gfx[1],
+				drawgfx(bitmap, screen->machine->gfx[1],
 						code & 0x3fff,
 						color,
 						flip_screen_get(), flip_screen_get(),

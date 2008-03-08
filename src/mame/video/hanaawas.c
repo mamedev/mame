@@ -107,6 +107,6 @@ VIDEO_START( hanaawas )
 
 VIDEO_UPDATE( hanaawas )
 {
-	tilemap_draw(bitmap, &machine->screen[0].visarea, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
 }

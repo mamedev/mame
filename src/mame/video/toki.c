@@ -293,7 +293,7 @@ VIDEO_UPDATE( toki )
 		tilemap_draw(bitmap,cliprect,foreground_layer,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	}
-	toki_draw_sprites(machine, bitmap,cliprect);
+	toki_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }
@@ -315,7 +315,7 @@ VIDEO_UPDATE( tokib )
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	}
 
-	tokib_draw_sprites(machine, bitmap,cliprect);
+	tokib_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 	return 0;
 }

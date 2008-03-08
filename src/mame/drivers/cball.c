@@ -40,7 +40,7 @@ static VIDEO_UPDATE( cball )
 
 	/* draw sprite */
 
-	drawgfx(bitmap, machine->gfx[1],
+	drawgfx(bitmap, screen->machine->gfx[1],
 		cball_video_ram[0x399] >> 4,
 		0,
 		0, 0,

@@ -205,12 +205,12 @@ VIDEO_UPDATE( pow )
 	fillbitmap(bitmap,2047,cliprect);
 
 	/* This appears to be correct priority */
-	draw_sprites(machine, bitmap,cliprect,1,0x000);
-	draw_sprites(machine, bitmap,cliprect,1,0x800);
-	draw_sprites(machine, bitmap,cliprect,2,0x000);
-	draw_sprites(machine, bitmap,cliprect,2,0x800);
-	draw_sprites(machine, bitmap,cliprect,0,0x000); //AT: (pow37b5yel)
-	draw_sprites(machine, bitmap,cliprect,0,0x800);
+	draw_sprites(screen->machine, bitmap,cliprect,1,0x000);
+	draw_sprites(screen->machine, bitmap,cliprect,1,0x800);
+	draw_sprites(screen->machine, bitmap,cliprect,2,0x000);
+	draw_sprites(screen->machine, bitmap,cliprect,2,0x800);
+	draw_sprites(screen->machine, bitmap,cliprect,0,0x000); //AT: (pow37b5yel)
+	draw_sprites(screen->machine, bitmap,cliprect,0,0x800);
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;
@@ -287,12 +287,12 @@ VIDEO_UPDATE( searchar )
 	fillbitmap(bitmap,2047,cliprect);
 
 	/* This appears to be correct priority */
-	draw_sprites2(machine, bitmap,cliprect,8,0x2000,0x000);
-	draw_sprites2(machine, bitmap,cliprect,8,0x2000,0x800);
-	draw_sprites2(machine, bitmap,cliprect,12,0x3000,0x000);
-	draw_sprites2(machine, bitmap,cliprect,12,0x3000,0x800);
-	draw_sprites2(machine, bitmap,cliprect,4,0x1000,0x000);
-	draw_sprites2(machine, bitmap,cliprect,4,0x1000,0x800);
+	draw_sprites2(screen->machine, bitmap,cliprect,8,0x2000,0x000);
+	draw_sprites2(screen->machine, bitmap,cliprect,8,0x2000,0x800);
+	draw_sprites2(screen->machine, bitmap,cliprect,12,0x3000,0x000);
+	draw_sprites2(screen->machine, bitmap,cliprect,12,0x3000,0x800);
+	draw_sprites2(screen->machine, bitmap,cliprect,4,0x1000,0x000);
+	draw_sprites2(screen->machine, bitmap,cliprect,4,0x1000,0x800);
 
 	tilemap_draw(bitmap,cliprect,fix_tilemap,0,0);
 	return 0;

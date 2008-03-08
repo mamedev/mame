@@ -235,7 +235,7 @@ VIDEO_UPDATE( popper )
 	tilemap_draw( bitmap,&finalclip,popper_ol_p123_tilemap,TILEMAP_DRAW_LAYER1,0 );
 	tilemap_draw( bitmap,&finalclip,popper_ol_p0_tilemap,  TILEMAP_DRAW_LAYER1,0 );
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 
 	tilemap_draw( bitmap,cliprect,popper_p123_tilemap,     TILEMAP_DRAW_LAYER0,0 );
 	tilemap_draw( bitmap,cliprect,popper_p0_tilemap,       TILEMAP_DRAW_LAYER0,0 );

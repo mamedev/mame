@@ -225,48 +225,48 @@ VIDEO_UPDATE( xain )
 	case 0:
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;
 	case 1:
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;
 	case 2:
 		tilemap_draw(bitmap,cliprect,char_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		break;
 	case 3:
 		tilemap_draw(bitmap,cliprect,char_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		break;
 	case 4:
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		break;
 	case 5:
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		break;
 	case 6:
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;
 	case 7:
 		tilemap_draw(bitmap,cliprect,bgram1_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bgram0_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,char_tilemap,0,0);
 		break;

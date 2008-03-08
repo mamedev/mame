@@ -192,9 +192,9 @@ VIDEO_UPDATE( tehkanwc )
 	tilemap_set_scrollx(bg_tilemap, 0, scroll_x[0] + 256 * scroll_x[1]);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 1, 0);
-	gridiron_draw_led(machine, bitmap, cliprect, led0, 0);
-	gridiron_draw_led(machine, bitmap, cliprect, led1, 1);
+	gridiron_draw_led(screen->machine, bitmap, cliprect, led0, 0);
+	gridiron_draw_led(screen->machine, bitmap, cliprect, led1, 1);
 	return 0;
 }

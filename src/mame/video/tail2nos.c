@@ -175,7 +175,7 @@ VIDEO_UPDATE( tail2nos )
 			if (dirtychar[i])
 			{
 				dirtychar[i] = 0;
-				decodechar(machine->gfx[2],i,(UINT8 *)zoomdata);
+				decodechar(screen->machine->gfx[2],i,(UINT8 *)zoomdata);
 			}
 		}
 
@@ -186,7 +186,7 @@ VIDEO_UPDATE( tail2nos )
 	if (video_enable)
 	{
 		K051316_zoom_draw_0(bitmap,cliprect,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
 	else

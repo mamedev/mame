@@ -291,7 +291,7 @@ VIDEO_UPDATE( madmotor )
 	else
 		tilemap_draw(bitmap,cliprect,madmotor_pf3a_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,madmotor_pf2_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect,0x00,0x00);
+	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 	tilemap_draw(bitmap,cliprect,madmotor_pf1_tilemap,0,0);
 	return 0;
 }

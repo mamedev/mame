@@ -328,7 +328,7 @@ VIDEO_UPDATE( fastfred )
 {
 	fillbitmap(bitmap, *fastfred_background_color, cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }
@@ -391,9 +391,9 @@ VIDEO_START( imago )
 VIDEO_UPDATE( imago )
 {
 	tilemap_draw(bitmap,cliprect,web_tilemap,0,0);
-	galaxian_draw_stars(machine, bitmap);
+	galaxian_draw_stars(screen->machine, bitmap);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 
 	return 0;

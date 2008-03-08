@@ -283,7 +283,7 @@ if (input_code_pressed(KEYCODE_Z))
 	else					fillbitmap(bitmap,0,cliprect);
 
 	if (layers_ctrl1 & 2)	tilemap_draw(bitmap,cliprect, fg_tilemap,  0,0);
-	if (layers_ctrl1 & 8)	draw_sprites(machine, bitmap,cliprect);
+	if (layers_ctrl1 & 8)	draw_sprites(screen->machine, bitmap,cliprect);
 	if (layers_ctrl1 & 4)	tilemap_draw(bitmap,cliprect, tx_tilemap, 0,0);
 
 	return 0;

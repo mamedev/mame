@@ -247,7 +247,7 @@ VIDEO_UPDATE( metlclsh )
 		tilemap_set_scrollx(bg_tilemap, 0,metlclsh_scrollx[1] + ((metlclsh_scrollx[0]&0x02)<<7) );
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	}
-	draw_sprites(machine,bitmap,cliprect);			// sprites
+	draw_sprites(screen->machine,bitmap,cliprect);			// sprites
 	tilemap_draw(bitmap,cliprect,fg_tilemap,2,0);	// high priority tiles of foreground
 
 //  popmessage("%02X",metlclsh_scrollx[0]);

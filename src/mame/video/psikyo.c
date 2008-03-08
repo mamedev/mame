@@ -576,7 +576,7 @@ VIDEO_UPDATE( psikyo )
 	tilemap_set_transparent_pen(tilemap_1_size2,(layer1_ctrl & 8 ?0:15));
 	tilemap_set_transparent_pen(tilemap_1_size3,(layer1_ctrl & 8 ?0:15));
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
@@ -587,7 +587,7 @@ VIDEO_UPDATE( psikyo )
 		tilemap_draw(bitmap,cliprect,tmptilemap1, layer1_ctrl & 2 ? TILEMAP_DRAW_OPAQUE : 0, 2);
 
 	if (layers_ctrl & 4)
-		draw_sprites(machine, bitmap,cliprect,(spr_ctrl & 4 ? 0 : 15));
+		draw_sprites(screen->machine, bitmap,cliprect,(spr_ctrl & 4 ? 0 : 15));
 
 	return 0;
 }

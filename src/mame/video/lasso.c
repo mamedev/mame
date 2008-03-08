@@ -382,23 +382,23 @@ static void draw_lasso(bitmap_t *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( lasso )
 {
-	palette_set_color(machine, 0, get_color(*lasso_back_color));
+	palette_set_color(screen->machine, 0, get_color(*lasso_back_color));
 	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_lasso(bitmap, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;
 }
 
 VIDEO_UPDATE( chameleo )
 {
-	palette_set_color(machine, 0, get_color(*lasso_back_color));
+	palette_set_color(screen->machine, 0, get_color(*lasso_back_color));
 	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -406,8 +406,8 @@ VIDEO_UPDATE( chameleo )
 
 VIDEO_UPDATE( wwjgtin )
 {
-	colortable_palette_set_color(machine->colortable, 0, get_color(*lasso_back_color));
-	wwjgtin_set_last_four_colors(machine->colortable);
+	colortable_palette_set_color(screen->machine->colortable, 0, get_color(*lasso_back_color));
+	wwjgtin_set_last_four_colors(screen->machine->colortable);
 
 	tilemap_set_scrollx(track_tilemap, 0, wwjgtin_track_scroll[0] + wwjgtin_track_scroll[1]*256);
 	tilemap_set_scrolly(track_tilemap, 0, wwjgtin_track_scroll[2] + wwjgtin_track_scroll[3]*256);
@@ -415,9 +415,9 @@ VIDEO_UPDATE( wwjgtin )
 	if (wwjgtin_track_enable)
 		tilemap_draw(bitmap, cliprect, track_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
-	draw_sprites(machine, bitmap, cliprect, 1);	// reverse order
+	draw_sprites(screen->machine, bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	return 0;
@@ -427,7 +427,7 @@ VIDEO_UPDATE( wwjgtin )
 VIDEO_UPDATE( pinbo )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	return 0;
 }

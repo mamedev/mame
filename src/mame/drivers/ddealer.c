@@ -139,7 +139,7 @@ static void ddealer_protection(running_machine *machine)
 
 static VIDEO_UPDATE( ddealer )
 {
-	ddealer_protection(machine);
+	ddealer_protection(screen->machine);
 	return 0;
 }
 

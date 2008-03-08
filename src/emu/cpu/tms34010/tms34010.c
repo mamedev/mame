@@ -1110,19 +1110,19 @@ void tms34010_get_display_params(int cpunum, tms34010_display_params *params)
 
 VIDEO_UPDATE( tms340x0 )
 {
-	pen_t blackpen = get_black_pen(machine);
+	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;
 	int x;
 
 	/* get the display parameters for the screen */
-	tms34010_get_display_params(screen_to_cpu[screen], &params);
+	tms34010_get_display_params(screen_to_cpu[scrnum], &params);
 
 	/* if the display is enabled, call the scanline callback */
 	if (params.enabled)
 	{
 		/* call through to the callback */
 		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr));
-		(*state.config->scanline_callback)(machine, screen, bitmap, cliprect->min_y, &params);
+		(*state.config->scanline_callback)(screen->machine, scrnum, bitmap, cliprect->min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */

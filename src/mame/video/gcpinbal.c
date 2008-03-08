@@ -341,7 +341,7 @@ VIDEO_UPDATE( gcpinbal )
 	tilemap_draw(bitmap,cliprect,gcpinbal_tilemap[layer[2]],0,4);
 
 
-	draw_sprites(machine, bitmap,cliprect,16);
+	draw_sprites(screen->machine, bitmap,cliprect,16);
 
 #if 0
 	{

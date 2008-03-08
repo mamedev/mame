@@ -446,7 +446,7 @@ static VIDEO_UPDATE( mwarr )
 	tilemap_draw(bitmap,cliprect,mlow_tilemap, 0,0x02);
 	tilemap_draw(bitmap,cliprect,mhigh_tilemap,0,0x04);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,   0,0x10);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 

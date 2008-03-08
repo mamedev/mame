@@ -110,7 +110,7 @@ VIDEO_UPDATE(ksayakyu)
 	fillbitmap(bitmap,0,cliprect);
 	if(video_ctrl&1)
 		tilemap_draw(bitmap,cliprect,ksayakyu_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,ksayakyu_textmap, 0,0);
 	return 0;
 }

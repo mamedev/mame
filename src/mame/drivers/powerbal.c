@@ -374,7 +374,7 @@ static VIDEO_START( powerbal )
 static VIDEO_UPDATE( powerbal )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

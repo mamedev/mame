@@ -460,7 +460,7 @@ VIDEO_UPDATE( gaelco2 )
 
 	tilemap_draw(bitmap, cliprect, pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, pant[0], 0, 0);
-	draw_sprites(machine, bitmap, cliprect, 0, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -487,17 +487,17 @@ VIDEO_UPDATE( gaelco2_dual )
 	/* draw screen */
 	fillbitmap(bitmap, 0, cliprect);
 
-	if (screen==1)
+	if (scrnum==1)
 	{
 		/* monitor 2 output */
 		tilemap_draw(bitmap,cliprect,pant[1], 0, 0);
-		draw_sprites(machine,bitmap,cliprect, 0x8000, 0);
+		draw_sprites(screen->machine,bitmap,cliprect, 0x8000, 0);
 	}
-	else if (screen==0)
+	else if (scrnum==0)
 	{
 		/* monitor 1 output */
 		tilemap_draw(bitmap,cliprect,pant[0], 0, 0);
-		draw_sprites(machine,bitmap,cliprect, 0x0000, 0);
+		draw_sprites(screen->machine,bitmap,cliprect, 0x0000, 0);
 	}
 
 	return 0;

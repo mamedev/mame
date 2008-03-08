@@ -117,36 +117,36 @@ enum
 /* In mamecore.h: typedef struct _machine_config machine_config; */
 struct _machine_config
 {
-	UINT32				driver_data_size;			/* amount of memory needed for driver_data */
+	UINT32					driver_data_size;		/* amount of memory needed for driver_data */
 
-	cpu_config			cpu[MAX_CPU];				/* array of CPUs in the system */
-	UINT32				cpu_slices_per_frame;		/* number of times to interleave execution per frame */
-	INT32				watchdog_vblank_count;		/* number of VBLANKs until the watchdog kills us */
-	attotime			watchdog_time;				/* length of time until the watchdog kills us */
+	cpu_config				cpu[MAX_CPU];			/* array of CPUs in the system */
+	UINT32					cpu_slices_per_frame;	/* number of times to interleave execution per frame */
+	INT32					watchdog_vblank_count;	/* number of VBLANKs until the watchdog kills us */
+	attotime				watchdog_time;			/* length of time until the watchdog kills us */
 
-	void 				(*machine_start)(running_machine *machine);		/* one-time machine start callback */
-	void 				(*machine_reset)(running_machine *machine);		/* machine reset callback */
+	machine_start_func		machine_start;			/* one-time machine start callback */
+	machine_reset_func		machine_reset;			/* machine reset callback */
 
-	void 				(*nvram_handler)(running_machine *machine, mame_file *file, int read_or_write); /* NVRAM save/load callback  */
-	void 				(*memcard_handler)(running_machine *machine, mame_file *file, int action); /* memory card save/load callback  */
+	nvram_handler_func		nvram_handler;			/* NVRAM save/load callback  */
+	memcard_handler_func	memcard_handler;		/* memory card save/load callback  */
 
-	UINT32				video_attributes;			/* flags describing the video system */
+	UINT32					video_attributes;		/* flags describing the video system */
 	const gfx_decode_entry *gfxdecodeinfo;			/* pointer to array of graphics decoding information */
-	UINT32				total_colors;				/* total number of colors in the palette */
-	const char *		default_layout;				/* default layout for this machine */
+	UINT32					total_colors;			/* total number of colors in the palette */
+	const char *			default_layout;			/* default layout for this machine */
 
-	void 				(*init_palette)(running_machine *machine, const UINT8 *color_prom); /* one-time palette init callback  */
-	void				(*video_start)(running_machine *machine);		/* one-time video start callback */
-	void				(*video_reset)(running_machine *machine);		/* video reset callback */
-	void				(*video_eof)(running_machine *machine);			/* end-of-frame video callback */
-	UINT32				(*video_update)(running_machine *machine, int screen, bitmap_t *bitmap, const rectangle *cliprect); /* video update callback */
+	palette_init_func		init_palette;			/* one-time palette init callback  */
+	video_start_func		video_start;			/* one-time video start callback */
+	sound_reset_func		video_reset;			/* video reset callback */
+	video_eof_func			video_eof;				/* end-of-frame video callback */
+	video_update_func 		video_update; 			/* video update callback */
 
-	sound_config		sound[MAX_SOUND];			/* array of sound chips in the system */
+	sound_config			sound[MAX_SOUND];		/* array of sound chips in the system */
 
-	void				(*sound_start)(running_machine *machine);		/* one-time sound start callback */
-	void				(*sound_reset)(running_machine *machine);		/* sound reset callback */
+	sound_start_func		sound_start;			/* one-time sound start callback */
+	sound_reset_func		sound_reset;			/* sound reset callback */
 
-	device_config *		devicelist;					/* list head for devices */
+	device_config *			devicelist;				/* list head for devices */
 };
 
 

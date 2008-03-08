@@ -227,10 +227,10 @@ VIDEO_UPDATE( thedeep )
 		tilemap_set_scrolly(tilemap_0, x, y + scrolly);
 	}
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	return 0;
 }

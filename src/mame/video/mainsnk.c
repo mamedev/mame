@@ -181,10 +181,10 @@ VIDEO_UPDATE(mainsnk)
 	myclip.min_y = cliprect->min_y;
 	myclip.max_y = cliprect->max_y;
 	tilemap_draw(bitmap,&myclip,me_bg_tilemap,0,0);
-	draw_sprites(machine,bitmap,&myclip, 0,0 );
+	draw_sprites(screen->machine,bitmap,&myclip, 0,0 );
 	tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
-	draw_status(machine,bitmap,cliprect,0,0x400 );
-	draw_status(machine,bitmap,cliprect,32*8,0x40 );
+	draw_status(screen->machine,bitmap,cliprect,0,0x400 );
+	draw_status(screen->machine,bitmap,cliprect,32*8,0x40 );
 	update_palette(1);
 	return 0;
 }
@@ -197,10 +197,10 @@ VIDEO_UPDATE(canvas)
 	myclip.min_y = cliprect->min_y;
 	myclip.max_y = cliprect->max_y;
 	tilemap_draw(bitmap,&myclip,me_bg_tilemap,0,0);
-	draw_sprites(machine,bitmap,&myclip, 0,0 );
+	draw_sprites(screen->machine,bitmap,&myclip, 0,0 );
 //  tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
-//  draw_status(machine,bitmap,cliprect,0,0x400 );
-//  draw_status(machine,bitmap,cliprect,32*8,0x40 );
+//  draw_status(screen->machine,bitmap,cliprect,0,0x400 );
+//  draw_status(screen->machine,bitmap,cliprect,32*8,0x40 );
 	update_palette(1);
 	return 0;
 }

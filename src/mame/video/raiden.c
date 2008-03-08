@@ -152,11 +152,11 @@ VIDEO_UPDATE( raiden )
 	tilemap_draw(bitmap,cliprect,bg_layer,0,0);
 
 	/* Draw sprites underneath foreground */
-	draw_sprites(machine,bitmap,cliprect,0x40);
+	draw_sprites(screen->machine,bitmap,cliprect,0x40);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
 
 	/* Rest of sprites */
-	draw_sprites(machine,bitmap,cliprect,0x80);
+	draw_sprites(screen->machine,bitmap,cliprect,0x80);
 
 	/* Text layer */
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);

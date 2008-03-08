@@ -329,7 +329,7 @@ static void draw_sprites(jedi_state *state, bitmap_t *bitmap, const rectangle *c
 
 static VIDEO_UPDATE( jedi )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = screen->machine->driver_data;
 
 	/* if no video, clear it all to black */
 	if (*state->video_off & 0x01)

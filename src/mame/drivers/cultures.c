@@ -91,7 +91,7 @@ static VIDEO_UPDATE( cultures )
 		tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	return 0;
 }

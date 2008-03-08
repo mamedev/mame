@@ -120,7 +120,7 @@ VIDEO_UPDATE( wiping )
 			sy = 27 - sy;
 		}
 
-		drawgfx(bitmap,machine->gfx[0],
+		drawgfx(bitmap,screen->machine->gfx[0],
 				videoram[offs],
 				colorram[offs] & 0x3f,
 				flipscreen,flipscreen,
@@ -149,13 +149,13 @@ VIDEO_UPDATE( wiping )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 			(spriteram[offs] & 0x3f) + 64 * otherbank,
 			color,
 			flipx,flipy,
 			sx,sy,
-			&machine->screen[0].visarea,TRANSPARENCY_PENS,
-			colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0x1f));
+			cliprect,TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color, 0x1f));
 	}
 
 	/* redraw high priority chars */
@@ -190,12 +190,12 @@ VIDEO_UPDATE( wiping )
 				sy = 27 - sy;
 			}
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 					videoram[offs],
 					colorram[offs] & 0x3f,
 					flipscreen,flipscreen,
 					sx*8,sy*8,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
         	}
 	}
 

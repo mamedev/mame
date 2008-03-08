@@ -43,7 +43,7 @@ static VIDEO_UPDATE( galaxia )
 		for (x=0;x<256/8;x++)
 		{
 			int tile = galaxia_video[count];
-			drawgfx(bitmap,machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
 

@@ -479,13 +479,13 @@ VIDEO_START( cdp1869 )
 
 VIDEO_UPDATE( cdp1869 )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	if (!cdp1869.dispoff)
 	{
 		int sx, sy, rows, cols, width, height;
 		UINT16 addr, pmemsize;
-		rectangle screen, outer;
+		rectangle screen_rect, outer;
 
 		switch (cdp1869.ntsc_pal)
 		{
@@ -494,10 +494,10 @@ VIDEO_UPDATE( cdp1869 )
 			outer.max_x = CDP1869_HBLANK_START - 1;
 			outer.min_y = CDP1869_SCANLINE_VBLANK_END_NTSC;
 			outer.max_y = CDP1869_SCANLINE_VBLANK_START_NTSC - 1;
-			screen.min_x = CDP1869_SCREEN_START_NTSC;
-			screen.max_x = CDP1869_SCREEN_END - 1;
-			screen.min_y = CDP1869_SCANLINE_DISPLAY_START_NTSC;
-			screen.max_y = CDP1869_SCANLINE_DISPLAY_END_NTSC - 1;
+			screen_rect.min_x = CDP1869_SCREEN_START_NTSC;
+			screen_rect.max_x = CDP1869_SCREEN_END - 1;
+			screen_rect.min_y = CDP1869_SCANLINE_DISPLAY_START_NTSC;
+			screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_NTSC - 1;
 			break;
 
 		default:
@@ -506,15 +506,15 @@ VIDEO_UPDATE( cdp1869 )
 			outer.max_x = CDP1869_HBLANK_START - 1;
 			outer.min_y = CDP1869_SCANLINE_VBLANK_END_PAL;
 			outer.max_y = CDP1869_SCANLINE_VBLANK_START_PAL - 1;
-			screen.min_x = CDP1869_SCREEN_START_PAL;
-			screen.max_x = CDP1869_SCREEN_END - 1;
-			screen.min_y = CDP1869_SCANLINE_DISPLAY_START_PAL;
-			screen.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
+			screen_rect.min_x = CDP1869_SCREEN_START_PAL;
+			screen_rect.max_x = CDP1869_SCREEN_END - 1;
+			screen_rect.min_y = CDP1869_SCANLINE_DISPLAY_START_PAL;
+			screen_rect.max_y = CDP1869_SCANLINE_DISPLAY_END_PAL - 1;
 			break;
 		}
 
 		sect_rect(&outer, cliprect);
-		fillbitmap(bitmap, machine->pens[cdp1869.bkg], &outer);
+		fillbitmap(bitmap, screen->machine->pens[cdp1869.bkg], &outer);
 
 		width = CDP1869_CHAR_WIDTH;
 		height = cdp1869_get_lines();
@@ -530,7 +530,7 @@ VIDEO_UPDATE( cdp1869 )
 		}
 
 		cols = cdp1869.freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
-		rows = (screen.max_y - screen.min_y + 1) / height;
+		rows = (screen_rect.max_y - screen_rect.min_y + 1) / height;
 
 		pmemsize = cdp1869_get_pmemsize(cols, rows);
 
@@ -543,7 +543,7 @@ VIDEO_UPDATE( cdp1869 )
 				int x = sx * width;
 				int y = sy * height;
 
-				cdp1869_draw_char(machine, bitmap, x, y, addr, &screen);
+				cdp1869_draw_char(screen->machine, bitmap, x, y, addr, &screen_rect);
 
 				addr++;
 

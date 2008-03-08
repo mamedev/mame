@@ -371,13 +371,13 @@ static void draw_shell(running_machine *machine,
 
 VIDEO_UPDATE( tunhunt )
 {
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	draw_box(bitmap, cliprect);
 
 	draw_motion_object(bitmap, cliprect);
 
-	draw_shell(machine, bitmap, cliprect,
+	draw_shell(screen->machine, bitmap, cliprect,
 		tunhunt_ram[SHL0PC],	/* picture code */
 		tunhunt_ram[SHEL0H],	/* hposition */
 		tunhunt_ram[SHL0V],	/* vstart */
@@ -385,7 +385,7 @@ VIDEO_UPDATE( tunhunt )
 		tunhunt_ram[SHL0ST],	/* vstretch */
 		tunhunt_control&0x08 ); /* hstretch */
 
-	draw_shell(machine, bitmap, cliprect,
+	draw_shell(screen->machine, bitmap, cliprect,
 		tunhunt_ram[SHL1PC],	/* picture code */
 		tunhunt_ram[SHEL1H],	/* hposition */
 		tunhunt_ram[SHL1V],	/* vstart */

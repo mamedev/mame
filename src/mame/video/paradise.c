@@ -249,13 +249,13 @@ if (input_code_pressed(KEYCODE_Z))
 }
 #endif
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	if (!(paradise_priority & 4))	/* Screen blanking */
 		return 0;
 
 	if (paradise_priority & 1)
-		if (layers_ctrl&16)	draw_sprites(machine,bitmap,cliprect);
+		if (layers_ctrl&16)	draw_sprites(screen->machine,bitmap,cliprect);
 
 	if (layers_ctrl&1)	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	if (layers_ctrl&2)	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
@@ -264,14 +264,14 @@ if (input_code_pressed(KEYCODE_Z))
 	if (paradise_priority & 2)
 	{
 		if (!(paradise_priority & 1))
-			if (layers_ctrl&16)	draw_sprites(machine, bitmap,cliprect);
+			if (layers_ctrl&16)	draw_sprites(screen->machine, bitmap,cliprect);
 		if (layers_ctrl&8)	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 	}
 	else
 	{
 		if (layers_ctrl&8)	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 		if (!(paradise_priority & 1))
-			if (layers_ctrl&16)	draw_sprites(machine, bitmap,cliprect);
+			if (layers_ctrl&16)	draw_sprites(screen->machine, bitmap,cliprect);
 	}
 	return 0;
 }
@@ -279,20 +279,20 @@ if (input_code_pressed(KEYCODE_Z))
 /* no pix layer, no tilemap_0, different priority bits */
 VIDEO_UPDATE( torus )
 {
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	if (!(paradise_priority & 2))	/* Screen blanking */
 		return 0;
 
 	if (paradise_priority & 1)
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
 
 	if(paradise_priority & 4)
 	{
 		if (!(paradise_priority & 1))
-			draw_sprites(machine, bitmap,cliprect);
+			draw_sprites(screen->machine, bitmap,cliprect);
 
 		tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 	}
@@ -301,7 +301,7 @@ VIDEO_UPDATE( torus )
 		tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
 
 		if (!(paradise_priority & 1))
-			draw_sprites(machine, bitmap,cliprect);
+			draw_sprites(screen->machine, bitmap,cliprect);
 	}
 	return 0;
 }
@@ -309,11 +309,11 @@ VIDEO_UPDATE( torus )
 /* I don't know how the priority bits work on this one */
 VIDEO_UPDATE( madball )
 {
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
 	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 

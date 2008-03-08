@@ -205,6 +205,6 @@ VIDEO_UPDATE( crospang )
 {
 	tilemap_draw(bitmap,cliprect,bg_layer,0,0);
 	tilemap_draw(bitmap,cliprect,fg_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

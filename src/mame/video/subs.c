@@ -72,18 +72,18 @@ VIDEO_UPDATE( subs )
 			charcode = charcode & 0x3F;
 
 		/* Draw the left screen */
-		if (screen==0)
+		if (scrnum==0)
 		{
 			if ((left_enable || left_sonar_window) && (!right_sonar_window))
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						charcode, 1,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
 			}
 			else
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						0, 1,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
@@ -91,18 +91,18 @@ VIDEO_UPDATE( subs )
 		}
 
 		/* Draw the right screen */
-		if (screen==1)
+		if (scrnum==1)
 		{
 			if ((right_enable || right_sonar_window) && (!left_sonar_window))
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						charcode, 0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
 			}
 			else
 			{
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						0, 0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
@@ -130,11 +130,11 @@ VIDEO_UPDATE( subs )
 		charcode = (charcode >> 3) & 0x1F;
 
 		/* Left screen - special check for drawing right screen's sub */
-		if (screen==0)
+		if (scrnum==0)
 		{
 			if ((offs!=0) || (sub_enable))
 			{
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx(bitmap,screen->machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,
@@ -144,11 +144,11 @@ VIDEO_UPDATE( subs )
 
 
 		/* Right screen - special check for drawing left screen's sub */
-		if (screen==1)
+		if (scrnum==1)
 		{
 			if ((offs!=1) || (sub_enable))
 			{
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx(bitmap,screen->machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,
@@ -158,7 +158,7 @@ VIDEO_UPDATE( subs )
 	}
 
 	/* Update sound */
-	discrete_sound_w(machine, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
-	discrete_sound_w(machine, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
+	discrete_sound_w(screen->machine, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
+	discrete_sound_w(screen->machine, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
 	return 0;
 }

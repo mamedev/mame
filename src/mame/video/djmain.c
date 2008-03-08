@@ -173,7 +173,7 @@ VIDEO_UPDATE( djmain )
 				order[j] = temp;
 			}
 
-	fillbitmap(bitmap, machine->pens[0], cliprect);
+	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
 	for (i = 0; i < NUM_LAYERS + 1; i++)
 	{
@@ -182,12 +182,12 @@ VIDEO_UPDATE( djmain )
 		if (layer == NUM_LAYERS)
 		{
 			if (enables & K55_INP_SUB2)
-				draw_sprites(machine, bitmap, cliprect);
+				draw_sprites(screen->machine, bitmap, cliprect);
 		}
 		else
 		{
 			if (enables & (K55_INP_VRAM_A << layer))
-				K056832_tilemap_draw_dj(machine, bitmap, cliprect, layer, 0, 1 << i);
+				K056832_tilemap_draw_dj(screen->machine, bitmap, cliprect, layer, 0, 1 << i);
 		}
 	}
 	return 0;

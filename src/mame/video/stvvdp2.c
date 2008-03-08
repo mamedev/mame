@@ -6074,11 +6074,11 @@ VIDEO_UPDATE( stv_vdp2 )
 
 	stv_vdp2_dynamic_res_change();
 
-	video_update_vdp1(machine);
+	video_update_vdp1(screen->machine);
 
-	stv_vdp2_fade_effects(machine);
+	stv_vdp2_fade_effects(screen->machine);
 
-	stv_vdp2_draw_back(machine, bitmap,cliprect);
+	stv_vdp2_draw_back(screen->machine, bitmap,cliprect);
 
 	#ifdef MAME_DEBUG
 	if(input_code_pressed_once(KEYCODE_T))
@@ -6122,12 +6122,12 @@ VIDEO_UPDATE( stv_vdp2 )
 		/*If a plane has a priority value of zero it isn't shown at all.*/
 		for(pri=1;pri<8;pri++)
 		{
-			if (debug.l_en & 1)    {if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(machine, bitmap,cliprect);}
-			if (debug.l_en & 2)    {if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(machine, bitmap,cliprect);}
-			if (debug.l_en & 4)    {if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(machine, bitmap,cliprect);}
-			if (debug.l_en & 8)    {if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(machine, bitmap,cliprect);}
-			if (debug.l_en & 0x10) {if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(machine, bitmap,cliprect);}
-			if (debug.l_en & 0x20) {draw_sprites(machine,bitmap,cliprect,pri);}
+			if (debug.l_en & 1)    {if(pri==STV_VDP2_N3PRIN) stv_vdp2_draw_NBG3(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 2)    {if(pri==STV_VDP2_N2PRIN) stv_vdp2_draw_NBG2(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 4)    {if(pri==STV_VDP2_N1PRIN) stv_vdp2_draw_NBG1(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 8)    {if(pri==STV_VDP2_N0PRIN) stv_vdp2_draw_NBG0(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 0x10) {if(pri==STV_VDP2_R0PRIN) stv_vdp2_draw_RBG0(screen->machine, bitmap,cliprect);}
+			if (debug.l_en & 0x20) {draw_sprites(screen->machine,bitmap,cliprect,pri);}
 		}
 	}
 
@@ -6155,41 +6155,41 @@ VIDEO_UPDATE( stv_vdp2 )
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			decodechar(machine->gfx[0], tilecode,  stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[0], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			decodechar(machine->gfx[1], tilecode,  stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[1], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			decodechar(machine->gfx[2], tilecode,  stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[2], tilecode,  stv_vdp2_gfx_decode);
 		}
 
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			decodechar(machine->gfx[3], tilecode, stv_vdp2_gfx_decode);
+			decodechar(screen->machine->gfx[3], tilecode, stv_vdp2_gfx_decode);
 		}
 
 		/* vdp 1 ... doesn't have to be tile based */
 
 		for (tilecode = 0;tilecode<0x8000;tilecode++)
 		{
-			decodechar(machine->gfx[4], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[4], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x2000;tilecode++)
 		{
-			decodechar(machine->gfx[5], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[5], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x4000;tilecode++)
 		{
-			decodechar(machine->gfx[6], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[6], tilecode,  stv_vdp1_gfx_decode);
 		}
 		for (tilecode = 0;tilecode<0x1000;tilecode++)
 		{
-			decodechar(machine->gfx[7], tilecode,  stv_vdp1_gfx_decode);
+			decodechar(screen->machine->gfx[7], tilecode,  stv_vdp1_gfx_decode);
 		}
 	}
 

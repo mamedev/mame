@@ -174,7 +174,7 @@ VIDEO_UPDATE( stlforce )
 	tilemap_draw(bitmap,cliprect,stlforce_bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,stlforce_mlow_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,stlforce_mhigh_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,stlforce_tx_tilemap,0,0);
 	return 0;
 }

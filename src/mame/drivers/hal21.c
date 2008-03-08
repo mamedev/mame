@@ -320,23 +320,23 @@ static VIDEO_UPDATE( aso )
 
 	if (snk_gamegroup)
 	{
-		hal21_draw_background(machine, bitmap, cliprect, bgsx+(msbs<<7 & 0x100), bgsy, attr, machine->gfx[1]);
+		hal21_draw_background(screen->machine, bitmap, cliprect, bgsx+(msbs<<7 & 0x100), bgsy, attr, screen->machine->gfx[1]);
 
 		attr = snk_blink_parity;
 		snk_blink_parity ^= 0xdf;
-		for (i=6; i<0x80; i+=8) { palette_set_color(machine, i, MAKE_RGB(attr, attr, attr)); }
+		for (i=6; i<0x80; i+=8) { palette_set_color(screen->machine, i, MAKE_RGB(attr, attr, attr)); }
 
-		hal21_draw_sprites(bitmap, cliprect, spsx, spsy, machine->gfx[2]);
+		hal21_draw_sprites(bitmap, cliprect, spsx, spsy, screen->machine->gfx[2]);
 	}
 	else
 	{
-		aso_draw_background(bitmap, cliprect, bgsx+(~msbs<<7 & 0x100), bgsy, attr, machine->gfx[1]);
-		aso_draw_sprites(bitmap, cliprect, spsx, spsy, machine->gfx[2]);
+		aso_draw_background(bitmap, cliprect, bgsx+(~msbs<<7 & 0x100), bgsy, attr, screen->machine->gfx[1]);
+		aso_draw_sprites(bitmap, cliprect, spsx, spsy, screen->machine->gfx[2]);
 	}
 
 	bank = msbs>>6 & 1;
-	tnk3_draw_text(machine, bitmap, cliprect, bank, &textram[0]);
-	tnk3_draw_status(machine, bitmap, cliprect, bank, &textram[0x400]);
+	tnk3_draw_text(screen->machine, bitmap, cliprect, bank, &textram[0]);
+	tnk3_draw_status(screen->machine, bitmap, cliprect, bank, &textram[0x400]);
 	return 0;
 }
 

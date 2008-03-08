@@ -387,7 +387,7 @@ VIDEO_UPDATE( pacland )
        wherever there is a high-priority pixel; note that we draw to the bitmap
        which is safe because the bg_tilemap draw will overwrite everything */
 	fillbitmap(priority_bitmap, 0x00, cliprect);
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	/* draw background */
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
@@ -396,12 +396,12 @@ VIDEO_UPDATE( pacland )
 	draw_fg(bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	draw_sprites(machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
 
 	/* draw high priority fg tiles */
 	draw_fg(bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(machine, bitmap, cliprect, 2);
+	draw_sprites(screen->machine, bitmap, cliprect, 2);
 	return 0;
 }

@@ -192,7 +192,7 @@ VIDEO_UPDATE( topspeed )
 	if (dislayer[4]==0)
 #endif
 
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }
 

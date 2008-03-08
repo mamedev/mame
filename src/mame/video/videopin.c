@@ -85,7 +85,7 @@ VIDEO_UPDATE( videopin )
 				{
 					for (j = 0; j < 2; j++)
 					{
-						drawgfx(bitmap, machine->gfx[1],
+						drawgfx(bitmap, screen->machine->gfx[1],
 							0, 0,
 							0, 0,
 							x + 16 * i,

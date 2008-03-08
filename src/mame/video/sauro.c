@@ -146,7 +146,7 @@ VIDEO_UPDATE( sauro )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	sauro_draw_sprites(machine, bitmap, cliprect);
+	sauro_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
 
@@ -220,6 +220,6 @@ static void trckydoc_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 VIDEO_UPDATE( trckydoc )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	trckydoc_draw_sprites(machine, bitmap, cliprect);
+	trckydoc_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

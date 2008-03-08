@@ -292,7 +292,7 @@ static void draw_chars(const _20pacgal_state *state, bitmap_t *bitmap)
 
 static VIDEO_UPDATE( 20pacgal )
 {
-	const _20pacgal_state *state = machine->driver_data;
+	const _20pacgal_state *state = screen->machine->driver_data;
 
 	draw_chars(state, bitmap);
 	draw_sprites(state, bitmap);

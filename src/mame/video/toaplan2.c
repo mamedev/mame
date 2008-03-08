@@ -1557,10 +1557,10 @@ VIDEO_UPDATE( batrider_0 )
 			draw_sprites(bitmap,cliprect,0,priority,1);	/* consider bank select */
 	}
 
-	clip.min_x = machine->screen[0].visarea.min_x;
-	clip.max_x = machine->screen[0].visarea.max_x;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_x = screen->machine->screen[0].visarea.min_x;
+	clip.max_x = screen->machine->screen[0].visarea.max_x;
+	clip.min_y = screen->machine->screen[0].visarea.min_y;
+	clip.max_y = screen->machine->screen[0].visarea.max_y;
 
 	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
 	for (line = 0; line < 256;line++)

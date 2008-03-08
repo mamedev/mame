@@ -311,11 +311,11 @@ static VIDEO_UPDATE(mediagx)
 {
 	fillbitmap(bitmap, 0, cliprect);
 
-	draw_framebuffer(machine, bitmap, cliprect);
+	draw_framebuffer(screen->machine, bitmap, cliprect);
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)	// don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(machine, bitmap, cliprect);
+		draw_cga(screen->machine, bitmap, cliprect);
 	}
 	return 0;
 }

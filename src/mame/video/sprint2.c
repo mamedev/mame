@@ -131,7 +131,7 @@ VIDEO_UPDATE( sprint2 )
 
 	for (i = 0; i < 4; i++)
 	{
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			get_sprite_code(i),
 			i,
 			0, 0,

@@ -134,7 +134,7 @@ VIDEO_UPDATE( carjmbre )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx(bitmap,screen->machine->gfx[1],
 						spriteram[troffs+1],
 						spriteram[troffs+2]&0x07,
 						flipx,flipy,

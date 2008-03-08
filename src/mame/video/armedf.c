@@ -334,17 +334,17 @@ VIDEO_UPDATE( armedf )
     }
     else
     {
-        fillbitmap( bitmap, get_black_pen(machine)&0x0f, cliprect );
+        fillbitmap( bitmap, get_black_pen(screen->machine)&0x0f, cliprect );
     }*/
 
 	if ((mcu_mode&0x0030)==0x0030) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 2 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 2 );
 	if ((mcu_mode&0x0030)==0x0020) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
 	tilemap_draw( bitmap, cliprect, fg_tilemap, 0, 0);
 	if ((mcu_mode&0x0030)==0x0010) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 1 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 1 );
 	if ((mcu_mode&0x0030)==0x0000) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);
-	if( sprite_enable ) draw_sprites(machine, bitmap, cliprect, 0 );
+	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 0 );
 
 	return 0;
 }

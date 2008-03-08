@@ -51,7 +51,7 @@ static VIDEO_UPDATE( mgolf )
 
 	for (i = 0; i < 2; i++)
 	{
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			mgolf_video_ram[0x399 + 4 * i],
 			i,
 			0, 0,
@@ -59,7 +59,7 @@ static VIDEO_UPDATE( mgolf )
 			mgolf_video_ram[0x398 + 4 * i] - 16,
 			cliprect, TRANSPARENCY_PEN, 0);
 
-		drawgfx(bitmap, machine->gfx[1],
+		drawgfx(bitmap, screen->machine->gfx[1],
 			mgolf_video_ram[0x39b + 4 * i],
 			i,
 			0, 0,

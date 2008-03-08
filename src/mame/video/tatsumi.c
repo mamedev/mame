@@ -999,11 +999,11 @@ static void draw_bg(running_machine *machine, bitmap_t *dst, tilemap *src, const
 
 VIDEO_UPDATE( apache3 )
 {
-	update_cluts(machine, 1024, 0, 2048);
+	update_cluts(screen->machine, 1024, 0, 2048);
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
-	draw_sky(machine, bitmap, cliprect, 256, apache3_a0000[1]);
-	draw_sprites(machine, bitmap,cliprect,0, (tatsumi_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
+	fillbitmap(bitmap,screen->machine->pens[0],cliprect);
+	draw_sky(screen->machine, bitmap, cliprect, 256, apache3_a0000[1]);
+	draw_sprites(screen->machine, bitmap,cliprect,0, (tatsumi_sprite_control_ram[0x20]&0x1000) ? 0x1000 : 0);
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 	return 0;
 }
@@ -1013,17 +1013,17 @@ VIDEO_UPDATE( roundup5 )
 //  UINT16 bg_x_scroll=roundup5_unknown1[0];
 //  UINT16 bg_y_scroll=roundup5_unknown2[0];
 
-	update_cluts(machine, 1024, 512, 4096);
+	update_cluts(screen->machine, 1024, 512, 4096);
 
 	tilemap_set_scrollx(tx_layer,0,24);
 	tilemap_set_scrolly(tx_layer,0,0); //(((roundupt_crt_reg[0xe]<<8)|roundupt_crt_reg[0xf])>>5) + 96);
 
-	fillbitmap(bitmap,machine->pens[384],cliprect); // todo
+	fillbitmap(bitmap,screen->machine->pens[384],cliprect); // todo
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	draw_sprites(machine, priority_bitmap,cliprect,1,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_road(machine, bitmap,cliprect,priority_bitmap);
-	draw_sprites(machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
+	draw_sprites(screen->machine, priority_bitmap,cliprect,1,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
+	draw_road(screen->machine, bitmap,cliprect,priority_bitmap);
+	draw_sprites(screen->machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Full pass
 	tilemap_draw(bitmap,cliprect,tx_layer,0,0);
 	return 0;
 }
@@ -1040,14 +1040,14 @@ VIDEO_UPDATE( cyclwarr )
 		bigfight_last_bank=bigfight_bank;
 	}
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
+	fillbitmap(bitmap,screen->machine->pens[0],cliprect);
 
-	draw_bg(machine, bitmap, layer3, &cyclwarr_videoram1[0x000], &cyclwarr_videoram1[0x100], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x80, 512, 4096);
-	draw_bg(machine, bitmap, layer2, &cyclwarr_videoram1[0x200], &cyclwarr_videoram1[0x300], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x80, 512, 4096);
-	draw_bg(machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
-	update_cluts(machine, 8192, 4096, 8192);
-	draw_sprites(machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x80, 512, 4096);
+	draw_bg(screen->machine, bitmap, layer3, &cyclwarr_videoram1[0x000], &cyclwarr_videoram1[0x100], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x80, 512, 4096);
+	draw_bg(screen->machine, bitmap, layer2, &cyclwarr_videoram1[0x200], &cyclwarr_videoram1[0x300], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x80, 512, 4096);
+	draw_bg(screen->machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	update_cluts(screen->machine, 8192, 4096, 8192);
+	draw_sprites(screen->machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	draw_bg(screen->machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x80, 512, 4096);
 
 	return 0;
 }
@@ -1064,13 +1064,13 @@ VIDEO_UPDATE( bigfight )
 		bigfight_last_bank=bigfight_bank;
 	}
 
-	fillbitmap(bitmap,machine->pens[0],cliprect);
-	draw_bg(machine, bitmap, layer3, &cyclwarr_videoram1[0x000], &cyclwarr_videoram1[0x100], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x40, 1024, 2048);
-	draw_bg(machine, bitmap, layer2, &cyclwarr_videoram1[0x200], &cyclwarr_videoram1[0x300], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x40, 1024, 2048);
-	draw_bg(machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
-	update_cluts(machine, 8192, 4096, 8192);
-	draw_sprites(machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
-	draw_bg(machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x40, 1024, 2048);
+	fillbitmap(bitmap,screen->machine->pens[0],cliprect);
+	draw_bg(screen->machine, bitmap, layer3, &cyclwarr_videoram1[0x000], &cyclwarr_videoram1[0x100], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(screen->machine, bitmap, layer2, &cyclwarr_videoram1[0x200], &cyclwarr_videoram1[0x300], cyclwarr_videoram1, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	draw_bg(screen->machine, bitmap, layer1, &cyclwarr_videoram0[0x000], &cyclwarr_videoram0[0x100], cyclwarr_videoram0, bigfight_a40000[0], 8, -0x40, 1024, 2048);
+	update_cluts(screen->machine, 8192, 4096, 8192);
+	draw_sprites(screen->machine, bitmap,cliprect,0,(tatsumi_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0);
+	draw_bg(screen->machine, bitmap, layer0, &cyclwarr_videoram0[0x200], &cyclwarr_videoram0[0x300], cyclwarr_videoram0, bigfight_a40000[0], 0x10, -0x40, 1024, 2048);
 
 	return 0;
 }

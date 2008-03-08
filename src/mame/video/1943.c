@@ -240,11 +240,11 @@ VIDEO_UPDATE( 1943 )
 	if (sc2on)
 		tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
-	if (objon) draw_sprites(machine, bitmap, cliprect, 0);
+	if (objon) draw_sprites(screen->machine, bitmap, cliprect, 0);
 	if (sc1on) tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	if (objon) draw_sprites(machine, bitmap, cliprect, 1);
+	if (objon) draw_sprites(screen->machine, bitmap, cliprect, 1);
 	if (chon)  tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

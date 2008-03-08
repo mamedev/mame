@@ -82,6 +82,6 @@ VIDEO_UPDATE( overdriv )
 	K051316_zoom_draw_0(bitmap,cliprect,0,0);
 	K051316_zoom_draw_1(bitmap,cliprect,0,1);
 
-	K053247_sprites_draw(machine, bitmap,cliprect);
+	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }

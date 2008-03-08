@@ -271,7 +271,7 @@ VIDEO_UPDATE( mcr3 )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(machine, bitmap, cliprect, 0x03, 0, 0, 0);
+	mcr3_update_sprites(screen->machine, bitmap, cliprect, 0x03, 0, 0, 0);
 	return 0;
 }
 
@@ -285,7 +285,7 @@ VIDEO_UPDATE( spyhunt )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(machine, bitmap, cliprect, spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(screen->machine, bitmap, cliprect, spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
 	tilemap_draw(bitmap, cliprect, alpha_tilemap, 0, 0);

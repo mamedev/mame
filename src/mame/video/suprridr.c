@@ -171,19 +171,19 @@ VIDEO_UPDATE( suprridr )
 	int i;
 
 	/* render left 4 columns with no scroll */
-	subclip = machine->screen[0].visarea;
+	subclip = screen->machine->screen[0].visarea;
 	subclip.max_x = subclip.min_x + (flipx ? 1*8 : 4*8) - 1;
 	sect_rect(&subclip, cliprect);
 	tilemap_draw(bitmap, &subclip, bg_tilemap_noscroll, 0, 0);
 
 	/* render right 1 column with no scroll */
-	subclip = machine->screen[0].visarea;
+	subclip = screen->machine->screen[0].visarea;
 	subclip.min_x = subclip.max_x - (flipx ? 4*8 : 1*8) + 1;
 	sect_rect(&subclip, cliprect);
 	tilemap_draw(bitmap, &subclip, bg_tilemap_noscroll, 0, 0);
 
 	/* render the middle columns normally */
-	subclip = machine->screen[0].visarea;
+	subclip = screen->machine->screen[0].visarea;
 	subclip.min_x += flipx ? 1*8 : 4*8;
 	subclip.max_x -= flipx ? 4*8 : 1*8;
 	sect_rect(&subclip, cliprect);
@@ -212,7 +212,7 @@ VIDEO_UPDATE( suprridr )
 			fy = !fy;
 			y = 240 - y;
 		}
-		drawgfx(bitmap, machine->gfx[2], code, color, fx, fy, x, y, cliprect, TRANSPARENCY_PEN, 0);
+		drawgfx(bitmap, screen->machine->gfx[2], code, color, fx, fy, x, y, cliprect, TRANSPARENCY_PEN, 0);
 	}
 	return 0;
 }

@@ -168,7 +168,7 @@ VIDEO_UPDATE( cheekyms )
 	fillbitmap(bitmap, 0, cliprect);
 
 	/* sprites go under the playfield */
-	draw_sprites(machine->gfx, bitmap, cliprect, flip);
+	draw_sprites(screen->machine->gfx, bitmap, cliprect, flip);
 
 	/* draw the non-scrolling parts of the playfield first */
 	tilemap_set_scrolly(cheekyms_tilemap, 0, 0);

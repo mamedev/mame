@@ -204,7 +204,7 @@ static VIDEO_UPDATE( wilytowr )
 		tilemap_set_scrolly(bg_tilemap, col, wilytowr_scrollram[col * 8]);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

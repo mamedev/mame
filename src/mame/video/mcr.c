@@ -400,18 +400,18 @@ VIDEO_UPDATE( mcr )
 	switch (mcr_sprite_board)
 	{
 		case 91399:
-			render_sprites_91399(machine, bitmap, cliprect);
+			render_sprites_91399(screen->machine, bitmap, cliprect);
 			break;
 
 		case 91464:
 			if (mcr_cpu_board == 91442)
-				render_sprites_91464(machine, bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen->machine, bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91475)
-				render_sprites_91464(machine, bitmap, cliprect, 0x00, 0x30, 0x40);
+				render_sprites_91464(screen->machine, bitmap, cliprect, 0x00, 0x30, 0x40);
 			else if (mcr_cpu_board == 91490)
-				render_sprites_91464(machine, bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen->machine, bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91721)
-				render_sprites_91464(machine, bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(screen->machine, bitmap, cliprect, 0x00, 0x30, 0x00);
 			break;
 	}
 	return 0;

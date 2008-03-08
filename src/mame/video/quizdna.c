@@ -194,10 +194,10 @@ VIDEO_UPDATE( quizdna )
 	if (quizdna_video_enable)
 	{
 		tilemap_draw(bitmap, cliprect, quizdna_bg_tilemap, 0, 0);
-		draw_sprites(machine, bitmap, cliprect);
+		draw_sprites(screen->machine, bitmap, cliprect);
 		tilemap_draw(bitmap, cliprect, quizdna_fg_tilemap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	return 0;
 }

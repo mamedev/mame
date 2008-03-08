@@ -257,7 +257,7 @@ VIDEO_UPDATE( cloud9 )
 {
 	UINT8 *spriteaddr = spriteram;
 	int flip = video_control[5] ? 0xff : 0x00;	/* PLAYER2 */
-	pen_t black = get_black_pen(machine);
+	pen_t black = get_black_pen(screen->machine);
 	int x, y, offs;
 
 	/* draw the sprites */
@@ -272,9 +272,9 @@ VIDEO_UPDATE( cloud9 )
 			int which = spriteaddr[offs + 0x20];
 			int color = 0;
 
-			drawgfx(spritebitmap, machine->gfx[0], which, color, xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 0);
+			drawgfx(spritebitmap, screen->machine->gfx[0], which, color, xflip, yflip, x, y, cliprect, TRANSPARENCY_PEN, 0);
 			if (x >= 256 - 16)
-				drawgfx(spritebitmap, machine->gfx[0], which, color, xflip, yflip, x - 256, y, cliprect, TRANSPARENCY_PEN, 0);
+				drawgfx(spritebitmap, screen->machine->gfx[0], which, color, xflip, yflip, x - 256, y, cliprect, TRANSPARENCY_PEN, 0);
 		}
 
 	/* draw the bitmap to the screen, looping over Y */

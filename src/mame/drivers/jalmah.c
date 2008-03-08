@@ -348,11 +348,11 @@ static VIDEO_UPDATE( jalmah )
         #define SUCHIPI_MCU  (0x23)
         */
 		case MJZOOMIN_MCU:
-		case DAIREIKA_MCU: daireika_mcu_run(machine); break;
-		case URASHIMA_MCU: urashima_mcu_run(machine); break;
+		case DAIREIKA_MCU: daireika_mcu_run(screen->machine); break;
+		case URASHIMA_MCU: urashima_mcu_run(screen->machine); break;
 		case KAKUMEI_MCU:
 		case KAKUMEI2_MCU:
-		case SUCHIPI_MCU:  second_mcu_run(machine); break;
+		case SUCHIPI_MCU:  second_mcu_run(screen->machine); break;
 	}
 	tilemap_set_scrollx( sc0_tilemap, 0, jm_scrollram[0] + ((jm_vregs[0] & 3) ? ((jm_scrollram[4] & 0x200) * 4) : 0));
 	tilemap_set_scrollx( sc1_tilemap, 0, jm_scrollram[1] + ((jm_vregs[1] & 3) ? ((jm_scrollram[5] & 0x200) * 4) : 0));

@@ -69,7 +69,7 @@ static UINT16 *textram;
 	 				{ \
 	 					UINT16 data0=map[y*128+x*2]; \
 	 					UINT16 data1=map[y*128+x*2+1]; \
-	 					drawgfx(bitmap,machine->gfx[0], data1, \
+	 					drawgfx(bitmap,screen->machine->gfx[0], data1, \
 		 					data0&0xff, \
 							data0&0x4000, data0&0x8000, \
 							x*16-512/*+(((INT16)(unkram[0x60000/2+num]))/32)*/, y*16/*+(((INT16)(unkram[0x60008/2+num]))/32)*/, \
@@ -84,7 +84,7 @@ static VIDEO_UPDATE( drill )
 
 	for (i=0; i<256; i++)
 	{
-		decodechar(machine->gfx[1],i,(UINT8*)&charram[0]);
+		decodechar(screen->machine->gfx[1],i,(UINT8*)&charram[0]);
 	}
 
 	DRAW_MAP(map1ram,0)
@@ -99,7 +99,7 @@ static VIDEO_UPDATE( drill )
 	 		for(x=0;x<64;x++)
 	 		{
 	 			drawgfx(	bitmap,
-						machine->gfx[1],
+						screen->machine->gfx[1],
 						textram[y*64+x]&0xff, //1ff ??
 						((textram[y*64+x]>>9)&0xf),
 						0, 0,

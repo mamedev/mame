@@ -143,14 +143,14 @@ VIDEO_UPDATE( gijoe )
 
 	sortlayers(layer, layer_pri);
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	fillbitmap(priority_bitmap, 0, cliprect);
 
-	K056832_tilemap_draw(machine, bitmap,cliprect, layer[0], 0, 1);
-	K056832_tilemap_draw(machine, bitmap,cliprect, layer[1], 0, 2);
-	K056832_tilemap_draw(machine, bitmap,cliprect, layer[2], 0, 4);
-	K056832_tilemap_draw(machine, bitmap,cliprect, layer[3], 0, 8);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[0], 0, 1);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[1], 0, 2);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[2], 0, 4);
+	K056832_tilemap_draw(screen->machine, bitmap,cliprect, layer[3], 0, 8);
 
-	K053247_sprites_draw(machine, bitmap, cliprect);
+	K053247_sprites_draw(screen->machine, bitmap, cliprect);
 	return 0;
 }

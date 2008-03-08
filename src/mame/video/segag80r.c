@@ -826,7 +826,7 @@ VIDEO_UPDATE( segag80r )
 		/* background: none */
 		case G80_BACKGROUND_NONE:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except where black */
@@ -834,7 +834,7 @@ VIDEO_UPDATE( segag80r )
 		/* we draw the foreground first, then the background to do collision detection */
 		case G80_BACKGROUND_SPACEOD:
 			memset(transparent_pens, 0, 16);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			draw_background_spaceod(bitmap, cliprect);
 			break;
 
@@ -843,7 +843,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_MONSTERB:
 			memset(transparent_pens, 1, 16);
 			draw_background_page_scroll(bitmap, cliprect);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
@@ -851,7 +851,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_PIGNEWT:
 			memset(transparent_pens, 1, 16);
 			draw_background_full_scroll(bitmap, cliprect);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
 		/* foreground: visible except for pen 0 */
@@ -859,7 +859,7 @@ VIDEO_UPDATE( segag80r )
 		case G80_BACKGROUND_SINDBADM:
 			memset(transparent_pens, 1, 16);
 			draw_background_page_scroll(bitmap, cliprect);
-			draw_videoram(machine, bitmap, cliprect, transparent_pens);
+			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 	}
 	return 0;

@@ -295,7 +295,7 @@ static void draw_bglayerscroll(running_machine *machine, int layer, bitmap_t *bi
 /* Looks better with blending and one scroll value than with 1D linescroll and no zoom */
 #if 0
 		int bg_scrollx[256], bg_scrolly[512];
-		fillbitmap(zoom_bitmap, get_black_pen(machine), NULL);
+		fillbitmap(zoom_bitmap, get_black_pen(screen->machine), NULL);
 		for (offs=0; offs<(0x400/4); offs++) /* 224 values for each */
 		{
 			bg_scrollx[offs] = (psikyosh_bgram[(scrollbank*0x800)/4 + offs - 0x4000/4] & 0x000001ff) >> 0;
@@ -1128,14 +1128,14 @@ static void psikyosh_postlineblend( bitmap_t *bitmap, const rectangle *cliprect 
 VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct priority */
 {
 		int i;
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	fillbitmap(z_bitmap,0,cliprect); /* z-buffer */
 
 		psikyosh_prelineblend(bitmap, cliprect);
 
 		for (i=0; i<=7; i++) {
-		draw_sprites(machine, bitmap, cliprect, i); // When same priority bg's have higher pri
-		draw_background(machine, bitmap, cliprect, i);
+		draw_sprites(screen->machine, bitmap, cliprect, i); // When same priority bg's have higher pri
+		draw_background(screen->machine, bitmap, cliprect, i);
 			if((psikyosh_vidregs[2]&0xf) == i) psikyosh_postlineblend(bitmap, cliprect);
 		}
 	return 0;

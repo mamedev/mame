@@ -550,7 +550,7 @@ static VIDEO_UPDATE( laserbat )
 	}
 
 	if(sprite_info.enable)
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 		        sprite_info.code,
 				sprite_info.color,
 				0,0,

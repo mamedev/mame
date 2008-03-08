@@ -46,8 +46,7 @@ static VIDEO_UPDATE( missb2 )
 	/* and sprites) are stored in the same memory region, and information on */
 	/* the background character columns is stored in the area dd00-dd3f */
 
-	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,255,&machine->screen[0].visarea);
+	fillbitmap(bitmap,255,cliprect);
 
 	if (!bublbobl_video_enable) return 0;
 
@@ -55,12 +54,12 @@ static VIDEO_UPDATE( missb2 )
 	//popmessage("%02x",(*missb2_bgvram) & 0x1f);
 	for(bg_offs = ((*missb2_bgvram) << 4);bg_offs<(((*missb2_bgvram)<< 4)|0xf);bg_offs++)
 	{
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,screen->machine->gfx[1],
 				bg_offs,
 				1,
 				0,0,
 				0,(bg_offs & 0xf) * 0x10,
-				&machine->screen[0].visarea,TRANSPARENCY_NONE,0xff);
+				cliprect,TRANSPARENCY_NONE,0xff);
 	}
 
 
@@ -115,12 +114,12 @@ static VIDEO_UPDATE( missb2 )
 					flipy = !flipy;
 				}
 
-				drawgfx(bitmap,machine->gfx[0],
+				drawgfx(bitmap,screen->machine->gfx[0],
 						code,
 						0,
 						flipx,flipy,
 						x,y,
-						&machine->screen[0].visarea,TRANSPARENCY_PEN,0xff);
+						cliprect,TRANSPARENCY_PEN,0xff);
 			}
 		}
 

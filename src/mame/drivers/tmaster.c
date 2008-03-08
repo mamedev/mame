@@ -222,10 +222,10 @@ static VIDEO_UPDATE( tmaster )
 #endif
 
 
-	if (layers_ctrl & 1)	copybitmap			(bitmap,tmaster_bitmap[0][(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,&machine->screen[0].visarea);
-	else					fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	if (layers_ctrl & 1)	copybitmap			(bitmap,tmaster_bitmap[0][(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,cliprect);
+	else					fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
-	if (layers_ctrl & 2)	copybitmap_trans	(bitmap,tmaster_bitmap[1][(tmaster_regs[0x02/2]>>9)&1],0,0,0,0,&machine->screen[0].visarea,0xff);
+	if (layers_ctrl & 2)	copybitmap_trans	(bitmap,tmaster_bitmap[1][(tmaster_regs[0x02/2]>>9)&1],0,0,0,0,cliprect,0xff);
 
 	return 0;
 }

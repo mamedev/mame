@@ -510,7 +510,7 @@ static VIDEO_UPDATE(bnstars)
 		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap[0],0,4);
 
 
-		draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x20000, 0);
+		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x20000, 0);
 	}
 	else
 	{
@@ -527,7 +527,7 @@ static VIDEO_UPDATE(bnstars)
 		tilemap_set_scrolly(ms32_tx_tilemap[1], 0, ms32_tx1_scroll[0x0c/4] + ms32_tx1_scroll[0x14/4]);
 		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap[1],0,4);
 
-		draw_sprites(machine,bitmap,cliprect, ms32_spram+(0x20000/4), 0x20000, 4);
+		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram+(0x20000/4), 0x20000, 4);
 	}
 
 	return 0;

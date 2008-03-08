@@ -546,7 +546,7 @@ static VIDEO_UPDATE( hornet )
 {
 	voodoo_update(0, bitmap, cliprect);
 
-	K037122_tile_update(machine, 0);
+	K037122_tile_update(screen->machine, 0);
 	K037122_tile_draw(0, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
@@ -556,11 +556,11 @@ static VIDEO_UPDATE( hornet )
 
 static VIDEO_UPDATE( hornet_2board )
 {
-	voodoo_update(screen, bitmap, cliprect);
+	voodoo_update(scrnum, bitmap, cliprect);
 
 	/* TODO: tilemaps per screen */
-	K037122_tile_update(machine, screen);
-	K037122_tile_draw(screen, bitmap, cliprect);
+	K037122_tile_update(screen->machine, scrnum);
+	K037122_tile_draw(scrnum, bitmap, cliprect);
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);

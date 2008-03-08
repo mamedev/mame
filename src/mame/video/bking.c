@@ -258,14 +258,14 @@ VIDEO_UPDATE( bking )
 
 	/* draw the balls */
 
-	drawgfx(bitmap, machine->gfx[2],
+	drawgfx(bitmap, screen->machine->gfx[2],
 		ball1_pic,
 		palette_bank,
 		0, 0,
 		xld1, yld1,
 		cliprect, TRANSPARENCY_PEN, 0);
 
-	drawgfx(bitmap, machine->gfx[3],
+	drawgfx(bitmap, screen->machine->gfx[3],
 		ball2_pic,
 		palette_bank,
 		0, 0,
@@ -274,7 +274,7 @@ VIDEO_UPDATE( bking )
 
 	/* draw the crow */
 
-	drawgfx(bitmap, machine->gfx[1],
+	drawgfx(bitmap, screen->machine->gfx[1],
 		crow_pic,
 		palette_bank,
 		crow_flip, crow_flip,

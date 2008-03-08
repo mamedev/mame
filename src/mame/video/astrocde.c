@@ -309,7 +309,7 @@ VIDEO_UPDATE( astrocde )
 
 	/* compute the starting point of sparkle for the current frame */
 	if (astrocade_video_config & AC_STARS)
-		sparklebase = (video_screen_get_frame_number(0) * (UINT64)(machine->screen[0].width * machine->screen[0].height)) % RNG_PERIOD;
+		sparklebase = (video_screen_get_frame_number(0) * (UINT64)(screen->machine->screen[0].width * screen->machine->screen[0].height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -323,8 +323,8 @@ VIDEO_UPDATE( astrocde )
 		/* compute the star and sparkle offset at the start of this line */
 		if (astrocade_video_config & AC_STARS)
 		{
-			staroffs = ((effy < 0) ? (effy + 262) : effy) * machine->screen[0].width;
-			sparkleoffs = sparklebase + y * machine->screen[0].width;
+			staroffs = ((effy < 0) ? (effy + 262) : effy) * screen->machine->screen[0].width;
+			sparkleoffs = sparklebase + y * screen->machine->screen[0].width;
 			if (sparkleoffs >= RNG_PERIOD)
 				sparkleoffs -= RNG_PERIOD;
 		}

@@ -254,8 +254,8 @@ static VIDEO_UPDATE( bfcobra )
 			UINT8 x_offset = x + h_scroll;
 			UINT8 pen = *(src + x_offset);
 
-			//*dest++ = machine->pens[pen & ramdac.mask];
-			*dest++ = machine->pens[pen];
+			//*dest++ = screen->machine->pens[pen & ramdac.mask];
+			*dest++ = screen->machine->pens[pen];
 		}
 	}
 

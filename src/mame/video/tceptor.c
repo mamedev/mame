@@ -561,11 +561,11 @@ VIDEO_UPDATE( tceptor )
 
 	if (screen)
 	{
-		int frame = video_screen_get_frame_number(screen);
+		int frame = video_screen_get_frame_number(scrnum);
 
-		if ((frame & 1) == 1 && screen == 1)
+		if ((frame & 1) == 1 && scrnum == 1)
 			return UPDATE_HAS_NOT_CHANGED;
-		if ((frame & 1) == 0 && screen == 2)
+		if ((frame & 1) == 0 && scrnum == 2)
 			return UPDATE_HAS_NOT_CHANGED;
 	}
 
@@ -585,9 +585,9 @@ VIDEO_UPDATE( tceptor )
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		namco_road_draw(machine, bitmap, cliprect, pri * 2);
-		namco_road_draw(machine, bitmap, cliprect, pri * 2 + 1);
-		draw_sprites(machine, bitmap, cliprect, pri);
+		namco_road_draw(screen->machine, bitmap, cliprect, pri * 2);
+		namco_road_draw(screen->machine, bitmap, cliprect, pri * 2 + 1);
+		draw_sprites(screen->machine, bitmap, cliprect, pri);
 	}
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);

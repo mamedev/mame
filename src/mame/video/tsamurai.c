@@ -218,7 +218,7 @@ VIDEO_UPDATE( tsamurai )
     */
 	fillbitmap(bitmap,bgcolor,cliprect);
 	tilemap_draw(bitmap,cliprect,background,0,0);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,foreground,0,0);
 	return 0;
 }
@@ -272,6 +272,6 @@ VIDEO_UPDATE( vsgongf )
 	#endif
 
 	tilemap_draw(bitmap,cliprect,foreground,0,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

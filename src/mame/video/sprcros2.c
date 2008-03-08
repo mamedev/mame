@@ -188,7 +188,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 VIDEO_UPDATE( sprcros2 )
 {
 	tilemap_draw( bitmap,cliprect,sprcros2_bgtilemap,0,0 );
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw( bitmap,cliprect,sprcros2_fgtilemap,0,0 );
 	return 0;
 }

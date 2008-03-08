@@ -202,7 +202,7 @@ VIDEO_UPDATE( tiamc1 )
 		tilemap_draw(bitmap, cliprect, bg_tilemap1, 0, 0);
 
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

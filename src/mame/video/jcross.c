@@ -181,14 +181,14 @@ VIDEO_UPDATE( jcross )
 
 	if( scroll_attributes & 8 ) sprite_scrolly += 256;
 	if( scroll_attributes & 0x10 ) bg_scrolly += 256;
-	update_palette(machine, 1);
+	update_palette(screen->machine, 1);
 
 
 	tilemap_set_scrollx( bg_tilemap, 0, bg_scrollx );
 	tilemap_set_scrolly( bg_tilemap, 0, bg_scrolly );
-	tilemap_draw( bitmap,cliprect,bg_tilemap,0 ,0);
-	draw_sprites( machine, bitmap,cliprect, sprite_scrollx+23, sprite_scrolly+1 );
-	tilemap_draw( bitmap,cliprect,tx_tilemap,0 ,0);
-	draw_status( machine, bitmap,cliprect );
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0 ,0);
+	draw_sprites(screen->machine, bitmap,cliprect, sprite_scrollx+23, sprite_scrolly+1 );
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0 ,0);
+	draw_status(screen->machine, bitmap,cliprect );
 	return 0;
 }

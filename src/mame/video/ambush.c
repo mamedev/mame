@@ -99,7 +99,7 @@ VIDEO_UPDATE( ambush )
 
 
 	/* Draw the background priority characters */
-	draw_chars(machine, bitmap, cliprect, 0x00);
+	draw_chars(screen->machine, bitmap, cliprect, 0x00);
 
 
 	/* Draw the sprites. */
@@ -159,7 +159,7 @@ VIDEO_UPDATE( ambush )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[gfx],
+		drawgfx(bitmap,screen->machine->gfx[gfx],
 				code, col | ((*ambush_colorbank & 0x03) << 4),
 				flipx, flipy,
 				sx,sy,
@@ -168,6 +168,6 @@ VIDEO_UPDATE( ambush )
 
 
 	/* Draw the foreground priority characters */
-	draw_chars(machine, bitmap, cliprect, 0x10);
+	draw_chars(screen->machine, bitmap, cliprect, 0x10);
 	return 0;
 }

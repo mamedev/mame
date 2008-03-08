@@ -347,7 +347,7 @@ VIDEO_UPDATE( fuuki16 )
 	fuuki16_draw_layer(bitmap,cliprect, tm_middle, 0, 2);
 	fuuki16_draw_layer(bitmap,cliprect, tm_front,  0, 4);
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

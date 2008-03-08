@@ -1105,7 +1105,7 @@ VIDEO_UPDATE( victory )
 	int x, y;
 
 	/* copy the palette from palette RAM */
-	set_palette(machine);
+	set_palette(screen->machine);
 
 	/* update the foreground & background */
 	update_foreground();

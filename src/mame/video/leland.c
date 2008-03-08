@@ -449,7 +449,7 @@ static VIDEO_UPDATE( leland )
 	}
 
 	/* set a timer to go off at the top of the frame */
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
 		timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, dac_reset);
 
 	return 0;
@@ -525,7 +525,7 @@ static VIDEO_UPDATE( ataxx )
 	}
 
 	/* set a timer to go off at the top of the frame */
-	if (cliprect->max_y == machine->screen[screen].visarea.max_y)
+	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
 		timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, dac_reset);
 
 	return 0;

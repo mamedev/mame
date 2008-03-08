@@ -210,7 +210,7 @@ VIDEO_UPDATE( maniacsq )
 	tilemap_draw(bitmap,cliprect,pant[1],0,4);
 	tilemap_draw(bitmap,cliprect,pant[0],0,4);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -249,6 +249,6 @@ VIDEO_UPDATE( bigkarnk )
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER0 | 0,8);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER0 | 0,8);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

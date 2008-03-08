@@ -445,9 +445,9 @@ static VIDEO_UPDATE(deroon)
 
 	// bg color , to see text in deroon
 	if(!gametype)
-			palette_set_color(machine,0x800,MAKE_RGB(0x80,0x80,0x80));
+			palette_set_color(screen->machine,0x800,MAKE_RGB(0x80,0x80,0x80));
 	else
-			palette_set_color(machine,0x800,MAKE_RGB(0x0,0x0,0x0));
+			palette_set_color(screen->machine,0x800,MAKE_RGB(0x0,0x0,0x0));
 
 	fillbitmap(bitmap,0x800,cliprect);
 

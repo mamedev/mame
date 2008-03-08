@@ -216,7 +216,7 @@ VIDEO_START( tbowl )
 
 VIDEO_UPDATE( tbowl )
 {
-	if (screen == 0)
+	if (scrnum == 0)
 	{
 		tilemap_set_scrollx(bg_tilemap,  0, tbowl_xscroll );
 		tilemap_set_scrolly(bg_tilemap,  0, tbowl_yscroll );
@@ -227,11 +227,11 @@ VIDEO_UPDATE( tbowl )
 
 		fillbitmap(bitmap,0x100,cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect, 0);
+		draw_sprites(screen->machine, bitmap,cliprect, 0);
 		tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}
-	else if (screen ==1)
+	else if (scrnum ==1)
 	{
 		tilemap_set_scrollx(bg_tilemap,  0, tbowl_xscroll+32*8 );
 		tilemap_set_scrolly(bg_tilemap,  0, tbowl_yscroll );
@@ -242,7 +242,7 @@ VIDEO_UPDATE( tbowl )
 
 		fillbitmap(bitmap,0x100,cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect, 32*8);
+		draw_sprites(screen->machine, bitmap,cliprect, 32*8);
 		tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}

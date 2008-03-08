@@ -75,7 +75,7 @@ VIDEO_UPDATE( megaplay_normal )
 		segae_drawscanline(i-16,0,0);
 
 	for (i = miny;i <= maxy;i++)
-		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&machine->pens[palette_base],0);
+		draw_scanline8(bitmap,32,i,256,&cache_bitmap[(i-16) * (16+256+16) +24],&screen->machine->pens[palette_base],0);
 
 	return 0;
 }

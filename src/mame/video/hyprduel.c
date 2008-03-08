@@ -632,8 +632,8 @@ VIDEO_UPDATE( hyprduel )
 		}
 	}
 
-	hyprduel_sprite_xoffs	=	hyprduel_videoregs[0x06/2] - machine->screen[0].width  / 2;
-	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - machine->screen[0].height / 2;
+	hyprduel_sprite_xoffs	=	hyprduel_videoregs[0x06/2] - screen->machine->screen[0].width  / 2;
+	hyprduel_sprite_yoffs	=	hyprduel_videoregs[0x04/2] - screen->machine->screen[0].height / 2;
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
@@ -678,6 +678,6 @@ if (input_code_pressed(KEYCODE_Z))
 		draw_layers(bitmap,cliprect,pri,layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

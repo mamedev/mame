@@ -249,7 +249,7 @@ VIDEO_UPDATE( kingofb )
 {
 	tilemap_set_scrolly(bg_tilemap, 0, -(*kingofb_scroll_y));
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	kingofb_draw_sprites(machine, bitmap, cliprect);
+	kingofb_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
@@ -309,7 +309,7 @@ VIDEO_UPDATE( ringking )
 {
 	tilemap_set_scrolly(bg_tilemap, 0, -(*kingofb_scroll_y));
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	ringking_draw_sprites(machine, bitmap, cliprect);
+	ringking_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }

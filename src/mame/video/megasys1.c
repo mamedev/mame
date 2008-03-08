@@ -1018,6 +1018,6 @@ VIDEO_UPDATE( megasys1 )
 	}
 
 	if (active_layers & 0x08)
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

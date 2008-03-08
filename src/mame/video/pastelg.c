@@ -267,9 +267,9 @@ VIDEO_UPDATE( pastelg )
 	{
 		int x, y;
 
-		for (y = 0; y < machine->screen[0].height; y++)
-			for (x = 0; x < machine->screen[0].width; x++)
-				*BITMAP_ADDR16(bitmap, y, x) = pastelg_videoram[(y * machine->screen[0].width) + x];
+		for (y = 0; y < screen->machine->screen[0].height; y++)
+			for (x = 0; x < screen->machine->screen[0].width; x++)
+				*BITMAP_ADDR16(bitmap, y, x) = pastelg_videoram[(y * screen->machine->screen[0].width) + x];
 	}
 	else
 		fillbitmap(bitmap, 0, cliprect);

@@ -73,17 +73,17 @@ VIDEO_UPDATE( flyball )
 
 	/* draw pitcher */
 
-	drawgfx(bitmap, machine->gfx[1], flyball_pitcher_pic ^ 0xf,
+	drawgfx(bitmap, screen->machine->gfx[1], flyball_pitcher_pic ^ 0xf,
 		0, 1, 0, pitcherx, pitchery, cliprect, TRANSPARENCY_PEN, 1);
 
 	/* draw ball */
 
 	for (y = bally; y < bally + 2; y++)
 		for (x = ballx; x < ballx + 2; x++)
-			if (x >= machine->screen[0].visarea.min_x &&
-			    x <= machine->screen[0].visarea.max_x &&
-			    y >= machine->screen[0].visarea.min_y &&
-			    y <= machine->screen[0].visarea.max_y)
+			if (x >= screen->machine->screen[0].visarea.min_x &&
+			    x <= screen->machine->screen[0].visarea.max_x &&
+			    y >= screen->machine->screen[0].visarea.min_y &&
+			    y <= screen->machine->screen[0].visarea.max_y)
 				*BITMAP_ADDR16(bitmap, y, x) = 1;
 	return 0;
 }

@@ -81,7 +81,7 @@ static VIDEO_UPDATE( dominob )
 	 		for(x=0;x<256/32;x++)
 	 		{
 	 			drawgfx(	bitmap,
-									machine->gfx[1],
+									screen->machine->gfx[1],
 									bgram[index]+256*(bgram[index+1]&0xf),
 						bgram[index+1]>>4,
 						0, 0,
@@ -98,7 +98,7 @@ static VIDEO_UPDATE( dominob )
 	 		for(x=0;x<32;x++)
 	 		{
 	 			drawgfx(	bitmap,
-						machine->gfx[0],
+						screen->machine->gfx[0],
 						videoram[(y*32+x)*2+1]+(videoram[(y*32+x)*2]&7)*256,
 						(videoram[(y*32+x)*2]>>3),
 						0, 0,
@@ -108,7 +108,7 @@ static VIDEO_UPDATE( dominob )
 	 		}
 	}
 
-	draw_sprites(machine, bitmap, cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 
 	return 0;
 }

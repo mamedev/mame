@@ -271,7 +271,7 @@ VIDEO_UPDATE( splash )
 	draw_bitmap(bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,0);
-	splash_draw_sprites(machine, bitmap,cliprect);
+	splash_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
 	return 0;
 }
@@ -286,7 +286,7 @@ VIDEO_UPDATE( funystrp )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap[1],0,0);
 	/*Sprite chip is similar but not the same*/
-	funystrp_draw_sprites(machine, bitmap,cliprect);
+	funystrp_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap[0],0,0);
 	return 0;
 }

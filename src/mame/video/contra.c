@@ -288,7 +288,7 @@ VIDEO_UPDATE( contra )
 	sect_rect(&fg_finalclip, cliprect);
 	sect_rect(&tx_finalclip, cliprect);
 
-	set_pens(machine->colortable);
+	set_pens(screen->machine->colortable);
 
 	tilemap_set_scrollx( fg_tilemap,0, K007121_ctrlram[0][0x00] - 40 );
 	tilemap_set_scrolly( fg_tilemap,0, K007121_ctrlram[0][0x02] );
@@ -297,8 +297,8 @@ VIDEO_UPDATE( contra )
 
 	tilemap_draw( bitmap,&bg_finalclip, bg_tilemap, 0 ,0);
 	tilemap_draw( bitmap,&fg_finalclip, fg_tilemap, 0 ,0);
-	draw_sprites( machine,bitmap,cliprect, 0 );
-	draw_sprites( machine,bitmap,cliprect, 1 );
+	draw_sprites( screen->machine,bitmap,cliprect, 0 );
+	draw_sprites( screen->machine,bitmap,cliprect, 1 );
 	tilemap_draw( bitmap,&tx_finalclip, tx_tilemap, 0 ,0);
 	return 0;
 }

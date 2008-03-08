@@ -301,8 +301,8 @@ VIDEO_UPDATE( senjyo )
 
 
 	/* two colors for the radar dots (verified on the real board) */
-	palette_set_color(machine,512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
-	palette_set_color(machine,513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
+	palette_set_color(screen->machine,512,MAKE_RGB(0xff,0x00,0x00));	/* red for enemies */
+	palette_set_color(screen->machine,513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
 
 	{
 		int scrollx,scrolly;
@@ -337,14 +337,14 @@ VIDEO_UPDATE( senjyo )
 		tilemap_set_scrolly(bg3_tilemap,0,scrolly);
 	}
 
-	draw_bgbitmap(machine, bitmap,cliprect);
-	draw_sprites(machine, bitmap,cliprect,0);
+	draw_bgbitmap(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect,bg3_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,1);
+	draw_sprites(screen->machine, bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,2);
+	draw_sprites(screen->machine, bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(screen->machine, bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	draw_radar(bitmap,cliprect);
 

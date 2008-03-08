@@ -81,7 +81,7 @@ VIDEO_UPDATE( finalizr )
 		sx = offs % 32;
 		sy = offs / 32;
 
-		drawgfx(tmpbitmap,machine->gfx[0],
+		drawgfx(tmpbitmap,screen->machine->gfx[0],
 				videoram[offs] + ((colorram[offs] & 0xc0) << 2) + (charbank<<10),
 				(colorram[offs] & 0x0f),
 				colorram[offs] & 0x10,colorram[offs] & 0x20,
@@ -130,25 +130,25 @@ VIDEO_UPDATE( finalizr )
 				case 0x14:	/* ? */
 				case 0x18:	/* ? */
 				case 0x1c:	/* ? */
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx(bitmap,screen->machine->gfx[1],
 							code,
 							color,
 							flipx,flipy,
 							flipx?sx+16:sx,flipy?sy+16:sy,
 							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx(bitmap,screen->machine->gfx[1],
 							code + 1,
 							color,
 							flipx,flipy,
 							flipx?sx:sx+16,flipy?sy+16:sy,
 							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx(bitmap,screen->machine->gfx[1],
 							code + 2,
 							color,
 							flipx,flipy,
 							flipx?sx+16:sx,flipy?sy:sy+16,
 							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx(bitmap,screen->machine->gfx[1],
 							code + 3,
 							color,
 							flipx,flipy,
@@ -157,7 +157,7 @@ VIDEO_UPDATE( finalizr )
 					break;
 
 				case 0x00:	/* 16x16 */
-					drawgfx(bitmap,machine->gfx[1],
+					drawgfx(bitmap,screen->machine->gfx[1],
 							code,
 							color,
 							flipx,flipy,
@@ -167,13 +167,13 @@ VIDEO_UPDATE( finalizr )
 
 				case 0x04:	/* 16x8 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx(bitmap,screen->machine->gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,
 							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx(bitmap,screen->machine->gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
@@ -183,13 +183,13 @@ VIDEO_UPDATE( finalizr )
 
 				case 0x08:	/* 8x16 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx(bitmap,screen->machine->gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,
 							cliprect,TRANSPARENCY_PEN,0);
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx(bitmap,screen->machine->gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
@@ -199,7 +199,7 @@ VIDEO_UPDATE( finalizr )
 
 				case 0x0c:	/* 8x8 */
 					code = ((code & 0x3ff) << 2) | ((code & 0xc00) >> 10);
-					drawgfx(bitmap,machine->gfx[2],
+					drawgfx(bitmap,screen->machine->gfx[2],
 							code,
 							color,
 							flipx,flipy,
@@ -221,7 +221,7 @@ VIDEO_UPDATE( finalizr )
 			if (sx >= 3) sx += 30;
 			sy = offs / 32;
 
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 					finalizr_videoram2[offs] + ((finalizr_colorram2[offs] & 0xc0) << 2),
 					(finalizr_colorram2[offs] & 0x0f),
 					finalizr_colorram2[offs] & 0x10,finalizr_colorram2[offs] & 0x20,

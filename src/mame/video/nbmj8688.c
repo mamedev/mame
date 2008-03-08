@@ -712,9 +712,9 @@ VIDEO_UPDATE( mbmj8688_LCD )
 {
 	int x, y, b;
 
-	if(screen==0) VIDEO_UPDATE_CALL(mbmj8688);
+	if(scrnum==0) VIDEO_UPDATE_CALL(mbmj8688);
 
-	if (screen==1)
+	if (scrnum==1)
 	{
 		for (y = 0;y < 64;y++)
 		{
@@ -728,7 +728,7 @@ VIDEO_UPDATE( mbmj8688_LCD )
 		}
 	}
 
-	if (screen==2)
+	if (scrnum==2)
 	{
 		for (y = 0;y < 64;y++)
 		{

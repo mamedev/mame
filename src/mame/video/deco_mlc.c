@@ -527,7 +527,7 @@ VIDEO_EOF( mlc )
 VIDEO_UPDATE( mlc )
 {
 //  fillbitmap(temp_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
-	draw_sprites(machine,bitmap,cliprect);
+	fillbitmap(bitmap,screen->machine->pens[0],cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
+	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

@@ -146,16 +146,16 @@ VIDEO_UPDATE( namcofl )
 	int pri;
 
 	handle_mcu();
-	namcofl_install_palette(machine);
+	namcofl_install_palette(screen->machine);
 
-	fillbitmap( bitmap, get_black_pen(machine), cliprect );
+	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
 
 	for( pri=0; pri<16; pri++ )
 	{
 		namco_roz_draw( bitmap,cliprect,pri );
 		if((pri&1)==0)
 			namco_tilemap_draw( bitmap, cliprect, pri>>1 );
-		namco_obj_draw(machine, bitmap, cliprect, pri );
+		namco_obj_draw(screen->machine, bitmap, cliprect, pri );
 	}
 
 	return 0;

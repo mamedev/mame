@@ -272,7 +272,7 @@ static void trojan_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 VIDEO_UPDATE( lwings )
 {
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-	lwings_draw_sprites(machine,bitmap,cliprect);
+	lwings_draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }
@@ -281,7 +281,7 @@ VIDEO_UPDATE( trojan )
 {
 	tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_LAYER1,0);
-	trojan_draw_sprites(machine,bitmap,cliprect);
+	trojan_draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;

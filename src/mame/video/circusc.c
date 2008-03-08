@@ -214,7 +214,7 @@ VIDEO_UPDATE( circusc )
 
 	fillbitmap(bitmap, 0, cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	return 0;
 }

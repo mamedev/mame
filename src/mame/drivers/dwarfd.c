@@ -530,8 +530,8 @@ static void drawCrt(running_machine *machine, bitmap_t *bitmap,const rectangle *
 
 static VIDEO_UPDATE( dwarfd )
 {
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
-	drawCrt(machine,bitmap,cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	drawCrt(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

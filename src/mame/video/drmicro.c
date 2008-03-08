@@ -154,7 +154,7 @@ VIDEO_UPDATE( drmicro )
 			else
 				x = (240-x) & 0xff;
 
-			drawgfx(bitmap,machine->gfx[3-g],
+			drawgfx(bitmap,screen->machine->gfx[3-g],
 					chr,
 					col,
 					fx,fy,
@@ -163,7 +163,7 @@ VIDEO_UPDATE( drmicro )
 
 			if (x>240)
 			{
-				drawgfx(bitmap,machine->gfx[3-g],
+				drawgfx(bitmap,screen->machine->gfx[3-g],
 						chr,
 						col,
 						fx,fy,

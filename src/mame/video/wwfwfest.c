@@ -263,13 +263,13 @@ VIDEO_UPDATE( wwfwfest )
 	if (wwfwfest_pri == 0x007b) {
 		tilemap_draw(bitmap,cliprect,bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
 	}
 
 	if (wwfwfest_pri == 0x007c) {
 		tilemap_draw(bitmap,cliprect,bg0_tilemap,TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
 	}
@@ -277,7 +277,7 @@ VIDEO_UPDATE( wwfwfest )
 	if (wwfwfest_pri == 0x0078) {
 		tilemap_draw(bitmap,cliprect,bg1_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		tilemap_draw(bitmap,cliprect,bg0_tilemap,0,0);
-		draw_sprites(machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,fg0_tilemap,0,0);
 	}
 	return 0;

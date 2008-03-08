@@ -125,15 +125,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( psikyo4 )
 {
-	if (screen==0)
+	if (scrnum==0)
 	{
 		fillbitmap(bitmap, 0x1000, cliprect);
-		draw_sprites(machine, bitmap, cliprect, 0x0000);
+		draw_sprites(screen->machine, bitmap, cliprect, 0x0000);
 	}
-	else if (screen==1)
+	else if (scrnum==1)
 	{
 		fillbitmap(bitmap, 0x1001, cliprect);
-		draw_sprites(machine, bitmap, cliprect, 0x2000);
+		draw_sprites(screen->machine, bitmap, cliprect, 0x2000);
 	}
 	return 0;
 }

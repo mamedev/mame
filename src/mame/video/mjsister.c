@@ -104,6 +104,6 @@ VIDEO_UPDATE( mjsister )
 		copybitmap_trans(bitmap,mjsister_tmpbitmap1,f,f,2,0,cliprect,0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), &machine->screen[0].visarea);
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	return 0;
 }

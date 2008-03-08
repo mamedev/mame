@@ -107,10 +107,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( warriorb )
 {
-	int xoffs = 40*8*screen;
+	int xoffs = 40*8*scrnum;
 	UINT8 layer[3], nodraw;
 
-	TC0100SCN_tilemap_update(machine);
+	TC0100SCN_tilemap_update(screen->machine);
 
 	layer[0] = TC0100SCN_bottomlayer(0);
 	layer[1] = layer[0]^1;
@@ -121,18 +121,18 @@ VIDEO_UPDATE( warriorb )
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
-	nodraw  = TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
+	nodraw  = TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,scrnum,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
-	if(nodraw) fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	if(nodraw) fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	// draw middle layer
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[1],0,1);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,scrnum,layer[1],0,1);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(machine, bitmap,cliprect,xoffs,8); // draw sprites
+	draw_sprites(screen->machine, bitmap,cliprect,xoffs,8); // draw sprites
 
 	// draw top(text) layer
-	TC0100SCN_tilemap_draw(machine,bitmap,cliprect,screen,layer[2],0,0);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,scrnum,layer[2],0,0);
 	return 0;
 }

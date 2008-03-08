@@ -235,7 +235,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 VIDEO_UPDATE( retofinv )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	draw_sprites(machine, bitmap);
+	draw_sprites(screen->machine, bitmap);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	return 0;
 }

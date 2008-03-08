@@ -557,7 +557,7 @@ VIDEO_UPDATE( slapshot )
 
 	taito_handle_sprite_buffering();
 
-	TC0480SCP_tilemap_update(machine);
+	TC0480SCP_tilemap_update(screen->machine);
 
 	priority = TC0480SCP_get_bg_priority();
 
@@ -615,7 +615,7 @@ VIDEO_UPDATE( slapshot )
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(machine,bitmap,cliprect,primasks,0);
+		draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
 	}
 
 	/*

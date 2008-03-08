@@ -379,7 +379,7 @@ static VIDEO_UPDATE(gstream)
 		if (x & 0x8000) x-=0x10000;
 		if (y & 0x8000) y-=0x10000;
 
-		drawgfx(bitmap,machine->gfx[1],code,col,0,0,x-2,y,cliprect,TRANSPARENCY_PEN,0);
+		drawgfx(bitmap,screen->machine->gfx[1],code,col,0,0,x-2,y,cliprect,TRANSPARENCY_PEN,0);
 	}
 
 	return 0;

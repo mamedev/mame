@@ -180,7 +180,7 @@ static VIDEO_UPDATE(murogem)
 			int tileno = murogem_videoram[count]&0x3f;
 			int attr = murogem_videoram[count+0x400]&0x0f;
 
-			drawgfx(bitmap,machine->gfx[0],tileno,attr,0,0,xx*8,yy*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],tileno,attr,0,0,xx*8,yy*8,cliprect,TRANSPARENCY_PEN,0);
 
 			count++;
 

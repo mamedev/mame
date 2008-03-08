@@ -224,7 +224,7 @@ VIDEO_UPDATE( exedexes )
 	else
 		fillbitmap(bitmap, 0, cliprect);
 
-	draw_sprites(machine, bitmap, cliprect, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, 1);
 
 	if (sc1on)
 	{
@@ -233,7 +233,7 @@ VIDEO_UPDATE( exedexes )
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	}
 
-	draw_sprites(machine, bitmap, cliprect, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	if (chon)
 		tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);

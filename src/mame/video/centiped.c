@@ -434,7 +434,7 @@ VIDEO_UPDATE( centiped )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
+		drawgfx(bitmap, screen->machine->gfx[1], code, color, flipx, flipy, x, y,
 				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);
 	}
 	return 0;
@@ -443,7 +443,7 @@ VIDEO_UPDATE( centiped )
 
 VIDEO_UPDATE( warlords )
 {
-	int upright_mode = input_port_0_r(machine, 0) & 0x80;
+	int upright_mode = readinputport(0) & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */
@@ -479,7 +479,7 @@ VIDEO_UPDATE( warlords )
 			flipx = !flipx;
 		}
 
-		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
+		drawgfx(bitmap, screen->machine->gfx[1], code, color, flipx, flipy, x, y,
 				cliprect, TRANSPARENCY_PEN, 0);
 	}
 	return 0;
@@ -510,7 +510,7 @@ VIDEO_UPDATE( bullsdrt )
 		int x = spriteram[offs + 0x20];
 		int y = 240 - spriteram[offs + 0x10];
 
-		drawgfx(bitmap, machine->gfx[1], code, color & 0x3f, 1, flipy, x, y,
+		drawgfx(bitmap, screen->machine->gfx[1], code, color & 0x3f, 1, flipy, x, y,
 				&spriteclip, TRANSPARENCY_PEN, 0);
 	}
 	return 0;
@@ -547,7 +547,7 @@ VIDEO_UPDATE( milliped )
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap, machine->gfx[1], code, color, flipx, flipy, x, y,
+		drawgfx(bitmap, screen->machine->gfx[1], code, color, flipx, flipy, x, y,
 				&spriteclip, TRANSPARENCY_PENS, penmask[color & 0x3f]);
 	}
 	return 0;

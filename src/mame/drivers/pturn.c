@@ -132,7 +132,7 @@ static VIDEO_UPDATE(pturn)
 	int sx, sy;
 	int flipx, flipy;
 
-	fillbitmap(bitmap, bgcolor, &machine->screen[0].visarea);
+	fillbitmap(bitmap, bgcolor, cliprect);
 	tilemap_draw(bitmap,cliprect,pturn_bgmap,0,0);
 	for ( offs = 0x80-4 ; offs >=0 ; offs -= 4)
 	{
@@ -157,7 +157,7 @@ static VIDEO_UPDATE(pturn)
 
 		if(sx|sy)
 		{
-			drawgfx(bitmap, machine->gfx[2],
+			drawgfx(bitmap, screen->machine->gfx[2],
 			spriteram[offs+1] & 0x3f ,
 			(spriteram[offs+2] & 0x1f),
 			flipx, flipy,

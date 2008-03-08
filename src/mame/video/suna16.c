@@ -221,7 +221,7 @@ VIDEO_UPDATE( suna16 )
 {
 	/* Suna Quiz indicates the background is the last pen */
 	fillbitmap(bitmap,0xff,cliprect);
-	draw_sprites(machine, bitmap, cliprect, spriteram16, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, spriteram16, 0);
 	return 0;
 }
 
@@ -240,7 +240,7 @@ if (input_code_pressed(KEYCODE_Z))
 
 	/* Suna Quiz indicates the background is the last pen */
 	fillbitmap(bitmap,0xff,cliprect);
-	if (layers_ctrl & 1)	draw_sprites(machine, bitmap, cliprect, spriteram16,   0);
-	if (layers_ctrl & 2)	draw_sprites(machine, bitmap, cliprect, spriteram16_2, 1);
+	if (layers_ctrl & 1)	draw_sprites(screen->machine, bitmap, cliprect, spriteram16,   0);
+	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap, cliprect, spriteram16_2, 1);
 	return 0;
 }

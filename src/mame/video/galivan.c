@@ -399,9 +399,9 @@ VIDEO_UPDATE( galivan )
 	if (layers & 0x20) {
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,1,0);
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 	} else {
-		draw_sprites(machine,bitmap,cliprect);
+		draw_sprites(screen->machine,bitmap,cliprect);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,1,0);
 	}
@@ -420,7 +420,7 @@ VIDEO_UPDATE( ninjemak )
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
-	draw_sprites(machine,bitmap,cliprect);
+	draw_sprites(screen->machine,bitmap,cliprect);
 
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

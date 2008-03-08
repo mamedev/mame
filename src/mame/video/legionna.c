@@ -357,7 +357,7 @@ if (input_code_pressed_once (KEYCODE_Z))
 
 //  if ((legionna_enable&1)!=1)
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);	/* wrong color? */
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);	/* wrong color? */
 
 #if LAYER_DB
 	if (dislayer[2]==0)
@@ -369,14 +369,14 @@ if (input_code_pressed_once (KEYCODE_Z))
 #endif
 	tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
-	draw_sprites(machine, bitmap,cliprect,3);
+	draw_sprites(screen->machine, bitmap,cliprect,3);
 #if LAYER_DB
 	if (dislayer[0]==0)
 #endif
 	tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect,2);
-	draw_sprites(machine,bitmap,cliprect,1);
-	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 #if LAYER_DB
 	if (dislayer[4]==0)
@@ -398,15 +398,15 @@ VIDEO_UPDATE( godzilla )
 	tilemap_set_scrollx( foreground_layer, 0, legionna_scrollram16[4] );
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,2);
 	tilemap_draw(bitmap,cliprect,midground_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect,0);
-	draw_sprites(machine,bitmap,cliprect,3);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,3);
 	tilemap_draw(bitmap,cliprect,text_layer,0,0);
 
 	return 0;
@@ -424,23 +424,23 @@ VIDEO_UPDATE( sdgndmrb )
   	tilemap_set_scrollx( text_layer, 0,  legionna_scrollram16[6] );
   	tilemap_set_scrolly( text_layer, 0,  legionna_scrollram16[7] );
 
-	fillbitmap(bitmap,get_black_pen(machine),cliprect);
+	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 
 	if(!(sdgndmrb_pri_n & 1))
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
-	draw_sprites(machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,2);
 
 	if(!(sdgndmrb_pri_n & 2))
 		tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
-	draw_sprites(machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
 
 	if(!(sdgndmrb_pri_n & 4))
 		tilemap_draw(bitmap,cliprect,foreground_layer,0,0);
 
-	draw_sprites(machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
 
-	draw_sprites(machine,bitmap,cliprect,3);
+	draw_sprites(screen->machine,bitmap,cliprect,3);
 
 	if(!(sdgndmrb_pri_n & 8))
 		tilemap_draw(bitmap,cliprect,text_layer,0,0);

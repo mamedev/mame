@@ -69,7 +69,7 @@ static VIDEO_UPDATE(intrscti)
 	int y,x;
 	int count;
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	count = 0;
 	for (y=0;y<64;y++)
@@ -78,7 +78,7 @@ static VIDEO_UPDATE(intrscti)
 		{
 			int dat;
 			dat = intrscti_ram[count];
-			drawgfx(bitmap,machine->gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
+			drawgfx(bitmap,screen->machine->gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_PEN,0);
 			count++;
 		}
 	}

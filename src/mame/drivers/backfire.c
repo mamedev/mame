@@ -178,7 +178,7 @@ static VIDEO_UPDATE(backfire)
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
-	if (screen==0)
+	if (scrnum==0)
 	{
 
 		fillbitmap(priority_bitmap,0,NULL);
@@ -188,20 +188,20 @@ static VIDEO_UPDATE(backfire)
 		{
 			deco16_tilemap_3_draw(bitmap,cliprect,0,1);
 			deco16_tilemap_1_draw(bitmap,cliprect,0,2);
-			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_1,3);
+			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else if (backfire_left_priority[0] == 2)
 		{
 			deco16_tilemap_1_draw(bitmap,cliprect,0,2);
 			deco16_tilemap_3_draw(bitmap,cliprect,0,4);
-			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_1,3);
+			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else
 		{
 			popmessage( "unknown left priority %08x", backfire_left_priority[0] );
 		}
 	}
-	else if (screen==1)
+	else if (scrnum==1)
 	{
 		fillbitmap(priority_bitmap,0,NULL);
 		fillbitmap(bitmap,0x500,cliprect);
@@ -210,13 +210,13 @@ static VIDEO_UPDATE(backfire)
 		{
 			deco16_tilemap_4_draw(bitmap,cliprect,0,1);
 			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
-			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_2,4);
+			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else if (backfire_right_priority[0] == 2)
 		{
 			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 			deco16_tilemap_4_draw(bitmap,cliprect,0,4);
-			draw_sprites(machine,bitmap,cliprect,backfire_spriteram32_2,4);
+			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else
 		{

@@ -142,17 +142,17 @@ VIDEO_UPDATE( momoko )
 					py = 248-(8*y+dy+9);
 				}
 
-				drawgfx(bitmap,machine->gfx[1],
+				drawgfx(bitmap,screen->machine->gfx[1],
 					chr,
 					col,
 					flip,flip,
 					px,py,
-					&machine->screen[0].visarea,TRANSPARENCY_NONE,0);
+					cliprect,TRANSPARENCY_NONE,0);
 			}
 		}
 	}
 	else
-	fillbitmap(bitmap, 256, 0);
+	fillbitmap(bitmap, 256, cliprect);
 
 
 /* draw sprites (momoko) */
@@ -177,12 +177,12 @@ VIDEO_UPDATE( momoko )
 			py = y+1;
 		}
 
-		drawgfx(bitmap,machine->gfx[3],
+		drawgfx(bitmap,screen->machine->gfx[3],
 			chr,
 			col,
 			!fx,fy,
 			px,py,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -241,12 +241,12 @@ VIDEO_UPDATE( momoko )
 			px = 248-x;
 			py = y+1;
 		}
-		drawgfx(bitmap,machine->gfx[3],
+		drawgfx(bitmap,screen->machine->gfx[3],
 			chr,
 			col,
 			!fx,fy,
 			px,py,
-			&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+			cliprect,TRANSPARENCY_PEN,0);
 	}
 
 
@@ -276,12 +276,12 @@ VIDEO_UPDATE( momoko )
 				px = 248-x*8;
 				py = 255-y;
 			}
-			drawgfx(bitmap,machine->gfx[0],
+			drawgfx(bitmap,screen->machine->gfx[0],
 				videoram[(sy>>3)*32+x]*8+dy,
 				col,
 				flip,0,
 				px,py,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 		}
 	}
 
@@ -311,12 +311,12 @@ VIDEO_UPDATE( momoko )
 					px = 248-(8*x+dx-8);
 					py = 248-(8*y+dy+9);
 				}
-				drawgfx(bitmap,machine->gfx[2],
+				drawgfx(bitmap,screen->machine->gfx[2],
 					chr,
 					0, /* color */
 					flip,flip, /* flip */
 					px,py,
-					&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+					cliprect,TRANSPARENCY_PEN,0);
 			}
 		}
 	}

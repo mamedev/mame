@@ -183,7 +183,7 @@ VIDEO_UPDATE( holeland )
 {
 /*tilemap_mark_all_tiles_dirty(bg_tilemap); */
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER1,0);
-	holeland_draw_sprites(machine, bitmap,cliprect);
+	holeland_draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }
@@ -191,6 +191,6 @@ VIDEO_UPDATE( holeland )
 VIDEO_UPDATE( crzrally )
 {
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	crzrally_draw_sprites(machine, bitmap,cliprect);
+	crzrally_draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

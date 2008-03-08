@@ -512,7 +512,7 @@ VIDEO_UPDATE( polepos )
 	clip.max_y = 127;
 	tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
 	draw_road(bitmap);
-	draw_sprites(machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 /* following code should be enabled only in a debug build */
 /* original arcade doesn't work in this way */

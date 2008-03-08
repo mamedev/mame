@@ -144,11 +144,11 @@ VIDEO_UPDATE( foodf )
 		int vflip = (data1 >> 14) & 1;
 		int pri = (data1 >> 13) & 1;
 
-		pdrawgfx(bitmap, machine->gfx[1], pict, color, hflip, vflip,
+		pdrawgfx(bitmap, screen->machine->gfx[1], pict, color, hflip, vflip,
 				xpos, ypos, cliprect, TRANSPARENCY_PEN, 0, pri * 2);
 
 		/* draw again with wraparound (needed to get the end of level animation right) */
-		pdrawgfx(bitmap, machine->gfx[1], pict, color, hflip, vflip,
+		pdrawgfx(bitmap, screen->machine->gfx[1], pict, color, hflip, vflip,
 				xpos - 256, ypos, cliprect, TRANSPARENCY_PEN, 0, pri * 2);
 	}
 

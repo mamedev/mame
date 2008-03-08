@@ -492,12 +492,12 @@ VIDEO_UPDATE( ms32 )
 
 
 	/* priority hack, we really need to figure out what priority ram is I think */
-	if (!strcmp(machine->gamedrv->name,"hayaosi3"))
+	if (!strcmp(screen->machine->gamedrv->name,"hayaosi3"))
 	{
 		tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
 		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
 		draw_roz(bitmap,cliprect,4); // this question text needs to appear over the sprites
-		draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
+		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x40000);
 
 	}
 	else
@@ -505,7 +505,7 @@ VIDEO_UPDATE( ms32 )
 		tilemap_draw(bitmap,cliprect,ms32_bg_tilemap,0,1);
 		draw_roz(bitmap,cliprect,2);
 		tilemap_draw(bitmap,cliprect,ms32_tx_tilemap,0,4);
-		draw_sprites(machine,bitmap,cliprect, ms32_spram, 0x40000);
+		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x40000);
 	}
 
 

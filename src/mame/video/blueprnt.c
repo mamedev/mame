@@ -122,9 +122,9 @@ VIDEO_UPDATE( blueprnt )
 		for (i = 0; i < 32; i++)
 			tilemap_set_scrolly(bg_tilemap, i, blueprnt_scrollram[30 - i]);
 
-	fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	draw_sprites(machine,bitmap, cliprect);
+	draw_sprites(screen->machine,bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
 	return 0;
 }

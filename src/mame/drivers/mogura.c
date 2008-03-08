@@ -62,17 +62,17 @@ static VIDEO_UPDATE( mogura )
 {
 	/* tilemap layout is a bit strange ... */
 	rectangle clip;
-	clip.min_x = machine->screen[0].visarea.min_x;
+	clip.min_x = screen->machine->screen[0].visarea.min_x;
 	clip.max_x = 256-1;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_y = screen->machine->screen[0].visarea.min_y;
+	clip.max_y = screen->machine->screen[0].visarea.max_y;
 	tilemap_set_scrollx(mogura_tilemap,0, 256);
 	tilemap_draw(bitmap,&clip,mogura_tilemap,0,0);
 
 	clip.min_x = 256;
 	clip.max_x = 512-1;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_y = screen->machine->screen[0].visarea.min_y;
+	clip.max_y = screen->machine->screen[0].visarea.max_y;
 	tilemap_set_scrollx(mogura_tilemap,0, -128);
 	tilemap_draw(bitmap,&clip,mogura_tilemap,0,0);
 
