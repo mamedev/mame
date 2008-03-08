@@ -583,8 +583,6 @@ Notes:
   NMI before clearing RAM, but the NMI handler doesn't save the registers, so it cannot
   interrupt program execution. If the NMI happens before the LDIR that clears RAM has
   finished, the program will crash.
-  To prevent this, I had to use a custom interrupt_gen, timing NMI generation
-  appropriately.
 
 - galaga: there were "fast shoot" hacks available, which are not supported.
   Their effects can be replicated with this line in cheat.dat:
@@ -697,7 +695,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atari_vg.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"
@@ -710,12 +707,10 @@ TODO:
 #include "nam_cust.h"
 
 
-static INTERRUPT_GEN( galaga_cpu3_nmi )
-{
-	/* see notes at the top of the driver */
-	if (cpu_getiloops() & 1)
-		nmi_line_pulse(machine, cpunum);
-}
+
+static emu_timer *cpu3_interrupt_timer;
+
+
 
 static READ8_HANDLER( bosco_dsw_r )
 {
@@ -747,13 +742,13 @@ static WRITE8_HANDLER( bosco_latch_w )
 		case 0x00:	/* IRQ1 */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
@@ -761,8 +756,8 @@ static WRITE8_HANDLER( bosco_latch_w )
 			break;
 
 		case 0x03:	/* RESET */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -808,6 +803,28 @@ static const struct namcoio_interface intf1 =
 };
 
 
+static TIMER_CALLBACK( cpu3_interrupt_callback )
+{
+	int scanline = param;
+
+	nmi_line_pulse(machine, 2);
+
+	scanline = scanline + 128;
+	if (scanline >= 272)
+		scanline = 64;
+
+	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+}
+
+
+static MACHINE_START( galaga )
+{
+	/* create the interrupt timer */
+	cpu3_interrupt_timer = timer_alloc(cpu3_interrupt_callback, NULL);
+}
+
+
 static MACHINE_RESET( bosco )
 {
 	int i;
@@ -827,6 +844,8 @@ static MACHINE_RESET( bosco )
 		NAMCOIO_52XX, NULL,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL);
+
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
 }
 
 static MACHINE_RESET( galaga )
@@ -842,6 +861,8 @@ static MACHINE_RESET( galaga )
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_54XX, NULL);
+
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
 }
 
 static MACHINE_RESET( xevious )
@@ -857,6 +878,8 @@ static MACHINE_RESET( xevious )
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_50XX, NULL,
 		NAMCOIO_54XX, NULL);
+
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
 }
 
 static MACHINE_RESET( battles )
@@ -868,6 +891,8 @@ static MACHINE_RESET( battles )
 		bosco_latch_w(machine,i,0);
 
 	battles_customio_init();
+
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
 }
 
 static MACHINE_RESET( digdug )
@@ -883,6 +908,8 @@ static MACHINE_RESET( digdug )
 		NAMCOIO_53XX_DIGDUG, &intf1,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL);
+
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
 }
 
 
@@ -1629,7 +1656,6 @@ static MACHINE_DRIVER_START( bosco )
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,2)	/* 64V */
 
 	MDRV_CPU_ADD_TAG(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
@@ -1649,6 +1675,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(bosco)
 
 	/* video hardware */
@@ -1656,7 +1683,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 32*8)
+	MDRV_SCREEN_SIZE(36*8, 272)		/* guess */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(bosco)
@@ -1698,7 +1725,6 @@ static MACHINE_DRIVER_START( galaga )
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(galaga_cpu3_nmi,4)	/* 64V (see notes at the top of the driver) */
 
 	MDRV_CPU_ADD_TAG(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
@@ -1708,6 +1734,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(galaga)
 
 	/* video hardware */
@@ -1715,7 +1742,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
+	MDRV_SCREEN_SIZE(36*8, 272)		/* guess */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(galaga)
@@ -1767,7 +1794,6 @@ static MACHINE_DRIVER_START( xevious )
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,2)	/* 64V */
 
 	MDRV_CPU_ADD_TAG(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
@@ -1782,6 +1808,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 	MDRV_INTERLEAVE(1000)	/* 1000 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(xevious)
 
 	/* video hardware */
@@ -1789,7 +1816,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
+	MDRV_SCREEN_SIZE(36*8, 272)		/* guess */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(xevious)
@@ -1851,10 +1878,10 @@ static MACHINE_DRIVER_START( digdug )
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,2)	/* 64V */
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
+	MDRV_MACHINE_START(galaga)
 	MDRV_MACHINE_RESET(digdug)
 	MDRV_NVRAM_HANDLER(atari_vg)
 
@@ -1863,7 +1890,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_SCREEN_REFRESH_RATE(60.606060)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
+	MDRV_SCREEN_SIZE(36*8, 272)		/* guess */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(digdug)
