@@ -34,6 +34,48 @@ Selection/Poker payout button: if pressed, all coins/credits are gone and added 
 payout bookkeeping, shown in the service mode under the coin in total. Last Winner shows
 the last payout. Payout hardware is unknown.
 
+Video Trivia sets (as stated from Greyhound Electronics, Inc. manual):
+
+Series 1: (128K)           Series 2: (128K)           Series 3: (128K)
+----------------           ----------------           ----------------
+Science                    T.V. Mash                  Beatlemania
+General I                  General II                 General III
+Sports I                   Sports II                  Sports III
+Music                      Comics                     Country-Western
+Movies-T.V.                Entertainment              T.V. Soaps
+
+
+Series 4: (128K)           Series 5: (128K)           Series 6: (128K)
+----------------           ----------------           ----------------
+History-Geography          The States                 Science II
+Star Trek                  James Bond                 General IV
+Baseball                   Hockey                     Commercials-Ads
+Hollywood                  Elvismania                 Honeymooners
+Television I               The Wild West              Television II
+
+
+Series 7: (128K)           Series 8: (256K)           * Starting with Series 8
+----------------           ----------------           "Announcement":
+T.V. Dallas                Science                    3 Times as many
+General V                  General                    questions in this
+Kids Korner                Sports                     series!
+Good Guys                  T.V./Entertainment
+Biblical                   Adult Sex
+                            or alt: Potpourri
+
+
+Series 9: (256K)           Series 10: (256K)          Series 11: (256K)
+----------------           -----------------          -----------------
+Facts                      New Science                Rich and Famous
+Rock-N-Roll                New General                Fast Women and Cars
+Television                 New T.V. Mash              Aerospace
+Artists-Athletes           New Entertainment          TV/Music Alternative
+U.S.A. Trivia              New Sports                 General Facts
+ or alt: Adult Sex 2        or alt: Adult Sex 3        or alt: Gay Times
+
+
+NOTE: Series 8 and above are version 1.03a (currently in findout.c)
+
 */
 
 #include "driver.h"
@@ -475,13 +517,15 @@ Contains:
  2 X2212P (Ram chips, no battery backup)
  DM7408N
 
+PCB labeled M075
+
 ****************************************************/
 
 ROM_START( jokpoker )
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
 	ROM_LOAD( "m075.1", 0x00000, 0x1000, CRC(ad42465b) SHA1(3f06847a9aecb0592f99419dba9be5f18005d57b) ) /* rom board UMV-1A */
 	ROM_LOAD( "m075.2", 0x01000, 0x1000, CRC(bd129fc2) SHA1(2e05ba34922c16d127be32941447013efea05bcd) )
-	ROM_LOAD( "m075.3", 0x02000, 0x1000, CRC(45725bc9) SHA1(9e6dcbec955ef8190f2307ddb367b24b7f34338d) ) /* Rom loads _ALL_WRONG_ */
+	ROM_LOAD( "m075.3", 0x02000, 0x1000, CRC(45725bc9) SHA1(9e6dcbec955ef8190f2307ddb367b24b7f34338d) )
 ROM_END
 
 /***************************************************
@@ -499,7 +543,7 @@ ROM_START( superbwl )
 	ROM_LOAD( "super_bowl.1", 0x00000, 0x1000, CRC(82edf064) SHA1(8a26377590282f51fb39d013452ba11252e7dd05) ) /* rom board UMV-1B */
 	ROM_LOAD( "super_bowl.2", 0x01000, 0x1000, CRC(2438dd1f) SHA1(26bbd1cb3d0d5b93f61b92ff95948ac9de060715) )
 	ROM_LOAD( "super_bowl.3", 0x02000, 0x1000, CRC(9b111430) SHA1(9aaa755f3e4b369477c1a0525c994a19fe0f6107) )
-	ROM_LOAD( "super_bowl.4", 0x03000, 0x1000, CRC(037cad42) SHA1(d4037a28bb49b31358b5d560e5e028d958ae2bc9) ) /* Rom loads _ALL_WRONG_ */
+	ROM_LOAD( "super_bowl.4", 0x03000, 0x1000, CRC(037cad42) SHA1(d4037a28bb49b31358b5d560e5e028d958ae2bc9) )
 ROM_END
 
 /***************************************************
@@ -512,100 +556,112 @@ Contains:
  SN74LS374
  MMI PAL10L8
 
-Note: Question roms that contain "#1" (or 2 ect) look
-      to be corrected roms (spelling or answers??)
+
+Sets will be listed by "series" - the program code version
+ is not as important as maintaining the correct questions
+ sets as per known series
+Missing sets will be filled as dumped, as question roms
+ are interchangable, operators did thier own swaps
+
+Note: Question roms that contain "#1" (or 2 ect)
+      are corrected roms (spelling and / or answers)
 
 ****************************************************/
 
-ROM_START( gt101c ) /* From 2 sets, using only unique question roms */
+ROM_START( gtsers1 ) /* Series 1 (Complete) */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
 	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
 	/* Question roms */
-	ROM_LOAD( "beatlemania",   0x10000, 0x4000, CRC(cb241960) SHA1(e560b776b2cb5fd29d1663fffdf68f4427d674a9) ) /* Dated 3/9 */
-	ROM_LOAD( "country-west",  0x14000, 0x4000, CRC(3227c475) SHA1(d07ad4876122223fe7ab3f21781e0d847332ea5c) ) /* Dated 3/9 */
-	ROM_LOAD( "james_bond",    0x18000, 0x4000, CRC(fe9fadfd) SHA1(44b3fee1f14148f47b0b40600aabd5bff9b65e85) ) /* Dated 5/9 */
-	ROM_LOAD( "television_#1", 0x1c000, 0x4000, CRC(0f646389) SHA1(23fefe2e6cc26767d52604e7ab15bb4db99a6e94) ) /* Dated 4/9 */
-	/* Question roms that matched gt102 sets:
-    star_trek      (dated 4/9)
-    tv_soaps       (dated 3/9)
-    sports_3       (dated 3/9)
-    general_3      (dated 3/9)
-    beatlemania_#1 (dated 3/9)
-    */
+	ROM_LOAD( "science_#1",    0x10000, 0x4000, CRC(68259e09) SHA1(29e848b4744b767c51ff81a756fba7bf96daefec) )
+	ROM_LOAD( "general_#1",    0x14000, 0x4000, CRC(25a0ef9d) SHA1(793abd779cc237e14933933747bbf27bbcbfcd32) )
+	ROM_LOAD( "sports_#1",     0x18000, 0x4000, CRC(cb1744f5) SHA1(ea3f7bfcecf5c58c26aa0f34908ba5d54f7279ec) )
+	ROM_LOAD( "music_#1",      0x1c000, 0x4000, CRC(1b546857) SHA1(31e04bb5016e8ef6dc48f9b3ddaeab5fe04f91c2) )
+	ROM_LOAD( "movies-tv_#1",  0x20000, 0x4000, CRC(e9a55dad) SHA1(c87682e72bad3507b24eb6a52b4e430e0bfcdab6) )
 ROM_END
 
-ROM_START( gt101c1 )
+ROM_START( gtsers2 ) /* Series 2 (Complete - question roms dated 2/9) */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
 	ROM_LOAD( "prog101c_right", 0x00000, 0x2000, CRC(767f0e46) SHA1(5de7b54876fcbfb2328174ffe6b656ffea886fcb) ) /* rom board UMV 10 B */
 	ROM_LOAD( "prog101c_left",  0x0a000, 0x2000, CRC(24c0a097) SHA1(b8de58baecb92775e0882cd6eca3b9e07cf7c5a5) )
 	/* Question roms */
-	ROM_LOAD( "sex_triv",             0x10000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) /* Dated 7/9 */
-	ROM_LOAD( "sports_3_#3",          0x14000, 0x4000, CRC(b22cec38) SHA1(a416c3de9749fda3ab5ae5841304da0cef900cbf) ) /* Dated 3/9 */
-	ROM_LOAD( "entertainment_#1_old", 0x18000, 0x4000, CRC(2bffb3b4) SHA1(5947ebd708df35cefa86608392909c16b25d0710) ) /* Spells "Acapella" as "Cappella" */
-	/* Question roms that matched gt102 sets:
-    sports_2_#2    (dated 2/9)
-    general_#1     (not dated)
-    */
+	ROM_LOAD( "tv_mash",          0x10000, 0x4000, CRC(a86990fc) SHA1(6a11b038d48bb97feb4857546349ed93ea1f9273) )
+	ROM_LOAD( "general_2",        0x14000, 0x4000, CRC(5798f2b3) SHA1(0636017969d9b1eac5d33cfb18cb36f7cf4cba88) )
+	ROM_LOAD( "sports_2_#2",      0x18000, 0x4000, CRC(fb632622) SHA1(c14d8178f5cfc5994e2ab4f829e353fa75b57304) )
+	ROM_LOAD( "comics_#1",        0x1c000, 0x4000, CRC(8c5cd561) SHA1(1ca566acf72ce636b1b34ee6b7cafb9584340bcc) )
+	ROM_LOAD( "entertainment_#1", 0x20000, 0x4000, CRC(cd3ce4c7) SHA1(4bd121fa5899a96b015605f84179ed82be0a25f3) ) /* Correct spelling of "Acapella" */
 ROM_END
 
-ROM_START( gt102c )
+ROM_START( gtsers3 ) /* Series 3 (Complete - question roms dated 3/9) */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
-	ROM_LOAD( "prog2_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
-	ROM_LOAD( "prog2_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
+	ROM_LOAD( "prog102b_right",   0x00000, 0x2000, CRC(e8391f71) SHA1(a955eff87d622d4fcfd25f6d888c48ff82556879) )
+	ROM_LOAD( "prog102b_left",    0x0a000, 0x2000, CRC(cc7b45a7) SHA1(c708f56feb36c1241358a42bb7dce25b799f1f0b) )
 	/* Question roms */
-	ROM_LOAD( "star_trek",    0x10000, 0x4000, CRC(19764e00) SHA1(d7ed577dba02776ac58e8f34b833ed07679c0af1) ) /* Dated 4/9 */
-	ROM_LOAD( "television",   0x14000, 0x4000, CRC(413f34c8) SHA1(318f6b464449bf3f0c43c4210a667190c774eb67) )
-	ROM_LOAD( "tv_soaps",     0x18000, 0x4000, CRC(26914f3a) SHA1(aec380cea14d6acb71986f3d65c7620b16c174ae) ) /* Dated 3/9 */
-	ROM_LOAD( "tv_mash",      0x1c000, 0x4000, CRC(a86990fc) SHA1(6a11b038d48bb97feb4857546349ed93ea1f9273) )
-	ROM_LOAD( "movies-tv_#1", 0x20000, 0x4000, CRC(e9a55dad) SHA1(c87682e72bad3507b24eb6a52b4e430e0bfcdab6) )
+	ROM_LOAD( "beatlemania_#1", 0x10000, 0x4000, CRC(c35ab539) SHA1(aa7c9b532aeb289b71c179e6ff1cc5b63dbe240c) )
+	ROM_LOAD( "general_3",      0x14000, 0x4000, CRC(a60f17a4) SHA1(0d79be9e2e49b9817e94d410e25bb6dcda10aa9e) )
+	ROM_LOAD( "sports_3_#3",    0x18000, 0x4000, CRC(b22cec38) SHA1(a416c3de9749fda3ab5ae5841304da0cef900cbf) )
+	ROM_LOAD( "country-west",   0x1c000, 0x4000, CRC(3227c475) SHA1(d07ad4876122223fe7ab3f21781e0d847332ea5c) )
+	ROM_LOAD( "tv_soaps",       0x20000, 0x4000, CRC(26914f3a) SHA1(aec380cea14d6acb71986f3d65c7620b16c174ae) )
 ROM_END
 
-ROM_START( gt102b )
+ROM_START( gtsers4 ) /* Series 4 (Incomplete - question roms dated 4/9) */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
-	ROM_LOAD( "trivb2.bin",   0x00000, 0x2000, CRC(e8391f71) SHA1(a955eff87d622d4fcfd25f6d888c48ff82556879) )
-	ROM_LOAD( "trivb1.bin",   0x0a000, 0x2000, CRC(cc7b45a7) SHA1(c708f56feb36c1241358a42bb7dce25b799f1f0b) )
+	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
+	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
-	ROM_LOAD( "comics_#1",     0x10000, 0x4000, CRC(8c5cd561) SHA1(1ca566acf72ce636b1b34ee6b7cafb9584340bcc) )
-	ROM_LOAD( "entertainment", 0x14000, 0x4000, CRC(b670b9e8) SHA1(0d2246fcc6c753694bc9bd1fc05ac439f24059ef) )
-	ROM_LOAD( "general_5",     0x18000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
-	ROM_LOAD( "hockey",        0x1c000, 0x4000, CRC(4874a431) SHA1(f3c11dfbf71d101aa1a6cd3622b282a4ebe4664b) )
-	ROM_LOAD( "sports",        0x20000, 0x4000, CRC(9b4a17b6) SHA1(1b5358b5bc83c2817ecfa4e277fa351a679d5023) )
+	ROM_LOAD( "history-geog",   0x10000, 0x4000, CRC(76d6b026) SHA1(613809b247cb27773631a1bb34af485c2b1bd486) )
+	ROM_LOAD( "star_trek",      0x14000, 0x4000, CRC(19764e00) SHA1(d7ed577dba02776ac58e8f34b833ed07679c0af1) )
+	ROM_LOAD( "television_#1",  0x18000, 0x4000, CRC(0f646389) SHA1(23fefe2e6cc26767d52604e7ab15bb4db99a6e94) )
+	/* Missing "baseball" */
+	/* Missing "hollywood" */
 ROM_END
 
-ROM_START( gt102c1 )
+ROM_START( gtsers5 ) /* Series 5 (Incomplete - question roms dated 5/9) */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
-	ROM_LOAD( "prog2_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
-	ROM_LOAD( "prog2_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
+	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
+	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
-	ROM_LOAD( "entertainment_#1", 0x10000, 0x4000, CRC(cd3ce4c7) SHA1(4bd121fa5899a96b015605f84179ed82be0a25f3) ) /* Correct spelling of "Acapella" */
-	ROM_LOAD( "facts_of_life",    0x14000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) )
-	ROM_LOAD( "sports_#1",        0x18000, 0x4000, CRC(cb1744f5) SHA1(ea3f7bfcecf5c58c26aa0f34908ba5d54f7279ec) )
-	ROM_LOAD( "sports_2",         0x1c000, 0x4000, CRC(e8f8e168) SHA1(d2bc57dc0799dd8817b15857f17c4d7ee4d9f932) )
-	ROM_LOAD( "sports_3",         0x20000, 0x4000, CRC(5986996c) SHA1(56432c15a3b0204ed527c18e24716f17bb52dc4e) ) /* Dated 3/9 */
+	ROM_LOAD( "james_bond",    0x10000, 0x4000, CRC(fe9fadfd) SHA1(44b3fee1f14148f47b0b40600aabd5bff9b65e85) )
+	ROM_LOAD( "hockey",        0x14000, 0x4000, CRC(4874a431) SHA1(f3c11dfbf71d101aa1a6cd3622b282a4ebe4664b) )
+	/* Missing "the_states" */
+	/* Missing "wild_west" */
+	/* Missing "elvismania" */
 ROM_END
 
-ROM_START( gt102c2 )
+ROM_START( gtsers7 ) /* Series 7 (Incomplete - question roms dated 7/9?) */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
-	ROM_LOAD( "prog2_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
-	ROM_LOAD( "prog2_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
+	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
+	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
-	ROM_LOAD( "comics",         0x10000, 0x4000, CRC(7efdfe8f) SHA1(ec255777c61677ca32c49b9da5e85e07c0647e5f) )
-	ROM_LOAD( "history-geog",   0x14000, 0x4000, CRC(76d6b026) SHA1(613809b247cb27773631a1bb34af485c2b1bd486) )
-	ROM_LOAD( "science_#1",     0x18000, 0x4000, CRC(68259e09) SHA1(29e848b4744b767c51ff81a756fba7bf96daefec) )
-	ROM_LOAD( "music_#1",       0x1c000, 0x4000, CRC(1b546857) SHA1(31e04bb5016e8ef6dc48f9b3ddaeab5fe04f91c2) )
-	ROM_LOAD( "beatlemania_#1", 0x20000, 0x4000, CRC(c35ab539) SHA1(aa7c9b532aeb289b71c179e6ff1cc5b63dbe240c) ) /* Dated 3/9 */
+	ROM_LOAD( "general_5",     0x10000, 0x4000, CRC(81bf07c7) SHA1(a53f050b4ef8ffc0499b50224d4bbed4af0ca09c) )
+	/* Missing "tv_dallas" */
+	/* Missing "kids_korner" */
+	/* Missing "good_guys" */
+	/* Missing "biblical" */
 ROM_END
 
-ROM_START( gt102c3 )
+ROM_START( gtsersa ) /* alt or older version questions */
 	ROM_REGION( 0x24000, REGION_CPU1, 0 )
-	ROM_LOAD( "prog2_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
-	ROM_LOAD( "prog2_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
+	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
+	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
 	/* Question roms */
-	ROM_LOAD( "general_#1",    0x10000, 0x4000, CRC(25a0ef9d) SHA1(793abd779cc237e14933933747bbf27bbcbfcd32) )
-	ROM_LOAD( "general_2",     0x14000, 0x4000, CRC(5798f2b3) SHA1(0636017969d9b1eac5d33cfb18cb36f7cf4cba88) )
-	ROM_LOAD( "general_3",     0x18000, 0x4000, CRC(a60f17a4) SHA1(0d79be9e2e49b9817e94d410e25bb6dcda10aa9e) ) /* Dated 3/9 */
-	ROM_LOAD( "sports_2_#2",   0x1c000, 0x4000, CRC(fb632622) SHA1(c14d8178f5cfc5994e2ab4f829e353fa75b57304) ) /* Dated 2/9 */
+	ROM_LOAD( "sports",               0x10000, 0x4000, CRC(9b4a17b6) SHA1(1b5358b5bc83c2817ecfa4e277fa351a679d5023) ) /* Series 1 question */
+	ROM_LOAD( "entertainment_#1_old", 0x14000, 0x4000, CRC(2bffb3b4) SHA1(5947ebd708df35cefa86608392909c16b25d0710) ) /* Dated 2/9 - Spells "Acapella" as "Cappella" */
+	ROM_LOAD( "sports_2",             0x18000, 0x4000, CRC(e8f8e168) SHA1(d2bc57dc0799dd8817b15857f17c4d7ee4d9f932) ) /* Dated 2/9 */
+	ROM_LOAD( "comics",               0x1c000, 0x4000, CRC(7efdfe8f) SHA1(ec255777c61677ca32c49b9da5e85e07c0647e5f) ) /* Dated 2/9 */
+	ROM_LOAD( "entertainment",        0x20000, 0x4000, CRC(b670b9e8) SHA1(0d2246fcc6c753694bc9bd1fc05ac439f24059ef) ) /* Dated 2/9 */
+ROM_END
+
+ROM_START( gtsersb ) /* alt or older version questions */
+	ROM_REGION( 0x24000, REGION_CPU1, 0 )
+	ROM_LOAD( "prog102c_right", 0x00000, 0x2000, CRC(76fdc3a3) SHA1(212e09644b9cab334aad22ec5860e8638c6ba3fa) )
+	ROM_LOAD( "prog102c_left",  0x0a000, 0x2000, CRC(901fb2f9) SHA1(98e49c74d89c4911a1f4d5ccf3e6cf3226c6a178) )
+	/* Question roms */
+	ROM_LOAD( "beatlemania",    0x10000, 0x4000, CRC(cb241960) SHA1(e560b776b2cb5fd29d1663fffdf68f4427d674a9) ) /* Dated 3/9 */
+	ROM_LOAD( "sports_3",       0x14000, 0x4000, CRC(5986996c) SHA1(56432c15a3b0204ed527c18e24716f17bb52dc4e) ) /* Dated 3/9 */
+	ROM_LOAD( "television",     0x18000, 0x4000, CRC(413f34c8) SHA1(318f6b464449bf3f0c43c4210a667190c774eb67) ) /* Dated 4/9 */
+	ROM_LOAD( "sex_triv",       0x1c000, 0x4000, CRC(cd0ce4e2) SHA1(2046ee3da94f00bf4a8b3fc62b1190d58e83cc89) ) /* Dated 7/9 - likely an alt series 7 question set */
+	ROM_LOAD( "facts_of_life",  0x20000, 0x4000, CRC(1668c7bf) SHA1(6bf43de26f8a626560579ab75fd0890fe00f99dd) ) /* Uknown series question set */
 ROM_END
 
 ROM_START( sextriv1 )
@@ -707,7 +763,7 @@ board (UVM 10 B/C) "sees" them as 27128 or the standard size of 2764.
 Dumped, but not known to be supported by any High/Control combo:
 ROM_LOAD( "rollingbones_am_3-16-84",  0x16000, 0x4000, CRC(41879e9b) SHA1(5106d5772bf43b28817e27efd16c785359cd929e) ) // Might work with IAM control, once it gets figured out
 
-The ICB set may also be known as the M105 set as some label sets included that name.
+The ICB set is known as the M105 set as some label sets included that name.
 
 */
 
@@ -766,19 +822,20 @@ GAME( 1982, superbwl, 0,        gselect,  gselect,  setbank, ROT0, "Greyhound El
 GAME( 1982, gs4002,   0,        gselect,  gselect,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 1)",     GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1982, gs4002a,  gs4002,   gselect,  gselect,  0,       ROT0, "Greyhound Electronics", "Selection (Version 40.02TMB, set 2)",     GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 
-GAME( 1982, amuse,  0,          amuse,    gepoker,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1982, amuse,    0,        amuse,    gepoker,  0,       ROT0, "Greyhound Electronics", "Amuse (Version 50.08 IBA)",               GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1984, gepoker,  0,        gepoker,  gepoker,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gepoker1, gepoker,  gepoker,  gepoker,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1984, gepoker2, gepoker,  gepoker,  gepoker,  0,       ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 
-GAME( 1984, gt102c,   0,        getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.02C)",                  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt102b,   gt102c,   getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.02B)",                  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt101c,   gt102c,   getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.01C)",                  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt101c1,  gt102c,   getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.01C, Alt questions 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt102c1,  gt102c,   getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.02C, Alt questions 1)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt102c2,  gt102c,   getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.02C, Alt questions 2)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
-GAME( 1984, gt102c3,  gt102c,   getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Version 1.02C, Alt questions 3)", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers1,  0,        getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers2,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 2)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers3,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 3)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers4,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 4)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers5,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 5)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsers7,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Questions Series 7)",             GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsersa,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 1)",   GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1984, gtsersb,  gtsers1,  getrivia, getrivia, 0,       ROT0, "Greyhound Electronics", "Trivia (Alt revision questions set 2)",   GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 
 GAME( 1985, sextriv1, 0,        getrivia, sextriv1, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 1)",  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1985, sextriv2, sextriv1, getrivia, sextriv1, 0,       ROT0, "Kinky Kit and Game Co.", "Sexual Trivia (Version 1.02SB, set 2)",  GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )

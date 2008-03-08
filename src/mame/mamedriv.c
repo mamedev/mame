@@ -7580,19 +7580,20 @@ Other Sun games
 	DRIVER( quiz211 )	/* (c) 1986 Italian bootleg */
 	DRIVER( jokpoker )	/* (c) 1982 Greyhound Electronics */
 	DRIVER( superbwl )	/* (c) 1982 Greyhound Electronics */
-	DRIVER( amuse )	    /* (c) 1982 Greyhound Electronics */
+	DRIVER( amuse )		/* (c) 1982 Greyhound Electronics */
 	DRIVER( gs4002 )	/* (c) 1982 G.E.I. */
 	DRIVER( gs4002a )	/* (c) 1982 G.E.I. */
 	DRIVER( gepoker )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gepoker1 )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gepoker2 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt102c )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt102b )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt101c )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt101c1 )	/* (c) 1984 Greyhound Electronics */
-	DRIVER( gt102c1 )	/* (c) 1985 Greyhound Electronics */
-	DRIVER( gt102c2 )	/* (c) 1985 Greyhound Electronics */
-	DRIVER( gt102c3 )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsers1 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers2 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers3 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers4 )	/* (c) 1984 Greyhound Electronics */
+	DRIVER( gtsers5 )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsers7 )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsersa )	/* (c) 1985 Greyhound Electronics */
+	DRIVER( gtsersb )	/* (c) 1985 Greyhound Electronics */
 	DRIVER( sextriv1 )	/* (c) 1985 Kinky Kit and Game Co. */
 	DRIVER( sextriv2 )	/* (c) 1985 Kinky Kit and Game Co. */
 	DRIVER( dribling )	/* (c) 1983 Model Racing */
