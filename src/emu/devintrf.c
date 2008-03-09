@@ -183,6 +183,9 @@ int device_list_items(const device_config *listhead, device_type type)
 	const device_config *curdev;
 	int count = 0;
 
+	assert(listhead != NULL);
+	assert(type != NULL);
+
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		count += device_matches_type(curdev, type);
@@ -200,6 +203,9 @@ int device_list_items(const device_config *listhead, device_type type)
 const device_config *device_list_first(const device_config *listhead, device_type type)
 {
 	const device_config *curdev;
+
+	assert(listhead != NULL);
+	assert(type != NULL);
 
 	/* scan forward starting with the list head */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
@@ -221,6 +227,7 @@ const device_config *device_list_next(const device_config *prevdevice, device_ty
 	const device_config *curdev;
 
 	assert(prevdevice != NULL);
+	assert(type != NULL);
 
 	/* scan forward starting with the item after the previous one */
 	for (curdev = prevdevice->next; curdev != NULL; curdev = curdev->next)
@@ -240,6 +247,8 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 {
 	const device_config *curdev;
 
+	assert(listhead != NULL);
+	assert(type != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
@@ -263,6 +272,10 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 	const device_config *curdev;
 	int index = 0;
 
+	assert(listhead != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (device_matches_type(curdev, type))
@@ -284,6 +297,10 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 const device_config *device_list_find_by_index(const device_config *listhead, device_type type, int index)
 {
 	const device_config *curdev;
+
+	assert(listhead != NULL);
+	assert(type != NULL);
+	assert(index >= 0);
 
 	/* find the device in the list */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
@@ -310,6 +327,8 @@ int device_list_class_items(const device_config *listhead, device_class class)
 	const device_config *curdev;
 	int count = 0;
 
+	assert(listhead != NULL);
+
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		count += (curdev->class == class);
@@ -326,6 +345,8 @@ int device_list_class_items(const device_config *listhead, device_class class)
 const device_config *device_list_class_first(const device_config *listhead, device_class class)
 {
 	const device_config *curdev;
+
+	assert(listhead != NULL);
 
 	/* scan forward starting with the list head */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
@@ -365,6 +386,7 @@ const device_config *device_list_class_find_by_tag(const device_config *listhead
 {
 	const device_config *curdev;
 
+	assert(listhead != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
@@ -386,6 +408,9 @@ int device_list_class_index(const device_config *listhead, device_class class, c
 {
 	const device_config *curdev;
 	int index = 0;
+
+	assert(listhead != NULL);
+	assert(tag != NULL);
 
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
@@ -410,6 +435,9 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 {
 	const device_config *curdev;
 
+	assert(listhead != NULL);
+	assert(index >= 0);
+
 	/* find the device in the list */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		if (curdev->class == class && index-- == 0)
@@ -433,6 +461,8 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 void device_list_start(running_machine *machine)
 {
 	device_config *device;
+
+	assert(machine != NULL);
 
 	/* add an exit callback for cleanup */
 	add_reset_callback(machine, device_list_reset);
@@ -466,6 +496,8 @@ static void device_list_stop(running_machine *machine)
 {
 	device_config *device;
 
+	assert(machine != NULL);
+
 	/* iterate over devices and stop them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
@@ -492,6 +524,8 @@ static void device_list_reset(running_machine *machine)
 {
 	const device_config *device;
 
+	assert(machine != NULL);
+
 	/* iterate over devices and stop them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 		device_reset(device);
@@ -505,6 +539,7 @@ static void device_list_reset(running_machine *machine)
 
 void device_reset(const device_config *device)
 {
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 
@@ -516,7 +551,13 @@ void device_reset(const device_config *device)
 
 void devtag_reset(running_machine *machine, device_type type, const char *tag)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_reset failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	device_reset(device);
@@ -535,7 +576,13 @@ void devtag_reset(running_machine *machine, device_type type, const char *tag)
 
 void *devtag_get_token(running_machine *machine, device_type type, const char *tag)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_get_token failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device->token;
@@ -550,7 +597,13 @@ void *devtag_get_token(running_machine *machine, device_type type, const char *t
 
 const void *devtag_get_static_config(running_machine *machine, device_type type, const char *tag)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_get_static_config failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device->static_config;
@@ -565,7 +618,13 @@ const void *devtag_get_static_config(running_machine *machine, device_type type,
 
 const void *devtag_get_inline_config(running_machine *machine, device_type type, const char *tag)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_get_inline_config failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device->inline_config;
@@ -581,6 +640,7 @@ INT64 device_get_info_int(const device_config *device, UINT32 state)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
@@ -594,7 +654,14 @@ INT64 device_get_info_int(const device_config *device, UINT32 state)
 
 INT64 devtag_get_info_int(running_machine *machine, device_type type, const char *tag, UINT32 state)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_get_info_int failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device_get_info_int(device, state);
@@ -610,6 +677,7 @@ void *device_get_info_ptr(const device_config *device, UINT32 state)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
@@ -623,7 +691,14 @@ void *device_get_info_ptr(const device_config *device, UINT32 state)
 
 void *devtag_get_info_ptr(running_machine *machine, device_type type, const char *tag, UINT32 state)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_get_info_ptr failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device_get_info_ptr(device, state);
@@ -639,6 +714,7 @@ genf *device_get_info_fct(const device_config *device, UINT32 state)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
@@ -652,7 +728,14 @@ genf *device_get_info_fct(const device_config *device, UINT32 state)
 
 genf *devtag_get_info_fct(running_machine *machine, device_type type, const char *tag, UINT32 state)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("device_get_info_fct failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device_get_info_fct(device, state);
@@ -668,6 +751,7 @@ const char *device_get_info_string(const device_config *device, UINT32 state)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
@@ -681,7 +765,14 @@ const char *device_get_info_string(const device_config *device, UINT32 state)
 
 const char *devtag_get_info_string(running_machine *machine, device_type type, const char *tag, UINT32 state)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("device_get_info_string failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	return device_get_info_string(device, state);
@@ -747,6 +838,7 @@ void device_set_info_int(const device_config *device, UINT32 state, INT64 data)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
@@ -759,7 +851,14 @@ void device_set_info_int(const device_config *device, UINT32 state, INT64 data)
 
 void devtag_set_info_int(running_machine *machine, device_type type, const char *tag, UINT32 state, INT64 data)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_set_info_int failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	device_set_info_int(device, state, data);
@@ -775,6 +874,7 @@ void device_set_info_ptr(const device_config *device, UINT32 state, void *data)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
@@ -787,7 +887,14 @@ void device_set_info_ptr(const device_config *device, UINT32 state, void *data)
 
 void devtag_set_info_ptr(running_machine *machine, device_type type, const char *tag, UINT32 state, void *data)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_set_info_ptr failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	device_set_info_ptr(device, state, data);
@@ -803,6 +910,7 @@ void device_set_info_fct(const device_config *device, UINT32 state, genf *data)
 {
 	deviceinfo info;
 
+	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_FCT_FIRST && state <= DEVINFO_FCT_LAST);
@@ -815,7 +923,14 @@ void device_set_info_fct(const device_config *device, UINT32 state, genf *data)
 
 void devtag_set_info_fct(running_machine *machine, device_type type, const char *tag, UINT32 state, genf *data)
 {
-	const device_config *device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+	assert(state >= DEVINFO_INT_FIRST && state <= DEVINFO_INT_LAST);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
 		fatalerror("devtag_set_info_fct failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
 	device_set_info_fct(device, state, data);
