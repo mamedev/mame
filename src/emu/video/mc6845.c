@@ -55,6 +55,7 @@ struct _mc6845_t
 {
 	int device_type;
 	const mc6845_interface *intf;
+	const device_config *screen;
 
 	/* register file */
 	UINT8	horiz_char_total;	/* 0x00 */
@@ -141,8 +142,7 @@ READ8_DEVICE_HANDLER( mc6845_status_r )
 	UINT8 ret = 0;
 
 	/* VBLANK bit */
-	if (supports_status_reg_d5[mc6845->device_type] &&
-	   (video_screen_get_vpos_scrnum(mc6845->intf->scrnum) > mc6845->max_visible_y))
+	if (supports_status_reg_d5[mc6845->device_type] && video_screen_get_vblank(mc6845->screen))
 	   ret = ret | 0x20;
 
 	/* light pen latched */
@@ -274,7 +274,7 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 				if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-				video_screen_configure_scrnum(mc6845->intf->scrnum, horiz_pix_total, vert_pix_total, &visarea, refresh);
+				video_screen_configure(mc6845->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
 
 				mc6845->has_valid_parameters = TRUE;
 			}
@@ -298,12 +298,9 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 }
 
 
-static int is_display_enabled(mc6845_t *mc6845)
+INLINE int is_display_enabled(mc6845_t *mc6845)
 {
-	UINT16 y = video_screen_get_vpos_scrnum(mc6845->intf->scrnum);
-	UINT16 x = video_screen_get_hpos_scrnum(mc6845->intf->scrnum);
-
-	return (y <= mc6845->max_visible_y) && (x <= mc6845->max_visible_x);
+	return !video_screen_get_vblank(mc6845->screen) && !video_screen_get_hblank(mc6845->screen);
 }
 
 
@@ -319,7 +316,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		if (is_display_enabled(mc6845))
 		{
 			/* normally, it's at end the current raster line */
-			next_y = video_screen_get_vpos_scrnum(mc6845->intf->scrnum);
+			next_y = video_screen_get_vpos(mc6845->screen);
 			next_x = mc6845->max_visible_x + 1;
 
 			/* but if visible width = horiz_pix_total, then we need
@@ -339,7 +336,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		else
 		{
 			next_x = 0;
-			next_y = (video_screen_get_vpos_scrnum(mc6845->intf->scrnum) + 1) % mc6845->vert_pix_total;
+			next_y = (video_screen_get_vpos(mc6845->screen) + 1) % mc6845->vert_pix_total;
 
 			/* if we would now fall in the vertical blanking, we need
                to go to the top of the screen */
@@ -348,7 +345,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 		}
 
 		if (next_y != -1)
-			duration = video_screen_get_time_until_pos_scrnum(mc6845->intf->scrnum, next_y, next_x);
+			duration = video_screen_get_time_until_pos(mc6845->screen, next_y, next_x);
 		else
 			duration = attotime_never;
 
@@ -364,19 +361,19 @@ static void update_hsync_changed_timers(mc6845_t *mc6845)
 		UINT16 next_y;
 
 		/* we are before the HSYNC position, we trigger on the current line */
-		if (video_screen_get_hpos_scrnum(mc6845->intf->scrnum) < mc6845->hsync_on_pos)
-			next_y = video_screen_get_vpos_scrnum(mc6845->intf->scrnum);
+		if (video_screen_get_hpos(mc6845->screen) < mc6845->hsync_on_pos)
+			next_y = video_screen_get_vpos(mc6845->screen);
 
 		/* trigger on the next line */
 		else
-			next_y = (video_screen_get_vpos_scrnum(mc6845->intf->scrnum) + 1) % mc6845->vert_pix_total;
+			next_y = (video_screen_get_vpos(mc6845->screen) + 1) % mc6845->vert_pix_total;
 
 		/* if the next line is not in the visible region, go to the beginning of the screen */
 		if (next_y > mc6845->max_visible_y)
 			next_y = 0;
 
-		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos_scrnum(mc6845->intf->scrnum, next_y, mc6845->hsync_on_pos) , 0);
-		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos_scrnum(mc6845->intf->scrnum, next_y, mc6845->hsync_off_pos), 0);
+		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_on_pos) , 0);
+		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_off_pos), 0);
 	}
 }
 
@@ -385,8 +382,8 @@ static void update_vsync_changed_timers(mc6845_t *mc6845)
 {
 	if (mc6845->has_valid_parameters && (mc6845->vsync_on_timer != NULL))
 	{
-		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos_scrnum(mc6845->intf->scrnum, mc6845->vsync_on_pos,  0), 0);
-		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos_scrnum(mc6845->intf->scrnum, mc6845->vsync_off_pos, 0), 0);
+		timer_adjust_oneshot(mc6845->vsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, mc6845->vsync_on_pos,  0), 0);
+		timer_adjust_oneshot(mc6845->vsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, mc6845->vsync_off_pos, 0), 0);
 	}
 }
 
@@ -456,8 +453,8 @@ UINT16 mc6845_get_ma(const device_config *device)
 	if (mc6845->has_valid_parameters)
 	{
 		/* clamp Y/X to the visible region */
-		int y = video_screen_get_vpos_scrnum(mc6845->intf->scrnum);
-		int x = video_screen_get_hpos_scrnum(mc6845->intf->scrnum);
+		int y = video_screen_get_vpos(mc6845->screen);
+		int x = video_screen_get_hpos(mc6845->screen);
 
 		/* since the MA counter stops in the blanking regions, if we are in a
            VBLANK, both X and Y are at their max */
@@ -486,7 +483,7 @@ UINT8 mc6845_get_ra(const device_config *device)
 	if (mc6845->has_valid_parameters)
 	{
 		/* get the current vertical raster position and clamp it to the visible region */
-		int y = video_screen_get_vpos_scrnum(mc6845->intf->scrnum);
+		int y = video_screen_get_vpos(mc6845->screen);
 
 		if (y > mc6845->max_visible_y)
 			y = mc6845->max_visible_y;
@@ -520,8 +517,8 @@ void mc6845_assert_light_pen_input(const device_config *device)
 	if (mc6845->has_valid_parameters)
 	{
 		/* get the current pixel coordinates */
-		y = video_screen_get_vpos_scrnum(mc6845->intf->scrnum);
-		x = video_screen_get_hpos_scrnum(mc6845->intf->scrnum);
+		y = video_screen_get_vpos(mc6845->screen);
+		x = video_screen_get_hpos(mc6845->screen);
 
 		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
 		char_x = x / mc6845->intf->hpixels_per_column;
@@ -538,7 +535,7 @@ void mc6845_assert_light_pen_input(const device_config *device)
 		}
 
 		/* set the timer that will latch the display address into the light pen registers */
-		timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos_scrnum(mc6845->intf->scrnum, y, x), 0);
+		timer_adjust_oneshot(mc6845->light_pen_latch_timer, video_screen_get_time_until_pos(mc6845->screen, y, x), 0);
 	}
 }
 
@@ -654,6 +651,11 @@ static void *common_start(const device_config *device, int device_type)
 
 	mc6845->device_type = device_type;
 	mc6845->intf = device->static_config;
+	mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
+
+	assert(mc6845->intf->clock > 0);
+	assert(mc6845->intf->hpixels_per_column > 0);
+	assert(mc6845->screen != NULL);
 
 	/* create the timers */
 	if (mc6845->intf != NULL)

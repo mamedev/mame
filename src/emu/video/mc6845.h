@@ -44,7 +44,7 @@ typedef void (*mc6845_on_vsync_changed_func)(const device_config *device, int vs
 typedef struct _mc6845_interface mc6845_interface;
 struct _mc6845_interface
 {
-	int scrnum;					/* screen we are acting on */
+	const char *screen_tag;		/* screen we are acting on */
 	int clock;					/* the clock (pin 21) of the chip */
 	int hpixels_per_column;		/* number of pixels per video memory address */
 

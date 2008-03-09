@@ -163,9 +163,6 @@ attotime video_screen_get_frame_period_scrnum(int scrnum);
 /* return the current frame number -- this is always increasing */
 UINT64 video_screen_get_frame_number(const device_config *screen);
 
-/* returns whether a given screen exists */
-int video_screen_exists(int scrnum);
-
 /* registers a VBLANK callback for the given screen */
 void video_screen_register_vbl_cb(const device_config *screen, vblank_state_changed_func vbl_cb);
 

@@ -68,7 +68,6 @@ struct _internal_screen_state
 	attoseconds_t			pixeltime;				/* attoseconds per pixel */
 	attoseconds_t 			vblank_period;			/* attoseconds per VBLANK period */
 	attotime 				vblank_start_time;		/* time of last VBLANK start */
-	UINT8					vblank_state;			/* 1 = in VBLANK region, 0 = outside */
 	emu_timer *				vblank_begin_timer;		/* timer to signal VBLANK start */
 	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
 	emu_timer *				scanline0_timer;		/* scanline 0 timer */
@@ -839,17 +838,6 @@ void video_screen_set_visarea_scrnum(int scrnum, int min_x, int max_x, int min_y
 
 
 /*-------------------------------------------------
-    video_screen_exists - returns whether a given
-    screen exists
--------------------------------------------------*/
-
-int video_screen_exists(int scrnum)
-{
-	return (device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum) != NULL);
-}
-
-
-/*-------------------------------------------------
     get_internal_state - accessor function to get
     private state for a screen
 -------------------------------------------------*/
@@ -857,7 +845,7 @@ int video_screen_exists(int scrnum)
 static internal_screen_state *get_internal_state(running_machine *machine, int scrnum)
 {
 	assert(machine != NULL);
-	assert(video_screen_exists(scrnum));
+	assert((scrnum >= 0) && (scrnum < MAX_SCREENS));
 	return (internal_screen_state *)machine->screen[scrnum].private_data;
 }
 
@@ -1033,8 +1021,8 @@ int video_screen_get_hpos_scrnum(int scrnum)
 int video_screen_get_vblank(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
-	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
-	return internal_state->vblank_state;
+	int vpos = video_screen_get_vpos(screen);
+	return (vpos < state->visarea.min_y || vpos > state->visarea.max_y);
 }
 
 
@@ -1337,9 +1325,6 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	/* reset the starting VBLANK time */
 	internal_state->vblank_start_time = timer_get_time();
 
-	/* mark as being in VBLANK */
-	internal_state->vblank_state = TRUE;
-
 	/* call the screen specific callbacks */
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
 		internal_state->vbl_cbs[i](screen, TRUE);
@@ -1373,9 +1358,6 @@ static TIMER_CALLBACK( vblank_end_callback )
 	const device_config *screen = ptr;
 	screen_state *state = get_safe_token(screen);
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
-
-	/* mark as not being in VBLANK */
-	internal_state->vblank_state = FALSE;
 
 	/* call the screen specific callbacks */
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
@@ -1494,7 +1476,7 @@ void video_frame_update(running_machine *machine, int debug)
 	if (phase == MAME_PHASE_RUNNING)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
-		if (video_screen_exists(0) && (mame_is_paused(machine) || debug || mame_debug_is_active()))
+		if ((machine->primary_screen != NULL) && (mame_is_paused(machine) || debug || mame_debug_is_active()))
 		{
 			void *param = (void *)machine->primary_screen;
 			scanline0_callback(machine, param, 0);

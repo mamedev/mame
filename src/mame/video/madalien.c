@@ -378,7 +378,7 @@ GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
-	0,                /* screen we are acting on */
+	"main",				/* screen we are acting on */
 	PIXEL_CLOCK / 8,  /* the clock of the chip  */
 	8,                /* number of pixels per video memory address */
 	NULL,             /* before pixel update callback */

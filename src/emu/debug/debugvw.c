@@ -10,6 +10,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "debugvw.h"
 #include "debugcmd.h"
 #include "debugcmt.h"
@@ -1075,7 +1076,7 @@ static void registers_update(debug_view *view)
 	debug_view_registers *regdata = view->extra_data;
 	debug_view_char *dest = view->viewdata;
 	UINT32 row, i;
-	int scrnum = 0;
+	const device_config *screen = Machine->primary_screen;
 
 	/* cannot update if no active CPU */
 	if (cpu_getactivecpu() < 0)
@@ -1122,13 +1123,13 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 2:
-						if (video_screen_exists(scrnum))
-							sprintf(dummy, "beamx:%3d", video_screen_get_hpos_scrnum(scrnum));
+						if (screen != NULL)
+							sprintf(dummy, "beamx:%3d", video_screen_get_hpos(screen));
 						break;
 
 					case MAX_REGS + 3:
-						if (video_screen_exists(scrnum))
-							sprintf(dummy, "beamy:%3d", video_screen_get_vpos_scrnum(scrnum));
+						if (screen != NULL)
+							sprintf(dummy, "beamy:%3d", video_screen_get_vpos(screen));
 						break;
 
 					case MAX_REGS + 4:

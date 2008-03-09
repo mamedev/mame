@@ -84,7 +84,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static const mc6845_interface mc6845_intf =
 {
-		0,
+		"main",
 		1000000, /* ? MHz */
 		8,
 		NULL,

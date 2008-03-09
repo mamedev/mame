@@ -428,7 +428,7 @@ ADDRESS_MAP_END
 
 static const mc6845_interface mc6845_intf =
 {
-	0,						/* screen we are acting on */
+	"main",					/* screen we are acting on */
 	QIX_CHARACTER_CLOCK, 	/* the clock (pin 21) of the chip */
 	8,						/* number of pixels per video memory address */
 	begin_update,			/* before pixel update callback */
