@@ -494,7 +494,7 @@ ADDRESS_MAP_END
 
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( looping_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)

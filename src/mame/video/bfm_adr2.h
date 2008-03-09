@@ -14,7 +14,7 @@ extern void adder2_decode_char_roms(void);
 MACHINE_RESET( adder2 );
 INTERRUPT_GEN( adder2_vbl );
 
-ADDRESS_MAP_EXTERN( adder2_memmap );
+ADDRESS_MAP_EXTERN( adder2_memmap, 8 );
 
 VIDEO_START(  adder2 );
 VIDEO_RESET(  adder2 );

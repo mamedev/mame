@@ -1242,11 +1242,11 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 #endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dsp56k_icount;			break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map = construct_map_dsp56156_x_data_memory;							break;
+ 			info->internal_map16 = address_map_dsp56156_x_data_memory;							break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map = construct_map_dsp56156_program_memory;							break;
+ 			info->internal_map16 = address_map_dsp56156_program_memory;							break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:
- 			info->internal_map = 0;																break;
+ 			info->internal_map16 = 0;															break;
 
 
 		// --- the following bits of info are returned as NULL-terminated strings ---

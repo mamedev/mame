@@ -23,6 +23,6 @@ void taito_f3_soundsystem_reset(void);
 	MDRV_SOUND_ROUTE(0, "left", 1.0)								\
 	MDRV_SOUND_ROUTE(1, "right", 1.0)								\
 
-ADDRESS_MAP_EXTERN(f3_sound_map);
+ADDRESS_MAP_EXTERN(f3_sound_map, 16);
 
 extern const struct ES5505interface es5505_interface;

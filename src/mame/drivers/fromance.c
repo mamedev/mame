@@ -328,14 +328,14 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( nekkyoku_readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x12, 0x12) AM_READ(MRA8_NOP)				// unknown
 	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r)
 	AM_RANGE(0xe6, 0xe6) AM_READ(fromance_commanddata_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_writeport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
@@ -349,14 +349,14 @@ static ADDRESS_MAP_START( nekkyoku_writeport_sub, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x12, 0x12) AM_READ(MRA8_NOP)				// unknown
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r)
 	AM_RANGE(0x26, 0x26) AM_READ(fromance_commanddata_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_writeport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
@@ -370,7 +370,7 @@ static ADDRESS_MAP_START( idolmj_writeport_sub, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_writeport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)

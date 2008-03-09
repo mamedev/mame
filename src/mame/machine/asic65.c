@@ -517,7 +517,7 @@ static READ16_HANDLER( asci65_get_bio )
  *************************************/
 
 static ADDRESS_MAP_START( asic65_program_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 

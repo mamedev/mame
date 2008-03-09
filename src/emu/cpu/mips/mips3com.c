@@ -47,7 +47,7 @@ static void program_write_qword_masked_32le(offs_t offset, UINT64 data, UINT64 m
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
 
-static const memory_handlers be_memory =
+static const memory_accessors be_memory =
 {
 	program_read_byte_32be,
 	program_read_word_32be,
@@ -64,7 +64,7 @@ static const memory_handlers be_memory =
 	program_write_qword_masked_32be
 };
 
-static const memory_handlers le_memory =
+static const memory_accessors le_memory =
 {
 	program_read_byte_32le,
 	program_read_word_32le,

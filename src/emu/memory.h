@@ -16,6 +16,7 @@
 
 #include "mamecore.h"
 #include "devintrf.h"
+#include "tokenize.h"
 
 
 
@@ -126,10 +127,6 @@ struct _data_accessors
     These apply to values in the array of read/write handlers that is
     declared within each driver.
 ***************************************************************************/
-
-/* ----- definitions for the flags in the address maps ----- */
-#define AM_FLAGS_EXTENDED		0x01					/* this is an extended entry with the below flags in the start field */
-#define AM_FLAGS_END			0x02					/* this is the terminating entry in the array */
 
 /* ----- definitions for the extended flags in the address maps ----- */
 #define AMEF_SPECIFIES_SPACE	0x00000001				/* set if the address space is specified */
@@ -545,10 +542,14 @@ typedef union _read_handlers read_handlers;
 union _read_handlers
 {
 	genf *					handler;
-	read8_machine_func		handler8;
-	read16_machine_func		handler16;
-	read32_machine_func		handler32;
-	read64_machine_func		handler64;
+	read8_machine_func		mhandler8;
+	read16_machine_func		mhandler16;
+	read32_machine_func		mhandler32;
+	read64_machine_func		mhandler64;
+	read8_device_func		dhandler8;
+	read16_device_func		dhandler16;
+	read32_device_func		dhandler32;
+	read64_device_func		dhandler64;
 };
 
 /* ----- a union of all the different write handler types ----- */
@@ -556,17 +557,29 @@ typedef union _write_handlers write_handlers;
 union _write_handlers
 {
 	genf *					handler;
-	write8_machine_func		handler8;
-	write16_machine_func	handler16;
-	write32_machine_func	handler32;
-	write64_machine_func	handler64;
+	write8_machine_func		mhandler8;
+	write16_machine_func	mhandler16;
+	write32_machine_func	mhandler32;
+	write64_machine_func	mhandler64;
+	write8_device_func		dhandler8;
+	write16_device_func		dhandler16;
+	write32_device_func		dhandler32;
+	write64_device_func		dhandler64;
+};
+
+typedef union _memory_handlers memory_handlers;
+union _memory_handlers
+{
+	read_handlers			read;
+	write_handlers			write;
 };
 
 /* ----- a generic address map type ----- */
-typedef struct _address_map address_map;
-struct _address_map
+typedef struct _address_map_entry address_map_entry;
+struct _address_map_entry
 {
-	UINT32				flags;				/* flags and additional info about this entry */
+	address_map_entry *	next;				/* pointer to the next entry */
+
 	offs_t				start, end;			/* start/end values */
 	offs_t				mirror;				/* mirror bits */
 	offs_t				mask;				/* mask bits */
@@ -578,12 +591,28 @@ struct _address_map
 	const char *		write_name;			/* write handler callback name */
 	device_type			write_devtype;		/* read device type for device references */
 	const char *		write_devtag;		/* read tag for the relevant device */
-	void *				memory;				/* pointer to memory backing this entry */
 	UINT32				share;				/* index of a shared memory block */
-	void **				base;				/* receives pointer to memory (optional) */
-	size_t *			size;				/* receives size of area in bytes (optional) */
+	void **				baseptr;			/* receives pointer to memory (optional) */
+	size_t *			sizeptr;			/* receives size of area in bytes (optional) */
+	UINT32				baseptroffs_plus1;	/* offset of base pointer within driver_data struct, plus 1 */
+	UINT32				sizeptroffs_plus1;	/* offset of size pointer within driver_data struct, plus 1 */
 	UINT32				region;				/* region containing the memory backing this entry */
 	offs_t				region_offs;		/* offset within the region */
+
+	void *				memory;				/* pointer to memory backing this entry */
+	offs_t				bytestart, byteend;	/* byte-adjusted start/end values */
+	offs_t				bytemirror;			/* byte-adjusted mirror bits */
+	offs_t				bytemask;			/* byte-adjusted mask bits */
+};
+
+typedef struct _address_map address_map;
+struct _address_map
+{
+	UINT8				spacenum;			/* space number of the map */
+	UINT8				databits;			/* data bits represented by the map */
+	UINT8				unmapval;			/* unmapped memory value */
+	offs_t				globalmask;			/* global mask */
+	address_map_entry *	entrylist;			/* list of entries */
 };
 
 /* ----- structs to contain internal data ----- */
@@ -599,134 +628,234 @@ struct _address_space
 };
 
 
+typedef union _addrmap_token addrmap_token;
+union _addrmap_token
+{
+	TOKEN_COMMON_FIELDS
+	const addrmap_token *	tokenptr;
+	read_handlers			read;				/* generic read handlers */
+	write_handlers			write;				/* generic write handlers */
+	device_type				devtype;			/* device type */
+	UINT8 **				memptr;				/* memory pointer */
+	size_t *				sizeptr;			/* size pointer */
+};
+
+
+typedef union _addrmap8_token addrmap8_token;
+union _addrmap8_token
+{
+	TOKEN_COMMON_FIELDS
+	const addrmap_token *	tokenptr;
+	read8_machine_func		mread;				/* pointer to native machine read handler */
+	write8_machine_func		mwrite;				/* pointer to native machine write handler */
+	read8_device_func		dread;				/* pointer to native device read handler */
+	write8_device_func		dwrite;				/* pointer to native device write handler */
+	read_handlers			read;				/* generic read handlers */
+	write_handlers			write;				/* generic write handlers */
+	device_type				devtype;			/* device type */
+	UINT8 **				memptr;				/* memory pointer */
+	size_t *				sizeptr;			/* size pointer */
+};
+
+
+typedef union _addrmap16_token addrmap16_token;
+union _addrmap16_token
+{
+	TOKEN_COMMON_FIELDS
+	const addrmap_token *	tokenptr;
+	read16_machine_func		mread;				/* pointer to native read handler */
+	write16_machine_func 	mwrite;				/* pointer to native write handler */
+	read16_device_func		dread;				/* pointer to native device read handler */
+	write16_device_func		dwrite;				/* pointer to native device write handler */
+	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
+	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read_handlers			read;				/* generic read handlers */
+	write_handlers			write;				/* generic write handlers */
+	device_type				devtype;			/* device type */
+	UINT16 **				memptr;				/* memory pointer */
+	size_t *				sizeptr;			/* size pointer */
+};
+
+
+typedef union _addrmap32_token addrmap32_token;
+union _addrmap32_token
+{
+	TOKEN_COMMON_FIELDS
+	const addrmap_token *	tokenptr;
+	read32_machine_func		mread;				/* pointer to native read handler */
+	write32_machine_func 	mwrite;				/* pointer to native write handler */
+	read32_device_func		dread;				/* pointer to native device read handler */
+	write32_device_func		dwrite;				/* pointer to native device write handler */
+	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
+	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
+	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read_handlers			read;				/* generic read handlers */
+	write_handlers			write;				/* generic write handlers */
+	device_type				devtype;			/* device type */
+	UINT32 **				memptr;				/* memory pointer */
+	size_t *				sizeptr;			/* size pointer */
+};
+
+
+typedef union _addrmap64_token addrmap64_token;
+union _addrmap64_token
+{
+	TOKEN_COMMON_FIELDS
+	const addrmap_token *	tokenptr;
+	read64_machine_func		mread;				/* pointer to native read handler */
+	write64_machine_func 	mwrite;				/* pointer to native write handler */
+	read64_device_func		dread;				/* pointer to native device read handler */
+	write64_device_func		dwrite;				/* pointer to native device write handler */
+	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
+	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
+	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read32_machine_func		mread32;			/* pointer to 32-bit machine read handler */
+	write32_machine_func	mwrite32;			/* pointer to 32-bit machine write handler */
+	read_handlers			read;				/* generic read handlers */
+	write_handlers			write;				/* generic write handlers */
+	device_type				devtype;			/* device type */
+	UINT64 **				memptr;				/* memory pointer */
+	size_t *				sizeptr;			/* size pointer */
+};
+
 
 /***************************************************************************
     ADDRESS MAP ARRAY CONSTRUCTORS
 ***************************************************************************/
 
-void construct_address_map(address_map *map, const machine_config *drv, int cpunum, int spacenum);
+#define address_map_0 NULL
 
-/* ----- a typedef for pointers to these functions ----- */
-typedef address_map *(*construct_map_t)(running_machine *machine, address_map *map);
+enum
+{
+	ADDRMAP_TOKEN_INVALID,
 
-/* use this to declare external references to a machine driver */
-#define ADDRESS_MAP_EXTERN(_name)										\
-address_map *construct_map_##_name(running_machine *machine, address_map *map)					\
+	ADDRMAP_TOKEN_START,
+	ADDRMAP_TOKEN_END,
+	ADDRMAP_TOKEN_INCLUDE,
+	
+	ADDRMAP_TOKEN_GLOBAL_MASK,
+	ADDRMAP_TOKEN_UNMAP_VALUE,
 
-/* ----- macros for starting, ending, and setting map flags ----- */
-#define ADDRESS_MAP_START(_name,_space,_bits)							\
-address_map *construct_map_##_name(running_machine *machine, address_map *map)					\
-{																		\
-	extern read##_bits##_machine_func port_tag_to_handler##_bits(const char *); \
-	typedef read##_bits##_machine_func _rmf_t;							\
-	typedef write##_bits##_machine_func _wmf_t;							\
-	typedef read##_bits##_device_func _rdf_t;							\
-	typedef write##_bits##_device_func _wdf_t;							\
-	_rmf_t readm;														\
-	_wmf_t writem;														\
-	_rdf_t readd;														\
-	_wdf_t writed;														\
-	_rmf_t (*port_tag_to_handler)(const char *) = port_tag_to_handler##_bits; \
-	UINT##_bits **base;													\
-																		\
-	(void)readm; (void)writem; (void)readd; (void)writed; (void)base;	\
-	(void)port_tag_to_handler; 											\
-	map->flags = AM_FLAGS_EXTENDED;										\
-	map->start = AMEF_DBITS(_bits) | AMEF_SPACE(_space);				\
+	ADDRMAP_TOKEN_RANGE,
+	ADDRMAP_TOKEN_MASK,
+	ADDRMAP_TOKEN_MIRROR,
+	ADDRMAP_TOKEN_READ,
+	ADDRMAP_TOKEN_WRITE,
+	ADDRMAP_TOKEN_DEVICE_READ,
+	ADDRMAP_TOKEN_DEVICE_WRITE,
+	ADDRMAP_TOKEN_READ_PORT,
+	ADDRMAP_TOKEN_REGION,
+	ADDRMAP_TOKEN_SHARE,
+	ADDRMAP_TOKEN_BASEPTR,
+	ADDRMAP_TOKEN_BASE_MEMBER,
+	ADDRMAP_TOKEN_SIZEPTR,
+	ADDRMAP_TOKEN_SIZE_MEMBER
+};
 
-#define ADDRESS_MAP_FLAGS(_flags)										\
-	map++;																\
-	map->flags = AM_FLAGS_EXTENDED;										\
-	map->start = (_flags);												\
 
-#define ADDRESS_MAP_END													\
-	map++;																\
-	map->flags = AM_FLAGS_END;											\
-	return map;															\
-}																		\
+/* start/end tags for the address map */
+#define ADDRESS_MAP_START(_name, _space, _bits) \
+	const addrmap##_bits##_token address_map_##_name[] = { \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_START, 8, _space, 8, _bits, 8),
 
-/* ----- each map entry begins with one of these ----- */
-#define AM_RANGE(_start,_end)											\
-	map++;																\
-	map->flags = 0;														\
-	map->start = (_start);												\
-	map->end = (_end);													\
+#define ADDRESS_MAP_END \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_END, 8) };
 
-/* ----- these are optional entries after each map entry ----- */
-#define AM_MASK(_mask)													\
-	map->mask = (_mask);												\
+/* use this to declare external references to an address map */
+#define ADDRESS_MAP_EXTERN(_name, _bits) \
+	extern const addrmap##_bits##_token address_map_##_name[]
 
-#define AM_MIRROR(_mirror)												\
-	map->mirror = (_mirror);											\
 
-#define AM_READ(_handler)												\
-	map->read.handler = (genf *)(readm = _handler);						\
-	map->read_name = #_handler;											\
+/* global controls */
+#define ADDRESS_MAP_GLOBAL_MASK(_mask) \
+	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_GLOBAL_MASK, 8, _mask, 32),
 
-#define AM_READ_PORT(_tag) 												\
-	AM_READ((*port_tag_to_handler)(_tag))								\
+#define ADDRESS_MAP_UNMAP_LOW \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_UNMAP_VALUE, 8, 0, 1),
 
-#define AM_DEVREAD(_type, _tag, _handler)								\
-	map->read.handler = (genf *)(readd = _handler);						\
-	map->read_name = #_handler;											\
-	map->read_devtype = _type;											\
-	map->read_devtag = _tag;											\
+#define ADDRESS_MAP_UNMAP_HIGH \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_UNMAP_VALUE, 8, 1, 1),
 
-#define AM_WRITE(_handler)												\
-	map->write.handler = (genf *)(writem = _handler);					\
-	map->write_name = #_handler;										\
 
-#define AM_DEVWRITE(_type, _tag, _handler)								\
-	map->write.handler = (genf *)(writed = _handler);					\
-	map->write_name = #_handler;										\
-	map->write_devtype = _type;											\
-	map->write_devtag = _tag;											\
+/* importing data from other address maps */
+#define AM_IMPORT_FROM(_name) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_INCLUDE, 8), \
+	TOKEN_PTR(tokenptr, address_map_##_name),
 
-#define AM_REGION(_region, _offs)										\
-	map->region = (_region);											\
-	map->region_offs = (_offs);											\
 
-#define AM_SHARE(_index)												\
-	map->share = _index;												\
+/* address ranges */
+#define AM_RANGE(_start, _end) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_RANGE, 8), \
+	TOKEN_UINT64_PACK2(_start, 32, _end, 32),
 
-#define AM_BASE(_base)													\
-	map->base = (void **)(base = _base);								\
+#define AM_MASK(_mask) \
+	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_MASK, 8, _mask, 32),
 
-#define AM_BASE_MEMBER(_struct, _member)								\
-	if (machine != NULL && machine->driver_data != NULL)				\
-		map->base = (void **)(base = &((_struct *)machine->driver_data)->_member);\
+#define AM_MIRROR(_mirror) \
+	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_MIRROR, 8, _mirror, 32),
 
-#define AM_SIZE(_size)													\
-	map->size = _size;													\
+#define AM_READ(_handler) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_READ, 8), \
+	TOKEN_PTR(mread, _handler), \
+	TOKEN_STRING(#_handler),
 
-#define AM_SIZE_MEMBER(_struct, _member)								\
-	if (machine != NULL && machine->driver_data != NULL)				\
-		map->size = &((_struct *)machine->driver_data)->_member;		\
+#define AM_WRITE(_handler) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_WRITE, 8), \
+	TOKEN_PTR(mwrite, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_DEVREAD(_type, _tag, _handler) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_DEVICE_READ, 8), \
+	TOKEN_PTR(dread, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVWRITE(_type, _tag, _handler) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_DEVICE_WRITE, 8), \
+	TOKEN_PTR(dwrite, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_READ_PORT(_tag) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_READ_PORT, 8), \
+	TOKEN_STRING(_tag),
+
+#define AM_REGION(_region, _offs) \
+	TOKEN_UINT64_PACK3(ADDRMAP_TOKEN_REGION, 8, _region, 24, _offs, 32),
+
+#define AM_SHARE(_index) \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SHARE, 8, _index, 24),
+
+#define AM_BASE(_base) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_BASEPTR, 8), \
+	TOKEN_PTR(memptr, _base),
+
+#define AM_BASE_MEMBER(_struct, _member) \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_BASE_MEMBER, 8, offsetof(_struct, _member), 24),
+
+#define AM_SIZE(_size) \
+	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_SIZEPTR, 8), \
+	TOKEN_PTR(sizeptr, _size),
+
+#define AM_SIZE_MEMBER(_struct, _member) \
+	TOKEN_UINT32_PACK2(ADDRMAP_TOKEN_SIZE_MEMBER, 8, offsetof(_struct, _member), 24),
 
 /* ----- common shortcuts ----- */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
 #define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
-#define AM_ROM								AM_READ((_rmf_t)STATIC_ROM)
-#define AM_RAM								AM_READWRITE((_rmf_t)STATIC_RAM, (_wmf_t)STATIC_RAM)
-#define AM_WRITEONLY						AM_WRITE((_wmf_t)STATIC_RAM)
-#define AM_UNMAP							AM_READWRITE((_rmf_t)STATIC_UNMAP, (_wmf_t)STATIC_UNMAP)
-#define AM_ROMBANK(_bank)					AM_READ((_rmf_t)(STATIC_BANK1 + (_bank) - 1))
-#define AM_RAMBANK(_bank)					AM_READWRITE((_rmf_t)(STATIC_BANK1 + (_bank) - 1), (_wmf_t)(STATIC_BANK1 + (_bank) - 1))
-#define AM_NOP								AM_READWRITE((_rmf_t)STATIC_NOP, (_wmf_t)STATIC_NOP)
-#define AM_READNOP							AM_READ((_rmf_t)STATIC_NOP)
-#define AM_WRITENOP							AM_WRITE((_wmf_t)STATIC_NOP)
-
-
-
-/***************************************************************************
-    ADDRESS MAP ARRAY HELPER MACROS
-***************************************************************************/
-
-/* ----- macros for identifying address map struct markers ----- */
-#define IS_AMENTRY_EXTENDED(ma)				(((ma)->flags & AM_FLAGS_EXTENDED) != 0)
-#define IS_AMENTRY_END(ma)					(((ma)->flags & AM_FLAGS_END) != 0)
-
-#define AM_EXTENDED_FLAGS(ma)				((ma)->start)
+#define AM_ROM								AM_READ((void *)STATIC_ROM)
+#define AM_RAM								AM_READWRITE((void *)STATIC_RAM, (void *)STATIC_RAM)
+#define AM_WRITEONLY						AM_WRITE((void *)STATIC_RAM)
+#define AM_UNMAP							AM_READWRITE((void *)STATIC_UNMAP, (void *)STATIC_UNMAP)
+#define AM_ROMBANK(_bank)					AM_READ((void *)(STATIC_BANK1 + (_bank) - 1))
+#define AM_RAMBANK(_bank)					AM_READWRITE((void *)(STATIC_BANK1 + (_bank) - 1), (void *)(STATIC_BANK1 + (_bank) - 1))
+#define AM_NOP								AM_READWRITE((void *)STATIC_NOP, (void *)STATIC_NOP)
+#define AM_READNOP							AM_READ((void *)STATIC_NOP)
+#define AM_WRITENOP							AM_WRITE((void *)STATIC_NOP)
 
 
 
@@ -756,7 +885,6 @@ extern const char *const address_space_names[ADDRESS_SPACES];
 #define LEVEL2_BITS				(32 - LEVEL1_BITS)		/* number of address bits in the level 2 table */
 
 /* ----- other address map constants ----- */
-#define MAX_ADDRESS_MAP_SIZE	256						/* maximum entries in an address map */
 #define MAX_MEMORY_BLOCKS		1024					/* maximum memory blocks we can track */
 #define MAX_SHARED_POINTERS		256						/* maximum number of shared pointers in memory maps */
 #define MEMORY_BLOCK_SIZE		65536					/* size of allocated memory blocks */
@@ -950,6 +1078,8 @@ void		memory_init(running_machine *machine);
 void		memory_set_context(int activecpu);
 
 /* ----- address map functions ----- */
+address_map *address_map_alloc(const machine_config *drv, int cpunum, int spacenum);
+void 		address_map_free(address_map *map);
 const address_map *memory_get_map(int cpunum, int spacenum);
 
 /* ----- opcode base control ---- */

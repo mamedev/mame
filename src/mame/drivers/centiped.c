@@ -677,7 +677,7 @@ static READ8_HANDLER( caterplr_AY8910_r )
  *************************************/
 
 static ADDRESS_MAP_START( centiped_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&rambase)
 	AM_RANGE(0x0400, 0x07bf) AM_READWRITE(MRA8_RAM, centiped_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE(&spriteram)
@@ -702,7 +702,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( centipdb_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x4000) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_READWRITE(MRA8_RAM, centiped_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE(&spriteram)
@@ -736,7 +736,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( milliped_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x0800, 0x080f) AM_READWRITE(pokey2_r, pokey2_w)
@@ -769,7 +769,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( warlords_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_READWRITE(MRA8_RAM, centiped_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE(&spriteram)
@@ -794,7 +794,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mazeinv_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x0800, 0x080f) AM_READWRITE(pokey2_r, pokey2_w)

@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( sauro_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_2_r)
 	AM_RANGE(0x20, 0x20) AM_READ(input_port_3_r)
 	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( sauro_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)

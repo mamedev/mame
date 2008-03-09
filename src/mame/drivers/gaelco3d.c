@@ -728,7 +728,7 @@ static WRITE32_HANDLER( led_1_020_w ) { if ((mem_mask & 0xffff) != 0xffff) led_1
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(MRA16_RAM, gaelco3d_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x51000c, 0x51000d) AM_READ(input_port_0_word_r)

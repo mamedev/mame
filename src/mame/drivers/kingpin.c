@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( kingpin_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kingpin_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(io_read_missing_dips)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_2_r)
 /*  AM_RANGE(0x02, 0x02) AM_READ(io_read_missing_dips) */
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( kingpin_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kingpin_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 /*  AM_RANGE(0x02, 0x02) AM_WRITE(NO IDEA) */
 /*  AM_RANGE(0x12, 0x12) AM_WRITE(NO IDEA) */
 /*  AM_RANGE(0x13, 0x13) AM_WRITE(NO IDEA) */

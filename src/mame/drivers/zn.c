@@ -658,24 +658,19 @@ static MACHINE_RESET( coh1000c )
 	zn_machine_init();
 }
 
-static ADDRESS_MAP_START( qsound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK10)	/* banked (contains music data) */
-	AM_RANGE(0xd007, 0xd007) AM_READ(qsound_status_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( qsound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
+static ADDRESS_MAP_START( qsound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(10)		/* banked (contains music data) */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(qsound_data_h_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(qsound_data_l_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(qsound_cmd_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_bankswitch_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd007, 0xd007) AM_READ(qsound_status_r)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qsound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( qsound_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -689,8 +684,8 @@ static MACHINE_DRIVER_START( coh1000c )
 
 	MDRV_CPU_ADD( Z80, 8000000 )
 	/* audio CPU */  /* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
-	MDRV_CPU_IO_MAP( qsound_readport, 0 )
+	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
+	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh1000c )
@@ -707,8 +702,8 @@ static MACHINE_DRIVER_START( coh1002c )
 
 	MDRV_CPU_ADD( Z80, 8000000 )
 	/* audio CPU */  /* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
-	MDRV_CPU_IO_MAP( qsound_readport, 0 )
+	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
+	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh1000c )
@@ -891,8 +886,8 @@ static MACHINE_DRIVER_START( coh3002c )
 
 	/* audio CPU */  /* 8MHz ?? */
 	MDRV_CPU_ADD( Z80, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( qsound_readmem, qsound_writemem )
-	MDRV_CPU_IO_MAP( qsound_readport, 0 )
+	MDRV_CPU_PROGRAM_MAP( qsound_map, 0 )
+	MDRV_CPU_IO_MAP( qsound_portmap, 0 )
 	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
 	MDRV_MACHINE_RESET( coh3002c )
@@ -2716,7 +2711,7 @@ static ADDRESS_MAP_START( cbaj_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x84, 0x84 ) AM_READWRITE( YMZ280B_status_0_r, YMZ280B_register_0_w )
 	AM_RANGE( 0x85, 0x85 ) AM_READWRITE( YMZ280B_status_0_r, YMZ280B_data_0_w )
 	AM_RANGE( 0x90, 0x90 ) AM_READWRITE( cbaj_z80_latch_r, cbaj_z80_latch_w )

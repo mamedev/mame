@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( bking_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking_xld1_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking_yld1_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking_xld2_w)
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( bking_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking3_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, bking_xld1_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, bking_yld1_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, bking_xld2_w)
@@ -246,7 +246,7 @@ static READ8_HANDLER( bking3_68705_portC_r )
 }
 #endif
 static ADDRESS_MAP_START( m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_portA_r, buggychl_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_portB_r, buggychl_68705_portB_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_portC_r, buggychl_68705_portC_w)

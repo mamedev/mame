@@ -375,7 +375,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( royalmah_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( royalmah_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ippatsu_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( ippatsu_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suzume_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( suzume_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dondenmj_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE(AY8910_control_port_0_w)
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( dondenmj_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjdiplob_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( mjdiplob_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tontonb_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -442,7 +442,7 @@ static ADDRESS_MAP_START( tontonb_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majs101b_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( majs101b_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjderngr_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
@@ -466,7 +466,7 @@ static ADDRESS_MAP_START( mjderngr_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjapinky_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( mjapinky_bank_w )
 	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
@@ -535,7 +535,7 @@ static WRITE8_HANDLER( janptr96_coin_counter_w )
 }
 
 static ADDRESS_MAP_START( janptr96_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( janptr96_rombank_w )	// BANK ROM Select
 	AM_RANGE( 0x1e, 0x1e ) AM_READWRITE( janptr96_dswsel_r, janptr96_dswsel_w )
 	AM_RANGE( 0x1c, 0x1c ) AM_READ( janptr96_dsw_r )

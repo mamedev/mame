@@ -270,7 +270,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(balsente_counter_8253_r, balsente_counter_8253_w)
 	AM_RANGE(0x08, 0x0f) AM_READ(balsente_counter_state_r)
 	AM_RANGE(0x08, 0x09) AM_WRITE(balsente_counter_control_w)

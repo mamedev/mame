@@ -5,9 +5,9 @@
 
 #define CPUTAG_54XX "54XX"
 
-ADDRESS_MAP_EXTERN( namco_54xx_map_program );
-ADDRESS_MAP_EXTERN( namco_54xx_map_data );
-ADDRESS_MAP_EXTERN( namco_54xx_map_io );
+ADDRESS_MAP_EXTERN( namco_54xx_map_program, 8 );
+ADDRESS_MAP_EXTERN( namco_54xx_map_data, 8 );
+ADDRESS_MAP_EXTERN( namco_54xx_map_io, 8 );
 
 void namco_54xx_write(UINT8 data);
 

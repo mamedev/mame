@@ -2253,7 +2253,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 #endif /* MESS */
 
 			default:
-				fatalerror("unknown port entry type");
+				fatalerror("Invalid token %d in input ports\n", entrytype);
 				break;
 		}
 	}

@@ -239,7 +239,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) /* joy1 */
 	AM_RANGE(0x04, 0x04) AM_READ(input_port_1_r) /* joy2 */
 	AM_RANGE(0x08, 0x08) AM_READ(input_port_2_r) /* coin,start */
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
 	AM_RANGE(0x15, 0x15) AM_WRITE(system1_videomode_w)    /* video control and (in some games) bank switching */
 	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* mirror address */
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbml_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) /* joy1 */
 	AM_RANGE(0x04, 0x04) AM_READ(input_port_1_r) /* joy2 */
 	AM_RANGE(0x08, 0x08) AM_READ(input_port_2_r) /* coin,start */
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( wbml_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sht_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) /* joy1 */
 //  AM_RANGE(0x04, 0x04) AM_READ(input_port_1_r) /* joy2 */
 	AM_RANGE(0x08, 0x08) AM_READ(input_port_2_r) /* coin,start */
@@ -304,7 +304,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nobo_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)	/* Player 1 inputs */
 	AM_RANGE(0x04, 0x04) AM_READ(input_port_1_r)	/* Player 2 inputs */
 	AM_RANGE(0x08, 0x08) AM_READ(input_port_2_r)	/* System inputs */
@@ -318,20 +318,20 @@ static ADDRESS_MAP_START( nobo_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbml_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
 	AM_RANGE(0x15, 0x15) AM_WRITE(chplft_videomode_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(wbml_videoram_bank_latch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hvymetal_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* sound commands */
 	AM_RANGE(0x19, 0x19) AM_WRITE(hvymetal_videomode_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brain_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* sound commands */
 	AM_RANGE(0x19, 0x19) AM_WRITE(brain_videomode_w)
 ADDRESS_MAP_END
@@ -375,7 +375,7 @@ static WRITE8_HANDLER(mcuenable_hack_w)
 }
 
 static ADDRESS_MAP_START( sht_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10,0x10) AM_WRITE(mcuenable_hack_w)
 
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
@@ -386,13 +386,13 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( chplft_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
 	AM_RANGE(0x15, 0x15) AM_WRITE(chplft_videomode_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nobo_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands ? */
 	AM_RANGE(0x15, 0x15) AM_WRITE(brain_videomode_w)	/* video control + bank switching */
 	AM_RANGE(0x16, 0x16) AM_WRITE(outport16_w)			/* Used - check code at 0x05cb */

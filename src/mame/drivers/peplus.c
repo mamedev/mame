@@ -760,7 +760,7 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS(AMEF_ABITS(8))
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// I/O Ports
 	AM_RANGE(0x00, 0x03) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE(&io_port)

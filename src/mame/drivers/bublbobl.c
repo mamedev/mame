@@ -377,7 +377,7 @@ ADDRESS_MAP_END
 
 // The 68705 is from a bootleg, the original MCU is a 6801U4
 static ADDRESS_MAP_START( bootlegmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_portA_r, bublbobl_68705_portA_w)
 	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_portB_r, bublbobl_68705_portB_w)
 	AM_RANGE(0x002, 0x002) AM_READ(input_port_0_r)	// COIN

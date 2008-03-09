@@ -311,7 +311,7 @@ static READ8_HANDLER( redbaron_joy_r )
  *************************************/
 
 static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
 	AM_RANGE(0x0a00, 0x0a00) AM_READ(input_port_1_r)	/* DSW1 */
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
 	AM_RANGE(0x0a00, 0x0a00) AM_READ(input_port_1_r)	/* DSW1 */

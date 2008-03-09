@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( vigilant_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vigilant_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
@@ -97,7 +97,7 @@ static ADDRESS_MAP_START( vigilant_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vigilant_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(m72_sound_command_byte_w)  /* SD */
 	AM_RANGE(0x01, 0x01) AM_WRITE(vigilant_out2_w) /* OUT2 */
 	AM_RANGE(0x04, 0x04) AM_WRITE(vigilant_bank_select_w) /* PBANK */
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( kikcubic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_3_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_4_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_0_r)
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( kikcubic_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(kikcubic_coin_w)	/* also flip screen, and...? */
 	AM_RANGE(0x04, 0x04) AM_WRITE(vigilant_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_command_byte_w)
@@ -151,14 +151,14 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)	/* SDRE */
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)	/* S ROM C */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_sample_addr_w)	/* STL / STH */
@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( buccanrs_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buccanrs_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(YM2203_status_port_1_r)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( buccanrs_sound_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buccanrs_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM2203_control_port_1_w)

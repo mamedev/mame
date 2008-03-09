@@ -302,7 +302,8 @@ static READ16_HANDLER( trisport_port_1_r )
  *************************************/
 
 static ADDRESS_MAP_START( mcr68_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(21) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x070000, 0x070fff) AM_READWRITE(MRA16_RAM, mcr68_videoram_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
@@ -325,7 +326,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( zwackery_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x084000, 0x084fff) AM_RAM
@@ -347,7 +348,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( pigskin_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(21) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(pigskin_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
@@ -371,7 +373,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( trisport_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(21) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(trisport_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(input_port_2_word_r)

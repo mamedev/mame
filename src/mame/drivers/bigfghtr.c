@@ -362,7 +362,7 @@ static READ8_HANDLER( soundlatch_clear_r )
 }
 
 static ADDRESS_MAP_START( soundport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x0) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0x1, 0x1) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x2, 0x2) AM_WRITE(DAC_0_signed_data_w)

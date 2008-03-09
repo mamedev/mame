@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 
 #define Main_PortMap( name, base )										\
 static ADDRESS_MAP_START( name##_portmap, ADDRESS_SPACE_IO, 8 )			\
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )									\
+	ADDRESS_MAP_GLOBAL_MASK(0xff)									\
 	AM_RANGE(base+0, base+0) AM_WRITE(interrupt_enable_w)				\
 	AM_RANGE(base+1, base+1) AM_WRITE(kyugo_flipscreen_w)				\
 	AM_RANGE(base+2, base+2) AM_WRITE(kyugo_sub_cpu_control_w)			\
@@ -123,7 +123,7 @@ Sub_MemMap( flashgla, 0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
 
 #define Sub_PortMap( name, ay0_base, ay1_base )								\
 static ADDRESS_MAP_START( name##_sub_portmap, ADDRESS_SPACE_IO, 8 )			\
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )										\
+	ADDRESS_MAP_GLOBAL_MASK(0xff)										\
 	AM_RANGE(ay0_base+0, ay0_base+0) AM_WRITE(AY8910_control_port_0_w)		\
 	AM_RANGE(ay0_base+1, ay0_base+1) AM_WRITE(AY8910_write_port_0_w)		\
 	AM_RANGE(ay0_base+2, ay0_base+2) AM_READ(AY8910_read_port_0_r)			\

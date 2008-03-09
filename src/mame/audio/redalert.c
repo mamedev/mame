@@ -134,7 +134,7 @@ static const struct AY8910interface redalert_ay8910_interface =
 
 
 static ADDRESS_MAP_START( redalert_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READWRITE(MRA8_NOP, redalert_AY8910_w)
 	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
@@ -303,7 +303,7 @@ static WRITE8_HANDLER( demoneye_ay8910_data_w )
 
 
 static ADDRESS_MAP_START( demoneye_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0500, 0x0503) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM

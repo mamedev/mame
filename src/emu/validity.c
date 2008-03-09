@@ -644,123 +644,100 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 		{
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			static const char *const spacename[] = { "program", "data", "I/O" };
 			int databus_width = cputype_databus_width(cpu->type, spacenum);
 			int addr_shift = cputype_addrbus_shift(cpu->type, spacenum);
 			int alignunit = databus_width/8;
-			address_map addrmap[MAX_ADDRESS_MAP_SIZE*2];
+			address_map_entry *entry;
 			address_map *map;
-			UINT32 flags;
 
 			/* check to see that the same map is not used twice */
-			if (cpu->construct_map[spacenum][0] && cpu->construct_map[spacenum][0] == cpu->construct_map[spacenum][1])
+			if (cpu->address_map[spacenum][0] != NULL && cpu->address_map[spacenum][0] == cpu->address_map[spacenum][1])
 			{
 				mame_printf_error("%s: %s uses identical memory maps for CPU #%d spacenum %d\n", driver->source_file, driver->name, cpunum, spacenum);
 				error = TRUE;
 			}
 
-			/* reset the address map, resetting the base address to a non-NULL value */
-			/* because the AM_REGION macro will query non-existant memory regions and */
-			/* product valid NULL results */
-			memset(addrmap, 0, sizeof(addrmap));
-
 			/* construct the maps */
-			map = addrmap;
-			construct_address_map(map, config, cpunum, spacenum);
+			map = address_map_alloc(config, cpunum, spacenum);
 
 			/* if this is an empty map, just skip it */
-			if (IS_AMENTRY_END(map))
-				continue;
-
-			/* make sure we start with a proper entry */
-			if (!IS_AMENTRY_EXTENDED(map))
+			if (map->entrylist == NULL)
 			{
-				mame_printf_error("%s: %s wrong MEMORY_READ_START for %s space\n", driver->source_file, driver->name, spacename[spacenum]);
+				address_map_free(map);
+				continue;
+			}
+
+			/* validate the global map parameters */
+			if (map->spacenum != spacenum)
+			{
+				mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!", driver->source_file, driver->name, cpunum, spacenum, map->spacenum);
+				error = TRUE;
+			}
+			if (map->databits != databus_width)
+			{
+				mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, address_space_names[spacenum], databus_width, map->databits);
 				error = TRUE;
 			}
 
 			/* loop over entries and look for errors */
-			for ( ; !IS_AMENTRY_END(map); map++)
-				if (!IS_AMENTRY_EXTENDED(map))
+			for (entry = map->entrylist; entry != NULL; entry = entry->next)
+			{
+				UINT32 start = SPACE_SHIFT(entry->start);
+				UINT32 end = SPACE_SHIFT_END(entry->end);
+
+				/* look for inverted start/end pairs */
+				if (end < start)
 				{
-					UINT32 start = SPACE_SHIFT(map->start);
-					UINT32 end = SPACE_SHIFT_END(map->end);
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, address_space_names[spacenum], entry->start, entry->end);
+					error = TRUE;
+				}
 
-					/* look for inverted start/end pairs */
-					if (end < start)
+				/* look for misaligned entries */
+				if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+				{
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, address_space_names[spacenum], entry->start, entry->end, alignunit);
+					error = TRUE;
+				}
+
+				/* if this is a program space, auto-assign implicit ROM entries */
+				if ((FPTR)entry->read.handler == STATIC_ROM && !entry->region)
+				{
+					entry->region = REGION_CPU1 + cpunum;
+					entry->region_offs = entry->start;
+				}
+
+				/* if this entry references a memory region, validate it */
+				if (entry->region && entry->share == 0)
+				{
+					offs_t length = region_length[entry->region];
+
+					if (length == 0)
 					{
-						mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end);
+						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, entry->start, entry->end, entry->region);
 						error = TRUE;
 					}
-
-					/* look for misaligned entries */
-					if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+					else if (entry->region_offs + (end - start + 1) > length)
 					{
-						mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, spacename[spacenum], map->start, map->end, alignunit);
-						error = TRUE;
-					}
-
-					/* if this is a program space, auto-assign implicit ROM entries */
-					if ((FPTR)map->read.handler == STATIC_ROM && !map->region)
-					{
-						map->region = REGION_CPU1 + cpunum;
-						map->region_offs = map->start;
-					}
-
-					/* if this entry references a memory region, validate it */
-					if (map->region && map->share == 0)
-					{
-						offs_t length = region_length[map->region];
-
-						if (length == 0)
-						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region);
-							error = TRUE;
-						}
-						else if (map->region_offs + (end - start + 1) > length)
-						{
-							mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, map->start, map->end, map->region, length);
-							error = TRUE;
-						}
-					}
-
-					/* make sure all devices exist */
-					if (map->read_devtype != NULL && device_list_find_by_tag(config->devicelist, map->read_devtype, map->read_devtag) == NULL)
-					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->read_devtype), map->read_devtag);
-						error = TRUE;
-					}
-					if (map->write_devtype != NULL && device_list_find_by_tag(config->devicelist, map->write_devtype, map->write_devtag) == NULL)
-					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(map->write_devtype), map->write_devtag);
+						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->start, entry->end, entry->region, length);
 						error = TRUE;
 					}
 				}
-				else
-				{
-					flags = AM_EXTENDED_FLAGS(map);
-					if (flags & AMEF_SPECIFIES_SPACE)
-					{
-						int val = (flags & AMEF_SPACE_MASK) >> AMEF_SPACE_SHIFT;
-						if (val != spacenum)
-						{
-							mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!", driver->source_file, driver->name, cpunum, spacenum, val);
-							error = TRUE;
-						}
-					}
 
-					/* verify the type of memory handlers */
-					if (flags & AMEF_SPECIFIES_DBITS)
-					{
-						int val = (flags & AMEF_DBITS_MASK) >> AMEF_DBITS_SHIFT;
-						val = (val + 1) * 8;
-						if (val != databus_width)
-						{
-							mame_printf_error("%s: %s cpu #%d uses wrong memory handlers for %s space! (width = %d, memory = %08x)\n", driver->source_file, driver->name, cpunum, spacename[spacenum], databus_width, val);
-							error = TRUE;
-						}
-					}
+				/* make sure all devices exist */
+				if (entry->read_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtype, entry->read_devtag) == NULL)
+				{
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->read_devtype), entry->read_devtag);
+					error = TRUE;
 				}
+				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
+				{
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->write_devtype), entry->write_devtag);
+					error = TRUE;
+				}
+			}
+
+			/* release the address map */
+			address_map_free(map);
 
 			/* validate the interrupts */
 			if (cpu->vblank_interrupt != NULL)

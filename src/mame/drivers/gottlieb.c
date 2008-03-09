@@ -410,7 +410,7 @@ logerror("current frame : %d\n",current_frame);
 
 
 static ADDRESS_MAP_START( reactor_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(16) )
+	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x02000, 0x020ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x03000, 0x033ff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, gottlieb_videoram_w) AM_BASE(&videoram)
@@ -426,7 +426,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(16) )
+	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_REGION(REGION_CPU1, 0x1000)	/* or ROM */
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_REGION(REGION_CPU1, 0x2000) 	/* or ROM */
@@ -446,7 +446,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gottlieb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	/* A15 not decoded except in expansion socket */
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0180) AM_RAM
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x01e0) AM_READWRITE(gottlieb_riot_r, MWA8_RAM) AM_BASE(&gottlieb_riot_regs)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(DAC_0_data_w)

@@ -180,7 +180,7 @@ static WRITE8_HANDLER( tubep_soundlatch_w )
 }
 
 static ADDRESS_MAP_START( tubep_main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_3_r)
 	AM_RANGE(0x90, 0x90) AM_READ(input_port_4_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(input_port_5_r)
@@ -222,7 +222,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( tubep_second_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(second_cpu_irq_line_clear_w)
 ADDRESS_MAP_END
 
@@ -258,7 +258,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( tubep_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_control_port_1_w)
@@ -422,7 +422,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rjammer_main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_2_r)	/* a bug in game code (during attract mode) */
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_2_r)
 	AM_RANGE(0x90, 0x90) AM_READ(input_port_3_r)
@@ -446,7 +446,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rjammer_second_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
 ADDRESS_MAP_END
@@ -614,7 +614,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rjammer_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(rjammer_soundlatch_r)
 	AM_RANGE(0x10, 0x10) AM_WRITE(rjammer_voice_startstop_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(rjammer_voice_frequency_select_w)

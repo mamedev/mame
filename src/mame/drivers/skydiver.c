@@ -182,7 +182,7 @@ static WRITE8_HANDLER( skydiver_whistle_w )
  *************************************/
 
 static ADDRESS_MAP_START( skydiver_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x4300) AM_READWRITE(skydiver_wram_r, skydiver_wram_w)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x4000) AM_READWRITE(MRA8_RAM, MWA8_RAM)		/* RAM B1 */
 	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x4000) AM_READWRITE(MRA8_RAM, skydiver_videoram_w) AM_BASE(&skydiver_videoram)		/* RAMs K1,M1,P1,J1,N1,K/L1,L1,H/J1 */

@@ -172,7 +172,7 @@ static WRITE8_HANDLER( skylncr_coin_w )
 }
 
 static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x00, 0x00) AM_READ( input_port_0_r )
 	AM_RANGE(0x01, 0x01) AM_READ( input_port_1_r )

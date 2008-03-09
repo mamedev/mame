@@ -460,13 +460,13 @@ static ADDRESS_MAP_START( fromanc2_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(fromanc2_maincpu_r_l)			// to MAIN CPU
 	AM_RANGE(0x04, 0x04) AM_READ(fromanc2_maincpu_r_h)			// to MAIN CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_writeport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fromanc2_subcpu_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(fromanc2_maincpu_w_l)			// from MAIN CPU
 	AM_RANGE(0x04, 0x04) AM_WRITE(fromanc2_maincpu_w_h)			// from MAIN CPU
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( fromanc2_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_readport_sound, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)					// snd cmd (1P)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)					// snd cmd (2P)
 	AM_RANGE(0x09, 0x09) AM_READ(MRA8_NOP)						// ?
@@ -499,7 +499,7 @@ static ADDRESS_MAP_START( fromanc2_readport_sound, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_writeport_sound, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)						// ?
 	AM_RANGE(0x08, 0x08) AM_WRITE(YM2610_control_port_0_A_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(YM2610_data_port_0_A_w)

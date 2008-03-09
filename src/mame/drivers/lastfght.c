@@ -347,7 +347,7 @@ static WRITE16_HANDLER( lastfght_sound_w )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( lastfght_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(24) )
+	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION(REGION_CPU1, 0)
 	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION(REGION_CPU1, 0)

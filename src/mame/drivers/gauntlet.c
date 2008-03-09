@@ -314,7 +314,7 @@ static WRITE8_HANDLER( mixer_w )
 
 /* full map verified from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x280000) AM_ROM
 
 	/* MBUS */
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
 
 /* full map verified from schematics */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE(atarigen_6502_sound_w)
 	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ(atarigen_6502_sound_r)

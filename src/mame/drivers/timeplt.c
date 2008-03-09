@@ -105,7 +105,7 @@ static WRITE8_HANDLER( timeplt_coin_counter_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(MRA8_RAM, timeplt_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xa400, 0xa7ff) AM_READWRITE(MRA8_RAM, timeplt_videoram_w) AM_BASE(&videoram)

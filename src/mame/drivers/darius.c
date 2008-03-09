@@ -562,14 +562,14 @@ static WRITE8_HANDLER( adpcm_data_w )
 }
 
 static ADDRESS_MAP_START( darius_sound2_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(adpcm_command_read)
 	AM_RANGE(0x02, 0x02) AM_READ(readport2)	/* ??? */
 	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
 	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_data_w)

@@ -580,9 +580,10 @@ INLINE void taitoic_drawscanline(
 
 static int has_write_handler(int cpunum, write16_machine_func handler)
 {
-	const address_map *map;
-	for (map = memory_get_map(cpunum, ADDRESS_SPACE_PROGRAM); map && !IS_AMENTRY_END(map); map++)
-		if (map->write.handler16 == handler)
+	const address_map *map = memory_get_map(cpunum, ADDRESS_SPACE_PROGRAM);
+	const address_map_entry *entry;
+	for (entry = map->entrylist; entry != NULL; entry = entry->next)
+		if (entry->write.mhandler16 == handler)
 			return 1;
 
 	return 0;

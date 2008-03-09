@@ -83,7 +83,7 @@ static READ16_HANDLER( inputs_r )
 
 /* full map verified from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x7f81fe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xff8200, 0xff8201) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_scanline_int_ack_w)

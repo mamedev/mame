@@ -449,7 +449,7 @@ static READ8_HANDLER( turbotag_kludge_r )
 
 /* address map verified from schematics */
 static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -461,7 +461,8 @@ ADDRESS_MAP_END
 
 /* I/O map verified from schematics */
 static ADDRESS_MAP_START( mcrmono_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP1")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP2")
@@ -482,7 +483,7 @@ ADDRESS_MAP_END
 
 /* address map verified from schematics */
 static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(MRA8_RAM, spyhunt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
@@ -493,7 +494,8 @@ ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
 static ADDRESS_MAP_START( spyhunt_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) | AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS
 	AM_RANGE(0x84, 0x86) AM_WRITE(mcr_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)

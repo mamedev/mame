@@ -498,7 +498,7 @@ void m4510_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m4510_dasm;			break;
 #endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m4510_ICount;			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map = construct_map_m4510_mem; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m4510_mem; break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = m4510_translate;		break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m4510.rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m4510.wrmem_id;		break;

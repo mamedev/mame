@@ -827,7 +827,7 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(z80dma_0_r, z80dma_0_w)	/* dma controller */
 	//AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)   /* dma controller */
 ADDRESS_MAP_END
@@ -835,7 +835,7 @@ ADDRESS_MAP_END
 /* Epos conversions */
 
 static ADDRESS_MAP_START( epos_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom) 	/* Switch protection logic */
 ADDRESS_MAP_END
 

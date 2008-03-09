@@ -1865,7 +1865,7 @@ static ADDRESS_MAP_START( quizchq_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w		)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizchq_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( quizchq_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r			)
 	AM_RANGE(0x1b, 0x1b) AM_READ(rongrong_blitter_busy_r	)
 	AM_RANGE(0x1c, 0x1c) AM_READ(rongrong_input_r			)
@@ -1875,7 +1875,7 @@ static ADDRESS_MAP_START( quizchq_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FL
 	AM_RANGE(0xa0, 0xaf) AM_READ(msm6242_r					)	// 6242RTC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizchq_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( quizchq_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w		)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(rongrong_blitter_busy_w	)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(rongrong_select_w			)
@@ -1910,7 +1910,7 @@ static ADDRESS_MAP_START( rongrong_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w	)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rongrong_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( rongrong_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r			)
 	AM_RANGE(0x1b, 0x1b) AM_READ(rongrong_blitter_busy_r	)
 	AM_RANGE(0x1c, 0x1c) AM_READ(rongrong_input_r			)
@@ -1920,7 +1920,7 @@ static ADDRESS_MAP_START( rongrong_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0xa2, 0xa3) AM_READ(rongrong_input2_r			)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rongrong_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( rongrong_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w		)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(rongrong_blitter_busy_w	)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(rongrong_select_w			)
@@ -2028,7 +2028,7 @@ static ADDRESS_MAP_START( mmpanic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w		)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmpanic_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mmpanic_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ(msm6242_r				)	// 6242RTC
 	AM_RANGE(0x38, 0x38) AM_READ(unk_r					)	// ? must be 78 on startup
 	AM_RANGE(0x58, 0x58) AM_READ(unk_r					)	// ? must be 78 on startup
@@ -2042,7 +2042,7 @@ static ADDRESS_MAP_START( mmpanic_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FL
 	AM_RANGE(0x9c, 0x9c) AM_READ(input_port_4_r			)	// DSW 1&2 high bits
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmpanic_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mmpanic_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_WRITE(msm6242_w					)	// 6242RTC
 	// Layers 0-3:
 	AM_RANGE(0x20, 0x23) AM_WRITE(ddenlovr_palette_base_w		)
@@ -2088,13 +2088,13 @@ static ADDRESS_MAP_START( mmpanic_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x66ff) AM_WRITE(MWA8_RAM		)	// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmpanic_sound_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mmpanic_sound_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r		)
 	AM_RANGE(0x02, 0x02) AM_READ(MRA8_NOP			)	// read just before port 00
 	AM_RANGE(0x04, 0x04) AM_READ(MRA8_NOP			)	// read only once at the start
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmpanic_sound_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mmpanic_sound_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(MWA8_NOP					)	// 0, during IRQ
 	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP					)	// almost always 1, sometimes 0
 	AM_RANGE(0x08, 0x08) AM_WRITE(YM2413_register_port_0_w	)
@@ -2200,7 +2200,7 @@ static WRITE8_HANDLER( funkyfig_lockout_w )
 	}
 }
 
-static ADDRESS_MAP_START( funkyfig_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( funkyfig_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ( OKIM6295_status_0_r	)	// Sound
 	AM_RANGE(0x04, 0x04) AM_READ( funkyfig_busy_r		)
 	AM_RANGE(0x1c, 0x1c) AM_READ( funkyfig_dsw_r		)
@@ -2212,7 +2212,7 @@ static ADDRESS_MAP_START( funkyfig_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 //  Other cabinets?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( funkyfig_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( funkyfig_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE( OKIM6295_data_0_w		)	// Sound
 	AM_RANGE(0x01, 0x01) AM_WRITE( mmpanic_leds_w			)	// Leds
 	AM_RANGE(0x02, 0x02) AM_WRITE( mmpanic_soundlatch_w		)	//
@@ -2237,7 +2237,7 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( funkyfig_sound_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( funkyfig_sound_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r		)
 	AM_RANGE(0x04, 0x04) AM_READ(MRA8_NOP			)	// read only once at the start
 ADDRESS_MAP_END
@@ -2387,7 +2387,7 @@ static READ8_HANDLER( hanakanz_rand_r )
 	return mame_rand(Machine);
 }
 
-static ADDRESS_MAP_START( hanakanz_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hanakanz_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_READ( hanakanz_busy_r			)
 	AM_RANGE(0x32, 0x32) AM_READ( hanakanz_dsw_r			)
 	AM_RANGE(0x83, 0x84) AM_READ( hanakanz_gfxrom_r			)
@@ -2398,7 +2398,7 @@ static ADDRESS_MAP_START( hanakanz_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0xe0, 0xef) AM_READ( msm6242_r					)	// 6242RTC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hanakanz_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hanakanz_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_WRITE( hanakanz_oki_bank_w		)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE( hanakanz_blitter_reg_w	)
 	AM_RANGE(0x30, 0x30) AM_WRITE( hanakanz_rombank_w		)
@@ -2414,7 +2414,7 @@ static ADDRESS_MAP_START( hanakanz_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hkagerou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hkagerou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_READ( hanakanz_busy_r			)
 	AM_RANGE(0x32, 0x32) AM_READ( hanakanz_dsw_r			)
 	AM_RANGE(0x83, 0x84) AM_READ( hanakanz_gfxrom_r			)
@@ -2425,7 +2425,7 @@ static ADDRESS_MAP_START( hkagerou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0xe0, 0xef) AM_READ( msm6242_r					)	// 6242RTC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hkagerou_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hkagerou_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_WRITE( hanakanz_oki_bank_w		)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE( hanakanz_blitter_reg_w	)
 	AM_RANGE(0x30, 0x30) AM_WRITE( hanakanz_rombank_w		)
@@ -2453,7 +2453,7 @@ static READ8_HANDLER( mjreach1_protection_r )
 	return mjreach1_protection_val;
 }
 
-static ADDRESS_MAP_START( mjreach1_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mjreach1_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_READ( hanakanz_busy_r			)
 	AM_RANGE(0x32, 0x32) AM_READ( hanakanz_dsw_r			)
 	AM_RANGE(0x83, 0x84) AM_READ( hanakanz_gfxrom_r			)
@@ -2465,7 +2465,7 @@ static ADDRESS_MAP_START( mjreach1_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0xe0, 0xef) AM_READ( msm6242_r					)	// 6242RTC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjreach1_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mjreach1_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x2c, 0x2c) AM_WRITE( hanakanz_oki_bank_w		)
 	AM_RANGE(0x2e, 0x2e) AM_WRITE( hanakanz_blitter_reg_w	)
 	AM_RANGE(0x30, 0x30) AM_WRITE( hanakanz_rombank_w		)
@@ -2713,7 +2713,7 @@ static WRITE8_HANDLER( mjmyster_blitter_w )
 	blitter_w(0,offset,data,0xfc);
 }
 
-static ADDRESS_MAP_START( mjmyster_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mjmyster_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ( rongrong_gfxrom_r			)
 	AM_RANGE(0x22, 0x22) AM_READ( mjmyster_coins_r			)
 	AM_RANGE(0x23, 0x23) AM_READ( mjmyster_keyb_r			)
@@ -2725,7 +2725,7 @@ static ADDRESS_MAP_START( mjmyster_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0xc3, 0xc3) AM_READ( mjmyster_dsw_r			)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjmyster_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mjmyster_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE( mjmyster_blitter_w		)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE( mjmyster_rambank_w		)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE( mmpanic_rombank_w		)
@@ -2891,7 +2891,7 @@ static WRITE8_HANDLER( hginga_blitter_w )
 	blitter_w(0,offset,data,0xfc);
 }
 
-static ADDRESS_MAP_START( hginga_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hginga_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ( rongrong_gfxrom_r			)
 	AM_RANGE(0x1c, 0x1c) AM_READ( MRA8_NOP					)
 	AM_RANGE(0x24, 0x24) AM_READ( AY8910_read_port_0_r		)
@@ -2901,7 +2901,7 @@ static ADDRESS_MAP_START( hginga_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLA
 	AM_RANGE(0xb8, 0xb8) AM_READ( unk_r						)	// ? must be 78 on startup
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hginga_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hginga_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE( hginga_blitter_w			)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE( mjmyster_rambank_w		)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE( hginga_rombank_w			)
@@ -3004,7 +3004,7 @@ static ADDRESS_MAP_START( hgokou_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hgokou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hgokou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r			)
 	AM_RANGE(0x1c, 0x1c) AM_READ(MRA8_NOP					)	// ? ack on RTC int
 	AM_RANGE(0x20, 0x2f) AM_READ(msm6242_r					)	// 6242RTC
@@ -3014,7 +3014,7 @@ static ADDRESS_MAP_START( hgokou_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLA
 	AM_RANGE(0x84, 0x84) AM_READ(AY8910_read_port_0_r		)
 	AM_RANGE(0xb0, 0xb0) AM_READ(hanakanz_rand_r			)
 ADDRESS_MAP_END
-static ADDRESS_MAP_START( hgokou_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hgokou_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(hginga_blitter_w			)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE(mjmyster_rambank_w		)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w			)
@@ -3101,7 +3101,7 @@ static ADDRESS_MAP_START( hparadis_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 // the RTC seems unused
-static ADDRESS_MAP_START( hparadis_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hparadis_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r			)
 	AM_RANGE(0x1b, 0x1b) AM_READ(rongrong_blitter_busy_r	)
 	AM_RANGE(0x1c, 0x1c) AM_READ(hparadis_dsw_r				)
@@ -3109,7 +3109,7 @@ static ADDRESS_MAP_START( hparadis_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0x98, 0x98) AM_READ(unk_r						)	// ? must be 78 on startup
 	AM_RANGE(0xa2, 0xa3) AM_READ(hparadis_input_r			)
 ADDRESS_MAP_END
-static ADDRESS_MAP_START( hparadis_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( hparadis_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w		)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(rongrong_blitter_busy_w	)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE(hparadis_select_w			)
@@ -3148,7 +3148,7 @@ static READ8_HANDLER( mjmywrld_coins_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mjmywrld_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mjmywrld_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ( rongrong_gfxrom_r			)
 	AM_RANGE(0x22, 0x22) AM_READ( mjmywrld_coins_r			)
 	AM_RANGE(0x23, 0x23) AM_READ( mjmyster_keyb_r			)
@@ -3160,7 +3160,7 @@ static ADDRESS_MAP_START( mjmywrld_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_F
 	AM_RANGE(0xe0, 0xe0) AM_READ( mjmyster_dsw_r			)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjmywrld_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+static ADDRESS_MAP_START( mjmywrld_writeport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE( mjmyster_blitter_w		)
 	AM_RANGE(0x1c, 0x1c) AM_WRITE( mjmyster_rambank_w		)
 	AM_RANGE(0x1e, 0x1e) AM_WRITE( hginga_rombank_w			)

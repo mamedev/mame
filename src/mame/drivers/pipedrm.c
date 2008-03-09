@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x20, 0x20) AM_READWRITE(input_port_0_r, sound_command_w)
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
 	AM_RANGE(0x17, 0x17) AM_WRITE(pending_command_clear_w)
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hatris_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM2608_control_port_0_B_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2608_data_port_0_B_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_command_r)

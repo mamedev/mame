@@ -3,8 +3,7 @@
 
 /*----------- defined in drivers/cps1.c -----------*/
 
-ADDRESS_MAP_EXTERN(qsound_readmem);
-ADDRESS_MAP_EXTERN(qsound_writemem);
+ADDRESS_MAP_EXTERN(qsound_map, 8);
 
 READ16_HANDLER( qsound_sharedram1_r );
 WRITE16_HANDLER( qsound_sharedram1_w );

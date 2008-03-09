@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(galivan_gfxbank_w)
 	AM_RANGE(0x41, 0x42) AM_WRITE(galivan_scrollx_w)
 	AM_RANGE(0x43, 0x44) AM_WRITE(galivan_scrolly_w)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjemak_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_0_r)
 	AM_RANGE(0x81, 0x81) AM_READ(input_port_1_r)
 	AM_RANGE(0x82, 0x82) AM_READ(input_port_2_r)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( ninjemak_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjemak_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_WRITE(ninjemak_gfxbank_w)
 	AM_RANGE(0x85, 0x85) AM_WRITE(galivan_sound_command_w)
 //  AM_RANGE(0x86, 0x86) AM_WRITE(MWA8_NOP)         // ??
@@ -176,13 +176,13 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 /*  AM_RANGE(0x04, 0x04) AM_READ(MRA8_NOP)    value read and *discarded*    */
 	AM_RANGE(0x06, 0x06) AM_READ(galivan_sound_command_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM3526_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM3526_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(DAC_0_data_w)

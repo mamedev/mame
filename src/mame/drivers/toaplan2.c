@@ -1867,7 +1867,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(raizing_sndirq_w)
@@ -1894,7 +1894,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_port, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(raizing_sndirq_w)

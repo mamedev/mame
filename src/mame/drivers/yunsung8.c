@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, yunsung8_videobank_w	)	// read = coins . write = video RAM bank
 	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, yunsung8_bankswitch_w	)	// read = P1 . write = ROM Bank + Layers Enable
 	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, soundlatch_w			)	// read = P2 . write = To Sound CPU

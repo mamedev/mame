@@ -411,14 +411,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sngkace_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(YM2610_status_port_0_A_r		)
 	AM_RANGE(0x02, 0x02) AM_READ(YM2610_status_port_0_B_r		)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r			)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2610_control_port_0_A_w		)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w		)
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM2610_control_port_0_B_w		)
@@ -457,14 +457,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gunbird_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READ(YM2610_status_port_0_A_r		)
 	AM_RANGE(0x06, 0x06) AM_READ(YM2610_status_port_0_B_r		)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r			)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunbird_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w	)
 	AM_RANGE(0x04, 0x04) AM_WRITE(YM2610_control_port_0_A_w		)
 	AM_RANGE(0x05, 0x05) AM_WRITE(YM2610_data_port_0_A_w		)
@@ -479,13 +479,13 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( s1945_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(YMF278B_status_port_0_r		)
 	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r			)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s1945_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w	)
 	AM_RANGE(0x02, 0x03) AM_WRITE(MWA8_NOP						)
 	AM_RANGE(0x08, 0x08) AM_WRITE(YMF278B_control_port_0_A_w	)

@@ -1102,7 +1102,7 @@ static void sharc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sharc_icount;			break;
 		case CPUINFO_PTR_READ:							info->read = sharc_debug_read;			break;
 		case CPUINFO_PTR_READOP:						info->readop = sharc_debug_readop;		break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_internal_pgm; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = address_map_internal_pgm; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "SHARC");				break;

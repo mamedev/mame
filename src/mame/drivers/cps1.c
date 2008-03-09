@@ -509,22 +509,16 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( qsound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)  /* banked (contains music data) */
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd007, 0xd007) AM_READ(qsound_status_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START( qsound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM) AM_BASE(&qsound_sharedram1)
+ADDRESS_MAP_START( qsound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/* banked (contains music data) */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&qsound_sharedram1)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(qsound_data_h_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(qsound_data_l_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(qsound_cmd_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(qsound_banksw_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&qsound_sharedram2)
+	AM_RANGE(0xd007, 0xd007) AM_READ(qsound_status_r)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&qsound_sharedram2)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -3523,7 +3517,7 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_CPU_VBLANK_INT("main", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
 	MDRV_CPU_REPLACE("sound", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)
+	MDRV_CPU_PROGRAM_MAP(qsound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
 	MDRV_NVRAM_HANDLER(qsound)

@@ -106,7 +106,7 @@ static WRITE8_HANDLER( canyon_led_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0400, 0x0401) AM_WRITE(canyon_motor_w)
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(canyon_explode_w)

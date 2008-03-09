@@ -658,7 +658,7 @@ extern WRITE16_HANDLER( model1_tgp_vr_adr_w );
 extern READ16_HANDLER( model1_vr_tgp_ram_r );
 extern WRITE16_HANDLER( model1_vr_tgp_ram_w );
 extern void model1_vr_tgp_reset( void );
-ADDRESS_MAP_EXTERN( model1_vr_tgp_map );
+ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
 static int model1_sound_irq;
 

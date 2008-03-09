@@ -581,7 +581,7 @@ static ADDRESS_MAP_START( srmp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)						/* coin, service */
 	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
 	AM_RANGE(0xc0, 0xc0) AM_READ(srmp3_input_r)						/* key matrix */
@@ -590,7 +590,7 @@ static ADDRESS_MAP_START( srmp3_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_WRITE(MWA8_NOP)							/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_WRITE(srmp3_flags_w)						/* GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)					/* ROM bank select */

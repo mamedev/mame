@@ -410,7 +410,7 @@ struct SearchRegion
 	UINT8	flags;
 
 	UINT8	* cachedPointer;
-	const address_map
+	const address_map_entry
 			* writeHandler;
 
 	UINT8	* first;
@@ -8922,7 +8922,7 @@ static void RestoreRegionBackup(SearchRegion * region)
 
 static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region, SearchInfo * info)
 {
-	write8_machine_func		handler = region->writeHandler->write.handler8;
+	write8_machine_func	handler = region->writeHandler->write.mhandler8;
 	FPTR				handlerAddress = (FPTR)handler;
 
 	switch(info->searchSpeed)
@@ -8939,7 +8939,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			}
 #endif
 
-			if(	(handler == MWA8_RAM) && (!region->writeHandler->base))
+			if(	(handler == MWA8_RAM) && (!region->writeHandler->baseptr))
 				return 1;
 
 #ifndef MESS
@@ -8981,7 +8981,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			if(	(handler == MWA8_NOP) || (handler == MWA8_ROM))
 				return 0;
 
-			if(	(handlerAddress > STATIC_COUNT) && (!region->writeHandler->base))
+			if(	(handlerAddress > STATIC_COUNT) && (!region->writeHandler->baseptr))
 				return 0;
 
 			return 1;
@@ -9155,37 +9155,31 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 				if(info->targetIdx < cpu_gettotalcpu())
 				{
 					const address_map			* map = NULL;
+					const address_map_entry			* entry;
 					SearchRegion						* traverse;
 					int									count = 0;
 
 					map = memory_get_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
-
-					while(!IS_AMENTRY_END(map))
-					{
-						if(!IS_AMENTRY_EXTENDED(map) && map->write.handler)
+					for (entry = map->entrylist; entry != NULL; entry = entry->next)
+						if (entry->write.handler)
 							count++;
-
-						map++;
-					}
 
 					info->regionList = calloc(sizeof(SearchRegion), count);
 					info->regionListLength = count;
 					traverse = info->regionList;
 
-					map = memory_get_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
-
-					while(!IS_AMENTRY_END(map))
+					for (entry = map->entrylist; entry != NULL; entry = entry->next)
 					{
-						if(!IS_AMENTRY_EXTENDED(map) && map->write.handler)
+						if (entry->write.handler)
 						{
-							UINT32	length = (map->end - map->start) + 1;
+							UINT32	length = (entry->end - entry->start) + 1;
 
-							traverse->address = map->start;
+							traverse->address = entry->start;
 							traverse->length = length;
 
 							traverse->targetIdx = info->targetIdx;
 							traverse->targetType = info->targetType;
-							traverse->writeHandler = map;
+							traverse->writeHandler = entry;
 
 							traverse->first = NULL;
 							traverse->last = NULL;
@@ -9200,8 +9194,6 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 
 							traverse++;
 						}
-
-						map++;
 					}
 				}
 			}
@@ -10475,22 +10467,16 @@ static void DoSearch(SearchInfo * search)
 static UINT8 ** LookupHandlerMemory(UINT8 cpu, UINT32 address, UINT32 * outRelativeAddress)
 {
 	const address_map	* map = memory_get_map(cpu, ADDRESS_SPACE_PROGRAM);
-
-	while(!IS_AMENTRY_END(map))
-	{
-		if(!IS_AMENTRY_EXTENDED(map) && map->write.handler)
+	const address_map_entry *entry;
+	
+	for (entry = map->entrylist; entry != NULL; entry = entry->next)
+		if (entry->write.handler != NULL && (address >= entry->start) && (address <= entry->end))
 		{
-			if((address >= map->start) && (address <= map->end))
-			{
-				if(outRelativeAddress)
-					*outRelativeAddress = address - map->start;
+			if(outRelativeAddress)
+				*outRelativeAddress = address - entry->start;
 
-				return (UINT8 **)map->base;
-			}
+			return (UINT8 **)entry->baseptr;
 		}
-
-		map++;
-	}
 
 	return NULL;
 }

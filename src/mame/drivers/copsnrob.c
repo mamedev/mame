@@ -105,7 +105,7 @@ static WRITE8_HANDLER( copsnrob_led_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(13) )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0500, 0x0503) AM_WRITE(MWA8_RAM)
 //  AM_RANGE(0x0504, 0x0507) AM_WRITE(MWA8_NOP)  // ???

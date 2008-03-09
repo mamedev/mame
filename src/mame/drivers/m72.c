@@ -834,7 +834,7 @@ static ADDRESS_MAP_START( sound_rom_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
@@ -844,7 +844,7 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
@@ -855,7 +855,7 @@ static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_WRITE(poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x41, 0x41) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
@@ -1956,7 +1956,7 @@ MACHINE_DRIVER_END
 
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1978,7 +1978,7 @@ static READ8_HANDLER(m72_mcu_data_r )
 }
 
 static ADDRESS_MAP_START( mcu_data_map, ADDRESS_SPACE_DATA, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	/* shared at b0000 - b0fff on the main cpu */
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
 ADDRESS_MAP_END

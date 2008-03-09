@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
 	AM_RANGE( 0x1000, 0x17FF) AM_WRITE( jamma_if_control_latch_w )
 	AM_RANGE( 0x1800, 0x1FFF) AM_READ(  jamma_if_read_dsw )
-	AM_RANGE( 0x2000, 0x27FF) AM_READ(  port_tag_to_handler8( "COIN" ) )
+	AM_RANGE( 0x2000, 0x27FF) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x2800, 0x2FFF) AM_READ(  jamma_if_control_latch_r )
 ADDRESS_MAP_END
 

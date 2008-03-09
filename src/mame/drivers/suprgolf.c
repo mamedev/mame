@@ -96,7 +96,7 @@ static READ8_HANDLER( suprgolf_random )
 }
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) // Player 1 controls
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r) // Player 2 controls
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r) // ??

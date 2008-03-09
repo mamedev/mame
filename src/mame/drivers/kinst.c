@@ -410,7 +410,7 @@ static READ32_HANDLER( kinst_speedup_r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(&rambase)
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE(&rambase2)
 	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_BASE(&kinst_control)

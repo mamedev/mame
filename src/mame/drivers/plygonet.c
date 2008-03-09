@@ -610,7 +610,7 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dsp56156_p_map, ADDRESS_SPACE_PROGRAM, 16 )
-//  ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+//  ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&dsp56k_p_mirror)   // is it 0x1000 words?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								// the processor memtests here
 ADDRESS_MAP_END

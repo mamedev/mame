@@ -1495,7 +1495,10 @@ void video_frame_update(running_machine *machine, int debug)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
 		if (video_screen_exists(0) && (mame_is_paused(machine) || debug || mame_debug_is_active()))
-			scanline0_callback(machine, machine->screen[0].private_data, 0);
+		{
+			void *param = (void *)machine->primary_screen;
+			scanline0_callback(machine, param, 0);
+		}
 
 		/* otherwise, call the video EOF callback */
 		else if (machine->config->video_eof != NULL)

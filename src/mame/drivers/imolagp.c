@@ -316,7 +316,7 @@ static WRITE8_HANDLER( vreg_data_w )
 }
 
 static ADDRESS_MAP_START( readport_master, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
 ADDRESS_MAP_END
 
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( imolagp_master, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_slave, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x05,0x05) AM_READ(imola_slave_port05r)
 	AM_RANGE(0x06,0x06) AM_READ(imola_slave_port06r)
 	AM_RANGE(0x81,0x81) AM_READ(imola_slave_port81r)

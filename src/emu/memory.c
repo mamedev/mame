@@ -233,9 +233,8 @@ struct _addrspace_data
 	UINT64					unmap;					/* unmapped value */
 	table_data				read;					/* memory read lookup table */
 	table_data				write;					/* memory write lookup table */
-	const data_accessors *		accessors;				/* pointer to the memory accessors */
+	const data_accessors *	accessors;				/* pointer to the memory accessors */
 	address_map *			map;					/* original memory map */
-	address_map *			adjmap;					/* adjusted memory map */
 };
 
 typedef struct _cpu_data cpu_data;
@@ -371,6 +370,8 @@ INLINE void force_opbase_update(void)
     FUNCTION PROTOTYPES
 -------------------------------------------------*/
 
+static void address_map_detokenize(address_map *map, const addrmap_token *tokens);
+
 static void init_cpudata(void);
 static void init_addrspace(UINT8 cpunum, UINT8 spacenum);
 static void preflight_memory(void);
@@ -387,9 +388,9 @@ static void release_subtable(table_data *tabledata, UINT8 subentry);
 static UINT8 *open_subtable(table_data *tabledata, offs_t l1index);
 static void close_subtable(table_data *tabledata, offs_t l1index);
 static void allocate_memory(void);
-static void *allocate_memory_block(int cpunum, int spacenum, offs_t start, offs_t end, void *memory);
+static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
 static void register_for_save(int cpunum, int spacenum, offs_t start, void *base, size_t numbytes);
-static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t start, offs_t end, UINT8 *base);
+static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t start, offs_t end, UINT8 *base);
 static void find_memory(void);
 static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t offset);
 static genf *get_static_handler(int databits, int readorwrite, int spacenum, int which);
@@ -468,9 +469,11 @@ static void memory_exit(running_machine *machine)
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
-			if (cpudata[cpunum].space[spacenum].read.table)
+			if (cpudata[cpunum].space[spacenum].map != NULL)
+				address_map_free(cpudata[cpunum].space[spacenum].map);
+			if (cpudata[cpunum].space[spacenum].read.table != NULL)
 				free(cpudata[cpunum].space[spacenum].read.table);
-			if (cpudata[cpunum].space[spacenum].write.table)
+			if (cpudata[cpunum].space[spacenum].write.table != NULL)
 				free(cpudata[cpunum].space[spacenum].write.table);
 		}
 }
@@ -542,6 +545,158 @@ void memory_set_context(int activecpu)
 		debug_hook_write = NULL;
 	}
 #endif
+}
+
+
+/*-------------------------------------------------
+    address_map_detokenize - detokenize an array
+    of address map tokens
+-------------------------------------------------*/
+
+static void address_map_detokenize(address_map *map, const addrmap_token *tokens)
+{
+	address_map_entry **entryptr;
+	address_map_entry *entry;
+	UINT8 spacenum, databits;
+	UINT32 entrytype;
+	
+	/* check the first token */
+	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, spacenum, 8, databits, 8);
+	if (entrytype != ADDRMAP_TOKEN_START)
+		fatalerror("Address map missing ADDRMAP_TOKEN_START!");
+	if (spacenum >= ADDRESS_SPACES)
+		fatalerror("Invalid address space %d for memory map!", spacenum);
+	if (databits != 8 && databits != 16 && databits != 32 && databits != 64)
+		fatalerror("Invalid data bits %d for memory map!", databits);
+	if (map->spacenum != 0 && map->spacenum != spacenum)
+		fatalerror("Included a mismatched address map (space %d) for an existing map of type %d!\n", spacenum, map->spacenum);
+	if (map->databits != 0 && map->databits != databits)
+		fatalerror("Included a mismatched address map (databits %d) for an existing map with databits %d!\n", databits, map->databits);
+	
+	/* fill in the map values */
+	map->spacenum = spacenum;
+	map->databits = databits;
+
+	/* find the end of the list */
+	for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
+	entry = NULL;
+
+	/* loop over tokens until we hit the end */
+	while (entrytype != ADDRMAP_TOKEN_END)
+	{
+		/* unpack the token from the first entry */
+		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
+		switch (entrytype)
+		{
+			/* end */
+			case ADDRMAP_TOKEN_END:
+				break;
+
+			/* including */
+			case ADDRMAP_TOKEN_INCLUDE:
+				address_map_detokenize(map, TOKEN_GET_PTR(tokens, tokenptr));
+				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
+				entry = NULL;
+				break;
+
+			/* global flags */
+			case ADDRMAP_TOKEN_GLOBAL_MASK:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, map->globalmask, 32);
+				break;
+				
+			case ADDRMAP_TOKEN_UNMAP_VALUE:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, map->unmapval, 1);
+				break;
+
+			/* start a new range */
+			case ADDRMAP_TOKEN_RANGE:
+				entry = *entryptr = malloc_or_die(sizeof(**entryptr));
+				entryptr = &entry->next;
+				memset(entry, 0, sizeof(*entry));
+				TOKEN_GET_UINT64_UNPACK2(tokens, entry->start, 32, entry->end, 32);
+				break;
+			
+			case ADDRMAP_TOKEN_MASK:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->mask, 32);
+				break;
+				
+			case ADDRMAP_TOKEN_MIRROR:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->mirror, 32);
+				break;
+				
+			case ADDRMAP_TOKEN_READ:
+				entry->read = TOKEN_GET_PTR(tokens, read);
+				entry->read_name = TOKEN_GET_STRING(tokens);
+				break;
+
+			case ADDRMAP_TOKEN_WRITE:
+				entry->write = TOKEN_GET_PTR(tokens, write);
+				entry->write_name = TOKEN_GET_STRING(tokens);
+				break;
+
+			case ADDRMAP_TOKEN_DEVICE_READ:
+				entry->read = TOKEN_GET_PTR(tokens, read);
+				entry->read_name = TOKEN_GET_STRING(tokens);
+				entry->read_devtype = TOKEN_GET_PTR(tokens, devtype);
+				entry->read_devtag = TOKEN_GET_STRING(tokens);
+				break;
+				
+			case ADDRMAP_TOKEN_DEVICE_WRITE:
+				entry->write = TOKEN_GET_PTR(tokens, write);
+				entry->write_name = TOKEN_GET_STRING(tokens);
+				entry->write_devtype = TOKEN_GET_PTR(tokens, devtype);
+				entry->write_devtag = TOKEN_GET_STRING(tokens);
+				break;
+
+			case ADDRMAP_TOKEN_READ_PORT:
+				switch (map->databits)
+				{
+					case 8:		entry->read.mhandler8  = port_tag_to_handler8(TOKEN_GET_STRING(tokens));	break;
+					case 16:	entry->read.mhandler16 = port_tag_to_handler16(TOKEN_GET_STRING(tokens));	break;
+					case 32:	entry->read.mhandler32 = port_tag_to_handler32(TOKEN_GET_STRING(tokens));	break;
+					case 64:	entry->read.mhandler64 = port_tag_to_handler64(TOKEN_GET_STRING(tokens));	break;
+				}
+				break;
+				
+			case ADDRMAP_TOKEN_REGION:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, entry->region, 24, entry->region_offs, 32);
+				break;
+				
+			case ADDRMAP_TOKEN_SHARE:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->share, 24);
+				break;
+				
+			case ADDRMAP_TOKEN_BASEPTR:
+				entry->baseptr = (void **)TOKEN_GET_PTR(tokens, voidptr);
+				break;
+				
+			case ADDRMAP_TOKEN_BASE_MEMBER:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->baseptroffs_plus1, 24);
+				entry->baseptroffs_plus1++;
+				break;
+
+			case ADDRMAP_TOKEN_SIZEPTR:
+				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
+				break;
+				
+			case ADDRMAP_TOKEN_SIZE_MEMBER:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
+				entry->sizeptroffs_plus1++;
+				break;
+			
+			default:
+				fatalerror("Invalid token %d in address map\n", entrytype);
+				break;
+		}
+	}
 }
 
 
@@ -1087,25 +1242,45 @@ UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t sta
 
 
 /*-------------------------------------------------
-    construct_address_map - build address map
+    address_map_alloc - build and allocate an 
+    address map
 -------------------------------------------------*/
 
-void construct_address_map(address_map *map, const machine_config *drv, int cpunum, int spacenum)
+address_map *address_map_alloc(const machine_config *config, int cpunum, int spacenum)
 {
-	int cputype = drv->cpu[cpunum].type;
-	construct_map_t internal_map = (construct_map_t)cputype_get_info_fct(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
-
-	map->flags = AM_FLAGS_END;
+	int cputype = config->cpu[cpunum].type;
+	const addrmap_token *internal_map = (const addrmap_token *)cputype_get_info_ptr(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
+	address_map *map;
+	
+	map = malloc_or_die(sizeof(*map));
+	memset(map, 0, sizeof(*map));
 
 	/* start by constructing the internal CPU map */
-	if (internal_map)
-		map = (*internal_map)(Machine, map);
+	if (internal_map != NULL)
+		address_map_detokenize(map, internal_map);
 
 	/* construct the standard map */
-	if (drv->cpu[cpunum].construct_map[spacenum][0])
-		map = (*drv->cpu[cpunum].construct_map[spacenum][0])(Machine, map);
-	if (drv->cpu[cpunum].construct_map[spacenum][1])
-		map = (*drv->cpu[cpunum].construct_map[spacenum][1])(Machine, map);
+	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
+		address_map_detokenize(map, config->cpu[cpunum].address_map[spacenum][0]);
+	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
+		address_map_detokenize(map, config->cpu[cpunum].address_map[spacenum][1]);
+
+	return map;
+}
+
+
+void address_map_free(address_map *map)
+{
+	/* free all entries */
+	while (map->entrylist != NULL)
+	{
+		address_map_entry *entry = map->entrylist;
+		map->entrylist = entry->next;
+		free(entry);
+	}
+	
+	/* free the map */
+	free(map);
 }
 
 
@@ -1187,7 +1362,6 @@ static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 	space->mask = SPACE_SHIFT_END(space, space->rawmask);
 	space->accessors = &memory_accessors[spacenum][accessorindex][cputype_endianness(cputype) == CPU_IS_LE ? 0 : 1];
 	space->map = NULL;
-	space->adjmap = NULL;
 
 	/* if there's nothing here, just punt */
 	if (space->abits == 0)
@@ -1196,54 +1370,53 @@ static void init_addrspace(UINT8 cpunum, UINT8 spacenum)
 
 	/* construct the combined memory map */
 	{
-		/* allocate and clear memory for 2 copies of the map */
-		address_map *map = auto_malloc(sizeof(space->map[0]) * MAX_ADDRESS_MAP_SIZE * 4);
-		memset(map, 0, sizeof(space->map[0]) * MAX_ADDRESS_MAP_SIZE * 4);
-
-		/* make pointers to the standard and adjusted maps */
-		space->map = map;
-		space->adjmap = &map[MAX_ADDRESS_MAP_SIZE * 2];
-
-		construct_address_map(map, Machine->config, cpunum, spacenum);
+		address_map_entry *entry;
+		
+		/* allocate the address map */
+		space->map = address_map_alloc(Machine->config, cpunum, spacenum);
 
 		/* convert implicit ROM entries to map to the memory region */
 		if (spacenum == ADDRESS_SPACE_PROGRAM && memory_region(REGION_CPU1 + cpunum))
-			for (map = space->map; !IS_AMENTRY_END(map); map++)
-				if (!IS_AMENTRY_EXTENDED(map) && HANDLER_IS_ROM(map->read.handler) && !map->region)
+			for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+				if (HANDLER_IS_ROM(entry->read.handler) && entry->region == 0)
 				{
-					offs_t end = SPACE_SHIFT_END(space, map->end);
+					offs_t end = SPACE_SHIFT_END(space, entry->end);
 
 					/* make sure they fit within the memory region before doing so, however */
 					if (end < memory_region_length(REGION_CPU1 + cpunum))
 					{
-						map->region = REGION_CPU1 + cpunum;
-						map->region_offs = SPACE_SHIFT(space, map->start);
+						entry->region = REGION_CPU1 + cpunum;
+						entry->region_offs = SPACE_SHIFT(space, entry->start);
 					}
 				}
 
 		/* convert region-relative entries to their memory pointers */
-		for (map = space->map; !IS_AMENTRY_END(map); map++)
-			if (map->region)
-				map->memory = memory_region(map->region) + map->region_offs;
+		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+			if (entry->region != 0)
+				entry->memory = memory_region(entry->region) + entry->region_offs;
 
 		/* make the adjusted map */
-		memcpy(space->adjmap, space->map, sizeof(space->map[0]) * MAX_ADDRESS_MAP_SIZE * 2);
-		for (map = space->adjmap; !IS_AMENTRY_END(map); map++)
-			if (!IS_AMENTRY_EXTENDED(map))
-				adjust_addresses(space, &map->start, &map->end, &map->mask, &map->mirror);
+		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+		{
+			entry->bytestart = entry->start;
+			entry->byteend = entry->end;
+			entry->bytemirror = entry->mirror;
+			entry->bytemask = entry->mask;
+			adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
+		}
 
 		/* validate adjusted addresses against implicit regions */
-		for (map = space->adjmap; !IS_AMENTRY_END(map); map++)
-			if (map->region && map->share == 0 && !map->base)
+		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+			if (entry->region != 0 && entry->share == 0 && entry->baseptr == NULL)
 			{
-				UINT8 *base = memory_region(map->region);
-				offs_t length = memory_region_length(map->region);
+				UINT8 *base = memory_region(entry->region);
+				offs_t length = memory_region_length(entry->region);
 
 				/* validate the region */
-				if (!base)
-					fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region %d", cpunum, spacenum, map->start, map->end, map->region);
-				if (map->region_offs + (map->end - map->start + 1) > length)
-					fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)", cpunum, spacenum, map->start, map->end, map->region, length);
+				if (base == NULL)
+					fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region %d", cpunum, spacenum, entry->start, entry->end, entry->region);
+				if (entry->region_offs + (entry->byteend - entry->bytestart + 1) > length)
+					fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)", cpunum, spacenum, entry->start, entry->end, entry->region, length);
 			}
 	}
 
@@ -1286,78 +1459,46 @@ static void preflight_memory(void)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
 				addrspace_data *space = &cpudata[cpunum].space[spacenum];
-				const address_map *map;
+				const address_map_entry *entry;
+
+				if (space->map->globalmask != 0)
+				{
+					space->rawmask = space->map->globalmask;
+					space->mask = SPACE_SHIFT_END(space, space->rawmask);
+				}
+				space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
 
 				/* scan the adjusted map */
-				for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
+				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 				{
-					/* look for extended flags */
-					if (IS_AMENTRY_EXTENDED(map))
+					int bank = -1;
+
+					/* look for a bank handler in eithe read or write */
+					if (HANDLER_IS_BANK(entry->read.handler))
+						bank = HANDLER_TO_BANK(entry->read.handler);
+					else if (HANDLER_IS_BANK(entry->write.handler))
+						bank = HANDLER_TO_BANK(entry->write.handler);
+
+					/* if we got one, add the data */
+					if (bank >= 1 && bank <= MAX_EXPLICIT_BANKS)
 					{
-						UINT32 flags = AM_EXTENDED_FLAGS(map);
-						UINT32 val;
+						bank_data *bdata = &bankdata[bank];
 
-						/* if we specify an address space, make sure it matches the current space */
-						if (flags & AMEF_SPECIFIES_SPACE)
-						{
-							val = (flags & AMEF_SPACE_MASK) >> AMEF_SPACE_SHIFT;
-							if (val != spacenum)
-								fatalerror("cpu #%d has address space %d handlers in place of address space %d handlers!", cpunum, val, spacenum);
-						}
+						/* wire up state saving for the entry the first time we see it */
+						if (!bdata->used)
+							state_save_register_item("memory", bank, bdata->curentry);
 
-						/* if we specify an databus width, make sure it matches the current address space's */
-						if (flags & AMEF_SPECIFIES_DBITS)
-						{
-							val = (flags & AMEF_DBITS_MASK) >> AMEF_DBITS_SHIFT;
-							val = (val + 1) * 8;
-							if (val != space->dbits)
-								fatalerror("cpu #%d uses wrong %d-bit handlers for address space %d (should be %d-bit)!", cpunum, val, spacenum, space->dbits);
-						}
-
-						/* if we specify an addressbus width, adjust the mask */
-						if (flags & AMEF_SPECIFIES_ABITS)
-						{
-							space->rawmask = 0xffffffffUL >> (32 - ((flags & AMEF_ABITS_MASK) >> AMEF_ABITS_SHIFT));
-							space->mask = SPACE_SHIFT_END(space, space->rawmask);
-						}
-
-						/* if we specify an unmap value, set it */
-						if (flags & AMEF_SPECIFIES_UNMAP)
-							space->unmap = ((flags & AMEF_UNMAP_MASK) == 0) ? (UINT64)0 : (UINT64)-1;
-					}
-
-					/* otherwise, just track banks and hardcoded memory pointers */
-					else
-					{
-						int bank = -1;
-
-						/* look for a bank handler in eithe read or write */
-						if (HANDLER_IS_BANK(map->read.handler))
-							bank = HANDLER_TO_BANK(map->read.handler);
-						else if (HANDLER_IS_BANK(map->write.handler))
-							bank = HANDLER_TO_BANK(map->write.handler);
-
-						/* if we got one, add the data */
-						if (bank >= 1 && bank <= MAX_EXPLICIT_BANKS)
-						{
-							bank_data *bdata = &bankdata[bank];
-
-							/* wire up state saving for the entry the first time we see it */
-							if (!bdata->used)
-								state_save_register_item("memory", bank, bdata->curentry);
-
-							bdata->used = TRUE;
-							bdata->dynamic = FALSE;
-							bdata->cpunum = cpunum;
-							bdata->spacenum = spacenum;
-							if (bank == HANDLER_TO_BANK(map->read.handler))
-								bdata->read = TRUE;
-							if (bank == HANDLER_TO_BANK(map->write.handler))
-								bdata->write = TRUE;
-							bdata->base = map->start;
-							bdata->end = map->end;
-							bdata->curentry = MAX_BANK_ENTRIES;
-						}
+						bdata->used = TRUE;
+						bdata->dynamic = FALSE;
+						bdata->cpunum = cpunum;
+						bdata->spacenum = spacenum;
+						if (bank == HANDLER_TO_BANK(entry->read.handler))
+							bdata->read = TRUE;
+						if (bank == HANDLER_TO_BANK(entry->write.handler))
+							bdata->write = TRUE;
+						bdata->base = entry->bytestart;
+						bdata->end = entry->byteend;
+						bdata->curentry = MAX_BANK_ENTRIES;
 					}
 				}
 
@@ -1386,43 +1527,46 @@ static void populate_memory(void)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
 				addrspace_data *space = &cpudata[cpunum].space[spacenum];
-				const address_map *map;
 
 				/* install the handlers, using the original, unadjusted memory map */
 				if (space->map != NULL)
 				{
-					/* first find the end */
-					for (map = space->map; !IS_AMENTRY_END(map); map++) ;
+					const address_map_entry *last_entry = NULL;
+					
+					while (last_entry != space->map->entrylist)
+					{
+						const address_map_entry *entry;
+						int isfixed;
+						
+						/* find the entry before the last one we processed */
+						for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
+						last_entry = entry;
 
-					/* then work backwards, populating the address map */
-					for (map--; map >= space->map; map--)
-						if (!IS_AMENTRY_EXTENDED(map))
+						isfixed = (entry->memory != NULL) || (entry->share != 0);
+
+						if (entry->read.handler != NULL)
 						{
-							int isfixed = (map->memory != NULL) || (map->share != 0);
-
-							if (map->read.handler != NULL)
+							void *object = Machine;
+							if (entry->read_devtype != NULL)
 							{
-								void *object = Machine;
-								if (map->read_devtype != NULL)
-								{
-									object = (void *)device_list_find_by_tag(Machine->config->devicelist, map->read_devtype, map->read_devtag);
-									if (object == NULL)
-										fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(map->read_devtype), map->read_devtag);
-								}
-								install_mem_handler_private(space, 0, space->dbits, map->start, map->end, map->mask, map->mirror, map->read.handler, isfixed, object, map->read_name);
+								object = (void *)device_list_find_by_tag(Machine->config->devicelist, entry->read_devtype, entry->read_devtag);
+								if (object == NULL)
+									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
 							}
-							if (map->write.handler != NULL)
-							{
-								void *object = Machine;
-								if (map->write_devtype != NULL)
-								{
-									object = (void *)device_list_find_by_tag(Machine->config->devicelist, map->write_devtype, map->write_devtag);
-									if (object == NULL)
-										fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(map->write_devtype), map->write_devtag);
-								}
-								install_mem_handler_private(space, 1, space->dbits, map->start, map->end, map->mask, map->mirror, map->write.handler, isfixed, object, map->write_name);
-							}
+							install_mem_handler_private(space, 0, space->dbits, entry->start, entry->end, entry->mask, entry->mirror, entry->read.handler, isfixed, object, entry->read_name);
 						}
+						if (entry->write.handler != NULL)
+						{
+							void *object = Machine;
+							if (entry->write_devtype != NULL)
+							{
+								object = (void *)device_list_find_by_tag(Machine->config->devicelist, entry->write_devtype, entry->write_devtag);
+								if (object == NULL)
+									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
+							}
+							install_mem_handler_private(space, 1, space->dbits, entry->start, entry->end, entry->mask, entry->mirror, entry->write.handler, isfixed, object, entry->write_name);
+						}
+					}
 				}
 			}
 }
@@ -1455,7 +1599,7 @@ static void install_mem_handler_private(addrspace_data *space, int iswrite, int 
 
 		/* assign a bank to the adjusted addresses */
 		handler = (genf *)assign_dynamic_bank(space->cpunum, space->spacenum, temp_start, temp_end, temp_mirror, isfixed, ismasked);
-		if (!bank_ptr[HANDLER_TO_BANK(handler)])
+		if (bank_ptr[HANDLER_TO_BANK(handler)] == NULL)
 			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, iswrite, temp_start);
 	}
 
@@ -1926,16 +2070,14 @@ static void close_subtable(table_data *tabledata, offs_t l1index)
     the need of allocating and registering memory
 -------------------------------------------------*/
 
-static int amentry_needs_backing_store(int cpunum, int spacenum, const address_map *map)
+static int amentry_needs_backing_store(int cpunum, int spacenum, const address_map_entry *entry)
 {
 	FPTR handler;
 
-	if (IS_AMENTRY_EXTENDED(map))
-		return 0;
-	if (map->base)
+	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
 		return 1;
 
-	handler = (FPTR)map->write.handler;
+	handler = (FPTR)entry->write.handler;
 	if (handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&
@@ -1945,12 +2087,12 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 			return 1;
 	}
 
-	handler = (FPTR)map->read.handler;
+	handler = (FPTR)entry->read.handler;
 	if (handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&
 			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || map->start >= memory_region_length(REGION_CPU1 + cpunum)) &&
+			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->start >= memory_region_length(REGION_CPU1 + cpunum)) &&
 			handler != STATIC_NOP &&
 			handler != STATIC_UNMAP)
 			return 1;
@@ -1975,22 +2117,23 @@ static void allocate_memory(void)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
 				addrspace_data *space = &cpudata[cpunum].space[spacenum];
-				address_map *map, *unassigned = NULL;
+				address_map_entry *unassigned = NULL;
+				address_map_entry *entry;
 				int start_count = memory_block_count;
 				int i;
 
 				/* make a first pass over the memory map and track blocks with hardcoded pointers */
 				/* we do this to make sure they are found by memory_find_base first */
-				for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-					if (!IS_AMENTRY_EXTENDED(map) && map->memory != NULL)
-						allocate_memory_block(cpunum, spacenum, map->start, map->end, map->memory);
+				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+					if (entry->memory != NULL)
+						allocate_memory_block(cpunum, spacenum, entry->bytestart, entry->byteend, entry->memory);
 
 				/* loop over all blocks just allocated and assign pointers from them */
 				for (i = start_count; i < memory_block_count; i++)
 					unassigned = assign_intersecting_blocks(space, memory_block_list[i].start, memory_block_list[i].end, memory_block_list[i].data);
 
 				/* if we don't have an unassigned pointer yet, try to find one */
-				if (!unassigned)
+				if (unassigned == NULL)
 					unassigned = assign_intersecting_blocks(space, ~0, 0, NULL);
 
 				/* loop until we've assigned all memory in this space */
@@ -2001,8 +2144,8 @@ static void allocate_memory(void)
 					void *block;
 
 					/* work in MEMORY_BLOCK_SIZE-sized chunks */
-					curstart = unassigned->start / MEMORY_BLOCK_SIZE;
-					curend = unassigned->end / MEMORY_BLOCK_SIZE;
+					curstart = unassigned->bytestart / MEMORY_BLOCK_SIZE;
+					curend = unassigned->byteend / MEMORY_BLOCK_SIZE;
 
 					/* loop while we keep finding unassigned blocks in neighboring MEMORY_BLOCK_SIZE chunks */
 					do
@@ -2010,14 +2153,14 @@ static void allocate_memory(void)
 						changed = 0;
 
 						/* scan for unmapped blocks in the adjusted map */
-						for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-							if (!IS_AMENTRY_EXTENDED(map) && map->memory == NULL && map != unassigned && amentry_needs_backing_store(cpunum, spacenum, map))
+						for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+							if (entry->memory == NULL && entry != unassigned && amentry_needs_backing_store(cpunum, spacenum, entry))
 							{
 								offs_t blockstart, blockend;
 
 								/* get block start/end blocks for this block */
-								blockstart = map->start / MEMORY_BLOCK_SIZE;
-								blockend = map->end / MEMORY_BLOCK_SIZE;
+								blockstart = entry->bytestart / MEMORY_BLOCK_SIZE;
+								blockend = entry->byteend / MEMORY_BLOCK_SIZE;
 
 								/* if we intersect or are adjacent, adjust the start/end */
 								if (blockstart <= curend + 1 && blockend >= curstart - 1)
@@ -2047,19 +2190,19 @@ static void allocate_memory(void)
     memory block of data
 -------------------------------------------------*/
 
-static void *allocate_memory_block(int cpunum, int spacenum, offs_t start, offs_t end, void *memory)
+static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory)
 {
 	memory_block *block = &memory_block_list[memory_block_count];
 	int allocatemem = (memory == NULL);
 	int region;
 
-	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, start, end, memory));
+	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, bytestart, byteend, memory));
 
 	/* if we weren't passed a memory block, allocate one and clear it to zero */
 	if (allocatemem)
 	{
-		memory = auto_malloc(end - start + 1);
-		memset(memory, 0, end - start + 1);
+		memory = auto_malloc(byteend - bytestart + 1);
+		memset(memory, 0, byteend - bytestart + 1);
 	}
 
 	/* register for saving, but only if we're not part of a memory region */
@@ -2067,21 +2210,21 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t start, offs_
 	{
 		UINT8 *region_base = memory_region(region);
 		UINT32 region_length = memory_region_length(region);
-		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (end - start + 1)) < region_base + region_length)
+		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
 			break;
 		}
 	}
 	if (region == MAX_MEMORY_REGIONS)
-		register_for_save(cpunum, spacenum, start, memory, end - start + 1);
+		register_for_save(cpunum, spacenum, bytestart, memory, byteend - bytestart + 1);
 
 	/* fill in the tracking block */
 	block->cpunum = cpunum;
 	block->spacenum = spacenum;
 	block->isallocated = allocatemem;
-	block->start = start;
-	block->end = end;
+	block->start = bytestart;
+	block->end = byteend;
 	block->data = memory;
 	memory_block_count++;
 	return memory;
@@ -2108,40 +2251,39 @@ static void register_for_save(int cpunum, int spacenum, offs_t start, void *base
     intersecting blocks and assign their pointers
 -------------------------------------------------*/
 
-static address_map *assign_intersecting_blocks(addrspace_data *space, offs_t start, offs_t end, UINT8 *base)
+static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t start, offs_t end, UINT8 *base)
 {
-	address_map *map, *unassigned = NULL;
+	address_map_entry *entry, *unassigned = NULL;
 
 	/* loop over the adjusted map and assign memory to any blocks we can */
-	for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-		if (!IS_AMENTRY_EXTENDED(map))
+	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+	{
+		/* if we haven't assigned this block yet, do it against the last block */
+		if (entry->memory == NULL)
 		{
-			/* if we haven't assigned this block yet, do it against the last block */
-			if (map->memory == NULL)
+			/* inherit shared pointers first */
+			if (entry->share != 0 && shared_ptr[entry->share] != NULL)
 			{
-				/* inherit shared pointers first */
-				if (map->share && shared_ptr[map->share])
-				{
-					map->memory = shared_ptr[map->share];
-	 				VPRINTF(("memory range %08X-%08X -> shared_ptr[%d] [%p]\n", map->start, map->end, map->share, map->memory));
-	 			}
+				entry->memory = shared_ptr[entry->share];
+ 				VPRINTF(("memory range %08X-%08X -> shared_ptr[%d] [%p]\n", entry->start, entry->end, entry->share, entry->memory));
+ 			}
 
-				/* otherwise, look for a match in this block */
-				else if (map->start >= start && map->end <= end)
-				{
-					map->memory = base + (map->start - start);
-					VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", map->start, map->end, start, end, map->memory));
-				}
+			/* otherwise, look for a match in this block */
+			else if (entry->bytestart >= start && entry->byteend <= end)
+			{
+				entry->memory = base + (entry->bytestart - start);
+				VPRINTF(("memory range %08X-%08X -> found in block from %08X-%08X [%p]\n", entry->start, entry->end, start, end, entry->memory));
 			}
-
-			/* if we're the first match on a shared pointer, assign it now */
-			if (map->memory != NULL && map->share && !shared_ptr[map->share])
-				shared_ptr[map->share] = map->memory;
-
-			/* keep track of the first unassigned entry */
-			if (map->memory == NULL && !unassigned && amentry_needs_backing_store(space->cpunum, space->spacenum, map))
-				unassigned = map;
 		}
+
+		/* if we're the first match on a shared pointer, assign it now */
+		if (entry->memory != NULL && entry->share && shared_ptr[entry->share] == NULL)
+			shared_ptr[entry->share] = entry->memory;
+
+		/* keep track of the first unassigned entry */
+		if (entry->memory == NULL && unassigned == NULL && amentry_needs_backing_store(space->cpunum, space->spacenum, entry))
+			unassigned = entry;
+	}
 
 	return unassigned;
 }
@@ -2181,32 +2323,35 @@ static void find_memory(void)
 			if (cpudata[cpunum].spacemask & (1 << spacenum))
 			{
 				addrspace_data *space = &cpudata[cpunum].space[spacenum];
-				const address_map *map;
+				const address_map_entry *entry;
 
 				/* fill in base/size entries, and handle shared memory */
-				for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-					if (!IS_AMENTRY_EXTENDED(map))
-					{
-						/* assign base/size values */
-						if (map->base != NULL)
-							*map->base = map->memory;
-						if (map->size != NULL)
-							*map->size = map->end - map->start + 1;
-					}
+				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+				{
+					/* assign base/size values */
+					if (entry->baseptr != NULL)
+						*entry->baseptr = entry->memory;
+					if (entry->baseptroffs_plus1 != 0)
+						*(void **)((UINT8 *)Machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
+					if (entry->sizeptr != NULL)
+						*entry->sizeptr = entry->byteend - entry->bytestart + 1;
+					if (entry->sizeptroffs_plus1 != 0)
+						*(size_t *)((UINT8 *)Machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
+				}
 			}
 
 	/* once this is done, find the starting bases for the banks */
 	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
 		if (bankdata[banknum].used)
 		{
-			address_map *map;
+			address_map_entry *entry;
 
 			/* set the initial bank pointer */
-			for (map = cpudata[bankdata[banknum].cpunum].space[bankdata[banknum].spacenum].adjmap; map && !IS_AMENTRY_END(map); map++)
-				if (!IS_AMENTRY_EXTENDED(map) && map->start == bankdata[banknum].base)
+			for (entry = cpudata[bankdata[banknum].cpunum].space[bankdata[banknum].spacenum].map->entrylist; entry != NULL; entry = entry->next)
+				if (entry->bytestart == bankdata[banknum].base)
 				{
-					bank_ptr[banknum] = map->memory;
-	 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%p]\n", banknum, map->start, map->end, map->memory));
+					bank_ptr[banknum] = entry->memory;
+	 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%p]\n", banknum, entry->start, entry->end, entry->memory));
 					break;
 				}
 
@@ -2229,23 +2374,22 @@ static void find_memory(void)
 static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t offset)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	address_map *map;
+	address_map_entry *entry;
 	memory_block *block;
 	int blocknum;
 
 	VPRINTF(("memory_find_base(%d,%d,%d,%08X) -> ", cpunum, spacenum, readwrite, offset));
 
 	/* look in the adjusted map */
-	for (map = space->adjmap; map && !IS_AMENTRY_END(map); map++)
-		if (!IS_AMENTRY_EXTENDED(map))
+	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+	{
+		offs_t maskoffs = offset & entry->bytemask;
+		if (maskoffs >= entry->bytestart && maskoffs <= entry->byteend)
 		{
-			offs_t maskoffs = offset & map->mask;
-			if (maskoffs >= map->start && maskoffs <= map->end)
-			{
-				VPRINTF(("found in entry %08X-%08X [%p]\n", map->start, map->end, (UINT8 *)map->memory + (maskoffs - map->start)));
-				return (UINT8 *)map->memory + (maskoffs - map->start);
-			}
+			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->start, entry->end, (UINT8 *)entry->memory + (maskoffs - entry->bytestart)));
+			return (UINT8 *)entry->memory + (maskoffs - entry->bytestart);
 		}
+	}
 
 	/* if not found there, look in the allocated blocks */
 	for (blocknum = 0, block = memory_block_list; blocknum < memory_block_count; blocknum++, block++)
@@ -2294,7 +2438,7 @@ UINT8 name(offs_t original_address)														\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMREADEND((*handler->handler.read.handler8)(handler->object, address));		\
+		MEMREADEND((*handler->handler.read.mhandler8)(handler->object, address));		\
 }																						\
 
 #define READBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
@@ -2320,12 +2464,12 @@ UINT8 name(offs_t original_address)														\
 	}																					\
 }																						\
 
-#define READBYTE16BE(name,space)	READBYTE(name,space,BYTE_XOR_BE, handler16,1,~address & 1,UINT16)
-#define READBYTE16LE(name,space)	READBYTE(name,space,BYTE_XOR_LE, handler16,1, address & 1,UINT16)
-#define READBYTE32BE(name,space)	READBYTE(name,space,BYTE4_XOR_BE,handler32,2,~address & 3,UINT32)
-#define READBYTE32LE(name,space)	READBYTE(name,space,BYTE4_XOR_LE,handler32,2, address & 3,UINT32)
-#define READBYTE64BE(name,space)	READBYTE(name,space,BYTE8_XOR_BE,handler64,3,~address & 7,UINT64)
-#define READBYTE64LE(name,space)	READBYTE(name,space,BYTE8_XOR_LE,handler64,3, address & 7,UINT64)
+#define READBYTE16BE(name,space)	READBYTE(name,space,BYTE_XOR_BE, mhandler16,1,~address & 1,UINT16)
+#define READBYTE16LE(name,space)	READBYTE(name,space,BYTE_XOR_LE, mhandler16,1, address & 1,UINT16)
+#define READBYTE32BE(name,space)	READBYTE(name,space,BYTE4_XOR_BE,mhandler32,2,~address & 3,UINT32)
+#define READBYTE32LE(name,space)	READBYTE(name,space,BYTE4_XOR_LE,mhandler32,2, address & 3,UINT32)
+#define READBYTE64BE(name,space)	READBYTE(name,space,BYTE8_XOR_BE,mhandler64,3,~address & 7,UINT64)
+#define READBYTE64LE(name,space)	READBYTE(name,space,BYTE8_XOR_LE,mhandler64,3, address & 7,UINT64)
 
 
 /*-------------------------------------------------
@@ -2350,7 +2494,7 @@ UINT16 name(offs_t original_address)													\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMREADEND((*handler->handler.read.handler16)(handler->object, address >> 1, 0));\
+		MEMREADEND((*handler->handler.read.mhandler16)(handler->object, address >> 1, 0));\
 }																						\
 
 #define READWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)		\
@@ -2376,10 +2520,10 @@ UINT16 name(offs_t original_address)													\
 	}																					\
 }																						\
 
-#define READWORD32BE(name,space)	READWORD(name,space,WORD_XOR_BE, handler32,2,~address & 2,UINT32)
-#define READWORD32LE(name,space)	READWORD(name,space,WORD_XOR_LE, handler32,2, address & 2,UINT32)
-#define READWORD64BE(name,space)	READWORD(name,space,WORD2_XOR_BE,handler64,3,~address & 6,UINT64)
-#define READWORD64LE(name,space)	READWORD(name,space,WORD2_XOR_LE,handler64,3, address & 6,UINT64)
+#define READWORD32BE(name,space)	READWORD(name,space,WORD_XOR_BE, mhandler32,2,~address & 2,UINT32)
+#define READWORD32LE(name,space)	READWORD(name,space,WORD_XOR_LE, mhandler32,2, address & 2,UINT32)
+#define READWORD64BE(name,space)	READWORD(name,space,WORD2_XOR_BE,mhandler64,3,~address & 6,UINT64)
+#define READWORD64LE(name,space)	READWORD(name,space,WORD2_XOR_LE,mhandler64,3, address & 6,UINT64)
 
 
 /*-------------------------------------------------
@@ -2404,7 +2548,7 @@ UINT32 name(offs_t original_address)													\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMREADEND((*handler->handler.read.handler32)(handler->object, address >> 2, 0));\
+		MEMREADEND((*handler->handler.read.mhandler32)(handler->object, address >> 2, 0));\
 }																						\
 
 #define READMASKED32(name,spacenum)														\
@@ -2424,7 +2568,7 @@ UINT32 name(offs_t original_address, UINT32 mem_mask)									\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMREADEND((*handler->handler.read.handler32)(handler->object, address >> 2, mem_mask));\
+		MEMREADEND((*handler->handler.read.mhandler32)(handler->object, address >> 2, mem_mask));\
 }																						\
 
 #define READDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
@@ -2450,8 +2594,8 @@ UINT32 name(offs_t original_address)													\
 	}																					\
 }																						\
 
-#define READDWORD64BE(name,space)	READDWORD(name,space,DWORD_XOR_BE,handler64,3,~address & 4,UINT64)
-#define READDWORD64LE(name,space)	READDWORD(name,space,DWORD_XOR_LE,handler64,3, address & 4,UINT64)
+#define READDWORD64BE(name,space)	READDWORD(name,space,DWORD_XOR_BE,mhandler64,3,~address & 4,UINT64)
+#define READDWORD64LE(name,space)	READDWORD(name,space,DWORD_XOR_LE,mhandler64,3, address & 4,UINT64)
 
 
 /*-------------------------------------------------
@@ -2476,7 +2620,7 @@ UINT64 name(offs_t original_address)													\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMREADEND((*handler->handler.read.handler64)(handler->object, address >> 3, 0));\
+		MEMREADEND((*handler->handler.read.mhandler64)(handler->object, address >> 3, 0));\
 }																						\
 
 #define READMASKED64(name,spacenum)														\
@@ -2496,7 +2640,7 @@ UINT64 name(offs_t original_address, UINT64 mem_mask)									\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMREADEND((*handler->handler.read.handler64)(handler->object, address >> 3, mem_mask));\
+		MEMREADEND((*handler->handler.read.mhandler64)(handler->object, address >> 3, mem_mask));\
 }																						\
 
 
@@ -2521,7 +2665,7 @@ void name(offs_t original_address, UINT8 data)											\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMWRITEEND((*handler->handler.write.handler8)(handler->object, address, data));\
+		MEMWRITEEND((*handler->handler.write.mhandler8)(handler->object, address, data));\
 }																						\
 
 #define WRITEBYTE(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
@@ -2547,12 +2691,12 @@ void name(offs_t original_address, UINT8 data)											\
 	}																					\
 }																						\
 
-#define WRITEBYTE16BE(name,space)	WRITEBYTE(name,space,BYTE_XOR_BE, handler16,1,~address & 1,UINT16)
-#define WRITEBYTE16LE(name,space)	WRITEBYTE(name,space,BYTE_XOR_LE, handler16,1, address & 1,UINT16)
-#define WRITEBYTE32BE(name,space)	WRITEBYTE(name,space,BYTE4_XOR_BE,handler32,2,~address & 3,UINT32)
-#define WRITEBYTE32LE(name,space)	WRITEBYTE(name,space,BYTE4_XOR_LE,handler32,2, address & 3,UINT32)
-#define WRITEBYTE64BE(name,space)	WRITEBYTE(name,space,BYTE8_XOR_BE,handler64,3,~address & 7,UINT64)
-#define WRITEBYTE64LE(name,space)	WRITEBYTE(name,space,BYTE8_XOR_LE,handler64,3, address & 7,UINT64)
+#define WRITEBYTE16BE(name,space)	WRITEBYTE(name,space,BYTE_XOR_BE, mhandler16,1,~address & 1,UINT16)
+#define WRITEBYTE16LE(name,space)	WRITEBYTE(name,space,BYTE_XOR_LE, mhandler16,1, address & 1,UINT16)
+#define WRITEBYTE32BE(name,space)	WRITEBYTE(name,space,BYTE4_XOR_BE,mhandler32,2,~address & 3,UINT32)
+#define WRITEBYTE32LE(name,space)	WRITEBYTE(name,space,BYTE4_XOR_LE,mhandler32,2, address & 3,UINT32)
+#define WRITEBYTE64BE(name,space)	WRITEBYTE(name,space,BYTE8_XOR_BE,mhandler64,3,~address & 7,UINT64)
+#define WRITEBYTE64LE(name,space)	WRITEBYTE(name,space,BYTE8_XOR_LE,mhandler64,3, address & 7,UINT64)
 
 
 /*-------------------------------------------------
@@ -2577,7 +2721,7 @@ void name(offs_t original_address, UINT16 data)											\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMWRITEEND((*handler->handler.write.handler16)(handler->object, address >> 1, data, 0));\
+		MEMWRITEEND((*handler->handler.write.mhandler16)(handler->object, address >> 1, data, 0));\
 }																						\
 
 #define WRITEWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
@@ -2603,10 +2747,10 @@ void name(offs_t original_address, UINT16 data)											\
 	}																					\
 }																						\
 
-#define WRITEWORD32BE(name,space)	WRITEWORD(name,space,WORD_XOR_BE, handler32,2,~address & 2,UINT32)
-#define WRITEWORD32LE(name,space)	WRITEWORD(name,space,WORD_XOR_LE, handler32,2, address & 2,UINT32)
-#define WRITEWORD64BE(name,space)	WRITEWORD(name,space,WORD2_XOR_BE,handler64,3,~address & 6,UINT64)
-#define WRITEWORD64LE(name,space)	WRITEWORD(name,space,WORD2_XOR_LE,handler64,3, address & 6,UINT64)
+#define WRITEWORD32BE(name,space)	WRITEWORD(name,space,WORD_XOR_BE, mhandler32,2,~address & 2,UINT32)
+#define WRITEWORD32LE(name,space)	WRITEWORD(name,space,WORD_XOR_LE, mhandler32,2, address & 2,UINT32)
+#define WRITEWORD64BE(name,space)	WRITEWORD(name,space,WORD2_XOR_BE,mhandler64,3,~address & 6,UINT64)
+#define WRITEWORD64LE(name,space)	WRITEWORD(name,space,WORD2_XOR_LE,mhandler64,3, address & 6,UINT64)
 
 
 /*-------------------------------------------------
@@ -2631,7 +2775,7 @@ void name(offs_t original_address, UINT32 data)											\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMWRITEEND((*handler->handler.write.handler32)(handler->object, address >> 2, data, 0));\
+		MEMWRITEEND((*handler->handler.write.mhandler32)(handler->object, address >> 2, data, 0));\
 }																						\
 
 #define WRITEMASKED32(name,spacenum)													\
@@ -2654,7 +2798,7 @@ void name(offs_t original_address, UINT32 data, UINT32 mem_mask)						\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMWRITEEND((*handler->handler.write.handler32)(handler->object, address >> 2, data, mem_mask));\
+		MEMWRITEEND((*handler->handler.write.mhandler32)(handler->object, address >> 2, data, mem_mask));\
 }																						\
 
 #define WRITEDWORD(name,spacenum,xormacro,handlertype,ignorebits,shiftbytes,masktype)	\
@@ -2680,8 +2824,8 @@ void name(offs_t original_address, UINT32 data)											\
 	}																					\
 }																						\
 
-#define WRITEDWORD64BE(name,space)	WRITEDWORD(name,space,DWORD_XOR_BE,handler64,3,~address & 4,UINT64)
-#define WRITEDWORD64LE(name,space)	WRITEDWORD(name,space,DWORD_XOR_LE,handler64,3, address & 4,UINT64)
+#define WRITEDWORD64BE(name,space)	WRITEDWORD(name,space,DWORD_XOR_BE,mhandler64,3,~address & 4,UINT64)
+#define WRITEDWORD64LE(name,space)	WRITEDWORD(name,space,DWORD_XOR_LE,mhandler64,3, address & 4,UINT64)
 
 
 /*-------------------------------------------------
@@ -2706,7 +2850,7 @@ void name(offs_t original_address, UINT64 data)											\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMWRITEEND((*handler->handler.write.handler64)(handler->object, address >> 3, data, 0));\
+		MEMWRITEEND((*handler->handler.write.mhandler64)(handler->object, address >> 3, data, 0));\
 }																						\
 
 #define WRITEMASKED64(name,spacenum)													\
@@ -2729,7 +2873,7 @@ void name(offs_t original_address, UINT64 data, UINT64 mem_mask)						\
 																						\
 	/* fall back to the handler */														\
 	else																				\
-		MEMWRITEEND((*handler->handler.write.handler64)(handler->object, address >> 3, data, mem_mask));\
+		MEMWRITEEND((*handler->handler.write.mhandler64)(handler->object, address >> 3, data, mem_mask));\
 }																						\
 
 

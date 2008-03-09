@@ -1221,7 +1221,7 @@ static ADDRESS_MAP_START( hotdogst_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotdogst_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
 	AM_RANGE(0x50, 0x50) AM_READ(YM2203_status_port_0_r	)	// YM2203
@@ -1230,7 +1230,7 @@ static ADDRESS_MAP_START( hotdogst_sound_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotdogst_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w		)	// ROM bank
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM2203_write_port_0_w		)	//
@@ -1267,13 +1267,13 @@ static ADDRESS_MAP_START( mazinger_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazinger_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x52, 0x52) AM_READ(YM2203_status_port_0_r	)	// YM2203
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazinger_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w		)	// ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
@@ -1327,7 +1327,7 @@ static ADDRESS_MAP_START( metmqstr_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metmqstr_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r				)	// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
@@ -1335,7 +1335,7 @@ static ADDRESS_MAP_START( metmqstr_sound_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metmqstr_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w		)	// Rom Bank
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM2151_data_port_0_w		)	//
@@ -1372,7 +1372,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(OKIM6295_status_0_r		)	// M6295
 	AM_RANGE(0x08, 0x08) AM_READ(OKIM6295_status_1_r		)	//
 	AM_RANGE(0x40, 0x40) AM_READ(YM2203_status_port_0_r	)	// YM2203
@@ -1382,7 +1382,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(OKIM6295_data_0_w			)	// M6295
 	AM_RANGE(0x08, 0x08) AM_WRITE(OKIM6295_data_1_w			)	//
 	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w			)	// Samples bank
@@ -1450,7 +1450,7 @@ static ADDRESS_MAP_START( sailormn_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailormn_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r				)	// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
@@ -1460,7 +1460,7 @@ static ADDRESS_MAP_START( sailormn_sound_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailormn_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sailormn_rombank_w		)	// Rom Bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2151_register_port_0_w	)	// YM2151

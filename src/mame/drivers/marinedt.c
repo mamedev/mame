@@ -187,7 +187,7 @@ static READ8_HANDLER( marinedt_obj1_yq_r )
 
 
 static ADDRESS_MAP_START( marinedt_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)		//dips coinage
 	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)		//trackball xy muxed
 	AM_RANGE(0x02, 0x02) AM_READ(marinedt_obj1_x_r)
@@ -283,7 +283,7 @@ static WRITE8_HANDLER( marinedt_pf_w )
 }
 
 static ADDRESS_MAP_START( marinedt_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITE(marinedt_obj1_a_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(marinedt_obj1_x_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(marinedt_obj1_y_w)

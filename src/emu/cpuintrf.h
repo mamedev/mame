@@ -130,7 +130,7 @@ enum
 	CPUINFO_PTR_READOP,									/* R/O: int (*readop)(UINT32 offset, int size, UINT64 *value) */
 	CPUINFO_PTR_DEBUG_SETUP_COMMANDS,					/* R/O: void (*setup_commands)(void) */
 	CPUINFO_PTR_INSTRUCTION_COUNTER,					/* R/O: int *icount */
-	CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: construct_map_t map */
+	CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: const addrmap_token *map */
 	CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
 	CPUINFO_PTR_DEBUG_REGISTER_LIST,					/* R/O: int *list: list of registers for the debugger */
 
@@ -238,7 +238,10 @@ union _cpuinfo
 	cpu_readop_func			readop;						/* CPUINFO_PTR_READOP */
 	cpu_setup_commands_func	setup_commands;				/* CPUINFO_PTR_DEBUG_SETUP_COMMANDS */
 	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
-	construct_map_t 		internal_map;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap8_token *	internal_map8;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap16_token *	internal_map16;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap32_token *	internal_map32;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
+	const addrmap64_token *	internal_map64;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
 };
 
 

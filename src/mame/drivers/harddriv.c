@@ -256,7 +256,7 @@ static const struct dsp32_config dsp32c_config =
  *************************************/
 
 static ADDRESS_MAP_START( driver_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_READ(hd68k_port0_r)
 	AM_RANGE(0x604000, 0x607fff) AM_WRITE(hd68k_nwr_w)
@@ -275,7 +275,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driver_gsp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP					/* hit during self-test */
 	AM_RANGE(0x02000000, 0x0207ffff) AM_READWRITE(hdgsp_vram_2bpp_r, hdgsp_vram_1bpp_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, hdgsp_io_w)
@@ -288,7 +288,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driver_msp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE(1) AM_BASE(&hdmsp_ram)
 	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
@@ -304,7 +304,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( multisync_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_READWRITE(atarigen_sound_upper_r, atarigen_sound_upper_w)
 	AM_RANGE(0x604000, 0x607fff) AM_READWRITE(hd68k_sound_reset_r, hd68k_nwr_w)
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( multisync_gsp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP					/* hit during self-test */
 	AM_RANGE(0x02000000, 0x020fffff) AM_READWRITE(hdgsp_vram_2bpp_r, hdgsp_vram_2bpp_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, hdgsp_io_w)
@@ -343,7 +343,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( multisync2_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x604000, 0x607fff) AM_WRITE(hd68k_nwr_w)
 	AM_RANGE(0x608000, 0x60bfff) AM_WRITE(watchdog_reset16_w)
@@ -362,7 +362,7 @@ ADDRESS_MAP_END
 
 /* GSP is identical to original multisync */
 static ADDRESS_MAP_START( multisync2_gsp_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP					/* hit during self-test */
 	AM_RANGE(0x02000000, 0x020fffff) AM_READWRITE(hdgsp_vram_2bpp_r, hdgsp_vram_2bpp_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, hdgsp_io_w)
@@ -382,13 +382,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( adsp_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&hdadsp_pgm_memory)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( adsp_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&hdadsp_data_memory)
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(hdadsp_special_r, hdadsp_special_w)
 ADDRESS_MAP_END
@@ -402,13 +402,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( ds3_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(&hdadsp_pgm_memory)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ds3_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(&hdadsp_data_memory)
 	AM_RANGE(0x3800, 0x3bff) AM_RAM						/* internal RAM */
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(hdds3_control_r, hdds3_control_w)	/* adsp control regs */
@@ -417,13 +417,13 @@ ADDRESS_MAP_END
 
 #if 0
 static ADDRESS_MAP_START( ds3snd_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ds3snd_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM						/* internal RAM */
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(hdds3_control_r, hdds3_control_w)	/* adsp control regs */
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( dsk_dsp32_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x001fff) AM_RAM
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM
 	AM_RANGE(0xfff800, 0xffffff) AM_RAM
@@ -475,7 +475,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( dsk2_dsp32_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x001fff) AM_RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM
 	AM_RANGE(0x400000, 0x5fffff) AM_ROM AM_REGION(REGION_USER4, 0)
@@ -491,7 +491,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( driversnd_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xff0fff) AM_READWRITE(hdsnd68k_data_r, hdsnd68k_data_w)
 	AM_RANGE(0xff1000, 0xff1fff) AM_READWRITE(hdsnd68k_switches_r, hdsnd68k_latches_w)
@@ -505,7 +505,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driversnd_dsp_program_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_RAM AM_BASE(&hdsnddsp_ram)
 ADDRESS_MAP_END
 

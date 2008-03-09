@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( ampoker2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0f) AM_WRITENOP				/* inexistent in the real hardware */
 	AM_RANGE(0x10, 0x10) AM_READ(input_port_0_r)
 	AM_RANGE(0x11, 0x11) AM_READ(input_port_1_r)

@@ -613,7 +613,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0007) AM_READWRITE(MRA8_RAM, darktowr_mcu_w) AM_BASE(&darktowr_mcu_ports)
 	AM_RANGE(0x0008, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM

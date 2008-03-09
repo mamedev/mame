@@ -4101,9 +4101,9 @@ void h8_3002_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;						break;
 
 		// Internal maps
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_h8_3002_internal_map; break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map = 0;		break;
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map = 0;		break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_h8_3002_internal_map; break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map16 = NULL;	break;
 
 		// CPU misc parameters
 	case CPUINFO_STR_NAME:						strcpy(info->s, "H8/3002");						break;
@@ -4150,7 +4150,7 @@ void h8_3044_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_h8_3044_internal_map;  break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_h8_3044_internal_map;  break;
 		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3044");	 break;
 		default:
 			h8_3002_get_info(state,info);
@@ -4161,7 +4161,7 @@ void h8_3007_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_h8_3007_internal_map;  break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_h8_3007_internal_map;  break;
 		case CPUINFO_PTR_INIT:				info->init = h8_3007_init;		break;
 		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3007");		break;
 		default:

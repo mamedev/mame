@@ -388,21 +388,21 @@ static WRITE8_HANDLER( bssoccer_DAC_2_w )
 
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r 				)	// From The Sound Z80
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_pcm_1_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_1_w				)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w	)	// Rom Bank
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r 				)	// From The Sound Z80
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_pcm_2_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_2_w				)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_2_bankswitch_w	)	// Rom Bank
 ADDRESS_MAP_END
@@ -435,11 +435,11 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( uballoon_pcm_1_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r 				)	// From The Sound Z80
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_pcm_1_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_1_w				)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w	)	// Rom Bank
 ADDRESS_MAP_END
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( bestbest_pcm_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_pcm_1_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ (soundlatch2_r 	)	// From The Sound Z80
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_1_w	)	// 2 x DAC
 	AM_RANGE(0x02, 0x03) AM_WRITE(bssoccer_DAC_2_w	)	// 2 x DAC

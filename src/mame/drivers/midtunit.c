@@ -39,7 +39,7 @@
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_r, midtunit_vram_w)
 	AM_RANGE(0x01000000, 0x013fffff) AM_RAM
 	AM_RANGE(0x01400000, 0x0141ffff) AM_READWRITE(midtunit_cmos_r, midtunit_cmos_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)

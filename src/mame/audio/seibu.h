@@ -29,10 +29,10 @@
 #include "sound/okim6295.h"
 #include "sound/custom.h"
 
-ADDRESS_MAP_EXTERN(seibu_sound_map);
-ADDRESS_MAP_EXTERN(seibu2_sound_map);
-ADDRESS_MAP_EXTERN(seibu3_sound_map);
-ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map);
+ADDRESS_MAP_EXTERN(seibu_sound_map, 8);
+ADDRESS_MAP_EXTERN(seibu2_sound_map, 8);
+ADDRESS_MAP_EXTERN(seibu3_sound_map, 8);
+ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map, 8);
 
 READ16_HANDLER( seibu_main_word_r );
 READ8_HANDLER( seibu_main_v30_r );

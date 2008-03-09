@@ -13,9 +13,9 @@
 #include "sound/c352.h"
 #include "cpu/m37710/m37710.h"
 
-ADDRESS_MAP_EXTERN(namcoc7x_mcu_map);
-ADDRESS_MAP_EXTERN(namcoc7x_mcu_share_map);
-ADDRESS_MAP_EXTERN(namcoc7x_mcu_io);
+ADDRESS_MAP_EXTERN(namcoc7x_mcu_map, 16);
+ADDRESS_MAP_EXTERN(namcoc7x_mcu_share_map, 16);
+ADDRESS_MAP_EXTERN(namcoc7x_mcu_io, 8);
 
 INTERRUPT_GEN( namcoc7x_interrupt );
 

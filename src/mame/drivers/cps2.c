@@ -1244,7 +1244,7 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
 
 	MDRV_CPU_ADD(Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(qsound_readmem,qsound_writemem)
+	MDRV_CPU_PROGRAM_MAP(qsound_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
 
 //  MDRV_INTERLEAVE(262)  /* 262 scanlines, for raster effects */

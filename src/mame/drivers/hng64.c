@@ -1218,7 +1218,7 @@ static ADDRESS_MAP_START( hng_comm_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* Reserved for the KL5C80 internal hardware */
 	AM_RANGE(0x00,0x07) AM_WRITE( hng64_comm_io_mmu ) AM_BASE(&hng64_com_mmu_mem)
 //  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */

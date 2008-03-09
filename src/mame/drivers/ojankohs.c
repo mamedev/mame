@@ -277,7 +277,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readport_ojankohs, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(ojankohs_keymatrix_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( readport_ojankohs, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ojankohs_gfxreg_w)
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankoy, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ojankoy_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ojankoy_coinctr_w)
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( writeport_ojankoy, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_ccasino, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(ojankohs_keymatrix_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( readport_ccasino, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ccasino_coinctr_w)
@@ -335,13 +335,13 @@ static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_ojankoc, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfc, 0xfd) AM_READ(ojankoc_keymatrix_r)
 	AM_RANGE(0xff, 0xff) AM_READ(AY8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankoc, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_WRITE(ojankoc_palette_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)

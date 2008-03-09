@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) 	/* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
 	AM_RANGE(0x02, 0x02) AM_WRITE(beg_banking_w)
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( bigevglf_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigevglf_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x06) AM_READ(beg_status_r)
 ADDRESS_MAP_END
 
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bigevglf_sub_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_WRITE(MWA8_NOP) /*coinlockout_w ???? watchdog ???? */
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(bigevglf_mcu_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(MWA8_NOP) /* 0-enable MCU, 1-keep reset line ASSERTED; D0 goes to the input of ls74 and the /Q of this ls74 goes to reset line on 68705 */
@@ -381,7 +381,7 @@ static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 }
 
 static ADDRESS_MAP_START( bigevglf_sub_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(MRA8_NOP)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_4_r)
@@ -426,7 +426,7 @@ ADDRESS_MAP_END
 /* MCU */
 
 static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READ(bigevglf_68705_portA_r)
 	AM_RANGE(0x0001, 0x0001) AM_READ(bigevglf_68705_portB_r)
 	AM_RANGE(0x0002, 0x0002) AM_READ(bigevglf_68705_portC_r)
@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(11) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(bigevglf_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(bigevglf_68705_portB_w)
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(bigevglf_68705_portC_w)

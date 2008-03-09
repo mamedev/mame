@@ -478,18 +478,18 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( dcs2_2115_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs2_2104_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dcs2_2115_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START( dcs2_2115_data_map, ADDRESS_SPACE_DATA, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dcs2_2104_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
@@ -521,13 +521,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( dsio_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dsio_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK(20)
 	AM_RANGE(0x0400, 0x3fdf) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
@@ -535,7 +535,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dsio_io_map, ADDRESS_SPACE_IO, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
@@ -553,13 +553,13 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( denver_program_map, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_BASE(&dcs_internal_program_ram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( denver_data_map, ADDRESS_SPACE_DATA, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK(20)
 	AM_RANGE(0x0800, 0x3fdf) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
@@ -567,7 +567,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( denver_io_map, ADDRESS_SPACE_IO, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_UNMAP(1) )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
 	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)

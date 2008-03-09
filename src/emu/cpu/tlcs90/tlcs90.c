@@ -2788,7 +2788,7 @@ void tmp90840_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = t90_dasm;		break;
 #endif
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &t90_ICount;			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_tmp90840_mem; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_tmp90840_mem; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
@@ -2834,7 +2834,7 @@ void tmp90841_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_tmp90841_mem; return;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_tmp90841_mem; return;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
@@ -2850,7 +2850,7 @@ void tmp91640_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_tmp91640_mem; return;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_tmp91640_mem; return;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
@@ -2866,7 +2866,7 @@ void tmp91641_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map = construct_map_tmp91641_mem; return;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_tmp91641_mem; return;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 

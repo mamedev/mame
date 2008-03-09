@@ -145,8 +145,8 @@ typedef enum _mips3_flavor mips3_flavor;
 ***************************************************************************/
 
 /* memory access function table */
-typedef struct _memory_handlers memory_handlers;
-struct _memory_handlers
+typedef struct _memory_accessors memory_accessors;
+struct _memory_accessors
 {
 	UINT8			(*readbyte)(offs_t);
 	UINT16			(*readhalf)(offs_t);
@@ -197,7 +197,7 @@ struct _mips3_state
 
 	/* memory accesses */
 	UINT8			bigendian;
-	memory_handlers memory;
+	memory_accessors memory;
 
 	/* cache memory */
 	UINT32 *		icache;

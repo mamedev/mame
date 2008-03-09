@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( pspikesc_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karatblz_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
 	AM_RANGE(0x082000, 0x083fff) AM_READWRITE(MRA16_RAM, aerofgt_bg2videoram_w) AM_BASE(&aerofgt_bg2videoram)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( spinlbrk_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(20) )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x0d0000, 0x0d1fff) AM_READWRITE(MRA16_RAM, aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(soundlatch_r, pending_command_clear_w)
 	AM_RANGE(0x18, 0x18) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( turbofrc_sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerofgt_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)

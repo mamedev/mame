@@ -77,7 +77,7 @@ static WRITE8_HANDLER(pzlestar_bank_w)
 /* Puzzle Star Ports */
 
 static ADDRESS_MAP_START (readport_pzlestar, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x98, 0x98) AM_READ( v9938_vram_r )
 	AM_RANGE( 0x99, 0x99) AM_READ( v9938_status_r )
 	AM_RANGE( 0xa0, 0xa0) AM_READ( input_port_0_r )
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START (readport_pzlestar, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (writeport_pzlestar, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
 	AM_RANGE( 0x7c, 0x7c) AM_WRITE( YM2413_register_port_0_w )
 	AM_RANGE( 0x7d, 0x7d) AM_WRITE( YM2413_data_port_0_w )
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 /* Sexy Boom Ports */
 
 static ADDRESS_MAP_START (readport_sexyboom, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0xa0, 0xa0) AM_READ( input_port_0_r )
 	AM_RANGE( 0xa1, 0xa1) AM_READ( input_port_1_r )
 	AM_RANGE( 0xf7, 0xf7) AM_READ( input_port_2_r )
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START (readport_sexyboom, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (writeport_sexyboom, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7c) AM_WRITE( YM2413_register_port_0_w )
 	AM_RANGE( 0x7d, 0x7d) AM_WRITE( YM2413_data_port_0_w )
 	AM_RANGE( 0xf0, 0xf0) AM_WRITE( v9938_vram_w )

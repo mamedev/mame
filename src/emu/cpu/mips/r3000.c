@@ -119,12 +119,12 @@
 typedef struct
 {
 	UINT8		(*readbyte)(offs_t);
-	UINT16	(*readword)(offs_t);
-	UINT32	(*readlong)(offs_t);
+	UINT16		(*readword)(offs_t);
+	UINT32		(*readlong)(offs_t);
 	void		(*writebyte)(offs_t, UINT8);
 	void		(*writeword)(offs_t, UINT16);
 	void		(*writelong)(offs_t, UINT32);
-} memory_handlers;
+} memory_accessors;
 
 /* R3000 Registers */
 typedef struct
@@ -156,9 +156,9 @@ typedef struct
 
 	/* memory accesses */
 	UINT8		bigendian;
-	memory_handlers cur;
-	const memory_handlers *memory_hand;
-	const memory_handlers *cache_hand;
+	memory_accessors cur;
+	const memory_accessors *memory_hand;
+	const memory_accessors *cache_hand;
 
 	/* cache memory */
 	UINT32 *	cache;
@@ -215,25 +215,25 @@ static int	r3000_icount;
 static r3000_regs r3000;
 
 
-static const memory_handlers be_memory =
+static const memory_accessors be_memory =
 {
 	program_read_byte_32be,  program_read_word_32be,  program_read_dword_32be,
 	program_write_byte_32be,  program_write_word_32be,  program_write_dword_32be
 };
 
-static const memory_handlers le_memory =
+static const memory_accessors le_memory =
 {
 	program_read_byte_32le,  program_read_word_32le,  program_read_dword_32le,
 	program_write_byte_32le,  program_write_word_32le,  program_write_dword_32le
 };
 
-static const memory_handlers be_cache =
+static const memory_accessors be_cache =
 {
 	readcache_be,  readcache_be_word,  readcache_be_dword,
 	writecache_be,  writecache_be_word,  writecache_be_dword
 };
 
-static const memory_handlers le_cache =
+static const memory_accessors le_cache =
 {
 	readcache_le,  readcache_le_word,  readcache_le_dword,
 	writecache_le,  writecache_le_word,  writecache_le_dword

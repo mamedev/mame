@@ -121,7 +121,7 @@ static WRITE8_HANDLER(paranoia_z80_io_37_w)
 }
 
 static ADDRESS_MAP_START(paranoia_z80_io_map, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_READ( paranoia_z80_io_01_r )
 	AM_RANGE( 0x02, 0x02 ) AM_READ( paranoia_z80_io_02_r )
 	AM_RANGE( 0x17, 0x17 ) AM_WRITE( paranoia_z80_io_17_w )

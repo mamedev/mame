@@ -200,7 +200,7 @@ static WRITE8_HANDLER( port_music_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(15) )	/* A15 is not decoded */
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM		/* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, crbaloon_videoram_w) AM_BASE(&crbaloon_videoram)
@@ -217,11 +217,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(4) )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("DSW0"))
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("IN0"))
+	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("DSW0")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ(pc3259_r)
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ(port_tag_to_handler8("IN1"))
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
 
 	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP) /* watchdog */

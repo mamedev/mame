@@ -626,14 +626,14 @@ static WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
 }
 
 static ADDRESS_MAP_START( megaplay_bios_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xdc, 0xdc) AM_READ(megatech_bios_port_dc_r)  // player inputs
 //  AM_RANGE(0xdd, 0xdd) AM_READ(megatech_bios_port_dd_r)  // other player 2 inputs
 	AM_RANGE(0xbe, 0xbf) AM_READ(megaplay_bios_port_be_bf_r)			/* VDP */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaplay_bios_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_1_w)	/* SN76489 */
 	AM_RANGE(0xbe, 0xbf) AM_WRITE(megaplay_bios_port_be_bf_w)			/* VDP */

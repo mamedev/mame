@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( inufuku_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inufuku_readport_sound, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
 	AM_RANGE(0x08, 0x08) AM_READ(YM2610_status_port_0_A_r)
 	AM_RANGE(0x09, 0x09) AM_READ(YM2610_read_port_0_r)
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( inufuku_readport_sound, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inufuku_writeport_sound, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(YM2610_control_port_0_A_w)

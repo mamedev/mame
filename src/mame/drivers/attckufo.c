@@ -83,7 +83,7 @@ static WRITE8_HANDLER(attckufo_io_w)
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&mainram)
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(attckufo_port_r, attckufo_port_w)
 	AM_RANGE(0x1400, 0x1403) AM_READWRITE(attckufo_io_r, attckufo_io_w)

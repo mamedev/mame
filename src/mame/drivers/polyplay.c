@@ -173,7 +173,7 @@ ADDRESS_MAP_END
 
 /* port mapping */
 static ADDRESS_MAP_START( polyplay_io_map, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(8) )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
 	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)
 	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)

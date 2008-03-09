@@ -331,7 +331,7 @@ static VIDEO_UPDATE( sbrkout )
 
 /* full memory map derived from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(14) )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK(1)
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(MRA8_RAM, sbrkout_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)

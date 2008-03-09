@@ -172,7 +172,7 @@ static WRITE16_HANDLER( latch_w )
 
 /* full memory map deduced from schematics and GALs */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	ADDRESS_MAP_FLAGS( AMEF_ABITS(23) )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fffff)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
