@@ -268,9 +268,9 @@ static TIMER_CALLBACK( via_0_ca1_timer_callback )
 	via_0_ca1_w(machine, 0, (UINT8)param);
 
 	if (param)
-		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
+		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 	else
-		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(0, VBEND, 0), 1);
+		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBEND, 0), 1);
 }
 
 
@@ -282,7 +282,7 @@ static void create_via_0_timer(gameplan_state *state)
 
 static void start_via_0_timer(gameplan_state *state)
 {
-	timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
+	timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(Machine->primary_screen, VBSTART, 0), 0);
 }
 
 

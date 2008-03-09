@@ -1151,9 +1151,9 @@ static int get_list_number(void)
 	return listctl[0] & 0x40 ? 0 : 1;
 }
 
-static void end_frame(void)
+static void end_frame(running_machine *machine)
 {
-	if((listctl[0] & 4) && (video_screen_get_frame_number(0) & 1))
+	if((listctl[0] & 4) && (video_screen_get_frame_number(machine->primary_screen) & 1))
 		listctl[0] ^= 0x40;
 }
 
@@ -1526,6 +1526,6 @@ VIDEO_UPDATE(model1)
 VIDEO_EOF(model1)
 {
 	tgp_scan();
-	end_frame();
+	end_frame(machine);
 	LOG_TGP(("TGP: vsync\n"));
 }

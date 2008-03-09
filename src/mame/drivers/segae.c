@@ -1440,7 +1440,7 @@ static void end_of_frame(struct sms_vdp *chip)
 		visarea.min_y = 0;
 		visarea.max_y = sms_mode_table[chip->screen_mode].sms2_height-1;
 
-		if (chip->chip_id==3) video_screen_configure(0, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
+		if (chip->chip_id==3) video_screen_configure(Machine->primary_screen, 256, 256, &visarea, HZ_TO_ATTOSECONDS(chip->sms_framerate));
 
 	}
 	else /* 160x144 */

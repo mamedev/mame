@@ -125,7 +125,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = video_screen_get_vpos(0);
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
 
@@ -135,7 +135,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	else
 		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
 }
 
 
@@ -145,43 +145,9 @@ static void create_interrupt_timer(void)
 }
 
 
-static void start_interrupt_timer(void)
+static void start_interrupt_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0);
-}
-
-
-
-/*************************************
- *
- *  Output port writes
- *
- *************************************/
-
-static WRITE8_HANDLER( spacefb_port_0_w )
-{
-	spacefb_set_flip_screen((data >> 0) & 0x01);
-
-	spacefb_set_gfx_bank((data >> 5) & 0x01);
-
-	spacefb_set_palette_bank((data >> 6) & 0x01);
-}
-
-
-static WRITE8_HANDLER( spacefb_port_2_w )
-{
-	spacefb_set_color_contrast_r((data >> 0) & 0x01);
-
-	spacefb_set_color_contrast_g((data >> 1) & 0x01);
-
-	spacefb_set_color_contrast_b((data >> 2) & 0x01);
-
-	spacefb_set_background_red((data >> 3) & 0x01);
-
-	spacefb_set_background_blue((data >> 4) & 0x01);
-
-	spacefb_set_disable_star_field((data >> 7) & 0x01);
-
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, SPACEFB_INT_TRIGGER_COUNT_1, 0), 0);
 }
 
 
@@ -212,7 +178,7 @@ static MACHINE_RESET( spacefb )
 	spacefb_port_1_w(machine, 0, 0);
 	spacefb_port_2_w(machine, 0, 0);
 
-	start_interrupt_timer();
+	start_interrupt_timer(machine);
 }
 
 

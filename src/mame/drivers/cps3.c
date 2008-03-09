@@ -1054,7 +1054,7 @@ static VIDEO_UPDATE(cps3)
 			cps3_screenwidth = 496;
 			visarea.min_x = 0; visarea.max_x = 496-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			video_screen_configure(0, 496, 224, &visarea, video_screen_get_frame_period(0).attoseconds);
+			video_screen_configure(screen, 496, 224, &visarea, video_screen_get_frame_period(screen).attoseconds);
 		}
 	}
 	else
@@ -1066,7 +1066,7 @@ static VIDEO_UPDATE(cps3)
 			cps3_screenwidth = 384;
 			visarea.min_x = 0; visarea.max_x = 384-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			video_screen_configure(0, 384, 224, &visarea, video_screen_get_frame_period(0).attoseconds);
+			video_screen_configure(screen, 384, 224, &visarea, video_screen_get_frame_period(screen).attoseconds);
 		}
 	}
 
@@ -1241,7 +1241,7 @@ static VIDEO_UPDATE(cps3)
 
 								if (current_ypos&0x200) current_ypos-=0x400;
 
-								//if ( (whichbpp) && (video_screen_get_frame_number(0) & 1)) continue;
+								//if ( (whichbpp) && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 								/* use the palette value from the main list or the sublists? */
 								if (whichpal)

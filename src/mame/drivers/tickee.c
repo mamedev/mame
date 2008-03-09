@@ -72,7 +72,7 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 	int beamx, beamy;
 
 	/* set a timer to do this again next frame */
-	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* only do work if the palette is flashed */
 	if (!tickee_control[2])
@@ -80,13 +80,13 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	timer_set(video_screen_get_time_until_pos(0, beamy,     beamx + 50), NULL, 0, trigger_gun_interrupt);
-	timer_set(video_screen_get_time_until_pos(0, beamy + 1, beamx + 50), NULL, 0, clear_gun_interrupt);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 0, trigger_gun_interrupt);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 0, clear_gun_interrupt);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	timer_set(video_screen_get_time_until_pos(0, beamy,     beamx + 50), NULL, 1, trigger_gun_interrupt);
-	timer_set(video_screen_get_time_until_pos(0, beamy + 1, beamx + 50), NULL, 1, clear_gun_interrupt);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 1, trigger_gun_interrupt);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 1, clear_gun_interrupt);
 }
 
 
@@ -101,7 +101,7 @@ static VIDEO_START( tickee )
 {
 	/* start a timer going on the first scanline of every frame */
 	setup_gun_timer = timer_alloc(setup_gun_interrupts, NULL);
-	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 

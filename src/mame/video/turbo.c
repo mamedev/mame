@@ -209,7 +209,7 @@ WRITE8_HANDLER( turbo_videoram_w )
 	state->videoram[offset] = data;
 	if (offset < 0x400)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 		tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 	}
 }

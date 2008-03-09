@@ -382,7 +382,7 @@ void atarirle_init(int map, const atarirle_desc *desc)
 void atarirle_control_w(int map, UINT8 bits)
 {
 	atarirle_data *mo = &atarirle[map];
-	int scanline = video_screen_get_vpos(0);
+	int scanline = video_screen_get_vpos(Machine->primary_screen);
 	int oldbits = mo->control_bits;
 
 //logerror("atarirle_control_w(%d)\n", bits);
@@ -392,7 +392,7 @@ void atarirle_control_w(int map, UINT8 bits)
 		return;
 
 	/* force a partial update first */
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(Machine->primary_screen, scanline);
 
 	/* if the erase flag was set, erase the front map */
 	if (oldbits & ATARIRLE_CONTROL_ERASE)

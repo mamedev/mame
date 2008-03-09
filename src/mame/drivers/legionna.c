@@ -264,7 +264,7 @@ static UINT32 hit_check_x,hit_check_y;
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	video_screen_configure(0, _x_, _y_, &visarea, video_screen_get_frame_period(0).attoseconds ); \
+	video_screen_configure(machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds ); \
 	flip_screen_set(_flip_); \
 	} \
 

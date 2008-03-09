@@ -15,7 +15,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "hitme.h"
 #include "sound/discrete.h"
 
@@ -136,10 +135,10 @@ static UINT8 read_port_and_t0(int port)
 }
 
 
-static UINT8 read_port_and_t0_and_hblank(int port)
+static UINT8 read_port_and_t0_and_hblank(running_machine *machine, int port)
 {
 	UINT8 val = read_port_and_t0(port);
-	if (video_screen_get_hpos(0) < (Machine->screen[0].width * 9 / 10))
+	if (video_screen_get_hpos(machine->primary_screen) < (machine->screen[0].width * 9 / 10))
 		val ^= 0x04;
 	return val;
 }
@@ -147,7 +146,7 @@ static UINT8 read_port_and_t0_and_hblank(int port)
 
 static READ8_HANDLER( hitme_port_0_r )
 {
-	return read_port_and_t0_and_hblank(0);
+	return read_port_and_t0_and_hblank(machine, 0);
 }
 
 
@@ -159,7 +158,7 @@ static READ8_HANDLER( hitme_port_1_r )
 
 static READ8_HANDLER( hitme_port_2_r )
 {
-	return read_port_and_t0_and_hblank(2);
+	return read_port_and_t0_and_hblank(machine, 2);
 }
 
 

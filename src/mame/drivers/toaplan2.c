@@ -579,7 +579,7 @@ static DRIVER_INIT( bbakradu )
 
 static READ16_HANDLER( toaplan2_inputport_0_word_r )
 {
-	return ((video_screen_get_vpos(0) + 15) % 262) >= 245;
+	return ((video_screen_get_vpos(machine->primary_screen) + 15) % 262) >= 245;
 }
 
 
@@ -588,15 +588,15 @@ static TIMER_CALLBACK( toaplan2_raise_irq )
 	cpunum_set_input_line(machine, 0, param, HOLD_LINE);
 }
 
-static void toaplan2_vblank_irq(int irq_line)
+static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
 {
 	/* the IRQ appears to fire at line 0xe6 */
-	timer_set(video_screen_get_time_until_pos(0, 0xe6, 0), NULL, irq_line, toaplan2_raise_irq);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0xe6, 0), NULL, irq_line, toaplan2_raise_irq);
 }
 
-static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(1); }
-static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(2); }
-static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(4); }
+static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(machine, 1); }
+static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(machine, 2); }
+static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(machine, 4); }
 
 static READ16_HANDLER( video_count_r )
 {
@@ -606,8 +606,8 @@ static READ16_HANDLER( video_count_r )
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = video_screen_get_hpos(0);
-	int vpos = video_screen_get_vpos(0);
+	int hpos = video_screen_get_hpos(machine->primary_screen);
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 	video_status = 0xff00;						/* Set signals inactive */
 
 	vpos = (vpos + 15) % 262;
@@ -623,7 +623,7 @@ static READ16_HANDLER( video_count_r )
 	else
 		video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(0));
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(machine->primary_screen));
 
 	return video_status;
 }

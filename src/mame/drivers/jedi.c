@@ -136,7 +136,7 @@ static TIMER_CALLBACK( generate_interrupt )
 	scanline += 32;
 	if (scanline > 256)
 		scanline = 32;
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -159,7 +159,7 @@ static MACHINE_START( jedi )
 
 	/* set a timer to run the interrupts */
 	state->interrupt_timer = timer_alloc(generate_interrupt, NULL);
-	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(0, 32, 0), 32);
+	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), 32);
 
 	/* configure the banks */
 	memory_configure_bank(1, 0, 3, memory_region(REGION_CPU1) + 0x10000, 0x4000);

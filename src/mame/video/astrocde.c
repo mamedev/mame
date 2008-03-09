@@ -223,7 +223,7 @@ VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
 	scanline_timer = timer_alloc(scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* register for save states */
 	init_savestate();
@@ -238,7 +238,7 @@ VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
 	scanline_timer = timer_alloc(scanline_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 1, 0), 1);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* allocate videoram */
 	profpac_videoram = auto_malloc(0x4000 * 4 * sizeof(*profpac_videoram));
@@ -309,7 +309,7 @@ VIDEO_UPDATE( astrocde )
 
 	/* compute the starting point of sparkle for the current frame */
 	if (astrocade_video_config & AC_STARS)
-		sparklebase = (video_screen_get_frame_number(0) * (UINT64)(screen->machine->screen[0].width * screen->machine->screen[0].height)) % RNG_PERIOD;
+		sparklebase = (video_screen_get_frame_number(screen) * (UINT64)(screen->machine->screen[0].width * screen->machine->screen[0].height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -465,7 +465,7 @@ static TIMER_CALLBACK( scanline_callback )
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
 
 	/* force an update against the current scanline */
-	video_screen_update_partial(0, scanline - 1);
+	video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
@@ -490,7 +490,7 @@ static TIMER_CALLBACK( scanline_callback )
 	scanline++;
 	if (scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 

@@ -70,7 +70,7 @@ static WRITE8_HANDLER( saa5050_w )
 
 static READ8_HANDLER( fake_VRLE_r )
 {
-	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(0)*0x40);
+	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(machine->primary_screen)*0x40);
 }
 
 static READ8_HANDLER( ram_mirror_r )

@@ -112,9 +112,9 @@ WRITE32_HANDLER( beathead_finescroll_w )
 	UINT32 newword = COMBINE_DATA(&finescroll);
 
 	/* if VBLANK is going off on a scanline other than the last, suspend time */
-	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(0) != 261)
+	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(machine->primary_screen) != 261)
 	{
-		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(0));
+		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(machine->primary_screen));
 		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }

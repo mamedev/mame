@@ -1123,12 +1123,12 @@ static void registers_update(debug_view *view)
 
 					case MAX_REGS + 2:
 						if (video_screen_exists(scrnum))
-							sprintf(dummy, "beamx:%3d", video_screen_get_hpos(scrnum));
+							sprintf(dummy, "beamx:%3d", video_screen_get_hpos_scrnum(scrnum));
 						break;
 
 					case MAX_REGS + 3:
 						if (video_screen_exists(scrnum))
-							sprintf(dummy, "beamy:%3d", video_screen_get_vpos(scrnum));
+							sprintf(dummy, "beamy:%3d", video_screen_get_vpos_scrnum(scrnum));
 						break;
 
 					case MAX_REGS + 4:

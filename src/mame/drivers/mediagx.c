@@ -219,7 +219,7 @@ static void draw_framebuffer(running_machine *machine, bitmap_t *bitmap, const r
 		visarea.min_x = visarea.min_y = 0;
 		visarea.max_x = width - 1;
 		visarea.max_y = height - 1;
-		video_screen_configure(0, width, height * 262 / 240, &visarea, video_screen_get_frame_period(0).attoseconds);
+		video_screen_configure(machine->primary_screen, width, height * 262 / 240, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	}
 
 	if (disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)		// 8-bit mode
@@ -329,10 +329,8 @@ static READ32_HANDLER( disp_ctrl_r )
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (video_screen_get_vpos(0) >= frame_height)
-			{
+			if (video_screen_get_vpos(machine->primary_screen) >= frame_height)
 				r &= ~0x40000000;
-			}
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup

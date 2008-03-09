@@ -50,14 +50,14 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 	/* PCB supports two dials, but cab has only got one */
 
-	timer_set(video_screen_get_time_until_pos(0, readinputport(3), 0), NULL, 0, destroyr_dial_callback);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, destroyr_frame_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, readinputport(3), 0), NULL, 0, destroyr_dial_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
 
 static MACHINE_RESET( destroyr )
 {
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, destroyr_frame_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
 
@@ -160,7 +160,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 static READ8_HANDLER( destroyr_scanline_r )
 {
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 

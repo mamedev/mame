@@ -582,5 +582,5 @@ void midyunit_scanline_update(running_machine *machine, int screen, bitmap_t *bi
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == machine->screen[0].visarea.max_y)
-		timer_set(video_screen_get_time_until_pos(0, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
+		timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
 }

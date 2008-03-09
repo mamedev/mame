@@ -302,7 +302,7 @@ static INTERRUPT_GEN( generate_int1 )
 {
 	/* signal the NMI */
 	itech32_update_interrupts(1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(0));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -393,7 +393,7 @@ static READ32_HANDLER( trackball32_4bit_r )
 	static attotime lasttime;
 	attotime curtime = timer_get_time();
 
-	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(0)) > 0)
+	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(machine->primary_screen)) > 0)
 	{
 		int upper, lower;
 		int dx, dy;
@@ -432,7 +432,7 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 	static attotime lasttime;
 	attotime curtime = timer_get_time();
 
-	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(0)) > 0)
+	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(machine->primary_screen)) > 0)
 	{
 		int upper, lower;
 		int dx, dy;

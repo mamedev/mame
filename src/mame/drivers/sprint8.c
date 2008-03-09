@@ -59,7 +59,7 @@ static MACHINE_RESET( sprint8 )
 	collision_reset = 0;
 	collision_index = 0;
 
-	timer_pulse(video_screen_get_frame_period(0), NULL, 0, input_callback);
+	timer_pulse(video_screen_get_frame_period(machine->primary_screen), NULL, 0, input_callback);
 }
 
 

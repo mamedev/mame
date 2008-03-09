@@ -1044,7 +1044,6 @@ static int sprintf_warnings(char *buffer)
 int sprintf_game_info(char *buffer)
 {
 	int scrcount = video_screen_count(Machine->config);
-	const device_config *device;
 	char *bufptr = buffer;
 	int cpunum, sndnum;
 	int count;
@@ -1112,13 +1111,15 @@ int sprintf_game_info(char *buffer)
 		buffer += sprintf(bufptr, "None\n");
 	else
 	{
-		for (device = video_screen_first(Machine->config); device != NULL; device = video_screen_next(device))
+		const device_config *screen;
+
+		for (screen = video_screen_first(Machine->config); screen != NULL; screen = video_screen_next(screen))
 		{
-			int index = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, device->tag);
-			const screen_config *scrconfig = device->inline_config;
+			int index = device_list_index(Machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+			const screen_config *scrconfig = screen->inline_config;
 
 			if (scrcount > 1)
-				bufptr += sprintf(bufptr, "Screen %d: ", index + 1);
+				bufptr += sprintf(bufptr, "%s: ", slider_get_screen_desc(index));
 
 			if (scrconfig->type == SCREEN_TYPE_VECTOR)
 				bufptr += sprintf(bufptr, "Vector\n");
@@ -1127,7 +1128,7 @@ int sprintf_game_info(char *buffer)
 						Machine->screen[index].visarea.max_x - Machine->screen[index].visarea.min_x + 1,
 						Machine->screen[index].visarea.max_y - Machine->screen[index].visarea.min_y + 1,
 						(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
-						ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds));
+						ATTOSECONDS_TO_HZ(video_screen_get_frame_period(screen).attoseconds));
 		}
 	}
 
@@ -1311,14 +1312,14 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* toggle movie recording */
 	if (input_ui_pressed(IPT_UI_RECORD_MOVIE))
 	{
-		if (!video_is_movie_active(Machine, 0))
+		if (!video_is_movie_active(Machine->primary_screen))
 		{
-			video_movie_begin_recording(Machine, 0, NULL);
+			video_movie_begin_recording(Machine->primary_screen, NULL);
 			popmessage("REC START");
 		}
 		else
 		{
-			video_movie_end_recording(Machine, 0);
+			video_movie_end_recording(Machine->primary_screen);
 			popmessage("REC STOP");
 		}
 	}
@@ -1742,10 +1743,10 @@ static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer
 	if (buffer != NULL)
 	{
 		screen_state *state = &Machine->screen[arg];
-		video_screen_configure(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "%s Refresh rate %.3f", slider_get_screen_desc(arg), ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds));
+		video_screen_configure_scrnum(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
+		sprintf(buffer, "%s Refresh rate %.3f", slider_get_screen_desc(arg), ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
 	}
-	refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds);
+	refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
 
@@ -1907,11 +1908,12 @@ static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, i
 
 static char *slider_get_screen_desc(int arg)
 {
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, arg);
 	int screen_count = video_screen_count(Machine->config);
 	static char descbuf[256];
 
 	if (screen_count > 1)
-		sprintf(descbuf, "Screen #%d", arg);
+		sprintf(descbuf, "Screen '%s'", screen->tag);
 	else
 		strcpy(descbuf, "Screen");
 

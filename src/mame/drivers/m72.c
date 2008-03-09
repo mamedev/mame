@@ -101,21 +101,21 @@ static MACHINE_RESET( m72 )
 {
 	m72_irq_base = 0x20;
 	MACHINE_RESET_CALL(m72_sound);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 static MACHINE_RESET( xmultipl )
 {
 	m72_irq_base = 0x08;
 	MACHINE_RESET_CALL(m72_sound);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 static MACHINE_RESET( kengo )
 {
 	m72_irq_base = 0x18;
 	MACHINE_RESET_CALL(m72_sound);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 static TIMER_CALLBACK( m72_scanline_interrupt )
@@ -125,21 +125,21 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	/* raster interrupt - visible area only? */
 	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
 	{
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 0);
 	}
 
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 

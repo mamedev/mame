@@ -410,14 +410,14 @@ static WRITE8_HANDLER( m15_a100_w )
 
 static READ8_HANDLER( m10_a700_r )
 {
-   	//printf("rd:%d\n",video_screen_get_vpos(0));
+   	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
 	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
 	return 0x00;
 }
 
 static READ8_HANDLER( m11_a700_r )
 {
-   	//printf("rd:%d\n",video_screen_get_vpos(0));
+   	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
 	return 0x00;
 }
 
@@ -439,12 +439,12 @@ static TIMER_CALLBACK( interrupt_callback )
     if (param==0)
     {
 	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	    timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
+	    timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
     }
     if (param==1)
     {
 	    cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
+    	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
     }
     if (param==-1)
 	    cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
@@ -454,7 +454,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static INTERRUPT_GEN( m11_interrupt )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
@@ -465,7 +465,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-   	timer_set(video_screen_get_time_until_pos(0, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
+   	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
 }
 
 /*************************************

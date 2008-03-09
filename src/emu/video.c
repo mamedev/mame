@@ -38,6 +38,7 @@
 #define SUBSECONDS_PER_SPEED_UPDATE	(ATTOSECONDS_PER_SECOND / 4)
 #define PAUSED_REFRESH_RATE			(30)
 #define MAX_VBL_CB					(10)
+#define DEFAULT_FRAME_PEIOD			ATTOTIME_IN_HZ(60)
 
 
 
@@ -189,7 +190,7 @@ static int finish_screen_updates(running_machine *machine);
 /* throttling/frameskipping/performance */
 static void update_throttle(running_machine *machine, attotime emutime);
 static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t target_ticks);
-static void update_frameskip(void);
+static void update_frameskip(running_machine *machine);
 static void recompute_speed(running_machine *machine, attotime emutime);
 
 /* screen snapshots */
@@ -197,7 +198,7 @@ static void create_snapshot_bitmap(running_machine *machine, int scrnum);
 static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file);
 
 /* movie recording */
-static void movie_record_frame(running_machine *machine, int scrnum);
+static void movie_record_frame(const device_config *screen);
 
 /* crosshair rendering */
 static void crosshair_init(running_machine *machine);
@@ -234,10 +235,10 @@ INLINE screen_state *get_safe_token(const device_config *device)
     forward
 -------------------------------------------------*/
 
-INLINE int effective_autoframeskip(void)
+INLINE int effective_autoframeskip(running_machine *machine)
 {
 	/* if we're fast forwarding or paused, autoframeskip is disabled */
-	if (global.fastforward || mame_is_paused(Machine))
+	if (global.fastforward || mame_is_paused(machine))
 		return FALSE;
 
 	/* otherwise, it's up to the user */
@@ -268,10 +269,10 @@ INLINE int effective_frameskip(void)
     forward and user interface
 -------------------------------------------------*/
 
-INLINE int effective_throttle(void)
+INLINE int effective_throttle(running_machine *machine)
 {
 	/* if we're paused, or if the UI is active, we always throttle */
-	if (mame_is_paused(Machine) || ui_is_menu_active() || ui_is_slider_active())
+	if (mame_is_paused(machine) || ui_is_menu_active() || ui_is_slider_active())
 		return TRUE;
 
 	/* if we're fast forwarding, we don't throttle */
@@ -294,7 +295,7 @@ INLINE int effective_throttle(void)
 
 void video_init(running_machine *machine)
 {
-	const device_config *device;
+	const device_config *screen;
 	const char *filename;
 
 	/* reset our global state */
@@ -317,14 +318,14 @@ void video_init(running_machine *machine)
 	/* set the first screen device as the primary - this will set NULL if screenless */
 	machine->primary_screen = video_screen_first(machine->config);
 
-	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
 		char unique_tag[40];
 
-		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, screen->tag);
 
 		render_container *container = render_container_get_screen(scrnum);
-		screen_config *config = device->inline_config;
+		screen_config *config = screen->inline_config;
 		screen_state *state = &machine->screen[scrnum];
 
 		/* allocate the private state and hook it up to the public structure */
@@ -333,19 +334,19 @@ void video_init(running_machine *machine)
 		state->private_data = internal_state;
 
 		/* allocate the VBLANK timers */
-		internal_state->vblank_begin_timer = timer_alloc(vblank_begin_callback, state);
-		internal_state->vblank_end_timer = timer_alloc(vblank_end_callback, internal_state);
+		internal_state->vblank_begin_timer = timer_alloc(vblank_begin_callback, (void *)screen);
+		internal_state->vblank_end_timer = timer_alloc(vblank_end_callback, (void *)screen);
 
 		/* allocate a timer to reset partial updates */
-		internal_state->scanline0_timer = timer_alloc(scanline0_callback, internal_state);
+		internal_state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
 
 		/* save some cross-reference information that makes our life easier */
 		internal_state->scrnum = scrnum;
-		internal_state->device = device;
+		internal_state->device = screen;
 
 		/* configure the screen with the default parameters */
 		state->format = config->format;
-		video_screen_configure(scrnum, config->width, config->height, &config->visarea, config->refresh);
+		video_screen_configure(screen, config->width, config->height, &config->visarea, config->refresh);
 
 		/* configure the default cliparea */
 		if (config->xoffset != 0)
@@ -363,13 +364,13 @@ void video_init(running_machine *machine)
 		/* allocate a timer to generate per-scanline updates */
 		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 		{
-			internal_state->scanline_timer = timer_alloc(scanline_update_callback, state);
-			timer_adjust_oneshot(internal_state->scanline_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
+			internal_state->scanline_timer = timer_alloc(scanline_update_callback, (void *)screen);
+			timer_adjust_oneshot(internal_state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 		}
 
 		/* register for save states */
-		assert(strlen(device->tag) < 30);
-		state_save_combine_module_and_tag(unique_tag, "video_screen", device->tag);
+		assert(strlen(screen->tag) < 30);
+		state_save_combine_module_and_tag(unique_tag, "video_screen", screen->tag);
 
 		state_save_register_item(unique_tag, 0, internal_state->vblank_start_time.seconds);
 		state_save_register_item(unique_tag, 0, internal_state->vblank_start_time.attoseconds);
@@ -411,8 +412,8 @@ void video_init(running_machine *machine)
 
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
-	if (filename[0] != 0)
-		video_movie_begin_recording(machine, 0, filename);
+	if ((filename[0] != 0) && (machine->primary_screen != NULL))
+		video_movie_begin_recording(machine->primary_screen, filename);
 }
 
 
@@ -422,23 +423,26 @@ void video_init(running_machine *machine)
 
 static void video_exit(running_machine *machine)
 {
-	int scrnum;
+	const device_config *screen;
 	int i;
 
 	/* free crosshairs */
 	crosshair_free();
 
 	/* stop recording any movie */
-	video_movie_end_recording(machine, 0);
+	if (machine->primary_screen != NULL)
+		video_movie_end_recording(machine->primary_screen);
 
 	/* free all the graphics elements */
 	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
 		freegfx(machine->gfx[i]);
 
 	/* free all the textures and bitmaps */
-	for (scrnum = 0; scrnum < MAX_SCREENS; scrnum++)
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
-		internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+		screen_state *state = get_safe_token(screen);
+		internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+
 		if (internal_state->texture[0] != NULL)
 			render_texture_free(internal_state->texture[0]);
 		if (internal_state->texture[1] != NULL)
@@ -685,20 +689,28 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
     of a screen
 -------------------------------------------------*/
 
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
+void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
 {
-	const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
-	screen_state *state = &Machine->screen[scrnum];
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+	screen_config *config = screen->inline_config;
+
+	/* validate arguments */
+	assert(width > 0);
+	assert(height > 0);
+	assert(visarea != NULL);
+	assert(frame_period > 0);
 
 	/* reallocate bitmap if necessary */
-	if (scrconfig->type != SCREEN_TYPE_VECTOR)
+	if (config->type != SCREEN_TYPE_VECTOR)
 	{
 		int curwidth = 0, curheight = 0;
 
 		/* reality checks */
-		if (visarea->min_x < 0 || visarea->min_y < 0 || visarea->max_x >= width || visarea->max_y >= height)
-			fatalerror("video_screen_configure(): visible area must be contained within the width/height!");
+		assert(visarea->min_x >= 0);
+		assert(visarea->min_y >= 0);
+		assert(visarea->min_x < width);
+		assert(visarea->min_y < height);
 
 		/* extract the current width/height from the bitmap */
 		if (internal_state->bitmap[0] != NULL)
@@ -737,9 +749,9 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 
 			/* allocate bitmaps */
 			internal_state->bitmap[0] = bitmap_alloc(curwidth, curheight, screen_format);
-			bitmap_set_palette(internal_state->bitmap[0], Machine->palette);
+			bitmap_set_palette(internal_state->bitmap[0], screen->machine->palette);
 			internal_state->bitmap[1] = bitmap_alloc(curwidth, curheight, screen_format);
-			bitmap_set_palette(internal_state->bitmap[1], Machine->palette);
+			bitmap_set_palette(internal_state->bitmap[1], screen->machine->palette);
 
 			/* allocate textures */
 			internal_state->texture[0] = render_texture_alloc(NULL, NULL);
@@ -761,10 +773,10 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 
 	/* if there has been no VBLANK time specified in the MACHINE_DRIVER, compute it now
        from the visible area, otherwise just used the supplied value */
-	if ((scrconfig->vblank == 0) && !scrconfig->oldstyle_vblank_supplied)
+	if ((config->vblank == 0) && !config->oldstyle_vblank_supplied)
 		internal_state->vblank_period = (frame_period / height) * (height - (visarea->max_y + 1 - visarea->min_y));
 	else
-		internal_state->vblank_period = scrconfig->vblank;
+		internal_state->vblank_period = config->vblank;
 
 	/* adjust speed if necessary */
 	if (global.refresh_speed)
@@ -784,13 +796,19 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
 
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */
-	if (video_screen_get_vpos(scrnum) == 0)
-		timer_adjust_oneshot(internal_state->scanline0_timer, attotime_zero, scrnum);
+	if (video_screen_get_vpos(screen) == 0)
+		timer_adjust_oneshot(internal_state->scanline0_timer, attotime_zero, 0);
 	else
-		timer_adjust_oneshot(internal_state->scanline0_timer, video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
+		timer_adjust_oneshot(internal_state->scanline0_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 
 	/* start the VBLANK timer */
-	timer_adjust_oneshot(internal_state->vblank_begin_timer, video_screen_get_time_until_vblank_start(scrnum), 0);
+	timer_adjust_oneshot(internal_state->vblank_begin_timer, video_screen_get_time_until_vblank_start(screen), 0);
+}
+
+void video_screen_configure_scrnum(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
+{
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	video_screen_configure(internal_state->device, width, height, visarea, frame_period);
 }
 
 
@@ -799,10 +817,10 @@ void video_screen_configure(int scrnum, int width, int height, const rectangle *
     of a screen
 -------------------------------------------------*/
 
-void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int max_y)
+void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y)
 {
-	screen_state *state = &Machine->screen[scrnum];
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	rectangle visarea;
 
 	visarea.min_x = min_x;
@@ -810,7 +828,13 @@ void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int m
 	visarea.min_y = min_y;
 	visarea.max_y = max_y;
 
-	video_screen_configure(scrnum, state->width, state->height, &visarea, internal_state->frame_period);
+	video_screen_configure(screen, state->width, state->height, &visarea, internal_state->frame_period);
+}
+
+void video_screen_set_visarea_scrnum(int scrnum, int min_x, int max_x, int min_y, int max_y)
+{
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	video_screen_set_visarea(internal_state->device, min_x, max_x, min_y, max_y);
 }
 
 
@@ -844,16 +868,16 @@ static internal_screen_state *get_internal_state(running_machine *machine, int s
     including the specified scanline
 -------------------------------------------------*/
 
-void video_screen_update_partial(int scrnum, int scanline)
+void video_screen_update_partial(const device_config *screen, int scanline)
 {
-	screen_state *state = &Machine->screen[scrnum];
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	rectangle clip = state->visarea;
 
-	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%d,%d): ", scrnum, scanline));
+	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%s, %d): ", screen->tag, scanline));
 
 	/* these two checks only apply if we're allowed to skip frames */
-	if (!(Machine->config->video_attributes & VIDEO_ALWAYS_UPDATE))
+	if (!(screen->machine->config->video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		/* if skipping this frame, bail */
 		if (global.skipping_this_frame)
@@ -863,7 +887,7 @@ void video_screen_update_partial(int scrnum, int scanline)
 		}
 
 		/* skip if this screen is not visible anywhere */
-		if (!(render_get_live_screens_mask() & (1 << scrnum)))
+		if (!(render_get_live_screens_mask() & (1 << internal_state->scrnum)))
 		{
 			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
 			return;
@@ -891,8 +915,8 @@ void video_screen_update_partial(int scrnum, int scanline)
 		profiler_mark(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		if (Machine->config->video_update != NULL)
-			flags = (*Machine->config->video_update)(internal_state->device, scrnum, internal_state->bitmap[internal_state->curbitmap], &clip);
+		if (screen->machine->config->video_update != NULL)
+			flags = (*screen->machine->config->video_update)(screen, internal_state->scrnum, internal_state->bitmap[internal_state->curbitmap], &clip);
 		global.partial_updates_this_frame++;
 		profiler_mark(PROFILER_END);
 
@@ -904,18 +928,24 @@ void video_screen_update_partial(int scrnum, int scanline)
 	internal_state->last_partial_scan = scanline + 1;
 }
 
+void video_screen_update_partial_scrnum(int scrnum, int scanline)
+{
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	video_screen_update_partial(internal_state->device, scanline);
+}
+
 
 /*-------------------------------------------------
-    video_screen_update_partial - perform an update
+    video_screen_update_now - perform an update
     from the last beam position up to the current
     beam position
 -------------------------------------------------*/
 
-void video_screen_update_now(int scrnum)
+void video_screen_update_now(const device_config *screen)
 {
-	screen_state *state = &Machine->screen[scrnum];
-	int current_vpos = video_screen_get_vpos(scrnum);
-	int current_hpos = video_screen_get_hpos(scrnum);
+	screen_state *state = get_safe_token(screen);
+	int current_vpos = video_screen_get_vpos(screen);
+	int current_hpos = video_screen_get_hpos(screen);
 
 	/* since we can currently update only at the scanline
        level, we are trying to do the right thing by
@@ -928,7 +958,7 @@ void video_screen_update_now(int scrnum)
 	if ((current_hpos < (state->width / 2)) && (current_vpos > 0))
 		current_vpos = current_vpos - 1;
 
-	video_screen_update_partial(scrnum, current_vpos);
+	video_screen_update_partial(screen, current_vpos);
 }
 
 
@@ -938,10 +968,10 @@ void video_screen_update_now(int scrnum)
     screen
 -------------------------------------------------*/
 
-int video_screen_get_vpos(int scrnum)
+int video_screen_get_vpos(const device_config *screen)
 {
-	screen_state *state = &Machine->screen[scrnum];
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	int vpos;
 
@@ -955,6 +985,12 @@ int video_screen_get_vpos(int scrnum)
 	return (state->visarea.max_y + 1 + vpos) % state->height;
 }
 
+int video_screen_get_vpos_scrnum(int scrnum)
+{
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	return video_screen_get_vpos(internal_state->device);
+}
+
 
 /*-------------------------------------------------
     video_screen_get_hpos - returns the current
@@ -962,9 +998,10 @@ int video_screen_get_vpos(int scrnum)
     screen
 -------------------------------------------------*/
 
-int video_screen_get_hpos(int scrnum)
+int video_screen_get_hpos(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	int vpos;
 
@@ -981,15 +1018,22 @@ int video_screen_get_hpos(int scrnum)
 	return delta / internal_state->pixeltime;
 }
 
+int video_screen_get_hpos_scrnum(int scrnum)
+{
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	return video_screen_get_hpos(internal_state->device);
+}
+
 
 /*-------------------------------------------------
     video_screen_get_vblank - returns the VBLANK
     state of a given screen
 -------------------------------------------------*/
 
-int video_screen_get_vblank(int scrnum)
+int video_screen_get_vblank(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	return internal_state->vblank_state;
 }
 
@@ -999,10 +1043,10 @@ int video_screen_get_vblank(int scrnum)
     state of a given screen
 -------------------------------------------------*/
 
-int video_screen_get_hblank(int scrnum)
+int video_screen_get_hblank(const device_config *screen)
 {
-	screen_state *state = &Machine->screen[scrnum];
-	int hpos = video_screen_get_hpos(scrnum);
+	screen_state *state = get_safe_token(screen);
+	int hpos = video_screen_get_hpos(screen);
 	return (hpos < state->visarea.min_x || hpos > state->visarea.max_x);
 }
 
@@ -1013,10 +1057,10 @@ int video_screen_get_hblank(int scrnum)
     at the given hpos,vpos
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
+attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos)
 {
-	screen_state *state = &Machine->screen[scrnum];
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	attoseconds_t targetdelta;
 
@@ -1037,6 +1081,12 @@ attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
 	return attotime_make(0, targetdelta - curdelta);
 }
 
+attotime video_screen_get_time_until_pos_scrnum(int scrnum, int vpos, int hpos)
+{
+	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	return video_screen_get_time_until_pos(internal_state->device, vpos, hpos);
+}
+
 
 /*-------------------------------------------------
     video_screen_get_time_until_vblank_start -
@@ -1044,9 +1094,11 @@ attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos)
     the next VBLANK period start
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_vblank_start(int scrnum)
+attotime video_screen_get_time_until_vblank_start(const device_config *screen)
 {
-	return video_screen_get_time_until_pos(scrnum, Machine->screen[scrnum].visarea.max_y + 1, 0);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+	return video_screen_get_time_until_pos(screen, screen->machine->screen[internal_state->scrnum].visarea.max_y + 1, 0);
 }
 
 
@@ -1057,9 +1109,11 @@ attotime video_screen_get_time_until_vblank_start(int scrnum)
     or the end of the next VBLANK
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_vblank_end(int scrnum)
+attotime video_screen_get_time_until_vblank_end(const device_config *screen)
 {
-	return video_screen_get_time_until_pos(scrnum, Machine->screen[scrnum].visarea.min_y, 0);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+	return video_screen_get_time_until_pos(screen, screen->machine->screen[internal_state->scrnum].visarea.min_y, 0);
 }
 
 
@@ -1069,12 +1123,12 @@ attotime video_screen_get_time_until_vblank_end(int scrnum)
     the next VBLANK period start
 -------------------------------------------------*/
 
-attotime video_screen_get_time_until_update(int scrnum)
+attotime video_screen_get_time_until_update(const device_config *screen)
 {
-	if (Machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
-		return video_screen_get_time_until_vblank_end(scrnum);
+	if (screen->machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
+		return video_screen_get_time_until_vblank_end(screen);
 	else
-		return video_screen_get_time_until_vblank_start(scrnum);
+		return video_screen_get_time_until_vblank_start(screen);
 }
 
 
@@ -1084,9 +1138,10 @@ attotime video_screen_get_time_until_update(int scrnum)
     scanline
 -------------------------------------------------*/
 
-attotime video_screen_get_scan_period(int scrnum)
+attotime video_screen_get_scan_period(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	return attotime_make(0, internal_state->scantime);
 }
 
@@ -1097,10 +1152,28 @@ attotime video_screen_get_scan_period(int scrnum)
     complete frame
 -------------------------------------------------*/
 
-attotime video_screen_get_frame_period(int scrnum)
+attotime video_screen_get_frame_period(const device_config *screen)
+{
+	attotime ret;
+
+	/* a lot of modules want to the period of the primary screen, so
+       if we are screenless, return something reasonable so that we don't fall over */
+    if (screen == NULL)
+    	ret = DEFAULT_FRAME_PEIOD;
+    else
+    {
+		screen_state *state = get_safe_token(screen);
+		internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+		ret = attotime_make(0, internal_state->frame_period);
+	}
+
+	return ret;
+}
+
+attotime video_screen_get_frame_period_scrnum(int scrnum)
 {
 	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	return attotime_make(0, internal_state->frame_period);
+	return video_screen_get_frame_period(internal_state->device);
 }
 
 
@@ -1110,9 +1183,10 @@ attotime video_screen_get_frame_period(int scrnum)
     emulated machine
 -------------------------------------------------*/
 
-UINT64 video_screen_get_frame_number(int scrnum)
+UINT64 video_screen_get_frame_number(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	return internal_state->frame_number;
 }
 
@@ -1256,7 +1330,8 @@ DEVICE_GET_INFO( video_screen )
 static TIMER_CALLBACK( vblank_begin_callback )
 {
 	int i;
-	screen_state *state = ptr;
+	const device_config *screen = ptr;
+	screen_state *state = get_safe_token(screen);
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* reset the starting VBLANK time */
@@ -1267,20 +1342,23 @@ static TIMER_CALLBACK( vblank_begin_callback )
 
 	/* call the screen specific callbacks */
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
-		internal_state->vbl_cbs[i](internal_state->device, TRUE);
+		internal_state->vbl_cbs[i](screen, TRUE);
 
-	/* for the first screen, call the global callbacks */
-	if (internal_state->scrnum == 0)
+	/* for the first screen */
+	if (screen == machine->primary_screen)
+	{
+		/* call the global callbacks */
 		for (i = 0; global.vbl_cbs[i] != NULL; i++)
 			global.vbl_cbs[i](machine, TRUE);
 
-	/* do we update the screen now? - only do it for the first screen */
-	if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (internal_state->scrnum == 0))
-		video_frame_update(machine, FALSE);
+		/* do we update the screen now? */
+		if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+			video_frame_update(machine, FALSE);
+	}
 
 	/* reset the timers */
 	timer_adjust_oneshot(internal_state->vblank_begin_timer, attotime_make(0, internal_state->frame_period), 0);
-	timer_adjust_oneshot(internal_state->vblank_end_timer, attotime_make(0, internal_state->vblank_period), 0);
+	timer_adjust_oneshot(internal_state->vblank_end_timer, video_screen_get_time_until_vblank_end(screen), 0);
 }
 
 
@@ -1292,23 +1370,28 @@ static TIMER_CALLBACK( vblank_begin_callback )
 static TIMER_CALLBACK( vblank_end_callback )
 {
 	int i;
-	internal_screen_state *internal_state = ptr;
-
-	/* update the first screen if we didn't before */
-	if ((machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK) && (internal_state->scrnum == 0))
-		video_frame_update(machine, FALSE);
+	const device_config *screen = ptr;
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* mark as not being in VBLANK */
 	internal_state->vblank_state = FALSE;
 
 	/* call the screen specific callbacks */
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
-		internal_state->vbl_cbs[i](internal_state->device, FALSE);
+		internal_state->vbl_cbs[i](screen, FALSE);
 
-	/* for the first screen, call the global callbacks */
-	if (internal_state->scrnum == 0)
+	/* for the first screen */
+	if (screen == machine->primary_screen)
+	{
+		/* call the global callbacks */
 		for (i = 0; global.vbl_cbs[i] != NULL; i++)
 			global.vbl_cbs[i](machine, FALSE);
+
+		/* update if we handn't already */
+		if (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
+			video_frame_update(machine, FALSE);
+	}
 
 	/* increment the frame number counter */
 	internal_state->frame_number++;
@@ -1322,13 +1405,15 @@ static TIMER_CALLBACK( vblank_end_callback )
 
 static TIMER_CALLBACK( scanline0_callback )
 {
-	internal_screen_state *internal_state = ptr;
+	const device_config *screen = ptr;
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* reset partial updates */
 	internal_state->last_partial_scan = 0;
 	global.partial_updates_this_frame = 0;
 
-	timer_adjust_oneshot(internal_state->scanline0_timer, video_screen_get_time_until_pos(internal_state->scrnum, 0, 0), 0);
+	timer_adjust_oneshot(internal_state->scanline0_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 }
 
 
@@ -1339,18 +1424,19 @@ static TIMER_CALLBACK( scanline0_callback )
 
 static TIMER_CALLBACK( scanline_update_callback )
 {
-	screen_state *state = ptr;
+	const device_config *screen = ptr;
+	screen_state *state = get_safe_token(screen);
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	int scanline = param;
 
 	/* force a partial update to the current scanline */
-	video_screen_update_partial(internal_state->scrnum, scanline);
+	video_screen_update_partial(screen, scanline);
 
 	/* compute the next visible scanline */
 	scanline++;
 	if (scanline > state->visarea.max_y)
 		scanline = state->visarea.min_y;
-	timer_adjust_oneshot(internal_state->scanline_timer, video_screen_get_time_until_pos(internal_state->scrnum, scanline, 0), scanline);
+	timer_adjust_oneshot(internal_state->scanline_timer, video_screen_get_time_until_pos(screen, scanline, 0), scanline);
 }
 
 
@@ -1384,7 +1470,7 @@ void video_frame_update(running_machine *machine, int debug)
 	ui_update_and_render(machine);
 
 	/* if we're throttling, synchronize before rendering */
-	if (!debug && !skipped_it && effective_throttle())
+	if (!debug && !skipped_it && effective_throttle(machine))
 		update_throttle(machine, current_time);
 
 	/* ask the OSD to update */
@@ -1398,7 +1484,7 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* update frameskipping */
 	if (!debug)
-		update_frameskip();
+		update_frameskip(machine);
 
 	/* update speed computations */
 	if (!debug && !skipped_it)
@@ -1409,7 +1495,7 @@ void video_frame_update(running_machine *machine, int debug)
 	{
 		/* reset partial updates if we're paused or if the debugger is active */
 		if (video_screen_exists(0) && (mame_is_paused(machine) || debug || mame_debug_is_active()))
-			scanline0_callback(machine, Machine->screen[0].private_data, 0);
+			scanline0_callback(machine, machine->screen[0].private_data, 0);
 
 		/* otherwise, call the video EOF callback */
 		else if (machine->config->video_eof != NULL)
@@ -1429,31 +1515,31 @@ void video_frame_update(running_machine *machine, int debug)
 
 static int finish_screen_updates(running_machine *machine)
 {
-	const device_config *device;
+	const device_config *screen;
 	int anything_changed = FALSE;
 	int livemask;
 
 	/* finish updating the screens */
-	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
-		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
-		video_screen_update_partial(scrnum, machine->screen[scrnum].visarea.max_y);
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+		video_screen_update_partial(screen, machine->screen[scrnum].visarea.max_y);
 	}
 
 	/* now add the quads for all the screens */
 	livemask = render_get_live_screens_mask();
-	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
-		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, device->tag);
+		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, screen->tag);
 		internal_screen_state *internal_state = get_internal_state(machine, scrnum);
 
 		/* only update if live */
 		if (livemask & (1 << scrnum))
 		{
-			const screen_config *scrconfig = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
+			const screen_config *config = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
 
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
-			if (scrconfig->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
+			if (config->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
 			{
 				/* if we're not skipping the frame and if the screen actually changed, then update the texture */
 				if (!global.skipping_this_frame && internal_state->changed)
@@ -1474,7 +1560,7 @@ static int finish_screen_updates(running_machine *machine)
 
 			/* update our movie recording state */
 			if (!mame_is_paused(machine))
-				movie_record_frame(machine, scrnum);
+				movie_record_frame(screen);
 		}
 
 		/* reset the screen changed flags */
@@ -1547,7 +1633,7 @@ const char *video_get_speed_text(void)
 		dest += sprintf(dest, "fast ");
 
 	/* if we're auto frameskipping, display that plus the level */
-	else if (effective_autoframeskip())
+	else if (effective_autoframeskip(Machine))
 		dest += sprintf(dest, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	/* otherwise, just display the frameskip plus the level */
@@ -1820,7 +1906,7 @@ static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t ta
 	/* we're allowed to sleep via the OSD code only if we're configured to do so
        and we're not frameskipping due to autoframeskip, or if we're paused */
 	allowed_to_sleep = mame_is_paused(machine) ||
-		(global.sleep && (!effective_autoframeskip() || effective_frameskip() == 0));
+		(global.sleep && (!effective_autoframeskip(machine) || effective_frameskip() == 0));
 
 	/* loop until we reach our target */
 	profiler_mark(PROFILER_IDLE);
@@ -1872,10 +1958,10 @@ static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t ta
     counters and periodically update autoframeskip
 -------------------------------------------------*/
 
-static void update_frameskip(void)
+static void update_frameskip(running_machine *machine)
 {
 	/* if we're throttling and autoframeskip is on, adjust */
-	if (effective_throttle() && effective_autoframeskip() && global.frameskip_counter == 0)
+	if (effective_throttle(machine) && effective_autoframeskip(machine) && global.frameskip_counter == 0)
 	{
 		double speed = global.speed * 0.01;
 
@@ -2135,9 +2221,10 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
     is currently being recorded
 -------------------------------------------------*/
 
-int video_is_movie_active(running_machine *machine, int scrnum)
+int video_is_movie_active(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	return (internal_state->movie_file != NULL);
 }
 
@@ -2147,20 +2234,21 @@ int video_is_movie_active(running_machine *machine, int scrnum)
     of a MNG movie
 -------------------------------------------------*/
 
-void video_movie_begin_recording(running_machine *machine, int scrnum, const char *name)
+void video_movie_begin_recording(const device_config *screen, const char *name)
 {
-	internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	file_error filerr;
 
 	/* close any existing movie file */
 	if (internal_state->movie_file != NULL)
-		video_movie_end_recording(machine, scrnum);
+		video_movie_end_recording(screen);
 
 	/* create a new movie file and start recording */
 	if (name != NULL)
 		filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &internal_state->movie_file);
 	else
-		filerr = mame_fopen_next(machine, SEARCHPATH_MOVIE, "mng", &internal_state->movie_file);
+		filerr = mame_fopen_next(screen->machine, SEARCHPATH_MOVIE, "mng", &internal_state->movie_file);
 	internal_state->movie_frame = 0;
 }
 
@@ -2170,9 +2258,10 @@ void video_movie_begin_recording(running_machine *machine, int scrnum, const cha
     a MNG movie
 -------------------------------------------------*/
 
-void video_movie_end_recording(running_machine *machine, int scrnum)
+void video_movie_end_recording(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* close the file if it exists */
 	if (internal_state->movie_file != NULL)
@@ -2190,9 +2279,10 @@ void video_movie_end_recording(running_machine *machine, int scrnum)
     movie
 -------------------------------------------------*/
 
-static void movie_record_frame(running_machine *machine, int scrnum)
+static void movie_record_frame(const device_config *screen)
 {
-	internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	const rgb_t *palette;
 
 	/* only record if we have a file */
@@ -2204,7 +2294,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 		profiler_mark(PROFILER_MOVIE_REC);
 
 		/* create the bitmap */
-		create_snapshot_bitmap(machine, scrnum);
+		create_snapshot_bitmap(screen->machine, internal_state->scrnum);
 
 		/* track frames */
 		if (internal_state->movie_frame++ == 0)
@@ -2214,7 +2304,7 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 			/* set up the text fields in the movie info */
 			sprintf(text, APPNAME " %s", build_version);
 			png_add_text(&pnginfo, "Software", text);
-			sprintf(text, "%s %s", machine->gamedrv->manufacturer, machine->gamedrv->description);
+			sprintf(text, "%s %s", screen->machine->gamedrv->manufacturer, screen->machine->gamedrv->description);
 			png_add_text(&pnginfo, "System", text);
 
 			/* start the capture */
@@ -2222,18 +2312,18 @@ static void movie_record_frame(running_machine *machine, int scrnum)
 			if (error != PNGERR_NONE)
 			{
 				png_free(&pnginfo);
-				video_movie_end_recording(machine, scrnum);
+				video_movie_end_recording(screen);
 				return;
 			}
 		}
 
 		/* write the next frame */
-		palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
-		error = mng_capture_frame(mame_core_file(internal_state->movie_file), &pnginfo, global.snap_bitmap, machine->config->total_colors, palette);
+		palette = (screen->machine->palette != NULL) ? palette_entry_list_adjusted(screen->machine->palette) : NULL;
+		error = mng_capture_frame(mame_core_file(internal_state->movie_file), &pnginfo, global.snap_bitmap, screen->machine->config->total_colors, palette);
 		png_free(&pnginfo);
 		if (error != PNGERR_NONE)
 		{
-			video_movie_end_recording(machine, scrnum);
+			video_movie_end_recording(screen);
 			return;
 		}
 

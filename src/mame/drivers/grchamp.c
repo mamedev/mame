@@ -342,7 +342,7 @@ INLINE UINT8 get_pc3259_bits(grchamp_state *state, int offs)
 	int bits;
 
 	/* force a partial update to the current position */
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 
 	/* get the relevant 4 bits */
 	bits = (state->collide >> (offs*4)) & 0x0f;

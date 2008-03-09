@@ -36,14 +36,14 @@ static emu_timer *acefruit_refresh_timer;
 
 static TIMER_CALLBACK( acefruit_refresh )
 {
-	int vpos = video_screen_get_vpos( 0 );
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 
-	video_screen_update_partial( 0, vpos );
+	video_screen_update_partial(machine->primary_screen, vpos );
 	acefruit_update_irq(machine, vpos );
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	timer_adjust_oneshot( acefruit_refresh_timer, video_screen_get_time_until_pos( 0, vpos, 0 ), 0 );
+	timer_adjust_oneshot( acefruit_refresh_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0 ), 0 );
 }
 
 static VIDEO_START( acefruit )

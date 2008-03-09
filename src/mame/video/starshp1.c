@@ -115,8 +115,8 @@ VIDEO_START( starshp1 )
 
 READ8_HANDLER( starshp1_rng_r )
 {
-	int x = video_screen_get_hpos(0);
-	int y = video_screen_get_vpos(0);
+	int x = video_screen_get_hpos(machine->primary_screen);
+	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* the LFSR is only running in the non-blank region
        of the screen, so this is not quite right */

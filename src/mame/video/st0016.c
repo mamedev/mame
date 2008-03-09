@@ -470,13 +470,13 @@ VIDEO_START( st0016 )
 	switch(st0016_game&0x3f)
 	{
 		case 0: //renju kizoku
-			video_screen_set_visarea(0, 0, 40*8-1, 0, 30*8-1);
+			video_screen_set_visarea(machine->primary_screen, 0, 40*8-1, 0, 30*8-1);
 			spr_dx=0;
 			spr_dy=0;
 		break;
 
 		case 1: //neratte chu!
-			video_screen_set_visarea(0, 8,41*8-1,0,30*8-1);
+			video_screen_set_visarea(machine->primary_screen, 8,41*8-1,0,30*8-1);
 			spr_dx=0;
 			spr_dy=8;
 		break;
@@ -486,15 +486,15 @@ VIDEO_START( st0016 )
 		break;
 
 		case 4: //mayjinsen 1&2
-			video_screen_set_visarea(0, 0,32*8-1,0,28*8-1);
+			video_screen_set_visarea(machine->primary_screen, 0,32*8-1,0,28*8-1);
 		break;
 
 		case 10:
-			video_screen_set_visarea(0, 0,383,0,255);
+			video_screen_set_visarea(machine->primary_screen, 0,383,0,255);
 		break;
 
 		case 11:
-			video_screen_set_visarea(0, 0,383,0,383);
+			video_screen_set_visarea(machine->primary_screen, 0,383,0,383);
 		break;
 
 	}

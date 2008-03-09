@@ -116,45 +116,52 @@ void video_init(running_machine *machine);
 /* ----- screen management ----- */
 
 /* set the resolution of a screen */
-void video_screen_configure(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh);
+void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t refresh);
+void video_screen_configure_scrnum(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh);
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
-void video_screen_set_visarea(int scrnum, int min_x, int max_x, int min_y, int max_y);
+void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y);
+void video_screen_set_visarea_scrnum(int scrnum, int min_x, int max_x, int min_y, int max_y);
 
 /* force a partial update of the screen up to and including the requested scanline */
-void video_screen_update_partial(int scrnum, int scanline);
+void video_screen_update_partial(const device_config *screen, int scanline);
+void video_screen_update_partial_scrnum(int scrnum, int scanline);
 
 /* force an update from the last beam position up to the current beam position */
-void video_screen_update_now(int scrnum);
+void video_screen_update_now(const device_config *screen);
 
 /* return the current vertical or horizontal position of the beam for a screen */
-int video_screen_get_vpos(int scrnum);
-int video_screen_get_hpos(int scrnum);
+int video_screen_get_vpos(const device_config *screen);
+int video_screen_get_vpos_scrnum(int scrnum);
+int video_screen_get_hpos(const device_config *screen);
+int video_screen_get_hpos_scrnum(int scrnum);
 
 /* return the current vertical or horizontal blanking state for a screen */
-int video_screen_get_vblank(int scrnum);
-int video_screen_get_hblank(int scrnum);
+int video_screen_get_vblank(const device_config *screen);
+int video_screen_get_hblank(const device_config *screen);
 
 /* return the time when the beam will reach a particular H,V position */
-attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
+attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos);
+attotime video_screen_get_time_until_pos_scrnum(int scrnum, int vpos, int hpos);
 
 /* return the time when the beam will reach the start of VBLANK */
-attotime video_screen_get_time_until_vblank_start(int scrnum);
+attotime video_screen_get_time_until_vblank_start(const device_config *screen);
 
 /* return the time when the beam will reach the end of VBLANK */
-attotime video_screen_get_time_until_vblank_end(int scrnum);
+attotime video_screen_get_time_until_vblank_end(const device_config *screen);
 
 /* return the time when the VIDEO_UPDATE function will be called */
-attotime video_screen_get_time_until_update(int scrnum);
+attotime video_screen_get_time_until_update(const device_config *screen);
 
 /* return the amount of time the beam takes to draw one scan line */
-attotime video_screen_get_scan_period(int scrnum);
+attotime video_screen_get_scan_period(const device_config *screen);
 
 /* return the amount of time the beam takes to draw one complete frame */
-attotime video_screen_get_frame_period(int scrnum);
+attotime video_screen_get_frame_period(const device_config *screen);
+attotime video_screen_get_frame_period_scrnum(int scrnum);
 
 /* return the current frame number -- this is always increasing */
-UINT64 video_screen_get_frame_number(int scrnum);
+UINT64 video_screen_get_frame_number(const device_config *screen);
 
 /* returns whether a given screen exists */
 int video_screen_exists(int scrnum);
@@ -171,7 +178,6 @@ void video_screen_register_global_vbl_cb(vblank_state_changed_global_func vbl_cb
 /* device get info callback */
 #define VIDEO_SCREEN DEVICE_GET_INFO_NAME(video_screen)
 DEVICE_GET_INFO( video_screen );
-
 
 
 /* ----- global rendering ----- */
@@ -216,10 +222,9 @@ void video_save_active_screen_snapshots(running_machine *machine);
 
 /* ----- movie recording ----- */
 
-/* Movie recording */
-int video_is_movie_active(running_machine *machine, int scrnum);
-void video_movie_begin_recording(running_machine *machine, int scrnum, const char *name);
-void video_movie_end_recording(running_machine *machine, int scrnum);
+int video_is_movie_active(const device_config *screen);
+void video_movie_begin_recording(const device_config *screen, const char *name);
+void video_movie_end_recording(const device_config *screen);
 
 
 /* ----- crosshair rendering ----- */

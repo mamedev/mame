@@ -31,7 +31,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 		bank = (source[1]&0x0002) >> 1;
 
-		if (!flash || (video_screen_get_frame_number(0) & 1))
+		if (!flash || (video_screen_get_frame_number(machine->primary_screen) & 1))
 		{
 			drawgfx(bitmap,machine->gfx[bank],
 					number,

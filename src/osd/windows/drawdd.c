@@ -1304,7 +1304,7 @@ static void pick_best_mode(win_window_info *window)
 	// use those as the target for now
 	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);
 	einfo.target_height = einfo.minimum_height * MAX(1, video_config.prescale);
-	einfo.target_refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds);
+	einfo.target_refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it
 	if (!video_config.hwstretch)

@@ -145,9 +145,9 @@ static void gtia_state(void)
 
 
 
-static int is_ntsc(void)
+static int is_ntsc(running_machine *machine)
 {
-	return ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) > 55;
+	return ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) > 55;
 }
 
 
@@ -159,7 +159,7 @@ static void gtia_reset(running_machine *machine)
 	for (i = 0; i < 32; i++)
 		atari_gtia_w(machine,i,0);
     memset(&gtia.r, 0, sizeof(gtia.r));
-	if (is_ntsc())
+	if (is_ntsc(machine))
 		gtia.r.pal = 0xff;
 	else
 		gtia.r.pal = 0xf1;

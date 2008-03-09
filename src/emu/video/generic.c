@@ -472,7 +472,7 @@ static void updateflip(void)
 		visarea.max_y = temp;
 	}
 
-	video_screen_configure(0, state->width, state->height, &visarea, video_screen_get_frame_period(0).attoseconds);
+	video_screen_configure(Machine->primary_screen, state->width, state->height, &visarea, video_screen_get_frame_period(Machine->primary_screen).attoseconds);
 }
 
 

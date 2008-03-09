@@ -2448,9 +2448,9 @@ VIDEO_UPDATE( system32 )
 
 	/* update the visible area */
 	if (system32_videoram[0x1ff00/2] & 0x8000)
-		video_screen_set_visarea(scrnum, 0, 52*8-1, 0, 28*8-1);
+		video_screen_set_visarea(screen, 0, 52*8-1, 0, 28*8-1);
 	else
-		video_screen_set_visarea(scrnum, 0, 40*8-1, 0, 28*8-1);
+		video_screen_set_visarea(screen, 0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
 	if (!system32_displayenable[scrnum])
@@ -2627,9 +2627,9 @@ VIDEO_UPDATE( multi32 )
 
 	/* update the visible area */
 	if (system32_videoram[0x1ff00/2] & 0x8000)
-		video_screen_set_visarea(scrnum, 0, 52*8-1, 0, 28*8-1);
+		video_screen_set_visarea(screen, 0, 52*8-1, 0, 28*8-1);
 	else
-		video_screen_set_visarea(scrnum, 0, 40*8-1, 0, 28*8-1);
+		video_screen_set_visarea(screen, 0, 40*8-1, 0, 28*8-1);
 
 	/* if the display is off, punt */
 	if (!system32_displayenable[scrnum])

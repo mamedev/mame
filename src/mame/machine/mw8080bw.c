@@ -63,7 +63,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	int next_vblank;
 
 	/* compute vector and set the interrupt line */
-	int vpos = video_screen_get_vpos(0);
+	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT8 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x40) >> 2) | ((~counter & 0x40) >> 3);
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
@@ -81,7 +81,7 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 	}
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_vblank);
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, next_vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
 }
 
 
@@ -91,10 +91,10 @@ static void mw8080bw_create_interrupt_timer(void)
 }
 
 
-static void mw8080bw_start_interrupt_timer(void)
+static void mw8080bw_start_interrupt_timer(running_machine *machine)
 {
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -121,5 +121,5 @@ MACHINE_START( mw8080bw )
 
 MACHINE_RESET( mw8080bw )
 {
-	mw8080bw_start_interrupt_timer();
+	mw8080bw_start_interrupt_timer(machine);
 }

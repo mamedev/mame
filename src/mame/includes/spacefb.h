@@ -34,7 +34,6 @@ READ8_HANDLER( spacefb_audio_t1_r );
 WRITE8_HANDLER( spacefb_port_1_w );
 
 
-
 /*----------- defined in video/spacefb.c -----------*/
 
 extern UINT8 *spacefb_videoram;
@@ -43,12 +42,5 @@ extern size_t spacefb_videoram_size;
 VIDEO_START( spacefb );
 VIDEO_UPDATE( spacefb );
 
-void spacefb_set_flip_screen(UINT8 data);
-void spacefb_set_gfx_bank(UINT8 data);
-void spacefb_set_palette_bank(UINT8 data);
-void spacefb_set_background_red(UINT8 data);
-void spacefb_set_background_blue(UINT8 data);
-void spacefb_set_disable_star_field(UINT8 data);
-void spacefb_set_color_contrast_r(UINT8 data);
-void spacefb_set_color_contrast_g(UINT8 data);
-void spacefb_set_color_contrast_b(UINT8 data);
+WRITE8_HANDLER( spacefb_port_0_w );
+WRITE8_HANDLER( spacefb_port_2_w );

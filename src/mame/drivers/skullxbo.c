@@ -63,7 +63,7 @@ static void alpha_row_update(running_machine *machine, int scrnum, int scanline)
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
 	if (check < &atarigen_alpha[0x7c0] && (*check & 0x8000))
 	{
-		attotime period = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 6, machine->screen[scrnum].width * 0.9);
+		attotime period = video_screen_get_time_until_pos_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum) + 6, machine->screen[scrnum].width * 0.9);
 		timer_set(period, NULL, 0, irq_gen);
 	}
 

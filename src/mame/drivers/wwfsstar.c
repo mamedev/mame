@@ -192,14 +192,14 @@ static INTERRUPT_GEN( wwfsstars_interrupt )
 	/* Vblank is raised on scanline 240 (248) */
 	else if (scanline==240)
 	{
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line(machine, 0, 6, ASSERT_LINE);
 	}
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline%16 == 0)
 	{
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line(machine, 0, 5, ASSERT_LINE);
 	}
 }

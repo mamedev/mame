@@ -97,7 +97,7 @@ static MACHINE_START( sbrkout )
 
 static MACHINE_RESET( sbrkout )
 {
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -113,7 +113,7 @@ static TIMER_CALLBACK( scanline_callback )
 	int scanline = param;
 
 	/* force a partial update before anything happens */
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* if this is a rising edge of 16V, assert the CPU interrupt */
 	if (scanline % 32 == 16)
@@ -126,14 +126,14 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == machine->screen[0].visarea.max_y + 1)
 	{
 		UINT8 potvalue = readinputportbytag("PADDLE");
-		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(0, 72 + (potvalue / 2), (potvalue % 2) * 128), 0);
+		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(machine->primary_screen, 72 + (potvalue / 2), (potvalue % 2) * 128), 0);
 	}
 
 	/* call us back in 4 scanlines */
 	scanline += 4;
 	if (scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -258,9 +258,9 @@ static WRITE8_HANDLER( coincount_w )
 
 static READ8_HANDLER( sync_r )
 {
-	int hpos = video_screen_get_hpos(0);
-	sync2_value = (hpos >= 128 && hpos <= Machine->screen[0].visarea.max_x);
-	return video_screen_get_vpos(0);
+	int hpos = video_screen_get_hpos(machine->primary_screen);
+	sync2_value = (hpos >= 128 && hpos <= machine->screen[0].visarea.max_x);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 

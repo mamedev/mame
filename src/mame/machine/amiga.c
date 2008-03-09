@@ -353,7 +353,7 @@ MACHINE_RESET( amiga )
 		(*amiga_intf->reset_callback)();
 
 	/* start the scanline timer */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
 }
 
 
@@ -389,14 +389,14 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline < machine->screen[0].visarea.min_y)
 		amiga_render_scanline(machine, NULL, scanline);
 	else
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* force a sound update */
 	amiga_audio_update();
 
 	/* set timer for next line */
 	scanline = (scanline + 1) % machine->screen[0].height;
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
 }
 
 

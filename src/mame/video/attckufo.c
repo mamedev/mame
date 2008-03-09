@@ -85,7 +85,7 @@ WRITE8_HANDLER ( attckufo_port_w )
 			case 5:
 			case 0xe:
 			case 0xf:
-				video_screen_update_partial(0, rasterline);
+				video_screen_update_partial(machine->primary_screen, rasterline);
 				break;
 		}
 		attckufo_regs[offset] = data;

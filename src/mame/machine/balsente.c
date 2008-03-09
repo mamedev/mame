@@ -111,15 +111,15 @@ static TIMER_CALLBACK( interrupt_timer )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 	else
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, param + 64, 0), param + 64);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(video_screen_get_time_until_pos(0, param, BALSENTE_HBSTART), NULL, 0, irq_off);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
 
 	/* if this is Grudge Match, update the steering */
 	if (grudge_steering_result & 0x80)
@@ -192,7 +192,7 @@ MACHINE_RESET( balsente )
 
 	/* start a timer to generate interrupts */
 	scanline_timer = timer_alloc(interrupt_timer, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* register for saving */
 	for (i = 0; i < 3; i++)
@@ -1204,7 +1204,7 @@ static void update_grudge_steering(void)
 
 READ8_HANDLER( grudge_steering_r )
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", activecpu_get_pc(), video_screen_get_vpos(0));
+	logerror("%04X:grudge_steering_r(@%d)\n", activecpu_get_pc(), video_screen_get_vpos(machine->primary_screen));
 	grudge_steering_result |= 0x80;
 	return grudge_steering_result;
 }

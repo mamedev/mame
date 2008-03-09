@@ -764,7 +764,7 @@ VIDEO_UPDATE( ygv608 )
 #ifdef _ENABLE_SCREEN_RESIZE
 		// hdw should be scaled by 16, not 8
 		// - is it something to do with double dot-clocks???
-		video_screen_set_visarea(0,  0, ((int)(ygv608.regs.s.hdw)<<3/*4*/)-1,
+		video_screen_set_visarea(screen,  0, ((int)(ygv608.regs.s.hdw)<<3/*4*/)-1,
 						  0, ((int)(ygv608.regs.s.vdw)<<3)-1 );
 #endif
 

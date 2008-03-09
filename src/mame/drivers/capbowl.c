@@ -127,16 +127,16 @@ static TIMER_CALLBACK( capbowl_update )
 {
 	int scanline = param;
 
-	video_screen_update_partial(0, scanline - 1);
+	video_screen_update_partial(machine->primary_screen, scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, capbowl_update);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, capbowl_update);
 }
 
 
 static MACHINE_RESET( capbowl )
 {
-	timer_set(video_screen_get_time_until_pos(0, 32, 0), NULL, 32, capbowl_update);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, capbowl_update);
 }
 
 

@@ -38,17 +38,15 @@ static TIMER_CALLBACK( interrupt_callback )
 	scanline += 32;
 
 	if (scanline >= 263)
-	{
 		scanline = 16;
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
 static MACHINE_RESET( runaway )
 {
-	timer_set(video_screen_get_time_until_pos(0, 16, 0), NULL, 16, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
 }
 
 

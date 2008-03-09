@@ -5,6 +5,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "eminline.h"
 #include "cpu/tms32031/tms32031.h"
 #include "includes/midzeus.h"
@@ -440,7 +441,7 @@ READ32_HANDLER( zeus2_r )
 			/* bits $00080000 is tested in a loop until 0 */
 			/* bit  $00000004 is tested for toggling; probably VBLANK */
 			result = 0x00;
-			if (video_screen_get_vblank(0))
+			if (video_screen_get_vblank(machine->primary_screen))
 				result |= 0x04;
 			break;
 
@@ -451,7 +452,7 @@ READ32_HANDLER( zeus2_r )
 
 		case 0x54:
 			/* both upper 16 bits and lower 16 bits seem to be used as vertical counters */
-			result = (video_screen_get_vpos(0) << 16) | video_screen_get_vpos(0);
+			result = (video_screen_get_vpos(machine->primary_screen) << 16) | video_screen_get_vpos(machine->primary_screen);
 			break;
 	}
 
@@ -510,7 +511,7 @@ if (regdata_count[offset] < 256)
 
 	/* writes to register $CC need to force a partial update */
 //  if ((offset & ~1) == 0xcc)
-//      video_screen_update_partial(0, video_screen_get_vpos(0));
+//      video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* always write to low word? */
 	zeusbase[offset] = data;
@@ -561,7 +562,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 		case 0x35:
 		case 0x36:
 		case 0x37:
-			video_screen_update_partial(0, video_screen_get_vpos(0));
+			video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 			{
 				int vtotal = zeusbase[0x37] & 0xffff;
 				int htotal = zeusbase[0x34] >> 16;
@@ -573,7 +574,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 				visarea.max_y = zeusbase[0x35] & 0xffff;
 				if (htotal > 0 && vtotal > 0 && visarea.min_x < visarea.max_x && visarea.max_y < vtotal)
 				{
-					video_screen_configure(0, htotal, vtotal, &visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 4.0 / (htotal * vtotal)));
+					video_screen_configure(Machine->primary_screen, htotal, vtotal, &visarea, HZ_TO_ATTOSECONDS((double)MIDZEUS_VIDEO_CLOCK / 4.0 / (htotal * vtotal)));
 					zeus_cliprect = visarea;
 					zeus_cliprect.max_x -= zeus_cliprect.min_x;
 					zeus_cliprect.min_x = 0;
@@ -585,7 +586,7 @@ static void zeus_register_update(offs_t offset, UINT32 oldval, int logit)
 			{
 				UINT32 temp = zeusbase[0x38];
 				zeusbase[0x38] = oldval;
-				video_screen_update_partial(0, video_screen_get_vpos(0));
+				video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 				log_fifo = input_code_pressed(KEYCODE_L);
 				zeusbase[0x38] = temp;
 			}

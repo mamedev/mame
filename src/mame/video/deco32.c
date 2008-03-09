@@ -232,7 +232,7 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		sx = spritedata[offs+1];
 
-		if ((sy&0x2000) && (video_screen_get_frame_number(0) & 1)) continue;
+		if ((sy&0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		colour = (spritedata[offs+2] >>0) & 0x1f;
 
@@ -291,7 +291,7 @@ static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];
@@ -407,7 +407,7 @@ static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 
 		y = spritedata[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		trans=TRANSPARENCY_PEN;
 		x = spritedata[offs+2];

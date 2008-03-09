@@ -586,7 +586,7 @@ READ32_HANDLER( n64_vi_reg_r )
             return n64_vi_intr;
 
 		case 0x10/4:		// VI_CURRENT_REG
-			return video_screen_get_vpos(0);
+			return video_screen_get_vpos(machine->primary_screen);
 
 		case 0x14/4:		// VI_BURST_REG
             return n64_vi_burst;
@@ -632,7 +632,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 				screen_state *state = &Machine->screen[0];
 				rectangle visarea = state->visarea;
 				visarea.max_y = (data & 0x40) ? 479 : 239;
-				video_screen_configure(0, state->width, visarea.max_y + 1, &visarea, video_screen_get_frame_period(0).attoseconds);
+				video_screen_configure(machine->primary_screen, state->width, visarea.max_y + 1, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 			}
             n64_vi_control = data;
 			break;
@@ -647,7 +647,7 @@ WRITE32_HANDLER( n64_vi_reg_w )
 				screen_state *state = &Machine->screen[0];
 				rectangle visarea = state->visarea;
 				visarea.max_x = data-1;
-				video_screen_configure(0, visarea.max_x + 1, state->height, &visarea, video_screen_get_frame_period(0).attoseconds);
+				video_screen_configure(machine->primary_screen, visarea.max_x + 1, state->height, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 			}
             n64_vi_width = data;
 		    fb_width = data;

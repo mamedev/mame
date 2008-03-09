@@ -74,7 +74,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		y = spriteram32[offs]&0xffff;
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		x = spriteram32[offs+2]&0xffff;
 		colour = (x >>9) & 0x1f;

@@ -1078,7 +1078,7 @@ static READ8_HANDLER( htengoku_coin_r )
 	{
 		case 0x00:	return readinputport(0);
 		case 0x01:	return 0xff;	//?
-		case 0x02:	return 0xbf | ((htengoku_hopper && !(video_screen_get_frame_number(0)%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:	return 0xbf | ((htengoku_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return htengoku_coins;
 	}
 	logerror("%04x: coin_r with select = %02x\n",activecpu_get_pc(),htengoku_select);

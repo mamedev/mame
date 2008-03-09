@@ -3466,7 +3466,7 @@ UINT32 readinputport(int port)
 		result = (result & ~portinfo->vblank) | (portinfo->defvalue & portinfo->vblank);
 
 		/* toggle VBLANK if we're in a VBLANK state */
-		if (video_screen_get_vblank(0))
+		if (video_screen_get_vblank(Machine->primary_screen))
 			result ^= portinfo->vblank;
 	}
 	return result;

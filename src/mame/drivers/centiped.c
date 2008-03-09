@@ -449,14 +449,14 @@ static TIMER_CALLBACK( generate_interrupt )
 		cpunum_set_input_line(machine, 0, 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* call back again after 16 scanlines */
 	scanline += 16;
 	if (scanline >= 256)
 		scanline = 0;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -471,7 +471,7 @@ static MACHINE_START( centiped )
 static MACHINE_RESET( centiped )
 {
 	interrupt_timer = timer_alloc(generate_interrupt, NULL);
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	dsw_select = 0;
 	control_select = 0;

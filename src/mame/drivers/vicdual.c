@@ -96,7 +96,7 @@ static CUSTOM_INPUT( vicdual_read_coin_status )
 		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(0))), NULL, 0, clear_coin_status);
+		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(machine->primary_screen))), NULL, 0, clear_coin_status);
 	}
 
 	last_coin_input = coin_input;
@@ -129,13 +129,13 @@ static UINT32 timer_value;
 #define TIMER_HALF_PERIOD	ATTOTIME_IN_MSEC(4 / 2)	/* 4Mhz square wave */
 
 
-static int get_vcounter(void)
+static int get_vcounter(running_machine *machine)
 {
-	int vcounter = video_screen_get_vpos(0);
+	int vcounter = video_screen_get_vpos(machine->primary_screen);
 
 	/* the vertical synch counter gets incremented at the end of HSYNC,
        compensate for this */
-	if (video_screen_get_hpos(0) >= VICDUAL_HSEND)
+	if (video_screen_get_hpos(machine->primary_screen) >= VICDUAL_HSEND)
 		vcounter = (vcounter + 1) % VICDUAL_VTOTAL;
 
 	return vcounter;
@@ -144,19 +144,19 @@ static int get_vcounter(void)
 
 static CUSTOM_INPUT( vicdual_get_64v )
 {
-	return (get_vcounter() >> 6) & 0x01;
+	return (get_vcounter(machine) >> 6) & 0x01;
 }
 
 
 static CUSTOM_INPUT( vicdual_get_vblank_comp )
 {
-	return (get_vcounter() < VICDUAL_VBSTART);
+	return (get_vcounter(machine) < VICDUAL_VBSTART);
 }
 
 
 static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
-	return (vicdual_get_vblank_comp(machine, 0) && !video_screen_get_hblank(0));
+	return (vicdual_get_vblank_comp(machine, 0) && !video_screen_get_hblank(machine->primary_screen));
 }
 
 

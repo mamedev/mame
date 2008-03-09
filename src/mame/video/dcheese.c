@@ -64,7 +64,7 @@ PALETTE_INIT( dcheese )
  *
  *************************************/
 
-static void update_scanline_irq(void)
+static void update_scanline_irq(running_machine *machine)
 {
 	/* if not in range, don't bother */
 	if (blitter_vidparam[0x22/2] <= blitter_vidparam[0x1e/2])
@@ -78,9 +78,9 @@ static void update_scanline_irq(void)
 			effscan += blitter_vidparam[0x1e/2];
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
-		time = video_screen_get_time_until_pos(0, effscan, 0);
-		if (attotime_compare(time, video_screen_get_scan_period(0)) < 0)
-			time = attotime_add(time, video_screen_get_frame_period(0));
+		time = video_screen_get_time_until_pos(machine->primary_screen, effscan, 0);
+		if (attotime_compare(time, video_screen_get_scan_period(machine->primary_screen)) < 0)
+			time = attotime_add(time, video_screen_get_frame_period(machine->primary_screen));
 		timer_adjust_oneshot(blitter_timer, time, 0);
 	}
 }
@@ -89,7 +89,7 @@ static void update_scanline_irq(void)
 static TIMER_CALLBACK( blitter_scanline_callback )
 {
 	dcheese_signal_irq(3);
-	update_scanline_irq();
+	update_scanline_irq(machine);
 }
 
 
@@ -153,7 +153,7 @@ VIDEO_UPDATE( dcheese )
  *
  *************************************/
 
-static void do_clear(void)
+static void do_clear(running_machine *machine)
 {
 	int y;
 
@@ -162,11 +162,11 @@ static void do_clear(void)
 		memset(BITMAP_ADDR16(dstbitmap, y % DSTBITMAP_HEIGHT, 0), 0, DSTBITMAP_WIDTH * 2);
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(video_screen_get_scan_period(0), NULL, 1, dcheese_signal_irq_callback);
+	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 1, dcheese_signal_irq_callback);
 }
 
 
-static void do_blit(void)
+static void do_blit(running_machine *machine)
 {
 	INT32 srcminx = blitter_xparam[0] << 12;
 	INT32 srcmaxx = blitter_xparam[1] << 12;
@@ -216,7 +216,7 @@ static void do_blit(void)
 	}
 
 	/* signal an IRQ when done (timing is just a guess) */
-	timer_set(attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) / 2), NULL, 2, dcheese_signal_irq_callback);
+	timer_set(attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(machine->primary_screen)) / 2), NULL, 2, dcheese_signal_irq_callback);
 
 	/* these extra parameters are written but they are always zero, so I don't know what they do */
 	if (blitter_xparam[8] != 0 || blitter_xparam[9] != 0 || blitter_xparam[10] != 0 || blitter_xparam[11] != 0 ||
@@ -280,7 +280,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x22/2:		/* scanline interrupt */
-			update_scanline_irq();
+			update_scanline_irq(machine);
 			break;
 
 		case 0x24/2:		/* writes here after writing to 0x28 */
@@ -292,11 +292,11 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x38/2:		/* blit */
-			do_blit();
+			do_blit(machine);
 			break;
 
 		case 0x3e/2:		/* clear */
-			do_clear();
+			do_clear(machine);
 			break;
 
 		default:

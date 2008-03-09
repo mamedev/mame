@@ -430,7 +430,7 @@ VIDEO_START( toaplan1 )
 
 READ16_HANDLER( toaplan1_frame_done_r )
 {
-	return video_screen_get_vblank(0);
+	return video_screen_get_vblank(machine->primary_screen);
 }
 
 WRITE16_HANDLER( toaplan1_tile_offsets_w )

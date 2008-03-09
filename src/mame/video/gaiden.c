@@ -316,7 +316,7 @@ static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			int ypos = source[3] & 0x01ff;
 			int xpos = source[4] & 0x01ff;
 
-			if ((attributes & 0x20) && (video_screen_get_frame_number(0) & 1))
+			if ((attributes & 0x20) && (video_screen_get_frame_number(machine->primary_screen) & 1))
 				goto skip_sprite;
 
 			color = (color >> 4) & 0x0f;

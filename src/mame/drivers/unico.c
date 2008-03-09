@@ -134,7 +134,7 @@ static READ16_HANDLER( unico_gunx_0_msb_r )
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (video_screen_get_frame_number(0)&1))<<8;
+	return ((x&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
 }
 
 static READ16_HANDLER( unico_guny_0_msb_r )
@@ -143,7 +143,7 @@ static READ16_HANDLER( unico_guny_0_msb_r )
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (video_screen_get_frame_number(0)&1))<<8;
+	return ((y&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
 }
 
 static READ16_HANDLER( unico_gunx_1_msb_r )
@@ -154,7 +154,7 @@ static READ16_HANDLER( unico_gunx_1_msb_r )
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (video_screen_get_frame_number(0)&1))<<8;
+	return ((x&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
 }
 
 static READ16_HANDLER( unico_guny_1_msb_r )
@@ -163,7 +163,7 @@ static READ16_HANDLER( unico_guny_1_msb_r )
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (video_screen_get_frame_number(0)&1))<<8;
+	return ((y&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
 }
 
 static ADDRESS_MAP_START( readmem_zeropnt, ADDRESS_SPACE_PROGRAM, 16 )

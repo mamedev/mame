@@ -128,7 +128,7 @@ static TIMER_CALLBACK( irq5_gen )
 static INTERRUPT_GEN( irq4_gen )
 {
 	cpunum_set_input_line(machine, 0, R3000_IRQ4, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, irq5_gen);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq5_gen);
 }
 
 

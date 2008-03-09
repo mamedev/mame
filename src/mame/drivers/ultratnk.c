@@ -48,26 +48,22 @@ static TIMER_CALLBACK( nmi_callback	)
 	int scanline = param + 64;
 
 	if (scanline >= VTOTAL)
-	{
 		scanline = 32;
-	}
 
 	/* NMI and watchdog are disabled during service mode */
 
 	watchdog_enable(machine, readinputport(0) & 0x40);
 
 	if (readinputport(0) & 0x40)
-	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, nmi_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, nmi_callback);
 }
 
 
 static MACHINE_RESET( ultratnk )
 {
-	timer_set(video_screen_get_time_until_pos(0, 32, 0), NULL, 32, nmi_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, nmi_callback);
 }
 
 

@@ -146,7 +146,7 @@ static TIMER_CALLBACK( scanline_update )
 		scanline = 0;
 
 	/* set a timer for it */
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -160,7 +160,7 @@ static MACHINE_START( foodf )
 static MACHINE_RESET( foodf )
 {
 	atarigen_interrupt_reset(update_interrupts);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 

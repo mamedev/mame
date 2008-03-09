@@ -111,11 +111,8 @@ WRITE8_HANDLER( gridlee_videoram_w )
 WRITE8_HANDLER( gridlee_palette_select_w )
 {
 	/* update the scanline palette */
-	if (palettebank_vis != (data & 0x3f))
-	{
-		video_screen_update_partial(0, video_screen_get_vpos(0) - 1 + BALSENTE_VBEND);
-		palettebank_vis = data & 0x3f;
-	}
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1 + BALSENTE_VBEND);
+	palettebank_vis = data & 0x3f;
 }
 
 

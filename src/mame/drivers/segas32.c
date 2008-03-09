@@ -572,7 +572,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, end_of_vblank_int);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }

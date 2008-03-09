@@ -216,7 +216,7 @@ static READ32_HANDLER( lcd_control_r )
 	{
 		case 0x00/4:
 		{
-			int line_val = video_screen_get_vpos(0) & 0x3ff;
+			int line_val = video_screen_get_vpos(machine->primary_screen) & 0x3ff;
 			return (lcd_control[offset] & ~(0x3ff << 18)) | ((lcd.line_val - line_val) << 18);
 		}
 
@@ -245,7 +245,7 @@ static WRITE32_HANDLER( lcd_control_w )
 	{
 		case 0x00/4:
 		{
-			int line_val = video_screen_get_vpos(0) & 0x3ff;
+			int line_val = video_screen_get_vpos(machine->primary_screen) & 0x3ff;
 			int bpp_mode = (lcd_control[offset] & 0x1e) >> 1;
 			int screen_type = (lcd_control[offset] & 0x60) >> 5;
 

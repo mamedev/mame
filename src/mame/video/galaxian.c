@@ -114,7 +114,7 @@ static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap);
 static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap);
 static void  jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap);
 static void start_stars_blink_timer(double ra, double rb, double c);
-static void start_stars_scroll_timer(void);
+static void start_stars_scroll_timer(running_machine *machine);
 
 /* bullets circuit */
 static UINT8 darkplnt_bullet_color;
@@ -1803,7 +1803,7 @@ void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap)
 
 	if (!timer_adjusted)
 	{
-		start_stars_scroll_timer();
+		start_stars_scroll_timer(machine);
 		timer_adjusted = 1;
 	}
 
@@ -1921,7 +1921,7 @@ static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap)
 
 	if (!timer_adjusted)
 	{
-		start_stars_scroll_timer();
+		start_stars_scroll_timer(machine);
 		timer_adjusted = 1;
 	}
 
@@ -1956,7 +1956,7 @@ static void jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap)
 	if (!timer_adjusted)
 	{
 		start_stars_blink_timer(100000, 10000, 0.00001);
-		start_stars_scroll_timer();
+		start_stars_scroll_timer(machine);
 		timer_adjusted = 1;
 	}
 
@@ -2023,9 +2023,9 @@ static TIMER_CALLBACK( stars_scroll_callback )
 	}
 }
 
-static void start_stars_scroll_timer()
+static void start_stars_scroll_timer(running_machine *machine)
 {
-	timer_adjust_periodic(stars_scroll_timer, video_screen_get_frame_period(0), 0, video_screen_get_frame_period(0));
+	timer_adjust_periodic(stars_scroll_timer, video_screen_get_frame_period(machine->primary_screen), 0, video_screen_get_frame_period(machine->primary_screen));
 }
 
 

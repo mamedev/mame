@@ -292,7 +292,7 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 		return FALSE;
 
 	/* adjust the timer */
-	timer_adjust_oneshot(object_timer, video_screen_get_time_until_pos(0, vc / 2, hdb), vc | (hdb << 16));
+	timer_adjust_oneshot(object_timer, video_screen_get_time_until_pos(machine->primary_screen, vc / 2, hdb), vc | (hdb << 16));
 	return TRUE;
 }
 
@@ -631,10 +631,10 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return cpu_irq_state;
 
 		case HC:
-			return video_screen_get_hpos(0) % (Machine->screen[0].width / 2);
+			return video_screen_get_hpos(machine->primary_screen) % (machine->screen[0].width / 2);
 
 		case VC:
-			return video_screen_get_vpos(0) * 2 + gpu_regs[VBE];
+			return video_screen_get_vpos(machine->primary_screen) * 2 + gpu_regs[VBE];
 
 	}
 
@@ -686,7 +686,7 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 					visarea.max_x = hbstart / 2 - 1;
 					visarea.min_y = vbend / 2;
 					visarea.max_y = vbstart / 2 - 1;
-					video_screen_configure(0, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
+					video_screen_configure(machine->primary_screen, hperiod / 2, vperiod / 2, &visarea, HZ_TO_ATTOSECONDS((double)COJAG_PIXEL_CLOCK * 2 / hperiod / vperiod));
 				}
 				break;
 			}

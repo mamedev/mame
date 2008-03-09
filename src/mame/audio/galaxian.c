@@ -365,7 +365,7 @@ static void galaxian_sh_start(void)
 
 	lfotimer = timer_alloc(lfo_timer_cb, NULL);
 
-	timer_pulse(video_screen_get_frame_period(0), NULL, 0, galaxian_sh_update);
+	timer_pulse(video_screen_get_frame_period(Machine->primary_screen), NULL, 0, galaxian_sh_update);
 
 	state_save_register_global(freq);
 	state_save_register_global(noise_enable);

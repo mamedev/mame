@@ -5,8 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "profiler.h"
 #include "deprecat.h"
+#include "profiler.h"
 #include "cpu/m6809/m6809.h"
 #include "irobot.h"
 
@@ -27,7 +27,7 @@
 
 #define IR_CPU_STATE \
 	logerror(\
-			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(0))
+			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(Machine->primary_screen))
 
 
 UINT8 irobot_vg_clear;
@@ -186,7 +186,7 @@ static TIMER_CALLBACK( scanline_callback )
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
     if (scanline >= 256) scanline = 0;
-    timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, scanline_callback);
+    timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
 }
 
 static TIMER_CALLBACK( irmb_done_callback );
@@ -207,7 +207,7 @@ MACHINE_RESET( irobot )
 	irmb_timer = timer_alloc(irmb_done_callback, NULL);
 
 	/* set an initial timer to go off on scanline 0 */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, scanline_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
 
 	irobot_rom_banksel_w(machine,0,0);
 	irobot_out0_w(machine,0,0);

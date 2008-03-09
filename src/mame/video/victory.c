@@ -198,7 +198,7 @@ READ8_HANDLER( victory_video_control_r )
 			result |= (~fgcoll & 1) << 6;
 			result |= (~vblank_irq & 1) << 5;
 			result |= (~bgcoll & 1) << 4;
-			result |= (video_screen_get_vpos(0) & 0x100) >> 5;
+			result |= (video_screen_get_vpos(machine->primary_screen) & 0x100) >> 5;
 			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", activecpu_get_previouspc(), result);
 			return result;
 
@@ -1126,7 +1126,7 @@ VIDEO_UPDATE( victory )
 			int bpix = bg[(x + scrollx) & 255];
 			scanline[x] = bpix | (fpix << 3);
 			if (fpix && (bpix & bgcollmask) && count++ < 128)
-				timer_set(video_screen_get_time_until_pos(0, y, x), NULL, x | (y << 8), bgcoll_irq_callback);
+				timer_set(video_screen_get_time_until_pos(screen, y, x), NULL, x | (y << 8), bgcoll_irq_callback);
 		}
 
 		/* draw the scanline */

@@ -87,26 +87,22 @@ static TIMER_CALLBACK( interrupt_callback )
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	if (!coin && prev_coin)
-	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
-	}
 
 	prev_coin = coin;
 
-	scanline = video_screen_get_vpos(0) + 128;
+	scanline = video_screen_get_vpos(machine->primary_screen) + 128;
 
 	if (scanline > 256)
-	{
 		scanline = 0;
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, 0, interrupt_callback);
 }
 
 
 static MACHINE_RESET( fgoal )
 {
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, interrupt_callback);
 }
 
 
@@ -124,14 +120,10 @@ static READ8_HANDLER( fgoal_analog_r )
 
 static READ8_HANDLER( fgoal_switches_r )
 {
-	if (video_screen_get_vpos(0) & 0x80)
-	{
+	if (video_screen_get_vpos(machine->primary_screen) & 0x80)
 		return readinputport(1) | 0x80;
-	}
 	else
-	{
 		return readinputport(1);
-	}
 }
 
 

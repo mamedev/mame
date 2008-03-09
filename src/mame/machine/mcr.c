@@ -500,7 +500,7 @@ static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
 	update_mcr68_interrupts();
-	timer_set(video_screen_get_scan_period(0), NULL, 0, mcr68_493_off_callback);
+	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, mcr68_493_off_callback);
 	logerror("--- (INT1) ---\n");
 }
 
@@ -621,7 +621,7 @@ static TIMER_CALLBACK( zwackery_493_off_callback )
 static TIMER_CALLBACK( zwackery_493_callback )
 {
 	pia_2_ca1_w(machine, 0, 1);
-	timer_set(video_screen_get_scan_period(0), NULL, 0, zwackery_493_off_callback);
+	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
 }
 
 

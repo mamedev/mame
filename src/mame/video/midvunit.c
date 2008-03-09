@@ -61,7 +61,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	if (scanline != -1)
 	{
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline + 1, 0), scanline);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline + 1, 0), scanline);
 		timer_set(ATTOTIME_IN_HZ(25000000), NULL, -1, scanline_timer_cb);
 	}
 	else
@@ -421,7 +421,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 		video_changed = TRUE;
 		if (LOG_DMA && input_code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
-		video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 	}
 	page_control = data;
 }
@@ -449,7 +449,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 
 	/* update the scanline timer */
 	if (offset == 0)
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, (data & 0x1ff) + 1, 0), data & 0x1ff);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (data & 0x1ff) + 1, 0), data & 0x1ff);
 
 	/* if something changed, update our parameters */
 	if (old != video_regs[offset] && video_regs[6] != 0 && video_regs[11] != 0)
@@ -461,14 +461,14 @@ WRITE32_HANDLER( midvunit_video_control_w )
 		visarea.max_x = (video_regs[6] + video_regs[2] - video_regs[5]) % video_regs[6];
 		visarea.min_y = 0;
 		visarea.max_y = (video_regs[11] + video_regs[7] - video_regs[10]) % video_regs[11];
-		video_screen_configure(0, video_regs[6], video_regs[11], &visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
+		video_screen_configure(machine->primary_screen, video_regs[6], video_regs[11], &visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
 	}
 }
 
 
 READ32_HANDLER( midvunit_scanline_r )
 {
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 

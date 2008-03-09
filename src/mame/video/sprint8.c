@@ -193,7 +193,7 @@ VIDEO_EOF( sprint8 )
 
 		for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
-				timer_set(video_screen_get_time_until_pos(0, y + 24, x), NULL,
+				timer_set(video_screen_get_time_until_pos(machine->primary_screen, y + 24, x), NULL,
 						  colortable_entry_get_value(machine->colortable, p1[x]),
 						  sprint8_collision_callback);
 	}

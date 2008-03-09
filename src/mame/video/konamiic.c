@@ -1149,6 +1149,7 @@ Registers (word-wise):
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define VERBOSE 0
@@ -7465,7 +7466,7 @@ void K053250_dma(int chip, int limiter)
 
 	chip_ptr = &K053250_info.chip[chip];
 
-	current_frame = video_screen_get_frame_number(0);
+	current_frame = video_screen_get_frame_number(Machine->primary_screen);
 	last_frame = chip_ptr->frame;
 
 	if (limiter && current_frame == last_frame) return; // make sure we only do DMA transfer once per frame

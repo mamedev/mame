@@ -173,7 +173,7 @@ static void cninja_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 		y = buffered_spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 		colour = (x >> 9) &0x1f;
 
 		fx = y & 0x2000;
@@ -241,7 +241,7 @@ static void robocop2_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		y = buffered_spriteram16[offs];
 		flash=y&0x1000;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 		colour = (x >> 9) &0x1f;
 
 		fx = y & 0x2000;
@@ -339,7 +339,7 @@ static void mutantf_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		w = (spriteptr[offs+2]&0x0f00)>> 8;
 
 		sy = spriteptr[offs];
-		if ((sy&0x2000) && (video_screen_get_frame_number(0) & 1)) {
+		if ((sy&0x2000) && (video_screen_get_frame_number(machine->primary_screen) & 1)) {
 			offs+=inc;
 			continue;
 		}

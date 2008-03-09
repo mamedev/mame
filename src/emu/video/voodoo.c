@@ -969,10 +969,10 @@ static void swap_buffers(voodoo_state *v)
 {
 	int count;
 
-	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", video_screen_get_vpos(v->scrnum));
+	if (LOG_VBLANK_SWAP) logerror("--- swap_buffers @ %d\n", video_screen_get_vpos_scrnum(v->scrnum));
 
 	/* force a partial update */
-	video_screen_update_partial(v->scrnum, video_screen_get_vpos(v->scrnum));
+	video_screen_update_partial_scrnum(v->scrnum, video_screen_get_vpos_scrnum(v->scrnum));
 	v->fbi.video_changed = TRUE;
 
 	/* keep a history of swap intervals */
@@ -1082,11 +1082,11 @@ static void swap_buffers(voodoo_state *v)
 
 static void adjust_vblank_timer(voodoo_state *v)
 {
-	attotime vblank_period = video_screen_get_time_until_pos(v->scrnum, v->fbi.vsyncscan, 0);
+	attotime vblank_period = video_screen_get_time_until_pos_scrnum(v->scrnum, v->fbi.vsyncscan, 0);
 
 	/* if zero, adjust to next frame, otherwise we may get stuck in an infinite loop */
 	if (attotime_compare(vblank_period, attotime_zero) == 0)
-		vblank_period = video_screen_get_frame_period(v->scrnum);
+		vblank_period = video_screen_get_frame_period_scrnum(v->scrnum);
 	timer_adjust_oneshot(v->fbi.vblank_timer, vblank_period, 0);
 }
 
@@ -1135,7 +1135,7 @@ static TIMER_CALLBACK( vblank_callback )
 		swap_buffers(v);
 
 	/* set a timer for the next off state */
-	timer_set(video_screen_get_time_until_pos(v->scrnum, 0, 0), v, 0, vblank_off_callback);
+	timer_set(video_screen_get_time_until_pos_scrnum(v->scrnum, 0, 0), v, 0, vblank_off_callback);
 
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
@@ -2610,7 +2610,7 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					int vvis = (v->reg[videoDimensions].u >> 16) & 0x3ff;
 					int hbp = (v->reg[backPorch].u & 0xff) + 2;
 					int vbp = (v->reg[backPorch].u >> 16) & 0xff;
-					attoseconds_t refresh = video_screen_get_frame_period(v->scrnum).attoseconds;
+					attoseconds_t refresh = video_screen_get_frame_period_scrnum(v->scrnum).attoseconds;
 					attoseconds_t stdperiod, medperiod, vgaperiod;
 					attoseconds_t stddiff, meddiff, vgadiff;
 					rectangle visarea;
@@ -2645,17 +2645,17 @@ static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data)
 					/* configure the screen based on which one matches the closest */
 					if (stddiff < meddiff && stddiff < vgadiff)
 					{
-						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, stdperiod);
+						video_screen_configure_scrnum(v->scrnum, htotal, vtotal, &visarea, stdperiod);
 						mame_printf_debug("Standard resolution, %f Hz\n", ATTOSECONDS_TO_HZ(stdperiod));
 					}
 					else if (meddiff < vgadiff)
 					{
-						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, medperiod);
+						video_screen_configure_scrnum(v->scrnum, htotal, vtotal, &visarea, medperiod);
 						mame_printf_debug("Medium resolution, %f Hz\n", ATTOSECONDS_TO_HZ(medperiod));
 					}
 					else
 					{
-						video_screen_configure(v->scrnum, htotal, vtotal, &visarea, vgaperiod);
+						video_screen_configure_scrnum(v->scrnum, htotal, vtotal, &visarea, vgaperiod);
 						mame_printf_debug("VGA resolution, %f Hz\n", ATTOSECONDS_TO_HZ(vgaperiod));
 					}
 
@@ -3851,7 +3851,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 
 		/* return the current scanline for now */
 		case vRetrace:
-			result = video_screen_get_vpos(v->scrnum);
+			result = video_screen_get_vpos_scrnum(v->scrnum);
 			break;
 
 		/* reserved area in the TMU read by the Vegas startup sequence */
@@ -4538,7 +4538,7 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 				v->fbi.width = data & 0xfff;
 			if (data & 0xfff000)
 				v->fbi.height = (data >> 12) & 0xfff;
-			video_screen_set_visarea(v->scrnum, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
+			video_screen_set_visarea_scrnum(v->scrnum, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
 			adjust_vblank_timer(v);
 			if (LOG_REGISTERS)
 				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);

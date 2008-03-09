@@ -116,7 +116,7 @@ PALETTE_INIT( tp84 )
 WRITE8_HANDLER( tp84_spriteram_w )
 {
 	/* the game multiplexes the sprites, so update now */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 	tp84_spriteram[offset] = data;
 }
 
@@ -124,7 +124,7 @@ WRITE8_HANDLER( tp84_spriteram_w )
 READ8_HANDLER( tp84_scanline_r )
 {
 	/* reads 1V - 128V */
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 

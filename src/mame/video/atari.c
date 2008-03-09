@@ -1057,12 +1057,12 @@ static void antic_linerefresh(void)
 
 static int cycle(void)
 {
-	return video_screen_get_hpos(0) * CYCLES_PER_LINE / Machine->screen[0].width;
+	return video_screen_get_hpos(Machine->primary_screen) * CYCLES_PER_LINE / Machine->screen[0].width;
 }
 
 static void after(int cycles, timer_fired_func function, const char *funcname)
 {
-    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(0)) * cycles / CYCLES_PER_LINE);
+    attotime duration = attotime_make(0, attotime_to_attoseconds(video_screen_get_scan_period(Machine->primary_screen)) * cycles / CYCLES_PER_LINE);
     (void)funcname;
 	LOG(("           after %3d (%5.1f us) %s\n", cycles, attotime_to_double(duration) * 1.0e6, funcname));
 	timer_set(duration, NULL, 0, function);

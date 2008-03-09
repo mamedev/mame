@@ -606,7 +606,7 @@ static void GCU_w(int chip, UINT32 offset, UINT32 data, UINT32 mem_mask)
 
 				// only try and update the screen if the driver says we have one
 				if (screen < numscreens)
-					video_screen_configure(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, video_screen_get_frame_period(0).attoseconds);
+					video_screen_configure_scrnum(screen, visarea.max_x + 1, visarea.max_y + 1, &visarea, video_screen_get_frame_period(Machine->primary_screen).attoseconds);
 			}
 			break;
 		}

@@ -163,7 +163,7 @@ static void adjust_display_position_interrupt_timer(void)
 	if ((display_counter + 1) != 0)
 	{
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(NEOGEO_PIXEL_CLOCK), display_counter + 1);
-		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(0), video_screen_get_hpos(0), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
+		if (LOG_VIDEO_SYSTEM) logerror("adjust_display_position_interrupt_timer  current y: %02x  current x: %02x   target y: %x  target x: %x\n", video_screen_get_vpos(Machine->primary_screen), video_screen_get_hpos(Machine->primary_screen), (display_counter + 1) / NEOGEO_HTOTAL, (display_counter + 1) % NEOGEO_HTOTAL);
 
 		timer_adjust_oneshot(display_position_interrupt_timer, period, 0);
 	}
@@ -227,10 +227,10 @@ void neogeo_acknowledge_interrupt(UINT16 data)
 
 static TIMER_CALLBACK( display_position_interrupt_callback )
 {
-	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
 	if (display_position_interrupt_control & IRQ2CTRL_ENABLE)
 	{
-		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+		if (LOG_VIDEO_SYSTEM) logerror("*** Scanline interrupt (IRQ2) ***  y: %02x  x: %02x\n", video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
 		display_position_interrupt_pending = 1;
 
 		update_interrupts(machine);
@@ -253,13 +253,13 @@ static TIMER_CALLBACK( display_position_vblank_callback )
 	}
 
 	/* set timer for next screen */
-	timer_adjust_oneshot(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
+	timer_adjust_oneshot(display_position_vblank_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
-	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(0), video_screen_get_hpos(0));
+	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));
 
 	/* add a timer tick to the pd4990a */
 	calendar_clock();
@@ -269,7 +269,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 	update_interrupts(machine);
 
 	/* set timer for next screen */
-	timer_adjust_oneshot(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0);
+	timer_adjust_oneshot(vblank_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VBSTART, 0), 0);
 }
 
 
@@ -281,10 +281,10 @@ static void create_interrupt_timers(void)
 }
 
 
-static void start_interrupt_timers(void)
+static void start_interrupt_timers(running_machine *machine)
 {
-	timer_adjust_oneshot(vblank_interrupt_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, 0), 0);
-	timer_adjust_oneshot(display_position_vblank_timer, video_screen_get_time_until_pos(0, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
+	timer_adjust_oneshot(vblank_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VBSTART, 0), 0);
+	timer_adjust_oneshot(display_position_vblank_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VBSTART, NEOGEO_VBLANK_RELOAD_HPOS), 0);
 }
 
 
@@ -1012,7 +1012,7 @@ static MACHINE_RESET( neogeo )
 
 	neogeo_reset_rng();
 
-	start_interrupt_timers();
+	start_interrupt_timers(machine);
 
 	/* trigger the IRQ3 that was set by MACHINE_START */
 	update_interrupts(machine);

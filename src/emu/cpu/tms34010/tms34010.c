@@ -951,7 +951,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (!master)
 	{
 		vtotal = MIN(screen->height - 1, vtotal);
-		vcount = video_screen_get_vpos(state.config->scrnum);
+		vcount = video_screen_get_vpos_scrnum(state.config->scrnum);
 	}
 
 	/* update the VCOUNT */
@@ -1012,7 +1012,7 @@ static TIMER_CALLBACK( scanline_callback )
 					if (width != screen->width || height != screen->height || visarea.min_y != screen->visarea.min_y || visarea.max_y != screen->visarea.max_y ||
 						(state.hblank_stable > 2 && (visarea.min_x != screen->visarea.min_x || visarea.max_x != screen->visarea.max_x)))
 					{
-						video_screen_configure(state.config->scrnum, width, height, &visarea, refresh);
+						video_screen_configure_scrnum(state.config->scrnum, width, height, &visarea, refresh);
 					}
 					state.hblank_stable++;
 				}
@@ -1029,7 +1029,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* force a partial update within the visible area */
 	if (vcount >= screen->visarea.min_y && vcount <= screen->visarea.max_y && state.config->scanline_callback != NULL)
-		video_screen_update_partial(state.config->scrnum, vcount);
+		video_screen_update_partial_scrnum(state.config->scrnum, vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
 	if (vcount >= veblnk && vcount < vsblnk)
@@ -1065,7 +1065,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust_oneshot(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8));
+	timer_adjust_oneshot(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos_scrnum(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8));
 
 	/* restore the context */
 	cpuintrf_pop_context();
@@ -1283,7 +1283,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), video_screen_get_vpos(state.config->scrnum));
+		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), video_screen_get_vpos_scrnum(state.config->scrnum));
 }
 
 
@@ -1320,7 +1320,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(offset) = data;
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), video_screen_get_vpos(state.config->scrnum));
+		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), video_screen_get_vpos_scrnum(state.config->scrnum));
 
 	switch (offset)
 	{
@@ -1485,7 +1485,7 @@ READ16_HANDLER( tms34010_io_register_r )
 	{
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = video_screen_get_hpos(state.config->scrnum);
+			result = video_screen_get_hpos_scrnum(state.config->scrnum);
 			total = IOREG(REG_HTOTAL) + 1;
 			result = result * total / Machine->screen[state.config->scrnum].width;
 
@@ -1528,7 +1528,7 @@ READ16_HANDLER( tms34020_io_register_r )
 	{
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = video_screen_get_hpos(state.config->scrnum);
+			result = video_screen_get_hpos_scrnum(state.config->scrnum);
 			total = IOREG(REG020_HTOTAL) + 1;
 			result = result * total / Machine->screen[state.config->scrnum].width;
 

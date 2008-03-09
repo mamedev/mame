@@ -273,7 +273,7 @@ static TIMER_CALLBACK( williams_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -290,10 +290,10 @@ static TIMER_CALLBACK( williams_count240_callback )
 	pia_1_ca1_w(machine, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 0, williams_count240_off_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0);
+	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
 }
 
 
@@ -354,7 +354,7 @@ static void tshoot_main_irq(int state)
  *
  *************************************/
 
-static void williams_common_init(void)
+static MACHINE_RESET( williams_common )
 {
 	/* reset the PIAs */
 	pia_reset();
@@ -364,11 +364,11 @@ static void williams_common_init(void)
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(williams_va11_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 240 */
 	scan240_timer = timer_alloc(williams_count240_callback, NULL);
-	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(0, 240, 0), 0);
+	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
 
 	state_save_register_global(vram_bank);
 }
@@ -376,7 +376,7 @@ static void williams_common_init(void)
 
 MACHINE_RESET( williams )
 {
-	williams_common_init();
+	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the memory bank */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);
@@ -402,7 +402,7 @@ static TIMER_CALLBACK( williams2_va11_callback )
 	/* set a timer for the next update */
 	scanline += 0x20;
 	if (scanline >= 256) scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -419,10 +419,10 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 	pia_0_ca1_w(machine, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
-	timer_set(video_screen_get_time_until_pos(0, 8, 0), NULL, 0, williams2_endscreen_off_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
 
 	/* set a timer for next frame */
-	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0);
+	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 }
 
 
@@ -453,11 +453,11 @@ MACHINE_RESET( williams2 )
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(williams2_va11_callback, NULL);
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	/* also set a timer to go off on scanline 254 */
 	scan254_timer = timer_alloc(williams2_endscreen_callback, NULL);
-	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(0, 254, 0), 0);
+	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 
 	state_save_register_global(vram_bank);
 	state_save_register_func_postload(williams2_postload);
@@ -719,7 +719,7 @@ static void defender_postload(void)
 
 MACHINE_RESET( defender )
 {
-	williams_common_init();
+	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
 	memory_configure_bank(1, 0, 9, &memory_region(REGION_CPU1)[0x10000], 0x1000);
@@ -815,7 +815,7 @@ WRITE8_HANDLER( sinistar_vram_select_w )
 
 MACHINE_RESET( blaster )
 {
-	williams_common_init();
+	MACHINE_RESET_CALL(williams_common);
 
 	/* banking is different for blaster */
 	memory_configure_bank(1, 0, 1, williams_videoram, 0);

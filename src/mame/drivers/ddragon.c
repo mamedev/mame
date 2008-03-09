@@ -145,7 +145,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
-	video_screen_update_partial(0, scanline - 1);
+	video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
@@ -158,7 +158,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -192,7 +192,7 @@ static MACHINE_RESET( ddragon )
 {
 	dd_sub_cpu_busy = 1;
 	adpcm_idle[0] = adpcm_idle[1] = 1;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 

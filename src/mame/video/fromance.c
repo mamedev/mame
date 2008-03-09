@@ -295,7 +295,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 {
 	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	if (param != 0)
-		timer_adjust_periodic(crtc_timer, attotime_div(video_screen_get_frame_period(0), param), 0, attotime_div(video_screen_get_frame_period(0), param));
+		timer_adjust_periodic(crtc_timer, attotime_div(video_screen_get_frame_period(machine->primary_screen), param), 0, attotime_div(video_screen_get_frame_period(machine->primary_screen), param));
 }
 
 
@@ -307,7 +307,7 @@ WRITE8_HANDLER( fromance_crtc_data_w )
 	{
 		/* only register we know about.... */
 		case 0x0b:
-			timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_pos(0, Machine->screen[0].visarea.max_y + 1, 0), (data > 0x80) ? 2 : 1);
+			timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_pos(machine->primary_screen, Machine->screen[0].visarea.max_y + 1, 0), (data > 0x80) ? 2 : 1);
 			break;
 
 		default:

@@ -100,7 +100,7 @@ static TIMER_CALLBACK( irq_callback )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 }
 
 
@@ -110,9 +110,9 @@ static void create_irq_timer(void)
 }
 
 
-static void start_irq_timer(void)
+static void start_irq_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, VBSTART, 0), 0);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
 }
 
 
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( video_control_1_w )
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
 
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -269,7 +269,7 @@ static void astrof_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( astrof_video_control_2_w )
 {
 	astrof_set_video_control_2(data);
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -287,7 +287,7 @@ static void spfghmk2_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( spfghmk2_video_control_2_w )
 {
 	spfghmk2_set_video_control_2(data);
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -304,7 +304,7 @@ static void tomahawk_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( tomahawk_video_control_2_w )
 {
 	tomahawk_set_video_control_2(data);
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -486,7 +486,7 @@ static MACHINE_START( tomahawk )
 
 static MACHINE_RESET( astrof )
 {
-	start_irq_timer();
+	start_irq_timer(machine);
 }
 
 

@@ -243,7 +243,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 			for (y = 0;y < h;y++)
 			{
 				if ((color & pri_mask) == pri_val &&
-							(!flash || (video_screen_get_frame_number(0) & 1)))
+							(!flash || (video_screen_get_frame_number(machine->primary_screen) & 1)))
 					drawgfx(bitmap,machine->gfx[3],
 							code - y * incy + h * x,
 							color,

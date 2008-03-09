@@ -26,8 +26,7 @@ static const pen_t pens_from_color_prom[] =
 
 WRITE8_HANDLER( vicdual_palette_bank_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
-
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	palette_bank = data & 3;
 }
 

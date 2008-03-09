@@ -91,10 +91,10 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(homerun_40_r)
 {
-	if(video_screen_get_vpos(0)>116)
-		return input_port_0_r(machine,0)|0x40;
+	if(video_screen_get_vpos(machine->primary_screen)>116)
+		return readinputport(0)|0x40;
 	else
-		return input_port_0_r(machine,0);
+		return readinputport(0);
 }
 
 static ADDRESS_MAP_START( homerun_iomap, ADDRESS_SPACE_IO, 8 )

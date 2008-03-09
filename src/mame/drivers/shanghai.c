@@ -638,9 +638,7 @@ static READ16_HANDLER( HD63484_data_r )
 	int res;
 
 	if (regno == 0x80)
-	{
-		res = video_screen_get_vpos(0);
-	}
+		res = video_screen_get_vpos(machine->primary_screen);
 	else if (regno == 0)
 	{
 logerror("%05x: HD63484 read FIFO\n",activecpu_get_pc());

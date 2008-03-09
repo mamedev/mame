@@ -2931,7 +2931,7 @@ static UINT8 hgokou_hopper;
 
 static UINT8 hgokou_player_r(int player)
 {
-	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(0)%10)) ? 0 : (1<<6));
+	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(Machine->primary_screen)%10)) ? 0 : (1<<6));
 
 	if (!(ddenlovr_select2 & 0x01))	return readinputport(player * 5 + 1) | hopper_bit;
 	if (!(ddenlovr_select2 & 0x02))	return readinputport(player * 5 + 2) | hopper_bit;

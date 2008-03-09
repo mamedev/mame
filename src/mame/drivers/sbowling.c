@@ -133,7 +133,7 @@ static READ8_HANDLER( pix_data_r )
 
 static INTERRUPT_GEN( sbw_interrupt )
 {
-	int vector = video_screen_get_vblank(0) ? 0xcf : 0xd7;	/* RST 08h/10h */
+	int vector = video_screen_get_vblank(machine->primary_screen) ? 0xcf : 0xd7;	/* RST 08h/10h */
 
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
 }

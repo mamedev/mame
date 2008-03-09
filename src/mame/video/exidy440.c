@@ -170,7 +170,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
      * caused by collision or beam, ORed together with CHRCLK,
      * which probably goes off once per scanline; for now, we just
      * always return the current scanline */
-	result = video_screen_get_vpos(0);
+	result = video_screen_get_vpos(machine->primary_screen);
 	return (result < 255) ? result : 255;
 }
 
@@ -184,7 +184,7 @@ READ8_HANDLER( exidy440_vertical_pos_r )
 
 WRITE8_HANDLER( exidy440_spriteram_w )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	spriteram[offset] = data;
 }
 
@@ -307,7 +307,8 @@ static TIMER_CALLBACK( collide_firq_callback )
  *
  *************************************/
 
-static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset, int check_collision)
+static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect,
+						 int scroll_offset, int check_collision)
 {
 	int i;
 
@@ -374,7 +375,7 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							timer_set(video_screen_get_time_until_pos(0, yoffs, currx), NULL, currx, collide_firq_callback);
+							timer_set(video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 
@@ -387,7 +388,7 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							timer_set(video_screen_get_time_until_pos(0, yoffs, currx), NULL, currx, collide_firq_callback);
+							timer_set(video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 				}
@@ -406,7 +407,8 @@ static void draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int scroll
  *
  *************************************/
 
-static void update_screen(bitmap_t *bitmap, const rectangle *cliprect, int scroll_offset, int check_collision)
+static void update_screen(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect,
+						  int scroll_offset, int check_collision)
 {
 	int y, sy;
 
@@ -423,7 +425,7 @@ static void update_screen(bitmap_t *bitmap, const rectangle *cliprect, int scrol
 	}
 
 	/* draw the sprites */
-	draw_sprites(bitmap, cliprect, scroll_offset, check_collision);
+	draw_sprites(screen, bitmap, cliprect, scroll_offset, check_collision);
 }
 
 
@@ -437,7 +439,7 @@ static void update_screen(bitmap_t *bitmap, const rectangle *cliprect, int scrol
 static VIDEO_UPDATE( exidy440 )
 {
 	/* redraw the screen */
-	update_screen(bitmap, cliprect, 0, TRUE);
+	update_screen(screen, bitmap, cliprect, 0, TRUE);
 
 	/* generate an interrupt once/frame for the beam */
 	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
@@ -453,8 +455,8 @@ static VIDEO_UPDATE( exidy440 )
             From this, it appears that they are expecting to get beams over
             a 12 scanline period, and trying to pick roughly the middle one.
             This is how it is implemented. */
-		attoseconds_t increment = attotime_to_attoseconds(video_screen_get_scan_period(0));
-		attotime time = attotime_sub(video_screen_get_time_until_pos(0, beamy, beamx), attotime_make(0, increment * 6));
+		attoseconds_t increment = attotime_to_attoseconds(video_screen_get_scan_period(screen));
+		attotime time = attotime_sub(video_screen_get_time_until_pos(screen, beamy, beamx), attotime_make(0, increment * 6));
 		for (i = 0; i <= 12; i++)
 		{
 			timer_set(time, NULL, beamx, beam_firq_callback);
@@ -469,7 +471,7 @@ static VIDEO_UPDATE( exidy440 )
 static VIDEO_UPDATE( topsecex )
 {
 	/* redraw the screen */
-	update_screen(bitmap, cliprect, *topsecex_yscroll, FALSE);
+	update_screen(screen, bitmap, cliprect, *topsecex_yscroll, FALSE);
 
 	return 0;
 }

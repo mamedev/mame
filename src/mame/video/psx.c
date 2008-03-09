@@ -418,51 +418,39 @@ static void DebugMeshEnd( void )
 static void DebugCheckKeys( void )
 {
 	if( input_code_pressed_once( KEYCODE_M ) )
-	{
 		m_b_debugmesh = !m_b_debugmesh;
-	}
+
 	if( input_code_pressed_once( KEYCODE_V ) )
-	{
 		m_b_debugtexture = !m_b_debugtexture;
-	}
+
 	if( m_b_debugmesh || m_b_debugtexture )
-	{
-		video_screen_set_visarea(0,  0, Machine->screen[0].width - 1, 0, Machine->screen[0].height - 1 );
-	}
+		video_screen_set_visarea(Machine->primary_screen, 0, Machine->screen[0].width - 1, 0, Machine->screen[0].height - 1 );
 	else
-	{
-		video_screen_set_visarea(0,  0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
-	}
+		video_screen_set_visarea(Machine->primary_screen, 0, m_n_screenwidth - 1, 0, m_n_screenheight - 1 );
 
 	if( input_code_pressed_once( KEYCODE_I ) )
 	{
 		if( m_b_debugtexture )
 		{
 			m_n_debuginterleave++;
+
 			if( m_n_debuginterleave == 2 )
-			{
 				m_n_debuginterleave = -1;
-			}
+
 			if( m_n_debuginterleave == -1 )
-			{
 				popmessage( "interleave off" );
-			}
 			else if( m_n_debuginterleave == 0 )
-			{
 				popmessage( "4 bit interleave" );
-			}
 			else if( m_n_debuginterleave == 1 )
-			{
 				popmessage( "8 bit interleave" );
-			}
 		}
 		else
 		{
 			m_n_debugskip++;
+
 			if( m_n_debugskip > 15 )
-			{
 				m_n_debugskip = 0;
-			}
+
 			popmessage( "debug skip %d", m_n_debugskip );
 		}
 	}
@@ -474,12 +462,8 @@ static void DebugCheckKeys( void )
 		int n_x;
 		f = fopen( "dump.txt", "w" );
 		for( n_y = 256; n_y < 512; n_y++ )
-		{
 			for( n_x = 640; n_x < 1024; n_x++ )
-			{
 				fprintf( f, "%04u,%04u = %04x\n", n_y, n_x, m_p_p_vram[ n_y ][ n_x ] );
-			}
-		}
 		fclose( f );
 	}
 	if( input_code_pressed_once( KEYCODE_S ) )
@@ -488,9 +472,7 @@ static void DebugCheckKeys( void )
 		popmessage( "saving..." );
 		f = fopen( "VRAM.BIN", "wb" );
 		for( n_y = 0; n_y < 1024; n_y++ )
-		{
 			fwrite( m_p_p_vram[ n_y ], 1024 * 2, 1, f );
-		}
 		fclose( f );
 	}
 	if( input_code_pressed_once( KEYCODE_L ) )
@@ -499,9 +481,7 @@ static void DebugCheckKeys( void )
 		popmessage( "loading..." );
 		f = fopen( "VRAM.BIN", "rb" );
 		for( n_y = 0; n_y < 1024; n_y++ )
-		{
 			fread( m_p_p_vram[ n_y ], 1024 * 2, 1, f );
-		}
 		fclose( f );
 	}
 #endif
@@ -624,7 +604,7 @@ static void updatevisiblearea( void )
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_x = m_n_screenwidth - 1;
 	visarea.max_y = m_n_screenheight - 1;
-	video_screen_configure(0, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
+	video_screen_configure(Machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 static void psx_gpu_init( void )

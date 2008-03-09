@@ -49,6 +49,7 @@
                 - calls watchdog_init() [watchdog.c] to initialize the watchdog system
                 - calls cpuint_init() [cpuint.c] to initialize the CPU interrupts
                 - calls the driver's DRIVER_INIT callback
+                - calls device_list_start() [devintrf.c] to start any devices
                 - calls video_init() [video.c] to start the video system
                 - calls sound_init() [sound.c] to start the audio system
                 - calls mame_debug_init() [debugcpu.c] to set up the debugger
@@ -1573,11 +1574,11 @@ static void init_machine(running_machine *machine)
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
 
-	/* start the video and audio hardware */
-	video_init(machine);
-
 	/* start up the devices */
 	device_list_start(machine);
+
+	/* start the video and audio hardware */
+	video_init(machine);
 
 	sound_init(machine);
 	input_port_post_init(machine);

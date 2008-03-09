@@ -4,6 +4,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
 
@@ -105,7 +106,7 @@ READ64_HANDLER( pvr_ta_r )
 	switch (reg)
 	{
 	case SPG_STATUS:
-		pvrta_regs[reg] = (video_screen_get_vblank(0) << 13) | (video_screen_get_hblank(0) << 12) | (video_screen_get_vpos(0) & 0x3ff);
+		pvrta_regs[reg] = (video_screen_get_vblank(machine->primary_screen) << 13) | (video_screen_get_hblank(machine->primary_screen) << 12) | (video_screen_get_vpos(machine->primary_screen) & 0x3ff);
 		break;
 	}
 
@@ -666,6 +667,6 @@ void dc_vblank(void)
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
 	update_interrupt_status();
 
-	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(Machine->primary_screen, 0, 0), 0);
 }
 

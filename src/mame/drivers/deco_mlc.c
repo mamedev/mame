@@ -199,20 +199,20 @@ static READ32_HANDLER( decomlc_vbl_r )
 
 static READ32_HANDLER( mlc_scanline_r )
 {
-//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(0));
-	return video_screen_get_vpos(0);
+//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(machine->primary_screen));
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 static TIMER_CALLBACK( interrupt_gen )
 {
-//  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(0), info.i);
+//  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(machine->primary_screen), info.i);
 	cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
 {
 	static int lastScanline[9]={ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	int scanline=video_screen_get_vpos(0);
+	int scanline=video_screen_get_vpos(machine->primary_screen);
 	irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
@@ -222,8 +222,8 @@ static WRITE32_HANDLER( mlc_irq_w )
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
-		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(0, irq_ram[0x14/4], 0),0);
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(0));
+		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(machine->primary_screen, irq_ram[0x14/4], 0),0);
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(machine->primary_screen));
 		return;
 		break;
 	case 0x18:

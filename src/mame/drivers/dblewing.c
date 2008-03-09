@@ -62,7 +62,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		y = spriteram16[offs];
 		flash=y&0x1000;
 		xsize = y&0x0800;
-		if (flash && (video_screen_get_frame_number(0) & 1)) continue;
+		if (flash && (video_screen_get_frame_number(machine->primary_screen) & 1)) continue;
 
 		x = spriteram16[offs+2];
 		colour = (x >>9) & 0x1f;

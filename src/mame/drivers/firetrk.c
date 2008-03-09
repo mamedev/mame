@@ -76,7 +76,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline > 262)
 		scanline = 0;
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, periodic_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, periodic_callback);
 }
 
 

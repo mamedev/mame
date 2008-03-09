@@ -181,7 +181,7 @@ SOUND_START( cchasm )
 	ctc_intf.baseclock = cpunum_get_clock(1);
 	z80ctc_init (0, &ctc_intf);
 
-	timer_pulse(video_screen_get_frame_period(0), NULL, 0, cchasm_sh_update);
+	timer_pulse(video_screen_get_frame_period(machine->primary_screen), NULL, 0, cchasm_sh_update);
 }
 
 

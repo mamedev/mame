@@ -183,7 +183,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(0, triggerscanline, 0), 0);
+		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, triggerscanline, 0), 0);
 	}
 }
 
@@ -315,22 +315,22 @@ GFXDECODE_END
 static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
-	timer_set(video_screen_get_frame_period(0), NULL, 0, network_interrupt_callback);
+	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
-	timer_set(video_screen_get_frame_period(0), NULL, 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	cpunum_set_input_line(machine, 0, I960_IRQ1, ASSERT_LINE);
-	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(0), 0);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_frame_period(machine->primary_screen), 0);
 }
 
 
@@ -342,8 +342,8 @@ static MACHINE_START( namcofl )
 
 static MACHINE_RESET( namcofl )
 {
-	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 3, 0), NULL, 0, network_interrupt_callback);
-	timer_set(video_screen_get_time_until_pos(0, machine->screen[0].visarea.max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, machine->screen[0].visarea.max_y + 3, 0), NULL, 0, network_interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, machine->screen[0].visarea.max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
 }
 
 

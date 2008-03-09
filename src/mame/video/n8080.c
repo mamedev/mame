@@ -193,7 +193,7 @@ VIDEO_UPDATE( spacefev )
 						6, /* cyan    */
 					};
 
-					int cycle = video_screen_get_frame_number(0) / 32;
+					int cycle = video_screen_get_frame_number(screen) / 32;
 
 					color = ufo_color[cycle % 6];
 				}
@@ -368,7 +368,7 @@ VIDEO_UPDATE( helifire )
 
 VIDEO_EOF( helifire )
 {
-	int n = (video_screen_get_frame_number(0) >> 1) % sizeof helifire_LSFR;
+	int n = (video_screen_get_frame_number(machine->primary_screen) >> 1) % sizeof helifire_LSFR;
 
 	int i;
 
@@ -385,7 +385,7 @@ VIDEO_EOF( helifire )
 				G |= B;
 			}
 
-			if (video_screen_get_frame_number(0) & 0x04)
+			if (video_screen_get_frame_number(machine->primary_screen) & 0x04)
 			{
 				R |= G;
 			}

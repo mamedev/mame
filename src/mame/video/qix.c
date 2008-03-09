@@ -125,7 +125,7 @@ static WRITE8_HANDLER( qix_videoram_w )
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -141,7 +141,7 @@ static WRITE8_HANDLER( slither_videoram_w )
 
 	/* update the screen in case the game is writing "behind" the beam -
        Zookeeper likes to do this */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 
 	/* add in the upper bit of the address latch */
 	offset += (state->videoram_address[0] & 0x80) << 8;
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( qix_addresslatch_w )
 	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( slither_addresslatch_w )
 	qix_state *state = machine->driver_data;
 
 	/* update the screen in case the game is writing "behind" the beam */
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 
 	/* compute the value at the address latch */
 	offset = (state->videoram_address[0] << 8) | state->videoram_address[1];
@@ -229,7 +229,7 @@ static WRITE8_HANDLER( qix_paletteram_w )
 	/* trigger an update if a currently visible pen has changed */
 	if (((offset >> 8) == state->palette_bank) &&
 	    (old_data != data))
-		video_screen_update_now(0);
+		video_screen_update_now(machine->primary_screen);
 }
 
 
@@ -240,7 +240,7 @@ WRITE8_HANDLER( qix_palettebank_w )
 	/* set the bank value */
 	if (state->palette_bank != (data & 3))
 	{
-		video_screen_update_now(0);
+		video_screen_update_now(machine->primary_screen);
 		state->palette_bank = data & 3;
 	}
 

@@ -350,7 +350,7 @@ static void check_collision(running_machine *machine)
 
 				/* if we got one, trigger an interrupt */
 				if ((current_collision_mask & collision_mask) && (count++ < 128))
-					timer_set(video_screen_get_time_until_pos(0, org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
+					timer_set(video_screen_get_time_until_pos(machine->primary_screen, org_1_x + sx, org_1_y + sy), NULL, current_collision_mask, collision_irq_callback);
 			}
 
 			if (*BITMAP_ADDR16(motion_object_2_vid, sy, sx) != 0xff)
@@ -358,7 +358,7 @@ static void check_collision(running_machine *machine)
 				/* check for background collision (M2CHAR) */
 				if (*BITMAP_ADDR16(background_bitmap, org_2_y + sy, org_2_x + sx) != 0)
 					if ((collision_mask & 0x08) && (count++ < 128))
-						timer_set(video_screen_get_time_until_pos(0, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
+						timer_set(video_screen_get_time_until_pos(machine->primary_screen, org_2_x + sx, org_2_y + sy), NULL, 0x08, collision_irq_callback);
 			}
 		}
 }

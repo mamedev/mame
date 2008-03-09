@@ -165,7 +165,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 			case 2:		/* /PFB */
 				if (playfield_tile_bank != (data & 7))
 				{
-					video_screen_update_partial(0, scanline - 1);
+					video_screen_update_partial(machine->primary_screen, scanline - 1);
 					playfield_tile_bank = data & 7;
 					tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
 				}
@@ -174,7 +174,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 			case 3:		/* /PFHSLD */
 				if (playfield_xscroll != (data & 0x1ff))
 				{
-					video_screen_update_partial(0, scanline - 1);
+					video_screen_update_partial(machine->primary_screen, scanline - 1);
 					tilemap_set_scrollx(atarigen_playfield_tilemap, 0, data);
 					playfield_xscroll = data & 0x1ff;
 				}
@@ -183,7 +183,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 			case 4:		/* /MOHS */
 				if (atarimo_get_xscroll(0) != (data & 0x1ff))
 				{
-					video_screen_update_partial(0, scanline - 1);
+					video_screen_update_partial(machine->primary_screen, scanline - 1);
 					atarimo_set_xscroll(0, data & 0x1ff);
 				}
 				break;
@@ -204,7 +204,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 
 				if (playfield_yscroll != ((data - offset) & 0x1ff))
 				{
-					video_screen_update_partial(0, scanline - 1);
+					video_screen_update_partial(machine->primary_screen, scanline - 1);
 					tilemap_set_scrolly(atarigen_playfield_tilemap, 0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}

@@ -65,7 +65,7 @@ INLINE UINT8 reverse_nibble(UINT8 nibble)
 static TIMER_CALLBACK( interrupt_callback )
 {
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xff);
-	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
 }
 
 /*
@@ -1478,7 +1478,7 @@ MACHINE_START( tx1 )
 	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
 
 	/* /CUDISP CRTC interrupt */
-	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
 }
 
 MACHINE_START( buggyboy )
@@ -1489,7 +1489,7 @@ MACHINE_START( buggyboy )
 	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
 
 	/* /CUDISP CRTC interrupt */
-	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
 }
 
 MACHINE_START( buggybjr )
@@ -1498,5 +1498,5 @@ MACHINE_START( buggybjr )
 	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
 
 	/* /CUDISP CRTC interrupt */
-	timer_set(video_screen_get_time_until_pos(0, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), NULL, 0, interrupt_callback);
 }

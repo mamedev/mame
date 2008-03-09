@@ -64,13 +64,13 @@ static TIMER_CALLBACK( interrupt_timer )
 
 	param = (param + 0x10) & 0xff;
 
-	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, param, 0), param);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
 	TTL7474_update(0);
 }
 
 
-static void machine_reset_common( int line )
+static void machine_reset_common(running_machine *machine, int line)
 {
 	irq_line = line;
 
@@ -86,17 +86,17 @@ static void machine_reset_common( int line )
 
 	/* start a timer to generate interrupts */
 	int_timer = timer_alloc(interrupt_timer, NULL);
-	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 MACHINE_RESET( galaxian )
 {
-	machine_reset_common(INPUT_LINE_NMI);
+	machine_reset_common(machine, INPUT_LINE_NMI);
 }
 
 MACHINE_RESET( devilfsg )
 {
-	machine_reset_common(0);
+	machine_reset_common(machine, 0);
 }
 
 

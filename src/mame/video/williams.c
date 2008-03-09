@@ -398,13 +398,13 @@ WRITE8_HANDLER( williams2_fg_select_w )
 
 READ8_HANDLER( williams_video_counter_r )
 {
-	return video_screen_get_vpos(0) & 0xfc;
+	return video_screen_get_vpos(machine->primary_screen) & 0xfc;
 }
 
 
 READ8_HANDLER( williams2_video_counter_r )
 {
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 
@@ -582,7 +582,7 @@ WRITE8_HANDLER( williams_blitter_w )
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
-			activecpu_get_pc(), video_screen_get_vpos(0),
+			activecpu_get_pc(), video_screen_get_vpos(machine->primary_screen),
 			blitterram[2], blitterram[3],
 			blitterram[4], blitterram[5],
 			blitterram[6], blitterram[7],

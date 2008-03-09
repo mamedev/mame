@@ -561,7 +561,7 @@ VIDEO_UPDATE( tceptor )
 
 	if (screen)
 	{
-		int frame = video_screen_get_frame_number(scrnum);
+		int frame = video_screen_get_frame_number(screen);
 
 		if ((frame & 1) == 1 && scrnum == 1)
 			return UPDATE_HAS_NOT_CHANGED;

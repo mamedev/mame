@@ -814,7 +814,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 		scanline = 64;
 
 	/* the vertical synch chain is clocked by H256 -- this is probably not important, but oh well */
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -845,7 +845,7 @@ static MACHINE_RESET( bosco )
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL);
 
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
 static MACHINE_RESET( galaga )
@@ -862,7 +862,7 @@ static MACHINE_RESET( galaga )
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_54XX, NULL);
 
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
 static MACHINE_RESET( xevious )
@@ -879,7 +879,7 @@ static MACHINE_RESET( xevious )
 		NAMCOIO_50XX, NULL,
 		NAMCOIO_54XX, NULL);
 
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
 static MACHINE_RESET( battles )
@@ -892,7 +892,7 @@ static MACHINE_RESET( battles )
 
 	battles_customio_init();
 
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
 static MACHINE_RESET( digdug )
@@ -909,7 +909,7 @@ static MACHINE_RESET( digdug )
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL);
 
-	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(0, 64, 0), 64);
+	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
 
 

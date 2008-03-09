@@ -295,7 +295,7 @@ INLINE int v_to_scanline(int v)
 }
 
 
-INLINE void schedule_next_irq(int curv)
+INLINE void schedule_next_irq(running_machine *machine, int curv)
 {
 	/* IRQ = /32V, clocked by /16V ^ flip */
 	/* When not flipped, clocks on 0, 64, 128, 192 */
@@ -306,7 +306,7 @@ INLINE void schedule_next_irq(int curv)
 		curv = ((curv + 32) & 0xff) & ~0x10;
 
 	/* next one at the start of this scanline */
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, v_to_scanline(curv), 0), curv);
 }
 
 
@@ -319,16 +319,16 @@ static TIMER_CALLBACK( clock_irq )
 	cpunum_set_input_line(machine, 0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
-	video_screen_update_partial(0, v_to_scanline(curv));
+	video_screen_update_partial(machine->primary_screen, v_to_scanline(curv));
 
 	/* find the next edge */
-	schedule_next_irq(curv);
+	schedule_next_irq(machine, curv);
 }
 
 
 static CUSTOM_INPUT( get_vblank )
 {
-	int v = scanline_to_v(video_screen_get_vpos(0));
+	int v = scanline_to_v(video_screen_get_vpos(machine->primary_screen));
 	return v < 24;
 }
 
@@ -352,7 +352,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* scanline for the next run */
 	curv ^= 224;
-	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(curv), 0), curv);
+	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(machine->primary_screen, v_to_scanline(curv), 0), curv);
 }
 
 
@@ -393,12 +393,12 @@ static MACHINE_START( missile )
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(adjust_cpu_speed, NULL);
-	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(0, v_to_scanline(0), 0), 0);
+	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(machine->primary_screen, v_to_scanline(0), 0), 0);
 
 	/* create a timer for IRQs and set up the first callback */
 	irq_timer = timer_alloc(clock_irq, NULL);
 	irq_state = 0;
-	schedule_next_irq(-32);
+	schedule_next_irq(machine, -32);
 
 	/* setup for save states */
 	state_save_register_global(irq_state);

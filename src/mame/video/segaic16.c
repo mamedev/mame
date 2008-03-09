@@ -498,7 +498,7 @@ void segaic16_set_display_enable(int enable)
 	enable = (enable != 0);
 	if (segaic16_display_enable != enable)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		segaic16_display_enable = enable;
 	}
 }
@@ -1179,14 +1179,14 @@ static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	timer_set(video_screen_get_time_until_pos(0, 261, 0), NULL, param, segaic16_tilemap_16b_latch_values);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 261, 0), NULL, param, segaic16_tilemap_16b_latch_values);
 }
 
 
 static void segaic16_tilemap_16b_reset(struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(video_screen_get_time_until_pos(0, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
+	timer_set(video_screen_get_time_until_pos(Machine->primary_screen, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
 }
 
 
@@ -1347,7 +1347,7 @@ void segaic16_tilemap_set_bank(int which, int banknum, int offset)
 
 	if (info->bank[banknum] != offset)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->bank[banknum] = offset;
 		tilemap_mark_all_tiles_dirty(NULL);
 	}
@@ -1369,7 +1369,7 @@ void segaic16_tilemap_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->flip = flip;
 		tilemap_set_flip(info->textmap, flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1392,7 +1392,7 @@ void segaic16_tilemap_set_rowscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->rowscroll = enable;
 	}
 }
@@ -1412,7 +1412,7 @@ void segaic16_tilemap_set_colscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->colscroll = enable;
 	}
 }
@@ -1436,7 +1436,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap[0].textmap, offset);
@@ -2761,7 +2761,7 @@ void segaic16_sprites_set_bank(int which, int banknum, int offset)
 
 	if (info->bank[banknum] != offset)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->bank[banknum] = offset;
 	}
 }
@@ -2781,7 +2781,7 @@ void segaic16_sprites_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->flip = flip;
 	}
 }
@@ -2801,7 +2801,7 @@ void segaic16_sprites_set_shadow(int which, int shadow)
 	shadow = (shadow != 0);
 	if (info->shadow != shadow)
 	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 		info->shadow = shadow;
 	}
 }

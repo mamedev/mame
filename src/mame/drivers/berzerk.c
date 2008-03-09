@@ -167,7 +167,7 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_irq_number);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_irq_number);
 }
 
 
@@ -177,10 +177,10 @@ static void create_irq_timer(void)
 }
 
 
-static void start_irq_timer(void)
+static void start_irq_timer(running_machine *machine)
 {
 	int vpos = vysnc_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -244,7 +244,7 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(0, next_vpos, 0), next_nmi_number);
+	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_nmi_number);
 }
 
 
@@ -254,10 +254,10 @@ static void create_nmi_timer(void)
 }
 
 
-static void start_nmi_timer(void)
+static void start_nmi_timer(running_machine *machine)
 {
 	int vpos = vysnc_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(0, vpos, 0), 0);
+	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
 
@@ -296,8 +296,8 @@ static MACHINE_RESET( berzerk )
 	set_led_status(0, 0);
 	magicram_control = 0;
 
-	start_irq_timer();
-	start_nmi_timer();
+	start_irq_timer(machine);
+	start_nmi_timer(machine);
 }
 
 
@@ -377,7 +377,7 @@ static READ8_HANDLER( intercept_v256_r )
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vysnc_chain_counter(video_screen_get_vpos(0), &counter, &v256);
+	vpos_to_vysnc_chain_counter(video_screen_get_vpos(machine->primary_screen), &counter, &v256);
 
 	return (!intercept << 7) | v256;
 }

@@ -545,7 +545,7 @@ static WRITE8_HANDLER( turbo_8279_w )
 static READ8_HANDLER( turbo_collision_r )
 {
 	turbo_state *state = Machine->driver_data;
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	return readinputport(3) | (state->turbo_collision & 15);
 }
 
@@ -553,7 +553,7 @@ static READ8_HANDLER( turbo_collision_r )
 static WRITE8_HANDLER( turbo_collision_clear_w )
 {
 	turbo_state *state = Machine->driver_data;
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 	state->turbo_collision = 0;
 }
 

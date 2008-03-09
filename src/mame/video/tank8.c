@@ -234,7 +234,7 @@ VIDEO_EOF( tank8 )
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 		const UINT16* p3 = BITMAP_ADDR16(helper3, y, 0);
 
-		if (y % 2 != video_screen_get_frame_number(0) % 2)
+		if (y % 2 != video_screen_get_frame_number(machine->primary_screen) % 2)
 			continue; /* video display is interlaced */
 
 		for (x = clip->min_x; x <= clip->max_x; x++)
@@ -293,7 +293,7 @@ VIDEO_EOF( tank8 )
 					index |= 0x80; /* collision on right side */
 			}
 
-			timer_set(video_screen_get_time_until_pos(0, y, x), NULL, index, tank8_collision_callback);
+			timer_set(video_screen_get_time_until_pos(machine->primary_screen, y, x), NULL, index, tank8_collision_callback);
 
 			state = 1;
 		}

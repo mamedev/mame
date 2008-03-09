@@ -320,16 +320,16 @@ curr_scanline = scanline;//for debugging
 	}
 
 
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 //debug
-logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(0));
+logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(machine->primary_screen));
 
 	scanline ++;
 	if (scanline>=264)
 		scanline=0;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -361,7 +361,7 @@ static MACHINE_START( tubep )
 
 static MACHINE_RESET( tubep )
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -502,15 +502,15 @@ curr_scanline = scanline;//for debugging
 	}
 
 
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
-logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(0));
+logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(machine->primary_screen));
 
 	scanline ++;
 	if (scanline>=264)
 		scanline=0;
 
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -524,7 +524,7 @@ static MACHINE_START( rjammer )
 
 static MACHINE_RESET( rjammer )
 {
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 

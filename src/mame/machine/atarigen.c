@@ -171,7 +171,7 @@ void atarigen_update_interrupts(void)
 
 void atarigen_scanline_int_set(int scrnum, int scanline)
 {
-	timer_adjust_oneshot(scanline_interrupt_timer, video_screen_get_time_until_pos(scrnum, scanline, 0), scrnum);
+	timer_adjust_oneshot(scanline_interrupt_timer, video_screen_get_time_until_pos_scrnum(scrnum, scanline, 0), scrnum);
 }
 
 
@@ -275,7 +275,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	atarigen_scanline_int_gen(machine, 0);
 
 	/* set a new timer to go off at the same scan line next frame */
-	timer_adjust_oneshot(scanline_interrupt_timer, video_screen_get_frame_period(param), param);
+	timer_adjust_oneshot(scanline_interrupt_timer, video_screen_get_frame_period_scrnum(param), param);
 }
 
 
@@ -853,7 +853,7 @@ void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_func update_gra
 
 	/* set a timer to go off at scanline 0 */
 	if (scanline_callback != NULL)
-		timer_adjust_oneshot(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), (scrnum << 16) | 0);
+		timer_adjust_oneshot(scanline_timer[scrnum], video_screen_get_time_until_pos_scrnum(scrnum, 0, 0), (scrnum << 16) | 0);
 }
 
 
@@ -876,7 +876,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		scanline += scanlines_per_callback;
 		if (scanline >= machine->screen[scrnum].height)
 			scanline = 0;
-		timer_adjust_oneshot(scanline_timer[scrnum], video_screen_get_time_until_pos(scrnum, scanline, 0), (scrnum << 16) | scanline);
+		timer_adjust_oneshot(scanline_timer[scrnum], video_screen_get_time_until_pos_scrnum(scrnum, scanline, 0), (scrnum << 16) | scanline);
 	}
 }
 
@@ -913,7 +913,7 @@ static TIMER_CALLBACK( atarivc_eof_update )
 		tilemap_set_scrollx(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_xscroll);
 		tilemap_set_scrolly(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_yscroll);
 	}
-	timer_adjust_oneshot(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
+	timer_adjust_oneshot(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos_scrnum(scrnum, 0, 0), scrnum);
 
 	/* use this for debugging the video controller values */
 #if 0
@@ -954,7 +954,7 @@ void atarivc_reset(int scrnum, UINT16 *eof_data, int playfields)
 
 	/* start a timer to go off a little before scanline 0 */
 	if (atarivc_eof_data)
-		timer_adjust_oneshot(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos(scrnum, 0, 0), scrnum);
+		timer_adjust_oneshot(atarivc_eof_update_timer[scrnum], video_screen_get_time_until_pos_scrnum(scrnum, 0, 0), scrnum);
 }
 
 
@@ -1013,7 +1013,7 @@ static void atarivc_common_w(running_machine *machine, int scrnum, offs_t offset
 			/* check for palette banking */
 			if (atarivc_state.palette_bank != (((newword & 0x0400) >> 10) ^ 1))
 			{
-				video_screen_update_partial(scrnum, video_screen_get_vpos(scrnum));
+				video_screen_update_partial_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum));
 				atarivc_state.palette_bank = ((newword & 0x0400) >> 10) ^ 1;
 			}
 			break;
@@ -1095,7 +1095,7 @@ READ16_HANDLER( atarivc_r )
 	/* also sets bit 0x4000 if we're in VBLANK */
 	if (offset == 0)
 	{
-		int result = video_screen_get_vpos(0);	/* need to support scrum */
+		int result = video_screen_get_vpos(machine->primary_screen);	/* need to support scrum */
 
 		if (result > 255)
 			result = 255;
@@ -1289,7 +1289,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w )
 
 int atarigen_get_hblank(running_machine *machine, int scrnum)
 {
-	return (video_screen_get_hpos(scrnum) > (machine->screen[scrnum].width * 9 / 10));
+	return (video_screen_get_hpos_scrnum(scrnum) > (machine->screen[scrnum].width * 9 / 10));
 }
 
 
@@ -1301,7 +1301,7 @@ int atarigen_get_hblank(running_machine *machine, int scrnum)
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
 {
 	/* halt the CPU until the next HBLANK */
-	int hpos = video_screen_get_hpos(0);	/* need to support scrnum */
+	int hpos = video_screen_get_hpos(machine->primary_screen);	/* need to support scrnum */
 	int hblank = Machine->screen[0].width * 9 / 10;
 	double fraction;
 
@@ -1311,7 +1311,7 @@ WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)Machine->screen[0].width;
-	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(0)) * fraction), NULL, 0, unhalt_cpu);
+	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(machine->primary_screen)) * fraction), NULL, 0, unhalt_cpu);
 	cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 }
 

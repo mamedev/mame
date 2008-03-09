@@ -314,7 +314,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void cosmica_draw_starfield(bitmap_t *bitmap, const rectangle *cliprect)
+static void cosmica_draw_starfield(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y = 0;
 	UINT8 map = 0;
@@ -333,9 +333,9 @@ static void cosmica_draw_starfield(bitmap_t *bitmap, const rectangle *cliprect)
 			int hc, hb_;
 
 			if (flip_screen_get())
-				x1 = x - video_screen_get_frame_number(0);
+				x1 = x - video_screen_get_frame_number(screen);
 			else
-				x1 = x + video_screen_get_frame_number(0);
+				x1 = x + video_screen_get_frame_number(screen);
 
 			hc  = (x1 >> 2) & 0x01;
 			hb_ = (x  >> 5) & 0x01;  /* not a bug, this one is the real x */
@@ -421,10 +421,10 @@ static void devzone_draw_grid(bitmap_t *bitmap, const rectangle *cliprect)
 }
 
 
-static void nomnlnd_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
+static void nomnlnd_draw_background(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 y = 0;
-	UINT8 water = video_screen_get_frame_number(0);
+	UINT8 water = video_screen_get_frame_number(screen);
 	UINT8 *PROM = memory_region(REGION_USER2);
 
 	/* all positioning is via logic gates:
@@ -563,7 +563,7 @@ VIDEO_UPDATE( panic )
 VIDEO_UPDATE( cosmica )
 {
 	fillbitmap(bitmap, 0, cliprect);
-	cosmica_draw_starfield(bitmap, cliprect);
+	cosmica_draw_starfield(screen, bitmap, cliprect);
 	draw_bitmap(bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0);
 	return 0;
@@ -602,7 +602,7 @@ VIDEO_UPDATE( nomnlnd )
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 
 	if (background_enable)
-		nomnlnd_draw_background(bitmap, cliprect);
+		nomnlnd_draw_background(screen, bitmap, cliprect);
 
 	return 0;
 }

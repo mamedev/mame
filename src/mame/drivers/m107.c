@@ -52,7 +52,7 @@ static MACHINE_START( m107 )
 
 static MACHINE_RESET( m107 )
 {
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 /*****************************************************************************/
@@ -64,21 +64,21 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	/* raster interrupt */
 	if (scanline == m107_raster_irq_position)
 	{
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == machine->screen[0].visarea.max_y + 1)
 	{
-		video_screen_update_partial(0, scanline);
+		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_0);
 	}
 
 	/* adjust for next scanline */
 	if (++scanline >= machine->screen[0].height)
 		scanline = 0;
-	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 

@@ -211,11 +211,8 @@ void hdgsp_read_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 
 static void update_palette_bank(int newbank)
 {
-	if (gfx_palettebank != newbank)
-	{
-		video_screen_update_partial(0, video_screen_get_vpos(0));
-		gfx_palettebank = newbank;
-	}
+	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+	gfx_palettebank = newbank;
 }
 
 
@@ -276,11 +273,8 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 
 		case 0x01:
 			data = data & (15 >> hdgsp_multisync);
-			if (gfx_finescroll != data)
-			{
-				video_screen_update_partial(0, video_screen_get_vpos(0) - 1);
-				gfx_finescroll = data;
-			}
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+			gfx_finescroll = data;
 			break;
 
 		case 0x02:

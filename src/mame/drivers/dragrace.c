@@ -37,7 +37,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 
 static MACHINE_RESET( dragrace )
 {
-	timer_pulse(video_screen_get_frame_period(0), NULL, 0, dragrace_frame_callback);
+	timer_pulse(video_screen_get_frame_period(machine->primary_screen), NULL, 0, dragrace_frame_callback);
 }
 
 static void dragrace_update_misc_flags(running_machine *machine)
@@ -165,7 +165,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 static READ8_HANDLER( dragrace_scanline_r )
 {
-	return (video_screen_get_vpos(0) ^ 0xf0) | 0x0f;
+	return (video_screen_get_vpos(machine->primary_screen) ^ 0xf0) | 0x0f;
 }
 
 

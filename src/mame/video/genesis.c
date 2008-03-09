@@ -252,8 +252,7 @@ void start_system18_vdp(void)
 /* set the display enable bit */
 void segac2_enable_display(int enable)
 {
-	if (!video_screen_get_vblank(0))
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 	display_enable = enable;
 }
 
@@ -348,8 +347,8 @@ READ16_HANDLER( genesis_vdp_r )
 		case 0x06:
 		case 0x07:
 		{
-			int xpos = video_screen_get_hpos(0);
-			int ypos = video_screen_get_vpos(0);
+			int xpos = video_screen_get_hpos(machine->primary_screen);
+			int ypos = video_screen_get_vpos(machine->primary_screen);
 
 			/* adjust for the weird counting rules */
 			if (xpos > 0xe9) xpos -= (342 - 0x100);
@@ -468,11 +467,10 @@ static void vdp_data_w(int data)
 	{
 		case 0x01:		/* VRAM write */
 
-			/* if the hscroll RAM is changing during screen refresh, force an update */
-			if (!video_screen_get_vblank(0) &&
-				vdp_address >= vdp_hscrollbase &&
+			/* if the hscroll RAM is changing, force an update */
+			if (vdp_address >= vdp_hscrollbase &&
 				vdp_address < vdp_hscrollbase + vdp_hscrollsize)
-				video_screen_update_partial(0, video_screen_get_vpos(0));
+				video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 
 			/* write to VRAM */
 			if (vdp_address & 1)
@@ -490,9 +488,8 @@ static void vdp_data_w(int data)
 
 		case 0x05:		/* VSRAM write */
 
-			/* if the vscroll RAM is changing during screen refresh, force an update */
-			if (!video_screen_get_vblank(0))
-				video_screen_update_partial(0, video_screen_get_vpos(0));
+			/* vscroll RAM is changing, force an update */
+			video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 
 			/* write to VSRAM */
 			if (vdp_address & 1)
@@ -554,11 +551,11 @@ static int vdp_control_r(void)
 	vdp_cmdpart = 0;
 
 	/* set the VBLANK bit */
-	if (video_screen_get_vblank(0))
+	if (video_screen_get_vblank(Machine->primary_screen))
 		status |= 0x0008;
 
 	/* set the HBLANK bit */
-	if (video_screen_get_hblank(0))
+	if (video_screen_get_hblank(Machine->primary_screen))
 		status |= 0x0004;
 
 	return (status);
@@ -572,7 +569,7 @@ static void vdp_control_w(int data)
 	{
 		/* if 10xxxxxx xxxxxxxx this is a register setting command */
 		if ((data & 0xc000) == 0x8000)
-			vdp_register_w(data, video_screen_get_vblank(0));
+			vdp_register_w(data, video_screen_get_vblank(Machine->primary_screen));
 
 		/* otherwise this is the First part of a mode setting command */
 		else
@@ -604,10 +601,9 @@ static void vdp_register_w(int data, int vblank)
 
 	genesis_vdp_regs[regnum] = regdat;
 
-	/* these are mostly important writes; force an update if they */
-	/* are written during a screen refresh */
-	if (!vblank && is_important[regnum])
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+	/* these are mostly important writes; force an update if they written */
+	if (is_important[regnum])
+		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
 
 	/* For quite a few of the registers its a good idea to set a couple of variable based
        upon the writes here */
@@ -672,11 +668,11 @@ static void vdp_register_w(int data, int vblank)
 			{
 				screen_state *state = &Machine->screen[genesis_screen_number];
 				rectangle visarea = state->visarea;
-				attoseconds_t refresh = video_screen_get_frame_period(genesis_screen_number).attoseconds;
+				attoseconds_t refresh = video_screen_get_frame_period_scrnum(genesis_screen_number).attoseconds;
 
 				/* this gets called from the init! */
 				visarea.max_x = scrwidth*8-1;
-				video_screen_configure(genesis_screen_number, scrwidth*8, state->height, &visarea, refresh);
+				video_screen_configure_scrnum(genesis_screen_number, scrwidth*8, state->height, &visarea, refresh);
 			}
 			break;
 

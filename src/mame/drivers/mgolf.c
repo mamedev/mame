@@ -103,11 +103,9 @@ static TIMER_CALLBACK( interrupt_callback )
 	scanline = scanline + 32;
 
 	if (scanline >= 262)
-	{
 		scanline = 16;
-	}
 
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
@@ -119,7 +117,7 @@ static double calc_plunger_pos(void)
 
 static MACHINE_RESET( mgolf )
 {
-	timer_set(video_screen_get_time_until_pos(0, 16, 0), NULL, 16, interrupt_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
 }
 
 

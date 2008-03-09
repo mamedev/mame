@@ -61,14 +61,11 @@ static struct
 	UINT8 oldrol;
 } joypad[4];
 
-// quick extern to fix missing header
-extern attotime video_screen_get_time_until_pos(int scrnum, int vpos, int hpos);
-
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
 static void snes_latch_counters(void)
 {
-	snes_ppu.beam.current_horz = video_screen_get_hpos(0) / snes_htmult;
-	snes_ppu.beam.latch_vert = video_screen_get_vpos(0);
+	snes_ppu.beam.current_horz = video_screen_get_hpos(Machine->primary_screen) / snes_htmult;
+	snes_ppu.beam.latch_vert = video_screen_get_vpos(Machine->primary_screen);
 	snes_ppu.beam.latch_horz = snes_ppu.beam.current_horz;
 	snes_ram[STAT78] |= 0x40;	// indicate we latched
 	read_ophct = read_opvct = 0;	// clear read flags
@@ -108,7 +105,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	cpuintrf_push_context(0);
 
 	/* Increase current line - we want to latch on this line during it, not after it */
-	snes_ppu.beam.current_vert = video_screen_get_vpos(0);
+	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
 
 	// not in hblank
 	snes_ram[HVBJOY] &= ~0x40;
@@ -148,7 +145,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			}
 			else
 			{
-				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
+				timer_adjust_oneshot(snes_hirq_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, pixel*snes_htmult), 0);
 			}
 		}
     	}
@@ -230,7 +227,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	cpuintrf_pop_context();
 
 	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
-	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(0, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0);
+	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0);
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
@@ -238,7 +235,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 {
 	int nextscan;
 
-	snes_ppu.beam.current_vert = video_screen_get_vpos(0);
+	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
 
 	/* make sure we halt */
 	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
@@ -249,15 +246,13 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
 	{
-		if (video_screen_get_vpos(0) > 0)
+		if (video_screen_get_vpos(machine->primary_screen) > 0)
 		{
 			/* Do HDMA */
 			if( snes_ram[HDMAEN] )
-			{
 				snes_hdma();
-			}
 
-			video_screen_update_partial(0, snes_ppu.beam.current_vert-1);
+			video_screen_update_partial(machine->primary_screen, snes_ppu.beam.current_vert-1);
 		}
 	}
 
@@ -273,7 +268,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		nextscan = 0;
 	}
 
-	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(0, nextscan, 0), 0);
+	timer_adjust_oneshot(snes_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, nextscan, 0), 0);
 }
 
 static void snes_init_ram(running_machine *machine)
@@ -330,13 +325,13 @@ static void snes_init_ram(running_machine *machine)
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	hblank_offset = 268;
-	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(0, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
+	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, ((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC-1 : SNES_VTOTAL_PAL-1, hblank_offset), 0);
 
 	// check if DSP1 is present (maybe not 100%?)
 	has_dsp1 = ((snes_r_bank1(machine,0xffd6) >= 3) && (snes_r_bank1(machine,0xffd6) <= 5)) ? 1 : 0;
 
 	// init frame counter so first line is 0
-	if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) >= 59 )
+	if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) >= 59 )
 	{
 		snes_ppu.beam.current_vert = SNES_VTOTAL_NTSC;
 	}
@@ -379,9 +374,9 @@ MACHINE_RESET( snes )
 	snes_init_ram(machine);
 
 	/* Set STAT78 to NTSC or PAL */
-	if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) >= 59.0f )
+	if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) >= 59.0f )
 		snes_ram[STAT78] = SNES_NTSC;
-	else /* if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(0).attoseconds) == 50.0f ) */
+	else /* if( ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds) == 50.0f ) */
 		snes_ram[STAT78] = SNES_PAL;
 
 	// reset does this to these registers
@@ -910,7 +905,7 @@ READ8_HANDLER( snes_r_io )
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (video_screen_get_hpos(0) >= 363) snes_ram[offset] |= 0x40;
+//          if (video_screen_get_hpos(machine->primary_screen) >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
 			return snes_ram[offset];
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
@@ -1109,13 +1104,9 @@ WRITE8_HANDLER( snes_w_io )
 				}
 
 				if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-				{
-					video_screen_configure(0, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, video_screen_get_frame_period(0).attoseconds);
-				}
+					video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 				else
-				{
-					video_screen_configure(0, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(0).attoseconds);
-				}
+					video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
 			}
 
 			snes_ppu.layer[0].tile_size = (data >> 4) & 0x1;

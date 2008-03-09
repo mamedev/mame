@@ -1691,7 +1691,7 @@ static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const
 
 
 
-static void cps1_render_stars(bitmap_t *bitmap,const rectangle *cliprect)
+static void cps1_render_stars(const device_config *screen, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *stars_rom = memory_region(REGION_GFX2);
@@ -1721,7 +1721,7 @@ static void cps1_render_stars(bitmap_t *bitmap,const rectangle *cliprect)
 					sy = 255 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(0)/16 & 0x0f);
+				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(screen)/16 & 0x0f);
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
@@ -1747,7 +1747,7 @@ static void cps1_render_stars(bitmap_t *bitmap,const rectangle *cliprect)
 					sy = 255 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(0)/16 & 0x0f);
+				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(screen)/16 & 0x0f);
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
@@ -1847,7 +1847,7 @@ VIDEO_UPDATE( cps1 )
 	/* Blank screen */
 	fillbitmap(bitmap,4095,cliprect);
 
-	cps1_render_stars(bitmap,cliprect);
+	cps1_render_stars(screen, bitmap,cliprect);
 
 	/* Draw layers (0 = sprites, 1-3 = tilemaps) */
 	l0 = (layercontrol >> 0x06) & 03;

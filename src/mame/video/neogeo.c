@@ -245,13 +245,12 @@ static TIMER_CALLBACK( auto_animation_timer_callback )
 	if (auto_animation_frame_counter == 0)
 	{
 		auto_animation_frame_counter = auto_animation_speed;
-
 		auto_animation_counter = auto_animation_counter + 1;
 	}
 	else
 		auto_animation_frame_counter = auto_animation_frame_counter - 1;
 
-	timer_adjust_oneshot(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0);
+	timer_adjust_oneshot(auto_animation_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VSSTART, 0), 0);
 }
 
 
@@ -261,9 +260,9 @@ static void create_auto_animation_timer(void)
 }
 
 
-static void start_auto_animation_timer(void)
+static void start_auto_animation_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(auto_animation_timer, video_screen_get_time_until_pos(0, NEOGEO_VSSTART, 0), 0);
+	timer_adjust_oneshot(auto_animation_timer, video_screen_get_time_until_pos(machine->primary_screen, NEOGEO_VSSTART, 0), 0);
 }
 
 
@@ -666,14 +665,14 @@ static TIMER_CALLBACK( sprite_line_timer_callback )
 	/* we are at the beginning of a scanline -
        we need to draw the previous scanline and parse the sprites on the current one */
     if (scanline != 0)
-    	video_screen_update_partial(0, scanline - 1);
+    	video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	parse_sprites(scanline);
 
 	/* let's come back at the beginning of the next line */
 	scanline = (scanline + 1) % NEOGEO_VTOTAL;
 
-	timer_adjust_oneshot(sprite_line_timer, video_screen_get_time_until_pos(0, scanline, 0), scanline);
+	timer_adjust_oneshot(sprite_line_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
 
@@ -683,9 +682,9 @@ static void create_sprite_line_timer(void)
 }
 
 
-static void start_sprite_line_timer(void)
+static void start_sprite_line_timer(running_machine *machine)
 {
-	timer_adjust_oneshot(sprite_line_timer, video_screen_get_time_until_pos(0, 0, 0), 0);
+	timer_adjust_oneshot(sprite_line_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 
@@ -751,7 +750,7 @@ static void optimize_sprite_data(void)
  *
  *************************************/
 
-static UINT16 get_video_control(void)
+static UINT16 get_video_control(running_machine *machine)
 {
 	UINT16 ret;
 	UINT16 v_counter;
@@ -778,7 +777,7 @@ static UINT16 get_video_control(void)
     */
 
 	/* the vertical counter chain goes from 0xf8 - 0x1ff */
-	v_counter = video_screen_get_vpos(0) + 0x100;
+	v_counter = video_screen_get_vpos(machine->primary_screen) + 0x100;
 
 	if (v_counter >= 0x200)
 		v_counter = v_counter - NEOGEO_VTOTAL;
@@ -818,7 +817,7 @@ READ16_HANDLER( neogeo_video_register_r )
 		case 0x00:
 		case 0x01: ret = get_videoram_data(); break;
 		case 0x02: ret = get_videoram_modulo(); break;
-		case 0x03: ret = get_video_control(); break;
+		case 0x03: ret = get_video_control(machine); break;
 		}
 	}
 
@@ -913,8 +912,8 @@ VIDEO_START( neogeo )
 
 VIDEO_RESET( neogeo )
 {
-	start_sprite_line_timer();
-	start_auto_animation_timer();
+	start_sprite_line_timer(machine);
+	start_auto_animation_timer(machine);
 }
 
 

@@ -129,8 +129,8 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 
 			/* set a timer to turn the interrupt on at HBLANK of the 7th scanline */
 			/* and another to turn it off one scanline later */
-			period_on  = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 7, machine->screen[scrnum].width * 0.9);
-			period_off = video_screen_get_time_until_pos(scrnum, video_screen_get_vpos(scrnum) + 8, machine->screen[scrnum].width * 0.9);
+			period_on  = video_screen_get_time_until_pos_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum) + 7, machine->screen[scrnum].width * 0.9);
+			period_off = video_screen_get_time_until_pos_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum) + 8, machine->screen[scrnum].width * 0.9);
 
 			timer_set(period_on, NULL,  0, irq_on);
 			timer_set(period_off, NULL, 0, irq_off);

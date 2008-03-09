@@ -48,7 +48,7 @@ VIDEO_START( changela )
 	tree1_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
 
 	changela_scanline_timer = timer_alloc(changela_scanline_callback, NULL);
-	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(0, 30, 0), 30);
+	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 30, 0), 30);
 
 	state_save_register_global(slopeROM_bank);
 	state_save_register_global(tree_en);
@@ -738,7 +738,7 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	sy++;
 	if(sy > 256) sy = 30;
-	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(0, sy, 0), sy);
+	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, sy, 0), sy);
 }
 
 VIDEO_UPDATE( changela )

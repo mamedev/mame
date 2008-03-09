@@ -147,7 +147,7 @@ INLINE void update_interrupts(void)
 static TIMER_CALLBACK( tms34061_interrupt )
 {
 	/* set timer for next frame */
-	timer_adjust_oneshot(tms34061.timer, video_screen_get_frame_period(tms34061.intf.scrnum), 0);
+	timer_adjust_oneshot(tms34061.timer, video_screen_get_frame_period_scrnum(tms34061.intf.scrnum), 0);
 
 	/* set the interrupt bit in the status reg */
 	tms34061.regs[TMS34061_STATUS] |= 1;
@@ -172,7 +172,7 @@ static WRITE8_HANDLER( register_w )
 	/* certain registers affect the display directly */
 	if ((regnum >= TMS34061_HORENDSYNC && regnum <= TMS34061_DISPSTART) ||
 		(regnum == TMS34061_CONTROL2))
-		video_screen_update_partial(0, video_screen_get_vpos(0));
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* store the hi/lo half */
 	if (offset & 0x02)
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( register_w )
 			if (scanline < 0)
 				scanline += tms34061.regs[TMS34061_VERTOTAL];
 
-			timer_adjust_oneshot(tms34061.timer, video_screen_get_time_until_pos(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
+			timer_adjust_oneshot(tms34061.timer, video_screen_get_time_until_pos_scrnum(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
 			break;
 
 		/* XY offset: set the X and Y masks */
@@ -251,7 +251,7 @@ static READ8_HANDLER( register_r )
 
 		/* vertical count register: return the current scanline */
 		case TMS34061_VERCOUNTER:
-			result = (video_screen_get_vpos(0)+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
+			result = (video_screen_get_vpos(machine->primary_screen)+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
 			break;
 	}
 

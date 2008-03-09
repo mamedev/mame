@@ -157,7 +157,7 @@ int ccastles_vblank_end;
  *
  *************************************/
 
-INLINE void schedule_next_irq(int curscanline)
+INLINE void schedule_next_irq(running_machine *machine, int curscanline)
 {
 	/* scan for a rising edge on the IRQCK signal */
 	for (curscanline++; ; curscanline = (curscanline + 1) & 0xff)
@@ -165,7 +165,7 @@ INLINE void schedule_next_irq(int curscanline)
 			break;
 
 	/* next one at the start of this scanline */
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(0, curscanline, 0), curscanline);
+	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, curscanline, 0), curscanline);
 }
 
 
@@ -179,16 +179,16 @@ static TIMER_CALLBACK( clock_irq )
 	}
 
 	/* force an update now */
-	video_screen_update_partial(0, video_screen_get_vpos(0));
+	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 
 	/* find the next edge */
-	schedule_next_irq(param);
+	schedule_next_irq(machine, param);
 }
 
 
 static CUSTOM_INPUT( get_vblank )
 {
-	int scanline = video_screen_get_vpos(0);
+	int scanline = video_screen_get_vpos(machine->primary_screen);
 	return syncprom[scanline & 0xff] & 1;
 }
 
@@ -227,7 +227,7 @@ static MACHINE_START( ccastles )
 	visarea.max_x = 255;
 	visarea.min_y = ccastles_vblank_end;
 	visarea.max_y = ccastles_vblank_start - 1;
-	video_screen_configure(0, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	video_screen_configure(machine->primary_screen, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0xa000, 0x6000);
@@ -235,7 +235,7 @@ static MACHINE_START( ccastles )
 	/* create a timer for IRQs and set up the first callback */
 	irq_timer = timer_alloc(clock_irq, NULL);
 	irq_state = 0;
-	schedule_next_irq(0);
+	schedule_next_irq(machine, 0);
 
 	/* allocate backing memory for the NVRAM */
 	generic_nvram = auto_malloc(generic_nvram_size);

@@ -101,7 +101,7 @@ WRITE16_HANDLER( badlands_pf_bank_w )
 	if (ACCESSING_LSB)
 		if (playfield_tile_bank != (data & 1))
 		{
-			video_screen_update_partial(0, video_screen_get_vpos(0));
+			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 			playfield_tile_bank = data & 1;
 			tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
 		}

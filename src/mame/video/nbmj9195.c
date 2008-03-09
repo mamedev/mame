@@ -132,7 +132,7 @@ static void nbmj9195_blitter_w(int vram, int offset, int data)
 					break;
 		case 0x01:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	nbmj9195_scrollx[vram] = (nbmj9195_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100);
-					new_line = video_screen_get_vpos(0);
+					new_line = video_screen_get_vpos(Machine->primary_screen);
 					if (nbmj9195_flipscreen[vram])
 					{
 						for ( ; nbmj9195_scanline[vram] < new_line; nbmj9195_scanline[vram]++)

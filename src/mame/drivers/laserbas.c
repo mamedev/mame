@@ -121,7 +121,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(video_screen_get_vblank(0))
+	if(video_screen_get_vblank(machine->primary_screen))
 		 cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);

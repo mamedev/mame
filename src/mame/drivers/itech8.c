@@ -586,7 +586,7 @@ static INTERRUPT_GEN( generate_nmi )
 	itech8_update_interrupts(machine, 1, -1, -1);
 	itech8_update_interrupts(machine, 0, -1, -1);
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(0));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }
 
 
@@ -623,7 +623,7 @@ static MACHINE_START( sstrike )
 	MACHINE_START_CALL(itech8);
 
 	/* we need to update behind the beam as well */
-	timer_set(video_screen_get_time_until_pos(0, 0, 0), NULL, 32, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 32, behind_the_beam_update);
 }
 
 static MACHINE_RESET( itech8 )
@@ -649,7 +649,7 @@ static MACHINE_RESET( itech8 )
 	/* set the visible area */
 	if (visarea)
 	{
-		video_screen_set_visarea(0, visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
+		video_screen_set_visarea(machine->primary_screen, visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
 		visarea = NULL;
 	}
 }
@@ -668,14 +668,14 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	int interval = param & 0xff;
 
 	/* force a partial update to the current scanline */
-	video_screen_update_partial(0, scanline);
+	video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* advance by the interval, and wrap to 0 */
 	scanline += interval;
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(video_screen_get_time_until_pos(0, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
 }
 
 

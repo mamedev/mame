@@ -296,14 +296,14 @@ GetCPURegister(int which)
 static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 {
 	int irqlevel = GetCPURegister(0x04)>>4;
-	video_screen_update_partial(0, param);
+	video_screen_update_partial(machine->primary_screen, param);
 	cpunum_set_input_line(machine, 0, irqlevel, PULSE_LINE);
 }
 
 static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
 	int irqlevel = GetCPURegister(0x02);
-	video_screen_update_partial(0, param);
+	video_screen_update_partial(machine->primary_screen, param);
 	cpunum_set_input_line(machine, 0, irqlevel, PULSE_LINE);
 } /* namconb2_TriggerPOSIRQ */
 
@@ -343,13 +343,10 @@ static INTERRUPT_GEN( namconb2_interrupt )
 	cpunum_set_input_line(machine, 0, irqlevel, HOLD_LINE);
 
 	if( scanline<0 )
-	{
 		scanline = 0;
-	}
+
 	if( scanline < NAMCONB1_VBSTART )
-	{
-		timer_set( video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
-	}
+		timer_set( video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
 } /* namconb2_interrupt */
 static INTERRUPT_GEN( namconb1_interrupt )
 {
@@ -396,7 +393,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( video_screen_get_time_until_pos(0, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
+		timer_set( video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
 	}
 } /* namconb1_interrupt */
 

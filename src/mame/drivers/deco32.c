@@ -248,7 +248,7 @@ extern void decrypt156(void);
 static TIMER_CALLBACK( interrupt_gen )
 {
 	/* Save state of scroll registers before the IRQ */
-	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(0);
+	deco32_raster_display_list[deco32_raster_display_position++]=video_screen_get_vpos(machine->primary_screen);
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[1]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[2]&0xffff;
 	deco32_raster_display_list[deco32_raster_display_position++]=deco32_pf12_control[3]&0xffff;
@@ -278,9 +278,9 @@ static READ32_HANDLER( deco32_irq_controller_r )
         Bit 7:
         */
 
-        /* ZV03082007 - video_screen_get_vblank(0) doesn't work for Captain America, as it expects
+        /* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
            that this bit is NOT set in rows 0-7. */
-        vblank = video_screen_get_vpos(0) > Machine->screen[0].visarea.max_y;
+        vblank = video_screen_get_vpos(machine->primary_screen) > machine->screen[0].visarea.max_y;
 		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 
@@ -305,7 +305,7 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(0, scanline-1, 320),0);
+			timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(machine->primary_screen, scanline-1, 320),0);
 		else
 			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		break;

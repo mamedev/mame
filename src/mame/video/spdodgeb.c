@@ -99,12 +99,12 @@ INTERRUPT_GEN( spdodgeb_interrupt )
 	if (iloop > 1 && iloop < 32)
 	{
 		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
-		video_screen_update_partial(0, scanline+7);
+		video_screen_update_partial(machine->primary_screen, scanline+7);
 	}
 	else if (!iloop)
 	{
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-		video_screen_update_partial(0, 256);
+		video_screen_update_partial(machine->primary_screen, 256);
 	}
 }
 

@@ -99,7 +99,7 @@ static READ8_HANDLER( redalert_interrupt_clear_r )
 	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
-	return video_screen_get_vpos(0);
+	return video_screen_get_vpos(machine->primary_screen);
 }
 
 
