@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "shuuz.h"
 #include "sound/okim6295.h"
@@ -48,6 +47,25 @@ static void update_interrupts(running_machine *machine)
 
 /*************************************
  *
+ *  Video controller access
+ *
+ *************************************/
+
+static READ16_HANDLER( shuuz_atarivc_r )
+{
+	return atarivc_r(machine->primary_screen, offset);
+}
+
+
+static WRITE16_HANDLER( shuuz_atarivc_w )
+{
+	atarivc_w(machine->primary_screen, offset, data, mem_mask);
+}
+
+
+
+/*************************************
+ *
  *  Initialization
  *
  *************************************/
@@ -55,7 +73,7 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_RESET( shuuz )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(0, atarivc_eof_data, 1);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 1);
 	atarigen_interrupt_reset(update_interrupts);
 }
 
@@ -124,7 +142,7 @@ static READ16_HANDLER( special_port0_r )
 {
 	int result = readinputport(0);
 
-	if ((result & 0x0800) && atarigen_get_hblank(Machine, 0))
+	if ((result & 0x0800) && atarigen_get_hblank(machine->primary_screen))
 		result &= ~0x0800;
 
 	return result;
@@ -149,7 +167,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x106000, 0x106001) AM_READWRITE(adpcm_r, adpcm_w)
 	AM_RANGE(0x107000, 0x107007) AM_NOP
 	AM_RANGE(0x3e0000, 0x3e087f) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(atarivc_r, atarivc_w) AM_BASE(&atarivc_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_BASE(&atarivc_data)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_READWRITE(SMH_RAM, atarigen_playfield_latched_msb_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE(&atarivc_eof_data)
 	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE(SMH_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)

@@ -50,7 +50,7 @@ static MACHINE_RESET( vindictr )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, vindictr_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, vindictr_scanline_update, 8);
 	atarijsa_reset();
 }
 

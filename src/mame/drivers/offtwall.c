@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "offtwall.h"
@@ -57,9 +56,28 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_RESET( offtwall )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(0, atarivc_eof_data, 1);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 1);
 	atarigen_interrupt_reset(update_interrupts);
 	atarijsa_reset();
+}
+
+
+
+/*************************************
+ *
+ *  Video controller access
+ *
+ *************************************/
+
+static READ16_HANDLER( offtwall_atarivc_r )
+{
+	return atarivc_r(machine->primary_screen, offset);
+}
+
+
+static WRITE16_HANDLER( offtwall_atarivc_w )
+{
+	atarivc_w(machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -84,7 +102,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_LSB)
 	{
 		/* bit 4 resets the sound CPU */
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 	}
 
@@ -273,7 +291,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260060, 0x260061) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(atarivc_r, atarivc_w) AM_BASE(&atarivc_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(offtwall_atarivc_r, offtwall_atarivc_w) AM_BASE(&atarivc_data)
 	AM_RANGE(0x3f4000, 0x3f5eff) AM_READWRITE(SMH_RAM, atarigen_playfield_latched_msb_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE(&atarivc_eof_data)
 	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE(SMH_RAM, atarimo_0_slipram_w) AM_BASE(&atarimo_0_slipram)

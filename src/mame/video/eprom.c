@@ -163,7 +163,7 @@ VIDEO_START( guts )
  *
  *************************************/
 
-void eprom_scanline_update(running_machine *machine, int scrnum, int scanline)
+void eprom_scanline_update(const device_config *screen, int scanline)
 {
 	/* update the playfield */
 	if (scanline == 0)

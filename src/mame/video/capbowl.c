@@ -28,7 +28,7 @@ static void generate_interrupt(running_machine *machine, int state)
 
 static const struct tms34061_interface tms34061intf =
 {
-	0,						/* the screen we are acting on */
+	"main",					/* the screen we are acting on */
 	8,						/* VRAM address is (row << rowshift) | col */
 	0x10000,				/* size of video RAM */
 	generate_interrupt		/* interrupt gen callback */
@@ -67,7 +67,7 @@ WRITE8_HANDLER( capbowl_tms34061_w )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	tms34061_w(machine, col, *capbowl_rowaddress, func, data);
+	tms34061_w(col, *capbowl_rowaddress, func, data);
 }
 
 
@@ -82,7 +82,7 @@ READ8_HANDLER( capbowl_tms34061_r )
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return tms34061_r(machine, col, *capbowl_rowaddress, func);
+	return tms34061_r(col, *capbowl_rowaddress, func);
 }
 
 

@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "blstroid.h"
@@ -53,7 +52,7 @@ static MACHINE_RESET( blstroid )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, blstroid_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, blstroid_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -69,7 +68,7 @@ static READ16_HANDLER( inputs_r )
 {
 	int temp = readinputport(2 + (offset & 1));
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(Machine, 0)) temp ^= 0x0010;
+	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

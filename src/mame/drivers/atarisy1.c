@@ -203,7 +203,7 @@ static TIMER_CALLBACK( delayed_joystick_int )
 {
 	joystick_value = param;
 	joystick_int = 1;
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 }
 
 
@@ -229,7 +229,7 @@ static READ16_HANDLER( joystick_r )
 	/* clear any existing interrupt and set a timer for a new one */
 	joystick_int = 0;
 	timer_adjust_oneshot(joystick_timer, ATTOTIME_IN_USEC(50), newval);
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 
 	return joystick_value;
 }

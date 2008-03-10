@@ -20,7 +20,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
@@ -68,7 +67,7 @@ static MACHINE_RESET( atarigx2 )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, atarigx2_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, atarigx2_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -145,7 +144,7 @@ static WRITE32_HANDLER( latch_w )
 
 	/* lower byte */
 	if (!(mem_mask & 0x00ff0000))
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -1147,7 +1146,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		if (lookup_table[i][0] == 0xffffffff)
 		{
 			if (last_write_offset*2 >= 0x700 && last_write_offset*2 < 0x720)
-				result = mame_rand(Machine) << 16;
+				result = mame_rand(machine) << 16;
 			else
 				result = 0xffff << 16;
 			logerror("%06X:Unhandled protection R@%04X = %04X\n", activecpu_get_previouspc(), offset, result);

@@ -30,7 +30,7 @@
 
 typedef void (*atarigen_int_func)(running_machine *machine);
 
-typedef void (*atarigen_scanline_func)(running_machine *machine, int scrnum, int scanline);
+typedef void (*atarigen_scanline_func)(const device_config *screen, int scanline);
 
 struct atarivc_state_desc
 {
@@ -96,9 +96,9 @@ extern struct atarivc_state_desc atarivc_state;
 ---------------------------------------------------------------*/
 
 void atarigen_interrupt_reset(atarigen_int_func update_int);
-void atarigen_update_interrupts(void);
+void atarigen_update_interrupts(running_machine *machine);
 
-void atarigen_scanline_int_set(int scrnum, int scanline);
+void atarigen_scanline_int_set(const device_config *screen, int scanline);
 INTERRUPT_GEN( atarigen_scanline_int_gen );
 WRITE16_HANDLER( atarigen_scanline_int_ack_w );
 WRITE32_HANDLER( atarigen_scanline_int_ack32_w );
@@ -182,10 +182,10 @@ void atarigen_set_oki6295_vol(running_machine *machine, int volume);
     VIDEO CONTROLLER
 ---------------------------------------------------------------*/
 
-void atarivc_reset(int scrnum, UINT16 *eof_data, int playfields);
+void atarivc_reset(const device_config *screen, UINT16 *eof_data, int playfields);
 
-WRITE16_HANDLER( atarivc_w );
-READ16_HANDLER( atarivc_r );
+void atarivc_w(const device_config *screen, offs_t offset, UINT16 data, UINT16 mem_mask);
+UINT16 atarivc_r(const device_config *screen, offs_t offset);
 
 INLINE void atarivc_update_pf_xscrolls(void)
 {
@@ -218,8 +218,8 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
     VIDEO HELPERS
 ---------------------------------------------------------------*/
 
-void atarigen_scanline_timer_reset(int scrnum, atarigen_scanline_func update_graphics, int frequency);
-int atarigen_get_hblank(running_machine *machine, int scrnum);
+void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanline_func update_graphics, int frequency);
+int atarigen_get_hblank(const device_config *screen);
 WRITE16_HANDLER( atarigen_halt_until_hblank_0_w );
 WRITE16_HANDLER( atarigen_666_paletteram_w );
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );

@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "relief.h"
 #include "sound/okim6295.h"
@@ -60,6 +59,25 @@ static void update_interrupts(running_machine *machine)
 
 /*************************************
  *
+ *  Video controller access
+ *
+ *************************************/
+
+static READ16_HANDLER( relief_atarivc_r )
+{
+	return atarivc_r(machine->primary_screen, offset);
+}
+
+
+static WRITE16_HANDLER( relief_atarivc_w )
+{
+	atarivc_w(machine->primary_screen, offset, data, mem_mask);
+}
+
+
+
+/*************************************
+ *
  *  Initialization
  *
  *************************************/
@@ -67,7 +85,7 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_RESET( relief )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(0, atarivc_eof_data, 2);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarigen_interrupt_reset(update_interrupts);
 
 	OKIM6295_set_bank_base(0, 0);
@@ -88,7 +106,7 @@ static READ16_HANDLER( special_port2_r )
 {
 	int result = readinputport(2);
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
-	if (!(result & 0x0080) || atarigen_get_hblank(Machine, 0)) result ^= 0x0001;
+	if (!(result & 0x0080) || atarigen_get_hblank(machine->primary_screen)) result ^= 0x0001;
 	return result;
 }
 
@@ -105,7 +123,7 @@ static WRITE16_HANDLER( audio_control_w )
 	if (ACCESSING_LSB)
 	{
 		ym2413_volume = (data >> 1) & 15;
-		atarigen_set_ym2413_vol(Machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
+		atarigen_set_ym2413_vol(machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
 		adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (adpcm_bank_base & 0x100000);
 	}
 	if (ACCESSING_MSB)
@@ -120,8 +138,8 @@ static WRITE16_HANDLER( audio_volume_w )
 	if (ACCESSING_LSB)
 	{
 		overall_volume = data & 127;
-		atarigen_set_ym2413_vol(Machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
-		atarigen_set_oki6295_vol(Machine, overall_volume * 100 / 127);
+		atarigen_set_ym2413_vol(machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
+		atarigen_set_oki6295_vol(machine, overall_volume * 100 / 127);
 	}
 }
 
@@ -188,7 +206,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260012, 0x260013) AM_READ(input_port_3_word_r)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(atarivc_r, atarivc_w) AM_BASE(&atarivc_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(relief_atarivc_r, relief_atarivc_w) AM_BASE(&atarivc_data)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_READWRITE(SMH_RAM, atarigen_playfield2_latched_msb_w) AM_BASE(&atarigen_playfield2)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_READWRITE(SMH_RAM, atarigen_playfield_latched_lsb_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_READWRITE(SMH_RAM, atarigen_playfield_dual_upper_w) AM_BASE(&atarigen_playfield_upper)

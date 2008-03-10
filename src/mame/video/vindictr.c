@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "vindictr.h"
 #include "thunderj.h"
@@ -132,7 +131,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 		int g = ((data >> 4) & 15) * i;
 		int b = ((data >> 0) & 15) * i;
 
-		palette_set_color(Machine,offset + c*2048,MAKE_RGB(r,g,b));
+		palette_set_color(machine,offset + c*2048,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -144,7 +143,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
  *
  *************************************/
 
-void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline)
+void vindictr_scanline_update(const device_config *screen, int scanline)
 {
 	UINT16 *base = &atarigen_alpha[((scanline - 8) / 8) * 64 + 42];
 	int x;
@@ -165,7 +164,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 			case 2:		/* /PFB */
 				if (playfield_tile_bank != (data & 7))
 				{
-					video_screen_update_partial(machine->primary_screen, scanline - 1);
+					video_screen_update_partial(screen, scanline - 1);
 					playfield_tile_bank = data & 7;
 					tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
 				}
@@ -174,7 +173,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 			case 3:		/* /PFHSLD */
 				if (playfield_xscroll != (data & 0x1ff))
 				{
-					video_screen_update_partial(machine->primary_screen, scanline - 1);
+					video_screen_update_partial(screen, scanline - 1);
 					tilemap_set_scrollx(atarigen_playfield_tilemap, 0, data);
 					playfield_xscroll = data & 0x1ff;
 				}
@@ -183,7 +182,7 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 			case 4:		/* /MOHS */
 				if (atarimo_get_xscroll(0) != (data & 0x1ff))
 				{
-					video_screen_update_partial(machine->primary_screen, scanline - 1);
+					video_screen_update_partial(screen, scanline - 1);
 					atarimo_set_xscroll(0, data & 0x1ff);
 				}
 				break;
@@ -192,19 +191,20 @@ void vindictr_scanline_update(running_machine *machine, int scrnum, int scanline
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(machine, 0);
+				atarigen_scanline_int_gen(screen->machine, 0);
 				break;
 
 			case 7:		/* /PFVS */
 			{
 				/* a new vscroll latches the offset into a counter; we must adjust for this */
 				int offset = scanline;
-				if (offset > machine->screen[0].visarea.max_y)
-					offset -= machine->screen[0].visarea.max_y + 1;
+				const rectangle *visible_area = video_screen_get_visible_area(screen);
+				if (offset > visible_area->max_y)
+					offset -= visible_area->max_y + 1;
 
 				if (playfield_yscroll != ((data - offset) & 0x1ff))
 				{
-					video_screen_update_partial(machine->primary_screen, scanline - 1);
+					video_screen_update_partial(screen, scanline - 1);
 					tilemap_set_scrolly(atarigen_playfield_tilemap, 0, data - offset);
 					atarimo_set_yscroll(0, (data - offset) & 0x1ff);
 				}

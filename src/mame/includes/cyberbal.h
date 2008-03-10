@@ -25,8 +25,6 @@ WRITE16_HANDLER( cyberbal_sound_68k_dac_w );
 
 /*----------- defined in video/cyberbal.c -----------*/
 
-void cyberbal_set_screen(int which);
-
 READ16_HANDLER( cyberbal_paletteram_0_r );
 READ16_HANDLER( cyberbal_paletteram_1_r );
 WRITE16_HANDLER( cyberbal_paletteram_0_w );
@@ -36,7 +34,7 @@ VIDEO_START( cyberbal );
 VIDEO_START( cyberb2p );
 VIDEO_UPDATE( cyberbal );
 
-void cyberbal_scanline_update(running_machine *machine, int scrnum, int scanline);
+void cyberbal_scanline_update(const device_config *screen, int scanline);
 
 extern UINT16 *cyberbal_paletteram_0;
 extern UINT16 *cyberbal_paletteram_1;

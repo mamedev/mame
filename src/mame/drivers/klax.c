@@ -44,11 +44,11 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0 && !(readinputport(0) & 0x800))
-		atarigen_scanline_int_gen(machine, 0);
+		atarigen_scanline_int_gen(screen->machine, 0);
 }
 
 
@@ -70,7 +70,7 @@ static MACHINE_RESET( klax )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 }
 
 

@@ -19,4 +19,4 @@ UINT16 atarigt_colorram_r(offs_t address);
 VIDEO_START( atarigt );
 VIDEO_UPDATE( atarigt );
 
-void atarigt_scanline_update(running_machine *machine, int scrnum, int scanline);
+void atarigt_scanline_update(const device_config *screen, int scanline);

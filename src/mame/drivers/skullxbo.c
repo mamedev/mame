@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "skullxbo.h"
@@ -55,7 +54,7 @@ static TIMER_CALLBACK( irq_gen )
 }
 
 
-static void alpha_row_update(running_machine *machine, int scrnum, int scanline)
+static void alpha_row_update(const device_config *screen, int scanline)
 {
 	UINT16 *check = &atarigen_alpha[(scanline / 8) * 64 + 42];
 
@@ -63,7 +62,8 @@ static void alpha_row_update(running_machine *machine, int scrnum, int scanline)
 	/* the interrupt occurs on the HBLANK of the 6th scanline following */
 	if (check < &atarigen_alpha[0x7c0] && (*check & 0x8000))
 	{
-		attotime period = video_screen_get_time_until_pos_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum) + 6, machine->screen[scrnum].width * 0.9);
+		int	width = video_screen_get_width(screen);
+		attotime period = video_screen_get_time_until_pos(screen, video_screen_get_vpos(screen) + 6, width * 0.9);
 		timer_set(period, NULL, 0, irq_gen);
 	}
 
@@ -76,7 +76,7 @@ static MACHINE_RESET( skullxbo )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, alpha_row_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, alpha_row_update, 8);
 	atarijsa_reset();
 }
 
@@ -92,7 +92,7 @@ static READ16_HANDLER( special_port1_r )
 {
 	int temp = readinputport(1);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(Machine, 0)) temp ^= 0x0010;
+	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

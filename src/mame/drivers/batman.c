@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "batman.h"
@@ -60,13 +59,32 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_RESET( batman )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(0, atarivc_eof_data, 2);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, batman_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
 	atarigen_init_save_state();
 	state_save_register_global(latch_data);
 
+}
+
+
+
+/*************************************
+ *
+ *  Video controller access
+ *
+ *************************************/
+
+static READ16_HANDLER( batman_atarivc_r )
+{
+	return atarivc_r(machine->primary_screen, offset);
+}
+
+
+static WRITE16_HANDLER( batman_atarivc_w )
+{
+	atarivc_w(machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -93,9 +111,9 @@ static WRITE16_HANDLER( latch_w )
 
 	/* bit 4 is connected to the /RESET pin on the 6502 */
 	if (latch_data & 0x0010)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* alpha bank is selected by the upper 4 bits */
 	if ((oldword ^ latch_data) & 0x7000)
@@ -132,7 +150,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_MIRROR(0x100000) AM_READWRITE(SMH_RAM, atarigen_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(atarivc_r, atarivc_w) AM_BASE(&atarivc_data)
+	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_READWRITE(batman_atarivc_r, batman_atarivc_w) AM_BASE(&atarivc_data)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield2_latched_msb_w) AM_BASE(&atarigen_playfield2)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_WRITE(atarigen_playfield_dual_upper_w) AM_BASE(&atarigen_playfield_upper)

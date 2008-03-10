@@ -15,4 +15,4 @@ VIDEO_UPDATE( atarigx2 );
 
 WRITE16_HANDLER( atarigx2_mo_control_w );
 
-void atarigx2_scanline_update(running_machine *machine, int scrnum, int scanline);
+void atarigx2_scanline_update(const device_config *screen, int scanline);

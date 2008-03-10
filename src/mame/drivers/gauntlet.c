@@ -119,7 +119,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "sound/5220intf.h"
 #include "sound/2151intf.h"
@@ -162,13 +161,13 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(machine, 0);
+		atarigen_6502_irq_gen(screen->machine, 0);
 	else
-		atarigen_6502_irq_ack_r(machine, 0);
+		atarigen_6502_irq_ack_r(screen->machine, 0);
 }
 
 
@@ -180,7 +179,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_eeprom_reset();
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 	atarigen_sound_io_reset(1);
 }
 
@@ -217,7 +216,7 @@ static WRITE16_HANDLER( sound_reset_w )
 
 		if ((oldword ^ sound_reset_val) & 1)
 		{
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset();
 		}
 	}
@@ -299,9 +298,9 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 static WRITE8_HANDLER( mixer_w )
 {
-	atarigen_set_ym2151_vol(Machine, (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(Machine, ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(Machine, ((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(machine, (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(machine, ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(machine, ((data >> 5) & 7) * 100 / 7);
 }
 
 

@@ -25,17 +25,17 @@
 
 struct tms34061_data
 {
-	UINT16			regs[TMS34061_REGCOUNT];
-	UINT16			xmask;
-	UINT8			yshift;
-	UINT32			vrammask;
-	UINT8 *			vram;
-	UINT8 *			latchram;
-	UINT8			latchdata;
-	UINT8 *			shiftreg;
-	emu_timer *		timer;
+	UINT16				regs[TMS34061_REGCOUNT];
+	UINT16				xmask;
+	UINT8				yshift;
+	UINT32				vrammask;
+	UINT8 *				vram;
+	UINT8 *				latchram;
+	UINT8				latchdata;
+	UINT8 *				shiftreg;
+	emu_timer *			timer;
 	struct tms34061_interface intf;
-	running_machine *machine;
+	const device_config *screen;
 };
 
 
@@ -79,8 +79,8 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 {
 	/* reset the data */
 	memset(&tms34061, 0, sizeof(tms34061));
-	tms34061.machine = machine;
 	tms34061.intf = *interface;
+	tms34061.screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, tms34061.intf.screen_tag);
 	tms34061.vrammask = tms34061.intf.vramsize - 1;
 
 	/* allocate memory for VRAM */
@@ -137,9 +137,9 @@ INLINE void update_interrupts(void)
 	{
 		/* if the status bit is set, and ints are enabled, turn it on */
 		if ((tms34061.regs[TMS34061_STATUS] & 0x0001) && (tms34061.regs[TMS34061_CONTROL1] & 0x0400))
-			(*tms34061.intf.interrupt)(tms34061.machine, ASSERT_LINE);
+			(*tms34061.intf.interrupt)(tms34061.screen->machine, ASSERT_LINE);
 		else
-			(*tms34061.intf.interrupt)(tms34061.machine, CLEAR_LINE);
+			(*tms34061.intf.interrupt)(tms34061.screen->machine, CLEAR_LINE);
 	}
 }
 
@@ -147,7 +147,7 @@ INLINE void update_interrupts(void)
 static TIMER_CALLBACK( tms34061_interrupt )
 {
 	/* set timer for next frame */
-	timer_adjust_oneshot(tms34061.timer, video_screen_get_frame_period_scrnum(tms34061.intf.scrnum), 0);
+	timer_adjust_oneshot(tms34061.timer, video_screen_get_frame_period(tms34061.screen), 0);
 
 	/* set the interrupt bit in the status reg */
 	tms34061.regs[TMS34061_STATUS] |= 1;
@@ -164,7 +164,7 @@ static TIMER_CALLBACK( tms34061_interrupt )
  *
  *************************************/
 
-static WRITE8_HANDLER( register_w )
+static void register_w(offs_t offset, UINT8 data)
 {
 	int scanline;
 	int regnum = offset >> 2;
@@ -172,7 +172,7 @@ static WRITE8_HANDLER( register_w )
 	/* certain registers affect the display directly */
 	if ((regnum >= TMS34061_HORENDSYNC && regnum <= TMS34061_DISPSTART) ||
 		(regnum == TMS34061_CONTROL2))
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(tms34061.screen, video_screen_get_vpos(tms34061.screen));
 
 	/* store the hi/lo half */
 	if (offset & 0x02)
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( register_w )
 			if (scanline < 0)
 				scanline += tms34061.regs[TMS34061_VERTOTAL];
 
-			timer_adjust_oneshot(tms34061.timer, video_screen_get_time_until_pos_scrnum(tms34061.intf.scrnum, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
+			timer_adjust_oneshot(tms34061.timer, video_screen_get_time_until_pos(tms34061.screen, scanline, tms34061.regs[TMS34061_HORSTARTBLNK]), 0);
 			break;
 
 		/* XY offset: set the X and Y masks */
@@ -232,7 +232,7 @@ static WRITE8_HANDLER( register_w )
  *
  *************************************/
 
-static READ8_HANDLER( register_r )
+static UINT8 register_r(offs_t offset)
 {
 	int regnum = offset >> 2;
 	UINT16 result;
@@ -251,7 +251,7 @@ static READ8_HANDLER( register_r )
 
 		/* vertical count register: return the current scanline */
 		case TMS34061_VERCOUNTER:
-			result = (video_screen_get_vpos(machine->primary_screen)+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
+			result = (video_screen_get_vpos(tms34061.screen)+ tms34061.regs[TMS34061_VERENDBLNK]) % tms34061.regs[TMS34061_VERTOTAL];
 			break;
 	}
 
@@ -351,7 +351,7 @@ INLINE void adjust_xyaddress(int offset)
 }
 
 
-static WRITE8_HANDLER( xypixel_w )
+static void xypixel_w(int offset, UINT8 data)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = tms34061.regs[TMS34061_XYADDRESS];
@@ -370,7 +370,7 @@ static WRITE8_HANDLER( xypixel_w )
 }
 
 
-static READ8_HANDLER( xypixel_r )
+static UINT8 xypixel_r(int offset)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = tms34061.regs[TMS34061_XYADDRESS];
@@ -395,7 +395,7 @@ static READ8_HANDLER( xypixel_r )
  *
  *************************************/
 
-void tms34061_w(running_machine *machine, int col, int row, int func, UINT8 data)
+void tms34061_w(int col, int row, int func, UINT8 data)
 {
 	offs_t offs;
 
@@ -405,12 +405,12 @@ void tms34061_w(running_machine *machine, int col, int row, int func, UINT8 data
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			register_w(machine, col, data);
+			register_w(col, data);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			xypixel_w(machine, col, data);
+			xypixel_w(col, data);
 			break;
 
 		/* function 3 maps to direct access */
@@ -454,7 +454,7 @@ void tms34061_w(running_machine *machine, int col, int row, int func, UINT8 data
 }
 
 
-UINT8 tms34061_r(running_machine *machine, int col, int row, int func)
+UINT8 tms34061_r(int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;
@@ -465,12 +465,12 @@ UINT8 tms34061_r(running_machine *machine, int col, int row, int func)
 		/* both 0 and 2 map to register access */
 		case 0:
 		case 2:
-			result = register_r(machine, col);
+			result = register_r(col);
 			break;
 
 		/* function 1 maps to XY access; col is the address adjustment */
 		case 1:
-			result = xypixel_r(machine, col);
+			result = xypixel_r(col);
 			break;
 
 		/* funtion 3 maps to direct access */

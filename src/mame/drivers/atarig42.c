@@ -19,7 +19,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
@@ -70,7 +69,7 @@ static MACHINE_RESET( atarig42 )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, atarig42_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, atarig42_scanline_update, 8);
 	atarijsa_reset();
 }
 
@@ -120,7 +119,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_LSB)
 	{
 		/* bit 4 resets the sound CPU */
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 
 		/* bit 5 is /XRESET, probably related to the ASIC */

@@ -124,7 +124,6 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
 
 /* force a partial update of the screen up to and including the requested scanline */
 void video_screen_update_partial(const device_config *screen, int scanline);
-void video_screen_update_partial_scrnum(int scrnum, int scanline);
 
 /* force an update from the last beam position up to the current beam position */
 void video_screen_update_now(const device_config *screen);
@@ -150,7 +149,6 @@ const rectangle *video_screen_get_visible_area(const device_config *screen);
 
 /* return the time when the beam will reach a particular H,V position */
 attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos);
-attotime video_screen_get_time_until_pos_scrnum(int scrnum, int vpos, int hpos);
 
 /* return the time when the beam will reach the start of VBLANK */
 attotime video_screen_get_time_until_vblank_start(const device_config *screen);

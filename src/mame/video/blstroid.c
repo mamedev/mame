@@ -107,11 +107,11 @@ static TIMER_CALLBACK( irq_on )
 {
 	/* generate the interrupt */
 	atarigen_scanline_int_gen(machine, 0);
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 }
 
 
-void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline)
+void blstroid_scanline_update(const device_config *screen, int scanline)
 {
 	int offset = (scanline / 8) * 64 + 40;
 
@@ -119,6 +119,7 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 	if (offset < 0x1000)
 		if (atarigen_playfield[offset] & 0x8000)
 		{
+			int width, vpos;
 			attotime period_on;
 			attotime period_off;
 
@@ -129,8 +130,10 @@ void blstroid_scanline_update(running_machine *machine, int scrnum, int scanline
 
 			/* set a timer to turn the interrupt on at HBLANK of the 7th scanline */
 			/* and another to turn it off one scanline later */
-			period_on  = video_screen_get_time_until_pos_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum) + 7, machine->screen[scrnum].width * 0.9);
-			period_off = video_screen_get_time_until_pos_scrnum(scrnum, video_screen_get_vpos_scrnum(scrnum) + 8, machine->screen[scrnum].width * 0.9);
+			width = video_screen_get_width(screen);
+			vpos  = video_screen_get_vpos(screen);
+			period_on  = video_screen_get_time_until_pos(screen, vpos + 7, width * 0.9);
+			period_off = video_screen_get_time_until_pos(screen, vpos + 8, width * 0.9);
 
 			timer_set(period_on, NULL,  0, irq_on);
 			timer_set(period_off, NULL, 0, irq_off);

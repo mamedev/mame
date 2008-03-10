@@ -213,14 +213,14 @@ static void update_interrupts(running_machine *machine)
  *
  *************************************/
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
-	if (scanline <= machine->screen[scrnum].height)
+	if (scanline <= video_screen_get_height(screen))
 	{
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (interrupt_enable & 4)
-				atarigen_scanline_int_gen(machine, 0);
+				atarigen_scanline_int_gen(screen->machine, 0);
 	}
 }
 
@@ -263,7 +263,7 @@ static MACHINE_RESET( atarisy2 )
 	slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_sound_io_reset(1);
-	atarigen_scanline_timer_reset(0, scanline_update, 64);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
 	memory_set_opbase_handler(0, atarisy2_opbase_handler);
 
 	tms5220_data_strobe = 1;
@@ -294,7 +294,7 @@ static WRITE16_HANDLER( int0_ack_w )
 {
 	/* reset sound IRQ */
 	p2portrd_state = 0;
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 }
 
 
@@ -302,7 +302,7 @@ static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
 	if (ACCESSING_LSB)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -636,7 +636,7 @@ static READ16_HANDLER( sound_r )
 {
 	/* clear the p2portwr state on a p1portrd */
 	p2portwr_state = 0;
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 
 	/* handle it normally otherwise */
 	return atarigen_sound_r(machine,offset,0);
@@ -647,7 +647,7 @@ static WRITE8_HANDLER( sound_6502_w )
 {
 	/* clock the state through */
 	p2portwr_state = (interrupt_enable & 2) != 0;
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 
 	/* handle it normally otherwise */
 	atarigen_6502_sound_w(machine, offset, data);
@@ -658,7 +658,7 @@ static READ8_HANDLER( sound_6502_r )
 {
 	/* clock the state through */
 	p2portrd_state = (interrupt_enable & 1) != 0;
-	atarigen_update_interrupts();
+	atarigen_update_interrupts(machine);
 
 	/* handle it normally otherwise */
 	return atarigen_6502_sound_r(machine, offset);

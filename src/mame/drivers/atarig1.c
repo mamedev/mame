@@ -75,7 +75,7 @@ static MACHINE_RESET( atarig1 )
 	atarigen_eeprom_reset();
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, atarig1_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, atarig1_scanline_update, 8);
 	atarijsa_reset();
 }
 

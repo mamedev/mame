@@ -20,7 +20,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "eprom.h"
@@ -69,7 +68,7 @@ static MACHINE_RESET( klaxp )
 {
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, eprom_scanline_update, 8);
+	atarigen_scanline_timer_reset(machine->primary_screen, eprom_scanline_update, 8);
 	atarijsa_reset();
 	atarigen_init_save_state();
 }
@@ -123,9 +122,9 @@ static WRITE16_HANDLER( eprom_latch_w )
 	if (ACCESSING_LSB)
 	{
 		if (data & 1)
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 

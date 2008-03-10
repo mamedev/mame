@@ -18,7 +18,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
 #include "toobin.h"
@@ -82,7 +81,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 	if (oldword != newword)
 	{
 		interrupt_scan[offset] = newword;
-		atarigen_scanline_int_set(0, newword & 0x1ff);
+		atarigen_scanline_int_set(machine->primary_screen, newword & 0x1ff);
 	}
 }
 
@@ -97,7 +96,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 static READ16_HANDLER( special_port1_r )
 {
 	int result = readinputport(1);
-	if (atarigen_get_hblank(Machine, 0)) result ^= 0x8000;
+	if (atarigen_get_hblank(machine->primary_screen)) result ^= 0x8000;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }

@@ -910,12 +910,6 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 	internal_state->last_partial_scan = scanline + 1;
 }
 
-void video_screen_update_partial_scrnum(int scrnum, int scanline)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	video_screen_update_partial(internal_state->device, scanline);
-}
-
 
 /*-------------------------------------------------
     video_screen_update_now - perform an update
@@ -1094,12 +1088,6 @@ attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, 
 
 	/* return the difference */
 	return attotime_make(0, targetdelta - curdelta);
-}
-
-attotime video_screen_get_time_until_pos_scrnum(int scrnum, int vpos, int hpos)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	return video_screen_get_time_until_pos(internal_state->device, vpos, hpos);
 }
 
 

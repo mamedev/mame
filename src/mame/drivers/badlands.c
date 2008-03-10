@@ -134,13 +134,13 @@ static void update_interrupts(running_machine *machine)
 }
 
 
-static void scanline_update(running_machine *machine, int scrnum, int scanline)
+static void scanline_update(const device_config *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_ack_r(machine, 0);
+		atarigen_6502_irq_ack_r(screen->machine, 0);
 	else if (!(readinputport(0) & 0x40))
-		atarigen_6502_irq_gen(machine, 0);
+		atarigen_6502_irq_gen(screen->machine, 0);
 }
 
 
@@ -150,7 +150,7 @@ static MACHINE_RESET( badlands )
 
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_scanline_timer_reset(0, scanline_update, 32);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 
 	atarigen_sound_io_reset(1);
 	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);

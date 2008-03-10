@@ -128,10 +128,10 @@ VIDEO_START( batman )
  *
  *************************************/
 
-void batman_scanline_update(running_machine *machine, int scrnum, int scanline)
+void batman_scanline_update(const device_config *screen, int scanline)
 {
 	/* update the scanline parameters */
-	if (scanline <= machine->screen[scrnum].visarea.max_y && atarivc_state.rowscroll_enable)
+	if (scanline <= video_screen_get_visible_area(screen)->max_y && atarivc_state.rowscroll_enable)
 	{
 		UINT16 *base = &atarigen_alpha[scanline / 8 * 64 + 48];
 		int scan, i;
@@ -143,13 +143,13 @@ void batman_scanline_update(running_machine *machine, int scrnum, int scanline)
 				switch (data & 15)
 				{
 					case 9:
-						video_screen_update_partial(machine->primary_screen, scanline - 1);
+						video_screen_update_partial(screen, scanline - 1);
 						atarivc_state.mo_xscroll = (data >> 7) & 0x1ff;
 						atarimo_set_xscroll(0, atarivc_state.mo_xscroll);
 						break;
 
 					case 10:
-						video_screen_update_partial(machine->primary_screen, scanline - 1);
+						video_screen_update_partial(screen, scanline - 1);
 						atarivc_state.pf1_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls();
 						tilemap_set_scrollx(atarigen_playfield_tilemap, 0, atarivc_state.pf0_xscroll);
@@ -157,26 +157,26 @@ void batman_scanline_update(running_machine *machine, int scrnum, int scanline)
 						break;
 
 					case 11:
-						video_screen_update_partial(machine->primary_screen, scanline - 1);
+						video_screen_update_partial(screen, scanline - 1);
 						atarivc_state.pf0_xscroll_raw = (data >> 7) & 0x1ff;
 						atarivc_update_pf_xscrolls();
 						tilemap_set_scrollx(atarigen_playfield_tilemap, 0, atarivc_state.pf0_xscroll);
 						break;
 
 					case 13:
-						video_screen_update_partial(machine->primary_screen, scanline - 1);
+						video_screen_update_partial(screen, scanline - 1);
 						atarivc_state.mo_yscroll = (data >> 7) & 0x1ff;
 						atarimo_set_yscroll(0, atarivc_state.mo_yscroll);
 						break;
 
 					case 14:
-						video_screen_update_partial(machine->primary_screen, scanline - 1);
+						video_screen_update_partial(screen, scanline - 1);
 						atarivc_state.pf1_yscroll = (data >> 7) & 0x1ff;
 						tilemap_set_scrolly(atarigen_playfield2_tilemap, 0, atarivc_state.pf1_yscroll);
 						break;
 
 					case 15:
-						video_screen_update_partial(machine->primary_screen, scanline - 1);
+						video_screen_update_partial(screen, scanline - 1);
 						atarivc_state.pf0_yscroll = (data >> 7) & 0x1ff;
 						tilemap_set_scrolly(atarigen_playfield_tilemap, 0, atarivc_state.pf0_yscroll);
 						break;

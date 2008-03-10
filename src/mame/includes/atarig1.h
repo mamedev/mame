@@ -11,6 +11,6 @@ WRITE16_HANDLER( atarig1_mo_control_w );
 VIDEO_START( atarig1 );
 VIDEO_UPDATE( atarig1 );
 
-void atarig1_scanline_update(running_machine *machine, int scrnum, int scanline);
+void atarig1_scanline_update(const device_config *screen, int scanline);
 
 extern UINT8 atarig1_pitfight;

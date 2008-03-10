@@ -37,10 +37,10 @@ enum
 /* interface structure */
 struct tms34061_interface
 {
-	int		scrnum;			/* the screen we are acting on */
-	UINT8	rowshift;		/* VRAM address is (row << rowshift) | col */
-	UINT32	vramsize;		/* size of video RAM */
-	void	(*interrupt)(running_machine *machine, int state);	/* interrupt gen callback */
+	const char	*screen_tag;	/* the screen we are acting on */
+	UINT8		rowshift;		/* VRAM address is (row << rowshift) | col */
+	UINT32		vramsize;		/* size of video RAM */
+	void		(*interrupt)(running_machine *machine, int state);	/* interrupt gen callback */
 };
 
 
@@ -59,8 +59,8 @@ struct tms34061_display
 void tms34061_start(running_machine *machine, const struct tms34061_interface *interface);
 
 /* reads/writes to the 34061 */
-UINT8 tms34061_r(running_machine *machine, int col, int row, int func);
-void tms34061_w(running_machine *machine, int col, int row, int func, UINT8 data);
+UINT8 tms34061_r(int col, int row, int func);
+void tms34061_w(int col, int row, int func, UINT8 data);
 
 /* latch settings */
 READ8_HANDLER( tms34061_latch_r );

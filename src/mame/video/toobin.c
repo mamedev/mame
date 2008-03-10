@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "toobin.h"
 
@@ -128,11 +127,11 @@ WRITE16_HANDLER( toobin_paletteram_w )
 		if (green) green += 38;
 		if (blue) blue += 38;
 
-		palette_set_color(Machine, offset & 0x3ff, MAKE_RGB(red, green, blue));
+		palette_set_color(machine, offset & 0x3ff, MAKE_RGB(red, green, blue));
 		if (!(newword & 0x8000))
-			palette_set_brightness(Machine, offset & 0x3ff, brightness);
+			palette_set_brightness(machine, offset & 0x3ff, brightness);
 		else
-			palette_set_brightness(Machine, offset & 0x3ff, 1.0);
+			palette_set_brightness(machine, offset & 0x3ff, 1.0);
 	}
 }
 
@@ -147,7 +146,7 @@ WRITE16_HANDLER( toobin_intensity_w )
 
 		for (i = 0; i < 0x400; i++)
 			if (!(paletteram16[i] & 0x8000))
-				palette_set_brightness(Machine, i, brightness);
+				palette_set_brightness(machine, i, brightness);
 	}
 }
 
