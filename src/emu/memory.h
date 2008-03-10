@@ -52,15 +52,21 @@ typedef offs_t			(*opbase_handler_func) (ATTR_UNUSED running_machine *machine, A
 typedef struct _data_accessors data_accessors;
 struct _data_accessors
 {
-	UINT8			(*read_byte)(offs_t offset);
-	UINT16			(*read_word)(offs_t offset);
-	UINT32			(*read_dword)(offs_t offset);
-	UINT64			(*read_qword)(offs_t offset);
+	void			(*change_pc)(offs_t byteaddress);
 
-	void			(*write_byte)(offs_t offset, UINT8 data);
-	void			(*write_word)(offs_t offset, UINT16 data);
-	void			(*write_dword)(offs_t offset, UINT32 data);
-	void			(*write_qword)(offs_t offset, UINT64 data);
+	UINT8			(*read_byte)(offs_t byteaddress);
+	UINT16			(*read_word)(offs_t byteaddress);
+	UINT32			(*read_dword)(offs_t byteaddress);
+	UINT32			(*read_dword_masked)(offs_t byteaddress, UINT32 mask);
+	UINT64			(*read_qword)(offs_t byteaddress);
+	UINT64			(*read_qword_masked)(offs_t byteaddress, UINT64 mask);
+
+	void			(*write_byte)(offs_t byteaddress, UINT8 data);
+	void			(*write_word)(offs_t byteaddress, UINT16 data);
+	void			(*write_dword)(offs_t byteaddress, UINT32 data);
+	void			(*write_dword_masked)(offs_t byteaddress, UINT32 data, UINT32 mask);
+	void			(*write_qword)(offs_t byteaddress, UINT64 data);
+	void			(*write_qword_masked)(offs_t byteaddress, UINT64 data, UINT64 mask);
 };
 
 
@@ -247,9 +253,10 @@ struct _address_map_entry
 {
 	address_map_entry *	next;				/* pointer to the next entry */
 
-	offs_t				start, end;			/* start/end values */
-	offs_t				mirror;				/* mirror bits */
-	offs_t				mask;				/* mask bits */
+	offs_t				addrstart;			/* start address */
+	offs_t				addrend;			/* end address */
+	offs_t				addrmirror;			/* mirror bits */
+	offs_t				addrmask;			/* mask bits */
 	read_handlers 		read;				/* read handler callback */
 	const char *		read_name;			/* read handler callback name */
 	device_type			read_devtype;		/* read device type for device references */
@@ -267,7 +274,8 @@ struct _address_map_entry
 	offs_t				region_offs;		/* offset within the region */
 
 	void *				memory;				/* pointer to memory backing this entry */
-	offs_t				bytestart, byteend;	/* byte-adjusted start/end values */
+	offs_t				bytestart;			/* byte-adjusted start address */
+	offs_t				byteend;			/* byte-adjusted end address */
 	offs_t				bytemirror;			/* byte-adjusted mirror bits */
 	offs_t				bytemask;			/* byte-adjusted mask bits */
 };
@@ -286,7 +294,7 @@ struct _address_map
 typedef struct _address_space address_space;
 struct _address_space
 {
-	offs_t				addrmask;			/* address mask */
+	offs_t				bytemask;			/* byte-adjusted address mask */
 	UINT8 *				readlookup;			/* read table lookup */
 	UINT8 *				writelookup;		/* write table lookup */
 	handler_data *		readhandlers;		/* read handlers */
@@ -722,15 +730,15 @@ const address_map *memory_get_map(int cpunum, int spacenum);
 
 /* ----- opcode base control ---- */
 opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func function);
-void		memory_set_opbase(offs_t offset);
+void		memory_set_opbase(offs_t byteaddress);
 
 /* ----- separate opcode/data encryption helper ---- */
-void 		memory_set_decrypted_region(int cpunum, offs_t start, offs_t end, void *base);
+void 		memory_set_decrypted_region(int cpunum, offs_t bytestart, offs_t byteend, void *base);
 
 /* ----- return a base pointer to memory ---- */
-void *		memory_get_read_ptr(int cpunum, int spacenum, offs_t offset);
-void *		memory_get_write_ptr(int cpunum, int spacenum, offs_t offset);
-void *		memory_get_op_ptr(int cpunum, offs_t offset, int arg);
+void *		memory_get_read_ptr(int cpunum, int spacenum, offs_t byteaddress);
+void *		memory_get_write_ptr(int cpunum, int spacenum, offs_t byteaddress);
+void *		memory_get_op_ptr(int cpunum, offs_t byteaddress, int arg);
 
 /* ----- memory banking ----- */
 void		memory_configure_bank(int banknum, int startentry, int numentries, void *base, offs_t stride);
@@ -739,31 +747,33 @@ void		memory_set_bank(int banknum, int entrynum);
 int 		memory_get_bank(int banknum);
 void		memory_set_bankptr(int banknum, void *base);
 
+const data_accessors *memory_get_accessors(int spacenum, int databits, int endianness);
+
 /* ----- debugging ----- */
 void		memory_set_debugger_access(int debugger);
 void		memory_set_log_unmap(int spacenum, int log);
 int			memory_get_log_unmap(int spacenum);
 
 /* ----- dynamic address space mapping ----- */
-void *		_memory_install_read_handler   (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_read8_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_machine_func handler, const char *handler_name);
-UINT16 *	_memory_install_read16_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_machine_func handler, const char *handler_name);
-UINT32 *	_memory_install_read32_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_machine_func handler, const char *handler_name);
-UINT64 *	_memory_install_read64_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_machine_func handler, const char *handler_name);
-void *		_memory_install_write_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR handler, const char *handler_name);
-UINT8 *		_memory_install_write8_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write8_machine_func handler, const char *handler_name);
-UINT16 *	_memory_install_write16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write16_machine_func handler, const char *handler_name);
-UINT32 *	_memory_install_write32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write32_machine_func handler, const char *handler_name);
-UINT64 *	_memory_install_write64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, write64_machine_func handler, const char *handler_name);
-void *		_memory_install_readwrite_handler  (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
-UINT8 *		_memory_install_readwrite8_handler (int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT16 *	_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT32 *	_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT64 *	_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t start, offs_t end, offs_t mask, offs_t mirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+void *		_memory_install_read_handler   (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR handler, const char *handler_name);
+UINT8 *		_memory_install_read8_handler  (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func handler, const char *handler_name);
+UINT16 *	_memory_install_read16_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func handler, const char *handler_name);
+UINT32 *	_memory_install_read32_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func handler, const char *handler_name);
+UINT64 *	_memory_install_read64_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func handler, const char *handler_name);
+void *		_memory_install_write_handler  (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR handler, const char *handler_name);
+UINT8 *		_memory_install_write8_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_machine_func handler, const char *handler_name);
+UINT16 *	_memory_install_write16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_machine_func handler, const char *handler_name);
+UINT32 *	_memory_install_write32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_machine_func handler, const char *handler_name);
+UINT64 *	_memory_install_write64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_machine_func handler, const char *handler_name);
+void *		_memory_install_readwrite_handler  (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
+UINT8 *		_memory_install_readwrite8_handler (int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *	_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *	_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *	_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name);
 
 /* ----- memory debugging ----- */
 void 		memory_dump(FILE *file);
-const char *memory_get_handler_string(int read0_or_write1, int cpunum, int spacenum, offs_t offset);
+const char *memory_get_handler_string(int read0_or_write1, int cpunum, int spacenum, offs_t byteaddress);
 
 
 
@@ -839,45 +849,45 @@ extern const char *const address_space_names[ADDRESS_SPACES];
 	_memory_install_readwrite64_handler(cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 
 /* ----- generic memory access ----- */
-INLINE UINT8  program_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(offset); }
-INLINE UINT16 program_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_word)(offset); }
-INLINE UINT32 program_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_dword)(offset); }
-INLINE UINT64 program_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_qword)(offset); }
+INLINE UINT8  program_read_byte (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_byte)(byteaddress); }
+INLINE UINT16 program_read_word (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_word)(byteaddress); }
+INLINE UINT32 program_read_dword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_dword)(byteaddress); }
+INLINE UINT64 program_read_qword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->read_qword)(byteaddress); }
 
-INLINE void	program_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_byte)(offset, data); }
-INLINE void	program_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_word)(offset, data); }
-INLINE void	program_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_dword)(offset, data); }
-INLINE void	program_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_qword)(offset, data); }
+INLINE void	program_write_byte (offs_t byteaddress, UINT8  data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_byte)(byteaddress, data); }
+INLINE void	program_write_word (offs_t byteaddress, UINT16 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_word)(byteaddress, data); }
+INLINE void	program_write_dword(offs_t byteaddress, UINT32 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_dword)(byteaddress, data); }
+INLINE void	program_write_qword(offs_t byteaddress, UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM].accessors->write_qword)(byteaddress, data); }
 
-INLINE UINT8  data_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_byte)(offset); }
-INLINE UINT16 data_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_word)(offset); }
-INLINE UINT32 data_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_dword)(offset); }
-INLINE UINT64 data_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_qword)(offset); }
+INLINE UINT8  data_read_byte (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_byte)(byteaddress); }
+INLINE UINT16 data_read_word (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_word)(byteaddress); }
+INLINE UINT32 data_read_dword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_dword)(byteaddress); }
+INLINE UINT64 data_read_qword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA].accessors->read_qword)(byteaddress); }
 
-INLINE void	data_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_byte)(offset, data); }
-INLINE void	data_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_word)(offset, data); }
-INLINE void	data_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_dword)(offset, data); }
-INLINE void	data_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_qword)(offset, data); }
+INLINE void	data_write_byte (offs_t byteaddress, UINT8  data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_byte)(byteaddress, data); }
+INLINE void	data_write_word (offs_t byteaddress, UINT16 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_word)(byteaddress, data); }
+INLINE void	data_write_dword(offs_t byteaddress, UINT32 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_dword)(byteaddress, data); }
+INLINE void	data_write_qword(offs_t byteaddress, UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA].accessors->write_qword)(byteaddress, data); }
 
-INLINE UINT8  io_read_byte (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_byte)(offset); }
-INLINE UINT16 io_read_word (offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_word)(offset); }
-INLINE UINT32 io_read_dword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_dword)(offset); }
-INLINE UINT64 io_read_qword(offs_t offset) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_qword)(offset); }
+INLINE UINT8  io_read_byte (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_byte)(byteaddress); }
+INLINE UINT16 io_read_word (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_word)(byteaddress); }
+INLINE UINT32 io_read_dword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_dword)(byteaddress); }
+INLINE UINT64 io_read_qword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO].accessors->read_qword)(byteaddress); }
 
-INLINE void	io_write_byte (offs_t offset, UINT8  data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_byte)(offset, data); }
-INLINE void	io_write_word (offs_t offset, UINT16 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_word)(offset, data); }
-INLINE void	io_write_dword(offs_t offset, UINT32 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_dword)(offset, data); }
-INLINE void	io_write_qword(offs_t offset, UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_qword)(offset, data); }
+INLINE void	io_write_byte (offs_t byteaddress, UINT8  data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_byte)(byteaddress, data); }
+INLINE void	io_write_word (offs_t byteaddress, UINT16 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_word)(byteaddress, data); }
+INLINE void	io_write_dword(offs_t byteaddress, UINT32 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_dword)(byteaddress, data); }
+INLINE void	io_write_qword(offs_t byteaddress, UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO].accessors->write_qword)(byteaddress, data); }
 
 /* ----- safe opcode and opcode argument reading ----- */
-UINT8	cpu_readop_safe(offs_t offset);
-UINT16	cpu_readop16_safe(offs_t offset);
-UINT32	cpu_readop32_safe(offs_t offset);
-UINT64	cpu_readop64_safe(offs_t offset);
-UINT8	cpu_readop_arg_safe(offs_t offset);
-UINT16	cpu_readop_arg16_safe(offs_t offset);
-UINT32	cpu_readop_arg32_safe(offs_t offset);
-UINT64	cpu_readop_arg64_safe(offs_t offset);
+UINT8	cpu_readop_safe(offs_t byteaddress);
+UINT16	cpu_readop16_safe(offs_t byteaddress);
+UINT32	cpu_readop32_safe(offs_t byteaddress);
+UINT64	cpu_readop64_safe(offs_t byteaddress);
+UINT8	cpu_readop_arg_safe(offs_t byteaddress);
+UINT16	cpu_readop_arg16_safe(offs_t byteaddress);
+UINT32	cpu_readop_arg32_safe(offs_t byteaddress);
+UINT64	cpu_readop_arg64_safe(offs_t byteaddress);
 
 /* ----- unsafe opcode and opcode argument reading ----- */
 #define cpu_opptr_unsafe(A)			((void *)&opcode_base[(A) & opcode_mask])
@@ -891,18 +901,18 @@ UINT64	cpu_readop_arg64_safe(offs_t offset);
 #define cpu_readop_arg64_unsafe(A)	(*(UINT64 *)&opcode_arg_base[(A) & opcode_mask])
 
 /* ----- opcode and opcode argument reading ----- */
-INLINE void * cpu_opptr(offs_t A)			{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_opptr_unsafe(A); }
-INLINE UINT8  cpu_readop(offs_t A)			{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_unsafe(A); }
-INLINE UINT16 cpu_readop16(offs_t A)		{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop16_unsafe(A); }
-INLINE UINT32 cpu_readop32(offs_t A)		{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop32_unsafe(A); }
-INLINE UINT64 cpu_readop64(offs_t A)		{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop64_unsafe(A); }
-INLINE UINT8  cpu_readop_arg(offs_t A)		{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_arg_unsafe(A); }
-INLINE UINT16 cpu_readop_arg16(offs_t A)	{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_arg16_unsafe(A); }
-INLINE UINT32 cpu_readop_arg32(offs_t A)	{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_arg32_unsafe(A); }
-INLINE UINT64 cpu_readop_arg64(offs_t A)	{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_arg64_unsafe(A); }
+INLINE void * cpu_opptr(offs_t byteaddress)			{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_opptr_unsafe(byteaddress); }
+INLINE UINT8  cpu_readop(offs_t byteaddress)		{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_unsafe(byteaddress); }
+INLINE UINT16 cpu_readop16(offs_t byteaddress)		{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop16_unsafe(byteaddress); }
+INLINE UINT32 cpu_readop32(offs_t byteaddress)		{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop32_unsafe(byteaddress); }
+INLINE UINT64 cpu_readop64(offs_t byteaddress)		{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop64_unsafe(byteaddress); }
+INLINE UINT8  cpu_readop_arg(offs_t byteaddress)	{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg_unsafe(byteaddress); }
+INLINE UINT16 cpu_readop_arg16(offs_t byteaddress)	{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg16_unsafe(byteaddress); }
+INLINE UINT32 cpu_readop_arg32(offs_t byteaddress)	{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg32_unsafe(byteaddress); }
+INLINE UINT64 cpu_readop_arg64(offs_t byteaddress)	{ if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg64_unsafe(byteaddress); }
 
 /* ----- bank switching for CPU cores ----- */
-#define change_pc(pc)				do { memory_set_opbase(pc); } while (0)
+#define change_pc(byteaddress)				do { memory_set_opbase(byteaddress); } while (0)
 
 /* ----- forces the next branch to generate a call to the opbase handler ----- */
 #define catch_nextBranch()			do { opcode_entry = 0xff; } while (0)
