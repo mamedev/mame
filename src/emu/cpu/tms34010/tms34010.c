@@ -7,7 +7,6 @@
 
 ***************************************************************************/
 
-#include <stddef.h>
 #include "debugger.h"
 #include "deprecat.h"
 #include "osd_cpu.h"
@@ -62,6 +61,7 @@ typedef struct tms34010_regs
 	UINT8 hblank_stable;
 	int (*irq_callback)(int irqline);
 	const tms34010_config *config;
+	const device_config *screen;
 	emu_timer *scantimer;
 
 	/* A registers 0-15 map to regs[0]-regs[15] */
@@ -89,10 +89,10 @@ typedef struct tms34010_regs
 static int	tms34010_ICount;
 
 /* internal state */
-static tms34010_regs 	state;
-static UINT8			external_host_access;
-static UINT8			screen_to_cpu[MAX_SCREENS];
-static UINT8			executing_cpu = 0xff;
+static tms34010_regs 		state;
+static UINT8				external_host_access;
+static const device_config	*screen_to_cpu[MAX_CPU];
+static UINT8				executing_cpu = 0xff;
 
 /* default configuration */
 static const tms34010_config default_config =
@@ -638,10 +638,20 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 
 	state.config = config;
 	state.irq_callback = irqcallback;
+	state.screen = device_list_find_by_tag(Machine->config->devicelist, VIDEO_SCREEN, config->screen_tag);
 
 	/* if we have a scanline callback, make us the owner of this screen */
 	if (config->scanline_callback != NULL)
-		screen_to_cpu[config->scrnum] = index;
+	{
+		int i;
+
+		for (i = 0; i < MAX_CPU; i++)
+			if (screen_to_cpu[i] == NULL)
+				break;
+
+		assert(i != MAX_CPU);
+		screen_to_cpu[i] = state.screen;
+	}
 
 	/* allocate a scanline timer and set it to go off at the start */
 	state.scantimer = timer_alloc(scanline_callback, NULL);
@@ -667,19 +677,18 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 
 static void tms34010_reset(void)
 {
-	const tms34010_config *config;
-	emu_timer *save_scantimer;
-	int (*save_irqcallback)(int);
-	UINT16 *shiftreg;
-
 	/* zap the state and copy in the config pointer */
-	config = state.config;
-	shiftreg = state.shiftreg;
-	save_irqcallback = state.irq_callback;
-	save_scantimer = state.scantimer;
+	const tms34010_config *config = state.config;
+	const device_config *screen = state.screen;
+	UINT16 *shiftreg = state.shiftreg;
+	int (*save_irqcallback)(int) = state.irq_callback;
+	emu_timer *save_scantimer = state.scantimer;
+
 	memset(&state, 0, sizeof(state));
-	state.shiftreg = shiftreg;
+
 	state.config = config;
+	state.screen = screen;
+	state.shiftreg = shiftreg;
 	state.irq_callback = save_irqcallback;
 	state.scantimer = save_scantimer;
 
@@ -834,9 +843,8 @@ static int tms34010_execute(int cycles)
 	check_interrupt();
 	do
 	{
-
 		#ifdef	ENABLE_DEBUGGER
-		if (Machine->debug_mode) { state.st = GET_ST(); mame_debug_hook(PC); }
+		if (state.screen->machine->debug_mode) { state.st = GET_ST(); mame_debug_hook(PC); }
 		#endif
 		state.op = ROPCODE();
 		(*opcode_table[state.op >> 4])();
@@ -931,7 +939,7 @@ static void set_raster_op(void)
 
 static TIMER_CALLBACK( scanline_callback )
 {
-	const screen_state *screen;
+	const rectangle *current_visarea;
 	int vsblnk, veblnk, vtotal;
 	int vcount = param >> 8;
 	int cpunum = param & 0xff;
@@ -940,9 +948,9 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* set the CPU context */
 	cpuintrf_push_context(cpunum);
-	screen = &machine->screen[state.config->scrnum];
 
 	/* fetch the core timing parameters */
+	current_visarea = video_screen_get_visible_area(state.screen);
 	enabled = SMART_IOREG(DPYCTL) & 0x8000;
 	master = (state.is_34020 || (SMART_IOREG(DPYCTL) & 0x2000));
 	vsblnk = SMART_IOREG(VSBLNK);
@@ -950,8 +958,8 @@ static TIMER_CALLBACK( scanline_callback )
 	vtotal = SMART_IOREG(VTOTAL);
 	if (!master)
 	{
-		vtotal = MIN(screen->height - 1, vtotal);
-		vcount = video_screen_get_vpos_scrnum(state.config->scrnum);
+		vtotal = MIN(video_screen_get_height(state.screen) - 1, vtotal);
+		vcount = video_screen_get_vpos(state.screen);
 	}
 
 	/* update the VCOUNT */
@@ -1009,10 +1017,13 @@ static TIMER_CALLBACK( scanline_callback )
 					/* because many games play with the HEBLNK/HSBLNK for effects, we don't change
                        if they are the only thing that has changed, unless they are stable for a couple
                        of frames */
-					if (width != screen->width || height != screen->height || visarea.min_y != screen->visarea.min_y || visarea.max_y != screen->visarea.max_y ||
-						(state.hblank_stable > 2 && (visarea.min_x != screen->visarea.min_x || visarea.max_x != screen->visarea.max_x)))
+					int current_width  = video_screen_get_width(state.screen);
+					int current_height = video_screen_get_height(state.screen);
+
+					if (width != current_width || height != current_height || visarea.min_y != current_visarea->min_y || visarea.max_y != current_visarea->max_y ||
+						(state.hblank_stable > 2 && (visarea.min_x != current_visarea->min_x || visarea.max_x != current_visarea->max_x)))
 					{
-						video_screen_configure_scrnum(state.config->scrnum, width, height, &visarea, refresh);
+						video_screen_configure(state.screen, width, height, &visarea, refresh);
 					}
 					state.hblank_stable++;
 				}
@@ -1028,8 +1039,8 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* force a partial update within the visible area */
-	if (vcount >= screen->visarea.min_y && vcount <= screen->visarea.max_y && state.config->scanline_callback != NULL)
-		video_screen_update_partial_scrnum(state.config->scrnum, vcount);
+	if (vcount >= current_visarea->min_y && vcount <= current_visarea->max_y && state.config->scanline_callback != NULL)
+		video_screen_update_partial(state.screen, vcount);
 
 	/* if we are in the visible area, increment DPYADR by DUDATE */
 	if (vcount >= veblnk && vcount < vsblnk)
@@ -1065,7 +1076,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* note that we add !master (0 or 1) as a attoseconds value; this makes no practical difference */
 	/* but helps ensure that masters are updated first before slaves */
-	timer_adjust_oneshot(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos_scrnum(state.config->scrnum, vcount, 0), !master), cpunum | (vcount << 8));
+	timer_adjust_oneshot(state.scantimer, attotime_add_attoseconds(video_screen_get_time_until_pos(state.screen, vcount, 0), !master), cpunum | (vcount << 8));
 
 	/* restore the context */
 	cpuintrf_pop_context();
@@ -1112,17 +1123,25 @@ VIDEO_UPDATE( tms340x0 )
 {
 	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;
+	int cpunum = -1;
 	int x;
 
+	/* find the owning CPU */
+	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
+		if (screen_to_cpu[cpunum] == screen)
+			break;
+
+	assert(cpunum >= 0);
+
 	/* get the display parameters for the screen */
-	tms34010_get_display_params(screen_to_cpu[scrnum], &params);
+	tms34010_get_display_params(cpunum, &params);
 
 	/* if the display is enabled, call the scanline callback */
 	if (params.enabled)
 	{
 		/* call through to the callback */
 		LOG(("  Update: scan=%3d ROW=%04X COL=%04X\n", cliprect->min_y, params.rowaddr, params.coladdr));
-		(*state.config->scanline_callback)(screen->machine, scrnum, bitmap, cliprect->min_y, &params);
+		(*state.config->scanline_callback)(screen, bitmap, cliprect->min_y, &params);
 	}
 
 	/* otherwise, just blank the current scanline */
@@ -1209,7 +1228,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			/* if the CPU is halting itself, stop execution right away */
 			if ((data & 0x8000) && !external_host_access)
 				tms34010_ICount = 0;
-			cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(state.screen->machine, cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
 
 			/* NMI issued? */
 			if (data & 0x0100)
@@ -1283,7 +1302,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), video_screen_get_vpos_scrnum(state.config->scrnum));
+		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg_name[offset], IOREG(offset), video_screen_get_vpos(state.screen));
 }
 
 
@@ -1320,7 +1339,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(offset) = data;
 
 	if (LOG_CONTROL_REGS)
-		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), video_screen_get_vpos_scrnum(state.config->scrnum));
+		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, activecpu_get_pc(), ioreg020_name[offset], IOREG(offset), video_screen_get_vpos(state.screen));
 
 	switch (offset)
 	{
@@ -1360,7 +1379,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			/* if the CPU is halting itself, stop execution right away */
 			if ((data & 0x8000) && !external_host_access)
 				tms34010_ICount = 0;
-			cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(state.screen->machine, cpunum, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
 
 			/* NMI issued? */
 			if (data & 0x0100)
@@ -1485,9 +1504,9 @@ READ16_HANDLER( tms34010_io_register_r )
 	{
 		case REG_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = video_screen_get_hpos_scrnum(state.config->scrnum);
+			result = video_screen_get_hpos(state.screen);
 			total = IOREG(REG_HTOTAL) + 1;
-			result = result * total / Machine->screen[state.config->scrnum].width;
+			result = result * total / video_screen_get_width(state.screen);
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG_HEBLNK);
@@ -1528,9 +1547,9 @@ READ16_HANDLER( tms34020_io_register_r )
 	{
 		case REG020_HCOUNT:
 			/* scale the horizontal position from screen width to HTOTAL */
-			result = video_screen_get_hpos_scrnum(state.config->scrnum);
+			result = video_screen_get_hpos(state.screen);
 			total = IOREG(REG020_HTOTAL) + 1;
-			result = result * total / Machine->screen[state.config->scrnum].width;
+			result = result * total / video_screen_get_width(state.screen);
 
 			/* offset by the HBLANK end */
 			result += IOREG(REG020_HEBLNK);
@@ -1653,8 +1672,8 @@ void tms34010_host_w(int cpunum, int reg, int data)
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 			external_host_access = TRUE;
-			tms34010_io_register_w(Machine, REG_HSTCTLH, data & 0xff00, 0);
-			tms34010_io_register_w(Machine, REG_HSTCTLL, data & 0x00ff, 0);
+			tms34010_io_register_w(state.screen->machine, REG_HSTCTLH, data & 0xff00, 0);
+			tms34010_io_register_w(state.screen->machine, REG_HSTCTLL, data & 0x00ff, 0);
 			external_host_access = FALSE;
 			break;
 

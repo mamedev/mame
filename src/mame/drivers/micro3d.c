@@ -137,7 +137,7 @@ static WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
 }
 
 
-static void micro3d_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void micro3d_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -848,7 +848,7 @@ static const struct upd7759_interface upd7759_interface =
 static const tms34010_config vgb_config =
 {
 	FALSE,							/* halt on reset ????? - check this */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	40000000/8,						/* pixel clock */
 	4,								/* pixels per clock */
 	micro3d_scanline_update,		/* scanline updater */

@@ -445,7 +445,7 @@ INPUT_PORTS_END
 static const tms34010_config master_config =
 {
 	FALSE,						/* halt on reset */
-	0,							/* the screen operated on */
+	"main",						/* the screen operated on */
 	40000000/8,					/* pixel clock */
 	1,							/* pixels per clock */
 	exterm_scanline_update,		/* scanline updater */
@@ -457,7 +457,7 @@ static const tms34010_config master_config =
 static const tms34010_config slave_config =
 {
 	TRUE,						/* halt on reset */
-	0,							/* the screen operated on */
+	"main",						/* the screen operated on */
 	40000000/8,					/* pixel clock */
 	1,							/* pixels per clock */
 	NULL,						/* scanline updater */

@@ -821,7 +821,7 @@ static void jpmimpct_tms_irq(int state)
 static const tms34010_config tms_config =
 {
 	TRUE,                       /* halt on reset */
-	0,                          /* the screen operated on */
+	"main",                     /* the screen operated on */
 	40000000/16,                /* pixel clock */
 	4,                          /* pixels per clock */
 	jpmimpct_scanline_update,   /* scanline updater */

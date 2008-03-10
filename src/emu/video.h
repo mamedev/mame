@@ -139,6 +139,12 @@ int video_screen_get_hpos_scrnum(int scrnum);
 int video_screen_get_vblank(const device_config *screen);
 int video_screen_get_hblank(const device_config *screen);
 
+/* return the current width for a screen */
+int video_screen_get_width(const device_config *screen);
+
+/* return the current height for a screen */
+int video_screen_get_height(const device_config *screen);
+
 /* return the current visible area for a screen */
 const rectangle *video_screen_get_visible_area(const device_config *screen);
 

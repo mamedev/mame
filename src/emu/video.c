@@ -1034,8 +1034,30 @@ int video_screen_get_hblank(const device_config *screen)
 
 
 /*-------------------------------------------------
+    video_screen_get_width - returns the width
+    of a given screen
+-------------------------------------------------*/
+int video_screen_get_width(const device_config *screen)
+{
+	screen_state *state = get_safe_token(screen);
+	return state->width;
+}
+
+
+/*-------------------------------------------------
+    video_screen_get_height - returns the height
+    of a given screen
+-------------------------------------------------*/
+int video_screen_get_height(const device_config *screen)
+{
+	screen_state *state = get_safe_token(screen);
+	return state->height;
+}
+
+
+/*-------------------------------------------------
     video_screen_get_visible_area - returns the
-    visible area a given screen
+    visible area of a given screen
 -------------------------------------------------*/
 const rectangle *video_screen_get_visible_area(const device_config *screen)
 {

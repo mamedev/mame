@@ -179,7 +179,7 @@ WRITE16_HANDLER( lethalj_blitter_w )
  *
  *************************************/
 
-void lethalj_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void lethalj_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *src = &screenram[(vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -191,7 +191,7 @@ void lethalj_scanline_update(running_machine *machine, int screen, bitmap_t *bit
 	{
 		for (x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = 0x7fff;
-		if (scanline == machine->screen[0].visarea.max_y)
+		if (scanline == video_screen_get_visible_area(screen)->max_y)
 			blank_palette = 0;
 		return;
 	}

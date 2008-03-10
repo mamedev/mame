@@ -76,7 +76,7 @@ static TIMER_CALLBACK( nvram_write_timeout );
  *
  *************************************/
 
-static void amerdart_scanline(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void amerdart_scanline(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -103,7 +103,7 @@ static void amerdart_scanline(running_machine *machine, int screen, bitmap_t *bi
 }
 
 
-static void coolpool_scanline(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void coolpool_scanline(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *vram = &vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -652,7 +652,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config_amerdart =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	40000000/12,					/* pixel clock */
 	2,								/* pixels per clock */
 	amerdart_scanline,				/* scanline callback */
@@ -665,7 +665,7 @@ static const tms34010_config tms_config_amerdart =
 static const tms34010_config tms_config_coolpool =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	40000000/6,						/* pixel clock */
 	1,								/* pixels per clock */
 	coolpool_scanline,				/* scanline callback */

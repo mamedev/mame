@@ -193,7 +193,7 @@ void slapstic_init(int chip);
 static const tms34010_config gsp_config_driver =
 {
 	TRUE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	4000000,						/* pixel clock */
 	4,								/* pixels per clock */
 	harddriv_scanline_driver,		/* scanline callback */
@@ -207,7 +207,7 @@ static const tms34010_config gsp_config_driver =
 static const tms34010_config gsp_config_multisync =
 {
 	TRUE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	6000000,						/* pixel clock */
 	2,								/* pixels per clock */
 	harddriv_scanline_multisync,	/* scanline callback */
@@ -221,7 +221,7 @@ static const tms34010_config gsp_config_multisync =
 static const tms34010_config gsp_config_multisync_stunrun =
 {
 	TRUE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	5000000,						/* pixel clock */
 	2,								/* pixels per clock */
 	harddriv_scanline_multisync,	/* scanline callback */
@@ -234,7 +234,7 @@ static const tms34010_config gsp_config_multisync_stunrun =
 static const tms34010_config msp_config =
 {
 	TRUE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	5000000,						/* pixel clock */
 	2,								/* pixels per clock */
 	NULL,							/* scanline callback */

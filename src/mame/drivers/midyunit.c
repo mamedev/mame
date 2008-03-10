@@ -977,7 +977,7 @@ INPUT_PORTS_END
 static const tms34010_config zunit_tms_config =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	MEDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
 	midyunit_scanline_update,		/* scanline updater */
@@ -989,7 +989,7 @@ static const tms34010_config zunit_tms_config =
 static const tms34010_config yunit_tms_config =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	STDRES_PIXEL_CLOCK,				/* pixel clock */
 	2,								/* pixels per clock */
 	midyunit_scanline_update,		/* scanline updater */

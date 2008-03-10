@@ -45,7 +45,7 @@ static MACHINE_RESET( xtheball )
  *
  *************************************/
 
-static void xtheball_scanline_update(running_machine *machine, int screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+static void xtheball_scanline_update(const device_config *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
 	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
@@ -337,7 +337,7 @@ INPUT_PORTS_END
 static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	5000000,						/* pixel clock */
 	2,								/* pixels per clock */
 	xtheball_scanline_update,		/* scanline callback */

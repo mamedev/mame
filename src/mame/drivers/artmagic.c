@@ -459,7 +459,7 @@ ADDRESS_MAP_END
 static const tms34010_config tms_config =
 {
 	TRUE,							/* halt on reset */
-	0,								/* the screen operated on */
+	"main",							/* the screen operated on */
 	MASTER_CLOCK_40MHz/6,			/* pixel clock */
 	1,								/* pixels per clock */
 	artmagic_scanline,				/* scanline update */
