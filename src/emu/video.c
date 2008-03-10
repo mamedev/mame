@@ -51,7 +51,6 @@ struct _internal_screen_state
 {
 	/* basic information about this screen */
 	int						scrnum;					/* the screen index */
-	const device_config *	device;					/* pointer to screen device configuration */
 
 	/* textures and bitmaps */
 	render_texture *		texture[2];				/* 2x textures for the screen bitmap */
@@ -173,7 +172,6 @@ static const UINT8 skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 /* core implementation */
 static void video_exit(running_machine *machine);
 static void init_buffered_spriteram(void);
-static internal_screen_state *get_internal_state(running_machine *machine, int scrnum);
 
 /* graphics decoding */
 static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
@@ -341,7 +339,6 @@ void video_init(running_machine *machine)
 
 		/* save some cross-reference information that makes our life easier */
 		internal_state->scrnum = scrnum;
-		internal_state->device = screen;
 
 		/* configure the screen with the default parameters */
 		state->format = config->format;
@@ -804,12 +801,6 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 	timer_adjust_oneshot(internal_state->vblank_begin_timer, video_screen_get_time_until_vblank_start(screen), 0);
 }
 
-void video_screen_configure_scrnum(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t frame_period)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	video_screen_configure(internal_state->device, width, height, visarea, frame_period);
-}
-
 
 /*-------------------------------------------------
     video_screen_set_visarea - just set the visible area
@@ -828,19 +819,6 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
 	visarea.max_y = max_y;
 
 	video_screen_configure(screen, state->width, state->height, &visarea, internal_state->frame_period);
-}
-
-
-/*-------------------------------------------------
-    get_internal_state - accessor function to get
-    private state for a screen
--------------------------------------------------*/
-
-static internal_screen_state *get_internal_state(running_machine *machine, int scrnum)
-{
-	assert(machine != NULL);
-	assert((scrnum >= 0) && (scrnum < MAX_SCREENS));
-	return (internal_screen_state *)machine->screen[scrnum].private_data;
 }
 
 
@@ -961,12 +939,6 @@ int video_screen_get_vpos(const device_config *screen)
 	return (state->visarea.max_y + 1 + vpos) % state->height;
 }
 
-int video_screen_get_vpos_scrnum(int scrnum)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	return video_screen_get_vpos(internal_state->device);
-}
-
 
 /*-------------------------------------------------
     video_screen_get_hpos - returns the current
@@ -994,11 +966,6 @@ int video_screen_get_hpos(const device_config *screen)
 	return delta / internal_state->pixeltime;
 }
 
-int video_screen_get_hpos_scrnum(int scrnum)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	return video_screen_get_hpos(internal_state->device);
-}
 
 
 /*-------------------------------------------------
@@ -1099,9 +1066,7 @@ attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, 
 
 attotime video_screen_get_time_until_vblank_start(const device_config *screen)
 {
-	screen_state *state = get_safe_token(screen);
-	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
-	return video_screen_get_time_until_pos(screen, screen->machine->screen[internal_state->scrnum].visarea.max_y + 1, 0);
+	return video_screen_get_time_until_pos(screen, video_screen_get_visible_area(screen)->max_y + 1, 0);
 }
 
 
@@ -1114,9 +1079,7 @@ attotime video_screen_get_time_until_vblank_start(const device_config *screen)
 
 attotime video_screen_get_time_until_vblank_end(const device_config *screen)
 {
-	screen_state *state = get_safe_token(screen);
-	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
-	return video_screen_get_time_until_pos(screen, screen->machine->screen[internal_state->scrnum].visarea.min_y, 0);
+	return video_screen_get_time_until_pos(screen, video_screen_get_visible_area(screen)->min_y, 0);
 }
 
 
@@ -1171,12 +1134,6 @@ attotime video_screen_get_frame_period(const device_config *screen)
 	}
 
 	return ret;
-}
-
-attotime video_screen_get_frame_period_scrnum(int scrnum)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	return video_screen_get_frame_period(internal_state->device);
 }
 
 
@@ -1530,13 +1487,13 @@ static int finish_screen_updates(running_machine *machine)
 	livemask = render_get_live_screens_mask();
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
-		int scrnum = device_list_index(machine->config->devicelist, VIDEO_SCREEN, screen->tag);
-		internal_screen_state *internal_state = get_internal_state(machine, scrnum);
+		screen_state *state = get_safe_token(screen);
+		internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 		/* only update if live */
-		if (livemask & (1 << scrnum))
+		if (livemask & (1 << internal_state->scrnum))
 		{
-			const screen_config *config = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum)->inline_config;
+			const screen_config *config = screen->inline_config;
 
 			/* only update if empty and not a vector game; otherwise assume the driver did it directly */
 			if (config->type != SCREEN_TYPE_VECTOR && (machine->config->video_attributes & VIDEO_SELF_RENDER) == 0)
@@ -1545,7 +1502,7 @@ static int finish_screen_updates(running_machine *machine)
 				if (!global.skipping_this_frame && internal_state->changed)
 				{
 					bitmap_t *bitmap = internal_state->bitmap[internal_state->curbitmap];
-					rectangle fixedvis = machine->screen[scrnum].visarea;
+					rectangle fixedvis = *video_screen_get_visible_area(screen);
 					fixedvis.max_x++;
 					fixedvis.max_y++;
 					render_texture_set_bitmap(internal_state->texture[internal_state->curbitmap], bitmap, &fixedvis, 0, internal_state->texture_format);
@@ -1554,8 +1511,8 @@ static int finish_screen_updates(running_machine *machine)
 				}
 
 				/* create an empty container with a single quad */
-				render_container_empty(render_container_get_screen(scrnum));
-				render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), internal_state->texture[internal_state->curtexture], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+				render_container_empty(render_container_get_screen(internal_state->scrnum));
+				render_screen_add_quad(internal_state->scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), internal_state->texture[internal_state->curtexture], PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 			}
 
 			/* update our movie recording state */

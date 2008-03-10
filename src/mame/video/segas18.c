@@ -41,8 +41,8 @@ static UINT8 vdp_mixing;
  *
  *************************************/
 
-extern void start_system18_vdp(void);
-extern void update_system18_vdp(bitmap_t *bitmap, const rectangle *cliprect);
+void system18_vdp_start(running_machine *machine);
+void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
 
 
 
@@ -64,7 +64,7 @@ VIDEO_START( system18 )
 	segaic16_sprites_init(0, SEGAIC16_SPRITES_16B, 0x400, 0);
 
 	/* create the VDP */
-	start_system18_vdp();
+	system18_vdp_start(machine);
 
 	/* create a temp bitmap to draw the VDP data into */
 	tempbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
@@ -213,7 +213,7 @@ VIDEO_UPDATE( system18 )
 
 	/* if the VDP is enabled, update our tempbitmap */
 	if (vdp_enable)
-		update_system18_vdp(tempbitmap, cliprect);
+		system18_vdp_update(tempbitmap, cliprect);
 
 	/* reset priorities */
 	fillbitmap(priority_bitmap, 0, cliprect);

@@ -1742,9 +1742,13 @@ static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer
 
 	if (buffer != NULL)
 	{
-		screen_state *state = &Machine->screen[arg];
-		video_screen_configure_scrnum(arg, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "%s Refresh rate %.3f", slider_get_screen_desc(arg), ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
+		const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+
+		video_screen_configure(screen, width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
+		sprintf(buffer, "%s Refresh Rate %.3ffps", slider_get_screen_desc(arg), ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
 	}
 	refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);

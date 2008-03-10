@@ -657,7 +657,13 @@ static UINT64 get_logunmap(UINT32 ref)
 
 static UINT64 get_beamx(UINT32 ref)
 {
-	return video_screen_get_hpos_scrnum(ref);
+	UINT64 ret = 0;
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, ref);
+
+	if (screen != NULL)
+		ret = video_screen_get_hpos(screen);
+
+	return ret;
 }
 
 
@@ -667,7 +673,13 @@ static UINT64 get_beamx(UINT32 ref)
 
 static UINT64 get_beamy(UINT32 ref)
 {
-	return video_screen_get_vpos_scrnum(ref);
+	UINT64 ret = 0;
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, ref);
+
+	if (screen != NULL)
+		ret = video_screen_get_vpos(screen);
+
+	return ret;
 }
 
 

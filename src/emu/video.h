@@ -117,7 +117,6 @@ void video_init(running_machine *machine);
 
 /* set the resolution of a screen */
 void video_screen_configure(const device_config *screen, int width, int height, const rectangle *visarea, attoseconds_t refresh);
-void video_screen_configure_scrnum(int scrnum, int width, int height, const rectangle *visarea, attoseconds_t refresh);
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
 void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y);
@@ -130,9 +129,7 @@ void video_screen_update_now(const device_config *screen);
 
 /* return the current vertical or horizontal position of the beam for a screen */
 int video_screen_get_vpos(const device_config *screen);
-int video_screen_get_vpos_scrnum(int scrnum);
 int video_screen_get_hpos(const device_config *screen);
-int video_screen_get_hpos_scrnum(int scrnum);
 
 /* return the current vertical or horizontal blanking state for a screen */
 int video_screen_get_vblank(const device_config *screen);
@@ -164,7 +161,6 @@ attotime video_screen_get_scan_period(const device_config *screen);
 
 /* return the amount of time the beam takes to draw one complete frame */
 attotime video_screen_get_frame_period(const device_config *screen);
-attotime video_screen_get_frame_period_scrnum(int scrnum);
 
 /* return the current frame number -- this is always increasing */
 UINT64 video_screen_get_frame_number(const device_config *screen);

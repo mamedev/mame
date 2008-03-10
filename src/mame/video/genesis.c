@@ -15,7 +15,7 @@
 VIDEO_START( megaplay_normal );
 VIDEO_UPDATE( megaplay_normal );
 
-static int genesis_screen_number;
+static const device_config *genesis_screen;
 
 
 /******************************************************************************
@@ -126,7 +126,7 @@ static UINT8		window_width;				/* window width */
 ******************************************************************************/
 
 
-static void start_genesis_vdp(int screen_number)
+static void start_genesis_vdp(const device_config *screen)
 {
 	static const UINT8 vdp_init[24] =
 	{
@@ -136,7 +136,7 @@ static void start_genesis_vdp(int screen_number)
 	};
 	int i;
 
-	genesis_screen_number = screen_number;
+	genesis_screen = screen;
 
 	/* allocate memory for the VDP, the lookup table, and the buffer bitmap */
 	vdp_vram			= auto_malloc(VRAM_SIZE);
@@ -203,13 +203,13 @@ static void start_genesis_vdp(int screen_number)
 
 VIDEO_START(genesis)
 {
-	start_genesis_vdp(0);
+	start_genesis_vdp(machine->primary_screen);
 }
 
 
 VIDEO_START( segac2 )
 {
-	start_genesis_vdp(0);
+	start_genesis_vdp(machine->primary_screen);
 
 	/* C2 has separate sprite/background palettes */
 	genesis_sp_pal_lookup[0] = 0x100;
@@ -223,9 +223,9 @@ VIDEO_START( segac2 )
 
 
 
-void start_system18_vdp(void)
+void system18_vdp_start(running_machine *machine)
 {
-	start_genesis_vdp(0);
+	start_genesis_vdp(machine->primary_screen);
 
 	genesis_palette_base = 0x1800;
 	genesis_bg_pal_lookup[0] = genesis_sp_pal_lookup[0] = 0x1800;
@@ -295,7 +295,7 @@ VIDEO_UPDATE( megaplay )
 	return 0;
 }
 
-void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect )
+void system18_vdp_update( bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int y;
 
@@ -347,8 +347,8 @@ READ16_HANDLER( genesis_vdp_r )
 		case 0x06:
 		case 0x07:
 		{
-			int xpos = video_screen_get_hpos(machine->primary_screen);
-			int ypos = video_screen_get_vpos(machine->primary_screen);
+			int xpos = video_screen_get_hpos(genesis_screen);
+			int ypos = video_screen_get_vpos(genesis_screen);
 
 			/* adjust for the weird counting rules */
 			if (xpos > 0xe9) xpos -= (342 - 0x100);
@@ -666,13 +666,13 @@ static void vdp_register_w(int data, int vblank)
 				break;
 			}
 			{
-				screen_state *state = &Machine->screen[genesis_screen_number];
-				rectangle visarea = state->visarea;
-				attoseconds_t refresh = video_screen_get_frame_period_scrnum(genesis_screen_number).attoseconds;
+				int height = video_screen_get_height(genesis_screen);
+				rectangle visarea = *video_screen_get_visible_area(genesis_screen);
+				attoseconds_t refresh = video_screen_get_frame_period(genesis_screen).attoseconds;
 
 				/* this gets called from the init! */
 				visarea.max_x = scrwidth*8-1;
-				video_screen_configure_scrnum(genesis_screen_number, scrwidth*8, state->height, &visarea, refresh);
+				video_screen_configure(genesis_screen, scrwidth*8, height, &visarea, refresh);
 			}
 			break;
 

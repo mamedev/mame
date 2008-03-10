@@ -94,11 +94,11 @@ type1       type0           function
 #include "video/resnet.h"
 
 /* video/segac2.c */
-extern void update_system18_vdp( bitmap_t *bitmap, const rectangle *cliprect );
-extern void start_system18_vdp(void);
-extern READ16_HANDLER( segac2_vdp_r );
-extern WRITE16_HANDLER( segac2_vdp_w );
-static UINT16 sys18_ddcrew_bankregs[0x20];
+void system18_vdp_update( bitmap_t *bitmap, const rectangle *cliprect );
+void system18_vdp_start(running_machine *machine);
+READ16_HANDLER( segac2_vdp_r );
+WRITE16_HANDLER( segac2_vdp_w );
+UINT16 sys18_ddcrew_bankregs[0x20];
 
 
 
@@ -864,7 +864,7 @@ VIDEO_START( system18old ){
 
 	sys16_bg1_trans=1;
 
-	start_system18_vdp();
+	system18_vdp_start(machine);
 
 	/* clear these registers to -1 so that writes of 0 get picked up */
 	for (i=0;i<0x20;i++)
@@ -1118,7 +1118,7 @@ VIDEO_UPDATE( system18old ){
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0 );	//??
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 2, 0 );	//??
 
-	if (!strcmp(screen->machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
+	if (!strcmp(screen->machine->gamedrv->name,"astorm"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for astorm
 	/* ASTORM also draws some sprites with the vdp, needs to be higher priority..*/
 
 //  sprite_draw(sprite_list,3);
@@ -1133,15 +1133,15 @@ VIDEO_UPDATE( system18old ){
 	if(sys18_fg2_active) tilemap_draw( bitmap,cliprect, foreground2, 1, 0x7 );
 	tilemap_draw( bitmap,cliprect, foreground, 1, 0x7 );
 
-	if (!strcmp(screen->machine->gamedrv->name,"ddcrew"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for ddcrew
+	if (!strcmp(screen->machine->gamedrv->name,"ddcrew"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for ddcrew
 
 	tilemap_draw( bitmap,cliprect, text_layer, 1, 0x7 );
 //  sprite_draw(sprite_list,0);
 	tilemap_draw( bitmap,cliprect, text_layer, 0, 0xf );
 
-	if (!strcmp(screen->machine->gamedrv->name,"cltchitr"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
-	if (!strcmp(screen->machine->gamedrv->name,"cltchtrj"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
-//  if (!strcmp(screen->machine->gamedrv->name,"astorm"))  update_system18_vdp(bitmap,cliprect); // kludge: render vdp here for astorm
+	if (!strcmp(screen->machine->gamedrv->name,"cltchitr"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
+	if (!strcmp(screen->machine->gamedrv->name,"cltchtrj"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for clthitr, draws the ball in game!
+//  if (!strcmp(screen->machine->gamedrv->name,"astorm"))  system18_vdp_update(bitmap,cliprect); // kludge: render vdp here for astorm
 
 	draw_sprites(screen->machine, bitmap,cliprect, 0 );
 	return 0;
