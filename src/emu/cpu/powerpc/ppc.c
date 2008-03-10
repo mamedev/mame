@@ -817,12 +817,10 @@ INLINE UINT32 ppc_get_cr(void)
 	return CR(0) << 28 | CR(1) << 24 | CR(2) << 20 | CR(3) << 16 | CR(4) << 12 | CR(5) << 8 | CR(6) << 4 | CR(7);
 }
 
-#ifdef UNUSED_FUNCTION
 INLINE void ppc_exception(int exception_type)
 {
 	longjmp(ppc.exception_jmpbuf, exception_type);
 }
-#endif
 
 /***********************************************************************/
 
