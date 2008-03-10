@@ -510,9 +510,9 @@ static VIDEO_START( hornet )
 	add_exit_callback(machine, hornet_exit);
 
 	if (voodoo_version == 0)
-		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
+		voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 0);
 	else
-		voodoo_start(0, 0, VOODOO_2, 2, 4, 0);
+		voodoo_start(0, machine->primary_screen, VOODOO_2, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
@@ -521,17 +521,20 @@ static VIDEO_START( hornet )
 
 static VIDEO_START( hornet_2board )
 {
+	const device_config *left_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "right");
+
 	add_exit_callback(machine, hornet_2board_exit);
 
 	if (voodoo_version == 0)
 	{
-		voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
-		voodoo_start(1, 1, VOODOO_1, 2, 4, 0);
+		voodoo_start(0, left_screen,  VOODOO_1, 2, 4, 0);
+		voodoo_start(1, right_screen, VOODOO_1, 2, 4, 0);
 	}
 	else
 	{
-		voodoo_start(0, 0, VOODOO_2, 2, 4, 0);
-		voodoo_start(1, 1, VOODOO_2, 2, 4, 0);
+		voodoo_start(0, left_screen,  VOODOO_2, 2, 4, 0);
+		voodoo_start(1, right_screen, VOODOO_2, 2, 4, 0);
 	}
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
@@ -945,6 +948,8 @@ static MACHINE_DRIVER_START( hornet_2board )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)
+
+	MDRV_SCREEN_REMOVE("main")
 
 	MDRV_SCREEN_ADD("left", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

@@ -492,7 +492,7 @@ static VIDEO_START( seattle )
 {
 	add_exit_callback(machine, seattle_exit);
 
-	voodoo_start(0, 0, VOODOO_1, 2, 4, 0);
+	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 0);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
 	voodoo_set_stall_callback(0, voodoo_stall);
@@ -503,7 +503,7 @@ static VIDEO_START( flagstaff )
 {
 	add_exit_callback(machine, seattle_exit);
 
-	voodoo_start(0, 0, VOODOO_1, 2, 4, 4);
+	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, vblank_assert);
 	voodoo_set_stall_callback(0, voodoo_stall);

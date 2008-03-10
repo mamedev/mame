@@ -89,8 +89,11 @@ static void voodoo_vblank_1(int param)
 
 static VIDEO_START( hangplt )
 {
-	voodoo_start(0, 0, VOODOO_1, 2, 4, 4);
-	voodoo_start(1, 1, VOODOO_1, 2, 4, 4);
+	const device_config *left_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	voodoo_start(0, left_screen,  VOODOO_1, 2, 4, 4);
+	voodoo_start(1, right_screen, VOODOO_1, 2, 4, 4);
 
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 	voodoo_set_vblank_callback(1, voodoo_vblank_1);

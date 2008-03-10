@@ -1671,7 +1671,7 @@ struct _banshee_info
 struct _voodoo_state
 {
 	UINT8		index;					/* index of board */
-	UINT8		scrnum;					/* the screen we are acting on */
+	const device_config *screen;		/* the screen we are acting on */
 	UINT8		type;					/* type of system */
 	UINT8		chipmask;				/* mask for which chips are available */
 	UINT32		freq;					/* operating frequency */

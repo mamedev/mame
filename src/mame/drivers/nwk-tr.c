@@ -528,7 +528,7 @@ static void voodoo_vblank_0(int param)
 
 static VIDEO_START( nwktr )
 {
-	voodoo_start(0, 0, VOODOO_1, 2, 2, 2);
+	voodoo_start(0, machine->primary_screen, VOODOO_1, 2, 2, 2);
 	voodoo_set_vblank_callback(0, voodoo_vblank_0);
 
 	K001604_vh_start(machine, 0);

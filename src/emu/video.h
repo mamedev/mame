@@ -121,7 +121,6 @@ void video_screen_configure_scrnum(int scrnum, int width, int height, const rect
 
 /* set the visible area of a screen; this is a subset of video_screen_configure */
 void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y);
-void video_screen_set_visarea_scrnum(int scrnum, int min_x, int max_x, int min_y, int max_y);
 
 /* force a partial update of the screen up to and including the requested scanline */
 void video_screen_update_partial(const device_config *screen, int scanline);
@@ -139,6 +138,9 @@ int video_screen_get_hpos_scrnum(int scrnum);
 /* return the current vertical or horizontal blanking state for a screen */
 int video_screen_get_vblank(const device_config *screen);
 int video_screen_get_hblank(const device_config *screen);
+
+/* return the current visible area for a screen */
+const rectangle *video_screen_get_visible_area(const device_config *screen);
 
 /* return the time when the beam will reach a particular H,V position */
 attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos);
@@ -211,7 +213,7 @@ void video_set_fastforward(int fastforward);
 /* ----- snapshots ----- */
 
 /* save a snapshot of a given screen */
-void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scrnum);
+void video_screen_save_snapshot(const device_config *screen, mame_file *fp);
 
 /* save a snapshot of all the active screens */
 void video_save_active_screen_snapshots(running_machine *machine);

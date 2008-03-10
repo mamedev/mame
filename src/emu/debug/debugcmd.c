@@ -2009,7 +2009,9 @@ static void execute_snap(int ref, int params, const char *param[])
 		UINT32 mask = render_get_live_screens_mask();
 		astring *fname;
 
-		if (scrnum < 0 || scrnum >= MAX_SCREENS || !(mask & (1 << scrnum)))
+		const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum);
+
+		if ((screen == NULL) || !(mask & (1 << scrnum)))
 		{
 			debug_console_printf("Invalid screen number '%d'\n", scrnum);
 			return;
@@ -2027,7 +2029,7 @@ static void execute_snap(int ref, int params, const char *param[])
 			return;
 		}
 
-		video_screen_save_snapshot(Machine, fp, scrnum);
+		video_screen_save_snapshot(screen, fp);
 		mame_fclose(fp);
 		debug_console_printf("Saved screen #%d snapshot as '%s'\n", scrnum, filename);
 	}

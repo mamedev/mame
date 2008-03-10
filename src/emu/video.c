@@ -193,7 +193,7 @@ static void update_frameskip(running_machine *machine);
 static void recompute_speed(running_machine *machine, attotime emutime);
 
 /* screen snapshots */
-static void create_snapshot_bitmap(running_machine *machine, int scrnum);
+static void create_snapshot_bitmap(const device_config *screen);
 static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file);
 
 /* movie recording */
@@ -830,12 +830,6 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
 	video_screen_configure(screen, state->width, state->height, &visarea, internal_state->frame_period);
 }
 
-void video_screen_set_visarea_scrnum(int scrnum, int min_x, int max_x, int min_y, int max_y)
-{
-	internal_screen_state *internal_state = get_internal_state(Machine, scrnum);
-	video_screen_set_visarea(internal_state->device, min_x, max_x, min_y, max_y);
-}
-
 
 /*-------------------------------------------------
     get_internal_state - accessor function to get
@@ -1036,6 +1030,17 @@ int video_screen_get_hblank(const device_config *screen)
 	screen_state *state = get_safe_token(screen);
 	int hpos = video_screen_get_hpos(screen);
 	return (hpos < state->visarea.min_x || hpos > state->visarea.max_x);
+}
+
+
+/*-------------------------------------------------
+    video_screen_get_visible_area - returns the
+    visible area a given screen
+-------------------------------------------------*/
+const rectangle *video_screen_get_visible_area(const device_config *screen)
+{
+	screen_state *state = get_safe_token(screen);
+	return &state->visarea;
 }
 
 
@@ -2043,18 +2048,21 @@ static void recompute_speed(running_machine *machine, attotime emutime)
 	/* if we're past the "time-to-execute" requested, signal an exit */
 	if (global.seconds_to_run != 0 && emutime.seconds >= global.seconds_to_run)
 	{
-		astring *fname = astring_assemble_2(astring_alloc(), machine->basename, PATH_SEPARATOR "final.png");
-		file_error filerr;
-		mame_file *file;
-
-		/* create a final screenshot */
-		filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
-		if (filerr == FILERR_NONE)
+		if (machine->primary_screen != NULL)
 		{
-			video_screen_save_snapshot(machine, file, 0);
-			mame_fclose(file);
+			astring *fname = astring_assemble_2(astring_alloc(), machine->basename, PATH_SEPARATOR "final.png");
+			file_error filerr;
+			mame_file *file;
+
+			/* create a final screenshot */
+			filerr = mame_fopen(SEARCHPATH_SCREENSHOT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+			if (filerr == FILERR_NONE)
+			{
+				video_screen_save_snapshot(machine->primary_screen, file);
+				mame_fclose(file);
+			}
+			astring_free(fname);
 		}
-		astring_free(fname);
 
 		/* schedule our demise */
 		mame_schedule_exit(machine);
@@ -2072,24 +2080,25 @@ static void recompute_speed(running_machine *machine, attotime emutime)
     to  the given file handle
 -------------------------------------------------*/
 
-void video_screen_save_snapshot(running_machine *machine, mame_file *fp, int scrnum)
+void video_screen_save_snapshot(const device_config *screen, mame_file *fp)
 {
-	const rgb_t *palette = (machine->palette != NULL) ? palette_entry_list_adjusted(machine->palette) : NULL;
+	const rgb_t *palette;
 	png_info pnginfo = { 0 };
 	png_error error;
 	char text[256];
 
 	/* create the bitmap to pass in */
-	create_snapshot_bitmap(machine, scrnum);
+	create_snapshot_bitmap(screen);
 
 	/* add two text entries describing the image */
 	sprintf(text, APPNAME " %s", build_version);
 	png_add_text(&pnginfo, "Software", text);
-	sprintf(text, "%s %s", machine->gamedrv->manufacturer, machine->gamedrv->description);
+	sprintf(text, "%s %s", screen->machine->gamedrv->manufacturer, screen->machine->gamedrv->description);
 	png_add_text(&pnginfo, "System", text);
 
 	/* now do the actual work */
-	error = png_write_bitmap(mame_core_file(fp), &pnginfo, global.snap_bitmap, machine->config->total_colors, palette);
+	palette = (screen->machine->palette != NULL) ? palette_entry_list_adjusted(screen->machine->palette) : NULL;
+	error = png_write_bitmap(mame_core_file(fp), &pnginfo, global.snap_bitmap, screen->machine->config->total_colors, palette);
 
 	/* free any data allocated */
 	png_free(&pnginfo);
@@ -2114,7 +2123,8 @@ void video_save_active_screen_snapshots(running_machine *machine)
 			file_error filerr = mame_fopen_next(machine, SEARCHPATH_SCREENSHOT, "png", &fp);
 			if (filerr == FILERR_NONE)
 			{
-				video_screen_save_snapshot(machine, fp, scrnum);
+				const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum);
+				video_screen_save_snapshot(screen, fp);
 				mame_fclose(fp);
 			}
 		}
@@ -2127,18 +2137,18 @@ void video_save_active_screen_snapshots(running_machine *machine)
     given screen number
 -------------------------------------------------*/
 
-static void create_snapshot_bitmap(running_machine *machine, int scrnum)
+static void create_snapshot_bitmap(const device_config *screen)
 {
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	const render_primitive_list *primlist;
 	INT32 width, height;
-
-	assert(scrnum >= 0 && scrnum < MAX_SCREENS);
 
 	/* only do it, if there is at least one screen */
 	if (global.snap_target != NULL)
 	{
 		/* select the appropriate view in our dummy target */
-		render_target_set_view(global.snap_target, scrnum);
+		render_target_set_view(global.snap_target, internal_state->scrnum);
 
 		/* get the minimum width/height and set it on the target */
 		render_target_get_minimum_size(global.snap_target, &width, &height);
@@ -2279,7 +2289,7 @@ static void movie_record_frame(const device_config *screen)
 		profiler_mark(PROFILER_MOVIE_REC);
 
 		/* create the bitmap */
-		create_snapshot_bitmap(screen->machine, internal_state->scrnum);
+		create_snapshot_bitmap(screen);
 
 		/* track frames */
 		if (internal_state->movie_frame++ == 0)

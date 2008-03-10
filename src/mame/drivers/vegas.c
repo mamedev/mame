@@ -522,7 +522,7 @@ static VIDEO_START( vegas_voodoo2 )
 {
 	add_exit_callback(machine, vegas_exit);
 
-	voodoo_start(0, 0, VOODOO_2, 2, 4, 4);
+	voodoo_start(0, machine->primary_screen, VOODOO_2, 2, 4, 4);
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -531,7 +531,7 @@ static VIDEO_START( vegas_voodoo_banshee )
 {
 	add_exit_callback(machine, vegas_exit);
 
-	voodoo_start(0, 0, VOODOO_BANSHEE, 16, 16, 0);
+	voodoo_start(0, machine->primary_screen, VOODOO_BANSHEE, 16, 16, 0);
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
@@ -540,7 +540,7 @@ static VIDEO_START( vegas_voodoo3 )
 {
 	add_exit_callback(machine, vegas_exit);
 
-	voodoo_start(0, 0, VOODOO_3, 16, 16, 16);
+	voodoo_start(0, machine->primary_screen, VOODOO_3, 16, 16, 16);
 	voodoo_set_vblank_callback(0, vblank_assert);
 }
 
