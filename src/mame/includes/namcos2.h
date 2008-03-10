@@ -206,20 +206,20 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank );
 /* MASTER CPU RAM MEMORY                                      */
 /**************************************************************/
 
-#define NAMCOS2_68K_MASTER_RAM_W	MWA16_BANK3
-#define NAMCOS2_68K_MASTER_RAM_R	MRA16_BANK3
+#define NAMCOS2_68K_MASTER_RAM_W	SMH_BANK3
+#define NAMCOS2_68K_MASTER_RAM_R	SMH_BANK3
 
 /**************************************************************/
 /* SLAVE CPU RAM MEMORY                                       */
 /**************************************************************/
 
-#define NAMCOS2_68K_SLAVE_RAM_W 	MWA16_BANK4
-#define NAMCOS2_68K_SLAVE_RAM_R 	MRA16_BANK4
+#define NAMCOS2_68K_SLAVE_RAM_W 	SMH_BANK4
+#define NAMCOS2_68K_SLAVE_RAM_R 	SMH_BANK4
 
 /**************************************************************/
 /*                                                            */
 /**************************************************************/
-#define BANKED_SOUND_ROM_R		MRA8_BANK6
+#define BANKED_SOUND_ROM_R		SMH_BANK6
 #define CPU3_ROM1				6			/* Bank number */
 
 /**************************************************************/

@@ -145,40 +145,40 @@ static WRITE8_HANDLER( aquarium_oki_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0xc00000, 0xc03fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xc80000, 0xc81fff) AM_READ(MRA16_RAM)	/* sprite ram */
-	AM_RANGE(0xd00000, 0xd00fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc00000, 0xc03fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc80000, 0xc81fff) AM_READ(SMH_RAM)	/* sprite ram */
+	AM_RANGE(0xd00000, 0xd00fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd80080, 0xd80081) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xd80082, 0xd80083) AM_READ(MRA16_NOP)	/* stored but not read back ? check code at 0x01f440 */
+	AM_RANGE(0xd80082, 0xd80083) AM_READ(SMH_NOP)	/* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)	/* RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)	/* RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc00000, 0xc00fff) AM_WRITE(aquarium_mid_videoram_w) AM_BASE(&aquarium_mid_videoram)
 	AM_RANGE(0xc01000, 0xc01fff) AM_WRITE(aquarium_bak_videoram_w) AM_BASE(&aquarium_bak_videoram)
 	AM_RANGE(0xc02000, 0xc03fff) AM_WRITE(aquarium_txt_videoram_w) AM_BASE(&aquarium_txt_videoram)
-	AM_RANGE(0xc80000, 0xc81fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc80000, 0xc81fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd00000, 0xd00fff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xd80014, 0xd8001f) AM_WRITE(MWA16_RAM) AM_BASE(&aquarium_scroll)
+	AM_RANGE(0xd80014, 0xd8001f) AM_WRITE(SMH_RAM) AM_BASE(&aquarium_scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP  /* probably not used */
 	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP /* ?? video related */
 	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE(aquarium_sound_w)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_readport, ADDRESS_SPACE_IO, 8 )

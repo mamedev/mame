@@ -127,10 +127,10 @@ static ADDRESS_MAP_START( gbusters_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f94, 0x1f94) AM_READ(input_port_0_r)		/* DIPSW #1 */
 	AM_RANGE(0x1f95, 0x1f95) AM_READ(input_port_1_r)		/* DIPSW #2 */
 	AM_RANGE(0x0000, 0x3fff) AM_READ(K052109_051960_r)	/* tiles + sprites (RAM H21, G21 & H6) */
-	AM_RANGE(0x4000, 0x57ff) AM_READ(MRA8_RAM)			/* RAM I12 */
+	AM_RANGE(0x4000, 0x57ff) AM_READ(SMH_RAM)			/* RAM I12 */
 	AM_RANGE(0x5800, 0x5fff) AM_READ(bankedram_r)		/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK1)			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)			/* ROM 878n02.rom */
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)			/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM 878n02.rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gbusters_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -141,23 +141,23 @@ static ADDRESS_MAP_START( gbusters_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)			/* enable gfx ROM read through VRAM */
 	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)			/* ??? */
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(K052109_051960_w)			/* tiles + sprites (RAM H21, G21 & H6) */
-	AM_RANGE(0x4000, 0x57ff) AM_WRITE(MWA8_RAM)					/* RAM I12 */
+	AM_RANGE(0x4000, 0x57ff) AM_WRITE(SMH_RAM)					/* RAM I12 */
 	AM_RANGE(0x5800, 0x5fff) AM_WRITE(bankedram_w) AM_BASE(&ram)			/* palette + work RAM (RAM D16 & C16) */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)					/* ROM 878n02.rom */
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM 878n02.rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gbusters_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)				/* ROM 878h01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)				/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 878h01.rom */
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
 	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)	/* 007232 registers */
 	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)	/* YM 2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gbusters_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)					/* ROM 878h01.rom */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)					/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 878h01.rom */
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)		/* 007232 registers */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM 2151 */
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)		/* YM 2151 */

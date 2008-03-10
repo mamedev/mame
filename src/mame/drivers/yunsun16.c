@@ -129,20 +129,20 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800018, 0x800019) AM_READ(input_port_1_word_r					)	// Coins
 	AM_RANGE(0x80001a, 0x80001b) AM_READ(input_port_2_word_r					)	// DSW1
 	AM_RANGE(0x80001c, 0x80001d) AM_READ(input_port_3_word_r					)	// DSW2
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(MWA16_NOP								)	// ? (value: don't care)
-	AM_RANGE(0x800100, 0x800101) AM_WRITE(MWA16_NOP								)	// ? $9100
-	AM_RANGE(0x800102, 0x800103) AM_WRITE(MWA16_NOP								)	// ? $9080
-	AM_RANGE(0x800104, 0x800105) AM_WRITE(MWA16_NOP								)	// ? $90c0
-	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(MWA16_NOP								)	// ? $9000
-	AM_RANGE(0x80010c, 0x80010f) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_scroll_1	)	// Scrolling
-	AM_RANGE(0x800114, 0x800117) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_scroll_0	)	// Scrolling
-	AM_RANGE(0x800154, 0x800155) AM_WRITE(MWA16_RAM) AM_BASE(&yunsun16_priority	)	// Priority
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(SMH_NOP								)	// ? (value: don't care)
+	AM_RANGE(0x800100, 0x800101) AM_WRITE(SMH_NOP								)	// ? $9100
+	AM_RANGE(0x800102, 0x800103) AM_WRITE(SMH_NOP								)	// ? $9080
+	AM_RANGE(0x800104, 0x800105) AM_WRITE(SMH_NOP								)	// ? $90c0
+	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(SMH_NOP								)	// ? $9000
+	AM_RANGE(0x80010c, 0x80010f) AM_WRITE(SMH_RAM) AM_BASE(&yunsun16_scroll_1	)	// Scrolling
+	AM_RANGE(0x800114, 0x800117) AM_WRITE(SMH_RAM) AM_BASE(&yunsun16_scroll_0	)	// Scrolling
+	AM_RANGE(0x800154, 0x800155) AM_WRITE(SMH_RAM) AM_BASE(&yunsun16_priority	)	// Priority
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w					)	// Sound
 	AM_RANGE(0x800188, 0x800189) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// Sound
-	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(MWA16_NOP												)	// ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x908000, 0x90bfff) AM_READWRITE(MRA16_RAM, yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
-	AM_RANGE(0x90c000, 0x90ffff) AM_READWRITE(MRA16_RAM, yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
+	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP												)	// ? 0 (during int)
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x908000, 0x90bfff) AM_READWRITE(SMH_RAM, yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
+	AM_RANGE(0x90c000, 0x90ffff) AM_READWRITE(SMH_RAM, yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
 	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE(&spriteram16) AM_SIZE(&spriteram_size					)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

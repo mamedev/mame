@@ -277,8 +277,8 @@ static WRITE8_HANDLER( butasan_pagedram_w )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( argus_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)			// Coin
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)			// Player 1
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)			// Player 2
@@ -287,14 +287,14 @@ static ADDRESS_MAP_START( argus_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xcfff) AM_READ(argus_paletteram_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(argus_txram_r)
 	AM_RANGE(0xd800, 0xdfff) AM_READ(argus_bg1ram_r)
-	AM_RANGE(0xe000, 0xf1ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf200, 0xf7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xf1ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf200, 0xf7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( argus_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
@@ -306,14 +306,14 @@ static ADDRESS_MAP_START( argus_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xcfff) AM_WRITE(argus_paletteram_w) AM_BASE(&argus_paletteram)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(argus_txram_w) AM_BASE(&argus_txram)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(argus_bg1ram_w) AM_BASE(&argus_bg1ram)
-	AM_RANGE(0xe000, 0xf1ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf200, 0xf7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xf1ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf200, 0xf7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( valtric_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)			// Coin
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)			// Player 1
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)			// Player 2
@@ -322,14 +322,14 @@ static ADDRESS_MAP_START( valtric_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xcfff) AM_READ(argus_paletteram_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_READ(argus_txram_r)
 	AM_RANGE(0xd800, 0xdfff) AM_READ(argus_bg1ram_r)
-	AM_RANGE(0xe000, 0xf1ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf200, 0xf7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xf1ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf200, 0xf7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( valtric_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
@@ -340,14 +340,14 @@ static ADDRESS_MAP_START( valtric_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xcfff) AM_WRITE(valtric_paletteram_w) AM_BASE(&argus_paletteram)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(argus_txram_w) AM_BASE(&argus_txram)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(argus_bg1ram_w) AM_BASE(&argus_bg1ram)
-	AM_RANGE(0xe000, 0xf1ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf200, 0xf7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xf1ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf200, 0xf7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( butasan_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)			// Coin
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)			// Player 1
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)			// Player 2
@@ -356,14 +356,14 @@ static ADDRESS_MAP_START( butasan_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc7ff) AM_READ(butasan_bg1ram_r)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(argus_paletteram_r)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(butasan_pagedram_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf000, 0xf67f) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf680, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf000, 0xf67f) AM_READ(SMH_RAM)
+	AM_RANGE(0xf680, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( butasan_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
@@ -377,23 +377,23 @@ static ADDRESS_MAP_START( butasan_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(butasan_bg1ram_w) AM_BASE(&butasan_bg1ram)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(butasan_paletteram_w) AM_BASE(&argus_paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(butasan_pagedram_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf000, 0xf67f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf680, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf000, 0xf67f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf680, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 WRITE8_HANDLER( bombsa_txram_w );
 READ8_HANDLER( bombsa_txram_r );
 
 static ADDRESS_MAP_START( bombsa_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0xd000, 0xd1ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd200, 0xd7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xd000, 0xd1ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xd200, 0xd7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM)
 	/* Input ports */
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)					// Coin
 	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r)					// Player 1
@@ -406,10 +406,10 @@ static ADDRESS_MAP_START( bombsa_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bombsa_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)
 
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
 
 	/* ports look like the other games */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_w) // confirmed
@@ -417,41 +417,41 @@ static ADDRESS_MAP_START( bombsa_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE(bombsa_pageselect_w) // 0,1,0,1,0,1 etc.
 
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM)
 
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) // ??
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) // ??
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(bombsa_txram_w) AM_BASE(&argus_txram) // banked? it gets corrupted at game start, maybe its banked and one layer can be 16x16 or 8x8?
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(bombsa_paletteram_w) AM_BASE(&argus_paletteram) // banked?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem_a, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_a, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem_b, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_b, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_c, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_RAM)							// Is this a confirm of some sort?
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_RAM)							// Is this a confirm of some sort?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport_1, ADDRESS_SPACE_IO, 8 )

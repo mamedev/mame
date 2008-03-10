@@ -61,8 +61,8 @@ static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&colorram)
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM AM_BASE(&goldstar_video1) AM_SIZE(&goldstar_video_size)
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE(&goldstar_video2)
-	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(MWA8_RAM) AM_BASE(&goldstar_video3)
-	AM_RANGE(0xf040, 0xf07f) AM_WRITE(MWA8_RAM) AM_BASE(&goldstar_scroll1)
+	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_video3)
+	AM_RANGE(0xf040, 0xf07f) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_scroll1)
 	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_0_r)
 	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_1_r)	/* Test Mode */
 	AM_RANGE(0xf802, 0xf802) AM_READ(input_port_2_r)	/* DSW 1 */
@@ -71,8 +71,8 @@ static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf805, 0xf805) AM_READ(input_port_7_r)	/* DSW 4 (also appears in 8910 port) */
 	AM_RANGE(0xf806, 0xf806) AM_READ(input_port_9_r)	/* (don't know to which one of the */
 										/* service mode dip switches it should map) */
-	AM_RANGE(0xf080, 0xf0bf) AM_WRITE(MWA8_RAM) AM_BASE(&goldstar_scroll2)
-	AM_RANGE(0xf0c0, 0xf0ff) AM_WRITE(MWA8_RAM) AM_BASE(&goldstar_scroll3)
+	AM_RANGE(0xf080, 0xf0bf) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_scroll2)
+	AM_RANGE(0xf0c0, 0xf0ff) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_scroll3)
 	AM_RANGE(0xf810, 0xf810) AM_READ(input_port_3_r)
 	AM_RANGE(0xf811, 0xf811) AM_READ(input_port_4_r)
 	AM_RANGE(0xf820, 0xf820) AM_READ(input_port_5_r)	/* DSW 2 */
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf840, 0xf840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_READWRITE(OKIM6295_status_0_r,OKIM6295_data_0_w)
-	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(MRA8_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
+	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 

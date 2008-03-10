@@ -197,16 +197,16 @@ static WRITE8_HANDLER( fax_bank_select_w )
 static ADDRESS_MAP_START( exidy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&exidy_videoram)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite1_xpos)
-	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite1_ypos)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite2_xpos)
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite2_ypos)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite1_xpos)
+	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite1_ypos)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite2_xpos)
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite2_ypos)
 	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_spriteno)
+	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITE(SMH_RAM) AM_BASE(&exidy_spriteno)
 	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite_enable)
+	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite_enable)
 	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5210, 0x5212) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_color_latch)
+	AM_RANGE(0x5210, 0x5212) AM_WRITE(SMH_RAM) AM_BASE(&exidy_color_latch)
 	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
@@ -243,19 +243,19 @@ static ADDRESS_MAP_START( rallys_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&exidy_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE(&exidy_characterram)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite1_xpos)
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite1_ypos)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite1_xpos)
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite1_ypos)
 	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_spriteno)
+	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITE(SMH_RAM) AM_BASE(&exidy_spriteno)
 	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite_enable)
+	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite_enable)
 	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0x5210, 0x5212) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_color_latch)
+	AM_RANGE(0x5210, 0x5212) AM_WRITE(SMH_RAM) AM_BASE(&exidy_color_latch)
 	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-	AM_RANGE(0x5300, 0x5300) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite2_xpos)
-	AM_RANGE(0x5301, 0x5301) AM_WRITE(MWA8_RAM) AM_BASE(&exidy_sprite2_ypos)
+	AM_RANGE(0x5300, 0x5300) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite2_xpos)
+	AM_RANGE(0x5301, 0x5301) AM_WRITE(SMH_RAM) AM_BASE(&exidy_sprite2_ypos)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION(REGION_CPU1, 0x3f00)
 ADDRESS_MAP_END
 
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( fax_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x5200, 0x520f) AM_READWRITE(pia_0_r, pia_0_w)
-	AM_RANGE(0x5213, 0x5217) AM_WRITE(MWA8_NOP)		/* empty control lines on color/sound board */
+	AM_RANGE(0x5213, 0x5217) AM_WRITE(SMH_NOP)		/* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE(&exidy_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1379,7 +1379,7 @@ static DRIVER_INIT( phantoma )
 	exidy_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, MRA8_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0xf800);
 }
 

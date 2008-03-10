@@ -306,12 +306,12 @@ static ADDRESS_MAP_START( readwritemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(MRA8_RAM, zvideoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(spaceg_colorram_r, MWA8_RAM) AM_BASE(&unkram)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(SMH_RAM, zvideoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(spaceg_colorram_r, SMH_RAM) AM_BASE(&unkram)
 
 
-	AM_RANGE(0x9400, 0x9400) AM_WRITE(MWA8_RAM) AM_BASE(&io9400) 	/* gfx ctrl */
-	AM_RANGE(0x9401, 0x9401) AM_WRITE(MWA8_RAM) AM_BASE(&io9401)	/* gfx ctrl */
+	AM_RANGE(0x9400, 0x9400) AM_WRITE(SMH_RAM) AM_BASE(&io9400) 	/* gfx ctrl */
+	AM_RANGE(0x9401, 0x9401) AM_WRITE(SMH_RAM) AM_BASE(&io9401)	/* gfx ctrl */
 	/* 9402 -
         bits 0 and 1 probably control the lamps under the player 1 and player 2 start buttons
         bit 3 is probably a flip screen

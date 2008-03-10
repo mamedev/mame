@@ -64,11 +64,11 @@ static WRITE8_HANDLER( blktiger_coinlockout_w )
 
 static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK1, MWA8_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(MRA8_RAM, blktiger_txvideoram_w) AM_BASE(&blktiger_txvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
-	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(SMH_RAM, blktiger_txvideoram_w) AM_BASE(&blktiger_txvideoram)
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE(&paletteram)
+	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE(&paletteram_2)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)	AM_WRITE(MWA8_NOP) /* Software protection (7) */
+	AM_RANGE(0x07, 0x07) AM_READ(blktiger_protection_r)	AM_WRITE(SMH_NOP) /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)

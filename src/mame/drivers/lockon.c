@@ -178,13 +178,13 @@ static ADDRESS_MAP_START( main_v30, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04000, 0x04003) AM_READWRITE(lockon_crtc_r, lockon_crtc_w)
 	AM_RANGE(0x06000, 0x06001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x08000, 0x081ff) AM_RAM AM_BASE(&lockon_hud_ram) AM_SIZE(&lockon_hudram_size)
-	AM_RANGE(0x09000, 0x09fff) AM_READWRITE(MRA16_RAM, lockon_char_w) AM_BASE(&lockon_char_ram)
+	AM_RANGE(0x09000, 0x09fff) AM_READWRITE(SMH_RAM, lockon_char_w) AM_BASE(&lockon_char_ram)
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(adrst_w)
 	AM_RANGE(0x0b000, 0x0bfff) AM_WRITE(lockon_rotate_w)
 	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(lockon_fb_clut_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(inten_w)
 	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(emres_w)
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(MRA16_NOP, tst_w)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(SMH_NOP, tst_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(main_z80_r, main_z80_w)
 	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(main_gnd_r, main_gnd_w)
 	AM_RANGE(0x40000, 0x4ffff) AM_READWRITE(main_obj_r, main_obj_w)
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_vol)
-	AM_RANGE(0x7400, 0x7403) AM_READWRITE(adc_r, MWA8_NOP)
+	AM_RANGE(0x7400, 0x7403) AM_READWRITE(adc_r, SMH_NOP)
 	AM_RANGE(0x7800, 0x7fff) AM_MIRROR(0x8000) AM_RAM
 ADDRESS_MAP_END
 

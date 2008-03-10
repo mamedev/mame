@@ -380,9 +380,9 @@ static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE( &tmaster_regs )
 	AM_RANGE( 0x500010, 0x500011 ) AM_READ ( tmaster_blitter_r )
 
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(MWA16_NOP) // often
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE(SMH_NOP) // often
 
-	AM_RANGE( 0x600000, 0x600fff ) AM_READWRITE( MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE(&paletteram16) // looks like palettes, maybe
+	AM_RANGE( 0x600000, 0x600fff ) AM_READWRITE( SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE(&paletteram16) // looks like palettes, maybe
 
 	AM_RANGE( 0x800000, 0x800001 ) AM_READWRITE( OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )
 
@@ -532,9 +532,9 @@ static READ16_HANDLER( dummy_read_01 )
 
 static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(MRA16_BANK1, MWA16_BANK2)
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READWRITE(SMH_BANK1, SMH_BANK2)
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( REGION_CPU1, 0 )
-	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(MRA16_BANK3, MWA16_BANK4)
+	AM_RANGE( 0x200000, 0x23ffff ) AM_READWRITE(SMH_BANK3, SMH_BANK4)
 	AM_RANGE( 0x240000, 0x3fffff ) AM_ROM AM_REGION( REGION_CPU1, 0 )
 
 	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE( &tmaster_regs )
@@ -542,8 +542,8 @@ static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE( tmaster_color_w )
 	AM_RANGE( 0x400020, 0x400021 ) AM_READ ( tmaster_blitter_r )
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( dummy_read_01, MWA16_NOP )
-	AM_RANGE( 0x700000, 0x700001 ) AM_READWRITE( dummy_read_01, MWA16_NOP )
+	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( dummy_read_01, SMH_NOP )
+	AM_RANGE( 0x700000, 0x700001 ) AM_READWRITE( dummy_read_01, SMH_NOP )
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
 	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE( watchdog_reset16_w )
 
@@ -554,13 +554,13 @@ static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE( galgames_palette_data_w )
 
 	AM_RANGE( 0xd00000, 0xd00001 ) AM_READ ( input_port_0_word_r )	// trackball p1 x
-	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITE( MWA16_NOP )
+	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITE( SMH_NOP )
 	AM_RANGE( 0xd00002, 0xd00003 ) AM_READ ( input_port_1_word_r )	// trackball p1 y
 	AM_RANGE( 0xd00004, 0xd00005 ) AM_READ ( input_port_2_word_r )	// trackball p2 x
 	AM_RANGE( 0xd00006, 0xd00007 ) AM_READ ( input_port_3_word_r )	// trackball p2 y
 	AM_RANGE( 0xd00008, 0xd00009 ) AM_READ ( input_port_4_word_r )
 	AM_RANGE( 0xd0000a, 0xd0000b ) AM_READ ( input_port_5_word_r )
-	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READWRITE( input_port_6_word_r, MWA16_NOP )
+	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READWRITE( input_port_6_word_r, SMH_NOP )
 
 	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE ( galgames_cart_sel_w )
 	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE( galgames_eeprom_r, galgames_eeprom_w )

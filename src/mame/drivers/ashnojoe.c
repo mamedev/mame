@@ -117,18 +117,18 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 
 static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram3_w) AM_BASE(&ashnojoetileram16_3)
-	AM_RANGE(0x042000, 0x043fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram4_w) AM_BASE(&ashnojoetileram16_4)
-	AM_RANGE(0x044000, 0x044fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram5_w) AM_BASE(&ashnojoetileram16_5)
-	AM_RANGE(0x045000, 0x045fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram2_w) AM_BASE(&ashnojoetileram16_2)
-	AM_RANGE(0x046000, 0x046fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram6_w) AM_BASE(&ashnojoetileram16_6)
-	AM_RANGE(0x047000, 0x047fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram7_w) AM_BASE(&ashnojoetileram16_7)
-	AM_RANGE(0x048000, 0x048fff) AM_READWRITE(MRA16_RAM, ashnojoe_tileram_w) AM_BASE(&ashnojoetileram16)
-	AM_RANGE(0x049000, 0x049fff) AM_READWRITE(MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x040000, 0x041fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram3_w) AM_BASE(&ashnojoetileram16_3)
+	AM_RANGE(0x042000, 0x043fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram4_w) AM_BASE(&ashnojoetileram16_4)
+	AM_RANGE(0x044000, 0x044fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram5_w) AM_BASE(&ashnojoetileram16_5)
+	AM_RANGE(0x045000, 0x045fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram2_w) AM_BASE(&ashnojoetileram16_2)
+	AM_RANGE(0x046000, 0x046fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram6_w) AM_BASE(&ashnojoetileram16_6)
+	AM_RANGE(0x047000, 0x047fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram7_w) AM_BASE(&ashnojoetileram16_7)
+	AM_RANGE(0x048000, 0x048fff) AM_READWRITE(SMH_RAM, ashnojoe_tileram_w) AM_BASE(&ashnojoetileram16)
+	AM_RANGE(0x049000, 0x049fff) AM_READWRITE(SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x04a000, 0x04a001) AM_READ(input_port_0_word_r) // p1 inputs, coins
 	AM_RANGE(0x04a002, 0x04a003) AM_READ(input_port_1_word_r) // p2 inputs
 	AM_RANGE(0x04a004, 0x04a005) AM_READ(input_port_2_word_r) // dipswitches
-	AM_RANGE(0x04a006, 0x04a007) AM_WRITE(MWA16_RAM) AM_BASE(&ashnojoe_tilemap_reg)
+	AM_RANGE(0x04a006, 0x04a007) AM_WRITE(SMH_RAM) AM_BASE(&ashnojoe_tilemap_reg)
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
 	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r) // ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)

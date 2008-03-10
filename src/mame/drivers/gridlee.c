@@ -298,20 +298,20 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
 
 /* CPU 1 read addresses */
 static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
 	AM_RANGE(0x9502, 0x9502) AM_READ(input_port_4_r)
 	AM_RANGE(0x9503, 0x9503) AM_READ(input_port_5_r)
 	AM_RANGE(0x9600, 0x9600) AM_READ(input_port_6_r)
 	AM_RANGE(0x9700, 0x9700) AM_READ(input_port_7_r)
 	AM_RANGE(0x9820, 0x9820) AM_READ(random_num_r)
-	AM_RANGE(0x9c00, 0x9cff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x9c00, 0x9cff) AM_READ(SMH_RAM)
+	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
 	AM_RANGE(0x0800, 0x7fff) AM_WRITE(gridlee_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)
 	AM_RANGE(0x9010, 0x9010) AM_WRITE(led_1_w)
@@ -320,10 +320,10 @@ static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
 	AM_RANGE(0x9380, 0x9380) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x9700, 0x9700) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x9700, 0x9700) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x9828, 0x993f) AM_WRITE(gridlee_sound_w)
-	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x9c00, 0x9cff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

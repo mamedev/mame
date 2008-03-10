@@ -111,20 +111,20 @@ static READ16_HANDLER( special_port1_r )
  *************************************/
 
 static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0xc00000, 0xc09fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xc10000, 0xc107ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff6000, 0xff6001) AM_READ(MRA16_NOP)		/* who knows? read at controls time */
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc00000, 0xc09fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc10000, 0xc107ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xff6000, 0xff6001) AM_READ(SMH_NOP)		/* who knows? read at controls time */
 	AM_RANGE(0xff8800, 0xff8801) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xff9000, 0xff9001) AM_READ(special_port1_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xffa000, 0xffafff) AM_READ(atarigen_eeprom_r)
-	AM_RANGE(0xffc000, 0xffffff) AM_READ(MRA16_RAM)
+	AM_RANGE(0xffc000, 0xffffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc00000, 0xc07fff) AM_WRITE(atarigen_playfield_large_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0xc08000, 0xc097ff) AM_WRITE(atarigen_alpha_w) AM_BASE(&atarigen_alpha)
 	AM_RANGE(0xc09800, 0xc09fff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( main_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8600, 0xff8601) AM_WRITE(toobin_xscroll_w) AM_BASE(&atarigen_xscroll)
 	AM_RANGE(0xff8700, 0xff8701) AM_WRITE(toobin_yscroll_w) AM_BASE(&atarigen_yscroll)
 	AM_RANGE(0xffa000, 0xffafff) AM_WRITE(atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
-	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 

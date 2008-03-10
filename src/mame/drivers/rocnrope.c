@@ -37,27 +37,27 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3083, 0x3083) AM_READ(input_port_3_r) /* DSW 0 */
 	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_4_r) /* DSW 1 */
 	AM_RANGE(0x3100, 0x3100) AM_READ(input_port_5_r) /* DSW 2 */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x4000, 0x402f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x4400, 0x442f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x4000, 0x402f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x4400, 0x442f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(rocnrope_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(rocnrope_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x5000, 0x5fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
 	AM_RANGE(0x8081, 0x8081) AM_WRITE(timeplt_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x8082, 0x8082) AM_WRITE(MWA8_NOP)	/* interrupt acknowledge??? */
-	AM_RANGE(0x8083, 0x8083) AM_WRITE(MWA8_NOP)	/* Coin counter 1 */
-	AM_RANGE(0x8084, 0x8084) AM_WRITE(MWA8_NOP)	/* Coin counter 2 */
+	AM_RANGE(0x8082, 0x8082) AM_WRITE(SMH_NOP)	/* interrupt acknowledge??? */
+	AM_RANGE(0x8083, 0x8083) AM_WRITE(SMH_NOP)	/* Coin counter 1 */
+	AM_RANGE(0x8084, 0x8084) AM_WRITE(SMH_NOP)	/* Coin counter 2 */
 	AM_RANGE(0x8087, 0x8087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

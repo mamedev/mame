@@ -86,23 +86,23 @@ static WRITE8_HANDLER( lemmings_sound_ack_w )
 /******************************************************************************/
 
 static ADDRESS_MAP_START( lemmings_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x120000, 0x1207ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x140000, 0x1407ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x160000, 0x160fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x140000, 0x1407ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x160000, 0x160fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(lemmings_prot_r)
 	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
-	AM_RANGE(0x200000, 0x202fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x300000, 0x37ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x380000, 0x39ffff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x200000, 0x202fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x300000, 0x37ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x380000, 0x39ffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lemmings_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
 	AM_RANGE(0x160000, 0x160fff) AM_WRITE(lemmings_palette_24bit_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x170000, 0x17000f) AM_WRITE(lemmings_control_w) AM_BASE(&lemmings_control_data)
 	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
@@ -116,20 +116,20 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0801, 0x0801) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x1000, 0x1000) AM_READ(OKIM6295_status_0_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(OKIM6295_data_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(lemmings_sound_ack_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /******************************************************************************/

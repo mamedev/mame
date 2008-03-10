@@ -296,19 +296,19 @@ static void init_generic(int bpp, int sound, int prot_start, int prot_end)
 
 		case SOUND_CVSD:
 			williams_cvsd_init(0);
-			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, MRA8_BANK9, MWA8_BANK9);
+			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(9, auto_malloc(0x80));
 			break;
 
 		case SOUND_ADPCM:
 			williams_adpcm_init();
-			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, MRA8_BANK9, MWA8_BANK9);
+			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(9, auto_malloc(0x80));
 			break;
 
 		case SOUND_NARC:
 			williams_narc_init();
-			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, MRA8_BANK9, MWA8_BANK9);
+			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(9, auto_malloc(0x80));
 			break;
 

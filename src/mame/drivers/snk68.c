@@ -134,56 +134,56 @@ static WRITE16_HANDLER( sound_w )
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( pow_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x040000, 0x043fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(control_2_r)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(MRA16_NOP) /* Watchdog or IRQ ack */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(MRA16_NOP) /* Watchdog or IRQ ack */
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(SMH_NOP) /* Watchdog or IRQ ack */
+	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(SMH_NOP) /* Watchdog or IRQ ack */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(dip_1_r)
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ(dip_2_r)
 	AM_RANGE(0x100000, 0x100fff) AM_READ(pow_video16_r)
 	AM_RANGE(0x200000, 0x207fff) AM_READ(pow_spriteram16_r)
-	AM_RANGE(0x400000, 0x400fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x400000, 0x400fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pow_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x040000, 0x043fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen16_w)
-	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x100000, 0x100fff) AM_WRITE(pow_video16_w) AM_BASE(&videoram16)
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(MWA16_NOP) // unknown register writes
+	AM_RANGE(0x101000, 0x101fff) AM_WRITE(SMH_NOP) // unknown register writes
 	AM_RANGE(0x200000, 0x207fff) AM_WRITE(pow_spriteram16_w) AM_BASE(&spriteram16)
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(pow_paletteram16_word_w) AM_BASE(&paletteram16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( searchar_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x040000, 0x043fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(rotary_1_r) /* Player 1 rotary */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ(rotary_2_r) /* Player 2 rotary */
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(rotary_lsb_r) /* Extra rotary bits */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(MRA16_NOP)	/* Watchdog or IRQ ack */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(MRA16_NOP)	/* Watchdog or IRQ ack */
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(SMH_NOP)	/* Watchdog or IRQ ack */
+	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(SMH_NOP)	/* Watchdog or IRQ ack */
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(dip_1_r)
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ(dip_2_r)
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_cpu_r)
 	AM_RANGE(0x100000, 0x107fff) AM_READ(pow_spriteram16_r)
 	AM_RANGE(0x200000, 0x200fff) AM_READ(pow_video16_r)
-	AM_RANGE(0x300000, 0x33ffff) AM_READ(MRA16_BANK1) /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x300000, 0x33ffff) AM_READ(SMH_BANK1) /* Extra code bank */
+	AM_RANGE(0x400000, 0x400fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( searchar_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x040000, 0x043fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x040000, 0x043fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(sound_w)
 	AM_RANGE(0x080006, 0x080007) AM_WRITE(protection_w) /* top byte unknown, bottom is protection in ikari3 and streetsm */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(pow_flipscreen16_w)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(pow_spriteram16_w) AM_BASE(&spriteram16)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(pow_video16_w) AM_BASE(&videoram16)
 	AM_RANGE(0x201000, 0x201fff) AM_WRITE(pow_video16_w) /* Mirror used by Ikari 3 */
@@ -193,14 +193,14 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( D7759_write_port_0_w )

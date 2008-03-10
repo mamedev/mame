@@ -146,38 +146,38 @@ static WRITE8_HANDLER( thedeep_e100_w )
 }
 
 static ADDRESS_MAP_START( thedeep_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1				)	// ROM (banked)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM				)	// RAM
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM				)	// RAM (MCU data copied here)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// ROM (banked)
+	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM				)	// RAM (MCU data copied here)
 	AM_RANGE(0xe000, 0xe000) AM_READ(thedeep_protection_r	)	// From MCU
 	AM_RANGE(0xe004, 0xe004) AM_READ(thedeep_e004_r		)	// ?
 	AM_RANGE(0xe008, 0xe008) AM_READ(input_port_0_r		)	// P1 (Inputs)
 	AM_RANGE(0xe009, 0xe009) AM_READ(input_port_1_r		)	// P2
 	AM_RANGE(0xe00a, 0xe00a) AM_READ(input_port_2_r		)	// DSW1
 	AM_RANGE(0xe00b, 0xe00b) AM_READ(input_port_3_r		)	// DSW2
-	AM_RANGE(0xe400, 0xe7ff) AM_READ(MRA8_RAM				)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_READ(MRA8_RAM				)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM				)	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_READ(MRA8_RAM				)	// Column Scroll
-	AM_RANGE(0xf840, 0xffff) AM_READ(MRA8_RAM				)	//
+	AM_RANGE(0xe400, 0xe7ff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM				)	// Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM				)	// Background Layer
+	AM_RANGE(0xf800, 0xf83f) AM_READ(SMH_RAM				)	// Column Scroll
+	AM_RANGE(0xf840, 0xffff) AM_READ(SMH_RAM				)	//
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thedeep_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM				)	// ROM (banked)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM				)	// RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM				)	// RAM (MCU data copied here)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM				)	// ROM
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM				)	// ROM (banked)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM				)	// RAM
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM				)	// RAM (MCU data copied here)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(thedeep_protection_w	)	// To MCU
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(thedeep_nmi_w			)	//
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w		)	// To Sound CPU
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w		)	// ?
-	AM_RANGE(0xe210, 0xe213) AM_WRITE(MWA8_RAM) AM_BASE(&thedeep_scroll				)	// Scroll
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0xe210, 0xe213) AM_WRITE(SMH_RAM) AM_BASE(&thedeep_scroll				)	// Scroll
+	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(thedeep_vram_1_w) AM_BASE(&thedeep_vram_1		)	// Text Layer
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(thedeep_vram_0_w) AM_BASE(&thedeep_vram_0		)	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_WRITE(MWA8_RAM) AM_BASE(&thedeep_scroll2				)	// Column Scroll
-	AM_RANGE(0xf840, 0xffff) AM_WRITE(MWA8_RAM								)	//
+	AM_RANGE(0xf800, 0xf83f) AM_WRITE(SMH_RAM) AM_BASE(&thedeep_scroll2				)	// Column Scroll
+	AM_RANGE(0xf840, 0xffff) AM_WRITE(SMH_RAM								)	//
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -187,16 +187,16 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( thedeep_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM					)	// RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r				)	// From Main CPU
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM					)	// ROM
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM					)	// ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thedeep_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w		)	//
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM					)	// ROM
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM					)	// ROM
 ADDRESS_MAP_END
 
 

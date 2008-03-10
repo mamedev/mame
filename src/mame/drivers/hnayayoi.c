@@ -102,15 +102,15 @@ static MACHINE_RESET( hnayayoi )
 
 
 static ADDRESS_MAP_START( hnayayoi_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnayayoi_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 
@@ -129,8 +129,8 @@ static ADDRESS_MAP_START( hnayayoi_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(adpcm_data_w)
-//  AM_RANGE(0x08, 0x08) AM_WRITE(MWA8_NOP) // CRT Controller
-//  AM_RANGE(0x09, 0x09) AM_WRITE(MWA8_NOP) // CRT Controller
+//  AM_RANGE(0x08, 0x08) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP) // CRT Controller
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(adpcm_vclk_w)
@@ -142,9 +142,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hnfubuki_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xfeff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xfeff) AM_READ(SMH_ROM)
 	AM_RANGE(0xff02, 0xff02) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xff03, 0xff03) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0xff04, 0xff04) AM_READ(input_port_2_r)
@@ -154,14 +154,14 @@ static ADDRESS_MAP_START( hnfubuki_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnfubuki_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xfeff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xfeff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xff01, 0xff01) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xff06, 0xff06) AM_WRITE(adpcm_data_w)
-//  AM_RANGE(0xff08, 0xff08) AM_WRITE(MWA8_NOP) // CRT Controller
-//  AM_RANGE(0xff09, 0xff09) AM_WRITE(MWA8_NOP) // CRT Controller
+//  AM_RANGE(0xff08, 0xff08) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0xff09, 0xff09) AM_WRITE(SMH_NOP) // CRT Controller
 	AM_RANGE(0xff0a, 0xff0a) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0xff0c, 0xff0c) AM_WRITE(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0xff23, 0xff23) AM_WRITE(adpcm_vclk_w)
@@ -182,15 +182,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( untoucha_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( untoucha_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 
@@ -208,8 +208,8 @@ static ADDRESS_MAP_START( untoucha_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(adpcm_data_w)
-//  AM_RANGE(0x12, 0x12) AM_WRITE(MWA8_NOP) // CRT Controller
-//  AM_RANGE(0x52, 0x52) AM_WRITE(MWA8_NOP) // CRT Controller
+//  AM_RANGE(0x12, 0x12) AM_WRITE(SMH_NOP) // CRT Controller
+//  AM_RANGE(0x52, 0x52) AM_WRITE(SMH_NOP) // CRT Controller
 	AM_RANGE(0x28, 0x28) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(adpcm_vclk_w)

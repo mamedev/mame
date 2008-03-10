@@ -191,9 +191,9 @@ static WRITE8_HANDLER (freekick_ff_w)
  *************************************/
 
 static ADDRESS_MAP_START( pbillrd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0xe800, 0xe800) AM_READ(input_port_1_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_2_r)
@@ -201,11 +201,11 @@ static ADDRESS_MAP_START( pbillrd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillrd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd900, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd900, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
@@ -217,23 +217,23 @@ static ADDRESS_MAP_START( pbillrd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( freekckb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xcfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)	// tilemap
-	AM_RANGE(0xe800, 0xe8ff) AM_READ(MRA8_RAM)	// sprites
+	AM_RANGE(0x0000, 0xcfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)	// tilemap
+	AM_RANGE(0xe800, 0xe8ff) AM_READ(SMH_RAM)	// sprites
 	AM_RANGE(0xec00, 0xec03) AM_READ(ppi8255_0_r)
 	AM_RANGE(0xf000, 0xf003) AM_READ(ppi8255_1_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_3_r)
 	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_4_r)
-	AM_RANGE(0xf802, 0xf802) AM_READ(MRA8_NOP)	//MUST return bit 0 = 0, otherwise game resets
+	AM_RANGE(0xf802, 0xf802) AM_READ(SMH_NOP)	//MUST return bit 0 = 0, otherwise game resets
 	AM_RANGE(0xf803, 0xf803) AM_READ(spinner_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( freekckb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xcfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xcfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
-	AM_RANGE(0xe800, 0xe8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe800, 0xe8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xec00, 0xec03) AM_WRITE(ppi8255_0_w)
 	AM_RANGE(0xf000, 0xf003) AM_WRITE(ppi8255_1_w)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(flipscreen_w)
@@ -247,9 +247,9 @@ static ADDRESS_MAP_START( freekckb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_2_r)
 	AM_RANGE(0xe800, 0xe800) AM_READ(input_port_3_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_4_r)
@@ -257,16 +257,16 @@ static ADDRESS_MAP_START( gigas_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
-	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd900, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(MWA8_NOP)// probably not flipscreen
+	AM_RANGE(0xd800, 0xd8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd900, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xe000, 0xe001) AM_WRITE(SMH_NOP)// probably not flipscreen
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(coin_w)
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_NOP) //bankswitch ?
+	AM_RANGE(0xe005, 0xe005) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) //bankswitch ?
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(SN76496_1_w)
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(SN76496_2_w)
@@ -276,7 +276,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gigas_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(gigas_spinner_r)
-	AM_RANGE(0x01, 0x01) AM_READ(MRA8_NOP) //unused dip 3
+	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP) //unused dip 3
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gigas_writeport, ADDRESS_SPACE_IO, 8 )
@@ -287,7 +287,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( oigas_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(gigas_spinner_r)
-	AM_RANGE(0x01, 0x01) AM_READ(MRA8_NOP) //unused dip 3
+	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP) //unused dip 3
 	AM_RANGE(0x02, 0x02) AM_READ(oigas_2_r)
 	AM_RANGE(0x03, 0x03) AM_READ(oigas_3_r)
 ADDRESS_MAP_END

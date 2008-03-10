@@ -353,13 +353,13 @@ static ADDRESS_MAP_START( meadows_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE(&spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(MRA8_RAM, meadows_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(SMH_RAM, meadows_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( minferno_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1eff) AM_READWRITE(MRA8_RAM, meadows_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1c00, 0x1eff) AM_READWRITE(SMH_RAM, meadows_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1f00, 0x1f00) AM_READ(input_port_0_r)
 	AM_RANGE(0x1f01, 0x1f01) AM_READ(input_port_1_r)
 	AM_RANGE(0x1f02, 0x1f02) AM_READ(input_port_2_r)

@@ -85,9 +85,9 @@ static INTERRUPT_GEN( pingpong_interrupt )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x97ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_0_r)
 	AM_RANGE(0xa880, 0xa880) AM_READ(input_port_1_r)
 	AM_RANGE(0xa900, 0xa900) AM_READ(input_port_2_r)
@@ -95,14 +95,14 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(pingpong_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_WRITE(pingpong_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x9002) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9003, 0x9052) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9053, 0x97ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x9000, 0x9002) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x9003, 0x9052) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9053, 0x97ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* coin counters + irq enables */
-	AM_RANGE(0xa200, 0xa200) AM_WRITE(MWA8_NOP)		/* SN76496 data latch */
+	AM_RANGE(0xa200, 0xa200) AM_WRITE(SMH_NOP)		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(SN76496_0_w)	/* trigger read */
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_1_r)
 	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_2_r)
 	AM_RANGE(0xa180, 0xa180) AM_READ(input_port_3_r)
-	AM_RANGE(0xa200, 0xa200) AM_WRITE(MWA8_NOP)		/* SN76496 data latch */
+	AM_RANGE(0xa200, 0xa200) AM_WRITE(SMH_NOP)		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(SN76496_0_w)	/* trigger read */
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
@@ -597,14 +597,14 @@ static DRIVER_INIT( cashquiz )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
 
 	// 8 independents banks for questions
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x50ff, 0, 0, MRA8_BANK1);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5100, 0x51ff, 0, 0, MRA8_BANK2);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5200, 0x52ff, 0, 0, MRA8_BANK3);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5300, 0x53ff, 0, 0, MRA8_BANK4);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5400, 0x54ff, 0, 0, MRA8_BANK5);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5500, 0x55ff, 0, 0, MRA8_BANK6);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5600, 0x56ff, 0, 0, MRA8_BANK7);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5700, 0x57ff, 0, 0, MRA8_BANK8);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x50ff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5100, 0x51ff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5200, 0x52ff, 0, 0, SMH_BANK3);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5300, 0x53ff, 0, 0, SMH_BANK4);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5400, 0x54ff, 0, 0, SMH_BANK5);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5500, 0x55ff, 0, 0, SMH_BANK6);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5600, 0x56ff, 0, 0, SMH_BANK7);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5700, 0x57ff, 0, 0, SMH_BANK8);
 
 	// setup default banks
 	for(i = 0; i < 8; i++)

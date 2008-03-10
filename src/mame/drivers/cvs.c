@@ -557,7 +557,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
     AM_RANGE(0x1840, 0x1840) AM_WRITE(DAC_0_data_w)
     AM_RANGE(0x1880, 0x1883) AM_WRITE(cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
-    AM_RANGE(0x1884, 0x1887) AM_WRITE(MWA8_NOP)		/* not connected to anything */
+    AM_RANGE(0x1884, 0x1887) AM_WRITE(SMH_NOP)		/* not connected to anything */
 ADDRESS_MAP_END
 
 

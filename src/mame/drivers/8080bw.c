@@ -481,13 +481,13 @@ ADDRESS_MAP_END
 
 /* at least one of these MWA8_NOPs must be sound related */
 static ADDRESS_MAP_START( cosmo_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, MWA8_NOP)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, MWA8_NOP)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, MWA8_NOP)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, SMH_NOP)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, SMH_NOP)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, SMH_NOP)
     AM_RANGE(0x03, 0x03) AM_WRITE(invadpt2_sh_port_1_w)
     AM_RANGE(0x05, 0x05) AM_WRITE(cosmo_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 
@@ -1522,9 +1522,9 @@ static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x800b, 0x800b) AM_READ(input_port_0_r)
 	AM_RANGE(0x8018, 0x8018) AM_WRITE(mb14241_0_shift_data_w)
 	AM_RANGE(0x8019, 0x8019) AM_WRITE(mb14241_0_shift_count_w)
-	AM_RANGE(0x801a, 0x801a) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x801c, 0x801c) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x801d, 0x801d) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x801a, 0x801a) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x801c, 0x801c) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x801d, 0x801d) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_RAM AM_BASE(&c8080bw_colorram)
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -2142,7 +2142,7 @@ MACHINE_DRIVER_END
 static ADDRESS_MAP_START( yosakdon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&mw8080bw_ram) AM_SIZE(&mw8080bw_ram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM) /* what's this? */
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM) /* what's this? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosakdon_io_map, ADDRESS_SPACE_IO, 8 )
@@ -2150,7 +2150,7 @@ static ADDRESS_MAP_START( yosakdon_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_WRITE(yosakdon_sh_port_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(yosakdon_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP) /* character numbers */
+	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP) /* character numbers */
 ADDRESS_MAP_END
 
 

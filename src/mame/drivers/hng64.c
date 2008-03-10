@@ -904,17 +904,17 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	// Ports
 	AM_RANGE(0x1F700000, 0x1F702fff) AM_READ(hng64_port_read)
 
-//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITE(MWA32_NOP)        // ?? often
-//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITE(MWA32_NOP)        // ?? often
-//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITE(MWA32_NOP)        // fatfur,strange
+//  AM_RANGE(0x1F70100C, 0x1F70100F) AM_WRITE(SMH_NOP)        // ?? often
+//  AM_RANGE(0x1F70101C, 0x1F70101F) AM_WRITE(SMH_NOP)        // ?? often
+//  AM_RANGE(0x1F70106C, 0x1F70106F) AM_WRITE(SMH_NOP)        // fatfur,strange
 //  AM_RANGE(0x1F701084, 0x1F701087) AM_RAM
-//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITE(MWA32_NOP)        // irq ack
+//  AM_RANGE(0x1F70111C, 0x1F70111F) AM_WRITE(SMH_NOP)        // irq ack
 	AM_RANGE(0x1F701204, 0x1F701207) AM_WRITE(hng_dma_start_w)
 	AM_RANGE(0x1F701214, 0x1F701217) AM_WRITE(hng_dma_dst_w)
 	AM_RANGE(0x1F701224, 0x1F701227) AM_WRITE(hng_dma_len_w)
-//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITE(MWA32_NOP)        // dma related?
-//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITE(MWA32_NOP)        // dma related?
-//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITE(MWA32_NOP)        // ?? often
+//  AM_RANGE(0x1F70124C, 0x1F70124F) AM_WRITE(SMH_NOP)        // dma related?
+//  AM_RANGE(0x1F70125C, 0x1F70125F) AM_WRITE(SMH_NOP)        // dma related?
+//  AM_RANGE(0x1F7021C4, 0x1F7021C7) AM_WRITE(SMH_NOP)        // ?? often
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	AM_RANGE(0x1F800000, 0x1F803fff) AM_READWRITE(hng64_sram_r, hng64_sram_w) AM_BASE(&hng64_sram)
@@ -928,9 +928,9 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	// Video
 	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)									// Sprites
 	AM_RANGE(0x20010000, 0x20010013) AM_READ(hng64_random_read)
-	AM_RANGE(0x20100000, 0x2017ffff) AM_READWRITE(MRA32_RAM, hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
+	AM_RANGE(0x20100000, 0x2017ffff) AM_READWRITE(SMH_RAM, hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)									// Video Registers
-	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(MRA32_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
+	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(SMH_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control
 	AM_RANGE(0x20300000, 0x2030ffff) AM_READWRITE(dl_r, dl_w) AM_BASE(&hng64_dl)						// 3d Display List
 
@@ -944,9 +944,9 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x60200000, 0x603fffff) AM_READWRITE(hng64_soundram_r, hng64_soundram_w)					// uploads the v53 sound program here, elsewhere on ss64-2 */
 
 	// ?
-//  AM_RANGE(0x68000000, 0x68000003) AM_WRITE(MWA32_NOP)                                                // ??
-//  AM_RANGE(0x68000004, 0x68000007) AM_READ(MWA32_NOP)                                                 // ??
-//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITE(MWA32_NOP)                                                // ??
+//  AM_RANGE(0x68000000, 0x68000003) AM_WRITE(SMH_NOP)                                                // ??
+//  AM_RANGE(0x68000004, 0x68000007) AM_READ(SMH_NOP)                                                 // ??
+//  AM_RANGE(0x68000008, 0x6800000b) AM_WRITE(SMH_NOP)                                                // ??
 
 	// Communications
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE(&hng64_com_ram)
@@ -1241,8 +1241,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x3ffff) AM_READ(MRA16_BANK2)
-	AM_RANGE(0xe0000, 0xfffff) AM_READ(MRA16_BANK1)
+	AM_RANGE(0x00000, 0x3ffff) AM_READ(SMH_BANK2)
+	AM_RANGE(0xe0000, 0xfffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 

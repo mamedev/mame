@@ -1356,7 +1356,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)		// PIA6821 IC8
 	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
 
-	AM_RANGE(0x1000, 0xffff) AM_READ(MRA8_BANK1)	// 64k  paged ROM (4 pages)
+	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END
 
 // machine driver for barcrest mpu4 board /////////////////////////////////

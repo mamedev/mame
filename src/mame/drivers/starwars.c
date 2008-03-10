@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4620, 0x463f) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x4680, 0x469f) AM_READWRITE(MRA8_NOP,starwars_out_w)
+	AM_RANGE(0x4680, 0x469f) AM_READWRITE(SMH_NOP,starwars_out_w)
 	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
 	AM_RANGE(0x46c0, 0x46c2) AM_WRITE(starwars_adc_select_w)
 	AM_RANGE(0x46e0, 0x46e0) AM_WRITE(starwars_soundrst_w)
@@ -587,7 +587,7 @@ static DRIVER_INIT( esb )
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_w);
 
 	/* install additional banking */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, MRA8_BANK2);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, SMH_BANK2);
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;

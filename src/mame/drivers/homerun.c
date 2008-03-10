@@ -82,7 +82,7 @@ GFXDECODE_END
 
 static ADDRESS_MAP_START( homerun_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_WRITE(homerun_videoram_w) AM_BASE(&homerun_videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
@@ -99,8 +99,8 @@ static READ8_HANDLER(homerun_40_r)
 
 static ADDRESS_MAP_START( homerun_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(MWA8_NOP) /* ?? */
-	AM_RANGE(0x20, 0x20) AM_WRITE(MWA8_NOP) /* ?? */
+	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP) /* ?? */
+	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP) /* ?? */
 	AM_RANGE(0x30, 0x33) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0x40, 0x40) AM_READ(homerun_40_r)
 	AM_RANGE(0x50, 0x50) AM_READ(input_port_2_r)

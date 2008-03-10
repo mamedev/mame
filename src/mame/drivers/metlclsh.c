@@ -73,26 +73,26 @@ static WRITE8_HANDLER( metlclsh_ack_nmi )
 }
 
 static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM					)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(sharedram_r				)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(MRA8_ROM					)
+	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_ROM					)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r			)
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r			)
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r			)
 	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r			)
-//  AM_RANGE(0xc800, 0xc82f) AM_READ(MRA8_RAM                   )   // not actually read
-//  AM_RANGE(0xcc00, 0xcc2f) AM_READ(MRA8_RAM                   )   // ""
+//  AM_RANGE(0xc800, 0xc82f) AM_READ(SMH_RAM                   )   // not actually read
+//  AM_RANGE(0xcc00, 0xcc2f) AM_READ(SMH_RAM                   )   // ""
 	AM_RANGE(0xd000, 0xd000) AM_READ(YM2203_status_port_0_r	)
-//  AM_RANGE(0xd800, 0xdfff) AM_READ(MRA8_RAM                   )   // not actually read
-	AM_RANGE(0xe800, 0xe9ff) AM_READ(MRA8_RAM					)
-	AM_RANGE(0xfff0, 0xffff) AM_READ(MRA8_ROM					)	// Reset/IRQ vectors
+//  AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM                   )   // not actually read
+	AM_RANGE(0xe800, 0xe9ff) AM_READ(SMH_RAM					)
+	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM					)	// Reset/IRQ vectors
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metlclsh_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM					)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(sharedram_w) AM_BASE(&sharedram	)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(MWA8_ROM					)
-	AM_RANGE(0xc080, 0xc080) AM_WRITE(MWA8_NOP					)	// ? 0
+	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_ROM					)
+	AM_RANGE(0xc080, 0xc080) AM_WRITE(SMH_NOP					)	// ? 0
 	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq		)	// cause irq on cpu #2
 	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi			)	// nmi ack
 	AM_RANGE(0xc800, 0xc82f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram		)
@@ -101,9 +101,9 @@ static ADDRESS_MAP_START( metlclsh_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(YM2203_write_port_0_w		)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM3526_control_port_0_w	)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM3526_write_port_0_w		)
-	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)
+	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(metlclsh_fgram_w) AM_BASE(&metlclsh_fgram		)
-	AM_RANGE(0xfff0, 0xffff) AM_WRITE(MWA8_ROM					)
+	AM_RANGE(0xfff0, 0xffff) AM_WRITE(SMH_ROM					)
 ADDRESS_MAP_END
 
 
@@ -134,18 +134,18 @@ static WRITE8_HANDLER( metlclsh_flipscreen_w )
 }
 
 static ADDRESS_MAP_START( metlclsh_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM			)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM			)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(sharedram_r		)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r	)
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r	)
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r	)
 	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r	)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_BANK1			)
-	AM_RANGE(0xfff0, 0xffff) AM_READ(MRA8_ROM			)	// Reset/IRQ vectors
+	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_BANK1			)
+	AM_RANGE(0xfff0, 0xffff) AM_READ(SMH_ROM			)	// Reset/IRQ vectors
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metlclsh_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM						)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM						)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(sharedram_w					)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(metlclsh_gfxbank_w			)	// bg tiles bank
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2			)	// cause nmi on cpu #1
@@ -154,10 +154,10 @@ static ADDRESS_MAP_START( metlclsh_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2				)	// nmi ack
 	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w			)	// 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE(metlclsh_rambank_w			)
-	AM_RANGE(0xe402, 0xe403) AM_WRITE(MWA8_RAM) AM_BASE(&metlclsh_scrollx	)
-//  AM_RANGE(0xe404, 0xe404) AM_WRITE(MWA8_NOP                      )   // ? 0
-//  AM_RANGE(0xe410, 0xe410) AM_WRITE(MWA8_NOP                      )   // ? 0 on startup only
-	AM_RANGE(0xfff0, 0xffff) AM_WRITE(MWA8_ROM						)
+	AM_RANGE(0xe402, 0xe403) AM_WRITE(SMH_RAM) AM_BASE(&metlclsh_scrollx	)
+//  AM_RANGE(0xe404, 0xe404) AM_WRITE(SMH_NOP                      )   // ? 0
+//  AM_RANGE(0xe410, 0xe410) AM_WRITE(SMH_NOP                      )   // ? 0 on startup only
+	AM_RANGE(0xfff0, 0xffff) AM_WRITE(SMH_ROM						)
 ADDRESS_MAP_END
 
 

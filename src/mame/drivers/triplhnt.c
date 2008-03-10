@@ -133,7 +133,7 @@ static READ8_HANDLER( triplhnt_da_latch_r )
 
 
 static ADDRESS_MAP_START( triplhnt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READ(MRA8_RAM) AM_MIRROR(0x300)
+	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x300)
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(input_port_0_r)
 	AM_RANGE(0x0c08, 0x0c08) AM_READ(input_port_1_r)
 	AM_RANGE(0x0c09, 0x0c09) AM_READ(input_port_2_r)
@@ -144,20 +144,20 @@ static ADDRESS_MAP_START( triplhnt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c30, 0x0c3f) AM_READ(triplhnt_misc_r)
 	AM_RANGE(0x0c40, 0x0c40) AM_READ(input_port_5_r)
 	AM_RANGE(0x0c48, 0x0c48) AM_READ(input_port_6_r)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(MRA8_ROM) /* program */
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_ROM) /* program mirror */
+	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM) /* program */
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_ROM) /* program mirror */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplhnt_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(MWA8_RAM) AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x04ff) AM_WRITE(MWA8_RAM) AM_BASE(&triplhnt_playfield_ram)
-	AM_RANGE(0x0800, 0x080f) AM_WRITE(MWA8_RAM) AM_BASE(&triplhnt_vpos_ram)
-	AM_RANGE(0x0810, 0x081f) AM_WRITE(MWA8_RAM) AM_BASE(&triplhnt_hpos_ram)
-	AM_RANGE(0x0820, 0x082f) AM_WRITE(MWA8_RAM) AM_BASE(&triplhnt_orga_ram)
-	AM_RANGE(0x0830, 0x083f) AM_WRITE(MWA8_RAM) AM_BASE(&triplhnt_code_ram)
+	AM_RANGE(0x0000, 0x00ff) AM_WRITE(SMH_RAM) AM_MIRROR(0x300)
+	AM_RANGE(0x0400, 0x04ff) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_playfield_ram)
+	AM_RANGE(0x0800, 0x080f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_vpos_ram)
+	AM_RANGE(0x0810, 0x081f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_hpos_ram)
+	AM_RANGE(0x0820, 0x082f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_orga_ram)
+	AM_RANGE(0x0830, 0x083f) AM_WRITE(SMH_RAM) AM_BASE(&triplhnt_code_ram)
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(triplhnt_misc_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(MWA8_ROM) /* program */
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_ROM) /* program mirror */
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_ROM) /* program */
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_ROM) /* program mirror */
 ADDRESS_MAP_END
 
 

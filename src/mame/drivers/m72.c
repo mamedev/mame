@@ -480,7 +480,7 @@ static void install_protection_handler(const UINT8 *code,const UINT8 *crc)
 	protection_ram = auto_malloc(0x1000);
 	protection_code = code;
 	protection_crc =  crc;
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, MRA16_BANK1);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(1, protection_ram);
@@ -645,8 +645,8 @@ static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	\
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)			\
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM										\
 ADDRESS_MAP_END
@@ -661,12 +661,12 @@ CPU1_MEMORY( dbreed72, 0x80000, 0x90000 )
 static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x88000, 0x8bfff) AM_RAM	/* work RAM */
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA16_RAM)	/* leftover from protection?? */
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(SMH_RAM)	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -676,8 +676,8 @@ static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
@@ -687,14 +687,14 @@ static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE(&majtitle_rowscrollram)
 	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xac000, 0xaffff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
+	AM_RANGE(0xac000, 0xaffff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xb0000, 0xbffff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE(&spriteram16_2)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(MWA16_RAM)	/* playfield enable? 1 during screen transitions, 0 otherwise */
+	AM_RANGE(0xe4000, 0xe4001) AM_WRITE(SMH_RAM)	/* playfield enable? 1 during screen transitions, 0 otherwise */
 	AM_RANGE(0xec000, 0xec001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -702,12 +702,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM	/* work RAM */
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA16_RAM)	/* leftover from protection?? */
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(SMH_RAM)	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -717,10 +717,10 @@ static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(MWA16_RAM)	/* leftover from protection?? */
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(SMH_RAM)	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -730,11 +730,11 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
-AM_RANGE(0xb4000, 0xb4001) AM_WRITE(MWA16_NOP)	/* ??? */
+AM_RANGE(0xb4000, 0xb4001) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x80000, 0x83fff) AM_READWRITE(MRA16_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_READWRITE(MRA16_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0x80000, 0x83fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0x84000, 0x87fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -747,7 +747,7 @@ static ADDRESS_MAP_START( m72_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( rtype2_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -774,7 +774,7 @@ static ADDRESS_MAP_START( poundfor_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -787,7 +787,7 @@ static ADDRESS_MAP_START( majtitle_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x04, 0x05) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( hharry_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(MWA16_NOP) /* Interrupt controller, only written to at bootup */
+	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -820,7 +820,7 @@ static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
-//AM_RANGE(0x8c, 0x8f) AM_WRITE(MWA8_NOP)   /* ??? */
+//AM_RANGE(0x8c, 0x8f) AM_WRITE(SMH_NOP)   /* ??? */
 ADDRESS_MAP_END
 
 

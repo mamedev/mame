@@ -407,14 +407,14 @@ DRIVER_INIT( mariner )
 	DRIVER_INIT_CALL(scramble_ppi);
 
 	/* extra ROM */
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, MRA8_BANK1, MWA8_UNMAP);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5800);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
 
 	/* ??? (it's NOT a background enable) */
-	/*memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, MWA8_NOP);*/
+	/*memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);*/
 }
 
 DRIVER_INIT( frogger )
@@ -506,7 +506,7 @@ DRIVER_INIT( cavelon )
 	DRIVER_INIT_CALL(scramble_ppi);
 
 	/* banked ROM */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, MRA8_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_configure_bank(1, 0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw();
 
@@ -514,8 +514,8 @@ DRIVER_INIT( cavelon )
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, cavelon_banksw_r);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, cavelon_banksw_w);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, MWA8_NOP);	/* ??? */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3801, 0, 0, MWA8_NOP);  /* looks suspicously like
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, SMH_NOP);	/* ??? */
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3801, 0, 0, SMH_NOP);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(cavelon_bank);
 }
@@ -898,7 +898,7 @@ DRIVER_INIT( monsterz )
 	ppi8255_init(&monsterz_ppi8255_intf);
 
 	/* extra ROM */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, MRA8_BANK1);
+	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x3000);
 }
 
@@ -920,11 +920,11 @@ DRIVER_INIT( scorpion )
 	ppi8255_set_portCread(1, scorpion_prot_r);
 
 	/* extra ROM */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, MRA8_BANK1);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5800);
 
 	/* no background related */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, MWA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);
 
 	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
 }

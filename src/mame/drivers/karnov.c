@@ -341,17 +341,17 @@ static READ16_HANDLER( karnov_control_r )
 /******************************************************************************/
 
 static ADDRESS_MAP_START( karnov_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x060000, 0x063fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x060000, 0x063fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_READ(karnov_control_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karnov_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x060000, 0x063fff) AM_WRITE(MWA16_RAM) AM_BASE(&karnov_ram)
-	AM_RANGE(0x080000, 0x080fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x060000, 0x063fff) AM_WRITE(SMH_RAM) AM_BASE(&karnov_ram)
+	AM_RANGE(0x080000, 0x080fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_WRITE(karnov_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
 	AM_RANGE(0x0a1000, 0x0a1fff) AM_WRITE(karnov_playfield_w) AM_BASE(&karnov_pf_data)
@@ -361,18 +361,18 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static ADDRESS_MAP_START( karnov_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x05ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karnov_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(MWA8_RAM)
+ 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM2203_control_port_0_w) /* OPN */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(YM3526_control_port_0_w) /* OPL */
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(YM3526_write_port_0_w)
- 	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+ 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /******************************************************************************/

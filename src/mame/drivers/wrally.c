@@ -98,16 +98,16 @@ WRITE16_HANDLER( wrally_coin_lockout_w );
 
 
 static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)			/* ROM */
-	AM_RANGE(0x100000, 0x103fff) AM_READ(MRA16_RAM)			/* encrypted Video RAM */
-	AM_RANGE(0x200000, 0x203fff) AM_READ(MRA16_RAM)			/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_READ(MRA16_RAM)			/* Sprite RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)			/* ROM */
+	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)			/* encrypted Video RAM */
+	AM_RANGE(0x200000, 0x203fff) AM_READ(SMH_RAM)			/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_READ(SMH_RAM)			/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r)/* DSW #1 & #2 */
 	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r)/* INPUT 1P & 2P, COINSW, STARTSW */
 	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_2_word_r)/* Wheel */
 	AM_RANGE(0x700008, 0x700009) AM_READ(input_port_3_word_r)/* TESTSW & SERVICESW */
 	AM_RANGE(0x70000e, 0x70000f) AM_READ(OKIM6295_status_0_lsb_r)/* OKI6295 status register */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(MRA16_RAM)			/* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_RAM)			/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( unknown_w )
@@ -116,20 +116,20 @@ static WRITE16_HANDLER( unknown_w )
 }
 
 static ADDRESS_MAP_START( wrally_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)								/* ROM */
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)								/* ROM */
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(wrally_vram_w) AM_BASE(&wrally_videoram)		/* encrypted Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITE(MWA16_RAM) AM_BASE(&wrally_vregs)				/* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(MWA16_NOP)								/* CLR INT Video */
+	AM_RANGE(0x108000, 0x108007) AM_WRITE(SMH_RAM) AM_BASE(&wrally_vregs)				/* Video Registers */
+	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(SMH_NOP)								/* CLR INT Video */
 	AM_RANGE(0x200000, 0x203fff) AM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_WRITE(MWA16_RAM) AM_BASE(&wrally_spriteram)			/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&wrally_spriteram)			/* Sprite RAM */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)					/* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_WRITE(OKIM6295_data_0_lsb_w)					/* OKI6295 data register */
 	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)					/* Coin lockouts */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)					/* Coin counters */
-	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(MWA16_NOP)								/* sound muting */
-	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(MWA16_NOP)								/* flip screen */
+	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)								/* sound muting */
+	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(SMH_NOP)								/* flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(unknown_w)								/* ??? */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_RAM)								/* Work RAM (partially shared with DS5002FP) */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)								/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 
 

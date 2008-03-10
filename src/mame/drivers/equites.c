@@ -162,17 +162,17 @@ static ADDRESS_MAP_START( equites_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc080, 0xc08d) AM_WRITE(equites_5232_w)
 	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(equites_8910data_w)
 	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(equites_8910control_w)
-	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITE(MWA8_NOP) // INTR: sync with main melody
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(MWA8_NOP) // INTR: sync with specific beats
+	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITE(SMH_NOP) // INTR: sync with main melody
+	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(SMH_NOP) // INTR: sync with specific beats
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac0_w)
 	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE(equites_dac1_w)
-	AM_RANGE(0xc0f8, 0xc0fe) AM_WRITE(MWA8_NOP) // soundboard I/O, ignored
+	AM_RANGE(0xc0f8, 0xc0fe) AM_WRITE(SMH_NOP) // soundboard I/O, ignored
 	AM_RANGE(0xc0ff, 0xc0ff) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( equites_s_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(MWA8_NOP) // soundboard I/O, ignored
+	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(SMH_NOP) // soundboard I/O, ignored
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( equites_sound )
@@ -331,20 +331,20 @@ static WRITE16_HANDLER(log16_w)
 static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_WRITENOP // ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram)
-	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(MRA16_RAM, equites_charram_w) AM_BASE(&videoram16)
+	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(SMH_RAM, equites_charram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE(&spriteram16_2)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(equites_spriteram_r, MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(equites_8404_r, MWA16_RAM) AM_BASE(&equites_8404ram)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(equites_spriteram_r, SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(equites_8404_r, SMH_RAM) AM_BASE(&equites_8404ram)
 	AM_RANGE(0x180000, 0x180001) AM_READWRITE(input_port_1_word_r, soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE(equites_flip0_w) // [MMLL] MM: normal screen, LL: use joystick 1 only
-	AM_RANGE(0x188000, 0x188001) AM_WRITE(MWA16_NOP) // 8404 control port1
-	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(MWA16_NOP) // 8404 control port2
+	AM_RANGE(0x188000, 0x188001) AM_WRITE(SMH_NOP) // 8404 control port1
+	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(SMH_NOP) // 8404 control port2
 	AM_RANGE(0x1a4000, 0x1a4001) AM_WRITE(equites_flip1_w) // [MMLL] MM: flip screen, LL: use both joysticks
-	AM_RANGE(0x1a8000, 0x1a8001) AM_WRITE(MWA16_NOP) // 8404 control port3
-	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITE(MWA16_NOP) // 8404 control port4
+	AM_RANGE(0x1a8000, 0x1a8001) AM_WRITE(SMH_NOP) // 8404 control port3
+	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITE(SMH_NOP) // 8404 control port4
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READWRITE(equites_joyport_r, equites_scrollreg_w) // scroll register[XXYY]
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(equites_bgcolor_w) // bg color register[CC--]
-	AM_RANGE(0x780000, 0x780001) AM_WRITE(MWA16_NOP) // watchdog
+	AM_RANGE(0x780000, 0x780001) AM_WRITE(SMH_NOP) // watchdog
 ADDRESS_MAP_END
 
 // Splendor Blast Hardware
@@ -353,20 +353,20 @@ static ADDRESS_MAP_START( splndrbt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(input_port_0_word_r) // joyport [2211]
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READWRITE(input_port_1_word_r, splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
-	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(MWA16_NOP) // 8404 control port1
-	AM_RANGE(0x0c8000, 0x0c8001) AM_WRITE(MWA16_NOP) // 8404 control port2
+	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(SMH_NOP) // 8404 control port1
+	AM_RANGE(0x0c8000, 0x0c8001) AM_WRITE(SMH_NOP) // 8404 control port2
 	AM_RANGE(0x0cc000, 0x0cc001) AM_WRITE(splndrbt_selchar0_w) // select active char map
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(splndrbt_flip1_w) // [MMLL] MM: not used, LL: flip screen
-	AM_RANGE(0x0e4000, 0x0e4001) AM_WRITE(MWA16_NOP) // 8404 control port3
-	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(MWA16_NOP) // 8404 control port4
+	AM_RANGE(0x0e4000, 0x0e4001) AM_WRITE(SMH_NOP) // 8404 control port3
+	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(SMH_NOP) // 8404 control port4
 	AM_RANGE(0x0ec000, 0x0ec001) AM_WRITE(splndrbt_selchar1_w) // select active char map
 	AM_RANGE(0x100000, 0x100001) AM_RAM AM_BASE(&splndrbt_scrollx) // scrollx
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(soundlatch_word_w) // LSB: sound command
 	AM_RANGE(0x1c0000, 0x1c0001) AM_RAM AM_BASE(&splndrbt_scrolly) // scrolly
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(equites_8404_r, MWA16_RAM) AM_BASE(&equites_8404ram) // 8404 RAM
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(MRA16_RAM, splndrbt_charram_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size) // char RAM page 0
+	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(equites_8404_r, SMH_RAM) AM_BASE(&equites_8404ram) // 8404 RAM
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(SMH_RAM, splndrbt_charram_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size) // char RAM page 0
 	AM_RANGE(0x201000, 0x201fff) AM_READWRITE(splndrbt_bankedchar_r, splndrbt_bankedchar_w) // banked char RAM page 1,2
-	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(MRA16_RAM, splndrbt_scrollram_w) AM_BASE(&spriteram16_2) // scroll RAM 0,1
+	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(SMH_RAM, splndrbt_scrollram_w) AM_BASE(&spriteram16_2) // scroll RAM 0,1
 	AM_RANGE(0x600000, 0x6001ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) // sprite RAM 0,1,2
 ADDRESS_MAP_END
 

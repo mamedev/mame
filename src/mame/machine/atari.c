@@ -136,18 +136,18 @@ void a600xl_mmu(UINT8 new_mmu)
 	if ( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", Machine->gamedrv->name);
-		rbank2 = MRA8_NOP;
-		wbank2 = MWA8_NOP;
+		rbank2 = SMH_NOP;
+		wbank2 = SMH_NOP;
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", Machine->gamedrv->name);
-		rbank2 = MRA8_BANK2;
-		wbank2 = MWA8_UNMAP;
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_UNMAP;
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, wbank2);
-	if (rbank2 == MRA8_BANK2)
+	if (rbank2 == SMH_BANK2)
 		memory_set_bankptr(2, memory_region(REGION_CPU1)+0x5000);
 }
 
@@ -161,21 +161,21 @@ void a800xl_mmu(UINT8 new_mmu)
 	if( new_mmu & 0x01 )
 	{
 		logerror("%s MMU BIOS ROM\n", Machine->gamedrv->name);
-		rbank3 = MRA8_BANK3;
-		wbank3 = MWA8_UNMAP;
+		rbank3 = SMH_BANK3;
+		wbank3 = SMH_UNMAP;
 		base3 = memory_region(REGION_CPU1)+0x14000;  /* 8K lo BIOS */
-		rbank4 = MRA8_BANK4;
-		wbank4 = MWA8_UNMAP;
+		rbank4 = SMH_BANK4;
+		wbank4 = SMH_UNMAP;
 		base4 = memory_region(REGION_CPU1)+0x15800;  /* 4K FP ROM + 8K hi BIOS */
 	}
 	else
 	{
 		logerror("%s MMU BIOS RAM\n", Machine->gamedrv->name);
-		rbank3 = MRA8_BANK3;
-		wbank3 = MWA8_BANK3;
+		rbank3 = SMH_BANK3;
+		wbank3 = SMH_BANK3;
 		base3 = memory_region(REGION_CPU1)+0x0c000;  /* 8K RAM */
-		rbank4 = MRA8_BANK4;
-		wbank4 = MWA8_BANK4;
+		rbank4 = SMH_BANK4;
+		wbank4 = SMH_BANK4;
 		base4 = memory_region(REGION_CPU1)+0x0d800;  /* 4K RAM + 8K RAM */
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, rbank3);
@@ -189,15 +189,15 @@ void a800xl_mmu(UINT8 new_mmu)
 	if( new_mmu & 0x02 )
 	{
 		logerror("%s MMU BASIC RAM\n", Machine->gamedrv->name);
-		rbank1 = MRA8_BANK1;
-		wbank1 = MWA8_BANK1;
+		rbank1 = SMH_BANK1;
+		wbank1 = SMH_BANK1;
 		base1 = memory_region(REGION_CPU1)+0x0a000;  /* 8K RAM */
 	}
 	else
 	{
 		logerror("%s MMU BASIC ROM\n", Machine->gamedrv->name);
-		rbank1 = MRA8_BANK1;
-		wbank1 = MWA8_UNMAP;
+		rbank1 = SMH_BANK1;
+		wbank1 = SMH_UNMAP;
 		base1 = memory_region(REGION_CPU1)+0x10000;  /* 8K BASIC */
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, rbank1);
@@ -208,15 +208,15 @@ void a800xl_mmu(UINT8 new_mmu)
 	if( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", Machine->gamedrv->name);
-		rbank2 = MRA8_BANK2;
-		wbank2 = MWA8_BANK2;
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_BANK2;
 		base2 = memory_region(REGION_CPU1)+0x05000;  /* 0x0800 bytes */
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", Machine->gamedrv->name);
-		rbank2 = MRA8_BANK2;
-		wbank2 = MWA8_UNMAP;
+		rbank2 = SMH_BANK2;
+		wbank2 = SMH_UNMAP;
 		base2 = memory_region(REGION_CPU1)+0x15000;  /* 0x0800 bytes */
 	}
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2);
@@ -639,9 +639,9 @@ DRIVER_INIT( atari )
 	/* install RAM */
 	ram_top = MIN(mess_ram_size, ram_size) - 1;
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
-		0x0000, ram_top, 0, 0, MRA8_BANK2);
+		0x0000, ram_top, 0, 0, SMH_BANK2);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,
-		0x0000, ram_top, 0, 0, MWA8_BANK2);
+		0x0000, ram_top, 0, 0, SMH_BANK2);
 	memory_set_bankptr(2, mess_ram);
 }
 #endif
@@ -683,9 +683,9 @@ static void a800_setbank(int n)
 	}
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0,
-		read_addr ? MRA8_BANK1 : MRA8_NOP);
+		read_addr ? SMH_BANK1 : SMH_NOP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0,
-		write_addr ? MWA8_BANK1 : MWA8_NOP);
+		write_addr ? SMH_BANK1 : SMH_NOP);
 	if (read_addr)
 		memory_set_bankptr(1, read_addr);
 	if (write_addr)
@@ -791,9 +791,9 @@ static void atari_machine_start(int type, const pia6821_interface *pia_intf, int
 		/* install RAM */
 		ram_top = MIN(mess_ram_size, ram_size) - 1;
 		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM,
-			0x0000, ram_top, 0, 0, MRA8_BANK2);
+			0x0000, ram_top, 0, 0, SMH_BANK2);
 		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM,
-			0x0000, ram_top, 0, 0, MWA8_BANK2);
+			0x0000, ram_top, 0, 0, SMH_BANK2);
 		memory_set_bankptr(2, mess_ram);
 	}
 #endif /* MESS */

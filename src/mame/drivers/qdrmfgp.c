@@ -340,10 +340,10 @@ static void gp2_ide_interrupt(int state)
  *************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM)				/* work ram */
-	AM_RANGE(0x180000, 0x183fff) AM_READ(MRA16_RAM)				/* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_READ(MRA16_RAM)				/* color ram */
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)				/* work ram */
+	AM_RANGE(0x180000, 0x183fff) AM_READ(SMH_RAM)				/* backup ram */
+	AM_RANGE(0x280000, 0x280fff) AM_READ(SMH_RAM)				/* color ram */
 	AM_RANGE(0x320000, 0x32001f) AM_READ(K053252_word_r)		/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ(i_port2_r)				/* battery power & service sw */
 	AM_RANGE(0x340000, 0x340001) AM_READ(i_port1_r)				/* inputport */
@@ -357,16 +357,16 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM) AM_BASE(&workram) 	/* work ram */
-	AM_RANGE(0x180000, 0x183fff) AM_WRITE(MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* backup ram */
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM) AM_BASE(&workram) 	/* work ram */
+	AM_RANGE(0x180000, 0x183fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)		/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_WRITE(K053252_word_w)		/* ccu */
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(MWA16_NOP)			/* unknown */
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(MWA16_NOP)			/* unknown */
+	AM_RANGE(0x350000, 0x350001) AM_WRITE(SMH_NOP)			/* unknown */
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(SMH_NOP)			/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp_control_w)			/* control reg */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(MWA16_NOP)			/* Watchdog */
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(SMH_NOP)			/* Watchdog */
 	AM_RANGE(0x800000, 0x80045f) AM_WRITE(k054539_word_w)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(K056832_ram_word_w)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_WRITE(K056832_ram_word_w)	/* vram (mirror) */
@@ -377,10 +377,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x110fff) AM_READ(MRA16_RAM)				/* work ram */
-	AM_RANGE(0x180000, 0x183fff) AM_READ(MRA16_RAM)				/* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_READ(MRA16_RAM)				/* color ram */
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x100000, 0x110fff) AM_READ(SMH_RAM)				/* work ram */
+	AM_RANGE(0x180000, 0x183fff) AM_READ(SMH_RAM)				/* backup ram */
+	AM_RANGE(0x280000, 0x280fff) AM_READ(SMH_RAM)				/* color ram */
 	AM_RANGE(0x320000, 0x32001f) AM_READ(K053252_word_r)		/* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ(i_port2_r)				/* battery power & service */
 	AM_RANGE(0x340000, 0x340001) AM_READ(i_port1_r)				/* inputport */
@@ -394,16 +394,16 @@ static ADDRESS_MAP_START( gp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x110fff) AM_WRITE(MWA16_RAM) AM_BASE(&workram)	/* work ram */
-	AM_RANGE(0x180000, 0x183fff) AM_WRITE(MWA16_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* backup ram */
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x110fff) AM_WRITE(SMH_RAM) AM_BASE(&workram)	/* work ram */
+	AM_RANGE(0x180000, 0x183fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300000, 0x30003f) AM_WRITE(K056832_word_w)		/* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_WRITE(K053252_word_w)		/* ccu */
-	AM_RANGE(0x350000, 0x350001) AM_WRITE(MWA16_NOP)			/* unknown */
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(MWA16_NOP)			/* unknown */
+	AM_RANGE(0x350000, 0x350001) AM_WRITE(SMH_NOP)			/* unknown */
+	AM_RANGE(0x360000, 0x360001) AM_WRITE(SMH_NOP)			/* unknown */
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(gp2_control_w)		/* control reg */
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(MWA16_NOP)			/* Watchdog */
+	AM_RANGE(0x380000, 0x380001) AM_WRITE(SMH_NOP)			/* Watchdog */
 	AM_RANGE(0x800000, 0x80045f) AM_WRITE(k054539_word_w)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(gp2_vram_w)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_WRITE(gp2_vram_mirror_w)	/* vram (mirror) */

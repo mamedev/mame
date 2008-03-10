@@ -20,7 +20,7 @@ Main CPU: ( 6502 )
 2100-2100 Sound latch write
 2800-2801 Protection
 3800-3800 VBblank ( bootleg 1 only )
-4000-ffff MRA8_ROM
+4000-ffff SMH_ROM
 
 Sound Cpu: ( 6809 )
 0000-1fff RAM

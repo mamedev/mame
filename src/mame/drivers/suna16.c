@@ -100,11 +100,11 @@ static WRITE16_HANDLER( bestbest_coin_w )
 ***************************************************************************/
 
 static ADDRESS_MAP_START( bssoccer_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(MRA16_ROM 				)	// ROM
-	AM_RANGE(0x200000, 0x203fff) AM_READ(MRA16_RAM 				)	// RAM
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM 				)	// ROM
+	AM_RANGE(0x200000, 0x203fff) AM_READ(SMH_RAM 				)	// RAM
 	AM_RANGE(0x400000, 0x4001ff) AM_READ(suna16_paletteram16_r	)	// Banked Palette
-	AM_RANGE(0x400200, 0x400fff) AM_READ(MRA16_RAM 				)	//
-	AM_RANGE(0x600000, 0x61ffff) AM_READ(MRA16_RAM 				)	// Sprites
+	AM_RANGE(0x400200, 0x400fff) AM_READ(SMH_RAM 				)	//
+	AM_RANGE(0x600000, 0x61ffff) AM_READ(SMH_RAM 				)	// Sprites
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(input_port_0_word_r		)	// P1 (Inputs)
 	AM_RANGE(0xa00002, 0xa00003) AM_READ(input_port_1_word_r		)	// P2
 	AM_RANGE(0xa00004, 0xa00005) AM_READ(input_port_2_word_r		)	// P3
@@ -114,16 +114,16 @@ static ADDRESS_MAP_START( bssoccer_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(MWA16_ROM 				)	// ROM
-	AM_RANGE(0x200000, 0x203fff) AM_WRITE(MWA16_RAM 				)	// RAM
+	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM 				)	// ROM
+	AM_RANGE(0x200000, 0x203fff) AM_WRITE(SMH_RAM 				)	// RAM
 	AM_RANGE(0x400000, 0x4001ff) AM_WRITE(suna16_paletteram16_w		)  // Banked Palette
-	AM_RANGE(0x400200, 0x400fff) AM_WRITE(MWA16_RAM 				)	//
-	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites
+	AM_RANGE(0x400200, 0x400fff) AM_WRITE(SMH_RAM 				)	//
+	AM_RANGE(0x600000, 0x61ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16	)	// Sprites
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(suna16_soundlatch_w		)	// To Sound CPU
 	AM_RANGE(0xa00002, 0xa00003) AM_WRITE(suna16_flipscreen_w		)	// Flip Screen
 	AM_RANGE(0xa00004, 0xa00005) AM_WRITE(bssoccer_leds_w			)	// Leds
-	AM_RANGE(0xa00006, 0xa00007) AM_WRITE(MWA16_NOP					)	// ? IRQ 1 Ack
-	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(MWA16_NOP					)	// ? IRQ 2 Ack
+	AM_RANGE(0xa00006, 0xa00007) AM_WRITE(SMH_NOP					)	// ? IRQ 1 Ack
+	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(SMH_NOP					)	// ? IRQ 2 Ack
 ADDRESS_MAP_END
 
 
@@ -137,31 +137,31 @@ static WRITE16_HANDLER( uballoon_spriteram16_w )
 }
 
 static ADDRESS_MAP_START( uballoon_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM 				)	// ROM
-	AM_RANGE(0x800000, 0x803fff) AM_READ(MRA16_RAM 				)	// RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM 				)	// ROM
+	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM 				)	// RAM
 	AM_RANGE(0x200000, 0x2001ff) AM_READ(suna16_paletteram16_r	)	// Banked Palette
-	AM_RANGE(0x200200, 0x200fff) AM_READ(MRA16_RAM 				)	//
-	AM_RANGE(0x400000, 0x41ffff) AM_READ(MRA16_RAM 				)	// Sprites
+	AM_RANGE(0x200200, 0x200fff) AM_READ(SMH_RAM 				)	//
+	AM_RANGE(0x400000, 0x41ffff) AM_READ(SMH_RAM 				)	// Sprites
 	AM_RANGE(0x600000, 0x600001) AM_READ(input_port_0_word_r		)	// P1 + Coins(Inputs)
 	AM_RANGE(0x600002, 0x600003) AM_READ(input_port_1_word_r		)	// P2 + Coins
 	AM_RANGE(0x600004, 0x600005) AM_READ(input_port_2_word_r		)	// DSW 1
 	AM_RANGE(0x600006, 0x600007) AM_READ(input_port_3_word_r		)	// DSW 2
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(MRA16_NOP					)	// Protection
+	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(SMH_NOP					)	// Protection
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uballoon_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM 				)	// ROM
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(MWA16_RAM 				)	// RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM 				)	// ROM
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE(SMH_RAM 				)	// RAM
 	AM_RANGE(0x200000, 0x2001ff) AM_WRITE(suna16_paletteram16_w		)	// Banked Palette
-	AM_RANGE(0x200200, 0x200fff) AM_WRITE(MWA16_RAM 				)	//
-	AM_RANGE(0x400000, 0x41ffff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16	)	// Sprites
+	AM_RANGE(0x200200, 0x200fff) AM_WRITE(SMH_RAM 				)	//
+	AM_RANGE(0x400000, 0x41ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16	)	// Sprites
 	AM_RANGE(0x5c0000, 0x5dffff) AM_WRITE(uballoon_spriteram16_w	)	// Sprites (Mirror?)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(suna16_soundlatch_w		)	// To Sound CPU
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(suna16_flipscreen_w		)	// Flip Screen
 	AM_RANGE(0x600008, 0x600009) AM_WRITE(uballoon_leds_w			)	// Leds
-	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(MWA16_NOP					)	// ? IRQ 1 Ack
-	AM_RANGE(0x600010, 0x600011) AM_WRITE(MWA16_NOP					)	// ? IRQ 1 Ack
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(MWA16_NOP					)	// Protection
+	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(SMH_NOP					)	// ? IRQ 1 Ack
+	AM_RANGE(0x600010, 0x600011) AM_WRITE(SMH_NOP					)	// ? IRQ 1 Ack
+	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(SMH_NOP					)	// Protection
 ADDRESS_MAP_END
 
 
@@ -170,24 +170,24 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( sunaq_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM 				)	// ROM
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM 				)	// ROM
 	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_0_word_r		)	// P1 + Coins
 	AM_RANGE(0x500002, 0x500003) AM_READ(input_port_1_word_r		)	// P2 + Coins
 	AM_RANGE(0x500004, 0x500005) AM_READ(input_port_2_word_r		)	// DSW
 	AM_RANGE(0x500006, 0x500007) AM_READ(input_port_3_word_r		)	// (unused?)
 	AM_RANGE(0x540000, 0x5401ff) AM_READ(suna16_paletteram16_r	)	// Banked Palette
-	AM_RANGE(0x540200, 0x540fff) AM_READ(MRA16_RAM 				)	// RAM
-	AM_RANGE(0x580000, 0x583fff) AM_READ(MRA16_RAM 				)	// RAM
-	AM_RANGE(0x5c0000, 0x5dffff) AM_READ(MRA16_RAM 				)	// RAM
+	AM_RANGE(0x540200, 0x540fff) AM_READ(SMH_RAM 				)	// RAM
+	AM_RANGE(0x580000, 0x583fff) AM_READ(SMH_RAM 				)	// RAM
+	AM_RANGE(0x5c0000, 0x5dffff) AM_READ(SMH_RAM 				)	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunaq_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM 				)	// ROM
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM 				)	// ROM
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(suna16_soundlatch_w		)	// To Sound CPU
 	AM_RANGE(0x500002, 0x500003) AM_WRITE(suna16_flipscreen_w		)	// Flip Screen
 	AM_RANGE(0x540000, 0x5401ff) AM_WRITE(suna16_paletteram16_w		)
-	AM_RANGE(0x540200, 0x540fff) AM_WRITE(MWA16_RAM                 )   // RAM
-	AM_RANGE(0x580000, 0x583fff) AM_WRITE(MWA16_RAM 				)	// RAM
+	AM_RANGE(0x540200, 0x540fff) AM_WRITE(SMH_RAM                 )   // RAM
+	AM_RANGE(0x580000, 0x583fff) AM_WRITE(SMH_RAM 				)	// RAM
 	AM_RANGE(0x5c0000, 0x5dffff) AM_WRITE(uballoon_spriteram16_w) AM_BASE(&spriteram16 )	// Sprites
 ADDRESS_MAP_END
 
@@ -250,15 +250,15 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( bssoccer_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM					)	// ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM					)	// ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w		)	//
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_w 			)	// To PCM Z80 #1
@@ -270,15 +270,15 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( uballoon_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(MRA8_ROM					)	// ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM					)	// ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uballoon_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(MWA8_ROM					)	// ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM					)	// ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w		)	//
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w				)	// To PCM Z80
@@ -289,15 +289,15 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( sunaq_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xe82f) AM_READ(MRA8_ROM					)	// ROM
-	AM_RANGE(0xe830, 0xf7ff) AM_READ(MRA8_RAM					)	// RAM
+	AM_RANGE(0x0000, 0xe82f) AM_READ(SMH_ROM					)	// ROM
+	AM_RANGE(0xe830, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunaq_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xe82f) AM_WRITE(MWA8_ROM					)	// ROM
-	AM_RANGE(0xe830, 0xf7ff) AM_WRITE(MWA8_RAM					)	// RAM (writes to efxx, could be a program bug tho)
+	AM_RANGE(0x0000, 0xe82f) AM_WRITE(SMH_ROM					)	// ROM
+	AM_RANGE(0xe830, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM (writes to efxx, could be a program bug tho)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w		)	//
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w				)	// To PCM Z80
@@ -355,20 +355,20 @@ static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 /* Memory maps: Yes, *no* RAM */
 
 static ADDRESS_MAP_START( bssoccer_pcm_1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM			)	// ROM
-	AM_RANGE(0x1000, 0xffff) AM_READ(MRA8_BANK1 		)	// Banked ROM
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1 		)	// Banked ROM
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_pcm_1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_ROM			)	// ROM
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM			)	// ROM
-	AM_RANGE(0x1000, 0xffff) AM_READ(MRA8_BANK2 		)	// Banked ROM
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK2 		)	// Banked ROM
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_pcm_2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_ROM			)	// ROM
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
 
@@ -426,11 +426,11 @@ static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 /* Memory maps: Yes, *no* RAM */
 
 static ADDRESS_MAP_START( uballoon_pcm_1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_ROM			)	// ROM
-	AM_RANGE(0x0400, 0xffff) AM_READ(MRA8_BANK1 		)	// Banked ROM
+	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0x0400, 0xffff) AM_READ(SMH_BANK1 		)	// Banked ROM
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_pcm_1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_ROM			)	// ROM
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM			)	// ROM
 ADDRESS_MAP_END
 
 

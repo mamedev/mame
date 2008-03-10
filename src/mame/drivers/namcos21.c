@@ -777,8 +777,8 @@ static WRITE16_HANDLER( dsp_xf_w )
 }
 
 static ADDRESS_MAP_START( master_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA16_ROM) /* BIOS */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) AM_BASE(&master_dsp_code)
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM) /* BIOS */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&master_dsp_code)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_data, ADDRESS_SPACE_DATA, 16 )
@@ -798,8 +798,8 @@ static ADDRESS_MAP_START( master_dsp_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0b,0x0b) AM_READ(dsp_portb_r) AM_WRITE(dsp_portb_w)
 	AM_RANGE(0x0c,0x0c) AM_WRITE(dsp_portc_w)
 	AM_RANGE(0x0f,0x0f) AM_READ(dsp_portf_r)
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ( MRA16_NOP )
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE( MWA16_NOP )
+	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ( SMH_NOP )
+	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE( SMH_NOP )
 	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE( dsp_xf_w )
 ADDRESS_MAP_END
 
@@ -906,8 +906,8 @@ static READ16_HANDLER( slave_portf_r )
 }
 
 static ADDRESS_MAP_START( slave_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA16_ROM) /* BIOS */
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM) /* BIOS */
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_dsp_data, ADDRESS_SPACE_DATA, 16 )
@@ -919,8 +919,8 @@ static ADDRESS_MAP_START( slave_dsp_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02,0x02) AM_READ(slave_port2_r)
 	AM_RANGE(0x03,0x03) AM_READ(slave_port3_r) AM_WRITE(slave_port3_w)
 	AM_RANGE(0x0f,0x0f) AM_READ(slave_portf_r)
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ(MRA16_NOP)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(MWA16_NOP)
+	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ(SMH_NOP)
+	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(SMH_NOP)
 	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE(slave_XF_output_w)
 ADDRESS_MAP_END
 
@@ -1085,24 +1085,24 @@ static READ16_HANDLER( NAMCO_C139_SCI_register_r ){ return 0; }
 /* MASTER 68000 CPU Memory declarations                      */
 /*************************************************************/
 static ADDRESS_MAP_START( namcos21_68k_master, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* private work RAM */
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_EEPROM_R) AM_WRITE(NAMCOS2_68K_EEPROM_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namcos21_68k_slave, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x13ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* private work RAM */
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x13ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_slave_C148_r) AM_WRITE(namcos2_68k_slave_C148_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namcos21_68k_common, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_READ(dspram16_r) AM_WRITE(dspram16_w) AM_BASE(&namcos21_dspram16)
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(MWA16_NOP) /* written once on startup */
+	AM_RANGE(0x280000, 0x280001) AM_WRITE(SMH_NOP) /* written once on startup */
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
 	AM_RANGE(0x440000, 0x440001) AM_READ(pointram_data_r) AM_WRITE(pointram_data_w)
-	AM_RANGE(0x440002, 0x47ffff) AM_WRITE(MWA16_NOP) /* (?) Air Combat */
+	AM_RANGE(0x440002, 0x47ffff) AM_WRITE(SMH_NOP) /* (?) Air Combat */
 	AM_RANGE(0x480000, 0x4807ff) AM_WRITE(namcos21_depthcue_w) AM_READ(namcos21_depthcue_r) /* Air Combat */
 	AM_RANGE(0x700000, 0x71ffff) AM_READ(namco_obj16_r) AM_WRITE(namco_obj16_w)
 	AM_RANGE(0x720000, 0x720007) AM_READ(namco_spritepos16_r) AM_WRITE(namco_spritepos16_w)
@@ -1255,7 +1255,7 @@ static READ16_HANDLER( winrun_table_r )
 }
 
 static ADDRESS_MAP_START( winrun_dsp_program, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winrun_dsp_data, ADDRESS_SPACE_DATA, 16 )
@@ -1267,12 +1267,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( winrun_dsp_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x08,0x09) AM_WRITE(winrun_dsp_pointrom_addr_w) AM_READ(winrun_dsp_pointrom_data_r)
 	AM_RANGE(0x0a,0x0a) AM_WRITE(winrun_dsp_render_w)
-	AM_RANGE(0x0b,0x0b) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x0b,0x0b) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x0c,0x0c) AM_WRITE(winrun_dsp_complete_w)
 	AM_RANGE(TMS32025_BIO,   TMS32025_BIO)   AM_READ( winrun_poly_reset_r )
-	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ( MRA16_NOP )
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE( MWA16_NOP )
-	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE( MWA16_NOP )
+	AM_RANGE(TMS32025_HOLD,  TMS32025_HOLD)  AM_READ( SMH_NOP )
+	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE( SMH_NOP )
+	AM_RANGE(TMS32025_XF,    TMS32025_XF)    AM_WRITE( SMH_NOP )
 ADDRESS_MAP_END
 
 static READ16_HANDLER( gpu_data_r )
@@ -1331,12 +1331,12 @@ static WRITE16_HANDLER( winrun_dspcomram_control_w )
 }
 
 static ADDRESS_MAP_START( am_master_winrun, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* work RAM */
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_EEPROM_R) AM_WRITE(NAMCOS2_68K_EEPROM_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
-	AM_RANGE(0x250000, 0x25ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) AM_BASE( &winrun_polydata )
-	AM_RANGE(0x260000, 0x26ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* unused? */
+	AM_RANGE(0x250000, 0x25ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE( &winrun_polydata )
+	AM_RANGE(0x260000, 0x26ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unused? */
 	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_BASE(&winrun_dspbios)
 	AM_RANGE(0x380000, 0x38000f) AM_READ(winrun_dspcomram_control_r) AM_WRITE(winrun_dspcomram_control_w)
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_READ(winrun_68k_dspcomram_r) AM_WRITE(winrun_68k_dspcomram_w)
@@ -1351,8 +1351,8 @@ static ADDRESS_MAP_START( am_master_winrun, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( am_slave_winrun, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x13ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x13ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_slave_C148_r) AM_WRITE(namcos2_68k_slave_C148_w)
 	AM_RANGE(0x600000, 0x60ffff) AM_READ(winrun_gpucomram_r) AM_WRITE(winrun_gpucomram_w)
 	AM_RANGE(0x800000, 0x87ffff) AM_READ(datarom_r)
@@ -1363,11 +1363,11 @@ static ADDRESS_MAP_START( am_slave_winrun, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( am_gpu_winrun, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x100001) AM_READ(winrun_gpu_color_r) AM_WRITE(winrun_gpu_color_w) /* ? */
-	AM_RANGE(0x180000, 0x19ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* work RAM */
+	AM_RANGE(0x180000, 0x19ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_gpu_C148_r) AM_WRITE(namcos2_68k_gpu_C148_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) AM_BASE( &winrun_gpucomram )
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE( &winrun_gpucomram )
 	AM_RANGE(0x400000, 0x41ffff) AM_READ(paletteram16_r) AM_WRITE(paletteram16_w) AM_BASE( &paletteram16 )
 	AM_RANGE(0x600000, 0x6fffff) AM_READ(gpu_data_r)
 	AM_RANGE(0xc00000, 0xcfffff) AM_READ(winrun_gpu_videoram_r) AM_WRITE(winrun_gpu_videoram_w)
@@ -1385,23 +1385,23 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x6fff) AM_READ(C140_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(namcos2_dualportram_byte_r)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(namcos2_dualportram_byte_r)	/* mirror */
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xd000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xd000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x3000, 0x3003) AM_WRITE(MWA8_NOP) /* ? */
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x3000, 0x3003) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x5000, 0x6fff) AM_WRITE(C140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(namcos2_dualportram_byte_w) AM_BASE(&mpDualPortRAM)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(namcos2_dualportram_byte_w) /* mirror */
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(MWA8_NOP) /* amplifier enable on 1st write */
+	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xa000, 0xbfff) AM_WRITE(SMH_NOP) /* amplifier enable on 1st write */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos2_sound_bankselect_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(MWA8_NOP) /* watchdog */
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(MWA8_NOP) /* avoid debug log noise; games write frequently to 0xe000 */
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(SMH_NOP) /* watchdog */
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_NOP) /* avoid debug log noise; games write frequently to 0xe000 */
 ADDRESS_MAP_END
 
 /*************************************************************/
@@ -1409,35 +1409,35 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static ADDRESS_MAP_START( readmem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_READ(MRA8_NOP)
+	AM_RANGE(0x0000, 0x0000) AM_READ(SMH_NOP)
 	AM_RANGE(0x0001, 0x0001) AM_READ(input_port_0_r)			/* p1,p2 start */
 	AM_RANGE(0x0002, 0x0002) AM_READ(input_port_1_r)			/* coins */
 	AM_RANGE(0x0003, 0x0003) AM_READ(namcos2_mcu_port_d_r)
 	AM_RANGE(0x0007, 0x0007) AM_READ(input_port_10_r)		/* fire buttons */
 	AM_RANGE(0x0010, 0x0010) AM_READ(namcos2_mcu_analog_ctrl_r)
 	AM_RANGE(0x0011, 0x0011) AM_READ(namcos2_mcu_analog_port_r)
-	AM_RANGE(0x0008, 0x003f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0040, 0x01bf) AM_READ(MRA8_RAM)
-	AM_RANGE(0x01c0, 0x1fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0008, 0x003f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0040, 0x01bf) AM_READ(SMH_RAM)
+	AM_RANGE(0x01c0, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_11_r) /* dipswitches */
 	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_12_r) /* DIAL0 */
 	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_13_r) /* DIAL1 */
 	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_14_r) /* DIAL2 */
 	AM_RANGE(0x3003, 0x3003) AM_READ(input_port_15_r) /* DIAL3 */
 	AM_RANGE(0x5000, 0x57ff) AM_READ(namcos2_dualportram_byte_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_NOP) /* watchdog */
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_NOP) /* watchdog */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(namcos2_mcu_port_d_w)
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(namcos2_mcu_analog_ctrl_w)
 	AM_RANGE(0x0011, 0x0011) AM_WRITE(namcos2_mcu_analog_port_w)
-	AM_RANGE(0x0000, 0x003f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0040, 0x01bf) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x01c0, 0x1fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x003f) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0040, 0x01bf) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x01c0, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x5000, 0x57ff) AM_WRITE(namcos2_dualportram_byte_w) AM_BASE(&mpDualPortRAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1446,20 +1446,20 @@ ADDRESS_MAP_END
 ////////////////////////////////////////////////////////////////////////////////
 
 static ADDRESS_MAP_START( driveyes_68k_master, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* private work RAM */
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_EEPROM_R) AM_WRITE(NAMCOS2_68K_EEPROM_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driveyes_68k_slave, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) /* private work RAM */
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_slave_C148_r) AM_WRITE(namcos2_68k_slave_C148_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driveyes_68k_common, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x250000, 0x25ffff) AM_READ(MRA16_RAM) AM_WRITE(MWA16_RAM) AM_BASE( &winrun_polydata )
+	AM_RANGE(0x250000, 0x25ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE( &winrun_polydata )
 	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_BASE(&winrun_dspbios)
 	AM_RANGE(0x380000, 0x38000f) AM_READ(winrun_dspcomram_control_r) AM_WRITE(winrun_dspcomram_control_w)
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_READ(winrun_68k_dspcomram_r) AM_WRITE(winrun_68k_dspcomram_w)

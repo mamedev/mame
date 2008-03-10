@@ -30,18 +30,18 @@ static INTERRUPT_GEN( higemaru_interrupt )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_1_r)
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_2_r)
 	AM_RANGE(0xc003, 0xc003) AM_READ(input_port_3_r)
 	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_4_r)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(higemaru_c800_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE(AY8910_write_port_0_w)
@@ -49,8 +49,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(higemaru_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(higemaru_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd880, 0xd9ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd880, 0xd9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 

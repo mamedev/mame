@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(MWA8_NOP) // sound? payout?
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP) // sound? payout?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&murogem_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END

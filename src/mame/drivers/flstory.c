@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( flstory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)
 	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ(input_port_5_r)
-//  AM_RANGE(0xda00, 0xda00) AM_WRITE(MWA8_RAM)
+//  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM AM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( onna34ro_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)
 	AM_RANGE(0xd805, 0xd805) AM_READ(onna34ro_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ(input_port_5_r)
-//  AM_RANGE(0xda00, 0xda00) AM_WRITE(MWA8_RAM)
+//  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM AM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
-	AM_RANGE(0xd002, 0xd002) AM_READWRITE(MRA8_NOP, MWA8_NOP)	/* unknown read & coin lock out? */
+	AM_RANGE(0xd002, 0xd002) AM_READWRITE(SMH_NOP, SMH_NOP)	/* unknown read & coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd805, 0xd805) AM_READ(victnine_port_5_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ(input_port_6_r)
 	AM_RANGE(0xd807, 0xd807) AM_READ(input_port_7_r)
-//  AM_RANGE(0xda00, 0xda00) AM_WRITE(MWA8_RAM)
+//  AM_RANGE(0xda00, 0xda00) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM AM_WRITE(flstory_scrlram_w) AM_BASE(&flstory_scrlram)
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
@@ -267,9 +267,9 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READWRITE(MRA8_NOP, nmi_enable_w)			/* unknown read*/
+	AM_RANGE(0xda00, 0xda00) AM_READWRITE(SMH_NOP, nmi_enable_w)			/* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READWRITE(MRA8_NOP, DAC_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xde00, 0xde00) AM_READWRITE(SMH_NOP, DAC_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 

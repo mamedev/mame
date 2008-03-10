@@ -154,10 +154,10 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 
 static ADDRESS_MAP_START( skyarmy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7FFF) AM_READ(MRA8_ROM)
-        AM_RANGE(0x8000, 0x87FF) AM_READ(MRA8_RAM)
-        AM_RANGE(0x8800, 0x93FF) AM_READ(MRA8_RAM) /* Video RAM */
-        AM_RANGE(0x9800, 0x983F) AM_READ(MRA8_RAM) /* Sprites */
+	AM_RANGE(0x0000, 0x7FFF) AM_READ(SMH_ROM)
+        AM_RANGE(0x8000, 0x87FF) AM_READ(SMH_RAM)
+        AM_RANGE(0x8800, 0x93FF) AM_READ(SMH_RAM) /* Video RAM */
+        AM_RANGE(0x9800, 0x983F) AM_READ(SMH_RAM) /* Sprites */
         AM_RANGE(0x9840, 0x985F) AM_READ(skyarmy_scrollram_r) /* Sroll RAM */
         AM_RANGE(0xA000, 0xA000) AM_READ(input_port_0_r)
         AM_RANGE(0xA001, 0xA001) AM_READ(input_port_1_r)
@@ -166,16 +166,16 @@ static ADDRESS_MAP_START( skyarmy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skyarmy_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7FFF) AM_WRITE(MWA8_ROM)
-        AM_RANGE(0x8000, 0x87FF) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7FFF) AM_WRITE(SMH_ROM)
+        AM_RANGE(0x8000, 0x87FF) AM_WRITE(SMH_RAM)
         AM_RANGE(0x8800, 0x8BFF) AM_WRITE(skyarmy_videoram_w) AM_BASE(&skyarmy_videoram) /* Video RAM */
         AM_RANGE(0x9000, 0x93FF) AM_WRITE(skyarmy_colorram_w) AM_BASE(&skyarmy_colorram) /* Color RAM */
-        AM_RANGE(0x9800, 0x983F) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
+        AM_RANGE(0x9800, 0x983F) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* Sprites */
         AM_RANGE(0x9840, 0x985F) AM_WRITE(skyarmy_scrollram_w) AM_BASE(&skyarmy_scrollram) /* Sprites */
         AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
-        AM_RANGE(0xa005, 0xa005) AM_WRITE(MWA8_NOP)
-        AM_RANGE(0xa006, 0xa006) AM_WRITE(MWA8_NOP)
-        AM_RANGE(0xa007, 0xa007) AM_WRITE(MWA8_NOP)
+        AM_RANGE(0xa005, 0xa005) AM_WRITE(SMH_NOP)
+        AM_RANGE(0xa006, 0xa006) AM_WRITE(SMH_NOP)
+        AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( skyarmy )

@@ -1077,30 +1077,30 @@ static void sdrc_remap_memory(void)
 	/* if SRAM disabled, clean it out */
 	if (SDRC_SM_EN == 0)
 	{
-		memory_install_read32_handler (dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, MRA32_UNMAP);
-		memory_install_write32_handler(dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, MWA32_UNMAP);
-		memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x37ff, 0, 0, MRA16_UNMAP);
-		memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x37ff, 0, 0, MWA16_UNMAP);
+		memory_install_read32_handler (dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_write32_handler(dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_UNMAP);
+		memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x37ff, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x37ff, 0, 0, SMH_UNMAP);
 	}
 
 	/* otherwise, map the SRAM */
 	else
 	{
 		/* first start with a clean program map */
-		memory_install_read32_handler (dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, MRA32_BANK21);
-		memory_install_write32_handler(dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, MWA32_BANK21);
+		memory_install_read32_handler (dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_BANK21);
+		memory_install_write32_handler(dcs.cpunum, ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_BANK21);
 		memory_set_bankptr(21, dcs_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, MRA16_BANK22);
-			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, MWA16_BANK22);
-			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, MRA16_BANK23);
-			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, MWA16_BANK23);
-			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, MRA16_BANK24);
-			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, MWA16_BANK24);
+			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, SMH_BANK22);
+			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, SMH_BANK22);
+			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, SMH_BANK23);
+			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, SMH_BANK23);
+			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, SMH_BANK24);
+			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, SMH_BANK24);
 			memory_set_bankptr(22, dcs_sram + 0x0000);
 			memory_set_bankptr(23, dcs_sram + 0x1000);
 			memory_set_bankptr(24, dcs_sram + 0x2000);
@@ -1109,12 +1109,12 @@ static void sdrc_remap_memory(void)
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
-			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, MRA16_UNMAP);
-			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, MWA16_UNMAP);
-			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, MRA16_BANK23);
-			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, MWA16_BANK23);
-			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, MRA16_BANK24);
-			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, MWA16_BANK24);
+			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, SMH_UNMAP);
+			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, SMH_UNMAP);
+			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, SMH_BANK23);
+			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, SMH_BANK23);
+			memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, SMH_BANK24);
+			memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, SMH_BANK24);
 			memory_set_bankptr(23, dcs_sram + 0x3000);
 			memory_set_bankptr(24, dcs_sram + 0x2000);
 		}
@@ -1125,15 +1125,15 @@ static void sdrc_remap_memory(void)
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, baseaddr, baseaddr + pagesize - 1, 0, 0, MRA16_BANK25);
+		memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, baseaddr, baseaddr + pagesize - 1, 0, 0, SMH_BANK25);
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, baseaddr, baseaddr + 0x3ff, 0, 0, MRA16_BANK26);
-		memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, baseaddr, baseaddr + 0x3ff, 0, 0, MWA16_BANK26);
+		memory_install_read16_handler (dcs.cpunum, ADDRESS_SPACE_DATA, baseaddr, baseaddr + 0x3ff, 0, 0, SMH_BANK26);
+		memory_install_write16_handler(dcs.cpunum, ADDRESS_SPACE_DATA, baseaddr, baseaddr + 0x3ff, 0, 0, SMH_BANK26);
 	}
 
 	/* update the bank pointers */

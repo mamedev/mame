@@ -25,7 +25,7 @@ static UINT8 *fortecar_ram;
 
 
 static ADDRESS_MAP_START( fortecar_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xc7ff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0xc7ff) AM_READ(SMH_ROM)
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
 
 	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE(&fortecar_ram)
@@ -40,8 +40,8 @@ READ8_HANDLER( fortecar_read62 )
 
 static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x41, 0x41) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x41, 0x41) AM_WRITE(SMH_NOP)
 //  AM_RANGE(0x62, 0x62) AM_READ(fortecar_read62) // nvram eeprom?
 ADDRESS_MAP_END
 

@@ -51,7 +51,7 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, SMH_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(5, paletteram);
 
 		if (K051316_readroms)
@@ -61,8 +61,8 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	}
 	else
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, MRA8_BANK1, MWA8_BANK1);				/* RAM */
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, MRA8_BANK2, MWA8_BANK2);				/* RAM */
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, SMH_BANK1, SMH_BANK1);				/* RAM */
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, SMH_BANK2, SMH_BANK2);				/* RAM */
 	}
 
 	/* other bits unknown/unused */
@@ -143,12 +143,12 @@ static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 /****************************************************************************/
 
 static ADDRESS_MAP_START( chqflag_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM)					/* RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_READ(MRA8_BANK1)					/* banked RAM (RAM/051316 (chip 1)) */
-	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_BANK2)					/* palette + RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)					/* RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_BANK1)					/* banked RAM (RAM/051316 (chip 1)) */
+	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_BANK2)					/* palette + RAM */
 	AM_RANGE(0x2000, 0x2007) AM_READ(K051937_r)					/* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_READ(K051960_r)					/* Sprite RAM */
-	AM_RANGE(0x2800, 0x2fff) AM_READ(MRA8_BANK3)					/* 051316 zoom/rotation (chip 2) */
+	AM_RANGE(0x2800, 0x2fff) AM_READ(SMH_BANK3)					/* 051316 zoom/rotation (chip 2) */
 	AM_RANGE(0x3100, 0x3100) AM_READ(input_port_0_r)				/* DIPSW #1  */
 	AM_RANGE(0x3200, 0x3200) AM_READ(input_port_3_r)				/* COINSW, STARTSW, test mode */
 	AM_RANGE(0x3201, 0x3201) AM_READ(input_port_2_r)				/* DIPSW #3, SW 4 */
@@ -156,14 +156,14 @@ static ADDRESS_MAP_START( chqflag_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3400, 0x341f) AM_READ(K051733_r)					/* 051733 (protection) */
 	AM_RANGE(0x3701, 0x3701) AM_READ(input_port_4_r)				/* Brake + Shift + ? */
 	AM_RANGE(0x3702, 0x3702) AM_READ(analog_read_r)				/* accelerator/wheel */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK4)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)					/* ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK4)					/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chqflag_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)					/* RAM */
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(MWA8_BANK1)				/* banked RAM (RAM/051316 (chip 1)) */
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_BANK2)					/* palette + RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)					/* RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_WRITE(SMH_BANK1)				/* banked RAM (RAM/051316 (chip 1)) */
+	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_BANK2)					/* palette + RAM */
 	AM_RANGE(0x2000, 0x2007) AM_WRITE(K051937_w)					/* Sprite control registers */
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(K051960_w)					/* Sprite RAM */
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(K051316_1_w)				/* 051316 zoom/rotation (chip 2) */
@@ -177,18 +177,18 @@ static ADDRESS_MAP_START( chqflag_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3600, 0x360f) AM_WRITE(K051316_ctrl_1_w)			/* 051316 control registers (chip 2) */
 	AM_RANGE(0x3700, 0x3700) AM_WRITE(select_analog_ctrl_w)		/* select accelerator/wheel */
 	AM_RANGE(0x3702, 0x3702) AM_WRITE(select_analog_ctrl_w)		/* select accelerator/wheel (mirror?) */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)					/* ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chqflag_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)				/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)				/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0xa000, 0xa00d) AM_READ(K007232_read_port_0_r)	/* 007232 (chip 1) */
 	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_1_r)	/* 007232 (chip 2) */
 	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	//AM_RANGE(0xe000, 0xe000) AM_READ(MRA8_NOP)                /* ??? */
+	//AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)                /* ??? */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( k007232_bankswitch_w )
@@ -207,8 +207,8 @@ static WRITE8_HANDLER( k007232_bankswitch_w )
 }
 
 static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)					/* ROM */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)					/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)		/* 007232 bankswitch */
 	AM_RANGE(0xa000, 0xa00d) AM_WRITE(K007232_write_port_0_w)		/* 007232 (chip 1) */
 	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)/* extra volume, goes to the 007232 w/ A11 */
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_1_w)		/* 007232 (chip 2) */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)		/* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_NOP)					/* ??? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)					/* ??? */
 ADDRESS_MAP_END
 
 

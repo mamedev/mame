@@ -97,22 +97,22 @@
 
 static ADDRESS_MAP_START( pengo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(MRA8_RAM, pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size) /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(MRA8_RAM, pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(SMH_RAM, pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size) /* video and color RAM, scratchpad RAM, sprite codes */
+	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(SMH_RAM, pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x9020, 0x902f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x9020, 0x902f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
 	AM_RANGE(0x9000, 0x903f) AM_READ(input_port_3_r)	/* DSW1 */
 	AM_RANGE(0x9040, 0x907f) AM_READ(input_port_2_r)	/* DSW0 */
 	AM_RANGE(0x9040, 0x9040) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x9041, 0x9041) AM_WRITE(pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x9044, 0x9045) AM_WRITE(MWA8_NOP) /* coin counters */
+	AM_RANGE(0x9044, 0x9045) AM_WRITE(SMH_NOP) /* coin counters */
 	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
 	AM_RANGE(0x9047, 0x9047) AM_WRITE(pengo_gfxbank_w)
-	AM_RANGE(0x9070, 0x9070) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x9070, 0x9070) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x9080, 0x90bf) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x90c0, 0x90ff) AM_READ(input_port_0_r)	/* IN0 */
 ADDRESS_MAP_END
@@ -120,11 +120,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jrpacmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, jrpacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, jrpacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x9020, 0x902f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x9020, 0x902f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
 	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ(input_port_2_r)	/* DSW1 */
 	AM_RANGE(0x9040, 0x9040) AM_WRITE(interrupt_enable_w)
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( jrpacmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9045, 0x9045) AM_WRITE(jrpacman_spritebank_w)
 	AM_RANGE(0x9046, 0x9046) AM_WRITE(pengo_colortablebank_w)
 	AM_RANGE(0x9047, 0x9047) AM_WRITE(jrpacman_charbank_w)
-	AM_RANGE(0x9070, 0x9070) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x9070, 0x9070) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x9080, 0x90bf) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x90c0, 0x90ff) AM_READ(input_port_0_r)	/* IN0 */
 ADDRESS_MAP_END

@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(MRA8_RAM, acefruit_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(SMH_RAM, acefruit_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)
 	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_1_r)
 	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_2_r)

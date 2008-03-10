@@ -193,17 +193,17 @@ static WRITE8_HANDLER( videopin_note_dvsr_w )
  *************************************/
 
 static ADDRESS_MAP_START( videopin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r)
 	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_0_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)   /* mirror for 6502 vectors */
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)   /* mirror for 6502 vectors */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( videopin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0200, 0x07ff) AM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( videopin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(videopin_ball_w)
 	AM_RANGE(0x0805, 0x0805) AM_WRITE(videopin_out1_w)
 	AM_RANGE(0x0806, 0x0806) AM_WRITE(videopin_out2_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

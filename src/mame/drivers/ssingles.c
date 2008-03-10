@@ -162,7 +162,7 @@ static READ8_HANDLER(controls_r)
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
-	AM_RANGE(0x0000, 0x1fff) AM_READ( MRA8_ROM )
+	AM_RANGE(0x0000, 0x1fff) AM_READ( SMH_ROM )
 	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
 	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
 	AM_RANGE(0x6000, 0xbfff) AM_ROM

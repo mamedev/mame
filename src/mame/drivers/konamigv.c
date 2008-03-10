@@ -636,7 +636,7 @@ static DRIVER_INIT( btchamp )
 
 	memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r );
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_w );
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f6800e0, 0x1f6800e3, 0, 0, MWA32_NOP );
+	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f6800e0, 0x1f6800e3, 0, 0, SMH_NOP );
 	memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r );
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f380000, 0x1f3fffff, 0, 0, btcflash_w );
 

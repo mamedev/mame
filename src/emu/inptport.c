@@ -2578,27 +2578,27 @@ int port_tag_to_index(const char *tag)
 read8_machine_func port_tag_to_handler8(const char *tag)
 {
 	int port = port_tag_to_index(tag);
-	return (port == -1) ? MRA8_NOP : port_handler8[port];
+	return (port == -1) ? SMH_NOP : port_handler8[port];
 }
 
 
 read16_machine_func port_tag_to_handler16(const char *tag)
 {
 	int port = port_tag_to_index(tag);
-	return (port == -1) ? MRA16_NOP : port_handler16[port];
+	return (port == -1) ? SMH_NOP : port_handler16[port];
 }
 
 
 read32_machine_func port_tag_to_handler32(const char *tag)
 {
 	int port = port_tag_to_index(tag);
-	return (port == -1) ? MRA32_NOP : port_handler32[port];
+	return (port == -1) ? SMH_NOP : port_handler32[port];
 }
 
 
 read64_machine_func port_tag_to_handler64(const char *tag)
 {
-	return MRA64_NOP;
+	return SMH_NOP;
 }
 
 

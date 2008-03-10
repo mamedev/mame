@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3841, 0x3841) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
 	AM_RANGE(0x8000, 0x9fff) AM_READ(trvquest_question_r)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_RAM) AM_BASE_MEMBER(gameplan_state, trvquest_question)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_RAM) AM_BASE_MEMBER(gameplan_state, trvquest_question)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	// bogus read from the game code when reads question roms
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END

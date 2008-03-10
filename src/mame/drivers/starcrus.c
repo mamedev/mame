@@ -35,13 +35,13 @@ extern int s1_sprite;
 extern int s2_sprite;
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM) /* Program ROM */
-	AM_RANGE(0x1000, 0x10ff) AM_READ(MRA8_RAM) /* RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM) /* Program ROM */
+	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM) /* RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM) /* Program ROM */
-    AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) /* RAM */
+    AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM) /* Program ROM */
+    AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM) /* RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )

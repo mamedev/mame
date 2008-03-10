@@ -268,9 +268,9 @@ static WRITE8_HANDLER( msm5205_w )
 }
 
 static ADDRESS_MAP_START( avengers_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf808, 0xf808) AM_READ(input_port_0_r)
 	AM_RANGE(0xf809, 0xf809) AM_READ(input_port_1_r)
 	AM_RANGE(0xf80a, 0xf80a) AM_READ(input_port_2_r)
@@ -280,10 +280,10 @@ static ADDRESS_MAP_START( avengers_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avengers_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xddff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xde00, 0xdf7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xdf80, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xddff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdf7f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xdf80, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(lwings_fgvideoram_w) AM_BASE(&lwings_fgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(lwings_bg1videoram_w) AM_BASE(&lwings_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE(&paletteram_2)
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( avengers_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(trojan_bg2_scrollx_w)
 	AM_RANGE(0xf805, 0xf805) AM_WRITE(trojan_bg2_image_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf809, 0xf809) AM_WRITE(avengers_protection_w)
 	AM_RANGE(0xf80c, 0xf80c) AM_WRITE(avengers_prot_bank_w)
 	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(avengers_adpcm_w)
@@ -300,9 +300,9 @@ static ADDRESS_MAP_START( avengers_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 ) /* common to trojan and lwings */
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf808, 0xf808) AM_READ(input_port_0_r)
 	AM_RANGE(0xf809, 0xf809) AM_READ(input_port_1_r)
 	AM_RANGE(0xf80a, 0xf80a) AM_READ(input_port_2_r)
@@ -311,9 +311,9 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 ) /* common to troja
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 ) /* lwings */
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xddff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xde00, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xddff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(lwings_fgvideoram_w) AM_BASE(&lwings_fgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(lwings_bg1videoram_w) AM_BASE(&lwings_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE(&paletteram_2)
@@ -326,10 +326,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 ) /* lwings */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xddff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xde00, 0xdf7f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xdf80, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xddff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdf7f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xdf80, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(lwings_fgvideoram_w) AM_BASE(&lwings_fgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(lwings_bg1videoram_w) AM_BASE(&lwings_bg1videoram)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE(&paletteram_2)
@@ -344,30 +344,30 @@ static ADDRESS_MAP_START( trojan_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
 	AM_RANGE(0xe006, 0xe006) AM_READ(avengers_soundlatch2_r) //AT: (avengers061gre)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(MWA8_RAM) AM_BASE(&avengers_soundlatch2)
+	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_RAM) AM_BASE(&avengers_soundlatch2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adpcm_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
 static ADDRESS_MAP_START( adpcm_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-/*  AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_ROM) avoid cluttering up error.log */
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_NOP)
+/*  AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM) avoid cluttering up error.log */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avengers_adpcm_readport, ADDRESS_SPACE_IO, 8 )

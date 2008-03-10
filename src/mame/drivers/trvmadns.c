@@ -199,8 +199,8 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(&trvmadns_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc01f) AM_RAM AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE(&paletteram)

@@ -66,20 +66,20 @@ static MACHINE_START( gng )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_0_r)
 	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_1_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_2_r)
 	AM_RANGE(0x3003, 0x3003) AM_READ(input_port_3_r)
 	AM_RANGE(0x3004, 0x3004) AM_READ(input_port_4_r)
-	AM_RANGE(0x3c00, 0x3c00) AM_READ(MRA8_NOP)	/* watchdog? */
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x6000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x3c00, 0x3c00) AM_READ(SMH_NOP)	/* watchdog? */
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1dff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x1dff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(gng_fgvideoram_w) AM_BASE(&gng_fgvideoram)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(gng_bgvideoram_w) AM_BASE(&gng_bgvideoram)
 	AM_RANGE(0x3800, 0x38ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE(&paletteram_2)
@@ -87,29 +87,29 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE(gng_bgscrolly_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(MWA8_NOP)   /* watchdog? */
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(SMH_NOP)   /* watchdog? */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(gng_flipscreen_w)
 //  { 0x3d01, 0x3d01, reset sound cpu?
 	AM_RANGE(0x3d02, 0x3d03) AM_WRITE(gng_coin_counter_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 #define GNG_COMMON \

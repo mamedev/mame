@@ -2355,22 +2355,22 @@ static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x03000000, 0x030003ff) AM_RAM // 'FRAM' (SFIII memory test mode ONLY)
 
-//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_BASE(&cps3_spriteram)//AM_WRITE(MWA32_RAM) // Sprite RAM (jojoba tests this size)
-	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_BASE(&cps3_spriteram)//AM_WRITE(MWA32_RAM) // Sprite RAM
+//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_BASE(&cps3_spriteram)//AM_WRITE(SMH_RAM) // Sprite RAM (jojoba tests this size)
+	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_BASE(&cps3_spriteram)//AM_WRITE(SMH_RAM) // Sprite RAM
 
 	AM_RANGE(0x04080000, 0x040bffff) AM_RAM AM_READWRITE(cps3_colourram_r, cps3_colourram_w) AM_BASE(&cps3_colourram)  // Colour RAM (jojoba tests this size) 0x20000 colours?!
 
 	// video registers of some kind probably
 	AM_RANGE(0x040C0000, 0x040C0003) AM_READ(cps3_40C0000_r)//?? every frame
 	AM_RANGE(0x040C0004, 0x040C0007) AM_READ(cps3_40C0004_r)//AM_READ(cps3_40C0004_r) // warzard reads this!
-//  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITE(MWA32_NOP)//??
-    AM_RANGE(0x040C000c, 0x040C000f) AM_READ(cps3_vbl_r)// AM_WRITE(MWA32_NOP)/
+//  AM_RANGE(0x040C0008, 0x040C000b) AM_WRITE(SMH_NOP)//??
+    AM_RANGE(0x040C000c, 0x040C000f) AM_READ(cps3_vbl_r)// AM_WRITE(SMH_NOP)/
 
 	AM_RANGE(0x040C0000, 0x040C001f) AM_WRITE(cps3_unk_vidregs_w)
-	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITE(MWA32_RAM) AM_BASE(&tilemap20_regs_base)
-	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITE(MWA32_RAM) AM_BASE(&tilemap30_regs_base)
-	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITE(MWA32_RAM) AM_BASE(&tilemap40_regs_base)
-	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITE(MWA32_RAM) AM_BASE(&tilemap50_regs_base)
+	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITE(SMH_RAM) AM_BASE(&tilemap20_regs_base)
+	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITE(SMH_RAM) AM_BASE(&tilemap30_regs_base)
+	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITE(SMH_RAM) AM_BASE(&tilemap40_regs_base)
+	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITE(SMH_RAM) AM_BASE(&tilemap50_regs_base)
 
 	AM_RANGE(0x040C0060, 0x040C007f) AM_RAM AM_BASE(&cps3_fullscreenzoom)
 
@@ -2392,7 +2392,7 @@ static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x05000000, 0x05000003) AM_READ( cps3_io1_r )
 	AM_RANGE(0x05000004, 0x05000007) AM_READ( cps3_io2_r )
 
-	AM_RANGE(0x05000008, 0x0500000b) AM_WRITE( MWA32_NOP ) // ?? every frame
+	AM_RANGE(0x05000008, 0x0500000b) AM_WRITE( SMH_NOP ) // ?? every frame
 
 	AM_RANGE(0x05000a00, 0x05000a1f) AM_READ( cps3_unk_io_r ) // ?? every frame
 

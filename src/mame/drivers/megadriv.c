@@ -2108,7 +2108,7 @@ static WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 static ADDRESS_MAP_START( megadriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000 , 0x3fffff) AM_READ(SMH_ROM)
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
 	AM_RANGE(0xa00000 , 0xa01fff) AM_READ(megadriv_68k_read_z80_ram)
@@ -2122,20 +2122,20 @@ static ADDRESS_MAP_START( megadriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000 , 0xd0001f) AM_READ(megadriv_vdp_r) // the earth defend
 
 	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000 , 0xb0ffff) AM_READ(MRA16_RAM) AM_BASE(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000 , 0xb1007f) AM_READ(MRA16_RAM) AM_BASE(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100 , 0xb1017f) AM_READ(MRA16_RAM) AM_BASE(&megadrive_vdp_cram)
+//  AM_RANGE(0xb00000 , 0xb0ffff) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_vram)
+//  AM_RANGE(0xb10000 , 0xb1007f) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_vsram)
+//  AM_RANGE(0xb10100 , 0xb1017f) AM_READ(SMH_RAM) AM_BASE(&megadrive_vdp_cram)
 
 
 
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(MRA16_RAM) AM_MIRROR(0x1f0000)
-//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(MRA16_RAM)
+	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
+//  AM_RANGE(0xff0000 , 0xffffff) AM_READ(SMH_RAM)
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megadriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(SMH_ROM)
 
 	AM_RANGE(0xa00000 , 0xa01fff) AM_WRITE(megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000 , 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
@@ -2151,7 +2151,7 @@ static ADDRESS_MAP_START( megadriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
 	AM_RANGE(0xd00000 , 0xd0001f) AM_WRITE(megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(MWA16_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 
 /* z80 sounds/sub CPU */
@@ -2436,7 +2436,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000 , 0x1fff) AM_READ(MRA8_BANK1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
+	AM_RANGE(0x0000 , 0x1fff) AM_READ(SMH_BANK1) AM_MIRROR(0x2000) // RAM can be accessed by the 68k
 	AM_RANGE(0x4000 , 0x4003) AM_READ(megadriv_z80_YM2612_read)
 
 	AM_RANGE(0x6100 , 0x7eff) AM_READ(megadriv_z80_unmapped_read)
@@ -2447,7 +2447,7 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(MWA8_BANK1) AM_MIRROR(0x2000)
+	AM_RANGE(0x0000 , 0x1fff) AM_WRITE(SMH_BANK1) AM_MIRROR(0x2000)
 	AM_RANGE(0x4000 , 0x4003) AM_WRITE(megadriv_z80_YM2612_write)
 
 	AM_RANGE(0x7f00 , 0x7fff) AM_WRITE(megadriv_z80_vdp_write)
@@ -2489,10 +2489,10 @@ static WRITE16_HANDLER( _32x_68k_palette_w )
 }
 
 static ADDRESS_MAP_START( _32x_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000 , 0x3fffff) AM_READ(SMH_ROM)
 
-	AM_RANGE(0x880000 , 0x8fffff) AM_READ(MRA16_BANK2)
-	AM_RANGE(0x900000 , 0x9fffff) AM_READ(MRA16_BANK3)
+	AM_RANGE(0x880000 , 0x8fffff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x900000 , 0x9fffff) AM_READ(SMH_BANK3)
 
 	AM_RANGE(0xa00000 , 0xa01fff) AM_READ(megadriv_68k_read_z80_ram)
 	AM_RANGE(0xa04000 , 0xa04003) AM_READ(megadriv_68k_YM2612_read)
@@ -2506,14 +2506,14 @@ static ADDRESS_MAP_START( _32x_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00000 , 0xc0001f) AM_READ(megadriv_vdp_r)
 	AM_RANGE(0xd00000 , 0xd0001f) AM_READ(megadriv_vdp_r) // the earth defend
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(MRA16_RAM) AM_MIRROR(0x1f0000)
+	AM_RANGE(0xe00000 , 0xe0ffff) AM_READ(SMH_RAM) AM_MIRROR(0x1f0000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( _32x_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000 , 0x3fffff) AM_WRITE(SMH_ROM)
 
-	AM_RANGE(0x880000, 0x8fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x900000, 0x9fffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x880000, 0x8fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x900000, 0x9fffff) AM_WRITE(SMH_ROM)
 
 
 	AM_RANGE(0xa00000 , 0xa01fff) AM_WRITE(megadriv_68k_write_z80_ram)
@@ -2530,28 +2530,28 @@ static ADDRESS_MAP_START( _32x_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00000 , 0xc0001f) AM_WRITE(megadriv_vdp_w)
 	AM_RANGE(0xd00000 , 0xd0001f) AM_WRITE(megadriv_vdp_w)
-	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(MWA16_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xe00000 , 0xe0ffff) AM_WRITE(SMH_RAM) AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2main_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_READ(MRA32_ROM)
-	AM_RANGE(0x2000000 , 0x23fffff) AM_READ(MRA32_BANK4)
+	AM_RANGE(0x0000000 , 0x0003fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x2000000 , 0x23fffff) AM_READ(SMH_BANK4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2main_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_WRITE(MWA32_ROM)
-	AM_RANGE(0x2000000 , 0x23fffff) AM_WRITE(MWA32_ROM)
+	AM_RANGE(0x0000000 , 0x0003fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000000 , 0x23fffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sh2slave_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_READ(MRA32_ROM)
-	AM_RANGE(0x2000000 , 0x23fffff) AM_READ(MRA32_BANK4)
+	AM_RANGE(0x0000000 , 0x0003fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x2000000 , 0x23fffff) AM_READ(SMH_BANK4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2slave_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_WRITE(MWA32_ROM)
-	AM_RANGE(0x2000000 , 0x23fffff) AM_WRITE(MWA32_ROM)
+	AM_RANGE(0x0000000 , 0x0003fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000000 , 0x23fffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 
@@ -4810,18 +4810,18 @@ void megatech_set_megadrive_z80_as_megadrive_z80(void)
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_w);
 
 
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK1);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK1);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
 	memory_set_bankptr( 1, genz80.z80_prgram );
 
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MRA8_BANK6);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, MWA8_BANK6);
+	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK6);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK6);
 	memory_set_bankptr( 6, genz80.z80_prgram );
 
 
 	// not allowed??
-//  memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK1);
-//  memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK1);
+//  memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK1);
+//  memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK1);
 
 	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read);
 	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);

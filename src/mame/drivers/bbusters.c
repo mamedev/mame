@@ -291,14 +291,14 @@ static READ16_HANDLER( mechatt_gun_r )
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( bbuster_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x090000, 0x090fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0b0000, 0x0b1fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0b2000, 0x0b3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x090000, 0x090fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0b0000, 0x0b1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0b2000, 0x0b3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(input_port_2_word_r) /* Coins */
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ(input_port_0_word_r) /* Player 1 & 2 */
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ(input_port_1_word_r) /* Player 3 */
@@ -311,32 +311,32 @@ static ADDRESS_MAP_START( bbuster_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bbuster_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(MWA16_RAM) AM_BASE(&bbuster_ram)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_ram)
 	AM_RANGE(0x090000, 0x090fff) AM_WRITE(bbuster_video_w) AM_BASE(&videoram16)
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
 	AM_RANGE(0x0b0000, 0x0b1fff) AM_WRITE(bbuster_pf1_w) AM_BASE(&bbuster_pf1_data)
 	AM_RANGE(0x0b2000, 0x0b3fff) AM_WRITE(bbuster_pf2_w) AM_BASE(&bbuster_pf2_data)
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITE(MWA16_RAM) AM_BASE(&bbuster_pf1_scroll_data)
-	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITE(MWA16_RAM) AM_BASE(&bbuster_pf2_scroll_data)
+	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf1_scroll_data)
+	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf2_scroll_data)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(gun_select_w)
-	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE(sound_cpu_w)
-	AM_RANGE(0x0f8000, 0x0f80ff) AM_WRITE(MWA16_RAM) AM_BASE(&eprom_data) /* Eeprom */
+	AM_RANGE(0x0f8000, 0x0f80ff) AM_WRITE(SMH_RAM) AM_BASE(&eprom_data) /* Eeprom */
 ADDRESS_MAP_END
 
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( mechatt_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x06ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x070000, 0x07ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x090000, 0x090fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x06ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x070000, 0x07ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0x090000, 0x090fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
@@ -344,31 +344,31 @@ static ADDRESS_MAP_START( mechatt_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mechatt_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x06ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x070000, 0x07ffff) AM_WRITE(MWA16_RAM) AM_BASE(&bbuster_ram)
+	AM_RANGE(0x000000, 0x06ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x070000, 0x07ffff) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_ram)
 	AM_RANGE(0x090000, 0x090fff) AM_WRITE(bbuster_video_w) AM_BASE(&videoram16)
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_WRITE(bbuster_pf1_w) AM_BASE(&bbuster_pf1_data)
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITE(MWA16_RAM) AM_BASE(&bbuster_pf1_scroll_data)
+	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf1_scroll_data)
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_WRITE(bbuster_pf2_w) AM_BASE(&bbuster_pf2_data)
-	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITE(MWA16_RAM) AM_BASE(&bbuster_pf2_scroll_data)
+	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf2_scroll_data)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITE(MWA16_NOP) /* Gun force feedback? */
+	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITE(SMH_NOP) /* Gun force feedback? */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(sound_cpu_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM2610_control_port_0_B_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2610_data_port_0_B_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(MWA8_NOP) /* -> Main CPU */
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(SMH_NOP) /* -> Main CPU */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sounda_readport, ADDRESS_SPACE_IO, 8 )
@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( sounda_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2608_data_port_0_A_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(YM2608_control_port_0_B_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2608_data_port_0_B_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(MWA8_NOP) /* -> Main CPU */
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(SMH_NOP) /* -> Main CPU */
 ADDRESS_MAP_END
 
 /******************************************************************************/

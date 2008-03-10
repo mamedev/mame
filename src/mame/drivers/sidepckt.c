@@ -127,53 +127,53 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 /******************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1800, 0x1bff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x20ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1000, 0x13ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1800, 0x1bff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2000, 0x20ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_0_r)
 	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_1_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_2_r)
 	AM_RANGE(0x3003, 0x3003) AM_READ(input_port_3_r)
 	AM_RANGE(0x3014, 0x3014) AM_READ(sidepckt_i8751_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1000, 0x13ff) AM_WRITE(sidepckt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1800, 0x1bff) AM_WRITE(sidepckt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x300c, 0x300c) AM_WRITE(sidepckt_flipscreen_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(sidepckt_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( j_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1000, 0x13ff) AM_WRITE(sidepckt_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x1800, 0x1bff) AM_WRITE(sidepckt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2000, 0x20ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x300c, 0x300c) AM_WRITE(sidepckt_flipscreen_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(sidepctj_i8751_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_RAM)
+    AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_RAM)
     AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-    AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+    AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-    AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_RAM)
+    AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
     AM_RANGE(0x1000, 0x1000) AM_WRITE(YM2203_control_port_0_w)
     AM_RANGE(0x1001, 0x1001) AM_WRITE(YM2203_write_port_0_w)
     AM_RANGE(0x2000, 0x2000) AM_WRITE(YM3526_control_port_0_w)
     AM_RANGE(0x2001, 0x2001) AM_WRITE(YM3526_write_port_0_w)
-    AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+    AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /******************************************************************************/

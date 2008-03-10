@@ -513,7 +513,7 @@ DRIVER_INIT( pcdboard )
 DRIVER_INIT( pcdboard_2 )
 {
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	/* common init */
@@ -605,7 +605,7 @@ DRIVER_INIT( pceboard )
 	ppu_latch = mapper9_latch;
 
 	/* nvram at $6000-$6fff */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x1000));
 
 	/* common init */
@@ -636,7 +636,7 @@ DRIVER_INIT( pcfboard )
 DRIVER_INIT( pcfboard_2 )
 {
 	/* extra ram at $6000-$6fff */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x1000));
 
 	/* common init */
@@ -805,7 +805,7 @@ DRIVER_INIT( pcgboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	gboard_banks[0] = 0x1e;
@@ -869,7 +869,7 @@ DRIVER_INIT( pchboard )
 	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	gboard_banks[0] = 0x1e;
@@ -894,7 +894,7 @@ DRIVER_INIT( pckboard )
 	mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, MRA8_BANK1, MWA8_BANK1 );
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	/* Roms are banked at $8000 to $bfff */

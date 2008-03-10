@@ -94,38 +94,38 @@ static INPUT_PORTS_START( hshavoc )
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( topshoot_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)					/* Cartridge Program Rom */
-	AM_RANGE(0x202000, 0x2023ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)					/* Cartridge Program Rom */
+	AM_RANGE(0x202000, 0x2023ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(genesis_68k_to_z80_r)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(MRA16_BANK3)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(MRA16_BANK4)
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)					/* Main Ram */
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK3)
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK4)
+	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( topshoot_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)					/* Cartridge Program Rom */
-//  AM_RANGE(0x200000, 0x20007f) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x200000, 0x2023ff) AM_WRITE(MWA16_RAM) // tested
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)					/* Cartridge Program Rom */
+//  AM_RANGE(0x200000, 0x20007f) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x200000, 0x2023ff) AM_WRITE(SMH_RAM) // tested
 	AM_RANGE(0xa10000, 0xa1001f) AM_WRITE(genesis_io_w) AM_BASE(&genesis_io_ram)				/* Genesis Input */
 	AM_RANGE(0xa11000, 0xa11203) AM_WRITE(genesis_ctrl_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(genesis_68k_to_z80_w)
 	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_BANK4)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_BANK4)
+	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&genesis_68k_ram)/* Main Ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( genesis_z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_BANK1)
- 	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_BANK2) /* mirror */
+ 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK1)
+ 	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_BANK2) /* mirror */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(genesis_z80_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(genesis_z80_bank_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( genesis_z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_BANK1) AM_BASE(&genesis_z80_ram)
- 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_BANK2) /* mirror */
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_BANK1) AM_BASE(&genesis_z80_ram)
+ 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_BANK2) /* mirror */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(genesis_z80_w)
  // AM_RANGE(0x8000, 0xffff) AM_WRITE(genesis_z80_bank_w)
 ADDRESS_MAP_END

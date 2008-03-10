@@ -261,35 +261,35 @@ static WRITE32_HANDLER( motor_control_w )
 ***********************************************************/
 
 static ADDRESS_MAP_START( groundfx_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(MRA32_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_READ(MRA32_RAM)	/* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_READ(MRA32_RAM)	/* sprite ram */
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x200000, 0x21ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
+	AM_RANGE(0x300000, 0x303fff) AM_READ(SMH_RAM)	/* sprite ram */
 	AM_RANGE(0x500000, 0x500007) AM_READ(groundfx_input_r)
 	AM_RANGE(0x600000, 0x600003) AM_READ(groundfx_adc_r)
-	AM_RANGE(0x700000, 0x7007ff) AM_READ(MRA32_RAM)
+	AM_RANGE(0x700000, 0x7007ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x800000, 0x80ffff) AM_READ(TC0480SCP_long_r)	  /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_READ(TC0480SCP_ctrl_long_r)	// debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_READ(TC0100SCN_long_r)	/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_READ(TC0100SCN_ctrl_long_r)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(MRA32_RAM) /* palette ram */
-	AM_RANGE(0xb00000, 0xb003ff) AM_READ(MRA32_RAM)	// ?? single bytes
-	AM_RANGE(0xc00000, 0xc00007) AM_READ(MRA32_NOP) /* Network? */
+	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(SMH_RAM) /* palette ram */
+	AM_RANGE(0xb00000, 0xb003ff) AM_READ(SMH_RAM)	// ?? single bytes
+	AM_RANGE(0xc00000, 0xc00007) AM_READ(SMH_NOP) /* Network? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( groundfx_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(MWA32_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(MWA32_RAM) AM_BASE(&groundfx_ram)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(MWA32_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(SMH_RAM) AM_BASE(&groundfx_ram)
+	AM_RANGE(0x300000, 0x303fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
 	AM_RANGE(0x500000, 0x500007) AM_WRITE(groundfx_input_w)	/* eerom etc. */
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(groundfx_adc_w)
-	AM_RANGE(0x700000, 0x7007ff) AM_WRITE(MWA32_RAM) AM_BASE(&f3_shared_ram)
+	AM_RANGE(0x700000, 0x7007ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(TC0480SCP_long_w)	  /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_WRITE(TC0480SCP_ctrl_long_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_WRITE(TC0100SCN_long_w)	/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_WRITE(TC0100SCN_ctrl_long_w)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(color_ram_w) AM_BASE(&paletteram32)
-	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(MWA32_RAM)	// single bytes, blending ??
+	AM_RANGE(0xb00000, 0xb003ff) AM_WRITE(SMH_RAM)	// single bytes, blending ??
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)	/* perhaps port based rotate control? */
 	/* f00000 is seat control? */
 ADDRESS_MAP_END

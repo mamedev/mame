@@ -103,12 +103,12 @@ static WRITE8_HANDLER( tbowl_sound_command_w )
 /* Board B */
 
 static ADDRESS_MAP_START( readmem_6206B, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_RAM) /* RAM 1 */
-	AM_RANGE(0xa000, 0xbfff) AM_READ(MRA8_RAM) /* RAM 1 */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_BANK1) /* Banked ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM) /* RAM 1 */
+	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM) /* RAM 1 */
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK1) /* Banked ROM */
 	AM_RANGE(0xf800, 0xfbff) AM_READ(shared_r) /* RAM 2 */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(input_port_0_r) // Player 1 inputs
 	AM_RANGE(0xfc01, 0xfc01) AM_READ(input_port_1_r) // Player 2 inputs
@@ -122,13 +122,13 @@ static ADDRESS_MAP_START( readmem_6206B, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_6206B, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(tbowl_bg2videoram_w) AM_BASE(&tbowl_bg2videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(tbowl_bgvideoram_w) AM_BASE(&tbowl_bgvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tbowl_txvideoram_w) AM_BASE(&tbowl_txvideoram)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write)* written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(shared_w) AM_BASE(&shared_ram) /* check */
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlb_bankswitch_w)
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
@@ -156,25 +156,25 @@ static WRITE8_HANDLER ( tbowl_trigger_nmi )
 }
 
 static ADDRESS_MAP_START( readmem_6206C, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM) /* not read? */
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_BANK2) /* Banked ROM */
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) /* not read? */
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK2) /* Banked ROM */
 	AM_RANGE(0xf800, 0xfbff) AM_READ(shared_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_6206C, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xd7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&tbowl_spriteram)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&tbowl_spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram) // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(tbowl_trigger_nmi) /* ? */
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(MWA8_NOP) /* ? */
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(SMH_NOP) /* ? */
 ADDRESS_MAP_END
 
 /* Board A */
@@ -219,14 +219,14 @@ static void tbowl_adpcm_int(int num)
 }
 
 static ADDRESS_MAP_START( readmem_6206A, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_6206A, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(YM3812_control_port_1_w)
@@ -234,8 +234,8 @@ static ADDRESS_MAP_START( writemem_6206A, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0xe007, 0xe007) AM_WRITE(MWA8_NOP)	/* NMI acknowledge */
+	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe007, 0xe007) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
 ADDRESS_MAP_END
 
 /*** Input Ports

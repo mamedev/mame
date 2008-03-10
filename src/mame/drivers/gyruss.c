@@ -86,21 +86,21 @@ static ADDRESS_MAP_START( main_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&gyruss_videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(input_port_4_r, MWA8_NOP)	/* watchdog reset */
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(input_port_4_r, SMH_NOP)	/* watchdog reset */
 	AM_RANGE(0xc080, 0xc080) AM_READWRITE(input_port_0_r, gyruss_sh_irqtrigger_w)
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ(input_port_1_r)
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ(input_port_2_r)
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ(input_port_3_r)
 	AM_RANGE(0xc100, 0xc100) AM_READWRITE(input_port_5_r, soundlatch_w)
 	AM_RANGE(0xc180, 0xc180) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xc185, 0xc185) AM_WRITE(MWA8_RAM) AM_BASE(&gyruss_flipscreen)
+	AM_RANGE(0xc185, 0xc185) AM_WRITE(SMH_RAM) AM_BASE(&gyruss_flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
-	AM_RANGE(0x4040, 0x40ff) AM_READWRITE(MRA8_RAM, gyruss_spriteram_w) AM_BASE(&gyruss_spriteram)
+	AM_RANGE(0x4040, 0x40ff) AM_READWRITE(SMH_RAM, gyruss_spriteram_w) AM_BASE(&gyruss_spriteram)
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(MWA8_NOP)
+	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 

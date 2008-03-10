@@ -161,15 +161,15 @@ static WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x97ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9800, 0x987f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9c00, 0x9dff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9e00, 0x9e3f) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa800, 0xafff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xb000, 0xb7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xb800, 0xbbff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x97ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9800, 0x987f) AM_READ(SMH_RAM)
+	AM_RANGE(0x9c00, 0x9dff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9e00, 0x9e3f) AM_READ(SMH_RAM)
+	AM_RANGE(0xa000, 0xa7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xa800, 0xafff) AM_READ(SMH_RAM)
+	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xb800, 0xbbff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)	/* player 1 input */
 	AM_RANGE(0xd001, 0xd001) AM_READ(input_port_1_r)	/* player 2 input */
 	AM_RANGE(0xd002, 0xd002) AM_READ(input_port_2_r)	/* coin */
@@ -178,43 +178,43 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(senjyo_fgvideoram_w) AM_BASE(&senjyo_fgvideoram)
 	AM_RANGE(0x9400, 0x97ff) AM_WRITE(senjyo_fgcolorram_w) AM_BASE(&senjyo_fgcolorram)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9800, 0x987f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9c00, 0x9dff) AM_WRITE(paletteram_IIBBGGRR_w) AM_BASE(&paletteram)
-	AM_RANGE(0x9e00, 0x9e1f) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_fgscroll)
-	AM_RANGE(0x9e20, 0x9e21) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly3)
+	AM_RANGE(0x9e00, 0x9e1f) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_fgscroll)
+	AM_RANGE(0x9e20, 0x9e21) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrolly3)
 /*  { 0x9e22, 0x9e23, height of the layer (Senjyo only, fixed at 0x380) */
-	AM_RANGE(0x9e25, 0x9e25) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx3)
+	AM_RANGE(0x9e25, 0x9e25) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrollx3)
 	AM_RANGE(0x9e27, 0x9e27) AM_WRITE(senjyo_bgstripes_w) AM_BASE(&senjyo_bgstripesram)	/* controls width of background stripes */
-	AM_RANGE(0x9e28, 0x9e29) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly2)
+	AM_RANGE(0x9e28, 0x9e29) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrolly2)
 /*  { 0x9e2a, 0x9e2b, height of the layer (Senjyo only, fixed at 0x200) */
-	AM_RANGE(0x9e2d, 0x9e2d) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx2)
-	AM_RANGE(0x9e30, 0x9e31) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly1)
+	AM_RANGE(0x9e2d, 0x9e2d) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrollx2)
+	AM_RANGE(0x9e30, 0x9e31) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrolly1)
 /*  { 0x9e32, 0x9e33, height of the layer (Senjyo only, fixed at 0x100) */
-	AM_RANGE(0x9e35, 0x9e35) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx1)
+	AM_RANGE(0x9e35, 0x9e35) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrollx1)
 /*  { 0x9e38, 0x9e38, probably radar y position (Senjyo only, fixed at 0x61) */
 /*  { 0x9e3d, 0x9e3d, probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
-AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(MWA8_RAM)
+AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(senjyo_bg3videoram_w) AM_BASE(&senjyo_bg3videoram)
 	AM_RANGE(0xa800, 0xafff) AM_WRITE(senjyo_bg2videoram_w) AM_BASE(&senjyo_bg2videoram)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
-	AM_RANGE(0xb800, 0xbbff) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_radarram)
+	AM_RANGE(0xb800, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd004, 0xd004) AM_WRITE(z80pioA_0_p_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(SN76496_1_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_2_w)
@@ -242,44 +242,44 @@ static WRITE8_HANDLER(starforb_scrollx2)
 
 
 static ADDRESS_MAP_START( starforb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(senjyo_fgvideoram_w) AM_BASE(&senjyo_fgvideoram)
 	AM_RANGE(0x9400, 0x97ff) AM_WRITE(senjyo_fgcolorram_w) AM_BASE(&senjyo_fgcolorram)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9800, 0x987f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9c00, 0x9dff) AM_WRITE(paletteram_IIBBGGRR_w) AM_BASE(&paletteram)
 
 	/* The format / use of the ram here is different on the bootleg */
-	AM_RANGE(0x9e20, 0x9e21) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly3)
-	AM_RANGE(0x9e25, 0x9e25) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx3)
+	AM_RANGE(0x9e20, 0x9e21) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrolly3)
+	AM_RANGE(0x9e25, 0x9e25) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrollx3)
 	AM_RANGE(0x9e30, 0x9e31) AM_WRITE(starforb_scrolly2) AM_BASE(&senjyo_scrolly2) // ok
 	AM_RANGE(0x9e35, 0x9e35) AM_WRITE(starforb_scrollx2) AM_BASE(&senjyo_scrollx2) // ok
-	AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(SMH_RAM)
 
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(senjyo_bg3videoram_w) AM_BASE(&senjyo_bg3videoram)
 	AM_RANGE(0xa800, 0xafff) AM_WRITE(senjyo_bg2videoram_w) AM_BASE(&senjyo_bg2videoram)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
-	AM_RANGE(0xb800, 0xbbff) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_radarram)
+	AM_RANGE(0xb800, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xd004, 0xd004) AM_WRITE(z80pioA_0_p_w)
 
 	/* these aren't used / written, left here to make sure memory is allocated */
-	AM_RANGE(0xfe00, 0xfe1f) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_fgscroll)
+	AM_RANGE(0xfe00, 0xfe1f) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_fgscroll)
 	AM_RANGE(0xfe27, 0xfe27) AM_WRITE(senjyo_bgstripes_w) AM_BASE(&senjyo_bgstripesram)	/* controls width of background stripes */
-	AM_RANGE(0xfe28, 0xfe29) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrolly1)
-	AM_RANGE(0xfe2d, 0xfe2d) AM_WRITE(MWA8_RAM) AM_BASE(&senjyo_scrollx1)
+	AM_RANGE(0xfe28, 0xfe29) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrolly1)
+	AM_RANGE(0xfe2d, 0xfe2d) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_scrollx1)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( starforb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( starforb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(SN76496_1_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_2_w)
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( starforb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown)
 #endif
 
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pio_w )

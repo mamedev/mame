@@ -347,24 +347,24 @@ static WRITE8_HANDLER( kabukiz_sample_w )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1) /* ROM + RAM */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1) /* ROM + RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_READ(tnzs_sharedram_r)	/* WORK RAM (shared by the 2 z80's) */
-	AM_RANGE(0xf000, 0xf1ff) AM_READ(MRA8_RAM)	/* VDC RAM */
-	AM_RANGE(0xf600, 0xf600) AM_READ(MRA8_NOP)	/* ? */
-	AM_RANGE(0xf800, 0xfbff) AM_READ(MRA8_RAM)	/* not in extrmatn and arknoid2 (PROMs instead) */
+	AM_RANGE(0xf000, 0xf1ff) AM_READ(SMH_RAM)	/* VDC RAM */
+	AM_RANGE(0xf600, 0xf600) AM_READ(SMH_NOP)	/* ? */
+	AM_RANGE(0xf800, 0xfbff) AM_READ(SMH_RAM)	/* not in extrmatn and arknoid2 (PROMs instead) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_BANK1)	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_objram)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)	/* ROM + RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_objram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w) AM_BASE(&tnzs_sharedram)
-	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_vdcram)
-	AM_RANGE(0xf200, 0xf2ff) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_vdcram)
+	AM_RANGE(0xf200, 0xf2ff) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_scrollram) /* scrolling info */
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tnzs_bankswitch_w)
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
@@ -378,22 +378,22 @@ static ADDRESS_MAP_START( cpu0_type2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&tnzs_objram)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(tnzs_sharedram_r, tnzs_sharedram_w) AM_BASE(&tnzs_sharedram) /* WORK RAM (shared by the 2 z80's) */
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE(&tnzs_vdcram)
-	AM_RANGE(0xf200, 0xf2ff) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_scrollram) /* scrolling info */
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(MWA8_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xf200, 0xf2ff) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_scrollram) /* scrolling info */
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_RAM) AM_BASE(&tnzs_bg_flag)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tnzs_bankswitch_w)
 	/* kabukiz still writes here but it's not used (it's paletteram in type1 map) */
 	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xb000, 0xb000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xb001, 0xb001) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0xc000, 0xc001) AM_READ(tnzs_mcu_r)	/* plain input ports in insectx (memory handler */
 									/* changed in insectx_init() ) */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_READ(tnzs_sharedram_r)
 	AM_RANGE(0xf000, 0xf003) AM_READ(arknoid2_sh_f000_r)	/* paddles in arkanoid2/plumppop. The ports are */
 						/* read but not used by the other games, and are not read at */
@@ -401,33 +401,33 @@ static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(tnzs_mcu_w)	/* not present in insectx */
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kageki_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xb000, 0xb000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xb001, 0xb001) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_2_r)
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_3_r)
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_4_r)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_READ(tnzs_sharedram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kageki_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w)
 ADDRESS_MAP_END
 
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ(input_port_4_r)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(tnzs_sharedram_r, tnzs_sharedram_w)
-	AM_RANGE(0xf000, 0xf003) AM_READ(MRA8_RAM)
+	AM_RANGE(0xf000, 0xf003) AM_READ(SMH_RAM)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -495,13 +495,13 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( i8742_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_READ(MRA8_RAM)	/* Internal i8742 RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x0800, 0x08ff) AM_READ(SMH_RAM)	/* Internal i8742 RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE(MWA8_RAM)	/* Internal i8742 RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x0800, 0x08ff) AM_WRITE(SMH_RAM)	/* Internal i8742 RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_readport, ADDRESS_SPACE_IO, 8 )

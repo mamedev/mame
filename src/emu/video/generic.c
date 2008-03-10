@@ -368,7 +368,7 @@ equal to the size of normal spriteram.
 
     Spriteram size _must_ be declared in the memory map:
 
-    { 0x120000, 0x1207ff, MWA8_BANK2, &spriteram, &spriteram_size },
+    { 0x120000, 0x1207ff, SMH_BANK2, &spriteram, &spriteram_size },
 
     Then the video driver must draw the sprites from the buffered_spriteram
 pointer.  The function buffer_spriteram_w() is used to simulate hardware

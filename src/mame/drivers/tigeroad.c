@@ -174,45 +174,45 @@ static WRITE8_HANDLER( msm5205_w )
 /***************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xfe0d00, 0xfe1807) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_READ(SMH_RAM)
+	AM_RANGE(0xfe0d00, 0xfe1807) AM_READ(SMH_RAM)
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfec000, 0xfec7ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff8200, 0xff867f) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffc000, 0xffffff) AM_READ(MRA16_RAM)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xff8200, 0xff867f) AM_READ(SMH_RAM)
+	AM_RANGE(0xffc000, 0xffffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xfe0d00, 0xfe1807) AM_WRITE(MWA16_RAM)  /* still part of OBJ RAM */
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xfe0d00, 0xfe1807) AM_WRITE(SMH_RAM)  /* still part of OBJ RAM */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
 	/*AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_WRITE(tigeroad_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
-	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITE(MWA16_RAM)    /* fe800e = watchdog or IRQ acknowledge */
+	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITE(SMH_RAM)    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xff8200, 0xff867f) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&ram16)
+	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&ram16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -221,12 +221,12 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sample_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 /* yes, no RAM */
 static ADDRESS_MAP_START( sample_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sample_readport, ADDRESS_SPACE_IO, 8 )

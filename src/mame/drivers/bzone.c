@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
 	AM_RANGE(0x0a00, 0x0a00) AM_READ(input_port_1_r)	/* DSW1 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(input_port_2_r)	/* DSW2 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(MWA8_NOP)			/* coin out */
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)			/* coin out */
 	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1804, 0x1804) AM_READ(mb_lo_r)
 	AM_RANGE(0x1806, 0x1806) AM_READ(mb_hi_r)
 	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
-	AM_RANGE(0x180a, 0x180a) AM_WRITE(MWA8_NOP)			/* sound reset, yet todo */
+	AM_RANGE(0x180a, 0x180a) AM_WRITE(SMH_NOP)			/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_WRITE(atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x1820, 0x185f) AM_READWRITE(atari_vg_earom_r, atari_vg_earom_w)
@@ -813,7 +813,7 @@ static WRITE8_HANDLER( analog_select_w )
 
 static DRIVER_INIT( bradley )
 {
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, MRA8_BANK1, MWA8_BANK1);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(1, auto_malloc(0x400));
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1808, 0x1808, 0, 0, input_port_4_r);

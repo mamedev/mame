@@ -66,9 +66,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xc3ff) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc400, 0xc7ff) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ(input_port_2_r)
-	AM_RANGE(0xcc00, 0xcc03) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xcc00, 0xcc03) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xcc05, 0xcc05) AM_WRITE(MWA8_RAM) AM_BASE(&ambush_colorbank)
+	AM_RANGE(0xcc05, 0xcc05) AM_WRITE(SMH_RAM) AM_BASE(&ambush_colorbank)
 	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
 ADDRESS_MAP_END
 

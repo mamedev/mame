@@ -173,11 +173,11 @@ static ADDRESS_MAP_START( igs_majhong_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_BASE(&igs_mainram)// main ram for asic?
 	AM_RANGE(0x18000000, 0x18007fff) AM_RAM
 
-	AM_RANGE(0x38001000, 0x380017ff) AM_READWRITE(MRA32_RAM, igs_cg_videoram_w) AM_BASE(&igs_cg_videoram)		//0x200 * 1   CG PALLETE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_READWRITE(MRA32_RAM, igs_pallete32_w) AM_BASE(&igs_pallete32)		//0x200 * 1
+	AM_RANGE(0x38001000, 0x380017ff) AM_READWRITE(SMH_RAM, igs_cg_videoram_w) AM_BASE(&igs_cg_videoram)		//0x200 * 1   CG PALLETE?
+	AM_RANGE(0x38001800, 0x38001fff) AM_READWRITE(SMH_RAM, igs_pallete32_w) AM_BASE(&igs_pallete32)		//0x200 * 1
 
-	AM_RANGE(0x38004000, 0x38005FFF) AM_READWRITE(MRA32_RAM, igs_tx_videoram_w) AM_BASE(&igs_tx_videoram) /* Text Layer */
-	AM_RANGE(0x38006000, 0x38007FFF) AM_READWRITE(MRA32_RAM, igs_bg_videoram_w) AM_BASE(&igs_bg_videoram) /* CG Layer */
+	AM_RANGE(0x38004000, 0x38005FFF) AM_READWRITE(SMH_RAM, igs_tx_videoram_w) AM_BASE(&igs_tx_videoram) /* Text Layer */
+	AM_RANGE(0x38006000, 0x38007FFF) AM_READWRITE(SMH_RAM, igs_bg_videoram_w) AM_BASE(&igs_bg_videoram) /* CG Layer */
 
 
 	AM_RANGE(0x38002010, 0x38002017) AM_RAM		//??????????????

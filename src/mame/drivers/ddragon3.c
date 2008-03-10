@@ -92,91 +92,91 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(MRA16_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x082000, 0x0827ff) AM_READ(MRA16_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x082000, 0x0827ff) AM_READ(SMH_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x100000, 0x100001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x100002, 0x100003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x100004, 0x100005) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x100006, 0x100007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x140000, 0x1405ff) AM_READ(MRA16_RAM)	/* Palette RAM */
-	AM_RANGE(0x180000, 0x180fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(MRA16_RAM)	/* working RAM */
+	AM_RANGE(0x140000, 0x1405ff) AM_READ(SMH_RAM)	/* Palette RAM */
+	AM_RANGE(0x180000, 0x180fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)	/* working RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x080000, 0x080fff) AM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16)
 	AM_RANGE(0x082000, 0x0827ff) AM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(ddragon3_io16_w)
 	AM_RANGE(0x140000, 0x1405ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x180000, 0x180fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x180000, 0x180fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd3b_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(MRA16_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x082000, 0x0827ff) AM_READ(MRA16_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
-	AM_RANGE(0x100000, 0x1005ff) AM_READ(MRA16_RAM)	/* Palette RAM */
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x082000, 0x0827ff) AM_READ(SMH_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x100000, 0x1005ff) AM_READ(SMH_RAM)	/* Palette RAM */
 	AM_RANGE(0x180000, 0x180001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x180002, 0x180003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x180004, 0x180005) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x180006, 0x180007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(MRA16_RAM)	/* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)	/* working RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd3b_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x080000, 0x080fff) AM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16)
-	AM_RANGE(0x081000, 0x081fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
+	AM_RANGE(0x081000, 0x081fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
 	AM_RANGE(0x082000, 0x0827ff) AM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
 	AM_RANGE(0x100000, 0x1005ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x080fff) AM_READ(MRA16_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x082000, 0x0827ff) AM_READ(MRA16_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
-	AM_RANGE(0x082800, 0x082fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)	/* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x082000, 0x0827ff) AM_READ(SMH_RAM)	/* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x082800, 0x082fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_READ(ddragon3_scroll16_r)
-	AM_RANGE(0x100000, 0x1005ff) AM_READ(MRA16_RAM)	/* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_READ(SMH_RAM)	/* Palette RAM */
 	AM_RANGE(0x180000, 0x180001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x180002, 0x180003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x180004, 0x180005) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x180006, 0x180007) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(MRA16_RAM)	/* working RAM */
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_READ(SMH_RAM)	/* working RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x080000, 0x080fff) AM_WRITE(ddragon3_fg_videoram16_w) AM_BASE(&ddragon3_fg_videoram16)
-	AM_RANGE(0x081000, 0x081fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
+	AM_RANGE(0x081000, 0x081fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) /* Sprites (16 bytes per sprite) */
 	AM_RANGE(0x082000, 0x0827ff) AM_WRITE(ddragon3_bg_videoram16_w) AM_BASE(&ddragon3_bg_videoram16)
-	AM_RANGE(0x082800, 0x082fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x082800, 0x082fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll16_w)
 	AM_RANGE(0x100000, 0x1005ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io16_w)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc801, 0xc801) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(OKIM6295_status_0_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(OKIM6295_data_0_w)
@@ -184,16 +184,16 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8801, 0x8801) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ctribe_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)

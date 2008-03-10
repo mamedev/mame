@@ -99,7 +99,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(yunsung8_bankswitch_w	)	// ROM Bank (again?)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1				)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// Banked ROM
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(yunsung8_videoram_r, yunsung8_videoram_w	)	// Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r								)	// DSW 1
 	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r								)	// DSW 2
 	AM_RANGE(0x06, 0x06) AM_WRITE(yunsung8_flipscreen_w						)	// Flip Screen
-	AM_RANGE(0x07, 0x07) AM_WRITE(MWA8_NOP									)	// ? (end of IRQ, random value)
+	AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP									)	// ? (end of IRQ, random value)
 ADDRESS_MAP_END
 
 
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_BANK2,MWA8_ROM		)	// Banked ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK2,SMH_ROM		)	// Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w	)	// ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w				)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w		)	// YM3812

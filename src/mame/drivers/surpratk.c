@@ -87,8 +87,8 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 
 static ADDRESS_MAP_START( surpratk_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(bankedram_r)
-	AM_RANGE(0x0800, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_BANK1)			/* banked ROM */
+	AM_RANGE(0x0800, 0x1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_BANK1)			/* banked ROM */
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ(input_port_0_r)
 	AM_RANGE(0x5f8d, 0x5f8d) AM_READ(input_port_1_r)
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ(input_port_4_r)
@@ -98,13 +98,13 @@ static ADDRESS_MAP_START( surpratk_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fa0, 0x5faf) AM_READ(K053244_r)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)			/* ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( surpratk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(bankedram_w) AM_BASE(&ram)
-	AM_RANGE(0x0800, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_ROM)					/* banked ROM */
+	AM_RANGE(0x0800, 0x1fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)					/* banked ROM */
 	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053244_w)
 	AM_RANGE(0x5fb0, 0x5fbf) AM_WRITE(K053251_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_WRITE(surpratk_5fc0_w)
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( surpratk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fd1, 0x5fd1) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)					/* ROM */
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 

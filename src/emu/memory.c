@@ -7,6 +7,30 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+****************************************************************************
+
+    Basic theory of memory handling:
+
+    An address with up to 32 bits is passed to a memory handler. First,
+    an address mask is applied to the address, removing unused bits.
+
+    Next, the address is broken into two halves, an upper half and a
+    lower half. The number of bits in each half can be controlled via
+    macros in memory.h, but they default to the upper 18 bits and the
+    lower 14 bits. The upper half is then used as an index into the
+    base_lookup table.
+
+    If the value pulled from the table is within the range 192-255, then
+    the lower half of the address is needed to resolve the final handler.
+    The value from the table (192-255) is combined with the lower address
+    bits to form an index into a subtable.
+
+    Table values in the range 0-63 are reserved for internal handling
+    (such as RAM, ROM, NOP, and banking). Table values between 64 and 192
+    are assigned dynamically at startup.
+
+****************************************************************************
+
     Caveats:
 
     * If your driver executes an opcode which crosses a bank-switched
@@ -98,30 +122,31 @@
 #define VPRINTF(x)	do { if (VERBOSE) mame_printf_debug x; } while (0)
 
 
+/* ----- banking constants ----- */
 
-/***************************************************************************
+#define MAX_BANKS				66						/* maximum number of banks */
+#define MAX_BANK_ENTRIES		256						/* maximum number of possible bank values */
+#define MAX_EXPLICIT_BANKS		32						/* maximum number of explicitly-defined banks */
 
-    Basic theory of memory handling:
+/* ----- address map lookup table definitions ----- */
+#define SUBTABLE_COUNT			64						/* number of slots reserved for subtables */
+#define SUBTABLE_BASE			(256-SUBTABLE_COUNT)	/* first index of a subtable */
+#define ENTRY_COUNT				(SUBTABLE_BASE)			/* number of legitimate (non-subtable) entries */
+#define SUBTABLE_ALLOC			8						/* number of subtables to allocate at a time */
 
-    An address with up to 32 bits is passed to a memory handler. First,
-    an address mask is applied to the address, removing unused bits.
+/* ----- bit counts ----- */
+#define LEVEL1_BITS				18						/* number of address bits in the level 1 table */
+#define LEVEL2_BITS				(32 - LEVEL1_BITS)		/* number of address bits in the level 2 table */
 
-    Next, the address is broken into two halves, an upper half and a
-    lower half. The number of bits in each half can be controlled via
-    macros in memory.h, but they default to the upper 18 bits and the
-    lower 14 bits. The upper half is then used as an index into the
-    base_lookup table.
+/* ----- other address map constants ----- */
+#define MAX_MEMORY_BLOCKS		1024					/* maximum memory blocks we can track */
+#define MAX_SHARED_POINTERS		256						/* maximum number of shared pointers in memory maps */
+#define MEMORY_BLOCK_SIZE		65536					/* size of allocated memory blocks */
 
-    If the value pulled from the table is within the range 192-255, then
-    the lower half of the address is needed to resolve the final handler.
-    The value from the table (192-255) is combined with the lower address
-    bits to form an index into a subtable.
+/* ----- table lookup helpers ----- */
+#define LEVEL1_INDEX(a)			((a) >> LEVEL2_BITS)
+#define LEVEL2_INDEX(e,a)		((1 << LEVEL1_BITS) + (((e) - SUBTABLE_BASE) << LEVEL2_BITS) + ((a) & ((1 << LEVEL2_BITS) - 1)))
 
-    Table values in the range 0-63 are reserved for internal handling
-    (such as RAM, ROM, NOP, and banking). Table values between 64 and 192
-    are assigned dynamically at startup.
-
-***************************************************************************/
 
 /* macros for the profiler */
 #define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
@@ -1583,7 +1608,7 @@ static void install_mem_handler_private(addrspace_data *space, int iswrite, int 
 {
 	/* translate ROM to RAM/UNMAP here */
 	if (HANDLER_IS_ROM(handler))
-		handler = iswrite ? (genf *)STATIC_UNMAP : (genf *)MRA8_RAM;
+		handler = iswrite ? (genf *)STATIC_UNMAP : (genf *)SMH_RAM;
 
 	/* assign banks for RAM/ROM areas */
 	if (HANDLER_IS_RAM(handler))

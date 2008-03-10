@@ -141,7 +141,7 @@ static WRITE16_HANDLER(fitfight_700000_w)
 static ADDRESS_MAP_START( fitfight_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_100000)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_RAM) AM_BASE(&fof_100000)
 	//written at scanline 5, allways 1. Used by histryma/fitfight @0x0000ec2c/@0x0000f076
 
 	AM_RANGE(0x200000, 0x200001) AM_READ(input_port_0_word_r)
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( fitfight_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_3_word_r)
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_600000)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_RAM) AM_BASE(&fof_600000)
 	//  Is 0x600000 controlling the slave audio CPU? data is 0x1111000zzzzzzzzz (9 sign. bits)
 	//  Used by histryma/fitfight:
 	//      @0x000031ae/0x00002b3a: 0xF000, once, during POST
@@ -163,27 +163,27 @@ static ADDRESS_MAP_START( fitfight_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fitfight_700000_w) AM_BASE(&fof_700000)
 	//  kept at 0xe07900/0xe04c56
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_800000)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_RAM) AM_BASE(&fof_800000)
 	//written at scanline 1, allways 0. Used by histryma/fitfight @0x00001d76/@0x00000f6a
 
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_900000) //mid tilemap scroll
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_RAM) AM_BASE(&fof_900000) //mid tilemap scroll
 	//  fitfigth: @0x00002b42,@0x00000f76
 	//  histryma: @0x000031b6,@0x00001d82
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_a00000) //bak tilemap scroll
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_RAM) AM_BASE(&fof_a00000) //bak tilemap scroll
 	//  fitfight: @0x00002b4a,@0x00000f82
 	//  histryma: @0x000031be,@0x00001d8e
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_READWRITE(MRA16_RAM,fof_bak_tileram_w) AM_BASE(&fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE(MRA16_RAM,fof_mid_tileram_w) AM_BASE(&fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE(MRA16_RAM,fof_txt_tileram_w) AM_BASE(&fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_READWRITE(SMH_RAM,fof_bak_tileram_w) AM_BASE(&fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE(SMH_RAM,fof_mid_tileram_w) AM_BASE(&fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE(SMH_RAM,fof_txt_tileram_w) AM_BASE(&fof_txt_tileram)
 
 	AM_RANGE(0xb10000, 0xb13fff) AM_WRITENOP //used by histryma @0x0000b25a
 	AM_RANGE(0xb14000, 0xb17fff) AM_WRITENOP //used by histryma @0x0000b25a,b270
 	AM_RANGE(0xb18000, 0xb1bfff) AM_WRITENOP //used by histryma @0x0000b25a,b270,b286
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE(MRA16_RAM,paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE(SMH_RAM,paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE(&fitfight_spriteram)
 
@@ -193,27 +193,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbprot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_100000)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_RAM) AM_BASE(&fof_100000)
 
 	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x380000, 0x380001) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x480000, 0x480001) AM_READ(input_port_3_word_r)
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_600000)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_RAM) AM_BASE(&fof_600000)
 
 	AM_RANGE(0x700000, 0x700001) AM_READWRITE(bbprot_700000_r,fitfight_700000_w) AM_BASE(&fof_700000)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_800000)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_900000)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(MWA16_RAM) AM_BASE(&fof_a00000)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_RAM) AM_BASE(&fof_800000)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_RAM) AM_BASE(&fof_900000)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_RAM) AM_BASE(&fof_a00000)
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_READWRITE(MRA16_RAM,fof_bak_tileram_w) AM_BASE(&fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE(MRA16_RAM,fof_mid_tileram_w) AM_BASE(&fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE(MRA16_RAM,fof_txt_tileram_w) AM_BASE(&fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_READWRITE(SMH_RAM,fof_bak_tileram_w) AM_BASE(&fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_READWRITE(SMH_RAM,fof_mid_tileram_w) AM_BASE(&fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_READWRITE(SMH_RAM,fof_txt_tileram_w) AM_BASE(&fof_txt_tileram)
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0xc00000, 0xc00fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE(&fitfight_spriteram)
@@ -226,7 +226,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)	/* ??? External ROM */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)	/* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END

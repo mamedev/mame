@@ -130,15 +130,15 @@ static WRITE16_HANDLER( k3_soundbanks_w )
 
 
 static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0009CE, 0x0009CF) AM_WRITE(MWA16_NOP) // bug in code? (clean up log)
-	AM_RANGE(0x0009D2, 0x0009D3) AM_WRITE(MWA16_NOP) // bug in code? (clean up log)
+	AM_RANGE(0x0009CE, 0x0009CF) AM_WRITE(SMH_NOP) // bug in code? (clean up log)
+	AM_RANGE(0x0009D2, 0x0009D3) AM_WRITE(SMH_NOP) // bug in code? (clean up log)
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) // palette
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) // palette
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE(&k3_spriteram_1)
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE(&k3_spriteram_2)
-	AM_RANGE(0x2c0000, 0x2c0fff) AM_READWRITE(MRA16_RAM, k3_bgram_w) AM_BASE(&k3_bgram)
+	AM_RANGE(0x2c0000, 0x2c0fff) AM_READWRITE(SMH_RAM, k3_bgram_w) AM_BASE(&k3_bgram)
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)

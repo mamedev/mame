@@ -1280,7 +1280,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01100000, 0x0110ffff) AM_READWRITE(sys24_tile32_r, sys24_tile32_w) AM_MIRROR(0x10000)
 	AM_RANGE(0x01180000, 0x011fffff) AM_READWRITE(sys24_char32_r, sys24_char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE(MRA32_RAM, pal32_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x01800000, 0x01803fff) AM_READWRITE(SMH_RAM, pal32_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
@@ -1311,9 +1311,9 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2o_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_READWRITE(MRA32_RAM, model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_READWRITE(MRA32_RAM, model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE(MRA32_RAM, model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_READWRITE(SMH_RAM, model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_READWRITE(SMH_RAM, model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE(SMH_RAM, model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00007) AM_READ(analog_r)
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ(ctrl10_r)
@@ -1338,9 +1338,9 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE( geo_ctl1_w )
 	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE( model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_READWRITE(MRA32_RAM, model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_READWRITE(MRA32_RAM, model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE(MRA32_RAM, model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_READWRITE(SMH_RAM, model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(&model2_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_READWRITE(SMH_RAM, model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(&model2_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_READWRITE(SMH_RAM, model2o_luma_w) AM_BASE(&model2_lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READWRITE(ctrl0_r, ctrl0_w)
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ(ctrl1_r)
@@ -1681,8 +1681,8 @@ static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION(REGION_CPU2, 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION(REGION_SOUND1, 0)
-	AM_RANGE(0xa00000, 0xdfffff) AM_READ(MRA16_BANK4)
-	AM_RANGE(0xe00000, 0xffffff) AM_READ(MRA16_BANK5)
+	AM_RANGE(0xa00000, 0xdfffff) AM_READ(SMH_BANK4)
+	AM_RANGE(0xe00000, 0xffffff) AM_READ(SMH_BANK5)
 ADDRESS_MAP_END
 
 static int scsp_last_line = 0;

@@ -205,7 +205,7 @@ static void vendetta_video_banking( int select )
 {
 	if ( select & 1 )
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, MRA8_BANK4, paletteram_xBBBBBGGGGGRRRRR_be_w );
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, SMH_BANK4, paletteram_xBBBBBGGGGGRRRRR_be_w );
 		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
 		memory_set_bankptr(4, paletteram);
 	}
@@ -264,8 +264,8 @@ static READ8_HANDLER( vendetta_sound_r )
 /********************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_BANK1	)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_BANK1	)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5f80, 0x5f9f) AM_READ(K054000_r)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(input_port_0_r)
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ(input_port_1_r)
@@ -278,15 +278,15 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fe8, 0x5fe9) AM_READ(K053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_BANK3)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_BANK3)
+	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(K052109_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x5f80, 0x5f9f) AM_WRITE(K054000_w)
 	AM_RANGE(0x5fa0, 0x5faf) AM_WRITE(K053251_w)
 	AM_RANGE(0x5fb0, 0x5fb7) AM_WRITE(K053246_w)
@@ -295,14 +295,14 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fe4, 0x5fe4) AM_WRITE(z80_irq_w)
 	AM_RANGE(0x5fe6, 0x5fe7) AM_WRITE(K053260_0_w)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(MWA8_BANK3)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_BANK2)
+	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_BANK3)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_BANK2)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(K052109_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( esckids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_RAM)			// 053248 64K SRAM
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)			// 053248 64K SRAM
 	AM_RANGE(0x3f80, 0x3f80) AM_READ(input_port_0_r)		// Player 1 Control
 	AM_RANGE(0x3f81, 0x3f81) AM_READ(input_port_1_r)		// Player 2 Control
 	AM_RANGE(0x3f82, 0x3f82) AM_READ(input_port_4_r) 	// Player 3 Control ???  (But not used)
@@ -313,42 +313,42 @@ static ADDRESS_MAP_START( esckids_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd6, 0x3fd7) AM_READ(vendetta_sound_r)				// Sound
 	AM_RANGE(0x3fd8, 0x3fd9) AM_READ(K053246_r)			// 053246 (Sprite)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x2000, 0x2fff) AM_READ(MRA8_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
-	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_BANK2)			// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
+	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
+	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_BANK2)			// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
 	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_r)			// 052109 (Tilemap)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK1)			// 053248 '975r01' 1M ROM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)			// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)			// 053248 '975r01' 1M ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( esckids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_RAM)			// 053248 64K SRAM
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_RAM)			// 053248 64K SRAM
 	AM_RANGE(0x3fa0, 0x3fa7) AM_WRITE(K053246_w)			// 053246 (Sprite)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_WRITE(K053251_w)			// 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_WRITE(MWA8_NOP)			// Not Emulated (053252 ???)
+	AM_RANGE(0x3fc0, 0x3fcf) AM_WRITE(SMH_NOP)			// Not Emulated (053252 ???)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)	// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_WRITE(z80_irq_w)			// Sound
 	AM_RANGE(0x3fd6, 0x3fd7) AM_WRITE(K053260_0_w)		// Sound
-	AM_RANGE(0x3fda, 0x3fda) AM_WRITE(MWA8_NOP)			// Not Emulated (Watchdog ???)
+	AM_RANGE(0x3fda, 0x3fda) AM_WRITE(SMH_NOP)			// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(MWA8_BANK2)			// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
+	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_BANK2)			// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
 	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_w)			// 052109 (Tilemap)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_ROM)			// 053248 '975r01' 1M ROM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)			// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)			// 053248 '975r01' 1M ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)			// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xfc00, 0xfc2f) AM_READ(K053260_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)

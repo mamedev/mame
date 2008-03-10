@@ -30,24 +30,24 @@ PALETTE_INIT( truco );
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM)		/* general purpose ram */
-	AM_RANGE(0x1800, 0x7bff) AM_READ(MRA8_RAM)		/* video ram */
-	AM_RANGE(0x7c00, 0x7fff) AM_READ(MRA8_RAM)		/* battery backed ram */
+	AM_RANGE(0x0000, 0x17ff) AM_READ(SMH_RAM)		/* general purpose ram */
+	AM_RANGE(0x1800, 0x7bff) AM_READ(SMH_RAM)		/* video ram */
+	AM_RANGE(0x7c00, 0x7fff) AM_READ(SMH_RAM)		/* battery backed ram */
 	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)	/* controls (and irq ack?) */
-	AM_RANGE(0x8001, 0x8001) AM_READ(MRA8_NOP)		/* unknown */
+	AM_RANGE(0x8001, 0x8001) AM_READ(SMH_NOP)		/* unknown */
 	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_1_r)	/* dipswitches */
-	AM_RANGE(0x8003, 0x8007) AM_READ(MRA8_NOP)		/* unknown */
-	AM_RANGE(0x8008, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8003, 0x8007) AM_READ(SMH_NOP)		/* unknown */
+	AM_RANGE(0x8008, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(MWA8_RAM)		/* general purpose ram */
-	AM_RANGE(0x1800, 0x7bff) AM_WRITE(MWA8_RAM)	AM_BASE(&videoram)	/* video ram */
-	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&battery_ram)		/* battery backed ram */
-	AM_RANGE(0x8000, 0x8001) AM_WRITE(MWA8_NOP)		/* unknown */
+	AM_RANGE(0x0000, 0x17ff) AM_WRITE(SMH_RAM)		/* general purpose ram */
+	AM_RANGE(0x1800, 0x7bff) AM_WRITE(SMH_RAM)	AM_BASE(&videoram)	/* video ram */
+	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&battery_ram)		/* battery backed ram */
+	AM_RANGE(0x8000, 0x8001) AM_WRITE(SMH_NOP)		/* unknown */
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x8003, 0x8007) AM_WRITE(MWA8_NOP)		/* unknown */
-	AM_RANGE(0x8008, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x8003, 0x8007) AM_WRITE(SMH_NOP)		/* unknown */
+	AM_RANGE(0x8008, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( truco )

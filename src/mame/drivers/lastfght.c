@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( lastfght_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE( lastfght_sound_r, lastfght_sound_w )
 	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE( lastfght_blit_w )
 	AM_RANGE( 0x600008, 0x600009 ) AM_WRITE( colordac_w )
-	AM_RANGE( 0x60000a, 0x60000b ) AM_WRITE( MWA16_NOP )	// colordac?
+	AM_RANGE( 0x60000a, 0x60000b ) AM_WRITE( SMH_NOP )	// colordac?
 
 	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE( lastfght_sx_w )
 	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE( lastfght_sd_w )

@@ -238,8 +238,8 @@ static WRITE8_HANDLER( fromance_coinctr_w )
  *************************************/
 
 static ADDRESS_MAP_START( nekkyoku_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_0_r)
 	AM_RANGE(0xf001, 0xf001) AM_READ(fromance_keymatrix_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ(input_port_1_r)
@@ -249,19 +249,19 @@ static ADDRESS_MAP_START( nekkyoku_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(fromance_portselect_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fromance_coinctr_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fromance_commanddata_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fromance_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9e89, 0x9e89) AM_READ(MRA8_NOP)			// unknown (idolmj)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9e89, 0x9e89) AM_READ(SMH_NOP)			// unknown (idolmj)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(fromance_keymatrix_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_1_r)
@@ -271,8 +271,8 @@ static ADDRESS_MAP_START( fromance_readmem_main, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_writemem_main, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(fromance_portselect_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(fromance_coinctr_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(fromance_commanddata_w)
@@ -287,34 +287,34 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( nekkyoku_readmem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xc000, 0xefff) AM_READ(fromance_videoram_r)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xffff) AM_READ(fromance_paletteram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xefff) AM_WRITE(fromance_videoram_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(fromance_paletteram_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fromance_readmem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc800, 0xcfff) AM_READ(fromance_paletteram_r)
 	AM_RANGE(0xd000, 0xffff) AM_READ(fromance_videoram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(fromance_paletteram_w)
 	AM_RANGE(0xd000, 0xffff) AM_WRITE(fromance_videoram_w)
 ADDRESS_MAP_END
@@ -329,7 +329,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_readport_sub, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_READ(MRA8_NOP)				// unknown
+	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
 	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r)
 	AM_RANGE(0xe6, 0xe6) AM_READ(fromance_commanddata_r)
 ADDRESS_MAP_END
@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_readport_sub, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_READ(MRA8_NOP)				// unknown
+	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
 	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r)
 	AM_RANGE(0x26, 0x26) AM_READ(fromance_commanddata_r)
 ADDRESS_MAP_END

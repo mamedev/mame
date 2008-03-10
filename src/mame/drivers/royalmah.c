@@ -355,20 +355,20 @@ static WRITE8_HANDLER ( dynax_bank_w )
 
 
 static ADDRESS_MAP_START( royalmah_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( MRA8_ROM, royalmah_rom_w )
+	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )	// banked ROMs not present in royalmah
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )	// banked ROMs not present in royalmah
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mjapinky_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( MRA8_ROM, royalmah_rom_w )
+	AM_RANGE( 0x0000, 0x6fff ) AM_READWRITE( SMH_ROM, royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x8000 ) AM_READ( mjapinky_dsw_r )
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 
@@ -484,8 +484,8 @@ static ADDRESS_MAP_START( janptr96_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK(3)	// nvram
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK(2)	// banked nvram
-	AM_RANGE( 0x8000, 0xffff ) AM_READ(MRA8_BANK1)
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE(MWA8_RAM) AM_BASE(&videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ(SMH_BANK1)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE(SMH_RAM) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( janptr96_dswsel_w )
@@ -618,8 +618,8 @@ static ADDRESS_MAP_START( mjifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE(&videoram)
-	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(MRA8_ROM, mjifb_videoram_w)
-//  AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(MRA8_ROM, MWA8_RAM)  This should, but doesn't work
+	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, mjifb_videoram_w)
+//  AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, SMH_RAM)  This should, but doesn't work
 ADDRESS_MAP_END
 
 static READ8_HANDLER( mjifb_p3_r )
@@ -717,7 +717,7 @@ static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE(&videoram)
-	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(MRA8_ROM, mjifb_videoram_w)
+	AM_RANGE( 0xc000, 0xffff ) AM_READWRITE(SMH_ROM, mjifb_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -758,8 +758,8 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjtensin_iomap, ADDRESS_SPACE_IO, 8 )
@@ -821,7 +821,7 @@ static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7fc2, 0x7fc2 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x7fc3, 0x7fc3 ) AM_WRITE( AY8910_control_port_0_w )
 	AM_RANGE( 0x7fd0, 0x7fd0 ) AM_WRITE( janptr96_coin_counter_w )
-	AM_RANGE( 0x7fd1, 0x7fd1 ) AM_READWRITE( input_port_10_r, MWA8_NOP )
+	AM_RANGE( 0x7fd1, 0x7fd1 ) AM_READWRITE( input_port_10_r, SMH_NOP )
 	AM_RANGE( 0x7fd3, 0x7fd3 ) AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x7fe0, 0x7fe0 ) AM_READ( cafetime_dsw_r )
 	AM_RANGE( 0x7fe1, 0x7fe1 ) AM_WRITE( cafetime_dsw_w )
@@ -829,8 +829,8 @@ static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE( cafetime_7fe3_w )
 	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
 	AM_RANGE( 0x7ff0, 0x7fff ) AM_READWRITE( msm6242_r, msm6242_w )
-	AM_RANGE( 0x8000, 0xffff ) AM_READ( MRA8_BANK1 )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( MWA8_RAM ) AM_BASE(&videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 

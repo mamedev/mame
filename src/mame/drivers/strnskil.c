@@ -88,11 +88,11 @@ static WRITE8_HANDLER( protection_w )
 /****************************************************************************/
 
 static ADDRESS_MAP_START( strnskil_readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x9fff) AM_READ(SMH_ROM)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM) AM_SHARE(1)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM) /* videoram */
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM) /* videoram */
 
 	AM_RANGE(0xd800, 0xd800) AM_READ(strnskil_d800_r)
 	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_0_r) /* dsw 1 */
@@ -103,27 +103,27 @@ static ADDRESS_MAP_START( strnskil_readmem1, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x9fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_SHARE(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(strnskil_videoram_w) AM_BASE(&videoram)
 
 	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
-	AM_RANGE(0xd809, 0xd809) AM_WRITE(MWA8_NOP) /* coin counter? */
-	AM_RANGE(0xd80a, 0xd80b) AM_WRITE(MWA8_RAM) AM_BASE(&strnskil_xscroll)
+	AM_RANGE(0xd809, 0xd809) AM_WRITE(SMH_NOP) /* coin counter? */
+	AM_RANGE(0xd80a, 0xd80b) AM_WRITE(SMH_RAM) AM_BASE(&strnskil_xscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM) AM_SHARE(1)
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM) AM_SHARE(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_WRITE(MWA8_RAM) AM_SHARE(1)
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_SHARE(1)
 
 	AM_RANGE(0xd801, 0xd801) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xd802, 0xd802) AM_WRITE(SN76496_1_w)
@@ -510,7 +510,7 @@ ROM_END
 
 static DRIVER_INIT( pettanp )
 {
-//  AM_RANGE(0xd80c, 0xd80c) AM_WRITE(MWA8_NOP)     /* protection reset? */
+//  AM_RANGE(0xd80c, 0xd80c) AM_WRITE(SMH_NOP)     /* protection reset? */
 //  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
 //  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 

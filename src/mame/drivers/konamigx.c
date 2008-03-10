@@ -1159,8 +1159,8 @@ static ADDRESS_MAP_START( gx_type1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xddc000, 0xddcfff) AM_READ(adc0834_r)
 	AM_RANGE(0xdde000, 0xdde003) AM_WRITE(type1_cablamps_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_1_ctrl)
-	AM_RANGE(0xe20000, 0xe2000f) AM_WRITE(MWA32_NOP)
-	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(MWA32_NOP)
+	AM_RANGE(0xe20000, 0xe2000f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl) 	// chips 21L+19L / S
 	AM_RANGE(0xec0000, 0xedffff) AM_RAM AM_WRITE(konamigx_t1_psacmap_w) AM_BASE(&gx_psacram)  // chips 20J+23J+18J / S
 	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)	// ROM readback
@@ -1178,8 +1178,8 @@ static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_1_ctrl)
-	AM_RANGE(0xe20000, 0xe20003) AM_WRITE(MWA32_NOP)
-	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(MWA32_NOP)
+	AM_RANGE(0xe20000, 0xe20003) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl)
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_WRITE(konamigx_555_palette_w) AM_BASE(&paletteram32) 	// main monitor palette (twice as large as reality)
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_WRITE(konamigx_555_palette2_w) AM_BASE(&gx_subpaletteram32) // sub monitor palette
@@ -1191,8 +1191,8 @@ static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_1_ctrl)
-	AM_RANGE(0xe20000, 0xe20003) AM_WRITE(MWA32_NOP)
-	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(MWA32_NOP)
+	AM_RANGE(0xe20000, 0xe20003) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_1_linectrl)  // 29C & 29G (PSAC2 line control)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM AM_WRITE(konamigx_palette_w) AM_BASE(&paletteram32) // 11G/13G/15G (main screen palette RAM) (twice as large as reality)
 	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_WRITE(konamigx_palette2_w) AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
@@ -1236,7 +1236,7 @@ static WRITE16_HANDLER( sndcomm68k_w )
 
 /* 68000 memory handling */
 static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_sndram)
 	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r, dual539_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r, tms57002_data_word_w)

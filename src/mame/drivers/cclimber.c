@@ -276,9 +276,9 @@ static ADDRESS_MAP_START( cclimber_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&cclimber_spriteram)
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(SMH_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_flip_screen)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(interrupt_enable_w) //used by Crazy Kong Bootleg with alt levels and speed up
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, cclimber_sample_rate_w)
@@ -291,8 +291,8 @@ static ADDRESS_MAP_START( cannonb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(MRA8_NOP, MWA8_RAM) AM_BASE(&cclimber_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
-//AM_RANGE(0x8900, 0x8bff) AM_WRITE(MWA8_RAM)  /* not used, but initialized */
+	AM_RANGE(0x8800, 0x88ff) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&cclimber_bigsprite_videoram) /* must not return what's written (game will reset after coin insert if it returns 0xff)*/
+//AM_RANGE(0x8900, 0x8bff) AM_WRITE(SMH_RAM)  /* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
 	/* 9800-9bff and 9c00-9fff share the same RAM, interleaved */
 	/* (9800-981f for scroll, 9c20-9c3f for color RAM, and so on) */
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( cannonb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&cclimber_spriteram)
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(SMH_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(cannonb_flip_screen_w) AM_BASE(&cclimber_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
@@ -314,17 +314,17 @@ static ADDRESS_MAP_START( swimmer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE(&cclimber_bigsprite_videoram)
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&cclimber_videoram)
-	AM_RANGE(0x9800, 0x981f) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_column_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_spriteram)
-	AM_RANGE(0x98fc, 0x98ff) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_bigsprite_control)
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
+	AM_RANGE(0x9800, 0x981f) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_column_scroll)
+	AM_RANGE(0x9880, 0x989f) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_spriteram)
+	AM_RANGE(0x98fc, 0x98ff) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_bigsprite_control)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(SMH_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_side_background_enabled)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(MWA8_RAM) AM_BASE(&swimmer_palettebank)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(SMH_RAM) AM_BASE(&swimmer_side_background_enabled)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(SMH_RAM) AM_BASE(&swimmer_palettebank)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, swimmer_sh_soundlatch_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, MWA8_RAM) AM_BASE(&swimmer_background_color)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, SMH_RAM) AM_BASE(&swimmer_background_color)
 	AM_RANGE(0xb880, 0xb880) AM_READ(input_port_4_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					/* ??? used by Guzzler */
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* Guzzler only */
@@ -343,9 +343,9 @@ static ADDRESS_MAP_START( yamato_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9880, 0x989f) AM_RAM AM_BASE(&cclimber_spriteram)
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(SMH_RAM, cclimber_colorram_w) AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(input_port_0_r, interrupt_enable_w)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_flip_screen)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
 	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_3_r)
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( yamato_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( toprollr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE(&cclimber_bigsprite_videoram)
 	AM_RANGE(0x8c00, 0x8fff) AM_RAM AM_BASE(&toprollr_bg_videoram)
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( toprollr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x99dc, 0x99df) AM_RAM AM_BASE(&cclimber_bigsprite_control)
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE(&cclimber_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa002) AM_WRITE(MWA8_RAM) AM_BASE(&cclimber_flip_screen)
+	AM_RANGE(0xa001, 0xa002) AM_WRITE(SMH_RAM) AM_BASE(&cclimber_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(cclimber_sample_trigger_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(input_port_1_r, cclimber_sample_rate_w)

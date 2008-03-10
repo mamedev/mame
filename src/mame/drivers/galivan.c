@@ -102,26 +102,26 @@ static WRITE8_HANDLER( ninjemak_videoreg_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe100, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe100, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjemak_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xd800, 0xd81f) AM_WRITE(ninjemak_videoreg_w)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(galivan_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xdc00, 0xdfff) AM_WRITE(galivan_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe200, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe200, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 
@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x42) AM_WRITE(galivan_scrollx_w)
 	AM_RANGE(0x43, 0x44) AM_WRITE(galivan_scrolly_w)
 	AM_RANGE(0x45, 0x45) AM_WRITE(galivan_sound_command_w)
-/*  AM_RANGE(0x46, 0x46) AM_WRITE(MWA8_NOP) */
-/*  AM_RANGE(0x47, 0x47) AM_WRITE(MWA8_NOP) */
+/*  AM_RANGE(0x46, 0x46) AM_WRITE(SMH_NOP) */
+/*  AM_RANGE(0x47, 0x47) AM_WRITE(SMH_NOP) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjemak_readport, ADDRESS_SPACE_IO, 8 )
@@ -159,25 +159,25 @@ static ADDRESS_MAP_START( ninjemak_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_WRITE(ninjemak_gfxbank_w)
 	AM_RANGE(0x85, 0x85) AM_WRITE(galivan_sound_command_w)
-//  AM_RANGE(0x86, 0x86) AM_WRITE(MWA8_NOP)         // ??
-//  AM_RANGE(0x87, 0x87) AM_WRITE(MWA8_NOP)         // ??
+//  AM_RANGE(0x86, 0x86) AM_WRITE(SMH_NOP)         // ??
+//  AM_RANGE(0x87, 0x87) AM_WRITE(SMH_NOP)         // ??
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-/*  AM_RANGE(0x04, 0x04) AM_READ(MRA8_NOP)    value read and *discarded*    */
+/*  AM_RANGE(0x04, 0x04) AM_READ(SMH_NOP)    value read and *discarded*    */
 	AM_RANGE(0x06, 0x06) AM_READ(galivan_sound_command_r)
 ADDRESS_MAP_END
 
@@ -1039,13 +1039,13 @@ static WRITE8_HANDLER( youmab_84_w )
 static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, MRA8_BANK2);
+	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
 	memory_set_bankptr( 2, memory_region(REGION_USER2) );
 
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xd81f, 0, 0, MWA8_NOP); // scrolling isn't here..
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xd81f, 0, 0, SMH_NOP); // scrolling isn't here..
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
 

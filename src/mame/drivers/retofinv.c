@@ -131,13 +131,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM	/* space for diagnostic ROM? The code looks */
 									/* for a string here, and jumps if it's present */
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, retofinv_fg_videoram_w) AM_SHARE(2) AM_BASE(&retofinv_fg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, retofinv_fg_videoram_w) AM_SHARE(2) AM_BASE(&retofinv_fg_videoram)
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE(1) AM_BASE(&retofinv_sharedram)
-	AM_RANGE(0xa000, 0xa7ff) AM_READWRITE(MRA8_RAM, retofinv_bg_videoram_w) AM_SHARE(3) AM_BASE(&retofinv_bg_videoram)
+	AM_RANGE(0xa000, 0xa7ff) AM_READWRITE(SMH_RAM, retofinv_bg_videoram_w) AM_SHARE(3) AM_BASE(&retofinv_bg_videoram)
 	AM_RANGE(0xb800, 0xb802) AM_WRITE(retofinv_gfx_ctrl_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_1_r)
 	AM_RANGE(0xc001, 0xc001) AM_READ(input_port_2_r)
-	AM_RANGE(0xc002, 0xc002) AM_READ(MRA8_NOP)	/* bit 7 must be 0, otherwise game resets */
+	AM_RANGE(0xc002, 0xc002) AM_READ(SMH_NOP)	/* bit 7 must be 0, otherwise game resets */
 	AM_RANGE(0xc003, 0xc003) AM_READ(retofinv_mcu_status_r)
 	AM_RANGE(0xc004, 0xc004) AM_READ(input_port_0_r)
 	AM_RANGE(0xc005, 0xc005) AM_READ(input_port_3_r)
@@ -158,9 +158,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, retofinv_fg_videoram_w) AM_SHARE(2)
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, retofinv_fg_videoram_w) AM_SHARE(2)
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xa000, 0xa7ff) AM_READWRITE(MRA8_RAM, retofinv_bg_videoram_w) AM_SHARE(3)
+	AM_RANGE(0xa000, 0xa7ff) AM_READWRITE(SMH_RAM, retofinv_bg_videoram_w) AM_SHARE(3)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)
 ADDRESS_MAP_END
 

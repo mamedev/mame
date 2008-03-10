@@ -144,26 +144,26 @@ static INTERRUPT_GEN( bionicc_interrupt )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)                /* 68000 ROM */
-	AM_RANGE(0xfe0000, 0xfe07ff) AM_READ(MRA16_RAM)                /* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_READ(MRA16_RAM)                /* sprites */
-	AM_RANGE(0xfe0d00, 0xfe3fff) AM_READ(MRA16_RAM)                /* RAM? */
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)                /* 68000 ROM */
+	AM_RANGE(0xfe0000, 0xfe07ff) AM_READ(SMH_RAM)                /* RAM? */
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_READ(SMH_RAM)                /* sprites */
+	AM_RANGE(0xfe0d00, 0xfe3fff) AM_READ(SMH_RAM)                /* RAM? */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0xfec000, 0xfecfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff0000, 0xff3fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff4000, 0xff7fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xff8000, 0xff87ff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffc000, 0xfffff7) AM_READ(MRA16_RAM)                /* working RAM */
+	AM_RANGE(0xfec000, 0xfecfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xff0000, 0xff3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xff4000, 0xff7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xff8000, 0xff87ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xffc000, 0xfffff7) AM_READ(SMH_RAM)                /* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_READ(hacked_soundcommand_r)      /* hack */
 	AM_RANGE(0xfffffa, 0xffffff) AM_READ(hacked_controls_r)      /* hack */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0xfe0000, 0xfe07ff) AM_WRITE(MWA16_RAM)	/* RAM? */
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xfe0d00, 0xfe3fff) AM_WRITE(MWA16_RAM)              /* RAM? */
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xfe0000, 0xfe07ff) AM_WRITE(SMH_RAM)	/* RAM? */
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xfe0d00, 0xfe3fff) AM_WRITE(SMH_RAM)              /* RAM? */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(bionicc_gfxctrl_w)	/* + coin counters */
 	AM_RANGE(0xfe8010, 0xfe8017) AM_WRITE(bionicc_scroll_w)
 	AM_RANGE(0xfe801a, 0xfe801b) AM_WRITE(bionicc_mpu_trigger_w)	/* ??? not sure, but looks like it */
@@ -171,24 +171,24 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xff3fff) AM_WRITE(bionicc_fgvideoram_w) AM_BASE(&bionicc_fgvideoram)
 	AM_RANGE(0xff4000, 0xff7fff) AM_WRITE(bionicc_bgvideoram_w) AM_BASE(&bionicc_bgvideoram)
 	AM_RANGE(0xff8000, 0xff87ff) AM_WRITE(bionicc_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffc000, 0xfffff7) AM_WRITE(MWA16_RAM)	/* working RAM */
+	AM_RANGE(0xffc000, 0xfffff7) AM_WRITE(SMH_RAM)	/* working RAM */
 	AM_RANGE(0xfffff8, 0xfffff9) AM_WRITE(hacked_soundcommand_w)      /* hack */
 	AM_RANGE(0xfffffa, 0xffffff) AM_WRITE(hacked_controls_w)	/* hack */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8001, 0x8001) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 

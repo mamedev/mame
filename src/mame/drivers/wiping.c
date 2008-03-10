@@ -95,39 +95,39 @@ static WRITE8_HANDLER( subcpu_reset_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8bff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x8bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_READ(shared1_r)
 	AM_RANGE(0x9800, 0x9bff) AM_READ(shared2_r)
 	AM_RANGE(0xa800, 0xa807) AM_READ(ports_r)
-	AM_RANGE(0xb000, 0xb7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x88ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x8900, 0x8bff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x88ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x8900, 0x8bff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(shared1_w) AM_BASE(&sharedram1)
 	AM_RANGE(0x9800, 0x9bff) AM_WRITE(shared2_w) AM_BASE(&sharedram2)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(wiping_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
 /* Sound cpu data */
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x9000, 0x93ff) AM_READ(shared1_r)
 	AM_RANGE(0x9800, 0x9bff) AM_READ(shared2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(wiping_sound_w) AM_BASE(&wiping_soundregs)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(shared1_w)
 	AM_RANGE(0x9800, 0x9bff) AM_WRITE(shared2_w)

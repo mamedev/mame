@@ -817,14 +817,14 @@ static DRIVER_INIT( namcos11 )
 			{
 				int bank;
 
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f0fffff, 0, 0, MRA32_BANK1 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f100000, 0x1f1fffff, 0, 0, MRA32_BANK2 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f200000, 0x1f2fffff, 0, 0, MRA32_BANK3 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f300000, 0x1f3fffff, 0, 0, MRA32_BANK4 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f4fffff, 0, 0, MRA32_BANK5 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f500000, 0x1f5fffff, 0, 0, MRA32_BANK6 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6fffff, 0, 0, MRA32_BANK7 );
-				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f700000, 0x1f7fffff, 0, 0, MRA32_BANK8 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f0fffff, 0, 0, SMH_BANK1 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f100000, 0x1f1fffff, 0, 0, SMH_BANK2 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f200000, 0x1f2fffff, 0, 0, SMH_BANK3 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f300000, 0x1f3fffff, 0, 0, SMH_BANK4 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f4fffff, 0, 0, SMH_BANK5 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f500000, 0x1f5fffff, 0, 0, SMH_BANK6 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6fffff, 0, 0, SMH_BANK7 );
+				memory_install_read32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1f700000, 0x1f7fffff, 0, 0, SMH_BANK8 );
 
 				for( bank = 0; bank < 8; bank++ )
 				{
@@ -841,13 +841,13 @@ static DRIVER_INIT( namcos11 )
 					m_n_bankoffset = 0;
 					memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
 					memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom64_w );
-					memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, MRA32_NOP );
+					memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP );
 					state_save_register_global( m_n_bankoffset );
 				}
 			}
 			else
 			{
-				memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, MWA32_NOP );
+				memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP );
 			}
 			break;
 		}

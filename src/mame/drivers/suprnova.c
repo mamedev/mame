@@ -859,49 +859,49 @@ static WRITE32_HANDLER( skns_ymz280_w )
 }
 
 static ADDRESS_MAP_START( skns_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_READ(MRA32_ROM) /* BIOS ROM */
+	AM_RANGE(0x00000000, 0x0007ffff) AM_READ(SMH_ROM) /* BIOS ROM */
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(nova_input_port_0_r)
 	AM_RANGE(0x00400004, 0x00400007) AM_READ(nova_input_port_dip_r)
-	AM_RANGE(0x00400008, 0x0040000b) AM_READ(MRA32_RAM)
+	AM_RANGE(0x00400008, 0x0040000b) AM_READ(SMH_RAM)
 	/* In between is write only */
 	AM_RANGE(0x0040000c, 0x0040000f) AM_READ(nova_input_port_3_r)
-	AM_RANGE(0x00800000, 0x00801fff) AM_READ(MRA32_RAM) /* 'backup' RAM */
+	AM_RANGE(0x00800000, 0x00801fff) AM_READ(SMH_RAM) /* 'backup' RAM */
 //  AM_RANGE(0x00c00000, 0x00c00003) AM_READ(skns_ymz280_r) /* ymz280 (sound) */
 	AM_RANGE(0x01000000, 0x0100000f) AM_READ(skns_msm6242_r)
-	AM_RANGE(0x02000000, 0x02003fff) AM_READ(MRA32_RAM) /* 'spc' RAM */
-	AM_RANGE(0x02100000, 0x0210003f) AM_READ(MRA32_RAM) /* 'spc' */
-	AM_RANGE(0x02400000, 0x0240007f) AM_READ(MRA32_RAM) /* 'v3' */
-    AM_RANGE(0x02500000, 0x02507fff) AM_READ(MRA32_RAM) /* 'v3tbl' RAM */
-    AM_RANGE(0x02600000, 0x02607fff) AM_READ(MRA32_RAM) /* 'v3slc' RAM */
-	AM_RANGE(0x02a00000, 0x02a0001f) AM_READ(MRA32_RAM) /* skns_pal_regs */
-    AM_RANGE(0x02a40000, 0x02a5ffff) AM_READ(MRA32_RAM) /* 'palette' RAM */
+	AM_RANGE(0x02000000, 0x02003fff) AM_READ(SMH_RAM) /* 'spc' RAM */
+	AM_RANGE(0x02100000, 0x0210003f) AM_READ(SMH_RAM) /* 'spc' */
+	AM_RANGE(0x02400000, 0x0240007f) AM_READ(SMH_RAM) /* 'v3' */
+    AM_RANGE(0x02500000, 0x02507fff) AM_READ(SMH_RAM) /* 'v3tbl' RAM */
+    AM_RANGE(0x02600000, 0x02607fff) AM_READ(SMH_RAM) /* 'v3slc' RAM */
+	AM_RANGE(0x02a00000, 0x02a0001f) AM_READ(SMH_RAM) /* skns_pal_regs */
+    AM_RANGE(0x02a40000, 0x02a5ffff) AM_READ(SMH_RAM) /* 'palette' RAM */
 	AM_RANGE(0x02f00000, 0x02f000ff) AM_READ(skns_hit_r) /* hit */
-	AM_RANGE(0x04000000, 0x041fffff) AM_READ(MRA32_BANK1) /* GAME ROM */
-	AM_RANGE(0x04800000, 0x0483ffff) AM_READ(MRA32_RAM) /* 'v3t' RAM */
-	AM_RANGE(0x06000000, 0x060fffff) AM_READ(MRA32_RAM) /* 'main' RAM */
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_READ(MRA32_RAM) /* 'cache' RAM */
+	AM_RANGE(0x04000000, 0x041fffff) AM_READ(SMH_BANK1) /* GAME ROM */
+	AM_RANGE(0x04800000, 0x0483ffff) AM_READ(SMH_RAM) /* 'v3t' RAM */
+	AM_RANGE(0x06000000, 0x060fffff) AM_READ(SMH_RAM) /* 'main' RAM */
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_READ(SMH_RAM) /* 'cache' RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skns_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_WRITE(MWA32_ROM) /* BIOS ROM */
+	AM_RANGE(0x00000000, 0x0007ffff) AM_WRITE(SMH_ROM) /* BIOS ROM */
 	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(skns_io_w) /* I/O Write */
-	AM_RANGE(0x00800000, 0x00801fff) AM_WRITE(MWA32_RAM) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* 'backup' RAM */
+	AM_RANGE(0x00800000, 0x00801fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size) /* 'backup' RAM */
 	AM_RANGE(0x00c00000, 0x00c00003) AM_WRITE(skns_ymz280_w) /* ymz280_w (sound) */
 	AM_RANGE(0x01000000, 0x0100000f) AM_WRITE(skns_msm6242_w)
 	AM_RANGE(0x01800000, 0x01800003) AM_WRITE(skns_hit2_w)
-	AM_RANGE(0x02000000, 0x02003fff) AM_WRITE(MWA32_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) /* sprite ram */
-	AM_RANGE(0x02100000, 0x0210003f) AM_WRITE(MWA32_RAM) AM_BASE(&skns_spc_regs) /* sprite registers */
+	AM_RANGE(0x02000000, 0x02003fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size) /* sprite ram */
+	AM_RANGE(0x02100000, 0x0210003f) AM_WRITE(SMH_RAM) AM_BASE(&skns_spc_regs) /* sprite registers */
 	AM_RANGE(0x02400000, 0x0240007f) AM_WRITE(skns_v3_regs_w) AM_BASE(&skns_v3_regs) /* tilemap registers */
 	AM_RANGE(0x02500000, 0x02503fff) AM_WRITE(skns_tilemapA_w) AM_BASE(&skns_tilemapA_ram) /* tilemap A */
 	AM_RANGE(0x02504000, 0x02507fff) AM_WRITE(skns_tilemapB_w) AM_BASE(&skns_tilemapB_ram) /* tilemap B */
-	AM_RANGE(0x02600000, 0x02607fff) AM_WRITE(MWA32_RAM) AM_BASE(&skns_v3slc_ram) /* tilemap linescroll */
+	AM_RANGE(0x02600000, 0x02607fff) AM_WRITE(SMH_RAM) AM_BASE(&skns_v3slc_ram) /* tilemap linescroll */
 	AM_RANGE(0x02a00000, 0x02a0001f) AM_WRITE(skns_pal_regs_w) AM_BASE(&skns_pal_regs)
 	AM_RANGE(0x02a40000, 0x02a5ffff) AM_WRITE(skns_palette_ram_w) AM_BASE(&skns_palette_ram)
 	AM_RANGE(0x02f00000, 0x02f000ff) AM_WRITE(skns_hit_w)
-	AM_RANGE(0x04000000, 0x041fffff) AM_WRITE(MWA32_ROM) /* GAME ROM */
+	AM_RANGE(0x04000000, 0x041fffff) AM_WRITE(SMH_ROM) /* GAME ROM */
 	AM_RANGE(0x04800000, 0x0483ffff) AM_WRITE(skns_v3t_w) AM_BASE(&skns_v3t_ram) /* tilemap b ram based tiles */
-	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(MWA32_RAM) AM_BASE(&skns_main_ram)
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_WRITE(MWA32_RAM) AM_BASE(&skns_cache_ram) /* 'cache' RAM */
+	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&skns_main_ram)
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_WRITE(SMH_RAM) AM_BASE(&skns_cache_ram) /* 'cache' RAM */
 ADDRESS_MAP_END
 
 /***** GFX DECODE *****/

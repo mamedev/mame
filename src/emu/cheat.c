@@ -8939,7 +8939,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			}
 #endif
 
-			if(	(handler == MWA8_RAM) && (!region->writeHandler->baseptr))
+			if(	(handler == SMH_RAM) && (!region->writeHandler->baseptr))
 				return 1;
 
 #ifndef MESS
@@ -8947,7 +8947,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			{
 				/* ----- for neogeo, search bank one ----- */
 				if(	(!strcmp(machine->gamedrv->parent, "neogeo")) && (info->targetType == kRegionType_CPU) &&
-					(info->targetIdx == 0) && (handler == MWA8_BANK1))
+					(info->targetIdx == 0) && (handler == SMH_BANK1))
 					return 1;
 			}
 
@@ -8957,28 +8957,28 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 
 			/* ----- for exterminator, search bank one ----- */
 			if(	(machine->config->cpu[1].type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
-				(info->targetIdx == 1) && (handler == MWA8_BANK1))
+				(info->targetIdx == 1) && (handler == SMH_BANK1))
 				return 1;
 
 			/* ----- for smashtv, search bank two ----- */
 			if(	(machine->config->cpu[0].type == CPU_TMS34010) && (info->targetType == kRegionType_CPU) &&
-				(info->targetIdx == 0) && (handler == MWA8_BANK2))
+				(info->targetIdx == 0) && (handler == SMH_BANK2))
 				return 1;
 
 #endif
 			return 0;
 
 		case kSearchSpeed_Medium:
-			if(	(handlerAddress >= ((FPTR)MWA8_BANK1)) && (handlerAddress <= ((FPTR)MWA8_BANK24)))
+			if(	(handlerAddress >= ((FPTR)SMH_BANK1)) && (handlerAddress <= ((FPTR)SMH_BANK24)))
 				return 1;
 
-			if(handler == MWA8_RAM)
+			if(handler == SMH_RAM)
 				return 1;
 
 			return 0;
 
 		case kSearchSpeed_Slow:
-			if(	(handler == MWA8_NOP) || (handler == MWA8_ROM))
+			if(	(handler == SMH_NOP) || (handler == SMH_ROM))
 				return 0;
 
 			if(	(handlerAddress > STATIC_COUNT) && (!region->writeHandler->baseptr))
@@ -8987,7 +8987,7 @@ static UINT8 DefaultEnableRegion(running_machine *machine, SearchRegion * region
 			return 1;
 
 		case kSearchSpeed_VerySlow:
-			if(	(handler == MWA8_NOP) || (handler == MWA8_ROM))
+			if(	(handler == SMH_NOP) || (handler == SMH_ROM))
 				return 0;
 
 			return 1;
@@ -9013,15 +9013,15 @@ static void SetSearchRegionDefaultName(SearchRegion * region)
 				genf *				handler = region->writeHandler->write.handler;
 				FPTR				handlerAddress = (FPTR)handler;
 
-				if(	(handlerAddress >= ((FPTR)MWA8_BANK1)) && (handlerAddress <= ((FPTR)MWA8_BANK24)))
-					sprintf(desc, "BANK%.2d", (int)(handlerAddress - (FPTR)MWA8_BANK1) + 1);
+				if(	(handlerAddress >= ((FPTR)SMH_BANK1)) && (handlerAddress <= ((FPTR)SMH_BANK24)))
+					sprintf(desc, "BANK%.2d", (int)(handlerAddress - (FPTR)SMH_BANK1) + 1);
 				else
 				{
 					switch(handlerAddress)
 					{
-						case (FPTR)MWA8_NOP:		strcpy(desc, "NOP   ");	break;
-						case (FPTR)MWA8_RAM:		strcpy(desc, "RAM   ");	break;
-						case (FPTR)MWA8_ROM:		strcpy(desc, "ROM   ");	break;
+						case (FPTR)SMH_NOP:		strcpy(desc, "NOP   ");	break;
+						case (FPTR)SMH_RAM:		strcpy(desc, "RAM   ");	break;
+						case (FPTR)SMH_ROM:		strcpy(desc, "ROM   ");	break;
 						default:					strcpy(desc, "CUSTOM");	break;
 					}
 				}

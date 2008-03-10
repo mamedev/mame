@@ -112,7 +112,7 @@ static WRITE16_HANDLER( puckpkmn_YM3438_w )
 
 
 static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(MRA16_ROM)					/* Main 68k Program Roms */
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)					/* Main 68k Program Roms */
 	AM_RANGE(0x700010, 0x700011) AM_READ(input_port_0_word_r)		/* Input (P2) */
 	AM_RANGE(0x700012, 0x700013) AM_READ(input_port_1_word_r)		/* Input (P1) */
 	AM_RANGE(0x700014, 0x700015) AM_READ(input_port_2_word_r)		/* Input (?) */
@@ -121,30 +121,30 @@ static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700022, 0x700023) AM_READ(OKIM6295_status_0_lsb_r)	/* M6295 Sound Chip Status Register */
 	AM_RANGE(0xa04000, 0xa04001) AM_READ(puckpkmn_YM3438_r)			/* Ym3438 Sound Chip Status Register */
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(MRA16_BANK1)				/* VDP sees the roms here */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(MRA16_BANK2)				/* VDP sees the ram here */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM	)					/* Main Ram */
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK1)				/* VDP sees the roms here */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_BANK2)				/* VDP sees the ram here */
+	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM	)					/* Main Ram */
 
 	/* Unknown reads: */
-//  AM_RANGE(0xa10000, 0xa10001) AM_READ(MRA16_NOP)                 /* ? once */
-	AM_RANGE(0xa10002, 0xa10005) AM_READ(MRA16_NOP)					/* ? alternative way of reading inputs ? */
-	AM_RANGE(0xa11100, 0xa11101) AM_READ(MRA16_NOP)					/* ? */
+//  AM_RANGE(0xa10000, 0xa10001) AM_READ(SMH_NOP)                 /* ? once */
+	AM_RANGE(0xa10002, 0xa10005) AM_READ(SMH_NOP)					/* ? alternative way of reading inputs ? */
+	AM_RANGE(0xa11100, 0xa11101) AM_READ(SMH_NOP)					/* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(MWA16_ROM)					/* Main 68k Program Roms */
+	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)					/* Main 68k Program Roms */
 	AM_RANGE(0x700022, 0x700023) AM_WRITE(OKIM6295_data_0_lsb_w)		/* M6295 Sound Chip Writes */
 	AM_RANGE(0xa04000, 0xa04003) AM_WRITE(puckpkmn_YM3438_w)			/* Ym3438 Sound Chip Writes */
 	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM) AM_BASE(&main_ram)		/* Main Ram */
+	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&main_ram)		/* Main Ram */
 
 	/* Unknown writes: */
-	AM_RANGE(0xa00000, 0xa00551) AM_WRITE(MWA16_RAM)					/* ? */
-	AM_RANGE(0xa10002, 0xa10005) AM_WRITE(MWA16_NOP)					/* ? alternative way of reading inputs ? */
-//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITE(MWA16_NOP)                    /* ? once */
-//  AM_RANGE(0xa14000, 0xa14003) AM_WRITE(MWA16_NOP)                    /* ? once */
-	AM_RANGE(0xa11100, 0xa11101) AM_WRITE(MWA16_NOP)					/* ? */
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(MWA16_NOP)					/* ? */
+	AM_RANGE(0xa00000, 0xa00551) AM_WRITE(SMH_RAM)					/* ? */
+	AM_RANGE(0xa10002, 0xa10005) AM_WRITE(SMH_NOP)					/* ? alternative way of reading inputs ? */
+//  AM_RANGE(0xa10008, 0xa1000d) AM_WRITE(SMH_NOP)                    /* ? once */
+//  AM_RANGE(0xa14000, 0xa14003) AM_WRITE(SMH_NOP)                    /* ? once */
+	AM_RANGE(0xa11100, 0xa11101) AM_WRITE(SMH_NOP)					/* ? */
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(SMH_NOP)					/* ? */
 ADDRESS_MAP_END
 
 

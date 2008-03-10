@@ -151,11 +151,11 @@ static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE( MRA8_RAM, skylncr_videoram_w ) AM_BASE( &skylncr_videoram )
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE( MRA8_RAM, skylncr_colorram_w ) AM_BASE( &skylncr_colorram )
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE( SMH_RAM, skylncr_videoram_w ) AM_BASE( &skylncr_videoram )
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE( SMH_RAM, skylncr_colorram_w ) AM_BASE( &skylncr_colorram )
 
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE( MRA8_RAM, skylncr_videoram2_w ) AM_BASE( &skylncr_videoram2 )
-	AM_RANGE(0xa000, 0xa7ff) AM_READWRITE( MRA8_RAM, skylncr_colorram2_w ) AM_BASE( &skylncr_colorram2 )
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE( SMH_RAM, skylncr_videoram2_w ) AM_BASE( &skylncr_videoram2 )
+	AM_RANGE(0xa000, 0xa7ff) AM_READWRITE( SMH_RAM, skylncr_colorram2_w ) AM_BASE( &skylncr_colorram2 )
 
 AM_RANGE(0xaa55, 0xaa55) AM_READ( ret_ff )
 

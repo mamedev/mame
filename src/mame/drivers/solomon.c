@@ -53,12 +53,12 @@ static READ8_HANDLER( solomon_0xe603_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(MRA8_RAM, solomon_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(MRA8_RAM, solomon_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, solomon_colorram2_w) AM_BASE(&solomon_colorram2)
-	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(MRA8_RAM, solomon_videoram2_w) AM_BASE(&solomon_videoram2)
+	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(SMH_RAM, solomon_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(SMH_RAM, solomon_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, solomon_colorram2_w) AM_BASE(&solomon_colorram2)
+	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(SMH_RAM, solomon_videoram2_w) AM_BASE(&solomon_videoram2)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe400, 0xe5ff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe400, 0xe5ff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe600, 0xe600) AM_READ(input_port_0_r)
 	AM_RANGE(0xe601, 0xe601) AM_READ(input_port_1_r)
 	AM_RANGE(0xe602, 0xe602) AM_READ(input_port_2_r)
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
-	AM_RANGE(0xffff, 0xffff) AM_WRITE(MWA8_NOP)	/* watchdog? */
+	AM_RANGE(0xffff, 0xffff) AM_WRITE(SMH_NOP)	/* watchdog? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )

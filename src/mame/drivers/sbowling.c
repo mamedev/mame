@@ -184,7 +184,7 @@ static READ8_HANDLER (controls_r)
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(MRA8_RAM, sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_RAM, sbw_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_1_r, MWA8_NOP)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_1_r, SMH_NOP)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, system_w)
 	AM_RANGE(0x05, 0x05) AM_READWRITE(input_port_5_r, graph_control_w)
 ADDRESS_MAP_END

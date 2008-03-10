@@ -215,18 +215,18 @@ static WRITE16_HANDLER( vmetal_es8712_w )
 
 static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_READWRITE(MRA16_RAM, vmetal_texttileram_w) AM_BASE(&vmetal_texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_READWRITE(MRA16_RAM, vmetal_mid1tileram_w) AM_BASE(&vmetal_mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_READWRITE(MRA16_RAM, vmetal_mid2tileram_w) AM_BASE(&vmetal_mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_READWRITE(SMH_RAM, vmetal_texttileram_w) AM_BASE(&vmetal_texttileram)
+	AM_RANGE(0x120000, 0x13ffff) AM_READWRITE(SMH_RAM, vmetal_mid1tileram_w) AM_BASE(&vmetal_mid1tileram)
+	AM_RANGE(0x140000, 0x15ffff) AM_READWRITE(SMH_RAM, vmetal_mid2tileram_w) AM_BASE(&vmetal_mid2tileram)
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 
-	AM_RANGE(0x170000, 0x173fff) AM_READWRITE(MRA16_RAM,metro_paletteram_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x170000, 0x173fff) AM_READWRITE(SMH_RAM,metro_paletteram_w) AM_BASE(&paletteram16	)	// Palette
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(&vmetal_tlookup)
 	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE(&vmetal_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITE(MWA16_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
+	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(input_port_0_word_r, vmetal_control_w)
 	AM_RANGE(0x200002, 0x200003) AM_READ(input_port_1_word_r )

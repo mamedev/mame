@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( actfan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x072000, 0x0727ff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE(&actfancr_pf2_data)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
-	AM_RANGE(0x120000, 0x1205ff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x120000, 0x1205ff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0x130000, 0x130003) AM_READ(actfan_control_1_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(actfan_control_0_r)
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
@@ -109,14 +109,14 @@ static ADDRESS_MAP_START( triothep_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04001f) AM_WRITE(actfancr_pf2_control_w)
 	AM_RANGE(0x044000, 0x045fff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE(&actfancr_pf2_data)
-	AM_RANGE(0x046400, 0x0467ff) AM_WRITE(MWA8_NOP) /* Pf2 rowscroll - is it used? */
+	AM_RANGE(0x046400, 0x0467ff) AM_WRITE(SMH_NOP) /* Pf2 rowscroll - is it used? */
 	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
 	AM_RANGE(0x064000, 0x0647ff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE(&actfancr_pf1_data)
-	AM_RANGE(0x066400, 0x0667ff) AM_WRITE(MWA8_RAM) AM_BASE(&actfancr_pf1_rowscroll_data)
+	AM_RANGE(0x066400, 0x0667ff) AM_WRITE(SMH_RAM) AM_BASE(&actfancr_pf1_rowscroll_data)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x130000, 0x1305ff) AM_READWRITE(MRA8_RAM, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0x130000, 0x1305ff) AM_READWRITE(SMH_RAM, paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE(&actfancr_ram) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)

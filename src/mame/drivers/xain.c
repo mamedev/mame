@@ -269,7 +269,7 @@ static INTERRUPT_GEN( xain_interrupt )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(xain_sharedram_r, xain_sharedram_w) AM_BASE(&xain_sharedram)
-	AM_RANGE(0x2000, 0x37ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x2000, 0x37ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(xain_charram_w) AM_BASE(&xain_charram)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(xain_bgram1_w) AM_BASE(&xain_bgram1)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(xain_bgram0_w) AM_BASE(&xain_bgram0)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)	/* from the 68705 */
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(xain_scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ(xain_input_port_4_r)
-//  AM_RANGE(0x3a06, 0x3a06) AM_READ(MRA8_NOP)  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
+//  AM_RANGE(0x3a06, 0x3a06) AM_READ(SMH_NOP)  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(xain_scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE(&paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE(&paletteram_2)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( cpu_map_B, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

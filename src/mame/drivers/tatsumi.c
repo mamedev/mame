@@ -178,11 +178,11 @@ static WRITE16_HANDLER(cyclwarr_sound_w)
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x08fff) AM_READWRITE(MRA16_RAM, apache3_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE(MRA16_RAM, roundup5_text_w) AM_BASE(&videoram16)
-	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(MWA16_NOP) // CRT
+	AM_RANGE(0x08000, 0x08fff) AM_READWRITE(SMH_RAM, apache3_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE(SMH_RAM, roundup5_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(SMH_NOP) // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ(input_port_3_word_r) // Dip 1+2
-	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(MWA16_NOP) // todo
+	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(SMH_NOP) // todo
 	AM_RANGE(0x0f800, 0x0f801) AM_READWRITE(apache3_bank_r, apache3_bank_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(apache3_v30_v20_r, apache3_v30_v20_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( apache3_68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE(&tatsumi_sprite_control_ram)
 	AM_RANGE(0xa0000, 0xa0001) AM_WRITE(apache3_a0000_w)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(apache3_irq_ack_w) //todo - z80 reset?
-	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(MWA16_RAM) AM_BASE(&tatsumi_c_ram)
+	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(SMH_RAM) AM_BASE(&tatsumi_c_ram)
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_BASE(&apache3_g_ram)
 	AM_RANGE(0xe0000, 0xe7fff) AM_READWRITE(apache3_z80_r, apache3_z80_w)
 ADDRESS_MAP_END
@@ -221,14 +221,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roundup5_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_READWRITE(MRA16_RAM, roundup5_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x08000, 0x0bfff) AM_READWRITE(SMH_RAM, roundup5_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
 	AM_RANGE(0x0d000, 0x0d001) AM_READ(input_port_3_word_r) /* Dip 1+2 */
-	AM_RANGE(0x0d400, 0x0d40f) AM_WRITE(MWA16_RAM) AM_BASE(&roundup5_unknown0)
-	AM_RANGE(0x0d800, 0x0d801) AM_WRITE(MWA16_RAM) AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
-	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITE(MWA16_RAM) AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
+	AM_RANGE(0x0d400, 0x0d40f) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown0)
+	AM_RANGE(0x0d800, 0x0d801) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
+	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
-	AM_RANGE(0x0f000, 0x0ffff) AM_READWRITE(MRA16_RAM, roundup5_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0f000, 0x0ffff) AM_READWRITE(SMH_RAM, roundup5_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
 	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(roundup5_vram_r, roundup5_vram_w)
@@ -256,8 +256,8 @@ static ADDRESS_MAP_START( roundup5_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff8, 0xfff8) AM_READ(input_port_0_r)
 	AM_RANGE(0xfff9, 0xfff9) AM_READ(input_port_1_r)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(input_port_2_r)
-	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(MWA8_NOP) //irq ack?
-	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(MWA8_NOP) //irq ack?
+	AM_RANGE(0xfff9, 0xfff9) AM_WRITE(SMH_NOP) //irq ack?
+	AM_RANGE(0xfffa, 0xfffa) AM_WRITE(SMH_NOP) //irq ack?
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff1, 0xfff1) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
 	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_r)
-	AM_RANGE(0xfffe, 0xfffe) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xfffe, 0xfffe) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 /******************************************************************************/

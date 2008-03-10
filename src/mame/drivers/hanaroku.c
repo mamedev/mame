@@ -118,12 +118,12 @@ static WRITE8_HANDLER( hanaroku_out_2_w )
 /* main cpu */
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x97ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa000, 0xa1ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc000, 0xc3ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc400, 0xc4ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xa000, 0xa1ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc000, 0xc3ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc400, 0xc4ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd000, 0xd000) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r)
@@ -132,15 +132,15 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&hanaroku_spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_WRITE(MWA8_RAM) AM_BASE(&hanaroku_spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(MWA8_RAM) AM_BASE(&hanaroku_spriteram3)
-	AM_RANGE(0xa200, 0xa2ff) AM_WRITE(MWA8_NOP)	// ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE(MWA8_NOP)	// ???
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(MWA8_RAM)				// main ram
-	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(MWA8_RAM)	// ???
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(MWA8_NOP)	// ??? always 0x40
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram1)
+	AM_RANGE(0x9000, 0x97ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram2)
+	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(SMH_RAM) AM_BASE(&hanaroku_spriteram3)
+	AM_RANGE(0xa200, 0xa2ff) AM_WRITE(SMH_NOP)	// ??? written once during P.O.S.T.
+	AM_RANGE(0xa300, 0xa304) AM_WRITE(SMH_NOP)	// ???
+	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM)				// main ram
+	AM_RANGE(0xc400, 0xc4ff) AM_WRITE(SMH_RAM)	// ???
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	// ??? always 0x40
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(hanaroku_out_0_w)

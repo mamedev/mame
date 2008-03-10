@@ -103,12 +103,12 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(sglatiat_flipscreen_w)
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(3) AM_BASE(&snk_rambase)
-//      AM_RANGE(0xd200, 0xd200) AM_WRITE(MWA8_RAM) /* ?0x24 */
-//      AM_RANGE(0xd300, 0xd300) AM_WRITE(MWA8_RAM) /* ------xx: msb scrollx */
-//      AM_RANGE(0xd400, 0xd400) AM_WRITE(MWA8_RAM) /* xscroll (sprite) */
-//      AM_RANGE(0xd500, 0xd500) AM_WRITE(MWA8_RAM) /* yscroll (sprite) */
-//      AM_RANGE(0xd600, 0xd600) AM_WRITE(MWA8_RAM) /* xscroll (bg) */
-//      AM_RANGE(0xd700, 0xd700) AM_WRITE(MWA8_RAM) /* yscroll (bg) */
+//      AM_RANGE(0xd200, 0xd200) AM_WRITE(SMH_RAM) /* ?0x24 */
+//      AM_RANGE(0xd300, 0xd300) AM_WRITE(SMH_RAM) /* ------xx: msb scrollx */
+//      AM_RANGE(0xd400, 0xd400) AM_WRITE(SMH_RAM) /* xscroll (sprite) */
+//      AM_RANGE(0xd500, 0xd500) AM_WRITE(SMH_RAM) /* yscroll (sprite) */
+//      AM_RANGE(0xd600, 0xd600) AM_WRITE(SMH_RAM) /* xscroll (bg) */
+//      AM_RANGE(0xd700, 0xd700) AM_WRITE(SMH_RAM) /* yscroll (bg) */
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram) AM_SHARE(2)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( sgladiat_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(MWA8_NOP)	// leftover wave generator ports?
+	AM_RANGE(0xe002, 0xe003) AM_WRITE(SMH_NOP)	// leftover wave generator ports?
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(AY8910_write_port_1_w)
 ADDRESS_MAP_END

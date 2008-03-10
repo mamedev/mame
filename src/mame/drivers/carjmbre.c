@@ -53,59 +53,59 @@ VIDEO_UPDATE( carjmbre );
 
 
 static ADDRESS_MAP_START( carjmbre_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8800, 0x8800) AM_READ(MRA8_NOP)			//?? possibly watchdog
-	AM_RANGE(0x9000, 0x97ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8800, 0x8800) AM_READ(SMH_NOP)			//?? possibly watchdog
+	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb800, 0xb800) AM_READ(input_port_2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( carjmbre_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8803, 0x8803) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8805, 0x8806) AM_WRITE(carjmbre_bgcolor_w)	//guess
 	AM_RANGE(0x8807, 0x8807) AM_WRITE(carjmbre_flipscreen_w)
-	AM_RANGE(0x8fc1, 0x8fc1) AM_WRITE(MWA8_NOP)			//overrun during initial screen clear
-	AM_RANGE(0x8fe1, 0x8fe1) AM_WRITE(MWA8_NOP)			//overrun during initial screen clear
+	AM_RANGE(0x8fc1, 0x8fc1) AM_WRITE(SMH_NOP)			//overrun during initial screen clear
+	AM_RANGE(0x8fe1, 0x8fe1) AM_WRITE(SMH_NOP)			//overrun during initial screen clear
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(carjmbre_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x985f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9880, 0x98df) AM_WRITE(MWA8_RAM)			//spriteram mirror
+	AM_RANGE(0x9800, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9880, 0x98df) AM_WRITE(SMH_RAM)			//spriteram mirror
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( carjmbre_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x1000, 0x10ff) AM_READ(MRA8_NOP)			//look to be stray reads from 10/12/14/16/18xx
-	AM_RANGE(0x1200, 0x12ff) AM_READ(MRA8_NOP)
-	AM_RANGE(0x1400, 0x14ff) AM_READ(MRA8_NOP)
-	AM_RANGE(0x1600, 0x16ff) AM_READ(MRA8_NOP)
-	AM_RANGE(0x1800, 0x18ff) AM_READ(MRA8_NOP)
-	AM_RANGE(0x2000, 0x27ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_NOP)			//look to be stray reads from 10/12/14/16/18xx
+	AM_RANGE(0x1200, 0x12ff) AM_READ(SMH_NOP)
+	AM_RANGE(0x1400, 0x14ff) AM_READ(SMH_NOP)
+	AM_RANGE(0x1600, 0x16ff) AM_READ(SMH_NOP)
+	AM_RANGE(0x1800, 0x18ff) AM_READ(SMH_NOP)
+	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( carjmbre_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x27ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( carjmbre_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x24, 0x24) AM_READ(MRA8_NOP)				//??
+	AM_RANGE(0x24, 0x24) AM_READ(SMH_NOP)				//??
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( carjmbre_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(MWA8_NOP)				//?? written on init/0xff sound command reset
+	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				//?? written on init/0xff sound command reset
 	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x21, 0x21) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x22, 0x22) AM_WRITE(MWA8_NOP)				//?? written before and after 0x21 with same value
+	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)				//?? written before and after 0x21 with same value
 	AM_RANGE(0x30, 0x30) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE(MWA8_NOP)				//?? written before and after 0x31 with same value
+	AM_RANGE(0x32, 0x32) AM_WRITE(SMH_NOP)				//?? written before and after 0x31 with same value
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( carjmbre )

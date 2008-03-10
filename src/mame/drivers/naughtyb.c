@@ -177,30 +177,30 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x8fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
 	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)	// DSW0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(MWA8_RAM) AM_BASE(&naughtyb_videoram2)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_WRITE(SMH_RAM) AM_BASE(&naughtyb_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(naughtyb_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_WRITE(MWA8_RAM) AM_BASE(&naughtyb_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_WRITE(SMH_RAM) AM_BASE(&naughtyb_scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_WRITE(pleiads_sound_control_b_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popflame_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(MWA8_RAM) AM_BASE(&naughtyb_videoram2)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_WRITE(SMH_RAM) AM_BASE(&naughtyb_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(popflame_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_WRITE(MWA8_RAM) AM_BASE(&naughtyb_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_WRITE(SMH_RAM) AM_BASE(&naughtyb_scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_WRITE(pleiads_sound_control_b_w)
 ADDRESS_MAP_END

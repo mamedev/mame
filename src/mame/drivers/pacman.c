@@ -798,22 +798,22 @@ static READ8_HANDLER( pacman_read_nop )
 static ADDRESS_MAP_START( pacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -826,22 +826,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(mspacman_activate_rom) /* Not actually, just handy */ // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -853,22 +853,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( woodpek_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -880,9 +880,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alibaba_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4eef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ef0, 0x4eff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4f00, 0x4fff) AM_MIRROR(0xa000) AM_RAM
@@ -891,13 +891,13 @@ static ADDRESS_MAP_START( alibaba_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(alibaba_sound_w) AM_BASE(&pacman_soundregs)  /* the sound region is not contiguous */
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2) /* actually at 5050-505f, here to point to free RAM */
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2) /* actually at 5050-505f, here to point to free RAM */
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_enable_w)
 	AM_RANGE(0x50c1, 0x50c1) AM_MIRROR(0xaf00) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x50c2, 0x50c2) AM_MIRROR(0xaf00) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x50c3, 0x50ff) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x50c3, 0x50ff) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ(input_port_2_r)	/* DSW1 */
@@ -912,21 +912,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dremshpr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 //  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) /* unknown */
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 //  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -938,22 +938,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( epos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -964,21 +964,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanvan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(vanvan_bgcolor_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5004) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5005, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) /* always written together with 5001 */
+	AM_RANGE(0x5004, 0x5004) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5005, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) /* always written together with 5001 */
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP) /* ??? toggled before reading 5000 */
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP) /* ??? toggled before reading 5000 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -988,25 +988,25 @@ static ADDRESS_MAP_START( vanvan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	/* probably a leftover from development: the Sanritsu version */
 	/* writes the color lookup table here, while the Karateko version */
 	/* writes garbage. */
-	AM_RANGE(0xb800, 0xb87f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xb800, 0xb87f) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK(1)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xe000) AM_WRITE(s2650games_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1400, 0x141f) AM_MIRROR(0xe000) AM_WRITE(s2650games_scroll_w)
-	AM_RANGE(0x1420, 0x148f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1490, 0x149f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM) AM_BASE(&s2650games_spriteram)
+	AM_RANGE(0x1420, 0x148f) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1490, 0x149f) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM) AM_BASE(&s2650games_spriteram)
 	AM_RANGE(0x14a0, 0x14bf) AM_MIRROR(0xe000) AM_WRITE(s2650games_tilesbank_w) AM_BASE(&s2650games_tileram)
-	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1500, 0x1502) AM_MIRROR(0xe000) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1500, 0x1502) AM_MIRROR(0xe000) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0xe000) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x1504, 0x1506) AM_MIRROR(0xe000) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x1504, 0x1506) AM_MIRROR(0xe000) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x1507, 0x1507) AM_MIRROR(0xe000) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x1508, 0x155f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1560, 0x156f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x1570, 0x157f) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0xe000) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x1508, 0x155f) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1560, 0x156f) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x1570, 0x157f) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0xe000) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x15c0, 0x15c0) AM_MIRROR(0xe000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x15c7, 0x15c7) AM_MIRROR(0xe000) AM_WRITE(porky_banking_w)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0xe000) AM_READ(input_port_0_r)
@@ -1014,7 +1014,7 @@ static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0xe000) AM_READ(input_port_2_r)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_WRITE(s2650games_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1c00, 0x1fef) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1ff0, 0x1fff) AM_MIRROR(0xe000) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1ff0, 0x1fff) AM_MIRROR(0xe000) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROMBANK(2)
 	AM_RANGE(0x4000, 0x4fff) AM_MIRROR(0x8000) AM_ROMBANK(3)
 	AM_RANGE(0x6000, 0x6fff) AM_MIRROR(0x8000) AM_ROMBANK(4)
@@ -1023,8 +1023,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rocktrv2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(pacman_sound_enable_w)
@@ -1050,20 +1050,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigbucks_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5007, 0x5007) AM_WRITE(MWA8_NOP) /*?*/
+	AM_RANGE(0x5007, 0x5007) AM_WRITE(SMH_NOP) /*?*/
 	AM_RANGE(0x5040, 0x505f) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x507f) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x5080, 0x50bf) AM_READ(input_port_2_r)	/* DSW1 */
 	AM_RANGE(0x50c0, 0x50ff) AM_READ(input_port_3_r)	/* DSW2 */
-	AM_RANGE(0x5100, 0x5100) AM_WRITE(MWA8_NOP) /*?*/
+	AM_RANGE(0x5100, 0x5100) AM_WRITE(SMH_NOP) /*?*/
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(bigbucks_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 ADDRESS_MAP_END
@@ -1071,22 +1071,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mschamp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)	/* IN1 */
@@ -1098,22 +1098,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( crushs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(MRA8_RAM,pacman_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,MWA8_NOP)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(pacman_sound_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(MWA8_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP) // doesn't use pacman sound hw
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP) // doesn't use pacman sound hw
+	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ(input_port_0_r)
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ(input_port_1_r)
@@ -1174,15 +1174,15 @@ static ADDRESS_MAP_START( bigbucks_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivfrcp_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(MRA8_NOP)
+	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP)
 	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( _8bpm_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(MRA8_NOP)
+	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP)
 	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
-	AM_RANGE(0xe0, 0xe0) AM_READ(MRA8_NOP)
+	AM_RANGE(0xe0, 0xe0) AM_READ(SMH_NOP)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
@@ -5381,7 +5381,7 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, MRA8_BANK5, MWA8_BANK5);
+	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, SMH_BANK5, SMH_BANK5);
 	memory_set_bankptr(5, auto_malloc(0x400));
 
 	/* protection? */

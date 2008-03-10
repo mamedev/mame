@@ -167,41 +167,41 @@ static READ8_HANDLER( thief_io_r )
 }
 
 static ADDRESS_MAP_START( sharkatt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)			/* 2114 (working RAM) */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)			/* 2114 (working RAM) */
 	AM_RANGE(0xc000, 0xdfff) AM_READ(thief_videoram_r)	/* 4116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharkatt_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)			/* 2114 */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)			/* 2114 */
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(thief_videoram_w)	/* 4116 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thief_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)			/* 2114 (working RAM) */
-	AM_RANGE(0xa000, 0xafff) AM_READ(MRA8_ROM)			/* NATO Defense diagnostic ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)			/* 2114 (working RAM) */
+	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_ROM)			/* NATO Defense diagnostic ROM */
 	AM_RANGE(0xc000, 0xdfff) AM_READ(thief_videoram_r)	/* 4116 */
 	AM_RANGE(0xe000, 0xe008) AM_READ(thief_coprocessor_r)
-	AM_RANGE(0xe010, 0xe02f) AM_READ(MRA8_ROM)
+	AM_RANGE(0xe010, 0xe02f) AM_READ(SMH_ROM)
 	AM_RANGE(0xe080, 0xe0bf) AM_READ(thief_context_ram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thief_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(thief_blit_w)
-	AM_RANGE(0x0001, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)			/* 2114 */
+	AM_RANGE(0x0001, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)			/* 2114 */
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(thief_videoram_w)	/* 4116 */
 	AM_RANGE(0xe000, 0xe008) AM_WRITE(thief_coprocessor_w)
-	AM_RANGE(0xe010, 0xe02f) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xe010, 0xe02f) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe080, 0xe0bf) AM_WRITE(thief_context_ram_w)
 	AM_RANGE(0xe0c0, 0xe0c0) AM_WRITE(thief_context_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) /* watchdog */
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) /* watchdog */
 	AM_RANGE(0x10, 0x10) AM_WRITE(thief_video_control_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(thief_input_select_w) // 8255
 	AM_RANGE(0x31, 0x31) AM_READ(thief_io_r) // 8255

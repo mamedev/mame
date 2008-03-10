@@ -184,16 +184,16 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
 	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
 	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xd00000, 0xd01fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xe00000, 0xe01fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffd000, 0xffdfff) AM_READ(MRA16_RAM)
-	AM_RANGE(0xffe000, 0xffefff) AM_READ(MRA16_RAM)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(SMH_RAM)
+	AM_RANGE(0xd00000, 0xd01fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe00000, 0xe01fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_RAM)
+	AM_RANGE(0xffd000, 0xffdfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_2_word_r)
@@ -203,30 +203,30 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)			// RAM-5
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)			// RAM-5
 	AM_RANGE(0xd00000, 0xd01fff) AM_WRITE(crshrace_videoram1_w) AM_BASE(&crshrace_videoram1)				// RAM-3 H/L
-	AM_RANGE(0xe00000, 0xe01fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)				// RAM-6
+	AM_RANGE(0xe00000, 0xe01fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)				// RAM-6
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_RAM)	/* work RAM */								// RAM-1 H/L
+	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)	/* work RAM */								// RAM-1 H/L
 	AM_RANGE(0xffd000, 0xffdfff) AM_WRITE(crshrace_videoram2_w) AM_BASE(&crshrace_videoram2)				// RAM-2 H/L
 	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE(&paletteram16)	// RAM-4 H/L
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfff020, 0xfff03f) AM_WRITE(MWA16_RAM) AM_BASE(&K053936_0_ctrl)
-	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(MWA16_RAM)	// ??? moves during race
+	AM_RANGE(0xfff020, 0xfff03f) AM_WRITE(SMH_RAM) AM_BASE(&K053936_0_ctrl)
+	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(SMH_RAM)	// ??? moves during race
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )

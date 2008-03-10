@@ -29,7 +29,7 @@
  *************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5400, 0x5403) AM_READ(pia_0_r)
 	AM_RANGE(0x5800, 0x5803) AM_READ(pia_1_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(carpolo_ball_screen_collision_cause_r)
@@ -41,13 +41,13 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa006, 0xa006) AM_READ(carpolo_car_goal_collision_cause_r)
 	AM_RANGE(0xa007, 0xa007) AM_READ(input_port_1_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(carpolo_interrupt_cause_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(MWA8_RAM) AM_BASE(&carpolo_alpharam)
-	AM_RANGE(0x4000, 0x400f) AM_WRITE(MWA8_RAM) AM_BASE(&carpolo_spriteram)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(SMH_RAM) AM_BASE(&carpolo_alpharam)
+	AM_RANGE(0x4000, 0x400f) AM_WRITE(SMH_RAM) AM_BASE(&carpolo_spriteram)
 	AM_RANGE(0x5400, 0x5403) AM_WRITE(pia_0_w)
 	AM_RANGE(0x5800, 0x5803) AM_WRITE(pia_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(carpolo_ball_screen_interrupt_clear_w)
@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(carpolo_car_border_interrupt_clear_w)
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(carpolo_car_ball_interrupt_clear_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(carpolo_car_goal_interrupt_clear_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

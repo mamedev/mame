@@ -13,7 +13,7 @@
         * Freeze
 
     To do:
-        * map out unused RAM per-game via MRA8_NOP/MWA8_NOP
+        * map out unused RAM per-game via SMH_NOP/SMH_NOP
 
     Note: There is believed to be a 68020 version of Maximum Force
             (not confirmed or dumped)

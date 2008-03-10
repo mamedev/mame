@@ -452,28 +452,28 @@ static WRITE8_HANDLER( topspeed_msm5205_stop_w )
 
 
 static ADDRESS_MAP_START( topspeed_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(sharedram_r)	// all shared ??
-	AM_RANGE(0x500000, 0x503fff) AM_READ(MRA16_RAM)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(MRA16_NOP)
+	AM_RANGE(0x500000, 0x503fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(SMH_NOP)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ(taitosound_comm16_lsb_r)
-	AM_RANGE(0x800000, 0x8003ff) AM_READ(MRA16_RAM)	/* raster line color control */
-	AM_RANGE(0x800400, 0x80ffff) AM_READ(MRA16_RAM)	/* unknown or unused */
+	AM_RANGE(0x800000, 0x8003ff) AM_READ(SMH_RAM)	/* raster line color control */
+	AM_RANGE(0x800400, 0x80ffff) AM_READ(SMH_RAM)	/* unknown or unused */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(PC080SN_word_0_r)	/* tilemaps */
 	AM_RANGE(0xb00000, 0xb0ffff) AM_READ(PC080SN_word_1_r)	/* tilemaps */
-	AM_RANGE(0xd00000, 0xd00fff) AM_READ(MRA16_RAM)	/* sprite ram */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_READ(MRA16_RAM)	/* sprite map */
+	AM_RANGE(0xd00000, 0xd00fff) AM_READ(SMH_RAM)	/* sprite ram */
+	AM_RANGE(0xe00000, 0xe0ffff) AM_READ(SMH_RAM)	/* sprite map */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
 	AM_RANGE(0x500000, 0x503fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITE(taitosound_port16_lsb_w)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_WRITE(taitosound_comm16_lsb_w)
-	AM_RANGE(0x800000, 0x8003ff) AM_WRITE(MWA16_RAM) AM_BASE(&topspeed_raster_ctrl)
-	AM_RANGE(0x800400, 0x80ffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x800000, 0x8003ff) AM_WRITE(SMH_RAM) AM_BASE(&topspeed_raster_ctrl)
+	AM_RANGE(0x800400, 0x80ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(PC080SN_word_0_w)
 	AM_RANGE(0xa20000, 0xa20003) AM_WRITE(PC080SN_yscroll_word_0_w)
 	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(PC080SN_xscroll_word_0_w)
@@ -482,13 +482,13 @@ static ADDRESS_MAP_START( topspeed_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb20000, 0xb20003) AM_WRITE(PC080SN_yscroll_word_1_w)
 	AM_RANGE(0xb40000, 0xb40003) AM_WRITE(PC080SN_xscroll_word_1_w)
 	AM_RANGE(0xb50000, 0xb50003) AM_WRITE(PC080SN_ctrl_word_1_w)
-	AM_RANGE(0xd00000, 0xd00fff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd00000, 0xd00fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&topspeed_spritemap)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_WRITE(SMH_RAM) AM_BASE(&topspeed_spritemap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_READ(MRA16_ROM)
+	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(sharedram_r)
 	AM_RANGE(0x880000, 0x880001) AM_READ(topspeed_input_bypass_r)
 	AM_RANGE(0x880002, 0x880003) AM_READ(TC0220IOC_halfword_port_r)
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( topspeed_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x01ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x400000, 0X40ffff) AM_WRITE(sharedram_w) AM_BASE(&sharedram)
 	AM_RANGE(0x880000, 0x880001) AM_WRITE(TC0220IOC_halfword_portreg_w)
 	AM_RANGE(0x880002, 0x880003) AM_WRITE(TC0220IOC_halfword_port_w)
@@ -507,16 +507,16 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK10)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9001, 0x9001) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)

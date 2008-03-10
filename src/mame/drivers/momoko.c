@@ -45,29 +45,29 @@ static WRITE8_HANDLER( momoko_bg_read_bank_w )
 /****************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0xd064, 0xd0ff) AM_READ(MRA8_RAM) /* sprite ram */
+	AM_RANGE(0xd064, 0xd0ff) AM_READ(SMH_RAM) /* sprite ram */
 
 	AM_RANGE(0xd400, 0xd400) AM_READ(input_port_0_r)
 	AM_RANGE(0xd402, 0xd402) AM_READ(input_port_1_r)
 	AM_RANGE(0xd406, 0xd406) AM_READ(input_port_2_r)
 	AM_RANGE(0xd407, 0xd407) AM_READ(input_port_3_r)
 
-	AM_RANGE(0xd800, 0xdbff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xe3ff) AM_READ(MRA8_RAM) /* text */
+	AM_RANGE(0xd800, 0xdbff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM) /* text */
 
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
 
-	AM_RANGE(0xd064, 0xd0ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd064, 0xd0ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(MWA8_NOP) /* interrupt ack? */
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(SMH_NOP) /* interrupt ack? */
 	AM_RANGE(0xd402, 0xd402) AM_WRITE(momoko_flipscreen_w)
 	AM_RANGE(0xd404, 0xd404) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd406, 0xd406) AM_WRITE(soundlatch_w)
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc01, 0xdc01) AM_WRITE(momoko_fg_scrollx_w)
 	AM_RANGE(0xdc02, 0xdc02) AM_WRITE(momoko_fg_select_w)
 
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(momoko_text_scrolly_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(momoko_text_mode_w)
@@ -91,8 +91,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(YM2203_status_port_1_r)
@@ -100,12 +100,12 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(MWA8_NOP) /* unknown */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(MWA8_NOP) /* unknown */
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2203_write_port_1_w)
 ADDRESS_MAP_END

@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_READWRITE(MRA8_RAM, ultratnk_video_ram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_READWRITE(SMH_RAM, ultratnk_video_ram_w) AM_BASE(&videoram)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ(input_port_0_r)
 	AM_RANGE(0x1800, 0x1fff) AM_READ(input_port_1_r)

@@ -444,8 +444,8 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(polepos_view_r, polepos_view_w) 				/* Background Memory */
 
-	AM_RANGE(0x8000, 0x83ff) AM_READ(MRA8_RAM)						/* Sound Memory */
-	AM_RANGE(0x8000, 0x83bf) AM_WRITE(MWA8_RAM)						/* Sound Memory */
+	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)						/* Sound Memory */
+	AM_RANGE(0x8000, 0x83bf) AM_WRITE(SMH_RAM)						/* Sound Memory */
 	AM_RANGE(0x83c0, 0x83ff) AM_WRITE(polepos_sound_w) AM_BASE(&polepos_soundregs)/* Sound data */
 
 	AM_RANGE(0x9000, 0x90ff) AM_READWRITE(namco_06xx_0_data_r, namco_06xx_0_data_w)
@@ -459,7 +459,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(polepos_adc_r, MWA8_NOP)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(polepos_adc_r, SMH_NOP)
 ADDRESS_MAP_END
 
 

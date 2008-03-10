@@ -450,30 +450,30 @@ WRITE16_HANDLER( cps1_eeprom_port_w )
 
 
 static ADDRESS_MAP_START( cps1_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(MRA16_ROM)             /* 68000 ROM */
+	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)             /* 68000 ROM */
 	AM_RANGE(0x800000, 0x800001) AM_READ(cps1_in1_r)            /* Player input ports */
 	AM_RANGE(0x800010, 0x800011) AM_READ(cps1_in1_r)            /* ?? */
 	AM_RANGE(0x800018, 0x800019) AM_READ(cps1_in0_r)            /* System input ports */
 	AM_RANGE(0x80001a, 0x80001f) AM_READ(cps1_dsw_r)            /* Dip Switches */
-	AM_RANGE(0x800020, 0x800021) AM_READ(MRA16_NOP)             /* ? Used by Rockman ? */
+	AM_RANGE(0x800020, 0x800021) AM_READ(SMH_NOP)             /* ? Used by Rockman ? */
 	AM_RANGE(0x800052, 0x800055) AM_READ(forgottn_dial_0_r)     /* Forgotten Worlds */
 	AM_RANGE(0x80005a, 0x80005d) AM_READ(forgottn_dial_1_r)     /* Forgotten Worlds */
 	AM_RANGE(0x800176, 0x800177) AM_READ(cps1_in2_r)            /* Extra input ports */
 	AM_RANGE(0x800178, 0x800179) AM_READ(cps1_in3_r)            /* Player 4 controls ("Captain Commando") */
 	AM_RANGE(0x8001fc, 0x8001fd) AM_READ(cps1_in2_r)            /* Extra input ports ("SF Rev E") */
 	AM_RANGE(0x800100, 0x8001ff) AM_READ(cps1_output_r)         /* Output ports */
-	AM_RANGE(0x900000, 0x92ffff) AM_READ(MRA16_RAM)	            /* SF2CE executes code from here */
+	AM_RANGE(0x900000, 0x92ffff) AM_READ(SMH_RAM)	            /* SF2CE executes code from here */
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)		/* Slammasters protection */
 	AM_RANGE(0xf18000, 0xf19fff) AM_READ(qsound_sharedram1_r)	/* Q RAM */
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)            /* Player 3 controls (later games) */
 	AM_RANGE(0xf1c002, 0xf1c003) AM_READ(cps1_in3_r)            /* Player 4 controls ("Muscle Bombers") */
 	AM_RANGE(0xf1c006, 0xf1c007) AM_READ(cps1_eeprom_port_r)
 	AM_RANGE(0xf1e000, 0xf1ffff) AM_READ(qsound_sharedram2_r)	/* Q RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(MRA16_RAM)             /* RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)             /* RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cps1_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(MWA16_ROM)            /* ROM */
+	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)            /* ROM */
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800040, 0x800041) AM_WRITE(forgottn_dial_0_reset_w)
 	AM_RANGE(0x800048, 0x800049) AM_WRITE(forgottn_dial_1_reset_w)
@@ -485,14 +485,14 @@ static ADDRESS_MAP_START( cps1_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)     /* Coin control2 (later games) */
 	AM_RANGE(0xf1c006, 0xf1c007) AM_WRITE(cps1_eeprom_port_w)
 	AM_RANGE(0xf1e000, 0xf1ffff) AM_WRITE(qsound_sharedram2_w)  /* Q RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(MWA16_RAM)            /* RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)            /* RAM */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf001, 0xf001) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ(OKIM6295_status_0_r)
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
@@ -500,8 +500,8 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(OKIM6295_data_0_w)

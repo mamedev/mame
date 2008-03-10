@@ -55,13 +55,13 @@ static DRIVER_INIT( hyhoo2 )
 
 
 static ADDRESS_MAP_START( readmem_hyhoo, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_hyhoo, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM) AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
 ADDRESS_MAP_END
 
 
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( readport_hyhoo, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(MRA8_NOP)					// unknown
+	AM_RANGE(0xd0, 0xd0) AM_READ(SMH_NOP)					// unknown
 	AM_RANGE(0xe0, 0xe1) AM_READ(nb1413m3_gfxrom_r)
 	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
 	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
@@ -86,10 +86,10 @@ static ADDRESS_MAP_START( writeport_hyhoo, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(MWA8_RAM) AM_BASE(&hyhoo_clut)
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_RAM) AM_BASE(&hyhoo_clut)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
-//  AM_RANGE(0xf0, 0xf0) AM_WRITE(MWA8_NOP)
+//  AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 

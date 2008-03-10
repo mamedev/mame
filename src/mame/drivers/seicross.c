@@ -120,10 +120,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x8820, 0x887f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, seicross_videoram_w) AM_BASE(&videoram)	/* video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, seicross_videoram_w) AM_BASE(&videoram)	/* video RAM */
 	AM_RANGE(0x9800, 0x981f) AM_RAM AM_BASE(&seicross_row_scroll)
-	AM_RANGE(0x9880, 0x989f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(MRA8_RAM, seicross_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9880, 0x989f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x9c00, 0x9fff) AM_READWRITE(SMH_RAM, seicross_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)	/* test */

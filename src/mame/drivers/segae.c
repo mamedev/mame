@@ -317,30 +317,30 @@ static struct sms_vdp *md_sms_vdp;
 
 #ifdef UNUSED_FUNCTION
 static ADDRESS_MAP_START( sms_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(MRA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(MRA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(MWA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(MWA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 /* we have to fill in the ROM addresses for systeme due to the encrypted games */
 static ADDRESS_MAP_START( systeme_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)				/* Fixed ROM */
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)				/* Banked ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* Fixed ROM */
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)				/* Banked ROM */
 
-//  AM_RANGE(0x0000 , 0xbfff) AM_READ(MRA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_READ(MRA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_READ(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_READ(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( systeme_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)				/* Fixed ROM */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* Fixed ROM */
 
-//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(MWA8_ROM)
-//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(MWA8_RAM) AM_MIRROR(0x2000)
+//  AM_RANGE(0x0000 , 0xbfff) AM_WRITE(SMH_ROM)
+//  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sms_readport, ADDRESS_SPACE_IO, 8 )
@@ -2203,8 +2203,8 @@ static void init_systeme_map(void)
 
 	/* fixed rom bank area */
 //  sms_rom = auto_malloc(0xc000);
-//  memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, MRA8_BANK1);
-//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, MWA8_UNMAP);
+//  memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK1);
+//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x7fff, 0, 0, SMH_UNMAP);
 //  memory_set_bankptr( 1, sms_rom );
 
 	memory_configure_bank(1, 0, 16, memory_region(REGION_CPU1) + 0x10000, 0x4000);
@@ -2217,8 +2217,8 @@ static void init_systeme_map(void)
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x4000);
-	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MRA8_BANK2);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, MWA8_BANK2);
+	memory_install_read8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2);
 	memory_set_bankptr( 2, sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 

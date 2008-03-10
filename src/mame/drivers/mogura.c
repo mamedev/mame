@@ -106,7 +106,7 @@ static WRITE8_HANDLER(dac_w)
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) // ??
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) // ??
 	AM_RANGE(0x14, 0x14) AM_WRITE(dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
 
@@ -122,15 +122,15 @@ static WRITE8_HANDLER ( mogura_gfxram_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM) // main ram
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_RAM) // tilemap
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) // main ram
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM) // tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(mogura_gfxram_w) AM_BASE(&mogura_gfxram)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(mogura_tileram_w) AM_BASE(&mogura_tileram)
 ADDRESS_MAP_END

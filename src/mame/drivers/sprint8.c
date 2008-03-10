@@ -112,35 +112,35 @@ static WRITE8_HANDLER( sprint8_motor_w ) {}
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(sprint8_collision_r)
 	AM_RANGE(0x1c01, 0x1c08) AM_READ(sprint8_input_r)
 	AM_RANGE(0x1c09, 0x1c09) AM_READ(input_port_16_r)
 	AM_RANGE(0x1c0a, 0x1c0a) AM_READ(input_port_17_r)
 	AM_RANGE(0x1c0f, 0x1c0f) AM_READ(input_port_18_r)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x00ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1800, 0x1bff) AM_WRITE(sprint8_video_ram_w) AM_BASE(&sprint8_video_ram)
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(MWA8_RAM) AM_BASE(&sprint8_pos_h_ram)
-	AM_RANGE(0x1c10, 0x1c1f) AM_WRITE(MWA8_RAM) AM_BASE(&sprint8_pos_v_ram)
-	AM_RANGE(0x1c20, 0x1c2f) AM_WRITE(MWA8_RAM) AM_BASE(&sprint8_pos_d_ram)
+	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(SMH_RAM) AM_BASE(&sprint8_pos_h_ram)
+	AM_RANGE(0x1c10, 0x1c1f) AM_WRITE(SMH_RAM) AM_BASE(&sprint8_pos_v_ram)
+	AM_RANGE(0x1c20, 0x1c2f) AM_WRITE(SMH_RAM) AM_BASE(&sprint8_pos_d_ram)
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(sprint8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(sprint8_int_reset_w)
 	AM_RANGE(0x1d01, 0x1d01) AM_WRITE(sprint8_crash_w)
 	AM_RANGE(0x1d02, 0x1d02) AM_WRITE(sprint8_explosion_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_WRITE(sprint8_bugle_w)
 	AM_RANGE(0x1d04, 0x1d04) AM_WRITE(sprint8_bug_w)
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(MWA8_RAM) AM_BASE(&sprint8_team)
+	AM_RANGE(0x1d05, 0x1d05) AM_WRITE(SMH_RAM) AM_BASE(&sprint8_team)
 	AM_RANGE(0x1d06, 0x1d06) AM_WRITE(sprint8_attract_w)
 	AM_RANGE(0x1e00, 0x1e07) AM_WRITE(sprint8_motor_w)
-	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(MWA8_NOP) /* probably a watchdog, disabled in service mode */
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x1f00, 0x1f00) AM_WRITE(SMH_NOP) /* probably a watchdog, disabled in service mode */
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

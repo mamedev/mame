@@ -230,45 +230,45 @@ static WRITE32_HANDLER( superchs_stick_w )
 ***********************************************************/
 
 static ADDRESS_MAP_START( superchs_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA32_ROM)
-	AM_RANGE(0x100000, 0x11ffff) AM_READ(MRA32_RAM)	/* main CPUA ram */
-	AM_RANGE(0x140000, 0x141fff) AM_READ(MRA32_RAM)	/* Sprite ram */
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x100000, 0x11ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
+	AM_RANGE(0x140000, 0x141fff) AM_READ(SMH_RAM)	/* Sprite ram */
 	AM_RANGE(0x180000, 0x18ffff) AM_READ(TC0480SCP_long_r)
 	AM_RANGE(0x1b0000, 0x1b002f) AM_READ(TC0480SCP_ctrl_long_r)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(MRA32_RAM)	/* Shared ram */
-	AM_RANGE(0x280000, 0x287fff) AM_READ(MRA32_RAM)	/* Palette ram */
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_READ(MRA32_RAM)	/* Sound shared ram */
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)	/* Shared ram */
+	AM_RANGE(0x280000, 0x287fff) AM_READ(SMH_RAM)	/* Palette ram */
+	AM_RANGE(0x2c0000, 0x2c07ff) AM_READ(SMH_RAM)	/* Sound shared ram */
 	AM_RANGE(0x300000, 0x300007) AM_READ(superchs_input_r)
 	AM_RANGE(0x340000, 0x340003) AM_READ(superchs_stick_r)	/* stick coord read */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superchs_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA32_ROM)
-	AM_RANGE(0x100000, 0x11ffff) AM_WRITE(MWA32_RAM) AM_BASE(&superchs_ram)
-	AM_RANGE(0x140000, 0x141fff) AM_WRITE(MWA32_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x11ffff) AM_WRITE(SMH_RAM) AM_BASE(&superchs_ram)
+	AM_RANGE(0x140000, 0x141fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(TC0480SCP_long_w)
 	AM_RANGE(0x1b0000, 0x1b002f) AM_WRITE(TC0480SCP_ctrl_long_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(MWA32_RAM) AM_BASE(&shared_ram)
+	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x280000, 0x287fff) AM_WRITE(superchs_palette_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_WRITE(MWA32_RAM) AM_BASE(&f3_shared_ram)
+	AM_RANGE(0x2c0000, 0x2c07ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
 	AM_RANGE(0x300000, 0x300007) AM_WRITE(superchs_input_w)	/* eerom etc. */
 	AM_RANGE(0x340000, 0x340003) AM_WRITE(superchs_stick_w)	/* stick int request */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superchs_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(MRA16_RAM)	/* local ram */
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)	/* local ram */
 	AM_RANGE(0x800000, 0x80ffff) AM_READ(shared_ram_r)
-	AM_RANGE(0xa00000, 0xa001ff) AM_READ(MRA16_RAM)
+	AM_RANGE(0xa00000, 0xa001ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superchs_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(shared_ram_w)
-	AM_RANGE(0xa00000, 0xa001ff) AM_WRITE(MWA16_RAM)	/* Extra road control?? */
+	AM_RANGE(0xa00000, 0xa001ff) AM_WRITE(SMH_RAM)	/* Extra road control?? */
 ADDRESS_MAP_END
 
 /***********************************************************/

@@ -81,22 +81,22 @@ static WRITE8_HANDLER(amidar_ppi8255_1_w)
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9000, 0x93ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x9800, 0x98ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9000, 0x93ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x9800, 0x98ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa800, 0xa800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xb000, 0xb03f) AM_READ(amidar_ppi8255_0_r)
 	AM_RANGE(0xb800, 0xb83f) AM_READ(amidar_ppi8255_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(galaxian_videoram_w) AM_BASE(&galaxian_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxian_attributesram_w) AM_BASE(&galaxian_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_WRITE(MWA8_RAM) AM_BASE(&galaxian_spriteram) AM_SIZE(&galaxian_spriteram_size)
-	AM_RANGE(0x9860, 0x98ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x9840, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&galaxian_spriteram) AM_SIZE(&galaxian_spriteram_size)
+	AM_RANGE(0x9860, 0x98ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(scramble_background_red_w)
 	AM_RANGE(0xa008, 0xa008) AM_WRITE(galaxian_nmi_enable_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITE(galaxian_flip_screen_x_w)
@@ -111,14 +111,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( amidar_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(amidar_soundram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amidar_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(amidar_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(MWA8_NOP) AM_BASE(&amidar_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_NOP) AM_BASE(&amidar_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 

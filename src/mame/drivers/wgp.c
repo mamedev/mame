@@ -654,34 +654,34 @@ static READ16_HANDLER( wgp_sound_r )
 *****************************************************************/
 
 static ADDRESS_MAP_START( wgp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(MRA16_RAM)	/* main CPUA ram */
-	AM_RANGE(0x140000, 0x143fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
+	AM_RANGE(0x140000, 0x143fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(TC0220IOC_halfword_byteswap_r)
 	AM_RANGE(0x200000, 0x20000f) AM_READ(wgp_adinput_r)
 	AM_RANGE(0x300000, 0x30ffff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps */
 	AM_RANGE(0x320000, 0x32000f) AM_READ(TC0100SCN_ctrl_word_0_r)
-	AM_RANGE(0x400000, 0x40bfff) AM_READ(MRA16_RAM)	/* sprite tilemaps */
-	AM_RANGE(0x40c000, 0x40dfff) AM_READ(MRA16_RAM)	/* sprite ram */
-	AM_RANGE(0x500000, 0x501fff) AM_READ(MRA16_RAM)	/* unknown/unused */
+	AM_RANGE(0x400000, 0x40bfff) AM_READ(SMH_RAM)	/* sprite tilemaps */
+	AM_RANGE(0x40c000, 0x40dfff) AM_READ(SMH_RAM)	/* sprite ram */
+	AM_RANGE(0x500000, 0x501fff) AM_READ(SMH_RAM)	/* unknown/unused */
 	AM_RANGE(0x502000, 0x517fff) AM_READ(wgp_pivram_word_r)	/* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_READ(wgp_piv_ctrl_word_r)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x700000, 0x701fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wgp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x140000, 0x143fff) AM_WRITE(MWA16_RAM) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x140000, 0x143fff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
 	AM_RANGE(0x180000, 0x18000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x200000, 0x20000f) AM_WRITE(wgp_adinput_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(TC0100SCN_word_0_w)	/* tilemaps */
 	AM_RANGE(0x320000, 0x32000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x400000, 0x40bfff) AM_WRITE(MWA16_RAM) AM_BASE(&wgp_spritemap) AM_SIZE(&wgp_spritemap_size)
-	AM_RANGE(0x40c000, 0x40dfff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* sprite ram */
-	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITE(MWA16_NOP)	// ?? (writes 0x8000 and 0 alternately - Wgp2 just 0)
-	AM_RANGE(0x500000, 0x501fff) AM_WRITE(MWA16_RAM)	/* unknown/unused */
+	AM_RANGE(0x400000, 0x40bfff) AM_WRITE(SMH_RAM) AM_BASE(&wgp_spritemap) AM_SIZE(&wgp_spritemap_size)
+	AM_RANGE(0x40c000, 0x40dfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* sprite ram */
+	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITE(SMH_NOP)	// ?? (writes 0x8000 and 0 alternately - Wgp2 just 0)
+	AM_RANGE(0x500000, 0x501fff) AM_WRITE(SMH_RAM)	/* unknown/unused */
 	AM_RANGE(0x502000, 0x517fff) AM_WRITE(wgp_pivram_word_w) AM_BASE(&wgp_pivram)	/* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_WRITE(wgp_piv_ctrl_word_w) AM_BASE(&wgp_piv_ctrlram)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)	/* rotation control ? */
@@ -689,51 +689,51 @@ static ADDRESS_MAP_START( wgp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wgp_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not mapped... */
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_READ(MRA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x140000, 0x143fff) AM_READ(sharedram_r)
 	AM_RANGE(0x200000, 0x200003) AM_READ(wgp_sound_r)
-//  AM_RANGE(0x380000, 0x383fff) AM_READ(MRA16_RAM) // LAN RAM
+//  AM_RANGE(0x380000, 0x383fff) AM_READ(SMH_RAM) // LAN RAM
 	AM_RANGE(0x380000, 0x380001) AM_READ(lan_status_r)	// ??
 	// a lan input area is read somewhere above the status
 	// (make the status return 0 and log)...
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wgp_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x140000, 0x143fff) AM_WRITE(sharedram_w)
 	AM_RANGE(0x200000, 0x200003) AM_WRITE(wgp_sound_w)
-//  AM_RANGE(0x380000, 0x383fff) AM_WRITE(MWA16_RAM)    // LAN RAM
+//  AM_RANGE(0x380000, 0x383fff) AM_WRITE(SMH_RAM)    // LAN RAM
 ADDRESS_MAP_END
 
 
 /***************************************************************************/
 
 static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK10)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(MRA8_NOP)
+	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
 	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(MRA8_NOP)
+	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(MWA8_NOP) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(MWA8_NOP) /* ? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_NOP) /* ? */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
+	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

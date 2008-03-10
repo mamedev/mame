@@ -54,7 +54,7 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 }
 
 static ADDRESS_MAP_START( labyrunr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0020, 0x005f) AM_READ(MRA8_RAM)	/* scroll registers */
+	AM_RANGE(0x0020, 0x005f) AM_READ(SMH_RAM)	/* scroll registers */
 	AM_RANGE(0x0801, 0x0801) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0x0800, 0x0800) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0x0901, 0x0901) AM_READ(YM2203_status_port_1_r)
@@ -63,16 +63,16 @@ static ADDRESS_MAP_START( labyrunr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0a01, 0x0a01) AM_READ(input_port_4_r)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(input_port_3_r)
 	AM_RANGE(0x0d00, 0x0d1f) AM_READ(K051733_r)			/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x10ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( labyrunr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(K007121_ctrl_0_w)
-	AM_RANGE(0x0020, 0x005f) AM_WRITE(MWA8_RAM)	AM_BASE(&labyrunr_scrollram) /* scroll registers */
+	AM_RANGE(0x0020, 0x005f) AM_WRITE(SMH_RAM)	AM_BASE(&labyrunr_scrollram) /* scroll registers */
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x0901, 0x0901) AM_WRITE(YM2203_control_port_1_w)
@@ -80,12 +80,12 @@ static ADDRESS_MAP_START( labyrunr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
 	AM_RANGE(0x0d00, 0x0d1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)	/* Sprite RAM */
+	AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)	/* Sprite RAM */
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(labyrunr_vram1_w) AM_BASE(&labyrunr_videoram1)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(labyrunr_vram2_w) AM_BASE(&labyrunr_videoram2)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

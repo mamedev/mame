@@ -366,14 +366,14 @@ static ADDRESS_MAP_START( cpu1_map, 0 , 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
-	AM_RANGE(0xa380, 0xa3ff) AM_WRITE(MWA8_RAM) AM_READ(MRA8_RAM) AM_BASE(&gsword_spritetile_ram)
+	AM_RANGE(0xa380, 0xa3ff) AM_WRITE(SMH_RAM) AM_READ(SMH_RAM) AM_BASE(&gsword_spritetile_ram)
 	AM_RANGE(0xa400, 0xa77f) AM_RAM
-	AM_RANGE(0xa780, 0xa7ff) AM_WRITE(MWA8_RAM) AM_READ(MRA8_RAM) AM_BASE(&gsword_spritexy_ram) AM_SIZE(&gsword_spritexy_size)
+	AM_RANGE(0xa780, 0xa7ff) AM_WRITE(SMH_RAM) AM_READ(SMH_RAM) AM_BASE(&gsword_spritexy_ram) AM_SIZE(&gsword_spritexy_size)
 	AM_RANGE(0xa980, 0xa980) AM_WRITE(gsword_charbank_w)
 	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
 	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
-	AM_RANGE(0xab80, 0xabff) AM_WRITE(MWA8_RAM) AM_BASE(&gsword_spriteattrib_ram)
-	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(gsword_videoram_w) AM_READ(MRA8_RAM) AM_BASE(&videoram)
+	AM_RANGE(0xab80, 0xabff) AM_WRITE(SMH_RAM) AM_BASE(&gsword_spriteattrib_ram)
+	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(gsword_videoram_w) AM_READ(SMH_RAM) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -403,9 +403,9 @@ static ADDRESS_MAP_START( cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_WRITE(gsword_AY8910_control_port_1_w) AM_READ(gsword_fake_1_r)
 	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_write_port_1_w)          AM_READ(AY8910_read_port_1_r)
 //
-	AM_RANGE(0xe0, 0xe0) AM_READ(MRA8_NOP) /* ?? */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(MWA8_NOP) /* ?? */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(MWA8_NOP) /* watch dog ?*/
+	AM_RANGE(0xe0, 0xe0) AM_READ(SMH_NOP) /* ?? */
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP) /* ?? */
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(SMH_NOP) /* watch dog ?*/
 ADDRESS_MAP_END
 
 //

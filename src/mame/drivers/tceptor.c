@@ -177,16 +177,16 @@ static READ8_HANDLER( readFF )
 
 static ADDRESS_MAP_START( m6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(MRA8_RAM, tceptor_tile_ram_w) AM_BASE(&tceptor_tile_ram)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(MRA8_RAM, tceptor_tile_attr_w) AM_BASE(&tceptor_tile_attr)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(MRA8_RAM, tceptor_bg_ram_w) AM_BASE(&tceptor_bg_ram)	// background (VIEW RAM)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(SMH_RAM, tceptor_tile_ram_w) AM_BASE(&tceptor_tile_ram)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(SMH_RAM, tceptor_tile_attr_w) AM_BASE(&tceptor_tile_attr)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(SMH_RAM, tceptor_bg_ram_w) AM_BASE(&tceptor_bg_ram)	// background (VIEW RAM)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(MWA8_NOP)				// 3D scope left/right?
-	AM_RANGE(0x4f00, 0x4f00) AM_READ(MRA8_NOP)				// unknown
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(SMH_NOP)				// 3D scope left/right?
+	AM_RANGE(0x4f00, 0x4f00) AM_READ(SMH_NOP)				// unknown
 	AM_RANGE(0x4f01, 0x4f01) AM_READ(input_port_4_r)		// analog input (accel)
 	AM_RANGE(0x4f02, 0x4f02) AM_READ(input_port_5_r)		// analog input (left/right)
 	AM_RANGE(0x4f03, 0x4f03) AM_READ(input_port_6_r)		// analog input (up/down)
-	AM_RANGE(0x4f00, 0x4f03) AM_WRITE(MWA8_NOP)				// analog input control?
+	AM_RANGE(0x4f00, 0x4f03) AM_WRITE(SMH_NOP)				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)	// bg scroll
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE(1) AM_BASE(&m68k_shared_ram) // COM RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( m6502_a_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0x3c01, 0x3c01) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x3c01, 0x3c01) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( m6502_b_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(voice_w)			// voice data
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(MWA8_RAM)			// voice ctrl??
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_RAM)			// voice ctrl??
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -221,8 +221,8 @@ static ADDRESS_MAP_START( m68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM			// M68K ERROR 1
 	AM_RANGE(0x100000, 0x10ffff) AM_ROM			// not sure
 	AM_RANGE(0x200000, 0x203fff) AM_RAM			// M68K ERROR 0
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(MWA16_RAM)
-	AM_RANGE(0x400000, 0x4001ff) AM_WRITE(MWA16_RAM) AM_BASE(&tceptor_sprite_ram)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x400000, 0x4001ff) AM_WRITE(SMH_RAM) AM_BASE(&tceptor_sprite_ram)
 	AM_RANGE(0x500000, 0x51ffff) AM_WRITE(namco_road16_w)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(m68k_irq_enable_w)	// not sure
 	AM_RANGE(0x700000, 0x703fff) AM_READWRITE(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE(1)
@@ -250,8 +250,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READWRITE(readFF, MWA8_NOP)
-	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(readFF, MWA8_NOP)
+	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READWRITE(readFF, SMH_NOP)
+	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(readFF, SMH_NOP)
 ADDRESS_MAP_END
 
 

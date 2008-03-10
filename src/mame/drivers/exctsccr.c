@@ -143,22 +143,22 @@ static WRITE8_HANDLER( cexctsccr_mcu_halt_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 #if MCU_HACK
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(exctsccr_mcu_w) AM_READ(MRA8_RAM) AM_BASE(&exctsccr_mcu_ram) /* Alpha mcu (protection) */
+	AM_RANGE(0x6000, 0x63ff) AM_WRITE(exctsccr_mcu_w) AM_READ(SMH_RAM) AM_BASE(&exctsccr_mcu_ram) /* Alpha mcu (protection) */
 #else
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) AM_BASE(&mcu_shared_ram)
 #endif
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(exctsccr_videoram_w) AM_READ(MRA8_RAM) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(exctsccr_colorram_w) AM_READ(MRA8_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(MWA8_RAM) AM_READ(MRA8_RAM) AM_BASE(&spriteram_2) /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(MWA8_NOP) /* ??? */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(exctsccr_videoram_w) AM_READ(SMH_RAM) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(exctsccr_colorram_w) AM_READ(SMH_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_WRITE(SMH_RAM) AM_READ(SMH_RAM) AM_BASE(&spriteram_2) /* ??? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) AM_READ(input_port_0_r)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(SMH_NOP) /* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(exctsccr_gfx_bank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w) /* Cocktail mode ( 0xff = flip screen, 0x00 = normal ) */
 	/* 0xa006 MCU control */
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(cexctsccr_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(MWA8_NOP) /* This is also MCU control, but i dont need it */
-	AM_RANGE(0xa040, 0xa06f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) /* Sprite pos */
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP) /* This is also MCU control, but i dont need it */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) /* Sprite pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc008, 0xc009) AM_WRITE(exctsccr_DAC_data_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_w) /* used to clear the latch */
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_r)
-	AM_RANGE(0xc00f, 0xc00f) AM_WRITE(MWA8_NOP) /* ??? */
+	AM_RANGE(0xc00f, 0xc00f) AM_WRITE(SMH_NOP) /* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -190,10 +190,10 @@ ADDRESS_MAP_END
 
 /* Bootleg */
 static ADDRESS_MAP_START( bl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8400, 0x87ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8800, 0x8fff) AM_READ(MRA8_RAM) /* ??? */
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8400, 0x87ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8800, 0x8fff) AM_READ(SMH_RAM) /* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa040, 0xa040) AM_READ(input_port_1_r)
 	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_3_r)
@@ -201,35 +201,35 @@ static ADDRESS_MAP_START( bl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bl_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(exctsccr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_WRITE(exctsccr_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2) /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(MWA8_NOP) /* ??? */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(MWA8_NOP) /* ??? */
+	AM_RANGE(0x8800, 0x8fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2) /* ??? */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) /* ??? */
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(SMH_NOP) /* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(exctsccr_gfx_bank_w) /* ??? */
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w) /* Cocktail mode ( 0xff = flip screen, 0x00 = normal ) */
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(MWA8_NOP) /* no MCU, but some leftover code still writes here */
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(MWA8_NOP) /* no MCU, but some leftover code still writes here */
-	AM_RANGE(0xa040, 0xa06f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) /* Sprite Pos */
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(SMH_NOP) /* no MCU, but some leftover code still writes here */
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP) /* no MCU, but some leftover code still writes here */
+	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) /* Sprite Pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bl_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe3ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bl_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(MWA8_NOP) /* 0 = DAC sound off, 1 = DAC sound on */
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP) /* 0 = DAC sound off, 1 = DAC sound on */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w) /* used to clear the latch */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exctsccr_DAC_data_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )

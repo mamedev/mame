@@ -78,45 +78,45 @@ static READ8_HANDLER( pcktgal_adpcm_reset_r )
 /***************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
 	AM_RANGE(0x1a00, 0x1a00) AM_READ(input_port_1_r)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(input_port_2_r)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK2)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK2)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0800, 0x0fff) AM_WRITE(pcktgal_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1000, 0x11ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1000, 0x11ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(pcktgal_flipscreen_w)
 	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE(pcktgal_sound_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pcktgal_bank_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /***************************************************************************/
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x3400, 0x3400) AM_READ(pcktgal_adpcm_reset_r)	/* ? not sure */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK3)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK3)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pcktgal_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pcktgal_sound_bank_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /***************************************************************************/

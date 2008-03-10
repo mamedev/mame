@@ -156,16 +156,16 @@ static WRITE16_HANDLER( backup_ram_w )
 static ADDRESS_MAP_START( base_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							    			// ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_BASE(&spriteram16)	// Sprites
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(MRA16_RAM,paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x600000, 0x601fff) AM_READWRITE(MRA16_RAM,realbrk_vram_0_w) AM_BASE(&realbrk_vram_0	)	// Background   (0)
-	AM_RANGE(0x602000, 0x603fff) AM_READWRITE(MRA16_RAM,realbrk_vram_1_w) AM_BASE(&realbrk_vram_1	)	// Background   (1)
-	AM_RANGE(0x604000, 0x604fff) AM_READWRITE(MRA16_RAM,realbrk_vram_2_w) AM_BASE(&realbrk_vram_2	)	// Text         (2)
-	AM_RANGE(0x606000, 0x60600f) AM_READWRITE(MRA16_RAM,realbrk_vregs_w) AM_BASE(&realbrk_vregs 	)	// Scroll + Video Regs
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(SMH_RAM,paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x600000, 0x601fff) AM_READWRITE(SMH_RAM,realbrk_vram_0_w) AM_BASE(&realbrk_vram_0	)	// Background   (0)
+	AM_RANGE(0x602000, 0x603fff) AM_READWRITE(SMH_RAM,realbrk_vram_1_w) AM_BASE(&realbrk_vram_1	)	// Background   (1)
+	AM_RANGE(0x604000, 0x604fff) AM_READWRITE(SMH_RAM,realbrk_vram_2_w) AM_BASE(&realbrk_vram_2	)	// Text         (2)
+	AM_RANGE(0x606000, 0x60600f) AM_READWRITE(SMH_RAM,realbrk_vregs_w) AM_BASE(&realbrk_vregs 	)	// Scroll + Video Regs
 	AM_RANGE(0x605000, 0x61ffff) AM_RAM							               	//
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(YMZ280B_register_0_msb_w			)	// YMZ280
 	AM_RANGE(0x800002, 0x800003) AM_READWRITE(YMZ280B_status_0_msb_r,YMZ280B_data_0_msb_w)	//
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM						                 	// RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(MRA16_RAM,tmp68301_regs_w) AM_BASE(&tmp68301_regs	)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(SMH_RAM,tmp68301_regs_w) AM_BASE(&tmp68301_regs	)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( realbrk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x80000a, 0x80000b) AM_WRITE(YM2413_data_port_0_lsb_w			)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(input_port_0_word_r		)	// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ(input_port_1_word_r		)	// Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,MWA16_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(realbrk_flipscreen_w				)	// Hack! Parallel port data register
 ADDRESS_MAP_END
@@ -192,19 +192,19 @@ static ADDRESS_MAP_START( pkgnshdx_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x800008, 0x800009) AM_WRITE(YM2413_register_port_0_lsb_w		)	// YM2413
 	AM_RANGE(0x80000a, 0x80000b) AM_WRITE(YM2413_data_port_0_lsb_w			)	//
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r		        )	// P1 & P2 (Inputs)
-	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(MWA16_RAM) AM_BASE(&realbrk_dsw_select) // DSW select
+	AM_RANGE(0xc00004, 0xc00005) AM_WRITE(SMH_RAM) AM_BASE(&realbrk_dsw_select) // DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_BASE(&backup_ram)	// RAM
 ADDRESS_MAP_END
 
 /*dai2kaku specific memory map*/
 static ADDRESS_MAP_START( dai2kaku_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x605000, 0x6053ff) AM_READWRITE(MRA16_RAM,MWA16_RAM) AM_BASE(&realbrk_vram_0ras	)	// rasterinfo   (0)
-	AM_RANGE(0x605400, 0x6057ff) AM_READWRITE(MRA16_RAM,MWA16_RAM) AM_BASE(&realbrk_vram_1ras	)	// rasterinfo   (1)
+	AM_RANGE(0x605000, 0x6053ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_0ras	)	// rasterinfo   (0)
+	AM_RANGE(0x605400, 0x6057ff) AM_READWRITE(SMH_RAM,SMH_RAM) AM_BASE(&realbrk_vram_1ras	)	// rasterinfo   (1)
 	AM_RANGE(0x800008, 0x800009) AM_WRITE(YM2413_register_port_0_lsb_w		)	// YM2413
 	AM_RANGE(0x80000a, 0x80000b) AM_WRITE(YM2413_data_port_0_lsb_w			)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(input_port_0_word_r		)	// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ(input_port_1_word_r		)	// Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,MWA16_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(realbrk_dsw_r,SMH_RAM) AM_BASE(&realbrk_dsw_select	)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE(dai2kaku_flipscreen_w				)	// Hack! Parallel port data register
 ADDRESS_MAP_END

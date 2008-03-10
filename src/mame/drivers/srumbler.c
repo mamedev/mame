@@ -67,23 +67,23 @@ static INTERRUPT_GEN( srumbler_interrupt )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_RAM)   /* RAM (of 1 sort or another) */
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_RAM)   /* RAM (of 1 sort or another) */
 	AM_RANGE(0x4008, 0x4008) AM_READ(input_port_0_r)
 	AM_RANGE(0x4009, 0x4009) AM_READ(input_port_1_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(input_port_2_r)
 	AM_RANGE(0x400b, 0x400b) AM_READ(input_port_3_r)
 	AM_RANGE(0x400c, 0x400c) AM_READ(input_port_4_r)
-	AM_RANGE(0x5000, 0x5fff) AM_READ(MRA8_BANK6)	/* Banked ROM */
-	AM_RANGE(0x6000, 0x6fff) AM_READ(MRA8_BANK7)	/* Banked ROM */
-	AM_RANGE(0x7000, 0x7fff) AM_READ(MRA8_BANK8)	/* Banked ROM */
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_BANK9)	/* Banked ROM */
-	AM_RANGE(0x9000, 0x9fff) AM_READ(MRA8_BANK10)	/* Banked ROM */
-	AM_RANGE(0xa000, 0xafff) AM_READ(MRA8_BANK11)	/* Banked ROM */
-	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_BANK12)	/* Banked ROM */
-	AM_RANGE(0xc000, 0xcfff) AM_READ(MRA8_BANK13)	/* Banked ROM */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_BANK14)	/* Banked ROM */
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_BANK15)	/* Banked ROM */
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_BANK16)	/* Banked ROM */
+	AM_RANGE(0x5000, 0x5fff) AM_READ(SMH_BANK6)	/* Banked ROM */
+	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_BANK7)	/* Banked ROM */
+	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_BANK8)	/* Banked ROM */
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_BANK9)	/* Banked ROM */
+	AM_RANGE(0x9000, 0x9fff) AM_READ(SMH_BANK10)	/* Banked ROM */
+	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_BANK11)	/* Banked ROM */
+	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_BANK12)	/* Banked ROM */
+	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_BANK13)	/* Banked ROM */
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_BANK14)	/* Banked ROM */
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_BANK15)	/* Banked ROM */
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_BANK16)	/* Banked ROM */
 ADDRESS_MAP_END
 
 /*
@@ -97,32 +97,32 @@ Ignore the warnings about writing to unmapped memory.
 */
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1dff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x1dff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1e00, 0x1fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(srumbler_background_w) AM_BASE(&srumbler_backgroundram)
 	AM_RANGE(0x4008, 0x4008) AM_WRITE(srumbler_bankswitch_w)
 	AM_RANGE(0x4009, 0x4009) AM_WRITE(srumbler_4009_w)
 	AM_RANGE(0x400a, 0x400d) AM_WRITE(srumbler_scroll_w)
 	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x5000, 0x5fff) AM_WRITE(srumbler_foreground_w) AM_BASE(&srumbler_foregroundram)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_RAM) /* Video RAM 2 ??? (not used) */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_RAM) /* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0x7400, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x7400, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

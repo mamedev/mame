@@ -40,25 +40,25 @@ static READ8_HANDLER( mrdo_SECRE_r )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)	/* video and color RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)	/* video and color RAM */
 	AM_RANGE(0x9803, 0x9803) AM_READ(mrdo_SECRE_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0xa002, 0xa002) AM_READ(input_port_2_r)	/* DSW1 */
 	AM_RANGE(0xa003, 0xa003) AM_READ(input_port_3_r)	/* DSW2 */
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(mrdo_bgvideoram_w) AM_BASE(&mrdo_bgvideoram)
 	AM_RANGE(0x8800, 0x8fff) AM_WRITE(mrdo_fgvideoram_w) AM_BASE(&mrdo_fgvideoram)
-	AM_RANGE(0x9000, 0x90ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9000, 0x90ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
 	AM_RANGE(0x9801, 0x9801) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0x9802, 0x9802) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(mrdo_scrollx_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(mrdo_scrolly_w)
 ADDRESS_MAP_END

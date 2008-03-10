@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(namcos1_bankswitch_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(namcos1_cpu_control_w)
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(namcos1_watchdog_w)
-//  AM_RANGE(0xf400, 0xf400) AM_WRITE(MWA8_NOP) // unknown
+//  AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_NOP) // unknown
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(namcos1_sub_firq_w) // asserts FIRQ on CPU1
@@ -495,9 +495,9 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK(14)
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK(15)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(namcos1_bankswitch_w)
-//  AM_RANGE(0xf000, 0xf000) AM_WRITE(MWA8_NOP) // IO Chip
+//  AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) // IO Chip
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(namcos1_watchdog_w)
-//  AM_RANGE(0xf400, 0xf400) AM_WRITE(MWA8_NOP) // ?
+//  AM_RANGE(0xf400, 0xf400) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK(16)
@@ -538,7 +538,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(HD63701_PORT1, HD63701_PORT1) AM_READ_PORT("COIN") AM_WRITE(namcos1_coin_w)
-	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(MRA8_NOP, namcos1_dac_gain_w)
+	AM_RANGE(HD63701_PORT2, HD63701_PORT2) AM_READWRITE(SMH_NOP, namcos1_dac_gain_w)
 ADDRESS_MAP_END
 
 

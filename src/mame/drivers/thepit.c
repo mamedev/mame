@@ -163,18 +163,18 @@ static WRITE8_HANDLER( thepit_sound_enable_w )
 static ADDRESS_MAP_START( thepit_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, thepit_colorram_w) AM_BASE(&thepit_colorram)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, thepit_videoram_w) AM_BASE(&thepit_videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, thepit_colorram_w) AM_BASE(&thepit_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, thepit_videoram_w) AM_BASE(&thepit_videoram)
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&thepit_spriteram) AM_SIZE(&thepit_spriteram_size)
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(thepit_input_port_0_r, MWA8_NOP) // Not hooked up according to the schematics
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(thepit_input_port_0_r, SMH_NOP) // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, interrupt_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(MWA8_NOP) // Unused, but initialized
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(MWA8_NOP) // coin_lockout_w
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(SMH_NOP) // Unused, but initialized
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP) // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
-	AM_RANGE(0xb004, 0xb005) AM_WRITE(MWA8_NOP) // Unused, but initialized
+	AM_RANGE(0xb004, 0xb005) AM_WRITE(SMH_NOP) // Unused, but initialized
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
@@ -184,18 +184,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( intrepid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, thepit_videoram_w) AM_BASE(&thepit_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(MRA8_RAM, thepit_colorram_w) AM_BASE(&thepit_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, thepit_videoram_w) AM_BASE(&thepit_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(SMH_RAM, thepit_colorram_w) AM_BASE(&thepit_colorram)
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&thepit_spriteram) AM_SIZE(&thepit_spriteram_size)
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(input_port_2_r, interrupt_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(MWA8_NOP) // Unused, but initialized
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(MWA8_NOP) // coin_lockout_w
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(SMH_NOP) // Unused, but initialized
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(SMH_NOP) // coin_lockout_w
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(MWA8_NOP) // Unused, but initialized
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(SMH_NOP) // Unused, but initialized
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)

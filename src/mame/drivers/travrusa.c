@@ -67,10 +67,10 @@ VIDEO_UPDATE( shtrider );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(MRA8_RAM, travrusa_videoram_w) AM_BASE(&travrusa_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(SMH_RAM, travrusa_videoram_w) AM_BASE(&travrusa_videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
 	AM_RANGE(0xd000, 0xd000) AM_READ(input_port_0_r)	/* IN0 */

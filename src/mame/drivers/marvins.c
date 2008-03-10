@@ -170,21 +170,21 @@ static ADDRESS_MAP_START( marvins_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8300, 0x8300) AM_WRITE(sound_command_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ(input_port_3_r)		/* dipswitch#1 */
 	AM_RANGE(0x8500, 0x8500) AM_READ(input_port_4_r)		/* dipswitch#2 */
-	AM_RANGE(0x8600, 0x8600) AM_WRITE(MWA8_RAM)	// video attribute
+	AM_RANGE(0x8600, 0x8600) AM_WRITE(SMH_RAM)	// video attribute
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(MRA8_RAM, marvins_foreground_ram_w) AM_SHARE(3) AM_BASE(&spriteram_2)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(MRA8_RAM, marvins_text_ram_w) AM_SHARE(4) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(SMH_RAM, marvins_foreground_ram_w) AM_SHARE(3) AM_BASE(&spriteram_2)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(SMH_RAM, marvins_text_ram_w) AM_SHARE(4) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marvins_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, marvins_background_ram_w) AM_SHARE(2)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(MRA8_RAM, marvins_foreground_ram_w) AM_SHARE(3)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(MRA8_RAM, marvins_text_ram_w) AM_SHARE(4)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, marvins_background_ram_w) AM_SHARE(2)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(SMH_RAM, marvins_foreground_ram_w) AM_SHARE(3)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(SMH_RAM, marvins_text_ram_w) AM_SHARE(4)
 ADDRESS_MAP_END
 
 
@@ -196,24 +196,24 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8300, 0x8300) AM_WRITE(sound_command_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ(input_port_3_r)		/* dipswitch#1 */
 	AM_RANGE(0x8500, 0x8500) AM_READ(input_port_4_r)		/* dipswitch#2 */
-	AM_RANGE(0x8600, 0x86ff) AM_WRITE(MWA8_RAM)	// video attribute
+	AM_RANGE(0x8600, 0x86ff) AM_WRITE(SMH_RAM)	// video attribute
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 //  AM_RANGE(0xc800, 0xc800) AM_WRITE(marvins_palette_bank_w)   // palette bank switch (c8f1 for Vanguard)
 	AM_RANGE(0xc800, 0xc8ff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(MRA8_RAM, marvins_foreground_ram_w) AM_SHARE(3) AM_BASE(&spriteram_2)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(MRA8_RAM, marvins_text_ram_w) AM_SHARE(4) AM_BASE(&videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(SMH_RAM, marvins_foreground_ram_w) AM_SHARE(3) AM_BASE(&spriteram_2)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(SMH_RAM, marvins_text_ram_w) AM_SHARE(4) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( madcrash_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8700, 0x8700) AM_WRITE(snk_cpuB_nmi_ack_w)	/* Vangaurd II */
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)	/* Mad Crasher */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(MRA8_RAM, marvins_foreground_ram_w) AM_SHARE(3)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(MRA8_RAM, marvins_text_ram_w) AM_SHARE(4)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_RAM, marvins_foreground_ram_w) AM_SHARE(3)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, marvins_text_ram_w) AM_SHARE(4)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(MRA8_RAM, marvins_background_ram_w) AM_SHARE(2)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(SMH_RAM, marvins_background_ram_w) AM_SHARE(2)
 ADDRESS_MAP_END
 
 

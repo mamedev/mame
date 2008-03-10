@@ -296,8 +296,8 @@ static WRITE8_HANDLER( flip_screen_w )
 
 
 static ADDRESS_MAP_START( panic_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x6800, 0x6800) AM_READ(input_port_0_r) /* IN1 */
 	AM_RANGE(0x6801, 0x6801) AM_READ(input_port_1_r) /* IN2 */
 	AM_RANGE(0x6802, 0x6802) AM_READ(input_port_2_r) /* DSW */
@@ -305,9 +305,9 @@ static ADDRESS_MAP_START( panic_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( panic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x7000, 0x700b) AM_WRITE(panic_sound_output_w)
 	AM_RANGE(0x700c, 0x700e) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
@@ -316,8 +316,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cosmica_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x6800, 0x6800) AM_READ(input_port_0_r) /* IN1 */
 	AM_RANGE(0x6801, 0x6801) AM_READ(input_port_1_r) /* IN2 */
 	AM_RANGE(0x6802, 0x6802) AM_READ(input_port_2_r) /* DSW */
@@ -325,22 +325,22 @@ static ADDRESS_MAP_START( cosmica_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmica_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x700c, 0x700d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cosmicg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_readport, ADDRESS_SPACE_IO, 8 )
@@ -355,22 +355,22 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( magspot_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ(input_port_1_r)
 	AM_RANGE(0x5002, 0x5002) AM_READ(input_port_2_r)
 	AM_RANGE(0x5003, 0x5003) AM_READ(input_port_3_r)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magspot_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x401f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x401f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(DAC_0_data_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
 
@@ -1485,7 +1485,7 @@ static DRIVER_INIT( devzone )
 static DRIVER_INIT( nomnlnd )
 {
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, MWA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, SMH_NOP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x480a, 0x480a, 0, 0, DAC_0_data_w);
 }

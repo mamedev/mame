@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( fantland_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
-	AM_RANGE( 0xa2000, 0xa21ff ) AM_READWRITE( MRA16_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0xa2000, 0xa21ff ) AM_READWRITE( SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE( &paletteram16 )
 
 	AM_RANGE( 0xa3000, 0xa3001 ) AM_READWRITE( input_port_0_word_r, fantland_nmi_enable_16_w )
 	AM_RANGE( 0xa3002, 0xa3003 ) AM_READWRITE( input_port_1_word_r, fantland_soundlatch_16_w )
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( galaxygn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
+	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
 
 	AM_RANGE( 0x53000, 0x53000 ) AM_READWRITE( input_port_0_r, fantland_nmi_enable_w )
 	AM_RANGE( 0x53001, 0x53001 ) AM_READ( input_port_1_r )
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( borntofi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
+	AM_RANGE( 0x52000, 0x521ff ) AM_READWRITE( SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE( &paletteram )
 	AM_RANGE( 0x53000, 0x53001 ) AM_READWRITE( borntofi_inputs_r, borntofi_nmi_enable_w )
 	AM_RANGE( 0x53002, 0x53002 ) AM_READWRITE( input_port_6_r,    fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ( input_port_7_r )
@@ -248,12 +248,12 @@ static ADDRESS_MAP_START( wheelrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
 	AM_RANGE(0x70000, 0x7ffff) AM_ROM
 
-	AM_RANGE(0x52000, 0x521ff) AM_READWRITE(MRA8_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
+	AM_RANGE(0x52000, 0x521ff) AM_READWRITE(SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
 
 	AM_RANGE(0x53000, 0x53000) AM_READWRITE( input_port_0_r, borntofi_nmi_enable_w )
 	AM_RANGE(0x53001, 0x53001) AM_READ( input_port_1_r )
 	AM_RANGE(0x53002, 0x53002) AM_READWRITE( input_port_2_r, fantland_soundlatch_w )
-	AM_RANGE(0x53003, 0x53003) AM_READWRITE( input_port_3_r, MWA8_NOP)
+	AM_RANGE(0x53003, 0x53003) AM_READWRITE( input_port_3_r, SMH_NOP)
 
 	AM_RANGE(0x54000, 0x567ff) AM_RAM AM_BASE(&spriteram	)
 	AM_RANGE(0x60000, 0x6ffff) AM_RAM AM_BASE(&spriteram_2	)
@@ -387,8 +387,8 @@ static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE( YM3526_status_port_0_r, YM3526_control_port_0_w )
 	AM_RANGE(0xa001, 0xa001) AM_WRITE( YM3526_write_port_0_w )
 
-	AM_RANGE(0xb000, 0xb000) AM_WRITE( MWA8_NOP )	// on a car crash / hit
-	AM_RANGE(0xc000, 0xc000) AM_WRITE( MWA8_NOP )	// ""
+	AM_RANGE(0xb000, 0xb000) AM_WRITE( SMH_NOP )	// on a car crash / hit
+	AM_RANGE(0xc000, 0xc000) AM_WRITE( SMH_NOP )	// ""
 
 	AM_RANGE(0xd000, 0xd000) AM_READ( soundlatch_r )	// during NMI
 ADDRESS_MAP_END

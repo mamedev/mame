@@ -87,33 +87,33 @@ static READ8_HANDLER( powerinb_fake_ym2203_r )
 
 
 static ADDRESS_MAP_START( powerins_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM				)	// ROM
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ(input_port_0_word_r		)	// Coins + Start Buttons
 	AM_RANGE(0x100002, 0x100003) AM_READ(input_port_1_word_r		)	// P1 + P2
 	AM_RANGE(0x100008, 0x100009) AM_READ(input_port_2_word_r		)	// DSW 1
 	AM_RANGE(0x10000a, 0x10000b) AM_READ(input_port_3_word_r		)	// DSW 2
 	AM_RANGE(0x10003e, 0x10003f) AM_READ(OKIM6295_status_0_lsb_r	)	// OKI Status (used by powerina)
-	AM_RANGE(0x120000, 0x120fff) AM_READ(MRA16_RAM				)	// Palette
-	AM_RANGE(0x130000, 0x130007) AM_READ(MRA16_RAM				)	// VRAM 0 Control
-	AM_RANGE(0x140000, 0x143fff) AM_READ(MRA16_RAM				)	// VRAM 0
-	AM_RANGE(0x170000, 0x170fff) AM_READ(MRA16_RAM				)	// VRAM 1
-	AM_RANGE(0x180000, 0x18ffff) AM_READ(MRA16_RAM				)	// RAM + Sprites
+	AM_RANGE(0x120000, 0x120fff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0x130000, 0x130007) AM_READ(SMH_RAM				)	// VRAM 0 Control
+	AM_RANGE(0x140000, 0x143fff) AM_READ(SMH_RAM				)	// VRAM 0
+	AM_RANGE(0x170000, 0x170fff) AM_READ(SMH_RAM				)	// VRAM 1
+	AM_RANGE(0x180000, 0x18ffff) AM_READ(SMH_RAM				)	// RAM + Sprites
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerins_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM								)	// ROM
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM								)	// ROM
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(powerins_flipscreen_w					)	// Flip Screen
-	AM_RANGE(0x100016, 0x100017) AM_WRITE(MWA16_NOP								)	// ? always 1
+	AM_RANGE(0x100016, 0x100017) AM_WRITE(SMH_NOP								)	// ? always 1
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(powerins_tilebank_w						)	// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w					)	// Sound Latch
 	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w						)	// Sound
 	AM_RANGE(0x10003e, 0x10003f) AM_WRITE(OKIM6295_data_0_lsb_w					)	// used by powerina
 	AM_RANGE(0x120000, 0x120fff) AM_WRITE(powerins_paletteram16_w) AM_BASE(&paletteram16	)	// Palette
-	AM_RANGE(0x130000, 0x130007) AM_WRITE(MWA16_RAM) AM_BASE(&powerins_vctrl_0			)	// VRAM 0 Control
+	AM_RANGE(0x130000, 0x130007) AM_WRITE(SMH_RAM) AM_BASE(&powerins_vctrl_0			)	// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_WRITE(powerins_vram_0_w) AM_BASE(&powerins_vram_0		)	// VRAM 0
 	AM_RANGE(0x170000, 0x170fff) AM_WRITE(powerins_vram_1_w) AM_BASE(&powerins_vram_1		)	// VRAM 1
 	AM_RANGE(0x171000, 0x171fff) AM_WRITE(powerins_vram_1_w						)	// Mirror of VRAM 1?
-	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16					)	// RAM + Sprites
+	AM_RANGE(0x180000, 0x18ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16					)	// RAM + Sprites
 ADDRESS_MAP_END
 
 /* In powerina there is a hidden test mode screen because it's a bootleg
@@ -121,16 +121,16 @@ ADDRESS_MAP_END
    data written to $10001e "sound code". */
 
 static ADDRESS_MAP_START( readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
-//  AM_RANGE(0xe000, 0xe000) AM_WRITE(MWA8_NOP) // ? written only once ?
-//  AM_RANGE(0xe001, 0xe001) AM_WRITE(MWA8_NOP) // ?
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
+//  AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP) // ? written only once ?
+//  AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) // ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerins_io_snd, ADDRESS_SPACE_IO, 8 )
@@ -144,7 +144,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerinb_io_snd, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(powerinb_fake_ym2203_r, MWA8_NOP)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(powerinb_fake_ym2203_r, SMH_NOP)
 	AM_RANGE(0x01, 0x01) AM_NOP
 	AM_RANGE(0x80, 0x80) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
 	AM_RANGE(0x88, 0x88) AM_READWRITE(OKIM6295_status_1_r, OKIM6295_data_1_w)

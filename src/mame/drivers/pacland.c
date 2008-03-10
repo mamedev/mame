@@ -247,17 +247,17 @@ static WRITE8_HANDLER( pacland_irq_2_ctrl_w )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(MRA8_RAM, pacland_videoram_w) AM_BASE(&pacland_videoram)
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(MRA8_RAM, pacland_videoram2_w) AM_BASE(&pacland_videoram2)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_RAM, pacland_videoram_w) AM_BASE(&pacland_videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(SMH_RAM, pacland_videoram2_w) AM_BASE(&pacland_videoram2)
 	AM_RANGE(0x2000, 0x37ff) AM_RAM AM_BASE(&pacland_spriteram)
 	AM_RANGE(0x3800, 0x3801) AM_WRITE(pacland_scroll0_w)
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(pacland_scroll1_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(pacland_bankswitch_w)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x6800, 0x6bff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w)		/* PSG device, shared RAM */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(pacland_irq_1_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(pacland_subreset_w)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(pacland_flipscreen_w)
 ADDRESS_MAP_END
@@ -268,10 +268,10 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w) AM_BASE(&namco_wavedata)		/* PSG device, shared RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)		/* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(pacland_irq_2_ctrl_w)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd003) AM_READ(pacland_input_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 

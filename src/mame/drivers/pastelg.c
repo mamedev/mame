@@ -58,13 +58,13 @@ static READ8_HANDLER( pastelg_sndrom_r )
 
 
 static ADDRESS_MAP_START( readmem_pastelg, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_pastelg, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
 ADDRESS_MAP_END
 
 
@@ -76,13 +76,13 @@ static ADDRESS_MAP_START( readport_pastelg, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(MRA8_NOP)					// unknown
+	AM_RANGE(0xd0, 0xd0) AM_READ(SMH_NOP)					// unknown
 	AM_RANGE(0xe0, 0xe0) AM_READ(input_port_2_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_pastelg, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)
+//  AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x82, 0x82) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x90, 0x96) AM_WRITE(pastelg_blitter_w)

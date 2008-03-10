@@ -449,7 +449,7 @@ DRIVER_INIT( mktunit )
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x1b00000, 0x1b6ffff, 0, 0, mk_prot_w);
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfb9c, 0xfbc6, 0, 0, MRA8_BANK9, MWA8_BANK9);
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfb9c, 0xfbc6, 0, 0, SMH_BANK9, SMH_BANK9);
 	memory_set_bankptr(9, auto_malloc(0x80));
 }
 
@@ -476,9 +476,9 @@ static void init_nbajam_common(int te_protection)
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfbaa, 0xfbd4, 0, 0, MRA8_BANK9, MWA8_BANK9);
+		memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfbaa, 0xfbd4, 0, 0, SMH_BANK9, SMH_BANK9);
 	else
-		memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfbec, 0xfc16, 0, 0, MRA8_BANK9, MWA8_BANK9);
+		memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfbec, 0xfc16, 0, 0, SMH_BANK9, SMH_BANK9);
 	memory_set_bankptr(9, auto_malloc(0x80));
 }
 
@@ -498,14 +498,14 @@ DRIVER_INIT( jdreddp )
 	init_tunit_generic(SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d81060, 0x01d8107f, 0, 0, MWA16_NOP);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d81060, 0x01d8107f, 0, 0, SMH_NOP);
 
 	/* protection */
 	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_r);
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_w);
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfbcf, 0xfbf9, 0, 0, MRA8_BANK7, MWA8_BANK9);
+	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xfbcf, 0xfbf9, 0, 0, SMH_BANK7, SMH_BANK9);
 	memory_set_bankptr(9, auto_malloc(0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS

@@ -65,9 +65,9 @@
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, m57_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, m57_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&m57_scroll)
-	AM_RANGE(0xc820, 0xc8ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xc820, 0xc8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")

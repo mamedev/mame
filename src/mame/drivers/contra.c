@@ -75,10 +75,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0015, 0x0015) AM_READ(input_port_4_r)		/* DIPSW2 */
 	AM_RANGE(0x0016, 0x0016) AM_READ(input_port_5_r)		/* DIPSW3 */
 
-	AM_RANGE(0x0c00, 0x0cff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x1000, 0x5fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0c00, 0x0cff) AM_READ(SMH_RAM)
+	AM_RANGE(0x1000, 0x5fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -86,37 +86,37 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0018, 0x0018) AM_WRITE(contra_coin_counter_w)
 	AM_RANGE(0x001a, 0x001a) AM_WRITE(contra_sh_irqtrigger_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(cpu_sound_command_w)
-	AM_RANGE(0x001e, 0x001e) AM_WRITE(MWA8_NOP)	/* ? */
+	AM_RANGE(0x001e, 0x001e) AM_WRITE(SMH_NOP)	/* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE(contra_K007121_ctrl_1_w)
-	AM_RANGE(0x0c00, 0x0cff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0c00, 0x0cff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE(&contra_fg_cram)
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE(&contra_fg_vram)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE(&contra_text_cram)
 	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_BASE(&contra_text_vram)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)/* 2nd bank is at 0x5000 */
-	AM_RANGE(0x3800, 0x3fff) AM_WRITE(MWA8_RAM) // second sprite buffer
+	AM_RANGE(0x3000, 0x37ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)/* 2nd bank is at 0x5000 */
+	AM_RANGE(0x3800, 0x3fff) AM_WRITE(SMH_RAM) // second sprite buffer
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE(&contra_bg_cram)
 	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE(&contra_bg_vram)
-	AM_RANGE(0x4800, 0x5fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4800, 0x5fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_ROM)
  	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
-	AM_RANGE(0x7001, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x7001, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(MWA8_NOP) /* read triggers irq reset and latch read (in the hardware only). */
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_NOP) /* read triggers irq reset and latch read (in the hardware only). */
+	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

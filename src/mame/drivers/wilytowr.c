@@ -253,9 +253,9 @@ static WRITE8_HANDLER( p2_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_0_r)
 	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_1_r)
 	AM_RANGE(0xf802, 0xf802) AM_READ(input_port_2_r)
@@ -263,11 +263,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe200, 0xe2ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe300, 0xe3ff) AM_WRITE(MWA8_RAM) AM_BASE(&wilytowr_scrollram)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xe200, 0xe2ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe300, 0xe3ff) AM_WRITE(SMH_RAM) AM_BASE(&wilytowr_scrollram)
 	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(wilytowr_videoram2_w) AM_BASE(&wilytowr_videoram2)
 	AM_RANGE(0xe800, 0xebff) AM_WRITE(wilytowr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xec00, 0xefff) AM_WRITE(wilytowr_colorram_w) AM_BASE(&colorram)
@@ -287,9 +287,9 @@ static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
 	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE(&wilytowr_scrollram)
-	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(MRA8_RAM, wilytowr_videoram2_w) AM_BASE(&wilytowr_videoram2)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(MRA8_RAM, wilytowr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(MRA8_RAM, wilytowr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(SMH_RAM, wilytowr_videoram2_w) AM_BASE(&wilytowr_videoram2)
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, wilytowr_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_READWRITE(SMH_RAM, wilytowr_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xf000, 0xf000) AM_READNOP //sound status
 	AM_RANGE(0xf001, 0xf001) AM_READ(input_port_0_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ(input_port_1_r)
@@ -308,11 +308,11 @@ static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )

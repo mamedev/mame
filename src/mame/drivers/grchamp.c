@@ -543,9 +543,9 @@ ADDRESS_MAP_END
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(MRA8_RAM, grchamp_left_w) AM_BASE_MEMBER(grchamp_state, leftram)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(MRA8_RAM, grchamp_right_w) AM_BASE_MEMBER(grchamp_state, rightram)
-	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(MRA8_RAM, grchamp_center_w) AM_BASE_MEMBER(grchamp_state, centerram)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(SMH_RAM, grchamp_left_w) AM_BASE_MEMBER(grchamp_state, leftram)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(SMH_RAM, grchamp_right_w) AM_BASE_MEMBER(grchamp_state, rightram)
+	AM_RANGE(0x3000, 0x37ff) AM_READWRITE(SMH_RAM, grchamp_center_w) AM_BASE_MEMBER(grchamp_state, centerram)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END

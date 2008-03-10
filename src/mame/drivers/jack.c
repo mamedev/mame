@@ -139,9 +139,9 @@ static READ8_HANDLER( striv_question_r )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xb000, 0xb07f) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xb000, 0xb07f) AM_READ(SMH_RAM)
 	AM_RANGE(0xb500, 0xb500) AM_READ(input_port_0_r)
 	AM_RANGE(0xb501, 0xb501) AM_READ(input_port_1_r)
 	AM_RANGE(0xb502, 0xb502) AM_READ(input_port_2_r)
@@ -149,20 +149,20 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb504, 0xb504) AM_READ(input_port_4_r)
 	AM_RANGE(0xb505, 0xb505) AM_READ(input_port_5_r)
 	AM_RANGE(0xb506, 0xb507) AM_READ(jack_flipscreen_r)
-	AM_RANGE(0xb800, 0xbfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0xb800, 0xbfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x5fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xb000, 0xb07f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xb000, 0xb07f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(jack_sh_command_w)
 	AM_RANGE(0xb506, 0xb507) AM_WRITE(jack_flipscreen_w)
 	AM_RANGE(0xb600, 0xb61f) AM_WRITE(jack_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xb800, 0xbbff) AM_WRITE(jack_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xbc00, 0xbfff) AM_WRITE(jack_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( joinem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -183,14 +183,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(MWA8_NOP)  /* R/C filter ??? */
+	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_NOP)  /* R/C filter ??? */
 ADDRESS_MAP_END
 
 
@@ -1458,7 +1458,7 @@ static DRIVER_INIT( striv )
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, striv_question_r);
 
 	// Nop out unused sprites writes
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, MWA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, SMH_NOP);
 
 	timer_rate = 128;
 }

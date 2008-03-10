@@ -91,40 +91,40 @@ static WRITE8_HANDLER( shared_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)  /* banked roms */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)  /* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_READ(shared_r)   /* shared with sound cpu */
-	AM_RANGE(0xe800, 0xe8ff) AM_READ(MRA8_RAM)    /* protection ram */
-	AM_RANGE(0xe900, 0xefff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xe800, 0xe8ff) AM_READ(SMH_RAM)    /* protection ram */
+	AM_RANGE(0xe900, 0xefff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf010, 0xf010) AM_READ(input_port_5_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(MRA8_RAM)    /* communication ram - to connect 4 players's subboard */
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)    /* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xe7ff) AM_WRITE(shared_w) AM_BASE(&shared)  /* shared with sound cpu */
-	AM_RANGE(0xc000, 0xd4ff) AM_WRITE(MWA8_RAM) AM_BASE(&mexico86_videoram) //AT: corrected size
-	AM_RANGE(0xd500, 0xd7ff) AM_WRITE(MWA8_RAM) AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
-	AM_RANGE(0xe800, 0xe8ff) AM_WRITE(MWA8_RAM) AM_BASE(&mexico86_protection_ram)  /* shared with mcu */
-	AM_RANGE(0xe900, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xd4ff) AM_WRITE(SMH_RAM) AM_BASE(&mexico86_videoram) //AT: corrected size
+	AM_RANGE(0xd500, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&mexico86_objectram) AM_SIZE(&mexico86_objectram_size)
+	AM_RANGE(0xe800, 0xe8ff) AM_WRITE(SMH_RAM) AM_BASE(&mexico86_protection_ram)  /* shared with mcu */
+	AM_RANGE(0xe900, 0xefff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)  /* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)    /* cpu reset lines + other unknown stuff */
-	AM_RANGE(0xf018, 0xf018) AM_WRITE(MWA8_NOP)    // watchdog_reset_w },
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(MWA8_RAM)    /* communication ram */
+	AM_RANGE(0xf018, 0xf018) AM_WRITE(SMH_NOP)    // watchdog_reset_w },
+	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)    /* communication ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xa7ff) AM_READ(shared_r)
-	AM_RANGE(0xa800, 0xbfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xa800, 0xbfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_READ(kiki_2203_r) //AT
 	AM_RANGE(0xc001, 0xc001) AM_READ(YM2203_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0xa7ff) AM_WRITE(shared_w)
-	AM_RANGE(0xa800, 0xbfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xa800, 0xbfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2203_write_port_0_w)
 ADDRESS_MAP_END
@@ -134,8 +134,8 @@ static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(mexico86_68705_portA_r)
 	AM_RANGE(0x0001, 0x0001) AM_READ(mexico86_68705_portB_r)
 	AM_RANGE(0x0002, 0x0002) AM_READ(input_port_0_r) /* COIN */
-	AM_RANGE(0x0010, 0x007f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -144,10 +144,10 @@ static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(mexico86_68705_portB_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddrB_w)
-	AM_RANGE(0x000a, 0x000a) AM_WRITE(MWA8_NOP)    /* looks like a bug in the code, writes to */
+	AM_RANGE(0x000a, 0x000a) AM_WRITE(SMH_NOP)    /* looks like a bug in the code, writes to */
 									/* 0x0a (=10dec) instead of 0x10 */
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )

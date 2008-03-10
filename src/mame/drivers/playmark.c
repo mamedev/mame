@@ -278,9 +278,9 @@ static ADDRESS_MAP_START( bigtwin_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x304000, 0x304001) AM_NOP				/* watchdog? irq ack? */
 	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x500000, 0x500fff) AM_WRITE(wbeachvl_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
-	AM_RANGE(0x501000, 0x501fff) AM_WRITE(MWA16_NOP)	/* unused RAM? */
+	AM_RANGE(0x501000, 0x501fff) AM_WRITE(SMH_NOP)	/* unused RAM? */
 	AM_RANGE(0x502000, 0x503fff) AM_WRITE(wbeachvl_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
-	AM_RANGE(0x504000, 0x50ffff) AM_WRITE(MWA16_NOP)	/* unused RAM? */
+	AM_RANGE(0x504000, 0x50ffff) AM_WRITE(SMH_NOP)	/* unused RAM? */
 	AM_RANGE(0x510000, 0x51000b) AM_WRITE(bigtwin_scroll_w)
 	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP	/* always 3? */
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM AM_BASE(&bigtwin_bgvideoram)
@@ -299,9 +299,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wbeachvl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(MRA16_RAM, wbeachvl_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
-	AM_RANGE(0x504000, 0x505fff) AM_READWRITE(MRA16_RAM, wbeachvl_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
-	AM_RANGE(0x508000, 0x509fff) AM_READWRITE(MRA16_RAM, wbeachvl_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
+	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(SMH_RAM, wbeachvl_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
+	AM_RANGE(0x504000, 0x505fff) AM_READWRITE(SMH_RAM, wbeachvl_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
+	AM_RANGE(0x508000, 0x509fff) AM_READWRITE(SMH_RAM, wbeachvl_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
 	AM_RANGE(0x50f000, 0x50ffff) AM_RAM AM_BASE(&wbeachvl_rowscroll)
 	AM_RANGE(0x510000, 0x51000b) AM_WRITE(wbeachvl_scroll_w)
 	AM_RANGE(0x51000c, 0x51000d) AM_WRITENOP	/* 2 and 3 */
@@ -313,7 +313,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x710018, 0x710019) AM_READ(input_port_3_word_r)
 	AM_RANGE(0x71001a, 0x71001b) AM_READ(input_port_4_word_r)
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ(playmark_snd_status???)
-//  AM_RANGE(0x71001e, 0x71001f) AM_WRITE(MWA16_NOP)//playmark_snd_command_w },
+//  AM_RANGE(0x71001e, 0x71001f) AM_WRITE(SMH_NOP)//playmark_snd_command_w },
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -340,9 +340,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotmind_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(MRA16_RAM, hrdtimes_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(MRA16_RAM, hrdtimes_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
-	AM_RANGE(0x108000, 0x10ffff) AM_READWRITE(MRA16_RAM, hrdtimes_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
+	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, hrdtimes_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(SMH_RAM, hrdtimes_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
+	AM_RANGE(0x108000, 0x10ffff) AM_READWRITE(SMH_RAM, hrdtimes_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_WRITE(bigtwin_paletteram_w) AM_BASE(&paletteram16)
@@ -360,9 +360,9 @@ static ADDRESS_MAP_START( hrdtimes_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION(REGION_CPU1, 0x0c0000)
-	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(MRA16_RAM, hrdtimes_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(MRA16_RAM, hrdtimes_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
-	AM_RANGE(0x108000, 0x10ffff) AM_READWRITE(MRA16_RAM, hrdtimes_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
+	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, hrdtimes_bgvideoram_w) AM_BASE(&wbeachvl_videoram3)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(SMH_RAM, hrdtimes_fgvideoram_w) AM_BASE(&wbeachvl_videoram2)
+	AM_RANGE(0x108000, 0x10ffff) AM_READWRITE(SMH_RAM, hrdtimes_txvideoram_w) AM_BASE(&wbeachvl_videoram1)
 	AM_RANGE(0x110000, 0x11000d) AM_WRITE(hrdtimes_scroll_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_WRITE(bigtwin_paletteram_w) AM_BASE(&paletteram16)

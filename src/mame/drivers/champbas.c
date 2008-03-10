@@ -121,8 +121,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM
 
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(champbas_videoram_w) AM_READ(MRA8_RAM) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(champbas_colorram_w) AM_READ(MRA8_RAM) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITE(champbas_videoram_w) AM_READ(SMH_RAM) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITE(champbas_colorram_w) AM_READ(SMH_RAM) AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w) AM_READ(input_port_0_r)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa005, 0xa005) AM_NOP
 
 	AM_RANGE(0xa040, 0xa040)                            AM_READ(input_port_1_r)
-	AM_RANGE(0xa060, 0xa06f) AM_WRITE(MWA8_RAM)                                   AM_BASE(&spriteram_2)
+	AM_RANGE(0xa060, 0xa06f) AM_WRITE(SMH_RAM)                                   AM_BASE(&spriteram_2)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)     AM_READ(input_port_2_r)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w) AM_READ(input_port_3_r)
@@ -150,11 +150,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe3ff) AM_READ(MRA8_RAM)
-/*  AM_RANGE(0x8000, 0x8000) AM_WRITE(MWA8_NOP) return low 4bit to main CPU */
+	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM)
+/*  AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP) return low 4bit to main CPU */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(champbas_dac_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )

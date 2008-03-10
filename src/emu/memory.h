@@ -128,396 +128,63 @@ struct _data_accessors
     declared within each driver.
 ***************************************************************************/
 
-/* ----- definitions for the extended flags in the address maps ----- */
-#define AMEF_SPECIFIES_SPACE	0x00000001				/* set if the address space is specified */
-#define AMEF_SPECIFIES_ABITS	0x00000002				/* set if the number of address space bits is specified */
-#define AMEF_SPECIFIES_DBITS	0x00000004				/* set if the databus width is specified */
-#define AMEF_SPECIFIES_UNMAP	0x00000008				/* set if the unmap value is specified */
-
-/* ----- definitions for specifying the address space in the extended flags ----- */
-#define AMEF_SPACE_SHIFT		8						/* shift to get at the address space */
-#define AMEF_SPACE_MASK			(0x0f << AMEF_SPACE_SHIFT) /* mask to get at the address space */
-#define AMEF_SPACE(x)			(((x) << AMEF_SPACE_SHIFT) | AMEF_SPECIFIES_SPACE) /* specifies a given address space */
-
-/* ----- definitions for specifying the address bus width in the extended flags ----- */
-#define AMEF_ABITS_SHIFT		12						/* shift to get the address bits count */
-#define AMEF_ABITS_MASK			(0x3f << AMEF_ABITS_SHIFT) /* mask to get at the address bits count */
-#define AMEF_ABITS(n)			(((n) << AMEF_ABITS_SHIFT) | AMEF_SPECIFIES_ABITS) /* specifies a given number of address  */
-
-/* ----- definitions for specifying the data bus width in the extended flags ----- */
-#define AMEF_DBITS_SHIFT		18						/* shift to get the data bits count */
-#define AMEF_DBITS_MASK			(0x07 << AMEF_DBITS_SHIFT) /* mask to get at the data bits count */
-#define AMEF_DBITS(n)			((((n)/8-1) << AMEF_DBITS_SHIFT) | AMEF_SPECIFIES_DBITS) /* specifies a given data bus width */
-
-/* ----- definitions for specifying the unmap value in the extended flags ----- */
-#define AMEF_UNMAP_SHIFT		21						/* shift to get the unmap value */
-#define AMEF_UNMAP_MASK			(1 << AMEF_UNMAP_SHIFT)	/* mask to get at the unmap value */
-#define AMEF_UNMAP(x)			(((x) << AMEF_UNMAP_SHIFT) | AMEF_SPECIFIES_UNMAP) /* specifies a given unmap value */
-
 /* ----- static data access handler constants ----- */
 enum
 {
 	STATIC_INVALID = 0,	/* invalid - should never be used */
-	STATIC_BANK1,		/* banked memory */
-	STATIC_BANK2,
-	STATIC_BANK3,
-	STATIC_BANK4,
-	STATIC_BANK5,
-	STATIC_BANK6,
-	STATIC_BANK7,
-	STATIC_BANK8,
-	STATIC_BANK9,
-	STATIC_BANK10,
-	STATIC_BANK11,
-	STATIC_BANK12,
-	STATIC_BANK13,
-	STATIC_BANK14,
-	STATIC_BANK15,
-	STATIC_BANK16,
-	STATIC_BANK17,
-	STATIC_BANK18,
-	STATIC_BANK19,
-	STATIC_BANK20,
-	STATIC_BANK21,
-	STATIC_BANK22,
-	STATIC_BANK23,
-	STATIC_BANK24,
-	STATIC_BANK25,
-	STATIC_BANK26,
-	STATIC_BANK27,
-	STATIC_BANK28,
-	STATIC_BANK29,
-	STATIC_BANK30,
-	STATIC_BANK31,
-	STATIC_BANK32,
-/* entries 33-67 are reserved for dynamically allocated internal banks */
+	STATIC_BANK1 = 1,	/* banked memory */
+	/* entries 1-32 are for fixed banks specified by the driver */
+	/* entries 33-67 are for dynamically allocated internal banks */
 	STATIC_RAM = 68,	/* RAM - standard reads/writes */
-	STATIC_ROM,		/* ROM - standard reads, no writes */
-	STATIC_NOP,
+	STATIC_ROM,			/* ROM - standard reads, no writes */
+	STATIC_NOP,			/* NOP - reads return unmapped value; writes do nothing */
 	STATIC_UNMAP,		/* unmapped - all unmapped memory goes here */
 	STATIC_COUNT		/* total number of static handlers */
 };
 
 /* ----- banking constants ----- */
-#define MAX_BANKS				66						/* maximum number of banks */
-#define MAX_BANK_ENTRIES		256						/* maximum number of possible bank values */
-#define MAX_EXPLICIT_BANKS		32						/* maximum number of explicitly-defined banks */
 #define STATIC_BANKMAX			(STATIC_RAM - 1)		/* handler constant of last bank */
 
+/* SMH_* macros are Static Memory Handler definitions with
+   pre-cast versions of the STATIC_* functions */
+#define SMH_RAM					((void *)STATIC_RAM)
+#define SMH_ROM					((void *)STATIC_ROM)
+#define SMH_NOP					((void *)STATIC_NOP)
+#define SMH_UNMAP				((void *)STATIC_UNMAP)
+#define SMH_BANK(n)				((void *)(STATIC_BANK1 + (n) - 1))
 
-
-/***************************************************************************
-    STATIC ENTRY CONSTANTS
-****************************************************************************
-    The first 32 entries in the address lookup table are reserved for
-    "static" handlers. These are internal handlers for RAM, ROM, banks,
-    and unmapped areas in the address space. The following definitions
-    are the properly-casted versions of the STATIC_ constants above.
-***************************************************************************/
-
-/* 8-bit reads */
-#define MRA8_BANK1				((read8_machine_func)STATIC_BANK1)
-#define MRA8_BANK2				((read8_machine_func)STATIC_BANK2)
-#define MRA8_BANK3				((read8_machine_func)STATIC_BANK3)
-#define MRA8_BANK4				((read8_machine_func)STATIC_BANK4)
-#define MRA8_BANK5				((read8_machine_func)STATIC_BANK5)
-#define MRA8_BANK6				((read8_machine_func)STATIC_BANK6)
-#define MRA8_BANK7				((read8_machine_func)STATIC_BANK7)
-#define MRA8_BANK8				((read8_machine_func)STATIC_BANK8)
-#define MRA8_BANK9				((read8_machine_func)STATIC_BANK9)
-#define MRA8_BANK10				((read8_machine_func)STATIC_BANK10)
-#define MRA8_BANK11				((read8_machine_func)STATIC_BANK11)
-#define MRA8_BANK12				((read8_machine_func)STATIC_BANK12)
-#define MRA8_BANK13				((read8_machine_func)STATIC_BANK13)
-#define MRA8_BANK14				((read8_machine_func)STATIC_BANK14)
-#define MRA8_BANK15				((read8_machine_func)STATIC_BANK15)
-#define MRA8_BANK16				((read8_machine_func)STATIC_BANK16)
-#define MRA8_BANK17				((read8_machine_func)STATIC_BANK17)
-#define MRA8_BANK18				((read8_machine_func)STATIC_BANK18)
-#define MRA8_BANK19				((read8_machine_func)STATIC_BANK19)
-#define MRA8_BANK20				((read8_machine_func)STATIC_BANK20)
-#define MRA8_BANK21				((read8_machine_func)STATIC_BANK21)
-#define MRA8_BANK22				((read8_machine_func)STATIC_BANK22)
-#define MRA8_BANK23				((read8_machine_func)STATIC_BANK23)
-#define MRA8_BANK24				((read8_machine_func)STATIC_BANK24)
-#define MRA8_BANK25				((read8_machine_func)STATIC_BANK25)
-#define MRA8_BANK26				((read8_machine_func)STATIC_BANK26)
-#define MRA8_BANK27				((read8_machine_func)STATIC_BANK27)
-#define MRA8_BANK28				((read8_machine_func)STATIC_BANK28)
-#define MRA8_BANK29				((read8_machine_func)STATIC_BANK29)
-#define MRA8_BANK30				((read8_machine_func)STATIC_BANK30)
-#define MRA8_BANK31				((read8_machine_func)STATIC_BANK31)
-#define MRA8_BANK32				((read8_machine_func)STATIC_BANK32)
-#define MRA8_RAM				((read8_machine_func)STATIC_RAM)
-#define MRA8_ROM				((read8_machine_func)STATIC_ROM)
-#define MRA8_NOP				((read8_machine_func)STATIC_NOP)
-#define MRA8_UNMAP				((read8_machine_func)STATIC_UNMAP)
-
-/* 8-bit writes */
-#define MWA8_BANK1				((write8_machine_func)STATIC_BANK1)
-#define MWA8_BANK2				((write8_machine_func)STATIC_BANK2)
-#define MWA8_BANK3				((write8_machine_func)STATIC_BANK3)
-#define MWA8_BANK4				((write8_machine_func)STATIC_BANK4)
-#define MWA8_BANK5				((write8_machine_func)STATIC_BANK5)
-#define MWA8_BANK6				((write8_machine_func)STATIC_BANK6)
-#define MWA8_BANK7				((write8_machine_func)STATIC_BANK7)
-#define MWA8_BANK8				((write8_machine_func)STATIC_BANK8)
-#define MWA8_BANK9				((write8_machine_func)STATIC_BANK9)
-#define MWA8_BANK10				((write8_machine_func)STATIC_BANK10)
-#define MWA8_BANK11				((write8_machine_func)STATIC_BANK11)
-#define MWA8_BANK12				((write8_machine_func)STATIC_BANK12)
-#define MWA8_BANK13				((write8_machine_func)STATIC_BANK13)
-#define MWA8_BANK14				((write8_machine_func)STATIC_BANK14)
-#define MWA8_BANK15				((write8_machine_func)STATIC_BANK15)
-#define MWA8_BANK16				((write8_machine_func)STATIC_BANK16)
-#define MWA8_BANK17				((write8_machine_func)STATIC_BANK17)
-#define MWA8_BANK18				((write8_machine_func)STATIC_BANK18)
-#define MWA8_BANK19				((write8_machine_func)STATIC_BANK19)
-#define MWA8_BANK20				((write8_machine_func)STATIC_BANK20)
-#define MWA8_BANK21				((write8_machine_func)STATIC_BANK21)
-#define MWA8_BANK22				((write8_machine_func)STATIC_BANK22)
-#define MWA8_BANK23				((write8_machine_func)STATIC_BANK23)
-#define MWA8_BANK24				((write8_machine_func)STATIC_BANK24)
-#define MWA8_BANK25				((write8_machine_func)STATIC_BANK25)
-#define MWA8_BANK26				((write8_machine_func)STATIC_BANK26)
-#define MWA8_BANK27				((write8_machine_func)STATIC_BANK27)
-#define MWA8_BANK28				((write8_machine_func)STATIC_BANK28)
-#define MWA8_BANK29				((write8_machine_func)STATIC_BANK29)
-#define MWA8_BANK30				((write8_machine_func)STATIC_BANK30)
-#define MWA8_BANK31				((write8_machine_func)STATIC_BANK31)
-#define MWA8_BANK32				((write8_machine_func)STATIC_BANK32)
-#define MWA8_RAM				((write8_machine_func)STATIC_RAM)
-#define MWA8_ROM				((write8_machine_func)STATIC_ROM)
-#define MWA8_NOP				((write8_machine_func)STATIC_NOP)
-#define MWA8_UNMAP				((write8_machine_func)STATIC_UNMAP)
-
-/* 16-bit reads */
-#define MRA16_BANK1				((read16_machine_func)STATIC_BANK1)
-#define MRA16_BANK2				((read16_machine_func)STATIC_BANK2)
-#define MRA16_BANK3				((read16_machine_func)STATIC_BANK3)
-#define MRA16_BANK4				((read16_machine_func)STATIC_BANK4)
-#define MRA16_BANK5				((read16_machine_func)STATIC_BANK5)
-#define MRA16_BANK6				((read16_machine_func)STATIC_BANK6)
-#define MRA16_BANK7				((read16_machine_func)STATIC_BANK7)
-#define MRA16_BANK8				((read16_machine_func)STATIC_BANK8)
-#define MRA16_BANK9				((read16_machine_func)STATIC_BANK9)
-#define MRA16_BANK10			((read16_machine_func)STATIC_BANK10)
-#define MRA16_BANK11			((read16_machine_func)STATIC_BANK11)
-#define MRA16_BANK12			((read16_machine_func)STATIC_BANK12)
-#define MRA16_BANK13			((read16_machine_func)STATIC_BANK13)
-#define MRA16_BANK14			((read16_machine_func)STATIC_BANK14)
-#define MRA16_BANK15			((read16_machine_func)STATIC_BANK15)
-#define MRA16_BANK16			((read16_machine_func)STATIC_BANK16)
-#define MRA16_BANK17			((read16_machine_func)STATIC_BANK17)
-#define MRA16_BANK18			((read16_machine_func)STATIC_BANK18)
-#define MRA16_BANK19			((read16_machine_func)STATIC_BANK19)
-#define MRA16_BANK20			((read16_machine_func)STATIC_BANK20)
-#define MRA16_BANK21			((read16_machine_func)STATIC_BANK21)
-#define MRA16_BANK22			((read16_machine_func)STATIC_BANK22)
-#define MRA16_BANK23			((read16_machine_func)STATIC_BANK23)
-#define MRA16_BANK24			((read16_machine_func)STATIC_BANK24)
-#define MRA16_BANK25			((read16_machine_func)STATIC_BANK25)
-#define MRA16_BANK26			((read16_machine_func)STATIC_BANK26)
-#define MRA16_BANK27			((read16_machine_func)STATIC_BANK27)
-#define MRA16_BANK28			((read16_machine_func)STATIC_BANK28)
-#define MRA16_BANK29			((read16_machine_func)STATIC_BANK29)
-#define MRA16_BANK30			((read16_machine_func)STATIC_BANK30)
-#define MRA16_BANK31			((read16_machine_func)STATIC_BANK31)
-#define MRA16_BANK32			((read16_machine_func)STATIC_BANK32)
-#define MRA16_RAM				((read16_machine_func)STATIC_RAM)
-#define MRA16_ROM				((read16_machine_func)STATIC_ROM)
-#define MRA16_NOP				((read16_machine_func)STATIC_NOP)
-#define MRA16_UNMAP				((read16_machine_func)STATIC_UNMAP)
-
-/* 16-bit writes */
-#define MWA16_BANK1				((write16_machine_func)STATIC_BANK1)
-#define MWA16_BANK2				((write16_machine_func)STATIC_BANK2)
-#define MWA16_BANK3				((write16_machine_func)STATIC_BANK3)
-#define MWA16_BANK4				((write16_machine_func)STATIC_BANK4)
-#define MWA16_BANK5				((write16_machine_func)STATIC_BANK5)
-#define MWA16_BANK6				((write16_machine_func)STATIC_BANK6)
-#define MWA16_BANK7				((write16_machine_func)STATIC_BANK7)
-#define MWA16_BANK8				((write16_machine_func)STATIC_BANK8)
-#define MWA16_BANK9				((write16_machine_func)STATIC_BANK9)
-#define MWA16_BANK10			((write16_machine_func)STATIC_BANK10)
-#define MWA16_BANK11			((write16_machine_func)STATIC_BANK11)
-#define MWA16_BANK12			((write16_machine_func)STATIC_BANK12)
-#define MWA16_BANK13			((write16_machine_func)STATIC_BANK13)
-#define MWA16_BANK14			((write16_machine_func)STATIC_BANK14)
-#define MWA16_BANK15			((write16_machine_func)STATIC_BANK15)
-#define MWA16_BANK16			((write16_machine_func)STATIC_BANK16)
-#define MWA16_BANK17			((write16_machine_func)STATIC_BANK17)
-#define MWA16_BANK18			((write16_machine_func)STATIC_BANK18)
-#define MWA16_BANK19			((write16_machine_func)STATIC_BANK19)
-#define MWA16_BANK20			((write16_machine_func)STATIC_BANK20)
-#define MWA16_BANK21			((write16_machine_func)STATIC_BANK21)
-#define MWA16_BANK22			((write16_machine_func)STATIC_BANK22)
-#define MWA16_BANK23			((write16_machine_func)STATIC_BANK23)
-#define MWA16_BANK24			((write16_machine_func)STATIC_BANK24)
-#define MWA16_BANK25			((write16_machine_func)STATIC_BANK25)
-#define MWA16_BANK26			((write16_machine_func)STATIC_BANK26)
-#define MWA16_BANK27			((write16_machine_func)STATIC_BANK27)
-#define MWA16_BANK28			((write16_machine_func)STATIC_BANK28)
-#define MWA16_BANK29			((write16_machine_func)STATIC_BANK29)
-#define MWA16_BANK30			((write16_machine_func)STATIC_BANK30)
-#define MWA16_BANK31			((write16_machine_func)STATIC_BANK31)
-#define MWA16_BANK32			((write16_machine_func)STATIC_BANK32)
-#define MWA16_RAM				((write16_machine_func)STATIC_RAM)
-#define MWA16_ROM				((write16_machine_func)STATIC_ROM)
-#define MWA16_NOP				((write16_machine_func)STATIC_NOP)
-#define MWA16_UNMAP				((write16_machine_func)STATIC_UNMAP)
-
-/* 32-bit reads */
-#define MRA32_BANK1				((read32_machine_func)STATIC_BANK1)
-#define MRA32_BANK2				((read32_machine_func)STATIC_BANK2)
-#define MRA32_BANK3				((read32_machine_func)STATIC_BANK3)
-#define MRA32_BANK4				((read32_machine_func)STATIC_BANK4)
-#define MRA32_BANK5				((read32_machine_func)STATIC_BANK5)
-#define MRA32_BANK6				((read32_machine_func)STATIC_BANK6)
-#define MRA32_BANK7				((read32_machine_func)STATIC_BANK7)
-#define MRA32_BANK8				((read32_machine_func)STATIC_BANK8)
-#define MRA32_BANK9				((read32_machine_func)STATIC_BANK9)
-#define MRA32_BANK10			((read32_machine_func)STATIC_BANK10)
-#define MRA32_BANK11			((read32_machine_func)STATIC_BANK11)
-#define MRA32_BANK12			((read32_machine_func)STATIC_BANK12)
-#define MRA32_BANK13			((read32_machine_func)STATIC_BANK13)
-#define MRA32_BANK14			((read32_machine_func)STATIC_BANK14)
-#define MRA32_BANK15			((read32_machine_func)STATIC_BANK15)
-#define MRA32_BANK16			((read32_machine_func)STATIC_BANK16)
-#define MRA32_BANK17			((read32_machine_func)STATIC_BANK17)
-#define MRA32_BANK18			((read32_machine_func)STATIC_BANK18)
-#define MRA32_BANK19			((read32_machine_func)STATIC_BANK19)
-#define MRA32_BANK20			((read32_machine_func)STATIC_BANK20)
-#define MRA32_BANK21			((read32_machine_func)STATIC_BANK21)
-#define MRA32_BANK22			((read32_machine_func)STATIC_BANK22)
-#define MRA32_BANK23			((read32_machine_func)STATIC_BANK23)
-#define MRA32_BANK24			((read32_machine_func)STATIC_BANK24)
-#define MRA32_BANK25			((read32_machine_func)STATIC_BANK25)
-#define MRA32_BANK26			((read32_machine_func)STATIC_BANK26)
-#define MRA32_BANK27			((read32_machine_func)STATIC_BANK27)
-#define MRA32_BANK28			((read32_machine_func)STATIC_BANK28)
-#define MRA32_BANK29			((read32_machine_func)STATIC_BANK29)
-#define MRA32_BANK30			((read32_machine_func)STATIC_BANK30)
-#define MRA32_BANK31			((read32_machine_func)STATIC_BANK31)
-#define MRA32_BANK32			((read32_machine_func)STATIC_BANK32)
-#define MRA32_RAM				((read32_machine_func)STATIC_RAM)
-#define MRA32_ROM				((read32_machine_func)STATIC_ROM)
-#define MRA32_NOP				((read32_machine_func)STATIC_NOP)
-#define MRA32_UNMAP				((read32_machine_func)STATIC_UNMAP)
-
-/* 32-bit writes */
-#define MWA32_BANK1				((write32_machine_func)STATIC_BANK1)
-#define MWA32_BANK2				((write32_machine_func)STATIC_BANK2)
-#define MWA32_BANK3				((write32_machine_func)STATIC_BANK3)
-#define MWA32_BANK4				((write32_machine_func)STATIC_BANK4)
-#define MWA32_BANK5				((write32_machine_func)STATIC_BANK5)
-#define MWA32_BANK6				((write32_machine_func)STATIC_BANK6)
-#define MWA32_BANK7				((write32_machine_func)STATIC_BANK7)
-#define MWA32_BANK8				((write32_machine_func)STATIC_BANK8)
-#define MWA32_BANK9				((write32_machine_func)STATIC_BANK9)
-#define MWA32_BANK10			((write32_machine_func)STATIC_BANK10)
-#define MWA32_BANK11			((write32_machine_func)STATIC_BANK11)
-#define MWA32_BANK12			((write32_machine_func)STATIC_BANK12)
-#define MWA32_BANK13			((write32_machine_func)STATIC_BANK13)
-#define MWA32_BANK14			((write32_machine_func)STATIC_BANK14)
-#define MWA32_BANK15			((write32_machine_func)STATIC_BANK15)
-#define MWA32_BANK16			((write32_machine_func)STATIC_BANK16)
-#define MWA32_BANK17			((write32_machine_func)STATIC_BANK17)
-#define MWA32_BANK18			((write32_machine_func)STATIC_BANK18)
-#define MWA32_BANK19			((write32_machine_func)STATIC_BANK19)
-#define MWA32_BANK20			((write32_machine_func)STATIC_BANK20)
-#define MWA32_BANK21			((write32_machine_func)STATIC_BANK21)
-#define MWA32_BANK22			((write32_machine_func)STATIC_BANK22)
-#define MWA32_BANK23			((write32_machine_func)STATIC_BANK23)
-#define MWA32_BANK24			((write32_machine_func)STATIC_BANK24)
-#define MWA32_BANK25			((write32_machine_func)STATIC_BANK25)
-#define MWA32_BANK26			((write32_machine_func)STATIC_BANK26)
-#define MWA32_BANK27			((write32_machine_func)STATIC_BANK27)
-#define MWA32_BANK28			((write32_machine_func)STATIC_BANK28)
-#define MWA32_BANK29			((write32_machine_func)STATIC_BANK29)
-#define MWA32_BANK30			((write32_machine_func)STATIC_BANK30)
-#define MWA32_BANK31			((write32_machine_func)STATIC_BANK31)
-#define MWA32_BANK32			((write32_machine_func)STATIC_BANK32)
-#define MWA32_RAM				((write32_machine_func)STATIC_RAM)
-#define MWA32_ROM				((write32_machine_func)STATIC_ROM)
-#define MWA32_NOP				((write32_machine_func)STATIC_NOP)
-#define MWA32_UNMAP				((write32_machine_func)STATIC_UNMAP)
-
-/* 64-bit reads */
-#define MRA64_BANK1				((read64_machine_func)STATIC_BANK1)
-#define MRA64_BANK2				((read64_machine_func)STATIC_BANK2)
-#define MRA64_BANK3				((read64_machine_func)STATIC_BANK3)
-#define MRA64_BANK4				((read64_machine_func)STATIC_BANK4)
-#define MRA64_BANK5				((read64_machine_func)STATIC_BANK5)
-#define MRA64_BANK6				((read64_machine_func)STATIC_BANK6)
-#define MRA64_BANK7				((read64_machine_func)STATIC_BANK7)
-#define MRA64_BANK8				((read64_machine_func)STATIC_BANK8)
-#define MRA64_BANK9				((read64_machine_func)STATIC_BANK9)
-#define MRA64_BANK10			((read64_machine_func)STATIC_BANK10)
-#define MRA64_BANK11			((read64_machine_func)STATIC_BANK11)
-#define MRA64_BANK12			((read64_machine_func)STATIC_BANK12)
-#define MRA64_BANK13			((read64_machine_func)STATIC_BANK13)
-#define MRA64_BANK14			((read64_machine_func)STATIC_BANK14)
-#define MRA64_BANK15			((read64_machine_func)STATIC_BANK15)
-#define MRA64_BANK16			((read64_machine_func)STATIC_BANK16)
-#define MRA64_BANK17			((read64_machine_func)STATIC_BANK17)
-#define MRA64_BANK18			((read64_machine_func)STATIC_BANK18)
-#define MRA64_BANK19			((read64_machine_func)STATIC_BANK19)
-#define MRA64_BANK20			((read64_machine_func)STATIC_BANK20)
-#define MRA64_BANK21			((read64_machine_func)STATIC_BANK21)
-#define MRA64_BANK22			((read64_machine_func)STATIC_BANK22)
-#define MRA64_BANK23			((read64_machine_func)STATIC_BANK23)
-#define MRA64_BANK24			((read64_machine_func)STATIC_BANK24)
-#define MRA64_BANK25			((read64_machine_func)STATIC_BANK25)
-#define MRA64_BANK26			((read64_machine_func)STATIC_BANK26)
-#define MRA64_BANK27			((read64_machine_func)STATIC_BANK27)
-#define MRA64_BANK28			((read64_machine_func)STATIC_BANK28)
-#define MRA64_BANK29			((read64_machine_func)STATIC_BANK29)
-#define MRA64_BANK30			((read64_machine_func)STATIC_BANK30)
-#define MRA64_BANK31			((read64_machine_func)STATIC_BANK31)
-#define MRA64_BANK32			((read64_machine_func)STATIC_BANK32)
-#define MRA64_RAM				((read64_machine_func)STATIC_RAM)
-#define MRA64_ROM				((read64_machine_func)STATIC_ROM)
-#define MRA64_NOP				((read64_machine_func)STATIC_NOP)
-#define MRA64_UNMAP				((read64_machine_func)STATIC_UNMAP)
-
-/* 64-bit writes */
-#define MWA64_BANK1				((write64_machine_func)STATIC_BANK1)
-#define MWA64_BANK2				((write64_machine_func)STATIC_BANK2)
-#define MWA64_BANK3				((write64_machine_func)STATIC_BANK3)
-#define MWA64_BANK4				((write64_machine_func)STATIC_BANK4)
-#define MWA64_BANK5				((write64_machine_func)STATIC_BANK5)
-#define MWA64_BANK6				((write64_machine_func)STATIC_BANK6)
-#define MWA64_BANK7				((write64_machine_func)STATIC_BANK7)
-#define MWA64_BANK8				((write64_machine_func)STATIC_BANK8)
-#define MWA64_BANK9				((write64_machine_func)STATIC_BANK9)
-#define MWA64_BANK10			((write64_machine_func)STATIC_BANK10)
-#define MWA64_BANK11			((write64_machine_func)STATIC_BANK11)
-#define MWA64_BANK12			((write64_machine_func)STATIC_BANK12)
-#define MWA64_BANK13			((write64_machine_func)STATIC_BANK13)
-#define MWA64_BANK14			((write64_machine_func)STATIC_BANK14)
-#define MWA64_BANK15			((write64_machine_func)STATIC_BANK15)
-#define MWA64_BANK16			((write64_machine_func)STATIC_BANK16)
-#define MWA64_BANK17			((write64_machine_func)STATIC_BANK17)
-#define MWA64_BANK18			((write64_machine_func)STATIC_BANK18)
-#define MWA64_BANK19			((write64_machine_func)STATIC_BANK19)
-#define MWA64_BANK20			((write64_machine_func)STATIC_BANK20)
-#define MWA64_BANK21			((write64_machine_func)STATIC_BANK21)
-#define MWA64_BANK22			((write64_machine_func)STATIC_BANK22)
-#define MWA64_BANK23			((write64_machine_func)STATIC_BANK23)
-#define MWA64_BANK24			((write64_machine_func)STATIC_BANK24)
-#define MWA64_BANK25			((write64_machine_func)STATIC_BANK25)
-#define MWA64_BANK26			((write64_machine_func)STATIC_BANK26)
-#define MWA64_BANK27			((write64_machine_func)STATIC_BANK27)
-#define MWA64_BANK28			((write64_machine_func)STATIC_BANK28)
-#define MWA64_BANK29			((write64_machine_func)STATIC_BANK29)
-#define MWA64_BANK30			((write64_machine_func)STATIC_BANK30)
-#define MWA64_BANK31			((write64_machine_func)STATIC_BANK31)
-#define MWA64_BANK32			((write64_machine_func)STATIC_BANK32)
-#define MWA64_RAM				((write64_machine_func)STATIC_RAM)
-#define MWA64_ROM				((write64_machine_func)STATIC_ROM)
-#define MWA64_NOP				((write64_machine_func)STATIC_NOP)
-#define MWA64_UNMAP				((write64_machine_func)STATIC_UNMAP)
+#define SMH_BANK1				SMH_BANK(1)
+#define SMH_BANK2				SMH_BANK(2)
+#define SMH_BANK3				SMH_BANK(3)
+#define SMH_BANK4				SMH_BANK(4)
+#define SMH_BANK5				SMH_BANK(5)
+#define SMH_BANK6				SMH_BANK(6)
+#define SMH_BANK7				SMH_BANK(7)
+#define SMH_BANK8				SMH_BANK(8)
+#define SMH_BANK9				SMH_BANK(9)
+#define SMH_BANK10				SMH_BANK(10)
+#define SMH_BANK11				SMH_BANK(11)
+#define SMH_BANK12				SMH_BANK(12)
+#define SMH_BANK13				SMH_BANK(13)
+#define SMH_BANK14				SMH_BANK(14)
+#define SMH_BANK15				SMH_BANK(15)
+#define SMH_BANK16				SMH_BANK(16)
+#define SMH_BANK17				SMH_BANK(17)
+#define SMH_BANK18				SMH_BANK(18)
+#define SMH_BANK19				SMH_BANK(19)
+#define SMH_BANK20				SMH_BANK(20)
+#define SMH_BANK21				SMH_BANK(21)
+#define SMH_BANK22				SMH_BANK(22)
+#define SMH_BANK23				SMH_BANK(23)
+#define SMH_BANK24				SMH_BANK(24)
+#define SMH_BANK25				SMH_BANK(25)
+#define SMH_BANK26				SMH_BANK(26)
+#define SMH_BANK27				SMH_BANK(27)
+#define SMH_BANK28				SMH_BANK(28)
+#define SMH_BANK29				SMH_BANK(29)
+#define SMH_BANK30				SMH_BANK(30)
+#define SMH_BANK31				SMH_BANK(31)
+#define SMH_BANK32				SMH_BANK(32)
 
 
 
@@ -847,15 +514,15 @@ enum
 /* ----- common shortcuts ----- */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
 #define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
-#define AM_ROM								AM_READ((void *)STATIC_ROM)
-#define AM_RAM								AM_READWRITE((void *)STATIC_RAM, (void *)STATIC_RAM)
-#define AM_WRITEONLY						AM_WRITE((void *)STATIC_RAM)
-#define AM_UNMAP							AM_READWRITE((void *)STATIC_UNMAP, (void *)STATIC_UNMAP)
-#define AM_ROMBANK(_bank)					AM_READ((void *)(STATIC_BANK1 + (_bank) - 1))
-#define AM_RAMBANK(_bank)					AM_READWRITE((void *)(STATIC_BANK1 + (_bank) - 1), (void *)(STATIC_BANK1 + (_bank) - 1))
-#define AM_NOP								AM_READWRITE((void *)STATIC_NOP, (void *)STATIC_NOP)
-#define AM_READNOP							AM_READ((void *)STATIC_NOP)
-#define AM_WRITENOP							AM_WRITE((void *)STATIC_NOP)
+#define AM_ROM								AM_READ(SMH_ROM)
+#define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
+#define AM_WRITEONLY						AM_WRITE(SMH_RAM)
+#define AM_UNMAP							AM_READWRITE(SMH_UNMAP, SMH_UNMAP)
+#define AM_ROMBANK(_bank)					AM_READ(SMH_BANK(_bank))
+#define AM_RAMBANK(_bank)					AM_READWRITE(SMH_BANK(_bank), SMH_BANK(_bank))
+#define AM_NOP								AM_READWRITE(SMH_NOP, SMH_NOP)
+#define AM_READNOP							AM_READ(SMH_NOP)
+#define AM_WRITENOP							AM_WRITE(SMH_NOP)
 
 
 
@@ -871,35 +538,6 @@ enum
 	ADDRESS_SPACE_IO,				/* I/O address space */
 	ADDRESS_SPACES					/* maximum number of address spaces */
 };
-
-extern const char *const address_space_names[ADDRESS_SPACES];
-
-/* ----- address map lookup table definitions ----- */
-#define SUBTABLE_COUNT			64						/* number of slots reserved for subtables */
-#define SUBTABLE_BASE			(256-SUBTABLE_COUNT)	/* first index of a subtable */
-#define ENTRY_COUNT				(SUBTABLE_BASE)			/* number of legitimate (non-subtable) entries */
-#define SUBTABLE_ALLOC			8						/* number of subtables to allocate at a time */
-
-/* ----- bit counts ----- */
-#define LEVEL1_BITS				18						/* number of address bits in the level 1 table */
-#define LEVEL2_BITS				(32 - LEVEL1_BITS)		/* number of address bits in the level 2 table */
-
-/* ----- other address map constants ----- */
-#define MAX_MEMORY_BLOCKS		1024					/* maximum memory blocks we can track */
-#define MAX_SHARED_POINTERS		256						/* maximum number of shared pointers in memory maps */
-#define MEMORY_BLOCK_SIZE		65536					/* size of allocated memory blocks */
-
-
-
-/***************************************************************************
-    ADDRESS MAP LOOKUP MACROS
-***************************************************************************/
-
-/* ----- table lookup helpers ----- */
-#define LEVEL1_INDEX(a)			((a) >> LEVEL2_BITS)
-#define LEVEL2_INDEX(e,a)		((1 << LEVEL1_BITS) + (((e) - SUBTABLE_BASE) << LEVEL2_BITS) + ((a) & ((1 << LEVEL2_BITS) - 1)))
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES FOR CORE READ/WRITE ROUTINES
@@ -1140,8 +778,8 @@ extern offs_t			opcode_mask;				/* mask to apply to the opcode address */
 extern offs_t			opcode_memory_min;			/* opcode memory minimum */
 extern offs_t			opcode_memory_max;			/* opcode memory maximum */
 extern address_space	active_address_space[];		/* address spaces */
-#define construct_map_0 NULL
 
+extern const char *const address_space_names[ADDRESS_SPACES];
 
 
 /***************************************************************************
@@ -1264,10 +902,10 @@ INLINE UINT32 cpu_readop_arg32(offs_t A)	{ if (address_is_unsafe(A)) { memory_se
 INLINE UINT64 cpu_readop_arg64(offs_t A)	{ if (address_is_unsafe(A)) { memory_set_opbase(A); } return cpu_readop_arg64_unsafe(A); }
 
 /* ----- bank switching for CPU cores ----- */
-#define change_pc(pc)				memory_set_opbase(pc);
+#define change_pc(pc)				do { memory_set_opbase(pc); } while (0)
 
 /* ----- forces the next branch to generate a call to the opbase handler ----- */
-#define catch_nextBranch()			(opcode_entry = 0xff)
+#define catch_nextBranch()			do { opcode_entry = 0xff; } while (0)
 
 
 #endif	/* __MEMORY_H__ */

@@ -552,7 +552,7 @@ DRIVER_INIT( drtoppel )
 	memcpy(&RAM[0x08000],&RAM[0x18000],0x4000);
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xfbff, 0, 0, MWA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xfbff, 0, 0, SMH_NOP);
 }
 
 DRIVER_INIT( chukatai )

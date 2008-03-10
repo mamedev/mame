@@ -41,29 +41,29 @@ static WRITE8_HANDLER( gekiretu_rombank_w )
 /****************************************************************************/
 
 static ADDRESS_MAP_START( quizdna_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizdna_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(quizdna_bg_ram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xe200, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe200, 0xefff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekiretu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(quizdna_bg_ram_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf200, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf200, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizdna_readport, ADDRESS_SPACE_IO, 8 )
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( quizdna_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITE(MWA8_NOP) /* unknown */
+	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( gakupara_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x03, 0x04) AM_WRITE(MWA8_NOP) /* unknown */
+	AM_RANGE(0x03, 0x04) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( gekiretu_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITE(MWA8_NOP) /* unknown */
+	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)

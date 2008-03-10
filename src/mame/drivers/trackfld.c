@@ -182,11 +182,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1281, 0x1281) AM_READ(input_port_1_r) /* P1 IO */
 	AM_RANGE(0x1282, 0x1282) AM_READ(input_port_2_r) /* P2 IO */
 	AM_RANGE(0x1283, 0x1283) AM_READ(input_port_3_r) /* DIP 1 */
-	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2800, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2800, 0x3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)       /* for atlantol (everything not mapped is read from rom) */
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)       /* for atlantol (everything not mapped is read from rom) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -197,33 +197,33 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
 	AM_RANGE(0x1087, 0x1087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1800, 0x183f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x1840, 0x185f) AM_WRITE(MWA8_RAM) AM_BASE(&trackfld_scroll)
-	AM_RANGE(0x1860, 0x1bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1c00, 0x1c3f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_WRITE(MWA8_RAM) AM_BASE(&trackfld_scroll2)
-	AM_RANGE(0x1c60, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(MWA8_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x1800, 0x183f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x1840, 0x185f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll)
+	AM_RANGE(0x1860, 0x1bff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1c00, 0x1c3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll2)
+	AM_RANGE(0x1c60, 0x1fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reaktor_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9200, 0x9200) AM_READ(input_port_4_r) /* DIP 2 */
 	AM_RANGE(0x9280, 0x9280) AM_READ(input_port_0_r) /* IO Coin */
 	AM_RANGE(0x9281, 0x9281) AM_READ(input_port_1_r) /* P1 IO */
 	AM_RANGE(0x9282, 0x9282) AM_READ(input_port_2_r) /* P2 IO */
 	AM_RANGE(0x9283, 0x9283) AM_READ(input_port_3_r) /* DIP 1 */
-	AM_RANGE(0x9800, 0x9fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xa800, 0xbfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x9800, 0x9fff) AM_READ(SMH_RAM)
+	AM_RANGE(0xa800, 0xbfff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reaktor_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x9080, 0x9080) AM_WRITE(trackfld_flipscreen_w)
@@ -231,14 +231,14 @@ static ADDRESS_MAP_START( reaktor_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9083, 0x9084) AM_WRITE(coin_w)
 	AM_RANGE(0x9087, 0x9087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x9100, 0x9100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x9800, 0x983f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x9840, 0x985f) AM_WRITE(MWA8_RAM) AM_BASE(&trackfld_scroll)
-	AM_RANGE(0x9860, 0x9bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x9c00, 0x9c3f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x9c40, 0x9c5f) AM_WRITE(MWA8_RAM) AM_BASE(&trackfld_scroll2)
-	AM_RANGE(0x9c60, 0x9fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xa800, 0xabff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xac00, 0xafff) AM_WRITE(MWA8_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x9800, 0x983f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x9840, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll)
+	AM_RANGE(0x9860, 0x9bff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x9c00, 0x9c3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x9c40, 0x9c5f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll2)
+	AM_RANGE(0x9c60, 0x9fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xa800, 0xabff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xac00, 0xafff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
@@ -246,15 +246,15 @@ ADDRESS_MAP_END
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
 static ADDRESS_MAP_START( reaktor_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(MRA8_NOP)
+	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reaktor_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x02, 0x02) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x03, 0x03) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x03, 0x03) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastkin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -263,9 +263,9 @@ static ADDRESS_MAP_START( mastkin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1281, 0x1281) AM_READ(input_port_1_r) /* P1 IO */
 //  AM_RANGE(0x1282, 0x1282) AM_READ(input_port_2_r) /* unused */
 	AM_RANGE(0x1283, 0x1283) AM_READ(input_port_3_r) /* DIP 1 */
-	AM_RANGE(0x1800, 0x1fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x2800, 0x3fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x6000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x1800, 0x1fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x2800, 0x3fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x6000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastkin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -275,17 +275,17 @@ static ADDRESS_MAP_START( mastkin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1083, 0x1084) AM_WRITE(coin_w)
 	AM_RANGE(0x1087, 0x1087) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1800, 0x183f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram_2)
-	AM_RANGE(0x1840, 0x185f) AM_WRITE(MWA8_RAM) AM_BASE(&trackfld_scroll)
-	AM_RANGE(0x1860, 0x1bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x1c00, 0x1c3f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1c40, 0x1c5f) AM_WRITE(MWA8_RAM) AM_BASE(&trackfld_scroll2)
-	AM_RANGE(0x1c60, 0x1fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(MWA8_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x1800, 0x183f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x1840, 0x185f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll)
+	AM_RANGE(0x1860, 0x1bff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1c00, 0x1c3f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_WRITE(SMH_RAM) AM_BASE(&trackfld_scroll2)
+	AM_RANGE(0x1c60, 0x1fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(SMH_RAM) AM_BASE(&nvram) AM_SIZE(&nvram_size)
 	AM_RANGE(0x3000, 0x37ff) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x6000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x6000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -309,61 +309,61 @@ static ADDRESS_MAP_START( wizzquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c60, 0x1fff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x3000, 0x37ff) AM_READ(MRA8_RAM) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_READ(MRA8_RAM) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x3000, 0x37ff) AM_READ(SMH_RAM) AM_WRITE(trackfld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_READ(SMH_RAM) AM_WRITE(trackfld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(questions_bank_w)
-	AM_RANGE(0x6000, 0xdfff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x6000, 0xdfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(trackfld_sh_timer_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(MRA8_NOP) // reaktor reads here
-	AM_RANGE(0xe001, 0xe001) AM_READ(MRA8_NOP) // reaktor reads here
+	AM_RANGE(0xc000, 0xc000) AM_READ(SMH_NOP) // reaktor reads here
+	AM_RANGE(0xe001, 0xe001) AM_READ(SMH_NOP) // reaktor reads here
 	AM_RANGE(0xe002, 0xe002) AM_READ(trackfld_speech_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_0_w)	/* Loads the snd command into the snd latch */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(MWA8_NOP)		/* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(DAC_0_data_w)
 /* There are lots more addresses which are used for setting a two bit volume
     controls for speech and music
 
     Currently these are un-supported by Mame
 */
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(MWA8_NOP) /* watch dog ? */
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) /* watch dog ? */
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(VLM5030_data_w)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(trackfld_sound_w) /* e003 speech control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprolyb_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(trackfld_sh_timer_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ(hyprolyb_speech_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyprolyb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_0_w)	/* Loads the snd command into the snd latch */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(MWA8_NOP)		/* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(DAC_0_data_w)
 /* There are lots more addresses which are used for setting a two bit volume
     controls for speech and music
 
     Currently these are un-supported by Mame
 */
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(MWA8_NOP) /* watch dog ? */
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(SMH_NOP) /* watch dog ? */
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(hyprolyb_ADPCM_data_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 
@@ -1329,7 +1329,7 @@ static DRIVER_INIT( atlantol )
 	for (A = 0x6000;A < size;A++)
 		decrypt[A] = konami1_decodebyte(rom[A],A);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, MWA8_NOP );
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, SMH_NOP );
 }
 
 static DRIVER_INIT( mastkin )

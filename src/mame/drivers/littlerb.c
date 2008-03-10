@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( littlerb_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITE(MWA16_NOP)
+	AM_RANGE(0x780000, 0x780001) AM_WRITE(SMH_NOP)
 
 	/* below are fake.. just to see the data */
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_BASE(&littlerb_region1)

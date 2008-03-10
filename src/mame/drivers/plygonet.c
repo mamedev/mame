@@ -647,7 +647,7 @@ static INTERRUPT_GEN(audio_interrupt)
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK2)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_READWRITE(K054539_0_r, K054539_0_w)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0xfff1, 0xfff3) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xfff1, 0xfff3) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static const struct K054539interface k054539_interface =

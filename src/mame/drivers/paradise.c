@@ -97,7 +97,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( paradise_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(MRA8_RAM			)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_READ(SMH_RAM			)	// Palette
 	AM_RANGE(0x2010, 0x2010) AM_READ(OKIM6295_status_0_r	)	// OKI 0
 	AM_RANGE(0x2030, 0x2030) AM_READ(OKIM6295_status_1_r	)	// OKI 1
 	AM_RANGE(0x2020, 0x2020) AM_READ(input_port_0_r		)	// DSW 1
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( paradise_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2022, 0x2022) AM_READ(input_port_2_r		)	// P1
 	AM_RANGE(0x2023, 0x2023) AM_READ(input_port_3_r		)	// P2
 	AM_RANGE(0x2024, 0x2024) AM_READ(input_port_4_r		)	// Coins
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_RAM			)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_RAM			)	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_writeport, ADDRESS_SPACE_IO, 8 )

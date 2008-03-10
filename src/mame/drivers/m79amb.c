@@ -125,10 +125,10 @@ static WRITE8_HANDLER( sound_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(MRA8_RAM, ramtek_videoram_w) AM_BASE(&ramtek_videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(SMH_RAM, ramtek_videoram_w) AM_BASE(&ramtek_videoram)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM		/* ?? */
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(input_port_0_r, sound_w) /* sound_w listed twice?? */
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(MWA8_RAM) AM_BASE(&mask)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(SMH_RAM) AM_BASE(&mask)
 	AM_RANGE(0x8002, 0x8002) AM_READWRITE(input_port_1_r, sound_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(sound_w)		/* Manual Shows sound control at 0x8002 */
 	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)

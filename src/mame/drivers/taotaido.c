@@ -99,13 +99,13 @@ static WRITE16_HANDLER( sound_command_w )
 	}
 }
 static ADDRESS_MAP_START( taotaido_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x800000, 0x803fff) AM_READ(MRA16_RAM)			// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_READ(MRA16_RAM)			// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(MRA16_RAM)			// sprite tile look up
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(MRA16_RAM)			// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_READ(MRA16_RAM)			// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_READ(MRA16_RAM)			// rowscroll / rowselect / scroll ram
+	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)			// bg ram?
+	AM_RANGE(0xa00000, 0xa01fff) AM_READ(SMH_RAM)			// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(SMH_RAM)			// sprite tile look up
+	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_RAM)			// main ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_READ(SMH_RAM)			// palette ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_READ(SMH_RAM)			// rowscroll / rowselect / scroll ram
 
 	AM_RANGE(0xffff80, 0xffff81) AM_READ(input_port_0_word_r)	// player 1 inputs
 	AM_RANGE(0xffff82, 0xffff83) AM_READ(input_port_1_word_r)	// player 2 inputs
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( taotaido_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff86, 0xffff87) AM_READ(input_port_3_word_r)	// DSWA
 	AM_RANGE(0xffff88, 0xffff89) AM_READ(input_port_4_word_r)	// DSWB
 	AM_RANGE(0xffff8a, 0xffff8b) AM_READ(input_port_5_word_r)	// DSWC
-	AM_RANGE(0xffff8c, 0xffff8d) AM_READ(MRA16_RAM)			// unknown
+	AM_RANGE(0xffff8c, 0xffff8d) AM_READ(SMH_RAM)			// unknown
 	AM_RANGE(0xffff8e, 0xffff8f) AM_READ(input_port_6_word_r)	// jumpers
 #if TAOTAIDO_SHOW_ALL_INPUTS
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ(input_port_7_word_r)	// player 3 inputs (unused)
@@ -124,17 +124,17 @@ static ADDRESS_MAP_START( taotaido_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( taotaido_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(MWA16_ROM)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(taotaido_bgvideoram_w) AM_BASE(&taotaido_bgram)	// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_WRITE(MWA16_RAM) AM_BASE(&taotaido_spriteram)		// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(MWA16_RAM) AM_BASE(&taotaido_spriteram2)		// sprite tile lookup ram
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(MWA16_RAM)						// main ram
+	AM_RANGE(0xa00000, 0xa01fff) AM_WRITE(SMH_RAM) AM_BASE(&taotaido_spriteram)		// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(SMH_RAM) AM_BASE(&taotaido_spriteram2)		// sprite tile lookup ram
+	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)						// main ram
 	AM_RANGE(0xffc000, 0xffcfff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_WRITE(MWA16_RAM) AM_BASE(&taotaido_scrollram)		// rowscroll / rowselect / scroll ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_WRITE(SMH_RAM) AM_BASE(&taotaido_scrollram)		// rowscroll / rowselect / scroll ram
 
 	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE(taotaido_tileregs_w)
-	AM_RANGE(0xffff10, 0xffff11) AM_WRITE(MWA16_NOP)						// unknown
-	AM_RANGE(0xffff20, 0xffff21) AM_WRITE(MWA16_NOP)						// unknown - flip screen related
+	AM_RANGE(0xffff10, 0xffff11) AM_WRITE(SMH_NOP)						// unknown
+	AM_RANGE(0xffff20, 0xffff21) AM_WRITE(SMH_NOP)						// unknown - flip screen related
 	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(taotaido_sprite_character_bank_select_w)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)					// seems right
 ADDRESS_MAP_END
@@ -155,15 +155,15 @@ static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( taotaido_sound_readport, ADDRESS_SPACE_IO, 8 )

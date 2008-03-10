@@ -125,8 +125,8 @@ static WRITE8_HANDLER( portrait_negative_scroll_w )
 
 static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(MRA8_RAM, portrait_bgvideo_write) AM_BASE(&portrait_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(MRA8_RAM, portrait_fgvideo_write) AM_BASE(&portrait_fgvideoram)
+	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, portrait_bgvideo_write) AM_BASE(&portrait_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(SMH_RAM, portrait_fgvideo_write) AM_BASE(&portrait_fgvideoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w)
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa004, 0xa004) AM_READ(input_port_1_r)
 	AM_RANGE(0xa008, 0xa008) AM_READWRITE(input_port_2_r, portrait_ctrl_w)
 	AM_RANGE(0xa010, 0xa010) AM_READ(input_port_3_r)
-	AM_RANGE(0xa018, 0xa018) AM_READWRITE(MRA8_NOP, portrait_positive_scroll_w)
+	AM_RANGE(0xa018, 0xa018) AM_READWRITE(SMH_NOP, portrait_positive_scroll_w)
 	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
 	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xffff, 0xffff) AM_READNOP

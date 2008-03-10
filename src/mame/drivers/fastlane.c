@@ -89,7 +89,7 @@ static WRITE8_HANDLER( fastlane_K007232_write_port_1_w )
 
 
 static ADDRESS_MAP_START( fastlane_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x005f) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x005f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0800, 0x0800) AM_READ(input_port_2_r) 	/* DIPSW #3 */
 	AM_RANGE(0x0801, 0x0801) AM_READ(input_port_5_r) 	/* 2P inputs */
 	AM_RANGE(0x0802, 0x0802) AM_READ(input_port_4_r) 	/* 1P inputs */
@@ -99,10 +99,10 @@ static ADDRESS_MAP_START( fastlane_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0d) AM_READ(fastlane_K007232_read_port_0_r)/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_READ(fastlane_K007232_read_port_1_r)/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_READ(K051733_r)			/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x1fff) AM_READ(MRA8_RAM)			/* Palette RAM/Work RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_READ(MRA8_RAM)			/* Video RAM + Sprite RAM */
-	AM_RANGE(0x4000, 0x7fff) AM_READ(MRA8_BANK1)			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)			/* ROM */
+	AM_RANGE(0x1000, 0x1fff) AM_READ(SMH_RAM)			/* Palette RAM/Work RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_RAM)			/* Video RAM + Sprite RAM */
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)			/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fastlane_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -112,12 +112,12 @@ static ADDRESS_MAP_START( fastlane_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0d) AM_WRITE(fastlane_K007232_write_port_0_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_WRITE(fastlane_K007232_write_port_1_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
-	AM_RANGE(0x1000, 0x17ff) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)/* palette RAM */
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(MWA8_RAM)				/* Work RAM */
+	AM_RANGE(0x1000, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)/* palette RAM */
+	AM_RANGE(0x1800, 0x1fff) AM_WRITE(SMH_RAM)				/* Work RAM */
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(fastlane_vram1_w) AM_BASE(&fastlane_videoram1)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(fastlane_vram2_w) AM_BASE(&fastlane_videoram2)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)	/* Sprite RAM */
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(MWA8_ROM)				/* ROM/banked ROM */
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)	/* Sprite RAM */
+	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM/banked ROM */
 ADDRESS_MAP_END
 
 /***************************************************************************

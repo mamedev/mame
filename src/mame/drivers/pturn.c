@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(MRA8_RAM, pturn_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(SMH_RAM, pturn_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
 

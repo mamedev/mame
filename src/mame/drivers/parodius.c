@@ -130,7 +130,7 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 
 static ADDRESS_MAP_START( parodius_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(bankedram_r)
-	AM_RANGE(0x0800, 0x1fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0800, 0x1fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3f8c, 0x3f8c) AM_READ(input_port_0_r)
 	AM_RANGE(0x3f8d, 0x3f8d) AM_READ(input_port_1_r)
 	AM_RANGE(0x3f8e, 0x3f8e) AM_READ(input_port_4_r)
@@ -141,13 +141,13 @@ static ADDRESS_MAP_START( parodius_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fcc, 0x3fcd) AM_READ(parodius_sound_r)	/* K053260 */
 	AM_RANGE(0x2000, 0x27ff) AM_READ(parodius_052109_053245_r)
 	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_r)
-	AM_RANGE(0x6000, 0x9fff) AM_READ(MRA8_BANK1)			/* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)			/* ROM */
+	AM_RANGE(0x6000, 0x9fff) AM_READ(SMH_BANK1)			/* banked ROM */
+	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( parodius_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(bankedram_w) AM_BASE(&ram)
-	AM_RANGE(0x0800, 0x1fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0800, 0x1fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x3fa0, 0x3faf) AM_WRITE(K053244_w)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_WRITE(K053251_w)
 	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(parodius_3fc0_w)
@@ -156,20 +156,20 @@ static ADDRESS_MAP_START( parodius_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fcc, 0x3fcd) AM_WRITE(K053260_0_w)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_w)
-	AM_RANGE(0x6000, 0x9fff) AM_WRITE(MWA8_ROM)					/* banked ROM */
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(MWA8_ROM)					/* ROM */
+	AM_RANGE(0x6000, 0x9fff) AM_WRITE(SMH_ROM)					/* banked ROM */
+	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( parodius_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xfc00, 0xfc2f) AM_READ(K053260_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( parodius_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xefff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)

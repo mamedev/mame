@@ -217,11 +217,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(MRA8_RAM, angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_READWRITE(MRA8_RAM, angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_READWRITE(MRA8_RAM, angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(SMH_RAM, angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_READWRITE(SMH_RAM, angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_READWRITE(SMH_RAM, angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
 	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_READWRITE(MRA8_RAM, angelkds_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xed00, 0xeeff) AM_READWRITE(SMH_RAM, angelkds_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -233,15 +233,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP) // 00 on start-up, not again
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) // 00 on start-up, not again
 	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
-	AM_RANGE(0x43, 0x43) AM_WRITE(MWA8_NOP) // 9a on start-up, not again
+	AM_RANGE(0x43, 0x43) AM_WRITE(SMH_NOP) // 9a on start-up, not again
 	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)	/* "Coinage" Dip Switches */
 	AM_RANGE(0x41, 0x41) AM_READ(input_port_1_r)	/* Other Dip Switches */
 	AM_RANGE(0x42, 0x42) AM_READ(input_port_2_r)	/* Players inputs (not needed ?) */
 	AM_RANGE(0x80, 0x80) AM_READ(input_port_3_r)	/* System inputs */
 	AM_RANGE(0x81, 0x82) AM_READ(angelkds_input_r)	/* Players inputs */
-	AM_RANGE(0x83, 0x83) AM_WRITE(MWA8_NOP) // 9b on start-up, not again
+	AM_RANGE(0x83, 0x83) AM_WRITE(SMH_NOP) // 9b on start-up, not again
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
 ADDRESS_MAP_END
 

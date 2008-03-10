@@ -1614,8 +1614,8 @@ static READ8_HANDLER( io_mirror_r )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(blitter_r)
-	AM_RANGE(0x1000, 0xefff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xf000, 0xfeff) AM_READ(MRA8_RAM)        // work ram
+	AM_RANGE(0x1000, 0xefff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf000, 0xfeff) AM_READ(SMH_RAM)        // work ram
 
 	AM_RANGE(0xff66, 0xff66) AM_READ(collision_id_r) // HACK: collision detection bypass(Halley's Comet only)
 	AM_RANGE(0xff71, 0xff71) AM_READ(blitter_status_r)
@@ -1628,9 +1628,9 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff95, 0xff95) AM_READ(input_port_0_r) // dipswitch 4
 	AM_RANGE(0xff96, 0xff96) AM_READ(input_port_1_r) // dipswitch 3
 	AM_RANGE(0xff97, 0xff97) AM_READ(input_port_2_r) // dipswitch 2
-	AM_RANGE(0xff00, 0xffbf) AM_READ(MRA8_RAM)        // I/O read fall-through
+	AM_RANGE(0xff00, 0xffbf) AM_READ(SMH_RAM)        // I/O read fall-through
 
-	AM_RANGE(0xffc0, 0xffdf) AM_READ(MRA8_RAM)        // palette read
+	AM_RANGE(0xffc0, 0xffdf) AM_READ(SMH_RAM)        // palette read
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
 ADDRESS_MAP_END
 
@@ -1638,39 +1638,39 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(blitter_w) AM_BASE(&blitter_ram) AM_SIZE(&blitter_ramsize)
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)       // background tiles?(Ben Bero Beh only)
-	AM_RANGE(0x1000, 0xefff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xf000, 0xfeff) AM_WRITE(MWA8_RAM)        // work ram
+	AM_RANGE(0x1000, 0xefff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xf000, 0xfeff) AM_WRITE(SMH_RAM)        // work ram
 
 	AM_RANGE(0xff8a, 0xff8a) AM_WRITE(soundcommand_w)
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xff00, 0xffbf) AM_WRITE(MWA8_RAM) AM_BASE(&io_ram) AM_SIZE(&io_ramsize) // I/O write fall-through
+	AM_RANGE(0xff00, 0xffbf) AM_WRITE(SMH_RAM) AM_BASE(&io_ram) AM_SIZE(&io_ramsize) // I/O write fall-through
 
 	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_BASE(&paletteram)
-	AM_RANGE(0xffe0, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xffe0, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4801, 0x4801) AM_READ(AY8910_read_port_1_r)
 	AM_RANGE(0x4803, 0x4803) AM_READ(AY8910_read_port_2_r)
 	AM_RANGE(0x4805, 0x4805) AM_READ(AY8910_read_port_3_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(MRA8_ROM) // space for diagnostic ROM
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM) // space for diagnostic ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x4801, 0x4801) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x4802, 0x4802) AM_WRITE(AY8910_control_port_2_w)
 	AM_RANGE(0x4803, 0x4803) AM_WRITE(AY8910_write_port_2_w)
 	AM_RANGE(0x4804, 0x4804) AM_WRITE(AY8910_control_port_3_w)
 	AM_RANGE(0x4805, 0x4805) AM_WRITE(AY8910_write_port_3_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 

@@ -245,10 +245,10 @@ static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x609b, 0x609b) AM_WRITE(banksel_3_2_w)
 	AM_RANGE(0x609d, 0x609d) AM_WRITE(banksel_2_2_w)
 	AM_RANGE(0x609e, 0x609e) AM_WRITE(banksel_1_2_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(MWA8_RAM) AM_BASE(&drawctrl)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(SMH_RAM) AM_BASE(&drawctrl)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(MRA8_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -261,8 +261,8 @@ static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_2_2_w)
 	AM_RANGE(0x4800, 0x4803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0x5000, 0x5003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(MWA8_RAM) AM_BASE(&drawctrl)
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(MRA8_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(SMH_RAM) AM_BASE(&drawctrl)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
@@ -277,9 +277,9 @@ static ADDRESS_MAP_START( amuse_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_3_1_w)
 	AM_RANGE(0x607d, 0x607d) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x607e, 0x607e) AM_WRITE(banksel_1_1_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(MWA8_RAM) AM_BASE(&drawctrl)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(SMH_RAM) AM_BASE(&drawctrl)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(MRA8_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -293,10 +293,10 @@ static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x60fd, 0x60fd) AM_WRITE(banksel_1_2_w)
 	AM_RANGE(0x60fe, 0x60fe) AM_WRITE(banksel_1_1_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE(MWA8_RAM) AM_BASE(&drawctrl)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(SMH_RAM) AM_BASE(&drawctrl)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(MRA8_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE(SMH_RAM, getrivia_bitmap_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 

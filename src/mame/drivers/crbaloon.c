@@ -203,8 +203,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM		/* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, crbaloon_videoram_w) AM_BASE(&crbaloon_videoram)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_READWRITE(MRA8_RAM, crbaloon_colorram_w) AM_BASE(&crbaloon_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, crbaloon_videoram_w) AM_BASE(&crbaloon_videoram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, crbaloon_colorram_w) AM_BASE(&crbaloon_colorram)
 	AM_RANGE(0x5800, 0x7fff) AM_NOP
 ADDRESS_MAP_END
 
@@ -223,15 +223,15 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ(pc3259_r)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
 
-	AM_RANGE(0x00, 0x00) AM_WRITE(MWA8_NOP)	/* not connected */
-	AM_RANGE(0x01, 0x01) AM_WRITE(MWA8_NOP) /* watchdog */
-	AM_RANGE(0x02, 0x04) AM_WRITE(MWA8_RAM) AM_BASE(&crbaloon_spriteram)
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)	/* not connected */
+	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP) /* watchdog */
+	AM_RANGE(0x02, 0x04) AM_WRITE(SMH_RAM) AM_BASE(&crbaloon_spriteram)
 	AM_RANGE(0x05, 0x05) AM_WRITE(port_music_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
 	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE(&pc3092_data)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(MWA8_NOP) /* MSK - to PC3259 */
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(MWA8_NOP) /* schematics has it in a box marked "NOT USE" */
-	AM_RANGE(0x0e, 0x0f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(SMH_NOP) /* MSK - to PC3259 */
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(SMH_NOP) /* schematics has it in a box marked "NOT USE" */
+	AM_RANGE(0x0e, 0x0f) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 

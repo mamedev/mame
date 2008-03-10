@@ -59,18 +59,18 @@ extern VIDEO_UPDATE( battlex );
 /*** MEMORY & PORT READ / WRITE **********************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM) /* not read? */
-	AM_RANGE(0x9000, 0x91ff) AM_READ(MRA8_RAM) /* not read? */
-	AM_RANGE(0xa000, 0xa3ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xe000, 0xe03f) AM_READ(MRA8_RAM) /* not read? */
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM) /* not read? */
+	AM_RANGE(0x9000, 0x91ff) AM_READ(SMH_RAM) /* not read? */
+	AM_RANGE(0xa000, 0xa3ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xe000, 0xe03f) AM_READ(SMH_RAM) /* not read? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(battlex_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(MWA8_RAM) /* main */
+	AM_RANGE(0x9000, 0x91ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(SMH_RAM) /* main */
 	AM_RANGE(0xe000, 0xe03f) AM_WRITE(battlex_palette_w) /* probably palette */
 ADDRESS_MAP_END
 
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 
 	/* 0x30 looks like scroll, but can't be ? changes (increases or decreases)
         depending on the direction your ship is facing on lev 2. at least */
-	AM_RANGE(0x30, 0x30) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x32, 0x32) AM_WRITE(battlex_scroll_x_lsb_w)
 	AM_RANGE(0x33, 0x33) AM_WRITE(battlex_scroll_x_msb_w)

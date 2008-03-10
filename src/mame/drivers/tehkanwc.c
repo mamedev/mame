@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf813, 0xf813) AM_READ(input_port_8_r) /* joy1 - button */
 	AM_RANGE(0xf820, 0xf820) AM_READWRITE(soundlatch2_r, sound_command_w)	/* answer from the sound CPU */
 	AM_RANGE(0xf840, 0xf840) AM_READWRITE(input_port_0_r, sub_cpu_halt_w) /* DSW1 */
-	AM_RANGE(0xf850, 0xf850) AM_READWRITE(input_port_1_r, MWA8_NOP)	/* DSW2, ?? writes 0x00 or 0xff */
+	AM_RANGE(0xf850, 0xf850) AM_READWRITE(input_port_1_r, SMH_NOP)	/* DSW2, ?? writes 0x00 or 0xff */
 	AM_RANGE(0xf860, 0xf860) AM_READWRITE(watchdog_reset_r, tehkanwc_flipscreen_x_w)
 	AM_RANGE(0xf870, 0xf870) AM_READWRITE(input_port_2_r, tehkanwc_flipscreen_y_w) /* DSW3 */
 ADDRESS_MAP_END
@@ -271,8 +271,8 @@ static ADDRESS_MAP_START( sub_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE(5) /* unused part of the palette RAM, I think? Gridiron uses it */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(6) AM_WRITE(tehkanwc_videoram2_w)
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE(7) /* sprites */
-	AM_RANGE(0xec00, 0xec01) AM_READ(MRA8_RAM) AM_WRITE(tehkanwc_scroll_x_w)
-	AM_RANGE(0xec02, 0xec02) AM_READ(MRA8_RAM) AM_WRITE(tehkanwc_scroll_y_w)
+	AM_RANGE(0xec00, 0xec01) AM_READ(SMH_RAM) AM_WRITE(tehkanwc_scroll_x_w)
+	AM_RANGE(0xec02, 0xec02) AM_READ(SMH_RAM) AM_WRITE(tehkanwc_scroll_y_w)
 	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -280,8 +280,8 @@ static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(msm_reset_w)/* MSM51xx reset */
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(MWA8_NOP)	/* ?? written in the IRQ handler */
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(MWA8_NOP)	/* ?? written in the NMI handler */
+	AM_RANGE(0x8002, 0x8002) AM_WRITE(SMH_NOP)	/* ?? written in the IRQ handler */
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(SMH_NOP)	/* ?? written in the NMI handler */
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(soundlatch_r, sound_answer_w)
 ADDRESS_MAP_END
 

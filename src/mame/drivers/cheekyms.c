@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r)
-	AM_RANGE(0x20, 0x3f) AM_WRITE(MWA8_RAM) AM_BASE(&cheekyms_spriteram)
+	AM_RANGE(0x20, 0x3f) AM_WRITE(SMH_RAM) AM_BASE(&cheekyms_spriteram)
 	AM_RANGE(0x40, 0x40) AM_WRITE(cheekyms_port_40_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(cheekyms_port_80_w) AM_BASE(&cheekyms_port_80)
 ADDRESS_MAP_END

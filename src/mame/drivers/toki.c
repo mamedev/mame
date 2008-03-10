@@ -110,10 +110,10 @@ static ADDRESS_MAP_START( toki_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x06e000, 0x06e7ff) AM_READWRITE(MRA16_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x06e800, 0x06efff) AM_READWRITE(MRA16_RAM, toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_READWRITE(MRA16_RAM, toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_READWRITE(MRA16_RAM, toki_foreground_videoram16_w) AM_BASE(&videoram16)
+	AM_RANGE(0x06e000, 0x06e7ff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x06e800, 0x06efff) AM_READWRITE(SMH_RAM, toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
+	AM_RANGE(0x06f000, 0x06f7ff) AM_READWRITE(SMH_RAM, toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
+	AM_RANGE(0x06f800, 0x06ffff) AM_READWRITE(SMH_RAM, toki_foreground_videoram16_w) AM_BASE(&videoram16)
 	AM_RANGE(0x080000, 0x08000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE(&toki_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(input_port_1_word_r)
@@ -125,17 +125,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
-	AM_RANGE(0x06e000, 0x06e7ff) AM_READWRITE(MRA16_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x06e800, 0x06efff) AM_READWRITE(MRA16_RAM, toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_READWRITE(MRA16_RAM, toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_READWRITE(MRA16_RAM, toki_foreground_videoram16_w) AM_BASE(&videoram16)
-	AM_RANGE(0x071000, 0x071001) AM_WRITE(MWA16_NOP)	/* sprite related? seems another scroll register */
+	AM_RANGE(0x06e000, 0x06e7ff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x06e800, 0x06efff) AM_READWRITE(SMH_RAM, toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
+	AM_RANGE(0x06f000, 0x06f7ff) AM_READWRITE(SMH_RAM, toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
+	AM_RANGE(0x06f800, 0x06ffff) AM_READWRITE(SMH_RAM, toki_foreground_videoram16_w) AM_BASE(&videoram16)
+	AM_RANGE(0x071000, 0x071001) AM_WRITE(SMH_NOP)	/* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
-	AM_RANGE(0x071804, 0x071807) AM_WRITE(MWA16_NOP)	/* sprite related, always 01be0100 */
-	AM_RANGE(0x07180e, 0x071e45) AM_WRITE(MWA16_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x071804, 0x071807) AM_WRITE(SMH_NOP)	/* sprite related, always 01be0100 */
+	AM_RANGE(0x07180e, 0x071e45) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
-	AM_RANGE(0x075004, 0x07500b) AM_WRITE(MWA16_RAM) AM_BASE(&toki_scrollram16)
+	AM_RANGE(0x075004, 0x07500b) AM_WRITE(SMH_RAM) AM_BASE(&toki_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ(input_port_2_word_r)
@@ -147,9 +147,9 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( tokib_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
 	AM_RANGE(0xec00, 0xec00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)

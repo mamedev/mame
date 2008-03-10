@@ -25,15 +25,15 @@ VIDEO_UPDATE( tinvader );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(MRA8_RAM, tinvader_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(SMH_RAM, tinvader_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
 	AM_RANGE(0x1d00, 0x1dff) AM_RAM
 	AM_RANGE(0x1e80, 0x1e80) AM_READWRITE(tinvader_port_0_r, tinvader_sound_w)
 	AM_RANGE(0x1e81, 0x1e81) AM_READ(input_port_1_r)
     AM_RANGE(0x1e82, 0x1e82) AM_READ(input_port_2_r)
 	AM_RANGE(0x1e85, 0x1e85) AM_READ(input_port_4_r)					/* Dodgem Only */
-	AM_RANGE(0x1e86, 0x1e86) AM_READWRITE(input_port_5_r, MWA8_NOP)		/* Dodgem Only */
-	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, MWA8_RAM) AM_BASE(&zac2650_s2636_0_ram)
+	AM_RANGE(0x1e86, 0x1e86) AM_READWRITE(input_port_5_r, SMH_NOP)		/* Dodgem Only */
+	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, SMH_RAM) AM_BASE(&zac2650_s2636_0_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )

@@ -265,28 +265,28 @@ static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// battery
 
 	AM_RANGE( 0x412000, 0x412fff ) AM_READ( bishjan_tmap2_lo_r )	//?
-	AM_RANGE( 0x413000, 0x413fff ) AM_READ( MRA16_RAM ) AM_SHARE(1)
+	AM_RANGE( 0x413000, 0x413fff ) AM_READ( SMH_RAM ) AM_SHARE(1)
 	AM_RANGE( 0x416000, 0x416fff ) AM_READ( bishjan_tmap1_lo_r )	//?
-	AM_RANGE( 0x417000, 0x417fff ) AM_READ( MRA16_RAM ) AM_SHARE(1)
+	AM_RANGE( 0x417000, 0x417fff ) AM_READ( SMH_RAM ) AM_SHARE(1)
 	AM_RANGE( 0x422000, 0x422fff ) AM_READ( bishjan_tmap2_hi_r )	//?
-	AM_RANGE( 0x423000, 0x423fff ) AM_READ( MRA16_RAM ) AM_SHARE(2)
+	AM_RANGE( 0x423000, 0x423fff ) AM_READ( SMH_RAM ) AM_SHARE(2)
 	AM_RANGE( 0x426000, 0x426fff ) AM_READ( bishjan_tmap1_hi_r )
-	AM_RANGE( 0x427000, 0x427fff ) AM_READ( MRA16_RAM ) AM_SHARE(2)
+	AM_RANGE( 0x427000, 0x427fff ) AM_READ( SMH_RAM ) AM_SHARE(2)
 	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE( bishjan_tmap2_w )
 	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE( bishjan_tmap2_w )		//?
-	AM_RANGE( 0x433000, 0x433fff ) AM_WRITE( MWA16_RAM ) AM_SHARE(1)
+	AM_RANGE( 0x433000, 0x433fff ) AM_WRITE( SMH_RAM ) AM_SHARE(1)
 	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE( bishjan_tmap1_w )
 	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE( bishjan_tmap1_w )		//?
-	AM_RANGE( 0x437000, 0x437fff ) AM_WRITE( MWA16_RAM ) AM_SHARE(2)
+	AM_RANGE( 0x437000, 0x437fff ) AM_WRITE( SMH_RAM ) AM_SHARE(2)
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( MRA16_NOP, bishjan_sel_w )
+	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( SMH_NOP, bishjan_sel_w )
 	AM_RANGE( 0x600060, 0x600061 ) AM_WRITE( colordac_w )
-	AM_RANGE( 0x600062, 0x600063 ) AM_WRITE( MWA16_NOP )	// ff to 600062
+	AM_RANGE( 0x600062, 0x600063 ) AM_WRITE( SMH_NOP )	// ff to 600062
 	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE( bishjan_low_w )
 
-	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE( MWA16_RAM ) AM_BASE( &bishjan_layers )
+	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE( SMH_RAM ) AM_BASE( &bishjan_layers )
 
-	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE( MWA16_RAM ) AM_BASE( &bishjan_scroll )
+	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE( SMH_RAM ) AM_BASE( &bishjan_scroll )
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ( input_port_1_word_r )	// c00001 sw1
 	AM_RANGE( 0xc00002, 0xc00003 ) AM_READWRITE( input_port_2_word_r, bishjan_input_w )	// in c

@@ -99,16 +99,16 @@ static const ppi8255_interface single_ppi_intf =
 static const struct segaic16_memory_map_entry outrun_info[] =
 {
 	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r, segaic16_road_control_0_w, NULL,                  "road control" },
-	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, MRA16_BANK10,              MWA16_BANK10,              &segaic16_roadram_0,   "road RAM" },
-	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, MRA16_BANK11,              MWA16_BANK11,              &cpu1ram,              "CPU 1 RAM" },
-	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, MRA16_BANK12,              MWA16_UNMAP,               &cpu1rom,              "CPU 1 ROM" },
+	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, SMH_BANK10,              SMH_BANK10,              &segaic16_roadram_0,   "road RAM" },
+	{ 0x35/2, 0x60000, 0x08000, 0xf18000,      ~0, SMH_BANK11,              SMH_BANK11,              &cpu1ram,              "CPU 1 RAM" },
+	{ 0x35/2, 0x00000, 0x60000, 0xf00000,      ~0, SMH_BANK12,              SMH_UNMAP,               &cpu1rom,              "CPU 1 ROM" },
 	{ 0x31/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,                 misc_io_w,                 NULL,                  "I/O space" },
-	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, MRA16_BANK13,              MWA16_BANK13,              &segaic16_spriteram_0, "object RAM" },
-	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, MRA16_BANK14,              segaic16_paletteram_w,     &paletteram16,         "color RAM" },
-	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, MRA16_BANK15,              segaic16_tileram_0_w,      &segaic16_tileram_0,   "tile RAM" },
-	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, MRA16_BANK16,              segaic16_textram_0_w,      &segaic16_textram_0,   "text RAM" },
-	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, MRA16_BANK17,              MWA16_BANK17,              &workram,              "CPU 0 RAM" },
-	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, MRA16_BANK18,              MWA16_UNMAP,               NULL,                  "CPU 0 ROM" },
+	{ 0x2d/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK13,              SMH_BANK13,              &segaic16_spriteram_0, "object RAM" },
+	{ 0x29/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK14,              segaic16_paletteram_w,     &paletteram16,         "color RAM" },
+	{ 0x25/2, 0x00000, 0x10000, 0xfe0000,      ~0, SMH_BANK15,              segaic16_tileram_0_w,      &segaic16_tileram_0,   "tile RAM" },
+	{ 0x25/2, 0x10000, 0x01000, 0xfef000,      ~0, SMH_BANK16,              segaic16_textram_0_w,      &segaic16_textram_0,   "text RAM" },
+	{ 0x21/2, 0x60000, 0x08000, 0xf98000,      ~0, SMH_BANK17,              SMH_BANK17,              &workram,              "CPU 0 RAM" },
+	{ 0x21/2, 0x00000, 0x60000, 0xf80000, 0x00000, SMH_BANK18,              SMH_UNMAP,               NULL,                  "CPU 0 ROM" },
 	{ 0 }
 };
 

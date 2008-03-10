@@ -151,17 +151,17 @@ static PALETTE_INIT( atarifb )
 static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(SMH_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(SMH_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(SMH_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
+	AM_RANGE(0x3000, 0x3000) AM_READ(SMH_RAM)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP) /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
@@ -172,17 +172,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(SMH_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(SMH_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(SMH_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(atarifb4_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
+	AM_RANGE(0x3000, 0x3000) AM_READ(SMH_RAM)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP) /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb4_in0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb4_in2_r)
@@ -194,17 +194,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(SMH_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(SMH_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_READWRITE(SMH_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(abaseb_out1_w) /* OUT 1 */
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(atarifb_out2_w) /* OUT 2 */
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(atarifb_out3_w) /* OUT 3 */
-	AM_RANGE(0x3000, 0x3000) AM_READ(MRA8_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
+	AM_RANGE(0x3000, 0x3000) AM_READ(SMH_RAM)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_NOP) /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ(atarifb_in0_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ(atarifb_in2_r)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
@@ -215,15 +215,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x025f) AM_READWRITE(MRA8_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
+	AM_RANGE(0x0200, 0x025f) AM_READWRITE(SMH_RAM, atarifb_alpha1_videoram_w) AM_BASE(&atarifb_alphap1_videoram)
 	AM_RANGE(0x0260, 0x039f) AM_RAM
-	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(MRA8_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
-	AM_RANGE(0x0800, 0x0bbf) AM_READWRITE(MRA8_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
+	AM_RANGE(0x03a0, 0x03ff) AM_READWRITE(SMH_RAM, atarifb_alpha2_videoram_w) AM_BASE(&atarifb_alphap2_videoram)
+	AM_RANGE(0x0800, 0x0bbf) AM_READWRITE(SMH_RAM, atarifb_field_videoram_w) AM_BASE(&atarifb_field_videoram)
 	AM_RANGE(0x0bc0, 0x0bff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(MWA8_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_RAM) AM_BASE(&atarifb_scroll_register) /* OUT 0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(soccer_out1_w) /* OUT 1 */
 	AM_RANGE(0x1002, 0x1002) AM_WRITE(soccer_out2_w) /* OUT 2 */
-	AM_RANGE(0x1004, 0x1004) AM_WRITE(MWA8_NOP) /* Interrupt Acknowledge */
+	AM_RANGE(0x1004, 0x1004) AM_WRITE(SMH_NOP) /* Interrupt Acknowledge */
 	AM_RANGE(0x1005, 0x1005) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ(atarifb4_in0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ(input_port_1_r)

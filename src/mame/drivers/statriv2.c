@@ -297,30 +297,30 @@ static READ8_HANDLER (hangman_questions_read)
 }
 
 static ADDRESS_MAP_START( statriv2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x4800, 0x48ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x2fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
+	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x4800, 0x48ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(statriv2_videoram_w) AM_BASE(&statriv2_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supertr2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc800, 0xcfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
+	AM_RANGE(0x4800, 0x48ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc800, 0xcfff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supertr2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x4800, 0x48ff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x4800, 0x48ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    // backup ram?
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(statriv2_videoram_w) AM_BASE(&statriv2_videoram)
 ADDRESS_MAP_END
 
@@ -329,17 +329,17 @@ static ADDRESS_MAP_START( statriv2_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_1_r)
 	AM_RANGE(0x2b, 0x2b) AM_READ(statriv2_questions_read)		// question data
 	AM_RANGE(0xb1, 0xb1) AM_READ(AY8910_read_port_0_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READ(MRA8_NOP)				// ???
+	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITE(MWA8_NOP)				// ???
-	AM_RANGE(0x23, 0x23) AM_WRITE(MWA8_NOP)				// ???
+	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)				// ???
+	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)				// ???
 	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_low_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_high_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xb1, 0xb1) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(MWA8_NOP)				// ???
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv4_readport, ADDRESS_SPACE_IO, 8 )
@@ -347,17 +347,17 @@ static ADDRESS_MAP_START( statriv4_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_1_r)
 	AM_RANGE(0x28, 0x28) AM_READ(statriv2_questions_read)		// question data
 	AM_RANGE(0xb1, 0xb1) AM_READ(AY8910_read_port_0_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READ(MRA8_NOP)				// ???
+	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv4_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITE(MWA8_NOP)				// ???
-	AM_RANGE(0x23, 0x23) AM_WRITE(MWA8_NOP)				// ???
+	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)				// ???
+	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)				// ???
 	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_high_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_low_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xb1, 0xb1) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(MWA8_NOP)				// ???
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supertr2_readport, ADDRESS_SPACE_IO, 8 )
@@ -365,28 +365,28 @@ static ADDRESS_MAP_START( supertr2_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_1_r)
 	AM_RANGE(0x28, 0x28) AM_READ(supertr2_questions_read)                // question data
 	AM_RANGE(0xb1, 0xb1) AM_READ(AY8910_read_port_0_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READ(MRA8_NOP)			// ???
+	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)			// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supertr2_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x22, 0x22) AM_WRITE(MWA8_NOP)				// ???
-	AM_RANGE(0x23, 0x23) AM_WRITE(MWA8_NOP)			// ???
+	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)				// ???
+	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)			// ???
 	AM_RANGE(0x28, 0x28) AM_WRITE(question_offset_low_w)
 	AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_med_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(question_offset_high_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xb1, 0xb1) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(MWA8_NOP)				// ???
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trivquiz_writeport, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x22, 0x22) AM_WRITE(MWA8_NOP)                               // ???
-    AM_RANGE(0x23, 0x23) AM_WRITE(MWA8_NOP)                               // ???
+    AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)                               // ???
+    AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP)                               // ???
     AM_RANGE(0x28, 0x28) AM_WRITE(question_offset_low_w)
     AM_RANGE(0x29, 0x29) AM_WRITE(question_offset_high_w)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xb1, 0xb1) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(MWA8_NOP)				// ???
+	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trivquiz_readport, ADDRESS_SPACE_IO, 8 )
@@ -394,7 +394,7 @@ static ADDRESS_MAP_START( trivquiz_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_1_r)
 	AM_RANGE(0x2a, 0x2a) AM_READ(statriv2_questions_read)                // question data
 	AM_RANGE(0xb1, 0xb1) AM_READ(AY8910_read_port_0_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READ(MRA8_NOP)				// ???
+	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supertr3_readport, ADDRESS_SPACE_IO, 8 )
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( supertr3_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_1_r)
 	AM_RANGE(0x28, 0x28) AM_READ(supertr3_questions_read)                // question data
 	AM_RANGE(0xb1, 0xb1) AM_READ(AY8910_read_port_0_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READ(MRA8_NOP)				// ???
+	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)				// ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hangman_readport, ADDRESS_SPACE_IO, 8 )
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( hangman_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READ(input_port_1_r)
 	AM_RANGE(0x28, 0x28) AM_READ(hangman_questions_read)                // question data
 	AM_RANGE(0xb1, 0xb1) AM_READ(AY8910_read_port_0_r)		// ???
-	AM_RANGE(0xce, 0xce) AM_READ(MRA8_NOP)			// ???
+	AM_RANGE(0xce, 0xce) AM_READ(SMH_NOP)			// ???
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( statriv2 )

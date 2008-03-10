@@ -218,8 +218,8 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
 
 	AM_RANGE(0xf0e0, 0xf0e0) AM_READ(msisaac_mcu_r)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
@@ -233,8 +233,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xdfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0xdfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM)
 
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
 
@@ -243,11 +243,11 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
 
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
-	AM_RANGE(0xf061, 0xf061) AM_WRITE(MWA8_NOP) /*sound_reset*/	//????
+	AM_RANGE(0xf061, 0xf061) AM_WRITE(SMH_NOP) /*sound_reset*/	//????
 
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(MWA8_RAM) 			//???
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(MWA8_RAM) 			//???
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(SMH_RAM) 			//???
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(SMH_RAM) 			//???
 
 	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE(msisaac_fg_scrollx_w)
 	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE(msisaac_fg_scrolly_w)
@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xf0e0, 0xf0e0) AM_WRITE(msisaac_mcu_w)
 
-	AM_RANGE(0xf100, 0xf17f) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram)	//sprites
+	AM_RANGE(0xf100, 0xf17f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram)	//sprites
 	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(msisaac_fg_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(msisaac_bg2_videoram_w) AM_BASE(&msisaac_videoram2)
 	AM_RANGE(0xfc00, 0xffff) AM_WRITE(msisaac_bg_videoram_w) AM_BASE(&msisaac_videoram)
@@ -271,10 +271,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_NOP) /*space for diagnostic ROM (not dumped, not reachable) */
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_NOP) /*space for diagnostic ROM (not dumped, not reachable) */
 ADDRESS_MAP_END
 
 
@@ -326,8 +326,8 @@ static WRITE8_HANDLER( sound_control_1_w )
 
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM)
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(AY8910_write_port_0_w)
@@ -339,7 +339,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(MWA8_NOP) /*???*/ /* this is NOT mixer_enable */
+	AM_RANGE(0xc003, 0xc003) AM_WRITE(SMH_NOP) /*???*/ /* this is NOT mixer_enable */
 
 ADDRESS_MAP_END
 
@@ -350,8 +350,8 @@ static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_portA_r)
 	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_portB_r)
 	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_portC_r)
-	AM_RANGE(0x0010, 0x007f) AM_READ(MRA8_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -362,8 +362,8 @@ static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddrA_w)
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddrB_w)
 	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x0080, 0x07ff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0010, 0x007f) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 #endif

@@ -561,9 +561,9 @@ static WRITE8_HANDLER( megaplay_game_w )
 }
 
 static ADDRESS_MAP_START( megaplay_bios_readmem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x5000, 0x5fff) AM_READ(MRA8_RAM)
+ 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x5000, 0x5fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x6200, 0x6200) AM_READ(input_port_7_r)
 	AM_RANGE(0x6201, 0x6201) AM_READ(input_port_8_r)
 	AM_RANGE(0x6400, 0x6400) AM_READ(input_port_5_r)
@@ -574,14 +574,14 @@ static ADDRESS_MAP_START( megaplay_bios_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6403, 0x6403) AM_READ(megaplay_bios_gamesel_r)
 	AM_RANGE(0x6404, 0x6404) AM_READ(megaplay_bios_6404_r)
 	AM_RANGE(0x6600, 0x6600) AM_READ(megaplay_bios_6600_r)
-	AM_RANGE(0x6800, 0x77ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x6800, 0x77ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8000, 0xffff) AM_READ(bank_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaplay_bios_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x5000, 0x5fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(megaplay_game_w)
 	AM_RANGE(0x6203, 0x6203) AM_WRITE(megaplay_bios_banksel_w)
 	AM_RANGE(0x6204, 0x6204) AM_WRITE(megaplay_bios_width_w)
@@ -589,8 +589,8 @@ static ADDRESS_MAP_START( megaplay_bios_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6403, 0x6403) AM_WRITE(megaplay_bios_gamesel_w)
 	AM_RANGE(0x6404, 0x6404) AM_WRITE(megaplay_bios_6404_w)
 	AM_RANGE(0x6600, 0x6600) AM_WRITE(megaplay_bios_6600_w)
-	AM_RANGE(0x6001, 0x67ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0x6800, 0x77ff) AM_WRITE(MWA8_RAM) AM_BASE(&ic3_ram)
+	AM_RANGE(0x6001, 0x67ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x6800, 0x77ff) AM_WRITE(SMH_RAM) AM_BASE(&ic3_ram)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
@@ -994,8 +994,8 @@ static DRIVER_INIT (megaplay)
 	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_w);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_read8_handler(1,  ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MRA8_BANK7);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, MWA8_BANK7);
+	memory_install_read8_handler(1,  ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK7);
+	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK7);
 	memory_set_bankptr(7, &ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */

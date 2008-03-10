@@ -154,10 +154,10 @@ static WRITE16_HANDLER( m107_sound_status_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK(1)
-	AM_RANGE(0xd0000, 0xdffff) AM_READWRITE(MRA16_RAM, m107_vram_w) AM_BASE(&m107_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_READWRITE(SMH_RAM, m107_vram_w) AM_BASE(&m107_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE(&spriteram16)
-	AM_RANGE(0xf9000, 0xf9fff) AM_READWRITE(MRA16_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xf9000, 0xf9fff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -169,19 +169,19 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)	/* answer from sound CPU */
 	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(MWA16_NOP) /* ??? 0008 */
+	AM_RANGE(0x04, 0x05) AM_WRITE(SMH_NOP) /* ??? 0008 */
 	AM_RANGE(0x06, 0x07) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x80, 0x9f) AM_WRITE(m107_control_w)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(MWA16_NOP) /* Written with 0's in interrupt */
+	AM_RANGE(0xa0, 0xaf) AM_WRITE(SMH_NOP) /* Written with 0's in interrupt */
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
-	AM_RANGE(0xc0, 0xc3) AM_READ(MRA16_NOP) /* Only wpksoc: ticket related? */
+	AM_RANGE(0xc0, 0xc3) AM_READ(SMH_NOP) /* Only wpksoc: ticket related? */
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(MWA16_NOP) /* Irq controller? */
+	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(SMH_NOP) /* Irq controller? */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_READWRITE(IremGA20_r, IremGA20_w)
 	AM_RANGE(0xa8040, 0xa8041) AM_WRITE(YM2151_register_port_0_lsb_w)

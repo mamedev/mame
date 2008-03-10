@@ -700,7 +700,7 @@ static ADDRESS_MAP_START( alpha68k_I_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM						  // main program
 	AM_RANGE(0x080000, 0x083fff) AM_RAM						  // work RAM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) // video RAM
-	AM_RANGE(0x180000, 0x180001) AM_READWRITE(input_port_3_word_r, MWA16_NOP) // LSB: DSW0, MSB: watchdog(?)
+	AM_RANGE(0x180000, 0x180001) AM_READWRITE(input_port_3_word_r, SMH_NOP) // LSB: DSW0, MSB: watchdog(?)
 	AM_RANGE(0x180008, 0x180009) AM_READ(input_port_4_word_r) // LSB: DSW1
 	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_0_word_r) // joy1, joy2
 	AM_RANGE(0x340000, 0x340001) AM_READ(input_port_1_word_r) // coin, start, service
@@ -716,13 +716,13 @@ static ADDRESS_MAP_START( alpha68k_II_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c00ff) AM_WRITE(alpha68k_II_video_bank_w)
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ(control_3_r) /* Bottom of CN2 */
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ(control_4_r) /* Top of CN1 & CN2 */
-	AM_RANGE(0x0d8000, 0x0d8001) AM_READ(MRA16_NOP) /* IRQ ack? */
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(MRA16_NOP) /* IRQ ack? */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(MRA16_NOP) /* watchdog? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(MRA16_RAM, alpha68k_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d8000, 0x0d8001) AM_READ(SMH_NOP) /* IRQ ack? */
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(SMH_NOP) /* IRQ ack? */
+	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(SMH_NOP) /* watchdog? */
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SMH_RAM, alpha68k_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(MRA16_RAM, alpha68k_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(SMH_RAM, alpha68k_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK(8)
 ADDRESS_MAP_END
 
@@ -735,12 +735,12 @@ static ADDRESS_MAP_START( alpha68k_V_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READNOP /* IRQ ack? */
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* IRQ ack? */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* watchdog? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(MRA16_RAM, alpha68k_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SMH_RAM, alpha68k_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x300000, 0x303fff) AM_READ(alpha_V_trigger_r)
 	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
 	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(MRA16_RAM, alpha68k_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(SMH_RAM, alpha68k_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK(8)
 ADDRESS_MAP_END
 
@@ -787,13 +787,13 @@ static ADDRESS_MAP_START( kyros_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(DAC_0_signed_data_w)
-	AM_RANGE(0xe006, 0xe00e) AM_WRITE(MWA8_NOP) // soundboard I/O's, ignored
+	AM_RANGE(0xe006, 0xe00e) AM_WRITE(SMH_NOP) // soundboard I/O's, ignored
 /* reference only
-    AM_RANGE(0xe006, 0xe006) AM_WRITE(MWA8_NOP) // NMI: diminishing saw-tooth
-    AM_RANGE(0xe008, 0xe008) AM_WRITE(MWA8_NOP) // NMI: 00
-    AM_RANGE(0xe00a, 0xe00a) AM_WRITE(MWA8_NOP) // RST38: 20
-    AM_RANGE(0xe00c, 0xe00c) AM_WRITE(MWA8_NOP) // RST30: 00 on entry
-    AM_RANGE(0xe00e, 0xe00e) AM_WRITE(MWA8_NOP) // RST30: 00,02,ff on exit(0x1d88)
+    AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_NOP) // NMI: diminishing saw-tooth
+    AM_RANGE(0xe008, 0xe008) AM_WRITE(SMH_NOP) // NMI: 00
+    AM_RANGE(0xe00a, 0xe00a) AM_WRITE(SMH_NOP) // RST38: 20
+    AM_RANGE(0xe00c, 0xe00c) AM_WRITE(SMH_NOP) // RST30: 00 on entry
+    AM_RANGE(0xe00e, 0xe00e) AM_WRITE(SMH_NOP) // RST30: 00,02,ff on exit(0x1d88)
 */
 ADDRESS_MAP_END
 
@@ -853,7 +853,7 @@ static ADDRESS_MAP_START( jongbou_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnexspce_sound_portmap, ADDRESS_SPACE_IO, 8 )

@@ -55,9 +55,9 @@ static MACHINE_RESET( springer )
 static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(MRA8_RAM, marineb_videoram_w) AM_BASE(&marineb_videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(SMH_RAM, marineb_videoram_w) AM_BASE(&marineb_videoram)
 	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE(&spriteram)  /* Hoccer only */
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(MRA8_RAM, marineb_colorram_w) AM_BASE(&marineb_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, marineb_colorram_w) AM_BASE(&marineb_colorram)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
 	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(marineb_flipscreen_x_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_2_r)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, MWA8_NOP)  /* also watchdog */
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(input_port_3_r, SMH_NOP)  /* also watchdog */
 ADDRESS_MAP_END
 
 

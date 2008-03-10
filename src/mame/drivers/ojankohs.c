@@ -230,48 +230,48 @@ static WRITE8_HANDLER( ccasino_coinctr_w )
 
 
 static ADDRESS_MAP_START( readmem_ojankohs, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(ojankohs_videoram_r)
 	AM_RANGE(0x9000, 0x9fff) AM_READ(ojankohs_colorram_r)
-	AM_RANGE(0xa000, 0xb7ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xa000, 0xb7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xb800, 0xbfff) AM_READ(ojankohs_palette_r)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_ojankohs, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xa000, 0xb7ff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xa000, 0xb7ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(ojankohs_palette_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_ojankoy, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(ojankohs_videoram_r)
 	AM_RANGE(0xa000, 0xafff) AM_READ(ojankohs_colorram_r)
-	AM_RANGE(0xb000, 0xbfff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_RAM)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_ojankoy, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(ojankohs_videoram_w)
 	AM_RANGE(0xa000, 0xafff) AM_WRITE(ojankohs_colorram_w)
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_ojankoc, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_ojankoc, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 
@@ -294,8 +294,8 @@ static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(MWA8_NOP)				// unknown
-	AM_RANGE(0x11, 0x11) AM_WRITE(MWA8_NOP)				// unknown
+	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				// unknown
+	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)				// unknown
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankoy, ADDRESS_SPACE_IO, 8 )
@@ -330,8 +330,8 @@ static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w)		// 16bit address access
-	AM_RANGE(0x10, 0x10) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x11, 0x11) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_ojankoc, ADDRESS_SPACE_IO, 8 )

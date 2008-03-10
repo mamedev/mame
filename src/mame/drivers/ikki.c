@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( ikki_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe005, 0xe005) AM_READ(input_port_3_r) /* player2 */
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(ikki_scrn_ctrl_w)
 	AM_RANGE(0xe009, 0xe009) AM_WRITE(ikki_coin_counters)
-	AM_RANGE(0xe00a, 0xe00b) AM_WRITE(MWA8_RAM) AM_BASE(&ikki_scroll)
+	AM_RANGE(0xe00a, 0xe00b) AM_WRITE(SMH_RAM) AM_BASE(&ikki_scroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikki_cpu2, ADDRESS_SPACE_PROGRAM, 8 )

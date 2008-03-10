@@ -124,70 +124,70 @@ static WRITE8_HANDLER( system1_soundport_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_ROM)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM)	// ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)	// ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
-	AM_RANGE(0xe800, 0xeeff) AM_WRITE(MWA8_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
-	AM_RANGE(0xefbd, 0xefbd) AM_WRITE(MWA8_RAM) AM_BASE(&system1_scroll_y)
-	AM_RANGE(0xeffc, 0xeffd) AM_WRITE(MWA8_RAM) AM_BASE(&system1_scroll_x)
+	AM_RANGE(0xe800, 0xeeff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xefbd, 0xefbd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_y)
+	AM_RANGE(0xeffc, 0xeffd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_x)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
 
 	/* these are required to make various games work (teddybb, imsorry, raflesia) */
 	/* these may actually be backed by RAM, or may be mirrors of other RAM areas */
-	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xde00, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xef00, 0xefbc) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xefbe, 0xeffb) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xeffe, 0xefff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xef00, 0xefbc) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xefbe, 0xeffb) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xeffe, 0xefff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blckgalb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM) // ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) // ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe800, 0xeeff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
-	AM_RANGE(0xe000, 0xe6ff) AM_WRITE(MWA8_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
-	AM_RANGE(0xe7bd, 0xe7bd) AM_WRITE(MWA8_RAM) AM_BASE(&system1_scroll_y)	// ???
-	AM_RANGE(0xe7c0, 0xe7c1) AM_WRITE(MWA8_RAM) AM_BASE(&system1_scroll_x)
+	AM_RANGE(0xe000, 0xe6ff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xe7bd, 0xe7bd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_y)	// ???
+	AM_RANGE(0xe7c0, 0xe7c1) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_x)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brain_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xffff) AM_READ(MRA8_RAM) AM_BASE(&system1_ram)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_RAM) AM_BASE(&system1_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbml_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM) AM_BASE(&system1_ram)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM) AM_BASE(&system1_ram)
 	AM_RANGE(0xe000, 0xefff) AM_READ(wbml_paged_videoram_r)
-	AM_RANGE(0xf000, 0xf3ff) AM_READ(MRA8_RAM)
-	AM_RANGE(0xf800, 0xfbff) AM_READ(MRA8_RAM)
+	AM_RANGE(0xf000, 0xf3ff) AM_READ(SMH_RAM)
+	AM_RANGE(0xf800, 0xfbff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbml_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM) // ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM) // mirror?
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) // ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM) // mirror?
 	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(wbml_paged_videoram_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
@@ -195,46 +195,46 @@ static ADDRESS_MAP_START( wbml_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chplft_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(MWA8_RAM) // ROM
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM) // ROM
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe7c0, 0xe7ff) AM_WRITE(choplifter_scroll_x_w) AM_BASE(&system1_scrollx_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(MWA8_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
 	AM_RANGE(0xe800, 0xeeff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
 
 	 /* needed for P.O.S.T. */
-	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xde00, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xef00, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xef00, 0xefff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nobo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(MWA8_ROM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(system1_background_collisionram_w) AM_BASE(&system1_background_collisionram)
 	AM_RANGE(0xc800, 0xcbff) AM_WRITE(system1_sprites_collisionram_w) AM_BASE(&system1_sprites_collisionram)
-	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xd000, 0xd1ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd800, 0xddff) AM_WRITE(system1_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xde00, 0xdfff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(system1_backgroundram_w) AM_BASE(&system1_backgroundram) AM_SIZE(&system1_backgroundram_size)
-	AM_RANGE(0xe800, 0xeeff) AM_WRITE(MWA8_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
-	AM_RANGE(0xefbd, 0xefbd) AM_WRITE(MWA8_RAM) AM_BASE(&system1_scroll_y)
-	AM_RANGE(0xeffc, 0xeffd) AM_WRITE(MWA8_RAM) AM_BASE(&system1_scroll_x)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xe800, 0xeeff) AM_WRITE(SMH_RAM) AM_BASE(&system1_videoram) AM_SIZE(&system1_videoram_size)
+	AM_RANGE(0xefbd, 0xefbd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_y)
+	AM_RANGE(0xeffc, 0xeffd) AM_WRITE(SMH_RAM) AM_BASE(&system1_scroll_x)
+	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 
 	/* These addresses are written during P.O.S.T. but don't seem to be used after */
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xde00, 0xdfff) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xef00, 0xefbc) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xefbe, 0xeffb) AM_WRITE(MWA8_RAM)
-	AM_RANGE(0xeffe, 0xefff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd200, 0xd7ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xde00, 0xdfff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xef00, 0xefbc) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xefbe, 0xeffb) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xeffe, 0xefff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 

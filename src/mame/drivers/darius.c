@@ -248,20 +248,20 @@ logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",
 ***********************************************************/
 
 static ADDRESS_MAP_START( darius_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_READ(MRA16_RAM)		/* main RAM */
+	AM_RANGE(0x000000, 0x05ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x080000, 0x08ffff) AM_READ(SMH_RAM)		/* main RAM */
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(darius_ioc_r)	/* inputs, sound */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_READ(PC080SN_word_0_r)	/* tilemaps */
-	AM_RANGE(0xd80000, 0xd80fff) AM_READ(MRA16_RAM)	/* palette */
+	AM_RANGE(0xd80000, 0xd80fff) AM_READ(SMH_RAM)	/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_READWRITE(MRA16_RAM, darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
-	AM_RANGE(0xe10000, 0xe10fff) AM_READ(MRA16_RAM)		/* ??? */
+	AM_RANGE(0xe08000, 0xe0ffff) AM_READWRITE(SMH_RAM, darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
+	AM_RANGE(0xe10000, 0xe10fff) AM_READ(SMH_RAM)		/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x05ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x080000, 0x08ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
 	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* coin ctr & lockout, sound */
@@ -270,20 +270,20 @@ static ADDRESS_MAP_START( darius_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd40000, 0xd40003) AM_WRITE(PC080SN_xscroll_word_0_w)
 	AM_RANGE(0xd50000, 0xd50003) AM_WRITE(PC080SN_ctrl_word_0_w)
 	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xe10000, 0xe10fff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0xe10000, 0xe10fff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(MRA16_ROM)
-	AM_RANGE(0x040000, 0x04ffff) AM_READ(MRA16_RAM)	/* local RAM */
+	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
+	AM_RANGE(0x040000, 0x04ffff) AM_READ(SMH_RAM)	/* local RAM */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_READWRITE(MRA16_RAM, darius_fg_layer_w) AM_SHARE(3)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_READWRITE(SMH_RAM, darius_fg_layer_w) AM_SHARE(3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(MWA16_ROM)
-	AM_RANGE(0x040000, 0x04ffff) AM_WRITE(MWA16_RAM)
+	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x040000, 0x04ffff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
 	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
 ADDRESS_MAP_END
@@ -475,19 +475,19 @@ static WRITE8_HANDLER( darius_write_portB1 )
 *****************************************************/
 
 static ADDRESS_MAP_START( darius_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0x9001, 0x9001) AM_READ(YM2203_read_port_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_1_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(YM2203_read_port_1_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(MRA8_NOP)
+	AM_RANGE(0xb000, 0xb000) AM_READ(SMH_NOP)
 	AM_RANGE(0xb001, 0xb001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(MWA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
@@ -505,12 +505,12 @@ static ADDRESS_MAP_START( darius_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READ(MRA8_ROM)
+	AM_RANGE(0x0000, 0xffff) AM_READ(SMH_ROM)
 	/* yes, no RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(MWA8_NOP)	/* writes rom whenever interrupt occurs - as no stack */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_NOP)	/* writes rom whenever interrupt occurs - as no stack */
 	/* yes, no RAM */
 ADDRESS_MAP_END
 

@@ -523,10 +523,10 @@ ADDRESS_MAP_END
 void defender_install_io_space(void)
 {
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc00f, 0, 0x03e0, MWA8_BANK4);
+	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc00f, 0, 0x03e0, SMH_BANK4);
 	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
 	memory_install_write8_handler     (0, ADDRESS_SPACE_PROGRAM, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
-	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc400, 0xc4ff, 0, 0x0300, MRA8_BANK3, williams_cmos_w);
+	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xc400, 0xc4ff, 0, 0x0300, SMH_BANK3, williams_cmos_w);
 	memory_install_read8_handler      (0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
 	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcc03, 0, 0x03e0, pia_1_r, pia_1_w);
 	memory_install_readwrite8_handler (0, ADDRESS_SPACE_PROGRAM, 0xcc04, 0xcc07, 0, 0x03e0, pia_0_r, pia_0_w);
@@ -543,31 +543,31 @@ void defender_install_io_space(void)
  *************************************/
 
 static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(williams_vram_select_w)
 	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(MRA8_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(SMH_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(sinistar_vram_select_w)
 	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(MRA8_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(SMH_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -581,12 +581,12 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
-	AM_RANGE(0x4000, 0x8fff) AM_READWRITE(MRA8_BANK2, MWA8_RAM)
-	AM_RANGE(0xbb00, 0xbbff) AM_WRITE(MWA8_RAM) AM_BASE(&blaster_palette_0)
-	AM_RANGE(0xbc00, 0xbcff) AM_WRITE(MWA8_RAM) AM_BASE(&blaster_scanline_control)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x4000, 0x8fff) AM_READWRITE(SMH_BANK2, SMH_RAM)
+	AM_RANGE(0xbb00, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&blaster_palette_0)
+	AM_RANGE(0xbc00, 0xbcff) AM_WRITE(SMH_RAM) AM_BASE(&blaster_scanline_control)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(MWA8_RAM) AM_BASE(&paletteram)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITE(SMH_RAM) AM_BASE(&paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_READWRITE(pia_1_r, pia_1_w)
 	AM_RANGE(0xc900, 0xc93f) AM_WRITE(blaster_vram_select_w)
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(MRA8_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(SMH_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -609,9 +609,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(MRA8_RAM, williams2_tileram_w) AM_BASE(&williams2_tileram)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(SMH_RAM, williams2_tileram_w) AM_BASE(&williams2_tileram)
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
 	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
@@ -625,15 +625,15 @@ static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
 	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
 	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(MRA8_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(SMH_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams2_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(MRA8_BANK1, MWA8_RAM) AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_RAM) AM_BASE(&williams_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(MRA8_RAM, williams2_tileram_w) AM_BASE(&williams2_tileram)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(SMH_RAM, williams2_tileram_w) AM_BASE(&williams2_tileram)
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
 	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
@@ -647,7 +647,7 @@ static ADDRESS_MAP_START( williams2_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
 	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
 	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(MRA8_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(SMH_RAM, williams_cmos_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -2701,7 +2701,7 @@ static DRIVER_INIT( alienar )
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 	CONFIGURE_PIAS(williams_muxed_pia_0_intf, williams_pia_1_intf, williams_snd_pia_intf);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcbff, 0xcbff, 0, 0, MWA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcbff, 0xcbff, 0, 0, SMH_NOP);
 }
 
 
@@ -2709,7 +2709,7 @@ static DRIVER_INIT( alienaru )
 {
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 	CONFIGURE_PIAS(williams_muxed_pia_0_intf, williams_pia_1_intf, williams_snd_pia_intf);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcbff, 0xcbff, 0, 0, MWA8_NOP);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xcbff, 0xcbff, 0, 0, SMH_NOP);
 }
 
 

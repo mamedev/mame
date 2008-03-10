@@ -62,7 +62,7 @@ static WRITE8_HANDLER(t5182shared_w)
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(MRA8_RAM, mustache_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_RAM, mustache_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(t5182_sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd804, 0xd804) AM_READ(input_port_4_r)	/* DSW B */
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(mustache_scroll_w)
 	AM_RANGE(0xd807, 0xd807) AM_WRITE(mustache_video_control_w)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

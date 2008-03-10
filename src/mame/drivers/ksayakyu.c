@@ -106,20 +106,20 @@ static WRITE8_HANDLER(tomaincpu_w)
 
 static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(MRA8_BANK1, MWA8_NOP)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_NOP)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_0_r)
 	AM_RANGE(0xa801, 0xa801) AM_READ(input_port_1_r)
 	AM_RANGE(0xa802, 0xa802) AM_READ(input_port_2_r)
-	AM_RANGE(0xa803, 0xa803) AM_READ(MRA8_NOP) /* watchdog ? */
+	AM_RANGE(0xa803, 0xa803) AM_READ(SMH_NOP) /* watchdog ? */
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(ksayakyu_videoctrl_w)
 	AM_RANGE(0xa805, 0xa805) AM_WRITE(latch_w)
 	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
-	AM_RANGE(0xa807, 0xa807) AM_READ(MRA8_NOP) /* watchdog ? */
+	AM_RANGE(0xa807, 0xa807) AM_READ(SMH_NOP) /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(MRA8_RAM, ksayakyu_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_READWRITE(MRA8_RAM, MWA8_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(SMH_RAM, ksayakyu_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_READWRITE(SMH_RAM, SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -130,9 +130,9 @@ static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
-	AM_RANGE(0xa010, 0xa010) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0xa010, 0xa010) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ksayakyu )

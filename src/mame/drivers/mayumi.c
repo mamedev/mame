@@ -69,15 +69,15 @@ static READ8_HANDLER( key_matrix_r )
 /****************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(MRA8_BANK1)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
+	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xf7ff) AM_READ(mayumi_videoram_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(mayumi_videoram_w)
 ADDRESS_MAP_END
 
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_WRITE(bank_sel_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
-	AM_RANGE(0xc3, 0xc3) AM_WRITE(MWA8_NOP)		// 0xc0-c3 8255ppi
+	AM_RANGE(0xc3, 0xc3) AM_WRITE(SMH_NOP)		// 0xc0-c3 8255ppi
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xd1, 0xd1) AM_WRITE(YM2203_write_port_0_w)
 ADDRESS_MAP_END

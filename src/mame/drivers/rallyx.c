@@ -308,17 +308,17 @@ static WRITE8_HANDLER( locomotn_latch_w )
 
 static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(MRA8_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(SMH_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_1_r)
 	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_2_r)
-	AM_RANGE(0xa000, 0xa00f) AM_WRITE(MWA8_RAM) AM_BASE(&rallyx_radarattr)
+	AM_RANGE(0xa000, 0xa00f) AM_WRITE(SMH_RAM) AM_BASE(&rallyx_radarattr)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa11f) AM_WRITE(pacman_sound_w) AM_BASE(&namco_soundregs)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
-	AM_RANGE(0xa170, 0xa170) AM_WRITE(MWA8_NOP)			/* ? */
+	AM_RANGE(0xa170, 0xa170) AM_WRITE(SMH_NOP)			/* ? */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(rallyx_latch_w)
 ADDRESS_MAP_END
 
@@ -330,13 +330,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jungler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(MRA8_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(SMH_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_1_r)
 	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_2_r)
 	AM_RANGE(0xa180, 0xa180) AM_READ(input_port_3_r)
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITE(MWA8_RAM) AM_BASE(&rallyx_radarattr)	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&rallyx_radarattr)	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */

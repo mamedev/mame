@@ -405,12 +405,12 @@ static WRITE16_HANDLER( powerbls_sound_w )
 
 static ADDRESS_MAP_START( sslam_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000400, 0x07ffff) AM_RAM
-	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(MRA16_RAM, sslam_bg_tileram_w) AM_BASE(&sslam_bg_tileram)
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(MRA16_RAM, sslam_md_tileram_w) AM_BASE(&sslam_md_tileram)
-	AM_RANGE(0x108000, 0x10ffff) AM_READWRITE(MRA16_RAM, sslam_tx_tileram_w) AM_BASE(&sslam_tx_tileram)
+	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, sslam_bg_tileram_w) AM_BASE(&sslam_bg_tileram)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(SMH_RAM, sslam_md_tileram_w) AM_BASE(&sslam_md_tileram)
+	AM_RANGE(0x108000, 0x10ffff) AM_READWRITE(SMH_RAM, sslam_tx_tileram_w) AM_BASE(&sslam_tx_tileram)
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_BASE(&sslam_regs)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(MRA16_RAM, bigtwin_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(SMH_RAM, bigtwin_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&sslam_spriteram)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -428,12 +428,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerbls_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(MRA16_RAM, powerbls_bg_tileram_w) AM_BASE(&sslam_bg_tileram)
+	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, powerbls_bg_tileram_w) AM_BASE(&sslam_bg_tileram)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM // not used
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_BASE(&sslam_regs)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE(&sslam_spriteram)
-	AM_RANGE(0x280000, 0x2803ff) AM_READWRITE(MRA16_RAM, bigtwin_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x280000, 0x2803ff) AM_READWRITE(SMH_RAM, bigtwin_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")

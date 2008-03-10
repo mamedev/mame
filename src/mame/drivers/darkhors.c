@@ -313,35 +313,35 @@ static WRITE32_HANDLER( darkhors_unk1_w )
 }
 
 static ADDRESS_MAP_START( darkhors_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ( MRA32_ROM					)
-	AM_RANGE(0x400000, 0x41ffff) AM_READ( MRA32_RAM					)
+	AM_RANGE(0x000000, 0x0fffff) AM_READ( SMH_ROM					)
+	AM_RANGE(0x400000, 0x41ffff) AM_READ( SMH_RAM					)
 	AM_RANGE(0x4e0080, 0x4e0083) AM_READ( darkhors_eeprom_r			)
 	AM_RANGE(0x580000, 0x580003) AM_READ( input_port_0_dword_r		)
 	AM_RANGE(0x580004, 0x580007) AM_READ( input_port_1_dword_r		)
 	AM_RANGE(0x580008, 0x58000b) AM_READ( darkhors_input_sel_r		)
 	AM_RANGE(0x580084, 0x580087) AM_READ( OKIM6295_status_0_msb32_r	)
-	AM_RANGE(0x580200, 0x580203) AM_READ( MRA32_NOP					)
+	AM_RANGE(0x580200, 0x580203) AM_READ( SMH_NOP					)
 	AM_RANGE(0x580400, 0x580403) AM_READ( input_port_2_dword_r		)
 	AM_RANGE(0x580420, 0x580423) AM_READ( input_port_3_dword_r		)
-	AM_RANGE(0x800000, 0x87ffff) AM_READ( MRA32_RAM					)
+	AM_RANGE(0x800000, 0x87ffff) AM_READ( SMH_RAM					)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darkhors_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE( MWA32_ROM				)
-	AM_RANGE(0x400000, 0x41ffff) AM_WRITE( MWA32_RAM				)
+	AM_RANGE(0x000000, 0x0fffff) AM_WRITE( SMH_ROM				)
+	AM_RANGE(0x400000, 0x41ffff) AM_WRITE( SMH_RAM				)
 	AM_RANGE(0x490040, 0x490043) AM_WRITE( darkhors_eeprom_w		)
 	AM_RANGE(0x58000c, 0x58000f) AM_WRITE( darkhors_input_sel_w		)
 	AM_RANGE(0x4e0080, 0x4e0083) AM_WRITE( darkhors_unk1_w			)
 	AM_RANGE(0x580084, 0x580087) AM_WRITE( OKIM6295_data_0_msb32_w	)
-	AM_RANGE(0x800000, 0x86bfff) AM_WRITE( MWA32_RAM				)
+	AM_RANGE(0x800000, 0x86bfff) AM_WRITE( SMH_RAM				)
 	AM_RANGE(0x86c000, 0x86ffff) AM_WRITE( darkhors_tmapram_w		)	AM_BASE(&darkhors_tmapram)
 	AM_RANGE(0x870000, 0x873fff) AM_WRITE( darkhors_tmapram2_w		)	AM_BASE(&darkhors_tmapram2)
-	AM_RANGE(0x874000, 0x87dfff) AM_WRITE( MWA32_RAM				)
-	AM_RANGE(0x87e000, 0x87ffff) AM_WRITE( MWA32_RAM				)	AM_BASE(&spriteram32)
+	AM_RANGE(0x874000, 0x87dfff) AM_WRITE( SMH_RAM				)
+	AM_RANGE(0x87e000, 0x87ffff) AM_WRITE( SMH_RAM				)	AM_BASE(&spriteram32)
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE( paletteram32_xBBBBBGGGGGRRRRR_dword_w)	AM_BASE(&paletteram32)
-	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE( MWA32_RAM				)	// this should still be palette ram!
-	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITE( MWA32_RAM				) AM_BASE(&darkhors_tmapscroll)
-	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITE( MWA32_RAM				) AM_BASE(&darkhors_tmapscroll2)
+	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITE( SMH_RAM				)	// this should still be palette ram!
+	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITE( SMH_RAM				) AM_BASE(&darkhors_tmapscroll)
+	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITE( SMH_RAM				) AM_BASE(&darkhors_tmapscroll2)
 ADDRESS_MAP_END
 
 

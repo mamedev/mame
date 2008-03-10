@@ -273,14 +273,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4808, 0x4808) AM_WRITE(cpu_shared_ctrl_main_w)
 	AM_RANGE(0x4801, 0x4801) AM_WRITE(nmi_disable_and_clear_line_w)
 	AM_RANGE(0x4809, 0x4809) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x4802, 0x4802) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x480a, 0x480a) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x4803, 0x4803) AM_WRITE(MWA8_NOP)
-	AM_RANGE(0x480b, 0x480b) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x4802, 0x4802) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x480a, 0x480a) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x4803, 0x4803) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x480b, 0x480b) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x4804, 0x4804) AM_WRITE(shougi_mcu_halt_off_w)
 	AM_RANGE(0x480c, 0x480c) AM_WRITE(shougi_mcu_halt_on_w)
-	AM_RANGE(0x4807, 0x4807) AM_WRITE(MWA8_NOP)//?????? connected to +5v via resistor
-	AM_RANGE(0x480f, 0x480f) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x4807, 0x4807) AM_WRITE(SMH_NOP)//?????? connected to +5v via resistor
+	AM_RANGE(0x480f, 0x480f) AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(shougi_watchdog_reset_w) AM_READ(input_port_0_r) /* game won't boot if watchdog doesn't work */

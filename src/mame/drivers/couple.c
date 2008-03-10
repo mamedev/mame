@@ -148,8 +148,8 @@ static ADDRESS_MAP_START( merit_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0xc00a, 0xc00a ) AM_READ(input_port_1_r)
   	AM_RANGE( 0xe000, 0xe000 ) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
   	AM_RANGE( 0xe001, 0xe001 ) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
-	AM_RANGE( 0xe800, 0xefff ) AM_READWRITE(MRA8_RAM, couple_vram_hi_w) AM_BASE(&vram_hi)
-	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(MRA8_RAM, couple_vram_lo_w) AM_BASE(&vram_lo)
+	AM_RANGE( 0xe800, 0xefff ) AM_READWRITE(SMH_RAM, couple_vram_hi_w) AM_BASE(&vram_hi)
+	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(SMH_RAM, couple_vram_lo_w) AM_BASE(&vram_lo)
 	AM_RANGE( 0xf800, 0xfbff ) AM_RAM /*extra VRAM?*/
 ADDRESS_MAP_END
 

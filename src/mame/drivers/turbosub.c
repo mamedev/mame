@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( game_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
         AM_RANGE(0x5000, 0x5000) AM_RAM                     		/* Write - related to 4C00. Bit 8 = ? bits0..3 =????  */
         AM_RANGE(0x5400, 0x54ff) AM_RAM                                 /* UART buffer? */
         AM_RANGE(0x5c00, 0x5c01) AM_READWRITE(UART_R, UART_W)           /* i8251A USART */
-        AM_RANGE(0x6000, 0xdfff) AM_READWRITE(MRA8_BANK1, MWA8_ROM)     /* Bank switched ROMs */
+        AM_RANGE(0x6000, 0xdfff) AM_READWRITE(SMH_BANK1, SMH_ROM)     /* Bank switched ROMs */
         AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

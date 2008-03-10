@@ -67,7 +67,7 @@ static WRITE8_HANDLER( sound_control_w )
 
 static ADDRESS_MAP_START( dynadice_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_READWRITE(MRA8_RAM, dynadice_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_READWRITE(SMH_RAM, dynadice_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
@@ -75,9 +75,9 @@ static ADDRESS_MAP_START( dynadice_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x50, 0x50) AM_READ(input_port_0_r)
 	AM_RANGE(0x51, 0x51) AM_READ(input_port_1_r)
 	AM_RANGE(0x52, 0x52) AM_READ(input_port_2_r)
-	AM_RANGE(0x62, 0x62) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x62, 0x62) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x63, 0x63) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x70, 0x77) AM_WRITE(MWA8_NOP)
+	AM_RANGE(0x70, 0x77) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynadice_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

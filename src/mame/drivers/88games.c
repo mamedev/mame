@@ -122,7 +122,7 @@ static WRITE8_HANDLER( speech_msg_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM	AM_BASE(&banked_rom) /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(MRA8_RAM, paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram_1000)	/* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(SMH_RAM, paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(&paletteram_1000)	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(&ram)

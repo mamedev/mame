@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( readmem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6820, 0x682f) AM_READ(gaplus_customio_3_r)	/* custom I/O chip #3 interface */
 	AM_RANGE(0x6800, 0x6bff) AM_READ(namcoio_r)				/* custom I/O chips interface */
 	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)		/* watchdog */
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)				/* ROM */
+	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
@@ -347,27 +347,27 @@ static ADDRESS_MAP_START( writemem_cpu1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)	 					/* reset CPU #2 & #3, enable sound */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)	 					/* reset I/O chips */
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(gaplus_starfield_control_w)				/* starfield control */
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(MWA8_ROM)								/* ROM */
+	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)								/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(gaplus_videoram_r)		/* tilemap RAM (shared with CPU #1) */
 	AM_RANGE(0x0800, 0x1fff) AM_READ(gaplus_spriteram_r)		/* shared RAM with CPU #1 & spriteram */
-	AM_RANGE(0xa000, 0xffff) AM_READ(MRA8_ROM)				/* ROM */
+	AM_RANGE(0xa000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(gaplus_videoram_w)		/* tilemap RAM (shared with CPU #1) */
 	AM_RANGE(0x0800, 0x1fff) AM_WRITE(gaplus_spriteram_w)		/* shared RAM with CPU #1 */
-//  AM_RANGE(0x500f, 0x500f) AM_WRITE(MWA8_NOP)             /* ??? written 256 times on startup */
+//  AM_RANGE(0x500f, 0x500f) AM_WRITE(SMH_NOP)             /* ??? written 256 times on startup */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(gaplus_irq_2_ctrl_w)	/* IRQ 2 control */
-	AM_RANGE(0xa000, 0xffff) AM_WRITE(MWA8_ROM)				/* ROM */
+	AM_RANGE(0xa000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_READ(gaplus_snd_sharedram_r) /* shared RAM with CPU #1 */
 	AM_RANGE(0x2000, 0x3fff) AM_READ(watchdog_reset_r)		/* watchdog? */
-	AM_RANGE(0xe000, 0xffff) AM_READ(MRA8_ROM)				/* ROM */
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 	/* CPU 3 (SOUND CPU) write addresses */
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( writemem_cpu3, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_WRITE(gaplus_snd_sharedram_w) AM_BASE(&namco_soundregs)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)		/* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(gaplus_irq_3_ctrl_w)	/* interrupt enable/disable */
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(MWA8_ROM)				/* ROM */
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 
 

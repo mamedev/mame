@@ -49,8 +49,8 @@ static WRITE8_HANDLER( crimfght_snd_bankswitch_w )
 /********************************************/
 
 static ADDRESS_MAP_START( crimfght_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(MRA8_BANK1)			/* banked RAM */
-	AM_RANGE(0x0400, 0x1fff) AM_READ(MRA8_RAM)			/* RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_BANK1)			/* banked RAM */
+	AM_RANGE(0x0400, 0x1fff) AM_READ(SMH_RAM)			/* RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ(input_port_7_r)		/* Coinsw */
 	AM_RANGE(0x3f81, 0x3f81) AM_READ(input_port_3_r)		/* 1P controls */
 	AM_RANGE(0x3f82, 0x3f82) AM_READ(input_port_4_r)		/* 2P controls */
@@ -61,31 +61,31 @@ static ADDRESS_MAP_START( crimfght_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3f87, 0x3f87) AM_READ(input_port_0_r)		/* DSW #1 */
 	AM_RANGE(0x3f88, 0x3f88) AM_READ(watchdog_reset_r)	/* watchdog reset */
 	AM_RANGE(0x2000, 0x5fff) AM_READ(K052109_051960_r)	/* video RAM + sprite RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_READ(MRA8_BANK2)			/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_ROM)			/* ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_BANK2)			/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimfght_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(MWA8_BANK1)					/* banked RAM */
-	AM_RANGE(0x0400, 0x1fff) AM_WRITE(MWA8_RAM)					/* RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_WRITE(SMH_BANK1)					/* banked RAM */
+	AM_RANGE(0x0400, 0x1fff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0x3f88, 0x3f88) AM_WRITE(crimfght_coin_w)			/* coin counters */
 	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
 	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_051960_w)			/* video RAM + sprite RAM */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(MWA8_ROM)					/* banked ROM */
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)					/* ROM */
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(SMH_ROM)					/* banked ROM */
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimfght_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(MRA8_ROM)				/* ROM 821l01.h4 */
-	AM_RANGE(0x8000, 0x87ff) AM_READ(MRA8_RAM)				/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM 821l01.h4 */
+	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0xa001, 0xa001) AM_READ(YM2151_status_port_0_r)	/* YM2151 */
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)			/* soundlatch_r */
 	AM_RANGE(0xe000, 0xe00d) AM_READ(K007232_read_port_0_r)	/* 007232 registers */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crimfght_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(MWA8_ROM)					/* ROM 821l01.h4 */
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(MWA8_RAM)					/* RAM */
+	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM 821l01.h4 */
+	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2151_data_port_0_w)		/* YM2151 */
 	AM_RANGE(0xe000, 0xe00d) AM_WRITE(K007232_write_port_0_w)		/* 007232 registers */
@@ -495,11 +495,11 @@ static void crimfght_banking( int lines )
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, MRA8_BANK3, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, SMH_BANK3, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(3, paletteram);
 	}
 	else
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, MRA8_BANK1, MWA8_BANK1);								/* RAM */
+		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x03ff, 0, 0, SMH_BANK1, SMH_BANK1);								/* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);

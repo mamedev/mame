@@ -181,19 +181,19 @@ static WRITE8_HANDLER( signature_w )
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_READ(MRA8_RAM)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4800, 0x4803) AM_READ(ppi8255_0_r)
 	AM_RANGE(0x5000, 0x5003) AM_READ(ppi8255_1_r)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(MRA8_ROM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(MRA8_BANK1)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(MWA8_ROM)
-	AM_RANGE(0x4000, 0x47ff) AM_WRITE(MWA8_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x4800, 0x4803) AM_WRITE(ppi8255_0_w)
 	AM_RANGE(0x5000, 0x5003) AM_WRITE(ppi8255_1_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
@@ -204,10 +204,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
 	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_main_w)
 	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(MWA8_ROM)	/* space for diagnostic ROM? */
+	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_ROM)	/* space for diagnostic ROM? */
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(findout_drawctrl_w)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(findout_bitmap_w)  AM_BASE(&videoram)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(MWA8_ROM)	/* overlapped by the above */
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)	/* overlapped by the above */
 ADDRESS_MAP_END
 
 

@@ -4004,8 +4004,8 @@ static ADDRESS_MAP_START( model3_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION(REGION_CPU2, 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION(REGION_SOUND1, 0)
-	AM_RANGE(0xa00000, 0xdfffff) AM_READ(MRA16_BANK4)
-	AM_RANGE(0xe00000, 0xffffff) AM_READ(MRA16_BANK5)
+	AM_RANGE(0xa00000, 0xdfffff) AM_READ(SMH_BANK4)
+	AM_RANGE(0xe00000, 0xffffff) AM_READ(SMH_BANK5)
 ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
@@ -4264,7 +4264,7 @@ static DRIVER_INIT( model3_10 )
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc0000000, 0xc00000ff, 0, 0, scsi_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc0000000, 0xc00000ff, 0, 0, scsi_w );
 
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_w );
@@ -4277,7 +4277,7 @@ static DRIVER_INIT( model3_10 )
 static DRIVER_INIT( model3_15 )
 {
 	interleave_vroms();
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_w );
@@ -4290,7 +4290,7 @@ static DRIVER_INIT( model3_15 )
 static DRIVER_INIT( model3_20 )
 {
 	interleave_vroms();
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_w );
@@ -4383,7 +4383,7 @@ static DRIVER_INIT( vs215 )
 	rom[(0x70e710^4)/4] = 0x60000000;
 
 	interleave_vroms();
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_w );
@@ -4408,7 +4408,7 @@ static DRIVER_INIT( vs29815 )
 	rom[(0x60290c^4)/4] = 0x60000000;
 
 	interleave_vroms();
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_w );
@@ -4433,7 +4433,7 @@ static DRIVER_INIT( bass )
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
 	interleave_vroms();
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_w );
@@ -4453,7 +4453,7 @@ static DRIVER_INIT( bass )
 static DRIVER_INIT( getbass )
 {
 	interleave_vroms();
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, MRA64_BANK1 );
+	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff7fffff, 0, 0, SMH_BANK1 );
 
 	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_r );
 	memory_install_write64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xf9000000, 0xf90000ff, 0, 0, scsi_w );
