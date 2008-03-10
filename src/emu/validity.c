@@ -682,20 +682,20 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 			/* loop over entries and look for errors */
 			for (entry = map->entrylist; entry != NULL; entry = entry->next)
 			{
-				UINT32 start = SPACE_SHIFT(entry->start);
-				UINT32 end = SPACE_SHIFT_END(entry->end);
+				UINT32 bytestart = SPACE_SHIFT(entry->addrstart);
+				UINT32 byteend = SPACE_SHIFT_END(entry->addrend);
 
 				/* look for inverted start/end pairs */
-				if (end < start)
+				if (byteend < bytestart)
 				{
-					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, address_space_names[spacenum], entry->start, entry->end);
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x > end = %08x\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend);
 					error = TRUE;
 				}
 
 				/* look for misaligned entries */
-				if ((start & (alignunit-1)) != 0 || (end & (alignunit-1)) != (alignunit-1))
+				if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
 				{
-					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, address_space_names[spacenum], entry->start, entry->end, alignunit);
+					mame_printf_error("%s: %s wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", driver->source_file, driver->name, address_space_names[spacenum], entry->addrstart, entry->addrend, alignunit);
 					error = TRUE;
 				}
 
@@ -703,7 +703,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 				if ((FPTR)entry->read.handler == STATIC_ROM && !entry->region)
 				{
 					entry->region = REGION_CPU1 + cpunum;
-					entry->region_offs = entry->start;
+					entry->region_offs = entry->addrstart;
 				}
 
 				/* if this entry references a memory region, validate it */
@@ -713,12 +713,12 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 
 					if (length == 0)
 					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, entry->start, entry->end, entry->region);
+						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X references non-existant region %d\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
 						error = TRUE;
 					}
-					else if (entry->region_offs + (end - start + 1) > length)
+					else if (entry->region_offs + (byteend - bytestart + 1) > length)
 					{
-						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->start, entry->end, entry->region, length);
+						mame_printf_error("%s: %s CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)\n", driver->source_file, driver->name, cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
 						error = TRUE;
 					}
 				}

@@ -437,7 +437,7 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *base, size_t numbytes);
 static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t bytestart, offs_t byteend, UINT8 *base);
 static void memory_init_locate(void);
-static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t byteaddress);
+static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress);
 static genf *get_static_handler(int databits, int readorwrite, int spacenum, int which);
 static void memory_exit(running_machine *machine);
 static void mem_dump(void);
@@ -1046,7 +1046,7 @@ void *_memory_install_read_handler(int cpunum, int spacenum, offs_t addrstart, o
 		fatalerror("fatal: can only use static banks with memory_install_read_handler()");
 	install_mem_handler(space, ROW_READ, space->dbits, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT8 *_memory_install_read8_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func handler, const char *handler_name)
@@ -1054,7 +1054,7 @@ UINT8 *_memory_install_read8_handler(int cpunum, int spacenum, offs_t addrstart,
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_READ, 8, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT16 *_memory_install_read16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func handler, const char *handler_name)
@@ -1062,7 +1062,7 @@ UINT16 *_memory_install_read16_handler(int cpunum, int spacenum, offs_t addrstar
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_READ, 16, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT32 *_memory_install_read32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func handler, const char *handler_name)
@@ -1070,7 +1070,7 @@ UINT32 *_memory_install_read32_handler(int cpunum, int spacenum, offs_t addrstar
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_READ, 32, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT64 *_memory_install_read64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func handler, const char *handler_name)
@@ -1078,7 +1078,7 @@ UINT64 *_memory_install_read64_handler(int cpunum, int spacenum, offs_t addrstar
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_READ, 64, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 
@@ -1094,7 +1094,7 @@ void *_memory_install_write_handler(int cpunum, int spacenum, offs_t addrstart, 
 		fatalerror("fatal: can only use static banks with memory_install_write_handler()");
 	install_mem_handler(space, ROW_WRITE, space->dbits, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 1, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT8 *_memory_install_write8_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_machine_func handler, const char *handler_name)
@@ -1102,7 +1102,7 @@ UINT8 *_memory_install_write8_handler(int cpunum, int spacenum, offs_t addrstart
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_WRITE, 8, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 1, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT16 *_memory_install_write16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_machine_func handler, const char *handler_name)
@@ -1110,7 +1110,7 @@ UINT16 *_memory_install_write16_handler(int cpunum, int spacenum, offs_t addrsta
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_WRITE, 16, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 1, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT32 *_memory_install_write32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_machine_func handler, const char *handler_name)
@@ -1118,7 +1118,7 @@ UINT32 *_memory_install_write32_handler(int cpunum, int spacenum, offs_t addrsta
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_WRITE, 32, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 1, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_machine_func handler, const char *handler_name)
@@ -1126,7 +1126,7 @@ UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t addrsta
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	install_mem_handler(space, ROW_WRITE, 64, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 1, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 
@@ -1143,7 +1143,7 @@ void *_memory_install_readwrite_handler(int cpunum, int spacenum, offs_t addrsta
 	install_mem_handler(space, ROW_READ, space->dbits, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, Machine, rhandler_name);
 	install_mem_handler(space, ROW_WRITE, space->dbits, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, Machine, whandler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT8 *_memory_install_readwrite8_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name)
@@ -1152,7 +1152,7 @@ UINT8 *_memory_install_readwrite8_handler(int cpunum, int spacenum, offs_t addrs
 	install_mem_handler(space, ROW_READ, 8, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
 	install_mem_handler(space, ROW_WRITE, 8, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT16 *_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name)
@@ -1161,7 +1161,7 @@ UINT16 *_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t add
 	install_mem_handler(space, ROW_READ, 16, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
 	install_mem_handler(space, ROW_WRITE, 16, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT32 *_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name)
@@ -1170,7 +1170,7 @@ UINT32 *_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t add
 	install_mem_handler(space, ROW_READ, 32, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
 	install_mem_handler(space, ROW_WRITE, 32, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name)
@@ -1179,7 +1179,7 @@ UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t add
 	install_mem_handler(space, ROW_READ, 64, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
 	install_mem_handler(space, ROW_WRITE, 64, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
 	mem_dump();
-	return memory_find_base(cpunum, spacenum, 0, ADDR2BYTE(space, addrstart));
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
 
@@ -1210,6 +1210,11 @@ address_map *address_map_alloc(const machine_config *config, int cpunum, int spa
 	return map;
 }
 
+
+/*-------------------------------------------------
+    address_map_free - release allocated memory
+    for an address map
+-------------------------------------------------*/
 
 void address_map_free(address_map *map)
 {
@@ -1491,9 +1496,6 @@ static void memory_init_preflight(const machine_config *config)
 				/* make a pass over the address map, adjusting for the CPU and getting memory pointers */
 				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
 				{
-					read_or_write bankaccess = 0;
-					int banknum = -1;
-
 					/* computed adjusted addresses first */
 					entry->bytestart = entry->addrstart;
 					entry->byteend = entry->addrend;
@@ -1632,7 +1634,7 @@ static void install_mem_handler_private(addrspace_data *space, read_or_write rea
 		/* assign a bank to the adjusted addresses */
 		handler = (genf *)bank_assign_dynamic(space->cpunum, space->spacenum, readorwrite, bytestart, byteend);
 		if (bank_ptr[HANDLER_TO_BANK(handler)] == NULL)
-			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, readorwrite, bytestart);
+			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(space->cpunum, space->spacenum, bytestart);
 	}
 
 	/* then do a normal installation */
@@ -1795,7 +1797,7 @@ static genf *bank_assign_dynamic(int cpunum, int spacenum, read_or_write readorw
 			bank->spacenum = spacenum;
 			bank->bytestart = bytestart;
 			bank->byteend = byteend;
-			VPRINTF(("Assigned bank %d to %d,%d,%08X\n", bank, cpunum, spacenum, bytestart));
+			VPRINTF(("Assigned bank %d to %d,%d,%08X\n", banknum, cpunum, spacenum, bytestart));
 			return BANK_TO_HANDLER(banknum);
 		}
 	}
@@ -2422,13 +2424,13 @@ static void memory_init_locate(void)
     and offset
 -------------------------------------------------*/
 
-static void *memory_find_base(int cpunum, int spacenum, int readwrite, offs_t byteaddress)
+static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	address_map_entry *entry;
 	memory_block *block;
 
-	VPRINTF(("memory_find_base(%d,%d,%d,%08X) -> ", cpunum, spacenum, readwrite, byteaddress));
+	VPRINTF(("memory_find_base(%d,%d,%08X) -> ", cpunum, spacenum, byteaddress));
 
 	/* look in the address map first */
 	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)

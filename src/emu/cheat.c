@@ -9172,9 +9172,9 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 					{
 						if (entry->write.handler)
 						{
-							UINT32	length = (entry->end - entry->start) + 1;
+							UINT32	length = (entry->addrend - entry->addrstart) + 1;
 
-							traverse->address = entry->start;
+							traverse->address = entry->addrstart;
 							traverse->length = length;
 
 							traverse->targetIdx = info->targetIdx;
@@ -10470,10 +10470,10 @@ static UINT8 ** LookupHandlerMemory(UINT8 cpu, UINT32 address, UINT32 * outRelat
 	const address_map_entry *entry;
 	
 	for (entry = map->entrylist; entry != NULL; entry = entry->next)
-		if (entry->write.handler != NULL && (address >= entry->start) && (address <= entry->end))
+		if (entry->write.handler != NULL && (address >= entry->addrstart) && (address <= entry->addrend))
 		{
 			if(outRelativeAddress)
-				*outRelativeAddress = address - entry->start;
+				*outRelativeAddress = address - entry->addrstart;
 
 			return (UINT8 **)entry->baseptr;
 		}
