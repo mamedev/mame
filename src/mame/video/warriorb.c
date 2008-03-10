@@ -107,8 +107,22 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( warriorb )
 {
-	int xoffs = 40*8*scrnum;
+	int xoffs = 0, screen_number = -1;
 	UINT8 layer[3], nodraw;
+
+	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
+	{
+		xoffs = 40*8*0;
+		screen_number = 0;
+	}
+	else if (screen == right_screen)
+	{
+		xoffs = 40*8*1;
+		screen_number = 1;
+	}
 
 	TC0100SCN_tilemap_update(screen->machine);
 
@@ -121,18 +135,18 @@ VIDEO_UPDATE( warriorb )
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
-	nodraw  = TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,scrnum,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
+	nodraw  = TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if(nodraw) fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 
 	// draw middle layer
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,scrnum,layer[1],0,1);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[1],0,1);
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(screen->machine, bitmap,cliprect,xoffs,8); // draw sprites
 
 	// draw top(text) layer
-	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,scrnum,layer[2],0,0);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[2],0,0);
 	return 0;
 }

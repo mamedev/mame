@@ -376,7 +376,7 @@ VIDEO_UPDATE( firetrk )
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
@@ -409,7 +409,7 @@ VIDEO_UPDATE( superbug )
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x10,   8, 0x10, 0x10);
 
-	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
@@ -439,7 +439,7 @@ VIDEO_UPDATE( montecar )
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 24, 0x20, 0x08);
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x20, 16, 0x20, 0x08);
 
-	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 

@@ -352,16 +352,16 @@ Offset+3
 -------x xxxxxxxx X offs
 */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scrnum)
+static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 {
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT32 cnt;
 	int block, offs;
 	int code,color,x,y,fx,fy;
 	rectangle clip;
 
-	clip.min_x = machine->screen[scrnum].visarea.min_x;
-	clip.max_x = machine->screen[scrnum].visarea.max_x;
+	clip.min_x = video_screen_get_visible_area(screen)->min_x;
+	clip.max_x = video_screen_get_visible_area(screen)->max_x;
 
 	for (block=0; block<0x8000; block+=0x800)
 	{
@@ -430,7 +430,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scrnum)
 static VIDEO_UPDATE( common )
 {
 	fillbitmap(bitmap,0,cliprect);
-	draw_sprites(screen->machine, bitmap, scrnum);
+	draw_sprites(screen, bitmap);
 	return 0;
 }
 

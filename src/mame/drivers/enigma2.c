@@ -169,11 +169,12 @@ static VIDEO_UPDATE( enigma2 )
 
 	pen_t pens[NUM_PENS];
 
+	const rectangle *visarea = video_screen_get_visible_area(screen);
 	UINT8 *color_map_base = engima2_flip_screen ? &memory_region(REGION_PROMS)[0x0400] : memory_region(REGION_PROMS);
 	UINT8 *star_map_base = (blink_count & 0x08) ? &memory_region(REGION_PROMS)[0x0c00] : &memory_region(REGION_PROMS)[0x0800];
 
 	UINT8 x = 0;
-	UINT16 bitmap_y = screen->machine->screen[scrnum].visarea.min_y;
+	UINT16 bitmap_y = visarea->min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 	UINT8 fore_color = 0;
@@ -235,10 +236,8 @@ static VIDEO_UPDATE( enigma2 )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == screen->machine->screen[scrnum].visarea.max_y)
-			{
+			if (bitmap_y == visarea->max_y)
 				break;
-			}
 
 			/* next row */
 			y = y + 1;
@@ -255,7 +254,8 @@ static VIDEO_UPDATE( enigma2 )
 static VIDEO_UPDATE( enigma2a )
 {
 	UINT8 x = 0;
-	UINT16 bitmap_y = screen->machine->screen[scrnum].visarea.min_y;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	UINT16 bitmap_y = visarea->min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 
@@ -298,10 +298,8 @@ static VIDEO_UPDATE( enigma2a )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == screen->machine->screen[scrnum].visarea.max_y)
-			{
+			if (bitmap_y == visarea->max_y)
 				break;
-			}
 
 			/* next row */
 			y = y + 1;

@@ -962,15 +962,13 @@ INPUT_PORTS_END
 static const struct CCPUConfig config_nojmi =
 {
 	joystick_read,
-	cinemat_vector_callback,
-	0
+	cinemat_vector_callback
 };
 
 static const struct CCPUConfig config_jmi =
 {
 	NULL,
-	cinemat_vector_callback,
-	0
+	cinemat_vector_callback
 };
 
 

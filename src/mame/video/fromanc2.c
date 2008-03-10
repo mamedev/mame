@@ -463,25 +463,35 @@ VIDEO_START( fromanc4 )
 
 VIDEO_UPDATE( fromanc2 )
 {
-	if (fromanc2_tilemap[scrnum][0]) {
-		tilemap_set_scrollx(fromanc2_tilemap[scrnum][0], 0, -fromanc2_scrollx[scrnum][0]);
-		tilemap_set_scrolly(fromanc2_tilemap[scrnum][0], 0, -fromanc2_scrolly[scrnum][0]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][0], 0, 0);
+	int i;
+	int *scrollx = NULL;
+	int *scrolly = NULL;
+	tilemap **tilemaps = NULL;
+
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
+	{
+		tilemaps = fromanc2_tilemap[0];
+		scrollx = fromanc2_scrollx[0];
+		scrolly = fromanc2_scrolly[0];
 	}
-	if (fromanc2_tilemap[scrnum][1]) {
-		tilemap_set_scrollx(fromanc2_tilemap[scrnum][1], 0, -fromanc2_scrollx[scrnum][1]);
-		tilemap_set_scrolly(fromanc2_tilemap[scrnum][1], 0, -fromanc2_scrolly[scrnum][1]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][1], 0, 0);
+	else if (screen == right_screen)
+	{
+		tilemaps = fromanc2_tilemap[1];
+		scrollx = fromanc2_scrollx[1];
+		scrolly = fromanc2_scrolly[1];
 	}
-	if (fromanc2_tilemap[scrnum][2]) {
-		tilemap_set_scrollx(fromanc2_tilemap[scrnum][2], 0, -fromanc2_scrollx[scrnum][2]);
-		tilemap_set_scrolly(fromanc2_tilemap[scrnum][2], 0, -fromanc2_scrolly[scrnum][2]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][2], 0, 0);
-	}
-	if (fromanc2_tilemap[scrnum][3]) {
-		tilemap_set_scrollx(fromanc2_tilemap[scrnum][3], 0, -fromanc2_scrollx[scrnum][3]);
-		tilemap_set_scrolly(fromanc2_tilemap[scrnum][3], 0, -fromanc2_scrolly[scrnum][3]);
-	 	tilemap_draw(bitmap,cliprect, fromanc2_tilemap[scrnum][3], 0, 0);
+
+	for (i = 0; i < 4; i++)
+	{
+		if (tilemaps[i])
+		{
+			tilemap_set_scrollx(tilemaps[i], 0, -scrollx[i]);
+			tilemap_set_scrolly(tilemaps[i], 0, -scrolly[i]);
+			tilemap_draw(bitmap, cliprect, tilemaps[i], 0, 0);
+		}
 	}
 
 	return 0;

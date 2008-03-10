@@ -71,7 +71,14 @@ VIDEO_UPDATE( vsnes )
 
 VIDEO_UPDATE( vsdual )
 {
+	const device_config *top_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+
 	/* render the ppu's */
-	ppu2c0x_render( scrnum, bitmap, 0, 0, 0, 0 );
+	if (screen == top_screen)
+		ppu2c0x_render(0, bitmap, 0, 0, 0, 0);
+	else if (screen == bottom_screen)
+		ppu2c0x_render(1, bitmap, 0, 0, 0, 0);
+
 	return 0;
 }

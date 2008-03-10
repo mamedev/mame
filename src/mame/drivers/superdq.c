@@ -67,7 +67,7 @@ static VIDEO_UPDATE( superdq )
 	if (!video_skip_this_frame() && discinfo != NULL)
 	{
 		bitmap_t *vidbitmap;
-		rectangle fixedvis = screen->machine->screen[scrnum].visarea;
+		rectangle fixedvis = *video_screen_get_visible_area(screen);
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
@@ -87,9 +87,9 @@ static VIDEO_UPDATE( superdq )
 		render_texture_set_bitmap(overlay_texture, bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
 
 		/* add both quads to the screen */
-		render_container_empty(render_container_get_screen(scrnum));
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+		render_container_empty(render_container_get_screen(screen));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 	}
 
 	/* display disc information */
@@ -187,9 +187,7 @@ static WRITE8_HANDLER( superdq_io_w )
 	superdq_color_bank = ( data & 2 ) ? 1 : 0;
 
 	for( i = 0; i < sizeof( black_color_entries ); i++ )
-	{
-		render_container_set_palette_alpha(render_container_get_screen(0), black_color_entries[i], (data&0x80) ? 0x00 : 0xff );
-	}
+		render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), black_color_entries[i], (data&0x80) ? 0x00 : 0xff );
 
 	/*
         bit 5 = DISP1?

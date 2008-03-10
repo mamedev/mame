@@ -468,6 +468,9 @@ VIDEO_UPDATE( gaelco2_dual )
 {
 	int i;
 
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
 	/* read scroll values */
 	int scroll0x = gaelco2_videoram[0x2802/2] + 0x14;
 	int scroll1x = gaelco2_videoram[0x2806/2] + 0x10;
@@ -487,13 +490,13 @@ VIDEO_UPDATE( gaelco2_dual )
 	/* draw screen */
 	fillbitmap(bitmap, 0, cliprect);
 
-	if (scrnum==1)
+	if (screen == right_screen)
 	{
 		/* monitor 2 output */
 		tilemap_draw(bitmap,cliprect,pant[1], 0, 0);
 		draw_sprites(screen->machine,bitmap,cliprect, 0x8000, 0);
 	}
-	else if (scrnum==0)
+	else if (screen == left_screen)
 	{
 		/* monitor 1 output */
 		tilemap_draw(bitmap,cliprect,pant[0], 0, 0);

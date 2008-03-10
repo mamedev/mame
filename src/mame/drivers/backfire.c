@@ -172,13 +172,16 @@ static void draw_sprites(running_machine *machine,bitmap_t *bitmap,const rectang
 
 static VIDEO_UPDATE(backfire)
 {
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
-	if (scrnum==0)
+	if (screen == left_screen)
 	{
 
 		fillbitmap(priority_bitmap,0,NULL);
@@ -197,11 +200,9 @@ static VIDEO_UPDATE(backfire)
 			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else
-		{
 			popmessage( "unknown left priority %08x", backfire_left_priority[0] );
-		}
 	}
-	else if (scrnum==1)
+	else if (screen == right_screen)
 	{
 		fillbitmap(priority_bitmap,0,NULL);
 		fillbitmap(bitmap,0x500,cliprect);
@@ -219,9 +220,7 @@ static VIDEO_UPDATE(backfire)
 			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else
-		{
 			popmessage( "unknown right priority %08x", backfire_right_priority[0] );
-		}
 	}
 	return 0;
 }

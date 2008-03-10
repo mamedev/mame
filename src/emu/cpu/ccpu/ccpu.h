@@ -42,7 +42,6 @@ struct CCPUConfig
 {
 	UINT8		(*external_input)(void);		/* if NULL, assume JMI jumper is present */
 	void		(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
-	UINT8		scrnum;
 };
 
 

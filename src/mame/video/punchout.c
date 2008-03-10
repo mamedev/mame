@@ -424,14 +424,17 @@ static void drawbs2(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 VIDEO_UPDATE( punchout )
 {
-	if (scrnum == 1)
+	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+
+	if (screen == bottom_screen)
 	{
 		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
 			draw_big_sprite(bitmap, cliprect);
 	}
-	else
+	else if (screen == top_screen)
 	{
 		int offs;
 
@@ -451,14 +454,17 @@ VIDEO_UPDATE( punchout )
 
 VIDEO_UPDATE( armwrest )
 {
-	if (scrnum == 1)
+	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
+
+	if (screen == bottom_screen)
 	{
 		tilemap_draw(bitmap, cliprect, punchout_topTilemap, 0, 0);
 
 		if (punchout_bigsprite1[7] & 1)	/* display in top monitor */
 			armwrest_draw_big_sprite(bitmap, cliprect);
 	}
-	else
+	else if (screen == top_screen)
 	{
 		tilemap_draw(bitmap, cliprect, punchout_botTilemap, 0, 0);
 

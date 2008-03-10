@@ -42,6 +42,9 @@ VIDEO_UPDATE( subs )
 {
 	int offs;
 
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
 	for (offs = videoram_size - 1;offs >= 0;offs--)
@@ -71,42 +74,34 @@ VIDEO_UPDATE( subs )
 		else
 			charcode = charcode & 0x3F;
 
-		/* Draw the left screen */
-		if (scrnum==0)
+		/* draw the left screen */
+		if (screen == left_screen)
 		{
 			if ((left_enable || left_sonar_window) && (!right_sonar_window))
-			{
 				drawgfx(bitmap,screen->machine->gfx[0],
 						charcode, 1,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
-			}
 			else
-			{
 				drawgfx(bitmap,screen->machine->gfx[0],
 						0, 1,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
-			}
 		}
 
-		/* Draw the right screen */
-		if (scrnum==1)
+		/* draw the right screen */
+		if (screen == right_screen)
 		{
 			if ((right_enable || right_sonar_window) && (!left_sonar_window))
-			{
 				drawgfx(bitmap,screen->machine->gfx[0],
 						charcode, 0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
-			}
 			else
-			{
 				drawgfx(bitmap,screen->machine->gfx[0],
 						0, 0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_NONE,0);
-			}
 		}
 	}
 
@@ -129,31 +124,27 @@ VIDEO_UPDATE( subs )
 		prom_set = charcode & 0x01;
 		charcode = (charcode >> 3) & 0x1F;
 
-		/* Left screen - special check for drawing right screen's sub */
-		if (scrnum==0)
+		/* left screen - special check for drawing right screen's sub */
+		if (screen == left_screen)
 		{
 			if ((offs!=0) || (sub_enable))
-			{
 				drawgfx(bitmap,screen->machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_PEN,0);
-			}
 		}
 
 
-		/* Right screen - special check for drawing left screen's sub */
-		if (scrnum==1)
+		/* right screen - special check for drawing left screen's sub */
+		if (screen == right_screen)
 		{
 			if ((offs!=1) || (sub_enable))
-			{
 				drawgfx(bitmap,screen->machine->gfx[1],
 						charcode + 32 * prom_set,
 						0,
 						0,0,sx,sy,
 						cliprect,TRANSPARENCY_PEN,0);
-			}
 		}
 	}
 

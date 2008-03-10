@@ -559,11 +559,25 @@ static VIDEO_UPDATE( hornet )
 
 static VIDEO_UPDATE( hornet_2board )
 {
-	voodoo_update(scrnum, bitmap, cliprect);
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
-	/* TODO: tilemaps per screen */
-	K037122_tile_update(screen->machine, scrnum);
-	K037122_tile_draw(scrnum, bitmap, cliprect);
+	if (screen == left_screen)
+	{
+		voodoo_update(0, bitmap, cliprect);
+
+		/* TODO: tilemaps per screen */
+		K037122_tile_update(screen->machine, 0);
+		K037122_tile_draw(0, bitmap, cliprect);
+	}
+	else if (screen == right_screen)
+	{
+		voodoo_update(1, bitmap, cliprect);
+
+		/* TODO: tilemaps per screen */
+		K037122_tile_update(screen->machine, 1);
+		K037122_tile_draw(1, bitmap, cliprect);
+	}
 
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);

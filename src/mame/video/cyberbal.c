@@ -341,27 +341,33 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
  *
  *************************************/
 
-static void update_one_screen(running_machine* machine, int screen, bitmap_t *bitmap, const rectangle *cliprect)
+static void update_one_screen(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	struct atarimo_rect_list rectlist;
 	rectangle tempclip = *cliprect;
 	bitmap_t *mobitmap;
 	int x, y, r, mooffset, temp;
+	rectangle *visarea = (rectangle *)video_screen_get_visible_area(screen);
+
+	/* for 2p games, the left screen is the main screen */
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	if (left_screen == NULL)
+		left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "main");
 
 	/* draw the playfield */
-	tilemap_draw(bitmap, cliprect, screen ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, (screen == left_screen) ? atarigen_playfield_tilemap : atarigen_playfield2_tilemap, 0, 0);
 
 	/* draw the MOs -- note some kludging to get this to work correctly for 2 screens */
 	mooffset = 0;
 	tempclip.min_x -= mooffset;
 	tempclip.max_x -= mooffset;
-	temp = machine->screen[screen].visarea.max_x;
+	temp = visarea->max_x;
 	if (temp > SCREEN_WIDTH)
-		machine->screen[screen].visarea.max_x /= 2;
-	mobitmap = atarimo_render(machine, screen, cliprect, &rectlist);
+		visarea->max_x /= 2;
+	mobitmap = atarimo_render(screen->machine, (screen == left_screen) ? 0 : 1, cliprect, &rectlist);
 	tempclip.min_x += mooffset;
 	tempclip.max_x += mooffset;
-	machine->screen[screen].visarea.max_x = temp;
+	visarea->max_x = temp;
 
 	/* draw and merge the MO */
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
@@ -382,12 +388,12 @@ static void update_one_screen(running_machine* machine, int screen, bitmap_t *bi
 		}
 
 	/* add the alpha on top */
-	tilemap_draw(bitmap, cliprect, screen ? atarigen_alpha2_tilemap : atarigen_alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, (screen == left_screen) ? atarigen_alpha_tilemap : atarigen_alpha2_tilemap, 0, 0);
 }
 
 
 VIDEO_UPDATE( cyberbal )
 {
-	update_one_screen(screen->machine, scrnum, bitmap, cliprect);
+	update_one_screen(screen, bitmap, cliprect);
 	return 0;
 }

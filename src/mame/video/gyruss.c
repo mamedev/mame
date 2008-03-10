@@ -156,7 +156,7 @@ static void draw_sprites(gfx_element **gfx, bitmap_t *bitmap, const rectangle *c
 
 VIDEO_UPDATE( gyruss )
 {
-	if (cliprect->min_y == screen->machine->screen[scrnum].visarea.min_y)
+	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		tilemap_set_flip(ALL_TILEMAPS, (*gyruss_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);

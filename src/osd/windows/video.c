@@ -450,9 +450,8 @@ static void extract_video_config(running_machine *machine)
 
 static void load_effect_overlay(running_machine *machine, const char *filename)
 {
+	const device_config *screen;
 	char *tempstr = malloc_or_die(strlen(filename) + 5);
-	int numscreens;
-	int scrnum;
 	char *dest;
 
 	// append a .PNG extension
@@ -472,9 +471,8 @@ static void load_effect_overlay(running_machine *machine, const char *filename)
 	}
 
 	// set the overlay on all screens
-	numscreens = video_screen_count(machine->config);
-	for (scrnum = 0; scrnum < numscreens; scrnum++)
-		render_container_set_overlay(render_container_get_screen(scrnum), effect_bitmap);
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+		render_container_set_overlay(render_container_get_screen(screen), effect_bitmap);
 
 	free(tempstr);
 }

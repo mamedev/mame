@@ -125,12 +125,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( psikyo4 )
 {
-	if (scrnum==0)
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
 	{
 		fillbitmap(bitmap, 0x1000, cliprect);
 		draw_sprites(screen->machine, bitmap, cliprect, 0x0000);
 	}
-	else if (scrnum==1)
+	if (screen == right_screen)
 	{
 		fillbitmap(bitmap, 0x1001, cliprect);
 		draw_sprites(screen->machine, bitmap, cliprect, 0x2000);

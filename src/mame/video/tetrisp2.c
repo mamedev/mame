@@ -686,9 +686,11 @@ VIDEO_UPDATE( rocknms )
 	int scr_pri;
 	int rot_pri;
 
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
 	/* Black background color */
-	if (scrnum==0)
+	if (screen == left_screen)
 	{
 		tilemap_set_scrollx(tilemap_sub_bg, 0, rocknms_sub_scroll_bg[ 2 ] + 0x000);
 		tilemap_set_scrolly(tilemap_sub_bg, 0, rocknms_sub_scroll_bg[ 5 ] + 0x000);
@@ -740,7 +742,7 @@ VIDEO_UPDATE( rocknms )
 
 		draw_sprites(screen->machine, bitmap,cliprect, spriteram16_2, spriteram_2_size, 4);
 	}
-	else if (scrnum==1) /* game screen */
+	else if (screen == right_screen) /* game screen */
 	{
 		tilemap_set_scrollx(tilemap_bg, 0, tetrisp2_scroll_bg[ 2 ] + 0x000);
 		tilemap_set_scrolly(tilemap_bg, 0, tetrisp2_scroll_bg[ 5 ] + 0x000);

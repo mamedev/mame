@@ -442,7 +442,7 @@ static VIDEO_UPDATE( exidy440 )
 	update_screen(screen, bitmap, cliprect, 0, TRUE);
 
 	/* generate an interrupt once/frame for the beam */
-	if (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y)
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 	{
 		int i;
 

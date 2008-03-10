@@ -259,10 +259,11 @@ void vector_clear_list (void)
 VIDEO_UPDATE( vector )
 {
 	UINT32 flags = PRIMFLAG_ANTIALIAS(options_get_bool(mame_options(), OPTION_ANTIALIAS) ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
-	float xscale = 1.0f / (65536 * (screen->machine->screen[scrnum].visarea.max_x - screen->machine->screen[scrnum].visarea.min_x));
-	float yscale = 1.0f / (65536 * (screen->machine->screen[scrnum].visarea.max_y - screen->machine->screen[scrnum].visarea.min_y));
-	float xoffs = (float)screen->machine->screen[scrnum].visarea.min_x;
-	float yoffs = (float)screen->machine->screen[scrnum].visarea.min_y;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	float xscale = 1.0f / (65536 * (visarea->max_x - visarea->min_x));
+	float yscale = 1.0f / (65536 * (visarea->max_y - visarea->min_y));
+	float xoffs = (float)visarea->min_x;
+	float yoffs = (float)visarea->min_y;
 	point *curpoint;
 	render_bounds clip;
 	int lastx = 0, lasty = 0;
@@ -270,8 +271,8 @@ VIDEO_UPDATE( vector )
 
 	curpoint = vector_list;
 
-	render_container_empty(render_container_get_screen(scrnum));
-	render_screen_add_rect(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	render_container_empty(render_container_get_screen(screen));
+	render_screen_add_rect(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	clip.x0 = clip.y0 = 0.0f;
 	clip.x1 = clip.y1 = 1.0f;
@@ -301,7 +302,7 @@ VIDEO_UPDATE( vector )
 
 			if (curpoint->intensity != 0)
 				if (!render_clip_line(&coords, &clip))
-					render_screen_add_line(scrnum, coords.x0, coords.y0, coords.x1, coords.y1,
+					render_screen_add_line(screen, coords.x0, coords.y0, coords.x1, coords.y1,
 							beam_width * (1.0f / (float)VECTOR_WIDTH_DENOM),
 							(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
 							flags);

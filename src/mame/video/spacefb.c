@@ -143,10 +143,7 @@ static void get_starfield_pens(pen_t *pens)
 }
 
 
-static void draw_starfield(running_machine *machine,
-						   int scrnum,
-						   bitmap_t *bitmap,
-						   const rectangle *cliprect)
+static void draw_starfield(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int y;
 	pen_t pens[NUM_STARFIELD_PENS];
@@ -154,7 +151,7 @@ static void draw_starfield(running_machine *machine,
 	get_starfield_pens(pens);
 
 	/* the shift register is always shifting -- do the portion in the top VBLANK */
-	if (cliprect->min_y == machine->screen[scrnum].visarea.min_y)
+	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
 		int i;
 
@@ -189,7 +186,7 @@ static void draw_starfield(running_machine *machine,
 	}
 
 	/* do the shifting in the bottom VBLANK */
-	if (cliprect->max_y == machine->screen[scrnum].visarea.max_y)
+	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 	{
 		int i;
 		int clock_count = (SPACEFB_HBSTART - SPACEFB_HBEND) * (SPACEFB_VTOTAL - SPACEFB_VBSTART);
@@ -403,7 +400,7 @@ static void draw_objects(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( spacefb )
 {
 	draw_objects(bitmap, cliprect);
-	draw_starfield(screen->machine, scrnum, bitmap, cliprect);
+	draw_starfield(screen, bitmap, cliprect);
 
 	return 0;
 }

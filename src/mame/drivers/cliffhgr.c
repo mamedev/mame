@@ -133,9 +133,9 @@ static VIDEO_UPDATE( cliff )
 		render_texture_set_bitmap(overlay_texture, bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
 
 		/* add both quads to the screen */
-		render_container_empty(render_container_get_screen(scrnum));
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+		render_container_empty(render_container_get_screen(screen));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 	}
 
 	/* display disc information */
@@ -201,8 +201,8 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	int overlay = ( data & 0x10 ) ? 1 : 0;
 
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
-	render_container_set_palette_alpha(render_container_get_screen(0), 0, overlay ? 0x00 : 0xff );
-	render_container_set_palette_alpha(render_container_get_screen(0), 1, overlay ? 0x00 : 0xff );
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 0, overlay ? 0x00 : 0xff );
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 1, overlay ? 0x00 : 0xff );
 
 	/* audio */
 	discrete_sound_w(machine, CLIFF_ENABLE_SND_1, sound&1);

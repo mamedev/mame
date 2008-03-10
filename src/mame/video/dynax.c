@@ -1203,8 +1203,10 @@ VIDEO_UPDATE( sprtmtch )
 
 VIDEO_UPDATE( jantouki )
 {
-
 	int layers_ctrl = dynax_layer_enable;
+
+	const device_config *top_screen    = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
+	const device_config *bottom_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "bottom");
 
 	if (debug_viewer(bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
@@ -1214,14 +1216,14 @@ VIDEO_UPDATE( jantouki )
 		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
 		cliprect);
 
-	if (scrnum==0)
+	if (screen == top_screen)
 	{
 	//  if (layers_ctrl & 0x01) jantouki_copylayer( bitmap, cliprect, 3, 0 );
 		if (layers_ctrl & 0x02)	jantouki_copylayer( bitmap, cliprect, 2, 0 );
 		if (layers_ctrl & 0x04)	jantouki_copylayer( bitmap, cliprect, 1, 0 );
 		if (layers_ctrl & 0x08)	jantouki_copylayer( bitmap, cliprect, 0, 0 );
 	}
-	else if (scrnum==1)
+	else if (screen == bottom_screen)
 	{
 		if (layers_ctrl & 0x01)	jantouki_copylayer( bitmap, cliprect, 3, 0 );
 		if (layers_ctrl & 0x10)	jantouki_copylayer( bitmap, cliprect, 7, 0 );

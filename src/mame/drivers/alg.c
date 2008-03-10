@@ -84,7 +84,7 @@ static VIDEO_START( alg )
 	VIDEO_START_CALL(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
-	render_container_set_palette_alpha(render_container_get_screen(0), 4096, 0x00);
+	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 4096, 0x00);
 	amiga_set_genlock_color(4096);
 }
 
@@ -114,10 +114,10 @@ static VIDEO_UPDATE( alg )
 		amiga_render_scanline(screen->machine, amiga_bitmap, y);
 
 	/* at the end of the frame, composite the video */
-	if (!video_skip_this_frame() && (cliprect->max_y == screen->machine->screen[scrnum].visarea.max_y))
+	if (!video_skip_this_frame() && (cliprect->max_y == video_screen_get_visible_area(screen)->max_y))
 	{
 		bitmap_t *vidbitmap;
-		rectangle fixedvis = screen->machine->screen[scrnum].visarea;
+		rectangle fixedvis = *video_screen_get_visible_area(screen);
 		fixedvis.max_x++;
 		fixedvis.max_y++;
 
@@ -133,9 +133,9 @@ static VIDEO_UPDATE( alg )
 		render_texture_set_bitmap(overlay_texture, amiga_bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
 
 		/* add both quads to the screen */
-		render_container_empty(render_container_get_screen(scrnum));
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+		render_container_empty(render_container_get_screen(screen));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 
 		/* display disc information */
 		if (discinfo != NULL)

@@ -184,7 +184,7 @@ VIDEO_UPDATE( tp84 )
 {
 	rectangle clip = *cliprect;
 
-	if (cliprect->min_y == screen->machine->screen[scrnum].visarea.min_y)
+	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y)
 	{
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 

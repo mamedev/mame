@@ -105,14 +105,29 @@ static VIDEO_START( hangplt )
 
 static VIDEO_UPDATE( hangplt )
 {
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
 	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
 
-	K001604_tile_update(scrnum);
-//  K001604_draw_back_layer(bitmap, cliprect);
+	if (screen == left_screen)
+	{
+		K001604_tile_update(0);
+	//  K001604_draw_back_layer(bitmap, cliprect);
 
-	voodoo_update(scrnum, bitmap, cliprect);
+		voodoo_update(0, bitmap, cliprect);
 
-	K001604_draw_front_layer(scrnum, bitmap, cliprect);
+		K001604_draw_front_layer(0, bitmap, cliprect);
+	}
+	else if (screen == right_screen)
+	{
+		K001604_tile_update(1);
+	//  K001604_draw_back_layer(bitmap, cliprect);
+
+		voodoo_update(1, bitmap, cliprect);
+
+		K001604_draw_front_layer(1, bitmap, cliprect);
+	}
 
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);

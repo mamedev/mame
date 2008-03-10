@@ -140,25 +140,29 @@ extern WRITE8_HANDLER( K052109_w );
 VIDEO_UPDATE( xmen6p )
 {
 	int x,y;
- /* update every other frame ...help prevent screens lagging (although it still does..)..
-     but maybe the hw has its own buffering hence the extra ram */
-//  if (xmen_current_frame&0x8000) /* actually don't bother */
-	{
 
+ 	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
 		for(y=0;y<32*8;y++)
 		{
 			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
-			UINT16* line_src;
-
-			if (scrnum==0) line_src = BITMAP_ADDR16(screen_left, y, 0);
-			else line_src = BITMAP_ADDR16(screen_right, y, 0);
+			UINT16* line_src = BITMAP_ADDR16(screen_left, y, 0);
 
 			for (x=12*8;x<52*8;x++)
-			{
 				line_dest[x] = line_src[x];
-			}
 		}
-	}
+	else if (screen == right_screen)
+		for(y=0;y<32*8;y++)
+		{
+			UINT16* line_dest = BITMAP_ADDR16(bitmap, y, 0);
+			UINT16* line_src = BITMAP_ADDR16(screen_right, y, 0);
+
+			for (x=12*8;x<52*8;x++)
+				line_dest[x] = line_src[x];
+		}
+
 	return 0;
 }
 

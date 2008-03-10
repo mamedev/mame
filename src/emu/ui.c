@@ -1762,7 +1762,8 @@ static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer
 
 static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_brightness(container, (float)newval * 0.001f);
@@ -1779,7 +1780,8 @@ static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buf
 
 static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_contrast(container, (float)newval * 0.001f);
@@ -1795,7 +1797,8 @@ static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffe
 
 static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_gamma(container, (float)newval * 0.001f);
@@ -1812,7 +1815,8 @@ static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, 
 
 static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_xscale(container, (float)newval * 0.001f);
@@ -1829,7 +1833,8 @@ static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer,
 
 static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_yscale(container, (float)newval * 0.001f);
@@ -1846,7 +1851,8 @@ static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer,
 
 static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_xoffset(container, (float)newval * 0.001f);
@@ -1863,7 +1869,8 @@ static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer
 
 static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	render_container *container = render_container_get_screen(arg);
+	const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg);
+	render_container *container = render_container_get_screen(screen);
 	if (buffer != NULL)
 	{
 		render_container_set_yoffset(container, (float)newval * 0.001f);

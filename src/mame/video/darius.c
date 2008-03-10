@@ -127,7 +127,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( darius )
 {
-	int xoffs = 36*8*scrnum;
+	int xoffs = 0;
+	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *middle_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "middle");
+	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
+		xoffs = 36*8*0;
+	else if (screen == middle_screen)
+		xoffs = 36*8*1;
+	else if (screen == right_screen)
+		xoffs = 36*8*2;
 
 	PC080SN_tilemap_update();
 

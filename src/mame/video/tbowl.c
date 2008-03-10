@@ -216,7 +216,10 @@ VIDEO_START( tbowl )
 
 VIDEO_UPDATE( tbowl )
 {
-	if (scrnum == 0)
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
 	{
 		tilemap_set_scrollx(bg_tilemap,  0, tbowl_xscroll );
 		tilemap_set_scrolly(bg_tilemap,  0, tbowl_yscroll );
@@ -231,7 +234,7 @@ VIDEO_UPDATE( tbowl )
 		tilemap_draw(bitmap,cliprect,bg2_tilemap,0,0);
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}
-	else if (scrnum ==1)
+	else if (screen == right_screen)
 	{
 		tilemap_set_scrollx(bg_tilemap,  0, tbowl_xscroll+32*8 );
 		tilemap_set_scrolly(bg_tilemap,  0, tbowl_yscroll );

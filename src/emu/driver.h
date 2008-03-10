@@ -55,8 +55,8 @@
 #define VIDEO_EOF(name)				void video_eof_##name(running_machine *machine)
 #define VIDEO_EOF_CALL(name)		video_eof_##name(machine)
 
-#define VIDEO_UPDATE(name)			UINT32 video_update_##name(const device_config *screen, int scrnum, bitmap_t *bitmap, const rectangle *cliprect)
-#define VIDEO_UPDATE_CALL(name)		video_update_##name(screen, scrnum, bitmap, cliprect)
+#define VIDEO_UPDATE(name)			UINT32 video_update_##name(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
+#define VIDEO_UPDATE_CALL(name)		video_update_##name(screen, bitmap, cliprect)
 
 
 /* NULL versions */
@@ -84,7 +84,7 @@ typedef void   (*video_start_func)(running_machine *machine);
 typedef void   (*video_reset_func)(running_machine *machine);
 typedef void   (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
 typedef void   (*video_eof_func)(running_machine *machine);
-typedef UINT32 (*video_update_func)(const device_config *screen, int scrnum, bitmap_t *bitmap, const rectangle *cliprect);
+typedef UINT32 (*video_update_func)(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect);
 
 
 

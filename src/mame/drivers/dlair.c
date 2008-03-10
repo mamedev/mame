@@ -217,8 +217,8 @@ static VIDEO_UPDATE( dlair )
 	last_seqid = seqid;
 
 	/* cover the whole screen with a quad */
-	render_container_empty(render_container_get_screen(scrnum));
-	render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+	render_container_empty(render_container_get_screen(screen));
+	render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 	if (discinfo != NULL)
 		popmessage("%s", laserdisc_describe_state(discinfo));
@@ -251,11 +251,11 @@ static VIDEO_UPDATE( dleuro )
 	last_seqid = seqid;
 
 	/* cover the whole screen with a quad */
-	render_container_empty(render_container_get_screen(scrnum));
+	render_container_empty(render_container_get_screen(screen));
 	if (last_misc & 0x02)
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 	else
-		render_screen_add_quad(scrnum, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 	if (discinfo != NULL)
 		popmessage("%s", laserdisc_describe_state(discinfo));

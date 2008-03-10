@@ -488,7 +488,11 @@ VIDEO_UPDATE( tx1 )
 {
 	int y;
 
-	if ( scrnum == 0 )
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *center_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "center");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if ( screen == left_screen )
 	{
 		rectangle rect = { 0, 768 - 1, 0, 240 - 1 };
 
@@ -496,10 +500,17 @@ VIDEO_UPDATE( tx1 )
 		tilemap_draw(tx1_bitmap, &rect, tx1_tilemap, 0, 0);
 //      tx1_draw_road(tx1_bitmap, &rect);
 		tx1_draw_objects(tx1_bitmap, &rect);
-	}
 
-	for (y = 0; y < 240; ++y)
-		memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, scrnum * 256), sizeof(UINT16) * 256);
+		for (y = 0; y < 240; ++y)
+			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 0 * 256), sizeof(UINT16) * 256);
+	}
+	else if ( screen == center_screen )
+		for (y = 0; y < 240; ++y)
+			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 1 * 256), sizeof(UINT16) * 256);
+	else if ( screen == right_screen )
+		for (y = 0; y < 240; ++y)
+			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 2 * 256), sizeof(UINT16) * 256);
+
 
 	return 0;
 }
@@ -1607,10 +1618,21 @@ VIDEO_START( buggyboy )
 
 VIDEO_UPDATE( buggyboy )
 {
-	/* The video hardware seems to use one large tilemap, scroll it to the right position for each screen */
-	int xscrollamount = scrnum * 256;
-	tilemap_set_scrollx(buggyboy_tilemap, 0, xscrollamount);
+	int xscrollamount = 0;
 
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *center_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "center");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	/* The video hardware seems to use one large tilemap, scroll it to the right position for each screen */
+	if ( screen == left_screen )
+		xscrollamount = 0 * 256;
+	else if ( screen == center_screen )
+		xscrollamount = 1 * 256;
+	else if ( screen == right_screen )
+		xscrollamount = 2 * 256;
+
+	tilemap_set_scrollx(buggyboy_tilemap, 0, xscrollamount);
 	tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	return 0;
 }
