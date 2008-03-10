@@ -848,8 +848,8 @@ struct _ext_inp_header
 	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
 	TOKEN_STRING(_name),
 
-#define PORT_CATEGORY_ITEM(_default,_name) \
-	TOKEN_UINT64_PACK2(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32), \
+#define PORT_CATEGORY_ITEM(_default,_name,_category) \
+	TOKEN_UINT64_PACK3(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32, _category, 32), \
 	TOKEN_STRING(_name),
 #endif /* MESS */
 
