@@ -525,7 +525,7 @@ static TIMER_CALLBACK( invasn_gun_callback )
 
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
-	if (beamy <= machine->screen[0].visarea.max_y && beamy <= gun_y[player] + BEAM_DY)
+	if (beamy <= video_screen_get_visible_area(machine->primary_screen)->max_y && beamy <= gun_y[player] + BEAM_DY)
 		timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(machine->primary_screen, beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
 }
 
@@ -547,7 +547,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle *visarea = &Machine->screen[0].visarea;
+			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },

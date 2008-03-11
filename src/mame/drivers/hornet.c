@@ -369,16 +369,18 @@ static void K037122_tile_update(running_machine *machine, int chip)
 
 static void K037122_tile_draw(int chip, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+
 	if (K037122_reg[chip][0xc] & 0x10000)
 	{
-		tilemap_set_scrolldx(K037122_layer[chip][1], Machine->screen[0].visarea.min_x, Machine->screen[0].visarea.min_x);
-		tilemap_set_scrolldy(K037122_layer[chip][1], Machine->screen[0].visarea.min_y, Machine->screen[0].visarea.min_y);
+		tilemap_set_scrolldx(K037122_layer[chip][1], visarea->min_x, visarea->min_x);
+		tilemap_set_scrolldy(K037122_layer[chip][1], visarea->min_y, visarea->min_y);
 		tilemap_draw(bitmap, cliprect, K037122_layer[chip][1], 0,0);
 	}
 	else
 	{
-		tilemap_set_scrolldx(K037122_layer[chip][0], Machine->screen[0].visarea.min_x, Machine->screen[0].visarea.min_x);
-		tilemap_set_scrolldy(K037122_layer[chip][0], Machine->screen[0].visarea.min_y, Machine->screen[0].visarea.min_y);
+		tilemap_set_scrolldx(K037122_layer[chip][0], visarea->min_x, visarea->min_x);
+		tilemap_set_scrolldy(K037122_layer[chip][0], visarea->min_y, visarea->min_y);
 		tilemap_draw(bitmap, cliprect, K037122_layer[chip][0], 0,0);
 	}
 }

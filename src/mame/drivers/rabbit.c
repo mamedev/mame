@@ -354,7 +354,7 @@ static VIDEO_START(rabbit)
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[3],0x0);
-	rabbit_sprite_bitmap = auto_bitmap_alloc(0x1000,0x1000,machine->screen[0].format);
+	rabbit_sprite_bitmap = auto_bitmap_alloc(0x1000,0x1000,video_screen_get_format(machine->primary_screen));
 	rabbit_sprite_clip.min_x = 0;
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;
@@ -1144,7 +1144,7 @@ static VIDEO_START(tmmjprd)
 	tilemap_set_transparent_pen(rabbit_tilemap[1],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[2],0x0);
 	tilemap_set_transparent_pen(rabbit_tilemap[3],0x0);
-	rabbit_sprite_bitmap = auto_bitmap_alloc(0x1000,0x1000,machine->screen[0].format);
+	rabbit_sprite_bitmap = auto_bitmap_alloc(0x1000,0x1000,video_screen_get_format(machine->primary_screen));
 	rabbit_sprite_clip.min_x = 0;
 	rabbit_sprite_clip.max_x = 0x1000-1;
 	rabbit_sprite_clip.min_y = 0;

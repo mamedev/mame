@@ -141,7 +141,8 @@ INLINE int scanline_to_vcount(int scanline)
 static TIMER_CALLBACK( ddragon_scanline_callback )
 {
 	int scanline = param;
-	int vcount_old = scanline_to_vcount((scanline == 0) ? machine->screen[0].height - 1 : scanline - 1);
+	int screen_height = video_screen_get_height(machine->primary_screen);
+	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
@@ -156,7 +157,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
-	if (++scanline >= machine->screen[0].height)
+	if (++scanline >= screen_height)
 		scanline = 0;
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }

@@ -280,7 +280,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
         /* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
            that this bit is NOT set in rows 0-7. */
-        vblank = video_screen_get_vpos(machine->primary_screen) > machine->screen[0].visarea.max_y;
+        vblank = video_screen_get_vpos(machine->primary_screen) > video_screen_get_visible_area(machine->primary_screen)->max_y;
 		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 

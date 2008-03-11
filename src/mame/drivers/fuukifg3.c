@@ -259,7 +259,9 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 		COMBINE_DATA(&fuuki32_vregs[offset]);
 		if (offset == 0x1c/4)
 		{
-			timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, fuuki32_vregs[0x1c/4]>>16, Machine->screen[0].visarea.max_x + 1), 0, video_screen_get_frame_period(machine->primary_screen));
+			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+			attotime period = video_screen_get_frame_period(machine->primary_screen);
+			timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, fuuki32_vregs[0x1c/4]>>16, visarea->max_x + 1), 0, period);
 		}
 	}
 }
@@ -556,7 +558,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpunum_set_input_line(machine, 0, 3, PULSE_LINE);	// VBlank IRQ
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, machine->screen[0].visarea.max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
+	timer_set(video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
 
@@ -576,9 +578,11 @@ static MACHINE_START( fuuki32 )
 
 static MACHINE_RESET( fuuki32 )
 {
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, machine->screen[0].visarea.max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
-	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, machine->screen[0].visarea.max_x + 1), 0);
+	timer_set(video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
+	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, visarea->max_x + 1), 0);
 }
 
 

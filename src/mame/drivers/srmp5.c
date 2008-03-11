@@ -67,6 +67,7 @@ static VIDEO_UPDATE( srmp5 )
 	UINT16 *sprite_list=sprram;
 	UINT16 *sprite_list_end=&sprram[0x1000]; //guess
 	UINT8 *pixels=(UINT8 *)tileram;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	fillbitmap(bitmap,0,cliprect);
 
@@ -105,7 +106,7 @@ static VIDEO_UPDATE( srmp5 )
 
 		 						if(pen)
 		 						{
-		 							if(xb+xs<=screen->machine->screen[0].visarea.max_x && xb+xs>=screen->machine->screen[0].visarea.min_x && yb+ys<=screen->machine->screen[0].visarea.max_y && yb+ys>=screen->machine->screen[0].visarea.min_y )
+		 							if(xb+xs<=visarea->max_x && xb+xs>=visarea->min_x && yb+ys<=visarea->max_y && yb+ys>=visarea->min_y )
 		 							{
 		 								UINT32 pixdata=paletteram32[pen+((sprite_sublist[SPRITE_PALETTE]&0xff)<<8)];
 		 								*BITMAP_ADDR32(bitmap, yb+ys, xb+xs) = ((pixdata&0x7c00)>>7) | ((pixdata&0x3e0)<<6) | ((pixdata&0x1f)<<19);

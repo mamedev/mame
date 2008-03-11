@@ -14,6 +14,10 @@
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
 
+#include "mamecore.h"
+#include "devintrf.h"
+#include "timer.h"
+
 
 /***************************************************************************
     CONSTANTS
@@ -46,6 +50,12 @@ enum
 #define video_screen_count(config)		device_list_items((config)->devicelist, VIDEO_SCREEN)
 #define video_screen_first(config)		device_list_first((config)->devicelist, VIDEO_SCREEN)
 #define video_screen_next(previous)		device_list_next((previous), VIDEO_SCREEN)
+
+#define video_screen_get_format(screen)	(((screen_config *)(screen)->inline_config)->format)
+
+/* allocates a bitmap that has the same dimensions and format as the passed in screen */
+#define video_screen_auto_bitmap_alloc(screen)	auto_bitmap_alloc(video_screen_get_width(screen), video_screen_get_height(screen), video_screen_get_format(screen))
+
 
 
 

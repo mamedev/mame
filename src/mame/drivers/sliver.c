@@ -441,8 +441,8 @@ ADDRESS_MAP_END
 
 static VIDEO_START(sliver)
 {
-	sliver_bitmap_bg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	sliver_bitmap_fg = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	sliver_bitmap_bg = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sliver_bitmap_fg = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 static VIDEO_UPDATE(sliver)

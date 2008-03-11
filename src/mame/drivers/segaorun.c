@@ -214,7 +214,7 @@ static TIMER_CALLBACK( scanline_callback )
 		case 65:
 		case 129:
 		case 193:
-			timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, machine->screen[0].visarea.max_x + 1), NULL, 0, irq2_gen);
+			timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, video_screen_get_visible_area(machine->primary_screen)->max_x + 1), NULL, 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 

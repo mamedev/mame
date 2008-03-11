@@ -502,15 +502,18 @@ static TILE_GET_INFO( get_tile_info )
 
 static VIDEO_START( laserbat )
 {
+	int screen_width = video_screen_get_width(machine->primary_screen);
+	int screen_height = video_screen_get_height(machine->primary_screen);
+
 	bg_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	videoram = (UINT8 *)auto_malloc(0x400);
 	colorram = (UINT8 *)auto_malloc(0x400);
 
 	/* configure the S2636 chips */
-	s2636_0 = s2636_config(s2636_0_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
-	s2636_1 = s2636_config(s2636_1_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
-	s2636_2 = s2636_config(s2636_2_ram, machine->screen[0].height, machine->screen[0].width, 0, -19);
+	s2636_0 = s2636_config(s2636_0_ram, screen_height, screen_width, 0, -19);
+	s2636_1 = s2636_config(s2636_1_ram, screen_height, screen_width, 0, -19);
+	s2636_2 = s2636_config(s2636_2_ram, screen_height, screen_width, 0, -19);
 }
 
 static VIDEO_UPDATE( laserbat )

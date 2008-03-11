@@ -22,7 +22,6 @@
 
 #include "driver.h"
 #include "render.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
 
@@ -47,16 +46,18 @@ static TIMER_CALLBACK( response_timer );
  *
  *************************************/
 
-static int get_lightgun_pos(int player, int *x, int *y)
+static int get_lightgun_pos(const device_config *screen, int player, int *x, int *y)
 {
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+
 	int xpos = readinputportbytag_safe((player == 0) ? "GUN1X" : "GUN2X", -1);
 	int ypos = readinputportbytag_safe((player == 0) ? "GUN1Y" : "GUN2Y", -1);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
 
-	*x = Machine->screen[0].visarea.min_x + xpos * (Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1) / 255;
-	*y = Machine->screen[0].visarea.min_y + ypos * (Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1) / 255;
+	*x = visarea->min_x + xpos * (visarea->max_x - visarea->min_x + 1) / 255;
+	*y = visarea->min_y + ypos * (visarea->max_y - visarea->min_y + 1) / 255;
 	return TRUE;
 }
 
@@ -78,7 +79,7 @@ static VIDEO_START( alg )
 	add_exit_callback(machine, video_cleanup);
 
 	/* allocate Amiga bitmap */
-	amiga_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	amiga_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* standard video start */
 	VIDEO_START_CALL(amiga);
@@ -242,7 +243,7 @@ static CUSTOM_INPUT( lightgun_pos_r )
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(input_select, &x, &y);
+	get_lightgun_pos(machine->primary_screen, input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 

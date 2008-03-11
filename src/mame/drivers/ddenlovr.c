@@ -36,12 +36,6 @@ Year + Game                 Board             CPU     Sound                    C
 98 Reach Ippatsu                              Z80              YM2413 + M6295  70C160F011
 -----------------------------------------------------------------------------------------------------------------------------
 
-Notes:
-
-- the zooming Dynax logo in ddenlovr would flicker because the palette is
-  updated one frame after the bitmap. This is fixed using a framebuffer but I
-  don't think it's correct.
-
 
 TODO:
 
@@ -60,8 +54,6 @@ TODO:
 - ddenlovr: sometimes the colors of the girl in the presentation before the
   beginning of a stage are wrong, and they correct themselves when the board
   is drawn.
-- The palette problems mentioned above happen in other games as well, e.g.
-  quizchq attract mode.
 
 - the registers right after the palette bank selectors (e00048-e0004f in ddenlovr)
   are not understood. They are related to the layer enable register and to the
@@ -104,7 +96,6 @@ TODO:
 
 
 UINT8 *ddenlovr_pixmap[8];
-static bitmap_t *framebuffer;
 static int extra_layers;
 
 
@@ -170,8 +161,6 @@ VIDEO_START(ddenlovr)
 		ddenlovr_pixmap[i] = auto_malloc(512*512);
 		ddenlovr_scroll[i*2+0] = ddenlovr_scroll[i*2+1] = 0;
 	}
-
-	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 
 	extra_layers = 0;
 
@@ -607,7 +596,7 @@ INLINE void log_blit(int data)
 #endif
 }
 
-static void blitter_w(int blitter, offs_t offset,UINT8 data,int irq_vector)
+static void blitter_w(running_machine *machine, int blitter, offs_t offset,UINT8 data,int irq_vector)
 {
 	static int ddenlovr_blit_reg[2];
 	int hi_bits;
@@ -745,14 +734,14 @@ profiler_mark(PROFILER_VIDEO);
 
 			if (irq_vector)
 				/* quizchq */
-				cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, irq_vector);
+				cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (ddenlovr_blitter_irq_enable)
 				{
 					ddenlovr_blitter_irq_flag = 1;
-					cpunum_set_input_line(Machine, 0,1,HOLD_LINE);
+					cpunum_set_input_line(machine, 0,1,HOLD_LINE);
 				}
 			}
 			break;
@@ -770,7 +759,7 @@ profiler_mark(PROFILER_END);
 
 
 // differences wrt blitter_data_w: slightly different blitter commands
-static void blitter_w_funkyfig(int blitter, offs_t offset,UINT8 data,int irq_vector)
+static void blitter_w_funkyfig(running_machine *machine, int blitter, offs_t offset,UINT8 data,int irq_vector)
 {
 	static int ddenlovr_blit_reg[2];
 	int hi_bits;
@@ -912,7 +901,7 @@ profiler_mark(PROFILER_VIDEO);
 				#endif
 			}
 
-			cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, irq_vector);
+			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, irq_vector);
 			break;
 
 		default:
@@ -1125,13 +1114,13 @@ profiler_mark(PROFILER_END);
 
 static WRITE8_HANDLER( rongrong_blitter_w )
 {
-	blitter_w(0,offset,data,0xf8);
+	blitter_w(machine, 0,offset,data,0xf8);
 }
 
 static WRITE16_HANDLER( ddenlovr_blitter_w )
 {
 	if (ACCESSING_LSB)
-		blitter_w(0,offset,data & 0xff,0);
+		blitter_w(machine, 0,offset,data & 0xff,0);
 }
 
 
@@ -1211,16 +1200,6 @@ static void copylayer(bitmap_t *bitmap,const rectangle *cliprect,int layer)
 
 VIDEO_UPDATE(ddenlovr)
 {
-	copybitmap(bitmap,framebuffer,0,0,0,0,cliprect);
-	return 0;
-}
-
-/*
-    I do the following in a eof handler, to avoid  palette/gfx synchronization
-    issues with frameskipping
-*/
-VIDEO_EOF(ddenlovr)
-{
 	static const int order[24][4] =
 	{
 		{ 3,2,1,0 }, { 2,3,1,0 }, { 3,1,2,0 }, { 1,3,2,0 }, { 2,1,3,0 }, { 1,2,3,0 },
@@ -1257,7 +1236,7 @@ VIDEO_EOF(ddenlovr)
 	if (input_code_pressed_once(KEYCODE_F)) { base++; while ((memory_region(REGION_GFX1)[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	fillbitmap(framebuffer,ddenlovr_bgcolor,&machine->screen[0].visarea);
+	fillbitmap(bitmap,ddenlovr_bgcolor,cliprect);
 
 #ifdef MAME_DEBUG
 	if (input_code_pressed(KEYCODE_Z))
@@ -1297,10 +1276,10 @@ VIDEO_EOF(ddenlovr)
 			pri = 0;
 		}
 
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][0]);
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][1]);
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][2]);
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][3]);
+		copylayer(bitmap,cliprect,order[pri][0]);
+		copylayer(bitmap,cliprect,order[pri][1]);
+		copylayer(bitmap,cliprect,order[pri][2]);
+		copylayer(bitmap,cliprect,order[pri][3]);
 
 	if (extra_layers)
 	{
@@ -1312,14 +1291,16 @@ VIDEO_EOF(ddenlovr)
 			pri = 0;
 		}
 
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][0]+4);
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][1]+4);
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][2]+4);
-		copylayer(framebuffer,&machine->screen[0].visarea,order[pri][3]+4);
+		copylayer(bitmap,cliprect,order[pri][0]+4);
+		copylayer(bitmap,cliprect,order[pri][1]+4);
+		copylayer(bitmap,cliprect,order[pri][2]+4);
+		copylayer(bitmap,cliprect,order[pri][3]+4);
 	}
 
 	ddenlovr_layer_enable = enab;
 	ddenlovr_layer_enable2 = enab2;
+
+	return 0;
 }
 
 static READ16_HANDLER( ddenlovr_special_r )
@@ -1518,8 +1499,8 @@ static READ8_HANDLER( quiz365_input_r )
 	if (!(ddenlovr_select & 0x01))	return readinputport(3);
 	if (!(ddenlovr_select & 0x02))	return readinputport(4);
 	if (!(ddenlovr_select & 0x04))	return readinputport(5);
-	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(Machine);
-	if (!(ddenlovr_select & 0x10))	return 0xff;//mame_rand(Machine);
+	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(machine);
+	if (!(ddenlovr_select & 0x10))	return 0xff;//mame_rand(machine);
 	return 0xff;
 }
 
@@ -1831,8 +1812,8 @@ static READ8_HANDLER( rongrong_input_r )
 {
 	if (!(ddenlovr_select & 0x01))	return readinputport(3);
 	if (!(ddenlovr_select & 0x02))	return readinputport(4);
-	if (!(ddenlovr_select & 0x04))	return 0xff;//mame_rand(Machine);
-	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(Machine);
+	if (!(ddenlovr_select & 0x04))	return 0xff;//mame_rand(machine);
+	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(machine);
 	if (!(ddenlovr_select & 0x10))	return readinputport(5);
 	return 0xff;
 }
@@ -1971,11 +1952,11 @@ static WRITE8_HANDLER( mmpanic_soundlatch_w )
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
 {
-	blitter_w(0,offset,data,0xdf);	// RST 18
+	blitter_w(machine, 0,offset,data,0xdf);	// RST 18
 }
 static WRITE8_HANDLER( mmpanic_blitter2_w )
 {
-	blitter_w(1,offset,data,0xdf);	// RST 18
+	blitter_w(machine, 1,offset,data,0xdf);	// RST 18
 }
 
 /* A led for each of the 9 buttons */
@@ -2134,7 +2115,7 @@ static READ8_HANDLER( funkyfig_busy_r )
 
 static WRITE8_HANDLER( funkyfig_blitter_w )
 {
-	blitter_w_funkyfig(0,offset,data,0xe0);
+	blitter_w_funkyfig(machine, 0,offset,data,0xe0);
 }
 
 static WRITE8_HANDLER( funkyfig_rombank_w )
@@ -2373,7 +2354,7 @@ static WRITE8_HANDLER( hanakanz_palette_w )
 		int g = ddenlovr_blit_reg & 0x1f;
 		int r = data & 0x1f;
 		int b = ((data & 0xe0) >> 5) | ((ddenlovr_blit_reg & 0x60) >> 2);
-		palette_set_color_rgb(Machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -2384,7 +2365,7 @@ static WRITE8_HANDLER( hanakanz_oki_bank_w )
 
 static READ8_HANDLER( hanakanz_rand_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( hanakanz_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -2553,7 +2534,7 @@ static WRITE8_HANDLER( mjchuuka_palette_w )
 		int r = (rgb >> 0) & 0x1f;
 		int g = (rgb >> 8) & 0x1f;
 		int b = ((rgb >> 5) & 0x07) | ((rgb & 0x6000) >> 10);
-		palette_set_color_rgb(Machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -2710,7 +2691,7 @@ static WRITE8_HANDLER( mjmyster_coincounter_w )
 
 static WRITE8_HANDLER( mjmyster_blitter_w )
 {
-	blitter_w(0,offset,data,0xfc);
+	blitter_w(machine, 0,offset,data,0xfc);
 }
 
 static ADDRESS_MAP_START( mjmyster_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -2888,7 +2869,7 @@ static WRITE8_HANDLER( hginga_blitter_w )
 				break;
 		}
 	}
-	blitter_w(0,offset,data,0xfc);
+	blitter_w(machine, 0,offset,data,0xfc);
 }
 
 static ADDRESS_MAP_START( hginga_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -2929,9 +2910,9 @@ ADDRESS_MAP_END
 
 static UINT8 hgokou_hopper;
 
-static UINT8 hgokou_player_r(int player)
+static UINT8 hgokou_player_r(running_machine *machine, int player)
 {
-	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(Machine->primary_screen)%10)) ? 0 : (1<<6));
+	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6));
 
 	if (!(ddenlovr_select2 & 0x01))	return readinputport(player * 5 + 1) | hopper_bit;
 	if (!(ddenlovr_select2 & 0x02))	return readinputport(player * 5 + 2) | hopper_bit;
@@ -2947,8 +2928,8 @@ static READ8_HANDLER( hgokou_input_r )
 	switch (hginga_select)
 	{
 		case 0x20:	return readinputport(0);
-		case 0x21:	return hgokou_player_r(1);
-		case 0x22:	return hgokou_player_r(0);
+		case 0x21:	return hgokou_player_r(machine, 1);
+		case 0x22:	return hgokou_player_r(machine, 0);
 		case 0x23:	return hginga_coins;
 	}
 	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", activecpu_get_pc(), hginga_select);
@@ -3320,7 +3301,7 @@ static READ8_HANDLER( mjflove_blitter_r )
 
 static WRITE8_HANDLER( mjflove_blitter_w )
 {
-	blitter_w(0,offset,data,0);
+	blitter_w(machine, 0,offset,data,0);
 }
 
 static WRITE8_HANDLER( mjflove_coincounter_w )
@@ -6537,8 +6518,8 @@ static MACHINE_DRIVER_START( ddenlovr )
 
 	MDRV_PALETTE_LENGTH(0x100)
 
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_VIDEO_START(ddenlovr)
-	MDRV_VIDEO_EOF(ddenlovr)
 	MDRV_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
@@ -6652,8 +6633,8 @@ static MACHINE_DRIVER_START( quizchq )
 
 	MDRV_PALETTE_LENGTH(0x100)
 
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_VIDEO_START(ddenlovr)
-	MDRV_VIDEO_EOF(ddenlovr)
 	MDRV_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
@@ -6727,8 +6708,8 @@ static MACHINE_DRIVER_START( mmpanic )
 
 	MDRV_PALETTE_LENGTH(0x100)
 
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_VIDEO_START(mmpanic)	// extra layers
-	MDRV_VIDEO_EOF(ddenlovr)
 	MDRV_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */
@@ -6791,8 +6772,8 @@ static MACHINE_DRIVER_START( hanakanz )
 
 	MDRV_PALETTE_LENGTH(0x200)
 
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_VIDEO_START(hanakanz)	// blitter commands in the roms are shuffled around
-	MDRV_VIDEO_EOF(ddenlovr)
 	MDRV_VIDEO_UPDATE(ddenlovr)
 
 	/* sound hardware */

@@ -456,9 +456,9 @@ static VIDEO_START( marinedt )
 	tilemap_set_scrolldx(tx_tilemap, 0, 4*8);
 	tilemap_set_scrolldy(tx_tilemap, 0, -4*8);
 
-	tile = auto_bitmap_alloc(32 * 8, 32 * 8, machine->screen[0].format);
-	obj1 = auto_bitmap_alloc(32,32,machine->screen[0].format);
-	obj2 = auto_bitmap_alloc(32,32,machine->screen[0].format);
+	tile = auto_bitmap_alloc(32 * 8, 32 * 8, video_screen_get_format(machine->primary_screen));
+	obj1 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
+	obj2 = auto_bitmap_alloc(32,32,video_screen_get_format(machine->primary_screen));
 }
 
 

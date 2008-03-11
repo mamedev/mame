@@ -138,7 +138,7 @@ static UINT8 read_port_and_t0(int port)
 static UINT8 read_port_and_t0_and_hblank(running_machine *machine, int port)
 {
 	UINT8 val = read_port_and_t0(port);
-	if (video_screen_get_hpos(machine->primary_screen) < (machine->screen[0].width * 9 / 10))
+	if (video_screen_get_hpos(machine->primary_screen) < (video_screen_get_width(machine->primary_screen) * 9 / 10))
 		val ^= 0x04;
 	return val;
 }

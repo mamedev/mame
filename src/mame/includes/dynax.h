@@ -68,7 +68,7 @@ VIDEO_UPDATE( hnoridur );
 VIDEO_UPDATE( sprtmtch );
 VIDEO_UPDATE( mjdialq2 );
 VIDEO_UPDATE( jantouki );
-VIDEO_EOF( htengoku );
+VIDEO_UPDATE( htengoku );
 
 PALETTE_INIT( sprtmtch );
 
@@ -93,5 +93,4 @@ extern UINT8 *ddenlovr_pixmap[8];
 
 VIDEO_START(ddenlovr);
 VIDEO_UPDATE(ddenlovr);
-VIDEO_EOF(ddenlovr);
 

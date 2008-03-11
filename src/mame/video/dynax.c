@@ -1254,29 +1254,26 @@ VIDEO_UPDATE( mjdialq2 )
 
 // htengoku uses the mixer chip from ddenlovr
 
-static bitmap_t *framebuffer;
-
 VIDEO_START(htengoku)
 {
 	VIDEO_START_CALL(ddenlovr);
 	VIDEO_START_CALL(hnoridur);
-	framebuffer = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
 }
 
-VIDEO_EOF(htengoku)
+VIDEO_UPDATE(htengoku)
 {
 	int layer,x,y;
 
 	// render the layers, one by one, "dynax.c" style. Then convert the pixmaps to "ddenlovr.c"
-	// format and let VIDEO_EOF(ddenlovr) do the final compositing (priorities + palettes)
+	// format and let VIDEO_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
-		fillbitmap(framebuffer,0,&machine->screen[0].visarea);
-		hanamai_copylayer( framebuffer, &machine->screen[0].visarea, layer );
+		fillbitmap(bitmap,0,cliprect);
+		hanamai_copylayer( bitmap, cliprect, layer );
 
 		for (y=0; y < 256; y++)
 			for (x=0; x < 512; x++)
-				ddenlovr_pixmap[3-layer][y*512+x] = (UINT8)(*BITMAP_ADDR16(framebuffer, y,x));
+				ddenlovr_pixmap[3-layer][y*512+x] = (UINT8)(*BITMAP_ADDR16(bitmap, y,x));
 	}
-	VIDEO_EOF_CALL(ddenlovr);
+	return VIDEO_UPDATE_CALL(ddenlovr);
 }

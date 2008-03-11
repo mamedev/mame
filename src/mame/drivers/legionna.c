@@ -258,8 +258,7 @@ static UINT32 hit_check_x,hit_check_y;
 
 #define CRT_MODE(_x_,_y_,_flip_) \
 	{ \
-	screen_state *state = &Machine->screen[0]; \
-	rectangle visarea = state->visarea; \
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen); \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \

@@ -102,7 +102,7 @@ static VIDEO_UPDATE(sbowling)
 
 static VIDEO_START(sbowling)
 {
-	tmpbitmap = auto_bitmap_alloc(32*8,32*8,machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(32*8,32*8,video_screen_get_format(machine->primary_screen));
 	sb_tilemap = tilemap_create(get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 

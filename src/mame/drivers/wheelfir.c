@@ -155,6 +155,8 @@ static bitmap_t* render_bitmap;
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
 	//wheelfir_blitdata[offset]=data;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 	int vpage=0;
 	COMBINE_DATA(&wheelfir_blitdata[offset]);
 
@@ -263,7 +265,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 				pix = rom[offs];
 
 
-				if(pix && destx >0 && desty >0 && destx<Machine->screen[0].width && desty <Machine->screen[0].height)
+				if(pix && destx >0 && desty >0 && destx<width && desty <height)
 					*BITMAP_ADDR16(wheelfir_tmp_bitmap[vpage], desty, destx) = pix;
 			}
 	}
@@ -275,11 +277,11 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 static VIDEO_START(wheelfir)
 {
 
-	wheelfir_tmp_bitmap[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	wheelfir_tmp_bitmap[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	wheelfir_tmp_bitmap[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	wheelfir_tmp_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	wheelfir_tmp_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	wheelfir_tmp_bitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	render_bitmap =          auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	render_bitmap =          video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 }
 
@@ -304,7 +306,7 @@ static VIDEO_UPDATE(wheelfir)
     copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect);
     //copybitmap_trans(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, 0);
     copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
-    fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
+    fillbitmap(wheelfir_tmp_bitmap[0], 0,video_screen_get_visible_area(screen));
 
     if ( input_code_pressed(KEYCODE_R) )
     {
@@ -606,7 +608,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 static VIDEO_EOF( wheelfir )
 {
 	scanline_counter = -1;
-	fillbitmap(wheelfir_tmp_bitmap[0], 0,&machine->screen[0].visarea);
+	fillbitmap(wheelfir_tmp_bitmap[0], 0,video_screen_get_visible_area(machine->primary_screen));
 
 	timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
 	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);

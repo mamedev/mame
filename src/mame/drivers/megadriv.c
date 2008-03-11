@@ -2567,7 +2567,7 @@ VIDEO_START(megadriv)
 {
 	int x;
 
-	render_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	render_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	megadrive_vdp_vram  = auto_malloc(0x10000);
 	megadrive_vdp_cram  = auto_malloc(0x80);

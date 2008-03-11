@@ -263,8 +263,8 @@ INLINE tilemap *indexed_tilemap(int index)
 
 void tilemap_init(running_machine *machine)
 {
-	screen_width	= machine->screen[0].width;
-	screen_height	= machine->screen[0].height;
+	screen_width  = video_screen_get_width(machine->primary_screen);
+	screen_height = video_screen_get_height(machine->primary_screen);
 
 	if (screen_width != 0 && screen_height != 0)
 	{

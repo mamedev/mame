@@ -123,7 +123,7 @@ static TIMER_CALLBACK( scanline_callback )
 	DAC_data_w(0, (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
-	if (scanline == machine->screen[0].visarea.max_y + 1)
+	if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		UINT8 potvalue = readinputportbytag("PADDLE");
 		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(machine->primary_screen, 72 + (potvalue / 2), (potvalue % 2) * 128), 0);
@@ -131,7 +131,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* call us back in 4 scanlines */
 	scanline += 4;
-	if (scanline >= machine->screen[0].height)
+	if (scanline >= video_screen_get_height(machine->primary_screen))
 		scanline = 0;
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
@@ -259,7 +259,7 @@ static WRITE8_HANDLER( coincount_w )
 static READ8_HANDLER( sync_r )
 {
 	int hpos = video_screen_get_hpos(machine->primary_screen);
-	sync2_value = (hpos >= 128 && hpos <= machine->screen[0].visarea.max_x);
+	sync2_value = (hpos >= 128 && hpos <= video_screen_get_visible_area(machine->primary_screen)->max_x);
 	return video_screen_get_vpos(machine->primary_screen);
 }
 

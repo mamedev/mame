@@ -220,7 +220,7 @@ WRITE16_HANDLER( atarigen_playfield2_latched_msb_w );
 
 void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanline_func update_graphics, int frequency);
 int atarigen_get_hblank(const device_config *screen);
-WRITE16_HANDLER( atarigen_halt_until_hblank_0_w );
+void atarigen_halt_until_hblank_0(const device_config *screen);
 WRITE16_HANDLER( atarigen_666_paletteram_w );
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w );
 WRITE32_HANDLER( atarigen_666_paletteram32_w );

@@ -9414,12 +9414,12 @@ static void HandleLocalCommandCheat(running_machine *machine, UINT32 type, UINT3
 				/* ----- refresh rate ----- */
 				case kCustomLocation_RefreshRate:
 				{
-					screen_state	*state = &machine->screen[0];
-					double			refresh = data;
+					int width  = video_screen_get_width(machine->primary_screen);
+					int height = video_screen_get_height(machine->primary_screen);
+					const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+					double refresh = data / 65536.0;
 
-					refresh /= 65536.0;
-
-					video_screen_configure(machine->primary_screen, state->width, state->height, &state->visarea, HZ_TO_ATTOSECONDS(refresh));
+					video_screen_configure(machine->primary_screen, width, height, visarea, HZ_TO_ATTOSECONDS(refresh));
 				}
 				break;
 			}
@@ -10468,7 +10468,7 @@ static UINT8 ** LookupHandlerMemory(UINT8 cpu, UINT32 address, UINT32 * outRelat
 {
 	const address_map	* map = memory_get_map(cpu, ADDRESS_SPACE_PROGRAM);
 	const address_map_entry *entry;
-	
+
 	for (entry = map->entrylist; entry != NULL; entry = entry->next)
 		if (entry->write.handler != NULL && (address >= entry->addrstart) && (address <= entry->addrend))
 		{

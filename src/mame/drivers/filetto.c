@@ -69,8 +69,7 @@ AH
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
-	screen_state *state = &machine->screen[0]; \
-	rectangle visarea = state->visarea; \
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen); \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \

@@ -72,6 +72,12 @@ static void alpha_row_update(const device_config *screen, int scanline)
 }
 
 
+static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
+{
+	atarigen_halt_until_hblank_0(machine->primary_screen);
+}
+
+
 static MACHINE_RESET( skullxbo )
 {
 	atarigen_eeprom_reset();
@@ -120,7 +126,7 @@ static WRITE16_HANDLER( skullxbo_mobwr_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xff0000, 0xff07ff) AM_WRITE(skullxbo_mobmsb_w)
-	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE(atarigen_halt_until_hblank_0_w)
+	AM_RANGE(0xff0800, 0xff0bff) AM_WRITE(skullxbo_halt_until_hblank_0_w)
 	AM_RANGE(0xff0c00, 0xff0fff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xff1000, 0xff13ff) AM_WRITE(atarigen_video_int_ack_w)
 	AM_RANGE(0xff1400, 0xff17ff) AM_WRITE(atarigen_sound_w)

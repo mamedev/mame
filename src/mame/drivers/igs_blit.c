@@ -216,7 +216,7 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 	int gfx_size	=	memory_region_length(REGION_GFX1);
 	int gfx2_size	=	memory_region_length(REGION_GFX2);
 
-	rectangle clip	=	Machine->screen[0].visarea;
+	const rectangle *clip = video_screen_get_visible_area(machine->primary_screen);
 
 	COMBINE_DATA(&blitter.flags);
 
@@ -285,7 +285,7 @@ static WRITE16_HANDLER( igs_blit_flags_w )
 			}
 
 			// plot it
-			if (x >= clip.min_x && x <= clip.max_x && y >= clip.min_y && y <= clip.max_y)
+			if (x >= clip->min_x && x <= clip->max_x && y >= clip->min_y && y <= clip->max_y)
 			{
 				if      (clear)				dest[x + y * 512] = clear_pen;
 				else if (pen != trans_pen)	dest[x + y * 512] = pen | pen_hi;

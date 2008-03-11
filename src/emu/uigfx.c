@@ -1033,7 +1033,7 @@ static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight
 
 static void tilemap_update_bitmap(ui_gfx_state *state, int width, int height)
 {
-	bitmap_format screen_format = Machine->screen[0].format;
+	bitmap_format screen_format = video_screen_get_format(Machine->primary_screen);
 	int screen_texformat;
 
 	/* convert the screen format to a texture format */

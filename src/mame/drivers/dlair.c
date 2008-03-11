@@ -192,7 +192,7 @@ static VIDEO_START( dleuro )
 {
 	VIDEO_START_CALL(dlair);
 
-	overlay_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	overlay_bitmap = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
 	fillbitmap(overlay_bitmap, 8, NULL);
 	overlay_texture = render_texture_alloc(NULL, NULL);
 }
@@ -242,7 +242,7 @@ static VIDEO_UPDATE( dleuro )
 		}
 
 	/* update the overlay */
-	render_texture_set_bitmap(overlay_texture, overlay_bitmap, &screen->machine->screen[0].visarea, 0, TEXFORMAT_PALETTE16);
+	render_texture_set_bitmap(overlay_texture, overlay_bitmap, video_screen_get_visible_area(screen), 0, TEXFORMAT_PALETTE16);
 
 	/* get the current video and update the bitmap if different */
 	seqid = laserdisc_get_video(discinfo, &vidbitmap);

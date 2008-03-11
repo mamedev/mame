@@ -249,14 +249,14 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 	}
 
 	/* VBLANK interrupt */
-	else if (scanline == machine->screen[0].visarea.max_y + 1)
+	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M92_IRQ_0);
 	}
 
 	/* adjust for next scanline */
-	if (++scanline >= machine->screen[0].height)
+	if (++scanline >= video_screen_get_height(machine->primary_screen))
 		scanline = 0;
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }

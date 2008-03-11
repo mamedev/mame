@@ -465,7 +465,7 @@ void render_container_set_overlay(render_container *container, bitmap_t *bitmap)
 /* return a pointer to the UI container */
 render_container *render_container_get_ui(void);
 
-/* return a pointer to the indexed screen container */
+/* return a pointer to the container for the given screen */
 render_container *render_container_get_screen(const device_config *screen);
 
 /* set the opacity of a given palette entry */

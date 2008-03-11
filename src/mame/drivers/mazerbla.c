@@ -104,10 +104,10 @@ static bitmap_t * tmpbitmaps[4];
 
 static VIDEO_START( mazerbla )
 {
-	tmpbitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmaps[2] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmaps[3] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmaps[3] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 #if 0

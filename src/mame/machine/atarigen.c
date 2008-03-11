@@ -1425,25 +1425,26 @@ int atarigen_get_hblank(const device_config *screen)
 
 
 /*---------------------------------------------------------------
-    atarigen_halt_until_hblank_0_w: Halts CPU 0 until the
+    atarigen_halt_until_hblank_0: Halts CPU 0 until the
     next HBLANK.
 ---------------------------------------------------------------*/
 
-WRITE16_HANDLER( atarigen_halt_until_hblank_0_w )
+void atarigen_halt_until_hblank_0(const device_config *screen)
 {
 	/* halt the CPU until the next HBLANK */
-	int hpos = video_screen_get_hpos(machine->primary_screen);	/* need to support scrnum */
-	int hblank = machine->screen[0].width * 9 / 10;
+	int hpos = video_screen_get_hpos(screen);
+	int width = video_screen_get_width(screen);
+	int hblank = width * 9 / 10;
 	double fraction;
 
 	/* if we're in hblank, set up for the next one */
 	if (hpos >= hblank)
-		hblank += machine->screen[0].width;
+		hblank += width;
 
 	/* halt and set a timer to wake up */
-	fraction = (double)(hblank - hpos) / (double)machine->screen[0].width;
-	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(machine->primary_screen)) * fraction), NULL, 0, unhalt_cpu);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+	fraction = (double)(hblank - hpos) / (double)width;
+	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
+	cpunum_set_input_line(screen->machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 

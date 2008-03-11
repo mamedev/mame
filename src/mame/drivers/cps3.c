@@ -330,7 +330,6 @@ Notes:
 
 #include "driver.h"
 #include "cdrom.h"
-#include "deprecat.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/intelfsh.h"
 #include "includes/cps3.h"
@@ -386,7 +385,7 @@ static rectangle renderbuffer_clip;
 #define CPS3_TRANSPARENCY_PEN_INDEX 2
 #define CPS3_TRANSPARENCY_PEN_INDEX_BLEND 3
 
-INLINE void cps3_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
+INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		const rectangle *clip,int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_t *pri_buffer,UINT32 pri_mask)
@@ -587,7 +586,7 @@ INLINE void cps3_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 											if (c&0x02) dest[x] |= 0x4000;
 											if (c&0x04) dest[x] |= 0x8000;
 											if (c&0x08) dest[x] |= 0x10000;
-											if (c&0xf0) dest[x] |= mame_rand(Machine); // ?? not used?
+											if (c&0xf0) dest[x] |= mame_rand(machine); // ?? not used?
 										}
 										else
 										{
@@ -687,7 +686,7 @@ static const struct game_keys2 keys_table2[] =
 	{ 0 }	// end of table
 };
 
-static void cps3_decrypt_bios(void)
+static void cps3_decrypt_bios(running_machine *machine)
 {
 	int i;
 	UINT32 *coderegion = (UINT32*)memory_region(REGION_USER1);
@@ -713,7 +712,7 @@ static void cps3_decrypt_bios(void)
 	/* Dump to file */
 	{
 		FILE *fp;
-		const char *gamename = Machine->gamedrv->name;
+		const char *gamename = machine->gamedrv->name;
 		char filename[256];
 		sprintf(filename, "%s_bios.dump", gamename);
 
@@ -753,7 +752,7 @@ static DRIVER_INIT( cps3crpt )
 		++k;
 	}
 
-	cps3_decrypt_bios();
+	cps3_decrypt_bios(machine);
 	decrypted_gamerom = auto_malloc(0x1000000);
 
 	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
@@ -812,7 +811,7 @@ static int cps3_ss_ram_is_dirty;
 static UINT8* cps3_char_ram_dirty;
 static int cps3_char_ram_is_dirty;
 
-static void cps3_set_mame_colours( int colournum, UINT16 data, UINT32 fadeval )
+static void cps3_set_mame_colours(running_machine *machine, int colournum, UINT16 data, UINT32 fadeval )
 {
 	int r,g,b;
 	UINT16* dst = (UINT16*)cps3_colourram;
@@ -847,50 +846,9 @@ static void cps3_set_mame_colours( int colournum, UINT16 data, UINT32 fadeval )
 
 	cps3_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
 
-	if (colournum<0x10000) palette_set_color(Machine,colournum,cps3_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//cps3_mame_colours[colournum]);
+	if (colournum<0x10000) palette_set_color(machine,colournum,cps3_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//cps3_mame_colours[colournum]);
 }
 
-#ifdef UNUSED_FUNCTION
-static void decode_ssram(void)
-{
-	if (cps3_ss_ram_dirty)
-	{
-		int i;
-		for (i=0;i<0x400;i++)
-		{
-			if (cps3_ss_ram_dirty[i])
-			{
-				decodechar(Machine->gfx[0], i, (UINT8*)cps3_ss_ram);
-				cps3_ss_ram_dirty[i] = 0;
-			}
-		}
-
-		cps3_ss_ram_is_dirty = 0;
-	}
-
-	return;
-}
-
-static void decode_charram(void)
-{
-	if (cps3_char_ram_is_dirty)
-	{
-		int i;
-		for (i=0;i<0x8000;i++)
-		{
-			if (cps3_char_ram_dirty[i])
-			{
-				decodechar(Machine->gfx[1], i, (UINT8*)cps3_char_ram);
-				cps3_char_ram_dirty[i] = 0;
-			}
-		}
-
-		cps3_char_ram_is_dirty = 0;
-	}
-
-	return;
-}
-#endif
 
 static VIDEO_START(cps3)
 {
@@ -928,7 +886,7 @@ static VIDEO_START(cps3)
 
 	// the renderbuffer can be twice the size of the screen, this allows us to handle framebuffer zoom values
 	// between 0x00 and 0x80 (0x40 is normal, 0x80 would be 'view twice as much', 0x20 is 'view half as much')
-	renderbuffer_bitmap = auto_bitmap_alloc(512*2,224*2,machine->screen[0].format);
+	renderbuffer_bitmap = auto_bitmap_alloc(512*2,224*2,video_screen_get_format(machine->primary_screen));
 
 	renderbuffer_clip.min_x = 0;
 	renderbuffer_clip.max_x = cps3_screenwidth-1;
@@ -941,7 +899,7 @@ static VIDEO_START(cps3)
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps3_draw_tilemapsprite_line(running_machine *machine, int tmnum, int drawline, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	UINT32* tmapregs[4] = { tilemap20_regs_base, tilemap30_regs_base, tilemap40_regs_base, tilemap50_regs_base };
 	UINT32* regs;
@@ -1015,15 +973,15 @@ static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_t *bitm
 			yflip  = (dat & 0x00000800)>>11;
 			xflip  = (dat & 0x00001000)>>12;
 
-			if (!bpp) Machine->gfx[1]->color_granularity=256;
-			else Machine->gfx[1]->color_granularity=64;
+			if (!bpp) machine->gfx[1]->color_granularity=256;
+			else machine->gfx[1]->color_granularity=64;
 
 			if (cps3_char_ram_dirty[tileno])
 			{
-				decodechar(Machine->gfx[1], tileno, (UINT8*)cps3_char_ram);
+				decodechar(machine->gfx[1], tileno, (UINT8*)cps3_char_ram);
 				cps3_char_ram_dirty[tileno] = 0;
 			}
-			cps3_drawgfxzoom(bitmap, Machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,&clip,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(machine, bitmap, machine->gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,&clip,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
 
 		}
 	}
@@ -1032,7 +990,8 @@ static void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_t *bitm
 static VIDEO_UPDATE(cps3)
 {
 	int y,x, count;
-//  int offset;
+	attoseconds_t period = video_screen_get_frame_period(screen).attoseconds;
+	rectangle visarea = *video_screen_get_visible_area(screen);
 
 	int bg_drawn[4] = { 0, 0, 0, 0 };
 
@@ -1049,24 +1008,20 @@ static VIDEO_UPDATE(cps3)
 	{
 		if (cps3_screenwidth!=496)
 		{
-			screen_state *state = &screen->machine->screen[0];
-			rectangle visarea = state->visarea;
 			cps3_screenwidth = 496;
 			visarea.min_x = 0; visarea.max_x = 496-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			video_screen_configure(screen, 496, 224, &visarea, video_screen_get_frame_period(screen).attoseconds);
+			video_screen_configure(screen, 496, 224, &visarea, period);
 		}
 	}
 	else
 	{
 		if (cps3_screenwidth!=384)
 		{
-			screen_state *state = &screen->machine->screen[0];
-			rectangle visarea = state->visarea;
 			cps3_screenwidth = 384;
 			visarea.min_x = 0; visarea.max_x = 384-1;
 			visarea.min_y = 0; visarea.max_y = 224-1;
-			video_screen_configure(screen, 384, 224, &visarea, video_screen_get_frame_period(screen).attoseconds);
+			video_screen_configure(screen, 384, 224, &visarea, period);
 		}
 	}
 
@@ -1183,7 +1138,7 @@ static VIDEO_UPDATE(cps3)
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line( tilemapnum, uu, renderbuffer_bitmap, &renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(screen->machine, tilemapnum, uu, renderbuffer_bitmap, &renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1276,11 +1231,11 @@ static VIDEO_UPDATE(cps3)
 
 									if (global_alpha || alpha)
 									{
-										cps3_drawgfxzoom(renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(screen->machine, renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX_BLEND,0,xinc,yinc, NULL, 0);
 									}
 									else
 									{
-										cps3_drawgfxzoom(renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
+										cps3_drawgfxzoom(screen->machine, renderbuffer_bitmap, screen->machine->gfx[1],realtileno,actualpal,0^flipx,0^flipy,current_xpos,current_ypos,&renderbuffer_clip,CPS3_TRANSPARENCY_PEN_INDEX,0,xinc,yinc, NULL, 0);
 									}
 									count++;
 								}
@@ -1353,7 +1308,7 @@ static VIDEO_UPDATE(cps3)
 					cps3_ss_ram_dirty[tile] = 0;
 				}
 
-				cps3_drawgfxzoom(bitmap, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,cliprect,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
+				cps3_drawgfxzoom(screen->machine, bitmap, screen->machine->gfx[0],tile,pal,flipx,flipy,x*8,y*8,cliprect,CPS3_TRANSPARENCY_PEN,0,0x10000,0x10000,NULL,0);
 				count++;
 			}
 		}
@@ -2014,11 +1969,11 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 
 					//if (paldma_fade!=0) printf("%08x\n",paldma_fade);
 
-					cps3_set_mame_colours((paldma_dest+i)^1, coldata, paldma_fade);
+					cps3_set_mame_colours(machine, (paldma_dest+i)^1, coldata, paldma_fade);
 				}
 
 
-				cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 
 
 			}
@@ -2212,7 +2167,7 @@ static void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_leng
 	}
 }
 
-static void cps3_process_character_dma(UINT32 address)
+static void cps3_process_character_dma(running_machine *machine, UINT32 address)
 {
 	int i;
 
@@ -2239,14 +2194,14 @@ static void cps3_process_character_dma(UINT32 address)
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
 				current_table_address = real_source;
 			}
-			cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 		}
 		else if  ( (dat1&0x00e00000) ==0x00400000 )
 		{
 			/* 6bpp DMA decompression
               - this is used for the majority of sprites and backgrounds */
 			cps3_do_char_dma( real_source, real_destination, real_length );
-			cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 
 		}
 		else if  ( (dat1&0x00e00000) ==0x00600000 )
@@ -2254,7 +2209,7 @@ static void cps3_process_character_dma(UINT32 address)
 			/* 8bpp DMA decompression
               - this is used on SFIII NG Sean's Stage ONLY */
 			cps3_do_alt_char_dma( real_source, real_destination, real_length);
-			cpunum_set_input_line(Machine, 0,10, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0,10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2292,7 +2247,7 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 				list_address = (chardma_source | ((chardma_other&0x003f0000)));
 
 				//printf("chardma_w activated %08x %08x (address = cram %08x)\n", chardma_source, chardma_other, list_address*4 );
-				cps3_process_character_dma(list_address);
+				cps3_process_character_dma(machine, list_address);
 			}
 			else
 			{
@@ -2311,12 +2266,12 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 
 static WRITE32_HANDLER( cps3_irq10_ack_w )
 {
-	cpunum_set_input_line(Machine, 0,10, CLEAR_LINE); return;
+	cpunum_set_input_line(machine, 0,10, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_irq12_ack_w )
 {
-	cpunum_set_input_line(Machine, 0,12, CLEAR_LINE); return;
+	cpunum_set_input_line(machine, 0,12, CLEAR_LINE); return;
 }
 
 static WRITE32_HANDLER( cps3_unk_vidregs_w )
@@ -2337,12 +2292,12 @@ static WRITE32_HANDLER( cps3_colourram_w )
 
 	if (ACCESSING_MSB32)
 	{
-		cps3_set_mame_colours(offset*2, (data & 0xffff0000) >> 16, 0);
+		cps3_set_mame_colours(machine, offset*2, (data & 0xffff0000) >> 16, 0);
 	}
 
 	if (ACCESSING_LSB32)
 	{
-		cps3_set_mame_colours(offset*2+1, (data & 0x0000ffff) >> 0, 0);
+		cps3_set_mame_colours(machine, offset*2+1, (data & 0x0000ffff) >> 0, 0);
 	}
 }
 
@@ -2672,7 +2627,7 @@ static void copy_from_nvram(void)
 	/*
     {
         FILE *fp;
-        const char *gamename = Machine->gamedrv->name;
+        const char *gamename = machine->gamedrv->name;
         char filename[256];
         sprintf(filename, "%s_bios.dump", gamename);
 

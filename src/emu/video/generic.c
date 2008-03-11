@@ -313,7 +313,7 @@ void generic_video_init(running_machine *machine)
 VIDEO_START( generic_bitmapped )
 {
 	/* allocate the temporary bitmap */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* ensure the contents of the bitmap are saved */
 	state_save_register_bitmap("video", 0, "tmpbitmap", tmpbitmap);
@@ -450,8 +450,10 @@ void buffer_spriteram_2(UINT8 *ptr, int length)
 
 static void updateflip(void)
 {
-	screen_state *state = &Machine->screen[0];
-	rectangle visarea = state->visarea;
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
+	attoseconds_t period = video_screen_get_frame_period(Machine->primary_screen).attoseconds;
+	rectangle visarea = *video_screen_get_visible_area(Machine->primary_screen);
 
 	tilemap_set_flip(ALL_TILEMAPS,(TILEMAP_FLIPX & flip_screen_x) | (TILEMAP_FLIPY & flip_screen_y));
 
@@ -459,20 +461,20 @@ static void updateflip(void)
 	{
 		int temp;
 
-		temp = state->width - visarea.min_x - 1;
-		visarea.min_x = state->width - visarea.max_x - 1;
+		temp = width - visarea.min_x - 1;
+		visarea.min_x = width - visarea.max_x - 1;
 		visarea.max_x = temp;
 	}
 	if (flip_screen_y)
 	{
 		int temp;
 
-		temp = state->height - visarea.min_y - 1;
-		visarea.min_y = state->height - visarea.max_y - 1;
+		temp = height - visarea.min_y - 1;
+		visarea.min_y = height - visarea.max_y - 1;
 		visarea.max_y = temp;
 	}
 
-	video_screen_configure(Machine->primary_screen, state->width, state->height, &visarea, video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+	video_screen_configure(Machine->primary_screen, width, height, &visarea, period);
 }
 
 

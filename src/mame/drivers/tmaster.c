@@ -193,7 +193,7 @@ static VIDEO_START( tmaster )
 	{
 		for (buffer = 0; buffer < 2; buffer++)
 		{
-			tmaster_bitmap[layer][buffer] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+			tmaster_bitmap[layer][buffer] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 			bitmap_fill(tmaster_bitmap[layer][buffer], NULL, 0xff);
 		}
 	}

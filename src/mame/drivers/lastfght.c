@@ -78,7 +78,7 @@ static VIDEO_START( lastfght )
 {
 	int i;
 	for (i = 0; i < 2; i++)
-		lastfght_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+		lastfght_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	colorram = auto_malloc(256*3);
 }

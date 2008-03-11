@@ -48,6 +48,12 @@ static void update_interrupts(running_machine *machine)
 }
 
 
+static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
+{
+	atarigen_halt_until_hblank_0(machine->primary_screen);
+}
+
+
 static MACHINE_RESET( blstroid )
 {
 	atarigen_eeprom_reset();
@@ -91,7 +97,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8800, 0xff89ff) AM_MIRROR(0x7f8000) AM_WRITE(SMH_RAM) AM_BASE(&blstroid_priorityram)
 	AM_RANGE(0xff8a00, 0xff8a01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_w)
 	AM_RANGE(0xff8c00, 0xff8c01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_sound_reset_w)
-	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(atarigen_halt_until_hblank_0_w)
+	AM_RANGE(0xff8e00, 0xff8e01) AM_MIRROR(0x7f81fe) AM_WRITE(blstroid_halt_until_hblank_0_w)
 	AM_RANGE(0xff9400, 0xff9401) AM_MIRROR(0x7f83fe) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x7f83f8) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xff9804, 0xff9805) AM_MIRROR(0x7f83f8) AM_READ(input_port_1_word_r)
