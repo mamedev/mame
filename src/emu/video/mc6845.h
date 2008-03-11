@@ -12,8 +12,12 @@
 
 
 #define MC6845		DEVICE_GET_INFO_NAME(mc6845)
+#define MC6845_1	DEVICE_GET_INFO_NAME(mc6845_1)
 #define R6545_1		DEVICE_GET_INFO_NAME(r6545_1)
 #define C6545_1 	DEVICE_GET_INFO_NAME(c6545_1)
+#define H46505	 	DEVICE_GET_INFO_NAME(h46505)
+#define HD6845 		DEVICE_GET_INFO_NAME(hd6845)
+#define SY6545_1 	DEVICE_GET_INFO_NAME(sy6545_1)
 
 
 /* callback definitions */
@@ -75,8 +79,12 @@ struct _mc6845_interface
 
 /* device interface */
 DEVICE_GET_INFO( mc6845 );
+DEVICE_GET_INFO( mc6845_1 );
 DEVICE_GET_INFO( r6545_1 );
 DEVICE_GET_INFO( c6545_1 );
+DEVICE_GET_INFO( h46505 );
+DEVICE_GET_INFO( hd6845 );
+DEVICE_GET_INFO( sy6545_1 );
 
 /* select one of the registers for reading or writing */
 WRITE8_DEVICE_HANDLER( mc6845_address_w );

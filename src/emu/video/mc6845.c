@@ -33,21 +33,25 @@
 enum
 {
 	TYPE_MC6845,
+	TYPE_MC6845_1,
 	TYPE_C6545_1,
 	TYPE_R6545_1,
+	TYPE_H46505,
+	TYPE_HD6845,
+	TYPE_SY6545_1,
 
 	NUM_TYPES
 };
 
 
 /* tags for state saving */
-const char * const device_tags[NUM_TYPES] = { "mc6845", "c6545-1", "r6545-1" };
+const char * const device_tags[NUM_TYPES] = {           "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
 
 /* capabilities */
-static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE, FALSE, FALSE };
-static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,  TRUE,  TRUE };
-static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
-static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,  TRUE,  TRUE };
+static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,     FALSE,     FALSE,    FALSE,    FALSE,      FALSE };
+static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE };
+static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
+static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
 
 
 typedef struct _mc6845_t mc6845_t;
@@ -711,6 +715,11 @@ static DEVICE_START( mc6845 )
 	return common_start(device, TYPE_MC6845);
 }
 
+static DEVICE_START( mc6845_1 )
+{
+	return common_start(device, TYPE_MC6845_1);
+}
+
 static DEVICE_START( c6545_1 )
 {
 	return common_start(device, TYPE_C6545_1);
@@ -719,6 +728,21 @@ static DEVICE_START( c6545_1 )
 static DEVICE_START( r6545_1 )
 {
 	return common_start(device, TYPE_R6545_1);
+}
+
+static DEVICE_START( h46505 )
+{
+	return common_start(device, TYPE_H46505);
+}
+
+static DEVICE_START( hd6845 )
+{
+	return common_start(device, TYPE_HD6845);
+}
+
+static DEVICE_START( sy6545_1 )
+{
+	return common_start(device, TYPE_SY6545_1);
 }
 
 
@@ -769,9 +793,24 @@ DEVICE_GET_INFO( mc6845 )
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "Motorola 6845";					break;
 		case DEVINFO_STR_FAMILY:						info->s = "MC6845 CRTC";					break;
-		case DEVINFO_STR_VERSION:						info->s = "1.6";							break;
+		case DEVINFO_STR_VERSION:						info->s = "1.61";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
+
+
+DEVICE_GET_INFO( mc6845_1 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Motorla 6845-1";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6845_1);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
 }
 
@@ -800,6 +839,51 @@ DEVICE_GET_INFO( r6545_1 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(r6545_1);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( h46505 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Hitachi 46505";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(h46505);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( hd6845 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Hitachi 6845";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd6845);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
+	}
+}
+
+
+DEVICE_GET_INFO( sy6545_1 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Synertek 6545-1";				break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sy6545_1);	break;
 
 		default: 										DEVICE_GET_INFO_CALL(mc6845);				break;
 	}
