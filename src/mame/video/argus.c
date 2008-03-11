@@ -327,13 +327,13 @@ VIDEO_START( argus )
 
 VIDEO_START( valtric )
 {
-	/*                           info                       offset             type                 w   h  col  row */
-	bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols,       16, 16, 32, 32);
-	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols,   8,  8, 32, 32);
+	/*                           info                       offset             w   h   col  row */
+	bg1_tilemap = tilemap_create(valtric_get_bg_tile_info,  tilemap_scan_cols, 16, 16, 32, 32);
+	tx_tilemap  = tilemap_create(valtric_get_tx_tile_info,  tilemap_scan_cols, 8,  8,  32, 32);
 
 	tilemap_set_transparent_pen( bg1_tilemap, 15 );
 	tilemap_set_transparent_pen( tx_tilemap,  15 );
-	mosaicbitmap=auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	mosaicbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	jal_blend_table = auto_malloc(0xc00);
 	memset(jal_blend_table,0,0xc00) ;
 }

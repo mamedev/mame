@@ -181,8 +181,8 @@ void K001005_swap_buffers(void);
 void K001005_init(void)
 {
 	int i;
-	K001005_bitmap[0] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
-	K001005_bitmap[1] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, Machine->screen[0].format);
+	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(Machine->primary_screen);
+	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(Machine->primary_screen);
 
 	K001005_zbuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 

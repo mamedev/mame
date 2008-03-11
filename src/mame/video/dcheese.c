@@ -108,7 +108,7 @@ static TIMER_CALLBACK( dcheese_signal_irq_callback )
 VIDEO_START( dcheese )
 {
 	/* the destination bitmap is not directly accessible to the CPU */
-	dstbitmap = auto_bitmap_alloc(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, machine->screen[0].format);
+	dstbitmap = auto_bitmap_alloc(DSTBITMAP_WIDTH, DSTBITMAP_HEIGHT, video_screen_get_format(machine->primary_screen));
 
 	/* create a timer */
 	blitter_timer = timer_alloc(blitter_scanline_callback, NULL);

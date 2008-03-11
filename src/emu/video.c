@@ -48,9 +48,6 @@
 typedef struct _internal_screen_state internal_screen_state;
 struct _internal_screen_state
 {
-	/* basic information about this screen */
-	int						scrnum;					/* the screen index */
-
 	/* textures and bitmaps */
 	render_texture *		texture[2];				/* 2x textures for the screen bitmap */
 	bitmap_t *				bitmap[2];				/* 2x bitmaps for rendering */
@@ -324,9 +321,6 @@ void video_init(running_machine *machine)
 		/* allocate a timer to reset partial updates */
 		internal_state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
 
-		/* save some cross-reference information that makes our life easier */
-		internal_state->scrnum = scrnum;
-
 		/* configure the screen with the default parameters */
 		state->format = config->format;
 		video_screen_configure(screen, config->width, config->height, &config->visarea, config->refresh);
@@ -378,17 +372,6 @@ void video_init(running_machine *machine)
 
 	/* reset video statics and get out of here */
 	pdrawgfx_shadow_lowpri = 0;
-
-	/* initialize tilemaps */
-	tilemap_init(machine);
-
-	/* create a render target for snapshots */
-	if (machine->screen[0].private_data != NULL)
-	{
-		global.snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
-		assert(global.snap_target != NULL);
-		render_target_set_layer_config(global.snap_target, 0);
-	}
 
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
@@ -828,7 +811,7 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 		}
 
 		/* skip if this screen is not visible anywhere */
-		if (!(render_get_live_screens_mask() & (1 << internal_state->scrnum)))
+		if (!render_is_live_screen(screen))
 		{
 			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
 			return;
@@ -1458,21 +1441,19 @@ static int finish_screen_updates(running_machine *machine)
 {
 	const device_config *screen;
 	int anything_changed = FALSE;
-	int livemask;
 
 	/* finish updating the screens */
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 		video_screen_update_partial(screen, video_screen_get_visible_area(screen)->max_y);
 
 	/* now add the quads for all the screens */
-	livemask = render_get_live_screens_mask();
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
 		screen_state *state = get_safe_token(screen);
 		internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 		/* only update if live */
-		if (livemask & (1 << internal_state->scrnum))
+		if (render_is_live_screen(screen))
 		{
 			const screen_config *config = screen->inline_config;
 
@@ -2062,19 +2043,16 @@ void video_screen_save_snapshot(const device_config *screen, mame_file *fp)
 
 void video_save_active_screen_snapshots(running_machine *machine)
 {
-	UINT32 screenmask = render_get_live_screens_mask();
 	mame_file *fp;
 	const device_config *screen;
-	int scrnum;
 
 	/* write one snapshot per visible screen */
-	for (screen = video_screen_first(machine->config), scrnum = 0; screen != NULL; screen = video_screen_next(screen), scrnum++)
-		if (screenmask & (1 << scrnum))
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+		if (render_is_live_screen(screen))
 		{
 			file_error filerr = mame_fopen_next(machine, SEARCHPATH_SCREENSHOT, "png", &fp);
 			if (filerr == FILERR_NONE)
 			{
-				const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum);
 				video_screen_save_snapshot(screen, fp);
 				mame_fclose(fp);
 			}
@@ -2090,36 +2068,40 @@ void video_save_active_screen_snapshots(running_machine *machine)
 
 static void create_snapshot_bitmap(const device_config *screen)
 {
-	screen_state *state = get_safe_token(screen);
-	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	const render_primitive_list *primlist;
 	INT32 width, height;
+	int view_index;
 
-	/* only do it, if there is at least one screen */
-	if (global.snap_target != NULL)
+	/* lazy create snap target */
+	if (global.snap_target == NULL)
 	{
-		/* select the appropriate view in our dummy target */
-		render_target_set_view(global.snap_target, internal_state->scrnum);
-
-		/* get the minimum width/height and set it on the target */
-		render_target_get_minimum_size(global.snap_target, &width, &height);
-		render_target_set_bounds(global.snap_target, width, height, 0);
-
-		/* if we don't have a bitmap, or if it's not the right size, allocate a new one */
-		if (global.snap_bitmap == NULL || width != global.snap_bitmap->width || height != global.snap_bitmap->height)
-		{
-			if (global.snap_bitmap != NULL)
-				bitmap_free(global.snap_bitmap);
-			global.snap_bitmap = bitmap_alloc(width, height, BITMAP_FORMAT_RGB32);
-			assert(global.snap_bitmap != NULL);
-		}
-
-		/* render the screen there */
-		primlist = render_target_get_primitives(global.snap_target);
-		osd_lock_acquire(primlist->lock);
-		rgb888_draw_primitives(primlist->head, global.snap_bitmap->base, width, height, global.snap_bitmap->rowpixels);
-		osd_lock_release(primlist->lock);
+		global.snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
+		assert(global.snap_target != NULL);
+		render_target_set_layer_config(global.snap_target, 0);
 	}
+
+	/* select the appropriate view in our dummy target */
+	view_index = device_list_index(screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+	render_target_set_view(global.snap_target, view_index);
+
+	/* get the minimum width/height and set it on the target */
+	render_target_get_minimum_size(global.snap_target, &width, &height);
+	render_target_set_bounds(global.snap_target, width, height, 0);
+
+	/* if we don't have a bitmap, or if it's not the right size, allocate a new one */
+	if ((global.snap_bitmap == NULL) || (width != global.snap_bitmap->width) || (height != global.snap_bitmap->height))
+	{
+		if (global.snap_bitmap != NULL)
+			bitmap_free(global.snap_bitmap);
+		global.snap_bitmap = bitmap_alloc(width, height, BITMAP_FORMAT_RGB32);
+		assert(global.snap_bitmap != NULL);
+	}
+
+	/* render the screen there */
+	primlist = render_target_get_primitives(global.snap_target);
+	osd_lock_acquire(primlist->lock);
+	rgb888_draw_primitives(primlist->head, global.snap_bitmap->base, width, height, global.snap_bitmap->rowpixels);
+	osd_lock_release(primlist->lock);
 }
 
 

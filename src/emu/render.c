@@ -898,20 +898,31 @@ void render_set_rescale_notify(running_machine *machine, int (*notifier)(running
 
 
 /*-------------------------------------------------
-    render_get_live_screens_mask - return a
-    bitmask indicating the live screens
+    render_is_live_screen - return if the screen
+    is 'live'
 -------------------------------------------------*/
 
-UINT32 render_get_live_screens_mask(void)
+int render_is_live_screen(const device_config *screen)
 {
 	render_target *target;
+	int screen_index;
 	UINT32 bitmask = 0;
+
+	assert(screen != NULL);
+	assert(screen->machine != NULL);
+	assert(screen->machine->config != NULL);
+	assert(screen->machine->config->devicelist != NULL);
+	assert(screen->tag != NULL);
+
+	screen_index = device_list_index(screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+
+	assert(screen_index != -1);
 
 	/* iterate over all live targets and or together their screen masks */
 	for (target = targetlist; target != NULL; target = target->next)
 		bitmask |= target->curview->screens;
 
-	return bitmask;
+	return (bitmask & (1 << screen_index)) ? TRUE : FALSE;
 }
 
 

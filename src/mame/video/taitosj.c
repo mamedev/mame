@@ -207,8 +207,8 @@ VIDEO_START( taitosj )
 
 	for (i = 0; i < 3; i++)
 	{
-		taitosj_layer_bitmap[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-		sprite_layer_collbitmap2[i] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+		taitosj_layer_bitmap[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+		sprite_layer_collbitmap2[i] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	}
 
 	sprite_sprite_collbitmap1 = auto_bitmap_alloc(32,32,machine->screen[0].format);

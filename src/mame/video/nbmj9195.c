@@ -405,7 +405,7 @@ WRITE8_HANDLER( nbmj9195_clut_1_w )		{ nbmj9195_clut_w(1, offset, data); }
 ******************************************************************************/
 VIDEO_START( nbmj9195_1layer )
 {
-	nbmj9195_tmpbitmap[0] = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	nbmj9195_videoram[0] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
 	nbmj9195_palette = auto_malloc(0x200 * sizeof(UINT8));
 	nbmj9195_clut[0] = auto_malloc(0x1000 * sizeof(UINT8));
@@ -417,8 +417,8 @@ VIDEO_START( nbmj9195_1layer )
 
 VIDEO_START( nbmj9195_2layer )
 {
-	nbmj9195_tmpbitmap[0] = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	nbmj9195_tmpbitmap[1] = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj9195_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	nbmj9195_videoram[0] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
 	nbmj9195_videoram[1] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
 	nbmj9195_palette = auto_malloc(0x200 * sizeof(UINT8));
@@ -433,8 +433,8 @@ VIDEO_START( nbmj9195_2layer )
 
 VIDEO_START( nbmj9195_nb22090 )
 {
-	nbmj9195_tmpbitmap[0] = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	nbmj9195_tmpbitmap[1] = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	nbmj9195_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	nbmj9195_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	nbmj9195_videoram[0] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
 	nbmj9195_videoram[1] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));
 	nbmj9195_videoworkram[0] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT16));

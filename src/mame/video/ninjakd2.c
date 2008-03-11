@@ -140,7 +140,7 @@ static void videoram_alloc(const running_machine* const machine, int const size)
 		memset(robokid_bg2_videoram, 0x00, size);
 	}
 
-	sp_bitmap = auto_bitmap_alloc (machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	sp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 VIDEO_START( ninjakd2 )

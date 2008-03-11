@@ -145,7 +145,7 @@ VIDEO_START( model3 )
 	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, model3_exit);
 
-	bitmap3d = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	bitmap3d = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	m3_char_ram = auto_malloc(0x100000);

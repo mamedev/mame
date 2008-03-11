@@ -6,7 +6,6 @@
 
 #include "driver.h"
 
-static UINT8 *dirty_f;
 static bitmap_t *bitmap_f;
 UINT16 karnov_scroll[2], *karnov_pf_data;
 static tilemap *fix_tilemap;
@@ -70,11 +69,7 @@ PALETTE_INIT( karnov )
 
 void karnov_flipscreen_w(int data)
 {
-	static int last_flip;
 	flipscreen=data;
-	if (flipscreen!=last_flip)
-		memset(dirty_f,1,0x800);
-	last_flip=flipscreen;
 	tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
@@ -86,39 +81,14 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 	if (flipscreen) fx=fy=1; else fx=fy=0;
 
-	/* 1st area is stored along X-axis... */
 	mx=-1; my=0;
 	for (offs = 0;offs < 0x400; offs ++) {
 		mx++;
 		if (mx==32) {mx=0; my++;}
 
-		if (!dirty_f[offs]) continue; else dirty_f[offs]=0;
-
 		tile=karnov_pf_data[offs];
 		color = tile >> 12;
 		tile = tile&0x7ff;
-		if (flipscreen)
-			drawgfx(bitmap_f,machine->gfx[1],tile,
-				color, fx, fy, 496-16*mx,496-16*my,
-		 		0,TRANSPARENCY_NONE,0);
-		else
-			drawgfx(bitmap_f,machine->gfx[1],tile,
-				color, fx, fy, 16*mx,16*my,
-		 		0,TRANSPARENCY_NONE,0);
-	}
-
-	/* 2nd area is stored along Y-axis... */
-	mx=0; my=-1;
-	for (offs = 0x400 ;offs < 0x800; offs ++) {
-		my++;
-		if (my==32) {my=0; mx++;}
-
-		if (!dirty_f[offs]) continue; else dirty_f[offs]=0;
-
-		tile=karnov_pf_data[offs];
-		color = tile >> 12;
-		tile=tile&0x7ff;
-
 		if (flipscreen)
 			drawgfx(bitmap_f,machine->gfx[1],tile,
 				color, fx, fy, 496-16*mx,496-16*my,
@@ -224,10 +194,10 @@ WRITE16_HANDLER( karnov_videoram_w )
 	tilemap_mark_tile_dirty(fix_tilemap,offset);
 }
 
-WRITE16_HANDLER( karnov_playfield_w )
+WRITE16_HANDLER( karnov_playfield_swap_w )
 {
+	offset = ((offset & 0x1f) << 5) | ((offset & 0x3e0) >> 5);
 	COMBINE_DATA(&karnov_pf_data[offset]);
-	dirty_f[offset] = 1;
 }
 
 /******************************************************************************/
@@ -235,10 +205,7 @@ WRITE16_HANDLER( karnov_playfield_w )
 VIDEO_START( karnov )
 {
 	/* Allocate bitmaps */
-	bitmap_f = auto_bitmap_alloc(512,512,machine->screen[0].format);
-
-	dirty_f=auto_malloc(0x800);
-	memset(dirty_f,1,0x800);
+	bitmap_f = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 
 	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_rows,8,8,32,32);
 
@@ -248,10 +215,7 @@ VIDEO_START( karnov )
 VIDEO_START( wndrplnt )
 {
 	/* Allocate bitmaps */
-	bitmap_f = auto_bitmap_alloc(512,512,machine->screen[0].format);
-
-	dirty_f=auto_malloc(0x800);
-	memset(dirty_f,1,0x800);
+	bitmap_f = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 
 	fix_tilemap=tilemap_create(get_fix_tile_info,tilemap_scan_cols,8,8,32,32);
 

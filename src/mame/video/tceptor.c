@@ -425,7 +425,7 @@ VIDEO_START( tceptor )
 	decode_sprite32(machine, REGION_GFX4);
 
 	/* allocate temp bitmaps */
-	temp_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	temp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	namco_road_init(machine, gfx_index);
 

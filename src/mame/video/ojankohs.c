@@ -295,7 +295,7 @@ VIDEO_START( ojankoy )
 
 VIDEO_START( ojankoc )
 {
-	ojankoc_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	ojankoc_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	ojankohs_videoram = auto_malloc(0x8000);
 	ojankohs_paletteram = auto_malloc(0x20);
 }

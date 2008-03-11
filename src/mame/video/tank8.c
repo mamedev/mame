@@ -115,9 +115,9 @@ static TILE_GET_INFO( tank8_get_tile_info )
 
 VIDEO_START( tank8 )
 {
-	helper1 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	helper2 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	helper3 = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	helper3 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	tank8_tilemap = tilemap_create(tank8_get_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 

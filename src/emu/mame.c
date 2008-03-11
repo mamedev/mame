@@ -51,6 +51,7 @@
                 - calls the driver's DRIVER_INIT callback
                 - calls device_list_start() [devintrf.c] to start any devices
                 - calls video_init() [video.c] to start the video system
+                - calls tilemap_init() [tilemap.c] to start the tilemap system
                 - calls crosshair_init() [crsshair.c] to configure the crosshairs
                 - calls sound_init() [sound.c] to start the audio system
                 - calls mame_debug_init() [debugcpu.c] to set up the debugger
@@ -1580,6 +1581,7 @@ static void init_machine(running_machine *machine)
 
 	/* start the video and audio hardware */
 	video_init(machine);
+	tilemap_init(machine);
 	crosshair_init(machine);
 
 	sound_init(machine);

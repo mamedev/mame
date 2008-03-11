@@ -122,7 +122,7 @@ VIDEO_START( system1 )
 	bg_dirtybuffer = auto_malloc(1024);
 	memset(bg_dirtybuffer,1,1024);
 
-	tmp_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	state_save_register_func_postload(system1_postload);
 	state_save_register_global(system1_background_memory);
@@ -141,7 +141,7 @@ VIDEO_START( wbml )
 	wbml_paged_videoram = auto_malloc(0x4000);	/* Allocate 16k for background banked ram */
 	memset(wbml_paged_videoram,0,0x4000);
 
-	tmp_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmp_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	system1_sprite_xoffset = 1+7*2;
 

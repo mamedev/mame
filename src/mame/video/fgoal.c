@@ -36,8 +36,8 @@ WRITE8_HANDLER( fgoal_xpos_w )
 
 VIDEO_START( fgoal )
 {
-	fgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
-	bgbitmap = auto_bitmap_alloc(256, 256, machine->screen[0].format);
+	fgbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	bgbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 

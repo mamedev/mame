@@ -54,10 +54,12 @@ void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_
 
 VIDEO_START( exidy )
 {
-	background_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	motion_object_1_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
-	motion_object_2_vid = auto_bitmap_alloc(16, 16, machine->screen[0].format);
-	motion_object_2_clip = auto_bitmap_alloc(16, 16, machine->screen[0].format);
+	bitmap_format format = video_screen_get_format(machine->primary_screen);
+
+	background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	motion_object_1_vid = auto_bitmap_alloc(16, 16, format);
+	motion_object_2_vid = auto_bitmap_alloc(16, 16, format);
+	motion_object_2_clip = auto_bitmap_alloc(16, 16, format);
 }
 
 

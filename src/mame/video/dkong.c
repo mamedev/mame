@@ -894,7 +894,7 @@ VIDEO_START( dkong )
 	switch (state->hardware_type)
 	{
 		case HARDWARE_TRS02:
-			state->bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
 			state->scanline_timer = timer_alloc(scanline_callback, NULL);
 			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 		    /* fall through */
@@ -907,7 +907,7 @@ VIDEO_START( dkong )
 			state->bg_tilemap = tilemap_create(radarsc1_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
-			state->bg_bits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 			state->scanline_timer = timer_alloc(scanline_callback, NULL);
 			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);

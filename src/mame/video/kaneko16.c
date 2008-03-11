@@ -141,7 +141,7 @@ VIDEO_START( kaneko16_1xVIEW2 )
 
 	kaneko16_tmap_3 = 0;
 
-	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	{
 		int dx, xdim = machine->screen[0].width;

@@ -147,7 +147,10 @@ VIDEO_START( btime )
 VIDEO_START( bnj )
 {
     /* the background area is twice as wide as the screen */
-    background_bitmap = auto_bitmap_alloc(2*machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+    int width = video_screen_get_width(machine->primary_screen);
+    int height = video_screen_get_height(machine->primary_screen);
+    bitmap_format format = video_screen_get_format(machine->primary_screen);
+    background_bitmap = auto_bitmap_alloc(2*width, height, format);
 
     VIDEO_START_CALL(btime);
 }

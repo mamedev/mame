@@ -120,7 +120,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( ikki )
 {
-	sprite_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 

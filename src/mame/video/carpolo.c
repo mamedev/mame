@@ -160,13 +160,15 @@ PALETTE_INIT( carpolo )
 
 VIDEO_START( carpolo )
 {
-	sprite_sprite_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,machine->screen[0].format);
-	sprite_sprite_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH*2,SPRITE_HEIGHT*2,machine->screen[0].format);
+	bitmap_format format = video_screen_get_format(machine->primary_screen);
 
-	sprite_goal_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,machine->screen[0].format);
-	sprite_goal_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH,SPRITE_HEIGHT+GOAL_HEIGHT,machine->screen[0].format);
+	sprite_sprite_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH*2, SPRITE_HEIGHT*2, format);
+	sprite_sprite_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH*2, SPRITE_HEIGHT*2, format);
 
-	sprite_border_collision_bitmap = auto_bitmap_alloc(SPRITE_WIDTH,SPRITE_HEIGHT,machine->screen[0].format);
+	sprite_goal_collision_bitmap1 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT, format);
+	sprite_goal_collision_bitmap2 = auto_bitmap_alloc(SPRITE_WIDTH+GOAL_WIDTH, SPRITE_HEIGHT+GOAL_HEIGHT, format);
+
+	sprite_border_collision_bitmap = auto_bitmap_alloc(SPRITE_WIDTH, SPRITE_HEIGHT, format);
 }
 
 

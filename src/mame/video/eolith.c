@@ -63,8 +63,8 @@ READ32_HANDLER( eolith_vram_r )
 VIDEO_START( eolith )
 {
 	eo_vram = auto_malloc(0x40000*2);
-	bitmaps[0] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	bitmaps[1] = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	bitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	bitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 VIDEO_UPDATE( eolith )

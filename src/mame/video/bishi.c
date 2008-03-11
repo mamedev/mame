@@ -25,7 +25,7 @@ static void bishi_tile_callback(int layer, int *code, int *color, int *flags)
 
 VIDEO_START(bishi)
 {
-	assert(machine->screen[0].format == BITMAP_FORMAT_RGB32);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
 	K055555_vh_start();
 	K054338_vh_start();

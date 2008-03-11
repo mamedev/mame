@@ -51,7 +51,7 @@ PALETTE_INIT( finalizr )
 
 VIDEO_START( finalizr )
 {
-	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
 }
 
 

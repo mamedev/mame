@@ -221,7 +221,7 @@ VIDEO_START( dday )
 	text_tilemap = tilemap_create(get_text_tile_info,tilemap_scan_rows,8,8,32,32);
 	sl_tilemap   = tilemap_create(get_sl_tile_info,  tilemap_scan_rows,8,8,32,32);
 
-	main_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	main_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	tilemap_set_transmask(bg_tilemap,0,0x00f0,0xff0f); /* pens 0-3 have priority over the foreground layer */
 

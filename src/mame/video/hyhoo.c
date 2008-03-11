@@ -232,7 +232,7 @@ void hyhoo_gfxdraw(void)
 
 VIDEO_START( hyhoo )
 {
-	hyhoo_tmpbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	hyhoo_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 

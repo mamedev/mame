@@ -308,8 +308,8 @@ void render_init(running_machine *machine);
 /* set a notifier that we call before doing long scaling operations */
 void render_set_rescale_notify(running_machine *machine, int (*notifier)(running_machine *, int, int));
 
-/* return a bitmask indicating the live screens */
-UINT32 render_get_live_screens_mask(void);
+/* return a boolean indicating if the screen is live */
+int render_is_live_screen(const device_config *screen);
 
 /* return the smallest maximum update rate across all targets */
 float render_get_max_update_rate(void);

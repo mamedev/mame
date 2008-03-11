@@ -78,7 +78,7 @@ VIDEO_START( gaelco3d )
 	poly = poly_alloc(2000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, gaelco3d_exit);
 
-	screenbits = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	screenbits = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
 

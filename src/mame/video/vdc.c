@@ -361,7 +361,7 @@ VIDEO_START( pce )
 	memset(vdc[1].vram, 0, 0x10000);
 
 	/* create display bitmap */
-	vce.bmp = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	vce.bmp = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	vdc[0].inc = 1;
 	vdc[1].inc = 1;

@@ -44,7 +44,7 @@
 
 PALETTE_INIT( karnov );
 VIDEO_UPDATE( karnov );
-WRITE16_HANDLER( karnov_playfield_w );
+WRITE16_HANDLER( karnov_playfield_swap_w );
 WRITE16_HANDLER( karnov_videoram_w );
 void karnov_flipscreen_w(int data);
 
@@ -354,7 +354,8 @@ static ADDRESS_MAP_START( karnov_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_WRITE(karnov_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE(karnov_videoram_w) /* Wndrplnt Mirror */
-	AM_RANGE(0x0a1000, 0x0a1fff) AM_WRITE(karnov_playfield_w) AM_BASE(&karnov_pf_data)
+	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITE(SMH_RAM) AM_BASE(&karnov_pf_data)
+	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE(karnov_playfield_swap_w)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(karnov_control_w)
 ADDRESS_MAP_END
 

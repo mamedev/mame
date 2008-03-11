@@ -134,8 +134,8 @@ VIDEO_START( tinvader )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		 24, 24, 32, 32);
 
-	spritebitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)

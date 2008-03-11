@@ -53,9 +53,9 @@ static TILE_GET_INFO( sprint4_tile_info )
 
 VIDEO_START( sprint4 )
 {
-	helper = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	helper = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
+	playfield = tilemap_create(sprint4_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 

@@ -85,7 +85,7 @@ VIDEO_START( dogfgt )
 
 	bitmapram = auto_malloc(BITMAPRAM_SIZE);
 
-	pixbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	pixbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 

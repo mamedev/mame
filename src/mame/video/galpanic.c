@@ -9,8 +9,8 @@ static bitmap_t *sprites_bitmap;
 
 VIDEO_START( galpanic )
 {
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	sprites_bitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	pandora_start(0,0, -16);
 }

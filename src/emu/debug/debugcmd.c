@@ -2006,12 +2006,11 @@ static void execute_snap(int ref, int params, const char *param[])
 		mame_file *fp;
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
-		UINT32 mask = render_get_live_screens_mask();
 		astring *fname;
 
 		const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum);
 
-		if ((screen == NULL) || !(mask & (1 << scrnum)))
+		if ((screen == NULL) || !render_is_live_screen(screen))
 		{
 			debug_console_printf("Invalid screen number '%d'\n", scrnum);
 			return;

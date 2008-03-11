@@ -224,13 +224,13 @@ VIDEO_START( splndrbt )
 	UINT8 *buf8ptr;
 	int i;
 
-	assert(machine->screen[0].format == BITMAP_FORMAT_INDEXED16);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_INDEXED16);
 
 	halfclip = machine->screen[0].visarea;
 	i = halfclip.max_y - halfclip.min_y + 1;
 	halfclip.max_y = halfclip.min_y + (i >> 1) - 1;
 
-	tmpbitmap = auto_bitmap_alloc(BMW, BMW, machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(BMW, BMW, video_screen_get_format(machine->primary_screen));
 
 	charmap0 = tilemap_create(splndrbt_char0info, tilemap_scan_cols,  8, 8, 32, 32);
 	tilemap_set_transparent_pen(charmap0, 0);

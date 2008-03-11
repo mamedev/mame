@@ -62,7 +62,7 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 VIDEO_START( blockout )
 {
 	/* Allocate temporary bitmaps */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 

@@ -107,8 +107,8 @@ VIDEO_START( fortyl )
 	fortyl_pixram1 = auto_malloc(0x4000);
 	fortyl_pixram2 = auto_malloc(0x4000);
 
-	pixel_bitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
-	pixel_bitmap2 = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	pixel_bitmap1 = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
+	pixel_bitmap2 = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
 
 	background  = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8,8,64,32);
 

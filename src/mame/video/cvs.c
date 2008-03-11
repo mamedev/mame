@@ -189,9 +189,9 @@ VIDEO_START( cvs )
 	s2636_2 = s2636_config(cvs_s2636_2_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* create helper bitmaps */
-	background_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	cvs_collision_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	scrolled_collision_background = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	background_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	cvs_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	scrolled_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 

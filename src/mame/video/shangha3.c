@@ -75,7 +75,7 @@ static bitmap_t *rawbitmap;
 
 VIDEO_START( shangha3 )
 {
-	rawbitmap = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	rawbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	if (shangha3_do_shadows)
 	{

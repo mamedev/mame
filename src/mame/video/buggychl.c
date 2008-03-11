@@ -29,8 +29,8 @@ PALETTE_INIT( buggychl )
 VIDEO_START( buggychl )
 {
 	dirtychar = auto_malloc(256 * sizeof(*dirtychar));
-	tmpbitmap1 = auto_bitmap_alloc(256,256,machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmap2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	memset(dirtychar,0xff,256 * sizeof(*dirtychar));
 }

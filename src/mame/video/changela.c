@@ -42,10 +42,10 @@ VIDEO_START( changela )
 	memory_devices = auto_malloc(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
 	tree_ram = auto_malloc(2 * 0x20);
 
-	obj0_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	river_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	tree0_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
-	tree1_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, machine->screen[0].format);
+	obj0_bitmap  = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	river_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tree0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tree1_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	changela_scanline_timer = timer_alloc(changela_scanline_callback, NULL);
 	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 30, 0), 30);

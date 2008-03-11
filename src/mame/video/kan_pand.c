@@ -182,7 +182,7 @@ void pandora_start(UINT8 region, int x, int y)
 	pandora_spriteram = auto_malloc(0x1000);
 	memset(pandora_spriteram,0x00, 0x1000);
 
-	pandora_sprites_bitmap = auto_bitmap_alloc(Machine->screen[0].width,Machine->screen[0].height,Machine->screen[0].format);
+	pandora_sprites_bitmap = video_screen_auto_bitmap_alloc(Machine->primary_screen);
 	pandora_clear_bitmap = 1;
 }
 

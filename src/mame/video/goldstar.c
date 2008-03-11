@@ -29,10 +29,10 @@ VIDEO_START( goldstar )
 //        int i;
 
 	/* the background area is half as high as the screen */
-	tmpbitmap1 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmap3 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
-	tmpbitmap4 = auto_bitmap_alloc(machine->screen[0].width,machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap1 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmap2 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmap3 = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	tmpbitmap4 = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 
