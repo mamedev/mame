@@ -34,6 +34,7 @@
 
 #define MULTIPCM_CLOCKDIV    	(360.0)
 #define MULTIPCM_ONE		(18)
+#define ICLIP16(x)		(x<-32768)?-32768:((x>32767)?32767:x)
 
 static const int ctbl[] =
 {
@@ -186,7 +187,14 @@ static void MultiPCM_update(void *param, stream_sample_t **inputs, stream_sample
 						break;
 					}
 
-					decTemp = 1.0f - (relcount * invrelamt);
+					if(relamt!=0)
+					{
+						decTemp = 1.0f - (relcount * invrelamt);
+					}
+					else
+					{
+						decTemp=0;
+					}
 
 					lvol = mlvol * decTemp;
 					rvol = mrvol * decTemp;
@@ -194,8 +202,8 @@ static void MultiPCM_update(void *param, stream_sample_t **inputs, stream_sample
 
 				ptsum += ptdelta;
 
-				datap[0][i] += ((pSamp[ptoffset] * lvol)>>2);
-				datap[1][i] += ((pSamp[ptoffset] * rvol)>>2);
+				datap[0][i] += ICLIP16((pSamp[ptoffset] * lvol)>>2);
+				datap[1][i] += ICLIP16((pSamp[ptoffset] * rvol)>>2);
 			}
 
 			// copy back the working values we need to keep
