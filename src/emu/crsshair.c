@@ -29,7 +29,8 @@
 typedef struct _crosshair_global crosshair_global;
 struct _crosshair_global
 {
-	UINT8 				visible;				/* global visibility */
+	UINT8 				used[MAX_PLAYERS];		/* usage per player */
+	UINT8 				visible[MAX_PLAYERS];	/* visibility per player */
 	bitmap_t *			bitmap[MAX_PLAYERS];	/* bitmap per player */
 	render_texture *	texture[MAX_PLAYERS];	/* texture per player */
 	const device_config *screen[MAX_PLAYERS];	/* the screen on which this player's crosshair is drawn */
@@ -178,19 +179,25 @@ static void create_bitmap(int player)
 
 void crosshair_init(running_machine *machine)
 {
+	int player;
 	input_port_entry *ipt;
 
 	/* request a callback upon exiting */
 	add_exit_callback(machine, crosshair_exit);
 
-	/* visible by default */
-	global.visible = TRUE;
+	/* nothing is used by default */
+	for (player = 0; player < MAX_PLAYERS; player++)
+		global.used[player] = FALSE;
 
 	/* determine who needs crosshairs */
 	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
 		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
 		{
 			int player = ipt->player;
+
+			/* mark as used and visible */
+			global.used[player] = TRUE;
+			global.visible[player] = TRUE;
 
 			/* for now, use the main screen */
 			global.screen[player] = machine->primary_screen;
@@ -234,7 +241,25 @@ static void crosshair_exit(running_machine *machine)
 
 void crosshair_toggle(running_machine *machine)
 {
-	global.visible = !global.visible;
+	int player;
+	int first_hidden_player = -1;
+
+	/* find the first invisible crosshair */
+	for (player = 0; player < MAX_PLAYERS; player++)
+		if (global.used[player] && !global.visible[player])
+		{
+			first_hidden_player = player;
+			break;
+		}
+
+	/* if all visible, turn all off */
+	if (first_hidden_player == -1)
+		for (player = 0; player < MAX_PLAYERS; player++)
+			global.visible[player] = FALSE;
+
+	/* otherwise, turn on the first one that isn't currently on */
+	else
+		global.visible[first_hidden_player] = TRUE;
 }
 
 
@@ -302,16 +327,15 @@ void crosshair_render(const device_config *screen)
 {
 	int player;
 
-	/* skip if not visible */
-	if (global.visible)
-		for (player = 0; player < MAX_PLAYERS; player++)
-			if (global.screen[player] == screen)
-			{
-				/* add a quad assuming a 4:3 screen (this is not perfect) */
-				render_screen_add_quad(screen,
-							global.x[player] - 0.03f, global.y[player] - 0.04f,
-							global.x[player] + 0.03f, global.y[player] + 0.04f,
-							MAKE_ARGB(0xc0, global.fade, global.fade, global.fade),
-							global.texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			}
+	for (player = 0; player < MAX_PLAYERS; player++)
+		/* draw if visible and the right screen */
+		if (global.visible[player] && (global.screen[player] == screen))
+		{
+			/* add a quad assuming a 4:3 screen (this is not perfect) */
+			render_screen_add_quad(screen,
+						global.x[player] - 0.03f, global.y[player] - 0.04f,
+						global.x[player] + 0.03f, global.y[player] + 0.04f,
+						MAKE_ARGB(0xc0, global.fade, global.fade, global.fade),
+						global.texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		}
 }
