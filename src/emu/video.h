@@ -14,10 +14,6 @@
 #ifndef __VIDEO_H__
 #define __VIDEO_H__
 
-#include "mamecore.h"
-#include "devintrf.h"
-#include "timer.h"
-
 
 /***************************************************************************
     CONSTANTS
@@ -195,7 +191,7 @@ int video_get_speed_factor(void);
 void video_set_speed_factor(int speed);
 
 /* return text to display about the current speed */
-const char *video_get_speed_text(void);
+const char *video_get_speed_text(running_machine *machine);
 
 /* get/set the current frameskip (-1 means auto) */
 int video_get_frameskip(void);
@@ -224,11 +220,6 @@ void video_save_active_screen_snapshots(running_machine *machine);
 int video_is_movie_active(const device_config *screen);
 void video_movie_begin_recording(const device_config *screen, const char *name);
 void video_movie_end_recording(const device_config *screen);
-
-
-/* ----- crosshair rendering ----- */
-
-void video_crosshair_toggle(void);
 
 
 #endif	/* __VIDEO_H__ */

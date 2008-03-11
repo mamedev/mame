@@ -1220,7 +1220,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* first draw the FPS counter */
 	if (showfps || osd_ticks() < showfps_end)
 	{
-		ui_draw_text_full(video_get_speed_text(), 0.0f, 0.0f, 1.0f,
+		ui_draw_text_full(video_get_speed_text(machine), 0.0f, 0.0f, 1.0f,
 					JUSTIFY_RIGHT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 	else
@@ -1334,7 +1334,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* toggle crosshair display */
 	if (input_ui_pressed(IPT_UI_TOGGLE_CROSSHAIR))
-		video_crosshair_toggle();
+		crosshair_toggle(machine);
 
 	/* increment frameskip? */
 	if (input_ui_pressed(IPT_UI_FRAMESKIP_INC))

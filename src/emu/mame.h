@@ -14,6 +14,7 @@
 
 #include "mamecore.h"
 #include "video.h"
+#include "crsshair.h"
 #include "restrack.h"
 #include "options.h"
 #include <stdarg.h>

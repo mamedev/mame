@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "png.h"
 #include "debugger.h"
@@ -126,13 +125,6 @@ struct _video_global
 	render_target *			snap_target;		/* screen shapshot target */
 	bitmap_t *				snap_bitmap;		/* screen snapshot bitmap */
 
-	/* crosshair bits */
-	bitmap_t *				crosshair_bitmap[MAX_PLAYERS]; /* crosshair bitmap per player */
-	render_texture *		crosshair_texture[MAX_PLAYERS]; /* crosshair texture per player */
-	UINT8 					crosshair_animate;	/* animation frame index */
-	UINT8 					crosshair_visible;	/* crosshair visible mask */
-	UINT8 					crosshair_needed;	/* crosshair needed mask */
-
 	/* global VBLANK callbacks */
 	vblank_state_changed_global_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 };
@@ -143,7 +135,7 @@ struct _video_global
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* global video state */
+/* global state */
 static video_global global;
 
 /* frameskipping tables */
@@ -196,11 +188,6 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 
 /* movie recording */
 static void movie_record_frame(const device_config *screen);
-
-/* crosshair rendering */
-static void crosshair_init(running_machine *machine);
-static void crosshair_render(running_machine *machine);
-static void crosshair_free(void);
 
 /* software rendering */
 static void rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
@@ -295,6 +282,9 @@ void video_init(running_machine *machine)
 	const device_config *screen;
 	const char *filename;
 
+	/* request a callback upon exiting */
+	add_exit_callback(machine, video_exit);
+
 	/* reset our global state */
 	memset(&global, 0, sizeof(global));
 	global.speed_percent = 1.0;
@@ -308,9 +298,6 @@ void video_init(running_machine *machine)
 	global.original_speed = global.speed = (options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5);
 	global.refresh_speed = options_get_bool(mame_options(), OPTION_REFRESHSPEED);
 	global.update_in_pause = options_get_bool(mame_options(), OPTION_UPDATEINPAUSE);
-
-	/* request a callback upon exiting */
-	add_exit_callback(machine, video_exit);
 
 	/* set the first screen device as the primary - this will set NULL if screenless */
 	machine->primary_screen = video_screen_first(machine->config);
@@ -403,9 +390,6 @@ void video_init(running_machine *machine)
 		render_target_set_layer_config(global.snap_target, 0);
 	}
 
-	/* create crosshairs */
-	crosshair_init(machine);
-
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
 	if ((filename[0] != 0) && (machine->primary_screen != NULL))
@@ -421,9 +405,6 @@ static void video_exit(running_machine *machine)
 {
 	const device_config *screen;
 	int i;
-
-	/* free crosshairs */
-	crosshair_free();
 
 	/* stop recording any movie */
 	if (machine->primary_screen != NULL)
@@ -1527,7 +1508,9 @@ static int finish_screen_updates(running_machine *machine)
 	}
 
 	/* draw any crosshairs */
-	crosshair_render(machine);
+	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+		crosshair_render(screen);
+
 	return anything_changed;
 }
 
@@ -1575,9 +1558,9 @@ void video_set_speed_factor(int speed)
     be displayed in the upper-right corner
 -------------------------------------------------*/
 
-const char *video_get_speed_text(void)
+const char *video_get_speed_text(running_machine *machine)
 {
-	int paused = mame_is_paused(Machine);
+	int paused = mame_is_paused(machine);
 	static char buffer[1024];
 	char *dest = buffer;
 
@@ -1590,7 +1573,7 @@ const char *video_get_speed_text(void)
 		dest += sprintf(dest, "fast ");
 
 	/* if we're auto frameskipping, display that plus the level */
-	else if (effective_autoframeskip(Machine))
+	else if (effective_autoframeskip(machine))
 		dest += sprintf(dest, "auto%2d/%d", effective_frameskip(), MAX_FRAMESKIP);
 
 	/* otherwise, just display the frameskip plus the level */
@@ -2291,284 +2274,6 @@ static void movie_record_frame(const device_config *screen)
 		}
 
 		profiler_mark(PROFILER_END);
-	}
-}
-
-
-
-/***************************************************************************
-    CROSSHAIR RENDERING
-***************************************************************************/
-
-/* decripton of the bitmap data */
-#define CROSSHAIR_RAW_SIZE		100
-#define CROSSHAIR_RAW_ROWBYTES	((CROSSHAIR_RAW_SIZE + 7) / 8)
-
-/* raw bitmap */
-static const UINT8 crosshair_raw_top[] =
-{
-	0x00,0x20,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x00,
-	0x00,0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xe0,0x00,
-	0x00,0xf8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xf0,0x00,
-	0x01,0xf8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0xf8,0x00,
-	0x03,0xfc,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x03,0xfc,0x00,
-	0x07,0xfe,0x00,0x00,0x00,0x0f,0xfe,0x00,0x00,0x00,0x07,0xfe,0x00,
-	0x0f,0xff,0x00,0x00,0x01,0xff,0xff,0xf0,0x00,0x00,0x0f,0xff,0x00,
-	0x1f,0xff,0x80,0x00,0x1f,0xff,0xff,0xff,0x00,0x00,0x1f,0xff,0x80,
-	0x3f,0xff,0x80,0x00,0xff,0xff,0xff,0xff,0xe0,0x00,0x1f,0xff,0xc0,
-	0x7f,0xff,0xc0,0x03,0xff,0xff,0xff,0xff,0xf8,0x00,0x3f,0xff,0xe0,
-	0xff,0xff,0xe0,0x07,0xff,0xff,0xff,0xff,0xfc,0x00,0x7f,0xff,0xf0,
-	0x7f,0xff,0xf0,0x1f,0xff,0xff,0xff,0xff,0xff,0x00,0xff,0xff,0xe0,
-	0x3f,0xff,0xf8,0x7f,0xff,0xff,0xff,0xff,0xff,0xc1,0xff,0xff,0xc0,
-	0x0f,0xff,0xf8,0xff,0xff,0xff,0xff,0xff,0xff,0xe1,0xff,0xff,0x00,
-	0x07,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfb,0xff,0xfe,0x00,
-	0x03,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfc,0x00,
-	0x01,0xff,0xff,0xff,0xff,0xf0,0x01,0xff,0xff,0xff,0xff,0xf8,0x00,
-	0x00,0x7f,0xff,0xff,0xff,0x00,0x00,0x1f,0xff,0xff,0xff,0xe0,0x00,
-	0x00,0x3f,0xff,0xff,0xf8,0x00,0x00,0x03,0xff,0xff,0xff,0xc0,0x00,
-	0x00,0x1f,0xff,0xff,0xe0,0x00,0x00,0x00,0xff,0xff,0xff,0x80,0x00,
-	0x00,0x0f,0xff,0xff,0x80,0x00,0x00,0x00,0x3f,0xff,0xff,0x00,0x00,
-	0x00,0x03,0xff,0xfe,0x00,0x00,0x00,0x00,0x0f,0xff,0xfc,0x00,0x00,
-	0x00,0x01,0xff,0xfc,0x00,0x00,0x00,0x00,0x07,0xff,0xf8,0x00,0x00,
-	0x00,0x03,0xff,0xf8,0x00,0x00,0x00,0x00,0x01,0xff,0xf8,0x00,0x00,
-	0x00,0x07,0xff,0xfc,0x00,0x00,0x00,0x00,0x03,0xff,0xfc,0x00,0x00,
-	0x00,0x0f,0xff,0xfe,0x00,0x00,0x00,0x00,0x07,0xff,0xfe,0x00,0x00,
-	0x00,0x0f,0xff,0xff,0x00,0x00,0x00,0x00,0x0f,0xff,0xfe,0x00,0x00,
-	0x00,0x1f,0xff,0xff,0x80,0x00,0x00,0x00,0x1f,0xff,0xff,0x00,0x00,
-	0x00,0x1f,0xff,0xff,0x80,0x00,0x00,0x00,0x1f,0xff,0xff,0x00,0x00,
-	0x00,0x3f,0xfe,0xff,0xc0,0x00,0x00,0x00,0x3f,0xff,0xff,0x80,0x00,
-	0x00,0x7f,0xfc,0x7f,0xe0,0x00,0x00,0x00,0x7f,0xe7,0xff,0xc0,0x00,
-	0x00,0x7f,0xf8,0x3f,0xf0,0x00,0x00,0x00,0xff,0xc3,0xff,0xc0,0x00,
-	0x00,0xff,0xf8,0x1f,0xf8,0x00,0x00,0x01,0xff,0x83,0xff,0xe0,0x00,
-	0x00,0xff,0xf0,0x07,0xf8,0x00,0x00,0x01,0xfe,0x01,0xff,0xe0,0x00,
-	0x00,0xff,0xf0,0x03,0xfc,0x00,0x00,0x03,0xfc,0x01,0xff,0xe0,0x00,
-	0x01,0xff,0xe0,0x01,0xfe,0x00,0x00,0x07,0xf8,0x00,0xff,0xf0,0x00,
-	0x01,0xff,0xe0,0x00,0xff,0x00,0x00,0x0f,0xf0,0x00,0xff,0xf0,0x00,
-	0x01,0xff,0xc0,0x00,0x3f,0x80,0x00,0x1f,0xc0,0x00,0x7f,0xf0,0x00,
-	0x01,0xff,0xc0,0x00,0x1f,0x80,0x00,0x1f,0x80,0x00,0x7f,0xf0,0x00,
-	0x03,0xff,0xc0,0x00,0x0f,0xc0,0x00,0x3f,0x00,0x00,0x7f,0xf8,0x00,
-	0x03,0xff,0x80,0x00,0x07,0xe0,0x00,0x7e,0x00,0x00,0x3f,0xf8,0x00,
-	0x03,0xff,0x80,0x00,0x01,0xf0,0x00,0xf8,0x00,0x00,0x3f,0xf8,0x00,
-	0x03,0xff,0x80,0x00,0x00,0xf8,0x01,0xf0,0x00,0x00,0x3f,0xf8,0x00,
-	0x03,0xff,0x80,0x00,0x00,0x78,0x01,0xe0,0x00,0x00,0x3f,0xf8,0x00,
-	0x07,0xff,0x00,0x00,0x00,0x3c,0x03,0xc0,0x00,0x00,0x3f,0xfc,0x00,
-	0x07,0xff,0x00,0x00,0x00,0x0e,0x07,0x00,0x00,0x00,0x1f,0xfc,0x00,
-	0x07,0xff,0x00,0x00,0x00,0x07,0x0e,0x00,0x00,0x00,0x1f,0xfc,0x00,
-	0x07,0xff,0x00,0x00,0x00,0x03,0x9c,0x00,0x00,0x00,0x1f,0xfc,0x00,
-	0x07,0xff,0x00,0x00,0x00,0x01,0x98,0x00,0x00,0x00,0x1f,0xfc,0x00,
-	0x07,0xff,0x00,0x00,0x00,0x00,0x60,0x00,0x00,0x00,0x1f,0xfc,0x00
-};
-
-/* per-player colors */
-static const rgb_t crosshair_colors[] =
-{
-	MAKE_RGB(0x40,0x40,0xff),
-	MAKE_RGB(0xff,0x40,0x40),
-	MAKE_RGB(0x40,0xff,0x40),
-	MAKE_RGB(0xff,0xff,0x40),
-	MAKE_RGB(0xff,0x40,0xff),
-	MAKE_RGB(0x40,0xff,0xff),
-	MAKE_RGB(0xff,0xff,0xff)
-};
-
-
-/*-------------------------------------------------
-    crosshair_init - initialize the crosshair
-    bitmaps and such
--------------------------------------------------*/
-
-static void crosshair_init(running_machine *machine)
-{
-	input_port_entry *ipt;
-	int player;
-
-	/* determine who needs crosshairs */
-	global.crosshair_needed = 0x00;
-	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
-		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
-			global.crosshair_needed |= 1 << ipt->player;
-
-	/* all visible by default */
-	global.crosshair_visible = global.crosshair_needed;
-
-	/* loop over each player and load or create a bitmap */
-	for (player = 0; player < MAX_PLAYERS; player++)
-		if (global.crosshair_needed & (1 << player))
-		{
-			char filename[20];
-
-			/* first try to load a bitmap for the crosshair */
-			sprintf(filename, "cross%d.png", player);
-			global.crosshair_bitmap[player] = render_load_png(NULL, filename, NULL, NULL);
-
-			/* if that didn't work, make one up */
-			if (global.crosshair_bitmap[player] == NULL)
-			{
-				rgb_t color = crosshair_colors[player];
-				int x, y;
-
-				/* allocate a blank bitmap to start with */
-				global.crosshair_bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
-				fillbitmap(global.crosshair_bitmap[player], MAKE_ARGB(0x00,0xff,0xff,0xff), NULL);
-
-				/* extract the raw source data to it */
-				for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
-				{
-					/* assume it is mirrored vertically */
-					UINT32 *dest0 = BITMAP_ADDR32(global.crosshair_bitmap[player], y, 0);
-					UINT32 *dest1 = BITMAP_ADDR32(global.crosshair_bitmap[player], CROSSHAIR_RAW_SIZE - 1 - y, 0);
-
-					/* extract to two rows simultaneously */
-					for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
-						if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
-							dest0[x] = dest1[x] = MAKE_ARGB(0xff,0x00,0x00,0x00) | color;
-				}
-			}
-
-			/* create a texture to reference the bitmap */
-			global.crosshair_texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
-			render_texture_set_bitmap(global.crosshair_texture[player], global.crosshair_bitmap[player], NULL, 0, TEXFORMAT_ARGB32);
-		}
-}
-
-
-/*-------------------------------------------------
-    video_crosshair_toggle - toggle crosshair
-    visibility
--------------------------------------------------*/
-
-void video_crosshair_toggle(void)
-{
-	int player;
-
-	/* if we're all visible, turn all off */
-	if (global.crosshair_visible == global.crosshair_needed)
-		global.crosshair_visible = 0;
-
-	/* otherwise, turn on the first bit that isn't currently on and stop there */
-	else
-		for (player = 0; player < MAX_PLAYERS; player++)
-			if ((global.crosshair_needed & (1 << player)) && !(global.crosshair_visible & (1 << player)))
-			{
-				global.crosshair_visible |= 1 << player;
-				break;
-			}
-}
-
-
-/*-------------------------------------------------
-    get_crosshair_screen_mask - returns a bitmask
-    indicating on which screens the crosshair for
-    a player's should be displayed
--------------------------------------------------*/
-
-static UINT32 get_crosshair_screen_mask(int player)
-{
-	return (global.crosshair_visible & (1 << player)) ? 1 : 0;
-}
-
-
-/*-------------------------------------------------
-    crosshair_render - render the crosshairs
--------------------------------------------------*/
-
-static void crosshair_render(running_machine *machine)
-{
-	float x[MAX_PLAYERS], y[MAX_PLAYERS];
-	input_port_entry *ipt;
-	int portnum = -1;
-	int player;
-	UINT8 tscale;
-
-	/* skip if not needed */
-	if (global.crosshair_visible == 0)
-		return;
-
-	/* animate via crosshair_animate */
-	global.crosshair_animate += 0x04;
-
-	/* compute a color scaling factor from the current animation value */
-	if (global.crosshair_animate < 0x80)
-		tscale = 0xa0 + (0x60 * ( global.crosshair_animate & 0x7f) / 0x80);
-	else
-		tscale = 0xa0 + (0x60 * (~global.crosshair_animate & 0x7f) / 0x80);
-
-	/* read all the lightgun values */
-	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
-	{
-		/* keep track of the port number */
-		if (ipt->type == IPT_PORT)
-			portnum++;
-
-		/* compute the values */
-		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
-		{
-			float value = (float)(get_crosshair_pos(portnum, ipt->player, ipt->analog.crossaxis) - ipt->analog.min) / (float)(ipt->analog.max - ipt->analog.min);
-			if (ipt->analog.crossscale < 0)
-				value = -(1.0 - value) * ipt->analog.crossscale;
-			else
-				value *= ipt->analog.crossscale;
-			value += ipt->analog.crossoffset;
-
-			/* switch off the axis */
-			switch (ipt->analog.crossaxis)
-			{
-				case CROSSHAIR_AXIS_X:
-					x[ipt->player] = value;
-					if (ipt->analog.crossaltaxis != 0)
-						y[ipt->player] = ipt->analog.crossaltaxis;
-					break;
-
-				case CROSSHAIR_AXIS_Y:
-					y[ipt->player] = value;
-					if (ipt->analog.crossaltaxis != 0)
-						x[ipt->player] = ipt->analog.crossaltaxis;
-					break;
-			}
-		}
-	}
-
-	/* draw all crosshairs */
-	for (player = 0; player < MAX_PLAYERS; player++)
-	{
-		const device_config *screen;
-		int scrnum;
-
-		UINT32 scrmask = get_crosshair_screen_mask(player);
-
-		for (screen = video_screen_first(machine->config), scrnum = 0; screen != NULL; screen = video_screen_next(screen), scrnum++)
-			if (scrmask & (1 << scrnum))
-			{
-				/* add a quad assuming a 4:3 screen (this is not perfect) */
-				render_screen_add_quad(screen,
-							x[player] - 0.03f, y[player] - 0.04f,
-							x[player] + 0.03f, y[player] + 0.04f,
-							MAKE_ARGB(0xc0, tscale, tscale, tscale),
-							global.crosshair_texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			}
-	}
-}
-
-
-/*-------------------------------------------------
-    crosshair_free - free memory allocated for
-    the crosshairs
--------------------------------------------------*/
-
-static void crosshair_free(void)
-{
-	int player;
-
-	/* free bitmaps and textures for each player */
-	for (player = 0; player < MAX_PLAYERS; player++)
-	{
-		if (global.crosshair_texture[player] != NULL)
-			render_texture_free(global.crosshair_texture[player]);
-		global.crosshair_texture[player] = NULL;
-
-		if (global.crosshair_bitmap[player] != NULL)
-			bitmap_free(global.crosshair_bitmap[player]);
-		global.crosshair_bitmap[player] = NULL;
 	}
 }
 
