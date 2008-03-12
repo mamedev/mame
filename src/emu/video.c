@@ -357,6 +357,8 @@ void video_init(running_machine *machine)
 
 		state_save_register_item(unique_tag, 0, internal_state->vblank_start_time.seconds);
 		state_save_register_item(unique_tag, 0, internal_state->vblank_start_time.attoseconds);
+		state_save_register_item(unique_tag, 0, internal_state->vblank_end_time.seconds);
+		state_save_register_item(unique_tag, 0, internal_state->vblank_end_time.attoseconds);
 		state_save_register_item(unique_tag, 0, internal_state->frame_number);
 	}
 
@@ -1086,7 +1088,7 @@ attotime video_screen_get_time_until_vblank_end(const device_config *screen)
 	if (attotime_compare(current_time, internal_state->vblank_end_time) < 0)
 		ret = attotime_sub(internal_state->vblank_end_time, current_time);
 
-	/* otherwise computer the time until the next VBLANK period */
+	/* otherwise compute the time until the end of the next frame VBLANK period */
 	else
 		ret = attotime_sub(attotime_add_attoseconds(internal_state->vblank_end_time, internal_state->frame_period), current_time);
 
