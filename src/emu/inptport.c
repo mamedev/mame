@@ -265,6 +265,8 @@ static double rec_speed;
 static int extended_inp;
 
 /* for average speed calculations */
+static attotime last_update;
+static attoseconds_t last_delta;
 static int framecount;
 static double totalspeed;
 
@@ -1032,14 +1034,12 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void on_vblank(running_machine *machine, int vblank_state);
 static void setup_playback(running_machine *machine);
 static void setup_record(running_machine *machine);
 static void input_port_exit(running_machine *machine);
+static void input_port_frame(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
-static void input_port_vblank_start(running_machine *machine);
-static void input_port_vblank_end(void);
 static void update_digital_joysticks(void);
 static void update_analog_port(int port);
 static void interpolate_analog_port(int port);
@@ -1063,6 +1063,7 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 
 	/* add an exit callback */
 	add_exit_callback(machine, input_port_exit);
+	add_frame_callback(machine, input_port_frame);
 
 	/* start with the raw defaults and ask the OSD to customize them in the backup array */
 	memcpy(default_ports_backup, default_ports_builtin, sizeof(default_ports_backup));
@@ -1136,32 +1137,6 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 	/* open playback and record files if specified */
 	setup_playback(machine);
 	setup_record(machine);
-}
-
-
-void input_port_post_init(running_machine *machine)
-{
-	/* set up callback for updating the ports */
-	video_screen_register_global_vbl_cb(on_vblank);
-}
-
-
-
-/*************************************
- *
- *  VBLANK handler
- *
- *************************************/
-
-static void on_vblank(running_machine *machine, int vblank_state)
-{
-	/* VBLANK starting - read keyboard & update the status of the input ports */
-	if (vblank_state)
-		input_port_vblank_start(machine);
-
-	/* VBLANK ending - update IPT_VBLANK input ports */
-	else
-		input_port_vblank_end();
 }
 
 
@@ -1539,7 +1514,7 @@ static void input_port_postload(void)
 	}
 
 	/* run an initial update */
-	input_port_vblank_start(Machine);
+	input_port_frame(Machine);
 }
 
 
@@ -2799,22 +2774,22 @@ profiler_mark(PROFILER_END);
  *
  *************************************/
 
-static void update_playback_record(int portnum, UINT32 portvalue)
+static void update_playback_record(running_machine *machine, int portnum, UINT32 portvalue)
 {
 	/* handle playback */
-	if (Machine->playback_file != NULL)
+	if (machine->playback_file != NULL)
 	{
 		UINT32 result;
 
 		/* a successful read goes into the playback field which overrides everything else */
-		if (mame_fread(Machine->playback_file, &result, sizeof(result)) == sizeof(result))
+		if (mame_fread(machine->playback_file, &result, sizeof(result)) == sizeof(result))
 			portvalue = port_info[portnum].playback = BIG_ENDIANIZE_INT32(result);
 
 		/* a failure causes us to close the playback file and stop playback */
 		else
 		{
-			mame_fclose(Machine->playback_file);
-			Machine->playback_file = NULL;
+			mame_fclose(machine->playback_file);
+			machine->playback_file = NULL;
 			if (!extended_inp)
 				popmessage("End of playback");
 			else
@@ -2826,19 +2801,19 @@ static void update_playback_record(int portnum, UINT32 portvalue)
 	}
 
 	/* handle recording */
-	if (Machine->record_file != NULL)
+	if (machine->record_file != NULL)
 	{
 		UINT32 result = BIG_ENDIANIZE_INT32(portvalue);
 
 		/* a successful write just works */
-		if (mame_fwrite(Machine->record_file, &result, sizeof(result)) == sizeof(result))
+		if (mame_fwrite(machine->record_file, &result, sizeof(result)) == sizeof(result))
 			;
 
 		/* a failure causes us to close the record file and stop recording */
 		else
 		{
-			mame_fclose(Machine->record_file);
-			Machine->record_file = NULL;
+			mame_fclose(machine->record_file);
+			machine->record_file = NULL;
 		}
 	}
 }
@@ -2884,12 +2859,22 @@ void input_port_update_defaults(void)
  *
  *************************************/
 
-static void input_port_vblank_start(running_machine *machine)
+static void input_port_frame(running_machine *machine)
 {
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
+	attotime curtime = timer_get_time();
 	int portnum, bitnum;
 
 profiler_mark(PROFILER_INPUT);
+
+	/* track the duration of the previous frame */
+	last_delta = attotime_to_attoseconds(attotime_sub(curtime, last_update)) / ATTOSECONDS_PER_SECOND_SQRT;
+	last_update = curtime;
+
+	/* update all analog ports if the UI isn't visible */
+	if (!ui_visible)
+		for (portnum = 0; portnum < MAX_INPUT_PORTS; portnum++)
+			update_analog_port(portnum);
 
 	/* update the digital joysticks first */
 	update_digital_joysticks();
@@ -2958,15 +2943,15 @@ profiler_mark(PROFILER_INPUT);
 							UINT8 mask;
 							switch( port->way )
 							{
-							case 4:
-								mask = joyinfo->current4way;
-								break;
-							case 16:
-								mask = 0xff;
-								break;
-							default:
-								mask = joyinfo->current;
-								break;
+								case 4:
+									mask = joyinfo->current4way;
+									break;
+								case 16:
+									mask = 0xff;
+									break;
+								default:
+									mask = joyinfo->current;
+									break;
 							}
 							if ((mask >> JOYSTICK_DIR_FOR_PORT(port)) & 1)
 								portinfo->digital ^= port->mask;
@@ -3025,7 +3010,7 @@ profiler_mark(PROFILER_INPUT);
 
 		/* non-analog ports must be manually updated */
 		else
-			update_playback_record(portnum, readinputport(portnum));
+			update_playback_record(machine, portnum, readinputport(portnum));
 	}
 
 	/* store speed read from INP file, if extended INP */
@@ -3038,29 +3023,6 @@ profiler_mark(PROFILER_INPUT);
 		rec_speed *= 100;
 		totalspeed += rec_speed;
 	}
-
-profiler_mark(PROFILER_END);
-}
-
-
-
-/*************************************
- *
- *  VBLANK end routine
- *
- *************************************/
-
-static void input_port_vblank_end(void)
-{
-	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
-	int port;
-
-profiler_mark(PROFILER_INPUT);
-
-	/* update all analog ports if the UI isn't visible */
-	if (!ui_visible)
-		for (port = 0; port < MAX_INPUT_PORTS; port++)
-			update_analog_port(port);
 
 profiler_mark(PROFILER_END);
 }
@@ -3380,8 +3342,11 @@ profiler_mark(PROFILER_INPUT);
 			INT32 value;
 
 			/* interpolate or not */
-			if (info->interpolate && !port->analog.reset)
-				current = info->previous + cpu_scalebyfcount(info->accum - info->previous);
+			if (info->interpolate && !port->analog.reset && last_delta != 0)
+			{
+				attoseconds_t time_since_last = attotime_to_attoseconds(attotime_sub(timer_get_time(), last_update)) / ATTOSECONDS_PER_SECOND_SQRT;
+				current = info->previous + ((INT64)(info->accum - info->previous) * time_since_last / last_delta);
+			}
 			else
 				current = info->accum;
 
@@ -3457,7 +3422,7 @@ UINT32 readinputport(int port)
 
 	/* if we have analog data, update the recording state */
 	if (port_info[port].analoginfo)
-		update_playback_record(port, result);
+		update_playback_record(Machine, port, result);
 
 	/* if we're playing back, use the recorded value for inputs instead */
 	if (Machine->playback_file != NULL)

@@ -65,8 +65,5 @@ extern running_machine *Machine;
    that the interrupt handler will be called once. */
 int cpu_getiloops(void);
 
-/* Scales a given value by the ratio of fcount / fperiod */
-int cpu_scalebyfcount(int value);
-
 
 #endif	/* __DEPRECAT_H__ */

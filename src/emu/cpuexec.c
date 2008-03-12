@@ -742,29 +742,6 @@ void cpu_triggerint(running_machine *machine, int cpunum)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_scalebyfcount - scale by time between
-    refresh timers
--------------------------------------------------*/
-
-int cpu_scalebyfcount(int value)
-{
-//  attotime refresh_elapsed = timer_timeelapsed(refresh_timer);
-//  int result;
-
-	/* shift off some bits to ensure no overflow */
-//  if (value < 65536)
-//      result = value * (refresh_elapsed.attoseconds >> 16) / (refresh_period.attoseconds >> 16);
-//  else
-//      result = value * (refresh_elapsed.attoseconds >> 32) / (refresh_period.attoseconds >> 32);
-//  if (value >= 0)
-//      return (result < value) ? result : value;
-//  else
-//      return (result > value) ? result : value;
-	return 0;
-}
-
-
-/*-------------------------------------------------
     cpu_getiloops - return the cheesy VBLANK
     interrupt counter (deprecated)
 -------------------------------------------------*/

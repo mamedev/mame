@@ -700,7 +700,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const UINT32 
 				}
 
 				/* if this is a program space, auto-assign implicit ROM entries */
-				if ((FPTR)entry->read.handler == STATIC_ROM && !entry->region)
+				if ((FPTR)entry->read.generic == STATIC_ROM && !entry->region)
 				{
 					entry->region = REGION_CPU1 + cpunum;
 					entry->region_offs = entry->addrstart;

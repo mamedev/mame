@@ -9010,7 +9010,7 @@ static void SetSearchRegionDefaultName(SearchRegion * region)
 
 			if(region->writeHandler)
 			{
-				genf *				handler = region->writeHandler->write.handler;
+				genf *				handler = region->writeHandler->write.generic;
 				FPTR				handlerAddress = (FPTR)handler;
 
 				if(	(handlerAddress >= ((FPTR)SMH_BANK1)) && (handlerAddress <= ((FPTR)SMH_BANK24)))
@@ -9159,9 +9159,9 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 					SearchRegion						* traverse;
 					int									count = 0;
 
-					map = memory_get_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
+					map = memory_get_address_map(info->targetIdx, ADDRESS_SPACE_PROGRAM);
 					for (entry = map->entrylist; entry != NULL; entry = entry->next)
-						if (entry->write.handler)
+						if (entry->write.generic)
 							count++;
 
 					info->regionList = calloc(sizeof(SearchRegion), count);
@@ -9170,7 +9170,7 @@ static void BuildSearchRegions(running_machine *machine, SearchInfo * info)
 
 					for (entry = map->entrylist; entry != NULL; entry = entry->next)
 					{
-						if (entry->write.handler)
+						if (entry->write.generic)
 						{
 							UINT32	length = (entry->addrend - entry->addrstart) + 1;
 
@@ -10466,11 +10466,11 @@ static void DoSearch(SearchInfo * search)
 
 static UINT8 ** LookupHandlerMemory(UINT8 cpu, UINT32 address, UINT32 * outRelativeAddress)
 {
-	const address_map	* map = memory_get_map(cpu, ADDRESS_SPACE_PROGRAM);
+	const address_map	* map = memory_get_address_map(cpu, ADDRESS_SPACE_PROGRAM);
 	const address_map_entry *entry;
 
 	for (entry = map->entrylist; entry != NULL; entry = entry->next)
-		if (entry->write.handler != NULL && (address >= entry->addrstart) && (address <= entry->addrend))
+		if (entry->write.generic != NULL && (address >= entry->addrstart) && (address <= entry->addrend))
 		{
 			if(outRelativeAddress)
 				*outRelativeAddress = address - entry->addrstart;

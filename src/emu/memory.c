@@ -167,7 +167,7 @@ typedef enum _read_or_write read_or_write;
     MACROS
 ***************************************************************************/
 
-/* ----- table lookup helpers ----- */
+/* table lookup helpers */
 #define LEVEL1_INDEX(a)			((a) >> LEVEL2_BITS)
 #define LEVEL2_INDEX(e,a)		((1 << LEVEL1_BITS) + (((e) - SUBTABLE_BASE) << LEVEL2_BITS) + ((a) & ((1 << LEVEL2_BITS) - 1)))
 
@@ -236,23 +236,15 @@ struct _bank_data
 	void *					entryd[MAX_BANK_ENTRIES];/* array of decrypted entries for this bank */
 };
 
-typedef union _rwhandlers rwhandlers;
-union _rwhandlers
-{
-	genf *					generic;				/* generic handler void */
-	read_handlers			read;					/* read handlers */
-	write_handlers			write;					/* write handlers */
-};
-
 /* In memory.h: typedef struct _handler_data handler_data */
 struct _handler_data
 {
-	rwhandlers				handler;				/* function pointer for handler */
+	memory_handler			handler;				/* function pointer for handler */
+	void *					object;					/* object associated with the handler */
+	const char *			name;					/* name of the handler */
 	offs_t					bytestart;				/* byte-adjusted start address for handler */
 	offs_t					byteend;				/* byte-adjusted end address for handler */
 	offs_t					bytemask;				/* byte-adjusted mask against the final address */
-	void *					object;					/* object associated with the handler */
-	const char *			name;					/* name of the handler */
 };
 
 typedef struct _subtable_data subtable_data;
@@ -490,23 +482,22 @@ INLINE void adjust_addresses(addrspace_data *space, offs_t *start, offs_t *end, 
 
 void memory_init(running_machine *machine)
 {
-	int i;
+	int spacenum;
 
-	for (i = 0; i < ADDRESS_SPACES; i++)
-		log_unmap[i] = TRUE;
+	add_exit_callback(machine, memory_exit);
 
-	/* no current context to start */
+	/* reset globals */
 	cur_context = -1;
+	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		log_unmap[spacenum] = TRUE;
 
 	/* reset the shared pointers and bank pointers */
 	memset(shared_ptr, 0, sizeof(shared_ptr));
 	memset(bank_ptr, 0, sizeof(bank_ptr));
 	memset(bankd_ptr, 0, sizeof(bankd_ptr));
 
-	/* init the CPUs */
+	/* build up the cpudata array with info about all CPUs and address spaces */
 	memory_init_cpudata(machine->config);
-
-	add_exit_callback(machine, memory_exit);
 
 	/* preflight the memory handlers and check banks */
 	memory_init_preflight(machine->config);
@@ -636,17 +627,6 @@ const data_accessors *memory_get_accessors(int spacenum, int databits, int endia
 {
 	int accessorindex = (databits == 8) ? 0 : (databits == 16) ? 1 : (databits == 32) ? 2 : 3;
 	return &memory_accessors[spacenum][accessorindex][(endianness == CPU_IS_LE) ? 0 : 1];
-}
-
-
-/*-------------------------------------------------
-    memory_get_map - return a pointer to a CPU's
-    memory map
--------------------------------------------------*/
-
-const address_map *memory_get_map(int cpunum, int spacenum)
-{
-	return cpudata[cpunum].space[spacenum].map;
 }
 
 
@@ -1185,7 +1165,7 @@ UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t add
 
 /*-------------------------------------------------
     address_map_alloc - build and allocate an 
-    address map
+    address map for a CPU's address space
 -------------------------------------------------*/
 
 address_map *address_map_alloc(const machine_config *config, int cpunum, int spacenum)
@@ -1228,6 +1208,18 @@ void address_map_free(address_map *map)
 	
 	/* free the map */
 	free(map);
+}
+
+
+/*-------------------------------------------------
+    memory_get_address_map - return a pointer to 
+    the constructed address map for a CPU's 
+    address space
+-------------------------------------------------*/
+
+const address_map *memory_get_address_map(int cpunum, int spacenum)
+{
+	return cpudata[cpunum].space[spacenum].map;
 }
 
 
@@ -1504,7 +1496,7 @@ static void memory_init_preflight(const machine_config *config)
 					adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
 
 					/* if this is a ROM handler without a specified region, attach it to the implicit region */
-					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.handler) && entry->region == 0)
+					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == 0)
 					{
 						/* make sure it fits within the memory region before doing so, however */
 						if (entry->byteend < cpu->regionsize)
@@ -1532,10 +1524,10 @@ static void memory_init_preflight(const machine_config *config)
 						entry->memory = memory_region(entry->region) + entry->region_offs;
 
 					/* assign static banks for explicitly specified entries */
-					if (HANDLER_IS_BANK(entry->read.handler))
-						bank_assign_static(HANDLER_TO_BANK(entry->read.handler), cpunum, spacenum, ROW_READ, entry->bytestart, entry->byteend);
-					if (HANDLER_IS_BANK(entry->write.handler))
-						bank_assign_static(HANDLER_TO_BANK(entry->write.handler), cpunum, spacenum, ROW_WRITE, entry->bytestart, entry->byteend);
+					if (HANDLER_IS_BANK(entry->read.generic))
+						bank_assign_static(HANDLER_TO_BANK(entry->read.generic), cpunum, spacenum, ROW_READ, entry->bytestart, entry->byteend);
+					if (HANDLER_IS_BANK(entry->write.generic))
+						bank_assign_static(HANDLER_TO_BANK(entry->write.generic), cpunum, spacenum, ROW_WRITE, entry->bytestart, entry->byteend);
 				}
 
 				/* now loop over all the handlers and enforce the address mask */
@@ -1579,7 +1571,7 @@ static void memory_init_populate(running_machine *machine)
 						for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
 						last_entry = entry;
 
-						if (entry->read.handler != NULL)
+						if (entry->read.generic != NULL)
 						{
 							void *object = machine;
 							if (entry->read_devtype != NULL)
@@ -1588,9 +1580,9 @@ static void memory_init_populate(running_machine *machine)
 								if (object == NULL)
 									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
 							}
-							install_mem_handler_private(space, ROW_READ, space->dbits, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->read.handler, object, entry->read_name);
+							install_mem_handler_private(space, ROW_READ, space->dbits, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->read.generic, object, entry->read_name);
 						}
-						if (entry->write.handler != NULL)
+						if (entry->write.generic != NULL)
 						{
 							void *object = machine;
 							if (entry->write_devtype != NULL)
@@ -1599,7 +1591,7 @@ static void memory_init_populate(running_machine *machine)
 								if (object == NULL)
 									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
 							}
-							install_mem_handler_private(space, ROW_WRITE, space->dbits, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->write.handler, object, entry->write_name);
+							install_mem_handler_private(space, ROW_WRITE, space->dbits, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->write.generic, object, entry->write_name);
 						}
 					}
 				}
@@ -1815,40 +1807,45 @@ static genf *bank_assign_dynamic(int cpunum, int spacenum, read_or_write readorw
 
 static UINT8 get_handler_index(handler_data *table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask)
 {
-	int i;
-
-	bytestart &= bytemask;
+	int entry;
 
 	/* all static handlers are hardcoded */
 	if (HANDLER_IS_STATIC(handler))
 	{
-		i = (FPTR)handler;
+		entry = (FPTR)handler;
+		
+		/* if it is a bank, copy in the relevant information */
 		if (HANDLER_IS_BANK(handler))
 		{
-			table[i].bytestart = bytestart;
-			table[i].byteend = byteend;
-			table[i].bytemask = bytemask;
-			table[i].name = handler_name;
-			table[i].object = object;
+			handler_data *hdata = &table[entry];
+			hdata->bytestart = bytestart;
+			hdata->byteend = byteend;
+			hdata->bytemask = bytemask;
+			hdata->name = handler_name;
 		}
-		return i;
+		return entry;
 	}
 
 	/* otherwise, we have to search */
-	for (i = STATIC_COUNT; i < SUBTABLE_BASE; i++)
+	for (entry = STATIC_COUNT; entry < SUBTABLE_BASE; entry++)
 	{
-		if (table[i].handler.generic == NULL)
+		handler_data *hdata = &table[entry];
+		
+		/* if we hit a NULL hdata, then we need to allocate this one as a new one */
+		if (hdata->handler.generic == NULL)
 		{
-			table[i].handler.generic = handler;
-			table[i].bytestart = bytestart;
-			table[i].byteend = byteend;
-			table[i].bytemask = bytemask;
-			table[i].name = handler_name;
-			table[i].object = object;
-			return i;
+			hdata->handler.generic = handler;
+			hdata->bytestart = bytestart;
+			hdata->byteend = byteend;
+			hdata->bytemask = bytemask;
+			hdata->name = handler_name;
+			hdata->object = object;
+			return entry;
 		}
-		if (table[i].handler.generic == handler && table[i].bytestart == bytestart && table[i].bytemask == bytemask && table[i].object == object)
-			return i;
+		
+		/* if we find a perfect match, return a duplicate entry */
+		if (hdata->handler.generic == handler && hdata->bytestart == bytestart && hdata->bytemask == bytemask && hdata->object == object)
+			return entry;
 	}
 	return 0;
 }
@@ -2121,7 +2118,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
 		return 1;
 
-	handler = (FPTR)entry->write.handler;
+	handler = (FPTR)entry->write.generic;
 	if (handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&
@@ -2131,7 +2128,7 @@ static int amentry_needs_backing_store(int cpunum, int spacenum, const address_m
 			return 1;
 	}
 
-	handler = (FPTR)entry->read.handler;
+	handler = (FPTR)entry->read.generic;
 	if (handler < STATIC_COUNT)
 	{
 		if (handler != STATIC_INVALID &&

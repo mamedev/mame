@@ -1585,7 +1585,6 @@ static void init_machine(running_machine *machine)
 	crosshair_init(machine);
 
 	sound_init(machine);
-	input_port_post_init(machine);
 
 #ifdef ENABLE_DEBUGGER
 	/* initialize the debugger */
