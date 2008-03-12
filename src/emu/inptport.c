@@ -1984,6 +1984,9 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 	while (entrytype != INPUT_TOKEN_END)
 	{
 		UINT32 mask, defval, type, val;
+#ifdef MESS
+		UINT16 category;
+#endif /* MESS */
 
 		/* unpack the token from the first entry */
 		TOKEN_GET_UINT32_UNPACK1(ipt, entrytype, 8);
@@ -2245,10 +2248,11 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 
 			case INPUT_TOKEN_CATEGORY_SETTING:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
+				TOKEN_GET_UINT64_UNPACK3(ipt, entrytype, 8, defval, 32, category, 16);
 				port = input_port_initialize(param, IPT_CATEGORY_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				port->name = input_port_string_from_token(*ipt++);
+				port->category = category;
 				break;
 #endif /* MESS */
 

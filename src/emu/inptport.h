@@ -849,7 +849,7 @@ struct _ext_inp_header
 	TOKEN_STRING(_name),
 
 #define PORT_CATEGORY_ITEM(_default,_name,_category) \
-	TOKEN_UINT64_PACK3(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32, _category, 32), \
+	TOKEN_UINT64_PACK3(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32, _category, 16), \
 	TOKEN_STRING(_name),
 #endif /* MESS */
 
