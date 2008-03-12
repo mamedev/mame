@@ -144,7 +144,7 @@ int mame_debug_is_active(void)
     on_vblank - called when a VBLANK hits
 -------------------------------------------------*/
 
-static void on_vblank(running_machine *machine, int vblank_state)
+static void on_vblank(const device_config *device, int vblank_state)
 {
 	/* if we're configured to stop on VBLANK, break */
 	if (vblank_state && break_on_vblank)
@@ -296,7 +296,8 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* add callback for breaking on VBLANK */
-	video_screen_register_global_vbl_cb(on_vblank);
+	if (machine->primary_screen != NULL)
+		video_screen_register_vbl_cb(machine->primary_screen, on_vblank);
 
 	add_exit_callback(machine, debug_cpu_exit);
 }

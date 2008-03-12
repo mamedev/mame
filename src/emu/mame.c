@@ -581,7 +581,7 @@ void mame_frame_update(running_machine *machine)
 {
 	callback_item *cb;
 
-	/* call all registered reset callbacks */
+	/* call all registered frame callbacks */
 	for (cb = machine->mame_data->frame_callback_list; cb; cb = cb->next)
 		(*cb->func.frame)(machine);
 }

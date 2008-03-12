@@ -124,9 +124,6 @@ struct _video_global
 	/* snapshot stuff */
 	render_target *			snap_target;		/* screen shapshot target */
 	bitmap_t *				snap_bitmap;		/* screen snapshot bitmap */
-
-	/* global VBLANK callbacks */
-	vblank_state_changed_global_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
 };
 
 
@@ -1187,39 +1184,6 @@ void video_screen_register_vbl_cb(const device_config *screen, vblank_state_chan
 }
 
 
-/*-------------------------------------------------
-    video_screen_register_global_vbl_cb - registers a
-    VBLANK callback for a specific screen
--------------------------------------------------*/
-
-void video_screen_register_global_vbl_cb(vblank_state_changed_global_func vbl_cb)
-{
-	int i, found;
-
-	/* validate arguments */
-	assert(vbl_cb != NULL);
-
-	/* check if we already have this callback registered */
-	found = FALSE;
-	for (i = 0; i < MAX_VBL_CB; i++)
-	{
-		if (global.vbl_cbs[i] == NULL)
-			break;
-
-		if (global.vbl_cbs[i] == vbl_cb)
-			found = TRUE;
-	}
-
-	/* check that there is room */
-	assert(i != MAX_VBL_CB);
-
-	/* if not found, register and increment count */
-	if (!found)
-		global.vbl_cbs[i] = vbl_cb;
-}
-
-
-
 /***************************************************************************
     VIDEO SCREEN DEVICE INTERFACE
 ***************************************************************************/
@@ -1303,17 +1267,9 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
 		internal_state->vbl_cbs[i](screen, TRUE);
 
-	/* for the first screen */
-	if (screen == machine->primary_screen)
-	{
-		/* call the global callbacks */
-		for (i = 0; global.vbl_cbs[i] != NULL; i++)
-			global.vbl_cbs[i](machine, TRUE);
-
-		/* do we update the screen now? */
-		if (!(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
-			video_frame_update(machine, FALSE);
-	}
+	/* if this is the primary screen and we need to update now */
+	if ((screen == machine->primary_screen) && !(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+		video_frame_update(machine, FALSE);
 
 	/* reset the timers */
 	timer_adjust_oneshot(internal_state->vblank_begin_timer, attotime_make(0, internal_state->frame_period), 0);
@@ -1337,17 +1293,9 @@ static TIMER_CALLBACK( vblank_end_callback )
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
 		internal_state->vbl_cbs[i](screen, FALSE);
 
-	/* for the first screen */
-	if (screen == machine->primary_screen)
-	{
-		/* call the global callbacks */
-		for (i = 0; global.vbl_cbs[i] != NULL; i++)
-			global.vbl_cbs[i](machine, FALSE);
-
-		/* update if we handn't already */
-		if (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK)
-			video_frame_update(machine, FALSE);
-	}
+	/* if this is the primary screen and we need to update now */
+	if ((screen == machine->primary_screen) && (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+		video_frame_update(machine, FALSE);
 
 	/* increment the frame number counter */
 	internal_state->frame_number++;
