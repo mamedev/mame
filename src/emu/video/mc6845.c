@@ -10,7 +10,7 @@
         * Motorola 6845, 6845-1
         * Hitachi 46505
         * Rockwell 6545, 6545-1 (= Synertek SY6545-1)
-        * Commodore 6545-1
+        * MOS Technology 6545-1
 
     (1) as per the document at
     http://www.6502.org/users/andre/hwinfo/crtc/diffs.html
@@ -218,7 +218,7 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 
 static void recompute_parameters(mc6845_t *mc6845, int postload)
 {
-	if (mc6845->intf)
+	if (mc6845->intf != NULL)
 	{
 		UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
@@ -653,17 +653,19 @@ static void *common_start(const device_config *device, int device_type)
 	mc6845 = auto_malloc(sizeof(*mc6845));
 	memset(mc6845, 0, sizeof(*mc6845));
 
-	mc6845->device_type = device_type;
 	mc6845->intf = device->static_config;
-	mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
+	mc6845->device_type = device_type;
 
-	assert(mc6845->intf->clock > 0);
-	assert(mc6845->intf->hpixels_per_column > 0);
-	assert(mc6845->screen != NULL);
-
-	/* create the timers */
 	if (mc6845->intf != NULL)
 	{
+		assert(mc6845->intf->clock > 0);
+		assert(mc6845->intf->hpixels_per_column > 0);
+
+		/* get the screen device */
+		mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
+		assert(mc6845->screen != NULL);
+
+		/* create the timers */
 		if (mc6845->intf->on_de_changed != NULL)
 			mc6845->de_changed_timer = timer_alloc(de_changed_timer_cb, (void *)device);
 
@@ -820,7 +822,7 @@ DEVICE_GET_INFO( c6545_1 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Commodore 6545-1";				break;
+		case DEVINFO_STR_NAME:							info->s = "MOS Technology 6545-1";			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(c6545_1);	break;
