@@ -970,8 +970,11 @@ int video_screen_get_vblank(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
-	int vpos = video_screen_get_vpos(screen);
-	return (vpos < internal_state->visarea.min_y || vpos > internal_state->visarea.max_y);
+
+	/* we should never be called with no VBLANK period - indication of a buggy driver */
+	assert(internal_state->vblank_period != 0);
+
+	return (attotime_compare(timer_get_time(), internal_state->vblank_end_time) < 0);
 }
 
 
@@ -1085,7 +1088,7 @@ attotime video_screen_get_time_until_vblank_end(const device_config *screen)
 	attotime current_time = timer_get_time();
 
 	/* we are in the VBLANK region, compute the time until the end of the current VBLANK period */
-	if (attotime_compare(current_time, internal_state->vblank_end_time) < 0)
+	if (video_screen_get_vblank(screen))
 		ret = attotime_sub(internal_state->vblank_end_time, current_time);
 
 	/* otherwise compute the time until the end of the next frame VBLANK period */
