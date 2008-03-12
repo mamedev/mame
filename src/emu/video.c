@@ -66,6 +66,7 @@ struct _internal_screen_state
 	attoseconds_t			pixeltime;				/* attoseconds per pixel */
 	attoseconds_t 			vblank_period;			/* attoseconds per VBLANK period */
 	attotime 				vblank_start_time;		/* time of last VBLANK start */
+	attotime 				vblank_end_time;		/* time of last VBLANK end */
 	emu_timer *				vblank_begin_timer;		/* timer to signal VBLANK start */
 	emu_timer *				vblank_end_timer;		/* timer to signal VBLANK end */
 	emu_timer *				scanline0_timer;		/* scanline 0 timer */
@@ -341,6 +342,7 @@ void video_init(running_machine *machine)
 
 		/* reset VBLANK timing */
 		internal_state->vblank_start_time = attotime_zero;
+		internal_state->vblank_end_time = attotime_make(0, internal_state->vblank_period);
 
 		/* allocate a timer to generate per-scanline updates */
 		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
@@ -1075,7 +1077,20 @@ attotime video_screen_get_time_until_vblank_start(const device_config *screen)
 
 attotime video_screen_get_time_until_vblank_end(const device_config *screen)
 {
-	return video_screen_get_time_until_pos(screen, video_screen_get_visible_area(screen)->min_y, 0);
+	attotime ret;
+	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+	attotime current_time = timer_get_time();
+
+	/* we are in the VBLANK region, compute the time until the end of the current VBLANK period */
+	if (attotime_compare(current_time, internal_state->vblank_end_time) < 0)
+		ret = attotime_sub(internal_state->vblank_end_time, current_time);
+
+	/* otherwise computer the time until the next VBLANK period */
+	else
+		ret = attotime_sub(attotime_add_attoseconds(internal_state->vblank_end_time, internal_state->frame_period), current_time);
+
+	return ret;
 }
 
 
@@ -1256,12 +1271,13 @@ DEVICE_GET_INFO( video_screen )
 static TIMER_CALLBACK( vblank_begin_callback )
 {
 	int i;
-	const device_config *screen = ptr;
+	device_config *screen = ptr;
 	screen_state *state = get_safe_token(screen);
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 
 	/* reset the starting VBLANK time */
 	internal_state->vblank_start_time = timer_get_time();
+	internal_state->vblank_end_time = attotime_add_attoseconds(internal_state->vblank_start_time, internal_state->vblank_period);
 
 	/* call the screen specific callbacks */
 	for (i = 0; internal_state->vbl_cbs[i] != NULL; i++)
@@ -1271,9 +1287,14 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	if ((screen == machine->primary_screen) && !(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		video_frame_update(machine, FALSE);
 
-	/* reset the timers */
-	timer_adjust_oneshot(internal_state->vblank_begin_timer, attotime_make(0, internal_state->frame_period), 0);
-	timer_adjust_oneshot(internal_state->vblank_end_timer, video_screen_get_time_until_vblank_end(screen), 0);
+	/* reset the VBLANK start timer for the next frame */
+	timer_adjust_oneshot(internal_state->vblank_begin_timer, video_screen_get_time_until_vblank_start(screen), 0);
+
+	/* if no VBLANK period, call the VBLANK end callback immedietely, otherwise reset the timer */
+	if (internal_state->vblank_period == 0)
+		vblank_end_callback(machine, screen, 0);
+	else
+		timer_adjust_oneshot(internal_state->vblank_end_timer, video_screen_get_time_until_vblank_end(screen), 0);
 }
 
 
