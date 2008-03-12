@@ -131,10 +131,10 @@ VIDEO_START( labyrunr )
 	tilemap_set_transparent_pen(layer0,0);
 	tilemap_set_transparent_pen(layer1,0);
 
-	clip0 = machine->screen[0].visarea;
+	clip0 = *video_screen_get_visible_area(machine->primary_screen);
 	clip0.min_x += 40;
 
-	clip1 = machine->screen[0].visarea;
+	clip1 = *video_screen_get_visible_area(machine->primary_screen);
 	clip1.max_x = 39;
 	clip1.min_x = 0;
 

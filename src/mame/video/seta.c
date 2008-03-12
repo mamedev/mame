@@ -903,7 +903,8 @@ static VIDEO_UPDATE( seta_layers )
 	int order	= 	0;
 	int flip	=	(spriteram16[ 0x600/2 ] & 0x40) >> 6;
 
-	int vis_dimy = screen->machine->screen[0].visarea.max_y - screen->machine->screen[0].visarea.min_y + 1;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	int vis_dimy = visarea->max_y - visarea->min_y + 1;
 
 	flip ^= tilemaps_flip;
 

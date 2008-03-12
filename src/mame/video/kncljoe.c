@@ -187,17 +187,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const gfx_element *gfx = machine->gfx[1 + sprite_bank];
 	int i, j;
 	static const int pribase[4]={0x0180, 0x0080, 0x0100, 0x0000};
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/* score covers sprites */
 	if (flipscreen)
 	{
-		if (clip.max_y > machine->screen[0].visarea.max_y - 64)
-			clip.max_y = machine->screen[0].visarea.max_y - 64;
+		if (clip.max_y > visarea->max_y - 64)
+			clip.max_y = visarea->max_y - 64;
 	}
 	else
 	{
-		if (clip.min_y < machine->screen[0].visarea.min_y + 64)
-			clip.min_y = machine->screen[0].visarea.min_y + 64;
+		if (clip.min_y < visarea->min_y + 64)
+			clip.min_y = visarea->min_y + 64;
 	}
 
 	for (i=0; i<4; i++)

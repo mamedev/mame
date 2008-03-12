@@ -122,7 +122,7 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 {
 	int bgcolor = machine->pens[0];
 	int sprite_transp = machine->pens[0x24];
-	const rectangle *clip = &machine->screen[0].visarea;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 	int y0 = 240 - state->cpu0_out[3];
 	int x0 = 256 - state->cpu0_out[2];
 	int x,y,sx,sy;
@@ -150,8 +150,8 @@ static int collision_check(running_machine *machine, grchamp_state *state, bitma
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
-				if( (sx >= clip->min_x) && (sx <= clip->max_x) &&
-					(sy >= clip->min_y) && (sy <= clip->max_y) )
+				if( (sx >= visarea->min_x) && (sx <= visarea->max_x) &&
+					(sy >= visarea->min_y) && (sy <= visarea->max_y) )
 				{
 					// Collision check uses only 16 pens!
 					pixel = *BITMAP_ADDR16(bitmap, sy, sx) % 16;

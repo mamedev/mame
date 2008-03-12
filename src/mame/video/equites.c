@@ -46,10 +46,11 @@ UINT16 *splndrbt_scrollx, *splndrbt_scrolly;
 static void video_init_common(running_machine *machine)
 {
 	int i;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	// set defaults
 	maskwidth = 8;
-	maskheight = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1;
+	maskheight = visarea->max_y - visarea->min_y + 1;
 	maskcolor = get_black_pen(machine);
 	scrollx = scrolly = 0;
 	for (i=0; i<4; i++) bgcolor[i] = 0;
@@ -226,7 +227,7 @@ VIDEO_START( splndrbt )
 
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_INDEXED16);
 
-	halfclip = machine->screen[0].visarea;
+	halfclip = *video_screen_get_visible_area(machine->primary_screen);
 	i = halfclip.max_y - halfclip.min_y + 1;
 	halfclip.max_y = halfclip.min_y + (i >> 1) - 1;
 
@@ -250,7 +251,7 @@ VIDEO_START( splndrbt )
 	memset(dirtybuf, 1, 0x800);
 
 	prestep = auto_malloc(i * sizeof(struct PRESTEP_TYPE));
-	splndrbt_prestep(prestep, &machine->screen[0].visarea, BMW, 434, 96, 480);
+	splndrbt_prestep(prestep, video_screen_get_visible_area(machine->primary_screen), BMW, 434, 96, 480);
 
 	defcharram = videoram16 + videoram_size / 2;
 

@@ -542,7 +542,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 {
 	/* draw the stars */
 
@@ -566,14 +566,11 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 
 			if   ( (set_a == star_seed_tab[star_cntr].set) ||  ( set_b == star_seed_tab[star_cntr].set) )
 			{
-
 				x = (star_seed_tab[star_cntr].x + stars_scrollx) % 256 + 16;
 				y = (112 + star_seed_tab[star_cntr].y + stars_scrolly) % 256;
 			   /* 112 is a tweak to get alignment about perfect */
 
-
-
-				if (y >= machine->screen[0].visarea.min_y && y <= machine->screen[0].visarea.max_y)
+				if (y >= cliprect->min_y && y <= cliprect->max_y)
 					*BITMAP_ADDR16(bitmap, y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
 			}
 
@@ -584,7 +581,7 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 VIDEO_UPDATE( galaga )
 {
 	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
-	draw_stars(screen->machine,bitmap,cliprect);
+	draw_stars(bitmap,cliprect);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;

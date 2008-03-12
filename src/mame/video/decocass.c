@@ -592,11 +592,11 @@ VIDEO_START( decocass )
 	tilemap_set_transparent_pen( bg_tilemap_r, 0 );
 	tilemap_set_transparent_pen( fg_tilemap, 0 );
 
-	bg_tilemap_l_clip = machine->screen[0].visarea;
-	bg_tilemap_l_clip.max_y = machine->screen[0].height / 2;
+	bg_tilemap_l_clip = *video_screen_get_visible_area(machine->primary_screen);
+	bg_tilemap_l_clip.max_y = video_screen_get_height(machine->primary_screen) / 2;
 
-	bg_tilemap_r_clip = machine->screen[0].visarea;
-	bg_tilemap_r_clip.min_y = machine->screen[0].height / 2;
+	bg_tilemap_r_clip = *video_screen_get_visible_area(machine->primary_screen);
+	bg_tilemap_r_clip.min_y = video_screen_get_height(machine->primary_screen) / 2;
 
 	/* background videroam bits D0-D3 are shared with the tileram */
 	decocass_bgvideoram = decocass_tileram;

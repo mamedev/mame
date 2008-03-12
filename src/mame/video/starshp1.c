@@ -334,7 +334,7 @@ static void draw_circle(bitmap_t* bitmap)
 }
 
 
-static int spaceship_collision(bitmap_t *bitmap, rectangle *rect)
+static int spaceship_collision(bitmap_t *bitmap, const rectangle *rect)
 {
 	int x;
 	int y;
@@ -361,7 +361,7 @@ static int point_in_circle(int x, int y, int center_x, int center_y, int r)
 }
 
 
-static int circle_collision(rectangle *rect)
+static int circle_collision(const rectangle *rect)
 {
 	int center_x = get_circle_hpos();
 	int center_y = get_circle_vpos();
@@ -407,6 +407,7 @@ VIDEO_UPDATE( starshp1 )
 VIDEO_EOF( starshp1 )
 {
 	rectangle rect;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	rect.min_x = get_sprite_hpos(13);
 	rect.min_y = get_sprite_vpos(13);
@@ -422,12 +423,12 @@ VIDEO_EOF( starshp1 )
 	if (rect.max_y > helper->height - 1)
 		rect.max_y = helper->height - 1;
 
-	fillbitmap(helper, 0, &machine->screen[0].visarea);
+	fillbitmap(helper, 0, visarea);
 
 	if (starshp1_attract == 0)
-		draw_spaceship(machine, helper, &machine->screen[0].visarea);
+		draw_spaceship(machine, helper, visarea);
 
-	if (circle_collision(&machine->screen[0].visarea))
+	if (circle_collision(visarea))
 		starshp1_collision_latch |= 1;
 
 	if (circle_collision(&rect))
@@ -436,6 +437,6 @@ VIDEO_EOF( starshp1 )
 	if (spaceship_collision(helper, &rect))
 		starshp1_collision_latch |= 4;
 
-	if (spaceship_collision(helper, &machine->screen[0].visarea))
+	if (spaceship_collision(helper, visarea))
 		starshp1_collision_latch |= 8;
 }

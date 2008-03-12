@@ -366,7 +366,7 @@ static void process_dma_queue(running_machine *machine)
 	extra->dither = ((dma_data[0] & 0x2000) != 0);
 
 	/* render as a quad */
-	poly_render_quad(poly, dest, &machine->screen[0].visarea, callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2], &vert[3]);
+	poly_render_quad(poly, dest, video_screen_get_visible_area(machine->primary_screen), callback, textured ? 2 : 0, &vert[0], &vert[1], &vert[2], &vert[3]);
 }
 
 
@@ -572,7 +572,7 @@ VIDEO_UPDATE( midvunit )
 
 	/* adjust the offset */
 	offset += xoffs;
-	offset += 512 * (cliprect->min_y - screen->machine->screen[0].visarea.min_y);
+	offset += 512 * (cliprect->min_y - video_screen_get_visible_area(screen)->min_y);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)

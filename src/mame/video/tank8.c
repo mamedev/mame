@@ -213,20 +213,19 @@ VIDEO_UPDATE( tank8 )
 
 VIDEO_EOF( tank8 )
 {
-	const rectangle *clip = &machine->screen[0].visarea;
-
 	int x;
 	int y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	tilemap_draw(helper1, clip, tank8_tilemap, 0, 0);
+	tilemap_draw(helper1, visarea, tank8_tilemap, 0, 0);
 
-	fillbitmap(helper2, 8, clip);
-	fillbitmap(helper3, 8, clip);
+	fillbitmap(helper2, 8, visarea);
+	fillbitmap(helper3, 8, visarea);
 
-	draw_sprites(machine, helper2, clip);
-	draw_bullets(helper3, clip);
+	draw_sprites(machine, helper2, visarea);
+	draw_bullets(helper3, visarea);
 
-	for (y = clip->min_y; y <= clip->max_y; y++)
+	for (y = visarea->min_y; y <= visarea->max_y; y++)
 	{
 		int state = 0;
 
@@ -237,7 +236,7 @@ VIDEO_EOF( tank8 )
 		if (y % 2 != video_screen_get_frame_number(machine->primary_screen) % 2)
 			continue; /* video display is interlaced */
 
-		for (x = clip->min_x; x <= clip->max_x; x++)
+		for (x = visarea->min_x; x <= visarea->max_x; x++)
 		{
 			UINT8 index;
 

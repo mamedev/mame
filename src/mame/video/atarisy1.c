@@ -345,7 +345,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 	/* because this latches a new value into the scroll base,
        we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
-	if (scanline <= Machine->screen[0].visarea.max_y)
+	if (scanline <= video_screen_get_visible_area(machine->primary_screen)->max_y)
 		adjusted_scroll -= (scanline + 1);
 	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, adjusted_scroll);
 

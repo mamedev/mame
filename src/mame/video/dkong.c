@@ -761,9 +761,8 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 
 }
 
-static void radarscp_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void radarscp_draw_background(dkong_state *state, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	dkong_state *state = machine->driver_data;
 	const UINT8 	*htable = NULL;
 	int 			x,y;
 	UINT8 			draw_ok;
@@ -772,11 +771,11 @@ static void radarscp_draw_background(running_machine *machine, bitmap_t *bitmap,
 	if (state->hardware_type == HARDWARE_TRS01)
 		htable = memory_region(REGION_GFX4);
 
-	y = machine->screen[0].visarea.min_y;
-	while (y <= machine->screen[0].visarea.max_y)
+	y = cliprect->min_y;
+	while (y <= cliprect->max_y)
 	{
-		x = machine->screen[0].visarea.min_x;
-		while (x <= machine->screen[0].visarea.max_x)
+		x = cliprect->min_x;
+		while (x <= cliprect->max_x)
 		{
 			pixel = BITMAP_ADDR16(bitmap, y, x);
 			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
@@ -800,10 +799,11 @@ static TIMER_CALLBACK( scanline_callback )
 	UINT16 			*pixel;
 	static int		counter=0;
 	int scanline = param;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	y = scanline;
 	radarscp_step(machine, y);
-	if (y <= machine->screen[0].visarea.min_y || y > machine->screen[0].visarea.max_y)
+	if (y <= visarea->min_y || y > visarea->max_y)
 		counter = 0;
 	offset = (state->flip ^ state->rflip_sig) ? 0x000 : 0x400;
 	x = 0;
@@ -937,7 +937,7 @@ VIDEO_UPDATE( dkong )
 		case HARDWARE_TRS02:
 			tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 			draw_sprites(screen->machine, bitmap, cliprect, 0x40, 1);
-			radarscp_draw_background(screen->machine, bitmap, cliprect);
+			radarscp_draw_background(state, bitmap, cliprect);
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_update");

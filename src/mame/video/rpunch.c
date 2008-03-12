@@ -165,7 +165,7 @@ WRITE16_HANDLER( rpunch_crtc_data_w )
 		{
 			/* only register we know about.... */
 			case 0x0b:
-				timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_pos(machine->primary_screen, machine->screen[0].visarea.max_y + 1, 0), (data == 0xc0) ? 2 : 1);
+				timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_vblank_start(machine->primary_screen), (data == 0xc0) ? 2 : 1);
 				break;
 
 			default:

@@ -148,30 +148,18 @@ static void pandora_draw(running_machine *machine, bitmap_t *bitmap, const recta
 				(tilecolour & 0xf0) >> 4,
 				flipx, flipy,
 				sx,sy,
-				&machine->screen[0].visarea,TRANSPARENCY_PEN,0);
+				cliprect,TRANSPARENCY_PEN,0);
 	}
 }
 
 void pandora_eof(running_machine *machine)
 {
-	rectangle clip;
-
-	/* draw top of screen */
-	clip.min_x = machine->screen[0].visarea.min_x;
-	clip.max_x = machine->screen[0].visarea.max_x;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
-
-	if (!pandora_spriteram)
-	{
-		printf("ERROR: pandora_eof with no pandora_spriteram\n");
-		return;
-	}
+	assert(pandora_spriteram != NULL);
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
-	if (pandora_clear_bitmap) fillbitmap(pandora_sprites_bitmap,0,&clip);
+	if (pandora_clear_bitmap) fillbitmap(pandora_sprites_bitmap,0,video_screen_get_visible_area(machine->primary_screen));
 
-	pandora_draw(machine, pandora_sprites_bitmap, &clip);
+	pandora_draw(machine, pandora_sprites_bitmap, video_screen_get_visible_area(machine->primary_screen));
 }
 
 void pandora_start(UINT8 region, int x, int y)

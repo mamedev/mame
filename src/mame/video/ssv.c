@@ -719,7 +719,7 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 static void draw_layer(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int  nr)
 {
 	int sy;
-	for ( sy = 0; sy <= machine->screen[0].visarea.max_y; sy += 0x40 )
+	for ( sy = 0; sy <= video_screen_get_visible_area(machine->primary_screen)->max_y; sy += 0x40 )
 		draw_row(machine, bitmap, cliprect, 0, sy, nr);
 }
 

@@ -109,7 +109,7 @@ WRITE8_HANDLER( megazone_flipscreen_w )
 
 VIDEO_START( megazone )
 {
-	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
 }
 
 

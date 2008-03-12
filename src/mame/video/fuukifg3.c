@@ -159,12 +159,13 @@ VIDEO_START( fuuki32 )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	int max_x		=	machine->screen[0].visarea.max_x+1;
-	int max_y		=	machine->screen[0].visarea.max_y+1;
+	const rectangle *visarea = video_screen_get_visible_area(screen);
+	int max_x =	visarea->max_x+1;
+	int max_y =	visarea->max_y+1;
 
 	UINT32 *src = buffered_spriteram32_2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
@@ -233,7 +234,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			for (x = xstart; x != xend; x += xinc)
 			{
 				if (xzoom == (16*8) && yzoom == (16*8))
-					pdrawgfx(		bitmap,machine->gfx[0],
+					pdrawgfx(		bitmap,screen->machine->gfx[0],
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
@@ -241,7 +242,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 									cliprect,TRANSPARENCY_PEN,15,
 									pri_mask	);
 				else
-					pdrawgfxzoom(	bitmap,machine->gfx[0],
+					pdrawgfxzoom(	bitmap,screen->machine->gfx[0],
 									code++,
 									attr & 0x3f,
 									flipx, flipy,
@@ -373,7 +374,7 @@ VIDEO_UPDATE( fuuki32 )
 	fuuki32_draw_layer(bitmap,cliprect, tm_middle, 0, 2);
 	fuuki32_draw_layer(bitmap,cliprect, tm_front,  0, 4);
 
-	draw_sprites(screen->machine,bitmap,cliprect);
+	draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 

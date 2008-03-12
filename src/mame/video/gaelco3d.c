@@ -127,10 +127,10 @@ VIDEO_START( gaelco3d )
     (repeat these two for each additional point in the fan)
 */
 
-static void render_poly(UINT32 *polydata)
+static void render_poly(const device_config *screen, UINT32 *polydata)
 {
-	float midx = Machine->screen[0].width / 2;
-	float midy = Machine->screen[0].height / 2;
+	float midx = video_screen_get_width(screen) / 2;
+	float midy = video_screen_get_height(screen) / 2;
 	float z0 = convert_tms3203x_fp_to_float(polydata[0]);
 	float voz_dy = convert_tms3203x_fp_to_float(polydata[1]) * 256.0f;
 	float voz_dx = convert_tms3203x_fp_to_float(polydata[2]) * 256.0f;
@@ -198,17 +198,19 @@ static void render_poly(UINT32 *polydata)
 	/* if we have a valid number of verts, render them */
 	if (vertnum >= 3)
 	{
+		const rectangle *visarea = video_screen_get_visible_area(screen);
+
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			poly_render_triangle_fan(poly, screenbits, &Machine->screen[0].visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(poly, screenbits, visarea, render_noz_noperspective, 0, vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			poly_render_triangle_fan(poly, screenbits, &Machine->screen[0].visarea, render_normal, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(poly, screenbits, visarea, render_normal, 0, vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			poly_render_triangle_fan(poly, screenbits, &Machine->screen[0].visarea, render_alphablend, 0, vertnum, &vert[0]);
+			poly_render_triangle_fan(poly, screenbits, visarea, render_alphablend, 0, vertnum, &vert[0]);
 
 		polygons += vertnum - 2;
 	}
@@ -375,7 +377,7 @@ void gaelco3d_render(void)
 #if DISPLAY_STATS
 {
 	int scan = video_screen_get_vpos(machine->primary_screen);
-	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - Machine->screen[0].visarea.max_y)));
+	popmessage("Polys = %4d  Timeleft = %3d", polygons, (lastscan < scan) ? (scan - lastscan) : (scan + (lastscan - video_screen_get_visible_area(Machine->primary_screen)->max_y)));
 }
 #endif
 
@@ -404,7 +406,7 @@ WRITE32_HANDLER( gaelco3d_render_w )
 	{
 		if (polydata_count >= 18 && (polydata_count % 2) == 1 && IS_POLYEND(polydata_buffer[polydata_count - 2]))
 		{
-			render_poly(&polydata_buffer[0]);
+			render_poly(machine->primary_screen, &polydata_buffer[0]);
 			polydata_count = 0;
 		}
 		video_changed = TRUE;

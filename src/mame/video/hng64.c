@@ -225,7 +225,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
  *  Or maybe it switches from fading by scaling to fading using absolute addition and subtraction...
  *  Or maybe they set transition type (there seems to be a cute scaling-squares transition in there somewhere)...
  */
-static void transition_control(running_machine *machine, bitmap_t *bitmap)
+static void transition_control(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int i, j ;
 
@@ -247,9 +247,9 @@ static void transition_control(running_machine *machine, bitmap_t *bitmap)
 		brigG = (INT32)((hng64_tcram[0x0000000a] >> 8)  & 0xff) ;
 		brigB = (INT32)((hng64_tcram[0x0000000a] >> 16) & 0xff) ;
 
-		for (i = machine->screen[0].visarea.min_x; i < machine->screen[0].visarea.max_x; i++)
+		for (i = cliprect->min_x; i < cliprect->max_x; i++)
 		{
-			for (j = machine->screen[0].visarea.min_y; j < machine->screen[0].visarea.max_y; j++)
+			for (j = cliprect->min_y; j < cliprect->max_y; j++)
 			{
 				UINT32* thePixel = BITMAP_ADDR32(bitmap, j, i);
 
@@ -374,6 +374,7 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 	UINT32 numPolys = 0 ;
 
 	struct polygon lastPoly = { 0 } ;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	// Set some matrices to the identity...
 	SetIdentity(projectionMatrix) ;
@@ -860,11 +861,11 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 									ndCoords[3] = polys[numPolys].vert[m].clipCoords[3] ;
 
 									// Final pixel values are garnered here :
-									windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(machine->screen[0].visarea.max_x) / 2.0f) + 0.0f ;
-									windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(machine->screen[0].visarea.max_y) / 2.0f) + 0.0f ;
+									windowCoords[0] = (ndCoords[0]+1.0f) * ((float)(visarea->max_x) / 2.0f) + 0.0f ;
+									windowCoords[1] = (ndCoords[1]+1.0f) * ((float)(visarea->max_y) / 2.0f) + 0.0f ;
 									windowCoords[2] = (ndCoords[2]+1.0f) * 0.5f ;
 
-									windowCoords[1] = (float)machine->screen[0].visarea.max_y - windowCoords[1] ;		// Flip Y
+									windowCoords[1] = (float)visarea->max_y - windowCoords[1] ;		// Flip Y
 
 									// Store the points in a list for later use...
 									polys[numPolys].vert[m].clipCoords[0] = windowCoords[0] ;
@@ -913,7 +914,7 @@ static void draw3d(running_machine *machine, bitmap_t *bitmap, const rectangle *
 	/////////////////////////////////////////////////
 
 	// Reset the depth buffer...
-	for (i = 0; i < (machine->screen[0].visarea.max_x)*(machine->screen[0].visarea.max_y); i++)
+	for (i = 0; i < (visarea->max_x)*(visarea->max_y); i++)
 		depthBuffer[i] = 100.0f ;
 
 	for (i = 0; i < numPolys; i++)
@@ -1058,6 +1059,8 @@ static void plotTilemap3Line(running_machine *machine,
 
 	float pixStride, pixOffset ;
 
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
 //  mame_printf_debug("(%d,%d) (%d,%d)\n", startX, startY, endX, endY) ;
 
 	// CLAMP - BUT I'M PRETTY SURE THIS ISN'T QUITE RIGHT !!! ???
@@ -1068,7 +1071,7 @@ static void plotTilemap3Line(running_machine *machine,
 
 	numPix = gatherPixelsForLine(tilemapBitmap, startX, startY, endX, endY, penList) ;
 
-	pixStride = (float)numPix / (float)(machine->screen[0].visarea.max_x-1) ;
+	pixStride = (float)numPix / (float)(visarea->max_x-1) ;
 	pixOffset = 0 ;
 
 	if (numPix == 0)
@@ -1077,7 +1080,7 @@ static void plotTilemap3Line(running_machine *machine,
 //  mame_printf_debug("numpix %d ps %f po %f s(%d,%d) e(%d,%d)\n", numPix, pixStride, pixOffset, startX, startY, endX, endY) ;
 
 	// Draw out the screen's line...
-	for (i = machine->screen[0].visarea.min_x; i < machine->screen[0].visarea.max_x; i++)
+	for (i = visarea->min_x; i < visarea->max_x; i++)
 	{
 		// Nearest-neighbor interpolation for now (but i doubt it does linear)
 		UINT16 tmPen = penList[(int)pixOffset] ;
@@ -1093,10 +1096,11 @@ static void hng64_drawtilemap3(running_machine *machine, bitmap_t *bitmap, const
 	int i ;
 
 	bitmap_t *srcbitmap = tilemap_get_pixmap( hng64_tilemap3 );
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 //  usrintf_showmessage("%d", hng64_hackTm3Count) ;
 
-	if (hng64_hackTm3Count/4 < machine->screen[0].visarea.max_y)
+	if (hng64_hackTm3Count/4 < visarea->max_y)
 	{
 		for (i = 0; i < hng64_hackTm3Count/4; i++)
 		{
@@ -1113,7 +1117,7 @@ static void hng64_drawtilemap3(running_machine *machine, bitmap_t *bitmap, const
 							 (INT16)((hng64_videoram[address+0x2]&0xffff0000) >> 16),
 							 (INT16)((hng64_videoram[address+0x1]&0xffff0000) >> 16),
 							 (INT16)((hng64_videoram[address+0x3]&0xffff0000) >> 16),
-							 (machine->screen[0].visarea.max_y-1)-i,
+							 (visarea->max_y-1)-i,
 							 bitmap) ;
 		}
 	}
@@ -1285,7 +1289,7 @@ VIDEO_UPDATE( hng64 )
 	/* AJG */
 	// if(input_code_pressed(KEYCODE_D))
 
-	transition_control(screen->machine, bitmap) ;
+	transition_control(bitmap, cliprect) ;
 
 //  mame_printf_debug("FRAME DONE %d\n", frameCount) ;
 	frameCount++ ;
@@ -1296,6 +1300,8 @@ VIDEO_UPDATE( hng64 )
 
 VIDEO_START( hng64 )
 {
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
 	hng64_tilemap0 = tilemap_create(get_hng64_tile0_info, tilemap_scan_rows,  8,   8, 128,128); /* 128x128x4 = 0x10000 */
 	hng64_tilemap1 = tilemap_create(get_hng64_tile1_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
 	hng64_tilemap2 = tilemap_create(get_hng64_tile2_info, tilemap_scan_rows,  16, 16, 128,128); /* 128x128x4 = 0x10000 */
@@ -1306,7 +1312,7 @@ VIDEO_START( hng64 )
 	tilemap_set_transparent_pen(hng64_tilemap3,0);
 
 	// 3d Buffer Allocation
-	depthBuffer = (float*)auto_malloc((machine->screen[0].visarea.max_x)*(machine->screen[0].visarea.max_y)*sizeof(float)) ;
+	depthBuffer = (float*)auto_malloc((visarea->max_x)*(visarea->max_y)*sizeof(float)) ;
 
 	// The general display list of polygons in the scene...
 	// !! This really should be a dynamic array !!
@@ -1708,7 +1714,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine *machine, bitmap_t *Co
 					  float g_start, float g_delta, float b_start, float b_delta,
 					  float s_start, float s_delta, float t_start, float t_delta)
 {
-	float *dp = &(depthBuffer[y*machine->screen[0].visarea.max_x+x_start]);
+	float *dp = &(depthBuffer[y*video_screen_get_visible_area(machine->primary_screen)->max_x+x_start]);
 
 	const UINT8 *gfx = memory_region(REGION_GFX3);
 	const UINT8 *textureOffset ;

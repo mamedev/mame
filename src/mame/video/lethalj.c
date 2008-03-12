@@ -36,8 +36,10 @@ static UINT8 blank_palette;
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	int width = machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x;
-	int height = machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	int width = visarea->max_x + 1 - visarea->min_x;
+	int height = visarea->max_y + 1 - visarea->min_y;
+
 	*x = ((readinputport(2 + player * 2) & 0xff) * width) / 255;
 	*y = ((readinputport(3 + player * 2) & 0xff) * height) / 255;
 }

@@ -500,7 +500,7 @@ VIDEO_UPDATE( wizdfire )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	fillbitmap(bitmap,screen->machine->pens[512],&screen->machine->screen[0].visarea);
+	fillbitmap(bitmap,screen->machine->pens[512],cliprect);
 
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,4,3);
@@ -529,7 +529,7 @@ VIDEO_UPDATE( nitrobal )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	fillbitmap(bitmap,screen->machine->pens[512],&screen->machine->screen[0].visarea);
+	fillbitmap(bitmap,screen->machine->pens[512],cliprect);
 	fillbitmap(priority_bitmap,0,NULL);
 	deco16_clear_sprite_priority_bitmap();
 

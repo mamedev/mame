@@ -134,7 +134,7 @@ VIDEO_UPDATE( copsnrob )
         {
             if (val & mask1)
             {
-                for (y = 0; y <= screen->machine->screen[0].visarea.max_y; y++)
+                for (y = cliprect->min_y; y <= cliprect->max_y; y++)
                     if (copsnrob_bulletsram[y] & mask2)
 						*BITMAP_ADDR16(bitmap, y, 256-x) = 1;
             }

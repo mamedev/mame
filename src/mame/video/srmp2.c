@@ -159,7 +159,7 @@ static void srmp3_draw_sprites_map(running_machine *machine, bitmap_t *bitmap, c
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(machine->screen[0].height-(machine->screen[0].visarea.max_y + 1));
+							(video_screen_get_height(machine->primary_screen) - (video_screen_get_visible_area(machine->primary_screen)->max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -322,7 +322,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 
 			int sx		=	  x + xoffs  + (offs & 1) * 16;
 			int sy		=	-(y + yoffs) + (offs / 2) * 16 -
-							(machine->screen[0].height-(machine->screen[0].visarea.max_y + 1));
+							(video_screen_get_height(machine->primary_screen) - (video_screen_get_visible_area(machine->primary_screen)->max_y + 1));
 
 			if (upper & (1 << col))	sx += 256;
 
@@ -416,7 +416,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 		if (flip)
 		{
 			y = max_y - y
-				+(machine->screen[0].height-(machine->screen[0].visarea.max_y + 1));
+				+(video_screen_get_height(machine->primary_screen) - (video_screen_get_visible_area(machine->primary_screen)->max_y + 1));
 			flipx = !flipx;
 			flipy = !flipy;
 		}

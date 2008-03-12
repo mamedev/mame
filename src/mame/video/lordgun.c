@@ -199,15 +199,17 @@ static void lorddgun_calc_gun_scr(int i)
 
 void lordgun_update_gun(int i)
 {
+	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+
 	lordgun_gun[i].hw_x = readinputport(5+i);
 	lordgun_gun[i].hw_y = readinputport(7+i);
 
 	lorddgun_calc_gun_scr(i);
 
-	if (	(lordgun_gun[i].scr_x < Machine->screen[0].visarea.min_x)	||
-			(lordgun_gun[i].scr_x > Machine->screen[0].visarea.max_x)	||
-			(lordgun_gun[i].scr_y < Machine->screen[0].visarea.min_y)	||
-			(lordgun_gun[i].scr_y > Machine->screen[0].visarea.max_y)	)
+	if (	(lordgun_gun[i].scr_x < visarea->min_x)	||
+			(lordgun_gun[i].scr_x > visarea->max_x)	||
+			(lordgun_gun[i].scr_y < visarea->min_y)	||
+			(lordgun_gun[i].scr_y > visarea->max_y)	)
 		lordgun_gun[i].hw_x = lordgun_gun[i].hw_y = 0;
 }
 

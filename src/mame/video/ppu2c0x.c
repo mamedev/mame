@@ -303,7 +303,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		chips[i].scan_scale = 1;
 
 		/* allocate a screen bitmap, videoram and spriteram, a dirtychar array and the monochromatic colortable */
-		chips[i].bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, machine->screen[0].format );
+		chips[i].bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
 		chips[i].videoram = auto_malloc( VIDEORAM_SIZE );
 		chips[i].spriteram = auto_malloc( SPRITERAM_SIZE );
 		chips[i].dirtychar = auto_malloc( CHARGEN_NUM_CHARS );

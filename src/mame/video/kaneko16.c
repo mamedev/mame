@@ -153,7 +153,7 @@ VIDEO_START( kaneko16_1xVIEW2 )
 			case 256:	dx = 0x5b;	break;
 			default:	dx = 0;
 		}
-		switch (machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1)
+		switch (video_screen_get_visible_area(machine->primary_screen)->max_y - video_screen_get_visible_area(machine->primary_screen)->min_y + 1)
 		{
 			case 240- 8:	dy = +0x08;	break;	/* blazeon */
 			case 240-16:	dy = -0x08;	break;	/* berlwall, bakubrk */
@@ -193,7 +193,7 @@ VIDEO_START( kaneko16_2xVIEW2 )
 			case 256:	dx = 0x5b;	break;
 			default:	dx = 0;
 		}
-		switch (machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y + 1)
+		switch (video_screen_get_visible_area(machine->primary_screen)->max_y - video_screen_get_visible_area(machine->primary_screen)->min_y + 1)
 		{
 			case 240- 8:	dy = +0x08;	break;
 			case 240-16:	dy = -0x08;	break;
@@ -377,12 +377,12 @@ static int kaneko16_parse_sprite_type012(running_machine *machine, int i, struct
 if (kaneko16_sprite_flipy)
 {
 	s->yoffs		-=		kaneko16_sprites_regs[0x2/2];
-	s->yoffs		-=		machine->screen[0].visarea.min_y<<6;
+	s->yoffs		-=		video_screen_get_visible_area(machine->primary_screen)->min_y<<6;
 }
 else
 {
 	s->yoffs		-=		kaneko16_sprites_regs[0x2/2];
-	s->yoffs		+=		machine->screen[0].visarea.min_y<<6;
+	s->yoffs		+=		video_screen_get_visible_area(machine->primary_screen)->min_y<<6;
 }
 
 	return 					( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |

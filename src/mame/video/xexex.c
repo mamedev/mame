@@ -36,7 +36,7 @@ VIDEO_START( xexex )
 {
 	int region = REGION_GFX3;
 
-	assert(machine->screen[0].format == BITMAP_FORMAT_RGB32);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
 	cur_alpha = 0;
 

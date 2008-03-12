@@ -106,39 +106,39 @@ static emu_timer *stars_blink_timer;
 static emu_timer *stars_scroll_timer;
 static UINT8 timer_adjusted;
        void galaxian_init_stars(running_machine *machine, int colors_offset);
-static void (*draw_stars)(running_machine *, bitmap_t *);		/* function to call to draw the star layer */
-static void     noop_draw_stars(running_machine *machine, bitmap_t *bitmap);
-       void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap);
-static 	   void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap);
-static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap);
-static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap);
-static void  jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap);
+static void (*draw_stars)(running_machine *machine, bitmap_t *, const rectangle *);		/* function to call to draw the star layer */
+static void     noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+       void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+static void  jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void start_stars_blink_timer(double ra, double rb, double c);
 static void start_stars_scroll_timer(running_machine *machine);
 
 /* bullets circuit */
 static UINT8 darkplnt_bullet_color;
-static void (*draw_bullets)(running_machine *, bitmap_t *,int,int,int);	/* function to call to draw a bullet */
-static void galaxian_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y);
-static void gteikob2_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y);
-static void scramble_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y);
-static void   theend_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y);
-static void darkplnt_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y);
-static void dambustr_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y);
+static void (*draw_bullets)(bitmap_t *,int,int,int,const rectangle *);	/* function to call to draw a bullet */
+static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
+static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
+static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
+static void   theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
+static void darkplnt_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
+static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 
 /* background circuit */
 static UINT8 background_enable;
 static UINT8 background_red, background_green, background_blue;
-static void (*draw_background)(running_machine *, bitmap_t *);	/* function to call to draw the background */
-static void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void scramble_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void  turtles_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void  mariner_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void  frogger_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void stratgyx_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void  minefld_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void   rescue_draw_background(running_machine *machine, bitmap_t *bitmap);
-static void dambustr_draw_background(running_machine *machine, bitmap_t *bitmap);
+static void (*draw_background)(bitmap_t *, const rectangle *cliprect);	/* function to call to draw the background */
+static void galaxian_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void  turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void  mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void  frogger_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void  minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void   rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void dambustr_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 
 static UINT16 rockclim_v;
 static UINT16 rockclim_h;
@@ -805,9 +805,9 @@ VIDEO_START( scorpion )
 	modify_spritecode = batman2_modify_spritecode;
 }
 
-static void rockclim_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void rockclim_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
-	tilemap_draw(bitmap,0,rockclim_tilemap, 0,0);
+	tilemap_draw(bitmap,cliprect,rockclim_tilemap, 0,0);
 }
 
 static void rockclim_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
@@ -1403,7 +1403,7 @@ static void frogger_modify_ypos(UINT8 *sy)
 
 /* bullet drawing functions */
 
-static void galaxian_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y)
+static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	int i;
 
@@ -1412,8 +1412,7 @@ static void galaxian_draw_bullets(running_machine *machine, bitmap_t *bitmap, in
 	{
 		x--;
 
-		if (x >= machine->screen[0].visarea.min_x &&
-			x <= machine->screen[0].visarea.max_x)
+		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 		{
 			int color;
 
@@ -1426,39 +1425,33 @@ static void galaxian_draw_bullets(running_machine *machine, bitmap_t *bitmap, in
 	}
 }
 
-static void gteikob2_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y)
+static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
-	galaxian_draw_bullets(machine, bitmap, offs, 260 - x, y);
+	galaxian_draw_bullets(bitmap, offs, 260 - x, y, cliprect);
 }
 
-static void scramble_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y)
+static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	if (flipscreen_x)  x++;
 
 	x = x - 6;
 
-	if (x >= machine->screen[0].visarea.min_x &&
-		x <= machine->screen[0].visarea.max_x)
-	{
+	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 		/* yellow bullets */
 		*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
-	}
 }
 
-static void darkplnt_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y)
+static void darkplnt_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	if (flipscreen_x)  x++;
 
 	x = x - 6;
 
-	if (x >= machine->screen[0].visarea.min_x &&
-		x <= machine->screen[0].visarea.max_x)
-	{
+	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 		*BITMAP_ADDR16(bitmap, y, x) = 32 + darkplnt_bullet_color;
-	}
 }
 
-static void theend_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y)
+static void theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	int i;
 
@@ -1468,15 +1461,12 @@ static void theend_draw_bullets(running_machine *machine, bitmap_t *bitmap, int 
 	{
 		x--;
 
-		if (x >= machine->screen[0].visarea.min_x &&
-			x <= machine->screen[0].visarea.max_x)
-		{
+		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 			*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
-		}
 	}
 }
 
-static void dambustr_draw_bullets(running_machine *machine, bitmap_t *bitmap, int offs, int x, int y)
+static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	int i, color;
 
@@ -1497,11 +1487,8 @@ static void dambustr_draw_bullets(running_machine *machine, bitmap_t *bitmap, in
 			x--;
 		}
 
-		if (x >= machine->screen[0].visarea.min_x &&
-			x <= machine->screen[0].visarea.max_x)
-		{
+		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 			*BITMAP_ADDR16(bitmap, y, x) = color;
-		}
 	}
 }
 
@@ -1509,28 +1496,28 @@ static void dambustr_draw_bullets(running_machine *machine, bitmap_t *bitmap, in
 
 /* background drawing functions */
 
-static void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void galaxian_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* plain black background */
-	fillbitmap(bitmap,0,&machine->screen[0].visarea);
+	fillbitmap(bitmap,0,cliprect);
 }
 
-static void scramble_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (background_enable)
-		fillbitmap(bitmap,BACKGROUND_COLOR_BASE,&machine->screen[0].visarea);
+		fillbitmap(bitmap,BACKGROUND_COLOR_BASE,cliprect);
 	else
-		fillbitmap(bitmap,0,&machine->screen[0].visarea);
+		fillbitmap(bitmap,0,cliprect);
 }
 
-static void turtles_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int color = (background_blue << 2) | (background_green << 1) | background_red;
 
-	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,&machine->screen[0].visarea);
+	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,cliprect);
 }
 
-static void frogger_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void frogger_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* color split point verified on real machine */
 	if (flipscreen_x)
@@ -1545,7 +1532,7 @@ static void frogger_draw_background(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static void stratgyx_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 x;
 	UINT8 *prom;
@@ -1580,7 +1567,7 @@ static void stratgyx_draw_background(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static void minefld_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (background_enable)
 	{
@@ -1596,10 +1583,10 @@ static void minefld_draw_background(running_machine *machine, bitmap_t *bitmap)
 		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-		fillbitmap(bitmap,0,&machine->screen[0].visarea);
+		fillbitmap(bitmap,0,cliprect);
 }
 
-static void rescue_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (background_enable)
 	{
@@ -1614,10 +1601,10 @@ static void rescue_draw_background(running_machine *machine, bitmap_t *bitmap)
 		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-		fillbitmap(bitmap,0,&machine->screen[0].visarea);
+		fillbitmap(bitmap,0,cliprect);
 }
 
-static void mariner_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	UINT8 x;
 	UINT8 *prom;
@@ -1659,7 +1646,7 @@ static void mariner_draw_background(running_machine *machine, bitmap_t *bitmap)
 	}
 }
 
-static void dambustr_draw_background(running_machine *machine, bitmap_t *bitmap)
+static void dambustr_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int col1 = BACKGROUND_COLOR_BASE + dambustr_bg_color_1;
 	int col2 = BACKGROUND_COLOR_BASE + dambustr_bg_color_2;
@@ -1677,7 +1664,7 @@ static void dambustr_draw_background(running_machine *machine, bitmap_t *bitmap)
 
 }
 
-static void dambustr_draw_upper_background(bitmap_t *bitmap)
+static void dambustr_draw_upper_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	static rectangle clip = { 0, 0, 0, 0 };
 
@@ -1774,29 +1761,23 @@ void galaxian_init_stars(running_machine *machine, int colors_offset)
 	}
 }
 
-static void plot_star(running_machine *machine, bitmap_t *bitmap, int x, int y, int color)
+static void plot_star(bitmap_t *bitmap, int x, int y, int color, const rectangle *cliprect)
 {
-	if (y < machine->screen[0].visarea.min_y ||
-		y > machine->screen[0].visarea.max_y ||
-		x < machine->screen[0].visarea.min_x ||
-		x > machine->screen[0].visarea.max_x)
-		return;
-
-
 	if (flipscreen_x)
 		x = 255 - x;
 
 	if (flipscreen_y)
 		y = 255 - y;
 
-	*BITMAP_ADDR16(bitmap, y, x) = stars_colors_start + color;
+	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
+		*BITMAP_ADDR16(bitmap, y, x) = stars_colors_start + color;
 }
 
-static void noop_draw_stars(running_machine *machine, bitmap_t *bitmap)
+static void noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 }
 
-void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap)
+void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1818,12 +1799,12 @@ void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap)
 
 		if ((y & 0x01) ^ ((x >> 3) & 0x01))
 		{
-			plot_star(machine, bitmap, x, y, stars[offs].color);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
 
-static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap)
+static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1862,12 +1843,12 @@ static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap)
 				break;
 			}
 
-			plot_star(machine, bitmap, x, y, stars[offs].color);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
 
-static void rescue_draw_stars(running_machine *machine, bitmap_t *bitmap)
+static void rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1908,12 +1889,12 @@ static void rescue_draw_stars(running_machine *machine, bitmap_t *bitmap)
 				break;
 			}
 
-			plot_star(machine, bitmap, x, y, stars[offs].color);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
 
-static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap)
+static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *prom;
@@ -1942,13 +1923,13 @@ static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap)
 		{
 			if (prom[(x/8 + 1) & 0x1f] & 0x04)
 			{
-				plot_star(machine, bitmap, x, y, stars[offs].color);
+				plot_star(bitmap, x, y, stars[offs].color, cliprect);
 			}
 		}
 	}
 }
 
-static void jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap)
+static void jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1994,7 +1975,7 @@ static void jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap)
 			/* no stars in the status area */
 			if (x >= 240)  continue;
 
-			plot_star(machine, bitmap, x, y, stars[offs].color);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
@@ -2056,7 +2037,7 @@ static TILE_GET_INFO( rockclim_get_tile_info )
 	SET_TILE_INFO(2, code, 0, 0);
 }
 
-static void draw_bullets_common(running_machine *machine, bitmap_t *bitmap)
+static void draw_bullets_common(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -2068,13 +2049,9 @@ static void draw_bullets_common(running_machine *machine, bitmap_t *bitmap)
 		sy = 255 - galaxian_bulletsram[offs + 1];
 		sx = 255 - galaxian_bulletsram[offs + 3];
 
-		if (sy < machine->screen[0].visarea.min_y ||
-			sy > machine->screen[0].visarea.max_y)
-			continue;
-
 		if (flipscreen_y)  sy = 255 - sy;
 
-		draw_bullets(machine, bitmap, offs, sx, sy);
+		draw_bullets(bitmap, offs, sx, sy, cliprect);
 	}
 }
 
@@ -2147,12 +2124,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, UINT8 *spri
 
 VIDEO_UPDATE( galaxian )
 {
-	draw_background(screen->machine, bitmap);
+	draw_background(bitmap, cliprect);
 
 
 	if (galaxian_stars_on)
 	{
-		draw_stars(screen->machine, bitmap);
+		draw_stars(screen->machine, bitmap, cliprect);
 	}
 
 
@@ -2161,7 +2138,7 @@ VIDEO_UPDATE( galaxian )
 
 	if (draw_bullets)
 	{
-		draw_bullets_common(screen->machine, bitmap);
+		draw_bullets_common(bitmap, cliprect);
 	}
 
 
@@ -2180,21 +2157,21 @@ VIDEO_UPDATE( dambustr )
 	int i, j;
 	UINT8 color;
 
-	draw_background(screen->machine, bitmap);
+	draw_background(bitmap, cliprect);
 
 	if (galaxian_stars_on)
 	{
-		draw_stars(screen->machine, bitmap);
+		draw_stars(screen->machine, bitmap, cliprect);
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
-	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, &screen->machine->screen[0].visarea);
+	copybitmap(dambustr_tmpbitmap, bitmap, 0, 0, 0, 0, NULL);
 
 	tilemap_draw(bitmap, 0, bg_tilemap, 0, 0);
 
 	if (draw_bullets)
 	{
-		draw_bullets_common(screen->machine, bitmap);
+		draw_bullets_common(bitmap, cliprect);
 	}
 
 	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
@@ -2202,7 +2179,7 @@ VIDEO_UPDATE( dambustr )
 	if (dambustr_bg_priority)
 	{
 		/* draw the upper part of the background, as it has priority */
-		dambustr_draw_upper_background(bitmap);
+		dambustr_draw_upper_background(bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
 		memset(dambustr_videoram2, 0x20, 0x0400);

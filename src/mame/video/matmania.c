@@ -125,11 +125,13 @@ WRITE8_HANDLER( matmania_paletteram_w )
 ***************************************************************************/
 VIDEO_START( matmania )
 {
-	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	tmpbitmap = auto_bitmap_alloc(machine->screen[0].width,2* machine->screen[0].height,machine->screen[0].format);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	bitmap_format format = video_screen_get_format(machine->primary_screen);
 
 	/* Mat Mania has a virtual screen twice as large as the visible screen */
-	tmpbitmap2 = auto_bitmap_alloc(machine->screen[0].width,2 * machine->screen[0].height,machine->screen[0].format);
+	tmpbitmap  = auto_bitmap_alloc(width, 2*height, format);
+	tmpbitmap2 = auto_bitmap_alloc(width, 2*height, format);
 }
 
 

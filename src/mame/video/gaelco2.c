@@ -339,17 +339,17 @@ VIDEO_START( gaelco2_dual )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
+static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int mask, int xoffs)
 {
 	int j, x, y, ex, ey, px, py;
-	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *gfx = screen->machine->gfx[0];
 
 	/* get sprite ram start and end offsets */
 	int start_offset = (gaelco2_vregs[1] & 0x10)*0x100;
 	int end_offset = start_offset + 0x1000;
 
 	/* sprite offset is based on the visible area */
-	int spr_x_adjust = (machine->screen[0].visarea.max_x - 320 + 1) - (511 - 320 - 1) - ((gaelco2_vregs[0] >> 4) & 0x01) + xoffs;
+	int spr_x_adjust = (video_screen_get_visible_area(screen)->max_x - 320 + 1) - (511 - 320 - 1) - ((gaelco2_vregs[0] >> 4) & 0x01) + xoffs;
 
 	for (j = start_offset; j < end_offset; j += 8){
 		int data = buffered_spriteram16[(j/2) + 0];
@@ -460,7 +460,7 @@ VIDEO_UPDATE( gaelco2 )
 
 	tilemap_draw(bitmap, cliprect, pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, pant[0], 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0, 0);
+	draw_sprites(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -494,13 +494,13 @@ VIDEO_UPDATE( gaelco2_dual )
 	{
 		/* monitor 2 output */
 		tilemap_draw(bitmap,cliprect,pant[1], 0, 0);
-		draw_sprites(screen->machine,bitmap,cliprect, 0x8000, 0);
+		draw_sprites(screen,bitmap,cliprect, 0x8000, 0);
 	}
 	else if (screen == left_screen)
 	{
 		/* monitor 1 output */
 		tilemap_draw(bitmap,cliprect,pant[0], 0, 0);
-		draw_sprites(screen->machine,bitmap,cliprect, 0x0000, 0);
+		draw_sprites(screen,bitmap,cliprect, 0x0000, 0);
 	}
 
 	return 0;

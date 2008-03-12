@@ -136,7 +136,7 @@ WRITE16_HANDLER( skullxbo_yscroll_w )
 		video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* adjust the effective scroll for the current scanline */
-	if (scanline > Machine->screen[0].visarea.max_y)
+	if (scanline > video_screen_get_visible_area(machine->primary_screen)->max_y)
 		scanline = 0;
 	effscroll = (newscroll >> 7) - scanline;
 

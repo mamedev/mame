@@ -39,7 +39,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const gfx_element *gfx = machine->gfx[0];
 	const UINT8 *source = spriteram;
 	const UINT8 *finish = source+0x100;
-	rectangle clip = machine->screen[0].visarea;
+	rectangle clip = *video_screen_get_visible_area(machine->primary_screen);
 	clip.max_x -= 24;
 	clip.min_x += 16;
 	while( source<finish ){

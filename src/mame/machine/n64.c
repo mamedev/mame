@@ -629,10 +629,12 @@ WRITE32_HANDLER( n64_vi_reg_w )
 		case 0x00/4:		// VI_CONTROL_REG
             if ((n64_vi_control & 0x40) != (data & 0x40))
 			{
-				screen_state *state = &Machine->screen[0];
-				rectangle visarea = state->visarea;
+				int width = video_screen_get_width(machine->primary_screen);
+				rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+				attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
+
 				visarea.max_y = (data & 0x40) ? 479 : 239;
-				video_screen_configure(machine->primary_screen, state->width, visarea.max_y + 1, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+				video_screen_configure(machine->primary_screen, width, visarea.max_y + 1, &visarea, period);
 			}
             n64_vi_control = data;
 			break;
@@ -644,10 +646,12 @@ WRITE32_HANDLER( n64_vi_reg_w )
 		case 0x08/4:		// VI_WIDTH_REG
             if (n64_vi_width != data && data > 0)
 			{
-				screen_state *state = &Machine->screen[0];
-				rectangle visarea = state->visarea;
+				int height = video_screen_get_height(machine->primary_screen);
+				rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+				attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
+
 				visarea.max_x = data-1;
-				video_screen_configure(machine->primary_screen, visarea.max_x + 1, state->height, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+				video_screen_configure(machine->primary_screen, visarea.max_x + 1, height, &visarea, period);
 			}
             n64_vi_width = data;
 		    fb_width = data;

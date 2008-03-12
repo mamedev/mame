@@ -237,10 +237,12 @@ static void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT3
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	int width = machine->screen[0].visarea.max_x + 1 - machine->screen[0].visarea.min_x;
-	int height = machine->screen[0].visarea.max_y + 1 - machine->screen[0].visarea.min_y;
-	*x = machine->screen[0].visarea.min_x + (((readinputport(3 + player * 2) & 0xff) * width) >> 8);
-	*y = machine->screen[0].visarea.min_y + (((readinputport(4 + player * 2) & 0xff) * height) >> 8);
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+
+	int width = visarea->max_x + 1 - visarea->min_x;
+	int height = visarea->max_y + 1 - visarea->min_y;
+	*x = visarea->min_x + (((readinputport(3 + player * 2) & 0xff) * width) >> 8);
+	*y = visarea->min_y + (((readinputport(4 + player * 2) & 0xff) * height) >> 8);
 }
 
 
@@ -756,12 +758,13 @@ static TIMER_CALLBACK( cojag_scanline_update )
 {
 	int vc = param & 0xffff;
 	int hdb = param >> 16;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/* only run if video is enabled and we are past the "display begin" */
 	if ((gpu_regs[VMODE] & 1) && vc >= (gpu_regs[VDB] & 0x7ff))
 	{
 		UINT32 *dest = BITMAP_ADDR32(screen_bitmap, vc / 2, 0);
-		int maxx = machine->screen[0].visarea.max_x;
+		int maxx = visarea->max_x;
 		int hde = effective_hvalue(gpu_regs[HDE]) / 2;
 		UINT16 scanline[360];
 		int x;
@@ -770,7 +773,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		if (ENABLE_BORDERS && vc % 2 == 0)
 		{
 			rgb_t border = MAKE_RGB(gpu_regs[BORD1] & 0xff, gpu_regs[BORD1] >> 8, gpu_regs[BORD2] & 0xff);
-			for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
+			for (x = visarea->min_x; x <= visarea->max_x; x++)
 				dest[x] = border;
 		}
 

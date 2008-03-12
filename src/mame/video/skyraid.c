@@ -17,7 +17,7 @@ static bitmap_t *helper;
 
 VIDEO_START( skyraid )
 {
-	helper = auto_bitmap_alloc(128, 240, machine->screen[0].format);
+	helper = auto_bitmap_alloc(128, 240, video_screen_get_format(machine->primary_screen));
 }
 
 

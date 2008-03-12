@@ -103,7 +103,7 @@ VIDEO_START( bioship )
 	tx_tilemap = tilemap_create(macross_get_tx_tile_info,tilemap_scan_cols,8,8,32,32);
 	spriteram_old = auto_malloc(0x1000);
 	spriteram_old2 = auto_malloc(0x1000);
-	background_bitmap = auto_bitmap_alloc(8192,512,machine->screen[0].format);
+	background_bitmap = auto_bitmap_alloc(8192,512,video_screen_get_format(machine->primary_screen));
 
 	tilemap_set_transparent_pen(bg_tilemap,15);
 	tilemap_set_transparent_pen(tx_tilemap,15);

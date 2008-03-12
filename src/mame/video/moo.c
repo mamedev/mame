@@ -43,7 +43,7 @@ VIDEO_START(moo)
 {
 	int offsx, offsy;
 
-	assert(machine->screen[0].format == BITMAP_FORMAT_RGB32);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
 	alpha_enabled = 0;
 

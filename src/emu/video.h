@@ -71,8 +71,6 @@ typedef struct _screen_state screen_state;
 struct _screen_state
 {
 	int				width, height;				/* current total width/height (HTOTAL, VTOTAL) */
-	rectangle		visarea;					/* current visible area (HBLANK end/start, VBLANK end/start) */
-	bitmap_format	format;						/* bitmap format (a copy of screen_config) */
 	void *			private_data;				/* pointer to the private data structure */
 };
 

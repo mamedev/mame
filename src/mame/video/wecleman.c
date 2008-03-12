@@ -787,9 +787,10 @@ static void hotchase_draw_road(running_machine *machine, bitmap_t *bitmap, const
 #define YSIZE 512
 
 	int sx, sy;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/* Let's draw from the top to the bottom of the visible screen */
-	for (sy = machine->screen[0].visarea.min_y;sy <= machine->screen[0].visarea.max_y;sy++)
+	for (sy = visarea->min_y;sy <= visarea->max_y;sy++)
 	{
 		int code    = wecleman_roadram[sy*4/2+2/2] + (wecleman_roadram[sy*4/2+0/2] << 16);
 		int color   = ((code & 0x00f00000) >> 20) + 0x70;
@@ -887,7 +888,7 @@ VIDEO_START( wecleman )
 	UINT8 *buffer;
 	int i, j;
 
-	assert(machine->screen[0].format == BITMAP_FORMAT_RGB15);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB15);
 	buffer = auto_malloc(0x12c00);	// working buffer for sprite operations
 
 	gameid = 0;

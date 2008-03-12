@@ -321,7 +321,7 @@ static TIMER_CALLBACK( force_update )
 		video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	scanline += 64;
-	if (scanline >= machine->screen[0].visarea.max_y)
+	if (scanline >= video_screen_get_visible_area(machine->primary_screen)->max_y)
 		scanline = 0;
 	timer_adjust_oneshot(force_update_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
@@ -696,7 +696,7 @@ bitmap_t *atarimo_render(running_machine *machine, int map, const rectangle *cli
 
 			/* compute minimum Y and wrap around if necessary */
 			bandclip.min_y = ((band << mo->slipshift) - mo->yscroll + mo->slipoffset) & mo->bitmapymask;
-			if (bandclip.min_y > machine->screen[0].visarea.max_y)
+			if (bandclip.min_y > video_screen_get_visible_area(machine->primary_screen)->max_y)
 				bandclip.min_y -= mo->bitmapheight;
 
 			/* maximum Y is based on the minimum */
@@ -815,8 +815,8 @@ if ((temp & 0xff00) == 0xc800)
 	/* adjust the final coordinates */
 	xpos &= mo->bitmapxmask;
 	ypos &= mo->bitmapymask;
-	if (xpos > machine->screen[0].visarea.max_x) xpos -= mo->bitmapwidth;
-	if (ypos > machine->screen[0].visarea.max_y) ypos -= mo->bitmapheight;
+	if (xpos > video_screen_get_visible_area(machine->primary_screen)->max_x) xpos -= mo->bitmapwidth;
+	if (ypos > video_screen_get_visible_area(machine->primary_screen)->max_y) ypos -= mo->bitmapheight;
 
 	/* is this one special? */
 	if (mo->specialmask.mask != 0 && EXTRACT_DATA(entry, mo->specialmask) == mo->specialvalue)

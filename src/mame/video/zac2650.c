@@ -48,6 +48,7 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 {
 	int Checksum=0;
 	int x,y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
     if((zac2650_s2636_0_ram[first * 0x10 + 10] < 0xf0) && (zac2650_s2636_0_ram[second * 0x10 + 10] < 0xf0))
     {
@@ -70,10 +71,10 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 	    {
 		    for (y = fy; y < fy + machine->gfx[expand]->height; y++)
             {
-			    if ((x < machine->screen[0].visarea.min_x) ||
-			        (x > machine->screen[0].visarea.max_x) ||
-			        (y < machine->screen[0].visarea.min_y) ||
-			        (y > machine->screen[0].visarea.max_y))
+			    if ((x < visarea->min_x) ||
+			        (x > visarea->max_x) ||
+			        (y < visarea->min_y) ||
+			        (y > visarea->max_y))
 			    {
 				    continue;
 			    }
@@ -97,10 +98,10 @@ static int SpriteCollision(running_machine *machine, int first,int second)
 	    {
 		    for (y = fy; y < fy + machine->gfx[expand]->height; y++)
             {
-			    if ((x < machine->screen[0].visarea.min_x) ||
-			        (x > machine->screen[0].visarea.max_x) ||
-			        (y < machine->screen[0].visarea.min_y) ||
-			        (y > machine->screen[0].visarea.max_y))
+			    if ((x < visarea->min_x) ||
+			        (x > visarea->max_x) ||
+			        (y < visarea->min_y) ||
+			        (y > visarea->max_y))
 			    {
 				    continue;
 			    }
@@ -141,6 +142,7 @@ VIDEO_START( tinvader )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 {
 	int offs;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
     /* -------------------------------------------------------------- */
     /* There seems to be a strange setup with this board, in that it  */
@@ -156,7 +158,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
     CollisionBackground = 0;	/* Read from 0x1e80 bit 7 */
 
 	// for collision detection checking
-	copybitmap(tmpbitmap,bitmap,0,0,0,0,&machine->screen[0].visarea);
+	copybitmap(tmpbitmap,bitmap,0,0,0,0,visarea);
 
     for(offs=0;offs<0x50;offs+=0x10)
     {
@@ -186,10 +188,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap)
 	        {
 		        for (y = by; y < by + machine->gfx[expand]->height; y++)
                 {
-			        if ((x < machine->screen[0].visarea.min_x) ||
-			            (x > machine->screen[0].visarea.max_x) ||
-			            (y < machine->screen[0].visarea.min_y) ||
-			            (y > machine->screen[0].visarea.max_y))
+			        if ((x < visarea->min_x) ||
+			            (x > visarea->max_x) ||
+			            (y < visarea->min_y) ||
+			            (y > visarea->max_y))
 			        {
 				        continue;
 			        }

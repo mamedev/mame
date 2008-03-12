@@ -247,28 +247,22 @@ static TILE_GET_INFO( get_fg_tile_info )
 VIDEO_START( skyskipr )
 {
 	popeye_bitmapram = auto_malloc(popeye_bitmapram_size);
-
-	tmpbitmap2 = auto_bitmap_alloc(1024,1024,machine->screen[0].format);	/* actually 1024x512 but not rolling over vertically? */
+	tmpbitmap2 = auto_bitmap_alloc(1024,1024,video_screen_get_format(machine->primary_screen));	/* actually 1024x512 but not rolling over vertically? */
 
 	bitmap_type = TYPE_SKYSKIPR;
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 16, 16, 32, 32);
-
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
 VIDEO_START( popeye )
 {
 	popeye_bitmapram = auto_malloc(popeye_bitmapram_size);
-
-	tmpbitmap2 = auto_bitmap_alloc(512,512,machine->screen[0].format);
+	tmpbitmap2 = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 
 	bitmap_type = TYPE_POPEYE;
 
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 16, 16, 32, 32);
-
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 

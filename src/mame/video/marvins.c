@@ -166,7 +166,7 @@ VIDEO_START( marvins )
 	tx_tilemap = tilemap_create(get_tx_tilemap_info,tilemap_scan_cols,8,8,32,32);
 
 	{
-		tilemap_clip = machine->screen[0].visarea;
+		tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
 		if (snk_gamegroup != 1) // not Mad Crasher
 		{
 			tilemap_clip.max_x-=16;

@@ -1034,7 +1034,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					sprintf(buf, "%X",xdim/16); /* Display Zoom in 16.16 */
 					if (machine->gamedrv->flags & ORIENTATION_SWAP_XY) {
 						x = ypos;
-						y = machine->screen[0].visarea.max_x - xpos; /* ORIENTATION_FLIP_Y */
+						y = video_screen_get_visible_area(machine->primary_screen)->max_x - xpos; /* ORIENTATION_FLIP_Y */
 					}
 					else {
 						x = xpos;

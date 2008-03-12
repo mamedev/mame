@@ -3782,7 +3782,7 @@ void K053247_vh_start(running_machine *machine, int gfx_memory_region, int dx, i
 
 	if (VERBOSE)
 	{
-	if (machine->screen[0].format == BITMAP_FORMAT_RGB32)
+	if (video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32)
 	{
 		if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
@@ -7295,12 +7295,13 @@ void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode
 	int clipx, clipy, clipw, cliph, i, dst_pitch;
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
-	register int bgcolor;
+	int bgcolor;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	clipx = machine->screen[0].visarea.min_x & ~3;
-	clipy = machine->screen[0].visarea.min_y;
-	clipw = (machine->screen[0].visarea.max_x - clipx + 4) & ~3;
-	cliph = machine->screen[0].visarea.max_y - clipy + 1;
+	clipx = visarea->min_x & ~3;
+	clipy = visarea->min_y;
+	clipw = (visarea->max_x - clipx + 4) & ~3;
+	cliph = visarea->max_y - clipy + 1;
 
 	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
 	dst_pitch = bitmap->rowpixels;
@@ -7769,7 +7770,7 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 	static int pmode[2] = {-1,-1};
 	static int kc=-1, kk=0, kxx=-105, kyy=0;
 
-	const rectangle area = machine->screen[0].visarea;
+	const rectangle area = *video_screen_get_visible_area(machine->primary_screen);
 	UINT16 *line;
 	int delta, dim1, dim1_max, dim2_max;
 	UINT32 mask1, mask2;

@@ -737,6 +737,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 		tilemap_draw(bitmap,cliprect,tmap, flags, priority);
 #else
 	int x,y,i;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	/* sub tile placement */
 //  sx      =   sx - (wx & ~7) + (wx & 7);
@@ -765,17 +766,17 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 		clip.max_x	=	clip.min_x + (WIN_NX-1)*8 - 1;
 		clip.max_y	=	clip.min_y + (WIN_NY-1)*8 - 1;
 
-		if (clip.min_x > machine->screen[0].visarea.max_x)	continue;
-		if (clip.min_y > machine->screen[0].visarea.max_y)	continue;
+		if (clip.min_x > visarea->max_x)	continue;
+		if (clip.min_y > visarea->max_y)	continue;
 
-		if (clip.max_x < machine->screen[0].visarea.min_x)	continue;
-		if (clip.max_y < machine->screen[0].visarea.min_y)	continue;
+		if (clip.max_x < visarea->min_x)	continue;
+		if (clip.max_y < visarea->min_y)	continue;
 
-		if (clip.min_x < machine->screen[0].visarea.min_x)	clip.min_x = machine->screen[0].visarea.min_x;
-		if (clip.max_x > machine->screen[0].visarea.max_x)	clip.max_x = machine->screen[0].visarea.max_x;
+		if (clip.min_x < visarea->min_x)	clip.min_x = visarea->min_x;
+		if (clip.max_x > visarea->max_x)	clip.max_x = visarea->max_x;
 
-		if (clip.min_y < machine->screen[0].visarea.min_y)	clip.min_y = machine->screen[0].visarea.min_y;
-		if (clip.max_y > machine->screen[0].visarea.max_y)	clip.max_y = machine->screen[0].visarea.max_y;
+		if (clip.min_y < visarea->min_y)	clip.min_y = visarea->min_y;
+		if (clip.max_y > visarea->max_y)	clip.max_y = visarea->max_y;
 
 		/* The clip region's width must be a multiple of 8!
            This fact renderes the function useless, as far as

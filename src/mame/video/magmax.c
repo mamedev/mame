@@ -78,7 +78,7 @@ VIDEO_START( magmax )
 	prom_tab = auto_malloc(256 * sizeof(UINT32));
 
 	/* Allocate temporary bitmap */
- 	tmpbitmap = auto_bitmap_alloc(256,256,machine->screen[0].format);
+ 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	for (i=0; i<256; i++)
 	{
@@ -107,7 +107,7 @@ VIDEO_UPDATE( magmax )
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		fillbitmap(tmpbitmap, 0, &screen->machine->screen[0].visarea);
+		fillbitmap(tmpbitmap, 0, NULL);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{

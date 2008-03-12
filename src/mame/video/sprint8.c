@@ -179,19 +179,20 @@ VIDEO_EOF( sprint8 )
 {
 	int x;
 	int y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	tilemap_draw(helper2, &machine->screen[0].visarea, tilemap2, 0, 0);
+	tilemap_draw(helper2, visarea, tilemap2, 0, 0);
 
-	fillbitmap(helper1, 0x20, &machine->screen[0].visarea);
+	fillbitmap(helper1, 0x20, visarea);
 
-	draw_sprites(machine, helper1, &machine->screen[0].visarea);
+	draw_sprites(machine, helper1, visarea);
 
-	for (y = machine->screen[0].visarea.min_y; y <= machine->screen[0].visarea.max_y; y++)
+	for (y = visarea->min_y; y <= visarea->max_y; y++)
 	{
 		const UINT16* p1 = BITMAP_ADDR16(helper1, y, 0);
 		const UINT16* p2 = BITMAP_ADDR16(helper2, y, 0);
 
-		for (x = machine->screen[0].visarea.min_x; x <= machine->screen[0].visarea.max_x; x++)
+		for (x = visarea->min_x; x <= visarea->max_x; x++)
 			if (p1[x] != 0x20 && p2[x] == 0x23)
 				timer_set(video_screen_get_time_until_pos(machine->primary_screen, y + 24, x), NULL,
 						  colortable_entry_get_value(machine->colortable, p1[x]),

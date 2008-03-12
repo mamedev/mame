@@ -188,7 +188,7 @@ WRITE16_HANDLER( zwackery_spriteram_w )
 
 static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	rectangle sprite_clip = machine->screen[0].visarea;
+	rectangle sprite_clip = *video_screen_get_visible_area(machine->primary_screen);
 	int offs;
 
 	/* adjust for clipping */

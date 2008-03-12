@@ -1416,7 +1416,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 		for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			if (item->element == NULL)
 			{
-				const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, item->index)->inline_config;
+				const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, item->index);
+				const screen_config *scrconfig = screen->inline_config;
 				const rectangle vectorvis = { 0, 639, 0, 479 };
 				const rectangle *visarea = NULL;
 				render_container *container = get_screen_container_by_index(item->index);
@@ -1426,8 +1427,8 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				/* we may be called very early, before Machine->visible_area is initialized; handle that case */
 				if (scrconfig->type == SCREEN_TYPE_VECTOR)
 					visarea = &vectorvis;
-				else if (Machine->screen[item->index].visarea.max_x > Machine->screen[item->index].visarea.min_x)
-					visarea = &Machine->screen[item->index].visarea;
+				else if (screen->token != NULL)
+					visarea = video_screen_get_visible_area(screen);
 				else
 					visarea = &scrconfig->visarea;
 

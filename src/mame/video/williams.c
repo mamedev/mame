@@ -258,7 +258,7 @@ VIDEO_UPDATE( blaster )
 		pens[x] = palette_lookup[paletteram[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect->min_y == screen->machine->screen[0].visarea.min_y || !(blaster_video_control & 1))
+	if (cliprect->min_y == video_screen_get_visible_area(screen)->min_y || !(blaster_video_control & 1))
 		blaster_color0 = pens[0];
 
 	/* loop over rows */

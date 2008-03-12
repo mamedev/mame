@@ -248,13 +248,8 @@ static void MB60553_draw(running_machine *machine, int numchip, bitmap_t* screen
 	rectangle clip;
 	MB60553_cur_chip = &MB60553[numchip];
 
-
-
-
-	clip.min_x = machine->screen[0].visarea.min_x;
-	clip.max_x = machine->screen[0].visarea.max_x;
-	clip.min_y = machine->screen[0].visarea.min_y;
-	clip.max_y = machine->screen[0].visarea.max_y;
+	clip.min_x = video_screen_get_visible_area(machine->primary_screen)->min_x;
+	clip.max_x = video_screen_get_visible_area(machine->primary_screen)->max_x;
 
 	for (line = 0; line < 224;line++)
 	{

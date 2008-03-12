@@ -49,13 +49,14 @@ static UINT8 last_control;
 
 void cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
+	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
 	int intensity = 0xff;
 
 	/* adjust for slop */
-	sx = sx - Machine->screen[0].visarea.min_x;
-	ex = ex - Machine->screen[0].visarea.min_x;
-	sy = sy - Machine->screen[0].visarea.min_y;
-	ey = ey - Machine->screen[0].visarea.min_y;
+	sx = sx - visarea->min_x;
+	ex = ex - visarea->min_x;
+	sy = sy - visarea->min_y;
+	ey = ey - visarea->min_y;
 
 	/* point intensity is determined by the shift value */
 	if (sx == ex && sy == ey)

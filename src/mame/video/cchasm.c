@@ -123,15 +123,10 @@ WRITE16_HANDLER( cchasm_refresh_control_w )
 
 VIDEO_START( cchasm )
 {
-	int xmin, xmax, ymin, ymax;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	xmin=machine->screen[0].visarea.min_x;
-	ymin=machine->screen[0].visarea.min_y;
-	xmax=machine->screen[0].visarea.max_x;
-	ymax=machine->screen[0].visarea.max_y;
-
-	xcenter=((xmax+xmin)/2) << 16;
-	ycenter=((ymax+ymin)/2) << 16;
+	xcenter=((visarea->max_x + visarea->min_x)/2) << 16;
+	ycenter=((visarea->max_y + visarea->min_y)/2) << 16;
 
 	VIDEO_START_CALL(vector);
 }

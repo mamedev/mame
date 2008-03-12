@@ -308,7 +308,7 @@ void atarirle_init(int map, const atarirle_desc *desc)
 	mo->romlength     = memory_region_length(desc->region);
 	mo->objectcount   = count_objects(base, mo->romlength);
 
-	mo->cliprect      = Machine->screen[0].visarea;
+	mo->cliprect      = *video_screen_get_visible_area(Machine->primary_screen);
 	if (desc->rightclip)
 	{
 		mo->cliprect.min_x = desc->leftclip;
@@ -840,6 +840,7 @@ if (hilite)
 
 		do
 		{
+			const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
 			int scaled_width = (scale * info->width + 0x7fff) >> 12;
 			int scaled_height = (scale * info->height + 0x7fff) >> 12;
 			int dx, dy, ex, ey, sx = x, sy = y, tx, ty;
@@ -855,27 +856,27 @@ if (hilite)
 			ey = sy + scaled_height - 1;
 
 			/* left edge clip */
-			if (sx < Machine->screen[0].visarea.min_x)
-				sx = Machine->screen[0].visarea.min_x;
-			if (sx > Machine->screen[0].visarea.max_x)
+			if (sx < visarea->min_x)
+				sx = visarea->min_x;
+			if (sx > visarea->max_x)
 				break;
 
 			/* right edge clip */
-			if (ex > Machine->screen[0].visarea.max_x)
-				ex = Machine->screen[0].visarea.max_x;
-			else if (ex < Machine->screen[0].visarea.min_x)
+			if (ex > visarea->max_x)
+				ex = visarea->max_x;
+			else if (ex < visarea->min_x)
 				break;
 
 			/* top edge clip */
-			if (sy < Machine->screen[0].visarea.min_y)
-				sy = Machine->screen[0].visarea.min_y;
-			else if (sy > Machine->screen[0].visarea.max_y)
+			if (sy < visarea->min_y)
+				sy = visarea->min_y;
+			else if (sy > visarea->max_y)
 				break;
 
 			/* bottom edge clip */
-			if (ey > Machine->screen[0].visarea.max_y)
-				ey = Machine->screen[0].visarea.max_y;
-			else if (ey < Machine->screen[0].visarea.min_y)
+			if (ey > visarea->max_y)
+				ey = visarea->max_y;
+			else if (ey < visarea->min_y)
 				break;
 
 			for (ty = sy; ty <= ey; ty++)
@@ -917,7 +918,7 @@ void draw_rle(atarirle_data *mo, bitmap_t *bitmap, int code, int color, int hfli
 	if (hflip)
 		scaled_xoffs = ((xscale * info->width) >> 12) - scaled_xoffs;
 
-//if (clip->min_y == Machine->screen[0].visarea.min_y)
+//if (clip->min_y == video_screen_get_visible_area(Machine->primary_screen)->min_y)
 //logerror("   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
 //  code, color, hflip,
 //  x, -scaled_xoffs, (xscale * info->width) >> 12,

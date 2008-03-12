@@ -2937,8 +2937,9 @@ INLINE void f3_drawgfxzoom(bitmap_t *dest_bmp,const gfx_element *gfx,
 
 static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_ptr)
 {
-	const int min_x=machine->screen[0].visarea.min_x,max_x=machine->screen[0].visarea.max_x;
-	const int min_y=machine->screen[0].visarea.min_y,max_y=machine->screen[0].visarea.max_y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const int min_x=visarea->min_x,max_x=visarea->max_x;
+	const int min_y=visarea->min_y,max_y=visarea->max_y;
 	int offs,spritecont,flipx,flipy,old_x,old_y,color,x,y;
 	int sprite,global_x=0,global_y=0,subglobal_x=0,subglobal_y=0;
 	int block_x=0, block_y=0;

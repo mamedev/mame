@@ -72,7 +72,7 @@ VIDEO_START( tunhunt )
     We keep track of dirty lines and cache the expanded bitmap.
     With max RLE expansion, bitmap size is 256x64.
     */
-	tmpbitmap = auto_bitmap_alloc( 256, 64, machine->screen[0].format );
+	tmpbitmap = auto_bitmap_alloc(256, 64, video_screen_get_format(machine->primary_screen));
 
 	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 

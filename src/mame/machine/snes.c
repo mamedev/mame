@@ -1085,8 +1085,7 @@ WRITE8_HANDLER( snes_w_io )
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x7;
 			{
-				screen_state *state = &Machine->screen[0];
-				rectangle visarea = state->visarea;
+				rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 
 				visarea.min_x = visarea.min_y = 0;
 				visarea.max_y = snes_ppu.beam.last_visible_line - 1;

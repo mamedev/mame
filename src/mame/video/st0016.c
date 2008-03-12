@@ -635,7 +635,7 @@ VIDEO_UPDATE( st0016 )
 		//super eagle shot
 		int x,y,dy;
 
-		fillbitmap(speglsht_bitmap,0,&screen->machine->screen[0].visarea);
+		fillbitmap(speglsht_bitmap,0,NULL);
 		dy=(speglsht_videoreg&0x20)?(256*512):0; //visible frame
 
 		for(y=0;y<256;y++)

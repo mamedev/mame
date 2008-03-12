@@ -550,12 +550,12 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 			if (sprite_flip&2)
 			{
 				xflip ^= 1;
-				sx = machine->screen[0].visarea.max_x+1 - sx;
+				sx = video_screen_get_visible_area(machine->primary_screen)->max_x+1 - sx;
 			}
 			if (sprite_flip&1)
 			{
 				yflip ^= 1;
-				sy = machine->screen[0].visarea.max_y+1 - sy;
+				sy = video_screen_get_visible_area(machine->primary_screen)->max_y+1 - sy;
 			}
 
 			/* Palette linking */

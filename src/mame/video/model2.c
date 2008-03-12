@@ -2703,8 +2703,9 @@ static void model2_exit(running_machine *machine)
 
 VIDEO_START(model2)
 {
-	int	width = machine->screen[0].visarea.max_x - machine->screen[0].visarea.min_x;
-	int	height = machine->screen[0].visarea.max_y - machine->screen[0].visarea.min_y;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	int	width = visarea->max_x - visarea->min_x;
+	int	height = visarea->max_y - visarea->min_y;
 
 	sys24_tile_vh_start(machine, 0x3fff);
 	sys24_bitmap = bitmap_alloc(width, height+4, BITMAP_FORMAT_INDEXED16);

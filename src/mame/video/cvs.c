@@ -357,20 +357,17 @@ VIDEO_UPDATE( cvs )
 			UINT8 x = (stars[offs].x + stars_scroll) >> 1;
 			UINT8 y = stars[offs].y + ((stars_scroll + stars[offs].x) >> 9);
 
-			if (y >= screen->machine->screen[0].visarea.min_y &&
-				y <= screen->machine->screen[0].visarea.max_y)
+			if ((y & 1) ^ ((x >> 4) & 1))
 			{
-				if ((y & 1) ^ ((x >> 4) & 1))
-				{
-					if (flip_screen_x_get())
-						x = ~x;
+				if (flip_screen_x_get())
+					x = ~x;
 
-					if (flip_screen_y_get())
-						y = ~y;
+				if (flip_screen_y_get())
+					y = ~y;
 
-					if (colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0)
-						*BITMAP_ADDR16(bitmap, y, x) = BULLET_STAR_PEN;
-				}
+				if ((y >= cliprect->min_y) && (y <= cliprect->max_y) &&
+					(colortable_entry_get_value(screen->machine->colortable, *BITMAP_ADDR16(bitmap, y, x)) == 0))
+					*BITMAP_ADDR16(bitmap, y, x) = BULLET_STAR_PEN;
 			}
 		}
 	}

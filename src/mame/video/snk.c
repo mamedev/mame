@@ -67,7 +67,7 @@ VIDEO_START( snk )
 {
 	snk_blink_parity = 0;
 
-	tmpbitmap = auto_bitmap_alloc( 512, 512, machine->screen[0].format );
+	tmpbitmap = auto_bitmap_alloc(512, 512, video_screen_get_format(machine->primary_screen));
 }
 
 /**************************************************************************************/
@@ -241,7 +241,7 @@ VIDEO_UPDATE( tnk3 )
 
 VIDEO_START( sgladiat )
 {
-	tmpbitmap = auto_bitmap_alloc( 512, 256, machine->screen[0].format );
+	tmpbitmap = auto_bitmap_alloc(512, 256, video_screen_get_format(machine->primary_screen));
 }
 
 static void sgladiat_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly )

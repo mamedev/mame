@@ -72,7 +72,7 @@ WRITE8_HANDLER( popper_flipscreen_w )
 	popper_flipscreen = data;
 	tilemap_set_flip( ALL_TILEMAPS,popper_flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
-	tilemap_clip = Machine->screen[0].visarea;
+	tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
 
 	if (popper_flipscreen)
 		tilemap_clip.min_x=tilemap_clip.max_x-15;
@@ -170,7 +170,7 @@ VIDEO_START( popper )
 	tilemap_set_transmask(popper_ol_p0_tilemap,  0,0x0f,0x0e);
 	tilemap_set_transmask(popper_ol_p0_tilemap,  1,0x0e,0x0f);
 
-	tilemap_clip = machine->screen[0].visarea;
+	tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
 
 	state_save_register_global(popper_flipscreen);
 //  state_save_register_global(popper_e002);

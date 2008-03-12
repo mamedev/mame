@@ -55,11 +55,11 @@ WRITE8_HANDLER( starcrus_p2_y_w ) { p2_y = data^0xff; }
 
 VIDEO_START( starcrus )
 {
-	ship1_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
-	ship2_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
+	ship1_vid = auto_bitmap_alloc(16,16,video_screen_get_format(machine->primary_screen));
+	ship2_vid = auto_bitmap_alloc(16,16,video_screen_get_format(machine->primary_screen));
 
-	proj1_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
-	proj2_vid = auto_bitmap_alloc(16,16,machine->screen[0].format);
+	proj1_vid = auto_bitmap_alloc(16,16,video_screen_get_format(machine->primary_screen));
+	proj2_vid = auto_bitmap_alloc(16,16,video_screen_get_format(machine->primary_screen));
 }
 
 WRITE8_HANDLER( starcrus_ship_parm_1_w )

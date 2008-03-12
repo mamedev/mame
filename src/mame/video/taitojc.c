@@ -492,7 +492,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000)
 				{
-					poly_render_triangle(poly, framebuffer, &Machine->screen[0].visarea, render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
+					poly_render_triangle(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_texture_scan, 4, &vert[0], &vert[1], &vert[2]);
 				}
 				break;
 			}
@@ -540,11 +540,11 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 						vert[2].p[1] == vert[3].p[1])
 					{
 						// optimization: all colours the same -> render solid
-						poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_solid_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 					else
 					{
-						poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+						poly_render_quad(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_shade_scan, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 					}
 				}
 				break;
@@ -610,7 +610,7 @@ void taitojc_render_polygons(UINT16 *polygon_fifo, int length)
 
 				if (vert[0].p[0] < 0x8000 && vert[1].p[0] < 0x8000 && vert[2].p[0] < 0x8000 && vert[3].p[0] < 0x8000)
 				{
-					poly_render_quad(poly, framebuffer, &Machine->screen[0].visarea, render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
+					poly_render_quad(poly, framebuffer, video_screen_get_visible_area(Machine->primary_screen), render_texture_scan, 4, &vert[0], &vert[1], &vert[2], &vert[3]);
 				}
 				break;
 			}

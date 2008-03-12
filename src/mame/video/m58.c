@@ -180,11 +180,16 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 
 VIDEO_START( yard )
 {
-	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
-	tilemap_set_scrolldx(bg_tilemap, machine->screen[0].visarea.min_x, machine->screen[0].width - (machine->screen[0].visarea.max_x + 1));
-	tilemap_set_scrolldy(bg_tilemap, machine->screen[0].visarea.min_y - 8, machine->screen[0].height + 16 - (machine->screen[0].visarea.max_y + 1));
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+	bitmap_format format = video_screen_get_format(machine->primary_screen);
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	scroll_panel_bitmap = auto_bitmap_alloc(SCROLL_PANEL_WIDTH, machine->screen[0].height, machine->screen[0].format);
+	bg_tilemap = tilemap_create(yard_get_bg_tile_info, yard_tilemap_scan_rows,  8, 8, 64, 32);
+	tilemap_set_scrolldx(bg_tilemap, visarea->min_x, width - (visarea->max_x + 1));
+	tilemap_set_scrolldy(bg_tilemap, visarea->min_y - 8, height + 16 - (visarea->max_y + 1));
+
+	scroll_panel_bitmap = auto_bitmap_alloc(SCROLL_PANEL_WIDTH, height, format);
 }
 
 
@@ -217,6 +222,7 @@ WRITE8_HANDLER( yard_flipscreen_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	int offs;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)
 	{
@@ -254,8 +260,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sy2 = sy1 + 0x10;
 		}
 
-		DRAW_SPRITE(code1 + 256 * bank, machine->screen[0].visarea.min_y + sy1)
-		DRAW_SPRITE(code2 + 256 * bank, machine->screen[0].visarea.min_y + sy2)
+		DRAW_SPRITE(code1 + 256 * bank, visarea->min_y + sy1)
+		DRAW_SPRITE(code2 + 256 * bank, visarea->min_y + sy2)
 	}
 }
 
@@ -282,14 +288,15 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 			1*8, 31*8-1
 		};
 		rectangle clip = flip_screen_get() ? clippanelflip : clippanel;
+		const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 		int sx = flip_screen_get() ? cliprect->min_x - 8 : cliprect->max_x + 1 - SCROLL_PANEL_WIDTH;
 		int yoffs = flip_screen_get() ? -40 : -16;
 
-		clip.min_y += machine->screen[0].visarea.min_y + yoffs;
-		clip.max_y += machine->screen[0].visarea.max_y + yoffs;
+		clip.min_y += visarea->min_y + yoffs;
+		clip.max_y += visarea->max_y + yoffs;
 
 		copybitmap(bitmap, scroll_panel_bitmap, flip_screen_get(), flip_screen_get(),
-				   sx, machine->screen[0].visarea.min_y + yoffs, &clip);
+				   sx, visarea->min_y + yoffs, &clip);
 	}
 }
 

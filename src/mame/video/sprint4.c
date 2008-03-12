@@ -113,7 +113,7 @@ VIDEO_EOF( sprint4 )
 		rect.max_x = horz - 15 + machine->gfx[1]->width - 1;
 		rect.max_y = vert - 15 + machine->gfx[1]->height - 1;
 
-		sect_rect(&rect, &machine->screen[0].visarea);
+		sect_rect(&rect, video_screen_get_visible_area(machine->primary_screen));
 
 		tilemap_draw(helper, &rect, playfield, 0, 0);
 

@@ -59,7 +59,7 @@ WRITE8_HANDLER( mnchmobl_sprite_tile_w ){ mnchmobl_sprite_tile[offset] = data; }
 
 VIDEO_START( mnchmobl )
 {
-	tmpbitmap = auto_bitmap_alloc(512,512,machine->screen[0].format);
+	tmpbitmap = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
 }
 
 static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

@@ -48,6 +48,9 @@
 typedef struct _internal_screen_state internal_screen_state;
 struct _internal_screen_state
 {
+	/* screen attributes */
+	rectangle				visarea;				/* current visible area (HBLANK end/start, VBLANK end/start) */
+
 	/* textures and bitmaps */
 	render_texture *		texture[2];				/* 2x textures for the screen bitmap */
 	bitmap_t *				bitmap[2];				/* 2x bitmaps for rendering */
@@ -279,6 +282,11 @@ void video_init(running_machine *machine)
 	const device_config *screen;
 	const char *filename;
 
+	/* validate */
+	assert(machine != NULL);
+	assert(machine->config != NULL);
+	assert(machine->config->devicelist != NULL);
+
 	/* request a callback upon exiting */
 	add_exit_callback(machine, video_exit);
 
@@ -322,7 +330,6 @@ void video_init(running_machine *machine)
 		internal_state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
 
 		/* configure the screen with the default parameters */
-		state->format = config->format;
 		video_screen_configure(screen, config->width, config->height, &config->visarea, config->refresh);
 
 		/* configure the default cliparea */
@@ -373,6 +380,14 @@ void video_init(running_machine *machine)
 	/* reset video statics and get out of here */
 	pdrawgfx_shadow_lowpri = 0;
 
+	/* create a render target for snapshots */
+	if (machine->primary_screen != NULL)
+	{
+		global.snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
+		assert(global.snap_target != NULL);
+		render_target_set_layer_config(global.snap_target, 0);
+	}
+
 	/* start recording movie if specified */
 	filename = options_get_string(mame_options(), OPTION_MNGWRITE);
 	if ((filename[0] != 0) && (machine->primary_screen != NULL))
@@ -388,6 +403,10 @@ static void video_exit(running_machine *machine)
 {
 	const device_config *screen;
 	int i;
+
+	/* validate */
+	assert(machine != NULL);
+	assert(machine->config != NULL);
 
 	/* stop recording any movie */
 	if (machine->primary_screen != NULL)
@@ -682,7 +701,7 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 		/* if we're too small to contain this width/height, reallocate our bitmaps and textures */
 		if (width > curwidth || height > curheight)
 		{
-			bitmap_format screen_format = state->format;
+			bitmap_format screen_format = config->format;
 
 			/* free what we have currently */
 			if (internal_state->texture[0] != NULL)
@@ -724,7 +743,7 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 	/* now fill in the new parameters */
 	state->width = width;
 	state->height = height;
-	state->visarea = *visarea;
+	internal_state->visarea = *visarea;
 
 	/* compute timing parameters */
 	internal_state->frame_period = frame_period;
@@ -777,6 +796,12 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	rectangle visarea;
 
+	/* validate arguments */
+	assert(min_x >= 0);
+	assert(min_y >= 0);
+	assert(min_x < max_x);
+	assert(min_y < max_y);
+
 	visarea.min_x = min_x;
 	visarea.max_x = max_x;
 	visarea.min_y = min_y;
@@ -796,7 +821,10 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 {
 	screen_state *state = get_safe_token(screen);
 	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
-	rectangle clip = state->visarea;
+	rectangle clip = internal_state->visarea;
+
+	/* validate arguments */
+	assert(scanline >= 0);
 
 	LOG_PARTIAL_UPDATES(("Partial: video_screen_update_partial(%s, %d): ", screen->tag, scanline));
 
@@ -900,7 +928,7 @@ int video_screen_get_vpos(const device_config *screen)
 	vpos = delta / internal_state->scantime;
 
 	/* adjust for the fact that VBLANK starts at the bottom of the visible area */
-	return (state->visarea.max_y + 1 + vpos) % state->height;
+	return (internal_state->visarea.max_y + 1 + vpos) % state->height;
 }
 
 
@@ -940,8 +968,9 @@ int video_screen_get_hpos(const device_config *screen)
 int video_screen_get_vblank(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	int vpos = video_screen_get_vpos(screen);
-	return (vpos < state->visarea.min_y || vpos > state->visarea.max_y);
+	return (vpos < internal_state->visarea.min_y || vpos > internal_state->visarea.max_y);
 }
 
 
@@ -953,8 +982,9 @@ int video_screen_get_vblank(const device_config *screen)
 int video_screen_get_hblank(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
 	int hpos = video_screen_get_hpos(screen);
-	return (hpos < state->visarea.min_x || hpos > state->visarea.max_x);
+	return (hpos < internal_state->visarea.min_x || hpos > internal_state->visarea.max_x);
 }
 
 
@@ -987,7 +1017,8 @@ int video_screen_get_height(const device_config *screen)
 const rectangle *video_screen_get_visible_area(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
-	return &state->visarea;
+	internal_screen_state *internal_state = (internal_screen_state *)state->private_data;
+	return &internal_state->visarea;
 }
 
 
@@ -1004,8 +1035,12 @@ attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, 
 	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(), internal_state->vblank_start_time));
 	attoseconds_t targetdelta;
 
+	/* validate arguments */
+	assert(vpos >= 0);
+	assert(hpos >= 0);
+
 	/* since we measure time relative to VBLANK, compute the scanline offset from VBLANK */
-	vpos += state->height - (state->visarea.max_y + 1);
+	vpos += state->height - (internal_state->visarea.max_y + 1);
 	vpos %= state->height;
 
 	/* compute the delta for the given X,Y position */
@@ -1196,8 +1231,8 @@ void video_screen_register_global_vbl_cb(vblank_state_changed_global_func vbl_cb
 
 static DEVICE_START( video_screen )
 {
-	int scrindex = device_list_index(device->machine->config->devicelist, VIDEO_SCREEN, device->tag);
-	return &device->machine->screen[scrindex];
+	int scrnum = device_list_index(device->machine->config->devicelist, VIDEO_SCREEN, device->tag);
+	return &device->machine->screen[scrnum];
 }
 
 
@@ -1355,8 +1390,8 @@ static TIMER_CALLBACK( scanline_update_callback )
 
 	/* compute the next visible scanline */
 	scanline++;
-	if (scanline > state->visarea.max_y)
-		scanline = state->visarea.min_y;
+	if (scanline > internal_state->visarea.max_y)
+		scanline = internal_state->visarea.min_y;
 	timer_adjust_oneshot(internal_state->scanline_timer, video_screen_get_time_until_pos(screen, scanline, 0), scanline);
 }
 
@@ -1372,6 +1407,10 @@ void video_frame_update(running_machine *machine, int debug)
 	attotime current_time = timer_get_time();
 	int skipped_it = global.skipping_this_frame;
 	int phase = mame_get_phase(machine);
+
+	/* validate */
+	assert(machine != NULL);
+	assert(machine->config != NULL);
 
 	/* only render sound and video if we're in the running phase */
 	if (phase == MAME_PHASE_RUNNING && (!mame_is_paused(machine) || global.update_in_pause))
@@ -1544,6 +1583,9 @@ const char *video_get_speed_text(running_machine *machine)
 	int paused = mame_is_paused(machine);
 	static char buffer[1024];
 	char *dest = buffer;
+
+	/* validate */
+	assert(machine != NULL);
 
 	/* if we're paused, just display Paused */
 	if (paused)
@@ -2018,6 +2060,10 @@ void video_screen_save_snapshot(const device_config *screen, mame_file *fp)
 	png_error error;
 	char text[256];
 
+	/* validate */
+	assert(screen != NULL);
+	assert(fp != NULL);
+
 	/* create the bitmap to pass in */
 	create_snapshot_bitmap(screen);
 
@@ -2046,6 +2092,10 @@ void video_save_active_screen_snapshots(running_machine *machine)
 	mame_file *fp;
 	const device_config *screen;
 
+	/* validate */
+	assert(machine != NULL);
+	assert(machine->config != NULL);
+
 	/* write one snapshot per visible screen */
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 		if (render_is_live_screen(screen))
@@ -2072,16 +2122,9 @@ static void create_snapshot_bitmap(const device_config *screen)
 	INT32 width, height;
 	int view_index;
 
-	/* lazy create snap target */
-	if (global.snap_target == NULL)
-	{
-		global.snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
-		assert(global.snap_target != NULL);
-		render_target_set_layer_config(global.snap_target, 0);
-	}
-
 	/* select the appropriate view in our dummy target */
 	view_index = device_list_index(screen->machine->config->devicelist, VIDEO_SCREEN, screen->tag);
+	assert(view_index != -1);
 	render_target_set_view(global.snap_target, view_index);
 
 	/* get the minimum width/height and set it on the target */

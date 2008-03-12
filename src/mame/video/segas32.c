@@ -2606,7 +2606,7 @@ for (showclip = 0; showclip < 4; showclip++)
 						rect.min_x = (visarea->max_x + 1) - ((system32_videoram[0x1ff64/2 + i * 4] & 0x1ff) + 1);
 						rect.min_y = (visarea->max_y + 1) - ((system32_videoram[0x1ff66/2 + i * 4] & 0x0ff) + 1);
 					}
-					sect_rect(&rect, &screen->machine->screen[screen].visarea);
+					sect_rect(&rect, video_screen_get_visible_area(screen));
 
 					if (rect.min_y <= rect.max_y && rect.min_x <= rect.max_x)
 					{

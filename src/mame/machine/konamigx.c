@@ -1119,17 +1119,16 @@ int K055555GX_decode_osmixcolor(int layer, int *color) // (see p.63, p.49-50 and
 	return(emx);
 }
 
-static void gx_wipezbuf(int noshadow)
+static void gx_wipezbuf(running_machine *machine, int noshadow)
 {
-	UINT8  *zptr;
-	int w, h;
-	register int ecx;
+	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	w = Machine->screen[0].visarea.max_x - Machine->screen[0].visarea.min_x + 1;
-	h = Machine->screen[0].visarea.max_y - Machine->screen[0].visarea.min_y + 1;
+	int w = visarea->max_x - visarea->min_x + 1;
+	int h = visarea->max_y - visarea->min_y + 1;
 
-	zptr = gx_objzbuf;
-	ecx = h;
+	UINT8 *zptr = gx_objzbuf;
+	int ecx = h;
+
 	do { memset(zptr, -1, w); zptr += GX_ZBUFW; } while (--ecx);
 
 	if (!noshadow)
@@ -1265,7 +1264,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	if (mixerflags & GXMIX_NOZBUF)
 		mixerflags |= GXMIX_NOSHADOW;
 	else
-		gx_wipezbuf(mixerflags & GXMIX_NOSHADOW);
+		gx_wipezbuf(machine, mixerflags & GXMIX_NOSHADOW);
 
 	// cache global parameters
 	konamigx_precache_registers();
