@@ -287,7 +287,7 @@ static const struct slapstic_data slapstic101 =
 
 	/* alternate banking */
 	{ 0x007f,UNKNOWN },				/* 1st mask/value in sequence */
-	{ 0x1fff,0x1dfe },				/* 2nd mask/value in sequence */
+	{ 0x1fff,0x1dff },				/* 2nd mask/value in sequence */
 	{ 0x1ffc,0x1b5c },				/* 3rd mask/value in sequence */
 	{ 0x1fcf,0x0080 },				/* 4th mask/value in sequence */
 	0,								/* shift to get bank from 3rd */
@@ -904,6 +904,7 @@ static int alt2_kludge(offs_t offset)
 
 int slapstic_tweak(offs_t offset)
 {
+//logerror("PC=%04X touch=%04X state=%d\n", activecpu_get_pc(), offset, state);
 	/* reset is universal */
 	if (offset == 0x0000)
 	{

@@ -23,7 +23,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
@@ -40,7 +39,9 @@ UINT8 starwars_is_esb;
 /* Local variables */
 static UINT8 *slapstic_source;
 static UINT8 *slapstic_base;
-static UINT8 current_bank;
+static UINT8 slapstic_current_bank;
+static offs_t slapstic_last_pc;
+static offs_t slapstic_last_address;
 
 
 
@@ -57,8 +58,8 @@ static MACHINE_RESET( starwars )
 	{
 		/* reset the slapstic */
 		slapstic_reset();
-		current_bank = slapstic_bank();
-		memcpy(slapstic_base, &slapstic_source[current_bank * 0x2000], 0x2000);
+		slapstic_current_bank = slapstic_bank();
+		memcpy(slapstic_base, &slapstic_source[slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
 		starwars_out_w(machine, 4, 0);
@@ -78,7 +79,7 @@ static MACHINE_RESET( starwars )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -89,31 +90,30 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static READ8_HANDLER( esb_slapstic_r )
+static void esb_slapstic_tweak(offs_t offset)
 {
-	int result = slapstic_base[offset];
 	int new_bank = slapstic_tweak(offset);
 
 	/* update for the new bank */
-	if (new_bank != current_bank)
+	if (new_bank != slapstic_current_bank)
 	{
-		current_bank = new_bank;
-		memcpy(slapstic_base, &slapstic_source[current_bank * 0x2000], 0x2000);
+		slapstic_current_bank = new_bank;
+		memcpy(slapstic_base, &slapstic_source[slapstic_current_bank * 0x2000], 0x2000);
 	}
+}
+
+
+static READ8_HANDLER( esb_slapstic_r )
+{
+	int result = slapstic_base[offset];
+	esb_slapstic_tweak(offset);
 	return result;
 }
 
 
 static WRITE8_HANDLER( esb_slapstic_w )
 {
-	int new_bank = slapstic_tweak(offset);
-
-	/* update for the new bank */
-	if (new_bank != current_bank)
-	{
-		current_bank = new_bank;
-		memcpy(slapstic_base, &slapstic_source[current_bank * 0x2000], 0x2000);
-	}
+	esb_slapstic_tweak(offset);
 }
 
 
@@ -126,32 +126,27 @@ static WRITE8_HANDLER( esb_slapstic_w )
 
 static OPBASE_HANDLER( esb_setopbase )
 {
-	int prevpc = activecpu_get_previouspc();
-
-	/*
-     *  This is a slightly ugly kludge for Empire Strikes Back because it jumps
-     *  directly to code in the slapstic.
-     */
-
-	/* if we're jumping into the slapstic region, tweak the new PC */
+	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
-		esb_slapstic_r(machine, address & 0x1fff);
-
-		/* make sure we catch the next branch as well */
-		catch_nextBranch();
-		return -1;
+		offs_t pc = activecpu_get_pc();
+		
+		/* filter out duplicates; we get these because the handler gets called for
+		   multiple reasons:
+			1. Because we have read/write handlers backing the current address
+			2. Because the CPU core executed a jump to a new address
+		*/
+		if (pc != slapstic_last_pc || address != slapstic_last_address)
+		{
+			slapstic_last_pc = pc;
+			slapstic_last_address = address;
+			esb_slapstic_tweak(address & 0x1fff);
+		}
+		return ~0;
 	}
-
-	/* if we're jumping out of the slapstic region, tweak the previous PC */
-	else if ((prevpc & 0xe000) == 0x8000)
-	{
-		if (prevpc != 0x8080 && prevpc != 0x8090 && prevpc != 0x80a0 && prevpc != 0x80b0)
-			esb_slapstic_r(machine, prevpc & 0x1fff);
-	}
-
 	return address;
 }
+
 
 
 /*************************************
@@ -598,6 +593,11 @@ static DRIVER_INIT( esb )
 	memory_set_bank(1, 0);
 	memory_configure_bank(2, 0, 2, memory_region(REGION_CPU1) + 0xa000, 0x1c000 - 0xa000);
 	memory_set_bank(2, 0);
+
+	/* additional globals for state saving */
+	state_save_register_global(slapstic_current_bank);
+	state_save_register_global(slapstic_last_pc);
+	state_save_register_global(slapstic_last_address);
 }
 
 
