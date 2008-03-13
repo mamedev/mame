@@ -16,6 +16,7 @@ static int gfxbank;
 static bitmap_t *fg_bitmap[2];
 static int show_bitmap;
 static tilemap *bg_tilemap;
+static int last_power[2];
 
 
 /***************************************************************************
@@ -56,6 +57,16 @@ static TILE_GET_INFO( sqix_get_bg_tile_info )
 VIDEO_START( pbillian )
 {
 	bg_tilemap = tilemap_create(pb_get_bg_tile_info, tilemap_scan_rows,  8, 8,32,32);
+
+	/* Need to do save state here */
+	state_save_register_global(last_power[0]);
+	state_save_register_global(last_power[1]);
+	state_save_register_global(pbillian_show_power);
+}
+
+static void superqix_postload(void)
+{
+	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }
 
 VIDEO_START( superqix )
@@ -66,6 +77,12 @@ VIDEO_START( superqix )
 
 	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(bg_tilemap,1,0x0001,0xfffe); /* split type 1 has pen 0 transparent in front half */
+
+	state_save_register_global(gfxbank);
+	state_save_register_global(show_bitmap);
+	state_save_register_global_bitmap(fg_bitmap[0]);
+	state_save_register_global_bitmap(fg_bitmap[1]);
+	state_save_register_func_postload(superqix_postload);
 }
 
 
@@ -91,7 +108,7 @@ WRITE8_HANDLER( superqix_bitmapram_w )
 
 		superqix_bitmapram[offset] = data;
 
-		*BITMAP_ADDR16(fg_bitmap[0], y, x + 0) = data >> 4;
+		*BITMAP_ADDR16(fg_bitmap[0], y, x)     = data >> 4;
 		*BITMAP_ADDR16(fg_bitmap[0], y, x + 1) = data & 0x0f;
 	}
 }
@@ -105,16 +122,13 @@ WRITE8_HANDLER( superqix_bitmapram2_w )
 
 		superqix_bitmapram2[offset] = data;
 
-		*BITMAP_ADDR16(fg_bitmap[1], y, x + 0) = data >> 4;
+		*BITMAP_ADDR16(fg_bitmap[1], y, x)     = data >> 4;
 		*BITMAP_ADDR16(fg_bitmap[1], y, x + 1) = data & 0x0f;
 	}
 }
 
 WRITE8_HANDLER( pbillian_0410_w )
 {
-	int bankaddress;
-	UINT8 *rom = memory_region(REGION_CPU1);
-
 	/*
      -------0  ? [not used]
      ------1-  coin counter 1
@@ -127,8 +141,7 @@ WRITE8_HANDLER( pbillian_0410_w )
 	coin_counter_w(0,data & 0x02);
 	coin_counter_w(1,data & 0x04);
 
-	bankaddress = 0x10000 + ((data & 0x08) >> 3) * 0x4000;
-	memory_set_bankptr(1,&rom[bankaddress]);
+	memory_set_bank(1, (data & 0x08) >> 3);
 
 	interrupt_enable_w(machine,0,data & 0x10);
 	flip_screen_set(data & 0x20);
@@ -136,9 +149,6 @@ WRITE8_HANDLER( pbillian_0410_w )
 
 WRITE8_HANDLER( superqix_0410_w )
 {
-	int bankaddress;
-	UINT8 *rom = memory_region(REGION_CPU1);
-
 	/* bits 0-1 select the tile bank */
 	if (gfxbank != (data & 0x03))
 	{
@@ -153,8 +163,7 @@ WRITE8_HANDLER( superqix_0410_w )
 	interrupt_enable_w(machine,offset,data & 0x08);
 
 	/* bits 4-5 control ROM bank */
-	bankaddress = 0x10000 + ((data & 0x30) >> 4) * 0x4000;
-	memory_set_bankptr(1,&rom[bankaddress]);
+	memory_set_bank(1, (data & 0x30) >> 4);
 }
 
 
@@ -230,7 +239,6 @@ VIDEO_UPDATE( pbillian )
 
 	if (pbillian_show_power)
 	{
-		static int last_power[2];
 		int curr_power;
 
 		curr_power = ((readinputport(4)&0x3f)*100)/0x3f;

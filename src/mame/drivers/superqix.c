@@ -489,6 +489,39 @@ static READ8_HANDLER(pbillian_ay_port_a_r)
 }
 
 
+static void machine_init_common(void)
+{
+	state_save_register_global(invert_coin_lockout);
+	state_save_register_global(from_mcu_pending);
+	state_save_register_global(from_z80_pending);
+	state_save_register_global(port1);
+	state_save_register_global(port3);
+	state_save_register_global(port3_latch);
+	state_save_register_global(from_mcu);
+	state_save_register_global(from_z80);
+	state_save_register_global(portb);
+
+	// hotsmash ???
+	state_save_register_global(portA_in);
+	state_save_register_global(portB_out);
+	state_save_register_global(portC);
+}
+
+static MACHINE_START( superqix )
+{
+	/* configure the banks */
+	memory_configure_bank(1, 0, 4, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+
+	machine_init_common();
+}
+
+static MACHINE_START( pbillian )
+{
+	/* configure the banks */
+	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x4000);
+
+	machine_init_common();
+}
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -932,6 +965,8 @@ static MACHINE_DRIVER_START( pbillian )
 	MDRV_CPU_IO_MAP(pbillian_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
+	MDRV_MACHINE_START(pbillian)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -966,6 +1001,8 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_CPU_ADD(M68705, 4000000) /* ???? */
 	MDRV_CPU_PROGRAM_MAP(m68705_map,0)
 
+	MDRV_MACHINE_START(pbillian)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -997,13 +1034,15 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(sqix_port_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,3)	/* ??? */
 
 	MDRV_CPU_ADD(I8751, 12000000/3)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 
 	MDRV_INTERLEAVE(500)
+
+	MDRV_MACHINE_START(superqix)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1038,7 +1077,9 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_CPU_ADD(Z80, 12000000/2)	/* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(bootleg_port_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,6)	/* ??? */
+	MDRV_CPU_VBLANK_INT_HACK(bootleg_interrupt,3)	/* ??? */
+
+	MDRV_MACHINE_START(superqix)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1297,11 +1338,11 @@ static DRIVER_INIT( perestro )
 
 
 
-GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "Prebillian", 0 )
-GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", 0 )
-GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (set 1)", 0 )
-GAME( 1987, sqixa,    sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (set 2)", 0 )
-GAME( 1987, sqixu,    sqix,     sqix,     superqix, sqix,     ROT90, "Taito (Romstar License)", "Super Qix (US)", GAME_NOT_WORKING ) // different MCU?
-GAME( 1987, sqixbl,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg)", 0 )
-GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", 0 )
-GAME( 1993, perestrf, perestro, sqixbl,   superqix, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", 0 )
+GAME( 1986, pbillian, 0,        pbillian, pbillian, pbillian, ROT0,  "Taito", "Prebillian", GAME_SUPPORTS_SAVE )
+GAME( 1987, hotsmash, 0,        hotsmash, hotsmash, hotsmash, ROT90, "Taito", "Vs. Hot Smash", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqix,     0,        sqix,     superqix, sqix,     ROT90, "Taito", "Super Qix (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixa,    sqix,     sqix,     superqix, sqixa,    ROT90, "Taito", "Super Qix (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sqixu,    sqix,     sqix,     superqix, sqix,     ROT90, "Taito (Romstar License)", "Super Qix (US)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // different MCU?
+GAME( 1987, sqixbl,   sqix,     sqixbl,   superqix, 0,        ROT90, "bootleg", "Super Qix (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1994, perestro, 0,        sqixbl,   superqix, perestro, ROT90, "Promat", "Perestroika Girls", GAME_SUPPORTS_SAVE )
+GAME( 1993, perestrf, perestro, sqixbl,   superqix, perestro, ROT90, "Promat (Fuuki license)", "Perestroika Girls (Fuuki license)", GAME_SUPPORTS_SAVE )
