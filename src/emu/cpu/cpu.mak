@@ -1019,8 +1019,8 @@ ifneq ($(filter M68000 M68008 M68010 M68EC020 M68020 M68040,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m68000
 CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kmame.o $(CPUOBJ)/m68000/m68kops.o
 DBGOBJS += $(CPUOBJ)/m68000/m68kdasm.o
-endif
 M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
+endif
 
 # when we compile source files we need to include generated files from the OBJ directory
 $(CPUOBJ)/m68000/%.o: $(CPUSRC)/m68000/%.c
