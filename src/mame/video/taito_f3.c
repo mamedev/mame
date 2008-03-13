@@ -545,7 +545,7 @@ VIDEO_EOF( f3 )
 VIDEO_START( f3 )
 {
 	const struct F3config *pCFG=&f3_config_table[0];
-	int tile;
+	int tile, width, height;
 
 	spritelist=0;
 	spriteram32_buffered=0;
@@ -605,7 +605,9 @@ VIDEO_START( f3 )
 	pivot_dirty = (UINT8 *)auto_malloc(2048);
 	pf_line_inf = auto_malloc(5 * sizeof(struct f3_playfield_line_inf));
 	sa_line_inf = auto_malloc(1 * sizeof(struct f3_spritealpha_line_inf));
-	pri_alp_bitmap = auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED8 );
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	pri_alp_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED8 );
 	tile_opaque_sp = (UINT8 *)auto_malloc(machine->gfx[2]->total_elements);
 	tile_opaque_pf = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
 

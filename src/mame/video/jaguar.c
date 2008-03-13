@@ -290,7 +290,7 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
 	hdb = hdbpix[vc % 2];
 
 	/* if setting the second one in a line, make sure we will ever actually hit it */
-	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= machine->screen[0].width))
+	if (vc % 2 == 1 && (hdbpix[1] == hdbpix[0] || hdbpix[1] >= video_screen_get_width(machine->primary_screen)))
 		return FALSE;
 
 	/* adjust the timer */
@@ -633,7 +633,7 @@ READ16_HANDLER( jaguar_tom_regs_r )
 			return cpu_irq_state;
 
 		case HC:
-			return video_screen_get_hpos(machine->primary_screen) % (machine->screen[0].width / 2);
+			return video_screen_get_hpos(machine->primary_screen) % (video_screen_get_width(machine->primary_screen) / 2);
 
 		case VC:
 			return video_screen_get_vpos(machine->primary_screen) * 2 + gpu_regs[VBE];
@@ -796,7 +796,7 @@ static TIMER_CALLBACK( cojag_scanline_update )
 		}
 
 		/* point to the next counter value */
-		if (++vc / 2 >= machine->screen[0].height)
+		if (++vc / 2 >= video_screen_get_height(machine->primary_screen))
 			vc = 0;
 
 	} while (!adjust_object_timer(machine, vc));

@@ -258,14 +258,12 @@ namcos2_GetPosIrqScanline( void )
 {
 	/* PaleteRegister(4)? used by Finest Hour; pc=0x356e */
 	int scanline = GetPaletteRegister(5) - 34;
+	int height = video_screen_get_height(Machine->primary_screen);
 	if( scanline<0 )
-	{
 		scanline = 0;
-	}
-	else if( scanline > Machine->screen[0].height )
-	{
-		scanline = Machine->screen[0].height;
-	}
+	else if( scanline > height )
+		scanline = height;
+
 	return scanline;
 } /* namcos2_GetPosIrqScanline */
 

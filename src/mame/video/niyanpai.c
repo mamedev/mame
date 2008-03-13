@@ -153,28 +153,30 @@ static void niyanpai_vramflip(int vram)
 	static int niyanpai_flipscreen_old[VRAM_MAX] = { 0, 0, 0 };
 	int x, y;
 	UINT16 color1, color2;
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
 
 	if (niyanpai_flipscreen[vram] == niyanpai_flipscreen_old[vram]) return;
 
-	for (y = 0; y < (Machine->screen[0].height / 2); y++)
+	for (y = 0; y < (height / 2); y++)
 	{
-		for (x = 0; x < Machine->screen[0].width; x++)
+		for (x = 0; x < width; x++)
 		{
-			color1 = niyanpai_videoram[vram][(y * Machine->screen[0].width) + x];
-			color2 = niyanpai_videoram[vram][((y ^ 0x1ff) * Machine->screen[0].width) + (x ^ 0x3ff)];
-			niyanpai_videoram[vram][(y * Machine->screen[0].width) + x] = color2;
-			niyanpai_videoram[vram][((y ^ 0x1ff) * Machine->screen[0].width) + (x ^ 0x3ff)] = color1;
+			color1 = niyanpai_videoram[vram][(y * width) + x];
+			color2 = niyanpai_videoram[vram][((y ^ 0x1ff) * width) + (x ^ 0x3ff)];
+			niyanpai_videoram[vram][(y * width) + x] = color2;
+			niyanpai_videoram[vram][((y ^ 0x1ff) * width) + (x ^ 0x3ff)] = color1;
 		}
 	}
 
-	for (y = 0; y < (Machine->screen[0].height / 2); y++)
+	for (y = 0; y < (height / 2); y++)
 	{
-		for (x = 0; x < Machine->screen[0].width; x++)
+		for (x = 0; x < width; x++)
 		{
-			color1 = niyanpai_videoworkram[vram][(y * Machine->screen[0].width) + x];
-			color2 = niyanpai_videoworkram[vram][((y ^ 0x1ff) * Machine->screen[0].width) + (x ^ 0x3ff)];
-			niyanpai_videoworkram[vram][(y * Machine->screen[0].width) + x] = color2;
-			niyanpai_videoworkram[vram][((y ^ 0x1ff) * Machine->screen[0].width) + (x ^ 0x3ff)] = color1;
+			color1 = niyanpai_videoworkram[vram][(y * width) + x];
+			color2 = niyanpai_videoworkram[vram][((y ^ 0x1ff) * width) + (x ^ 0x3ff)];
+			niyanpai_videoworkram[vram][(y * width) + x] = color2;
+			niyanpai_videoworkram[vram][((y ^ 0x1ff) * width) + (x ^ 0x3ff)] = color1;
 		}
 	}
 
@@ -184,7 +186,7 @@ static void niyanpai_vramflip(int vram)
 
 static void update_pixel(int vram, int x, int y)
 {
-	UINT16 color = niyanpai_videoram[vram][(y * Machine->screen[0].width) + x];
+	UINT16 color = niyanpai_videoram[vram][(y * video_screen_get_width(Machine->primary_screen)) + x];
 	*BITMAP_ADDR16(niyanpai_tmpbitmap[vram], y, x) = color;
 }
 
@@ -196,6 +198,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void niyanpai_gfxdraw(int vram)
 {
 	UINT8 *GFX = memory_region(REGION_GFX1);
+	int width = video_screen_get_width(Machine->primary_screen);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -289,27 +292,27 @@ static void niyanpai_gfxdraw(int vram)
 				if (niyanpai_clutsel[vram] & 0x80)
 				{
 					// clut256 mode 1st(low)
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx1] &= 0x00f0;
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx1] |= color1 & 0x0f;
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx2] &= 0x00f0;
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx2] |= color2 & 0x0f;
+					niyanpai_videoworkram[vram][(dy * width) + dx1] &= 0x00f0;
+					niyanpai_videoworkram[vram][(dy * width) + dx1] |= color1 & 0x0f;
+					niyanpai_videoworkram[vram][(dy * width) + dx2] &= 0x00f0;
+					niyanpai_videoworkram[vram][(dy * width) + dx2] |= color2 & 0x0f;
 
 					continue;
 				}
 				else
 				{
 					// clut256 mode 2nd(high)
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx1] &= 0x000f;
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx1] |= (color1 & 0x0f) << 4;
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx2] &= 0x000f;
-					niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx2] |= (color2 & 0x0f) << 4;
+					niyanpai_videoworkram[vram][(dy * width) + dx1] &= 0x000f;
+					niyanpai_videoworkram[vram][(dy * width) + dx1] |= (color1 & 0x0f) << 4;
+					niyanpai_videoworkram[vram][(dy * width) + dx2] &= 0x000f;
+					niyanpai_videoworkram[vram][(dy * width) + dx2] |= (color2 & 0x0f) << 4;
 
-		//          niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx1] += niyanpai_clut[vram][(niyanpai_clutsel[vram] * 0x10)];
-		//          niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx2] += niyanpai_clut[vram][(niyanpai_clutsel[vram] * 0x10)];
+		//          niyanpai_videoworkram[vram][(dy * width) + dx1] += niyanpai_clut[vram][(niyanpai_clutsel[vram] * 0x10)];
+		//          niyanpai_videoworkram[vram][(dy * width) + dx2] += niyanpai_clut[vram][(niyanpai_clutsel[vram] * 0x10)];
 				}
 
-				color1 = niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx1];
-				color2 = niyanpai_videoworkram[vram][(dy * Machine->screen[0].width) + dx2];
+				color1 = niyanpai_videoworkram[vram][(dy * width) + dx1];
+				color2 = niyanpai_videoworkram[vram][(dy * width) + dx2];
 			}
 			else
 			{
@@ -323,12 +326,12 @@ static void niyanpai_gfxdraw(int vram)
 
 			if (((color1 & 0x00ff) != 0x00ff) || (!niyanpai_transparency[vram]))
 			{
-				niyanpai_videoram[vram][(dy * Machine->screen[0].width) + dx1] = color1;
+				niyanpai_videoram[vram][(dy * width) + dx1] = color1;
 				update_pixel(vram, dx1, dy);
 			}
 			if (((color2 & 0x00ff) != 0x00ff) || (!niyanpai_transparency[vram]))
 			{
-				niyanpai_videoram[vram][(dy * Machine->screen[0].width) + dx2] = color2;
+				niyanpai_videoram[vram][(dy * width) + dx2] = color2;
 				update_pixel(vram, dx2, dy);
 			}
 
@@ -372,25 +375,28 @@ WRITE16_HANDLER( niyanpai_clutsel_2_w )	{ niyanpai_clutsel_w(2, data); }
 ******************************************************************************/
 VIDEO_START( niyanpai )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	niyanpai_tmpbitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	niyanpai_tmpbitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	niyanpai_tmpbitmap[2] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	niyanpai_videoram[0] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(short));
-	niyanpai_videoram[1] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(short));
-	niyanpai_videoram[2] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(short));
-	niyanpai_videoworkram[0] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(short));
-	niyanpai_videoworkram[1] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(short));
-	niyanpai_videoworkram[2] = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(short));
+	niyanpai_videoram[0] = auto_malloc(width * height * sizeof(short));
+	niyanpai_videoram[1] = auto_malloc(width * height * sizeof(short));
+	niyanpai_videoram[2] = auto_malloc(width * height * sizeof(short));
+	niyanpai_videoworkram[0] = auto_malloc(width * height * sizeof(short));
+	niyanpai_videoworkram[1] = auto_malloc(width * height * sizeof(short));
+	niyanpai_videoworkram[2] = auto_malloc(width * height * sizeof(short));
 	niyanpai_palette = auto_malloc(0x480 * sizeof(short));
 	niyanpai_clut[0] = auto_malloc(0x1000 * sizeof(char));
 	niyanpai_clut[1] = auto_malloc(0x1000 * sizeof(char));
 	niyanpai_clut[2] = auto_malloc(0x1000 * sizeof(char));
-	memset(niyanpai_videoram[0], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
-	memset(niyanpai_videoram[1], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
-	memset(niyanpai_videoram[2], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
-	memset(niyanpai_videoworkram[0], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
-	memset(niyanpai_videoworkram[1], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
-	memset(niyanpai_videoworkram[2], 0x0000, (machine->screen[0].width * machine->screen[0].height * sizeof(short)));
+	memset(niyanpai_videoram[0], 0x0000, (width * height * sizeof(short)));
+	memset(niyanpai_videoram[1], 0x0000, (width * height * sizeof(short)));
+	memset(niyanpai_videoram[2], 0x0000, (width * height * sizeof(short)));
+	memset(niyanpai_videoworkram[0], 0x0000, (width * height * sizeof(short)));
+	memset(niyanpai_videoworkram[1], 0x0000, (width * height * sizeof(short)));
+	memset(niyanpai_videoworkram[2], 0x0000, (width * height * sizeof(short)));
 	nb19010_busyflag = 1;
 }
 
@@ -406,17 +412,18 @@ VIDEO_UPDATE( niyanpai )
 
 	if (niyanpai_screen_refresh)
 	{
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+
 		niyanpai_screen_refresh = 0;
 
-		for (y = 0; y < screen->machine->screen[0].height; y++)
-		{
-			for (x = 0; x < screen->machine->screen[0].width; x++)
+		for (y = 0; y < height; y++)
+			for (x = 0; x < width; x++)
 			{
 				update_pixel(0, x, y);
 				update_pixel(1, x, y);
 				update_pixel(2, x, y);
 			}
-		}
 	}
 
 	for (i = 0; i < 3; i++)

@@ -1550,7 +1550,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 	}
 
 	// traverse draw list
-	screenwidth = Machine->screen[0].width;
+	screenwidth = video_screen_get_width(machine->primary_screen);
 
 	for (count=0; count<nobj; count++)
 	{

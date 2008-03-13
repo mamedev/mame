@@ -1855,7 +1855,7 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 	/* sanity checks */
 	if (strcmp(itemnode->name, "screen") == 0)
 	{
-		if (item->index >= MAX_SCREENS)
+		if (item->index < 0)
 			fatalerror("Layout references invalid screen index %d", item->index);
 	}
 	else

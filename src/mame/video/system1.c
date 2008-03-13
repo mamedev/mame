@@ -194,8 +194,8 @@ INLINE void draw_pixel(running_machine *machine, bitmap_t *bitmap,
 	int sprite_onscreen;
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	if (x < 0 || x >= Machine->screen[0].width ||
-		y < 0 || y >= Machine->screen[0].height)
+	if (x < 0 || x >= video_screen_get_width(machine->primary_screen) ||
+		y < 0 || y >= video_screen_get_height(machine->primary_screen))
 		return;
 
 	if (sprite_onscreen_map[256*y+x] != 255)

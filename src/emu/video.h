@@ -23,9 +23,6 @@
     CONSTANTS
 ***************************************************************************/
 
-/* maximum number of screens for one game */
-#define MAX_SCREENS					8
-
 /* number of levels of frameskipping supported */
 #define FRAMESKIP_LEVELS			12
 #define MAX_FRAMESKIP				(FRAMESKIP_LEVELS - 2)
@@ -62,18 +59,6 @@ enum
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    screen_state - current live state of a screen
--------------------------------------------------*/
-
-typedef struct _screen_state screen_state;
-struct _screen_state
-{
-	int				width, height;				/* current total width/height (HTOTAL, VTOTAL) */
-	void *			private_data;				/* pointer to the private data structure */
-};
-
 
 /*-------------------------------------------------
     screen_config - configuration of a single

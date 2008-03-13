@@ -82,7 +82,7 @@ WRITE8_HANDLER( irobot_paletteram_w )
 
 static void _irobot_poly_clear(running_machine *machine, UINT8 *bitmap_base)
 {
-	memset(bitmap_base, 0, BITMAP_WIDTH * machine->screen[0].height);
+	memset(bitmap_base, 0, BITMAP_WIDTH * video_screen_get_height(machine->primary_screen));
 }
 
 void irobot_poly_clear(void)
@@ -100,8 +100,9 @@ void irobot_poly_clear(void)
 VIDEO_START( irobot )
 {
 	/* Setup 2 bitmaps for the polygon generator */
-	polybitmap1 = auto_malloc(BITMAP_WIDTH * machine->screen[0].height);
-	polybitmap2 = auto_malloc(BITMAP_WIDTH * machine->screen[0].height);
+	int height = video_screen_get_height(machine->primary_screen);
+	polybitmap1 = auto_malloc(BITMAP_WIDTH * height);
+	polybitmap2 = auto_malloc(BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
 	_irobot_poly_clear(machine, polybitmap1);
@@ -109,8 +110,8 @@ VIDEO_START( irobot )
 
 	/* Set clipping */
 	ir_xmin = ir_ymin = 0;
-	ir_xmax = machine->screen[0].width;
-	ir_ymax = machine->screen[0].height;
+	ir_xmax = video_screen_get_width(machine->primary_screen);
+	ir_ymax = video_screen_get_height(machine->primary_screen);
 }
 
 

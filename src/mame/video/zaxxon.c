@@ -141,8 +141,8 @@ static void video_start_common(running_machine *machine, tile_get_info_func fg_t
 
 	/* configure the foreground tilemap */
 	tilemap_set_transparent_pen(fg_tilemap, 0);
-	tilemap_set_scrolldx(fg_tilemap, 0, machine->screen[0].width - 256);
-	tilemap_set_scrolldy(fg_tilemap, 0, machine->screen[0].height - 256);
+	tilemap_set_scrolldx(fg_tilemap, 0, video_screen_get_width(machine->primary_screen) - 256);
+	tilemap_set_scrolldy(fg_tilemap, 0, video_screen_get_height(machine->primary_screen) - 256);
 
 	/* register for save states */
 	state_save_register_global(bg_enable);

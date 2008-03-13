@@ -179,7 +179,6 @@ struct _running_machine
 
 	/* video-related information */
 	gfx_element *			gfx[MAX_GFX_ELEMENTS];/* array of pointers to graphic sets (chars, sprites) */
-	screen_state			screen[MAX_SCREENS];/* current screen state (to go away) */
 	const device_config *	primary_screen;		/* the primary screen device, or NULL if screenless */
 	palette_t *				palette;			/* global palette object */
 

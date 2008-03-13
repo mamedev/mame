@@ -153,23 +153,25 @@ static void nbmj8991_vramflip(void)
 	static int nbmj8991_flipscreen_old = 0;
 	int x, y;
 	UINT8 color1, color2;
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
 
 	if (nbmj8991_flipscreen == nbmj8991_flipscreen_old) return;
 
-	for (y = 0; y < Machine->screen[0].height / 2; y++)
+	for (y = 0; y < height / 2; y++)
 	{
-		for (x = 0; x < Machine->screen[0].width / 2; x++)
+		for (x = 0; x < width / 2; x++)
 		{
 			// rotate 180 degrees (   0,   0) - ( 511, 511)
-			color1 = nbmj8991_videoram[(y * Machine->screen[0].width) + x];
-			color2 = nbmj8991_videoram[(((Machine->screen[0].height - 1) - y) * Machine->screen[0].width) + (((Machine->screen[0].width / 2) - 1) - x)];
-			nbmj8991_videoram[(y * Machine->screen[0].width) + x] = color2;
-			nbmj8991_videoram[(((Machine->screen[0].height - 1) - y) * Machine->screen[0].width) + (((Machine->screen[0].width / 2) - 1) - x)] = color1;
+			color1 = nbmj8991_videoram[(y * width) + x];
+			color2 = nbmj8991_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)];
+			nbmj8991_videoram[(y * width) + x] = color2;
+			nbmj8991_videoram[(((height - 1) - y) * width) + (((width / 2) - 1) - x)] = color1;
 			// rotate 180 degrees ( 512,   0) - (1023, 511)
-			color1 = nbmj8991_videoram[(y * Machine->screen[0].width) + (x + (Machine->screen[0].width / 2))];
-			color2 = nbmj8991_videoram[(((Machine->screen[0].height - 1) - y) * Machine->screen[0].width) + ((((Machine->screen[0].width / 2) - 1) - x) + (Machine->screen[0].width / 2))];
-			nbmj8991_videoram[(y * Machine->screen[0].width) + (x + (Machine->screen[0].width / 2))] = color2;
-			nbmj8991_videoram[(((Machine->screen[0].height - 1) - y) * Machine->screen[0].width) + ((((Machine->screen[0].width / 2) - 1) - x) + (Machine->screen[0].width / 2))] = color1;
+			color1 = nbmj8991_videoram[(y * width) + (x + (width / 2))];
+			color2 = nbmj8991_videoram[(((height - 1) - y) * width) + ((((width / 2) - 1) - x) + (width / 2))];
+			nbmj8991_videoram[(y * width) + (x + (width / 2))] = color2;
+			nbmj8991_videoram[(((height - 1) - y) * width) + ((((width / 2) - 1) - x) + (width / 2))] = color1;
 		}
 	}
 
@@ -179,7 +181,7 @@ static void nbmj8991_vramflip(void)
 
 static void update_pixel(int x, int y)
 {
-	UINT8 color = nbmj8991_videoram[(y * Machine->screen[0].width) + x];
+	UINT8 color = nbmj8991_videoram[(y * video_screen_get_width(Machine->primary_screen)) + x];
 	*BITMAP_ADDR16(nbmj8991_tmpbitmap, y, x) = color;
 }
 
@@ -191,6 +193,7 @@ static TIMER_CALLBACK( blitter_timer_callback )
 static void nbmj8991_gfxdraw(void)
 {
 	UINT8 *GFX = memory_region(REGION_GFX1);
+	int width = video_screen_get_width(Machine->primary_screen);
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -274,12 +277,12 @@ static void nbmj8991_gfxdraw(void)
 
 			if (color1 != 0xff)
 			{
-				nbmj8991_videoram[(dy * Machine->screen[0].width) + dx1] = color1;
+				nbmj8991_videoram[(dy * width) + dx1] = color1;
 				update_pixel(dx1, dy);
 			}
 			if (color2 != 0xff)
 			{
-				nbmj8991_videoram[(dy * Machine->screen[0].width) + dx2] = color2;
+				nbmj8991_videoram[(dy * width) + dx2] = color2;
 				update_pixel(dx2, dy);
 			}
 
@@ -297,10 +300,13 @@ static void nbmj8991_gfxdraw(void)
 ******************************************************************************/
 VIDEO_START( nbmj8991 )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	nbmj8991_tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	nbmj8991_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height * sizeof(UINT8));
+	nbmj8991_videoram = auto_malloc(width * height * sizeof(UINT8));
 	nbmj8991_clut = auto_malloc(0x800 * sizeof(UINT8));
-	memset(nbmj8991_videoram, 0x00, (machine->screen[0].width * machine->screen[0].height * sizeof(UINT8)));
+	memset(nbmj8991_videoram, 0x00, (width * height * sizeof(UINT8)));
 }
 
 VIDEO_UPDATE( nbmj8991_type1 )
@@ -309,15 +315,14 @@ VIDEO_UPDATE( nbmj8991_type1 )
 
 	if (nbmj8991_screen_refresh)
 	{
+		int width = video_screen_get_width(Machine->primary_screen);
+		int height = video_screen_get_height(Machine->primary_screen);
+
 		nbmj8991_screen_refresh = 0;
 
-		for (y = 0; y < screen->machine->screen[0].height; y++)
-		{
-			for (x = 0; x < screen->machine->screen[0].width; x++)
-			{
+		for (y = 0; y < height; y++)
+			for (x = 0; x < width; x++)
 				update_pixel(x, y);
-			}
-		}
 	}
 
 	if (nbmj8991_dispflag)
@@ -349,15 +354,14 @@ VIDEO_UPDATE( nbmj8991_type2 )
 
 	if (nbmj8991_screen_refresh)
 	{
+		int width = video_screen_get_width(screen);
+		int height = video_screen_get_height(screen);
+
 		nbmj8991_screen_refresh = 0;
 
-		for (y = 0; y < screen->machine->screen[0].height; y++)
-		{
-			for (x = 0; x < screen->machine->screen[0].width; x++)
-			{
+		for (y = 0; y < height; y++)
+			for (x = 0; x < width; x++)
 				update_pixel(x, y);
-			}
-		}
 	}
 
 	if (nb1413m3_inputport & 0x20)

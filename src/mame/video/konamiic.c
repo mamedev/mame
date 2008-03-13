@@ -4221,7 +4221,7 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 	int offy = (short)((K053246_regs[2] << 8) | K053246_regs[3]);
 
 	int solidpens = K053247_gfx->color_granularity - 1;
-	int screen_width = machine->screen[0].width;
+	int screen_width = video_screen_get_width(machine->primary_screen);
 
 	/*
         safeguard older drivers missing any of the following video attributes:

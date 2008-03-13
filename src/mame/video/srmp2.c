@@ -79,7 +79,7 @@ static void srmp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y	=	machine -> screen[0].height;
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	xoffs	=	flip ? 0x10 : 0x10;
 	yoffs	=	flip ? 0x05 : 0x07;
@@ -229,7 +229,7 @@ static void srmp3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	int offs;
 	int xoffs, yoffs;
 
-	int max_y	=	machine -> screen[0].height;
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	int ctrl	=	spriteram[ 0x600/2 ];
 //  int ctrl2   =   spriteram[ 0x602/2 ];
@@ -390,7 +390,7 @@ static void mjyuugi_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 	/* Sprites Banking and/or Sprites Buffering */
 	UINT16 *src = spriteram16_2 + ( ((ctrl2 ^ (~ctrl2<<1)) & 0x40) ? 0x2000/2 : 0 );
 
-	int max_y	=	machine -> screen[0].height;
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	mjyuugi_draw_sprites_map(machine, bitmap, cliprect);
 

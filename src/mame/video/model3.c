@@ -142,11 +142,15 @@ static void model3_exit(running_machine *machine)
 
 VIDEO_START( model3 )
 {
+	int width, height;
+
 	poly = poly_alloc(4000, sizeof(poly_extra_data), 0);
 	add_exit_callback(machine, model3_exit);
 
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
 	bitmap3d = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	zbuffer = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
+	zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
 
 	m3_char_ram = auto_malloc(0x100000);
 	m3_tile_ram = auto_malloc(0x8000);

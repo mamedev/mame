@@ -98,12 +98,15 @@ PALETTE_INIT( quasar )
 
 VIDEO_START( quasar )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
 	quasar_effectram = auto_malloc(0x400);
 
 	/* configure the S2636 chips */
-	s2636_0 = s2636_config(cvs_s2636_0_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_1 = s2636_config(cvs_s2636_1_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
-	s2636_2 = s2636_config(cvs_s2636_2_ram, machine->screen[0].height, machine->screen[0].width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_0 = s2636_config(cvs_s2636_0_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_1 = s2636_config(cvs_s2636_1_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
+	s2636_2 = s2636_config(cvs_s2636_2_ram, height, width, CVS_S2636_Y_OFFSET, CVS_S2636_X_OFFSET);
 
 	/* create helper bitmaps */
 	cvs_collision_background = video_screen_auto_bitmap_alloc(machine->primary_screen);

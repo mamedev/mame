@@ -1035,6 +1035,8 @@ VIDEO_START( lockload )
 
 VIDEO_START( nslasher )
 {
+	int width, height;
+
 	pf1_tilemap = tilemap_create(get_pf1_tile_info, tilemap_scan_rows, 8, 8,64,32);
 	pf2_tilemap = tilemap_create(get_pf2_tile_info, deco16_scan_rows,16,16,64,32);
 	pf3_tilemap = tilemap_create(get_pf3_tile_info, deco16_scan_rows,16,16,64,32);
@@ -1042,9 +1044,11 @@ VIDEO_START( nslasher )
 	pf1a_tilemap =0;
 	dirty_palette = auto_malloc(4096);
 
-	sprite0_mix_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
-	sprite1_mix_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
-	tilemap_alpha_bitmap=auto_bitmap_alloc( machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16 );
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	sprite0_mix_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	sprite1_mix_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	tilemap_alpha_bitmap=auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);

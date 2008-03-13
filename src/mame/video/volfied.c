@@ -95,13 +95,15 @@ static void refresh_pixel_layer(running_machine *machine, bitmap_t *bitmap)
     *********************************************************/
 
 	UINT16* p = video_ram;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	if (video_ctrl & 1)
 		p += 0x20000;
 
-	for (y = 0; y < machine->screen[0].height; y++)
+	for (y = 0; y < height; y++)
 	{
-		for (x = 1; x < machine->screen[0].width + 1; x++) // Hmm, 1 pixel offset is needed to align properly with sprites
+		for (x = 1; x < width + 1; x++) // Hmm, 1 pixel offset is needed to align properly with sprites
 		{
 			int color = (p[x] << 2) & 0x700;
 

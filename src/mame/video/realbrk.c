@@ -217,8 +217,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 {
 	int offs;
 
-	int max_x		=	machine->screen[0].width;
-	int max_y		=	machine->screen[0].height;
+	int max_x = video_screen_get_width(machine->primary_screen);
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	rectangle spritetile_clip;
 	spritetile_clip.min_x = 0;
@@ -384,8 +384,8 @@ static void dai2kaku_draw_sprites( bitmap_t *bitmap,const rectangle *cliprect, i
 {
 	int offs;
 
-	int max_x		=	Machine->screen[0].width;
-	int max_y		=	Machine->screen[0].height;
+	int max_x = video_screen_get_width(Machine->primary_screen);
+	int max_y = video_screen_get_height(Machine->primary_screen);
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{

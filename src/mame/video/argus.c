@@ -1555,23 +1555,27 @@ VIDEO_UPDATE( valtric )
 			int step=valtric_mosaic;
 			UINT32 *dest;
 			int x,y,xx,yy;
+			int width = video_screen_get_width(screen);
+			int height = video_screen_get_height(screen);
+
 			if(valtric_mosaic<0)step*=-1;
-			for(y=0;y<screen->machine->screen[0].width+step;y+=step)
-				for(x=0;x<screen->machine->screen[0].height+step;x+=step)
+
+			for(y=0;y<width+step;y+=step)
+				for(x=0;x<height+step;x+=step)
 				{
 					static int c=0;
 
-					if(y<screen->machine->screen[0].height && x< screen->machine->screen[0].width)
+					if(y<height && x< width)
 						c=*BITMAP_ADDR32(mosaicbitmap, y, x);
 
 					if(valtric_mosaic<0)
-						if(y+step-1<screen->machine->screen[0].height && x+step-1< screen->machine->screen[0].width)
+						if(y+step-1<height && x+step-1< width)
 							c = *BITMAP_ADDR32(mosaicbitmap, y+step-1, x+step-1);
 
 					for(yy=0;yy<step;yy++)
 					 for(xx=0;xx<step;xx++)
 					 {
-							if(xx+x < screen->machine->screen[0].width && yy+y<screen->machine->screen[0].height)
+							if(xx+x < width && yy+y<height)
 							{
 					 			dest=BITMAP_ADDR32(bitmap, y+yy, x+xx);
 								*dest=c;

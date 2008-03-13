@@ -155,7 +155,7 @@ static VIDEO_START( madalien )
 
 		tilemap_edge2[i] = tilemap_create(get_tile_info_BG_2, scan_functions[i], 16, 16, tilemap_cols[i], 8);
 		tilemap_set_scrolldx(tilemap_edge2[i], 0, 0x50);
-		tilemap_set_scrolldy(tilemap_edge2[i], 0, machine->screen[0].height - 256);
+		tilemap_set_scrolldy(tilemap_edge2[i], 0, video_screen_get_height(machine->primary_screen) - 256);
 	}
 
 	headlight_bitmap = auto_bitmap_alloc(128, 128, BITMAP_FORMAT_INDEXED16);

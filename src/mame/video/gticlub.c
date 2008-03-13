@@ -181,10 +181,13 @@ void K001005_swap_buffers(void);
 void K001005_init(void)
 {
 	int i;
+
+	int width = video_screen_get_width(Machine->primary_screen);
+	int height = video_screen_get_height(Machine->primary_screen);
+	K001005_zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
+
 	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(Machine->primary_screen);
 	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(Machine->primary_screen);
-
-	K001005_zbuffer = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED32);
 
 	K001005_texture = auto_malloc(0x800000);
 

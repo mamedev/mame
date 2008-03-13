@@ -561,8 +561,8 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 	UINT8 *base_gfx	=	memory_region(region);
 	UINT8 *gfx_max	=	base_gfx + memory_region_length(region);
 
-	int max_x				=	machine->screen[0].width;
-	int max_y				=	machine->screen[0].height;
+	int max_x = video_screen_get_width(machine->primary_screen);
+	int max_y = video_screen_get_height(machine->primary_screen);
 
 	int max_sprites			=	spriteram_size / 8;
 	int sprites				=	metro_videoregs[0x00/2] % max_sprites;
@@ -869,8 +869,8 @@ VIDEO_UPDATE( metro )
 		}
 	}
 
-	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - screen->machine->screen[0].width  / 2;
-	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - screen->machine->screen[0].height / 2;
+	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - video_screen_get_width(screen)  / 2;
+	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - video_screen_get_height(screen) / 2;
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);

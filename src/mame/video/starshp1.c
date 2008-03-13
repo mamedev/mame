@@ -115,15 +115,17 @@ VIDEO_START( starshp1 )
 
 READ8_HANDLER( starshp1_rng_r )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 	int x = video_screen_get_hpos(machine->primary_screen);
 	int y = video_screen_get_vpos(machine->primary_screen);
 
 	/* the LFSR is only running in the non-blank region
        of the screen, so this is not quite right */
-	if (x > Machine->screen[0].width - 1)
-		x = Machine->screen[0].width - 1;
-	if (y > Machine->screen[0].height - 1)
-		y = Machine->screen[0].height - 1;
+	if (x > width - 1)
+		x = width - 1;
+	if (y > height - 1)
+		y = height - 1;
 
 	return LSFR[x + (UINT16) (512 * y)];
 }

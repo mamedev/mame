@@ -134,7 +134,7 @@ VIDEO_START( atarigt )
 		{{ 0,0x8000,0,0,0,0,0,0 }}	/* mask for the VRAM target */
 	};
 	atarirle_desc adjusted_modesc = modesc;
-	int i;
+	int i, width, height;
 
 	/* blend the playfields and free the temporary one */
 	atarigen_blend_gfx(machine, 0, 2, 0x0f, 0x30);
@@ -149,8 +149,11 @@ VIDEO_START( atarigt )
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 
 	/* allocate temp bitmaps */
-	pf_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	an_bitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+
+	pf_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	an_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 
 	/* allocate memory */
 	expanded_mram = auto_malloc(sizeof(*expanded_mram) * MRAM_ENTRIES * 3);

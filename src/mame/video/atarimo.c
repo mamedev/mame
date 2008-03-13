@@ -429,8 +429,8 @@ void atarimo_init(running_machine *machine, int map, const struct atarimo_desc *
 		mo->colorlookup[i] = i;
 
 	/* allocate dirty grid */
-	mo->dirtywidth = (machine->screen[0].width >> mo->tilexshift) + 2;
-	mo->dirtyheight = (machine->screen[0].height >> mo->tileyshift) + 2;
+	mo->dirtywidth = (video_screen_get_width(machine->primary_screen) >> mo->tilexshift) + 2;
+	mo->dirtyheight = (video_screen_get_height(machine->primary_screen) >> mo->tileyshift) + 2;
 	mo->dirtygrid = auto_malloc(mo->dirtywidth * mo->dirtyheight);
 
 	/* allocate the gfx lookup */

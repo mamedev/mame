@@ -308,8 +308,11 @@ VIDEO_UPDATE( astrocde )
 	int y;
 
 	/* compute the starting point of sparkle for the current frame */
+	int width = video_screen_get_width(screen);
+	int height = video_screen_get_height(screen);
+
 	if (astrocade_video_config & AC_STARS)
-		sparklebase = (video_screen_get_frame_number(screen) * (UINT64)(screen->machine->screen[0].width * screen->machine->screen[0].height)) % RNG_PERIOD;
+		sparklebase = (video_screen_get_frame_number(screen) * (UINT64)(width * height)) % RNG_PERIOD;
 
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
@@ -323,8 +326,8 @@ VIDEO_UPDATE( astrocde )
 		/* compute the star and sparkle offset at the start of this line */
 		if (astrocade_video_config & AC_STARS)
 		{
-			staroffs = ((effy < 0) ? (effy + 262) : effy) * screen->machine->screen[0].width;
-			sparkleoffs = sparklebase + y * screen->machine->screen[0].width;
+			staroffs = ((effy < 0) ? (effy + 262) : effy) * width;
+			sparkleoffs = sparklebase + y * width;
 			if (sparkleoffs >= RNG_PERIOD)
 				sparkleoffs -= RNG_PERIOD;
 		}
@@ -488,7 +491,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* advance to the next scanline */
 	scanline++;
-	if (scanline >= machine->screen[0].height)
+	if (scanline >= video_screen_get_height(machine->primary_screen))
 		scanline = 0;
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }

@@ -273,7 +273,7 @@ void atarirle_init(int map, const atarirle_desc *desc)
 {
 	const UINT16 *base = (const UINT16 *)memory_region(desc->region);
 	atarirle_data *mo = &atarirle[map];
-	int i;
+	int i, width, height;
 
 	/* verify the map index */
 	assert_always(map >= 0 && map < ATARIRLE_MAX, "Invalid map index");
@@ -341,16 +341,19 @@ void atarirle_init(int map, const atarirle_desc *desc)
 	memset(mo->spriteram, 0, sizeof(mo->spriteram[0]) * mo->spriteramsize);
 
 	/* allocate bitmaps */
-	mo->vram[0][0] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-	mo->vram[0][1] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	width = video_screen_get_width(Machine->primary_screen);
+	height = video_screen_get_height(Machine->primary_screen);
+
+	mo->vram[0][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+	mo->vram[0][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	fillbitmap(mo->vram[0][0], 0, NULL);
 	fillbitmap(mo->vram[0][1], 0, NULL);
 
 	/* allocate alternate bitmaps if needed */
 	if (mo->vrammask.mask != 0)
 	{
-		mo->vram[1][0] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
-		mo->vram[1][1] = auto_bitmap_alloc(Machine->screen[0].width, Machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+		mo->vram[1][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
+		mo->vram[1][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 		fillbitmap(mo->vram[1][0], 0, NULL);
 		fillbitmap(mo->vram[1][1], 0, NULL);
 	}

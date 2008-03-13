@@ -54,6 +54,8 @@ void system18_vdp_update(bitmap_t *bitmap, const rectangle *cliprect);
 
 VIDEO_START( system18 )
 {
+	int width, height;
+
 	/* compute palette info */
 	segaic16_palette_init(0x800);
 
@@ -67,7 +69,9 @@ VIDEO_START( system18 )
 	system18_vdp_start(machine);
 
 	/* create a temp bitmap to draw the VDP data into */
-	tempbitmap = auto_bitmap_alloc(machine->screen[0].width, machine->screen[0].height, BITMAP_FORMAT_INDEXED16);
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	tempbitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 }
 
 

@@ -145,10 +145,9 @@ static void starfield_init(running_machine *machine)
 	int generator = 0;
 	int x,y;
 	int set = 0;
-	int width, height;
 
-	width = machine->screen[0].width;
-	height = machine->screen[0].height;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	total_stars = 0;
 
@@ -242,10 +241,9 @@ WRITE8_HANDLER( gaplus_starfield_control_w )
 static void starfield_render(running_machine *machine, bitmap_t *bitmap)
 {
 	int i;
-	int width, height;
 
-	width = machine->screen[0].width;
-	height = machine->screen[0].height;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	/* check if we're running */
 	if ( ( gaplus_starfield_control[0] & 1 ) == 0 )
@@ -341,10 +339,9 @@ VIDEO_UPDATE( gaplus )
 VIDEO_EOF( gaplus )	/* update starfields */
 {
 	int i;
-	int width, height;
 
-	width = machine->screen[0].width;
-	height = machine->screen[0].height;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	/* check if we're running */
 	if ( ( gaplus_starfield_control[0] & 1 ) == 0 )

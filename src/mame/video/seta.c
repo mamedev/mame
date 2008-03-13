@@ -853,7 +853,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 		if (flip)
 		{
-			y = (0x100 - machine->screen[0].height) + max_y - y;
+			y = (0x100 - video_screen_get_height(machine->primary_screen)) + max_y - y;
 			flipx = !flipx;
 			flipy = !flipy;
 		}

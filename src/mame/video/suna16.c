@@ -121,8 +121,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int offs;
 
-	int max_x	=	machine->screen[0].width  - 8;
-	int max_y	=	machine->screen[0].height - 8;
+	int max_x = video_screen_get_width(machine->primary_screen) - 8;
+	int max_y = video_screen_get_height(machine->primary_screen) - 8;
 
 	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
 	{

@@ -747,9 +747,9 @@ VIDEO_UPDATE( ygv608 )
 
 	// clip to the current bitmap
 	finalclip.min_x = 0;
-	finalclip.max_x = screen->machine->screen[0].width - 1;
+	finalclip.max_x = video_screen_get_width(screen) - 1;
 	finalclip.min_y = 0;
-	finalclip.max_y = screen->machine->screen[0].height - 1;
+	finalclip.max_y = video_screen_get_height(screen) - 1;
 	sect_rect(&finalclip, cliprect);
 	cliprect = &finalclip;
 

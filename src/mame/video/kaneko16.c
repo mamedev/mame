@@ -144,8 +144,10 @@ VIDEO_START( kaneko16_1xVIEW2 )
 	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	{
-		int dx, xdim = machine->screen[0].width;
-		int dy, ydim = machine->screen[0].height;
+		int dx, dy;
+
+		int xdim = video_screen_get_width(machine->primary_screen);
+		int ydim = video_screen_get_height(machine->primary_screen);
 
 		switch (xdim)
 		{
@@ -184,8 +186,10 @@ VIDEO_START( kaneko16_2xVIEW2 )
 										 16,16, 0x20,0x20	);
 
 	{
-		int dx, xdim = machine->screen[0].width;
-		int dy, ydim = machine->screen[0].height;
+		int dx, dy;
+
+		int xdim = video_screen_get_width(machine->primary_screen);
+		int ydim = video_screen_get_height(machine->primary_screen);
 
 		switch (xdim)
 		{
@@ -502,7 +506,7 @@ void kaneko16_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rec
        in a temp buffer, then draw the buffer's contents from last
        to first. */
 
-	int max	=	(machine->screen[0].width > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max	=	(video_screen_get_width(machine->primary_screen) > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct tempsprite *s = spritelist.first_sprite;

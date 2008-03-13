@@ -301,8 +301,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT8 *TILES	=	memory_region(REGION_USER1);	// Sprites LUT
 	int TILES_LEN			=	memory_region_length(REGION_USER1);
 
-	int width	=	machine->screen[0].width;
-	int height	=	machine->screen[0].height;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	/* Exit if sprites are disabled */
 	if ( spritelist[ BYTE_XOR_BE((0x800-2)/2) ] & 1 )	return;

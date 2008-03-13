@@ -427,6 +427,8 @@ static void check_sprite_sprite_collision(running_machine *machine)
 static void calculate_sprite_areas(running_machine *machine, int *sprites_on, rectangle *sprite_areas)
 {
 	int which;
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 
 	for (which = 0; which < 0x20; which++)
 	{
@@ -453,10 +455,10 @@ static void calculate_sprite_areas(running_machine *machine, int *sprites_on, re
 			/* check for bitmap bounds to avoid illegal memory access */
 			if (minx < 0) minx = 0;
 			if (miny < 0) miny = 0;
-			if (maxx >= machine->screen[0].width - 1)
-				maxx = machine->screen[0].width - 1;
-			if (maxy >= machine->screen[0].height - 1)
-				maxy = machine->screen[0].height - 1;
+			if (maxx >= width - 1)
+				maxx = width - 1;
+			if (maxy >= height - 1)
+				maxy = height - 1;
 
 			sprite_areas[which].min_x = minx;
 			sprite_areas[which].max_x = maxx;

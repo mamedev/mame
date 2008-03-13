@@ -395,7 +395,7 @@ static TIMER_CALLBACK( scanline_callback )
 	amiga_audio_update();
 
 	/* set timer for next line */
-	scanline = (scanline + 1) % machine->screen[0].height;
+	scanline = (scanline + 1) % video_screen_get_height(machine->primary_screen);
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
 }
 

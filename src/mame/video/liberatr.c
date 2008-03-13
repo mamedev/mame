@@ -124,8 +124,8 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 {
 	UINT16 longitude;
 
-	const UINT8* latitude_scale = memory_region(REGION_USER1);
-	const UINT8* longitude_scale = memory_region(REGION_USER2);
+	const UINT8 *latitude_scale = memory_region(REGION_USER1);
+	const UINT8 *longitude_scale = memory_region(REGION_USER2);
 
 	/* for each starting longitude */
 	for (longitude = 0; longitude < 0x100; longitude++)
@@ -243,7 +243,7 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 
 			/* calculate the bitmap's x coordinate for the western horizon
                center of bitmap - (the number of planet pixels) / 4 */
-			*buffer++ = machine->screen[0].width/2 - (line->max_x + 2) / 4;
+			*buffer++ = (video_screen_get_width(machine->primary_screen) / 2) - ((line->max_x + 2) / 4);
 
 			for (i = 0; i < segment_count; i++)
 			{
@@ -267,7 +267,7 @@ static void liberatr_init_planet(running_machine *machine, planet *liberatr_plan
 
 VIDEO_START( liberatr )
 {
-	liberatr_videoram = auto_malloc(machine->screen[0].width * machine->screen[0].height);
+	liberatr_videoram = auto_malloc(0x10000);
 
 	/* allocate the planet descriptor structure */
 	liberatr_planets[0] = auto_malloc(sizeof(planet));
@@ -332,24 +332,20 @@ static void liberatr_draw_planet(bitmap_t *bitmap, pen_t *pens)
 			UINT8 segment_length = *buffer++;
 
 			if ((color & 0x0c) == 0x0c)
-			{
 				color = base_color;
-			}
 
 			for (i = 0; i < segment_length; i++, x++)
-			{
 				*BITMAP_ADDR32(bitmap, y, x) = pens[color];
-			}
 		}
 	}
 }
 
 
-static void liberatr_draw_bitmap(running_machine *machine, bitmap_t *bitmap, pen_t *pens)
+static void liberatr_draw_bitmap(bitmap_t *bitmap, pen_t *pens)
 {
 	offs_t offs;
 
-	for (offs = 0; offs < machine->screen[0].width * machine->screen[0].height; offs++)
+	for (offs = 0; offs < 0x10000; offs++)
 	{
 		UINT8 data = liberatr_videoram[offs];
 
@@ -368,10 +364,8 @@ VIDEO_UPDATE( liberatr )
 	get_pens(pens);
 
 	fillbitmap(bitmap, RGB_BLACK, cliprect);
-
 	liberatr_draw_planet(bitmap, pens);
-
-	liberatr_draw_bitmap(screen->machine, bitmap, pens);
+	liberatr_draw_bitmap(bitmap, pens);
 
 	return 0;
 }

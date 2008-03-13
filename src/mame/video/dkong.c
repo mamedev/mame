@@ -807,7 +807,7 @@ static TIMER_CALLBACK( scanline_callback )
 		counter = 0;
 	offset = (state->flip ^ state->rflip_sig) ? 0x000 : 0x400;
 	x = 0;
-	while (x < machine->screen[0].width)
+	while (x < video_screen_get_width(machine->primary_screen))
 	{
 		pixel = BITMAP_ADDR16(state->bg_bits, y, x);
 		if ((counter < table_len) && (x == 4 * (table[counter|offset] & 0x7f)))

@@ -79,6 +79,8 @@ WRITE8_HANDLER( spacefb_port_2_w )
 
 VIDEO_START( spacefb )
 {
+	int width, height;
+
 	/* compute the color gun weights */
 	static const int resistances_rg[] = { 1000, 470, 220 };
 	static const int resistances_b [] = {       470, 220 };
@@ -88,7 +90,9 @@ VIDEO_START( spacefb )
 							 2, resistances_b,  color_weights_b,  470, 0,
 							 0, 0, 0, 0, 0);
 
-	object_present_map = auto_malloc(machine->screen[0].width * machine->screen[0].height);
+	width = video_screen_get_width(machine->primary_screen);
+	height = video_screen_get_height(machine->primary_screen);
+	object_present_map = auto_malloc(width * height);
 
 	/* this start value positions the stars to match the flyer screen shot,
        but most likely, the actual star position is random as the hardware
