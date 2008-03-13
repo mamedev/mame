@@ -218,7 +218,10 @@ static void pitfighb_cheap_slapstic_init(void)
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x000000, 0x037fff) AM_ROM
+	AM_RANGE(0x038000, 0x03ffff) AM_ROM	/* pitfight slapstic goes here */
+	AM_RANGE(0x040000, 0x077fff) AM_ROM
+	AM_RANGE(0x078000, 0x07ffff) AM_ROM	/* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xf90000, 0xf90001) AM_WRITE(atarigen_sound_upper_w)

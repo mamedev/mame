@@ -1059,13 +1059,19 @@ INLINE uint m68ki_read_imm_16(void)
 	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 #if M68K_EMULATE_PREFETCH
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+{
+	uint result;
+	if(REG_PC != CPU_PREF_ADDR)
 	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+		CPU_PREF_ADDR = REG_PC;
+		CPU_PREF_DATA = m68k_read_immediate_16(ADDRESS_68K(CPU_PREF_ADDR));
 	}
+	result = MASK_OUT_ABOVE_16(CPU_PREF_DATA);
 	REG_PC += 2;
-	return MASK_OUT_ABOVE_16(CPU_PREF_DATA >> ((2-((REG_PC-2)&2))<<3));
+	CPU_PREF_ADDR = REG_PC;
+	CPU_PREF_DATA = m68k_read_immediate_16(ADDRESS_68K(CPU_PREF_ADDR));
+	return result;
+}
 #else
 	REG_PC += 2;
 	return m68k_read_immediate_16(ADDRESS_68K(REG_PC-2));
@@ -1078,20 +1084,21 @@ INLINE uint m68ki_read_imm_32(void)
 
 	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 	m68ki_check_address_error(REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
+
+	if(REG_PC != CPU_PREF_ADDR)
 	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
+		CPU_PREF_ADDR = REG_PC;
+		CPU_PREF_DATA = m68k_read_immediate_16(ADDRESS_68K(CPU_PREF_ADDR));
 	}
-	temp_val = CPU_PREF_DATA;
+	temp_val = MASK_OUT_ABOVE_16(CPU_PREF_DATA);
 	REG_PC += 2;
-	if(MASK_OUT_BELOW_2(REG_PC) != CPU_PREF_ADDR)
-	{
-		CPU_PREF_ADDR = MASK_OUT_BELOW_2(REG_PC);
-		CPU_PREF_DATA = m68k_read_immediate_32(ADDRESS_68K(CPU_PREF_ADDR));
-		temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | (CPU_PREF_DATA >> 16));
-	}
+	CPU_PREF_ADDR = REG_PC;
+	CPU_PREF_DATA = m68k_read_immediate_16(ADDRESS_68K(CPU_PREF_ADDR));
+
+	temp_val = MASK_OUT_ABOVE_32((temp_val << 16) | MASK_OUT_ABOVE_16(CPU_PREF_DATA));
 	REG_PC += 2;
+	CPU_PREF_ADDR = REG_PC;
+	CPU_PREF_DATA = m68k_read_immediate_16(ADDRESS_68K(CPU_PREF_ADDR));
 
 	return temp_val;
 #else

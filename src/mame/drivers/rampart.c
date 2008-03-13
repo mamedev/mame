@@ -173,7 +173,7 @@ static WRITE16_HANDLER( latch_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fffff)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM
+	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM /* slapstic goes here */
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&rampart_bitmap)
 	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP	/* the code blasts right through this when initializing */
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_READWRITE(SMH_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)

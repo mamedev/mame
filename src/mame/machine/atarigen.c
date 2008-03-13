@@ -73,6 +73,10 @@ static UINT8					atarigen_slapstic_num;
 static UINT16 *					atarigen_slapstic;
 static UINT8					atarigen_slapstic_bank;
 static void *					atarigen_slapstic_bank0;
+static offs_t					atarigen_slapstic_last_pc;
+static offs_t					atarigen_slapstic_last_address;
+static offs_t					atarigen_slapstic_base;
+static offs_t					atarigen_slapstic_mirror;
 
 static UINT8 					sound_cpu_num;
 static UINT8 					atarigen_cpu_to_sound;
@@ -504,6 +508,29 @@ static void slapstic_postload(void)
 }
 
 
+static OPBASE_HANDLER( atarigen_slapstic_setopbase )
+{
+	/* if we jump to an address in the slapstic region, tweak the slapstic
+	   at that address and return ~0; this will cause us to be called on
+	   subsequent fetches as well */
+	address &= ~atarigen_slapstic_mirror;
+	if (address >= atarigen_slapstic_base && address < atarigen_slapstic_base + 0x8000)
+	{
+		offs_t pc = activecpu_get_previouspc();
+		if (pc != atarigen_slapstic_last_pc || address != atarigen_slapstic_last_address)
+		{
+			atarigen_slapstic_last_pc = pc;
+			atarigen_slapstic_last_address = address;
+			atarigen_slapstic_r(machine, (address >> 1) & 0x3fff, 0);
+		}
+		return ~0;
+	}
+
+	return address;
+}
+
+
+
 /*---------------------------------------------------------------
     atarigen_slapstic_init: Installs memory handlers for the
     slapstic and sets the chip number.
@@ -530,6 +557,11 @@ void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum)
 
 		/* ensure we recopy memory for the bank */
 		atarigen_slapstic_bank = 0xff;
+		
+		/* install an opcode base handler if we are a 68000 or variant */
+		atarigen_slapstic_base = base;
+		atarigen_slapstic_mirror = mirror;
+		memory_set_opbase_handler(cpunum, atarigen_slapstic_setopbase);
 	}
 }
 
@@ -1629,6 +1661,8 @@ void atarigen_init_save_state(void)
 
 	state_save_register_global(atarigen_slapstic_num);
 	state_save_register_global(atarigen_slapstic_bank);
+	state_save_register_global(atarigen_slapstic_last_pc);
+	state_save_register_global(atarigen_slapstic_last_address);
 
 	state_save_register_global(sound_cpu_num);
 	state_save_register_global(atarigen_cpu_to_sound);

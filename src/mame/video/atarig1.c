@@ -164,7 +164,7 @@ void atarig1_scanline_update(const device_config *screen, int scanline)
 	/* keep in range */
 	if (base >= &atarigen_alpha[0x800])
 		return;
-	video_screen_update_partial(screen, scanline - 1);
+	video_screen_update_partial(screen, MAX(scanline - 1, 0));
 
 	/* update the playfield scrolls */
 	for (i = 0; i < 8; i++)
@@ -178,7 +178,7 @@ void atarig1_scanline_update(const device_config *screen, int scanline)
 			int newscroll = ((word >> 6) + pfscroll_xoffset) & 0x1ff;
 			if (newscroll != playfield_xscroll)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				video_screen_update_partial(screen, MAX(scanline + i - 1, 0));
 				tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll);
 				playfield_xscroll = newscroll;
 			}
@@ -192,13 +192,13 @@ void atarig1_scanline_update(const device_config *screen, int scanline)
 			int newbank = word & 7;
 			if (newscroll != playfield_yscroll)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				video_screen_update_partial(screen, MAX(scanline + i - 1, 0));
 				tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll);
 				playfield_yscroll = newscroll;
 			}
 			if (newbank != playfield_tile_bank)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				video_screen_update_partial(screen, MAX(scanline + i - 1, 0));
 				tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
 				playfield_tile_bank = newbank;
 			}

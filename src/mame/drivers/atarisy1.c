@@ -145,6 +145,9 @@ static UINT8 tms5220_in_data;
 static UINT8 tms5220_ctl;
 
 
+static TIMER_CALLBACK( delayed_joystick_int );
+
+
 
 /*************************************
  *
@@ -173,8 +176,6 @@ static void update_interrupts(running_machine *machine)
 		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
-
-static TIMER_CALLBACK( delayed_joystick_int );
 
 static MACHINE_RESET( atarisy1 )
 {
@@ -410,49 +411,13 @@ static WRITE8_HANDLER( led_w )
 
 /*************************************
  *
- *  Opcode memory catcher.
- *
- *************************************/
-
-static OPBASE_HANDLER( indytemp_setopbase )
-{
-	int prevpc = activecpu_get_previouspc();
-	/*
-     *  This is a slightly ugly kludge for Indiana Jones & the Temple of Doom because it jumps
-     *  directly to code in the slapstic.  The general order of things is this:
-     *
-     *      jump to $3A, which turns off interrupts and jumps to $00 (the reset address)
-     *      look up the request in a table and jump there
-     *      (under some circumstances, tweak the special addresses)
-     *      return via an RTS at the real bankswitch address
-     *
-     *  To simulate this, we tweak the slapstic reset address on entry into slapstic code; then
-     *  we let the system tweak whatever other addresses it wishes.  On exit, we tweak the
-     *  address of the previous PC, which is the RTS instruction, thereby completing the
-     *  bankswitch sequence.
-     *
-     *  Fortunately for us, all 4 banks have exactly the same code at this point in their
-     *  ROM, so it doesn't matter which version we're actually executing.
-     */
-
-	if (address & 0x80000)
-		atarigen_slapstic_r(machine,0,0);
-	else if (prevpc & 0x80000)
-		atarigen_slapstic_r(machine,(prevpc >> 1) & 0x3fff,0);
-
-	return address;
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x087fff) AM_ROM
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x087fff) AM_ROM	/* slapstic maps here */
 	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(atarisy1_xscroll_w) AM_BASE(&atarigen_xscroll)
@@ -2163,9 +2128,6 @@ static DRIVER_INIT( indytemp )
 
 	atarigen_eeprom_default = NULL;
 	atarigen_slapstic_init(0, 0x080000, 0, 105);
-
-	/* special case for the Indiana Jones slapstic */
-	memory_set_opbase_handler(0,indytemp_setopbase);
 
 	joystick_type = 1;	/* digital */
 	trackball_type = 0;	/* none */

@@ -84,7 +84,9 @@ static READ16_HANDLER( special_port1_r )
 /* full map verified from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
+	AM_RANGE(0x000000, 0x007fff) AM_MIRROR(0x7c0000) AM_ROM
+	AM_RANGE(0x008000, 0x00ffff) AM_MIRROR(0x7c0000) AM_ROM	/* slapstic maps here */
+	AM_RANGE(0x010000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0xff8000, 0xff8fff) AM_MIRROR(0x7f8000) AM_READWRITE(SMH_RAM, atarigen_alpha_w) AM_BASE(&atarigen_alpha)
 	AM_RANGE(0xff9000, 0xffadff) AM_MIRROR(0x7f8000) AM_RAM
 	AM_RANGE(0xffae00, 0xffafff) AM_MIRROR(0x7f8000) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
