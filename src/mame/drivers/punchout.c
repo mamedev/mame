@@ -95,6 +95,12 @@ write:
 4015      ?? 00 or 0f
 4017      ?? always c0
 
+***************************************************************************
+
+DIP locations verified for:
+	-punchout (manual)
+	-spnchout (manual)
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -492,7 +498,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( punchout )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
@@ -502,7 +508,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
@@ -512,187 +518,135 @@ static INPUT_PORTS_START( punchout )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START	/* DSW0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Time" )
+	PORT_DIPNAME( 0x0c, 0x00, "Time" )					PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "Longest" )
 	PORT_DIPSETTING(    0x04, "Long" )
 	PORT_DIPSETTING(    0x08, "Short" )
 	PORT_DIPSETTING(    0x0c, "Shortest" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Rematch at a Discount" )
+	PORT_DIPNAME( 0x20, 0x00, "Rematch At A Discount" )	PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )		/* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW2:!8" )
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x0b, DEF_STR( 4C_1C ) )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
+	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )		/* Not documented */
+	PORT_DIPSETTING(    0x0b, DEF_STR( 4C_1C ) )		/* Not documented */
 	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, "1 Coin/2 Credits (2 Credits/1 Play)" )
-	PORT_DIPSETTING(    0x0d, "1 Coin/3 Credits (2 Credits/1 Play)" )
+//  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )		/* Not documented */
+	PORT_DIPSETTING(    0x08, "1 Coin/2 Credits (2 Credits/1 Play)" ) /* Not documented */
+	PORT_DIPSETTING(    0x0d, "1 Coin/3 Credits (2 Credits/1 Play)" ) /* Not documented */
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-//  PORT_DIPSETTING(    0x09, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )		/* Not documented */
+//  PORT_DIPSETTING(    0x09, DEF_STR( 1C_2C ) )		/* Not documented */
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, "Copyright" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )		/* Not documented, R18 resistor */
+	PORT_DIPNAME( 0x80, 0x00, "Copyright" )				PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
 	PORT_DIPSETTING(    0x00, "Nintendo" )
-	PORT_DIPSETTING(    0x80, "Nintendo of America" )
-	PORT_START
+	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
 INPUT_PORTS_END
 
 /* same as punchout with additional duck button */
 static INPUT_PORTS_START( spnchout )
-	PORT_START	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_INCLUDE( punchout )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON4 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START	/* DSW0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Time" )
-	PORT_DIPSETTING(    0x00, "Longest" )
-	PORT_DIPSETTING(    0x04, "Long" )
-	PORT_DIPSETTING(    0x08, "Short" )
-	PORT_DIPSETTING(    0x0c, "Shortest" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Rematch at a Discount" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
-
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-//  PORT_DIPSETTING(    0x09, DEF_STR( 4C_1C ) )
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!1,!2,!3,!4")
+	PORT_DIPSETTING(    0x08, DEF_STR( 6C_1C ) )		/* Not documented */
+	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )		/* Not documented */
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )		/* Not documented */
+//  PORT_DIPSETTING(    0x09, DEF_STR( 4C_1C ) )		/* Not documented */
 	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0d, "1 Coin/3 Credits (2 Credits/1 Play)" )
+//  PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )		/* Not documented */
+	PORT_DIPSETTING(    0x0d, "1 Coin/3 Credits (2 Credits/1 Play)" ) /* Not documented */
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0b, "1 Coin/2 Credits (3 Credits/1 Play)" )
+	PORT_DIPSETTING(    0x0b, "1 Coin/2 Credits (3 Credits/1 Play)" ) /* Not documented */
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* VLM5030 busy signal */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x00, "Copyright" )
-	PORT_DIPSETTING(    0x00, "Nintendo" )
-	PORT_DIPSETTING(    0x80, "Nintendo of America" )
-	PORT_START
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( armwrest )
-	PORT_START	/* IN0 */
+	PORT_INCLUDE( punchout )
+
+	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START	/* DSW0 */
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	/* See http://www.mametesters.org/mantis/view.php?id=790 for more info about coinage */
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x1c, 0x00, "Coinage 2" )				PORT_DIPLOCATION("SW2:!3,!4,!5") //K,L,M
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x0c, "c" )
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x14, "14" )
+	PORT_DIPSETTING(    0x18, "18" )
+	PORT_DIPSETTING(    0x1c, "1c" )
+	PORT_DIPNAME( 0x20, 0x00, "Coinage 3" )				PORT_DIPLOCATION("SW2:!6") //N
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Rematches" )
+	PORT_DIPNAME( 0x40, 0x00, "Rematches" )				PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* VLM5030 busy signal */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x00, "Coinage 1" )				PORT_DIPLOCATION("SW1:!1,!2,!3,!4") //A,B,C,D
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "a" )
+	PORT_DIPSETTING(    0x0b, "b" )
+	PORT_DIPSETTING(    0x0c, "c" )
+	PORT_DIPSETTING(    0x0d, "d" )
+	PORT_DIPSETTING(    0x0e, "e" )
+	PORT_DIPSETTING(    0x0f, "f" )
+	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )			PORT_DIPLOCATION("R18:!1") /* R18 resistor */
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "R19:!1" )		/* R19 resistor */
 INPUT_PORTS_END
 
 
@@ -1221,7 +1175,7 @@ ROM_END
 
 
 GAME( 1984, punchout, 0,        punchout, punchout, punchout, ROT0, "Nintendo", "Punch-Out!!", 0 )
-GAME( 1984, punchita, punchout, punchout, punchout, spnchout, ROT0, "bootleg", "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, punchita, punchout, punchout, punchout, spnchout, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
 GAME( 1984, spnchout, 0,        punchout, spnchout, spnchout, ROT0, "Nintendo", "Super Punch-Out!!", 0 )
 GAME( 1984, spnchotj, spnchout, punchout, spnchout, spnchotj, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
 GAME( 1985, armwrest, 0,        armwrest, armwrest, armwrest, ROT0, "Nintendo", "Arm Wrestling", 0 )
