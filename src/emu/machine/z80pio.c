@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "z80pio.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -57,6 +58,8 @@ struct _z80pio
 	UINT8 vector[2];                      /* interrupt vector               */
 	void (*intr)(int which);            /* interrupt callbacks            */
 	void (*rdyr[2])(int data);          /* RDY active callback            */
+	read8_machine_func  port_read[2];     /* port read callbacks            */
+	write8_machine_func port_write[2];    /* port write callbacks           */
 	UINT8 mode[2];                        /* mode 00=in,01=out,02=i/o,03=bit*/
 	UINT8 enable[2];                      /* interrupt enable               */
 	UINT8 mask[2];                        /* mask folowers                  */
@@ -172,6 +175,10 @@ void z80pio_init(int which, const z80pio_interface *intf)
 	memset(pio, 0, sizeof(*pio));
 
 	pio->intr = intf->intr;
+	pio->port_read[0] = intf->portAread;
+	pio->port_read[1] = intf->portBread;
+	pio->port_write[0] = intf->portAwrite;
+	pio->port_write[1] = intf->portBwrite;
 	pio->rdyr[0] = intf->rdyA;
 	pio->rdyr[1] = intf->rdyB;
 	z80pio_reset(which);
@@ -221,7 +228,7 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 	/* load direction phase ? */
 	if (pio->mode[ch] == 0x13)
 	{
-		logerror("PIO-%c Bits %02x\n", 'A' + ch, data);
+		VPRINTF(("PIO-%c Bits %02x\n", 'A' + ch, data));
 		pio->dir[ch] = data;
 		pio->mode[ch] = 0x03;
 		return;
@@ -233,7 +240,7 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 		/* load mask folows */
 		pio->mask[ch] = data;
 		pio->enable[ch] &= ~PIO_INT_MASK;
-		logerror("PIO-%c interrupt mask %02x\n",'A'+ch,data );
+		VPRINTF(("PIO-%c interrupt mask %02x\n",'A'+ch,data ));
 		return;
 	}
 
@@ -241,7 +248,7 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 	{
 		case PIO_OP_MODE:	/* mode select 0=out,1=in,2=i/o,3=bit */
 			pio->mode[ch] = (data >> 6);
-			logerror("PIO-%c Mode %x\n", 'A' + ch, pio->mode[ch]);
+			VPRINTF(("PIO-%c Mode %x\n", 'A' + ch, pio->mode[ch]));
 			if (pio->mode[ch] == 0x03)
 				pio->mode[ch] = 0x13;
 			return;
@@ -250,23 +257,23 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 			pio->enable[ch] = data & 0xf0;
 			pio->mask[ch] = 0x00;
 			/* when interrupt enable , set vector request flag */
-			logerror("PIO-%c Controll %02x\n", 'A' + ch, data);
+			VPRINTF(("PIO-%c Controll %02x\n", 'A' + ch, data));
 			break;
 
 		case PIO_OP_INTE:		/* interrupt enable controll */
 			pio->enable[ch] &= ~PIO_INT_ENABLE;
 			pio->enable[ch] |= (data & PIO_INT_ENABLE);
-			logerror("PIO-%c enable %02x\n", 'A' + ch, data & 0x80);
+			VPRINTF(("PIO-%c enable %02x\n", 'A' + ch, data & 0x80));
 			break;
 
 		default:
 			if (!(data & 1))
 			{
 				pio->vector[ch] = data;
-				logerror("PIO-%c vector %02x\n", 'A' + ch, data);
+				VPRINTF(("PIO-%c vector %02x\n", 'A' + ch, data));
 			}
 			else
-				logerror("PIO-%c illegal command %02x\n", 'A' + ch, data);
+				VPRINTF(("PIO-%c illegal command %02x\n", 'A' + ch, data));
 			break;
 	}
 
@@ -277,7 +284,7 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 
 UINT8 z80pio_c_r(int which, int ch)
 {
-	logerror("PIO-%c controll read\n", 'A' + ch );
+	VPRINTF(("PIO-%c controll read\n", 'A' + ch ));
 	return 0;
 }
 
@@ -292,6 +299,9 @@ void z80pio_d_w(int which, int ch, UINT8 data)
 	z80pio *pio = pios + which;
 
 	pio->out[ch] = data;	/* latch out data */
+	if(pio->port_write[ch])
+		pio->port_write[ch](Machine, 0, data);
+
 	switch (pio->mode[ch])
 	{
 		case PIO_MODE0:			/* mode 0 output */
@@ -305,7 +315,7 @@ void z80pio_d_w(int which, int ch, UINT8 data)
 			return;
 
 		default:
-			logerror("PIO-%c data write,bad mode\n",'A'+ch );
+			VPRINTF(("PIO-%c data write,bad mode\n",'A'+ch ));
 	}
 }
 
@@ -321,19 +331,25 @@ UINT8 z80pio_d_r(int which, int ch)
 
 		case PIO_MODE1:			/* mode 1 input */
 			set_rdy(pio, ch, 1);	/* ready = H */
+			if(pio->port_read[ch])
+				pio->in[ch] = pio->port_read[ch](Machine, 0);
 			update_irq_state(pio, ch);
 			return pio->in[ch];
 
 		case PIO_MODE2:			/* mode 2 i/o */
-			if (ch) logerror("PIO-B mode 2 \n");
+			if (ch) VPRINTF(("PIO-B mode 2 \n"));
 			set_rdy(pio, 1, 1); /* brdy = H */
+			if(pio->port_read[ch])
+				pio->in[ch] = pio->port_read[ch](Machine, 0);
 			update_irq_state(pio, ch);
 			return pio->in[ch];
 
 		case PIO_MODE3:			/* mode 3 bit */
+			if(pio->port_read[ch])
+				pio->in[ch] = pio->port_read[ch](Machine, 0);
 			return (pio->in[ch] & pio->dir[ch]) | (pio->out[ch] & ~pio->dir[ch]);
 	}
-	logerror("PIO-%c data read,bad mode\n",'A'+ch );
+	VPRINTF(("PIO-%c data read,bad mode\n",'A'+ch ));
 	return 0;
 }
 
@@ -351,7 +367,7 @@ void z80pio_p_w(int which, UINT8 ch, UINT8 data)
 	switch (pio->mode[ch])
 	{
 		case PIO_MODE0:
-			logerror("PIO-%c OUTPUT mode and data write\n",'A'+ch );
+			VPRINTF(("PIO-%c OUTPUT mode and data write\n",'A'+ch ));
 			break;
 
 		case PIO_MODE2:	/* only port A */
@@ -383,7 +399,7 @@ int z80pio_p_r(int which, UINT8 ch)
 			break;
 
 		case PIO_MODE1:
-			logerror("PIO-%c INPUT mode and data read\n",'A'+ch );
+			VPRINTF(("PIO-%c INPUT mode and data read\n",'A'+ch ));
 			break;
 
 		case PIO_MODE3:
@@ -429,7 +445,7 @@ static void z80pio_update_strobe(int which, int ch, int state)
 				if (state != 0)
 				{
 					/* positive edge */
-					logerror("PIO-%c positive strobe\n",'A' + ch);
+					VPRINTF(("PIO-%c positive strobe\n",'A' + ch));
 
 					/* ready is now inactive */
 					set_rdy(pio, ch, 0);
@@ -507,7 +523,7 @@ int z80pio_irq_ack(int which)
 			return pio->vector[ch];
 		}
 
-	logerror("z80pio_irq_ack: failed to find an interrupt to ack!");
+	VPRINTF(("z80pio_irq_ack: failed to find an interrupt to ack!"));
 	return pio->vector[0];
 }
 
@@ -529,5 +545,34 @@ void z80pio_irq_reti(int which)
 			return;
 		}
 
-	logerror("z80pio_irq_reti: failed to find an interrupt to clear IEO on!");
+	VPRINTF(("z80pio_irq_reti: failed to find an interrupt to clear IEO on!"));
+}
+
+/***************************************************************************
+	READ/WRITE HANDLERS
+***************************************************************************/
+READ8_HANDLER(z80pio_0_r)
+{
+	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(0, offset & 1);
+}
+
+WRITE8_HANDLER(z80pio_0_w)
+{
+	if (offset & 2)
+		z80pio_c_w(0, offset & 1, data);
+	else
+		z80pio_d_w(0, offset & 1, data);
+}
+
+READ8_HANDLER(z80pio_1_r)
+{
+	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(1, offset & 1);
+}
+
+WRITE8_HANDLER(z80pio_1_w)
+{
+	if (offset & 2)
+		z80pio_c_w(1, offset & 1, data);
+	else
+		z80pio_d_w(1, offset & 1, data);
 }

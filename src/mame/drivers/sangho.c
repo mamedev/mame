@@ -78,8 +78,8 @@ static WRITE8_HANDLER(pzlestar_bank_w)
 
 static ADDRESS_MAP_START (readport_pzlestar, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x98, 0x98) AM_READ( v9938_vram_r )
-	AM_RANGE( 0x99, 0x99) AM_READ( v9938_status_r )
+	AM_RANGE( 0x98, 0x98) AM_READ( v9938_0_vram_r )
+	AM_RANGE( 0x99, 0x99) AM_READ( v9938_0_status_r )
 	AM_RANGE( 0xa0, 0xa0) AM_READ( input_port_0_r )
 	AM_RANGE( 0xa1, 0xa1) AM_READ( input_port_1_r )
 	AM_RANGE( 0xf7, 0xf7) AM_READ( input_port_2_r )
@@ -90,10 +90,10 @@ static ADDRESS_MAP_START (writeport_pzlestar, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
 	AM_RANGE( 0x7c, 0x7c) AM_WRITE( YM2413_register_port_0_w )
 	AM_RANGE( 0x7d, 0x7d) AM_WRITE( YM2413_data_port_0_w )
-	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_command_w )
-	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_palette_w )
-	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_register_w )
+	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_0_vram_w )
+	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_0_command_w )
+	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
+	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
 ADDRESS_MAP_END
 
 /* Sexy Boom Ports */
@@ -103,18 +103,18 @@ static ADDRESS_MAP_START (readport_sexyboom, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0xa0, 0xa0) AM_READ( input_port_0_r )
 	AM_RANGE( 0xa1, 0xa1) AM_READ( input_port_1_r )
 	AM_RANGE( 0xf7, 0xf7) AM_READ( input_port_2_r )
-	AM_RANGE( 0xf0, 0xf0) AM_READ( v9938_vram_r )
-	AM_RANGE( 0xf1, 0xf1) AM_READ( v9938_status_r )
+	AM_RANGE( 0xf0, 0xf0) AM_READ( v9938_0_vram_r )
+	AM_RANGE( 0xf1, 0xf1) AM_READ( v9938_0_status_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (writeport_sexyboom, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7c) AM_WRITE( YM2413_register_port_0_w )
 	AM_RANGE( 0x7d, 0x7d) AM_WRITE( YM2413_data_port_0_w )
-	AM_RANGE( 0xf0, 0xf0) AM_WRITE( v9938_vram_w )
-	AM_RANGE( 0xf1, 0xf1) AM_WRITE( v9938_command_w )
-	AM_RANGE( 0xf2, 0xf2) AM_WRITE( v9938_palette_w )
-	AM_RANGE( 0xf3, 0xf3) AM_WRITE( v9938_register_w )
+	AM_RANGE( 0xf0, 0xf0) AM_WRITE( v9938_0_vram_w )
+	AM_RANGE( 0xf1, 0xf1) AM_WRITE( v9938_0_command_w )
+	AM_RANGE( 0xf2, 0xf2) AM_WRITE( v9938_0_palette_w )
+	AM_RANGE( 0xf3, 0xf3) AM_WRITE( v9938_0_register_w )
 	//bank f8-ff ???
 ADDRESS_MAP_END
 
@@ -185,7 +185,7 @@ static void sangho_common_machine_reset(void)
 	memory_set_bankptr(2,&sangho_ram[0x4000]);
 	memory_set_bankptr(3,&sangho_ram[0x8000]);
 	memory_set_bankptr(4,&sangho_ram[0xc000]);
-	v9938_reset();
+	v9938_reset(0);
 }
 
 
@@ -219,15 +219,15 @@ static void msx_vdp_interrupt(int i)
 
 static INTERRUPT_GEN( sangho_interrupt )
 {
-	v9938_set_sprite_limit(0);
-	v9938_set_resolution(2);
-	v9938_interrupt();
+	v9938_set_sprite_limit(0, 0);
+	v9938_set_resolution(0, 2);
+	v9938_interrupt(0);
 }
 
 
 static VIDEO_START( sangho )
 {
-	v9938_init (machine, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init (machine, 0, tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 static MACHINE_DRIVER_START(pzlestar)

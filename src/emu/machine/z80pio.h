@@ -22,6 +22,10 @@
 struct _z80pio_interface
 {
 	void (*intr)(int which);    /* callback when change interrupt status */
+	read8_machine_func portAread;    /* port A read callback */
+	read8_machine_func portBread;    /* port B read callback */
+	write8_machine_func portAwrite;  /* port A write callback */
+	write8_machine_func portBwrite;  /* port B write callback */
 	void (*rdyA)(int data);     /* portA ready active callback (do not support yet)*/
 	void (*rdyB)(int data);     /* portB ready active callback (do not support yet)*/
 };
@@ -90,3 +94,11 @@ void z80pio_bstb_w(int which, int state);
 int z80pio_irq_state(int which);
 int z80pio_irq_ack(int which);
 void z80pio_irq_reti(int which);
+
+/***************************************************************************
+	READ/WRITE HANDLERS
+***************************************************************************/
+READ8_HANDLER(z80pio_0_r);
+WRITE8_HANDLER(z80pio_0_w);
+READ8_HANDLER(z80pio_1_r);
+WRITE8_HANDLER(z80pio_1_w);

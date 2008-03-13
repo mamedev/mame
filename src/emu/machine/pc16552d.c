@@ -55,6 +55,7 @@ typedef struct
 	PC16552D_CHANNEL ch[2];
 	int frequency;
 	void (* irq_handler)(int channel, int value);
+	void (* tx_callback)(int channel, int count, UINT8* data);
 } PC16552D_REGS;
 
 #define MAX_PC16552D_CHIPS		4
@@ -146,6 +147,9 @@ static TIMER_CALLBACK( tx_fifo_timer_callback )
 
 	ch = &duart[chip].ch[channel];
 
+	if (duart[chip].tx_callback)
+		duart[chip].tx_callback(channel, ch->tx_fifo_num, ch->tx_fifo);
+
 	ch->tx_fifo_num = 0;
 
 	// set transmitter empty interrupt
@@ -160,6 +164,7 @@ static void duart_push_tx_fifo(int chip, int channel, UINT8 data)
 	attotime period;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
 
+	ch->tx_fifo[ch->tx_fifo_num] = data;
 	ch->tx_fifo_num++;
 
 	period = attotime_mul(ATTOTIME_IN_HZ(duart[chip].frequency), ch->divisor * 16 * 16 * 8);
@@ -379,12 +384,13 @@ static void duart_w(int chip, int reg, UINT8 data)
 
 /*****************************************************************************/
 
-void pc16552d_init(int chip, int frequency, void (* irq_handler)(int channel, int value))
+void pc16552d_init(int chip, int frequency, void (* irq_handler)(int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
 {
 	memset(&duart[chip], 0, sizeof(PC16552D_REGS));
 
 	duart[chip].frequency = frequency;
 	duart[chip].irq_handler = irq_handler;
+	duart[chip].tx_callback = tx_callback;
 
 	// clear interrupts
 	duart[chip].ch[0].pending_interrupt = 0;

@@ -18,6 +18,14 @@
 #include "deprecat.h"
 #include "v9938.h"
 
+#define VERBOSE 0
+
+#if VERBOSE
+#define LOG(x)	logerror x
+#else
+#define LOG(x)
+#endif
+
 typedef struct {
 	/* general */
 	int model;
@@ -44,11 +52,32 @@ typedef struct {
 	UINT8 mx_delta, my_delta;
 	/* mouse & lightpen */
 	UINT8 button_state;
+	/* palette */
+	UINT16 pal_ind16[16];
+	UINT16 pal_ind256[256];
+	/* render bitmap */
+	bitmap_t *bitmap;
+	/* Command unit */
+	struct {
+		int SX,SY;
+		int DX,DY;
+		int TX,TY;
+		int NX,NY;
+		int MX;
+		int ASX,ADX,ANX;
+		UINT8 CL;
+		UINT8 LO;
+		UINT8 CM;
+		UINT8 MXS, MXD;
+		} MMC;
+	int  VdpOpsCnt;
+	void (*VdpEngine)(void);
 } V9938;
 
-static V9938 vdp;
+static UINT16 *pal_indYJK;
 
-static UINT16 pal_ind16[16], pal_ind256[256], *pal_indYJK;
+static V9938 vdps[2];
+static V9938 *vdp = NULL;
 
 #define V9938_MODE_TEXT1	(0)
 #define V9938_MODE_MULTI	(1)
@@ -141,7 +170,7 @@ PALETTE_INIT( v9958 )
 	/* set up YJK table */
 		pal_indYJK = auto_malloc(0x20000 * sizeof(UINT16));
 
-	logerror ("Building YJK table for V9958 screens, may take a while ... \n");
+	LOG(("Building YJK table for V9958 screens, may take a while ... \n"));
 	i = 0;
 	for (y=0;y<32;y++) for (k=0;k<64;k++) for (j=0;j<64;j++)
 	{
@@ -183,7 +212,7 @@ PALETTE_INIT( v9958 )
 	}
 
 	if (i != 19268)
-		logerror ("Table creation failed - %d colours out of 19286 created\n", i);
+		LOG( ("Table creation failed - %d colours out of 19286 created\n", i));
 }
 
 /*
@@ -209,30 +238,42 @@ pixel3 = *(data+3) & 8 ? pal_ind16[*(data+3) >> 4] : pal_indYJK[ind | *(data+3) 
 
 */
 
-WRITE8_HANDLER (v9938_palette_w)
+static void v9938_palette_w(UINT8 data)
 	{
 	int indexp;
 
-	if (vdp.pal_write_first)
+	if (vdp->pal_write_first)
 		{
 		/* store in register */
-		indexp = vdp.contReg[0x10] & 15;
-		vdp.palReg[indexp*2] = vdp.pal_write & 0x77;
-		vdp.palReg[indexp*2+1] = data & 0x07;
+		indexp = vdp->contReg[0x10] & 15;
+		vdp->palReg[indexp*2] = vdp->pal_write & 0x77;
+		vdp->palReg[indexp*2+1] = data & 0x07;
 		/* update palette */
-		pal_ind16[indexp] = (((int)vdp.pal_write << 2) & 0x01c0)  |
+		vdp->pal_ind16[indexp] = (((int)vdp->pal_write << 2) & 0x01c0)  |
 						 	   (((int)data << 3) & 0x0038)  |
-						 		((int)vdp.pal_write & 0x0007);
+						 		((int)vdp->pal_write & 0x0007);
 
-		vdp.contReg[0x10] = (vdp.contReg[0x10] + 1) & 15;
-		vdp.pal_write_first = 0;
+		vdp->contReg[0x10] = (vdp->contReg[0x10] + 1) & 15;
+		vdp->pal_write_first = 0;
 		}
 	else
 		{
-		vdp.pal_write = data;
-		vdp.pal_write_first = 1;
+		vdp->pal_write = data;
+		vdp->pal_write_first = 1;
 		}
 	}
+
+WRITE8_HANDLER( v9938_0_palette_w )
+{
+	vdp = &vdps[0];
+	v9938_palette_w(data);
+};
+
+WRITE8_HANDLER( v9938_1_palette_w )
+{
+	vdp = &vdps[1];
+	v9938_palette_w(data);
+}
 
 static void v9938_reset_palette (void)
 	{
@@ -260,10 +301,10 @@ static void v9938_reset_palette (void)
 	for (i=0;i<16;i++)
 		{
 		/* set the palette registers */
-		vdp.palReg[i*2+0] = pal16[i*3+1] << 4 | pal16[i*3+2];
-		vdp.palReg[i*2+1] = pal16[i*3];
+		vdp->palReg[i*2+0] = pal16[i*3+1] << 4 | pal16[i*3+2];
+		vdp->palReg[i*2+1] = pal16[i*3];
 		/* set the reference table */
-		pal_ind16[i] = pal16[i*3+1] << 6 | pal16[i*3] << 3 | pal16[i*3+2];
+		vdp->pal_ind16[i] = pal16[i*3+1] << 6 | pal16[i*3] << 3 | pal16[i*3+2];
 		}
 
 	/* set internal palette GRAPHIC 7 */
@@ -274,7 +315,7 @@ static void v9938_reset_palette (void)
 		red = (i << 1) & 6; if (red == 6) red++;
 		ind |= red;
 
-		pal_ind256[i] = ind;
+		vdp->pal_ind256[i] = ind;
 		}
 	}
 
@@ -288,115 +329,151 @@ static void v9938_vram_write (int offset, int data)
 	{
 	int newoffset;
 
-	if ( (vdp.mode == V9938_MODE_GRAPHIC6) || (vdp.mode == V9938_MODE_GRAPHIC7) )
+	if ( (vdp->mode == V9938_MODE_GRAPHIC6) || (vdp->mode == V9938_MODE_GRAPHIC7) )
 		{
         newoffset = ((offset & 1) << 16) | (offset >> 1);
-   		if (newoffset < vdp.vram_size)
-        	vdp.vram[newoffset] = data;
+   		if (newoffset < vdp->vram_size)
+        	vdp->vram[newoffset] = data;
 		}
 	else
 		{
-		if (offset < vdp.vram_size)
-			vdp.vram[offset] = data;
+		if (offset < vdp->vram_size)
+			vdp->vram[offset] = data;
         }
 	}
 
 static int v9938_vram_read (int offset)
 	{
-	if ( (vdp.mode == V9938_MODE_GRAPHIC6) || (vdp.mode == V9938_MODE_GRAPHIC7) )
-		return vdp.vram[((offset & 1) << 16) | (offset >> 1)];
+	if ( (vdp->mode == V9938_MODE_GRAPHIC6) || (vdp->mode == V9938_MODE_GRAPHIC7) )
+		return vdp->vram[((offset & 1) << 16) | (offset >> 1)];
 	else
-		return vdp.vram[offset];
+		return vdp->vram[offset];
 	}
 
-WRITE8_HANDLER (v9938_vram_w)
+void v9938_vram_w( UINT8 data )
 	{
 	int address;
 
 	/*v9938_update_command ();*/
 
-	vdp.cmd_write_first = 0;
+	vdp->cmd_write_first = 0;
 
-    address = ((int)vdp.contReg[14] << 14) | vdp.address_latch;
+    address = ((int)vdp->contReg[14] << 14) | vdp->address_latch;
 
-    if (vdp.contReg[45] & 0x40)
+    if (vdp->contReg[45] & 0x40)
         {
-		if ( (vdp.mode == V9938_MODE_GRAPHIC6) || (vdp.mode == V9938_MODE_GRAPHIC7) )
+		if ( (vdp->mode == V9938_MODE_GRAPHIC6) || (vdp->mode == V9938_MODE_GRAPHIC7) )
 			address >>= 1;	/* correct? */
-        if (vdp.vram_exp && address < 0x10000)
-            vdp.vram_exp[address] = data;
+        if (vdp->vram_exp && address < 0x10000)
+            vdp->vram_exp[address] = data;
         }
     else
         {
 		v9938_vram_write (address, data);
         }
 
-	vdp.address_latch = (vdp.address_latch + 1) & 0x3fff;
-	if ((!vdp.address_latch) && (vdp.contReg[0] & 0x0c) ) /* correct ??? */
+	vdp->address_latch = (vdp->address_latch + 1) & 0x3fff;
+	if ((!vdp->address_latch) && (vdp->contReg[0] & 0x0c) ) /* correct ??? */
 		{
-		vdp.contReg[14] = (vdp.contReg[14] + 1) & 7;
+		vdp->contReg[14] = (vdp->contReg[14] + 1) & 7;
 		}
 	}
 
- READ8_HANDLER (v9938_vram_r)
+ WRITE8_HANDLER (v9938_0_vram_w)
+ {
+	 vdp = &vdps[0];
+	 v9938_vram_w( data );
+ }
+
+ WRITE8_HANDLER (v9938_1_vram_w)
+ {
+	 vdp = &vdps[1];
+	 v9938_vram_w( data );
+ }
+
+ static UINT8 v9938_vram_r(void)
 	{
 	UINT8 ret;
 	int address;
 
-	address = ((int)vdp.contReg[14] << 14) | vdp.address_latch;
+	address = ((int)vdp->contReg[14] << 14) | vdp->address_latch;
 
-	vdp.cmd_write_first = 0;
+	vdp->cmd_write_first = 0;
 
-	ret = vdp.read_ahead;
+	ret = vdp->read_ahead;
 
-	if (vdp.contReg[45] & 0x40)
+	if (vdp->contReg[45] & 0x40)
 		{
-		if ( (vdp.mode == V9938_MODE_GRAPHIC6) || (vdp.mode == V9938_MODE_GRAPHIC7) )
+		if ( (vdp->mode == V9938_MODE_GRAPHIC6) || (vdp->mode == V9938_MODE_GRAPHIC7) )
 			address >>= 1;	/* correct? */
 		/* correct? */
-		if (vdp.vram_exp && address < 0x10000)
-			vdp.read_ahead = vdp.vram_exp[address];
+		if (vdp->vram_exp && address < 0x10000)
+			vdp->read_ahead = vdp->vram_exp[address];
 		else
-			vdp.read_ahead = 0xff;
+			vdp->read_ahead = 0xff;
 		}
 	else
 		{
-		vdp.read_ahead = v9938_vram_read (address);
+		vdp->read_ahead = v9938_vram_read (address);
 		}
 
-	vdp.address_latch = (vdp.address_latch + 1) & 0x3fff;
-	if ((!vdp.address_latch) && (vdp.contReg[0] & 0x0c) ) /* correct ??? */
+	vdp->address_latch = (vdp->address_latch + 1) & 0x3fff;
+	if ((!vdp->address_latch) && (vdp->contReg[0] & 0x0c) ) /* correct ??? */
 		{
-		vdp.contReg[14] = (vdp.contReg[14] + 1) & 7;
+		vdp->contReg[14] = (vdp->contReg[14] + 1) & 7;
 		}
 
 	return ret;
 	}
 
-WRITE8_HANDLER (v9938_command_w)
+READ8_HANDLER (v9938_0_vram_r)
+{
+	vdp = &vdps[0];
+	return v9938_vram_r();
+}
+
+READ8_HANDLER (v9938_1_vram_r)
+{
+	vdp = &vdps[1];
+	return v9938_vram_r();
+}
+
+static void v9938_command_w(UINT8 data)
 	{
-	if (vdp.cmd_write_first)
+	if (vdp->cmd_write_first)
 		{
 		if (data & 0x80)
 		{
 			if (!(data & 0x40))
-			v9938_register_write (data & 0x3f, vdp.cmd_write);
+			v9938_register_write (data & 0x3f, vdp->cmd_write);
 		}
 		else
 			{
-			vdp.address_latch =
-				(((UINT16)data << 8) | vdp.cmd_write) & 0x3fff;
-			if ( !(data & 0x40) ) v9938_vram_r (machine,0); /* read ahead! */
+			vdp->address_latch =
+				(((UINT16)data << 8) | vdp->cmd_write) & 0x3fff;
+			if ( !(data & 0x40) ) v9938_vram_r (); /* read ahead! */
 			}
 
-		vdp.cmd_write_first = 0;
+		vdp->cmd_write_first = 0;
 		}
 	else
 		{
-		vdp.cmd_write = data;
-		vdp.cmd_write_first = 1;
+		vdp->cmd_write = data;
+		vdp->cmd_write_first = 1;
 		}
 	}
+
+WRITE8_HANDLER (v9938_0_command_w)
+{
+	vdp = &vdps[0];
+	v9938_command_w(data);
+}
+
+WRITE8_HANDLER (v9938_1_command_w)
+{
+	vdp = &vdps[1];
+	v9938_command_w(data);
+}
 
 /***************************************************************************
 
@@ -404,67 +481,125 @@ WRITE8_HANDLER (v9938_command_w)
 
 ***************************************************************************/
 
-void v9938_init (running_machine *machine, int model, int vram_size, void (*callback)(int) )
+void v9938_init (running_machine *machine, int which, bitmap_t *bitmap, int model, int vram_size, void (*callback)(int) )
 {
-	memset (&vdp, 0, sizeof (vdp) );
+	vdp = &vdps[which];
 
-	vdp.model = model;
-	vdp.vram_size = vram_size;
-	vdp.INTCallback = callback;
-	vdp.size_old = -1;
+	memset (vdp, 0, sizeof (*vdp) );
+
+	vdp->VdpOpsCnt = 1;
+	vdp->VdpEngine = NULL;
+
+	vdp->bitmap = bitmap;
+	vdp->model = model;
+	vdp->vram_size = vram_size;
+	vdp->INTCallback = callback;
+	vdp->size_old = -1;
 
 	/* allocate VRAM */
-	vdp.vram = auto_malloc (0x20000);
-	memset (vdp.vram, 0, 0x20000);
-	if (vdp.vram_size < 0x20000)
+	vdp->vram = auto_malloc (0x20000);
+	memset (vdp->vram, 0, 0x20000);
+	if (vdp->vram_size < 0x20000)
 	{
 		/* set unavailable RAM to 0xff */
-		memset (vdp.vram + vdp.vram_size, 0xff, (0x20000 - vdp.vram_size) );
+		memset (vdp->vram + vdp->vram_size, 0xff, (0x20000 - vdp->vram_size) );
 	}
 
 	/* do we have expanded memory? */
-	if (vdp.vram_size > 0x20000)
+	if (vdp->vram_size > 0x20000)
 	{
-		vdp.vram_exp = auto_malloc (0x10000);
-		memset (vdp.vram_exp, 0, 0x10000);
+		vdp->vram_exp = auto_malloc (0x10000);
+		memset (vdp->vram_exp, 0, 0x10000);
 	}
 	else
-		vdp.vram_exp = NULL;
+		vdp->vram_exp = NULL;
 
-	VIDEO_START_CALL(generic_bitmapped);
+	state_save_register_item("v9938", which, vdp->offset_x);
+	state_save_register_item("v9938", which, vdp->offset_y);
+	state_save_register_item("v9938", which, vdp->visible_y);
+	state_save_register_item("v9938", which, vdp->mode);
+	state_save_register_item("v9938", which, vdp->pal_write_first);
+	state_save_register_item("v9938", which, vdp->cmd_write_first);
+	state_save_register_item("v9938", which, vdp->pal_write);
+	state_save_register_item("v9938", which, vdp->cmd_write);
+	state_save_register_item_array("v9938", which, vdp->palReg);
+	state_save_register_item_array("v9938", which, vdp->statReg);
+	state_save_register_item_array("v9938", which, vdp->contReg);
+	state_save_register_item("v9938", which, vdp->read_ahead);
+	state_save_register_item_pointer("v9938", which, vdp->vram, 0x20000);
+	if ( vdp->vram_exp != NULL )
+		state_save_register_item_pointer("v9938", which, vdp->vram_exp, 0x10000);
+	state_save_register_item("v9938", which, vdp->INT);
+	state_save_register_item("v9938", which, vdp->scanline);
+	state_save_register_item("v9938", which, vdp->blink);
+	state_save_register_item("v9938", which, vdp->blink_count);
+	state_save_register_item("v9938", which, vdp->size);
+	state_save_register_item("v9938", which, vdp->size_old);
+	state_save_register_item("v9938", which, vdp->size_auto);
+	state_save_register_item("v9938", which, vdp->size_now);
+	state_save_register_item("v9938", which, vdp->mx_delta);
+	state_save_register_item("v9938", which, vdp->my_delta);
+	state_save_register_item("v9938", which, vdp->button_state);
+	state_save_register_item_array("v9938", which, vdp->pal_ind16);
+	state_save_register_item_array("v9938", which, vdp->pal_ind256);
+	state_save_register_item("v9938", which, vdp->MMC.SX);
+	state_save_register_item("v9938", which, vdp->MMC.SY);
+	state_save_register_item("v9938", which, vdp->MMC.DX);
+	state_save_register_item("v9938", which, vdp->MMC.DY);
+	state_save_register_item("v9938", which, vdp->MMC.TX);
+	state_save_register_item("v9938", which, vdp->MMC.TY);
+	state_save_register_item("v9938", which, vdp->MMC.NX);
+	state_save_register_item("v9938", which, vdp->MMC.NY);
+	state_save_register_item("v9938", which, vdp->MMC.MX);
+	state_save_register_item("v9938", which, vdp->MMC.ASX);
+	state_save_register_item("v9938", which, vdp->MMC.ADX);
+	state_save_register_item("v9938", which, vdp->MMC.ANX);
+	state_save_register_item("v9938", which, vdp->MMC.CL);
+	state_save_register_item("v9938", which, vdp->MMC.LO);
+	state_save_register_item("v9938", which, vdp->MMC.CM);
+	state_save_register_item("v9938", which, vdp->MMC.MXS);
+	state_save_register_item("v9938", which, vdp->MMC.MXD);
+	state_save_register_item("v9938", which, vdp->VdpOpsCnt);
 }
 
-void v9938_reset (void)
+void v9938_reset (int which)
 {
 	int i;
 
+	vdp = &vdps[which];
+
 	/* offset reset */
-	vdp.offset_x = 8;
-	vdp.offset_y = 8 + 16;
-	vdp.visible_y = 192;
+	vdp->offset_x = 8;
+	vdp->offset_y = 8 + 16;
+	vdp->visible_y = 192;
 	/* register reset */
 	v9938_reset_palette (); /* palette registers */
-	for (i=0;i<10;i++) vdp.statReg[i] = 0;
-	vdp.statReg[2] = 0x0c;
-	if (vdp.model == MODEL_V9958) vdp.statReg[1] |= 4;
-	for (i=0;i<48;i++) vdp.contReg[i] = 0;
-	vdp.cmd_write_first = vdp.pal_write_first = 0;
-	vdp.INT = 0;
-	vdp.read_ahead = 0; vdp.address_latch = 0; /* ??? */
-	vdp.scanline = 0;
+	for (i=0;i<10;i++) vdp->statReg[i] = 0;
+	vdp->statReg[2] = 0x0c;
+	if (vdp->model == MODEL_V9958) vdp->statReg[1] |= 4;
+	for (i=0;i<48;i++) vdp->contReg[i] = 0;
+	vdp->cmd_write_first = vdp->pal_write_first = 0;
+	vdp->INT = 0;
+	vdp->read_ahead = 0; vdp->address_latch = 0; /* ??? */
+	vdp->scanline = 0;
 }
 
 static void v9938_check_int (void)
 	{
 	UINT8 n;
 
-	n = ( (vdp.contReg[1] & 0x20) && (vdp.statReg[0] & 0x80) ) ||
-		( (vdp.statReg[1] & 0x01) && (vdp.contReg[0] & 0x10) );
+	n = ( (vdp->contReg[1] & 0x20) && (vdp->statReg[0] & 0x80) /*&& vdp->vblank_int*/) ||
+		( (vdp->statReg[1] & 0x01) && (vdp->contReg[0] & 0x10) );
 
-	if (n != vdp.INT)
+	/*if(n && vdp->vblank_int)
+	{
+		vdp->vblank_int = 0;
+	}*/
+
+	if (n != vdp->INT)
 		{
-		vdp.INT = n;
-		logerror ("V9938: IRQ line %s\n", n ? "up" : "down");
+		vdp->INT = n;
+		LOG(("V9938: IRQ line %s\n", n ? "up" : "down"));
 		}
 
 	/*
@@ -472,24 +607,26 @@ static void v9938_check_int (void)
     ** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
     ** run. As a patch it's called every scanline
     */
-	vdp.INTCallback (n);
+	vdp->INTCallback (n);
 	}
 
-void v9938_set_sprite_limit (int i)
+void v9938_set_sprite_limit (int which, int i)
 	{
-	vdp.sprite_limit = i;
+	vdp = &vdps[which];
+	vdp->sprite_limit = i;
 	}
 
-void v9938_set_resolution (int i)
+void v9938_set_resolution (int which, int i)
 	{
+	vdp = &vdps[which];
 	if (i == RENDER_AUTO)
 		{
-		vdp.size_auto = 1;
+		vdp->size_auto = 1;
 		}
 	else
 		{
-		vdp.size = i;
-		vdp.size_auto = 0;
+		vdp->size = i;
+		vdp->size_auto = 0;
 		}
 	}
 
@@ -499,16 +636,28 @@ void v9938_set_resolution (int i)
 
 ***************************************************************************/
 
-WRITE8_HANDLER (v9938_register_w)
+static void v9938_register_w(UINT8 data)
 {
 	int reg;
 
-	reg = vdp.contReg[17] & 0x3f;
+	reg = vdp->contReg[17] & 0x3f;
 	if (reg != 17)
 		v9938_register_write (reg, data); /* true ? */
 
-	if (!(vdp.contReg[17] & 0x80))
-		vdp.contReg[17] = (vdp.contReg[17] + 1) & 0x3f;
+	if (!(vdp->contReg[17] & 0x80))
+		vdp->contReg[17] = (vdp->contReg[17] + 1) & 0x3f;
+}
+
+WRITE8_HANDLER (v9938_0_register_w)
+{
+	vdp = &vdps[0];
+	v9938_register_w(data);
+}
+
+WRITE8_HANDLER (v9938_1_register_w)
+{
+	vdp = &vdps[1];
+	v9938_register_w(data);
 }
 
 static void v9938_register_write (int reg, int data)
@@ -524,13 +673,13 @@ static void v9938_register_write (int reg, int data)
 	if (reg <= 27)
 	{
 		data &= reg_mask[reg];
-		if (vdp.contReg[reg] == data)
+		if (vdp->contReg[reg] == data)
 			return;
 	}
 
 	if (reg > 46)
 	{
-		logerror ("V9938: Attempted to write to non-existant R#%d\n", reg);
+		LOG(("V9938: Attempted to write to non-existant R#%d\n", reg));
 		return;
 	}
 
@@ -540,46 +689,46 @@ static void v9938_register_write (int reg, int data)
 	/* registers that affect interrupt and display mode */
 	case 0:
 	case 1:
-		vdp.contReg[reg] = data;
+		vdp->contReg[reg] = data;
 		v9938_set_mode ();
 		v9938_check_int ();
-		logerror ("V9938: mode = %s\n", v9938_modes[vdp.mode]);
+		LOG(("V9938: mode = %s\n", v9938_modes[vdp->mode]));
 		break;
 
 	case 18:
 	case 9:
-		vdp.contReg[reg] = data;
+		vdp->contReg[reg] = data;
 		/* recalc offset */
-		vdp.offset_x = (( (~vdp.contReg[18] - 8) & 0x0f) + 1);
-		vdp.offset_y = ((~(vdp.contReg[18]>>4) - 8) & 0x0f) + 7;
-		if (vdp.contReg[9] & 0x80)
+		vdp->offset_x = (( (~vdp->contReg[18] - 8) & 0x0f) + 1);
+		vdp->offset_y = ((~(vdp->contReg[18]>>4) - 8) & 0x0f) + 7;
+		if (vdp->contReg[9] & 0x80)
 		{
-			vdp.visible_y = 212;
+			vdp->visible_y = 212;
 		}
 		else
 		{
-			vdp.visible_y = 192;
-			vdp.offset_y += 10;
+			vdp->visible_y = 192;
+			vdp->offset_y += 10;
 		}
 		break;
 
 	case 15:
-		vdp.pal_write_first = 0;
+		vdp->pal_write_first = 0;
 		break;
 
 	/* color burst registers aren't emulated */
 	case 20:
 	case 21:
 	case 22:
-		logerror ("V9938: Write %02xh to R#%d; color burst not emulated\n",
-			data, reg);
+		LOG(("V9938: Write %02xh to R#%d; color burst not emulated\n",
+			data, reg));
 		break;
 	case 25:
 	case 26:
 	case 27:
-		if (vdp.model != MODEL_V9958)
+		if (vdp->model != MODEL_V9958)
 		{
-			logerror ("V9938: Attempting to write %02xh to V9958 R#%d\n", data, reg);
+			LOG(("V9938: Attempting to write %02xh to V9958 R#%d\n", data, reg));
 			data = 0;
 		}
 		break;
@@ -594,80 +743,93 @@ static void v9938_register_write (int reg, int data)
 	}
 
 	if (reg != 15)
-		logerror("V9938: Write %02x to R#%d\n", data, reg);
+		LOG(("V9938: Write %02x to R#%d\n", data, reg));
 
-	vdp.contReg[reg] = data;
+	vdp->contReg[reg] = data;
 }
 
- READ8_HANDLER (v9938_status_r)
+ static UINT8 v9938_status_r(void)
 	{
 	int reg;
 	UINT8 ret;
 
-	vdp.cmd_write_first = 0;
+	vdp->cmd_write_first = 0;
 
-	reg = vdp.contReg[15] & 0x0f;
+	reg = vdp->contReg[15] & 0x0f;
 	if (reg > 9)
 		return 0xff;
 
 	switch (reg)
 		{
 		case 0:
-			ret = vdp.statReg[0];
-			vdp.statReg[0] &= 0x1f;
+			ret = vdp->statReg[0];
+			vdp->statReg[0] &= 0x1f;
 			break;
 		case 1:
-			ret = vdp.statReg[1];
-			vdp.statReg[1] &= 0xfe;
-			if ((vdp.contReg[8] & 0xc0) == 0x80)
+			ret = vdp->statReg[1];
+			vdp->statReg[1] &= 0xfe;
+			if ((vdp->contReg[8] & 0xc0) == 0x80)
 				/* mouse mode: add button state */
-				ret |= vdp.button_state & 0xc0;
+				ret |= vdp->button_state & 0xc0;
 			break;
 		case 2:
 			/*v9938_update_command ();*/
 /*
     WTF is this? Whatever this was intended to do, it is nonsensical.
     Might as well pick a random number....
+	This was an attempt to emulate H-Blank flag ;)
             n = cycles_currently_ran ();
             if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
             else vdp.statReg[2] &= ~0x20;
 */
-			if (mame_rand(Machine) & 1) vdp.statReg[2] |= 0x20;
-			else vdp.statReg[2] &= ~0x20;
-			ret = vdp.statReg[2];
+			if (mame_rand(Machine) & 1) vdp->statReg[2] |= 0x20;
+			else vdp->statReg[2] &= ~0x20;
+			ret = vdp->statReg[2];
 			break;
 		case 3:
-			if ((vdp.contReg[8] & 0xc0) == 0x80)
+			if ((vdp->contReg[8] & 0xc0) == 0x80)
 			{	/* mouse mode: return x mouse delta */
-				ret = vdp.mx_delta;
-				vdp.mx_delta = 0;
+				ret = vdp->mx_delta;
+				vdp->mx_delta = 0;
 			}
 			else
-				ret = vdp.statReg[3];
+				ret = vdp->statReg[3];
 			break;
 		case 5:
-			if ((vdp.contReg[8] & 0xc0) == 0x80)
+			if ((vdp->contReg[8] & 0xc0) == 0x80)
 			{	/* mouse mode: return y mouse delta */
-				ret = vdp.my_delta;
-				vdp.my_delta = 0;
+				ret = vdp->my_delta;
+				vdp->my_delta = 0;
 			}
 			else
-				ret = vdp.statReg[5];
+				ret = vdp->statReg[5];
 			break;
 		case 7:
-			ret = vdp.statReg[7];
-			vdp.statReg[7] = vdp.contReg[44] = v9938_vdp_to_cpu () ;
+			ret = vdp->statReg[7];
+			vdp->statReg[7] = vdp->contReg[44] = v9938_vdp_to_cpu () ;
 			break;
 		default:
-			ret = vdp.statReg[reg];
+			ret = vdp->statReg[reg];
 			break;
 		}
 
-	logerror ("V9938: Read %02x from S#%d\n", ret, reg);
+	LOG(("V9938: Read %02x from S#%d\n", ret, reg));
 	v9938_check_int ();
 
 	return ret;
 	}
+
+READ8_HANDLER( v9938_0_status_r )
+{
+	vdp = &vdps[0];
+	return v9938_status_r();
+}
+
+READ8_HANDLER( v9938_1_status_r )
+{
+	vdp = &vdps[1];
+	return v9938_status_r();
+}
 
 /***************************************************************************
 
@@ -675,7 +837,7 @@ static void v9938_register_write (int reg, int data)
 
 ***************************************************************************/
 
-#define V9938_SECOND_FIELD ( !(((vdp.contReg[9] & 0x04) && !(vdp.statReg[2] & 2)) || vdp.blink))
+#define V9938_SECOND_FIELD ( !(((vdp->contReg[9] & 0x04) && !(vdp->statReg[2] & 2)) || vdp->blink))
 
 #define V9938_BPP	(16)
 #define V9938_WIDTH	(512 + 32)
@@ -694,22 +856,22 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 	memset (col, 0, 256);
 
 	/* are sprites disabled? */
-	if (vdp.contReg[8] & 0x02) return;
+	if (vdp->contReg[8] & 0x02) return;
 
-	attrtbl = vdp.vram + (vdp.contReg[5] << 7) + (vdp.contReg[11] << 15);
-	patterntbl = vdp.vram + (vdp.contReg[6] << 11);
+	attrtbl = vdp->vram + (vdp->contReg[5] << 7) + (vdp->contReg[11] << 15);
+	patterntbl = vdp->vram + (vdp->contReg[6] << 11);
 
 	/* 16x16 or 8x8 sprites */
-	height = (vdp.contReg[1] & 2) ? 16 : 8;
+	height = (vdp->contReg[1] & 2) ? 16 : 8;
 	/* magnified sprites (zoomed) */
-	if (vdp.contReg[1] & 1) height *= 2;
+	if (vdp->contReg[1] & 1) height *= 2;
 
 	p2 = p = 0;
 	while (1)
 		{
 		y = attrtbl[0];
 		if (y == 208) break;
-		y = (y - vdp.contReg[23]) & 255;
+		y = (y - vdp->contReg[23]) & 255;
 		if (y > 208)
 			y = -(~y&255);
 		else
@@ -721,10 +883,10 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 			if (p2 == 4)
 				{
 				/* max maximum sprites per line! */
-				if ( !(vdp.statReg[0] & 0x40) )
-					vdp.statReg[0] = (vdp.statReg[0] & 0xa0) | 0x40 | p;
+				if ( !(vdp->statReg[0] & 0x40) )
+					vdp->statReg[0] = (vdp->statReg[0] & 0xa0) | 0x40 | p;
 
-				if (vdp.sprite_limit) break;
+				if (vdp->sprite_limit) break;
 				}
 			/* get x */
 			x = attrtbl[1];
@@ -732,11 +894,11 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 
 			/* get pattern */
 			pattern = attrtbl[2];
-			if (vdp.contReg[1] & 2)
+			if (vdp->contReg[1] & 2)
 				pattern &= 0xfc;
 			n = line - y;
 			patternptr = patterntbl + pattern * 8 +
-				((vdp.contReg[1] & 1) ? n/2  : n);
+				((vdp->contReg[1] & 1) ? n/2  : n);
 			pattern = patternptr[0] << 8 | patternptr[16];
 
 			/* get colour */
@@ -747,7 +909,7 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 			while (1)
 				{
 				if (n == 0) pattern = patternptr[0];
-				else if ( (n == 1) && (vdp.contReg[1] & 2) ) pattern = patternptr[16];
+				else if ( (n == 1) && (vdp->contReg[1] & 2) ) pattern = patternptr[16];
 				else break;
 
 				n++;
@@ -762,28 +924,28 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 								{
 								/* we have a collision! */
 								if (p2 < 4)
-									vdp.statReg[0] |= 0x20;
+									vdp->statReg[0] |= 0x20;
 								}
 							if ( !(col[x] & 0x80) )
 								{
-								if (c || (vdp.contReg[8] & 0x20) )
+								if (c || (vdp->contReg[8] & 0x20) )
 									col[x] |= 0xc0 | c;
 								else
 									col[x] |= 0x40;
 								}
 
 							/* if zoomed, draw another pixel */
-							if (vdp.contReg[1] & 1)
+							if (vdp->contReg[1] & 1)
 								{
 								if (col[x+1] & 0x40)
     	                        	{
        		                    	/* we have a collision! */
 									if (p2 < 4)
-										vdp.statReg[0] |= 0x20;
+										vdp->statReg[0] |= 0x20;
                             		}
                         		if ( !(col[x+1] & 0x80) )
 	                            	{
-   		                         	if (c || (vdp.contReg[8] & 0x20) )
+   		                         	if (c || (vdp->contReg[8] & 0x20) )
 										col[x+1] |= 0xc0 | c;
 									else
 										col[x+1] |= 0x80;
@@ -791,7 +953,7 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 								}
 							}
 						}
-					if (vdp.contReg[1] & 1) x += 2; else x++;
+					if (vdp->contReg[1] & 1) x += 2; else x++;
 					pattern <<= 1;
 					}
 				}
@@ -804,8 +966,8 @@ static void v9938_sprite_mode1 (int line, UINT8 *col)
 		attrtbl += 4;
 		}
 
-	if ( !(vdp.statReg[0] & 0x40) )
-		vdp.statReg[0] = (vdp.statReg[0] & 0xa0) | p;
+	if ( !(vdp->statReg[0] & 0x40) )
+		vdp->statReg[0] = (vdp->statReg[0] & 0xa0) | p;
 	}
 
 static void v9938_sprite_mode2 (int line, UINT8 *col)
@@ -816,24 +978,24 @@ static void v9938_sprite_mode2 (int line, UINT8 *col)
 	memset (col, 0, 256);
 
 	/* are sprites disabled? */
-	if (vdp.contReg[8] & 0x02) return;
+	if (vdp->contReg[8] & 0x02) return;
 
-	attrtbl = ( (vdp.contReg[5] & 0xfc) << 7) + (vdp.contReg[11] << 15);
-	colourtbl =  ( (vdp.contReg[5] & 0xf8) << 7) + (vdp.contReg[11] << 15);
-	patterntbl = (vdp.contReg[6] << 11);
-	colourmask = ( (vdp.contReg[5] & 3) << 3) | 0x7; /* check this! */
+	attrtbl = ( (vdp->contReg[5] & 0xfc) << 7) + (vdp->contReg[11] << 15);
+	colourtbl =  ( (vdp->contReg[5] & 0xf8) << 7) + (vdp->contReg[11] << 15);
+	patterntbl = (vdp->contReg[6] << 11);
+	colourmask = ( (vdp->contReg[5] & 3) << 3) | 0x7; /* check this! */
 
 	/* 16x16 or 8x8 sprites */
-	height = (vdp.contReg[1] & 2) ? 16 : 8;
+	height = (vdp->contReg[1] & 2) ? 16 : 8;
 	/* magnified sprites (zoomed) */
-	if (vdp.contReg[1] & 1) height *= 2;
+	if (vdp->contReg[1] & 1) height *= 2;
 
 	p2 = p = first_cc_seen = 0;
 	while (1)
 		{
 		y = v9938_vram_read (attrtbl);
 		if (y == 216) break;
-		y = (y - vdp.contReg[23]) & 255;
+		y = (y - vdp->contReg[23]) & 255;
 		if (y > 216)
 			y = -(~y&255);
 		else
@@ -845,13 +1007,13 @@ static void v9938_sprite_mode2 (int line, UINT8 *col)
 			if (p2 == 8)
 				{
 				/* max maximum sprites per line! */
-				if ( !(vdp.statReg[0] & 0x40) )
-					vdp.statReg[0] = (vdp.statReg[0] & 0xa0) | 0x40 | p;
+				if ( !(vdp->statReg[0] & 0x40) )
+					vdp->statReg[0] = (vdp->statReg[0] & 0xa0) | 0x40 | p;
 
-				if (vdp.sprite_limit) break;
+				if (vdp->sprite_limit) break;
 				}
 
-			n = line - y; if (vdp.contReg[1] & 1) n /= 2;
+			n = line - y; if (vdp->contReg[1] & 1) n /= 2;
 			/* get colour */
 			c = v9938_vram_read (colourtbl + (((p&colourmask)*16) + n));
 
@@ -867,7 +1029,7 @@ static void v9938_sprite_mode2 (int line, UINT8 *col)
 
 			/* get pattern */
 			pattern = v9938_vram_read (attrtbl + 2);
-			if (vdp.contReg[1] & 2)
+			if (vdp->contReg[1] & 2)
 				pattern &= 0xfc;
 			patternptr = patterntbl + pattern * 8 + n;
 			pattern = (v9938_vram_read (patternptr) << 8) |
@@ -877,16 +1039,16 @@ static void v9938_sprite_mode2 (int line, UINT8 *col)
 			x = v9938_vram_read (attrtbl + 1);
 			if (c & 0x80) x -= 32;
 
-			n = (vdp.contReg[1] & 2) ? 16 : 8;
+			n = (vdp->contReg[1] & 2) ? 16 : 8;
 			while (n--)
 				{
-				for (i=0;i<=(vdp.contReg[1] & 1);i++)
+				for (i=0;i<=(vdp->contReg[1] & 1);i++)
 					{
 					if ( (x >= 0) && (x < 256) )
 						{
 						if ( (pattern & 0x8000) && !(col[x] & 0x10) )
 							{
-							if ( (c & 15) || (vdp.contReg[8] & 0x20) )
+							if ( (c & 15) || (vdp->contReg[8] & 0x20) )
 								{
 								if ( !(c & 0x40) )
 									{
@@ -912,7 +1074,7 @@ static void v9938_sprite_mode2 (int line, UINT8 *col)
 								{
 								/* sprite collision! */
 								if (p2 < 8)
-									vdp.statReg[0] |= 0x20;
+									vdp->statReg[0] |= 0x20;
 								}
 							else
 								col[x] |= 0x40;
@@ -934,8 +1096,8 @@ skip_first_cc_set:
 		attrtbl += 4;
 		}
 
-	if ( !(vdp.statReg[0] & 0x40) )
-		vdp.statReg[0] = (vdp.statReg[0] & 0xa0) | p;
+	if ( !(vdp->statReg[0] & 0x40) )
+		vdp->statReg[0] = (vdp->statReg[0] & 0xa0) | p;
 	}
 
 typedef struct {
@@ -1044,12 +1206,12 @@ static void v9938_set_mode (void)
 	{
 	int n,i;
 
-	n = (((vdp.contReg[0] & 0x0e) << 1) | ((vdp.contReg[1] & 0x18) >> 3));
+	n = (((vdp->contReg[0] & 0x0e) << 1) | ((vdp->contReg[1] & 0x18) >> 3));
 	for (i=0;;i++)
 		{
 		if ( (modes[i].m == n) || (modes[i].m == 0xff) ) break;
 		}
-	vdp.mode = i;
+	vdp->mode = i;
 	}
 
 static void v9938_refresh_16 (bitmap_t *bmp, int line)
@@ -1060,12 +1222,12 @@ static void v9938_refresh_16 (bitmap_t *bmp, int line)
 
 	double_lines = 0;
 
-	if (vdp.size == RENDER_HIGH)
+	if (vdp->size == RENDER_HIGH)
 		{
-		if (vdp.contReg[9] & 0x08)
+		if (vdp->contReg[9] & 0x08)
 			{
-			vdp.size_now = RENDER_HIGH;
-			ln = BITMAP_ADDR16(bmp, line*2+((vdp.statReg[2]>>1)&1), 0);
+			vdp->size_now = RENDER_HIGH;
+			ln = BITMAP_ADDR16(bmp, line*2+((vdp->statReg[2]>>1)&1), 0);
 			}
 		else
 			{
@@ -1077,32 +1239,32 @@ static void v9938_refresh_16 (bitmap_t *bmp, int line)
 	else
 		ln = BITMAP_ADDR16(bmp, line, 0);
 
-	if ( !(vdp.contReg[1] & 0x40) || (vdp.statReg[2] & 0x40) )
+	if ( !(vdp->contReg[1] & 0x40) || (vdp->statReg[2] & 0x40) )
 		{
-		if (vdp.size == RENDER_HIGH)
-			modes[vdp.mode].border_16 (ln);
+		if (vdp->size == RENDER_HIGH)
+			modes[vdp->mode].border_16 (ln);
 		else
-			modes[vdp.mode].border_16s (ln);
+			modes[vdp->mode].border_16s (ln);
 		}
 	else
 		{
-		i = (line - vdp.offset_y) & 255;
-		if (vdp.size == RENDER_HIGH)
+		i = (line - vdp->offset_y) & 255;
+		if (vdp->size == RENDER_HIGH)
 			{
-			modes[vdp.mode].visible_16 (ln, i);
-			if (modes[vdp.mode].sprites)
+			modes[vdp->mode].visible_16 (ln, i);
+			if (modes[vdp->mode].sprites)
 				{
-				modes[vdp.mode].sprites (i, col);
-				modes[vdp.mode].draw_sprite_16 (ln, col);
+				modes[vdp->mode].sprites (i, col);
+				modes[vdp->mode].draw_sprite_16 (ln, col);
 				}
 			}
 		else
 			{
-			modes[vdp.mode].visible_16s (ln, i);
-			if (modes[vdp.mode].sprites)
+			modes[vdp->mode].visible_16s (ln, i);
+			if (modes[vdp->mode].sprites)
 				{
-				modes[vdp.mode].sprites (i, col);
-				modes[vdp.mode].draw_sprite_16s (ln, col);
+				modes[vdp->mode].sprites (i, col);
+				modes[vdp->mode].draw_sprite_16s (ln, col);
 				}
 			}
 		}
@@ -1115,21 +1277,21 @@ static void v9938_refresh_line (bitmap_t *bmp, int line)
 	{
 	int ind16, ind256;
 
-	ind16 = pal_ind16[0];
-	ind256 = pal_ind256[0];
+	ind16 = vdp->pal_ind16[0];
+	ind256 = vdp->pal_ind256[0];
 
-	if ( !(vdp.contReg[8] & 0x20) && (vdp.mode != V9938_MODE_GRAPHIC5) )
+	if ( !(vdp->contReg[8] & 0x20) && (vdp->mode != V9938_MODE_GRAPHIC5) )
 		{
-		pal_ind16[0] = pal_ind16[(vdp.contReg[7] & 0x0f)];
-		pal_ind256[0] = pal_ind256[vdp.contReg[7]];
+		vdp->pal_ind16[0] = vdp->pal_ind16[(vdp->contReg[7] & 0x0f)];
+		vdp->pal_ind256[0] = vdp->pal_ind256[vdp->contReg[7]];
 		}
 
 	v9938_refresh_16 (bmp, line);
 
-	if ( !(vdp.contReg[8] & 0x20) && (vdp.mode != V9938_MODE_GRAPHIC5) )
+	if ( !(vdp->contReg[8] & 0x20) && (vdp->mode != V9938_MODE_GRAPHIC5) )
 		{
-		pal_ind16[0] = ind16;
-		pal_ind256[0] = ind256;
+		vdp->pal_ind16[0] = ind16;
+		vdp->pal_ind256[0] = ind256;
 		}
 	}
 
@@ -1249,120 +1411,141 @@ static void v9938_interrupt_start_vblank (void)
 		fp = fopen ("vram.dmp", "wb");
 		if (fp)
 			{
-			fwrite (vdp.vram, 0x10000, 1, fp);
+			fwrite (vdp->vram, 0x10000, 1, fp);
 			fclose (fp);
 			popmessage("saved");
 			}
 
-		for (i=0;i<24;i++) mame_printf_debug ("R#%d = %02x\n", i, vdp.contReg[i]);
+		for (i=0;i<24;i++) mame_printf_debug ("R#%d = %02x\n", i, vdp->contReg[i]);
 		}
 #endif
 
 	/* at every frame, vdp switches fields */
-	vdp.statReg[2] = (vdp.statReg[2] & 0xfd) | (~vdp.statReg[2] & 2);
+	vdp->statReg[2] = (vdp->statReg[2] & 0xfd) | (~vdp->statReg[2] & 2);
 
 	/* color blinking */
-	if (!(vdp.contReg[13] & 0xf0))
-		vdp.blink = 0;
-	else if (!(vdp.contReg[13] & 0x0f))
-		vdp.blink = 1;
+	if (!(vdp->contReg[13] & 0xf0))
+		vdp->blink = 0;
+	else if (!(vdp->contReg[13] & 0x0f))
+		vdp->blink = 1;
 	else
 		{
 		/* both on and off counter are non-zero: timed blinking */
-		if (vdp.blink_count)
-			vdp.blink_count--;
-		if (!vdp.blink_count)
+		if (vdp->blink_count)
+			vdp->blink_count--;
+		if (!vdp->blink_count)
 			{
-			vdp.blink = !vdp.blink;
-			if (vdp.blink)
-				vdp.blink_count = (vdp.contReg[13] >> 4) * 10;
+			vdp->blink = !vdp->blink;
+			if (vdp->blink)
+				vdp->blink_count = (vdp->contReg[13] >> 4) * 10;
 			else
-				vdp.blink_count = (vdp.contReg[13] & 0x0f) * 10;
+				vdp->blink_count = (vdp->contReg[13] & 0x0f) * 10;
 			}
 		}
 
 	/* check screen rendering size */
-	if (vdp.size_auto && (vdp.size_now >= 0) && (vdp.size != vdp.size_now) )
-		vdp.size = vdp.size_now;
+	if (vdp->size_auto && (vdp->size_now >= 0) && (vdp->size != vdp->size_now) )
+		vdp->size = vdp->size_now;
 
-	if (vdp.size != vdp.size_old)
+	if (vdp->size != vdp->size_old)
 		{
-		if (vdp.size == RENDER_HIGH)
+		if (vdp->size == RENDER_HIGH)
 			video_screen_set_visarea (0, 0, 512 + 32 - 1, 0, 424 + 56 - 1);
 		else
 			video_screen_set_visarea (0, 0, 256 + 16 - 1, 0, 212 + 28 - 1);
 
-		vdp.size_old = vdp.size;
+		vdp->size_old = vdp->size;
 		}
 
-	vdp.size_now = -1;
+	vdp->size_now = -1;
 	}
 
-int v9938_interrupt (void)
+int v9938_interrupt (int which)
 {
 	int scanline, max, pal, scanline_start;
 
+	vdp = &vdps[which];
+
 	v9938_update_command ();
 
-	pal = vdp.contReg[9] & 2;
+	pal = vdp->contReg[9] & 2;
 	if (pal) scanline_start = 53; else scanline_start = 22;
 
 	/* set flags */
-	if (vdp.scanline == (vdp.offset_y + scanline_start) )
+	if (vdp->scanline == (vdp->offset_y + scanline_start) )
 	{
-		vdp.statReg[2] &= ~0x40;
+		vdp->statReg[2] &= ~0x40;
 	}
-	else if (vdp.scanline == (vdp.offset_y + vdp.visible_y + scanline_start) )
+	else if (vdp->scanline == (vdp->offset_y + vdp->visible_y + scanline_start) )
 	{
-		vdp.statReg[2] |= 0x40;
-		vdp.statReg[0] |= 0x80;
+		vdp->statReg[2] |= 0x40;
+		vdp->statReg[0] |= 0x80;
 	}
 
-	max = (pal) ? 255 : (vdp.contReg[9] & 0x80) ? 234 : 244;
-	scanline = (vdp.scanline - scanline_start - vdp.offset_y);
+	max = (pal) ? 255 : (vdp->contReg[9] & 0x80) ? 234 : 244;
+	scanline = (vdp->scanline - scanline_start - vdp->offset_y);
 	if ( (scanline >= 0) && (scanline <= max) &&
-	   ( ( (scanline + vdp.contReg[23]) & 255) == vdp.contReg[19]) )
+	   ( ( (scanline + vdp->contReg[23]) & 255) == vdp->contReg[19]) )
 	{
-		vdp.statReg[1] |= 1;
-		logerror ("V9938: scanline interrupt (%d)\n", scanline);
+		vdp->statReg[1] |= 1;
+		LOG(("V9938: scanline interrupt (%d)\n", scanline));
 	}
 	else
-		if ( !(vdp.contReg[0] & 0x10) ) vdp.statReg[1] &= 0xfe;
+		if ( !(vdp->contReg[0] & 0x10) ) vdp->statReg[1] &= 0xfe;
 
 	v9938_check_int ();
 
 	/* check for start of vblank */
-	if ((pal && (vdp.scanline == 310)) ||
-		(!pal && (vdp.scanline == 259)))
+	if ((pal && (vdp->scanline == 310)) ||
+		(!pal && (vdp->scanline == 259)))
 		v9938_interrupt_start_vblank ();
 
 	/* render the current line */
-	if ((vdp.scanline >= scanline_start) && (vdp.scanline < (212 + 28 + scanline_start)))
+	if ((vdp->scanline >= scanline_start) && (vdp->scanline < (212 + 28 + scanline_start)))
 	{
-		scanline = (vdp.scanline - scanline_start) & 255;
+		scanline = (vdp->scanline - scanline_start) & 255;
 
-		v9938_refresh_line (tmpbitmap, scanline);
+		v9938_refresh_line (vdp->bitmap, scanline);
 	}
 
-	max = (vdp.contReg[9] & 2) ? 313 : 262;
-	if (++vdp.scanline == max)
-		vdp.scanline = 0;
+	max = (vdp->contReg[9] & 2) ? 313 : 262;
+	if (++vdp->scanline == max)
+		vdp->scanline = 0;
 
-	return vdp.INT;
+	return vdp->INT;
+}
+
+/*
+	Not really right... won't work with sprites in graphics 7
+	and with palette updated mid-screen
+*/
+int v9938_get_transpen(int which)
+{
+	vdp = &vdps[which];
+	if (vdp->mode == V9938_MODE_GRAPHIC7)
+	{
+		return vdp->pal_ind256[0];
+	}
+	else
+	{
+		return vdp->pal_ind16[0];
+	}
 }
 
 /*
     Driver-specific function: update the vdp mouse state
 */
-void v9938_update_mouse_state(int mx_delta, int my_delta, int button_state)
+void v9938_update_mouse_state(int which, int mx_delta, int my_delta, int button_state)
 {
-	/* save button state */
-	vdp.button_state = (button_state << 6) & 0xc0;
+	vdp = &vdps[which];
 
-	if ((vdp.contReg[8] & 0xc0) == 0x80)
+	/* save button state */
+	vdp->button_state = (button_state << 6) & 0xc0;
+
+	if ((vdp->contReg[8] & 0xc0) == 0x80)
 	{	/* vdp will process mouse deltas only if it is in mouse mode */
-		vdp.mx_delta += mx_delta;
-		vdp.my_delta += my_delta;
+		vdp->mx_delta += mx_delta;
+		vdp->my_delta += my_delta;
 	}
 }
 
@@ -1372,11 +1555,11 @@ void v9938_update_mouse_state(int mx_delta, int my_delta, int button_state)
 
 ***************************************************************************/
 
-#define VDP vdp.contReg
-#define VDPStatus vdp.statReg
-#define VRAM vdp.vram
-#define VRAM_EXP vdp.vram_exp
-#define ScrMode vdp.mode
+#define VDP vdp->contReg
+#define VDPStatus vdp->statReg
+#define VRAM vdp->vram
+#define VRAM_EXP vdp->vram_exp
+#define ScrMode vdp->mode
 
 /*************************************************************/
 /** Completely rewritten by Alex Wulms:                     **/
@@ -1467,22 +1650,6 @@ void v9938_update_mouse_state(int mx_delta, int my_delta, int button_state)
   }
 
 /*************************************************************/
-/** Structures and stuff                                    **/
-/*************************************************************/
-static struct {
-  int SX,SY;
-  int DX,DY;
-  int TX,TY;
-  int NX,NY;
-  int MX;
-  int ASX,ADX,ANX;
-  UINT8 CL;
-  UINT8 LO;
-  UINT8 CM;
-  UINT8 MXS, MXD;
-} MMC;
-
-/*************************************************************/
 /** Function prototypes                                     **/
 /*************************************************************/
 static UINT8 *VDPVRMP(register UINT8 M, register int MX, register int X, register int Y);
@@ -1532,8 +1699,6 @@ static void ReportVdpCommand(register UINT8 Op);
 static const UINT8 Mask[4] = { 0x0F,0x03,0x0F,0xFF };
 static const int  PPB[4]  = { 2,4,2,1 };
 static const int  PPL[4]  = { 256,512,512,256 };
-static int  VdpOpsCnt=1;
-static void (*VdpEngine)(void)=0;
 
                       /*  SprOn SprOn SprOf SprOf */
                       /*  ScrOf ScrOn ScrOf ScrOn */
@@ -1551,7 +1716,6 @@ static const int hmmm_timing[8]={ 818,  1111, 818,  854,
                             684,  879,  684,  708 };
 static const int lmmm_timing[8]={ 1160, 1599, 1160, 1172,
                             964,  1257, 964,  977 };
-
 
 /** VDPVRMP() **********************************************/
 /** Calculate addr of a pixel in vram                       **/
@@ -1712,17 +1876,17 @@ static int GetVdpTimingValue(register const int *timing_values)
 /*************************************************************/
 void SrchEngine(void)
 {
-  register int SX=MMC.SX;
-  register int SY=MMC.SY;
-  register int TX=MMC.TX;
-  register int ANX=MMC.ANX;
-  register UINT8 CL=MMC.CL;
-  register int MXD = MMC.MXD;
+  register int SX=vdp->MMC.SX;
+  register int SY=vdp->MMC.SY;
+  register int TX=vdp->MMC.TX;
+  register int ANX=vdp->MMC.ANX;
+  register UINT8 CL=vdp->MMC.CL;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(srch_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
 #define pre_srch \
     pre_loop \
@@ -1750,16 +1914,16 @@ void SrchEngine(void)
             break;
   }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     /* Update SX in VDP registers */
     VDPStatus[8]=SX&0xFF;
     VDPStatus[9]=(SX>>8)|0xFE;
   }
   else {
-    MMC.SX=SX;
+    vdp->MMC.SX=SX;
   }
 }
 
@@ -1768,22 +1932,22 @@ void SrchEngine(void)
 /*************************************************************/
 void LineEngine(void)
 {
-  register int DX=MMC.DX;
-  register int DY=MMC.DY;
-  register int TX=MMC.TX;
-  register int TY=MMC.TY;
-  register int NX=MMC.NX;
-  register int NY=MMC.NY;
-  register int ASX=MMC.ASX;
-  register int ADX=MMC.ADX;
-  register UINT8 CL=MMC.CL;
-  register UINT8 LO=MMC.LO;
-  register int MXD = MMC.MXD;
+  register int DX=vdp->MMC.DX;
+  register int DY=vdp->MMC.DY;
+  register int TX=vdp->MMC.TX;
+  register int TY=vdp->MMC.TY;
+  register int NX=vdp->MMC.NX;
+  register int NY=vdp->MMC.NY;
+  register int ASX=vdp->MMC.ASX;
+  register int ADX=vdp->MMC.ADX;
+  register UINT8 CL=vdp->MMC.CL;
+  register UINT8 LO=vdp->MMC.LO;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(line_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
 #define post_linexmaj(MX) \
       DX+=TX; \
@@ -1833,18 +1997,18 @@ void LineEngine(void)
               break;
     }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     VDP[38]=DY & 0xFF;
     VDP[39]=(DY>>8) & 0x03;
   }
   else {
-    MMC.DX=DX;
-    MMC.DY=DY;
-    MMC.ASX=ASX;
-    MMC.ADX=ADX;
+    vdp->MMC.DX=DX;
+    vdp->MMC.DY=DY;
+    vdp->MMC.ASX=ASX;
+    vdp->MMC.ADX=ADX;
   }
 }
 
@@ -1853,22 +2017,22 @@ void LineEngine(void)
 /*************************************************************/
 void LmmvEngine(void)
 {
-  register int DX=MMC.DX;
-  register int DY=MMC.DY;
-  register int TX=MMC.TX;
-  register int TY=MMC.TY;
-  register int NX=MMC.NX;
-  register int NY=MMC.NY;
-  register int ADX=MMC.ADX;
-  register int ANX=MMC.ANX;
-  register UINT8 CL=MMC.CL;
-  register UINT8 LO=MMC.LO;
-  register int MXD = MMC.MXD;
+  register int DX=vdp->MMC.DX;
+  register int DY=vdp->MMC.DY;
+  register int TX=vdp->MMC.TX;
+  register int TY=vdp->MMC.TY;
+  register int NX=vdp->MMC.NX;
+  register int NY=vdp->MMC.NY;
+  register int ADX=vdp->MMC.ADX;
+  register int ANX=vdp->MMC.ANX;
+  register UINT8 CL=vdp->MMC.CL;
+  register UINT8 LO=vdp->MMC.LO;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(lmmv_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
   switch (ScrMode) {
     default:
@@ -1882,10 +2046,10 @@ void LmmvEngine(void)
             break;
   }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     if (!NY)
       DY+=TY;
     VDP[38]=DY & 0xFF;
@@ -1894,10 +2058,10 @@ void LmmvEngine(void)
     VDP[43]=(NY>>8) & 0x03;
   }
   else {
-    MMC.DY=DY;
-    MMC.NY=NY;
-    MMC.ANX=ANX;
-    MMC.ADX=ADX;
+    vdp->MMC.DY=DY;
+    vdp->MMC.NY=NY;
+    vdp->MMC.ANX=ANX;
+    vdp->MMC.ADX=ADX;
   }
 }
 
@@ -1906,25 +2070,25 @@ void LmmvEngine(void)
 /*************************************************************/
 void LmmmEngine(void)
 {
-  register int SX=MMC.SX;
-  register int SY=MMC.SY;
-  register int DX=MMC.DX;
-  register int DY=MMC.DY;
-  register int TX=MMC.TX;
-  register int TY=MMC.TY;
-  register int NX=MMC.NX;
-  register int NY=MMC.NY;
-  register int ASX=MMC.ASX;
-  register int ADX=MMC.ADX;
-  register int ANX=MMC.ANX;
-  register UINT8 LO=MMC.LO;
-  register int MXS = MMC.MXS;
-  register int MXD = MMC.MXD;
+  register int SX=vdp->MMC.SX;
+  register int SY=vdp->MMC.SY;
+  register int DX=vdp->MMC.DX;
+  register int DY=vdp->MMC.DY;
+  register int TX=vdp->MMC.TX;
+  register int TY=vdp->MMC.TY;
+  register int NX=vdp->MMC.NX;
+  register int NY=vdp->MMC.NY;
+  register int ASX=vdp->MMC.ASX;
+  register int ADX=vdp->MMC.ADX;
+  register int ANX=vdp->MMC.ANX;
+  register UINT8 LO=vdp->MMC.LO;
+  register int MXS = vdp->MMC.MXS;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(lmmm_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
   switch (ScrMode) {
     default:
@@ -1938,10 +2102,10 @@ void LmmmEngine(void)
             break;
   }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     if (!NY) {
       SY+=TY;
       DY+=TY;
@@ -1957,12 +2121,12 @@ void LmmmEngine(void)
     VDP[39]=(DY>>8) & 0x03;
   }
   else {
-    MMC.SY=SY;
-    MMC.DY=DY;
-    MMC.NY=NY;
-    MMC.ANX=ANX;
-    MMC.ASX=ASX;
-    MMC.ADX=ADX;
+    vdp->MMC.SY=SY;
+    vdp->MMC.DY=DY;
+    vdp->MMC.NY=NY;
+    vdp->MMC.ANX=ANX;
+    vdp->MMC.ASX=ASX;
+    vdp->MMC.ADX=ADX;
   }
 }
 
@@ -1973,24 +2137,24 @@ void LmcmEngine(void)
 {
   if ((VDPStatus[2]&0x80)!=0x80) {
 
-    VDPStatus[7]=VDP[44]=VDP_POINT(((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0, MMC.MXS, MMC.ASX, MMC.SY);
-    VdpOpsCnt-=GetVdpTimingValue(lmmv_timing);
+    VDPStatus[7]=VDP[44]=VDP_POINT(((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0, vdp->MMC.MXS, vdp->MMC.ASX, vdp->MMC.SY);
+    vdp->VdpOpsCnt-=GetVdpTimingValue(lmmv_timing);
     VDPStatus[2]|=0x80;
 
-    if (!--MMC.ANX || ((MMC.ASX+=MMC.TX)&MMC.MX)) {
-      if (!(--MMC.NY & 1023) || (MMC.SY+=MMC.TY)==-1) {
+    if (!--vdp->MMC.ANX || ((vdp->MMC.ASX+=vdp->MMC.TX)&vdp->MMC.MX)) {
+      if (!(--vdp->MMC.NY & 1023) || (vdp->MMC.SY+=vdp->MMC.TY)==-1) {
         VDPStatus[2]&=0xFE;
-        VdpEngine=0;
-        if (!MMC.NY)
-          MMC.DY+=MMC.TY;
-        VDP[42]=MMC.NY & 0xFF;
-        VDP[43]=(MMC.NY>>8) & 0x03;
-        VDP[34]=MMC.SY & 0xFF;
-        VDP[35]=(MMC.SY>>8) & 0x03;
+        vdp->VdpEngine=0;
+        if (!vdp->MMC.NY)
+          vdp->MMC.DY+=vdp->MMC.TY;
+        VDP[42]=vdp->MMC.NY & 0xFF;
+        VDP[43]=(vdp->MMC.NY>>8) & 0x03;
+        VDP[34]=vdp->MMC.SY & 0xFF;
+        VDP[35]=(vdp->MMC.SY>>8) & 0x03;
       }
       else {
-        MMC.ASX=MMC.SX;
-        MMC.ANX=MMC.NX;
+        vdp->MMC.ASX=vdp->MMC.SX;
+        vdp->MMC.ANX=vdp->MMC.NX;
       }
     }
   }
@@ -2005,24 +2169,24 @@ void LmmcEngine(void)
     register UINT8 SM=((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0;
 
     VDPStatus[7]=VDP[44]&=Mask[SM];
-    VDP_PSET(SM, MMC.MXD, MMC.ADX, MMC.DY, VDP[44], MMC.LO);
-    VdpOpsCnt-=GetVdpTimingValue(lmmv_timing);
+    VDP_PSET(SM, vdp->MMC.MXD, vdp->MMC.ADX, vdp->MMC.DY, VDP[44], vdp->MMC.LO);
+    vdp->VdpOpsCnt-=GetVdpTimingValue(lmmv_timing);
     VDPStatus[2]|=0x80;
 
-    if (!--MMC.ANX || ((MMC.ADX+=MMC.TX)&MMC.MX)) {
-      if (!(--MMC.NY&1023) || (MMC.DY+=MMC.TY)==-1) {
+    if (!--vdp->MMC.ANX || ((vdp->MMC.ADX+=vdp->MMC.TX)&vdp->MMC.MX)) {
+      if (!(--vdp->MMC.NY&1023) || (vdp->MMC.DY+=vdp->MMC.TY)==-1) {
         VDPStatus[2]&=0xFE;
-        VdpEngine=0;
-        if (!MMC.NY)
-          MMC.DY+=MMC.TY;
-        VDP[42]=MMC.NY & 0xFF;
-        VDP[43]=(MMC.NY>>8) & 0x03;
-        VDP[38]=MMC.DY & 0xFF;
-        VDP[39]=(MMC.DY>>8) & 0x03;
+        vdp->VdpEngine=0;
+        if (!vdp->MMC.NY)
+          vdp->MMC.DY+=vdp->MMC.TY;
+        VDP[42]=vdp->MMC.NY & 0xFF;
+        VDP[43]=(vdp->MMC.NY>>8) & 0x03;
+        VDP[38]=vdp->MMC.DY & 0xFF;
+        VDP[39]=(vdp->MMC.DY>>8) & 0x03;
       }
       else {
-        MMC.ADX=MMC.DX;
-        MMC.ANX=MMC.NX;
+        vdp->MMC.ADX=vdp->MMC.DX;
+        vdp->MMC.ANX=vdp->MMC.NX;
       }
     }
   }
@@ -2033,21 +2197,21 @@ void LmmcEngine(void)
 /*************************************************************/
 void HmmvEngine(void)
 {
-  register int DX=MMC.DX;
-  register int DY=MMC.DY;
-  register int TX=MMC.TX;
-  register int TY=MMC.TY;
-  register int NX=MMC.NX;
-  register int NY=MMC.NY;
-  register int ADX=MMC.ADX;
-  register int ANX=MMC.ANX;
-  register UINT8 CL=MMC.CL;
-  register int MXD = MMC.MXD;
+  register int DX=vdp->MMC.DX;
+  register int DY=vdp->MMC.DY;
+  register int TX=vdp->MMC.TX;
+  register int TY=vdp->MMC.TY;
+  register int NX=vdp->MMC.NX;
+  register int NY=vdp->MMC.NY;
+  register int ADX=vdp->MMC.ADX;
+  register int ANX=vdp->MMC.ANX;
+  register UINT8 CL=vdp->MMC.CL;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(hmmv_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
   switch (ScrMode) {
     default:
@@ -2061,10 +2225,10 @@ void HmmvEngine(void)
             break;
   }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     if (!NY)
       DY+=TY;
     VDP[42]=NY & 0xFF;
@@ -2073,10 +2237,10 @@ void HmmvEngine(void)
     VDP[39]=(DY>>8) & 0x03;
   }
   else {
-    MMC.DY=DY;
-    MMC.NY=NY;
-    MMC.ANX=ANX;
-    MMC.ADX=ADX;
+    vdp->MMC.DY=DY;
+    vdp->MMC.NY=NY;
+    vdp->MMC.ANX=ANX;
+    vdp->MMC.ADX=ADX;
   }
 }
 
@@ -2085,24 +2249,24 @@ void HmmvEngine(void)
 /*************************************************************/
 void HmmmEngine(void)
 {
-  register int SX=MMC.SX;
-  register int SY=MMC.SY;
-  register int DX=MMC.DX;
-  register int DY=MMC.DY;
-  register int TX=MMC.TX;
-  register int TY=MMC.TY;
-  register int NX=MMC.NX;
-  register int NY=MMC.NY;
-  register int ASX=MMC.ASX;
-  register int ADX=MMC.ADX;
-  register int ANX=MMC.ANX;
-  register int MXS = MMC.MXS;
-  register int MXD = MMC.MXD;
+  register int SX=vdp->MMC.SX;
+  register int SY=vdp->MMC.SY;
+  register int DX=vdp->MMC.DX;
+  register int DY=vdp->MMC.DY;
+  register int TX=vdp->MMC.TX;
+  register int TY=vdp->MMC.TY;
+  register int NX=vdp->MMC.NX;
+  register int NY=vdp->MMC.NY;
+  register int ASX=vdp->MMC.ASX;
+  register int ADX=vdp->MMC.ADX;
+  register int ANX=vdp->MMC.ANX;
+  register int MXS = vdp->MMC.MXS;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(hmmm_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
   switch (ScrMode) {
     default:
@@ -2116,10 +2280,10 @@ void HmmmEngine(void)
             break;
   }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     if (!NY) {
       SY+=TY;
       DY+=TY;
@@ -2135,12 +2299,12 @@ void HmmmEngine(void)
     VDP[39]=(DY>>8) & 0x03;
   }
   else {
-    MMC.SY=SY;
-    MMC.DY=DY;
-    MMC.NY=NY;
-    MMC.ANX=ANX;
-    MMC.ASX=ASX;
-    MMC.ADX=ADX;
+    vdp->MMC.SY=SY;
+    vdp->MMC.DY=DY;
+    vdp->MMC.NY=NY;
+    vdp->MMC.ANX=ANX;
+    vdp->MMC.ASX=ASX;
+    vdp->MMC.ADX=ADX;
   }
 }
 
@@ -2149,19 +2313,19 @@ void HmmmEngine(void)
 /*************************************************************/
 void YmmmEngine(void)
 {
-  register int SY=MMC.SY;
-  register int DX=MMC.DX;
-  register int DY=MMC.DY;
-  register int TX=MMC.TX;
-  register int TY=MMC.TY;
-  register int NY=MMC.NY;
-  register int ADX=MMC.ADX;
-  register int MXD = MMC.MXD;
+  register int SY=vdp->MMC.SY;
+  register int DX=vdp->MMC.DX;
+  register int DY=vdp->MMC.DY;
+  register int TX=vdp->MMC.TX;
+  register int TY=vdp->MMC.TY;
+  register int NY=vdp->MMC.NY;
+  register int ADX=vdp->MMC.ADX;
+  register int MXD = vdp->MMC.MXD;
   register int cnt;
   register int delta;
 
   delta = GetVdpTimingValue(ymmm_timing);
-  cnt = VdpOpsCnt;
+  cnt = vdp->VdpOpsCnt;
 
   switch (ScrMode) {
     default:
@@ -2175,10 +2339,10 @@ void YmmmEngine(void)
             break;
   }
 
-  if ((VdpOpsCnt=cnt)>0) {
+  if ((vdp->VdpOpsCnt=cnt)>0) {
     /* Command execution done */
     VDPStatus[2]&=0xFE;
-    VdpEngine=0;
+    vdp->VdpEngine=0;
     if (!NY) {
       SY+=TY;
       DY+=TY;
@@ -2194,10 +2358,10 @@ void YmmmEngine(void)
     VDP[39]=(DY>>8) & 0x03;
   }
   else {
-    MMC.SY=SY;
-    MMC.DY=DY;
-    MMC.NY=NY;
-    MMC.ADX=ADX;
+    vdp->MMC.SY=SY;
+    vdp->MMC.DY=DY;
+    vdp->MMC.NY=NY;
+    vdp->MMC.ADX=ADX;
   }
 }
 
@@ -2208,37 +2372,37 @@ void HmmcEngine(void)
 {
   if ((VDPStatus[2]&0x80)!=0x80) {
 
-    *VDP_VRMP(((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0, MMC.MXD, MMC.ADX, MMC.DY)=VDP[44];
-    VdpOpsCnt-=GetVdpTimingValue(hmmv_timing);
+    *VDP_VRMP(((ScrMode >= 5) && (ScrMode <= 8)) ? (ScrMode-5) : 0, vdp->MMC.MXD, vdp->MMC.ADX, vdp->MMC.DY)=VDP[44];
+    vdp->VdpOpsCnt-=GetVdpTimingValue(hmmv_timing);
     VDPStatus[2]|=0x80;
 
-    if (!--MMC.ANX || ((MMC.ADX+=MMC.TX)&MMC.MX)) {
-      if (!(--MMC.NY&1023) || (MMC.DY+=MMC.TY)==-1) {
+    if (!--vdp->MMC.ANX || ((vdp->MMC.ADX+=vdp->MMC.TX)&vdp->MMC.MX)) {
+      if (!(--vdp->MMC.NY&1023) || (vdp->MMC.DY+=vdp->MMC.TY)==-1) {
         VDPStatus[2]&=0xFE;
-        VdpEngine=0;
-        if (!MMC.NY)
-          MMC.DY+=MMC.TY;
-        VDP[42]=MMC.NY & 0xFF;
-        VDP[43]=(MMC.NY>>8) & 0x03;
-        VDP[38]=MMC.DY & 0xFF;
-        VDP[39]=(MMC.DY>>8) & 0x03;
+        vdp->VdpEngine=0;
+        if (!vdp->MMC.NY)
+          vdp->MMC.DY+=vdp->MMC.TY;
+        VDP[42]=vdp->MMC.NY & 0xFF;
+        VDP[43]=(vdp->MMC.NY>>8) & 0x03;
+        VDP[38]=vdp->MMC.DY & 0xFF;
+        VDP[39]=(vdp->MMC.DY>>8) & 0x03;
       }
       else {
-        MMC.ADX=MMC.DX;
-        MMC.ANX=MMC.NX;
+        vdp->MMC.ADX=vdp->MMC.DX;
+        vdp->MMC.ANX=vdp->MMC.NX;
       }
     }
   }
 }
 
 /** VDPWrite() ***********************************************/
-/** Use this function to transfer pixel(s) from CPU to VDP. **/
+/** Use this function to transfer pixel(s) from CPU to vdp-> **/
 /*************************************************************/
 static void v9938_cpu_to_vdp (UINT8 V)
 {
   VDPStatus[2]&=0x7F;
   VDPStatus[7]=VDP[44]=V;
-  if(VdpEngine&&(VdpOpsCnt>0)) VdpEngine();
+  if(vdp->VdpEngine&&(vdp->VdpOpsCnt>0)) vdp->VdpEngine();
 }
 
 /** VDPRead() ************************************************/
@@ -2247,7 +2411,7 @@ static void v9938_cpu_to_vdp (UINT8 V)
 static UINT8 v9938_vdp_to_cpu (void)
 {
   VDPStatus[2]&=0x7F;
-  if(VdpEngine&&(VdpOpsCnt>0)) VdpEngine();
+  if(vdp->VdpEngine&&(vdp->VdpOpsCnt>0)) vdp->VdpEngine();
   return(VDP[44]);
 }
 
@@ -2256,6 +2420,7 @@ static UINT8 v9938_vdp_to_cpu (void)
 /*************************************************************/
 static void ReportVdpCommand(register UINT8 Op)
 {
+#if VERBOSE
 	static const char *const Ops[16] =
 	{
 		"SET ","AND ","OR  ","XOR ","NOT ","NOP ","NOP ","NOP ",
@@ -2266,6 +2431,7 @@ static void ReportVdpCommand(register UINT8 Op)
 		" ABRT"," ????"," ????"," ????","POINT"," PSET"," SRCH"," LINE",
 		" LMMV"," LMMM"," LMCM"," LMMC"," HMMV"," HMMM"," YMMM"," HMMC"
 	};
+#endif
 
 	register UINT8 CL, CM, LO;
 	register int SX,SY, DX,DY, NX,NY;
@@ -2281,12 +2447,12 @@ static void ReportVdpCommand(register UINT8 Op)
 	CM = Op>>4;
 	LO = Op&0x0F;
 
-	logerror ("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
+	LOG(("V9938: Opcode %02Xh %s-%s (%d,%d)->(%d,%d),%d [%d,%d]%s\n",
 			Op, Commands[CM], Ops[LO],
 			SX,SY, DX,DY, CL, VDP[45]&0x04? -NX:NX,
 			VDP[45]&0x08? -NY:NY,
 			VDP[45]&0x70? " on ExtVRAM":""
-		);
+		));
 }
 
 /** VDPDraw() ************************************************/
@@ -2302,8 +2468,8 @@ static UINT8 v9938_command_unit_w (UINT8 Op)
 
   SM = ScrMode-5;         /* Screen mode index 0..3  */
 
-  MMC.CM = Op>>4;
-  if ((MMC.CM & 0x0C) != 0x0C && MMC.CM != 0)
+  vdp->MMC.CM = Op>>4;
+  if ((vdp->MMC.CM & 0x0C) != 0x0C && vdp->MMC.CM != 0)
     /* Dot operation: use only relevant bits of color */
     VDPStatus[7]=(VDP[44]&=Mask[SM]);
 
@@ -2313,11 +2479,11 @@ static UINT8 v9938_command_unit_w (UINT8 Op)
   switch(Op>>4) {
     case CM_ABRT:
       VDPStatus[2]&=0xFE;
-      VdpEngine=0;
+      vdp->VdpEngine=0;
       return 1;
     case CM_POINT:
       VDPStatus[2]&=0xFE;
-      VdpEngine=0;
+      vdp->VdpEngine=0;
       VDPStatus[7]=VDP[44]=
                    VDP_POINT(SM, (VDP[45] & 0x10) != 0,
                                  VDP[32]+((int)VDP[33]<<8),
@@ -2325,7 +2491,7 @@ static UINT8 v9938_command_unit_w (UINT8 Op)
       return 1;
     case CM_PSET:
       VDPStatus[2]&=0xFE;
-      VdpEngine=0;
+      vdp->VdpEngine=0;
       VDP_PSET(SM, (VDP[45] & 0x20) != 0,
                VDP[36]+((int)VDP[37]<<8),
                VDP[38]+((int)VDP[39]<<8),
@@ -2333,84 +2499,84 @@ static UINT8 v9938_command_unit_w (UINT8 Op)
                Op&0x0F);
       return 1;
     case CM_SRCH:
-      VdpEngine=SrchEngine;
+      vdp->VdpEngine=SrchEngine;
       break;
     case CM_LINE:
-      VdpEngine=LineEngine;
+      vdp->VdpEngine=LineEngine;
       break;
     case CM_LMMV:
-      VdpEngine=LmmvEngine;
+      vdp->VdpEngine=LmmvEngine;
       break;
     case CM_LMMM:
-      VdpEngine=LmmmEngine;
+      vdp->VdpEngine=LmmmEngine;
       break;
     case CM_LMCM:
-      VdpEngine=LmcmEngine;
+      vdp->VdpEngine=LmcmEngine;
       break;
     case CM_LMMC:
-      VdpEngine=LmmcEngine;
+      vdp->VdpEngine=LmmcEngine;
       break;
     case CM_HMMV:
-      VdpEngine=HmmvEngine;
+      vdp->VdpEngine=HmmvEngine;
       break;
     case CM_HMMM:
-      VdpEngine=HmmmEngine;
+      vdp->VdpEngine=HmmmEngine;
       break;
     case CM_YMMM:
-      VdpEngine=YmmmEngine;
+      vdp->VdpEngine=YmmmEngine;
       break;
     case CM_HMMC:
-      VdpEngine=HmmcEngine;
+      vdp->VdpEngine=HmmcEngine;
       break;
     default:
-      logerror("V9938: Unrecognized opcode %02Xh\n",Op);
+      LOG(("V9938: Unrecognized opcode %02Xh\n",Op));
         return(0);
   }
 
   /* Fetch unconditional arguments */
-  MMC.SX = (VDP[32]+((int)VDP[33]<<8)) & 511;
-  MMC.SY = (VDP[34]+((int)VDP[35]<<8)) & 1023;
-  MMC.DX = (VDP[36]+((int)VDP[37]<<8)) & 511;
-  MMC.DY = (VDP[38]+((int)VDP[39]<<8)) & 1023;
-  MMC.NY = (VDP[42]+((int)VDP[43]<<8)) & 1023;
-  MMC.TY = VDP[45]&0x08? -1:1;
-  MMC.MX = PPL[SM];
-  MMC.CL = VDP[44];
-  MMC.LO = Op&0x0F;
-  MMC.MXS = (VDP[45] & 0x10) != 0;
-  MMC.MXD = (VDP[45] & 0x20) != 0;
+  vdp->MMC.SX = (VDP[32]+((int)VDP[33]<<8)) & 511;
+  vdp->MMC.SY = (VDP[34]+((int)VDP[35]<<8)) & 1023;
+  vdp->MMC.DX = (VDP[36]+((int)VDP[37]<<8)) & 511;
+  vdp->MMC.DY = (VDP[38]+((int)VDP[39]<<8)) & 1023;
+  vdp->MMC.NY = (VDP[42]+((int)VDP[43]<<8)) & 1023;
+  vdp->MMC.TY = VDP[45]&0x08? -1:1;
+  vdp->MMC.MX = PPL[SM];
+  vdp->MMC.CL = VDP[44];
+  vdp->MMC.LO = Op&0x0F;
+  vdp->MMC.MXS = (VDP[45] & 0x10) != 0;
+  vdp->MMC.MXD = (VDP[45] & 0x20) != 0;
 
   /* Argument depends on UINT8 or dot operation */
-  if ((MMC.CM & 0x0C) == 0x0C) {
-    MMC.TX = VDP[45]&0x04? -PPB[SM]:PPB[SM];
-    MMC.NX = ((VDP[40]+((int)VDP[41]<<8)) & 1023)/PPB[SM];
+  if ((vdp->MMC.CM & 0x0C) == 0x0C) {
+    vdp->MMC.TX = VDP[45]&0x04? -PPB[SM]:PPB[SM];
+    vdp->MMC.NX = ((VDP[40]+((int)VDP[41]<<8)) & 1023)/PPB[SM];
   }
   else {
-    MMC.TX = VDP[45]&0x04? -1:1;
-    MMC.NX = (VDP[40]+((int)VDP[41]<<8)) & 1023;
+    vdp->MMC.TX = VDP[45]&0x04? -1:1;
+    vdp->MMC.NX = (VDP[40]+((int)VDP[41]<<8)) & 1023;
   }
 
   /* X loop variables are treated specially for LINE command */
-  if (MMC.CM == CM_LINE) {
-    MMC.ASX=((MMC.NX-1)>>1);
-    MMC.ADX=0;
+  if (vdp->MMC.CM == CM_LINE) {
+    vdp->MMC.ASX=((vdp->MMC.NX-1)>>1);
+    vdp->MMC.ADX=0;
   }
   else {
-    MMC.ASX = MMC.SX;
-    MMC.ADX = MMC.DX;
+    vdp->MMC.ASX = vdp->MMC.SX;
+    vdp->MMC.ADX = vdp->MMC.DX;
   }
 
   /* NX loop variable is treated specially for SRCH command */
-  if (MMC.CM == CM_SRCH)
-    MMC.ANX=(VDP[45]&0x02)!=0; /* Do we look for "==" or "!="? */
+  if (vdp->MMC.CM == CM_SRCH)
+    vdp->MMC.ANX=(VDP[45]&0x02)!=0; /* Do we look for "==" or "!="? */
   else
-    MMC.ANX = MMC.NX;
+    vdp->MMC.ANX = vdp->MMC.NX;
 
   /* Command execution started */
   VDPStatus[2]|=0x01;
 
   /* Start execution if we still have time slices */
-  if(VdpEngine&&(VdpOpsCnt>0)) VdpEngine();
+  if(vdp->VdpEngine&&(vdp->VdpOpsCnt>0)) vdp->VdpEngine();
 
   /* Operation successfull initiated */
   return(1);
@@ -2421,15 +2587,15 @@ static UINT8 v9938_command_unit_w (UINT8 Op)
 /*************************************************************/
 static void v9938_update_command (void)
 {
-  if(VdpOpsCnt<=0)
+  if(vdp->VdpOpsCnt<=0)
   {
-    VdpOpsCnt+=13662;
-    if(VdpEngine&&(VdpOpsCnt>0)) VdpEngine();
+    vdp->VdpOpsCnt+=13662;
+    if(vdp->VdpEngine&&(vdp->VdpOpsCnt>0)) vdp->VdpEngine();
   }
   else
   {
-    VdpOpsCnt=13662;
-    if(VdpEngine) VdpEngine();
+    vdp->VdpOpsCnt=13662;
+    if(vdp->VdpEngine) vdp->VdpEngine();
   }
 }
 

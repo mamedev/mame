@@ -7767,6 +7767,8 @@ Other Sun games
 	DRIVER( spitboss )	/* (c) 198? Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1995 Merit */
+	DRIVER( megat4 )	/* (c) 1996 Merit */
+	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat5 )	/* (c) 1997 Merit */
 	DRIVER( megat6 )	/* (c) 1998 Merit */
 	DRIVER( suprgolf )	/* (c) 19?? Nasco */
