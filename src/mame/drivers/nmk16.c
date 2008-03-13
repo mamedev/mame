@@ -5021,12 +5021,11 @@ static const struct YM2151interface afega_ym2151_intf =
 static MACHINE_DRIVER_START( stagger1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,12000000)
+	MDRV_CPU_ADD(M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(afega,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmk_interrupt,2)
 
-	MDRV_CPU_ADD(Z80, 4000000)
-	/* audio CPU */	/* ? */
+	MDRV_CPU_ADD(Z80, XTAL_4MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(afega_sound_cpu,0)
 
 	/* video hardware */

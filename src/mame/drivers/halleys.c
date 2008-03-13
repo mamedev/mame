@@ -1948,12 +1948,11 @@ static const struct AY8910interface ay8910_interface =
 
 
 static MACHINE_DRIVER_START( halleys )
-	MDRV_CPU_ADD_TAG("main", M6809, 1664000) /* 19968000/12 (verified on pcb) */
+	MDRV_CPU_ADD_TAG("main", M6809, XTAL_19_968MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
 	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
 
-	MDRV_CPU_ADD(Z80, 6000000/2) /* (verified on pcb) */
-	/* audio CPU */
+	MDRV_CPU_ADD(Z80, XTAL_6MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
@@ -1994,7 +1993,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( benberob )
 	MDRV_IMPORT_FROM(halleys)
-	MDRV_CPU_REPLACE("main", M6809, 1000000) // 19.968MHz/20? (CAUTION: timing critical)
+	MDRV_CPU_REPLACE("main", M6809, XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MDRV_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
 	MDRV_VIDEO_UPDATE(benberob)
 MACHINE_DRIVER_END
