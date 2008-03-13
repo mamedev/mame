@@ -222,8 +222,11 @@ Interrupts:
 ***************************************************************************/
 
 #include "driver.h"
+#include "rendlay.h"
 #include "machine/6821pia.h"
 #include "qix.h"
+
+#include "elecyoyo.lh"
 
 
 
@@ -1115,8 +1118,8 @@ GAME( 1981, qixa,     qix,      qix,      qix,      0,       ROT270, "Taito Amer
 GAME( 1981, qixb,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix (set 3)", GAME_SUPPORTS_SAVE )
 GAME( 1981, qix2,     qix,      qix,      qix,      0,       ROT270, "Taito America Corporation", "Qix II (Tournament)", GAME_SUPPORTS_SAVE )
 GAME( 1981, sdungeon, 0,        mcu,      sdungeon, 0,       ROT270, "Taito America Corporation", "Space Dungeon", GAME_SUPPORTS_SAVE )
-GAME( 1982, elecyoyo, 0,        mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, elecyoy2, elecyoyo, mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE )
+GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
+GAMEL(1982, elecyoy2, elecyoyo, mcu,      elecyoyo, 0,       ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", GAME_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     0,       ROT0,   "Taito America Corporation", "Kram (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram2,    kram,     mcu,      kram,     0,       ROT0,   "Taito America Corporation", "Kram (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, kram3,    kram,     qix,      kram,     kram3,   ROT0,   "Taito America Corporation", "Kram (encrypted)", GAME_SUPPORTS_SAVE )

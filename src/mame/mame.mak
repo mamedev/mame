@@ -1711,6 +1711,8 @@ $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
 						$(LAYOUT)/goldnpkr.lh \
 						$(LAYOUT)/pottnpkr.lh
 
+$(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
+
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh

@@ -2345,6 +2345,7 @@ src/mame/layout/crusnexo.lay svneol=native#text/plain
 src/mame/layout/darius.lay svneol=native#text/plain
 src/mame/layout/deadeye.lay svneol=native#text/plain
 src/mame/layout/dlair.lay svneol=native#text/plain
+src/mame/layout/elecyoyo.lay svneol=native#text/plain
 src/mame/layout/firebeat.lay svneol=native#text/plain
 src/mame/layout/funworld.lay svneol=native#text/plain
 src/mame/layout/geebee.lay svneol=native#text/plain
