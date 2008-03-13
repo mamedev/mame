@@ -96,7 +96,7 @@ int z80pio_irq_ack(int which);
 void z80pio_irq_reti(int which);
 
 /***************************************************************************
-	READ/WRITE HANDLERS
+    READ/WRITE HANDLERS
 ***************************************************************************/
 READ8_HANDLER(z80pio_0_r);
 WRITE8_HANDLER(z80pio_0_w);

@@ -1,15 +1,15 @@
-/* 
+/*
   Merit CRT250 and CRT260 hardware
-  
+
   Driver by Mariusz Wojcieszek
-  
+
   CRT 250 (basic components, also used by CRT260)
     Main CPU: 1xZ80B
   Sound: 1xYM2149F (or compatible)
     Video: 2xYamaha V9938 (MSX2 video chip!)
   Other: 2xZ80APIO (I/O and interrupt controllers)
          1x8255 (I/O)
-  
+
   CRT 260 additional components:
   - Microtouch touch screen controller (SMT-3)
   - PC16550 UART (for communication with touch screen controller)
@@ -52,7 +52,7 @@
   - megat4: rom u32 was bad, currently using u32 from megat4te
   - megat5: has jmp $0000 in the initialization code causing infinite loop, is rom bad?
  */
-  
+
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
@@ -86,7 +86,7 @@ static UINT8* meritm_ram;
 #define DS1204_STATE_READ_KEY			2
 #define DS1204_STATE_WRITE_SECURITY_MATCH	3
 #define DS1204_STATE_READ_NVRAM			4
-  
+
 static struct
 {
 	int state;
@@ -96,9 +96,9 @@ static struct
 	UINT8 nvram[16];
 	int out_bit;
 	UINT8 command[3];
-  
+
 } ds1204;
-  
+
 void ds1204_w( int rst, int clk, int dq )
 {
 	//logerror("ds1204_w: rst = %d, clk = %d, dq = %d\n", rst, clk, dq );
@@ -177,13 +177,13 @@ void ds1204_w( int rst, int clk, int dq )
 		ds1204.last_clk = clk;
 	}
 };
-  
+
 int ds1204_r(void)
 {
 	//logerror("ds1204_r\n");
 	return ds1204.out_bit;
 };
-  
+
 void ds1204_init(const UINT8* key, const UINT8* nvram)
 {
 	memset(&ds1204, 0, sizeof(ds1204));
@@ -204,7 +204,7 @@ void ds1204_init(const UINT8* key, const UINT8* nvram)
  *  Microtouch touch screen controller
  *
  *************************************/
-  
+
 static struct
 {
 	UINT8		tx_buffer[16];
@@ -220,7 +220,7 @@ static struct
 	void		(*tx_callback)(UINT8 data);
 	int		(*touch_callback)(int *touch_x, int *touch_y);
 } microtouch;
-  
+
 
 static int microtouch_check_command( const char* commandtocheck, int command_len, UINT8* command_data )
   {
@@ -236,7 +236,7 @@ static int microtouch_check_command( const char* commandtocheck, int command_len
 		return 0;
 	}
   }
-  
+
 static void microtouch_send_format_table_packet(UINT8 flag, int x, int y)
 {
 	microtouch.tx_callback(flag);
@@ -321,7 +321,7 @@ static void microtouch_rx(int count, UINT8* data)
 		microtouch.tx_buffer[i+microtouch.tx_buffer_ptr] = data[i];
 		microtouch.tx_buffer_ptr++;
 	}
-	
+
 	if (microtouch.tx_buffer_ptr > 0 && (microtouch.tx_buffer[microtouch.tx_buffer_ptr-1] == 0x0d))
 	{
 		// check command
@@ -385,7 +385,7 @@ static int meritm_touch_coord_transform(int *touch_x, int *touch_y)
 	int xscr = (int)((double)(*touch_x)/0x4000*544);
 	int yscr = (int)((double)(*touch_y)/0x4000*480);
 
-	if( (xscr < 16) || 
+	if( (xscr < 16) ||
 		(xscr > 544-16) ||
 		(yscr < 16) ||
 		(yscr > 480-16))
@@ -753,7 +753,7 @@ static INPUT_PORTS_START(meritm_crt260)
 	PORT_START_TAG("PIO1_PORTB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "Calibration" ) PORT_CODE(KEYCODE_C)
 INPUT_PORTS_END
 
@@ -771,7 +771,7 @@ static INPUT_PORTS_START(meritm_crt250)
 	PORT_START_TAG("PIO1_PORTB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
@@ -963,7 +963,7 @@ static const z80pio_interface meritm_io_pio_intf =
 /*
 static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval, UINT32 newval)
 {
-	z80pio_p_w(1, 1, (UINT8)newval);
+    z80pio_p_w(1, 1, (UINT8)newval);
 }
 */
 
@@ -1059,14 +1059,14 @@ static MACHINE_DRIVER_START(meritm_crt250)
 	MDRV_SCREEN_SIZE(MSX2_TOTAL_XRES_PIXELS, MSX2_TOTAL_YRES_PIXELS)
 	MDRV_SCREEN_VISIBLE_AREA(MSX2_XBORDER_PIXELS - MSX2_VISIBLE_XBORDER_PIXELS, MSX2_TOTAL_XRES_PIXELS - MSX2_XBORDER_PIXELS + MSX2_VISIBLE_XBORDER_PIXELS - 1, MSX2_YBORDER_PIXELS - MSX2_VISIBLE_YBORDER_PIXELS, MSX2_TOTAL_YRES_PIXELS - MSX2_YBORDER_PIXELS + MSX2_VISIBLE_YBORDER_PIXELS - 1)
 	MDRV_PALETTE_LENGTH(512)
-  
+
 	MDRV_PALETTE_INIT( v9938 )
 
 	MDRV_VIDEO_START(meritm)
 	MDRV_VIDEO_UPDATE(meritm)
 
   /* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")	
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(AY8910, SYSTEM_CLK/6)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1270,7 +1270,7 @@ ROM_START( megat4te )
 	ROM_RELOAD(              0x280000, 0x080000 )
 	ROM_LOAD( "megat4.u38",  0x300000, 0x080000, CRC(124d5b84) SHA1(3c2117f56d0dc406bfb508989729e36781e215a4) )
 	ROM_RELOAD(              0x380000, 0x080000 )
-    
+
     ROM_REGION( 0x8000, REGION_USER1, 0 ) // DS1644 nv ram
 	ROM_LOAD( "ds1644.u31",  0x00000,  0x8000,   CRC(0908bc39) SHA1(e6ec6238d6bf5c802e046407c0f25a83b09f6135) )
 
@@ -1390,7 +1390,7 @@ static DRIVER_INIT(megat3)
 
 static DRIVER_INIT(megat4)
 {
-	static const UINT8 megat4_ds1204_nvram[16] = 
+	static const UINT8 megat4_ds1204_nvram[16] =
 		{ 0xe3, 0x08, 0x39, 0xd8, 0x4c, 0xbb, 0xc4, 0xf8, 0xf0, 0xe2, 0xd8, 0x77, 0xa8, 0x3d, 0x95, 0x02 };
 
 	ds1204_init(0, megat4_ds1204_nvram);
@@ -1398,7 +1398,7 @@ static DRIVER_INIT(megat4)
 
 static DRIVER_INIT(megat4te)
 {
-	static const UINT8 megat4te_ds1204_nvram[16] = 
+	static const UINT8 megat4te_ds1204_nvram[16] =
 		{ 0x05, 0x21, 0x96, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
 	ds1204_init(0, megat4te_ds1204_nvram);
@@ -1410,7 +1410,7 @@ static DRIVER_INIT(megat4te)
 
 static DRIVER_INIT(megat6)
 {
-	static const UINT8 megat6_ds1204_nvram[16] = 
+	static const UINT8 megat6_ds1204_nvram[16] =
 		{ 0x07, 0x15, 0x98, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
 	ds1204_init(0, megat6_ds1204_nvram);

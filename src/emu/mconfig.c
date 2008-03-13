@@ -522,7 +522,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				sound->route[sound->routes].target = TOKEN_GET_STRING(tokens);
 				sound->routes++;
 				break;
-			
+
 			default:
 				fatalerror("Invalid token %d in machine config\n", entrytype);
 				break;

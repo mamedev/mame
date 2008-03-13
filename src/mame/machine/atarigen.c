@@ -511,8 +511,8 @@ static void slapstic_postload(void)
 static OPBASE_HANDLER( atarigen_slapstic_setopbase )
 {
 	/* if we jump to an address in the slapstic region, tweak the slapstic
-	   at that address and return ~0; this will cause us to be called on
-	   subsequent fetches as well */
+       at that address and return ~0; this will cause us to be called on
+       subsequent fetches as well */
 	address &= ~atarigen_slapstic_mirror;
 	if (address >= atarigen_slapstic_base && address < atarigen_slapstic_base + 0x8000)
 	{
@@ -557,7 +557,7 @@ void atarigen_slapstic_init(int cpunum, offs_t base, offs_t mirror, int chipnum)
 
 		/* ensure we recopy memory for the bank */
 		atarigen_slapstic_bank = 0xff;
-		
+
 		/* install an opcode base handler if we are a 68000 or variant */
 		atarigen_slapstic_base = base;
 		atarigen_slapstic_mirror = mirror;

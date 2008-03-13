@@ -254,8 +254,8 @@ static INPUT_PORTS_START( baraduke )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	/*	To advance rounds: set SWB:5 to ON, coin up game and push 1P start.
-		Use joystick to select round 1 - 48. Set SWB:5 to OFF to play selected round. */
+	/*  To advance rounds: set SWB:5 to ON, coin up game and push 1P start.
+        Use joystick to select round 1 - 48. Set SWB:5 to OFF to play selected round. */
 	PORT_DIPNAME( 0x08, 0x08, "Round Select" )			PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -323,8 +323,8 @@ static INPUT_PORTS_START( metrocrs )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWB:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	/*	To advance rounds: set SWB:2 to ON, coin up game and push 1P start.
-		Use joystick to select round 1 - 32. Set SWB:2 to OFF to play selected round. */
+	/*  To advance rounds: set SWB:2 to ON, coin up game and push 1P start.
+        Use joystick to select round 1 - 32. Set SWB:2 to OFF to play selected round. */
 	PORT_DIPNAME( 0x40, 0x40, "Round Select" )			PORT_DIPLOCATION("SWB:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

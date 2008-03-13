@@ -176,7 +176,7 @@ VIDEO_EOF( xmen6p )
 
 	xmen_current_frame ^=0x8000;
 
-//	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+//  const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 //  cliprect.min_x = visarea->min_x;
 //  cliprect.max_x = visarea->max_x;
 //  cliprect.min_y = visarea->min_y;

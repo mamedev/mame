@@ -130,12 +130,12 @@ static OPBASE_HANDLER( esb_setopbase )
 	if ((address & 0xe000) == 0x8000)
 	{
 		offs_t pc = activecpu_get_pc();
-		
+
 		/* filter out duplicates; we get these because the handler gets called for
-		   multiple reasons:
-			1. Because we have read/write handlers backing the current address
-			2. Because the CPU core executed a jump to a new address
-		*/
+           multiple reasons:
+            1. Because we have read/write handlers backing the current address
+            2. Because the CPU core executed a jump to a new address
+        */
 		if (pc != slapstic_last_pc || address != slapstic_last_address)
 		{
 			slapstic_last_pc = pc;

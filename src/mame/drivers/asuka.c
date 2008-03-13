@@ -195,7 +195,7 @@ Earthjkr: Wrong screen size? Left edge of green blueprints in
 attract looks like it's incorrectly off screen.
 
 Cadash: Hooks for twin arcade machine setup: will involve emulating an extra
-microcontroller, the 07 rom might be the program for it. Cadash background 
+microcontroller, the 07 rom might be the program for it. Cadash background
 colors don't reinitialize properly with save states.
 
 Galmedes: Test mode has select1/2 stuck at on.

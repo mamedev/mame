@@ -199,8 +199,8 @@ static void rgb888_draw_primitives(const render_primitive *primlist, void *dstda
 ***************************************************************************/
 
 /*-------------------------------------------------
-	get_safe_token - makes sure that the passed
-	in device is, in fact, a screen
+    get_safe_token - makes sure that the passed
+    in device is, in fact, a screen
 -------------------------------------------------*/
 
 INLINE screen_state *get_safe_token(const device_config *device)

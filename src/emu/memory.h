@@ -57,7 +57,7 @@ enum
 	ADDRMAP_TOKEN_START,
 	ADDRMAP_TOKEN_END,
 	ADDRMAP_TOKEN_INCLUDE,
-	
+
 	ADDRMAP_TOKEN_GLOBAL_MASK,
 	ADDRMAP_TOKEN_UNMAP_VALUE,
 
@@ -663,7 +663,7 @@ void memory_init(running_machine *machine);
 /* set the current memory context */
 void memory_set_context(int activecpu);
 
-/* get a pointer to the set of memory accessor functions based on the address space, 
+/* get a pointer to the set of memory accessor functions based on the address space,
    databus width, and endianness */
 const data_accessors *memory_get_accessors(int spacenum, int databits, int endianness);
 

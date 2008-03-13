@@ -592,9 +592,9 @@ static void v9938_check_int (void)
 		( (vdp->statReg[1] & 0x01) && (vdp->contReg[0] & 0x10) );
 
 	/*if(n && vdp->vblank_int)
-	{
-		vdp->vblank_int = 0;
-	}*/
+    {
+        vdp->vblank_int = 0;
+    }*/
 
 	if (n != vdp->INT)
 		{
@@ -777,7 +777,7 @@ static void v9938_register_write (int reg, int data)
 /*
     WTF is this? Whatever this was intended to do, it is nonsensical.
     Might as well pick a random number....
-	This was an attempt to emulate H-Blank flag ;)
+    This was an attempt to emulate H-Blank flag ;)
             n = cycles_currently_ran ();
             if ( (n < 28) || (n > 199) ) vdp.statReg[2] |= 0x20;
             else vdp.statReg[2] &= ~0x20;
@@ -1516,8 +1516,8 @@ int v9938_interrupt (int which)
 }
 
 /*
-	Not really right... won't work with sprites in graphics 7
-	and with palette updated mid-screen
+    Not really right... won't work with sprites in graphics 7
+    and with palette updated mid-screen
 */
 int v9938_get_transpen(int which)
 {

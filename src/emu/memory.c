@@ -16,27 +16,27 @@
 
     Next, the address is broken into two halves, an upper half and a
     lower half. The number of bits in each half can be controlled via
-    the macros in LEVEL1_BITS and LEVEL2_BITS, but they default to the 
-    upper 18 bits and the lower 14 bits. 
-    
-    The upper half is then used as an index into a lookup table of bytes. 
-    If the value pulled from the table is between SUBTABLE_BASE and 255, 
-    then the lower half of the address is needed to resolve the final 
-    handler. In this case, the value from the table is combined with the 
+    the macros in LEVEL1_BITS and LEVEL2_BITS, but they default to the
+    upper 18 bits and the lower 14 bits.
+
+    The upper half is then used as an index into a lookup table of bytes.
+    If the value pulled from the table is between SUBTABLE_BASE and 255,
+    then the lower half of the address is needed to resolve the final
+    handler. In this case, the value from the table is combined with the
     lower address bits to form an index into a subtable.
-    
+
     The final result of the lookup is a value from 0 to SUBTABLE_BASE - 1.
     These values correspond to memory handlers. The lower numbered
     handlers (from 0 through STATIC_COUNT - 1) are fixed handlers and refer
     to either memory banks or other special cases. The remaining handlers
     (from STATIC_COUNT through SUBTABLE_BASE - 1) are dynamically
     allocated to driver-specified handlers.
-    
+
     Thus, table entries fall into these categories:
-    
-    	0 .. STATIC_COUNT - 1 = fixed handlers
-    	STATIC_COUNT .. SUBTABLE_BASE - 1 = driver-specific handlers
-    	SUBTABLE_BASE .. 255 = need to look up lower bits in subtable
+
+        0 .. STATIC_COUNT - 1 = fixed handlers
+        STATIC_COUNT .. SUBTABLE_BASE - 1 = driver-specific handlers
+        SUBTABLE_BASE .. 255 = need to look up lower bits in subtable
 
     Caveats:
 
@@ -527,7 +527,7 @@ void memory_init(running_machine *machine)
 static void memory_exit(running_machine *machine)
 {
 	int cpunum, spacenum;
-	
+
 	/* free the memory blocks */
 	while (memory_block_list != NULL)
 	{
@@ -640,7 +640,7 @@ const data_accessors *memory_get_accessors(int spacenum, int databits, int endia
 ***************************************************************************/
 
 /*-------------------------------------------------
-    address_map_alloc - build and allocate an 
+    address_map_alloc - build and allocate an
     address map for a CPU's address space
 -------------------------------------------------*/
 
@@ -649,7 +649,7 @@ address_map *address_map_alloc(const machine_config *config, int cpunum, int spa
 	int cputype = config->cpu[cpunum].type;
 	const addrmap_token *internal_map = (const addrmap_token *)cputype_get_info_ptr(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	address_map *map;
-	
+
 	map = malloc_or_die(sizeof(*map));
 	memset(map, 0, sizeof(*map));
 
@@ -681,15 +681,15 @@ void address_map_free(address_map *map)
 		map->entrylist = entry->next;
 		free(entry);
 	}
-	
+
 	/* free the map */
 	free(map);
 }
 
 
 /*-------------------------------------------------
-    memory_get_address_map - return a pointer to 
-    the constructed address map for a CPU's 
+    memory_get_address_map - return a pointer to
+    the constructed address map for a CPU's
     address space
 -------------------------------------------------*/
 
@@ -710,7 +710,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 	address_map_entry *entry;
 	UINT8 spacenum, databits;
 	UINT32 entrytype;
-	
+
 	/* check the first token */
 	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, spacenum, 8, databits, 8);
 	if (entrytype != ADDRMAP_TOKEN_START)
@@ -723,7 +723,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 		fatalerror("Included a mismatched address map (space %d) for an existing map of type %d!\n", spacenum, map->spacenum);
 	if (map->databits != 0 && map->databits != databits)
 		fatalerror("Included a mismatched address map (databits %d) for an existing map with databits %d!\n", databits, map->databits);
-	
+
 	/* fill in the map values */
 	map->spacenum = spacenum;
 	map->databits = databits;
@@ -755,7 +755,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, map->globalmask, 32);
 				break;
-				
+
 			case ADDRMAP_TOKEN_UNMAP_VALUE:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, map->unmapval, 1);
@@ -768,17 +768,17 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				memset(entry, 0, sizeof(*entry));
 				TOKEN_GET_UINT64_UNPACK2(tokens, entry->addrstart, 32, entry->addrend, 32);
 				break;
-			
+
 			case ADDRMAP_TOKEN_MASK:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmask, 32);
 				break;
-				
+
 			case ADDRMAP_TOKEN_MIRROR:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmirror, 32);
 				break;
-				
+
 			case ADDRMAP_TOKEN_READ:
 				entry->read = TOKEN_GET_PTR(tokens, read);
 				entry->read_name = TOKEN_GET_STRING(tokens);
@@ -795,7 +795,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				entry->read_devtype = TOKEN_GET_PTR(tokens, devtype);
 				entry->read_devtag = TOKEN_GET_STRING(tokens);
 				break;
-				
+
 			case ADDRMAP_TOKEN_DEVICE_WRITE:
 				entry->write = TOKEN_GET_PTR(tokens, write);
 				entry->write_name = TOKEN_GET_STRING(tokens);
@@ -812,21 +812,21 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 					case 64:	entry->read.mhandler64 = port_tag_to_handler64(TOKEN_GET_STRING(tokens));	break;
 				}
 				break;
-				
+
 			case ADDRMAP_TOKEN_REGION:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, entry->region, 24, entry->region_offs, 32);
 				break;
-				
+
 			case ADDRMAP_TOKEN_SHARE:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->share, 24);
 				break;
-				
+
 			case ADDRMAP_TOKEN_BASEPTR:
 				entry->baseptr = (void **)TOKEN_GET_PTR(tokens, voidptr);
 				break;
-				
+
 			case ADDRMAP_TOKEN_BASE_MEMBER:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->baseptroffs_plus1, 24);
@@ -836,13 +836,13 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 			case ADDRMAP_TOKEN_SIZEPTR:
 				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
 				break;
-				
+
 			case ADDRMAP_TOKEN_SIZE_MEMBER:
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
 				entry->sizeptroffs_plus1++;
 				break;
-			
+
 			default:
 				fatalerror("Invalid token %d in address map\n", entrytype);
 				break;
@@ -873,7 +873,7 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
 	for (banknum = 0; banknum < STATIC_COUNT; banknum++)
 	{
 		bank_info *bank = &bankdata[banknum];
-		
+
 		/* consider this bank if it is used for reading and matches the CPU/address space */
 		if (bank->used && bank->read && bank->cpunum == cpunum && bank->spacenum == ADDRESS_SPACE_PROGRAM)
 		{
@@ -888,7 +888,7 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
 				if (cpu_getactivecpu() >= 0 && cpunum == cur_context && opcode_entry == banknum)
 					force_opbase_update();
 			}
-			
+
 			/* fatal error if the decrypted region straddles the bank */
 			else if (bank->bytestart < byteend && bank->byteend > bytestart)
 				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for CPU %d", bytestart, byteend, cpunum);
@@ -918,7 +918,7 @@ opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func fu
 
 
 /*-------------------------------------------------
-    memory_set_opbase - called by CPU cores to 
+    memory_set_opbase - called by CPU cores to
     update the opcode base for the given address
 -------------------------------------------------*/
 
@@ -1429,7 +1429,7 @@ static void memory_init_cpudata(const machine_config *config)
 		cpu->region = memory_region(REGION_CPU1 + cpunum);
 		cpu->regionsize = memory_region_length(REGION_CPU1 + cpunum);
 
-		/* initialize each address space, and build up a mask of spaces */		
+		/* initialize each address space, and build up a mask of spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			addrspace_data *space = &cpu->space[spacenum];
@@ -1497,7 +1497,7 @@ static void memory_init_preflight(const machine_config *config)
 	{
 		cpu_data *cpu = &cpudata[cpunum];
 		int spacenum;
-		
+
 		/* loop over valid address spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (cpu->spacemask & (1 << spacenum))
@@ -1550,7 +1550,7 @@ static void memory_init_preflight(const machine_config *config)
 						if (entry->region_offs + (entry->byteend - entry->bytestart + 1) > length)
 							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region %d size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
 					}
-					
+
 					/* convert any region-relative entries to their memory pointers */
 					if (entry->region != 0)
 						entry->memory = memory_region(entry->region) + entry->region_offs;
@@ -1594,11 +1594,11 @@ static void memory_init_populate(running_machine *machine)
 				if (space->map != NULL)
 				{
 					const address_map_entry *last_entry = NULL;
-					
+
 					while (last_entry != space->map->entrylist)
 					{
 						const address_map_entry *entry;
-						
+
 						/* find the entry before the last one we processed */
 						for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
 						last_entry = entry;
@@ -1774,7 +1774,7 @@ static void install_mem_handler(addrspace_data *space, read_or_write readorwrite
 static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
 {
 	bank_info *bank = &bankdata[banknum];
-	
+
 	/* if we're not yet used, fill in the data */
 	if (!bank->used)
 	{
@@ -1845,7 +1845,7 @@ static UINT8 get_handler_index(handler_data *table, void *object, genf *handler,
 	if (HANDLER_IS_STATIC(handler))
 	{
 		entry = (FPTR)handler;
-		
+
 		/* if it is a bank, copy in the relevant information */
 		if (HANDLER_IS_BANK(handler))
 		{
@@ -1862,7 +1862,7 @@ static UINT8 get_handler_index(handler_data *table, void *object, genf *handler,
 	for (entry = STATIC_COUNT; entry < SUBTABLE_BASE; entry++)
 	{
 		handler_data *hdata = &table[entry];
-		
+
 		/* if we hit a NULL hdata, then we need to allocate this one as a new one */
 		if (hdata->handler.generic == NULL)
 		{
@@ -1874,7 +1874,7 @@ static UINT8 get_handler_index(handler_data *table, void *object, genf *handler,
 			hdata->object = object;
 			return entry;
 		}
-		
+
 		/* if we find a perfect match, return a duplicate entry */
 		if (hdata->handler.generic == handler && hdata->bytestart == bytestart && hdata->bytemask == bytemask && hdata->object == object)
 			return entry;
@@ -2271,12 +2271,12 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 	int region;
 
 	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, bytestart, byteend, memory));
-	
+
 	/* determine how much memory to allocate for this */
 	bytestoalloc = sizeof(*block);
 	if (allocatemem)
 		bytestoalloc += byteend - bytestart + 1;
-	
+
 	/* allocate and clear the memory */
 	block = malloc_or_die(bytestoalloc);
 	memset(block, 0, bytestoalloc);
@@ -2304,11 +2304,11 @@ static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, o
 	block->bytestart = bytestart;
 	block->byteend = byteend;
 	block->data = memory;
-	
+
 	/* attach us to the head of the list */
 	block->next = memory_block_list;
 	memory_block_list = block;
-	
+
 	return memory;
 }
 

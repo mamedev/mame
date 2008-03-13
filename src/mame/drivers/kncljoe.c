@@ -7,7 +7,7 @@ driver by Ernesto Corvi
 Notes:
 This board seems to be an Irem design.
 The sound hardware is modified the 6803-based one used by the classic Irem
-games. There's only one AY 3-8910 chip and no MSM5205. There are also two 
+games. There's only one AY 3-8910 chip and no MSM5205. There are also two
 SN76489 controlled directly by main(!) cpu, and used only for in-game music.
 The video hardware is pretty much like Irem games too. The only
 strange thing is that the screen is flipped vertically.
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_CPU_ADD(Z80, XTAL_6MHz)  /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-	
+
 	MDRV_CPU_ADD_TAG("sound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-	
+
 	MDRV_SOUND_ADD(SN76489, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 

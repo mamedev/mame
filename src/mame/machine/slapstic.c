@@ -871,11 +871,11 @@ int slapstic_bank(void)
 static int alt2_kludge(offs_t offset)
 {
 	/* Of the 3 alternate addresses, only the middle one needs to actually hit
-	   in the slapstic region; the first and third ones can be anywhere in the
-	   address space. For this reason, the read/write handlers usually only
-	   see the 2nd access. For the 68000-based games, we do the following
-	   kludge to examine the opcode that is executing and look for the 1st
-	   and 3rd accesses. */
+       in the slapstic region; the first and third ones can be anywhere in the
+       address space. For this reason, the read/write handlers usually only
+       see the 2nd access. For the 68000-based games, we do the following
+       kludge to examine the opcode that is executing and look for the 1st
+       and 3rd accesses. */
 
 	if (access_68k)
 	{

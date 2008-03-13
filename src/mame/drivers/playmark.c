@@ -1108,7 +1108,7 @@ static MACHINE_DRIVER_START( hrdtimes )
 	MDRV_CPU_PROGRAM_MAP(hrdtimes_main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
-//  MDRV_CPU_ADD(PIC16C57, XTAL_24MHz/2)	/* verified on pcb */
+//  MDRV_CPU_ADD(PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
 //  MDRV_CPU_IO_MAP(playmark_sound_io_map, 0)
 
