@@ -373,7 +373,7 @@ static void update_lamps(void)
 		mpu4_draw_led(8, pled_segs[0]);
 		mpu4_draw_led(9, pled_segs[1]);
 	}
-
+	draw_lamps();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -575,7 +575,6 @@ static void ic23_update(void)
 	{
 		input_strobe = 0x00;
 	}
-	draw_lamps();
 }
 /*---------------------------------------
    IC24 emulation
@@ -1326,35 +1325,20 @@ static INTERRUPT_GEN( gen_50hz )
 
 static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-
-	AM_RANGE(0x0800, 0x0810) AM_WRITE(characteriser_w)
-	AM_RANGE(0x0800, 0x0810) AM_READ( characteriser_r)
+	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	// write bank (rom page select)
 
-//  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
-//  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
+//  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
 
-	AM_RANGE(0x0900, 0x0907) AM_READ( ptm6840_0_r)  // 6840PTM
-	AM_RANGE(0x0900, 0x0907) AM_WRITE(ptm6840_0_w)
+	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)  // 6840PTM
 
-	AM_RANGE(0x0A00, 0x0A03) AM_WRITE(pia_0_w)		// PIA6821 IC3
-	AM_RANGE(0x0A00, 0x0A03) AM_READ( pia_0_r)
-
-	AM_RANGE(0x0B00, 0x0B03) AM_WRITE(pia_1_w)		// PIA6821 IC4
-	AM_RANGE(0x0B00, 0x0B03) AM_READ( pia_1_r)
-
-	AM_RANGE(0x0C00, 0x0C03) AM_WRITE(pia_2_w)		// PIA6821 IC5
-	AM_RANGE(0x0C00, 0x0C03) AM_READ( pia_2_r)
-
-	AM_RANGE(0x0D00, 0x0D03) AM_WRITE(pia_3_w)		// PIA6821 IC6
-	AM_RANGE(0x0D00, 0x0D03) AM_READ( pia_3_r)
-
-	AM_RANGE(0x0E00, 0x0E03) AM_WRITE(pia_4_w)		// PIA6821 IC7
-	AM_RANGE(0x0E00, 0x0E03) AM_READ( pia_4_r)
-
-	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)		// PIA6821 IC8
-	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
+	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	// PIA6821 IC3
+	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	// PIA6821 IC4
+	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	// PIA6821 IC5
+	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
 
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	// 64k  paged ROM (4 pages)
 ADDRESS_MAP_END

@@ -171,7 +171,9 @@ IRQ line connected to CPU
 -----------+---+-----------------+--------------------------------------------------------------------------
 TODO: - Confirm that MC6850 emulation is sufficient.
       - MPU4 Master clock value taken from schematic, but 68k value is not.
-
+      - Deal 'Em changes its inputs depending on the cabinet, need conditional support
+      - Deal 'Em also has bad tiles (apostrophe and bottom corner), black should actually be transparent
+      - to give black on green.
 *****************************************************************************************/
 
 //MPU4 Video
@@ -179,6 +181,7 @@ TODO: - Confirm that MC6850 emulation is sufficient.
 #include "machine/6850acia.h"
 #include "sound/saa1099.h"
 #include "video/mc6845.h"
+#include "video/resnet.h"
 
 #ifdef MAME_DEBUG
 #define MPU4VIDVERBOSE 1
@@ -661,7 +664,6 @@ static void scn2674_write_init_regs(UINT8 data)
 
 		case 15: // not valid!
 			break;
-
 
 	}
 
@@ -1163,14 +1165,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dealem )
 	PORT_START_TAG("ORANGE1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Gamble")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START_TAG("ORANGE2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("20p Token")PORT_IMPULSE(3)
@@ -1183,7 +1185,7 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START_TAG("BLACK1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Collect")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Gamble")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Pontoon")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1199,7 +1201,7 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Lo")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Hi")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Stick")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Collect")
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Deal")
 
 	PORT_START_TAG("DIL1")
@@ -1388,8 +1390,7 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(acia6850_1_stat_lsb_r, acia6850_1_ctrl_lsb_w)
     AM_RANGE(0xff8002, 0xff8003) AM_READWRITE(acia6850_1_data_lsb_r, acia6850_1_data_lsb_w)
 
-	AM_RANGE(0xff9000, 0xff900f) AM_READ(  ptm6840_1_lsb_r)
-	AM_RANGE(0xff9000, 0xff900f) AM_WRITE( ptm6840_1_lsb_w)
+	AM_RANGE(0xff9000, 0xff900f) AM_READWRITE(ptm6840_1_lsb_r,ptm6840_1_lsb_w)
 
 	/* characterizer */
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w) // Word-based version of old CHR???
@@ -1402,32 +1403,16 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x0801, 0x0801) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
 
-	//AM_RANGE(0x0880, 0x0880) AM_READ(uart1stat_r)     // Could be a UART datalogger is here.
-	//AM_RANGE(0x0880, 0x0880) AM_WRITE(uart1ctrl_w)    // Or a PIA?
-	//AM_RANGE(0x0881, 0x0881) AM_READ(uart1data_r)
-	//AM_RANGE(0x0881, 0x0881) AM_WRITE(uart1data_w)
-	AM_RANGE(0x0880, 0x0881) AM_NOP
+	AM_RANGE(0x0880, 0x0881) AM_NOP // Could be a UART datalogger is here.
 
-	AM_RANGE(0x0900, 0x0907) AM_READ( ptm6840_0_r)  	// 6840PTM IC2
-	AM_RANGE(0x0900, 0x0907) AM_WRITE(ptm6840_0_w)
+	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)  // 6840PTM
 
-	AM_RANGE(0x0A00, 0x0A03) AM_WRITE(pia_0_w)			// PIA6821 IC3
-	AM_RANGE(0x0A00, 0x0A03) AM_READ( pia_0_r)
-
-	AM_RANGE(0x0B00, 0x0B03) AM_WRITE(pia_1_w)			// PIA6821 IC4
-	AM_RANGE(0x0B00, 0x0B03) AM_READ( pia_1_r)
-
-	AM_RANGE(0x0C00, 0x0C03) AM_WRITE(pia_2_w)			// PIA6821 IC5
-	AM_RANGE(0x0C00, 0x0C03) AM_READ( pia_2_r)
-
-	AM_RANGE(0x0D00, 0x0D03) AM_WRITE(pia_3_w)			// PIA6821 IC6
-	AM_RANGE(0x0D00, 0x0D03) AM_READ( pia_3_r)
-
-	AM_RANGE(0x0E00, 0x0E03) AM_WRITE(pia_4_w)			// PIA6821 IC7
-	AM_RANGE(0x0E00, 0x0E03) AM_READ( pia_4_r)
-
-	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)			// PIA6821 IC8
-	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
+	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	// PIA6821 IC3
+	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	// PIA6821 IC4
+	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	// PIA6821 IC5
+	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
 
 	AM_RANGE(0x4000, 0x40ff) AM_RAM // it actually runs code from here...
 
@@ -1514,7 +1499,16 @@ static UINT8 *dealem_videoram;
 static PALETTE_INIT( dealem )
 {
 	int i;
-	for (i = 0;i < memory_region_length(REGION_PROMS);i++)
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double weights_r[3], weights_g[3], weights_b[2];
+
+	compute_resistor_weights(0,	255,	-1.0,
+			3,	resistances_rg,	weights_r,	0,	0,
+			3,	resistances_rg,	weights_g,	0,	0,
+			2,	resistances_b,	weights_b,	0,	0);
+
+	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -1522,22 +1516,20 @@ static PALETTE_INIT( dealem )
 		bit0 = BIT(*color_prom,0);
 		bit1 = BIT(*color_prom,1);
 		bit2 = BIT(*color_prom,2);
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = combine_3_weights(weights_r, bit0, bit1, bit2);
 		/* green component */
 		bit0 = BIT(*color_prom,3);
 		bit1 = BIT(*color_prom,4);
 		bit2 = BIT(*color_prom,5);
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		g = combine_3_weights(weights_g, bit0, bit1, bit2);
 		/* blue component */
-		bit0 = 0;
-		bit1 = BIT(*color_prom,6);
-		bit2 = BIT(*color_prom,7);
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(*color_prom,6);
+		bit1 = BIT(*color_prom,7);
+		b = combine_2_weights(weights_b, bit0, bit1);
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 		color_prom++;
 	}
-
 }
 
 static VIDEO_UPDATE(dealem)
@@ -1567,29 +1559,16 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 //  AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)    // write bank (rom page select)
 
-//  AM_RANGE(0x08E0, 0x08E7) AM_READ( 68681_duart_r)
-//  AM_RANGE(0x08E0, 0x08E7) AM_WRITE( 68681_duart_w)
+//  AM_RANGE(0x08E0, 0x08E7) AM_READWRITE(68681_duart_r,68681_duart_w)
 
-	AM_RANGE(0x0900, 0x0907) AM_READ( ptm6840_0_r)  // 6840PTM
-	AM_RANGE(0x0900, 0x0907) AM_WRITE(ptm6840_0_w)
+	AM_RANGE(0x0900, 0x0907) AM_READWRITE(ptm6840_0_r,ptm6840_0_w)  // 6840PTM
 
-	AM_RANGE(0x0A00, 0x0A03) AM_WRITE(pia_0_w)		// PIA6821 IC3
-	AM_RANGE(0x0A00, 0x0A03) AM_READ( pia_0_r)
-
-	AM_RANGE(0x0B00, 0x0B03) AM_WRITE(pia_1_w)		// PIA6821 IC4
-	AM_RANGE(0x0B00, 0x0B03) AM_READ( pia_1_r)
-
-	AM_RANGE(0x0C00, 0x0C03) AM_WRITE(pia_2_w)		// PIA6821 IC5
-	AM_RANGE(0x0C00, 0x0C03) AM_READ( pia_2_r)
-
-	AM_RANGE(0x0D00, 0x0D03) AM_WRITE(pia_3_w)		// PIA6821 IC6
-	AM_RANGE(0x0D00, 0x0D03) AM_READ( pia_3_r)
-
-	AM_RANGE(0x0E00, 0x0E03) AM_WRITE(pia_4_w)		// PIA6821 IC7
-	AM_RANGE(0x0E00, 0x0E03) AM_READ( pia_4_r)
-
-	AM_RANGE(0x0F00, 0x0F03) AM_WRITE(pia_5_w)		// PIA6821 IC8
-	AM_RANGE(0x0F00, 0x0F03) AM_READ( pia_5_r)
+	AM_RANGE(0x0A00, 0x0A03) AM_READWRITE(pia_0_r,pia_0_w)	  	// PIA6821 IC3
+	AM_RANGE(0x0B00, 0x0B03) AM_READWRITE(pia_1_r,pia_1_w)	  	// PIA6821 IC4
+	AM_RANGE(0x0C00, 0x0C03) AM_READWRITE(pia_2_r,pia_2_w)	  	// PIA6821 IC5
+	AM_RANGE(0x0D00, 0x0D03) AM_READWRITE(pia_3_r,pia_3_w)		// PIA6821 IC6
+	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
+	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
 
 	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE(&dealem_videoram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP// 64k  paged ROM (4 pages)
@@ -1602,19 +1581,20 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map,0)
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 50 )
 
-	MDRV_CPU_ADD_TAG("video", M68000, VIDEO_MASTER_CLOCK )
-	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map,0)
-	MDRV_CPU_VBLANK_INT("main", mpu4_vid_irq)
-
 	MDRV_NVRAM_HANDLER(generic_0fill)				// confirm
 
-	MDRV_INTERLEAVE(16)
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
 	MDRV_SCREEN_REFRESH_RATE(50)
+
+	MDRV_CPU_ADD_TAG("video", M68000, VIDEO_MASTER_CLOCK )
+	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map,0)
+	MDRV_CPU_VBLANK_INT("main", mpu4_vid_irq)
+
+	MDRV_INTERLEAVE(16)
 
 	MDRV_MACHINE_START(mpu4_vid)
 	MDRV_MACHINE_RESET(mpu4_vid)
@@ -1653,13 +1633,12 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)					// generate 50 hz signal
 
-	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)						// load/save nv RAM
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)		/* not accurate */)
@@ -1967,7 +1946,7 @@ GAME( 199?, mating,  bctvidbs,mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"
 GAME( 199?, matinga, mating,  mpu4_vid, mpu4,     mating,ROT0,   "Barcrest", 		"The Mating Game (Standard)",										GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, vgpoker, 0,		  vgpoker,	mpu4,     0,	 ROT0,   "BwB",				"Vegas Poker (Prototype)",											GAME_NOT_WORKING|GAME_NO_SOUND )
 
-GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,   "Dolbeck Systems", 	"Connect 4",													GAME_IMPERFECT_GRAPHICS,layout_connect4 )
-GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,   "Barcrest", 		"MPU4 Unit Test (Program 4)",									0 )
-GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,   "Barcrest", 		"MPU4 Unit Test (Program 2)",									0 )
-GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,   "Barcrest", 		"MPU4 Meter Clear ROM",											0 )
+GAMEL(1989?,connect4,0,       mpu4mod2, connect4, connect4, ROT0,"Dolbeck Systems", "Connect 4",														GAME_IMPERFECT_GRAPHICS,layout_connect4 )
+GAME( 198?, mpu4utst,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest", 		"MPU4 Unit Test (Program 4)",										0 )
+GAME( 198?, mpu4tst2,0,		  mpu4mod2, mpu4,			 0,	ROT0,"Barcrest", 		"MPU4 Unit Test (Program 2)",										0 )
+GAME( 198?, mpu4met0,0,		  mpu4mod2, mpu4,			 0, ROT0,"Barcrest", 		"MPU4 Meter Clear ROM",												0 )
