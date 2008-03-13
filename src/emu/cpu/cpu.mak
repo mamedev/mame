@@ -1390,19 +1390,19 @@ $(CPUOBJ)/mips/psx.o:	$(CPUSRC)/mips/psx.c \
 
 
 #-------------------------------------------------
-# SSP1610
+# SSP1601
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_SSP1610=$(if $(filter SSP1610,$(CPUS)),1,0)
+CPUDEFS += -DHAS_SSP1601=$(if $(filter SSP1601,$(CPUS)),1,0)
 
-ifneq ($(filter SSP1610,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/ssp1610
-CPUOBJS += $(CPUOBJ)/ssp1610/ssp1610.o
-DBGOBJS += $(CPUOBJ)/ssp1610/ssp1610d.o
+ifneq ($(filter SSP1601,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ssp1601
+CPUOBJS += $(CPUOBJ)/ssp1601/ssp1601.o
+DBGOBJS += $(CPUOBJ)/ssp1601/ssp1601d.o
 endif
 
-$(CPUOBJ)/ssp1610/ssp1610.o:	$(CPUSRC)/ssp1610/ssp1610.c \
-								$(CPUSRC)/ssp1610/ssp1610.h
+$(CPUOBJ)/ssp1610/ssp1601.o:	$(CPUSRC)/ssp1601/ssp1601.c \
+								$(CPUSRC)/ssp1610/ssp1601.h
 
 
 

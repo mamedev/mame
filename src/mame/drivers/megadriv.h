@@ -1,15 +1,18 @@
 extern DRIVER_INIT( megadrie );
 extern DRIVER_INIT( megadriv );
 extern DRIVER_INIT( megadrij );
+extern DRIVER_INIT( megadsvp );
 
 INPUT_PORTS_EXTERN(megadriv);
 INPUT_PORTS_EXTERN(aladbl);
 INPUT_PORTS_EXTERN(megadri6);
 INPUT_PORTS_EXTERN(ssf2ghw);
+INPUT_PORTS_EXTERN(megdsvp);
 
 MACHINE_DRIVER_EXTERN(megadriv);
 MACHINE_DRIVER_EXTERN(megadpal);
 MACHINE_DRIVER_EXTERN(_32x);
+MACHINE_DRIVER_EXTERN(megdsvp);
 
 extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;

@@ -557,7 +557,9 @@ static void update_megadrive_vdp_code_and_address(void)
                             ((megadrive_vdp_command_part2 & 0x0003) << 14);
 }
 
-static UINT16 get_word_from_68k_mem(UINT32 source)
+static UINT16 (*vdp_get_word_from_68k_mem)(UINT32 source);
+
+static UINT16 vdp_get_word_from_68k_mem_default(UINT32 source)
 {
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
@@ -642,7 +644,7 @@ static void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 
 	for (count = 0;count<(length>>1);count++)
 	{
-		vdp_vram_write(get_word_from_68k_mem(source));
+		vdp_vram_write(vdp_get_word_from_68k_mem(source));
 		source+=2;
 		if (source>0xffffff) source = 0xe00000;
 	}
@@ -668,7 +670,7 @@ static void megadrive_do_insta_68k_to_cram_dma(UINT32 source,UINT16 length)
 	{
 		//if (megadrive_vdp_address>=0x80) return; // abandon
 
-		write_cram_value((megadrive_vdp_address&0x7e)>>1, get_word_from_68k_mem(source));
+		write_cram_value((megadrive_vdp_address&0x7e)>>1, vdp_get_word_from_68k_mem(source));
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
@@ -696,7 +698,7 @@ static void megadrive_do_insta_68k_to_vsram_dma(UINT32 source,UINT16 length)
 	{
 		if (megadrive_vdp_address>=0x80) return; // abandon
 
-		megadrive_vdp_vsram[(megadrive_vdp_address&0x7e)>>1] = get_word_from_68k_mem(source);
+		megadrive_vdp_vsram[(megadrive_vdp_address&0x7e)>>1] = vdp_get_word_from_68k_mem(source);
 		source+=2;
 
 		if (source>0xffffff) source = 0xfe0000;
@@ -1401,8 +1403,9 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 	}
 }
 
-static emu_timer *io_timeout[2];
-static int io_stage[2];
+/* Megadrive / Genesis has 3 I/O ports */
+static emu_timer *io_timeout[3];
+static int io_stage[3];
 
 static TIMER_CALLBACK( io_timeout0_timer_callback )
 {
@@ -1414,6 +1417,11 @@ static TIMER_CALLBACK( io_timeout1_timer_callback )
 	io_stage[1] = -1;
 }
 
+static TIMER_CALLBACK( io_timeout2_timer_callback )
+{
+	io_stage[2] = -1;
+}
+
 
 static void init_megadri6_io(void)
 {
@@ -1423,6 +1431,8 @@ static void init_megadri6_io(void)
 	io_timeout[1] = timer_alloc(io_timeout1_timer_callback, NULL);
 	io_stage[1] = -1;
 
+	io_timeout[2] = timer_alloc(io_timeout2_timer_callback, NULL);
+	io_stage[2] = -1;
 }
 
 /* pointers to our io data read/write functions */
@@ -2555,9 +2565,404 @@ static ADDRESS_MAP_START( sh2slave_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-
-
 /****************************************** END 32X related *************************************/
+
+/****************************************** SVP related *****************************************/
+
+/*
+ * Emulator of memory controller in SVP chip
+ *
+ * Copyright 2008, Grazvydas Ignotas
+ * based on RE work by Tasco Deluxe
+ *
+ * SSP1601 EXT registers are mapped as I/O ports due to their function
+ * (they are interfaced through external bus), and are named as follows
+ * (these are unofficial names, official ones are unknown):
+ *   EXT0: PM0 - programmable register 0
+ *   EXT1: PM1 - ... 1
+ *   EXT2: PM2 - ... 2
+ *   EXT3: XST - external status. Can also act as PM.
+ *   EXT4: PM4 - ... 4
+ *   EXT5: (unused)
+ *   EXT6: PMC - programmable memory register control (PMAC).
+ *   EXT7: AL  - although internal to SSP1601, it still causes bus access
+ *
+ * Depending on GPO bits in status register, PM0, PM1, PM2 and XST can act as
+ * external status registers, os as programmable memory registers. PM4 always
+ * acts as PM register (independend on GPO bits).
+ */
+
+#include "cpu/ssp1601/ssp1601.h"
+
+static struct svp_vars
+{
+	UINT8 *iram; // IRAM (0-0x7ff)
+	UINT8 *dram; // [0x20000];
+	UINT32 pmac_read[6];	// read modes/addrs for PM0-PM5
+	UINT32 pmac_write[6];	// write ...
+	PAIR pmc;
+	#define SSP_PMC_HAVE_ADDR  1  // address written to PMAC, waiting for mode
+	#define SSP_PMC_SET        2  // PMAC is set, PMx can be programmed
+	UINT32 emu_status;
+	UINT16 XST;		// external status, mapped at a15000 and a15002 on 68k side.
+	UINT16 XST2;		// status of XST (bit1 set when 68k writes to XST)
+} svp;
+
+static int get_inc(int mode)
+{
+	int inc = (mode >> 11) & 7;
+	if (inc != 0) {
+		if (inc != 7) inc--;
+		inc = 1 << inc; // 0 1 2 4 8 16 32 128
+		if (mode & 0x8000) inc = -inc; // decrement mode
+	}
+	return inc;
+}
+
+INLINE void overwrite_write(UINT16 *dst, UINT16 d)
+{
+	if (d & 0xf000) { *dst &= ~0xf000; *dst |= d & 0xf000; }
+	if (d & 0x0f00) { *dst &= ~0x0f00; *dst |= d & 0x0f00; }
+	if (d & 0x00f0) { *dst &= ~0x00f0; *dst |= d & 0x00f0; }
+	if (d & 0x000f) { *dst &= ~0x000f; *dst |= d & 0x000f; }
+}
+
+static UINT32 pm_io(int reg, int write, UINT32 d)
+{
+	if (svp.emu_status & SSP_PMC_SET)
+	{
+		svp.pmac_read[write ? reg + 6 : reg] = svp.pmc.d;
+		svp.emu_status &= ~SSP_PMC_SET;
+		return 0;
+	}
+
+	// just in case
+	if (svp.emu_status & SSP_PMC_HAVE_ADDR) {
+		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
+	}
+
+	if (reg == 4 || (activecpu_get_reg(SSP_ST) & 0x60))
+	{
+		#define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
+		UINT16 *dram = (UINT16 *)svp.dram;
+		if (write)
+		{
+			int mode = svp.pmac_write[reg]>>16;
+			int addr = svp.pmac_write[reg]&0xffff;
+			if      ((mode & 0x43ff) == 0x0018) // DRAM
+			{
+				int inc = get_inc(mode);
+				if (mode & 0x0400) {
+				       overwrite_write(&dram[addr], d);
+				} else dram[addr] = d;
+				svp.pmac_write[reg] += inc;
+			}
+			else if ((mode & 0xfbff) == 0x4018) // DRAM, cell inc
+			{
+				if (mode & 0x0400) {
+				       overwrite_write(&dram[addr], d);
+				} else dram[addr] = d;
+				svp.pmac_write[reg] += (addr&1) ? 31 : 1;
+			}
+			else if ((mode & 0x47ff) == 0x001c) // IRAM
+			{
+				int inc = get_inc(mode);
+				((UINT16 *)svp.iram)[addr&0x3ff] = d;
+				svp.pmac_write[reg] += inc;
+			}
+			else
+			{
+				logerror("ssp FIXME: PM%i unhandled write mode %04x, [%06x] %04x\n",
+						reg, mode, CADDR, d);
+			}
+		}
+		else
+		{
+			int mode = svp.pmac_read[reg]>>16;
+			int addr = svp.pmac_read[reg]&0xffff;
+			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
+			{
+				UINT16 *ROM = (UINT16 *) memory_region(REGION_CPU1);
+				svp.pmac_read[reg] += 1;
+				d = ROM[addr|((mode&0xf)<<16)];
+			}
+			else if ((mode & 0x47ff) == 0x0018) // DRAM
+			{
+				int inc = get_inc(mode);
+				d = dram[addr];
+				svp.pmac_read[reg] += inc;
+			}
+			else
+			{
+				logerror("ssp FIXME: PM%i unhandled read  mode %04x, [%06x]\n",
+						reg, mode, CADDR);
+				d = 0;
+			}
+		}
+
+		// PMC value corresponds to last PMR accessed (not sure).
+		svp.pmc.d = svp.pmac_read[write ? reg + 6 : reg];
+
+		return d;
+	}
+
+	return (UINT32)-1;
+}
+
+static READ16_HANDLER( read_PM0 )
+{
+	UINT32 d = pm_io(0, 0, 0);
+	if (d != (UINT32)-1) return d;
+	d = svp.XST2;
+	svp.XST2 &= ~2; // ?
+	return d;
+}
+
+static WRITE16_HANDLER( write_PM0 )
+{
+	UINT32 r = pm_io(0, 1, data);
+	if (r != (UINT32)-1) return;
+	svp.XST2 = data; // ?
+}
+
+static READ16_HANDLER( read_PM1 )
+{
+	UINT32 r = pm_io(1, 0, 0);
+	if (r != (UINT32)-1) return r;
+	logerror("svp: PM1 acces in non PM mode?\n");
+	return 0;
+}
+
+static WRITE16_HANDLER( write_PM1 )
+{
+	UINT32 r = pm_io(1, 1, data);
+	if (r != (UINT32)-1) return;
+	logerror("svp: PM1 acces in non PM mode?\n");
+}
+
+static READ16_HANDLER( read_PM2 )
+{
+	UINT32 r = pm_io(2, 0, 0);
+	if (r != (UINT32)-1) return r;
+	logerror("svp: PM2 acces in non PM mode?\n");
+	return 0;
+}
+
+static WRITE16_HANDLER( write_PM2 )
+{
+	UINT32 r = pm_io(2, 1, data);
+	if (r != (UINT32)-1) return;
+	logerror("svp: PM2 acces in non PM mode?\n");
+}
+
+static READ16_HANDLER( read_XST )
+{
+	UINT32 d = pm_io(3, 0, 0);
+	if (d != (UINT32)-1) return d;
+
+	return svp.XST;
+}
+
+static WRITE16_HANDLER( write_XST )
+{
+	UINT32 r = pm_io(3, 1, data);
+	if (r != (UINT32)-1) return;
+
+	svp.XST2 |= 1;
+	svp.XST = data;
+}
+
+static READ16_HANDLER( read_PM4 )
+{
+	return pm_io(4, 0, 0);
+}
+
+static WRITE16_HANDLER( write_PM4 )
+{
+	pm_io(4, 1, data);
+}
+
+static READ16_HANDLER( read_PMC )
+{
+	if (svp.emu_status & SSP_PMC_HAVE_ADDR) {
+		svp.emu_status |= SSP_PMC_SET;
+		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
+		return ((svp.pmc.w.l << 4) & 0xfff0) | ((svp.pmc.w.l >> 4) & 0xf);
+	} else {
+		svp.emu_status |= SSP_PMC_HAVE_ADDR;
+		return svp.pmc.w.l;
+	}
+}
+
+static WRITE16_HANDLER( write_PMC )
+{
+	if (svp.emu_status & SSP_PMC_HAVE_ADDR) {
+		svp.emu_status |= SSP_PMC_SET;
+		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
+		svp.pmc.w.h = data;
+	} else {
+		svp.emu_status |= SSP_PMC_HAVE_ADDR;
+		svp.pmc.w.l = data;
+	}
+}
+
+static READ16_HANDLER( read_AL )
+{
+	svp.emu_status &= ~(SSP_PMC_SET|SSP_PMC_HAVE_ADDR);
+	return 0;
+}
+
+static WRITE16_HANDLER( write_AL )
+{
+}
+
+
+
+static READ16_HANDLER( svp_68k_io_r )
+{
+	UINT32 d;
+	switch (offset)
+	{
+		// 0xa15000, 0xa15002
+		case 0:
+		case 1:  return svp.XST;
+		// 0xa15004
+		case 2:  d = svp.XST2; svp.XST2 &= ~1; return d;
+		default: logerror("unhandled SVP reg read @ %x\n", offset<<1);
+	}
+	return 0;
+}
+
+static WRITE16_HANDLER( svp_68k_io_w )
+{
+	switch (offset)
+	{
+		// 0xa15000, 0xa15002
+		case 0:
+		case 1:  svp.XST = data; svp.XST2 |= 2; break;
+		// 0xa15006
+		case 3:  break; // possibly halts SSP1601
+		default: logerror("unhandled SVP reg write %04x @ %x\n", data, offset<<1);
+	}
+}
+
+static READ16_HANDLER( svp_68k_cell1_r )
+{
+	// this is rewritten 68k test code
+	UINT32 a1 = offset;
+	a1 = (a1 & 0x7001) | ((a1 & 0x3e) << 6) | ((a1 & 0xfc0) >> 5);
+	return ((UINT16 *)svp.dram)[a1];
+}
+
+static READ16_HANDLER( svp_68k_cell2_r )
+{
+	// this is rewritten 68k test code
+	UINT32 a1 = offset;
+	a1 = (a1 & 0x7801) | ((a1 & 0x1e) << 6) | ((a1 & 0x7e0) >> 4);
+	return ((UINT16 *)svp.dram)[a1];
+}
+
+static ADDRESS_MAP_START( svp_ssp_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x0000 , 0x03ff) AM_READ(SMH_BANK3)
+	AM_RANGE(0x0400 , 0xffff) AM_READ(SMH_BANK4)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
+	ADDRESS_MAP_GLOBAL_MASK(0xf)
+	AM_RANGE(0*2 , 0*2+1) AM_READWRITE(read_PM0, write_PM0)
+	AM_RANGE(1*2 , 1*2+1) AM_READWRITE(read_PM1, write_PM1)
+	AM_RANGE(2*2 , 2*2+1) AM_READWRITE(read_PM2, write_PM2)
+	AM_RANGE(3*2 , 3*2+1) AM_READWRITE(read_XST, write_XST)
+	AM_RANGE(4*2 , 4*2+1) AM_READWRITE(read_PM4, write_PM4)
+	AM_RANGE(6*2 , 6*2+1) AM_READWRITE(read_PMC, write_PMC)
+	AM_RANGE(7*2 , 7*2+1) AM_READWRITE(read_AL, write_AL)
+ADDRESS_MAP_END
+
+
+/* DMA read function for SVP */
+static UINT16 vdp_get_word_from_68k_mem_svp(UINT32 source)
+{
+	if ((source & 0xe00000) == 0x000000)
+	{
+		UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+		source -= 2; // DMA latency
+		return rom[source >> 1];
+	}
+	else if ((source & 0xfe0000) == 0x300000)
+	{
+		UINT16 *dram = (UINT16*)svp.dram;
+		source &= 0x1fffe;
+		source -= 2;
+		return dram[source >> 1];
+	}
+	else if ((source & 0xe00000) == 0xe00000)
+	{
+		return megadrive_ram[(source&0xffff)>>1];
+	}
+	else
+	{
+		mame_printf_debug("DMA Read unmapped %06x\n",source);
+		return mame_rand(Machine);
+	}
+}
+
+/* emulate testmode plug */
+static UINT8 megadrive_io_read_data_port_svp(int portnum)
+{
+	if (portnum == 0 && readinputportbytag_safe("MEMORY_TEST", 0x00))
+	{
+		return (megadrive_io_data_regs[0] & 0xc0);
+	}
+	return megadrive_io_read_data_port_3button(portnum);
+}
+
+static void svp_init(void)
+{
+	UINT8 *ROM;
+
+	memset(&svp, 0, sizeof(svp));
+
+	/* SVP stuff */
+	svp.dram = auto_malloc(0x20000);
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_set_bankptr( 2, svp.dram );
+	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
+	// "cell arrange" 1 and 2
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
+	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+
+	svp.iram = auto_malloc(0x800);
+	memory_set_bankptr( 3, svp.iram );
+	/* SVP ROM just shares m68k region.. */
+	ROM = memory_region(REGION_CPU1);
+	memory_set_bankptr( 4, ROM + 0x800 );
+
+	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_svp;
+	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
+}
+
+
+INPUT_PORTS_START( megdsvp )
+	PORT_INCLUDE( megadriv )
+
+	PORT_START_TAG("MEMORY_TEST") /* special memtest mode */
+	/* Region setting for Console */
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Test ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
+MACHINE_DRIVER_START( megdsvp )
+	MDRV_IMPORT_FROM(megadriv)
+
+	MDRV_CPU_ADD(SSP1601, MASTER_CLOCK / 7 * 3) /* ~23 MHz (guessed) */
+	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
+	MDRV_CPU_IO_MAP(svp_ext_map, 0)
+	/* IRQs are not used by this CPU */
+MACHINE_DRIVER_END
+
+
+/****************************************** END SVP related *************************************/
 
 
 static attotime time_elapsed_since_crap;
@@ -4713,6 +5118,8 @@ static void megadriv_init_common(running_machine *machine)
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
+	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
+
 	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
 
 	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
@@ -4771,6 +5178,15 @@ DRIVER_INIT( megadrie )
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 1;
 	hazemdchoice_megadriv_framerate = 50;
+}
+
+DRIVER_INIT( megadsvp )
+{
+	megadriv_init_common(machine);
+	svp_init();
+	hazemdchoice_megadrive_region_export = 1;
+	hazemdchoice_megadrive_region_pal = 0;
+	hazemdchoice_megadriv_framerate = 60;
 }
 
 
