@@ -468,7 +468,8 @@ static TIMER_CALLBACK( scanline_callback )
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);
 
 	/* force an update against the current scanline */
-	video_screen_update_partial(machine->primary_screen, scanline - 1);
+	if (scanline > 0)
+		video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	/* generate a scanline interrupt if it's time */
 	if (astrocade_scanline == interrupt_scanline && (interrupt_enable & 0x08) != 0)
