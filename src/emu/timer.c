@@ -57,6 +57,21 @@ struct _emu_timer
 };
 
 
+/*-------------------------------------------------
+    timer_state - configuration of a single
+    timer device
+-------------------------------------------------*/
+
+typedef struct _timer_state timer_state;
+struct _timer_state
+{
+	emu_timer				*timer;			/* the backing timer */
+	attotime				duration;		/* duration before the timer fires */
+	attotime				period;			/* period of repeated timer firings */
+	INT32					param;			/* the integer parameter passed to the timer callback */
+	void 					*ptr;			/* the pointer parameter passed to the timer callback */
+};
+
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -191,6 +206,21 @@ INLINE void timer_list_insert(emu_timer *timer)
 		timer_head = timer;
 	timer->prev = lt;
 	timer->next = NULL;
+}
+
+
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, a timer
+-------------------------------------------------*/
+
+INLINE timer_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == TIMER);
+
+	return (timer_state *)device->token;
 }
 
 
@@ -536,6 +566,12 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 }
 
 
+void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
+{
+	timer_device_adjust_periodic(timer, duration, param, attotime_never);
+}
+
+
 /*-------------------------------------------------
     timer_adjust_periodic - adjust the time when
     this timer will fire and specify a period for
@@ -571,6 +607,19 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
 	if (which == timer_head && cpu_getexecutingcpu() >= 0)
 		activecpu_abort_timeslice();
+}
+
+
+void timer_device_adjust_periodic(const device_config *timer, attotime duration, INT32 param, attotime period)
+{
+	timer_state *state = get_safe_token(timer);
+
+	state->duration = duration;
+	state->period = period;
+	state->param = param;
+
+	/* adjust the timer */
+	timer_adjust_periodic(state->timer, state->duration, 0, state->period);
 }
 
 
@@ -619,6 +668,13 @@ void timer_reset(emu_timer *which, attotime duration)
 }
 
 
+void timer_device_reset(const device_config *timer, attotime duration)
+{
+	timer_state *state = get_safe_token(timer);
+	timer_adjust_periodic(state->timer, state->duration, 0, state->period);
+}
+
+
 /*-------------------------------------------------
     timer_enable - enable/disable a timer
 -------------------------------------------------*/
@@ -639,6 +695,13 @@ int timer_enable(emu_timer *which, int enable)
 }
 
 
+int timer_device_enable(const device_config *timer, int enable)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_enable(state->timer, enable);
+}
+
+
 /*-------------------------------------------------
     timer_enabled - determine if a timer is
     enabled
@@ -647,6 +710,13 @@ int timer_enable(emu_timer *which, int enable)
 int timer_enabled(emu_timer *which)
 {
 	return which->enabled;
+}
+
+
+int timer_device_enabled(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_enabled(state->timer);
 }
 
 
@@ -662,11 +732,24 @@ int timer_get_param(emu_timer *which)
 }
 
 
+int timer_device_get_param(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return state->param;
+}
+
+
 void *timer_get_param_ptr(emu_timer *which)
 {
 	return which->ptr;
 }
 
+
+void *timer_device_get_param_ptr(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return state->ptr;
+}
 
 
 /***************************************************************************
@@ -684,6 +767,13 @@ attotime timer_timeelapsed(emu_timer *which)
 }
 
 
+attotime timer_device_timeelapsed(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_timeelapsed(state->timer);
+}
+
+
 /*-------------------------------------------------
     timer_timeleft - return the time until the
     next trigger
@@ -692,6 +782,13 @@ attotime timer_timeelapsed(emu_timer *which)
 attotime timer_timeleft(emu_timer *which)
 {
 	return attotime_sub(which->expire, get_current_time());
+}
+
+
+attotime timer_device_timeleft(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_timeleft(state->timer);
 }
 
 
@@ -716,6 +813,13 @@ attotime timer_starttime(emu_timer *which)
 }
 
 
+attotime timer_device_starttime(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_starttime(state->timer);
+}
+
+
 /*-------------------------------------------------
     timer_firetime - return the time when this
     timer will fire next
@@ -724,6 +828,29 @@ attotime timer_starttime(emu_timer *which)
 attotime timer_firetime(emu_timer *which)
 {
 	return which->expire;
+}
+
+
+attotime timer_device_firetime(const device_config *timer)
+{
+	timer_state *state = get_safe_token(timer);
+	return timer_firetime(state->timer);
+}
+
+
+/*-------------------------------------------------
+    timer_device_timer_callback - calls
+    the timer device specific callback
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( timer_device_timer_callback )
+{
+	const device_config *timer_device = ptr;
+	timer_state *state = get_safe_token(timer_device);
+	timer_config *config = timer_device->inline_config;
+
+	/* call the real callback */
+	config->callback(timer_device, state->ptr, state->param);
 }
 
 
@@ -772,14 +899,72 @@ static void timer_logtimers(void)
 
 static DEVICE_START( timer )
 {
-//	timer_config *config = device->inline_config;
+	char unique_tag[40];
+	timer_state *state;
+	timer_config *config;
+	void *param;
 
-//	fprintf(stderr, "tag = %s\n", device->tag);
-//	fprintf(stderr, "  duration = %s\n", attotime_string(UINT64_ATTOTIME_TO_ATTOTIME(config->duration), 3));
-//	fprintf(stderr, "  period = %s\n", attotime_string(UINT64_ATTOTIME_TO_ATTOTIME(config->period), 3));
-//	fprintf(stderr, "  param = %d\n", config->param);
+	/* validate some basic stuff */
+	assert(device != NULL);
+	assert(device->static_config == NULL);
+	assert(device->inline_config != NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
 
-	return auto_malloc(1);
+	/* get and validate the configuration */
+	config = device->inline_config;
+	assert(config->type == TIMER_TYPE_PERIODIC);
+	assert(config->callback != NULL);
+
+	/* everything checks out so far, allocate the state object */
+	state = auto_malloc(sizeof(*state));
+	memset(state, 0, sizeof(*state));
+
+	/* allocate the backing timer */
+	param = (void *)device;
+	state->timer = timer_alloc(timer_device_timer_callback, param);
+
+	/* copy the parameters */
+	state->param = config->param;
+	state->ptr = config->ptr;
+
+	/* switch on the type */
+	switch (config->type)
+	{
+	case TIMER_TYPE_PERIODIC:
+		/* validate that we have at least a duration or period */
+		assert((config->duration > 0) || (config->period > 0));
+
+		/* convert the duration and period into attotime */
+		if (config->duration > 0)
+			state->duration = UINT64_ATTOTIME_TO_ATTOTIME(config->duration);
+		else
+			state->duration = attotime_zero;
+
+		if (config->period > 0)
+			state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
+		else
+			state->period = attotime_never;
+
+		/* finally, start the timer */
+		timer_adjust_periodic(state->timer, state->duration, 0, state->period);
+		break;
+
+	default:
+		fatalerror("Unknown timer device type");
+		break;
+	}
+
+	/* register for save states */
+	assert(strlen(device->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "timer_device", device->tag);
+	state_save_register_item(unique_tag, 0, state->duration.seconds);
+	state_save_register_item(unique_tag, 0, state->duration.attoseconds);
+	state_save_register_item(unique_tag, 0, state->period.seconds);
+	state_save_register_item(unique_tag, 0, state->period.attoseconds);
+	state_save_register_item(unique_tag, 0, state->param);
+
+	return state;
 }
 
 

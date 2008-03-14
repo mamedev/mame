@@ -48,7 +48,7 @@ void desertgun_set_controller_select(UINT8 data);
 
 void clowns_set_controller_select(UINT8 data);
 
-void spcenctr_set_strobe_state(running_machine *machine, UINT8 data);
+void spcenctr_set_strobe_state(UINT8 data);
 UINT8 spcenctr_get_trench_width(void);
 UINT8 spcenctr_get_trench_center(void);
 UINT8 spcenctr_get_trench_slope(UINT8 addr);

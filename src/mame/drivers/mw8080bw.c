@@ -2008,7 +2008,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 #define SPCENCTR_STROBE_FREQ		(9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_DUTY_CYCLE			(95) 	/* % */
+#define SPCENCTR_STROBE_DUTY_CYCLE	(95) 	/* % */
 
 
 static UINT8 spcenctr_strobe_state;
@@ -2019,7 +2019,7 @@ static UINT8 spcenctr_trench_slope[16];  /* 16x4 bit RAM */
 
 static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )
 {
-	output_set_value("STROBE", param);
+	output_set_value("STROBE", param && spcenctr_strobe_state);
 }
 
 
@@ -2035,19 +2035,9 @@ static MACHINE_START( spcenctr )
 }
 
 
-void spcenctr_set_strobe_state(running_machine *machine, UINT8 data)
+void spcenctr_set_strobe_state(UINT8 data)
 {
-	if (data != spcenctr_strobe_state)
-	{
-#if 0
-		const device_config *on_timer  = device_list_find_by_tag(machine->config->devicelist, TIMER, "STROBE_ON");
-		const device_config *off_timer = device_list_find_by_tag(machine->config->devicelist, TIMER, "STROBE_OFF");
-
-		timer_device_enable(on_timer, data);
-		timer_device_enable(off_timer, data);
-#endif
-		spcenctr_strobe_state = data;
-	}
+	spcenctr_strobe_state = data;
 }
 
 
@@ -2177,7 +2167,7 @@ static MACHINE_DRIVER_START( spcenctr )
 
 	MDRV_TIMER_ADD("STROBE_OFF", PERIODIC, spcenctr_strobe_timer_callback)
 	MDRV_TIMER_PARAM(FALSE)	/* indicates strobe OFF */
-	MDRV_TIMER_DURATION(UINT64_ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ * 100 / SPCENCTR_DUTY_CYCLE))
+	MDRV_TIMER_DURATION(UINT64_ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ * 100 / SPCENCTR_STROBE_DUTY_CYCLE))
 	MDRV_TIMER_PERIOD(UINT64_ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ))
 
 	/* video hardware */
