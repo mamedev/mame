@@ -716,7 +716,7 @@ static void *start_vdp(running_machine *machine, int type)
 	memset(chip->sprite_renderline,0x00,256+32);
 
 	chip->writemode = 0;
-	chip->r_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	chip->r_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_RGB15);
 
 	chip->sms_scanline_timer = timer_alloc(sms_scanline_timer_callback, chip);
 
