@@ -215,7 +215,7 @@ static UINT8 *vicdual_characterram;
 
 static WRITE8_HANDLER( vicdual_videoram_w )
 {
-	video_screen_update_now(0);
+	video_screen_update_now(machine->primary_screen);
 	vicdual_videoram[offset] = data;
 }
 
@@ -228,8 +228,7 @@ UINT8 vicdual_videoram_r(offs_t offset)
 
 static WRITE8_HANDLER( vicdual_characterram_w )
 {
-	video_screen_update_now(0);
-
+	video_screen_update_now(machine->primary_screen);
 	vicdual_characterram[offset] = data;
 }
 
