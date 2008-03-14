@@ -2008,39 +2008,16 @@ MACHINE_DRIVER_END
  *************************************/
 
 #define SPCENCTR_STROBE_FREQ		(9.00)  /* Hz - calculated from the 555 timer */
-#define SPCENCTR_STROBE_PERIOD		ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ)
-#define SPCENCTR_DUTY_CYCLE			(95) /* % */
+#define SPCENCTR_DUTY_CYCLE			(95) 	/* % */
 
 
-static emu_timer *spcenctr_strobe_on_timer;
-static emu_timer *spcenctr_strobe_off_timer;
 static UINT8 spcenctr_strobe_state;
 static UINT8 spcenctr_trench_width;
 static UINT8 spcenctr_trench_center;
 static UINT8 spcenctr_trench_slope[16];  /* 16x4 bit RAM */
 
 
-static void adjust_strobe_timers(void)
-{
-	/* the strobe light is controlled by a 555 timer, which appears to have a
-       frequency of 9Hz and a duty cycle of 95% */
-	if (spcenctr_strobe_state)
-	{
-		/* multiply by the precentage and divide by 100 to get the ON period */
-		attotime on_period = attotime_div(attotime_mul(SPCENCTR_STROBE_PERIOD, SPCENCTR_DUTY_CYCLE), 100);
-
-		timer_adjust_periodic(spcenctr_strobe_on_timer, attotime_zero, 1, SPCENCTR_STROBE_PERIOD);
-		timer_adjust_periodic(spcenctr_strobe_off_timer, on_period, 0, SPCENCTR_STROBE_PERIOD);
-	}
-	else
-	{
-		timer_adjust_oneshot(spcenctr_strobe_on_timer, attotime_never, 0);
-		timer_adjust_oneshot(spcenctr_strobe_off_timer, attotime_zero, 0);
-	}
-}
-
-
-static TIMER_CALLBACK( spcenctr_strobe_timer_callback )
+static TIMER_DEVICE_CALLBACK( spcenctr_strobe_timer_callback )
 {
 	output_set_value("STROBE", param);
 }
@@ -2048,28 +2025,28 @@ static TIMER_CALLBACK( spcenctr_strobe_timer_callback )
 
 static MACHINE_START( spcenctr )
 {
-	/* create timers */
-	spcenctr_strobe_on_timer = timer_alloc(spcenctr_strobe_timer_callback, NULL);
-	spcenctr_strobe_off_timer = timer_alloc(spcenctr_strobe_timer_callback, NULL);
-
 	/* setup for save states */
 	state_save_register_global(spcenctr_strobe_state);
 	state_save_register_global(spcenctr_trench_width);
 	state_save_register_global(spcenctr_trench_center);
 	state_save_register_global_array(spcenctr_trench_slope);
-	state_save_register_func_postload(adjust_strobe_timers);
 
 	MACHINE_START_CALL(mw8080bw);
 }
 
 
-void spcenctr_set_strobe_state(UINT8 data)
+void spcenctr_set_strobe_state(running_machine *machine, UINT8 data)
 {
 	if (data != spcenctr_strobe_state)
 	{
-		spcenctr_strobe_state = data;
+#if 0
+		const device_config *on_timer  = device_list_find_by_tag(machine->config->devicelist, TIMER, "STROBE_ON");
+		const device_config *off_timer = device_list_find_by_tag(machine->config->devicelist, TIMER, "STROBE_OFF");
 
-		adjust_strobe_timers();
+		timer_device_enable(on_timer, data);
+		timer_device_enable(off_timer, data);
+#endif
+		spcenctr_strobe_state = data;
 	}
 }
 
@@ -2093,41 +2070,32 @@ UINT8 spcenctr_get_trench_slope(UINT8 addr)
 
 
 static WRITE8_HANDLER( spcenctr_io_w )
-{										/* A7 A6 A5 A4 A3 A2 A1 A0 */
+{												/* A7 A6 A5 A4 A3 A2 A1 A0 */
 	if ((offset & 0x07) == 0x02)
-	{
-		watchdog_reset_w(machine, 0, data);		/* -  -  -  -  -  0  1  0 */
-	}
+		watchdog_reset_w(machine, 0, data);		/*  -  -  -  -  -  0  1  0 */
+
 	else if ((offset & 0x5f) == 0x01)
-	{
-		spcenctr_audio_1_w(machine, 0, data);	/* -  0  -  0  0  0  0  1 */
-	}
+		spcenctr_audio_1_w(machine, 0, data);	/*  -  0  -  0  0  0  0  1 */
+
 	else if ((offset & 0x5f) == 0x09)
-	{
-		spcenctr_audio_2_w(machine, 0, data);	/* -  0  -  0  1  0  0  1 */
-	}
+		spcenctr_audio_2_w(machine, 0, data);	/*  -  0  -  0  1  0  0  1 */
+
 	else if ((offset & 0x5f) == 0x11)
-	{
-		spcenctr_audio_3_w(machine, 0, data);	/* -  0  -  1  0  0  0  1 */
-	}
+		spcenctr_audio_3_w(machine, 0, data);	/*  -  0  -  1  0  0  0  1 */
+
 	else if ((offset & 0x07) == 0x03)
-	{									/* -  -  -  -  -  0  1  1 */
+	{											/*  -  -  -  -  -  0  1  1 */
 		UINT8 addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
 		spcenctr_trench_slope[addr] = data;
 	}
 	else if ((offset & 0x07) == 0x04)
-	{
-		spcenctr_trench_center = data;	/* -  -  -  -  -  1  0  0 */
-	}
+		spcenctr_trench_center = data;			/*  -  -  -  -  -  1  0  0 */
+
 	else if ((offset & 0x07) == 0x07)
-	{
-		spcenctr_trench_width = data;	/* -  -  -  -  -  1  1  1 */
-	}
+		spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
+
 	else
-	{
-		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n",
-				 activecpu_get_pc(), offset, data);
-	}
+		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", activecpu_get_pc(), offset, data);
 }
 
 
@@ -2201,6 +2169,16 @@ static MACHINE_DRIVER_START( spcenctr )
 	MDRV_CPU_IO_MAP(spcenctr_io_map,0)
 	MDRV_MACHINE_START(spcenctr)
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+
+	/* timers */
+	MDRV_TIMER_ADD("STROBE_ON", PERIODIC, spcenctr_strobe_timer_callback)
+	MDRV_TIMER_PARAM(TRUE)	/* indicates strobe ON */
+	MDRV_TIMER_PERIOD(UINT64_ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ))
+
+	MDRV_TIMER_ADD("STROBE_OFF", PERIODIC, spcenctr_strobe_timer_callback)
+	MDRV_TIMER_PARAM(FALSE)	/* indicates strobe OFF */
+	MDRV_TIMER_DURATION(UINT64_ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ * 100 / SPCENCTR_DUTY_CYCLE))
+	MDRV_TIMER_PERIOD(UINT64_ATTOTIME_IN_HZ(SPCENCTR_STROBE_FREQ))
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spcenctr)

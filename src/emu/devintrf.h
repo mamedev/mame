@@ -30,6 +30,7 @@ enum _device_class
 	DEVICE_CLASS_VIDEO,					/* video devices, including screens */
 	DEVICE_CLASS_CPU_CHIP,				/* CPU chips; only CPU cores should return this class */
 	DEVICE_CLASS_SOUND_CHIP,			/* sound chips; only sound cores should return this class */
+	DEVICE_CLASS_TIMER,					/* timer devices */
 	DEVICE_CLASS_OTHER					/* anything else (the list may expand in the future) */
 };
 typedef enum _device_class device_class;

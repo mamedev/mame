@@ -479,7 +479,7 @@ INLINE emu_timer *_timer_alloc_common(timer_fired_func callback, void *ptr, cons
 	timer->expire = attotime_never;
 	timer_list_insert(timer);
 
-	/* if we're not temporary, register ourselve with the save state system */
+	/* if we're not temporary, register ourselves with the save state system */
 	if (!temp)
 	{
 		timer_register_save(timer);
@@ -757,4 +757,68 @@ static void timer_logtimers(void)
 	logerror("==============\n");
 	logerror("TIMER LOG STOP\n");
 	logerror("==============\n");
+}
+
+
+
+/***************************************************************************
+    TIMER DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    timer_start - device start callback
+    for a timer device
+-------------------------------------------------*/
+
+static DEVICE_START( timer )
+{
+//	timer_config *config = device->inline_config;
+
+//	fprintf(stderr, "tag = %s\n", device->tag);
+//	fprintf(stderr, "  duration = %s\n", attotime_string(UINT64_ATTOTIME_TO_ATTOTIME(config->duration), 3));
+//	fprintf(stderr, "  period = %s\n", attotime_string(UINT64_ATTOTIME_TO_ATTOTIME(config->period), 3));
+//	fprintf(stderr, "  param = %d\n", config->param);
+
+	return auto_malloc(1);
+}
+
+
+/*-------------------------------------------------
+    timer_set_info - device set info callback
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( timer )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+/*-------------------------------------------------
+    timer_get_info - device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( timer )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(timer_config);			break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_TIMER;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(timer); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timer); break;
+		case DEVINFO_FCT_STOP:					/* Nothing */							break;
+		case DEVINFO_FCT_RESET:					/* Nothing */							break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "Generic";					break;
+		case DEVINFO_STR_FAMILY:				info->s = "Timer";						break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
 }

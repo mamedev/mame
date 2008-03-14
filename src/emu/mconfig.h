@@ -436,6 +436,37 @@ union _machine_config_token
 	MDRV_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
 
 
+/* add/remove timers */
+#define MDRV_TIMER_ADD(_tag, _type, _callback) \
+	MDRV_DEVICE_ADD(_tag, TIMER) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_##_type) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback)
+
+#define MDRV_TIMER_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, TIMER_SCREEN)
+
+#define MDRV_TIMER_MODIFY(_tag) \
+	MDRV_DEVICE_MODIFY(_tag, TIMER_SCREEN)
+
+#define MDRV_TIMER_TYPE(_type) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_##_type)
+
+#define MDRV_TIMER_CALLBACK(_callback) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback)
+
+#define MDRV_TIMER_DURATION(_duration) \
+	MDRV_DEVICE_CONFIG_DATA64(timer_config, duration, _duration)
+
+#define MDRV_TIMER_PERIOD(_period) \
+	MDRV_DEVICE_CONFIG_DATA64(timer_config, period, _period)
+
+#define MDRV_TIMER_PARAM(_param) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, param, _param)
+
+#define MDRV_TIMER_PTR(_ptr) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, ptr, _ptr)
+
+
 /* core sound functions */
 #define MDRV_SOUND_START(_func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_SOUND_START, 8), \

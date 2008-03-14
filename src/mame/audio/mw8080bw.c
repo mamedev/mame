@@ -2731,7 +2731,7 @@ WRITE8_HANDLER( spcenctr_audio_3_w )
 
 	discrete_sound_w(machine, SPCENCTR_ENEMY_SHIP_SHOT_EN, (data >> 1) & 0x01);
 
-	spcenctr_set_strobe_state((data >> 2) & 0x01);
+	spcenctr_set_strobe_state(machine, (data >> 2) & 0x01);
 
 	output_set_value("LAMP", (data >> 3) & 0x01);
 
