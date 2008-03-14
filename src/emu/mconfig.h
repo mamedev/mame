@@ -466,6 +466,11 @@ union _machine_config_token
 #define MDRV_TIMER_PTR(_ptr) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, ptr, _ptr)
 
+#define MDRV_TIMER_SCANLINE(_screen, _first_vpos, _increment) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, screen, _screen) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, first_vpos, _first_vpos) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, increment, _increment)
+
 
 /* core sound functions */
 #define MDRV_SOUND_START(_func) \

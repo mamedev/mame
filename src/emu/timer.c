@@ -66,10 +66,15 @@ typedef struct _timer_state timer_state;
 struct _timer_state
 {
 	emu_timer				*timer;			/* the backing timer */
+	void 					*ptr;			/* the pointer parameter passed to the timer callback */
+
+	/* periodic timers only */
 	attotime				duration;		/* duration before the timer fires */
 	attotime				period;			/* period of repeated timer firings */
 	INT32					param;			/* the integer parameter passed to the timer callback */
-	void 					*ptr;			/* the pointer parameter passed to the timer callback */
+
+	/* scanline timers only */
+	UINT32 					first_time;		/* indicates that the system is starting */
 };
 
 
@@ -568,6 +573,11 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 
 void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
 {
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+
 	timer_device_adjust_periodic(timer, duration, param, attotime_never);
 }
 
@@ -613,6 +623,10 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 void timer_device_adjust_periodic(const device_config *timer, attotime duration, INT32 param, attotime period)
 {
 	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
 
 	state->duration = duration;
 	state->period = period;
@@ -671,6 +685,11 @@ void timer_reset(emu_timer *which, attotime duration)
 void timer_device_reset(const device_config *timer, attotime duration)
 {
 	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+
 	timer_adjust_periodic(state->timer, state->duration, 0, state->period);
 }
 
@@ -735,6 +754,11 @@ int timer_get_param(emu_timer *which)
 int timer_device_get_param(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
+
+	/* only makes sense for periodic timers */
+	assert(config->type == TIMER_TYPE_PERIODIC);
+
 	return state->param;
 }
 
@@ -839,18 +863,68 @@ attotime timer_device_firetime(const device_config *timer)
 
 
 /*-------------------------------------------------
-    timer_device_timer_callback - calls
+    periodic_timer_device_timer_callback - calls
     the timer device specific callback
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( timer_device_timer_callback )
+static TIMER_CALLBACK( periodic_timer_device_timer_callback )
 {
-	const device_config *timer_device = ptr;
-	timer_state *state = get_safe_token(timer_device);
-	timer_config *config = timer_device->inline_config;
+	const device_config *timer = ptr;
+	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
 
 	/* call the real callback */
-	config->callback(timer_device, state->ptr, state->param);
+	config->callback(timer, state->ptr, state->param);
+}
+
+
+
+/*-------------------------------------------------
+    scanline_timer_device_timer_callback -
+    manages the scanline based timer's state
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( scanline_timer_device_timer_callback )
+{
+	int next_vpos;
+	const device_config *timer = ptr;
+	timer_state *state = get_safe_token(timer);
+	timer_config *config = timer->inline_config;
+
+	/* get the screen device and verify it */
+	const device_config *screen = device_list_find_by_tag(timer->machine->config->devicelist, VIDEO_SCREEN, config->screen);
+	assert(screen != NULL);
+
+	/* first time, start with the first scanline, but do not call the callback */
+	if (state->first_time)
+	{
+		next_vpos = config->first_vpos;
+
+		/* indicate that we are done with the first call */
+		state->first_time = FALSE;
+	}
+
+	/* not the first time */
+	else
+	{
+		int vpos = video_screen_get_vpos(screen);
+
+		/* call the real callback */
+		config->callback(timer, state->ptr, vpos);
+
+		/* if the increment is 0 or the next scanline is larger than the screen size,
+           go back to the first one */
+        if ((config->increment == 0) ||
+            ((vpos + config->increment) >= video_screen_get_height(screen)))
+			next_vpos = config->first_vpos;
+
+		/* otherwise, increment */
+		else
+			next_vpos = vpos + config->increment;
+	}
+
+	/* adjust the timer */
+	timer_adjust_oneshot(state->timer, video_screen_get_time_until_pos(screen, next_vpos, 0), 0);
 }
 
 
@@ -899,7 +973,7 @@ static void timer_logtimers(void)
 
 static DEVICE_START( timer )
 {
-	char unique_tag[40];
+	char unique_tag[50];
 	timer_state *state;
 	timer_config *config;
 	void *param;
@@ -913,27 +987,34 @@ static DEVICE_START( timer )
 
 	/* get and validate the configuration */
 	config = device->inline_config;
-	assert(config->type == TIMER_TYPE_PERIODIC);
+	assert((config->type == TIMER_TYPE_PERIODIC) || (config->type == TIMER_TYPE_SCANLINE));
 	assert(config->callback != NULL);
 
 	/* everything checks out so far, allocate the state object */
 	state = auto_malloc(sizeof(*state));
 	memset(state, 0, sizeof(*state));
 
-	/* allocate the backing timer */
-	param = (void *)device;
-	state->timer = timer_alloc(timer_device_timer_callback, param);
-
-	/* copy the parameters */
-	state->param = config->param;
+	/* copy the pointer parameter */
 	state->ptr = config->ptr;
 
-	/* switch on the type */
+	/* create the name for save states */
+	assert(strlen(device->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "timer_device", device->tag);
+
+	/* type based configuration */
 	switch (config->type)
 	{
 	case TIMER_TYPE_PERIODIC:
+		/* make sure that only the applicable parameters are filled in */
+		assert(config->screen == NULL);
+		assert(config->first_vpos == 0);
+		assert(config->increment == 0);
+
 		/* validate that we have at least a duration or period */
 		assert((config->duration > 0) || (config->period > 0));
+
+		/* copy the optional integer parameter */
+		state->param = config->param;
 
 		/* convert the duration and period into attotime */
 		if (config->duration > 0)
@@ -946,23 +1027,49 @@ static DEVICE_START( timer )
 		else
 			state->period = attotime_never;
 
+		/* register for state saves */
+		state_save_register_item(unique_tag, 0, state->duration.seconds);
+		state_save_register_item(unique_tag, 0, state->duration.attoseconds);
+		state_save_register_item(unique_tag, 0, state->period.seconds);
+		state_save_register_item(unique_tag, 0, state->period.attoseconds);
+		state_save_register_item(unique_tag, 0, state->param);
+
+		/* allocate the backing timer */
+		param = (void *)device;
+		state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
+
 		/* finally, start the timer */
 		timer_adjust_periodic(state->timer, state->duration, 0, state->period);
 		break;
 
+	case TIMER_TYPE_SCANLINE:
+		/* make sure that only the applicable parameters are filled in */
+		assert(config->duration == 0);
+		assert(config->period == 0);
+		assert(config->param == 0);
+
+		assert(config->first_vpos >= 0);
+		assert(config->increment >= 0);
+
+		/* allocate the backing timer */
+		param = (void *)device;
+		state->timer = timer_alloc(scanline_timer_device_timer_callback, param);
+
+		/* indicate that this will be the first call */
+		state->first_time = TRUE;
+
+		/* register for state saves */
+		state_save_register_item(unique_tag, 0, state->first_time);
+
+		/* fire it as soon as the emulation starts */
+		timer_adjust_oneshot(state->timer, attotime_zero, 0);
+		break;
+
 	default:
+		/* we will never get here */
 		fatalerror("Unknown timer device type");
 		break;
 	}
-
-	/* register for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "timer_device", device->tag);
-	state_save_register_item(unique_tag, 0, state->duration.seconds);
-	state_save_register_item(unique_tag, 0, state->duration.attoseconds);
-	state_save_register_item(unique_tag, 0, state->period.seconds);
-	state_save_register_item(unique_tag, 0, state->period.attoseconds);
-	state_save_register_item(unique_tag, 0, state->param);
 
 	return state;
 }

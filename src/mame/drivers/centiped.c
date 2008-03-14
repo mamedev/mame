@@ -431,8 +431,6 @@ static UINT8 sign[4];
 static UINT8 dsw_select, control_select;
 static UINT8 *rambase;
 
-static emu_timer *interrupt_timer;
-
 
 /*************************************
  *
@@ -440,23 +438,16 @@ static emu_timer *interrupt_timer;
  *
  *************************************/
 
-static TIMER_CALLBACK( generate_interrupt )
+static TIMER_DEVICE_CALLBACK( generate_interrupt )
 {
 	int scanline = param;
 
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
-		cpunum_set_input_line(machine, 0, 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(timer->machine, 0, 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
-	video_screen_update_partial(machine->primary_screen, scanline);
-
-	/* call back again after 16 scanlines */
-	scanline += 16;
-	if (scanline >= 256)
-		scanline = 0;
-
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+	video_screen_update_partial(timer->machine->primary_screen, scanline);
 }
 
 
@@ -470,8 +461,6 @@ static MACHINE_START( centiped )
 
 static MACHINE_RESET( centiped )
 {
-	interrupt_timer = timer_alloc(generate_interrupt, NULL);
-	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	dsw_select = 0;
 	control_select = 0;
@@ -1634,6 +1623,10 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_MACHINE_START(centiped)
 	MDRV_MACHINE_RESET(centiped)
 	MDRV_NVRAM_HANDLER(atari_vg)
+
+	/* timer */
+	MDRV_TIMER_ADD("32V", SCANLINE, generate_interrupt)
+	MDRV_TIMER_SCANLINE("main", 0, 16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

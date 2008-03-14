@@ -27,7 +27,8 @@
 /* timer types */
 enum
 {
-	TIMER_TYPE_PERIODIC = 0
+	TIMER_TYPE_PERIODIC = 0,
+	TIMER_TYPE_SCANLINE
 };
 
 
@@ -81,10 +82,17 @@ struct _timer_config
 {
 	int						type;			/* type of timer */
 	timer_device_fired_func	callback;		/* the timer's callback function */
+	void 					*ptr;			/* the pointer parameter passed to the timer callback */
+
+	/* periodic timers only */
 	UINT64					duration;		/* duration before the timer fires */
 	UINT64					period;			/* period of repeated timer firings */
 	INT32					param;			/* the integer parameter passed to the timer callback */
-	void 					*ptr;			/* the pointer parameter passed to the timer callback */
+
+	/* scanline timers only */
+	const char 				*screen;		/* the name of the screen this timer tracks */
+	UINT32					first_vpos;		/* the first vertical scanline position the timer fires on */
+	UINT32					increment;		/* the number of scanlines between firings */
 };
 
 
