@@ -573,10 +573,12 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 
 void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
 {
+#ifndef NDEBUG
 	timer_config *config = timer->inline_config;
 
 	/* only makes sense for periodic timers */
 	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
 
 	timer_device_adjust_periodic(timer, duration, param, attotime_never);
 }
@@ -623,10 +625,12 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 void timer_device_adjust_periodic(const device_config *timer, attotime duration, INT32 param, attotime period)
 {
 	timer_state *state = get_safe_token(timer);
+#ifndef NDEBUG
 	timer_config *config = timer->inline_config;
 
 	/* only makes sense for periodic timers */
 	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
 
 	state->duration = duration;
 	state->period = period;
@@ -685,10 +689,12 @@ void timer_reset(emu_timer *which, attotime duration)
 void timer_device_reset(const device_config *timer, attotime duration)
 {
 	timer_state *state = get_safe_token(timer);
+#ifndef NDEBUG
 	timer_config *config = timer->inline_config;
 
 	/* only makes sense for periodic timers */
 	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
 
 	timer_adjust_periodic(state->timer, state->duration, 0, state->period);
 }
@@ -754,10 +760,12 @@ int timer_get_param(emu_timer *which)
 int timer_device_get_param(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
+#ifndef NDEBUG
 	timer_config *config = timer->inline_config;
 
 	/* only makes sense for periodic timers */
 	assert(config->type == TIMER_TYPE_PERIODIC);
+#endif
 
 	return state->param;
 }
