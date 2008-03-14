@@ -153,7 +153,7 @@ attotime video_screen_get_frame_period(const device_config *screen);
 UINT64 video_screen_get_frame_number(const device_config *screen);
 
 /* registers a VBLANK callback for the given screen */
-void video_screen_register_vbl_cb(const device_config *screen, vblank_state_changed_func vbl_cb);
+void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback);
 
 
 /* ----- video screen device interface ----- */

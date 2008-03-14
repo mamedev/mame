@@ -297,7 +297,7 @@ void debug_cpu_init(running_machine *machine)
 
 	/* add callback for breaking on VBLANK */
 	if (machine->primary_screen != NULL)
-		video_screen_register_vbl_cb(machine->primary_screen, on_vblank);
+		video_screen_register_vblank_callback(machine->primary_screen, on_vblank);
 
 	add_exit_callback(machine, debug_cpu_exit);
 }

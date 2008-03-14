@@ -117,7 +117,7 @@ void watchdog_reset(running_machine *machine)
 
 		/* register a VBLANK callback for the primary screen */
 		if (machine->primary_screen != NULL)
-			video_screen_register_vbl_cb(machine->primary_screen, on_vblank);
+			video_screen_register_vblank_callback(machine->primary_screen, on_vblank);
 	}
 
 	/* timer-based watchdog? */

@@ -964,7 +964,7 @@ static void cpu_inittimers(running_machine *machine)
 
 			assert(screen != NULL);
 
-			video_screen_register_vbl_cb(screen, on_vblank);
+			video_screen_register_vblank_callback(screen, on_vblank);
 		}
 
 		/* periodic interrupts */

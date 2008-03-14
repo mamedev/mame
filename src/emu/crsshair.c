@@ -207,7 +207,7 @@ void crosshair_init(running_machine *machine)
 
 	/* register the animation callback */
 	if (machine->primary_screen != NULL)
-		video_screen_register_vbl_cb(machine->primary_screen, animate);
+		video_screen_register_vblank_callback(machine->primary_screen, animate);
 }
 
 

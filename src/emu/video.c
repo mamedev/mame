@@ -36,8 +36,8 @@
 
 #define SUBSECONDS_PER_SPEED_UPDATE	(ATTOSECONDS_PER_SECOND / 4)
 #define PAUSED_REFRESH_RATE			(30)
-#define MAX_VBL_CB					(10)
-#define DEFAULT_FRAME_PEIOD			ATTOTIME_IN_HZ(60)
+#define MAX_VBLANK_CALLBACKS		(10)
+#define DEFAULT_FRAME_PERIOD		ATTOTIME_IN_HZ(60)
 
 
 
@@ -76,7 +76,7 @@ struct _screen_state
 	UINT64					frame_number;			/* the current frame number */
 
 	/* screen specific VBLANK callbacks */
-	vblank_state_changed_func vbl_cbs[MAX_VBL_CB];	/* the array of callbacks */
+	vblank_state_changed_func vblank_callback[MAX_VBLANK_CALLBACKS]; /* the array of callbacks */
 
 	/* movie recording */
 	mame_file *				movie_file;				/* handle to the open movie file */
@@ -87,46 +87,49 @@ struct _screen_state
 typedef struct _video_global video_global;
 struct _video_global
 {
+	/* screenless systems */
+	emu_timer *				screenless_frame_timer;	/* timer to signal VBLANK start */
+
 	/* throttling calculations */
-	osd_ticks_t				throttle_last_ticks;/* osd_ticks the last call to throttle */
-	attotime 				throttle_realtime;	/* real time the last call to throttle */
-	attotime 				throttle_emutime;	/* emulated time the last call to throttle */
-	UINT32 					throttle_history;	/* history of frames where we were fast enough */
+	osd_ticks_t				throttle_last_ticks;	/* osd_ticks the last call to throttle */
+	attotime 				throttle_realtime;		/* real time the last call to throttle */
+	attotime 				throttle_emutime;		/* emulated time the last call to throttle */
+	UINT32 					throttle_history;		/* history of frames where we were fast enough */
 
 	/* dynamic speed computation */
-	osd_ticks_t 			speed_last_realtime;/* real time at the last speed calculation */
-	attotime 				speed_last_emutime;	/* emulated time at the last speed calculation */
-	double 					speed_percent;		/* most recent speed percentage */
+	osd_ticks_t 			speed_last_realtime;	/* real time at the last speed calculation */
+	attotime 				speed_last_emutime;		/* emulated time at the last speed calculation */
+	double 					speed_percent;			/* most recent speed percentage */
 	UINT32 					partial_updates_this_frame;/* partial update counter this frame */
 
 	/* overall speed computation */
-	UINT32					overall_real_seconds;/* accumulated real seconds at normal speed */
-	osd_ticks_t				overall_real_ticks;	/* accumulated real ticks at normal speed */
-	attotime				overall_emutime;	/* accumulated emulated time at normal speed */
-	UINT32					overall_valid_counter;/* number of consecutive valid time periods */
+	UINT32					overall_real_seconds;	/* accumulated real seconds at normal speed */
+	osd_ticks_t				overall_real_ticks;		/* accumulated real ticks at normal speed */
+	attotime				overall_emutime;		/* accumulated emulated time at normal speed */
+	UINT32					overall_valid_counter;	/* number of consecutive valid time periods */
 
 	/* configuration */
-	UINT8					sleep;				/* flag: TRUE if we're allowed to sleep */
-	UINT8					throttle;			/* flag: TRUE if we're currently throttled */
-	UINT8					fastforward;		/* flag: TRUE if we're currently fast-forwarding */
-	UINT32					seconds_to_run;		/* number of seconds to run before quitting */
-	UINT8					auto_frameskip;		/* flag: TRUE if we're automatically frameskipping */
-	UINT32					speed;				/* overall speed (*100) */
-	UINT32					original_speed;		/* originally-specified speed */
-	UINT8					refresh_speed;		/* flag: TRUE if we max out our speed according to the refresh */
-	UINT8					update_in_pause;	/* flag: TRUE if video is updated while in pause */
+	UINT8					sleep;					/* flag: TRUE if we're allowed to sleep */
+	UINT8					throttle;				/* flag: TRUE if we're currently throttled */
+	UINT8					fastforward;			/* flag: TRUE if we're currently fast-forwarding */
+	UINT32					seconds_to_run;			/* number of seconds to run before quitting */
+	UINT8					auto_frameskip;			/* flag: TRUE if we're automatically frameskipping */
+	UINT32					speed;					/* overall speed (*100) */
+	UINT32					original_speed;			/* originally-specified speed */
+	UINT8					refresh_speed;			/* flag: TRUE if we max out our speed according to the refresh */
+	UINT8					update_in_pause;		/* flag: TRUE if video is updated while in pause */
 
 	/* frameskipping */
-	UINT8					empty_skip_count;	/* number of empty frames we have skipped */
-	UINT8					frameskip_level;	/* current frameskip level */
-	UINT8					frameskip_counter;	/* counter that counts through the frameskip steps */
+	UINT8					empty_skip_count;		/* number of empty frames we have skipped */
+	UINT8					frameskip_level;		/* current frameskip level */
+	UINT8					frameskip_counter;		/* counter that counts through the frameskip steps */
 	INT8					frameskip_adjust;
-	UINT8					skipping_this_frame;/* flag: TRUE if we are skipping the current frame */
-	osd_ticks_t				average_oversleep;	/* average number of ticks the OSD oversleeps */
+	UINT8					skipping_this_frame;	/* flag: TRUE if we are skipping the current frame */
+	osd_ticks_t				average_oversleep;		/* average number of ticks the OSD oversleeps */
 
 	/* snapshot stuff */
-	render_target *			snap_target;		/* screen shapshot target */
-	bitmap_t *				snap_bitmap;		/* screen snapshot bitmap */
+	render_target *			snap_target;			/* screen shapshot target */
+	bitmap_t *				snap_bitmap;			/* screen snapshot bitmap */
 };
 
 
@@ -172,6 +175,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 /* global rendering */
 static TIMER_CALLBACK( vblank_begin_callback );
 static TIMER_CALLBACK( vblank_end_callback );
+static TIMER_CALLBACK( screenless_update_callback );
 static TIMER_CALLBACK( scanline0_callback );
 static TIMER_CALLBACK( scanline_update_callback );
 static int finish_screen_updates(running_machine *machine);
@@ -355,6 +359,13 @@ void video_init(running_machine *machine)
 		/* start the timer to generate per-scanline updates */
 		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
+	}
+	
+	/* if no screens, create a periodic timer to drive updates */
+	if (video_screen_count(machine->config) == 0)
+	{
+		global.screenless_frame_timer = timer_alloc(screenless_update_callback, NULL);
+		timer_adjust_periodic(global.screenless_frame_timer, DEFAULT_FRAME_PERIOD, 0, DEFAULT_FRAME_PERIOD);
 	}
 }
 
@@ -1168,7 +1179,7 @@ attotime video_screen_get_frame_period(const device_config *screen)
     if (video_screen_count(screen->machine->config) == 0)
     {
     	assert(screen == NULL);
-    	ret = DEFAULT_FRAME_PEIOD;
+    	ret = DEFAULT_FRAME_PERIOD;
 	}
     else
     {
@@ -1194,35 +1205,35 @@ UINT64 video_screen_get_frame_number(const device_config *screen)
 
 
 /*-------------------------------------------------
-    video_screen_register_vbl_cb - registers a
+    video_screen_register_vblank_callback - registers a
     VBLANK callback for a specific screen
 -------------------------------------------------*/
 
-void video_screen_register_vbl_cb(const device_config *screen, vblank_state_changed_func vbl_cb)
+void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback)
 {
 	int i, found;
 	screen_state *state = get_safe_token(screen);
 
 	/* validate arguments */
-	assert(vbl_cb != NULL);
+	assert(vblank_callback != NULL);
 
 	/* check if we already have this callback registered */
 	found = FALSE;
-	for (i = 0; i < MAX_VBL_CB; i++)
+	for (i = 0; i < MAX_VBLANK_CALLBACKS; i++)
 	{
-		if (state->vbl_cbs[i] == NULL)
+		if (state->vblank_callback[i] == NULL)
 			break;
 
-		if (state->vbl_cbs[i] == vbl_cb)
+		if (state->vblank_callback[i] == vblank_callback)
 			found = TRUE;
 	}
 
 	/* check that there is room */
-	assert(i != MAX_VBL_CB);
+	assert(i != MAX_VBLANK_CALLBACKS);
 
 	/* if not found, register and increment count */
 	if (!found)
-		state->vbl_cbs[i] = vbl_cb;
+		state->vblank_callback[i] = vblank_callback;
 }
 
 
@@ -1305,8 +1316,8 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	state->vblank_end_time = attotime_add_attoseconds(state->vblank_start_time, state->vblank_period);
 
 	/* call the screen specific callbacks */
-	for (i = 0; state->vbl_cbs[i] != NULL; i++)
-		state->vbl_cbs[i](screen, TRUE);
+	for (i = 0; state->vblank_callback[i] != NULL; i++)
+		(*state->vblank_callback[i])(screen, TRUE);
 
 	/* if this is the primary screen and we need to update now */
 	if ((screen == machine->primary_screen) && !(machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -1335,8 +1346,8 @@ static TIMER_CALLBACK( vblank_end_callback )
 	screen_state *state = get_safe_token(screen);
 
 	/* call the screen specific callbacks */
-	for (i = 0; state->vbl_cbs[i] != NULL; i++)
-		state->vbl_cbs[i](screen, FALSE);
+	for (i = 0; state->vblank_callback[i] != NULL; i++)
+		(*state->vblank_callback[i])(screen, FALSE);
 
 	/* if this is the primary screen and we need to update now */
 	if ((screen == machine->primary_screen) && (machine->config->video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
@@ -1344,6 +1355,18 @@ static TIMER_CALLBACK( vblank_end_callback )
 
 	/* increment the frame number counter */
 	state->frame_number++;
+}
+
+
+/*-------------------------------------------------
+    screenless_update_callback - update generator
+    when there are no screens to drive it
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( screenless_update_callback )
+{
+	/* force an update */
+	video_frame_update(machine, FALSE);
 }
 
 
