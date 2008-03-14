@@ -244,13 +244,15 @@ void atarigt_scanline_update(const device_config *screen, int scanline)
 			int newbank = (word >> 16) & 0x1f;
 			if (newscroll != playfield_xscroll)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				if (scanline + i > 0)
+					video_screen_update_partial(screen, scanline + i - 1);
 				tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll);
 				playfield_xscroll = newscroll;
 			}
 			if (newbank != playfield_color_bank)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				if (scanline + i > 0)
+					video_screen_update_partial(screen, scanline + i - 1);
 				tilemap_set_palette_offset(atarigen_playfield_tilemap, (newbank & 0x1f) << 8);
 				playfield_color_bank = newbank;
 			}
@@ -262,13 +264,15 @@ void atarigt_scanline_update(const device_config *screen, int scanline)
 			int newbank = word & 15;
 			if (newscroll != playfield_yscroll)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				if (scanline + i > 0)
+					video_screen_update_partial(screen, scanline + i - 1);
 				tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll);
 				playfield_yscroll = newscroll;
 			}
 			if (newbank != playfield_tile_bank)
 			{
-				video_screen_update_partial(screen, scanline + i - 1);
+				if (scanline + i > 0)
+					video_screen_update_partial(screen, scanline + i - 1);
 				tilemap_mark_all_tiles_dirty(atarigen_playfield_tilemap);
 				playfield_tile_bank = newbank;
 			}

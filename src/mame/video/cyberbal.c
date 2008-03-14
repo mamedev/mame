@@ -296,7 +296,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 		{
 			if (((base[3] >> 1) & 7) != playfield_palette_bank[i])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				playfield_palette_bank[i] = (base[3] >> 1) & 7;
 				tilemap_set_palette_offset(i ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, playfield_palette_bank[i] << 8);
 			}
@@ -306,7 +307,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 			int newscroll = 2 * (((base[4] >> 7) + 4) & 0x1ff);
 			if (newscroll != playfield_xscroll[i])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				tilemap_set_scrollx(i ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, 0, newscroll);
 				playfield_xscroll[i] = newscroll;
 			}
@@ -317,7 +319,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 			int newscroll = ((base[5] >> 7) - (scanline)) & 0x1ff;
 			if (newscroll != playfield_yscroll[i])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				tilemap_set_scrolly(i ? atarigen_playfield2_tilemap : atarigen_playfield_tilemap, 0, newscroll);
 				playfield_yscroll[i] = newscroll;
 			}
@@ -326,7 +329,8 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 		{
 			if (current_slip[i] != base[7])
 			{
-				video_screen_update_partial(update_screen, scanline - 1);
+				if (scanline > 0)
+					video_screen_update_partial(update_screen, scanline - 1);
 				current_slip[i] = base[7];
 			}
 		}
