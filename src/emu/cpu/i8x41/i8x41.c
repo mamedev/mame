@@ -183,7 +183,6 @@ static I8X41 i8x41;
 #define R(n)		i8x41.ram[((PSW & BS) ? M_BANK1:M_BANK0)+(n)]
 #define STATE		i8x41.state
 #define ENABLE		i8x41.enable
-#define TIMER		i8x41.timer
 #define PRESCALER	i8x41.prescaler
 #define P1			i8x41.p1
 #define P2			i8x41.p2
@@ -868,7 +867,7 @@ INLINE void mov_a_rm(int r)
  ***********************************/
 INLINE void mov_a_t(void)
 {
-	A = TIMER;
+	A = i8x41.timer;
 }
 
 /***********************************
@@ -935,7 +934,7 @@ INLINE void mov_sts_a(void)
  ***********************************/
 INLINE void mov_t_a(void)
 {
-	TIMER = A;
+	i8x41.timer = A;
 }
 
 /***********************************
@@ -1947,8 +1946,8 @@ static int i8x41_execute(int cycles)
 				T1_level = RP(I8X41_t1);
 				if( (CONTROL & TEST1) && (T1_level == 0) )	/* Negative Edge */
 				{
-					TIMER++;
-					if (TIMER == 0)
+					i8x41.timer++;
+					if (i8x41.timer == 0)
 					{
 						CONTROL |= TOVF;
 						if( ENABLE & TCNTI )
@@ -1967,8 +1966,8 @@ static int i8x41_execute(int cycles)
 			if( PRESCALER >= 32 )
 			{
 				PRESCALER -= 32;
-				TIMER++;
-				if( TIMER == 0 )
+				i8x41.timer++;
+				if( i8x41.timer == 0 )
 				{
 					CONTROL |= TOVF;
 					if( ENABLE & TCNTI )
@@ -2068,8 +2067,8 @@ static void set_irq_line(int irqline, int state)
 				/* counting enabled? */
 				if( ENABLE & CNT )
 				{
-					TIMER++;
-					if( TIMER == 0 )
+					i8x41.timer++;
+					if( i8x41.timer == 0 )
 					{
 						CONTROL |= TOVF;
 						CONTROL |= TIRQ_PEND;
@@ -2115,7 +2114,7 @@ static void i8x41_set_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_INT_REGISTER + I8X41_PSW:			PSW = info->i;							break;
 		case CPUINFO_INT_REGISTER + I8X41_A:			A = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8X41_T:			TIMER = info->i & 0x1fff;				break;
+		case CPUINFO_INT_REGISTER + I8X41_T:			i8x41.timer = info->i & 0x1fff;				break;
 		case CPUINFO_INT_REGISTER + I8X41_R0:			SETR(0, info->i);						break;
 		case CPUINFO_INT_REGISTER + I8X41_R1:			SETR(1, info->i);						break;
 		case CPUINFO_INT_REGISTER + I8X41_R2:			SETR(2, info->i);						break;
@@ -2228,7 +2227,7 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_INT_REGISTER + I8X41_PSW:			info->i = PSW;							break;
 		case CPUINFO_INT_REGISTER + I8X41_A:			info->i = A;							break;
-		case CPUINFO_INT_REGISTER + I8X41_T:			info->i = TIMER;						break;
+		case CPUINFO_INT_REGISTER + I8X41_T:			info->i = i8x41.timer;						break;
 		case CPUINFO_INT_REGISTER + I8X41_R0:			info->i = GETR(0);						break;
 		case CPUINFO_INT_REGISTER + I8X41_R1:			info->i = GETR(1);						break;
 		case CPUINFO_INT_REGISTER + I8X41_R2:			info->i = GETR(2);						break;
