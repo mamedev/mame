@@ -1011,21 +1011,18 @@ static DEVICE_START( timer )
 		assert(config->increment == 0);
 
 		/* validate that we have at least a duration or period */
-		assert((config->duration > 0) || (config->period > 0));
+		assert(config->period > 0);
 
 		/* copy the optional integer parameter */
 		state->param = config->param;
 
 		/* convert the duration and period into attotime */
+		state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
+
 		if (config->duration > 0)
 			state->duration = UINT64_ATTOTIME_TO_ATTOTIME(config->duration);
 		else
 			state->duration = attotime_zero;
-
-		if (config->period > 0)
-			state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
-		else
-			state->period = attotime_never;
 
 		/* register for state saves */
 		state_save_register_item(unique_tag, 0, state->duration.seconds);

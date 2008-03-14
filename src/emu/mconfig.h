@@ -437,10 +437,19 @@ union _machine_config_token
 
 
 /* add/remove timers */
-#define MDRV_TIMER_ADD(_tag, _type, _callback) \
+#define MDRV_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
 	MDRV_DEVICE_ADD(_tag, TIMER) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_##_type) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback)
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_PERIODIC) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
+	MDRV_DEVICE_CONFIG_DATA64(timer_config, period, UINT64_ATTOTIME_IN_##_period)
+
+#define MDRV_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
+	MDRV_DEVICE_ADD(_tag, TIMER) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_SCANLINE) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, screen, _screen) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, first_vpos, _first_vpos) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, increment, _increment)
 
 #define MDRV_TIMER_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, TIMER_SCREEN)
@@ -448,28 +457,17 @@ union _machine_config_token
 #define MDRV_TIMER_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag, TIMER_SCREEN)
 
-#define MDRV_TIMER_TYPE(_type) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_##_type)
-
 #define MDRV_TIMER_CALLBACK(_callback) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback)
 
 #define MDRV_TIMER_DURATION(_duration) \
-	MDRV_DEVICE_CONFIG_DATA64(timer_config, duration, _duration)
-
-#define MDRV_TIMER_PERIOD(_period) \
-	MDRV_DEVICE_CONFIG_DATA64(timer_config, period, _period)
+	MDRV_DEVICE_CONFIG_DATA64(timer_config, duration, UINT64_ATTOTIME_IN_##_duration)
 
 #define MDRV_TIMER_PARAM(_param) \
 	MDRV_DEVICE_CONFIG_DATA32(timer_config, param, _param)
 
 #define MDRV_TIMER_PTR(_ptr) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, ptr, _ptr)
-
-#define MDRV_TIMER_SCANLINE(_screen, _first_vpos, _increment) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, screen, _screen) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, first_vpos, _first_vpos) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, increment, _increment)
 
 
 /* core sound functions */
