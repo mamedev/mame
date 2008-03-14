@@ -27,8 +27,8 @@
 
     - CPU  1x R6502P
     - CRTC 1x MC6845P
-    - RAMs 1x MK48Z02B-20  (2K*8)  (near prg ROM)
-           2x HM6116LP-4   (2K*8)  (near GFX ROMs)
+    - RAMs 1x MK48Z02B-20  CMOS 2K*8 zeropower SRAM (near prg ROM)
+           2x HM6116LP-4   2K*8 SRAM (near GFX ROMs)
     - CLK  1x oscillator 10.000 MHz
 
     - ROMs 1x AM27128      (NS3.1)
@@ -36,10 +36,12 @@
            1x SGS M2764    (NS1)
     - PLDs 1x PAL16R4A     (read protected)
 
+    - 1x TDA 2002      (8W. car radio audio amplifier)
+    - 3x OUAZ SS-112D  (relay 1 pole 12v) 
     - 1x 4 DIP switches
     - 1x 30x2 edge connector
     - 1x 10 pins male connector
-    - 1x trimmer (volume)
+    - 2x trimmer (audio?) 
 
 
     PCB Layout:
@@ -76,22 +78,22 @@
     | | HM6116       |    ________       _________                ____|
     | | o MSM2128    |   | 74LS08 |     | 74LS174 |               ____|
     | |______________|   |________|     |_________|               ____|
-    |  ________________   __________                              ____|
-    | |                | | PAL16R4A |                             ____|
-    | |     2764       | |__________|                             ____|
-    | |________________|  __________                              ____|
+    |  ________________   __________           ______             ____|
+    | |                | | PAL16R4A |         | TDA  |-           ____|
+    | |     2764       | |__________|         | 2002 |-           ____|
+    | |________________|  __________          |______|-           ____|
     |  ________________  | 74LS166  |                             ____|
-    | |                | |__________|                            |
-    | |     2764       |  __________                             |
-    | |________________| | 74LS166  |                            |____
-    |  ________________  |__________|                               __|
-    | |                |  __________       _________               |  |
-    | |     2764       | | 74LS166  |     | 74LS05  |              |8 |  10
-    | |________________| |__________|     |_________|              |8 |  pins
-    |  ________  ______   __________       _________               |8 |  male
-    | | 74LS04 || osc. | | 74LS193  |     | 74LS86  |              |8 |  connector
-    | |________||10 MHz| |__________|     |_________|              |8 |
-    |           |______|                                           |__|
+    | |                | |__________|      _                     |
+    | |     2764       |  __________     /   \                   |
+    | |________________| | 74LS166  |   | pot |                  |____
+    |  ________________  |__________|    \ _ /                      __|
+    | |                |  __________       _________         ______|  |
+    | |     2764       | | 74LS166  |     | 74LS05  |   _   |ss112d|8 |  10
+    | |________________| |__________|     |_________| /   \ |______|8 |  pins
+    |  ________  ______   __________       _________ | pot ||ss112d|8 |  male
+    | | 74LS04 || osc. | | 74LS193  |     | 74LS86  | \ _ / |______|8 |  connector
+    | |________||10 MHz| |__________|     |_________|       |ss112d|8 |
+    |           |______|                                    |______|__|
     |_________________________________________________________________|
 
 
@@ -182,6 +184,7 @@
         ($56 - $58)      ; Store credits value (shown in the game under "Secondi").
         ($5A - $5C)      ; Store bonus value (shown in the game under "Credits").
         ($5E - $5F)      ; Store values to be written in video and color ram, respectively.
+        ($63 - $63)      ; Store position of marker/cursor (0-4).
         ($66 - $66)      ; Store number of baloon to be risen.
         ($67 - $67)      ; Program compare the content with 0x02, 0x03, 0x04, 0x05 and 0xE1.
                          ; If 0xE1 is found here, the machine hangs showing "I/O ERROR" (see code at $C1A2).
@@ -217,7 +220,7 @@
     $3000 - $3000    Input selector  ; Only writes. NMI write 0x01, 0x02, 0x04, 0x08.
                                      ; Main code at $C152 do a complex loop with boolean operations and write 0x00/0x80 here.
 
-    $C000 - $FFFF    ROM        ; Program ROMs.
+    $C000 - $FFFF    ROM space       ; Program ROMs.
 
 
 *******************************************************************************
@@ -300,6 +303,11 @@
     - Cleaned up and optimized the driver.
     - Reworked/updated technical notes.
 
+    [2008-03-14]
+    - Completed the component list & PCB layout.
+    - Added technical references to register $63 (magicfly).
+    - Switched crystal to new predefined format.
+
 
     TODO:
 
@@ -311,7 +319,7 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	10000000	/* 10MHz */
+#define MASTER_CLOCK	XTAL_10MHz
 
 #include "driver.h"
 #include "video/mc6845.h"
