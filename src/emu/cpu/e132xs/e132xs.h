@@ -156,24 +156,24 @@ extern int hyp_type_16bit;
 #define IRQ_IO3			6
 
 /* Trap numbers */
-#define IO2					48
-#define IO1					49
-#define INT4				50
-#define INT3				51
-#define INT2				52
-#define INT1				53
-#define IO3					54
-#define TIMER				55
-#define RESERVED1			56
-#define TRACE_EXCEPTION		57
-#define PARITY_ERROR		58
-#define EXTENDED_OVERFLOW	59
-#define RANGE_ERROR			60
-#define PRIVILEGE_ERROR		RANGE_ERROR
-#define FRAME_ERROR			RANGE_ERROR
-#define RESERVED2			61
-#define RESET				62	// reserved if not mapped @ MEM3
-#define ERROR_ENTRY			63	// for instruction code of all ones
+#define TRAPNO_IO2					48
+#define TRAPNO_IO1					49
+#define TRAPNO_INT4				50
+#define TRAPNO_INT3				51
+#define TRAPNO_INT2				52
+#define TRAPNO_INT1				53
+#define TRAPNO_IO3					54
+#define TRAPNO_TIMER				55
+#define TRAPNO_RESERVED1			56
+#define TRAPNO_TRACE_EXCEPTION		57
+#define TRAPNO_PARITY_ERROR		58
+#define TRAPNO_EXTENDED_OVERFLOW	59
+#define TRAPNO_RANGE_ERROR			60
+#define TRAPNO_PRIVILEGE_ERROR		TRAPNO_RANGE_ERROR
+#define TRAPNO_FRAME_ERROR			TRAPNO_RANGE_ERROR
+#define TRAPNO_RESERVED2			61
+#define TRAPNO_RESET				62	// reserved if not mapped @ MEM3
+#define TRAPNO_ERROR_ENTRY			63	// for instruction code of all ones
 
 /* Traps code */
 #define	TRAPLE		4

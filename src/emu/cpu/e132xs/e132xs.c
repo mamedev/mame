@@ -1470,7 +1470,7 @@ static void check_interrupts(void)
 	/* IO3 is priority 5; state is in bit 6 of ISR; FCR bit 10 enables input and FCR bit 8 inhibits interrupt */
 	if (IO3_LINE_STATE && (FCR & 0x00000500) == 0x00000400)
 	{
-		execute_int(get_trap_addr(IO3));
+		execute_int(get_trap_addr(TRAPNO_IO3));
 		(*hyperstone.irq_callback)(IRQ_IO3);
 		return;
 	}
@@ -1479,14 +1479,14 @@ static void check_interrupts(void)
 	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00300000)
 	{
 		hyperstone.timer_int_pending = 0;
-		execute_int(get_trap_addr(TIMER));
+		execute_int(get_trap_addr(TRAPNO_TIMER));
 		return;
 	}
 
 	/* INT1 is priority 7; state is in bit 0 of ISR; FCR bit 28 inhibits interrupt */
 	if (INT1_LINE_STATE && (FCR & 0x10000000) == 0x00000000)
 	{
-		execute_int(get_trap_addr(INT1));
+		execute_int(get_trap_addr(TRAPNO_INT1));
 		(*hyperstone.irq_callback)(IRQ_INT1);
 		return;
 	}
@@ -1495,14 +1495,14 @@ static void check_interrupts(void)
 	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00200000)
 	{
 		hyperstone.timer_int_pending = 0;
-		execute_int(get_trap_addr(TIMER));
+		execute_int(get_trap_addr(TRAPNO_TIMER));
 		return;
 	}
 
 	/* INT2 is priority 9; state is in bit 1 of ISR; FCR bit 29 inhibits interrupt */
 	if (INT2_LINE_STATE && (FCR & 0x20000000) == 0x00000000)
 	{
-		execute_int(get_trap_addr(INT2));
+		execute_int(get_trap_addr(TRAPNO_INT2));
 		(*hyperstone.irq_callback)(IRQ_INT2);
 		return;
 	}
@@ -1511,14 +1511,14 @@ static void check_interrupts(void)
 	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00100000)
 	{
 		hyperstone.timer_int_pending = 0;
-		execute_int(get_trap_addr(TIMER));
+		execute_int(get_trap_addr(TRAPNO_TIMER));
 		return;
 	}
 
 	/* INT3 is priority 11; state is in bit 2 of ISR; FCR bit 30 inhibits interrupt */
 	if (INT3_LINE_STATE && (FCR & 0x40000000) == 0x00000000)
 	{
-		execute_int(get_trap_addr(INT3));
+		execute_int(get_trap_addr(TRAPNO_INT3));
 		(*hyperstone.irq_callback)(IRQ_INT3);
 		return;
 	}
@@ -1527,14 +1527,14 @@ static void check_interrupts(void)
 	if (hyperstone.timer_int_pending && (FCR & 0x00b00000) == 0x00000000)
 	{
 		hyperstone.timer_int_pending = 0;
-		execute_int(get_trap_addr(TIMER));
+		execute_int(get_trap_addr(TRAPNO_TIMER));
 		return;
 	}
 
 	/* INT4 is priority 13; state is in bit 3 of ISR; FCR bit 31 inhibits interrupt */
 	if (INT4_LINE_STATE && (FCR & 0x80000000) == 0x00000000)
 	{
-		execute_int(get_trap_addr(INT4));
+		execute_int(get_trap_addr(TRAPNO_INT4));
 		(*hyperstone.irq_callback)(IRQ_INT4);
 		return;
 	}
@@ -1542,7 +1542,7 @@ static void check_interrupts(void)
 	/* IO1 is priority 14; state is in bit 4 of ISR; FCR bit 2 enables input and FCR bit 0 inhibits interrupt */
 	if (IO1_LINE_STATE && (FCR & 0x00000005) == 0x00000004)
 	{
-		execute_int(get_trap_addr(IO1));
+		execute_int(get_trap_addr(TRAPNO_IO1));
 		(*hyperstone.irq_callback)(IRQ_IO1);
 		return;
 	}
@@ -1550,7 +1550,7 @@ static void check_interrupts(void)
 	/* IO2 is priority 15; state is in bit 5 of ISR; FCR bit 6 enables input and FCR bit 4 inhibits interrupt */
 	if (IO2_LINE_STATE && (FCR & 0x00000050) == 0x00000040)
 	{
-		execute_int(get_trap_addr(IO2));
+		execute_int(get_trap_addr(TRAPNO_IO2));
 		(*hyperstone.irq_callback)(IRQ_IO2);
 		return;
 	}
@@ -1739,7 +1739,7 @@ static void hyperstone_reset(void)
 	set_global_register(FCR_REGISTER, ~0);
 	set_global_register(TPR_REGISTER, 0xc000000);
 
-	PC = get_trap_addr(RESET);
+	PC = get_trap_addr(TRAPNO_RESET);
 	change_pc(PC);
 
 	SET_FP(0);
@@ -1786,7 +1786,7 @@ static offs_t hyperstone_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const
 
 INLINE void hyperstone_chk(struct regs_decode *decode)
 {
-	UINT32 addr = get_trap_addr(RANGE_ERROR);
+	UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 
 	if( SRC_IS_SR )
 	{
@@ -1839,7 +1839,7 @@ INLINE void hyperstone_movd(struct regs_decode *decode)
 
 			if( (!old_s && GET_S) || (!GET_S && !old_l && GET_L))
 			{
-				UINT32 addr = get_trap_addr(PRIVILEGE_ERROR);
+				UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 				execute_exception(addr);
 			}
 
@@ -1915,7 +1915,7 @@ INLINE void hyperstone_divu(struct regs_decode *decode)
 				//N -> undefined
 				UINT32 addr;
 				SET_V(1);
-				addr = get_trap_addr(RANGE_ERROR);
+				addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 				execute_exception(addr);
 			}
 			else
@@ -1964,7 +1964,7 @@ INLINE void hyperstone_divs(struct regs_decode *decode)
 				//N -> undefined
 				UINT32 addr;
 				SET_V(1);
-				addr = get_trap_addr(RANGE_ERROR);
+				addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 				execute_exception(addr);
 			}
 			else
@@ -2004,12 +2004,12 @@ INLINE void hyperstone_xm(struct regs_decode *decode)
 			case 3:
 				if( !SRC_IS_PC && (SREG > EXTRA_U) )
 				{
-					UINT32 addr = get_trap_addr(RANGE_ERROR);
+					UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 					execute_exception(addr);
 				}
 				else if( SRC_IS_PC && (SREG >= EXTRA_U) )
 				{
-					UINT32 addr = get_trap_addr(RANGE_ERROR);
+					UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 					execute_exception(addr);
 				}
 				else
@@ -2095,7 +2095,7 @@ INLINE void hyperstone_sums(struct regs_decode *decode)
 
 	if( GET_V && !SRC_IS_SR )
 	{
-		UINT32 addr = get_trap_addr(RANGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
@@ -2132,7 +2132,7 @@ INLINE void hyperstone_mov(struct regs_decode *decode)
 {
 	if( !GET_S && decode->dst >= 16 )
 	{
-		UINT32 addr = get_trap_addr(PRIVILEGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 		execute_exception(addr);
 	}
 
@@ -2197,7 +2197,7 @@ INLINE void hyperstone_adds(struct regs_decode *decode)
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(RANGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
@@ -2333,7 +2333,7 @@ INLINE void hyperstone_subs(struct regs_decode *decode)
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(RANGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
@@ -2437,7 +2437,7 @@ INLINE void hyperstone_negs(struct regs_decode *decode)
 
 	if( GET_V && !SRC_IS_SR ) //trap doesn't occur when source is SR
 	{
-		UINT32 addr = get_trap_addr(RANGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
@@ -2471,7 +2471,7 @@ INLINE void hyperstone_movi(struct regs_decode *decode)
 {
 	if( !GET_S && decode->dst >= 16 )
 	{
-		UINT32 addr = get_trap_addr(PRIVILEGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_PRIVILEGE_ERROR);
 		execute_exception(addr);
 	}
 
@@ -2545,7 +2545,7 @@ INLINE void hyperstone_addsi(struct regs_decode *decode)
 
 	if( GET_V )
 	{
-		UINT32 addr = get_trap_addr(RANGE_ERROR);
+		UINT32 addr = get_trap_addr(TRAPNO_RANGE_ERROR);
 		execute_exception(addr);
 	}
 }
@@ -4516,7 +4516,7 @@ INLINE void hyperstone_frame(struct regs_decode *decode)
 
 		if( tmp_flag )
 		{
-			UINT32 addr = get_trap_addr(FRAME_ERROR);
+			UINT32 addr = get_trap_addr(TRAPNO_FRAME_ERROR);
 			execute_exception(addr);
 		}
 	}
@@ -4780,7 +4780,7 @@ static int hyperstone_execute(int cycles)
 
 		if( GET_T && GET_P && hyperstone.delay.delay_cmd == NO_DELAY ) /* Not in a Delayed Branch instructions */
 		{
-			UINT32 addr = get_trap_addr(TRACE_EXCEPTION);
+			UINT32 addr = get_trap_addr(TRAPNO_TRACE_EXCEPTION);
 			execute_exception(addr);
 		}
 
