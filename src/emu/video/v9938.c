@@ -55,6 +55,8 @@ typedef struct {
 	/* palette */
 	UINT16 pal_ind16[16];
 	UINT16 pal_ind256[256];
+	/* render screen */
+	const device_config *screen;
 	/* render bitmap */
 	bitmap_t *bitmap;
 	/* Command unit */
@@ -481,7 +483,7 @@ WRITE8_HANDLER (v9938_1_command_w)
 
 ***************************************************************************/
 
-void v9938_init (running_machine *machine, int which, bitmap_t *bitmap, int model, int vram_size, void (*callback)(int) )
+void v9938_init (running_machine *machine, int which, const device_config *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(int) )
 {
 	vdp = &vdps[which];
 
@@ -490,6 +492,7 @@ void v9938_init (running_machine *machine, int which, bitmap_t *bitmap, int mode
 	vdp->VdpOpsCnt = 1;
 	vdp->VdpEngine = NULL;
 
+	vdp->screen = screen;
 	vdp->bitmap = bitmap;
 	vdp->model = model;
 	vdp->vram_size = vram_size;
@@ -1450,9 +1453,9 @@ static void v9938_interrupt_start_vblank (void)
 	if (vdp->size != vdp->size_old)
 		{
 		if (vdp->size == RENDER_HIGH)
-			video_screen_set_visarea (0, 0, 512 + 32 - 1, 0, 424 + 56 - 1);
+			video_screen_set_visarea (vdp->screen, 0, 512 + 32 - 1, 0, 424 + 56 - 1);
 		else
-			video_screen_set_visarea (0, 0, 256 + 16 - 1, 0, 212 + 28 - 1);
+			video_screen_set_visarea (vdp->screen, 0, 256 + 16 - 1, 0, 212 + 28 - 1);
 
 		vdp->size_old = vdp->size;
 		}

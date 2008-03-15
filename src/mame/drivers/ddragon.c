@@ -146,7 +146,8 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 	int vcount = scanline_to_vcount(scanline);
 
 	/* update to the current point */
-	video_screen_update_partial(machine->primary_screen, scanline - 1);
+	if (scanline > 0)
+		video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)

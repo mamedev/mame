@@ -87,7 +87,9 @@ WRITE16_HANDLER( btoads_display_control_w )
 	if (ACCESSING_MSB)
 	{
 		/* allow multiple changes during display */
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+		int scanline = video_screen_get_vpos(machine->primary_screen);
+		if (scanline > 0)
+			video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)

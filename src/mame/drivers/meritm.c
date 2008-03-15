@@ -460,11 +460,11 @@ static void meritm_vdp1_interrupt(int i)
 static VIDEO_START( meritm )
 {
 	vdp0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	v9938_init (machine, 0, vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
+	v9938_init (machine, 0, machine->primary_screen, vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
 	v9938_reset(0);
 
 	vdp1_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	v9938_init (machine, 1, vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
+	v9938_init (machine, 1, machine->primary_screen, vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
 	v9938_reset(1);
 
 	state_save_register_global(meritm_vint);
