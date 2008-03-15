@@ -367,57 +367,6 @@ union _machine_config_token
 	TOKEN_PTR(video_update, video_update_##_func),
 
 
-/* add/remove screens */
-#define MDRV_SCREEN_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, VIDEO_SCREEN) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
-
-#define MDRV_SCREEN_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, VIDEO_SCREEN)
-
-#define MDRV_SCREEN_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag, VIDEO_SCREEN)
-
-#define MDRV_SCREEN_FORMAT(_format) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, format, _format)
-
-#define MDRV_SCREEN_TYPE(_type) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, type, SCREEN_TYPE_##_type)
-
-#define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, ((HZ_TO_ATTOSECONDS(_pixclock) * (_htotal) * (_vtotal)) / (_vtotal)) * ((_vtotal) - ((_vbstart) - (_vbend)))) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _htotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _vtotal)	\
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _hbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, (_hbstart) - 1) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _vbend) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, (_vbstart) - 1)
-
-#define MDRV_SCREEN_REFRESH_RATE(_rate) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, refresh, HZ_TO_ATTOSECONDS(_rate))
-
-#define MDRV_SCREEN_VBLANK_TIME(_time) \
-	MDRV_DEVICE_CONFIG_DATA64(screen_config, vblank, _time) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, oldstyle_vblank_supplied, TRUE)
-
-#define MDRV_SCREEN_SIZE(_width, _height) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, width, _width) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, height, _height)
-
-#define MDRV_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_x, _minx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_x, _maxx) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.min_y, _miny) \
-	MDRV_DEVICE_CONFIG_DATA32(screen_config, visarea.max_y, _maxy)
-
-#define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xoffset, _xoffs, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, xscale, _xscale, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, yoffset, _yoffs, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(screen_config, yscale, _yscale, 24)
-
-
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
 	MDRV_DEVICE_ADD(_tag, SPEAKER_OUTPUT) \
@@ -434,40 +383,6 @@ union _machine_config_token
 #define MDRV_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
 	MDRV_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
 	MDRV_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
-
-
-/* add/remove timers */
-#define MDRV_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
-	MDRV_DEVICE_ADD(_tag, TIMER) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_PERIODIC) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
-	MDRV_DEVICE_CONFIG_DATA64(timer_config, period, UINT64_ATTOTIME_IN_##_period)
-
-#define MDRV_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
-	MDRV_DEVICE_ADD(_tag, TIMER) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_SCANLINE) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, screen, _screen) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, first_vpos, _first_vpos) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, increment, _increment)
-
-#define MDRV_TIMER_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag, TIMER_SCREEN)
-
-#define MDRV_TIMER_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag, TIMER_SCREEN)
-
-#define MDRV_TIMER_CALLBACK(_callback) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback)
-
-#define MDRV_TIMER_DURATION(_duration) \
-	MDRV_DEVICE_CONFIG_DATA64(timer_config, duration, UINT64_ATTOTIME_IN_##_duration)
-
-#define MDRV_TIMER_PARAM(_param) \
-	MDRV_DEVICE_CONFIG_DATA32(timer_config, param, _param)
-
-#define MDRV_TIMER_PTR(_ptr) \
-	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, ptr, _ptr)
 
 
 /* core sound functions */

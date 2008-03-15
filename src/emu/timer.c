@@ -69,7 +69,7 @@ struct _timer_state
 	void 					*ptr;			/* the pointer parameter passed to the timer callback */
 
 	/* periodic timers only */
-	attotime				duration;		/* duration before the timer fires */
+	attotime				start_delay;	/* delay before the timer fires for the first time */
 	attotime				period;			/* period of repeated timer firings */
 	INT32					param;			/* the integer parameter passed to the timer callback */
 
@@ -590,7 +590,7 @@ void timer_device_adjust_oneshot(const device_config *timer, attotime duration, 
     subsequent firings
 -------------------------------------------------*/
 
-void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, attotime period)
+void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period)
 {
 	attotime time = get_current_time();
 
@@ -603,12 +603,12 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 	which->enabled = TRUE;
 
 	/* clamp negative times to 0 */
-	if (duration.seconds < 0)
-		duration = attotime_zero;
+	if (start_delay.seconds < 0)
+		start_delay = attotime_zero;
 
 	/* set the start and expire times */
 	which->start = time;
-	which->expire = attotime_add(time, duration);
+	which->expire = attotime_add(time, start_delay);
 	which->period = period;
 
 	/* remove and re-insert the timer in its new order */
@@ -622,7 +622,7 @@ void timer_adjust_periodic(emu_timer *which, attotime duration, INT32 param, att
 }
 
 
-void timer_device_adjust_periodic(const device_config *timer, attotime duration, INT32 param, attotime period)
+void timer_device_adjust_periodic(const device_config *timer, attotime start_delay, INT32 param, attotime period)
 {
 	timer_state *state = get_safe_token(timer);
 #ifndef NDEBUG
@@ -632,12 +632,12 @@ void timer_device_adjust_periodic(const device_config *timer, attotime duration,
 	assert(config->type == TIMER_TYPE_PERIODIC);
 #endif
 
-	state->duration = duration;
+	state->start_delay = start_delay;
 	state->period = period;
 	state->param = param;
 
 	/* adjust the timer */
-	timer_adjust_periodic(state->timer, state->duration, 0, state->period);
+	timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
 }
 
 
@@ -686,7 +686,7 @@ void timer_reset(emu_timer *which, attotime duration)
 }
 
 
-void timer_device_reset(const device_config *timer, attotime duration)
+void timer_device_reset(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
 #ifndef NDEBUG
@@ -696,7 +696,7 @@ void timer_device_reset(const device_config *timer, attotime duration)
 	assert(config->type == TIMER_TYPE_PERIODIC);
 #endif
 
-	timer_adjust_periodic(state->timer, state->duration, 0, state->period);
+	timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
 }
 
 
@@ -1018,23 +1018,23 @@ static DEVICE_START( timer )
 		assert(config->first_vpos == 0);
 		assert(config->increment == 0);
 
-		/* validate that we have at least a duration or period */
+		/* validate that we have at least a start_delay or period */
 		assert(config->period > 0);
 
 		/* copy the optional integer parameter */
 		state->param = config->param;
 
-		/* convert the duration and period into attotime */
+		/* convert the start_delay and period into attotime */
 		state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
 
-		if (config->duration > 0)
-			state->duration = UINT64_ATTOTIME_TO_ATTOTIME(config->duration);
+		if (config->start_delay > 0)
+			state->start_delay = UINT64_ATTOTIME_TO_ATTOTIME(config->start_delay);
 		else
-			state->duration = attotime_zero;
+			state->start_delay = attotime_zero;
 
 		/* register for state saves */
-		state_save_register_item(unique_tag, 0, state->duration.seconds);
-		state_save_register_item(unique_tag, 0, state->duration.attoseconds);
+		state_save_register_item(unique_tag, 0, state->start_delay.seconds);
+		state_save_register_item(unique_tag, 0, state->start_delay.attoseconds);
 		state_save_register_item(unique_tag, 0, state->period.seconds);
 		state_save_register_item(unique_tag, 0, state->period.attoseconds);
 		state_save_register_item(unique_tag, 0, state->param);
@@ -1044,12 +1044,12 @@ static DEVICE_START( timer )
 		state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
 
 		/* finally, start the timer */
-		timer_adjust_periodic(state->timer, state->duration, 0, state->period);
+		timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
 		break;
 
 	case TIMER_TYPE_SCANLINE:
 		/* make sure that only the applicable parameters are filled in */
-		assert(config->duration == 0);
+		assert(config->start_delay == 0);
 		assert(config->period == 0);
 		assert(config->param == 0);
 
