@@ -136,39 +136,42 @@ static void animate(const device_config *device, int vblank_state);
 
 static void create_bitmap(int player)
 {
-	char filename[20];
-
-	/* first try to load a bitmap for the crosshair */
-	sprintf(filename, "cross%d.png", player);
-	global.bitmap[player] = render_load_png(NULL, filename, NULL, NULL);
-
-	/* if that didn't work, use the built-in one */
+	/* if we don't have a bitmap for this player yet */
 	if (global.bitmap[player] == NULL)
 	{
-		rgb_t color = crosshair_colors[player];
 		int x, y;
+		char filename[20];
+		rgb_t color = crosshair_colors[player];
 
-		/* allocate a blank bitmap to start with */
-		global.bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
-		fillbitmap(global.bitmap[player], MAKE_ARGB(0x00,0xff,0xff,0xff), NULL);
+		/* first try to load a bitmap for the crosshair */
+		sprintf(filename, "cross%d.png", player);
+		global.bitmap[player] = render_load_png(NULL, filename, NULL, NULL);
 
-		/* extract the raw source data to it */
-		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
+		/* if that didn't work, use the built-in one */
+		if (global.bitmap[player] == NULL)
 		{
-			/* assume it is mirrored vertically */
-			UINT32 *dest0 = BITMAP_ADDR32(global.bitmap[player], y, 0);
-			UINT32 *dest1 = BITMAP_ADDR32(global.bitmap[player], CROSSHAIR_RAW_SIZE - 1 - y, 0);
+			/* allocate a blank bitmap to start with */
+			global.bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
+			fillbitmap(global.bitmap[player], MAKE_ARGB(0x00,0xff,0xff,0xff), NULL);
 
-			/* extract to two rows simultaneously */
-			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
-				if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
-					dest0[x] = dest1[x] = MAKE_ARGB(0xff,0x00,0x00,0x00) | color;
+			/* extract the raw source data to it */
+			for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
+			{
+				/* assume it is mirrored vertically */
+				UINT32 *dest0 = BITMAP_ADDR32(global.bitmap[player], y, 0);
+				UINT32 *dest1 = BITMAP_ADDR32(global.bitmap[player], CROSSHAIR_RAW_SIZE - 1 - y, 0);
+
+				/* extract to two rows simultaneously */
+				for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
+					if ((crosshair_raw_top[y * CROSSHAIR_RAW_ROWBYTES + x / 8] << (x % 8)) & 0x80)
+						dest0[x] = dest1[x] = MAKE_ARGB(0xff,0x00,0x00,0x00) | color;
+			}
 		}
-	}
 
-	/* create a texture to reference the bitmap */
-	global.texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
-	render_texture_set_bitmap(global.texture[player], global.bitmap[player], NULL, 0, TEXFORMAT_ARGB32);
+		/* create a texture to reference the bitmap */
+		global.texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
+		render_texture_set_bitmap(global.texture[player], global.bitmap[player], NULL, 0, TEXFORMAT_ARGB32);
+	}
 }
 
 
@@ -179,21 +182,21 @@ static void create_bitmap(int player)
 
 void crosshair_init(running_machine *machine)
 {
-	int player;
 	input_port_entry *ipt;
 
 	/* request a callback upon exiting */
 	add_exit_callback(machine, crosshair_exit);
 
-	/* nothing is used by default */
-	for (player = 0; player < MAX_PLAYERS; player++)
-		global.used[player] = FALSE;
+	/* clear all the globals */
+	memset(&global, 0, sizeof(global));
 
 	/* determine who needs crosshairs */
 	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
 		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
 		{
 			int player = ipt->player;
+
+			assert(player < MAX_PLAYERS);
 
 			/* mark as used and visible */
 			global.used[player] = TRUE;
