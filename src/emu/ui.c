@@ -25,7 +25,7 @@
 #include "mess.h"
 #include "uimess.h"
 #include "inputx.h"
-#endif
+#endif /* MESS */
 
 #include <ctype.h>
 
@@ -446,8 +446,8 @@ void ui_update_and_render(running_machine *machine)
 
 #ifdef MESS
 	/* let MESS display its stuff */
-	mess_ui_update();
-#endif
+	mess_ui_update(machine);
+#endif /* MESS */
 }
 
 
@@ -1251,9 +1251,9 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	}
 
 #ifdef MESS
-	if (mess_disable_builtin_ui())
+	if (mess_disable_builtin_ui(machine))
 		return 0;
-#endif
+#endif /* MESS */
 
 	/* if the user pressed ESC, stop the emulation */
 	if (input_ui_pressed(IPT_UI_CANCEL))
