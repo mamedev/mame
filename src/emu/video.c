@@ -360,7 +360,7 @@ void video_init(running_machine *machine)
 		if (machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 			timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 	}
-	
+
 	/* if no screens, create a periodic timer to drive updates */
 	if (video_screen_count(machine->config) == 0)
 	{
@@ -399,10 +399,10 @@ static screen_state *screen_init(const device_config *screen)
 	assert(config->height > 0);
 	assert(config->refresh > 0);
 	assert(config->visarea.min_x >= 0);
-	assert(config->visarea.max_x < config->width);
+	assert((config->visarea.max_x < config->width) || (config->type == SCREEN_TYPE_VECTOR));
 	assert(config->visarea.max_x > config->visarea.min_x);
 	assert(config->visarea.min_y >= 0);
-	assert(config->visarea.max_y < config->height);
+	assert((config->visarea.max_y < config->height) || (config->type == SCREEN_TYPE_VECTOR));
 	assert(config->visarea.max_y > config->visarea.min_y);
 
 	/* everything checks out, allocate the state object */
