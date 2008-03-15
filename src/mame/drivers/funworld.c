@@ -184,6 +184,11 @@
     get the input codes necessary to allow boot the game.
 
 
+    - Jolly Card (croatian sets) and Jolly Card Professional 2.0
+
+    These games don't operate with regular coins/tokens. Only remote credits are allowed.
+
+
     - Magic Card II (Impera)
 
     Impera made 2 graphics sets for this game. One of them is encrypted, and meant for the TAB blue board.
@@ -813,12 +818,17 @@
     - Added minor corrections.
     - Updated technical notes.
 
+    2008/03/14
+    - Added proper inputs to jolyc980.
+    - Added temporary patch to allow bypass the "code" screen in jolyc980.
+    - Updated technical notes.
+
 
     *** TO DO ***
 
     - Figure out the royalcdc, jokercrd and saloon encryption.
     - Fix the imperfect sound in Magic Card II.
-    - Reverse-engineering the boot code of Jolly Card Professional 2.0 to get the proper input codes to boot.
+    - Reverse-engineering the boot code of Jolly Card Professional 2.0 to get the proper codes to boot.
     - Analyze the unknown writes to $2000/$4000 in some games.
     - Check for the reads to the ay8910 output ports in some games.
     - Figure out the MCU in monglfir and soccernw.
@@ -1129,6 +1139,64 @@ static INPUT_PORTS_START( jolycdit )
     to allow the remote credits mode to work */
 
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "Hopper" )
+	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jolyc980 )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Navijanje (Remote)") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_NAME("Stop (Hold) 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_NAME("Ponistavange (Cancel) / Kasiranje (Take) / Autohold") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Djelenje (Start) / Gamble (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_NAME("Stop (Hold) 5 / Ulog (Bet) / Half Gamble") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )	PORT_NAME("Konobar (Service1)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Namjestit (Service2)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_NAME("Stop (Hold) 4 / Veca (High)") PORT_CODE(KEYCODE_V)
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_NAME("Stop (Hold) 2 / Manja (Low)") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Stop (Hold) 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Vratiti Nazad (Payout)") PORT_CODE(KEYCODE_M)	// Payout? Need to check with hopper filled.
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "State" )				PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, "Play" )
+	PORT_DIPSETTING(    0x00, "Keyboard Test" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "With Joker" )		// also enable Five of a Kind.
+	PORT_DIPSETTING(    0x20, "Without Joker" )
+	PORT_DIPNAME( 0x40, 0x00, "Hold" )				PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, "Auto Hold" )
+	PORT_DIPSETTING(    0x40, "No Auto Hold" )
+	PORT_DIPNAME( 0x80, 0x80, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -2202,8 +2270,6 @@ ROM_START( saloon )
 ROM_END
 
 
-
-
 /**************************
 *  Driver Initialization  *
 **************************/
@@ -2217,7 +2283,8 @@ static DRIVER_INIT( funworld )
 
 static DRIVER_INIT( tabblue )
 {
-/* +----------------------------------------------------------------------+
+/*****************************************************************************
+   +----------------------------------------------------------------------+
    | For TAB blue colored PCB with 2 HY18CV85 (electrically-erasable PLD) |
    +----------------------------------------------------------------------+
 
@@ -2235,7 +2302,8 @@ static DRIVER_INIT( tabblue )
     to get the same result.
 
     Since the table is very short, we will substitute each nibble.
-*/
+
+*****************************************************************************/
 
 	int x, na, nb, nad, nbd;
 	UINT8 *src = memory_region( REGION_GFX1 );
@@ -2314,6 +2382,32 @@ static DRIVER_INIT( jolycdae )
 	pia_config(1, &pia1_intf);
 }
 
+static DRIVER_INIT( jolyc980 )
+{
+/************************************************************************************************
+
+   The game need the vector $07F0/$07F1 pointing to $801C to proper boot.
+
+   Vector $07F0/$07F1 is copied to $0006/$0007 (multipurpose)
+   and then accessed through indirect JMP ($0006).
+
+   This is a temporary patch to allow boot the game since vector $07F0/$07F1 is normally empty,
+   pointing to $0000 and therefore jumping to $C210 constantly where starts producing unexpected
+   things, like stack overflow.
+
+*************************************************************************************************/
+
+	UINT8 *ROM = memory_region(REGION_CPU1);
+
+	ROM[0xc1fc] = 0x4c;
+	ROM[0xc1fd] = 0x1c;
+	ROM[0xc1fe] = 0x80;
+
+	/* Initializing PIAs... */
+	pia_config(0, &pia0_intf);
+	pia_config(1, &pia1_intf);
+}
+
 static DRIVER_INIT( soccernw )
 {
 /* temporary patch to avoid hardware errors for debug purposes */
@@ -2343,7 +2437,7 @@ static DRIVER_INIT( soccernw )
 GAME( 1985, jollycrd, 0,        funworld, funworld, funworld, ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0 )
 GAME( 1985, jolycdae, jollycrd, funworld, funworld, jolycdae, ROT0, "TAB-Austria",     "Jolly Card (austrian, encrypted)",                0 )
 GAME( 1985, jolyc3x3, jollycrd, funworld, funworld, funworld, ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0 )
-GAME( 2000, jolyc980, jollycrd, cuoreuno, funworld, funworld, ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0 )
+GAME( 2000, jolyc980, jollycrd, cuoreuno, jolyc980, jolyc980, ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0 )
 GAME( 1998, jolycdev, jollycrd, funworld, funworld, funworld, ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0 )
 GAME( 1985, jolyccra, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "TAB-Austria",     "Jolly Card (croatian, set 1)",                    0 )
 GAME( 1993, jolyccrb, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "Soft Design",     "Jolly Card (croatian, set 2)",                    0 )
