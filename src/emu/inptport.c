@@ -2865,6 +2865,10 @@ static void input_port_frame(running_machine *machine)
 	attotime curtime = timer_get_time();
 	int portnum, bitnum;
 
+	/* get out if we are just initializing */
+	if (mame_get_phase(machine) != MAME_PHASE_RUNNING)
+		return
+
 profiler_mark(PROFILER_INPUT);
 
 	/* track the duration of the previous frame */
