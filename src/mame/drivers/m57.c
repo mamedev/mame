@@ -198,7 +198,7 @@ INPUT_PORTS_END
 static const gfx_layout spritelayout =
 {
 	16,32,
-	RGN_FRAC(1,3),
+	RGN_FRAC(1,6),
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ STEP8(0,1), STEP8(16*8,1) },
