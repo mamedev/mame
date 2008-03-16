@@ -2867,7 +2867,7 @@ static void input_port_frame(running_machine *machine)
 
 	/* get out if we are just initializing */
 	if (mame_get_phase(machine) != MAME_PHASE_RUNNING)
-		return
+		return;
 
 profiler_mark(PROFILER_INPUT);
 
