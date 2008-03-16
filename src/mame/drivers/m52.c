@@ -103,7 +103,7 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Generic port definitions
+ *  Port definitions
  *
  *************************************/
 
@@ -160,11 +160,6 @@ static INPUT_PORTS_START( m52 )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
-/*************************************
- *
- *  Games port definitions
- *
- *************************************/
 
 static INPUT_PORTS_START( mpatrol )
 	PORT_INCLUDE(m52)
@@ -204,6 +199,7 @@ static INPUT_PORTS_START( mpatrol )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	IREM_Z80_COINAGE_TYPE_1_LOC(SW1)
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( mpatrolw )
 	PORT_INCLUDE(mpatrol)
