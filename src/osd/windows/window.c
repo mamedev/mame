@@ -1184,7 +1184,7 @@ static int complete_create(win_window_info *window)
 
 	// create the window menu if needed
 #if HAS_WINDOW_MENU
-	if (win_create_menu(&menu))
+	if (win_create_menu(Machine, &menu))
 		return 1;
 #endif
 

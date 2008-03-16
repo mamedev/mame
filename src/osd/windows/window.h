@@ -127,7 +127,7 @@ void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param);
 void winwindow_dispatch_message(MSG *message);
 
 #if HAS_WINDOW_MENU
-int win_create_menu(HMENU *menus);
+int win_create_menu(running_machine *machine, HMENU *menus);
 #endif
 
 
