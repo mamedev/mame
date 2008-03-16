@@ -201,8 +201,6 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 
 MACHINE_RESET( ajax )
 {
-	firq_enable = 1;
-
 	ajax_bankswitch_w(machine, 0, 0);
 	ajax_bankswitch_2_w(machine, 0, 0);
 }
