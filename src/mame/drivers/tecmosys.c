@@ -16,9 +16,78 @@ T.Slanina 20040530 :
 
 /*
 
-Deroon DeroDero
-(c)1996 Tecmo
-Tecmo System Board
+Deroon Dero Dero
+Tecmo, 1996
+
+This game is a Puyo Puyo rip-off.
+
+PCB Layout
+----------
+
+TECMO SYSTEM BOARD A
+|-------------------------------------------------------------------------|
+|  LM324  UPC452C      16.9MHz        |--------|    |--------|  6264  |
+| TA8205 LM324  YAC513  YMF262 YMZ280B  |TECMO  |    |TECMO  |  6264  |
+|        LM324  M6295  UPC452C          |AA03-8431    |AA02-1927        |
+|                      YAC512          |        |    |        |        |
+|                                        |--------|    |--------|        |
+|        Z80  6264 28MHz 14.31818MHz                  |--------|        |
+|                    16MHz              62256          |TECMO  |        |
+|            TA8030                    62256          |AA02-1927  6264  |
+|                                                      |        |  6264  |
+|J  93C46                              |--------|    |--------|        |
+|A                                      |TECMO  |    |--------|        |
+|M                                      |AA03-8431    |TECMO  |        |
+|M          68000                        |        |    |AA02-1927        |
+|A                                      |--------|    |        |  6264  |
+|                  PAL              6116              |--------|  6264  |
+|                                    6116              |--------|        |
+|  |--------|                                          |TECMO  |        |
+|  |TECMO  |                      PAL                |AA02-1927        |
+|  |AA03-8431  62256                                  |        |  6264  |
+|  |        |  62256                                  |--------|  6264  |
+|  |--------|                                |---------|                |
+|                                              |TECMO    |                |
+|                                              |AA03-8431|                |
+|                                              |        |                |
+|                                              |---------|          424260|
+|                                              62256 62256          424260|
+|-------------------------------------------------------------------------|
+Notes:
+68000 @ 16MHz
+Z80 @ 8MHz [16/2]
+YMZ280B @ 16.9MHz
+YMF262 @ 14.31818MHz
+OKI M6295 @ 2MHz [16/8]. Pin 7 HIGH
+
+Game Board
+----------
+
+TECMO SYSTEM BOARD B2
+|-------------------------------------------------------------------------|
+|    T201_DIP42_MASK.UBB1                                                |
+| |----|                                              T202_DIP42_MASK.UBC1|
+| |*  |                                                                  |
+| |----|                                                                  |
+|                                                                        |
+|  T003_2M_EPROM.UZ1                        T101_SOP44.UAH1            |
+|                                                                        |
+|                                            T301_DIP42_MASK.UBD1        |
+|                                                                        |
+|                                                                        |
+|                                                                        |
+|  T401_DIP42_MASK.UYA1      T104_SOP44.UCL1    T001_4M_EPROM.UPAU1    |
+|                              T103_SOP44.UBL1                            |
+|  T501_DIP32_MASK.UAD1      T102_SOP44.UAL1                            |
+|                                                  T002_4M_EPROM.UPAL1    |
+|-------------------------------------------------------------------------|
+Notes:
+      * - Unknown QFP64 microcontroller marked 'TECMO SC432146FU E23D 185 SSAB9540B'
+          Clocks: pin 33 - 8MHz, pin 31: 8MHz, pin 29 - 2MHz
+          GND on pins 49, 23, 24, 27
+          Power on pins 55, 25
+          Note - Pins 25 and 27 are tied to some jumpers, so these
+          appear to be some kind of configuration setting.
 
 CPU  : TMP68HC000P-16
 Sound: TMPZ84C00AP-8 YMF262 YMZ280B M6295
