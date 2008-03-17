@@ -970,6 +970,10 @@ void atarigen_scanline_timer_reset(const device_config *screen, atarigen_scanlin
 		emu_timer *timer = get_scanline_timer_for_screen(screen);
 		timer_adjust_oneshot(timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 	}
+	
+	/* implicitly allocate a scanline interrupt timer */
+	get_scanline_interrupt_timer_for_screen(screen);
+
 }
 
 
