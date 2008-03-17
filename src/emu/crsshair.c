@@ -332,7 +332,8 @@ void crosshair_render(const device_config *screen)
 
 	for (player = 0; player < MAX_PLAYERS; player++)
 		/* draw if visible and the right screen */
-		if (global.visible[player] && (global.screen[player] == screen))
+		if (global.visible[player] &&
+			((global.screen[player] == screen) || (global.screen[player] == CROSSHAIR_SCREEN_ALL)))
 		{
 			/* add a quad assuming a 4:3 screen (this is not perfect) */
 			render_screen_add_quad(screen,
@@ -341,4 +342,15 @@ void crosshair_render(const device_config *screen)
 						MAKE_ARGB(0xc0, global.fade, global.fade, global.fade),
 						global.texture[player], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
+}
+
+
+/*-------------------------------------------------
+    crosshair_set_screen - sets the screen(s) for a
+    given player's crosshair
+-------------------------------------------------*/
+
+void crosshair_set_screen(running_machine *machine, int player, const device_config *screen)
+{
+	global.screen[player] = screen;
 }
