@@ -73,7 +73,11 @@ static void watchdog_internal_reset(running_machine *machine)
 static TIMER_CALLBACK( watchdog_callback )
 {
 	logerror("Reset caused by the watchdog!!!\n");
+
+#ifdef MAME_DEBUG
 	popmessage("Reset caused by the watchdog!!!\n");
+#endif
+
 	mame_schedule_soft_reset(machine);
 }
 
