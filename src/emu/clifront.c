@@ -730,6 +730,9 @@ static int info_verifysamples(core_options *options, const char *gamename)
 			}
 		}
 
+	/* clear out any cached files */
+	zip_file_cache_clear();
+
 	/* if we didn't get anything at all, display a generic end message */
 	if (correct + incorrect == 0)
 	{
