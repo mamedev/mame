@@ -4,26 +4,26 @@
     driver by Nicola Salmoria, Mike Coates, Frank Palazzolo, Aaron Giles
 
     Games supported:
-        * Sea Wolf II
+        * Seawolf II
         * Extra Bases
         * Space Zap
         * Wizard of Wor
         * Gorf
         * Robby Roto
         * Professor Pac-Man
-        * Demons and Dragons
+        * Demons & Dragons
         * Ten Pix Deluxe
 
     Known bugs:
-        * no audio board for Demons and Dragons
-        * Demons and Dragons doesn't work with RAM protection enabled
+        * No audio board for Demons & Dragons
+        * Demons & Dragons doesn't work with RAM protection enabled
         * Professor Pac-Man fails screen RAM test
 
 ****************************************************************************
 
     Game boards:
-        90002 = Sea Wolf II Motherboard (seawolf2)
-        90700 = Sea Wolf II Logic Board (seawolf2, ebases)
+        90002 = Seawolf II Motherboard (seawolf2)
+        90700 = Seawolf II Logic Board (seawolf2, ebases)
         91312 = Characterization Card (seawolf2)
         91354 = CPU Board (ebases, spacezap, wow, gorf, robby)
         91355 = Pattern Board (spacezap, wow, gorf, robby)
@@ -39,9 +39,9 @@
         91699 = Sound I/O Board (tenpindx)
         91846 = 640K EPROM board (profpac)
 
-    Sea Wolf II:
-        90002 = Sea Wolf II Motherboard
-        90700 = Sea Wolf II Logic Board
+    Seawolf II:
+        90002 = Seawolf II Motherboard
+        90700 = Seawolf II Logic Board
         91312 = Characterization Card
 
     Extra Bases:
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( protected_ram_w )
 
 /*************************************
  *
- *  Sea Wolf II specific input/output
+ *  Seawolf II specific input/output
  *
  *************************************/
 
@@ -456,7 +456,7 @@ static void profbank_banksw_restore(void)
 
 /*************************************
  *
- *  Demons and Dragons specific input/output
+ *  Demons & Dragons specific input/output
  *
  *************************************/
 
@@ -1772,7 +1772,7 @@ static DRIVER_INIT( tenpindx )
  *************************************/
 
 /* 90002 CPU board + 90700 game board + 91312 "characterization card" */
-GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, seawolf2, ROT0,   "Midway", "Sea Wolf II", GAME_SUPPORTS_SAVE )
+GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, seawolf2, ROT0,   "Midway", "Seawolf II", GAME_SUPPORTS_SAVE )
 
 /* 91354 CPU board + 90700 game board + 91356 RAM board */
 GAME( 1980, ebases,   0,    ebases,   ebases,   ebases,   ROT0,   "Midway", "Extra Bases", GAME_SUPPORTS_SAVE )
@@ -1785,14 +1785,14 @@ GAME( 1980, wow,      0,    wow,      wow,      wow,      ROT0,   "Midway", "Wiz
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
 GAMEL(1981, gorf,     0,    gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf", GAME_SUPPORTS_SAVE, layout_gorf  )
-GAMEL(1981, gorfpgm1, gorf, gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf (Program 1)", GAME_SUPPORTS_SAVE, layout_gorf )
+GAMEL(1981, gorfpgm1, gorf, gorf,     gorf,     gorf,     ROT270, "Midway", "Gorf (program 1)", GAME_SUPPORTS_SAVE, layout_gorf )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */
 GAME( 1981, robby,    0,    robby,    robby,    robby,    ROT0,   "Bally Midway", "Robby Roto", GAME_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91469 game board + 91466 RAM board + 91488 pattern board + 91467 memory board + 91846 EPROM board */
-GAME( 1983, profpac,  0,    profpac,  profpac,  profpac,  ROT0,   "Bally Midway", "Professor PacMan", GAME_SUPPORTS_SAVE )
+GAME( 1983, profpac,  0,    profpac,  profpac,  profpac,  ROT0,   "Bally Midway", "Professor Pac-Man", GAME_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
-GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, demndrgn, ROT0,   "Bally Midway", "Demons and Dragons (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, demndrgn, ROT0,   "Bally Midway", "Demons & Dragons (prototype)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, tenpindx, ROT0,   "Bally Midway", "Ten Pin Deluxe", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_tenpindx )
