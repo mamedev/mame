@@ -56,8 +56,8 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_RESET( offtwall )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(machine->primary_screen, atarivc_eof_data, 1);
 	atarigen_interrupt_reset(update_interrupts);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 1);
 	atarijsa_reset();
 }
 

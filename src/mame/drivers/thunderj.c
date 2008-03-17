@@ -59,8 +59,8 @@ static void update_interrupts(running_machine *machine)
 static MACHINE_RESET( thunderj )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarigen_interrupt_reset(update_interrupts);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarijsa_reset();
 
 	rom_base[0] = (UINT16 *)memory_region(REGION_CPU1);

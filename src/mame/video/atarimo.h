@@ -1,18 +1,18 @@
-/*##########################################################################
+/***************************************************************************
 
     atarimo.h
 
     Common motion object management functions for Atari raster games.
 
-##########################################################################*/
+***************************************************************************/
 
 #ifndef __ATARIMO__
 #define __ATARIMO__
 
 
-/*##########################################################################
+/***************************************************************************
     CONSTANTS
-##########################################################################*/
+***************************************************************************/
 
 /* maximum number of motion object processors */
 #define ATARIMO_MAX				2
@@ -27,21 +27,23 @@
 
 
 
-/*##########################################################################
+/***************************************************************************
     TYPES & STRUCTURES
-##########################################################################*/
+***************************************************************************/
 
 /* callback for special processing */
 typedef int (*atarimo_special_func)(bitmap_t *bitmap, const rectangle *clip, int code, int color, int xpos, int ypos, rectangle *mobounds);
 
 /* description for a four-word mask */
-struct atarimo_entry
+typedef struct _atarimo_entry atarimo_entry;
+struct _atarimo_entry
 {
 	UINT16			data[4];
 };
 
 /* description of the motion objects */
-struct atarimo_desc
+typedef struct _atarimo_desc atarimo_desc;
+struct _atarimo_desc
 {
 	UINT8				gfxindex;			/* index to which gfx system */
 	UINT8				banks;				/* number of motion object banks */
@@ -58,46 +60,47 @@ struct atarimo_desc
 	UINT16				maxcolors;			/* maximum number of colors */
 	UINT8				transpen;			/* transparent pen index */
 
-	struct atarimo_entry linkmask;			/* mask for the link */
-	struct atarimo_entry gfxmask;			/* mask for the graphics bank */
-	struct atarimo_entry codemask;			/* mask for the code index */
-	struct atarimo_entry codehighmask;		/* mask for the upper code index */
-	struct atarimo_entry colormask;			/* mask for the color */
-	struct atarimo_entry xposmask;			/* mask for the X position */
-	struct atarimo_entry yposmask;			/* mask for the Y position */
-	struct atarimo_entry widthmask;			/* mask for the width, in tiles*/
-	struct atarimo_entry heightmask;		/* mask for the height, in tiles */
-	struct atarimo_entry hflipmask;			/* mask for the horizontal flip */
-	struct atarimo_entry vflipmask;			/* mask for the vertical flip */
-	struct atarimo_entry prioritymask;		/* mask for the priority */
-	struct atarimo_entry neighbormask;		/* mask for the neighbor */
-	struct atarimo_entry absolutemask;		/* mask for absolute coordinates */
+	atarimo_entry 		linkmask;			/* mask for the link */
+	atarimo_entry 		gfxmask;			/* mask for the graphics bank */
+	atarimo_entry 		codemask;			/* mask for the code index */
+	atarimo_entry 		codehighmask;		/* mask for the upper code index */
+	atarimo_entry 		colormask;			/* mask for the color */
+	atarimo_entry 		xposmask;			/* mask for the X position */
+	atarimo_entry 		yposmask;			/* mask for the Y position */
+	atarimo_entry 		widthmask;			/* mask for the width, in tiles*/
+	atarimo_entry 		heightmask;			/* mask for the height, in tiles */
+	atarimo_entry 		hflipmask;			/* mask for the horizontal flip */
+	atarimo_entry 		vflipmask;			/* mask for the vertical flip */
+	atarimo_entry 		prioritymask;		/* mask for the priority */
+	atarimo_entry 		neighbormask;		/* mask for the neighbor */
+	atarimo_entry 		absolutemask;		/* mask for absolute coordinates */
 
-	struct atarimo_entry specialmask;		/* mask for the special value */
-	UINT16			specialvalue;		/* resulting value to indicate "special" */
-	atarimo_special_func	specialcb;			/* callback routine for special entries */
+	atarimo_entry 		specialmask;		/* mask for the special value */
+	UINT16				specialvalue;		/* resulting value to indicate "special" */
+	atarimo_special_func specialcb;			/* callback routine for special entries */
 };
 
 /* rectangle list */
-struct atarimo_rect_list
+typedef struct _atarimo_rect_list atarimo_rect_list;
+struct _atarimo_rect_list
 {
 	int					numrects;
-	rectangle *	rect;
+	rectangle *			rect;
 };
 
 
-/*##########################################################################
+/***************************************************************************
     FUNCTION PROTOTYPES
-##########################################################################*/
+***************************************************************************/
 
 /* setup/shutdown */
-void atarimo_init(running_machine *machine, int map, const struct atarimo_desc *desc);
+void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc);
 UINT16 *atarimo_get_code_lookup(int map, int *size);
 UINT8 *atarimo_get_color_lookup(int map, int *size);
 UINT8 *atarimo_get_gfx_lookup(int map, int *size);
 
 /* core processing */
-bitmap_t *atarimo_render(running_machine *machine, int map, const rectangle *cliprect, struct atarimo_rect_list *rectlist);
+bitmap_t *atarimo_render(int map, const rectangle *cliprect, atarimo_rect_list *rectlist);
 
 /* atrribute setters */
 void atarimo_set_bank(int map, int bank);
@@ -119,9 +122,9 @@ WRITE16_HANDLER( atarimo_1_slipram_w );
 
 
 
-/*##########################################################################
+/***************************************************************************
     GLOBAL VARIABLES
-##########################################################################*/
+***************************************************************************/
 
 extern UINT16 *atarimo_0_spriteram;
 extern UINT16 *atarimo_0_slipram;

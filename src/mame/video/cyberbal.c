@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_playfield2_tile_info )
 
 static void video_start_cyberbal_common(running_machine* machine, int screens)
 {
-	static const struct atarimo_desc mo0desc =
+	static const atarimo_desc mo0desc =
 	{
 		1,					/* index to which gfx system */
 		1,					/* number of motion object banks */
@@ -125,7 +125,7 @@ static void video_start_cyberbal_common(running_machine* machine, int screens)
 		0					/* callback routine for special entries */
 	};
 
-	static const struct atarimo_desc mo1desc =
+	static const atarimo_desc mo1desc =
 	{
 		1,					/* index to which gfx system */
 		1,					/* number of motion object banks */
@@ -347,7 +347,7 @@ void cyberbal_scanline_update(const device_config *screen, int scanline)
 
 static void update_one_screen(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	struct atarimo_rect_list rectlist;
+	atarimo_rect_list rectlist;
 	rectangle tempclip = *cliprect;
 	bitmap_t *mobitmap;
 	int x, y, r, mooffset, temp;
@@ -368,7 +368,7 @@ static void update_one_screen(const device_config *screen, bitmap_t *bitmap, con
 	temp = visarea->max_x;
 	if (temp > SCREEN_WIDTH)
 		visarea->max_x /= 2;
-	mobitmap = atarimo_render(screen->machine, (screen == left_screen) ? 0 : 1, cliprect, &rectlist);
+	mobitmap = atarimo_render((screen == left_screen) ? 0 : 1, cliprect, &rectlist);
 	tempclip.min_x += mooffset;
 	tempclip.max_x += mooffset;
 	visarea->max_x = temp;

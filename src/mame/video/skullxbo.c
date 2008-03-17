@@ -46,7 +46,7 @@ static TILE_GET_INFO( get_playfield_tile_info )
 
 VIDEO_START( skullxbo )
 {
-	static const struct atarimo_desc modesc =
+	static const atarimo_desc modesc =
 	{
 		0,					/* index to which gfx system */
 		2,					/* number of motion object banks */
@@ -236,7 +236,7 @@ void skullxbo_scanline_update(int scanline)
 
 VIDEO_UPDATE( skullxbo )
 {
-	struct atarimo_rect_list rectlist;
+	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
 
@@ -244,7 +244,7 @@ VIDEO_UPDATE( skullxbo )
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 
 	/* draw and merge the MO */
-	mobitmap = atarimo_render(screen->machine, 0, cliprect, &rectlist);
+	mobitmap = atarimo_render(0, cliprect, &rectlist);
 	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
 		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
 		{

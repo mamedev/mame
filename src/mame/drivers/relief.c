@@ -85,8 +85,8 @@ static WRITE16_HANDLER( relief_atarivc_w )
 static MACHINE_RESET( relief )
 {
 	atarigen_eeprom_reset();
-	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarigen_interrupt_reset(update_interrupts);
+	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 
 	OKIM6295_set_bank_base(0, 0);
 	ym2413_volume = 15;
