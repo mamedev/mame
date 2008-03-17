@@ -1,0 +1,170 @@
+<mamelayout version="2">
+	<element name="white">
+		<rect>
+			<color red="1.0" green="1.0" blue="1.0" />
+		</rect>
+	</element>
+	<element name="yellow">
+		<rect>
+			<color red="1.0" green="0.85" blue="0" />
+		</rect>
+	</element>
+	<element name="black">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
+	<element name="lamp" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.85" blue="0.0" />
+		</rect>
+	</element>
+	<element name="spacetext">
+		<text string="SPACE">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="rank">
+		<text string="SPACE RANK">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="cadet">
+		<text string="CADET">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="captain">
+		<text string="CAPTAIN">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="colonel">
+		<text string="COLONEL">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="general">
+		<text string="GENERAL">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="warrior">
+		<text string="WARRIOR">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<element name="avenger">
+		<text string="AVENGER">
+			<color red="0" green="0" blue="0" />
+		</text> 
+	</element>
+	<view name="Lamps">
+		<bounds x="-112" y="0" width="524" height="400" />
+		<screen index="0">
+			<bounds x="0" y="0" width="300" height="400" />
+		</screen>
+		<bezel element="white">
+			<bounds x="324" y="213" width="88" height="180" />
+		</bezel>
+		<bezel element="rank">
+			<bounds x="330" y="214" width="76" height="10" />
+		</bezel>
+		<bezel element="black">
+			<bounds x="328" y="227" width="38" height="50" />
+		</bezel>
+		<bezel element="black">
+			<bounds x="370" y="227" width="38" height="50" />
+		</bezel>
+		<bezel element="black">
+			<bounds x="328" y="283" width="38" height="50" />
+		</bezel>
+		<bezel element="black">
+			<bounds x="370" y="283" width="38" height="50" />
+		</bezel>
+		<bezel element="black">
+			<bounds x="328" y="339" width="38" height="50" />
+		</bezel>
+		<bezel element="black">
+			<bounds x="370" y="339" width="38" height="50" />
+		</bezel>
+		<bezel name="lamp0" element="lamp">
+            		<bounds x="332" y="234" width="30" height="36" />
+		</bezel>
+		<bezel name="lamp1" element="lamp">
+            		<bounds x="374" y="234" width="30" height="36" />
+		</bezel>
+		<bezel name="lamp2" element="lamp">
+            		<bounds x="332" y="290" width="30" height="36" />
+		</bezel>
+		<bezel name="lamp3" element="lamp">
+            		<bounds x="374" y="290" width="30" height="36" />
+		</bezel>
+		<bezel name="lamp4" element="lamp">
+            		<bounds x="332" y="346" width="30" height="36" />
+		</bezel>
+		<bezel name="lamp5" element="lamp">
+            		<bounds x="374" y="346" width="30" height="36" />
+		</bezel>
+		<bezel element="yellow">
+            		<bounds x="332" y="234" width="30" height="36" />
+			<color alpha=".5" />
+		</bezel>
+		<bezel element="yellow">
+            		<bounds x="374" y="234" width="30" height="36" />
+			<color alpha=".5" />
+		</bezel>
+		<bezel element="yellow">
+            		<bounds x="332" y="290" width="30" height="36" />
+			<color alpha=".5" />
+		</bezel>
+		<bezel element="yellow">
+            		<bounds x="374" y="290" width="30" height="36" />
+			<color alpha=".5" />
+		</bezel>
+		<bezel element="yellow">
+            		<bounds x="332" y="346" width="30" height="36" />
+			<color alpha=".5" />
+		</bezel>
+		<bezel element="yellow">
+            		<bounds x="374" y="346" width="30" height="36" />
+			<color alpha=".5" />
+		</bezel>
+		<bezel element="spacetext">
+			<bounds x="332" y="244" width="30" height="7" />
+		</bezel>
+		<bezel element="cadet">
+			<bounds x="332" y="251" width="30" height="7" />
+		</bezel>
+		<bezel element="spacetext">
+			<bounds x="374" y="244" width="30" height="7" />
+		</bezel>
+		<bezel element="captain">
+			<bounds x="374" y="251" width="30" height="7" />
+		</bezel>
+		<bezel element="spacetext">
+			<bounds x="332" y="300" width="30" height="7" />
+		</bezel>
+		<bezel element="colonel">
+			<bounds x="332" y="307" width="30" height="7" />
+		</bezel>
+		<bezel element="spacetext">
+			<bounds x="374" y="300" width="30" height="7" />
+		</bezel>
+		<bezel element="general">
+			<bounds x="374" y="307" width="30" height="7" />
+		</bezel>
+		<bezel element="spacetext">
+			<bounds x="332" y="356" width="30" height="7" />
+		</bezel>
+		<bezel element="warrior">
+			<bounds x="332" y="363" width="30" height="7" />
+		</bezel>
+		<bezel element="spacetext">
+			<bounds x="374" y="356" width="30" height="7" />
+		</bezel>
+		<bezel element="avenger">
+			<bounds x="374" y="363" width="30" height="7" />
+		</bezel>
+	</view>
+</mamelayout>

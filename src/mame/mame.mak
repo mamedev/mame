@@ -1642,7 +1642,8 @@ $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 						$(LAYOUT)/sigmapkr.lh \
 
-$(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh
+$(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
+						$(LAYOUT)/tenpindx.lh
 
 $(DRIVERS)/atarifb.o:	$(LAYOUT)/atarifb.lh \
 						$(LAYOUT)/atarifb4.lh \
