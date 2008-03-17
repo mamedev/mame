@@ -445,6 +445,12 @@ static ADDRESS_MAP_START( uballoon_pcm_1_writeport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static MACHINE_RESET(uballoon)
+{
+	uballoon_pcm_1_bankswitch_w(machine, 0, 0);
+}
+
+
 /***************************************************************************
                             Best Of Best
 ***************************************************************************/
@@ -925,6 +931,8 @@ static MACHINE_DRIVER_START( uballoon )
 	/* 2nd PCM Z80 missing */
 
 	MDRV_INTERLEAVE(100)
+
+	MDRV_MACHINE_RESET(uballoon)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

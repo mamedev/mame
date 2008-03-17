@@ -2928,6 +2928,11 @@ ADDRESS_MAP_END
                         Caliber 50 / U.S. Classic
 ***************************************************************************/
 
+static MACHINE_RESET(calibr50)
+{
+	sub_bankswitch_w(machine, 0, 0);
+}
+
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
 	soundlatch2_w(machine,0,data);
@@ -6843,6 +6848,8 @@ static MACHINE_DRIVER_START( usclssic )
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* NMI caused by main cpu when writing to the sound latch */
 
+	MDRV_MACHINE_RESET(calibr50)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -6888,6 +6895,8 @@ static MACHINE_DRIVER_START( calibr50 )
 	MDRV_CPU_PROGRAM_MAP(calibr50_sub_readmem,calibr50_sub_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* IRQ: 4/frame
                                NMI: when the 68k writes the sound latch */
+
+	MDRV_MACHINE_RESET(calibr50)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
