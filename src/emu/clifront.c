@@ -597,7 +597,7 @@ static int info_verifyroms(core_options *options, const char *gamename)
 {
 	int correct = 0;
 	int incorrect = 0;
-	int notfound = FALSE;
+	int notfound = 0;
 	int drvindex;
 
 	/* iterate over drivers */
@@ -614,12 +614,9 @@ static int info_verifyroms(core_options *options, const char *gamename)
 			if (audit_records > 0)
 				free(audit);
 
-			/* if not found, print a message and set the flag */
+			/* if not found, count that and leave it at that */
 			if (res == NOTFOUND)
-			{
-				mame_printf_error("romset \"%s\" not found!\n", drivers[drvindex]->name);
-				notfound = TRUE;
-			}
+				notfound++;
 
 			/* else display information about what we discovered */
 			else
@@ -656,10 +653,12 @@ static int info_verifyroms(core_options *options, const char *gamename)
 	/* clear out any cached files */
 	zip_file_cache_clear();
 
-	/* if we didn't get anything at all because of an unsupported set, display message */
+	/* if we didn't get anything at all, display a generic end message */
 	if (correct + incorrect == 0)
 	{
-		if (!notfound)
+		if (notfound > 0)
+			mame_printf_info("romset \"%s\" not found!\n", gamename);
+		else
 			mame_printf_info("romset \"%s\" not supported!\n", gamename);
 		return MAMERR_NO_SUCH_GAME;
 	}
