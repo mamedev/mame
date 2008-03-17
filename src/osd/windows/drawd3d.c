@@ -1238,13 +1238,21 @@ static int get_adapter_for_monitor(d3d_info *d3d, win_monitor_info *monitor)
 
 static void pick_best_mode(win_window_info *window)
 {
-	double target_refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+	const device_config *primary_screen = video_screen_first(Machine->config);
+	double target_refresh = 60.0;
 	INT32 target_width, target_height;
 	d3d_info *d3d = window->drawdata;
 	INT32 minwidth, minheight;
 	float best_score = 0.0f;
 	int maxmodes;
 	int modenum;
+
+	// determine the refresh rate of the primary screen
+	if (primary_screen != NULL)
+	{
+		const screen_config *config = primary_screen->inline_config;
+		target_refresh = ATTOSECONDS_TO_HZ(config->refresh);
+	}
 
 	// determine the minimum width/height for the selected target
 	// note: technically we should not be calling this from an alternate window

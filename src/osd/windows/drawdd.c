@@ -1291,6 +1291,7 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 
 static void pick_best_mode(win_window_info *window)
 {
+	const device_config *primary_screen = video_screen_first(Machine->config);
 	dd_info *dd = window->drawdata;
 	mode_enum_info einfo;
 	HRESULT result;
@@ -1304,7 +1305,15 @@ static void pick_best_mode(win_window_info *window)
 	// use those as the target for now
 	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);
 	einfo.target_height = einfo.minimum_height * MAX(1, video_config.prescale);
-	einfo.target_refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+
+	// determine the refresh rate of the primary screen
+	einfo.target_refresh = 60.0;
+	if (primary_screen != NULL)
+	{
+		const screen_config *config = primary_screen->inline_config;
+		einfo.target_refresh = ATTOSECONDS_TO_HZ(config->refresh);
+	}
+	printf("Target refresh = %f\n", einfo.target_refresh);
 
 	// if we're not stretching, allow some slop on the minimum since we can handle it
 	if (!video_config.hwstretch)
