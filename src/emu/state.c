@@ -249,6 +249,8 @@ void state_save_register_memory(const char *module, UINT32 instance, const char 
 	if (!ss_registration_allowed)
 	{
 		logerror("Attempt to register save state entry after state registration is closed! module %s name %s\n",module,name);
+		if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
+			fatalerror("Attempt to register save state entry after state registration is closed! module %s name %s\n",module,name);
 		ss_illegal_regs++;
 		return;
 	}
@@ -315,6 +317,8 @@ static void register_func_void(ss_func **root, void (*func)(void))
 	if (!ss_registration_allowed)
 	{
 		logerror("Attempt to register callback function after state registration is closed!");
+		if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
+			fatalerror("Attempt to register callback function after state registration is closed!");
 		ss_illegal_regs++;
 		return;
 	}
