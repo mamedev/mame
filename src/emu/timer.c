@@ -981,8 +981,8 @@ static void timer_logtimers(void)
 
 static DEVICE_START( timer )
 {
+	timer_state *state = get_safe_token(device);
 	char unique_tag[50];
-	timer_state *state;
 	timer_config *config;
 	void *param;
 
@@ -998,10 +998,6 @@ static DEVICE_START( timer )
 	assert((config->type == TIMER_TYPE_PERIODIC) || (config->type == TIMER_TYPE_SCANLINE));
 	assert(config->callback != NULL);
 
-	/* everything checks out so far, allocate the state object */
-	state = auto_malloc(sizeof(*state));
-	memset(state, 0, sizeof(*state));
-
 	/* copy the pointer parameter */
 	state->ptr = config->ptr;
 
@@ -1012,71 +1008,69 @@ static DEVICE_START( timer )
 	/* type based configuration */
 	switch (config->type)
 	{
-	case TIMER_TYPE_PERIODIC:
-		/* make sure that only the applicable parameters are filled in */
-		assert(config->screen == NULL);
-		assert(config->first_vpos == 0);
-		assert(config->increment == 0);
+		case TIMER_TYPE_PERIODIC:
+			/* make sure that only the applicable parameters are filled in */
+			assert(config->screen == NULL);
+			assert(config->first_vpos == 0);
+			assert(config->increment == 0);
 
-		/* validate that we have at least a start_delay or period */
-		assert(config->period > 0);
+			/* validate that we have at least a start_delay or period */
+			assert(config->period > 0);
 
-		/* copy the optional integer parameter */
-		state->param = config->param;
+			/* copy the optional integer parameter */
+			state->param = config->param;
 
-		/* convert the start_delay and period into attotime */
-		state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
+			/* convert the start_delay and period into attotime */
+			state->period = UINT64_ATTOTIME_TO_ATTOTIME(config->period);
 
-		if (config->start_delay > 0)
-			state->start_delay = UINT64_ATTOTIME_TO_ATTOTIME(config->start_delay);
-		else
-			state->start_delay = attotime_zero;
+			if (config->start_delay > 0)
+				state->start_delay = UINT64_ATTOTIME_TO_ATTOTIME(config->start_delay);
+			else
+				state->start_delay = attotime_zero;
 
-		/* register for state saves */
-		state_save_register_item(unique_tag, 0, state->start_delay.seconds);
-		state_save_register_item(unique_tag, 0, state->start_delay.attoseconds);
-		state_save_register_item(unique_tag, 0, state->period.seconds);
-		state_save_register_item(unique_tag, 0, state->period.attoseconds);
-		state_save_register_item(unique_tag, 0, state->param);
+			/* register for state saves */
+			state_save_register_item(unique_tag, 0, state->start_delay.seconds);
+			state_save_register_item(unique_tag, 0, state->start_delay.attoseconds);
+			state_save_register_item(unique_tag, 0, state->period.seconds);
+			state_save_register_item(unique_tag, 0, state->period.attoseconds);
+			state_save_register_item(unique_tag, 0, state->param);
 
-		/* allocate the backing timer */
-		param = (void *)device;
-		state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
+			/* allocate the backing timer */
+			param = (void *)device;
+			state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
 
-		/* finally, start the timer */
-		timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
-		break;
+			/* finally, start the timer */
+			timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
+			break;
 
-	case TIMER_TYPE_SCANLINE:
-		/* make sure that only the applicable parameters are filled in */
-		assert(config->start_delay == 0);
-		assert(config->period == 0);
-		assert(config->param == 0);
+		case TIMER_TYPE_SCANLINE:
+			/* make sure that only the applicable parameters are filled in */
+			assert(config->start_delay == 0);
+			assert(config->period == 0);
+			assert(config->param == 0);
 
-		assert(config->first_vpos >= 0);
-		assert(config->increment >= 0);
+			assert(config->first_vpos >= 0);
+			assert(config->increment >= 0);
 
-		/* allocate the backing timer */
-		param = (void *)device;
-		state->timer = timer_alloc(scanline_timer_device_timer_callback, param);
+			/* allocate the backing timer */
+			param = (void *)device;
+			state->timer = timer_alloc(scanline_timer_device_timer_callback, param);
 
-		/* indicate that this will be the first call */
-		state->first_time = TRUE;
+			/* indicate that this will be the first call */
+			state->first_time = TRUE;
 
-		/* register for state saves */
-		state_save_register_item(unique_tag, 0, state->first_time);
+			/* register for state saves */
+			state_save_register_item(unique_tag, 0, state->first_time);
 
-		/* fire it as soon as the emulation starts */
-		timer_adjust_oneshot(state->timer, attotime_zero, 0);
-		break;
+			/* fire it as soon as the emulation starts */
+			timer_adjust_oneshot(state->timer, attotime_zero, 0);
+			break;
 
-	default:
-		/* we will never get here */
-		fatalerror("Unknown timer device type");
-		break;
+		default:
+			/* we will never get here */
+			fatalerror("Unknown timer device type");
+			break;
 	}
-
-	return state;
 }
 
 
@@ -1102,6 +1096,7 @@ DEVICE_GET_INFO( timer )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(timer_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(timer_config);			break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_TIMER;			break;
 

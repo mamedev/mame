@@ -639,19 +639,15 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 
 
 /* device interface */
-static void *common_start(const device_config *device, int device_type)
+static void common_start(const device_config *device, int device_type)
 {
-	mc6845_t *mc6845;
+	mc6845_t *mc6845 = get_safe_token(device);
 	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
-
-	/* allocate the object that holds the state */
-	mc6845 = auto_malloc(sizeof(*mc6845));
-	memset(mc6845, 0, sizeof(*mc6845));
 
 	mc6845->intf = device->static_config;
 	mc6845->device_type = device_type;
@@ -708,43 +704,41 @@ static void *common_start(const device_config *device, int device_type)
 	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
-
-	return mc6845;
 }
 
 static DEVICE_START( mc6845 )
 {
-	return common_start(device, TYPE_MC6845);
+	common_start(device, TYPE_MC6845);
 }
 
 static DEVICE_START( mc6845_1 )
 {
-	return common_start(device, TYPE_MC6845_1);
+	common_start(device, TYPE_MC6845_1);
 }
 
 static DEVICE_START( c6545_1 )
 {
-	return common_start(device, TYPE_C6545_1);
+	common_start(device, TYPE_C6545_1);
 }
 
 static DEVICE_START( r6545_1 )
 {
-	return common_start(device, TYPE_R6545_1);
+	common_start(device, TYPE_R6545_1);
 }
 
 static DEVICE_START( h46505 )
 {
-	return common_start(device, TYPE_H46505);
+	common_start(device, TYPE_H46505);
 }
 
 static DEVICE_START( hd6845 )
 {
-	return common_start(device, TYPE_HD6845);
+	common_start(device, TYPE_HD6845);
 }
 
 static DEVICE_START( sy6545_1 )
 {
-	return common_start(device, TYPE_SY6545_1);
+	common_start(device, TYPE_SY6545_1);
 }
 
 
@@ -783,6 +777,7 @@ DEVICE_GET_INFO( mc6845 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc6845_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 

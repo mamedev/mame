@@ -378,7 +378,7 @@ void video_init(running_machine *machine)
 static screen_state *screen_init(const device_config *screen)
 {
 	char unique_tag[40];
-	screen_state *state;
+	screen_state *state = get_safe_token(screen);
 	render_container *container;
 	screen_config *config;
 
@@ -404,10 +404,6 @@ static screen_state *screen_init(const device_config *screen)
 	assert(config->visarea.min_y >= 0);
 	assert((config->visarea.max_y < config->height) || (config->type == SCREEN_TYPE_VECTOR));
 	assert(config->visarea.max_y > config->visarea.min_y);
-
-	/* everything checks out, allocate the state object */
-	state = auto_malloc(sizeof(*state));
-	memset(state, 0, sizeof(*state));
 
 	/* allocate the VBLANK timers */
 	state->vblank_begin_timer = timer_alloc(vblank_begin_callback, (void *)screen);
@@ -1248,7 +1244,7 @@ void video_screen_register_vblank_callback(const device_config *screen, vblank_s
 
 static DEVICE_START( video_screen )
 {
-	return screen_init(device);
+	screen_init(device);
 }
 
 
@@ -1276,6 +1272,7 @@ DEVICE_GET_INFO( video_screen )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(screen_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(screen_config);		break;
 		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 

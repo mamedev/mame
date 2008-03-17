@@ -471,18 +471,24 @@ void device_list_start(running_machine *machine)
 	/* iterate over devices and start them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
+		UINT32 tokenlen;
+		
 		assert(device->token == NULL);
 		assert(device->type != NULL);
 		assert(device->start != NULL);
 
+		/* get the size of the token data */
+		tokenlen = (UINT32)devtype_get_info_int(device->type, DEVINFO_INT_TOKEN_BYTES);
+		if (tokenlen == 0)
+			fatalerror("Device %s specifies a 0 token length!\n", devtype_name(device->type));
+
+		/* allocate memory for the token */
+		device->token = malloc_or_die(tokenlen);
+		memset(device->token, 0, tokenlen);
+
 		/* call the start function */
 		device->machine = machine;
-		device->token = (*device->start)(device);
-		assert(device->token != NULL);
-
-		/* fatal error if this fails */
-		if (device->token == NULL)
-			fatalerror("Error starting device: type=%s tag=%s\n", devtype_name(device->type), device->tag);
+		(*device->start)(device);
 	}
 }
 
@@ -507,8 +513,10 @@ static void device_list_stop(running_machine *machine)
 		/* if we have a stop function, call it */
 		if (device->stop != NULL)
 			(*device->stop)(device);
-
-		/* clear the token to indicate we are finished */
+		
+		/* free allocated memory for the token */
+		if (device->token != NULL)
+			free(device->token);
 		device->token = NULL;
 		device->machine = NULL;
 	}

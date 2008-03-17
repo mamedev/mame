@@ -46,7 +46,8 @@ enum
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
 	DEVINFO_INT_FIRST = 0x00000,
 
-	DEVINFO_INT_INLINE_CONFIG_BYTES = DEVINFO_INT_FIRST,/* R/O: bytes of inline configuration */
+	DEVINFO_INT_TOKEN_BYTES = DEVINFO_INT_FIRST,		/* R/O: bytes to allocate for the token */
+	DEVINFO_INT_INLINE_CONFIG_BYTES,					/* R/O: bytes to allocate for the inline configuration */
 	DEVINFO_INT_CLASS,									/* R/O: the device's class */
 
 	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
@@ -101,7 +102,7 @@ enum
 #define DEVICE_SET_INFO_CALL(name)	DEVICE_SET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_START_NAME(name)		device_start_##name
-#define DEVICE_START(name)			void *DEVICE_START_NAME(name)(const device_config *device)
+#define DEVICE_START(name)			void DEVICE_START_NAME(name)(const device_config *device)
 #define DEVICE_START_CALL(name)		DEVICE_START_NAME(name)(device)
 
 #define DEVICE_STOP_NAME(name)		device_stop_##name
@@ -126,7 +127,7 @@ typedef struct _device_config device_config;
 /* device interface function types */
 typedef void (*device_get_info_func)(const device_config *device, UINT32 state, deviceinfo *info);
 typedef void (*device_set_info_func)(const device_config *device, UINT32 state, const deviceinfo *info);
-typedef void *(*device_start_func)(const device_config *device);
+typedef void (*device_start_func)(const device_config *device);
 typedef void (*device_stop_func)(const device_config *device);
 typedef void (*device_reset_func)(const device_config *device);
 

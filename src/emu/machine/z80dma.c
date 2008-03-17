@@ -407,17 +407,13 @@ void z80dma_rdy_write(z80dma_t *z80dma, int state)
 
 static DEVICE_START( z80dma )
 {
-	z80dma_t *z80dma;
+	z80dma_t *z80dma = device->token;
 	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
 	assert(strlen(device->tag) < 20);
-
-	/* allocate the object that holds the state */
-	z80dma = auto_malloc(sizeof(*z80dma));
-	memset(z80dma, 0, sizeof(*z80dma));
 
 	//z80dma->device_type = device_type;
 	z80dma->machine = device->machine;
@@ -442,8 +438,6 @@ static DEVICE_START( z80dma )
 	state_save_register_item(unique_tag, 0, z80dma->is_read);
 	state_save_register_item(unique_tag, 0, z80dma->cur_cycle);
 	state_save_register_item(unique_tag, 0, z80dma->latch);
-
-	return z80dma;
 }
 
 static DEVICE_RESET( z80dma )
@@ -472,6 +466,7 @@ DEVICE_GET_INFO( z80dma )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(z80dma_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
 

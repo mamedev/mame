@@ -128,6 +128,21 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 ***************************************************************************/
 
 /*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, a timer
+-------------------------------------------------*/
+
+INLINE speaker_info *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == SPEAKER_OUTPUT);
+
+	return (speaker_info *)device->token;
+}
+
+
+/*-------------------------------------------------
     find_speaker_by_tag - find a tagged speaker
 -------------------------------------------------*/
 
@@ -787,16 +802,11 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 
 static DEVICE_START( speaker_output )
 {
-	speaker_info *info;
-
-	/* allocate memory for the speaker information */
-	info = auto_malloc(sizeof(*info));
-	memset(info, 0, sizeof(*info));
+	speaker_info *info = device->token;
 
 	/* copy in all the relevant info */
 	info->speaker = device->inline_config;
 	info->tag = device->tag;
-	return info;
 }
 
 
@@ -841,6 +851,7 @@ DEVICE_GET_INFO( speaker_output )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(speaker_info);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(speaker_config);		break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_AUDIO;			break;
 
