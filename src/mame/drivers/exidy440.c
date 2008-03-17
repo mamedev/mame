@@ -215,7 +215,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "exidy440.h"
 
 
@@ -343,7 +342,7 @@ static WRITE8_HANDLER( bankram_w )
 static READ8_HANDLER( exidy440_input_port_3_r )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	return readinputport(3);
 }
 
@@ -364,7 +363,7 @@ static READ8_HANDLER( sound_command_ack_r )
 
 static TIMER_CALLBACK( delayed_sound_command_w )
 {
-	*exidy440_sound_command = param;
+	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
 
 	/* cause an FIRQ on the sound CPU */
@@ -381,7 +380,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( exidy440_input_port_3_w )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -476,7 +475,7 @@ static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(&exidy440_scanline)
 	AM_RANGE(0x2b03, 0x2b03) AM_READWRITE(input_port_0_r, exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
-	AM_RANGE(0x2e00, 0x2e1f) AM_READWRITE(SMH_RAM, sound_command_w) AM_BASE(&exidy440_sound_command)
+	AM_RANGE(0x2e00, 0x2e1f) AM_READWRITE(SMH_RAM, sound_command_w)
 	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
 	AM_RANGE(0x2e40, 0x2e5f) AM_READWRITE(SMH_NOP, exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
 	AM_RANGE(0x2e60, 0x2e7f) AM_READWRITE(input_port_1_r, SMH_NOP)

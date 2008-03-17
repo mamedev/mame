@@ -17,8 +17,8 @@ void exidy440_bank_select(UINT8 bank);
 
 /*----------- defined in audio/exidy440.c -----------*/
 
-extern UINT8 *exidy440_sound_command;
-extern UINT8  exidy440_sound_command_ack;
+extern UINT8 exidy440_sound_command;
+extern UINT8 exidy440_sound_command_ack;
 
 MACHINE_DRIVER_EXTERN( exidy440_audio );
 

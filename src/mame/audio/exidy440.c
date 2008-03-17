@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "exidy440.h"
 
 
@@ -73,8 +72,8 @@ typedef struct sound_cache_entry
 
 
 /* globals */
-UINT8 *exidy440_sound_command;
-UINT8  exidy440_sound_command_ack;
+UINT8 exidy440_sound_command;
+UINT8 exidy440_sound_command_ack;
 
 /* local allocated storage */
 static UINT8 *sound_banks;
@@ -136,8 +135,9 @@ static void *exidy440_sh_start(int clock, const struct CustomSound_interface *co
 	int i, length;
 
 	/* reset the system */
-	*exidy440_sound_command = 0;
+	exidy440_sound_command = 0;
 	exidy440_sound_command_ack = 1;
+	state_save_register_global(exidy440_sound_command);
 	state_save_register_global(exidy440_sound_command_ack);
 
 	/* reset the 6844 */
@@ -339,10 +339,10 @@ static void channel_update(void *param, stream_sample_t **inputs, stream_sample_
 static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	cpunum_set_input_line(Machine, 1, 1, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 1, CLEAR_LINE);
 	exidy440_sound_command_ack = 1;
 
-	return *exidy440_sound_command;
+	return exidy440_sound_command;
 }
 
 
@@ -375,7 +375,7 @@ static WRITE8_HANDLER( sound_volume_w )
 
 static WRITE8_HANDLER( sound_interrupt_clear_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 

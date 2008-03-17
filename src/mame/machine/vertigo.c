@@ -11,6 +11,8 @@
 #include "machine/74148.h"
 #include "machine/pit8253.h"
 
+
+
 /*************************************
  *
  *  Prototypes
@@ -20,6 +22,7 @@
 static void v_irq4_w(int level);
 static void v_irq3_w(int level);
 static void update_irq(void);
+
 
 
 /*************************************
@@ -60,10 +63,12 @@ static const struct pit8253_config pit8254_config =
 	}
 };
 
+
 static const struct TTL74148_interface irq_encoder =
 {
 	update_irq
 };
+
 
 
 /*************************************
@@ -85,11 +90,13 @@ static void update_irq(void)
 		cpunum_set_input_line(Machine, 0, irq_state ^ 7, ASSERT_LINE);
 }
 
+
 static void update_irq_encoder(int line, int state)
 {
 	TTL74148_input_line_w(0, line, !state);
 	TTL74148_update(0);
 }
+
 
 static void v_irq4_w(int level)
 {
@@ -98,6 +105,7 @@ static void v_irq4_w(int level)
 	irq4_time = timer_get_time();
 }
 
+
 static void v_irq3_w(int level)
 {
 	if (level)
@@ -105,6 +113,7 @@ static void v_irq3_w(int level)
 
 	update_irq_encoder(INPUT_LINE_IRQ3, level);
 }
+
 
 
 /*************************************
@@ -124,11 +133,13 @@ READ16_HANDLER( vertigo_io_convert )
 	return 0;
 }
 
+
 READ16_HANDLER( vertigo_io_adc )
 {
 	update_irq_encoder(INPUT_LINE_IRQ2, CLEAR_LINE);
 	return adc_result;
 }
+
 
 READ16_HANDLER( vertigo_coin_r )
 {
@@ -136,12 +147,14 @@ READ16_HANDLER( vertigo_coin_r )
 	return (readinputportbytag("COIN"));
 }
 
+
 INTERRUPT_GEN( vertigo_interrupt )
 {
 	/* Coin inputs cause IRQ6 */
 	if ((readinputportbytag("COIN") & 0x7) < 0x7)
 		update_irq_encoder(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
+
 
 
 /*************************************
@@ -159,9 +172,10 @@ WRITE16_HANDLER( vertigo_wsot_w )
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
+
 static TIMER_CALLBACK( sound_command_w )
 {
-	*exidy440_sound_command = param;
+	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
 	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, ASSERT_LINE);
 
@@ -172,11 +186,13 @@ static TIMER_CALLBACK( sound_command_w )
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
+
 WRITE16_HANDLER( vertigo_audio_w )
 {
 	if (ACCESSING_LSB)
 		timer_call_after_resynch(NULL, data & 0xff, sound_command_w);
 }
+
 
 READ16_HANDLER( vertigo_sio_r )
 {
@@ -185,6 +201,8 @@ READ16_HANDLER( vertigo_sio_r )
 	else
 		return 0xfd;
 }
+
+
 
 /*************************************
  *
@@ -216,6 +234,7 @@ MACHINE_RESET( vertigo )
 }
 
 
+
 /*************************************
  *
  *  Motor controller interface
@@ -226,4 +245,3 @@ WRITE16_HANDLER( vertigo_motor_w )
 {
 	/* Motor controller interface. Not emulated. */
 }
-
