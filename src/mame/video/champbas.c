@@ -1,15 +1,9 @@
-/***************************************************************************
-
-  video.c
-
-  Functions to emulate the video hardware of the machine.
-
-***************************************************************************/
-
 #include "driver.h"
 #include "video/resnet.h"
 
-static UINT8 gfxbank;
+UINT8 *champbas_bg_videoram;
+
+static UINT8 gfx_bank;
 static UINT8 palette_bank;
 
 static tilemap *bg_tilemap;
@@ -46,7 +40,7 @@ PALETTE_INIT( champbas )
 			2, &resistances_b[0],  bweights, 0, 0);
 
 	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 32);
+	machine->colortable = colortable_alloc(machine, 0x20);
 
 	/* create a lookup table for the palette */
 	for (i = 0; i < 0x20; i++)
@@ -74,10 +68,8 @@ PALETTE_INIT( champbas )
 		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 32;
+	color_prom += 0x20;
 
-	/* character lookup table - sprites use the same color lookup table as characters */
 	for (i = 0; i < 0x200; i++)
 	{
 		UINT8 ctabentry = ((i & 0x100) >> 4) | (color_prom[i & 0xff] & 0x0f);
@@ -85,81 +77,98 @@ PALETTE_INIT( champbas )
 	}
 }
 
-WRITE8_HANDLER( champbas_videoram_w )
+
+
+
+static TILE_GET_INFO( get_bg_tile_info )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	int code = champbas_bg_videoram[tile_index] | (gfx_bank << 8);
+	int color = (champbas_bg_videoram[tile_index + 0x400] & 0x1f) | 0x20 | (palette_bank << 6);
+
+	SET_TILE_INFO(0, code, color, 0);
 }
 
-WRITE8_HANDLER( champbas_colorram_w )
+
+
+VIDEO_START( champbas )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+
+	// talbot has only 1 bank
+	gfx_bank = 0;
+	palette_bank = 0;
+}
+
+
+
+
+WRITE8_HANDLER( champbas_bg_videoram_w )
+{
+	champbas_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset & 0x3ff);
 }
 
 WRITE8_HANDLER( champbas_gfxbank_w )
 {
-	if (gfxbank != (data & 0x01))
+	data &= 1;
+	if (gfx_bank != data)
 	{
-		gfxbank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		gfx_bank = data;
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 }
 
 WRITE8_HANDLER( champbas_palette_bank_w )
 {
-	if (palette_bank != (data & 0x01))
+	data &= 1;
+	if (palette_bank != data)
 	{
-		palette_bank = data & 0x01;
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
+		palette_bank = data;
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 }
 
 WRITE8_HANDLER( champbas_flipscreen_w )
 {
-	if (flip_screen_get() != data)
-	{
-		flip_screen_set(data);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	}
+	flip_screen_set(~data & 1);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
-{
-	int code = videoram[tile_index];
-	int color = (palette_bank << 6) | 0x20 | (colorram[tile_index] & 0x1f);
 
-	SET_TILE_INFO(gfxbank, code, color, 0);
-}
-
-VIDEO_START( champbas )
-{
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
-}
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
+	const gfx_element* const gfx = machine->gfx[1];
 
 	for (offs = spriteram_size - 2; offs >= 0; offs -= 2)
 	{
-		int code = spriteram[offs] >> 2;
-		int color = (palette_bank << 6) | (spriteram[offs + 1] & 0x3f);
-		int flipx = spriteram[offs] & 0x01;
-		int flipy = spriteram[offs] & 0x02;
-		int sx = ((256 + 16 - spriteram_2[offs + 1]) & 0xff) - 16;
-		int sy = spriteram_2[offs] - 16;
+		int code = (spriteram[offs] >> 2) | (gfx_bank << 6);
+		int color = (spriteram[offs + 1] & 0x1f) | (palette_bank << 6);
+		int flipx = ~spriteram[offs] & 0x01;
+		int flipy = ~spriteram[offs] & 0x02;
+		int sx = spriteram_2[offs + 1] - 16;
+		int sy = 255 - spriteram_2[offs];
 
-		drawgfx(bitmap,
-			machine->gfx[2 + gfxbank],
-			code, color,
-			flipx, flipy,
-			sx, sy,
-			cliprect,
-			TRANSPARENCY_PENS,
-			colortable_get_transpen_mask(machine->colortable, machine->gfx[2 + gfxbank], color, 0));
+		drawgfx(bitmap, gfx,
+				code, color,
+				flipx, flipy,
+				sx, sy,
+				cliprect,
+				TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, gfx, color, 0));
+
+		// wraparound
+		drawgfx(bitmap, gfx,
+				code, color,
+				flipx, flipy,
+				sx + 256, sy,
+				cliprect,
+				TRANSPARENCY_PENS,
+				colortable_get_transpen_mask(machine->colortable, gfx, color, 0));
 	}
 }
+
+
 
 VIDEO_UPDATE( champbas )
 {

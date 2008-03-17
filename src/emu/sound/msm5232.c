@@ -5,6 +5,8 @@
 
 #include "msm5232.h"
 
+#define CLOCK_RATE_DIVIDER 16
+
 /*
     OKI MSM5232RS
     8 channel tone generator
@@ -34,6 +36,8 @@ typedef struct {
 	double	rr_rate;
 
 	int	pitch;			/* current pitch data */
+
+	int GF;
 } VOICE;
 
 
@@ -61,10 +65,13 @@ typedef struct {
 	UINT8   control1;
 	UINT8   control2;
 
+	int		gate;		/* current state of the GATE output */
+
 	int		clock;		/* chip clock in Hz */
 	int		rate;		/* sample rate in Hz */
 
 	double	external_capacity[8]; /* in Farads, eg 0.39e-6 = 0.36 uF (microFarads) */
+	void (*gate_handler)(int state);	/* callback called when the GATE output pin changes state */
 
 } MSM5232;
 
@@ -246,6 +253,18 @@ static void msm5232_init_voice(MSM5232 *chip, int i)
 static void msm5232_write(MSM5232 *chip, int ofst, int data);
 
 
+static void msm5232_gate_update(MSM5232 *chip)
+{
+	int new_state = (chip->control2 & 0x20) ? chip->voi[7].GF : 0;
+
+	if (chip->gate != new_state && chip->gate_handler)
+	{
+		chip->gate = new_state;
+		(*chip->gate_handler)(new_state);
+	}
+}
+
+
 static void msm5232_reset(void *_chip)
 {
 	MSM5232 *chip = _chip;
@@ -272,6 +291,7 @@ static void msm5232_reset(void *_chip)
 	chip->EN_out4[1]	= 0;
 	chip->EN_out2[1]	= 0;
 
+	msm5232_gate_update(chip);
 }
 
 static void msm5232_init(MSM5232 *chip, const struct MSM5232interface *intf, int clock, int rate)
@@ -285,6 +305,8 @@ static void msm5232_init(MSM5232 *chip, const struct MSM5232interface *intf, int
 	{
 		chip->external_capacity[j] = intf->capacity[j];
 	}
+
+	chip->gate_handler = intf->gate_handler;
 
 	msm5232_init_tables( chip );
 
@@ -321,6 +343,11 @@ static void msm5232_write(MSM5232 *chip, int ofst, int data)
 	if (ofst < 0x08) /* pitch */
 	{
 		int ch = ofst&7;
+
+		chip->voi[ch].GF = ((data&0x80)>>7);
+		if (ch == 7)
+			msm5232_gate_update(chip);
+
 		if(data&0x80)
 		{
 			if(data >= 0xd8)
@@ -355,7 +382,6 @@ static void msm5232_write(MSM5232 *chip, int ofst, int data)
 
 					n = (n>0)? n-1: 0;
 					chip->voi[ch].TG_out2  = 1<<n;
-
 				}
 				chip->voi[ch].mode = 0;		/* tone mode */
 				chip->voi[ch].eg_sect = 0;	/* Key On */
@@ -363,10 +389,10 @@ static void msm5232_write(MSM5232 *chip, int ofst, int data)
 		}
 		else
 		{
-				if ( !chip->voi[ch].eg_arm )	/* arm = 0 */
-					chip->voi[ch].eg_sect = 2;	/* Key Off -> go to release */
-				else							/* arm = 1 */
-					chip->voi[ch].eg_sect = 1;	/* Key Off -> go to decay */
+			if ( !chip->voi[ch].eg_arm )	/* arm = 0 */
+				chip->voi[ch].eg_sect = 2;	/* Key Off -> go to release */
+			else							/* arm = 1 */
+				chip->voi[ch].eg_sect = 1;	/* Key Off -> go to decay */
 		}
 	}
 	else
@@ -423,6 +449,7 @@ static void msm5232_write(MSM5232 *chip, int ofst, int data)
                 popmessage("msm5232: control2 ctrl=%2x\n", data);*/
 
 			chip->control2 = data;
+			msm5232_gate_update(chip);
 
 			for (i=0; i<4; i++)
 				chip->voi[i+4].eg_arm = data&0x10;
@@ -543,14 +570,14 @@ INLINE void EG_voices_advance(MSM5232 *chip)
 
 }
 
-static int o2,o4,o8,o16;
+static int o2,o4,o8,o16,solo8,solo16;
 
 INLINE void TG_group_advance(MSM5232 *chip, int groupidx)
 {
 	VOICE *voi = &chip->voi[groupidx*4];
 	int i;
 
-	o2 = o4 = o8 = o16 = 0;
+	o2 = o4 = o8 = o16 = solo8 = solo16 = 0;
 
 	i=4;
 	do
@@ -614,6 +641,13 @@ INLINE void TG_group_advance(MSM5232 *chip, int groupidx)
 		o8  += ( (out8 -(1<<(STEP_SH-1))) * voi->egvol) >> STEP_SH;
 		o4  += ( (out4 -(1<<(STEP_SH-1))) * voi->egvol) >> STEP_SH;
 		o2  += ( (out2 -(1<<(STEP_SH-1))) * voi->egvol) >> STEP_SH;
+
+		if (i == 1 && groupidx == 1)
+		{
+			solo16 += ( (out16-(1<<(STEP_SH-1))) << 11) >> STEP_SH;
+			solo8  += ( (out8 -(1<<(STEP_SH-1))) << 11) >> STEP_SH;
+		}
+
 		voi++;
 		i--;
 	}while (i>0);
@@ -670,34 +704,41 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 	MSM5232 * chip = param;
 	stream_sample_t *buf1 = buffer[0];
 	stream_sample_t *buf2 = buffer[1];
+	stream_sample_t *buf3 = buffer[2];
+	stream_sample_t *buf4 = buffer[3];
+	stream_sample_t *buf5 = buffer[4];
+	stream_sample_t *buf6 = buffer[5];
+	stream_sample_t *buf7 = buffer[6];
+	stream_sample_t *buf8 = buffer[7];
+	stream_sample_t *bufsolo1 = buffer[8];
+	stream_sample_t *bufsolo2 = buffer[9];
 	int i;
 
 	for (i=0; i<samples; i++)
 	{
-		int out;
-
 		/* calculate all voices' envelopes */
 		EG_voices_advance(chip);
 
 		TG_group_advance(chip,0);	/* calculate tones group 1 */
-		out = (o2+o4+o8+o16);
-		if (out>32767)
-			out = 32767;
-		else if (out<-32768)
-			out = -32768;
-		buf1[i] = out;				/* should be 4 separate outputs */
+		buf1[i] = o2;
+		buf2[i] = o4;
+		buf3[i] = o8;
+		buf4[i] = o16;
+
 		SAVE_SINGLE_CHANNEL(0,o2)
 		SAVE_SINGLE_CHANNEL(1,o4)
 		SAVE_SINGLE_CHANNEL(2,o8)
 		SAVE_SINGLE_CHANNEL(3,o16)
 
 		TG_group_advance(chip,1);	/* calculate tones group 2 */
-		out = (o2+o4+o8+o16);
-		if (out>32767)
-			out = 32767;
-		else if (out<-32768)
-			out = -32768;
-		buf2[i] = out;				/* should be 4 separate outputs */
+		buf5[i] = o2;
+		buf6[i] = o4;
+		buf7[i] = o8;
+		buf8[i] = o16;
+
+		bufsolo1[i] = solo8;
+		bufsolo2[i] = solo16;
+
 		SAVE_SINGLE_CHANNEL(4,o2)
 		SAVE_SINGLE_CHANNEL(5,o4)
 		SAVE_SINGLE_CHANNEL(6,o8)
@@ -714,7 +755,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 				int tmp = chip->noise_rng & (1<<16);		/* store current level */
 
 				if (chip->noise_rng&1)
-					chip->noise_rng ^= 0x28000;
+					chip->noise_rng ^= 0x24000;
 				chip->noise_rng>>=1;
 
 				if ( (chip->noise_rng & (1<<16)) != tmp )	/* level change detect */
@@ -733,7 +774,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 static void *msm5232_start(int sndindex, int clock, const void *config)
 {
 	const struct MSM5232interface *intf = config;
-	int rate = clock/16;
+	int rate = clock/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip;
 
 	chip = auto_malloc(sizeof(*chip));
@@ -741,7 +782,7 @@ static void *msm5232_start(int sndindex, int clock, const void *config)
 
 	msm5232_init(chip, intf, clock, rate);
 
-	chip->stream = stream_create(0,2,rate,chip,MSM5232_update_one);
+	chip->stream = stream_create(0,10,rate,chip,MSM5232_update_one);
 	return chip;
 }
 
@@ -764,6 +805,19 @@ WRITE8_HANDLER ( MSM5232_1_w )
 	msm5232_write(chip, offset, data);
 }
 
+void msm5232_set_clock(void *_chip, int clock)
+{
+	MSM5232 *chip = _chip;
+
+	if (chip->clock != clock)
+	{
+		stream_update (chip->stream);
+		chip->clock = clock;
+		chip->rate = clock/CLOCK_RATE_DIVIDER;
+		msm5232_init_tables( chip );
+		stream_set_sample_rate(chip->stream, chip->rate);
+	}
+}
 
 
 
@@ -794,8 +848,8 @@ void msm5232_get_info(void *token, UINT32 state, sndinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "MSM5232";					break;
-		case SNDINFO_STR_CORE_FAMILY:					info->s = "ADPCM";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
+		case SNDINFO_STR_CORE_FAMILY:					info->s = "Oki Tone";					break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}

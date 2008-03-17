@@ -22,17 +22,35 @@ The game supports Coin 2, but the dip switches used for it are the same
 as Coin 1. Basically, this allowed to select an alternative coin table
 based on wich Coin input was connected.
 
+The Kazutomi bootleg board is a conversion from Champion Baseball:
+Alpha denshi co. LTD made in Japan
+cpu board 58AS1
+Display board 58AS2
+Voice board 58AS3
+KAZUTOMI board
+1x Alpha8201 (CPU board)
+1x AY-3-8910 (CPU board)
+1x Sharp Z80ACPU (CPU board)
+1x Sharp Z80ACPU (VOICE board)
+3x 2764 (CPU board) (1-2-3)
+3x 2764 (VOICE board) (a-b-c)
+2x 2764 (DISPLAY board) (4-5)
+1x 2764 (daughter board kazutomi) (6)
+2x 2732 (daughter board kazutomi) (7-8)
+
+TODO:
+- interrupt source for sound CPU is unknown.
+
+- sound CPU writes to unknown ports on startup. Timer configure?
+
+- unknown writes to 8910 I/O ports (filters?)
+
 ***************************************************************************/
 
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
-/* MCU hacking switch */
-/*  when set 1, old raw patch */
-/*  when set 0, uses MCU core emulation and some MCU patch */
-#define MCU_HACK 0
 
 /* from video */
 extern WRITE8_HANDLER( exctsccr_videoram_w );
@@ -44,13 +62,17 @@ extern PALETTE_INIT( exctsccr );
 extern VIDEO_START( exctsccr );
 extern VIDEO_UPDATE( exctsccr );
 
-/* from machine */
-#if MCU_HACK
-extern UINT8 *exctsccr_mcu_ram;
-extern WRITE8_HANDLER( exctsccr_mcu_w );
-extern WRITE8_HANDLER( exctsccr_mcu_control_w );
-extern WRITE8_HANDLER( exctscc2_mcu_control_w );
-#endif
+
+static TIMER_CALLBACK( exctsccr_fm_callback )
+{
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+}
+
+static MACHINE_START( exctsccr )
+{
+	// FIXME
+	timer_pulse(ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
+}
 
 
 static WRITE8_HANDLER( exctsccr_DAC_data_w )
@@ -58,80 +80,10 @@ static WRITE8_HANDLER( exctsccr_DAC_data_w )
 	DAC_signed_data_w(offset,data << 2);
 }
 
-/*
-exctsccr MCU program patch data
-*/
-static const int exctsccr_mcu_patch_data[] =
+
+static WRITE8_HANDLER( exctsccr_mcu_halt_w )
 {
-/*
-bypass ROM sum error because some opcodes are unknown yet
-3B7: F6      db   f6
-3BA: F6      db   f6
-3BC: F9      db   f9
-3BD: F6      db   f6
-3C1: F6      db   f6
-3C7: F8      db   f8 ; check SUM to ZF
-*/
-  (0x3c8<<16) | (0xd1<<8) | 0xd2, // JZ -> JMP
-  -1
-};
-
-/*
-exctscc2 MCU program patch data
-*/
-static const int exctscc2_mcu_patch_data[] =
-{
-/*
-bypass initislize check
-
-307: D5 01 unknown
-309: D4 00 unknown
-A reg 2 to 5
-
-30F: D4 01 unknown
-A reg 5 to 2
-
-*/
-  (0x30d<<16) | (0xcf<<8) | 0xda, // JNZ -> CMP
-  (0x313<<16) | (0xcf<<8) | 0xda, // JNZ -> CMP
-/*
-bypass ROM check sum
-3B7: F6      db   f6
-3BA: F6      db   f6
-3BC: F9      db   f9
-3BD: F6      db   f6
-3C1: F6      db   f6
-3C7: F8      db   f8
-*/
-  (0x3C8<<16) | (0xd1<<8) | 0xd2, // JZ -> JMP
-  -1
-};
-
-static const int *mcu_patch_data = NULL;
-static UINT8 *mcu_shared_ram;
-static WRITE8_HANDLER( cexctsccr_mcu_halt_w )
-{
-#if MCU_HACK
-	exctsccr_mcu_control_w(offset,data&1);
-#else
-	const int *p;
-
-	data &= 1;
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
-	if( (p=mcu_patch_data) != NULL)
-	{
-		/* patch MCU program */
-		while(*p != -1)
-		{
-			int a = (*p)>>16;
-			int c = ((*p)>>8) & 0xff;
-			int d = (*p)&0xff;
-			if(mcu_shared_ram[a] == c)
-				mcu_shared_ram[a] = d;
-			p++;
-		}
-	}
-#endif
+	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /***************************************************************************
@@ -142,42 +94,38 @@ static WRITE8_HANDLER( cexctsccr_mcu_halt_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-#if MCU_HACK
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(exctsccr_mcu_w) AM_READ(SMH_RAM) AM_BASE(&exctsccr_mcu_ram) /* Alpha mcu (protection) */
-#else
-	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) AM_BASE(&mcu_shared_ram)
-#endif
+	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(exctsccr_videoram_w) AM_READ(SMH_RAM) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(exctsccr_colorram_w) AM_READ(SMH_RAM) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(SMH_RAM) AM_READ(SMH_RAM) AM_BASE(&spriteram_2) /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(SMH_NOP) /* ??? */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(exctsccr_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_WRITE(exctsccr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
+	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* ??? toggled twice at end of irq handler */
+//	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(exctsccr_gfx_bank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w) /* Cocktail mode ( 0xff = flip screen, 0x00 = normal ) */
-	/* 0xa006 MCU control */
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(cexctsccr_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP) /* This is also MCU control, but i dont need it */
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(exctsccr_mcu_halt_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
 	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) /* Sprite pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
 
 	AM_RANGE(0xa040, 0xa040) AM_READ(input_port_1_r)
-	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_3_r)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ(input_port_2_r)
+	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_2_r)	// FIXME use champbas_dsw_r
+	AM_RANGE(0xa0c0, 0xa0c0) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc008, 0xc009) AM_WRITE(exctsccr_DAC_data_w)
-	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_w) /* used to clear the latch */
+	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_r)
-	AM_RANGE(0xc00f, 0xc00f) AM_WRITE(SMH_NOP) /* ??? */
+//	AM_RANGE(0xc00f, 0xc00f) AM_WRITE(MWA8_NOP) /* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x82, 0x82) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x86, 0x86) AM_WRITE(AY8910_write_port_1_w)
@@ -188,52 +136,45 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(AY8910_control_port_3_w)
 ADDRESS_MAP_END
 
-/* Bootleg */
-static ADDRESS_MAP_START( bl_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8400, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8fff) AM_READ(SMH_RAM) /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa040, 0xa040) AM_READ(input_port_1_r)
-	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_3_r)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_READ(input_port_2_r)
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1) /* main CPU shared RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bl_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
+
+/* Bootleg */
+static ADDRESS_MAP_START( bl_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(exctsccr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITE(exctsccr_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2) /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SMH_NOP) /* ??? */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(SMH_NOP) /* ??? */
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(exctsccr_gfx_bank_w) /* ??? */
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w) /* Cocktail mode ( 0xff = flip screen, 0x00 = normal ) */
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(SMH_NOP) /* no MCU, but some leftover code still writes here */
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP) /* no MCU, but some leftover code still writes here */
+
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(exctsccr_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_WRITE(exctsccr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
+
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(exctsccr_gfx_bank_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
+	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
+
 	AM_RANGE(0xa040, 0xa06f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) /* Sprite Pos */
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
+
+	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
+	AM_RANGE(0xa040, 0xa040) AM_READ(input_port_1_r)
+	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_2_r)	// FIXME use champbas_dsw_r
+	AM_RANGE(0xa0c0, 0xa0c0) AM_READ(input_port_3_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bl_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( bl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe3ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( bl_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP) /* 0 = DAC sound off, 1 = DAC sound on */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w) /* used to clear the latch */
+//	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	/* 0 = DAC sound off, 1 = DAC sound on */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exctsccr_DAC_data_w)
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1) /* main CPU shared RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -263,16 +204,6 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 
-	PORT_START      /* IN2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_START      /* DSW0 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -293,7 +224,17 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* Has to be 0 */
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// bit 2 of the watchdog counter
+
+	PORT_START      /* IN2 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -302,73 +243,43 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static const gfx_layout charlayout1 =
+static const gfx_layout charlayout_3bpp =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	3,		/* 3 bits per pixel */
-	{ 0x4000*8+4, 0, 4 },	/* plane offset */
-	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 consecutive bytes */
+	8,8,
+	RGN_FRAC(1,2),
+	3,
+	{ RGN_FRAC(1,2)+4, 0, 4 },
+	{ STEP4(8*8,1), STEP4(0,1) },
+	{ STEP8(0,8) },
+	16*8
 };
 
-static const gfx_layout charlayout2 =
+static const gfx_layout spritelayout_3bpp =
 {
-	8,8,	/* 8*8 characters */
-	256,	/* 256 characters */
-	3,		/* 3 bits per pixel */
-	{ 0x2000*8, 0, 4 },	/* plane offset */
-	{ 8*8+0, 8*8+1, 8*8+2, 8*8+3, 0, 1, 2, 3 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	16*8	/* every char takes 16 consecutive bytes */
+	16,16,
+	RGN_FRAC(1,2),
+	3,
+	{ RGN_FRAC(1,2)+4, 0, 4 },
+	{ STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1), STEP4(0,1) },
+	{ STEP8(0,8), STEP8(32*8,8) },
+	64*8
 };
 
-static const gfx_layout spritelayout1 =
+static const gfx_layout spritelayout_4bpp =
 {
-	16,16,	    /* 16*16 sprites */
-	64,	        /* 64 sprites */
-	3,	        /* 3 bits per pixel */
-	{ 0x4000*8+4, 0, 4 },	/* plane offset */
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3  },
-	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
-			32 * 8, 33 * 8, 34 * 8, 35 * 8, 36 * 8, 37 * 8, 38 * 8, 39 * 8 },
-	64*8	/* every sprite takes 64 bytes */
-};
-
-static const gfx_layout spritelayout2 =
-{
-	16,16,	    /* 16*16 sprites */
-	64,         /* 64 sprites */
-	3,	        /* 3 bits per pixel */
-	{ 0x2000*8, 0, 4 },	/* plane offset */
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3  },
-	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
-			32 * 8, 33 * 8, 34 * 8, 35 * 8, 36 * 8, 37 * 8, 38 * 8, 39 * 8 },
-	64*8	/* every sprite takes 64 bytes */
-};
-
-static const gfx_layout spritelayout =
-{
-	16,16,		/* 16*16 sprites */
-	64,	    	/* 64 sprites */
-	3,	    	/* 2 bits per pixel */
-	{ 0x1000*8+4, 0, 4 },	/* plane offset */
-	{ 8*8, 8*8+1, 8*8+2, 8*8+3, 16*8+0, 16*8+1, 16*8+2, 16*8+3,
-			24*8+0, 24*8+1, 24*8+2, 24*8+3, 0, 1, 2, 3  },
-	{ 0 * 8, 1 * 8, 2 * 8, 3 * 8, 4 * 8, 5 * 8, 6 * 8, 7 * 8,
-			32 * 8, 33 * 8, 34 * 8, 35 * 8, 36 * 8, 37 * 8, 38 * 8, 39 * 8 },
-	64*8	/* every sprite takes 64 bytes */
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+0, RGN_FRAC(1,2)+4, 0, 4 },
+	{ STEP4(8*8,1), STEP4(16*8,1), STEP4(24*8,1), STEP4(0,1) },
+	{ STEP8(0,8), STEP8(32*8,8) },
+	64*8
 };
 
 static GFXDECODE_START( exctsccr )
-	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, charlayout1,      0, 16 ) /* chars */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x2000, charlayout2,      0, 16 ) /* chars */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x1000, spritelayout1, 16*8, 32 ) /* sprites */
-	GFXDECODE_ENTRY( REGION_GFX1, 0x3000, spritelayout2, 16*8, 32 ) /* sprites */
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,  16*8, 32 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX1, 0, charlayout_3bpp,   0x000, 0x080/8 ) /* chars */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout_3bpp, 0x080, 0x080/8 ) /* sprites */
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout_4bpp, 0x100, 0x100/16 ) /* sprites */
 GFXDECODE_END
 
 
@@ -391,22 +302,20 @@ static MACHINE_DRIVER_START( exctsccr )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
-#if MCU_HACK
-#else
 	MDRV_CPU_ADD(ALPHA8301, 4000000/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
-#endif
+
+	MDRV_MACHINE_START(exctsccr)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(exctsccr)
-	MDRV_PALETTE_LENGTH(48*8)
+	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_PALETTE_INIT(exctsccr)
 	MDRV_VIDEO_START(exctsccr)
@@ -416,45 +325,44 @@ static MACHINE_DRIVER_START( exctsccr )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD(AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 
 	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
-/* Bootleg */
+/* Bootleg on a modified Championship Baseball board */
 static MACHINE_DRIVER_START( exctsccb )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 4000000)	/* 4.0 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(bl_readmem,bl_writemem)
+	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_PROGRAM_MAP(bl_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3072000)	/* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(bl_sound_readmem,bl_sound_writemem)
+	MDRV_CPU_ADD(Z80, XTAL_18_432MHz/6)
+	MDRV_CPU_PROGRAM_MAP(bl_sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(exctsccr)
-	MDRV_PALETTE_LENGTH(48*8)
+	MDRV_PALETTE_LENGTH(0x200)
 
 	MDRV_PALETTE_INIT(exctsccr)
 	MDRV_VIDEO_START(exctsccr)
@@ -463,11 +371,11 @@ static MACHINE_DRIVER_START( exctsccb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -489,12 +397,14 @@ ROM_START( exctsccr )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) )
-	ROM_LOAD( "5_b5.bin",     0x2000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) )
-	ROM_LOAD( "6_c5.bin",     0x4000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) )
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
+	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
 
-	ROM_REGION( 0x02000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
+
+	ROM_REGION( 0x02000, REGION_GFX3, ROMREGION_DISPOSE )	// 4bpp sprites
 	ROM_LOAD( "2_k5.bin",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3_l5.bin",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -517,12 +427,14 @@ ROM_START( exctscca )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) )
-	ROM_LOAD( "5_b5.bin",     0x2000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) )
-	ROM_LOAD( "6_c5.bin",     0x4000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) )
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
+	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
 
-	ROM_REGION( 0x02000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
+
+	ROM_REGION( 0x02000, REGION_GFX3, ROMREGION_DISPOSE )	// 4bpp sprites
 	ROM_LOAD( "2_k5.bin",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
 	ROM_LOAD( "3_l5.bin",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
@@ -544,15 +456,17 @@ ROM_START( exctsccb )
 	ROM_LOAD( "es-b.l2",      0x2000, 0x2000, CRC(8b3db794) SHA1(dbfed2357c7631bfca6bbd63a23617bc3abf6ca3) )
 	ROM_LOAD( "es-c.m2",      0x4000, 0x2000, CRC(7bed2f81) SHA1(cbbb0480519cc04a99e8983228b18c9e49a9985d) )
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
-	/* I'm using the ROMs from exctscc2, national flags are wrong (ITA replaces USA) */
-	ROM_LOAD( "vr.5a",        0x0000, 0x2000, BAD_DUMP CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c)  )
-	ROM_LOAD( "vr.5b",        0x2000, 0x2000, BAD_DUMP CRC(5605b60b) SHA1(19d5909896ae4a3d7552225c369d30475c56793b)  )
-	ROM_LOAD( "vr.5c",        0x4000, 0x2000, BAD_DUMP CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f)  )
+	/* the national flags are wrong. This happens on the real board */
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "4_a5.bin",     0x0000, 0x2000, CRC(c342229b) SHA1(a989d6c12521c77882a7e17d4d80afe7eae05906) ) /* planes 0,1 */
+	ROM_LOAD( "6_c5.bin",     0x2000, 0x2000, CRC(eda40e32) SHA1(6c08fd4f4fb35fd354d02e04548e960c545f6a88) ) /* plane 3 */
 
-	ROM_REGION( 0x02000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "vr.5k",        0x0000, 0x1000, BAD_DUMP CRC(1d37edfa) SHA1(184fa6dd7b1b3fff4c5fc19b42301ccb7979ac84)  )
-	ROM_LOAD( "vr.5l",        0x1000, 0x1000, BAD_DUMP CRC(b97f396c) SHA1(4ffe512acf047230bd593911a615fc0ef66b481d)  )
+	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "5_b5.bin",     0x0000, 0x2000, CRC(35f4f8c9) SHA1(cdf5bbfea9abdd338938e5f4499d2d71ce3c6237) ) /* planes 0,1 */
+
+	ROM_REGION( 0x02000, REGION_GFX3, ROMREGION_DISPOSE )	// 4bpp sprites
+	ROM_LOAD( "2_k5.bin",     0x0000, 0x1000, CRC(7f9cace2) SHA1(bf05a31716f3ca1c2fd1034cd1f39e2d21cdaed3) )
+	ROM_LOAD( "3_l5.bin",     0x1000, 0x1000, CRC(db2d9e0d) SHA1(6ec09a47f7aea6bf31eb0ee78f44012f4d92de8a) )
 
 	ROM_REGION( 0x0220, REGION_PROMS, 0 )
 	ROM_LOAD( "prom1.e1",     0x0000, 0x0020, CRC(d9b10bf0) SHA1(bc1263331968f4bf37eb70ec4f56a8cb763c29d2) ) /* palette */
@@ -573,12 +487,14 @@ ROM_START( exctscc2 )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )	/* vr.7h */
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )	/* vr.7k */
 
-	ROM_REGION( 0x06000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "vr.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) )
-	ROM_LOAD( "vr.5b",        0x2000, 0x2000, CRC(5605b60b) SHA1(19d5909896ae4a3d7552225c369d30475c56793b) )
-	ROM_LOAD( "vr.5c",        0x4000, 0x2000, CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f) )
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
+	ROM_LOAD( "vr.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) ) /* planes 0,1 */
+	ROM_LOAD( "vr.5c",        0x2000, 0x2000, CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f) ) /* plane 3 */
 
-	ROM_REGION( 0x02000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_REGION( 0x04000, REGION_GFX2, ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only sprites
+	ROM_LOAD( "vr.5b",        0x0000, 0x2000, CRC(5605b60b) SHA1(19d5909896ae4a3d7552225c369d30475c56793b) ) /* planes 0,1 */
+
+	ROM_REGION( 0x02000, REGION_GFX3, ROMREGION_DISPOSE )	// 4bpp sprites
 	ROM_LOAD( "vr.5k",        0x0000, 0x1000, CRC(1d37edfa) SHA1(184fa6dd7b1b3fff4c5fc19b42301ccb7979ac84) )
 	ROM_LOAD( "vr.5l",        0x1000, 0x1000, CRC(b97f396c) SHA1(4ffe512acf047230bd593911a615fc0ef66b481d) )
 
@@ -588,27 +504,39 @@ ROM_START( exctscc2 )
 	ROM_LOAD( "prom3.k5",     0x0120, 0x0100, CRC(b5db1c2c) SHA1(900aaaac6b674a9c5c7b7804a4b0c3d5cce761aa) ) /* lookup table */
 ROM_END
 
-/* The games need a different MCU control */
+
 
 static DRIVER_INIT( exctsccr )
 {
-#if MCU_HACK
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa006, 0xa006, 0, 0, exctsccr_mcu_control_w);
-#else
-	mcu_patch_data = exctsccr_mcu_patch_data;
-#endif
+	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
+	UINT8 *rom1 = memory_region(REGION_GFX1);
+	UINT8 *rom2 = memory_region(REGION_GFX2);
+	int i;
+
+	// planes 0,1
+	for (i = 0; i < 0x1000; ++i)
+	{
+		UINT8 t = rom1[i + 0x1000];
+		rom1[i + 0x1000] = rom2[i];
+		rom2[i] = t;
+	}
+
+	// plane 3
+	for (i = 0; i < 0x1000; ++i)
+	{
+		rom2[i + 0x3000] = rom1[i + 0x3000] >> 4;
+		rom2[i + 0x2000] = rom1[i + 0x3000] & 0x0f;
+	}
+	for (i = 0; i < 0x1000; ++i)
+	{
+		rom1[i + 0x3000] = rom1[i + 0x2000] >> 4;
+		rom1[i + 0x2000] &= 0x0f;
+	}
 }
 
-static DRIVER_INIT( exctscc2 )
-{
-#if MCU_HACK
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa006, 0xa006, 0, 0, exctscc2_mcu_control_w);
-#else
-	mcu_patch_data = exctscc2_mcu_patch_data;
-#endif
-}
+
 
 GAME( 1983, exctsccr, 0,        exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer", 0 )
 GAME( 1983, exctscca, exctsccr, exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 )
-GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, 0,        ROT90, "bootleg",          "Exciting Soccer (bootleg)", 0 )
-GAME( 1984, exctscc2, 0       , exctsccr, exctsccr, exctscc2, ROT90, "Alpha Denshi Co.", "Exciting Soccer II", GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, exctsccr, ROT90, "bootleg",          "Exciting Soccer (bootleg)", 0 )
+GAME( 1984, exctscc2, 0       , exctsccr, exctsccr, exctsccr, ROT90, "Alpha Denshi Co.", "Exciting Soccer II", GAME_IMPERFECT_GRAPHICS )

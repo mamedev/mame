@@ -1,11 +1,3 @@
-/***************************************************************************
-
-  video.c
-
-  Functions to emulate the video hardware of the machine.
-
-***************************************************************************/
-
 #include "driver.h"
 
 static int gfx_bank;
@@ -55,48 +47,26 @@ PALETTE_INIT( exctsccr )
 	color_prom += 0x20;
 
 	/* characters */
-	for (i = 0; i < 0x80; i++)
+	for (i = 0; i < 0x100; i++)
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
 		UINT8 ctabentry = color_prom[0x100 + swapped_i];
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
-
 	/* sprites */
-	for (i = 0; i < 0xf0; i++)
-	{
-		if ((i & 0x08) == 0)
-		{
-			int swapped_i = BITSWAP8(i,3,7,6,5,4,2,1,0);
-			UINT8 ctabentry = color_prom[i] | 0x10;
-			colortable_entry_set_value(machine->colortable, swapped_i + 0x80, ctabentry);
-		}
-	}
-
-	for (i = 0xf0; i < 0x100; i++)
-	{
-		if (i & 0x08)
-		{
-			int swapped_i = BITSWAP8(i,3,7,6,5,4,2,1,0);
-			UINT8 ctabentry = color_prom[i] | 0x10;
-			colortable_entry_set_value(machine->colortable, swapped_i + 0x80, ctabentry);
-		}
-	}
-
 	for (i = 0x80; i < 0x100; i++)
 	{
 		int swapped_i = BITSWAP8(i,2,7,6,5,4,3,1,0);
 		UINT8 ctabentry = color_prom[0x100 + swapped_i] | 0x10;
-		colortable_entry_set_value(machine->colortable, i + 0x80, ctabentry);
+		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 
-	/* patch for goalkeeper - but of course, this is totally wrong */
-	colortable_entry_set_value(machine->colortable, 0x80+(0x1d*8)+7, 0x10);
-}
-
-static TIMER_CALLBACK( exctsccr_fm_callback )
-{
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	/* sprites */
+	for (i = 0; i < 0x100; i++)
+	{
+		UINT8 ctabentry = color_prom[i] | 0x10;
+		colortable_entry_set_value(machine->colortable, i + 0x100, ctabentry);
+	}
 }
 
 WRITE8_HANDLER( exctsccr_videoram_w )
@@ -113,39 +83,31 @@ WRITE8_HANDLER( exctsccr_colorram_w )
 
 WRITE8_HANDLER( exctsccr_gfx_bank_w )
 {
-	if (gfx_bank != (data & 0x01))
+	data &= 0x01;
+	if (gfx_bank != data)
 	{
-		gfx_bank = data & 0x01;
+		gfx_bank = data;
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 }
 
 WRITE8_HANDLER( exctsccr_flipscreen_w )
 {
-	if (flip_screen_get() != data)
-	{
-		flip_screen_set(data);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	}
+	flip_screen_set(data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = videoram[tile_index];
-
-	/* ZV 02052008 - this used to be "& 0x1f," but that's not supported by the
-       color PROM decoding, so I am using 0x0f.  I don't see any glitches */
 	int color = colorram[tile_index] & 0x0f;
 
-	SET_TILE_INFO(gfx_bank, code, color, 0);
+	SET_TILE_INFO(0, code + (gfx_bank << 8), color, 0);
 }
 
 VIDEO_START( exctsccr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
-
-	timer_pulse(ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -156,7 +118,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	OBJ1 = videoram;
 	OBJ2 = &(spriteram[0x20]);
 
-	for ( offs = 0x0e; offs >= 0; offs -= 2 ) {
+	for ( offs = 0x0e; offs >= 0; offs -= 2 )
+	{
 		int sx,sy,code,bank,flipx,flipy,color;
 
 		sx = 256 - OBJ2[offs+1];
@@ -165,12 +128,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		code = ( OBJ1[offs] >> 2 ) & 0x3f;
 		flipx = ( OBJ1[offs] ) & 0x01;
 		flipy = ( OBJ1[offs] ) & 0x02;
-		color = ( OBJ1[offs+1] ) & 0x1f;
-		bank = 2;
-		bank += ( ( OBJ1[offs+1] >> 4 ) & 1 );
+		color = ( OBJ1[offs+1] ) & 0x0f;
+		bank = ( ( OBJ1[offs+1] >> 4 ) & 1 );
 
-		drawgfx(bitmap,machine->gfx[bank],
-				code,
+		drawgfx(bitmap,machine->gfx[1],
+				code + (bank << 6),
 				color,
 				flipx, flipy,
 				sx,sy,
@@ -181,8 +143,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	OBJ1 = spriteram_2;
 	OBJ2 = spriteram;
 
-	for ( offs = 0x0e; offs >= 0; offs -= 2 ) {
-		int sx,sy,code,bank,flipx,flipy,color;
+	for ( offs = 0x0e; offs >= 0; offs -= 2 )
+	{
+		int sx,sy,code,flipx,flipy,color;
 
 		sx = 256 - OBJ2[offs+1];
 		sy = OBJ2[offs] - 16;
@@ -190,60 +153,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		code = ( OBJ1[offs] >> 2 ) & 0x3f;
 		flipx = ( OBJ1[offs] ) & 0x01;
 		flipy = ( OBJ1[offs] ) & 0x02;
-		color = ( OBJ1[offs+1] ) & 0x1f;
-		bank = 3;
+		color = ( OBJ1[offs+1] ) & 0x0f;
 
-		if ( color == 0 )
-			continue;
-
-		if ( color < 0x10 )
-			bank++;
-
-		if ( color > 0x10 && color < 0x17 )
-		{
-			drawgfx(bitmap,machine->gfx[4],
-				code,
-				0x0e,
-				flipx, flipy,
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,0);
-
-			color += 6;
-		}
-
-		if ( color==0x1d && gfx_bank==1 )
-		{
-			drawgfx(bitmap,machine->gfx[3],
-				code,
-				color,
-				flipx, flipy,
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PEN,0);
-
-			drawgfx(bitmap,machine->gfx[4],
-				code,
-				color,
-				flipx, flipy,
-				sx,sy,
-				cliprect,
-				TRANSPARENCY_PENS,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[4], color, 0x10));
-
-		}
-		else
-		{
-			drawgfx(bitmap,machine->gfx[bank],
-					code,
-					color,
-					flipx, flipy,
-					sx,sy,
-					cliprect,
-					TRANSPARENCY_PEN,0);
-		}
+		drawgfx(bitmap,machine->gfx[2],
+			code,
+			color,
+			flipx, flipy,
+			sx,sy,
+			cliprect,
+			TRANSPARENCY_PENS,
+			colortable_get_transpen_mask(machine->colortable, machine->gfx[2], color, 0x10));
 	}
 }
+
+
 
 VIDEO_UPDATE( exctsccr )
 {

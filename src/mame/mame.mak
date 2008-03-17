@@ -438,11 +438,10 @@ $(MAMEOBJ)/alliedl.a: \
 $(MAMEOBJ)/alpha.a: \
 	$(DRIVERS)/alpha68k.o $(VIDEO)/alpha68k.o \
 	$(DRIVERS)/champbas.o $(VIDEO)/champbas.o \
-	$(DRIVERS)/equites.o $(MACHINE)/equites.o $(VIDEO)/equites.o \
-	$(DRIVERS)/exctsccr.o $(MACHINE)/exctsccr.o $(VIDEO)/exctsccr.o \
+	$(DRIVERS)/equites.o $(VIDEO)/equites.o \
+	$(DRIVERS)/exctsccr.o $(VIDEO)/exctsccr.o \
 	$(DRIVERS)/meijinsn.o \
 	$(DRIVERS)/shougi.o \
-	$(DRIVERS)/talbot.o \
 
 $(MAMEOBJ)/amiga.a: \
 	$(DRIVERS)/alg.o \

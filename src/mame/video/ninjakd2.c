@@ -335,7 +335,7 @@ WRITE8_HANDLER( ninjakd2_sprite_overdraw_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
+static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 {
 	const gfx_element* const gfx = machine->gfx[1];
 	int const big_xshift = robokid_sprites ? 1 : 0;
@@ -347,10 +347,10 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap,
 	// the sprite generator draws exactly 96 16x16 sprites per frame. When big
 	// (32x32) sprites are drawn, this counts for 4 sprites drawn, so the sprite
 	// list is reduced accordingly (i.e. three slots at the end of the list will
-	// be ignored). Note that a disabled sprite, even if it is not draw, still
+	// be ignored). Note that a disabled sprite, even if it is not drawn, still
 	// counts as one sprite drawn.
 	// This is proven by Mutant Night, which doesn't work correctly (leaves shots
-	// on screen) if we don't take this into account.
+	// on screen) if we don't take big sprites into account.
 
 	for (;;)
 	{
@@ -399,12 +399,10 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap,
 							for (xx = 0; xx < 16; ++xx)
 							{
 								UINT16* const ptr = BITMAP_ADDR16(bitmap, sy + yy, sx + xx);
-								int const offset = (flipx ? (16 - xx) : xx) + (flipy ? (16 - yy) : yy ) * gfx->line_modulo;;
+								int const offset = (flipx ? (15 - xx) : xx) + (flipy ? (15 - yy) : yy ) * gfx->line_modulo;;
 
 								if (srcgfx[offset] != 15 && (*ptr & 0xf0) >= 0xc0)
-								{
 									*ptr = 15;
-								}
 							}
 						}
 					}
@@ -415,8 +413,7 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap,
 								color,
 								flipx,flipy,
 								sx + 16*x, sy + 16*y,
-								cliprect,
-								TRANSPARENCY_PEN, 15);
+								0, TRANSPARENCY_PEN, 15);
 					}
 
 					++sprites_drawn;
@@ -519,5 +516,5 @@ VIDEO_EOF( ninjakd2 )
 	// exit from stage 3.
 	sprite_overdraw_enabled = next_sprite_overdraw_enabled;
 
-	draw_sprites(machine, sp_bitmap, 0);
+	draw_sprites(machine, sp_bitmap);
 }

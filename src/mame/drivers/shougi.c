@@ -32,14 +32,8 @@ c000 - ffff videoram
 
 
 
-TO DO:
-
-------
 Both games use custom MCU: ALPHA 8201 (42 pin DIP).
 It's connected to the RAM that is shared with the first CPU.
-CPU controls MCU (probably to run and stop it).
-
-note: ALPHA 8302 is the MCU used in Exciting Soccer.
 
 Shougi
 Alpha Electronics Co. Ltd., 198x
@@ -104,7 +98,7 @@ PROM  : Type MB7051
   bit 2 -- 220 ohm resistor --/  \---------------1000 ohm resistor---\
   bit 3 -- 1000 ohm resistor--\                                      |
   bit 4 -- 470 ohm resistor --+--+--> GREEN                          |
-  bit 5 -- 220 ohm resistor --/  \---------------1000 ohm resistor---+--- 1000 Ohm pullup resistor
+  bit 5 -- 220 ohm resistor --/  \---------------1000 ohm resistor---+--- GND
   bit 6 -- 470 ohm resistor --+--+--> BLUE                           |
   bit 7 -- 220 ohm resistor --/  \---------------1000 ohm resistor---/
 
@@ -120,9 +114,9 @@ static PALETTE_INIT( shougi )
 
 
 	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	0,	1000+1000,
-			3,	resistances_rg,	weights_g,	0,	1000+1000,
-			2,	resistances_b,	weights_b,	0,	1000+1000);
+			3,	resistances_rg,	weights_r,	1000, 0,
+			3,	resistances_rg,	weights_g,	1000, 0,
+			2,	resistances_b,	weights_b,	1000, 0);
 
 	for (i = 0;i < machine->config->total_colors;i++)
 	{
@@ -154,7 +148,7 @@ static PALETTE_INIT( shougi )
 
 static VIDEO_UPDATE( shougi )
 {
-int offs;
+	int offs;
 
 	for (offs = 0;offs <0x4000; offs++)
 	{
@@ -270,26 +264,24 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	/* 4800-480f connected to the 74LS259, A3 is data line so 4800-4807 write 0, and 4808-480f write 1 */
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(cpu_shared_ctrl_sub_w)  AM_READ(input_port_2_r)
-	AM_RANGE(0x4808, 0x4808) AM_WRITE(cpu_shared_ctrl_main_w)
 	AM_RANGE(0x4801, 0x4801) AM_WRITE(nmi_disable_and_clear_line_w)
-	AM_RANGE(0x4809, 0x4809) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x4802, 0x4802) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x480a, 0x480a) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x4803, 0x4803) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x480b, 0x480b) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x4802, 0x4802) AM_NOP
+	AM_RANGE(0x4803, 0x4803) AM_NOP
 	AM_RANGE(0x4804, 0x4804) AM_WRITE(shougi_mcu_halt_off_w)
+	AM_RANGE(0x4807, 0x4807) AM_WRITENOP	//?????? connected to +5v via resistor
+	AM_RANGE(0x4808, 0x4808) AM_WRITE(cpu_shared_ctrl_main_w)
+	AM_RANGE(0x4809, 0x4809) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0x480a, 0x480a) AM_NOP
+	AM_RANGE(0x480b, 0x480b) AM_NOP
 	AM_RANGE(0x480c, 0x480c) AM_WRITE(shougi_mcu_halt_on_w)
-	AM_RANGE(0x4807, 0x4807) AM_WRITE(SMH_NOP)//?????? connected to +5v via resistor
-	AM_RANGE(0x480f, 0x480f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x480f, 0x480f) AM_NOP
 
 	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(shougi_watchdog_reset_w) AM_READ(input_port_0_r) /* game won't boot if watchdog doesn't work */
+	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r) AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE(1) /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE(2) /* 2114 x 2 (0x400 x 4bit each) */
-//  AM_RANGE(0x7800, 0x78ff) AM_WRITE(cpu_sharedram_main_w) AM_BASE(&cpu_sharedram)/* sharedram main/sub */
-//  AM_RANGE(0x7800, 0x7bff) AM_READ(cpu_sharedram_r)/* 2114 x 2 (0x400 x 4bit each) */
 
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)	/* 4116 x 16 (32K) */
 ADDRESS_MAP_END
@@ -306,7 +298,7 @@ static READ8_HANDLER ( dummy_r )
 }
 
 static ADDRESS_MAP_START( readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
 ADDRESS_MAP_END
 
@@ -319,38 +311,66 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
 
+
+
 static INPUT_PORTS_START( shougi )
-	PORT_START	/* Player 1 controls */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )//+-
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )//+-
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_START_TAG("PLAYER1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START	/* Player 2 controls */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_COCKTAIL
+	PORT_START_TAG("PLAYER2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START	/* Coin, Start */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )//+
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )//?
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN4 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START3 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START4 )
-
+	// dip switch order is not sequential. Only 2,3,4, and 5 identified.
+	// 1 and 6 missing, with three possible positions (the third available
+	// bit is not a dip switch)
+	PORT_START_TAG("DSW")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x32, 0x32, "Time" ) PORT_DIPLOCATION("SW:!3,!4,!2")
+	PORT_DIPSETTING(    0x00, "1 Minute" )
+	PORT_DIPSETTING(    0x20, "2 Minutes" )
+	PORT_DIPSETTING(    0x02, "3 Minutes" )
+	PORT_DIPSETTING(    0x22, "4 Minutes" )
+	PORT_DIPSETTING(    0x10, "5 Minutes" )
+	PORT_DIPSETTING(    0x30, "10 Minutes" )
+	PORT_DIPSETTING(    0x12, "20 Minutes" )
+	PORT_DIPSETTING(    0x32, "30 Minutes" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW:!5")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( shougi2 )
+	PORT_INCLUDE(shougi)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
+INPUT_PORTS_END
+
 
 
 static MACHINE_DRIVER_START( shougi )
@@ -369,6 +389,7 @@ static MACHINE_DRIVER_START( shougi )
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 
 	MDRV_INTERLEAVE(10)
+	MDRV_WATCHDOG_VBLANK_INIT(16)	// assuming it's the same as champbas
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -407,6 +428,9 @@ ROM_START( shougi )
 	ROM_LOAD( "7.3h",    0x4000, 0x1000, CRC(7ea8ec4a) SHA1(d3b999a683f49c911871d0ae6bb2022e73e3cfb8) )
 	/* shougi has one socket empty */
 
+	ROM_REGION( 0x2000, REGION_CPU3, 0 )
+	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
 ROM_END
@@ -426,9 +450,14 @@ ROM_START( shougi2 )
 	ROM_LOAD( "7-2.3h",    0x4000, 0x1000, CRC(5f37ebc6) SHA1(2e5c4c2f455979e2ad2c66c5aa9f4d92194796af) )
 	ROM_LOAD( "10-2.3l",   0x5000, 0x1000, CRC(a26385fd) SHA1(2adb21bb4f67a378014bc1edda48daca349d17e1) )
 
+	ROM_REGION( 0x2000, REGION_CPU3, 0 )
+	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
+
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "pr.2l",   0x0000, 0x0020, CRC(cd3559ff) SHA1(a1291b06a8a337943660b2ef62c94c49d58a6fb5) )
 ROM_END
 
-GAME( 198?, shougi,  0,        shougi,  shougi,  0, ROT0, "Alpha Denshi", "Shougi", GAME_UNEMULATED_PROTECTION )
-GAME( 198?, shougi2, shougi,   shougi,  shougi,  0, ROT0, "Alpha Denshi", "Shougi 2", GAME_UNEMULATED_PROTECTION )
+
+
+GAME( 1982?, shougi,  0,      shougi, shougi,  0, ROT0, "Alpha Denshi Co.", "Shougi", 0 )
+GAME( 1982?, shougi2, shougi, shougi, shougi2, 0, ROT0, "Alpha Denshi Co.", "Shougi 2", 0 )
