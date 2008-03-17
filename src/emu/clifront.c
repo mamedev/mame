@@ -597,7 +597,7 @@ static int info_verifyroms(core_options *options, const char *gamename)
 {
 	int correct = 0;
 	int incorrect = 0;
-	int notfound = 0;
+	int notfound = FALSE;
 	int drvindex;
 
 	/* iterate over drivers */
@@ -614,9 +614,12 @@ static int info_verifyroms(core_options *options, const char *gamename)
 			if (audit_records > 0)
 				free(audit);
 
-			/* if not found, count that and leave it at that */
+			/* if not found, print a message and set the flag */
 			if (res == NOTFOUND)
-				notfound++;
+			{
+				mame_printf_error("romset \"%s\" not found!\n", drivers[drvindex]->name);
+				notfound = TRUE;
+			}
 
 			/* else display information about what we discovered */
 			else
@@ -653,12 +656,10 @@ static int info_verifyroms(core_options *options, const char *gamename)
 	/* clear out any cached files */
 	zip_file_cache_clear();
 
-	/* if we didn't get anything at all, display a generic end message */
+	/* if we didn't get anything at all because of an unsupported set, display message */
 	if (correct + incorrect == 0)
 	{
-		if (notfound > 0)
-			mame_printf_info("romset \"%s\" not found!\n", gamename);
-		else
+		if (!notfound)
 			mame_printf_info("romset \"%s\" not supported!\n", gamename);
 		return MAMERR_NO_SUCH_GAME;
 	}
@@ -681,7 +682,7 @@ static int info_verifysamples(core_options *options, const char *gamename)
 {
 	int correct = 0;
 	int incorrect = 0;
-	int notfound = 0;
+	int notfound = FALSE;
 	int drvindex;
 
 	/* now iterate over drivers */
@@ -700,9 +701,12 @@ static int info_verifysamples(core_options *options, const char *gamename)
 			else
 				continue;
 
-			/* if not found, count that and leave it at that */
+			/* if not found, print a message and set the flag */
 			if (res == NOTFOUND)
-				notfound++;
+			{
+				mame_printf_error("sampleset \"%s\" not found!\n", drivers[drvindex]->name);
+				notfound = TRUE;
+			}
 
 			/* else display information about what we discovered */
 			else
@@ -733,12 +737,10 @@ static int info_verifysamples(core_options *options, const char *gamename)
 	/* clear out any cached files */
 	zip_file_cache_clear();
 
-	/* if we didn't get anything at all, display a generic end message */
+	/* if we didn't get anything at all because of an unsupported set, display message */
 	if (correct + incorrect == 0)
 	{
-		if (notfound > 0)
-			mame_printf_error("sampleset \"%s\" not found!\n", gamename);
-		else
+		if (!notfound)
 			mame_printf_error("sampleset \"%s\" not supported!\n", gamename);
 		return MAMERR_NO_SUCH_GAME;
 	}
