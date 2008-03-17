@@ -44,8 +44,8 @@ enum
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define video_screen_count(config)		device_list_items((config)->devicelist, VIDEO_SCREEN)
-#define video_screen_first(config)		device_list_first((config)->devicelist, VIDEO_SCREEN)
+#define video_screen_count(config)		((config)->devicelist ? device_list_items((config)->devicelist, VIDEO_SCREEN) : 0)
+#define video_screen_first(config)		((config)->devicelist ? device_list_first((config)->devicelist, VIDEO_SCREEN) : NULL)
 #define video_screen_next(previous)		device_list_next((previous), VIDEO_SCREEN)
 
 #define video_screen_get_format(screen)	(((screen_config *)(screen)->inline_config)->format)
