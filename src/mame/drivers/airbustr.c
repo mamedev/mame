@@ -648,7 +648,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( airbusb )
 	MDRV_IMPORT_FROM(airbustr)
-	MDRV_WATCHDOG_VBLANK_INIT(0) // no protection device or watchdog
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(0)) // no protection device or watchdog
 MACHINE_DRIVER_END
 
 
