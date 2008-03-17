@@ -645,8 +645,8 @@ static void AICA_Init(struct _AICA *AICA, const struct AICAinterface *intf, int 
 	}
 
 	AICALFO_Init();
-	AICA->buffertmpl=(signed int*) malloc(44100*sizeof(signed int));
-	AICA->buffertmpr=(signed int*) malloc(44100*sizeof(signed int));
+	AICA->buffertmpl=(signed int*) auto_malloc(44100*sizeof(signed int));
+	AICA->buffertmpr=(signed int*) auto_malloc(44100*sizeof(signed int));
 	memset(AICA->buffertmpl,0,44100*sizeof(signed int));
 	memset(AICA->buffertmpr,0,44100*sizeof(signed int));
 
@@ -1300,7 +1300,7 @@ static void *aica_start(int sndindex, int clock, const void *config)
 
 	struct _AICA *AICA;
 
-	AICA = malloc(sizeof(*AICA));
+	AICA = auto_malloc(sizeof(*AICA));
 	memset(AICA, 0, sizeof(*AICA));
 
 	intf = config;
