@@ -1065,6 +1065,9 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 	add_exit_callback(machine, input_port_exit);
 	add_frame_callback(machine, input_port_frame);
 
+	/* reset the pointers */
+	memset(&joystick_info, 0, sizeof(joystick_info));
+
 	/* start with the raw defaults and ask the OSD to customize them in the backup array */
 	memcpy(default_ports_backup, default_ports_builtin, sizeof(default_ports_backup));
 	osd_customize_inputport_list(default_ports_backup);
@@ -1263,9 +1266,6 @@ static void input_port_postload(void)
 	input_port_entry *port;
 	int portnum, bitnum;
 	UINT32 mask;
-
-	/* reset the pointers */
-	memset(&joystick_info, 0, sizeof(joystick_info));
 
 	/* loop over the ports and identify all the analog inputs */
 	portnum = -1;
@@ -2864,10 +2864,6 @@ static void input_port_frame(running_machine *machine)
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	attotime curtime = timer_get_time();
 	int portnum, bitnum;
-
-	/* get out if we are just initializing */
-	if (mame_get_phase(machine) != MAME_PHASE_RUNNING)
-		return;
 
 profiler_mark(PROFILER_INPUT);
 
