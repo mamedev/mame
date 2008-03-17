@@ -427,10 +427,11 @@ void osd_work_queue_free(osd_work_queue *queue)
 					(double)thread->waittime * 100.0 / (double)total);
 		}
 #endif
-
-		// free the list
-		free(queue->thread);
 	}
+
+	// free the list
+	if (queue->thread != NULL)
+		free(queue->thread);
 
 	// free all the events
 	if (queue->doneevent != NULL)
