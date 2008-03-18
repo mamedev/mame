@@ -125,6 +125,8 @@ static void sprite_draw_donpachi_zbuf( int priority );
 static int spriteram_bank;
 static int spriteram_bank_delay;
 
+static UINT16 *palette_map;
+
 /***************************************************************************
 
                             Palette Init Routines
@@ -134,120 +136,122 @@ static int spriteram_bank_delay;
 
 ***************************************************************************/
 
+PALETTE_INIT( cave )
+{
+	int maxpen = cave_paletteram_size / 2;
+	int pen;
+	
+	/* create a 1:1 palette map covering everything */
+	palette_map = auto_malloc(machine->config->total_colors * sizeof(palette_map[0]));
+	for (pen = 0; pen < machine->config->total_colors; pen++)
+		palette_map[pen] = pen % maxpen;
+}
+
 PALETTE_INIT( dfeveron )
 {
 	int color, pen;
-
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x0800);
 
 	/* Fill the 0-3fff range, used by sprites ($40 color codes * $100 pens)
        Here sprites have 16 pens, but the sprite drawing routine always
        multiplies the color code by $100 (for consistency).
        That's why we need this function.    */
 
+	PALETTE_INIT_CALL(cave);
+	
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) | pen);
+			palette_map[(color << 8) | pen] = (color << 4) | pen;
 }
 
 PALETTE_INIT( ddonpach )
 {
 	int color, pen;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x8000);
-
 	/* Fill the 8000-83ff range ($40 color codes * $10 pens) for
        layers 0 & 1 which are 4 bits deep rather than 8 bits deep
        like layer 2, but use the first 16 color of every 256 for
        any given color code. */
 
+	PALETTE_INIT_CALL(cave);
+	
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			colortable_entry_set_value(machine->colortable, 0x8000 | (color << 4) | pen, 0x4000 | (color << 8) | pen);
+			palette_map[0x8000 | (color << 4) | pen] = 0x4000 | (color << 8) | pen;
 }
 
 PALETTE_INIT( mazinger )
 {
 	int color, pen;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x4000);
+	PALETTE_INIT_CALL(cave);
 
 	/* sprites (encrypted) are 4 bit deep */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x100; pen++)
-			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) + pen);	/* yes, PLUS, not OR */
+			palette_map[(color << 8) | pen] = (color << 4) + pen;	/* yes, PLUS, not OR */
 
 	/* layer 0 is 6 bit deep, there are 64 color codes but only $400
        colors are actually addressable */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			colortable_entry_set_value(machine->colortable, 0x4400 | (color << 6) | pen, 0x400 | ((color & 0x0f) << 6) | pen);
+			palette_map[0x4400 | (color << 6) | pen] = 0x400 | ((color & 0x0f) << 6) | pen;
 }
 
 PALETTE_INIT( sailormn )
 {
 	int color, pen;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x2000);
+	PALETTE_INIT_CALL(cave);
 
 	/* sprites (encrypted) are 4 bit deep */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x100; pen++)
-			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) + pen);	/* yes, PLUS, not OR */
+			palette_map[(color << 8) | pen] = (color << 4) + pen;	/* yes, PLUS, not OR */
 
 	/* layer 2 is 6 bit deep, there are 64 color codes but only $400
        colors are actually addressable */
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			colortable_entry_set_value(machine->colortable, 0x4c00 | (color << 6) | pen, 0xc00 | ((color & 0x0f) << 6) | pen);
+			palette_map[0x4c00 | (color << 6) | pen] = 0xc00 | ((color & 0x0f) << 6) | pen;
 }
 
 PALETTE_INIT( pwrinst2 )
 {
 	int color, pen;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x2800);
+	PALETTE_INIT_CALL(cave);
 
 	for (color = 0; color < 0x80; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			colortable_entry_set_value(machine->colortable, (color << 8) | pen, (color << 4) | pen);
+			palette_map[(color << 8) | pen] = (color << 4) | pen;
 
 	for (pen = 0x8000; pen < 0xa800; pen++)
-			colortable_entry_set_value(machine->colortable, pen, pen - 0x8000);
+			palette_map[pen] = pen - 0x8000;
 }
 
 PALETTE_INIT( korokoro )
 {
 	int color, pen;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x4000);
+	PALETTE_INIT_CALL(cave);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
-			colortable_entry_set_value(machine->colortable, (color << 8) | pen, 0x3c00 | (color << 4) | pen);
+			palette_map[(color << 8) | pen] = 0x3c00 | (color << 4) | pen;
 }
 
 
 static void set_pens(running_machine *machine)
 {
-	offs_t i;
+	int pen;
 
-	for (i = 0; i < cave_paletteram_size / 2; i++)
+	for (pen = 0; pen < machine->config->total_colors; pen++)
 	{
-		UINT16 data = paletteram16[i];
+		UINT16 data = paletteram16[palette_map[pen]];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 
-		if (machine->colortable != NULL)
-			colortable_palette_set_color(machine->colortable, i, color);
-		else
-			palette_set_color(machine, i, color);
+		palette_set_color(machine, pen, color);
 	}
 }
 
@@ -427,6 +431,8 @@ static int background_color;
 
 static void cave_vh_start(running_machine *machine, int num)
 {
+	assert(palette_map != NULL);
+
 	tilemap_0 = 0;
 	tilemap_1 = 0;
 	tilemap_2 = 0;
