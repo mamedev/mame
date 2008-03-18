@@ -29,6 +29,7 @@
     * Pool 10 (italian, set 1),                         C.M.C.,             1996.
     * Pool 10 (italian, set 2),                         C.M.C.,             1996.
     * Tortuga Family (italian),                         C.M.C.,             1997.
+    * Pot Game (italian),                               C.M.C.,             1996.
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
     * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
     * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.

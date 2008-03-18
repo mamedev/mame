@@ -7818,6 +7818,7 @@ Other Sun games
 	DRIVER( pool10 )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10b )	/* (c) 1996 C.M.C. */
 	DRIVER( tortufam )	/* (c) 1997 C.M.C. */
+	DRIVER( potgame )	/* (c) 1996 C.M.C. */
 	DRIVER( royalcrd )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcdb )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcdc )	/* (c) 1991 Evona Electronic */

@@ -29,6 +29,7 @@
     * Pool 10 (italian, set 1),                         C.M.C.,             1996.
     * Pool 10 (italian, set 2),                         C.M.C.,             1996.
     * Tortuga Family (italian),                         C.M.C.,             1997.
+    * Pot Game (italian),                               C.M.C.,             1996.
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
     * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
     * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
@@ -148,6 +149,7 @@
     - Cuore 1
     - Elephant Family
     - Tortuga Family
+    - Pot Game
 
     In Italy many people became addicted to videopokers. They put so much money on them,
     and they had to sell the house. Also some engineers modified videopokers to do less
@@ -495,8 +497,8 @@
     - 1x battery
 
 
-    Tortuga Family (italian)
-    ------------------------
+    Tortuga Family (italian) & Pot Game (italian)
+    ---------------------------------------------
 
     - 1x G65SC02P2 (main)
     - 1x 95101 (sound)
@@ -821,6 +823,10 @@
     2008/03/14
     - Added proper inputs to jolyc980.
     - Added temporary patch to allow bypass the "code" screen in jolyc980.
+    - Updated technical notes.
+
+    2008/03/18
+    - Added new game: Pot Game (italian).
     - Updated technical notes.
 
 
@@ -1997,6 +2003,23 @@ ROM_START( tortufam )
 	ROM_LOAD( "palce20v8h_tf.u23", 0x0400, 0x0157, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
+ROM_START( potgame )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "now.u2", 0x8000, 0x8000, CRC(7b537ce6) SHA1(b221d08c53b9e14178335632420e78070b9cfb27) )
+
+	ROM_REGION( 0x10000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "potg.b.u21", 0x0000, 0x8000, CRC(32fc1d4f) SHA1(cc533a44498338bc0cbb7c7b9c42559ce7ff1337) )
+	ROM_LOAD( "potg.c.u20", 0x8000, 0x8000, CRC(0331eb42) SHA1(a8e838d644fc6d93a9632070b305e44e4242ce94) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "am27s29_pot.u25",    0x0000, 0x0200, CRC(a221f151) SHA1(270c57c9b7de912b136686bc6720eb8f12dbb805) )
+
+	ROM_REGION( 0x0600, REGION_PLDS, 0 )
+	ROM_LOAD( "palce16v8h_pot.u5",  0x0000, 0x0157, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "palce20v8h_pot.u22", 0x0200, 0x0157, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "palce20v8h_pot.u23", 0x0400, 0x0157, NO_DUMP ) /* PAL is read protected */
+ROM_END
+
 ROM_START( royalcrd )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "r2.bin", 0x8000, 0x8000, CRC(25dfe0dc) SHA1(1a857a910d0c34b6b5bfc2b6ea2e08ed8ed0cae0) )
@@ -2453,6 +2476,7 @@ GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",   
 GAME( 1996, pool10,   0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
 GAME( 1996, pool10b,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 2)",                        0 )
 GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
+GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
 GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )
 GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 2)",                    0 )
 GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, funworld, ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
