@@ -337,9 +337,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( spbactn )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, fgtilelayout,   0x0200, 16384  )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, bgtilelayout,   0x0300, 16384  )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0x0000, 16384  )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, fgtilelayout,   0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, bgtilelayout,   0x0300, 16 + 128 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0x0000, 16 + 384 )
 GFXDECODE_END
 
 static void irqhandler(int linestate)

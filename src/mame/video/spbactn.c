@@ -6,101 +6,34 @@
 extern UINT16 *spbactn_bgvideoram, *spbactn_fgvideoram, *spbactn_spvideoram;
 static bitmap_t *tile_bitmap_bg, *tile_bitmap_fg;
 
-/* mix & blend the paletted 16-bit tile and sprite bitmaps into an RGB 32-bit bitmap */
 static void blendbitmaps(running_machine *machine,
 		bitmap_t *dest,bitmap_t *src1,bitmap_t *src2,
-		int sx,int sy,const rectangle *clip)
+		const rectangle *cliprect)
 {
-	int ox;
-	int oy;
-	int ex;
-	int ey;
+	int y,x;
+	const pen_t *paldata = machine->pens;
 
-	/* check bounds */
-	ox = sx;
-	oy = sy;
-
-	ex = sx + src1->width - 1;
-	if (sx < 0) sx = 0;
-	if (sx < clip->min_x) sx = clip->min_x;
-	if (ex >= dest->width) ex = dest->width - 1;
-	if (ex > clip->max_x) ex = clip->max_x;
-	if (sx > ex) return;
-
-	ey = sy + src1->height - 1;
-	if (sy < 0) sy = 0;
-	if (sy < clip->min_y) sy = clip->min_y;
-	if (ey >= dest->height) ey = dest->height - 1;
-	if (ey > clip->max_y) ey = clip->max_y;
-	if (sy > ey) return;
-
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		const pen_t *paldata = machine->pens;
-		UINT32 *end;
+		UINT32 *dd  = BITMAP_ADDR32(dest, y, 0);
+		UINT16 *sd1 = BITMAP_ADDR16(src1, y, 0);
+		UINT16 *sd2 = BITMAP_ADDR16(src2, y, 0);
 
-		UINT16 *sd1 = src1->base;												/* source data   */
-		UINT16 *sd2 = src2->base;
-
-		int sw = ex-sx+1;														/* source width  */
-		int sh = ey-sy+1;														/* source height */
-		int sm = src1->rowpixels;												/* source modulo */
-
-		UINT32 *dd = BITMAP_ADDR32(dest, sy, sx);								/* dest data     */
-		int dm = dest->rowpixels;												/* dest modulo   */
-
-		sd1 += (sx-ox);
-		sd1 += sm * (sy-oy);
-		sd2 += (sx-ox);
-		sd2 += sm * (sy-oy);
-
-		sm -= sw;
-		dm -= sw;
-
-		while (sh)
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-
-#define BLENDPIXEL(x)	if (sd2[x]) {												\
-							if (sd2[x] & 0x1000) {									\
-								dd[x] = paldata[sd1[x] & 0x07ff] + paldata[sd2[x]];	\
-							} else {												\
-								dd[x] = paldata[sd2[x]];							\
-							}														\
-						} else {													\
-							dd[x] = paldata[sd1[x]];								\
-						}
-
-			end = dd + sw;
-			while (dd <= end - 8)
+			if (sd2[x])
 			{
-				BLENDPIXEL(0);
-				BLENDPIXEL(1);
-				BLENDPIXEL(2);
-				BLENDPIXEL(3);
-				BLENDPIXEL(4);
-				BLENDPIXEL(5);
-				BLENDPIXEL(6);
-				BLENDPIXEL(7);
-				dd += 8;
-				sd1 += 8;
-				sd2 += 8;
+				if (sd2[x] & 0x1000)
+					dd[x] = paldata[sd1[x] & 0x07ff] + paldata[sd2[x]];
+				else
+					dd[x] = paldata[sd2[x]];
 			}
-			while (dd < end)
-			{
-				BLENDPIXEL(0);
-				dd++;
-				sd1++;
-				sd2++;
-			}
-			sd1 += sm;
-			sd2 += sm;
-			dd += dm;
-			sh--;
-
-#undef BLENDPIXEL
-
+			else
+				dd[x] = paldata[sd1[x]];
 		}
 	}
 }
+
 
 /* from gals pinball (which was in turn from ninja gaiden) */
 static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
@@ -159,10 +92,10 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 					drawgfx(bitmap, machine->gfx[2],
 						code + layout[row][col],
-						color,
+						color * 16,
 						flipx, flipy,
 						x, y,
-						cliprect, TRANSPARENCY_PEN, 0);
+						cliprect, TRANSPARENCY_PEN_RAW, 0);
 				}
 			}
 
@@ -188,24 +121,26 @@ VIDEO_UPDATE( spbactn )
 {
 	int offs, sx, sy;
 
-	fillbitmap(tile_bitmap_fg,      0, cliprect);
+	fillbitmap(tile_bitmap_fg, 0, cliprect);
 
 	/* draw table bg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 	{
-		int attr, code, colour;
+		int attr, code, color;
 
 		code = spbactn_bgvideoram[offs + 0x4000 / 2];
 		attr = spbactn_bgvideoram[offs + 0x0000 / 2];
 
-		colour = ((attr & 0x00f0) >> 4) | 0x80;
+		color = ((attr & 0x00f0) >> 4) | 0x80;
 
+		/* using pen 16 as the transparent pen is a hack,
+           it's done to simulate non-existant TRANSPARENY_NONE_RAW */
 		drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
 					code,
-					colour,
+					0x300 + (color * 16),
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_NONE, 0);
+					cliprect, TRANSPARENCY_PEN_RAW, 16);
 
 		sx++;
 		if (sx > 63)
@@ -220,19 +155,19 @@ VIDEO_UPDATE( spbactn )
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 		{
-			int attr, code, colour;
+			int attr, code, color;
 
 			code = spbactn_bgvideoram[offs + 0x4000 / 2];
 			attr = spbactn_bgvideoram[offs + 0x0000 / 2];
 
-			colour = ((attr & 0x00f0) >> 4) | 0x80;
+			color = ((attr & 0x00f0) >> 4) | 0x80;
 
 			drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
 					code,
-					colour,
+					0x300 + (color * 16),
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN, 0);
+					cliprect, TRANSPARENCY_PEN_RAW, 0);
 
 			sx++;
 			if (sx > 63)
@@ -248,25 +183,25 @@ VIDEO_UPDATE( spbactn )
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
 	{
-		int attr, code, colour;
+		int attr, code, color;
 
 		code = spbactn_fgvideoram[offs + 0x4000 / 2];
 		attr = spbactn_fgvideoram[offs + 0x0000 / 2];
 
-		colour = ((attr & 0x00f0) >> 4);
+		color = ((attr & 0x00f0) >> 4);
 
 		/* blending */
 		if (attr & 0x0008)
-			colour += 0x00f0;
+			color += 0x00f0;
 		else
-			colour |= 0x0080;
+			color |= 0x0080;
 
 		drawgfx(tile_bitmap_fg, screen->machine->gfx[0],
 					code,
-					colour,
+					0x200 + (color * 16),
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect,TRANSPARENCY_PEN, 0);
+					cliprect,TRANSPARENCY_PEN_RAW, 0);
 
 		sx++;
 		if (sx > 63)
@@ -279,6 +214,6 @@ VIDEO_UPDATE( spbactn )
 	draw_sprites(screen->machine, tile_bitmap_fg, cliprect, 3);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(screen->machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, 0, 0, cliprect);
+	blendbitmaps(screen->machine, bitmap, tile_bitmap_bg, tile_bitmap_fg, cliprect);
 	return 0;
 }
