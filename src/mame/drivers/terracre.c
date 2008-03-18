@@ -206,47 +206,6 @@ static MACHINE_START( amazon )
 	state_save_register_global_array(mAmazonProtReg);
 }
 
-/* This is not the REAL Booby Kids (early Japanese version of Kid no Hore Hore Daisakusen),
-  it is a bootleg that was manufactureed in Italy which became popular in Europe.  The bootleggers
-  probably called it 'Booby Kids' because this is the name under which the game was known on home systems
-  at the time.  This is actually just a graphic hack of the other bootleg (horekidb) it is supported because
-  it is a common PCB, and we need to clarify that this is not the real thing.
-*/
-ROM_START( boobhack )
-	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 68000 code (main CPU) */
-	ROM_LOAD16_BYTE( "1-c.bin", 0x00000, 0x8000, CRC(786619c7) SHA1(6b4a659839a7c19370a81f9f9b26e4fe0d210d7b) )
-	ROM_LOAD16_BYTE( "1-b.bin", 0x00001, 0x8000, CRC(3bbb475b) SHA1(575cdc4f902f15335579c0f860fa75e33a0ea539) )
-	ROM_LOAD16_BYTE( "1-d.bin",	0x10000, 0x8000, CRC(375c0c50) SHA1(ee040dbdfe6673cf48f143518458609b21b4e15d) )
-	ROM_LOAD16_BYTE( "1-a.bin",	0x10001, 0x8000, CRC(ee7d52bb) SHA1(b9083f672a6bc37ec2bbb9af081e6f27b712b663) )
-
-	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 code (sound) */
-	ROM_LOAD( "1-i.bin",	0x0000, 0x4000,CRC(49cd3b81) SHA1(284d75f6f6121d0581bb62f13ee02c85c3d972d2) )
-	ROM_LOAD( "1-j.bin",	0x4000, 0x4000,CRC(c1eaa938) SHA1(839f03e701f072a6441ee4980eb1961859c40d97) )
-	ROM_LOAD( "1-k.bin",	0x8000, 0x4000,CRC(0a2bc702) SHA1(0cef9e9022a27d30d2f83a16a55d8ede0ab686f4) )
-
-	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE ) /* alphanumerics */
-	ROM_LOAD( "1-p.bin",	0x0000, 0x2000, CRC(104b77cc) SHA1(f875c7fe4f2b540bc44fa144a449a01268011431) )
-
-	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE ) /* tiles */
-	ROM_LOAD( "1-e.bin",	0x00000, 0x8000, CRC(da25ae10) SHA1(83d8b78cff85854b497b40525ec3c93a84ba6248) )
-	ROM_LOAD( "1-f.bin",	0x08000, 0x8000, CRC(616e4321) SHA1(5bf0e0a7290b6bcb5dfbb1070eeb683830e6916b) )
-	ROM_LOAD( "1-g.bin",	0x10000, 0x8000, CRC(8c7d2be2) SHA1(efd70997126fc7c2622546fabe69cb222dca87f9) )
-	ROM_LOAD( "1-h.bin",	0x18000, 0x8000, CRC(a0066b02) SHA1(d6437932028e937dab5728f40d6d09b6afe9a903) )
-
-	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE ) /* sprites */
-	ROM_LOAD( "1-l.bin",	0x00000, 0x8000, CRC(a3caa07a) SHA1(4baa7d1867dbaa8bace43416040114129f5405d6) )
-	ROM_LOAD( "1-m.bin",	0x08000, 0x8000, CRC(15b6cbdf) SHA1(b7f2a527946bcbd51aeae98b8971f4fbabcb3d14) ) // Booby Kids gfx hack changes these 2 roms ONLY
-	ROM_LOAD( "1-n.bin",	0x10000, 0x8000, CRC(e300747a) SHA1(5875a46c215b12f1e9a889819215bca40e4459a6) )
-	ROM_LOAD( "1-o.bin",	0x18000, 0x8000, CRC(cddc6a6c) SHA1(28d12342e0ada941f68845fa65793a3f5fa21246) ) // Booby Kids gfx hack changes these 2 roms ONLY
-
-	ROM_REGION( 0x500, REGION_PROMS, 0 )
-	ROM_LOAD( "kid_prom.10f", 0x000, 0x100, CRC(ca13ce23) SHA1(46f0ed22f601721fa35bab12ce8816f30b102f59) ) /* red */
-	ROM_LOAD( "kid_prom.11f", 0x100, 0x100, CRC(fb44285a) SHA1(f9605e82f63188daeff044fd48d81c1dfc4d4f2a) ) /* green */
-	ROM_LOAD( "kid_prom.12f", 0x200, 0x100, CRC(40d41237) SHA1(b33082540d739a3bfe096f68f3359fbf1360b5be) ) /* blue */
-	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) /* clut */
-	ROM_LOAD( "kid_prom.4e",  0x400, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
-ROM_END
-
 static ADDRESS_MAP_START( terracre_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x020000, 0x0201ff) AM_READ(SMH_RAM)
@@ -1007,6 +966,50 @@ ROM_START( horekidb )
 
 	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* unknown, mostly text */
 	ROM_LOAD( "horekid.17",	0x0000, 0x2000, CRC(1d8d592b) SHA1(be8d6df8b5926069ae2cbc1dc26e1fa92d63f297) )
+ROM_END
+
+/* This is not the REAL Booby Kids (early Japanese version of Kid no Hore Hore Daisakusen),
+  it is a bootleg that was manufactureed in Italy which became popular in Europe.  The bootleggers
+  probably called it 'Booby Kids' because this is the name under which the game was known on home systems
+  at the time.  This is actually just a graphic hack of the other bootleg (horekidb) it is supported because
+  it is a common PCB, and we need to clarify that this is not the real thing.
+*/
+ROM_START( boobhack )
+	ROM_REGION( 0x20000, REGION_CPU1, 0 ) /* 68000 code (main CPU) */
+	ROM_LOAD16_BYTE( "1-c.bin", 0x00000, 0x8000, CRC(786619c7) SHA1(6b4a659839a7c19370a81f9f9b26e4fe0d210d7b) )
+	ROM_LOAD16_BYTE( "1-b.bin", 0x00001, 0x8000, CRC(3bbb475b) SHA1(575cdc4f902f15335579c0f860fa75e33a0ea539) )
+	ROM_LOAD16_BYTE( "1-d.bin",	0x10000, 0x8000, CRC(375c0c50) SHA1(ee040dbdfe6673cf48f143518458609b21b4e15d) )
+	ROM_LOAD16_BYTE( "1-a.bin",	0x10001, 0x8000, CRC(ee7d52bb) SHA1(b9083f672a6bc37ec2bbb9af081e6f27b712b663) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* Z80 code (sound) */
+	ROM_LOAD( "1-i.bin",	0x0000, 0x4000,CRC(49cd3b81) SHA1(284d75f6f6121d0581bb62f13ee02c85c3d972d2) )
+	ROM_LOAD( "1-j.bin",	0x4000, 0x4000,CRC(c1eaa938) SHA1(839f03e701f072a6441ee4980eb1961859c40d97) )
+	ROM_LOAD( "1-k.bin",	0x8000, 0x4000,CRC(0a2bc702) SHA1(0cef9e9022a27d30d2f83a16a55d8ede0ab686f4) )
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE ) /* alphanumerics */
+	ROM_LOAD( "1-p.bin",	0x0000, 0x2000, CRC(104b77cc) SHA1(f875c7fe4f2b540bc44fa144a449a01268011431) )
+
+	ROM_REGION( 0x20000, REGION_GFX2, ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "1-e.bin",	0x00000, 0x8000, CRC(da25ae10) SHA1(83d8b78cff85854b497b40525ec3c93a84ba6248) )
+	ROM_LOAD( "1-f.bin",	0x08000, 0x8000, CRC(616e4321) SHA1(5bf0e0a7290b6bcb5dfbb1070eeb683830e6916b) )
+	ROM_LOAD( "1-g.bin",	0x10000, 0x8000, CRC(8c7d2be2) SHA1(efd70997126fc7c2622546fabe69cb222dca87f9) )
+	ROM_LOAD( "1-h.bin",	0x18000, 0x8000, CRC(a0066b02) SHA1(d6437932028e937dab5728f40d6d09b6afe9a903) )
+
+	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE ) /* sprites */
+	ROM_LOAD( "1-l.bin",	0x00000, 0x8000, CRC(a3caa07a) SHA1(4baa7d1867dbaa8bace43416040114129f5405d6) )
+	ROM_LOAD( "1-m.bin",	0x08000, 0x8000, CRC(15b6cbdf) SHA1(b7f2a527946bcbd51aeae98b8971f4fbabcb3d14) ) // Booby Kids gfx hack changes these 2 roms ONLY
+	ROM_LOAD( "1-n.bin",	0x10000, 0x8000, CRC(e300747a) SHA1(5875a46c215b12f1e9a889819215bca40e4459a6) )
+	ROM_LOAD( "1-o.bin",	0x18000, 0x8000, CRC(cddc6a6c) SHA1(28d12342e0ada941f68845fa65793a3f5fa21246) ) // Booby Kids gfx hack changes these 2 roms ONLY
+
+	ROM_REGION( 0x500, REGION_PROMS, 0 )
+	ROM_LOAD( "kid_prom.10f", 0x000, 0x100, CRC(ca13ce23) SHA1(46f0ed22f601721fa35bab12ce8816f30b102f59) ) /* red */
+	ROM_LOAD( "kid_prom.11f", 0x100, 0x100, CRC(fb44285a) SHA1(f9605e82f63188daeff044fd48d81c1dfc4d4f2a) ) /* green */
+	ROM_LOAD( "kid_prom.12f", 0x200, 0x100, CRC(40d41237) SHA1(b33082540d739a3bfe096f68f3359fbf1360b5be) ) /* blue */
+	ROM_LOAD( "kid_prom.2g",  0x300, 0x100, CRC(4b9be0ed) SHA1(81aa7bb24fe6ea13f5dffdb67ea699adf0b3129a) ) /* clut */
+	ROM_LOAD( "kid_prom.4e",  0x400, 0x100, CRC(e4fb54ee) SHA1(aba89d347b24dc6680e6f25b4a6c0d6657bb6a83) ) /* ctable */
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 )
+	ROM_LOAD( "kid_prom.4e",  0x000, 0x100, NO_DUMP ) /* ctable */
 ROM_END
 
 static DRIVER_INIT( amazon )
