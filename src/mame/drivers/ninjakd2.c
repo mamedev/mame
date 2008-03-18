@@ -85,6 +85,8 @@ Notes:
   all write the 0xF0 "silence" command), however since these games don't have PCM
   samples it seems unlikely that the boards actually have the PCM circuitry. The
   command written might be a leftover from the code used for Ninja Kid II.
+  Atomic Robo-Kid definitely doesn't have the DAC and counters. The other boards
+  have not been verified.
 
 - Ark Area has no explicit copyright year on the title screen, however it was
   reportedly released in December 1987.
@@ -115,8 +117,6 @@ Notes:
 
 TODO:
 -----
-- Ninja Kid II PCM sample playback frequency is not verified
-
 - What does the "credit service" dip switch do in Ninja Kid II?
 
 ******************************************************************************/
@@ -130,6 +130,11 @@ TODO:
 
 #define MAIN_CLOCK_12 XTAL_12MHz
 #define MAIN_CLOCK_5  XTAL_5MHz
+
+// PCM playback is controlled by a 555 timer
+#define NE555_FREQUENCY	16300	// measured on PCB
+//#define NE555_FREQUENCY	(1.0f / (0.693 * (560 + 2*51) * 0.1e-6)) 	// theoretical: this gives 21.8kHz which is too high
+
 
 static const INT16* ninjakd2_sampledata;
 
@@ -233,7 +238,7 @@ static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 			++end;
 
 		if (end - start)
-			sample_start_raw(0, &ninjakd2_sampledata[start], end - start, MAIN_CLOCK_5 / 384, 0);	// 13020kHz NOT verified
+			sample_start_raw(0, &ninjakd2_sampledata[start], end - start, NE555_FREQUENCY, 0);
 		else
 			sample_stop(0);
 	}
