@@ -464,10 +464,10 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 
 						pdrawgfx(bitmap_sp, gfx,
 							number + layout[row][col],
-							color * 16,
+							color,
 							flipx, flipy,
 							sx, sy,
-							cliprect, TRANSPARENCY_PEN_RAW, 0,
+							cliprect, TRANSPARENCY_PEN, 0,
 							priority_mask);
 					}
 				}
@@ -485,10 +485,10 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 
 						pdrawgfx(bitmap, gfx,
 							number + layout[row][col],
-							color * 16,
+							color,
 							flipx, flipy,
 							sx, sy,
-							cliprect, TRANSPARENCY_PEN_RAW, 0,
+							cliprect, TRANSPARENCY_PEN, 0,
 							priority_mask);
 					}
 				}

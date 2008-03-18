@@ -92,10 +92,10 @@ static int draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 					drawgfx(bitmap, machine->gfx[2],
 						code + layout[row][col],
-						color * 16,
+						color,
 						flipx, flipy,
 						x, y,
-						cliprect, TRANSPARENCY_PEN_RAW, 0);
+						cliprect, TRANSPARENCY_PEN, 0);
 				}
 			}
 
@@ -133,14 +133,12 @@ VIDEO_UPDATE( spbactn )
 
 		color = ((attr & 0x00f0) >> 4) | 0x80;
 
-		/* using pen 16 as the transparent pen is a hack,
-           it's done to simulate non-existant TRANSPARENY_NONE_RAW */
 		drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
 					code,
-					0x300 + (color * 16),
+					color,
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN_RAW, 16);
+					cliprect, TRANSPARENCY_NONE, 0);
 
 		sx++;
 		if (sx > 63)
@@ -164,10 +162,10 @@ VIDEO_UPDATE( spbactn )
 
 			drawgfx(tile_bitmap_bg, screen->machine->gfx[1],
 					code,
-					0x300 + (color * 16),
+					color,
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect, TRANSPARENCY_PEN_RAW, 0);
+					cliprect, TRANSPARENCY_PEN, 0);
 
 			sx++;
 			if (sx > 63)
@@ -198,10 +196,10 @@ VIDEO_UPDATE( spbactn )
 
 		drawgfx(tile_bitmap_fg, screen->machine->gfx[0],
 					code,
-					0x200 + (color * 16),
+					color,
 					0, 0,
 					16 * sx, 8 * sy,
-					cliprect,TRANSPARENCY_PEN_RAW, 0);
+					cliprect, TRANSPARENCY_PEN, 0);
 
 		sx++;
 		if (sx > 63)
