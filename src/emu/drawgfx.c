@@ -121,7 +121,6 @@ static void calc_penusage(gfx_element *gfx, int num)
 
 	/* packed case */
 	if (gfx->flags & GFX_ELEMENT_PACKED)
-	{
 		for (y = 0; y < gfx->height; y++)
 		{
 			for (x = 0; x < gfx->width/2; x++)
@@ -129,11 +128,9 @@ static void calc_penusage(gfx_element *gfx, int num)
 
 			dp += gfx->line_modulo;
 		}
-	}
 
 	/* unpacked case */
 	else
-	{
 		for (y = 0; y < gfx->height; y++)
 		{
 			for (x = 0; x < gfx->width; x++)
@@ -141,7 +138,6 @@ static void calc_penusage(gfx_element *gfx, int num)
 
 			dp += gfx->line_modulo;
 		}
-	}
 
 	/* store the final result */
 	gfx->pen_usage[num] = usage;
@@ -172,7 +168,6 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src)
 
 	/* packed case */
 	if (gfx->flags & GFX_ELEMENT_PACKED)
-	{
 		for (plane = 0; plane < planes; plane++)
 		{
 			int planebit = 1 << (planes - 1 - plane);
@@ -192,11 +187,9 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src)
 				}
 			}
 		}
-	}
 
 	/* unpacked case */
 	else
-	{
 		for (plane = 0; plane < planes; plane++)
 		{
 			int planebit = 1 << (planes - 1 - plane);
@@ -212,7 +205,6 @@ void decodechar(gfx_element *gfx, int num, const UINT8 *src)
 						dp[x] |= planebit;
 			}
 		}
-	}
 
 	/* compute pen usage */
 	calc_penusage(gfx, num);
@@ -250,6 +242,7 @@ gfx_element *allocgfx(const gfx_layout *gl)
 		memcpy(buffer, gl->extxoffs, sizeof(gfx->layout.extxoffs[0]) * gl->width);
 		gfx->layout.extxoffs = buffer;
 	}
+
 	if (gl->extyoffs != NULL)
 	{
 		UINT32 *buffer = malloc_or_die(sizeof(buffer[0]) * gl->height);
@@ -323,10 +316,8 @@ void decodegfx(gfx_element *gfx, const UINT8 *src, UINT32 first, UINT32 count)
 
 	/* otherwise, we get to manually decode */
 	else
-	{
 		for (c = first; c <= last; c++)
 			decodechar(gfx, c, src);
-	}
 }
 
 
@@ -357,137 +348,6 @@ void freegfx(gfx_element *gfx)
 /***************************************************************************
     BLOCKMOVE PRIMITIVES
 ***************************************************************************/
-
-#ifdef UNUSED_FUNCTION
-INLINE void blockmove_NtoN_transpen_noremap8(
-		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		UINT8 *dstdata,int dstmodulo,
-		int transpen)
-{
-	UINT8 *end;
-	int trans4;
-	UINT32 *sd4;
-
-	srcmodulo -= srcwidth;
-	dstmodulo -= srcwidth;
-
-	trans4 = transpen * 0x01010101;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (((FPTR)srcdata & 3) && dstdata < end)	/* longword align */
-		{
-			int col;
-
-			col = *(srcdata++);
-			if (col != transpen) *dstdata = col;
-			dstdata++;
-		}
-		sd4 = (UINT32 *)srcdata;
-		while (dstdata <= end - 4)
-		{
-			UINT32 col4;
-
-			if ((col4 = *(sd4++)) != trans4)
-			{
-				UINT32 xod4;
-
-				xod4 = col4 ^ trans4;
-				if( (xod4&0x000000ff) && (xod4&0x0000ff00) &&
-					(xod4&0x00ff0000) && (xod4&0xff000000) )
-				{
-					write_dword((UINT32 *)dstdata,col4);
-				}
-				else
-				{
-					if (xod4 & (0xff<<SHIFT0)) dstdata[0] = col4>>SHIFT0;
-					if (xod4 & (0xff<<SHIFT1)) dstdata[1] = col4>>SHIFT1;
-					if (xod4 & (0xff<<SHIFT2)) dstdata[2] = col4>>SHIFT2;
-					if (xod4 & (0xff<<SHIFT3)) dstdata[3] = col4>>SHIFT3;
-				}
-			}
-			dstdata += 4;
-		}
-		srcdata = (UINT8 *)sd4;
-		while (dstdata < end)
-		{
-			int col;
-
-			col = *(srcdata++);
-			if (col != transpen) *dstdata = col;
-			dstdata++;
-		}
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-}
-#endif
-
-#ifdef UNUSED_FUNCTION
-INLINE void blockmove_NtoN_transpen_noremap_flipx8(
-		const UINT8 *srcdata,int srcwidth,int srcheight,int srcmodulo,
-		UINT8 *dstdata,int dstmodulo,
-		int transpen)
-{
-	UINT8 *end;
-	int trans4;
-	UINT32 *sd4;
-
-	srcmodulo += srcwidth;
-	dstmodulo -= srcwidth;
-	srcdata -= 3;
-
-	trans4 = transpen * 0x01010101;
-
-	while (srcheight)
-	{
-		end = dstdata + srcwidth;
-		while (((FPTR)srcdata & 3) && dstdata < end)	/* longword align */
-		{
-			int col;
-
-			col = srcdata[3];
-			srcdata--;
-			if (col != transpen) *dstdata = col;
-			dstdata++;
-		}
-		sd4 = (UINT32 *)srcdata;
-		while (dstdata <= end - 4)
-		{
-			UINT32 col4;
-
-			if ((col4 = *(sd4--)) != trans4)
-			{
-				UINT32 xod4;
-
-				xod4 = col4 ^ trans4;
-				if (xod4 & (0xff<<SHIFT0)) dstdata[3] = (col4>>SHIFT0);
-				if (xod4 & (0xff<<SHIFT1)) dstdata[2] = (col4>>SHIFT1);
-				if (xod4 & (0xff<<SHIFT2)) dstdata[1] = (col4>>SHIFT2);
-				if (xod4 & (0xff<<SHIFT3)) dstdata[0] = (col4>>SHIFT3);
-			}
-			dstdata += 4;
-		}
-		srcdata = (UINT8 *)sd4;
-		while (dstdata < end)
-		{
-			int col;
-
-			col = srcdata[3];
-			srcdata--;
-			if (col != transpen) *dstdata = col;
-			dstdata++;
-		}
-
-		srcdata += srcmodulo;
-		dstdata += dstmodulo;
-		srcheight--;
-	}
-}
-#endif
 
 INLINE void blockmove_NtoN_transpen_noremap16(
 		const UINT16 *srcdata,int srcwidth,int srcheight,int srcmodulo,
@@ -632,9 +492,9 @@ int pdrawgfx_shadow_lowpri = 0;
 		DATA_TYPE *dstdata,int dstwidth,int dstheight,int dstmodulo
 
 #define RAW 1
-#define COLOR_ARG unsigned int colorbase,UINT8 *pridata,UINT32 pmask
+#define COLOR_ARG int color,UINT8 *pridata,UINT32 pmask
 #define INCREMENT_DST(n) {dstdata+=(n);pridata += (n);}
-#define LOOKUP(n) (colorbase + (n))
+#define LOOKUP(n) (color + (n))
 #define SETPIXELCOLOR(dest,n) { if (((1 << (pridata[dest] & 0x1f)) & pmask) == 0) { if (pridata[dest] & 0x80) { dstdata[dest] = palette_shadow_table[n];} else { dstdata[dest] = (n);} } pridata[dest] = (pridata[dest] & 0x7f) | afterdrawmask; }
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##_raw_pri16 args body
 #include "drawgfx.c"
@@ -645,8 +505,8 @@ int pdrawgfx_shadow_lowpri = 0;
 #undef RAW
 
 #define RAW 0
-#define COLOR_ARG const pen_t *paldata,UINT8 *pridata,UINT32 pmask
-#define LOOKUP(n) (paldata[n])
+#define COLOR_ARG int colorbase,const pen_t *paldata,UINT8 *pridata,UINT32 pmask
+#define LOOKUP(n) (colorbase + (n))
 #define SETPIXELCOLOR(dest,n) { if (((1 << (pridata[dest] & 0x1f)) & pmask) == 0) { if (pridata[dest] & 0x80) { dstdata[dest] = palette_shadow_table[n];} else { dstdata[dest] = (n);} } pridata[dest] = (pridata[dest] & 0x7f) | afterdrawmask; }
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##_pri16 args body
 #include "drawgfx.c"
@@ -658,9 +518,9 @@ int pdrawgfx_shadow_lowpri = 0;
 #undef RAW
 
 #define RAW 1
-#define COLOR_ARG unsigned int colorbase
+#define COLOR_ARG int color
 #define INCREMENT_DST(n) {dstdata+=(n);}
-#define LOOKUP(n) (colorbase + (n))
+#define LOOKUP(n) (color + (n))
 #define SETPIXELCOLOR(dest,n) {dstdata[dest] = (n);}
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##_raw16 args body
 #include "drawgfx.c"
@@ -671,8 +531,8 @@ int pdrawgfx_shadow_lowpri = 0;
 #undef RAW
 
 #define RAW 0
-#define COLOR_ARG const pen_t *paldata
-#define LOOKUP(n) (paldata[n])
+#define COLOR_ARG int colorbase, const pen_t *paldata
+#define LOOKUP(n) (colorbase + (n))
 #define SETPIXELCOLOR(dest,n) {dstdata[dest] = (n);}
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##16 args body
 #include "drawgfx.c"
@@ -740,9 +600,9 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
 		DATA_TYPE *dstdata,int dstwidth,int dstheight,int dstmodulo
 
 #define RAW 1
-#define COLOR_ARG unsigned int colorbase,UINT8 *pridata,UINT32 pmask
+#define COLOR_ARG int color,UINT8 *pridata,UINT32 pmask
 #define INCREMENT_DST(n) {dstdata+=(n);pridata += (n);}
-#define LOOKUP(n) (colorbase + (n))
+#define LOOKUP(n) (color + (n))
 #define SETPIXELCOLOR(dest,n) { UINT8 r8=pridata[dest]; if(!(1<<(r8&0x1f)&pmask)){ if(afterdrawmask){ r8&=0x7f; r8|=0x1f; dstdata[dest]=(n); pridata[dest]=r8; } else if(!(r8&0x80)){ dstdata[dest]=SHADOW32(palette_shadow_table,n); pridata[dest]|=0x80; } } }
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##_raw_pri32 args body
 #include "drawgfx.c"
@@ -753,7 +613,7 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
 #undef RAW
 
 #define RAW 0
-#define COLOR_ARG const pen_t *paldata,UINT8 *pridata,UINT32 pmask
+#define COLOR_ARG int colorbase, const pen_t *paldata,UINT8 *pridata,UINT32 pmask
 #define LOOKUP(n) (paldata[n])
 #define SETPIXELCOLOR(dest,n) { UINT8 r8=pridata[dest]; if(!(1<<(r8&0x1f)&pmask)){ if(afterdrawmask){ r8&=0x7f; r8|=0x1f; dstdata[dest]=(n); pridata[dest]=r8; } else if(!(r8&0x80)){ dstdata[dest]=SHADOW32(palette_shadow_table,n); pridata[dest]|=0x80; } } }
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##_pri32 args body
@@ -766,9 +626,9 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
 #undef RAW
 
 #define RAW 1
-#define COLOR_ARG unsigned int colorbase
+#define COLOR_ARG int color
 #define INCREMENT_DST(n) {dstdata+=(n);}
-#define LOOKUP(n) (colorbase + (n))
+#define LOOKUP(n) (color + (n))
 #define SETPIXELCOLOR(dest,n) {dstdata[dest] = (n);}
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##_raw32 args body
 #include "drawgfx.c"
@@ -779,7 +639,7 @@ INLINE UINT32 SHADOW32(pen_t *shadow_table, UINT32 c)
 #undef RAW
 
 #define RAW 0
-#define COLOR_ARG const pen_t *paldata
+#define COLOR_ARG int colorbase, const pen_t *paldata
 #define LOOKUP(n) (paldata[n])
 #define SETPIXELCOLOR(dest,n) {dstdata[dest] = (n);}
 #define DECLARE_SWAP_RAW_PRI(function,args,body) static void function##32 args body
@@ -871,13 +731,9 @@ INLINE void common_drawgfx(bitmap_t *dest,const gfx_element *gfx,
 		int transmask = 0;
 
 		if (transparency == TRANSPARENCY_PEN)
-		{
 			transmask = 1 << (transparent_color & 0xff);
-		}
 		else	/* transparency == TRANSPARENCY_PENS */
-		{
 			transmask = transparent_color;
-		}
 
 		if ((gfx->pen_usage[code] & ~transmask) == 0)
 			/* character is totally transparent, no need to draw */
@@ -1020,7 +876,6 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		int col,colwidth;
 		rectangle myclip;
 
-
 		colwidth = srcwidth / cols;
 
 		myclip.min_y = clip->min_y;
@@ -1031,15 +886,16 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		{
 			int cons,scroll;
 
-
 			/* count consecutive columns scrolled by the same amount */
 			scroll = colscroll[col];
 			cons = 1;
 			while (col + cons < cols &&	colscroll[col + cons] == scroll)
 				cons++;
 
-			if (scroll < 0) scroll = srcheight - (-scroll) % srcheight;
-			else scroll %= srcheight;
+			if (scroll < 0)
+				scroll = srcheight - (-scroll) % srcheight;
+			else
+				scroll %= srcheight;
 
 			myclip.min_x = col * colwidth;
 			if (myclip.min_x < clip->min_x) myclip.min_x = clip->min_x;
@@ -1058,7 +914,6 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		int row,rowheight;
 		rectangle myclip;
 
-
 		rowheight = srcheight / rows;
 
 		myclip.min_x = clip->min_x;
@@ -1069,15 +924,16 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		{
 			int cons,scroll;
 
-
 			/* count consecutive rows scrolled by the same amount */
 			scroll = rowscroll[row];
 			cons = 1;
 			while (row + cons < rows &&	rowscroll[row + cons] == scroll)
 				cons++;
 
-			if (scroll < 0) scroll = srcwidth - (-scroll) % srcwidth;
-			else scroll %= srcwidth;
+			if (scroll < 0)
+				scroll = srcwidth - (-scroll) % srcwidth;
+			else
+				scroll %= srcwidth;
 
 			myclip.min_y = row * rowheight;
 			if (myclip.min_y < clip->min_y) myclip.min_y = clip->min_y;
@@ -1095,12 +951,15 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		/* XY scrolling playfield */
 		int scrollx,scrolly,sx,sy;
 
+		if (rowscroll[0] < 0)
+			scrollx = srcwidth - (-rowscroll[0]) % srcwidth;
+		else
+			scrollx = rowscroll[0] % srcwidth;
 
-		if (rowscroll[0] < 0) scrollx = srcwidth - (-rowscroll[0]) % srcwidth;
-		else scrollx = rowscroll[0] % srcwidth;
-
-		if (colscroll[0] < 0) scrolly = srcheight - (-colscroll[0]) % srcheight;
-		else scrolly = colscroll[0] % srcheight;
+		if (colscroll[0] < 0)
+			scrolly = srcheight - (-colscroll[0]) % srcheight;
+		else
+			scrolly = colscroll[0] % srcheight;
 
 		for (sx = scrollx - srcwidth;sx < destwidth;sx += srcwidth)
 			for (sy = scrolly - srcheight;sy < destheight;sy += srcheight)
@@ -1113,9 +972,10 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		int scrollx;
 		rectangle myclip;
 
-
-		if (rowscroll[0] < 0) scrollx = srcwidth - (-rowscroll[0]) % srcwidth;
-		else scrollx = rowscroll[0] % srcwidth;
+		if (rowscroll[0] < 0)
+			scrollx = srcwidth - (-rowscroll[0]) % srcwidth;
+		else
+			scrollx = rowscroll[0] % srcwidth;
 
 		colwidth = srcwidth / cols;
 
@@ -1127,15 +987,16 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		{
 			int cons,scroll;
 
-
 			/* count consecutive columns scrolled by the same amount */
 			scroll = colscroll[col];
 			cons = 1;
 			while (col + cons < cols &&	colscroll[col + cons] == scroll)
 				cons++;
 
-			if (scroll < 0) scroll = srcheight - (-scroll) % srcheight;
-			else scroll %= srcheight;
+			if (scroll < 0)
+				scroll = srcheight - (-scroll) % srcheight;
+			else
+				scroll %= srcheight;
 
 			myclip.min_x = col * colwidth + scrollx;
 			if (myclip.min_x < clip->min_x) myclip.min_x = clip->min_x;
@@ -1163,9 +1024,10 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		int scrolly;
 		rectangle myclip;
 
-
-		if (colscroll[0] < 0) scrolly = srcheight - (-colscroll[0]) % srcheight;
-		else scrolly = colscroll[0] % srcheight;
+		if (colscroll[0] < 0)
+			scrolly = srcheight - (-colscroll[0]) % srcheight;
+		else
+			scrolly = colscroll[0] % srcheight;
 
 		rowheight = srcheight / rows;
 
@@ -1177,15 +1039,16 @@ static void copyscrollbitmap_common(bitmap_t *dest,bitmap_t *src,
 		{
 			int cons,scroll;
 
-
 			/* count consecutive rows scrolled by the same amount */
 			scroll = rowscroll[row];
 			cons = 1;
 			while (row + cons < rows &&	rowscroll[row + cons] == scroll)
 				cons++;
 
-			if (scroll < 0) scroll = srcwidth - (-scroll) % srcwidth;
-			else scroll %= srcwidth;
+			if (scroll < 0)
+				scroll = srcwidth - (-scroll) % srcwidth;
+			else
+				scroll %= srcwidth;
 
 			myclip.min_y = row * rowheight + scrolly;
 			if (myclip.min_y < clip->min_y) myclip.min_y = clip->min_y;
@@ -1294,7 +1157,6 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
     1<<17 : double to 200%
     */
 
-
 	/* force clip to bitmap boundary */
 	if (clip)
 	{
@@ -1313,11 +1175,10 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 		clip = &myclip;
 	}
 
-
 	/* 16-bit destination bitmap */
 	if (dest_bmp->bpp == 16)
 	{
-		const pen_t *pal = &Machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		int colorbase = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 		UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
 
 		int sprite_screen_height = (scaley*gfx->height+0x8000)>>16;
@@ -1335,54 +1196,52 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 			int x_index_base;
 			int y_index;
 
-			if( flipx )
+			if (flipx)
 			{
 				x_index_base = (sprite_screen_width-1)*dx;
 				dx = -dx;
 			}
 			else
-			{
 				x_index_base = 0;
-			}
 
-			if( flipy )
+			if (flipy)
 			{
 				y_index = (sprite_screen_height-1)*dy;
 				dy = -dy;
 			}
 			else
-			{
 				y_index = 0;
-			}
 
-			if( clip )
+			if (clip)
 			{
-				if( sx < clip->min_x)
+				if (sx < clip->min_x)
 				{ /* clip left */
 					int pixels = clip->min_x-sx;
 					sx += pixels;
 					x_index_base += pixels*dx;
 				}
-				if( sy < clip->min_y )
+
+				if (sy < clip->min_y)
 				{ /* clip top */
 					int pixels = clip->min_y-sy;
 					sy += pixels;
 					y_index += pixels*dy;
 				}
-				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip->max_x+1 )
+
+				if (ex > clip->max_x + 1)
 				{ /* clip right */
 					int pixels = ex-clip->max_x-1;
 					ex -= pixels;
 				}
-				if( ey > clip->max_y+1 )
+
+				if (ey > clip->max_y + 1)
 				{ /* clip bottom */
 					int pixels = ey-clip->max_y-1;
 					ey -= pixels;
 				}
 			}
 
-			if( ex>sx )
+			if (ex > sx)
 			{ /* skip if inner loop doesn't draw anything */
 				int y;
 
@@ -1392,82 +1251,74 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 					if (pri_buffer)
 					{
 						if (gfx->flags & GFX_ELEMENT_PACKED)
-						{
-							for( y=sy; y<ey; y++ )
+							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
-										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+										dest[x] = colorbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
 									pri[x] = 31;
 									x_index += dx;
 								}
 
 								y_index += dy;
 							}
-						}
 						else
-						{
-							for( y=sy; y<ey; y++ )
+							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
-										dest[x] = pal[source[x_index>>16]];
+										dest[x] = colorbase + source[x_index>>16];
 									pri[x] = 31;
 									x_index += dx;
 								}
 
 								y_index += dy;
 							}
-						}
 					}
 					else
 					{
 						if (gfx->flags & GFX_ELEMENT_PACKED)
-						{
-							for( y=sy; y<ey; y++ )
+							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
-									dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
+									dest[x] = colorbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
 									x_index += dx;
 								}
 
 								y_index += dy;
 							}
-						}
 						else
-						{
-							for( y=sy; y<ey; y++ )
+							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
-									dest[x] = pal[source[x_index>>16]];
+									dest[x] = colorbase + source[x_index>>16];
 									x_index += dx;
 								}
 
 								y_index += dy;
 							}
-						}
 					}
 				}
 
@@ -1477,21 +1328,20 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 					if (pri_buffer)
 					{
 						if (gfx->flags & GFX_ELEMENT_PACKED)
-						{
-							for( y=sy; y<ey; y++ )
+							for(y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
 									int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-									if( c != transparent_color )
+									if (c != transparent_color)
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
+											dest[x] = colorbase + c;
 										pri[x] = 31;
 									}
 									x_index += dx;
@@ -1499,23 +1349,21 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 								y_index += dy;
 							}
-						}
 						else
-						{
-							for( y=sy; y<ey; y++ )
+							for(y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 								UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
 									int c = source[x_index>>16];
-									if( c != transparent_color )
+									if (c != transparent_color)
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
-											dest[x] = pal[c];
+											dest[x] = colorbase + c;
 										pri[x] = 31;
 									}
 									x_index += dx;
@@ -1523,46 +1371,41 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 								y_index += dy;
 							}
-						}
 					}
 					else
 					{
 						if (gfx->flags & GFX_ELEMENT_PACKED)
-						{
-							for( y=sy; y<ey; y++ )
+							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
 									int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
-									if( c != transparent_color ) dest[x] = pal[c];
+									if (c != transparent_color) dest[x] = colorbase + c;
 									x_index += dx;
 								}
 
 								y_index += dy;
 							}
-						}
 						else
-						{
-							for( y=sy; y<ey; y++ )
+							for (y = sy; y < ey; y++)
 							{
 								UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 								UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 								int x, x_index = x_index_base;
-								for( x=sx; x<ex; x++ )
+								for (x = sx; x < ex; x++)
 								{
 									int c = source[x_index>>16];
-									if( c != transparent_color ) dest[x] = pal[c];
+									if (c != transparent_color) dest[x] = colorbase + c;
 									x_index += dx;
 								}
 
 								y_index += dy;
 							}
-						}
 					}
 				}
 
@@ -1570,18 +1413,17 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				if (transparency == TRANSPARENCY_PEN_RAW)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = color + c;
@@ -1592,46 +1434,42 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = color + c;
+								if (c != transparent_color) dest[x] = color + c;
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 
 				/* case 2: TRANSPARENCY_PENS */
 				if (transparency == TRANSPARENCY_PENS)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
 								if (((1 << c) & transparent_color) == 0)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
-										dest[x] = pal[c];
+										dest[x] = colorbase + c;
 									pri[x] = 31;
 								}
 								x_index += dx;
@@ -1639,26 +1477,23 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
 								if (((1 << c) & transparent_color) == 0)
-									dest[x] = pal[c];
+									dest[x] = colorbase + c;
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 
 				/* case 3: TRANSPARENCY_PEN_TABLE */
@@ -1669,17 +1504,17 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 					{
 						UINT8 al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
 
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									UINT8 ah;
 
@@ -1690,9 +1525,9 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 										if (((1 << (ah & 0x1f)) & pri_mask) == 0)
 										{
 											if (ah & 0x80)
-												dest[x] = palette_shadow_table[pal[c]];
+												dest[x] = palette_shadow_table[colorbase + c];
 											else
-												dest[x] = pal[c];
+												dest[x] = colorbase + c;
 										}
 										pri[x] = (ah & 0x7f) | 31;
 										break;
@@ -1711,21 +1546,21 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 					}
 					else
 					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									switch(gfx_drawmode_table[c])
 									{
 									case DRAWMODE_SOURCE:
-										dest[x] = pal[c];
+										dest[x] = colorbase + c;
 										break;
 									case DRAWMODE_SHADOW:
 										dest[x] = palette_shadow_table[dest[x]];
@@ -1744,21 +1579,20 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				if (transparency == TRANSPARENCY_ALPHA)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
-										dest[x] = alpha_blend16(dest[x], pal[c]);
+										dest[x] = alpha_blend16(dest[x], colorbase + c);
 									pri[x] = 31;
 								}
 								x_index += dx;
@@ -1766,51 +1600,46 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = alpha_blend16(dest[x], pal[c]);
+								if (c != transparent_color) dest[x] = alpha_blend16(dest[x], colorbase + c);
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 
-				/* pjp 31/5/02 */
 				/* case 7: TRANSPARENCY_ALPHARANGE */
 				if (transparency == TRANSPARENCY_ALPHARANGE)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 									{
-										if( gfx_alpharange_table[c] == 0xff )
-											dest[x] = pal[c];
+										if (gfx_alpharange_table[c] == 0xff)
+											dest[x] = colorbase + c;
 										else
-											dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
+											dest[x] = alpha_blend_r16(dest[x], colorbase + c, gfx_alpharange_table[c]);
 									}
 									pri[x] = 31;
 								}
@@ -1819,31 +1648,28 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
-									if( gfx_alpharange_table[c] == 0xff )
-										dest[x] = pal[c];
+									if (gfx_alpharange_table[c] == 0xff)
+										dest[x] = colorbase + c;
 									else
-										dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
+										dest[x] = alpha_blend_r16(dest[x], colorbase + c, gfx_alpharange_table[c]);
 								}
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 			}
 		}
@@ -1870,7 +1696,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 			int x_index_base;
 			int y_index;
 
-			if( flipx )
+			if (flipx)
 			{
 				x_index_base = (sprite_screen_width-1)*dx;
 				dx = -dx;
@@ -1880,7 +1706,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				x_index_base = 0;
 			}
 
-			if( flipy )
+			if (flipy)
 			{
 				y_index = (sprite_screen_height-1)*dy;
 				dy = -dy;
@@ -1890,34 +1716,36 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				y_index = 0;
 			}
 
-			if( clip )
+			if (clip)
 			{
-				if( sx < clip->min_x)
+				if (sx < clip->min_x)
 				{ /* clip left */
 					int pixels = clip->min_x-sx;
 					sx += pixels;
 					x_index_base += pixels*dx;
 				}
-				if( sy < clip->min_y )
+
+				if (sy < clip->min_y)
 				{ /* clip top */
 					int pixels = clip->min_y-sy;
 					sy += pixels;
 					y_index += pixels*dy;
 				}
-				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip->max_x+1 )
+
+				if (ex > clip->max_x + 1)
 				{ /* clip right */
 					int pixels = ex-clip->max_x-1;
 					ex -= pixels;
 				}
-				if( ey > clip->max_y+1 )
+
+				if (ey > clip->max_y + 1)
 				{ /* clip bottom */
 					int pixels = ey-clip->max_y-1;
 					ey -= pixels;
 				}
 			}
 
-			if( ex>sx )
+			if (ex > sx)
 			{ /* skip if inner loop doesn't draw anything */
 				int y;
 
@@ -1925,15 +1753,14 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 				if (transparency == TRANSPARENCY_NONE)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								if (((1 << pri[x]) & pri_mask) == 0)
 									dest[x] = pal[source[x_index>>16]];
@@ -1943,16 +1770,14 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								dest[x] = pal[source[x_index>>16]];
 								x_index += dx;
@@ -1960,25 +1785,23 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 				}
 
 				/* case 1: TRANSPARENCY_PEN */
 				if (transparency == TRANSPARENCY_PEN)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = pal[c];
@@ -1989,43 +1812,39 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = pal[c];
+								if (c != transparent_color) dest[x] = pal[c];
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 
 				/* case 1b: TRANSPARENCY_PEN_RAW */
 				if (transparency == TRANSPARENCY_PEN_RAW)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = color + c;
@@ -2036,40 +1855,36 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = color + c;
+								if (c != transparent_color) dest[x] = color + c;
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 
 				/* case 2: TRANSPARENCY_PENS */
 				if (transparency == TRANSPARENCY_PENS)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
 								if (((1 << c) & transparent_color) == 0)
@@ -2083,16 +1898,14 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
 								if (((1 << c) & transparent_color) == 0)
@@ -2102,7 +1915,6 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 				}
 
 				/* case 3: TRANSPARENCY_PEN_TABLE */
@@ -2116,8 +1928,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 					UINT8 al, ah;
 
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							source = source_base + (y_index>>16) * gfx->line_modulo;
 							y_index += dy;
@@ -2125,7 +1936,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 							pri = BITMAP_ADDR8(pri_buffer, y, 0);
 							x_index = x_index_base;
 
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int ebx = x_index;
 								x_index += dx;
@@ -2156,17 +1967,15 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								}
 							}
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							source = source_base + (y_index>>16) * gfx->line_modulo;
 							y_index += dy;
 							dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							x_index = x_index_base;
 
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								c = source[x_index>>16];
 								x_index += dx;
@@ -2178,25 +1987,23 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 									dest[x] = SHADOW32(palette_shadow_table,dest[x]);
 							}
 						}
-					}
 				}
 
 				/* case 6: TRANSPARENCY_ALPHA */
 				if (transparency == TRANSPARENCY_ALPHA)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = alpha_blend32(dest[x], pal[c]);
@@ -2207,48 +2014,43 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color ) dest[x] = alpha_blend32(dest[x], pal[c]);
+								if (c != transparent_color) dest[x] = alpha_blend32(dest[x], pal[c]);
 								x_index += dx;
 							}
 
 							y_index += dy;
 						}
-					}
 				}
 
-				/* pjp 31/5/02 */
 				/* case 7: TRANSPARENCY_ALPHARANGE */
 				if (transparency == TRANSPARENCY_ALPHARANGE)
 				{
 					if (pri_buffer)
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 							UINT8 *pri = BITMAP_ADDR8(pri_buffer, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 									{
-										if( gfx_alpharange_table[c] == 0xff )
+										if (gfx_alpharange_table[c] == 0xff)
 											dest[x] = pal[c];
 										else
 											dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
@@ -2260,21 +2062,19 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 					else
-					{
-						for( y=sy; y<ey; y++ )
+						for (y = sy; y < ey; y++)
 						{
 							UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 							UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
 
 							int x, x_index = x_index_base;
-							for( x=sx; x<ex; x++ )
+							for (x = sx; x < ex; x++)
 							{
 								int c = source[x_index>>16];
-								if( c != transparent_color )
+								if (c != transparent_color)
 								{
-									if( gfx_alpharange_table[c] == 0xff )
+									if (gfx_alpharange_table[c] == 0xff)
 										dest[x] = pal[c];
 									else
 										dest[x] = alpha_blend_r32(dest[x], pal[c], gfx_alpharange_table[c]);
@@ -2284,7 +2084,6 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 							y_index += dy;
 						}
-					}
 				}
 			}
 		}
@@ -2380,8 +2179,7 @@ void mdrawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 
 
 #if (RAW == 0)
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_opaque,(COMMON_ARGS,
-		COLOR_ARG),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_opaque,(COMMON_ARGS, COLOR_ARG),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
@@ -2456,8 +2254,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_opaque,(COMMON_ARGS,
 #endif
 
 #if (RAW == 0)
-DECLARE_SWAP_RAW_PRI(blockmove_4toN_opaque,(COMMON_ARGS,
-		COLOR_ARG),
+DECLARE_SWAP_RAW_PRI(blockmove_4toN_opaque,(COMMON_ARGS, COLOR_ARG),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_4
@@ -2553,8 +2350,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_4toN_opaque,(COMMON_ARGS,
 })
 #endif
 
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_transpen,(COMMON_ARGS,
-		COLOR_ARG,int transpen),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_transpen,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
@@ -2665,8 +2461,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_transpen,(COMMON_ARGS,
 	}
 })
 
-DECLARE_SWAP_RAW_PRI(blockmove_4toN_transpen,(COMMON_ARGS,
-		COLOR_ARG,int transpen),
+DECLARE_SWAP_RAW_PRI(blockmove_4toN_transpen,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_4
@@ -2744,8 +2539,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_4toN_transpen,(COMMON_ARGS,
 #if (RAW == 0)
 #define PEN_IS_OPAQUE ((1<<col)&transmask) == 0
 
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_transmask,(COMMON_ARGS,
-		COLOR_ARG,int transmask),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_transmask,(COMMON_ARGS, COLOR_ARG, int transmask),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
@@ -2853,8 +2647,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_transmask,(COMMON_ARGS,
 
 #if (RAW == 0)
 #if (DEPTH == 32)
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS,
-		COLOR_ARG,int transcolor),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS, COLOR_ARG, int transcolor),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
@@ -2931,8 +2724,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS,
 	}
 })
 #else
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS,
-		COLOR_ARG,int transcolor),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS, COLOR_ARG, int transcolor),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	int eax = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
@@ -3014,8 +2806,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_pen_table,(COMMON_ARGS,
 #endif
 
 #if (RAW == 0)
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpha,(COMMON_ARGS,
-		COLOR_ARG,int transpen),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpha,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
@@ -3127,8 +2918,7 @@ DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpha,(COMMON_ARGS,
 })
 
 /* pjp 02/06/02 */
-DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpharange,(COMMON_ARGS,
-		COLOR_ARG,int transpen),
+DECLARE_SWAP_RAW_PRI(blockmove_8toN_alpharange,(COMMON_ARGS, COLOR_ARG, int transpen),
 {
 	pen_t *palette_shadow_table = Machine->shadow_table;
 	ADJUST_8
@@ -3280,7 +3070,8 @@ DECLARE(drawgfx_core,(
 		int dw = ex-sx+1;										/* dest width */
 		int dh = ey-sy+1;										/* dest height */
 		int dm = dest->rowpixels;								/* dest modulo */
-		const pen_t *paldata = &Machine->pens[gfx->color_base + gfx->color_granularity * color];
+		int colorbase = gfx->color_base + gfx->color_granularity * color;
+		const pen_t *paldata = &Machine->pens[colorbase];
 		UINT8 *pribuf = (pri_buffer) ? BITMAP_ADDR8(pri_buffer, sy, sx) : NULL;
 
 		switch (transparency)
@@ -3289,16 +3080,16 @@ DECLARE(drawgfx_core,(
 				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask));
+						BLOCKMOVEPRI(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask));
 					else
-						BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
+						BLOCKMOVELU(4toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata));
 				}
 				else
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(8toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask));
+						BLOCKMOVEPRI(8toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask));
 					else
-						BLOCKMOVELU(8toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata));
+						BLOCKMOVELU(8toN_opaque,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata));
 				}
 				break;
 
@@ -3306,16 +3097,16 @@ DECLARE(drawgfx_core,(
 				if (gfx->flags & GFX_ELEMENT_PACKED)
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
+						BLOCKMOVEPRI(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 					else
-						BLOCKMOVELU(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
+						BLOCKMOVELU(4toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				}
 				else
 				{
 					if (pribuf)
-						BLOCKMOVEPRI(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
+						BLOCKMOVEPRI(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 					else
-						BLOCKMOVELU(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
+						BLOCKMOVELU(8toN_transpen,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				}
 				break;
 
@@ -3338,30 +3129,30 @@ DECLARE(drawgfx_core,(
 
 			case TRANSPARENCY_PENS:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
+					BLOCKMOVELU(8toN_transmask,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			case TRANSPARENCY_PEN_TABLE:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_pen_table,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_pen_table,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_pen_table,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
+					BLOCKMOVELU(8toN_pen_table,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			case TRANSPARENCY_ALPHA:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_alpha,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_alpha,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_alpha,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
+					BLOCKMOVELU(8toN_alpha,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			case TRANSPARENCY_ALPHARANGE:
 				if (pribuf)
-					BLOCKMOVEPRI(8toN_alpharange,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,pribuf,pri_mask,transparent_color));
+					BLOCKMOVEPRI(8toN_alpharange,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,pribuf,pri_mask,transparent_color));
 				else
-					BLOCKMOVELU(8toN_alpharange,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,paldata,transparent_color));
+					BLOCKMOVELU(8toN_alpharange,(sd,sw,sh,sm,ls,ts,flipx,flipy,dd,dw,dh,dm,colorbase,paldata,transparent_color));
 				break;
 
 			default:
