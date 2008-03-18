@@ -353,6 +353,7 @@ D                                                                               
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "sound/dac.h"
+#include "sound/samples.h"
 #include "equites.h"
 
 #define HVOLTAGE_DEBUG	0
@@ -454,35 +455,48 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	}
 }
 
+
+#define POPDRUMKIT 0
+#if POPDRUMKIT
+static int hihat,cymbal;
+#endif
+
 static WRITE8_HANDLER(equites_8910porta_w)
 {
-#if 0
-static int prev;
-static int count1,count2;
+	// bongo 1
+	sample_set_volume(0, ((data & 0x30)>>4) * 0.33);
+	if (data & ~ay_port_a & 0x80)
+		sample_start(0, 0, 0);
 
-if (data & ~prev & 0x08) count1++;
-if (data & ~prev & 0x80) count2++;
+	// bongo 2
+	sample_set_volume(1, (data & 0x03) * 0.33);
+	if (data & ~ay_port_a & 0x08)
+		sample_start(1, 1, 0);
 
-popmessage("%d (%d) %d (%d)",count1, data&0x03, count2, (data&0x30)>>4);
-prev=data;
-#endif
 	ay_port_a = data;
+
+#if POPDRUMKIT
+popmessage("HH %d(%d) CYM %d(%d)",hihat,BIT(ay_port_b,6),cymbal,ay_port_b&3);
+#endif
 }
 
 static WRITE8_HANDLER(equites_8910portb_w)
 {
-#if 0
-static int prev;
-static int count1,count2;
-
-if (data & ~prev & 0x08) count1++;
-if (data & ~prev & 0x80) count2++;
-
-popmessage("%d %d",count1, count2);
-prev=data;
+#if POPDRUMKIT
+if (data & ~ay_port_b & 0x08) cymbal++;
+if (data & ~ay_port_b & 0x04) hihat++;
 #endif
-//popmessage("%02x",data&0x44);
+
+	// bongo 3
+	sample_set_volume(2, ((data & 0x30)>>4) * 0.33);
+	if (data & ~ay_port_b & 0x80)
+		sample_start(2, 2, 0);
+
 	ay_port_b = data;
+
+#if POPDRUMKIT
+popmessage("HH %d(%d) CYM %d(%d)",hihat,BIT(ay_port_b,6),cymbal,ay_port_b&3);
+#endif
 }
 
 
@@ -545,11 +559,11 @@ static WRITE8_HANDLER(equites_8155_w)
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
 	{
-		case 0: logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
+		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
 			if (((data >> 6) & 3) == 3)
 				timer_adjust_periodic(nmi_timer, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / timer_count), 0, ATTOTIME_IN_HZ(XTAL_6_144MHz/2 / timer_count));
 			break;
-		case 1: logerror( "8155 I/O Port A write %x\n", data );
+		case 1: //logerror( "8155 I/O Port A write %x\n", data );
 			eq8155_port_a = data;
 
 			sndti_set_output_gain(SOUND_MSM5232, 0, 0, (data >> 4) / 15.0);	/* group1 from msm5232 */
@@ -562,10 +576,10 @@ static WRITE8_HANDLER(equites_8155_w)
 			sndti_set_output_gain(SOUND_MSM5232, 0, 7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
 
 			break;
-		case 2: logerror( "8155 I/O Port B write %x\n", data );
+		case 2: //logerror( "8155 I/O Port B write %x\n", data );
 			equites_8155_portb_w(machine,0,data);
 			break;
-		case 3: logerror( "8155 I/O Port C (or control) write %x\n", data );
+		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
 			eq8155_port_c = data;
 
 			sndti_set_output_gain(SOUND_MSM5232, 0, 8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
@@ -575,10 +589,10 @@ static WRITE8_HANDLER(equites_8155_w)
 				sndti_set_output_gain(SOUND_MSM5232, 0, 9, 0);	/* SOLO 16' from msm5232 */
 
 			break;
-		case 4: logerror( "8155 Timer low 8 bits write %x\n", data );
+		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
 			timer_count = (timer_count & 0xff00) | data;
 			break;
-		case 5: logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
+		case 5: //logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
 			timer_count = (timer_count & 0x00ff) | ((data & 0x3f) << 8);
 			break;
 	}
@@ -1054,6 +1068,7 @@ static const struct MSM5232interface equites_5232intf =
 	equites_msm5232_gate
 };
 
+
 static const struct AY8910interface equites_8910intf =
 {
 	0,
@@ -1061,6 +1076,23 @@ static const struct AY8910interface equites_8910intf =
 	equites_8910porta_w,
 	equites_8910portb_w
 };
+
+
+static const char *const alphamc07_sample_names[] =
+{
+	"*alphamc07",
+	"bongo1.wav",
+	"bongo2.wav",
+	"bongo3.wav",
+	0
+};
+
+const struct Samplesinterface alphamc07_samples_interface =
+{
+	3,	/* 3 channels */
+	alphamc07_sample_names
+};
+
 
 #define MSM5232_BASE_VOLUME 1.0
 
@@ -1099,6 +1131,10 @@ static MACHINE_DRIVER_START( common_sound )
 
 	MDRV_SOUND_ADD(DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD(SAMPLES, 0)
+	MDRV_SOUND_CONFIG(alphamc07_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 /******************************************************************************/
