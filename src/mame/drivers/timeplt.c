@@ -165,6 +165,7 @@ static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+
 /*************************************
  *
  *  Port definitions
@@ -392,6 +393,8 @@ static MACHINE_DRIVER_START( psurge )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(psurge_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+	MDRV_MACHINE_START(NULL)
 MACHINE_DRIVER_END
 
 
