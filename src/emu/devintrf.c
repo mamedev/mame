@@ -183,7 +183,6 @@ int device_list_items(const device_config *listhead, device_type type)
 	const device_config *curdev;
 	int count = 0;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 
 	/* locate all devices */
@@ -204,7 +203,6 @@ const device_config *device_list_first(const device_config *listhead, device_typ
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 
 	/* scan forward starting with the list head */
@@ -247,7 +245,6 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
 
@@ -272,7 +269,6 @@ int device_list_index(const device_config *listhead, device_type type, const cha
 	const device_config *curdev;
 	int index = 0;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 	assert(tag != NULL);
 
@@ -298,7 +294,6 @@ const device_config *device_list_find_by_index(const device_config *listhead, de
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(type != NULL);
 	assert(index >= 0);
 
@@ -327,8 +322,6 @@ int device_list_class_items(const device_config *listhead, device_class class)
 	const device_config *curdev;
 	int count = 0;
 
-	assert(listhead != NULL);
-
 	/* locate all devices */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
 		count += (curdev->class == class);
@@ -345,8 +338,6 @@ int device_list_class_items(const device_config *listhead, device_class class)
 const device_config *device_list_class_first(const device_config *listhead, device_class class)
 {
 	const device_config *curdev;
-
-	assert(listhead != NULL);
 
 	/* scan forward starting with the list head */
 	for (curdev = listhead; curdev != NULL; curdev = curdev->next)
@@ -386,7 +377,6 @@ const device_config *device_list_class_find_by_tag(const device_config *listhead
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
@@ -409,7 +399,6 @@ int device_list_class_index(const device_config *listhead, device_class class, c
 	const device_config *curdev;
 	int index = 0;
 
-	assert(listhead != NULL);
 	assert(tag != NULL);
 
 	/* locate all devices */
@@ -435,7 +424,6 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 {
 	const device_config *curdev;
 
-	assert(listhead != NULL);
 	assert(index >= 0);
 
 	/* find the device in the list */
