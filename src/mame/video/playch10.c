@@ -10,7 +10,7 @@ extern int pc10_int_detect;
 extern int pc10_game_mode;
 extern int pc10_dispmask_old;
 
-/* from common.c */
+/* from romload.c */
 extern int system_bios;
 
 static tilemap *bg_tilemap;

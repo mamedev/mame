@@ -28,21 +28,6 @@
 
 
 
-/*************************************
- *
- *  Macros to help verify active CPU
- *
- *************************************/
-
-#define VERIFY_ACTIVECPU(retval, name)						\
-	int activecpu = cpu_getactivecpu();						\
-	assert_always(activecpu >= 0, #name "() called with no active cpu!")
-
-#define VERIFY_ACTIVECPU_VOID(name)							\
-	int activecpu = cpu_getactivecpu();						\
-	assert_always(activecpu >= 0, #name "() called with no active cpu!")
-
-
 
 /*************************************
  *

@@ -142,7 +142,7 @@ static UINT32 op0000(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op0001(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.L   %s,@($%02X,%s)\n", regname[Rm], (opcode & 15) * 4, regname[Rn]);
+	sprintf(buffer, "MOV.L   %s,@($%02X,%s)", regname[Rm], (opcode & 15) * 4, regname[Rn]);
 	return 0;
 }
 
@@ -462,7 +462,7 @@ static UINT32 op0100(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op0101(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "MOV.L   @($%02X,%s),%s\n", (opcode & 15) * 4, regname[Rm], regname[Rn]);
+	sprintf(buffer, "MOV.L   @($%02X,%s),%s", (opcode & 15) * 4, regname[Rm], regname[Rn]);
 	return 0;
 }
 
@@ -525,7 +525,7 @@ static UINT32 op0110(char *buffer, UINT32 pc, UINT16 opcode)
 
 static UINT32 op0111(char *buffer, UINT32 pc, UINT16 opcode)
 {
-	sprintf(buffer, "ADD     #$%02X,%s\n", opcode & 0xff, regname[Rn]);
+	sprintf(buffer, "ADD     #$%02X,%s", opcode & 0xff, regname[Rn]);
 	return 0;
 }
 
@@ -561,7 +561,7 @@ static UINT32 op1000(char *buffer, UINT32 pc, UINT16 opcode)
 		sprintf(buffer, "BFS     $%08X", pc + SIGNX8(opcode & 0xff) * 2 + 2);
 		break;
 	default :
-		sprintf(buffer, "invalid $%04X\n", opcode);
+		sprintf(buffer, "invalid $%04X", opcode);
 	}
 	return 0;
 }
@@ -659,85 +659,85 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 	switch (opcode & 0xf)
 	{
 		case 0:
-			sprintf(buffer, "FADD    F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FADD    F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 1:
-			sprintf(buffer, "FSUB    F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FSUB    F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 2:
-			sprintf(buffer, "FMUL    F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMUL    F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 3:
-			sprintf(buffer, "FDIV    F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FDIV    F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 4:
-			sprintf(buffer, "FCMP/EQ    F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FCMP/EQ    F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 5:
-			sprintf(buffer, "FCMP/GT    F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FCMP/GT    F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 6:
-			sprintf(buffer, "FMOV.S  @(R0,%s),F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  @(R0,%s),F%s", regname[Rm], regname[Rn]);
 			break;
 		case 7:
-			sprintf(buffer, "FMOV.S  F%s, @(R0,%s)\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  F%s, @(R0,%s)", regname[Rm], regname[Rn]);
 			break;
 		case 8:
-			sprintf(buffer, "FMOV.S  @%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  @%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 9:
-			sprintf(buffer, "FMOV.S  @%s+, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  @%s+, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 10:
-			sprintf(buffer, "FMOV.S  F%s, @%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  F%s, @%s", regname[Rm], regname[Rn]);
 			break;
 		case 11:
-			sprintf(buffer, "FMOV.S  F%s, @-%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  F%s, @-%s", regname[Rm], regname[Rn]);
 			break;
 		case 12:
-			sprintf(buffer, "FMOV.S  F%s, F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMOV.S  F%s, F%s", regname[Rm], regname[Rn]);
 			break;
 		case 13:
 			switch (opcode & 0xF0)
 			{
 				case 0x00:
-					sprintf(buffer, "FSTS    FPUL, F%s\n", regname[Rn]);
+					sprintf(buffer, "FSTS    FPUL, F%s", regname[Rn]);
 					break;
 				case 0x10:
-					sprintf(buffer, "FLDS    F%s, FPUL\n", regname[Rn]);
+					sprintf(buffer, "FLDS    F%s, FPUL", regname[Rn]);
 					break;
 				case 0x20:
-					sprintf(buffer, "FLOAT   FPUL, F%s\n", regname[Rn]);
+					sprintf(buffer, "FLOAT   FPUL, F%s", regname[Rn]);
 					break;
 				case 0x30:
-					sprintf(buffer, "FTRC    F%s, FPUL\n", regname[Rn]);
+					sprintf(buffer, "FTRC    F%s, FPUL", regname[Rn]);
 					break;
 				case 0x40:
-					sprintf(buffer, "FNEG    F%s\n", regname[Rn]);
+					sprintf(buffer, "FNEG    F%s", regname[Rn]);
 					break;
 				case 0x50:
-					sprintf(buffer, "FABS    F%s\n", regname[Rn]);
+					sprintf(buffer, "FABS    F%s", regname[Rn]);
 					break;
 				case 0x60:
-					sprintf(buffer, "FSQRT   F%s\n", regname[Rn]);
+					sprintf(buffer, "FSQRT   F%s", regname[Rn]);
 					break;
 				case 0x70:
-					sprintf(buffer, "FSRRA   F%s\n", regname[Rn]);
+					sprintf(buffer, "FSRRA   F%s", regname[Rn]);
 					break;
 				case 0x80:
-					sprintf(buffer, "FLDI0   F%s\n", regname[Rn]);
+					sprintf(buffer, "FLDI0   F%s", regname[Rn]);
 					break;
 				case 0x90:
-					sprintf(buffer, "FLDI1   F%s\n", regname[Rn]);
+					sprintf(buffer, "FLDI1   F%s", regname[Rn]);
 					break;
 				case 0xA0:
-					sprintf(buffer, "FCNVSD  FPUL, D%s\n", regname[Rn]);
+					sprintf(buffer, "FCNVSD  FPUL, D%s", regname[Rn]);
 					break;
 				case 0xB0:
-					sprintf(buffer, "FCNVDS  D%s, FPUL\n", regname[Rn]);
+					sprintf(buffer, "FCNVDS  D%s, FPUL", regname[Rn]);
 					break;
 				case 0xE0:
-					sprintf(buffer, "FIPR    FV%d, FV%d\n", Rn << 2, Rn & 12);
+					sprintf(buffer, "FIPR    FV%d, FV%d", Rn << 2, Rn & 12);
 					break;
 				case 0xF0:
 					if (opcode & 0x100) {
@@ -745,20 +745,20 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 							switch (opcode & 0xC00)
 							{
 								case 0x000:
-									sprintf(buffer, "FSCHG\n");
+									sprintf(buffer, "FSCHG");
 									break;
 								case 0x800:
-									sprintf(buffer, "FRCHG\n");
+									sprintf(buffer, "FRCHG");
 									break;
 								default:
 									sprintf(buffer, "Funknown $%04X", opcode);
 									break;
 							}
 						} else {
-							sprintf(buffer, "FTRV    XMTRX, FV%d\n", Rn & 12);
+							sprintf(buffer, "FTRV    XMTRX, FV%d", Rn & 12);
 						}
 					} else {
-						sprintf(buffer, "FSSCA    FPUL, F%d\n", Rn & 14);
+						sprintf(buffer, "FSSCA    FPUL, F%d", Rn & 14);
 					}
 					break;
 				default:
@@ -767,7 +767,7 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 			}
 			break;
 		case 14:
-			sprintf(buffer, "FMAC    FR0, F%s,F%s\n", regname[Rm], regname[Rn]);
+			sprintf(buffer, "FMAC    FR0, F%s,F%s", regname[Rm], regname[Rn]);
 			break;
 		default:
 			sprintf(buffer, "Funknown $%04X", opcode);
