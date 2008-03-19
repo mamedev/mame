@@ -754,10 +754,11 @@ void video_screen_set_visarea(const device_config *screen, int min_x, int max_x,
     including the specified scanline
 -------------------------------------------------*/
 
-void video_screen_update_partial(const device_config *screen, int scanline)
+int video_screen_update_partial(const device_config *screen, int scanline)
 {
 	screen_state *state = get_safe_token(screen);
 	rectangle clip = state->visarea;
+	int result = FALSE;
 
 	/* validate arguments */
 	assert(scanline >= 0);
@@ -771,14 +772,14 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 		if (global.skipping_this_frame)
 		{
 			LOG_PARTIAL_UPDATES(("skipped due to frameskipping\n"));
-			return;
+			return FALSE;
 		}
 
 		/* skip if this screen is not visible anywhere */
 		if (!render_is_live_screen(screen))
 		{
 			LOG_PARTIAL_UPDATES(("skipped because screen not live\n"));
-			return;
+			return FALSE;
 		}
 	}
 
@@ -786,7 +787,7 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 	if (scanline < state->last_partial_scan)
 	{
 		LOG_PARTIAL_UPDATES(("skipped because less than previous\n"));
-		return;
+		return FALSE;
 	}
 
 	/* set the start/end scanlines */
@@ -810,10 +811,12 @@ void video_screen_update_partial(const device_config *screen, int scanline)
 
 		/* if we modified the bitmap, we have to commit */
 		state->changed |= ~flags & UPDATE_HAS_NOT_CHANGED;
+		result = TRUE;
 	}
 
 	/* remember where we left off */
 	state->last_partial_scan = scanline + 1;
+	return result;
 }
 
 

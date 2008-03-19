@@ -386,10 +386,8 @@ static TIMER_CALLBACK( scanline_callback )
 	cia_clock_tod(1);
 
 	/* render up to this scanline */
-	if (scanline < video_screen_get_visible_area(machine->primary_screen)->min_y)
+	if (!video_screen_update_partial(machine->primary_screen, scanline))
 		amiga_render_scanline(machine, NULL, scanline);
-	else
-		video_screen_update_partial(machine->primary_screen, scanline);
 
 	/* force a sound update */
 	amiga_audio_update();

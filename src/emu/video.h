@@ -164,7 +164,7 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 void video_screen_set_visarea(const device_config *screen, int min_x, int max_x, int min_y, int max_y);
 
 /* force a partial update of the screen up to and including the requested scanline */
-void video_screen_update_partial(const device_config *screen, int scanline);
+int video_screen_update_partial(const device_config *screen, int scanline);
 
 /* force an update from the last beam position up to the current beam position */
 void video_screen_update_now(const device_config *screen);
