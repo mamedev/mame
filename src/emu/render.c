@@ -1456,7 +1456,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				screens_considered++;
 			}
 	}
-	
+
 	/* if there were no screens considered, pick a nominal default */
 	if (screens_considered == 0)
 	{

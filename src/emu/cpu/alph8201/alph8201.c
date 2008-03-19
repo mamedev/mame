@@ -268,7 +268,7 @@ INLINE void M_XOR(UINT8 dat)
 {
 	R.A ^= dat;
 	ZF = (R.A==0);
-//	CF = 0;	unknown whether it's affected or not
+//  CF = 0; unknown whether it's affected or not
 }
 
 INLINE void M_JMP(UINT8 dat)

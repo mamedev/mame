@@ -133,7 +133,7 @@ TODO:
 
 // PCM playback is controlled by a 555 timer
 #define NE555_FREQUENCY	16300	// measured on PCB
-//#define NE555_FREQUENCY	(1.0f / (0.693 * (560 + 2*51) * 0.1e-6)) 	// theoretical: this gives 21.8kHz which is too high
+//#define NE555_FREQUENCY   (1.0f / (0.693 * (560 + 2*51) * 0.1e-6))    // theoretical: this gives 21.8kHz which is too high
 
 
 static const INT16* ninjakd2_sampledata;

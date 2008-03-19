@@ -140,7 +140,7 @@ PALETTE_INIT( cave )
 {
 	int maxpen = cave_paletteram_size / 2;
 	int pen;
-	
+
 	/* create a 1:1 palette map covering everything */
 	palette_map = auto_malloc(machine->config->total_colors * sizeof(palette_map[0]));
 	for (pen = 0; pen < machine->config->total_colors; pen++)
@@ -157,7 +157,7 @@ PALETTE_INIT( dfeveron )
        That's why we need this function.    */
 
 	PALETTE_INIT_CALL(cave);
-	
+
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
 			palette_map[(color << 8) | pen] = (color << 4) | pen;
@@ -173,7 +173,7 @@ PALETTE_INIT( ddonpach )
        any given color code. */
 
 	PALETTE_INIT_CALL(cave);
-	
+
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
 			palette_map[0x8000 | (color << 4) | pen] = 0x4000 | (color << 8) | pen;

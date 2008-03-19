@@ -37,11 +37,11 @@
     - PLDs 1x PAL16R4A     (read protected)
 
     - 1x TDA 2002      (8W. car radio audio amplifier)
-    - 3x OUAZ SS-112D  (relay 1 pole 12v) 
+    - 3x OUAZ SS-112D  (relay 1 pole 12v)
     - 1x 4 DIP switches
     - 1x 30x2 edge connector
     - 1x 10 pins male connector
-    - 2x trimmer (audio?) 
+    - 2x trimmer (audio?)
 
 
     PCB Layout:

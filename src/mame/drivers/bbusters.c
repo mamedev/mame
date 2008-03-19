@@ -459,18 +459,18 @@ static INPUT_PORTS_START( bbusters )
 	PORT_DIPSETTING(    0x02, "9 / 4" )
 	PORT_DIPSETTING(    0x00, "12 / 5" )
 	/* Manual (from a different revision/region?) says:
-						SW1:4	SW1:5	SW1:6
-	1C_1C 1 To continue	OFF		OFF		OFF
-	2C_1C 1 To continue	ON		OFF		OFF
-	1C_2C 1 To continue	OFF		ON		OFF
-	2C_1C 2 To continue	ON		ON		OFF
-	3C_1C 1 To continue	OFF		OFF		ON
-	3C_1C 2 To continue	ON		OFF		ON
-	4C_3C 1 To continue	OFF		ON		ON
-	Free Play Mode		OFF		OFF		OFF
+                        SW1:4   SW1:5   SW1:6
+    1C_1C 1 To continue OFF     OFF     OFF
+    2C_1C 1 To continue ON      OFF     OFF
+    1C_2C 1 To continue OFF     ON      OFF
+    2C_1C 2 To continue ON      ON      OFF
+    3C_1C 1 To continue OFF     OFF     ON
+    3C_1C 2 To continue ON      OFF     ON
+    4C_3C 1 To continue OFF     ON      ON
+    Free Play Mode      OFF     OFF     OFF
 
-	SW1:7 Unused
-	SW1:8 Blood color: ON=green OFF=red	*/
+    SW1:7 Unused
+    SW1:8 Blood color: ON=green OFF=red */
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )

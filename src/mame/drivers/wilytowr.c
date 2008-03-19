@@ -398,8 +398,8 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	/*	"For cabinets with a single coin selector or 2 coin selectors of the same value, set to Mode 1.
-		For cabinets with coin selectors of two different values, set to Mode 2." */
+	/*  "For cabinets with a single coin selector or 2 coin selectors of the same value, set to Mode 1.
+        For cabinets with coin selectors of two different values, set to Mode 2." */
 	PORT_DIPNAME( 0x04, 0x00, "Coin Mode" )				PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x00, "Mode 1" )
 	PORT_DIPSETTING(    0x04, "Mode 2" )

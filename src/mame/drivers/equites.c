@@ -435,9 +435,9 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 4: // c0fc: increment PROM address (written by NMI handler)
 			equites_sound_prom_address = (equites_sound_prom_address + 1) & 0x1f;
-//			FIXME: at this point, the 5-bit value
-//			memory_region(REGION_SOUND1)[equites_sound_prom_address] & 0x1f
-//			should be used for something...
+//          FIXME: at this point, the 5-bit value
+//          memory_region(REGION_SOUND1)[equites_sound_prom_address] & 0x1f
+//          should be used for something...
 			break;
 
 		case 5: // c0fd: n.c.

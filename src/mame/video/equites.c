@@ -349,7 +349,7 @@ static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		int scalex = spriteram16_2[offs+1] & 0x000f;
 		int transmask = colortable_get_transpen_mask(machine->colortable, gfx, color, 0);
 
-//		const UINT8 * const xromline = xrom + (scalex << 4);
+//      const UINT8 * const xromline = xrom + (scalex << 4);
 		const UINT8 * const yromline = yrom + (scaley << 4) + (15 - scaley);
 		const UINT8* const srcgfx = gfx->gfxdata + tile * gfx->char_modulo;
 		const pen_t *paldata = &machine->pens[gfx->color_base + gfx->color_granularity * color];
@@ -367,12 +367,12 @@ static void splndrbt_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		{
 			sy = 256 - sy;
 		}
-		
+
 		for (yy = 0; yy <= scaley; ++yy)
 		{
 			int const line = yromline[yy];
 			int yhalf;
-			
+
 			for (yhalf = 0; yhalf < 2; ++yhalf)	// top or bottom half
 			{
 				int const y = yhalf ? sy + 1 + yy : sy - yy;
@@ -476,7 +476,7 @@ VIDEO_UPDATE( splndrbt )
 
 	if (fg_char_bank)
 		tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	
+
 	splndrbt_draw_sprites(screen->machine, bitmap, cliprect);
 
 	if (!fg_char_bank)

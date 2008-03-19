@@ -460,7 +460,7 @@ void device_list_start(running_machine *machine)
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
 		UINT32 tokenlen;
-		
+
 		assert(device->token == NULL);
 		assert(device->type != NULL);
 		assert(device->start != NULL);
@@ -501,7 +501,7 @@ static void device_list_stop(running_machine *machine)
 		/* if we have a stop function, call it */
 		if (device->stop != NULL)
 			(*device->stop)(device);
-		
+
 		/* free allocated memory for the token */
 		if (device->token != NULL)
 			free(device->token);

@@ -128,14 +128,14 @@ static const char *const Formats[] = {
 	FMT("1101_0111 I", "LD   (R7:$%02X),LP0"),	// D7 : hvoltage; not sure if R7 or R77
 	FMT("1101_1000 I", "LD   A,($%02X)"),		// D8 : equites
 	FMT("1101_1001 I", "LD   ($%02X),A"),		// D9 : equites
-	FMT("1101_1010 I", "CMP  A,$%02X"),			// DA : 
+	FMT("1101_1010 I", "CMP  A,$%02X"),			// DA :
 	FMT("1101_1011 I", "XOR  A,$%02X"),			// DB : equites splndrbt
 	FMT("1101_1100 I", "unk  $%02X"),			// DC : not found (LD   A,R($%02X) ?)
 	FMT("1101_1101 I", "LD   R($%02X),A"),		// DD : equites, splndrbt
 	FMT("1101_1110 I", "unk  $%02X"),			// DE : not found
-	FMT("1101_1111 I", "CALL $%02X"),			// DF : 
+	FMT("1101_1111 I", "CALL $%02X"),			// DF :
 
-	FMT("1110_0000", "DEC  IX0"),			// E0 : 
+	FMT("1110_0000", "DEC  IX0"),			// E0 :
 	FMT("1110_0001", "unknown"),			// E1 : not found (DEC IX1?)
 	FMT("1110_0010", "unknown"),			// E2 : not found (DEC IX2?)
 	FMT("1110_0011", "ld   a,unk ?"),		// E3 : exctsccr in pair with EB
@@ -143,9 +143,9 @@ static const char *const Formats[] = {
 	FMT("1110_0101", "LD   A,B"),			// E5 : splndrbt
 	FMT("1110_0110", "EXG  A,LP0"),			// E6 : splndrbt, bullfgtr, kouyakyu. EXG, not LD: see splndrbt $3ba to $3d3
 	FMT("1110_0111", "unknown"),			// E7 : not found
-	FMT("1110_1000", "LD   IX0,A"),			// E8 : 
+	FMT("1110_1000", "LD   IX0,A"),			// E8 :
 	FMT("1110_1001", "ld   ix1,a ?"),		// E9 : not found
-	FMT("1110_1010", "LD   IX2,A"),			// EA : 
+	FMT("1110_1010", "LD   IX2,A"),			// EA :
 	FMT("1110_1011", "ld   unk,a ?"),		// EB : exctsccr in pair with E3. unk is not LP0, IX0, IX2
 	FMT("1110_1100", "unknown"),			// EC : not found
 	FMT("1110_1101", "LD   B,A"),			// ED : splndrbt
@@ -161,12 +161,12 @@ static const char *const Formats[] = {
 	FMT("1111_0111", "unknown"),			// F7 : not found
 	FMT("1111_1000", "sub/cmp  a,(rxb) ?"),	// F8 : exctsccr : ZF check  could be CMP instead? see DA/DB
 	FMT("1111_1001", "XOR  A,(RXB)"),		// F9 : exctsccr
-	FMT("1111_1010", "ADD  A,CF"),			// FA : 
+	FMT("1111_1010", "ADD  A,CF"),			// FA :
 	FMT("1111_1011", "unknown"),			// FB : not found (SUB  A,CF ?)
 	FMT("1111_1100", "TST  A"),				// FC : ZF = (A==0) ?
-	FMT("1111_1101", "CLR  A"),				// FD : 
-	FMT("1111_1110", "LD   A,(IX0+A)"),		// FE : 
-	FMT("1111_1111", "RET"),				// FF : 
+	FMT("1111_1101", "CLR  A"),				// FD :
+	FMT("1111_1110", "LD   A,(IX0+A)"),		// FE :
+	FMT("1111_1111", "RET"),				// FF :
 	NULL
 };
 

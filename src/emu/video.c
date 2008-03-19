@@ -1136,7 +1136,7 @@ void video_screen_register_vblank_callback(const device_config *screen, vblank_s
 ***************************************************************************/
 
 /*-------------------------------------------------
-    device_start_video_screen - device start 
+    device_start_video_screen - device start
     callback for a video screen
 -------------------------------------------------*/
 
@@ -1216,7 +1216,7 @@ static DEVICE_START( video_screen )
 
 
 /*-------------------------------------------------
-    device_stop_video_screen - device stop 
+    device_stop_video_screen - device stop
     callback for a video screen
 -------------------------------------------------*/
 

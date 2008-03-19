@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* ??? toggled twice at end of irq handler */
-//	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	/* ??? */
+//  AM_RANGE(0xa001, 0xa001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(exctsccr_gfx_bank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(exctsccr_flipscreen_w)
 	AM_RANGE(0xa006, 0xa006) AM_WRITE(exctsccr_mcu_halt_w)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc008, 0xc009) AM_WRITE(exctsccr_DAC_data_w)
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_r)
-//	AM_RANGE(0xc00f, 0xc00f) AM_WRITE(MWA8_NOP) /* ??? */
+//  AM_RANGE(0xc00f, 0xc00f) AM_WRITE(MWA8_NOP) /* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -171,7 +171,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bl_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-//	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	/* 0 = DAC sound off, 1 = DAC sound on */
+//  AM_RANGE(0x8000, 0x8000) AM_WRITENOP    /* 0 = DAC sound off, 1 = DAC sound on */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exctsccr_DAC_data_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
