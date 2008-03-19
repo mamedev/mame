@@ -114,8 +114,8 @@ static READ8_HANDLER( psurge_protection_r )
  *
  *  Memory maps
  *
- *  Power Surge has no NMI enable,
- *  and has a proection check
+ *  Power Surge has no NMI enable
+ *  but has a protection check
  *
  *************************************/
 
