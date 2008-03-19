@@ -19,6 +19,9 @@ TODO:
   are drawn 2 pixels off in x/y directions. If you fix that, then the player
   sprite doesn't slide in the middle of the pipes when climbing...
 
+Dip locations verified for:
+- atomboy (manual)
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -350,19 +353,27 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW0")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	/* TODO: support the different settings which happen in Coin Mode 2 */
-	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) ) /* mapped on coin mode 1 */
+	PORT_DIPNAME( 0x0c, 0x00, "Bonus Points Rate" )		PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, "x1.2" )
+	PORT_DIPSETTING(    0x08, "x1.4" )
+	PORT_DIPSETTING(    0x0c, "x1.6" )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:!5,!6") PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x04) /* coin mode 2 */
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Free_Play ) )	/* Not documented */
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:!7,!8") PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x04) /* coin mode 2 */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:!5,!6,!7,!8") PORT_CONDITION("DSW1",0x04,PORTCOND_EQUALS,0x00) /* coin mode 1 */
 	PORT_DIPSETTING(    0x60, DEF_STR( 7C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 5C_1C ) )
@@ -381,29 +392,27 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_DIPSETTING(    0xf0, DEF_STR( Free_Play ) )
 
 	PORT_START_TAG("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW2:!2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x00, "Coin Mode" )
+	/*	"For cabinets with a single coin selector or 2 coin selectors of the same value, set to Mode 1.
+		For cabinets with coin selectors of two different values, set to Mode 2." */
+	PORT_DIPNAME( 0x04, 0x00, "Coin Mode" )				PORT_DIPLOCATION("SW2:!3")
 	PORT_DIPSETTING(    0x00, "Mode 1" )
 	PORT_DIPSETTING(    0x04, "Mode 2" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:!4" )		/* Listed as "Unused" */
 	/* In stop mode, press 1 to stop and 2 to restart */
-	PORT_DIPNAME( 0x10, 0x00, "Stop Mode (Cheat)")
+	PORT_DIPNAME( 0x10, 0x00, "Stop Mode (Cheat)")		PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:!6" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_HIGH, "SW2:!8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fghtbskt )

@@ -168,6 +168,21 @@ HIGHWAYMAN's notes:
 
 after adding the mechanized attack u.s. roms i suspect that there is more than just a few bytes changed ;-)
 
+
+RansAckeR's notes:
+
+bbusters:
+
+If you only calibrate the P1 gun or do not hit the correct spots for all guns
+you will get either garbage or a black screen when rebooting.
+According to the manual this happens when the eprom contains invalid gun aim data.
+
+If you calibrate the guns correctly the game runs as expected:
+1) Using P1 controls fire at the indicated spots.
+2) Using P2 controls fire at the indicated spots.
+3) Using P3 controls fire at the indicated spots.
+
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -435,43 +450,56 @@ static INPUT_PORTS_START( bbusters )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x06, 0x06, "Magazine / Grenade" )
+	PORT_DIPNAME( 0x06, 0x06, "Magazine / Grenade" )		PORT_DIPLOCATION("SW1:2,3")
 	PORT_DIPSETTING(    0x04, "5 / 2" )
 	PORT_DIPSETTING(    0x06, "7 / 3" )
 	PORT_DIPSETTING(    0x02, "9 / 4" )
 	PORT_DIPSETTING(    0x00, "12 / 5" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )
+	/* Manual (from a different revision/region?) says:
+						SW1:4	SW1:5	SW1:6
+	1C_1C 1 To continue	OFF		OFF		OFF
+	2C_1C 1 To continue	ON		OFF		OFF
+	1C_2C 1 To continue	OFF		ON		OFF
+	2C_1C 2 To continue	ON		ON		OFF
+	3C_1C 1 To continue	OFF		OFF		ON
+	3C_1C 2 To continue	ON		OFF		ON
+	4C_3C 1 To continue	OFF		ON		ON
+	Free Play Mode		OFF		OFF		OFF
+
+	SW1:7 Unused
+	SW1:8 Blood color: ON=green OFF=red	*/
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )			// See notes
+	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )				PORT_DIPLOCATION("SW1:8") // See notes
 	PORT_DIPSETTING(    0x80, "Common" )
 	PORT_DIPSETTING(    0x00, "Individual" )
 
 	PORT_START_TAG("DSW2")	/* Dip switch bank 2 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )					PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x04, "Infinite Energy (Cheat)")
 	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
- 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )			/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )			/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )			/* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START_TAG("IN5")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -518,41 +546,41 @@ static INPUT_PORTS_START( mechatt )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START_TAG("DSW1")	/* Dip switch bank 1 */
-	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slots" )		// See notes
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Slots" )				PORT_DIPLOCATION("SW1:1") // Listed as "Unused" (manual from different revision/region?), See notes
 	PORT_DIPSETTING(      0x0001, "Common" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x000c, 0x000c, "Magazine / Grenade" )
+	PORT_DIPNAME( 0x000c, 0x000c, "Magazine / Grenade" )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0008, "5 / 2" )
 	PORT_DIPSETTING(      0x000c, "6 / 3" )
 	PORT_DIPSETTING(      0x0004, "7 / 4" )
 	PORT_DIPSETTING(      0x0000, "8 / 5" )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )	// See notes
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:5,6") // See notes
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )	// See notes
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW1:7,8") // Listed as "Unused" (manual from different revision/region?), See notes
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Game Mode" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Game Mode" )					PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, "Demo Sounds Off" )
 	PORT_DIPSETTING(      0x0c00, "Demo Sounds On" )
 	PORT_DIPSETTING(      0x0400, "Infinite Energy (Cheat)")
 	PORT_DIPSETTING(      0x0000, "Freeze" )
-	PORT_DIPUNUSED( 0x1000, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x2000, IP_ACTIVE_LOW )
-	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
- 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC(0x1000, 0x1000, "SW2:5" )			/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC(0x2000, 0x2000, "SW2:6" )			/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC(0x4000, 0x4000, "SW2:7" )			/* Listed as "Unused" */
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" )
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(1)
