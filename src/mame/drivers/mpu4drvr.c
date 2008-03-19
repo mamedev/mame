@@ -169,10 +169,10 @@ IRQ line connected to CPU
 -----------+---+-----------------+--------------------------------------------------------------------------
  C000-FFFF | R | D D D D D D D D | ROM
 -----------+---+-----------------+--------------------------------------------------------------------------
-TODO: - Confirm that MC6850 emulation is sufficient.
+TODO: - Craft bespoke 6850 core from MC6850 emulation.
       - MPU4 Master clock value taken from schematic, but 68k value is not.
-      - Deal 'Em changes its inputs depending on the cabinet, need conditional support
-      - Deal 'Em also has bad tiles (apostrophe and bottom corner), black should actually be transparent
+      - Deal 'Em lockouts vary on certain cabinets (normally connected to AUX, but not there?)
+      - Deal 'Em has bad tiles (apostrophe, logo, bottom corner), black should actually be transparent
       - to give black on green.
 *****************************************************************************************/
 
@@ -1175,8 +1175,13 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START_TAG("ORANGE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("20p Token")PORT_IMPULSE(3)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("20p Token")PORT_IMPULSE(5)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x04)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x05)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x06)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x07)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x08)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x09)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1187,15 +1192,22 @@ static INPUT_PORTS_START( dealem )
 	PORT_START_TAG("BLACK1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Gamble")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Pontoon")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x01)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x09)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x03)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x04)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x05)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x06)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x07)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x08)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Rear Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START_TAG("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x00)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x02)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Twist")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Lo")
@@ -1270,7 +1282,10 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x00)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x01)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x02)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x03)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
@@ -1398,7 +1413,7 @@ ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
 static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0000, 0x07FF) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
 	AM_RANGE(0x0800, 0x0800) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
 	AM_RANGE(0x0801, 0x0801) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
@@ -1414,7 +1429,7 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0E00, 0x0E03) AM_READWRITE(pia_4_r,pia_4_w)		// PIA6821 IC7
 	AM_RANGE(0x0F00, 0x0F03) AM_READWRITE(pia_5_r,pia_5_w)		// PIA6821 IC8
 
-	AM_RANGE(0x4000, 0x40ff) AM_RAM // it actually runs code from here...
+	AM_RANGE(0x4000, 0x40FF) AM_RAM // it actually runs code from here...
 
 	AM_RANGE(0xBE00, 0xBFFF) AM_RAM //00 written on startup
 	AM_RANGE(0xC000, 0xFFFF) AM_ROM	AM_REGION(REGION_CPU1,0)  // 64k EPROM on board, only this region read
@@ -1494,6 +1509,7 @@ static UINT8 *dealem_videoram;
   Blue:     470R
             220R    Bit 7
 
+  Everything is also tied to a 1K pulldown
 ***************************************************************************/
 
 static PALETTE_INIT( dealem )
@@ -1504,9 +1520,9 @@ static PALETTE_INIT( dealem )
 	double weights_r[3], weights_g[3], weights_b[2];
 
 	compute_resistor_weights(0,	255,	-1.0,
-			3,	resistances_rg,	weights_r,	0,	0,
-			3,	resistances_rg,	weights_g,	0,	0,
-			2,	resistances_b,	weights_b,	0,	0);
+			3,	resistances_rg,	weights_r,	1000,	0,
+			3,	resistances_rg,	weights_g,	1000,	0,
+			2,	resistances_b,	weights_b,	1000,	0);
 
 	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
@@ -1550,12 +1566,36 @@ static VIDEO_UPDATE(dealem)
 	return 0;
 }
 
+MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
+{
+	cpunum_set_input_line(device->machine, 0, INPUT_LINE_NMI, vsync);
+}
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static const mc6845_interface hd6845_intf =
+{
+	"main",					/* screen we are acting on */
+	MPU4_MASTER_CLOCK/4/8, 	/* the clock (pin 21) of the chip (educated guess)*/
+	8,						/* number of pixels per video memory address */
+	NULL,					/* before pixel update callback */
+	NULL,					/* row update callback */
+	NULL,					/* after pixel update callback */
+	NULL,					/* callback for display state changes */
+	NULL,					/* HSYNC callback */
+	dealem_vsync_changed	/* VSYNC callback */
+};
+
 static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(HD6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(HD6845, "crtc", mc6845_register_r, mc6845_register_w)
 
 //  AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)    // write bank (rom page select)
 
@@ -1628,8 +1668,8 @@ static MACHINE_DRIVER_START( dealem )
 
 	MDRV_MACHINE_START(mpu4mod2)							// main mpu4 board initialisation
 	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)	// 6809 CPU
-	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)					// setup read and write memorymap
+	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)
+	MDRV_CPU_PROGRAM_MAP(dealem_memmap,0)
 
 	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)					// generate 50 hz signal
 
@@ -1641,11 +1681,10 @@ static MACHINE_DRIVER_START( dealem )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)		/* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from MC6845 init, registers 01 & 06 */
-	MDRV_SCREEN_REFRESH_RATE(56)							//Measured accurately from the flip-flop
+	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
+	MDRV_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop */
 
 	MDRV_GFXDECODE(dealem)
 	MDRV_VIDEO_UPDATE(dealem)
@@ -1653,7 +1692,8 @@ static MACHINE_DRIVER_START( dealem )
 	MDRV_PALETTE_LENGTH(32)
 	MDRV_PALETTE_INIT(dealem)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_ADD("crtc", HD6845)							// HD68B45
+	MDRV_DEVICE_CONFIG(hd6845_intf)
 MACHINE_DRIVER_END
 
 static DRIVER_INIT (crmaze)
