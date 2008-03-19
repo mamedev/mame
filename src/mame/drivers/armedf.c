@@ -1358,8 +1358,8 @@ static DRIVER_INIT( cclimbr2 )
 
 
 /*     YEAR, NAME,    PARENT,   MACHINE,  INPUT,    INIT,     MONITOR, COMPANY,         FULLNAME,                          FLAGS */
-GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Legion (ver 2.03)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Legion (ver 1.05)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, legion,   0,        legion,   legion,   legion,   ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 2.03)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1987, legiono,  legion,   legiono,  legion,   legiono,  ROT270, "Nichibutsu",     "Chouji Meikyuu Legion (ver 1.05)",               GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terraf,   0,        terraf,   terraf,   terraf,   ROT0,   "Nichibutsu",     "Terra Force (set 1)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafa,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu",     "Terra Force (set 2)",             GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1987, terrafu,  terraf,   terraf,   terraf,   terrafu,  ROT0,   "Nichibutsu USA", "Terra Force (US)",                GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
