@@ -42,6 +42,17 @@ static DWORD create_path_recursive(const TCHAR *path);
 
 
 //============================================================
+//  INLINE FUNCTIONS
+//============================================================
+
+INLINE int is_path_to_physical_drive(const char *path)
+{
+	return (_strnicmp(path, "\\\\.\\physicaldrive", 17) == 0);
+}
+
+
+
+//============================================================
 //  osd_open
 //============================================================
 
@@ -79,7 +90,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	// select the file open modes
 	if (openflags & OPEN_FLAG_WRITE)
 	{
-		disposition = (openflags & OPEN_FLAG_CREATE) ? CREATE_ALWAYS : OPEN_EXISTING;
+		disposition = (!is_path_to_physical_drive(path) && (openflags & OPEN_FLAG_CREATE)) ? CREATE_ALWAYS : OPEN_EXISTING;
 		access = (openflags & OPEN_FLAG_READ) ? (GENERIC_READ | GENERIC_WRITE) : GENERIC_WRITE;
 		sharemode = 0;
 	}
@@ -250,7 +261,7 @@ int osd_get_physical_drive_geometry(const char *filename, UINT32 *cylinders, UIN
 	int result;
 
 	// if it doesn't smell like a physical drive, just return FALSE
-	if (_strnicmp(filename, "\\\\.\\physicaldrive", 17) != 0)
+	if (!is_path_to_physical_drive(filename))
 		return FALSE;
 
 	// do a create file on the drive
