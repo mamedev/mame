@@ -3161,6 +3161,31 @@ ROM_START( pitfall2 )
 	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
+ROM_START( pitfalla )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "epr-6505",	0x0000, 0x4000, CRC(b6769739) SHA1(e1b8401c20f77f8ec799b19d7bc94ae4f9ed702f) ) /* encrypted */
+	ROM_LOAD( "epr-6506",	0x4000, 0x4000, CRC(1ce6aec4) SHA1(69b54c4569ccfb1166a901e7044ae1026db01a82) ) /* encrypted */
+	ROM_LOAD( "epr6458a.96",	0x8000, 0x4000, CRC(5c30b3e8) SHA1(9048091ebf054d0ba0c6a92520ddfac38a479034) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "epr-6462.120",	0x0000, 0x2000, CRC(86bb9185) SHA1(89add2e3784e8f5a20b895fb2c4466bdd6c34b0c) )
+
+	ROM_REGION( 0xc000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "epr6474a.62",	0x0000, 0x2000, CRC(9f1711b9) SHA1(c652010a8b19828f81fd101aa1ea781e250c4ec2) )
+	ROM_LOAD( "epr6473a.61",	0x2000, 0x2000, CRC(8e53b8dd) SHA1(23e04589f2b523d6b8e46d16f40e59685e27f522) )
+	ROM_LOAD( "epr6472a.64",	0x4000, 0x2000, CRC(e0f34a11) SHA1(b7a96a1867f8bd3cc1251b5fd12991c406e62a37) )
+	ROM_LOAD( "epr6471a.63",	0x6000, 0x2000, CRC(d5bc805c) SHA1(520afa7617e8dfd09bf469c01ac606a4a3acdc5e) )
+	ROM_LOAD( "epr6470a.66",	0x8000, 0x2000, CRC(1439729f) SHA1(54ea6ef54be6dcc2a5d00f7f817fd8836a02b3b9) )
+	ROM_LOAD( "epr6469a.65",	0xa000, 0x2000, CRC(e4ac6921) SHA1(f95e3b368c2c6dbf8265fb314d73019fe7dcce22) )
+
+	ROM_REGION( 0x8000, REGION_GFX2, 0 ) /* 32k for sprites data */
+	ROM_LOAD( "epr6454a.117",	0x0000, 0x4000, CRC(a5d96780) SHA1(e0571f6fd031bbe2d971c3be7b96a017b0ea4be9) )
+	ROM_LOAD( "epr-6455.05",	0x4000, 0x4000, CRC(32ee64a1) SHA1(21743f78735fc9105fbbfac420bdaa2965b4b56f) )
+
+	ROM_REGION( 0x0100, REGION_USER1, 0 ) /* misc PROMs, but not color so don't use REGION_PROMS! */
+	ROM_LOAD( "pr-5317.76",		0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
+ROM_END
+
 ROM_START( pitfallu )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
 	ROM_LOAD( "epr-6623.116",	0x0000, 0x4000, CRC(bcb47ed6) SHA1(d33421999f899c0a4dc0d4553614c1f5c7027257) )
@@ -4905,6 +4930,7 @@ GAME( 1984, thetogyu, bullfgt,  system1,  bullfgt,  bullfgtj, ROT0,   "Coreland 
 GAME( 1984, spatter,  0,        small,    spatter,  spatter,  ROT0,   "Sega",            "Spatter", GAME_SUPPORTS_SAVE )
 GAME( 1984, ssanchan, spatter,  small,    spatter,  spatter,  ROT0,   "Sega",            "Sanrin San Chan (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfall2, 0,        pitfall2, pitfall2, pitfall2, ROT0,   "Sega",            "Pitfall II (315-5093)", GAME_SUPPORTS_SAVE )
+GAME( 1985, pitfalla, pitfall2, pitfall2, pitfall2, pitfall2, ROT0,   "Sega",            "Pitfall II (315-5093, Flicky Conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, pitfallu, pitfall2, pitfall2, pitfallu, 0,        ROT0,   "Sega",            "Pitfall II (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1985, seganinj, 0,        system1,  seganinj, seganinj, ROT0,   "Sega",            "Sega Ninja (315-5102)", GAME_SUPPORTS_SAVE )
 GAME( 1985, seganinu, seganinj, system1,  seganinj, 0,        ROT0,   "Sega",            "Sega Ninja (not encrypted)", GAME_SUPPORTS_SAVE )
@@ -4935,7 +4961,7 @@ GAME( 1986, wboyo,    wboy,     system1,  wboy,     hvymetal, ROT0,   "Sega (Esc
 GAME( 1986, wboy2,    wboy,     system1,  wboy,     wboy2,    ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, 315-5178)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy2u,   wboy,     system1,  wboy,     0,        ROT0,   "Sega (Escape license)", "Wonder Boy (set 2, not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy3,    wboy,     system1,  wboy3,    hvymetal, ROT0,   "Sega (Escape license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy4,    wboy,     system1,  wboy,     4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (set 4, 315-5162)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboy4,    wboy,     system1,  wboy,     4dwarrio, ROT0,   "Sega (Escape license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboyu,    wboy,     system1,  wboyu,    0,        ROT0,   "Sega (Escape license)", "Wonder Boy (not encrypted)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboysys2, wboy,     wbml,     wboysys2, wboy,     ROT0,   "Sega (Escape license)", "Wonder Boy (system 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wbdeluxe, wboy,     system1,  wbdeluxe, 0,        ROT0,   "Sega (Escape license)", "Wonder Boy Deluxe", GAME_SUPPORTS_SAVE )
