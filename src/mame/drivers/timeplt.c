@@ -45,7 +45,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "timeplt.h"
 #include "audio/timeplt.h"
 
@@ -54,7 +53,7 @@
 
 
 
-static UINT8 irq_enable;
+static UINT8 nmi_enable;
 
 
 /*************************************
@@ -65,22 +64,22 @@ static UINT8 irq_enable;
 
 static MACHINE_START( timeplt )
 {
-	state_save_register_global(irq_enable);
+	state_save_register_global(nmi_enable);
 }
 
 
 static INTERRUPT_GEN( timeplt_interrupt )
 {
-	if (irq_enable)
+	if (nmi_enable)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( irq_enable_w )
+static WRITE8_HANDLER( timeplt_nmi_enable_w )
 {
-	irq_enable = data & 1;
-	if (!irq_enable)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	nmi_enable = data & 1;
+	if (!nmi_enable)
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -100,11 +99,27 @@ static WRITE8_HANDLER( timeplt_coin_counter_w )
 
 /*************************************
  *
- *  Memory maps
+ *  Power Surge protection
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static READ8_HANDLER( psurge_protection_r )
+{
+	return 0x80;
+}
+
+
+
+/*************************************
+ *
+ *  Memory maps
+ *
+ *  Power Surge has no NMI enable,
+ *  and has a proection check
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( timeplt_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(SMH_RAM, timeplt_colorram_w) AM_BASE(&colorram)
@@ -114,7 +129,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_nmi_enable_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_flipscreen_w)
 	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_sh_irqtrigger_w)
 	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
@@ -126,6 +141,28 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
+	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(SMH_RAM, timeplt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_READWRITE(SMH_RAM, timeplt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_flipscreen_w)
+	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_sh_irqtrigger_w)
+	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ(timeplt_scanline_r)
+	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
+	AM_RANGE(0xc320, 0xc320) AM_MIRROR(0x0c9f) AM_READ_PORT("IN1")
+	AM_RANGE(0xc340, 0xc340) AM_MIRROR(0x0c9f) AM_READ_PORT("IN2")
+	AM_RANGE(0xc360, 0xc360) AM_MIRROR(0x0c9f) AM_READ_PORT("DSW0")
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -321,8 +358,8 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( timeplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_ADD_TAG("main", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
+	MDRV_CPU_PROGRAM_MAP(timeplt_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", timeplt_interrupt)
 
 	MDRV_MACHINE_START(timeplt)
@@ -345,6 +382,16 @@ static MACHINE_DRIVER_START( timeplt )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(timeplt_sound)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( psurge )
+	MDRV_IMPORT_FROM(timeplt)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(psurge_main_map,0)
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 MACHINE_DRIVER_END
 
 
@@ -484,4 +531,4 @@ GAME( 1982, timeplt,  0,       timeplt, timeplt, 0, ROT90,  "Konami", "Time Pilo
 GAME( 1982, timepltc, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Centuri license)", "Time Pilot (Centuri)", GAME_SUPPORTS_SAVE )
 GAME( 1982, timeplta, timeplt, timeplt, timeplt, 0, ROT90,  "Konami (Atari license)", "Time Pilot (Atari)", GAME_SUPPORTS_SAVE )
 GAME( 1982, spaceplt, timeplt, timeplt, timeplt, 0, ROT90,  "bootleg", "Space Pilot", GAME_SUPPORTS_SAVE )
-GAME( 1988, psurge,   0,       timeplt, psurge,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
+GAME( 1988, psurge,   0,       psurge,  psurge,  0, ROT270, "<unknown>", "Power Surge", GAME_SUPPORTS_SAVE )
