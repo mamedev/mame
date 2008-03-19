@@ -136,6 +136,7 @@ TODO:
 
 - splndrbt, hvoltage: the interpretation of the scaling PROMs might be wrong.
   The sprite x scaling is not used at all because I couldn't figure it out.
+  Sprite y scaling is slightly wrong and leaves gaps in tall objects.
   Note that sprites are 30x30 instead of 32x32.
 
 - Need to use different default volumes for various games, especially gekisou
@@ -376,7 +377,7 @@ static int equites_sound_prom_address;
 static UINT8 equites_dac_latch;
 static UINT8 equites_8155_portb;
 
-static UINT8 eq8155_port_a,eq8155_port_c,ay_port_a,ay_port_b,eq_unk1;
+static UINT8 eq8155_port_a,eq8155_port_c,ay_port_a,ay_port_b,eq_cymbal_ctrl;
 
 static MACHINE_RESET(equites)
 {
@@ -395,12 +396,20 @@ static TIMER_CALLBACK( equites_nmi_callback )
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
+
+static float cymvol,hihatvol;
+
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
 	UINT8 frq = readinputportbytag(FRQ_ADJUSTER_TAG);
 
 	msm5232_set_clock(sndti_token(SOUND_MSM5232, 0), MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
-//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", eq8155_port_c,eq8155_port_a,ay_port_a,ay_port_b,eq_unk1&15);
+//popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", eq8155_port_c,eq8155_port_a,ay_port_a,ay_port_b,eq_cymbal_ctrl&15);
+
+	cymvol *= 0.94;
+	hihatvol *= 0.94;
+
+	sndti_set_output_gain(SOUND_MSM5232, 0, 10, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
 
 static SOUND_START(equites)
@@ -492,11 +501,32 @@ if (data & ~ay_port_b & 0x04) hihat++;
 	if (data & ~ay_port_b & 0x80)
 		sample_start(2, 2, 0);
 
+	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
+	// of the analog circuitry should be done instead.
+//	if (data & ~ay_port_b & 0x08)	cymbal hit trigger
+//	if (data & ~ay_port_b & 0x04)	hi-hat hit trigger
+//	data & 3   cymbal volume
+//	data & 0x40  hi-hat enable
+
+	if (data & ~ay_port_b & 0x08)
+		cymvol = 1.0;
+
+	if (data & ~ay_port_b & 0x04)
+		hihatvol = 0.8;
+
+	if (~data & 0x40)
+		hihatvol = 0.0;
+
 	ay_port_b = data;
 
 #if POPDRUMKIT
 popmessage("HH %d(%d) CYM %d(%d)",hihat,BIT(ay_port_b,6),cymbal,ay_port_b&3);
 #endif
+}
+
+static WRITE8_HANDLER(equites_cymbal_ctrl_w)
+{
+	eq_cymbal_ctrl++;
 }
 
 
@@ -526,11 +556,6 @@ static WRITE8_HANDLER(equites_8155_portb_w)
 {
 	equites_8155_portb = data;
 	equites_update_dac();
-}
-
-static WRITE8_HANDLER(equites_unk1_w)
-{
-	eq_unk1++;
 }
 
 static void equites_msm5232_gate(int state)
@@ -694,7 +719,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_unk1_w)
+	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
 	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE(equites_dac_latch_w)	// followed by 2 (and usually 0) on 8155 port B
 	AM_RANGE(0xc0f8, 0xc0ff) AM_WRITE(equites_c0f8_w)
@@ -1118,9 +1143,9 @@ static MACHINE_DRIVER_START( common_sound )
 	MDRV_SOUND_ROUTE(5, "mono", MSM5232_BASE_VOLUME/1.5)	// pin 35  4'-2 : 15k resistor
 	MDRV_SOUND_ROUTE(6, "mono", MSM5232_BASE_VOLUME)		// pin 34  8'-2 : 10k resistor
 	MDRV_SOUND_ROUTE(7, "mono", MSM5232_BASE_VOLUME)		// pin 33 16'-2 : 10k resistor
-	MDRV_SOUND_ROUTE(8, "mono", 1.0)		// pin 1 SOLO  8'
-	MDRV_SOUND_ROUTE(9, "mono", 1.0)		// pin 2 SOLO 16'
-	// pin 22 Noise Output  not mapped
+	MDRV_SOUND_ROUTE(8, "mono", 1.0)		// pin 1 SOLO  8' (this actually feeds an analog section)
+	MDRV_SOUND_ROUTE(9, "mono", 1.0)		// pin 2 SOLO 16' (this actually feeds an analog section)
+	MDRV_SOUND_ROUTE(10,"mono", 0.12)		// pin 22 Noise Output (this actually feeds an analog section)
 
 	MDRV_SOUND_ADD(AY8910, XTAL_6_144MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(equites_8910intf)

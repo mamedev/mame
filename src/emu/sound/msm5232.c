@@ -712,6 +712,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 	stream_sample_t *buf8 = buffer[7];
 	stream_sample_t *bufsolo1 = buffer[8];
 	stream_sample_t *bufsolo2 = buffer[9];
+	stream_sample_t *bufnoise = buffer[10];
 	int i;
 
 	for (i=0; i<samples; i++)
@@ -764,6 +765,8 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 				cnt--;
 			}
 		}
+		
+		bufnoise[i] = (chip->noise_rng & (1<<16)) ? 32767 : 0;
 	}
 }
 
@@ -782,7 +785,7 @@ static void *msm5232_start(int sndindex, int clock, const void *config)
 
 	msm5232_init(chip, intf, clock, rate);
 
-	chip->stream = stream_create(0,10,rate,chip,MSM5232_update_one);
+	chip->stream = stream_create(0,11,rate,chip,MSM5232_update_one);
 	return chip;
 }
 
