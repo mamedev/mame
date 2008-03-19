@@ -4,6 +4,15 @@
 #include "video/cdp1869.h"
 #include "sound/cdp1869.h"
 
+/*
+
+	TODO:
+
+	- convert CDP1869 into a device with video/sound
+	- add predisplay/display timers
+
+*/
+
 typedef struct
 {
 	int ntsc_pal;
@@ -563,7 +572,7 @@ void cdp1869_configure(const CDP1869_interface *intf)
 		memcpy(cdp1869.cram, memory, intf->charram_size);
 	}
 
-	cdp1869.ntsc_pal = intf->ntsc_pal;
+	cdp1869.ntsc_pal = intf->video_format;
 	cdp1869.cramsize = intf->charram_size;
 	cdp1869.pramsize = intf->pageram_size;
 	cdp1869.color_callback = intf->get_color_bits;

@@ -34,7 +34,9 @@
 #ifndef __CDP1869_VIDEO__
 #define __CDP1869_VIDEO__
 
-enum {
+typedef enum _cdp1869_video_format cdp1869_video_format;
+
+enum _cdp1869_video_format {
 	CDP1869_NTSC,
 	CDP1869_PAL
 };
@@ -99,10 +101,10 @@ enum {
 
 typedef struct CDP1869_interface
 {
-	int ntsc_pal;			// display format (NTSC/PAL)
-	int charrom_region;		// memory region to load CHARRAM from
-	UINT16 charram_size;	// CHARRAM size
-	UINT16 pageram_size;	// PAGERAM size
+	cdp1869_video_format video_format;	// display format (NTSC/PAL)
+	int charrom_region;					// memory region to load CHARRAM from
+	UINT16 charram_size;				// CHARRAM size
+	UINT16 pageram_size;				// PAGERAM size
 	UINT8 (*get_color_bits)(UINT8 cramdata, UINT16 cramaddr, UINT16 pramaddr); // 0x01 = PCB, 0x02 = CCB0, 0x04 = CCB1
 } CDP1869_interface;
 

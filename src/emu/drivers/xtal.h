@@ -45,6 +45,7 @@ enum
 	XTAL_1MHz    		= 1000000,		/* Used to drive OKI M6295 chips */
 	XTAL_1_75MHz		= 1750000,		/* RCA CDP1861 */
 	XTAL_2MHz    		= 2000000,
+	XTAL_2_01216MHz		= 2012160,		/* Cidelsa Draco sound board */
 	XTAL_2_4576MHz		= 2457600,		/* Atari ST MFP */
 	XTAL_3MHz    		= 3000000,		/* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	XTAL_3_52128MHz		= 3521280,		/* RCA COSMAC VIP */
@@ -52,9 +53,11 @@ enum
 	XTAL_3_6864MHz  	= 3686400,		/* CPS3 */
 	XTAL_4MHz    		= 4000000,
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
+	XTAL_4_43361MHz		= 4433610,		/* Cidelsa Draco */
 	XTAL_4_433619MHz	= 4433619,		/* PAL color subcarrier */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
+	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
 	XTAL_6MHz    		= 6000000,
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7MHz    		= 7000000,		/* Jaleco Mega System PCBs */
