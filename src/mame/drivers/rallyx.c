@@ -165,6 +165,9 @@ Notes:
    At 0x0050 there is code to give infinite lives for player 1 when bit 3 of DSW0
    is ON. I can't tell however when it is supposed to be called.
 
+- tactician has the score area at the bottom of the screen. While highly unusual,
+  this is the correct behaviour and has been verified with screenshots.
+
 TODO:
 - commsega: the first time you kill a soldier, the music stops. When you die,
   the music restarts and won't stop a second time.
