@@ -398,6 +398,13 @@ VIDEO_START( locomotn )
 	bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
 	fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
 
+	/* handle reduced visible area in some games */
+	if (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)
+	{
+		tilemap_set_scrolldx(bg_tilemap,0,32);
+		tilemap_set_scrolldx(fg_tilemap,0,32);
+	}
+
 	spriteram_base = 0x14;
 
 	spriteram = rallyx_videoram + 0x00;
@@ -426,6 +433,13 @@ VIDEO_START( commsega )
 
 	bg_tilemap = tilemap_create(locomotn_bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
 	fg_tilemap = tilemap_create(locomotn_fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
+
+	/* handle reduced visible area in some games */
+	if (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)
+	{
+		tilemap_set_scrolldx(bg_tilemap,0,32);
+		tilemap_set_scrolldx(fg_tilemap,0,32);
+	}
 
 	/* commsega has more sprites and bullets than the other games */
 	spriteram_base = 0x00;
@@ -550,9 +564,6 @@ static void locomotn_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 		int color = spriteram_2[offs + 1] & 0x3f;
 		int flip = spriteram[offs] & 2;
 
-		/* handle reduced visible area in some games */
-		if (flip_screen_get() && (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)) sx += 32;
-
 		pdrawgfx(bitmap,machine->gfx[1],
 				((spriteram[offs] & 0x7c) >> 2) + 0x20*(spriteram[offs] & 0x01) + ((spriteram[offs] & 0x80) >> 1),
 				color,
@@ -623,9 +634,6 @@ static void locomotn_draw_bullets(running_machine *machine, bitmap_t *bitmap, co
 
 		x = rallyx_radarx[offs] + ((~rallyx_radarattr[offs & 0x0f] & 0x08) << 5);
 		y = 252 - rallyx_radary[offs];
-
-		/* handle reduced visible area in some games */
-		if (flip_screen_get() && (video_screen_get_visible_area(machine->primary_screen)->max_x == 32*8-1)) x += 32;
 
 		drawgfx(bitmap,machine->gfx[2],
 				(rallyx_radarattr[offs & 0x0f] & 0x07) ^ 0x07,
@@ -713,8 +721,17 @@ VIDEO_UPDATE( locomotn )
 	rectangle bg_clip = *cliprect;
 	if (flip_screen_get())
 	{
-		bg_clip.min_x = 8*8;
-		fg_clip.max_x = 8*8-1;
+		/* handle reduced visible area in some games */
+		if (video_screen_get_visible_area(screen)->max_x == 32*8-1)
+		{
+			bg_clip.min_x = 4*8;
+			fg_clip.max_x = 4*8-1;
+		}
+		else
+		{
+			bg_clip.min_x = 8*8;
+			fg_clip.max_x = 8*8-1;
+		}
 	}
 	else
 	{
