@@ -98,21 +98,9 @@ Notes:
 - similarly, splndrbt hardware only appears to be capable of displaying 24 sprites.
   This time, they are consecutive in RAM.
 
-
-TODO:
-----
-
-- on startup, the CPU continuously writes 5555 to 100000 in a tight loop and expects
-  it to change to exit the loop. The value should obviously be modified by the
-  sprite hardware but it's difficult to guess what should happen. A kludge read
-  handler is used as a work around.
-
-- the second interrupt source for main CPU is unknown.
-
-- gekisou inputs. Looks like there should be an EEPROM. Note ROM patches in
-  DRIVER_INIT to make it boot past what I think is the EEPROM read.
-  Settings are changed by pressing the service button and then using joystick
-  to change options.
+- gekisou doesn't have dip switches, but battery backed RAM. To enter the Settings
+  menu, press F1. The settings menu is VERY spartan, with no indication of what the
+  settings do.
 
   Settings:                1   2   3   4   5   6   7   8
   COIN 1  1 Coin / 1 Play  ON  ON
@@ -128,11 +116,30 @@ TODO:
   CABINET     Cocktail                         ON
               Upright                          OFF
 
+
+TODO:
+----
+
+- on startup, the CPU continuously writes 5555 to 100000 in a tight loop and expects
+  it to change to exit the loop. The value should obviously be modified by the
+  sprite hardware but it's difficult to guess what should happen. A kludge read
+  handler is used as a work around.
+
+- the second interrupt source for main CPU is unknown.
+
+- gekisou has some unknown device mapped to 580000/5a0000. The bit read from bit 7
+  of 180000 must match the last write, otherwise the game will report a BOARD ERROR
+  during boot.
+
 - gekisou: there's a white line crossing the explosion sprite. This doesn't look
   like a bad ROM since the line is crossing several, not concecutive, explosion
   sprites, and no other sprites.
 
 - gekisou: wrong sprite when hitting helicopter with missile?
+
+- gekisou: there is a small glitch during the text intro at the beginning of player
+  2 game in cocktail mode: a white line spills out from the text box as characters
+  in the last line are written. This might well be a bug in the original.
 
 - splndrbt, hvoltage: the interpretation of the scaling PROMs might be wrong.
   The sprite x scaling is not used at all because I couldn't figure it out.
@@ -150,6 +157,10 @@ TODO:
 - properly emulate the 8155 on the sound board.
 
 - implement low-pass filters on the DAC output
+
+- the purpose of the sound PROM is unclear. From the schematics, it seems it
+  should influence the MSM5232 clock. However, even removing it from the board
+  doesn't seem to affect the sound.
 
 * Special Thanks to:
 
@@ -444,9 +455,12 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 4: // c0fc: increment PROM address (written by NMI handler)
 			equites_sound_prom_address = (equites_sound_prom_address + 1) & 0x1f;
-//          FIXME: at this point, the 5-bit value
-//          memory_region(REGION_SOUND1)[equites_sound_prom_address] & 0x1f
-//          should be used for something...
+//       at this point, the 5-bit value
+//       memory_region(REGION_SOUND1)[equites_sound_prom_address] & 0x1f
+//       goes to an op-amp and to the base of a transistor. The transistor is part
+//       of a resonator that is used to generate the M5232 clock. The PROM doesn't
+//       actually seem to be important, since even removing it the M5232 clock
+//       continues to come out normally.
 			break;
 
 		case 5: // c0fd: n.c.
@@ -633,6 +647,25 @@ static READ16_HANDLER(hvoltage_debug_r)
 }
 #endif
 
+
+// Gekisou special handling
+static int unknown_bit;
+
+static CUSTOM_INPUT( gekisou_unknown_status )
+{
+	return unknown_bit;
+}
+
+static WRITE16_HANDLER( gekisou_unknown_0_w )
+{
+	unknown_bit = 0;
+}
+
+static WRITE16_HANDLER( gekisou_unknown_1_w )
+{
+	unknown_bit = 1;
+}
+
 /******************************************************************************/
 // Main CPU Memory Map
 
@@ -670,7 +703,7 @@ static WRITE16_HANDLER( mcu_halt_clear_w )
 
 static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram)
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(&equites_workram) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM AM_WRITE(equites_bg_videoram_w) AM_BASE(&equites_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
@@ -686,6 +719,8 @@ static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITENOP // 8404 control port4
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READWRITE(input_port_0_word_r, equites_scrollreg_w) // scroll register[XXYY]
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(equites_bgcolor_w) // bg color register[CC--]
+	// 580000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
+	// 5a0000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
 	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
@@ -809,24 +844,12 @@ static INPUT_PORTS_START( gekisou )
 #if EASY_TEST_MODE
 	PORT_SERVICE( 0x0300, IP_ACTIVE_HIGH )
 #endif
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR ( Unknown ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Settings") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gekisou_unknown_status, 0)
 
 	/* this is actually a variable resistor */
 	PORT_START_TAG(FRQ_ADJUSTER_TAG)
@@ -1191,6 +1214,16 @@ static MACHINE_DRIVER_START( equites )
 
 	MDRV_MACHINE_RESET(equites)
 MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( gekisou )
+	MDRV_IMPORT_FROM(equites)
+
+	// gekisou has battery-backed RAM to store settings
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( splndrbt )
 
@@ -1785,21 +1818,12 @@ static DRIVER_INIT( kouyakyu )
 
 static DRIVER_INIT( gekisou )
 {
-	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
-
 	unpack_region(REGION_GFX2);
 	unpack_region(REGION_GFX3);
 
-	// FIXME - patch input check
-	rom[0x8b0>>1] = 0x4e71;
-	rom[0x8d4>>1] = 0x4e71;
-	rom[0xb3a>>1] = 0x4e71;
-	rom[0xb3c>>1] = 0x4e71;
-	// patch ROM checksum test too
-	rom[0x4b4>>1] = 0x4e71;
-	rom[0x4b6>>1] = 0x4e71;
-	rom[0x4bc>>1] = 0x4e71;
-	rom[0x4be>>1] = 0x4e71;
+	// install special handlers for unknown device (protection?)
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1823,7 +1847,7 @@ static DRIVER_INIT( hvoltage )
 // Equites Hardware
 GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_IMPERFECT_SOUND )
 GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_IMPERFECT_SOUND )
-GAME( 1985, gekisou,  0,        equites,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_NO_COCKTAIL | GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_IMPERFECT_SOUND )
 GAME( 1984, bullfgts, bullfgtr, equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_IMPERFECT_SOUND )
 GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_IMPERFECT_SOUND )
