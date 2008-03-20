@@ -1384,7 +1384,8 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 								sy = (y+nys*16) & 0x1ff;
 
 								DRAWSPRITE(
-										code+(nx-1)-nxs+0x10*(ny-1-nys),
+//										code+(nx-1)-nxs+0x10*(ny-1-nys),
+										(code & ~0xf) + ((code + (nx-1) - nxs) & 0xf) + 0x10*(ny-1-nys),
 										(col&0x1f) + palette_basecolor[0],
 										1,1,
 										sx,sy);
@@ -1401,7 +1402,8 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 								sy = (y+nys*16) & 0x1ff;
 
 								DRAWSPRITE(
-										code+nxs+0x10*(ny-1-nys),
+//										code+nxs+0x10*(ny-1-nys),
+										(code & ~0xf) + ((code + nxs) & 0xf) + 0x10*(ny-1-nys),
 										(col&0x1f) + palette_basecolor[0],
 										0,1,
 										sx,sy);
@@ -1421,7 +1423,8 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 								sy = (y+nys*16) & 0x1ff;
 
 								DRAWSPRITE(
-										code+(nx-1)-nxs+0x10*nys,
+//										code+(nx-1)-nxs+0x10*nys,
+										(code & ~0xf) + ((code + (nx-1) - nxs) & 0xf) + 0x10*nys,
 										(col&0x1f) + palette_basecolor[0],
 										1,0,
 										sx,sy);
@@ -1438,7 +1441,8 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 								sy = (y+nys*16) & 0x1ff;
 
 								DRAWSPRITE(
-										code+nxs+0x10*nys,
+//										code+nxs+0x10*nys,
+										(code & ~0xf) + ((code + nxs) & 0xf) + 0x10*nys,	// fix 00406: qadj: When playing as the ninja, there is one broekn frame in his animation loop when walking. 
 										(col&0x1f) + palette_basecolor[0],
 										0,0,
 										sx,sy);
