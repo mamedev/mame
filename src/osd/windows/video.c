@@ -7,9 +7,6 @@
 //
 //============================================================
 
-// needed for multimonitor
-#define _WIN32_WINNT 0x501
-
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

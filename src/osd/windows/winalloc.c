@@ -7,8 +7,6 @@
 //
 //============================================================
 
-#define _WIN32_WINNT 0x0400
-
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -27,6 +25,8 @@
 //============================================================
 //  CONSTANTS
 //============================================================
+
+#define OVERRIDE_STANDARD_CALLS		(0)
 
 #define PAGE_SIZE		4096
 #define COOKIE_VAL		0x11335577
@@ -193,10 +193,12 @@ void *malloc_file_line(size_t size, const char *file, int line)
 //  malloc - override for the malloc() function
 //============================================================
 
+#if OVERRIDE_STANDARD_CALLS
 void *CLIB_DECL malloc(size_t size)
 {
 	return malloc_file_line(size, NULL, 0);
 }
+#endif
 
 
 //============================================================
@@ -221,10 +223,12 @@ void *calloc_file_line(size_t size, size_t count, const char *file, int line)
 //  calloc - override for the calloc() function
 //============================================================
 
+#if OVERRIDE_STANDARD_CALLS
 void *CLIB_DECL calloc(size_t size, size_t count)
 {
 	return calloc_file_line(size, count, NULL, 0);
 }
+#endif
 
 
 //============================================================
@@ -232,10 +236,12 @@ void *CLIB_DECL calloc(size_t size, size_t count)
 //  which is called by beginthreadex
 //============================================================
 
+#if OVERRIDE_STANDARD_CALLS
 void *CLIB_DECL _calloc_crt(size_t size, size_t count)
 {
 	return calloc_file_line(size, count, NULL, 0);
 }
+#endif
 
 
 //============================================================
@@ -298,17 +304,20 @@ void *realloc_file_line(void *memory, size_t size, const char *file, int line)
 //  realloc - override for the realloc() function
 //============================================================
 
+#if OVERRIDE_STANDARD_CALLS
 void *CLIB_DECL realloc(void *memory, size_t size)
 {
 	return realloc_file_line(memory, size, NULL, 0);
 }
+#endif
 
 
 //============================================================
-//  free - override for the free() function
+//  free_file_line - debugging version of free which
+//  accepts filename and line number
 //============================================================
 
-void CLIB_DECL free(void *memory)
+void CLIB_DECL free_file_line(void *memory, const char *file, int line)
 {
 	memory_entry *entry;
 
@@ -347,10 +356,23 @@ void CLIB_DECL free(void *memory)
 
 
 //============================================================
+//  free - override for the free() function
+//============================================================
+
+#if OVERRIDE_STANDARD_CALLS
+void CLIB_DECL free(void *memory)
+{
+	free_file_line(memory, NULL, 0);
+}
+#endif
+
+
+//============================================================
 //  _msize - internal MSVC routine that returns the size of
 //  a memory block
 //============================================================
 
+#if OVERRIDE_STANDARD_CALLS
 size_t CLIB_DECL _msize(void *memory)
 {
 	size_t result;
@@ -376,6 +398,7 @@ size_t CLIB_DECL _msize(void *memory)
 	}
 	return result;
 }
+#endif
 
 
 //============================================================
