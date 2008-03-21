@@ -549,23 +549,20 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 static void wbbc97_draw_bitmap(bitmap_t *bitmap)
 {
 	int x,y,count;
-	int color;
 
 	count = 16; // weird, the bitmap doesn't start at 0?
 	for (y=0;y<256;y++)
-	{
 		for (x=0;x<512;x++)
 		{
-			color = wbbc97_bitmapram[count] >> 1;
+			int color = wbbc97_bitmapram[count] >> 1;
 
 			/* data is GRB; convert to RGB */
-			color = (color & 0x1f) | ((color & 0x3e0) << 5) | ((color & 0x7c00) >> 5);
-			*BITMAP_ADDR16(bitmap, y, (10+x-aerofgt_rasterram[(y & 0x7f)])&0x1ff) = color;
+			rgb_t pen = MAKE_RGB(pal5bit((color & 0x3e0) >> 5), pal5bit((color & 0x7c00) >> 10), pal5bit(color & 0x1f));
+			*BITMAP_ADDR32(bitmap, y, (10+x-aerofgt_rasterram[(y & 0x7f)])&0x1ff) = pen;
 
 			count++;
 			count &= 0x1ffff;
 		}
-	}
 }
 
 
