@@ -136,6 +136,6 @@ int ui_is_menu_active(void);
 int ui_is_slider_active(void);
 
 /* print the game info string into a buffer */
-int sprintf_game_info(char *buffer);
+int sprintf_game_info(running_machine *machine, char *buffer);
 
 #endif	/* __USRINTRF_H__ */

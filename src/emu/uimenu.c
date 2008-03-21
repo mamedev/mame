@@ -1248,7 +1248,7 @@ static UINT32 menu_game_info(UINT32 state)
 	UINT32 selected = 0;
 
 	/* add the game info */
-	bufptr += sprintf_game_info(bufptr);
+	bufptr += sprintf_game_info(Machine, bufptr);
 
 	/* draw the text */
 	ui_menu_draw_text_box(buf);

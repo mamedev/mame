@@ -19,7 +19,6 @@
 #include "ui.h"
 #include "uimenu.h"
 #include "uigfx.h"
-#include "deprecat.h"
 
 #ifdef MESS
 #include "mess.h"
@@ -124,8 +123,8 @@ static void ui_exit(running_machine *machine);
 static int rescale_notifier(running_machine *machine, int width, int height);
 
 /* text generators */
-static int sprintf_disclaimer(char *buffer);
-static int sprintf_warnings(char *buffer);
+static int sprintf_disclaimer(running_machine *machine, char *buffer);
+static int sprintf_warnings(running_machine *machine, char *buffer);
 
 /* UI handlers */
 static UINT32 handler_messagebox(running_machine *machine, UINT32 state);
@@ -136,7 +135,7 @@ static UINT32 handler_slider(running_machine *machine, UINT32 state);
 static UINT32 handler_load_save(running_machine *machine, UINT32 state);
 
 /* slider controls */
-static void slider_init(void);
+static void slider_init(running_machine *machine);
 static void slider_display(const char *text, int minval, int maxval, int defval, int curval);
 static void slider_draw_bar(float leftx, float topy, float width, float height, float percentage, float default_percentage);
 static INT32 slider_volume(running_machine *machine, INT32 newval, char *buffer, int arg);
@@ -317,15 +316,15 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 	int state;
 
 	/* disable everything if we are using -str */
-	if (!first_time || (str > 0 && str < 60*5) || Machine->gamedrv == &driver_empty)
+	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &driver_empty)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
-	slider_init();
+	slider_init(machine);
 
 	/* loop over states */
 	ui_set_handler(handler_ingame, 0);
-	for (state = 0; state < maxstate && !mame_is_scheduled_event_pending(Machine) && !ui_menu_is_force_game_select(); state++)
+	for (state = 0; state < maxstate && !mame_is_scheduled_event_pending(machine) && !ui_menu_is_force_game_select(); state++)
 	{
 		/* default to standard colors */
 		messagebox_backcolor = UI_FILLCOLOR;
@@ -334,21 +333,21 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 		switch (state)
 		{
 			case 0:
-				if (show_disclaimer && sprintf_disclaimer(messagebox_text))
+				if (show_disclaimer && sprintf_disclaimer(machine, messagebox_text))
 					ui_set_handler(handler_messagebox_ok, 0);
 				break;
 
 			case 1:
-				if (show_warnings && sprintf_warnings(messagebox_text))
+				if (show_warnings && sprintf_warnings(machine, messagebox_text))
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
-					if (Machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
+					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
 						messagebox_backcolor = UI_REDCOLOR;
 				}
 				break;
 
 			case 2:
-				if (show_gameinfo && sprintf_game_info(messagebox_text))
+				if (show_gameinfo && sprintf_game_info(machine, messagebox_text))
 					ui_set_handler(handler_messagebox_anykey, 0);
 				break;
 #ifdef MESS
@@ -362,7 +361,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 		while (input_code_poll_switches(FALSE) != INPUT_CODE_INVALID) ;
 
 		/* loop while we have a handler */
-		while (ui_handler_callback != handler_ingame && !mame_is_scheduled_event_pending(Machine) && !ui_menu_is_force_game_select())
+		while (ui_handler_callback != handler_ingame && !mame_is_scheduled_event_pending(machine) && !ui_menu_is_force_game_select())
 			video_frame_update(machine, FALSE);
 
 		/* clear the handler and force an update */
@@ -412,7 +411,7 @@ void ui_update_and_render(running_machine *machine)
 	render_container_empty(render_container_get_ui());
 
 	/* if we're paused, dim the whole screen */
-	if (mame_get_phase(Machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(Machine)))
+	if (mame_get_phase(machine) >= MAME_PHASE_RESET && (single_step || mame_is_paused(machine)))
 	{
 		int alpha = (1.0f - options_get_float(mame_options(), OPTION_PAUSE_BRIGHTNESS)) * 255.0f;
 		if (ui_menu_is_force_game_select())
@@ -932,11 +931,11 @@ int ui_is_slider_active(void)
     text to the given buffer
 -------------------------------------------------*/
 
-static int sprintf_disclaimer(char *buffer)
+static int sprintf_disclaimer(running_machine *machine, char *buffer)
 {
 	char *bufptr = buffer;
 	bufptr += sprintf(bufptr, "Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
-	bufptr += sprintf(bufptr, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", Machine->gamedrv->description);
+	bufptr += sprintf(bufptr, "IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->gamedrv->description);
 	bufptr += sprintf(bufptr, "Otherwise, type OK or move the joystick left then right to continue");
 	return bufptr - buffer;
 }
@@ -947,7 +946,7 @@ static int sprintf_disclaimer(char *buffer)
     text to the given buffer
 -------------------------------------------------*/
 
-static int sprintf_warnings(char *buffer)
+static int sprintf_warnings(running_machine *machine, char *buffer)
 {
 #define WARNING_FLAGS (	GAME_NOT_WORKING | \
 						GAME_UNEMULATED_PROTECTION | \
@@ -961,59 +960,59 @@ static int sprintf_warnings(char *buffer)
 	int i;
 
 	/* if no warnings, nothing to return */
-	if (rom_load_warnings() == 0 && !(Machine->gamedrv->flags & WARNING_FLAGS))
+	if (rom_load_warnings() == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
 		return 0;
 
 	/* add a warning if any ROMs were loaded with warnings */
 	if (rom_load_warnings() > 0)
 	{
 		bufptr += sprintf(bufptr, "One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
-		if (Machine->gamedrv->flags & WARNING_FLAGS)
+		if (machine->gamedrv->flags & WARNING_FLAGS)
 			*bufptr++ = '\n';
 	}
 
 	/* if we have at least one warning flag, print the general header */
-	if (Machine->gamedrv->flags & WARNING_FLAGS)
+	if (machine->gamedrv->flags & WARNING_FLAGS)
 	{
 		bufptr += sprintf(bufptr, "There are known problems with this " GAMENOUN "\n\n");
 
 		/* add one line per warning flag */
 #ifdef MESS
-		if (Machine->gamedrv->flags & GAME_COMPUTER)
+		if (machine->gamedrv->flags & GAME_COMPUTER)
 			bufptr += sprintf(bufptr, "%s\n\n%s\n", "The emulated system is a computer: ", "The keyboard emulation may not be 100% accurate.");
 #endif
-		if (Machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
+		if (machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
 			bufptr += sprintf(bufptr, "The colors aren't 100%% accurate.\n");
-		if (Machine->gamedrv->flags & GAME_WRONG_COLORS)
+		if (machine->gamedrv->flags & GAME_WRONG_COLORS)
 			bufptr += sprintf(bufptr, "The colors are completely wrong.\n");
-		if (Machine->gamedrv->flags & GAME_IMPERFECT_GRAPHICS)
+		if (machine->gamedrv->flags & GAME_IMPERFECT_GRAPHICS)
 			bufptr += sprintf(bufptr, "The video emulation isn't 100%% accurate.\n");
-		if (Machine->gamedrv->flags & GAME_IMPERFECT_SOUND)
+		if (machine->gamedrv->flags & GAME_IMPERFECT_SOUND)
 			bufptr += sprintf(bufptr, "The sound emulation isn't 100%% accurate.\n");
-		if (Machine->gamedrv->flags & GAME_NO_SOUND)
+		if (machine->gamedrv->flags & GAME_NO_SOUND)
 			bufptr += sprintf(bufptr, "The game lacks sound.\n");
-		if (Machine->gamedrv->flags & GAME_NO_COCKTAIL)
+		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
 			bufptr += sprintf(bufptr, "Screen flipping in cocktail mode is not supported.\n");
 
 		/* if there's a NOT WORKING or UNEMULATED PROTECTION warning, make it stronger */
-		if (Machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
+		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
 		{
 			const game_driver *maindrv;
 			const game_driver *clone_of;
 			int foundworking;
 
 			/* add the strings for these warnings */
-			if (Machine->gamedrv->flags & GAME_NOT_WORKING)
+			if (machine->gamedrv->flags & GAME_NOT_WORKING)
 				bufptr += sprintf(bufptr, "THIS " CAPGAMENOUN " DOESN'T WORK. You won't be able to make it work correctly.  Don't bother.\n");
-			if (Machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
+			if (machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
 				bufptr += sprintf(bufptr, "The game has protection which isn't fully emulated.\n");
 
 			/* find the parent of this driver */
-			clone_of = driver_get_clone(Machine->gamedrv);
+			clone_of = driver_get_clone(machine->gamedrv);
 			if (clone_of != NULL && !(clone_of->flags & GAME_IS_BIOS_ROOT))
  				maindrv = clone_of;
 			else
-				maindrv = Machine->gamedrv;
+				maindrv = machine->gamedrv;
 
 			/* scan the driver list for any working clones and add them */
 			foundworking = 0;
@@ -1041,26 +1040,26 @@ static int sprintf_warnings(char *buffer)
     to the given buffer
 -------------------------------------------------*/
 
-int sprintf_game_info(char *buffer)
+int sprintf_game_info(running_machine *machine, char *buffer)
 {
-	int scrcount = video_screen_count(Machine->config);
+	int scrcount = video_screen_count(machine->config);
 	char *bufptr = buffer;
 	int cpunum, sndnum;
 	int count;
 
 	/* print description, manufacturer, and CPU: */
-	bufptr += sprintf(bufptr, "%s\n%s %s\n\nCPU:\n", Machine->gamedrv->description, Machine->gamedrv->year, Machine->gamedrv->manufacturer);
+	bufptr += sprintf(bufptr, "%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
 
 	/* loop over all CPUs */
-	for (cpunum = 0; cpunum < MAX_CPU && Machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
+	for (cpunum = 0; cpunum < MAX_CPU && machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum += count)
 	{
-		cpu_type type = Machine->config->cpu[cpunum].type;
-		int clock = Machine->config->cpu[cpunum].clock;
+		cpu_type type = machine->config->cpu[cpunum].type;
+		int clock = machine->config->cpu[cpunum].clock;
 
 		/* count how many identical CPUs we have */
 		for (count = 1; cpunum + count < MAX_CPU; count++)
-			if (Machine->config->cpu[cpunum + count].type != type ||
-		        Machine->config->cpu[cpunum + count].clock != clock)
+			if (machine->config->cpu[cpunum + count].type != type ||
+		        machine->config->cpu[cpunum + count].clock != clock)
 		    	break;
 
 		/* if more than one, prepend a #x in front of the CPU name */
@@ -1076,9 +1075,9 @@ int sprintf_game_info(char *buffer)
 	}
 
 	/* loop over all sound chips */
-	for (sndnum = 0; sndnum < MAX_SOUND && Machine->config->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
+	for (sndnum = 0; sndnum < MAX_SOUND && machine->config->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
 	{
-		sound_type type = Machine->config->sound[sndnum].type;
+		sound_type type = machine->config->sound[sndnum].type;
 		int clock = sndnum_clock(sndnum);
 
 		/* append the Sound: string */
@@ -1087,7 +1086,7 @@ int sprintf_game_info(char *buffer)
 
 		/* count how many identical sound chips we have */
 		for (count = 1; sndnum + count < MAX_SOUND; count++)
-			if (Machine->config->sound[sndnum + count].type != type ||
+			if (machine->config->sound[sndnum + count].type != type ||
 		        sndnum_clock(sndnum + count) != clock)
 		    	break;
 
@@ -1113,7 +1112,7 @@ int sprintf_game_info(char *buffer)
 	{
 		const device_config *screen;
 
-		for (screen = video_screen_first(Machine->config); screen != NULL; screen = video_screen_next(screen))
+		for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 		{
 			const screen_config *scrconfig = screen->inline_config;
 
@@ -1129,7 +1128,7 @@ int sprintf_game_info(char *buffer)
 				bufptr += sprintf(bufptr, "%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 						visarea->max_x - visarea->min_x + 1,
 						visarea->max_y - visarea->min_y + 1,
-						(Machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
+						(machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 						ATTOSECONDS_TO_HZ(video_screen_get_frame_period(screen).attoseconds));
 			}
 		}
@@ -1177,7 +1176,7 @@ static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state)
 	/* if the user cancels, exit out completely */
 	else if (input_ui_pressed(IPT_UI_CANCEL))
 	{
-		mame_schedule_exit(Machine);
+		mame_schedule_exit(machine);
 		state = UI_HANDLER_CANCEL;
 	}
 
@@ -1199,7 +1198,7 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state)
 	/* if the user cancels, exit out completely */
 	if (input_ui_pressed(IPT_UI_CANCEL))
 	{
-		mame_schedule_exit(Machine);
+		mame_schedule_exit(machine);
 		state = UI_HANDLER_CANCEL;
 	}
 
@@ -1218,7 +1217,7 @@ static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state)
 
 static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 {
-	int is_paused = mame_is_paused(Machine);
+	int is_paused = mame_is_paused(machine);
 
 	/* first draw the FPS counter */
 	if (showfps || osd_ticks() < showfps_end)
@@ -1246,7 +1245,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* if we're single-stepping, pause now */
 	if (single_step)
 	{
-		mame_pause(Machine, TRUE);
+		mame_pause(machine, TRUE);
 		single_step = FALSE;
 	}
 
@@ -1257,47 +1256,47 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* if the user pressed ESC, stop the emulation */
 	if (input_ui_pressed(IPT_UI_CANCEL))
-		mame_schedule_exit(Machine);
+		mame_schedule_exit(machine);
 
 	/* turn on menus if requested */
 	if (input_ui_pressed(IPT_UI_CONFIGURE))
 		return ui_set_handler(ui_menu_ui_handler, 0);
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */
-	if (!Machine->debug_mode && input_ui_pressed(IPT_UI_ON_SCREEN_DISPLAY))
+	if (!machine->debug_mode && input_ui_pressed(IPT_UI_ON_SCREEN_DISPLAY))
 		return ui_set_handler(handler_slider, 0);
 
 	/* handle a reset request */
 	if (input_ui_pressed(IPT_UI_RESET_MACHINE))
-		mame_schedule_hard_reset(Machine);
+		mame_schedule_hard_reset(machine);
 	if (input_ui_pressed(IPT_UI_SOFT_RESET))
-		mame_schedule_soft_reset(Machine);
+		mame_schedule_soft_reset(machine);
 
 	/* handle a request to display graphics/palette */
 	if (input_ui_pressed(IPT_UI_SHOW_GFX))
 	{
 		if (!is_paused)
-			mame_pause(Machine, TRUE);
+			mame_pause(machine, TRUE);
 		return ui_set_handler(ui_gfx_ui_handler, is_paused);
 	}
 
 	/* handle a save state request */
 	if (input_ui_pressed(IPT_UI_SAVE_STATE))
 	{
-		mame_pause(Machine, TRUE);
+		mame_pause(machine, TRUE);
 		return ui_set_handler(handler_load_save, LOADSAVE_SAVE);
 	}
 
 	/* handle a load state request */
 	if (input_ui_pressed(IPT_UI_LOAD_STATE))
 	{
-		mame_pause(Machine, TRUE);
+		mame_pause(machine, TRUE);
 		return ui_set_handler(handler_load_save, LOADSAVE_LOAD);
 	}
 
 	/* handle a save snapshot request */
 	if (input_ui_pressed(IPT_UI_SNAPSHOT))
-		video_save_active_screen_snapshots(Machine);
+		video_save_active_screen_snapshots(machine);
 
 	/* toggle pause */
 	if (input_ui_pressed(IPT_UI_PAUSE))
@@ -1306,23 +1305,23 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 		if (is_paused && (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT)))
 		{
 			single_step = TRUE;
-			mame_pause(Machine, FALSE);
+			mame_pause(machine, FALSE);
 		}
 		else
-			mame_pause(Machine, !mame_is_paused(Machine));
+			mame_pause(machine, !mame_is_paused(machine));
 	}
 
 	/* toggle movie recording */
 	if (input_ui_pressed(IPT_UI_RECORD_MOVIE))
 	{
-		if (!video_is_movie_active(Machine->primary_screen))
+		if (!video_is_movie_active(machine->primary_screen))
 		{
-			video_movie_begin_recording(Machine->primary_screen, NULL);
+			video_movie_begin_recording(machine->primary_screen, NULL);
 			popmessage("REC START");
 		}
 		else
 		{
-			video_movie_end_recording(Machine->primary_screen);
+			video_movie_end_recording(machine->primary_screen);
 			popmessage("REC STOP");
 		}
 	}
@@ -1478,7 +1477,7 @@ static UINT32 handler_load_save(running_machine *machine, UINT32 state)
 			popmessage("Load cancelled");
 
 		/* reset the state */
-		mame_pause(Machine, FALSE);
+		mame_pause(machine, FALSE);
 		return UI_HANDLER_CANCEL;
 	}
 
@@ -1502,16 +1501,16 @@ static UINT32 handler_load_save(running_machine *machine, UINT32 state)
 	if (state == LOADSAVE_SAVE)
 	{
 		popmessage("Save to position %c", file);
-		mame_schedule_save(Machine, filename);
+		mame_schedule_save(machine, filename);
 	}
 	else
 	{
 		popmessage("Load from position %c", file);
-		mame_schedule_load(Machine, filename);
+		mame_schedule_load(machine, filename);
 	}
 
 	/* remove the pause and reset the state */
-	mame_pause(Machine, FALSE);
+	mame_pause(machine, FALSE);
 	return UI_HANDLER_CANCEL;
 }
 
@@ -1526,9 +1525,9 @@ static UINT32 handler_load_save(running_machine *machine, UINT32 state)
     controls
 -------------------------------------------------*/
 
-static void slider_init(void)
+static void slider_init(running_machine *machine)
 {
-	int numscreens = video_screen_count(Machine->config);
+	int numscreens = video_screen_count(machine->config);
 	const device_config *device;
 	int numitems, item;
 	input_port_entry *in;
@@ -1544,9 +1543,9 @@ static void slider_init(void)
 		slider_config(&slider_list[slider_count++], 0, sound_get_default_gain(item) * 1000.0f + 0.5f, 2000, 20, slider_mixervol, item);
 
 	/* add analog adjusters */
-	for (in = Machine->input_ports; in && in->type != IPT_END; in++)
+	for (in = machine->input_ports; in && in->type != IPT_END; in++)
 		if ((in->type & 0xff) == IPT_ADJUSTER)
-			slider_config(&slider_list[slider_count++], 0, in->default_value >> 8, 100, 1, slider_adjuster, in - Machine->input_ports);
+			slider_config(&slider_list[slider_count++], 0, in->default_value >> 8, 100, 1, slider_adjuster, in - machine->input_ports);
 
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
 	{
@@ -1561,7 +1560,7 @@ static void slider_init(void)
 
 	for (item = 0; item < numscreens; item++)
 	{
-		const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, item)->inline_config;
+		const screen_config *scrconfig = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, item)->inline_config;
 		int defxscale = floor(scrconfig->xscale * 1000.0f + 0.5f);
 		int defyscale = floor(scrconfig->yscale * 1000.0f + 0.5f);
 		int defxoffset = floor(scrconfig->xoffset * 1000.0f + 0.5f);
@@ -1579,7 +1578,7 @@ static void slider_init(void)
 		slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_yoffset, item);
 	}
 
-	for (device = video_screen_first(Machine->config); device != NULL; device = video_screen_next(device))
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
 		const screen_config *scrconfig = device->inline_config;
 		if (scrconfig->type == SCREEN_TYPE_VECTOR)
@@ -1593,7 +1592,7 @@ static void slider_init(void)
 
 #ifdef MAME_DEBUG
 	/* add crosshair adjusters */
-	for (in = Machine->input_ports; in && in->type != IPT_END; in++)
+	for (in = machine->input_ports; in && in->type != IPT_END; in++)
 		if (in->analog.crossaxis != CROSSHAIR_AXIS_NONE && in->player == 0)
 		{
 			slider_config(&slider_list[slider_count++], -3000, 1000, 3000, 100, slider_crossscale, in->analog.crossaxis);
@@ -1707,7 +1706,7 @@ static INT32 slider_mixervol(running_machine *machine, INT32 newval, char *buffe
 
 static INT32 slider_adjuster(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	input_port_entry *in = &Machine->input_ports[arg];
+	input_port_entry *in = &machine->input_ports[arg];
 	if (buffer != NULL)
 	{
 		in->default_value = (in->default_value & ~0xff) | (newval & 0xff);
@@ -1739,7 +1738,7 @@ static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buff
 
 static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer, int arg)
 {
-	const screen_config *scrconfig = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, arg)->inline_config;
+	const screen_config *scrconfig = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, arg)->inline_config;
 	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->refresh);
 	double refresh;
 
@@ -1946,7 +1945,7 @@ static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buf
 
 	if (buffer != NULL)
 	{
-		for (in = Machine->input_ports; in && in->type != IPT_END; in++)
+		for (in = machine->input_ports; in && in->type != IPT_END; in++)
 			if (in->analog.crossaxis == arg)
 			{
 				in->analog.crossscale = (float)newval * 0.001f;
@@ -1954,7 +1953,7 @@ static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buf
 			}
 		sprintf(buffer, "%s %s %1.3f", "Crosshair Scale", (in->analog.crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	}
-	for (in = Machine->input_ports; in && in->type != IPT_END; in++)
+	for (in = machine->input_ports; in && in->type != IPT_END; in++)
 		if (in->analog.crossaxis == arg)
 			return floor(in->analog.crossscale * 1000.0f + 0.5f);
 	return 0;
@@ -1974,7 +1973,7 @@ static INT32 slider_crossoffset(running_machine *machine, INT32 newval, char *bu
 
 	if (buffer != NULL)
 	{
-		for (in = Machine->input_ports; in && in->type != IPT_END; in++)
+		for (in = machine->input_ports; in && in->type != IPT_END; in++)
 			if (in->analog.crossaxis == arg)
 			{
 				in->analog.crossoffset = (float)newval * 0.001f;
@@ -1982,7 +1981,7 @@ static INT32 slider_crossoffset(running_machine *machine, INT32 newval, char *bu
 			}
 		sprintf(buffer, "%s %s %1.3f", "Crosshair Offset", (in->analog.crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	}
-	for (in = Machine->input_ports; in && in->type != IPT_END; in++)
+	for (in = machine->input_ports; in && in->type != IPT_END; in++)
 		if (in->analog.crossaxis == arg)
 			return floor(in->analog.crossoffset * 1000.0f + 0.5f);
 	return 0;

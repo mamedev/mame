@@ -11,6 +11,7 @@
 
 #ifdef MALLOC_DEBUG
 #include <stdlib.h>
+#include <malloc.h>
 
 // override malloc/calloc/realloc/free to track file/line
 void *malloc_file_line(size_t size, const char *file, int line);

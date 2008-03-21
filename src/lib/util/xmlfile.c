@@ -534,11 +534,36 @@ const char *xml_normalize_string(const char *string)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    expat_malloc/expat_realloc/expat_free - 
+    wrappers for memory allocation functions so 
+    that they pass through out memory tracking 
+    systems
+-------------------------------------------------*/
+
+static void *expat_malloc(size_t size)
+{
+	return malloc(size);
+}
+
+static void *expat_realloc(void *ptr, size_t size)
+{
+	return realloc(ptr, size);
+}
+
+static void expat_free(void *ptr)
+{
+	free(ptr);
+}
+
+
+/*-------------------------------------------------
     expat_setup_parser - set up expat for parsing
 -------------------------------------------------*/
 
 static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
 {
+	XML_Memory_Handling_Suite memcallbacks;
+	
 	/* setup parse_info structure */
 	memset(parse_info, 0, sizeof(*parse_info));
 	if (opts != NULL)
@@ -559,7 +584,10 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	parse_info->curnode = parse_info->rootnode;
 
 	/* create the XML parser */
-	parse_info->parser = XML_ParserCreate(NULL);
+	memcallbacks.malloc_fcn = expat_malloc;
+	memcallbacks.realloc_fcn = expat_realloc;
+	memcallbacks.free_fcn = expat_free;
+	parse_info->parser = XML_ParserCreate_MM(NULL, &memcallbacks, NULL);
 	if (parse_info->parser == NULL)
 	{
 		free(parse_info->rootnode);
