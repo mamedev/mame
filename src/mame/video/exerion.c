@@ -209,7 +209,9 @@ WRITE8_HANDLER( exerion_videoreg_w )
 
 WRITE8_HANDLER( exerion_video_latch_w )
 {
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+	int scanline = video_screen_get_vpos(machine->primary_screen);
+	if (scanline > 0)
+		video_screen_update_partial(machine->primary_screen, scanline - 1);
 	background_latches[offset] = data;
 }
 
