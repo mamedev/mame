@@ -213,7 +213,8 @@ void skullxbo_scanline_update(int scanline)
 			int newscroll = ((data >> 7) - scanline) & 0x1ff;
 
 			/* force a partial update with the previous scroll */
-			video_screen_update_partial(Machine->primary_screen, scanline - 1);
+			if (scanline > 0)
+				video_screen_update_partial(Machine->primary_screen, scanline - 1);
 
 			/* update the new scroll */
 			tilemap_set_scrolly(atarigen_playfield_tilemap, 0, newscroll);
