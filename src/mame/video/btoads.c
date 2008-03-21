@@ -7,7 +7,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "btoads.h"
@@ -78,7 +77,7 @@ WRITE16_HANDLER( btoads_misc_control_w )
 	COMBINE_DATA(&misc_control);
 
 	/* bit 3 controls sound reset line */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -119,7 +118,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 WRITE16_HANDLER( btoads_scroll0_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+	video_screen_update_now(machine->primary_screen);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_MSB)
@@ -132,7 +131,7 @@ WRITE16_HANDLER( btoads_scroll0_w )
 WRITE16_HANDLER( btoads_scroll1_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+	video_screen_update_now(machine->primary_screen);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_MSB)
