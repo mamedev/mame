@@ -32,7 +32,7 @@
 /* device types */
 enum
 {
-	TYPE_MC6845,
+	TYPE_MC6845 = 0,
 	TYPE_MC6845_1,
 	TYPE_C6545_1,
 	TYPE_R6545_1,
@@ -119,8 +119,12 @@ INLINE mc6845_t *get_safe_token(const device_config *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert((device->type == DEVICE_GET_INFO_NAME(mc6845)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(mc6845_1)) ||
 		   (device->type == DEVICE_GET_INFO_NAME(c6545_1)) ||
-		   (device->type == DEVICE_GET_INFO_NAME(r6545_1)));
+		   (device->type == DEVICE_GET_INFO_NAME(r6545_1)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(h46505)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(hd6845)) ||
+		   (device->type == DEVICE_GET_INFO_NAME(sy6545_1)));
 
 	return (mc6845_t *)device->token;
 }
