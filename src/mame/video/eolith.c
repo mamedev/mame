@@ -1,74 +1,57 @@
 #include "driver.h"
 
 int eolith_buffer = 0;
-static bitmap_t *bitmaps[2];
-static UINT32 *eo_vram;
+static UINT32 *vram;
 
-static void plot_pixel_rgb(int x, int y, int color)
-{
-	if (bitmaps[eolith_buffer]->bpp == 32)
-	{
-		UINT32 r = (color & 0x001f) << 3;
-		UINT32 g = (color & 0x03e0) >> 2;
-		UINT32 b = (color & 0x7c00) >> 7;
-		*BITMAP_ADDR32(bitmaps[eolith_buffer], y, x) = b | (g<<8) | (r<<16);
-	}
-	else
-	{
-		*BITMAP_ADDR16(bitmaps[eolith_buffer], y, x) = color;
-	}
-}
+
 
 WRITE32_HANDLER( eolith_vram_w )
 {
-	int x,y;
-	switch(mem_mask)
+	UINT32 *dest = &vram[offset+(0x40000/4)*eolith_buffer];
+
+	if (mem_mask == 0)
 	{
-		case 0:
-			eolith_vram_w(machine,offset,data,0x0000ffff);
-			eolith_vram_w(machine,offset,data,0xffff0000);
-			return;
+		if (~data & 0x80000000)
+			*dest = (*dest & 0x0000ffff) | (data & 0xffff0000);
 
-		case 0xffff:
-			if(data & 0x80000000)
-				return;
-		break;
-
-		case 0xffff0000:
-			if(data & 0x8000)
-				return;
-		break;
+		if (~data & 0x00008000)
+			*dest = (*dest & 0xffff0000) | (data & 0x0000ffff);
 	}
-
-	COMBINE_DATA(&eo_vram[offset+(0x40000/4)*eolith_buffer]);
-
-	//logical line width = 336;
-	x = offset % (336/2);
-	y = offset / (336/2);
-
-	if(x < 320/2 && y < 240)
-	{
-		plot_pixel_rgb(x*2,  y,(eo_vram[offset+(0x40000/4)*eolith_buffer]>>16) & 0x7fff);
-		plot_pixel_rgb(x*2+1,y, eo_vram[offset+(0x40000/4)*eolith_buffer] & 0x7fff);
-
-	}
+	else if (((mem_mask == 0x0000ffff) && (~data & 0x80000000)) ||
+	    	 ((mem_mask == 0xffff0000) && (~data & 0x00008000)))
+		COMBINE_DATA(dest);
 }
 
 
 READ32_HANDLER( eolith_vram_r )
 {
-	return eo_vram[offset+(0x40000/4)*eolith_buffer];
+	return vram[offset+(0x40000/4)*eolith_buffer];
 }
 
 VIDEO_START( eolith )
 {
-	eo_vram = auto_malloc(0x40000*2);
-	bitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	bitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	vram = auto_malloc(0x40000*2);
 }
 
 VIDEO_UPDATE( eolith )
 {
-	copybitmap(bitmap,bitmaps[eolith_buffer ^ 1],0,0,0,0,cliprect);
+	int y;
+
+	for (y = 0; y < 240; y++)
+	{
+		int x;
+		UINT32 *src = &vram[(eolith_buffer ? 0 : 0x10000) | (y * (336 / 2))];
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x = 0; x < 320; x += 2)
+		{
+			dest[0] = (*src >> 16) & 0x7fff;
+			dest[1] = (*src >>  0) & 0x7fff;
+
+			src++;
+			dest += 2;
+		}
+	}
+
 	return 0;
 }
