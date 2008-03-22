@@ -117,7 +117,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/se3208/se3208.h"
 #include "video/vrender0.h"
 #include "machine/ds1302.h"
@@ -140,7 +139,7 @@ static UINT32 DMA0ctrl,DMA1ctrl;
 static UINT8 OldPort4;
 static UINT32 *ResetPatch;
 
-static void IntReq(int num)
+static void IntReq(running_machine *machine, int num)
 {
 	UINT32 IntEn=program_read_dword_32le(0x01800c08);
 	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
@@ -148,7 +147,7 @@ static void IntReq(int num)
 	{
 		IntPend|=(1<<num);
 		program_write_dword_32le(0x01800c0c,IntPend);
-		cpunum_set_input_line(Machine, 0,SE3208_INT,ASSERT_LINE);
+		cpunum_set_input_line(machine, 0,SE3208_INT,ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
 	FlipCntRead=0;
@@ -189,9 +188,9 @@ static READ32_HANDLER(Input_r)
 	{
 		UINT8 Port4=readinputport(4);
 		if(!(Port4&0x10) && ((OldPort4^Port4)&0x10))	//coin buttons trigger IRQs
-			IntReq(12);
+			IntReq(machine, 12);
 		if(!(Port4&0x20) && ((OldPort4^Port4)&0x20))
-			IntReq(19);
+			IntReq(machine, 19);
 		OldPort4=Port4;
 		return /*dips*/readinputport(5)|(Port4<<16);
 	}
@@ -206,7 +205,7 @@ static WRITE32_HANDLER(IntAck_w)
 		IntPend&=~(1<<(data&0x1f));
 		program_write_dword_32le(0x01800c0c,IntPend);
 		if(!IntPend)
-			cpunum_set_input_line(Machine, 0,SE3208_INT,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,SE3208_INT,CLEAR_LINE);
 	}
 	if((~mem_mask)&0xff00)
 		IntHigh=(data>>8)&7;
@@ -240,7 +239,7 @@ static TIMER_CALLBACK( Timer0cb )
 {
 	if(!(Timer0ctrl&2))
 		Timer0ctrl&=~1;
-	IntReq(0);
+	IntReq(machine, 0);
 }
 
 static WRITE32_HANDLER(Timer0_w)
@@ -268,7 +267,7 @@ static TIMER_CALLBACK( Timer1cb )
 {
 	if(!(Timer1ctrl&2))
 		Timer1ctrl&=~1;
-	IntReq(1);
+	IntReq(machine, 1);
 }
 
 static WRITE32_HANDLER(Timer1_w)
@@ -296,7 +295,7 @@ static TIMER_CALLBACK( Timer2cb )
 {
 	if(!(Timer2ctrl&2))
 		Timer2ctrl&=~1;
-	IntReq(9);
+	IntReq(machine, 9);
 }
 
 static WRITE32_HANDLER(Timer2_w)
@@ -324,7 +323,7 @@ static TIMER_CALLBACK( Timer3cb )
 {
 	if(!(Timer3ctrl&2))
 		Timer3ctrl&=~1;
-	IntReq(10);
+	IntReq(machine, 10);
 }
 
 static WRITE32_HANDLER(Timer3_w)
@@ -439,7 +438,7 @@ static WRITE32_HANDLER(DMA0_w)
 		}
 		data&=~(1<<10);
 		program_write_dword_32le(0x0180080C,0);
-		IntReq(7);
+		IntReq(machine, 7);
 	}
 	COMBINE_DATA(&DMA0ctrl);
 }
@@ -485,7 +484,7 @@ static WRITE32_HANDLER(DMA1_w)
 		}
 		data&=~(1<<10);
 		program_write_dword_32le(0x0180081C,0);
-		IntReq(8);
+		IntReq(machine, 8);
 	}
 	COMBINE_DATA(&DMA1ctrl);
 }
@@ -617,23 +616,6 @@ static VIDEO_START(crystal)
 {
 }
 
-static void plot_pixel_rgb(bitmap_t *bitmap, int x, int y , int color)
-{
-	//565 to 555
-	color=(color&0x1f)|((color>>1)&0x7fe0);
-	if (bitmap->bpp == 32)
-	{
-		UINT32 cb=(color&0x1f)<<3;
-		UINT32 cg=(color&0x3e0)>>2;
-		UINT32 cr=(color&0x7c00)>>7;
-		*BITMAP_ADDR32(bitmap, y, x) = cb | (cg<<8) | (cr<<16);
-	}
-	else
-	{
-		*BITMAP_ADDR16(bitmap, y, x) = color;
-	}
-}
-
 static UINT16 GetVidReg(UINT16 reg)
 {
 	return program_read_word_32le(0x03000000+reg);
@@ -700,7 +682,10 @@ static VIDEO_UPDATE(crystal)
 	srcline=(UINT16 *) Visible;
 	for(y=0;y<240;y++)
 		for(x=0;x<320;x++)
-			plot_pixel_rgb(bitmap,x,y,srcline[y*512+x]);
+		{
+			UINT16 color= srcline[y*512+x];
+			*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(pal5bit(color >> 11), pal6bit(color >> 5), pal5bit(color >> 0));
+		}
 	return 0;
 }
 
@@ -732,7 +717,7 @@ static VIDEO_EOF(crystal)
 
 static INTERRUPT_GEN(crystal_interrupt)
 {
-	IntReq(24);		//VRender0 VBlank
+	IntReq(machine, 24);		//VRender0 VBlank
 }
 
 static INPUT_PORTS_START(crystal)
@@ -832,11 +817,9 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-
-	MDRV_PALETTE_LENGTH(8192)
 
 	MDRV_VIDEO_START(crystal)
 	MDRV_VIDEO_UPDATE(crystal)
