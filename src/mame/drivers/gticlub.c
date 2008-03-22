@@ -53,7 +53,7 @@ UINT8 gticlub_led_reg0 = 0x7f;
 UINT8 gticlub_led_reg1 = 0x7f;
 
 int K001604_vh_start(running_machine *machine, int chip);
-void K001604_tile_update(int chip);
+void K001604_tile_update(running_machine *machine, int chip);
 void K001604_draw_front_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *cliprect);
 READ32_HANDLER(K001604_tile_r);
@@ -112,7 +112,7 @@ static VIDEO_UPDATE( hangplt )
 
 	if (screen == left_screen)
 	{
-		K001604_tile_update(0);
+		K001604_tile_update(screen->machine, 0);
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
 		voodoo_update(0, bitmap, cliprect);
@@ -121,7 +121,7 @@ static VIDEO_UPDATE( hangplt )
 	}
 	else if (screen == right_screen)
 	{
-		K001604_tile_update(1);
+		K001604_tile_update(screen->machine, 1);
 	//  K001604_draw_back_layer(bitmap, cliprect);
 
 		voodoo_update(1, bitmap, cliprect);
