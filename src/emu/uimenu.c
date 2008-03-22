@@ -822,7 +822,7 @@ do { \
 
 #if HAS_WAVE
   	/* add tape control menu */
-	if (device_find(Machine->devices, IO_CASSETTE))
+	if (device_find_from_machine(Machine, IO_CASSETTE))
 		ADD_MENU("Tape Control", menu_tape_control, 1);
 #endif /* HAS_WAVE */
 #endif /* MESS */
