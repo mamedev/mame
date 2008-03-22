@@ -84,7 +84,7 @@ READ32_HANDLER(K001604_reg_r);
 
 static VIDEO_START( jetwave )
 {
-	K001005_init();
+	K001005_init(machine);
 	K001604_vh_start(machine, 0);
 }
 
@@ -133,7 +133,7 @@ static VIDEO_START( zr107 )
 	};
 
 	K056832_vh_start(machine, REGION_GFX2, K056832_BPP_8, 1, scrolld, game_tile_callback, 0);
-	K001005_init();
+	K001005_init(machine);
 }
 
 static VIDEO_UPDATE( zr107 )

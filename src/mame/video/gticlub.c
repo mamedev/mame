@@ -178,16 +178,21 @@ static int K001005_bitmap_page = 0;
 
 void K001005_swap_buffers(void);
 
-void K001005_init(void)
+static void K001005_exit(running_machine *machine)
+{
+	poly_free(poly);
+}
+
+void K001005_init(running_machine *machine)
 {
 	int i;
 
-	int width = video_screen_get_width(Machine->primary_screen);
-	int height = video_screen_get_height(Machine->primary_screen);
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
 	K001005_zbuffer = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED32);
 
-	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(Machine->primary_screen);
-	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(Machine->primary_screen);
+	K001005_bitmap[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	K001005_bitmap[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	K001005_texture = auto_malloc(0x800000);
 
@@ -197,6 +202,9 @@ void K001005_init(void)
 	K001005_fifo = auto_malloc(0x800 * sizeof(UINT32));
 
 	K001005_3d_fifo = auto_malloc(0x10000 * sizeof(UINT32));
+
+	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
+	add_exit_callback(machine, K001005_exit);
 
 	for (i=0; i < 128; i++)
 	{
@@ -947,19 +955,9 @@ void K001005_swap_buffers(void)
 	}
 }
 
-
-
-static void gticlub_exit(running_machine *machine)
-{
-	poly_free(poly);
-}
-
 VIDEO_START( gticlub )
 {
-	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	add_exit_callback(machine, gticlub_exit);
-
-	K001005_init();
+	K001005_init(machine);
 	K001604_vh_start(machine, 0);
 }
 
