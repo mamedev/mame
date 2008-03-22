@@ -221,12 +221,10 @@ static VIDEO_UPDATE( kinst )
 		/* loop over columns */
 		for (x = cliprect->min_x; x < cliprect->max_x; x += 2)
 		{
-			/* data is BGR; convert to RGB */
 			UINT32 data = *src++;
-			data = (data & 0x03e003e0) | ((data << 10) & 0x7c007c00) | ((data >> 10) & 0x001f001f);
 
 			/* store two pixels */
-			*dest++ = data & 0x7fff;
+			*dest++ = (data >>  0) & 0x7fff;
 			*dest++ = (data >> 16) & 0x7fff;
 		}
 	}
@@ -668,10 +666,11 @@ static MACHINE_DRIVER_START( kinst )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
+	MDRV_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_UPDATE(kinst)
