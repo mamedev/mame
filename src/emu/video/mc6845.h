@@ -107,6 +107,9 @@ UINT8 mc6845_get_ra(const device_config *device);
 /* simulates the LO->HI clocking of the light pen pin (pin 3) */
 void mc6845_assert_light_pen_input(const device_config *device);
 
+/* set the clock (pin 21) of the chip */
+void mc6845_set_clock(const device_config *device, int clock);
+
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */

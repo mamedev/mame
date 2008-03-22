@@ -79,6 +79,7 @@ struct _mc6845_t
 	UINT16	light_pen_addr;		/* 0x10/0x11 */
 
 	/* other internal state */
+	UINT64	clock;
 	UINT8	register_address_latch;
 	UINT8	cursor_state;	/* 0 = off, 1 = on */
 	UINT8	cursor_blink_count;
@@ -272,7 +273,7 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 			{
 				rectangle visarea;
 
-				attoseconds_t refresh = HZ_TO_ATTOSECONDS(mc6845->intf->clock) * (mc6845->horiz_char_total + 1) * vert_pix_total;
+				attoseconds_t refresh = HZ_TO_ATTOSECONDS(mc6845->clock) * (mc6845->horiz_char_total + 1) * vert_pix_total;
 
 				visarea.min_x = 0;
 				visarea.min_y = 0;
@@ -548,6 +549,21 @@ void mc6845_assert_light_pen_input(const device_config *device)
 }
 
 
+void mc6845_set_clock(const device_config *device, int clock)
+{
+	mc6845_t *mc6845 = get_safe_token(device);
+
+	/* validate arguments */
+	assert(clock > 0);
+
+	if (clock != mc6845->clock)
+	{
+		mc6845->clock = clock;
+		recompute_parameters(mc6845, FALSE);
+	}
+}
+
+
 static void update_cursor_state(mc6845_t *mc6845)
 {
 	/* save and increment cursor counter */
@@ -661,6 +677,9 @@ static void common_start(const device_config *device, int device_type)
 		assert(mc6845->intf->clock > 0);
 		assert(mc6845->intf->hpixels_per_column > 0);
 
+		/* copy the initial clock */
+		mc6845->clock = mc6845->intf->clock;
+
 		/* get the screen device */
 		mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
 		assert(mc6845->screen != NULL);
@@ -689,6 +708,7 @@ static void common_start(const device_config *device, int device_type)
 
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
+	state_save_register_item(unique_tag, 0, mc6845->clock);
 	state_save_register_item(unique_tag, 0, mc6845->register_address_latch);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
