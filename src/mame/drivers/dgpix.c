@@ -54,7 +54,6 @@
 
 static UINT32 *vram;
 static int vbuffer = 0;
-static bitmap_t *bitmaps[2];
 
 static int flash_roms;
 static UINT32 flash_cmd = 0;
@@ -139,55 +138,13 @@ static WRITE32_HANDLER( flash_w )
 	}
 }
 
-static void plot_pixel_rgb(int x, int y, int color)
-{
-	if (bitmaps[vbuffer]->bpp == 32)
-	{
-		UINT32 b = (color & 0x001f) << 3;
-		UINT32 g = (color & 0x03e0) >> 2;
-		UINT32 r = (color & 0x7c00) >> 7;
-		*BITMAP_ADDR32(bitmaps[vbuffer], y, x) = b | (g<<8) | (r<<16);
-	}
-	else
-	{
-		/* color is BGR; convert to RGB */
-		color = ((color & 0x1f) << 10) | (color & 0x3e0) | ((color & 0x7c00) >> 10);
-		*BITMAP_ADDR16(bitmaps[vbuffer], y, x) = color;
-	}
-}
-
 static WRITE32_HANDLER( vram_w )
 {
-	int x,y;
-
-	switch(mem_mask)
-	{
-		case 0:
-			vram_w(machine,offset,data,0x0000ffff);
-			vram_w(machine,offset,data,0xffff0000);
-			return;
-
-		case 0xffff:
-			if(data & 0x80000000)
-				return;
-		break;
-
-		case 0xffff0000:
-			if(data & 0x8000)
-				return;
-		break;
-	}
+	if ((((mem_mask & 0x0000ffff) == 0x0000ffff) && (data & 0x80000000)) ||
+		(((mem_mask & 0xffff0000) == 0xffff0000) && (data & 0x00008000)))
+		return;
 
 	COMBINE_DATA(&vram[offset+(0x40000/4)*vbuffer]);
-
-	y = offset >> 8;
-	x = offset & 0xff;
-
-	if(x < 320/2 && y < 240)
-	{
-		plot_pixel_rgb(x*2,  y,(vram[offset+(0x40000/4)*vbuffer]>>16) & 0x7fff);
-		plot_pixel_rgb(x*2+1,y, vram[offset+(0x40000/4)*vbuffer] & 0x7fff);
-	}
 }
 
 static READ32_HANDLER( vram_r )
@@ -307,13 +264,28 @@ INPUT_PORTS_END
 static VIDEO_START( dgpix )
 {
 	vram = auto_malloc(0x40000*2);
-	bitmaps[0] = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	bitmaps[1] = video_screen_auto_bitmap_alloc(machine->primary_screen);
 }
 
 static VIDEO_UPDATE( dgpix )
 {
-	copybitmap(bitmap,bitmaps[vbuffer ^ 1],0,0,0,0,cliprect);
+	int y;
+
+	for (y = 0; y < 240; y++)
+	{
+		int x;
+		UINT32 *src = &vram[(vbuffer ? 0 : 0x10000) | (y << 8)];
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x = 0; x < 320; x += 2)
+		{
+			dest[0] = (*src >> 16) & 0x7fff;
+			dest[1] = (*src >>  0) & 0x7fff;
+
+			src++;
+			dest += 2;
+		}
+	}
+
 	return 0;
 }
 
@@ -333,10 +305,11 @@ static MACHINE_DRIVER_START( dgpix )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
+	MDRV_PALETTE_INIT(BBBBB_GGGGG_RRRRR)
 	MDRV_PALETTE_LENGTH(32768)
 
 	MDRV_VIDEO_START(dgpix)

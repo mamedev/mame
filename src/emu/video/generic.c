@@ -625,6 +625,31 @@ PALETTE_INIT( RRRR_GGGG_BBBB )
 
 
 
+/*-------------------------------------------------
+    RRRRR_GGGGG_BBBBB/BBBBB_GGGGG_RRRRR -
+    standard 5-5-5 palette for games using a
+    15-bit color space
+-------------------------------------------------*/
+
+PALETTE_INIT( RRRRR_GGGGG_BBBBB )
+{
+	int i;
+
+	for (i = 0; i < 0x8000; i++)
+		palette_set_color(machine, i, MAKE_RGB(pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0)));
+}
+
+
+PALETTE_INIT( BBBBB_GGGGG_RRRRR )
+{
+	int i;
+
+	for (i = 0; i < 0x8000; i++)
+		palette_set_color(machine, i, MAKE_RGB(pal5bit(i >> 0), pal5bit(i >> 5), pal5bit(i >> 10)));
+}
+
+
+
 /***************************************************************************
     3-3-2 RGB PALETTE WRITE HANDLERS
 ***************************************************************************/
