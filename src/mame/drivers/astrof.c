@@ -49,7 +49,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "astrof.h"
 
 
@@ -70,8 +69,6 @@ static size_t astrof_videoram_size;
 static UINT8 *astrof_colorram;
 static UINT8 *tomahawk_protection;
 
-static emu_timer *irq_timer;
-
 static UINT8 *astrof_color;
 static UINT8 astrof_palette_bank;
 static UINT8 red_on;
@@ -88,31 +85,17 @@ static UINT16 abattle_count;
  *
  *************************************/
 
-static READ8_HANDLER( irq_ack_r )
+static READ8_HANDLER( irq_clear_r )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	return 0;
 }
 
 
-static TIMER_CALLBACK( irq_callback )
+static TIMER_DEVICE_CALLBACK( irq_callback )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
-}
-
-
-static void create_irq_timer(void)
-{
-	irq_timer = timer_alloc(irq_callback, NULL);
-}
-
-
-static void start_irq_timer(running_machine *machine)
-{
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);
+	cpunum_set_input_line(timer->machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -386,7 +369,7 @@ static VIDEO_UPDATE( tomahawk )
 static READ8_HANDLER( shoot_r )
 {
 	/* not really sure about this */
-	return mame_rand(Machine) & 8;
+	return mame_rand(machine) & 8;
 }
 
 
@@ -422,8 +405,6 @@ static READ8_HANDLER( tomahawk_protection_r )
 
 static MACHINE_START( astrof )
 {
-	create_irq_timer();
-
 	/* the 74175 outputs all HI's if not otherwise set */
 	astrof_set_video_control_2(0xff);
 
@@ -448,8 +429,6 @@ static MACHINE_START( abattle )
 
 static MACHINE_START( spfghmk2 )
 {
-	create_irq_timer();
-
 	/* the 74175 outputs all HI's if not otherwise set */
 	spfghmk2_set_video_control_2(0xff);
 
@@ -465,8 +444,6 @@ static MACHINE_START( spfghmk2 )
 
 static MACHINE_START( tomahawk )
 {
-	create_irq_timer();
-
 	/* the 74175 outputs all HI's if not otherwise set */
 	tomahawk_set_video_control_2(0xff);
 
@@ -484,16 +461,8 @@ static MACHINE_START( tomahawk )
  *
  *************************************/
 
-static MACHINE_RESET( astrof )
-{
-	start_irq_timer(machine);
-}
-
-
 static MACHINE_RESET( abattle )
 {
-	MACHINE_RESET_CALL(astrof);
-
 	abattle_count = 0;
 }
 
@@ -518,7 +487,7 @@ static ADDRESS_MAP_START( astrof_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, astrof_audio_2_w)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, SMH_NOP)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_clear_r, SMH_NOP)
 	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -537,7 +506,7 @@ static ADDRESS_MAP_START( spfghmk2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITENOP
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, SMH_NOP)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_clear_r, SMH_NOP)
 	AM_RANGE(0xa003, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -556,7 +525,7 @@ static ADDRESS_MAP_START( tomahawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8007, 0x8007) AM_MIRROR(0x1ff8) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&tomahawk_protection)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ff8) AM_READ_PORT("IN") AM_WRITE(SMH_NOP)
 	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ff8) AM_READ_PORT("DSW") AM_WRITE(SMH_NOP)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_ack_r, SMH_NOP)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ff8) AM_READWRITE(irq_clear_r, SMH_NOP)
 	AM_RANGE(0xa003, 0xa003) AM_MIRROR(0x1ff8) AM_READWRITE(tomahawk_protection_r, SMH_NOP)
 	AM_RANGE(0xa004, 0xa007) AM_MIRROR(0x1ff8) AM_NOP
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -864,8 +833,7 @@ static MACHINE_DRIVER_START( base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M6502, MAIN_CPU_CLOCK)
-
-	MDRV_MACHINE_RESET(astrof)
+	MDRV_TIMER_ADD_SCANLINE("VBLANK", irq_callback, "main", VBSTART, 0)
 
 	/* video hardware */
 	MDRV_VIDEO_START(astrof)
