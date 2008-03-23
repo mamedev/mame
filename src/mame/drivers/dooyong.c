@@ -1153,6 +1153,8 @@ static MACHINE_DRIVER_START( primella )
 	/* audio CPU */	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(bluehawk_sound_readmem,bluehawk_sound_writemem)
 
+	MDRV_MACHINE_START(lastday)
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

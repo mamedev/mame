@@ -643,6 +643,11 @@ VIDEO_START( lastday )
 	/* Text layer is offset on this machine */
 	tilemap_set_scrolly(tx_tilemap, 0, 8);
 
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
+
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
@@ -675,6 +680,11 @@ VIDEO_START( gulfstrm )
 	/* Text layer is offset on this machine */
 	tilemap_set_scrolly(tx_tilemap, 0, 8);
 
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
+
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
@@ -702,6 +712,11 @@ VIDEO_START( pollux )
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
+
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
@@ -737,6 +752,11 @@ VIDEO_START( bluehawk )
 	tilemap_set_transparent_pen(fg2_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
+
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
@@ -767,6 +787,11 @@ VIDEO_START( flytiger )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
+
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(fgscroll8);
@@ -775,9 +800,6 @@ VIDEO_START( flytiger )
 
 VIDEO_START( primella )
 {
-	/* Configure memory banking */
-	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1) + 0x10000, 0x4000);
-
 	/* Configure tilemap callbacks */
 	bg_tilerom = memory_region(REGION_GFX2) + memory_region_length(REGION_GFX2) - 0x8000;
 	fg_tilerom = memory_region(REGION_GFX3) + memory_region_length(REGION_GFX3) - 0x8000;
@@ -798,6 +820,11 @@ VIDEO_START( primella )
 	/* Configure tilemap transparency */
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
+
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
@@ -836,6 +863,11 @@ VIDEO_START( rshark )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(fg2_tilemap, 15);
 
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
+
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
 	state_save_register_global_array(bg2scroll8);
@@ -854,6 +886,11 @@ VIDEO_START( popbingo )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
 		 32, 32, 32, 8);
 	bg2_tilemap = fg_tilemap = fg2_tilemap = NULL;	/* Stop scroll handler from crashing on these */
+
+	memset(bgscroll8, 0, 0x10);
+	memset(bg2scroll8, 0, 0x10);
+	memset(fgscroll8, 0, 0x10);
+	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
 	state_save_register_global_array(bgscroll8);
