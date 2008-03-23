@@ -37,7 +37,7 @@ static VIDEO_START(taitowlf)
 	}
 }
 
-static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
+static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	UINT8 *dp;
@@ -51,9 +51,9 @@ static void draw_char(running_machine *machine, bitmap_t *bitmap, const rectangl
 		{
 			UINT8 pen = dp[index++];
 			if (pen)
-				p[i] = machine->pens[gfx->color_base + (att & 0xf)];
+				p[i] = gfx->color_base + (att & 0xf);
 			else
-				p[i] = machine->pens[gfx->color_base  + ((att >> 4) & 0x7)];
+				p[i] = gfx->color_base  + ((att >> 4) & 0x7);
 		}
 	}
 }
@@ -76,8 +76,8 @@ static VIDEO_UPDATE(taitowlf)
 			int att1 = (cga[index] >> 24) & 0xff;
 			int ch1 = (cga[index] >> 16) & 0xff;
 
-			draw_char(screen->machine, bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
-			draw_char(screen->machine, bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
+			draw_char(bitmap, cliprect, gfx, ch0, att0, i*8, j*8);
+			draw_char(bitmap, cliprect, gfx, ch1, att1, (i*8)+8, j*8);
 			index++;
 		}
 	}
@@ -422,7 +422,7 @@ static MACHINE_DRIVER_START(taitowlf)
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
 
