@@ -637,7 +637,7 @@ static VIDEO_UPDATE(crystal)
 	UINT16 *Front,*Back;
 	UINT16 *Visible,*DrawDest;
 	UINT16 *srcline;
-	int x,y;
+	int y;
 	UINT16 head,tail;
 
 	if(GetVidReg(0x8e)&1)
@@ -681,11 +681,8 @@ static VIDEO_UPDATE(crystal)
 
 	srcline=(UINT16 *) Visible;
 	for(y=0;y<240;y++)
-		for(x=0;x<320;x++)
-		{
-			UINT16 color= srcline[y*512+x];
-			*BITMAP_ADDR32(bitmap, y, x) = MAKE_RGB(pal5bit(color >> 11), pal6bit(color >> 5), pal5bit(color >> 0));
-		}
+		memcpy(BITMAP_ADDR16(bitmap, y, 0), &srcline[y*512], 320*2);
+
 	return 0;
 }
 
@@ -817,13 +814,16 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(320, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 	MDRV_VIDEO_START(crystal)
 	MDRV_VIDEO_UPDATE(crystal)
 	MDRV_VIDEO_EOF(crystal)
+
+	MDRV_PALETTE_INIT(RRRRR_GGGGGG_BBBBB)
+	MDRV_PALETTE_LENGTH(65536)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
@@ -904,6 +904,6 @@ static DRIVER_INIT(evosocc)
 	Rom[WORD_XOR_LE(0x974ED2/2)]=0x9001;	//PUSH R0
 }
 
-GAME( 2001, crysbios,		   0,  crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
-GAME( 2001, crysking,	crysbios,  crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 )
-GAME( 2001, evosocc,   crysbios,  crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )
+GAME( 2001, crysbios,        0, crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 )
+GAME( 2001, evosocc,  crysbios, crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )
