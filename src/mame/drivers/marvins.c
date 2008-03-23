@@ -9,8 +9,6 @@ driver by Phil Stroffolino
 Known Issues:
     Mad Crasher fails the ROM test, but ROMs are verified to be good (reason's unknown)
     Mad Crasher sound effects aren't being played (fixed)
-    Vanguard II crashes under dos with sound enabled (cannot verify)
-    Marvin's maze crashes under dos with sound enabled, hangs with sound disabled (cannot verify)
 
 
 Change Log
@@ -122,7 +120,7 @@ static READ8_HANDLER( sound_command_r )
 
 static READ8_HANDLER( sound_nmi_ack_r )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
@@ -170,7 +168,7 @@ static ADDRESS_MAP_START( marvins_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8300, 0x8300) AM_WRITE(sound_command_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ(input_port_3_r)		/* dipswitch#1 */
 	AM_RANGE(0x8500, 0x8500) AM_READ(input_port_4_r)		/* dipswitch#2 */
-	AM_RANGE(0x8600, 0x8600) AM_WRITE(SMH_RAM)	// video attribute
+	AM_RANGE(0x8600, 0x8600) AM_RAM	// video attribute
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)
@@ -196,7 +194,7 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8300, 0x8300) AM_WRITE(sound_command_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ(input_port_3_r)		/* dipswitch#1 */
 	AM_RANGE(0x8500, 0x8500) AM_READ(input_port_4_r)		/* dipswitch#2 */
-	AM_RANGE(0x8600, 0x86ff) AM_WRITE(SMH_RAM)	// video attribute
+	AM_RANGE(0x8600, 0x86ff) AM_RAM	// video attribute
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 //  AM_RANGE(0xc800, 0xc800) AM_WRITE(marvins_palette_bank_w)   // palette bank switch (c8f1 for Vanguard)
 	AM_RANGE(0xc800, 0xc8ff) AM_RAM
@@ -413,9 +411,9 @@ static INPUT_PORTS_START( madcrash )
 	PORT_DIPNAME( 0x01, 0x01, "Unused SW 1-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )

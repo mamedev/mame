@@ -6,6 +6,7 @@ static int flipscreen, sprite_flip_adjust;
 static tilemap *fg_tilemap, *bg_tilemap, *tx_tilemap;
 static UINT8 bg_color, fg_color, old_bg_color, old_fg_color;
 static rectangle tilemap_clip;
+static int video_bank = 0;
 
 /***************************************************************************
 **
@@ -99,13 +100,15 @@ WRITE8_HANDLER( marvins_spriteram_w )
 WRITE8_HANDLER( marvins_foreground_ram_w )
 {
 	spriteram_2[offset] = data;
-	if (offset < 0x800) tilemap_mark_tile_dirty(fg_tilemap,offset);
+	if (offset < 0x800 && !video_bank) tilemap_mark_tile_dirty(fg_tilemap,offset);
+	else if (offset >= 0x800 && video_bank) tilemap_mark_tile_dirty(fg_tilemap,offset - 0x800);
 }
 
 WRITE8_HANDLER( marvins_background_ram_w )
 {
 	spriteram_3[offset] = data;
-	if (offset < 0x800) tilemap_mark_tile_dirty(bg_tilemap,offset);
+	if (offset < 0x800 && !video_bank) tilemap_mark_tile_dirty(bg_tilemap,offset);
+	else if (offset >= 0x800 && video_bank) tilemap_mark_tile_dirty(bg_tilemap,offset - 0x800);
 }
 
 WRITE8_HANDLER( marvins_text_ram_w )
@@ -124,7 +127,7 @@ static TILE_GET_INFO( get_bg_tilemap_info )
 {
 	SET_TILE_INFO(
 			2,
-			spriteram_3[tile_index],
+			spriteram_3[tile_index + video_bank * 0x800],
 			0,
 			0);
 }
@@ -133,7 +136,7 @@ static TILE_GET_INFO( get_fg_tilemap_info )
 {
 	SET_TILE_INFO(
 			1,
-			spriteram_2[tile_index],
+			spriteram_2[tile_index + video_bank * 0x800],
 			0,
 			0);
 }
@@ -339,6 +342,14 @@ VIDEO_UPDATE( marvins )
 		rectangle finalclip = tilemap_clip;
 		sect_rect(&finalclip, cliprect);
 
+		if(video_bank != ((attributes & 8) >> 3))
+		{
+			video_bank = ((attributes & 8) >> 3);
+
+			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			tilemap_mark_all_tiles_dirty(fg_tilemap);
+		}
+
 		if( (scroll_attributes & 4)==0 ) bg_scrollx += 256;
 		if( scroll_attributes & 1 ) sprite_scrollx += 256;
 		if( scroll_attributes & 2 ) fg_scrollx += 256;
@@ -401,6 +412,14 @@ VIDEO_UPDATE( madcrash )
 
 		rectangle finalclip = tilemap_clip;
 		sect_rect(&finalclip, cliprect);
+
+		if(video_bank != ((attributes & 8) >> 3))
+		{
+			video_bank = ((attributes & 8) >> 3);
+
+			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			tilemap_mark_all_tiles_dirty(fg_tilemap);
+		}
 
 		if( (scroll_attributes & 4)==0 ) bg_scrollx += 256;
 		if( scroll_attributes & 1 ) sprite_scrollx += 256;
