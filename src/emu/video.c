@@ -288,7 +288,6 @@ void video_init(running_machine *machine)
 	/* validate */
 	assert(machine != NULL);
 	assert(machine->config != NULL);
-	assert(machine->config->devicelist != NULL);
 
 	/* request a callback upon exiting */
 	add_exit_callback(machine, video_exit);
