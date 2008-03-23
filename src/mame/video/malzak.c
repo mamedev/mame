@@ -59,8 +59,6 @@ VIDEO_START( malzak )
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	saa5050_vidram = auto_malloc(0x800);
-
 	/* configure the S2636 chips */
 //  s2636_0 = s2636_config(malzak_s2636_0_ram, height, width, -8, -16);
 //  s2636_1 = s2636_config(malzak_s2636_1_ram, height, width, -9, -16);
@@ -248,7 +246,7 @@ VIDEO_UPDATE( malzak )
 	return 0;
 }
 
-WRITE8_HANDLER( playfield_w )
+WRITE8_HANDLER( malzak_playfield_w )
 {
 	int tile = ((malzak_x / 16) * 16) + (offset / 16);
 

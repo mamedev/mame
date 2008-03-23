@@ -48,39 +48,19 @@ static int malzak_bank1;
 extern int malzak_x;
 extern int malzak_y;
 
-extern UINT8* saa5050_vidram;  /* Video RAM for SAA 5050 */
+extern UINT8 *saa5050_vidram;  /* Video RAM for SAA 5050 */
 extern UINT8 *malzak_s2636_0_ram;
 extern UINT8 *malzak_s2636_1_ram;
 
 // in video/malzak.c
 VIDEO_START( malzak );
 VIDEO_UPDATE( malzak );
-WRITE8_HANDLER( playfield_w );
+WRITE8_HANDLER( malzak_playfield_w );
 
-
-static READ8_HANDLER( saa5050_r )
-{
-	return saa5050_vidram[offset];
-}
-
-static WRITE8_HANDLER( saa5050_w )
-{
-	saa5050_vidram[offset] = data;
-}
 
 static READ8_HANDLER( fake_VRLE_r )
 {
 	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(machine->primary_screen)*0x40);
-}
-
-static READ8_HANDLER( ram_mirror_r )
-{
-	return program_read_byte(0x1000+offset);
-}
-
-static WRITE8_HANDLER( ram_mirror_w )
-{
-	program_write_byte(0x1000+offset,data);
 }
 
 static READ8_HANDLER( bank_r )
@@ -110,98 +90,46 @@ static READ8_HANDLER( s2636_portA_r )
 	}
 }
 
-/*
-static READ8_HANDLER( bank2_r )
-{  // probably very wrong :)
-    UINT8* bank = memory_region(REGION_USER1);
-
-    return bank[offset + (malzak_bank1 * 0x0400)];
-}
-*/
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0bff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( malzak_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(bank_r)
-	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1100, 0x11ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1200, 0x12ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1300, 0x13ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x14cb, 0x14cb) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x1400, 0x14ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1600, 0x16ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1700, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(saa5050_r)  // SAA 5050 video RAM
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_READ(ram_mirror_r)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_READ(ram_mirror_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(ram_mirror_r)
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1100, 0x11ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_0_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_1_ram)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(SMH_RAM, malzak_playfield_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&saa5050_vidram)
+	AM_RANGE(0x2000, 0x2fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1100, 0x11ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1200, 0x12ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1300, 0x13ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1400, 0x14ff) AM_WRITE(SMH_RAM) AM_BASE(&malzak_s2636_0_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_WRITE(SMH_RAM) AM_BASE(&malzak_s2636_1_ram)
-	AM_RANGE(0x1600, 0x16ff) AM_WRITE(playfield_w)
-	AM_RANGE(0x1600, 0x16ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1700, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(saa5050_w)  // SAA 5050 video RAM
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(ram_mirror_w)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(ram_mirror_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(ram_mirror_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( malzak2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0bff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( malzak2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(bank_r)
-	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1100, 0x11ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1200, 0x12ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1300, 0x13ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x14cb, 0x14cb) AM_READ(fake_VRLE_r)
-	AM_RANGE(0x14cc, 0x14cc) AM_READ(s2636_portA_r)
-	AM_RANGE(0x1400, 0x14ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1600, 0x16ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1700, 0x17ff) AM_READ(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x1800, 0x1fff) AM_READ(saa5050_r)  // SAA 5050 video RAM
-	AM_RANGE(0x2000, 0x2fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_READ(ram_mirror_r)
-	AM_RANGE(0x4000, 0x4fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_READ(ram_mirror_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(ram_mirror_r)
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1100, 0x11ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1300, 0x13ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x14cb, 0x14cb) AM_MIRROR(0x6000) AM_READ(fake_VRLE_r)
+	AM_RANGE(0x14cc, 0x14cc) AM_MIRROR(0x6000) AM_READ(s2636_portA_r)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_0_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&malzak_s2636_1_ram)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(SMH_RAM, malzak_playfield_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x1800, 0x1fff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&saa5050_vidram)
+	AM_RANGE(0x2000, 0x2fff) AM_ROM
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( malzak2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1100, 0x11ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1200, 0x12ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1300, 0x13ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1400, 0x14ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1500, 0x15ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1600, 0x16ff) AM_WRITE(playfield_w)
-	AM_RANGE(0x1600, 0x16ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1700, 0x17ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x1800, 0x1fff) AM_WRITE(saa5050_w)  // SAA 5050 video RAM
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(ram_mirror_w)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(ram_mirror_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(ram_mirror_w)
-ADDRESS_MAP_END
 
 static READ8_HANDLER( s2650_data_r )
 {
@@ -247,19 +175,17 @@ static READ8_HANDLER( collision_r )
 	return 0xd0 + counter;
 }
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( malzak_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(collision_r) // returns where a collision can occur.
+	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
+	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
     AM_RANGE(0x80, 0x80) AM_READ(input_port_0_r)  //controls
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP)  // echoes I/O port read from port 0x80
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(s2650_data_r)  // read upon death
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
-	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(SMH_NOP)  // echoes I/O port read from port 0x80
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(portc0_w)  // possibly playfield row selection for writing and/or collisions
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( malzak )
 
@@ -415,8 +341,8 @@ static MACHINE_DRIVER_START( malzak )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", S2650, 3800000/4)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_PROGRAM_MAP(malzak_map,0)
+	MDRV_CPU_IO_MAP(malzak_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -451,7 +377,7 @@ static MACHINE_DRIVER_START( malzak2 )
 	MDRV_IMPORT_FROM( malzak )
 
 	MDRV_CPU_MODIFY( "main" )
-	MDRV_CPU_PROGRAM_MAP( malzak2_readmem, malzak2_writemem )
+	MDRV_CPU_PROGRAM_MAP(malzak2_map,0)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
 MACHINE_DRIVER_END
