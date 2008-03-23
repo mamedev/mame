@@ -338,8 +338,8 @@ static const tms34010_config tms_config =
 {
 	FALSE,							/* halt on reset */
 	"main",							/* the screen operated on */
-	5000000,						/* pixel clock */
-	2,								/* pixels per clock */
+	10000000,						/* pixel clock */
+	1,								/* pixels per clock */
 	xtheball_scanline_update,		/* scanline callback */
 	NULL,							/* generate interrupt */
 	xtheball_to_shiftreg,			/* write to shiftreg function */
@@ -369,9 +369,7 @@ static MACHINE_DRIVER_START( xtheball )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(512,256)
-	MDRV_SCREEN_VISIBLE_AREA(0,511, 24,247)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
