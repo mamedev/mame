@@ -17,6 +17,10 @@
 #include "xmlfile.h"
 #include "hash.h"
 
+#ifdef MESS
+#include "infomess.h"
+#endif /* MESS */
+
 /* MESS/MAME configuration */
 #ifdef MESS
 #define XML_ROOT "mess"
@@ -25,11 +29,6 @@
 #define XML_ROOT "mame"
 #define XML_TOP "game"
 #endif
-
-#ifdef MESS
-void print_game_device(FILE* out, const game_driver* game);
-void print_game_ramoptions(FILE* out, const game_driver* game);
-#endif /* MESS */
 
 
 /*-------------------------------------------------
@@ -923,9 +922,9 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_switches(out, game, input);
 	print_game_driver(out, game, config);
 #ifdef MESS
-	print_game_device(out, game);
-	print_game_ramoptions(out, game);
-#endif
+	print_game_device(out, game, config);
+	print_game_ramoptions(out, game, config);
+#endif /* MESS */
 
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
