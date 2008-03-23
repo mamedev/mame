@@ -4154,16 +4154,19 @@ static INPUT_PORTS_START( zombraid )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:8" ) /* Listed as "Unused" */
 
-	/* Gun on screen left=0xc0, right=0x40, top=0x48, bottom=0xa8 */
-	PORT_START_TAG("IN5")	/* Player 1 Gun X       ($f00003) */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -256.0/(256 - 0x40 - 0x40), -127.0/256, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
-	PORT_START_TAG("IN6")	/* Player 1 Gun Y       ($f00003) */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 256.0/(256 - 0x48 - 0x58), -193.0/256, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+	/* The gun calibration defaults to: left=0xc0, right=0x40, top=0x48, bottom=0xa8 */
+	/* The user calibrated values are lost each time MAME starts, so the gun always needs to be re-calibrated. */
+	/* Either NVRAM or battery backed up RAM is not emulated. */
+	/* For now it is best to just use a Save State after calibration to remember the setting. */
+	PORT_START_TAG("IN5")   /* Player 1 Gun X       ($f00003) */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1, 0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
+	PORT_START_TAG("IN6")   /* Player 1 Gun Y       ($f00003) */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y,  1, 0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
-	PORT_START_TAG("IN7")	/* Player 2 Gun X       ($f00003) */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -256.0/(256 - 0x40 - 0x40), -127.0/256, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(2)
-	PORT_START_TAG("IN0")	/* Player 2 Gun Y       ($f00003) */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 256.0/(256 - 0x48 - 0x58), -193.0/256, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
+	PORT_START_TAG("IN7")   /* Player 2 Gun X       ($f00003) */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1, 0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(2)
+	PORT_START_TAG("IN8")   /* Player 2 Gun Y       ($f00003) */
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y,  1, 0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
