@@ -45,7 +45,7 @@ enum
 
 
 /* tags for state saving */
-const char * const device_tags[NUM_TYPES] = {           "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
+static const char * const device_tags[NUM_TYPES] = {     "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
 
 /* capabilities */
 static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,     FALSE,     FALSE,    FALSE,    FALSE,      FALSE };
