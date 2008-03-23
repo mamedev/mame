@@ -417,8 +417,8 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 	msm5232_set_clock(sndti_token(SOUND_MSM5232, 0), MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", eq8155_port_c,eq8155_port_a,ay_port_a,ay_port_b,eq_cymbal_ctrl&15);
 
-	cymvol *= 0.94;
-	hihatvol *= 0.94;
+	cymvol *= 0.94f;
+	hihatvol *= 0.94f;
 
 	sndti_set_output_gain(SOUND_MSM5232, 0, 10, hihatvol + cymvol * (ay_port_b & 3) * 0.33);	/* NO from msm5232 */
 }
@@ -523,13 +523,13 @@ if (data & ~ay_port_b & 0x04) hihat++;
 //	data & 0x40  hi-hat enable
 
 	if (data & ~ay_port_b & 0x08)
-		cymvol = 1.0;
+		cymvol = 1.0f;
 
 	if (data & ~ay_port_b & 0x04)
-		hihatvol = 0.8;
+		hihatvol = 0.8f;
 
 	if (~data & 0x40)
-		hihatvol = 0.0;
+		hihatvol = 0.0f;
 
 	ay_port_b = data;
 
