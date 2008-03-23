@@ -110,6 +110,9 @@ void mc6845_assert_light_pen_input(const device_config *device);
 /* set the clock (pin 21) of the chip */
 void mc6845_set_clock(const device_config *device, int clock);
 
+/* set number of pixels per video memory address */
+void mc6845_set_hpixels_per_column(const device_config *device, int hpixels_per_column);
+
 /* updates the screen -- this will call begin_update(),
    followed by update_row() reapeatedly and after all row
    updating is complete, end_update() */

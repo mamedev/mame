@@ -81,6 +81,7 @@ struct _mc6845_t
 	/* other internal state */
 	UINT64	clock;
 	UINT8	register_address_latch;
+	UINT8	hpixels_per_column;
 	UINT8	cursor_state;	/* 0 = off, 1 = on */
 	UINT8	cursor_blink_count;
 
@@ -228,11 +229,11 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 		UINT16 hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos;
 
 		/* compute the screen sizes */
-		UINT16 horiz_pix_total = (mc6845->horiz_char_total + 1) * mc6845->intf->hpixels_per_column;
+		UINT16 horiz_pix_total = (mc6845->horiz_char_total + 1) * mc6845->hpixels_per_column;
 		UINT16 vert_pix_total = (mc6845->vert_char_total + 1) * (mc6845->max_ras_addr + 1) + mc6845->vert_total_adj;
 
 		/* determine the visible area, avoid division by 0 */
-		UINT16 max_visible_x = mc6845->horiz_disp * mc6845->intf->hpixels_per_column - 1;
+		UINT16 max_visible_x = mc6845->horiz_disp * mc6845->hpixels_per_column - 1;
 		UINT16 max_visible_y = mc6845->vert_disp * (mc6845->max_ras_addr + 1) - 1;
 
 		/* determine the syncing positions */
@@ -245,8 +246,8 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 		if (vert_sync_pix_width == 0)
 			vert_sync_pix_width = 0x10;
 
-		hsync_on_pos = mc6845->horiz_sync_pos * mc6845->intf->hpixels_per_column;
-		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * mc6845->intf->hpixels_per_column);
+		hsync_on_pos = mc6845->horiz_sync_pos * mc6845->hpixels_per_column;
+		hsync_off_pos = hsync_on_pos + (horiz_sync_char_width * mc6845->hpixels_per_column);
 		vsync_on_pos = mc6845->vert_sync_pos * (mc6845->max_ras_addr + 1);
 		vsync_off_pos = vsync_on_pos + vert_sync_pix_width;
 
@@ -475,7 +476,7 @@ UINT16 mc6845_get_ma(const device_config *device)
 
 		ret = (mc6845->disp_start_addr +
 			  (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
-			  (x / mc6845->intf->hpixels_per_column)) & 0x3fff;
+			  (x / mc6845->hpixels_per_column)) & 0x3fff;
 	}
 	else
 		ret = 0;
@@ -530,8 +531,8 @@ void mc6845_assert_light_pen_input(const device_config *device)
 		x = video_screen_get_hpos(mc6845->screen);
 
 		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
-		char_x = x / mc6845->intf->hpixels_per_column;
-		x = (char_x + 1) * mc6845->intf->hpixels_per_column;
+		char_x = x / mc6845->hpixels_per_column;
+		x = (char_x + 1) * mc6845->hpixels_per_column;
 
 		/* adjust if we are passed the boundaries of the screen */
 		if (x == mc6845->horiz_pix_total)
@@ -559,6 +560,21 @@ void mc6845_set_clock(const device_config *device, int clock)
 	if (clock != mc6845->clock)
 	{
 		mc6845->clock = clock;
+		recompute_parameters(mc6845, FALSE);
+	}
+}
+
+
+void mc6845_set_hpixels_per_column(const device_config *device, int hpixels_per_column)
+{
+	mc6845_t *mc6845 = get_safe_token(device);
+
+	/* validate arguments */
+	assert(hpixels_per_column > 0);
+
+	if (hpixels_per_column != mc6845->hpixels_per_column)
+	{
+		mc6845->hpixels_per_column = hpixels_per_column;
 		recompute_parameters(mc6845, FALSE);
 	}
 }
@@ -677,8 +693,9 @@ static void common_start(const device_config *device, int device_type)
 		assert(mc6845->intf->clock > 0);
 		assert(mc6845->intf->hpixels_per_column > 0);
 
-		/* copy the initial clock */
+		/* copy the initial parameters */
 		mc6845->clock = mc6845->intf->clock;
+		mc6845->hpixels_per_column = mc6845->intf->hpixels_per_column;
 
 		/* get the screen device */
 		mc6845->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, mc6845->intf->screen_tag);
@@ -709,6 +726,7 @@ static void common_start(const device_config *device, int device_type)
 	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
 
 	state_save_register_item(unique_tag, 0, mc6845->clock);
+	state_save_register_item(unique_tag, 0, mc6845->hpixels_per_column);
 	state_save_register_item(unique_tag, 0, mc6845->register_address_latch);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_char_total);
 	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
