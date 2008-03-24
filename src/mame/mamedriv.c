@@ -5469,6 +5469,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( burningh )	/* 0018 (c) 1991 SNK */
 	DRIVER( lbowling )	/* 0019 (c) 1990 SNK */
 	DRIVER( gpilots )	/* 0020 (c) 1991 SNK */
+	DRIVER( gpilotsh )	/* 0020 (c) 1991 SNK */
 	DRIVER( joyjoy )	/* 0021 (c) 1990 SNK */
 	DRIVER( bjourney )	/* 0022 (c) 1990 Alpha Denshi Co. */
 	DRIVER( quizdais )	/* 0023 (c) 1991 SNK */
@@ -5484,7 +5485,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( socbrawl )	/* 0031 (c) 1991 SNK */
 	DRIVER( socbrala )	/* 0031 (c) 1991 SNK */
 	DRIVER( roboarmy )	/* 0032 (c) 1991 SNK */
-	DRIVER( roboarma )	/* 0032 (c) 1991 SNK */
 	DRIVER( fatfury1 )	/* 0033 (c) 1991 SNK */
 	DRIVER( fbfrenzy )	/* 0034 (c) 1992 SNK */
 				/* 0035 Mystic Wand (prototype) 1991 Alpha */
@@ -5498,6 +5498,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( 3countb )	/* 0043 (c) 1993 SNK */
 	DRIVER( aof )		/* 0044 (c) 1992 SNK */
 	DRIVER( samsho )	/* 0045 (c) 1993 SNK */
+	DRIVER( samshoh )	/* 0045 (c) 1993 SNK */
 	DRIVER( tophuntr )	/* 0046 (c) 1994 SNK */
 	DRIVER( tophunta )	/* 0046 (c) 1994 SNK */
 	DRIVER( fatfury2 )	/* 0047 (c) 1992 SNK */
@@ -5565,7 +5566,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sonicwi3 )	/* 0097 (c) 1995 Video System Co. */
 				/* 0098 Idol Mahjong - final romance 2 (CD only? not confirmed, MVS might exist) */
 				/* 0099 Neo Pool Masters */
-				/* 0160 Japanese MVS cart; No bootleg (c) 1997/1998 SNK */
+				/* 0160 98 BEST 44 (c) 1997/1998 SNK */
 	DRIVER( turfmast )	/* 0200 (c) 1996 Nazca */
 	DRIVER( mslug )		/* 0201 (c) 1996 Nazca */
 	DRIVER( puzzledp )	/* 0202 (c) 1995 Taito (Visco license) */
