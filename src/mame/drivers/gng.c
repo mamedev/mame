@@ -451,10 +451,10 @@ ROM_START( gnga )
 	ROM_LOAD( "gg6.bin",      0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) /* tiles 2-3 Plane 3*/
 
 	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
-	ROM_LOAD( "gg17.bin",     0x00000, 0x4000, CRC(93e50a8f) SHA1(42d367f57bb2fdf60a0445ac1533da99cfeaa617) ) /* sprites 0 Plane 1-2 */
+	ROM_LOAD( "gng13.n4",     0x00000, 0x4000, CRC(4613afdc) SHA1(13e5a38a134bd7cfa16c63a18fa332c6d66b9345) ) /* sprites 0 Plane 1-2 */
 	ROM_LOAD( "gg16.bin",     0x04000, 0x4000, CRC(06d7e5ca) SHA1(9e06012bcd82f98fad43de666ef9a75979d940ab) ) /* sprites 1 Plane 1-2 */
 	ROM_LOAD( "gg15.bin",     0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) /* sprites 2 Plane 1-2 */
-	ROM_LOAD( "gg14.bin",     0x10000, 0x4000, CRC(6aaf12f9) SHA1(207a7407288182a4f3eddaea634c6a6452131182) ) /* sprites 0 Plane 3-4 */
+	ROM_LOAD( "gng16.l4",     0x10000, 0x4000, CRC(608d68d5) SHA1(af207f9ee2f93a0cf9cf25cfe72b0fdfe55481b8) ) /* sprites 0 Plane 3-4 */
 	ROM_LOAD( "gg13.bin",     0x14000, 0x4000, CRC(e80c3fca) SHA1(cb641c25bb04b970b2cbeca41adb792bbe142fb5) ) /* sprites 1 Plane 3-4 */
 	ROM_LOAD( "gg12.bin",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) /* sprites 2 Plane 3-4 */
 
