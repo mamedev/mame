@@ -836,6 +836,7 @@ const game_driver * const drivers[] =
 
 	/* Namco System 22 games */
 	DRIVER( ridgerac )	/* (c) 1993 */
+	DRIVER( ridgerab )	/* (c) 1993 */
 	DRIVER( ridgeraj )	/* (c) 1993 */
 	DRIVER( acedrvrw )	/* (c) 1994 */
 	DRIVER( alpinerd )	/* (c) 1994 */
