@@ -939,6 +939,7 @@ const game_driver * const drivers[] =
 	DRIVER( dkongjrj )	/* (c) 1982 Nintendo */
 	DRIVER( dkngjnrj )	/* (c) 1982 Nintendo */
 	DRIVER( dkongjrb )	/* bootleg */
+	DRIVER( jrking )	/* bootleg */
 	DRIVER( dkongjre )	/* (c) 1982 Nintendo of America */
 	DRIVER( dkong3 )	/* (c) 1983 Nintendo of America */
 	DRIVER( dkong3j )	/* (c) 1983 Nintendo */
