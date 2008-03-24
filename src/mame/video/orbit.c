@@ -22,12 +22,6 @@ WRITE8_HANDLER( orbit_playfield_w )
 }
 
 
-WRITE8_HANDLER( orbit_sprite_w )
-{
-	orbit_sprite_ram[offset] = data;
-}
-
-
 static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 code = orbit_playfield_ram[tile_index];
@@ -35,13 +29,9 @@ static TILE_GET_INFO( get_tile_info )
 	int flags = 0;
 
 	if (code & 0x40)
-	{
 		flags |= TILE_FLIPX;
-	}
 	if (orbit_flip_screen)
-	{
 		flags |= TILE_FLIPY;
-	}
 
 	SET_TILE_INFO(3, code & 0x3f, 0, flags);
 }
@@ -79,13 +69,9 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 		code &= 0x3f;
 
 		if (flag & 1)
-		{
 			code |= 0x40;
-		}
 		if (flag & 2)
-		{
 			zoom_x *= 2;
-		}
 
 		vpos = 240 - vpos;
 

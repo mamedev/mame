@@ -22,17 +22,46 @@ Atari Orbit Driver
 #include "sound/discrete.h"
 
 
-static int orbit_nmi_enable;
+#define MASTER_CLOCK		XTAL_12_096MHz
+
 
 static UINT8 orbit_misc_flags;
 
 
-static INTERRUPT_GEN( orbit_interrupt )
+
+/*************************************
+ *
+ *  Interrupts and timing
+ *
+ *************************************/
+
+static TIMER_CALLBACK( nmi_32v )
 {
-	if (orbit_nmi_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	int scanline = param;
+	int nmistate = (scanline & 32) && (orbit_misc_flags & 4);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+static TIMER_CALLBACK( irq_off )
+{
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+}
+
+
+static INTERRUPT_GEN( orbit_interrupt )
+{
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, irq_off);
+}
+
+
+
+/*************************************
+ *
+ *  Bit flags
+ *
+ *************************************/
 
 static void update_misc_flags(running_machine *machine, UINT8 val)
 {
@@ -47,7 +76,6 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	orbit_nmi_enable = (orbit_misc_flags >> 2) & 1;
 	discrete_sound_w(machine, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
 
 	set_led_status(0, orbit_misc_flags & 0x08);
@@ -58,47 +86,63 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 }
 
 
+static WRITE8_HANDLER( orbit_misc_w )
+{
+	UINT8 bit = offset >> 1;
+
+	if (offset & 1)
+		update_misc_flags(machine, orbit_misc_flags | (1 << bit));
+	else
+		update_misc_flags(machine, orbit_misc_flags & ~(1 << bit));
+}
+
+
+
+/*************************************
+ *
+ *  Machine setup
+ *
+ *************************************/
+
 static MACHINE_RESET( orbit )
 {
 	update_misc_flags(machine, 0);
 }
 
 
-static WRITE8_HANDLER( orbit_misc_w )
-{
-	UINT8 bit = offset >> 1;
 
-	if (offset & 1)
-	{
-		update_misc_flags(machine, orbit_misc_flags | (1 << bit));
-	}
-	else
-	{
-		update_misc_flags(machine, orbit_misc_flags & ~(1 << bit));
-	}
-}
-
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( orbit_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x700)
-	AM_RANGE(0x0800, 0x0800) AM_READ(input_port_0_r)
-	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_1_r)
-	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_2_r)
-	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_3_r)
-	AM_RANGE(0x2800, 0x2800) AM_READ(input_port_4_r)
-	AM_RANGE(0x3000, 0x33bf) AM_READWRITE(SMH_RAM, orbit_playfield_w) AM_BASE(&orbit_playfield_ram)
-	AM_RANGE(0x33c0, 0x33ff) AM_READWRITE(SMH_RAM, orbit_sprite_w) AM_BASE(&orbit_sprite_ram)
-	AM_RANGE(0x3400, 0x37bf) AM_WRITE(orbit_playfield_w)
-	AM_RANGE(0x37c0, 0x37ff) AM_WRITE(orbit_sprite_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(orbit_note_w)
-	AM_RANGE(0x3900, 0x3900) AM_WRITE(orbit_noise_amp_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(orbit_note_amp_w)
-	AM_RANGE(0x3c00, 0x3c0f) AM_WRITE(orbit_misc_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(orbit_noise_rst_w)
-	AM_RANGE(0x3f00, 0x3f00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x6800, 0x7fff) AM_ROM AM_MIRROR(0x8000)		/* program */
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x07ff) AM_READ(input_port_0_r)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x07ff) AM_READ(input_port_1_r)
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x07ff) AM_READ(input_port_2_r)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07ff) AM_READ(input_port_3_r)
+	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x07ff) AM_READ(input_port_4_r)
+	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, orbit_playfield_w) AM_BASE(&orbit_playfield_ram)
+	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(&orbit_sprite_ram)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_w)
+	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_amp_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_amp_w)
+	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE(orbit_misc_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_rst_w)
+	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
+
+
+/*************************************
+ *
+ *  Port definitions
+ *
+ *************************************/
 
 static INPUT_PORTS_START( orbit )
 	PORT_START /* 0800 */
@@ -174,73 +218,58 @@ static INPUT_PORTS_START( orbit )
 INPUT_PORTS_END
 
 
+
+/*************************************
+ *
+ *  Graphics layouts
+ *
+ *************************************/
+
 static const gfx_layout orbit_full_sprite_layout =
 {
-	8, 32,    /* width, height */
-	128,      /* total         */
-	1,        /* planes        */
-	{ 0 },    /* plane offsets */
-	{
-		0, 1, 2, 3, 4, 5, 6, 7
-	},
-	{
-		0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38,
-		0x40, 0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78,
-		0x80, 0x88, 0x90, 0x98, 0xA0, 0xA8, 0xB0, 0xB8,
-		0xC0, 0xC8, 0xD0, 0xD8, 0xE0, 0xE8, 0xF0, 0xF8
-	},
-	0x100     /* increment */
+	8, 32,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP32(0,8) },
+	0x100
 };
 
 
 static const gfx_layout orbit_upper_sprite_layout =
 {
-	8, 16,    /* width, height */
-	128,      /* total         */
-	1,        /* planes        */
-	{ 0 },    /* plane offsets */
-	{
-		0, 1, 2, 3, 4, 5, 6, 7
-	},
-	{
-		0x00, 0x08, 0x10, 0x18, 0x20, 0x28, 0x30, 0x38,
-		0x40, 0x48, 0x50, 0x58, 0x60, 0x68, 0x70, 0x78
-	},
-	0x100     /* increment */
+	8, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP16(0,8) },
+	0x100
 };
 
 
 static const gfx_layout orbit_lower_sprite_layout =
 {
-	8, 16,    /* width, height */
-	128,      /* total         */
-	1,        /* planes        */
-	{ 0 },    /* plane offsets */
-	{
-		0, 1, 2, 3, 4, 5, 6, 7
-	},
-	{
-		0x80, 0x88, 0x90, 0x98, 0xA0, 0xA8, 0xB0, 0xB8,
-		0xC0, 0xC8, 0xD0, 0xD8, 0xE0, 0xE8, 0xF0, 0xF8
-	},
-	0x100     /* increment */
+	8, 16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP16(0x80,8) },
+	0x100
 };
 
 
 static const gfx_layout orbit_tile_layout =
 {
-	16, 16,   /* width, height */
-	64,       /* total         */
-	1,        /* planes        */
-	{ 0 },    /* plane offsets */
-	{
-		0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7
-	},
-	{
-		0x00, 0x00, 0x08, 0x08, 0x10, 0x10, 0x18, 0x18,
-		0x20, 0x20, 0x28, 0x28, 0x30, 0x30, 0x38, 0x38
-	},
-	0x40      /* increment */
+	8, 8, 
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	0x40
 };
 
 
@@ -248,38 +277,36 @@ static GFXDECODE_START( orbit )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_full_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_upper_sprite_layout, 0, 1 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, orbit_lower_sprite_layout, 0, 1 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, orbit_tile_layout, 0, 1 )
+	GFXDECODE_SCALE( REGION_GFX2, 0, orbit_tile_layout, 0, 1, 2, 2 )
 GFXDECODE_END
 
 
-static PALETTE_INIT( orbit )
-{
-	palette_set_color(machine, 0, MAKE_RGB(0x00, 0x00, 0x00));
-	palette_set_color(machine, 1, MAKE_RGB(0xFF, 0xFF, 0xFF));
-}
 
+/*************************************
+ *
+ *  Machine drivers
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( orbit )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6800, 12096000 / 16)
+	MDRV_CPU_ADD(M6800, MASTER_CLOCK / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
-	MDRV_CPU_PERIODIC_INT(orbit_interrupt, 240)
+	MDRV_CPU_VBLANK_INT("main", orbit_interrupt)
+	
+	MDRV_TIMER_ADD_SCANLINE("32V", nmi_32v, "main", 0, 32)
 
 	MDRV_MACHINE_RESET(orbit)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60) /* interlaced */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((int) ((22. * 1000000) / (262. * 60) + 0.5)))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 524)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 0, 479)
+	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2)
 
 	MDRV_GFXDECODE(orbit)
 	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(orbit)
+	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(orbit)
 	MDRV_VIDEO_UPDATE(orbit)
 
@@ -292,6 +319,13 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+
+
+/*************************************
+ *
+ *  ROM definitions
+ *
+ *************************************/
 
 ROM_START( orbit )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
@@ -321,5 +355,12 @@ ROM_START( orbit )
 	ROM_LOAD( "033688.p6", 0x0000, 0x100, CRC(ee66ddba) SHA1(5b9ae4cbf019375c8d54528b69280413c641c4f2) )
 ROM_END
 
+
+
+/*************************************
+ *
+ *  Game drivers
+ *
+ *************************************/
 
 GAME( 1978, orbit, 0, orbit, orbit, 0, 0, "Atari", "Orbit", 0 )

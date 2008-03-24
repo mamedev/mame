@@ -34,4 +34,3 @@ extern UINT8* orbit_playfield_ram;
 extern UINT8* orbit_sprite_ram;
 
 extern WRITE8_HANDLER( orbit_playfield_w );
-extern WRITE8_HANDLER( orbit_sprite_w );
