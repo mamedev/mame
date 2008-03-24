@@ -5913,6 +5913,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( strahl )	/* UPL-91074 (c) 1992 UPL (Japan) */
 	DRIVER( strahla )	/* UPL-91074 (c) 1992 UPL (Japan) */
 	DRIVER( bjtwin )	/* UPL-93087 (c) 1993 NMK */
+	DRIVER( bjtwina )	/* UPL-93087 (c) 1993 NMK */
 	DRIVER( tdragon2 )	/* UPL-93091 (c) 1993 NMK */
 	DRIVER( tdragn2a )	/* UPL-93091 (c) 1993 NMK */
 	DRIVER( bigbang )	/* UPL-93091 (c) 1993 NMK */

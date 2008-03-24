@@ -4761,7 +4761,6 @@ static DRIVER_INIT( ssmissin )
 
 static DRIVER_INIT( bjtwin )
 {
-	DRIVER_INIT_CALL(nmk);
 
 	/* Patch rom to enable test mode */
 
@@ -4778,10 +4777,14 @@ static DRIVER_INIT( bjtwin )
  *  008F78: 33C3 000F FFFE           move.w  D3, $ffffe.l
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
+#if 0
+	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
+	rom[0x09172/2] = 0x6006;    /* patch checksum error */
+	rom[0x08f74/2] = 0x4e71;
+#endif
 
-//  data 16_t *rom = (UINT16 *)memory_region(REGION_CPU1);
-//  rom[0x09172/2] = 0x6006;    /* patch checksum error */
-//  rom[0x08f74/2] = 0x4e71);
+	DRIVER_INIT_CALL(nmk);
+
 }
 
 /* NO NMK004, it has a PIC instead */
@@ -6271,6 +6274,30 @@ ROM_START( bjtwin )
 	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) /* unknown */
 ROM_END
 
+ROM_START( bjtwina )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )  /* 68000 code */
+	ROM_LOAD16_BYTE( "93087.1",  0x00000, 0x20000, CRC(c82b3d8e) SHA1(74435ba7842f1be9968006894cfa5eef05c47395) )
+	ROM_LOAD16_BYTE( "93087.2",  0x00001, 0x20000, CRC(9be1ec47) SHA1(bf37d9254a7bbdf49b006971886ed9845d72e4b3) )
+
+	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "93087-3.bin",  0x000000, 0x010000, CRC(aa13df7c) SHA1(162d4f12364c68028e86fe97ee75c262daa4c699) ) /* 8x8 tiles */
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "93087-4.bin",  0x000000, 0x100000, CRC(8a4f26d0) SHA1(be057a2b6d28c623ac1f16cf02ddbe12ca430b4a) ) /* 16x16 tiles */
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD16_WORD_SWAP( "93087-5.bin", 0x000000, 0x100000, CRC(bb06245d) SHA1(c91e2284d95370b8ef2eb1b9d6305fdd6cde23a0) ) /* Sprites */
+
+	ROM_REGION( 0x140000, REGION_SOUND1, 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "93087-6.bin",    0x040000, 0x100000, CRC(372d46dd) SHA1(18f44e777241af50787730652fa018c51b65ea15) ) /* all banked */
+
+	ROM_REGION( 0x140000, REGION_SOUND2, 0 ) /* OKIM6295 samples */
+	ROM_LOAD( "93087-7.bin",    0x040000, 0x100000, CRC(8da67808) SHA1(f042574c097f5a8c2684fcc23f2c817c168254ef) ) /* all banked */
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "8.bpr",      0x0000, 0x0100, CRC(633ab1c9) SHA1(acd99fcca41eaab7948ca84988352f1d7d519c61) ) /* unknown */
+	ROM_LOAD( "9.bpr",      0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) /* unknown */
+ROM_END
 
 ROM_START( nouryoku )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 code */
@@ -6981,9 +7008,13 @@ GAME( 1993, tdragn2a, tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",    
 GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
 GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "Media Trading Corp",           "Rapid Hero (Japan?)", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
-GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (9th Mar. 1992 / set 1)", GAME_NO_COCKTAIL )
-GAME( 1992, sabotnba, sabotenb, bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (9th Mar. 1992 / set 2)", GAME_NO_COCKTAIL )
-GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin", GAME_NO_COCKTAIL )
+/* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
+GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
+GAME( 1992, sabotnba, sabotenb, bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", GAME_NO_COCKTAIL )
+GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", GAME_NO_COCKTAIL )
+GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", GAME_NO_COCKTAIL )
+
+
 GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", GAME_NO_COCKTAIL )
 
 /* Non NMK boards */
