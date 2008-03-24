@@ -122,7 +122,7 @@ static const double tx1_engine_gains[16] =
 static UINT8 ay_outputa;
 static UINT8 ay_outputb;
 
-static double weights0[3], weights1[3], weights2[4];
+static double weights0[4], weights1[3], weights2[3];
 static int eng0[4];
 static int eng1[4];
 static int eng2[4];
