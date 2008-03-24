@@ -352,7 +352,7 @@ static int v9938_vram_read (int offset)
 		return vdp->vram[offset];
 	}
 
-void v9938_vram_w( UINT8 data )
+static void v9938_vram_w( UINT8 data )
 	{
 	int address;
 

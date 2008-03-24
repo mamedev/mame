@@ -44,7 +44,7 @@ extern UINT8 *kncljoe_scrollregs;
 static UINT8 port1, port2;
 
 
-WRITE8_HANDLER( sound_cmd_w )
+static WRITE8_HANDLER( sound_cmd_w )
 {
 	if ((data & 0x80) == 0)
 		soundlatch_w(machine, 0, data & 0x7f);
@@ -253,7 +253,7 @@ static const struct AY8910interface ay8910_interface =
 	unused_w
 };
 
-INTERRUPT_GEN (sound_nmi)
+static INTERRUPT_GEN (sound_nmi)
 {
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }

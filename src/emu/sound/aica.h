@@ -20,8 +20,6 @@ void AICA_set_ram_base(int which, void *base, int size);
 // AICA register access
 READ16_HANDLER( AICA_0_r );
 WRITE16_HANDLER( AICA_0_w );
-READ16_HANDLER( AICA_1_r );
-WRITE16_HANDLER( AICA_1_w );
 
 // MIDI I/O access
 WRITE16_HANDLER( AICA_MidiIn );

@@ -337,7 +337,7 @@ static void p8257_ctl_w(UINT8 data);
  *
  *************************************/
 
-static z80dma_interface dk3_dma =
+static const z80dma_interface dk3_dma =
 {
 	0,
 	CLOCK_1H,

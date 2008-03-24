@@ -1307,7 +1307,7 @@ static const struct YM2203interface ym2203_interface =
 };
 
 
-static UPD7810_CONFIG upd_config =
+static const UPD7810_CONFIG upd_config =
 {
 	TYPE_7810,
 	NULL	/* io_callback */

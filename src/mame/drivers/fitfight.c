@@ -275,7 +275,7 @@ static INTERRUPT_GEN( snd_irq )
 	cpunum_set_input_line(machine, 1,UPD7810_INTF2,HOLD_LINE);
 }
 
-static UPD7810_CONFIG sound_cpu_config =
+static const UPD7810_CONFIG sound_cpu_config =
 {
     TYPE_7810,
     0

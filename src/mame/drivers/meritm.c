@@ -99,7 +99,7 @@ static struct
 
 } ds1204;
 
-void ds1204_w( int rst, int clk, int dq )
+static void ds1204_w( int rst, int clk, int dq )
 {
 	//logerror("ds1204_w: rst = %d, clk = %d, dq = %d\n", rst, clk, dq );
 	if ( rst == 0 )
@@ -178,13 +178,13 @@ void ds1204_w( int rst, int clk, int dq )
 	}
 };
 
-int ds1204_r(void)
+static int ds1204_r(void)
 {
 	//logerror("ds1204_r\n");
 	return ds1204.out_bit;
 };
 
-void ds1204_init(const UINT8* key, const UINT8* nvram)
+static void ds1204_init(const UINT8* key, const UINT8* nvram)
 {
 	memset(&ds1204, 0, sizeof(ds1204));
 	if (key)
@@ -350,7 +350,7 @@ static void microtouch_rx(int count, UINT8* data)
 	}
 };
 
-INPUT_PORTS_START(microtouch)
+static INPUT_PORTS_START(microtouch)
 	PORT_START_TAG("TOUCH")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(10) PORT_NAME( "Touch screen" )
 	PORT_START_TAG("TOUCH_X")
@@ -513,7 +513,7 @@ static VIDEO_UPDATE( meritm )
 static int meritm_bank;
 static int meritm_psd_a15;
 
-void meritm_crt250_switch_banks( void )
+static void meritm_crt250_switch_banks( void )
 {
 	int rombank = (meritm_bank & 0x07) ^ 0x07;
 
@@ -526,7 +526,7 @@ static WRITE8_HANDLER(meritm_crt250_bank_w)
 	meritm_crt250_switch_banks();
 };
 
-void meritm_switch_banks( void )
+static void meritm_switch_banks( void )
 {
 	int rambank = (meritm_psd_a15 >> 2) & 0x3;
 	int rombank = (((meritm_bank >> 3) & 0x3) << 5) |
@@ -623,7 +623,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
  *
  *************************************/
 
-WRITE8_HANDLER(meritm_ds1644_w)
+static WRITE8_HANDLER(meritm_ds1644_w)
 {
 	int rambank = (meritm_psd_a15 >> 2) & 0x3;
 	if (rambank < 3)
@@ -647,7 +647,7 @@ static UINT8 binary_to_BCD(UINT8 data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-READ8_HANDLER(meritm_ds1644_r)
+static READ8_HANDLER(meritm_ds1644_r)
 {
 	mame_system_time systime;
 	int rambank = (meritm_psd_a15 >> 2) & 0x3;
@@ -811,13 +811,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-READ8_HANDLER(meritm_8255_port_c_r)
+static READ8_HANDLER(meritm_8255_port_c_r)
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 };
 
-WRITE8_HANDLER(meritm_crt250_port_b_w)
+static WRITE8_HANDLER(meritm_crt250_port_b_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output_set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -862,12 +862,12 @@ static const ppi8255_interface crt250_ppi8255_intf =
  Port B: Bits 0,1 used
 */
 
-READ8_HANDLER(meritm_ay8930_port_a_r)
+static READ8_HANDLER(meritm_ay8930_port_a_r)
 {
 	return readinputportbytag_safe("DSW", 0);
 };
 
-WRITE8_HANDLER(meritm_ay8930_port_b_w)
+static WRITE8_HANDLER(meritm_ay8930_port_b_w)
 {
 	// lamps
 };

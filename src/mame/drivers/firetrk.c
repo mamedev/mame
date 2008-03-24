@@ -13,8 +13,6 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #define FIRETRK_CPU_CLOCK_750KZ		(12096000 / 16)
 
 
-int firetrk_game;
-
 static UINT8 in_service_mode;
 static UINT32 dial[2];
 static UINT8 steer_dir[2];

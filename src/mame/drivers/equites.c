@@ -1135,7 +1135,7 @@ static const char *const alphamc07_sample_names[] =
 	0
 };
 
-const struct Samplesinterface alphamc07_samples_interface =
+static const struct Samplesinterface alphamc07_samples_interface =
 {
 	3,	/* 3 channels */
 	alphamc07_sample_names

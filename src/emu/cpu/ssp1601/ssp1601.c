@@ -317,7 +317,7 @@ static void write_AL(int reg, UINT32 d)
 typedef UINT32 (*read_func_t)(int reg);
 typedef void (*write_func_t)(int reg, UINT32 d);
 
-static read_func_t reg_read_handlers[16] =
+static const read_func_t reg_read_handlers[16] =
 {
 	read_unknown, read_unknown, read_unknown, read_unknown, // -, X, Y, A
 	read_unknown,	// 4 ST
@@ -334,7 +334,7 @@ static read_func_t reg_read_handlers[16] =
 	read_AL
 };
 
-static write_func_t reg_write_handlers[16] =
+static const write_func_t reg_write_handlers[16] =
 {
 	write_unknown, write_unknown, write_unknown, write_unknown, // -, X, Y, A
 	write_ST,

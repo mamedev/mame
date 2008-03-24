@@ -50,7 +50,7 @@ static const discrete_comp_adder_table qix_attn_table =
 	{RES_K(22)+250, RES_K(10)+250, RES_K(5.6)+250, RES_K(3.3)+250}
 };
 
-DISCRETE_SOUND_START(qix)
+static DISCRETE_SOUND_START(qix)
 	/*                    NODE                      */
 	DISCRETE_INPUTX_DATA(QIX_DAC_DATA, 128, -128*128, 128)
 	DISCRETE_INPUT_DATA (QIX_VOL_DATA)

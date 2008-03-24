@@ -11,7 +11,7 @@
 
 
 UINT8 *sraider_grid_data;
-UINT8 sraider_grid_color;
+static UINT8 sraider_grid_color;
 
 /* Use the Zero Hour star generator board */
 void redclash_set_stars_enable( UINT8 on );

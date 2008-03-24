@@ -40,7 +40,6 @@ struct _stactics_state
 
 MACHINE_DRIVER_EXTERN( stactics_video );
 
-WRITE8_HANDLER( stactics_palette_w );
 WRITE8_HANDLER( stactics_scroll_ram_w );
 WRITE8_HANDLER( stactics_speed_latch_w );
 WRITE8_HANDLER( stactics_shot_trigger_w );

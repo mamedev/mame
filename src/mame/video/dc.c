@@ -610,7 +610,7 @@ static void pvr_build_parameterconfig(void)
 			pvr_parameterconfig[a] = pvr_parameterconfig[a-1];
 }
 
-TIMER_CALLBACK(vbout)
+static TIMER_CALLBACK(vbout)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_OUT; // V Blank-out interrupt
 	update_interrupt_status();

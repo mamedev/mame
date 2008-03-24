@@ -1566,7 +1566,7 @@ static VIDEO_UPDATE(dealem)
 	return 0;
 }
 
-MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
+static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 {
 	cpunum_set_input_line(device->machine, 0, INPUT_LINE_NMI, vsync);
 }
