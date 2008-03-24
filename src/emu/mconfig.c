@@ -209,7 +209,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	{
 		device_type devtype;
 		const char *tag;
-		int size, offset, type, bits;
+		int size, offset, type, bits, in, out;
 		UINT32 data32, clock, gain;
 		UINT64 data64;
 
@@ -516,8 +516,10 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_ROUTE:
 				assert(sound != NULL);
+				in = sound->route[sound->routes].input;
+				out = sound->route[sound->routes].output;
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, sound->route[sound->routes].output, -12, sound->route[sound->routes].input, -12, gain, 32);
+				TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, out, -12, in, -12, gain, 32);
 				sound->route[sound->routes].gain = (float)gain / 16777216.0f;
 				sound->route[sound->routes].target = TOKEN_GET_STRING(tokens);
 				sound->routes++;
