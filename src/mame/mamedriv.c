@@ -8007,4 +8007,7 @@ Other Sun games
 	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
 
+	/* Astro Corp. */
+	DRIVER( showhand )
+
 #endif	/* DRIVER_RECURSIVE */

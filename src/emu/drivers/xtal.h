@@ -103,6 +103,7 @@ enum
 	XTAL_24_576MHz  	= 24576000,		/* Pole Position h/w, Model 3 CPU board */
 	XTAL_25MHz   		= 25000000,		/* Namco System 22, Taito GNET, Dogyuun h/w */
 	XTAL_25_1748MHz  	= 25174800,		/* Sega S16A, S16B */
+	XTAL_25_601712MHz  	= 25601712,		/* Astro Corp.'s Show Hand */
 	XTAL_26_66666MHz 	= 26666660,		/* Irem M92 but most use 27MHz */
 	XTAL_26_686MHz 		= 26686000,		/* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27MHz   		= 27000000,		/* Some Banpresto games macrossp, Irem M92 and 90's Toaplan games */
