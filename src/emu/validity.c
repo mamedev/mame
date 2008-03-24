@@ -1045,7 +1045,7 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 	for (inp = *memory; inp->type != IPT_END; inp++)
 	{
 		int strindex = 0;
-		
+
 		/* check for duplicate tags */
 		if (inp->type == IPT_PORT)
 		{

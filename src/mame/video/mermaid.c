@@ -116,7 +116,7 @@ READ8_HANDLER( mermaid_collision_r )
         Bit 5
         Bit 6 - Sprite (Boat) - Sprite
         Bit 7
-	*/
+    */
 
 	int collision = 0xff;
 
@@ -245,7 +245,7 @@ VIDEO_EOF( mermaid )
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
 		int code = (spriteram[offs] & 0x3f) | (bank << 6);
-//		int color = attr & 0x0f;
+//      int color = attr & 0x0f;
 		int flipx = spriteram[offs] & 0x40;
 		int flipy = spriteram[offs] & 0x80;
 		int sx = spriteram[offs + 3] + 1;
@@ -317,7 +317,7 @@ VIDEO_EOF( mermaid )
 				int attr2 = spriteram[offs2 + 2];
 				int bank2 = (attr2 & 0x30) >> 4;
 				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-//				int color2 = attr2 & 0x0f;
+//              int color2 = attr2 & 0x0f;
 				int flipx2 = spriteram[offs2] & 0x40;
 				int flipy2 = spriteram[offs2] & 0x80;
 				int sx2 = spriteram[offs2 + 3] + 1;
@@ -355,7 +355,7 @@ VIDEO_EOF( mermaid )
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
 		int code = (spriteram[offs] & 0x3f) | (bank << 6);
-//		int color = attr & 0x0f;
+//      int color = attr & 0x0f;
 		int flipx = spriteram[offs] & 0x40;
 		int flipy = spriteram[offs] & 0x80;
 		int sx = spriteram[offs + 3] + 1;
@@ -392,7 +392,7 @@ VIDEO_EOF( mermaid )
 		if (rect.max_y > visarea->max_y)
 			rect.max_y = visarea->max_y;
 
-		// check collision sprite "sail" - sprite 
+		// check collision sprite "sail" - sprite
 
 		fillbitmap(helper,0,&rect);
 		fillbitmap(helper2,0,&rect);
@@ -403,7 +403,7 @@ VIDEO_EOF( mermaid )
 				int attr2 = spriteram[offs2 + 2];
 				int bank2 = (attr2 & 0x30) >> 4;
 				int code2 = (spriteram[offs2] & 0x3f) | (bank2 << 6);
-//				int color2 = attr2 & 0x0f;
+//              int color2 = attr2 & 0x0f;
 				int flipx2 = spriteram[offs2] & 0x40;
 				int flipy2 = spriteram[offs2] & 0x80;
 				int sx2 = spriteram[offs2 + 3] + 1;

@@ -765,7 +765,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 				cnt--;
 			}
 		}
-		
+
 		bufnoise[i] = (chip->noise_rng & (1<<16)) ? 32767 : 0;
 	}
 }

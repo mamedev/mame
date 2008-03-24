@@ -517,10 +517,10 @@ if (data & ~ay_port_b & 0x04) hihat++;
 
 	// FIXME I'm just enabling the MSM5232 Noise Output for now. Proper emulation
 	// of the analog circuitry should be done instead.
-//	if (data & ~ay_port_b & 0x08)	cymbal hit trigger
-//	if (data & ~ay_port_b & 0x04)	hi-hat hit trigger
-//	data & 3   cymbal volume
-//	data & 0x40  hi-hat enable
+//  if (data & ~ay_port_b & 0x08)   cymbal hit trigger
+//  if (data & ~ay_port_b & 0x04)   hi-hat hit trigger
+//  data & 3   cymbal volume
+//  data & 0x40  hi-hat enable
 
 	if (data & ~ay_port_b & 0x08)
 		cymvol = 1.0f;

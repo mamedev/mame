@@ -10,8 +10,8 @@
 
     TODO:
 
-	- auto_malloc cidelsa_pcb
-	- move set_cpu_mode timer call to MDRV
+    - auto_malloc cidelsa_pcb
+    - move set_cpu_mode timer call to MDRV
     - fix COP420 core to get sound in Draco
 
 */

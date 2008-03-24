@@ -1267,7 +1267,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-//										dest[x] = colorbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
+//                                      dest[x] = colorbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
 									pri[x] = 31;
 									x_index += dx;
 								}
@@ -1286,7 +1286,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = pal[source[x_index>>16]];
-//										dest[x] = colorbase + source[x_index>>16];
+//                                      dest[x] = colorbase + source[x_index>>16];
 									pri[x] = 31;
 									x_index += dx;
 								}
@@ -1306,7 +1306,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								for (x = sx; x < ex; x++)
 								{
 									dest[x] = pal[(source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f];
-//									dest[x] = colorbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
+//                                  dest[x] = colorbase + ((source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f);
 									x_index += dx;
 								}
 
@@ -1322,7 +1322,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								for (x = sx; x < ex; x++)
 								{
 									dest[x] = pal[source[x_index>>16]];
-//									dest[x] = colorbase + source[x_index>>16];
+//                                  dest[x] = colorbase + source[x_index>>16];
 									x_index += dx;
 								}
 
@@ -1351,7 +1351,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
 											dest[x] = pal[c];
-//											dest[x] = colorbase + c;
+//                                          dest[x] = colorbase + c;
 										pri[x] = 31;
 									}
 									x_index += dx;
@@ -1374,7 +1374,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 									{
 										if (((1 << pri[x]) & pri_mask) == 0)
 											dest[x] = pal[c];
-//											dest[x] = colorbase + c;
+//                                          dest[x] = colorbase + c;
 										pri[x] = 31;
 									}
 									x_index += dx;
@@ -1396,7 +1396,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									int c = (source[x_index>>17] >> ((x_index & 0x10000) >> 14)) & 0x0f;
 									if( c != transparent_color ) dest[x] = pal[c];
-//									if (c != transparent_color) dest[x] = colorbase + c;
+//                                  if (c != transparent_color) dest[x] = colorbase + c;
 									x_index += dx;
 								}
 
@@ -1413,7 +1413,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									int c = source[x_index>>16];
 									if( c != transparent_color ) dest[x] = pal[c];
-//									if (c != transparent_color) dest[x] = colorbase + c;
+//                                  if (c != transparent_color) dest[x] = colorbase + c;
 									x_index += dx;
 								}
 
@@ -1483,7 +1483,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = pal[c];
-//										dest[x] = colorbase + c;
+//                                      dest[x] = colorbase + c;
 									pri[x] = 31;
 								}
 								x_index += dx;
@@ -1503,7 +1503,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								int c = source[x_index>>16];
 								if (((1 << c) & transparent_color) == 0)
 									dest[x] = pal[c];
-//									dest[x] = colorbase + c;
+//                                  dest[x] = colorbase + c;
 								x_index += dx;
 							}
 
@@ -1541,10 +1541,10 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 										{
 											if (ah & 0x80)
 												dest[x] = palette_shadow_table[pal[c]];
-//												dest[x] = palette_shadow_table[colorbase + c];
+//                                              dest[x] = palette_shadow_table[colorbase + c];
 											else
 												dest[x] = pal[c];
-//												dest[x] = colorbase + c;
+//                                              dest[x] = colorbase + c;
 										}
 										pri[x] = (ah & 0x7f) | 31;
 										break;
@@ -1578,7 +1578,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 									{
 									case DRAWMODE_SOURCE:
 										dest[x] = pal[c];
-//										dest[x] = colorbase + c;
+//                                      dest[x] = colorbase + c;
 										break;
 									case DRAWMODE_SHADOW:
 										dest[x] = palette_shadow_table[dest[x]];
@@ -1611,7 +1611,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									if (((1 << pri[x]) & pri_mask) == 0)
 										dest[x] = alpha_blend16(dest[x], pal[c]);
-//										dest[x] = alpha_blend16(dest[x], colorbase + c);
+//                                      dest[x] = alpha_blend16(dest[x], colorbase + c);
 									pri[x] = 31;
 								}
 								x_index += dx;
@@ -1630,7 +1630,7 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 							{
 								int c = source[x_index>>16];
 								if( c != transparent_color ) dest[x] = alpha_blend16(dest[x], pal[c]);
-//								if (c != transparent_color) dest[x] = alpha_blend16(dest[x], colorbase + c);
+//                              if (c != transparent_color) dest[x] = alpha_blend16(dest[x], colorbase + c);
 								x_index += dx;
 							}
 
@@ -1658,10 +1658,10 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 									{
 										if (gfx_alpharange_table[c] == 0xff)
 											dest[x] = pal[c];
-//											dest[x] = colorbase + c;
+//                                          dest[x] = colorbase + c;
 										else
 											dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
-//											dest[x] = alpha_blend_r16(dest[x], colorbase + c, gfx_alpharange_table[c]);
+//                                          dest[x] = alpha_blend_r16(dest[x], colorbase + c, gfx_alpharange_table[c]);
 									}
 									pri[x] = 31;
 								}
@@ -1684,10 +1684,10 @@ INLINE void common_drawgfxzoom( bitmap_t *dest_bmp,const gfx_element *gfx,
 								{
 									if (gfx_alpharange_table[c] == 0xff)
 										dest[x] = pal[c];
-//										dest[x] = colorbase + c;
+//                                      dest[x] = colorbase + c;
 									else
 										dest[x] = alpha_blend_r16(dest[x], pal[c], gfx_alpharange_table[c]);
-//										dest[x] = alpha_blend_r16(dest[x], colorbase + c, gfx_alpharange_table[c]);
+//                                      dest[x] = alpha_blend_r16(dest[x], colorbase + c, gfx_alpharange_table[c]);
 								}
 								x_index += dx;
 							}

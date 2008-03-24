@@ -534,9 +534,9 @@ const char *xml_normalize_string(const char *string)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    expat_malloc/expat_realloc/expat_free - 
-    wrappers for memory allocation functions so 
-    that they pass through out memory tracking 
+    expat_malloc/expat_realloc/expat_free -
+    wrappers for memory allocation functions so
+    that they pass through out memory tracking
     systems
 -------------------------------------------------*/
 
@@ -563,7 +563,7 @@ static void expat_free(void *ptr)
 static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
 {
 	XML_Memory_Handling_Suite memcallbacks;
-	
+
 	/* setup parse_info structure */
 	memset(parse_info, 0, sizeof(*parse_info));
 	if (opts != NULL)

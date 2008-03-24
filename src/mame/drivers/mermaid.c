@@ -390,6 +390,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid, 0,       mermaid, mermaid, 0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", GAME_NOT_WORKING )
-GAME( 1982, yachtmn, mermaid, mermaid, mermaid, 0, ROT0, "[Sanritsu] Esco", "Yachtsman", GAME_NOT_WORKING )
+GAME( 1982, mermaid, 0,       mermaid, mermaid, 0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", 0 )
+GAME( 1982, yachtmn, mermaid, mermaid, mermaid, 0, ROT0, "[Sanritsu] Esco", "Yachtsman", 0 )
 GAME( 1982, rougien, 0,       mermaid, mermaid, 0, ROT0, "Sanritsu", "Rougien", 0 )

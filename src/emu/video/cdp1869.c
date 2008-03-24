@@ -6,10 +6,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- convert CDP1869 into a device with video/sound
-	- add predisplay/display timers
+    - convert CDP1869 into a device with video/sound
+    - add predisplay/display timers
 
 */
 

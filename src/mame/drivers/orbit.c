@@ -263,7 +263,7 @@ static const gfx_layout orbit_lower_sprite_layout =
 
 static const gfx_layout orbit_tile_layout =
 {
-	8, 8, 
+	8, 8,
 	RGN_FRAC(1,1),
 	1,
 	{ 0 },
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_CPU_ADD(M6800, MASTER_CLOCK / 16)
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
 	MDRV_CPU_VBLANK_INT("main", orbit_interrupt)
-	
+
 	MDRV_TIMER_ADD_SCANLINE("32V", nmi_32v, "main", 0, 32)
 
 	MDRV_MACHINE_RESET(orbit)
