@@ -538,11 +538,11 @@ static const struct MSM5205interface msm5205_interface_2 =
 static MACHINE_DRIVER_START( cabal )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 20000000/2) /* verified on pcb */
+	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem_cpu,writemem_cpu)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 3579580) /* verified on pcb */
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	/* audio CPU */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
 
@@ -565,15 +565,15 @@ static MACHINE_DRIVER_START( cabal )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579580) /* verified on pcb */
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(seibu_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000)
+	MDRV_SOUND_ADD(CUSTOM, 8000) /* it should use the msm5205 */
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 
-	MDRV_SOUND_ADD(CUSTOM, 8000)
+	MDRV_SOUND_ADD(CUSTOM, 8000) /* it should use the msm5205 */
 	MDRV_SOUND_CONFIG(seibu_adpcm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.40)
 MACHINE_DRIVER_END
@@ -583,20 +583,20 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cabalbl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz */
+	MDRV_CPU_ADD(M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_cpu,cabalbl_writemem_cpu)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_readmem_sound,cabalbl_writemem_sound)
 
 	/* there are 2x z80s for the ADPCM */
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_talk1_map,0)
 	MDRV_CPU_IO_MAP(cabalbl_talk1_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
-	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cabalbl_talk2_map,0)
 	MDRV_CPU_IO_MAP(cabalbl_talk2_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
@@ -622,15 +622,15 @@ static MACHINE_DRIVER_START( cabalbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579580)
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(cabalbl_ym2151_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD(MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
 	MDRV_SOUND_CONFIG(msm5205_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_SOUND_ADD(MSM5205, 384000)
+	MDRV_SOUND_ADD(MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
 	MDRV_SOUND_CONFIG(msm5205_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
