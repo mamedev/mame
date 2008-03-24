@@ -1539,12 +1539,13 @@ static const struct PSXSPUinterface konami573_psxspu_interface =
 
 static void update_mode( void )
 {
-	int mode = readinputportbytag( "MODE" );
+	int cart = readinputportbytag( "CART" );
+	int cd = readinputportbytag( "CD" );
 	static SCSIInstance *new_cdrom;
 
 	if( chiptype[ 1 ] != 0 )
 	{
-		security_cart_number = mode;
+		security_cart_number = cart;
 	}
 	else
 	{
@@ -1553,7 +1554,7 @@ static void update_mode( void )
 
 	if( available_cdroms[ 1 ] != NULL )
 	{
-		new_cdrom = available_cdroms[ mode ];
+		new_cdrom = available_cdroms[ cd ];
 	}
 	else
 	{
@@ -2834,10 +2835,15 @@ static INPUT_PORTS_START( konami573 )
 	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 //  PORT_BIT( 0xf0fff0ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("MODE")
-	PORT_CONFNAME( 1, 0, "Mode" )
+	PORT_START_TAG("CART")
+	PORT_CONFNAME( 1, 0, "Security Cart" )
 	PORT_CONFSETTING( 0, "Install" )
 	PORT_CONFSETTING( 1, "Game" )
+
+	PORT_START_TAG("CD")
+	PORT_CONFNAME( 1, 0, "CD" )
+	PORT_CONFSETTING( 0, "1" )
+	PORT_CONFSETTING( 1, "2" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fbaitbc )
@@ -3725,6 +3731,30 @@ ROM_START( drmn2m )
 	DISK_IMAGE_READONLY( "912jab", 0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
 ROM_END
 
+ROM_START( drmn2mpu )
+	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0000224, REGION_USER2, 0 ) /* install security cart eeprom */
+	ROM_LOAD( "ge912ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(1246fe5b) SHA1(b58d4f4c95e13abf639d645223565544bd79a58a) )
+
+	ROM_REGION( 0x0001014, REGION_USER8, 0 ) /* game security cart eeprom */
+	ROM_LOAD( "gn912ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(34deea99) SHA1(f179e22eaf30453bb94177ed9c25d7996f020c99) )
+
+	ROM_REGION( 0x1000000, REGION_USER3, 0 ) /* onboard flash */
+	ROM_FILL( 0x0000000, 0x1000000, 0xff )
+
+	ROM_REGION( 0x000008, REGION_USER9, 0 ) /* install security cart id */
+	ROM_LOAD( "ge912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
+
+	ROM_REGION( 0x000008, REGION_USER10, 0 ) /* game security cart id */
+	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( REGION_DISKS )
+	DISK_IMAGE_READONLY( "912jab",  0, BAD_DUMP MD5(60dadc836f00f22d50b5b634250aa624) SHA1(5316b2e2e89af7bc038a3febc91525edac91fe7e) )
+	DISK_IMAGE_READONLY( "912za01", 1, BAD_DUMP MD5(1d3fa130a3a6c8433c276e609b373e4f) SHA1(121ca6df16084a01c88ef26167b13053c9adc7ce) )
+ROM_END
+
 ROM_START( drmn3m )
 	ROM_REGION32_LE( 0x080000, REGION_USER1, 0 )
 	SYS573_BIOS_A
@@ -4434,7 +4464,8 @@ GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami"
 GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
 GAME( 1999, dsfdct,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, dsfdcta,  dsfdct,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
+GAME( 1999, drmn2mpu, drmn2m,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */

@@ -2931,7 +2931,8 @@ V-V                           TP-027
 	DRIVER( ddrs2kj )	/* 1999 - Dance Dance Revolution Solo 2000 (GC905 VER. JAA) */
 	DRIVER( dsfdct )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JCA) */
 	DRIVER( dsfdcta )	/* 1999 - Dancing Stage featuring Dreams Come True (GC910 VER. JAA) */
-	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAA) */
+	DRIVER( drmn2m )	/* 1999 - DrumMania 2nd Mix (GE912 VER. JAB) */
+	DRIVER( drmn2mpu )	/* 1999 - DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB) */
 	DRIVER( dncfrks )	/* 2000 - Dance Freaks (G*874 VER. KAA) */
 	DRIVER( dmx )		/* 2000 - Dance Maniax (G*874 VER. JAA) */
 	DRIVER( gtrfrk3m )	/* 2000 - Guitar Freaks 3rd Mix (GE949 VER. JAC) */
