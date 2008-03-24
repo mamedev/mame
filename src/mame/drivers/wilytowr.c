@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(wilytwr_palbank_w)
 	AM_RANGE(0xf006, 0xf007) AM_WRITE(coin_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(watchdog_reset_w)	/* unknown (cleared by NMI handler) */
+	AM_RANGE(0xf801, 0xf801) AM_WRITE(SMH_NOP)	/* continues game when in stop mode (cleared by NMI handler) */
 	AM_RANGE(0xf803, 0xf803) AM_WRITE(snd_irq_w)
 ADDRESS_MAP_END
 

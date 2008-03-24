@@ -305,7 +305,6 @@ INPUT_PORTS_END
 
 /* same as Turtles, but dip switches are different. */
 static INPUT_PORTS_START( turpin )
-	PORT_START_TAG("IN0")
 	PORT_INCLUDE( turtles )
 
 	PORT_MODIFY("IN1")
