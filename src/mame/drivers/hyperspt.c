@@ -362,7 +362,7 @@ static INPUT_PORTS_START( roadf )
 /* 0x00 disables Coin 2. It still accepts coins and makes the sound, but
    it doesn't give you any credit */
 
-	PORT_START_TAG("IN1")
+	PORT_START_TAG("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )

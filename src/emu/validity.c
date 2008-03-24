@@ -1016,6 +1016,8 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
 	const input_port_entry *inp, *last_dipname_entry = NULL;
 	const game_driver *driver = drivers[drivnum];
+	const char *tag[MAX_INPUT_PORTS] = { 0 };
+	int portnum = 0;
 	int empty_string_found = FALSE;
 	int last_strindex = 0;
 	quark_entry *entry;
@@ -1043,6 +1045,24 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 	for (inp = *memory; inp->type != IPT_END; inp++)
 	{
 		int strindex = 0;
+		
+		/* check for duplicate tags */
+		if (inp->type == IPT_PORT)
+		{
+			if (inp->start.tag != NULL && portnum < ARRAY_LENGTH(tag))
+			{
+				int scanport;
+
+				for (scanport = 0; scanport < portnum - 1; scanport++)
+					if (strcmp(inp->start.tag, tag[scanport]) == 0)
+					{
+						mame_printf_error("%s: %s has a duplicate input port tag \"%s\"\n", driver->source_file, driver->name, inp->start.tag);
+						error = TRUE;
+					}
+				tag[portnum++] = inp->start.tag;
+			}
+			continue;
+		}
 
 		if (port_type_is_analog(inp->type))
 		{
@@ -1148,7 +1168,7 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 		}
 
 		/* clear the DIP switch tracking when we hit the first non-DIP entry */
-		if (last_dipname_entry && inp->type != IPT_DIPSWITCH_SETTING)
+		if (last_dipname_entry != NULL && inp->type != IPT_DIPSWITCH_SETTING)
 			last_dipname_entry = NULL;
 
 		/* look for invalid (0) types which should be mapped to IPT_OTHER */
@@ -1159,7 +1179,7 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 		}
 
 		/* if this entry doesn't have a name, we don't care about the rest of this stuff */
-		if (!inp->name || inp->name == IP_NAME_DEFAULT)
+		if (inp->name == NULL || inp->name == IP_NAME_DEFAULT)
 		{
 			/* not allowed for dipswitches */
 			if (inp->type == IPT_DIPSWITCH_NAME || inp->type == IPT_DIPSWITCH_SETTING)
@@ -1172,7 +1192,7 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 		}
 
 		/* check for empty string */
-		if (!inp->name[0] && !empty_string_found)
+		if (inp->name[0] == 0 && !empty_string_found)
 		{
 			mame_printf_error("%s: %s has an input with an empty string\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -1180,7 +1200,7 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 		}
 
 		/* check for trailing spaces */
-		if (inp->name[0] && inp->name[strlen(inp->name) - 1] == ' ')
+		if (inp->name[0] != 0 && inp->name[strlen(inp->name) - 1] == ' ')
 		{
 			mame_printf_error("%s: %s input '%s' has trailing spaces\n", driver->source_file, driver->name, inp->name);
 			error = TRUE;
