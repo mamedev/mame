@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 static tilemap *text_layer;
 static tilemap *back_layer;
@@ -208,8 +207,8 @@ WRITE32_HANDLER( palette_dma_start_w )
 			UINT32 color = spimainram[(video_dma_address / 4) + i - 0x200];
 			if (palette_ram[i] != color) {
 				palette_ram[i] = color;
-				palette_set_color_rgb( Machine, (i * 2), pal5bit(palette_ram[i] >> 0), pal5bit(palette_ram[i] >> 5), pal5bit(palette_ram[i] >> 10) );
-				palette_set_color_rgb( Machine, (i * 2) + 1, pal5bit(palette_ram[i] >> 16), pal5bit(palette_ram[i] >> 21), pal5bit(palette_ram[i] >> 26) );
+				palette_set_color_rgb( machine, (i * 2), pal5bit(palette_ram[i] >> 0), pal5bit(palette_ram[i] >> 5), pal5bit(palette_ram[i] >> 10) );
+				palette_set_color_rgb( machine, (i * 2) + 1, pal5bit(palette_ram[i] >> 16), pal5bit(palette_ram[i] >> 21), pal5bit(palette_ram[i] >> 26) );
 			}
 		}
 	}
@@ -233,8 +232,9 @@ WRITE32_HANDLER( video_dma_address_w )
 	COMBINE_DATA( &video_dma_address );
 }
 
-static void draw_blend_gfx(bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
+static void draw_blend_gfx(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy)
 {
+	const pen_t *pens = &machine->pens[gfx->color_base];
 	UINT8 *dp;
 	int i, j;
 	int x1, x2;
@@ -319,7 +319,7 @@ static void draw_blend_gfx(bitmap_t *bitmap, const rectangle *cliprect, const gf
 	// draw
 	for (j=y1; j <= y2; j++)
 	{
-		UINT16 *p = BITMAP_ADDR16(bitmap, j, 0);
+		UINT32 *p = BITMAP_ADDR32(bitmap, j, 0);
 		int dp_i = (py * width) + px;
 		py += yd;
 
@@ -332,11 +332,11 @@ static void draw_blend_gfx(bitmap_t *bitmap, const rectangle *cliprect, const gf
 				UINT8 alpha = alpha_table[global_pen];
 				if (alpha)
 				{
-					p[i] = alpha_blend16(p[i], Machine->pens[gfx->color_base + global_pen]);
+					p[i] = alpha_blend_r32(p[i], pens[global_pen], 0x7f);
 				}
 				else
 				{
-					p[i] = Machine->pens[gfx->color_base + global_pen];
+					p[i] = pens[global_pen];
 				}
 			}
 			dp_i += xd;
@@ -407,11 +407,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 		for( x=x1; x < width; x++ ) {
 			for( y=y1; y < height; y++ ) {
-				draw_blend_gfx(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
+				draw_blend_gfx(machine, bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
 
 				/* xpos seems to wrap-around to 0 at 512 */
 				if( (xpos + (16 * x) + 16) >= 512 ) {
-					draw_blend_gfx(bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos - 512 + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
+					draw_blend_gfx(machine, bitmap, cliprect, gfx, tile_num, color, flip_x, flip_y, xpos - 512 + sprite_xtable[flip_x][x], ypos + sprite_ytable[flip_y][y]);
 				}
 
 				tile_num++;
@@ -566,7 +566,7 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 {
 	int i,j;
 	UINT16 *s;
-	UINT16 *d;
+	UINT32 *d;
 	UINT8 *t;
 	UINT32 xscroll_mask, yscroll_mask;
 	bitmap_t *pen_bitmap;
@@ -577,8 +577,6 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 	xscroll_mask = pen_bitmap->width - 1;
 	yscroll_mask = pen_bitmap->height - 1;
 
-	alpha_set_level(0x7f);
-
 	for (j=cliprect->min_y; j <= cliprect->max_y; j++)
 	{
 		int rx = x;
@@ -587,7 +585,7 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 			rx += rowscroll[(j+y) & yscroll_mask];
 		}
 
-		d = BITMAP_ADDR16(bitmap, j, 0);
+		d = BITMAP_ADDR32(bitmap, j, 0);
 		s = BITMAP_ADDR16(pen_bitmap, (j+y) & yscroll_mask, 0);
 		t = BITMAP_ADDR8(flags_bitmap, (j+y) & yscroll_mask, 0);
 		for (i=cliprect->min_x+rx; i <= cliprect->max_x+rx; i++)
@@ -598,7 +596,7 @@ static void combine_tilemap(running_machine *machine, bitmap_t *bitmap, const re
 				UINT8 alpha = alpha_table[pen];
 				if (alpha)
 				{
-					*d = alpha_blend16(*d, machine->pens[pen]);
+					*d = alpha_blend_r32(*d, machine->pens[pen], 0x7f);
 				}
 				else
 				{

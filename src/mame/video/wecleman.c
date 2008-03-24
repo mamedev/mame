@@ -28,6 +28,7 @@ struct sprite
 	int line_offset;
 
 	const pen_t *pal_data;
+	rgb_t pal_base;
 
 	int x_offset, y_offset;
 	int tile_width, tile_height;
@@ -137,7 +138,8 @@ static void get_sprite_info(running_machine *machine)
 		code = source[0x06/2];
 		zoom = source[0x08/2];
 
-		sprite->pal_data = base_pal + ((source[0x0e/2] & 0xff) << 4);
+		sprite->pal_base = (source[0x0e/2] & 0xff) << 4;
+		sprite->pal_data = base_pal + sprite->pal_base;
 
 		gfx = (wecleman_gfx_bank[bank] << 15) + (code & 0x7fff);
 
@@ -198,7 +200,7 @@ static void sortsprite(int *idx_array, int *key_array, int size)
 }
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
-static void do_blit_zoom16(bitmap_t *bitmap, const rectangle *cliprect, struct sprite *sprite)
+static void do_blit_zoom32(bitmap_t *bitmap, const rectangle *cliprect, struct sprite *sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -275,56 +277,80 @@ static void do_blit_zoom16(bitmap_t *bitmap, const rectangle *cliprect, struct s
 	// pre-loop assignments and adjustments
 	pal_base = sprite->pal_data;
 
-	x1 -= dx;
-	x2 -= dx;
+	if (x1 > cliprect->min_x)
+	{
+		x1 -= dx;
+		x2 -= dx;
+	}
 
 	for (sy = y1; sy != y2; sy += dy)
 	{
 		UINT8 *row_base = sprite->pen_data + (src_f0y>>PRECISION_Y) * sprite->line_offset;
-		UINT16 *dst_ptr = BITMAP_ADDR16(bitmap, sy, 0);
 		src_fpx = src_f0x;
 
-		if (!sprite->shadow_mode)
+		if (bitmap->format == BITMAP_FORMAT_RGB32)	// Wec Le Mans
 		{
-			for (sx = x1; sx != x2; sx += dx)
+			UINT32 *dst_ptr = BITMAP_ADDR32(bitmap, sy, 0);
+
+			if (!sprite->shadow_mode)
 			{
-				int pix = row_base[src_fpx >> PRECISION_X];
-				if (pix & 0x80) break;
-				if (pix)
-					dst_ptr[sx] = pal_base[pix];
-				src_fpx += src_fdx;
-			}
-		}
-		else if (gameid == 0)	// Wec Le Mans
-		{
-			for (sx = x1; sx != x2; sx += dx)
-			{
-				int pix = row_base[src_fpx >> PRECISION_X];
-				if (pix & 0x80) break;
-				if (pix)
+				for (sx = x1; sx != x2; sx += dx)
 				{
-					if (pix != 0xa)
+					int pix = row_base[src_fpx >> PRECISION_X];
+					if (pix & 0x80) break;
+					if (pix)
 						dst_ptr[sx] = pal_base[pix];
-					else
-						dst_ptr[sx] = rgb_half[dst_ptr[sx]];
+					src_fpx += src_fdx;
 				}
-				src_fpx += src_fdx;
+			}
+			else
+			{
+				for (sx = x1; sx != x2; sx += dx)
+				{
+					int pix = row_base[src_fpx >> PRECISION_X];
+					if (pix & 0x80) break;
+					if (pix)
+					{
+						if (pix != 0xa)
+							dst_ptr[sx] = pal_base[pix];
+						else
+							dst_ptr[sx] = (dst_ptr[sx] >> 1) & MAKE_RGB(0x7f,0x7f,0x7f);
+					}
+					src_fpx += src_fdx;
+				}
 			}
 		}
 		else	// Hot Chase
 		{
-			for (sx = x1; sx != x2; sx += dx)
+			UINT16 *dst_ptr = BITMAP_ADDR16(bitmap, sy, 0);
+			pen_t base = sprite->pal_base;
+
+			if (!sprite->shadow_mode)
 			{
-				int pix = row_base[src_fpx >> PRECISION_X];
-				if (pix & 0x80) break;
-				if (pix)
+				for (sx = x1; sx != x2; sx += dx)
 				{
-					if (pix != 0xa)
-						dst_ptr[sx] = pal_base[pix];
-					else
-						dst_ptr[sx] |= 0x800;
+					int pix = row_base[src_fpx >> PRECISION_X];
+					if (pix & 0x80) break;
+					if (pix)
+						dst_ptr[sx] = base + pix;
+					src_fpx += src_fdx;
 				}
-				src_fpx += src_fdx;
+			}
+			else
+			{
+				for (sx = x1; sx != x2; sx += dx)
+				{
+					int pix = row_base[src_fpx >> PRECISION_X];
+					if (pix & 0x80) break;
+					if (pix)
+					{
+						if (pix != 0xa)
+							dst_ptr[sx] = base + pix;
+						else
+							dst_ptr[sx] |= 0x800;
+					}
+					src_fpx += src_fdx;
+				}
 			}
 		}
 
@@ -340,11 +366,11 @@ static void sprite_draw(bitmap_t *bitmap, const rectangle *cliprect)
 	{
 		sortsprite(spr_idx_list, spr_pri_list, spr_count);
 
-		for (i=0; i<spr_count; i++) do_blit_zoom16(bitmap, cliprect, spr_ptr_list[spr_idx_list[i]]);
+		for (i=0; i<spr_count; i++) do_blit_zoom32(bitmap, cliprect, spr_ptr_list[spr_idx_list[i]]);
 	}
 	else	// Hot Chase
 	{
-		for (i=0; i<spr_count; i++) do_blit_zoom16(bitmap, cliprect, spr_ptr_list[i]);
+		for (i=0; i<spr_count; i++) do_blit_zoom32(bitmap, cliprect, spr_ptr_list[i]);
 	}
 }
 
@@ -573,8 +599,9 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 		// draw sky; each scanline is assumed to be dword aligned
 		for (sy=cliprect->min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
 		{
-			UINT16 *dst = BITMAP_ADDR16(bitmap, sy+BMP_PAD, BMP_PAD);
-			UINT16 pix, road;
+			UINT32 *dst = BITMAP_ADDR32(bitmap, sy+BMP_PAD, BMP_PAD);
+			UINT32 pix;
+			UINT16 road;
 
 			road = wecleman_roadram[sy];
 			if ((road>>8) != 0x02) continue;
@@ -599,8 +626,9 @@ static void wecleman_draw_road(running_machine *machine, bitmap_t *bitmap, const
 
 		for (sy=cliprect->min_y-BMP_PAD; sy<DST_HEIGHT; sy++)
 		{
-			UINT16 *dst = BITMAP_ADDR16(bitmap, sy+BMP_PAD, BMP_PAD);
-			UINT16 pix, road;
+			UINT32 *dst = BITMAP_ADDR32(bitmap, sy+BMP_PAD, BMP_PAD);
+			UINT32 pix;
+			UINT16 road;
 
 			road = wecleman_roadram[sy];
 			if ((road>>8) != 0x04) continue;
@@ -654,12 +682,13 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 				 int alpha, int pal_offset )	// alpha(0-3f), # of color codes to shift
 {
 	UINT8 *src_base, *src_ptr;
-	UINT16 *tmap_ptr, *dst_base, *dst_ptr;
+	UINT16 *tmap_ptr;
+	UINT32 *dst_base, *dst_ptr;
 	const pen_t *pal_base, *pal_ptr;
 
 	int tilew, tileh;
 	int tmskipx, tmskipy, tmscanx, tmmaskx, tmmasky;
-	int dx, dy, dst_pitch;
+	int dx, dy;
 	int i, j, tx, ty;
 
 	if (alpha > 0x1f) return;
@@ -680,8 +709,7 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 
 	src_base = gfx->gfxdata;
 
-	dst_pitch = bitmap->rowpixels;
-	dst_base = (UINT16 *)bitmap->base + (y0+dy)*dst_pitch + (x0+dx);
+	dst_base = BITMAP_ADDR32(bitmap, y0+dy, x0+dx);
 
 	pal_base = machine->pens + pal_offset * gfx->color_granularity;
 
@@ -716,24 +744,24 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 					{
 						UINT8 srcpix = *src_ptr++;
 						pen_t srcrgb = pal_ptr[srcpix];
-						UINT16 dstrgb = dst_ptr[tx];
+						UINT32 dstrgb = dst_ptr[tx];
 						int sr, sg, sb, dr, dg, db;
 
-						sr = (srcrgb >> 0) & 0x1f;
-						sg = (srcrgb >> 5) & 0x1f;
-						sb = (srcrgb >> 10) & 0x1f;
+						sr = (srcrgb >> 3) & 0x1f;
+						sg = (srcrgb >> 11) & 0x1f;
+						sb = (srcrgb >> 19) & 0x1f;
 
-						dr = (dstrgb >> 0) & 0x1f;
-						dg = (dstrgb >> 5) & 0x1f;
-						db = (dstrgb >> 10) & 0x1f;
+						dr = (dstrgb >> 3) & 0x1f;
+						dg = (dstrgb >> 11) & 0x1f;
+						db = (dstrgb >> 19) & 0x1f;
 
 						dr = (t32x32pm[dr - sr + alpha] >> 5) + dr;
 						dg = (t32x32pm[dg - sg + alpha] >> 5) + dg;
 						db = (t32x32pm[db - sb + alpha] >> 5) + db;
 
-						dst_ptr[tx] = dr | (dg << 5) | (db << 10);
+						dst_ptr[tx] = MAKE_RGB(pal5bit(db), pal5bit(dg), pal5bit(dr));
 					}
-					dst_ptr += dst_pitch;
+					dst_ptr += bitmap->rowpixels;
 				}
 			}
 
@@ -744,12 +772,12 @@ static void draw_cloud(running_machine *machine, bitmap_t *bitmap,
 				{
 					for (tx = 0; tx < tilew; tx++)
 						dst_ptr[tx] = pal_ptr[*src_ptr++];
-					dst_ptr += dst_pitch;
+					dst_ptr += bitmap->rowpixels;
 				}
 			}
 		}
 
-		dst_base += dst_pitch * tileh;
+		dst_base += bitmap->rowpixels * tileh;
 	}
 }
 
@@ -888,7 +916,7 @@ VIDEO_START( wecleman )
 	UINT8 *buffer;
 	int i, j;
 
-	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB15);
+	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 	buffer = auto_malloc(0x12c00);	// working buffer for sprite operations
 
 	gameid = 0;
