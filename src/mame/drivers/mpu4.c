@@ -1313,7 +1313,7 @@ static READ8_HANDLER( characteriser_r )
 }
 
 // generate a 50 Hz signal (based on an RC time) //////////////////////////
-static INTERRUPT_GEN( gen_50hz )
+static TIMER_DEVICE_CALLBACK( gen_50hz )
 {
 	// Although reported as a '50Hz' signal, the fact that both rising and
 	// falling edges of the pulse are used, the timer actually gives a 100Hz
@@ -1352,7 +1352,7 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_CPU_ADD_TAG("main", M6809, MPU4_MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mod2_memmap,0)
 
-	MDRV_CPU_PERIODIC_INT(gen_50hz, 100)
+	MDRV_TIMER_ADD_PERIODIC("50HZ",gen_50hz, HZ(100))
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD_TAG("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
