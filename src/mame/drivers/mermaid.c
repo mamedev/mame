@@ -104,6 +104,7 @@ READ8_HANDLER( mermaid_collision_r );
 PALETTE_INIT( mermaid );
 VIDEO_START( mermaid );
 VIDEO_UPDATE( mermaid );
+VIDEO_EOF( mermaid );
 
 /* Read/Write Handlers */
 
@@ -272,6 +273,7 @@ static MACHINE_DRIVER_START( mermaid )
 	MDRV_PALETTE_INIT(mermaid)
 	MDRV_VIDEO_START(mermaid)
 	MDRV_VIDEO_UPDATE(mermaid)
+	MDRV_VIDEO_EOF(mermaid)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
