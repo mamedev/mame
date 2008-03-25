@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
-#include "includes/galaxian.h"
+#include "includes/galaxold.h"
 
 static UINT8 moonwar_port_select;
 

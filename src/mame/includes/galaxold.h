@@ -13,18 +13,18 @@
 
 /*----------- defined in video/galaxian.c -----------*/
 
-extern UINT8 *galaxian_videoram;
-extern UINT8 *galaxian_spriteram;
-extern UINT8 *galaxian_spriteram2;
-extern UINT8 *galaxian_attributesram;
-extern UINT8 *galaxian_bulletsram;
+extern UINT8 *galaxold_videoram;
+extern UINT8 *galaxold_spriteram;
+extern UINT8 *galaxold_spriteram2;
+extern UINT8 *galaxold_attributesram;
+extern UINT8 *galaxold_bulletsram;
 extern UINT8 *rockclim_videoram;
 extern UINT8 *racknrol_tiles_bank;
 
 
-extern size_t galaxian_spriteram_size;
-extern size_t galaxian_spriteram2_size;
-extern size_t galaxian_bulletsram_size;
+extern size_t galaxold_spriteram_size;
+extern size_t galaxold_spriteram2_size;
+extern size_t galaxold_bulletsram_size;
 
 PALETTE_INIT( galaxian );
 PALETTE_INIT( scramble );
@@ -38,16 +38,16 @@ PALETTE_INIT( mariner );
 PALETTE_INIT( frogger );
 PALETTE_INIT( rockclim );
 
-WRITE8_HANDLER( galaxian_videoram_w );
-READ8_HANDLER( galaxian_videoram_r );
+WRITE8_HANDLER( galaxold_videoram_w );
+READ8_HANDLER( galaxold_videoram_r );
 
 WRITE8_HANDLER( rockclim_videoram_w );
 WRITE8_HANDLER( rockclim_scroll_w );
 READ8_HANDLER( rockclim_videoram_r );
 
-WRITE8_HANDLER( galaxian_attributesram_w );
+WRITE8_HANDLER( galaxold_attributesram_w );
 
-WRITE8_HANDLER( galaxian_stars_enable_w );
+WRITE8_HANDLER( galaxold_stars_enable_w );
 WRITE8_HANDLER( scramble_background_enable_w );
 WRITE8_HANDLER( scramble_background_red_w );
 WRITE8_HANDLER( scramble_background_green_w );
@@ -56,7 +56,7 @@ WRITE8_HANDLER( hotshock_flip_screen_w );
 WRITE8_HANDLER( darkplnt_bullet_color_w );
 WRITE8_HANDLER( racknrol_tiles_bank_w );
 
-VIDEO_START( galaxian_plain );
+VIDEO_START( galaxold_plain );
 VIDEO_START( galaxian );
 VIDEO_START( gmgalax );
 VIDEO_START( mooncrst );
@@ -93,9 +93,9 @@ VIDEO_START( ad2083 );
 
 VIDEO_UPDATE( galaxian );
 
-WRITE8_HANDLER( galaxian_gfxbank_w );
-WRITE8_HANDLER( galaxian_flip_screen_x_w );
-WRITE8_HANDLER( galaxian_flip_screen_y_w );
+WRITE8_HANDLER( galaxold_gfxbank_w );
+WRITE8_HANDLER( galaxold_flip_screen_x_w );
+WRITE8_HANDLER( galaxold_flip_screen_y_w );
 WRITE8_HANDLER( gteikob2_flip_screen_x_w );
 WRITE8_HANDLER( gteikob2_flip_screen_y_w );
 
@@ -119,17 +119,17 @@ DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
 DRIVER_INIT( gmgalax );
 
-WRITE8_HANDLER( galaxian_nmi_enable_w );
+WRITE8_HANDLER( galaxold_nmi_enable_w );
 
 MACHINE_RESET( galaxian );
 MACHINE_RESET( devilfsg );
 
-WRITE8_HANDLER( galaxian_coin_lockout_w );
-WRITE8_HANDLER( galaxian_coin_counter_w );
-#define galaxian_coin_counter_0_w galaxian_coin_counter_w
-WRITE8_HANDLER( galaxian_coin_counter_1_w );
-WRITE8_HANDLER( galaxian_coin_counter_2_w );
-WRITE8_HANDLER( galaxian_leds_w );
+WRITE8_HANDLER( galaxold_coin_lockout_w );
+WRITE8_HANDLER( galaxold_coin_counter_w );
+#define galaxold_coin_counter_0_w galaxold_coin_counter_w
+WRITE8_HANDLER( galaxold_coin_counter_1_w );
+WRITE8_HANDLER( galaxold_coin_counter_2_w );
+WRITE8_HANDLER( galaxold_leds_w );
 
 READ8_HANDLER( scramblb_protection_1_r );
 READ8_HANDLER( scramblb_protection_2_r );

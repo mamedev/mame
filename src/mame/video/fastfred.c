@@ -11,9 +11,9 @@
 #include "video/resnet.h"
 #include "fastfred.h"
 
-extern UINT8 galaxian_stars_on;
-void galaxian_init_stars(running_machine *machine, int colors_offset);
-void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap);
+extern UINT8 galaxold_stars_on;
+void galaxold_init_stars(running_machine *machine, int colors_offset);
+void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap);
 
 UINT8 *fastfred_videoram;
 UINT8 *fastfred_spriteram;
@@ -380,8 +380,8 @@ VIDEO_START( imago )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
 	/* the game has a galaxian starfield */
-	galaxian_init_stars(machine, 256);
-	galaxian_stars_on = 1;
+	galaxold_init_stars(machine, 256);
+	galaxold_stars_on = 1;
 
 	/* web colors */
 	palette_set_color(machine,256+64+0,MAKE_RGB(0x50,0x00,0x00));
@@ -391,7 +391,7 @@ VIDEO_START( imago )
 VIDEO_UPDATE( imago )
 {
 	tilemap_draw(bitmap,cliprect,web_tilemap,0,0);
-	galaxian_draw_stars(screen->machine, bitmap);
+	galaxold_draw_stars(screen->machine, bitmap);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);

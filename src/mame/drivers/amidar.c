@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "galaxian.h"
+#include "galaxold.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 
@@ -93,18 +93,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x93ff) AM_WRITE(galaxian_videoram_w) AM_BASE(&galaxian_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxian_attributesram_w) AM_BASE(&galaxian_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&galaxian_spriteram) AM_SIZE(&galaxian_spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x9840, 0x985f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x9860, 0x98ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(scramble_background_red_w)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(galaxian_nmi_enable_w)
-	AM_RANGE(0xa010, 0xa010) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xa018, 0xa018) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xa010, 0xa010) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0xa018, 0xa018) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa020, 0xa020) AM_WRITE(scramble_background_green_w)
 	AM_RANGE(0xa028, 0xa028) AM_WRITE(scramble_background_blue_w)
-	AM_RANGE(0xa030, 0xa030) AM_WRITE(galaxian_coin_counter_0_w)
-	AM_RANGE(0xa038, 0xa038) AM_WRITE(galaxian_coin_counter_1_w)
+	AM_RANGE(0xa030, 0xa030) AM_WRITE(galaxold_coin_counter_0_w)
+	AM_RANGE(0xa038, 0xa038) AM_WRITE(galaxold_coin_counter_1_w)
 	AM_RANGE(0xb000, 0xb03f) AM_WRITE(amidar_ppi8255_0_w)
 	AM_RANGE(0xb800, 0xb83f) AM_WRITE(amidar_ppi8255_1_w)
 ADDRESS_MAP_END

@@ -11,7 +11,7 @@ Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 #include "driver.h"
 
 #include "cpu/z80/z80.h"
-#include "galaxian.h"
+#include "galaxold.h"
 
 
 PALETTE_INIT( dambustr );
@@ -36,7 +36,7 @@ static ADDRESS_MAP_START( dambustr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd000, 0xd3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd400, 0xd7ff) AM_READ(galaxian_videoram_r)
+	AM_RANGE(0xd400, 0xd7ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0xd800, 0xd8ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0xe800, 0xefff) AM_READ(input_port_1_r)
@@ -50,22 +50,22 @@ static ADDRESS_MAP_START( dambustr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(galaxian_videoram_w) AM_BASE(&galaxian_videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_WRITE(galaxian_attributesram_w) AM_BASE(&galaxian_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_WRITE(SMH_RAM) AM_BASE(&galaxian_spriteram) AM_SIZE(&galaxian_spriteram_size)
-	AM_RANGE(0xd860, 0xd87f) AM_WRITE(SMH_RAM) AM_BASE(&galaxian_bulletsram) AM_SIZE(&galaxian_bulletsram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
+	AM_RANGE(0xd860, 0xd87f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0xd880, 0xd8ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(galaxian_coin_counter_w)
+	AM_RANGE(0xe002, 0xe003) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0xe004, 0xe007) AM_WRITE(galaxian_lfo_freq_w)
 	AM_RANGE(0xe800, 0xe802) AM_WRITE(galaxian_background_enable_w)
 	AM_RANGE(0xe803, 0xe803) AM_WRITE(dambustr_noise_enable_w)
 	AM_RANGE(0xe804, 0xe804) AM_WRITE(galaxian_shoot_enable_w)	// probably louder than normal shot
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(galaxian_shoot_enable_w)	// normal shot (like Galaxian)
 	AM_RANGE(0xe806, 0xe807) AM_WRITE(galaxian_vol_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(galaxian_nmi_enable_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(galaxian_stars_enable_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(galaxian_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(galaxold_stars_enable_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(galaxian_pitch_w)
 ADDRESS_MAP_END
 

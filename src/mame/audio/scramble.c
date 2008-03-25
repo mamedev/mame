@@ -19,7 +19,7 @@
 #include "sound/5110intf.h"
 #include "sound/tms5110.h"
 #include "sound/ay8910.h"
-#include "includes/galaxian.h"
+#include "includes/galaxold.h"
 
 #define AD2083_TMS5110_CLOCK 		XTAL_640kHz
 

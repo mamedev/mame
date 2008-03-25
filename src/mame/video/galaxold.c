@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "includes/galaxian.h"
+#include "includes/galaxold.h"
 
 static const rectangle _spritevisiblearea =
 {
@@ -27,15 +27,15 @@ static const rectangle* spritevisibleareaflipx;
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
 
 
-UINT8 *galaxian_videoram;
-UINT8 *galaxian_spriteram;
-UINT8 *galaxian_spriteram2;
-UINT8 *galaxian_attributesram;
-UINT8 *galaxian_bulletsram;
+UINT8 *galaxold_videoram;
+UINT8 *galaxold_spriteram;
+UINT8 *galaxold_spriteram2;
+UINT8 *galaxold_attributesram;
+UINT8 *galaxold_bulletsram;
 UINT8 *rockclim_videoram;
-size_t galaxian_spriteram_size;
-size_t galaxian_spriteram2_size;
-size_t galaxian_bulletsram_size;
+size_t galaxold_spriteram_size;
+size_t galaxold_spriteram2_size;
+size_t galaxold_bulletsram_size;
 
 
 static TILE_GET_INFO( get_tile_info );
@@ -99,16 +99,16 @@ struct star
 };
 static struct star stars[STAR_COUNT];
 static int stars_colors_start;
-       UINT8 galaxian_stars_on;
+       UINT8 galaxold_stars_on;
 static INT32 stars_scrollpos;
 static UINT8 stars_blink_state;
 static emu_timer *stars_blink_timer;
 static emu_timer *stars_scroll_timer;
 static UINT8 timer_adjusted;
-       void galaxian_init_stars(running_machine *machine, int colors_offset);
+       void galaxold_init_stars(running_machine *machine, int colors_offset);
 static void (*draw_stars)(running_machine *machine, bitmap_t *, const rectangle *);		/* function to call to draw the star layer */
 static void     noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-       void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
+       void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
@@ -119,7 +119,7 @@ static void start_stars_scroll_timer(running_machine *machine);
 /* bullets circuit */
 static UINT8 darkplnt_bullet_color;
 static void (*draw_bullets)(bitmap_t *,int,int,int,const rectangle *);	/* function to call to draw a bullet */
-static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
+static void galaxold_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 static void   theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
@@ -130,7 +130,7 @@ static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 static UINT8 background_enable;
 static UINT8 background_red, background_green, background_blue;
 static void (*draw_background)(bitmap_t *, const rectangle *cliprect);	/* function to call to draw the background */
-static void galaxian_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
+static void galaxold_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void  turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void  mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
@@ -214,7 +214,7 @@ PALETTE_INIT( galaxian )
 	}
 
 
-	galaxian_init_stars(machine, STARS_COLOR_BASE);
+	galaxold_init_stars(machine, STARS_COLOR_BASE);
 
 
 	/* bullets - yellow and white */
@@ -500,7 +500,7 @@ static void state_save_register(void)
 	state_save_register_global(flipscreen_x);
 	state_save_register_global(flipscreen_y);
 
-	state_save_register_global(galaxian_stars_on);
+	state_save_register_global(galaxold_stars_on);
 	state_save_register_global(stars_scrollpos);
 	state_save_register_global(stars_blink_state);
 
@@ -528,7 +528,7 @@ static void video_start_common(running_machine *machine, tilemap_mapper_func get
 
 	draw_bullets = 0;
 
-	draw_background = galaxian_draw_background;
+	draw_background = galaxold_draw_background;
 	background_enable = 0;
 	background_blue = 0;
 	background_red = 0;
@@ -549,7 +549,7 @@ static void video_start_common(running_machine *machine, tilemap_mapper_func get
 	state_save_register();
 }
 
-VIDEO_START( galaxian_plain )
+VIDEO_START( galaxold_plain )
 {
 	video_start_common(machine,tilemap_scan_rows);
 
@@ -559,11 +559,11 @@ VIDEO_START( galaxian_plain )
 
 VIDEO_START( galaxian )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
-	draw_stars = galaxian_draw_stars;
+	draw_stars = galaxold_draw_stars;
 
-	draw_bullets = galaxian_draw_bullets;
+	draw_bullets = galaxold_draw_bullets;
 }
 
 VIDEO_START( gmgalax )
@@ -633,7 +633,7 @@ VIDEO_START( batman2 )
 
 VIDEO_START( scramble )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	/* FIXME: This most probably needs to be adjusted
      * again when RAW video params are added to scramble
@@ -663,7 +663,7 @@ VIDEO_START( sfx )
 
 VIDEO_START( turtles )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	draw_background = turtles_draw_background;
 }
@@ -677,7 +677,7 @@ VIDEO_START( theend )
 
 VIDEO_START( darkplnt )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	tilemap_set_scrolldx(bg_tilemap, 0, 0);
 	draw_bullets = darkplnt_draw_bullets;
@@ -703,7 +703,7 @@ VIDEO_START( minefld )
 
 VIDEO_START( stratgyx )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	draw_background = stratgyx_draw_background;
 }
@@ -717,7 +717,7 @@ VIDEO_START( ckongs )
 
 VIDEO_START( calipso )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	draw_bullets = scramble_draw_bullets;
 
@@ -728,7 +728,7 @@ VIDEO_START( calipso )
 
 VIDEO_START( mariner )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	draw_stars = mariner_draw_stars;
 
@@ -741,7 +741,7 @@ VIDEO_START( mariner )
 
 VIDEO_START( froggers )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	draw_background = frogger_draw_background;
 	modify_color = frogger_modify_color;
@@ -766,9 +766,9 @@ VIDEO_START( jumpbug )
 
 VIDEO_START( azurian )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
-	draw_stars = galaxian_draw_stars;
+	draw_stars = galaxold_draw_stars;
 	draw_bullets = scramble_draw_bullets; /* Shots are yellow like in Scramble */
 }
 
@@ -782,7 +782,7 @@ VIDEO_START( mimonkey )
 
 VIDEO_START( dkongjrm )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	modify_charcode   = pisces_modify_charcode;
 	modify_spritecode = dkongjrm_modify_spritecode;
@@ -829,13 +829,13 @@ VIDEO_START( rockclim )
 
 static TILE_GET_INFO( drivfrcg_get_tile_info )
 {
-	int code = galaxian_videoram[tile_index];
+	int code = galaxold_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & 7;
-	UINT8 bank = galaxian_attributesram[(x << 1) | 1] & 0x30;
+	UINT8 color = galaxold_attributesram[(x << 1) | 1] & 7;
+	UINT8 bank = galaxold_attributesram[(x << 1) | 1] & 0x30;
 
 	code |= (bank << 4);
-	color |= ((galaxian_attributesram[(x << 1) | 1] & 0x40) >> 3);
+	color |= ((galaxold_attributesram[(x << 1) | 1] & 0x40) >> 3);
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -857,7 +857,7 @@ VIDEO_START( drivfrcg )
 
 	draw_bullets = 0;
 
-	draw_background = galaxian_draw_background;
+	draw_background = galaxold_draw_background;
 	background_enable = 0;
 	background_blue = 0;
 	background_red = 0;
@@ -926,9 +926,9 @@ WRITE8_HANDLER( racknrol_tiles_bank_w )
 
 static TILE_GET_INFO( racknrol_get_tile_info )
 {
-	int code = galaxian_videoram[tile_index];
+	int code = galaxold_videoram[tile_index];
 	UINT8 x = tile_index & 0x1f;
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & 7;
+	UINT8 color = galaxold_attributesram[(x << 1) | 1] & 7;
 	UINT8 bank = racknrol_tiles_bank[x] & 7;
 
 	code |= (bank << 8);
@@ -953,7 +953,7 @@ VIDEO_START( racknrol )
 
 	draw_bullets = 0;
 
-	draw_background = galaxian_draw_background;
+	draw_background = galaxold_draw_background;
 	background_enable = 0;
 	background_blue = 0;
 	background_red = 0;
@@ -976,7 +976,7 @@ VIDEO_START( racknrol )
 
 VIDEO_START( bongo )
 {
-	VIDEO_START_CALL(galaxian_plain);
+	VIDEO_START_CALL(galaxold_plain);
 
 	modify_spritecode = batman2_modify_spritecode;
 }
@@ -986,7 +986,7 @@ static TILE_GET_INFO( dambustr_get_tile_info2 )
 	UINT8 x = tile_index & 0x1f;
 
 	UINT16 code = dambustr_videoram2[tile_index];
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & color_mask;
+	UINT8 color = galaxold_attributesram[(x << 1) | 1] & color_mask;
 
 	if (modify_charcode)
 	{
@@ -1029,21 +1029,21 @@ VIDEO_START( dambustr )
 }
 
 
-WRITE8_HANDLER( galaxian_videoram_w )
+WRITE8_HANDLER( galaxold_videoram_w )
 {
-	galaxian_videoram[offset] = data;
+	galaxold_videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
-READ8_HANDLER( galaxian_videoram_r )
+READ8_HANDLER( galaxold_videoram_r )
 {
-	return galaxian_videoram[offset];
+	return galaxold_videoram[offset];
 }
 
 
-WRITE8_HANDLER( galaxian_attributesram_w )
+WRITE8_HANDLER( galaxold_attributesram_w )
 {
-	if (galaxian_attributesram[offset] != data)
+	if (galaxold_attributesram[offset] != data)
 	{
 		if (offset & 0x01)
 		{
@@ -1063,12 +1063,12 @@ WRITE8_HANDLER( galaxian_attributesram_w )
 			tilemap_set_scroll(bg_tilemap, offset >> 1, data);
 		}
 
-		galaxian_attributesram[offset] = data;
+		galaxold_attributesram[offset] = data;
 	}
 }
 
 
-WRITE8_HANDLER( galaxian_flip_screen_x_w )
+WRITE8_HANDLER( galaxold_flip_screen_x_w )
 {
 	if (flipscreen_x != (data & 0x01))
 	{
@@ -1078,7 +1078,7 @@ WRITE8_HANDLER( galaxian_flip_screen_x_w )
 	}
 }
 
-WRITE8_HANDLER( galaxian_flip_screen_y_w )
+WRITE8_HANDLER( galaxold_flip_screen_y_w )
 {
 	if (flipscreen_y != (data & 0x01))
 	{
@@ -1091,19 +1091,19 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 
 WRITE8_HANDLER( gteikob2_flip_screen_x_w )
 {
-	galaxian_flip_screen_x_w(machine, offset, ~data);
+	galaxold_flip_screen_x_w(machine, offset, ~data);
 }
 
 WRITE8_HANDLER( gteikob2_flip_screen_y_w )
 {
-	galaxian_flip_screen_y_w(machine, offset, ~data);
+	galaxold_flip_screen_y_w(machine, offset, ~data);
 }
 
 
 WRITE8_HANDLER( hotshock_flip_screen_w )
 {
-	galaxian_flip_screen_x_w(machine, offset, data);
-	galaxian_flip_screen_y_w(machine, offset, data);
+	galaxold_flip_screen_x_w(machine, offset, data);
+	galaxold_flip_screen_y_w(machine, offset, data);
 }
 
 
@@ -1128,11 +1128,11 @@ WRITE8_HANDLER( scramble_background_blue_w )
 }
 
 
-WRITE8_HANDLER( galaxian_stars_enable_w )
+WRITE8_HANDLER( galaxold_stars_enable_w )
 {
-	galaxian_stars_on = data & 0x01;
+	galaxold_stars_on = data & 0x01;
 
-	if (!galaxian_stars_on)
+	if (!galaxold_stars_on)
 	{
 		stars_scrollpos = 0;
 	}
@@ -1146,7 +1146,7 @@ WRITE8_HANDLER( darkplnt_bullet_color_w )
 
 
 
-WRITE8_HANDLER( galaxian_gfxbank_w )
+WRITE8_HANDLER( galaxold_gfxbank_w )
 {
 	if (gfxbank[offset] != data)
 	{
@@ -1223,12 +1223,12 @@ static void mooncrgx_modify_charcode(UINT16 *code,UINT8 x)
 
 static void moonqsr_modify_charcode(UINT16 *code,UINT8 x)
 {
-	*code |= ((galaxian_attributesram[(x << 1) | 1] & 0x20) << 3);
+	*code |= ((galaxold_attributesram[(x << 1) | 1] & 0x20) << 3);
 }
 
 static void mshuttle_modify_charcode(UINT16 *code,UINT8 x)
 {
-	*code |= ((galaxian_attributesram[(x << 1) | 1] & 0x30) << 4);
+	*code |= ((galaxold_attributesram[(x << 1) | 1] & 0x30) << 4);
 }
 
 static void pisces_modify_charcode(UINT16 *code,UINT8 x)
@@ -1403,7 +1403,7 @@ static void frogger_modify_ypos(UINT8 *sy)
 
 /* bullet drawing functions */
 
-static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
+static void galaxold_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	int i;
 
@@ -1427,7 +1427,7 @@ static void galaxian_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 
 static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
-	galaxian_draw_bullets(bitmap, offs, 260 - x, y, cliprect);
+	galaxold_draw_bullets(bitmap, offs, 260 - x, y, cliprect);
 }
 
 static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
@@ -1496,7 +1496,7 @@ static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 
 /* background drawing functions */
 
-static void galaxian_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
+static void galaxold_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* plain black background */
 	fillbitmap(bitmap,0,cliprect);
@@ -1690,7 +1690,7 @@ static void dambustr_draw_upper_background(bitmap_t *bitmap, const rectangle *cl
 
 /* star drawing functions */
 
-void galaxian_init_stars(running_machine *machine, int colors_offset)
+void galaxold_init_stars(running_machine *machine, int colors_offset)
 {
 	int i;
 	int total_stars;
@@ -1698,7 +1698,7 @@ void galaxian_init_stars(running_machine *machine, int colors_offset)
 	int x,y;
 
 
-	galaxian_stars_on = 0;
+	galaxold_stars_on = 0;
 	stars_blink_state = 0;
 	stars_blink_timer = timer_alloc(stars_blink_callback, NULL);
 	stars_scroll_timer = timer_alloc(stars_scroll_callback, NULL);
@@ -1777,7 +1777,7 @@ static void noop_draw_stars(running_machine *machine, bitmap_t *bitmap, const re
 {
 }
 
-void galaxian_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+void galaxold_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
@@ -1998,7 +1998,7 @@ static void start_stars_blink_timer(double ra, double rb, double c)
 
 static TIMER_CALLBACK( stars_scroll_callback )
 {
-	if (galaxian_stars_on)
+	if (galaxold_stars_on)
 	{
 		stars_scrollpos++;
 	}
@@ -2015,8 +2015,8 @@ static TILE_GET_INFO( get_tile_info )
 {
 	UINT8 x = tile_index & 0x1f;
 
-	UINT16 code = galaxian_videoram[tile_index];
-	UINT8 color = galaxian_attributesram[(x << 1) | 1] & color_mask;
+	UINT16 code = galaxold_videoram[tile_index];
+	UINT8 color = galaxold_attributesram[(x << 1) | 1] & color_mask;
 
 	if (modify_charcode)
 	{
@@ -2042,12 +2042,12 @@ static void draw_bullets_common(bitmap_t *bitmap, const rectangle *cliprect)
 	int offs;
 
 
-	for (offs = 0;offs < galaxian_bulletsram_size;offs += 4)
+	for (offs = 0;offs < galaxold_bulletsram_size;offs += 4)
 	{
 		UINT8 sx,sy;
 
-		sy = 255 - galaxian_bulletsram[offs + 1];
-		sx = 255 - galaxian_bulletsram[offs + 3];
+		sy = 255 - galaxold_bulletsram[offs + 1];
+		sx = 255 - galaxold_bulletsram[offs + 3];
 
 		if (flipscreen_y)  sy = 255 - sy;
 
@@ -2127,7 +2127,7 @@ VIDEO_UPDATE( galaxian )
 	draw_background(bitmap, cliprect);
 
 
-	if (galaxian_stars_on)
+	if (galaxold_stars_on)
 	{
 		draw_stars(screen->machine, bitmap, cliprect);
 	}
@@ -2142,11 +2142,11 @@ VIDEO_UPDATE( galaxian )
 	}
 
 
-	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
+	draw_sprites(screen->machine, bitmap, galaxold_spriteram, galaxold_spriteram_size);
 
 	if (spriteram2_present)
 	{
-		draw_sprites(screen->machine, bitmap, galaxian_spriteram2, galaxian_spriteram2_size);
+		draw_sprites(screen->machine, bitmap, galaxold_spriteram2, galaxold_spriteram2_size);
 	}
 	return 0;
 }
@@ -2159,7 +2159,7 @@ VIDEO_UPDATE( dambustr )
 
 	draw_background(bitmap, cliprect);
 
-	if (galaxian_stars_on)
+	if (galaxold_stars_on)
 	{
 		draw_stars(screen->machine, bitmap, cliprect);
 	}
@@ -2174,7 +2174,7 @@ VIDEO_UPDATE( dambustr )
 		draw_bullets_common(bitmap, cliprect);
 	}
 
-	draw_sprites(screen->machine, bitmap, galaxian_spriteram, galaxian_spriteram_size);
+	draw_sprites(screen->machine, bitmap, galaxold_spriteram, galaxold_spriteram_size);
 
 	if (dambustr_bg_priority)
 	{
@@ -2184,10 +2184,10 @@ VIDEO_UPDATE( dambustr )
 		/* only rows with color code > 3 are stronger than the background */
 		memset(dambustr_videoram2, 0x20, 0x0400);
 		for (i=0; i<32; i++) {
-			color = galaxian_attributesram[(i << 1) | 1] & color_mask;
+			color = galaxold_attributesram[(i << 1) | 1] & color_mask;
 			if (color > 3) {
 				for (j=0; j<32; j++)
-					dambustr_videoram2[32*j+i] = galaxian_videoram[32*j+i];
+					dambustr_videoram2[32*j+i] = galaxold_videoram[32*j+i];
 			};
 		};
 		tilemap_mark_all_tiles_dirty(dambustr_tilemap2);
