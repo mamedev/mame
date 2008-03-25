@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "cpu/cop400/cop400.h"
 #include "video/cdp1869.h"
@@ -10,7 +9,6 @@
 
     TODO:
 
-    - auto_malloc cidelsa_pcb
     - move set_cpu_mode timer call to MDRV
     - fix COP420 core to get sound in Draco
 
@@ -28,7 +26,7 @@
 
 static int cdp1869_prd;
 static int cdp1869_pcb;
-static UINT8 cidelsa_pcb[0x800];  // 2048x1 bit PCB ram
+static UINT8 *pcb_ram;  // 2048x1 bit PCB ram
 
 static int cdp1802_mode = CDP1802_MODE_RESET;
 
@@ -39,46 +37,39 @@ static UINT8 cidelsa_mode_r(void)
 
 static UINT8 cidelsa_ef_r(void)
 {
-	/*
-        EF1     CDP1869 _PRD
-        EF2     Test
-        EF3     Coin 2
-        EF4     Coin 1
-    */
-
 	return readinputportbytag("EF");
 }
 
 static const CDP1802_CONFIG cidelsa_cdp1802_config =
 {
-	cidelsa_mode_r,
-	cidelsa_ef_r,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	cidelsa_mode_r,	// MODE input
+	cidelsa_ef_r,	// EF input
+	NULL,			// SC output
+	NULL,			// Q output
+	NULL,			// DMA read
+	NULL			// DMA write
 };
 
-/* Sound Interface */
+/* Draco Sound Interface */
 
 static int draco_sound;
 static int draco_ay_latch;
 
 static WRITE8_HANDLER ( draco_sound_bankswitch_w )
 {
-	memory_set_bank(1, (data & 0x08) >> 3);
+	memory_set_bank(1, BIT(data, 3));
 }
 
 static WRITE8_HANDLER ( draco_sound_g_w )
 {
 	/*
 
-     G1 G0  description
+		 G1 G0  description
 
-      0  0  IAB     inactive
-      0  1  DWS     write to PSG
-      1  0  DTB     read from PSG
-      1  1  INTAK   latch address
+		  0  0  IAB     inactive
+		  0  1  DWS     write to PSG
+		  1  0  DTB     read from PSG
+		  1  1  INTAK   latch address
 
     */
 
@@ -100,7 +91,7 @@ static WRITE8_HANDLER ( draco_sound_g_w )
 
 static READ8_HANDLER ( draco_sound_in_r )
 {
-	return draco_sound & 0x07;
+	return ~draco_sound & 0x07; // inverted
 }
 
 static READ8_HANDLER ( draco_sound_ay8910_r )
@@ -116,6 +107,7 @@ static WRITE8_HANDLER ( draco_sound_ay8910_w )
 static WRITE8_HANDLER ( draco_ay8910_port_a_w )
 {
 	/*
+
       bit   description
 
         0   N/C
@@ -126,12 +118,14 @@ static WRITE8_HANDLER ( draco_ay8910_port_a_w )
         5   N/C
         6   N/C
         7   N/C
+
     */
 }
 
 static WRITE8_HANDLER ( draco_ay8910_port_b_w )
 {
 	/*
+
       bit   description
 
         0   RELE0
@@ -142,15 +136,16 @@ static WRITE8_HANDLER ( draco_ay8910_port_b_w )
         5   N/C
         6   N/C
         7   N/C
+
     */
 }
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
-	draco_ay8910_port_a_w,
-	draco_ay8910_port_b_w
+	0,						// port A read
+	0,						// port B read
+	draco_ay8910_port_a_w,	// port A write
+	draco_ay8910_port_b_w	// port B write
 };
 
 /* Read/Write Handlers */
@@ -158,6 +153,7 @@ static const struct AY8910interface ay8910_interface =
 static WRITE8_HANDLER ( destryer_out1_w )
 {
 	/*
+
       bit   description
 
         0
@@ -168,12 +164,14 @@ static WRITE8_HANDLER ( destryer_out1_w )
         5
         6
         7
+
     */
 }
 
 static WRITE8_HANDLER ( altair_out1_w )
 {
 	/*
+
       bit   description
 
         0   S1 (CARTUCHO)
@@ -184,16 +182,18 @@ static WRITE8_HANDLER ( altair_out1_w )
         5   LGF
         6   CONT. M2
         7   CONT. M1
+
     */
 
-	set_led_status(0, data & 0x08); // 1P
-	set_led_status(1, data & 0x10); // 2P
-	set_led_status(2, data & 0x20); // FIRE
+	set_led_status(0, BIT(data, 3)); // 1P
+	set_led_status(1, BIT(data, 4)); // 2P
+	set_led_status(2, BIT(data, 5)); // FIRE
 }
 
 static WRITE8_HANDLER ( draco_out1_w )
 {
 	/*
+
       bit   description
 
         0   3K9 -> Green signal
@@ -204,16 +204,17 @@ static WRITE8_HANDLER ( draco_out1_w )
         5   SONIDO A -> COP402 IN0
         6   SONIDO B -> COP402 IN1
         7   SONIDO C -> COP402 IN2
+
     */
 
-    draco_sound = (data & 0xe0) >> 5;
+    draco_sound = (data >> 5) & 0x07;
 }
 
 static WRITE8_HANDLER ( cidelsa_charram_w )
 {
 	int addr = cdp1869_get_cma(offset);
 
-	cidelsa_pcb[addr] = activecpu_get_reg(CDP1802_Q);
+	pcb_ram[addr] = activecpu_get_reg(CDP1802_Q);
 
 	cdp1869_charram_w(machine, offset, data);
 }
@@ -222,7 +223,7 @@ static READ8_HANDLER ( cidelsa_charram_r )
 {
 	int addr = cdp1869_get_cma(offset);
 
-	cdp1869_pcb = cidelsa_pcb[addr];
+	cdp1869_pcb = pcb_ram[addr];
 
 	return cdp1869_charram_r(machine, offset);
 }
@@ -460,24 +461,24 @@ INPUT_PORTS_END
 
 /* Video Timer Callbacks */
 
-static TIMER_DEVICE_CALLBACK( altair_prd_start )
+static TIMER_CALLBACK( altair_prd_start )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 	cdp1869_prd = 1; // inverted
 }
 
-static TIMER_DEVICE_CALLBACK( altair_prd_end )
+static TIMER_CALLBACK( altair_prd_end )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 	cdp1869_prd = 0; // inverted
 }
 
-static TIMER_DEVICE_CALLBACK( draco_prd_start )
+static TIMER_CALLBACK( draco_prd_start )
 {
 	cdp1869_prd = 0;
 }
 
-static TIMER_DEVICE_CALLBACK( draco_prd_end )
+static TIMER_CALLBACK( draco_prd_end )
 {
 	cdp1869_prd = 1;
 }
@@ -491,54 +492,76 @@ static TIMER_CALLBACK( set_cpu_mode )
 
 static UINT8 cidelsa_get_color_bits(UINT8 cramdata, UINT16 cramaddr, UINT16 pramaddr)
 {
-	int ccb0 = (cramdata & 0x40) >> 4;
-	int ccb1 = (cramdata & 0x80) >> 6;
-	int pcb = cidelsa_pcb[cramaddr];
+	int ccb0 = BIT(cramdata, 6);
+	int ccb1 = BIT(cramdata, 7);
+	int pcb = BIT(pcb_ram[cramaddr & 0x7ff], 0);
 
-	return ccb0 + ccb1 + pcb;
+	return (ccb0 << 2) + (ccb1 << 1) + pcb;
 }
 
 static const CDP1869_interface destryer_CDP1869_interface =
 {
-	CDP1869_PAL,
-	REGION_INVALID,
-	0x800,
-	0x400,
-	cidelsa_get_color_bits
+	CDP1869_PAL,			// display format
+	REGION_INVALID,			// character RAM region
+	0x800,					// character RAM size
+	0x400,					// page RAM size
+	cidelsa_get_color_bits	// color callback function
 };
 
 static const CDP1869_interface draco_CDP1869_interface =
 {
-	CDP1869_PAL,
-	REGION_INVALID,
-	0x800,
-	0x800,
-	cidelsa_get_color_bits
+	CDP1869_PAL,			// display format
+	REGION_INVALID,			// character RAM region
+	0x800,					// character RAM size
+	0x800,					// page RAM size
+	cidelsa_get_color_bits	// color callback function
 };
 
 static MACHINE_START( destryer )
 {
+	// allocate PCB RAM
+
+	pcb_ram = auto_malloc(0x800);
+
+	// configure CDP1869
+
 	cdp1869_configure(&destryer_CDP1869_interface);
+
+	// allocate one-shot CPU mode set timer
 
 	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
+	// save state support
+
 	state_save_register_global(cdp1802_mode);
-	state_save_register_global_array(cidelsa_pcb);
+	state_save_register_global_pointer(pcb_ram, 0x800);
 	state_save_register_global(cdp1869_prd);
 	state_save_register_global(cdp1869_pcb);
 }
 
 static MACHINE_START( draco )
 {
+	// configure COP402 ROM banking
+
 	UINT8 *ROM = memory_region(REGION_CPU2);
 	memory_configure_bank(1, 0, 2, &ROM[0x000], 0x400);
 
+	// allocate PCB RAM
+
+	pcb_ram = auto_malloc(0x800);
+
+	// configure CDP1869
+
 	cdp1869_configure(&draco_CDP1869_interface);
+
+	// allocate one-shot CPU mode set timer
 
 	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
+	// save state support
+
 	state_save_register_global(cdp1802_mode);
-	state_save_register_global_array(cidelsa_pcb);
+	state_save_register_global_pointer(pcb_ram, 0x800);
 	state_save_register_global(cdp1869_prd);
 	state_save_register_global(cdp1869_pcb);
 	state_save_register_global(draco_sound);
