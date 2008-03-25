@@ -248,231 +248,151 @@ VIDEO_START( namcona1 )
 
 /*************************************************************************/
 
-static void pdraw_masked_tile(running_machine *machine,
-		bitmap_t *bitmap,
-		const rectangle *cliprect,
-		unsigned code,
+static void pdraw_tile(running_machine *machine,
+		bitmap_t *dest_bmp,
+		const rectangle *clip,
+		UINT32 code,
 		int color,
 		int sx, int sy,
 		int flipx, int flipy,
 		int priority,
-		int bShadow )
+		int bShadow,
+		int bOpaque )
 {
-	const gfx_element *gfx,*mask;
-	pen_t pen_base;
-	UINT8 *gfx_addr;
-	int gfx_pitch;
-	UINT8 *mask_addr;
-	int mask_pitch;
-	int x,y;
+	const gfx_element *gfx = machine->gfx[0];
+	const gfx_element *mask = machine->gfx[1];
 
-	/*
-     *  custom blitter for drawing a masked 8x8x8BPP tile
-     */
-	if( sx > cliprect->min_x-8 &&
-		sy > cliprect->min_y-8 &&
-		sx <= cliprect->max_x &&
-		sy <= cliprect->max_y ) /* all-or-nothing clip */
+	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
+	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+	UINT8 *mask_base = mask->gfxdata + (code % mask->total_elements) * mask->char_modulo;
+
+	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
+	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
+
+	if (sprite_screen_width && sprite_screen_height)
 	{
-		gfx = machine->gfx[0];
-		mask = machine->gfx[1];
-		code %= gfx->total_elements;
-		color %= gfx->total_colors;
-		pen_base = gfx->color_base + gfx->color_granularity * color;
-		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
-		gfx_pitch = gfx->line_modulo;
-		mask_addr = mask->gfxdata + code * mask->char_modulo;
-		mask_pitch = mask->line_modulo;
+		/* compute sprite increment per screen pixel */
+		int dx = (gfx->width<<16)/sprite_screen_width;
+		int dy = (gfx->height<<16)/sprite_screen_height;
 
-		/* The way we render shadows makes some Emeralda text invisible.
-         * The relevant text is composed of sprites with the shadow bit set,
-         * displayed over a black backdrop.
-         */
-		if( bShadow && namcona1_gametype!=NAMCO_EMERALDA )
+		int ex = sx+sprite_screen_width;
+		int ey = sy+sprite_screen_height;
+
+		int x_index_base;
+		int y_index;
+
+		if( flipx )
 		{
-			for( y=0; y<8; y++ )
-			{
-				int ypos = sy+(flipy?7-y:y);
-				if (ypos >= cliprect->min_y && ypos <= cliprect->max_y)
-				{
-					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, ypos, 0);
-					UINT16 *dest = BITMAP_ADDR16(bitmap, ypos, 0);
-					if( flipx )
-					{
-						dest += sx+7;
-						pri += sx+7;
-						for( x=0; x<8; x++ )
-							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x)
-							{
-								if( mask_addr[x] )
-								{ /* sprite pixel is opaque */
-									if( priority>=pri[-x] )
-									{
-										dest[-x] |= 0x1000;
-									}
-									pri[-x] = 0xff;
-								}
-							}
-					}
-					else
-					{
-						dest += sx;
-						pri += sx;
-						for( x=0; x<8; x++ )
-							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x)
-							{
-								if( mask_addr[x] )
-								{ /* sprite pixel is opaque */
-									if( priority>=pri[x] )
-									{
-										dest[x] |= 0x1000;
-									}
-									pri[x] = 0xff;
-								}
-							}
-					}
-				}
-				mask_addr += mask_pitch;
-			}
-		} /* render translucent sprite */
+			x_index_base = (sprite_screen_width-1)*dx;
+			dx = -dx;
+		}
 		else
 		{
-			for( y=0; y<8; y++ )
+			x_index_base = 0;
+		}
+
+		if( flipy )
+		{
+			y_index = (sprite_screen_height-1)*dy;
+			dy = -dy;
+		}
+		else
+		{
+			y_index = 0;
+		}
+
+		if( clip )
+		{
+			if( sx < clip->min_x)
+			{ /* clip left */
+				int pixels = clip->min_x-sx;
+				sx += pixels;
+				x_index_base += pixels*dx;
+			}
+			if( sy < clip->min_y )
+			{ /* clip top */
+				int pixels = clip->min_y-sy;
+				sy += pixels;
+				y_index += pixels*dy;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if( ex > clip->max_x+1 )
+			{ /* clip right */
+				int pixels = ex-clip->max_x-1;
+				ex -= pixels;
+			}
+			if( ey > clip->max_y+1 )
+			{ /* clip bottom */
+				int pixels = ey-clip->max_y-1;
+				ey -= pixels;
+			}
+		}
+
+		if( ex>sx )
+		{ /* skip if inner loop doesn't draw anything */
+			int y;
+
+			for( y=sy; y<ey; y++ )
 			{
-				int ypos = sy+(flipy?7-y:y);
-				if (ypos >= cliprect->min_y && ypos <= cliprect->max_y)
+				UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+				UINT8 *mask_addr = mask_base + (y_index>>16) * mask->line_modulo;
+				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+
+				int x, x_index = x_index_base;
+				for( x=sx; x<ex; x++ )
 				{
-					UINT8 *pri = BITMAP_ADDR8(priority_bitmap, ypos, 0);
-					UINT16 *dest = BITMAP_ADDR16(bitmap, ypos, 0);
-					if( flipx )
+					if( bOpaque )
 					{
-						dest += sx+7;
-						pri += sx+7;
-						for( x=0; x<8; x++ )
-							if (sx-x >= cliprect->min_x && sx-x <= cliprect->max_x)
-							{
-								if( mask_addr[x] )
-								{ /* sprite pixel is opaque */
-									if( priority>=pri[-x] )
-									{
-										dest[-x] = pen_base + gfx_addr[x];
-									}
-									pri[-x] = 0xff;
-								}
-							}
+						if (pri[x] <= priority)
+						{
+							int c = source[x_index>>16];
+							dest[x] = pal_base + c;	
+						}
+
+						pri[x] = 0xff;
 					}
 					else
 					{
-						dest += sx;
-						pri += sx;
-						for( x=0; x<8; x++ )
-							if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x)
+						/* sprite pixel is opaque */
+						if( mask_addr[x_index>>16] != 0 )
+						{
+							if (pri[x] <= priority)
 							{
-								if( mask_addr[x] )
-								{ /* sprite pixel is opaque */
-									if( priority>=pri[x] )
-									{
-										dest[x] = pen_base + gfx_addr[x];
-									}
-									pri[x] = 0xff;
+								int c = source[x_index>>16];
+
+								/* The way we render shadows makes some Emeralda text invisible.
+								* The relevant text is composed of sprites with the shadow bit set,
+								* displayed over a black backdrop.
+								*/
+								if( bShadow && namcona1_gametype!=NAMCO_EMERALDA )
+								{
+									//TODO: this isn't right
+									dest[x] |= 0x1000;
 								}
-							} /* next x */
-					} /* !flipx */
-				}
-				gfx_addr += gfx_pitch;
-				mask_addr += mask_pitch;
-			} /* next y */
-		} /* render normal sprite (no translucency) */
-	}
-} /* pdraw_masked_tile */
-
-static void pdraw_opaque_tile(running_machine *machine,
-		bitmap_t *bitmap,
-		const rectangle *cliprect,
-		unsigned code,
-		int color,
-		int sx, int sy,
-		int flipx, int flipy,
-		int priority,
-		int bShadow )
-{
-	const gfx_element *gfx;
-	pen_t pen_base;
-	UINT8 *gfx_addr;
-	int gfx_pitch;
-	int x,y;
-	int ypos;
-	UINT8 *pri;
-	UINT16 *dest;
-
-	if( sx > cliprect->min_x-8 &&
-		sy > cliprect->min_y-8 &&
-		sx <= cliprect->max_x &&
-		sy <= cliprect->max_y ) /* all-or-nothing clip */
-	{
-		gfx = machine->gfx[0];
-		code %= gfx->total_elements;
-		color %= gfx->total_colors;
-		pen_base = gfx->color_base + gfx->color_granularity * color;
-		gfx_addr = gfx->gfxdata + code * gfx->char_modulo;
-		gfx_pitch = gfx->line_modulo;
-
-		for( y=0; y<8; y++ )
-		{
-			ypos = sy+(flipy?7-y:y);
-			if (ypos >= cliprect->min_y && ypos <= cliprect->max_y)
-			{
-				pri = BITMAP_ADDR8(priority_bitmap, ypos, 0);
-				dest = BITMAP_ADDR16(bitmap, ypos, 0);
-				if( flipx )
-				{
-					dest += sx+7;
-					pri += sx+7;
-					for( x=0; x<8; x++ )
-						if (sx-x >= cliprect->min_x && sx-x <= cliprect->max_x)
-						{
-							if( priority>=pri[-x] )
-							{
-								dest[-x] = pen_base + gfx_addr[x];
+								else
+								{
+									dest[x] = pal_base + c;	
+								}
 							}
-							pri[-x] = 0xff;
-						}
-				}
-				else
-				{
-					dest += sx;
-					pri += sx;
-					for( x=0; x<8; x++ )
-						if (sx+x >= cliprect->min_x && sx+x <= cliprect->max_x)
-						{
-							if( priority>=pri[x] )
-							{
-								dest[x] = pen_base + gfx_addr[x];
-							}
+
 							pri[x] = 0xff;
-						} /* next x */
-				} /* !flipx */
-			}
-			gfx_addr += gfx_pitch;
-		} /* next y */
-	}
-} /* pdraw_opaque_tile */
+						}
+					}
 
-static const UINT8 pri_mask[8] = { 0x00,0x01,0x03,0x07,0x0f,0x1f,0x3f,0x7f };
+					x_index += dx;
+				}
+
+				y_index += dy;
+			}
+		}
+	}
+} /* pdraw_tile */
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int which;
 	const UINT16 *source = spriteram16;
-	void (*drawtile)(running_machine *,
-		bitmap_t *,
-		const rectangle *,
-		unsigned code,
-		int color,
-		int sx, int sy,
-		int flipx, int flipy,
-		int priority,
-		int bShadow );
 	UINT16 sprite_control;
 	UINT16 ypos,tile,color,xpos;
 	int priority;
@@ -486,25 +406,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for( which=0; which<0x100; which++ )
 	{ /* max 256 sprites */
-		ypos	= source[0];	/* FHHH---E YYYYYYYY    flipy, height, ypos */
+		ypos	= source[0];	/* FHHH---Y YYYYYYYY    flipy, height, ypos */
 		tile	= source[1];	/* O???TTTT TTTTTTTT    opaque tile */
 		color	= source[2];	/* FSWW???B CCCC?PPP    flipx, shadow, width, color, pri*/
 		xpos	= source[3];	/* -------X XXXXXXXX    xpos */
 
-		priority = pri_mask[color&0x7];
+		priority = color&0x7;
 		width = ((color>>12)&0x3)+1;
 		height = ((ypos>>12)&0x7)+1;
 		flipy = ypos&0x8000;
 		flipx = color&0x8000;
 
-		if( (tile&0x8000)==0 )
-		{
-			drawtile = pdraw_masked_tile;
-		}
-		else
-		{
-			drawtile = pdraw_opaque_tile;
-		}
 		for( row=0; row<height; row++ )
 		{
 			sy = (ypos&0x1ff)-30+32;
@@ -527,16 +439,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					sx+=col*8;
 				}
-				drawtile(machine,
+
+				pdraw_tile(machine,
 					bitmap,
 					cliprect,
-					tile + row*64+col,
+					(tile & 0xfff) + row*64+col,
 					(color>>4)&0xf,
 					((sx+16)&0x1ff)-8,
 					((sy+8)&0x1ff)-8,
 					flipx,flipy,
 					priority,
-					color&0x4000 /* shadow */ );
+					color & 0x4000, /* shadow */
+					tile & 0x8000 /* opaque */ );
 			} /* next col */
 		} /* next row */
 		source += 4;
@@ -616,7 +530,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			{
 				tilemap_set_scrollx( bg_tilemap[which], 0, scrollx );
 				tilemap_set_scrolly( bg_tilemap[which], 0, scrolly );
-				tilemap_draw( bitmap, &clip, bg_tilemap[which], 0, primask );
+				tilemap_draw_primask( bitmap, &clip, bg_tilemap[which], 0, primask, 0 );
 			}
 		}
 	}
@@ -658,7 +572,7 @@ VIDEO_UPDATE( namcona1 )
 			{
 				if( (namcona1_vreg[0x50+which]&0x7) == priority )
 				{
-					draw_background(screen->machine,bitmap,cliprect,which,pri_mask[priority] );
+					draw_background(screen->machine,bitmap,cliprect,which,priority );
 				}
 			} /* next tilemap */
 		} /* next priority level */
