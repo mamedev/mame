@@ -198,11 +198,6 @@ struct _running_machine
 	/* debugger-related information */
 	int						debug_mode;			/* was debug mode enabled? */
 
-	/* MESS-specific information */
-#ifdef MESS
-	struct IODevice *		devices;
-#endif /* MESS */
-
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
