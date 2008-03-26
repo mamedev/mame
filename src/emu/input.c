@@ -1160,7 +1160,7 @@ astring *input_code_to_token(astring *string, input_code code)
 	modifier = code_to_string(modifier_token_table, INPUT_CODE_MODIFIER(code));
 
 	/* determine the itemclass part; if we match the native class, we don't include this */
-	if (item == NULL || item->itemclass == INPUT_CODE_ITEMCLASS(code))
+	if (item != NULL && item->itemclass == INPUT_CODE_ITEMCLASS(code))
 		itemclass = "";
 	else
 		itemclass = code_to_string(itemclass_token_table, INPUT_CODE_ITEMCLASS(code));
