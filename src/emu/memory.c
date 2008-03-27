@@ -2761,7 +2761,7 @@ void name(offs_t original_address, UINT8 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~0);								\
-	DEBUG_HOOK_WRITE(spacenum, address - xormacro(shiftbytes), data, (masktype)0xff << (8 * (shiftbytes)));	\
+	DEBUG_HOOK_WRITE(spacenum, address - xormacro(shiftbytes), (masktype)data << (8 * (shiftbytes)), (masktype)0xff << (8 * (shiftbytes)));	\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2817,7 +2817,7 @@ void name(offs_t original_address, UINT16 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~1);								\
-	DEBUG_HOOK_WRITE(spacenum, address - xormacro(shiftbytes), data, (masktype)0xffff << (8 * (shiftbytes)));	\
+	DEBUG_HOOK_WRITE(spacenum, address - xormacro(shiftbytes), (masktype)data << (8 * (shiftbytes)), (masktype)0xffff << (8 * (shiftbytes)));	\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2894,7 +2894,7 @@ void name(offs_t original_address, UINT32 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~3);								\
-	DEBUG_HOOK_WRITE(spacenum, address - xormacro(shiftbytes), data, (masktype)0xffffffff << (8 * (shiftbytes)));	\
+	DEBUG_HOOK_WRITE(spacenum, address - xormacro(shiftbytes), (masktype)data << (8 * (shiftbytes)), (masktype)0xffffffff << (8 * (shiftbytes)));	\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
