@@ -6721,6 +6721,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( deerhunt )	/* (c) 2000 Sammy USA Corporation */
 	DRIVER( deerhuna )	/* (c) 2000 Sammy USA Corporation */
 	DRIVER( deerhunb )	/* (c) 2000 Sammy USA Corporation */
+	DRIVER( deerhunc )	/* (c) 2000 Sammy USA Corporation */
 	DRIVER( turkhunt )	/* (c) 2001 Sammy USA Corporation */
 	DRIVER( wschamp )	/* (c) 2001 Sammy USA Corporation */
 	DRIVER( wschampa )	/* (c) 2001 Sammy USA Corporation */
