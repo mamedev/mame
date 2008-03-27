@@ -93,7 +93,7 @@ static void set_logunmap(UINT32 ref, UINT64 value);
 static UINT64 get_current_pc(UINT32 ref);
 static UINT64 get_cpu_reg(UINT32 ref);
 static void set_cpu_reg(UINT32 ref, UINT64 value);
-static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
+static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address, offs_t size, UINT64 value_to_write);
 static void check_hotspots(int cpunum, int spacenum, offs_t address);
 
 
@@ -1079,13 +1079,13 @@ void debug_interrupt_hook(int cpunum, int irqline)
     standard_debug_hook_read - standard read hook
 -------------------------------------------------*/
 
-static void standard_debug_hook_read(int spacenum, offs_t address, UINT64 mem_mask)
+static void standard_debug_hook_read(int spacenum, int size, offs_t address)
 {
 	debug_cpu_info *info = &debug_cpuinfo[memory_hook_cpunum];
 
 	/* check watchpoints */
 	if (info->read_watchpoints)
-		check_watchpoints(memory_hook_cpunum, spacenum, WATCHPOINT_READ, address, 0, mem_mask);
+		check_watchpoints(memory_hook_cpunum, spacenum, WATCHPOINT_READ, address, size, 0);
 
 	/* check hotspots */
 	if (info->hotspots)
@@ -1097,13 +1097,13 @@ static void standard_debug_hook_read(int spacenum, offs_t address, UINT64 mem_ma
     standard_debug_hook_write - standard write hook
 -------------------------------------------------*/
 
-static void standard_debug_hook_write(int spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
+static void standard_debug_hook_write(int spacenum, int size, offs_t address, UINT64 data)
 {
 	debug_cpu_info *info = &debug_cpuinfo[memory_hook_cpunum];
 
 	/* check watchpoints */
 	if (info->write_watchpoints)
-		check_watchpoints(memory_hook_cpunum, spacenum, WATCHPOINT_WRITE, address, data, mem_mask);
+		check_watchpoints(memory_hook_cpunum, spacenum, WATCHPOINT_WRITE, address, size, data);
 }
 
 
@@ -1307,47 +1307,16 @@ int debug_breakpoint_enable(int bpnum, int enable)
     breakpoints for a given CPU and address space
 -------------------------------------------------*/
 
-static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
+static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address, offs_t size, UINT64 value_to_write)
 {
 	debug_cpu_watchpoint *wp;
 	UINT64 result;
-	offs_t size = 0;
 
 	/* if we're within debugger code, don't stop */
 	if (within_debugger_code)
 		return;
 
 	within_debugger_code = TRUE;
-
-	/* adjust address, size & value_to_write based on mem_mask. */
-	if( mem_mask != 0 )
-	{
-		const debug_cpu_info *info = &debug_cpuinfo[cpunum];
-		int address_offset = 0;
-		int bus_size = info->space[spacenum].databytes;
-
-		while (address_offset < bus_size && (mem_mask & 0xff) == 0)
-		{	
-			address_offset++;
-			value_to_write >>= 8;
-			mem_mask >>= 8;
-		}
-
-		while (mem_mask != 0)
-		{
-			size++;
-			mem_mask >>= 8;
-		}
-
-		if (info->endianness == CPU_IS_LE)
-		{
-			address += address_offset;
-		}
-		else
-		{
-			address += bus_size - size - address_offset;
-		}
-	}
 
 	/* if we are a write watchpoint, stash the value that will be written */
 	wpaddr = address;
@@ -1361,6 +1330,12 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 			/* if we do, evaluate the condition */
 			if (wp->condition == NULL || (expression_execute(wp->condition, &result) == EXPRERR_NONE && result))
 			{
+				static const char *const sizes[] =
+				{
+					"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
+				};
+				char buffer[100];
+
 				/* halt in the debugger by default */
 				execution_state = EXECUTION_STATE_STOPPED;
 
@@ -1371,12 +1346,6 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 				/* print a notification, unless the action made us go again */
 				if (execution_state == EXECUTION_STATE_STOPPED)
 				{
-					static const char *const sizes[] =
-					{
-						"0bytes", "byte", "word", "3bytes", "dword", "5bytes", "6bytes", "7bytes", "qword"
-					};
-					char buffer[100];
-
 					if (type & WATCHPOINT_WRITE)
 					{
 						sprintf(buffer, "Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &debug_cpuinfo[cpunum], spacenum), activecpu_get_pc());

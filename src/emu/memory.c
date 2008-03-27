@@ -196,11 +196,11 @@ typedef enum _read_or_write read_or_write;
 #define SUBTABLE_PTR(tabledata, entry) (&(tabledata)->table[(1 << LEVEL1_BITS) + (((entry) - SUBTABLE_BASE) << LEVEL2_BITS)])
 
 #ifdef ENABLE_DEBUGGER
-#define DEBUG_HOOK_READ(spacenum,address,mem_mask) if (debug_hook_read) (*debug_hook_read)(spacenum,address,mem_mask)
-#define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask) if (debug_hook_write) (*debug_hook_write)(spacenum,address,data,mem_mask)
+#define DEBUG_HOOK_READ(a,b,c) if (debug_hook_read) (*debug_hook_read)(a, b, c)
+#define DEBUG_HOOK_WRITE(a,b,c,d) if (debug_hook_write) (*debug_hook_write)(a, b, c, d)
 #else
-#define DEBUG_HOOK_READ(spacenum,address,mem_mask)
-#define DEBUG_HOOK_WRITE(spacenum,address,data,mem_mask)
+#define DEBUG_HOOK_READ(a,b,c)
+#define DEBUG_HOOK_WRITE(a,b,c,d)
 #endif
 
 
@@ -2514,7 +2514,7 @@ UINT8 name(offs_t original_address)														\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~0);								\
-	DEBUG_HOOK_READ(spacenum, address, 0xff);											\
+	DEBUG_HOOK_READ(spacenum, 1, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2534,7 +2534,7 @@ UINT8 name(offs_t original_address)														\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~0);								\
-	DEBUG_HOOK_READ(spacenum, address, (masktype)0xff << (8 * (shiftbytes)));			\
+	DEBUG_HOOK_READ(spacenum, 1, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2570,7 +2570,7 @@ UINT16 name(offs_t original_address)													\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~1);								\
-	DEBUG_HOOK_READ(spacenum, address, 0xffff);											\
+	DEBUG_HOOK_READ(spacenum, 2, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2590,7 +2590,7 @@ UINT16 name(offs_t original_address)													\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~1);								\
-	DEBUG_HOOK_READ(spacenum, address, (masktype)0xffff << (8 * (shiftbytes)));			\
+	DEBUG_HOOK_READ(spacenum, 2, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2624,7 +2624,7 @@ UINT32 name(offs_t original_address)													\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~3);								\
-	DEBUG_HOOK_READ(spacenum, address, 0xffffffff);										\
+	DEBUG_HOOK_READ(spacenum, 4, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2644,7 +2644,7 @@ UINT32 name(offs_t original_address, UINT32 mem_mask)									\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~3);								\
-	DEBUG_HOOK_READ(spacenum, address, ~mem_mask);										\
+	DEBUG_HOOK_READ(spacenum, 4, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2664,7 +2664,7 @@ UINT32 name(offs_t original_address)													\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~3);								\
-	DEBUG_HOOK_READ(spacenum, address, (masktype)0xffffffff << (8 * (shiftbytes)));		\
+	DEBUG_HOOK_READ(spacenum, 4, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2696,7 +2696,7 @@ UINT64 name(offs_t original_address)													\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~7);								\
-	DEBUG_HOOK_READ(spacenum, address, ~(UINT64)0);										\
+	DEBUG_HOOK_READ(spacenum, 8, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2716,7 +2716,7 @@ UINT64 name(offs_t original_address, UINT64 mem_mask)									\
 	UINT32 entry;																		\
 	MEMREADSTART();																		\
 	PERFORM_LOOKUP(readlookup,readhandlers,spacenum,~7);								\
-	DEBUG_HOOK_READ(spacenum, address, ~mem_mask);										\
+	DEBUG_HOOK_READ(spacenum, 8, address);												\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2741,7 +2741,7 @@ void name(offs_t original_address, UINT8 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~0);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, 0xff);									\
+	DEBUG_HOOK_WRITE(spacenum, 1, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2761,7 +2761,7 @@ void name(offs_t original_address, UINT8 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~0);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, (masktype)0xff << (8 * (shiftbytes)));	\
+	DEBUG_HOOK_WRITE(spacenum, 1, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2797,7 +2797,7 @@ void name(offs_t original_address, UINT16 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~1);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, 0xffff);									\
+	DEBUG_HOOK_WRITE(spacenum, 2, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2817,7 +2817,7 @@ void name(offs_t original_address, UINT16 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~1);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, (masktype)0xffff << (8 * (shiftbytes)));	\
+	DEBUG_HOOK_WRITE(spacenum, 2, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2851,7 +2851,7 @@ void name(offs_t original_address, UINT32 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~3);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, 0xffffffff);								\
+	DEBUG_HOOK_WRITE(spacenum, 4, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2871,7 +2871,7 @@ void name(offs_t original_address, UINT32 data, UINT32 mem_mask)						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~3);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, ~mem_mask);								\
+	DEBUG_HOOK_WRITE(spacenum, 4, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2894,7 +2894,7 @@ void name(offs_t original_address, UINT32 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~3);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, (masktype)0xffffffff << (8 * (shiftbytes)));\
+	DEBUG_HOOK_WRITE(spacenum, 4, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2926,7 +2926,7 @@ void name(offs_t original_address, UINT64 data)											\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~7);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, ~(UINT64)0);								\
+	DEBUG_HOOK_WRITE(spacenum, 8, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
@@ -2946,7 +2946,7 @@ void name(offs_t original_address, UINT64 data, UINT64 mem_mask)						\
 	UINT32 entry;																		\
 	MEMWRITESTART();																	\
 	PERFORM_LOOKUP(writelookup,writehandlers,spacenum,~7);								\
-	DEBUG_HOOK_WRITE(spacenum, address, data, ~mem_mask);								\
+	DEBUG_HOOK_WRITE(spacenum, 8, address, data);										\
 																						\
 	/* handle banks inline */															\
 	address = (address - handler->bytestart) & handler->bytemask;						\
