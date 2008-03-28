@@ -115,8 +115,6 @@ struct _video_global
 	UINT32					seconds_to_run;			/* number of seconds to run before quitting */
 	UINT8					auto_frameskip;			/* flag: TRUE if we're automatically frameskipping */
 	UINT32					speed;					/* overall speed (*100) */
-	UINT32					original_speed;			/* originally-specified speed */
-	UINT8					refresh_speed;			/* flag: TRUE if we max out our speed according to the refresh */
 	UINT8					update_in_pause;		/* flag: TRUE if video is updated while in pause */
 
 	/* frameskipping */
@@ -272,6 +270,17 @@ INLINE int effective_throttle(running_machine *machine)
 }
 
 
+/*-------------------------------------------------
+    original_speed_setting - return the original
+    speed setting
+-------------------------------------------------*/
+
+INLINE int original_speed_setting(void)
+{
+	return options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5;
+}
+
+
 
 /***************************************************************************
     CORE IMPLEMENTATION
@@ -302,8 +311,7 @@ void video_init(running_machine *machine)
 	global.auto_frameskip = options_get_bool(mame_options(), OPTION_AUTOFRAMESKIP);
 	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
 	global.seconds_to_run = options_get_int(mame_options(), OPTION_SECONDS_TO_RUN);
-	global.original_speed = global.speed = (options_get_float(mame_options(), OPTION_SPEED) * 100.0 + 0.5);
-	global.refresh_speed = options_get_bool(mame_options(), OPTION_REFRESHSPEED);
+	global.speed = original_speed_setting();
 	global.update_in_pause = options_get_bool(mame_options(), OPTION_UPDATEINPAUSE);
 
 	/* set the first screen device as the primary - this will set NULL if screenless */
@@ -695,13 +703,14 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 		state->vblank_period = config->vblank;
 
 	/* adjust speed if necessary */
-	if (global.refresh_speed)
+	if (options_get_bool(mame_options(), OPTION_REFRESHSPEED))
 	{
 		float minrefresh = render_get_max_update_rate();
 		if (minrefresh != 0)
 		{
 			UINT32 target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(frame_period));
-			target_speed = MIN(target_speed, global.original_speed);
+			UINT32 original_speed = original_speed_setting();
+			target_speed = MIN(target_speed, original_speed);
 			if (target_speed != global.speed)
 			{
 				mame_printf_verbose("Adjusting target speed to %d%%\n", target_speed);
