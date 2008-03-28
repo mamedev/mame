@@ -157,26 +157,6 @@ void palette_init(running_machine *machine)
 }
 
 
-/*-------------------------------------------------
-    palette_config - palette initialization that
-    takes place after the display is created
--------------------------------------------------*/
-
-void palette_config(running_machine *machine)
-{
-	int i;
-
-	/* now let the driver modify the initial palette and colortable */
-	if (machine->config->init_palette)
-		(*machine->config->init_palette)(machine, memory_region(REGION_PROMS));
-
-	/* set the color table base for each graphics element */
-	for (i = 0; i < MAX_GFX_ELEMENTS; i++)
-		if (machine->gfx[i] != NULL)
-			machine->gfx[i]->color_base = machine->config->gfxdecodeinfo[i].color_codes_start;
-}
-
-
 
 /***************************************************************************
     SHADOW/HIGHLIGHT CONFIGURATION

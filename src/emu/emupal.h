@@ -126,9 +126,6 @@ typedef struct _colortable_t colortable_t;
 /* palette initialization that takes place before the display is created */
 void palette_init(running_machine *machine);
 
-/* palette initialization that takes place after the display is created */
-void palette_config(running_machine *machine);
-
 
 
 /* ----- shadow/hilight configuration ----- */
