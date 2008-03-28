@@ -363,10 +363,10 @@ static void gaiden_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 					pdrawgfx(bitmap, gfx,
 						number + layout[row][col],
-						color,
+						gfx->color_base + color * gfx->color_granularity,
 						flipx, flipy,
 						sx, sy,
-						cliprect, TRANSPARENCY_PEN, 0,
+						cliprect, TRANSPARENCY_PEN_RAW, 0,
 						priority_mask);
 				}
 			}
@@ -464,10 +464,10 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 
 						pdrawgfx(bitmap_sp, gfx,
 							number + layout[row][col],
-							color,
+							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							cliprect, TRANSPARENCY_PEN, 0,
+							cliprect, TRANSPARENCY_PEN_RAW, 0,
 							priority_mask);
 					}
 				}
@@ -485,10 +485,10 @@ static void raiga_draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bi
 
 						pdrawgfx(bitmap, gfx,
 							number + layout[row][col],
-							color,
+							gfx->color_base + color * gfx->color_granularity,
 							flipx, flipy,
 							sx, sy,
-							cliprect, TRANSPARENCY_PEN, 0,
+							cliprect, TRANSPARENCY_PEN_RAW, 0,
 							priority_mask);
 					}
 				}
@@ -543,17 +543,19 @@ static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 		pdrawgfx(bitmap,machine->gfx[3],
 				code,
-				color,flipx,flipy,x,y,
+				machine->gfx[3]->color_base + color * machine->gfx[3]->color_granularity,
+				flipx,flipy,x,y,
 				cliprect,
-				TRANSPARENCY_PEN,15,
+				TRANSPARENCY_PEN_RAW,15,
 				priority_mask);
 
 		/* wrap x*/
 		pdrawgfx(bitmap,machine->gfx[3],
 				code,
-				color,flipx,flipy,x-512,y,
+				machine->gfx[3]->color_base + color * machine->gfx[3]->color_granularity,
+				flipx,flipy,x-512,y,
 				cliprect,
-				TRANSPARENCY_PEN,15,
+				TRANSPARENCY_PEN_RAW,15,
 				priority_mask);
 
 	}

@@ -413,28 +413,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 						}
 						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
-								color,
+								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								cliprect,TRANSPARENCY_PEN,0,
+								cliprect,TRANSPARENCY_PEN_RAW,0,
 								priority_mask);
 
 						/* wrap around x */
 						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
-								color,
+								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
+								cliprect,TRANSPARENCY_PEN_RAW,0,
 								priority_mask);
 
 						/* wrap around x */
 						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
-								color,
+								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
+								cliprect,TRANSPARENCY_PEN_RAW,0,
 								priority_mask);
 					}
 				}
@@ -459,28 +459,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 						}
 						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
-								color,
+								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx,sy,
-								cliprect,TRANSPARENCY_PEN,0,
+								cliprect,TRANSPARENCY_PEN_RAW,0,
 								priority_mask);
 
 						/* wrap around x */
 						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
-								color,
+								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx-512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
+								cliprect,TRANSPARENCY_PEN_RAW,0,
 								priority_mask);
 
 						/* wrap around x */
 						pdrawgfx(bitmap,machine->gfx[2],
 								code + layout[y][x],
-								color,
+								machine->gfx[2]->color_base + color * machine->gfx[2]->color_granularity,
 								flipx,flipy,
 								sx+512,sy,
-								cliprect,TRANSPARENCY_PEN,0,
+								cliprect,TRANSPARENCY_PEN_RAW,0,
 								priority_mask);
 					}
 				}
