@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) static inline void (mnemonic)(UINT8 opcode)
+#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(UINT8 opcode)
 
 #define ROM(addr)			cpu_readop(addr)
 #define RAM_W(addr, value)	(data_write_byte_8(addr, value))
