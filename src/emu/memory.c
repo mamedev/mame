@@ -735,6 +735,8 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 	/* loop over tokens until we hit the end */
 	while (entrytype != ADDRMAP_TOKEN_END)
 	{
+		const char *tag;
+	
 		/* unpack the token from the first entry */
 		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
 		switch (entrytype)
@@ -804,13 +806,16 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_READ_PORT:
+				tag = TOKEN_GET_STRING(tokens);
 				switch (map->databits)
 				{
-					case 8:		entry->read.mhandler8  = port_tag_to_handler8(TOKEN_GET_STRING(tokens));	break;
-					case 16:	entry->read.mhandler16 = port_tag_to_handler16(TOKEN_GET_STRING(tokens));	break;
-					case 32:	entry->read.mhandler32 = port_tag_to_handler32(TOKEN_GET_STRING(tokens));	break;
-					case 64:	entry->read.mhandler64 = port_tag_to_handler64(TOKEN_GET_STRING(tokens));	break;
+					case 8:		entry->read.mhandler8  = port_tag_to_handler8(tag);		break;
+					case 16:	entry->read.mhandler16 = port_tag_to_handler16(tag);	break;
+					case 32:	entry->read.mhandler32 = port_tag_to_handler32(tag);	break;
+					case 64:	entry->read.mhandler64 = port_tag_to_handler64(tag);	break;
 				}
+				if (entry->read.generic == NULL)
+					fatalerror("Non-existent port referenced: '%s'\n", tag);
 				break;
 
 			case ADDRMAP_TOKEN_REGION:
