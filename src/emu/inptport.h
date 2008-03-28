@@ -324,6 +324,7 @@ enum
 	INPUT_TOKEN_START_TAG,
 	INPUT_TOKEN_MODIFY,
 	INPUT_TOKEN_BIT,
+	INPUT_TOKEN_SPECIAL_ONOFF,
 	INPUT_TOKEN_CODE,
 	INPUT_TOKEN_CODE_DEC,
 	INPUT_TOKEN_CODE_INC,
@@ -685,9 +686,18 @@ struct _ext_inp_header
 	TOKEN_STRING(_tag),
 
 /* input bit definition */
-#define PORT_BIT(_mask,_default,_type) \
+#define PORT_BIT(_mask, _default, _type) \
 	TOKEN_UINT32_PACK2(INPUT_TOKEN_BIT, 8, _type, 24), \
 	TOKEN_UINT64_PACK2(_mask, 32, _default, 32),
+
+#define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
+	TOKEN_UINT32_PACK3(INPUT_TOKEN_SPECIAL_ONOFF, 8, FALSE, 1, INPUT_STRING_##_strindex, 23), \
+	TOKEN_UINT64_PACK2(_mask, 32, _default, 32),
+
+#define PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, _diploc) \
+	TOKEN_UINT32_PACK3(INPUT_TOKEN_SPECIAL_ONOFF, 8, TRUE, 1, INPUT_STRING_##_strindex, 23), \
+	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
+	TOKEN_STRING(_diploc),
 
 /* append a code */
 #define PORT_CODE(_code) \
@@ -743,7 +753,7 @@ struct _ext_inp_header
 
 /* analog settings */
 /* if this macro is not used, the minimum defaluts to 0 and maximum defaults to the mask value */
-#define PORT_MINMAX(_min,_max) \
+#define PORT_MINMAX(_min, _max) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_MINMAX, 8), \
 	TOKEN_UINT64_PACK2(_min, 32, _max, 32),
 
@@ -798,12 +808,12 @@ struct _ext_inp_header
 	TOKEN_PTR(voidptr, _param),
 
 /* dip switch definition */
-#define PORT_DIPNAME(_mask,_default,_name) \
+#define PORT_DIPNAME(_mask, _default, _name) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_DIPNAME, 8), \
 	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
 	TOKEN_STRING(_name),
 
-#define PORT_DIPSETTING(_default,_name) \
+#define PORT_DIPSETTING(_default, _name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_DIPSETTING, 8, _default, 32), \
 	TOKEN_STRING(_name),
 
@@ -814,23 +824,23 @@ struct _ext_inp_header
 	TOKEN_STRING(_location),
 
 /* conditionals for dip switch settings */
-#define PORT_CONDITION(_tag,_mask,_condition,_value) \
+#define PORT_CONDITION(_tag, _mask, _condition, _value) \
 	TOKEN_UINT32_PACK2(INPUT_TOKEN_CONDITION, 8, _condition, 24), \
 	TOKEN_UINT64_PACK2(_mask, 32, _value, 32), \
 	TOKEN_STRING(_tag),
 
 /* analog adjuster definition */
-#define PORT_ADJUSTER(_default,_name) \
+#define PORT_ADJUSTER(_default, _name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_ADJUSTER, 8, _default, 32), \
 	TOKEN_STRING(_name),
 
 /* config definition */
-#define PORT_CONFNAME(_mask,_default,_name) \
+#define PORT_CONFNAME(_mask, _default, _name) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_CONFNAME, 8), \
 	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
 	TOKEN_STRING(_name),
 
-#define PORT_CONFSETTING(_default,_name) \
+#define PORT_CONFSETTING(_default, _name) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_CONFSETTING, 8, _default, 32), \
 	TOKEN_STRING(_name),
 
@@ -843,12 +853,12 @@ struct _ext_inp_header
 #define PORT_CATEGORY(_category) \
 	TOKEN_UINT32_PACK2(INPUT_TOKEN_CHAR, 8, _category, 24),
 
-#define PORT_CATEGORY_CLASS(_mask,_default,_name) \
+#define PORT_CATEGORY_CLASS(_mask, _default, _name) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_CATEGORY_NAME, 8), \
 	TOKEN_UINT64_PACK2(_mask, 32, _default, 32), \
 	TOKEN_STRING(_name),
 
-#define PORT_CATEGORY_ITEM(_default,_name,_category) \
+#define PORT_CATEGORY_ITEM(_default, _name, _category) \
 	TOKEN_UINT64_PACK3(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32, _category, 16), \
 	TOKEN_STRING(_name),
 #endif /* MESS */
@@ -859,38 +869,26 @@ struct _ext_inp_header
     HELPER MACROS
 ***************************************************************************/
 
-#define PORT_SERVICE_DIPLOC(mask,default,loc)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION(loc)	\
-	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
-	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+#define PORT_DIPUNUSED_DIPLOC(_mask, _default, _diploc) \
+	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, Unused, _diploc)
 
-#define PORT_SERVICE(mask,default)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Service_Mode )) PORT_CODE(KEYCODE_F2) PORT_TOGGLE	\
-	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
-	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+#define PORT_DIPUNUSED(_mask, _default) \
+	PORT_SPECIAL_ONOFF(_mask, _default, Unused)
 
-#define PORT_SERVICE_NO_TOGGLE(mask,default)	\
-	PORT_BIT(    mask, mask & default, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode ))
+#define PORT_DIPUNKNOWN_DIPLOC(_mask, _default, _diploc) \
+	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, Unknown, _diploc)
 
-#define PORT_DIPUNUSED_DIPLOC(mask,default,loc)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unused )) PORT_DIPLOCATION(loc)	\
-	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
-	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+#define PORT_DIPUNKNOWN(_mask, _default) \
+	PORT_SPECIAL_ONOFF(_mask, _default, Unknown)
 
-#define PORT_DIPUNUSED(mask,default)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unused )) \
-	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
-	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+#define PORT_SERVICE_DIPLOC(_mask, _default, _diploc) \
+	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, Service_Mode, _diploc)
 
-#define PORT_DIPUNKNOWN_DIPLOC(mask,default,loc)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unknown )) PORT_DIPLOCATION(loc)	\
-	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
-	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+#define PORT_SERVICE(_mask, _default) \
+	PORT_SPECIAL_ONOFF(_mask, _default, Service_Mode)
 
-#define PORT_DIPUNKNOWN(mask,default)	\
-	PORT_BIT(    mask, mask & default, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Unknown )) \
-	PORT_DIPSETTING(    mask & default, DEF_STR( Off ) )	\
-	PORT_DIPSETTING(    mask &~default, DEF_STR( On ) )
+#define PORT_SERVICE_NO_TOGGLE(_mask, _default) \
+	PORT_BIT( _mask, _mask & _default, IPT_SERVICE ) PORT_NAME( DEF_STR( Service_Mode ))
 
 
 

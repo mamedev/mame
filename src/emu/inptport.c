@@ -1959,6 +1959,8 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 	while (entrytype != INPUT_TOKEN_END)
 	{
 		UINT32 mask, defval, type, val;
+		input_port_token temptoken;
+		int hasdiploc, strindex;
 #ifdef MESS
 		UINT16 category;
 #endif /* MESS */
@@ -1997,6 +1999,31 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				port = input_port_initialize(param, type, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
+				break;
+			
+			case INPUT_TOKEN_SPECIAL_ONOFF:
+				TOKEN_UNGET_UINT32(ipt);
+				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, hasdiploc, 1, strindex, 23);
+				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
+
+				port = input_port_initialize(param, IPT_DIPSWITCH_NAME, modify_tag, mask, mask & defval);
+				temptoken.i = strindex;
+				port->name = input_port_string_from_token(temptoken);
+				if (strindex == INPUT_STRING_Service_Mode)
+				{
+					port->toggle = TRUE;
+					port->seq.code[0] = KEYCODE_F2;
+				}
+				if (hasdiploc)
+					input_port_parse_diplocation(port, TOKEN_GET_STRING(ipt));
+
+				port = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, mask & defval);
+				temptoken.i = INPUT_STRING_Off;
+				port->name = input_port_string_from_token(temptoken);
+
+				port = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, mask & ~defval);
+				temptoken.i = INPUT_STRING_On;
+				port->name = input_port_string_from_token(temptoken);
 				break;
 
 			/* append a code */
