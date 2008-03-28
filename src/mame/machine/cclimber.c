@@ -50,7 +50,7 @@ DRIVER_INIT( cclimber )
 	cclimber_decode(convtable);
 }
 
-DRIVER_INIT( cclimbrj )
+void cclimbrj_decode(void)
 {
 	static const UINT8 convtable[8][16] =
 	{
@@ -67,7 +67,12 @@ DRIVER_INIT( cclimbrj )
 	cclimber_decode(convtable);
 }
 
-DRIVER_INIT( mshuttle )
+DRIVER_INIT( cclimbrj )
+{
+	cclimbrj_decode();
+}
+
+void mshuttle_decode(void)
 {
 	static const UINT8 convtable[8][16] =
 	{

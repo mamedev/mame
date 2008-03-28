@@ -105,6 +105,36 @@ static void tone_update(void *param, stream_sample_t **input, stream_sample_t **
 	}
 }
 
+WRITE8_HANDLER( galaxian_sound_w )
+{
+	data &= 0x01;
+	switch (offset & 7)
+	{
+		case 0:		/* FS1 (controls 555 timer at 8R) */
+		case 1:		/* FS2 (controls 555 timer at 8S) */
+		case 2:		/* FS3 (controls 555 timer at 8T) */
+			galaxian_background_enable_w(machine, offset, data);
+			break;
+		
+		case 3:		/* HIT */
+			galaxian_noise_enable_w(machine, 0, data);
+			break;
+		
+		case 4:		/* n/c */
+			break;
+		
+		case 5:		/* FIRE */
+			galaxian_shoot_enable_w(machine, 0, data);
+			break;
+		
+		case 6:		/* VOL1 */
+		case 7:		/* VOL2 */
+			galaxian_vol_w(machine, offset & 1, data);
+			break;
+	}
+}
+
+
 WRITE8_HANDLER( galaxian_pitch_w )
 {
 	stream_update(tone_stream);
@@ -523,6 +553,13 @@ static TIMER_CALLBACK( galaxian_sh_update )
 
 
 const struct Samplesinterface galaxian_samples_interface =
+{
+	5,
+	NULL,
+	galaxian_sh_start
+};
+
+const struct Samplesinterface galaxian_custom_interface =
 {
 	5,
 	NULL,

@@ -818,7 +818,6 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/88games.o $(VIDEO)/88games.o \
 	$(DRIVERS)/ajax.o $(MACHINE)/ajax.o $(VIDEO)/ajax.o \
 	$(DRIVERS)/aliens.o $(VIDEO)/aliens.o \
-	$(DRIVERS)/amidar.o \
 	$(DRIVERS)/asterix.o $(VIDEO)/asterix.o \
 	$(DRIVERS)/battlnts.o $(VIDEO)/battlnts.o \
 	$(DRIVERS)/bishi.o $(VIDEO)/bishi.o \
@@ -838,7 +837,6 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/finalizr.o $(VIDEO)/finalizr.o \
 	$(DRIVERS)/firebeat.o \
 	$(DRIVERS)/flkatck.o $(VIDEO)/flkatck.o \
-	$(DRIVERS)/frogger.o \
 	$(DRIVERS)/gberet.o $(VIDEO)/gberet.o \
 	$(DRIVERS)/gbusters.o $(VIDEO)/gbusters.o \
 	$(DRIVERS)/gijoe.o $(VIDEO)/gijoe.o \
@@ -961,7 +959,8 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/baraduke.o $(VIDEO)/baraduke.o \
 	$(DRIVERS)/dambustr.o \
 	$(DRIVERS)/galaga.o $(AUDIO)/galaga.o $(VIDEO)/galaga.o \
-	$(DRIVERS)/galaxold.o $(MACHINE)/galaxold.o $(AUDIO)/galaxian.o $(VIDEO)/galaxold.o \
+	$(DRIVERS)/galaxian.o $(AUDIO)/galaxian.o $(VIDEO)/galaxian.o \
+	$(DRIVERS)/galaxold.o $(MACHINE)/galaxold.o $(VIDEO)/galaxold.o \
 	$(DRIVERS)/gaplus.o $(MACHINE)/gaplus.o $(VIDEO)/gaplus.o \
 	$(DRIVERS)/mappy.o $(VIDEO)/mappy.o \
 	$(DRIVERS)/namcofl.o $(VIDEO)/namcofl.o \
@@ -1741,5 +1740,6 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 # misc dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c
+$(DRIVERS)/galaxian.o:	$(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/mpu4.o:		$(MAMESRC)/drivers/mpu4drvr.c
+$(DRIVERS)/neogeo.o:	$(MAMESRC)/drivers/neodrvr.c

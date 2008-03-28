@@ -20,7 +20,7 @@ static UINT8 security_2B_counter;
 
 MACHINE_RESET( scramble )
 {
-	MACHINE_RESET_CALL(galaxian);
+	MACHINE_RESET_CALL(galaxold);
 
 	if (cpu_gettotalcpu() > 1)
 	{
@@ -61,7 +61,7 @@ MACHINE_RESET( explorer )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	RAM[0x47ff] = 0; /* If not set, it doesn't reset after the 1st time */
 
-	MACHINE_RESET_CALL(galaxian);
+	MACHINE_RESET_CALL(galaxold);
 }
 
 static READ8_HANDLER( scrambls_input_port_2_r )
@@ -333,14 +333,14 @@ DRIVER_INIT( scobra )
 {
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa803, 0xa803, 0, 0, scramble_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( atlantis )
 {
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, scramble_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( scramble )
@@ -371,9 +371,9 @@ DRIVER_INIT( stratgyx )
 {
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0, scramble_background_green_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scramble_background_blue_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb00a, 0xb00a, 0, 0, scramble_background_red_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
 
 	ppi8255_set_portCread(0, stratgyx_input_port_2_r);
 	ppi8255_set_portCread(1, stratgyx_input_port_3_r);
@@ -383,7 +383,7 @@ DRIVER_INIT( tazmani2 )
 {
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scramble_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( amidar )
@@ -576,21 +576,21 @@ DRIVER_INIT( mimonkey )
 
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scramble_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonsco )
 {
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scramble_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonscr )
 {
 	DRIVER_INIT_CALL(scramble_ppi);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6804, 0x6804, 0, 0, scramble_background_enable_w);
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
 }
 
 

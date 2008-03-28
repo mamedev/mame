@@ -26,17 +26,16 @@ extern size_t galaxold_spriteram_size;
 extern size_t galaxold_spriteram2_size;
 extern size_t galaxold_bulletsram_size;
 
-PALETTE_INIT( galaxian );
-PALETTE_INIT( scramble );
-PALETTE_INIT( turtles );
+PALETTE_INIT( galaxold );
+PALETTE_INIT( scrambold );
 PALETTE_INIT( moonwar );
 PALETTE_INIT( darkplnt );
 PALETTE_INIT( rescue );
 PALETTE_INIT( minefld );
 PALETTE_INIT( stratgyx );
 PALETTE_INIT( mariner );
-PALETTE_INIT( frogger );
 PALETTE_INIT( rockclim );
+PALETTE_INIT( turtles );
 
 WRITE8_HANDLER( galaxold_videoram_w );
 READ8_HANDLER( galaxold_videoram_r );
@@ -48,28 +47,26 @@ READ8_HANDLER( rockclim_videoram_r );
 WRITE8_HANDLER( galaxold_attributesram_w );
 
 WRITE8_HANDLER( galaxold_stars_enable_w );
-WRITE8_HANDLER( scramble_background_enable_w );
-WRITE8_HANDLER( scramble_background_red_w );
-WRITE8_HANDLER( scramble_background_green_w );
-WRITE8_HANDLER( scramble_background_blue_w );
+WRITE8_HANDLER( scrambold_background_enable_w );
+WRITE8_HANDLER( scrambold_background_red_w );
+WRITE8_HANDLER( scrambold_background_green_w );
+WRITE8_HANDLER( scrambold_background_blue_w );
 WRITE8_HANDLER( hotshock_flip_screen_w );
 WRITE8_HANDLER( darkplnt_bullet_color_w );
 WRITE8_HANDLER( racknrol_tiles_bank_w );
 
 VIDEO_START( galaxold_plain );
-VIDEO_START( galaxian );
-VIDEO_START( gmgalax );
+VIDEO_START( galaxold );
 VIDEO_START( mooncrst );
 VIDEO_START( mooncrgx );
 VIDEO_START( moonqsr );
 VIDEO_START( mshuttle );
 VIDEO_START( pisces );
-VIDEO_START( gteikob2 );
 VIDEO_START( batman2 );
 VIDEO_START( jumpbug );
 VIDEO_START( azurian );
 VIDEO_START( dkongjrm );
-VIDEO_START( scramble );
+VIDEO_START( scrambold );
 VIDEO_START( theend );
 VIDEO_START( darkplnt );
 VIDEO_START( rescue );
@@ -91,7 +88,7 @@ VIDEO_START( scorpion );
 VIDEO_START( racknrol );
 VIDEO_START( ad2083 );
 
-VIDEO_UPDATE( galaxian );
+VIDEO_UPDATE( galaxold );
 
 WRITE8_HANDLER( galaxold_gfxbank_w );
 WRITE8_HANDLER( galaxold_flip_screen_x_w );
@@ -113,7 +110,6 @@ DRIVER_INIT( mooncrst );
 DRIVER_INIT( mooncrgx );
 DRIVER_INIT( moonqsr );
 DRIVER_INIT( checkman );
-DRIVER_INIT( gteikob2 );
 DRIVER_INIT( azurian );
 DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
@@ -121,7 +117,7 @@ DRIVER_INIT( gmgalax );
 
 WRITE8_HANDLER( galaxold_nmi_enable_w );
 
-MACHINE_RESET( galaxian );
+MACHINE_RESET( galaxold );
 MACHINE_RESET( devilfsg );
 
 WRITE8_HANDLER( galaxold_coin_lockout_w );

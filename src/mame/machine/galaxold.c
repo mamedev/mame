@@ -89,7 +89,7 @@ static void machine_reset_common(running_machine *machine, int line)
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
-MACHINE_RESET( galaxian )
+MACHINE_RESET( galaxold )
 {
 	machine_reset_common(machine, INPUT_LINE_NMI);
 }
@@ -98,7 +98,6 @@ MACHINE_RESET( devilfsg )
 {
 	machine_reset_common(machine, 0);
 }
-
 
 
 WRITE8_HANDLER( galaxold_coin_lockout_w )
@@ -127,24 +126,6 @@ WRITE8_HANDLER( galaxold_leds_w )
 {
 	set_led_status(offset,data & 1);
 }
-
-
-READ8_HANDLER( jumpbug_protection_r )
-{
-	switch (offset)
-	{
-	case 0x0114:  return 0x4f;
-	case 0x0118:  return 0xd3;
-	case 0x0214:  return 0xcf;
-	case 0x0235:  return 0x02;
-	case 0x0311:  return 0x00;  /* not checked */
-	default:
-		logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,activecpu_get_pc());
-	}
-
-	return 0;
-}
-
 
 
 static READ8_HANDLER( checkmaj_protection_r )
@@ -490,14 +471,6 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 		rom[i] ^= data_xor;
 	}
-}
-
-DRIVER_INIT( gteikob2 )
-{
-	DRIVER_INIT_CALL(pisces);
-
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7006, 0x7006, 0, 0, gteikob2_flip_screen_x_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7007, 0x7007, 0, 0, gteikob2_flip_screen_y_w);
 }
 
 DRIVER_INIT( azurian )

@@ -51,40 +51,25 @@ static UINT8 color_mask;
 static tilemap *dambustr_tilemap2;
 static UINT8 *dambustr_videoram2;
 static void (*modify_charcode)(UINT16 *code,UINT8 x);		/* function to call to do character banking */
-static void  gmgalax_modify_charcode(UINT16 *code,UINT8 x);
 static void mooncrst_modify_charcode(UINT16 *code,UINT8 x);
-static void mooncrgx_modify_charcode(UINT16 *code,UINT8 x);
-static void  moonqsr_modify_charcode(UINT16 *code,UINT8 x);
-static void mshuttle_modify_charcode(UINT16 *code,UINT8 x);
 static void   pisces_modify_charcode(UINT16 *code,UINT8 x);
 static void mimonkey_modify_charcode(UINT16 *code,UINT8 x);
-static void  batman2_modify_charcode(UINT16 *code,UINT8 x);
 static void  mariner_modify_charcode(UINT16 *code,UINT8 x);
-static void  jumpbug_modify_charcode(UINT16 *code,UINT8 x);
 static void dambustr_modify_charcode(UINT16 *code,UINT8 x);
 
 static void (*modify_spritecode)(UINT8 *spriteram,int*,int*,int*,int);	/* function to call to do sprite banking */
-static void  gmgalax_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void mooncrst_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void mooncrgx_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  moonqsr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void mshuttle_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void  calipso_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void   pisces_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void mimonkey_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void  batman2_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
-static void  jumpbug_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void dkongjrm_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void   ad2083_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 static void dambustr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs);
 
 static void (*modify_color)(UINT8 *color);	/* function to call to do modify how the color codes map to the PROM */
-static void frogger_modify_color(UINT8 *color);
-static void gmgalax_modify_color(UINT8 *color);
 static void drivfrcg_modify_color(UINT8 *color);
 
 static void (*modify_ypos)(UINT8*);	/* function to call to do modify how vertical positioning bits are connected */
-static void frogger_modify_ypos(UINT8 *sy);
 
 static TIMER_CALLBACK( stars_blink_callback );
 static TIMER_CALLBACK( stars_scroll_callback );
@@ -112,7 +97,6 @@ static void     noop_draw_stars(running_machine *machine, bitmap_t *bitmap, cons
 static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void   rescue_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void  mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void  jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void start_stars_blink_timer(double ra, double rb, double c);
 static void start_stars_scroll_timer(running_machine *machine);
 
@@ -120,9 +104,7 @@ static void start_stars_scroll_timer(running_machine *machine);
 static UINT8 darkplnt_bullet_color;
 static void (*draw_bullets)(bitmap_t *,int,int,int,const rectangle *);	/* function to call to draw a bullet */
 static void galaxold_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
-static void   theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 static void darkplnt_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect);
 
@@ -134,7 +116,6 @@ static void galaxold_draw_background(bitmap_t *bitmap, const rectangle *cliprect
 static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void  turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void  mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
-static void  frogger_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void  minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
 static void   rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect);
@@ -183,7 +164,7 @@ static bitmap_t *dambustr_tmpbitmap;
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT( galaxian )
+PALETTE_INIT( galaxold )
 {
 	int i;
 
@@ -222,9 +203,9 @@ PALETTE_INIT( galaxian )
 	palette_set_color(machine,BULLETS_COLOR_BASE+1,MAKE_RGB(0xef,0xef,0xef));
 }
 
-PALETTE_INIT( scramble )
+PALETTE_INIT( scrambold )
 {
-	PALETTE_INIT_CALL(galaxian);
+	PALETTE_INIT_CALL(galaxold);
 
 
 	/* blue background - 390 ohm resistor */
@@ -233,35 +214,11 @@ PALETTE_INIT( scramble )
 
 PALETTE_INIT( moonwar )
 {
-	PALETTE_INIT_CALL(scramble);
+	PALETTE_INIT_CALL(scrambold);
 
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
 	palette_set_color(machine,BULLETS_COLOR_BASE+0,MAKE_RGB(0xef,0xef,0x97));
-}
-
-PALETTE_INIT( turtles )
-{
-	int i;
-
-
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/*  The background color generator is connected this way:
-
-        RED   - 390 ohm resistor
-        GREEN - 470 ohm resistor
-        BLUE  - 390 ohm resistor */
-
-	for (i = 0; i < 8; i++)
-	{
-		int r = BIT(i,0) * 0x55;
-		int g = BIT(i,1) * 0x47;
-		int b = BIT(i,2) * 0x55;
-
-		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
-	}
 }
 
 PALETTE_INIT( stratgyx )
@@ -269,7 +226,7 @@ PALETTE_INIT( stratgyx )
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxian);
+	PALETTE_INIT_CALL(galaxold);
 
 
 	/*  The background color generator is connected this way:
@@ -286,15 +243,6 @@ PALETTE_INIT( stratgyx )
 
 		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
 	}
-}
-
-PALETTE_INIT( frogger )
-{
-	PALETTE_INIT_CALL(galaxian);
-
-
-	/* blue background - 470 ohm resistor */
-	palette_set_color(machine,BACKGROUND_COLOR_BASE,MAKE_RGB(0,0,0x47));
 }
 
 PALETTE_INIT( rockclim )
@@ -384,7 +332,7 @@ PALETTE_INIT( minefld )
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxian);
+	PALETTE_INIT_CALL(galaxold);
 
 
 	/* set up background colors */
@@ -415,7 +363,7 @@ PALETTE_INIT( rescue )
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxian);
+	PALETTE_INIT_CALL(galaxold);
 
 
 	/* set up background colors */
@@ -436,7 +384,7 @@ PALETTE_INIT( mariner )
 	int i;
 
 
-	PALETTE_INIT_CALL(galaxian);
+	PALETTE_INIT_CALL(galaxold);
 
 
 	/* set up background colors */
@@ -465,7 +413,7 @@ PALETTE_INIT( dambustr )
 {
 	int i;
 
-	PALETTE_INIT_CALL(galaxian);
+	PALETTE_INIT_CALL(galaxold);
 
 
 	/*
@@ -486,6 +434,30 @@ PALETTE_INIT( dambustr )
 	}
 }
 
+
+PALETTE_INIT( turtles )
+{
+	int i;
+
+
+	PALETTE_INIT_CALL(galaxold);
+
+
+	/*  The background color generator is connected this way:
+
+        RED   - 390 ohm resistor
+        GREEN - 470 ohm resistor
+        BLUE  - 390 ohm resistor */
+
+	for (i = 0; i < 8; i++)
+	{
+		int r = BIT(i,0) * 0x55;
+		int g = BIT(i,1) * 0x47;
+		int b = BIT(i,2) * 0x55;
+
+		palette_set_color_rgb(machine,BACKGROUND_COLOR_BASE+i,r,g,b);
+	}
+}
 
 
 /***************************************************************************
@@ -557,7 +529,7 @@ VIDEO_START( galaxold_plain )
 	tilemap_set_scroll = tilemap_set_scrolly;
 }
 
-VIDEO_START( galaxian )
+VIDEO_START( galaxold )
 {
 	VIDEO_START_CALL(galaxold_plain);
 
@@ -566,72 +538,7 @@ VIDEO_START( galaxian )
 	draw_bullets = galaxold_draw_bullets;
 }
 
-VIDEO_START( gmgalax )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = gmgalax_modify_charcode;
-	modify_spritecode = gmgalax_modify_spritecode;
-	modify_color      = gmgalax_modify_color;
-}
-
-VIDEO_START( mooncrst )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = mooncrst_modify_charcode;
-	modify_spritecode = mooncrst_modify_spritecode;
-}
-
-VIDEO_START( mooncrgx )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = mooncrgx_modify_charcode;
-	modify_spritecode = mooncrgx_modify_spritecode;
-}
-
-VIDEO_START( moonqsr )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = moonqsr_modify_charcode;
-	modify_spritecode = moonqsr_modify_spritecode;
-}
-
-VIDEO_START( mshuttle )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = mshuttle_modify_charcode;
-	modify_spritecode = mshuttle_modify_spritecode;
-}
-
-VIDEO_START( pisces )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = pisces_modify_charcode;
-	modify_spritecode = pisces_modify_spritecode;
-}
-
-VIDEO_START( gteikob2 )
-{
-	VIDEO_START_CALL(pisces);
-
-	draw_bullets = gteikob2_draw_bullets;
-}
-
-VIDEO_START( batman2 )
-{
-	VIDEO_START_CALL(galaxian);
-
-	modify_charcode   = batman2_modify_charcode;
-	modify_spritecode = batman2_modify_spritecode;
-
-}
-
-VIDEO_START( scramble )
+VIDEO_START( scrambold )
 {
 	VIDEO_START_CALL(galaxold_plain);
 
@@ -647,34 +554,6 @@ VIDEO_START( scramble )
 	draw_background = scramble_draw_background;
 }
 
-VIDEO_START( sfx )
-{
-	video_start_common(machine,tilemap_scan_cols);
-
-	tilemap_set_scroll_rows(bg_tilemap, 32);
-	tilemap_set_scroll = tilemap_set_scrollx;
-
-	draw_stars = scramble_draw_stars;
-
-	draw_bullets = scramble_draw_bullets;
-
-	draw_background = turtles_draw_background;
-}
-
-VIDEO_START( turtles )
-{
-	VIDEO_START_CALL(galaxold_plain);
-
-	draw_background = turtles_draw_background;
-}
-
-VIDEO_START( theend )
-{
-	VIDEO_START_CALL(galaxian);
-
-	draw_bullets = theend_draw_bullets;
-}
-
 VIDEO_START( darkplnt )
 {
 	VIDEO_START_CALL(galaxold_plain);
@@ -685,7 +564,7 @@ VIDEO_START( darkplnt )
 
 VIDEO_START( rescue )
 {
-	VIDEO_START_CALL(scramble);
+	VIDEO_START_CALL(scrambold);
 
 	draw_stars = rescue_draw_stars;
 
@@ -694,7 +573,7 @@ VIDEO_START( rescue )
 
 VIDEO_START( minefld )
 {
-	VIDEO_START_CALL(scramble);
+	VIDEO_START_CALL(scrambold);
 
 	draw_stars = rescue_draw_stars;
 
@@ -710,7 +589,7 @@ VIDEO_START( stratgyx )
 
 VIDEO_START( ckongs )
 {
-	VIDEO_START_CALL(scramble);
+	VIDEO_START_CALL(scrambold);
 
 	modify_spritecode = mshuttle_modify_spritecode;
 }
@@ -739,42 +618,9 @@ VIDEO_START( mariner )
 	modify_charcode = mariner_modify_charcode;
 }
 
-VIDEO_START( froggers )
-{
-	VIDEO_START_CALL(galaxold_plain);
-
-	draw_background = frogger_draw_background;
-	modify_color = frogger_modify_color;
-}
-
-VIDEO_START( frogger )
-{
-	VIDEO_START_CALL(froggers);
-
-	modify_ypos = frogger_modify_ypos;
-}
-
-VIDEO_START( jumpbug )
-{
-	VIDEO_START_CALL(scramble);
-
-	draw_stars = jumpbug_draw_stars;
-
-	modify_charcode   = jumpbug_modify_charcode;
-	modify_spritecode = jumpbug_modify_spritecode;
-}
-
-VIDEO_START( azurian )
-{
-	VIDEO_START_CALL(galaxold_plain);
-
-	draw_stars = galaxold_draw_stars;
-	draw_bullets = scramble_draw_bullets; /* Shots are yellow like in Scramble */
-}
-
 VIDEO_START( mimonkey )
 {
-	VIDEO_START_CALL(scramble);
+	VIDEO_START_CALL(scrambold);
 
 	modify_charcode   = mimonkey_modify_charcode;
 	modify_spritecode = mimonkey_modify_spritecode;
@@ -792,7 +638,7 @@ VIDEO_START( dkongjrm )
 
 VIDEO_START( newsin7 )
 {
-	VIDEO_START_CALL(scramble);
+	VIDEO_START_CALL(scrambold);
 
 	spritevisiblearea      = &_spritevisibleareaflipx;
 	spritevisibleareaflipx = &_spritevisiblearea;
@@ -800,10 +646,80 @@ VIDEO_START( newsin7 )
 
 VIDEO_START( scorpion )
 {
-	VIDEO_START_CALL(scramble);
+	VIDEO_START_CALL(scrambold);
 
 	modify_spritecode = batman2_modify_spritecode;
 }
+
+static void pisces_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
+{
+	*code |= (gfxbank[0] << 6);
+}
+
+VIDEO_START( pisces )
+{
+	VIDEO_START_CALL(galaxold);
+
+	modify_charcode   = pisces_modify_charcode;
+	modify_spritecode = pisces_modify_spritecode;
+}
+
+static void theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
+{
+	int i;
+
+
+	/* same as Galaxian, but all bullets are yellow */
+	for (i = 0; i < 4; i++)
+	{
+		x--;
+
+		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
+			*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
+	}
+}
+
+VIDEO_START( theend )
+{
+	VIDEO_START_CALL(galaxold);
+
+	draw_bullets = theend_draw_bullets;
+}
+
+static void mooncrst_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
+{
+	if (gfxbank[2] && ((*code & 0x30) == 0x20))
+	{
+		*code = (*code & 0x0f) | (gfxbank[0] << 4) | (gfxbank[1] << 5) | 0x40;
+	}
+}
+
+VIDEO_START( mooncrst )
+{
+	VIDEO_START_CALL(galaxold);
+
+	modify_charcode   = mooncrst_modify_charcode;
+	modify_spritecode = mooncrst_modify_spritecode;
+}
+
+static void batman2_modify_charcode(UINT16 *code,UINT8 x)
+{
+	if (*code & 0x80)
+	{
+		*code |= (gfxbank[0] << 8);
+	}
+}
+
+VIDEO_START( batman2 )
+{
+	VIDEO_START_CALL(galaxold);
+
+	modify_charcode   = batman2_modify_charcode;
+	modify_spritecode = batman2_modify_spritecode;
+
+}
+
+
 
 static void rockclim_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -817,7 +733,7 @@ static void rockclim_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int
 
 VIDEO_START( rockclim )
 {
-	VIDEO_START_CALL(galaxian);
+	VIDEO_START_CALL(galaxold);
 	rockclim_tilemap = tilemap_create(rockclim_get_tile_info,tilemap_scan_rows,8,8,64,32);
 	draw_background = rockclim_draw_background;
 	modify_charcode = mooncrst_modify_charcode;
@@ -1003,7 +919,7 @@ static TILE_GET_INFO( dambustr_get_tile_info2 )
 
 VIDEO_START( dambustr )
 {
-	VIDEO_START_CALL(galaxian);
+	VIDEO_START_CALL(galaxold);
 
 	dambustr_bg_split_line = 0;
 	dambustr_bg_color_1 = 0;
@@ -1107,22 +1023,22 @@ WRITE8_HANDLER( hotshock_flip_screen_w )
 }
 
 
-WRITE8_HANDLER( scramble_background_enable_w )
+WRITE8_HANDLER( scrambold_background_enable_w )
 {
 	background_enable = data & 0x01;
 }
 
-WRITE8_HANDLER( scramble_background_red_w )
+WRITE8_HANDLER( scrambold_background_red_w )
 {
 	background_red = data & 0x01;
 }
 
-WRITE8_HANDLER( scramble_background_green_w )
+WRITE8_HANDLER( scrambold_background_green_w )
 {
 	background_green = data & 0x01;
 }
 
-WRITE8_HANDLER( scramble_background_blue_w )
+WRITE8_HANDLER( scrambold_background_blue_w )
 {
 	background_blue = data & 0x01;
 }
@@ -1200,35 +1116,12 @@ WRITE8_HANDLER( dambustr_bg_color_w )
 
 /* character banking functions */
 
-static void gmgalax_modify_charcode(UINT16 *code,UINT8 x)
-{
-	*code |= (gfxbank[0] << 9);
-}
-
 static void mooncrst_modify_charcode(UINT16 *code,UINT8 x)
 {
 	if (gfxbank[2] && ((*code & 0xc0) == 0x80))
 	{
 		*code = (*code & 0x3f) | (gfxbank[0] << 6) | (gfxbank[1] << 7) | 0x0100;
 	}
-}
-
-static void mooncrgx_modify_charcode(UINT16 *code,UINT8 x)
-{
-	if (gfxbank[2] && ((*code & 0xc0) == 0x80))
-	{
-		*code = (*code & 0x3f) | (gfxbank[1] << 6) | (gfxbank[0] << 7) | 0x0100;
-	}
-}
-
-static void moonqsr_modify_charcode(UINT16 *code,UINT8 x)
-{
-	*code |= ((galaxold_attributesram[(x << 1) | 1] & 0x20) << 3);
-}
-
-static void mshuttle_modify_charcode(UINT16 *code,UINT8 x)
-{
-	*code |= ((galaxold_attributesram[(x << 1) | 1] & 0x30) << 4);
 }
 
 static void pisces_modify_charcode(UINT16 *code,UINT8 x)
@@ -1239,14 +1132,6 @@ static void pisces_modify_charcode(UINT16 *code,UINT8 x)
 static void mimonkey_modify_charcode(UINT16 *code,UINT8 x)
 {
 	*code |= (gfxbank[0] << 8) | (gfxbank[2] << 9);
-}
-
-static void batman2_modify_charcode(UINT16 *code,UINT8 x)
-{
-	if (*code & 0x80)
-	{
-		*code |= (gfxbank[0] << 8);
-	}
 }
 
 static void mariner_modify_charcode(UINT16 *code,UINT8 x)
@@ -1260,18 +1145,6 @@ static void mariner_modify_charcode(UINT16 *code,UINT8 x)
 
 	*code |= ((prom[x] & 0x01) << 8);
 }
-
-static void jumpbug_modify_charcode(UINT16 *code,UINT8 x)
-{
-	if (((*code & 0xc0) == 0x80) &&
-		 (gfxbank[2] & 0x01))
-	{
-		*code += 128 + (( gfxbank[0] & 0x01) << 6) +
-					   (( gfxbank[1] & 0x01) << 7) +
-					   ((~gfxbank[4] & 0x01) << 8);
-	}
-}
-
 
 static void dambustr_modify_charcode(UINT16 *code,UINT8 x)
 {
@@ -1290,32 +1163,6 @@ static void dambustr_modify_charcode(UINT16 *code,UINT8 x)
 
 /* sprite banking functions */
 
-static void gmgalax_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= (gfxbank[0] << 7) | 0x40;
-}
-
-static void mooncrst_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (gfxbank[2] && ((*code & 0x30) == 0x20))
-	{
-		*code = (*code & 0x0f) | (gfxbank[0] << 4) | (gfxbank[1] << 5) | 0x40;
-	}
-}
-
-static void mooncrgx_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (gfxbank[2] && ((*code & 0x30) == 0x20))
-	{
-		*code = (*code & 0x0f) | (gfxbank[1] << 4) | (gfxbank[0] << 5) | 0x40;
-	}
-}
-
-static void moonqsr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= ((spriteram[offs + 2] & 0x20) << 1);
-}
-
 static void mshuttle_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
 {
 	*code |= ((spriteram[offs + 2] & 0x30) << 2);
@@ -1329,11 +1176,6 @@ static void calipso_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int 
 	*flipy = 0;
 }
 
-static void pisces_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	*code |= (gfxbank[0] << 6);
-}
-
 static void mimonkey_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
 {
 	*code |= (gfxbank[0] << 6) | (gfxbank[2] << 7);
@@ -1343,17 +1185,6 @@ static void batman2_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int 
 {
 	/* only the upper 64 sprites are used */
 	*code |= 0x40;
-}
-
-static void jumpbug_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
-{
-	if (((*code & 0x30) == 0x20) &&
-		 (gfxbank[2] & 0x01) != 0)
-	{
-		*code += 32 + (( gfxbank[0] & 0x01) << 4) +
-					  (( gfxbank[1] & 0x01) << 5) +
-					  ((~gfxbank[4] & 0x01) << 6);
-	}
 }
 
 static void dkongjrm_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int *flipy,int offs)
@@ -1378,27 +1209,12 @@ static void dambustr_modify_spritecode(UINT8 *spriteram,int *code,int *flipx,int
 
 /* color PROM mapping functions */
 
-static void frogger_modify_color(UINT8 *color)
-{
-	*color = ((*color >> 1) & 0x03) | ((*color << 2) & 0x04);
-}
-
-static void gmgalax_modify_color(UINT8 *color)
-{
-	*color |= (gfxbank[0] << 3);
-}
-
 static void drivfrcg_modify_color(UINT8 *color)
 {
 	*color = ((*color & 0x40) >> 3) | (*color & 7);
 }
 
 /* y position mapping functions */
-
-static void frogger_modify_ypos(UINT8 *sy)
-{
-	*sy = (*sy << 4) | (*sy >> 4);
-}
 
 
 /* bullet drawing functions */
@@ -1425,11 +1241,6 @@ static void galaxold_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 	}
 }
 
-static void gteikob2_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	galaxold_draw_bullets(bitmap, offs, 260 - x, y, cliprect);
-}
-
 static void scramble_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
 {
 	if (flipscreen_x)  x++;
@@ -1449,21 +1260,6 @@ static void darkplnt_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 
 	if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
 		*BITMAP_ADDR16(bitmap, y, x) = 32 + darkplnt_bullet_color;
-}
-
-static void theend_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
-{
-	int i;
-
-
-	/* same as Galaxian, but all bullets are yellow */
-	for (i = 0; i < 4; i++)
-	{
-		x--;
-
-		if ((x >= cliprect->min_x) && (x <= cliprect->max_x) && (y >= cliprect->min_y) && (y <= cliprect->max_y))
-			*BITMAP_ADDR16(bitmap, y, x) = BULLETS_COLOR_BASE;
-	}
 }
 
 static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, const rectangle *cliprect)
@@ -1515,21 +1311,6 @@ static void turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 	int color = (background_blue << 2) | (background_green << 1) | background_red;
 
 	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,cliprect);
-}
-
-static void frogger_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
-{
-	/* color split point verified on real machine */
-	if (flipscreen_x)
-	{
-		plot_box(bitmap,   0, 0, 128, 256, 0);
-		plot_box(bitmap, 128, 0, 128, 256, BACKGROUND_COLOR_BASE);
-	}
-	else
-	{
-		plot_box(bitmap,   0, 0, 128, 256, BACKGROUND_COLOR_BASE);
-		plot_box(bitmap, 128, 0, 128, 256, 0);
-	}
 }
 
 static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1929,58 +1710,6 @@ static void mariner_draw_stars(running_machine *machine, bitmap_t *bitmap, const
 	}
 }
 
-static void jumpbug_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	int offs;
-
-
-	if (!timer_adjusted)
-	{
-		start_stars_blink_timer(100000, 10000, 0.00001);
-		start_stars_scroll_timer(machine);
-		timer_adjusted = 1;
-	}
-
-
-	for (offs = 0;offs < STAR_COUNT;offs++)
-	{
-		int x,y;
-
-
-		x = stars[offs].x >> 1;
-		y = stars[offs].y;
-
-		/* determine when to skip plotting */
-		if ((y & 0x01) ^ ((x >> 3) & 0x01))
-		{
-			switch (stars_blink_state & 0x03)
-			{
-			case 0:
-				if (!(stars[offs].color & 0x01))  continue;
-				break;
-			case 1:
-				if (!(stars[offs].color & 0x04))  continue;
-				break;
-			case 2:
-				if (!(stars[offs].y & 0x02))  continue;
-				break;
-			case 3:
-				/* always plot */
-				break;
-			}
-
-			x = ((stars[offs].x +   stars_scrollpos) & 0x01ff) >> 1;
-			y = ( stars[offs].y + ((stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
-
-			/* no stars in the status area */
-			if (x >= 240)  continue;
-
-			plot_star(bitmap, x, y, stars[offs].color, cliprect);
-		}
-	}
-}
-
-
 static TIMER_CALLBACK( stars_blink_callback )
 {
 	stars_blink_state++;
@@ -2122,7 +1851,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, UINT8 *spri
 }
 
 
-VIDEO_UPDATE( galaxian )
+VIDEO_UPDATE( galaxold )
 {
 	draw_background(bitmap, cliprect);
 

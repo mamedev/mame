@@ -2,7 +2,8 @@
 
 DRIVER_INIT( cclimber );
 DRIVER_INIT( cclimbrj );
-DRIVER_INIT( mshuttle );
+void cclimbrj_decode(void);
+void mshuttle_decode(void);
 DRIVER_INIT( cannonb );
 DRIVER_INIT( cannonb2 );
 DRIVER_INIT( ckongb );

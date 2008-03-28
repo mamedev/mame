@@ -350,7 +350,7 @@ static ADDRESS_MAP_START( anteatg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2621, 0x2621) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x2624, 0x2624) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x2647, 0x2647) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x2653, 0x2653) AM_WRITE(scramble_background_enable_w)
+	AM_RANGE(0x2653, 0x2653) AM_WRITE(scrambold_background_enable_w)
 	AM_RANGE(0x2702, 0x2702) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x2736, 0x2736) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x4600, 0x4fff) AM_WRITE(SMH_ROM)
@@ -388,7 +388,7 @@ static ADDRESS_MAP_START( anteatgb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1171, 0x1171) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x1174, 0x1174) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x1177, 0x1177) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x1173, 0x1173) AM_WRITE(scramble_background_enable_w)
+	AM_RANGE(0x1173, 0x1173) AM_WRITE(scrambold_background_enable_w)
 	AM_RANGE(0x1172, 0x1172) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0x1176, 0x1176) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x4600, 0x4fff) AM_WRITE(SMH_ROM)
@@ -1404,9 +1404,9 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_GFXDECODE(scobra)
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for background */
 
-	MDRV_PALETTE_INIT(scramble)
-	MDRV_VIDEO_START(scramble)
-	MDRV_VIDEO_UPDATE(galaxian)
+	MDRV_PALETTE_INIT(scrambold)
+	MDRV_VIDEO_START(scrambold)
+	MDRV_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1428,7 +1428,7 @@ static MACHINE_DRIVER_START( armorcar )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2)	/* 32 for characters, 64 for stars, 2 for bullets */
 
-	MDRV_PALETTE_INIT(galaxian)
+	MDRV_PALETTE_INIT(galaxold)
 	MDRV_VIDEO_START(theend)
 MACHINE_DRIVER_END
 
@@ -1561,9 +1561,9 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_GFXDECODE(scobra)
 	MDRV_PALETTE_LENGTH(32+64+2)	/* 32 for characters, 64 for stars, 2 for bullets */
 
-	MDRV_PALETTE_INIT(galaxian)
-	MDRV_VIDEO_START(scramble)
-	MDRV_VIDEO_UPDATE(galaxian)
+	MDRV_PALETTE_INIT(galaxold)
+	MDRV_VIDEO_START(scrambold)
+	MDRV_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2221,29 +2221,19 @@ ROM_START( mimonsco )
 ROM_END
 
 
-GAME( 1981, scobra,   0,        type1,    scobra,   scobra,       ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobras,  scobra,   type1,    scobras,  scobra,       ROT90,  "[Konami] (Stern license)", "Super Cobra (Stern)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobrase, scobra,   type1,    scobras,  scobra,       ROT90,  "[Konami] (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
-GAME( 1981, scobrab,  scobra,   type1,    scobras,  scobra,       ROT90,  "bootleg", "Super Cobra (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1981, stratgyx, 0,        stratgyx, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
 GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "[Konami] (Stern license)", "Strategy X (Stern)", GAME_SUPPORTS_SAVE )
-GAME( 1981, armorcar, 0,        armorcar, armorcar, scramble_ppi, ROT90,  "Stern", "Armored Car (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1981, armorca2, armorcar, armorcar, armorcar, scramble_ppi, ROT90,  "Stern", "Armored Car (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, moonwar,  0,        moonwar,  moonwar,  moonwar,      ROT90,  "Stern", "Moonwar", GAME_SUPPORTS_SAVE )
 GAME( 1981, moonwara, moonwar,  moonwar,  moonwara, moonwar,      ROT90,  "Stern", "Moonwar (older)", GAME_SUPPORTS_SAVE )
 GAME( 1984, spdcoin,  0,        type1,    spdcoin,  scramble_ppi, ROT90,  "Stern", "Speed Coin (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1982, darkplnt, 0,        darkplnt, darkplnt, darkplnt,     ROT180, "Stern", "Dark Planet", GAME_SUPPORTS_SAVE )
-GAME( 1982, tazmania, 0,        type1,    tazmania, scobra,       ROT90,  "Stern", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, tazmani2, tazmania, type2,    tazmania, tazmani2,     ROT90,  "Stern", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, calipso,  0,        calipso,  calipso,  scobra,       ROT90,  "[Stern] (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
-GAME( 1982, anteater, 0,        type1,    anteater, anteater,     ROT90,  "[Stern] (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
 GAME( 1983, anteatg,  anteater, anteatg,  anteatg,  scramble_ppi, ROT90,  "TV-Tuning (F.E.G. license)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
 GAME( 1983, anteatgb, anteater, anteatgb, anteatgb, scramble_ppi, ROT90,  "Free Enterprise Games", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
 GAME( 1982, rescue,   0,        rescue,   rescue,   rescue,       ROT90,  "Stern", "Rescue", GAME_SUPPORTS_SAVE )
 GAME( 1982, aponow,   rescue,   rescue,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
 GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern", "Minefield", GAME_SUPPORTS_SAVE )
-GAME( 1982, losttomb, 0,        type1,    losttomb, losttomb,     ROT90,  "Stern", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
-GAME( 1982, losttmbh, losttomb, type1,    losttomb, losttomb,     ROT90,  "Stern", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
 GAME( 198?, superbon, 0,        type1,    superbon, superbon,     ROT90,  "bootleg", "Super Bond", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
