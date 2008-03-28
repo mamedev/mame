@@ -9,12 +9,8 @@
 
 ***************************************************************************/
 
-#ifndef _COP400_H
-#define _COP400_H
-
-#ifndef INLINE
-#define INLINE static inline
-#endif
+#ifndef __COP400__
+#define __COP400__
 
 #define COP400_PORT_L	0x100
 #define COP400_PORT_G	0x101
@@ -38,13 +34,22 @@ enum {
     COP400_SKL
 };
 
+extern void cop401_get_info(UINT32 state, cpuinfo *info);
 extern void cop410_get_info(UINT32 state, cpuinfo *info);
 extern void cop411_get_info(UINT32 state, cpuinfo *info);
+
+extern void cop402_get_info(UINT32 state, cpuinfo *info);
 extern void cop420_get_info(UINT32 state, cpuinfo *info);
+extern void cop421_get_info(UINT32 state, cpuinfo *info);
+extern void cop422_get_info(UINT32 state, cpuinfo *info);
+
+extern void cop404_get_info(UINT32 state, cpuinfo *info);
+extern void cop444_get_info(UINT32 state, cpuinfo *info);
+extern void cop445_get_info(UINT32 state, cpuinfo *info);
 
 #ifdef ENABLE_DEBUGGER
 offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif /* ENABLE_DEBUGGER */
 
-#endif  /* _COP400_H */
+#endif  /* __COP400__ */

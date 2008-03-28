@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #define SC				R.SC
+#define IL				R.IL
 
 #define PUSH(addr) 		{ SC = SB; SB = SA; SA = addr; }
 #define POP() 			{ PC = SA; SA = SB; SB = SC; }
@@ -18,9 +19,45 @@
 
 #define IN_IN()			IN(COP400_PORT_IN)
 
-INLINE void adt(void) { A = (A + 10) & 0x0F; }
+/* Arithmetic Instructions */
 
-INLINE void casc(void)
+/*
+
+	Mnemonic:			ADT
+	
+	Hex Code:			4A
+	Binary:				0 1 0 0 1 0 1 0
+
+	Data Flow:			A + 10 -> A
+
+	Skip Conditions:	None
+
+	Description:		Add Ten to A
+
+*/
+
+INSTRUCTION(adt)
+{
+	A = (A + 10) & 0x0F;
+}
+
+/*
+
+	Mnemonic:			CASC
+	
+	Hex Code:			10
+	Binary:				0 0 0 1 0 0 0 0
+
+	Data Flow:			~A + RAM(B) + C -> A
+						Carry -> C
+
+	Skip Conditions:	Carry
+
+	Description:		Complement and Add with Carry, Skip on Carry
+
+*/
+
+INSTRUCTION(casc)
 {
 	A = (A ^ 0xF) + RAM_R(B) + C;
 
@@ -36,50 +73,112 @@ INLINE void casc(void)
 	}
 }
 
-INLINE void cqma(void)
+/* Transfer-of-Control Instructions */
+
+/*
+
+	Mnemonic:			RET
+	
+	Hex Code:			48
+	Binary:				0 1 0 0 1 0 0 0
+
+	Data Flow:			SC -> SB -> SA -> PC
+
+	Description:		Return from Subroutine, restore Skip logic
+
+*/
+
+INSTRUCTION(cop420_ret)
+{
+	POP();
+	skip = R.last_skip;
+}
+
+/* Memory Reference Instructions */
+
+/*
+
+	Mnemonic:			CQMA
+	
+	Hex Code:			33 2C
+	Binary:				0 0 1 1 0 0 1 1 0 0 1 0 1 1 0 0
+
+	Data Flow:			Q7:4 -> RAM(B)
+						Q3:0 -> A
+
+	Skip Conditions:	None
+
+	Description:		Copy Q to RAM, A
+
+*/
+
+INSTRUCTION(cqma)
 {
 	WRITE_M(Q >> 4);
 	A = Q & 0xF;
 }
 
-INLINE void inil(void)
+/*
+
+	Mnemonic:			LDD
+	
+	Operand:			r, d
+	Hex Code:			23 --
+	Binary:				0 0 1 0 0 0 1 1 0 0 r1 r0 d3 d2 d1 d0
+
+	Data Flow:			RAM(r,d) -> A
+
+	Description:		Load A with RAM pointed to directly by r,d
+
+*/
+
+INSTRUCTION(ldd)
 {
-	// NOT IMPLEMENTED
-	A = IN_IN();
+	UINT8 rd = opcode & 0x3f;
+	
+	A = RAM_R(rd);
 }
 
-INLINE void cop421_inil(void)
+/* Register Reference Instructions */
+
+/*
+
+	Mnemonic:			XABR
+	
+	Hex Code:			12
+	Binary:				0 0 0 1 0 0 1 0
+
+	Data Flow:			A <-> Br(0,0 -> A3,A2)
+
+	Description:		Exchange A with Br
+
+*/
+
+INSTRUCTION(xabr)
 {
-	// NOT IMPLEMENTED
+	UINT8 Br = A & 0x03;
+	UINT8 Bd = B & 0x0f;
+
+	A = (B & 0x30) >> 4;
+	B = (Br << 4) + Bd;
 }
 
-INLINE void inin(void) { A = IN_IN(); }
+/* Test Instructions */
 
-INLINE void cop402m_inin(void) { A = IN_IN() | 0x02; }
+/*
 
-INLINE void ldd(void)
-{
-	A = RAM_R(ROM(PC++) & 0x3f);
-}
+	Mnemonic:			SKT
+	
+	Hex Code:			41
+	Binary:				0 1 0 0 0 0 0 1
 
-INLINE void ogi0(void) { WRITE_G(0); }
-INLINE void ogi1(void) { WRITE_G(1); }
-INLINE void ogi2(void) { WRITE_G(2); }
-INLINE void ogi3(void) { WRITE_G(3); }
-INLINE void ogi4(void) { WRITE_G(4); }
-INLINE void ogi5(void) { WRITE_G(5); }
-INLINE void ogi6(void) { WRITE_G(6); }
-INLINE void ogi7(void) { WRITE_G(7); }
-INLINE void ogi8(void) { WRITE_G(8); }
-INLINE void ogi9(void) { WRITE_G(9); }
-INLINE void ogi10(void) { WRITE_G(10); }
-INLINE void ogi11(void) { WRITE_G(11); }
-INLINE void ogi12(void) { WRITE_G(12); }
-INLINE void ogi13(void) { WRITE_G(13); }
-INLINE void ogi14(void) { WRITE_G(14); }
-INLINE void ogi15(void) { WRITE_G(15); }
+	Skip Conditions:	A time-base counter carry has occurred since last test
 
-INLINE void skt(void)
+	Description:		Skip on Timer
+
+*/
+
+INSTRUCTION(skt)
 {
 	if (R.timerlatch == 1)
 	{
@@ -88,11 +187,101 @@ INLINE void skt(void)
 	}
 }
 
-INLINE void xabr(void)
-{
-	UINT8 Br = A & 0x03;
-	UINT8 Bd = B & 0x0f;
+/* Input/Output Instructions */
 
-	A = (B & 0x30) >> 4;
-	B = (Br << 4) + Bd;
+/*
+
+	Mnemonic:			ININ
+	
+	Hex Code:			33 28
+	Binary:				
+
+	Data Flow:			IN -> A
+
+	Description:		Input IN Inputs to A
+
+*/
+
+INSTRUCTION(inin) { A = IN_IN(); }
+
+/*
+
+	Processor:			COP402M
+
+	Mnemonic:			ININ
+	
+	Hex Code:			33 28
+	Binary:				
+
+	Data Flow:			IN -> A, A1 = "1"
+
+	Description:		Input IN Inputs to A
+
+*/
+
+INSTRUCTION(cop402m_inin)
+{
+	A = IN_IN() | 0x02;
+}
+
+
+/*
+
+	Mnemonic:			INIL
+	
+	Hex Code:			33 29
+	Binary:				
+
+	Data Flow:			IL3,"1","0",IL0 -> A
+
+	Description:		Input IL Latches to A
+
+*/
+
+INSTRUCTION(inil)
+{
+	// NOT PROPERLY IMPLEMENTED
+	
+	A = (IN_IN() & 0x09) | 0x04;
+}
+
+/*
+
+	Processor:			COP421
+
+	Mnemonic:			INIL
+	
+	Hex Code:			33 29
+	Binary:				
+
+	Data Flow:			"0",CKO,"0","0" -> A
+
+	Description:		Input CKO to A
+
+*/
+
+INSTRUCTION(cop421_inil)
+{
+	// NOT IMPLEMENTED
+}
+
+/*
+
+	Mnemonic:			OGI
+	
+	Operand:			y
+	Hex Code:			33 5-
+	Binary:				0 0 1 1 0 0 1 1 0 1 0 1 y3 y2 y1 y0
+
+	Data Flow:			y -> G
+
+	Description:		Output to G Ports Immediate
+
+*/
+
+INSTRUCTION(ogi)
+{
+	UINT4 y = opcode & 0x0f;
+
+	WRITE_G(y);
 }
