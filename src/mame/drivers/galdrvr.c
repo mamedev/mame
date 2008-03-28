@@ -4639,7 +4639,7 @@ GAME( 1981, batman2,  phoenix,  galaxian, batman2,  batman2,  ROT270, "bootleg",
 
 /* separate tile/sprite ROMs */
 GAME( 1981, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, nolock,   ROT270, "bootleg", "Pac-Man (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 
 /* separate tile/sprite ROMs, plus INT instead of NMI */
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )

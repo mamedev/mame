@@ -2049,6 +2049,8 @@ static void common_init(
 	irq_line = INPUT_LINE_NMI;
 	galaxian_frogger_adjust = FALSE;
 	galaxian_sfx_tilemap = FALSE;
+	galaxian_sprite_clip_start = 16;
+	galaxian_sprite_clip_end = 255;
 	galaxian_draw_bullet_ptr = (draw_bullet != NULL) ? draw_bullet : galaxian_draw_bullet;
 	galaxian_draw_background_ptr = (draw_background != NULL) ? draw_background : galaxian_draw_background;
 	galaxian_extend_tile_info_ptr = extend_tile_info;
@@ -2095,7 +2097,7 @@ static DRIVER_INIT( galaxian )
 static DRIVER_INIT( nolock )
 {
 	/* same as galaxian... */
-	driver_init_galaxian(machine);
+	DRIVER_INIT_CALL(galaxian);
 
 	/* ...but coin lockout disabled/disconnected */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
@@ -2202,6 +2204,20 @@ static DRIVER_INIT( moonqsr )
 	/* decrypt program code */
 	decode_mooncrst(0x8000, decrypt);
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+}
+
+
+static DRIVER_INIT( pacmanbl )
+{
+	/* same as galaxian... */
+	DRIVER_INIT_CALL(galaxian);
+
+	/* ...but coin lockout disabled/disconnected */
+	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
+
+	/* also shift the sprite clip offset */
+	galaxian_sprite_clip_start = 7;
+	galaxian_sprite_clip_end = 246;
 }
 
 
@@ -2444,7 +2460,7 @@ static DRIVER_INIT( sfx )
 	/* basic configuration */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, upper_extend_tile_info, NULL);
 	galaxian_sfx_tilemap = TRUE;
-	
+
 	/* sfx uses 3 x 8255, so we need a non-standard interface */
 	ppi8255_init(&sfx_ppi8255_intf);
 
