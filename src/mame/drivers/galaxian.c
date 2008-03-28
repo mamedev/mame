@@ -826,7 +826,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 
 static CUSTOM_INPUT( azurian_port_r )
 {
-	return (readinputportbytag("FAKE") >> (int)param) & 1;
+	return (readinputportbytag("FAKE") >> (FPTR)param) & 1;
 }
 
 
