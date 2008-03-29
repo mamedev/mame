@@ -222,9 +222,7 @@ INSTRUCTION(aisc)
 
 	if (A > 0x0f)
 	{
-		popmessage("SKIP!");
 		skip = 1;
-		logerror("skip %x\n", skip);
 		A &= 0xF;
 	}
 
