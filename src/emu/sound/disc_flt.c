@@ -91,6 +91,10 @@ struct dst_rcfilter_context
 	double	vCap;
 };
 
+struct dst_rcfilter_sw_context
+{
+	double	vCap[4];
+};
 
 /************************************************************************
  *
@@ -1076,6 +1080,67 @@ static void dst_rcfilter_reset(node_description *node)
 	node->output = 0;
 }
 
+/************************************************************************
+ *
+ * DST_RCFILTER_SW - Usage of node_description values for switchable RC filter
+ *
+ * input[0]    - Enable input value
+ * input[1]    - input value
+ * input[2]    - Resistor value (initialization only)
+ * input[3]    - Capacitor Value (initialization only)
+ * input[4]    - Voltage reference. Usually 0V.
+ *
+ ************************************************************************/
+#define DST_RCFILTER_SW__ENABLE		(*(node->input[0]))
+#define DST_RCFILTER_SW__VIN		(*(node->input[1]))
+#define DST_RCFILTER_SW__SWITCH		(*(node->input[2]))
+#define DST_RCFILTER_SW__R			(*(node->input[3]))
+#define DST_RCFILTER_SW__C(x)		(*(node->input[4+x]))
+
+#define CD4066_ON_RES  470
+
+static void dst_rcfilter_sw_step(node_description *node)
+{
+	struct dst_rcfilter_sw_context *context = node->context;
+	int i;
+	double rcexp;
+	double us=0, rs=0;
+
+	if(DST_RCFILTER_SW__ENABLE)
+	{
+		for (i=0;i<4;i++)
+		{
+			if ( ( (int)DST_RCFILTER_SW__SWITCH & (1<<i)) == 1)
+			{
+				us += context->vCap[i];
+				rs += DST_RCFILTER_SW__R;
+			}
+		}
+		node->output = CD4066_ON_RES / ( CD4066_ON_RES + rs) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
+		for (i=0;i<4;i++)
+		{
+			if ( ( (int)DST_RCFILTER_SW__SWITCH & (1<<i)) == 1)
+			{
+				rcexp = 1.0 - exp(-1.0 / ( CD4066_ON_RES * DST_RCFILTER_SW__C(i)) * discrete_current_context->sample_rate);
+				context->vCap[i] += ((node->output - context->vCap[i]) * rcexp);
+			}
+		}
+	}
+	else
+	{
+		node->output=0;
+	}
+}
+
+static void dst_rcfilter_sw_reset(node_description *node)
+{
+	struct dst_rcfilter_sw_context *context = node->context;
+	int i;
+	
+	for (i=0;i<4;i++)
+		context->vCap[i] = 0;
+	node->output = 0;
+}
 
 /* !!!!!!!!!!! NEW FILTERS for testing !!!!!!!!!!!!!!!!!!!!! */
 

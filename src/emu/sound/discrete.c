@@ -241,9 +241,10 @@ static const discrete_module module_list[] =
 	{ DST_RCDISC3     ,"DST_RCDISC3"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     },
 	{ DST_RCDISC4     ,"DST_RCDISC4"     ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     },
 	{ DST_RCDISC5     ,"DST_RCDISC5"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     },
-	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" ,sizeof(struct dst_rcdisc_context)      ,dst_rcintegrate_reset ,dst_rcintegrate_step   },
-	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step },
+	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" ,sizeof(struct dst_rcdisc_context)      ,dst_rcintegrate_reset ,dst_rcintegrate_step },
+	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  },
 	{ DST_RCFILTER    ,"DST_RCFILTER"    ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    },
+	{ DST_RCFILTER_SW ,"DST_RCFILTER_SW" ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step },
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
 	{ DST_RCFILTERN   ,"DST_RCFILTERN"   ,sizeof(struct dss_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     },
 	{ DST_RCDISCN     ,"DST_RCDISCN"     ,sizeof(struct dss_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     },

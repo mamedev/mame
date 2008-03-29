@@ -2585,6 +2585,43 @@
  * EXAMPLES: see Polaris
  *
  ***********************************************************************
+ *
+ * DISCRETE_RCFILTER_SW - Multiple switchable RC filters 
+ *
+ *                             R       
+ *    INPUT      >-----------ZZZZ-+-------+----......-----> Output  
+ *                                |       |    
+ *                               +-+     +-+
+ *    SWITCH     > Bit 0 ---->F1 | |  F2 | |
+ *                               '-'   ^ '-'
+ *                 Bit 1 ---------|----'  |
+ *                                |       |
+ *                 Bit ...       ---     ---
+ *                               --- C1  --- C2
+ *                                |       |
+ *                               GND     GND
+ *
+ * 
+ *  Declaration syntax
+ *
+ *     DISCRETE_RCFILTER_SW(name of node,
+ *                          enable,
+ *                          input node (or value),
+ *                          switch node (or value),
+ *                          R in Ohms,
+ *                          C1 in Farads,
+ *                          C2 in Farads,
+ *                          C3 in Farads,
+ *                          C4 in Farads)
+ *
+ *     This is a typical filter circuit in circusc or scramble. 
+ *     Switches are usually CD4066 with a "open" resistance of 
+ *     typical 470 Ohms at 5V.
+ *     This circuit supports up to 4 filters.
+ * 
+ * EXAMPLES: see circusc
+ *
+ ***********************************************************************
  =======================================================================
  * from from disc_flt.c
  * Component specific modules
@@ -3772,6 +3809,7 @@ enum
 	DST_RCINTEGRATE,	/* NPN RC charge/discharge network */
 	DST_RCDISC_MOD,		/* Two diode mixer with Transistor and charge/discharge network */
 	DST_RCFILTER,		/* Simple RC Filter network */
+	DST_RCFILTER_SW,	/* Switcheable RC Filter network */
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
 	DST_RCFILTERN,		/* Simple RC Filter network */
 	DST_RCDISCN,		/* Simple RC discharge */
@@ -3927,6 +3965,7 @@ enum
 #define DISCRETE_RCINTEGRATE(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)		{ NODE, DST_RCINTEGRATE     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "RC Discharge 6" },
 #define DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)			{ NODE, DST_RCDISC_MOD     , 9, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "Modulated RC Discharge" },
 #define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Filter" },
+#define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "RC Filter Switch" },
 #define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "RC Filter to VREF" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */
 #define DISCRETE_RCDISCN(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISCN     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Discharge (New Type)" },
