@@ -20,7 +20,7 @@
 #include <stdarg.h>
 
 #ifdef MESS
-#include "device.h"
+#include "image.h"
 #endif /* MESS */
 
 
@@ -203,6 +203,9 @@ struct _running_machine
 	palette_private *		palette_data;		/* internal data from palette.c */
 	streams_private *		streams_data;		/* internal data from streams.c */
 	devices_private *		devices_data;		/* internal data from devices.c */
+#ifdef MESS
+	images_private *		images_data;		/* internal data from image.c */
+#endif /* MESS */
 
 	/* driver-specific information */
 	void *					driver_data;		/* drivers can hang data off of here instead of using globals */
