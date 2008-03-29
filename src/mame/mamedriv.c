@@ -7495,7 +7495,13 @@ Other Sun games
 	DRIVER( skattva )	/* (c) 1995 */
 	DRIVER( fashiong )	/* (c) 1997 */
 
-	/* JMP Impact Games */
+	/* JPM Give us a Break hardware */
+	DRIVER( guab )		/* (c) 1986 */
+	DRIVER( guab3 )		/* (c) 1986 */
+	DRIVER( tenup )		/* (c) 1988 */
+	DRIVER( tenup3 )	/* (c) 1988 */
+
+	/* JPM Impact Games */
 	DRIVER( cluedo )	/* (c) 1995 */
 	DRIVER( cluedo2c )	/* (c) 1995 */
 	DRIVER( cluedo2 )	/* (c) 1995 */

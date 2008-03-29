@@ -1486,6 +1486,7 @@ src/mame/drivers/gstriker.c svneol=native#text/plain
 src/mame/drivers/gsword.c svneol=native#text/plain
 src/mame/drivers/gticlub.c svneol=native#text/plain
 src/mame/drivers/gtipoker.c svneol=native#text/plain
+src/mame/drivers/guab.c svneol=native#text/plain
 src/mame/drivers/gumbo.c svneol=native#text/plain
 src/mame/drivers/gunbustr.c svneol=native#text/plain
 src/mame/drivers/gundealr.c svneol=native#text/plain

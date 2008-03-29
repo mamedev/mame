@@ -345,6 +345,7 @@ DRVLIBS = \
 	$(MAMEOBJ)/irem.a \
 	$(MAMEOBJ)/itech.a \
 	$(MAMEOBJ)/jaleco.a \
+	$(MAMEOBJ)/jpm.a \
 	$(MAMEOBJ)/kaneko.a \
 	$(MAMEOBJ)/konami.a \
 	$(MAMEOBJ)/meadows.a \
@@ -801,6 +802,10 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/skyfox.o $(VIDEO)/skyfox.o \
 	$(DRIVERS)/stepstag.o \
 	$(DRIVERS)/tetrisp2.o $(VIDEO)/tetrisp2.o \
+
+$(MAMEOBJ)/jpm.a: \
+	$(DRIVERS)/guab.o \
+	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 
 $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/airbustr.o $(VIDEO)/airbustr.o \
@@ -1553,7 +1558,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/istellar.o \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jongkyo.o \
-	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/kingpin.o \
 	$(DRIVERS)/koikoi.o \
 	$(DRIVERS)/kyugo.o $(VIDEO)/kyugo.o \
