@@ -19,7 +19,7 @@ To enter service mode, keep 1&2 pressed on reset
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
-
+#include "sound/discrete.h"
 
 void konami1_decode(void);
 
@@ -82,7 +82,7 @@ static WRITE8_HANDLER( circusc_coin_counter_w )
 
 static WRITE8_HANDLER(circusc_sound_w)
 {
-	int c;
+	//int c;
 
 	switch (offset & 7)
 	{
@@ -103,23 +103,17 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 		/* CS5 */
 		case 3:
-			DAC_data_w(0, data);
+			discrete_sound_w(machine, NODE_03, data);
 			break;
 
 		/* CS6 */
 		case 4:
-			c = (offset & 0x20) ? 470000 : 0;
-			filter_rc_set_RC(0, FLT_RC_LOWPASS, 1000, 2200, 1000, CAP_P(c));
-
-			c = 0;
-			if (offset & 0x10) c += 470000;
-			if (offset & 0x08) c +=  47000;
-			filter_rc_set_RC(1, FLT_RC_LOWPASS, 1000, 2200, 1000, CAP_P(c));
-
-			c = (offset & 0x40) ? 470000 : 0;
-			filter_rc_set_RC(2, FLT_RC_LOWPASS, 1000, 10000, 1000, CAP_P(c));
+			discrete_sound_w(machine, NODE_05, (offset & 0x20) >> 5);
+			discrete_sound_w(machine, NODE_06, (offset & 0x18) >> 3);
+			discrete_sound_w(machine, NODE_07, (offset & 0x40) >> 6);
+			break;
 	}
-}
+}	
 
 
 
@@ -296,7 +290,35 @@ static GFXDECODE_START( circusc )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, spritelayout, 16*16, 16 )
 GFXDECODE_END
 
+static const discrete_mixer_desc circusc_mixer_desc =
+	{DISC_MIXER_IS_RESISTOR,
+		{RES_K(2.2), RES_K(2.2), RES_K(10)},
+		{0,0,0},	// no variable resistors
+		{0,0,0},  // no node capacitors
+		0, RES_K(1),
+		CAP_U(0.1),
+		CAP_U(0.47),
+		0, 1};
 
+static DISCRETE_SOUND_START( circusc )
+
+	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
+	DISCRETE_INPUTX_DATA(NODE_03, 255, 0, 0) //DAC
+	
+	DISCRETE_INPUT_DATA(NODE_05)
+	DISCRETE_INPUT_DATA(NODE_06)
+	DISCRETE_INPUT_DATA(NODE_07)
+
+	DISCRETE_RCFILTER_SW(NODE_10, 1, NODE_01, NODE_05, 1000, CAP_U(0.47), 0, 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_11, 1, NODE_02, NODE_06, 1000, CAP_U(0.047), CAP_U(0.47), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_12, 1, NODE_03, NODE_07, 1000, CAP_U(0.47), 0, 0, 0)
+
+	DISCRETE_MIXER3(NODE_20, 1, NODE_10, NODE_11, NODE_12, &circusc_mixer_desc)
+
+	DISCRETE_OUTPUT(NODE_20, 10.0 )
+	
+DISCRETE_SOUND_END
 
 static MACHINE_DRIVER_START( circusc )
 
@@ -332,19 +354,14 @@ static MACHINE_DRIVER_START( circusc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(SN76496, 14318180/8)
-	MDRV_SOUND_ROUTE(0, "filter.1", 1.0)
-
+	MDRV_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 0)
+	
 	MDRV_SOUND_ADD(SN76496, 14318180/8)
-	MDRV_SOUND_ROUTE(0, "filter.2", 1.0)
-
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(0, "filter.3", 1.0)
-
-	MDRV_SOUND_ADD_TAG("filter.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.3", FILTER_RC, 0)
+	MDRV_SOUND_ROUTE_EX(0, "fltdisc", 1.0, 1)
+	
+	MDRV_SOUND_ADD_TAG("fltdisc", DISCRETE, 0)
+	
+	MDRV_SOUND_CONFIG_DISCRETE(circusc)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END
