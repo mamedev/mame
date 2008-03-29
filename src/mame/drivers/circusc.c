@@ -18,7 +18,6 @@ To enter service mode, keep 1&2 pressed on reset
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
-#include "sound/flt_rc.h"
 #include "sound/discrete.h"
 
 void konami1_decode(void);
