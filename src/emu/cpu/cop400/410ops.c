@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) INLINE UINT16 (mnemonic)(UINT8 opcode)
+#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(UINT8 opcode)
 
 #define ROM(addr)			cpu_readop(addr)
 #define RAM_W(addr, value)	(data_write_byte_8(addr, value))
@@ -31,7 +31,10 @@
 #define PC				R.PC
 #define prevPC			R.PREVPC
 #define skip			R.skip
-#define skip_lbi		R.skip_lbi
+#define skipLBI			R.skipLBI
+
+#define READ_M			RAM_R(B)
+#define WRITE_M(VAL)	RAM_W(B,VAL)
 
 #define IN_G()			IN(COP400_PORT_G)
 #define IN_L()			IN(COP400_PORT_L)
@@ -138,8 +141,6 @@ INLINE void WRITE_G(UINT8 data)
 INSTRUCTION(illegal)
 {
 	logerror("COP400: PC = %04x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
-
-	return PC + 1;
 }
 
 /* Arithmetic Instructions */
@@ -174,8 +175,6 @@ INSTRUCTION(asc)
 	{
 		C = 0;
 	}
-
-	return PC + 1;
 }
 
 /*
@@ -194,8 +193,6 @@ INSTRUCTION(asc)
 INSTRUCTION(add)
 {
 	A = (A + RAM_R(B)) & 0x0F;
-
-	return PC + 1;
 }
 
 /*
@@ -225,8 +222,6 @@ INSTRUCTION(aisc)
 		skip = 1;
 		A &= 0xF;
 	}
-
-	return PC + 1;
 }
 
 /*
@@ -245,8 +240,6 @@ INSTRUCTION(aisc)
 INSTRUCTION(clra)
 {
 	A = 0;
-
-	return PC + 1;
 }
 
 /*
@@ -265,8 +258,6 @@ INSTRUCTION(clra)
 INSTRUCTION(comp)
 {
 	A = A ^ 0xF;
-
-	return PC + 1;
 }
 
 /*
@@ -283,8 +274,6 @@ INSTRUCTION(comp)
 INSTRUCTION(nop)
 {
 	// do nothing
-
-	return PC + 1;
 }
 
 /*
@@ -303,8 +292,6 @@ INSTRUCTION(nop)
 INSTRUCTION(rc)
 {
 	C = 0;
-
-	return PC + 1;
 }
 
 /*
@@ -323,8 +310,6 @@ INSTRUCTION(rc)
 INSTRUCTION(sc)
 {
 	C = 1;
-
-	return PC + 1;
 }
 
 /*
@@ -343,8 +328,6 @@ INSTRUCTION(sc)
 INSTRUCTION(xor)
 {
 	A = RAM_R(B) ^ A;
-
-	return PC + 1;
 }
 
 /* Transfer-of-Control Instructions */
@@ -364,9 +347,8 @@ INSTRUCTION(xor)
 
 INSTRUCTION(jid)
 {
-	UINT16 addr = (PC & 0x300) | (A << 4) | RAM_R(B);
-
-	return (PC & 0x300) | ROM(addr);
+	UINT16 addr = (PC & 0x300) | (A << 4) | READ_M;
+	PC = (PC & 0x300) | ROM(addr);
 }
 
 /*
@@ -385,9 +367,7 @@ INSTRUCTION(jid)
 
 INSTRUCTION(jmp)
 {
-	UINT8 a = ((opcode & 0x03) << 8) | ROM(++PC);
-
-	return a;
+	PC = ((opcode & 0x03) << 8) | ROM(PC);
 }
 
 /*
@@ -408,42 +388,27 @@ INSTRUCTION(jmp)
 
 	Description:		Jump within Page
 
-	--------------------------------------------
-
-	Mnemonic:			JSRP
-
-	Operand:			a
-	Hex Code:			--
-	Binary:				1 0 a5 a4 a3 a2 a1 a0
-
-	Data Flow:			PC + 1 -> SA -> SB -> SC
-						0010 -> PC9:6
-						a -> PC5:0
-
-	Description:		Jump to Subroutine Page
-
 */
 
 INSTRUCTION(jp)
 {
-	UINT8 page = (PC >> 6) & 0x0f;
+	UINT8 op = ROM(prevPC);
 
-	if (page == 2 || page == 3)
+	if (((PC & 0x3E0) >= 0x80) && ((PC & 0x3E0) < 0x100)) //JP pages 2,3
 	{
-		UINT8 a = opcode & 0x7f;
-		return (PC & 0x30) | a;
-	}
-	else if ((opcode & 0xc0) == 0xc0)
-	{
-		UINT8 a = opcode & 0x3f;
-		return (PC & 0x3c0) | a;
+		PC = (UINT16)((PC & 0x380) | (op & 0x7F));
 	}
 	else
 	{
-		// JSRP
-		UINT8 a = opcode & 0x3f;
-		PUSH(PC + 1);
-		return 0x80 | a;
+		if ((op & 0xC0) == 0xC0) //JP other pages
+		{
+			PC = (UINT16)((PC & 0x3C0) | (op & 0x3F));
+		}
+		else					//JSRP
+		{
+			PUSH((UINT16)(PC));
+			PC = (UINT16)(0x80 | (op & 0x3F));
+		}
 	}
 }
 
@@ -462,13 +427,16 @@ INSTRUCTION(jp)
 
 */
 
-
-INSTRUCTION(jsr)
+INLINE void JSR(UINT8 a8)
 {
-	UINT16 a = ((opcode & 0x03) << 8) | ROM(++PC);
 	PUSH(PC + 1);
-	return a;
+	PC = (a8 << 8) | ROM(PC);
 }
+
+INSTRUCTION(jsr0) { JSR(0); }
+INSTRUCTION(jsr1) { JSR(1); }
+INSTRUCTION(jsr2) { JSR(2); }
+INSTRUCTION(jsr3) { JSR(3); }
 
 /*
 
@@ -486,8 +454,6 @@ INSTRUCTION(jsr)
 INSTRUCTION(ret)
 {
 	POP();
-
-	return PC;
 }
 
 /*
@@ -509,8 +475,6 @@ INSTRUCTION(retsk)
 {
 	POP();
 	skip = 1;
-
-	return PC;
 }
 
 /* Memory Reference Instructions */
@@ -531,9 +495,7 @@ INSTRUCTION(retsk)
 
 INSTRUCTION(camq)
 {
-	WRITE_Q((A << 4) | RAM_R(B));
-
-	return PC + 1;
+	WRITE_Q((A << 4) | READ_M);
 }
 
 /*
@@ -557,10 +519,10 @@ INLINE void LD(UINT8 r)
 	B = B ^ (r << 4);
 }
 
-INSTRUCTION(ld0) { LD(0); return PC + 1; }
-INSTRUCTION(ld1) { LD(1); return PC + 1; }
-INSTRUCTION(ld2) { LD(2); return PC + 1; }
-INSTRUCTION(ld3) { LD(3); return PC + 1; }
+INSTRUCTION(ld0) { LD(0); }
+INSTRUCTION(ld1) { LD(1); }
+INSTRUCTION(ld2) { LD(2); }
+INSTRUCTION(ld3) { LD(3); }
 
 /*
 
@@ -579,11 +541,9 @@ INSTRUCTION(ld3) { LD(3); return PC + 1; }
 INSTRUCTION(lqid)
 {
 	PUSH(PC + 1);
-	PC = (PC & 0x300) | (A << 4) | RAM_R(B);
+	PC = (UINT16)((PC & 0x300) | (A << 4) | READ_M);
 	WRITE_Q(ROM(PC));
 	POP();
-
-	return PC;
 }
 
 /*
@@ -614,10 +574,10 @@ INSTRUCTION(lqid)
 
 */
 
-INSTRUCTION(rmb0) { RAM_W(B, RAM_R(B) & 0xE); return PC + 1; }
-INSTRUCTION(rmb1) { RAM_W(B, RAM_R(B) & 0xD); return PC + 1; }
-INSTRUCTION(rmb2) { RAM_W(B, RAM_R(B) & 0xB); return PC + 1; }
-INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); return PC + 1; }
+INSTRUCTION(rmb0) { RAM_W(B, RAM_R(B) & 0xE); }
+INSTRUCTION(rmb1) { RAM_W(B, RAM_R(B) & 0xD); }
+INSTRUCTION(rmb2) { RAM_W(B, RAM_R(B) & 0xB); }
+INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); }
 
 /*
 
@@ -647,10 +607,10 @@ INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); return PC + 1; }
 
 */
 
-INSTRUCTION(smb0) { RAM_W(B, RAM_R(B) | 0x1); return PC + 1; }
-INSTRUCTION(smb1) { RAM_W(B, RAM_R(B) | 0x2); return PC + 1; }
-INSTRUCTION(smb2) { RAM_W(B, RAM_R(B) | 0x4); return PC + 1; }
-INSTRUCTION(smb3) { RAM_W(B, RAM_R(B) | 0x8); return PC + 1; }
+INSTRUCTION(smb0) { RAM_W(B, RAM_R(B) | 0x1); }
+INSTRUCTION(smb1) { RAM_W(B, RAM_R(B) | 0x2); }
+INSTRUCTION(smb2) { RAM_W(B, RAM_R(B) | 0x4); }
+INSTRUCTION(smb3) { RAM_W(B, RAM_R(B) | 0x8); }
 
 /*
 
@@ -676,8 +636,6 @@ INSTRUCTION(stii)
 	Bd = (B & 0x0f) + 1;
 	if (Bd > 15) Bd = 0;
 	B = (B & 0x30) + Bd;
-
-	return PC + 1;
 }
 
 /*
@@ -704,8 +662,6 @@ INSTRUCTION(x)
 
 	A = t;
 	B = B ^ (r << 4);
-
-	return PC + 1;
 }
 
 /*
@@ -724,12 +680,10 @@ INSTRUCTION(x)
 
 INSTRUCTION(xad)
 {
-	UINT8 addr = ROM(++PC) & 0x3f;
+	UINT8 addr = ROM(PC++) & 0x3f;
 	UINT8 t = A;
 	A = RAM_R(addr);
 	RAM_W(addr, t);
-
-	return PC + 1;
 }
 
 /*
@@ -764,8 +718,6 @@ INSTRUCTION(xds)
 	B = (UINT8)(Br | (Bd & 0x0F));
 
 	if (Bd == 0xFF) skip = 1;
-
-	return PC + 1;
 }
 
 /*
@@ -800,8 +752,6 @@ INSTRUCTION(xis)
 	B = (UINT8)(Br | (Bd & 0x0F));
 
 	if (Bd == 0x10) skip = 1;
-
-	return PC + 1;
 }
 
 /* Register Reference Instructions */
@@ -822,8 +772,6 @@ INSTRUCTION(xis)
 INSTRUCTION(cab)
 {
 	B = (B & 0x30) | A;
-
-	return PC + 1;
 }
 
 /*
@@ -842,8 +790,6 @@ INSTRUCTION(cab)
 INSTRUCTION(cba)
 {
 	A = B & 0xF;
-
-	return PC + 1;
 }
 
 /*
@@ -868,76 +814,76 @@ INSTRUCTION(cba)
 INLINE void LBI(UINT8 r, UINT8 d)
 {
 	B = (r << 4) | d;
-	skip_lbi = 1;
+	skipLBI = 1;
 }
 
-INSTRUCTION(lbi0_0) { LBI(0,0); return PC + 1; }
-INSTRUCTION(lbi0_1) { LBI(0,1); return PC + 1; }
-INSTRUCTION(lbi0_2) { LBI(0,2); return PC + 1; }
-INSTRUCTION(lbi0_3) { LBI(0,3); return PC + 1; }
-INSTRUCTION(lbi0_4) { LBI(0,4); return PC + 1; }
-INSTRUCTION(lbi0_5) { LBI(0,5); return PC + 1; }
-INSTRUCTION(lbi0_6) { LBI(0,6); return PC + 1; }
-INSTRUCTION(lbi0_7) { LBI(0,7); return PC + 1; }
-INSTRUCTION(lbi0_8) { LBI(0,8); return PC + 1; }
-INSTRUCTION(lbi0_9) { LBI(0,9); return PC + 1; }
-INSTRUCTION(lbi0_10) { LBI(0,10); return PC + 1; }
-INSTRUCTION(lbi0_11) { LBI(0,11); return PC + 1; }
-INSTRUCTION(lbi0_12) { LBI(0,12); return PC + 1; }
-INSTRUCTION(lbi0_13) { LBI(0,13); return PC + 1; }
-INSTRUCTION(lbi0_14) { LBI(0,14); return PC + 1; }
-INSTRUCTION(lbi0_15) { LBI(0,15); return PC + 1; }
+INSTRUCTION(lbi0_0) { LBI(0,0); }
+INSTRUCTION(lbi0_1) { LBI(0,1); }
+INSTRUCTION(lbi0_2) { LBI(0,2); }
+INSTRUCTION(lbi0_3) { LBI(0,3); }
+INSTRUCTION(lbi0_4) { LBI(0,4); }
+INSTRUCTION(lbi0_5) { LBI(0,5); }
+INSTRUCTION(lbi0_6) { LBI(0,6); }
+INSTRUCTION(lbi0_7) { LBI(0,7); }
+INSTRUCTION(lbi0_8) { LBI(0,8); }
+INSTRUCTION(lbi0_9) { LBI(0,9); }
+INSTRUCTION(lbi0_10) { LBI(0,10); }
+INSTRUCTION(lbi0_11) { LBI(0,11); }
+INSTRUCTION(lbi0_12) { LBI(0,12); }
+INSTRUCTION(lbi0_13) { LBI(0,13); }
+INSTRUCTION(lbi0_14) { LBI(0,14); }
+INSTRUCTION(lbi0_15) { LBI(0,15); }
 
-INSTRUCTION(lbi1_0) { LBI(1,0); return PC + 1; }
-INSTRUCTION(lbi1_1) { LBI(1,1); return PC + 1; }
-INSTRUCTION(lbi1_2) { LBI(1,2); return PC + 1; }
-INSTRUCTION(lbi1_3) { LBI(1,3); return PC + 1; }
-INSTRUCTION(lbi1_4) { LBI(1,4); return PC + 1; }
-INSTRUCTION(lbi1_5) { LBI(1,5); return PC + 1; }
-INSTRUCTION(lbi1_6) { LBI(1,6); return PC + 1; }
-INSTRUCTION(lbi1_7) { LBI(1,7); return PC + 1; }
-INSTRUCTION(lbi1_8) { LBI(1,8); return PC + 1; }
-INSTRUCTION(lbi1_9) { LBI(1,9); return PC + 1; }
-INSTRUCTION(lbi1_10) { LBI(1,10); return PC + 1; }
-INSTRUCTION(lbi1_11) { LBI(1,11); return PC + 1; }
-INSTRUCTION(lbi1_12) { LBI(1,12); return PC + 1; }
-INSTRUCTION(lbi1_13) { LBI(1,13); return PC + 1; }
-INSTRUCTION(lbi1_14) { LBI(1,14); return PC + 1; }
-INSTRUCTION(lbi1_15) { LBI(1,15); return PC + 1; }
+INSTRUCTION(lbi1_0) { LBI(1,0); }
+INSTRUCTION(lbi1_1) { LBI(1,1); }
+INSTRUCTION(lbi1_2) { LBI(1,2); }
+INSTRUCTION(lbi1_3) { LBI(1,3); }
+INSTRUCTION(lbi1_4) { LBI(1,4); }
+INSTRUCTION(lbi1_5) { LBI(1,5); }
+INSTRUCTION(lbi1_6) { LBI(1,6); }
+INSTRUCTION(lbi1_7) { LBI(1,7); }
+INSTRUCTION(lbi1_8) { LBI(1,8); }
+INSTRUCTION(lbi1_9) { LBI(1,9); }
+INSTRUCTION(lbi1_10) { LBI(1,10); }
+INSTRUCTION(lbi1_11) { LBI(1,11); }
+INSTRUCTION(lbi1_12) { LBI(1,12); }
+INSTRUCTION(lbi1_13) { LBI(1,13); }
+INSTRUCTION(lbi1_14) { LBI(1,14); }
+INSTRUCTION(lbi1_15) { LBI(1,15); }
 
-INSTRUCTION(lbi2_0) { LBI(2,0); return PC + 1; }
-INSTRUCTION(lbi2_1) { LBI(2,1); return PC + 1; }
-INSTRUCTION(lbi2_2) { LBI(2,2); return PC + 1; }
-INSTRUCTION(lbi2_3) { LBI(2,3); return PC + 1; }
-INSTRUCTION(lbi2_4) { LBI(2,4); return PC + 1; }
-INSTRUCTION(lbi2_5) { LBI(2,5); return PC + 1; }
-INSTRUCTION(lbi2_6) { LBI(2,6); return PC + 1; }
-INSTRUCTION(lbi2_7) { LBI(2,7); return PC + 1; }
-INSTRUCTION(lbi2_8) { LBI(2,8); return PC + 1; }
-INSTRUCTION(lbi2_9) { LBI(2,9); return PC + 1; }
-INSTRUCTION(lbi2_10) { LBI(2,10); return PC + 1; }
-INSTRUCTION(lbi2_11) { LBI(2,11); return PC + 1; }
-INSTRUCTION(lbi2_12) { LBI(2,12); return PC + 1; }
-INSTRUCTION(lbi2_13) { LBI(2,13); return PC + 1; }
-INSTRUCTION(lbi2_14) { LBI(2,14); return PC + 1; }
-INSTRUCTION(lbi2_15) { LBI(2,15); return PC + 1; }
+INSTRUCTION(lbi2_0) { LBI(2,0); }
+INSTRUCTION(lbi2_1) { LBI(2,1); }
+INSTRUCTION(lbi2_2) { LBI(2,2); }
+INSTRUCTION(lbi2_3) { LBI(2,3); }
+INSTRUCTION(lbi2_4) { LBI(2,4); }
+INSTRUCTION(lbi2_5) { LBI(2,5); }
+INSTRUCTION(lbi2_6) { LBI(2,6); }
+INSTRUCTION(lbi2_7) { LBI(2,7); }
+INSTRUCTION(lbi2_8) { LBI(2,8); }
+INSTRUCTION(lbi2_9) { LBI(2,9); }
+INSTRUCTION(lbi2_10) { LBI(2,10); }
+INSTRUCTION(lbi2_11) { LBI(2,11); }
+INSTRUCTION(lbi2_12) { LBI(2,12); }
+INSTRUCTION(lbi2_13) { LBI(2,13); }
+INSTRUCTION(lbi2_14) { LBI(2,14); }
+INSTRUCTION(lbi2_15) { LBI(2,15); }
 
-INSTRUCTION(lbi3_0) { LBI(3,0); return PC + 1; }
-INSTRUCTION(lbi3_1) { LBI(3,1); return PC + 1; }
-INSTRUCTION(lbi3_2) { LBI(3,2); return PC + 1; }
-INSTRUCTION(lbi3_3) { LBI(3,3); return PC + 1; }
-INSTRUCTION(lbi3_4) { LBI(3,4); return PC + 1; }
-INSTRUCTION(lbi3_5) { LBI(3,5); return PC + 1; }
-INSTRUCTION(lbi3_6) { LBI(3,6); return PC + 1; }
-INSTRUCTION(lbi3_7) { LBI(3,7); return PC + 1; }
-INSTRUCTION(lbi3_8) { LBI(3,8); return PC + 1; }
-INSTRUCTION(lbi3_9) { LBI(3,9); return PC + 1; }
-INSTRUCTION(lbi3_10) { LBI(3,10); return PC + 1; }
-INSTRUCTION(lbi3_11) { LBI(3,11); return PC + 1; }
-INSTRUCTION(lbi3_12) { LBI(3,12); return PC + 1; }
-INSTRUCTION(lbi3_13) { LBI(3,13); return PC + 1; }
-INSTRUCTION(lbi3_14) { LBI(3,14); return PC + 1; }
-INSTRUCTION(lbi3_15) { LBI(3,15); return PC + 1; }
+INSTRUCTION(lbi3_0) { LBI(3,0); }
+INSTRUCTION(lbi3_1) { LBI(3,1); }
+INSTRUCTION(lbi3_2) { LBI(3,2); }
+INSTRUCTION(lbi3_3) { LBI(3,3); }
+INSTRUCTION(lbi3_4) { LBI(3,4); }
+INSTRUCTION(lbi3_5) { LBI(3,5); }
+INSTRUCTION(lbi3_6) { LBI(3,6); }
+INSTRUCTION(lbi3_7) { LBI(3,7); }
+INSTRUCTION(lbi3_8) { LBI(3,8); }
+INSTRUCTION(lbi3_9) { LBI(3,9); }
+INSTRUCTION(lbi3_10) { LBI(3,10); }
+INSTRUCTION(lbi3_11) { LBI(3,11); }
+INSTRUCTION(lbi3_12) { LBI(3,12); }
+INSTRUCTION(lbi3_13) { LBI(3,13); }
+INSTRUCTION(lbi3_14) { LBI(3,14); }
+INSTRUCTION(lbi3_15) { LBI(3,15); }
 
 /*
 
@@ -963,8 +909,6 @@ INSTRUCTION(lei)
 	{
 		OUT_L(0);
 	}
-
-	return PC + 1;
 }
 
 /* Test Instructions */
@@ -985,8 +929,6 @@ INSTRUCTION(lei)
 INSTRUCTION(skc)
 {
 	if (C == 1) skip = 1;
-
-	return PC + 1;
 }
 
 /*
@@ -1005,8 +947,6 @@ INSTRUCTION(skc)
 INSTRUCTION(ske)
 {
 	if (A == RAM_R(B)) skip = 1;
-
-	return PC + 1;
 }
 
 /*
@@ -1025,8 +965,6 @@ INSTRUCTION(ske)
 INSTRUCTION(skgz)
 {
 	if (IN_G() == 0) skip = 1;
-
-	return PC + 1;
 }
 
 /*
@@ -1049,10 +987,10 @@ INSTRUCTION(skgz)
 
 */
 
-INSTRUCTION(skgbz0) { if (!BIT(IN_G(), 0)) skip = 1; return PC + 1; }
-INSTRUCTION(skgbz1) { if (!BIT(IN_G(), 1)) skip = 1; return PC + 1; }
-INSTRUCTION(skgbz2) { if (!BIT(IN_G(), 2)) skip = 1; return PC + 1; }
-INSTRUCTION(skgbz3) { if (!BIT(IN_G(), 3)) skip = 1; return PC + 1; }
+INSTRUCTION(skgbz0) { if (!BIT(IN_G(), 0)) skip = 1; }
+INSTRUCTION(skgbz1) { if (!BIT(IN_G(), 1)) skip = 1; }
+INSTRUCTION(skgbz2) { if (!BIT(IN_G(), 2)) skip = 1; }
+INSTRUCTION(skgbz3) { if (!BIT(IN_G(), 3)) skip = 1; }
 
 /*
 
@@ -1074,10 +1012,10 @@ INSTRUCTION(skgbz3) { if (!BIT(IN_G(), 3)) skip = 1; return PC + 1; }
 
 */
 
-INSTRUCTION(skmbz0) { if (!BIT(RAM_R(B), 0)) skip = 1; return PC + 1; }
-INSTRUCTION(skmbz1) { if (!BIT(RAM_R(B), 1)) skip = 1; return PC + 1; }
-INSTRUCTION(skmbz2) { if (!BIT(RAM_R(B), 2)) skip = 1; return PC + 1; }
-INSTRUCTION(skmbz3) { if (!BIT(RAM_R(B), 3)) skip = 1; return PC + 1; }
+INSTRUCTION(skmbz0) { if (!BIT(RAM_R(B), 0)) skip = 1; }
+INSTRUCTION(skmbz1) { if (!BIT(RAM_R(B), 1)) skip = 1; }
+INSTRUCTION(skmbz2) { if (!BIT(RAM_R(B), 2)) skip = 1; }
+INSTRUCTION(skmbz3) { if (!BIT(RAM_R(B), 3)) skip = 1; }
 
 /* Input/Output Instructions */
 
@@ -1097,8 +1035,6 @@ INSTRUCTION(skmbz3) { if (!BIT(RAM_R(B), 3)) skip = 1; return PC + 1; }
 INSTRUCTION(ing)
 {
 	A = IN_G();
-
-	return PC + 1;
 }
 
 /*
@@ -1120,8 +1056,6 @@ INSTRUCTION(inl)
 	UINT8 L = IN_L();
 	RAM_W(B, L >> 4);
 	A = L & 0xF;
-
-	return PC + 1;
 }
 
 /*
@@ -1140,8 +1074,6 @@ INSTRUCTION(inl)
 INSTRUCTION(obd)
 {
 	OUT_D(B & 0x0f);
-
-	return PC + 1;
 }
 
 /*
@@ -1160,8 +1092,6 @@ INSTRUCTION(obd)
 INSTRUCTION(omg)
 {
 	WRITE_G(RAM_R(B));
-
-	return PC + 1;
 }
 
 /*
@@ -1185,6 +1115,4 @@ INSTRUCTION(xas)
 	A = t;
 
 	SKL = C;
-
-	return PC + 1;
 }

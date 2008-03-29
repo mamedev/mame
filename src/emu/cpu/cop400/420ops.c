@@ -30,8 +30,6 @@
 
 	Data Flow:			A + 10 -> A
 
-	Skip Conditions:	None
-
 	Description:		Add Ten to A
 
 */
@@ -39,8 +37,6 @@
 INSTRUCTION(adt)
 {
 	A = (A + 10) & 0x0F;
-
-	return PC + 1;
 }
 
 /*
@@ -73,8 +69,6 @@ INSTRUCTION(casc)
 	{
 		C = 0;
 	}
-
-	return PC + 1;
 }
 
 /* Transfer-of-Control Instructions */
@@ -96,8 +90,6 @@ INSTRUCTION(cop420_ret)
 {
 	POP();
 	skip = R.last_skip;
-
-	return PC;
 }
 
 /* Memory Reference Instructions */
@@ -112,18 +104,14 @@ INSTRUCTION(cop420_ret)
 	Data Flow:			Q7:4 -> RAM(B)
 						Q3:0 -> A
 
-	Skip Conditions:	None
-
 	Description:		Copy Q to RAM, A
 
 */
 
 INSTRUCTION(cqma)
 {
-	RAM_W(B, Q >> 4);
+	WRITE_M(Q >> 4);
 	A = Q & 0xF;
-
-	return PC + 1;
 }
 
 /*
@@ -145,8 +133,6 @@ INSTRUCTION(ldd)
 	UINT8 rd = opcode & 0x3f;
 
 	A = RAM_R(rd);
-
-	return PC + 1;
 }
 
 /* Register Reference Instructions */
@@ -171,8 +157,6 @@ INSTRUCTION(xabr)
 
 	A = (B & 0x30) >> 4;
 	B = (Br << 4) + Bd;
-
-	return PC + 1;
 }
 
 /* Test Instructions */
@@ -197,8 +181,6 @@ INSTRUCTION(skt)
 		R.timerlatch = 0;
 		skip = 1;
 	}
-
-	return PC + 1;
 }
 
 /* Input/Output Instructions */
@@ -216,12 +198,7 @@ INSTRUCTION(skt)
 
 */
 
-INSTRUCTION(inin)
-{
-	A = IN_IN();
-
-	return PC + 1;
-}
+INSTRUCTION(inin) { A = IN_IN(); }
 
 /*
 
@@ -241,8 +218,6 @@ INSTRUCTION(inin)
 INSTRUCTION(cop402m_inin)
 {
 	A = IN_IN() | 0x02;
-
-	return PC + 1;
 }
 
 
@@ -264,8 +239,6 @@ INSTRUCTION(inil)
 	// NOT PROPERLY IMPLEMENTED
 
 	A = (IN_IN() & 0x09) | 0x04;
-
-	return PC + 1;
 }
 
 /*
@@ -286,8 +259,6 @@ INSTRUCTION(inil)
 INSTRUCTION(cop421_inil)
 {
 	// NOT IMPLEMENTED
-
-	return PC + 1;
 }
 
 /*
@@ -309,6 +280,4 @@ INSTRUCTION(ogi)
 	UINT4 y = opcode & 0x0f;
 
 	WRITE_G(y);
-
-	return PC + 1;
 }
