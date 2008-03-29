@@ -1,7 +1,6 @@
 /*  Namco System NA1/2 Video Hardware */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "namcona1.h"
 
 #define NAMCONA1_NUM_TILEMAPS 4
@@ -98,7 +97,7 @@ WRITE16_HANDLER( namcona1_paletteram_w )
 	if( namcona1_vreg[0x8e/2] )
 	{
 		/* graphics enabled; update palette immediately */
-		UpdatePalette(Machine, offset );
+		UpdatePalette(machine, offset );
 	}
 	else
 	{
@@ -361,18 +360,15 @@ static void pdraw_tile(running_machine *machine,
 							{
 								int c = source[x_index>>16];
 
-								/* The way we render shadows makes some Emeralda text invisible.
-								* The relevant text is composed of sprites with the shadow bit set,
-								* displayed over a black backdrop.
-								*/
-								if( bShadow && namcona1_gametype!=NAMCO_EMERALDA )
+								/* render a shadow only if the sprites color is $F */
+								if( bShadow && color == 0x0f )
 								{
-									//TODO: this isn't right
-									dest[x] |= 0x1000;
+									pen_t *palette_shadow_table = machine->shadow_table;
+									dest[x] = palette_shadow_table[dest[x]];
 								}
 								else
 								{
-									dest[x] = pal_base + c;	
+									dest[x] = pal_base + c;
 								}
 							}
 
@@ -451,6 +447,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					priority,
 					color & 0x4000, /* shadow */
 					tile & 0x8000 /* opaque */ );
+
 			} /* next col */
 		} /* next row */
 		source += 4;

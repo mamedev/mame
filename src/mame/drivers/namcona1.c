@@ -23,7 +23,6 @@ To Do:
 
 - Emeralda:
     After selecting the game type, tilemap scrolling is briefly incorrect
-    Shadow sprites, if enabled, make the score display invisible
     The demo sprites are incorrect, you should see a dolphin speaking
     the instructions and the playfield is wrong.
     Byte 0x25 of the NVRAM controls the FBI logo. 0x00 is on, 0x01 is off
