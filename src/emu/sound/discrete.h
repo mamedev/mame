@@ -3710,7 +3710,8 @@ enum { NODE_00=0x40000000
 
 #define NODE_START	NODE_00
 #define NODE_END	NODE_SPECIAL
-
+       
+#define NODE(_x)	(NODE_00+(_x))
 
 
 /*************************************
