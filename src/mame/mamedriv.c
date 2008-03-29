@@ -7447,6 +7447,7 @@ Other Sun games
 	DRIVER( inquiztr )	/* 1989 BFM */
 	DRIVER( escounts )	/* 1990 BFM */
 	DRIVER( trebltop )	/* 1991 BFM */
+	DRIVER( beeline )	/* 1991 BFM */
 	DRIVER( quizvadr )	/* 1991 BFM */
 	DRIVER( qos )		/* 1992 BFM */
 	DRIVER( qosa )		/* 1992 BFM */

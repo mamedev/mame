@@ -5,9 +5,10 @@
     driver by Phil Bennett
 
     Games supported:
-        * A Question of Sport (two sets)
+        * A Question of Sport [2 sets]
+        * Beeline (non-working)
         * Every Second Counts
-        * Inquizitor (Viper hardware)
+        * Inquizitor (Viper hardware, non-working)
         * Quizvaders
         * Treble Top
 
@@ -1578,6 +1579,18 @@ ROM_START( trebltop )
 	ROM_LOAD( "95000173.bin", 0x10000, 0x10000, CRC(8bda2c5e) SHA1(79aab5a2af7a5add5fe9132dc13bcc3705c6faf3) )
 ROM_END
 
+ROM_START( beeline )
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "bln12int.a", 0x08000, 0x08000, CRC(cb97905e) SHA1(9725156bf64e53a56bc0f90795d4b07db41d059e) )
+
+	ROM_REGION( 0x20000, REGION_USER1, 0 )
+	ROM_LOAD( "blncob.pa", 0x00000, 0x10000, CRC(8abc0017) SHA1(ecf6e7a4021b35295eb9bb9aed1b88fff27ffbd1) )
+	ROM_LOAD( "blncob.pb", 0x10000, 0x10000, CRC(feb121fe) SHA1(e83bfd6db00a3264e5076f257e261a1cb4605a83) )
+
+	ROM_REGION( 0x1c2000, REGION_USER2, 0 )
+	ROM_LOAD( "beedisk.img", 0x000000, 0x1c2000, NO_DUMP )
+ROM_END
+
 ROM_START( quizvadr )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
 	ROM_LOAD( "q6809.bin", 0x08000, 0x8000, CRC(a74dff10) SHA1(87578694a022dc3d7ade9cc76d387c1ae5fc74d9) )
@@ -1641,6 +1654,7 @@ ROM_END
 GAME( 1989, inquiztr, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Inquizitor",                       GAME_NOT_WORKING )
 GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
 GAME( 1991, trebltop, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, beeline,  0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, quizvadr, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, qos,      0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-107)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, qosa,     qos, bfcobra, bfcobra, bfcobra, ROT0, "BFM", "A Question of Sport (39-960-099)", GAME_IMPERFECT_GRAPHICS )
