@@ -26,6 +26,8 @@ WRITE8_HANDLER( flkatck_k007121_regs_w );
 extern UINT8 *k007121_ram;
 extern int flkatck_irq_enabled;
 
+static int multiply_reg[2];
+
 /***************************************************************************/
 
 static MACHINE_RESET( flkatck )
@@ -92,6 +94,18 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 	}
 }
 
+/* Protection - an external multiplyer connected to the sound CPU */
+static READ8_HANDLER( multiply_r )
+{
+	return (multiply_reg[0] * multiply_reg[1]) & 0xFF;
+}
+
+static WRITE8_HANDLER( multiply_w )
+{
+	multiply_reg[offset] = data;
+}
+
+
 static ADDRESS_MAP_START( flkatck_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0400, 0x041f) AM_READ(flkatck_ls138_r)			/* inputs + DIPS */
@@ -116,8 +130,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flkatck_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)				/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READ(SMH_RAM)				/* ??? */
-	AM_RANGE(0x9001, 0x9001) AM_READ(SMH_RAM)				/* ??? */
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)				/* ??? */
+//	AM_RANGE(0x9001, 0x9001) AM_READ(SMH_RAM)				/* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READ(SMH_RAM)				/* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
 	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)	/* 007232 registers */
@@ -127,8 +141,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flkatck_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)					/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(SMH_RAM)					/* ??? */
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(SMH_RAM)					/* ??? */
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)					/* ??? */
+//	AM_RANGE(0x9001, 0x9001) AM_WRITE(SMH_RAM)					/* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITE(SMH_RAM)					/* ??? */
 	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w) 	/* 007232 registers */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
