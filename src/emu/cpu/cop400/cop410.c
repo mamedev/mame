@@ -25,7 +25,7 @@
 /* The opcode table now is a combination of cycle counts and function pointers */
 typedef struct {
 	unsigned cycles;
-	void (*function) (UINT8 opcode);
+	UINT16 (*function) (UINT8 opcode);
 }	s_opcode;
 
 #define UINT1	UINT8
@@ -46,10 +46,11 @@ typedef struct
 	UINT9	SA, SB;
 	UINT4	SIO;
 	UINT1	SKL;
-	UINT8   skip, skipLBI;
 	UINT8	G_mask;
 	UINT8	D_mask;
 	int		last_si;
+	int		skip;
+	int		skip_lbi;
 } COP410_Regs;
 
 static COP410_Regs R;
@@ -100,13 +101,6 @@ static const s_opcode opcode_23_map[256]=
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
 };
 
-static void cop410_op23(UINT8 opcode)
-{
-	UINT8 opcode23 = ROM(PC++);
-
-	(*(opcode_23_map[opcode23].function))(opcode23);
-}
-
 static const s_opcode opcode_33_map[256]=
 {
 	{1, illegal 	},{1, skgbz0	},{1, illegal   },{1, skgbz2	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
@@ -143,31 +137,25 @@ static const s_opcode opcode_33_map[256]=
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
 };
 
-static void cop410_op33(UINT8 opcode)
-{
-	UINT8 opcode33 = ROM(PC++);
-
-	(*(opcode_33_map[opcode33].function))(opcode33);
-}
-
 static const s_opcode opcode_map[256]=
 {
 	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld0		},{1, x			},{1, xds		},
 	{1, lbi0_9		},{1, lbi0_10	},{1, lbi0_11	},{1, lbi0_12		},{1, lbi0_13	},{1, lbi0_14	},{1, lbi0_15	},{1, lbi0_0	},
 	{0, illegal		},{1, skmbz1	},{0, illegal	},{1, skmbz3		},{1, xis		},{1, ld1		},{1, x			},{1, xds		},
 	{1, lbi1_9		},{1, lbi1_10	},{1, lbi1_11	},{1, lbi1_12		},{1, lbi1_13	},{1, lbi1_14	},{1, lbi1_15	},{1, lbi1_0	},
-	{1, skc			},{1, ske		},{1, sc		},{2, cop410_op23	},{1, xis		},{1, ld2		},{1, x			},{1, xds 		},
+	{1, skc			},{1, ske		},{1, sc		},{2, illegal		},{1, xis		},{1, ld2		},{1, x			},{1, xds 		},
 	{1,	lbi2_9		},{1, lbi2_10	},{1, lbi2_11	},{1, lbi2_12		},{1, lbi2_13	},{1, lbi2_14	},{1, lbi2_15	},{1, lbi2_0	},
-	{1, asc			},{1, add		},{1, rc		},{2, cop410_op33	},{1, xis		},{1, ld3		},{1, x			},{1, xds		},
+	{1, asc			},{1, add		},{1, rc		},{2, illegal		},{1, xis		},{1, ld3		},{1, x			},{1, xds		},
 	{1,	lbi3_9		},{1, lbi3_10	},{1, lbi3_11	},{1, lbi3_12		},{1, lbi3_13	},{1, lbi3_14	},{1, lbi3_15	},{1, lbi3_0	},
 	{1, comp		},{0, illegal	},{1, rmb2		},{1, rmb2			},{1, nop		},{1, rmb1		},{1, smb2		},{1, smb1		},
 	{1,	ret			},{1, retsk		},{0, illegal	},{1, smb3			},{1, rmb0		},{1, smb0		},{1, cba		},{1, xas		},
 	{1, cab			},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
 	{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc			},{1, aisc		},{1, aisc		},{1, aisc		},{1, aisc		},
 	{2, jmp			},{2, jmp		},{0, illegal	},{0, illegal		},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal   },
-	{2, jsr0		},{2, jsr1		},{0, illegal	},{0, illegal		},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
+	{2, jsr			},{2, jsr		},{0, illegal	},{0, illegal		},{0, illegal	},{0, illegal	},{0, illegal	},{0, illegal	},
 	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
 	{1, stii		},{1, stii		},{1, stii		},{1, stii			},{1, stii		},{1, stii		},{1, stii		},{1, stii		},
+
 	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
 	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
 	{1, jp			},{1, jp		},{1, jp		},{1, jp			},{1, jp		},{1, jp		},{1, jp		},{1, jp		},
@@ -233,7 +221,7 @@ static void cop410_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop410", index, SIO);
 	state_save_register_item("cop410", index, SKL);
 	state_save_register_item("cop410", index, skip);
-	state_save_register_item("cop410", index, skipLBI);
+	state_save_register_item("cop410", index, skip_lbi);
 	state_save_register_item("cop410", index, R.G_mask);
 	state_save_register_item("cop410", index, R.D_mask);
 	state_save_register_item("cop410", index, R.last_si);
@@ -268,6 +256,8 @@ static void cop410_reset(void)
 static int cop410_execute(int cycles)
 {
 	UINT8 opcode;
+	UINT16 (*function)(UINT8);
+	int is_lbi = 0;
 
 	cop410_ICount = cycles;
 
@@ -275,50 +265,67 @@ static int cop410_execute(int cycles)
 	{
 		prevPC = PC;
 
-		CALL_DEBUGGER(PC);
+		// fetch and decode
 
 		opcode = ROM(PC);
 
-		if (skipLBI == 1)
+		switch (opcode)
 		{
-			if (LBIops[opcode] == 0)
-			{
-				skipLBI = 0;
-			}
-			else {
-				cop410_ICount -= opcode_map[opcode].cycles;
+		case 0x23:
+			opcode = ROM(++PC);
+			function = opcode_23_map[opcode].function;
+			break;
 
-				PC += InstLen[opcode];
+		case 0x33:
+			opcode = ROM(++PC);
+			function = opcode_33_map[opcode].function;
+			break;
+
+		default:
+			function = opcode_map[opcode].function;
+			is_lbi = LBIops[opcode];
+			break;
+		}
+
+		// skip LBI?
+
+		if (skip_lbi)
+		{
+			if (is_lbi)
+			{
+				skip = 1;
+			}
+			else
+			{
+				skip_lbi = 0;
 			}
 		}
 
-		if (skipLBI == 0)
+		if (skip)
 		{
-			int inst_cycles = opcode_map[opcode].cycles;
-			PC++;
-			(*(opcode_map[opcode].function))(opcode);
-			cop410_ICount -= inst_cycles;
+			// skip
 
-			// skip next instruction?
-
-			if (skip == 1)
+			if ((function == lqid) || (function == jid))
 			{
-				void *function = opcode_map[ROM(PC)].function;
-
-				opcode = ROM(PC);
-
-				if ((function == lqid) || (function == jid))
-				{
-					cop410_ICount -= 1;
-				}
-				else
-				{
-					cop410_ICount -= opcode_map[opcode].cycles;
-				}
-				PC += InstLen[opcode];
-				
-				skip = 0;
+				cop410_ICount -= 1;
 			}
+			else
+			{
+				cop410_ICount -= opcode_map[opcode].cycles;
+			}
+
+			PC++;
+
+			skip = 0;
+		}
+		else
+		{
+			// execute
+
+			CALL_DEBUGGER(PC);
+
+			PC = function(opcode);
+			cop410_ICount -= opcode_map[opcode].cycles;
 		}
 	} while (cop410_ICount > 0);
 
