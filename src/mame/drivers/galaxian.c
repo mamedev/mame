@@ -169,9 +169,9 @@ TO DO :
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "sound/flt_rc.h"
 #include "sound/dac.h"
 #include "includes/cclimber.h"
+#include "sound/discrete.h"
 
 
 #define KONAMI_SOUND_CLOCK		14318000
@@ -347,22 +347,13 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 	for (which = 0; which < 2; which++)
 		if (sndti_exists(SOUND_AY8910, which))
 			for (chan = 0; chan < 3; chan++)
-				if (sndti_exists(SOUND_FILTER_RC, 3 * which + chan))
-				{
-					UINT8 bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
-					int c = 0;
-					
-					/* low bit goes to 0.22uF capacitor = 220000pF */
-					if (bits & 1)
-						c += 220000;
-					
-					/* high bit goes to 0.047uF capacitor = 47000pF */
-					if (bits & 2)
-						c += 47000;
+			{
+				UINT8 bits = (offset >> (2 * chan + 6 * (1 - which))) & 3;
 
-					/* configure the RC filter on this channel */
-					filter_rc_set_RC(3 * which + chan, FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(c));
-				}
+				/* low bit goes to 0.22uF capacitor = 220000pF  */
+				/* high bit goes to 0.047uF capacitor = 47000pF */
+				discrete_sound_w(machine, NODE(3 * which + chan + 11), bits);
+			}
 }
 
 
@@ -1499,6 +1490,52 @@ static struct AY8910interface checkmaj_ay8910_interface =
 };
 
 
+static const discrete_mixer_desc konami_sound_mixer_desc =
+	{DISC_MIXER_IS_RESISTOR,
+		{RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1)},
+		{0,0,0,0,0,0},	/* no variable resistors   */
+		{0,0,0,0,0,0},  /* no node capacitors      */
+		0, RES_K(200),  /* actually after an opamp */
+		0,
+		CAP_U(0.15),
+		0, 1};
+
+static DISCRETE_SOUND_START( konami_sound )
+
+	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
+	
+	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_05, 4, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_06, 5, 1.0, 0)
+
+	DISCRETE_INPUT_DATA(NODE_11)
+	DISCRETE_INPUT_DATA(NODE_12)
+	DISCRETE_INPUT_DATA(NODE_13)
+
+	DISCRETE_INPUT_DATA(NODE_14)
+	DISCRETE_INPUT_DATA(NODE_15)
+	DISCRETE_INPUT_DATA(NODE_16)
+
+	DISCRETE_RCFILTER_SW(NODE_21, 1, NODE_01, NODE_11, 1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_22, 1, NODE_02, NODE_12, 1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_23, 1, NODE_03, NODE_13, 1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
+
+	DISCRETE_RCFILTER_SW(NODE_24, 1, NODE_04, NODE_14, 1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_25, 1, NODE_05, NODE_15, 1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_26, 1, NODE_06, NODE_16, 1000, CAP_U(0.22), CAP_U(0.047), 0, 0)
+
+	DISCRETE_MIXER6(NODE_30, 1, NODE_21, NODE_22, NODE_23, NODE_24, NODE_25, NODE_26, &konami_sound_mixer_desc)
+
+	/* FIXME the amplifier M51516L has a decay circuit */
+	/* This is handled with sound_global_enable but    */
+	/* belongs here.                                   */
+	
+	DISCRETE_OUTPUT(NODE_30, 5.0 )
+	
+DISCRETE_SOUND_END
+
 
 
 /*************************************
@@ -1555,15 +1592,12 @@ static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 	/* sound hardware */
 	MDRV_SOUND_ADD_TAG("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(frogger_ay8910_interface)
-	MDRV_SOUND_ROUTE(0, "filter.0.0", 1.25)
-	MDRV_SOUND_ROUTE(1, "filter.0.1", 1.25)
-	MDRV_SOUND_ROUTE(2, "filter.0.2", 1.25)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
-	MDRV_SOUND_ADD_TAG("filter.0.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.2", FILTER_RC, 0)
+	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1577,28 +1611,18 @@ static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD_TAG("8910.0", AY8910, KONAMI_SOUND_CLOCK/8)
-	MDRV_SOUND_ROUTE(0, "filter.0.0", 0.25)
-	MDRV_SOUND_ROUTE(1, "filter.0.1", 0.25)
-	MDRV_SOUND_ROUTE(2, "filter.0.2", 0.25)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
 	MDRV_SOUND_ADD_TAG("8910.1", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(konami_ay8910_interface)
-	MDRV_SOUND_ROUTE(0, "filter.1.0", 0.25)
-	MDRV_SOUND_ROUTE(1, "filter.1.1", 0.25)
-	MDRV_SOUND_ROUTE(2, "filter.1.2", 0.25)
-
-	MDRV_SOUND_ADD_TAG("filter.0.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD_TAG("filter.1.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.1.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.1.2", FILTER_RC, 0)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
+	
+	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
