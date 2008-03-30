@@ -745,6 +745,14 @@ READ64_HANDLER( dc_modem_r )
 	UINT64 shift;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
+
+	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
+	// our PVR emulation is apparently not good enough for that to work yet though.
+	if ((reg == 0x280/4) && (mem_mask == U64(0xffffffff00000000)))
+	{
+		return 1;
+	}
+
 	mame_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
 	return 0;
 }
