@@ -142,20 +142,11 @@ static WRITE8_HANDLER( wolfpack_coldetres_w )
 }
 
 
-static ADDRESS_MAP_START( wolfpack_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x100)
-	AM_RANGE(0x1000, 0x1000) AM_READ(wolfpack_input_r)
-	AM_RANGE(0x2000, 0x2000) AM_READ(wolfpack_misc_r)
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_1_r)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(SMH_NOP) /* debugger ROM location? */
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( wolfpack_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE(SMH_RAM) AM_MIRROR(0x100)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
+	AM_RANGE(0x1000, 0x1000) AM_READ(wolfpack_input_r)		/* Fallthrough */
 	AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&wolfpack_alpha_num_ram)
+	AM_RANGE(0x2000, 0x2000) AM_READ(wolfpack_misc_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(wolfpack_high_explo_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(wolfpack_sonar_ping_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(wolfpack_sirlat_w)
@@ -171,6 +162,7 @@ static ADDRESS_MAP_START( wolfpack_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x200d, 0x200d) AM_WRITE(wolfpack_attract_w)
 	AM_RANGE(0x200e, 0x200e) AM_WRITE(wolfpack_pt_pos_select_w)
 	AM_RANGE(0x200f, 0x200f) AM_WRITE(wolfpack_warning_light_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_1_r)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(wolfpack_audamp_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(wolfpack_pt_horz_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITE(wolfpack_pt_pic_w)
@@ -184,8 +176,9 @@ static ADDRESS_MAP_START( wolfpack_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4005, 0x4005) AM_WRITE(wolfpack_torpedo_h_w)
 	AM_RANGE(0x4006, 0x4006) AM_WRITE(wolfpack_torpedo_v_w)
 	AM_RANGE(0x5000, 0x5fff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x7000, 0x7fff) AM_ROM
+	AM_RANGE(0x9000, 0x9000) AM_READ(SMH_NOP) /* debugger ROM location? */
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -327,11 +320,11 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START(wolfpack)
-        MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 12096000 / 16)
-	MDRV_CPU_PROGRAM_MAP(wolfpack_readmem, wolfpack_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */
 	MDRV_MACHINE_RESET(wolfpack)

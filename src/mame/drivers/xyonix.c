@@ -152,7 +152,7 @@ static WRITE8_HANDLER ( xyonix_io_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(SMH_RAM, xyonix_vidram_w) AM_BASE(&xyonix_vidram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_WRITE(xyonix_vidram_w) AM_BASE(&xyonix_vidram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )

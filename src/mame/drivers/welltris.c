@@ -363,74 +363,46 @@ static WRITE8_HANDLER( pending_command_clear_w )
 }
 
 
-static ADDRESS_MAP_START( welltris_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x17ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x800000, 0x81ffff) AM_READ(SMH_RAM) /* Graph_1 & 2*/
-	AM_RANGE(0xff8000, 0xffbfff) AM_READ(SMH_RAM) /* Work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_READ(SMH_RAM) /* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_READ(SMH_RAM) /* Char */
-	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM) /* Palette */
-
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_1_word_r) /* Bottom Controls */
-	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_2_word_r) /* Top Controls */
-	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_3_word_r) /* Left Side Ctrls */
-	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_4_word_r) /* Right Side Ctrls */
-
-	AM_RANGE(0xfff008, 0xfff009) AM_READ(in0_r) /* Coinage, Start Buttons, pending sound command etc. */  /* Bit 5 Tested at start of irq 1 */
-	AM_RANGE(0xfff00a, 0xfff00b) AM_READ(input_port_5_word_r) /* P3+P4 Coin + Start Buttons */
-	AM_RANGE(0xfff00c, 0xfff00d) AM_READ(input_port_6_word_r) /* DSW0 Coinage */
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READ(input_port_7_word_r) /* DSW1 Game Options */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( welltris_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x17ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x800000, 0x81ffff) AM_WRITE(SMH_RAM) AM_BASE(&welltris_pixelram)
-	AM_RANGE(0xff8000, 0xffbfff) AM_WRITE(SMH_RAM)
-
-	AM_RANGE(0xffc000, 0xffc3ff) AM_WRITE(welltris_spriteram_w) AM_BASE(&welltris_spriteram)
-	AM_RANGE(0xffd000, 0xffdfff) AM_WRITE(welltris_charvideoram_w) AM_BASE(&welltris_charvideoram)
-	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(&welltris_pixelram)	/* Graph_1 & 2*/
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM AM_WRITE(welltris_spriteram_w) AM_BASE(&welltris_spriteram)				/* Sprite */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_WRITE(welltris_charvideoram_w) AM_BASE(&welltris_charvideoram)		/* Char */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	/* Palette */
+	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_1_word_r)	/* Bottom Controls */
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_2_word_r)	/* Top Controls */
 	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(welltris_gfxbank_w)
+	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_3_word_r)	/* Left Side Ctrls */
 	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(welltris_scrollreg_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_4_word_r)	/* Right Side Ctrls */
+	AM_RANGE(0xfff008, 0xfff009) AM_READ(in0_r)					/* Coinage, Start Buttons, pending sound command etc. */  /* Bit 5 Tested at start of irq 1 */
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(SMH_NOP)		// ??
-	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(SMH_NOP)		// ??
+	AM_RANGE(0xfff00a, 0xfff00b) AM_READ(input_port_5_word_r)	/* P3+P4 Coin + Start Buttons */
+	AM_RANGE(0xfff00c, 0xfff00d) AM_READ(input_port_6_word_r)	/* DSW0 Coinage */
+	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(SMH_NOP)			/* ?? */
+	AM_RANGE(0xfff00e, 0xfff00f) AM_READ(input_port_7_word_r)	/* DSW1 Game Options */
+	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(SMH_NOP)			/* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_READ(SMH_BANK1)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(YM2610_control_port_0_A_w)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(YM2610_status_port_0_A_r,YM2610_control_port_0_A_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YM2610_control_port_0_B_w)
+	AM_RANGE(0x0a, 0x0a) AM_READWRITE(YM2610_status_port_0_B_r,YM2610_control_port_0_B_w)
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
 ADDRESS_MAP_END
-
-
 
 static INPUT_PORTS_START( welltris )
 	PORT_START
@@ -751,14 +723,13 @@ static MACHINE_DRIVER_START( welltris )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz */
-	MDRV_CPU_PROGRAM_MAP(welltris_readmem,welltris_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80,8000000/2)		/* 4 MHz ??? */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-								/* IRQs are triggered by the YM2610 */
+	MDRV_CPU_ADD(Z80,8000000/2)		/* 4 MHz ??? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_port_map,0)	/* IRQs are triggered by the YM2610 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

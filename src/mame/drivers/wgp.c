@@ -653,85 +653,52 @@ static READ16_HANDLER( wgp_sound_r )
                          MEMORY STRUCTURES
 *****************************************************************/
 
-static ADDRESS_MAP_START( wgp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
-	AM_RANGE(0x140000, 0x143fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x180000, 0x18000f) AM_READ(TC0220IOC_halfword_byteswap_r)
-	AM_RANGE(0x200000, 0x20000f) AM_READ(wgp_adinput_r)
-	AM_RANGE(0x300000, 0x30ffff) AM_READ(TC0100SCN_word_0_r)	/* tilemaps */
-	AM_RANGE(0x320000, 0x32000f) AM_READ(TC0100SCN_ctrl_word_0_r)
-	AM_RANGE(0x400000, 0x40bfff) AM_READ(SMH_RAM)	/* sprite tilemaps */
-	AM_RANGE(0x40c000, 0x40dfff) AM_READ(SMH_RAM)	/* sprite ram */
-	AM_RANGE(0x500000, 0x501fff) AM_READ(SMH_RAM)	/* unknown/unused */
-	AM_RANGE(0x502000, 0x517fff) AM_READ(wgp_pivram_word_r)	/* piv tilemaps */
-	AM_RANGE(0x520000, 0x52001f) AM_READ(wgp_piv_ctrl_word_r)
-	AM_RANGE(0x700000, 0x701fff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wgp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x140000, 0x143fff) AM_WRITE(SMH_RAM) AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
-	AM_RANGE(0x180000, 0x18000f) AM_WRITE(TC0220IOC_halfword_byteswap_w)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main CPUA ram */
+	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE(&sharedram) AM_SIZE(&sharedram_size)
+	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(TC0220IOC_halfword_byteswap_r,TC0220IOC_halfword_byteswap_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x200000, 0x20000f) AM_WRITE(wgp_adinput_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(TC0100SCN_word_0_w)	/* tilemaps */
-	AM_RANGE(0x320000, 0x32000f) AM_WRITE(TC0100SCN_ctrl_word_0_w)
-	AM_RANGE(0x400000, 0x40bfff) AM_WRITE(SMH_RAM) AM_BASE(&wgp_spritemap) AM_SIZE(&wgp_spritemap_size)
-	AM_RANGE(0x40c000, 0x40dfff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	/* sprite ram */
-	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITE(SMH_NOP)	// ?? (writes 0x8000 and 0 alternately - Wgp2 just 0)
-	AM_RANGE(0x500000, 0x501fff) AM_WRITE(SMH_RAM)	/* unknown/unused */
-	AM_RANGE(0x502000, 0x517fff) AM_WRITE(wgp_pivram_word_w) AM_BASE(&wgp_pivram)	/* piv tilemaps */
-	AM_RANGE(0x520000, 0x52001f) AM_WRITE(wgp_piv_ctrl_word_w) AM_BASE(&wgp_piv_ctrlram)
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(wgp_adinput_r,wgp_adinput_w)
+	AM_RANGE(0x300000, 0x30ffff) AM_READWRITE(TC0100SCN_word_0_r,TC0100SCN_word_0_w)			/* tilemaps */
+	AM_RANGE(0x320000, 0x32000f) AM_READWRITE(TC0100SCN_ctrl_word_0_r,TC0100SCN_ctrl_word_0_w)
+	AM_RANGE(0x400000, 0x40bfff) AM_RAM AM_BASE(&wgp_spritemap) AM_SIZE(&wgp_spritemap_size)	/* sprite tilemaps */
+	AM_RANGE(0x40c000, 0x40dfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)			/* sprite ram */
+	AM_RANGE(0x40fff0, 0x40fff1) AM_WRITE(SMH_NOP)	/* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
+	AM_RANGE(0x500000, 0x501fff) AM_RAM					/* unknown/unused */
+	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r,wgp_pivram_word_w) AM_BASE(&wgp_pivram) /* piv tilemaps */
+	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r,wgp_piv_ctrl_word_w) AM_BASE(&wgp_piv_ctrlram)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)	/* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wgp_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not mapped... */
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x140000, 0x143fff) AM_READ(sharedram_r)
-	AM_RANGE(0x200000, 0x200003) AM_READ(wgp_sound_r)
-//  AM_RANGE(0x380000, 0x383fff) AM_READ(SMH_RAM) // LAN RAM
+static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not mapped... */
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM
+	AM_RANGE(0x140000, 0x143fff) AM_READWRITE(sharedram_r,sharedram_w)
+	AM_RANGE(0x200000, 0x200003) AM_READWRITE(wgp_sound_r,wgp_sound_w)
+//  AM_RANGE(0x380000, 0x383fff) AM_READ(SMH_RAM)		// LAN RAM
+//  AM_RANGE(0x380000, 0x383fff) AM_WRITE(SMH_RAM)    // LAN RAM
 	AM_RANGE(0x380000, 0x380001) AM_READ(lan_status_r)	// ??
 	// a lan input area is read somewhere above the status
 	// (make the status return 0 and log)...
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wgp_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x140000, 0x143fff) AM_WRITE(sharedram_w)
-	AM_RANGE(0x200000, 0x200003) AM_WRITE(wgp_sound_w)
-//  AM_RANGE(0x380000, 0x383fff) AM_WRITE(SMH_RAM)    // LAN RAM
-ADDRESS_MAP_END
-
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
-	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
+static ADDRESS_MAP_START( z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)	/* Fallthrough */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM2610_status_port_0_A_r,YM2610_control_port_0_A_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2610_read_port_0_r,YM2610_data_port_0_A_w)
+	AM_RANGE(0xe002, 0xe002) AM_READWRITE(YM2610_status_port_0_B_r,YM2610_control_port_0_B_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
-	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP,taitosound_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r,taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
+	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
 	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
@@ -981,15 +948,15 @@ static MACHINE_DRIVER_START( wgp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wgp_readmem,wgp_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz ??? */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(z80_sound_map,0)
 
 	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wgp_cpub_readmem,wgp_cpub_writemem)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
 
 	MDRV_MACHINE_START(wgp)
@@ -1023,47 +990,11 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( wgp2 )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wgp_readmem,wgp_writemem)
-	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
-
-	MDRV_CPU_ADD(Z80, 16000000/4)	/* 4 MHz ??? */
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(z80_sound_readmem,z80_sound_writemem)
-
-	MDRV_CPU_ADD(M68000, 12000000)	/* 12 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wgp_cpub_readmem,wgp_cpub_writemem)
-	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
-
-	MDRV_MACHINE_START(wgp)
+	MDRV_IMPORT_FROM(wgp)
 
 	MDRV_INTERLEAVE(200)
-
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-
-	MDRV_GFXDECODE(wgp)
-	MDRV_PALETTE_LENGTH(4096)
-
 	MDRV_VIDEO_START(wgp2)
-	MDRV_VIDEO_UPDATE(wgp)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-
-	MDRV_SOUND_ADD(YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
 
 

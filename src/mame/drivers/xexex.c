@@ -377,7 +377,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x182000, 0x183fff) AM_READWRITE(K056832_ram_word_r, K056832_ram_word_w)
 	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(K056832_rom_word_r, SMH_ROM)		// Passthrough to tile roms
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_READ(K053250_0_rom_r)
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_READWRITE(SMH_RAM, paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM AM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE(&paletteram16)
 
 #if XE_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_READ(K056832_word_r)
