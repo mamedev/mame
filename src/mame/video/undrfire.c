@@ -223,6 +223,152 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 }
 
+
+static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
+{
+	UINT16 *spritemap = (UINT16 *)memory_region(REGION_USER1);
+	UINT8 *spritemapHibit = (UINT8 *)memory_region(REGION_USER2);
+
+	int offs, data, tilenum, color, flipx, flipy;
+	int x, y, priority, dblsize, curx, cury;
+	int sprites_flipscreen = 0;
+	int zoomx, zoomy, zx, zy;
+	int sprite_chunk,map_offset,code,j,k,px,py;
+	int dimension,total_chunks;
+
+	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
+       while processing sprite ram and then draw them all at the end */
+	struct tempsprite *sprite_ptr = spritelist;
+
+	for (offs = (spriteram_size/4-4);offs >= 0;offs -= 4)
+	{
+		data = spriteram32[offs+0];
+		flipx =    (data & 0x00800000) >> 23;
+		zoomx =    (data & 0x007f0000) >> 16;
+		tilenum =  (data & 0x00007fff);
+
+		data = spriteram32[offs+2];
+		priority = (data & 0x000c0000) >> 18;
+		color =    (data & 0x0003fc00) >> 10;
+		x =        (data & 0x000003ff);
+
+		data = spriteram32[offs+3];
+		dblsize =  (data & 0x00040000) >> 18;
+		flipy =    (data & 0x00020000) >> 17;
+		zoomy =    (data & 0x0001fc00) >> 10;
+		y =        (data & 0x000003ff);
+
+		color |= (/*0x100 +*/ (priority << 6));		/* priority bits select color bank */
+
+		color /= 2;		/* as sprites are 5bpp */
+		flipy = !flipy;
+//		y = (-y &0x3ff);
+
+		if (!tilenum) continue;
+
+//		flipy = !flipy;
+		zoomx += 1;
+		zoomy += 1;
+
+		y += y_offs;
+
+		/* treat coords as signed */
+		if (x>0x340) x -= 0x400;
+		if (y>0x340) y -= 0x400;
+
+		x -= x_offs;
+
+		dimension = ((dblsize*2) + 2);	// 2 or 4
+		total_chunks = ((dblsize*3) + 1) << 2;	// 4 or 16
+		map_offset = tilenum << 2;
+
+		{
+			for (sprite_chunk=0;sprite_chunk<total_chunks;sprite_chunk++)
+			{
+				j = sprite_chunk / dimension;   /* rows */
+				k = sprite_chunk % dimension;   /* chunks per row */
+
+				px = k;
+				py = j;
+				/* pick tiles back to front for x and y flips */
+				if (flipx)  px = dimension-1-k;
+				if (flipy)  py = dimension-1-j;
+
+				code = spritemap[map_offset + px + (py<<(dblsize+1))];
+
+				if (spritemapHibit)
+				{
+					code|=spritemapHibit[map_offset + px + (py<<(dblsize+1))] << 16;
+
+					//if (spritemapHibit[map_offset + px + (py<<(dblsize+1))])
+						//color=mame_rand(machine);
+				}
+
+				curx = x + ((k*zoomx)/dimension);
+				cury = y + ((j*zoomy)/dimension);
+
+				zx= x + (((k+1)*zoomx)/dimension) - curx;
+				zy= y + (((j+1)*zoomy)/dimension) - cury;
+
+				if (sprites_flipscreen)
+				{
+					/* -zx/y is there to fix zoomed sprite coords in screenflip.
+                       drawgfxzoom does not know to draw from flip-side of sprites when
+                       screen is flipped; so we must correct the coords ourselves. */
+
+					curx = 320 - curx - zx;
+					cury = 256 - cury - zy;
+					flipx = !flipx;
+					flipy = !flipy;
+				}
+
+				sprite_ptr->gfx = 0;
+				sprite_ptr->code = code;
+				sprite_ptr->color = color;
+				sprite_ptr->flipx = !flipx;
+				sprite_ptr->flipy = flipy;
+				sprite_ptr->x = curx;
+				sprite_ptr->y = cury;
+				sprite_ptr->zoomx = zx << 12;
+				sprite_ptr->zoomy = zy << 12;
+
+				if (primasks)
+				{
+					sprite_ptr->primask = primasks[priority];
+
+					sprite_ptr++;
+				}
+				else
+				{
+					drawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+							sprite_ptr->code,
+							sprite_ptr->color,
+							sprite_ptr->flipx,sprite_ptr->flipy,
+							sprite_ptr->x,sprite_ptr->y,
+							cliprect,TRANSPARENCY_PEN,0,
+							sprite_ptr->zoomx,sprite_ptr->zoomy);
+				}
+			}
+		}
+	}
+
+	/* this happens only if primsks != NULL */
+	while (sprite_ptr != spritelist)
+	{
+		sprite_ptr--;
+
+		pdrawgfxzoom(bitmap,machine->gfx[sprite_ptr->gfx],
+				sprite_ptr->code,
+				sprite_ptr->color,
+				sprite_ptr->flipx,sprite_ptr->flipy,
+				sprite_ptr->x,sprite_ptr->y,
+				cliprect,TRANSPARENCY_PEN,0,
+				sprite_ptr->zoomx,sprite_ptr->zoomy,
+				sprite_ptr->primask);
+	}
+}
+
+
 /**************************************************************
                 SCREEN REFRESH
 **************************************************************/
@@ -336,6 +482,150 @@ VIDEO_UPDATE( undrfire )
 		{
 			static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
 			draw_sprites(screen->machine, bitmap,cliprect,primasks,44,-574);
+		}
+	}
+
+#ifdef MAME_DEBUG
+	if (dislayer[5]==0)
+#endif
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[2],0,0);	/* piv text layer */
+
+	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);	/* TC0480SCP text layer */
+
+	/* See if we should draw artificial gun targets */
+	/* (not yet implemented...) */
+
+	if (input_port_7_word_r(screen->machine,0,0) & 0x1)	/* Fake DSW */
+	{
+		popmessage("Gunsights on");
+	}
+
+/* Enable this to see rotation (?) control words */
+#if 0
+	{
+		char buf[80];
+		int i;
+
+		for (i = 0; i < 8; i += 1)
+		{
+			sprintf (buf, "%02x: %04x", i, undrfire_rotate_ctrl[i]);
+			ui_draw_text (buf, 0, i*8);
+		}
+	}
+#endif
+	return 0;
+}
+
+
+VIDEO_UPDATE( cbombers )
+{
+	UINT8 layer[5];
+	UINT8 pivlayer[3];
+	UINT16 priority;
+
+#ifdef MAME_DEBUG
+	static UINT8 dislayer[6];	/* Layer toggles to help get layers correct */
+#endif
+
+#ifdef MAME_DEBUG
+	if (input_code_pressed_once (KEYCODE_X))
+	{
+		dislayer[5] ^= 1;
+		popmessage("piv text: %01x",dislayer[5]);
+	}
+	if (input_code_pressed_once (KEYCODE_C))
+	{
+		dislayer[0] ^= 1;
+		popmessage("bg0: %01x",dislayer[0]);
+	}
+
+	if (input_code_pressed_once (KEYCODE_V))
+	{
+		dislayer[1] ^= 1;
+		popmessage("bg1: %01x",dislayer[1]);
+	}
+
+	if (input_code_pressed_once (KEYCODE_B))
+	{
+		dislayer[2] ^= 1;
+		popmessage("bg2: %01x",dislayer[2]);
+	}
+
+	if (input_code_pressed_once (KEYCODE_N))
+	{
+		dislayer[3] ^= 1;
+		popmessage("bg3: %01x",dislayer[3]);
+	}
+
+	if (input_code_pressed_once (KEYCODE_M))
+	{
+		dislayer[4] ^= 1;
+		popmessage("sprites: %01x",dislayer[4]);
+	}
+#endif
+
+	TC0100SCN_tilemap_update(screen->machine);
+	TC0480SCP_tilemap_update(screen->machine);
+
+	priority = TC0480SCP_get_bg_priority();
+
+	layer[0] = (priority &0xf000) >> 12;	/* tells us which bg layer is bottom */
+	layer[1] = (priority &0x0f00) >>  8;
+	layer[2] = (priority &0x00f0) >>  4;
+	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
+	layer[4] = 4;   /* text layer always over bg layers */
+
+	pivlayer[0] = TC0100SCN_bottomlayer(0);
+	pivlayer[1] = pivlayer[0]^1;
+	pivlayer[2] = 2;
+
+	fillbitmap(priority_bitmap,0,cliprect);
+	fillbitmap(bitmap,0,cliprect);	/* wrong color? */
+
+
+/* The "PIV" chip seems to be a renamed TC0100SCN. It has a
+   bottom layer usually full of bright garish colors that
+   vaguely mimic the structure of the layers on top. Seems
+   pointless - it's always hidden by other layers. Does it
+   serve some blending pupose ? */
+
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],TILEMAP_DRAW_OPAQUE,0);
+	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);
+
+#ifdef MAME_DEBUG
+	if (dislayer[layer[0]]==0)
+#endif
+	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[0],0,1);
+
+#ifdef MAME_DEBUG
+	if (dislayer[layer[1]]==0)
+#endif
+	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
+
+#ifdef MAME_DEBUG
+	if (dislayer[layer[2]]==0)
+#endif
+	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
+
+#ifdef MAME_DEBUG
+	if (dislayer[layer[3]]==0)
+#endif
+	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
+
+#ifdef MAME_DEBUG
+	if (dislayer[4]==0)
+#endif
+	/* Sprites have variable priority (we kludge this on road levels) */
+	{
+		if ((TC0480SCP_pri_reg &0x3) == 3)	/* on road levels kludge sprites up 1 priority */
+		{
+			static const int primasks[4] = {0xfff0, 0xff00, 0x0, 0x0};
+			draw_sprites_cbombers(screen->machine, bitmap,cliprect,primasks,80,-208);
+		}
+		else
+		{
+			static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
+			draw_sprites_cbombers(screen->machine, bitmap,cliprect,primasks,80,-208);
 		}
 	}
 
