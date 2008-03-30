@@ -4988,6 +4988,7 @@ int megadrive_z80irq_hpos = 320;
 UINT16* megadriv_backupram;
 int megadriv_backupram_length;
 
+#ifndef MESS
 static NVRAM_HANDLER( megadriv )
 {
 	if (megadriv_backupram!=NULL)
@@ -5009,7 +5010,7 @@ static NVRAM_HANDLER( megadriv )
 		}
 	}
 }
-
+#endif
 
 
 MACHINE_DRIVER_START( megadriv )
@@ -5032,7 +5033,9 @@ MACHINE_DRIVER_START( megadriv )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
+#ifndef MESS
 	MDRV_NVRAM_HANDLER(megadriv)
+#endif
 
 	MDRV_PALETTE_LENGTH(0x200)
 
