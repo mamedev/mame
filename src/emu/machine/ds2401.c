@@ -161,7 +161,6 @@ void ds2401_init( int which, const UINT8 *data )
 	state_save_register_item( "ds2401", which, c->shift );
 	state_save_register_item( "ds2401", which, c->rx );
 	state_save_register_item( "ds2401", which, c->tx );
-	state_save_register_generic( "ds2401", which, "data", (UINT8 *)&data[0], data[0], SIZE_DATA );
 
 	c->timer = timer_alloc( ds2401_tick , NULL);
 	c->reset_timer = timer_alloc( ds2401_reset , NULL);
