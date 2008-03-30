@@ -70,8 +70,8 @@ extern const struct YM2203interface seibu_ym2203_interface;
 /**************************************************************************/
 
 #define SEIBU_COIN_INPUTS											\
-	PORT_START														\
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)			\
+	PORT_START_TAG("COIN")											\
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(4)		\
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(4)
 
 

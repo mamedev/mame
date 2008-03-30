@@ -124,8 +124,7 @@ static ADDRESS_MAP_START( goodejan_io_map, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goodejan )
-	/* Must be port 0: coin inputs read through sound cpu */
-	SEIBU_COIN_INPUTS
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )

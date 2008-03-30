@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( deadang )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( deadang )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Cabinet) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x0080, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Cocktail ) )
 	/* Dip switch B */
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( deadang )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ghunter )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START	/* IN0 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -196,7 +196,7 @@ static INPUT_PORTS_START( ghunter )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Cabinet) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x0080, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Cocktail ) )
 	/* Dip switch B */

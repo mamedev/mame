@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 static INPUT_PORTS_START( dcon )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( dcon )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sdgndmps )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_B ) )
@@ -202,10 +202,10 @@ static INPUT_PORTS_START( sdgndmps )
 	PORT_DIPSETTING(      0x0090, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPSETTING(      0x0100, "4" )
-	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0100, "4" )
+	PORT_DIPSETTING(      0x0000, "6" )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -416,4 +416,4 @@ static DRIVER_INIT( sdgndmps )
 
 
 GAME( 1991, sdgndmps, 0, sdgndmps, sdgndmps, sdgndmps, ROT0, "Banpresto / Bandai", "SD Gundam Psycho Salamander no Kyoui", GAME_NO_COCKTAIL )
-GAME( 1992, dcon,     0, dcon,     dcon,     0, ROT0, "Success",            "D-Con", GAME_NO_COCKTAIL )
+GAME( 1992, dcon,     0, dcon,     dcon,     0,        ROT0, "Success",            "D-Con", GAME_NO_COCKTAIL )

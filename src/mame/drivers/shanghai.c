@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( kothello_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kothello )
-	SEIBU_COIN_INPUTS
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 INPUT_PORTS_END
 
 

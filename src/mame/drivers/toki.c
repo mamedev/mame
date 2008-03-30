@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( toki )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START_TAG("DSW0")
 	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4,5")
@@ -842,4 +842,3 @@ GAME( 1989, juju,  toki, toki,  toki,  toki,  ROT0, "Tad", "JuJu Densetsu (Japan
 GAME( 1989, tokib, toki, tokib, tokib, tokib, ROT0, "bootleg", "Toki (bootleg)", 0 )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
 GAME( 1989, jujub, toki, toki,  toki,  jujub, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", GAME_IMPERFECT_SOUND ) // bootleg of tokia/tokij revison
-

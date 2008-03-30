@@ -2815,7 +2815,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( legionna )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) )
@@ -2903,7 +2903,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( heatbrl )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x001f, 0x001f, DEF_STR( Coinage ) )
@@ -3007,7 +3007,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( godzilla )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -3105,7 +3105,7 @@ static INPUT_PORTS_START( godzilla )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sdgndmrb )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -3250,7 +3250,7 @@ static INPUT_PORTS_START( sdgndmrb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cupsoc )
-	SEIBU_COIN_INPUTS	/* Must be port 0: coin inputs read through sound cpu */
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START
 	PORT_DIPNAME( 0x0007, 0x0007, "Coin 1 (3)" )
@@ -4399,7 +4399,7 @@ GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,        ROT0, "Banpresto",
 GAME( 1993, sdgndmrb, 0,        sdgndmrb, sdgndmrb, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, godzilla, 0,        ROT0, "Banpresto", "Denjin Makai", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1992, cupsoc,   0,        cupsoc,  cupsoc,    0,        ROT0, "Seibu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsoc2,  cupsoc,   cupsoc,  cupsoc,    0,        ROT0, "Seibu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, olysoc92, cupsoc,   cupsoc,  cupsoc,    0,        ROT0, "Seibu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsoc2,  cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocbl, cupsoc,   cupsocbl, cupsoc,   cupsoc,   ROT0, "bootleg", "Seibu Cup Soccer (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )

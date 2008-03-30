@@ -84,7 +84,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( dynduke )
-	SEIBU_COIN_INPUTS	// Must be port 0: coin inputs read through sound cpu
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
