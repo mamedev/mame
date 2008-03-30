@@ -26,7 +26,7 @@
 static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
 #ifdef MESS
-	mess_image *image;
+	const device_config *image;
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
