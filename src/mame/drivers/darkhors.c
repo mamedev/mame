@@ -242,7 +242,7 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 	if (data & ~0xff000000)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %08X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_MSB32 )
+	if ( ACCESSING_BYTE_3 )
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x04000000);
@@ -257,7 +257,7 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 
 static WRITE32_HANDLER( OKIM6295_data_0_msb32_w )
 {
-	if (ACCESSING_MSB32)
+	if (ACCESSING_BYTE_3)
 		OKIM6295_data_0_msb_w(machine, offset, data >> 16, mem_mask >> 16);
 }
 
@@ -269,15 +269,15 @@ static READ32_HANDLER( OKIM6295_status_0_msb32_r )
 static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_MSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2+1, data, mem_mask);
+	if (ACCESSING_WORD_1)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_WORD_0)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2+1, data, mem_mask);
 }
 
 static UINT32 input_sel;
 static WRITE32_HANDLER( darkhors_input_sel_w )
 {
 	COMBINE_DATA(&input_sel);
-//  if (ACCESSING_MSW32)    popmessage("%04X",data >> 16);
+//  if (ACCESSING_WORD_1)    popmessage("%04X",data >> 16);
 }
 
 static int mask_to_bit( int mask )
@@ -309,7 +309,7 @@ static READ32_HANDLER( darkhors_input_sel_r )
 static WRITE32_HANDLER( darkhors_unk1_w )
 {
 	// 0x1000 lockout
-//  if (ACCESSING_MSW32)    popmessage("%04X",data >> 16);
+//  if (ACCESSING_WORD_1)    popmessage("%04X",data >> 16);
 }
 
 static ADDRESS_MAP_START( darkhors_readmem, ADDRESS_SPACE_PROGRAM, 32 )

@@ -895,12 +895,12 @@ static WRITE16_HANDLER( megadriv_vdp_w )
 	{
 		case 0x00:
 		case 0x02:
-			if (!ACCESSING_MSB)
+			if (!ACCESSING_BYTE_1)
 			{
 				data = (data&0x00ff) | data<<8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			}
-			else if (!ACCESSING_LSB)
+			else if (!ACCESSING_BYTE_0)
 			{
 				data = (data&0xff00) | data>>8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
@@ -910,7 +910,7 @@ static WRITE16_HANDLER( megadriv_vdp_w )
 
 		case 0x04:
 		case 0x06:
-			if ((!ACCESSING_MSB) || (!ACCESSING_LSB)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
+			if ((!ACCESSING_BYTE_1) || (!ACCESSING_BYTE_0)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			megadriv_vdp_ctrl_port_w(data);
 			break;
 
@@ -925,8 +925,8 @@ static WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_LSB) SN76496_0_w(machine, 0, data & 0xff);
-			//if (ACCESSING_MSB) SN76496_0_w(machine, 0, (data >>8) & 0xff);
+			if (ACCESSING_BYTE_0) SN76496_0_w(machine, 0, data & 0xff);
+			//if (ACCESSING_BYTE_1) SN76496_0_w(machine, 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1293,13 +1293,13 @@ static READ16_HANDLER( megadriv_vdp_r )
 
 		case 0x00:
 		case 0x02:
-			if ((!ACCESSING_MSB) || (!ACCESSING_LSB)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
+			if ((!ACCESSING_BYTE_1) || (!ACCESSING_BYTE_0)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_data_port_r();
 			break;
 
 		case 0x04:
 		case 0x06:
-		//  if ((!ACCESSING_MSB) || (!ACCESSING_LSB)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
+		//  if ((!ACCESSING_BYTE_1) || (!ACCESSING_BYTE_0)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r();
 		//  retvalue = mame_rand(Machine);
 		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",activecpu_get_pc(),genesis_scanline_counter, get_hposition(),retvalue);
@@ -1309,7 +1309,7 @@ static READ16_HANDLER( megadriv_vdp_r )
 		case 0x0a:
 		case 0x0c:
 		case 0x0e:
-		//  if ((!ACCESSING_MSB) || (!ACCESSING_LSB)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
+		//  if ((!ACCESSING_BYTE_1) || (!ACCESSING_BYTE_0)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
 		//  retvalue = mame_rand(Machine);
 		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",activecpu_get_pc(),genesis_scanline_counter, get_hposition(),retvalue);
@@ -1334,11 +1334,11 @@ static READ16_HANDLER( megadriv_68k_YM2612_read)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_MSB)	 return YM2612_status_port_0_A_r(machine, 0) << 8;
+				if (ACCESSING_BYTE_1)	 return YM2612_status_port_0_A_r(machine, 0) << 8;
 				else 				 return YM2612_status_port_0_A_r(machine, 0);
 				break;
 			case 1:
-				if (ACCESSING_MSB)	return YM2612_status_port_0_A_r(machine, 0) << 8;
+				if (ACCESSING_BYTE_1)	return YM2612_status_port_0_A_r(machine, 0) << 8;
 				else 				return YM2612_status_port_0_A_r(machine, 0);
 				break;
 		}
@@ -1362,11 +1362,11 @@ static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_MSB)	YM2612_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+				if (ACCESSING_BYTE_1)	YM2612_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
 				else 				YM2612_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 				break;
 			case 1:
-				if (ACCESSING_MSB)	YM2612_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+				if (ACCESSING_BYTE_1)	YM2612_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
 				else 				YM2612_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 				break;
 		}
@@ -2189,11 +2189,11 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 	if ((genz80.z80_has_bus==0) && (genz80.z80_is_reset==0))
 	{
 
-		if (!ACCESSING_LSB) // byte (MSB) access
+		if (!ACCESSING_BYTE_0) // byte (MSB) access
 		{
 			genz80.z80_prgram[(offset<<1)] = (data & 0xff00) >> 8;
 		}
-		else if (!ACCESSING_MSB)
+		else if (!ACCESSING_BYTE_1)
 		{
 			genz80.z80_prgram[(offset<<1)^1] = (data & 0x00ff);
 		}
@@ -2224,7 +2224,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 
 
 	/* Check if the 68k has the z80 bus */
-	if (!ACCESSING_LSB) // byte (MSB) access
+	if (!ACCESSING_BYTE_0) // byte (MSB) access
 	{
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
@@ -2233,7 +2233,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 		return retvalue;
 
 	}
-	else if (!ACCESSING_MSB) // is this valid?
+	else if (!ACCESSING_BYTE_1) // is this valid?
 	{
 		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", activecpu_get_pc(),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = 0x0001;
@@ -2256,7 +2256,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 {
 	/* Request the Z80 bus, allows 68k to read/write Z80 address space */
-	if (!ACCESSING_LSB) // byte access
+	if (!ACCESSING_BYTE_0) // byte access
 	{
 		if (data & 0x0100)
 		{
@@ -2272,7 +2272,7 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 
 		}
 	}
-	else if (!ACCESSING_MSB) // is this valid?
+	else if (!ACCESSING_BYTE_1) // is this valid?
 	{
 		if (data & 0x0001)
 		{
@@ -2306,7 +2306,7 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 
 static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 {
-	if (!ACCESSING_LSB) // byte access
+	if (!ACCESSING_BYTE_0) // byte access
 	{
 		if (data & 0x0100)
 		{
@@ -2322,7 +2322,7 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
-	else if (!ACCESSING_MSB) // is this valid?
+	else if (!ACCESSING_BYTE_1) // is this valid?
 	{
 		if (data & 0x0001)
 		{

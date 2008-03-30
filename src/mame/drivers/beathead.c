@@ -310,7 +310,7 @@ static READ32_HANDLER( sound_data_r )
 
 static WRITE32_HANDLER( sound_data_w )
 {
-	if (ACCESSING_LSB32)
+	if (ACCESSING_BYTE_0)
 		atarigen_sound_w(machine,offset, data, mem_mask);
 }
 

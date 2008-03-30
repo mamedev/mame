@@ -593,7 +593,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 		//case 0x3c:
 		{
 			COMBINE_DATA( &gcu[chip].visible_area );
-			if (ACCESSING_LSW32)
+			if (ACCESSING_WORD_0)
 			{
 				const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, chip);
 
@@ -672,15 +672,15 @@ static READ32_HANDLER(input_r)
 {
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= (readinputport(0) & 0xff) << 24;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= (readinputport(1) & 0xff) << 8;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= (readinputport(2) & 0xff);
 	}
@@ -703,19 +703,19 @@ static READ32_HANDLER( sensor_r )
 static READ32_HANDLER(flashram_r)
 {
 	UINT32 r = 0;
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= (intelflash_read(0, (offset*4)+0) & 0xff) << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= (intelflash_read(0, (offset*4)+1) & 0xff) << 16;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= (intelflash_read(0, (offset*4)+2) & 0xff) << 8;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= (intelflash_read(0, (offset*4)+3) & 0xff) << 0;
 	}
@@ -724,19 +724,19 @@ static READ32_HANDLER(flashram_r)
 
 static WRITE32_HANDLER(flashram_w)
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		intelflash_write(0, (offset*4)+0, (data >> 24) & 0xff);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		intelflash_write(0, (offset*4)+1, (data >> 16) & 0xff);
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		intelflash_write(0, (offset*4)+2, (data >> 8) & 0xff);
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		intelflash_write(0, (offset*4)+3, (data >> 0) & 0xff);
 	}
@@ -757,19 +757,19 @@ static READ32_HANDLER(soundflash_r)
 
 	offset &= 0x7ffff;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= (intelflash_read(chip, (offset*4)+0) & 0xff) << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= (intelflash_read(chip, (offset*4)+1) & 0xff) << 16;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= (intelflash_read(chip, (offset*4)+2) & 0xff) << 8;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= (intelflash_read(chip, (offset*4)+3) & 0xff) << 0;
 	}
@@ -790,19 +790,19 @@ static WRITE32_HANDLER(soundflash_w)
 
 	offset &= 0x7ffff;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		intelflash_write(chip, (offset*4)+0, (data >> 24) & 0xff);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		intelflash_write(chip, (offset*4)+1, (data >> 16) & 0xff);
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		intelflash_write(chip, (offset*4)+2, (data >> 8) & 0xff);
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		intelflash_write(chip, (offset*4)+3, (data >> 0) & 0xff);
 	}
@@ -1222,19 +1222,19 @@ static READ32_HANDLER( comm_uart_r )
 {
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= pc16552d_0_r(machine, (offset*4)+0) << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= pc16552d_0_r(machine, (offset*4)+1) << 16;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= pc16552d_0_r(machine, (offset*4)+2) << 8;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= pc16552d_0_r(machine, (offset*4)+3) << 0;
 	}
@@ -1244,19 +1244,19 @@ static READ32_HANDLER( comm_uart_r )
 
 static WRITE32_HANDLER( comm_uart_w )
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		pc16552d_0_w(machine, (offset*4)+0, (data >> 24) & 0xff);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		pc16552d_0_w(machine, (offset*4)+1, (data >> 16) & 0xff);
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		pc16552d_0_w(machine, (offset*4)+2, (data >> 8) & 0xff);
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		pc16552d_0_w(machine, (offset*4)+3, (data >> 0) & 0xff);
 	}
@@ -1276,19 +1276,19 @@ static READ32_HANDLER( rtc_r )
 	int reg = offset * 4;
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= rtc65271_r((reg >> 8) & 0x1, (reg & 0xff) + 0) << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= rtc65271_r((reg >> 8) & 0x1, (reg & 0xff) + 1) << 16;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= rtc65271_r((reg >> 8) & 0x1, (reg & 0xff) + 2) << 8;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= rtc65271_r((reg >> 8) & 0x1, (reg & 0xff) + 3) << 0;
 	}
@@ -1299,19 +1299,19 @@ static READ32_HANDLER( rtc_r )
 static WRITE32_HANDLER( rtc_w )
 {
 	int reg = offset * 4;
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		rtc65271_w((reg >> 8) & 0x1, (reg & 0xff) + 0, (data >> 24) & 0xff);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		rtc65271_w((reg >> 8) & 0x1, (reg & 0xff) + 1, (data >> 16) & 0xff);
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		rtc65271_w((reg >> 8) & 0x1, (reg & 0xff) + 2, (data >> 8) & 0xff);
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		rtc65271_w((reg >> 8) & 0x1, (reg & 0xff) + 3, (data >> 0) & 0xff);
 	}
@@ -1325,11 +1325,11 @@ static READ32_HANDLER( sound_r )
 
 //  printf("sound_r: %08X, %08X\n", offset, mem_mask);
 
-	if (!(mem_mask & 0xff000000))	/* External RAM read */
+	if (ACCESSING_BYTE_3)	/* External RAM read */
 	{
 		r |= YMZ280B_data_0_r(machine, offset) << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= YMZ280B_status_0_r(machine, offset) << 16;
 	}
@@ -1340,11 +1340,11 @@ static READ32_HANDLER( sound_r )
 static WRITE32_HANDLER( sound_w )
 {
 //  printf("sound_w: %08X, %08X, %08X\n", offset, data, mem_mask);
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		YMZ280B_register_0_w(machine, offset, (data >> 24) & 0xff);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		YMZ280B_data_0_w(machine, offset, (data >> 16) & 0xff);
 	}
@@ -1397,7 +1397,7 @@ static READ32_HANDLER( midi_uart_r )
 {
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= pc16552d_1_r(machine, offset >> 6) << 24;
 	}
@@ -1407,7 +1407,7 @@ static READ32_HANDLER( midi_uart_r )
 
 static WRITE32_HANDLER( midi_uart_w )
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		pc16552d_1_w(machine, offset >> 6, (data >> 24) & 0xff);
 	}
@@ -1518,7 +1518,7 @@ static READ32_HANDLER( extend_board_irq_r)
 {
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= (~extend_board_irq_active) << 24;
 	}
@@ -1530,7 +1530,7 @@ static WRITE32_HANDLER( extend_board_irq_w )
 {
 //  printf("extend_board_irq_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		extend_board_irq_active &= ~((data >> 24) & 0xff);
 
@@ -1543,7 +1543,7 @@ static WRITE32_HANDLER( extend_board_irq_w )
 static WRITE32_HANDLER( lamp_output_w )
 {
 	// -------- -------- -------- xxxxxxxx   Status LEDs (active low)
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		output_set_value("status_led_0", (data & 0x01) ? 0 : 1);
 		output_set_value("status_led_1", (data & 0x02) ? 0 : 1);
@@ -1562,13 +1562,13 @@ static WRITE32_HANDLER( lamp_output_kbm_w )
 {
 	lamp_output_w(machine, offset, data, mem_mask);
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		output_set_value("door_lamp",	(data & 0x10000000) ? 1 : 0);
 		output_set_value("start1p",		(data & 0x01000000) ? 1 : 0);
 		output_set_value("start2p",		(data & 0x02000000) ? 1 : 0);
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		output_set_value("lamp1",		(data & 0x00000100) ? 1 : 0);
 		output_set_value("lamp2",		(data & 0x00000200) ? 1 : 0);
@@ -1595,7 +1595,7 @@ static WRITE32_HANDLER( lamp_output_ppp_w )
 	// 0x00020000 Stage LED 5
 	// 0x00040000 Stage LED 6
 	// 0x00080000 Stage LED 7
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		output_set_value("left",			(data & 0x00000100) ? 1 : 0);
 		output_set_value("right",			(data & 0x00000200) ? 1 : 0);
@@ -1603,14 +1603,14 @@ static WRITE32_HANDLER( lamp_output_ppp_w )
 		output_set_value("ok",				(data & 0x00000800) ? 1 : 0);
 		output_set_value("slim",			(data & 0x00008000) ? 1 : 0);
 	}
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		output_set_value("stage_led_0",		(data & 0x01000000) ? 1 : 0);
 		output_set_value("stage_led_1",		(data & 0x02000000) ? 1 : 0);
 		output_set_value("stage_led_2",		(data & 0x04000000) ? 1 : 0);
 		output_set_value("stage_led_3",		(data & 0x08000000) ? 1 : 0);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		output_set_value("stage_led_4",		(data & 0x00010000) ? 1 : 0);
 		output_set_value("stage_led_5",		(data & 0x00020000) ? 1 : 0);
@@ -1637,14 +1637,14 @@ static WRITE32_HANDLER( lamp_output2_ppp_w )
 	// 0x00000002 Top LED 5
 	// 0x00000004 Top LED 6
 	// 0x00000008 Top LED 7
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		output_set_value("top_led_0",		(data & 0x00010000) ? 1 : 0);
 		output_set_value("top_led_1",		(data & 0x00020000) ? 1 : 0);
 		output_set_value("top_led_2",		(data & 0x00040000) ? 1 : 0);
 		output_set_value("top_led_3",		(data & 0x00080000) ? 1 : 0);
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		output_set_value("top_led_4",		(data & 0x00000001) ? 1 : 0);
 		output_set_value("top_led_5",		(data & 0x00000002) ? 1 : 0);
@@ -1667,7 +1667,7 @@ static WRITE32_HANDLER( lamp_output3_ppp_w )
 	// 0x00040000 Lamp 1
 	// 0x00100000 Lamp 2
 	// 0x00400000 Lamp 3
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		output_set_value("lamp_0",			(data & 0x00010000) ? 1 : 0);
 		output_set_value("lamp_1",			(data & 0x00040000) ? 1 : 0);
@@ -1684,19 +1684,19 @@ static READ32_HANDLER(ppc_spu_share_r)
 {
 	UINT32 r = 0;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= spu_shared_ram[(offset * 4) + 0] << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= spu_shared_ram[(offset * 4) + 1] << 16;
 	}
-	if (!(mem_mask & 0x0000ff0000))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= spu_shared_ram[(offset * 4) + 2] <<  8;
 	}
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= spu_shared_ram[(offset * 4) + 3] <<  0;
 	}
@@ -1706,19 +1706,19 @@ static READ32_HANDLER(ppc_spu_share_r)
 
 static WRITE32_HANDLER(ppc_spu_share_w)
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		spu_shared_ram[(offset * 4) + 0] = (data >> 24) & 0xff;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		spu_shared_ram[(offset * 4) + 1] = (data >> 16) & 0xff;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		spu_shared_ram[(offset * 4) + 2] = (data >>  8) & 0xff;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		spu_shared_ram[(offset * 4) + 3] = (data >>  0) & 0xff;
 	}

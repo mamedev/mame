@@ -442,25 +442,25 @@ INLINE int convert_to_offset_and_size32(offs_t *offset, UINT32 mem_mask)
 	int size = 4;
 
 	/* determine which real offset */
-	if (mem_mask & 0x000000ff)
+	if (!ACCESSING_BYTE_0)
 	{
 		(*offset)++, size = 3;
-		if (mem_mask & 0x0000ff00)
+		if (!ACCESSING_BYTE_1)
 		{
 			(*offset)++, size = 2;
-			if (mem_mask & 0x00ff0000)
+			if (!ACCESSING_BYTE_2)
 				(*offset)++, size = 1;
 		}
 	}
 
 	/* determine the real size */
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 		return size;
 	size--;
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 		return size;
 	size--;
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 		return size;
 	size--;
 	return size;
@@ -471,10 +471,10 @@ INLINE int convert_to_offset_and_size16(offs_t *offset, UINT32 mem_mask)
 	int size = 2;
 
 	/* determine which real offset */
-	if (mem_mask & 0x000000ff)
+	if (!ACCESSING_BYTE_0)
 		(*offset)++, size = 1;
 
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 		return size;
 	size--;
 	return size;

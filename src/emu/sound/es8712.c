@@ -407,37 +407,37 @@ WRITE8_HANDLER( ES8712_data_2_w )
 
 WRITE16_HANDLER( ES8712_data_0_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		ES8712_data_w(0, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( ES8712_data_1_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		ES8712_data_w(1, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( ES8712_data_2_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		ES8712_data_w(2, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( ES8712_data_0_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		ES8712_data_w(0, offset, data >> 8);
 }
 
 WRITE16_HANDLER( ES8712_data_1_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		ES8712_data_w(1, offset, data >> 8);
 }
 
 WRITE16_HANDLER( ES8712_data_2_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		ES8712_data_w(2, offset, data >> 8);
 }
 

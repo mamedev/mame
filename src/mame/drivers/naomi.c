@@ -574,7 +574,7 @@ static READ64_HANDLER( naomi_rom_board_r )
 	UINT8 *ROM = (UINT8 *)memory_region(REGION_USER1);
 
 	// ROM_DATA
-	if ((offset == 1) && ((mem_mask & 0xffff) == 0))
+	if ((offset == 1) && ACCESSING_WORD_0)
 	{
 		UINT64 ret;
 
@@ -584,7 +584,7 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 		return ret;
 	}
-	else if ((offset == 15) && ((mem_mask & U64(0xffff00000000)) == 0)) // boardid read
+	else if ((offset == 15) && ACCESSING_WORD_2) // boardid read
 	{
 		UINT64 ret;
 
@@ -602,31 +602,31 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 static WRITE64_HANDLER( naomi_rom_board_w )
 {
-	if ((offset == 1) && ((mem_mask & U64(0xffff00000000)) == 0))
+	if ((offset == 1) && ACCESSING_WORD_2)
 	{
 		// DMA_OFFSETH
 		dma_offset &= 0xffff;
 		dma_offset |= (data >> 16) & 0x1fff0000;
 	}
-	else if ((offset == 2) && ((mem_mask & U64(0xffff)) == 0))
+	else if ((offset == 2) && ACCESSING_WORD_0)
 	{
 		// DMA_OFFSETL
 		dma_offset &= 0xffff0000;
 		dma_offset |= (data & 0xffff);
 	}
-	else if ((offset == 0) && ((mem_mask & U64(0xffff)) == 0))
+	else if ((offset == 0) && ACCESSING_WORD_0)
 	{
 		// ROM_OFFSETH
 		rom_offset &= 0xffff;
 		rom_offset |= (data & 0x1fff)<<16;
 	}
-	else if ((offset == 0) && ((mem_mask & U64(0xffff00000000)) == 0))
+	else if ((offset == 0) && ACCESSING_WORD_2)
 	{
 		// ROM_OFFSETL
 		rom_offset &= 0xffff0000;
 		rom_offset |= (data & 0xffff);
 	}
-	else if ((offset == 15) && ((mem_mask & 0xffff) == 0))
+	else if ((offset == 15) && ACCESSING_WORD_0)
 	{
 		// NAOMI_BOARDID_WRITE
 		x76f100_cs_write(0, (data >> 2) & 1 );
@@ -634,7 +634,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 		x76f100_scl_write(0, (data >> 1) & 1 );
 		x76f100_sda_write(0, (data >> 0) & 1 );
 	}
-	else if ((offset == 2) && ((mem_mask & U64(0xffffffff00000000)) == 0))
+	else if ((offset == 2) && ACCESSING_DWORD_1)
 	{
 		// NAOMI_DMA_COUNT
 		dma_count = data >> 32;

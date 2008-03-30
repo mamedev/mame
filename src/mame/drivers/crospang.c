@@ -52,7 +52,7 @@ extern WRITE16_HANDLER ( bestri_tilebank_w );
 
 static WRITE16_HANDLER ( crospang_soundlatch_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 	}

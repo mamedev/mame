@@ -330,7 +330,7 @@ WRITE16_HANDLER( tmnt_paletteram_word_w )
 
 WRITE16_HANDLER( tmnt_0a0000_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static int last;
 
@@ -356,7 +356,7 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 
 WRITE16_HANDLER( punkshot_0a0020_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static int last;
 
@@ -377,7 +377,7 @@ WRITE16_HANDLER( punkshot_0a0020_w )
 
 WRITE16_HANDLER( lgtnfght_0a0018_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static int last;
 
@@ -399,7 +399,7 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 
 WRITE16_HANDLER( blswhstl_700300_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0,1 = coin counter */
 		coin_counter_w(0,data & 0x01);
@@ -433,7 +433,7 @@ READ16_HANDLER( glfgreat_rom_r )
 
 WRITE16_HANDLER( glfgreat_122000_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0,1 = coin counter */
 		coin_counter_w(0,data & 0x01);
@@ -454,7 +454,7 @@ WRITE16_HANDLER( glfgreat_122000_w )
 
 		/* other bits unknown */
 	}
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		/* bit 8 = 53596 char/rom selection for ROM test */
 		glfgreat_roz_rom_mode = data & 0x100;
@@ -464,7 +464,7 @@ WRITE16_HANDLER( glfgreat_122000_w )
 
 WRITE16_HANDLER( ssriders_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
@@ -485,7 +485,7 @@ WRITE16_HANDLER( ssriders_eeprom_w )
 
 WRITE16_HANDLER( ssriders_1c0300_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0,1 = coin counter */
 		coin_counter_w(0,data & 0x01);
@@ -501,7 +501,7 @@ WRITE16_HANDLER( ssriders_1c0300_w )
 
 WRITE16_HANDLER( prmrsocr_122000_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0,1 = coin counter */
 		coin_counter_w(0,data & 0x01);
@@ -531,7 +531,7 @@ READ16_HANDLER( prmrsocr_rom_r )
 
 WRITE16_HANDLER( tmnt_priority_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 2/3 = priority; other bits unused */
 		/* bit2 = PRI bit3 = PRI2

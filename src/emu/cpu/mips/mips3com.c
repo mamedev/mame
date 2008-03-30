@@ -894,9 +894,9 @@ static UINT64 program_read_qword_32be(offs_t offset)
 static UINT64 program_read_qword_masked_32be(offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
+	if (ACCESSING_DWORD_1)
 		result |= (UINT64)program_read_masked_32be(offset, mem_mask >> 32) << 32;
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
+	if (ACCESSING_DWORD_0)
 		result |= program_read_masked_32be(offset + 4, mem_mask);
 	return result;
 }
@@ -922,9 +922,9 @@ static UINT64 program_read_qword_32le(offs_t offset)
 static UINT64 program_read_qword_masked_32le(offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
+	if (ACCESSING_DWORD_0)
 		result |= program_read_masked_32le(offset, mem_mask);
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
+	if (ACCESSING_DWORD_1)
 		result |= (UINT64)program_read_masked_32le(offset + 4, mem_mask >> 32) << 32;
 	return result;
 }
@@ -949,9 +949,9 @@ static void program_write_qword_32be(offs_t offset, UINT64 data)
 
 static void program_write_qword_masked_32be(offs_t offset, UINT64 data, UINT64 mem_mask)
 {
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
+	if (ACCESSING_DWORD_1)
 		program_write_masked_32be(offset, data >> 32, mem_mask >> 32);
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
+	if (ACCESSING_DWORD_0)
 		program_write_masked_32be(offset + 4, data, mem_mask);
 }
 
@@ -975,8 +975,8 @@ static void program_write_qword_32le(offs_t offset, UINT64 data)
 
 static void program_write_qword_masked_32le(offs_t offset, UINT64 data, UINT64 mem_mask)
 {
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
+	if (ACCESSING_DWORD_0)
 		program_write_masked_32le(offset, data, mem_mask);
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
+	if (ACCESSING_DWORD_1)
 		program_write_masked_32le(offset + 4, data >> 32, mem_mask >> 32);
 }

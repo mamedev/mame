@@ -2615,8 +2615,8 @@ READ32_HANDLER( TC0100SCN_ctrl_long_r )
 
 WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
 {
-	if (ACCESSING_MSW32) TC0100SCN_ctrl_word_w(0,offset*2,data>>16,mem_mask>>16);
-	if (ACCESSING_LSW32) TC0100SCN_ctrl_word_w(0,(offset*2)+1,data&0xffff,mem_mask&0xffff);
+	if (ACCESSING_WORD_1) TC0100SCN_ctrl_word_w(0,offset*2,data>>16,mem_mask>>16);
+	if (ACCESSING_WORD_0) TC0100SCN_ctrl_word_w(0,(offset*2)+1,data&0xffff,mem_mask&0xffff);
 }
 
 READ32_HANDLER( TC0100SCN_long_r )
@@ -2626,23 +2626,23 @@ READ32_HANDLER( TC0100SCN_long_r )
 
 WRITE32_HANDLER( TC0100SCN_long_w )
 {
-	if (((mem_mask & 0xff000000) == 0) || ((mem_mask & 0x00ff0000) == 0))
+	if (ACCESSING_WORD_1)
 	{
 		int oldword = TC0100SCN_word_0_r(machine,offset*2,0);
 		int newword = data>>16;
-		if ((mem_mask & 0x00ff0000) != 0)
+		if (!ACCESSING_BYTE_2)
 			newword |= (oldword &0x00ff);
-		if ((mem_mask & 0xff000000) != 0)
+		if (!ACCESSING_BYTE_3)
 			newword |= (oldword &0xff00);
 		TC0100SCN_word_0_w(machine,offset*2,newword,0);
 	}
-	if (((mem_mask & 0x0000ff00) == 0) || ((mem_mask & 0x000000ff) == 0))
+	if (ACCESSING_WORD_0)
 	{
 		int oldword = TC0100SCN_word_0_r(machine,(offset*2)+1,0);
 		int newword = data&0xffff;
-		if ((mem_mask & 0x000000ff) != 0)
+		if (!ACCESSING_BYTE_0)
 			newword |= (oldword &0x00ff);
-		if ((mem_mask & 0x0000ff00) != 0)
+		if (!ACCESSING_BYTE_1)
 			newword |= (oldword &0xff00);
 		TC0100SCN_word_0_w(machine,(offset*2)+1,newword,0);
 	}
@@ -2917,7 +2917,7 @@ if (offset >= 0x0a)
 
 WRITE16_HANDLER( TC0360PRI_halfword_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		TC0360PRI_w(machine,offset,data & 0xff);
 #if 0
@@ -2931,7 +2931,7 @@ if (data & 0xff00)
 
 WRITE16_HANDLER( TC0360PRI_halfword_swap_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		TC0360PRI_w(machine,offset,(data >> 8) & 0xff);
 #if 0
@@ -3282,8 +3282,8 @@ READ32_HANDLER( TC0480SCP_ctrl_long_r )
 
 WRITE32_HANDLER( TC0480SCP_ctrl_long_w )
 {
-	if (ACCESSING_MSW32) TC0480SCP_ctrl_word_w(machine,offset*2,data>>16,mem_mask>>16);
-	if (ACCESSING_LSW32) TC0480SCP_ctrl_word_w(machine,(offset*2)+1,data&0xffff,mem_mask&0xffff);
+	if (ACCESSING_WORD_1) TC0480SCP_ctrl_word_w(machine,offset*2,data>>16,mem_mask>>16);
+	if (ACCESSING_WORD_0) TC0480SCP_ctrl_word_w(machine,(offset*2)+1,data&0xffff,mem_mask&0xffff);
 }
 
 READ32_HANDLER( TC0480SCP_long_r )
@@ -3293,23 +3293,23 @@ READ32_HANDLER( TC0480SCP_long_r )
 
 WRITE32_HANDLER( TC0480SCP_long_w )
 {
-	if (((mem_mask & 0xff000000) == 0) || ((mem_mask & 0x00ff0000) == 0))
+	if (ACCESSING_WORD_1)
 	{
 		int oldword = TC0480SCP_word_r(machine,offset*2,0);
 		int newword = data>>16;
-		if ((mem_mask & 0x00ff0000) != 0)
+		if (!ACCESSING_BYTE_2)
 			newword |= (oldword &0x00ff);
-		if ((mem_mask & 0xff000000) != 0)
+		if (!ACCESSING_BYTE_3)
 			newword |= (oldword &0xff00);
 		TC0480SCP_word_w(machine,offset*2,newword,0);
 	}
-	if (((mem_mask & 0x0000ff00) == 0) || ((mem_mask & 0x000000ff) == 0))
+	if (ACCESSING_WORD_0)
 	{
 		int oldword = TC0480SCP_word_r(machine,(offset*2)+1,0);
 		int newword = data&0xffff;
-		if ((mem_mask & 0x000000ff) != 0)
+		if (!ACCESSING_BYTE_0)
 			newword |= (oldword &0x00ff);
-		if ((mem_mask & 0x0000ff00) != 0)
+		if (!ACCESSING_BYTE_1)
 			newword |= (oldword &0xff00);
 		TC0480SCP_word_w(machine,(offset*2)+1,newword,0);
 	}
@@ -5022,7 +5022,7 @@ READ16_HANDLER( TC0220IOC_halfword_port_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_port_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		TC0220IOC_port_w( machine, offset, data & 0xff );
 }
 
@@ -5033,7 +5033,7 @@ READ16_HANDLER( TC0220IOC_halfword_portreg_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_portreg_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		TC0220IOC_portreg_w( machine, offset, data & 0xff );
 }
 
@@ -5044,7 +5044,7 @@ READ16_HANDLER( TC0220IOC_halfword_byteswap_port_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_port_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		TC0220IOC_port_w( machine, offset, (data>>8) & 0xff );
 }
 
@@ -5055,7 +5055,7 @@ READ16_HANDLER( TC0220IOC_halfword_byteswap_portreg_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_portreg_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		TC0220IOC_portreg_w( machine, offset, (data>>8) & 0xff );
 }
 
@@ -5066,7 +5066,7 @@ READ16_HANDLER( TC0220IOC_halfword_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		TC0220IOC_w(machine,offset,data & 0xff);
 	else
 	{
@@ -5085,7 +5085,7 @@ READ16_HANDLER( TC0220IOC_halfword_byteswap_r )
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		TC0220IOC_w(machine,offset,(data >> 8) & 0xff);
 	else
 	{
@@ -5159,7 +5159,7 @@ READ16_HANDLER( TC0510NIO_halfword_r )
 
 WRITE16_HANDLER( TC0510NIO_halfword_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		TC0510NIO_w(machine,offset,data & 0xff);
 	else
 	{
@@ -5242,7 +5242,7 @@ READ16_HANDLER( TC0640FIO_halfword_r )
 
 WRITE16_HANDLER( TC0640FIO_halfword_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		TC0640FIO_w(machine,offset,data & 0xff);
 	else
 	{
@@ -5258,7 +5258,7 @@ READ16_HANDLER( TC0640FIO_halfword_byteswap_r )
 
 WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		TC0640FIO_w(machine,offset,(data >> 8) & 0xff);
 	else
 	{

@@ -503,9 +503,9 @@ READ32_HANDLER( multi32_paletteram_0_r )
 
 WRITE32_HANDLER( multi32_paletteram_0_w )
 {
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		common_paletteram_w(0, offset*2+0, data, mem_mask);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		common_paletteram_w(0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
@@ -519,9 +519,9 @@ READ32_HANDLER( multi32_paletteram_1_r )
 
 WRITE32_HANDLER( multi32_paletteram_1_w )
 {
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		common_paletteram_w(1, offset*2+0, data, mem_mask);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		common_paletteram_w(1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
@@ -567,9 +567,9 @@ READ32_HANDLER( multi32_videoram_r )
 
 WRITE32_HANDLER( multi32_videoram_w )
 {
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		system32_videoram_w(machine, offset*2+0, data, mem_mask);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		system32_videoram_w(machine, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
@@ -641,7 +641,7 @@ READ16_HANDLER( system32_sprite_control_r )
 
 WRITE16_HANDLER( system32_sprite_control_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		sprite_control[offset & 7] = data;
 }
 
@@ -655,9 +655,9 @@ READ32_HANDLER( multi32_sprite_control_r )
 
 WRITE32_HANDLER( multi32_sprite_control_w )
 {
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		system32_sprite_control_w(machine, offset*2+0, data, mem_mask);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		system32_sprite_control_w(machine, offset*2+1, data >> 16, mem_mask >> 16);
 }
 

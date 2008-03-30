@@ -263,7 +263,7 @@ static READ16_HANDLER( namcona1_nvram_r )
 
 static WRITE16_HANDLER( namcona1_nvram_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 	{
 		namcona1_nvmem[offset] = data&0xff;
 	}
@@ -1158,12 +1158,12 @@ static READ16_HANDLER(snd_r)
 
 static WRITE16_HANDLER(snd_w)
 {
-	if (ACCESSING_LSB16)
+	if (ACCESSING_BYTE_0)
 	{
 		C140_w(machine,(offset*2)+1, data);
 	}
 
-	if (ACCESSING_MSB16)
+	if (ACCESSING_BYTE_1)
 	{
 		C140_w(machine,(offset*2), data>>8);
 	}

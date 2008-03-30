@@ -180,7 +180,7 @@ static READ64_HANDLER(cf_card_data_r)
 {
 	UINT64 r = 0;
 
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_WORD_1)
 	{
 		switch (offset & 0xf)
 		{
@@ -201,7 +201,7 @@ static READ64_HANDLER(cf_card_data_r)
 
 static WRITE64_HANDLER(cf_card_data_w)
 {
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_WORD_1)
 	{
 		switch (offset & 0xf)
 		{
@@ -223,7 +223,7 @@ static READ64_HANDLER(cf_card_r)
 {
 	UINT64 r = 0;
 
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_WORD_1)
 	{
 		if (cf_card_ide)
 		{
@@ -286,7 +286,7 @@ static WRITE64_HANDLER(cf_card_w)
 {
 	//printf("compact_flash_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), activecpu_get_pc());
 
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_WORD_1)
 	{
 		if (offset < 0x10)
 		{
@@ -357,7 +357,7 @@ static WRITE64_HANDLER(cf_card_w)
 
 static WRITE64_HANDLER(unk2_w)
 {
-	if (!(mem_mask & U64(0xff00000000000000)))
+	if (ACCESSING_BYTE_7)
 	{
 		cf_card_ide = 0;
 	}
@@ -370,7 +370,7 @@ static READ64_HANDLER(ata_r)
 {
 	UINT64 r = 0;
 
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_WORD_1)
 	{
 		int reg = (offset >> 4) & 0x7;
 
@@ -382,7 +382,7 @@ static READ64_HANDLER(ata_r)
 
 static WRITE64_HANDLER(ata_w)
 {
-	if (!(mem_mask & U64(0x00000000ffff0000)))
+	if (ACCESSING_WORD_1)
 	{
 		int reg = (offset >> 4) & 0x7;
 
@@ -396,7 +396,7 @@ static READ64_HANDLER(unk1_r)
 	UINT64 r = 0;
 	//return 0;//U64(0x0000400000000000);
 
-	if (!(mem_mask & U64(0x0000ff0000000000)))
+	if (ACCESSING_BYTE_5)
 	{
 		r |= (UINT64)(unk1_bit << 5) << 40;
 	}
@@ -406,7 +406,7 @@ static READ64_HANDLER(unk1_r)
 
 static WRITE64_HANDLER(unk1a_w)
 {
-	if (!(mem_mask & U64(0xff00000000000000)))
+	if (ACCESSING_BYTE_7)
 	{
 		unk1_bit = 1;
 	}
@@ -414,7 +414,7 @@ static WRITE64_HANDLER(unk1a_w)
 
 static WRITE64_HANDLER(unk1b_w)
 {
-	if (!(mem_mask & U64(0xff00000000000000)))
+	if (ACCESSING_BYTE_7)
 	{
 		unk1_bit = 0;
 	}
@@ -563,11 +563,11 @@ static READ64_HANDLER(m48t58_r)
 {
 	UINT64 r = 0;
 
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
+	if (ACCESSING_DWORD_1)
 	{
 		r |= (UINT64)timekeeper_0_32be_r(machine, (offset * 2) + 0, (UINT32)(mem_mask >> 32)) << 32;
 	}
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
+	if (ACCESSING_DWORD_0)
 	{
 		r |= timekeeper_0_32be_r(machine, (offset * 2) + 1, (UINT32)(mem_mask));
 	}
@@ -577,11 +577,11 @@ static READ64_HANDLER(m48t58_r)
 
 static WRITE64_HANDLER(m48t58_w)
 {
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		timekeeper_0_32be_w(machine, (offset * 2) + 0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 	{
 		timekeeper_0_32be_w(machine, (offset * 2) + 1, (UINT32)(data), (UINT32)(mem_mask));
 	}

@@ -162,10 +162,10 @@ WRITE16_HANDLER( midxunit_unknown_w )
 {
 	int offs = offset / 0x40000;
 
-	if (offs == 1 && ACCESSING_LSB)
+	if (offs == 1 && ACCESSING_BYTE_0)
 		dcs_reset_w(data & 2);
 
-	if (ACCESSING_LSB && offset % 0x40000 == 0)
+	if (ACCESSING_BYTE_0 && offset % 0x40000 == 0)
 		logerror("%08X:midxunit_unknown_w @ %d = %02X\n", activecpu_get_pc(), offs, data & 0xff);
 }
 
@@ -229,7 +229,7 @@ READ16_HANDLER( midxunit_analog_r )
 
 WRITE16_HANDLER( midxunit_analog_select_w )
 {
-	if (offset == 0 && ACCESSING_LSB)
+	if (offset == 0 && ACCESSING_BYTE_0)
 		midxunit_analog_port = data - 8 + 4;
 }
 
@@ -328,7 +328,7 @@ READ16_HANDLER( midxunit_uart_r )
 WRITE16_HANDLER( midxunit_uart_w )
 {
 	/* convert to a byte offset, ignoring MSB writes */
-	if ((offset & 1) || !ACCESSING_LSB)
+	if ((offset & 1) || !ACCESSING_BYTE_0)
 		return;
 	offset /= 2;
 	data &= 0xff;
@@ -645,21 +645,21 @@ READ16_HANDLER( midwunit_security_r )
 
 WRITE16_HANDLER( midwunit_security_w )
 {
-	if (offset == 0 && ACCESSING_LSB)
+	if (offset == 0 && ACCESSING_BYTE_0)
 		midway_serial_pic_w(data);
 }
 
 
 WRITE16_HANDLER( midxunit_security_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		security_bits = data & 0x0f;
 }
 
 
 WRITE16_HANDLER( midxunit_security_clock_w )
 {
-	if (offset == 0 && ACCESSING_LSB)
+	if (offset == 0 && ACCESSING_BYTE_0)
 		midway_serial_pic_w(((~data & 2) << 3) | security_bits);
 }
 
@@ -695,7 +695,7 @@ WRITE16_HANDLER( midwunit_sound_w )
 	}
 
 	/* call through based on the sound type */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		logerror("%08X:Sound write = %04X\n", activecpu_get_pc(), data);
 		dcs_data_w(data & 0xff);

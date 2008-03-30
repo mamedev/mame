@@ -81,7 +81,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 WRITE16_HANDLER( nemesis_gfx_flipx_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		flipscreen = data & 0x01;
 		if (flipscreen)
@@ -100,7 +100,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_w )
 
 WRITE16_HANDLER( nemesis_gfx_flipy_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (data & 0x01)
 			tilemap_flip |= TILEMAP_FLIPY;

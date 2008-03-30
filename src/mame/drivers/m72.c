@@ -195,37 +195,37 @@ static INTERRUPT_GEN(fake_nmi)
 static WRITE16_HANDLER( bchopper_sample_trigger_w )
 {
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
-	if (ACCESSING_LSB && (data & 0xff) < 6) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 6) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( nspirit_sample_trigger_w )
 {
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
-	if (ACCESSING_LSB && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( imgfight_sample_trigger_w )
 {
 	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (ACCESSING_LSB && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( loht_sample_trigger_w )
 {
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_LSB && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 7) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( xmultipl_sample_trigger_w )
 {
 	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
-	if (ACCESSING_LSB && (data & 0xff) < 3) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 3) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( dbreed72_sample_trigger_w )
 {
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
-	if (ACCESSING_LSB && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 9) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( airduel_sample_trigger_w )
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( airduel_sample_trigger_w )
 	static const int a[16] = {
 		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
 		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_LSB && (data & 0xff) < 16) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 16) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( dkgenm72_sample_trigger_w )
@@ -244,7 +244,7 @@ static WRITE16_HANDLER( dkgenm72_sample_trigger_w )
 		0x10fa0, 0x10fc0, 0x10fe0, 0x11f40, 0x12b20, 0x130a0, 0x13c60, 0x14740,
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
-	if (ACCESSING_LSB && (data & 0xff) < 28) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 28) m72_set_sample_start(a[data & 0xff]);
 }
 
 static WRITE16_HANDLER( gallop_sample_trigger_w )
@@ -255,7 +255,7 @@ static WRITE16_HANDLER( gallop_sample_trigger_w )
 		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
 		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
 
-	if (ACCESSING_LSB && (data & 0xff) < 31) m72_set_sample_start(a[data & 0xff]);
+	if (ACCESSING_BYTE_0 && (data & 0xff) < 31) m72_set_sample_start(a[data & 0xff]);
 }
 
 
@@ -460,7 +460,7 @@ static void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 
 static READ16_HANDLER( protection_r )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		copy_le(protection_ram,protection_code,CODE_LEN);
 	return protection_ram[0xffa/2+offset];
 }
@@ -471,7 +471,7 @@ static WRITE16_HANDLER( protection_w )
 	COMBINE_DATA(&protection_ram[offset]);
 	data ^= 0xffff;
 
-	if (offset == 0x0fff/2 && ACCESSING_MSB && (data >> 8) == 0)
+	if (offset == 0x0fff/2 && ACCESSING_BYTE_1 && (data >> 8) == 0)
 		copy_le(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
 }
 
@@ -600,9 +600,9 @@ static READ16_HANDLER( soundram_r )
 
 static WRITE16_HANDLER( soundram_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		soundram[offset * 2 + 0] = data;
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		soundram[offset * 2 + 1] = data >> 8;
 }
 

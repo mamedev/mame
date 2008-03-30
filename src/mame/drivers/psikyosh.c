@@ -388,7 +388,7 @@ static NVRAM_HANDLER(93C56)
 
 static WRITE32_HANDLER( psh_eeprom_w )
 {
-	if (ACCESSING_MSB32)
+	if (ACCESSING_BYTE_3)
 	{
 		EEPROM_write_bit((data & 0x20000000) ? 1 : 0);
 		EEPROM_set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
@@ -402,7 +402,7 @@ static WRITE32_HANDLER( psh_eeprom_w )
 
 static READ32_HANDLER( psh_eeprom_r )
 {
-	if (ACCESSING_MSB32)
+	if (ACCESSING_BYTE_3)
 	{
 		return ((EEPROM_read_bit() << 28) | (readinputport(4) << 24)); /* EEPROM | Region */
 	}
@@ -441,7 +441,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 #if ROMTEST
 	if(offset==4) /* Configure bank for gfx test */
 	{
-		if (!(mem_mask & 0x000000ff) || !(mem_mask & 0x0000ff00))	// Bank
+		if (ACCESSING_WORD_0)	// Bank
 		{
 			UINT8 *ROM = memory_region(REGION_GFX1);
 			memory_set_bankptr(2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
@@ -468,22 +468,22 @@ static READ32_HANDLER( psh_ymf_fm_r )
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
-	if (!(mem_mask & 0xff000000))	// FM bank 1 address (OPL2/OPL3 compatible)
+	if (ACCESSING_BYTE_3)	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
 		YMF278B_control_port_0_A_w(machine, 0, data>>24);
 	}
 
-	if (!(mem_mask & 0x00ff0000))	// FM bank 1 data
+	if (ACCESSING_BYTE_2)	// FM bank 1 data
 	{
 		YMF278B_data_port_0_A_w(machine, 0, data>>16);
 	}
 
-	if (!(mem_mask & 0x0000ff00))	// FM bank 2 address (OPL3/YMF 262 extended)
+	if (ACCESSING_BYTE_1)	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
 		YMF278B_control_port_0_B_w(machine, 0, data>>8);
 	}
 
-	if (!(mem_mask & 0x000000ff))	// FM bank 2 data
+	if (ACCESSING_BYTE_0)	// FM bank 2 data
 	{
 		YMF278B_data_port_0_B_w(machine, 0, data);
 	}
@@ -491,7 +491,7 @@ static WRITE32_HANDLER( psh_ymf_fm_w )
 
 static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
-	if (!(mem_mask & 0xff000000))	// PCM address (OPL4/YMF 278B extended)
+	if (ACCESSING_BYTE_3)	// PCM address (OPL4/YMF 278B extended)
 	{
 		YMF278B_control_port_0_C_w(machine, 0, data>>24);
 
@@ -503,7 +503,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 #endif
 	}
 
-	if (!(mem_mask & 0x00ff0000))	// PCM data
+	if (ACCESSING_BYTE_2)	// PCM data
 	{
 		YMF278B_data_port_0_C_w(machine, 0, data>>16);
 	}

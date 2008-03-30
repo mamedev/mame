@@ -542,14 +542,14 @@ READ16_HANDLER( scudhamm_analog_r )
 */
 static WRITE16_HANDLER( scudhamm_leds_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
  		set_led_status(0, data & 0x0100);	// 3 buttons
 		set_led_status(1, data & 0x0200);
 		set_led_status(2, data & 0x0400);
 	}
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 //      set_led_status(3, data & 0x0010);   // if we had more leds..
 //      set_led_status(4, data & 0x0020);
@@ -568,7 +568,7 @@ static WRITE16_HANDLER( scudhamm_enable_w )
 
 static WRITE16_HANDLER( scudhamm_oki_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * ((data >> 0) & 0x3) );
 		OKIM6295_set_bank_base(1, 0x40000 * ((data >> 4) & 0x3) );
@@ -656,7 +656,7 @@ static READ16_HANDLER( armchmp2_buttons_r )
 */
 static WRITE16_HANDLER( armchmp2_leds_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		set_led_status(0, data & 0x0100);
  		set_led_status(1, data & 0x1000);
@@ -664,7 +664,7 @@ static WRITE16_HANDLER( armchmp2_leds_w )
 		set_led_status(3, data & 0x4000);
 	}
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		coin_counter_w(0, data & 0x0040);
 		coin_counter_w(1, data & 0x0080);
@@ -832,7 +832,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( bigrun_soundbank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * ((data >> 0) & 1) );
 		OKIM6295_set_bank_base(1, 0x40000 * ((data >> 4) & 1) );
@@ -866,11 +866,11 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( cischeat_soundbank_0_w )
 {
-	if (ACCESSING_LSB)	OKIM6295_set_bank_base(0, 0x40000 * (data & 1) );
+	if (ACCESSING_BYTE_0)	OKIM6295_set_bank_base(0, 0x40000 * (data & 1) );
 }
 static WRITE16_HANDLER( cischeat_soundbank_1_w )
 {
-	if (ACCESSING_LSB)	OKIM6295_set_bank_base(1, 0x40000 * (data & 1) );
+	if (ACCESSING_BYTE_0)	OKIM6295_set_bank_base(1, 0x40000 * (data & 1) );
 }
 
 static ADDRESS_MAP_START( cischeat_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )

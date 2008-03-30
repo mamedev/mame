@@ -59,7 +59,7 @@ logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activec
 
 static WRITE16_HANDLER( zerozone_sound_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		soundlatch_w(machine,offset,data >> 8);
 		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);

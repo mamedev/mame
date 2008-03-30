@@ -41,7 +41,7 @@ extern UINT16 *madmotor_pf1_data,*madmotor_pf2_data,*madmotor_pf3_data;
 
 static WRITE16_HANDLER( madmotor_sound_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);

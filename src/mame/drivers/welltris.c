@@ -344,7 +344,7 @@ static int pending_command;
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		pending_command = 1;
 		soundlatch_w(machine, 0, data & 0xff);

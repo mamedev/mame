@@ -1357,7 +1357,7 @@ static WRITE32_HANDLER( spotram_w )
    */
 	if( offset==0 )
 	{
-		if( mem_mask&0xffff0000 )
+		if( !ACCESSING_WORD_1 )
 		{
 			if( mSpotRAM.portW>=SPOTRAM_SIZE )
 			{

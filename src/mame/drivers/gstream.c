@@ -126,7 +126,7 @@ static WRITE32_HANDLER( gstream_vram_w )
 {
 	COMBINE_DATA(&gstream_vram[offset]);
 
-	if (ACCESSING_MSB32)
+	if (ACCESSING_BYTE_3)
 	{
 		if (offset>=0x000/4 && offset<0x400/4)
 		{

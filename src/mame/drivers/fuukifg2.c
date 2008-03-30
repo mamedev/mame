@@ -78,7 +78,7 @@ static WRITE16_HANDLER( fuuki16_vregs_w )
 
 static WRITE16_HANDLER( fuuki16_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);

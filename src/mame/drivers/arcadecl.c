@@ -133,7 +133,7 @@ static READ16_HANDLER( adpcm_r )
 
 static WRITE16_HANDLER( adpcm_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		OKIM6295_data_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( latch_w )
     */
 
 	/* lower byte being modified? */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
 		atarigen_set_oki6295_vol(machine, (data & 0x001f) * 100 / 0x1f);

@@ -91,7 +91,7 @@ static READ8_HANDLER( input_2_r )
 
 static WRITE16_HANDLER( led_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bits 0 and 1 are coin counters */
 		coin_counter_w(0, data & 2);

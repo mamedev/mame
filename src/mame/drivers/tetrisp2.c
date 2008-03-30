@@ -97,7 +97,7 @@ VIDEO_UPDATE( rocknms );
 
 static WRITE16_HANDLER( tetrisp2_systemregs_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		tetrisp2_systemregs[offset] = data;
 	}
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( tetrisp2_systemregs_w )
 
 static WRITE16_HANDLER( rockn_systemregs_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		tetrisp2_systemregs[offset] = data;
 		if (offset == 0x0c)
@@ -121,7 +121,7 @@ static WRITE16_HANDLER( rockn_systemregs_w )
 
 static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		rocknms_sub_systemregs[offset] = data;
 		if (offset == 0x0c)
@@ -148,7 +148,7 @@ static READ16_HANDLER( tetrisp2_sound_r )
 
 static WRITE16_HANDLER( tetrisp2_sound_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (offset)	YMZ280B_data_0_w     (machine, offset, data & 0xff);
 		else		YMZ280B_register_0_w (machine, offset, data & 0xff);
@@ -300,7 +300,7 @@ static READ16_HANDLER( rocknms_main2sub_r )
 
 static WRITE16_HANDLER( rocknms_main2sub_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		rocknms_main2sub = (data ^ 0xffff);
 }
 
@@ -311,7 +311,7 @@ static READ16_HANDLER( rocknms_port_0_r )
 
 static WRITE16_HANDLER( rocknms_sub2main_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		rocknms_sub2main = (data ^ 0xffff);
 }
 

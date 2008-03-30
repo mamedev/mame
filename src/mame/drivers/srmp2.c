@@ -289,7 +289,7 @@ static READ16_HANDLER( srmp2_input_1_r )
     --x- ---- : Player 1 and 2 side flag
 */
 
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 	{
 		return 0xffff;
 	}
@@ -322,7 +322,7 @@ static READ16_HANDLER( srmp2_input_1_r )
 
 static READ16_HANDLER( srmp2_input_2_r )
 {
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 	{
 		return 0x0001;
 	}

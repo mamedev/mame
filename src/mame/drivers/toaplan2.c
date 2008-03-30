@@ -653,11 +653,11 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 
 static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		toaplan2_coin_w(machine, offset, data & 0xff);
 	}
-	if (ACCESSING_MSB && (data & 0xff00) )
+	if (ACCESSING_BYTE_1 && (data & 0xff00) )
 	{
 		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
 	}
@@ -665,12 +665,12 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 
 static WRITE16_HANDLER( shippumd_coin_word_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		toaplan2_coin_w(machine, offset, data & 0xff);
 		OKIM6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
 	}
-	if (ACCESSING_MSB && (data & 0xff00) )
+	if (ACCESSING_BYTE_1 && (data & 0xff00) )
 	{
 		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
 	}
@@ -683,7 +683,7 @@ static READ16_HANDLER( toaplan2_shared_r )
 
 static WRITE16_HANDLER( toaplan2_shared_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		toaplan2_shared_ram[offset] = data & 0xff;
 	}
@@ -694,7 +694,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 	/* Command sent to secondary CPU. Support for HD647180 will be
        required when a ROM dump becomes available for this hardware */
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (toaplan2_sub_cpu == CPU_2_Z80)			/* Whoopee */
 		{
@@ -731,7 +731,7 @@ static READ16_HANDLER( pipibibi_z80_status_r )
 
 static WRITE16_HANDLER( pipibibi_z80_task_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		toaplan2_shared_ram[0] = data & 0xff;
 	}
@@ -766,7 +766,7 @@ static READ16_HANDLER( ghox_mcu_r )
 
 static WRITE16_HANDLER( ghox_mcu_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		mcu_data = data;
 		if ((data >= 0xd0) && (data < 0xe0))
@@ -825,7 +825,7 @@ static READ16_HANDLER( ghox_shared_ram_r )
 
 static WRITE16_HANDLER( ghox_shared_ram_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		toaplan2_shared_ram16[offset] = data & 0xff;
 	}
@@ -842,7 +842,7 @@ static READ16_HANDLER( shared_ram_r )
 
 static WRITE16_HANDLER( shared_ram_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		data &= 0xff;
 		switch (offset * 2)
@@ -883,7 +883,7 @@ static READ16_HANDLER( toaplan2_snd_cpu_r )
 
 static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		mcu_data = data;
 		dogyuun_okisnd_w(machine, data);
@@ -903,7 +903,7 @@ static READ16_HANDLER( kbash_snd_cpu_r )
 
 static WRITE16_HANDLER( kbash_snd_cpu_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		kbash_okisnd_w(machine, data);
 	}
@@ -937,7 +937,7 @@ static READ16_HANDLER( fixeight_sec_cpu_r )
 
 static WRITE16_HANDLER( fixeight_sec_cpu_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (mcu_data & 0xff00)
 		{
@@ -974,7 +974,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 
 static WRITE16_HANDLER( vfive_snd_cpu_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		mcu_data = data;
 	}
@@ -983,7 +983,7 @@ static WRITE16_HANDLER( vfive_snd_cpu_w )
 
 static WRITE16_HANDLER( batsugun_snd_cpu_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		mcu_data = data;
 		batsugun_okisnd_w(machine, data);
@@ -998,7 +998,7 @@ static READ16_HANDLER( V25_sharedram_r )
 
 static WRITE16_HANDLER( V25_sharedram_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		V25_shared_ram[offset] = data & 0xff;
 	}
@@ -1006,7 +1006,7 @@ static WRITE16_HANDLER( V25_sharedram_w )
 
 static WRITE16_HANDLER( oki_bankswitch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
 	}
@@ -1014,7 +1014,7 @@ static WRITE16_HANDLER( oki_bankswitch_w )
 
 static WRITE16_HANDLER( fixeighb_oki_bankswitch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		data &= 7;
 		if (data <= 4)
@@ -1039,7 +1039,7 @@ static READ16_HANDLER( raizing_shared_ram_r )
 
 static WRITE16_HANDLER( raizing_shared_ram_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		raizing_shared_ram[offset] = data & 0xff;
 	}
@@ -1048,7 +1048,7 @@ static WRITE16_HANDLER( raizing_shared_ram_w )
 
 static WRITE16_HANDLER( bgaregga_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine, offset, data & 0xff);
 		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
@@ -1155,7 +1155,7 @@ static READ16_HANDLER( batrider_z80_busack_r )
 
 static WRITE16_HANDLER( batrider_z80_busreq_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		raizing_Z80_busreq = (data & 0xff);
 	}
@@ -1176,7 +1176,7 @@ static READ16_HANDLER( raizing_z80rom_r )
 // these two latches are always written together, via a single move.l instruction
 static WRITE16_HANDLER( batrider_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine, offset, data & 0xff);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
@@ -1186,7 +1186,7 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 
 static WRITE16_HANDLER( batrider_soundlatch2_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch2_w(machine, offset, data & 0xff);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
@@ -1320,7 +1320,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 	if (data & ~0x001f)
 		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_LSB )
+	if ( ACCESSING_BYTE_0 )
 	{
 		// chip select
 		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );

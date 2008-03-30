@@ -248,7 +248,7 @@ static READ16_HANDLER( kaneko16_rnd_r )
 
 static WRITE16_HANDLER( kaneko16_coin_lockout_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_counter_w(0,   data  & 0x0100);
 		coin_counter_w(1,   data  & 0x0200);
@@ -270,7 +270,7 @@ static WRITE16_HANDLER( kaneko16_coin_lockout_w )
 
 static WRITE16_HANDLER( kaneko16_soundlatch_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		soundlatch_w(machine, 0, (data & 0xff00) >> 8 );
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
@@ -297,7 +297,7 @@ static WRITE16_HANDLER( kaneko16_YM2149_0_w )
 	/* Each 2149 register is mapped to a different address */
 	AY8910_control_port_0_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_LSB)	AY8910_write_port_0_w(machine,0, data       & 0xff);
+	if (ACCESSING_BYTE_0)	AY8910_write_port_0_w(machine,0, data       & 0xff);
 	else				AY8910_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 static WRITE16_HANDLER( kaneko16_YM2149_1_w )
@@ -305,7 +305,7 @@ static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 	/* Each 2149 register is mapped to a different address */
 	AY8910_control_port_1_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_LSB)	AY8910_write_port_1_w(machine,0, data       & 0xff);
+	if (ACCESSING_BYTE_0)	AY8910_write_port_1_w(machine,0, data       & 0xff);
 	else				AY8910_write_port_1_w(machine,0,(data >> 8) & 0xff);
 }
 
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( kaneko16_eeprom_reset_w )
 
 static WRITE16_HANDLER( kaneko16_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x02);
@@ -343,7 +343,7 @@ static WRITE16_HANDLER( kaneko16_eeprom_w )
 		EEPROM_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 	}
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_counter_w(0, data & 0x0100);
 		coin_counter_w(1, data & 0x0200);
@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( bakubrkr_oki_bank_sw )
 {
-	if (ACCESSING_LSB) {
+	if (ACCESSING_BYTE_0) {
 		OKIM6295_set_bank_base(0, 0x40000 * (data & 0x7) );
 		logerror("PC:%06X  Selecting OKI bank %02X\n",activecpu_get_pc(),data&0xff);
 	}
@@ -472,7 +472,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( bloodwar_oki_0_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * (data & 0xf) );
 //      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",activecpu_get_pc(),data);
@@ -481,7 +481,7 @@ static WRITE16_HANDLER( bloodwar_oki_0_bank_w )
 
 static WRITE16_HANDLER( bloodwar_oki_1_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(1, 0x40000 * data );
 //      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",activecpu_get_pc(),data);
@@ -490,7 +490,7 @@ static WRITE16_HANDLER( bloodwar_oki_1_bank_w )
 
 static WRITE16_HANDLER( bloodwar_coin_lockout_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_counter_w(0, data & 0x0100);
 		coin_counter_w(1, data & 0x0200);
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( bonkadv_oki_0_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * (data & 0xF));
 		logerror("CPU #0 PC %06X : OKI0  bank %08X\n",activecpu_get_pc(),data);
@@ -551,7 +551,7 @@ static WRITE16_HANDLER( bonkadv_oki_0_bank_w )
 
 static WRITE16_HANDLER( bonkadv_oki_1_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(1, 0x40000 * data );
 		logerror("CPU #0 PC %06X : OKI1  bank %08X\n",activecpu_get_pc(),data);
@@ -611,7 +611,7 @@ static READ16_HANDLER( gtmr_wheel_r )
 
 static WRITE16_HANDLER( gtmr_oki_0_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * (data & 0xF) );
 //      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",activecpu_get_pc(),data);
@@ -620,7 +620,7 @@ static WRITE16_HANDLER( gtmr_oki_0_bank_w )
 
 static WRITE16_HANDLER( gtmr_oki_1_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(1, 0x40000 * (data & 0x1) );
 //      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",activecpu_get_pc(),data);
@@ -629,7 +629,7 @@ static WRITE16_HANDLER( gtmr_oki_1_bank_w )
 
 static WRITE16_HANDLER( gtmr_oki_0_data_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_data_0_w(machine,0,data);
 //      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",activecpu_get_pc(),data);
@@ -638,7 +638,7 @@ static WRITE16_HANDLER( gtmr_oki_0_data_w )
 
 static WRITE16_HANDLER( gtmr_oki_1_data_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_data_1_w(machine,0,data);
 //      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",activecpu_get_pc(),data);
@@ -796,7 +796,7 @@ ADDRESS_MAP_END
 /* Untested */
 static WRITE16_HANDLER( shogwarr_oki_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(0, 0x10000 * ((data >> 0) & 0x3) );
 		OKIM6295_set_bank_base(1, 0x10000 * ((data >> 4) & 0x3) );

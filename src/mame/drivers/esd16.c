@@ -68,7 +68,7 @@ static WRITE16_HANDLER( esd16_spriteram_w ) {	COMBINE_DATA(&spriteram16[offset])
 
 static WRITE16_HANDLER( esd16_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1,0,ASSERT_LINE);		// Generate an IRQ
@@ -129,7 +129,7 @@ static WRITE16_HANDLER(hedpanic_platform_w)
 
 static READ16_HANDLER( esd_eeprom_r )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		return ((EEPROM_read_bit() & 0x01) << 15);
 	}
@@ -140,7 +140,7 @@ static READ16_HANDLER( esd_eeprom_r )
 
 static WRITE16_HANDLER( esd_eeprom_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		// data line
 		EEPROM_write_bit((data & 0x0400) >> 6);

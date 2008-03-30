@@ -413,18 +413,22 @@ union _addrmap64_token
 #define COMBINE_DATA(varptr)			(*(varptr) = (*(varptr) & mem_mask) | (data & ~mem_mask))
 
 
-/* 16-bit memory access tests */
-#define ACCESSING_LSB16					((mem_mask & 0x00ff) == 0)
-#define ACCESSING_MSB16					((mem_mask & 0xff00) == 0)
-#define ACCESSING_LSB					ACCESSING_LSB16
-#define ACCESSING_MSB					ACCESSING_MSB16
+#define ACCESSING_BYTE_0				((~mem_mask & 0x000000ff)!=0)
+#define ACCESSING_BYTE_1				((~mem_mask & 0x0000ff00)!=0)
+#define ACCESSING_BYTE_2				((~mem_mask & 0x00ff0000)!=0)
+#define ACCESSING_BYTE_3				((~mem_mask & 0xff000000)!=0)
+#define ACCESSING_BYTE_4				((~mem_mask & U64(0x000000ff00000000))!=0)
+#define ACCESSING_BYTE_5				((~mem_mask & U64(0x0000ff0000000000))!=0)
+#define ACCESSING_BYTE_6				((~mem_mask & U64(0x00ff000000000000))!=0)
+#define ACCESSING_BYTE_7				((~mem_mask & U64(0xff00000000000000))!=0)
 
+#define ACCESSING_WORD_0				((~mem_mask & 0x0000ffff)!=0)
+#define ACCESSING_WORD_1				((~mem_mask & 0xffff0000)!=0)
+#define ACCESSING_WORD_2				((~mem_mask & U64(0x0000ffff00000000))!=0)
+#define ACCESSING_WORD_3				((~mem_mask & U64(0xffff000000000000))!=0)
 
-/* 32-bit memory access tests */
-#define ACCESSING_LSW32					((mem_mask & 0x0000ffff) == 0)
-#define ACCESSING_MSW32					((mem_mask & 0xffff0000) == 0)
-#define ACCESSING_LSB32					((mem_mask & 0x000000ff) == 0)
-#define ACCESSING_MSB32					((mem_mask & 0xff000000) == 0)
+#define ACCESSING_DWORD_0				((~mem_mask & 0xffffffff)!=0)
+#define ACCESSING_DWORD_1				((~mem_mask & U64(0xffffffff00000000))!=0)
 
 
 /* bank switching for CPU cores */

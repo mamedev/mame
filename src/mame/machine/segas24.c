@@ -81,7 +81,7 @@ READ32_HANDLER(system24temp_sys16_io_dword_r)
 
 WRITE16_HANDLER( system24temp_sys16_io_w )
 {
-	if(ACCESSING_LSB) {
+	if(ACCESSING_BYTE_0) {
 		if(offset < 8) {
 			if(!(system24temp_sys16_io_dir & (1 << offset))) {
 				logerror("IO port write on input-only port (%d, [%02x], %02x, %d:%x)\n", offset, system24temp_sys16_io_dir, data & 0xff, cpu_getactivecpu(), activecpu_get_pc());

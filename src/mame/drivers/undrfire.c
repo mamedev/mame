@@ -241,12 +241,12 @@ static WRITE32_HANDLER( undrfire_input_w )
 	{
 		case 0x00:
 		{
-			if (ACCESSING_MSB32)	/* $500000 is watchdog */
+			if (ACCESSING_BYTE_3)	/* $500000 is watchdog */
 			{
 				watchdog_reset(machine);
 			}
 
-			if (ACCESSING_LSB32)
+			if (ACCESSING_BYTE_0)
 			{
 				EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				EEPROM_write_bit(data & 0x40);
@@ -259,7 +259,7 @@ static WRITE32_HANDLER( undrfire_input_w )
 
 		case 0x01:
 		{
-			if (ACCESSING_MSB32)
+			if (ACCESSING_BYTE_3)
 			{
 				coin_lockout_w(0,~data & 0x01000000);
 				coin_lockout_w(1,~data & 0x02000000);
@@ -338,13 +338,13 @@ logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",active
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
 {
-		if (ACCESSING_LSW32)
+		if (ACCESSING_WORD_0)
 		{
 			undrfire_rotate_ctrl[port_sel] = data;
 			return;
 		}
 
-		if (ACCESSING_MSW32)
+		if (ACCESSING_WORD_1)
 		{
 			port_sel = (data &0x70000) >> 16;
 		}

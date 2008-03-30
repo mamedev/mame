@@ -727,7 +727,7 @@ static CUSTOM_INPUT( cps2_eeprom_port_r )
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
 {
-    if (ACCESSING_MSB)
+    if (ACCESSING_BYTE_1)
     {
 	/* bit 0 - Unused */
 	/* bit 1 - Unused */
@@ -744,7 +744,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	EEPROM_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 	/* bit 0 - coin counter 1 */
 	/* bit 0 - coin counter 2 */

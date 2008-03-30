@@ -38,7 +38,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt );
 
 static WRITE16_HANDLER( bankswitch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		UINT8 *RAM = memory_region(REGION_CPU1);
 		memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
@@ -84,7 +84,7 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 
 static WRITE16_HANDLER( m107_coincounter_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		coin_counter_w(0,data & 0x01);
 		coin_counter_w(1,data & 0x02);

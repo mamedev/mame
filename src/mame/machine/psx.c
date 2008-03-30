@@ -854,12 +854,12 @@ WRITE32_HANDLER( psx_sio_w )
 		verboselog( 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		break;
 	case 2:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_WORD_0 )
 		{
 			m_p_n_sio_mode[ n_port ] = data & 0xffff;
 			verboselog( 1, "psx_sio_w %d mode %04x\n", n_port, data & 0xffff );
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_WORD_1 )
 		{
 			verboselog( 1, "psx_sio_w %d control %04x\n", n_port, data >> 16 );
 			m_p_n_sio_control[ n_port ] = data >> 16;
@@ -897,11 +897,11 @@ WRITE32_HANDLER( psx_sio_w )
 		}
 		break;
 	case 3:
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_WORD_0 )
 		{
 			verboselog( 0, "psx_sio_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_WORD_1 )
 		{
 			m_p_n_sio_baud[ n_port ] = data >> 16;
 			verboselog( 1, "psx_sio_w %d baud %04x\n", n_port, data >> 16 );
@@ -930,33 +930,33 @@ READ32_HANDLER( psx_sio_r )
 		break;
 	case 1:
 		data = m_p_n_sio_status[ n_port ];
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_WORD_0 )
 		{
 			verboselog( 1, "psx_sio_r %d status %04x\n", n_port, data & 0xffff );
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_WORD_1 )
 		{
 			verboselog( 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		}
 		break;
 	case 2:
 		data = ( m_p_n_sio_control[ n_port ] << 16 ) | m_p_n_sio_mode[ n_port ];
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_WORD_0 )
 		{
 			verboselog( 1, "psx_sio_r %d mode %04x\n", n_port, data & 0xffff );
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_WORD_1 )
 		{
 			verboselog( 1, "psx_sio_r %d control %04x\n", n_port, data >> 16 );
 		}
 		break;
 	case 3:
 		data = m_p_n_sio_baud[ n_port ] << 16;
-		if( ACCESSING_LSW32 )
+		if( ACCESSING_WORD_0 )
 		{
 			verboselog( 0, "psx_sio_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 		}
-		if( ACCESSING_MSW32 )
+		if( ACCESSING_WORD_1 )
 		{
 			verboselog( 1, "psx_sio_r %d baud %04x\n", n_port, data >> 16 );
 		}

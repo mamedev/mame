@@ -163,7 +163,7 @@ WRITE16_HANDLER( bionicc_scroll_w )
 
 WRITE16_HANDLER( bionicc_gfxctrl_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		flip_screen_set(data & 0x0100);
 

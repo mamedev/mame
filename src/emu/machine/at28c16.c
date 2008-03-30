@@ -150,7 +150,7 @@ static void at28c16_write( UINT32 chip, offs_t offset, UINT8 data )
 static UINT16 at28c16_16msb_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 {
 	UINT32 data = 0;
-	if( ACCESSING_MSB16 )
+	if( ACCESSING_BYTE_1 )
 	{
 		data |= at28c16_read( chip, offset ) << 8;
 	}
@@ -159,7 +159,7 @@ static UINT16 at28c16_16msb_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 
 static void at28c16_16msb_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
 {
-	if( ACCESSING_MSB16 )
+	if( ACCESSING_BYTE_1 )
 	{
 		at28c16_write( chip, offset, data >> 8 );
 	}
@@ -179,19 +179,19 @@ WRITE16_HANDLER( at28c16_16msb_3_w ) { at28c16_16msb_write( 3, offset, data, mem
 static UINT32 at28c16_32le_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 {
 	UINT32 data = 0;
-	if( ACCESSING_LSB32 )
+	if( ACCESSING_BYTE_0 )
 	{
 		data |= at28c16_read( chip, ( offset * 4 ) + 0 ) << 0;
 	}
-	if( ( mem_mask & 0x0000ff00 ) == 0 )
+	if( ACCESSING_BYTE_1 )
 	{
 		data |= at28c16_read( chip, ( offset * 4 ) + 1 ) << 8;
 	}
-	if( ( mem_mask & 0x00ff0000 ) == 0 )
+	if( ACCESSING_BYTE_2 )
 	{
 		data |= at28c16_read( chip, ( offset * 4 ) + 2 ) << 16;
 	}
-	if( ACCESSING_MSB32 )
+	if( ACCESSING_BYTE_3 )
 	{
 		data |= at28c16_read( chip, ( offset * 4 ) + 3 ) << 24;
 	}
@@ -200,19 +200,19 @@ static UINT32 at28c16_32le_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 
 static void at28c16_32le_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
 {
-	if( ACCESSING_LSB32 )
+	if( ACCESSING_BYTE_0 )
 	{
 		at28c16_write( chip, ( offset * 4 ) + 0, data >> 0 );
 	}
-	if( ( mem_mask & 0x0000ff00 ) == 0 )
+	if( ACCESSING_BYTE_1 )
 	{
 		at28c16_write( chip, ( offset * 4 ) + 1, data >> 8 );
 	}
-	if( ( mem_mask & 0x00ff0000 ) == 0 )
+	if( ACCESSING_BYTE_2 )
 	{
 		at28c16_write( chip, ( offset * 4 ) + 2, data >> 16 );
 	}
-	if( ACCESSING_MSB32 )
+	if( ACCESSING_BYTE_3 )
 	{
 		at28c16_write( chip, ( offset * 4 ) + 3, data >> 24 );
 	}
@@ -230,11 +230,11 @@ WRITE32_HANDLER( at28c16_32le_3_w ) { at28c16_32le_write( 3, offset, data, mem_m
 static UINT32 at28c16_32le_16lsb_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 {
 	UINT32 data = 0;
-	if( ACCESSING_LSB32 )
+	if( ACCESSING_BYTE_0 )
 	{
 		data |= at28c16_read( chip, ( offset * 2 ) + 0 ) << 0;
 	}
-	if( ( mem_mask & 0x00ff0000 ) == 0 )
+	if( ACCESSING_BYTE_2 )
 	{
 		data |= at28c16_read( chip, ( offset * 2 ) + 1 ) << 16;
 	}
@@ -243,11 +243,11 @@ static UINT32 at28c16_32le_16lsb_read( UINT32 chip, offs_t offset, UINT32 mem_ma
 
 static void at28c16_32le_16lsb_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
 {
-	if( ACCESSING_LSB32 )
+	if( ACCESSING_BYTE_0 )
 	{
 		at28c16_write( chip, ( offset * 2 ) + 0, data >> 0 );
 	}
-	if( ( mem_mask & 0x00ff0000 ) == 0 )
+	if( ACCESSING_BYTE_2 )
 	{
 		at28c16_write( chip, ( offset * 2 ) + 1, data >> 16 );
 	}

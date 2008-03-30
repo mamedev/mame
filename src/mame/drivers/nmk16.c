@@ -186,11 +186,11 @@ static WRITE16_HANDLER( nmk16_mainram_strange_w )
 
  	dstram = nmk16_mainram;
 
-	if (!ACCESSING_MSB)
+	if (!ACCESSING_BYTE_1)
 	{
 		dstram[offset] = (data & 0x00ff) |  ((data & 0x00ff)<<8);
  	}
-	else if (!ACCESSING_LSB)
+	else if (!ACCESSING_BYTE_0)
 	{
 		dstram[offset] = (data & 0xff00) |  ((data & 0xff00)>>8);
 	}
@@ -280,7 +280,7 @@ static MACHINE_RESET( mustang_sound )
 
 static WRITE16_HANDLER ( ssmissin_sound_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1,0, HOLD_LINE);
@@ -313,7 +313,7 @@ static READ16_HANDLER( tharrier_mcu_r )
 {
 	/* The MCU is mapped as the top byte for byte accesses only,
         all word accesses are to the input port */
-	if (ACCESSING_MSB && !ACCESSING_LSB)
+	if (ACCESSING_BYTE_1 && !ACCESSING_BYTE_0)
 	{
 		static const UINT8 to_main[] =
 		{
@@ -340,7 +340,7 @@ static READ16_HANDLER( tharrier_mcu_r )
 
 static WRITE16_HANDLER( macross2_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		soundlatch_w(machine,0,data & 0xff);
 }
 
@@ -376,7 +376,7 @@ static WRITE8_HANDLER( tharrier_oki6295_bankswitch_1_w )
 
 static WRITE16_HANDLER( afega_soundlatch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data&0xff);
 		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
@@ -4871,7 +4871,7 @@ static WRITE16_HANDLER( twinactn_scroll1_w )
 
 static WRITE16_HANDLER( twinactn_flipscreen_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		flip_screen_set(data & 1);
 
 	if (data & (~1))

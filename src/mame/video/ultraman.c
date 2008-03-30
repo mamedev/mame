@@ -83,7 +83,7 @@ VIDEO_START( ultraman )
 
 WRITE16_HANDLER( ultraman_gfxctrl_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/*  bit 0: enable wraparound for scr #1
             bit 1: msb of code for scr #1

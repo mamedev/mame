@@ -60,7 +60,7 @@ VIDEO_UPDATE( tecmo16 );
 
 static WRITE16_HANDLER( tecmo16_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0x00,data & 0xff);
 		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);

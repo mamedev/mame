@@ -114,7 +114,7 @@ VIDEO_UPDATE( yunsun16 );
 
 static WRITE16_HANDLER( yunsun16_sound_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		int bank = data & 3;
 		UINT8 *dst	= memory_region(REGION_SOUND1);
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( magicbub_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 /*
 HACK: the game continuously sends this. It'll play the oki sample

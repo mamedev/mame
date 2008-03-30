@@ -706,19 +706,19 @@ void atarigen_sound_reset(void)
 
 WRITE16_HANDLER( atarigen_sound_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
 
 WRITE16_HANDLER( atarigen_sound_upper_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		timer_call_after_resynch(NULL, (data >> 8) & 0xff, delayed_sound_w);
 }
 
 WRITE32_HANDLER( atarigen_sound_upper32_w )
 {
-	if (ACCESSING_MSB32)
+	if (ACCESSING_BYTE_3)
 		timer_call_after_resynch(NULL, (data >> 24) & 0xff, delayed_sound_w);
 }
 
@@ -1294,9 +1294,9 @@ WRITE16_HANDLER( atarigen_alpha_w )
 WRITE32_HANDLER( atarigen_alpha32_w )
 {
 	COMBINE_DATA(&atarigen_alpha32[offset]);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		tilemap_mark_tile_dirty(atarigen_alpha_tilemap, offset * 2);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		tilemap_mark_tile_dirty(atarigen_alpha_tilemap, offset * 2 + 1);
 }
 
@@ -1338,9 +1338,9 @@ WRITE16_HANDLER( atarigen_playfield_w )
 WRITE32_HANDLER( atarigen_playfield32_w )
 {
 	COMBINE_DATA(&atarigen_playfield32[offset]);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		tilemap_mark_tile_dirty(atarigen_playfield_tilemap, offset * 2);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		tilemap_mark_tile_dirty(atarigen_playfield_tilemap, offset * 2 + 1);
 }
 
@@ -1512,7 +1512,7 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		int palentry = offset / 2;
 		int newword = (paletteram16[palentry * 2] & 0xff00) | (paletteram16[palentry * 2 + 1] >> 8);
@@ -1538,7 +1538,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 	COMBINE_DATA(&paletteram32[offset]);
 
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 	{
 		newword = paletteram32[offset] >> 16;
 
@@ -1549,7 +1549,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 		palette_set_color_rgb(machine, offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 	{
 		newword = paletteram32[offset] & 0xffff;
 

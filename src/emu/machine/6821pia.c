@@ -1209,14 +1209,14 @@ READ16_HANDLER( pia_5_lsb_r ) { return pia_read(5, offset); }
 READ16_HANDLER( pia_6_lsb_r ) { return pia_read(6, offset); }
 READ16_HANDLER( pia_7_lsb_r ) { return pia_read(7, offset); }
 
-WRITE16_HANDLER( pia_0_lsb_w ) { if (ACCESSING_LSB) pia_write(0, offset, data); }
-WRITE16_HANDLER( pia_1_lsb_w ) { if (ACCESSING_LSB) pia_write(1, offset, data); }
-WRITE16_HANDLER( pia_2_lsb_w ) { if (ACCESSING_LSB) pia_write(2, offset, data); }
-WRITE16_HANDLER( pia_3_lsb_w ) { if (ACCESSING_LSB) pia_write(3, offset, data); }
-WRITE16_HANDLER( pia_4_lsb_w ) { if (ACCESSING_LSB) pia_write(4, offset, data); }
-WRITE16_HANDLER( pia_5_lsb_w ) { if (ACCESSING_LSB) pia_write(5, offset, data); }
-WRITE16_HANDLER( pia_6_lsb_w ) { if (ACCESSING_LSB) pia_write(6, offset, data); }
-WRITE16_HANDLER( pia_7_lsb_w ) { if (ACCESSING_LSB) pia_write(7, offset, data); }
+WRITE16_HANDLER( pia_0_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(0, offset, data); }
+WRITE16_HANDLER( pia_1_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(1, offset, data); }
+WRITE16_HANDLER( pia_2_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(2, offset, data); }
+WRITE16_HANDLER( pia_3_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(3, offset, data); }
+WRITE16_HANDLER( pia_4_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(4, offset, data); }
+WRITE16_HANDLER( pia_5_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(5, offset, data); }
+WRITE16_HANDLER( pia_6_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(6, offset, data); }
+WRITE16_HANDLER( pia_7_lsb_w ) { if (ACCESSING_BYTE_0) pia_write(7, offset, data); }
 
 READ16_HANDLER( pia_0_lsb_alt_r ) { return pia_alt_read(0, offset); }
 READ16_HANDLER( pia_1_lsb_alt_r ) { return pia_alt_read(1, offset); }
@@ -1227,14 +1227,14 @@ READ16_HANDLER( pia_5_lsb_alt_r ) { return pia_alt_read(5, offset); }
 READ16_HANDLER( pia_6_lsb_alt_r ) { return pia_alt_read(6, offset); }
 READ16_HANDLER( pia_7_lsb_alt_r ) { return pia_alt_read(7, offset); }
 
-WRITE16_HANDLER( pia_0_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(0, offset, data); }
-WRITE16_HANDLER( pia_1_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(1, offset, data); }
-WRITE16_HANDLER( pia_2_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(2, offset, data); }
-WRITE16_HANDLER( pia_3_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(3, offset, data); }
-WRITE16_HANDLER( pia_4_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(4, offset, data); }
-WRITE16_HANDLER( pia_5_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(5, offset, data); }
-WRITE16_HANDLER( pia_6_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(6, offset, data); }
-WRITE16_HANDLER( pia_7_lsb_alt_w ) { if (ACCESSING_LSB) pia_alt_write(7, offset, data); }
+WRITE16_HANDLER( pia_0_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(0, offset, data); }
+WRITE16_HANDLER( pia_1_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(1, offset, data); }
+WRITE16_HANDLER( pia_2_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(2, offset, data); }
+WRITE16_HANDLER( pia_3_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(3, offset, data); }
+WRITE16_HANDLER( pia_4_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(4, offset, data); }
+WRITE16_HANDLER( pia_5_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(5, offset, data); }
+WRITE16_HANDLER( pia_6_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(6, offset, data); }
+WRITE16_HANDLER( pia_7_lsb_alt_w ) { if (ACCESSING_BYTE_0) pia_alt_write(7, offset, data); }
 
 /******************* Standard 16-bit CPU interfaces, D8-D15 *******************/
 
@@ -1247,14 +1247,14 @@ READ16_HANDLER( pia_5_msb_r ) { return pia_read(5, offset) << 8; }
 READ16_HANDLER( pia_6_msb_r ) { return pia_read(6, offset) << 8; }
 READ16_HANDLER( pia_7_msb_r ) { return pia_read(7, offset) << 8; }
 
-WRITE16_HANDLER( pia_0_msb_w ) { if (ACCESSING_MSB) pia_write(0, offset, data >> 8); }
-WRITE16_HANDLER( pia_1_msb_w ) { if (ACCESSING_MSB) pia_write(1, offset, data >> 8); }
-WRITE16_HANDLER( pia_2_msb_w ) { if (ACCESSING_MSB) pia_write(2, offset, data >> 8); }
-WRITE16_HANDLER( pia_3_msb_w ) { if (ACCESSING_MSB) pia_write(3, offset, data >> 8); }
-WRITE16_HANDLER( pia_4_msb_w ) { if (ACCESSING_MSB) pia_write(4, offset, data >> 8); }
-WRITE16_HANDLER( pia_5_msb_w ) { if (ACCESSING_MSB) pia_write(5, offset, data >> 8); }
-WRITE16_HANDLER( pia_6_msb_w ) { if (ACCESSING_MSB) pia_write(6, offset, data >> 8); }
-WRITE16_HANDLER( pia_7_msb_w ) { if (ACCESSING_MSB) pia_write(7, offset, data >> 8); }
+WRITE16_HANDLER( pia_0_msb_w ) { if (ACCESSING_BYTE_1) pia_write(0, offset, data >> 8); }
+WRITE16_HANDLER( pia_1_msb_w ) { if (ACCESSING_BYTE_1) pia_write(1, offset, data >> 8); }
+WRITE16_HANDLER( pia_2_msb_w ) { if (ACCESSING_BYTE_1) pia_write(2, offset, data >> 8); }
+WRITE16_HANDLER( pia_3_msb_w ) { if (ACCESSING_BYTE_1) pia_write(3, offset, data >> 8); }
+WRITE16_HANDLER( pia_4_msb_w ) { if (ACCESSING_BYTE_1) pia_write(4, offset, data >> 8); }
+WRITE16_HANDLER( pia_5_msb_w ) { if (ACCESSING_BYTE_1) pia_write(5, offset, data >> 8); }
+WRITE16_HANDLER( pia_6_msb_w ) { if (ACCESSING_BYTE_1) pia_write(6, offset, data >> 8); }
+WRITE16_HANDLER( pia_7_msb_w ) { if (ACCESSING_BYTE_1) pia_write(7, offset, data >> 8); }
 
 READ16_HANDLER( pia_0_msb_alt_r ) { return pia_alt_read(0, offset) << 8; }
 READ16_HANDLER( pia_1_msb_alt_r ) { return pia_alt_read(1, offset) << 8; }
@@ -1265,14 +1265,14 @@ READ16_HANDLER( pia_5_msb_alt_r ) { return pia_alt_read(5, offset) << 8; }
 READ16_HANDLER( pia_6_msb_alt_r ) { return pia_alt_read(6, offset) << 8; }
 READ16_HANDLER( pia_7_msb_alt_r ) { return pia_alt_read(7, offset) << 8; }
 
-WRITE16_HANDLER( pia_0_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(0, offset, data >> 8); }
-WRITE16_HANDLER( pia_1_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(1, offset, data >> 8); }
-WRITE16_HANDLER( pia_2_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(2, offset, data >> 8); }
-WRITE16_HANDLER( pia_3_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(3, offset, data >> 8); }
-WRITE16_HANDLER( pia_4_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(4, offset, data >> 8); }
-WRITE16_HANDLER( pia_5_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(5, offset, data >> 8); }
-WRITE16_HANDLER( pia_6_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(6, offset, data >> 8); }
-WRITE16_HANDLER( pia_7_msb_alt_w ) { if (ACCESSING_MSB) pia_alt_write(7, offset, data >> 8); }
+WRITE16_HANDLER( pia_0_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(0, offset, data >> 8); }
+WRITE16_HANDLER( pia_1_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(1, offset, data >> 8); }
+WRITE16_HANDLER( pia_2_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(2, offset, data >> 8); }
+WRITE16_HANDLER( pia_3_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(3, offset, data >> 8); }
+WRITE16_HANDLER( pia_4_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(4, offset, data >> 8); }
+WRITE16_HANDLER( pia_5_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(5, offset, data >> 8); }
+WRITE16_HANDLER( pia_6_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(6, offset, data >> 8); }
+WRITE16_HANDLER( pia_7_msb_alt_w ) { if (ACCESSING_BYTE_1) pia_alt_write(7, offset, data >> 8); }
 
 /******************* 8-bit A/B port interfaces *******************/
 

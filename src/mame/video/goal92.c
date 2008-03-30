@@ -21,7 +21,7 @@ WRITE16_HANDLER( goal92_fg_bank_w )
 {
 	COMBINE_DATA(&fg_bank);
 
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		tilemap_mark_all_tiles_dirty(foreground_layer);
 	}

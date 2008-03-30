@@ -417,7 +417,7 @@ READ16_HANDLER( segaic16_memory_mapper_lsb_r )
 
 WRITE16_HANDLER( segaic16_memory_mapper_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		memory_mapper_w(&memory_mapper, offset, data & 0xff);
 }
 

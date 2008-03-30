@@ -176,7 +176,7 @@ static WRITE16_HANDLER( gp2_vram_mirror_w )
 
 static READ16_HANDLER( sndram_r )
 {
-	if (ACCESSING_LSB16)
+	if (ACCESSING_BYTE_0)
 			return sndram[offset];
 
 	return 0;
@@ -184,7 +184,7 @@ static READ16_HANDLER( sndram_r )
 
 static WRITE16_HANDLER( sndram_w )
 {
-	if (ACCESSING_LSB16)
+	if (ACCESSING_BYTE_0)
 	{
 		sndram[offset] = data & 0xff;
 		if (offset >= 0x40000)
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( sndram_w )
 
 static READ16_HANDLER( k054539_word_r )
 {
-	if (ACCESSING_LSB16)
+	if (ACCESSING_BYTE_0)
 		return K054539_0_r(machine, offset);
 
 	return 0;
@@ -202,7 +202,7 @@ static READ16_HANDLER( k054539_word_r )
 
 static WRITE16_HANDLER( k054539_word_w )
 {
-	if (ACCESSING_LSB16)
+	if (ACCESSING_BYTE_0)
 		K054539_0_w(machine, offset, data);
 }
 

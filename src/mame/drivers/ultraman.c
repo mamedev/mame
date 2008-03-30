@@ -49,62 +49,62 @@ static READ16_HANDLER( ultraman_K051316_2_r )
 
 static WRITE16_HANDLER( ultraman_K051316_0_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051316_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_1_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051316_1_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_2_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051316_2_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_0_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051316_ctrl_0_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_1_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051316_ctrl_1_w(machine, offset, data & 0xff);
 
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_2_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051316_ctrl_2_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051937_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051937_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051960_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051960_w(machine, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		soundlatch_w(machine,0,data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_irq_trigger_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 

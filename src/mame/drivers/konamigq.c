@@ -62,7 +62,7 @@ static UINT8 sndtor3k[ 16 ];
 
 static WRITE32_HANDLER( soundr3k_w )
 {
-	if( ACCESSING_MSW32 )
+	if( ACCESSING_WORD_1 )
 	{
 		sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
@@ -70,7 +70,7 @@ static WRITE32_HANDLER( soundr3k_w )
 			cpunum_set_input_line(Machine, 1, 1, HOLD_LINE );
 		}
 	}
-	if( ACCESSING_LSW32 )
+	if( ACCESSING_WORD_0 )
 	{
 		sndto000[ offset << 1 ] = data;
 	}
@@ -155,11 +155,11 @@ static UINT8 *m_p_n_pcmram;
 
 static WRITE32_HANDLER( pcmram_w )
 {
-	if( ACCESSING_LSB32 )
+	if( ACCESSING_BYTE_0 )
 	{
 		m_p_n_pcmram[ offset << 1 ] = data;
 	}
-	if( ( mem_mask & 0x00ff0000 ) == 0 )
+	if( ACCESSING_BYTE_2 )
 	{
 		m_p_n_pcmram[ ( offset << 1 ) + 1 ] = data >> 16;
 	}
@@ -223,11 +223,11 @@ static READ16_HANDLER( dual539_r )
 	UINT16 data;
 
 	data = 0;
-	if( ACCESSING_LSB16 )
+	if( ACCESSING_BYTE_0 )
 	{
 		data |= K054539_1_r( machine, offset );
 	}
-	if( ACCESSING_MSB16 )
+	if( ACCESSING_BYTE_1 )
 	{
 		data |= K054539_0_r( machine, offset ) << 8;
 	}
@@ -236,11 +236,11 @@ static READ16_HANDLER( dual539_r )
 
 static WRITE16_HANDLER( dual539_w )
 {
-	if( ACCESSING_LSB16 )
+	if( ACCESSING_BYTE_0 )
 	{
 		K054539_1_w( machine, offset, data );
 	}
-	if( ACCESSING_MSB16 )
+	if( ACCESSING_BYTE_1 )
 	{
 		K054539_0_w( machine, offset, data >> 8 );
 	}

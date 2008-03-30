@@ -571,26 +571,26 @@ static READ32_HANDLER( sysreg_r )
 	UINT32 r = 0;
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BYTE_3)
 		{
 			r |= readinputport(0) << 24;
 		}
-		if (!(mem_mask & 0x00ff0000))
+		if (ACCESSING_BYTE_2)
 		{
 			r |= readinputport(1) << 16;
 		}
-		if (!(mem_mask & 0x0000ff00))
+		if (ACCESSING_BYTE_1)
 		{
 			r |= readinputport(2) << 8;
 		}
-		if (!(mem_mask & 0x000000ff))
+		if (ACCESSING_BYTE_0)
 		{
 			r |= (adc1213x_do_r(0)) | (adc1213x_eoc_r(0) << 2);
 		}
 	}
 	else if (offset == 1)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BYTE_3)
 		{
 			r |= readinputport(3) << 24;
 		}
@@ -602,11 +602,11 @@ static WRITE32_HANDLER( sysreg_w )
 {
 	if( offset == 0 )
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BYTE_3)
 		{
 			led_reg0 = (data >> 24) & 0xff;
 		}
-		if (!(mem_mask & 0x00ff0000))
+		if (ACCESSING_BYTE_2)
 		{
 			led_reg1 = (data >> 16) & 0xff;
 		}
@@ -614,7 +614,7 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 	if( offset == 1 )
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BYTE_3)
 		{
 			int cs = (data >> 27) & 0x1;
 			int conv = (data >> 26) & 0x1;
@@ -626,7 +626,7 @@ static WRITE32_HANDLER( sysreg_w )
 			adc1213x_di_w(0, di);
 			adc1213x_sclk_w(0, sclk);
 		}
-		if (!(mem_mask & 0x000000ff))
+		if (ACCESSING_BYTE_0)
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
@@ -679,7 +679,7 @@ static READ32_HANDLER( lanc2_r )
 
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0x000000ff))
+		if (ACCESSING_BYTE_0)
 		{
 			r |= lanc2_ram[lanc2_ram_r & 0x7fff];
 			lanc2_ram_r++;
@@ -692,7 +692,7 @@ static READ32_HANDLER( lanc2_r )
 
 	if (offset == 4)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BYTE_3)
 		{
 			r |= 0x00000000;
 		}
@@ -707,7 +707,7 @@ static WRITE32_HANDLER( lanc2_w )
 {
 	if (offset == 0)
 	{
-		if (!(mem_mask & 0xff000000))
+		if (ACCESSING_BYTE_3)
 		{
 			UINT8 value = data >> 24;
 
@@ -724,7 +724,7 @@ static WRITE32_HANDLER( lanc2_w )
 
 			//printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
 		}
-		else if (!(mem_mask & 0x000000ff))
+		else if (ACCESSING_BYTE_0)
 		{
 			lanc2_ram[lanc2_ram_w & 0x7fff] = data & 0xff;
 			lanc2_ram_w++;

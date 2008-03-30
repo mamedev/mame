@@ -824,7 +824,7 @@ static READ32_HANDLER( sound_fifo_r )
 
 static WRITE32_HANDLER( sound_fifo_w )
 {
-	if( (mem_mask & 0xff) == 0 ) {
+	if( ACCESSING_BYTE_0 ) {
 		z80_fifoin_push(data & 0xff);
 	}
 }
@@ -852,14 +852,14 @@ static READ32_HANDLER( spi_unknown_r )
 
 static WRITE32_HANDLER( ds2404_reset_w )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		DS2404_1W_reset_w(machine, offset, data);
 	}
 }
 
 static READ32_HANDLER( ds2404_data_r )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		return DS2404_data_r(machine, offset);
 	}
 	return 0;
@@ -867,14 +867,14 @@ static READ32_HANDLER( ds2404_data_r )
 
 static WRITE32_HANDLER( ds2404_data_w )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		DS2404_data_w(machine, offset, data);
 	}
 }
 
 static WRITE32_HANDLER( ds2404_clk_w )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		DS2404_clk_w(machine, offset, data);
 	}
 }
@@ -882,7 +882,7 @@ static WRITE32_HANDLER( ds2404_clk_w )
 static WRITE32_HANDLER( eeprom_w )
 {
 	// tile banks
-	if( !(mem_mask & 0x00ff0000) ) {
+	if( ACCESSING_BYTE_2 ) {
 		rf2_set_layer_banks(data >> 16);
 		EEPROM_write_bit((data & 0x800000) ? 1 : 0);
 		EEPROM_set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
@@ -896,7 +896,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 static WRITE32_HANDLER( z80_prg_fifo_w )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		if (z80_prg_fifo_pos<0x40000) z80_rom[z80_prg_fifo_pos] = data & 0xff;
 		z80_prg_fifo_pos++;
 	}
@@ -905,12 +905,12 @@ static WRITE32_HANDLER( z80_prg_fifo_w )
 static WRITE32_HANDLER( z80_enable_w )
 {
 	// tile banks
-	if( !(mem_mask & 0x00ff0000) ) {
+	if( ACCESSING_BYTE_2 ) {
 		rf2_set_layer_banks(data >> 16);
 	}
 
 logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
-	if( !(mem_mask & 0x000000ff) ) {
+	if( ACCESSING_BYTE_0 ) {
 		if( data & 0x1 ) {
 			z80_prg_fifo_pos = 0;
 			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE );
@@ -922,7 +922,7 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 
 static READ32_HANDLER( spi_controls1_r )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		return (readinputport(1) << 8) | readinputport(0) | 0xffff0000;
 	}
 	return 0xffffffff;
@@ -930,7 +930,7 @@ static READ32_HANDLER( spi_controls1_r )
 
 static READ32_HANDLER( spi_controls2_r )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		return ((readinputport(2) | 0xffffff00) & ~0x40) | (EEPROM_read_bit() << 6);
 	}
 	return 0xffffffff;
@@ -948,14 +948,14 @@ static READ32_HANDLER( spi_6295_1_r )
 
 static WRITE32_HANDLER( spi_6295_0_w )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		OKIM6295_data_0_w(machine, 0, data & 0xff);
 	}
 }
 
 static WRITE32_HANDLER( spi_6295_1_w )
 {
-	if( ACCESSING_LSB32 ) {
+	if( ACCESSING_BYTE_0 ) {
 		OKIM6295_data_1_w(machine, 0, data & 0xff);
 	}
 }

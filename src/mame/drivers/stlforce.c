@@ -91,7 +91,7 @@ static READ16_HANDLER( stlforce_input_port_1_r )
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 	{
 		EEPROM_write_bit(data & 0x01);
 		EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );

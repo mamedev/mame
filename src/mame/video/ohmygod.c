@@ -54,7 +54,7 @@ WRITE16_HANDLER( ohmygod_videoram_w )
 
 WRITE16_HANDLER( ohmygod_spritebank_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		spritebank = data & 0x8000;
 }
 

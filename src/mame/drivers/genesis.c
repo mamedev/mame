@@ -271,11 +271,11 @@ READ16_HANDLER ( genesis_68k_to_z80_r )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_MSB)	 return YM3438_status_port_0_A_r(machine, 0) << 8;
+			if (ACCESSING_BYTE_1)	 return YM3438_status_port_0_A_r(machine, 0) << 8;
 			else 				 return YM3438_read_port_0_r(machine, 0);
 			break;
 		case 2:
-			if (ACCESSING_MSB)	return YM3438_status_port_0_B_r(machine, 0) << 8;
+			if (ACCESSING_BYTE_1)	return YM3438_status_port_0_B_r(machine, 0) << 8;
 			else 				return 0;
 			break;
 		}
@@ -331,11 +331,11 @@ READ16_HANDLER ( megaplay_68k_to_z80_r )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_MSB)	 return YM3438_status_port_0_A_r(machine, 0) << 8;
+			if (ACCESSING_BYTE_1)	 return YM3438_status_port_0_A_r(machine, 0) << 8;
 			else 				 return YM3438_read_port_0_r(machine, 0);
 			break;
 		case 2:
-			if (ACCESSING_MSB)	return YM3438_status_port_0_B_r(machine, 0) << 8;
+			if (ACCESSING_BYTE_1)	return YM3438_status_port_0_B_r(machine, 0) << 8;
 			else 				return 0;
 			break;
 		}
@@ -372,8 +372,8 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 	{
 		offset &=0x1fff;
 
-	if (ACCESSING_LSB) genesis_z80_ram[offset+1] = data & 0xff;
-	if (ACCESSING_MSB) genesis_z80_ram[offset] = (data >> 8) & 0xff;
+	if (ACCESSING_BYTE_0) genesis_z80_ram[offset+1] = data & 0xff;
+	if (ACCESSING_BYTE_1) genesis_z80_ram[offset] = (data >> 8) & 0xff;
 	}
 
 
@@ -383,11 +383,11 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_MSB)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+			if (ACCESSING_BYTE_1)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
 			else 				YM3438_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		case 2:
-			if (ACCESSING_MSB)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+			if (ACCESSING_BYTE_1)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
 			else 				YM3438_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		}
@@ -412,8 +412,8 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 
 		if ( (offset >= 0x10) && (offset <=0x17) )
 		{
-			if (ACCESSING_LSB) SN76496_0_w(machine, 0, data & 0xff);
-			if (ACCESSING_MSB) SN76496_0_w(machine, 0, (data >>8) & 0xff);
+			if (ACCESSING_BYTE_0) SN76496_0_w(machine, 0, data & 0xff);
+			if (ACCESSING_BYTE_1) SN76496_0_w(machine, 0, (data >>8) & 0xff);
 		}
 
 	}

@@ -162,7 +162,7 @@ READ16_HANDLER(equites_fg_videoram_r)
 
 WRITE16_HANDLER(equites_fg_videoram_w)
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		equites_fg_videoram[offset] = data & 0xff;
 
@@ -179,16 +179,16 @@ WRITE16_HANDLER(equites_bg_videoram_w)
 
 WRITE16_HANDLER(equites_bgcolor_w)
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		bgcolor = data >> 8;
 }
 
 WRITE16_HANDLER(equites_scrollreg_w)
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		tilemap_set_scrolly(bg_tilemap, 0, data & 0xff);
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		tilemap_set_scrollx(bg_tilemap, 0, data >> 8);
 }
 
@@ -222,16 +222,16 @@ WRITE16_HANDLER(equites_flip1_w)
 
 WRITE16_HANDLER(splndrbt_flip0_w)
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		flip_screen_set(0);
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		bgcolor = data >> 8;
 }
 
 WRITE16_HANDLER(splndrbt_flip1_w)
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		flip_screen_set(1);
 }
 

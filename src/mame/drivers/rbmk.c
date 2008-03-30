@@ -94,7 +94,7 @@ static READ16_HANDLER( eeprom_r )
 static WRITE16_HANDLER( eeprom_w )
 {
 	//bad ?
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 	{
 		EEPROM_write_bit(data & 0x04);
 		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );

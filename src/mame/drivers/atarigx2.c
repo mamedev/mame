@@ -98,9 +98,9 @@ static READ32_HANDLER( special_port3_r )
 #if 0
 static WRITE32_HANDLER( a2d_select_w )
 {
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 		which_input = offset * 2;
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 		which_input = offset * 2 + 1;
 }
 #endif
@@ -136,14 +136,14 @@ static WRITE32_HANDLER( latch_w )
 	logerror("latch_w(%08X) & %08X\n", data, ~mem_mask);
 
 	/* upper byte */
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(0, (data >> 27) & 7);
 	}
 
 	/* lower byte */
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -151,7 +151,7 @@ static WRITE32_HANDLER( latch_w )
 static WRITE32_HANDLER( mo_command_w )
 {
 	COMBINE_DATA(mo_command);
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 		atarirle_command_w(0, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
@@ -173,7 +173,7 @@ static WRITE32_HANDLER( atarigx2_protection_w )
 //      if (pc == 0x11cbe || pc == 0x11c30)
 //          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, activecpu_get_reg(M68K_A2));
 //      else
-		if (ACCESSING_MSW32)
+		if (ACCESSING_WORD_1)
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4, data >> 16);
 		else
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4 + 2, data);
@@ -181,12 +181,12 @@ static WRITE32_HANDLER( atarigx2_protection_w )
 
 	COMBINE_DATA(&protection_base[offset]);
 
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 	{
 		last_write = protection_base[offset] >> 16;
 		last_write_offset = offset*2;
 	}
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 	{
 		last_write = protection_base[offset] & 0xffff;
 		last_write_offset = offset*2+1;
@@ -1153,7 +1153,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 		}
 	}
 
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 		logerror("%06X:Protection R@%04X = %04X\n", activecpu_get_previouspc(), offset * 4, result >> 16);
 	else
 		logerror("%06X:Protection R@%04X = %04X\n", activecpu_get_previouspc(), offset * 4 + 2, result);

@@ -377,21 +377,21 @@ READ32_HANDLER( psx_spu_r )
 		switch( offset % 4 )
 		{
 		case SPU_CHANNEL_REG( 0x8 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				verboselog( 1, "psx_spu_r() channel %d attack/decay/sustain = %04x\n", n_channel, chip->m_p_n_attackdecaysustain[ n_channel ] );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				verboselog( 1, "psx_spu_r() channel %d sustain/release = %04x\n", n_channel, chip->m_p_n_sustainrelease[ n_channel ] );
 			}
 			return ( chip->m_p_n_sustainrelease[ n_channel ] << 16 ) | chip->m_p_n_attackdecaysustain[ n_channel ];
 		case SPU_CHANNEL_REG( 0xc ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				verboselog( 1, "psx_spu_r() channel %d adsr volume = %04x\n", n_channel, chip->m_p_n_adsrvolume[ n_channel ] );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				verboselog( 1, "psx_spu_r() channel %d repeat address = %04x\n", n_channel, chip->m_p_n_repeataddress[ n_channel ] );
 			}
@@ -446,48 +446,48 @@ WRITE32_HANDLER( psx_spu_w )
 		switch( offset % 4 )
 		{
 		case SPU_CHANNEL_REG( 0x0 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_p_n_volumeleft[ n_channel ] = data & 0xffff;
 				verboselog( 1, "psx_spu_w() channel %d volume left = %04x\n", n_channel, chip->m_p_n_volumeleft[ n_channel ] );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_p_n_volumeright[ n_channel ] = data >> 16;
 				verboselog( 1, "psx_spu_w() channel %d volume right = %04x\n", n_channel, chip->m_p_n_volumeright[ n_channel ] );
 			}
 			break;
 		case SPU_CHANNEL_REG( 0x4 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_p_n_pitch[ n_channel ] = data & 0xffff;
 				verboselog( 1, "psx_spu_w() channel %d pitch = %04x\n", n_channel, chip->m_p_n_pitch[ n_channel ] );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_p_n_address[ n_channel ] = data >> 16;
 				verboselog( 1, "psx_spu_w() channel %d address = %04x\n", n_channel, chip->m_p_n_address[ n_channel ] );
 			}
 			break;
 		case SPU_CHANNEL_REG( 0x8 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_p_n_attackdecaysustain[ n_channel ] = data & 0xffff;
 				verboselog( 1, "psx_spu_w() channel %d attack/decay/sustain = %04x\n", n_channel, chip->m_p_n_attackdecaysustain[ n_channel ] );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_p_n_sustainrelease[ n_channel ] = data >> 16;
 				verboselog( 1, "psx_spu_w() channel %d sustain/release = %04x\n", n_channel, chip->m_p_n_sustainrelease[ n_channel ] );
 			}
 			break;
 		case SPU_CHANNEL_REG( 0xc ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_p_n_adsrvolume[ n_channel ] = data & 0xffff;
 				verboselog( 1, "psx_spu_w() channel %d adsr volume = %04x\n", n_channel, chip->m_p_n_adsrvolume[ n_channel ] );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_p_n_repeataddress[ n_channel ] = data >> 16;
 				verboselog( 1, "psx_spu_w() channel %d repeat address = %04x\n", n_channel, chip->m_p_n_repeataddress[ n_channel ] );
@@ -503,24 +503,24 @@ WRITE32_HANDLER( psx_spu_w )
 		switch( offset )
 		{
 		case SPU_REG( 0xd80 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_n_mainvolumeleft = data & 0xffff;
 				verboselog( 1, "psx_spu_w() main volume left = %04x\n", chip->m_n_mainvolumeleft );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_mainvolumeright = data >> 16;
 				verboselog( 1, "psx_spu_w() main volume right = %04x\n", chip->m_n_mainvolumeright );
 			}
 			break;
 		case SPU_REG( 0xd84 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_n_reverberationdepthleft = data & 0xffff;
 				verboselog( 1, "psx_spu_w() reverberation depth left = %04x\n", chip->m_n_reverberationdepthleft );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_reverberationdepthright = data >> 16;
 				verboselog( 1, "psx_spu_w() reverberation depth right = %04x\n", chip->m_n_reverberationdepthright );
@@ -564,23 +564,23 @@ WRITE32_HANDLER( psx_spu_w )
 			verboselog( 1, "psx_spu_w() channel on/off = %08x\n", chip->m_n_channelonoff );
 			break;
 		case SPU_REG( 0xda0 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				verboselog( 0, "psx_spu_w( %08x, %08x, %08x ) %08x\n", offset, mem_mask, data, 0xc00 + ( offset * 4 ) );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_reverbworkareastart = data >> 16;
 				verboselog( 1, "psx_spu_w() reverb work area start = %04x\n", chip->m_n_reverbworkareastart );
 			}
 			break;
 		case SPU_REG( 0xda4 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_n_irqaddress = data & 0xffff;
 				verboselog( 1, "psx_spu_w() irq address = %04x\n", chip->m_n_irqaddress );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_spuoffset = ( data >> 16 ) * 4;
 				chip->m_n_spuoffset %= ( SPU_RAM_SIZE / 2 );
@@ -588,14 +588,14 @@ WRITE32_HANDLER( psx_spu_w )
 			}
 			break;
 		case SPU_REG( 0xda8 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_n_spudata = data & 0xffff;
 				chip->m_p_n_spuram[ chip->m_n_spuoffset++ ] = chip->m_n_spudata;
 				chip->m_n_spuoffset %= ( SPU_RAM_SIZE / 2 );
 				verboselog( 1, "psx_spu_w() spu data = %04x\n", chip->m_n_spudata );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_spucontrol = data >> 16;
 				verboselog( 1, "psx_spu_w() spu control = %04x\n", chip->m_n_spucontrol );
@@ -607,24 +607,24 @@ WRITE32_HANDLER( psx_spu_w )
 			verboselog( 1, "psx_spu_w() spu status = %08x\n", chip->m_n_spustatus );
 			break;
 		case SPU_REG( 0xdb0 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_n_cdvolumeleft = data & 0xffff;
 				verboselog( 1, "psx_spu_w() cd volume left = %04x\n", chip->m_n_cdvolumeleft );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_cdvolumeright = data >> 16;
 				verboselog( 1, "psx_spu_w() cd volume right = %04x\n", chip->m_n_cdvolumeright );
 			}
 			break;
 		case SPU_REG( 0xdb4 ):
-			if( ACCESSING_LSW32 )
+			if( ACCESSING_WORD_0 )
 			{
 				chip->m_n_externalvolumeleft = data & 0xffff;
 				verboselog( 1, "psx_spu_w() external volume left = %04x\n", chip->m_n_externalvolumeleft );
 			}
-			if( ACCESSING_MSW32 )
+			if( ACCESSING_WORD_1 )
 			{
 				chip->m_n_externalvolumeright = data >> 16;
 				verboselog( 1, "psx_spu_w() external volume right = %04x\n", chip->m_n_externalvolumeright );

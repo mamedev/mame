@@ -278,7 +278,7 @@ static VIDEO_EOF( bigfghtr )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
 }
 

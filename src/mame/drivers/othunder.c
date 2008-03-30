@@ -358,7 +358,7 @@ static int eeprom_r(void)
 
 static WRITE16_HANDLER( othunder_TC0220IOC_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		switch (offset)
 		{

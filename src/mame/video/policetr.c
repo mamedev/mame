@@ -203,7 +203,7 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* latch 0x50 allows a direct write to the destination bitmap */
 				case 0x50:
-					if (ACCESSING_MSB32 && dst_xoffs < DSTBITMAP_WIDTH && dst_yoffs < DSTBITMAP_HEIGHT)
+					if (ACCESSING_BYTE_3 && dst_xoffs < DSTBITMAP_WIDTH && dst_yoffs < DSTBITMAP_HEIGHT)
 						dstbitmap[dst_yoffs * DSTBITMAP_WIDTH + dst_xoffs] = data >> 24;
 					break;
 
@@ -331,7 +331,7 @@ READ32_HANDLER( policetr_video_r )
 
 WRITE32_HANDLER( policetr_palette_offset_w )
 {
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		palette_offset = (data >> 16) & 0xff;
 		palette_index = 0;
@@ -341,7 +341,7 @@ WRITE32_HANDLER( policetr_palette_offset_w )
 
 WRITE32_HANDLER( policetr_palette_data_w )
 {
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		palette_data[palette_index] = (data >> 16) & 0xff;
 		if (++palette_index == 3)

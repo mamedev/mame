@@ -144,7 +144,7 @@ static READ16_HANDLER( mk_prot_r )
 
 static WRITE16_HANDLER( mk_prot_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		int first_val = (data >> 9) & 0x3f;
 		int i;
@@ -609,7 +609,7 @@ WRITE16_HANDLER( midtunit_sound_w )
 	}
 
 	/* call through based on the sound type */
-	if (ACCESSING_LSB && ACCESSING_MSB)
+	if (ACCESSING_BYTE_0 && ACCESSING_BYTE_1)
 		switch (chip_type)
 		{
 			case SOUND_ADPCM:

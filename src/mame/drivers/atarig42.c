@@ -106,7 +106,7 @@ static READ16_HANDLER( a2d_data_r )
 static WRITE16_HANDLER( io_latch_w )
 {
 	/* upper byte */
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		/* bit 14 controls the ASIC65 reset line */
 		asic65_reset((~data >> 14) & 1);
@@ -116,7 +116,7 @@ static WRITE16_HANDLER( io_latch_w )
 	}
 
 	/* lower byte */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 4 resets the sound CPU */
 		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);

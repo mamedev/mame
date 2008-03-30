@@ -101,7 +101,7 @@ static NVRAM_HANDLER( polygonet )
 
 static READ32_HANDLER( polygonet_eeprom_r )
 {
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 	{
 		return 0x0200 | (EEPROM_read_bit()<<8);
 	}
@@ -120,7 +120,7 @@ static READ32_HANDLER( polygonet_eeprom_r )
 
 static WRITE32_HANDLER( polygonet_eeprom_w )
 {
-	if (ACCESSING_MSB32)
+	if (ACCESSING_BYTE_3)
 	{
 		EEPROM_write_bit((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_set_cs_line((data & 0x02000000) ? CLEAR_LINE : ASSERT_LINE);
@@ -175,7 +175,7 @@ static READ32_HANDLER( sound_r )
 
 static WRITE32_HANDLER( sound_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		soundlatch_w(machine, 0, (data>>8)&0xff);
 	}

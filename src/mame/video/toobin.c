@@ -140,7 +140,7 @@ WRITE16_HANDLER( toobin_intensity_w )
 {
 	int i;
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		brightness = (double)(~data & 0x1f) / 31.0;
 

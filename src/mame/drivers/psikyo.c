@@ -171,7 +171,7 @@ static TIMER_CALLBACK( psikyo_soundlatch_callback )
 
 static WRITE32_HANDLER( psikyo_soundlatch_w )
 {
-	if (ACCESSING_LSB32)
+	if (ACCESSING_BYTE_0)
 		timer_call_after_resynch(NULL, data & 0xff, psikyo_soundlatch_callback);
 }
 
@@ -181,7 +181,7 @@ static WRITE32_HANDLER( psikyo_soundlatch_w )
 
 static WRITE32_HANDLER( s1945_soundlatch_w )
 {
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 		timer_call_after_resynch(NULL, (data >> 16) & 0xff, psikyo_soundlatch_callback);
 }
 
@@ -330,9 +330,9 @@ static READ32_HANDLER( s1945_input_r )
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(machine, offset*2+1, data, mem_mask);
 }
 

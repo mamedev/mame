@@ -705,7 +705,7 @@ WRITE16_HANDLER( batrider_textdata_decode )
 
 WRITE16_HANDLER( batrider_objectbank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		data &= 0xf;
 		if (batrider_object_bank[offset] != data)
@@ -813,7 +813,7 @@ WRITE16_HANDLER( toaplan2_1_videoram16_w )
 
 static void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		toaplan2_scroll_reg[controller] = data & 0x8f;
 		if (data & 0x70)
@@ -1045,7 +1045,7 @@ WRITE16_HANDLER( toaplan2_1_scroll_reg_data_w )
 
 WRITE16_HANDLER( pipibibi_scroll_w )
 {
-	if (ACCESSING_MSB && ACCESSING_LSB)
+	if (ACCESSING_BYTE_1 && ACCESSING_BYTE_0)
 	{
 		switch(offset)
 		{

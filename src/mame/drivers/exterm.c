@@ -187,7 +187,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	/* All the outputs are activated on the rising edge */
 	static UINT16 last = 0;
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* Bit 0-1= Resets analog controls */
 		if ((data & 0x0001) && !(last & 0x0001))
@@ -196,7 +196,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 			aimpos[1] = 0;
 	}
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(last & 0x2000))
@@ -222,7 +222,7 @@ static TIMER_CALLBACK( sound_delayed_w )
 
 static WRITE16_HANDLER( sound_latch_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		timer_call_after_resynch(NULL, data & 0xff, sound_delayed_w);
 }
 

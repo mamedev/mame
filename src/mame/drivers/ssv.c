@@ -308,7 +308,7 @@ static INTERRUPT_GEN( gdfs_interrupt )
 static WRITE16_HANDLER( ssv_lockout_w )
 {
 //  popmessage("%02X",data & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		coin_lockout_w(1,~data & 0x01);
 		coin_lockout_w(0,~data & 0x02);
@@ -323,7 +323,7 @@ static WRITE16_HANDLER( ssv_lockout_w )
 static WRITE16_HANDLER( ssv_lockout_inv_w )
 {
 //  popmessage("%02X",data & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		coin_lockout_w(1, data & 0x01);
 		coin_lockout_w(0, data & 0x02);
@@ -501,7 +501,7 @@ static WRITE16_HANDLER( gdfs_eeprom_w )
 	if (data & ~0x7b00)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_MSB )
+	if ( ACCESSING_BYTE_1 )
 	{
 //      data & 0x8000 ? (near palette writes)
 //      data & 0x0001 ?
@@ -561,7 +561,7 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			if (data & ~0x43)
 				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",activecpu_get_pc(),data);
 
-			if (ACCESSING_LSB)
+			if (ACCESSING_BYTE_0)
 				gdfs_gfxram_bank = data & 3;
 		}
 		break;
@@ -828,7 +828,7 @@ static READ16_HANDLER( srmp7_irqv_r )
 
 static WRITE16_HANDLER( srmp7_sound_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
@@ -908,7 +908,7 @@ static READ16_HANDLER( sxyreact_dial_r )
 
 static WRITE16_HANDLER( sxyreact_dial_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static int old;
 
@@ -1063,7 +1063,7 @@ static READ16_HANDLER( eaglshot_gfxrom_r )
 
 static WRITE16_HANDLER( eaglshot_gfxrom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		gfxrom_select = data;
 }
 
@@ -1082,7 +1082,7 @@ static READ16_HANDLER( eaglshot_trackball_r )
 
 static WRITE16_HANDLER( eaglshot_trackball_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		trackball_select = data;
 }
 

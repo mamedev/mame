@@ -77,7 +77,7 @@ static READ16_HANDLER( heberpop_gfxrom_r )
 
 static WRITE16_HANDLER( shangha3_coinctrl_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_lockout_w(0,~data & 0x0400);
 		coin_lockout_w(1,~data & 0x0400);
@@ -88,7 +88,7 @@ static WRITE16_HANDLER( shangha3_coinctrl_w )
 
 static WRITE16_HANDLER( heberpop_coinctrl_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
 		OKIM6295_set_bank_base(0,(data & 0x08) ? 0x40000 : 0x00000);
@@ -103,7 +103,7 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 
 static WRITE16_HANDLER( heberpop_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);	/* RST 38h */

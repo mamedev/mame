@@ -367,7 +367,7 @@ static WRITE32_HANDLER( dsp_flags_w )
 
 	/* if they were clearing the A2S interrupt, see if we are headed for the spin */
 	/* loop with R22 != 0; if we are, just start spinning again */
-	if (cpu_getactivecpu() == 2 && !(mem_mask & 0x0000ff00) && (data & 0x400))
+	if (cpu_getactivecpu() == 2 && ACCESSING_BYTE_1 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
 		if (!(data & 0x04000) && activecpu_get_reg(JAGUAR_R22) != 0)

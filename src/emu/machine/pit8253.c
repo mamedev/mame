@@ -1185,8 +1185,8 @@ WRITE8_HANDLER ( pit8253_1_w ) { pit8253_write(1, offset, data); }
 
 READ16_HANDLER ( pit8253_0_lsb_r ) { return pit8253_read(0, offset);	}
 READ16_HANDLER ( pit8253_1_lsb_r ) { return pit8253_read(1, offset);	}
-WRITE16_HANDLER ( pit8253_0_lsb_w ) { if (ACCESSING_LSB) pit8253_write(0, offset, data); }
-WRITE16_HANDLER ( pit8253_1_lsb_w ) { if (ACCESSING_LSB) pit8253_write(1, offset, data); }
+WRITE16_HANDLER ( pit8253_0_lsb_w ) { if (ACCESSING_BYTE_0) pit8253_write(0, offset, data); }
+WRITE16_HANDLER ( pit8253_1_lsb_w ) { if (ACCESSING_BYTE_0) pit8253_write(1, offset, data); }
 
 READ16_HANDLER ( pit8253_16le_0_r ) { return read16le_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
 READ16_HANDLER ( pit8253_16le_1_r ) { return read16le_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }

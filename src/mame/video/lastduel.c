@@ -123,7 +123,7 @@ VIDEO_START( madgear )
 
 WRITE16_HANDLER( lastduel_flip_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		flip_screen_set(data & 0x01);
 

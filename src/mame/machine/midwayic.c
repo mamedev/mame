@@ -852,9 +852,9 @@ void midway_ioasic_fifo_full_w(UINT16 data)
 READ32_HANDLER( midway_ioasic_packed_r )
 {
 	UINT32 result = 0;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		result |= midway_ioasic_r(machine, offset*2, 0xffff0000) & 0xffff;
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		result |= (midway_ioasic_r(machine, offset*2+1, 0xffff0000) & 0xffff) << 16;
 	return result;
 }
@@ -948,9 +948,9 @@ READ32_HANDLER( midway_ioasic_r )
 
 WRITE32_HANDLER( midway_ioasic_packed_w )
 {
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		midway_ioasic_w(machine, offset*2, data & 0xffff, 0xffff0000);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		midway_ioasic_w(machine, offset*2+1, data >> 16, 0xffff0000);
 }
 

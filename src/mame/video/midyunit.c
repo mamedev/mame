@@ -172,16 +172,16 @@ WRITE16_HANDLER( midyunit_vram_w )
 	offset *= 2;
 	if (videobank_select)
 	{
-		if (ACCESSING_LSB)
+		if (ACCESSING_BYTE_0)
 			local_videoram[offset] = (data & 0x00ff) | (dma_register[DMA_PALETTE] << 8);
-		if (ACCESSING_MSB)
+		if (ACCESSING_BYTE_1)
 			local_videoram[offset + 1] = (data >> 8) | (dma_register[DMA_PALETTE] & 0xff00);
 	}
 	else
 	{
-		if (ACCESSING_LSB)
+		if (ACCESSING_BYTE_0)
 			local_videoram[offset] = (local_videoram[offset] & 0x00ff) | (data << 8);
-		if (ACCESSING_MSB)
+		if (ACCESSING_BYTE_1)
 			local_videoram[offset + 1] = (local_videoram[offset + 1] & 0x00ff) | (data & 0xff00);
 	}
 }
@@ -239,7 +239,7 @@ WRITE16_HANDLER( midyunit_control_w )
      *
      */
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* CMOS page is bits 6-7 */
 		midyunit_cmos_page = ((data >> 6) & 3) * 0x1000;

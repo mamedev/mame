@@ -156,16 +156,16 @@ WRITE16_HANDLER( midtunit_vram_w )
 	offset *= 2;
 	if (videobank_select)
 	{
-		if (ACCESSING_LSB)
+		if (ACCESSING_BYTE_0)
 			local_videoram[offset] = (data & 0xff) | ((dma_register[DMA_PALETTE] & 0xff) << 8);
-		if (ACCESSING_MSB)
+		if (ACCESSING_BYTE_1)
 			local_videoram[offset + 1] = ((data >> 8) & 0xff) | (dma_register[DMA_PALETTE] & 0xff00);
 	}
 	else
 	{
-		if (ACCESSING_LSB)
+		if (ACCESSING_BYTE_0)
 			local_videoram[offset] = (local_videoram[offset] & 0xff) | ((data & 0xff) << 8);
-		if (ACCESSING_MSB)
+		if (ACCESSING_BYTE_1)
 			local_videoram[offset + 1] = (local_videoram[offset + 1] & 0xff) | (data & 0xff00);
 	}
 }
@@ -174,9 +174,9 @@ WRITE16_HANDLER( midtunit_vram_w )
 WRITE16_HANDLER( midtunit_vram_data_w )
 {
 	offset *= 2;
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		local_videoram[offset] = (data & 0xff) | ((dma_register[DMA_PALETTE] & 0xff) << 8);
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		local_videoram[offset + 1] = ((data >> 8) & 0xff) | (dma_register[DMA_PALETTE] & 0xff00);
 }
 
@@ -184,9 +184,9 @@ WRITE16_HANDLER( midtunit_vram_data_w )
 WRITE16_HANDLER( midtunit_vram_color_w )
 {
 	offset *= 2;
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		local_videoram[offset] = (local_videoram[offset] & 0xff) | ((data & 0xff) << 8);
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		local_videoram[offset + 1] = (local_videoram[offset + 1] & 0xff) | (data & 0xff00);
 }
 

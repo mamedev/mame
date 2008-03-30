@@ -31,7 +31,7 @@ static emu_timer *interrupt_timer;
 
 static WRITE16_HANDLER( magmax_sound_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		sound_latch = (data & 0xff) << 1;
 		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);

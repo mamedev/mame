@@ -98,7 +98,7 @@ VIDEO_START( badlands )
 
 WRITE16_HANDLER( badlands_pf_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		if (playfield_tile_bank != (data & 1))
 		{
 			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));

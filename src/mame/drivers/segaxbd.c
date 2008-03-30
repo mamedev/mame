@@ -329,7 +329,7 @@ static WRITE16_HANDLER( iochip_0_w )
 	UINT8 oldval;
 
 	/* access is via the low 8 bits */
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 		return;
 
 	data &= 0xff;
@@ -402,7 +402,7 @@ static READ16_HANDLER( iochip_1_r )
 static WRITE16_HANDLER( iochip_1_w )
 {
 	/* access is via the low 8 bits */
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 		return;
 
 	data &= 0xff;
@@ -417,7 +417,7 @@ static WRITE16_HANDLER( iochip_1_w )
 
 static WRITE16_HANDLER( iocontrol_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		logerror("I/O chip force input = %d\n", data & 1);
 		/* Racing Hero and ABCop set this and fouls up their output ports */
@@ -436,7 +436,7 @@ static WRITE16_HANDLER( iocontrol_w )
 static WRITE16_HANDLER( aburner2_iochip_0_D_w )
 {
 	/* access is via the low 8 bits */
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 		return;
 
 	iochip_regs[0][3] = data;

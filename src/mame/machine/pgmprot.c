@@ -392,7 +392,7 @@ READ16_HANDLER( pgm_asic3_r )
 
 WRITE16_HANDLER( pgm_asic3_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		if(asic3_reg < 3)
 			asic3_latch[asic3_reg] = data << 1;
@@ -421,7 +421,7 @@ WRITE16_HANDLER( pgm_asic3_w )
 
 WRITE16_HANDLER( pgm_asic3_reg_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		asic3_reg = data & 0xff;
 }
 

@@ -415,15 +415,15 @@ static void chcolor(pen_t color, UINT16 data)
 static WRITE32_HANDLER(pal32_w)
 {
 	COMBINE_DATA(paletteram32+offset);
-	if(ACCESSING_LSW32)
+	if(ACCESSING_WORD_0)
 		chcolor(offset*2, paletteram32[offset]);
-	if(ACCESSING_MSW32)
+	if(ACCESSING_WORD_1)
 		chcolor(offset*2+1, paletteram32[offset]>>16);
 }
 
 static WRITE32_HANDLER(ctrl0_w)
 {
-	if(!(mem_mask & 0x000000ff)) {
+	if(ACCESSING_BYTE_0) {
 		model2_ctrlmode = data & 0x01;
 		EEPROM_write_bit(data & 0x20);
 		EEPROM_set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -942,7 +942,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 
 static WRITE32_HANDLER( model2_serial_w )
 {
-	if (((mem_mask & 0xff) == 0) && (offset == 0))
+	if (ACCESSING_BYTE_0 && (offset == 0))
 	{
 		SCSP_MidiIn(machine, 0, data&0xff, 0);
 

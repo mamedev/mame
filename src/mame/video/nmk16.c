@@ -297,7 +297,7 @@ WRITE16_HANDLER( bioshipbg_scroll_w )
 {
 	static UINT8 scroll[4];
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		scroll[offset] = (data >> 8) & 0xff;
 
@@ -310,7 +310,7 @@ WRITE16_HANDLER( bioshipbg_scroll_w )
 
 WRITE16_HANDLER( nmk_scroll_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static UINT8 scroll[4];
 
@@ -325,7 +325,7 @@ WRITE16_HANDLER( nmk_scroll_w )
 
 WRITE16_HANDLER( nmk_scroll_2_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static UINT8 scroll[4];
 
@@ -369,13 +369,13 @@ WRITE16_HANDLER( manybloc_scroll_w )
 
 WRITE16_HANDLER( nmk_flipscreen_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		flip_screen_set(data & 0x01);
 }
 
 WRITE16_HANDLER( nmk_tilebank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (bgbank != (data & 0xff))
 		{
@@ -387,13 +387,13 @@ WRITE16_HANDLER( nmk_tilebank_w )
 
 WRITE16_HANDLER( bioship_scroll_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		bioship_scroll[offset]=data>>8;
 }
 
 WRITE16_HANDLER( bioship_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (bioship_background_bank != data)
 		{

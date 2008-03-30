@@ -428,7 +428,7 @@ WRITE8_HANDLER( K053260_1_w )
 
 WRITE16_HANDLER( K053260_0_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K053260_0_w (machine, offset, data & 0xff);
 }
 
@@ -439,7 +439,7 @@ READ16_HANDLER( K053260_0_lsb_r )
 
 WRITE16_HANDLER( K053260_1_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K053260_1_w (machine, offset, data & 0xff);
 }
 

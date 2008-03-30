@@ -206,13 +206,13 @@ static WRITE32_HANDLER( latch_w )
     */
 
 	/* upper byte */
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		/* bits 13-11 are the MO control bits */
 		atarirle_control_w(0, (data >> 27) & 7);
 	}
 
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 //      cage_reset_w(data & 0x00100000);
 		coin_counter_w(0, data & 0x00080000);
@@ -224,7 +224,7 @@ static WRITE32_HANDLER( latch_w )
 static WRITE32_HANDLER( mo_command_w )
 {
 	COMBINE_DATA(mo_command);
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 		atarirle_command_w(0, ((data & 0xffff) == 2) ? ATARIRLE_COMMAND_CHECKSUM : ATARIRLE_COMMAND_DRAW);
 }
 
@@ -246,9 +246,9 @@ static READ32_HANDLER( sound_data_r )
 {
 	UINT32 result = 0;
 
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 		result |= cage_control_r();
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 		result |= main_from_cage_r() << 16;
 	return result;
 }
@@ -256,9 +256,9 @@ static READ32_HANDLER( sound_data_r )
 
 static WRITE32_HANDLER( sound_data_w )
 {
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 		cage_control_w(data);
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 		main_to_cage_w(data >> 16);
 }
 
@@ -568,13 +568,13 @@ static READ32_HANDLER( colorram_protection_r )
 	UINT32 result32 = 0;
 	UINT16 result;
 
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 	{
 		result = atarigt_colorram_r(address);
 		(*protection_r)(address, &result);
 		result32 |= result << 16;
 	}
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 	{
 		result = atarigt_colorram_r(address + 2);
 		(*protection_r)(address + 2, &result);
@@ -589,13 +589,13 @@ static WRITE32_HANDLER( colorram_protection_w )
 {
 	offs_t address = 0xd80000 + offset * 4;
 
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 	{
 		if (!ignore_writes)
 			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
 		(*protection_w)(address, data >> 16);
 	}
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 	{
 		if (!ignore_writes)
 			atarigt_colorram_w(address + 2, data, mem_mask);

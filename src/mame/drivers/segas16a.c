@@ -297,7 +297,7 @@ static WRITE16_HANDLER( standard_io_w )
 		case 0x0000/2:
 			/* the port C handshaking signals control the Z80 NMI, */
 			/* so we have to sync whenever we access this PPI */
-			if (ACCESSING_LSB)
+			if (ACCESSING_BYTE_0)
 				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 			return;
 	}

@@ -166,7 +166,7 @@ static READ16_HANDLER( hangon_io_r )
 
 static WRITE16_HANDLER( hangon_io_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		switch (offset & 0x3020/2)
 		{
 			case 0x0000/2: /* PPI @ 4B */
@@ -212,7 +212,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 static WRITE16_HANDLER( sharrier_io_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		switch (offset & 0x0030/2)
 		{
 			case 0x0000/2:

@@ -121,7 +121,7 @@ static WRITE32_HANDLER( flash_w )
 
 			// write game settings
 
-			if(ACCESSING_LSW32)
+			if(ACCESSING_WORD_0)
 				rom[BYTE_XOR_BE(offset*2 + 1)] = data & 0xffff;
 			else
 				rom[BYTE_XOR_BE(offset*2 + 0)] = (data & 0xffff0000) >> 16;

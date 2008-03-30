@@ -732,25 +732,25 @@ static WRITE32_HANDLER( skns_io_w )
 {
 	switch(offset) {
 	case 2:
-		if(((mem_mask & 0xff000000) == 0))
+		if(ACCESSING_BYTE_3)
 		{ /* Coin Lock/Count */
 //          coin_counter_w(0, data & 0x01000000);
 //          coin_counter_w(1, data & 0x02000000);
 //          coin_lockout_w(0, ~data & 0x04000000);
 //          coin_lockout_w(1, ~data & 0x08000000); // Works in puzzloop, others behave strange.
 		}
-		if(((mem_mask & 0x00ff0000) == 0))
+		if(ACCESSING_BYTE_2)
 		{ /* Analogue Input Select */
 		}
-		if(((mem_mask & 0x0000ff00) == 0))
+		if(ACCESSING_BYTE_1)
 		{ /* Extended Output - Port A, Mahjong inputs, Comms etc. */
 		}
-		if(((mem_mask & 0x000000ff) == 0))
+		if(ACCESSING_BYTE_0)
 		{ /* Extended Output - Port B */
 		}
 	break;
 	case 3:
-		if(((mem_mask & 0x0000ff00) == 0))
+		if(ACCESSING_BYTE_1)
 		{ /* Interrupt Clear, do we need these? */
 /*          if(data&0x01)
                 cpunum_set_input_line(Machine, 0,1,CLEAR_LINE);
@@ -852,9 +852,9 @@ static WRITE32_HANDLER( skns_v3t_w )
 
 static WRITE32_HANDLER( skns_ymz280_w )
 {
-	if ((mem_mask & 0xff000000) == 0)
+	if (ACCESSING_BYTE_3)
 		YMZ280B_register_0_w(machine,offset,(data >> 24) & 0xff);
-	if ((mem_mask & 0x00ff0000) == 0)
+	if (ACCESSING_BYTE_2)
 		YMZ280B_data_0_w(machine,offset,(data >> 16) & 0xff);
 }
 

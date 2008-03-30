@@ -60,12 +60,12 @@ static int tile_bank;
 
 WRITE16_HANDLER( powerins_flipscreen_w )
 {
-	if (ACCESSING_LSB)	flip_screen_set( data & 1 );
+	if (ACCESSING_BYTE_0)	flip_screen_set( data & 1 );
 }
 
 WRITE16_HANDLER( powerins_tilebank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (data != tile_bank)
 		{

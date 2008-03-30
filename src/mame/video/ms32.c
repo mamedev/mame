@@ -220,7 +220,7 @@ WRITE32_HANDLER( ms32_priram_w )
 
 WRITE32_HANDLER( ms32_gfxctrl_w )
 {
-	if (ACCESSING_LSB32)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 1 = flip screen */
 		flipscreen = data & 0x02;

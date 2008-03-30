@@ -55,25 +55,25 @@ static READ16_HANDLER( K051316_rom_1_msb_r )
 
 static WRITE16_HANDLER( K051316_0_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K051316_0_w(machine,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_1_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K051316_1_w(machine,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_ctrl_0_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K051316_ctrl_0_w(machine,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_ctrl_1_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K051316_ctrl_1_w(machine,offset,data >> 8);
 }
 
@@ -137,7 +137,7 @@ static READ16_HANDLER( eeprom_r )
 static WRITE16_HANDLER( eeprom_w )
 {
 //logerror("%06x: write %04x to eeprom_w\n",activecpu_get_pc(),data);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
@@ -172,7 +172,7 @@ static MACHINE_RESET( overdriv )
 
 static WRITE16_HANDLER( cpuA_ctrl_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0 probably enables the second 68000 */
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -199,7 +199,7 @@ static WRITE16_HANDLER( cpuB_ctrl_w )
 {
 	COMBINE_DATA(&cpuB_ctrl);
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0 = enable sprite ROM reading */
 		K053246_set_OBJCHA_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);

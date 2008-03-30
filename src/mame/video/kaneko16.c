@@ -694,7 +694,7 @@ WRITE16_HANDLER( kaneko16_sprites_regs_w )
 	switch (offset)
 	{
 		case 0:
-			if (ACCESSING_LSB)
+			if (ACCESSING_BYTE_0)
 			{
 				kaneko16_sprite_flipx = new_data & 2;
 				kaneko16_sprite_flipy = new_data & 1;

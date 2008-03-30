@@ -101,7 +101,7 @@ static INTERRUPT_GEN( nemesis_interrupt )
 
 static WRITE16_HANDLER( salamand_soundlatch_word_w )
 {
-	if(ACCESSING_LSB) {
+	if(ACCESSING_BYTE_0) {
 		soundlatch_w(machine,offset,data & 0xff);
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
@@ -141,7 +141,7 @@ static INTERRUPT_GEN( gx400_interrupt )
 
 static WRITE16_HANDLER( gx400_irq1_enable_word_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		irq1_on = data & 0x0001;
 /*  else
 logerror("irq1en = %08x\n",data);*/
@@ -149,7 +149,7 @@ logerror("irq1en = %08x\n",data);*/
 
 static WRITE16_HANDLER( gx400_irq2_enable_word_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		irq2_on = data & 0x0001;
 /*  else
 logerror("irq2en = %08x\n",data);*/
@@ -157,7 +157,7 @@ logerror("irq2en = %08x\n",data);*/
 
 static WRITE16_HANDLER( gx400_irq4_enable_word_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		irq4_on = data & 0x0100;
 /*  else
 logerror("irq4en = %08x\n",data);*/
@@ -172,7 +172,7 @@ static READ16_HANDLER( gx400_sharedram_word_r )
 
 static WRITE16_HANDLER( gx400_sharedram_word_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		gx400_shared_ram[offset] = data;
 }
 
@@ -192,19 +192,19 @@ static INTERRUPT_GEN( blkpnthr_interrupt )
 
 static WRITE16_HANDLER( nemesis_irq_enable_word_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		irq_on = data & 0xff;
 }
 
 static WRITE16_HANDLER( konamigt_irq_enable_word_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		irq_on = data & 0xff;
 }
 
 static WRITE16_HANDLER( konamigt_irq2_enable_word_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		irq2_on = data & 0xff;
 }
 
@@ -238,7 +238,7 @@ static UINT16 hcrash_selected_ip;
 
 static WRITE16_HANDLER( selected_ip_w )
 {
-	if (ACCESSING_LSB) hcrash_selected_ip = data & 0xff;	// latch the value
+	if (ACCESSING_BYTE_0) hcrash_selected_ip = data & 0xff;	// latch the value
 }
 
 static READ16_HANDLER( selected_ip_r )
@@ -256,7 +256,7 @@ static READ16_HANDLER( selected_ip_r )
 
 static WRITE16_HANDLER( nemesis_soundlatch_word_w )
 {
-	if(ACCESSING_LSB) {
+	if(ACCESSING_BYTE_0) {
 		soundlatch_w(machine,offset,data & 0xff);
 	}
 }

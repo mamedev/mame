@@ -249,7 +249,7 @@ READ16_HANDLER( tlc34076_lsb_r )
 
 WRITE16_HANDLER( tlc34076_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		tlc34076_w(machine, offset, data);
 }
 
@@ -260,7 +260,7 @@ READ16_HANDLER( tlc34076_msb_r )
 
 WRITE16_HANDLER( tlc34076_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		tlc34076_w(machine, offset, data >> 8);
 }
 

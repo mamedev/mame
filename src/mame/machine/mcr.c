@@ -902,14 +902,14 @@ static READ16_HANDLER( mcr68_6840_r_common )
 
 WRITE16_HANDLER( mcr68_6840_upper_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		mcr68_6840_w_common(machine, offset, (data >> 8) & 0xff);
 }
 
 
 WRITE16_HANDLER( mcr68_6840_lower_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		mcr68_6840_w_common(machine, offset, data & 0xff);
 }
 

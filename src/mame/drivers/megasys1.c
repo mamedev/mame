@@ -3859,12 +3859,12 @@ static DRIVER_INIT( iganinju )
 
 static WRITE16_HANDLER( OKIM6295_data_0_both_w )
 {
-	if (ACCESSING_LSB)	OKIM6295_data_0_w(machine, 0, (data >> 0) & 0xff );
+	if (ACCESSING_BYTE_0)	OKIM6295_data_0_w(machine, 0, (data >> 0) & 0xff );
 	else				OKIM6295_data_0_w(machine, 0, (data >> 8) & 0xff );
 }
 static WRITE16_HANDLER( OKIM6295_data_1_both_w )
 {
-	if (ACCESSING_LSB)	OKIM6295_data_1_w(machine, 0, (data >> 0) & 0xff );
+	if (ACCESSING_BYTE_0)	OKIM6295_data_1_w(machine, 0, (data >> 0) & 0xff );
 	else				OKIM6295_data_1_w(machine, 0, (data >> 8) & 0xff );
 }
 

@@ -94,7 +94,7 @@ WRITE16_HANDLER( raiden_control_w )
 	/* All other bits unknown - could be playfield enables */
 
 	/* Flipscreen */
-	if (offset==3 && ACCESSING_LSB) {
+	if (offset==3 && ACCESSING_BYTE_0) {
 		flipscreen=data&0x2;
 		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}

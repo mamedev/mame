@@ -105,7 +105,7 @@ READ16_HANDLER( rocknms_sub_priority_r )
 
 WRITE16_HANDLER( tetrisp2_priority_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		data |= ((data & 0xff00) >> 8);
 		tetrisp2_priority[offset] = data;
@@ -115,7 +115,7 @@ WRITE16_HANDLER( tetrisp2_priority_w )
 
 WRITE16_HANDLER( rockn_priority_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		tetrisp2_priority[offset] = data;
 	}
@@ -123,7 +123,7 @@ WRITE16_HANDLER( rockn_priority_w )
 
 WRITE16_HANDLER( rocknms_sub_priority_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		rocknms_sub_priority[offset] = data;
 	}

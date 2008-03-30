@@ -419,7 +419,7 @@ static READ32_HANDLER ( jc_control_r )
 	{
 		case 0x0:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				r |= ((readinputport(0) & 0x2) << 2) << 24;
 			}
@@ -427,7 +427,7 @@ static READ32_HANDLER ( jc_control_r )
 		}
 		case 0x1:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				UINT32 data = EEPROM_read_bit() & 1;
 				data |= readinputport(0) & 0xfe;
@@ -437,7 +437,7 @@ static READ32_HANDLER ( jc_control_r )
 		}
 		case 0x2:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				r |= readinputport(1) << 24;
 			}
@@ -445,7 +445,7 @@ static READ32_HANDLER ( jc_control_r )
 		}
 		case 0x3:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				r |= readinputport(2) << 24;
 			}
@@ -453,7 +453,7 @@ static READ32_HANDLER ( jc_control_r )
 		}
 		case 0x4:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				//r |= (mame_rand(Machine) & 0xff) << 24;
 			}
@@ -461,7 +461,7 @@ static READ32_HANDLER ( jc_control_r )
 		}
 		case 0x7:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				r |= readinputport(3) << 24;
 			}
@@ -483,7 +483,7 @@ static WRITE32_HANDLER ( jc_control_w )
 	{
 		case 0x3:
 		{
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 			{
 				EEPROM_set_clock_line(((data >> 24) & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 				EEPROM_write_bit(((data >> 24) & 0x04) ? 1 : 0);
@@ -562,19 +562,19 @@ static READ32_HANDLER(mcu_comm_r)
 	UINT32 r = 0;
 	int reg = offset * 4;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		r |= mcu_comm_reg_r(reg + 0) << 24;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		r |= mcu_comm_reg_r(reg + 1) << 16;
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		r |= mcu_comm_reg_r(reg + 2) << 8;
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		r |= mcu_comm_reg_r(reg + 3) << 0;
 	}
@@ -586,19 +586,19 @@ static WRITE32_HANDLER(mcu_comm_w)
 {
 	int reg = offset * 4;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		mcu_comm_reg_w(reg + 0, (data >> 24) & 0xff);
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		mcu_comm_reg_w(reg + 1, (data >> 16) & 0xff);
 	}
-	if (!(mem_mask & 0x0000ff00))
+	if (ACCESSING_BYTE_1)
 	{
 		mcu_comm_reg_w(reg + 2, (data >> 8) & 0xff);
 	}
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		mcu_comm_reg_w(reg + 3, (data >> 0) & 0xff);
 	}
@@ -752,12 +752,12 @@ static int first_dsp_reset = 1;
 static WRITE32_HANDLER(dsp_shared_w)
 {
 	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, activecpu_get_pc());
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		dsp_shared_ram[offset] &= 0x00ff;
 		dsp_shared_ram[offset] |= (data >> 16) & 0xff00;
 	}
-	if (!(mem_mask & 0x00ff0000))
+	if (ACCESSING_BYTE_2)
 	{
 		dsp_shared_ram[offset] &= 0xff00;
 		dsp_shared_ram[offset] |= (data >> 16) & 0x00ff;

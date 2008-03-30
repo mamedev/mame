@@ -123,7 +123,7 @@ void m72_ym2151_irq_handler(int irq)
 
 WRITE16_HANDLER( m72_sound_command_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine,offset,data);
 		timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);

@@ -25,9 +25,9 @@ static UINT16 *taotaido_spriteram2_old, *taotaido_spriteram2_older;
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
 WRITE16_HANDLER( taotaido_sprite_character_bank_select_w )
 {
-	if(ACCESSING_MSB)
+	if(ACCESSING_BYTE_1)
 		taotaido_sprite_character_bank_select[offset*2] = data >> 8;
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		taotaido_sprite_character_bank_select[offset*2+1] = data &0xff;
 }
 
@@ -153,9 +153,9 @@ WRITE16_HANDLER( taotaido_tileregs_w )
 		case 5:
 		case 6:
 		case 7:
-			if(ACCESSING_MSB)
+			if(ACCESSING_BYTE_1)
 				taotaido_video_bank_select[(offset-4)*2] = data >> 8;
-			if(ACCESSING_LSB)
+			if(ACCESSING_BYTE_0)
 				taotaido_video_bank_select[(offset-4)*2+1] = data &0xff;
 				tilemap_mark_all_tiles_dirty(bg_tilemap);
 			break;

@@ -226,7 +226,7 @@ static READ32_HANDLER(dreamwld_6295_0_r)
 
 static WRITE32_HANDLER(dreamwld_6295_0_w)
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		OKIM6295_data_0_w(machine, 0, (data>>24) & 0xff);
 	}
@@ -248,7 +248,7 @@ static void dreamwld_oki_setbank( UINT8 chip, UINT8 bank )
 
 static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 {
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		dreamwld_oki_setbank(0,data&0x3);
 	}
@@ -265,7 +265,7 @@ static READ32_HANDLER(dreamwld_6295_1_r)
 
 static WRITE32_HANDLER(dreamwld_6295_1_w)
 {
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		OKIM6295_data_1_w(machine, 0, (data>>24) & 0xff);
 	}
@@ -277,7 +277,7 @@ static WRITE32_HANDLER(dreamwld_6295_1_w)
 
 static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 {
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		dreamwld_oki_setbank(1,data&0x3);
 	}

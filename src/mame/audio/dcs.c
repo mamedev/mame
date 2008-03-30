@@ -1411,13 +1411,13 @@ WRITE32_HANDLER( dsio_idma_data_w )
 {
 	UINT32 pc = activecpu_get_pc();
 	cpuintrf_push_context(dcs.cpunum);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 	{
 		if (LOG_DCS_TRANSFERS)
 			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(), data & 0xffff);
 		adsp2181_idma_data_w(data & 0xffff);
 	}
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 	{
 		if (LOG_DCS_TRANSFERS)
 			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(), data >> 16);

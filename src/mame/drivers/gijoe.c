@@ -115,7 +115,7 @@ static READ16_HANDLER( control2_r )
 
 static WRITE16_HANDLER( control2_w )
 {
-	if(ACCESSING_LSB) {
+	if(ACCESSING_BYTE_0) {
 		/* bit 0  is data */
 		/* bit 1  is cs (active low) */
 		/* bit 2  is clock (active high) */
@@ -183,7 +183,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
-	if(ACCESSING_LSB) {
+	if(ACCESSING_BYTE_0) {
 		data &= 0xff;
 		soundlatch_w(machine, 0, data);
 	}

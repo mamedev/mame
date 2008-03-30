@@ -108,10 +108,10 @@ static WRITE16_HANDLER( guab_tms34061_w )
 	else
 		col = offset <<= 1;
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		tms34061_w(col, row, func, data >> 8);
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		tms34061_w(col | 1, row, func, data & 0xff);
 }
 
@@ -128,10 +128,10 @@ static READ16_HANDLER( guab_tms34061_r )
 	else
 		col = offset <<= 1;
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		data |= tms34061_r(col, row, func) << 8;
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		data |= tms34061_r(col | 1, row, func);
 
 	return data;

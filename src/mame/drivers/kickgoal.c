@@ -163,7 +163,7 @@ static void kickgoal_play(int melody, int data)
 
 WRITE16_HANDLER( kickgoal_snd_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		logerror("PC:%06x Writing %04x to Sound CPU\n",activecpu_get_previouspc(),data);
 		if (data >= 0x40) {
@@ -218,7 +218,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 {
 	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",activecpu_get_previouspc(),data,mem_mask);
 
-	if (!ACCESSING_LSB) data >>= 8;
+	if (!ACCESSING_BYTE_0) data >>= 8;
 
 	switch (data)
 	{
@@ -465,7 +465,7 @@ static NVRAM_HANDLER( kickgoal )
 
 static READ16_HANDLER( kickgoal_eeprom_r )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		return EEPROM_read_bit();
 	}
@@ -475,7 +475,7 @@ static READ16_HANDLER( kickgoal_eeprom_r )
 
 static WRITE16_HANDLER( kickgoal_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		switch (offset)
 		{

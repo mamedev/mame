@@ -183,7 +183,7 @@ static READ16_HANDLER( amazon_protection_r )
 
 static WRITE16_HANDLER( amazon_protection_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 	{
 		if( offset==1 )
 		{

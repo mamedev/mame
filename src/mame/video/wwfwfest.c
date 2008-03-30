@@ -24,9 +24,9 @@ static int sprite_xoff, bg0_dx, bg1_dx[2];
 WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
 {
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place */
-	if (ACCESSING_MSB && ACCESSING_LSB) {
+	if (ACCESSING_BYTE_1 && ACCESSING_BYTE_0) {
 		COMBINE_DATA(&wwfwfest_fg0_videoram[offset]);
-	} else if (ACCESSING_MSB) {
+	} else if (ACCESSING_BYTE_1) {
 		wwfwfest_fg0_videoram[offset]=(data>>8)&0xff;
 	} else {
 		wwfwfest_fg0_videoram[offset]=data&0xff;

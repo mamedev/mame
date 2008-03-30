@@ -560,7 +560,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 	}
 
 	/* call through based on the sound type */
-	if (ACCESSING_LSB && ACCESSING_MSB)
+	if (ACCESSING_BYTE_0 && ACCESSING_BYTE_1)
 		switch (chip_type)
 		{
 			case SOUND_NARC:

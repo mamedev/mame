@@ -1106,7 +1106,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
 	{
-		if (!ACCESSING_MSB)
+		if (!ACCESSING_BYTE_1)
 			return;
 		which = 1;
 		data >>= 8;
@@ -1115,7 +1115,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	/* offsets 0800-0fff reference CIA A, and are accessed via the LSB */
 	else
 	{
-		if (!ACCESSING_LSB)
+		if (!ACCESSING_BYTE_0)
 			return;
 		which = 0;
 		data &= 0xff;
@@ -1737,7 +1737,7 @@ WRITE16_HANDLER( amiga_autoconfig_w )
 	logerror("autoconfig_w(%02X) = %04X & %04X\n", offset, data, mem_mask ^ 0xffff);
 
 	/* if no current device, bail */
-	if (!cur_autoconfig || !ACCESSING_MSB)
+	if (!cur_autoconfig || !ACCESSING_BYTE_1)
 		return;
 
 	/* switch off of the base offset */

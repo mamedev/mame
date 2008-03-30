@@ -159,7 +159,7 @@ static READ32_HANDLER( namcofl_sysreg_r )
 
 static WRITE32_HANDLER( namcofl_sysreg_w )
 {
-	if ((offset == 2) && !(mem_mask & 0xff))  // address space configuration
+	if ((offset == 2) && ACCESSING_BYTE_0)  // address space configuration
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
@@ -178,7 +178,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 
-	if ((offset == 0x1808/4) && ACCESSING_MSW32)
+	if ((offset == 0x1808/4) && ACCESSING_WORD_1)
 	{
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);

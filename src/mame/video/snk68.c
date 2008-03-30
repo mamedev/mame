@@ -107,7 +107,7 @@ VIDEO_START( ikari3 )
 
 WRITE16_HANDLER( pow_flipscreen16_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 	    flip_screen_set(data & 0x08);
 	    sprite_flip=data&0x4;

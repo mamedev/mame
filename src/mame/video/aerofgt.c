@@ -193,7 +193,7 @@ static void setbank(tilemap *tmap,int num,int bank)
 
 WRITE16_HANDLER( pspikes_gfxbank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		setbank(bg1_tilemap,0,(data & 0xf0) >> 4);
 		setbank(bg1_tilemap,1,data & 0x0f);
@@ -210,7 +210,7 @@ WRITE16_HANDLER( pspikesb_gfxbank_w )
 
 WRITE16_HANDLER( karatblz_gfxbank_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		setbank(bg1_tilemap,0,(data & 0x0100) >> 8);
 		setbank(bg2_tilemap,1,(data & 0x0800) >> 11);
@@ -219,7 +219,7 @@ WRITE16_HANDLER( karatblz_gfxbank_w )
 
 WRITE16_HANDLER( spinlbrk_gfxbank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		setbank(bg1_tilemap,0,(data & 0x07));
 		setbank(bg2_tilemap,1,(data & 0x38) >> 3);
@@ -272,7 +272,7 @@ WRITE16_HANDLER( aerofgt_bg2scrolly_w )
 
 WRITE16_HANDLER( pspikes_palette_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		spritepalettebank = data & 0x03;
 		if (charpalettebank != (data & 0x1c) >> 2)

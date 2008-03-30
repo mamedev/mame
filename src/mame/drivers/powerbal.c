@@ -68,7 +68,7 @@ static READ16_HANDLER( magicstk_port2_r )
 
 static WRITE16_HANDLER( magicstk_coin_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		coin_counter_w(0,data & 0x20);
 

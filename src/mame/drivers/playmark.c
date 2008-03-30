@@ -81,7 +81,7 @@ VIDEO_UPDATE( hrdtimes );
 
 static WRITE16_HANDLER( coinctrl_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_counter_w(0,data & 0x0100);
 		coin_counter_w(1,data & 0x0200);
@@ -151,7 +151,7 @@ static READ16_HANDLER( hotmind_port2_r )
 
 static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bits 0-3 are coin counters? (only 0 used?) */
 		coin_counter_w(0,data & 0x01);
@@ -168,7 +168,7 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 
 static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		coin_counter_w(0,data & 0x20);
 
@@ -186,7 +186,7 @@ static WRITE16_HANDLER( hrdtimes_coin_w )
 
 static WRITE16_HANDLER( playmark_snd_command_w )
 {
-	if (ACCESSING_LSB) {
+	if (ACCESSING_BYTE_0) {
 		playmark_snd_command = (data & 0xff);
 		playmark_snd_flag = 1;
 		cpu_yield();

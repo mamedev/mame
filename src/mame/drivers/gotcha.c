@@ -97,7 +97,7 @@ static WRITE16_HANDLER( gotcha_lamps_w )
 
 static WRITE16_HANDLER( gotcha_oki_bank_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		OKIM6295_set_bank_base(0,(((~data & 0x0100) >> 8) * 0x40000));
 	}

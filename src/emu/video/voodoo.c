@@ -3164,9 +3164,9 @@ static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask,
 	y = (offset >> v->fbi.lfb_stride) & ((1 << v->fbi.lfb_stride) - 1);
 
 	/* adjust the mask based on which half of the data is written */
-	if ((mem_mask & 0x0000ffff) == 0x0000ffff)
+	if (!ACCESSING_WORD_0)
 		mask &= ~(0x0f - LFB_DEPTH_PRESENT_MSW);
-	if ((mem_mask & 0xffff0000) == 0xffff0000)
+	if (!ACCESSING_WORD_1)
 		mask &= ~(0xf0 + LFB_DEPTH_PRESENT_MSW);
 
 	/* select the target buffer */
@@ -3688,9 +3688,9 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 	/* modify the offset based on the mem_mask */
 	if (mem_mask)
 	{
-		if (mem_mask & 0xffff0000)
+		if (!ACCESSING_WORD_1)
 			offset |= 0x80000000;
-		if (mem_mask & 0x0000ffff)
+		if (!ACCESSING_WORD_0)
 			offset |= 0x40000000;
 	}
 
@@ -4268,13 +4268,13 @@ static UINT32 banshee_io_r(voodoo_state *v, offs_t offset, UINT32 mem_mask)
 		case io_vgac0:	case io_vgac4:	case io_vgac8:	case io_vgacc:
 		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
 			result = 0;
-			if (!(mem_mask & 0x000000ff))
+			if (ACCESSING_BYTE_0)
 				result |= banshee_vga_r(v, offset*4+0) << 0;
-			if (!(mem_mask & 0x0000ff00))
+			if (ACCESSING_BYTE_1)
 				result |= banshee_vga_r(v, offset*4+1) << 8;
-			if (!(mem_mask & 0x00ff0000))
+			if (ACCESSING_BYTE_2)
 				result |= banshee_vga_r(v, offset*4+2) << 16;
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 				result |= banshee_vga_r(v, offset*4+3) << 24;
 			break;
 
@@ -4563,13 +4563,13 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 		case io_vgab0:	case io_vgab4:	case io_vgab8:	case io_vgabc:
 		case io_vgac0:	case io_vgac4:	case io_vgac8:	case io_vgacc:
 		case io_vgad0:	case io_vgad4:	case io_vgad8:	case io_vgadc:
-			if (!(mem_mask & 0x000000ff))
+			if (ACCESSING_BYTE_0)
 				banshee_vga_w(v, offset*4+0, data >> 0);
-			if (!(mem_mask & 0x0000ff00))
+			if (ACCESSING_BYTE_1)
 				banshee_vga_w(v, offset*4+1, data >> 8);
-			if (!(mem_mask & 0x00ff0000))
+			if (ACCESSING_BYTE_2)
 				banshee_vga_w(v, offset*4+2, data >> 16);
-			if (!(mem_mask & 0xff000000))
+			if (ACCESSING_BYTE_3)
 				banshee_vga_w(v, offset*4+3, data >> 24);
 			break;
 

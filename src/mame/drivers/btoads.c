@@ -77,7 +77,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE16_HANDLER( main_sound_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
 

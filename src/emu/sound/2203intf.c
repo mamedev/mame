@@ -233,62 +233,62 @@ READ16_HANDLER( YM2203_read_port_4_lsb_r ) { struct ym2203_info *info = sndti_to
 WRITE16_HANDLER( YM2203_control_port_0_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 0);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,0,data);
 }
 WRITE16_HANDLER( YM2203_control_port_1_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 1);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,0,data);
 }
 WRITE16_HANDLER( YM2203_control_port_2_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 2);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,0,data);
 }
 WRITE16_HANDLER( YM2203_control_port_3_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 3);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,0,data);
 }
 WRITE16_HANDLER( YM2203_control_port_4_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 4);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,0,data);
 }
 
 WRITE16_HANDLER( YM2203_write_port_0_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 0);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,1,data);
 }
 WRITE16_HANDLER( YM2203_write_port_1_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 1);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,1,data);
 }
 WRITE16_HANDLER( YM2203_write_port_2_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 2);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,1,data);
 }
 WRITE16_HANDLER( YM2203_write_port_3_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 3);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,1,data);
 }
 WRITE16_HANDLER( YM2203_write_port_4_lsb_w )
 {
 	struct ym2203_info *info = sndti_token(SOUND_YM2203, 4);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		YM2203Write(info->chip,1,data);
 }
 

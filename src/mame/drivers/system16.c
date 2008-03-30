@@ -209,7 +209,7 @@ static UINT16 coinctrl;
 
 static WRITE16_HANDLER( sys16_3d_coinctrl_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 {
 		coinctrl = data&0xff;
 		sys16_refreshenable = coinctrl & 0x10;
@@ -409,7 +409,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 {
 		soundlatch_w( machine,0,data&0xff );
 		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
@@ -418,7 +418,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( sound_command_nmi_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 {
 		soundlatch_w( machine,0,data&0xff );
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
@@ -430,7 +430,7 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 
 static WRITE16_HANDLER( sys16_coinctrl_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 {
 		coinctrl = data&0xff;
 		sys16_refreshenable = coinctrl & 0x20;
@@ -502,7 +502,7 @@ MACHINE_DRIVER_END
 
 static WRITE16_HANDLER( sys16_tilebank_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		switch(offset & 1)
 		{
@@ -891,7 +891,7 @@ static int eswat_tilebank0;
 
 static WRITE16_HANDLER( eswat_tilebank0_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 	{
 		eswat_tilebank0 = data&0xff;
 	}
@@ -1228,7 +1228,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( ga_sound_command_w )
 {
 	COMBINE_DATA( &sys16_workingram[(0xecfc-0xc000)/2] );
-	if( ACCESSING_MSB )
+	if( ACCESSING_BYTE_1 )
 {
 		soundlatch_w( machine,0,data>>8 );
 		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );

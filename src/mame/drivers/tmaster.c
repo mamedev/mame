@@ -46,14 +46,14 @@ To Do:
 static int okibank;
 static WRITE16_HANDLER( tmaster_oki_bank_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		// data & 0x0800?
 		okibank = ((data >> 8) & 3);
 		OKIM6295_set_bank_base(0, okibank * 0x40000);
 	}
 
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		// data & 0x0002?
 	}
@@ -76,7 +76,7 @@ static void show_touchscreen(void)
 
 static WRITE16_HANDLER( tmaster_tscreen_reset_w )
 {
-	if (ACCESSING_LSB && data == 0x05)
+	if (ACCESSING_BYTE_0 && data == 0x05)
 	{
 		touchscreen = 0;
 		show_touchscreen();
@@ -419,7 +419,7 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 	if (data & ~0x0003)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_LSB )
+	if ( ACCESSING_BYTE_0 )
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x0001);
@@ -447,7 +447,7 @@ static UINT8 palette_data[3];
 
 static WRITE16_HANDLER( galgames_palette_offset_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		palette_offset = data & 0xff;
 		palette_index = 0;
@@ -455,7 +455,7 @@ static WRITE16_HANDLER( galgames_palette_offset_w )
 }
 static WRITE16_HANDLER( galgames_palette_data_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		palette_data[palette_index] = data & 0xff;
 		if (++palette_index == 3)
@@ -474,7 +474,7 @@ static READ16_HANDLER( galgames_okiram_r )
 }
 static WRITE16_HANDLER( galgames_okiram_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		memory_region(REGION_SOUND1)[offset] = data & 0xff;
 }
 
@@ -486,7 +486,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 	// cart selection (0 1 2 3 4 7)
 
 	// 7 resets the eeprom
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		EEPROM_set_cs_line(((data&0xff) == 0x07) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -497,7 +497,7 @@ static READ16_HANDLER( galgames_cart_clock_r )
 
 static WRITE16_HANDLER( galgames_cart_clock_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		// bit 3 = clock
 

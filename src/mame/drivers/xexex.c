@@ -252,7 +252,7 @@ static WRITE16_HANDLER( control2_w )
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
 		if (xexex_strip0x1a)
@@ -264,7 +264,7 @@ static WRITE16_HANDLER( sound_cmd1_w )
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		soundlatch2_w(machine, 0, data & 0xff);
 	}

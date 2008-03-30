@@ -194,7 +194,7 @@ static READ16_HANDLER( fromanc4_input_r )
 
 static WRITE16_HANDLER( fromanc2_eeprom_w )
 {
-	if (ACCESSING_MSB) {
+	if (ACCESSING_BYTE_1) {
 		// latch the bit
 		EEPROM_write_bit(data & 0x0100);
 
@@ -208,7 +208,7 @@ static WRITE16_HANDLER( fromanc2_eeprom_w )
 
 static WRITE16_HANDLER( fromancr_eeprom_w )
 {
-	if (ACCESSING_LSB) {
+	if (ACCESSING_BYTE_0) {
 		fromancr_gfxbank_w(data & 0xfff8);
 
 		// latch the bit
@@ -224,7 +224,7 @@ static WRITE16_HANDLER( fromancr_eeprom_w )
 
 static WRITE16_HANDLER( fromanc4_eeprom_w )
 {
-	if (ACCESSING_LSB) {
+	if (ACCESSING_BYTE_0) {
 		// latch the bit
 		EEPROM_write_bit(data & 0x0004);
 

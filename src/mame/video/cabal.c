@@ -54,7 +54,7 @@ VIDEO_START( cabal )
 
 WRITE16_HANDLER( cabal_flipscreen_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		int flip = (data & 0x20) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
 		tilemap_set_flip(background_layer,flip);

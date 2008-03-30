@@ -689,7 +689,7 @@ static READ16_HANDLER( fifoin_status_r )
 
 static WRITE16_HANDLER( bank_w )
 {
-	if(ACCESSING_LSB) {
+	if(ACCESSING_BYTE_0) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
 			memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x1000000 + 0x100000*((data >> 4) & 0xf));

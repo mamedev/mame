@@ -253,12 +253,12 @@ static WRITE16_HANDLER( pntnpuzl_palette_w )
 {
 	static int indx,sub,rgb[3];
 
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		indx = data >> 8;
 		sub = 0;
 	}
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		rgb[sub++] = data & 0xff;
 		if (sub == 3)

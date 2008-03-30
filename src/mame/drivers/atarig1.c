@@ -89,7 +89,7 @@ static MACHINE_RESET( atarig1 )
 
 static WRITE16_HANDLER( mo_control_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		atarirle_control_w(0, data & 7);
 }
 

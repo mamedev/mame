@@ -161,7 +161,7 @@ static INTERRUPT_GEN( galhustl_interrupt )
 
 static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		UINT8 *rom = memory_region(REGION_SOUND1);
 
@@ -174,7 +174,7 @@ static WRITE16_HANDLER( galpanic_6295_bankswitch_w )
 
 static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		UINT8 *rom = memory_region(REGION_SOUND1);
 
@@ -185,7 +185,7 @@ static WRITE16_HANDLER( galpania_6295_bankswitch_w )
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( galpania_misc_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		pandora_set_clear_bitmap( data & 0x0004 );
 	}
@@ -196,7 +196,7 @@ static WRITE16_HANDLER( galpania_misc_w )
 
 static WRITE16_HANDLER( galpanic_coin_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_counter_w(0, data & 0x100);
 		coin_counter_w(1, data & 0x200);

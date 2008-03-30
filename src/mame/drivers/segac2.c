@@ -192,7 +192,7 @@ static READ16_HANDLER( ym3438_r )
 static WRITE16_HANDLER( ym3438_w )
 {
 	/* only works if we're accessing the low byte */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		static UINT8 last_port;
 
@@ -222,7 +222,7 @@ static WRITE16_HANDLER( segac2_upd7759_w )
 		return;
 
 	/* only works if we're accessing the low byte */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		upd7759_port_w(0, data & 0xff);
 		upd7759_start_w(0, 0);
@@ -487,7 +487,7 @@ static WRITE16_HANDLER( io_chip_w )
 static WRITE16_HANDLER( control_w )
 {
 	/* skip if not LSB */
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 		return;
 	data &= 0x0f;
 
@@ -534,7 +534,7 @@ static WRITE16_HANDLER( prot_w )
 	int table_index;
 
 	/* only works for the LSB */
-	if (!ACCESSING_LSB)
+	if (!ACCESSING_BYTE_0)
 		return;
 
 	/* compute the table index */
@@ -575,7 +575,7 @@ static WRITE16_HANDLER( prot_w )
 static WRITE16_HANDLER( counter_timer_w )
 {
 	/* only LSB matters */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/*int value = data & 1;*/
 		switch (data & 0x1e)

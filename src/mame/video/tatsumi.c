@@ -155,9 +155,9 @@ WRITE16_HANDLER( cyclwarr_videoram1_w )
 
 WRITE16_HANDLER( roundup5_crt_w )
 {
-	if (offset==0 && ACCESSING_LSB)
+	if (offset==0 && ACCESSING_BYTE_0)
 		roundupt_crt_selected_reg=data&0x3f;
-	if (offset==1 && ACCESSING_LSB) {
+	if (offset==1 && ACCESSING_BYTE_0) {
 		roundupt_crt_reg[roundupt_crt_selected_reg]=data;
 //      if (roundupt_crt_selected_reg!=0xa && roundupt_crt_selected_reg!=0xb && roundupt_crt_selected_reg!=29)
 //      logerror("%08x:  Crt write %02x %02x\n",activecpu_get_pc(),roundupt_crt_selected_reg,data);

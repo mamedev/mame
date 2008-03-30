@@ -44,7 +44,7 @@ static READ16_HANDLER(galpani2_eeprom_r)
 static WRITE16_HANDLER(galpani2_eeprom_w)
 {
 	COMBINE_DATA( &eeprom_word );
-	if ( ACCESSING_LSB )
+	if ( ACCESSING_BYTE_0 )
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x02);
@@ -186,7 +186,7 @@ static WRITE16_HANDLER( galpani2_mcu_nmi_w )
 
 static WRITE16_HANDLER( galpani2_coin_lockout_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		coin_counter_w(0, data & 0x0100);
 		coin_counter_w(1, data & 0x0200);
@@ -200,7 +200,7 @@ static WRITE16_HANDLER( galpani2_coin_lockout_w )
 
 static WRITE16_HANDLER( galpani2_oki_0_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		UINT8 *ROM = memory_region(REGION_SOUND1);
 		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",activecpu_get_pc(),data);
@@ -210,7 +210,7 @@ static WRITE16_HANDLER( galpani2_oki_0_bank_w )
 
 static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		OKIM6295_set_bank_base(1, 0x40000 * (data & 0xf) );
 		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",activecpu_get_pc(),data);

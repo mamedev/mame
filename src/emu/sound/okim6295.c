@@ -604,37 +604,37 @@ WRITE8_HANDLER( OKIM6295_data_2_w )
 
 WRITE16_HANDLER( OKIM6295_data_0_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		OKIM6295_data_w(0, data & 0xff);
 }
 
 WRITE16_HANDLER( OKIM6295_data_1_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		OKIM6295_data_w(1, data & 0xff);
 }
 
 WRITE16_HANDLER( OKIM6295_data_2_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		OKIM6295_data_w(2, data & 0xff);
 }
 
 WRITE16_HANDLER( OKIM6295_data_0_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		OKIM6295_data_w(0, data >> 8);
 }
 
 WRITE16_HANDLER( OKIM6295_data_1_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		OKIM6295_data_w(1, data >> 8);
 }
 
 WRITE16_HANDLER( OKIM6295_data_2_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		OKIM6295_data_w(2, data >> 8);
 }
 

@@ -441,7 +441,7 @@ static WRITE16_HANDLER( jalmah_tilebank_w )
      ---- xxxx Priority number (trusted,see mjzoomin)
     */
 	//popmessage("Write to tilebank %02x",data);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (sc0bank != ((data & 0xf0) >> 4))
 		{
@@ -491,7 +491,7 @@ static UINT8 oki_rom,oki_bank;
 
 static WRITE16_HANDLER( jalmah_okirom_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		UINT8 *oki = memory_region(REGION_SOUND1);
 		oki_rom = data & 1;
@@ -505,7 +505,7 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 
 static WRITE16_HANDLER( jalmah_okibank_w )
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 	{
 		UINT8 *oki = memory_region(REGION_SOUND1);
 		oki_bank = data & 3;
@@ -1319,7 +1319,7 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 static WRITE16_HANDLER( urashima_mcu_w )
 {
-	if(ACCESSING_LSB && data)
+	if(ACCESSING_BYTE_0 && data)
 	{
 		//jm_regs[0x30e/2] = ?
 
@@ -1470,7 +1470,7 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 static WRITE16_HANDLER( daireika_mcu_w )
 {
-	if(ACCESSING_LSB && data)
+	if(ACCESSING_BYTE_0 && data)
 	{
 		/*MCU program upload complete/upload kind*/
 		//jm_regs[0x000e/2] = 0x0005;
@@ -1755,7 +1755,7 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
 static WRITE16_HANDLER( mjzoomin_mcu_w )
 {
-	if(ACCESSING_LSB && data)
+	if(ACCESSING_BYTE_0 && data)
 	{
 		/*******************************************************
         1st M68k code uploaded by the MCU(Service Mode PC=2a56).

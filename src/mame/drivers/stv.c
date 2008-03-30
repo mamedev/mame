@@ -769,10 +769,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(mem_mask & 0xff000000))	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
-	if (!(mem_mask & 0x00ff0000))	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
-	if (!(mem_mask & 0x0000ff00))	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
-	if (!(mem_mask & 0x000000ff))	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
+	if (ACCESSING_BYTE_3)	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
+	if (ACCESSING_BYTE_2)	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
+	if (ACCESSING_BYTE_1)	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
+	if (ACCESSING_BYTE_0)	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -785,10 +785,10 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 	/* registers are all byte accesses, convert here so we can use the data more easily later */
 	offset = offset << 2; // multiply offset by 4
 
-	if (!(mem_mask & 0xff000000))	{ byte = 0; writedata = data >> 24; }
-	if (!(mem_mask & 0x00ff0000))	{ byte = 1; writedata = data >> 16; }
-	if (!(mem_mask & 0x0000ff00))	{ byte = 2; writedata = data >> 8;  }
-	if (!(mem_mask & 0x000000ff))	{ byte = 3; writedata = data >> 0;  }
+	if (ACCESSING_BYTE_3)	{ byte = 0; writedata = data >> 24; }
+	if (ACCESSING_BYTE_2)	{ byte = 1; writedata = data >> 16; }
+	if (ACCESSING_BYTE_1)	{ byte = 2; writedata = data >> 8;  }
+	if (ACCESSING_BYTE_0)	{ byte = 3; writedata = data >> 0;  }
 
 	writedata &= 0xff;
 
@@ -942,9 +942,6 @@ static const UINT8 port_ad[] =
 
 static UINT8 port_sel,mux_data;
 
-#define HI_WORD_ACCESS (mem_mask & 0x00ff0000) == 0
-#define LO_WORD_ACCESS (mem_mask & 0x000000ff) == 0
-
 static READ32_HANDLER ( stv_io_r32 )
 {
 	static int i= -1;
@@ -1051,7 +1048,7 @@ static WRITE32_HANDLER ( stv_io_w32 )
 	switch(offset)
 	{
 		case 1:
-			if(LO_WORD_ACCESS)
+			if(ACCESSING_BYTE_0)
 			{
 				/*Why does the BIOS tests these as ACTIVE HIGH?A program bug?*/
 				ioga[1] = (data) & 0xff;
@@ -1065,24 +1062,24 @@ static WRITE32_HANDLER ( stv_io_w32 )
 			}
 		break;
 		case 2:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BYTE_2)
 			{
 				ioga[2] = data >> 16;
 				mux_data = ioga[2];
 			}
-			else if(LO_WORD_ACCESS)
+			else if(ACCESSING_BYTE_0)
 				ioga[2] = data;
 		break;
 		case 3:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BYTE_2)
 				ioga[3] = data;
 		break;
 		case 4:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BYTE_2)
 				port_sel = (data & 0xffff0000) >> 16;
 		break;
 		case 5:
-			if(HI_WORD_ACCESS)
+			if(ACCESSING_BYTE_2)
 				ioga[5] = data;
 		break;
 	}

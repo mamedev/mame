@@ -173,7 +173,7 @@ static MACHINE_RESET( foodf )
 
 static WRITE16_HANDLER( digital_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		foodf_set_flip(data & 0x01);
 
@@ -223,9 +223,9 @@ static READ16_HANDLER( pokey1_word_r ) { return pokey1_r(machine, offset); }
 static READ16_HANDLER( pokey2_word_r ) { return pokey2_r(machine, offset); }
 static READ16_HANDLER( pokey3_word_r ) { return pokey3_r(machine, offset); }
 
-static WRITE16_HANDLER( pokey1_word_w ) { if (ACCESSING_LSB) pokey1_w(machine, offset, data & 0xff); }
-static WRITE16_HANDLER( pokey2_word_w ) { if (ACCESSING_LSB) pokey2_w(machine, offset, data & 0xff); }
-static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_LSB) pokey3_w(machine, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey1_word_w ) { if (ACCESSING_BYTE_0) pokey1_w(machine, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey2_word_w ) { if (ACCESSING_BYTE_0) pokey2_w(machine, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_BYTE_0) pokey3_w(machine, offset, data & 0xff); }
 
 
 

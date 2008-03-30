@@ -146,7 +146,7 @@ static READ64_HANDLER(irq_enable_r)
 {
 	UINT64 r = 0;
 
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		r |= (UINT64)(irq_enable) << 32;
 	}
@@ -156,7 +156,7 @@ static READ64_HANDLER(irq_enable_r)
 
 static WRITE64_HANDLER(irq_enable_w)
 {
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		irq_enable |= (UINT32)(data >> 32);
 	}
@@ -166,7 +166,7 @@ static READ64_HANDLER(irq_active_r)
 {
 	UINT64 r = 0;
 
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		r |= (UINT64)(irq_active) << 32;
 	}
@@ -185,7 +185,7 @@ static READ64_HANDLER(unk1_r)
 #ifdef UNUSED_FUNCTION
 static READ64_HANDLER(unk2_r)
 {
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		return (UINT64)0xa5 << 32;
 	}
@@ -206,12 +206,12 @@ static READ64_HANDLER(unk4_r)
 	UINT64 r = 0;
 //  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), activecpu_get_pc());
 
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		// MCfg
 		r |= (UINT64)((0 << 13) | (5 << 10)) << 32;
 	}
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 	{
 		r |= unk20004 & ~0x800000;
 	}
@@ -223,7 +223,7 @@ static WRITE64_HANDLER(unk4_w)
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
 //      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), activecpu_get_pc());
 
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 	{
 		if (data & 0x800000)
 		{
@@ -245,7 +245,7 @@ static READ64_HANDLER(unk30000_r)
 
 static READ64_HANDLER(unk30030_r)
 {
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 	{
 		return 1;
 	}
@@ -254,11 +254,11 @@ static READ64_HANDLER(unk30030_r)
 
 static WRITE64_HANDLER(video_w)
 {
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		vdl0_address = (UINT32)(data >> 32);
 	}
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 	{
 		vdl1_address = (UINT32)(data);
 	}
@@ -266,7 +266,7 @@ static WRITE64_HANDLER(video_w)
 
 static WRITE64_HANDLER(video_irq_ack_w)
 {
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		if ((data >> 32) & 0x8000)
 		{
@@ -319,7 +319,7 @@ static WRITE64_HANDLER(unk4000418_w)
 
 static WRITE64_HANDLER(reset_w)
 {
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		if (data & U64(0x100000000))
 		{
@@ -725,7 +725,7 @@ static READ64_HANDLER(cde_r)
 	UINT32 r = 0;
 	int reg = offset * 2;
 
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 		reg++;
 
 	switch (reg)
@@ -800,7 +800,7 @@ static WRITE64_HANDLER(cde_w)
 	int reg = offset * 2;
 	UINT32 d;
 
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 	{
 		reg++;
 		d = (UINT32)(data);
@@ -953,7 +953,7 @@ static READ64_HANDLER(device2_r)
 	UINT32 r = 0;
 	int reg = offset * 2;
 
-	if (!(mem_mask & U64(0x00000000ffffffff)))
+	if (ACCESSING_DWORD_0)
 		reg++;
 
 	switch (reg)
@@ -983,7 +983,7 @@ static READ64_HANDLER(cpu_r)
 {
 	UINT64 r = 0;
 
-	if (!(mem_mask & U64(0xffffffff00000000)))
+	if (ACCESSING_DWORD_1)
 	{
 		r = (UINT64)(cpu_getactivecpu() ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?

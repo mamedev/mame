@@ -119,7 +119,7 @@ static READ16_HANDLER( adc_r )
 static WRITE16_HANDLER( eprom_latch_w )
 {
 	/* reset extra CPU */
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		if (data & 1)
 			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);

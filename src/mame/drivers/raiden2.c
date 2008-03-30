@@ -2043,7 +2043,7 @@ static NVRAM_HANDLER( rdx_v33 )
 
 static WRITE16_HANDLER( rdx_v33_eeprom_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		EEPROM_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_write_bit(data & 0x20);
@@ -2102,8 +2102,8 @@ static READ16_HANDLER( rdx_v33_oki_r )
 
 static WRITE16_HANDLER( rdx_v33_oki_w )
 {
-	if (ACCESSING_LSB) OKIM6295_data_0_w(machine, 0, data & 0x00ff);
-	if (ACCESSING_MSB) logerror("rdx_v33_oki_w MSB %04x\n",data);
+	if (ACCESSING_BYTE_0) OKIM6295_data_0_w(machine, 0, data & 0x00ff);
+	if (ACCESSING_BYTE_1) logerror("rdx_v33_oki_w MSB %04x\n",data);
 }
 
 static READ16_HANDLER( rdx_v33_unknown_r )

@@ -524,7 +524,7 @@ static READ16_HANDLER( namcos2_68k_dpram_word_r )
 
 static WRITE16_HANDLER( namcos2_68k_dpram_word_w )
 {
-	if( ACCESSING_LSB )
+	if( ACCESSING_BYTE_0 )
 	{
 		namcos2_dpram[offset] = data&0xff;
 

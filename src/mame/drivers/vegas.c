@@ -1341,7 +1341,7 @@ static READ32_HANDLER( sio_irq_clear_r )
 
 static WRITE32_HANDLER( sio_irq_clear_w )
 {
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		sio_irq_clear = data;
 
@@ -1370,7 +1370,7 @@ static READ32_HANDLER( sio_irq_enable_r )
 
 static WRITE32_HANDLER( sio_irq_enable_w )
 {
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 	{
 		sio_irq_enable = data;
 		update_sio_irqs();
@@ -1392,7 +1392,7 @@ static READ32_HANDLER( sio_irq_status_r )
 
 static WRITE32_HANDLER( sio_led_w )
 {
-	if (!(mem_mask & 0x000000ff))
+	if (ACCESSING_BYTE_0)
 		sio_led_state = data;
 }
 
@@ -1412,10 +1412,10 @@ static READ32_HANDLER( sio_led_r )
 
 static WRITE32_HANDLER( sio_w )
 {
-	if (!(mem_mask & 0x000000ff)) offset += 0;
-	if (!(mem_mask & 0x0000ff00)) offset += 1;
-	if (!(mem_mask & 0x00ff0000)) offset += 2;
-	if (!(mem_mask & 0xff000000)) offset += 3;
+	if (ACCESSING_BYTE_0) offset += 0;
+	if (ACCESSING_BYTE_1) offset += 1;
+	if (ACCESSING_BYTE_2) offset += 2;
+	if (ACCESSING_BYTE_3) offset += 3;
 	if (LOG_SIO && offset != 0)
 		logerror("%08X:sio write to offset %X = %02X\n", activecpu_get_pc(), offset, data >> (offset*8));
 	if (offset < 4)
@@ -1428,10 +1428,10 @@ static WRITE32_HANDLER( sio_w )
 static READ32_HANDLER( sio_r )
 {
 	UINT32 result = 0;
-	if (!(mem_mask & 0x000000ff)) offset += 0;
-	if (!(mem_mask & 0x0000ff00)) offset += 1;
-	if (!(mem_mask & 0x00ff0000)) offset += 2;
-	if (!(mem_mask & 0xff000000)) offset += 3;
+	if (ACCESSING_BYTE_0) offset += 0;
+	if (ACCESSING_BYTE_1) offset += 1;
+	if (ACCESSING_BYTE_2) offset += 2;
+	if (ACCESSING_BYTE_3) offset += 3;
 	if (offset < 4)
 		result = sio_data[0] | (sio_data[1] << 8) | (sio_data[2] << 16) | (sio_data[3] << 24);
 	if (LOG_SIO && offset != 2)
@@ -1507,9 +1507,9 @@ static WRITE32_HANDLER( ide_alt_w )
 static READ32_HANDLER( ethernet_r )
 {
 	UINT32 result = 0;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		result |= smc91c94_r(machine, offset * 2 + 0, mem_mask);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		result |= smc91c94_r(machine, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
@@ -1517,9 +1517,9 @@ static READ32_HANDLER( ethernet_r )
 
 static WRITE32_HANDLER( ethernet_w )
 {
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
+	if (ACCESSING_WORD_0)
 		smc91c94_w(machine, offset * 2 + 0, data, mem_mask);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
+	if (ACCESSING_WORD_1)
 		smc91c94_w(machine, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 

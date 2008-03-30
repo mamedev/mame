@@ -70,7 +70,7 @@ static WRITE8_HANDLER( fantland_nmi_enable_w )
 
 static WRITE16_HANDLER( fantland_nmi_enable_16_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		fantland_nmi_enable_w(machine,offset*2,data);
 }
 
@@ -82,7 +82,7 @@ static WRITE8_HANDLER( fantland_soundlatch_w )
 
 static WRITE16_HANDLER( fantland_soundlatch_16_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		fantland_soundlatch_w(machine, offset*2, data);
 }
 
@@ -102,17 +102,17 @@ static READ16_HANDLER( spriteram2_16_r )
 
 static WRITE16_HANDLER( spriteram_16_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		spriteram[2*offset+0] = data;
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		spriteram[2*offset+1] = data >> 8;
 }
 
 static WRITE16_HANDLER( spriteram2_16_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		spriteram_2[2*offset+0] = data;
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		spriteram_2[2*offset+1] = data >> 8;
 }
 

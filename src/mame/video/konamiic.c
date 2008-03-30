@@ -2252,9 +2252,9 @@ READ16_HANDLER( K052109_word_r )
 
 WRITE16_HANDLER( K052109_word_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K052109_w(machine,offset,(data >> 8) & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K052109_w(machine,offset + 0x2000,data & 0xff);
 }
 
@@ -2265,7 +2265,7 @@ READ16_HANDLER(K052109_lsb_r)
 
 WRITE16_HANDLER(K052109_lsb_w)
 {
-	if(ACCESSING_LSB)
+	if(ACCESSING_BYTE_0)
 		K052109_w(machine, offset, data & 0xff);
 }
 
@@ -2618,9 +2618,9 @@ READ16_HANDLER( K051960_word_r )
 
 WRITE16_HANDLER( K051960_word_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K051960_w(machine,offset*2,(data >> 8) & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051960_w(machine,offset*2 + 1,data & 0xff);
 }
 
@@ -2691,9 +2691,9 @@ READ16_HANDLER( K051937_word_r )
 
 WRITE16_HANDLER( K051937_word_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K051937_w(machine,offset*2,(data >> 8) & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K051937_w(machine,offset*2 + 1,data & 0xff);
 }
 
@@ -3194,7 +3194,7 @@ READ16_HANDLER( K053244_lsb_r )
 
 WRITE16_HANDLER( K053244_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K053244_w(machine, offset, data & 0xff);
 }
 
@@ -3205,9 +3205,9 @@ READ16_HANDLER( K053244_word_r )
 
 WRITE16_HANDLER( K053244_word_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K053244_w(machine, offset*2, (data >> 8) & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K053244_w(machine, offset*2+1, data & 0xff);
 }
 
@@ -4134,9 +4134,9 @@ READ16_HANDLER( K053246_word_r )
 
 WRITE16_HANDLER( K053246_word_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K053246_w(machine, offset<<1,(data >> 8) & 0xff);
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K053246_w(machine, (offset<<1) + 1,data & 0xff);
 }
 
@@ -5155,13 +5155,13 @@ WRITE8_HANDLER( K053251_w )
 
 WRITE16_HANDLER( K053251_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K053251_w(machine, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( K053251_msb_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 		K053251_w(machine, offset, (data >> 8) & 0xff);
 }
 
@@ -5236,7 +5236,7 @@ READ16_HANDLER( K054000_lsb_r )
 
 WRITE16_HANDLER( K054000_lsb_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 		K054000_w(machine, offset, data & 0xff);
 }
 
@@ -6419,11 +6419,11 @@ WRITE8_HANDLER( K056832_b_w )
 
 WRITE32_HANDLER( K056832_b_long_w )
 {
-	if (ACCESSING_MSW32)
+	if (ACCESSING_WORD_1)
 	{
 		K056832_b_word_w(machine, offset<<1, data>>16, mem_mask >> 16);
 	}
-	if (ACCESSING_LSW32)
+	if (ACCESSING_WORD_0)
 	{
 		K056832_b_word_w(machine, (offset<<1)+1, data, mem_mask);
 	}
@@ -7165,14 +7165,14 @@ WRITE32_HANDLER( K055555_long_w )
 {
 	UINT8 regnum, regdat;
 
-	if (!(mem_mask & 0xff000000))
+	if (ACCESSING_BYTE_3)
 	{
 		regnum = offset<<1;
 		regdat = data>>24;
 	}
 	else
 	{
-		if (!(mem_mask & 0xff00))
+		if (ACCESSING_BYTE_1)
 		{
 			regnum = (offset<<1)+1;
 			regdat = data>>8;
@@ -7525,7 +7525,7 @@ void K053250_vh_start(int chips, int *region)
 
 WRITE16_HANDLER( K053250_0_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
 		if (offset == 4 && !(data & 2) && (K053250_info.chip[0].regs[4] & 2)) K053250_dma(0, 1);
@@ -7558,7 +7558,7 @@ READ16_HANDLER( K053250_0_rom_r )
 
 WRITE16_HANDLER( K053250_1_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		// start LVC DMA transfer at the falling edge of control register's bit1
 		if (offset == 4 && !(data & 2) && (K053250_info.chip[1].regs[4] & 2)) K053250_dma(1, 1);

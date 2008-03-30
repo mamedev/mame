@@ -1057,7 +1057,7 @@ void NMK004_init(void)
 
 WRITE16_HANDLER( NMK004_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 logerror("%06x: NMK004_w %02x\n",activecpu_get_pc(),data);
 		NMK004_state.from_main = data & 0xff;

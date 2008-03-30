@@ -89,7 +89,7 @@ static WRITE32_HANDLER( f3_control_w )
 			watchdog_reset(machine);
 			return;
 		case 0x01: /* Coin counters & lockouts */
-			if (ACCESSING_MSB32) {
+			if (ACCESSING_BYTE_3) {
 				coin_lockout_w(0,~data & 0x01000000);
 				coin_lockout_w(1,~data & 0x02000000);
 				coin_counter_w(0, data & 0x04000000);
@@ -98,14 +98,14 @@ static WRITE32_HANDLER( f3_control_w )
 			}
 			return;
 		case 0x04: /* Eeprom */
-			if (ACCESSING_LSB32) {
+			if (ACCESSING_BYTE_0) {
 				EEPROM_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 				EEPROM_write_bit(data & 0x04);
 				EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			}
 			return;
 		case 0x05:	/* Player 3 & 4 coin counters */
-			if (ACCESSING_MSB32) {
+			if (ACCESSING_BYTE_3) {
 				coin_lockout_w(2,~data & 0x01000000);
 				coin_lockout_w(3,~data & 0x02000000);
 				coin_counter_w(2, data & 0x04000000);
@@ -134,7 +134,7 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
-		if (ACCESSING_LSW32)
+		if (ACCESSING_WORD_0)
 			idx += 1;
 
 		if (idx >= 8)

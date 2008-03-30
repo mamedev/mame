@@ -94,22 +94,22 @@ WRITE8_HANDLER( dooyong_fg2scroll8_w )
 
 WRITE16_HANDLER( dooyong_bgscroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_bgscroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BYTE_0) dooyong_bgscroll8_w(machine, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_bg2scroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_bg2scroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BYTE_0) dooyong_bg2scroll8_w(machine, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fgscroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_fgscroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BYTE_0) dooyong_fgscroll8_w(machine, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fg2scroll16_w )
 {
-	if (ACCESSING_LSB) dooyong_fg2scroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BYTE_0) dooyong_fg2scroll8_w(machine, offset, data & 0x00ff);
 }
 
 
@@ -188,7 +188,7 @@ WRITE8_HANDLER( flytiger_ctrl_w )
 
 WRITE16_HANDLER( rshark_ctrl_w )
 {
-	if (ACCESSING_LSB)
+	if (ACCESSING_BYTE_0)
 	{
 		/* bit 0 flips screen */
 		flip_screen_set(data & 0x0001);

@@ -210,7 +210,7 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 
 static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 {
-	if (ACCESSING_MSB)
+	if (ACCESSING_BYTE_1)
 	{
 		soundlatch_w(machine,1,data >> 8);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
