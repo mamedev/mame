@@ -45,7 +45,6 @@
 #define INVALID_AXIS_VALUE		0x7fffffff
 
 
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -315,6 +314,74 @@ static const code_string_table itemid_token_table[] =
 	{ ITEM_ID_BUTTON16,      "BUTTON16" },
 	{ ITEM_ID_START,         "START" },
 	{ ITEM_ID_SELECT,        "SELECT" },
+	
+	/* Hats */
+	{ ITEM_ID_HAT1UP,        "HAT1UP" },
+	{ ITEM_ID_HAT1DOWN,      "HAT1DOWN" },
+	{ ITEM_ID_HAT1LEFT,      "HAT1LEFT" },
+	{ ITEM_ID_HAT1RIGHT,     "HAT1RIGHT" },
+	{ ITEM_ID_HAT2UP,        "HAT2UP" },
+	{ ITEM_ID_HAT2DOWN,      "HAT2DOWN" },
+	{ ITEM_ID_HAT2LEFT,      "HAT2LEFT" },
+	{ ITEM_ID_HAT2RIGHT,     "HAT2RIGHT" },
+	{ ITEM_ID_HAT3UP,        "HAT3UP" },
+	{ ITEM_ID_HAT3DOWN,      "HAT3DOWN" },
+	{ ITEM_ID_HAT3LEFT,      "HAT3LEFT" },
+	{ ITEM_ID_HAT3RIGHT,     "HAT3RIGHT" },
+	{ ITEM_ID_HAT4UP,        "HAT4UP" },
+	{ ITEM_ID_HAT4DOWN,      "HAT4DOWN" },
+	{ ITEM_ID_HAT4LEFT,      "HAT4LEFT" },
+	{ ITEM_ID_HAT4RIGHT,     "HAT4RIGHT" },
+
+	/* Additional IDs */
+	{ ITEM_ID_ADD_SWITCH1,   "ADDSW1" },
+	{ ITEM_ID_ADD_SWITCH2,   "ADDSW2" },
+	{ ITEM_ID_ADD_SWITCH3,   "ADDSW3" },
+	{ ITEM_ID_ADD_SWITCH4,	 "ADDSW4" },
+	{ ITEM_ID_ADD_SWITCH5,	 "ADDSW5" },
+	{ ITEM_ID_ADD_SWITCH6,   "ADDSW6" },
+	{ ITEM_ID_ADD_SWITCH7,   "ADDSW7" },
+	{ ITEM_ID_ADD_SWITCH8,   "ADDSW8" },
+	{ ITEM_ID_ADD_SWITCH9,   "ADDSW9" },
+	{ ITEM_ID_ADD_SWITCH10,  "ADDSW10" },
+	{ ITEM_ID_ADD_SWITCH11,  "ADDSW11" },
+	{ ITEM_ID_ADD_SWITCH12,  "ADDSW12" },
+	{ ITEM_ID_ADD_SWITCH13,  "ADDSW13" },
+	{ ITEM_ID_ADD_SWITCH14,  "ADDSW14" },
+	{ ITEM_ID_ADD_SWITCH15,  "ADDSW15" },
+	{ ITEM_ID_ADD_SWITCH16,  "ADDSW16" },
+	{ ITEM_ID_ADD_ABSOLUTE1, "ADDAXIS1" },
+	{ ITEM_ID_ADD_ABSOLUTE2, "ADDAXIS2" },
+	{ ITEM_ID_ADD_ABSOLUTE3, "ADDAXIS3" },
+	{ ITEM_ID_ADD_ABSOLUTE4, "ADDAXIS4" },
+	{ ITEM_ID_ADD_ABSOLUTE5, "ADDAXIS5" },
+	{ ITEM_ID_ADD_ABSOLUTE6, "ADDAXIS6" },
+	{ ITEM_ID_ADD_ABSOLUTE7, "ADDAXIS7" },
+	{ ITEM_ID_ADD_ABSOLUTE8, "ADDAXIS8" },
+	{ ITEM_ID_ADD_ABSOLUTE9, "ADDAXIS9" },
+	{ ITEM_ID_ADD_ABSOLUTE10,"ADDAXIS10" },
+	{ ITEM_ID_ADD_ABSOLUTE11,"ADDAXIS11" },
+	{ ITEM_ID_ADD_ABSOLUTE12,"ADDAXIS12" },
+	{ ITEM_ID_ADD_ABSOLUTE13,"ADDAXIS13" },
+	{ ITEM_ID_ADD_ABSOLUTE14,"ADDAXIS14" },
+	{ ITEM_ID_ADD_ABSOLUTE15,"ADDAXIS15" },
+	{ ITEM_ID_ADD_ABSOLUTE16,"ADDAXIS16" },
+	{ ITEM_ID_ADD_RELATIVE1, "ADDREL1" },
+	{ ITEM_ID_ADD_RELATIVE2, "ADDREL2" },
+	{ ITEM_ID_ADD_RELATIVE3, "ADDREL3" },
+	{ ITEM_ID_ADD_RELATIVE4, "ADDREL4" },
+	{ ITEM_ID_ADD_RELATIVE5, "ADDREL5" },
+	{ ITEM_ID_ADD_RELATIVE6, "ADDREL6" },
+	{ ITEM_ID_ADD_RELATIVE7, "ADDREL7" },
+	{ ITEM_ID_ADD_RELATIVE8, "ADDREL8" },
+	{ ITEM_ID_ADD_RELATIVE9, "ADDREL9" },
+	{ ITEM_ID_ADD_RELATIVE10,"ADDREL10" },
+	{ ITEM_ID_ADD_RELATIVE11,"ADDREL11" },
+	{ ITEM_ID_ADD_RELATIVE12,"ADDREL12" },
+	{ ITEM_ID_ADD_RELATIVE13,"ADDREL13" },
+	{ ITEM_ID_ADD_RELATIVE14,"ADDREL14" },
+	{ ITEM_ID_ADD_RELATIVE15,"ADDREL15" },
+	{ ITEM_ID_ADD_RELATIVE16,"ADDREL16" },
 
 	{ ~0,                    NULL }
 };
@@ -409,11 +476,11 @@ INLINE input_code device_item_to_code(input_device *device, input_item_id itemid
 INLINE input_item_class input_item_standard_class(input_device_class devclass, input_item_id itemid)
 {
 	/* most everything standard is a switch, apart from the axes */
-	if (itemid == ITEM_ID_OTHER_SWITCH || itemid < ITEM_ID_XAXIS || itemid > ITEM_ID_SLIDER2)
+	if (itemid == ITEM_ID_OTHER_SWITCH || itemid < ITEM_ID_XAXIS || (itemid > ITEM_ID_SLIDER2 && itemid < ITEM_ID_ADD_ABSOLUTE1))
 		return ITEM_CLASS_SWITCH;
 
 	/* standard mouse axes are relative */
-	else if (devclass == DEVICE_CLASS_MOUSE || itemid == ITEM_ID_OTHER_AXIS_RELATIVE)
+	else if (devclass == DEVICE_CLASS_MOUSE || itemid == ITEM_ID_OTHER_AXIS_RELATIVE || (itemid >= ITEM_ID_ADD_RELATIVE1 && itemid <= ITEM_ID_ADD_RELATIVE16))
 		return ITEM_CLASS_RELATIVE;
 
 	/* all other standard axes are absolute */
