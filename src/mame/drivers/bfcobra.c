@@ -2,13 +2,13 @@
 
     Bell-Fruit Cobra I/II and Viper Hardware
 
-    driver by Phil Bennett
+    driver by Phil Bennett and Anonymous
 
     Games supported:
         * A Question of Sport [2 sets]
-        * Beeline (non-working)
+        * Beeline (non-working - missing disk)
         * Every Second Counts
-        * Inquizitor (Viper hardware, non-working)
+        * Inquizitor (Viper hardware, non-working - missing disk)
         * Quizvaders
         * Treble Top
 
@@ -55,22 +55,23 @@
 
     To do:
 
-    * Verify blitter modes on real hardware and rewrite code
-    * Deduce unknown chipset accesses
+    * Complete blitter emulation
     * Cobra II support
-    * Implement Flare One DSP (although nothing seems to use it)
     * Hook up additional inputs, EM meters, lamps etc
-    * Remove a 'TODO' comment or thirty
 
     Known issues:
 
-    * trebltop: During the intro, DLT's signature is drawn incorrectly.
-    * escounts: Colours are completely wrong. Is there a palette register
-    somewhere that affects blitter/video output?
-    * qos: Game clock and score dividers aren't drawn (needs line draw mode)
-    * All games bar qos: NVRAM not saved.
+    * All games bar qos: NVRAM not saved
+
+    * Viper does not have a colour palette - the Flare chipset drives RGB direct.
+	  To fix this I set default values in the palette when the machine is initialised
+    * CPU execution rate is wrong, the hardware adds 1 TCycle to each access which is unaccounted for.
+    * Plane priority is probably wrong but it's only used in Treble Top.
+    * Blitter loop counts and step are wrong - they are 9 bit counts, not 8.
+    * Blitter emulation doesn't support hi-res mode (needed for Inquizitor)
 
 ******************************************************************************/
+
 #include "driver.h"
 #include "deprecat.h"
 #include "machine/6850acia.h"
@@ -83,7 +84,7 @@
 /*
     Defines
 */
-#define Z80_XTAL	4000000
+#define Z80_XTAL	5910000		/* Unconfirmed */
 #define M6809_XTAL	1000000
 
 
@@ -97,6 +98,7 @@ static UINT8 h_scroll;
 static UINT8 v_scroll;
 static UINT8 flip_8;
 static UINT8 flip_22;
+static UINT8 videomode;
 
 /* UART source/sinks */
 static UINT8 z80_m6809_line;
@@ -104,7 +106,7 @@ static UINT8 m6809_z80_line;
 static UINT8 data_r;
 static UINT8 data_t;
 
-static int	irq_state;
+static int irq_state;
 static int acia_irq;
 static int vblank_irq;
 static int blitter_irq;
@@ -140,16 +142,13 @@ static void update_irqs(running_machine *machine)
 
 ***************************************************************************/
 
-#ifdef MAME_DEBUG
-static int DEBUG_BLITTER = 0;
-#endif
-
-/* Typedefs */
 typedef union
 {
 #ifdef LSB_FIRST
+	struct { UINT16 loword, hiword ; } ;
 	struct { UINT8 addr0, addr1, addr2; };
 #else
+	struct { UINT16 hiword, loword ; } ;
 	struct { UINT8 addr2, addr1, addr0; };
 #endif
 	UINT32 addr;
@@ -161,9 +160,10 @@ typedef union
 #define CMD_PARRD		0x04		/* Never used? */
 #define CMD_SRCUP		0x08
 #define CMD_DSTUP		0x10
-#define CMD_SRCEN		0x20
-#define CMD_DSTEN		0x40
+#define CMD_LT0 		0x20
+#define CMD_LT1			0x40
 #define CMD_LINEDRAW	0x80
+
 
 /* All unconfirmed */
 //#define SRCDST_CMP    0x10
@@ -178,13 +178,10 @@ typedef union
 #define MODE_BITTOBYTE	0x04
 #define MODE_PALREMAP	0x10
 
-/* All unconfirmed */
-//#define CMPFUNC_EQ    0x01
-//#define CMPFUNC_NE    0x02
-//#define CMPFUNC_GT    0x04
-//#define CMPFUNC_PLANE 0x08
-
-#define CMPFUNC_EQ		0x08
+#define CMPFUNC_LT    	0x01
+#define CMPFUNC_EQ    	0x02
+#define CMPFUNC_GT    	0x04
+#define CMPFUNC_BEQ		0x08
 #define CMPFUNC_LOG0	0x10
 #define CMPFUNC_LOG1	0x20
 #define CMPFUNC_LOG2	0x40
@@ -212,6 +209,8 @@ static struct
 	UINT8		pattern;
 } blitter;
 
+#define LOOPTYPE ( ( blitter.command&0x60 ) >> 5 )
+
 /*
     MUSIC Semiconductor TR9C1710 RAMDAC or equivalent
 */
@@ -231,18 +230,130 @@ static struct
 	UINT8	count_w;
 } ramdac;
 
+
+#define BLUE_0 0
+#define BLUE_1 1
+#define BLUE_2 2
+#define BLUE_3 3
+#define GREEN_0 ( 0 << 2 )
+#define GREEN_1 ( 1 << 2 )
+#define GREEN_2 ( 2 << 2 )
+#define GREEN_3 ( 3 << 2 )
+#define GREEN_4 ( 4 << 2 )
+#define GREEN_5 ( 5 << 2 )
+#define GREEN_6 ( 6 << 2 )
+#define GREEN_7 ( 7 << 2 )
+#define RED_0 ( 0 << 5 )
+#define RED_1 ( 1 << 5 )
+#define RED_2 ( 2 << 5 )
+#define RED_3 ( 3 << 5 )
+#define RED_4 ( 4 << 5 )
+#define RED_5 ( 5 << 5 )
+#define RED_6 ( 6 << 5 )
+#define RED_7 ( 7 << 5 )
+
+static UINT8 col4bit[16]=
+{
+	BLUE_0 | GREEN_0 | RED_0,
+	BLUE_1,
+	GREEN_2,
+	BLUE_1 | GREEN_2,
+	RED_2,
+	RED_2 | BLUE_1,
+	RED_2 | GREEN_2,
+	RED_2 | GREEN_2 | BLUE_1,
+	BLUE_2 | GREEN_5 | RED_5,
+	BLUE_3,
+	GREEN_7,
+	BLUE_3 | GREEN_7,
+	RED_7,
+	RED_7 | BLUE_3,
+	RED_7 | GREEN_7,
+	RED_7 | GREEN_7 | BLUE_3
+};
+
+static UINT8 col3bit[16]=
+{
+	0,
+	BLUE_3,
+	GREEN_7,
+	BLUE_3 | GREEN_7,
+	RED_7,
+	RED_7 | BLUE_3,
+	RED_7 | GREEN_7,
+	RED_7 | GREEN_7 | BLUE_3,
+	0,
+	BLUE_3,
+	GREEN_7,
+	BLUE_3 | GREEN_7,
+	RED_7,
+	RED_7 | BLUE_3,
+	RED_7 | GREEN_7,
+	RED_7 | GREEN_7 | BLUE_3
+};
+
+static UINT8 col8bit[256];
+static UINT8 col7bit[256];
+static UINT8 col6bit[256];
+static UINT8 col76index[] = {0, 2, 4, 7};
+
+
 static VIDEO_UPDATE( bfcobra )
 {
+	static int init_colour_indexes = 1;
 	int x, y;
 	UINT8  *src;
 	UINT32 *dest;
 	UINT32 offset;
+	UINT8 *hirescol;
+	UINT8 *lorescol;
 
-	/* A bit dodgy */
+	/*
+		The following is a dirty hack to init the palette index tables
+		this should really be done elsewhere, preferably at compile time.
+	*/
+	if (init_colour_indexes == 1)
+	{
+		init_colour_indexes = 0;
+
+		for (x = 0; x < 256; ++x)
+		{
+			UINT8 col;
+
+			col8bit[x] = x;
+			col = x & 0x7f;
+			col = (col & 0x1f) | (col76index[ ( (col & 0x60) >> 5 ) & 3] << 5);
+			col7bit[x] = col;
+
+			col = (col & 3) | (col76index[( (col & 0x0c) >> 2) & 3] << 2 ) |
+				  (col76index[( (col & 0x30) >> 4) & 3] << 5 );
+			col6bit[x] = col;
+		}
+	}
+
+
+	/* Select screen has to be programmed into two registers */
+	/* No idea what happens if the registers are different */
 	if (flip_8 & 0x40 && flip_22 & 0x40)
 		offset = 0x10000;
 	else
 		offset = 0;
+
+	if(videomode & 0x20)
+	{
+		hirescol = col3bit;
+		lorescol = col7bit;
+	}
+	else if(videomode & 0x40)
+	{
+		hirescol = col4bit;
+		lorescol = col6bit;
+	}
+	else
+	{
+		hirescol = col4bit;
+		lorescol = col8bit;
+	}
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
@@ -250,13 +361,21 @@ static VIDEO_UPDATE( bfcobra )
 		src = &video_ram[offset + y_offset];
 		dest = BITMAP_ADDR32(bitmap, y, 0);
 
-		for (x = cliprect->min_x; x <= cliprect->max_x; ++x)
+		for (x = cliprect->min_x; x <= cliprect->max_x / 2; ++x)
 		{
 			UINT8 x_offset = x + h_scroll;
 			UINT8 pen = *(src + x_offset);
 
-			//*dest++ = screen->machine->pens[pen & ramdac.mask];
-			*dest++ = screen->machine->pens[pen];
+			if ( ( videomode & 0x81 ) == 1 || (videomode & 0x80 && pen & 0x80) )
+			{
+				*dest++ = screen->machine->pens[hirescol[pen & 0x0f]];
+				*dest++ = screen->machine->pens[hirescol[(pen >> 4) & 0x0f]];
+			}
+			else
+			{
+				*dest++ = screen->machine->pens[lorescol[pen]];
+				*dest++ = screen->machine->pens[lorescol[pen]];
+			}
 		}
 	}
 
@@ -297,6 +416,9 @@ static void RunBlit(void)
 {
 #define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(blitter.program.addr++))
 
+	int cycles_used = 0;
+
+
 	do
 	{
 		UINT8 srcdata = 0;
@@ -316,7 +438,8 @@ static void RunBlit(void)
 		BLITPRG_READ(step);
 		BLITPRG_READ(pattern);
 
-#ifdef MAME_DEBUG
+#if 0
+		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
 			mame_printf_debug("\nBlitter (%x): Running command from 0x%.5x\n\n", activecpu_get_previouspc(), blitter.program.addr - 12);
@@ -326,9 +449,7 @@ static void RunBlit(void)
 				blitter.command & CMD_COLST ? "COLST" : "     ",
 				blitter.command & CMD_PARRD ? "PARRD" : "     ",
 				blitter.command & CMD_SRCUP ? "SRCUP" : "     ",
-				blitter.command & CMD_DSTUP ? "DSTUP" : "     ",
-				blitter.command & CMD_SRCEN ? "SRCEN" : "     ",
-				blitter.command & CMD_DSTEN ? "DSTEN" : "     ");
+				blitter.command & CMD_DSTUP ? "DSTUP" : "     ");
 
 			mame_printf_debug("Src Address Byte 0  %.2x\n",	blitter.source.addr0);
 			mame_printf_debug("Src Address Byte 1  %.2x\n",	blitter.source.addr1);
@@ -351,79 +472,99 @@ static void RunBlit(void)
 
 		/* Ignore these writes */
 		if (blitter.dest.addr == 0)
-		{
 			return;
-		}
-
-		/* Dirty hacks for Quizvaders */
-		if ( (blitter.command == 0x01) || (blitter.command == 0x19) )
-		{
-			blitter.command |= CMD_SRCEN;
-		}
 
 		/* Begin outer loop */
 		for (;;)
 		{
 			UINT8 innercnt = blitter.innercnt;
+			dstdata = blitter.pattern;
 
 			if (blitter.command & CMD_LINEDRAW)
 			{
-				/*
-                    Line Drawing Mode
+				do
+				{
+					if (blitter.modectl & MODE_YFRAC)
+					{
+						if (blitter.modectl & MODE_SSIGN )
+							blitter.dest.addr0--;
+						else
+							blitter.dest.addr0++;
+					}
+					else
+					{
+						if (blitter.modectl & MODE_DSIGN )
+							blitter.dest.addr1--;
+						else
+							blitter.dest.addr1++;
+					}
+					if( blitter.source.addr0 < blitter.step )
+					{
 
-                    x1 - x0
-                    y1 - y0
+						blitter.source.addr0 -=blitter.step ;
+						blitter.source.addr0 +=blitter.source.addr1;
 
-                    d1 = bigger
-                    d2 = smaller
+						if ( blitter.modectl & MODE_YFRAC )
+						{
+							if (blitter.modectl & MODE_DSIGN )
+								blitter.dest.addr1--;
+							else
+								blitter.dest.addr1++;
+						}
+						else
+						{
+							if (blitter.modectl & MODE_SSIGN )
+								blitter.dest.addr0--;
+							else
+								blitter.dest.addr0++;
+						}
+					}
+					else
+					{
+						blitter.source.addr0 -=blitter.step;
+					}
 
-                    * SRC0 = d1/2
-                    * SRC1 = d1
-                    * Inner Count = d1
-                    * DST0 = X0
-                    * DST1 = Y0
-                    * Source control = LSB of d1
-                    * Step reg = d2
-                */
+					*blitter_get_addr(blitter.dest.addr) = blitter.pattern;
+					cycles_used++;
+
+				} while (--innercnt);
 			}
 			else do
 			{
-			//  UINT32  srcaddr = 0;
 				UINT8	inhibit = 0;
 
 				/* TODO: Set this correctly */
 				UINT8	result = blitter.pattern;
 
-				/* Source value is read only once in character mode */
-				if (blitter.modectl & MODE_BITTOBYTE && innercnt == blitter.innercnt)
+				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
 				{
-					if (blitter.command & CMD_SRCEN)
-					{
-						srcdata = *(blitter_get_addr(blitter.source.addr & 0xfffff));
-					}
+					srcdata = *(blitter_get_addr(blitter.source.addr & 0xfffff));
+					blitter.source.loword++;
+					cycles_used++;
 				}
 
 				/* Enable source address read and increment? */
-				if ( !(blitter.modectl & (MODE_BITTOBYTE | MODE_PALREMAP)) )
+				if (!(blitter.modectl & (MODE_BITTOBYTE | MODE_PALREMAP)))
 				{
-					if (blitter.command & CMD_SRCEN)
+					if (LOOPTYPE == 0 || LOOPTYPE == 1)
 					{
 						srcdata = *(blitter_get_addr(blitter.source.addr & 0xfffff));
+						cycles_used++;
 
-						/* TODO */
 						if (blitter.modectl & MODE_SSIGN)
-							blitter.source.addr = (blitter.source.addr - 1) & 0xfffff;
+							blitter.source.loword-- ;
 						else
-							blitter.source.addr = (blitter.source.addr + 1) & 0xfffff;
+							blitter.source.loword++;
 
 						result = srcdata;
 					}
 				}
 
 				/* Read destination pixel? */
-				if (blitter.command & CMD_DSTEN)
+				if (LOOPTYPE == 0)
 				{
 					dstdata = *blitter_get_addr(blitter.dest.addr & 0xfffff);
+					cycles_used++;
 				}
 
 				/* Inhibit depending on the bit selected by the inner count */
@@ -432,16 +573,46 @@ static void RunBlit(void)
 				if (blitter.modectl & MODE_BITTOBYTE)
 				{
 					inhibit = !(srcdata & (1 << (8 - innercnt)));
-
-					if (innercnt == 1)
-					{
-						blitter.source.addr = (blitter.source.addr + 1) & 0xfffff;
-					}
 				}
 
-				if (blitter.compfunc & 0x08)
+				if (blitter.compfunc & CMPFUNC_BEQ)
 				{
 					if (srcdata == blitter.pattern)
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+				if (blitter.compfunc & CMPFUNC_LT)
+				{
+					/* Might be wrong */
+					if ((srcdata & 0xc0) < (dstdata & 0xc0))
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+				if (blitter.compfunc & CMPFUNC_EQ)
+				{
+					if ((srcdata & 0xc0) == (dstdata & 0xc0))
+					{
+						inhibit = 1;
+
+						/* TODO: Resume from inhibit? */
+						if (blitter.command & CMD_COLST)
+							return;
+					}
+				}
+				if (blitter.compfunc & CMPFUNC_GT)
+				{
+					/* Might be wrong */
+					if ((srcdata & 0xc0) > (dstdata & 0xc0))
 					{
 						inhibit = 1;
 
@@ -465,15 +636,35 @@ static void RunBlit(void)
 						UINT8 newcol = *(blitter_get_addr((blitter.source.addr + dest) & 0xfffff));
 
 						*blitter_get_addr(blitter.dest.addr) = newcol;
+						cycles_used += 3;
 					}
 					else
 					{
-						*blitter_get_addr(blitter.dest.addr) = result;
+						UINT8 final_result = 0;
+
+						if (blitter.compfunc & CMPFUNC_LOG3)
+							final_result |= result & dstdata;
+
+						if (blitter.compfunc & CMPFUNC_LOG2)
+							final_result |= result & ~dstdata;
+
+						if (blitter.compfunc & CMPFUNC_LOG1)
+							final_result |= ~result & dstdata;
+
+						if (blitter.compfunc & CMPFUNC_LOG0)
+							final_result |= ~result & ~dstdata;
+
+						*blitter_get_addr(blitter.dest.addr) = final_result;
+						cycles_used++;
 					}
 				}
 
 				/* Update destination address */
-				blitter.dest.addr = (blitter.dest.addr + 1) & 0xfffff;
+				if (blitter.modectl & MODE_DSIGN)
+					blitter.dest.loword--;
+				else
+					blitter.dest.loword++;
+
 			} while (--innercnt);
 
 			if (!--blitter.outercnt)
@@ -483,14 +674,10 @@ static void RunBlit(void)
 			else
 			{
 				if (blitter.command & CMD_DSTUP)
-				{
-					blitter.dest.addr = (blitter.dest.addr + blitter.step) & 0xfffff;
-				}
+					blitter.dest.loword += blitter.step;
 
 				if (blitter.command & CMD_SRCUP)
-				{
-					blitter.source.addr = (blitter.source.addr + blitter.step) & 0xfffff;
-				}
+					blitter.source.loword += blitter.step;
 
 				if (blitter.command & CMD_PARRD)
 				{
@@ -505,6 +692,9 @@ static void RunBlit(void)
 		BLITPRG_READ(command);
 
 	} while (blitter.command  & CMD_RUN);
+
+	/* Burn Z80 cycles while blitter is in operation */
+	cpu_spinuntil_time( ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 
@@ -551,6 +741,7 @@ static READ8_HANDLER( ramdac_r )
 
 static WRITE8_HANDLER( ramdac_w )
 {
+
 	switch (offset & 3)
 	{
 		case 0:
@@ -592,18 +783,27 @@ static WRITE8_HANDLER( ramdac_w )
     03  Bank control for Z80 region 0xc000-0xffff (16kB)    WR
 
     06  Interrupt status....................................WR
-    07  Interrupt ack.......................................WR
+    07  Interrupt ack.......................................WR 
+	    Writing here sets the line number that vertical interrupt is generated at.
+		cmd1, bit2 is the 9th bit of the line number
         ???? Written with 0x21
-    08
-    09  ???? Linked with c001...............................W
+    08  cmd1                                                WR * bit 6 = screen select
+	    bit2 = 9th bit of vertical interrupt line number
+		bit6 = 1 = select screen 1 else screen 0
+    09  cmd2 Linked with c001...............................W * bit 0 = 1 = hires
+		bit0=1=hi res else lo res (as long as bit7 is 0)
+		bit5=mask msb of each pixel
+		bit6=mask 2 msbits of each lores pixel
+		bit7=1=variable resolution - resolution is set by bit 7 of each vram byte.  bit7=1=2 hires pixels
     0A  ???? Written with 0 and 1...........................W
+		color of border
 
     0B  Horizontal frame buffer scroll .....................W
     0C  Vertical frame buffer scroll .......................W
 
-    0D  ???? Written with $FF...............................W
-    0E  ???? Written with $A2 (162).........................W
-    0F  ???? Written with $B4 (180).........................W
+    0D  Colour hold colour..................................W
+    0E  Palette value for hi-res magenta....................W
+    0F  Palette value for hi-res yellow?....................W
     14  ....................................................W
 
     18  Blitter program low byte............................WR
@@ -686,19 +886,23 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x03:
 		{
 			if (data > 0x3f)
-			{
 				popmessage("%x: Unusual bank access (%x)\n", activecpu_get_previouspc(), data);
-			}
+
 			data &= 0x3f;
 			bank[offset] = data;
 			z80_bank(offset, data);
 			break;
 		}
+
 		case 0x08:
 		{
 			flip_8 = data;
 			break;
 		}
+		case 9:
+			videomode = data;
+			break;
+
 		case 0x0B:
 		{
 			h_scroll = data;
@@ -707,6 +911,20 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x0C:
 		{
 			v_scroll = data;
+			break;
+		}
+		case 0x0E:
+		{
+			col4bit[5] = data;
+			col3bit[5] = data;
+			col3bit[5 + 8] = data;
+			break;
+		}
+		case 0x0f:
+		{
+			col4bit[6] = data;
+			col3bit[6] = data;
+			col3bit[6 + 8] = data;
 			break;
 		}
 		case 0x18:
@@ -731,7 +949,7 @@ static WRITE8_HANDLER( chipset_w )
 			if (data & CMD_RUN)
 				RunBlit();
 			else
-				mame_printf_debug ("Blitter stopped by IO.\n");
+				mame_printf_debug("Blitter stopped by IO.\n");
 
 			break;
 		}
@@ -905,7 +1123,7 @@ static READ8_HANDLER( fddata_r )
 				{
 					fdc.byte_pos = 0;
 
-					if(fdc.sector == fdc.stop_track || ++fdc.sector == 11)
+					if (fdc.sector == fdc.stop_track || ++fdc.sector == 11)
 					{
 						/* End of read operation */
 						fdc.MSR = 0xd0;
@@ -1032,7 +1250,7 @@ static void command_phase(UINT8 data)
 		//mame_printf_debug(" %x\n",data);
 	}
 
-	if(fdc.cmd_cnt == fdc.cmd_len)
+	if (fdc.cmd_cnt == fdc.cmd_len)
 	{
 		fdc.phase = fdc.next_phase;
 		fdc.cmd_cnt = 0;
@@ -1070,6 +1288,13 @@ WRITE8_HANDLER( fd_ctrl_w )
 
 static MACHINE_RESET( bfcobra )
 {
+	unsigned int pal;
+
+	for (pal = 0; pal < 256; ++pal)
+	{
+		palette_set_color_rgb(Machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
+	}
+
 	bank[0] = 1;
 	memset(&ramdac, 0, sizeof(ramdac));
 	reset_fdc();
@@ -1150,10 +1375,9 @@ static WRITE8_HANDLER( meter_w )
         When a meter is triggered, the current drawn is sensed. If a meter
         is connected, the /FIRQ line will be pulsed.
     */
-
-	for (i = 0; i<8; i++)
+	for (i = 0; i < 8; i++)
  	{
-		if ( changed & (1 << i) )
+		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
 			cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, PULSE_LINE );
@@ -1248,11 +1472,11 @@ static INPUT_PORTS_START( bfcobra )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START_TAG("STROBE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("PASS") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("CONTINUE") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("START")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("BONUS") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pass") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Continue") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bonus") PORT_CODE(KEYCODE_F)
 //  PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 //  PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 //  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -1510,11 +1734,11 @@ static MACHINE_DRIVER_START( bfcobra )
 
 	/* TODO */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512 - 1, 0, 256 - 1)
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1652,7 +1876,7 @@ ROM_START( qosb )
 ROM_END
 
 GAME( 1989, inquiztr, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Inquizitor",                       GAME_NOT_WORKING )
-GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAME( 1990, escounts, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Every Second Counts (39-360-053)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, trebltop, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Treble Top (39-360-070)",          GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, beeline,  0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Beeline (39-360-075)",             GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, quizvadr, 0,   bfcobra, bfcobra, bfcobra, ROT0, "BFM", "Quizvaders (39-360-078)",          GAME_IMPERFECT_GRAPHICS )
