@@ -535,3 +535,196 @@ static DRIVER_INIT( badlands )
  *************************************/
 
 GAME( 1989, badlands, 0, badlands, badlands, badlands, ROT0, "Atari Games", "Bad Lands", 0 )
+
+/* Badlands - Playmark Bootleg support - split this into its own file?
+
+ Year: 1989
+ Producer: Playmark
+
+ cpu: 68000
+ sound cpu:  Z80
+ sound ics: YM2151 + 3012
+
+ other ics: 28c16 2kx8 eeprom.Used to store bookeeping,settings etc. like original pcb.
+
+ Osc: 20 Mhz, 28 Mhz
+
+ ROMs:
+
+ blb21, blb22, blb27, blb28 main program
+ blb26 sound program
+ blb29 to blb40 graphics
+
+ All eproms are 27c512
+
+ Note
+
+ This romset comes from a bootleg pcb produced by Playmark.This pcb was been modified to use as control standard joysticks instead of steering wheels.Game differences are: Copyright string removed.
+
+*/
+
+static READ16_HANDLER( badlandb_unk_r )
+{
+
+	return 0xffff;
+}
+
+static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+
+
+	AM_RANGE(0x400008, 0x400009) AM_READ(badlandb_unk_r )
+	AM_RANGE(0x4000fe, 0x4000ff) AM_READ(badlandb_unk_r )
+
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(badlandb_unk_r )
+
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(badlandb_unk_r )
+	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(badlandb_unk_r )
+	AM_RANGE(0xfe4006, 0xfe4007) AM_READ(badlandb_unk_r )
+
+
+	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
+	//AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE(atarigen_video_int_ack_w)
+
+	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
+	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(atarigen_eeprom_enable_w)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_READWRITE(SMH_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xfff200, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static const gfx_layout pflayout_bootleg =
+{
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static GFXDECODE_START( badlandb )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, pflayout_bootleg,    0, 8 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0, molayout,  128, 8 )
+GFXDECODE_END
+
+static void update_interrupts_bootleg(running_machine *machine)
+{
+	int newstate = 0;
+
+	if (atarigen_video_int_state)
+		newstate = 1;
+//	if (atarigen_sound_int_state)
+//		newstate = 2;
+
+	if (newstate)
+		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
+	else
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+}
+
+
+static void scanline_update_bootleg(const device_config *screen, int scanline)
+{
+	/* sound IRQ is on 32V */
+//	if (scanline & 32)
+//		atarigen_6502_irq_ack_r(screen->machine, 0);
+//	else if (!(readinputport(0) & 0x40))
+//		atarigen_6502_irq_gen(screen->machine, 0);
+}
+
+
+
+static MACHINE_RESET( badlandb )
+{
+//	pedal_value[0] = pedal_value[1] = 0x80;
+
+	atarigen_eeprom_reset();
+	atarigen_interrupt_reset(update_interrupts_bootleg);
+	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update_bootleg, 32);
+
+//	atarigen_sound_io_reset(1);
+//	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
+}
+
+static MACHINE_DRIVER_START( badlandb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, 2800000/2)
+	MDRV_CPU_PROGRAM_MAP(bootleg_map,0)
+	MDRV_CPU_VBLANK_INT("main", vblank_int)
+
+//	MDRV_CPU_ADD(Z80, 2800000/8)
+//	MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
+
+	MDRV_MACHINE_RESET(badlandb)
+	MDRV_NVRAM_HANDLER(atarigen)
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MDRV_GFXDECODE(badlandb)
+	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	/* note: these parameters are from published specs, not derived */
+	/* the board uses an SOS-2 chip to generate video signals */
+	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+
+	MDRV_VIDEO_START(badlands)
+	MDRV_VIDEO_UPDATE(badlands)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM2151, 2800000/4)
+	MDRV_SOUND_ROUTE(0, "mono", 0.30)
+	MDRV_SOUND_ROUTE(1, "mono", 0.30)
+MACHINE_DRIVER_END
+
+
+
+/* bootleg by Playmark, uses Joystick controls */
+ROM_START( badlandb )
+	/* bootleg 68k Program */
+	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 4*64k for 68000 code */
+	ROM_LOAD16_BYTE( "blb28.ic21",  0x00000, 0x10000, CRC(dffb025d) SHA1(f2c17607acbbeee7d5d3f3dd2e8dc768b755e991) )
+	ROM_LOAD16_BYTE( "blb22.ic22",  0x00001, 0x10000, CRC(ca3015c4) SHA1(72e1451498143d920239487704f4b4a8a71410e0) )
+	ROM_LOAD16_BYTE( "blb27.ic19",  0x20000, 0x10000, CRC(0e2e807f) SHA1(5b61de066dca12c44335aa68a13c821845657866) )
+	ROM_LOAD16_BYTE( "blb21.ic20",  0x20001, 0x10000, CRC(99a20c2c) SHA1(9b0a5a5dafb8816e72330d302c60339b600b49a8) )
+
+	/* Z80 on the bootleg! */
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "blb26.ic27", 0x00000, 0x10000, CRC(59503ab4) SHA1(ea5686ee28f6125c1394d687cc35c6322c8f900c) )
+
+	/* the 2nd half of 122,123,124 and 125 is identical to the first half and not used */
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "blb36.ic123",  0x000000, 0x10000, BAD_DUMP CRC(d7978eeb) SHA1(1adc95bebe9eea8c112d40cd04ab7a8d75c4f961) ) /* bad dump -- empty */
+	ROM_LOAD( "blb37.ic92",   0x008000, 0x10000, CRC(9188db9f) SHA1(8f7dc2c4c0dec9a80b6214a2efaa0de0858de84c) )
+	ROM_LOAD( "blb38.ic125",  0x020000, 0x10000, CRC(4839dd54) SHA1(031efbc144e5e088be0f3576aa514c7c2b775f6d) )
+	ROM_LOAD( "blb31.ic91",   0x028000, 0x10000, BAD_DUMP CRC(77e3dabc) SHA1(fa3c93f37ab11cfe82cf17c25ec2f9b8bee8a64e) ) /* bad dump -- BADADDR        xxxx-xxxxxxxxxxx */
+	ROM_LOAD( "blb30.ic122",  0x040000, 0x10000, CRC(61a1bcec) SHA1(fd38bbf8f6c8d1e0e936740db757f9fa85753503) )
+	ROM_LOAD( "blb35.ic90",   0x048000, 0x10000, CRC(649c17f0) SHA1(bed3b7fc2c0516fe309bb81b65d8925ecf3065e4) )
+	ROM_LOAD( "blb32.ic124",  0x060000, 0x10000, CRC(a67c61ba) SHA1(d701eb7f4520b57be54a7113d39f81d52800ee7e) )
+	ROM_LOAD( "blb29.ic88",   0x068000, 0x10000, CRC(a9f280e5) SHA1(daff021d14f17da8c4469270a1e50e5a01d05d49) )
+
+	/* the 1st half of 67 & 68 are empty and not used */
+	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "blb33.ic67", 0x10001, 0x10000, CRC(aebf9938) SHA1(3778aacbde07e5a5d010e41ab62d5b0db8632ad8) )
+	ROM_LOAD16_BYTE( "blb34.ic34", 0x00001, 0x10000, CRC(3eac30a5) SHA1(deefc668185bf30ad3eeba73853f97ce12b85293) )
+	ROM_LOAD16_BYTE( "blb39.ic68", 0x10000, 0x10000, CRC(f398f2d7) SHA1(1eef64680101888425490eb4d5b86072e59753cf) )
+	ROM_LOAD16_BYTE( "blb40.ic35", 0x00000, 0x10000, CRC(b47679ee) SHA1(0bd7d40dad214c54021c2014efbd374a7e4c7a3f) )
+ROM_END
+
+
+static DRIVER_INIT( badlandb )
+{
+	atarigen_eeprom_default = NULL;
+}
+
+
+GAME( 1989, badlandb, badlands, badlandb, badlands, badlandb, ROT0, "[Atari Games] (Playmark bootleg)", "Bad Lands (bootleg)", GAME_NOT_WORKING )

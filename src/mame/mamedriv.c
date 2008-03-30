@@ -5280,6 +5280,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cyberbt1 )	/* 136073           (c) 1989 */
 
 	DRIVER( badlands )	/* 136074           (c) 1989 */
+	DRIVER( badlandb )	/* bootleg */
 	DRIVER( klax )		/* 136075           (c) 1989 */
 	DRIVER( klax2 )		/* 136075           (c) 1989 */
 	DRIVER( klax3 )		/* 136075           (c) 1989 */
