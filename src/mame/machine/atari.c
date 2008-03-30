@@ -838,7 +838,7 @@ MACHINE_START( a800 )
 
 
 #ifdef MESS
-DEVICE_LOAD( a800_cart )
+DEVICE_IMAGE_LOAD( a800_cart )
 {
 	UINT8 *mem = memory_region(REGION_CPU1);
 	int size;
@@ -861,7 +861,7 @@ DEVICE_LOAD( a800_cart )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( a800_cart )
+DEVICE_IMAGE_UNLOAD( a800_cart )
 {
 	if( image_index_in_device(image) > 0 )
 	{
@@ -892,7 +892,7 @@ MACHINE_START( a800xl )
 
 
 #ifdef MESS
-DEVICE_LOAD( a800xl_cart )
+DEVICE_IMAGE_LOAD( a800xl_cart )
 {
 	UINT8 *mem = memory_region(REGION_CPU1);
 	astring *fname;
@@ -949,7 +949,7 @@ MACHINE_START( a5200 )
 
 
 #ifdef MESS
-DEVICE_LOAD( a5200_cart )
+DEVICE_IMAGE_LOAD( a5200_cart )
 {
 	UINT8 *mem = memory_region(REGION_CPU1);
 	int size;
@@ -976,7 +976,7 @@ DEVICE_LOAD( a5200_cart )
 	return INIT_PASS;
 }
 
-DEVICE_UNLOAD( a5200_cart )
+DEVICE_IMAGE_UNLOAD( a5200_cart )
 {
 	UINT8 *mem = memory_region(REGION_CPU1);
     /* zap the cartridge memory (again) */

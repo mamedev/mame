@@ -36,16 +36,16 @@ MACHINE_START( a800xl );
 MACHINE_START( a5200 );
 
 #ifdef MESS
-DEVICE_LOAD( a800_floppy );
+DEVICE_IMAGE_LOAD( a800_floppy );
 
-DEVICE_LOAD( a800_cart );
-DEVICE_UNLOAD( a800_cart );
+DEVICE_IMAGE_LOAD( a800_cart );
+DEVICE_IMAGE_UNLOAD( a800_cart );
 
-DEVICE_LOAD( a800xl_cart );
-DEVICE_UNLOAD( a800xl_cart );
+DEVICE_IMAGE_LOAD( a800xl_cart );
+DEVICE_IMAGE_UNLOAD( a800xl_cart );
 
-DEVICE_LOAD( a5200_cart );
-DEVICE_UNLOAD( a5200_cart );
+DEVICE_IMAGE_LOAD( a5200_cart );
+DEVICE_IMAGE_UNLOAD( a5200_cart );
 #endif
 
  READ8_HANDLER ( atari_serin_r );
