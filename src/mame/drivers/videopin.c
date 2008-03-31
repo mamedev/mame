@@ -192,28 +192,20 @@ static WRITE8_HANDLER( videopin_note_dvsr_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( videopin_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r)
-	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_0_r)
-	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r)
-	AM_RANGE(0x2000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)   /* mirror for 6502 vectors */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( videopin_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0200, 0x07ff) AM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(videopin_note_dvsr_w)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x07ff) AM_RAM AM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
+	AM_RANGE(0x0800, 0x0800) AM_READWRITE(videopin_misc_r, videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(videopin_ball_w)
 	AM_RANGE(0x0805, 0x0805) AM_WRITE(videopin_out1_w)
 	AM_RANGE(0x0806, 0x0806) AM_WRITE(videopin_out2_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_0_r)
+	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)   /* mirror for 6502 vectors */
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -331,7 +323,7 @@ static MACHINE_DRIVER_START( videopin )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 12096000 / 16)
-	MDRV_CPU_PROGRAM_MAP(videopin_readmem, videopin_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	MDRV_MACHINE_RESET(videopin)
 
