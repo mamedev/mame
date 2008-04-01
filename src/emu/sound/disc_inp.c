@@ -42,6 +42,9 @@ READ8_HANDLER(discrete_sound_r)
 	{
 		UINT8 *node_data = node->context;
 
+		/* Bring the system up to now */
+		stream_update(info->discrete_stream);
+
 		if ((node->module.type >= DSS_INPUT_DATA) && (node->module.type <= DSS_INPUT_PULSE))
 		{
 			data = *node_data;
@@ -63,24 +66,28 @@ WRITE8_HANDLER(discrete_sound_w)
 	{
 		UINT8 *node_data = node->context;
 		UINT8 last_data = *node_data;
+		UINT8 new_data = 0;
 
 		switch (node->module.type)
 		{
 			case DSS_INPUT_DATA:
-				*node_data = data;
+				new_data = data;
 				break;
 			case DSS_INPUT_LOGIC:
 			case DSS_INPUT_PULSE:
-				*node_data = data ? 1 : 0;
+				new_data = data ? 1 : 0;
 				break;
 			case DSS_INPUT_NOT:
-				*node_data = data ? 0 : 1;
+				new_data = data ? 0 : 1;
 				break;
 		}
-
-		/* Bring the system up to now */
-		if (last_data != *node_data)
+		if (last_data != new_data)
+		{
+			/* Bring the system up to now */
 			stream_update(info->discrete_stream);
+
+			*node_data = new_data;
+		}
 	}
 	else
 	{
@@ -125,14 +132,14 @@ static void dss_adjustment_step(node_description *node)
 
 			context->lastpval = rawportval;
 			if (DSS_ADJUSTMENT__LOG == 0)
-				node->output = scaledval;
+				node->output[0] = scaledval;
 			else
-				node->output = pow(10, scaledval);
+				node->output[0] = pow(10, scaledval);
 		}
 	}
 	else
 	{
-		node->output = 0;
+		node->output[0] = 0;
 	}
 }
 
@@ -186,7 +193,7 @@ static void dss_adjustment_reset(node_description *node)
 
 static void dss_constant_step(node_description *node)
 {
-	node->output= DSS_CONSTANT__INIT;
+	node->output[0]= DSS_CONSTANT__INIT;
 }
 
 
@@ -204,7 +211,7 @@ static void dss_input_step(node_description *node)
 {
 	UINT8 *node_data = node->context;
 
-	node->output = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
+	node->output[0] = *node_data * DSS_INPUT__GAIN + DSS_INPUT__OFFSET;
 }
 
 static void dss_input_reset(node_description *node)
@@ -232,7 +239,7 @@ static void dss_input_pulse_step(node_description *node)
 	UINT8 *node_data = node->context;
 
 	/* Set a valid output */
-	node->output = *node_data;
+	node->output[0] = *node_data;
 	/* Reset the input to default for the next cycle */
 	/* node order is now important */
 	*node_data = DSS_INPUT__INIT;
@@ -258,7 +265,7 @@ static void dss_input_stream_step(node_description *node)
 	stream_sample_t **ptr = node->context;
 	stream_sample_t *data = *ptr;
 
-	node->output = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
+	node->output[0] = data ? (*data) * DSS_INPUT_STREAM__GAIN + DSS_INPUT_STREAM__OFFSET : 0;
 }
 
 static void dss_input_stream_reset(node_description *node)

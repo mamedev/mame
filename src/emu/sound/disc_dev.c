@@ -175,7 +175,7 @@ static void dsd_555_astbl_step(node_description *node)
 	{
 		/* We are in RESET */
 		/* If there was a fatal INIT error then we will also stay in RESET */
-		node->output = 0;
+		node->output[0] = 0;
 		context->flip_flop = 1;
 		context->cap_voltage = 0;
 		return;
@@ -308,32 +308,32 @@ static void dsd_555_astbl_step(node_description *node)
 	switch (context->output_type)
 	{
 		case DISC_555_OUT_SQW:
-			node->output = context->flip_flop * context->output_high_voltage + context->ac_shift;
+			node->output[0] = context->flip_flop * context->output_high_voltage + context->ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			node->output = vCnext;
+			node->output[0] = vCnext;
 			/* Fake it to AC if needed */
 			if (context->output_is_ac)
-				node->output -= context->threshold * 3.0 /4.0;
+				node->output[0] -= context->threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
-			node->output = context->output_high_voltage * (context->flip_flop ? xTime : (1 - xTime));
-			node->output += context->ac_shift;
+			node->output[0] = context->output_high_voltage * (context->flip_flop ? xTime : (1 - xTime));
+			node->output[0] += context->ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			node->output = context->flip_flop + xTime;
+			node->output[0] = context->flip_flop + xTime;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
-			node->output = count_f ? count_f + xTime : count_f;
+			node->output[0] = count_f ? count_f + xTime : count_f;
 			break;
 		case DISC_555_OUT_COUNT_R_X:
-			node->output =  count_r ? count_r + xTime : count_r;
+			node->output[0] =  count_r ? count_r + xTime : count_r;
 			break;
 		case DISC_555_OUT_COUNT_F:
-			node->output = count_f;
+			node->output[0] = count_f;
 			break;
 		case DISC_555_OUT_COUNT_R:
-			node->output = count_r;
+			node->output[0] = count_r;
 			break;
 	}
 }
@@ -411,7 +411,7 @@ static void dsd_555_mstbl_step(node_description *node)
 	{
 		/* We are in RESET */
 		/* If there was a fatal INIT error then we will also stay in RESET */
-		node->output = 0;
+		node->output[0] = 0;
 		context->flip_flop = 0;
 		context->cap_voltage = 0;
 	}
@@ -469,16 +469,16 @@ static void dsd_555_mstbl_step(node_description *node)
 			switch (info->options & DISC_555_OUT_MASK)
 			{
 				case DISC_555_OUT_SQW:
-					node->output = context->flip_flop * context->output_high_voltage;
+					node->output[0] = context->flip_flop * context->output_high_voltage;
 					/* Fake it to AC if needed */
 					if (context->output_is_ac)
-						node->output -= context->output_high_voltage / 2.0;
+						node->output[0] -= context->output_high_voltage / 2.0;
 					break;
 				case DISC_555_OUT_CAP:
-					node->output = vCnext;
+					node->output[0] = vCnext;
 					/* Fake it to AC if needed */
 					if (context->output_is_ac)
-						node->output -= context->threshold * 3.0 /4.0;
+						node->output[0] -= context->threshold * 3.0 /4.0;
 					break;
 			}
 		}
@@ -514,7 +514,7 @@ static void dsd_555_mstbl_reset(node_description *node)
 	context->flip_flop = 0;
 	context->cap_voltage = 0;
 
-	node->output = 0;
+	node->output[0] = 0;
 }
 
 
@@ -568,7 +568,7 @@ static void dsd_555_cc_step(node_description *node)
 	{
 		/* We are in RESET */
 		/* If there was a fatal INIT error then we will also stay in RESET */
-		node->output = 0;
+		node->output[0] = 0;
 		context->flip_flop = 1;
 		context->cap_voltage = 0;
 		return;
@@ -782,34 +782,34 @@ static void dsd_555_cc_step(node_description *node)
 			if (count_r && (~context->type & 0x01))
 			{
 				/* There has been an immediate discharge, so keep low for 1 sample. */
-				node->output = 0;
+				node->output[0] = 0;
 			}
 			else
-				node->output = context->flip_flop * context->output_high_voltage;
+				node->output[0] = context->flip_flop * context->output_high_voltage;
 			/* Fake it to AC if needed */
-			node->output += context->ac_shift;
+			node->output[0] += context->ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			node->output = vCnext + context->ac_shift;
+			node->output[0] = vCnext + context->ac_shift;
 			break;
 		case DISC_555_OUT_ENERGY:
-			node->output = context->output_high_voltage * (context->flip_flop ? xTime : (1 - xTime));
-			node->output += context->ac_shift;
+			node->output[0] = context->output_high_voltage * (context->flip_flop ? xTime : (1 - xTime));
+			node->output[0] += context->ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			node->output = context->flip_flop + xTime;
+			node->output[0] = context->flip_flop + xTime;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
-			node->output = count_f + xTime;
+			node->output[0] = count_f + xTime;
 			break;
 		case DISC_555_OUT_COUNT_R_X:
-			node->output = count_r + xTime;
+			node->output[0] = count_r + xTime;
 			break;
 		case DISC_555_OUT_COUNT_F:
-			node->output = count_f;
+			node->output[0] = count_f;
 			break;
 		case DISC_555_OUT_COUNT_R:
-			node->output = count_r;
+			node->output[0] = count_r;
 			break;
 	}
 }
@@ -1120,32 +1120,32 @@ static void dsd_555_vco1_step(node_description *node)
 	switch (context->output_type)
 	{
 		case DISC_555_OUT_SQW:
-			node->output = context->flip_flop * context->output_high_voltage + context->ac_shift;
+			node->output[0] = context->flip_flop * context->output_high_voltage + context->ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			node->output = vCnext;
+			node->output[0] = vCnext;
 			/* Fake it to AC if needed */
 			if (context->output_is_ac)
-				node->output -= context->threshold * 3.0 /4.0;
+				node->output[0] -= context->threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
-			node->output = context->output_high_voltage * (context->flip_flop ? xTime : (1 - xTime));
-			node->output += context->ac_shift;
+			node->output[0] = context->output_high_voltage * (context->flip_flop ? xTime : (1 - xTime));
+			node->output[0] += context->ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
-			node->output = context->flip_flop + xTime;
+			node->output[0] = context->flip_flop + xTime;
 			break;
 		case DISC_555_OUT_COUNT_F_X:
-			node->output = count_f ? count_f + xTime : count_f;
+			node->output[0] = count_f ? count_f + xTime : count_f;
 			break;
 		case DISC_555_OUT_COUNT_R_X:
-			node->output =  count_r ? count_r + xTime : count_r;
+			node->output[0] =  count_r ? count_r + xTime : count_r;
 			break;
 		case DISC_555_OUT_COUNT_F:
-			node->output = count_f;
+			node->output[0] = count_f;
 			break;
 		case DISC_555_OUT_COUNT_R:
-			node->output = count_r;
+			node->output[0] = count_r;
 			break;
 	}
 }
@@ -1308,34 +1308,34 @@ static void dsd_566_step(node_description *node)
 			case DISC_566_OUT_SQUARE:
 			case DISC_566_OUT_LOGIC:
 				/* use up any output states */
-				if (node->output && context->state[0])
+				if (node->output[0] && context->state[0])
 				{
-					node->output = 0;
+					node->output[0] = 0;
 					context->state[0]--;
 				}
-				else if (!node->output && context->state[1])
+				else if (!node->output[0] && context->state[1])
 				{
-					node->output = 1;
+					node->output[0] = 1;
 					context->state[1]--;
 				}
 				else
 				{
-					node->output = context->flip_flop;
+					node->output[0] = context->flip_flop;
 				}
 				if ((info->options & DISC_566_OUT_MASK) != DISC_566_OUT_LOGIC)
-					node->output = context->flip_flop ? context->vSqrHigh : context->vSqrLow;
+					node->output[0] = context->flip_flop ? context->vSqrHigh : context->vSqrLow;
 				break;
 			case DISC_566_OUT_TRIANGLE:
 				/* we can ignore any unused states when
                  * outputting the cap voltage */
-				node->output = vCnext;
+				node->output[0] = vCnext;
 				if (info->options & DISC_566_OUT_AC)
-					node->output -= context->triOffset;
+					node->output[0] -= context->triOffset;
 				break;
 		}
 	}
 	else
-		node->output = 0;
+		node->output[0] = 0;
 }
 
 static void dsd_566_reset(node_description *node)
@@ -1434,22 +1434,22 @@ static void dsd_ls624_step(node_description *node)
 		switch (context->outtype)
 		{
 			case DISC_LS624_OUT_ENERGY:
-				node->output = ((double) lst) * (1.0+context->remain/sample_t) - ((double) context->state) * context->remain/sample_t;
+				node->output[0] = ((double) lst) * (1.0+context->remain/sample_t) - ((double) context->state) * context->remain/sample_t;
 				break;
 			case DISC_LS624_OUT_LOGIC:
-				node->output = context->state;
+				node->output[0] = context->state;
 				break;
 			case DISC_LS624_OUT_COUNT_F:
-				node->output = cntf;
+				node->output[0] = cntf;
 				break;
 			case DISC_LS624_OUT_COUNT_R:
-				node->output = cntr;
+				node->output[0] = cntr;
 				break;
 		}
 
 	}
 	else
-		node->output = 0;
+		node->output[0] = 0;
 }
 
 static void dsd_ls624_reset(node_description *node)

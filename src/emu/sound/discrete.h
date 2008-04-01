@@ -41,6 +41,16 @@
  * does not do individual device emulation, but instead does a function
  * emulation. So you will need to convert the schematic design into
  * a logic block representation.
+ * 
+ * There is the possibility to support multiple outputs per module.
+ * In this case, NODE_XXX is the default ouput. Alternative outputs may
+ * be accessed by using NODE_XXX_YY where 00<=Y<08.
+ * 
+ * You may also access nodes with a macros:
+ * 
+ *     NODE_XXX = NODE_SUB(XXX, 0)
+ * 	   NODE_XXX = NODE(XXX)
+ *     NODE_XXX_YY = NODE_SUB(XXX, YY) with YY != 00 
  *
  * One node point may feed a number of inputs, for example you could
  * connect the output of a DISCRETE_SINEWAVE to the AMPLITUDE input
@@ -3113,7 +3123,7 @@
 #define DISCRETE_MAX_OUTPUTS			16
 #define DISCRETE_MAX_WAVELOGS			10
 #define DISCRETE_MAX_CSVLOGS			10
-
+#define DISCRETE_MAX_NODE_OUTPUTS		 8
 
 
 /*************************************
@@ -3340,6 +3350,7 @@ struct _discrete_module
 {
 	int				type;
 	const char *	name;
+	int				num_output;				/* Total number of output nodes, i.e. Master node + 1 */
 	size_t			contextsize;
 	void (*reset)(node_description *node);	/* Called to reset a node after creation or system reset */
 	void (*step)(node_description *node);	/* Called to execute one time delta of output update */
@@ -3355,18 +3366,18 @@ typedef struct _discrete_module discrete_module;
 
 struct _node_description
 {
-	int				node;						/* The node's index number in the node list */
-	double			output;						/* The node's last output value */
+	int				node;								/* The node's index number in the node list */
+	double			output[DISCRETE_MAX_NODE_OUTPUTS];	/* The node's last output value */
 
-	int				active_inputs;				/* Number of active inputs on this node type */
-	int				input_is_node;				/* Bit Flags.  1 in bit location means input_is_node */
-	const double *	input[DISCRETE_MAX_INPUTS];	/* Addresses of Input values */
+	int				active_inputs;						/* Number of active inputs on this node type */
+	int				input_is_node;						/* Bit Flags.  1 in bit location means input_is_node */
+	const double *	input[DISCRETE_MAX_INPUTS];			/* Addresses of Input values */
 
-	discrete_module module;						/* Copy of the node's module info */
-	const discrete_sound_block *block;			/* Points to the node's setup block. */
-	void *			context;					/* Contextual information specific to this node type */
-	const char *	name;						/* Text name string for identification/debug */
-	const void *	custom;						/* Custom function specific initialisation data */
+	discrete_module module;								/* Copy of the node's module info */
+	const discrete_sound_block *block;					/* Points to the node's setup block. */
+	void *			context;							/* Contextual information specific to this node type */
+	const char *	name;								/* Text name string for identification/debug */
+	const void *	custom;								/* Custom function specific initialisation data */
 };
 
 
@@ -3672,46 +3683,65 @@ typedef struct _discrete_inverter_osc_desc discrete_inverter_osc_desc;
  *
  *************************************/
 
-enum { NODE_00=0x40000000
-              , NODE_01, NODE_02, NODE_03, NODE_04, NODE_05, NODE_06, NODE_07, NODE_08, NODE_09,
-       NODE_10, NODE_11, NODE_12, NODE_13, NODE_14, NODE_15, NODE_16, NODE_17, NODE_18, NODE_19,
-       NODE_20, NODE_21, NODE_22, NODE_23, NODE_24, NODE_25, NODE_26, NODE_27, NODE_28, NODE_29,
-       NODE_30, NODE_31, NODE_32, NODE_33, NODE_34, NODE_35, NODE_36, NODE_37, NODE_38, NODE_39,
-       NODE_40, NODE_41, NODE_42, NODE_43, NODE_44, NODE_45, NODE_46, NODE_47, NODE_48, NODE_49,
-       NODE_50, NODE_51, NODE_52, NODE_53, NODE_54, NODE_55, NODE_56, NODE_57, NODE_58, NODE_59,
-       NODE_60, NODE_61, NODE_62, NODE_63, NODE_64, NODE_65, NODE_66, NODE_67, NODE_68, NODE_69,
-       NODE_70, NODE_71, NODE_72, NODE_73, NODE_74, NODE_75, NODE_76, NODE_77, NODE_78, NODE_79,
-       NODE_80, NODE_81, NODE_82, NODE_83, NODE_84, NODE_85, NODE_86, NODE_87, NODE_88, NODE_89,
-       NODE_90, NODE_91, NODE_92, NODE_93, NODE_94, NODE_95, NODE_96, NODE_97, NODE_98, NODE_99,
-       NODE_100,NODE_101,NODE_102,NODE_103,NODE_104,NODE_105,NODE_106,NODE_107,NODE_108,NODE_109,
-       NODE_110,NODE_111,NODE_112,NODE_113,NODE_114,NODE_115,NODE_116,NODE_117,NODE_118,NODE_119,
-       NODE_120,NODE_121,NODE_122,NODE_123,NODE_124,NODE_125,NODE_126,NODE_127,NODE_128,NODE_129,
-       NODE_130,NODE_131,NODE_132,NODE_133,NODE_134,NODE_135,NODE_136,NODE_137,NODE_138,NODE_139,
-       NODE_140,NODE_141,NODE_142,NODE_143,NODE_144,NODE_145,NODE_146,NODE_147,NODE_148,NODE_149,
-       NODE_150,NODE_151,NODE_152,NODE_153,NODE_154,NODE_155,NODE_156,NODE_157,NODE_158,NODE_159,
-       NODE_160,NODE_161,NODE_162,NODE_163,NODE_164,NODE_165,NODE_166,NODE_167,NODE_168,NODE_169,
-       NODE_170,NODE_171,NODE_172,NODE_173,NODE_174,NODE_175,NODE_176,NODE_177,NODE_178,NODE_179,
-       NODE_180,NODE_181,NODE_182,NODE_183,NODE_184,NODE_185,NODE_186,NODE_187,NODE_188,NODE_189,
-       NODE_190,NODE_191,NODE_192,NODE_193,NODE_194,NODE_195,NODE_196,NODE_197,NODE_198,NODE_199,
-       NODE_200,NODE_201,NODE_202,NODE_203,NODE_204,NODE_205,NODE_206,NODE_207,NODE_208,NODE_209,
-       NODE_210,NODE_211,NODE_212,NODE_213,NODE_214,NODE_215,NODE_216,NODE_217,NODE_218,NODE_219,
-       NODE_220,NODE_221,NODE_222,NODE_223,NODE_224,NODE_225,NODE_226,NODE_227,NODE_228,NODE_229,
-       NODE_230,NODE_231,NODE_232,NODE_233,NODE_234,NODE_235,NODE_236,NODE_237,NODE_238,NODE_239,
-       NODE_240,NODE_241,NODE_242,NODE_243,NODE_244,NODE_245,NODE_246,NODE_247,NODE_248,NODE_249,
-       NODE_250,NODE_251,NODE_252,NODE_253,NODE_254,NODE_255,NODE_256,NODE_257,NODE_258,NODE_259,
-       NODE_260,NODE_261,NODE_262,NODE_263,NODE_264,NODE_265,NODE_266,NODE_267,NODE_268,NODE_269,
-       NODE_270,NODE_271,NODE_272,NODE_273,NODE_274,NODE_275,NODE_276,NODE_277,NODE_278,NODE_279,
-       NODE_280,NODE_281,NODE_282,NODE_283,NODE_284,NODE_285,NODE_286,NODE_287,NODE_288,NODE_289,
-       NODE_290,NODE_291,NODE_292,NODE_293,NODE_294,NODE_295,NODE_296,NODE_297,NODE_298,NODE_299 };
+#define NODE0_DEF(_x) NODE_ ## 0 ## _x = (0x40000000 + (_x) * DISCRETE_MAX_NODE_OUTPUTS), \
+	NODE_ ## 0 ## _x ## _01, NODE_ ## 0 ## _x ## _02, NODE_ ## 0 ## _x ## _03, NODE_ ## 0 ## _x ## _04, \
+	NODE_ ## 0 ## _x ## _05, NODE_ ## 0 ## _x ## _06, NODE_ ## 0 ## _x ## _07
+#define NODE_DEF(_x) NODE_ ## _x = (0x40000000 + (_x) * DISCRETE_MAX_NODE_OUTPUTS), \
+	NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, NODE_ ## _x ## _04, \
+	NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
+
+enum { 
+	NODE0_DEF(0), NODE0_DEF(1), NODE0_DEF(2), NODE0_DEF(3), NODE0_DEF(4), NODE0_DEF(5), NODE0_DEF(6), NODE0_DEF(7), NODE0_DEF(8), NODE0_DEF(9),
+	NODE_DEF(10), NODE_DEF(11), NODE_DEF(12), NODE_DEF(13), NODE_DEF(14), NODE_DEF(15), NODE_DEF(16), NODE_DEF(17), NODE_DEF(18), NODE_DEF(19),
+	NODE_DEF(20), NODE_DEF(21), NODE_DEF(22), NODE_DEF(23), NODE_DEF(24), NODE_DEF(25), NODE_DEF(26), NODE_DEF(27), NODE_DEF(28), NODE_DEF(29),
+	NODE_DEF(30), NODE_DEF(31), NODE_DEF(32), NODE_DEF(33), NODE_DEF(34), NODE_DEF(35), NODE_DEF(36), NODE_DEF(37), NODE_DEF(38), NODE_DEF(39),
+	NODE_DEF(40), NODE_DEF(41), NODE_DEF(42), NODE_DEF(43), NODE_DEF(44), NODE_DEF(45), NODE_DEF(46), NODE_DEF(47), NODE_DEF(48), NODE_DEF(49),
+	NODE_DEF(50), NODE_DEF(51), NODE_DEF(52), NODE_DEF(53), NODE_DEF(54), NODE_DEF(55), NODE_DEF(56), NODE_DEF(57), NODE_DEF(58), NODE_DEF(59),
+	NODE_DEF(60), NODE_DEF(61), NODE_DEF(62), NODE_DEF(63), NODE_DEF(64), NODE_DEF(65), NODE_DEF(66), NODE_DEF(67), NODE_DEF(68), NODE_DEF(69),
+	NODE_DEF(70), NODE_DEF(71), NODE_DEF(72), NODE_DEF(73), NODE_DEF(74), NODE_DEF(75), NODE_DEF(76), NODE_DEF(77), NODE_DEF(78), NODE_DEF(79),
+	NODE_DEF(80), NODE_DEF(81), NODE_DEF(82), NODE_DEF(83), NODE_DEF(84), NODE_DEF(85), NODE_DEF(86), NODE_DEF(87), NODE_DEF(88), NODE_DEF(89),
+	NODE_DEF(90), NODE_DEF(91), NODE_DEF(92), NODE_DEF(93), NODE_DEF(94), NODE_DEF(95), NODE_DEF(96), NODE_DEF(97), NODE_DEF(98), NODE_DEF(99),
+	NODE_DEF(100),NODE_DEF(101),NODE_DEF(102),NODE_DEF(103),NODE_DEF(104),NODE_DEF(105),NODE_DEF(106),NODE_DEF(107),NODE_DEF(108),NODE_DEF(109),
+	NODE_DEF(110),NODE_DEF(111),NODE_DEF(112),NODE_DEF(113),NODE_DEF(114),NODE_DEF(115),NODE_DEF(116),NODE_DEF(117),NODE_DEF(118),NODE_DEF(119),
+	NODE_DEF(120),NODE_DEF(121),NODE_DEF(122),NODE_DEF(123),NODE_DEF(124),NODE_DEF(125),NODE_DEF(126),NODE_DEF(127),NODE_DEF(128),NODE_DEF(129),
+	NODE_DEF(130),NODE_DEF(131),NODE_DEF(132),NODE_DEF(133),NODE_DEF(134),NODE_DEF(135),NODE_DEF(136),NODE_DEF(137),NODE_DEF(138),NODE_DEF(139),
+	NODE_DEF(140),NODE_DEF(141),NODE_DEF(142),NODE_DEF(143),NODE_DEF(144),NODE_DEF(145),NODE_DEF(146),NODE_DEF(147),NODE_DEF(148),NODE_DEF(149),
+	NODE_DEF(150),NODE_DEF(151),NODE_DEF(152),NODE_DEF(153),NODE_DEF(154),NODE_DEF(155),NODE_DEF(156),NODE_DEF(157),NODE_DEF(158),NODE_DEF(159),
+	NODE_DEF(160),NODE_DEF(161),NODE_DEF(162),NODE_DEF(163),NODE_DEF(164),NODE_DEF(165),NODE_DEF(166),NODE_DEF(167),NODE_DEF(168),NODE_DEF(169),
+	NODE_DEF(170),NODE_DEF(171),NODE_DEF(172),NODE_DEF(173),NODE_DEF(174),NODE_DEF(175),NODE_DEF(176),NODE_DEF(177),NODE_DEF(178),NODE_DEF(179),
+	NODE_DEF(180),NODE_DEF(181),NODE_DEF(182),NODE_DEF(183),NODE_DEF(184),NODE_DEF(185),NODE_DEF(186),NODE_DEF(187),NODE_DEF(188),NODE_DEF(189),
+	NODE_DEF(190),NODE_DEF(191),NODE_DEF(192),NODE_DEF(193),NODE_DEF(194),NODE_DEF(195),NODE_DEF(196),NODE_DEF(197),NODE_DEF(198),NODE_DEF(199),
+	NODE_DEF(200),NODE_DEF(201),NODE_DEF(202),NODE_DEF(203),NODE_DEF(204),NODE_DEF(205),NODE_DEF(206),NODE_DEF(207),NODE_DEF(208),NODE_DEF(209),
+	NODE_DEF(210),NODE_DEF(211),NODE_DEF(212),NODE_DEF(213),NODE_DEF(214),NODE_DEF(215),NODE_DEF(216),NODE_DEF(217),NODE_DEF(218),NODE_DEF(219),
+	NODE_DEF(220),NODE_DEF(221),NODE_DEF(222),NODE_DEF(223),NODE_DEF(224),NODE_DEF(225),NODE_DEF(226),NODE_DEF(227),NODE_DEF(228),NODE_DEF(229),
+	NODE_DEF(230),NODE_DEF(231),NODE_DEF(232),NODE_DEF(233),NODE_DEF(234),NODE_DEF(235),NODE_DEF(236),NODE_DEF(237),NODE_DEF(238),NODE_DEF(239),
+	NODE_DEF(240),NODE_DEF(241),NODE_DEF(242),NODE_DEF(243),NODE_DEF(244),NODE_DEF(245),NODE_DEF(246),NODE_DEF(247),NODE_DEF(248),NODE_DEF(249),
+	NODE_DEF(250),NODE_DEF(251),NODE_DEF(252),NODE_DEF(253),NODE_DEF(254),NODE_DEF(255),NODE_DEF(256),NODE_DEF(257),NODE_DEF(258),NODE_DEF(259),
+	NODE_DEF(260),NODE_DEF(261),NODE_DEF(262),NODE_DEF(263),NODE_DEF(264),NODE_DEF(265),NODE_DEF(266),NODE_DEF(267),NODE_DEF(268),NODE_DEF(269),
+	NODE_DEF(270),NODE_DEF(271),NODE_DEF(272),NODE_DEF(273),NODE_DEF(274),NODE_DEF(275),NODE_DEF(276),NODE_DEF(277),NODE_DEF(278),NODE_DEF(279),
+	NODE_DEF(280),NODE_DEF(281),NODE_DEF(282),NODE_DEF(283),NODE_DEF(284),NODE_DEF(285),NODE_DEF(286),NODE_DEF(287),NODE_DEF(288),NODE_DEF(289),
+	NODE_DEF(290),NODE_DEF(291),NODE_DEF(292),NODE_DEF(293),NODE_DEF(294),NODE_DEF(295),NODE_DEF(296),NODE_DEF(297),NODE_DEF(298),NODE_DEF(299)
+};
 
 /* Some Pre-defined nodes for convenience */
+
+#define NODE(_x)	(NODE_00 + (_x) * DISCRETE_MAX_NODE_OUTPUTS)
+#define NODE_SUB(_x, _y) (NODE(_x) + (_y))
+
+#if DISCRETE_MAX_NODE_OUTPUTS == 8
+#define NODE_CHILD_NODE_NUM(_x)		((_x) & 7)
+#define NODE_DEFAULT_NODE(_x)		((_x) & ~7)
+#define NODE_INDEX(_x)				(((_x) - NODE_START)>>3)	
+#else
+#error "DISCRETE_MAX_NODE_OUTPUTS != 8"
+#endif
+
 #define NODE_NC  NODE_00
-#define NODE_SPECIAL  (NODE_00+(DISCRETE_MAX_NODES))
+#define NODE_SPECIAL  NODE(DISCRETE_MAX_NODES)
 
 #define NODE_START	NODE_00
 #define NODE_END	NODE_SPECIAL
-       
-#define NODE(_x)	(NODE_00+(_x))
+
 
 
 /*************************************

@@ -3395,7 +3395,7 @@ static const discrete_mixer_desc invaders_mixer =
 
 
 /* sound board 1 or 2, for multi-board games */
-#define INVADERS_NODE(_node, _board)	(NODE_START + _node + ((_board - 1) * 100))
+#define INVADERS_NODE(_node, _board)	(NODE(_node + ((_board - 1) * 100)))
 
 /************************************************
  * Noise Generator

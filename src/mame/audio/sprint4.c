@@ -157,7 +157,7 @@ static const discrete_mixer_desc sprint4_mixer =
 /* used to offset the motor nodes based on the player so the nodes do not overlap */
 /* _plr must be 1, 2, 3, or 4 */
 /* so it uses NODES_30 to NODE_69 */
-#define SPRINT4_PLAYER_MOTOR_NODE(_node, _plr)		NODE_20 + 10 * _plr + _node
+#define SPRINT4_PLAYER_MOTOR_NODE(_node, _plr)		NODE(20 + 10 * _plr + _node)
 
 
 /************************************************

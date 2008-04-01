@@ -163,105 +163,105 @@ static void CLIB_DECL ATTR_PRINTF(1,2) discrete_log(const char *text, ...)
 
 static const discrete_module module_list[] =
 {
-	{ DSO_OUTPUT      ,"DSO_OUTPUT"      ,0                                      ,NULL                  ,NULL                 },
-	{ DSO_CSVLOG      ,"DSO_CSVLOG"      ,0                                      ,NULL                  ,NULL                 },
-	{ DSO_WAVELOG     ,"DSO_WAVELOG"     ,0                                      ,NULL                  ,NULL                 },
+	{ DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,0                                      ,NULL                  ,NULL                 },
+	{ DSO_CSVLOG      ,"DSO_CSVLOG"      , 0 ,0                                      ,NULL                  ,NULL                 },
+	{ DSO_WAVELOG     ,"DSO_WAVELOG"     , 0 ,0                                      ,NULL                  ,NULL                 },
 
 	/* from disc_inp.c */
-	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
-	{ DSS_CONSTANT    ,"DSS_CONSTANT"    ,0                                      ,NULL                  ,dss_constant_step    },
-	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
-	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_pulse_step },
-	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM",0                                      ,dss_input_stream_reset,dss_input_stream_step},
+	{ DSS_ADJUSTMENT  ,"DSS_ADJUSTMENT"  , 1 ,sizeof(struct dss_adjustment_context)  ,dss_adjustment_reset  ,dss_adjustment_step  },
+	{ DSS_CONSTANT    ,"DSS_CONSTANT"    , 1 ,0                                      ,NULL                  ,dss_constant_step    },
+	{ DSS_INPUT_DATA  ,"DSS_INPUT_DATA"  , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
+	{ DSS_INPUT_LOGIC ,"DSS_INPUT_LOGIC" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
+	{ DSS_INPUT_NOT   ,"DSS_INPUT_NOT"   , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_step       },
+	{ DSS_INPUT_PULSE ,"DSS_INPUT_PULSE" , 1 ,sizeof(UINT8)                          ,dss_input_reset       ,dss_input_pulse_step },
+	{ DSS_INPUT_STREAM,"DSS_INPUT_STREAM", 1 ,0                                      ,dss_input_stream_reset,dss_input_stream_step},
 
 	/* from disc_wav.c */
 	/* Generic modules */
-	{ DSS_COUNTER     ,"DSS_COUNTER"     ,sizeof(struct dss_counter_context)     ,dss_counter_reset     ,dss_counter_step     },
-	{ DSS_LFSR_NOISE  ,"DSS_LFSR_NOISE"  ,sizeof(struct dss_lfsr_context)        ,dss_lfsr_reset        ,dss_lfsr_step        },
-	{ DSS_NOISE       ,"DSS_NOISE"       ,sizeof(struct dss_noise_context)       ,dss_noise_reset       ,dss_noise_step       },
-	{ DSS_NOTE        ,"DSS_NOTE"        ,sizeof(struct dss_note_context)        ,dss_note_reset        ,dss_note_step        },
-	{ DSS_SAWTOOTHWAVE,"DSS_SAWTOOTHWAVE",sizeof(struct dss_sawtoothwave_context),dss_sawtoothwave_reset,dss_sawtoothwave_step},
-	{ DSS_SINEWAVE    ,"DSS_SINEWAVE"    ,sizeof(struct dss_sinewave_context)    ,dss_sinewave_reset    ,dss_sinewave_step    },
-	{ DSS_SQUAREWAVE  ,"DSS_SQUAREWAVE"  ,sizeof(struct dss_squarewave_context)  ,dss_squarewave_reset  ,dss_squarewave_step  },
-	{ DSS_SQUAREWFIX  ,"DSS_SQUAREWFIX"  ,sizeof(struct dss_squarewfix_context)  ,dss_squarewfix_reset  ,dss_squarewfix_step  },
-	{ DSS_SQUAREWAVE2 ,"DSS_SQUAREWAVE2" ,sizeof(struct dss_squarewave_context)  ,dss_squarewave2_reset ,dss_squarewave2_step },
-	{ DSS_TRIANGLEWAVE,"DSS_TRIANGLEWAVE",sizeof(struct dss_trianglewave_context),dss_trianglewave_reset,dss_trianglewave_step},
+	{ DSS_COUNTER     ,"DSS_COUNTER"     , 1 ,sizeof(struct dss_counter_context)     ,dss_counter_reset     ,dss_counter_step     },
+	{ DSS_LFSR_NOISE  ,"DSS_LFSR_NOISE"  , 1 ,sizeof(struct dss_lfsr_context)        ,dss_lfsr_reset        ,dss_lfsr_step        },
+	{ DSS_NOISE       ,"DSS_NOISE"       , 1 ,sizeof(struct dss_noise_context)       ,dss_noise_reset       ,dss_noise_step       },
+	{ DSS_NOTE        ,"DSS_NOTE"        , 1 ,sizeof(struct dss_note_context)        ,dss_note_reset        ,dss_note_step        },
+	{ DSS_SAWTOOTHWAVE,"DSS_SAWTOOTHWAVE", 1 ,sizeof(struct dss_sawtoothwave_context),dss_sawtoothwave_reset,dss_sawtoothwave_step},
+	{ DSS_SINEWAVE    ,"DSS_SINEWAVE"    , 1 ,sizeof(struct dss_sinewave_context)    ,dss_sinewave_reset    ,dss_sinewave_step    },
+	{ DSS_SQUAREWAVE  ,"DSS_SQUAREWAVE"  , 1 ,sizeof(struct dss_squarewave_context)  ,dss_squarewave_reset  ,dss_squarewave_step  },
+	{ DSS_SQUAREWFIX  ,"DSS_SQUAREWFIX"  , 1 ,sizeof(struct dss_squarewfix_context)  ,dss_squarewfix_reset  ,dss_squarewfix_step  },
+	{ DSS_SQUAREWAVE2 ,"DSS_SQUAREWAVE2" , 1 ,sizeof(struct dss_squarewave_context)  ,dss_squarewave2_reset ,dss_squarewave2_step },
+	{ DSS_TRIANGLEWAVE,"DSS_TRIANGLEWAVE", 1 ,sizeof(struct dss_trianglewave_context),dss_trianglewave_reset,dss_trianglewave_step},
 	/* Component specific modules */
-	{ DSS_INVERTER_OSC ,"DSS_INVERTER_OSC" ,sizeof(struct dss_inverter_osc_context) ,dss_inverter_osc_reset ,dss_inverter_osc_step },
-	{ DSS_OP_AMP_OSC  ,"DSS_OP_AMP_OSC"  ,sizeof(struct dss_op_amp_osc_context)  ,dss_op_amp_osc_reset  ,dss_op_amp_osc_step  },
-	{ DSS_SCHMITT_OSC ,"DSS_SCHMITT_OSC" ,sizeof(struct dss_schmitt_osc_context) ,dss_schmitt_osc_reset ,dss_schmitt_osc_step },
+	{ DSS_INVERTER_OSC ,"DSS_INVERTER_OSC" , 1 ,sizeof(struct dss_inverter_osc_context) ,dss_inverter_osc_reset ,dss_inverter_osc_step },
+	{ DSS_OP_AMP_OSC  ,"DSS_OP_AMP_OSC"  , 1 ,sizeof(struct dss_op_amp_osc_context)  ,dss_op_amp_osc_reset  ,dss_op_amp_osc_step  },
+	{ DSS_SCHMITT_OSC ,"DSS_SCHMITT_OSC" , 1 ,sizeof(struct dss_schmitt_osc_context) ,dss_schmitt_osc_reset ,dss_schmitt_osc_step },
 	/* Not yet implemented */
-	{ DSS_ADSR        ,"DSS_ADSR"        ,sizeof(struct dss_adsr_context)        ,dss_adsrenv_reset     ,dss_adsrenv_step     },
+	{ DSS_ADSR        ,"DSS_ADSR"        , 1 ,sizeof(struct dss_adsr_context)        ,dss_adsrenv_reset     ,dss_adsrenv_step     },
 
 	/* from disc_mth.c */
 	/* Generic modules */
-	{ DST_ADDER       ,"DST_ADDER"       ,0                                      ,NULL                  ,dst_adder_step       },
-	{ DST_CLAMP       ,"DST_CLAMP"       ,0                                      ,NULL                  ,dst_clamp_step       },
-	{ DST_DIVIDE      ,"DST_DIVIDE"      ,0                                      ,NULL                  ,dst_divide_step      },
-	{ DST_GAIN        ,"DST_GAIN"        ,0                                      ,NULL                  ,dst_gain_step        },
-	{ DST_LOGIC_INV   ,"DST_LOGIC_INV"   ,0                                      ,NULL                  ,dst_logic_inv_step   },
-	{ DST_LOGIC_AND   ,"DST_LOGIC_AND"   ,0                                      ,NULL                  ,dst_logic_and_step   },
-	{ DST_LOGIC_NAND  ,"DST_LOGIC_NAND"  ,0                                      ,NULL                  ,dst_logic_nand_step  },
-	{ DST_LOGIC_OR    ,"DST_LOGIC_OR"    ,0                                      ,NULL                  ,dst_logic_or_step    },
-	{ DST_LOGIC_NOR   ,"DST_LOGIC_NOR"   ,0                                      ,NULL                  ,dst_logic_nor_step   },
-	{ DST_LOGIC_XOR   ,"DST_LOGIC_XOR"   ,0                                      ,NULL                  ,dst_logic_xor_step   },
-	{ DST_LOGIC_NXOR  ,"DST_LOGIC_NXOR"  ,0                                      ,NULL                  ,dst_logic_nxor_step  },
-	{ DST_LOGIC_DFF   ,"DST_LOGIC_DFF"   ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_dff_step   },
-	{ DST_LOGIC_JKFF  ,"DST_LOGIC_JKFF"  ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_jkff_step  },
-	{ DST_LOOKUP_TABLE,"DST_LOOKUP_TABLE",0                                      ,NULL                  ,dst_lookup_table_step},
-	{ DST_MULTIPLEX   ,"DST_MULTIPLEX"   ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   },
-	{ DST_ONESHOT     ,"DST_ONESHOT"     ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     },
-	{ DST_RAMP        ,"DST_RAMP"        ,sizeof(struct dss_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        },
-	{ DST_SAMPHOLD    ,"DST_SAMPHOLD"    ,sizeof(struct dst_samphold_context)    ,dst_samphold_reset    ,dst_samphold_step    },
-	{ DST_SWITCH      ,"DST_SWITCH"      ,0                                      ,NULL                  ,dst_switch_step      },
-	{ DST_ASWITCH     ,"DST_ASWITCH"     ,0                                      ,NULL                  ,dst_aswitch_step     },
-	{ DST_TRANSFORM   ,"DST_TRANSFORM"   ,0                                      ,NULL                  ,dst_transform_step   },
+	{ DST_ADDER       ,"DST_ADDER"       , 1 ,0                                      ,NULL                  ,dst_adder_step       },
+	{ DST_CLAMP       ,"DST_CLAMP"       , 1 ,0                                      ,NULL                  ,dst_clamp_step       },
+	{ DST_DIVIDE      ,"DST_DIVIDE"      , 1 ,0                                      ,NULL                  ,dst_divide_step      },
+	{ DST_GAIN        ,"DST_GAIN"        , 1 ,0                                      ,NULL                  ,dst_gain_step        },
+	{ DST_LOGIC_INV   ,"DST_LOGIC_INV"   , 1 ,0                                      ,NULL                  ,dst_logic_inv_step   },
+	{ DST_LOGIC_AND   ,"DST_LOGIC_AND"   , 1 ,0                                      ,NULL                  ,dst_logic_and_step   },
+	{ DST_LOGIC_NAND  ,"DST_LOGIC_NAND"  , 1 ,0                                      ,NULL                  ,dst_logic_nand_step  },
+	{ DST_LOGIC_OR    ,"DST_LOGIC_OR"    , 1 ,0                                      ,NULL                  ,dst_logic_or_step    },
+	{ DST_LOGIC_NOR   ,"DST_LOGIC_NOR"   , 1 ,0                                      ,NULL                  ,dst_logic_nor_step   },
+	{ DST_LOGIC_XOR   ,"DST_LOGIC_XOR"   , 1 ,0                                      ,NULL                  ,dst_logic_xor_step   },
+	{ DST_LOGIC_NXOR  ,"DST_LOGIC_NXOR"  , 1 ,0                                      ,NULL                  ,dst_logic_nxor_step  },
+	{ DST_LOGIC_DFF   ,"DST_LOGIC_DFF"   , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_dff_step   },
+	{ DST_LOGIC_JKFF  ,"DST_LOGIC_JKFF"  , 1 ,sizeof(struct dst_flipflop_context)    ,dst_logic_ff_reset    ,dst_logic_jkff_step  },
+	{ DST_LOOKUP_TABLE,"DST_LOOKUP_TABLE", 1 ,0                                      ,NULL                  ,dst_lookup_table_step},
+	{ DST_MULTIPLEX   ,"DST_MULTIPLEX"   , 1 ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   },
+	{ DST_ONESHOT     ,"DST_ONESHOT"     , 1 ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     },
+	{ DST_RAMP        ,"DST_RAMP"        , 1 ,sizeof(struct dss_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        },
+	{ DST_SAMPHOLD    ,"DST_SAMPHOLD"    , 1 ,sizeof(struct dst_samphold_context)    ,dst_samphold_reset    ,dst_samphold_step    },
+	{ DST_SWITCH      ,"DST_SWITCH"      , 1 ,0                                      ,NULL                  ,dst_switch_step      },
+	{ DST_ASWITCH     ,"DST_ASWITCH"     , 1 ,0                                      ,NULL                  ,dst_aswitch_step     },
+	{ DST_TRANSFORM   ,"DST_TRANSFORM"   , 1 ,0                                      ,NULL                  ,dst_transform_step   },
 	/* Component specific */
-	{ DST_COMP_ADDER  ,"DST_COMP_ADDER"  ,0                                      ,NULL                  ,dst_comp_adder_step  },
-	{ DST_DAC_R1      ,"DST_DAC_R1"      ,sizeof(struct dst_dac_r1_context)      ,dst_dac_r1_reset      ,dst_dac_r1_step      },
-	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   ,sizeof(struct dst_size_context)        ,dst_diode_mix_reset   ,dst_diode_mix_step   },
-	{ DST_INTEGRATE   ,"DST_INTEGRATE"   ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   },
-	{ DST_MIXER       ,"DST_MIXER"       ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       },
-	{ DST_OP_AMP      ,"DST_OP_AMP"      ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      },
-	{ DST_OP_AMP_1SHT ,"DST_OP_AMP_1SHT" ,sizeof(struct dst_op_amp_1sht_context) ,dst_op_amp_1sht_reset ,dst_op_amp_1sht_step },
-	{ DST_TVCA_OP_AMP ,"DST_TVCA_OP_AMP" ,sizeof(struct dst_tvca_op_amp_context) ,dst_tvca_op_amp_reset ,dst_tvca_op_amp_step },
-	{ DST_VCA         ,"DST_VCA"         ,0                                      ,NULL                  ,NULL                 },
+	{ DST_COMP_ADDER  ,"DST_COMP_ADDER"  , 1 ,0                                      ,NULL                  ,dst_comp_adder_step  },
+	{ DST_DAC_R1      ,"DST_DAC_R1"      , 1 ,sizeof(struct dst_dac_r1_context)      ,dst_dac_r1_reset      ,dst_dac_r1_step      },
+	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   , 1 ,sizeof(struct dst_size_context)        ,dst_diode_mix_reset   ,dst_diode_mix_step   },
+	{ DST_INTEGRATE   ,"DST_INTEGRATE"   , 1 ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   },
+	{ DST_MIXER       ,"DST_MIXER"       , 1 ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       },
+	{ DST_OP_AMP      ,"DST_OP_AMP"      , 1 ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      },
+	{ DST_OP_AMP_1SHT ,"DST_OP_AMP_1SHT" , 1 ,sizeof(struct dst_op_amp_1sht_context) ,dst_op_amp_1sht_reset ,dst_op_amp_1sht_step },
+	{ DST_TVCA_OP_AMP ,"DST_TVCA_OP_AMP" , 1 ,sizeof(struct dst_tvca_op_amp_context) ,dst_tvca_op_amp_reset ,dst_tvca_op_amp_step },
+	{ DST_VCA         ,"DST_VCA"         , 1 ,0                                      ,NULL                  ,NULL                 },
 
 	/* from disc_flt.c */
 	/* Generic modules */
-	{ DST_FILTER1     ,"DST_FILTER1"     ,sizeof(struct dss_filter1_context)     ,dst_filter1_reset     ,dst_filter1_step     },
-	{ DST_FILTER2     ,"DST_FILTER2"     ,sizeof(struct dss_filter2_context)     ,dst_filter2_reset     ,dst_filter2_step     },
+	{ DST_FILTER1     ,"DST_FILTER1"     , 1 ,sizeof(struct dss_filter1_context)     ,dst_filter1_reset     ,dst_filter1_step     },
+	{ DST_FILTER2     ,"DST_FILTER2"     , 1 ,sizeof(struct dss_filter2_context)     ,dst_filter2_reset     ,dst_filter2_step     },
 	/* Component specific modules */
-	{ DST_CRFILTER    ,"DST_CRFILTER"    ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    },
-	{ DST_OP_AMP_FILT ,"DST_OP_AMP_FILT" ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step },
-	{ DST_RCDISC      ,"DST_RCDISC"      ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_reset      ,dst_rcdisc_step      },
-	{ DST_RCDISC2     ,"DST_RCDISC2"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc2_reset     ,dst_rcdisc2_step     },
-	{ DST_RCDISC3     ,"DST_RCDISC3"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     },
-	{ DST_RCDISC4     ,"DST_RCDISC4"     ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     },
-	{ DST_RCDISC5     ,"DST_RCDISC5"     ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     },
-	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" ,sizeof(struct dst_rcdisc_context)      ,dst_rcintegrate_reset ,dst_rcintegrate_step },
-	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  },
-	{ DST_RCFILTER    ,"DST_RCFILTER"    ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    },
-	{ DST_RCFILTER_SW ,"DST_RCFILTER_SW" ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step },
+	{ DST_CRFILTER    ,"DST_CRFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    },
+	{ DST_OP_AMP_FILT ,"DST_OP_AMP_FILT" , 1 ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step },
+	{ DST_RCDISC      ,"DST_RCDISC"      , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_reset      ,dst_rcdisc_step      },
+	{ DST_RCDISC2     ,"DST_RCDISC2"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc2_reset     ,dst_rcdisc2_step     },
+	{ DST_RCDISC3     ,"DST_RCDISC3"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     },
+	{ DST_RCDISC4     ,"DST_RCDISC4"     , 1 ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     },
+	{ DST_RCDISC5     ,"DST_RCDISC5"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     },
+	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcintegrate_reset ,dst_rcintegrate_step },
+	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  },
+	{ DST_RCFILTER    ,"DST_RCFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    },
+	{ DST_RCFILTER_SW ,"DST_RCFILTER_SW" , 1 ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step },
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
-	{ DST_RCFILTERN   ,"DST_RCFILTERN"   ,sizeof(struct dss_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     },
-	{ DST_RCDISCN     ,"DST_RCDISCN"     ,sizeof(struct dss_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     },
-	{ DST_RCDISC2N    ,"DST_RCDISC2N"    ,sizeof(struct dss_rcdisc2_context)     ,dst_rcdisc2N_reset    ,dst_rcdisc2N_step    },
+	{ DST_RCFILTERN   ,"DST_RCFILTERN"   , 1 ,sizeof(struct dss_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     },
+	{ DST_RCDISCN     ,"DST_RCDISCN"     , 1 ,sizeof(struct dss_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     },
+	{ DST_RCDISC2N    ,"DST_RCDISC2N"    , 1 ,sizeof(struct dss_rcdisc2_context)     ,dst_rcdisc2N_reset    ,dst_rcdisc2N_step    },
 
 	/* from disc_dev.c */
 	/* generic modules */
-	{ DST_CUSTOM      ,"DST_CUSTOM"      ,0                                      ,NULL                  ,NULL                 },
+	{ DST_CUSTOM      ,"DST_CUSTOM"      , 1 ,0                                      ,NULL                  ,NULL                 },
 	/* Component specific modules */
-	{ DSD_555_ASTBL   ,"DSD_555_ASTBL"   ,sizeof(struct dsd_555_astbl_context)   ,dsd_555_astbl_reset   ,dsd_555_astbl_step   },
-	{ DSD_555_MSTBL   ,"DSD_555_MSTBL"   ,sizeof(struct dsd_555_mstbl_context)   ,dsd_555_mstbl_reset   ,dsd_555_mstbl_step   },
-	{ DSD_555_CC      ,"DSD_555_CC"      ,sizeof(struct dsd_555_cc_context)      ,dsd_555_cc_reset      ,dsd_555_cc_step      },
-	{ DSD_555_VCO1    ,"DSD_555_VCO1"    ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    },
-	{ DSD_566         ,"DSD_566"         ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         },
-	{ DSD_LS624       ,"DSD_LS624"       ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       },
+	{ DSD_555_ASTBL   ,"DSD_555_ASTBL"   , 1 ,sizeof(struct dsd_555_astbl_context)   ,dsd_555_astbl_reset   ,dsd_555_astbl_step   },
+	{ DSD_555_MSTBL   ,"DSD_555_MSTBL"   , 1 ,sizeof(struct dsd_555_mstbl_context)   ,dsd_555_mstbl_reset   ,dsd_555_mstbl_step   },
+	{ DSD_555_CC      ,"DSD_555_CC"      , 1 ,sizeof(struct dsd_555_cc_context)      ,dsd_555_cc_reset      ,dsd_555_cc_step      },
+	{ DSD_555_VCO1    ,"DSD_555_VCO1"    , 1 ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    },
+	{ DSD_566         ,"DSD_566"         , 1 ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         },
+	{ DSD_LS624       ,"DSD_LS624"       , 1 ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       },
 	/* must be the last one */
-	{ DSS_NULL        ,"DSS_NULL"        ,0                                      ,NULL                  ,NULL                 }
+	{ DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 }
 };
 
 
@@ -276,7 +276,7 @@ node_description *discrete_find_node(void *chip, int node)
 {
 	discrete_info *info = chip ? chip : discrete_current_context;
 	if (node < NODE_START || node > NODE_END) return NULL;
-	return info->indexed_node[node - NODE_START];
+	return info->indexed_node[NODE_INDEX(node)];
 }
 
 
@@ -324,7 +324,13 @@ static void *discrete_start(int sndindex, int clock, const void *config)
 
 		/* make sure the node type is valid */
 		if (intf[info->node_count].type > DSO_OUTPUT)
-			fatalerror("discrete_start() - Invalid function type on NODE_%02d", intf[info->node_count].node - NODE_START);
+			fatalerror("discrete_start() - Invalid function type on NODE_%02d", NODE_INDEX(intf[info->node_count].node) );
+
+		/* make sure this is a main node */
+		if (NODE_CHILD_NODE_NUM(intf[info->node_count].node) > 0)
+			fatalerror("discrete_start() - Child node number on NODE_%02d", NODE_INDEX(intf[info->node_count].node) );
+
+	
 	}
 	info->node_count++;
 	discrete_log("discrete_start() - Sanity check counted %d nodes", info->node_count);
@@ -409,7 +415,7 @@ static void discrete_reset(void *chip)
 	{
 		node_description *node = info->running_order[nodenum];
 
-		node->output = 0;
+		node->output[0] = 0;
 
 		/* if the node has a reset function, call it */
 		if (node->module.reset)
@@ -571,9 +577,9 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 		/* otherwise, make sure we are not a duplicate, and put ourselves into the indexed list */
 		else
 		{
-			if (info->indexed_node[block->node - NODE_START])
-				fatalerror("init_nodes() - Duplicate entries for NODE_%02d", block->node - NODE_START);
-			info->indexed_node[block->node - NODE_START] = node;
+			if (info->indexed_node[NODE_INDEX(block->node)])
+				fatalerror("init_nodes() - Duplicate entries for NODE_%02d", NODE_INDEX(block->node));
+			info->indexed_node[NODE_INDEX(block->node)] = node;
 		}
 
 		/* find the requested module */
@@ -581,12 +587,12 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 			if (module_list[modulenum].type == block->type)
 				break;
 		if (module_list[modulenum].type != block->type)
-			fatalerror("init_nodes() - Unable to find discrete module type %d for NODE_%02d", block->type, block->node - NODE_START);
+			fatalerror("init_nodes() - Unable to find discrete module type %d for NODE_%02d", block->type, NODE_INDEX(block->node));
 
 		/* static inits */
 		node->node = block->node;
 		node->module = module_list[modulenum];
-		node->output = 0.0;
+		node->output[0] = 0.0;
 		node->block = block;
 
 		node->active_inputs = block->active_inputs;
@@ -659,11 +665,14 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
 			/* if this input is node-based, find the node in the indexed list */
 			if IS_VALUE_A_NODE(inputnode)
 			{
-				node_description *node_ref = info->indexed_node[inputnode - NODE_START];
+				node_description *node_ref = info->indexed_node[NODE_INDEX(inputnode)];
 				if (!node_ref)
-					fatalerror("discrete_start - Node NODE_%02d referenced a non existent node NODE_%02d", node->node - NODE_START, inputnode - NODE_START);
+					fatalerror("discrete_start - Node NODE_%02d referenced a non existent node NODE_%02d", NODE_INDEX(node->node), NODE_INDEX(inputnode));
 
-				node->input[inputnum] = &(node_ref->output);	// Link referenced node out to input
+				if (NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module.num_output)
+					fatalerror("discrete_start - Node NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_INDEX(node->node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
+				
+				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	// Link referenced node out to input
 				node->input_is_node |= 1 << inputnum;			// Bit flag if input is node
 			}
 		}
@@ -709,7 +718,7 @@ static void setup_disc_logs(discrete_info *info)
 		fprintf(info->disc_csv_file[log_num], "\"Sample\"");
 		for (node_num = 0; node_num < info->csvlog_node[log_num]->active_inputs; node_num++)
 		{
-			fprintf(info->disc_csv_file[log_num], ", \"NODE_%2d\"", info->csvlog_node[log_num]->block->input_node[node_num] - NODE_START);
+			fprintf(info->disc_csv_file[log_num], ", \"NODE_%2d\"", NODE_INDEX(info->csvlog_node[log_num]->block->input_node[node_num]));
 		}
 		fprintf(info->disc_csv_file[log_num], "\n");
 	}
@@ -751,7 +760,7 @@ void discrete_get_info(void *token, UINT32 state, sndinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "Discrete";					break;
 		case SNDINFO_STR_CORE_FAMILY:					info->s = "Analog";						break;
-		case SNDINFO_STR_CORE_VERSION:					info->s = "1.0";						break;
+		case SNDINFO_STR_CORE_VERSION:					info->s = "1.1";						break;
 		case SNDINFO_STR_CORE_FILE:						info->s = __FILE__;						break;
 		case SNDINFO_STR_CORE_CREDITS:					info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
