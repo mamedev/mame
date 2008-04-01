@@ -943,7 +943,7 @@ void tilemap_draw_by_index(bitmap_t *dest, int number, UINT32 scrollx, UINT32 sc
 	int xpos,ypos;
 
 	/* set up for the blit, using hard-coded parameters (no priority, etc) */
-	configure_blit_parameters(&blit, tmap, dest, NULL, TILEMAP_DRAW_OPAQUE, 0, 0xff);
+	configure_blit_parameters(&blit, tmap, dest, NULL, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0, 0xff);
 
 	/* compute the effective scroll positions */
 	scrollx = tmap->width  - scrollx % tmap->width;
@@ -1497,6 +1497,13 @@ static void configure_blit_parameters(blit_parameters *blit, tilemap *tmap, bitm
 	{
 		blit->mask &= ~(TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 | TILEMAP_PIXEL_LAYER2);
 		blit->value &= ~(TILEMAP_PIXEL_LAYER0 | TILEMAP_PIXEL_LAYER1 | TILEMAP_PIXEL_LAYER2);
+	}
+
+	/* don't check category if requested */
+	if (flags & TILEMAP_DRAW_ALL_CATEGORIES)
+	{
+		blit->mask &= ~TILEMAP_PIXEL_CATEGORY_MASK;
+		blit->value &= ~TILEMAP_PIXEL_CATEGORY_MASK;
 	}
 }
 

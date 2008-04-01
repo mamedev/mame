@@ -321,6 +321,7 @@
 #define TILEMAP_DRAW_LAYER2				0x40		/* draw layer 2 */
 #define TILEMAP_DRAW_OPAQUE				0x80		/* draw everything, even transparent stuff */
 #define TILEMAP_DRAW_ALPHA				0x100		/* draw with alpha blending */
+#define TILEMAP_DRAW_ALL_CATEGORIES		0x200		/* draw all categories */
 
 
 /* per-pixel flags in the transparency_bitmap */
