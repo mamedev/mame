@@ -71,7 +71,7 @@ enum
 
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
 
-	DEVINFO_FCT_LAST = 0x1ffff,
+	DEVINFO_FCT_LAST = 0x2ffff,
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	DEVINFO_STR_FIRST = 0x30000,
