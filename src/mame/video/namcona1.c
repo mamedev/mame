@@ -405,7 +405,7 @@ static void pdraw_tile(running_machine *machine,
 								int c = source[x_index>>16];
 
 								/* render a shadow only if the sprites color is $F (8bpp) or $FF (4bpp) */
-								if( bShadow && /*((gfx_region == 0 && color == 0x0f) || */(gfx_region == 1 && color == 0xff)/*)*/)
+								if( bShadow && ((gfx_region == 0 && color == 0x0f) || (gfx_region == 1 && color == 0xff)/*)*/)
 								{
 									pen_t *palette_shadow_table = machine->shadow_table;
 									dest[x] = palette_shadow_table[dest[x]];
