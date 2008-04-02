@@ -357,8 +357,7 @@ VIDEO_UPDATE( nova2001 )
 
 VIDEO_UPDATE( pkunwar )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	pkunwar_draw_sprites(screen->machine, bitmap, cliprect);
 

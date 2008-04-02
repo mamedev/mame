@@ -533,8 +533,7 @@ VIDEO_UPDATE( superpac )
 {
 	int x,y;
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	fillbitmap(sprite_bitmap,15,cliprect);
 	mappy_draw_sprites(screen->machine,sprite_bitmap,cliprect,0,0,15);
@@ -560,8 +559,7 @@ VIDEO_UPDATE( phozon )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(mappy_spriteram[0x1f7f-0x800] & 1);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	phozon_draw_sprites(screen->machine,bitmap,cliprect);
 
@@ -577,8 +575,7 @@ VIDEO_UPDATE( mappy )
 	for (offs = 2;offs < 34;offs++)
 		tilemap_set_scrolly(bg_tilemap,offs,mappy_scroll);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0|TILEMAP_DRAW_OPAQUE,0);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,1|TILEMAP_DRAW_OPAQUE,0);
+	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	mappy_draw_sprites(screen->machine,bitmap,cliprect,0,0,15);
 

@@ -304,8 +304,7 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
 VIDEO_UPDATE( mcr68 )
 {
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	/* draw the low-priority sprites */
 	mcr68_update_sprites(screen->machine, bitmap, cliprect, 0);
