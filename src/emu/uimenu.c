@@ -1889,7 +1889,7 @@ static int input_menu_get_game_items(input_item_data *itemlist)
 		/* add if we match the group and we have a valid name */
 		if ((name != NULL) && (input_port_condition(in)) &&
 #ifdef MESS
-			(in->category == 0 || input_category_active(in->category)) &&
+			(in->category == 0 || input_category_active(Machine, in->category)) &&
 #endif /* MESS */
 			((in->type == IPT_OTHER && in->name != IP_NAME_DEFAULT) || port_type_to_group(in->type, in->player) != IPG_INVALID))
 		{
