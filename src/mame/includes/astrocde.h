@@ -6,7 +6,7 @@
 
 #include "sound/custom.h"
 
-#define ASTROCADE_CLOCK		(14318180/2)
+#define ASTROCADE_CLOCK		(XTAL_14_31818MHz/2)
 
 #define AC_SOUND_PRESENT	(0x01)
 #define AC_LIGHTPEN_INTS	(0x02)

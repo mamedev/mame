@@ -439,7 +439,10 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 	{
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x01) == 0)
+		{
 			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector & 0xf0);
+			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
@@ -476,7 +479,10 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
+		{
 			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector);
+			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
@@ -555,6 +561,22 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 
 		case 0x17:	/* keypad column 3 */
 			result = readinputportbytag_safe("KEYPAD3", 0xff);
+			break;
+
+		case 0x1c:	/* player 1 knob */
+			result = readinputportbytag_safe("P1_KNOB", 0xff);
+			break;
+
+		case 0x1d:	/* player 2 knob */
+			result = readinputportbytag_safe("P2_KNOB", 0xff);
+			break;
+
+		case 0x1e:	/* player 3 knob */
+			result = readinputportbytag_safe("P3_KNOB", 0xff);
+			break;
+
+		case 0x1f:	/* player 4 knob */
+			result = readinputportbytag_safe("P4_KNOB", 0xff);
 			break;
 	}
 
