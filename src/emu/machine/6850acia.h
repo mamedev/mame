@@ -28,6 +28,9 @@ struct acia6850_interface
 
 void acia6850_config(int which, const struct acia6850_interface *intf);
 
+void acia_tx_clock_in(int which);
+void acia_rx_clock_in(int which);
+
 void acia6850_set_rx_clock(int which, int clock);
 void acia6850_set_tx_clock(int which, int clock);
 

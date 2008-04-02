@@ -57,6 +57,9 @@ typedef struct _acia_6850_
 	UINT8	rx_shift;
 	UINT8	tx_shift;
 
+	UINT8	rx_counter;
+	UINT8	tx_counter;
+
 	int	rx_clock;
 	int	tx_clock;
 
@@ -118,6 +121,9 @@ static void acia6850_reset(int which)
 	acia_p->rdr = 0;
 	acia_p->tx_shift = 0;
 	acia_p->rx_shift = 0;
+	acia_p->tx_counter = 0;
+	acia_p->rx_counter = 0;
+
 	*acia_p->tx_pin = 1;
 	acia_p->overrun = 0;
 	acia_p->status_read = 0;
@@ -163,6 +169,8 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 
 	acia_p->rx_clock = intf->rx_clock;
 	acia_p->tx_clock = intf->tx_clock;
+	acia_p->tx_counter = 0;
+	acia_p->rx_counter = 0;
 	acia_p->rx_pin = intf->rx_pin;
 	acia_p->tx_pin = intf->tx_pin;
 	acia_p->cts_pin = intf->cts_pin;
@@ -182,6 +190,8 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	state_save_register_item("acia6850", which, acia_p->status);
 	state_save_register_item("acia6850", which, acia_p->rx_clock);
 	state_save_register_item("acia6850", which, acia_p->tx_clock);
+	state_save_register_item("acia6850", which, acia_p->rx_counter);
+	state_save_register_item("acia6850", which, acia_p->tx_counter);
 	state_save_register_item("acia6850", which, acia_p->rx_shift);
 	state_save_register_item("acia6850", which, acia_p->tx_shift);
 	state_save_register_item("acia6850", which, acia_p->rdr);
@@ -201,6 +211,7 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	state_save_register_item("acia6850", which, acia_p->status_read);
 }
 
+
 /*
     Read Status Register
 */
@@ -212,6 +223,7 @@ static UINT8 acia6850_stat_r(int which)
 
 	return acia_p->status;
 }
+
 
 /*
     Write Control Register
@@ -297,12 +309,19 @@ static void acia6850_ctrl_w(int which, UINT8 data)
 
 	if (!acia_p->reset)
 	{
-		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
-		attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
-		timer_adjust_periodic(acia_p->rx_timer, rx_period, which, rx_period);
-		timer_adjust_periodic(acia_p->tx_timer, tx_period, which, tx_period);
+		if (acia_p->rx_clock)
+		{
+			attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
+			timer_adjust_periodic(acia_p->rx_timer, rx_period, which, rx_period);
+		}
+		if (acia_p->tx_clock)
+		{
+			attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
+			timer_adjust_periodic(acia_p->tx_timer, tx_period, which, tx_period);
+		}
 	}
 }
+
 
 static void acia6850_check_interrupts(int which)
 {
@@ -331,6 +350,7 @@ static void acia6850_check_interrupts(int which)
 	}
 }
 
+
 /*
     Write transmit register
 */
@@ -349,6 +369,7 @@ static void acia6850_data_w(int which, UINT8 data)
 		logerror("ACIA %d: Data write while in reset! (%x)\n", which, activecpu_get_previouspc());
 	}
 }
+
 
 /*
     Read character
@@ -381,12 +402,12 @@ static UINT8 acia6850_data_r(int which)
 	return acia_p->rdr;
 }
 
+
 /*
     Transmit a bit
 */
-static TIMER_CALLBACK( transmit_event )
+static void tx_tick(int which)
 {
-	int which = param;
 	acia_6850 *acia_p = &acia[which];
 
 	if (acia_p->cts_pin && *acia_p->cts_pin)
@@ -499,10 +520,47 @@ static TIMER_CALLBACK( transmit_event )
 	}
 }
 
-/* Called on receive timer event */
-static TIMER_CALLBACK( receive_event )
+
+/* Called on transmit timer event */
+static TIMER_CALLBACK( transmit_event )
 {
 	int which = param;
+	acia_6850 *acia_p = &acia[which];
+	tx_tick(which);
+	acia_p->tx_counter = 0;
+}
+
+
+/* As above, but using the tx pin */
+void acia_tx_clock_in(int which)
+{
+	acia_6850 *acia_p = &acia[which];
+
+	if (acia_p->cts_pin && *acia_p->cts_pin)
+	{
+		acia_p->status |= ACIA6850_STATUS_CTS;
+	}
+	else
+	{
+		acia_p->status &= ~ACIA6850_STATUS_CTS;
+	}
+
+	acia_p->tx_counter ++;
+
+	if ( acia_p->tx_counter > acia_p->divide-1)
+	{
+		tx_tick(which);
+		acia_p->tx_counter = 0;
+	}
+
+}
+
+
+/*
+    Receive a bit
+*/
+static void rx_tick(int which)
+{
 	acia_6850 *acia_p = &acia[which];
 
 	if (acia_p->dcd_pin && *acia_p->dcd_pin)
@@ -639,11 +697,48 @@ static TIMER_CALLBACK( receive_event )
 	}
 }
 
+/* Called on receive timer event */
+static TIMER_CALLBACK( receive_event )
+{
+	int which = param;
+	acia_6850 *acia_p = &acia[which];
+	rx_tick(which);
+	acia_p->rx_counter = 0;
+}
+
+
+/* As above, but using the rx pin */
+void acia_rx_clock_in(int which)
+{
+	acia_6850 *acia_p = &acia[which];
+
+	if (acia_p->dcd_pin && *acia_p->dcd_pin)
+	{
+		acia_p->status |= ACIA6850_STATUS_DCD;
+		acia6850_check_interrupts(which);
+	}
+	else if ((acia_p->status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
+	{
+		acia_p->status &= ~ACIA6850_STATUS_DCD;
+	}
+
+	acia_p->rx_counter ++;
+
+	if ( acia_p->rx_counter > acia_p->divide-1)
+	{
+		rx_tick(which);
+		acia_p->rx_counter = 0;
+	}
+}
+
+
+/* Set clock frequencies dynamically */
 void acia6850_set_rx_clock(int which, int clock)
 {
 	acia_6850 *acia_p = &acia[which];
 	acia_p->rx_clock = clock;
 }
+
 
 void acia6850_set_tx_clock(int which, int clock)
 {
