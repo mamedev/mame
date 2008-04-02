@@ -1015,9 +1015,9 @@ static void model3_init(running_machine *machine, int step)
 	model3_tap_reset();
 
 	if(step < 0x20) {
-		if( mame_stricmp(Machine->gamedrv->name, "vs215") == 0 ||
-			mame_stricmp(Machine->gamedrv->name, "vs29815") == 0 ||
-			mame_stricmp(Machine->gamedrv->name, "bass") == 0 )
+		if( mame_stricmp(machine->gamedrv->name, "vs215") == 0 ||
+			mame_stricmp(machine->gamedrv->name, "vs29815") == 0 ||
+			mame_stricmp(machine->gamedrv->name, "bass") == 0 )
 		{
 			mpc106_init();
 		} else {
@@ -1420,13 +1420,13 @@ static READ64_HANDLER(model3_security_r)
 		case 0x00/8:	return 0;		/* status */
 		case 0x1c/8:					/* security board data read */
 		{
-			if (mame_stricmp(Machine->gamedrv->name, "vs299") == 0 ||
-				mame_stricmp(Machine->gamedrv->name, "vs2v991") == 0)
+			if (mame_stricmp(machine->gamedrv->name, "vs299") == 0 ||
+				mame_stricmp(machine->gamedrv->name, "vs2v991") == 0)
 			{
 				return (UINT64)vs299_prot_data[prot_data_ptr++] << 48;
 			}
-			else if (mame_stricmp(Machine->gamedrv->name, "swtrilgy") == 0 ||
-					 mame_stricmp(Machine->gamedrv->name, "swtrilga") == 0)
+			else if (mame_stricmp(machine->gamedrv->name, "swtrilgy") == 0 ||
+					 mame_stricmp(machine->gamedrv->name, "swtrilga") == 0)
 			{
 				UINT64 data = (UINT64)swt_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr > 0x38)
@@ -1435,7 +1435,7 @@ static READ64_HANDLER(model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(Machine->gamedrv->name, "fvipers2") == 0)
+			else if (mame_stricmp(machine->gamedrv->name, "fvipers2") == 0)
 			{
 				UINT64 data = (UINT64)fvipers2_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr >= 0x41)
@@ -1444,8 +1444,8 @@ static READ64_HANDLER(model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(Machine->gamedrv->name, "spikeout") == 0 ||
-					 mame_stricmp(Machine->gamedrv->name, "spikeofe") == 0)
+			else if (mame_stricmp(machine->gamedrv->name, "spikeout") == 0 ||
+					 mame_stricmp(machine->gamedrv->name, "spikeofe") == 0)
 			{
 				UINT64 data = (UINT64)spikeout_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr >= 0x55)
@@ -1454,7 +1454,7 @@ static READ64_HANDLER(model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(Machine->gamedrv->name, "eca") == 0)
+			else if (mame_stricmp(machine->gamedrv->name, "eca") == 0)
 			{
 				UINT64 data = (UINT64)eca_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr >= 0x31)

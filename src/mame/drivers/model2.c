@@ -494,7 +494,7 @@ static READ32_HANDLER(videoctl_r)
 
 static READ32_HANDLER(copro_prg_r)
 {
-	if ((strcmp(Machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(Machine->gamedrv->name, "srallyc" ) == 0))
+	if ((strcmp(machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(machine->gamedrv->name, "srallyc" ) == 0))
 	{
 		return 8;
 	}
@@ -530,7 +530,7 @@ static WRITE32_HANDLER( copro_ctl1_w )
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			if (dsp_type != DSP_TYPE_TGPX4)
 			{
-				cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+				cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -550,7 +550,7 @@ static WRITE32_HANDLER(copro_function_port_w)
 
 static READ32_HANDLER(copro_fifo_r)
 {
-	if ((strcmp(Machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(Machine->gamedrv->name, "srallyc" ) == 0))
+	if ((strcmp(machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(machine->gamedrv->name, "srallyc" ) == 0))
 	{
 		return 8;
 	}
@@ -589,10 +589,10 @@ static int iop_write_num = 0;
 static UINT32 iop_data = 0;
 static WRITE32_HANDLER(copro_sharc_iop_w)
 {
-	if ((strcmp(Machine->gamedrv->name, "schamp" ) == 0) ||
-		(strcmp(Machine->gamedrv->name, "fvipers" ) == 0) ||
-		(strcmp(Machine->gamedrv->name, "vstriker" ) == 0) ||
-		(strcmp(Machine->gamedrv->name, "gunblade" ) == 0))
+	if ((strcmp(machine->gamedrv->name, "schamp" ) == 0) ||
+		(strcmp(machine->gamedrv->name, "fvipers" ) == 0) ||
+		(strcmp(machine->gamedrv->name, "vstriker" ) == 0) ||
+		(strcmp(machine->gamedrv->name, "gunblade" ) == 0))
 	{
 		cpuintrf_push_context(2);
 		sharc_external_iop_write(offset, data);
@@ -659,7 +659,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         else
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
-            cpunum_set_input_line(Machine, 3, INPUT_LINE_HALT, CLEAR_LINE);
+            cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, CLEAR_LINE);
             //cpu_spinuntil_time(ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
@@ -669,7 +669,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
 
 static READ32_HANDLER(geo_sharc_fifo_r)
 {
-    if ((strcmp(Machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(Machine->gamedrv->name, "srallyc" ) == 0))
+    if ((strcmp(machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(machine->gamedrv->name, "srallyc" ) == 0))
     {
         return 8;
     }
@@ -700,7 +700,7 @@ static int geo_iop_write_num = 0;
 static UINT32 geo_iop_data = 0;
 static WRITE32_HANDLER(geo_sharc_iop_w)
 {
-    if ((strcmp(Machine->gamedrv->name, "schamp" ) == 0))
+    if ((strcmp(machine->gamedrv->name, "schamp" ) == 0))
     {
         cpuintrf_push_context(3);
         sharc_external_iop_write(offset, data);

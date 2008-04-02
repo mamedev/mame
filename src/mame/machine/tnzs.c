@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8x41/i8x41.h"
 #include "includes/tnzs.h"
 
@@ -722,9 +721,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	memory_set_bankptr (1, &RAM[0x10000 + 0x4000 * (data & 0x07)]);
@@ -743,8 +742,8 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				/* bit 2 resets the mcu */
 				if (data & 0x04)
 				{
-					if (Machine->config->cpu[2].type == CPU_I8X41)
-						cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, PULSE_LINE);
+					if (machine->config->cpu[2].type == CPU_I8X41)
+						cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

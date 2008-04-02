@@ -119,12 +119,12 @@ void ui_gfx_init(running_machine *machine)
 	/* set up the graphics state */
 	for (gfx = 0; gfx < MAX_GFX_ELEMENTS; gfx++)
 	{
-		state->gfxset.rotate[gfx] = Machine->gamedrv->flags & ORIENTATION_MASK;
+		state->gfxset.rotate[gfx] = machine->gamedrv->flags & ORIENTATION_MASK;
 		state->gfxset.count[gfx] = 16;
 	}
 
 	/* set up the tilemap state */
-	state->tilemap.rotate = Machine->gamedrv->flags & ORIENTATION_MASK;
+	state->tilemap.rotate = machine->gamedrv->flags & ORIENTATION_MASK;
 }
 
 
@@ -155,11 +155,11 @@ UINT32 ui_gfx_ui_handler(running_machine *machine, UINT32 uistate)
 	ui_gfx_state *state = &ui_gfx;
 
 	/* if we have nothing, implicitly cancel */
-	if (Machine->config->total_colors == 0 && Machine->colortable == NULL && Machine->gfx[0] == NULL && tilemap_count() == 0)
+	if (machine->config->total_colors == 0 && machine->colortable == NULL && machine->gfx[0] == NULL && tilemap_count() == 0)
 		goto cancel;
 
 	/* if we're not paused, mark the bitmap dirty */
-	if (!mame_is_paused(Machine))
+	if (!mame_is_paused(machine))
 		state->bitmap_dirty = TRUE;
 
 	/* switch off the state to display something */
@@ -168,7 +168,7 @@ again:
 	{
 		case 0:
 			/* if we have a palette, display it */
-			if (Machine->config->total_colors > 0)
+			if (machine->config->total_colors > 0)
 			{
 				palette_handler(state);
 				break;
@@ -179,7 +179,7 @@ again:
 
 		case 1:
 			/* if we have graphics sets, display them */
-			if (Machine->gfx[0] != NULL)
+			if (machine->gfx[0] != NULL)
 			{
 				gfxset_handler(state);
 				break;
@@ -208,7 +208,7 @@ again:
 	}
 
 	if (input_ui_pressed(IPT_UI_PAUSE))
-		mame_pause(Machine, !mame_is_paused(Machine));
+		mame_pause(machine, !mame_is_paused(machine));
 
 	if (input_ui_pressed(IPT_UI_CANCEL) || input_ui_pressed(IPT_UI_SHOW_GFX))
 		goto cancel;
@@ -217,7 +217,7 @@ again:
 
 cancel:
 	if (!uistate)
-		mame_pause(Machine, FALSE);
+		mame_pause(machine, FALSE);
 	state->bitmap_dirty = TRUE;
 	return UI_HANDLER_CANCEL;
 }

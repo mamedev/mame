@@ -484,7 +484,7 @@ void memcard_eject(running_machine *machine)
 
 	/* create a name */
 	memcard_name(memcard_inserted, name);
-	fname = astring_assemble_3(astring_alloc(), Machine->basename, PATH_SEPARATOR, name);
+	fname = astring_assemble_3(astring_alloc(), machine->basename, PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
@@ -684,24 +684,24 @@ INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(machine, cpunum, 7, ASSERT_LIN
     8-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(Machine); }
-READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(Machine); return 0xff; }
+WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(machine); }
+READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(machine); return 0xff; }
 
 
 /*-------------------------------------------------
     16-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(Machine); }
-READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(Machine); return 0xffff; }
+WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(machine); }
+READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(machine); return 0xffff; }
 
 
 /*-------------------------------------------------
     32-bit reset read/write handlers
 -------------------------------------------------*/
 
-WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(Machine); }
-READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(Machine); return 0xffffffff; }
+WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(machine); }
+READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(machine); return 0xffffffff; }
 
 
 

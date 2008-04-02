@@ -80,7 +80,7 @@ TODO:
 
 static WRITE8_HANDLER( io_select_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	switch (data)
 	{
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( io_select_w )
 
 static READ8_HANDLER( io_port_r )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	return readinputport(state->current_port);
 }
@@ -127,13 +127,13 @@ static const struct via6522_interface via_1_interface =
 
 static WRITE8_HANDLER( audio_reset_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_cmd_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	state->audio_cmd = data & 0x7f;
 }

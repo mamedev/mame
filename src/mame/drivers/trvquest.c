@@ -35,14 +35,13 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
 #include "gameplan.h"
 
 static READ8_HANDLER( trvquest_question_r )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	return memory_region(REGION_USER1)[*state->trvquest_question * 0x2000 + offset];
 }

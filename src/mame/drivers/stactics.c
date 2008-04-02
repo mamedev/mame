@@ -41,7 +41,6 @@ Verify Color PROM resistor values (Last 8 colors)
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "stactics.h"
 #include "stactics.lh"
 
@@ -65,7 +64,7 @@ static CUSTOM_INPUT( get_motor_not_ready )
 
 static READ8_HANDLER( vert_pos_r )
 {
-	stactics_state *state = Machine->driver_data;
+	stactics_state *state = machine->driver_data;
 
     return 0x70 - state->vert_pos;
 }
@@ -73,7 +72,7 @@ static READ8_HANDLER( vert_pos_r )
 
 static READ8_HANDLER( horiz_pos_r )
 {
-	stactics_state *state = Machine->driver_data;
+	stactics_state *state = machine->driver_data;
 
     return state->horiz_pos + 0x88;
 }

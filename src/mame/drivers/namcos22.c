@@ -1170,11 +1170,11 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable for Super System 22 */
 			if (data)
 			{
-				cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+				cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			else
 			{
-				cpunum_set_input_line(Machine, 3,INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
+				cpunum_set_input_line(machine, 3,INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
 			}
 		}
 	}
@@ -1196,19 +1196,19 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 	{
 		if( newReg == 0 )
 		{ /* disable DSPs */
-			cpunum_set_input_line(Machine, 1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-			cpunum_set_input_line(Machine, 2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+			cpunum_set_input_line(machine, 1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
+			cpunum_set_input_line(machine, 2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
 			mbEnableDspIrqs = 0;
 		}
 		else if( newReg==1 )
 		{ /*enable dsp and rendering subsystem */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 			namcos22_enable_slave_simulation();
 			mbEnableDspIrqs = 1;
 		}
 		else if( newReg==0xff )
 		{ /* used to upload game-specific code to master/slave dsps */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 			mbEnableDspIrqs = 0;
 		}
 	}
@@ -1589,7 +1589,7 @@ static WRITE8_HANDLER( mcu_port5_w )
 	// bit 1 = fan
 	// bit 2 = button light
 
-	if (!strcmp(Machine->gamedrv->name, "propcycl"))
+	if (!strcmp(machine->gamedrv->name, "propcycl"))
 	{
 		output_set_value("fan0", data & 1);
 		set_led_status(0, data & 2);
@@ -1630,7 +1630,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					cpunum_set_input_line(Machine, 3, M37710_LINE_TIMERA3TICK, PULSE_LINE);
+					cpunum_set_input_line(machine, 3, M37710_LINE_TIMERA3TICK, PULSE_LINE);
 				}
 			}
 

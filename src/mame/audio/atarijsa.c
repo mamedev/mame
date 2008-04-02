@@ -31,7 +31,6 @@ Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/5220intf.h"
 #include "sound/2151intf.h"
@@ -123,7 +122,7 @@ void atarijsa_init(running_machine *machine, int testport, int testmask)
 	has_tms5220 = has_oki6295 = has_pokey = has_ym2151 = 0;
 	for (i = 0; i < MAX_SOUND; i++)
 	{
-		switch (Machine->config->sound[i].type)
+		switch (machine->config->sound[i].type)
 		{
 			case SOUND_TMS5220:
 				has_tms5220 = 1;

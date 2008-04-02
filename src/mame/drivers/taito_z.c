@@ -846,7 +846,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 	parse_control();
 
 	// Chase HQ: handle the lights
-	if ((!strcmp(Machine->gamedrv->name, "chasehq")) || (!strcmp(Machine->gamedrv->name, "chasehqj")))
+	if ((!strcmp(machine->gamedrv->name, "chasehq")) || (!strcmp(machine->gamedrv->name, "chasehqj")))
 	{
 		output_set_lamp_value(0, (data&0x20) ? 1 : 0);
 		output_set_lamp_value(1, (data&0x40) ? 1 : 0);
@@ -1304,7 +1304,7 @@ static READ16_HANDLER( chasehq_motor_r )
 	switch (offset)
 	{
 		case 0x0:
-			return (mame_rand(Machine) &0xff);	/* motor status ?? */
+			return (mame_rand(machine) &0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */

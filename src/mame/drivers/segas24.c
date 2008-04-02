@@ -870,13 +870,13 @@ static WRITE16_HANDLER(irq_w)
 		break;
 	case 2:
 		irq_allow0 = data;
-		cpunum_set_input_line(Machine, 0, IRQ_TIMER+1, irq_timer_pend0 && (irq_allow0 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(Machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, IRQ_TIMER+1, irq_timer_pend0 && (irq_allow0 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		irq_allow1 = data;
-		cpunum_set_input_line(Machine, 1, IRQ_TIMER+1, irq_timer_pend1 && (irq_allow1 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(Machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, IRQ_TIMER+1, irq_timer_pend1 && (irq_allow1 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -896,19 +896,19 @@ static READ16_HANDLER(irq_r)
 	/* These hacks are for Gain Ground */
 	/* otherwise the interrupt occurs before the correct state has been
        set and the game crashes before booting */
-	if (!strcmp(Machine->gamedrv->name,"gground"))
+	if (!strcmp(machine->gamedrv->name,"gground"))
 	{
 
 		if (activecpu_get_pc()==0x0084aa)
 		{
 			ggground_kludge = 1;
-			return mame_rand(Machine);
+			return mame_rand(machine);
 
 		}
 		if (activecpu_get_pc()==0x084ba)
 		{
 			/* Clear IRQ line so IRQ doesn't happen too early */
-			cpunum_set_input_line(Machine, 1, 5, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, 5, CLEAR_LINE);
 
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
@@ -920,19 +920,19 @@ static READ16_HANDLER(irq_r)
 		}
 	}
 
-	if (!strcmp(Machine->gamedrv->name,"ggroundj"))
+	if (!strcmp(machine->gamedrv->name,"ggroundj"))
 	{
 
 		if (activecpu_get_pc()==0x0084ac)
 		{
 			ggground_kludge = 1;
-			return mame_rand(Machine);
+			return mame_rand(machine);
 
 		}
 		if (activecpu_get_pc()==0x084bc)
 		{
 			/* Clear IRQ line so IRQ doesn't happen too early */
-			cpunum_set_input_line(Machine, 1, 5, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, 5, CLEAR_LINE);
 
 			/* set a timer to generate an irq at the needed point */
 			if (ggground_kludge == 1)
@@ -947,11 +947,11 @@ static READ16_HANDLER(irq_r)
 	switch(offset) {
 	case 2:
 		irq_timer_pend0 = 0;
-		cpunum_set_input_line(Machine, 0, IRQ_TIMER+1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
-		cpunum_set_input_line(Machine, 1, IRQ_TIMER+1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	return 0xffff;

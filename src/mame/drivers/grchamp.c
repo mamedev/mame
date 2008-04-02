@@ -202,7 +202,7 @@ static WRITE8_HANDLER( led_board_w )
 {
 	static const UINT8 ls247_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 
 	switch (offset)
 	{
@@ -354,28 +354,28 @@ INLINE UINT8 get_pc3259_bits(grchamp_state *state, int offs)
 
 static READ8_HANDLER( pc3259_0_r )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	return get_pc3259_bits(state, 0);
 }
 
 
 static READ8_HANDLER( pc3259_1_r )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	return get_pc3259_bits(state, 1);
 }
 
 
 static READ8_HANDLER( pc3259_2_r )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	return get_pc3259_bits(state, 2);
 }
 
 
 static READ8_HANDLER( pc3259_3_r )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	return get_pc3259_bits(state, 3);
 }
 
@@ -389,7 +389,7 @@ static READ8_HANDLER( pc3259_3_r )
 
 static READ8_HANDLER( sub_to_main_comm_r )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	return state->comm_latch;
 }
 
@@ -410,7 +410,7 @@ static WRITE8_HANDLER( main_to_sub_comm_w )
 
 static READ8_HANDLER( main_to_sub_comm_r )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	return state->comm_latch2[offset];
 }
 

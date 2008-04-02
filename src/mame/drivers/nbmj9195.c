@@ -173,9 +173,9 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 {
 	int portdata;
 
-	if ((!strcmp(Machine->gamedrv->name, "mscoutm")) ||
-		(!strcmp(Machine->gamedrv->name, "imekura")) ||
-		(!strcmp(Machine->gamedrv->name, "mjegolf")))
+	if ((!strcmp(machine->gamedrv->name, "mscoutm")) ||
+		(!strcmp(machine->gamedrv->name, "imekura")) ||
+		(!strcmp(machine->gamedrv->name, "mjegolf")))
 	{
 
 		switch (offset)
@@ -352,9 +352,9 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 
 static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 {
-	if ((!strcmp(Machine->gamedrv->name, "imekura")) ||
-		(!strcmp(Machine->gamedrv->name, "mscoutm")) ||
-		(!strcmp(Machine->gamedrv->name, "mjegolf")))
+	if ((!strcmp(machine->gamedrv->name, "imekura")) ||
+		(!strcmp(machine->gamedrv->name, "mscoutm")) ||
+		(!strcmp(machine->gamedrv->name, "mjegolf")))
 		{
 
 		switch (offset)

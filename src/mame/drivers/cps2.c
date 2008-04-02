@@ -584,7 +584,6 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/qsound.h"
@@ -756,11 +755,11 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);
-	if( (strncmp(Machine->gamedrv->name,"pzloop2",8)==0) ||
- 	    (strncmp(Machine->gamedrv->name,"pzloop2j",8)==0) )
+	if( (strncmp(machine->gamedrv->name,"pzloop2",8)==0) ||
+ 	    (strncmp(machine->gamedrv->name,"pzloop2j",8)==0) )
 	{
 		// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 		readpaddle = data & 0x0002;
@@ -770,7 +769,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		coin_counter_w(1, data & 0x0002);
 	}
 
-	if(strncmp(Machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
+	if(strncmp(machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
 	{
 		coin_lockout_w(0,data & 0x0010);
 		coin_lockout_w(1,data & 0x0020);

@@ -380,7 +380,7 @@ static READ32_HANDLER( skns_hit_r )
 	switch(adr) {
 	case 0x28:
 	case 0x2a:
-		return (UINT16)mame_rand(Machine);
+		return (UINT16)mame_rand(machine);
 	case 0x00:
 	case 0x10:
 		return (UINT16)hit.x_in;
@@ -753,27 +753,27 @@ static WRITE32_HANDLER( skns_io_w )
 		if(ACCESSING_BYTE_1)
 		{ /* Interrupt Clear, do we need these? */
 /*          if(data&0x01)
-                cpunum_set_input_line(Machine, 0,1,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,1,CLEAR_LINE);
             if(data&0x02)
-                cpunum_set_input_line(Machine, 0,3,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,3,CLEAR_LINE);
             if(data&0x04)
-                cpunum_set_input_line(Machine, 0,5,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,5,CLEAR_LINE);
             if(data&0x08)
-                cpunum_set_input_line(Machine, 0,7,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,7,CLEAR_LINE);
             if(data&0x10)
-                cpunum_set_input_line(Machine, 0,9,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,9,CLEAR_LINE);
             if(data&0x20)
-                cpunum_set_input_line(Machine, 0,0xb,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,0xb,CLEAR_LINE);
             if(data&0x40)
-                cpunum_set_input_line(Machine, 0,0xd,CLEAR_LINE);
+                cpunum_set_input_line(machine, 0,0xd,CLEAR_LINE);
             if(data&0x80)
-                cpunum_set_input_line(Machine, 0,0xf,CLEAR_LINE);*/
+                cpunum_set_input_line(machine, 0,0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
 			if (activecpu_get_pc()==0x04013B44)
 			{
-				if (!strcmp(Machine->gamedrv->name,"vblokbrk") ||
-					!strcmp(Machine->gamedrv->name,"sarukani"))
+				if (!strcmp(machine->gamedrv->name,"vblokbrk") ||
+					!strcmp(machine->gamedrv->name,"sarukani"))
 					cpu_spinuntil_int();
 			}
 
@@ -795,7 +795,7 @@ static READ32_HANDLER( skns_msm6242_r )
 	mame_system_time systime;
 	long value;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 	// The clock is not y2k-compatible, wrap back 10 years, screw the leap years
 	//  tm->tm_year -= 10;
 

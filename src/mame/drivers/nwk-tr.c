@@ -50,7 +50,7 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
@@ -511,8 +511,8 @@ READ32_HANDLER(K001604_reg_r)
 
 	switch (offset)
 	{
-		case 0x54/4:	return mame_rand(Machine) << 16; break;
-		case 0x5c/4:	return mame_rand(Machine) << 16 | mame_rand(Machine); break;
+		case 0x54/4:	return mame_rand(machine) << 16; break;
+		case 0x5c/4:	return mame_rand(machine) << 16 | mame_rand(machine); break;
 	}
 
 	return K001604_reg[chip][offset];
@@ -630,11 +630,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
-				//cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	// CG Board 0 IRQ Ack
 			{
-				//cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
 		return;
@@ -736,7 +736,7 @@ static WRITE32_HANDLER( lanc2_w )
 	}
 	if (offset == 4)
 	{
-		if (mame_stricmp(Machine->gamedrv->name, "thrilld") == 0)
+		if (mame_stricmp(machine->gamedrv->name, "thrilld") == 0)
 		{
 			work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
 			work_ram[(0x3ffed0/4) + 1] = 0x33202020;

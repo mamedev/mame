@@ -190,7 +190,7 @@ static VIDEO_START( looping )
 
 static WRITE8_HANDLER( flip_screen_x_w )
 {
-	looping_state *state = Machine->driver_data;
+	looping_state *state = machine->driver_data;
 	flip_screen_x_set(~data & 0x01);
 	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get() ? 128 : 0);
 }
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( flip_screen_x_w )
 
 static WRITE8_HANDLER( flip_screen_y_w )
 {
-	looping_state *state = Machine->driver_data;
+	looping_state *state = machine->driver_data;
 	flip_screen_y_set(~data & 0x01);
 	tilemap_set_scrollx(state->bg_tilemap, 0, flip_screen_get() ? 128 : 0);
 }
@@ -206,7 +206,7 @@ static WRITE8_HANDLER( flip_screen_y_w )
 
 static WRITE8_HANDLER( looping_videoram_w )
 {
-	looping_state *state = Machine->driver_data;
+	looping_state *state = machine->driver_data;
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -214,7 +214,7 @@ static WRITE8_HANDLER( looping_videoram_w )
 
 static WRITE8_HANDLER( looping_colorram_w )
 {
-	looping_state *state = Machine->driver_data;
+	looping_state *state = machine->driver_data;
 	int i;
 
 	state->colorram[offset] = data;
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( looping_sound_sw )
         0007 = AFA
     */
 
-	looping_state *state = Machine->driver_data;
+	looping_state *state = machine->driver_data;
 	state->sound[offset + 1] = data ^ 1;
 	DAC_data_w(0, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
 }

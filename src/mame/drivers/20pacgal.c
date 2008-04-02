@@ -31,7 +31,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/namco.h"
 #include "sound/dac.h"
@@ -64,7 +63,7 @@ static WRITE8_HANDLER( irqack_w )
 	cpu_interrupt_enable(0, bit);
 
 	if (!bit)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE );
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
 }
 
 
@@ -161,7 +160,7 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	_20pacgal_state *state = Machine->driver_data;
+	_20pacgal_state *state = machine->driver_data;
 
 	state->game_selected = data & 1;
 
@@ -172,7 +171,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 static WRITE8_HANDLER( rom_48000_w )
 {
-	_20pacgal_state *state = Machine->driver_data;
+	_20pacgal_state *state = machine->driver_data;
 
 	if (state->game_selected)
 	{

@@ -538,7 +538,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 {
 	mame_system_time systime;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 //  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
 	smpc_ram[offset] = data;
@@ -630,7 +630,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpu_trigger(Machine, 1000);
+				cpu_trigger(machine, 1000);
 				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
@@ -794,7 +794,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 	offset += byte;
 
-	stv_SMPC_w8(Machine, offset,writedata);
+	stv_SMPC_w8(machine, offset,writedata);
 }
 
 
@@ -971,7 +971,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			}
 			case 0x47:
 			{
-				if ( strcmp(Machine->gamedrv->name,"critcrsh") == 0 )
+				if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
 				{
 					int data1 = 0, data2 = 0;
 
@@ -992,7 +992,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			return (readinputport(2) << 16) | (readinputport(3));
 		}
 		case 1:
-		if ( strcmp(Machine->gamedrv->name,"critcrsh") == 0 )
+		if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
 		{
 			return ((readinputport(4) << 16) & ((readinputport(2) & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		}
@@ -1292,14 +1292,14 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cpunum_set_input_line_and_vector(Machine, 0, 3, HOLD_LINE, 0x4c);
+						cpunum_set_input_line_and_vector(machine, 0, 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1353,7 +1353,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1403,7 +1403,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpunum_set_input_line_and_vector(Machine, 0, 9, HOLD_LINE , 0x46);
+				//cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -2049,7 +2049,7 @@ static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
 	cpu_boost_interleave(minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 

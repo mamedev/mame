@@ -346,7 +346,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 	}
 }
 
@@ -355,7 +355,7 @@ static WRITE16_HANDLER( tnexspce_soundlatch_w )
 	if (ACCESSING_BYTE_0)
 	{
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -418,7 +418,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			{
 				if (microcontroller_id == 0x00ff)		/* Super Stingry */
 				{
-					if (trigstate >= 12 || !strcmp(Machine->gamedrv->name, "jongbou"))	/* arbitrary value ! */
+					if (trigstate >= 12 || !strcmp(machine->gamedrv->name, "jongbou"))	/* arbitrary value ! */
 					{
 						trigstate = 0;
 						microcontroller_data = 0x21;			// timer
@@ -477,7 +477,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					if(!strcmp(Machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(machine->gamedrv->name, "btlfildb"))
 						coinvalue = (readinputportbytag("IN4")>>0) & 7;
 					else
 						coinvalue = (~readinputportbytag("IN4")>>0) & 7;
@@ -500,7 +500,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					if(!strcmp(Machine->gamedrv->name, "btlfildb"))
+					if(!strcmp(machine->gamedrv->name, "btlfildb"))
 						coinvalue = (readinputportbytag("IN4")>>0) & 7;
 					else
 						coinvalue = (~readinputportbytag("IN4")>>0) & 7;

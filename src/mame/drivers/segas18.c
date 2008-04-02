@@ -389,7 +389,7 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 	/* tile banking */
 	if (offset < 8)
 	{
-		int maxbanks = Machine->gfx[0]->total_elements / 1024;
+		int maxbanks = machine->gfx[0]->total_elements / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
 		segaic16_tilemap_set_bank(0, offset, data);
@@ -556,7 +556,7 @@ static WRITE8_HANDLER( soundbank_w )
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(Machine, 2, 1, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, 1, PULSE_LINE);
 }
 
 

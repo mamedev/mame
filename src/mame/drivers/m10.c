@@ -101,7 +101,6 @@ Notes (couriersud)
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 #include "m10.h"
 
@@ -139,7 +138,7 @@ static PALETTE_INIT( m10 )
 
 static MACHINE_RESET( irem )
 {
-	m10_state *state = Machine->driver_data;
+	m10_state *state = machine->driver_data;
 
 	state_save_register_global(state->bottomline);
 	state_save_register_global(state->flip);
@@ -172,7 +171,7 @@ static MACHINE_RESET( irem )
 
 static WRITE8_HANDLER( m10_ctrl_w )
 {
-	m10_state *state = Machine->driver_data;
+	m10_state *state = machine->driver_data;
 
 #if DEBUG
 	if (data & 0x40)
@@ -249,7 +248,7 @@ static WRITE8_HANDLER( m10_ctrl_w )
 
 static WRITE8_HANDLER( m11_ctrl_w )
 {
-	m10_state *state = Machine->driver_data;
+	m10_state *state = machine->driver_data;
 
 #if DEBUG
 	if (data & 0x4C)
@@ -282,7 +281,7 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 static WRITE8_HANDLER( m15_ctrl_w )
 {
-	m10_state *state = Machine->driver_data;
+	m10_state *state = machine->driver_data;
 
 #if DEBUG
 	if (data & 0xF0)
@@ -411,7 +410,7 @@ static WRITE8_HANDLER( m15_a100_w )
 static READ8_HANDLER( m10_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	return 0x00;
 }
 

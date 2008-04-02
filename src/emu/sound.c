@@ -244,7 +244,7 @@ static void sound_exit(running_machine *machine)
 
 	/* stop all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (Machine->config->sound[sndnum].type != SOUND_DUMMY)
+		if (machine->config->sound[sndnum].type != SOUND_DUMMY)
 			sndintrf_exit_sound(sndnum);
 
 	/* reset variables */
@@ -501,7 +501,7 @@ static void sound_reset(running_machine *machine)
 
 	/* reset all the sound chips */
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-		if (Machine->config->sound[sndnum].type != SOUND_DUMMY)
+		if (machine->config->sound[sndnum].type != SOUND_DUMMY)
 			sndnum_reset(sndnum);
 }
 

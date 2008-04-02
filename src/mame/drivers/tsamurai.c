@@ -104,19 +104,19 @@ static READ8_HANDLER( unknown_d938_r )
 static WRITE8_HANDLER( sound_command1_w )
 {
 	sound_command1 = data;
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE );
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command2_w )
 {
 	sound_command2 = data;
-	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE );
+	cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command3_w )
 {
 	sound_command3 = data;
-	cpunum_set_input_line(Machine, 3, 0, HOLD_LINE );
+	cpunum_set_input_line(machine, 3, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -365,9 +365,9 @@ static INTERRUPT_GEN( vsgongf_sound_interrupt ){
 
 static READ8_HANDLER( vsgongf_a006_r ){
 	/* sound CPU busy? */
-	if (!strcmp(Machine->gamedrv->name,"vsgongf"))  return 0x80;
-	if (!strcmp(Machine->gamedrv->name,"ringfgt"))  return 0x80;
-	if (!strcmp(Machine->gamedrv->name,"ringfgt2")) return 0xc0;
+	if (!strcmp(machine->gamedrv->name,"vsgongf"))  return 0x80;
+	if (!strcmp(machine->gamedrv->name,"ringfgt"))  return 0x80;
+	if (!strcmp(machine->gamedrv->name,"ringfgt2")) return 0xc0;
 
 	logerror ("unhandled read from a006\n");
 	return 0x00;
@@ -375,9 +375,9 @@ static READ8_HANDLER( vsgongf_a006_r ){
 
 static READ8_HANDLER( vsgongf_a100_r ){
 	/* protection? */
-	if (!strcmp(Machine->gamedrv->name,"vsgongf"))  return 0xaa;
-	if (!strcmp(Machine->gamedrv->name,"ringfgt"))  return 0x63;
-	if (!strcmp(Machine->gamedrv->name,"ringfgt2")) return 0x6a;
+	if (!strcmp(machine->gamedrv->name,"vsgongf"))  return 0xaa;
+	if (!strcmp(machine->gamedrv->name,"ringfgt"))  return 0x63;
+	if (!strcmp(machine->gamedrv->name,"ringfgt2")) return 0x6a;
 
 	logerror ("unhandled read from a100\n");
 	return 0x00;

@@ -528,7 +528,7 @@ static WRITE32_HANDLER( s23_txtchar_w )
 {
 	COMBINE_DATA(&namcos23_charram[offset]	);
 
-	decodechar( Machine->gfx[0],offset/32,(UINT8 *)namcos23_charram );
+	decodechar( machine->gfx[0],offset/32,(UINT8 *)namcos23_charram );
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);
 }
@@ -608,12 +608,12 @@ static WRITE32_HANDLER( s23_mcuen_w )
 		if (data)
 		{
 			logerror("S23: booting H8/3002\n");
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			logerror("S23: stopping H8/3002\n");
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }
@@ -701,7 +701,7 @@ static READ8_HANDLER( s23_mcu_rtc_r )
 	mame_system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 	switch (s23_rtcstate)
 	{

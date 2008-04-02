@@ -922,7 +922,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/psx.h"
 #include "cpu/h83002/h83002.h"
 #include "includes/psx.h"
@@ -984,8 +983,8 @@ static UINT32 m_n_bankoffset;
 static WRITE32_HANDLER( bankoffset_w )
 {
 	// Golgo 13 has different banking (maybe the keycus controls it?)
-	if( strcmp( Machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( Machine->gamedrv->name, "g13knd" ) == 0 )
+	if( strcmp( machine->gamedrv->name, "golgo13" ) == 0 ||
+		strcmp( machine->gamedrv->name, "g13knd" ) == 0 )
 	{
 		if( ( data & 8 ) != 0 )
 		{
@@ -1300,7 +1299,7 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 	mame_system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 
 	switch (s12_rtcstate)
 	{

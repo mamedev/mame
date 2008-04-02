@@ -99,7 +99,7 @@ WRITE16_HANDLER( demonwld_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			logerror("Turning 68000 on\n");
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		demonwld_dsp_BIO = ASSERT_LINE;
@@ -226,10 +226,10 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 	if (ACCESSING_BYTE_0 && (data == 0))
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n",activecpu_get_previouspc(),data);
-		if (Machine->config->sound[0].type == SOUND_YM3812)
+		if (machine->config->sound[0].type == SOUND_YM3812)
 			sndti_reset(SOUND_YM3812, 0);
-		if (Machine->config->cpu[1].type == CPU_Z80)
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		if (machine->config->cpu[1].type == CPU_Z80)
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

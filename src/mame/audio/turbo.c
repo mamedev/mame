@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "turbo.h"
 #include "sound/samples.h"
 
@@ -72,7 +71,7 @@ if (!((data >> 4) & 1)) mame_printf_debug("/TRIG4\n");
 
 WRITE8_HANDLER( turbo_sound_a_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -120,7 +119,7 @@ WRITE8_HANDLER( turbo_sound_a_w )
 
 WRITE8_HANDLER( turbo_sound_b_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -142,7 +141,7 @@ WRITE8_HANDLER( turbo_sound_b_w )
 
 WRITE8_HANDLER( turbo_sound_c_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 
 	/* OSEL1-2 */
 	state->turbo_osel = (state->turbo_osel & 1) | ((data & 3) << 1);
@@ -292,7 +291,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( subroc3d_sound_a_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	state->sound_state[0] = data;
 
 	/* DIS0-3 contained in bits 0-3 */
@@ -322,7 +321,7 @@ INLINE void subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 dir)
 
 WRITE8_HANDLER( subroc3d_sound_b_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 
@@ -377,7 +376,7 @@ WRITE8_HANDLER( subroc3d_sound_b_w )
 
 WRITE8_HANDLER( subroc3d_sound_c_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[2];
 	state->sound_state[2] = data;
 
@@ -501,7 +500,7 @@ static void buckrog_update_samples(turbo_state *state)
 
 WRITE8_HANDLER( buckrog_sound_a_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[0];
 	state->sound_state[0] = data;
 
@@ -526,7 +525,7 @@ WRITE8_HANDLER( buckrog_sound_a_w )
 
 WRITE8_HANDLER( buckrog_sound_b_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	UINT8 diff = data ^ state->sound_state[1];
 	state->sound_state[1] = data;
 

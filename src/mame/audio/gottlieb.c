@@ -35,7 +35,7 @@ WRITE8_HANDLER( gottlieb_sh_w )
 	{
 		if (sndti_exists(SOUND_SAMPLES, 0))
 		{
-			if (!strcmp(Machine->gamedrv->name,"reactor"))	/* reactor */
+			if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
 			{
 				switch (data ^ 0x3f)
 				{
@@ -297,5 +297,5 @@ WRITE8_HANDLER( gottlieb_nmi_rate_w )
 
 WRITE8_HANDLER( gottlieb_cause_dac_nmi_w )
 {
-	cpunum_set_input_line(Machine, cpu_gettotalcpu()-2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, cpu_gettotalcpu()-2, INPUT_LINE_NMI, PULSE_LINE);
 }

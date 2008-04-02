@@ -21,11 +21,11 @@ bit 0 = ? (unused?)
 */
 WRITE8_HANDLER( mexico86_f008_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
- 	if (Machine->config->cpu[2].type != CPU_DUMMY)
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+ 	if (machine->config->cpu[2].type != CPU_DUMMY)
 	{
 		// mexico 86, knight boy
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -314,8 +314,8 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 	if ((ddrB & 0x20) && (data & 0x20) && (~portB_out & 0x20))
 	{
 		cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-		//cpunum_set_input_line(Machine, 0,0,PULSE_LINE);
-		cpunum_set_input_line(Machine, 0, 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		//cpunum_set_input_line(machine, 0,0,PULSE_LINE);
+		cpunum_set_input_line(machine, 0, 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{

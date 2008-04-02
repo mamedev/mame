@@ -563,7 +563,7 @@ static WRITE8_HANDLER( banked_ram_w )
 			mastboy_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
-			decodechar(Machine->gfx[0], offs/32, mastboy_vram);
+			decodechar(machine->gfx[0], offs/32, mastboy_vram);
 		}
 	}
 	else
@@ -656,7 +656,7 @@ static const struct MSM5205interface msm5205_interface =
 static WRITE8_HANDLER( mastboy_irq0_ack_w )
 {
 	mastboy_irq0_ack = data;
-	if ((data&1)==1) cpunum_set_input_line(Machine, 0,0, CLEAR_LINE);
+	if ((data&1)==1) cpunum_set_input_line(machine, 0,0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mastboy_interrupt )
