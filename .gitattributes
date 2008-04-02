@@ -2332,6 +2332,7 @@ src/mame/includes/xybots.h svneol=native#text/plain
 src/mame/includes/zaxxon.h svneol=native#text/plain
 src/mame/layout/abaseb.lay svneol=native#text/plain
 src/mame/layout/ampoker2.lay svneol=native#text/plain
+src/mame/layout/armora.lay svneol=native#text/plain
 src/mame/layout/atarifb.lay svneol=native#text/plain
 src/mame/layout/atarifb4.lay svneol=native#text/plain
 src/mame/layout/avalnche.lay svneol=native#text/plain

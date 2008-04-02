@@ -36,6 +36,7 @@
 #include "cinemat.h"
 #include "rendlay.h"
 
+#include "armora.lh"
 #include "starcas.lh"
 #include "solarq.lh"
 
@@ -1487,9 +1488,9 @@ GAME( 1979, starhawk, 0,       starhawk, starhawk, 0,        ORIENTATION_FLIP_Y,
 GAMEL(1979, sundance, 0,       sundance, sundance, sundance, ORIENTATION_FLIP_X ^ ROT270, "Cinematronics", "Sundance", GAME_SUPPORTS_SAVE, layout_voffff20 )
 GAMEL(1979, tailg,    0,       tailg,    tailg,    tailg,    ORIENTATION_FLIP_Y,   "Cinematronics", "Tailgunner", GAME_SUPPORTS_SAVE, layout_ho20ffff )
 GAME( 1979, warrior,  0,       warrior,  warrior,  0,        ORIENTATION_FLIP_Y,   "Vectorbeam", "Warrior", GAME_SUPPORTS_SAVE )
-GAME( 1980, armora,   0,       armora,   armora,   0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", GAME_SUPPORTS_SAVE )
-GAME( 1980, armorap,  armora,  armora,   armora,   0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1980, armorar,  armora,  armora,   armora,   0,        ORIENTATION_FLIP_Y,   "Cinematronics (Rock-ola license)", "Armor Attack (Rock-ola)", GAME_SUPPORTS_SAVE )
+GAMEL(1980, armora,   0,       armora,   armora,   0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack", GAME_SUPPORTS_SAVE, layout_armora )
+GAMEL(1980, armorap,  armora,  armora,   armora,   0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Armor Attack (prototype)", GAME_SUPPORTS_SAVE, layout_armora )
+GAMEL(1980, armorar,  armora,  armora,   armora,   0,        ORIENTATION_FLIP_Y,   "Cinematronics (Rock-ola license)", "Armor Attack (Rock-ola)", GAME_SUPPORTS_SAVE, layout_armora )
 GAME( 1980, ripoff,   0,       ripoff,   ripoff,   0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Rip Off", GAME_SUPPORTS_SAVE )
 GAMEL(1980, starcas,  0,       starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (version 3)", GAME_SUPPORTS_SAVE, layout_starcas )
 GAMEL(1980, starcas1, starcas, starcas,  starcas,  0,        ORIENTATION_FLIP_Y,   "Cinematronics", "Star Castle (older)", GAME_SUPPORTS_SAVE, layout_starcas )

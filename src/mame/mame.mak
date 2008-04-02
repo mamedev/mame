@@ -1668,7 +1668,8 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 
 $(DRIVERS)/cardline.o:	$(LAYOUT)/cardline.lh
 
-$(DRIVERS)/cinemat.o:	$(LAYOUT)/solarq.lh \
+$(DRIVERS)/cinemat.o:	$(LAYOUT)/armora.lh \
+						$(LAYOUT)/solarq.lh \
 						$(LAYOUT)/starcas.lh
 
 $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
