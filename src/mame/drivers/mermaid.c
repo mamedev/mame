@@ -10,7 +10,6 @@
         * Rougien
 
     Known issues:
-        * Hardware collision detection is not implemented.
         * Are the stars really supposed to go up in Rougien?
 
 
