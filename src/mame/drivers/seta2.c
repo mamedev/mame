@@ -2096,10 +2096,10 @@ ROM_START( penbros )
 	ROM_LOAD( "u18.bin", 0x100000, 0x200000, CRC(de4e65e2) SHA1(82d4e590c714b3e9bf0ffaf1500deb24fd315595) )
 ROM_END
 
-ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) */
+ROM_START( deerhunt ) /* Deer Hunting USA V4.3 (11/1/2000) - The "E05" breaks version label conventions but is correct & verified */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* TMP68301 Code */
-	ROM_LOAD16_BYTE( "as0906e04-v4_3.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) ) /* CRC16 694E printed on label */
-	ROM_LOAD16_BYTE( "as0907e04-v4_3.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* CRC16 5D89 printed on label */
+	ROM_LOAD16_BYTE( "as0906e05.u06", 0x000000, 0x100000, CRC(20c81f17) SHA1(d41d93d6ee88738cec55f7bf3ce6be1dbec68e09) ) /* CRC16 694E printed on label */
+	ROM_LOAD16_BYTE( "as0907e05.u07", 0x000001, 0x100000, CRC(1731aa2a) SHA1(cffae7a99a7f960a62ef0c4454884df17a93c1a6) ) /* CRC16 5D89 printed on label */
 
 	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "as0901m01.u38", 0x0000000, 0x800000, CRC(1d6acf8f) SHA1(6f61fe21bebb7c87e8e6c3ef3ba73b8cf327dde9) )
@@ -2143,6 +2143,8 @@ ROM_START( deerhunb ) /* Deer Hunting USA V4.0 (6/15/2000) */
 	/* Leave 1MB empty (addressable by the chip) */
 	ROM_LOAD( "as0905m01.u18", 0x100000, 0x400000, CRC(8d8165bb) SHA1(aca7051613d260734ee787b4c3db552c336bd600) )
 ROM_END
+
+	/* There are known versions 3.x of Deer Hunting USA.... just none are currently dumped.  roms should be "AS0906 E03 U06" & "AS0907 E03 U07" */
 
 ROM_START( deerhunc ) /* Deer Hunting USA V2.x - No version number is printed to screen but "E02" in EPROM label signifies V2 */
 	ROM_REGION( 0x200000, REGION_CPU1, 0 )		/* TMP68301 Code */
