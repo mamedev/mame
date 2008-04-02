@@ -10,8 +10,7 @@ driver by Mirko Buffoni
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
-#include "sound/flt_rc.h"
-
+#include "sound/discrete.h"
 
 extern UINT8 *ironhors_scroll;
 static UINT8 *ironhors_interrupt_enable;
@@ -48,14 +47,13 @@ static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( ironhors_filter_w )
 {
-	if (sndti_exists(SOUND_FILTER_RC, 2))
+	if (sndti_exists(SOUND_DISCRETE, 2))
 	{
-		filter_rc_set_RC(0,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x04 ? CAP_N(220) : 0); /* YM2203-SSG-A */
-		filter_rc_set_RC(1,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x02 ? CAP_N(220) : 0); /* YM2203-SSG-B */
-		filter_rc_set_RC(2,FLT_RC_LOWPASS, 1000,2200,1000,data & 0x01 ? CAP_N(220) : 0); /* YM2203-SSG-C */
+		discrete_sound_w(machine, NODE_11, (data & 0x04) >> 2);
+		discrete_sound_w(machine, NODE_12, (data & 0x02) >> 1);
+		discrete_sound_w(machine, NODE_13, (data & 0x01) >> 0);
 	}
 }
-
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
@@ -382,6 +380,50 @@ static GFXDECODE_START( farwest )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, farwest_spritelayout2,16*8*16, 16*8 )  /* to handle 8x8 sprites */
 GFXDECODE_END
 
+static const discrete_mixer_desc ironhors_mixer_desc =
+	{DISC_MIXER_IS_RESISTOR,
+		{RES_K(2.2), RES_K(2.2), RES_K(2.2)},
+		{0,0,0,0,0,0},	/* no variable resistors   */
+		{0,0,0,0,0,0},  /* no node capacitors      */
+		0, RES_K(1),   /* RF */
+		0,
+		0,
+		0, 1};
+
+static const discrete_mixer_desc ironhors_mixer_desc_final =
+	{DISC_MIXER_IS_RESISTOR,
+		{RES_K(0.5), RES_K(1)},
+		{0,0,0,0,0,0},	/* no variable resistors   */
+		{CAP_U(4.7), CAP_U(4.7)},  /* node capacitors         */
+		0, RES_K(1),   /* RF */
+		0,
+		0,
+		0, 1};
+
+static DISCRETE_SOUND_START( ironhors )
+
+	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
+
+	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
+
+	DISCRETE_INPUT_DATA(NODE_11)
+	DISCRETE_INPUT_DATA(NODE_12)
+	DISCRETE_INPUT_DATA(NODE_13)
+
+	DISCRETE_RCFILTER_SW(NODE_21, 1, NODE_01, NODE_11, 1000, CAP_U(0.22), 0, 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_22, 1, NODE_02, NODE_12, 1000, CAP_U(0.22), 0, 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_23, 1, NODE_03, NODE_13, 1000, CAP_U(0.22), 0, 0, 0)
+	
+	DISCRETE_MIXER3(NODE_30, 1, NODE_21, NODE_22, NODE_23, &ironhors_mixer_desc)
+
+	DISCRETE_RCFILTER(NODE_31,1,NODE_04, RES_K(1), CAP_N(33) )
+	DISCRETE_MIXER2(NODE_33, 1, NODE_30, NODE_31, &ironhors_mixer_desc_final)
+	
+	DISCRETE_OUTPUT(NODE_33, 5.0 )
+	
+DISCRETE_SOUND_END
 
 static const struct YM2203interface ym2203_interface =
 {
@@ -422,19 +464,18 @@ static MACHINE_DRIVER_START( ironhors )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2203, 18432000/6)
+	MDRV_SOUND_ADD_TAG("ym2203", YM2203, 18432000/6)
 	MDRV_SOUND_CONFIG(ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "filter1", 0.40)
-	MDRV_SOUND_ROUTE(1, "filter2", 0.40)
-	MDRV_SOUND_ROUTE(2, "filter3", 0.40)
-	MDRV_SOUND_ROUTE(3, "mono", 0.40)
+	
+	MDRV_SOUND_ROUTE_EX(0, "disc_ih", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "disc_ih", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "disc_ih", 1.0, 2)
+	MDRV_SOUND_ROUTE_EX(3, "disc_ih", 1.0, 3)
 
-	MDRV_SOUND_ADD_TAG("filter1", FILTER_RC, 0)
+	MDRV_SOUND_ADD_TAG("disc_ih", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(ironhors)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD_TAG("filter3", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 
