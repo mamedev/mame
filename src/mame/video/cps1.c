@@ -98,15 +98,17 @@ Some registers move from game to game.. following example strider
 0x6c-0x6d   Priority mask |   of these masks. The masks indicate pens in the tile
 0x6e-0x6f   Priority mask /   that have priority over sprites.
 0x70-0x71   Control register (usually 0x003f). The details of how this register
-            works are unknown, but it definitely affects the palette; experiments
-            on the real board show that values different from 0x3f in the low 6
-            bits cause wrong colors. The other bits seem to be unused.
+            works are unknown, but it definitely affects the palette, and games
+            always set it together with the palette base register.
+            Experiments on the real board show that values different from 0x3f in
+            the low 6 bits cause wrong colors. The other bits seem to be unused.
             There is one CPS2 game (Slammasters II) setting this to 0x2f: the
             purpose is unknown.
             The only other places where this register seems to be set to a value
             different from 0x3f is during startup tests. Examples:
-            ghouls  0x02
-            strider 0x02
+            ghouls  0x02 (and palette base is set to 9105; palette base is 9100 normally)
+            strider 0x02 (and palette base is set to 9145; palette base is 9140 normally)
+            1941    0x02 (and palette base is set to 9145; palette base is 9140 normally)
             unsquad 0x0f
             kod     0x0f
             mtwins  0x0f
@@ -164,6 +166,14 @@ wof
 * In round 8, when the player goes over a bridge, there is a problem with
 some sprites. When an enemy falls to the floor near the edge of the bridge,
 parts of it become visible under the bridge.
+
+varth
+* the background color during startup is brown, while it should most likely be
+  black. This is caused by the background color palette entry (0xbff), however
+  that entry is definitely correct and used by other games (3wonders, mtwins)
+  to make the background different from black.
+  The boot screen of some CPS2 also has a blue background instead of black,
+  however that might be the correct behaviour.
 
 
 Unknown issues
@@ -420,13 +430,6 @@ int cps1_scanline1;
 int cps1_scanline2;
 int cps1_scancalls;
 
-#ifdef UNUSED_FUNCTION
-void cps_setversion(int v)
-{
-    cps_version=v;
-}
-#endif
-
 
 static MACHINE_RESET( cps )
 {
@@ -571,7 +574,7 @@ if (cps1_game_config->control_reg && offset == cps1_game_config->control_reg/2 &
 if (VERBOSE)
 {
 if (offset > 0x22/2 &&
-        offset != cps1_game_config->layer_control/2 &&
+		offset != cps1_game_config->layer_control/2 &&
 		offset != cps1_game_config->priority[0]/2 &&
 		offset != cps1_game_config->priority[1]/2 &&
 		offset != cps1_game_config->priority[2]/2 &&
@@ -599,7 +602,7 @@ size_t cps1_output_size;
 
 /* Offset of each palette entry */
 static int palette_basecolor[6];
-#define cps1_palette_entries (32*8)  /* Number colour schemes in palette */
+#define cps1_palette_entries (32*6)  /* Number colour schemes in palette */
 
 static const int cps1_scroll_size =0x4000;	/* scroll1, scroll2, scroll3 */
 static const int cps1_obj_size    =0x0800;
@@ -1161,10 +1164,11 @@ static VIDEO_START( cps )
     cps1_buffered_obj = auto_malloc (cps1_obj_size);
     memset(cps1_buffered_obj, 0x00, cps1_obj_size);
 
-    if (cps_version==2) {
-	cps2_buffered_obj = auto_malloc (cps2_obj_size);
-	memset(cps2_buffered_obj, 0x00, cps2_obj_size);
-    }
+	if (cps_version==2)
+	{
+		cps2_buffered_obj = auto_malloc (cps2_obj_size);
+		memset(cps2_buffered_obj, 0x00, cps2_obj_size);
+	}
 
 	memset(cps1_gfxram, 0, cps1_gfxram_size);   /* Clear GFX RAM */
 	memset(cps1_output, 0, cps1_output_size);   /* Clear output ports */
@@ -1195,22 +1199,19 @@ static VIDEO_START( cps )
 	palette_basecolor[2] = 2*32;	/* scroll2 */
 	palette_basecolor[3] = 3*32;	/* scroll3 */
 	palette_basecolor[4] = 4*32;	/* stars1 */
-	palette_basecolor[5] = 5*32;	/* stars2 */
+	palette_basecolor[5] = 5*32;	/* stars2 (and bg) */
 }
 
 VIDEO_START( cps1 )
 {
-    cps_version=1;
-    VIDEO_START_CALL(cps);
+	cps_version=1;
+	VIDEO_START_CALL(cps);
 }
 
 VIDEO_START( cps2 )
 {
-    if (cps_version != 99)
-    {
-        cps_version=2;
-    }
-    VIDEO_START_CALL(cps);
+	cps_version=2;
+	VIDEO_START_CALL(cps);
 }
 
 /***************************************************************************
@@ -1231,7 +1232,7 @@ void cps1_build_palette(running_machine *machine)
 
 		if (palette != cps1_old_palette[offset])
 		{
-		   	int red, green, blue, bright;
+			int red, green, blue, bright;
 
 			bright = 0x10 + (palette>>12);
 
@@ -1801,7 +1802,7 @@ static void cps1_render_high_layer(bitmap_t *bitmap, const rectangle *cliprect, 
 
 VIDEO_UPDATE( cps1 )
 {
-    int layercontrol,l0,l1,l2,l3;
+	int layercontrol,l0,l1,l2,l3;
 	int videocontrol=cps1_port(0x22);
 
 
@@ -1813,11 +1814,11 @@ VIDEO_UPDATE( cps1 )
 	cps1_get_video_base();
 
 	/* Find the offset of the last sprite in the sprite table */
-    cps1_find_last_sprite();
-    if (cps_version == 2)
-    {
-        cps2_find_last_sprite();
-    }
+	cps1_find_last_sprite();
+	if (cps_version == 2)
+	{
+		cps2_find_last_sprite();
+	}
 	/* Build palette */
 	cps1_build_palette(screen->machine);
 
@@ -1849,7 +1850,7 @@ VIDEO_UPDATE( cps1 )
 
 
 	/* Blank screen */
-	fillbitmap(bitmap,4095,cliprect);
+	fillbitmap(bitmap,0xbff,cliprect);
 
 	cps1_render_stars(screen, bitmap,cliprect);
 
