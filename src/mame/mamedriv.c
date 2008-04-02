@@ -1082,6 +1082,7 @@ const game_driver * const drivers[] =
 	/* NES-based hacks */
 	DRIVER( multigam )	/* 1992 */
 	DRIVER( multigmb )	/* 1992 */
+	DRIVER( multigm3 )  /* 19?? */
 	DRIVER( cham24 )	/* 2002 */
 
 	/* Nintendo Super System Games */
