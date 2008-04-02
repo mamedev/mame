@@ -34,13 +34,6 @@
 #ifndef __CDP1869_VIDEO__
 #define __CDP1869_VIDEO__
 
-typedef enum _cdp1869_video_format cdp1869_video_format;
-
-enum _cdp1869_video_format {
-	CDP1869_NTSC,
-	CDP1869_PAL
-};
-
 #define CDP1869_DOT_CLK_PAL			5626000.0
 #define CDP1869_DOT_CLK_NTSC		5670000.0
 #define CDP1869_COLOR_CLK_PAL		8867236.0
@@ -54,8 +47,8 @@ enum _cdp1869_video_format {
 #define CDP1869_HSYNC_START			(56 * CDP1869_CHAR_WIDTH)
 #define CDP1869_HSYNC_END			(60 * CDP1869_CHAR_WIDTH)
 #define CDP1869_HBLANK_START		(54 * CDP1869_CHAR_WIDTH)
-#define CDP1869_HBLANK_END			(5 * CDP1869_CHAR_WIDTH)
-#define CDP1869_SCREEN_START_PAL	(9 * CDP1869_CHAR_WIDTH)
+#define CDP1869_HBLANK_END			( 5 * CDP1869_CHAR_WIDTH)
+#define CDP1869_SCREEN_START_PAL	( 9 * CDP1869_CHAR_WIDTH)
 #define CDP1869_SCREEN_START_NTSC	(10 * CDP1869_CHAR_WIDTH)
 #define CDP1869_SCREEN_START		(10 * CDP1869_CHAR_WIDTH)
 #define CDP1869_SCREEN_END			(50 * CDP1869_CHAR_WIDTH)
@@ -83,48 +76,85 @@ enum _cdp1869_video_format {
 #define CDP1869_SCANLINE_PREDISPLAY_END_NTSC	228
 #define CDP1869_VISIBLE_SCANLINES_NTSC			(CDP1869_SCANLINE_DISPLAY_END_NTSC - CDP1869_SCANLINE_DISPLAY_START_NTSC)
 
-#define CDP1869_FPS_PAL				CDP1869_DOT_CLK_PAL / CDP1869_SCREEN_WIDTH / CDP1869_TOTAL_SCANLINES_PAL
-#define CDP1869_FPS_NTSC			CDP1869_DOT_CLK_NTSC / CDP1869_SCREEN_WIDTH / CDP1869_TOTAL_SCANLINES_NTSC
+#define	CDP1869_PALETTE_LENGTH	8+64
 
-#define CDP1869_WEIGHT_RED		30 // % of max luminance
-#define CDP1869_WEIGHT_GREEN	59
-#define CDP1869_WEIGHT_BLUE		11
+#define CDP1869_VIDEO		DEVICE_GET_INFO_NAME(cdp1869_video)
 
-#define CDP1869_CHARRAM_SIZE	0x1000
-#define CDP1869_PAGERAM_SIZE	0x800
+typedef UINT8 (*cdp1869_char_ram_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
+#define CDP1869_CHAR_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma, UINT8 cma)
 
-#define CDP1869_COLUMNS_HALF	20
-#define CDP1869_COLUMNS_FULL	40
-#define CDP1869_ROWS_HALF		12
-#define CDP1869_ROWS_FULL_PAL	25
-#define CDP1869_ROWS_FULL_NTSC	24
+typedef void (*cdp1869_char_ram_write_func)(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data);
+#define CDP1869_CHAR_RAM_WRITE(name) void name(const device_config *device, UINT16 pma, UINT8 cma, UINT8 data)
 
-typedef struct CDP1869_interface
+typedef UINT8 (*cdp1869_page_ram_read_func)(const device_config *device, UINT16 pma);
+#define CDP1869_PAGE_RAM_READ(name) UINT8 name(const device_config *device, UINT16 pma)
+
+typedef void (*cdp1869_page_ram_write_func)(const device_config *device, UINT16 pma, UINT8 data);
+#define CDP1869_PAGE_RAM_WRITE(name) void name(const device_config *device, UINT16 pma, UINT8 data)
+
+typedef int (*cdp1869_pcb_read_func)(const device_config *device, UINT16 pma, UINT8 cma);
+#define CDP1869_PCB_READ(name) int name(const device_config *device, UINT16 pma, UINT8 cma)
+
+typedef void (*cdp1869_on_prd_changed_func) (const device_config *device, int prd);
+#define CDP1869_ON_PRD_CHANGED(name) void name(const device_config *device, int prd)
+
+typedef enum _cdp1869_format cdp1869_format;
+enum _cdp1869_format {
+	CDP1869_NTSC = 0,
+	CDP1869_PAL
+};
+
+/* interface */
+typedef struct _cdp1869_interface cdp1869_interface;
+struct _cdp1869_interface
 {
-	cdp1869_video_format video_format;	// display format (NTSC/PAL)
-	int charrom_region;					// memory region to load CHARRAM from
-	UINT16 charram_size;				// CHARRAM size
-	UINT16 pageram_size;				// PAGERAM size
-	UINT8 (*get_color_bits)(UINT8 cramdata, UINT16 cramaddr, UINT16 pramaddr); // 0x01 = PCB, 0x02 = CCB0, 0x04 = CCB1
-} CDP1869_interface;
+	const char *screen_tag;		/* screen we are acting on */
+	int pixel_clock;			/* the dot clock of the chip */
+	int color_clock;			/* the chroma clock of the chip */
 
-WRITE8_HANDLER ( cdp1869_out3_w );
-WRITE8_HANDLER ( cdp1869_out4_w );
-WRITE8_HANDLER ( cdp1869_out5_w );
-WRITE8_HANDLER ( cdp1869_out6_w );
-WRITE8_HANDLER ( cdp1869_out7_w );
+	cdp1869_format pal_ntsc;	/* screen format */
 
+	/* page memory read function */
+	cdp1869_page_ram_read_func		page_ram_r;
+
+	/* page memory write function */
+	cdp1869_page_ram_write_func		page_ram_w;
+
+	/* page memory color bit read function */
+	cdp1869_pcb_read_func			pcb_r;
+
+	/* character memory read function */
+	cdp1869_char_ram_read_func		char_ram_r;
+
+	/* character memory write function */
+	cdp1869_char_ram_write_func		char_ram_w;
+
+	/* if specified, this gets called for every change of the predisplay pin (CDP1870/76 pin 1) */
+	cdp1869_on_prd_changed_func		on_prd_changed;
+};
+
+/* device interface */
+DEVICE_GET_INFO( cdp1869_video );
+
+/* palette initialization */
 PALETTE_INIT( cdp1869 );
-VIDEO_START( cdp1869 );
-VIDEO_UPDATE( cdp1869 );
 
-READ8_HANDLER ( cdp1869_charram_r );
-READ8_HANDLER ( cdp1869_pageram_r );
-WRITE8_HANDLER ( cdp1869_charram_w );
-WRITE8_HANDLER ( cdp1869_pageram_w );
+/* io port access */
+WRITE8_DEVICE_HANDLER( cdp1869_out3_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out4_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out5_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out6_w );
+WRITE8_DEVICE_HANDLER( cdp1869_out7_w );
 
-void cdp1869_configure(const CDP1869_interface *intf);
+/* character memory access */
+READ8_DEVICE_HANDLER ( cdp1869_charram_r );
+WRITE8_DEVICE_HANDLER ( cdp1869_charram_w );
 
-UINT16 cdp1869_get_cma(UINT16 offset);
+/* page memory access */
+READ8_DEVICE_HANDLER ( cdp1869_pageram_r );
+WRITE8_DEVICE_HANDLER ( cdp1869_pageram_w );
+
+/* updates the screen */
+void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

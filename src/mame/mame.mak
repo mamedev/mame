@@ -1515,7 +1515,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/carrera.o \
 	$(DRIVERS)/cave.o $(VIDEO)/cave.o \
 	$(DRIVERS)/cherrym.o \
-	$(DRIVERS)/cidelsa.o \
+	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
