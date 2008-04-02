@@ -33,9 +33,6 @@
 #define skip			R.skip
 #define skipLBI			R.skipLBI
 
-#define READ_M			RAM_R(B)
-#define WRITE_M(VAL)	RAM_W(B,VAL)
-
 #define IN_G()			IN(COP400_PORT_G)
 #define IN_L()			IN(COP400_PORT_L)
 #define IN_SI()			IN(COP400_PORT_SIO)
@@ -55,7 +52,7 @@
 static TIMER_CALLBACK(cop410_serial_tick)
 {
     int cpunum = param;
-
+	
 	cpuintrf_push_context(cpunum);
 
 	if (BIT(EN, 0))
@@ -69,11 +66,7 @@ static TIMER_CALLBACK(cop410_serial_tick)
 		if (R.last_si && !si)
 		{
 			SIO--;
-
-			if (SIO == 0)
-			{
-				SIO = 15;
-			}
+			SIO &= 0x0f;
 		}
 
 		R.last_si = si;
@@ -148,7 +141,7 @@ INSTRUCTION(illegal)
 /*
 
 	Mnemonic:			ASC
-
+	
 	Hex Code:			30
 	Binary:				0 0 1 1 0 0 0 0
 
@@ -180,7 +173,7 @@ INSTRUCTION(asc)
 /*
 
 	Mnemonic:			ADD
-
+	
 	Hex Code:			31
 	Binary:				0 0 1 1 0 0 0 1
 
@@ -192,13 +185,13 @@ INSTRUCTION(asc)
 
 INSTRUCTION(add)
 {
-	A = (A + RAM_R(B)) & 0x0F;
+	A = (A + RAM_R(B)) & 0x0F; 
 }
 
 /*
 
 	Mnemonic:			AISC
-
+	
 	Operand:			y
 	Hex Code:			5-
 	Binary:				0 1 0 1 y3 y2 y1 y0
@@ -227,7 +220,7 @@ INSTRUCTION(aisc)
 /*
 
 	Mnemonic:			CLRA
-
+	
 	Hex Code:			00
 	Binary:				0 0 0 0 0 0 0 0
 
@@ -245,7 +238,7 @@ INSTRUCTION(clra)
 /*
 
 	Mnemonic:			COMP
-
+	
 	Hex Code:			40
 	Binary:				0 1 0 0 0 0 0 0
 
@@ -263,7 +256,7 @@ INSTRUCTION(comp)
 /*
 
 	Mnemonic:			NOP
-
+	
 	Hex Code:			44
 	Binary:				0 1 0 0 0 1 0 0
 
@@ -279,7 +272,7 @@ INSTRUCTION(nop)
 /*
 
 	Mnemonic:			RC
-
+	
 	Hex Code:			32
 	Binary:				0 0 1 1 0 0 1 0
 
@@ -297,7 +290,7 @@ INSTRUCTION(rc)
 /*
 
 	Mnemonic:			SC
-
+	
 	Hex Code:			22
 	Binary:				0 0 1 0 0 0 1 0
 
@@ -315,19 +308,19 @@ INSTRUCTION(sc)
 /*
 
 	Mnemonic:			XOR
-
+	
 	Hex Code:			02
 	Binary:				0 0 0 0 0 0 1 0
 
 	Data Flow:			A ^ RAM(B) -> A
 
-	Description:
+	Description:		Exclusive-OR RAM with A
 
 */
 
 INSTRUCTION(xor)
 {
-	A = RAM_R(B) ^ A;
+	A = A ^ RAM_R(B);
 }
 
 /* Transfer-of-Control Instructions */
@@ -335,7 +328,7 @@ INSTRUCTION(xor)
 /*
 
 	Mnemonic:			JID
-
+	
 	Hex Code:			FF
 	Binary:				1 1 1 1 1 1 1 1
 
@@ -347,14 +340,14 @@ INSTRUCTION(xor)
 
 INSTRUCTION(jid)
 {
-	UINT16 addr = (PC & 0x300) | (A << 4) | READ_M;
+	UINT16 addr = (PC & 0x300) | (A << 4) | RAM_R(B);
 	PC = (PC & 0x300) | ROM(addr);
 }
 
 /*
 
 	Mnemonic:			JMP
-
+	
 	Operand:			a
 	Hex Code:			6- --
 	Binary:				0 1 1 0 0 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
@@ -367,13 +360,15 @@ INSTRUCTION(jid)
 
 INSTRUCTION(jmp)
 {
-	PC = ((opcode & 0x03) << 8) | ROM(PC);
+	UINT16 a = ((opcode & 0x03) << 8) | ROM(PC);
+
+	PC = a;
 }
 
 /*
 
 	Mnemonic:			JP
-
+	
 	Operand:			a
 	Hex Code:			--
 	Binary:				1 a6 a5 a4 a3 a2 a1 a0
@@ -392,30 +387,31 @@ INSTRUCTION(jmp)
 
 INSTRUCTION(jp)
 {
-	UINT8 op = ROM(prevPC);
+	UINT4 page = PC >> 6;
 
-	if (((PC & 0x3E0) >= 0x80) && ((PC & 0x3E0) < 0x100)) //JP pages 2,3
+	if (page == 2 || page == 3)
 	{
-		PC = (UINT16)((PC & 0x380) | (op & 0x7F));
+		UINT8 a = opcode & 0x7f;
+		PC = (PC & 0x380) | a;
+	}
+	else if ((opcode & 0xc0) == 0xc0)
+	{
+		UINT8 a = opcode & 0x3f;
+		PC = (PC & 0x3c0) | a;
 	}
 	else
 	{
-		if ((op & 0xC0) == 0xC0) //JP other pages
-		{
-			PC = (UINT16)((PC & 0x3C0) | (op & 0x3F));
-		}
-		else					//JSRP
-		{
-			PUSH((UINT16)(PC));
-			PC = (UINT16)(0x80 | (op & 0x3F));
-		}
+		// JSRP
+		UINT8 a = opcode & 0x3f;
+		PUSH(PC + 1);
+		PC = 0x80 | a;
 	}
 }
 
 /*
 
 	Mnemonic:			JSR
-
+	
 	Operand:			a
 	Hex Code:			6- --
 	Binary:				0 1 1 0 1 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
@@ -427,21 +423,18 @@ INSTRUCTION(jp)
 
 */
 
-INLINE void JSR(UINT8 a8)
+INSTRUCTION(jsr)
 {
-	PUSH(PC + 1);
-	PC = (a8 << 8) | ROM(PC);
-}
+	UINT16 a = ((opcode & 0x03) << 8) | ROM(PC);
 
-INSTRUCTION(jsr0) { JSR(0); }
-INSTRUCTION(jsr1) { JSR(1); }
-INSTRUCTION(jsr2) { JSR(2); }
-INSTRUCTION(jsr3) { JSR(3); }
+	PUSH(PC + 1);
+	PC = a;
+}
 
 /*
 
 	Mnemonic:			RET
-
+	
 	Hex Code:			48
 	Binary:				0 1 0 0 1 0 0 0
 
@@ -459,7 +452,7 @@ INSTRUCTION(ret)
 /*
 
 	Mnemonic:			RETSK
-
+	
 	Hex Code:			49
 	Binary:				0 1 0 0 1 0 0 1
 
@@ -482,7 +475,7 @@ INSTRUCTION(retsk)
 /*
 
 	Mnemonic:			CAMQ
-
+	
 	Hex Code:			33 3C
 	Binary:				0 0 1 1 0 0 1 1	0 0 1 1 1 1 0 0
 
@@ -495,13 +488,13 @@ INSTRUCTION(retsk)
 
 INSTRUCTION(camq)
 {
-	WRITE_Q((A << 4) | READ_M);
+	WRITE_Q((A << 4) | RAM_R(B));
 }
 
 /*
 
 	Mnemonic:			LD
-
+	
 	Operand:			r
 	Hex Code:			-5
 	Binary:				0 0 r1 r0 0 1 0 1
@@ -513,21 +506,18 @@ INSTRUCTION(camq)
 
 */
 
-INLINE void LD(UINT8 r)
+INSTRUCTION(ld)
 {
-	A = RAM_R(B);
-	B = B ^ (r << 4);
-}
+	UINT8 r = opcode & 0x30;
 
-INSTRUCTION(ld0) { LD(0); }
-INSTRUCTION(ld1) { LD(1); }
-INSTRUCTION(ld2) { LD(2); }
-INSTRUCTION(ld3) { LD(3); }
+	A = RAM_R(B);
+	B = B ^ r;
+}
 
 /*
 
 	Mnemonic:			LQID
-
+	
 	Hex Code:			BF
 	Binary:				1 0 1 1 1 1 1 1
 
@@ -541,7 +531,7 @@ INSTRUCTION(ld3) { LD(3); }
 INSTRUCTION(lqid)
 {
 	PUSH(PC + 1);
-	PC = (UINT16)((PC & 0x300) | (A << 4) | READ_M);
+	PC = (PC & 0x300) | (A << 4) | RAM_R(B);
 	WRITE_Q(ROM(PC));
 	POP();
 }
@@ -549,7 +539,7 @@ INSTRUCTION(lqid)
 /*
 
 	Mnemonic:			RMB
-
+	
 	Operand:			0
 						1
 						2
@@ -582,7 +572,7 @@ INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); }
 /*
 
 	Mnemonic:			SMB
-
+	
 	Operand:			0
 						1
 						2
@@ -615,7 +605,7 @@ INSTRUCTION(smb3) { RAM_W(B, RAM_R(B) | 0x8); }
 /*
 
 	Mnemonic:			STII
-
+	
 	Operand:			y
 	Hex Code:			7-
 	Binary:				0 1 1 1 y3 y2 y1 y0
@@ -633,15 +623,15 @@ INSTRUCTION(stii)
 	UINT16 Bd;
 
 	RAM_W(B, y);
-	Bd = (B & 0x0f) + 1;
-	if (Bd > 15) Bd = 0;
+
+	Bd = ((B & 0x0f) + 1) & 0x0f;
 	B = (B & 0x30) + Bd;
 }
 
 /*
 
 	Mnemonic:			X
-
+	
 	Operand:			r
 	Hex Code:			-6
 	Binary:				0 0 r1 r0 0 1 1 0
@@ -655,24 +645,24 @@ INSTRUCTION(stii)
 
 INSTRUCTION(x)
 {
-	UINT4 r = (opcode >> 4) & 0x03;
+	UINT4 r = opcode & 0x30;
 	UINT8 t = RAM_R(B);
 
 	RAM_W(B, A);
 
 	A = t;
-	B = B ^ (r << 4);
+	B = B ^ r;
 }
 
 /*
 
 	Mnemonic:			XAD
-
+	
 	Operand:			r,d
 	Hex Code:			23 --
 	Binary:				0 0 1 0 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
 
-	Data Flow:			RAM(r,d) -> A
+	Data Flow:			RAM(r,d) <-> A
 
 	Description:		Exchange A with RAM pointed to directly by r,d
 
@@ -680,16 +670,18 @@ INSTRUCTION(x)
 
 INSTRUCTION(xad)
 {
-	UINT8 addr = ROM(PC++) & 0x3f;
+	UINT8 rd = opcode & 0x3f;
 	UINT8 t = A;
-	A = RAM_R(addr);
-	RAM_W(addr, t);
+
+	A = RAM_R(rd);
+
+	RAM_W(rd, t);
 }
 
 /*
 
 	Mnemonic:			XDS
-
+	
 	Operand:			r
 	Hex Code:			-7
 	Binary:				0 0 r1 r0 0 1 1 1
@@ -706,24 +698,25 @@ INSTRUCTION(xad)
 
 INSTRUCTION(xds)
 {
-	UINT8 t, Bd, Br;
-	UINT4 r = (opcode >> 4) & 0x03;
+	UINT8 t, Bd;
+	UINT4 r = opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
 	A = t;
 
-	Br = (UINT8)((B & 0x30) ^ (r << 4));
-	Bd = (UINT8)((B & 0x0F) - 1);
-	B = (UINT8)(Br | (Bd & 0x0F));
+	Bd = ((B & 0x0f) - 1) & 0x0f;
+	B = (B & 0x30) | Bd;
 
-	if (Bd == 0xFF) skip = 1;
+	B = B ^ r;
+
+	if (Bd == 0x0f) skip = 1;
 }
 
 /*
 
 	Mnemonic:			XIS
-
+	
 	Operand:			r
 	Hex Code:			-4
 	Binary:				0 0 r1 r0 0 1 0 0
@@ -740,18 +733,19 @@ INSTRUCTION(xds)
 
 INSTRUCTION(xis)
 {
-	UINT8 t, Bd, Br;
-	UINT4 r = (opcode >> 4) & 0x03;
+	UINT8 t, Bd;
+	UINT4 r = opcode & 0x30;
 
 	t = RAM_R(B);
 	RAM_W(B, A);
 	A = t;
 
-	Br = (UINT8)((B & 0x30) ^ (r << 4));
-	Bd = (UINT8)((B & 0x0F) + 1);
-	B = (UINT8)(Br | (Bd & 0x0F));
+	Bd = ((B & 0x0f) + 1) & 0x0f;
+	B = (B & 0x30) | Bd;
 
-	if (Bd == 0x10) skip = 1;
+	B = B ^ r;
+
+	if (Bd == 0x00) skip = 1;
 }
 
 /* Register Reference Instructions */
@@ -759,7 +753,7 @@ INSTRUCTION(xis)
 /*
 
 	Mnemonic:			CAB
-
+	
 	Hex Code:			50
 	Binary:				0 1 0 1 0 0 0 0 0
 
@@ -777,7 +771,7 @@ INSTRUCTION(cab)
 /*
 
 	Mnemonic:			CBA
-
+	
 	Hex Code:			4E
 	Binary:				0 1 0 0 1 1 1 0
 
@@ -795,7 +789,7 @@ INSTRUCTION(cba)
 /*
 
 	Mnemonic:			LBI
-
+	
 	Operand:			r,d
 	Hex Code:			--
 						33 --
@@ -811,84 +805,24 @@ INSTRUCTION(cba)
 
 */
 
-INLINE void LBI(UINT8 r, UINT8 d)
+INSTRUCTION(lbi)
 {
-	B = (r << 4) | d;
+	if (opcode & 0x80)
+	{
+		B = opcode & 0x3f;
+	}
+	else
+	{
+		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
+	}
+
 	skipLBI = 1;
 }
-
-INSTRUCTION(lbi0_0) { LBI(0,0); }
-INSTRUCTION(lbi0_1) { LBI(0,1); }
-INSTRUCTION(lbi0_2) { LBI(0,2); }
-INSTRUCTION(lbi0_3) { LBI(0,3); }
-INSTRUCTION(lbi0_4) { LBI(0,4); }
-INSTRUCTION(lbi0_5) { LBI(0,5); }
-INSTRUCTION(lbi0_6) { LBI(0,6); }
-INSTRUCTION(lbi0_7) { LBI(0,7); }
-INSTRUCTION(lbi0_8) { LBI(0,8); }
-INSTRUCTION(lbi0_9) { LBI(0,9); }
-INSTRUCTION(lbi0_10) { LBI(0,10); }
-INSTRUCTION(lbi0_11) { LBI(0,11); }
-INSTRUCTION(lbi0_12) { LBI(0,12); }
-INSTRUCTION(lbi0_13) { LBI(0,13); }
-INSTRUCTION(lbi0_14) { LBI(0,14); }
-INSTRUCTION(lbi0_15) { LBI(0,15); }
-
-INSTRUCTION(lbi1_0) { LBI(1,0); }
-INSTRUCTION(lbi1_1) { LBI(1,1); }
-INSTRUCTION(lbi1_2) { LBI(1,2); }
-INSTRUCTION(lbi1_3) { LBI(1,3); }
-INSTRUCTION(lbi1_4) { LBI(1,4); }
-INSTRUCTION(lbi1_5) { LBI(1,5); }
-INSTRUCTION(lbi1_6) { LBI(1,6); }
-INSTRUCTION(lbi1_7) { LBI(1,7); }
-INSTRUCTION(lbi1_8) { LBI(1,8); }
-INSTRUCTION(lbi1_9) { LBI(1,9); }
-INSTRUCTION(lbi1_10) { LBI(1,10); }
-INSTRUCTION(lbi1_11) { LBI(1,11); }
-INSTRUCTION(lbi1_12) { LBI(1,12); }
-INSTRUCTION(lbi1_13) { LBI(1,13); }
-INSTRUCTION(lbi1_14) { LBI(1,14); }
-INSTRUCTION(lbi1_15) { LBI(1,15); }
-
-INSTRUCTION(lbi2_0) { LBI(2,0); }
-INSTRUCTION(lbi2_1) { LBI(2,1); }
-INSTRUCTION(lbi2_2) { LBI(2,2); }
-INSTRUCTION(lbi2_3) { LBI(2,3); }
-INSTRUCTION(lbi2_4) { LBI(2,4); }
-INSTRUCTION(lbi2_5) { LBI(2,5); }
-INSTRUCTION(lbi2_6) { LBI(2,6); }
-INSTRUCTION(lbi2_7) { LBI(2,7); }
-INSTRUCTION(lbi2_8) { LBI(2,8); }
-INSTRUCTION(lbi2_9) { LBI(2,9); }
-INSTRUCTION(lbi2_10) { LBI(2,10); }
-INSTRUCTION(lbi2_11) { LBI(2,11); }
-INSTRUCTION(lbi2_12) { LBI(2,12); }
-INSTRUCTION(lbi2_13) { LBI(2,13); }
-INSTRUCTION(lbi2_14) { LBI(2,14); }
-INSTRUCTION(lbi2_15) { LBI(2,15); }
-
-INSTRUCTION(lbi3_0) { LBI(3,0); }
-INSTRUCTION(lbi3_1) { LBI(3,1); }
-INSTRUCTION(lbi3_2) { LBI(3,2); }
-INSTRUCTION(lbi3_3) { LBI(3,3); }
-INSTRUCTION(lbi3_4) { LBI(3,4); }
-INSTRUCTION(lbi3_5) { LBI(3,5); }
-INSTRUCTION(lbi3_6) { LBI(3,6); }
-INSTRUCTION(lbi3_7) { LBI(3,7); }
-INSTRUCTION(lbi3_8) { LBI(3,8); }
-INSTRUCTION(lbi3_9) { LBI(3,9); }
-INSTRUCTION(lbi3_10) { LBI(3,10); }
-INSTRUCTION(lbi3_11) { LBI(3,11); }
-INSTRUCTION(lbi3_12) { LBI(3,12); }
-INSTRUCTION(lbi3_13) { LBI(3,13); }
-INSTRUCTION(lbi3_14) { LBI(3,14); }
-INSTRUCTION(lbi3_15) { LBI(3,15); }
 
 /*
 
 	Mnemonic:			LEI
-
+	
 	Operand:			y
 	Hex Code:			33 6-
 	Binary:				0 0 1 1 0 0 1 1 0 1 1 0 y3 y2 y1 y0
@@ -916,7 +850,7 @@ INSTRUCTION(lei)
 /*
 
 	Mnemonic:			SKC
-
+	
 	Hex Code:			20
 	Binary:				0 0 1 0 0 0 0 0
 
@@ -928,13 +862,13 @@ INSTRUCTION(lei)
 
 INSTRUCTION(skc)
 {
-	if (C == 1) skip = 1;
+	if (C == 1) skip = 1; 
 }
 
 /*
 
 	Mnemonic:			SKE
-
+	
 	Hex Code:			21
 	Binary:				0 0 1 0 0 0 0 1
 
@@ -952,7 +886,7 @@ INSTRUCTION(ske)
 /*
 
 	Mnemonic:			SKGZ
-
+	
 	Hex Code:			33 21
 	Binary:				00 0 1 1 0 0 1 1 0 0 1 0 0 0 0 1
 
@@ -970,13 +904,13 @@ INSTRUCTION(skgz)
 /*
 
 	Mnemonic:			SKGBZ
-
+	
 	Hex Code:			33 01
 						33 11
 						33 03
 						33 13
-
-	Binary:
+	
+	Binary:				
 
 	Skip Conditions:	G0 = 0
 						G1 = 0
@@ -987,21 +921,26 @@ INSTRUCTION(skgz)
 
 */
 
-INSTRUCTION(skgbz0) { if (!BIT(IN_G(), 0)) skip = 1; }
-INSTRUCTION(skgbz1) { if (!BIT(IN_G(), 1)) skip = 1; }
-INSTRUCTION(skgbz2) { if (!BIT(IN_G(), 2)) skip = 1; }
-INSTRUCTION(skgbz3) { if (!BIT(IN_G(), 3)) skip = 1; }
+INLINE void skgbz(int bit)
+{
+	if (!BIT(IN_G(), bit)) skip = 1;
+}
+
+INSTRUCTION(skgbz0) { skgbz(0); }
+INSTRUCTION(skgbz1) { skgbz(1); }
+INSTRUCTION(skgbz2) { skgbz(2); }
+INSTRUCTION(skgbz3) { skgbz(3); }
 
 /*
 
 	Mnemonic:			SKMBZ
-
+	
 	Hex Code:			01
 						11
 						03
 						13
 
-	Binary:
+	Binary:				
 
 	Skip Conditions:	RAM(B)0 = 0
 						RAM(B)0 = 1
@@ -1012,19 +951,24 @@ INSTRUCTION(skgbz3) { if (!BIT(IN_G(), 3)) skip = 1; }
 
 */
 
-INSTRUCTION(skmbz0) { if (!BIT(RAM_R(B), 0)) skip = 1; }
-INSTRUCTION(skmbz1) { if (!BIT(RAM_R(B), 1)) skip = 1; }
-INSTRUCTION(skmbz2) { if (!BIT(RAM_R(B), 2)) skip = 1; }
-INSTRUCTION(skmbz3) { if (!BIT(RAM_R(B), 3)) skip = 1; }
+INLINE void skmbz(int bit)
+{
+	if (!BIT(RAM_R(B), bit)) skip = 1;
+}
+
+INSTRUCTION(skmbz0) { skmbz(0); }
+INSTRUCTION(skmbz1) { skmbz(1); }
+INSTRUCTION(skmbz2) { skmbz(2); }
+INSTRUCTION(skmbz3) { skmbz(3); }
 
 /* Input/Output Instructions */
 
 /*
 
 	Mnemonic:			ING
-
+	
 	Hex Code:			33 2A
-	Binary:
+	Binary:				
 
 	Data Flow:			G -> A
 
@@ -1040,9 +984,9 @@ INSTRUCTION(ing)
 /*
 
 	Mnemonic:			INL
-
+	
 	Hex Code:			33 2E
-	Binary:
+	Binary:				
 
 	Data Flow:			L7:4 -> RAM(B)
 						L3:0 -> A
@@ -1054,6 +998,7 @@ INSTRUCTION(ing)
 INSTRUCTION(inl)
 {
 	UINT8 L = IN_L();
+
 	RAM_W(B, L >> 4);
 	A = L & 0xF;
 }
@@ -1061,9 +1006,9 @@ INSTRUCTION(inl)
 /*
 
 	Mnemonic:			OBD
-
+	
 	Hex Code:			33 3E
-	Binary:
+	Binary:				
 
 	Data Flow:			Bd -> D
 
@@ -1079,9 +1024,9 @@ INSTRUCTION(obd)
 /*
 
 	Mnemonic:			OMG
-
+	
 	Hex Code:			33 3A
-	Binary:
+	Binary:				
 
 	Data Flow:			RAM(B) -> G
 
@@ -1097,7 +1042,7 @@ INSTRUCTION(omg)
 /*
 
 	Mnemonic:			XAS
-
+	
 	Hex Code:			4F
 	Binary:				0 1 0 0 1 1 1 1
 

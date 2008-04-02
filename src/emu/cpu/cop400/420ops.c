@@ -24,7 +24,7 @@
 /*
 
 	Mnemonic:			ADT
-
+	
 	Hex Code:			4A
 	Binary:				0 1 0 0 1 0 1 0
 
@@ -42,7 +42,7 @@ INSTRUCTION(adt)
 /*
 
 	Mnemonic:			CASC
-
+	
 	Hex Code:			10
 	Binary:				0 0 0 1 0 0 0 0
 
@@ -76,7 +76,7 @@ INSTRUCTION(casc)
 /*
 
 	Mnemonic:			RET
-
+	
 	Hex Code:			48
 	Binary:				0 1 0 0 1 0 0 0
 
@@ -97,7 +97,7 @@ INSTRUCTION(cop420_ret)
 /*
 
 	Mnemonic:			CQMA
-
+	
 	Hex Code:			33 2C
 	Binary:				0 0 1 1 0 0 1 1 0 0 1 0 1 1 0 0
 
@@ -110,14 +110,14 @@ INSTRUCTION(cop420_ret)
 
 INSTRUCTION(cqma)
 {
-	WRITE_M(Q >> 4);
+	RAM_W(B, Q >> 4);
 	A = Q & 0xF;
 }
 
 /*
 
 	Mnemonic:			LDD
-
+	
 	Operand:			r, d
 	Hex Code:			23 --
 	Binary:				0 0 1 0 0 0 1 1 0 0 r1 r0 d3 d2 d1 d0
@@ -131,7 +131,7 @@ INSTRUCTION(cqma)
 INSTRUCTION(ldd)
 {
 	UINT8 rd = opcode & 0x3f;
-
+	
 	A = RAM_R(rd);
 }
 
@@ -140,7 +140,7 @@ INSTRUCTION(ldd)
 /*
 
 	Mnemonic:			XABR
-
+	
 	Hex Code:			12
 	Binary:				0 0 0 1 0 0 1 0
 
@@ -155,7 +155,7 @@ INSTRUCTION(xabr)
 	UINT8 Br = A & 0x03;
 	UINT8 Bd = B & 0x0f;
 
-	A = (B & 0x30) >> 4;
+	A = B >> 4;
 	B = (Br << 4) + Bd;
 }
 
@@ -164,7 +164,7 @@ INSTRUCTION(xabr)
 /*
 
 	Mnemonic:			SKT
-
+	
 	Hex Code:			41
 	Binary:				0 1 0 0 0 0 0 1
 
@@ -176,7 +176,7 @@ INSTRUCTION(xabr)
 
 INSTRUCTION(skt)
 {
-	if (R.timerlatch == 1)
+	if (R.timerlatch)
 	{
 		R.timerlatch = 0;
 		skip = 1;
@@ -188,9 +188,9 @@ INSTRUCTION(skt)
 /*
 
 	Mnemonic:			ININ
-
+	
 	Hex Code:			33 28
-	Binary:
+	Binary:				
 
 	Data Flow:			IN -> A
 
@@ -198,16 +198,19 @@ INSTRUCTION(skt)
 
 */
 
-INSTRUCTION(inin) { A = IN_IN(); }
+INSTRUCTION(inin)
+{
+	A = IN_IN();
+}
 
 /*
 
 	Processor:			COP402M
 
 	Mnemonic:			ININ
-
+	
 	Hex Code:			33 28
-	Binary:
+	Binary:				
 
 	Data Flow:			IN -> A, A1 = "1"
 
@@ -220,13 +223,12 @@ INSTRUCTION(cop402m_inin)
 	A = IN_IN() | 0x02;
 }
 
-
 /*
 
 	Mnemonic:			INIL
-
+	
 	Hex Code:			33 29
-	Binary:
+	Binary:				
 
 	Data Flow:			IL3,"1","0",IL0 -> A
 
@@ -237,7 +239,7 @@ INSTRUCTION(cop402m_inin)
 INSTRUCTION(inil)
 {
 	// NOT PROPERLY IMPLEMENTED
-
+	
 	A = (IN_IN() & 0x09) | 0x04;
 }
 
@@ -246,9 +248,9 @@ INSTRUCTION(inil)
 	Processor:			COP421
 
 	Mnemonic:			INIL
-
+	
 	Hex Code:			33 29
-	Binary:
+	Binary:				
 
 	Data Flow:			"0",CKO,"0","0" -> A
 
@@ -258,13 +260,15 @@ INSTRUCTION(inil)
 
 INSTRUCTION(cop421_inil)
 {
-	// NOT IMPLEMENTED
+	// NOT PROPERLY IMPLEMENTED
+
+	A = 0;
 }
 
 /*
 
 	Mnemonic:			OGI
-
+	
 	Operand:			y
 	Hex Code:			33 5-
 	Binary:				0 0 1 1 0 0 1 1 0 1 0 1 y3 y2 y1 y0
