@@ -20,7 +20,7 @@ Mercs (US)                                  CPS-B-12  DL-0411-10007     C628    
 Street Fighter II (Japan Rev C)             CPS-B-12  DL-0411-10007     C632           STF29 & IOB1
 Magic Sword (US)                            CPS-B-13  DL-0411-10008     None           MS24B & IOB1
 Street Fighter II (Japan)                   CPS-B-13  DL-0411-10008     C632           STF29 & IOB1
-Chiki Chiki Boys / Mega Twins               CPS-B-14  DL-0411-10009     ?              ?
+Chiki Chiki Boys / Mega Twins               CPS-B-14  DL-0411-10009     ?              CK24B & IOB1
 Street Fighter II (US Rev I)                CPS-B-14  DL-0411-10009     C632           STF29 & IOB1
 Nemo                                        CPS-B-15  DL-0411-10010     ?              NM24B & ?
 Carrier Air Wing                            CPS-B-16  DL-0411-10011     None           CA24B & IOB1
@@ -280,10 +280,10 @@ static const struct CPS1config cps1_config_table[]=
 	{"ghouls",  CPS_B_01, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 1 },
 	{"ghoulsu", CPS_B_01, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 1 },
 	{"daimakai",CPS_B_01, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 1 },
-	{"strider", CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff },
-	{"stridrua",CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff },
-	{"striderj",CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff },
-	{"stridrja",CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff },
+	{"strider", CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff, 11 },
+	{"stridrua",CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff, 11 },
+	{"striderj",CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff, 11 },
+	{"stridrja",CPS_B_01, 1,0,1, 0x0000,0xffff,0x0000,0xffff, 11 },
 	{"dynwar",  CPS_B_02, 0,1,1, 0x0000,0xffff,0x0000,0xffff },
 	{"dynwarj", CPS_B_02, 0,1,1, 0x0000,0xffff,0x0000,0xffff },
 	{"willow",  CPS_B_03, 0,1,0, 0x0000,0xffff,0x0000,0xffff },
@@ -297,8 +297,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj1",CPS_B_02, 0,0,0, 0x0001,0xffff,0x0001,0xffff },
 	{"1941",    CPS_B_05, 0,0,0, 0x0000,0xffff,0x0400,0x07ff },
 	{"1941j",   CPS_B_05, 0,0,0, 0x0000,0xffff,0x0400,0x07ff },
-	{"unsquad", CPS_B_11, 0,0,0, 0x0000,0xffff,0x0001,0xffff },	/* CPSB ID not checked, but it's the same as sf2eg */
-	{"area88",  CPS_B_11, 0,0,0, 0x0000,0xffff,0x0001,0xffff },	/* CPSB ID not checked, but it's the same as sf2eg */
+	{"unsquad", CPS_B_11, 0,0,0, 0x0000,0xffff,0x0001,0xffff, 11 },	/* CPSB ID not checked, but it's the same as sf2eg */
+	{"area88",  CPS_B_11, 0,0,0, 0x0000,0xffff,0x0001,0xffff, 11 },	/* CPSB ID not checked, but it's the same as sf2eg */
 	{"mercs",   CPS_B_12, 0,0,0, 0x0600,0x5bff,0x0700,0x17ff, 4 },	/* (uses port 74) */
 	{"mercsu",  CPS_B_12, 0,0,0, 0x0600,0x5bff,0x0700,0x17ff, 4 },	/* (uses port 74) */
 	{"mercsua", CPS_B_12, 0,0,0, 0x0600,0x5bff,0x0700,0x17ff, 4 },	/* (uses port 74) */
@@ -335,9 +335,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"kodu",    BATTRY_2, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
 	{"kodj",    BATTRY_2, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
 	{"kodb",    BATTRY_2, 0,0,0, 0x0000,0xffff,0x0000,0xffff },	/* bootleg, doesn't use multiply protection */
-	{"captcomm",BATTRY_3, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
-	{"captcomu",BATTRY_3, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
-	{"captcomj",BATTRY_3, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
+	{"captcomm",BATTRY_3, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 11 },
+	{"captcomu",BATTRY_3, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 11 },
+	{"captcomj",BATTRY_3, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 11 },
 	{"knights", BATTRY_4, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 3 },
 	{"knightsu",BATTRY_4, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 3 },
 	{"knightsj",BATTRY_4, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 3 },
@@ -1018,15 +1018,7 @@ static TILE_GET_INFO( get_tile0_info )
 	/* allows us to reproduce a problem seen with a ffight board where USA and Japanese
        roms have been mixed to be reproduced (ffightua) -- it looks like each column
        should alternate between the left and right side of the 16x16 tiles */
-	if (tile_index&0x20) gfxset = 1;
-	else gfxset = 0;
-
-	/* knights & msword */
-	if (cps1_game_config->kludge == 3)
-		if (code == 0xf020) { gfxset = 4; code = 0; } // use a blank tile (see startup text..)
-
-	/* 0x0020 appears to never be drawn for CPS1 games (it is drawn for CPS2 games though, see gigawing '0' in score for example) */
-	if (cps_version == 1 && code == 0x0020) { gfxset = 4; code = 0; }
+	gfxset = (tile_index & 0x20) >> 5;
 
 	SET_TILE_INFO(
 			gfxset,
@@ -1034,6 +1026,13 @@ static TILE_GET_INFO( get_tile0_info )
 			(attr & 0x1f) + palette_basecolor[1],
 			TILE_FLIPYX((attr & 0x60) >> 5));
 	tileinfo->group = (attr & 0x0180) >> 7;
+
+	if ((cps1_game_config->kludge == 3  && code == 0xf020) ||	// knights & msword: startup text
+		(cps1_game_config->kludge == 2  && code == 0x0000) ||	// 3wonders: bottom of screen, between lives of first player and the word INSERT COIN
+		(cps1_game_config->kludge == 11 && code == 0x0020))		// strider, unsquad, captcomm
+	{
+		tileinfo->pen_data = empty_tile;
+	}
 }
 
 static TILE_GET_INFO( get_tile1_info )
