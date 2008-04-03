@@ -1028,10 +1028,21 @@ static TILE_GET_INFO( get_tile0_info )
 	tileinfo->group = (attr & 0x0180) >> 7;
 
 	if ((cps1_game_config->kludge == 3  && code == 0xf020) ||	// knights & msword: startup text
-		(cps1_game_config->kludge == 2  && code == 0x0000) ||	// 3wonders: bottom of screen, between lives of first player and the word INSERT COIN
 		(cps1_game_config->kludge == 11 && code == 0x0020))		// strider, unsquad, captcomm
 	{
 		tileinfo->pen_data = empty_tile;
+	}
+
+	if (cps1_game_config->kludge == 2)	// 3wonders
+	{
+		if (code == 0x0000 ||	// bottom of screen, between lives of first player and the word INSERT COIN
+			code == 0x0a5c ||	// SIVA LOU'S COMPANION in attract mode
+			code == 0x0a5d ||	// (note that this is definitely a game bug, 0a5c is supposed to be
+			code == 0x0a6c ||	// the position on screen where to draw the string, but it is interpreted
+			code == 0x0a6d)		// as a character code)
+		{
+			tileinfo->pen_data = empty_tile;
+		}
 	}
 }
 
