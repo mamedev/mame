@@ -85,6 +85,7 @@ DRVLIBS = \
 # layout dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/astrocde.o:	$(LAYOUT)/tenpindx.lh
+$(DRIVERS)/astrocde.o:	$(LAYOUT)/gorf.lh \
+						$(LAYOUT)/tenpindx.lh
 $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 						$(LAYOUT)/crash.lh
