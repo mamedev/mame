@@ -105,25 +105,48 @@ a400      sound port 2
 a800      sound port 3
 ac00      sound port 4
 
-Note:
-idsoccer seems to run on a modified version of this board which allows for
-more sprite tiles, it also has a MSM5205 chip for sample playback.
+Notes:
+------
+- idsoccer seems to run on a modified version of this board which allows for
+  more sprite tiles, it also has a MSM5205 chip for sample playback.
+
+TODO:
+-----
+
+- third CPU
+- dip switch reading bug. dorunrun and docastle are VERY timing sensitive, and
+  dip switch reading will fail if the main CPU is running at the nominally correct
+  4MHz speed. This is kludge by slighly lowering the speed to 3.98MHz.
+- the dorunrun attract mode sequence is also very timing sensitive. The behaviour
+  of the "dorunru2" set, verified on the real board, with all dips in the OFF
+  position (easiest difficulty setting), should be, for the first 12 rounds of
+  demo play:
+  1) Mr do moves right. Kills all monsters and a letter 'E'.
+  2) Mr do moves Left. Picks up 'A' letter, but dies.
+  3) Mr do moves right. Kills all monsters.
+  4) Mr do moves left. Kills 'X' monster.
+  5) Mr do moves right.
+  6) Mr do moves left. Get 'T' monster.
+  7) Mr do moves right.
+  8) Mr do moves left. Kills 'E' monster - but already has this.
+  9) Mr do moves right.
+  10) Mr do moves left. Kills 'R' monster.
+  11) Mr do moves right.
+  12) Mr do moves. Kills 'A' monster. Shows winning extra Mr do.
+
+  Small changes to the CPU speed alter the demo timing and can cause the above
+  sequence not to work (e.g. Mr Do might not fill all monsters at once on the
+  first round). The 3.98MHz speed makes the sequence work.
+  Note that this only works in the dorunru2 set. The dorunrun set works slightly
+  differently, however it hasn't been compared with the real board so it might be
+  right.
+- unknown ports 0 and 2
+- bad communication in idsoccer
+- adpcm status in idsoccer
+- real values for the adpcm interface in idsoccer
+- handle flipscreen on/off based on address line A7 (cX0X/cX8X)
 
 ***************************************************************************/
-
-/*
-
-    TODO:
-
-    - third CPU
-    - dip switch reading bug
-    - unknown ports 0 and 2
-    - bad communication in idsoccer
-    - adpcm status in idsoccer
-    - real values for the adpcm interface in idsoccer
-    - handle flipscreen on/off based on address line A7 (cX0X/cX8X)
-
-*/
 
 #include "driver.h"
 #include "deprecat.h"
@@ -628,7 +651,7 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( docastle )
 	// basic machine hardware
 //  MDRV_CPU_ADD_TAG("main", Z80, 4000000)  // 4 MHz
-	MDRV_CPU_ADD_TAG("main", Z80, 3900000)	// make dip switches work in docastle and dorunrun
+	MDRV_CPU_ADD_TAG("main", Z80, 3980000)	// make dip switches work in docastle and dorunrun and fix dorunru2 attract sequence
 	MDRV_CPU_PROGRAM_MAP(docastle_map, 0)
 	MDRV_CPU_IO_MAP(docastle_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
