@@ -1036,10 +1036,11 @@ static TILE_GET_INFO( get_tile0_info )
 	if (cps1_game_config->kludge == 2)	// 3wonders
 	{
 		if (code == 0x0000 ||	// bottom of screen, between lives of first player and the word INSERT COIN
+			code == 0x2020 ||	// glitch after entering high score
 			code == 0x0a5c ||	// SIVA LOU'S COMPANION in attract mode
-			code == 0x0a5d ||	// (note that this is definitely a game bug, 0a5c is supposed to be
-			code == 0x0a6c ||	// the position on screen where to draw the string, but it is interpreted
-			code == 0x0a6d)		// as a character code)
+			code == 0x0a5d ||	// (0a5c is supposed to be the position on screen where to draw the string,
+			code == 0x0a6c ||	// but due to a game bug it is interpreted as a character code. This has no
+			code == 0x0a6d)		// effect on real hardware since out-of-bounds chars are ignored)
 		{
 			tileinfo->pen_data = empty_tile;
 		}
