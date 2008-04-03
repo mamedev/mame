@@ -2942,10 +2942,15 @@ profiler_mark(PROFILER_INPUT);
 #endif
 						/* skip locked-out coin inputs */
 						if (port->type >= IPT_COIN1 && port->type <= IPT_COIN8 && coinlockedout[port->type - IPT_COIN1])
+						{
+							ui_popup_time(3, "Coinlock disabled %s.", input_port_name(port));
 							continue;
+						}
 						if (port->type >= IPT_SERVICE1 && port->type <= IPT_SERVICE4 && servicecoinlockedout[port->type - IPT_SERVICE1])
+						{
+							ui_popup_time(3, "Coinlock disabled %s.", input_port_name(port));
 							continue;
-
+						}
 						/* if this is a downward press and we're an impulse control, reset the count */
 						if (port->impulse)
 						{
