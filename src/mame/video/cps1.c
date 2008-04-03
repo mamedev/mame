@@ -311,10 +311,10 @@ static const struct CPS1config cps1_config_table[]=
 	{"chikij",  CPS_B_14, 0,0,0, 0x0000,0x3fff,0x0e00,0xffff },
 	{"nemo",    CPS_B_15, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
 	{"nemoj",   CPS_B_15, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
-	{"cawing",  CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
-	{"cawingr1",CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
-	{"cawingu", CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
-	{"cawingj", CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
+	{"cawing",  CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 12 },
+	{"cawingr1",CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 12 },
+	{"cawingu", CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 12 },
+	{"cawingj", CPS_B_16, 0,0,0, 0x0000,0xffff,0x0000,0xffff, 12 },
 	{"sf2",     CPS_B_11, 2,2,2, 0x0000,0xffff,0x0000,0xffff },
 	{"sf2eb",   CPS_B_17, 2,2,2, 0x0000,0xffff,0x0000,0xffff },
 	{"sf2ua",   CPS_B_17, 2,2,2, 0x0000,0xffff,0x0000,0xffff },
@@ -1028,7 +1028,8 @@ static TILE_GET_INFO( get_tile0_info )
 	tileinfo->group = (attr & 0x0180) >> 7;
 
 	if ((cps1_game_config->kludge == 3  && code == 0xf020) ||	// knights & msword: startup text
-		(cps1_game_config->kludge == 11 && code == 0x0020))		// strider, unsquad, captcomm
+		(cps1_game_config->kludge == 11 && code == 0x0020) ||	// strider, unsquad, captcomm
+		(cps1_game_config->kludge == 12 && (code == 0x0000 || code == 0x0002)))	// cawing, large text during attract
 	{
 		tileinfo->pen_data = empty_tile;
 	}
