@@ -314,7 +314,7 @@ static const code_string_table itemid_token_table[] =
 	{ ITEM_ID_BUTTON16,      "BUTTON16" },
 	{ ITEM_ID_START,         "START" },
 	{ ITEM_ID_SELECT,        "SELECT" },
-	
+
 	/* Hats */
 	{ ITEM_ID_HAT1UP,        "HAT1UP" },
 	{ ITEM_ID_HAT1DOWN,      "HAT1DOWN" },

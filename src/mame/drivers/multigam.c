@@ -35,8 +35,8 @@
          - ROM at 0x80000:  Several things patched and/or relocated.
                             Most original NOPs were replaced by proper code.
 
-	Multi Game III: 21 games included, hardware features MMC3 NES mapper and additional
-	RAM used by Super Mario Bros 3.
+    Multi Game III: 21 games included, hardware features MMC3 NES mapper and additional
+    RAM used by Super Mario Bros 3.
 */
 
 #include "driver.h"

@@ -109,7 +109,7 @@ READ8_HANDLER( mermaid_collision_r )
 	/*
         collision register active LOW:
 
-	with coll = spriteram[offs + 2] & 0xc0 
+    with coll = spriteram[offs + 2] & 0xc0
 
         Bit 0 - Sprite (coll = 0x40) - Sprite (coll = 0x00)
         Bit 1 - Sprite (coll = 0x40) - Foreground
@@ -119,7 +119,7 @@ READ8_HANDLER( mermaid_collision_r )
         Bit 5
         Bit 6 - Sprite (coll = 0x40) - Sprite (coll = 0x80)
         Bit 7
-	*/
+    */
 
 	int collision = 0xff;
 

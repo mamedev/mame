@@ -483,7 +483,7 @@ static WRITE8_HANDLER( ic2_o1_callback )
 	ptm6840_set_c2(0,data);
 
 	/* copy output value to IC2 c2
-	this output is the clock for timer2 */
+    this output is the clock for timer2 */
 }
 
 
@@ -499,7 +499,7 @@ static WRITE8_HANDLER( ic2_o2_callback )
 static WRITE8_HANDLER( ic2_o3_callback )
 {
 	/* the output from timer3 is used as a square wave for the alarm output
-	and as an external clock source for timer 1! */
+    and as an external clock source for timer 1! */
 
 	ptm6840_set_c1(   0, data);
 }

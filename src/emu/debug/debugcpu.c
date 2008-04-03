@@ -1327,7 +1327,7 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 		int bus_size = info->space[spacenum].databytes;
 
 		while (address_offset < bus_size && (mem_mask & 0xff) == 0)
-		{	
+		{
 			address_offset++;
 			value_to_write >>= 8;
 			mem_mask >>= 8;

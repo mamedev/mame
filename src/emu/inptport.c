@@ -2000,7 +2000,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				port = input_port_initialize(param, type, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				break;
-			
+
 			case INPUT_TOKEN_SPECIAL_ONOFF:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, hasdiploc, 1, strindex, 23);

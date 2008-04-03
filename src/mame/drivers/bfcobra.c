@@ -64,7 +64,7 @@
     * All games bar qos: NVRAM not saved
 
     * Viper does not have a colour palette - the Flare chipset drives RGB direct.
-	  To fix this I set default values in the palette when the machine is initialised
+      To fix this I set default values in the palette when the machine is initialised
     * CPU execution rate is wrong, the hardware adds 1 TCycle to each access which is unaccounted for.
     * Plane priority is probably wrong but it's only used in Treble Top.
     * Blitter loop counts and step are wrong - they are 9 bit counts, not 8.
@@ -309,9 +309,9 @@ static VIDEO_UPDATE( bfcobra )
 	UINT8 *lorescol;
 
 	/*
-		The following is a dirty hack to init the palette index tables
-		this should really be done elsewhere, preferably at compile time.
-	*/
+        The following is a dirty hack to init the palette index tables
+        this should really be done elsewhere, preferably at compile time.
+    */
 	if (init_colour_indexes == 1)
 	{
 		init_colour_indexes = 0;
@@ -783,20 +783,20 @@ static WRITE8_HANDLER( ramdac_w )
     03  Bank control for Z80 region 0xc000-0xffff (16kB)    WR
 
     06  Interrupt status....................................WR
-    07  Interrupt ack.......................................WR 
-	    Writing here sets the line number that vertical interrupt is generated at.
-		cmd1, bit2 is the 9th bit of the line number
+    07  Interrupt ack.......................................WR
+        Writing here sets the line number that vertical interrupt is generated at.
+        cmd1, bit2 is the 9th bit of the line number
         ???? Written with 0x21
     08  cmd1                                                WR * bit 6 = screen select
-	    bit2 = 9th bit of vertical interrupt line number
-		bit6 = 1 = select screen 1 else screen 0
+        bit2 = 9th bit of vertical interrupt line number
+        bit6 = 1 = select screen 1 else screen 0
     09  cmd2 Linked with c001...............................W * bit 0 = 1 = hires
-		bit0=1=hi res else lo res (as long as bit7 is 0)
-		bit5=mask msb of each pixel
-		bit6=mask 2 msbits of each lores pixel
-		bit7=1=variable resolution - resolution is set by bit 7 of each vram byte.  bit7=1=2 hires pixels
+        bit0=1=hi res else lo res (as long as bit7 is 0)
+        bit5=mask msb of each pixel
+        bit6=mask 2 msbits of each lores pixel
+        bit7=1=variable resolution - resolution is set by bit 7 of each vram byte.  bit7=1=2 hires pixels
     0A  ???? Written with 0 and 1...........................W
-		color of border
+        color of border
 
     0B  Horizontal frame buffer scroll .....................W
     0C  Vertical frame buffer scroll .......................W

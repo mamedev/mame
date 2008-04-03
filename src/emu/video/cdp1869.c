@@ -10,10 +10,10 @@
     TODO:
 
     - connect to sound system when possible
-	- white noise
-	- scanline based update
-	- fix flashing spaceship in destryer/altair
-	- fix flashing player in draco
+    - white noise
+    - scanline based update
+    - fix flashing spaceship in destryer/altair
+    - fix flashing player in draco
 
 */
 
@@ -104,7 +104,7 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 			start = CDP1869_SCANLINE_PREDISPLAY_START_PAL;
 			end = CDP1869_SCANLINE_PREDISPLAY_END_PAL;
 		}
- 
+
 		if (scanline < start)
 		{
 			next_scanline = start;
@@ -460,7 +460,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 	cdp1869->wnamp = (word & 0x0f00) >> 8;
 	cdp1869->wnfreq = (word & 0x7000) >> 12;
 	cdp1869->wnoff = BIT(word, 15);
-	
+
 	// fork out to CDP1869 sound core
 	cdp1869_set_wnamp(0, cdp1869->wnamp);
 	cdp1869_set_wnfreq(0, cdp1869->wnfreq);
@@ -794,7 +794,7 @@ static DEVICE_START( cdp1869 )
 	assert(cdp1869->screen != NULL);
 
 	// allocate timers
-	
+
 	if (cdp1869->intf->on_prd_changed != NULL)
 	{
 		cdp1869->prd_changed_timer = timer_alloc(prd_changed_tick, (void *)device);

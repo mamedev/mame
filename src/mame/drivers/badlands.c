@@ -618,8 +618,8 @@ static void update_interrupts_bootleg(running_machine *machine)
 
 	if (atarigen_video_int_state)
 		newstate = 1;
-//	if (atarigen_sound_int_state)
-//		newstate = 2;
+//  if (atarigen_sound_int_state)
+//      newstate = 2;
 
 	if (newstate)
 		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
@@ -631,24 +631,24 @@ static void update_interrupts_bootleg(running_machine *machine)
 static void scanline_update_bootleg(const device_config *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
-//	if (scanline & 32)
-//		atarigen_6502_irq_ack_r(screen->machine, 0);
-//	else if (!(readinputport(0) & 0x40))
-//		atarigen_6502_irq_gen(screen->machine, 0);
+//  if (scanline & 32)
+//      atarigen_6502_irq_ack_r(screen->machine, 0);
+//  else if (!(readinputport(0) & 0x40))
+//      atarigen_6502_irq_gen(screen->machine, 0);
 }
 
 
 
 static MACHINE_RESET( badlandb )
 {
-//	pedal_value[0] = pedal_value[1] = 0x80;
+//  pedal_value[0] = pedal_value[1] = 0x80;
 
 	atarigen_eeprom_reset();
 	atarigen_interrupt_reset(update_interrupts_bootleg);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update_bootleg, 32);
 
-//	atarigen_sound_io_reset(1);
-//	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
+//  atarigen_sound_io_reset(1);
+//  memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
 }
 
 static MACHINE_DRIVER_START( badlandb )
@@ -658,8 +658,8 @@ static MACHINE_DRIVER_START( badlandb )
 	MDRV_CPU_PROGRAM_MAP(bootleg_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
-//	MDRV_CPU_ADD(Z80, 2800000/8)
-//	MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
+//  MDRV_CPU_ADD(Z80, 2800000/8)
+//  MDRV_CPU_PROGRAM_MAP(bootleg_soundmap,0)
 
 	MDRV_MACHINE_RESET(badlandb)
 	MDRV_NVRAM_HANDLER(atarigen)

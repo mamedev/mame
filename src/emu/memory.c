@@ -736,7 +736,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 	while (entrytype != ADDRMAP_TOKEN_END)
 	{
 		const char *tag;
-	
+
 		/* unpack the token from the first entry */
 		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
 		switch (entrytype)

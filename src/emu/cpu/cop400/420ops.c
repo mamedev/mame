@@ -23,14 +23,14 @@
 
 /*
 
-	Mnemonic:			ADT
-	
-	Hex Code:			4A
-	Binary:				0 1 0 0 1 0 1 0
+    Mnemonic:           ADT
 
-	Data Flow:			A + 10 -> A
+    Hex Code:           4A
+    Binary:             0 1 0 0 1 0 1 0
 
-	Description:		Add Ten to A
+    Data Flow:          A + 10 -> A
+
+    Description:        Add Ten to A
 
 */
 
@@ -41,17 +41,17 @@ INSTRUCTION(adt)
 
 /*
 
-	Mnemonic:			CASC
-	
-	Hex Code:			10
-	Binary:				0 0 0 1 0 0 0 0
+    Mnemonic:           CASC
 
-	Data Flow:			~A + RAM(B) + C -> A
-						Carry -> C
+    Hex Code:           10
+    Binary:             0 0 0 1 0 0 0 0
 
-	Skip Conditions:	Carry
+    Data Flow:          ~A + RAM(B) + C -> A
+                        Carry -> C
 
-	Description:		Complement and Add with Carry, Skip on Carry
+    Skip Conditions:    Carry
+
+    Description:        Complement and Add with Carry, Skip on Carry
 
 */
 
@@ -75,14 +75,14 @@ INSTRUCTION(casc)
 
 /*
 
-	Mnemonic:			RET
-	
-	Hex Code:			48
-	Binary:				0 1 0 0 1 0 0 0
+    Mnemonic:           RET
 
-	Data Flow:			SC -> SB -> SA -> PC
+    Hex Code:           48
+    Binary:             0 1 0 0 1 0 0 0
 
-	Description:		Return from Subroutine, restore Skip logic
+    Data Flow:          SC -> SB -> SA -> PC
+
+    Description:        Return from Subroutine, restore Skip logic
 
 */
 
@@ -96,15 +96,15 @@ INSTRUCTION(cop420_ret)
 
 /*
 
-	Mnemonic:			CQMA
-	
-	Hex Code:			33 2C
-	Binary:				0 0 1 1 0 0 1 1 0 0 1 0 1 1 0 0
+    Mnemonic:           CQMA
 
-	Data Flow:			Q7:4 -> RAM(B)
-						Q3:0 -> A
+    Hex Code:           33 2C
+    Binary:             0 0 1 1 0 0 1 1 0 0 1 0 1 1 0 0
 
-	Description:		Copy Q to RAM, A
+    Data Flow:          Q7:4 -> RAM(B)
+                        Q3:0 -> A
+
+    Description:        Copy Q to RAM, A
 
 */
 
@@ -116,22 +116,22 @@ INSTRUCTION(cqma)
 
 /*
 
-	Mnemonic:			LDD
-	
-	Operand:			r, d
-	Hex Code:			23 --
-	Binary:				0 0 1 0 0 0 1 1 0 0 r1 r0 d3 d2 d1 d0
+    Mnemonic:           LDD
 
-	Data Flow:			RAM(r,d) -> A
+    Operand:            r, d
+    Hex Code:           23 --
+    Binary:             0 0 1 0 0 0 1 1 0 0 r1 r0 d3 d2 d1 d0
 
-	Description:		Load A with RAM pointed to directly by r,d
+    Data Flow:          RAM(r,d) -> A
+
+    Description:        Load A with RAM pointed to directly by r,d
 
 */
 
 INSTRUCTION(ldd)
 {
 	UINT8 rd = opcode & 0x3f;
-	
+
 	A = RAM_R(rd);
 }
 
@@ -139,14 +139,14 @@ INSTRUCTION(ldd)
 
 /*
 
-	Mnemonic:			XABR
-	
-	Hex Code:			12
-	Binary:				0 0 0 1 0 0 1 0
+    Mnemonic:           XABR
 
-	Data Flow:			A <-> Br(0,0 -> A3,A2)
+    Hex Code:           12
+    Binary:             0 0 0 1 0 0 1 0
 
-	Description:		Exchange A with Br
+    Data Flow:          A <-> Br(0,0 -> A3,A2)
+
+    Description:        Exchange A with Br
 
 */
 
@@ -163,14 +163,14 @@ INSTRUCTION(xabr)
 
 /*
 
-	Mnemonic:			SKT
-	
-	Hex Code:			41
-	Binary:				0 1 0 0 0 0 0 1
+    Mnemonic:           SKT
 
-	Skip Conditions:	A time-base counter carry has occurred since last test
+    Hex Code:           41
+    Binary:             0 1 0 0 0 0 0 1
 
-	Description:		Skip on Timer
+    Skip Conditions:    A time-base counter carry has occurred since last test
+
+    Description:        Skip on Timer
 
 */
 
@@ -187,14 +187,14 @@ INSTRUCTION(skt)
 
 /*
 
-	Mnemonic:			ININ
-	
-	Hex Code:			33 28
-	Binary:				
+    Mnemonic:           ININ
 
-	Data Flow:			IN -> A
+    Hex Code:           33 28
+    Binary:
 
-	Description:		Input IN Inputs to A
+    Data Flow:          IN -> A
+
+    Description:        Input IN Inputs to A
 
 */
 
@@ -205,16 +205,16 @@ INSTRUCTION(inin)
 
 /*
 
-	Processor:			COP402M
+    Processor:          COP402M
 
-	Mnemonic:			ININ
-	
-	Hex Code:			33 28
-	Binary:				
+    Mnemonic:           ININ
 
-	Data Flow:			IN -> A, A1 = "1"
+    Hex Code:           33 28
+    Binary:
 
-	Description:		Input IN Inputs to A
+    Data Flow:          IN -> A, A1 = "1"
+
+    Description:        Input IN Inputs to A
 
 */
 
@@ -225,36 +225,36 @@ INSTRUCTION(cop402m_inin)
 
 /*
 
-	Mnemonic:			INIL
-	
-	Hex Code:			33 29
-	Binary:				
+    Mnemonic:           INIL
 
-	Data Flow:			IL3,"1","0",IL0 -> A
+    Hex Code:           33 29
+    Binary:
 
-	Description:		Input IL Latches to A
+    Data Flow:          IL3,"1","0",IL0 -> A
+
+    Description:        Input IL Latches to A
 
 */
 
 INSTRUCTION(inil)
 {
 	// NOT PROPERLY IMPLEMENTED
-	
+
 	A = (IN_IN() & 0x09) | 0x04;
 }
 
 /*
 
-	Processor:			COP421
+    Processor:          COP421
 
-	Mnemonic:			INIL
-	
-	Hex Code:			33 29
-	Binary:				
+    Mnemonic:           INIL
 
-	Data Flow:			"0",CKO,"0","0" -> A
+    Hex Code:           33 29
+    Binary:
 
-	Description:		Input CKO to A
+    Data Flow:          "0",CKO,"0","0" -> A
+
+    Description:        Input CKO to A
 
 */
 
@@ -267,15 +267,15 @@ INSTRUCTION(cop421_inil)
 
 /*
 
-	Mnemonic:			OGI
-	
-	Operand:			y
-	Hex Code:			33 5-
-	Binary:				0 0 1 1 0 0 1 1 0 1 0 1 y3 y2 y1 y0
+    Mnemonic:           OGI
 
-	Data Flow:			y -> G
+    Operand:            y
+    Hex Code:           33 5-
+    Binary:             0 0 1 1 0 0 1 1 0 1 0 1 y3 y2 y1 y0
 
-	Description:		Output to G Ports Immediate
+    Data Flow:          y -> G
+
+    Description:        Output to G Ports Immediate
 
 */
 

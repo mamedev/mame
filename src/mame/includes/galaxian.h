@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Galaxian hardware family
+    Galaxian hardware family
 
 ***************************************************************************/
 
@@ -16,8 +16,8 @@
 /* from 264-383 */
 #define GALAXIAN_HTOTAL			(384*GALAXIAN_XSCALE)
 #define GALAXIAN_HBEND			(0*GALAXIAN_XSCALE)
-//#define GALAXIAN_H0START		(6*GALAXIAN_XSCALE)
-//#define GALAXIAN_HBSTART		(264*GALAXIAN_XSCALE)
+//#define GALAXIAN_H0START      (6*GALAXIAN_XSCALE)
+//#define GALAXIAN_HBSTART      (264*GALAXIAN_XSCALE)
 #define GALAXIAN_H0START		(0*GALAXIAN_XSCALE)
 #define GALAXIAN_HBSTART		(256*GALAXIAN_XSCALE)
 

@@ -103,7 +103,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 
 DIP locations verified for:
-	- bloodbro (manual)
+    - bloodbro (manual)
 
 **************************************************************************/
 
@@ -211,24 +211,24 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( weststry )
 	PORT_START_TAG("DSW")
 	BLOODBRO_COINAGE
-	/*	SW1:7,8 is listed as "ROM change option", "optional"
+	/*  SW1:7,8 is listed as "ROM change option", "optional"
                          A  B  C  D
-		Coin Up          0  1  1  1 
-		Screen Complete  0  0  0  1
-		Stage Complete   1  1  3  1
-		Top 10           1  3  3  3
-		High Score       1  4  5  4
-		Complete Game    5  5 10 15
+        Coin Up          0  1  1  1
+        Screen Complete  0  0  0  1
+        Stage Complete   1  1  3  1
+        Top 10           1  3  3  3
+        High Score       1  4  5  4
+        Complete Game    5  5 10 15
 
-		D limits 8 tickets/coin except completion
+        D limits 8 tickets/coin except completion
 
-		The sets handled in MAME don't seem to have this "feature"
+        The sets handled in MAME don't seem to have this "feature"
     PORT_DIPNAME( 0x00c0, 0x00c0, "Ticket Dispenser Payout Mode" ) PORT_DIPLOCATION("SW1:7,8")
     PORT_DIPSETTING(      0x00c0, "A" )
     PORT_DIPSETTING(      0x0080, "B" )
-	PORT_DIPSETTING(      0x0040, "C" )
-	PORT_DIPSETTING(      0x0000, "D" )
-	*/
+    PORT_DIPSETTING(      0x0040, "C" )
+    PORT_DIPSETTING(      0x0000, "D" )
+    */
 	PORT_DIPUNKNOWN_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )             PORT_DIPLOCATION("SW2:1,2")

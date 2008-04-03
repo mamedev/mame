@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( kikcubic_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_READ(input_port_1_r)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_2_r, vigilant_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_command_byte_w)
-//	AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP) /* ?? */
+//  AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP) /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

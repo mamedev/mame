@@ -1,57 +1,57 @@
 /***************************************************************************
 
-	Galaxian-derived hardware
-	
-	Galaxian is the root hardware for many, many systems developed in the
-	1980-1982 timeframe. The basic design, which originated with Namco(?),
-	was replicated, tweaked, bootlegged, and used numerous times.
-	
-	The basic hardware design comprises three sections on a single PCB:
-	a CPU section, a sound section, and a video section.
-	
-	The CPU section is based around a Z80 (though there are modified
-	designed that changed this to an S2650). The base galaxian hardware
-	is designed to allow access to up to 16k of program ROM and 2k of
-	working RAM.
-	
-	The sound section consists of three parts. The first part is
-	a programmable 8-bit down counter that clocks a 4-bit counter which
-	generates a primitive waveform whose shape is hardcoded but can be
-	controlled by a pair of variable resistors. The second part is
-	a set of three 555 timers which can be individually enabled and 
-	combined to produce square waves at fixed separated pitches. A
-	fourth 555 timer is configured via a 4-bit frequency parameter to 
-	control the overall pitch of the other three. Finally, two single
-	bit-triggered noise circuits are available. A 17-bit noise LFSR
-	(which also generates stars for the video circuit) feeds into both
-	circuits. A "HIT" line enables a simple on/off control of one
-	filtered output, while a "FIRE" line triggers a fixed short duration
-	pulse (controlled by another 555 timer) of modulated noise.
-	
-	See video/galaxian.c for a description of the video section.
+    Galaxian-derived hardware
+
+    Galaxian is the root hardware for many, many systems developed in the
+    1980-1982 timeframe. The basic design, which originated with Namco(?),
+    was replicated, tweaked, bootlegged, and used numerous times.
+
+    The basic hardware design comprises three sections on a single PCB:
+    a CPU section, a sound section, and a video section.
+
+    The CPU section is based around a Z80 (though there are modified
+    designed that changed this to an S2650). The base galaxian hardware
+    is designed to allow access to up to 16k of program ROM and 2k of
+    working RAM.
+
+    The sound section consists of three parts. The first part is
+    a programmable 8-bit down counter that clocks a 4-bit counter which
+    generates a primitive waveform whose shape is hardcoded but can be
+    controlled by a pair of variable resistors. The second part is
+    a set of three 555 timers which can be individually enabled and
+    combined to produce square waves at fixed separated pitches. A
+    fourth 555 timer is configured via a 4-bit frequency parameter to
+    control the overall pitch of the other three. Finally, two single
+    bit-triggered noise circuits are available. A 17-bit noise LFSR
+    (which also generates stars for the video circuit) feeds into both
+    circuits. A "HIT" line enables a simple on/off control of one
+    filtered output, while a "FIRE" line triggers a fixed short duration
+    pulse (controlled by another 555 timer) of modulated noise.
+
+    See video/galaxian.c for a description of the video section.
 
 ****************************************************************************
 
-	Schematics are known to exist for these games:
-		* Galaxian
-		* Moon Alien Part 2
-		* King and Balloon
+    Schematics are known to exist for these games:
+        * Galaxian
+        * Moon Alien Part 2
+        * King and Balloon
 
-		* Moon Cresta
-		* Moon Shuttle
+        * Moon Cresta
+        * Moon Shuttle
 
-		* Frogger
-		* Amidar
-		* Turtles
+        * Frogger
+        * Amidar
+        * Turtles
 
-		* Scramble
-		* The End
+        * Scramble
+        * The End
 
-		* Super Cobra
-		* Dark Planet
-		* Lost Tomb
-		
-		* Dambusters
+        * Super Cobra
+        * Dark Planet
+        * Lost Tomb
+
+        * Dambusters
 
 ****************************************************************************
 
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	/* the latched D0 bit here goes to the CLEAR line on the interrupt flip-flop */
 	irq_enabled = data & 1;
-	
+
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!irq_enabled)
 		cpunum_set_input_line(machine, 0, irq_line, CLEAR_LINE);
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( konami_sound_control_w )
 {
 	UINT8 old = konami_sound_control;
 	konami_sound_control = data;
-	
+
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
@@ -307,22 +307,22 @@ static WRITE8_HANDLER( konami_sound_control_w )
 static READ8_HANDLER( konami_sound_timer_r )
 {
 	/*
-		The timer is clocked at KONAMI_SOUND_CLOCK and cascades through a
-		series of counters. It first encounters a chained pair of 4-bit
-		counters in an LS393, which produce an effective divide-by-256. Next
-		it enters the divide-by-2 counter in an LS93, followed by the
-		divide-by-8 counter. Finally, it clocks a divide-by-5 counter in an
-		LS90, followed by the divide-by-2 counter. This produces an effective
-		period of 16*16*2*8*5*2 = 40960 clocks.
-		
-		The clock for the sound CPU comes from output C of the first
-		divide-by-16 counter, or KONAMI_SOUND_CLOCK/8. To recover the
-		current counter index, we use the sound cpu clock times 8 mod
-		16*16*2*8*5*2.
-	*/
+        The timer is clocked at KONAMI_SOUND_CLOCK and cascades through a
+        series of counters. It first encounters a chained pair of 4-bit
+        counters in an LS393, which produce an effective divide-by-256. Next
+        it enters the divide-by-2 counter in an LS93, followed by the
+        divide-by-8 counter. Finally, it clocks a divide-by-5 counter in an
+        LS90, followed by the divide-by-2 counter. This produces an effective
+        period of 16*16*2*8*5*2 = 40960 clocks.
+
+        The clock for the sound CPU comes from output C of the first
+        divide-by-16 counter, or KONAMI_SOUND_CLOCK/8. To recover the
+        current counter index, we use the sound cpu clock times 8 mod
+        16*16*2*8*5*2.
+    */
 	UINT32 cycles = (cpunum_gettotalcycles(1) * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
-	
+
 	/* separate the high bit from the others */
 	if (cycles >= 16*16*2*8*5)
 	{
@@ -342,7 +342,7 @@ static READ8_HANDLER( konami_sound_timer_r )
 static WRITE8_HANDLER( konami_sound_filter_w )
 {
 	int which, chan;
-	
+
 	/* the offset is used as data, 6 channels * 2 bits each */
 	for (which = 0; which < 2; which++)
 		if (sndti_exists(SOUND_AY8910, which))
@@ -359,14 +359,14 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 
 static READ8_HANDLER( konami_porta_0_r )
 {
-//	logerror("%04X:ppi0_porta_r\n", activecpu_get_pc());
+//  logerror("%04X:ppi0_porta_r\n", activecpu_get_pc());
 	return readinputportbytag("IN0");
 }
 
 
 static READ8_HANDLER( konami_portb_0_r )
 {
-//	logerror("%04X:ppi0_portb_r\n", activecpu_get_pc());
+//  logerror("%04X:ppi0_portb_r\n", activecpu_get_pc());
 	return readinputportbytag("IN1");
 }
 
@@ -443,18 +443,18 @@ static WRITE8_HANDLER( theend_coin_counter_w )
 
 /*************************************
  *
- *  Scramble I/O 
+ *  Scramble I/O
  *
  *************************************/
 
 static WRITE8_HANDLER( scramble_protection_w )
 {
-	/* 
-		This is not fully understood; the low 4 bits of port C are
-		inputs; the upper 4 bits are outputs. Scramble main set always
-		writes sequences of 3 or more nibbles to the low port and
-		expects certain results in the upper nibble afterwards.
-	*/
+	/*
+        This is not fully understood; the low 4 bits of port C are
+        inputs; the upper 4 bits are outputs. Scramble main set always
+        writes sequences of 3 or more nibbles to the low port and
+        expects certain results in the upper nibble afterwards.
+    */
 	protection_state = (protection_state << 4) | (data & 0x0f);
 	switch (protection_state & 0xfff)
 	{
@@ -463,7 +463,7 @@ static WRITE8_HANDLER( scramble_protection_w )
 		case 0xa49:		protection_result = 0xbf;	break;
 		case 0x319:		protection_result = 0x4f;	break;
 		case 0x5c9:		protection_result = 0x6f;	break;
-		
+
 		/* scrambls */
 		case 0x246:		protection_result ^= 0x80;	break;
 		case 0xb5f:		protection_result = 0x6f;	break;
@@ -480,10 +480,10 @@ static READ8_HANDLER( scramble_protection_r )
 static CUSTOM_INPUT( scramble_protection_alt_r )
 {
 	/*
-		There are two additional bits that are derived from bit 7 of
-		the protection result. This is just a guess but works well enough
-		to boot scrambls.
-	*/
+        There are two additional bits that are derived from bit 7 of
+        the protection result. This is just a guess but works well enough
+        to boot scrambls.
+    */
 	return (protection_result >> 7) & 1;
 }
 
@@ -491,7 +491,7 @@ static CUSTOM_INPUT( scramble_protection_alt_r )
 
 /*************************************
  *
- *  Explorer I/O 
+ *  Explorer I/O
  *
  *************************************/
 
@@ -536,7 +536,7 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 {
 	UINT8 old = sfx_sample_control;
 	sfx_sample_control = data;
-	
+
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
@@ -559,7 +559,7 @@ static const ppi8255_interface sfx_ppi8255_intf =
 
 /*************************************
  *
- *  Frogger I/O 
+ *  Frogger I/O
  *
  *************************************/
 
@@ -615,7 +615,7 @@ static WRITE8_HANDLER( froggrmc_sound_control_w )
 
 /*************************************
  *
- *  Frog (Falcon) I/O 
+ *  Frog (Falcon) I/O
  *
  *************************************/
 
@@ -640,7 +640,7 @@ static WRITE8_HANDLER( frogf_ppi8255_w )
 
 /*************************************
  *
- *  Turtles I/O 
+ *  Turtles I/O
  *
  *************************************/
 
@@ -684,7 +684,7 @@ static READ8_HANDLER( scorpion_protection_r )
 {
 	UINT16 paritybits;
 	UINT8 parity = 0;
-	
+
 	/* compute parity of the current (bitmask & $CE29) */
 	for (paritybits = protection_state & 0xce29; paritybits != 0; paritybits >>= 1)
 		if (paritybits & 1)
@@ -700,7 +700,7 @@ static WRITE8_HANDLER( scorpion_protection_w )
 	/* bit 5 low is a reset */
 	if (!(data & 0x20))
 		protection_state = 0x0000;
-	
+
 	/* bit 4 low is a clock */
 	if (!(data & 0x10))
 	{
@@ -720,7 +720,7 @@ static READ8_HANDLER( scorpion_sound_status_r )
 static WRITE8_HANDLER( scorpion_sound_data_w )
 {
 	scorpion_sound_data = data;
-//	logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_activecpu_get_pc(), data);
+//  logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_activecpu_get_pc(), data);
 }
 
 
@@ -728,14 +728,14 @@ static WRITE8_HANDLER( scorpion_sound_control_w )
 {
 	if (!(data & 0x04))
 		mame_printf_debug("Secondary sound = %02X\n", scorpion_sound_data);
-//	logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_activecpu_get_pc(), data);
+//  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_activecpu_get_pc(), data);
 }
 
 
 
 /*************************************
  *
- *  Ghostmuncher Galaxian I/O 
+ *  Ghostmuncher Galaxian I/O
  *
  *************************************/
 
@@ -743,14 +743,14 @@ static INPUT_CHANGED( gmgalax_game_changed )
 {
 	/* new value is the selected game */
 	gmgalax_selected_game = newval;
-	
+
 	/* select the bank and graphics bank based on it */
 	memory_set_bank(1, gmgalax_selected_game);
 	galaxian_gfxbank_w(machine, 0, gmgalax_selected_game);
-	
+
 	/* reset the starts */
 	galaxian_stars_enable_w(machine, 0, 0);
-	
+
 	/* reset the CPU */
 	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
@@ -768,7 +768,7 @@ static CUSTOM_INPUT( gmgalax_port_r )
 
 /*************************************
  *
- *  Zig Zag I/O 
+ *  Zig Zag I/O
  *
  *************************************/
 
@@ -795,12 +795,12 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 					AY8910_control_port_0_w(machine, 0, zigzag_ay8910_latch);
 			}
 			break;
-		
+
 		case 0x100:
 			/* data latch */
 			zigzag_ay8910_latch = offset & 0xff;
 			break;
-		
+
 		case 0x200:
 			/* unknown */
 			break;
@@ -811,7 +811,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 
 /*************************************
  *
- *  Azurian I/O 
+ *  Azurian I/O
  *
  *************************************/
 
@@ -824,7 +824,7 @@ static CUSTOM_INPUT( azurian_port_r )
 
 /*************************************
  *
- *  King & Balloon I/O 
+ *  King & Balloon I/O
  *
  *************************************/
 
@@ -872,7 +872,7 @@ static WRITE8_HANDLER( kingball_dac_w )
 
 /*************************************
  *
- *  Moon Shuttle I/O 
+ *  Moon Shuttle I/O
  *
  *************************************/
 
@@ -907,7 +907,7 @@ static READ8_HANDLER( mshuttle_ay8910_data_r )
 
 /*************************************
  *
- *  Jump Bug I/O 
+ *  Jump Bug I/O
  *
  *************************************/
 
@@ -929,7 +929,7 @@ static READ8_HANDLER( jumpbug_protection_r )
 
 /*************************************
  *
- *  Checkman I/O 
+ *  Checkman I/O
  *
  *************************************/
 
@@ -967,7 +967,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 
 /*************************************
  *
- *  Dingo I/O 
+ *  Dingo I/O
  *
  *************************************/
 
@@ -992,13 +992,13 @@ static READ8_HANDLER( dingoe_3001_r )
 
 /*************************************
  *
- *  Memory maps 
+ *  Memory maps
  *
  *************************************/
 
 /*
 0000-3fff
-  
+
 
 4000-7fff
   4000-47ff -> RAM read/write (10 bits = 0x400)
@@ -1102,8 +1102,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dambustr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-//	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
-//	AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
+//  AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
+//  AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, galaxian_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd800, 0xd8ff) AM_MIRROR(0x0700) AM_READWRITE(SMH_RAM, galaxian_objram_w) AM_BASE(&spriteram)
@@ -1221,13 +1221,13 @@ ADDRESS_MAP_END
 
 
 /* changes from galaxian map:
-	galaxian sound removed
-	$4800-$57ff: cointains video and object RAM (normally at $5000-$5fff)
-	$5800-$5fff: AY-8910 access added
-	$6002-$6006: graphics banking controls replace coin lockout, coin counter, and lfo
-	$7002: coin counter (moved from $6003)
-	$8000-$afff: additional ROM area
-	$b000-$bfff: protection
+    galaxian sound removed
+    $4800-$57ff: cointains video and object RAM (normally at $5000-$5fff)
+    $5800-$5fff: AY-8910 access added
+    $6002-$6006: graphics banking controls replace coin lockout, coin counter, and lfo
+    $7002: coin counter (moved from $6003)
+    $8000-$afff: additional ROM area
+    $b000-$bfff: protection
 */
 static ADDRESS_MAP_START( jumpbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1299,7 +1299,7 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Sound CPU memory maps 
+ *  Sound CPU memory maps
  *
  *************************************/
 
@@ -1505,7 +1505,7 @@ static DISCRETE_SOUND_START( konami_sound )
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
-	
+
 	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_05, 4, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_06, 5, 1.0, 0)
@@ -1531,9 +1531,9 @@ static DISCRETE_SOUND_START( konami_sound )
 	/* FIXME the amplifier M51516L has a decay circuit */
 	/* This is handled with sound_global_enable but    */
 	/* belongs here.                                   */
-	
+
 	DISCRETE_OUTPUT(NODE_30, 5.0 )
-	
+
 DISCRETE_SOUND_END
 
 
@@ -1550,7 +1550,7 @@ static MACHINE_DRIVER_START( galaxian_base )
 	MDRV_CPU_ADD_TAG("main", Z80, GALAXIAN_PIXEL_CLOCK/3/2)
 	MDRV_CPU_PROGRAM_MAP(galaxian_map,0)
 	MDRV_CPU_VBLANK_INT("main", interrupt_gen)
-	
+
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */
@@ -1564,7 +1564,7 @@ static MACHINE_DRIVER_START( galaxian_base )
 	MDRV_PALETTE_INIT(galaxian)
 	MDRV_VIDEO_START(galaxian)
 	MDRV_VIDEO_UPDATE(galaxian)
-	
+
 	/* blinking frequency is determined by 555 counter with Ra=100k, Rb=10k, C=10uF */
 	MDRV_TIMER_ADD_PERIODIC("stars", galaxian_stars_blink_timer, NSEC(PERIOD_OF_555_ASTABLE_NSEC(100000, 10000, 0.00001)))
 
@@ -1620,7 +1620,7 @@ static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
 	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
 	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
-	
+
 	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1650,7 +1650,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zigzag )
 	MDRV_IMPORT_FROM(galaxian_base)
-	
+
 	/* separate tile/sprite ROMs */
 	MDRV_GFXDECODE(pacmanbl)
 
@@ -1853,13 +1853,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sfx )
 	MDRV_IMPORT_FROM(galaxian_base)
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
-	
+
 	MDRV_WATCHDOG_VBLANK_INIT(0)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(sfx_map,0)
-	
+
 	/* 3rd CPU for the sample player */
 	MDRV_CPU_ADD(Z80, KONAMI_SOUND_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
@@ -1888,7 +1888,7 @@ MACHINE_DRIVER_END
 
 /*************************************
  *
- *  Decryption helpers 
+ *  Decryption helpers
  *
  *************************************/
 
@@ -1896,7 +1896,7 @@ static void decode_mooncrst(int length, UINT8 *dest)
 {
 	UINT8 *rom = memory_region(REGION_CPU1);
 	int offs;
-	
+
 	for (offs = 0; offs < length; offs++)
 	{
 		UINT8 data = rom[offs];
@@ -1912,39 +1912,39 @@ static void decode_mooncrst(int length, UINT8 *dest)
 static void decode_checkman(void)
 {
 	/*
-		                     Encryption Table
-		                     ----------------
-		+---+---+---+------+------+------+------+------+------+------+------+
-		|A2 |A1 |A0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0    |
-		+---+---+---+------+------+------+------+------+------+------+------+
-		| 0 | 0 | 0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0^^D6|
-		| 0 | 0 | 1 |D7    |D6    |D5    |D4    |D3    |D2    |D1^^D5|D0    |
-		| 0 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D4|D1^^D6|D0    |
-		| 0 | 1 | 1 |D7    |D6    |D5    |D4^^D2|D3    |D2    |D1    |D0^^D5|
-		| 1 | 0 | 0 |D7    |D6^^D4|D5^^D1|D4    |D3    |D2    |D1    |D0    |
-		| 1 | 0 | 1 |D7    |D6^^D0|D5^^D2|D4    |D3    |D2    |D1    |D0    |
-		| 1 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D0|D1    |D0    |
-		| 1 | 1 | 1 |D7    |D6    |D5    |D4^^D1|D3    |D2    |D1    |D0    |
-		+---+---+---+------+------+------+------+------+------+------+------+
+                             Encryption Table
+                             ----------------
+        +---+---+---+------+------+------+------+------+------+------+------+
+        |A2 |A1 |A0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0    |
+        +---+---+---+------+------+------+------+------+------+------+------+
+        | 0 | 0 | 0 |D7    |D6    |D5    |D4    |D3    |D2    |D1    |D0^^D6|
+        | 0 | 0 | 1 |D7    |D6    |D5    |D4    |D3    |D2    |D1^^D5|D0    |
+        | 0 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D4|D1^^D6|D0    |
+        | 0 | 1 | 1 |D7    |D6    |D5    |D4^^D2|D3    |D2    |D1    |D0^^D5|
+        | 1 | 0 | 0 |D7    |D6^^D4|D5^^D1|D4    |D3    |D2    |D1    |D0    |
+        | 1 | 0 | 1 |D7    |D6^^D0|D5^^D2|D4    |D3    |D2    |D1    |D0    |
+        | 1 | 1 | 0 |D7    |D6    |D5    |D4    |D3    |D2^^D0|D1    |D0    |
+        | 1 | 1 | 1 |D7    |D6    |D5    |D4^^D1|D3    |D2    |D1    |D0    |
+        +---+---+---+------+------+------+------+------+------+------+------+
 
-		For example if A2=1, A1=1 and A0=0 then D2 to the CPU would be an XOR of
-		D2 and D0 from the ROM's. Note that D7 and D3 are not encrypted.
+        For example if A2=1, A1=1 and A0=0 then D2 to the CPU would be an XOR of
+        D2 and D0 from the ROM's. Note that D7 and D3 are not encrypted.
 
-		Encryption PAL 16L8 on cardridge
-		         +--- ---+
-		    OE --|   U   |-- VCC
-		 ROMD0 --|       |-- D0
-		 ROMD1 --|       |-- D1
-		 ROMD2 --|VER 5.2|-- D2
-		    A0 --|       |-- NOT USED
-		    A1 --|       |-- A2
-		 ROMD4 --|       |-- D4
-		 ROMD5 --|       |-- D5
-		 ROMD6 --|       |-- D6
-		   GND --|       |-- M1 (NOT USED)
-		         +-------+
-		Pin layout is such that links can replace the PAL if encryption is not used.
-	*/
+        Encryption PAL 16L8 on cardridge
+                 +--- ---+
+            OE --|   U   |-- VCC
+         ROMD0 --|       |-- D0
+         ROMD1 --|       |-- D1
+         ROMD2 --|VER 5.2|-- D2
+            A0 --|       |-- NOT USED
+            A1 --|       |-- A2
+         ROMD4 --|       |-- D4
+         ROMD5 --|       |-- D5
+         ROMD6 --|       |-- D6
+           GND --|       |-- M1 (NOT USED)
+                 +-------+
+        Pin layout is such that links can replace the PAL if encryption is not used.
+    */
 	static const UINT8 xortable[8][4] =
 	{
 		{ 6,0,6,0 },
@@ -1998,7 +1998,7 @@ static void decode_frogger_sound(void)
 {
 	UINT8 *rombase = memory_region(REGION_CPU2);
 	UINT32 offs;
-	
+
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
 	for (offs = 0; offs < 0x0800; offs++)
 		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
@@ -2009,7 +2009,7 @@ static void decode_frogger_gfx(void)
 {
 	UINT8 *rombase = memory_region(REGION_GFX1);
 	UINT32 offs;
-	
+
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
 	for (offs = 0x0800; offs < 0x1000; offs++)
 		rombase[offs] = BITSWAP8(rombase[offs], 7,6,5,4,3,2,0,1);
@@ -2059,7 +2059,7 @@ static void decode_losttomb_gfx(void)
 
 /*************************************
  *
- *  Driver configuration 
+ *  Driver configuration
  *
  *************************************/
 
@@ -2067,7 +2067,7 @@ static void common_init(
 	running_machine *machine,
 	galaxian_draw_bullet_func draw_bullet,
 	galaxian_draw_background_func draw_background,
-	galaxian_extend_tile_info_func extend_tile_info, 
+	galaxian_extend_tile_info_func extend_tile_info,
 	galaxian_extend_sprite_info_func extend_sprite_info)
 {
 	irq_line = INPUT_LINE_NMI;
@@ -2086,12 +2086,12 @@ static void konami_common_init(
 	running_machine *machine,
 	galaxian_draw_bullet_func draw_bullet,
 	galaxian_draw_background_func draw_background,
-	galaxian_extend_tile_info_func extend_tile_info, 
+	galaxian_extend_tile_info_func extend_tile_info,
 	galaxian_extend_sprite_info_func extend_sprite_info)
 {
 	/* basic configuration */
 	common_init(machine, draw_bullet, draw_background, extend_tile_info, extend_sprite_info);
-	
+
 	/* configure Konami sound */
 	ppi8255_init(&konami_ppi8255_intf);
 }
@@ -2108,7 +2108,7 @@ static void unmap_galaxian_sound(offs_t base)
 
 /*************************************
  *
- *  Galaxian-derived games 
+ *  Galaxian-derived games
  *
  *************************************/
 
@@ -2177,7 +2177,7 @@ static DRIVER_INIT( frogg )
 {
 	/* same as galaxian... */
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
-	
+
 	/* ...but needs a full 2k of RAM */
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x47ff, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(1, auto_malloc(0x800));
@@ -2187,7 +2187,7 @@ static DRIVER_INIT( frogg )
 
 /*************************************
  *
- *  Moon Cresta-derived games 
+ *  Moon Cresta-derived games
  *
  *************************************/
 
@@ -2195,7 +2195,7 @@ static DRIVER_INIT( mooncrst )
 {
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
-	
+
 	/* decrypt program code */
 	decode_mooncrst(0x8000, memory_region(REGION_CPU1));
 }
@@ -2212,7 +2212,7 @@ static DRIVER_INIT( mooncrgx )
 {
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
-	
+
 	/* LEDs and coin lockout replaced by graphics banking */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6002, 0, 0x7f8, galaxian_gfxbank_w);
 }
@@ -2224,7 +2224,7 @@ static DRIVER_INIT( moonqsr )
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, moonqsr_extend_tile_info, moonqsr_extend_sprite_info);
-	
+
 	/* decrypt program code */
 	decode_mooncrst(0x8000, decrypt);
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
@@ -2259,7 +2259,7 @@ static DRIVER_INIT( zigzag )
 {
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
-	
+
 	/* make ROMs 2 & 3 swappable */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2fff, 0, 0, SMH_BANK1);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK2);
@@ -2272,11 +2272,11 @@ static DRIVER_INIT( zigzag )
 
 	/* coin lockout disabled */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);
-	
+
 	/* remove the galaxian sound hardware */
 	unmap_galaxian_sound(0x6000);
 
-	/* install our AY-8910 handler */	
+	/* install our AY-8910 handler */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4fff, 0, 0, zigzag_ay8910_w);
 }
 
@@ -2292,14 +2292,14 @@ static DRIVER_INIT( checkman )
 {
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
-	
+
 	/* move the interrupt enable from $b000 to $b001 */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
 
 	/* attach the sound command handler */
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
-	
+
 	/* decrypt program code */
 	decode_checkman();
 }
@@ -2312,7 +2312,7 @@ static DRIVER_INIT( checkmaj )
 
 	/* attach the sound command handler */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7800, 0, 0x7ff, checkman_sound_command_w);
-	
+
 	/* for the title screen */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
 }
@@ -2325,7 +2325,7 @@ static DRIVER_INIT( dingo )
 
 	/* attach the sound command handler */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7800, 0x7800, 0, 0x7ff, checkman_sound_command_w);
-	
+
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, dingo_3000_r);
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3035, 0x3035, 0, 0, dingo_3035_r);
 }
@@ -2335,7 +2335,7 @@ static DRIVER_INIT( dingoe )
 {
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
-	
+
 	/* move the interrupt enable from $b000 to $b001 */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0x7f8, SMH_UNMAP);
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xb001, 0xb001, 0, 0x7f8, irq_enable_w);
@@ -2344,7 +2344,7 @@ static DRIVER_INIT( dingoe )
 	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0xffff, checkman_sound_command_w);
 
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
-	
+
 	/* decrypt program code */
 	decode_dingoe();
 }
@@ -2425,7 +2425,7 @@ static DRIVER_INIT( scorpnmc )
 	/* install RAM at $4000-$4800 */
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x47ff, 0, 0, SMH_BANK2, SMH_BANK2);
 	memory_set_bankptr(2, auto_malloc(0x800));
-	
+
 	/* doesn't appear to use original RAM */
 	memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 }
@@ -2434,7 +2434,7 @@ static DRIVER_INIT( scorpnmc )
 
 /*************************************
  *
- *  Konami games 
+ *  Konami games
  *
  *************************************/
 
@@ -2442,7 +2442,7 @@ static DRIVER_INIT( theend )
 {
 	/* video extensions */
 	konami_common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
-	
+
 	/* coin counter on the upper bit of port C */
 	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6802, 0x6802, 0, 0x7f8, SMH_UNMAP);
 	ppi8255_set_portCwrite(0, theend_coin_counter_w);
@@ -2453,7 +2453,7 @@ static DRIVER_INIT( scramble )
 {
 	/* video extensions */
 	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
-	
+
 	/* configure protection */
 	ppi8255_set_portCread (1, scramble_protection_r);
 	ppi8255_set_portCwrite(1, scramble_protection_w);
@@ -2516,7 +2516,7 @@ static DRIVER_INIT( losttomb )
 {
 	/* video extensions */
 	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
-	
+
 	/* decrypt */
 	decode_losttomb_gfx();
 }
@@ -2588,30 +2588,30 @@ static DRIVER_INIT( scorpion )
 	/* configure protection */
 	ppi8255_set_portCwrite(1, scorpion_protection_w);
 	ppi8255_set_portCread(1, scorpion_protection_r);
-	
+
 	/* extra ROM */
 	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5800);
 
 	/* no background related */
-//	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);
+//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);
 
 	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
 /*
 {
-	const UINT8 *rom = memory_region(REGION_SOUND1);
-	int i;
-	
-	for (i = 0; i < 0x2c; i++)
-	{
-		UINT16 addr = (rom[2*i] << 8) | rom[2*i+1];
-		UINT16 endaddr = (rom[2*i+2] << 8) | rom[2*i+3];
-		int j;
-		printf("Cmd %02X -> %04X-%04X:", i, addr, endaddr - 1);
-		for (j = 0; j < 32 && addr < endaddr; j++)
-			printf(" %02X", rom[addr++]);
-		printf("\n");
-	}
+    const UINT8 *rom = memory_region(REGION_SOUND1);
+    int i;
+
+    for (i = 0; i < 0x2c; i++)
+    {
+        UINT16 addr = (rom[2*i] << 8) | rom[2*i+1];
+        UINT16 endaddr = (rom[2*i+2] << 8) | rom[2*i+3];
+        int j;
+        printf("Cmd %02X -> %04X-%04X:", i, addr, endaddr - 1);
+        for (j = 0; j < 32 && addr < endaddr; j++)
+            printf(" %02X", rom[addr++]);
+        printf("\n");
+    }
 }
 */
 }

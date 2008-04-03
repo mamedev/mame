@@ -330,7 +330,7 @@ static void *discrete_start(int sndindex, int clock, const void *config)
 		if (NODE_CHILD_NODE_NUM(intf[info->node_count].node) > 0)
 			fatalerror("discrete_start() - Child node number on NODE_%02d", NODE_INDEX(intf[info->node_count].node) );
 
-	
+
 	}
 	info->node_count++;
 	discrete_log("discrete_start() - Sanity check counted %d nodes", info->node_count);
@@ -671,7 +671,7 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
 
 				if (NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module.num_output)
 					fatalerror("discrete_start - Node NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_INDEX(node->node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
-				
+
 				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	// Link referenced node out to input
 				node->input_is_node |= 1 << inputnum;			// Bit flag if input is node
 			}

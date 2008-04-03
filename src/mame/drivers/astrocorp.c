@@ -291,27 +291,27 @@ Show Hand
 
 PCB CHE-B50-4002A 88 94V-0 0002
 
-CPU		1x MC68HC000FN12 (main)
-		1x pLSI1016-60LJ (main)
-		1x ASTRO V01 0005 (custom)
-		1x AD-65 (equivalent to OKI6295)(sound)
-		1x ASTRO 0001B (custom)
-		1x oscillator 20.000MHz
-		1x oscillator 25.601712MHz  
+CPU     1x MC68HC000FN12 (main)
+        1x pLSI1016-60LJ (main)
+        1x ASTRO V01 0005 (custom)
+        1x AD-65 (equivalent to OKI6295)(sound)
+        1x ASTRO 0001B (custom)
+        1x oscillator 20.000MHz
+        1x oscillator 25.601712MHz
 
-ROMs	2x 27C512 (1,2)
-		2x M27C801 (3,4)
-		1x M27C4001 (5)
-		1x 93C46 (not dumped)  
+ROMs    2x 27C512 (1,2)
+        2x M27C801 (3,4)
+        1x M27C4001 (5)
+        1x 93C46 (not dumped)
 
-Note	1x 28x2 JAMMA edge connector
-		1x 18x2 edge connector
-		1x 10x2 edge connector
-		1x pushbutton
-		1x trimmer (volume)
-		1x 2x2 switches dip  
+Note    1x 28x2 JAMMA edge connector
+        1x 18x2 edge connector
+        1x 10x2 edge connector
+        1x pushbutton
+        1x trimmer (volume)
+        1x 2x2 switches dip
 
-Hardware info by f205v  
+Hardware info by f205v
 
 ***************************************************************************/
 
@@ -331,14 +331,14 @@ ROM_END
 static DRIVER_INIT( showhand )
 {
 /*
-	UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
+    UINT16 *rom = (UINT16*)memory_region(REGION_CPU1);
 
-	rom[0x0a1a/2] = 0x6000;	// hopper jam
+    rom[0x0a1a/2] = 0x6000; // hopper jam
 
-	rom[0x1494/2] = 0x4e71;	// enable full test mode
+    rom[0x1494/2] = 0x4e71; // enable full test mode
 
-	rom[0x12f6/2] = 0x6000;	// rom error
-	rom[0x4916/2] = 0x6000;	// rom error
+    rom[0x12f6/2] = 0x6000; // rom error
+    rom[0x4916/2] = 0x6000; // rom error
 */
 }
 

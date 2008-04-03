@@ -99,7 +99,7 @@ static const struct tms34061_interface tms34061intf =
 
 static WRITE16_HANDLER( guab_tms34061_w )
 {
-	int func = (offset >> 19) & 3;	
+	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
 	int col;
 
@@ -119,10 +119,10 @@ static WRITE16_HANDLER( guab_tms34061_w )
 static READ16_HANDLER( guab_tms34061_r )
 {
 	UINT16 data = 0;
-	int func = (offset >> 19) & 3;	
+	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
 	int col;
-	
+
 	if (func == 0 || func == 2)
 		col = offset  & 0xff;
 	else
@@ -218,7 +218,7 @@ static VIDEO_START( guab )
 static VIDEO_UPDATE( guab )
 {
 	int x, y;
-	struct tms34061_display state;	
+	struct tms34061_display state;
 
 	tms34061_get_display_state(&state);
 
@@ -235,7 +235,7 @@ static VIDEO_UPDATE( guab )
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 2)
-		{			
+		{
 			UINT8 pen = src[x >> 1];
 
 			/* Draw two 4-bit pixels */
@@ -300,14 +300,14 @@ static TIMER_CALLBACK( fdc_data_callback )
 	int more_data = 0;
 
 	/*
-		Disk dumps are organised as:
+        Disk dumps are organised as:
 
-		Side 0, Track 0: Sectors 0 - 17
-		Side 1, Track 0: Sectors 0 - 17
-		Side 0, Track 1: Sectors 0 - 17
-		Side 1, Track 1: Sectors 0 - 17
-		etc.
-	*/
+        Side 0, Track 0: Sectors 0 - 17
+        Side 1, Track 0: Sectors 0 - 17
+        Side 0, Track 1: Sectors 0 - 17
+        Side 1, Track 1: Sectors 0 - 17
+        etc.
+    */
 
 	int idx = 2 * fdc.track * (DISK_TRACK_SIZE) + (fdc.side ? DISK_TRACK_SIZE : 0)+
 			  fdc.sector * (DISK_SECTOR_SIZE) +
@@ -615,7 +615,7 @@ static WRITE16_HANDLER( io_w )
 		case 0x31:
 		{
 			/* Only JPM knows about the other bits... */
-			fdc.side = (data >> 3) & 1;			
+			fdc.side = (data >> 3) & 1;
 			break;
 		}
 		case 0x32:

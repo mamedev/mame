@@ -29,8 +29,8 @@ struct pit8253_config
 		pit8253_output_changed_func			output_changed;
 
 		/* If specified, this gets called whenever the frequency of the output for this
-		   timer changes. */
-		pit8253_frequency_changed_func		frequency_changed;		
+           timer changes. */
+		pit8253_frequency_changed_func		frequency_changed;
 	} timer[3];
 };
 

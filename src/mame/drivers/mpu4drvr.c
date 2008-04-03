@@ -14,11 +14,11 @@ This version of the game card does not have the OKI chip, or the characteriser.
 The VIDEO BOARD is driven by a 10mhz 68000 processor, and contains a 6840PTM, 6850 serial IO
 (the other end of the communications), an SAA1099 for stereo sound and SCN2674 gfx chip.
 
-The VIDEO CARTRIDGE plugs into the video board, and contains the program roms for the video based game. 
+The VIDEO CARTRIDGE plugs into the video board, and contains the program roms for the video based game.
 Like the MPU4 game card, in some cases an extra OKI sound chip is added to the video board's game card,
 as well as extra RAM.
 There is a protection chip similar to and replacing the MPU4 Characteriser, which is often fed question
-data to descramble (unknown how it works). In non-question cases, however, the protection chip works 
+data to descramble (unknown how it works). In non-question cases, however, the protection chip works
 near identically to the original.
 
 No video card schematics ever left the PCB factory, but some decent scans of the board have been made,
@@ -1446,7 +1446,7 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900002, 0x900003) AM_WRITE(saa1099_write_port_0_lsb_w)
 
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w) /* the palette chip */
-/*	AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 
@@ -1500,7 +1500,7 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	/* the palette chip */
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w) /* the palette chip */
-/*	AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 

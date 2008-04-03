@@ -1,7 +1,7 @@
 /*************************************
  *
- *	Input Ports
- *  Galaxian-derived games 
+ *  Input Ports
+ *  Galaxian-derived games
  *
  *************************************/
 
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( catacomb )
 	PORT_INCLUDE(galaxian)
-	
+
 	PORT_MODIFY("IN0")
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
 	PORT_DIPUNKNOWN( 0x80, 0x00 )
@@ -402,7 +402,7 @@ INPUT_PORTS_START( pisces )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
@@ -441,7 +441,7 @@ INPUT_PORTS_START( gteikokb )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Not tested due to code removed at 0x00ab, 0x1b26 and 0x1c97*/
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )		/* Not tested due to code removed at 0x1901*/
-	
+
 	PORT_MODIFY("IN1")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
@@ -764,8 +764,8 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *	Input Ports
- *  Moon Cresta-derived games 
+ *  Input Ports
+ *  Moon Cresta-derived games
  *
  *************************************/
 
@@ -1233,8 +1233,8 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *	Input Ports
- *  Konami games 
+ *  Input Ports
+ *  Konami games
  *
  *************************************/
 
@@ -1318,7 +1318,7 @@ INPUT_PORTS_END
 
 INPUT_PORTS_START( frogg )
 	PORT_INCLUDE(froggrmc)
-	
+
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL )		// See notes
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
@@ -2064,7 +2064,7 @@ INPUT_PORTS_END
 /*************************************
  *
  *  ROM definitions
- *	Galaxian-derived games
+ *  Galaxian-derived games
  *
  *************************************/
 
@@ -2902,7 +2902,7 @@ ROM_END
 /*************************************
  *
  *  ROM definitions
- *	Moon Cresta-derived games
+ *  Moon Cresta-derived games
  *
  *************************************/
 
@@ -3647,7 +3647,7 @@ ROM_END
 /*************************************
  *
  *  ROM definitions
- *	Konami games
+ *  Konami games
  *
  *************************************/
 
@@ -4581,7 +4581,7 @@ ROM_END
 /*************************************
  *
  *  Game drivers
- *	Galaxian-derived games
+ *  Galaxian-derived games
  *
  *************************************/
 
@@ -4656,7 +4656,7 @@ GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg",
 /*************************************
  *
  *  Game drivers
- *	Moon Cresta-derived games
+ *  Moon Cresta-derived games
  *
  *************************************/
 
@@ -4713,7 +4713,7 @@ GAME( 1980, kingbalj, kingball, kingball, kingball, kingball, ROT90,  "Namco", "
 /*************************************
  *
  *  Game drivers
- *	Konami games 
+ *  Konami games
  *
  *************************************/
 
@@ -4794,9 +4794,9 @@ GAME( 1982, anteater, 0,        scobra,   anteater, anteater, ROT90,  "[Stern] (
 //GAME( 1984, drivfrcg, drivfrcp, drivfrcg, drivfrcg, galaxian, ROT90,  "Shinkai Inc. (Magic Eletronics USA licence)", "Driving Force (Galaxian conversion)", GAME_SUPPORTS_SAVE )
 //GAME( 1985, drivfrcb, drivfrcp, drivfrcg, drivfrcg, galaxian, ROT90,  "bootleg", "Driving Force (Galaxian conversion bootleg)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, bongo,    0,        bongo,    bongo,    galaxian, ROT90,  "Jetsoft", "Bongo", GAME_SUPPORTS_SAVE )
-//GAME( 1983, hunchbkg, hunchbak,	hunchbkg, hunchbkg, galaxian, ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, hunchbkg, hunchbak,   hunchbkg, hunchbkg, galaxian, ROT90,  "Century Electronics", "Hunchback (Galaxian hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, harem,    0,        harem,    harem,    galaxian, ROT90,  "I.G.R.", "Harem", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-//GAME( 1982, tazzmang, tazmania,	tazzmang, tazzmang, galaxian, ROT90,  "bootleg", "Tazz-Mania (Galaxian Hardware)", GAME_SUPPORTS_SAVE )
+//GAME( 1982, tazzmang, tazmania,   tazzmang, tazzmang, galaxian, ROT90,  "bootleg", "Tazz-Mania (Galaxian Hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1986, racknrol, 0,        racknrol, racknrol, galaxian, ROT0,   "Status (Shinkai License)", "Rack + Roll", GAME_SUPPORTS_SAVE )
 //GAME( 1986, hexpool,  racknrol, racknrol, racknrol, galaxian, ROT90,  "Shinkai", "Hex Pool (Shinkai)", GAME_SUPPORTS_SAVE )
 //GAME( 1985, hexpoola, racknrol, hexpoola, racknrol, galaxian, ROT90,  "Senko", "Hex Pool (Senko)", GAME_SUPPORTS_SAVE )
@@ -4825,7 +4825,7 @@ GAME( 1982, anteater, 0,        scobra,   anteater, anteater, ROT90,  "[Stern] (
 //GAME( 1983, cavelon,  0,        theend  /*cavelon*/,  cavelon,  cavelon,      ROT90, "Jetsoft", "Cavelon", GAME_SUPPORTS_SAVE )
 //GAME( 198?, mimonscr, mimonkey, theend  /*mimonscr*/, mimonscr, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, ad2083,   0,        theend  /*ad2083*/,   ad2083,   ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-//GAME( 1981, turpins,  turtles,  turtles,  turpins,  0,		      ROT90, "[Sega] (bootleg)", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
+//GAME( 1981, turpins,  turtles,  turtles,  turpins,  0,              ROT90, "[Sega] (bootleg)", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
 
 /* currently in scobra.c and should be moved here */
 //GAME( 1981, stratgyx, 0,        scobra/*stratgyx*/, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
@@ -4845,7 +4845,7 @@ GAME( 1982, anteater, 0,        scobra,   anteater, anteater, ROT90,  "[Stern] (
 //GAME( 1981, hustler,  0,        scobra/*hustler*/,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 //GAME( 1981, billiard, hustler,  scobra/*hustler*/,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards", GAME_SUPPORTS_SAVE )
 //GAME( 1981, hustlerb, hustler,  scobra/*hustlerb*/, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
-//GAME( 198?, mimonkey, 0,		scobra/*mimonkey*/, mimonkey,	mimonkey,	  ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
+//GAME( 198?, mimonkey, 0,      scobra/*mimonkey*/, mimonkey,   mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 //GAME( 198?, mimonsco, mimonkey, scobra/*mimonkey*/, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
 /* currently in dambustr.c and should be moved here */

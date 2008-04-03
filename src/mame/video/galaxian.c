@@ -1,169 +1,169 @@
 /***************************************************************************
 
-	Galaxian-derived video hardware
+    Galaxian-derived video hardware
 
 ****************************************************************************
 
-	Video timing:
-	
-		The master clock is an 18.432MHz crystal. It is divided by 3 by
-		a pair of J/K flip-flops to 6.144MHz. This 6MHz signal is used to
-		drive most of the video logic. Note that due to the way the
-		divide-by-3 circuit is implemented, the duty cycle of the 6MHz
-		signal is 66% (i.e., it is high for 2 18MHz clocks and low for 1).
-		This is important for accurate stars rendering.
-	
+    Video timing:
 
-	Horizontal timing:
+        The master clock is an 18.432MHz crystal. It is divided by 3 by
+        a pair of J/K flip-flops to 6.144MHz. This 6MHz signal is used to
+        drive most of the video logic. Note that due to the way the
+        divide-by-3 circuit is implemented, the duty cycle of the 6MHz
+        signal is 66% (i.e., it is high for 2 18MHz clocks and low for 1).
+        This is important for accurate stars rendering.
 
-		H counts from 010000000 (128) to 111111111 (511), giving 384
-		total H clocks per scanline
 
-		However, the top bit is inverted to become 256H, so when reading
-		the schematics it's really counting from:
-			110000000 -> 111111111 (blanking period)
-		and then from:
-			000000000 -> 011111111 (main portion of screen = 256 pixels)
+    Horizontal timing:
 
-		HBLANK is a flip-flop clocked by 2H:
-		  * It is held clear when 256H = 0 (main portion of screen)
-		  * The D input is connected to !(64H & 32H & 16H & 8H)
-		  * It is clocked to 1 when H=130
-		  * It is clocked to 0 when H=250
-		  * This gives 264 total non-blanked pixels:
-		      6 additional pixels on the left (H=250..255)
-		      256 main area pixels (H=256..511)
-		      2 additional pixels on the right (H=128..129)
-		
-		HSYNC is a flip-flop clocked by 16H:
-		  * It is held clear when 256H = 0 (main portion of screen)
-		  * The D input is connected to !(!64H & 32H)
-		  * HSYNC is the /Q output
-		  * It is clocked to 1 when H=176
-		  * It is clocked to 0 when H=208
+        H counts from 010000000 (128) to 111111111 (511), giving 384
+        total H clocks per scanline
 
-	
-	Vertical timing:
-	
-		V counts from 011111000 (248) to 111111111 (511), giving 264
-		total V clocks per frame
-		
-		IMPORTANT: the V sync chain is clocked by HSYNC. This means
-		that for the first 48 H clocks of the blanking period, the
-		V counter is one behind. This is important to take into account
-		for sprite and missile positioning.
-		
-		VBLANK is a flip-flop clocked by 16V:
-		  * The D input is connected to !(128V & 64V & 32V)
-		  * It is clocked to 1 when V=496
-		  * It is clocked to 0 when V=272
-		  * This gives 224 total non-blanked pixels
-		  
-		VSYNC is set to !256V:
-		  * It is set to 1 when V=248
-		  * It is cleared to 0 when V=256
-		  
+        However, the top bit is inverted to become 256H, so when reading
+        the schematics it's really counting from:
+            110000000 -> 111111111 (blanking period)
+        and then from:
+            000000000 -> 011111111 (main portion of screen = 256 pixels)
 
-	Sprites and missiles:
+        HBLANK is a flip-flop clocked by 2H:
+          * It is held clear when 256H = 0 (main portion of screen)
+          * The D input is connected to !(64H & 32H & 16H & 8H)
+          * It is clocked to 1 when H=130
+          * It is clocked to 0 when H=250
+          * This gives 264 total non-blanked pixels:
+              6 additional pixels on the left (H=250..255)
+              256 main area pixels (H=256..511)
+              2 additional pixels on the right (H=128..129)
 
-		During the HBLANK period, sprites and missiles are processed.
-		Sprites are rendered into the line buffer, which was cleared
-		during the visible portion of the previous scanline.
-		
-		It takes 8 H clocks to set up a sprite, and 16 to render it
-		to the line buffer. The setup clocks are overlapped with the
-		rendering clocks. In theory this would result in enough time
-		to render 128/16 = 8 sprites. However, the setup does not 
-		begin until after HBLANK, so there is only enough time to
-		render the first 7 1/2 entries.
-		
-		Interleaved with the setup for sprites is setup for the
-		shell and missile rendering. Shells and missiles are rendered
-		realtime during the visible portion of the frame, and are
-		effectively color-ORed directly into the final RGB output.
-		During the HBLANK setup period, each shell/missile entry is
-		compared against the current V position; if an exact match
-		is found, the H position is loaded into a dedicated 8-bit 
-		counter. The counter clocks each pixel during the active video
-		period; when it reaches $FC it enables the output until it
-		hits zero, at which point it shuts itself off. Because there 
-		is only one counter for shells and one for missiles, only one 
-		shell and one missile can be specified per scanline. The last 
-		matching entry found will always win.
-		
-		The difference between shell and missile is that shells
-		populate the first 7 entries and are rendered as white,
-		whereas missiles populate the final entry and are rendered
-		as yellow.
-		
-		Here is the detailed sequence of events for sprite and
-		missile/shell rendering during the first 24 H clocks of
-		HBLANK:
+        HSYNC is a flip-flop clocked by 16H:
+          * It is held clear when 256H = 0 (main portion of screen)
+          * The D input is connected to !(!64H & 32H)
+          * HSYNC is the /Q output
+          * It is clocked to 1 when H=176
+          * It is clocked to 0 when H=208
 
-			H=080: HPOSI=objram[40], /VPL latches V+objram[40]
-			H=081: HPOSI=objram[40]
-			H=082: HPOSI=objram[41], /OBJ DATA L latches picture number, H/V flip
-			H=083: HPOSI=objram[41]
-			H=084: HPOSI=objram[42], /COL L latches low 3 bits as color
-			H=085: HPOSI=objram[42]
-			H=086: HPOSI=objram[43]
-			H=087: HPOSI=objram[43], /CNTR LD latches X position
-			<sprite 0 begins rendering>
-			H=088: HPOSI=objram[40], /VPL latches V+objram[40]
-			H=089: HPOSI=objram[40]
-			H=08A: HPOSI=objram[61]
-			H=08B: HPOSI=objram[61], MSLD is latched if Y position matches shell
-			H=08C: HPOSI=objram[42]
-			H=08D: HPOSI=objram[42]
-			H=08E: HPOSI=objram[63]
-			H=08F: HPOSI=objram[63], /SLD fires to latch down shell counter value
-			H=090: HPOSI=objram[44], /VPL latches V+objram[44]
-			H=091: HPOSI=objram[44]
-			H=092: HPOSI=objram[45], /OBJ DATA L latches picture number, H/V flip
-			H=093: HPOSI=objram[45]
-			H=094: HPOSI=objram[46], /COL L latches low 3 bits as color
-			H=095: HPOSI=objram[46]
-			H=096: HPOSI=objram[47]
-			H=097: HPOSI=objram[47], /CNTR LD latches X position
-			<sprite 1 begins rendering>
-		
-		From this, you can see the object RAM layout looks like:
-		
-			objram[40] = vertical position of sprite 0
-			objram[41] = picture number and H/V flip of sprite 0
-			objram[42] = color of sprite 0
-			objram[43] = horizontal position of sprite 0
 
-			objram[61] = vertical position of shell 0
-			objram[63] = horizontal count until shell 0 starts rendering
-		
-		A vertical match for a sprite is true if ((V + vpos) & 0xf0) == 0xf0.
-		A vertical match for a shell/missile is if ((V + vpos) & 0xff) == 0xff.
-		
-		Overall, the process for sprites and missiles during HBLANK looks 
-		like this:
-		
-			H=080: begin setup sprite 0
-			H=082: begin HBLANK
-			H=088: begin render sprite 0; begin setup shell 0
-			H=090: begin setup sprite 1
-			H=098: begin render sprite 1; begin setup shell 1
-			H=0A0: begin setup sprite 2
-			H=0A8: begin render sprite 2; begin setup shell 2
-			H=0B0: VSYNC increments V counter; subsequent sprites match V+1
-			H=0B0: begin setup sprite 3
-			H=0B8: begin render sprite 3; begin setup shell 3
-			H=0C0: begin setup sprite 4
-			H=0C8: begin render sprite 4; begin setup shell 4
-			H=0D0: begin setup sprite 5
-			H=0D8: begin render sprite 5; begin setup shell 5
-			H=0E0: begin setup sprite 6
-			H=0E8: begin render sprite 6; begin setup shell 6
-			H=0F0: begin setup sprite 7
-			H=0F8: begin render sprite 7; begin setup missile
-			H=0FA: end HBLANK
-			H=100: finish render sprite 7 (only 1/2 way through)
-		
+    Vertical timing:
+
+        V counts from 011111000 (248) to 111111111 (511), giving 264
+        total V clocks per frame
+
+        IMPORTANT: the V sync chain is clocked by HSYNC. This means
+        that for the first 48 H clocks of the blanking period, the
+        V counter is one behind. This is important to take into account
+        for sprite and missile positioning.
+
+        VBLANK is a flip-flop clocked by 16V:
+          * The D input is connected to !(128V & 64V & 32V)
+          * It is clocked to 1 when V=496
+          * It is clocked to 0 when V=272
+          * This gives 224 total non-blanked pixels
+
+        VSYNC is set to !256V:
+          * It is set to 1 when V=248
+          * It is cleared to 0 when V=256
+
+
+    Sprites and missiles:
+
+        During the HBLANK period, sprites and missiles are processed.
+        Sprites are rendered into the line buffer, which was cleared
+        during the visible portion of the previous scanline.
+
+        It takes 8 H clocks to set up a sprite, and 16 to render it
+        to the line buffer. The setup clocks are overlapped with the
+        rendering clocks. In theory this would result in enough time
+        to render 128/16 = 8 sprites. However, the setup does not
+        begin until after HBLANK, so there is only enough time to
+        render the first 7 1/2 entries.
+
+        Interleaved with the setup for sprites is setup for the
+        shell and missile rendering. Shells and missiles are rendered
+        realtime during the visible portion of the frame, and are
+        effectively color-ORed directly into the final RGB output.
+        During the HBLANK setup period, each shell/missile entry is
+        compared against the current V position; if an exact match
+        is found, the H position is loaded into a dedicated 8-bit
+        counter. The counter clocks each pixel during the active video
+        period; when it reaches $FC it enables the output until it
+        hits zero, at which point it shuts itself off. Because there
+        is only one counter for shells and one for missiles, only one
+        shell and one missile can be specified per scanline. The last
+        matching entry found will always win.
+
+        The difference between shell and missile is that shells
+        populate the first 7 entries and are rendered as white,
+        whereas missiles populate the final entry and are rendered
+        as yellow.
+
+        Here is the detailed sequence of events for sprite and
+        missile/shell rendering during the first 24 H clocks of
+        HBLANK:
+
+            H=080: HPOSI=objram[40], /VPL latches V+objram[40]
+            H=081: HPOSI=objram[40]
+            H=082: HPOSI=objram[41], /OBJ DATA L latches picture number, H/V flip
+            H=083: HPOSI=objram[41]
+            H=084: HPOSI=objram[42], /COL L latches low 3 bits as color
+            H=085: HPOSI=objram[42]
+            H=086: HPOSI=objram[43]
+            H=087: HPOSI=objram[43], /CNTR LD latches X position
+            <sprite 0 begins rendering>
+            H=088: HPOSI=objram[40], /VPL latches V+objram[40]
+            H=089: HPOSI=objram[40]
+            H=08A: HPOSI=objram[61]
+            H=08B: HPOSI=objram[61], MSLD is latched if Y position matches shell
+            H=08C: HPOSI=objram[42]
+            H=08D: HPOSI=objram[42]
+            H=08E: HPOSI=objram[63]
+            H=08F: HPOSI=objram[63], /SLD fires to latch down shell counter value
+            H=090: HPOSI=objram[44], /VPL latches V+objram[44]
+            H=091: HPOSI=objram[44]
+            H=092: HPOSI=objram[45], /OBJ DATA L latches picture number, H/V flip
+            H=093: HPOSI=objram[45]
+            H=094: HPOSI=objram[46], /COL L latches low 3 bits as color
+            H=095: HPOSI=objram[46]
+            H=096: HPOSI=objram[47]
+            H=097: HPOSI=objram[47], /CNTR LD latches X position
+            <sprite 1 begins rendering>
+
+        From this, you can see the object RAM layout looks like:
+
+            objram[40] = vertical position of sprite 0
+            objram[41] = picture number and H/V flip of sprite 0
+            objram[42] = color of sprite 0
+            objram[43] = horizontal position of sprite 0
+
+            objram[61] = vertical position of shell 0
+            objram[63] = horizontal count until shell 0 starts rendering
+
+        A vertical match for a sprite is true if ((V + vpos) & 0xf0) == 0xf0.
+        A vertical match for a shell/missile is if ((V + vpos) & 0xff) == 0xff.
+
+        Overall, the process for sprites and missiles during HBLANK looks
+        like this:
+
+            H=080: begin setup sprite 0
+            H=082: begin HBLANK
+            H=088: begin render sprite 0; begin setup shell 0
+            H=090: begin setup sprite 1
+            H=098: begin render sprite 1; begin setup shell 1
+            H=0A0: begin setup sprite 2
+            H=0A8: begin render sprite 2; begin setup shell 2
+            H=0B0: VSYNC increments V counter; subsequent sprites match V+1
+            H=0B0: begin setup sprite 3
+            H=0B8: begin render sprite 3; begin setup shell 3
+            H=0C0: begin setup sprite 4
+            H=0C8: begin render sprite 4; begin setup shell 4
+            H=0D0: begin setup sprite 5
+            H=0D8: begin render sprite 5; begin setup shell 5
+            H=0E0: begin setup sprite 6
+            H=0E8: begin render sprite 6; begin setup shell 6
+            H=0F0: begin setup sprite 7
+            H=0F8: begin render sprite 7; begin setup missile
+            H=0FA: end HBLANK
+            H=100: finish render sprite 7 (only 1/2 way through)
+
 
 
        /VPL: H=xxxxxx000 -> latches sum of V+HPOSI for vertical positioning
@@ -310,38 +310,38 @@ PALETTE_INIT( galaxian )
 	double rweights[3], gweights[3], bweights[2];
 	int i, minval, midval, maxval;
 	UINT8 starmap[4];
-	
+
 	/*
-		Sprite/tilemap colors are mapped through a color PROM as follows:
-	
-		  bit 7 -- 220 ohm resistor  -- BLUE
-		        -- 470 ohm resistor  -- BLUE
-		        -- 220 ohm resistor  -- GREEN
-		        -- 470 ohm resistor  -- GREEN
-		        -- 1  kohm resistor  -- GREEN
-		        -- 220 ohm resistor  -- RED
-		        -- 470 ohm resistor  -- RED
-		  bit 0 -- 1  kohm resistor  -- RED
-		
-		In parallel with these resistors are a pair of 150 ohm and 100 ohm
-		resistors on each R,G,B component that are connected to the star
-		generator.
-		
-		And in parallel with the whole mess are a set of 100 ohm resistors
-		on each R,G,B component that are enabled when a shell/missile is
-		enabled.
-		
-		When computing weights, we use RGB_MAXIMUM as the maximum to give 
-		headroom for stars and shells/missiles. This is not fully accurate, 
-		but if we included all possible sources in parallel, the brightness
-		of the main game would be very low to allow for all the oversaturation
-		of the stars and shells/missiles.
-	*/
+        Sprite/tilemap colors are mapped through a color PROM as follows:
+
+          bit 7 -- 220 ohm resistor  -- BLUE
+                -- 470 ohm resistor  -- BLUE
+                -- 220 ohm resistor  -- GREEN
+                -- 470 ohm resistor  -- GREEN
+                -- 1  kohm resistor  -- GREEN
+                -- 220 ohm resistor  -- RED
+                -- 470 ohm resistor  -- RED
+          bit 0 -- 1  kohm resistor  -- RED
+
+        In parallel with these resistors are a pair of 150 ohm and 100 ohm
+        resistors on each R,G,B component that are connected to the star
+        generator.
+
+        And in parallel with the whole mess are a set of 100 ohm resistors
+        on each R,G,B component that are enabled when a shell/missile is
+        enabled.
+
+        When computing weights, we use RGB_MAXIMUM as the maximum to give
+        headroom for stars and shells/missiles. This is not fully accurate,
+        but if we included all possible sources in parallel, the brightness
+        of the main game would be very low to allow for all the oversaturation
+        of the stars and shells/missiles.
+    */
 	compute_resistor_weights(0,	RGB_MAXIMUM, -1.0,
 			3, &rgb_resistances[0], rweights, 470, 0,
 			3, &rgb_resistances[0], gweights, 470, 0,
 			2, &rgb_resistances[1], bweights, 470, 0);
-	
+
 	/* decode the palette first */
 	for (i = 0; i < memory_region_length(REGION_PROMS); i++)
 	{
@@ -358,7 +358,7 @@ PALETTE_INIT( galaxian )
 		bit1 = BIT(color_prom[i],4);
 		bit2 = BIT(color_prom[i],5);
 		g = combine_3_weights(gweights, bit0, bit1, bit2);
-		
+
 		/* blue component */
 		bit0 = BIT(color_prom[i],6);
 		bit1 = BIT(color_prom[i],7);
@@ -366,26 +366,26 @@ PALETTE_INIT( galaxian )
 
 		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
-	
+
 	/*
-		The maximum sprite/tilemap resistance is ~130 Ohms with all RGB 
-		outputs enabled (1/(1/1000 + 1/470 + 1/220)). Since we normalized 
-		to RGB_MAXIMUM, this maps RGB_MAXIMUM -> 130 Ohms.
+        The maximum sprite/tilemap resistance is ~130 Ohms with all RGB
+        outputs enabled (1/(1/1000 + 1/470 + 1/220)). Since we normalized
+        to RGB_MAXIMUM, this maps RGB_MAXIMUM -> 130 Ohms.
 
-		The stars are at 150 Ohms for the LSB, and 100 Ohms for the MSB.
-		This means the 3 potential values are:
+        The stars are at 150 Ohms for the LSB, and 100 Ohms for the MSB.
+        This means the 3 potential values are:
 
-			150 Ohms -> RGB_MAXIMUM * 130 / 150
-			100 Ohms -> RGB_MAXIMUM * 130 / 100
-			 60 Ohms -> RGB_MAXIMUM * 130 / 60
+            150 Ohms -> RGB_MAXIMUM * 130 / 150
+            100 Ohms -> RGB_MAXIMUM * 130 / 100
+             60 Ohms -> RGB_MAXIMUM * 130 / 60
 
-		Since we can't saturate that high, we instead approximate this
-		by compressing the values proportionally into the 194->255 range.
-	*/
+        Since we can't saturate that high, we instead approximate this
+        by compressing the values proportionally into the 194->255 range.
+    */
 	minval = RGB_MAXIMUM * 130 / 150;
 	midval = RGB_MAXIMUM * 130 / 100;
 	maxval = RGB_MAXIMUM * 130 / 60;
-	
+
 	/* compute the values for each of 4 possible star values */
 	starmap[0] = 0;
 	starmap[1] = minval;
@@ -411,7 +411,7 @@ PALETTE_INIT( galaxian )
 		bit0 = BIT(i,1);
 		bit1 = BIT(i,0);
 		b = starmap[(bit1 << 1) | bit0];
-		
+
 		/* set the RGB color */
 		star_color[i] = MAKE_RGB(r, g, b);
 	}
@@ -458,7 +458,7 @@ VIDEO_START( galaxian )
 	background_blue = 0;
 	background_red = 0;
 	background_green = 0;
-	
+
 	/* initialize stars */
 	stars_init();
 
@@ -502,7 +502,7 @@ VIDEO_UPDATE( galaxian )
 
 	/* render the sprites next */
 	sprites_draw(screen->machine, bitmap, cliprect, &spriteram[0x40]);
-	
+
 	/* if we have bullets to draw, render them following */
 	if (galaxian_draw_bullet_ptr != NULL)
 		bullets_draw(screen->machine, bitmap, cliprect, &spriteram[0x60]);
@@ -537,7 +537,7 @@ WRITE8_HANDLER( galaxian_videoram_w )
 {
 	/* update any video up to the current scanline */
 	video_screen_update_now(machine->primary_screen);
-	
+
 	/* store the data and mark the corresponding tile dirty */
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -548,10 +548,10 @@ WRITE8_HANDLER( galaxian_objram_w )
 {
 	/* update any video up to the current scanline */
 	video_screen_update_now(machine->primary_screen);
-	
+
 	/* store the data */
 	spriteram[offset] = data;
-	
+
 	/* the first $40 bytes affect the tilemap */
 	if (offset < 0x40)
 	{
@@ -566,7 +566,7 @@ WRITE8_HANDLER( galaxian_objram_w )
 			else
 				tilemap_set_scrollx(bg_tilemap, offset >> 1, GALAXIAN_XSCALE*data);
 		}
-		
+
 		/* odd entries control the color base for the row */
 		else
 		{
@@ -588,13 +588,13 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	rectangle clip = *cliprect;
 	int sprnum;
-	
+
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
 	/* according to the schematics, it should be the first 16 pixels; however, */
 	/* some bootlegs demonstrate that this can be shifted to other positions. */
 	clip.min_x = MAX(clip.min_x, galaxian_sprite_clip_start * GALAXIAN_XSCALE);
 	clip.max_x = MIN(clip.max_x, (galaxian_sprite_clip_end + 1) * GALAXIAN_XSCALE - 1);
-	
+
 	/* The line buffer is only written if it contains a '0' currently; */
 	/* it is cleared during the visible area, and populated during HBLANK */
 	/* To simulate this, we render backwards so that lower numbered sprites */
@@ -651,14 +651,14 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 static void bullets_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *base)
 {
 	int y;
-	
+
 	/* iterate over scanlines */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 shell = 0xff, missile = 0xff;
 		UINT8 effy;
 		int which;
-		
+
 		/* the first 3 entries match Y-1 */
 		effy = flipscreen_y ? ((y - 1) ^ 255) : (y - 1);
 		for (which = 0; which < 3; which++)
@@ -675,7 +675,7 @@ static void bullets_draw(running_machine *machine, bitmap_t *bitmap, const recta
 				else
 					missile = which;
 			}
-		
+
 		/* draw the shell */
 		if (shell != 0xff)
 			(*galaxian_draw_bullet_ptr)(machine, bitmap, cliprect, shell, 255 - base[shell*4+3], y);
@@ -688,7 +688,7 @@ static void bullets_draw(running_machine *machine, bitmap_t *bitmap, const recta
 
 /*************************************
  *
- *  Screen orientation 
+ *  Screen orientation
  *
  *************************************/
 
@@ -728,7 +728,7 @@ WRITE8_HANDLER( galaxian_flip_screen_xy_w )
 
 /*************************************
  *
- *  Background controls 
+ *  Background controls
  *
  *************************************/
 
@@ -779,7 +779,7 @@ WRITE8_HANDLER( scramble_background_blue_w )
 
 /*************************************
  *
- *  Graphics banking 
+ *  Graphics banking
  *
  *************************************/
 
@@ -809,7 +809,7 @@ static void stars_init(void)
 	/* reset the blink and enabled states */
 	stars_enabled = FALSE;
 	stars_blink_state = 0;
-	
+
 	/* precalculate the RNG */
 	stars = auto_malloc(STAR_RNG_PERIOD);
 	shiftreg = 0;
@@ -817,13 +817,13 @@ static void stars_init(void)
 	{
 		/* stars are enabled if the upper 8 bits are 1 and the low bit is 0 */
 		int enabled = ((shiftreg & 0x1fe01) == 0x1fe00);
-		
+
 		/* color comes from the 6 bits below the top 8 bits */
 		int color = (~shiftreg & 0x1f8) >> 3;
-		
+
 		/* store the color value in the low 6 bits and the enable in the upper bit */
 		stars[i] = color | (enabled << 7);
-		
+
 		/* the LFSR is fed based on the XOR of bit 12 and the inverse of bit 0 */
 		shiftreg = (shiftreg >> 1) | ((((shiftreg >> 12) ^ ~shiftreg) & 1) << 16);
 	}
@@ -840,7 +840,7 @@ static void stars_init(void)
 static void stars_update_origin(running_machine *machine)
 {
 	int curframe = video_screen_get_frame_number(machine->primary_screen);
-	
+
 	/* only update on a different frame */
 	if (curframe != star_rng_origin_frame)
 	{
@@ -852,7 +852,7 @@ static void stars_update_origin(running_machine *machine)
 		/* of these off-by-one countings produce the horizontal star scrolling. */
 		int per_frame_delta = flipscreen_x ? 1 : -1;
 		int total_delta = per_frame_delta * (curframe - star_rng_origin_frame);
-		
+
 		/* we can't just use % here because mod of a negative number is undefined */
 		while (total_delta < 0)
 			total_delta += STAR_RNG_PERIOD;
@@ -887,41 +887,41 @@ TIMER_CALLBACK( galaxian_stars_blink_timer )
 static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, UINT8 starmask)
 {
 	int x;
-	
+
 	/* ensure our star offset is valid */
 	star_offs %= STAR_RNG_PERIOD;
-	
+
 	/* iterate over the specified number of 6MHz pixels */
 	for (x = 0; x < maxx; x++)
 	{
 		/* stars are suppressed unless V1 ^ H8 == 1 */
 		int enable_star = (y ^ (x >> 3)) & 1;
 		UINT8 star;
-		
-		/* 
-			The RNG clock is the master clock (18MHz) ANDed with the pixel clock (6MHz).
-			The divide-by-3 circuit that produces the pixel clock generates a square wave
-			with a 2/3 duty cycle, so the result of the AND generates a clock like this:
-			            _   _   _   _   _   _   _   _
-			  MASTER: _| |_| |_| |_| |_| |_| |_| |_| |
-			            _______     _______     ______
-			  PIXEL:  _|       |___|       |___|     
-			            _   _       _   _       _   _
-			  RNG:    _| |_| |_____| |_| |_____| |_| |
-			
-			Thus for each pixel, there are 3 master clocks and 2 RNG clocks, and the RNG
-			is clocked asymmetrically. To simulate this, we expand the horizontal screen
-			size by 3 and handle the first RNG clock with one pixel and the second RNG
-			clock with two pixels.
-		*/
-		
+
+		/*
+            The RNG clock is the master clock (18MHz) ANDed with the pixel clock (6MHz).
+            The divide-by-3 circuit that produces the pixel clock generates a square wave
+            with a 2/3 duty cycle, so the result of the AND generates a clock like this:
+                        _   _   _   _   _   _   _   _
+              MASTER: _| |_| |_| |_| |_| |_| |_| |_| |
+                        _______     _______     ______
+              PIXEL:  _|       |___|       |___|
+                        _   _       _   _       _   _
+              RNG:    _| |_| |_____| |_| |_____| |_| |
+
+            Thus for each pixel, there are 3 master clocks and 2 RNG clocks, and the RNG
+            is clocked asymmetrically. To simulate this, we expand the horizontal screen
+            size by 3 and handle the first RNG clock with one pixel and the second RNG
+            clock with two pixels.
+        */
+
 		/* first RNG clock: one pixel */
 		star = stars[star_offs++];
 		if (star_offs >= STAR_RNG_PERIOD)
 			star_offs = 0;
 		if (enable_star && (star & 0x80) != 0 && (star & starmask) != 0)
 			*BITMAP_ADDR32(bitmap, y, GALAXIAN_XSCALE*x + 0) = star_color[star & 0x3f];
-		
+
 		/* second RNG clock: two pixels */
 		star = stars[star_offs++];
 		if (star_offs >= STAR_RNG_PERIOD)
@@ -938,7 +938,7 @@ static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, 
 
 /*************************************
  *
- *  Background rendering 
+ *  Background rendering
  *
  *************************************/
 
@@ -967,12 +967,12 @@ void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const 
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);
-	
+
 	/* render stars if enabled */
 	if (stars_enabled)
 	{
 		int y;
-	
+
 		/* iterate over scanlines */
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
@@ -986,7 +986,7 @@ void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const 
 void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	rectangle draw;
-	
+
 	/* color split point verified on real machine */
 	/* hmmm, according to schematics it is at 128+8; which is right? */
 	draw = *cliprect;
@@ -1010,20 +1010,20 @@ void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	for (x = 0; x < 32; x++)
 		if (flip_and_clip(&draw, x * 8, x * 8 + 7, cliprect))
 		{
-			/* 
-				The background PROM is connected the following way:
+			/*
+                The background PROM is connected the following way:
 
-			       bit 0 = 0 enables the blue gun if BCB is asserted
-			       bit 1 = 0 enables the red gun if BCR is asserted and
-			                 the green gun if BCG is asserted
-			       bits 2-7 are unconnected
+                   bit 0 = 0 enables the blue gun if BCB is asserted
+                   bit 1 = 0 enables the red gun if BCR is asserted and
+                             the green gun if BCG is asserted
+                   bits 2-7 are unconnected
 
-				The background color generator is connected this way:
+                The background color generator is connected this way:
 
-			        RED   - 270 ohm resistor
-			        GREEN - 560 ohm resistor
-			        BLUE  - 470 ohm resistor
-			*/
+                    RED   - 270 ohm resistor
+                    GREEN - 560 ohm resistor
+                    BLUE  - 470 ohm resistor
+            */
 			UINT8 red = ((~prom[x] & 0x02) && background_red) ? 0x7c : 0x00;
 			UINT8 green = ((~prom[x] & 0x02) && background_green) ? 0x3c : 0x00;
 			UINT8 blue = ((~prom[x] & 0x01) && background_blue) ? 0x47 : 0x00;
@@ -1035,11 +1035,11 @@ void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const re
 void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/*
-		The background color generator is connected this way:
+        The background color generator is connected this way:
 
-	        RED   - 390 ohm resistor
-	        GREEN - 470 ohm resistor
-	        BLUE  - 390 ohm resistor 
+            RED   - 390 ohm resistor
+            GREEN - 470 ohm resistor
+            BLUE  - 390 ohm resistor
     */
 	fillbitmap(bitmap, MAKE_RGB(background_red * 0x55, background_green * 0x47, background_blue * 0x55), cliprect);
 }
@@ -1052,13 +1052,13 @@ void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const 
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);
-	
+
 	/* render stars if enabled */
 	if (stars_enabled)
 	{
 		int blink_state = stars_blink_state & 3;
 		int y;
-		
+
 		/* iterate over scanlines */
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
@@ -1081,13 +1081,13 @@ void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);
-	
+
 	/* render stars if enabled -- same as scramble but nothing in the status area */
 	if (stars_enabled)
 	{
 		int blink_state = stars_blink_state & 3;
 		int y;
-		
+
 		/* iterate over scanlines */
 		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
@@ -1106,7 +1106,7 @@ void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 
 /*************************************
  *
- *  Bullet rendering 
+ *  Bullet rendering
  *
  *************************************/
 
@@ -1116,15 +1116,15 @@ INLINE void galaxian_draw_pixel(bitmap_t *bitmap, const rectangle *cliprect, int
 	{
 		x *= GALAXIAN_XSCALE;
 		x += GALAXIAN_H0START;
-		if (x >= cliprect->min_x && x <= cliprect->max_x) 
+		if (x >= cliprect->min_x && x <= cliprect->max_x)
 			*BITMAP_ADDR32(bitmap, y, x) = color;
-		
+
 		x++;
-		if (x >= cliprect->min_x && x <= cliprect->max_x) 
+		if (x >= cliprect->min_x && x <= cliprect->max_x)
 			*BITMAP_ADDR32(bitmap, y, x) = color;
-		
+
 		x++;
-		if (x >= cliprect->min_x && x <= cliprect->max_x) 
+		if (x >= cliprect->min_x && x <= cliprect->max_x)
 			*BITMAP_ADDR32(bitmap, y, x) = color;
 	}
 }
@@ -1133,11 +1133,11 @@ INLINE void galaxian_draw_pixel(bitmap_t *bitmap, const rectangle *cliprect, int
 void galaxian_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
 {
 	/*
-		Both "shells" and "missiles" begin displaying when the horizontal counter
-		reaches $FC, and they stop displaying when it reaches $00, resulting in 
-		4-pixel-long shots. The first 7 entries are called "shells" and render as
-		white; the final entry is called a "missile" and renders as yellow.
-	*/
+        Both "shells" and "missiles" begin displaying when the horizontal counter
+        reaches $FC, and they stop displaying when it reaches $00, resulting in
+        4-pixel-long shots. The first 7 entries are called "shells" and render as
+        white; the final entry is called a "missile" and renders as yellow.
+    */
 	x -= 4;
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, bullet_color[offs]);
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, bullet_color[offs]);
@@ -1149,10 +1149,10 @@ void galaxian_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rect
 void mshuttle_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
 {
 	/* verified by schematics:
-		* both "W" and "Y" bullets are 4 pixels long
-		* "W" bullets are enabled when H6 == 0, and are always purple
-		* "Y" bullets are enabled when H6 == 1, and vary in color based on H4,H3,H2
-	*/
+        * both "W" and "Y" bullets are 4 pixels long
+        * "W" bullets are enabled when H6 == 0, and are always purple
+        * "Y" bullets are enabled when H6 == 1, and vary in color based on H4,H3,H2
+    */
 	static const rgb_t colors[8] =
 	{
 		MAKE_RGB(0xff,0xff,0xff),
@@ -1178,10 +1178,10 @@ void mshuttle_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rect
 void scramble_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int offs, int x, int y)
 {
 	/*
-		Scramble only has "shells", which begin displaying when the counter
-		reaches $FA, and stop displaying one pixel clock layer. All shells are
-		rendered as yellow.
-	*/
+        Scramble only has "shells", which begin displaying when the counter
+        reaches $FA, and stop displaying one pixel clock layer. All shells are
+        rendered as yellow.
+    */
 	x -= 6;
 	galaxian_draw_pixel(bitmap, cliprect, y, x, MAKE_RGB(0xff,0xff,0x00));
 }
@@ -1201,7 +1201,7 @@ void theend_draw_bullet(running_machine *machine, bitmap_t *bitmap, const rectan
 
 /*************************************
  *
- *  Generic extensions 
+ *  Generic extensions
  *
  *************************************/
 
@@ -1222,7 +1222,7 @@ void upper_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *fl
 
 /*************************************
  *
- *  Frogger extensions 
+ *  Frogger extensions
  *
  *************************************/
 
@@ -1240,14 +1240,14 @@ void frogger_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*************************************
  *
- *  Ghostmuncher Galaxian extensions 
+ *  Ghostmuncher Galaxian extensions
  *
  *************************************/
 
 void gmgalax_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 {
 	*code |= gfxbank[0] << 9;
-//	*color |= gfxbank[0] << 3;
+//  *color |= gfxbank[0] << 3;
 }
 
 void gmgalax_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color)
@@ -1260,7 +1260,7 @@ void gmgalax_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*************************************
  *
- *  Pisces extensions 
+ *  Pisces extensions
  *
  *************************************/
 
@@ -1278,7 +1278,7 @@ void pisces_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *f
 
 /*************************************
  *
- *  Batman Part 2 extensions 
+ *  Batman Part 2 extensions
  *
  *************************************/
 
@@ -1292,7 +1292,7 @@ void batman2_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x)
 
 /*************************************
  *
- *  Moon Cresta extensions 
+ *  Moon Cresta extensions
  *
  *************************************/
 
@@ -1312,7 +1312,7 @@ void mooncrst_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 
 
 /*************************************
  *
- *  Moon Quasar extensions 
+ *  Moon Quasar extensions
  *
  *************************************/
 
@@ -1330,7 +1330,7 @@ void moonqsr_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*************************************
  *
- *  Moon Shuttle extensions 
+ *  Moon Shuttle extensions
  *
  *************************************/
 

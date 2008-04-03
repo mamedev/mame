@@ -262,11 +262,11 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 
 		color /= 2;		/* as sprites are 5bpp */
 		flipy = !flipy;
-//		y = (-y &0x3ff);
+//      y = (-y &0x3ff);
 
 		if (!tilenum) continue;
 
-//		flipy = !flipy;
+//      flipy = !flipy;
 		zoomx += 1;
 		zoomy += 1;
 

@@ -76,7 +76,7 @@ Notes:
       CN7/8 - 8 pin connector for power
       4AK16 - power amp IC tied to CN5/6
       675*  - 27C240 EPROMs
-      
+
 ***************************************************************************/
 
 #define CPU_CLOCK	(XTAL_24MHz / 2)	/* 68000 clock */

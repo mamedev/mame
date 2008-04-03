@@ -13,8 +13,8 @@
 
     TODO:
 
-	- remove LBIops
-	- JP/JSR/JSRP
+    - remove LBIops
+    - JP/JSR/JSRP
 
 */
 
@@ -326,7 +326,7 @@ static int cop410_execute(int cycles)
 					cop410_ICount -= opcode_map[opcode].cycles;
 				}
 				PC += InstLen[opcode];
-				
+
 				skip = 0;
 			}
 		}
@@ -439,8 +439,8 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 #endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
 
-/*		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map8 = address_map_cop410_internal_rom;								break;*/
+/*      case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
+            info->internal_map8 = address_map_cop410_internal_rom;                              break;*/
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
  			info->internal_map8 = address_map_cop410_internal_ram;								break;
 

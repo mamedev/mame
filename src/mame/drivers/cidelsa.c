@@ -62,14 +62,14 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 {
 	/*
 
-		pin		description
+        pin     description
 
-		D0		not connected
-		D1		not connected
-		D2		not connected
-		D3		2716 A10
+        D0      not connected
+        D1      not connected
+        D2      not connected
+        D3      2716 A10
 
-	*/
+    */
 
 	int bank = BIT(data, 3);
 

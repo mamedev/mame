@@ -479,7 +479,7 @@ static void pspikesb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int attr_start;//,base,first;
-//	int notdraw = 0;
+//  int notdraw = 0;
 
 //  base = chip * 0x0200;
 //  first = 4 * aerofgt_spriteram3[0x1fe + base];
@@ -500,13 +500,13 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		zoomx = (aerofgt_spriteram3[attr_start + 1] & 0xf000) >> 12;
 		zoomy = (aerofgt_spriteram3[attr_start + 0] & 0xf000) >> 12;
 		pri = aerofgt_spriteram3[attr_start + 2] & 0x0010;
-//		code = aerofgt_spriteram3[attr_start + 3] & 0x3fff;
+//      code = aerofgt_spriteram3[attr_start + 3] & 0x3fff;
 		code = aerofgt_spriteram3[attr_start + 3] & 0x1fff;
 
-//		if ((!(aerofgt_spriteram3[attr_start + 0])) & (!(aerofgt_spriteram3[attr_start + 1])) &
-//			(!(aerofgt_spriteram3[attr_start + 2])) & (!(aerofgt_spriteram3[attr_start + 3]))) notdraw = 1;
+//      if ((!(aerofgt_spriteram3[attr_start + 0])) & (!(aerofgt_spriteram3[attr_start + 1])) &
+//          (!(aerofgt_spriteram3[attr_start + 2])) & (!(aerofgt_spriteram3[attr_start + 3]))) notdraw = 1;
 
-//		if (notdraw) continue;
+//      if (notdraw) continue;
 
 		if (!(aerofgt_spriteram3[attr_start + 2] & 0x0040)) code |= 0x2000;
 
@@ -514,7 +514,7 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		zoomy = 32 + zoomy;
 
 		sy = ((oy + 16) & 0x1ff) - 16;
-			
+
 		sx = ((ox + 16) & 0x1ff) - 16;
 
 		pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],

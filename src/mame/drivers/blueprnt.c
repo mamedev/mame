@@ -49,8 +49,8 @@ write:
       should take 15 seconds according to the service manual
 
 
-	DIP locations verified for:
-	- blueprnt (manual)
+    DIP locations verified for:
+    - blueprnt (manual)
 
 */
 

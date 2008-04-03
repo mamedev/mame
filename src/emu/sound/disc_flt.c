@@ -1136,7 +1136,7 @@ static void dst_rcfilter_sw_reset(node_description *node)
 {
 	struct dst_rcfilter_sw_context *context = node->context;
 	int i;
-	
+
 	for (i=0;i<4;i++)
 		context->vCap[i] = 0;
 	node->output[0] = 0;

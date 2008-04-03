@@ -52,7 +52,7 @@
 static TIMER_CALLBACK(cop410_serial_tick)
 {
     int cpunum = param;
-	
+
 	cpuintrf_push_context(cpunum);
 
 	if (BIT(EN, 0))
@@ -81,7 +81,7 @@ static TIMER_CALLBACK(cop410_serial_tick)
 	}
 	else
 	{
-		/* SIO is a	shift register */
+		/* SIO is a shift register */
 
 		// serial output
 
@@ -140,17 +140,17 @@ INSTRUCTION(illegal)
 
 /*
 
-	Mnemonic:			ASC
-	
-	Hex Code:			30
-	Binary:				0 0 1 1 0 0 0 0
+    Mnemonic:           ASC
 
-	Data Flow:			A + C + RAM(B) -> A
-						Carry -> C
+    Hex Code:           30
+    Binary:             0 0 1 1 0 0 0 0
 
-	Skip Conditions:	Carry
+    Data Flow:          A + C + RAM(B) -> A
+                        Carry -> C
 
-	Description:		Add with Carry, Skip on Carry
+    Skip Conditions:    Carry
+
+    Description:        Add with Carry, Skip on Carry
 
 */
 
@@ -172,35 +172,35 @@ INSTRUCTION(asc)
 
 /*
 
-	Mnemonic:			ADD
-	
-	Hex Code:			31
-	Binary:				0 0 1 1 0 0 0 1
+    Mnemonic:           ADD
 
-	Data Flow:			A + RAM(B) -> A
+    Hex Code:           31
+    Binary:             0 0 1 1 0 0 0 1
 
-	Description:		Add RAM to A
+    Data Flow:          A + RAM(B) -> A
+
+    Description:        Add RAM to A
 
 */
 
 INSTRUCTION(add)
 {
-	A = (A + RAM_R(B)) & 0x0F; 
+	A = (A + RAM_R(B)) & 0x0F;
 }
 
 /*
 
-	Mnemonic:			AISC
-	
-	Operand:			y
-	Hex Code:			5-
-	Binary:				0 1 0 1 y3 y2 y1 y0
+    Mnemonic:           AISC
 
-	Data Flow:			A + y -> A
+    Operand:            y
+    Hex Code:           5-
+    Binary:             0 1 0 1 y3 y2 y1 y0
 
-	Skip Conditions:	Carry
+    Data Flow:          A + y -> A
 
-	Description:		Add Immediate, Skip on Carry (y != 0)
+    Skip Conditions:    Carry
+
+    Description:        Add Immediate, Skip on Carry (y != 0)
 
 */
 
@@ -219,14 +219,14 @@ INSTRUCTION(aisc)
 
 /*
 
-	Mnemonic:			CLRA
-	
-	Hex Code:			00
-	Binary:				0 0 0 0 0 0 0 0
+    Mnemonic:           CLRA
 
-	Data Flow:			0 -> A
+    Hex Code:           00
+    Binary:             0 0 0 0 0 0 0 0
 
-	Description:		Clear A
+    Data Flow:          0 -> A
+
+    Description:        Clear A
 
 */
 
@@ -237,14 +237,14 @@ INSTRUCTION(clra)
 
 /*
 
-	Mnemonic:			COMP
-	
-	Hex Code:			40
-	Binary:				0 1 0 0 0 0 0 0
+    Mnemonic:           COMP
 
-	Data Flow:			~A -> A
+    Hex Code:           40
+    Binary:             0 1 0 0 0 0 0 0
 
-	Description:		Ones Complement of A to A
+    Data Flow:          ~A -> A
+
+    Description:        Ones Complement of A to A
 
 */
 
@@ -255,12 +255,12 @@ INSTRUCTION(comp)
 
 /*
 
-	Mnemonic:			NOP
-	
-	Hex Code:			44
-	Binary:				0 1 0 0 0 1 0 0
+    Mnemonic:           NOP
 
-	Description:		No Operation
+    Hex Code:           44
+    Binary:             0 1 0 0 0 1 0 0
+
+    Description:        No Operation
 
 */
 
@@ -271,14 +271,14 @@ INSTRUCTION(nop)
 
 /*
 
-	Mnemonic:			RC
-	
-	Hex Code:			32
-	Binary:				0 0 1 1 0 0 1 0
+    Mnemonic:           RC
 
-	Data Flow:			"0" -> C
+    Hex Code:           32
+    Binary:             0 0 1 1 0 0 1 0
 
-	Description:		Reset C
+    Data Flow:          "0" -> C
+
+    Description:        Reset C
 
 */
 
@@ -289,14 +289,14 @@ INSTRUCTION(rc)
 
 /*
 
-	Mnemonic:			SC
-	
-	Hex Code:			22
-	Binary:				0 0 1 0 0 0 1 0
+    Mnemonic:           SC
 
-	Data Flow:			"1" -> C
+    Hex Code:           22
+    Binary:             0 0 1 0 0 0 1 0
 
-	Description:		Set C
+    Data Flow:          "1" -> C
+
+    Description:        Set C
 
 */
 
@@ -307,14 +307,14 @@ INSTRUCTION(sc)
 
 /*
 
-	Mnemonic:			XOR
-	
-	Hex Code:			02
-	Binary:				0 0 0 0 0 0 1 0
+    Mnemonic:           XOR
 
-	Data Flow:			A ^ RAM(B) -> A
+    Hex Code:           02
+    Binary:             0 0 0 0 0 0 1 0
 
-	Description:		Exclusive-OR RAM with A
+    Data Flow:          A ^ RAM(B) -> A
+
+    Description:        Exclusive-OR RAM with A
 
 */
 
@@ -327,14 +327,14 @@ INSTRUCTION(xor)
 
 /*
 
-	Mnemonic:			JID
-	
-	Hex Code:			FF
-	Binary:				1 1 1 1 1 1 1 1
+    Mnemonic:           JID
 
-	Data Flow:			ROM(PC9:8,A,M) -> PC7:0
+    Hex Code:           FF
+    Binary:             1 1 1 1 1 1 1 1
 
-	Description:		Jump Indirect
+    Data Flow:          ROM(PC9:8,A,M) -> PC7:0
+
+    Description:        Jump Indirect
 
 */
 
@@ -346,15 +346,15 @@ INSTRUCTION(jid)
 
 /*
 
-	Mnemonic:			JMP
-	
-	Operand:			a
-	Hex Code:			6- --
-	Binary:				0 1 1 0 0 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
+    Mnemonic:           JMP
 
-	Data Flow:			a -> PC
+    Operand:            a
+    Hex Code:           6- --
+    Binary:             0 1 1 0 0 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
 
-	Description:		Jump
+    Data Flow:          a -> PC
+
+    Description:        Jump
 
 */
 
@@ -367,21 +367,21 @@ INSTRUCTION(jmp)
 
 /*
 
-	Mnemonic:			JP
-	
-	Operand:			a
-	Hex Code:			--
-	Binary:				1 a6 a5 a4 a3 a2 a1 a0
-						(pages 2,3 only)
+    Mnemonic:           JP
 
-						1 1 a5 a4 a3 a2 a1 a0
-						(all other pages)
+    Operand:            a
+    Hex Code:           --
+    Binary:             1 a6 a5 a4 a3 a2 a1 a0
+                        (pages 2,3 only)
 
-	Data Flow:			a -> PC6:0
+                        1 1 a5 a4 a3 a2 a1 a0
+                        (all other pages)
 
-						a -> PC5:0
+    Data Flow:          a -> PC6:0
 
-	Description:		Jump within Page
+                        a -> PC5:0
+
+    Description:        Jump within Page
 
 */
 
@@ -410,16 +410,16 @@ INSTRUCTION(jp)
 
 /*
 
-	Mnemonic:			JSR
-	
-	Operand:			a
-	Hex Code:			6- --
-	Binary:				0 1 1 0 1 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
+    Mnemonic:           JSR
 
-	Data Flow:			PC + 1 -> SA -> SB -> SC
-						a -> PC
+    Operand:            a
+    Hex Code:           6- --
+    Binary:             0 1 1 0 1 0 a9 a8 a7 a6 a5 a4 a3 a2 a1 a0
 
-	Description:		Jump to Subroutine
+    Data Flow:          PC + 1 -> SA -> SB -> SC
+                        a -> PC
+
+    Description:        Jump to Subroutine
 
 */
 
@@ -433,14 +433,14 @@ INSTRUCTION(jsr)
 
 /*
 
-	Mnemonic:			RET
-	
-	Hex Code:			48
-	Binary:				0 1 0 0 1 0 0 0
+    Mnemonic:           RET
 
-	Data Flow:			SC -> SB -> SA -> PC
+    Hex Code:           48
+    Binary:             0 1 0 0 1 0 0 0
 
-	Description:		Return from Subroutine
+    Data Flow:          SC -> SB -> SA -> PC
+
+    Description:        Return from Subroutine
 
 */
 
@@ -451,16 +451,16 @@ INSTRUCTION(ret)
 
 /*
 
-	Mnemonic:			RETSK
-	
-	Hex Code:			49
-	Binary:				0 1 0 0 1 0 0 1
+    Mnemonic:           RETSK
 
-	Data Flow:			SC -> SB -> SA -> PC
+    Hex Code:           49
+    Binary:             0 1 0 0 1 0 0 1
 
-	Skip Conditions:	Always Skip on Return
+    Data Flow:          SC -> SB -> SA -> PC
 
-	Description:		Return from Subroutine then Skip
+    Skip Conditions:    Always Skip on Return
+
+    Description:        Return from Subroutine then Skip
 
 */
 
@@ -474,15 +474,15 @@ INSTRUCTION(retsk)
 
 /*
 
-	Mnemonic:			CAMQ
-	
-	Hex Code:			33 3C
-	Binary:				0 0 1 1 0 0 1 1	0 0 1 1 1 1 0 0
+    Mnemonic:           CAMQ
 
-	Data Flow:			A -> Q7:4
-						RAM(B) -> Q3:0
+    Hex Code:           33 3C
+    Binary:             0 0 1 1 0 0 1 1 0 0 1 1 1 1 0 0
 
-	Description:		Copy A, RAM to Q
+    Data Flow:          A -> Q7:4
+                        RAM(B) -> Q3:0
+
+    Description:        Copy A, RAM to Q
 
 */
 
@@ -493,16 +493,16 @@ INSTRUCTION(camq)
 
 /*
 
-	Mnemonic:			LD
-	
-	Operand:			r
-	Hex Code:			-5
-	Binary:				0 0 r1 r0 0 1 0 1
+    Mnemonic:           LD
 
-	Data Flow:			RAM(B) -> A
-						Br ^ r -> Br
+    Operand:            r
+    Hex Code:           -5
+    Binary:             0 0 r1 r0 0 1 0 1
 
-	Description:		Load RAM into A, Exclusive-OR Br with r
+    Data Flow:          RAM(B) -> A
+                        Br ^ r -> Br
+
+    Description:        Load RAM into A, Exclusive-OR Br with r
 
 */
 
@@ -516,15 +516,15 @@ INSTRUCTION(ld)
 
 /*
 
-	Mnemonic:			LQID
-	
-	Hex Code:			BF
-	Binary:				1 0 1 1 1 1 1 1
+    Mnemonic:           LQID
 
-	Data Flow:			ROM(PC9:8,A,M) -> Q
-						SB -> SC
+    Hex Code:           BF
+    Binary:             1 0 1 1 1 1 1 1
 
-	Description:		Load Q Indirect
+    Data Flow:          ROM(PC9:8,A,M) -> Q
+                        SB -> SC
+
+    Description:        Load Q Indirect
 
 */
 
@@ -538,29 +538,29 @@ INSTRUCTION(lqid)
 
 /*
 
-	Mnemonic:			RMB
-	
-	Operand:			0
-						1
-						2
-						3
+    Mnemonic:           RMB
 
-	Hex Code:			4C
-						45
-						42
-						43
+    Operand:            0
+                        1
+                        2
+                        3
 
-	Binary:				0 1 0 0 1 1 0 0
-						0 1 0 0 0 1 0 1
-						0 1 0 0 0 0 1 0
-						0 1 0 0 0 0 1 1
+    Hex Code:           4C
+                        45
+                        42
+                        43
 
-	Data Flow:			0 -> RAM(B)0
-						0 -> RAM(B)1
-						0 -> RAM(B)2
-						0 -> RAM(B)3
+    Binary:             0 1 0 0 1 1 0 0
+                        0 1 0 0 0 1 0 1
+                        0 1 0 0 0 0 1 0
+                        0 1 0 0 0 0 1 1
 
-	Description:		Reset RAM Bit
+    Data Flow:          0 -> RAM(B)0
+                        0 -> RAM(B)1
+                        0 -> RAM(B)2
+                        0 -> RAM(B)3
+
+    Description:        Reset RAM Bit
 
 */
 
@@ -571,29 +571,29 @@ INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); }
 
 /*
 
-	Mnemonic:			SMB
-	
-	Operand:			0
-						1
-						2
-						3
+    Mnemonic:           SMB
 
-	Hex Code:			4D
-						47
-						46
-						4B
+    Operand:            0
+                        1
+                        2
+                        3
 
-	Binary:				0 1 0 0 1 1 0 1
-						0 1 0 0 0 1 1 1
-						0 1 0 0 0 1 1 0
-						0 1 0 0 1 0 1 1
+    Hex Code:           4D
+                        47
+                        46
+                        4B
 
-	Data Flow:			1 -> RAM(B)0
-						1 -> RAM(B)1
-						1 -> RAM(B)2
-						1 -> RAM(B)3
+    Binary:             0 1 0 0 1 1 0 1
+                        0 1 0 0 0 1 1 1
+                        0 1 0 0 0 1 1 0
+                        0 1 0 0 1 0 1 1
 
-	Description:		Set RAM Bit
+    Data Flow:          1 -> RAM(B)0
+                        1 -> RAM(B)1
+                        1 -> RAM(B)2
+                        1 -> RAM(B)3
+
+    Description:        Set RAM Bit
 
 */
 
@@ -604,16 +604,16 @@ INSTRUCTION(smb3) { RAM_W(B, RAM_R(B) | 0x8); }
 
 /*
 
-	Mnemonic:			STII
-	
-	Operand:			y
-	Hex Code:			7-
-	Binary:				0 1 1 1 y3 y2 y1 y0
+    Mnemonic:           STII
 
-	Data Flow:			y -> RAM(B)
-						Bd + 1 -> Bd
+    Operand:            y
+    Hex Code:           7-
+    Binary:             0 1 1 1 y3 y2 y1 y0
 
-	Description:		Store Memory Immediate and Increment Bd
+    Data Flow:          y -> RAM(B)
+                        Bd + 1 -> Bd
+
+    Description:        Store Memory Immediate and Increment Bd
 
 */
 
@@ -630,16 +630,16 @@ INSTRUCTION(stii)
 
 /*
 
-	Mnemonic:			X
-	
-	Operand:			r
-	Hex Code:			-6
-	Binary:				0 0 r1 r0 0 1 1 0
+    Mnemonic:           X
 
-	Data Flow:			RAM(B) <-> A
-						Br ^ r -> Br
+    Operand:            r
+    Hex Code:           -6
+    Binary:             0 0 r1 r0 0 1 1 0
 
-	Description:		Exchange RAM with A, Exclusive-OR Br with r
+    Data Flow:          RAM(B) <-> A
+                        Br ^ r -> Br
+
+    Description:        Exchange RAM with A, Exclusive-OR Br with r
 
 */
 
@@ -656,15 +656,15 @@ INSTRUCTION(x)
 
 /*
 
-	Mnemonic:			XAD
-	
-	Operand:			r,d
-	Hex Code:			23 --
-	Binary:				0 0 1 0 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
+    Mnemonic:           XAD
 
-	Data Flow:			RAM(r,d) <-> A
+    Operand:            r,d
+    Hex Code:           23 --
+    Binary:             0 0 1 0 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
 
-	Description:		Exchange A with RAM pointed to directly by r,d
+    Data Flow:          RAM(r,d) <-> A
+
+    Description:        Exchange A with RAM pointed to directly by r,d
 
 */
 
@@ -680,19 +680,19 @@ INSTRUCTION(xad)
 
 /*
 
-	Mnemonic:			XDS
-	
-	Operand:			r
-	Hex Code:			-7
-	Binary:				0 0 r1 r0 0 1 1 1
+    Mnemonic:           XDS
 
-	Data Flow:			RAM(B) <-> A
-						Bd - 1 -> Bd
-						Br ^ r -> Br
+    Operand:            r
+    Hex Code:           -7
+    Binary:             0 0 r1 r0 0 1 1 1
 
-	Skip Conditions:	Bd decrements past 0
+    Data Flow:          RAM(B) <-> A
+                        Bd - 1 -> Bd
+                        Br ^ r -> Br
 
-	Description:		Exchange RAM with A and Decrement Bd, Exclusive-OR Br with r
+    Skip Conditions:    Bd decrements past 0
+
+    Description:        Exchange RAM with A and Decrement Bd, Exclusive-OR Br with r
 
 */
 
@@ -715,19 +715,19 @@ INSTRUCTION(xds)
 
 /*
 
-	Mnemonic:			XIS
-	
-	Operand:			r
-	Hex Code:			-4
-	Binary:				0 0 r1 r0 0 1 0 0
+    Mnemonic:           XIS
 
-	Data Flow:			RAM(B) <-> A
-						Bd + 1 -> Bd
-						Br ^ r -> Br
+    Operand:            r
+    Hex Code:           -4
+    Binary:             0 0 r1 r0 0 1 0 0
 
-	Skip Conditions:	Bd increments past 15
+    Data Flow:          RAM(B) <-> A
+                        Bd + 1 -> Bd
+                        Br ^ r -> Br
 
-	Description:		Exchange RAM with A and Increment Bd, Exclusive-OR Br with r
+    Skip Conditions:    Bd increments past 15
+
+    Description:        Exchange RAM with A and Increment Bd, Exclusive-OR Br with r
 
 */
 
@@ -752,14 +752,14 @@ INSTRUCTION(xis)
 
 /*
 
-	Mnemonic:			CAB
-	
-	Hex Code:			50
-	Binary:				0 1 0 1 0 0 0 0 0
+    Mnemonic:           CAB
 
-	Data Flow:			A -> Bd
+    Hex Code:           50
+    Binary:             0 1 0 1 0 0 0 0 0
 
-	Description:		Copy A to Bd
+    Data Flow:          A -> Bd
+
+    Description:        Copy A to Bd
 
 */
 
@@ -770,14 +770,14 @@ INSTRUCTION(cab)
 
 /*
 
-	Mnemonic:			CBA
-	
-	Hex Code:			4E
-	Binary:				0 1 0 0 1 1 1 0
+    Mnemonic:           CBA
 
-	Data Flow:			Bd -> A
+    Hex Code:           4E
+    Binary:             0 1 0 0 1 1 1 0
 
-	Description:		Copy Bd to A
+    Data Flow:          Bd -> A
+
+    Description:        Copy Bd to A
 
 */
 
@@ -788,20 +788,20 @@ INSTRUCTION(cba)
 
 /*
 
-	Mnemonic:			LBI
-	
-	Operand:			r,d
-	Hex Code:			--
-						33 --
+    Mnemonic:           LBI
 
-	Binary:				0 0 r1 r0 d3 d2 d1 d0 (d-1)
-						0 0 1 1 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
+    Operand:            r,d
+    Hex Code:           --
+                        33 --
 
-	Data Flow:			r,d -> B
+    Binary:             0 0 r1 r0 d3 d2 d1 d0 (d-1)
+                        0 0 1 1 0 0 1 1 1 0 r1 r0 d3 d2 d1 d0
 
-	Skip Conditions:	Skip until not a LBI
+    Data Flow:          r,d -> B
 
-	Description:		Load B Immediate with r,d
+    Skip Conditions:    Skip until not a LBI
+
+    Description:        Load B Immediate with r,d
 
 */
 
@@ -821,15 +821,15 @@ INSTRUCTION(lbi)
 
 /*
 
-	Mnemonic:			LEI
-	
-	Operand:			y
-	Hex Code:			33 6-
-	Binary:				0 0 1 1 0 0 1 1 0 1 1 0 y3 y2 y1 y0
+    Mnemonic:           LEI
 
-	Data Flow:			y -> EN
+    Operand:            y
+    Hex Code:           33 6-
+    Binary:             0 0 1 1 0 0 1 1 0 1 1 0 y3 y2 y1 y0
 
-	Description:		Load EN Immediate
+    Data Flow:          y -> EN
+
+    Description:        Load EN Immediate
 
 */
 
@@ -849,32 +849,32 @@ INSTRUCTION(lei)
 
 /*
 
-	Mnemonic:			SKC
-	
-	Hex Code:			20
-	Binary:				0 0 1 0 0 0 0 0
+    Mnemonic:           SKC
 
-	Skip Conditions:	C = "1"
+    Hex Code:           20
+    Binary:             0 0 1 0 0 0 0 0
 
-	Description:		Skip if C is True
+    Skip Conditions:    C = "1"
+
+    Description:        Skip if C is True
 
 */
 
 INSTRUCTION(skc)
 {
-	if (C == 1) skip = 1; 
+	if (C == 1) skip = 1;
 }
 
 /*
 
-	Mnemonic:			SKE
-	
-	Hex Code:			21
-	Binary:				0 0 1 0 0 0 0 1
+    Mnemonic:           SKE
 
-	Skip Conditions:	A = RAM(B)
+    Hex Code:           21
+    Binary:             0 0 1 0 0 0 0 1
 
-	Description:		Skip if A Equals RAM
+    Skip Conditions:    A = RAM(B)
+
+    Description:        Skip if A Equals RAM
 
 */
 
@@ -885,14 +885,14 @@ INSTRUCTION(ske)
 
 /*
 
-	Mnemonic:			SKGZ
-	
-	Hex Code:			33 21
-	Binary:				00 0 1 1 0 0 1 1 0 0 1 0 0 0 0 1
+    Mnemonic:           SKGZ
 
-	Skip Conditions:	G3:0 = 0
+    Hex Code:           33 21
+    Binary:             00 0 1 1 0 0 1 1 0 0 1 0 0 0 0 1
 
-	Description:		Skip if G is Zero (all 4 bits)
+    Skip Conditions:    G3:0 = 0
+
+    Description:        Skip if G is Zero (all 4 bits)
 
 */
 
@@ -903,21 +903,21 @@ INSTRUCTION(skgz)
 
 /*
 
-	Mnemonic:			SKGBZ
-	
-	Hex Code:			33 01
-						33 11
-						33 03
-						33 13
-	
-	Binary:				
+    Mnemonic:           SKGBZ
 
-	Skip Conditions:	G0 = 0
-						G1 = 0
-						G2 = 0
-						G3 = 0
+    Hex Code:           33 01
+                        33 11
+                        33 03
+                        33 13
 
-	Description:		Skip if G Bit is Zero
+    Binary:
+
+    Skip Conditions:    G0 = 0
+                        G1 = 0
+                        G2 = 0
+                        G3 = 0
+
+    Description:        Skip if G Bit is Zero
 
 */
 
@@ -933,21 +933,21 @@ INSTRUCTION(skgbz3) { skgbz(3); }
 
 /*
 
-	Mnemonic:			SKMBZ
-	
-	Hex Code:			01
-						11
-						03
-						13
+    Mnemonic:           SKMBZ
 
-	Binary:				
+    Hex Code:           01
+                        11
+                        03
+                        13
 
-	Skip Conditions:	RAM(B)0 = 0
-						RAM(B)0 = 1
-						RAM(B)0 = 2
-						RAM(B)0 = 3
+    Binary:
 
-	Description:		Skip if RAM Bit is Zero
+    Skip Conditions:    RAM(B)0 = 0
+                        RAM(B)0 = 1
+                        RAM(B)0 = 2
+                        RAM(B)0 = 3
+
+    Description:        Skip if RAM Bit is Zero
 
 */
 
@@ -965,14 +965,14 @@ INSTRUCTION(skmbz3) { skmbz(3); }
 
 /*
 
-	Mnemonic:			ING
-	
-	Hex Code:			33 2A
-	Binary:				
+    Mnemonic:           ING
 
-	Data Flow:			G -> A
+    Hex Code:           33 2A
+    Binary:
 
-	Description:		Input G Ports to A
+    Data Flow:          G -> A
+
+    Description:        Input G Ports to A
 
 */
 
@@ -983,15 +983,15 @@ INSTRUCTION(ing)
 
 /*
 
-	Mnemonic:			INL
-	
-	Hex Code:			33 2E
-	Binary:				
+    Mnemonic:           INL
 
-	Data Flow:			L7:4 -> RAM(B)
-						L3:0 -> A
+    Hex Code:           33 2E
+    Binary:
 
-	Description:		Input L Ports to RAM,A
+    Data Flow:          L7:4 -> RAM(B)
+                        L3:0 -> A
+
+    Description:        Input L Ports to RAM,A
 
 */
 
@@ -1005,14 +1005,14 @@ INSTRUCTION(inl)
 
 /*
 
-	Mnemonic:			OBD
-	
-	Hex Code:			33 3E
-	Binary:				
+    Mnemonic:           OBD
 
-	Data Flow:			Bd -> D
+    Hex Code:           33 3E
+    Binary:
 
-	Description:		Output Bd to D Outputs
+    Data Flow:          Bd -> D
+
+    Description:        Output Bd to D Outputs
 
 */
 
@@ -1023,14 +1023,14 @@ INSTRUCTION(obd)
 
 /*
 
-	Mnemonic:			OMG
-	
-	Hex Code:			33 3A
-	Binary:				
+    Mnemonic:           OMG
 
-	Data Flow:			RAM(B) -> G
+    Hex Code:           33 3A
+    Binary:
 
-	Description:		Output RAM to G Ports
+    Data Flow:          RAM(B) -> G
+
+    Description:        Output RAM to G Ports
 
 */
 
@@ -1041,15 +1041,15 @@ INSTRUCTION(omg)
 
 /*
 
-	Mnemonic:			XAS
-	
-	Hex Code:			4F
-	Binary:				0 1 0 0 1 1 1 1
+    Mnemonic:           XAS
 
-	Data Flow:			A <-> SIO
-						C -> SK
+    Hex Code:           4F
+    Binary:             0 1 0 0 1 1 1 1
 
-	Description:		Exchange A with SIO
+    Data Flow:          A <-> SIO
+                        C -> SK
+
+    Description:        Exchange A with SIO
 
 */
 

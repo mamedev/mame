@@ -910,7 +910,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
- 
+
 static const gfx_layout char_layout =
 {
 	8,8,
@@ -1441,16 +1441,16 @@ ROM_END
 
 
 /* this is a well known italian bootleg of Double Dragon it can be identified by the following gameplay trait
- -- The Boss of level 4 is coloured like level 1 and 5 instead of green, and is invulnerable to rocks attack. 
+ -- The Boss of level 4 is coloured like level 1 and 5 instead of green, and is invulnerable to rocks attack.
 
  in terms of code the game code has been heavily modified, banking writes appear to have been removed, and
  the graphic roms are all scrambled.  The game also runs on 3x M6809 rather than the original CPUs.
- 
+
  I'm not 100% convinced the program roms are good dumps, apprently ROM3 fails on the original board (could just
  be due to the rom hacking, as the game runs fine) but there is a jump to the 0x2000 region in the code, although
  this could be additional protection / rom scrambling.  Also the sound roms seem too small.  If you have this
  PCB please verify.
- 
+
  */
 ROM_START( ddgn6809 )
 	ROM_REGION( 0x30000, REGION_CPU1, 0 )	/* 64k for code + bankswitched memory */
@@ -1464,35 +1464,35 @@ ROM_START( ddgn6809 )
 
 	ROM_REGION( 0x10000, REGION_CPU3, 0 ) /* audio cpu */
 	ROM_LOAD( "21.bin",      0x08000, 0x08000, CRC(4437fc51) SHA1(fffcf2bec50d0b79861904b4abc607206b7794e6) )
-	
+
 	/* all the gfx roms are scrambled on this set */
 	ROM_REGION( 0x08000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "13.bin",        0x00000, 0x08000, CRC(b5a54537) SHA1(a6157cde4f9738565008d11a4a6d8576ae3abfef) )	/* chars */
 
 	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE )
-	ROM_LOAD( "22.bin",        0x00000, 0x08000, CRC(fe08ef61) SHA1(50404936934dc61f3553add4d4b918529b3b5ef3) )	
-	ROM_LOAD( "23.bin",        0x08000, 0x08000, CRC(988bea93) SHA1(053ebb5a71dfdb68ae88ef49d8409a99f8c6926d) )	
-	ROM_LOAD( "24.bin",        0x10000, 0x08000, CRC(437501fc) SHA1(e7758e0fb226ae46eb398bd95f5e95c90b6adb93) )	
-	ROM_LOAD( "25.bin",        0x18000, 0x08000, CRC(d302f69b) SHA1(64d4d8ae38457ee6b361b5157ec0557f9a7639a8) )	
-	ROM_LOAD( "26.bin",        0x20000, 0x08000, CRC(8ece953e) SHA1(12a43e1ed1a99b04299941a9506228490649b181) )	
-	ROM_LOAD( "27.bin",        0x28000, 0x08000, CRC(15cd16cb) SHA1(ab2068ebba14da256e8f2600f34dca0e048a1de9) )	
-	ROM_LOAD( "28.bin",        0x30000, 0x08000, CRC(51b8a217) SHA1(60c067cd7272f856e29cdb64312535236656891a) )	
-	ROM_LOAD( "29.bin",        0x38000, 0x08000, CRC(e4ec2394) SHA1(43376ce2a07c1fc3053f7ac9b750e944d289105b) )	
-	ROM_LOAD( "1.bin",         0x40000, 0x08000, CRC(2485a71d) SHA1(3e987a2f3e9a59da5fdc7bb779a43736ca67aac7) )	
-	ROM_LOAD( "2.bin",         0x48000, 0x08000, CRC(6940120d) SHA1(bbe94f095ef983f54658c936f916ba6a72a84ead) )	
-	ROM_LOAD( "3.bin",         0x50000, 0x08000, CRC(c67aac12) SHA1(aab535507e3889bf1bdc2f4fe4828a70a350ba63) )	
-	ROM_LOAD( "4.bin",         0x58000, 0x08000, CRC(941dcd08) SHA1(266dee264f28affe8c3f57fe569929817ae16508) )	
-	ROM_LOAD( "5.bin",         0x60000, 0x08000, CRC(42d36bc3) SHA1(080cbc3ffda8ab26dc65a8e9eaf948c509d064b3) )	
-	ROM_LOAD( "6.bin",         0x68000, 0x08000, CRC(d5d19a8d) SHA1(c4b044dd12d6468c0ad114644f01813d4fe9a673) )	
-	ROM_LOAD( "7.bin",         0x70000, 0x08000, CRC(d4e350cd) SHA1(78ed2baa8c52b766f998091e7ce9e1a2941352e7) )	
-	ROM_LOAD( "8.bin",         0x78000, 0x08000, CRC(204fdb7d) SHA1(f75b1bc6f65e7a33927cd451267fcd7e2aa44f7e) )	
+	ROM_LOAD( "22.bin",        0x00000, 0x08000, CRC(fe08ef61) SHA1(50404936934dc61f3553add4d4b918529b3b5ef3) )
+	ROM_LOAD( "23.bin",        0x08000, 0x08000, CRC(988bea93) SHA1(053ebb5a71dfdb68ae88ef49d8409a99f8c6926d) )
+	ROM_LOAD( "24.bin",        0x10000, 0x08000, CRC(437501fc) SHA1(e7758e0fb226ae46eb398bd95f5e95c90b6adb93) )
+	ROM_LOAD( "25.bin",        0x18000, 0x08000, CRC(d302f69b) SHA1(64d4d8ae38457ee6b361b5157ec0557f9a7639a8) )
+	ROM_LOAD( "26.bin",        0x20000, 0x08000, CRC(8ece953e) SHA1(12a43e1ed1a99b04299941a9506228490649b181) )
+	ROM_LOAD( "27.bin",        0x28000, 0x08000, CRC(15cd16cb) SHA1(ab2068ebba14da256e8f2600f34dca0e048a1de9) )
+	ROM_LOAD( "28.bin",        0x30000, 0x08000, CRC(51b8a217) SHA1(60c067cd7272f856e29cdb64312535236656891a) )
+	ROM_LOAD( "29.bin",        0x38000, 0x08000, CRC(e4ec2394) SHA1(43376ce2a07c1fc3053f7ac9b750e944d289105b) )
+	ROM_LOAD( "1.bin",         0x40000, 0x08000, CRC(2485a71d) SHA1(3e987a2f3e9a59da5fdc7bb779a43736ca67aac7) )
+	ROM_LOAD( "2.bin",         0x48000, 0x08000, CRC(6940120d) SHA1(bbe94f095ef983f54658c936f916ba6a72a84ead) )
+	ROM_LOAD( "3.bin",         0x50000, 0x08000, CRC(c67aac12) SHA1(aab535507e3889bf1bdc2f4fe4828a70a350ba63) )
+	ROM_LOAD( "4.bin",         0x58000, 0x08000, CRC(941dcd08) SHA1(266dee264f28affe8c3f57fe569929817ae16508) )
+	ROM_LOAD( "5.bin",         0x60000, 0x08000, CRC(42d36bc3) SHA1(080cbc3ffda8ab26dc65a8e9eaf948c509d064b3) )
+	ROM_LOAD( "6.bin",         0x68000, 0x08000, CRC(d5d19a8d) SHA1(c4b044dd12d6468c0ad114644f01813d4fe9a673) )
+	ROM_LOAD( "7.bin",         0x70000, 0x08000, CRC(d4e350cd) SHA1(78ed2baa8c52b766f998091e7ce9e1a2941352e7) )
+	ROM_LOAD( "8.bin",         0x78000, 0x08000, CRC(204fdb7d) SHA1(f75b1bc6f65e7a33927cd451267fcd7e2aa44f7e) )
 
 	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )
-	ROM_LOAD( "9.bin",         0x00000, 0x10000, CRC(736eff0f) SHA1(ae2ec2d5c8ab1db579a08256d874426dc5d889c6) )	
-	ROM_LOAD( "10.bin",        0x10000, 0x10000, CRC(a670d088) SHA1(27e7b49645753dd039f104c3e0a7e6513a98710d) )	
-	ROM_LOAD( "11.bin",        0x20000, 0x10000, CRC(4171b70d) SHA1(dc300c9bca6481417e97ad03c973e47389f261c1) )	
-	ROM_LOAD( "12.bin",        0x30000, 0x10000, CRC(5f6a6d6f) SHA1(7d546a226cda81c28e7ccfb4c5daebc65072198d) )	
-	
+	ROM_LOAD( "9.bin",         0x00000, 0x10000, CRC(736eff0f) SHA1(ae2ec2d5c8ab1db579a08256d874426dc5d889c6) )
+	ROM_LOAD( "10.bin",        0x10000, 0x10000, CRC(a670d088) SHA1(27e7b49645753dd039f104c3e0a7e6513a98710d) )
+	ROM_LOAD( "11.bin",        0x20000, 0x10000, CRC(4171b70d) SHA1(dc300c9bca6481417e97ad03c973e47389f261c1) )
+	ROM_LOAD( "12.bin",        0x30000, 0x10000, CRC(5f6a6d6f) SHA1(7d546a226cda81c28e7ccfb4c5daebc65072198d) )
+
 	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* adpcm samples -- roms too small? (please check) */
 	ROM_LOAD( "14.bin",        0x00000, 0x08000, BAD_DUMP CRC(678f8657) SHA1(2652fdc6719d2c889ca87802f6e2cefae59fc2eb) )
 	ROM_LOAD( "15.bin",        0x10000, 0x08000, BAD_DUMP CRC(10f21dea) SHA1(739cf649f91490384297a81a2cc9855acb58a1c0) )

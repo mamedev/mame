@@ -41,16 +41,16 @@
  * does not do individual device emulation, but instead does a function
  * emulation. So you will need to convert the schematic design into
  * a logic block representation.
- * 
+ *
  * There is the possibility to support multiple outputs per module.
  * In this case, NODE_XXX is the default ouput. Alternative outputs may
  * be accessed by using NODE_XXX_YY where 00<=Y<08.
- * 
+ *
  * You may also access nodes with a macros:
- * 
+ *
  *     NODE_XXX = NODE_SUB(XXX, 0)
- * 	   NODE_XXX = NODE(XXX)
- *     NODE_XXX_YY = NODE_SUB(XXX, YY) with YY != 00 
+ *     NODE_XXX = NODE(XXX)
+ *     NODE_XXX_YY = NODE_SUB(XXX, YY) with YY != 00
  *
  * One node point may feed a number of inputs, for example you could
  * connect the output of a DISCRETE_SINEWAVE to the AMPLITUDE input
@@ -2596,11 +2596,11 @@
  *
  ***********************************************************************
  *
- * DISCRETE_RCFILTER_SW - Multiple switchable RC filters 
+ * DISCRETE_RCFILTER_SW - Multiple switchable RC filters
  *
- *                             R       
- *    INPUT      >-----------ZZZZ-+-------+----......-----> Output  
- *                                |       |    
+ *                             R
+ *    INPUT      >-----------ZZZZ-+-------+----......-----> Output
+ *                                |       |
  *                               +-+     +-+
  *    SWITCH     > Bit 0 ---->F1 | |  F2 | |
  *                               '-'   ^ '-'
@@ -2611,7 +2611,7 @@
  *                                |       |
  *                               GND     GND
  *
- * 
+ *
  *  Declaration syntax
  *
  *     DISCRETE_RCFILTER_SW(name of node,
@@ -2624,11 +2624,11 @@
  *                          C3 in Farads,
  *                          C4 in Farads)
  *
- *     This is a typical filter circuit in circusc or scramble. 
- *     Switches are usually CD4066 with a "open" resistance of 
+ *     This is a typical filter circuit in circusc or scramble.
+ *     Switches are usually CD4066 with a "open" resistance of
  *     typical 470 Ohms at 5V.
  *     This circuit supports up to 4 filters.
- * 
+ *
  * EXAMPLES: see circusc
  *
  ***********************************************************************
@@ -3690,7 +3690,7 @@ typedef struct _discrete_inverter_osc_desc discrete_inverter_osc_desc;
 	NODE_ ## _x ## _01, NODE_ ## _x ## _02, NODE_ ## _x ## _03, NODE_ ## _x ## _04, \
 	NODE_ ## _x ## _05, NODE_ ## _x ## _06, NODE_ ## _x ## _07
 
-enum { 
+enum {
 	NODE0_DEF(0), NODE0_DEF(1), NODE0_DEF(2), NODE0_DEF(3), NODE0_DEF(4), NODE0_DEF(5), NODE0_DEF(6), NODE0_DEF(7), NODE0_DEF(8), NODE0_DEF(9),
 	NODE_DEF(10), NODE_DEF(11), NODE_DEF(12), NODE_DEF(13), NODE_DEF(14), NODE_DEF(15), NODE_DEF(16), NODE_DEF(17), NODE_DEF(18), NODE_DEF(19),
 	NODE_DEF(20), NODE_DEF(21), NODE_DEF(22), NODE_DEF(23), NODE_DEF(24), NODE_DEF(25), NODE_DEF(26), NODE_DEF(27), NODE_DEF(28), NODE_DEF(29),
@@ -3731,7 +3731,7 @@ enum {
 #if DISCRETE_MAX_NODE_OUTPUTS == 8
 #define NODE_CHILD_NODE_NUM(_x)		((_x) & 7)
 #define NODE_DEFAULT_NODE(_x)		((_x) & ~7)
-#define NODE_INDEX(_x)				(((_x) - NODE_START)>>3)	
+#define NODE_INDEX(_x)				(((_x) - NODE_START)>>3)
 #else
 #error "DISCRETE_MAX_NODE_OUTPUTS != 8"
 #endif

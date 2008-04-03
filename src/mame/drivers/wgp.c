@@ -677,7 +677,7 @@ static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x143fff) AM_READWRITE(sharedram_r,sharedram_w)
 	AM_RANGE(0x200000, 0x200003) AM_READWRITE(wgp_sound_r,wgp_sound_w)
-//  AM_RANGE(0x380000, 0x383fff) AM_READ(SMH_RAM)		// LAN RAM
+//  AM_RANGE(0x380000, 0x383fff) AM_READ(SMH_RAM)       // LAN RAM
 //  AM_RANGE(0x380000, 0x383fff) AM_WRITE(SMH_RAM)    // LAN RAM
 	AM_RANGE(0x380000, 0x380001) AM_READ(lan_status_r)	// ??
 	// a lan input area is read somewhere above the status

@@ -735,7 +735,7 @@ static int scsicd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 		case SCSIOP_READ_DATA:
 			scsicd_read_data( file, ptrparm, intparm );
 			return 0;
-			     
+
 		case SCSIOP_WRITE_DATA:
 			scsicd_write_data( file, ptrparm, intparm );
 			return 0;

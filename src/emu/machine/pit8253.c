@@ -1097,21 +1097,21 @@ static void common_start( const device_config *device, int device_type ) {
 	pit8253_t	*pit8253 = get_safe_token(device);
 	char		unique_tag[30];
 	int			timerno;
-  
+
 	pit8253->config = device->static_config;
 	pit8253->device_type = device_type;
-  
+
 	/* register for state saving */
 	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
-  
+
 	for (timerno = 0; timerno < MAX_TIMER; timerno++)
 	{
 		struct pit8253_timer *timer = get_timer(pit8253,timerno);
-  
+
 		timer->clockin = pit8253->config->timer[timerno].clockin;
 		timer->output_changed = pit8253->config->timer[timerno].output_changed;
 		timer->frequency_changed = pit8253->config->timer[timerno].frequency_changed;
-  
+
 		if (timer->output_changed == NULL)
 			timer->outputtimer = NULL;
 		else
@@ -1126,7 +1126,7 @@ static void common_start( const device_config *device, int device_type ) {
 			timer->freqtimer = timer_alloc(frequency_changed, (void *)device);
 			timer_adjust_oneshot(timer->freqtimer,  attotime_never, timerno);
 		}
-  
+
 		/* set up state save values */
 		state_save_register_item(unique_tag, timerno, timer->clockin);
 		state_save_register_item(unique_tag, timerno, timer->control);
@@ -1150,8 +1150,8 @@ static void common_start( const device_config *device, int device_type ) {
 		state_save_register_item(unique_tag, timerno, timer->last_updated.attoseconds);
 	}
 }
-  
-  
+
+
 static DEVICE_START( pit8253 ) {
 	common_start( device, TYPE_PIT8253 );
 }
@@ -1170,8 +1170,8 @@ static DEVICE_RESET( pit8253 ) {
 	{
 		struct pit8253_timer *timer = get_timer(pit,i);
 		/* According to Intel's 8254 docs, the state of a timer is undefined
-		   until the first mode control word is written. Here we define this
-		   undefined behaviour */
+           until the first mode control word is written. Here we define this
+           undefined behaviour */
 		timer->control = timer->status = 0x30;
 		timer->rmsb = timer->wmsb = 0;
 		timer->count = timer->value = timer->latch = 0;

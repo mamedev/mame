@@ -514,7 +514,7 @@ static ADDRESS_MAP_START( cbombers_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x300000, 0x303fff) AM_READ(SMH_RAM)	/* Sprite ram */
 	AM_RANGE(0x800000, 0x80ffff) AM_READ(TC0480SCP_long_r)
 	AM_RANGE(0x830000, 0x83002f) AM_READ(TC0480SCP_ctrl_long_r)
-//	AM_RANGE(0x340000, 0x340003) AM_READ(superchs_stick_r)	/* stick coord read */
+//  AM_RANGE(0x340000, 0x340003) AM_READ(superchs_stick_r)  /* stick coord read */
 
 	AM_RANGE(0x500000, 0x500007) AM_READ(undrfire_input_r)
 	AM_RANGE(0xc00000, 0xc00007) AM_READ(undrfire_input_r)
@@ -539,12 +539,12 @@ static ADDRESS_MAP_START( cbombers_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
-//	AM_RANGE(0x340000, 0x340003) AM_WRITE(superchs_stick_w)	/* stick int request */
+//  AM_RANGE(0x340000, 0x340003) AM_WRITE(superchs_stick_w) /* stick int request */
 
-//	AM_RANGE(0x500000, 0x500003) AM_WRITE(MWA32_NOP)
+//  AM_RANGE(0x500000, 0x500003) AM_WRITE(MWA32_NOP)
 	AM_RANGE(0x500000, 0x500007) AM_WRITE(undrfire_input_w)	/* eerom etc. */
 
-//	AM_RANGE(0x600000, 0x600007) AM_WRITE(unknown_int_req_w)	/* int request for unknown hardware */
+//  AM_RANGE(0x600000, 0x600007) AM_WRITE(unknown_int_req_w)    /* int request for unknown hardware */
 
 	AM_RANGE(0x700000, 0x7007ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
 
@@ -558,15 +558,15 @@ static ADDRESS_MAP_START( cbombers_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_READ(SMH_RAM)	/* local ram */
 	AM_RANGE(0x800000, 0x80ffff) AM_READ(shared_ram_r)
-//	AM_RANGE(0xa00000, 0xa001ff) AM_READ(SMH_RAM)
+//  AM_RANGE(0xa00000, 0xa001ff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbombers_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(SMH_RAM)
-//	AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
+//  AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(shared_ram_w)
-//	AM_RANGE(0xa00000, 0xa001ff) AM_WRITE(SMH_RAM)	/* Extra road control?? */
+//  AM_RANGE(0xa00000, 0xa001ff) AM_WRITE(SMH_RAM)  /* Extra road control?? */
 ADDRESS_MAP_END
 
 

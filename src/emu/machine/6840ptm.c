@@ -251,7 +251,7 @@ INLINE void update_interrupts(int which)
 				((currptr->status_reg & 0x02) && (currptr->control_reg[1] & 0x40)) ||
 				((currptr->status_reg & 0x04) && (currptr->control_reg[2] & 0x40));
 
-//	if (new_state != currptr->IRQ)
+//  if (new_state != currptr->IRQ)
 	{
 		currptr->IRQ = new_state;
 

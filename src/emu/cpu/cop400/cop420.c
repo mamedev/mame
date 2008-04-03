@@ -13,8 +13,8 @@
 
     TODO:
 
-	- remove LBIops
-	- INIL
+    - remove LBIops
+    - INIL
 
 */
 
@@ -366,9 +366,9 @@ static int cop420_execute(int cycles)
 		if (skipLBI == 0)
 		{
 			int inst_cycles = opcode_map[opcode].cycles;
-			
+
 			PC++;
-			
+
 			(*(opcode_map[opcode].function))(opcode);
 			cop420_ICount -= inst_cycles;
 
@@ -419,7 +419,7 @@ static int cop420_execute(int cycles)
 					cop420_ICount -= opcode_map[opcode].cycles;
 				}
 				PC += InstLen[opcode];
-				
+
 				skip = 0;
 			}
 		}
@@ -534,8 +534,8 @@ void cop420_get_info(UINT32 state, cpuinfo *info)
 #endif /* ENABLE_DEBUGGER */
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop420_ICount;			break;
 
-/*		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map8 = address_map_cop420_internal_rom;								break;*/
+/*      case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
+            info->internal_map8 = address_map_cop420_internal_rom;                              break;*/
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
  			info->internal_map8 = address_map_cop420_internal_ram;								break;
 
@@ -597,7 +597,7 @@ void cop422_get_info(UINT32 state, cpuinfo *info)
 }
 
 void cop402_get_info(UINT32 state, cpuinfo *info)
-{	
+{
 	// COP402 is a ROMless version of the COP420
 
 	switch (state)
@@ -615,7 +615,7 @@ void cop402_get_info(UINT32 state, cpuinfo *info)
 }
 
 void cop444_get_info(UINT32 state, cpuinfo *info)
-{	
+{
 	// COP444 is functionally equivalent to COP420, but with twice the RAM/ROM
 
 	switch (state)
@@ -635,7 +635,7 @@ void cop444_get_info(UINT32 state, cpuinfo *info)
 }
 
 void cop445_get_info(UINT32 state, cpuinfo *info)
-{	
+{
 	// COP445 is a 24-pin package version of the COP444, lacking the IN ports
 
 	switch (state)
@@ -652,7 +652,7 @@ void cop445_get_info(UINT32 state, cpuinfo *info)
 }
 
 void cop404_get_info(UINT32 state, cpuinfo *info)
-{	
+{
 	// COP404 is a ROMless version of the COP444
 
 	switch (state)
