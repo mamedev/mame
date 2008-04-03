@@ -182,6 +182,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sx = spriteram[offs + 3] + 1;
 		int sy = 240 - spriteram[offs + 1];
 
+		if (sx >= 0xf0) sx -= 256;
+
 		code |= rougien_gfxbank1 * 0x2800;
 		code |= rougien_gfxbank2 * 0x2400;
 
