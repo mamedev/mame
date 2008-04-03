@@ -1471,7 +1471,7 @@ void cheat_init(running_machine *machine)
 	searchListLength =		0;
 
 #ifdef MESS
-	InitMessCheats();
+	InitMessCheats(machine);
 #endif
 
 	/* ----- initialize flags ----- */
