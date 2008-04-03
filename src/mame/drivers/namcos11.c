@@ -648,11 +648,11 @@ static WRITE32_HANDLER( bankswitch_rom32_w )
 {
 	verboselog( 2, "bankswitch_rom32_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		bankswitch_rom8( ( offset * 2 ), data & 0xffff );
 	}
-	if( ACCESSING_WORD_1 )
+	if( ACCESSING_BITS_16_31 )
 	{
 		bankswitch_rom8( ( offset * 2 ) + 1, data >> 16 );
 	}
@@ -662,11 +662,11 @@ static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 {
 	verboselog( 2, "bankswitch_rom64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		m_n_bankoffset = 0;
 	}
-	if( ACCESSING_WORD_1 )
+	if( ACCESSING_BITS_16_31 )
 	{
 		m_n_bankoffset = 16;
 	}
@@ -682,11 +682,11 @@ static WRITE32_HANDLER( bankswitch_rom64_w )
 {
 	verboselog( 2, "bankswitch_rom64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		bankswitch_rom64( ( offset * 2 ), data & 0xffff );
 	}
-	if( ACCESSING_WORD_1 )
+	if( ACCESSING_BITS_16_31 )
 	{
 		bankswitch_rom64( ( offset * 2 ) + 1, data >> 16 );
 	}
@@ -694,7 +694,7 @@ static WRITE32_HANDLER( bankswitch_rom64_w )
 
 static WRITE32_HANDLER( lightgun_w )
 {
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		output_set_value( "led0", !( data & 0x08 ) );
 		output_set_value( "led1", !( data & 0x04 ) );
@@ -703,7 +703,7 @@ static WRITE32_HANDLER( lightgun_w )
 
 		verboselog( 1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
-	if( ACCESSING_WORD_1 )
+	if( ACCESSING_BITS_16_31 )
 	{
 		verboselog( 2, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}

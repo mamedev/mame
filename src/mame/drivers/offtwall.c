@@ -99,7 +99,7 @@ static READ16_HANDLER( special_port3_r )
 static WRITE16_HANDLER( io_latch_w )
 {
 	/* lower byte */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);

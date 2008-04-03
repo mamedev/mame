@@ -91,7 +91,7 @@ static READ16_HANDLER( adpcm_r )
 
 static WRITE16_HANDLER( adpcm_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		OKIM6295_data_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
@@ -105,7 +105,7 @@ static WRITE16_HANDLER( adpcm_w )
 
 static WRITE16_HANDLER( ym2413_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (offset & 1)
 			YM2413_data_port_0_w(machine, 0, (data >> 8) & 0xff);
@@ -141,7 +141,7 @@ static WRITE16_HANDLER( latch_w )
     */
 
 	/* upper byte being modified? */
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0x1000)
 			logerror("Color bank set to 1!\n");
@@ -150,7 +150,7 @@ static WRITE16_HANDLER( latch_w )
 	}
 
 	/* lower byte being modified? */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		atarigen_set_oki6295_vol(machine, (data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))

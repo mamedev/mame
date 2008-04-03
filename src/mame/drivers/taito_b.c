@@ -362,7 +362,7 @@ static READ16_HANDLER( trackx2_lo_r )
 
 static WRITE16_HANDLER( gain_control_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (offset==0)
 		{
@@ -429,7 +429,7 @@ static WRITE16_HANDLER( eeprom_w )
 {
 	COMBINE_DATA(&eep_latch);
 
-    if (ACCESSING_BYTE_1)
+    if (ACCESSING_BITS_8_15)
     {
 		data >>= 8; /*M68k byte write*/
 

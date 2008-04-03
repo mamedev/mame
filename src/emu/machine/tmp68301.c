@@ -155,7 +155,7 @@ WRITE16_HANDLER( tmp68301_regs_w )
 {
 	COMBINE_DATA(&tmp68301_regs[offset]);
 
-	if (!ACCESSING_BYTE_0)	return;
+	if (!ACCESSING_BITS_0_7)	return;
 
 //  logerror("CPU #0 PC %06X: TMP68301 Reg %04X<-%04X & %04X\n",activecpu_get_pc(),offset*2,data,mem_mask^0xffff);
 

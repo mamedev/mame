@@ -549,7 +549,7 @@ static int pci_reg;
 
 static READ64_HANDLER( mpc105_addr_r )
 {
-	if (ACCESSING_DWORD_1)
+	if (ACCESSING_BITS_32_63)
 	{
 		return (UINT64)mpc105_addr << 32;
 	}
@@ -558,7 +558,7 @@ static READ64_HANDLER( mpc105_addr_r )
 
 static WRITE64_HANDLER( mpc105_addr_w )
 {
-	if (ACCESSING_DWORD_1)
+	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = BYTE_REVERSE32((UINT32)(data >> 32));
 		mpc105_addr = data >> 32;
@@ -586,7 +586,7 @@ static WRITE64_HANDLER( mpc105_data_w )
 		mpc105_regs[(pci_reg/2)+0] = BYTE_REVERSE32((UINT32)(data));
 		return;
 	}
-	if (ACCESSING_DWORD_0)
+	if (ACCESSING_BITS_0_31)
 	{
 		pci_device_set_reg(pci_device, pci_reg, BYTE_REVERSE32((UINT32)data));
 	}
@@ -627,7 +627,7 @@ static UINT32 mpc106_addr;
 
 static READ64_HANDLER( mpc106_addr_r )
 {
-	if (ACCESSING_DWORD_1)
+	if (ACCESSING_BITS_32_63)
 	{
 		return (UINT64)mpc106_addr << 32;
 	}
@@ -636,7 +636,7 @@ static READ64_HANDLER( mpc106_addr_r )
 
 static WRITE64_HANDLER( mpc106_addr_w )
 {
-	if (ACCESSING_DWORD_1)
+	if (ACCESSING_BITS_32_63)
 	{
 		UINT32 d = BYTE_REVERSE32((UINT32)(data >> 32));
 
@@ -662,7 +662,7 @@ static READ64_HANDLER( mpc106_data_r )
 		return ((UINT64)(BYTE_REVERSE32(mpc106_regs[(pci_reg/2)+1])) << 32) |
 			   ((UINT64)(BYTE_REVERSE32(mpc106_regs[(pci_reg/2)+0])));
 	}
-	if (ACCESSING_DWORD_1)
+	if (ACCESSING_BITS_32_63)
 	{
 		return (UINT64)(BYTE_REVERSE32(pci_device_get_reg(pci_device, pci_reg))) << 32;
 	}
@@ -679,7 +679,7 @@ static WRITE64_HANDLER( mpc106_data_w )
 		mpc106_regs[(pci_reg/2)+0] = BYTE_REVERSE32((UINT32)(data));
 		return;
 	}
-	if (ACCESSING_DWORD_0)
+	if (ACCESSING_BITS_0_31)
 	{
 		pci_device_set_reg(pci_device, pci_reg, BYTE_REVERSE32((UINT32)data));
 	}
@@ -723,28 +723,28 @@ static READ64_HANDLER(scsi_r)
 {
 	int reg = offset*8;
 	UINT64 r = 0;
-	if (ACCESSING_BYTE_7) {
+	if (ACCESSING_BITS_56_63) {
 		r |= (UINT64)lsi53c810_reg_r(reg+0) << 56;
 	}
-	if (ACCESSING_BYTE_6) {
+	if (ACCESSING_BITS_48_55) {
 		r |= (UINT64)lsi53c810_reg_r(reg+1) << 48;
 	}
-	if (ACCESSING_BYTE_5) {
+	if (ACCESSING_BITS_40_47) {
 		r |= (UINT64)lsi53c810_reg_r(reg+2) << 40;
 	}
-	if (ACCESSING_BYTE_4) {
+	if (ACCESSING_BITS_32_39) {
 		r |= (UINT64)lsi53c810_reg_r(reg+3) << 32;
 	}
-	if (ACCESSING_BYTE_3) {
+	if (ACCESSING_BITS_24_31) {
 		r |= (UINT64)lsi53c810_reg_r(reg+4) << 24;
 	}
-	if (ACCESSING_BYTE_2) {
+	if (ACCESSING_BITS_16_23) {
 		r |= (UINT64)lsi53c810_reg_r(reg+5) << 16;
 	}
-	if (ACCESSING_BYTE_1) {
+	if (ACCESSING_BITS_8_15) {
 		r |= (UINT64)lsi53c810_reg_r(reg+6) << 8;
 	}
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 		r |= (UINT64)lsi53c810_reg_r(reg+7) << 0;
 	}
 
@@ -754,28 +754,28 @@ static READ64_HANDLER(scsi_r)
 static WRITE64_HANDLER(scsi_w)
 {
 	int reg = offset*8;
-	if (ACCESSING_BYTE_7) {
+	if (ACCESSING_BITS_56_63) {
 		lsi53c810_reg_w(reg+0, data >> 56);
 	}
-	if (ACCESSING_BYTE_6) {
+	if (ACCESSING_BITS_48_55) {
 		lsi53c810_reg_w(reg+1, data >> 48);
 	}
-	if (ACCESSING_BYTE_5) {
+	if (ACCESSING_BITS_40_47) {
 		lsi53c810_reg_w(reg+2, data >> 40);
 	}
-	if (ACCESSING_BYTE_4) {
+	if (ACCESSING_BITS_32_39) {
 		lsi53c810_reg_w(reg+3, data >> 32);
 	}
-	if (ACCESSING_BYTE_3) {
+	if (ACCESSING_BITS_24_31) {
 		lsi53c810_reg_w(reg+4, data >> 24);
 	}
-	if (ACCESSING_BYTE_2) {
+	if (ACCESSING_BITS_16_23) {
 		lsi53c810_reg_w(reg+5, data >> 16);
 	}
-	if (ACCESSING_BYTE_1) {
+	if (ACCESSING_BITS_8_15) {
 		lsi53c810_reg_w(reg+6, data >> 8);
 	}
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 		lsi53c810_reg_w(reg+7, data >> 0);
 	}
 }
@@ -810,7 +810,7 @@ static READ64_HANDLER( real3d_dma_r )
 		case 1:
 			return (dma_irq << 24) | (dma_endian << 8);
 		case 2:
-			if(ACCESSING_DWORD_0) {
+			if(ACCESSING_BITS_0_31) {
 				return dma_data;
 			}
 			break;
@@ -824,17 +824,17 @@ static WRITE64_HANDLER( real3d_dma_w )
 	switch(offset)
 	{
 		case 0:
-			if(ACCESSING_DWORD_1) {		/* DMA source address */
+			if(ACCESSING_BITS_32_63) {		/* DMA source address */
 				dma_source = BYTE_REVERSE32((UINT32)(data >> 32));
 				return;
 			}
-			if(ACCESSING_DWORD_0) {		/* DMA destination address */
+			if(ACCESSING_BITS_0_31) {		/* DMA destination address */
 				dma_dest = BYTE_REVERSE32((UINT32)(data));
 				return;
 			}
 			break;
 		case 1:
-			if(ACCESSING_DWORD_1)		/* DMA length */
+			if(ACCESSING_BITS_32_63)		/* DMA length */
 			{
 				int length = BYTE_REVERSE32((UINT32)(data >> 32)) * 4;
 				if (dma_endian & 0x80)
@@ -849,21 +849,21 @@ static WRITE64_HANDLER( real3d_dma_w )
 				scsi_irq_callback();
 				return;
 			}
-			else if(ACCESSING_BYTE_2)
+			else if(ACCESSING_BITS_16_23)
 			{
 				if(data & 0x10000) {
 					dma_irq &= ~0x1;
 				}
 				return;
 			}
-			else if(ACCESSING_BYTE_1)
+			else if(ACCESSING_BITS_8_15)
 			{
 				dma_endian = (data >> 8) & 0xff;
 				return;
 			}
 			break;
 		case 2:
-			if(ACCESSING_DWORD_1) {		/* DMA command */
+			if(ACCESSING_BITS_32_63) {		/* DMA command */
 				UINT32 cmd = BYTE_REVERSE32((UINT32)(data >> 32));
 				if(cmd & 0x20000000) {
 					dma_data = BYTE_REVERSE32(real3d_device_id);	/* (PCI Vendor & Device ID) */
@@ -874,7 +874,7 @@ static WRITE64_HANDLER( real3d_dma_w )
 				}
 				return;
 			}
-			if(ACCESSING_DWORD_0) {		/* ??? */
+			if(ACCESSING_BITS_0_31) {		/* ??? */
 				dma_data = 0xffffffff;
 				return;
 			}
@@ -1050,11 +1050,11 @@ static READ64_HANDLER( model3_ctrl_r )
 	switch( offset )
 	{
 		case 0:
-			if (ACCESSING_BYTE_7)
+			if (ACCESSING_BITS_56_63)
 			{
 				return (UINT64)model3_controls_bank << 56;
 			}
-			else if (ACCESSING_BYTE_3)
+			else if (ACCESSING_BITS_24_31)
 			{
 				if(model3_controls_bank & 0x1) {
 					eeprom_bit = EEPROM_read_bit() << 5;
@@ -1067,11 +1067,11 @@ static READ64_HANDLER( model3_ctrl_r )
 			break;
 
 		case 1:
-			if (ACCESSING_BYTE_7)
+			if (ACCESSING_BITS_56_63)
 			{
 				return (UINT64)readinputport(2) << 56;
 			}
-			else if (ACCESSING_BYTE_3)
+			else if (ACCESSING_BITS_24_31)
 			{
 				return readinputport(3) << 24;
 			}
@@ -1087,25 +1087,25 @@ static READ64_HANDLER( model3_ctrl_r )
 			return U64(0xffffffffffffffff);
 
 		case 5:
-			if (ACCESSING_BYTE_3)					/* Serial comm RX FIFO 1 */
+			if (ACCESSING_BITS_24_31)					/* Serial comm RX FIFO 1 */
 			{
 				return (UINT64)model3_serial_fifo1 << 24;
 			}
 			break;
 
 		case 6:
-			if (ACCESSING_BYTE_7)		/* Serial comm RX FIFO 2 */
+			if (ACCESSING_BITS_56_63)		/* Serial comm RX FIFO 2 */
 			{
 				return (UINT64)model3_serial_fifo2 << 56;
 			}
-			else if (ACCESSING_BYTE_3)				/* Serial comm full/empty flags */
+			else if (ACCESSING_BITS_24_31)				/* Serial comm full/empty flags */
 			{
 				return 0x0c << 24;
 			}
 			break;
 
 		case 7:
-			if (ACCESSING_BYTE_3)		/* ADC Data read */
+			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
 				UINT8 adc_data = readinputport(5 + adc_channel);
 				adc_channel++;
@@ -1124,7 +1124,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 	switch(offset)
 	{
 		case 0:
-			if (ACCESSING_BYTE_7)
+			if (ACCESSING_BITS_56_63)
 			{
 				int reg = (data >> 56) & 0xff;
 				EEPROM_write_bit((reg & 0x20) ? 1 : 0);
@@ -1143,11 +1143,11 @@ static WRITE64_HANDLER( model3_ctrl_w )
 			return;
 
 		case 4:
-			if (ACCESSING_BYTE_7)	/* Port 4 direction */
+			if (ACCESSING_BITS_56_63)	/* Port 4 direction */
 			{
 
 			}
-			if (ACCESSING_BYTE_3)				/* Serial comm TX FIFO 1 */
+			if (ACCESSING_BITS_24_31)				/* Serial comm TX FIFO 1 */
 			{											/* Used for reading the light gun in Lost World */
 				switch(data >> 24)
 				{
@@ -1198,7 +1198,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 			return;
 
 		case 5:
-			if (ACCESSING_BYTE_7)	/* Serial comm TX FIFO 2 */
+			if (ACCESSING_BITS_56_63)	/* Serial comm TX FIFO 2 */
 			{
 				model3_serial_fifo2 = data >> 56;
 				return;
@@ -1206,7 +1206,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 			break;
 
 		case 7:
-			if (ACCESSING_BYTE_3)	/* ADC Channel selection */
+			if (ACCESSING_BITS_24_31)	/* ADC Channel selection */
 			{
 				adc_channel = (data >> 24) & 0xf;
 			}
@@ -1221,20 +1221,20 @@ static READ64_HANDLER( model3_sys_r )
 	switch (offset)
 	{
 		case 0x08/8:
-			if (ACCESSING_BYTE_7)
+			if (ACCESSING_BITS_56_63)
 			{
 				return ((UINT64)model3_crom_bank << 56);
 			}
 			break;
 
 		case 0x10/8:
-			if (ACCESSING_BYTE_7)
+			if (ACCESSING_BITS_56_63)
 			{
 				UINT64 res = model3_tap_read();
 
 				return res<<61;
 			}
-			else if (ACCESSING_BYTE_3)
+			else if (ACCESSING_BITS_24_31)
 			{
 				return (model3_irq_enable<<24);
 			}
@@ -1254,14 +1254,14 @@ static WRITE64_HANDLER( model3_sys_w )
 	switch (offset)
 	{
 		case 0x10/8:
-			if (ACCESSING_BYTE_3)
+			if (ACCESSING_BITS_24_31)
 			{
 				model3_irq_enable = (data>>24)&0xff;
 			}
 			else logerror("m3_sys: unknown mask on IRQen write\n");
 			break;
 		case 0x08/8:
-			if (ACCESSING_BYTE_7)
+			if (ACCESSING_BITS_56_63)
 			{
 				model3_crom_bank = data >> 56;
 
@@ -1269,7 +1269,7 @@ static WRITE64_HANDLER( model3_sys_w )
 				data = (~data) & 0xf;
 				memory_set_bankptr( 1, memory_region( REGION_USER1 ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
-			if (ACCESSING_BYTE_3)
+			if (ACCESSING_BITS_24_31)
 			{
 				data >>= 24;
 				model3_tap_write(
@@ -1286,10 +1286,10 @@ static WRITE64_HANDLER( model3_sys_w )
 static READ64_HANDLER( model3_rtc_r )
 {
 	UINT64 r = 0;
-	if(ACCESSING_BYTE_7) {
+	if(ACCESSING_BITS_56_63) {
 		r |= (UINT64)rtc72421_r(machine, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
 	}
-	if(ACCESSING_BYTE_3) {
+	if(ACCESSING_BITS_24_31) {
 		r |= (UINT64)rtc72421_r(machine, (offset*2)+1, (UINT32)(mem_mask));
 	}
 	return r;
@@ -1297,10 +1297,10 @@ static READ64_HANDLER( model3_rtc_r )
 
 static WRITE64_HANDLER( model3_rtc_w )
 {
-	if(ACCESSING_BYTE_7) {
+	if(ACCESSING_BITS_56_63) {
 		rtc72421_w(machine, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
-	if(ACCESSING_BYTE_3) {
+	if(ACCESSING_BITS_24_31) {
 		rtc72421_w(machine, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
@@ -1474,7 +1474,7 @@ static READ64_HANDLER(model3_security_r)
 
 static WRITE64_HANDLER(daytona2_rombank_w)
 {
-	if (ACCESSING_BYTE_7)
+	if (ACCESSING_BITS_56_63)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;

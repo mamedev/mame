@@ -412,23 +412,22 @@ union _addrmap64_token
 /* helper macro for merging data with the memory mask */
 #define COMBINE_DATA(varptr)			(*(varptr) = (*(varptr) & mem_mask) | (data & ~mem_mask))
 
+#define ACCESSING_BITS_0_7				((~mem_mask & 0x000000ff) != 0)
+#define ACCESSING_BITS_8_15				((~mem_mask & 0x0000ff00) != 0)
+#define ACCESSING_BITS_16_23			((~mem_mask & 0x00ff0000) != 0)
+#define ACCESSING_BITS_24_31			((~mem_mask & 0xff000000) != 0)
+#define ACCESSING_BITS_32_39			((~mem_mask & U64(0x000000ff00000000)) != 0)
+#define ACCESSING_BITS_40_47			((~mem_mask & U64(0x0000ff0000000000)) != 0)
+#define ACCESSING_BITS_48_55			((~mem_mask & U64(0x00ff000000000000)) != 0)
+#define ACCESSING_BITS_56_63			((~mem_mask & U64(0xff00000000000000)) != 0)
 
-#define ACCESSING_BYTE_0				((~mem_mask & 0x000000ff)!=0)
-#define ACCESSING_BYTE_1				((~mem_mask & 0x0000ff00)!=0)
-#define ACCESSING_BYTE_2				((~mem_mask & 0x00ff0000)!=0)
-#define ACCESSING_BYTE_3				((~mem_mask & 0xff000000)!=0)
-#define ACCESSING_BYTE_4				((~mem_mask & U64(0x000000ff00000000))!=0)
-#define ACCESSING_BYTE_5				((~mem_mask & U64(0x0000ff0000000000))!=0)
-#define ACCESSING_BYTE_6				((~mem_mask & U64(0x00ff000000000000))!=0)
-#define ACCESSING_BYTE_7				((~mem_mask & U64(0xff00000000000000))!=0)
+#define ACCESSING_BITS_0_15				((~mem_mask & 0x0000ffff) != 0)
+#define ACCESSING_BITS_16_31			((~mem_mask & 0xffff0000) != 0)
+#define ACCESSING_BITS_32_47			((~mem_mask & U64(0x0000ffff00000000)) != 0)
+#define ACCESSING_BITS_48_63			((~mem_mask & U64(0xffff000000000000)) != 0)
 
-#define ACCESSING_WORD_0				((~mem_mask & 0x0000ffff)!=0)
-#define ACCESSING_WORD_1				((~mem_mask & 0xffff0000)!=0)
-#define ACCESSING_WORD_2				((~mem_mask & U64(0x0000ffff00000000))!=0)
-#define ACCESSING_WORD_3				((~mem_mask & U64(0xffff000000000000))!=0)
-
-#define ACCESSING_DWORD_0				((~mem_mask & 0xffffffff)!=0)
-#define ACCESSING_DWORD_1				((~mem_mask & U64(0xffffffff00000000))!=0)
+#define ACCESSING_BITS_0_31				((~mem_mask & 0xffffffff) != 0)
+#define ACCESSING_BITS_32_63			((~mem_mask & U64(0xffffffff00000000)) != 0)
 
 
 /* bank switching for CPU cores */

@@ -347,7 +347,7 @@ static WRITE16_HANDLER( misc_io_w )
 		/* I/O chip */
 		case 0x0000/2:
 		case 0x1000/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				io_chip_w(machine, offset, data, mem_mask);
 				return;
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( misc_io_w )
 
 		/* video control latch */
 		case 0x2000/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				system18_set_vdp_mixing(data & 0xff);
 				return;
@@ -381,7 +381,7 @@ static WRITE16_HANDLER( misc_io_w )
 
 static WRITE16_HANDLER( rom_5987_bank_w )
 {
-	if (!ACCESSING_BYTE_0)
+	if (!ACCESSING_BITS_0_7)
 		return;
 	offset &= 0xf;
 	data &= 0xff;

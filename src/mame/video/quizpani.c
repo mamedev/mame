@@ -55,7 +55,7 @@ WRITE16_HANDLER( quizpani_txt_videoram_w )
 
 WRITE16_HANDLER( quizpani_tilesbank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if(quizpani_txtbank != (data & 0x30)>>4)
 		{

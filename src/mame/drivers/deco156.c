@@ -158,7 +158,7 @@ static READ32_HANDLER(hvysmsh_eeprom_r)
 
 static WRITE32_HANDLER(hvysmsh_eeprom_w)
 {
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 
 		OKIM6295_set_bank_base(1, 0x40000 * (data & 0x7) );
 
@@ -201,7 +201,7 @@ static READ32_HANDLER(wcvol95_eeprom_r)
 
 static WRITE32_HANDLER(wcvol95_eeprom_w)
 {
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 		EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_write_bit(data & 0x1);
 		EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);

@@ -21,7 +21,7 @@ READ16_HANDLER( dcon_control_r )
 
 WRITE16_HANDLER( dcon_control_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		dcon_enable=data;
 		if ((dcon_enable&4)==4)

@@ -527,9 +527,9 @@ static READ16_HANDLER( interrupt_control_16_r )
 
 static WRITE16_HANDLER( interrupt_control_16_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		int_control_w(offset*2+0, data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		int_control_w(offset*2+1, data >> 8);
 }
 
@@ -550,13 +550,13 @@ static READ32_HANDLER( interrupt_control_32_r )
 
 static WRITE32_HANDLER( interrupt_control_32_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		int_control_w(offset*4+0, data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		int_control_w(offset*4+1, data >> 8);
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		int_control_w(offset*4+2, data >> 16);
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 		int_control_w(offset*4+3, data >> 24);
 }
 
@@ -642,7 +642,7 @@ static void common_io_chip_w(int which, offs_t offset, UINT16 data, UINT16 mem_m
 	UINT8 old;
 
 	/* only LSB matters */
-	if (!ACCESSING_BYTE_0)
+	if (!ACCESSING_BITS_0_7)
 		return;
 
 	/* generic implementation */
@@ -719,9 +719,9 @@ static READ32_HANDLER( io_chip_0_r )
 
 static WRITE32_HANDLER( io_chip_0_w )
 {
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 		common_io_chip_w(0, offset*2+0, data, mem_mask);
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 		common_io_chip_w(0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
@@ -735,9 +735,9 @@ static READ32_HANDLER( io_chip_1_r )
 
 static WRITE32_HANDLER( io_chip_1_w )
 {
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 		common_io_chip_w(1, offset*2+0, data, mem_mask);
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 		common_io_chip_w(1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
@@ -762,7 +762,7 @@ static READ16_HANDLER( io_expansion_r )
 static WRITE16_HANDLER( io_expansion_w )
 {
 	/* only LSB matters */
-	if (!ACCESSING_BYTE_0)
+	if (!ACCESSING_BITS_0_7)
 		return;
 
 	if (custom_io_w[0])
@@ -786,14 +786,14 @@ static READ32_HANDLER( io_expansion_0_r )
 static WRITE32_HANDLER( io_expansion_0_w )
 {
 	/* only LSB matters */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (custom_io_w[0])
 			(*custom_io_w[0])(machine, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		if (custom_io_w[0])
 			(*custom_io_w[0])(machine, offset*2+1, data >> 16, mem_mask >> 16);
@@ -817,14 +817,14 @@ static READ32_HANDLER( io_expansion_1_r )
 static WRITE32_HANDLER( io_expansion_1_w )
 {
 	/* only LSB matters */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (custom_io_w[1])
 			(*custom_io_w[1])(machine, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", activecpu_get_pc(), offset, data & 0xff);
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		if (custom_io_w[1])
 			(*custom_io_w[1])(machine, offset*2+1, data >> 16, mem_mask >> 16);
@@ -993,9 +993,9 @@ static READ16_HANDLER( shared_ram_16_r )
 
 static WRITE16_HANDLER( shared_ram_16_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		z80_shared_ram[offset*2+0] = data;
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		z80_shared_ram[offset*2+1] = data >> 8;
 }
 
@@ -1009,13 +1009,13 @@ static READ32_HANDLER( shared_ram_32_r )
 
 static WRITE32_HANDLER( shared_ram_32_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		z80_shared_ram[offset*4+0] = data;
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		z80_shared_ram[offset*4+1] = data >> 8;
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		z80_shared_ram[offset*4+2] = data >> 16;
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 		z80_shared_ram[offset*4+3] = data >> 24;
 }
 

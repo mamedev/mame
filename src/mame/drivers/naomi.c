@@ -574,7 +574,7 @@ static READ64_HANDLER( naomi_rom_board_r )
 	UINT8 *ROM = (UINT8 *)memory_region(REGION_USER1);
 
 	// ROM_DATA
-	if ((offset == 1) && ACCESSING_WORD_0)
+	if ((offset == 1) && ACCESSING_BITS_0_15)
 	{
 		UINT64 ret;
 
@@ -584,7 +584,7 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 		return ret;
 	}
-	else if ((offset == 15) && ACCESSING_WORD_2) // boardid read
+	else if ((offset == 15) && ACCESSING_BITS_32_47) // boardid read
 	{
 		UINT64 ret;
 
@@ -602,31 +602,31 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 static WRITE64_HANDLER( naomi_rom_board_w )
 {
-	if ((offset == 1) && ACCESSING_WORD_2)
+	if ((offset == 1) && ACCESSING_BITS_32_47)
 	{
 		// DMA_OFFSETH
 		dma_offset &= 0xffff;
 		dma_offset |= (data >> 16) & 0x1fff0000;
 	}
-	else if ((offset == 2) && ACCESSING_WORD_0)
+	else if ((offset == 2) && ACCESSING_BITS_0_15)
 	{
 		// DMA_OFFSETL
 		dma_offset &= 0xffff0000;
 		dma_offset |= (data & 0xffff);
 	}
-	else if ((offset == 0) && ACCESSING_WORD_0)
+	else if ((offset == 0) && ACCESSING_BITS_0_15)
 	{
 		// ROM_OFFSETH
 		rom_offset &= 0xffff;
 		rom_offset |= (data & 0x1fff)<<16;
 	}
-	else if ((offset == 0) && ACCESSING_WORD_2)
+	else if ((offset == 0) && ACCESSING_BITS_32_47)
 	{
 		// ROM_OFFSETL
 		rom_offset &= 0xffff0000;
 		rom_offset |= (data & 0xffff);
 	}
-	else if ((offset == 15) && ACCESSING_WORD_0)
+	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
 		// NAOMI_BOARDID_WRITE
 		x76f100_cs_write(0, (data >> 2) & 1 );
@@ -634,7 +634,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 		x76f100_scl_write(0, (data >> 1) & 1 );
 		x76f100_sda_write(0, (data >> 0) & 1 );
 	}
-	else if ((offset == 2) && ACCESSING_DWORD_1)
+	else if ((offset == 2) && ACCESSING_BITS_32_63)
 	{
 		// NAOMI_DMA_COUNT
 		dma_count = data >> 32;

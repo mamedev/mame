@@ -434,7 +434,7 @@ READ16_HANDLER( seibu_main_word_r )
 WRITE16_HANDLER( seibu_main_word_w )
 {
 	//logerror("%06x: seibu_main_word_w(%x,%02x)\n",activecpu_get_pc(),offset,data);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
 		{

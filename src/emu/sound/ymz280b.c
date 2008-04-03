@@ -1002,25 +1002,25 @@ WRITE8_HANDLER( YMZ280B_register_1_w )
 WRITE16_HANDLER( YMZ280B_register_0_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BYTE_0)	chip->current_register = data & 0xff;
+	if (ACCESSING_BITS_0_7)	chip->current_register = data & 0xff;
 }
 
 WRITE16_HANDLER( YMZ280B_register_0_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BYTE_1)	chip->current_register = (data >> 8) & 0xff;
+	if (ACCESSING_BITS_8_15)	chip->current_register = (data >> 8) & 0xff;
 }
 
 WRITE16_HANDLER( YMZ280B_register_1_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BYTE_0)	chip->current_register = data & 0xff;
+	if (ACCESSING_BITS_0_7)	chip->current_register = data & 0xff;
 }
 
 WRITE16_HANDLER( YMZ280B_register_1_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BYTE_1)	chip->current_register = (data >> 8) & 0xff;
+	if (ACCESSING_BITS_8_15)	chip->current_register = (data >> 8) & 0xff;
 }
 
 /**********************************************************************************************
@@ -1044,25 +1044,25 @@ WRITE8_HANDLER( YMZ280B_data_1_w )
 WRITE16_HANDLER( YMZ280B_data_0_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BYTE_0)	write_to_register(chip, data & 0xff);
+	if (ACCESSING_BITS_0_7)	write_to_register(chip, data & 0xff);
 }
 
 WRITE16_HANDLER( YMZ280B_data_0_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	if (ACCESSING_BYTE_1)	write_to_register(chip, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_8_15)	write_to_register(chip, (data >> 8) & 0xff);
 }
 
 WRITE16_HANDLER( YMZ280B_data_1_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BYTE_0)	write_to_register(chip, data & 0xff);
+	if (ACCESSING_BITS_0_7)	write_to_register(chip, data & 0xff);
 }
 
 WRITE16_HANDLER( YMZ280B_data_1_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	if (ACCESSING_BYTE_1)	write_to_register(chip, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_8_15)	write_to_register(chip, (data >> 8) & 0xff);
 }
 
 /**********************************************************************************************

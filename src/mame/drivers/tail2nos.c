@@ -39,7 +39,7 @@ static MACHINE_RESET( tail2nos )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
 		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
@@ -53,13 +53,13 @@ static READ16_HANDLER( tail2nos_K051316_0_r )
 
 static WRITE16_HANDLER( tail2nos_K051316_0_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K051316_0_w(machine,offset,data & 0xff);
 }
 
 static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K051316_ctrl_0_w(machine,offset,data & 0xff);
 }
 

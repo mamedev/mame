@@ -787,22 +787,22 @@ READ16_HANDLER( acia6850_1_data_msb_r ) { return acia6850_data_r(1) << 8; }
 READ16_HANDLER( acia6850_2_data_msb_r ) { return acia6850_data_r(2) << 8; }
 READ16_HANDLER( acia6850_3_data_msb_r ) { return acia6850_data_r(3) << 8; }
 
-WRITE16_HANDLER( acia6850_0_ctrl_msb_w ) { if (ACCESSING_BYTE_1) acia6850_ctrl_w(0, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_1_ctrl_msb_w ) { if (ACCESSING_BYTE_1) acia6850_ctrl_w(1, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_2_ctrl_msb_w ) { if (ACCESSING_BYTE_1) acia6850_ctrl_w(2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_3_ctrl_msb_w ) { if (ACCESSING_BYTE_1) acia6850_ctrl_w(3, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_0_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(0, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_1_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(1, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_2_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(2, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_3_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(3, (data >> 8) & 0xff); }
 
-WRITE16_HANDLER( acia6850_0_ctrl_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_ctrl_w(0, data & 0xff); }
-WRITE16_HANDLER( acia6850_1_ctrl_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_ctrl_w(1, data & 0xff); }
-WRITE16_HANDLER( acia6850_2_ctrl_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_ctrl_w(2, data & 0xff); }
-WRITE16_HANDLER( acia6850_3_ctrl_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_ctrl_w(3, data & 0xff); }
+WRITE16_HANDLER( acia6850_0_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(0, data & 0xff); }
+WRITE16_HANDLER( acia6850_1_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(1, data & 0xff); }
+WRITE16_HANDLER( acia6850_2_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(2, data & 0xff); }
+WRITE16_HANDLER( acia6850_3_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(3, data & 0xff); }
 
-WRITE16_HANDLER( acia6850_0_data_msb_w ) { if (ACCESSING_BYTE_1) acia6850_data_w(0, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_1_data_msb_w ) { if (ACCESSING_BYTE_1) acia6850_data_w(1, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_2_data_msb_w ) { if (ACCESSING_BYTE_1) acia6850_data_w(2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_3_data_msb_w ) { if (ACCESSING_BYTE_1) acia6850_data_w(3, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_0_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(0, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_1_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(1, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_2_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(2, (data >> 8) & 0xff); }
+WRITE16_HANDLER( acia6850_3_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(3, (data >> 8) & 0xff); }
 
-WRITE16_HANDLER( acia6850_0_data_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_data_w(0, data & 0xff); }
-WRITE16_HANDLER( acia6850_1_data_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_data_w(1, data & 0xff); }
-WRITE16_HANDLER( acia6850_2_data_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_data_w(2, data & 0xff); }
-WRITE16_HANDLER( acia6850_3_data_lsb_w ) { if (ACCESSING_BYTE_0) acia6850_data_w(3, data & 0xff); }
+WRITE16_HANDLER( acia6850_0_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(0, data & 0xff); }
+WRITE16_HANDLER( acia6850_1_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(1, data & 0xff); }
+WRITE16_HANDLER( acia6850_2_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(2, data & 0xff); }
+WRITE16_HANDLER( acia6850_3_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(3, data & 0xff); }

@@ -222,7 +222,7 @@ static WRITE16_HANDLER( archrivl_control_w )
 static WRITE16_HANDLER( pigskin_protection_w )
 {
 	/* ignore upper-byte only */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* track the last 5 bytes */
 		protection_data[0] = protection_data[1];

@@ -496,7 +496,7 @@ static WRITE32_HANDLER( eeprom_w )
 {
 	UINT32 odata;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		odata = data >> 24;
 		/*
@@ -517,7 +517,7 @@ static WRITE32_HANDLER( eeprom_w )
 		konamigx_wrport1_0 = odata;
 	}
 
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		/*
           bit 7 = mask all IRQ
@@ -553,7 +553,7 @@ static WRITE32_HANDLER( control_w )
 	//          results.
 	// bit 17 = DOTSEL1 : 0 = 6M, 1=8M, 2=12M, 3=16M
 	// bit 16 = DOTSEL0
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		if (data & 0x400000)
 		{
@@ -627,14 +627,14 @@ static WRITE32_HANDLER( ccu_w )
 	if (offset == 0x1c/4)
 	{
 		// vblank interrupt ACK
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 		{
 			cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
@@ -764,14 +764,14 @@ static READ32_HANDLER( sound020_r )
 
 	reg = offset << 1;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		MSW = sndto020[reg];
 		if (reg == 2) MSW &= ~3; // supress VOLWR busy flags
 		rv |= MSW<<24;
 	}
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		LSW = sndto020[reg+1];
 		rv |= LSW<<8;
@@ -832,14 +832,14 @@ static WRITE32_HANDLER( sound020_w )
 {
 	int reg=0, val=0;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		reg = offset<<1;
 		val = data>>24;
 		write_snd_020(reg, val);
 	}
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		reg = (offset<<1)+1;
 		val = (data>>8)&0xff;
@@ -1207,9 +1207,9 @@ static READ16_HANDLER( dual539_r )
 {
 	UINT16 ret = 0;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ret |= K054539_1_r(machine, offset);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		ret |= K054539_0_r(machine, offset)<<8;
 
 	return ret;
@@ -1217,9 +1217,9 @@ static READ16_HANDLER( dual539_r )
 
 static WRITE16_HANDLER( dual539_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K054539_1_w(machine, offset, data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K054539_0_w(machine, offset, data>>8);
 }
 

@@ -243,7 +243,7 @@ static WRITE16_HANDLER( bg_videoram_w )
 
 static WRITE16_HANDLER( nmg5_soundlatch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);

@@ -231,7 +231,7 @@ WRITE16_HANDLER( namcos2_68k_video_palette_w )
 	if( (offset&0x1800) == 0x1800 )
 	{
 		offset &= 0x180f;
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			namcos2_68k_palette_ram[offset] = data;
 		}

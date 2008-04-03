@@ -80,7 +80,7 @@ static READ16_HANDLER( mahjong_panel_r )
 
 static WRITE16_HANDLER( mahjong_panel_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		sengokumj_mux_data = data >> 8;
 }
 
@@ -89,7 +89,7 @@ static WRITE16_HANDLER( sengokmj_out_w )
 	static UINT8 old = 0;
 	static int coins_used = 0;
 
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 	{
 		if((old & 4) == 0 && (data & 4) == 4)
 		{

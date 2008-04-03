@@ -265,7 +265,7 @@ static UINT8 jumping_latch = 0;
 
 static WRITE16_HANDLER( jumping_sound_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
 		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);

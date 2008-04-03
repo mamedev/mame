@@ -150,7 +150,7 @@ NVRAM_HANDLER( namcos2 )
 }
 
 WRITE16_HANDLER( namcos2_68k_eeprom_w ){
-	if( ACCESSING_BYTE_0 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		namcos2_eeprom[offset] = data;
 	}

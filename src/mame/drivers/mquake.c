@@ -88,12 +88,12 @@ static void mquake_cia_0_portb_w(UINT8 data)
 
 static READ16_HANDLER( es5503_word_lsb_r )
 {
-	return (ACCESSING_BYTE_0) ? (ES5503_reg_0_r(machine, offset) | 0xff00) : 0xffff;
+	return (ACCESSING_BITS_0_7) ? (ES5503_reg_0_r(machine, offset) | 0xff00) : 0xffff;
 }
 
 static WRITE16_HANDLER( es5503_word_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// 5503 ROM is banked by the output channel (it's a handy 4-bit output from the 5503)
 		if (offset < 0xe0)
@@ -116,7 +116,7 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 
 static WRITE16_HANDLER( output_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		logerror("%06x:output_w(%x) = %02x\n", activecpu_get_pc(), offset, data);
 }
 

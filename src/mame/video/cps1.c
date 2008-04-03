@@ -1471,7 +1471,7 @@ static void cps1_render_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 WRITE16_HANDLER( cps2_objram_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		cps2_objram_bank = data & 1;
 	}

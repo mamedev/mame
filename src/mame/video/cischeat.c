@@ -253,7 +253,7 @@ WRITE16_HANDLER( bigrun_vregs_w )
 	switch (offset)
 	{
  		case 0x0000/2   :	// leds
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 	 			coin_counter_w(0,new_data & 0x01);
 	 			coin_counter_w(1,new_data & 0x02);
@@ -266,7 +266,7 @@ WRITE16_HANDLER( bigrun_vregs_w )
 			break;
 
  		case 0x0004/2   :	// motor (seat?)
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				set_led_status(2, (new_data != old_data) ? 1 : 0);
  			break;
 
@@ -347,7 +347,7 @@ WRITE16_HANDLER( cischeat_vregs_w )
 	switch (offset)
 	{
  		case 0x0000/2   :	// leds
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 	 			coin_counter_w(0,new_data & 0x01);
 	 			coin_counter_w(1,new_data & 0x02);
@@ -360,7 +360,7 @@ WRITE16_HANDLER( cischeat_vregs_w )
 			break;
 
  		case 0x0004/2   :	// motor (seat?)
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				set_led_status(2, (new_data != old_data) ? 1 : 0);
  			break;
 
@@ -492,7 +492,7 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 */
 		// "shudder" motors, leds
 		case 0x0004/2   :
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 	 			coin_counter_w(0,new_data & 0x01);
 	 			coin_counter_w(1,new_data & 0x02);
@@ -546,7 +546,7 @@ WRITE16_HANDLER( f1gpstr2_vregs_w )
 	switch (offset)
 	{
 		case 0x0000/2   :
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				cpunum_set_input_line(machine, 4,4,(new_data & 4)?ASSERT_LINE:CLEAR_LINE);
 				cpunum_set_input_line(machine, 4,2,(new_data & 2)?ASSERT_LINE:CLEAR_LINE);

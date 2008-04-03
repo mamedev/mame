@@ -45,7 +45,7 @@ static WRITE16_HANDLER( drgnmst_coin_w )
 
 static WRITE16_HANDLER( drgnmst_snd_command_w )
 {
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 		drgnmst_snd_command = (data & 0xff);
 		cpu_yield();
 	}
@@ -54,7 +54,7 @@ static WRITE16_HANDLER( drgnmst_snd_command_w )
 static WRITE16_HANDLER( drgnmst_snd_flag_w )
 {
 	/* Enables the following 68K write operation to latch through to the PIC */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		drgnmst_snd_flag = 1;
 }
 

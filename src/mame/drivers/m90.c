@@ -59,7 +59,7 @@ static void set_m90_bank(void)
 
 static WRITE16_HANDLER( m90_coincounter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,data & 0x01);
 		coin_counter_w(1,data & 0x02);
@@ -70,7 +70,7 @@ static WRITE16_HANDLER( m90_coincounter_w )
 
 static WRITE16_HANDLER( quizf1_bankswitch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x10000 * (data & 0x0f);
 		set_m90_bank();

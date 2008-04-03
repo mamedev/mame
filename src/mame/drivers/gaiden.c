@@ -163,14 +163,14 @@ WRITE16_HANDLER( gaiden_flip_w );
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {
-	if (ACCESSING_BYTE_0) soundlatch_w(machine,0,data & 0xff);	/* Ninja Gaiden */
-	if (ACCESSING_BYTE_1) soundlatch_w(machine,0,data >> 8);	/* Tecmo Knight */
+	if (ACCESSING_BITS_0_7) soundlatch_w(machine,0,data & 0xff);	/* Ninja Gaiden */
+	if (ACCESSING_BITS_8_15) soundlatch_w(machine,0,data >> 8);	/* Tecmo Knight */
 	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine,0,data >> 8);
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
@@ -187,7 +187,7 @@ static int prot;
 
 static WRITE16_HANDLER( wildfang_protection_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		static int jumpcode;
 		static const int jumppoints[] =
@@ -321,7 +321,7 @@ static MACHINE_RESET ( raiga )
 
 static WRITE16_HANDLER( raiga_protection_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		static int jumpcode;
 

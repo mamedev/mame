@@ -106,7 +106,7 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 /* b5 = active background plane */
 /* b6 = active middle plane */
 /* b7 = active sprites */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		sf_active = data & 0xff;
 		flip_screen_set(data & 0x04);

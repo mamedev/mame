@@ -192,7 +192,7 @@ static WRITE16_HANDLER( nvram_thrash_w )
 static WRITE16_HANDLER( nvram_data_w )
 {
 	/* only the low 8 bits matter */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (nvram_write_enable)
 			generic_nvram16[offset] = data & 0xff;

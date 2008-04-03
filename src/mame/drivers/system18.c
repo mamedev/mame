@@ -86,7 +86,7 @@ extern WRITE16_HANDLER( segac2_vdp_w );
 
 static WRITE16_HANDLER( sys18_refreshenable_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 	{
 		sys16_refreshenable = data & 0x02;
 	}
@@ -94,7 +94,7 @@ static WRITE16_HANDLER( sys18_refreshenable_w )
 
 static WRITE16_HANDLER( sys18_tilebank_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 	{
 		sys16_tile_bank0 = (data >> 0) & 0x0F;
 		sys16_tile_bank1 = (data >> 4) & 0x0F;
@@ -193,7 +193,7 @@ static const struct MSM5205interface shdancbl_msm5205_interface =
 static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected portion of ROM */
 
 static WRITE16_HANDLER( sound_command_irq_w ){
-	if( ACCESSING_BYTE_0 ){
+	if( ACCESSING_BITS_0_7 ){
 		soundlatch_w( machine,0,data&0xff );
 		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
 	}
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( sound_writeport_18, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_nmi_w ){
-	if( ACCESSING_BYTE_0 ){
+	if( ACCESSING_BITS_0_7 ){
 		soundlatch_w( machine,0,data&0xff );
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -478,7 +478,7 @@ static int io_reg[0x10];
 
 static READ16_HANDLER( sys18_io_r )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 	{
 		switch(offset & 0x3000/2)
 		{
@@ -576,7 +576,7 @@ static READ16_HANDLER( sys18_io_r )
 
 static WRITE16_HANDLER( sys18_io_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 	{
 		switch(offset & 0x3000/2)
 		{

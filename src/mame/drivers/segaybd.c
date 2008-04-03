@@ -217,7 +217,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static WRITE16_HANDLER( sound_data_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_data_w);
 }
 
@@ -344,7 +344,7 @@ static WRITE16_HANDLER( io_chip_w )
 static READ16_HANDLER( analog_r )
 {
 	int result = 0xff;
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		result = analog_data[offset & 3] & 0x80;
 		analog_data[offset & 3] <<= 1;

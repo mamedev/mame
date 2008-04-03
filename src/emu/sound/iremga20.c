@@ -138,7 +138,7 @@ WRITE16_HANDLER( IremGA20_w )
 	int channel;
 
 	/* only low byte hooked up? */
-	if (!ACCESSING_BYTE_0)
+	if (!ACCESSING_BITS_0_7)
 		return;
 
 	//logerror("GA20:  Offset %02x, data %04x\n",offset,data);

@@ -274,13 +274,13 @@ static WRITE16_HANDLER( m92_eeprom_w )
 {
 	UINT8 *RAM = memory_region(REGION_USER1);
 //  logerror("%05x: EEPROM WR %04x\n",activecpu_get_pc(),offset);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
 
 static WRITE16_HANDLER( m92_coincounter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0, data & 0x01);
 		coin_counter_w(1, data & 0x02);
@@ -292,7 +292,7 @@ static WRITE16_HANDLER( m92_coincounter_w )
 
 static WRITE16_HANDLER( m92_bankswitch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x100000 + ((data & 0x7) * 0x10000);
 		set_m92_bank();

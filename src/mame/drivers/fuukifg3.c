@@ -186,7 +186,7 @@ VIDEO_EOF( fuuki32 );
 
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
-	if(ACCESSING_WORD_1)
+	if(ACCESSING_BITS_16_31)
 	{
 		int r,g,b;
 		COMBINE_DATA(&paletteram32[offset]);
@@ -198,7 +198,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 		palette_set_color_rgb(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
-	if(ACCESSING_WORD_0)
+	if(ACCESSING_BITS_0_15)
 	{
 		int r,g,b;
 		COMBINE_DATA(&paletteram32[offset]);
@@ -241,12 +241,12 @@ static READ32_HANDLER( snd_020_r )
 
 static WRITE32_HANDLER( snd_020_w )
 {
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		fuuki32_shared_ram[offset*2] = data>>16;
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		fuuki32_shared_ram[(offset*2)+1] = data & 0xff;
 	}

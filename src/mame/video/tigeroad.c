@@ -13,7 +13,7 @@ WRITE16_HANDLER( tigeroad_videoctrl_w )
 {
 	int bank;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		data = (data >> 8) & 0xff;
 

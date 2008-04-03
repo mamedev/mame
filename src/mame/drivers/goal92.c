@@ -29,7 +29,7 @@ static int msm5205next;
 
 static WRITE16_HANDLER( goal92_sound_command_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine, 0, (data >> 8) & 0xff);
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);

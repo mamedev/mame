@@ -126,7 +126,7 @@ static NVRAM_HANDLER( pirates )
 
 static WRITE16_HANDLER( pirates_out_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-2 control EEPROM */
 		EEPROM_write_bit(data & 0x04);

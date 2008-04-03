@@ -249,7 +249,7 @@ VIDEO_START( itech32 )
 
 WRITE16_HANDLER( timekill_colora_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		enable_latch[0] = (~data >> 5) & 1;
 		enable_latch[1] = (~data >> 7) & 1;
@@ -260,14 +260,14 @@ WRITE16_HANDLER( timekill_colora_w )
 
 WRITE16_HANDLER( timekill_colorbc_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		color_latch[1] = ((data & 0xf0) << 4) | 0x1000;
 }
 
 
 WRITE16_HANDLER( timekill_intensity_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
@@ -279,21 +279,21 @@ WRITE16_HANDLER( timekill_intensity_w )
 
 WRITE16_HANDLER( bloodstm_color1_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		color_latch[0] = (data & 0x7f) << 8;
 }
 
 
 WRITE16_HANDLER( bloodstm_color2_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		color_latch[1] = (data & 0x7f) << 8;
 }
 
 
 WRITE16_HANDLER( bloodstm_plane_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		enable_latch[0] = (~data >> 1) & 1;
 		enable_latch[1] = (~data >> 2) & 1;
@@ -303,28 +303,28 @@ WRITE16_HANDLER( bloodstm_plane_w )
 
 WRITE32_HANDLER( drivedge_color0_w )
 {
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		color_latch[0] = ((data >> 16) & 0x7f) << 8;
 }
 
 
 WRITE32_HANDLER( itech020_color1_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		color_latch[1] = (data & 0x7f) << 8;
 }
 
 
 WRITE32_HANDLER( itech020_color2_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		color_latch[0] = (data & 0x7f) << 8;
 }
 
 
 WRITE32_HANDLER( itech020_plane_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		enable_latch[0] = (~data >> 9) & 1;
 		enable_latch[1] = (~data >> 10) & 1;
@@ -359,7 +359,7 @@ WRITE16_HANDLER( bloodstm_paletteram_w )
 	int r, g, b;
 
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
-	if (!ACCESSING_BYTE_0 && (offset & 1))
+	if (!ACCESSING_BITS_0_7 && (offset & 1))
 		data >>= 8, mem_mask >>= 8;
 	COMBINE_DATA(&paletteram16[offset]);
 
@@ -1422,7 +1422,7 @@ READ16_HANDLER( bloodstm_video_r )
 
 WRITE32_HANDLER( itech020_video_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 		itech32_video_w(machine, offset, data >> 16, mem_mask >> 16);
 	else
 		itech32_video_w(machine, offset, data, mem_mask);

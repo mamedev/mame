@@ -414,7 +414,7 @@ WRITE8_HANDLER( timekeeper_0_w )
 static UINT16 timekeeper_msb16_read( UINT32 chip, offs_t offset, UINT16 mem_mask )
 {
 	UINT16 data = 0;
-	if( ACCESSING_BYTE_1 )
+	if( ACCESSING_BITS_8_15 )
 	{
 		data |= timekeeper_read( chip, offset ) << 8;
 	}
@@ -423,7 +423,7 @@ static UINT16 timekeeper_msb16_read( UINT32 chip, offs_t offset, UINT16 mem_mask
 
 static void timekeeper_msb16_write( UINT32 chip, offs_t offset, UINT16 data, UINT16 mem_mask )
 {
-	if( ACCESSING_BYTE_1 )
+	if( ACCESSING_BITS_8_15 )
 	{
 		timekeeper_write( chip, offset, data >> 8 );
 	}
@@ -437,19 +437,19 @@ WRITE16_HANDLER( timekeeper_0_msb16_w ) { timekeeper_msb16_write( 0, offset, dat
 static UINT32 timekeeper_32be_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 {
 	UINT32 data = 0;
-	if( ACCESSING_BYTE_3 )
+	if( ACCESSING_BITS_24_31 )
 	{
 		data |= timekeeper_read( chip, ( offset * 4 ) + 0 ) << 24;
 	}
-	if( ACCESSING_BYTE_2 )
+	if( ACCESSING_BITS_16_23 )
 	{
 		data |= timekeeper_read( chip, ( offset * 4 ) + 1 ) << 16;
 	}
-	if( ACCESSING_BYTE_1 )
+	if( ACCESSING_BITS_8_15 )
 	{
 		data |= timekeeper_read( chip, ( offset * 4 ) + 2 ) << 8;
 	}
-	if( ACCESSING_BYTE_0 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		data |= timekeeper_read( chip, ( offset * 4 ) + 3 ) << 0;
 	}
@@ -458,19 +458,19 @@ static UINT32 timekeeper_32be_read( UINT32 chip, offs_t offset, UINT32 mem_mask 
 
 static void timekeeper_32be_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
 {
-	if( ACCESSING_BYTE_3 )
+	if( ACCESSING_BITS_24_31 )
 	{
 		timekeeper_write( chip, ( offset * 4 ) + 0, data >> 24 );
 	}
-	if( ACCESSING_BYTE_2 )
+	if( ACCESSING_BITS_16_23 )
 	{
 		timekeeper_write( chip, ( offset * 4 ) + 1, data >> 16 );
 	}
-	if( ACCESSING_BYTE_1 )
+	if( ACCESSING_BITS_8_15 )
 	{
 		timekeeper_write( chip, ( offset * 4 ) + 2, data >> 8 );
 	}
-	if( ACCESSING_BYTE_0 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		timekeeper_write( chip, ( offset * 4 ) + 3, data >> 0 );
 	}
@@ -482,11 +482,11 @@ WRITE32_HANDLER( timekeeper_0_32be_w ) { timekeeper_32be_write( 0, offset, data,
 static UINT32 timekeeper_32le_lsb16_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
 {
 	UINT32 data = 0;
-	if( ACCESSING_BYTE_0 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		data |= timekeeper_read( chip, ( offset * 2 ) + 0 ) << 0;
 	}
-	if( ACCESSING_BYTE_2 )
+	if( ACCESSING_BITS_16_23 )
 	{
 		data |= timekeeper_read( chip, ( offset * 2 ) + 1 ) << 16;
 	}
@@ -495,11 +495,11 @@ static UINT32 timekeeper_32le_lsb16_read( UINT32 chip, offs_t offset, UINT32 mem
 
 static void timekeeper_32le_lsb16_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
 {
-	if( ACCESSING_BYTE_0 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		timekeeper_write( chip, ( offset * 2 ) + 0, data >> 0 );
 	}
-	if( ACCESSING_BYTE_2 )
+	if( ACCESSING_BITS_16_23 )
 	{
 		timekeeper_write( chip, ( offset * 2 ) + 1, data >> 16 );
 	}

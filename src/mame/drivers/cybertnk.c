@@ -301,35 +301,35 @@ static WRITE16_HANDLER( io_w )
 	{
 		case 0:
 			// sound data
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
 		case 2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				;//watchdog ? written in similar context to CPU1 @ 0x140002
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
 		case 6:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				;//select controller device
 			else
 				;//blank inputs
 			break;
 
 		case 8:
-			if (ACCESSING_BYTE_1)
+			if (ACCESSING_BITS_8_15)
 				;//blank inputs
 			else
 				LOG_UNKNOWN_WRITE
 			break;
 
 		case 0xc:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				// This seems to only be written after each irq1 and irq2
 				logerror("irq wrote %04x\n", data);
 			else
@@ -337,7 +337,7 @@ static WRITE16_HANDLER( io_w )
 			break;
 
 		case 0xd4:
-			if ( ACCESSING_BYTE_0 )
+			if ( ACCESSING_BITS_0_7 )
 				;// controller device data
 			else
 				LOG_UNKNOWN_WRITE

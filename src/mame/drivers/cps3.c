@@ -1387,7 +1387,7 @@ static UINT32 cram_bank = 0;
 
 static WRITE32_HANDLER( cram_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// this seems to be related to accesses to the 0x04100000 region
 		if (cram_bank != data)
@@ -1445,22 +1445,22 @@ static READ32_HANDLER( cps3_gfxflash_r )
 
 	if(DEBUG_PRINTF) printf("gfxflash_r\n");
 
-	if (ACCESSING_BYTE_3)	// GFX Flash 1
+	if (ACCESSING_BITS_24_31)	// GFX Flash 1
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash1-8, (offset<<1));
 		result |= intelflash_read(flash1, (offset<<1) ) << 24;
 	}
-	if (ACCESSING_BYTE_2)	// GFX Flash 2
+	if (ACCESSING_BITS_16_23)	// GFX Flash 2
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash2-8, (offset<<1));
 		result |= intelflash_read(flash2, (offset<<1) ) << 16;
 	}
-	if (ACCESSING_BYTE_1)	// GFX Flash 1
+	if (ACCESSING_BITS_8_15)	// GFX Flash 1
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash1-8, (offset<<1)+1);
 		result |= intelflash_read(flash1, (offset<<1)+0x1 ) << 8;
 	}
-	if (ACCESSING_BYTE_0)	// GFX Flash 2
+	if (ACCESSING_BITS_0_7)	// GFX Flash 2
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash2-8, (offset<<1)+1);
 		result |= intelflash_read(flash2, (offset<<1)+0x1 ) << 0;
@@ -1485,25 +1485,25 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 //  if(DEBUG_PRINTF) printf("cps3_gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
 
 
-	if (ACCESSING_BYTE_3)	// GFX Flash 1
+	if (ACCESSING_BITS_24_31)	// GFX Flash 1
 	{
 		command = (data >> 24) & 0xff;
 		logerror("write to GFX flash chip %d addr %02x cmd %02x\n", flash1-8, (offset<<1), command);
 		intelflash_write(flash1, (offset<<1), command);
 	}
-	if (ACCESSING_BYTE_2)	// GFX Flash 2
+	if (ACCESSING_BITS_16_23)	// GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		logerror("write to GFX flash chip %d addr %02x cmd %02x\n", flash2-8, (offset<<1), command);
 		intelflash_write(flash2, (offset<<1), command);
 	}
-	if (ACCESSING_BYTE_1)	// GFX Flash 1
+	if (ACCESSING_BITS_8_15)	// GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
 		logerror("write to GFX flash chip %d addr %02x cmd %02x\n", flash1-8, (offset<<1)+1, command);
 		intelflash_write(flash1, (offset<<1)+0x1, command);
 	}
-	if (ACCESSING_BYTE_0)	// GFX Flash 2
+	if (ACCESSING_BITS_0_7)	// GFX Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//if ( ((offset<<1)+1) != 0x555) printf("write to GFX flash chip %d addr %02x cmd %02x\n", flash1-8, (offset<<1)+1, command);
@@ -1536,22 +1536,22 @@ static UINT32 cps3_flashmain_r(int base, UINT32 offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 
-	if (ACCESSING_BYTE_3)	// Flash 1
+	if (ACCESSING_BITS_24_31)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+0, offset*4 );
 		result |= (intelflash_read(base+0, offset)<<24);
 	}
-	if (ACCESSING_BYTE_2)	// Flash 1
+	if (ACCESSING_BITS_16_23)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+1, offset*4 );
 		result |= (intelflash_read(base+1, offset)<<16);
 	}
-	if (ACCESSING_BYTE_1)	// Flash 1
+	if (ACCESSING_BITS_8_15)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+2, offset*4 );
 		result |= (intelflash_read(base+2, offset)<<8);
 	}
-	if (ACCESSING_BYTE_0)	// Flash 1
+	if (ACCESSING_BITS_0_7)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+3, offset*4 );
 		result |= (intelflash_read(base+3, offset)<<0);
@@ -1649,25 +1649,25 @@ static READ32_HANDLER( cps3_flash2_r )
 static void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
 	int command;
-	if (ACCESSING_BYTE_3)	// Flash 1
+	if (ACCESSING_BITS_24_31)	// Flash 1
 	{
 		command = (data >> 24) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+0, offset, command);
 		intelflash_write(base+0, offset, command);
 	}
-	if (ACCESSING_BYTE_2)	// Flash 2
+	if (ACCESSING_BITS_16_23)	// Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+1, offset, command);
 		intelflash_write(base+1, offset, command);
 	}
-	if (ACCESSING_BYTE_1)	// Flash 2
+	if (ACCESSING_BITS_8_15)	// Flash 2
 	{
 		command = (data >> 8) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+2, offset, command);
 		intelflash_write(base+2, offset, command);
 	}
-	if (ACCESSING_BYTE_0)	// Flash 2
+	if (ACCESSING_BITS_0_7)	// Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+3, offset, command);
@@ -1727,7 +1727,7 @@ static WRITE32_HANDLER( cps3_flash2_w )
 
 static WRITE32_HANDLER( cram_gfxflash_bank_w )
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		//printf("cram_gfxflash_bank_w MSB32 %08x\n",data);
 /*
@@ -1774,7 +1774,7 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
 		cram_gfxflash_bank-= 0x0002;// as with sound access etc. first 4 meg is 'special' and skipped
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 	/*  if(DEBUG_PRINTF)*/ printf("cram_gfxflash_bank_LSB_w LSB32 %08x\n",data);
 	}
@@ -1822,7 +1822,7 @@ static READ32_HANDLER( cps3_eeprom_r )
 
 	if (addr>=0x100 && addr<=0x17f)
 	{
-		if (ACCESSING_BYTE_3) cps3_current_eeprom_read = (cps3_eeprom[offset-0x100/4] & 0xffff0000)>>16;
+		if (ACCESSING_BITS_24_31) cps3_current_eeprom_read = (cps3_eeprom[offset-0x100/4] & 0xffff0000)>>16;
 		else cps3_current_eeprom_read = (cps3_eeprom[offset-0x100/4] & 0x0000ffff)>>0;
 		// read word to latch...
 		return 0x00000000;
@@ -1830,7 +1830,7 @@ static READ32_HANDLER( cps3_eeprom_r )
 	else if (addr == 0x200)
 	{
 		// busy flag / read data..
-		if (ACCESSING_BYTE_3) return 0;
+		if (ACCESSING_BITS_24_31) return 0;
 		else
 		{
 			//if(DEBUG_PRINTF) printf("reading %04x from eeprom\n", cps3_current_eeprom_read);
@@ -1871,12 +1871,12 @@ static READ32_HANDLER( cps3_cdrom_r )
 {
 	UINT32 retval = 0;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		retval |= ((UINT16)wd33c93_r(machine,0))<<16;
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		retval |= (UINT16)wd33c93_r(machine,1);
 	}
@@ -1886,12 +1886,12 @@ static READ32_HANDLER( cps3_cdrom_r )
 
 static WRITE32_HANDLER( cps3_cdrom_w )
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		wd33c93_w(machine,0,(data & 0x00ff0000)>>16);
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		wd33c93_w(machine,1,(data & 0x000000ff)>>0);
 	}
@@ -1910,7 +1910,7 @@ static WRITE32_HANDLER( cps3_ss_pal_base_w )
 {
 	 if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
 
-	if(ACCESSING_BYTE_3)
+	if(ACCESSING_BITS_24_31)
 	{
 		cps3_ss_pal_base = (data & 0x00ff0000)>>16;
 
@@ -1951,11 +1951,11 @@ static WRITE32_HANDLER( cps3_palettedma_w )
 	{
 		COMBINE_DATA(&paldma_other2);
 
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			paldma_length = (data & 0xffff0000)>>16;
 		}
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			if (data & 0x0002)
 			{
@@ -2226,11 +2226,11 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 	if (offset==0)
 	{
 		//COMBINE_DATA(&chardma_source);
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			chardma_source = data & 0x0000ffff;
 		}
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			if(DEBUG_PRINTF) printf("chardma_w accessing MSB32 of offset 0");
 		}
@@ -2239,7 +2239,7 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 	{
 		COMBINE_DATA(&chardma_other);
 
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			if ((data>>16) & 0x0040)
 			{
@@ -2290,12 +2290,12 @@ static WRITE32_HANDLER( cps3_colourram_w )
 {
 //  COMBINE_DATA(&cps3_colourram[offset]);
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		cps3_set_mame_colours(machine, offset*2, (data & 0xffff0000) >> 16, 0);
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		cps3_set_mame_colours(machine, offset*2+1, (data & 0x0000ffff) >> 0, 0);
 	}

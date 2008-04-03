@@ -320,7 +320,7 @@ static void sslam_play(running_machine *machine, int track, int data)
 
 static WRITE16_HANDLER( sslam_snd_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		logerror("PC:%06x Writing %04x to Sound CPU\n",activecpu_get_previouspc(),data);
 		if (data >= 0x40) {

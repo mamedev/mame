@@ -117,7 +117,7 @@ static NVRAM_HANDLER(gaiapols)
 
 static READ16_HANDLER( mweeprom_r )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		int res = readinputport(1) | EEPROM_read_bit();
 
@@ -137,7 +137,7 @@ static READ16_HANDLER( mweeprom_r )
 
 static READ16_HANDLER( vseeprom_r )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		int res = readinputport(1) | EEPROM_read_bit();
 
@@ -157,7 +157,7 @@ static READ16_HANDLER( vseeprom_r )
 
 static WRITE16_HANDLER( mweeprom_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		EEPROM_write_bit((data&0x0100) ? 1 : 0);
 		EEPROM_set_cs_line((data&0x0200) ? CLEAR_LINE : ASSERT_LINE);
@@ -171,7 +171,7 @@ static WRITE16_HANDLER( mweeprom_w )
 
 static READ16_HANDLER( dddeeprom_r )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		return (readinputport(1) | EEPROM_read_bit())<<8;
 	}
@@ -181,7 +181,7 @@ static READ16_HANDLER( dddeeprom_r )
 
 static WRITE16_HANDLER( mmeeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		EEPROM_write_bit((data&0x01) ? 1 : 0);
 		EEPROM_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
@@ -305,7 +305,7 @@ static WRITE16_HANDLER( irq_ack_w )
 {
 	K056832_b_word_w(machine, offset, data, mem_mask);
 
-	if (offset == 3 && ACCESSING_BYTE_0)
+	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
 		mw_irq_control = data&0xff;
 
@@ -582,7 +582,7 @@ static READ16_HANDLER( mccontrol_r )
 
 static WRITE16_HANDLER( mccontrol_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		mw_irq_control = data>>8;
 		// bit 0 = watchdog

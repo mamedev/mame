@@ -100,7 +100,7 @@ static READ16_HANDLER( astrocorp_eeprom_r )
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x01);
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( astrocorp_eeprom_w )
 
 static WRITE16_HANDLER( astrocorp_sound_bank_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * ((data >> 8) & 1) );
 //      logerror("CPU #0 PC %06X: OKI bank %08X\n",activecpu_get_pc(),data);
@@ -124,14 +124,14 @@ static WRITE16_HANDLER( astrocorp_sound_bank_w )
 
 static WRITE16_HANDLER( astrocorp_outputs_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,	(data & 0x0004));	// coin counter
 		set_led_status(0,	(data & 0x0008));	// you win
 		if (				(data & 0x0010))	dispensed_tickets++;	// coin out
 		set_led_status(1,	(data & 0x0020));	// coin/hopper jam
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		set_led_status(2,	(data & 0x0100));	// bet
 		set_led_status(3,	(data & 0x0800));	// start

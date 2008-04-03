@@ -179,7 +179,7 @@ WRITE16_HANDLER( gaiden_videoram3_w )
 
 WRITE16_HANDLER( gaiden_flip_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		flip_screen_set(data & 1);
 }
 

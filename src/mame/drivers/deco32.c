@@ -359,12 +359,12 @@ static READ32_HANDLER( fghthist_control_r )
 
 static WRITE32_HANDLER( fghthist_eeprom_w )
 {
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 		EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_write_bit(data & 0x10);
 		EEPROM_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
-	else if (!ACCESSING_BYTE_1)
+	else if (!ACCESSING_BITS_8_15)
 	{
 		// Volume port
 	}
@@ -434,7 +434,7 @@ static READ32_HANDLER( dragngun_eeprom_r )
 
 static WRITE32_HANDLER( dragngun_eeprom_w )
 {
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 		EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_write_bit(data & 0x1);
 		EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
@@ -635,7 +635,7 @@ static READ32_HANDLER( nslasher_prot_r )
 
 static WRITE32_HANDLER( nslasher_eeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		EEPROM_write_bit(data & 0x10);

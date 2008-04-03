@@ -271,7 +271,7 @@ static WRITE8_HANDLER( soundlatch_ack_w )
 /* Handles writes to the YMZ280B */
 static WRITE16_HANDLER( cave_sound_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (offset)	YMZ280B_data_0_w     (machine, offset, data & 0xff);
 		else		YMZ280B_register_0_w (machine, offset, data & 0xff);
@@ -329,7 +329,7 @@ static WRITE16_HANDLER( cave_eeprom_msb_w )
 	if (data & ~0xfe00)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_BYTE_1 )  // even address
+	if ( ACCESSING_BITS_8_15 )  // even address
 	{
 		coin_lockout_w(1,~data & 0x8000);
 		coin_lockout_w(0,~data & 0x4000);
@@ -355,7 +355,7 @@ static WRITE16_HANDLER( sailormn_eeprom_msb_w )
 
 static WRITE16_HANDLER( hotdogst_eeprom_msb_w )
 {
-	if ( ACCESSING_BYTE_1 )  // even address
+	if ( ACCESSING_BITS_8_15 )  // even address
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x0800);
@@ -373,7 +373,7 @@ static WRITE16_HANDLER( cave_eeprom_lsb_w )
 	if (data & ~0x00ef)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_BYTE_0 )  // odd address
+	if ( ACCESSING_BITS_0_7 )  // odd address
 	{
 		coin_lockout_w(1,~data & 0x0008);
 		coin_lockout_w(0,~data & 0x0004);
@@ -394,7 +394,7 @@ static WRITE16_HANDLER( cave_eeprom_lsb_w )
 /*  - No eeprom or lockouts */
 static WRITE16_HANDLER( gaia_coin_lsb_w )
 {
-	if ( ACCESSING_BYTE_0 )  // odd address
+	if ( ACCESSING_BITS_0_7 )  // odd address
 	{
 		coin_counter_w(1, data & 0x0002);
 		coin_counter_w(0, data & 0x0001);
@@ -408,7 +408,7 @@ static WRITE16_HANDLER( metmqstr_eeprom_msb_w )
 	if (data & ~0xff00)
 		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
 
-	if ( ACCESSING_BYTE_1 )  // even address
+	if ( ACCESSING_BITS_8_15 )  // even address
 	{
 		coin_counter_w(1, data & 0x2000);
 		coin_counter_w(0, data & 0x1000);
@@ -853,7 +853,7 @@ static WRITE16_HANDLER( korokoro_eeprom_msb_w )
 		show_leds();
 	}
 
-	if ( ACCESSING_BYTE_1 )  // even address
+	if ( ACCESSING_BITS_8_15 )  // even address
 	{
 		hopper = data & 0x0100;	// ???
 

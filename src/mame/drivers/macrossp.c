@@ -275,7 +275,7 @@ static READ32_HANDLER ( macrossp_soundstatus_r )
 
 static WRITE32_HANDLER( macrossp_soundcmd_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		//logerror("%08x write soundcmd %08x (%08x)\n",activecpu_get_pc(),data,mem_mask);
 		soundlatch_word_w(machine,0,data >> 16,0);

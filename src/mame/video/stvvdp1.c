@@ -287,7 +287,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 	if ( offset == 0 )
 	{
 		stv_set_framebuffer_config();
-		if ( ACCESSING_WORD_0 )
+		if ( ACCESSING_BITS_0_15 )
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Access to register FBCR = %1X\n", STV_VDP1_FBCR );
 			stv_vdp1_fbcr_accessed = 1;
@@ -309,7 +309,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 	}
 	else if ( offset == 1 )
 	{
-		if ( ACCESSING_WORD_1 )
+		if ( ACCESSING_BITS_16_31 )
 		{
 			if ( STV_VDP1_PTMR == 1 )
 			{
@@ -323,18 +323,18 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 				}
 			}
 		}
-		else if ( ACCESSING_WORD_0 )
+		else if ( ACCESSING_BITS_0_15 )
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Erase data set %08X\n", data );
 		}
 	}
 	else if ( offset == 2 )
 	{
-		if ( ACCESSING_WORD_1 )
+		if ( ACCESSING_BITS_16_31 )
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Erase upper-left coord set: %08X\n", data );
 		}
-		else if ( ACCESSING_WORD_0 )
+		else if ( ACCESSING_BITS_0_15 )
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Erase lower-right coord set: %08X\n", data );
 		}
@@ -377,11 +377,11 @@ WRITE32_HANDLER ( stv_vdp1_framebuffer0_w )
 	else
 	{
 		/* 16-bit mode */
-		if ( ACCESSING_WORD_1 )
+		if ( ACCESSING_BITS_16_31 )
 		{
 			stv_framebuffer[stv_vdp1_current_draw_framebuffer][offset*2] = (data >> 16) & 0xffff;
 		}
-		if ( ACCESSING_WORD_0 )
+		if ( ACCESSING_BITS_0_15 )
 		{
 			stv_framebuffer[stv_vdp1_current_draw_framebuffer][offset*2+1] = data & 0xffff;
 		}
@@ -399,11 +399,11 @@ READ32_HANDLER ( stv_vdp1_framebuffer0_r )
 	else
 	{
 		/* 16-bit mode */
-		if ( ACCESSING_WORD_1 )
+		if ( ACCESSING_BITS_16_31 )
 		{
 			result |= (stv_framebuffer[stv_vdp1_current_draw_framebuffer][offset*2] << 16);
 		}
-		if ( ACCESSING_WORD_0 )
+		if ( ACCESSING_BITS_0_15 )
 		{
 			result |= stv_framebuffer[stv_vdp1_current_draw_framebuffer][offset*2+1];
 		}

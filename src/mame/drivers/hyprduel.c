@@ -107,7 +107,7 @@ static READ16_HANDLER( hyprduel_irq_cause_r )
 
 static WRITE16_HANDLER( hyprduel_irq_cause_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (data == int_num)
 			requested_int &= ~(int_num & ~*hypr_irq_enable);

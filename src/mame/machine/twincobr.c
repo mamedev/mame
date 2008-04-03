@@ -240,7 +240,7 @@ static void toaplan0_control_w(int offset, int data)
 
 WRITE16_HANDLER( twincobr_control_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan0_control_w(offset, data & 0xff);
 	}
@@ -259,7 +259,7 @@ READ16_HANDLER( twincobr_sharedram_r )
 
 WRITE16_HANDLER( twincobr_sharedram_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		twincobr_sharedram[offset] = data & 0xff;
 	}
@@ -297,7 +297,7 @@ static void toaplan0_coin_dsp_w(int offset, int data)
 
 WRITE16_HANDLER( fshark_coin_dsp_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan0_coin_dsp_w(offset, data & 0xff);
 	}

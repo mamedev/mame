@@ -265,12 +265,12 @@ READ8_HANDLER( taitosound_slave_comm_r )
 
 WRITE16_HANDLER( taitosound_port16_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		taitosound_port_w(machine,0,data & 0xff);
 }
 WRITE16_HANDLER( taitosound_comm16_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		taitosound_comm_w(machine,0,data & 0xff);
 }
 READ16_HANDLER( taitosound_comm16_lsb_r )
@@ -281,12 +281,12 @@ READ16_HANDLER( taitosound_comm16_lsb_r )
 
 WRITE16_HANDLER( taitosound_port16_msb_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		taitosound_port_w(machine,0,data >> 8);
 }
 WRITE16_HANDLER( taitosound_comm16_msb_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		taitosound_comm_w(machine,0,data >> 8);
 }
 READ16_HANDLER( taitosound_comm16_msb_r )

@@ -105,7 +105,7 @@ static int pending_command;
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		pending_command = 1;
 		soundlatch_w(machine,offset,data & 0xff);
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( turbofrc_sound_command_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		pending_command = 1;
 		soundlatch_w(machine,offset,(data >> 8) & 0xff);

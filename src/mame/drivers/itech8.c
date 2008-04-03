@@ -855,28 +855,28 @@ static READ16_HANDLER( tms34061_16_r )
 
 static WRITE16_HANDLER( sound_data16_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		sound_data_w(machine, 0, data >> 8);
 }
 
 
 static WRITE16_HANDLER( grom_bank16_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		*itech8_grom_bank = data >> 8;
 }
 
 
 static WRITE16_HANDLER( display_page16_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		itech8_page_w(machine, 0, ~data >> 8);
 }
 
 
 static WRITE16_HANDLER( tms34061_latch16_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		tms34061_latch_w(machine, 0, data >> 8);
 }
 
@@ -889,7 +889,7 @@ static WRITE16_HANDLER( blitter16_w )
 
 static WRITE16_HANDLER( palette16_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		itech8_palette_w(machine, offset / 8, data >> 8);
 }
 

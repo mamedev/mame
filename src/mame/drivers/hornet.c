@@ -593,27 +593,27 @@ static READ32_HANDLER( sysreg_r )
 	UINT32 r = 0;
 	if (offset == 0)
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			//printf("read sysreg 0\n");
 			r |= readinputport(0) << 24;
 		}
-		if (ACCESSING_BYTE_2)
+		if (ACCESSING_BITS_16_23)
 		{
 			r |= readinputport(1) << 16;
 		}
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 		{
 			r |= readinputport(2) << 8;
 		}
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			r |= 0xf7;
 		}
 	}
 	else if (offset == 1)
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= readinputport(3) << 24;
 		}
@@ -624,11 +624,11 @@ static READ32_HANDLER( sysreg_r )
 static WRITE32_HANDLER( sysreg_w )
 {
 	if( offset == 0 ) {
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			led_reg0 = (data >> 24) & 0xff;
 		}
-		if (ACCESSING_BYTE_2)
+		if (ACCESSING_BITS_16_23)
 		{
 			led_reg1 = (data >> 16) & 0xff;
 		}
@@ -636,10 +636,10 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 	if( offset == 1 )
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 		}
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 			{

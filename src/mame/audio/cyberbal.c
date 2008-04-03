@@ -146,7 +146,7 @@ READ16_HANDLER( cyberbal_sound_68k_r )
 
 WRITE16_HANDLER( cyberbal_sound_68k_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		sound_data_from_68k = (data >> 8) & 0xff;
 		sound_data_from_68k_ready = 1;

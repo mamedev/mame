@@ -459,25 +459,25 @@ WRITE8_HANDLER( saa1099_write_port_1_w )
 
 WRITE16_HANDLER( saa1099_control_port_0_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		saa1099_control_port_w(0, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( saa1099_write_port_0_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		saa1099_write_port_w(0, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( saa1099_control_port_1_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		saa1099_control_port_w(1, offset, data & 0xff);
 }
 
 WRITE16_HANDLER( saa1099_write_port_1_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		saa1099_write_port_w(1, offset, data & 0xff);
 }
 

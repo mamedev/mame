@@ -155,7 +155,7 @@ WRITE16_HANDLER( f1gp_fgscroll_w )
 
 WRITE16_HANDLER( f1gp_gfxctrl_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		flipscreen = data & 0x20;
 		gfxctrl = data & 0xdf;
@@ -164,7 +164,7 @@ WRITE16_HANDLER( f1gp_gfxctrl_w )
 
 WRITE16_HANDLER( f1gp2_gfxctrl_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		flipscreen = data & 0x20;
 
@@ -174,7 +174,7 @@ WRITE16_HANDLER( f1gp2_gfxctrl_w )
 		gfxctrl = data & 0xdf;
 	}
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (f1gp2_roz_bank != (data >> 8))
 		{

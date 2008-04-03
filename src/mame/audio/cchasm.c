@@ -88,7 +88,7 @@ WRITE16_HANDLER( cchasm_io_w )
 {
     static int led;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 		switch (offset & 0xf)

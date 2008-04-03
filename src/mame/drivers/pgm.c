@@ -404,9 +404,9 @@ static WRITE16_HANDLER( arm7_ram_w )
 static WRITE16_HANDLER ( z80_ram_w )
 {
 	int pc = activecpu_get_pc();
-	if(ACCESSING_BYTE_1)
+	if(ACCESSING_BITS_8_15)
 		z80_mainram[offset*2] = data >> 8;
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 		z80_mainram[offset*2+1] = data;
 
 	if(pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
@@ -443,7 +443,7 @@ static WRITE16_HANDLER ( z80_ctrl_w )
 
 static WRITE16_HANDLER ( m68k_l1_w )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, activecpu_get_pc());
 		soundlatch_w(machine, 0, data);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
@@ -755,11 +755,11 @@ static READ32_HANDLER( kovsh_arm7_protlatch_r )
 
 static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		kovsh_highlatch = data>>16;
 	}
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 	{
 		kovsh_lowlatch = data;
 	}

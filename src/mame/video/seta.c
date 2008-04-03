@@ -277,7 +277,7 @@ WRITE16_HANDLER( seta_vregs_w )
         ---- ---- ---- -2--     Coin #0 Lock Out
         ---- ---- ---- --1-     Coin #1 Counter
         ---- ---- ---- ---0     Coin #0 Counter     */
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				seta_coin_lockout_w (data & 0x0f);
 				if (sndti_exists(SOUND_X1_010, 0))
@@ -288,7 +288,7 @@ WRITE16_HANDLER( seta_vregs_w )
 			break;
 
 		case 2/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				int new_bank;
 
@@ -419,7 +419,7 @@ WRITE16_HANDLER( seta_vram_2_w )
 
 WRITE16_HANDLER( twineagl_tilebank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
 		if (twineagl_tilebank[offset] != data)

@@ -165,7 +165,7 @@ WRITE16_HANDLER( amazon_foreground_w )
 
 WRITE16_HANDLER( amazon_flipscreen_w )
 {
-	if( ACCESSING_BYTE_0 )
+	if( ACCESSING_BITS_0_7 )
 	{
 		coin_counter_w( 0, data&0x01 );
 		coin_counter_w( 1, (data&0x02)>>1 );

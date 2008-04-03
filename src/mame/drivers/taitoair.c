@@ -240,7 +240,7 @@ VIDEO_UPDATE( taitoair );
 
 static WRITE16_HANDLER( system_control_w )
 {
-	if ((ACCESSING_BYTE_0 == 0) && ACCESSING_BYTE_1)
+	if ((ACCESSING_BITS_0_7 == 0) && ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 	}
@@ -259,7 +259,7 @@ static READ16_HANDLER( lineram_r )
 
 static WRITE16_HANDLER( lineram_w )
 {
-	if (ACCESSING_BYTE_1 && ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		taitoair_line_ram[offset] = data;
 }
 
@@ -270,7 +270,7 @@ static READ16_HANDLER( dspram_r )
 
 static WRITE16_HANDLER( dspram_w )
 {
-	if (ACCESSING_BYTE_1 && ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7)
 		dsp_ram[offset] = data;
 }
 

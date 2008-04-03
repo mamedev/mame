@@ -238,7 +238,7 @@ static WRITE8_HANDLER( cps1_oki_pin7_w )
 
 static WRITE16_HANDLER( cps1_sound_fade_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		cps1_sound_fade_timer = data & 0xff;
 }
 
@@ -249,7 +249,7 @@ static READ8_HANDLER( cps1_snd_fade_timer_r )
 
 static WRITE16_HANDLER( cps1_sound_command_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		soundlatch_w(machine,0,data & 0xff);
 }
 
@@ -257,7 +257,7 @@ WRITE16_HANDLER( cps1_coinctrl_w )
 {
 //  popmessage("coinctrl %04x",data);
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		coin_counter_w(0,data & 0x0100);
 		coin_counter_w(1,data & 0x0200);
@@ -265,7 +265,7 @@ WRITE16_HANDLER( cps1_coinctrl_w )
 		coin_lockout_w(1,~data & 0x0800);
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* mercs sets bit 0 */
 		set_led_status(0,data & 0x02);
@@ -276,7 +276,7 @@ WRITE16_HANDLER( cps1_coinctrl_w )
 
 static WRITE16_HANDLER( cpsq_coinctrl2_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(2,data & 0x01);
 		coin_lockout_w(2,~data & 0x02);
@@ -339,7 +339,7 @@ READ16_HANDLER( qsound_sharedram1_r )
 
 WRITE16_HANDLER( qsound_sharedram1_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		qsound_sharedram1[offset] = data;
 }
 
@@ -350,7 +350,7 @@ static READ16_HANDLER( qsound_sharedram2_r )
 
 static WRITE16_HANDLER( qsound_sharedram2_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		qsound_sharedram2[offset] = data;
 }
 
@@ -434,7 +434,7 @@ READ16_HANDLER( cps1_eeprom_port_r )
 
 WRITE16_HANDLER( cps1_eeprom_port_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/*
         bit 0 = data

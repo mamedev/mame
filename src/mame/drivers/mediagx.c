@@ -466,17 +466,17 @@ static READ32_HANDLER( io20_r )
 {
 	UINT32 r = 0;
 	// 0x20 - 0x21, PIC
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 	{
 		r |= pic8259_32le_0_r(machine, offset, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 
 	}
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		r |= mediagx_config_reg_r() << 24;
 	}
@@ -486,17 +486,17 @@ static READ32_HANDLER( io20_r )
 static WRITE32_HANDLER( io20_w )
 {
 	// 0x20 - 0x21, PIC
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 	{
 		pic8259_32le_0_w(machine, offset, data, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		mediagx_config_reg_sel = (data >> 16) & 0xff;
 	}
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		mediagx_config_reg_w((data >> 24) & 0xff);
 	}
@@ -506,7 +506,7 @@ static READ32_HANDLER( parallel_port_r )
 {
 	UINT32 r = 0;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 nibble = parallel_latched;//(readinputport(parallel_pointer / 3) >> (4 * (parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
@@ -526,7 +526,7 @@ static READ32_HANDLER( parallel_port_r )
 
         //r |= control_read << 8;*/
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		r |= parport & 0xff0000;
 	}
@@ -538,7 +538,7 @@ static WRITE32_HANDLER( parallel_port_w )
 {
 	COMBINE_DATA( &parport );
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/*
             Controls:
@@ -699,12 +699,12 @@ static WRITE32_HANDLER( ad1847_w )
 {
 	if (offset == 0)
 	{
-		if (ACCESSING_WORD_1)
+		if (ACCESSING_BITS_16_31)
 		{
 			UINT16 ldata = (data >> 16) & 0xffff;
 			dacl[dacl_ptr++] = ldata;
 		}
-		if (ACCESSING_WORD_0)
+		if (ACCESSING_BITS_0_15)
 		{
 			UINT16 rdata = data & 0xffff;
 			dacr[dacr_ptr++] = rdata;

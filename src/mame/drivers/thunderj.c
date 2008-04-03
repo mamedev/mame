@@ -91,7 +91,7 @@ static READ16_HANDLER( special_port2_r )
 static WRITE16_HANDLER( latch_w )
 {
 	/* reset extra CPU */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)

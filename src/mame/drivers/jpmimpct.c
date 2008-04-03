@@ -508,7 +508,7 @@ static READ16_HANDLER( inputs1_r )
  *************************************/
 static WRITE16_HANDLER( volume_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		upd7759_set_bank_base(0, 0x20000 * ((data >> 1) & 3));
 		upd7759_reset_w(0, data & 0x01);
@@ -517,7 +517,7 @@ static WRITE16_HANDLER( volume_w )
 
 static WRITE16_HANDLER( upd7759_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		upd7759_port_w(0, data);
 		upd7759_start_w(0, 0);
@@ -527,7 +527,7 @@ static WRITE16_HANDLER( upd7759_w )
 
 static READ16_HANDLER( upd7759_r )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		return upd7759_busy_r(0);
 	}

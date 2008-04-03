@@ -64,7 +64,7 @@ static int color_bank;
 
 WRITE16_HANDLER( suna16_flipscreen_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		flip_screen_set( data & 1 );
 		color_bank =   ( data & 4 ) >> 2;
@@ -74,7 +74,7 @@ WRITE16_HANDLER( suna16_flipscreen_w )
 
 WRITE16_HANDLER( bestbest_flipscreen_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		flip_screen_set( data & 0x10 );
 //      color_bank =   ( data & 0x07 );

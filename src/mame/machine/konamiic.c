@@ -71,19 +71,19 @@ READ32_HANDLER(K056800_host_r)
 {
 	UINT32 r = 0;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		r |= K056800_host_reg_r((offset*4)+0) << 24;
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		r |= K056800_host_reg_r((offset*4)+1) << 16;
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		r |= K056800_host_reg_r((offset*4)+2) << 8;
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		r |= K056800_host_reg_r((offset*4)+3) << 0;
 	}
@@ -93,19 +93,19 @@ READ32_HANDLER(K056800_host_r)
 
 WRITE32_HANDLER(K056800_host_w)
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		K056800_host_reg_w((offset*4)+0, (data >> 24) & 0xff);
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		K056800_host_reg_w((offset*4)+1, (data >> 16) & 0xff);
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		K056800_host_reg_w((offset*4)+2, (data >> 8) & 0xff);
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		K056800_host_reg_w((offset*4)+3, (data >> 0) & 0xff);
 	}

@@ -105,7 +105,7 @@ static READ16_HANDLER( oneshot_gun_y_p2_r )
 
 static WRITE16_HANDLER( soundbank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		OKIM6295_set_bank_base(0, 0x40000 * ((data & 0x03) ^ 0x03));
 	}

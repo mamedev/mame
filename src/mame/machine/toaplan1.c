@@ -36,7 +36,7 @@ INTERRUPT_GEN( toaplan1_interrupt )
 
 WRITE16_HANDLER( toaplan1_intenable_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_intenable = data & 0xff;
 	}
@@ -140,7 +140,7 @@ WRITE16_HANDLER( demonwld_dsp_ctrl_w )
 	logerror("68000:%08x  Writing %08x to %08x.\n",activecpu_get_pc() ,data ,0xe0000a + offset);
 #endif
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		switch (data)
 		{
@@ -201,7 +201,7 @@ WRITE16_HANDLER( vimana_mcu_w )
 	{
 		case 0:  break;
 		case 1:  break;
-		case 2:  if (ACCESSING_BYTE_0) vimana_credits = data & 0xff; break;
+		case 2:  if (ACCESSING_BITS_0_7) vimana_credits = data & 0xff; break;
 	}
 }
 
@@ -212,7 +212,7 @@ READ16_HANDLER( toaplan1_shared_r )
 
 WRITE16_HANDLER( toaplan1_shared_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_sharedram[offset] = data & 0xff;
 	}
@@ -223,7 +223,7 @@ WRITE16_HANDLER( toaplan1_reset_sound )
 {
 	/* Reset the secondary CPU and sound chip during soft resets */
 
-	if (ACCESSING_BYTE_0 && (data == 0))
+	if (ACCESSING_BITS_0_7 && (data == 0))
 	{
 		logerror("PC:%04x  Resetting Sound CPU and Sound chip (%08x)\n",activecpu_get_previouspc(),data);
 		if (machine->config->sound[0].type == SOUND_YM3812)
@@ -281,11 +281,11 @@ WRITE8_HANDLER( toaplan1_coin_w )
 
 WRITE16_HANDLER( samesame_coin_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		toaplan1_coin_w(machine, offset, data & 0xff);
 	}
-	if (ACCESSING_BYTE_1 && (data&0xff00))
+	if (ACCESSING_BITS_8_15 && (data&0xff00))
 	{
 		logerror("PC:%04x  Writing unknown MSB data (%04x) to coin count/lockout port\n",activecpu_get_previouspc(),data);
 	}

@@ -68,7 +68,7 @@ VIDEO_UPDATE( funystrp );
 
 static WRITE16_HANDLER( splash_sh_irqtrigger_w )
 {
-	if (ACCESSING_BYTE_0){
+	if (ACCESSING_BITS_0_7){
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( splash_sh_irqtrigger_w )
 
 static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 {
-	if (ACCESSING_BYTE_0){
+	if (ACCESSING_BITS_0_7){
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( splash_coin_w )
 {
-	if (ACCESSING_BYTE_1){
+	if (ACCESSING_BITS_8_15){
 		switch ((offset >> 3)){
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:

@@ -123,7 +123,7 @@ static READ16_HANDLER( rng_sysregs_r )
 		break;
 
 		case 0x06/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				data = readinputport(1) | EEPROM_read_bit();
 
@@ -155,7 +155,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit7  : set before massive memory writes
                 bit10 : IRQ5 ACK
             */
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				EEPROM_write_bit((data & 0x01) ? 1 : 0);
 				EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
@@ -180,25 +180,25 @@ static WRITE16_HANDLER( rng_sysregs_w )
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		soundlatch_w(machine, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		soundlatch2_w(machine, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_msb_r )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		return(rng_sound_status<<8);
 
 	return(0);

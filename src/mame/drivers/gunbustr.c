@@ -124,12 +124,12 @@ popmessage(t);
 	{
 		case 0x00:
 		{
-			if (ACCESSING_BYTE_3)	/* $400000 is watchdog */
+			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
 				watchdog_reset(machine);
 			}
 
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				EEPROM_write_bit(data & 0x40);
@@ -141,7 +141,7 @@ popmessage(t);
 
 		case 0x01:
 		{
-			if (ACCESSING_BYTE_3)
+			if (ACCESSING_BITS_24_31)
 			{
 				/* game does not write a separate counter for coin 2!
                    It should disable both coins when 9 credits reached

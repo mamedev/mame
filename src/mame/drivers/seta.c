@@ -1476,7 +1476,7 @@ static READ16_HANDLER( sharedram_68000_r )
 
 static WRITE16_HANDLER( sharedram_68000_w )
 {
-	if (ACCESSING_BYTE_0)	sharedram[offset] = data & 0xff;
+	if (ACCESSING_BITS_0_7)	sharedram[offset] = data & 0xff;
 }
 
 
@@ -1494,7 +1494,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 	switch(offset)
 	{
 		case 0/2:	// bit 0: reset sub cpu?
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(old_data&1) && (data&1) )
 					cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
@@ -1506,11 +1506,11 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			break;
 
 		case 4/2:	// not sure
-			if (ACCESSING_BYTE_0)	soundlatch_w(machine, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	soundlatch_w(machine, 0, data & 0xff);
 			break;
 
 		case 6/2:	// not sure
-			if (ACCESSING_BYTE_0)	soundlatch2_w(machine, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	soundlatch2_w(machine, 0, data & 0xff);
 			break;
 	}
 
@@ -1677,7 +1677,7 @@ static READ16_HANDLER ( calibr50_ip_r )
 
 static WRITE16_HANDLER( calibr50_soundlatch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_word_w(machine,0,data,mem_mask);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
@@ -1762,7 +1762,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 {
 	static int old_tiles_offset = 0;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		seta_tiles_offset = (data & 0x10) ? 0x4000: 0;
 		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -2589,7 +2589,7 @@ static READ16_HANDLER( kiwame_nvram_r )
 
 static WRITE16_HANDLER( kiwame_nvram_w )
 {
-	if (ACCESSING_BYTE_0)	COMBINE_DATA( &kiwame_nvram[offset] );
+	if (ACCESSING_BITS_0_7)	COMBINE_DATA( &kiwame_nvram[offset] );
 }
 
 static READ16_HANDLER( kiwame_input_r )
@@ -2760,7 +2760,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 		soundlatch_w(machine,0,data & 0xff);
@@ -3069,8 +3069,8 @@ ADDRESS_MAP_END
                             Crazy Fight
 ***************************************************************************/
 
-static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_BYTE_0)	YM3812_control_port_0_w(machine, 0, data & 0xff);	}
-static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_BYTE_0)	YM3812_write_port_0_w(machine, 0, data & 0xff);		}
+static WRITE16_HANDLER( YM3812_control_port_0_lsb_w )	{	if (ACCESSING_BITS_0_7)	YM3812_control_port_0_w(machine, 0, data & 0xff);	}
+static WRITE16_HANDLER( YM3812_write_port_0_lsb_w )		{	if (ACCESSING_BITS_0_7)	YM3812_write_port_0_w(machine, 0, data & 0xff);		}
 
 static ADDRESS_MAP_START( crazyfgt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -9278,7 +9278,7 @@ logerror("%04x: twineagl_200100_r %d\n",activecpu_get_pc(),offset);
 static WRITE16_HANDLER( twineagl_200100_w )
 {
 logerror("%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		xram[offset] = data & 0xff;
 }
 

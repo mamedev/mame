@@ -167,7 +167,7 @@ static int waiting_msb;
 
 WRITE16_HANDLER( terraf_fg_scrollx_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		armedf_fg_scrollx = data >> 8;
 		waiting_msb = 1;
@@ -176,7 +176,7 @@ WRITE16_HANDLER( terraf_fg_scrollx_w )
 
 WRITE16_HANDLER( terraf_fg_scrolly_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (waiting_msb)
 			terraf_scroll_msb = data >> 8;
@@ -187,7 +187,7 @@ WRITE16_HANDLER( terraf_fg_scrolly_w )
 
 WRITE16_HANDLER( terraf_fg_scroll_msb_arm_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		waiting_msb = 0;
 }
 

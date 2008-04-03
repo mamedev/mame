@@ -3445,7 +3445,7 @@ READ16_HANDLER( segaic16_road_control_0_r )
 
 WRITE16_HANDLER( segaic16_road_control_0_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		road[0].control = data & ((road[0].type == SEGAIC16_ROAD_OUTRUN) ? 3 : 7);
 	}

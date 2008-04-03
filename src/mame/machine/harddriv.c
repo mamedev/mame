@@ -679,7 +679,7 @@ READ16_HANDLER( hd68k_duart_r )
 
 WRITE16_HANDLER( hd68k_duart_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		int newdata = (data >> 8) & 0xff;
 		duart_write_data[offset] = newdata;

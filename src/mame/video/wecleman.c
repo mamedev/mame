@@ -856,7 +856,7 @@ WRITE16_HANDLER( wecleman_videostatus_w )
 
 	// bit0-6: background transition, 0=off, 1=on
 	// bit7: palette being changed, 0=no, 1=yes
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if ((data & 0x7f) == 0 && !cloud_ds)
 			cloud_ds = BLEND_INC;

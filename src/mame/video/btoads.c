@@ -83,7 +83,7 @@ WRITE16_HANDLER( btoads_misc_control_w )
 
 WRITE16_HANDLER( btoads_display_control_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		/* allow multiple changes during display */
 		int scanline = video_screen_get_vpos(machine->primary_screen);
@@ -121,9 +121,9 @@ WRITE16_HANDLER( btoads_scroll0_w )
 	video_screen_update_now(machine->primary_screen);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		yscroll0 = data >> 8;
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		xscroll0 = data & 0xff;
 }
 
@@ -134,9 +134,9 @@ WRITE16_HANDLER( btoads_scroll1_w )
 	video_screen_update_now(machine->primary_screen);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		yscroll1 = data >> 8;
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		xscroll1 = data & 0xff;
 }
 
@@ -200,14 +200,14 @@ READ16_HANDLER( btoads_vram_bg1_r )
 
 WRITE16_HANDLER( btoads_vram_fg_display_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		vram_fg_display[offset] = data;
 }
 
 
 WRITE16_HANDLER( btoads_vram_fg_draw_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		vram_fg_draw[offset] = data;
 }
 

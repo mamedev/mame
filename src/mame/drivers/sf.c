@@ -38,7 +38,7 @@ static READ16_HANDLER( dummy_r )
 
 static WRITE16_HANDLER( sf_coin_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,data & 0x01);
 		coin_counter_w(1,data & 0x02);
@@ -51,7 +51,7 @@ static WRITE16_HANDLER( sf_coin_w )
 
 static WRITE16_HANDLER( soundcmd_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
 		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);

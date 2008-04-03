@@ -1163,7 +1163,7 @@ static READ16_HANDLER( i80186_internal_port_r )
 		case 0x60/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 Timer %d count\n", activecpu_get_pc(), (offset - 0x50/2) / 4);
 			which = (offset - 0x50/2) / 4;
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				internal_timer_sync(which);
 			return i80186.timer[which].count;
 
@@ -1269,9 +1269,9 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 	int temp, which;
 
 	/* handle partials */
-	if (!ACCESSING_BYTE_1)
+	if (!ACCESSING_BITS_8_15)
 		data = (i80186_internal_port_r(machine, offset, 0) & 0xff00) | (data & 0x00ff);
-	else if (!ACCESSING_BYTE_0)
+	else if (!ACCESSING_BITS_0_7)
 		data = (i80186_internal_port_r(machine, offset, 0) & 0x00ff) | (data & 0xff00);
 
 	switch (offset)
@@ -1576,7 +1576,7 @@ static WRITE16_HANDLER( pit8254_w )
 	int reg = offset & 3;
 
 	/* ignore odd offsets */
-	if (!ACCESSING_BYTE_0)
+	if (!ACCESSING_BITS_0_7)
 		return;
 	data &= 0xff;
 
@@ -1825,7 +1825,7 @@ static WRITE16_HANDLER( dac_w )
 	struct dac_state *d = &dac[which];
 
 	/* handle value changes */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		int count = (d->bufin - d->bufout) & DAC_BUFFER_SIZE_MASK;
 
@@ -1851,7 +1851,7 @@ static WRITE16_HANDLER( dac_w )
 	}
 
 	/* handle volume changes */
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		d->volume = ((data >> 8) ^ 0x00) / DAC_VOLUME_SCALE;
 		if (LOG_DAC) logerror("%05X:DAC %d volume = %02X\n", activecpu_get_pc(), offset, data);
@@ -1897,7 +1897,7 @@ static WRITE16_HANDLER( dac_10bit_w )
 	int data16;
 
 	/* warning: this assumes all port writes here are word-sized */
-	assert(ACCESSING_BYTE_0 && ACCESSING_BYTE_1);
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
 	data16 = data;
 
 	/* set the new value */
@@ -1930,7 +1930,7 @@ static WRITE16_HANDLER( ataxx_dac_control )
 		case 0x00:
 		case 0x01:
 		case 0x02:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				dac_w(machine, offset, data, 0xff00);
 			return;
 

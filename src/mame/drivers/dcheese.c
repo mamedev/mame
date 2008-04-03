@@ -142,7 +142,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 {
 	/* toggles bit $0100 very frequently while waiting for things */
 	/* bits $0080-$0010 are probably lamps */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		EEPROM_set_cs_line(~data & 8);
 		EEPROM_write_bit(data & 2);
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;

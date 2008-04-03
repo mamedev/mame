@@ -24,7 +24,7 @@
  *************************************/
 
 static READ16_DEVICE_HANDLER( vertigo_pit8254_lsb_r ) { return pit8253_r( device, offset ); }
-static WRITE16_DEVICE_HANDLER( vertigo_pit8254_lsb_w ) { if (ACCESSING_BYTE_0) pit8253_w(device, offset, data); }
+static WRITE16_DEVICE_HANDLER( vertigo_pit8254_lsb_w ) { if (ACCESSING_BITS_0_7) pit8253_w(device, offset, data); }
 
 static ADDRESS_MAP_START( vertigo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM

@@ -524,7 +524,7 @@ static READ16_HANDLER( memcard_r )
 
 static WRITE16_HANDLER( memcard_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (memcard_present() != -1)
 			memcard_data[offset] = data;
@@ -810,7 +810,7 @@ static void audio_cpu_banking_init(void)
 
 static WRITE16_HANDLER( system_control_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 bit = (offset >> 3) & 0x01;
 
@@ -875,7 +875,7 @@ static WRITE16_HANDLER( system_control_w )
 static WRITE16_HANDLER( watchdog_w )
 {
 	/* only an LSB write resets the watchdog */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		watchdog_reset16_w(machine, offset, data, mem_mask);
 	}

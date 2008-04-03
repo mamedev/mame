@@ -409,7 +409,7 @@ static WRITE16_HANDLER( fdc_w )
 	if(!track_size)
 		return;
 
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		data &= 0xff;
 		switch(offset) {
 		case 0:
@@ -499,7 +499,7 @@ static READ16_HANDLER( fdc_status_r )
 
 static WRITE16_HANDLER( fdc_ctrl_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 		logerror("FDC control %02x\n", data & 0xff);
 }
 
@@ -634,7 +634,7 @@ static UINT8 hotrod_ctrl_cur;
 
 static WRITE16_HANDLER( hotrod3_ctrl_w )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		data &= 3;
 		hotrod_ctrl_cur = readinputport(9+data);
 	}
@@ -642,7 +642,7 @@ static WRITE16_HANDLER( hotrod3_ctrl_w )
 
 static READ16_HANDLER( hotrod3_ctrl_r )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		switch(offset) {
 			// Steering dials
 		case 0:
@@ -735,7 +735,7 @@ static READ16_HANDLER( curbank_r )
 
 static WRITE16_HANDLER( curbank_w )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		curbank = data & 0xff;
 		reset_bank();
 	}
@@ -751,13 +751,13 @@ static READ16_HANDLER( ym_status_r )
 
 static WRITE16_HANDLER( ym_register_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 		YM2151_register_port_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( ym_data_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 		YM2151_data_port_0_w(machine, 0, data);
 }
 
@@ -782,7 +782,7 @@ static READ16_HANDLER( mlatch_r )
 
 static WRITE16_HANDLER( mlatch_w )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
@@ -861,7 +861,7 @@ static WRITE16_HANDLER(irq_w)
 		break;
 	}
 	case 1:
-		if(ACCESSING_BYTE_0) {
+		if(ACCESSING_BITS_0_7) {
 			UINT8 old_tb = irq_timerb;
 			irq_timerb = data;
 			if(old_tb != irq_timerb)

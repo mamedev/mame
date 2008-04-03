@@ -56,8 +56,8 @@ static TILE_GET_INFO( get_tile_info )
 WRITE16_HANDLER( alpha68k_videoram_w )
 {
 	/* Doh. */
-	if(ACCESSING_BYTE_0)
-		if(ACCESSING_BYTE_1)
+	if(ACCESSING_BITS_0_7)
+		if(ACCESSING_BITS_8_15)
 			videoram16[offset] = data;
 		else
 			videoram16[offset] = data & 0xff;

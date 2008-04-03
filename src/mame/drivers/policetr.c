@@ -178,7 +178,7 @@ static WRITE32_HANDLER( control_w )
 	COMBINE_DATA(&control_data);
 
 	/* handle EEPROM I/O */
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		EEPROM_write_bit(data & 0x00800000);
 		EEPROM_set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);

@@ -326,14 +326,14 @@ static WRITE16_HANDLER(ac_devices_w)
 	switch(offset)
 	{
 		case 0x16/2:
-			if(ACCESSING_BYTE_0)
+			if(ACCESSING_BITS_0_7)
 			{
 				logerror("Request to play sample %02x with rom 2\n",data);
 				OKIM6295_data_0_w(machine,0,data);
 			}
 			break;
 		case 0x1a/2:
-			if(ACCESSING_BYTE_0)
+			if(ACCESSING_BITS_0_7)
 			{
 				logerror("Request to play sample %02x with rom 1\n",data);
 				OKIM6295_data_1_w(machine,0,data);

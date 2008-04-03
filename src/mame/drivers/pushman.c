@@ -39,7 +39,7 @@ static UINT16 latch,new_latch=0;
 
 static WRITE16_HANDLER( pushman_control_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		soundlatch_w(machine,0,(data>>8)&0xff);
 }
 
@@ -56,9 +56,9 @@ static READ16_HANDLER( pushman_68705_r )
 
 static WRITE16_HANDLER( pushman_68705_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		shared_ram[2*offset]=data>>8;
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		shared_ram[2*offset+1]=data&0xff;
 
 	if (offset==1)
@@ -87,9 +87,9 @@ static READ16_HANDLER( bballs_68705_r )
 
 static WRITE16_HANDLER( bballs_68705_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		shared_ram[2*offset]=data>>8;
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		shared_ram[2*offset+1]=data&0xff;
 
 	if(offset==0)

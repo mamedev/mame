@@ -809,17 +809,17 @@ READ16_HANDLER( ptm6840_1_msb_r ) { return ptm6840_read(1, offset) << 8; }
 READ16_HANDLER( ptm6840_2_msb_r ) { return ptm6840_read(2, offset) << 8; }
 READ16_HANDLER( ptm6840_3_msb_r ) { return ptm6840_read(3, offset) << 8; }
 
-WRITE16_HANDLER( ptm6840_0_msb_w ) { if (ACCESSING_BYTE_1) ptm6840_write(0, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_1_msb_w ) { if (ACCESSING_BYTE_1) ptm6840_write(1, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_2_msb_w ) { if (ACCESSING_BYTE_1) ptm6840_write(2, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_3_msb_w ) { if (ACCESSING_BYTE_1) ptm6840_write(3, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_0_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(0, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_1_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(1, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_2_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(2, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_3_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(3, offset, data >> 8); }
 
 READ16_HANDLER( ptm6840_0_lsb_r ) { return ptm6840_read(0, offset); }
 READ16_HANDLER( ptm6840_1_lsb_r ) { return ptm6840_read(1, offset); }
 READ16_HANDLER( ptm6840_2_lsb_r ) { return ptm6840_read(2, offset); }
 READ16_HANDLER( ptm6840_3_lsb_r ) { return ptm6840_read(3, offset); }
 
-WRITE16_HANDLER( ptm6840_0_lsb_w ) { if (ACCESSING_BYTE_0) ptm6840_write(0, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_1_lsb_w ) { if (ACCESSING_BYTE_0) ptm6840_write(1, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_2_lsb_w ) { if (ACCESSING_BYTE_0) ptm6840_write(2, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_3_lsb_w ) { if (ACCESSING_BYTE_0) ptm6840_write(3, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_0_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(0, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_1_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(1, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_2_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(2, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_3_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(3, offset, data & 0xff); }

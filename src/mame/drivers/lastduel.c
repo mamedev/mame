@@ -39,7 +39,7 @@ extern UINT16 *lastduel_vram,*lastduel_scroll2,*lastduel_scroll1;
 
 static WRITE16_HANDLER( lastduel_sound_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		soundlatch_w(machine,0,data & 0xff);
 }
 

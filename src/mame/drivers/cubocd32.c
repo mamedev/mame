@@ -72,7 +72,7 @@ static WRITE32_HANDLER( amiga_custom32_w )
 
 static WRITE32_HANDLER( aga_overlay_w )
 {
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		data = (data >> 16) & 1;
 

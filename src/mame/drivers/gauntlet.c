@@ -209,7 +209,7 @@ static READ16_HANDLER( port4_r )
 
 static WRITE16_HANDLER( sound_reset_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		int oldword = sound_reset_val;
 		COMBINE_DATA(&sound_reset_val);

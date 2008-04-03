@@ -185,7 +185,7 @@ static READ16_HANDLER( livequiz_eeprom_r )
 
 static WRITE16_HANDLER( livequiz_eeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x04);

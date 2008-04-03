@@ -549,7 +549,7 @@ static READ16_HANDLER( csdeluxe_pia_r )
 	/* My guess is that Turbo Tag works through a fluke, whereby the 68000 */
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		return pia_0_alt_r(machine, offset) << 8;
 	else
 		return pia_0_alt_r(machine, offset);
@@ -557,7 +557,7 @@ static READ16_HANDLER( csdeluxe_pia_r )
 
 static WRITE16_HANDLER( csdeluxe_pia_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		pia_0_alt_w(machine, offset, data >> 8);
 	else
 		pia_0_alt_w(machine, offset, data);

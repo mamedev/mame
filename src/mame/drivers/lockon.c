@@ -85,9 +85,9 @@ static WRITE16_HANDLER( main_gnd_w )
 {
 	cpuintrf_push_context(GROUND_CPU);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		program_write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		program_write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 
 	cpuintrf_pop_context();
@@ -108,9 +108,9 @@ static WRITE16_HANDLER( main_obj_w )
 {
 	cpuintrf_push_context(OBJECT_CPU);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		program_write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		program_write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 
 	cpuintrf_pop_context();
@@ -121,16 +121,16 @@ static WRITE16_HANDLER( tst_w )
 	if (offset < 0x800)
 	{
 		cpuintrf_push_context(GROUND_CPU);
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 			program_write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 			program_write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 		cpuintrf_pop_context();
 
 		cpuintrf_push_context(OBJECT_CPU);
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 			program_write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 			program_write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 		cpuintrf_pop_context();
 	}

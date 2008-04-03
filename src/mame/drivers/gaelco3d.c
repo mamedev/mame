@@ -253,7 +253,7 @@ static WRITE16_HANDLER( irq_ack_w )
 {
 	cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 }
-static WRITE32_HANDLER( irq_ack_020_w ) { if (ACCESSING_WORD_1) irq_ack_w(machine, offset, data >> 16, mem_mask >> 16); }
+static WRITE32_HANDLER( irq_ack_020_w ) { if (ACCESSING_BITS_16_31) irq_ack_w(machine, offset, data >> 16, mem_mask >> 16); }
 
 
 
@@ -276,26 +276,26 @@ static READ32_HANDLER( eeprom_data_020_r ) { return eeprom_data_r(machine, offse
 
 static WRITE16_HANDLER( eeprom_data_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		EEPROM_write_bit(data & 0x01);
 }
-static WRITE32_HANDLER( eeprom_data_020_w ) { if (ACCESSING_WORD_0) eeprom_data_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( eeprom_data_020_w ) { if (ACCESSING_BITS_0_15) eeprom_data_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( eeprom_clock_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		EEPROM_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
-static WRITE32_HANDLER( eeprom_clock_020_w ) { if (ACCESSING_WORD_0) eeprom_clock_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( eeprom_clock_020_w ) { if (ACCESSING_BITS_0_15) eeprom_clock_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( eeprom_cs_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( eeprom_cs_020_w ) { if (ACCESSING_WORD_0) eeprom_cs_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( eeprom_cs_020_w ) { if (ACCESSING_BITS_0_15) eeprom_cs_w(machine, offset, data, mem_mask); }
 
 
 
@@ -316,10 +316,10 @@ static TIMER_CALLBACK( delayed_sound_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
-static WRITE32_HANDLER( sound_data_020_w ) { if (ACCESSING_WORD_1) sound_data_w(machine, offset, data >> 16, mem_mask >> 16); }
+static WRITE32_HANDLER( sound_data_020_w ) { if (ACCESSING_BITS_16_31) sound_data_w(machine, offset, data >> 16, mem_mask >> 16); }
 
 
 static READ16_HANDLER( sound_data_r )
@@ -333,11 +333,11 @@ static READ16_HANDLER( sound_data_r )
 static READ16_HANDLER( sound_status_r )
 {
 	logerror("%06X:sound_status_r(%02X) = %02X\n", activecpu_get_pc(), offset, sound_status);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		return sound_status;
 	return 0xffff;
 }
-static READ32_HANDLER( sound_status_020_r ) { if (ACCESSING_WORD_0) return sound_status_r(machine, offset, mem_mask); return ~0; }
+static READ32_HANDLER( sound_status_020_r ) { if (ACCESSING_BITS_0_15) return sound_status_r(machine, offset, mem_mask); return ~0; }
 
 
 static WRITE16_HANDLER( sound_status_w )
@@ -370,7 +370,7 @@ static CUSTOM_INPUT( analog_bit_r )
 static WRITE16_HANDLER( analog_port_clock_w )
 {
 	/* a zero/one combo is written here to clock the next analog port bit */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (!(data & 0xff))
 		{
@@ -383,13 +383,13 @@ static WRITE16_HANDLER( analog_port_clock_w )
 	else
 		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( analog_port_clock_020_w ) { if (ACCESSING_WORD_0) analog_port_clock_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( analog_port_clock_020_w ) { if (ACCESSING_BITS_0_15) analog_port_clock_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( analog_port_latch_w )
 {
 	/* a zero is written here to read the analog ports, and a one is written when finished */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (!(data & 0xff))
 		{
@@ -402,7 +402,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 	else
 		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( analog_port_latch_020_w ) { if (ACCESSING_WORD_0) analog_port_latch_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( analog_port_latch_020_w ) { if (ACCESSING_BITS_0_15) analog_port_latch_w(machine, offset, data, mem_mask); }
 
 
 
@@ -446,7 +446,7 @@ static WRITE16_HANDLER( tms_reset_w )
 	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( tms_reset_020_w ) { if (ACCESSING_WORD_0) tms_reset_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( tms_reset_020_w ) { if (ACCESSING_BITS_0_15) tms_reset_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_irq_w )
@@ -454,17 +454,17 @@ static WRITE16_HANDLER( tms_irq_w )
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
 	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		cpunum_set_input_line(Machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( tms_irq_020_w ) { if (ACCESSING_WORD_0) tms_irq_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( tms_irq_020_w ) { if (ACCESSING_BITS_0_15) tms_irq_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_control3_w )
 {
 	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( tms_control3_020_w ) { if (ACCESSING_WORD_0) tms_control3_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( tms_control3_020_w ) { if (ACCESSING_BITS_0_15) tms_control3_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_comm_w )
@@ -667,7 +667,7 @@ static void adsp_tx_callback(int port, INT32 data)
 static WRITE32_HANDLER( unknown_107_w )
 {
 	/* arbitrary data written */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		logerror("%06X:unknown_107_w = %02X\n", activecpu_get_pc(), data & 0xff);
 	else
 		logerror("%06X:unknown_107_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
@@ -676,7 +676,7 @@ static WRITE32_HANDLER( unknown_107_w )
 static WRITE32_HANDLER( unknown_127_w )
 {
 	/* arbitrary data written */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		logerror("%06X:unknown_127_w = %02X\n", activecpu_get_pc(), data & 0xff);
 	else
 		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
@@ -685,7 +685,7 @@ static WRITE32_HANDLER( unknown_127_w )
 static WRITE32_HANDLER( unknown_137_w )
 {
 	/* only written $00 or $ff */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		logerror("%06X:unknown_137_w = %02X\n", activecpu_get_pc(), data & 0xff);
 	else
 		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
@@ -694,7 +694,7 @@ static WRITE32_HANDLER( unknown_137_w )
 static WRITE32_HANDLER( unknown_13a_w )
 {
 	/* only written $0000 or $0001 */
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 		logerror("%06X:unknown_13a_w = %04X\n", activecpu_get_pc(), data & 0xffff);
 	else
 		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
@@ -705,19 +705,19 @@ static WRITE16_HANDLER( led_0_w )
 {
 	/* this has $00 written during an IRQ 6, then reset to $ff afterwards */
 	/* LED??? */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		set_led_status(0, data != 0);
 }
-static WRITE32_HANDLER( led_0_020_w ) { if (ACCESSING_WORD_0) led_0_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( led_0_020_w ) { if (ACCESSING_BITS_0_15) led_0_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( led_1_w )
 {
 	/* LED??? -- only written $00 or $ff */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		set_led_status(1, data != 0);
 }
-static WRITE32_HANDLER( led_1_020_w ) { if (ACCESSING_WORD_0) led_1_w(machine, offset, data, mem_mask); }
+static WRITE32_HANDLER( led_1_020_w ) { if (ACCESSING_BITS_0_15) led_1_w(machine, offset, data, mem_mask); }
 
 
 

@@ -200,7 +200,7 @@ static NVRAM_HANDLER(93C56)
 
 static WRITE32_HANDLER( ps4_eeprom_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		EEPROM_write_bit((data & 0x00200000) ? 1 : 0);
 		EEPROM_set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
@@ -214,7 +214,7 @@ static WRITE32_HANDLER( ps4_eeprom_w )
 
 static READ32_HANDLER( ps4_eeprom_r )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		return ((EEPROM_read_bit() << 20)); /* EEPROM */
 	}
@@ -286,7 +286,7 @@ static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
 
 static WRITE32_HANDLER( ps4_screen1_brt_w )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		/* Need seperate brightness for both screens if displaying together */
 		double brt1 = data & 0xff;
 		static double oldbrt1;
@@ -312,7 +312,7 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 
 static WRITE32_HANDLER( ps4_screen2_brt_w )
 {
-	if(ACCESSING_BYTE_0) {
+	if(ACCESSING_BITS_0_7) {
 		/* Need seperate brightness for both screens if displaying together */
 		double brt2 = data & 0xff;
 		static double oldbrt2;
@@ -344,7 +344,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 #if ROMTEST
 	if(offset==2) /* Configure bank for gfx test */
 	{
-		if (ACCESSING_WORD_0)	// Bank
+		if (ACCESSING_BITS_0_15)	// Bank
 		{
 			UINT8 *ROM = memory_region(REGION_GFX1);
 			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
@@ -370,22 +370,22 @@ static READ32_HANDLER( psh_ymf_fm_r )
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
-	if (ACCESSING_BYTE_3)	// FM bank 1 address (OPL2/OPL3 compatible)
+	if (ACCESSING_BITS_24_31)	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
 		YMF278B_control_port_0_A_w(machine, 0, data>>24);
 	}
 
-	if (ACCESSING_BYTE_2)	// FM bank 1 data
+	if (ACCESSING_BITS_16_23)	// FM bank 1 data
 	{
 		YMF278B_data_port_0_A_w(machine, 0, data>>16);
 	}
 
-	if (ACCESSING_BYTE_1)	// FM bank 2 address (OPL3/YMF 262 extended)
+	if (ACCESSING_BITS_8_15)	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
 		YMF278B_control_port_0_B_w(machine, 0, data>>8);
 	}
 
-	if (ACCESSING_BYTE_0)	// FM bank 2 data
+	if (ACCESSING_BITS_0_7)	// FM bank 2 data
 	{
 		YMF278B_data_port_0_B_w(machine, 0, data);
 	}
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( psh_ymf_fm_w )
 
 static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
-	if (ACCESSING_BYTE_3)	// PCM address (OPL4/YMF 278B extended)
+	if (ACCESSING_BITS_24_31)	// PCM address (OPL4/YMF 278B extended)
 	{
 		YMF278B_control_port_0_C_w(machine, 0, data>>24);
 
@@ -405,7 +405,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 #endif
 	}
 
-	if (ACCESSING_BYTE_2)	// PCM data
+	if (ACCESSING_BITS_16_23)	// PCM data
 	{
 		YMF278B_data_port_0_C_w(machine, 0, data>>16);
 	}

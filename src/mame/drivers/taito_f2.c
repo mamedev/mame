@@ -315,7 +315,7 @@ static WRITE16_HANDLER( taitof2_watchdog_w )
 
 static WRITE16_HANDLER( growl_coin_word_w )	/* what about coins 3&4 ?? */
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_lockout_w(0, ~data & 0x01);
 		coin_lockout_w(1, ~data & 0x02);
@@ -326,7 +326,7 @@ static WRITE16_HANDLER( growl_coin_word_w )	/* what about coins 3&4 ?? */
 
 static WRITE16_HANDLER( taitof2_4p_coin_word_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_lockout_w(0, ~data & 0x01);
 		coin_lockout_w(1, ~data & 0x02);
@@ -341,7 +341,7 @@ static WRITE16_HANDLER( taitof2_4p_coin_word_w )
 
 static WRITE16_HANDLER( ninjak_coin_word_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		coin_lockout_w(0, ~data & 0x0100);
 		coin_lockout_w(1, ~data & 0x0200);
@@ -871,7 +871,7 @@ static WRITE16_HANDLER ( driveout_sound_command_w )
 {
 	static int nibble = 0;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 		if (offset==0)

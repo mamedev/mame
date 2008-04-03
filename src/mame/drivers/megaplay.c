@@ -964,11 +964,11 @@ static READ16_HANDLER( megadriv_68k_read_z80_extra_ram )
 
 static WRITE16_HANDLER( megadriv_68k_write_z80_extra_ram )
 {
-	if (!ACCESSING_BYTE_0) // byte (MSB) access
+	if (!ACCESSING_BITS_0_7) // byte (MSB) access
 	{
 		ic36_ram[(offset<<1)] = (data & 0xff00) >> 8;
 	}
-	else if (!ACCESSING_BYTE_1)
+	else if (!ACCESSING_BITS_8_15)
 	{
 		ic36_ram[(offset<<1)^1] = (data & 0x00ff);
 	}

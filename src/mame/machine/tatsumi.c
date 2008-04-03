@@ -111,7 +111,7 @@ WRITE16_HANDLER( apache3_v30_v20_w )
 		logerror("%08x: write unmapped v30 rom %08x\n",activecpu_get_pc(),offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		cpuintrf_push_context(2);
 		program_write_byte(offset, data&0xff);
@@ -170,7 +170,7 @@ READ16_HANDLER( roundup_v30_z80_r )
 WRITE16_HANDLER( roundup_v30_z80_w )
 {
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (tatsumi_control_word&0x20)
 			offset+=0x8000; /* Upper half of Z80 address space */

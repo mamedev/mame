@@ -206,7 +206,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 {
 //if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",activecpu_get_pc(),data);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		data &= ~*metro_irq_enable;
 
@@ -357,7 +357,7 @@ static int metro_io_callback(int ioline, int state)
 
 static WRITE16_HANDLER( metro_soundlatch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
@@ -379,7 +379,7 @@ static READ16_HANDLER( daitorid_soundstatus_r )
 
 static WRITE16_HANDLER( metro_soundstatus_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		metro_soundstatus = data & 0x01;
 }
 
@@ -534,7 +534,7 @@ static READ16_HANDLER( ymf278b_r )
 
 static WRITE16_HANDLER( ymf278b_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 		switch(offset)
 		{
 			case 0:
@@ -578,7 +578,7 @@ static const struct YMF278B_interface ymf278b_interface =
 
 static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 //      coin_lockout_w(0, data & 1);
 //      coin_lockout_w(1, data & 2);
@@ -1393,7 +1393,7 @@ static void gakusai_oki_bank_set(void)
 
 static WRITE16_HANDLER( gakusai_oki_bank_hi_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		gakusai_oki_bank_hi = data & 0xff;
 		gakusai_oki_bank_set();
@@ -1402,7 +1402,7 @@ static WRITE16_HANDLER( gakusai_oki_bank_hi_w )
 
 static WRITE16_HANDLER( gakusai_oki_bank_lo_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		gakusai_oki_bank_lo = data & 0xff;
 		gakusai_oki_bank_set();
@@ -1430,7 +1430,7 @@ static READ16_HANDLER( gakusai_eeprom_r )
 
 static WRITE16_HANDLER( gakusai_eeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x01);
@@ -1562,7 +1562,7 @@ static READ16_HANDLER( dokyusp_eeprom_r )
 
 static WRITE16_HANDLER( dokyusp_eeprom_bit_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x01);
@@ -1575,7 +1575,7 @@ static WRITE16_HANDLER( dokyusp_eeprom_bit_w )
 
 static WRITE16_HANDLER( dokyusp_eeprom_reset_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// reset line asserted: reset.
 		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
@@ -2034,7 +2034,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( mouja_sound_rombank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		OKIM6295_set_bank_base(0, ((data >> 3) & 0x07) * 0x40000);
 }
 
@@ -2102,7 +2102,7 @@ static READ16_HANDLER( puzzlet_dsw_r )
 
 static WRITE16_HANDLER( puzzlet_irq_enable_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		*metro_irq_enable = data^0xffff;
 }
 

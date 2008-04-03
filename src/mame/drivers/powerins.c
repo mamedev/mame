@@ -60,7 +60,7 @@ static int oki_bank;
 
 static WRITE16_HANDLER( powerins_okibank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *RAM = memory_region(REGION_SOUND1);
 		int new_bank = data & 0x7;
@@ -75,7 +75,7 @@ static WRITE16_HANDLER( powerins_okibank_w )
 
 static WRITE16_HANDLER( powerins_soundlatch_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, 0, data & 0xff);
 	}

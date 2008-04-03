@@ -96,7 +96,7 @@ static void sndram_set_bank(void)
 
 static WRITE32_HANDLER( sndram_bank_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		sndram_bank = (data >> 16) & 0x1f;
 		sndram_set_bank();
@@ -107,16 +107,16 @@ static READ32_HANDLER( sndram_r )
 {
 	UINT32 data = 0;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 		data |= sndram[offset * 4] << 24;
 
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		data |= sndram[offset * 4 + 1] << 16;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		data |= sndram[offset * 4 + 2] << 8;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		data |= sndram[offset * 4 + 3];
 
 	return data;
@@ -124,16 +124,16 @@ static READ32_HANDLER( sndram_r )
 
 static WRITE32_HANDLER( sndram_w )
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 		sndram[offset * 4] = data >> 24;
 
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		sndram[offset * 4 + 1] = data >> 16;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		sndram[offset * 4 + 2] = data >> 8;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		sndram[offset * 4 + 3] = data;
 }
 
@@ -144,9 +144,9 @@ static READ16_HANDLER( dual539_16_r )
 {
 	UINT16 ret = 0;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ret |= K054539_1_r(machine, offset);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		ret |= K054539_0_r(machine, offset)<<8;
 
 	return ret;
@@ -154,9 +154,9 @@ static READ16_HANDLER( dual539_16_r )
 
 static WRITE16_HANDLER( dual539_16_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K054539_1_w(machine, offset, data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K054539_0_w(machine, offset, data>>8);
 }
 
@@ -164,9 +164,9 @@ static READ32_HANDLER( dual539_r )
 {
 	UINT32 data = 0;
 
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 		data |= dual539_16_r(machine, offset * 2, mem_mask >> 16) << 16;
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 		data |= dual539_16_r(machine, offset * 2 + 1, mem_mask);
 
 	return data;
@@ -174,9 +174,9 @@ static READ32_HANDLER( dual539_r )
 
 static WRITE32_HANDLER( dual539_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 		dual539_16_w(machine, offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 		dual539_16_w(machine, offset * 2 + 1, data, mem_mask);
 }
 
@@ -206,7 +206,7 @@ static READ32_HANDLER( obj_rom_r )
 	offset += bank * 0x200;
 	offset *= 4;
 
-	if (ACCESSING_WORD_0)
+	if (ACCESSING_BITS_0_15)
 		offset += 2;
 
 	if (~mem_mask & 0xff00ff00)
@@ -220,7 +220,7 @@ static READ32_HANDLER( obj_rom_r )
 
 static WRITE32_HANDLER( v_ctrl_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
 		mem_mask >>= 16;
@@ -241,7 +241,7 @@ static READ32_HANDLER( v_rom_r )
 
 	offset *= 2;
 
-	if (!ACCESSING_BYTE_3)
+	if (!ACCESSING_BITS_24_31)
 		offset += 1;
 
 	offset += bank * 0x800 * 4;
@@ -271,7 +271,7 @@ static READ32_HANDLER( turntable_r )
 {
 	UINT32 result = 0;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		UINT8 pos;
 		int delta;
@@ -294,7 +294,7 @@ static READ32_HANDLER( turntable_r )
 
 static WRITE32_HANDLER( turntable_select_w )
 {
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		turntable_select = (data >> 19) & 1;
 }
 
@@ -306,7 +306,7 @@ static WRITE32_HANDLER( turntable_select_w )
 
 static READ32_HANDLER( ide_std_r )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset, 0x00ff) >> 8;
 	else
 		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset, 0x0000) << 16;
@@ -314,7 +314,7 @@ static READ32_HANDLER( ide_std_r )
 
 static WRITE32_HANDLER( ide_std_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ide_controller16_0_w(machine, IDE_STD_OFFSET + offset, data << 8, 0x00ff);
 	else
 		ide_controller16_0_w(machine, IDE_STD_OFFSET + offset, data >> 16, 0x0000);
@@ -331,7 +331,7 @@ static READ32_HANDLER( ide_alt_r )
 
 static WRITE32_HANDLER( ide_alt_w )
 {
-	if (offset == 0 && ACCESSING_BYTE_2)
+	if (offset == 0 && ACCESSING_BITS_16_23)
 		ide_controller16_0_w(machine, IDE_ALT_OFFSET, data >> 24, 0xff00);
 }
 
@@ -371,7 +371,7 @@ static WRITE32_HANDLER( ide_alt_w )
 
 static WRITE32_HANDLER( light_ctrl_1_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		output_set_value("right-red-hlt",  !(data & 0x08000000));	// Right red HIGHLIGHT
 		output_set_value("left-red-hlt",   !(data & 0x04000000));	// Left red HIGHLIGHT
@@ -382,7 +382,7 @@ static WRITE32_HANDLER( light_ctrl_1_w )
 
 static WRITE32_HANDLER( light_ctrl_2_w )
 {
-	if (ACCESSING_WORD_1)
+	if (ACCESSING_BITS_16_31)
 	{
 		output_set_value("left-ssr",       !!(data & 0x08000000));	// SSR
 		output_set_value("right-ssr",      !!(data & 0x08000000));	// SSR

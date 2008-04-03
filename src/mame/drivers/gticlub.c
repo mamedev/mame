@@ -283,19 +283,19 @@ static READ32_HANDLER( sysreg_r )
 	UINT32 r = 0;
 	if (offset == 0)
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= readinputport(0) << 24;
 		}
-		if (ACCESSING_BYTE_2)
+		if (ACCESSING_BITS_16_23)
 		{
 			r |= readinputport(1) << 16;
 		}
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 		{
 			r |= (adc1038_sars_r() << 7) << 8;
 		}
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			r |= readinputport(3) << 0;
 		}
@@ -303,7 +303,7 @@ static READ32_HANDLER( sysreg_r )
 	}
 	else if (offset == 1)
 	{
-		if (ACCESSING_BYTE_3 )
+		if (ACCESSING_BITS_24_31 )
 		{
 			// 7        0
 			// |?????ae?|
@@ -328,15 +328,15 @@ static WRITE32_HANDLER( sysreg_w )
 {
 	if (offset == 0)
 	{
-		if( ACCESSING_BYTE_3 )
+		if( ACCESSING_BITS_24_31 )
 		{
 			gticlub_led_reg0 = (data >> 24) & 0xff;
 		}
-		if( ACCESSING_BYTE_2 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			gticlub_led_reg1 = (data >> 16) & 0xff;
 		}
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			EEPROM_write_bit((data & 0x01) ? 1 : 0);
 			EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
@@ -345,7 +345,7 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 	if( offset == 1 )
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
 			{
@@ -414,19 +414,19 @@ READ32_HANDLER( lanc_r )
 	UINT32 r = 0;
 	int reg = offset * 4;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		r |= K056230_r(reg+0) << 24;
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		r |= K056230_r(reg+1) << 16;
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		r |= K056230_r(reg+2) << 8;
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		r |= K056230_r(reg+3) << 0;
 	}
@@ -438,19 +438,19 @@ WRITE32_HANDLER( lanc_w )
 {
 	int reg = offset * 4;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		K056230_w(reg+0, (data >> 24) & 0xff);
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		K056230_w(reg+1, (data >> 16) & 0xff);
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		K056230_w(reg+2, (data >> 8) & 0xff);
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		K056230_w(reg+3, (data >> 0) & 0xff);
 	}

@@ -423,7 +423,7 @@ U38 - U40 Mask roms (Graphics 23c64020 64Mbit) - 23C64020 read as 27C322 with pi
 
 static WRITE16_HANDLER( seta2_sound_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *ROM = memory_region( REGION_SOUND1 );
 		int banks = (memory_region_length( REGION_SOUND1 ) - 0x100000) / 0x20000;
@@ -443,7 +443,7 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 
 static WRITE16_HANDLER( grdians_lockout_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// initially 0, then either $25 (coin 1) or $2a (coin 2)
 		coin_counter_w(0,data & 0x01);	// or 0x04
@@ -575,7 +575,7 @@ static READ16_HANDLER( mj4simai_p1_r )
 
 static WRITE16_HANDLER( mj4simai_keyboard_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		keyboard_row = data & 0xff;
 }
 
@@ -691,7 +691,7 @@ static READ16_HANDLER( pzlbowl_coins_r )
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,data & 0x10);
 		coin_counter_w(1,data & 0x20);
@@ -780,7 +780,7 @@ static READ16_HANDLER( samshoot_lightgun2_r )
 
 static WRITE16_HANDLER( samshoot_coin_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0, data & 0x10);
 		coin_counter_w(1, data & 0x20);

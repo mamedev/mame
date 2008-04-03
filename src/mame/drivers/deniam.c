@@ -54,7 +54,7 @@ VIDEO_UPDATE( deniam );
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine,offset,(data >> 8) & 0xff);
 		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( deniam16b_oki_rom_bank_w )
 
 static WRITE16_HANDLER( deniam16c_oki_rom_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		OKIM6295_set_bank_base(0,(data & 0x01) ? 0x40000 : 0x00000);
 }
 
@@ -80,13 +80,13 @@ static MACHINE_RESET( deniam )
 
 static WRITE16_HANDLER( YM3812_control_port_0_msb_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		YM3812_control_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 
 static WRITE16_HANDLER( YM3812_write_port_0_msb_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		YM3812_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 

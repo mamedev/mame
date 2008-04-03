@@ -91,7 +91,7 @@ static READ16_HANDLER( pending_command_r )
 
 static WRITE16_HANDLER( sound_command_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		pending_command = 1;
 		soundlatch_w(machine,offset,data & 0xff);

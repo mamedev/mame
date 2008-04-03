@@ -1011,11 +1011,11 @@ static UINT32 m_n_tektagdmaoffset = 0xffffffff;
 
 static WRITE32_HANDLER( dmaoffset_w )
 {
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		m_n_dmaoffset = ( offset * 4 ) | ( data << 16 );
 	}
-	if( ACCESSING_WORD_1 )
+	if( ACCESSING_BITS_16_31 )
 	{
 		m_n_dmaoffset = ( ( offset + 2 ) * 4 ) | ( data & 0xffff0000 );
 	}
@@ -1121,7 +1121,7 @@ ADDRESS_MAP_END
 
 static WRITE32_HANDLER( system11gun_w )
 {
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		/* start 1 */
 		set_led_status(0, !(data & 0x08));
@@ -1133,7 +1133,7 @@ static WRITE32_HANDLER( system11gun_w )
 		/* !(data & 0x01) */
 		verboselog( 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
-	if( ACCESSING_WORD_1 )
+	if( ACCESSING_BITS_16_31 )
 	{
 		verboselog( 2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}

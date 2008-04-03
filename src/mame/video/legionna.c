@@ -32,7 +32,7 @@ void denjinmk_setgfxbank(UINT16 data)
 #ifdef UNUSED_FUNCTION
 WRITE16_HANDLER( legionna_control_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		legionna_enable=data;
 		if ((legionna_enable&4)==4)

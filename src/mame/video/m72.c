@@ -330,14 +330,14 @@ WRITE16_HANDLER( m72_scrolly2_w )
 
 WRITE16_HANDLER( m72_dmaon_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		memcpy(m72_spriteram,spriteram16,spriteram_size);
 }
 
 
 WRITE16_HANDLER( m72_port02_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
@@ -363,7 +363,7 @@ WRITE16_HANDLER( m72_port02_w )
 
 WRITE16_HANDLER( rtype2_port02_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
@@ -387,7 +387,7 @@ static int majtitle_rowscroll;
 /* the following is mostly a kludge. This register seems to be used for something else */
 WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0xff00) majtitle_rowscroll = 1;
 		else majtitle_rowscroll = 0;

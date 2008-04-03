@@ -135,6 +135,6 @@ READ16_HANDLER( msm6242_lsb_r )
 
 WRITE16_HANDLER( msm6242_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		msm6242_w(machine, offset, data);
 }

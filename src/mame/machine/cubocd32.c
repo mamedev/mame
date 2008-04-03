@@ -852,17 +852,17 @@ WRITE32_HANDLER(amiga_akiko32_w)
 			break;
 
 		case 0x18/4:	/* CDROM COMMAND 1 */
-			if ( ACCESSING_BYTE_2 )
+			if ( ACCESSING_BITS_16_23 )
 				akiko.cdrom_cmd_start = ( data >> 16 ) & 0xff;
 
-			if ( ACCESSING_BYTE_1 )
+			if ( ACCESSING_BITS_8_15 )
 				akiko.cdrom_cmd_resp = ( data >> 8 ) & 0xff;
 
 			akiko_update_cdrom();
 			break;
 
 		case 0x1C/4:	/* CDROM COMMAND 2 */
-			if ( ACCESSING_BYTE_2 )
+			if ( ACCESSING_BITS_16_23 )
 				akiko.cdrom_cmd_end = ( data >> 16 ) & 0xff;
 
 			akiko_update_cdrom();
@@ -872,7 +872,7 @@ WRITE32_HANDLER(amiga_akiko32_w)
 #if LOG_AKIKO_CD
 			logerror( "Read Req mask W: data %08x - mem mask %08x\n", data, mem_mask );
 #endif
-			if ( ACCESSING_WORD_1 )
+			if ( ACCESSING_BITS_16_31 )
 			{
 				akiko.cdrom_readreqmask = (data >> 16);
 				akiko.cdrom_readmask = 0;

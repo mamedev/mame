@@ -41,7 +41,7 @@ static MACHINE_RESET( ohmygod )
 
 static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *rom = memory_region(REGION_SOUND1);
 
@@ -52,7 +52,7 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 			memcpy(rom + 0x20000,rom + 0x40000 + 0x20000 * sndbank,0x20000);
 		}
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		coin_counter_w(0,data & 0x1000);
 		coin_counter_w(1,data & 0x2000);

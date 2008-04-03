@@ -158,7 +158,7 @@ static WRITE16_HANDLER( f1dream_control_w )
 
 static WRITE16_HANDLER( tigeroad_soundcmd_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		soundlatch_w(machine,offset,data >> 8);
 }
 

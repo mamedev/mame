@@ -1841,7 +1841,7 @@ WRITE16_HANDLER( K055550_word_w )
 
 	COMBINE_DATA(prot_data+offset);
 
-	if (offset == 0 && ACCESSING_BYTE_1)
+	if (offset == 0 && ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 		switch (data)
@@ -1968,7 +1968,7 @@ WRITE16_HANDLER( K053990_martchmp_word_w )
 
 	COMBINE_DATA(prot_data+offset);
 
-	if (offset == 0x0c && ACCESSING_BYTE_1)
+	if (offset == 0x0c && ACCESSING_BITS_8_15)
 	{
 		mode  = (prot_data[0x0d]<<8 & 0xff00) | (prot_data[0x0f] & 0xff);
 

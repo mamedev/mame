@@ -411,12 +411,12 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				ppi8255_0_w(machine, offset & 3, data);
 			return;
 
 		case 0x20/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				/* Output port:
                     D7: /MUTE

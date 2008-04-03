@@ -93,7 +93,7 @@ WRITE16_HANDLER( dynduke_gfxbank_w )
 {
 	static int old_back,old_fore;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (data&0x01) back_bankbase=0x1000; else back_bankbase=0;
 		if (data&0x10) fore_bankbase=0x1000; else fore_bankbase=0;
@@ -112,7 +112,7 @@ WRITE16_HANDLER( dynduke_gfxbank_w )
 WRITE16_HANDLER( dynduke_control_w )
 {
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		// bit 0x80 toggles, maybe sprite buffering?
 		// bit 0x40 is flipscreen

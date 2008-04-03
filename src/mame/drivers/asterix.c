@@ -90,7 +90,7 @@ static READ16_HANDLER( control2_r )
 
 static WRITE16_HANDLER( control2_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		cur_control2 = data;
 		/* bit 0 is data */

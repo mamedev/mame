@@ -166,37 +166,37 @@ READ16_HANDLER( YM2151_status_port_2_lsb_r )
 
 WRITE16_HANDLER( YM2151_register_port_0_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM2151_register_port_0_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_register_port_1_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM2151_register_port_1_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_register_port_2_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM2151_register_port_2_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_data_port_0_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM2151_data_port_0_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_data_port_1_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM2151_data_port_1_w(machine, 0, data & 0xff);
 }
 
 WRITE16_HANDLER( YM2151_data_port_2_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM2151_data_port_2_w(machine, 0, data & 0xff);
 }
 

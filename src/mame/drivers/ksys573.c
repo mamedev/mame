@@ -987,7 +987,7 @@ static WRITE32_HANDLER( security_w )
 
 	verboselog( 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if( ACCESSING_WORD_0 )
+	if( ACCESSING_BITS_0_15 )
 	{
 		switch( chiptype[ security_cart_number ] )
 		{
@@ -1054,19 +1054,19 @@ static READ32_HANDLER( flash_r )
 	{
 		int adr = offset * 2;
 
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			data |= ( intelflash_read( flash_bank + 0, adr + 0 ) & 0xff ) << 0; // 31m/31l/31j/31h
 		}
-		if( ACCESSING_BYTE_1 )
+		if( ACCESSING_BITS_8_15 )
 		{
 			data |= ( intelflash_read( flash_bank + 1, adr + 0 ) & 0xff ) << 8; // 27m/27l/27j/27h
 		}
-		if( ACCESSING_BYTE_2 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			data |= ( intelflash_read( flash_bank + 0, adr + 1 ) & 0xff ) << 16; // 31m/31l/31j/31h
 		}
-		if( ACCESSING_BYTE_3 )
+		if( ACCESSING_BITS_24_31 )
 		{
 			data |= ( intelflash_read( flash_bank + 1, adr + 1 ) & 0xff ) << 24; // 27m/27l/27j/27h
 		}
@@ -1089,19 +1089,19 @@ static WRITE32_HANDLER( flash_w )
 	{
 		int adr = offset * 2;
 
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			intelflash_write( flash_bank + 0, adr + 0, ( data >> 0 ) & 0xff );
 		}
-		if( ACCESSING_BYTE_1 )
+		if( ACCESSING_BITS_8_15 )
 		{
 			intelflash_write( flash_bank + 1, adr + 0, ( data >> 8 ) & 0xff );
 		}
-		if( ACCESSING_BYTE_2 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			intelflash_write( flash_bank + 0, adr + 1, ( data >> 16 ) & 0xff );
 		}
-		if( ACCESSING_BYTE_3 )
+		if( ACCESSING_BITS_24_31 )
 		{
 			intelflash_write( flash_bank + 1, adr + 1, ( data >> 24 ) & 0xff );
 		}
@@ -1610,13 +1610,13 @@ static READ32_HANDLER( ge765pwbba_r )
 		uPD4701_cs_w( 0, 0 );
 		uPD4701_xy_w( 0, 1 );
 
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			uPD4701_ul_w( 0, 0 );
 			data |= uPD4701_d_r( 0 ) << 0;
 		}
 
-		if( ACCESSING_BYTE_2 )
+		if( ACCESSING_BITS_16_23 )
 		{
 			uPD4701_ul_w( 0, 1 );
 			data |= uPD4701_d_r( 0 ) << 16;
@@ -1642,21 +1642,21 @@ static WRITE32_HANDLER( ge765pwbba_w )
 		break;
 
 	case 0x20:
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			output_set_value( "motor", data & 0xff );
 		}
 		break;
 
 	case 0x22:
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			output_set_value( "brake", data & 0xff );
 		}
 		break;
 
 	case 0x28:
-		if( ACCESSING_BYTE_0 )
+		if( ACCESSING_BITS_0_7 )
 		{
 			uPD4701_resety_w( 0, 1 );
 			uPD4701_resety_w( 0, 0 );
@@ -1750,28 +1750,28 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 	{
 	case 0x20:
 
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 0, data & 0xff );
 		}
 		break;
 
 	case 0x22:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 1, data & 0xff );
 		}
 		break;
 
 	case 0x24:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 2, data & 0xff );
 		}
 		break;
 
 	case 0x26:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx700pwbf_output( 3, data & 0xff );
 		}
@@ -2057,42 +2057,42 @@ static READ32_HANDLER( gx894pwbba_r )
 		data |= 0x10000;
 		break;
 	case 0x20:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			data |= 0x00001234;
 		}
 		break;
 	case 0x2b:
 		/* sound? */
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 //          data |= 0x00001000; /* ? */
 			data |= 0x00002000; /* ? */
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          data |= 0x10000000; /* rdy??? */
 		}
 		break;
 	case 0x2d:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			data |= gx894_ram[ gx894_ram_read_offset / 2 ];
 //          printf( "reading %08x %04x\r", gx894_ram_read_offset, gx894_ram[ gx894_ram_read_offset / 2 ] );
 			gx894_ram_read_offset += 2;
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          printf( "read offset 2d msw32\n" );
 		}
 		break;
 	case 0x30:
 		/* mp3? */
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			/* unknown data word */
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			/* 0x000-0x1ff */
 			data |= 0x1ff0000;
@@ -2100,38 +2100,38 @@ static READ32_HANDLER( gx894pwbba_r )
 		break;
 	case 0x31:
 		/* mp3? */
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			/* unknown data word count */
 			data |= 0x0000;
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          printf( "read offset 31 msw32\n" );
 		}
 		break;
 	case 0x32:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			data |= 0 & 0xffff0000;
 		}
 		/* todo */
 		break;
 	case 0x33:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			data |= 0 & 0x0000ffff;
 		}
 		/* todo */
 		break;
 	case 0x3b:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			data |= ds2401_read( 2 ) << 28;
 		}
 		break;
 	case 0x3d:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			/* fails if !8000 */
 			/* fails if  4000 */
@@ -2205,71 +2205,71 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		/* sound? */
 		break;
 	case 0x2c:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894_ram_write_offset &= 0x0000ffff;
 			gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894_ram_write_offset &= 0xffff0000;
 			gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
 		}
 		break;
 	case 0x2d:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894_ram[ gx894_ram_write_offset / 2 ] = data & 0xffff;
 //          printf( "writing %08x %04x\r", gx894_ram_write_offset, gx894_ram[ gx894_ram_write_offset / 2 ] );
 			gx894_ram_write_offset += 2;
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894_ram_read_offset &= 0x0000ffff;
 			gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
 		}
 		break;
 	case 0x2e:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894_ram_read_offset &= 0xffff0000;
 			gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
 		}
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 //          printf( "write offset 2e msw32\n" );
 		}
 		break;
 	case 0x38:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 0, ( data >> 28 ) & 0xf );
 		}
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894pwbba_output( 1, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &a );
 		break;
 	case 0x39:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 7, ( data >> 28 ) & 0xf );
 		}
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894pwbba_output( 3, ( data >> 12 ) & 0xf );
 		}
 		COMBINE_DATA( &b );
 		break;
 	case 0x3b:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			ds2401_write( 2, !( ( data >> 28 ) & 1 ) );
 		}
 		break;
 	case 0x3e:
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			/* 12 */
 			/* 13 */
@@ -2291,18 +2291,18 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			}
 		}
 
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 4, ( data >> 28 ) & 0xf );
 		}
 		COMBINE_DATA( &c );
 		break;
 	case 0x3f:
-		if( ACCESSING_WORD_1 )
+		if( ACCESSING_BITS_16_31 )
 		{
 			gx894pwbba_output( 2, ( data >> 28 ) & 0xf );
 		}
-		if( ACCESSING_WORD_0 )
+		if( ACCESSING_BITS_0_15 )
 		{
 			gx894pwbba_output( 5, ( data >> 12 ) & 0xf );
 		}

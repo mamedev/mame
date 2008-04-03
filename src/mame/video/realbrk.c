@@ -32,7 +32,7 @@ static int disable_video;
 
 WRITE16_HANDLER( realbrk_flipscreen_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,	data & 0x0001);
 		coin_counter_w(1,	data & 0x0004);
@@ -40,7 +40,7 @@ WRITE16_HANDLER( realbrk_flipscreen_w )
 		flip_screen_set(	data & 0x0080);
 	}
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		disable_video	=	data & 0x8000;
 	}

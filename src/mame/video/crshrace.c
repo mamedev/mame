@@ -72,7 +72,7 @@ WRITE16_HANDLER( crshrace_videoram2_w )
 
 WRITE16_HANDLER( crshrace_roz_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (roz_bank != (data & 0xff))
 		{
@@ -85,7 +85,7 @@ WRITE16_HANDLER( crshrace_roz_bank_w )
 
 WRITE16_HANDLER( crshrace_gfxctrl_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		gfxctrl = data & 0xdf;
 		flipscreen = data & 0x20;

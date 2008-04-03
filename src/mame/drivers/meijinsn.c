@@ -68,7 +68,7 @@ static unsigned deposits1=0, deposits2=0, credits=0;
 
 static WRITE16_HANDLER( sound_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 		soundlatch_w(machine, 0, data&0xff);
 }
 

@@ -107,7 +107,7 @@ static void cchasm_refresh (void)
 
 WRITE16_HANDLER( cchasm_refresh_control_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		switch (data >> 8)
 		{

@@ -301,7 +301,7 @@ static WRITE16_HANDLER( int0_ack_w )
 static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -314,7 +314,7 @@ static TIMER_CALLBACK( delayed_int_enable_w )
 
 static WRITE16_HANDLER( int_enable_w )
 {
-	if (offset == 0 && ACCESSING_BYTE_0)
+	if (offset == 0 && ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data, delayed_int_enable_w);
 }
 

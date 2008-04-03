@@ -224,7 +224,7 @@ static WRITE8_HANDLER( ddenlovr_bgcolor2_w )
 
 static WRITE16_HANDLER( ddenlovr16_bgcolor_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_bgcolor_w(machine,offset,data);
 }
 
@@ -241,7 +241,7 @@ static WRITE8_HANDLER( ddenlovr_priority2_w )
 
 static WRITE16_HANDLER( ddenlovr16_priority_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_priority_w(machine,offset,data);
 }
 
@@ -259,7 +259,7 @@ static WRITE8_HANDLER( ddenlovr_layer_enable2_w )
 
 static WRITE16_HANDLER( ddenlovr16_layer_enable_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_layer_enable_w(machine,offset,data);
 }
 
@@ -1119,14 +1119,14 @@ static WRITE8_HANDLER( rongrong_blitter_w )
 
 static WRITE16_HANDLER( ddenlovr_blitter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		blitter_w(machine, 0,offset,data & 0xff,0);
 }
 
 
 static WRITE16_HANDLER( ddenlovr_blitter_irq_ack_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 1)
 		{
@@ -1312,12 +1312,12 @@ static READ16_HANDLER( ddenlovr_special_r )
 
 static WRITE16_HANDLER( ddenlovr_coincounter_0_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		coin_counter_w(0, data & 1);
 }
 static WRITE16_HANDLER( ddenlovr_coincounter_1_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		coin_counter_w(1, data & 1);
 }
 
@@ -1344,7 +1344,7 @@ static WRITE8_HANDLER( rongrong_palette_w )
 
 static WRITE16_HANDLER( ddenlovr_palette_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		rongrong_palette_w(machine,offset,data & 0xff);
 }
 
@@ -1388,25 +1388,25 @@ static WRITE8_HANDLER( ddenlovr_transparency_mask2_w )
 
 static WRITE16_HANDLER( ddenlovr16_palette_base_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_palette_base[offset] = data & 0xff;
 }
 
 static WRITE16_HANDLER( ddenlovr16_palette_mask_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_palette_mask[offset] = data & 0xff;
 }
 
 static WRITE16_HANDLER( ddenlovr16_transparency_pen_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_transparency_pen[offset] = data & 0xff;
 }
 
 static WRITE16_HANDLER( ddenlovr16_transparency_mask_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_transparency_mask[offset] = data & 0xff;
 }
 
@@ -1418,7 +1418,7 @@ static WRITE8_HANDLER( quizchq_oki_bank_w )
 
 static WRITE16_HANDLER( ddenlovr_oki_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		OKIM6295_set_bank_base(0, (data & 7) * 0x40000);
 }
 
@@ -1427,7 +1427,7 @@ static int okibank;
 
 static WRITE16_HANDLER( quiz365_oki_bank1_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		okibank = (okibank & 2) | (data & 1);
 		OKIM6295_set_bank_base(0, okibank * 0x40000);
@@ -1436,7 +1436,7 @@ static WRITE16_HANDLER( quiz365_oki_bank1_w )
 
 static WRITE16_HANDLER( quiz365_oki_bank2_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		okibank = (okibank & 1) | ((data & 1) << 1);
 		OKIM6295_set_bank_base(0, okibank * 0x40000);
@@ -1465,7 +1465,7 @@ static WRITE8_HANDLER( ddenlovr_select_w )
 
 static WRITE16_HANDLER( ddenlovr_select_16_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_select = data;
 }
 
@@ -1476,7 +1476,7 @@ static WRITE8_HANDLER( ddenlovr_select2_w )
 
 static WRITE16_HANDLER( ddenlovr_select2_16_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ddenlovr_select2 = data;
 }
 
@@ -1540,7 +1540,7 @@ static READ8_HANDLER( rongrong_blitter_busy_r )
 
 static WRITE16_HANDLER( quiz365_coincounter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		if (ddenlovr_select2 == 0x1c)
 		{
@@ -1623,7 +1623,7 @@ static READ16_HANDLER( ddenlvrj_dsw_r )
 
 static WRITE16_HANDLER( ddenlvrj_coincounter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0, data & 0x01);
 		coin_counter_w(1, data & 0x04);
@@ -1749,7 +1749,7 @@ static READ16_HANDLER( nettoqc_protection_r )
 
 static WRITE16_HANDLER( nettoqc_coincounter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0, data & 0x01);
 		coin_counter_w(1, data & 0x04);
@@ -1759,7 +1759,7 @@ static WRITE16_HANDLER( nettoqc_coincounter_w )
 
 static WRITE16_HANDLER( nettoqc_oki_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		OKIM6295_set_bank_base(0, (data & 3) * 0x40000);
 }
 

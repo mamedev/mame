@@ -1641,7 +1641,7 @@ static READ32_HANDLER( status_leds_r )
 
 static WRITE32_HANDLER( status_leds_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		status_leds = data;
 }
 

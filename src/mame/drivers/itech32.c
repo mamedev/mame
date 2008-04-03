@@ -543,7 +543,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static WRITE16_HANDLER( sound_data_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_data_w);
 }
 
@@ -556,7 +556,7 @@ static READ32_HANDLER( sound_data32_r )
 
 static WRITE32_HANDLER( sound_data32_w )
 {
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 		timer_call_after_resynch(NULL, (data >> 16) & 0xff, delayed_sound_data_w);
 }
 
@@ -890,37 +890,37 @@ static UINT8 written[0x8000];
 
 static READ32_HANDLER( test1_r )
 {
-	if (ACCESSING_BYTE_3 && !written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+0);
-	if (ACCESSING_BYTE_2 && !written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+1);
-	if (ACCESSING_BYTE_1 && !written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+2);
-	if (ACCESSING_BYTE_0 && !written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+3);
+	if (ACCESSING_BITS_24_31 && !written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+3);
 	return ((UINT32 *)main_ram)[0x100/4 + offset];
 }
 
 static WRITE32_HANDLER( test1_w )
 {
-	if (ACCESSING_BYTE_3) written[0x100 + offset*4+0] = 1;
-	if (ACCESSING_BYTE_2) written[0x100 + offset*4+1] = 1;
-	if (ACCESSING_BYTE_1) written[0x100 + offset*4+2] = 1;
-	if (ACCESSING_BYTE_0) written[0x100 + offset*4+3] = 1;
+	if (ACCESSING_BITS_24_31) written[0x100 + offset*4+0] = 1;
+	if (ACCESSING_BITS_16_23) written[0x100 + offset*4+1] = 1;
+	if (ACCESSING_BITS_8_15) written[0x100 + offset*4+2] = 1;
+	if (ACCESSING_BITS_0_7) written[0x100 + offset*4+3] = 1;
 	COMBINE_DATA(&((UINT32 *)main_ram)[0x100/4 + offset]);
 }
 
 static READ32_HANDLER( test2_r )
 {
-	if (ACCESSING_BYTE_3 && !written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+0);
-	if (ACCESSING_BYTE_2 && !written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+1);
-	if (ACCESSING_BYTE_1 && !written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+2);
-	if (ACCESSING_BYTE_0 && !written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+3);
+	if (ACCESSING_BITS_24_31 && !written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+3);
 	return ((UINT32 *)main_ram)[0xc00/4 + offset];
 }
 
 static WRITE32_HANDLER( test2_w )
 {
-	if (ACCESSING_BYTE_3) written[0xc00 + offset*4+0] = 1;
-	if (ACCESSING_BYTE_2) written[0xc00 + offset*4+1] = 1;
-	if (ACCESSING_BYTE_1) written[0xc00 + offset*4+2] = 1;
-	if (ACCESSING_BYTE_0) written[0xc00 + offset*4+3] = 1;
+	if (ACCESSING_BITS_24_31) written[0xc00 + offset*4+0] = 1;
+	if (ACCESSING_BITS_16_23) written[0xc00 + offset*4+1] = 1;
+	if (ACCESSING_BITS_8_15) written[0xc00 + offset*4+2] = 1;
+	if (ACCESSING_BITS_0_7) written[0xc00 + offset*4+3] = 1;
 	COMBINE_DATA(&((UINT32 *)main_ram)[0xc00/4 + offset]);
 }
 #endif

@@ -137,7 +137,7 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 	{
 		if (offset == 0)
 		{
-			if (ACCESSING_BYTE_3)
+			if (ACCESSING_BITS_24_31)
 			{
 				dsp_shared_ram_bank[cgboard_id] = (data >> 24) & 0x1;
 
@@ -158,7 +158,7 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 					cpunum_set_input_line(Machine, dsp, INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				dsp_comm_ppc[cgboard_id][offset] = data & 0xff;
 		}
 		else

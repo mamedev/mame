@@ -126,7 +126,7 @@ static READ16_HANDLER( adpcm_r )
 
 static WRITE16_HANDLER( adpcm_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		OKIM6295_data_0_w(machine, offset, data & 0xff);
 }
 

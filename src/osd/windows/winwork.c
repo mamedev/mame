@@ -26,6 +26,7 @@
 //============================================================
 
 #define KEEP_STATISTICS			(0)
+#define USE_SCALABLE_LOCKS		(0)
 
 
 
@@ -74,12 +75,16 @@ INLINE void YieldProcessor(void)
 typedef struct _scalable_lock scalable_lock;
 struct _scalable_lock
 {
+#if USE_SCALABLE_LOCKS
    struct
    {
       volatile INT32 	haslock;		// do we have the lock?
       INT32 			filler[64/4-1];	// assumes a 64-byte cache line
    } slot[WORK_MAX_THREADS];			// one slot per thread
    volatile INT32 		nextindex;		// index of next slot to use
+#else
+	CRITICAL_SECTION	section;
+#endif
 };
 
 
@@ -197,12 +202,17 @@ INLINE INT32 interlocked_add(INT32 volatile *ptr, INT32 add)
 INLINE void scalable_lock_init(scalable_lock *lock)
 {
 	memset(lock, 0, sizeof(*lock));
+#if USE_SCALABLE_LOCKS
 	lock->slot[0].haslock = TRUE;
+#else
+	InitializeCriticalSection(&lock->section);
+#endif
 }
 
 
 INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 {
+#if USE_SCALABLE_LOCKS
 	INT32 myslot = (interlocked_increment(&lock->nextindex) - 1) & (WORK_MAX_THREADS - 1);
 	INT32 backoff = 1;
 
@@ -215,12 +225,20 @@ INLINE INT32 scalable_lock_acquire(scalable_lock *lock)
 	}
 	lock->slot[myslot].haslock = FALSE;
 	return myslot;
+#else
+	EnterCriticalSection(&lock->section);
+	return 0;
+#endif
 }
 
 
 INLINE void scalable_lock_release(scalable_lock *lock, INT32 myslot)
 {
+#if USE_SCALABLE_LOCKS
 	interlocked_exchange32(&lock->slot[(myslot + 1) & (WORK_MAX_THREADS - 1)].haslock, TRUE);
+#else
+	LeaveCriticalSection(&lock->section);
+#endif
 }
 
 

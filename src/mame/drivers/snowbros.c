@@ -75,7 +75,7 @@ out of the sprite list at that point.. (verify on real hw)
 
 static WRITE16_HANDLER( snowbros_flipscreen_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		flip_screen_set(~data & 0x8000);
 }
 
@@ -145,7 +145,7 @@ static READ16_HANDLER( snowbros_68000_sound_r )
 
 static WRITE16_HANDLER( snowbros_68000_sound_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
 		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( snowbros_68000_sound_w )
 
 static WRITE16_HANDLER( semicom_soundcmd_w )
 {
-	if (ACCESSING_BYTE_0) soundlatch_w(machine,0,data & 0xff);
+	if (ACCESSING_BITS_0_7) soundlatch_w(machine,0,data & 0xff);
 }
 
 
@@ -287,7 +287,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( twinadv_68000_sound_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
 		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);

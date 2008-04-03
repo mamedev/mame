@@ -620,7 +620,7 @@ static READ16_HANDLER( HD63484_status_r )
 static WRITE16_HANDLER( HD63484_address_w )
 {
 	/* only low 8 bits are used */
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		regno = data;
 }
 
@@ -739,7 +739,7 @@ static INTERRUPT_GEN( shanghai_interrupt )
 
 static WRITE16_HANDLER( shanghai_coin_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,data & 1);
 		coin_counter_w(1,data & 2);

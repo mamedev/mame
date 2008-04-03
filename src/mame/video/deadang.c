@@ -20,7 +20,7 @@ WRITE16_HANDLER( deadang_text_w )
 
 WRITE16_HANDLER( deadang_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		deadangle_tilebank = data&1;
 		if (deadangle_tilebank!=deadangle_oldtilebank)

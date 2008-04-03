@@ -169,27 +169,27 @@ static READ32_HANDLER( sysreg_r )
 	UINT32 r = 0;
 	if (offset == 0)
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= readinputport(0) << 24;
 		}
-		if (ACCESSING_BYTE_2)
+		if (ACCESSING_BITS_16_23)
 		{
 			r |= readinputport(1) << 16;
 		}
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 		{
 			int adc_bit = adc083x_do_read(0);
 			r |= ((readinputport(2) & 0x7f) | (adc_bit << 7)) << 8;
 		}
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			r |= readinputport(3) << 0;
 		}
 	}
 	else if (offset == 1)
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			r |= ((adc083x_sars_read(0) << 5) | (EEPROM_read_bit() << 4)) << 24;
 		}
@@ -202,15 +202,15 @@ static WRITE32_HANDLER( sysreg_w )
 {
 	if( offset == 0 )
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			led_reg0 = (data >> 24) & 0xff;
 		}
-		if (ACCESSING_BYTE_2)
+		if (ACCESSING_BITS_16_23)
 		{
 			led_reg1 = (data >> 16) & 0xff;
 		}
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 		{
 			EEPROM_write_bit((data & 0x1) ? 1 : 0);
 			EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
@@ -225,7 +225,7 @@ static WRITE32_HANDLER( sysreg_w )
 	}
 	else if( offset == 1 )
 	{
-		if (ACCESSING_BYTE_3)
+		if (ACCESSING_BITS_24_31)
 		{
 			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
 				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -276,12 +276,12 @@ static READ32_HANDLER( ccu_r )
 		case 0x1c/4:
 		{
 			// Midnight Run polls the vertical counter in vblank
-			if (ACCESSING_BYTE_3)
+			if (ACCESSING_BITS_24_31)
 			{
 				ccu_vcth ^= 0xff;
 				r |= ccu_vcth << 24;
 			}
-			if (ACCESSING_BYTE_1)
+			if (ACCESSING_BITS_8_15)
 			{
 				ccu_vctl++;
 				ccu_vctl &= 0x1ff;
@@ -357,9 +357,9 @@ static READ16_HANDLER( dual539_r )
 {
 	UINT16 ret = 0;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		ret |= K054539_1_r(machine, offset);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		ret |= K054539_0_r(machine, offset)<<8;
 
 	return ret;
@@ -367,9 +367,9 @@ static READ16_HANDLER( dual539_r )
 
 static WRITE16_HANDLER( dual539_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K054539_1_w(machine, offset, data);
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K054539_0_w(machine, offset, data>>8);
 }
 

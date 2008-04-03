@@ -224,12 +224,12 @@ WRITE16_HANDLER( pandora_spriteram_LSB_w )
 		return;
 	}
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		pandora_spriteram[offset] = (data>>8)&0xff;
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		pandora_spriteram[offset] = data&0xff;
 	}

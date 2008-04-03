@@ -107,7 +107,7 @@ static READ16_HANDLER(fake_4a00a_r)
 
 static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 {
-	if(ACCESSING_BYTE_0)
+	if(ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		//needed?

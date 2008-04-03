@@ -18,7 +18,7 @@ READ16_HANDLER( aztarac_sound_r )
 
 WRITE16_HANDLER( aztarac_sound_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
 		soundlatch_w(machine, offset, data);

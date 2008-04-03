@@ -685,7 +685,7 @@ static READ16_HANDLER(mcu_r)
 
 static WRITE16_HANDLER(mcu_w)
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		mcu_ram[offset] = data & 0xff;
 }
 

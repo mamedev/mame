@@ -268,7 +268,7 @@ static READ16_HANDLER(reg_f80000_r)
 
 static READ16_HANDLER(reg_b80000_r)
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		// Bit 7: 0 = ready to write
 		// Bit 6: 0 = ready to read
@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( eeprom_w )
 {
-	if ( ACCESSING_BYTE_1 )
+	if ( ACCESSING_BITS_8_15 )
 	{
 		EEPROM_write_bit(data & 0x0800);
 		EEPROM_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );

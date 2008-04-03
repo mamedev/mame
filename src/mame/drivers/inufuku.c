@@ -103,7 +103,7 @@ WRITE16_HANDLER( inufuku_scrollreg_w );
 
 static WRITE16_HANDLER( inufuku_soundcommand_w )
 {
-	if (ACCESSING_BYTE_0) {
+	if (ACCESSING_BITS_0_7) {
 
 		/* hack... sound doesn't work otherwise */
 		if (data == 0x08) return;

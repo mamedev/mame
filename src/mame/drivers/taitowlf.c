@@ -153,19 +153,19 @@ static void intel82439tx_init(void)
 static UINT32 intel82439tx_pci_r(int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		r |= mxtc_config_r(function, reg + 3) << 24;
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		r |= mxtc_config_r(function, reg + 2) << 16;
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		r |= mxtc_config_r(function, reg + 1) << 8;
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		r |= mxtc_config_r(function, reg + 0) << 0;
 	}
@@ -174,19 +174,19 @@ static UINT32 intel82439tx_pci_r(int function, int reg, UINT32 mem_mask)
 
 static void intel82439tx_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		mxtc_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		mxtc_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		mxtc_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		mxtc_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
@@ -210,19 +210,19 @@ static void piix4_config_w(int function, int reg, UINT8 data)
 static UINT32 intel82371ab_pci_r(int function, int reg, UINT32 mem_mask)
 {
 	UINT32 r = 0;
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		r |= piix4_config_r(function, reg + 3) << 24;
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		r |= piix4_config_r(function, reg + 2) << 16;
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		r |= piix4_config_r(function, reg + 1) << 8;
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		r |= piix4_config_r(function, reg + 0) << 0;
 	}
@@ -231,19 +231,19 @@ static UINT32 intel82371ab_pci_r(int function, int reg, UINT32 mem_mask)
 
 static void intel82371ab_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
 	}
-	if (ACCESSING_BYTE_2)
+	if (ACCESSING_BITS_16_23)
 	{
 		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
 	}
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
 	}
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
 	}
@@ -252,7 +252,7 @@ static void intel82371ab_pci_w(int function, int reg, UINT32 data, UINT32 mem_ma
 // ISA Plug-n-Play
 static WRITE32_HANDLER( pnp_config_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 //      mame_printf_debug("PNP Config: %02X\n", (data >> 8) & 0xff);
 	}
@@ -260,7 +260,7 @@ static WRITE32_HANDLER( pnp_config_w )
 
 static WRITE32_HANDLER( pnp_data_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 //      mame_printf_debug("PNP Data: %02X\n", (data >> 8) & 0xff);
 	}

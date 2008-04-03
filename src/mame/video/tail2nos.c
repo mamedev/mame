@@ -98,7 +98,7 @@ WRITE16_HANDLER( tail2nos_zoomdata_w )
 
 WRITE16_HANDLER( tail2nos_gfxbank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		int bank;
 

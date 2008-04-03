@@ -63,13 +63,13 @@ WRITE16_HANDLER( gotcha_bgvideoram_w )
 
 WRITE16_HANDLER( gotcha_gfxbank_select_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		banksel = (data & 0x0300) >> 8;
 }
 
 WRITE16_HANDLER( gotcha_gfxbank_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		if (gfxbank[banksel] != ((data & 0x0f00) >> 8))
 		{

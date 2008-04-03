@@ -52,7 +52,7 @@ static READ16_HANDLER( m68k_shared_word_r )
 
 static WRITE16_HANDLER( m68k_shared_word_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		m68k_shared_ram[offset] = data & 0xff;
 }
 

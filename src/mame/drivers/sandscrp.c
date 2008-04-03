@@ -138,7 +138,7 @@ static READ16_HANDLER( sandscrp_irq_cause_r )
 /* Clear the cause of the interrupt */
 static WRITE16_HANDLER( sandscrp_irq_cause_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		kaneko16_sprite_flipx	=	data & 1;
 		kaneko16_sprite_flipy	=	data & 1;
@@ -159,7 +159,7 @@ static WRITE16_HANDLER( sandscrp_irq_cause_w )
 
 static WRITE16_HANDLER( sandscrp_coin_counter_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,   data  & 0x0001);
 		coin_counter_w(1,   data  & 0x0002);
@@ -177,7 +177,7 @@ static READ16_HANDLER( sandscrp_latchstatus_word_r )
 
 static WRITE16_HANDLER( sandscrp_latchstatus_word_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		latch1_full = data & 0x80;
 		latch2_full = data & 0x40;
@@ -192,7 +192,7 @@ static READ16_HANDLER( sandscrp_soundlatch_word_r )
 
 static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		latch1_full = 1;
 		soundlatch_w(machine, 0, data & 0xff);

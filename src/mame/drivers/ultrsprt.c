@@ -51,7 +51,7 @@ static READ32_HANDLER( eeprom_r )
 {
 	UINT32 r = 0;
 
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 		r |= (((EEPROM_read_bit()) << 1) | (readinputport(6) << 3)) << 24;
 
 	return r;
@@ -59,7 +59,7 @@ static READ32_HANDLER( eeprom_r )
 
 static WRITE32_HANDLER( eeprom_w )
 {
-	if (ACCESSING_BYTE_3)
+	if (ACCESSING_BITS_24_31)
 	{
 		EEPROM_write_bit((data & 0x01000000) ? 1 : 0);
 		EEPROM_set_clock_line((data & 0x02000000) ? CLEAR_LINE : ASSERT_LINE);
@@ -107,10 +107,10 @@ static READ16_HANDLER( sound_r )
 	UINT16 r = 0;
 	int reg = offset * 2;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		r |= K054539_0_r(machine, reg+0) << 8;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		r |= K054539_0_r(machine, reg+1) << 0;
 
 	return r;
@@ -120,10 +120,10 @@ static WRITE16_HANDLER( sound_w )
 {
 	int reg = offset * 2;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K054539_0_w(machine, reg+0, (data >> 8) & 0xff);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K054539_0_w(machine, reg+1, (data >> 0) & 0xff);
 }
 
@@ -131,10 +131,10 @@ static READ16_HANDLER( K056800_68k_r )
 {
 	UINT16 r = 0;
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		r |= K056800_sound_r(machine, (offset*2)+0, 0xffff) << 8;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		r |= K056800_sound_r(machine, (offset*2)+1, 0xffff) << 0;
 
 	return r;
@@ -142,10 +142,10 @@ static READ16_HANDLER( K056800_68k_r )
 
 static WRITE16_HANDLER( K056800_68k_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K056800_sound_w(machine, (offset*2)+0, (data >> 8) & 0xff, 0xffff);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K056800_sound_w(machine, (offset*2)+1, (data >> 0) & 0xff, 0xffff);
 }
 

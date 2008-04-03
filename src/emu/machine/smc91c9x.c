@@ -418,7 +418,7 @@ READ16_HANDLER( smc91c94_r )
 	switch (offset)
 	{
 		case EREG_PNR_ARR:
-			if (ACCESSING_BYTE_1)
+			if (ACCESSING_BITS_8_15)
 			{
 				ethernet.reg[EREG_INTERRUPT] &= ~0x0008;
 				update_ethernet_irq();
@@ -431,7 +431,7 @@ READ16_HANDLER( smc91c94_r )
 			UINT8 *buffer = (ethernet.reg[EREG_POINTER] & 0x8000) ? ethernet.rx : ethernet.tx;
 			int addr = ethernet.reg[EREG_POINTER] & 0x7ff;
 			result = buffer[addr++];
-			if (ACCESSING_BYTE_1)
+			if (ACCESSING_BITS_8_15)
 				result |= buffer[addr++] << 8;
 			if (ethernet.reg[EREG_POINTER] & 0x4000)
 				ethernet.reg[EREG_POINTER] = (ethernet.reg[EREG_POINTER] & ~0x7ff) | (addr & 0x7ff);
@@ -549,7 +549,7 @@ WRITE16_HANDLER( smc91c94_w )
 			UINT8 *buffer = (ethernet.reg[EREG_POINTER] & 0x8000) ? ethernet.rx : ethernet.tx;
 			int addr = ethernet.reg[EREG_POINTER] & 0x7ff;
 			buffer[addr++] = data;
-			if (ACCESSING_BYTE_1)
+			if (ACCESSING_BITS_8_15)
 				buffer[addr++] = data >> 8;
 			if (ethernet.reg[EREG_POINTER] & 0x4000)
 				ethernet.reg[EREG_POINTER] = (ethernet.reg[EREG_POINTER] & ~0x7ff) | (addr & 0x7ff);

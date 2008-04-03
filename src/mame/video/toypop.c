@@ -167,10 +167,10 @@ READ16_HANDLER( toypop_merged_background_r )
 WRITE16_HANDLER( toypop_merged_background_w )
 {
 	// 0xabcd is written as 0x0a0b0c0d in the background image
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		toypop_bg_image[2*offset] = ((data & 0xf00) >> 8) | ((data & 0xf000) >> 4);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		toypop_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 

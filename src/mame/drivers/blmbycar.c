@@ -55,7 +55,7 @@ VIDEO_UPDATE( blmbycar );
 
 static WRITE16_HANDLER( blmbycar_okibank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *RAM = memory_region(REGION_SOUND1);
 		memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*(data & 0xf)],0x10000);
@@ -76,13 +76,13 @@ static UINT8 pot_wheel = 0;
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		pot_wheel = ~readinputport(2) & 0xff;
 }
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		static int old;
 		if ( ((old & 0xff) == 0xff) && ((data & 0xff) == 0) )

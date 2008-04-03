@@ -262,32 +262,32 @@ WRITE8_HANDLER( AY8910_control_port_1_w ) { ay8910_write_ym(sndti_token(SOUND_AY
 WRITE8_HANDLER( AY8910_control_port_2_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 2),0,data); }
 WRITE8_HANDLER( AY8910_control_port_3_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 3),0,data); }
 WRITE8_HANDLER( AY8910_control_port_4_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 4),0,data); }
-WRITE16_HANDLER( AY8910_control_port_0_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),0,data & 0xff); }
-WRITE16_HANDLER( AY8910_control_port_1_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),0,data & 0xff); }
-WRITE16_HANDLER( AY8910_control_port_2_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),0,data & 0xff); }
-WRITE16_HANDLER( AY8910_control_port_3_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),0,data & 0xff); }
-WRITE16_HANDLER( AY8910_control_port_4_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),0,data & 0xff); }
-WRITE16_HANDLER( AY8910_control_port_0_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),0,data >> 8); }
-WRITE16_HANDLER( AY8910_control_port_1_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),0,data >> 8); }
-WRITE16_HANDLER( AY8910_control_port_2_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),0,data >> 8); }
-WRITE16_HANDLER( AY8910_control_port_3_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),0,data >> 8); }
-WRITE16_HANDLER( AY8910_control_port_4_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),0,data >> 8); }
+WRITE16_HANDLER( AY8910_control_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),0,data & 0xff); }
+WRITE16_HANDLER( AY8910_control_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),0,data & 0xff); }
+WRITE16_HANDLER( AY8910_control_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),0,data & 0xff); }
+WRITE16_HANDLER( AY8910_control_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),0,data & 0xff); }
+WRITE16_HANDLER( AY8910_control_port_4_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),0,data & 0xff); }
+WRITE16_HANDLER( AY8910_control_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),0,data >> 8); }
+WRITE16_HANDLER( AY8910_control_port_1_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),0,data >> 8); }
+WRITE16_HANDLER( AY8910_control_port_2_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),0,data >> 8); }
+WRITE16_HANDLER( AY8910_control_port_3_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),0,data >> 8); }
+WRITE16_HANDLER( AY8910_control_port_4_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),0,data >> 8); }
 
 WRITE8_HANDLER( AY8910_write_port_0_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 0),1,data); }
 WRITE8_HANDLER( AY8910_write_port_1_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 1),1,data); }
 WRITE8_HANDLER( AY8910_write_port_2_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 2),1,data); }
 WRITE8_HANDLER( AY8910_write_port_3_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 3),1,data); }
 WRITE8_HANDLER( AY8910_write_port_4_w ) { ay8910_write_ym(sndti_token(SOUND_AY8910, 4),1,data); }
-WRITE16_HANDLER( AY8910_write_port_0_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),1,data & 0xff); }
-WRITE16_HANDLER( AY8910_write_port_1_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),1,data & 0xff); }
-WRITE16_HANDLER( AY8910_write_port_2_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),1,data & 0xff); }
-WRITE16_HANDLER( AY8910_write_port_3_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),1,data & 0xff); }
-WRITE16_HANDLER( AY8910_write_port_4_lsb_w ) { if (ACCESSING_BYTE_0) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),1,data & 0xff); }
-WRITE16_HANDLER( AY8910_write_port_0_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),1,data >> 8); }
-WRITE16_HANDLER( AY8910_write_port_1_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),1,data >> 8); }
-WRITE16_HANDLER( AY8910_write_port_2_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),1,data >> 8); }
-WRITE16_HANDLER( AY8910_write_port_3_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),1,data >> 8); }
-WRITE16_HANDLER( AY8910_write_port_4_msb_w ) { if (ACCESSING_BYTE_1) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),1,data >> 8); }
+WRITE16_HANDLER( AY8910_write_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),1,data & 0xff); }
+WRITE16_HANDLER( AY8910_write_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),1,data & 0xff); }
+WRITE16_HANDLER( AY8910_write_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),1,data & 0xff); }
+WRITE16_HANDLER( AY8910_write_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),1,data & 0xff); }
+WRITE16_HANDLER( AY8910_write_port_4_lsb_w ) { if (ACCESSING_BITS_0_7) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),1,data & 0xff); }
+WRITE16_HANDLER( AY8910_write_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 0),1,data >> 8); }
+WRITE16_HANDLER( AY8910_write_port_1_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 1),1,data >> 8); }
+WRITE16_HANDLER( AY8910_write_port_2_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 2),1,data >> 8); }
+WRITE16_HANDLER( AY8910_write_port_3_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 3),1,data >> 8); }
+WRITE16_HANDLER( AY8910_write_port_4_msb_w ) { if (ACCESSING_BITS_8_15) ay8910_write_ym(sndti_token(SOUND_AY8910, 4),1,data >> 8); }
 
 
 

@@ -1187,7 +1187,7 @@ static WRITE16_HANDLER( misc_io_w )
 
 static WRITE16_HANDLER( rom_5704_bank_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		segaic16_tilemap_set_bank(0, offset & 1, data & 7);
 }
 
@@ -1225,7 +1225,7 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 			break;
 
 		case 0x2000/2:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				segaic16_tilemap_set_bank(0, offset & 1, data & 7);
 			break;
 	}
@@ -1531,7 +1531,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 
 static WRITE16_HANDLER( atomicp_sound_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		switch (offset & 1)
 		{
 			case 0:	YM2413_register_port_0_w(machine, 0, data >> 8);	break;

@@ -63,14 +63,14 @@ static READ16_HANDLER( shared_ram_r )
 static WRITE16_HANDLER( shared_ram_w )
 {
 	if ((offset&1)==0) {
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 			shared_ram[offset/2]=(shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 			shared_ram[offset/2]=(shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
 	} else {
-		if (ACCESSING_BYTE_1)
+		if (ACCESSING_BITS_8_15)
 			shared_ram[offset/2]=(shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
-		if (ACCESSING_BYTE_0)
+		if (ACCESSING_BITS_0_7)
 			shared_ram[offset/2]=(shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
 	}
 }
@@ -86,13 +86,13 @@ static WRITE32_HANDLER( cpua_ctrl_w )
     is there an irq enable in the top nibble?
     */
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
 		if (data&0x8000) cpunum_set_input_line(Machine, 0,3,HOLD_LINE); /* Guess */
 	}
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* Lamp control bits of some sort in the lsb */
 	}
@@ -143,12 +143,12 @@ static WRITE32_HANDLER( superchs_input_w )
 	{
 		case 0x00:
 		{
-			if (ACCESSING_BYTE_3)	/* $300000 is watchdog */
+			if (ACCESSING_BITS_24_31)	/* $300000 is watchdog */
 			{
 				watchdog_reset(machine);
 			}
 
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				EEPROM_write_bit(data & 0x40);
@@ -163,7 +163,7 @@ static WRITE32_HANDLER( superchs_input_w )
 
 		case 0x01:
 		{
-			if (ACCESSING_BYTE_3)
+			if (ACCESSING_BITS_24_31)
 			{
 				coin_lockout_w(0,~data & 0x01000000);
 				coin_lockout_w(1,~data & 0x02000000);

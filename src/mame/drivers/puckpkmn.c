@@ -100,11 +100,11 @@ static WRITE16_HANDLER( puckpkmn_YM3438_w )
 	switch (offset)
 	{
 		case 0:
-			if (ACCESSING_BYTE_1)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
+			if (ACCESSING_BITS_8_15)	YM3438_control_port_0_A_w	(machine, 0,	(data >> 8) & 0xff);
 			else 				YM3438_data_port_0_A_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 		case 1:
-			if (ACCESSING_BYTE_1)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
+			if (ACCESSING_BITS_8_15)	YM3438_control_port_0_B_w	(machine, 0,	(data >> 8) & 0xff);
 			else 				YM3438_data_port_0_B_w		(machine, 0,	(data >> 0) & 0xff);
 			break;
 	}

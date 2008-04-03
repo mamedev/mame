@@ -395,7 +395,7 @@ VIDEO_UPDATE(martchmp)
 
 WRITE16_HANDLER(ddd_053936_enable_w)
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		roz_enable = data & 0x0100;
 		roz_rombank = (data & 0xc000)>>14;
@@ -410,7 +410,7 @@ WRITE16_HANDLER(ddd_053936_clip_w)
 
 	if (offset == 1)
 	{
- 		if (ACCESSING_BYTE_1) K053936GP_clip_enable(0, data & 0x0100);
+ 		if (ACCESSING_BITS_8_15) K053936GP_clip_enable(0, data & 0x0100);
 	}
 	else
 	{

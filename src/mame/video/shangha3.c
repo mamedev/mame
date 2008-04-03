@@ -94,7 +94,7 @@ VIDEO_START( shangha3 )
 
 WRITE16_HANDLER( shangha3_flipscreen_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 7 flips screen, the rest seems to always be set to 0x7e */
 		flip_screen_set(data & 0x80);

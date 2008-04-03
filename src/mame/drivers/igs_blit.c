@@ -627,7 +627,7 @@ static WRITE16_HANDLER( chmplst2_magic_w )
 		case 0x00:
 			COMBINE_DATA(&igs_input_sel2);
 
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				coin_counter_w(0,	data & 0x20);
 				//  coin out        data & 0x40
@@ -640,7 +640,7 @@ static WRITE16_HANDLER( chmplst2_magic_w )
 			break;
 
 		case 0x02:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				chmplst2_pen_hi = data & 0x07;
 
@@ -718,7 +718,7 @@ static WRITE16_HANDLER( chindrag_magic_w )
 	{
 
 		case 0x00:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 				coin_counter_w(0,data & 2);
 
 			if (data & ~0x2)
@@ -781,7 +781,7 @@ static WRITE16_HANDLER( grtwall_magic_w )
 	switch(igs_magic[0])
 	{
 		case 0x02:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				coin_counter_w(0,data & 0x01);
 
@@ -838,7 +838,7 @@ static READ16_HANDLER( grtwall_magic_r )
 
 static WRITE16_HANDLER( lhb_okibank_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		OKIM6295_set_bank_base(0, (data & 0x200) ? 0x40000 : 0);
 	}
@@ -853,7 +853,7 @@ static WRITE16_HANDLER( lhb_input2_w )
 {
 	COMBINE_DATA(&igs_input_sel2);
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		coin_counter_w(0,			 data & 0x20	);
 		//  coin out                 data & 0x40
@@ -897,7 +897,7 @@ static WRITE16_HANDLER( vbowl_magic_w )
 	switch(igs_magic[0])
 	{
 		case 0x02:
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				coin_counter_w(0,data & 1);
 				coin_counter_w(1,data & 2);
@@ -964,7 +964,7 @@ static WRITE16_HANDLER( xymg_magic_w )
 		case 0x01:
 			COMBINE_DATA(&igs_input_sel2);
 
-			if (ACCESSING_BYTE_0)
+			if (ACCESSING_BITS_0_7)
 			{
 				coin_counter_w(0,	data & 0x20);
 				//  coin out        data & 0x40
@@ -1012,13 +1012,13 @@ static READ16_HANDLER( xymg_magic_r )
 
 static WRITE16_HANDLER( igs_YM3812_control_port_0_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM3812_control_port_0_w(machine,0,data);
 }
 
 static WRITE16_HANDLER( igs_YM3812_write_port_0_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		YM3812_write_port_0_w(machine,0,data);
 }
 
@@ -1170,11 +1170,11 @@ static WRITE16_HANDLER( ics2115_0_word_w )
 	switch(offset)
 	{
 		case 1:
-			if (ACCESSING_BYTE_0)	ics2115_w(machine,1,data);
+			if (ACCESSING_BITS_0_7)	ics2115_w(machine,1,data);
 			break;
 		case 2:
-			if (ACCESSING_BYTE_0)	ics2115_w(machine,2,data);
-			if (ACCESSING_BYTE_1)	ics2115_w(machine,3,data>>8);
+			if (ACCESSING_BITS_0_7)	ics2115_w(machine,2,data);
+			if (ACCESSING_BITS_8_15)	ics2115_w(machine,3,data>>8);
 			break;
 	}
 }
@@ -1199,7 +1199,7 @@ static VIDEO_EOF( vbowl )
 
 static WRITE16_HANDLER( vbowl_pen_hi_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		chmplst2_pen_hi = data & 0x07;
 	}

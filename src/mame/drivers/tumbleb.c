@@ -847,7 +847,7 @@ static WRITE8_HANDLER( YM2151_w )
 
 static WRITE16_HANDLER( semicom_soundcmd_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		// needed for Super Trio which reads the sound with polling

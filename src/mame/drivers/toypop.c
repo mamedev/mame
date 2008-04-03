@@ -149,7 +149,7 @@ static READ16_HANDLER( toypop_m68000_sharedram_r )
 
 static WRITE16_HANDLER( toypop_m68000_sharedram_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		toypop_m68000_sharedram[offset] = data & 0xff;
 }
 

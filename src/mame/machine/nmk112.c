@@ -54,7 +54,7 @@ WRITE8_HANDLER( NMK112_okibank_w )
 
 WRITE16_HANDLER( NMK112_okibank_lsb_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		NMK112_okibank_w(machine, offset, data & 0xff);
 	}

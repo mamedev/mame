@@ -134,9 +134,9 @@ static WRITE16_HANDLER( punkshot_K052109_word_w )
 {
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K052109_w(machine,offset,(data >> 8) & 0xff);
-	else if (ACCESSING_BYTE_0)
+	else if (ACCESSING_BITS_0_7)
 		K052109_w(machine,offset + 0x2000,data & 0xff);
 }
 
@@ -185,9 +185,9 @@ static WRITE16_HANDLER( K053244_word_noA1_w )
 {
 	offset &= ~1;	/* handle mirror address */
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K053244_w(machine,offset,(data >> 8) & 0xff);
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		K053244_w(machine,offset + 1,data & 0xff);
 }
 
@@ -223,7 +223,7 @@ static INTERRUPT_GEN( lgtnfght_interrupt )
 
 static WRITE16_HANDLER( tmnt_sound_command_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 		soundlatch_w(machine,0,data & 0xff);
 }
 
@@ -250,7 +250,7 @@ static READ16_HANDLER( glfgreat_sound_r )
 
 static WRITE16_HANDLER( glfgreat_sound_w )
 {
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 		K053260_0_w(machine, offset, (data >> 8) & 0xff);
 
 	if (offset)
@@ -264,7 +264,7 @@ static READ16_HANDLER( prmrsocr_sound_r )
 
 static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
 		if (offset == 0) soundlatch_w(machine,0,data);
@@ -551,7 +551,7 @@ static READ16_HANDLER( sunsetbl_eeprom_r )
 
 static WRITE16_HANDLER( blswhstl_eeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
@@ -625,7 +625,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 {
 	static int last;
 
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
@@ -668,12 +668,12 @@ static READ16_HANDLER( prmrsocr_eeprom_r )
 
 static WRITE16_HANDLER( prmrsocr_eeprom_w )
 {
-	if (ACCESSING_BYTE_0)
+	if (ACCESSING_BITS_0_7)
 	{
 		prmrsocr_122000_w(machine,offset,data,mem_mask);
 	}
 
-	if (ACCESSING_BYTE_1)
+	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 8 is data */
 		/* bit 9 is cs (active low) */
@@ -932,7 +932,7 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 
 	COMBINE_DATA(tmnt2_1c0800 + offset);
 
-	if (offset != 0x18/2 || !ACCESSING_BYTE_1) return;
+	if (offset != 0x18/2 || !ACCESSING_BITS_8_15) return;
 
 	mcu = tmnt2_1c0800;
 	if ((mcu[8] & 0xff00) != 0x8200) return;
