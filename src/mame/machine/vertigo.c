@@ -19,8 +19,8 @@
  *
  *************************************/
 
-static void v_irq4_w(int level);
-static void v_irq3_w(int level);
+static PIT8253_OUTPUT_CHANGED( v_irq4_w );
+static PIT8253_OUTPUT_CHANGED( v_irq3_w );
 static void update_irq(void);
 
 
@@ -43,9 +43,8 @@ static UINT8 irq_state;
 static UINT8 adc_result;
 
 /* 8254 timer config */
-static const struct pit8253_config pit8254_config =
+const struct pit8253_config vertigo_pit8254_config =
 {
-	TYPE8254,
 	{
 		{
 			240000,
@@ -98,20 +97,20 @@ static void update_irq_encoder(int line, int state)
 }
 
 
-static void v_irq4_w(int level)
+static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 {
-	update_irq_encoder(INPUT_LINE_IRQ4, level);
-	vertigo_vproc(ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(), irq4_time)), level);
+	update_irq_encoder(INPUT_LINE_IRQ4, state);
+	vertigo_vproc(ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(), irq4_time)), state);
 	irq4_time = timer_get_time();
 }
 
 
-static void v_irq3_w(int level)
+static PIT8253_OUTPUT_CHANGED( v_irq3_w )
 {
-	if (level)
+	if (state)
 		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
 
-	update_irq_encoder(INPUT_LINE_IRQ3, level);
+	update_irq_encoder(INPUT_LINE_IRQ3, state);
 }
 
 
@@ -221,7 +220,6 @@ MACHINE_RESET( vertigo )
 		TTL74148_input_line_w(0, i, 1);
 
 	TTL74148_update(0);
-	pit8253_init(1, &pit8254_config);
 	vertigo_vproc_init();
 
 	irq4_time = timer_get_time();

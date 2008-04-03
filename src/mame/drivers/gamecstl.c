@@ -40,6 +40,7 @@
 
 #include "driver.h"
 #include "memconv.h"
+#include "devconv.h"
 #include "deprecat.h"
 #include "machine/8237dma.h"
 #include "machine/pic8259.h"
@@ -332,6 +333,10 @@ static WRITE32_HANDLER(bios_ram_w)
 	}
 }
 
+
+DEV_READWRITE8TO32LE( gamecstl_pit8254_32le, pit8253_r, pit8253_w )
+
+
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( gamecstl_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -348,7 +353,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(gamecstl_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(dma8237_32le_0_r,			dma8237_32le_0_w)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
-	AM_RANGE(0x0040, 0x005f) AM_READWRITE(pit8253_32le_0_r,			pit8253_32le_0_w)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, "pit8254", gamecstl_pit8254_32le_r, gamecstl_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
@@ -441,6 +446,30 @@ static MACHINE_RESET(gamecstl)
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
+{
+    pic8259_set_irq_line(0, 0, state);
+}
+
+static const struct pit8253_config gamecstl_pit8254_config =
+{
+	{
+		{
+			4772720/4,				/* heartbeat IRQ */
+			pc_timer0_w,
+			NULL
+		}, {
+			4772720/4,				/* dram refresh */
+			NULL,
+			NULL
+		}, {
+			4772720/4,				/* pio port c pin 4, and speaker polling enough */
+			NULL,
+			NULL
+		}
+	}
+};
+
 static MACHINE_DRIVER_START(gamecstl)
 
 	/* basic machine hardware */
@@ -449,6 +478,9 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_CPU_IO_MAP(gamecstl_io, 0)
 
 	MDRV_MACHINE_RESET(gamecstl)
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( gamecstl_pit8254_config )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -509,7 +541,7 @@ static DRIVER_INIT( gamecstl )
 {
 	bios_ram = auto_malloc(0x10000);
 
-	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT | PCCOMMON_TIMER_8254);
+	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT);
 	mc146818_init(MC146818_STANDARD);
 
 	intel82439tx_init();

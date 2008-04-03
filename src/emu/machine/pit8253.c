@@ -8,6 +8,7 @@
  *  8254 has an additional readback feature
  *
  *  Revision History
+ *      1-Apr-2008 - WFP:   Changed the implementation into a device.
  *      8-Jul-2004 - AJ:    Fixed some bugs. Styx now runs correctly.
  *                          Implemented 8254 features.
  *      1-Mar-2004 - NPW:   Did an almost total rewrite and cleaned out much
@@ -19,7 +20,7 @@
 
 #include <math.h>
 #include "driver.h"
-#include "memconv.h"
+#include "devconv.h"
 #include "machine/pit8253.h"
 
 
@@ -41,12 +42,25 @@
 
 #define	CYCLES_NEVER ((UINT32) -1)
 
+/* device types */
+enum {
+	TYPE_PIT8253 = 0,
+	TYPE_PIT8254,
+
+	NUM_TYPES
+};
+
+
+/* device tags */
+static const char * const device_tags[NUM_TYPES] = { "pit8253", "pit8254" };
+
+
 struct pit8253_timer
 {
 	double clockin;					/* input clock frequency in Hz */
 
-	void (*output_callback_func)(int);	/* callback function for when output changes */
-	void (*freq_callback)(double);	/* callback function for when output frequency changes */
+	pit8253_output_changed_func		output_changed;	/* callback function for when output changes */
+	pit8253_frequency_changed_func	frequency_changed;	/* callback function for when output frequency changes */
 
 	attotime last_updated;			/* time when last updated */
 
@@ -74,9 +88,11 @@ struct pit8253_timer
 	UINT32 freq_count;				/* counter period for periodic modes, 0 if counter non-periodic */
 };
 
-struct pit8253
+typedef struct _pit8253_t	pit8253_t;
+struct _pit8253_t
 {
 	const struct pit8253_config *config;
+	int	device_type;
 	struct pit8253_timer timers[MAX_TIMER];
 };
 
@@ -85,24 +101,23 @@ struct pit8253
 #define	CTRL_BCD(control)			(((control)	>> 0) &	0x01)
 
 
-static int pit_count;
-static struct pit8253 *pits;
-
-
-
 /***************************************************************************
 
     Functions
 
 ***************************************************************************/
 
-static struct pit8253 *get_pit(int which)
-{
-	return &pits[which];
+/* makes sure that the passed in device is of the right type */
+INLINE pit8253_t *get_safe_token(const device_config *device) {
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( ( device->type == DEVICE_GET_INFO_NAME(pit8253) ) ||
+		    ( device->type == DEVICE_GET_INFO_NAME(pit8254) ) );
+	return ( pit8253_t * ) device->token;
 }
 
 
-static struct pit8253_timer	*get_timer(struct pit8253 *pit,int which)
+static struct pit8253_timer	*get_timer(struct _pit8253_t *pit,int which)
 {
 	which &= 3;
 	if (which < MAX_TIMER)
@@ -111,7 +126,7 @@ static struct pit8253_timer	*get_timer(struct pit8253 *pit,int which)
 }
 
 
-static UINT32 decimal_from_bcd(UINT16 val)
+INLINE UINT32 decimal_from_bcd(UINT16 val)
 {
 	/* In BCD mode, a nybble loaded with value A-F counts down the same as in
        binary mode, but wraps around to 9 instead of F after 0, so loading the
@@ -208,7 +223,7 @@ static void	freq_callback_in(struct	pit8253_timer *timer,UINT32	cycles)
 {
 	LOG2(("pit8253: freq_callback_in(): %d cycles\n",cycles));
 
-	if (timer->freq_callback ==	NULL)
+	if (timer->frequency_changed == NULL)
 	{
 		return;
 	}
@@ -225,7 +240,7 @@ static void	freq_callback_in(struct	pit8253_timer *timer,UINT32	cycles)
 }
 
 
-static void	set_freq_count(struct pit8253_timer	*timer)
+static void	set_freq_count(const device_config *device, struct pit8253_timer *timer)
 {
 	int	mode = CTRL_MODE(timer->control);
 	UINT32 freq_count;
@@ -242,9 +257,9 @@ static void	set_freq_count(struct pit8253_timer	*timer)
 	if (freq_count != timer->freq_count)
 	{
 		timer->freq_count =	freq_count;
-		if (timer->freq_callback !=	NULL)
+		if (timer->frequency_changed != NULL)
 		{
-			timer->freq_callback(get_frequency(timer));
+			timer->frequency_changed(device, get_frequency(timer));
 			freq_callback_in(timer,CYCLES_NEVER);
 		}
 	}
@@ -254,7 +269,7 @@ static void	set_freq_count(struct pit8253_timer	*timer)
 
 
 /* Call the output callback in "cycles" cycles */
-static void	trigger_countdown(struct pit8253_timer *timer)
+static void	trigger_countdown(const device_config *device, struct pit8253_timer *timer)
 {
 	LOG2(("pit8253: trigger_countdown()\n"));
 
@@ -263,18 +278,18 @@ static void	trigger_countdown(struct pit8253_timer *timer)
 	if (CTRL_MODE(timer->control) == 3 && timer->output	== 0)
 		timer->value &=	0xfffe;
 
-	set_freq_count(timer);
+	set_freq_count(device, timer);
 }
 
 
-static void	set_output(struct pit8253_timer	*timer,int output)
+static void	set_output(const device_config *device, struct pit8253_timer *timer,int output)
 {
 	if (output != timer->output)
 	{
 		timer->output =	output;
-		if (timer->output_callback_func != NULL)
+		if (timer->output_changed != NULL)
 		{
-			timer->output_callback_func(output);
+			timer->output_changed(device, output);
 		}
 	}
 }
@@ -282,7 +297,7 @@ static void	set_output(struct pit8253_timer	*timer,int output)
 
 /* This emulates timer "timer" for "elapsed_cycles" cycles and assumes no
    callbacks occur during that time. */
-static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
+static void	simulate2(const device_config *device, struct pit8253_timer *timer,UINT64 elapsed_cycles)
 {
 	UINT32 adjusted_value;
 	int	bcd	= CTRL_BCD(timer->control);
@@ -358,7 +373,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 			}
 		}
 
-		set_output(timer,timer->phase == 3 ? 1 : 0);
+		set_output(device, timer, timer->phase == 3 ? 1 : 0);
 		break;
 
 
@@ -397,7 +412,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 			decrease_counter_value(timer,elapsed_cycles);
 			cycles_to_output = CYCLES_NEVER;
 		}
-		set_output(timer,timer->phase == 0 ? 1 : 0);
+		set_output(device, timer, timer->phase == 0 ? 1 : 0);
 		break;
 
 
@@ -427,7 +442,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 		if (timer->gate	== 0 ||	timer->phase ==	0)
 		{
 			/* Gate low or mode control write forces output high */
-			set_output(timer,1);
+			set_output(device, timer, 1);
 			cycles_to_output = CYCLES_NEVER;
 		}
 		else
@@ -442,12 +457,12 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 			{
 				/* Counter wrapped around one or more times */
 				elapsed_cycles -= adjusted_value;
-				trigger_countdown(timer);
+				trigger_countdown(device, timer);
 				decrease_counter_value(timer,elapsed_cycles	% adjusted_count(bcd,timer->count));
 			}
 			cycles_to_output = (timer->value ==	1 ?	1 :	(adjusted_count(bcd,timer->value) -	1));
 
-			set_output(timer,timer->value != 1 ? 1 : 0);
+			set_output(device, timer, timer->value != 1 ? 1 : 0);
 		}
 		break;
 
@@ -477,7 +492,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 		if (timer->gate	== 0 ||	timer->phase ==	0)
 		{
 			/* Gate low or mode control write forces output high */
-			set_output(timer,1);
+			set_output(device, timer, 1);
 			cycles_to_output = CYCLES_NEVER;
 		}
 		else
@@ -493,8 +508,8 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 				/* Counter wrapped around one or more times */
 				elapsed_cycles -= ((adjusted_value+1)>>1);
 
-				set_output(timer,1 - timer->output);
-				trigger_countdown(timer);
+				set_output(device, timer, 1 - timer->output);
+				trigger_countdown(device, timer);
 
 				elapsed_cycles %= adjusted_count(bcd,timer->count);
 				adjusted_value = adjusted_count(bcd,timer->value);
@@ -503,8 +518,8 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 					/* Counter wrapped around an even number of times */
 					elapsed_cycles -= ((adjusted_value+1)>>1);
 
-					set_output(timer,1 - timer->output);
-					trigger_countdown(timer);
+					set_output(device, timer, 1 - timer->output);
+					trigger_countdown(device, timer);
 				}
 				decrease_counter_value(timer,elapsed_cycles<<1);
 			}
@@ -598,11 +613,11 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
 				break;
 			}
 		}
-		set_output(timer,timer->phase != 3 ? 1 : 0);
+		set_output(device, timer, timer->phase != 3 ? 1 : 0);
 		break;
 	}
 
-	if (timer->output_callback_func != NULL)
+	if (timer->output_changed != NULL)
 	{
 		timer->cycles_to_output	= cycles_to_output;
 		if (cycles_to_output ==	CYCLES_NEVER ||	timer->clockin == 0)
@@ -638,7 +653,7 @@ static void	simulate2(struct pit8253_timer *timer,UINT64 elapsed_cycles)
    inaccurate by more than one cycle, and the output changed multiple
    times during the discrepancy. In practice updates should still be O(1).
 */
-static void	simulate(struct	pit8253_timer *timer,UINT64	elapsed_cycles)
+static void	simulate(const device_config *device, struct pit8253_timer *timer,UINT64 elapsed_cycles)
 {
 	while ((timer->cycles_to_output	!= CYCLES_NEVER	&&
 			timer->cycles_to_output	<= elapsed_cycles) ||
@@ -657,15 +672,15 @@ static void	simulate(struct	pit8253_timer *timer,UINT64	elapsed_cycles)
 			cycles_to_callback = timer->cycles_to_freq;
 		}
 
-		simulate2(timer,cycles_to_callback);
+		simulate2(device, timer, cycles_to_callback);
 		elapsed_cycles -= cycles_to_callback;
 	}
-	simulate2(timer,elapsed_cycles);
+	simulate2(device, timer, elapsed_cycles);
 }
 
 
 /* This brings timer "timer" up to date */
-static void	update(struct pit8253_timer	*timer)
+static void	update(const device_config *device, struct pit8253_timer *timer)
 {
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
@@ -675,51 +690,21 @@ static void	update(struct pit8253_timer	*timer)
 
 	timer->last_updated	= attotime_add(timer->last_updated,double_to_attotime(elapsed_cycles/timer->clockin));
 
-	simulate(timer,elapsed_cycles);
+	simulate(device, timer,elapsed_cycles);
 }
 
 
-void pit8253_reset(int which)
+static TIMER_CALLBACK( frequency_changed )
 {
-	struct pit8253 *pit	= get_pit(which);
-	struct pit8253_timer *timer;
-	int	i;
-
-	LOG1(("pit8253_reset(): resetting pit %d\n", which));
-
-	for	(i = 0;	i <	MAX_TIMER; i++)
-	{
-		timer =	get_timer(pit,i);
-		/* According to Intel's 8254 docs, the state of a timer is undefined
-           until the first mode control word is written. Here we define this
-           undefined behaviour */
-		timer->control = timer->status = 0x30;
-		timer->rmsb	= timer->wmsb =	0;
-		timer->count = timer->value	= timer->latch = 0;
-		timer->lowcount	= 0;
-		timer->gate	= 1;
-		timer->output =	0;
-		timer->latched_count = 0;
-		timer->latched_status =	0;
-		timer->null_count =	1;
-		timer->cycles_to_output	= timer->cycles_to_freq	= CYCLES_NEVER;
-
-		timer->last_updated	= timer_get_time();
-
-		update(timer);
-	}
-}
-
-
-static TIMER_CALLBACK( freqcallback )
-{
-	struct pit8253_timer *timer = get_timer(get_pit(param &	0x0F),(param >>	4) & 0x0F);
+	const device_config *device = ptr;
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer = get_timer(pit8253,param);
 	INT64 cycles =	timer->cycles_to_freq;
 	double t;
 
-	LOG2(("pit8253: freqcallback(): pit %d, timer %d, %d cycles\n",param & 0xf,(param >> 4) & 0xf,(UINT32)cycles));
+	LOG2(("pit8253: frequency_changed(): timer %d, %d cycles\n",param,(UINT32)cycles));
 
-	simulate(timer,cycles);
+	simulate(device, timer,cycles);
 
 	t = cycles / timer->clockin;
 
@@ -727,92 +712,21 @@ static TIMER_CALLBACK( freqcallback )
 }
 
 
-static TIMER_CALLBACK( outputcallback )
+static TIMER_CALLBACK( output_changed )
 {
-	struct pit8253_timer *timer = get_timer(get_pit(param &	0x0F),(param >>	4) & 0x0F);
+	const device_config *device = ptr;
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer = get_timer(pit8253,param);
 	INT64 cycles =	timer->cycles_to_output;
 	double t;
 
-	LOG2(("pit8253: outputcallback(): pit %d, timer %d, %d cycles\n",param & 0xf,(param >> 4) & 0xf,(UINT32)cycles));
+	LOG2(("pit8253: output_changed(): timer %d, %d cycles\n",param,(UINT32)cycles));
 
-	simulate(timer,cycles);
+	simulate(device, timer,cycles);
 
 	t = cycles / timer->clockin;
 
 	timer->last_updated	= attotime_add(timer->last_updated, double_to_attotime(t));
-}
-
-
-int	pit8253_init(int count,	const struct pit8253_config *config)
-{
-	int	i, timerno,	n=0;
-	struct pit8253 *pit;
-	struct pit8253_timer *timer;
-
-	LOG2(("pit8253_init(): initializing %d pit(s)\n", count));
-
-	pit_count =	count;
-	pits = auto_malloc(count * sizeof(struct pit8253));
-
-	memset(pits, 0,	count *	sizeof(struct pit8253));
-
-	for (i = 0;	i < count; i++)
-	{
-		pit	= get_pit(i);
-		pit->config	= &config[i];
-
-		for	(timerno = 0; timerno <	MAX_TIMER; timerno++)
-		{
-			timer =	get_timer(pit,timerno);
-
-			timer->clockin = pit->config->timer[timerno].clockin;
-			timer->output_callback_func = pit->config->timer[timerno].output_callback_func;
-			timer->freq_callback = pit->config->timer[timerno].clock_callback;
-
-			if (timer->output_callback_func == NULL)
-				timer->outputtimer = NULL;
-			else
-			{
-				timer->outputtimer = timer_alloc(outputcallback, NULL);
-				timer_adjust_oneshot(timer->outputtimer, attotime_never, i	| (timerno<<4));
-			}
-			if (timer->freq_callback ==	NULL)
-				timer->freqtimer = NULL;
-			else
-			{
-				timer->freqtimer = timer_alloc(freqcallback, NULL);
-				timer_adjust_oneshot(timer->freqtimer,	attotime_never,	i |	(timerno<<4));
-			}
-
-			/* set up state save values */
-			state_save_register_item("pit8253", n, timer->clockin);
-			state_save_register_item("pit8253", n, timer->control);
-			state_save_register_item("pit8253", n, timer->status);
-			state_save_register_item("pit8253", n, timer->lowcount);
-			state_save_register_item("pit8253", n, timer->latch);
-			state_save_register_item("pit8253", n, timer->count);
-			state_save_register_item("pit8253", n, timer->value);
-			state_save_register_item("pit8253", n, timer->wmsb);
-			state_save_register_item("pit8253", n, timer->rmsb);
-			state_save_register_item("pit8253", n, timer->output);
-			state_save_register_item("pit8253", n, timer->gate);
-			state_save_register_item("pit8253", n, timer->latched_count);
-			state_save_register_item("pit8253", n, timer->latched_status);
-			state_save_register_item("pit8253", n, timer->null_count);
-			state_save_register_item("pit8253", n, timer->phase);
-			state_save_register_item("pit8253", n, timer->cycles_to_output);
-			state_save_register_item("pit8253", n, timer->cycles_to_freq);
-			state_save_register_item("pit8253", n, timer->freq_count);
-			state_save_register_item("pit8253", n, timer->last_updated.seconds);
-			state_save_register_item("pit8253", n, timer->last_updated.attoseconds);
-			++n;
-		}
-		pit8253_reset(i);
-	}
-
-	LOG1(("pit8253_init(): initialized successfully\n"));
-
-	return 0;
 }
 
 
@@ -833,14 +747,14 @@ static UINT16 masked_value(struct pit8253_timer	*timer)
      latched_count
      rmsb
   so they don't affect any timer operations except other reads. */
-static UINT8 pit8253_read(int	which,offs_t offset)
+READ8_DEVICE_HANDLER( pit8253_r )
 {
-	struct pit8253 *pit	= get_pit(which);
-	struct pit8253_timer *timer	= get_timer(pit,offset);
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer	= get_timer(pit8253,offset);
 	UINT8	data;
 	UINT16 value;
 
-	LOG2(("pit8253_read(): pit %d, offset %d\n",which,offset));
+	LOG2(("pit8253_r(): offset %d\n", offset));
 
 	if (timer == NULL)
 	{
@@ -850,7 +764,7 @@ static UINT8 pit8253_read(int	which,offs_t offset)
 	}
 	else
 	{
-		update(timer);
+		update(device, timer);
 
 		if (timer->latched_status)
 		{
@@ -898,13 +812,13 @@ static UINT8 pit8253_read(int	which,offs_t offset)
 		}
 	}
 
-	LOG2(("pit8253_read(): PIT #%d offset=%d data=0x%02x\n", which, (int) offset, (unsigned) data));
+	LOG2(("pit8253_r(): offset=%d data=0x%02x\n", offset, data));
 	return data;
 }
 
 
 /* Loads a new value from the bus to the count register (CR) */
-static void	load_count(struct pit8253_timer	*timer,	UINT16 newcount)
+static void	load_count(const device_config *device, struct pit8253_timer *timer, UINT16 newcount)
 {
 	int	mode = CTRL_MODE(timer->control);
 
@@ -925,7 +839,7 @@ static void	load_count(struct pit8253_timer	*timer,	UINT16 newcount)
 	{
 		if (timer->phase ==	0)
 		{
-			trigger_countdown(timer);
+			trigger_countdown(device, timer);
 		}
 		else
 		{
@@ -944,16 +858,16 @@ static void	load_count(struct pit8253_timer	*timer,	UINT16 newcount)
 	{
 		if (mode ==	0 || mode == 4)
 		{
-			trigger_countdown(timer);
+			trigger_countdown(device, timer);
 		}
 	}
 }
 
 
-static void	readback(struct	pit8253_timer *timer,int command)
+static void	readback(const device_config *device, struct pit8253_timer *timer,int command)
 {
 	UINT16 value;
-	update(timer);
+	update(device, timer);
 
 	if ((command & 1) == 0)
 	{
@@ -1002,62 +916,62 @@ static void	readback(struct	pit8253_timer *timer,int command)
 }
 
 
-static void	pit8253_write(int which, offs_t	offset,	int	data)
+WRITE8_DEVICE_HANDLER( pit8253_w )
 {
-	struct pit8253 *pit	= get_pit(which);
-	struct pit8253_timer *timer	= get_timer(pit,offset);
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer	= get_timer(pit8253,offset);
 	int	read_command;
 
-	LOG2(("pit8253_write(): PIT #%d offset=%d data=0x%02x\n", which, (int) offset, (unsigned) data));
+	LOG2(("pit8253_w(): offset=%d data=0x%02x\n", offset, data));
 
 	if (timer == NULL) {
 		/* Write to mode control register */
-		timer =	get_timer(pit, (data >>	6) & 3);
+		timer =	get_timer(pit8253, (data >>	6) & 3);
 		if (timer == NULL)
 		{
 			/* Readback command. Illegal on 8253 */
 			/* Todo: find out what (if anything) the 8253 hardware actually does here. */
-			if (pit->config->type == TYPE8254)
+			if (pit8253->device_type == TYPE_PIT8254)
 			{
-				LOG1(("pit8253_write(): PIT #%d readback %02x\n", which, data & 0x3f));
+				LOG1(("pit8253_w(): readback %02x\n", data & 0x3f));
 
 				/* Bit 0 of data must be 0. Todo: find out what the hardware does if it isn't. */
 				read_command = (data >>	4) & 3;
 				if ((data &	2) != 0)
-					readback(get_timer(pit,0),read_command);
+					readback(device, get_timer(pit8253,0), read_command);
 				if ((data &	4) != 0)
-					readback(get_timer(pit,1),read_command);
+					readback(device, get_timer(pit8253,1), read_command);
 				if ((data &	8) != 0)
-					readback(get_timer(pit,2),read_command);
+					readback(device, get_timer(pit8253,2), read_command);
 			}
 			return;
 		}
 
-		update(timer);
+		update(device, timer);
 
 		if (CTRL_ACCESS(data) == 0)
 		{
-			LOG1(("pit8253_write(): PIT #%d timer=%d readback\n", which, (data >> 6) & 3));
+			LOG1(("pit8253_write(): timer=%d readback\n", (data >> 6) & 3));
 
 			/* Latch current timer value */
 			/* Experimentally verified: this command does not affect the mode control register */
-			readback(timer,1);
+			readback(device, timer, 1);
 		}
 		else {
-			LOG1(("pit8253_write(): PIT #%d timer=%d bytes=%d mode=%d bcd=%d\n", which, (data >> 6) & 3, (data >> 4) & 3, (data >> 1) & 7,data & 1));
+			LOG1(("pit8253_write(): timer=%d bytes=%d mode=%d bcd=%d\n", (data >> 6) & 3, (data >> 4) & 3, (data >> 1) & 7,data & 1));
 
 			timer->control = (data & 0x3f);
 			timer->null_count =	1;
 			timer->wmsb	= timer->rmsb =	0;
 			/* Phase 0 is always the phase after a mode control write */
 			timer->phase = 0;
-			set_output(timer,1);
-			set_freq_count(timer);
+			set_output(device, timer, 1);
+			set_freq_count(device, timer);
 		}
 	}
 	else
 	{
-		update(timer);
+		update(device, timer);
 
 		switch(CTRL_ACCESS(timer->control))	{
 		case 0:
@@ -1066,19 +980,19 @@ static void	pit8253_write(int which, offs_t	offset,	int	data)
 
 		case 1:
 			/* read/write counter bits 0-7 only */
-			load_count(timer,data);
+			load_count(device, timer, data);
 			break;
 
 		case 2:
 			/* read/write counter bits 8-15 only */
-			load_count(timer,data << 8);
+			load_count(device, timer, data << 8);
 			break;
 
 		case 3:
 			/* read/write bits 0-7 first, then 8-15 */
 			if (timer->wmsb	!= 0)
 			{
-				load_count(timer,timer->lowcount | (data <<	8));
+				load_count(device, timer,timer->lowcount | (data << 8));
 			}
 			else
 			{
@@ -1095,17 +1009,18 @@ static void	pit8253_write(int which, offs_t	offset,	int	data)
 			break;
 		}
 	}
-	update(timer);
+	update(device, timer);
 }
 
 
-static void	pit8253_gate_write(int which,int offset,int	data)
+WRITE8_DEVICE_HANDLER( pit8253_gate_w )
 {
-	struct pit8253_timer *timer	= get_timer(get_pit(which),offset);
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer	= get_timer(pit8253,offset);
 	int	mode;
 	int	gate = (data!=0	? 1	: 0);
 
-	LOG2(("pit8253_gate_write(): PIT #%d offset=%d gate=%d\n", which, (int) offset, (unsigned) data));
+	LOG2(("pit8253_gate_w(): offset=%d gate=%d\n", offset, data));
 
 	if (timer == NULL)
 		return;
@@ -1114,16 +1029,16 @@ static void	pit8253_gate_write(int which,int offset,int	data)
 
 	if (gate !=	timer->gate)
 	{
-		update(timer);
+		update(device, timer);
 		timer->gate	= gate;
-		set_freq_count(timer);
+		set_freq_count(device, timer);
 		if (gate !=	0 &&
 			(mode == 1 || mode == 5	||
 			 (timer->phase == 1	&& (mode ==	2 || mode == 3))))
 		{
-			trigger_countdown(timer);
+			trigger_countdown(device, timer);
 		}
-		update(timer);
+		update(device, timer);
 	}
 }
 
@@ -1131,42 +1046,45 @@ static void	pit8253_gate_write(int which,int offset,int	data)
 
 /* ----------------------------------------------------------------------- */
 
-int	pit8253_get_frequency(int which, int timerno)
+int	pit8253_get_frequency(const device_config *device, int timerno)
 {
-	struct pit8253_timer *timer	= get_timer(get_pit(which),timerno);
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer	= get_timer(pit8253,timerno);
 
-	update(timer);
+	update(device, timer);
 	return get_frequency(timer);
 }
 
 
 
-int	pit8253_get_output(int which, int timerno)
+int	pit8253_get_output(const device_config *device, int timerno)
 {
-	struct pit8253_timer *timer	= get_timer(get_pit(which),timerno);
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer	= get_timer(pit8253,timerno);
 	int	result;
 
-	update(timer);
+	update(device, timer);
 	result = timer->output;
-	LOG2(("pit8253_get_output(): PIT #%d timer=%d result=%d\n", which, timerno, result));
+	LOG2(("pit8253_get_output(): PIT timer=%d result=%d\n", timerno, result));
 	return result;
 }
 
 
 
-void pit8253_set_clockin(int which,	int	timerno, double	new_clockin)
+void pit8253_set_clockin(const device_config *device, int timerno, double new_clockin)
 {
-	struct pit8253_timer *timer	= get_timer(get_pit(which),timerno);
+	pit8253_t	*pit8253 = get_safe_token(device);
+	struct pit8253_timer *timer	= get_timer(pit8253,timerno);
 
-	LOG2(("pit8253_set_clockin(): PIT #%d timer=%d, clockin = %lf\n", which, (int) timerno,new_clockin));
+	LOG2(("pit8253_set_clockin(): PIT timer=%d, clockin = %lf\n", timerno,new_clockin));
 
-	update(timer);
+	update(device, timer);
 	timer->clockin = new_clockin;
-	update(timer);
+	update(device, timer);
 
-	if (timer->freq_callback !=	NULL)
+	if (timer->frequency_changed != NULL)
 	{
-		timer->freq_callback(get_frequency(timer));
+		timer->frequency_changed(device, get_frequency(timer));
 		if (timer->cycles_to_freq != CYCLES_NEVER)
 		{
 			freq_callback_in(timer,timer->cycles_to_freq);
@@ -1175,34 +1093,141 @@ void pit8253_set_clockin(int which,	int	timerno, double	new_clockin)
 }
 
 
+static void common_start( const device_config *device, int device_type ) {
+	pit8253_t	*pit8253 = get_safe_token(device);
+	char		unique_tag[30];
+	int			timerno;
+  
+	pit8253->config = device->static_config;
+	pit8253->device_type = device_type;
+  
+	/* register for state saving */
+	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
+  
+	for (timerno = 0; timerno < MAX_TIMER; timerno++)
+	{
+		struct pit8253_timer *timer = get_timer(pit8253,timerno);
+  
+		timer->clockin = pit8253->config->timer[timerno].clockin;
+		timer->output_changed = pit8253->config->timer[timerno].output_changed;
+		timer->frequency_changed = pit8253->config->timer[timerno].frequency_changed;
+  
+		if (timer->output_changed == NULL)
+			timer->outputtimer = NULL;
+		else
+		{
+			timer->outputtimer = timer_alloc(output_changed, (void *)device);
+			timer_adjust_oneshot(timer->outputtimer, attotime_never, timerno);
+		}
+		if (timer->frequency_changed == NULL)
+			timer->freqtimer = NULL;
+		else
+		{
+			timer->freqtimer = timer_alloc(frequency_changed, (void *)device);
+			timer_adjust_oneshot(timer->freqtimer,  attotime_never, timerno);
+		}
+  
+		/* set up state save values */
+		state_save_register_item(unique_tag, timerno, timer->clockin);
+		state_save_register_item(unique_tag, timerno, timer->control);
+		state_save_register_item(unique_tag, timerno, timer->status);
+		state_save_register_item(unique_tag, timerno, timer->lowcount);
+		state_save_register_item(unique_tag, timerno, timer->latch);
+		state_save_register_item(unique_tag, timerno, timer->count);
+		state_save_register_item(unique_tag, timerno, timer->value);
+		state_save_register_item(unique_tag, timerno, timer->wmsb);
+		state_save_register_item(unique_tag, timerno, timer->rmsb);
+		state_save_register_item(unique_tag, timerno, timer->output);
+		state_save_register_item(unique_tag, timerno, timer->gate);
+		state_save_register_item(unique_tag, timerno, timer->latched_count);
+		state_save_register_item(unique_tag, timerno, timer->latched_status);
+		state_save_register_item(unique_tag, timerno, timer->null_count);
+		state_save_register_item(unique_tag, timerno, timer->phase);
+		state_save_register_item(unique_tag, timerno, timer->cycles_to_output);
+		state_save_register_item(unique_tag, timerno, timer->cycles_to_freq);
+		state_save_register_item(unique_tag, timerno, timer->freq_count);
+		state_save_register_item(unique_tag, timerno, timer->last_updated.seconds);
+		state_save_register_item(unique_tag, timerno, timer->last_updated.attoseconds);
+	}
+}
+  
+  
+static DEVICE_START( pit8253 ) {
+	common_start( device, TYPE_PIT8253 );
+}
 
-/* ----------------------------------------------------------------------- */
 
-READ8_HANDLER (	pit8253_0_r	) {	return pit8253_read(0, offset);	}
-READ8_HANDLER (	pit8253_1_r	) {	return pit8253_read(1, offset);	}
-WRITE8_HANDLER ( pit8253_0_w ) { pit8253_write(0, offset, data); }
-WRITE8_HANDLER ( pit8253_1_w ) { pit8253_write(1, offset, data); }
+static DEVICE_START( pit8254 ) {
+	common_start( device, TYPE_PIT8254 );
+}
 
-READ16_HANDLER ( pit8253_0_lsb_r ) { return pit8253_read(0, offset);	}
-READ16_HANDLER ( pit8253_1_lsb_r ) { return pit8253_read(1, offset);	}
-WRITE16_HANDLER ( pit8253_0_lsb_w ) { if (ACCESSING_BYTE_0) pit8253_write(0, offset, data); }
-WRITE16_HANDLER ( pit8253_1_lsb_w ) { if (ACCESSING_BYTE_0) pit8253_write(1, offset, data); }
 
-READ16_HANDLER ( pit8253_16le_0_r ) { return read16le_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
-READ16_HANDLER ( pit8253_16le_1_r ) { return read16le_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }
-WRITE16_HANDLER	( pit8253_16le_0_w ) { write16le_with_write8_handler(pit8253_0_w, machine, offset, data,	mem_mask); }
-WRITE16_HANDLER	( pit8253_16le_1_w ) { write16le_with_write8_handler(pit8253_1_w, machine, offset, data,	mem_mask); }
+static DEVICE_RESET( pit8253 ) {
+	pit8253_t *pit  = get_safe_token(device);
+	int i;
 
-READ32_HANDLER ( pit8253_32le_0_r ) { return read32le_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
-READ32_HANDLER ( pit8253_32le_1_r ) { return read32le_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }
-WRITE32_HANDLER	( pit8253_32le_0_w ) { write32le_with_write8_handler(pit8253_0_w, machine, offset, data,	mem_mask); }
-WRITE32_HANDLER	( pit8253_32le_1_w ) { write32le_with_write8_handler(pit8253_1_w, machine, offset, data,	mem_mask); }
+	for (i = 0; i < MAX_TIMER; i++)
+	{
+		struct pit8253_timer *timer = get_timer(pit,i);
+		/* According to Intel's 8254 docs, the state of a timer is undefined
+		   until the first mode control word is written. Here we define this
+		   undefined behaviour */
+		timer->control = timer->status = 0x30;
+		timer->rmsb = timer->wmsb = 0;
+		timer->count = timer->value = timer->latch = 0;
+		timer->lowcount = 0;
+		timer->gate = 1;
+		timer->output = 0;
+		timer->latched_count = 0;
+		timer->latched_status = 0;
+		timer->null_count = 1;
+		timer->cycles_to_output = timer->cycles_to_freq = CYCLES_NEVER;
 
-READ64_HANDLER ( pit8253_64be_0_r ) { return read64be_with_read8_handler(pit8253_0_r, machine, offset, mem_mask); }
-READ64_HANDLER ( pit8253_64be_1_r ) { return read64be_with_read8_handler(pit8253_1_r, machine, offset, mem_mask); }
-WRITE64_HANDLER	( pit8253_64be_0_w ) { write64be_with_write8_handler(pit8253_0_w, machine, offset, data,	mem_mask); }
-WRITE64_HANDLER	( pit8253_64be_1_w ) { write64be_with_write8_handler(pit8253_1_w, machine, offset, data,	mem_mask); }
+		timer->last_updated = timer_get_time();
 
-WRITE8_HANDLER ( pit8253_0_gate_w )	{ pit8253_gate_write(0,	offset,	data); }
-WRITE8_HANDLER ( pit8253_1_gate_w )	{ pit8253_gate_write(1,	offset,	data); }
+		update(device, timer);
+	}
+}
 
+
+static DEVICE_SET_INFO( pit8253 ) {
+	switch ( state ) {
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( pit8253 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(pit8253_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
+		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:					info->set_info = DEVICE_SET_INFO_NAME(pit8253);	break;
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pit8253);	break;
+		case DEVINFO_FCT_STOP:						/* nothing */								break;
+		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(pit8253);	break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:						info->s = "Intel PIT8253";					break;
+		case DEVINFO_STR_FAMILY:					info->s = "PIT8253";						break;
+		case DEVINFO_STR_VERSION:					info->s = "1.00";							break;
+		case DEVINFO_STR_SOURCE_FILE:				info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:					info->s = "Copyright the MAME and MESS Teams"; break;
+	}
+}
+
+
+DEVICE_GET_INFO( pit8254 ) {
+	switch ( state ) {
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_STR_NAME:						info->s = "Intel PIT8254";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(pit8254);	break;
+
+		default:									DEVICE_GET_INFO_CALL(pit8253);				break;
+	}
+}

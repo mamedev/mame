@@ -53,8 +53,8 @@ MACHINE_START( buggybjr );
 MACHINE_START( buggyboy );
 
 /*----------- defined in audio/tx1.c -----------*/
-READ8_HANDLER( pit8253_r );
-WRITE8_HANDLER( pit8253_w );
+READ8_HANDLER( tx1_pit8253_r );
+WRITE8_HANDLER( tx1_pit8253_w );
 
 WRITE8_HANDLER( bb_ym1_a_w );
 WRITE8_HANDLER( bb_ym1_b_w );

@@ -384,7 +384,7 @@ static READ8_HANDLER( kludge_r )
 	return mame_rand(Machine);
 }
 
-static void pc_timer0_w(int state)
+static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
 	//if (state)
 	//  pic8259_0_issue_irq(0);
@@ -392,7 +392,6 @@ static void pc_timer0_w(int state)
 
 static const struct pit8253_config pc_pit8253_config =
 {
-	TYPE8253,
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
@@ -405,7 +404,7 @@ static const struct pit8253_config pc_pit8253_config =
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
 			NULL,
-			NULL//pc_sh_speaker_change_clock
+			NULL
 		}
 	}
 };
@@ -654,7 +653,6 @@ GFXDECODE_END
 static MACHINE_RESET(filetto)
 {
 	ppi8255_init(&filetto_ppi8255_intf);
-	pit8253_init(1, &pc_pit8253_config);
 }
 
 /*
@@ -738,6 +736,9 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(filetto_irq,200)
+
+	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
+	MDRV_DEVICE_CONFIG( pc_pit8253_config )
 
 	MDRV_GFXDECODE(filetto)
 

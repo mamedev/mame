@@ -6,6 +6,8 @@
 
 /*----------- defined in machine/vertigo.c -----------*/
 
+extern const struct pit8253_config vertigo_pit8254_config;
+
 READ16_HANDLER( vertigo_io_convert );
 READ16_HANDLER( vertigo_io_adc );
 READ16_HANDLER( vertigo_coin_r );

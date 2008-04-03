@@ -36,7 +36,6 @@
 #ifdef MESS
 #include "machine/pc_fdc.h"
 #include "machine/pc_hdc.h"
-#include "audio/pc.h"
 #endif /* MESS */
 
 #define VERBOSE_DBG 0       /* general debug messages */
@@ -53,67 +52,6 @@ static emu_timer *pc_keyboard_timer;
 static TIMER_CALLBACK( pc_keyb_timer );
 
 #define LOG_PORT80 0
-
-
-static void pc_timer0_w(int state)
-{
-	pic8259_set_irq_line(0, 0, state);
-}
-
-
-/*
- * timer0   heartbeat IRQ
- * timer1   DRAM refresh (ignored)
- * timer2   PIO port C pin 4 and speaker polling
- */
-static const struct pit8253_config pc_pit8253_config =
-{
-	TYPE8253,
-	{
-		{
-			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
-		}, {
-			4772720/4,				/* dram refresh */
-			NULL,
-			NULL
-		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-#ifdef MESS
-			pc_sh_speaker_change_clock
-#else
-			NULL //pc_sh_speaker_change_clock
-#endif /* MESS */
-		}
-	}
-};
-
-static const struct pit8253_config pc_pit8254_config =
-{
-	TYPE8254,
-	{
-		{
-			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w,
-			NULL
-		}, {
-			4772720/4,				/* dram refresh */
-			NULL,
-			NULL
-		}, {
-			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL,
-#ifdef MESS
-			pc_sh_speaker_change_clock
-#else
-			NULL //pc_sh_speaker_change_clock
-#endif /* MESS */
-		}
-	}
-};
-
 
 
 /*************************************************************************
@@ -289,12 +227,6 @@ static void pc_pic_set_int_line(int which, int interrupt)
 
 void init_pc_common(UINT32 flags)
 {
-	/* PIT */
-	if (flags & PCCOMMON_TIMER_8254)
-		pit8253_init(1, &pc_pit8254_config);
-	else if (flags & PCCOMMON_TIMER_8253)
-		pit8253_init(1, &pc_pit8253_config);
-
 	/* PC-XT keyboard */
 	if (flags & PCCOMMON_KEYBOARD_AT)
 		at_keyboard_init(AT_KEYBOARD_TYPE_AT);

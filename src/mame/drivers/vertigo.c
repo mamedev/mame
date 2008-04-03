@@ -23,6 +23,9 @@
  *
  *************************************/
 
+static READ16_DEVICE_HANDLER( vertigo_pit8254_lsb_r ) { return pit8253_r( device, offset ); }
+static WRITE16_DEVICE_HANDLER( vertigo_pit8254_lsb_w ) { if (ACCESSING_BYTE_0) pit8253_w(device, offset, data); }
+
 static ADDRESS_MAP_START( vertigo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x001fff) AM_RAM AM_MIRROR(0x010000)
@@ -35,7 +38,7 @@ static ADDRESS_MAP_START( vertigo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x004050, 0x00405f) AM_READWRITE(SMH_RAM, vertigo_audio_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004060, 0x00406f) AM_WRITE(vertigo_motor_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004070, 0x00407f) AM_WRITE(vertigo_wsot_w) AM_MIRROR(0x001000)
-	AM_RANGE(0x006000, 0x006007) AM_READWRITE(pit8253_0_lsb_r, pit8253_0_lsb_w)
+	AM_RANGE(0x006000, 0x006007) AM_DEVREADWRITE(PIT8254, "pit8254", vertigo_pit8254_lsb_r, vertigo_pit8254_lsb_w)
 	AM_RANGE(0x007000, 0x0073ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END
@@ -107,6 +110,9 @@ static MACHINE_DRIVER_START( vertigo )
 	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
 	MDRV_IMPORT_FROM(exidy440_audio)
+
+	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
+	MDRV_DEVICE_CONFIG( vertigo_pit8254_config )
 
 	/* motor controller */
 	/*

@@ -499,6 +499,7 @@ src/emu/debug/textbuf.c svneol=native#text/plain
 src/emu/debug/textbuf.h svneol=native#text/plain
 src/emu/debugger.h svneol=native#text/plain
 src/emu/deprecat.h svneol=native#text/plain
+src/emu/devconv.h svneol=native#text/plain
 src/emu/devintrf.c svneol=native#text/plain
 src/emu/devintrf.h svneol=native#text/plain
 src/emu/drawgfx.c svneol=native#text/plain

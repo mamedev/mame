@@ -43,7 +43,7 @@ static struct
 } pit8253;
 
 
-WRITE8_HANDLER( pit8253_w )
+WRITE8_HANDLER( tx1_pit8253_w )
 {
 	stream_update(stream);
 
@@ -75,7 +75,7 @@ WRITE8_HANDLER( pit8253_w )
 	}
 }
 
-READ8_HANDLER( pit8253_r )
+READ8_HANDLER( tx1_pit8253_r )
 {
 	mame_printf_debug("PIT R: %x", offset);
 	return 0;
