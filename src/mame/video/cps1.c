@@ -328,9 +328,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ja",   CPS_B_17, 2,2,2, 0x0000,0xffff,0x0000,0xffff },
 	{"sf2jc",   CPS_B_12, 2,2,2, 0x0000,0xffff,0x0000,0xffff },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
-	{"3wonders",BATTRY_1, 0,1,0, 0x0000,0xffff,0x0000,0xffff, 2 },
-	{"3wonderu",BATTRY_1, 0,1,0, 0x0000,0xffff,0x0000,0xffff, 2 },
-	{"wonder3", BATTRY_1, 0,1,0, 0x0000,0xffff,0x0000,0xffff, 2 },
+	{"3wonders",BATTRY_1, 0,1,0, 0x0001,0xffff,0x0000,0xffff, 2 },	// start_scroll2: 0x0000 causes glitch between level 1 & 2 and in level 3
+	{"3wonderu",BATTRY_1, 0,1,0, 0x0001,0xffff,0x0000,0xffff, 2 },
+	{"wonder3", BATTRY_1, 0,1,0, 0x0001,0xffff,0x0000,0xffff, 2 },
 	{"kod",     BATTRY_2, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
 	{"kodu",    BATTRY_2, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
 	{"kodj",    BATTRY_2, 0,0,0, 0x0000,0xffff,0x0000,0xffff },
