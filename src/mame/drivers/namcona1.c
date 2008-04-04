@@ -1277,7 +1277,7 @@ static INTERRUPT_GEN( namcona1_interrupt )
 	{
 		simulate_mcu();
 	}
-	if(1)// mEnableInterrupts )
+	if( mEnableInterrupts )
 	{
 		if( (namcona1_vreg[0x1a/2]&(1<<level))==0 )
 		{
