@@ -741,8 +741,8 @@ static int scsicd_dispatch(int operation, void *file, INT64 intparm, void *ptrpa
 			return 0;
 
 		case SCSIOP_ALLOC_INSTANCE:
-			SCSIBase( &SCSIClassCDROM, operation, file, intparm + SCSI_DEVICE_CDROM_STATE_BASE, ptrparm );
-			scsicd_alloc_instance( *((SCSIInstance **) ptrparm), intparm + SCSI_DEVICE_CDROM_STATE_BASE );
+			SCSIBase( &SCSIClassCDROM, operation, file, intparm, ptrparm );
+			scsicd_alloc_instance( *((SCSIInstance **) ptrparm), intparm );
 			return 0;
 
 		case SCSIOP_DELETE_INSTANCE:
