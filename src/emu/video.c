@@ -181,6 +181,7 @@ static void update_throttle(running_machine *machine, attotime emutime);
 static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t target_ticks);
 static void update_frameskip(running_machine *machine);
 static void recompute_speed(running_machine *machine, attotime emutime);
+static void update_refresh_speed(running_machine *machine);
 
 /* screen snapshots */
 static void create_snapshot_bitmap(const device_config *screen);
@@ -305,6 +306,7 @@ void video_init(running_machine *machine)
 
 	/* extract initial execution state from global configuration settings */
 	global.speed = original_speed_setting();
+	update_refresh_speed(machine);
 	global.throttle = options_get_bool(mame_options(), OPTION_THROTTLE);
 	global.auto_frameskip = options_get_bool(mame_options(), OPTION_AUTOFRAMESKIP);
 	global.frameskip_level = options_get_int(mame_options(), OPTION_FRAMESKIP);
@@ -699,23 +701,6 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 	else
 		state->vblank_period = config->vblank;
 
-	/* adjust speed if necessary */
-	if (options_get_bool(mame_options(), OPTION_REFRESHSPEED))
-	{
-		float minrefresh = render_get_max_update_rate();
-		if (minrefresh != 0)
-		{
-			UINT32 target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(frame_period));
-			UINT32 original_speed = original_speed_setting();
-			target_speed = MIN(target_speed, original_speed);
-			if (target_speed != global.speed)
-			{
-				mame_printf_verbose("Adjusting target speed to %d%%\n", target_speed);
-				global.speed = target_speed;
-			}
-		}
-	}
-
 	/* if we are on scanline 0 already, reset the update timer immediately */
 	/* otherwise, defer until the next scanline 0 */
 	if (video_screen_get_vpos(screen) == 0)
@@ -725,6 +710,9 @@ void video_screen_configure(const device_config *screen, int width, int height, 
 
 	/* start the VBLANK timer */
 	timer_adjust_oneshot(state->vblank_begin_timer, video_screen_get_time_until_vblank_start(screen), 0);
+
+	/* adjust speed if necessary */
+	update_refresh_speed(screen->machine);
 }
 
 
@@ -1969,6 +1957,46 @@ static void update_frameskip(running_machine *machine)
 	/* increment the frameskip counter and determine if we will skip the next frame */
 	global.frameskip_counter = (global.frameskip_counter + 1) % FRAMESKIP_LEVELS;
 	global.skipping_this_frame = skiptable[effective_frameskip()][global.frameskip_counter];
+}
+
+
+/*-------------------------------------------------
+    update_refresh_speed - update the global.speed
+    based on the maximum refresh rate supported
+-------------------------------------------------*/
+
+static void update_refresh_speed(running_machine *machine)
+{
+	/* only do this if the refreshspeed option is used */
+	if (options_get_bool(mame_options(), OPTION_REFRESHSPEED))
+	{
+		float minrefresh = render_get_max_update_rate();
+		if (minrefresh != 0)
+		{
+			attoseconds_t min_frame_period = ATTOSECONDS_PER_SECOND;
+			UINT32 original_speed = original_speed_setting();
+			const device_config *screen;
+			UINT32 target_speed;
+			
+			/* find the screen with the shortest frame period (max refresh rate) */
+			for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
+			{
+				screen_state *state = get_safe_token(screen);
+				min_frame_period = MIN(min_frame_period, state->frame_period);
+			}
+
+			/* compute a target speed as an integral percentage */
+			target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(min_frame_period));
+			target_speed = MIN(target_speed, original_speed);
+			
+			/* if we changed, log that verbosely */
+			if (target_speed != global.speed)
+			{
+				mame_printf_verbose("Adjusting target speed to %d%%\n", target_speed);
+				global.speed = target_speed;
+			}
+		}
+	}
 }
 
 
