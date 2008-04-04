@@ -617,11 +617,11 @@ DEV_WRITE8TO16LE(name,write8)
  ************************************/
 
 #define DEV_READ8TO16BE_MSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 16, name, read8, read16be_with_read8_device_handler, ACCESSING_MSB )
+DEV_READ_TEMPLATE_COND( 16, name, read8, read16be_with_read8_device_handler, ACCESSING_BITS_8_15 )
 
 
 #define DEV_WRITE8TO16BE_MSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16be_with_write8_device_handler, ACCESSING_MSB )
+DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16be_with_write8_device_handler, ACCESSING_BITS_8_15 )
 
 
 #define DEV_READWRITE8TO16BE_MSB( name, read8, write8 ) \
@@ -634,11 +634,11 @@ DEV_WRITE8TO16BE_MSB(name,write8)
  ************************************/
 
 #define DEV_READ8TO16LE_MSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 16, name, read8, read16le_with_read8_device_handler, ACCESSING_MSB )
+DEV_READ_TEMPLATE_COND( 16, name, read8, read16le_with_read8_device_handler, ACCESSING_BITS_8_15 )
 
 
 #define DEV_WRITE8TO16LE_MSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16le_with_write8_device_handler, ACCESSING_MSB )
+DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16le_with_write8_device_handler, ACCESSING_BITS_8_15 )
 
 
 #define DEV_READWRITE8TO16LE_MSB( name, read8, write8 ) \
@@ -651,11 +651,11 @@ DEV_WRITE8TO16LE_MSB(name,write8)
  ************************************/
 
 #define DEV_READ8TO16BE_LSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 16, name, read8, read16be_with_read8_device_handler, ACCESSING_LSB )
+DEV_READ_TEMPLATE_COND( 16, name, read8, read16be_with_read8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_WRITE8TO16BE_LSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16be_with_write8_device_handler, ACCESSING_LSB )
+DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16be_with_write8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_READWRITE8TO16BE_LSB( name, read8, write8 ) \
@@ -668,11 +668,11 @@ DEV_WRITE8TO16BE_LSB(name,write8)
  ************************************/
 
 #define DEV_READ8TO16LE_LSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 16, name, read8, read16le_with_read8_device_handler, ACCESSING_LSB )
+DEV_READ_TEMPLATE_COND( 16, name, read8, read16le_with_read8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_WRITE8TO16LE_LSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16le_with_write8_device_handler, ACCESSING_LSB )
+DEV_WRITE_TEMPLATE_COND( 16, name, write8, write16le_with_write8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_READWRITE8TO16LE_LSB( name, read8, write8 ) \
@@ -719,11 +719,11 @@ DEV_WRITE8TO32LE(name,write8)
  ************************************/
 
 #define DEV_READ8TO32BE_MSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read8, read32be_with_read8_device_handler, ACCESSING_MSB32 )
+DEV_READ_TEMPLATE_COND( 32, name, read8, read32be_with_read8_device_handler, ACCESSING_BITS_24_31 )
 
 
 #define DEV_WRITE8TO32BE_MSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32be_with_write8_device_handler, ACCESSING_MSB32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32be_with_write8_device_handler, ACCESSING_BITS_24_31 )
 
 
 #define DEV_READWRITE8TO32BE_MSB( name, read8, write8 ) \
@@ -736,11 +736,11 @@ DEV_WRITE8TO32BE_MSB(name,write8)
  ************************************/
 
 #define DEV_READ8TO32LE_MSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read8, read32le_with_read8_device_handler, ACCESSING_MSB32 )
+DEV_READ_TEMPLATE_COND( 32, name, read8, read32le_with_read8_device_handler, ACCESSING_BITS_24_31 )
 
 
 #define DEV_WRITE8TO32LE_MSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32le_with_write8_device_handler, ACCESSING_MSB32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32le_with_write8_device_handler, ACCESSING_BITS_24_31 )
 
 
 #define DEV_READWRITE8TO32LE_MSB( name, read8, write8 ) \
@@ -753,11 +753,11 @@ DEV_WRITE8TO32LE_MSB(name,write8)
  ************************************/
 
 #define DEV_READ8TO32BE_LSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read8, read32be_with_read8_device_handler, ACCESSING_LSB32 )
+DEV_READ_TEMPLATE_COND( 32, name, read8, read32be_with_read8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_WRITE8TO32BE_LSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32be_with_write8_device_handler, ACCESSING_LSB32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32be_with_write8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_READWRITE8TO32BE_LSB( name, read8, write8 ) \
@@ -770,11 +770,11 @@ DEV_WRITE8TO32BE_LSB(name,write8)
  ************************************/
 
 #define DEV_READ8TO32LE_LSB( name, read8 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read8, read32le_with_read8_device_handler, ACCESSING_LSB32 )
+DEV_READ_TEMPLATE_COND( 32, name, read8, read32le_with_read8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_WRITE8TO32LE_LSB( name, write8 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32le_with_write8_device_handler, ACCESSING_LSB32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write8, write32le_with_write8_device_handler, ACCESSING_BITS_0_7 )
 
 
 #define DEV_READWRITE8TO32LE_LSB( name, read8, write8 ) \
@@ -889,11 +889,11 @@ DEV_WRITE16LETO32LE(name,write16)
  *************************************/
 
 #define DEV_READ16BETO32BE_MSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16be_device_handler, ACCESSING_MSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16be_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_WRITE16BETO32BE_MSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16be_device_handler, ACCESSING_MSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16be_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_READWRITE16BETO32BE_MSW( name, read16, write16 ) \
@@ -906,11 +906,11 @@ DEV_WRITE16BETO32BE_MSW(name,write16)
  *************************************/
 
 #define DEV_READ16LETO32BE_MSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16le_device_handler, ACCESSING_MSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16le_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_WRITE16LETO32BE_MSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16le_device_handler, ACCESSING_MSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16le_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_READWRITE16LETO32BE_MSW( name, read16, write16 ) \
@@ -923,11 +923,11 @@ DEV_WRITE16LETO32BE_MSW(name,write16)
  *************************************/
 
 #define DEV_READ16BETO32LE_MSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16be_device_handler, ACCESSING_MSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16be_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_WRITE16BETO32LE_MSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16be_device_handler, ACCESSING_MSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16be_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_READWRITE16BETO32LE_MSW( name, read16, write16 ) \
@@ -940,11 +940,11 @@ DEV_WRITE16BETO32LE_MSW(name,write16)
  *************************************/
 
 #define DEV_READ16LETO32LE_MSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16le_device_handler, ACCESSING_MSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16le_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_WRITE16LETO32LE_MSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16le_device_handler, ACCESSING_MSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16le_device_handler, ACCESSING_BITS_16_31 )
 
 
 #define DEV_READWRITE16LETO32LE_MSW( name, read16, write16 ) \
@@ -956,11 +956,11 @@ DEV_WRITE16LETO32LE_MSW(name,write16)
  *************************************/
 
 #define DEV_READ16BETO32BE_LSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16be_device_handler, ACCESSING_LSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16be_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_WRITE16BETO32BE_LSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16be_device_handler, ACCESSING_LSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16be_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_READWRITE16BETO32BE_LSW( name, read16, write16 ) \
@@ -973,11 +973,11 @@ DEV_WRITE16BETO32BE_LSW(name,write16)
  *************************************/
 
 #define DEV_READ16LETO32BE_LSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16le_device_handler, ACCESSING_LSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32be_with_16le_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_WRITE16LETO32BE_LSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16le_device_handler, ACCESSING_LSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32be_with_16le_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_READWRITE16LETO32BE_LSW( name, read16, write16 ) \
@@ -990,11 +990,11 @@ DEV_WRITE16LETO32BE_LSW(name,write16)
  *************************************/
 
 #define DEV_READ16BETO32LE_LSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16be_device_handler, ACCESSING_LSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16be_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_WRITE16BETO32LE_LSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16be_device_handler, ACCESSING_LSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16be_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_READWRITE16BETO32LE_LSW( name, read16, write16 ) \
@@ -1007,11 +1007,11 @@ DEV_WRITE16BETO32LE_LSW(name,write16)
  *************************************/
 
 #define DEV_READ16LETO32LE_LSW( name, read16 ) \
-DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16le_device_handler, ACCESSING_LSW32 )
+DEV_READ_TEMPLATE_COND( 32, name, read16, read32le_with_16le_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_WRITE16LETO32LE_LSW( name, write16 ) \
-DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16le_device_handler, ACCESSING_LSW32 )
+DEV_WRITE_TEMPLATE_COND( 32, name, write16, write32le_with_16le_device_handler, ACCESSING_BITS_0_15 )
 
 
 #define DEV_READWRITE16LETO32LE_LSW( name, read16, write16 ) \
