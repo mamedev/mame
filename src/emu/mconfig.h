@@ -229,11 +229,11 @@ union _machine_config_token
 
 #define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
 	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, sizeof(((_struct *)NULL)->_field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
-	TOKEN_UINT32((UINT32)((float)(_val) * (float)(1 << (_fixbits)))),
+	TOKEN_UINT32((INT32)((float)(_val) * (float)(1 << (_fixbits)))),
 
 #define MDRV_DEVICE_CONFIG_DATAFP64(_struct, _field, _val, _fixbits) \
 	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64, 8, sizeof(((_struct *)NULL)->_field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
-	TOKEN_UINT64((UINT64)((float)(_val) * (float)((UINT64)1 << (_fixbits)))),
+	TOKEN_UINT64((INT64)((float)(_val) * (float)((UINT64)1 << (_fixbits)))),
 
 #ifdef PTR64
 #define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val)
