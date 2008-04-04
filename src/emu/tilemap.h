@@ -432,7 +432,10 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 /* specify a parameter to be passed into the tile_get_info callback */
 void tilemap_set_user_data(tilemap *tmap, void *user_data);
 
-/* specify an offset to be added to each pixel before looking up the palette */
+/* specify an offset to be added to each pixel before looking up the palette
+ * The offset only applies at final rendering time (e.g., tilemap_draw()) 
+ * It does not apply to the cached pixmap, which is provided by tilemap_get_pixmap().
+ */
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset);
 
 /* set an enable flag for the tilemap; if 0, requests to draw the tilemap are ignored */

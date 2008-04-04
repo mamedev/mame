@@ -379,11 +379,7 @@ void tilemap_set_user_data(tilemap *tmap, void *user_data)
 
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset)
 {
-	if (tmap->palette_offset != offset)
-	{
-		tmap->palette_offset = offset;
-		tilemap_mark_all_tiles_dirty(tmap);
-	}
+	tmap->palette_offset = offset;
 }
 
 
