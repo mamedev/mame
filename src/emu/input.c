@@ -759,6 +759,7 @@ input_device *input_device_add(input_device_class devclass, const char *name, vo
 void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate)
 {
 	input_device_item *item;
+	input_item_id itemid_std = itemid;
 
 	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call input_device_item_add at init time!");
 	assert(name != NULL);
@@ -787,7 +788,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	item->name = astring_cpyc(auto_astring_alloc(), name);
 	item->token = NULL;
 	item->internal = internal;
-	item->itemclass = input_item_standard_class(device->devclass, itemid);
+	item->itemclass = input_item_standard_class(device->devclass, itemid_std);
 	item->itemid = itemid;
 	item->getstate = getstate;
 
