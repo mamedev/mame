@@ -2399,6 +2399,10 @@ WRITE16_HANDLER( copdx_0_w )
 			break;
 		}
 
+		case (0x438/2):	{cop_438 = data; break; }
+		case (0x43a/2):	{cop_43a = data; break;	}
+		case (0x43c/2): {cop_43c = data; break;	}
+		
 		case (0x4a0/2):
 		case (0x4a2/2):
 		case (0x4a4/2):
@@ -2949,7 +2953,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		case 0x4a2/2:		/* COP register high word */
 		case 0x4a4/2:		/* COP register high word */
 		case 0x4a6/2:		/* COP register high word */
-			regnum = (offset / 2) % 4;
+			regnum = (offset) % 4;
 			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", activecpu_get_pc(), regnum, data));
 			cop->reg[regnum] = (cop->reg[regnum] & 0x0000ffff) | (data << 16);
 			break;
@@ -2958,7 +2962,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		case 0x4c2/2:		/* COP register low word */
 		case 0x4c4/2:		/* COP register low word */
 		case 0x4c6/2:		/* COP register low word */
-			regnum = (offset / 2) % 4;
+			regnum = (offset) % 4;
 			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", activecpu_get_pc(), regnum, data));
 			cop->reg[regnum] = (cop->reg[regnum] & 0xffff0000) | data;
 			break;
@@ -3000,7 +3004,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		/* ----- other stuff ----- */
 
 		default:		/* unknown */
-			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", activecpu_get_pc(), offset + 0x400, data));
+			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", activecpu_get_pc(), offset*2 + 0x400, data));
 			break;
 	}
 }
