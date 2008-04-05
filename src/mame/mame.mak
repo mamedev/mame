@@ -383,7 +383,6 @@ DRVLIBS = \
 	$(MAMEOBJ)/subsino.a \
 	$(MAMEOBJ)/sun.a \
 	$(MAMEOBJ)/suna.a \
-	$(MAMEOBJ)/tad.a \
 	$(MAMEOBJ)/taito.a \
 	$(MAMEOBJ)/tatsumi.a \
 	$(MAMEOBJ)/tch.a \
@@ -1216,6 +1215,12 @@ $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/wiz.o $(VIDEO)/wiz.o \
 	$(MACHINE)/spisprit.o \
 	$(AUDIO)/seibu.o \
+	$(DRIVERS)/bloodbro.o $(VIDEO)/bloodbro.o \
+	$(DRIVERS)/cabal.o $(VIDEO)/cabal.o \
+	$(DRIVERS)/goal92.o $(VIDEO)/goal92.o \
+	$(DRIVERS)/legionna.o $(VIDEO)/legionna.o \
+	$(MACHINE)/seicop.o \
+	$(DRIVERS)/toki.o $(VIDEO)/toki.o \
 
 $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/aleck64.o $(MACHINE)/n64.o $(VIDEO)/n64.o \
@@ -1278,13 +1283,6 @@ $(MAMEOBJ)/suna.a: \
 	$(DRIVERS)/goindol.o $(VIDEO)/goindol.o \
 	$(DRIVERS)/suna8.o $(AUDIO)/suna8.o $(VIDEO)/suna8.o \
 	$(DRIVERS)/suna16.o $(VIDEO)/suna16.o \
-
-$(MAMEOBJ)/tad.a: \
-	$(DRIVERS)/bloodbro.o $(VIDEO)/bloodbro.o \
-	$(DRIVERS)/cabal.o $(VIDEO)/cabal.o \
-	$(DRIVERS)/goal92.o $(VIDEO)/goal92.o \
-	$(DRIVERS)/legionna.o $(VIDEO)/legionna.o \
-	$(DRIVERS)/toki.o $(VIDEO)/toki.o \
 
 $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/40love.o $(VIDEO)/40love.o \

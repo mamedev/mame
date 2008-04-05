@@ -72,6 +72,12 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 	COMBINE_DATA(dest);
 }
 
+/* machine/seicop.c */
+extern READ16_HANDLER( raiden2_cop2_r );
+extern WRITE16_HANDLER( raiden2_cop2_w );
+extern void cop_init(void);
+
+
 
 /* SPRITE DRAWING (move to video file) */
 
@@ -491,199 +497,6 @@ static INTERRUPT_GEN( raiden2_interrupt )
 
 
 
-//  COPX functions, terribly incomplete
-
-typedef struct _cop_state cop_state;
-struct _cop_state
-{
-	UINT16		offset;						/* last write offset */
-	UINT16		ram[0x200/2];				/* RAM from 0x400-0x5ff */
-
-	UINT32		reg[4];						/* registers */
-
-	UINT16		func_trigger[0x100/8];		/* function trigger */
-	UINT16		func_value[0x100/8];		/* function value (?) */
-	UINT16		func_mask[0x100/8];			/* function mask (?) */
-	UINT16		program[0x100];				/* program "code" */
-};
-
-static cop_state cop_data;
-
-
-#define VERBOSE 1
-#define COP_LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-
-
-
-INLINE UINT16 cop_ram_r(cop_state *cop, UINT16 offset)
-{
-	return cop->ram[(offset - 0x400) / 2];
-}
-
-INLINE void cop_ram_w(cop_state *cop, UINT16 offset, UINT16 data)
-{
-	cop->ram[(offset - 0x400) / 2] = data;
-}
-
-INLINE UINT32 r32(offs_t address)
-{
-	return 	(program_read_word(address + 0) << 0) |
-			(program_read_word(address + 2) << 16);
-}
-
-INLINE void w32(offs_t address, UINT32 data)
-{
-	program_write_word(address + 0, data >> 0);
-	program_write_word(address + 2, data >> 16);
-}
-
-
-static void cop_init(void)
-{
-	memset(&cop_data, 0, sizeof(cop_data));
-}
-
-
-static WRITE16_HANDLER( cop_w )
-{
-	cop_state *cop = &cop_data;
-	UINT32 temp32;
-	UINT8 regnum;
-	int func;
-
-	/* all COP data writes are word-length (?) */
-	data = COMBINE_DATA(&cop->ram[offset]);
-
-	/* handle writes */
-	switch (offset + 0x400)
-	{
-		/* ----- BCD conversion ----- */
-
-		case 0x420:		/* LSW of number */
-		case 0x422:		/* MSW of number */
-			temp32 = cop_ram_r(cop, 0x420) | (cop_ram_r(cop, 0x422) << 16);
-			cop_ram_w(cop, 0x590, ((temp32 / 1) % 10) + (((temp32 / 10) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x592, ((temp32 / 100) % 10) + (((temp32 / 1000) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x594, ((temp32 / 10000) % 10) + (((temp32 / 100000) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x596, ((temp32 / 1000000) % 10) + (((temp32 / 10000000) % 10) << 8) + 0x3030);
-			cop_ram_w(cop, 0x598, ((temp32 / 100000000) % 10) + (((temp32 / 1000000000) % 10) << 8) + 0x3030);
-			break;
-
-		/* ----- program upload registers ----- */
-
-		case 0x432:		/* COP program data */
-			COP_LOG(("%05X:COP Prog Data = %04X\n", activecpu_get_pc(), data));
-			cop->program[cop_ram_r(cop, 0x434)] = data;
-			break;
-
-		case 0x434:		/* COP program address */
-			COP_LOG(("%05X:COP Prog Addr = %04X\n", activecpu_get_pc(), data));
-			assert((data & ~0xff) == 0);
-			temp32 = (data & 0xff) / 8;
-			cop->func_value[temp32] = cop_ram_r(cop, 0x438);
-			cop->func_mask[temp32] = cop_ram_r(cop, 0x43a);
-			cop->func_trigger[temp32] = cop_ram_r(cop, 0x43c);
-			break;
-
-		case 0x438:		/* COP program entry value (0,4,5,6,7,8,9,F) */
-			COP_LOG(("%05X:COP Prog Val  = %04X\n", activecpu_get_pc(), data));
-			break;
-
-		case 0x43a:		/* COP program entry mask */
-			COP_LOG(("%05X:COP Prog Mask = %04X\n", activecpu_get_pc(), data));
-			break;
-
-		case 0x43c:		/* COP program trigger value */
-			COP_LOG(("%05X:COP Prog Trig = %04X\n", activecpu_get_pc(), data));
-			break;
-
-		/* ----- ???? ----- */
-
-		case 0x47a:		/* clear RAM */
-			if (cop_ram_r(cop, 0x47e) == 0x118)
-			{
-				UINT32 addr = cop_ram_r(cop, 0x478) << 6;
-				int count = (cop_ram_r(cop, 0x47a) + 1) << 5;
-				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", activecpu_get_pc(), addr, addr + count));
-				while (count--)
-					program_write_byte(addr++, 0);
-			}
-			else
-			{
-				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", activecpu_get_pc(), cop_ram_r(cop, 0x47e), data));
-			}
-			break;
-
-		/* ----- program data registers ----- */
-
-		case 0x4a0:		/* COP register high word */
-		case 0x4a2:		/* COP register high word */
-		case 0x4a4:		/* COP register high word */
-		case 0x4a6:		/* COP register high word */
-			regnum = (offset / 2) % 4;
-			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", activecpu_get_pc(), regnum, data));
-			cop->reg[regnum] = (cop->reg[regnum] & 0x0000ffff) | (data << 16);
-			break;
-
-		case 0x4c0:		/* COP register low word */
-		case 0x4c2:		/* COP register low word */
-		case 0x4c4:		/* COP register low word */
-		case 0x4c6:		/* COP register low word */
-			regnum = (offset / 2) % 4;
-			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", activecpu_get_pc(), regnum, data));
-			cop->reg[regnum] = (cop->reg[regnum] & 0xffff0000) | data;
-			break;
-
-		/* ----- program trigger register ----- */
-
-		case 0x500:		/* COP trigger */
-			COP_LOG(("%05X:COP Trigger = %04X\n", activecpu_get_pc(), data));
-			for (func = 0; func < ARRAY_LENGTH(cop->func_trigger); func++)
-				if (cop->func_trigger[func] == data)
-				{
-					int offs;
-
-					COP_LOG(("  Execute:"));
-					for (offs = 0; offs < 8; offs++)
-					{
-						if (cop->program[func * 8 + offs] == 0)
-							break;
-						COP_LOG((" %04X", cop->program[func * 8 + offs]));
-					}
-					COP_LOG(("\n"));
-
-					/* special cases for now */
-					if (data == 0x5205 || data == 0x5a05)
-					{
-						COP_LOG(("  Copy 32 bits from %05X to %05X\n", cop->reg[0], cop->reg[1]));
-						w32(cop->reg[1], r32(cop->reg[0]));
-					}
-					else if (data == 0xf205)
-					{
-						COP_LOG(("  Copy 32 bits from %05X to %05X\n", cop->reg[0] + 4, cop->reg[1]));
-						w32(cop->reg[2], r32(cop->reg[0] + 4));
-					}
-					break;
-				}
-			assert(func != ARRAY_LENGTH(cop->func_trigger));
-			break;
-
-		/* ----- other stuff ----- */
-
-		default:		/* unknown */
-			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", activecpu_get_pc(), offset + 0x400, data));
-			break;
-	}
-}
-
-
-static READ16_HANDLER( cop_r )
-{
-	cop_state *cop = &cop_data;
-	COP_LOG(("%05X:COP Read(%04X) = %04X\n", activecpu_get_pc(), offset*2 + 0x400, cop->ram[offset]));
-	return cop->ram[offset];
-}
-
 
 // Sprite encryption key upload
 
@@ -935,7 +748,7 @@ static MACHINE_RESET(raiden2)
 /* MEMORY MAPS */
 
 static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00400, 0x005ff) AM_READWRITE(cop_r, cop_w)
+	AM_RANGE(0x00400, 0x005ff) AM_READWRITE(raiden2_cop2_r, raiden2_cop2_w)
 
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
@@ -1887,7 +1700,7 @@ ROM_START( zeroteab )
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
 ROM_END
 
-/* Different hardware, COP-D3? */
+/* Different hardware, uses COPX-D3 for protection  */
 ROM_START( nzerotea )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1",   0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
@@ -2302,7 +2115,9 @@ GAME( 1993, zeroteam, 0,       raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaih
 GAME( 1993, zeroteaa, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteab, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zerotsel, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, nzerotea, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND)
+
+// 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
+GAME( 1993, nzerotea, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
 GAME( 1996, r2dx_v33, 0, rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden 2 / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
