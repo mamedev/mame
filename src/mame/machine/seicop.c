@@ -4,8 +4,8 @@
   there appear to be 3 revisions of this protection (based on the external rom)
 
   COPX-D1 - Seibu Cup Soccer / Olympic Soccer '92
-  COPX-D2 - Legionnaire
-          - Heated Barrel
+          - Legionnaire
+  COPX-D2 - Heated Barrel
           - Godzilla
           - SD Gundam Sangokushi Rainbow Tairiku Senki
           - Denjin Makai
@@ -29,6 +29,9 @@
   nor if the co-processor is a real MCU with internal code, or a custom designed
   'blitter' like device.
 
+  I suspect that for the earlier games it's part of the COP300 or COP1000 chips,
+  for the COPX-D3 based games it's probably inside the system controller SEI333
+
   the external COP rom is probably used as a lookup for maths operations.
 
   there should probably only be a single cop2_r / cop2_w function, the chip
@@ -49,6 +52,15 @@
 UINT16 *cop_mcu_ram;
 
 static UINT16 copd2_table[0x100];
+static UINT16 copd2_table_2[0x100/8];
+static UINT16 copd2_table_3[0x100/8];
+static UINT16 copd2_table_4[0x100/8];
+
+static UINT16 cop_438;
+static UINT16 cop_43a;
+static UINT16 cop_43c;
+
+
 static UINT16 copd2_offs = 0;
 
 extern UINT16* legionna_scrollram16;
@@ -64,6 +76,45 @@ void copd2_set_tableoffset(UINT16 data, running_machine *machine)
 	{
 		logerror("copd2 offs > 0x100\n");
 	}
+
+	copd2_table_2[copd2_offs/8] = cop_438;
+	copd2_table_3[copd2_offs/8] = cop_43a;
+	copd2_table_4[copd2_offs/8] = cop_43c;
+
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.table2", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table_2, 0x200/8, 1, fp);
+			fclose(fp);
+		}
+	}
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.table3", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table_3, 0x200/8, 1, fp);
+			fclose(fp);
+		}
+	}
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"copdat_%s.table4", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(copd2_table_4, 0x200/8, 1, fp);
+			fclose(fp);
+		}
+	}
+
 }
 
 void copd2_set_tabledata(UINT16 data, running_machine *machine)
@@ -552,7 +603,9 @@ WRITE16_HANDLER( legionna_mcu_w )
 			break;
 		}
 
-		/* writes to 438 and 43a during this period too */
+		case (0x438/2):	{cop_438 = data; break; }
+		case (0x43a/2):	{cop_43a = data; break;	}
+		case (0x43c/2): {cop_43c = data; break;	}
 
 
 		case (0x4c0/2):
@@ -1156,6 +1209,11 @@ WRITE16_HANDLER( cop2_mcu_w )
 		}
 
 
+		case (0x438/2):	{cop_438 = data; break; }
+		case (0x43a/2):	{cop_43a = data; break;	}
+		case (0x43c/2): {cop_43c = data; break;	}
+
+
 		case (0x470/2):
 		{
 			heatbrl_setgfxbank( cop_mcu_ram[offset] );
@@ -1492,6 +1550,11 @@ WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 			copd2_set_tableoffset(data, machine);
 			break;
 		}
+
+		case (0x438/2):	{cop_438 = data; break; }
+		case (0x43a/2):	{cop_43a = data; break;	}
+		case (0x43c/2): {cop_43c = data; break;	}
+
 
 
 		case (0x478/2):
@@ -1953,6 +2016,11 @@ WRITE16_HANDLER( denjinmk_cop_mcu_w )
 			break;
 		}
 
+		case (0x438/2):	{cop_438 = data; break; }
+		case (0x43a/2):	{cop_43a = data; break;	}
+		case (0x43c/2): {cop_43c = data; break;	}
+
+
 
 		case (0x470/2):
 		{
@@ -2113,6 +2181,9 @@ WRITE16_HANDLER( godzilla_cop_mcu_w )
 			break;
 		}
 
+		case (0x438/2):	{cop_438 = data; break; }
+		case (0x43a/2):	{cop_43a = data; break;	}
+		case (0x43c/2): {cop_43c = data; break;	}
 
 
 		case (0x478/2):
