@@ -338,7 +338,7 @@ static int snk_input_port_r( running_machine *machine, int which ){
 		case SNK_INP8: return input_port_read_indexed(machine, 8);
 		case SNK_INP9: return input_port_read_indexed(machine, 9);
 		case SNK_INP10: return input_port_read_indexed(machine, 10);
-		case SNK_INP11: return input_port_11_r(machine,0);
+		case SNK_INP11: return input_port_read_indexed(machine, 11);
 
 		default:
 		logerror("read from unmapped input port:%d\n", which );
