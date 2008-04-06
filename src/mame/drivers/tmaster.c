@@ -17,19 +17,22 @@ To Do:
 
 - Proper touchscreen controller emulation. Currently it's flakey and
   tends to stop registering user input (try coining up in that case)
-- Protection in tm4k
+- Protection in tm4k and later games
 - Coin optics
 - RTC emulation (there's code to check the upper bytes of NVRAM to see if
   the real time clock is present, and to only use it in that case)
 
 To be dumped and added:
 
+Touch Master 2000
 Touch Master 6000
 Touch Master 7000 *
-Touch Master 8000
+Touch Master 8000 *(?)
 
-* There is a reported "Minnesota" version with modification due to legal issues
-  Also, the TM5000 is labeled "DOMESTIC" (AKA "Standard"), is there an EXPORT version?
+* There is a reported "Minnesota" version with modifications due to legal issues
+  Touch Master 5000 is labeled "DOMESTIC" (AKA "Standard"), is there an EXPORT version?
+  Starting with Touch Master 2000, each later version is a chipswap for the mainboard.
+   IE: Touch Master 8000 chips can update any Touch Master mainboard 2000 through 7000
 
 Touch Master 8000 part lists:
 
@@ -864,7 +867,7 @@ TM3K_u39.bin               5.0  Video Images & Graphics         6029
 TM3K_u40.bin               5.0  Video Images & Graphics         ccb4
 TM3K_u41.bin               5.0  Video Images & Graphics         54a7
 u62 (NOT INCLUDED)         N/A  Battery Memory Module           N/A
-J12 (NOT INCLUDED)         N/A  Security Key(not required for this Version)
+J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Labeled A-21657-002
 -----------------------------------------------------------------------------------
 
 SCN68681c1n40
@@ -874,8 +877,8 @@ xc3042A      www.xilinx.com
 
 ROM_START( tm3k )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
-	ROM_LOAD16_BYTE( "tm3k_u52.bin", 0x000001, 0x100000, CRC(8c6a0db7) SHA1(6b0eae60ea471cd8c4001749ac2677d8d4532567) )
-	ROM_LOAD16_BYTE( "tm3k_u51.bin", 0x000000, 0x100000, CRC(c9522279) SHA1(e613b791f831271722f05b7e96c35519fa9fc174) )
+	ROM_LOAD16_BYTE( "tm3k_u52.bin", 0x000001, 0x100000, CRC(8c6a0db7) SHA1(6b0eae60ea471cd8c4001749ac2677d8d4532567) ) /* Ver: 5.01 Standard 11-4-97 */
+	ROM_LOAD16_BYTE( "tm3k_u51.bin", 0x000000, 0x100000, CRC(c9522279) SHA1(e613b791f831271722f05b7e96c35519fa9fc174) ) /* Ver: 5.01 Standard 11-4-97 */
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm3k_u38.bin", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) )
