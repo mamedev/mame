@@ -7303,6 +7303,14 @@ static DRIVER_INIT( slammast )
 
 static DRIVER_INIT( pang3 )
 {
+	/* Pang 3 EEPROM interface is at a different address */
+	memory_install_readwrite16_handler (0, ADDRESS_SPACE_PROGRAM, 0x80017a, 0x80017b, 0, 0, cps1_eeprom_port_r, cps1_eeprom_port_w);
+
+	DRIVER_INIT_CALL(cps1);
+}
+
+static DRIVER_INIT( pang3j )
+{
 	UINT16 *rom = (UINT16 *)memory_region(REGION_CPU1);
 	int A,src,dst;
 
@@ -7322,7 +7330,7 @@ static DRIVER_INIT( pang3 )
 		rom[A/2] = dst;
 	}
 
-	DRIVER_INIT_CALL(cps1);
+	DRIVER_INIT_CALL(pang3);
 }
 #endif
 
@@ -7443,5 +7451,5 @@ GAME( 1993, mbombrdj, slammast, qsound,   slammast, slammast, ROT0,   "Capcom", 
 
 GAME( 1994, pnickj,   0,        cps1,     pnickj,   cps1,     ROT0,   "Compile (Capcom license)", "Pnickies (Japan 940608)", 0 )
 /* Japanese version of Pang 3 is encrypted, Euro version is not */
-GAME( 1995, pang3,    0,        pang3,    pang3,    cps1,     ROT0,   "Mitchell", "Pang! 3 (Euro 950511)", 0 )
-GAME( 1995, pang3j,   pang3,    pang3,    pang3,    pang3,    ROT0,   "Mitchell", "Pang! 3 (Japan 950511)", 0 )
+GAME( 1995, pang3,    0,        pang3,    pang3,    pang3,    ROT0,   "Mitchell", "Pang! 3 (Euro 950511)", 0 )
+GAME( 1995, pang3j,   pang3,    pang3,    pang3,    pang3j,   ROT0,   "Mitchell", "Pang! 3 (Japan 950511)", 0 )
