@@ -236,6 +236,9 @@ void video_set_speed_factor(int speed);
 /* return text to display about the current speed */
 const char *video_get_speed_text(running_machine *machine);
 
+/* return the current effective speed percentage */
+double video_get_speed_percent(running_machine *machine);
+
 /* get/set the current frameskip (-1 means auto) */
 int video_get_frameskip(void);
 void video_set_frameskip(int frameskip);

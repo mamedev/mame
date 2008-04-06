@@ -1517,6 +1517,7 @@ static void destroy_machine(running_machine *machine)
 static void init_machine(running_machine *machine)
 {
 	mame_private *mame = machine->mame_data;
+	time_t newbase;
 	int num;
 
 	/* initialize basic can't-fail systems here */
@@ -1545,16 +1546,15 @@ static void init_machine(running_machine *machine)
 	/* init the osd layer */
 	osd_init(machine);
 
+	/* initialize the base time (needed for doing record/playback) */
+	time(&mame->base_time);
+
 	/* initialize the input system and input ports for the game */
 	/* this must be done before memory_init in order to allow specifying */
 	/* callbacks based on input port tags */
-	input_port_init(machine, machine->gamedrv->ipt);
-
-	/* initialize the base time (if not doing record/playback) */
-	if (machine->record_file == NULL && machine->playback_file == NULL)
-		time(&mame->base_time);
-	else
-		mame->base_time = 0;
+	newbase = input_port_init(machine, machine->gamedrv->ipt);
+	if (newbase != 0)
+		mame->base_time = newbase;
 
 	/* first load ROMs, then populate memory, and finally initialize CPUs */
 	/* these operations must proceed in this order */

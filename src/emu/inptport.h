@@ -39,6 +39,11 @@
 #define INPUT_PORT_PAIR_TOKENS	(2 * sizeof(UINT32) / sizeof(FPTR))
 
 
+#define INP_HEADER_SIZE			64
+#define INP_HEADER_MAJVERSION	2
+#define INP_HEADER_MINVERSION	0
+
+
 /* macro for a custom callback functions (PORT_CUSTOM) */
 #define CUSTOM_INPUT(name)	UINT32 name(running_machine *machine, void *param)
 
@@ -630,20 +635,13 @@ struct _input_port_entry
 typedef struct _inp_header inp_header;
 struct _inp_header
 {
-	char 	name[9];      		/* 8 bytes for game->name + NUL */
-	char 	version[3];   		/* byte[0] = 0, byte[1] = version byte[2] = beta_version */
-	char 	reserved[20]; 		/* for future use, possible store game options? */
-};
-
-
-typedef struct _ext_inp_header ext_inp_header;
-struct _ext_inp_header
-{
-	char 	header[7];			/* must be "XINP" followed by NULLs */
-	char 	shortname[9];		/* game shortname */
-	char 	version[32];		/* MAME version string */
-	UINT32 starttime;			/* approximate INP start time */
-	char 	dummy[32];			/* for possible future expansion */
+	char	header[8];			/* +00: 8 byte header - must be "MAMEINP\0" */
+	UINT64	basetime;			/* +08: base time of recording */
+	UINT8	majversion;			/* +10: major INP version */
+	UINT8	minversion;			/* +11: minor INP version */
+	UINT8	reserved[2];		/* +12: must be zero */
+	char	gamename[12];		/* +14: game name string, NULL-terminated */
+	char	version[32];		/* +20: system version string, NULL-terminated */
 };
 
 
@@ -904,7 +902,7 @@ struct _ext_inp_header
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-void input_port_init(running_machine *machine, const input_port_token *ipt);
+time_t input_port_init(running_machine *machine, const input_port_token *ipt);
 const char *input_port_string_from_token(const input_port_token token);
 
 input_port_entry *input_port_initialize(input_port_init_params *params, UINT32 type, const char *tag, UINT32 mask, UINT32 defval);
@@ -937,8 +935,6 @@ int input_ui_pressed(int code);
 int input_ui_pressed_repeat(int code, int speed);
 
 void input_port_update_defaults(void);
-
-void input_port_set_digital_value(int port, UINT32 value, UINT32 mask);
 
 UINT32 get_crosshair_pos(int port_num, UINT8 player, UINT8 axis);
 

@@ -133,94 +133,90 @@
 typedef struct _analog_port_info analog_port_info;
 struct _analog_port_info
 {
-	analog_port_info *	next;			/* linked list */
-	input_port_entry *	port;			/* pointer to the input port referenced */
-	double				accum;			/* accumulated value (including relative adjustments) */
-	double				previous;		/* previous adjusted value */
-	INT32				previousanalog;	/* previous analog value */
-	INT32				minimum;		/* minimum adjusted value */
-	INT32				maximum;		/* maximum adjusted value */
-	INT32				center;			/* center adjusted value for autocentering */
-	INT32				reverse_val;	/* value where we subtract from to reverse directions */
-	double				scalepos;		/* scale factor to apply to positive adjusted values */
-	double				scaleneg;		/* scale factor to apply to negative adjusted values */
-	double				keyscalepos;	/* scale factor to apply to the key delta field when pos */
-	double				keyscaleneg;	/* scale factor to apply to the key delta field when neg */
-	double				positionalscale;/* scale factor to divide a joystick into positions */
-	UINT8				shift;			/* left shift to apply to the final result */
-	UINT8				bits;			/* how many bits of resolution are expected? */
-	UINT8				absolute;		/* is this an absolute or relative input? */
-	UINT8				wraps;			/* does the control wrap around? */
-	UINT8				one_of_x;		/* is this a 1 of X positional input? */
-	UINT8				autocenter;		/* autocenter this input? */
-	UINT8				single_scale;	/* scale joystick differently if default is between min/max */
-	UINT8				interpolate;	/* should we do linear interpolation for mid-frame reads? */
-	UINT8				lastdigital;	/* was the last modification caused by a digital form? */
-	UINT32				crosshair_pos;	/* position of fake crosshair */
+	analog_port_info *	next;				/* linked list */
+	input_port_entry *	portentry;			/* pointer to the input port entry referenced */
+	INT32				accum;				/* accumulated value (including relative adjustments) */
+	INT32				previous;			/* previous adjusted value */
+	INT32				previousanalog;		/* previous analog value */
+	INT32				minimum;			/* minimum adjusted value */
+	INT32				maximum;			/* maximum adjusted value */
+	INT32				center;				/* center adjusted value for autocentering */
+	INT32				reverse_val;		/* value where we subtract from to reverse directions */
+	INT64				scalepos;			/* scale factor to apply to positive adjusted values */
+	INT64				scaleneg;			/* scale factor to apply to negative adjusted values */
+	INT64				keyscalepos;		/* scale factor to apply to the key delta field when pos */
+	INT64				keyscaleneg;		/* scale factor to apply to the key delta field when neg */
+	INT64				positionalscale;	/* scale factor to divide a joystick into positions */
+	UINT8				shift;				/* left shift to apply to the final result */
+	UINT8				bits;				/* how many bits of resolution are expected? */
+	UINT8				absolute;			/* is this an absolute or relative input? */
+	UINT8				wraps;				/* does the control wrap around? */
+	UINT8				one_of_x;			/* is this a 1 of X positional input? */
+	UINT8				autocenter;			/* autocenter this input? */
+	UINT8				single_scale;		/* scale joystick differently if default is between min/max */
+	UINT8				interpolate;		/* should we do linear interpolation for mid-frame reads? */
+	UINT8				lastdigital;		/* was the last modification caused by a digital form? */
+	UINT32				crosshair_pos;		/* position of fake crosshair */
 };
 
 
 typedef struct _custom_port_info custom_port_info;
 struct _custom_port_info
 {
-	custom_port_info *	next;		/* linked list */
-	input_port_entry *	port;		/* pointer to the input port referenced */
-	UINT8				shift;		/* left shift to apply to the final result */
+	custom_port_info *	next;				/* linked list */
+	input_port_entry *	portentry;			/* pointer to the input port entry referenced */
+	UINT8				shift;				/* left shift to apply to the final result */
 };
 
 
 typedef struct _changed_port_info changed_port_info;
 struct _changed_port_info
 {
-	changed_port_info *	next;		/* linked list */
-	input_port_entry *	port;		/* pointer to the input port referenced */
-	UINT8				shift;		/* right shift to apply before calling callback */
+	changed_port_info *	next;				/* linked list */
+	input_port_entry *	portentry;			/* pointer to the input port entry referenced */
+	UINT8				shift;				/* right shift to apply before calling callback */
 };
 
 
 typedef struct _input_bit_info input_bit_info;
 struct _input_bit_info
 {
-	input_port_entry *	port;		/* port for this input */
-	UINT8				impulse;	/* counter for impulse controls */
-	UINT8				last;		/* were we pressed last time? */
+	input_port_entry *	portentry;			/* port entry for this input */
+	UINT8				impulse;			/* counter for impulse controls */
+	UINT8				last;				/* were we pressed last time? */
 };
 
 
 typedef struct _input_port_info input_port_info;
 struct _input_port_info
 {
-	const char *		tag;		/* tag for this port */
-	UINT32				defvalue;	/* default value of all the bits */
-	UINT32				analog;		/* value from analog inputs */
-	UINT32				analogmask;	/* mask of all analog inputs */
-	UINT32				digital;	/* value from digital inputs */
-	UINT32				vblank;		/* value of all IPT_VBLANK bits */
-	UINT32				playback;	/* current playback override */
-	UINT8				has_custom;	/* do we have any custom ports? */
+	const char *		tag;				/* tag for this port */
+	UINT32				defvalue;			/* default value of all the bits */
+	UINT32				digital;			/* value from digital inputs */
+	UINT32				vblank;				/* value of all IPT_VBLANK bits */
 	input_bit_info 		bit[MAX_BITS_PER_PORT]; /* info about each bit in the port */
-	analog_port_info *	analoginfo;	/* pointer to linked list of analog port info */
-	custom_port_info *	custominfo;	/* pointer to linked list of custom port info */
-	changed_port_info *	changedinfo;/* pointer to linked list of changed port info */
+	analog_port_info *	analoginfo;			/* pointer to linked list of analog port info */
+	custom_port_info *	custominfo;			/* pointer to linked list of custom port info */
+	changed_port_info *	changedinfo;		/* pointer to linked list of changed port info */
 };
 
 
 typedef struct _digital_joystick_info digital_joystick_info;
 struct _digital_joystick_info
 {
-	input_port_entry *	port[4];	/* port for up,down,left,right respectively */
-	UINT8				inuse;		/* is this joystick used? */
-	UINT8				current;	/* current value */
-	UINT8				current4way;/* current 4-way value */
-	UINT8				previous;	/* previous value */
+	input_port_entry *	portentry[4];		/* port entry for up,down,left,right respectively */
+	UINT8				inuse;				/* is this joystick used? */
+	UINT8				current;			/* current value */
+	UINT8				current4way;		/* current 4-way value */
+	UINT8				previous;			/* previous value */
 };
 
 
 struct _input_port_init_params
 {
-	input_port_entry *	ports;		/* base of the port array */
-	int					max_ports;	/* maximum number of ports we can support */
-	int					current_port;/* current port index */
+	input_port_entry *	ports;				/* base of the port array */
+	int					max_ports;			/* maximum number of ports we can support */
+	int					current_port;		/* current port index */
 };
 
 
@@ -234,8 +230,12 @@ struct _input_port_init_params
 #define JOYSTICK_INFO_FOR_PORT(in)	(&joystick_info[(in)->player][((in)->type - __ipt_digital_joystick_start) / 4])
 #define JOYSTICK_DIR_FOR_PORT(in)	(((in)->type - __ipt_digital_joystick_start) % 4)
 
-#define APPLY_SENSITIVITY(x,s)		(((double)(x) * (s)) / 100)
-#define APPLY_INVERSE_SENSITIVITY(x,s) (((double)(x) * 100) / (s))
+#define APPLY_SENSITIVITY(x,s)		(((INT64)(x) * (s)) / 100)
+#define APPLY_INVERSE_SENSITIVITY(x,s) (((INT64)(x) * 100) / (s))
+
+#define COMPUTE_SCALE(num,den)		(((INT64)(num) << 24) / (den))
+#define RECIP_SCALE(s)				(((INT64)1 << 48) / (s))
+#define APPLY_SCALE(x,s)			(((INT64)(x) * (s)) >> 24)
 
 
 
@@ -258,17 +258,13 @@ static const char *const seqtypestrings[] = { "standard", "decrement", "incremen
 /* original input_ports without modifications */
 static input_port_entry *input_ports_default;
 
-/* recorded speed read from an INP file */
-static double rec_speed;
-
-/* set to TRUE if INP file being played is an extended INP file */
-static int extended_inp;
-
-/* for average speed calculations */
+/* for scaling analog ports */
 static attotime last_update;
 static attoseconds_t last_delta;
-static int framecount;
-static double totalspeed;
+
+/* playback information */
+static UINT64 playback_accumulated_speed;
+static UINT32 playback_accumulated_frames;
 
 
 
@@ -1034,16 +1030,23 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void setup_playback(running_machine *machine);
-static void setup_record(running_machine *machine);
 static void input_port_exit(running_machine *machine);
 static void input_port_frame(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
 static void update_digital_joysticks(void);
 static void update_analog_port(int port);
-static void interpolate_analog_port(int port);
 static void autoselect_device(const input_port_entry *ipt, int type1, int type2, int type3, const char *option, const char *ananame);
+
+/* playback and record */
+static time_t playback_init(running_machine *machine);
+static void record_init(running_machine *machine);
+static void playback_end(running_machine *machine, const char *message);
+static void record_end(running_machine *machine, const char *message);
+static void playback_frame(running_machine *machine, attotime curtime);
+static void record_frame(running_machine *machine, attotime curtime);
+static void playback_port(running_machine *machine, input_port_info *portinfo);
+static void record_port(running_machine *machine, input_port_info *portinfo);
 
 
 
@@ -1057,9 +1060,10 @@ static void autoselect_device(const input_port_entry *ipt, int type1, int type2,
  *
  *************************************/
 
-void input_port_init(running_machine *machine, const input_port_token *ipt)
+time_t input_port_init(running_machine *machine, const input_port_token *ipt)
 {
 	int ipnum, player;
+	time_t basetime;
 
 	/* add an exit callback */
 	add_exit_callback(machine, input_port_exit);
@@ -1089,7 +1093,7 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 	if (ipt != NULL)
 	{
 		const char *joystick_map_default = options_get_string(mame_options(), OPTION_JOYSTICK_MAP);
-		input_port_entry *port;
+		input_port_entry *portentry;
 		int portnum;
 
 		/* allocate input ports */
@@ -1110,27 +1114,27 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 
 		/* look for 4-way joysticks and change the default map if we find any */
 		if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-			for (port = machine->input_ports; port->type != IPT_END; port++)
-				if (IS_DIGITAL_JOYSTICK(port) && port->way == 4)
+			for (portentry = machine->input_ports; portentry->type != IPT_END; portentry++)
+				if (IS_DIGITAL_JOYSTICK(portentry) && portentry->way == 4)
 				{
-					input_device_set_joystick_map(-1, port->rotated ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
+					input_device_set_joystick_map(-1, portentry->rotated ? joystick_map_4way_diagonal : joystick_map_4way_sticky);
 					break;
 				}
 
 		/* identify all the tagged ports up front so the memory system can access them */
 		portnum = 0;
-		for (port = machine->input_ports; port->type != IPT_END; port++)
-			if (port->type == IPT_PORT)
-				port_info[portnum++].tag = port->start.tag;
+		for (portentry = machine->input_ports; portentry->type != IPT_END; portentry++)
+			if (portentry->type == IPT_PORT)
+				port_info[portnum++].tag = portentry->start.tag;
 
 		/* look up all the tags referenced in conditions */
-		for (port = machine->input_ports; port->type != IPT_END; port++)
-			if (port->condition.tag)
+		for (portentry = machine->input_ports; portentry->type != IPT_END; portentry++)
+			if (portentry->condition.tag)
 			{
-				int tag = port_tag_to_index(port->condition.tag);
+				int tag = port_tag_to_index(portentry->condition.tag);
 				if (tag == -1)
-					fatalerror("Conditional port references invalid tag '%s'", port->condition.tag);
-				port->condition.portnum = tag;
+					fatalerror("Conditional port references invalid tag '%s'", portentry->condition.tag);
+				portentry->condition.portnum = tag;
 			}
 	}
 
@@ -1138,102 +1142,10 @@ void input_port_init(running_machine *machine, const input_port_token *ipt)
 	config_register("input", input_port_load, input_port_save);
 
 	/* open playback and record files if specified */
-	setup_playback(machine);
-	setup_record(machine);
-}
+	basetime = playback_init(machine);
+	record_init(machine);
 
-
-
-/*************************************
- *
- *  Set up for playback
- *
- *************************************/
-
-static void setup_playback(running_machine *machine)
-{
-	const char *filename = options_get_string(mame_options(), OPTION_PLAYBACK);
-	ext_inp_header extinpheader;
-	inp_header inpheader;
-	file_error filerr;
-	time_t started_time;
-	char check[7];
-
-	/* if no file, nothing to do */
-	if (filename[0] == 0)
-		return;
-
-	/* open the playback file */
-	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_READ, &machine->playback_file);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
-
-	/* read first four bytes to check INP type */
-	mame_fread(machine->playback_file, check, 7);
-	mame_fseek(machine->playback_file, 0, SEEK_SET);
-
-	/* Check if input file is an eXtended INP file */
-	extended_inp = (memcmp(check, "XINP\0\0\0", 7) == 0);
-	if (!extended_inp)
-	{
-		/* read playback header */
-		mame_fread(machine->playback_file, &inpheader, sizeof(inpheader));
-
-		/* if the first byte is not alphanumeric, it's an old INP file with no header */
-		if (!isalnum(inpheader.name[0]))
-			mame_fseek(machine->playback_file, 0, SEEK_SET);
-
-		/* else verify the header against the current game */
-		else if (strcmp(machine->gamedrv->name, inpheader.name) != 0)
-			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", inpheader.name, machine->gamedrv->name);
-
-		/* otherwise, print a message indicating what's happening */
-		else
-			mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
-	}
- 	else
-	{
-		/* read playback header */
-		mame_fread(machine->playback_file, &extinpheader, sizeof(extinpheader));
-
-		/* output info to console */
-		mame_printf_info("Extended INP file info:\n");
-		mame_printf_info("Version string: %s\n", extinpheader.version);
-		started_time = (time_t)extinpheader.starttime;
-		mame_printf_info("Start time: %s\n", ctime(&started_time));
-
-		/* verify header against current game */
-		if (strcmp(machine->gamedrv->name, extinpheader.shortname) != 0)
-			fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", extinpheader.shortname, machine->gamedrv->name);
-		else
-			mame_printf_info("Playing back previously recorded " GAMENOUN " %s\n", machine->gamedrv->name);
-	}
-}
-
-
-/*************************************
- *
- *  Set up for recording
- *
- *************************************/
-
-static void setup_record(running_machine *machine)
-{
-	const char *filename = options_get_string(mame_options(), OPTION_RECORD);
-	inp_header inpheader;
-	file_error filerr;
-
-	/* if no file, nothing to do */
-	if (filename[0] == 0)
-		return;
-
-	/* open the record file  */
-	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &machine->record_file);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
-
-	/* create a header */
-	memset(&inpheader, 0, sizeof(inpheader));
-	strcpy(inpheader.name, machine->gamedrv->name);
-	mame_fwrite(machine->record_file, &inpheader, sizeof(inpheader));
+	return basetime;
 }
 
 
@@ -1247,10 +1159,8 @@ static void setup_record(running_machine *machine)
 void input_port_exit(running_machine *machine)
 {
 	/* close any playback or recording files */
-	if (machine->playback_file != NULL)
-		mame_fclose(machine->playback_file);
-	if (machine->record_file != NULL)
-		mame_fclose(machine->record_file);
+	playback_end(machine, NULL);
+	record_end(machine, NULL);
 }
 
 
@@ -1263,24 +1173,24 @@ void input_port_exit(running_machine *machine)
 
 static void input_port_postload(void)
 {
-	input_port_entry *port;
+	input_port_entry *portentry;
 	int portnum, bitnum;
 	UINT32 mask;
 
 	/* loop over the ports and identify all the analog inputs */
 	portnum = -1;
 	bitnum = 0;
-	for (port = Machine->input_ports; port->type != IPT_END; port++)
+	for (portentry = Machine->input_ports; portentry->type != IPT_END; portentry++)
 	{
 		/* if this is IPT_PORT, increment the port number */
-		if (port->type == IPT_PORT)
+		if (portentry->type == IPT_PORT)
 		{
 			portnum++;
 			bitnum = 0;
 		}
 
 		/* if this is not a DIP setting or config setting, add it to the list */
-		else if (port->type != IPT_DIPSWITCH_SETTING && port->type != IPT_CONFIG_SETTING)
+		else if (portentry->type != IPT_DIPSWITCH_SETTING && portentry->type != IPT_CONFIG_SETTING)
 		{
 			/* fatal error if we didn't hit an IPT_PORT */
 			if (portnum < 0)
@@ -1291,12 +1201,12 @@ static void input_port_postload(void)
 				fatalerror("Error in InputPort definition: too many bits for a port (%d max)", MAX_BITS_PER_PORT);
 
 			/* fill in the bit info */
-			port_info[portnum].bit[bitnum].port = port;
+			port_info[portnum].bit[bitnum].portentry = portentry;
 			port_info[portnum].bit[bitnum].impulse = 0;
 			port_info[portnum].bit[bitnum++].last = 0;
 
 			/* if this is a custom input, add it to the list */
-			if (port->custom != NULL)
+			if (portentry->custom != NULL)
 			{
 				custom_port_info *info;
 
@@ -1305,8 +1215,8 @@ static void input_port_postload(void)
 				memset(info, 0, sizeof(*info));
 
 				/* fill in the data */
-				info->port = port;
-				for (mask = port->mask; !(mask & 1); mask >>= 1)
+				info->portentry = portentry;
+				for (mask = portentry->mask; !(mask & 1); mask >>= 1)
 					info->shift++;
 
 				/* hook in the list */
@@ -1315,7 +1225,7 @@ static void input_port_postload(void)
 			}
 
 			/* if this is a changed input, add it to the list */
-			else if (port->changed != NULL)
+			else if (portentry->changed != NULL)
 			{
 				changed_port_info *info;
 
@@ -1324,8 +1234,8 @@ static void input_port_postload(void)
 				memset(info, 0, sizeof(*info));
 
 				/* fill in the data */
-				info->port = port;
-				for (mask = port->mask; !(mask & 1); mask >>= 1)
+				info->portentry = portentry;
+				for (mask = portentry->mask; !(mask & 1); mask >>= 1)
 					info->shift++;
 
 				/* hook in the list */
@@ -1334,7 +1244,7 @@ static void input_port_postload(void)
 			}
 
 			/* if this is an analog port, create an info struct for it */
-			else if (IS_ANALOG(port))
+			else if (IS_ANALOG(portentry))
 			{
 				analog_port_info *info;
 
@@ -1343,8 +1253,8 @@ static void input_port_postload(void)
 				memset(info, 0, sizeof(*info));
 
 				/* fill in the data */
-				info->port = port;
-				for (mask = port->mask; !(mask & 1); mask >>= 1)
+				info->portentry = portentry;
+				for (mask = portentry->mask; !(mask & 1); mask >>= 1)
 					info->shift++;
 				for ( ; mask & 1; mask >>= 1)
 					info->bits++;
@@ -1355,14 +1265,14 @@ static void input_port_postload(void)
 				info->interpolate = 1;
 
 				/* adjust default, min, and max so they fall in the bitmask range */
-				port->default_value = (port->default_value & port->mask) >> info->shift;
-				if (port->type != IPT_POSITIONAL && port->type != IPT_POSITIONAL_V)
+				portentry->default_value = (portentry->default_value & portentry->mask) >> info->shift;
+				if (portentry->type != IPT_POSITIONAL && portentry->type != IPT_POSITIONAL_V)
 				{
-					port->analog.min = (port->analog.min & port->mask) >> info->shift;
-					port->analog.max = (port->analog.max & port->mask) >> info->shift;
+					portentry->analog.min = (portentry->analog.min & portentry->mask) >> info->shift;
+					portentry->analog.max = (portentry->analog.max & portentry->mask) >> info->shift;
 				}
 
-				switch (port->type)
+				switch (portentry->type)
 				{
 					/* pedals start at and autocenter to the min range*/
 					case IPT_PEDAL:
@@ -1370,7 +1280,7 @@ static void input_port_postload(void)
 					case IPT_PEDAL3:
 						info->center = INPUT_ABSOLUTE_MIN;
 						/* force pedals to start at their scaled minimum */
-						info->accum = APPLY_INVERSE_SENSITIVITY(info->center, port->analog.sensitivity);
+						info->accum = APPLY_INVERSE_SENSITIVITY(info->center, portentry->analog.sensitivity);
 						/* fall through to complete setup */
 
 					/* pedals, paddles and analog joysticks are absolute and autocenter */
@@ -1408,12 +1318,12 @@ static void input_port_postload(void)
 					/* set each position to be 512 units */
 					case IPT_POSITIONAL:
 					case IPT_POSITIONAL_V:
-						info->positionalscale = (double)(port->analog.max) / (INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
+						info->positionalscale = COMPUTE_SCALE(portentry->analog.max, INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
 						/* force to only use PORT_POSITIONS data */
-						port->analog.min = 0;
-						port->analog.max--;
-						info->autocenter = !port->analog.wraps;
-						info->wraps = port->analog.wraps;
+						portentry->analog.min = 0;
+						portentry->analog.max--;
+						info->autocenter = !portentry->analog.wraps;
+						info->wraps = portentry->analog.wraps;
 						break;
 
 					default:
@@ -1428,17 +1338,17 @@ static void input_port_postload(void)
                      * and the default port value is between min/max,
                      * we need to scale differently for the +/- directions.
                      * All other absolute types use a 1:1 scale */
-					info->single_scale = (port->default_value == port->analog.min) || (port->default_value == port->analog.max);
+					info->single_scale = (portentry->default_value == portentry->analog.min) || (portentry->default_value == portentry->analog.max);
 
 					if (!info->single_scale)
 					{
 						/* axis moves in both directions from the default value */
 
 						/* unsigned */
-						info->scalepos = ((double)port->analog.max - (double)port->default_value) / (double)(INPUT_ABSOLUTE_MAX - 0);
-						info->scaleneg = ((double)port->default_value - (double)port->analog.min) / (double)(0 - INPUT_ABSOLUTE_MIN);
+						info->scalepos = COMPUTE_SCALE(portentry->analog.max - portentry->default_value, INPUT_ABSOLUTE_MAX - 0);
+						info->scaleneg = COMPUTE_SCALE(portentry->default_value - portentry->analog.min, 0 - INPUT_ABSOLUTE_MIN);
 
-						if (port->analog.min > port->analog.max)
+						if (portentry->analog.min > portentry->analog.max)
 						{
 							/* signed */
 							info->scaleneg *= -1;
@@ -1450,10 +1360,10 @@ static void input_port_postload(void)
 					else
 					{
 						/* single axis that increases from default */
-						info->scalepos = (double)(port->analog.max - port->analog.min) / (double)(INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
+						info->scalepos = COMPUTE_SCALE(portentry->analog.max - portentry->analog.min, INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
 
 						/* move from default */
-						if (port->default_value == port->analog.max)
+						if (portentry->default_value == portentry->analog.max)
 							info->scalepos *= -1;
 
 						/* make the scaling the same for easier coding when we need to scale */
@@ -1471,17 +1381,17 @@ static void input_port_postload(void)
 					/* The validity checks are purposely set up to not allow you to use anything other */
 					/* a default of 0 and PORT_MINMAX(0,mask).  This is in case the need arises to use */
 					/* this feature in the future.  Keeping the code in does not hurt anything. */
-					if (port->analog.min > port->analog.max)
+					if (portentry->analog.min > portentry->analog.max)
 						/* adjust for signed */
-						port->analog.min *= -1;
+						portentry->analog.min *= -1;
 
-					info->minimum = (port->analog.min - port->default_value) * 512;
-					info->maximum = (port->analog.max - port->default_value) * 512;
+					info->minimum = (portentry->analog.min - portentry->default_value) * 512;
+					info->maximum = (portentry->analog.max - portentry->default_value) * 512;
 
 					/* make the scaling the same for easier coding when we need to scale */
-					info->scaleneg = info->scalepos = 1.0 / 512.0;
+					info->scaleneg = info->scalepos = COMPUTE_SCALE(1, 512);
 
-					if (port->analog.reset)
+					if (portentry->analog.reset)
 						/* delta values reverse from center */
 						info->reverse_val = 0;
 					else
@@ -1490,13 +1400,14 @@ static void input_port_postload(void)
 						info->reverse_val = info->maximum + info->minimum;
 
 						/* relative controls reverse from 1 past their max range */
-						if (info->positionalscale == 0) info->reverse_val += 512;
+						if (info->positionalscale == 0)
+							info->reverse_val += 512;
 					}
 				}
 
 				/* compute scale for keypresses */
-				info->keyscalepos = 1.0 / info->scalepos;
-				info->keyscaleneg = 1.0 / info->scaleneg;
+				info->keyscalepos = RECIP_SCALE(info->scalepos);
+				info->keyscaleneg = RECIP_SCALE(info->scaleneg);
 
 				/* hook in the list */
 				info->next = port_info[portnum].analoginfo;
@@ -1504,10 +1415,10 @@ static void input_port_postload(void)
 			}
 
 			/* if this is a digital joystick port, update info on it */
-			else if (IS_DIGITAL_JOYSTICK(port))
+			else if (IS_DIGITAL_JOYSTICK(portentry))
 			{
-				digital_joystick_info *info = JOYSTICK_INFO_FOR_PORT(port);
-				info->port[JOYSTICK_DIR_FOR_PORT(port)] = port;
+				digital_joystick_info *info = JOYSTICK_INFO_FOR_PORT(portentry);
+				info->portentry[JOYSTICK_DIR_FOR_PORT(portentry)] = portentry;
 				info->inuse = 1;
 			}
 		}
@@ -1951,7 +1862,7 @@ const char *input_port_string_from_token(const input_port_token token)
 static void input_port_detokenize(input_port_init_params *param, const input_port_token *ipt)
 {
 	UINT32 entrytype = INPUT_TOKEN_INVALID;
-	input_port_entry *port = NULL;
+	input_port_entry *portentry = NULL;
 	const char *modify_tag = NULL;
 	int seq_index[3] = {0};
 
@@ -1982,9 +1893,9 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 			case INPUT_TOKEN_START:
 			case INPUT_TOKEN_START_TAG:
 				modify_tag = NULL;
-				port = input_port_initialize(param, IPT_PORT, NULL, 0, 0);
+				portentry = input_port_initialize(param, IPT_PORT, NULL, 0, 0);
 				if (entrytype == INPUT_TOKEN_START_TAG)
-					port->start.tag = TOKEN_GET_STRING(ipt);
+					portentry->start.tag = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* modify an existing port */
@@ -1997,7 +1908,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, type, 24);
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-				port = input_port_initialize(param, type, modify_tag, mask, defval);
+				portentry = input_port_initialize(param, type, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
 				break;
 
@@ -2006,24 +1917,24 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, hasdiploc, 1, strindex, 23);
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 
-				port = input_port_initialize(param, IPT_DIPSWITCH_NAME, modify_tag, mask, mask & defval);
+				portentry = input_port_initialize(param, IPT_DIPSWITCH_NAME, modify_tag, mask, mask & defval);
 				temptoken.i = strindex;
-				port->name = input_port_string_from_token(temptoken);
+				portentry->name = input_port_string_from_token(temptoken);
 				if (strindex == INPUT_STRING_Service_Mode)
 				{
-					port->toggle = TRUE;
-					port->seq.code[0] = KEYCODE_F2;
+					portentry->toggle = TRUE;
+					portentry->seq.code[0] = KEYCODE_F2;
 				}
 				if (hasdiploc)
-					input_port_parse_diplocation(port, TOKEN_GET_STRING(ipt));
+					input_port_parse_diplocation(portentry, TOKEN_GET_STRING(ipt));
 
-				port = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, mask & defval);
+				portentry = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, mask & defval);
 				temptoken.i = INPUT_STRING_Off;
-				port->name = input_port_string_from_token(temptoken);
+				portentry->name = input_port_string_from_token(temptoken);
 
-				port = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, mask & ~defval);
+				portentry = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, mask & ~defval);
 				temptoken.i = INPUT_STRING_On;
-				port->name = input_port_string_from_token(temptoken);
+				portentry->name = input_port_string_from_token(temptoken);
 				break;
 
 			/* append a code */
@@ -2031,24 +1942,24 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				if (seq_index[0] > 0)
-					port->seq.code[seq_index[0]++] = SEQCODE_OR;
-				port->seq.code[seq_index[0]++] = val;
+					portentry->seq.code[seq_index[0]++] = SEQCODE_OR;
+				portentry->seq.code[seq_index[0]++] = val;
 				break;
 
 			case INPUT_TOKEN_CODE_DEC:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				if (seq_index[1] > 0)
-					port->analog.decseq.code[seq_index[1]++] = SEQCODE_OR;
-				port->analog.decseq.code[seq_index[1]++] = val;
+					portentry->analog.decseq.code[seq_index[1]++] = SEQCODE_OR;
+				portentry->analog.decseq.code[seq_index[1]++] = val;
 				break;
 
 			case INPUT_TOKEN_CODE_INC:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				if (seq_index[2] > 0)
-					port->analog.incseq.code[seq_index[2]++] = SEQCODE_OR;
-				port->analog.incseq.code[seq_index[2]++] = val;
+					portentry->analog.incseq.code[seq_index[2]++] = SEQCODE_OR;
+				portentry->analog.incseq.code[seq_index[2]++] = val;
 				break;
 
 			/* joystick flags */
@@ -2056,16 +1967,16 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 			case INPUT_TOKEN_4WAY:
 			case INPUT_TOKEN_8WAY:
 			case INPUT_TOKEN_16WAY:
-				port->way = 2 << (entrytype - INPUT_TOKEN_2WAY);
+				portentry->way = 2 << (entrytype - INPUT_TOKEN_2WAY);
 				break;
 
 			case INPUT_TOKEN_ROTATED:
-				port->rotated = TRUE;
+				portentry->rotated = TRUE;
 				break;
 
 			/* general flags */
 			case INPUT_TOKEN_NAME:
-				port->name = input_port_string_from_token(*ipt++);
+				portentry->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_PLAYER1:
@@ -2076,151 +1987,151 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 			case INPUT_TOKEN_PLAYER6:
 			case INPUT_TOKEN_PLAYER7:
 			case INPUT_TOKEN_PLAYER8:
-				port->player = entrytype - INPUT_TOKEN_PLAYER1;
+				portentry->player = entrytype - INPUT_TOKEN_PLAYER1;
 				break;
 
 			case INPUT_TOKEN_COCKTAIL:
-				port->cocktail = TRUE;
-				port->player = 1;
+				portentry->cocktail = TRUE;
+				portentry->player = 1;
 				break;
 
 			case INPUT_TOKEN_TOGGLE:
-				port->toggle = TRUE;
+				portentry->toggle = TRUE;
 				break;
 
 			case INPUT_TOKEN_IMPULSE:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->impulse, 24);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->impulse, 24);
 				break;
 
 			case INPUT_TOKEN_REVERSE:
-				port->analog.reverse = TRUE;
+				portentry->analog.reverse = TRUE;
 				break;
 
 			case INPUT_TOKEN_RESET:
-				port->analog.reset = TRUE;
+				portentry->analog.reset = TRUE;
 				break;
 
 			case INPUT_TOKEN_UNUSED:
-				port->unused = TRUE;
+				portentry->unused = TRUE;
 				break;
 
 			/* analog settings */
 			case INPUT_TOKEN_MINMAX:
-				TOKEN_GET_UINT64_UNPACK2(ipt, port->analog.min, 32, port->analog.max, 32);
+				TOKEN_GET_UINT64_UNPACK2(ipt, portentry->analog.min, 32, portentry->analog.max, 32);
 				break;
 
 			case INPUT_TOKEN_SENSITIVITY:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.sensitivity, 24);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->analog.sensitivity, 24);
 				break;
 
 			case INPUT_TOKEN_KEYDELTA:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.delta, -24);
-				port->analog.centerdelta = port->analog.delta;
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->analog.delta, -24);
+				portentry->analog.centerdelta = portentry->analog.delta;
 				break;
 
 			case INPUT_TOKEN_CENTERDELTA:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.centerdelta, -24);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->analog.centerdelta, -24);
 				break;
 
 			case INPUT_TOKEN_CROSSHAIR:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, port->analog.crossaxis, 4, port->analog.crossaltaxis, -20);
-				TOKEN_GET_UINT64_UNPACK2(ipt, port->analog.crossscale, -32, port->analog.crossoffset, -32);
-				port->analog.crossaltaxis *= 1.0f / 65536.0f;
-				port->analog.crossscale *= 1.0f / 65536.0f;
-				port->analog.crossoffset *= 1.0f / 65536.0f;
+				TOKEN_GET_UINT32_UNPACK3(ipt, entrytype, 8, portentry->analog.crossaxis, 4, portentry->analog.crossaltaxis, -20);
+				TOKEN_GET_UINT64_UNPACK2(ipt, portentry->analog.crossscale, -32, portentry->analog.crossoffset, -32);
+				portentry->analog.crossaltaxis *= 1.0f / 65536.0f;
+				portentry->analog.crossscale *= 1.0f / 65536.0f;
+				portentry->analog.crossoffset *= 1.0f / 65536.0f;
 				break;
 
 			case INPUT_TOKEN_FULL_TURN_COUNT:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.full_turn_count, 24);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->analog.full_turn_count, 24);
 				break;
 
 			case INPUT_TOKEN_POSITIONS:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->analog.max, 24);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->analog.max, 24);
 				break;
 
 			case INPUT_TOKEN_WRAPS:
-				port->analog.wraps = TRUE;
+				portentry->analog.wraps = TRUE;
 				break;
 
 			case INPUT_TOKEN_REMAP_TABLE:
-				port->analog.remap_table = TOKEN_GET_PTR(ipt, ui32ptr);
+				portentry->analog.remap_table = TOKEN_GET_PTR(ipt, ui32ptr);
 				break;
 
 			case INPUT_TOKEN_INVERT:
-				port->analog.invert = TRUE;
+				portentry->analog.invert = TRUE;
 				break;
 
 			/* custom callbacks */
 			case INPUT_TOKEN_CUSTOM:
-				port->custom = TOKEN_GET_PTR(ipt, customptr);
-				port->custom_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
+				portentry->custom = TOKEN_GET_PTR(ipt, customptr);
+				portentry->custom_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
 
 			/* changed callbacks */
 			case INPUT_TOKEN_CHANGED:
-				port->changed = TOKEN_GET_PTR(ipt, changedptr);
-				port->changed_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
+				portentry->changed = TOKEN_GET_PTR(ipt, changedptr);
+				portentry->changed_param = (void *)TOKEN_GET_PTR(ipt, voidptr);
 				break;
 
 			/* dip switch definition */
 			case INPUT_TOKEN_DIPNAME:
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-				port = input_port_initialize(param, IPT_DIPSWITCH_NAME, modify_tag, mask, defval);
+				portentry = input_port_initialize(param, IPT_DIPSWITCH_NAME, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
+				portentry->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_DIPSETTING:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				port = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, defval);
+				portentry = input_port_initialize(param, IPT_DIPSWITCH_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
+				portentry->name = input_port_string_from_token(*ipt++);
 				break;
 
 			/* physical location */
 			case INPUT_TOKEN_DIPLOCATION:
-				input_port_parse_diplocation(port, TOKEN_GET_STRING(ipt));
+				input_port_parse_diplocation(portentry, TOKEN_GET_STRING(ipt));
 				break;
 
 			/* conditionals for dip switch settings */
 			case INPUT_TOKEN_CONDITION:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->condition.condition, 24);
-				TOKEN_GET_UINT64_UNPACK2(ipt, port->condition.mask, 32, port->condition.value, 32);
-				port->condition.tag = TOKEN_GET_STRING(ipt);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->condition.condition, 24);
+				TOKEN_GET_UINT64_UNPACK2(ipt, portentry->condition.mask, 32, portentry->condition.value, 32);
+				portentry->condition.tag = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* analog adjuster definition */
 			case INPUT_TOKEN_ADJUSTER:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				port = input_port_initialize(param, IPT_ADJUSTER, modify_tag, 0xff, defval | (defval << 8));
+				portentry = input_port_initialize(param, IPT_ADJUSTER, modify_tag, 0xff, defval | (defval << 8));
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = TOKEN_GET_STRING(ipt);
+				portentry->name = TOKEN_GET_STRING(ipt);
 				break;
 
 			/* configuration definition */
 			case INPUT_TOKEN_CONFNAME:
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-				port = input_port_initialize(param, IPT_CONFIG_NAME, modify_tag, mask, defval);
+				portentry = input_port_initialize(param, IPT_CONFIG_NAME, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
+				portentry->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_CONFSETTING:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				port = input_port_initialize(param, IPT_CONFIG_SETTING, modify_tag, 0, defval);
+				portentry = input_port_initialize(param, IPT_CONFIG_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
+				portentry->name = input_port_string_from_token(*ipt++);
 				break;
 
 #ifdef MESS
@@ -2229,32 +2140,32 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, val, 24);
 				{
 					int ch;
-					for (ch = 0; port->keyboard.chars[ch] != 0; ch++)
+					for (ch = 0; portentry->keyboard.chars[ch] != 0; ch++)
 						;
-					port->keyboard.chars[ch] = (unicode_char) val;
+					portentry->keyboard.chars[ch] = (unicode_char) val;
 				}
 				break;
 
 			/* category definition */
 			case INPUT_TOKEN_CATEGORY:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, port->category, 24);
+				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, portentry->category, 24);
 				break;
 
 			case INPUT_TOKEN_CATEGORY_NAME:
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-				port = input_port_initialize(param, IPT_CATEGORY_NAME, modify_tag, mask, defval);
+				portentry = input_port_initialize(param, IPT_CATEGORY_NAME, modify_tag, mask, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
+				portentry->name = input_port_string_from_token(*ipt++);
 				break;
 
 			case INPUT_TOKEN_CATEGORY_SETTING:
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK3(ipt, entrytype, 8, defval, 32, category, 16);
-				port = input_port_initialize(param, IPT_CATEGORY_SETTING, modify_tag, 0, defval);
+				portentry = input_port_initialize(param, IPT_CATEGORY_SETTING, modify_tag, 0, defval);
 				seq_index[0] = seq_index[1] = seq_index[2] = 0;
-				port->name = input_port_string_from_token(*ipt++);
-				port->category = category;
+				portentry->name = input_port_string_from_token(*ipt++);
+				portentry->category = category;
 				break;
 #endif /* MESS */
 
@@ -2276,7 +2187,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 input_port_entry *input_port_initialize(input_port_init_params *iip, UINT32 type, const char *tag, UINT32 mask, UINT32 defval)
 {
 	/* this function is used within an INPUT_PORT callback to set up a single port */
-	input_port_entry *port;
+	input_port_entry *portentry;
 	input_code code;
 
 	/* are we modifying an existing port? */
@@ -2310,10 +2221,10 @@ input_port_entry *input_port_initialize(input_port_init_params *iip, UINT32 type
 		{
 			memmove(&iip->ports[portnum + 1], &iip->ports[portnum], (iip->current_port - portnum) * sizeof(iip->ports[0]));
 			iip->current_port++;
-			port = &iip->ports[portnum];
+			portentry = &iip->ports[portnum];
 		}
 		else
-			port = &iip->ports[iip->current_port++];
+			portentry = &iip->ports[iip->current_port++];
 	}
 
 	/* otherwise, just allocate a new one from the end */
@@ -2321,23 +2232,23 @@ input_port_entry *input_port_initialize(input_port_init_params *iip, UINT32 type
 	{
 		if (iip->current_port >= iip->max_ports)
 			fatalerror("Too many input ports");
-		port = &iip->ports[iip->current_port++];
+		portentry = &iip->ports[iip->current_port++];
 	}
 
 	/* set up defaults */
-	memset(port, 0, sizeof(*port));
-	port->name = IP_NAME_DEFAULT;
-	port->type = type;
-	port->mask = mask;
-	port->default_value = defval;
+	memset(portentry, 0, sizeof(*portentry));
+	portentry->name = IP_NAME_DEFAULT;
+	portentry->type = type;
+	portentry->mask = mask;
+	portentry->default_value = defval;
 
 	/* default min to 0 and max to the mask value */
 	/* they can be overwritten by PORT_MINMAX */
-	if (port_type_is_analog(port->type) && !port->analog.min && !port->analog.max)
-		port->analog.max = port->mask;
+	if (port_type_is_analog(portentry->type) && !portentry->analog.min && !portentry->analog.max)
+		portentry->analog.max = portentry->mask;
 
 	/* sets up default port codes */
-	switch (port->type)
+	switch (portentry->type)
 	{
 		case IPT_DIPSWITCH_NAME:
 		case IPT_DIPSWITCH_SETTING:
@@ -2352,10 +2263,10 @@ input_port_entry *input_port_initialize(input_port_init_params *iip, UINT32 type
 	}
 
 	/* set the default codes */
-	input_seq_set_1(&port->seq, code);
-	input_seq_set_1(&port->analog.incseq, code);
-	input_seq_set_1(&port->analog.decseq, code);
-	return port;
+	input_seq_set_1(&portentry->seq, code);
+	input_seq_set_1(&portentry->analog.incseq, code);
+	input_seq_set_1(&portentry->analog.decseq, code);
+	return portentry;
 }
 
 
@@ -2532,9 +2443,9 @@ int token_to_port_type(const char *string, int *player)
  *
  *************************************/
 
-int input_port_active(const input_port_entry *port)
+int input_port_active(const input_port_entry *portentry)
 {
-	return (input_port_name(port) != NULL && !port->unused);
+	return (input_port_name(portentry) != NULL && !portentry->unused);
 }
 
 
@@ -2552,9 +2463,9 @@ int port_type_is_analog_absolute(int type)
 
 int port_type_in_use(int type)
 {
-	input_port_entry *port;
-	for (port = Machine->input_ports; port->type != IPT_END; port++)
-		if (port->type == type)
+	input_port_entry *portentry;
+	for (portentry = Machine->input_ports; portentry->type != IPT_END; portentry++)
+		if (portentry->type == type)
 			return 1;
 	return 0;
 }
@@ -2571,34 +2482,34 @@ int port_type_to_group(int type, int player)
 
 int port_tag_to_index(const char *tag)
 {
-	int port;
+	int portnum;
 
 	/* find the matching tag */
-	for (port = 0; port < MAX_INPUT_PORTS; port++)
-		if (port_info[port].tag != NULL && !strcmp(port_info[port].tag, tag))
-			return port;
+	for (portnum = 0; portnum < MAX_INPUT_PORTS; portnum++)
+		if (port_info[portnum].tag != NULL && !strcmp(port_info[portnum].tag, tag))
+			return portnum;
 	return -1;
 }
 
 
 read8_machine_func port_tag_to_handler8(const char *tag)
 {
-	int port = port_tag_to_index(tag);
-	return (port == -1) ? SMH_NOP : port_handler8[port];
+	int portnum = port_tag_to_index(tag);
+	return (portnum == -1) ? SMH_NOP : port_handler8[portnum];
 }
 
 
 read16_machine_func port_tag_to_handler16(const char *tag)
 {
-	int port = port_tag_to_index(tag);
-	return (port == -1) ? SMH_NOP : port_handler16[port];
+	int portnum = port_tag_to_index(tag);
+	return (portnum == -1) ? SMH_NOP : port_handler16[portnum];
 }
 
 
 read32_machine_func port_tag_to_handler32(const char *tag)
 {
-	int port = port_tag_to_index(tag);
-	return (port == -1) ? SMH_NOP : port_handler32[port];
+	int portnum = port_tag_to_index(tag);
+	return (portnum == -1) ? SMH_NOP : port_handler32[portnum];
 }
 
 
@@ -2608,16 +2519,16 @@ read64_machine_func port_tag_to_handler64(const char *tag)
 }
 
 
-const char *input_port_name(const input_port_entry *port)
+const char *input_port_name(const input_port_entry *portentry)
 {
 	int defindex;
 
 	/* if we have a non-default name, use that */
-	if (port->name != IP_NAME_DEFAULT)
-		return port->name;
+	if (portentry->name != IP_NAME_DEFAULT)
+		return portentry->name;
 
 	/* if the port exists, return the default name */
-	defindex = default_ports_lookup[port->type][port->player];
+	defindex = default_ports_lookup[portentry->type][portentry->player];
 	if (defindex != -1)
 		return default_ports[defindex].name;
 
@@ -2626,32 +2537,32 @@ const char *input_port_name(const input_port_entry *port)
 }
 
 
-const input_seq *input_port_seq(input_port_entry *port, input_seq_type seqtype)
+const input_seq *input_port_seq(input_port_entry *portentry, input_seq_type seqtype)
 {
 	static const input_seq ip_none = SEQ_DEF_0;
 	input_seq *portseq;
 
 	/* if port is disabled, return no key */
-	if (port->unused)
+	if (portentry->unused)
 		return &ip_none;
 
 	/* handle the various seq types */
 	switch (seqtype)
 	{
 		case SEQ_TYPE_STANDARD:
-			portseq = &port->seq;
+			portseq = &portentry->seq;
 			break;
 
 		case SEQ_TYPE_INCREMENT:
-			if (!IS_ANALOG(port))
+			if (!IS_ANALOG(portentry))
 				return &ip_none;
-			portseq = &port->analog.incseq;
+			portseq = &portentry->analog.incseq;
 			break;
 
 		case SEQ_TYPE_DECREMENT:
-			if (!IS_ANALOG(port))
+			if (!IS_ANALOG(portentry))
 				return &ip_none;
-			portseq = &port->analog.decseq;
+			portseq = &portentry->analog.decseq;
 			break;
 
 		default:
@@ -2663,7 +2574,7 @@ const input_seq *input_port_seq(input_port_entry *port, input_seq_type seqtype)
 		return portseq;
 
 	/* otherwise find the default setting */
-	return input_port_default_seq(port->type, port->player, seqtype);
+	return input_port_default_seq(portentry->type, portentry->player, seqtype);
 }
 
 
@@ -2797,58 +2708,6 @@ profiler_mark(PROFILER_END);
 
 /*************************************
  *
- *  Playback/record helper
- *
- *************************************/
-
-static void update_playback_record(running_machine *machine, int portnum, UINT32 portvalue)
-{
-	/* handle playback */
-	if (machine->playback_file != NULL)
-	{
-		UINT32 result;
-
-		/* a successful read goes into the playback field which overrides everything else */
-		if (mame_fread(machine->playback_file, &result, sizeof(result)) == sizeof(result))
-			portvalue = port_info[portnum].playback = BIG_ENDIANIZE_INT32(result);
-
-		/* a failure causes us to close the playback file and stop playback */
-		else
-		{
-			mame_fclose(machine->playback_file);
-			machine->playback_file = NULL;
-			if (!extended_inp)
-				popmessage("End of playback");
-			else
-			{
-				popmessage("End of playback - %i frames - Average speed %f%%", framecount, (double)totalspeed/framecount);
-				printf("End of playback - %i frames - Average speed %f%%\n", framecount, (double)totalspeed/framecount);
-			}
-		}
-	}
-
-	/* handle recording */
-	if (machine->record_file != NULL)
-	{
-		UINT32 result = BIG_ENDIANIZE_INT32(portvalue);
-
-		/* a successful write just works */
-		if (mame_fwrite(machine->record_file, &result, sizeof(result)) == sizeof(result))
-			;
-
-		/* a failure causes us to close the record file and stop recording */
-		else
-		{
-			mame_fclose(machine->record_file);
-			machine->record_file = NULL;
-		}
-	}
-}
-
-
-
-/*************************************
- *
  *  Update default ports
  *
  *************************************/
@@ -2872,9 +2731,9 @@ void input_port_update_defaults(void)
 				portinfo->defvalue = 0;
 
 			/* first compute the default value for the entire port */
-			for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->port; bitnum++, info++)
-				if (input_port_condition(info->port))
-					portinfo->defvalue = (portinfo->defvalue & ~info->port->mask) | (info->port->default_value & info->port->mask);
+			for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->portentry; bitnum++, info++)
+				if (input_port_condition(info->portentry))
+					portinfo->defvalue = (portinfo->defvalue & ~info->portentry->mask) | (info->portentry->default_value & info->portentry->mask);
 		}
 }
 
@@ -2891,8 +2750,16 @@ static void input_port_frame(running_machine *machine)
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	attotime curtime = timer_get_time();
 	int portnum, bitnum;
+	
+	/* if we're paused, don't do anything */
+	if (mame_is_paused(machine))
+		return;
 
 profiler_mark(PROFILER_INPUT);
+
+	/* record/playback information about the current frame */
+	playback_frame(machine, curtime);
+	record_frame(machine, curtime);
 
 	/* track the duration of the previous frame */
 	last_delta = attotime_to_attoseconds(attotime_sub(curtime, last_update)) / ATTOSECONDS_PER_SECOND_SQRT;
@@ -2918,62 +2785,62 @@ profiler_mark(PROFILER_INPUT);
 
 		/* compute the VBLANK mask */
 		portinfo->vblank = 0;
-		for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->port; bitnum++, info++)
-			if (info->port->type == IPT_VBLANK)
-				portinfo->vblank ^= info->port->mask;
+		for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->portentry; bitnum++, info++)
+			if (input_port_condition(info->portentry) && info->portentry->type == IPT_VBLANK)
+				portinfo->vblank ^= info->portentry->mask;
 
 		/* now loop back and modify based on the inputs */
 		portinfo->digital = 0;
-		for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->port; bitnum++, info++)
-			if (input_port_condition(info->port))
+		for (bitnum = 0, info = &portinfo->bit[0]; bitnum < MAX_BITS_PER_PORT && info->portentry; bitnum++, info++)
+			if (input_port_condition(info->portentry))
 			{
-				input_port_entry *port = info->port;
+				input_port_entry *portentry = info->portentry;
 
 				/* handle non-analog types, but only when the UI isn't visible */
-				if (port->type != IPT_VBLANK && !IS_ANALOG(port) && !ui_visible)
+				if (portentry->type != IPT_VBLANK && !IS_ANALOG(portentry) && !ui_visible)
 				{
 					/* if the sequence for this port is currently pressed.... */
-					if (input_seq_pressed(input_port_seq(port, SEQ_TYPE_STANDARD)))
+					if (input_seq_pressed(input_port_seq(portentry, SEQ_TYPE_STANDARD)))
 					{
 #ifdef MESS
 						/* (MESS-specific) check for disabled keyboard */
-						if (port->type == IPT_KEYBOARD && osd_keyboard_disabled())
+						if (portentry->type == IPT_KEYBOARD && osd_keyboard_disabled())
 							continue;
 #endif
 						/* skip locked-out coin inputs */
-						if (port->type >= IPT_COIN1 && port->type <= IPT_COIN8 && coinlockedout[port->type - IPT_COIN1])
+						if (portentry->type >= IPT_COIN1 && portentry->type <= IPT_COIN8 && coinlockedout[portentry->type - IPT_COIN1])
 						{
-							ui_popup_time(3, "Coinlock disabled %s.", input_port_name(port));
+							ui_popup_time(3, "Coinlock disabled %s.", input_port_name(portentry));
 							continue;
 						}
-						if (port->type >= IPT_SERVICE1 && port->type <= IPT_SERVICE4 && servicecoinlockedout[port->type - IPT_SERVICE1])
+						if (portentry->type >= IPT_SERVICE1 && portentry->type <= IPT_SERVICE4 && servicecoinlockedout[portentry->type - IPT_SERVICE1])
 						{
-							ui_popup_time(3, "Coinlock disabled %s.", input_port_name(port));
+							ui_popup_time(3, "Coinlock disabled %s.", input_port_name(portentry));
 							continue;
 						}
 						/* if this is a downward press and we're an impulse control, reset the count */
-						if (port->impulse)
+						if (portentry->impulse)
 						{
 							if (info->last == 0)
-								info->impulse = port->impulse;
+								info->impulse = portentry->impulse;
 						}
 
 						/* if this is a downward press and we're a toggle control, toggle the value */
-						else if (port->toggle)
+						else if (portentry->toggle)
 						{
 							if (info->last == 0)
 							{
-								port->default_value ^= port->mask;
-								portinfo->digital ^= port->mask;
+								portentry->default_value ^= portentry->mask;
+								portinfo->digital ^= portentry->mask;
 							}
 						}
 
 						/* if this is a digital joystick type, apply either standard or 4-way rules */
-						else if (IS_DIGITAL_JOYSTICK(port))
+						else if (IS_DIGITAL_JOYSTICK(portentry))
 						{
-							digital_joystick_info *joyinfo = JOYSTICK_INFO_FOR_PORT(port);
+							digital_joystick_info *joyinfo = JOYSTICK_INFO_FOR_PORT(portentry);
 							UINT8 mask;
-							switch( port->way )
+							switch( portentry->way )
 							{
 								case 4:
 									mask = joyinfo->current4way;
@@ -2985,13 +2852,13 @@ profiler_mark(PROFILER_INPUT);
 									mask = joyinfo->current;
 									break;
 							}
-							if ((mask >> JOYSTICK_DIR_FOR_PORT(port)) & 1)
-								portinfo->digital ^= port->mask;
+							if ((mask >> JOYSTICK_DIR_FOR_PORT(portentry)) & 1)
+								portinfo->digital ^= portentry->mask;
 						}
 
 						/* otherwise, just set it raw */
 						else
-							portinfo->digital ^= port->mask;
+							portinfo->digital ^= portentry->mask;
 
 						/* track the last value */
 						info->last = 1;
@@ -3000,11 +2867,11 @@ profiler_mark(PROFILER_INPUT);
 						info->last = 0;
 
 					/* handle the impulse countdown */
-					if (port->impulse && info->impulse > 0)
+					if (portentry->impulse && info->impulse > 0)
 					{
 						info->impulse--;
 						info->last = 1;
-						portinfo->digital ^= port->mask;
+						portinfo->digital ^= portentry->mask;
 					}
 				}
 
@@ -3013,18 +2880,18 @@ profiler_mark(PROFILER_INPUT);
 
 		/* call changed handlers */
 		for (changed = portinfo->changedinfo; changed; changed = changed->next)
-			if (input_port_condition(changed->port))
+			if (input_port_condition(changed->portentry))
 			{
-				input_port_entry *port = changed->port;
+				input_port_entry *portentry = changed->portentry;
 
 				UINT32 new_unmasked_value = readinputport(portnum);
-				UINT32 newval = (new_unmasked_value       & port->mask) >> changed->shift;
-				UINT32 oldval = (port->changed_last_value & port->mask) >> changed->shift;
+				UINT32 newval = (new_unmasked_value       & portentry->mask) >> changed->shift;
+				UINT32 oldval = (portentry->changed_last_value & portentry->mask) >> changed->shift;
 
 				if (newval != oldval)
-					(*port->changed)(machine, port->changed_param, oldval, newval);
+					(*portentry->changed)(machine, portentry->changed_param, oldval, newval);
 
-				port->changed_last_value = new_unmasked_value;
+				portentry->changed_last_value = new_unmasked_value;
 			}
 	}
 
@@ -3036,24 +2903,8 @@ profiler_mark(PROFILER_INPUT);
 	/* handle playback/record */
 	for (portnum = 0; portnum < MAX_INPUT_PORTS; portnum++)
 	{
-		/* analog ports automatically update on every read */
-		if (port_info[portnum].analoginfo)
-			readinputport(portnum);
-
-		/* non-analog ports must be manually updated */
-		else
-			update_playback_record(machine, portnum, readinputport(portnum));
-	}
-
-	/* store speed read from INP file, if extended INP */
-	if (machine->playback_file != NULL && extended_inp)
-	{
-		UINT32 dummy;
-		mame_fread(machine->playback_file, &rec_speed, sizeof(rec_speed));
-		mame_fread(machine->playback_file, &dummy, sizeof(dummy));
-		framecount++;
-		rec_speed *= 100;
-		totalspeed += rec_speed;
+		playback_port(machine, &port_info[portnum]);
+		record_port(machine, &port_info[portnum]);
 	}
 
 profiler_mark(PROFILER_END);
@@ -3082,13 +2933,13 @@ static void update_digital_joysticks(void)
 				info->current = 0;
 
 				/* read all the associated ports */
-				if (info->port[JOYDIR_UP] != NULL && input_seq_pressed(input_port_seq(info->port[JOYDIR_UP], SEQ_TYPE_STANDARD)))
+				if (info->portentry[JOYDIR_UP] != NULL && input_seq_pressed(input_port_seq(info->portentry[JOYDIR_UP], SEQ_TYPE_STANDARD)))
 					info->current |= JOYDIR_UP_BIT;
-				if (info->port[JOYDIR_DOWN] != NULL && input_seq_pressed(input_port_seq(info->port[JOYDIR_DOWN], SEQ_TYPE_STANDARD)))
+				if (info->portentry[JOYDIR_DOWN] != NULL && input_seq_pressed(input_port_seq(info->portentry[JOYDIR_DOWN], SEQ_TYPE_STANDARD)))
 					info->current |= JOYDIR_DOWN_BIT;
-				if (info->port[JOYDIR_LEFT] != NULL && input_seq_pressed(input_port_seq(info->port[JOYDIR_LEFT], SEQ_TYPE_STANDARD)))
+				if (info->portentry[JOYDIR_LEFT] != NULL && input_seq_pressed(input_port_seq(info->portentry[JOYDIR_LEFT], SEQ_TYPE_STANDARD)))
 					info->current |= JOYDIR_LEFT_BIT;
-				if (info->port[JOYDIR_RIGHT] != NULL && input_seq_pressed(input_port_seq(info->port[JOYDIR_RIGHT], SEQ_TYPE_STANDARD)))
+				if (info->portentry[JOYDIR_RIGHT] != NULL && input_seq_pressed(input_port_seq(info->portentry[JOYDIR_RIGHT], SEQ_TYPE_STANDARD)))
 					info->current |= JOYDIR_RIGHT_BIT;
 
 				/* lock out opposing directions (left + right or up + down) */
@@ -3151,16 +3002,16 @@ static void update_digital_joysticks(void)
  *
  *************************************/
 
-INLINE INT32 apply_analog_min_max(const analog_port_info *info, double value)
+INLINE INT32 apply_analog_min_max(const analog_port_info *info, INT32 value)
 {
-	const input_port_entry *port = info->port;
-	double adjmax, adjmin, adj1, adjdif;
+	const input_port_entry *portentry = info->portentry;
+	INT32 adjmax, adjmin, adj1, adjdif;
 
 	/* take the analog minimum and maximum values and apply the inverse of the */
 	/* sensitivity so that we can clamp against them before applying sensitivity */
-	adjmin = APPLY_INVERSE_SENSITIVITY(info->minimum, port->analog.sensitivity);
-	adjmax = APPLY_INVERSE_SENSITIVITY(info->maximum, port->analog.sensitivity);
-	adj1   = APPLY_INVERSE_SENSITIVITY(512, port->analog.sensitivity);
+	adjmin = APPLY_INVERSE_SENSITIVITY(info->minimum, portentry->analog.sensitivity);
+	adjmax = APPLY_INVERSE_SENSITIVITY(info->maximum, portentry->analog.sensitivity);
+	adj1   = APPLY_INVERSE_SENSITIVITY(512, portentry->analog.sensitivity);
 
 	/* for absolute devices, clamp to the bounds absolutely */
 	if (!info->wraps)
@@ -3175,7 +3026,7 @@ INLINE INT32 apply_analog_min_max(const analog_port_info *info, double value)
 	else
 	{
 		adjdif = adjmax - adjmin + adj1;
-		if (port->analog.reverse)
+		if (portentry->analog.reverse)
 		{
 			while (value <= adjmin - adj1)
 				value += adjdif;
@@ -3209,17 +3060,18 @@ static void update_analog_port(int portnum)
 	/* loop over all analog ports in this port number */
 	for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
 	{
-		input_port_entry *port = info->port;
+		input_port_entry *portentry = info->portentry;
 		INT32 rawvalue;
-		double delta = 0, keyscale;
-		int keypressed = 0;
+		INT32 delta = 0;
+		INT64 keyscale;
+		int keypressed = FALSE;
 		input_item_class itemclass;
 
 		/* clamp the previous value to the min/max range and remember it */
 		info->previous = info->accum = apply_analog_min_max(info, info->accum);
 
 		/* get the new raw analog value and its type */
-		rawvalue = input_seq_axis_value(input_port_seq(port, SEQ_TYPE_STANDARD), &itemclass);
+		rawvalue = input_seq_axis_value(input_port_seq(portentry, SEQ_TYPE_STANDARD), &itemclass);
 
 		/* if we got an absolute input, it overrides everything else */
 		if (itemclass == ITEM_CLASS_ABSOLUTE)
@@ -3232,35 +3084,36 @@ static void update_analog_port(int portnum)
 				/* apply the inverse of the sensitivity to the raw value so that */
 				/* it will still cover the full min->max range requested after */
 				/* we apply the sensitivity adjustment */
-				if (info->absolute || port->analog.reset)
+				if (info->absolute || portentry->analog.reset)
 				{
 					/* if port is absolute, then just return the absolute data supplied */
-					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, port->analog.sensitivity);
+					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, portentry->analog.sensitivity);
 				}
 				else if (info->positionalscale != 0)
 				{
 					/* if port is positional, we will take the full analog control and divide it */
 					/* into positions, that way as the control is moved full scale, */
 					/* it moves through all the positions */
-					rawvalue = info->positionalscale * (rawvalue - INPUT_ABSOLUTE_MIN) * 512  + info->minimum;
+					rawvalue = APPLY_SCALE(rawvalue - INPUT_ABSOLUTE_MIN, info->positionalscale) * 512 + info->minimum;
 
 					/* clamp the high value so it does not roll over */
-					if (rawvalue > info->maximum) rawvalue = info->maximum;
-					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, port->analog.sensitivity);
+					rawvalue = MIN(rawvalue, info->maximum);
+					info->accum = APPLY_INVERSE_SENSITIVITY(rawvalue, portentry->analog.sensitivity);
 				}
 				else
 					/* if port is relative, we use the value to simulate the speed of relative movement */
 					/* sensitivity adjustment is allowed for this mode */
 					info->accum += rawvalue;
 
-				info->lastdigital = 0;
+				info->lastdigital = FALSE;
 				/* do not bother with other control types if the analog data is changing */
-				return;
+				continue;
 			}
 			else
 			{
 				/* we still have to update fake relative from joystick control */
-				if (!info->absolute && info->positionalscale == 0) info->accum += rawvalue;
+				if (!info->absolute && info->positionalscale == 0)
+					info->accum += rawvalue;
 			}
 		}
 
@@ -3276,26 +3129,26 @@ static void update_analog_port(int portnum)
 
 		/* if the decrement code sequence is pressed, add the key delta to */
 		/* the accumulated delta; also note that the last input was a digital one */
-		if (input_seq_pressed(input_port_seq(info->port, SEQ_TYPE_DECREMENT)))
+		if (input_seq_pressed(input_port_seq(info->portentry, SEQ_TYPE_DECREMENT)))
 		{
-			keypressed = 1;
-			if (port->analog.delta)
-				delta -= (double)(port->analog.delta) * keyscale;
+			keypressed = TRUE;
+			if (portentry->analog.delta)
+				delta -= APPLY_SCALE(portentry->analog.delta, keyscale);
 			else if (info->lastdigital != 1)
 				/* decrement only once when first pressed */
-				delta -= keyscale;
+				delta -= APPLY_SCALE(1, keyscale);
 			info->lastdigital = 1;
 		}
 
 		/* same for the increment code sequence */
-		if (input_seq_pressed(input_port_seq(info->port, SEQ_TYPE_INCREMENT)))
+		if (input_seq_pressed(input_port_seq(info->portentry, SEQ_TYPE_INCREMENT)))
 		{
-			keypressed = 1;
-			if (port->analog.delta)
-				delta += (double)(port->analog.delta) * keyscale;
+			keypressed = TRUE;
+			if (portentry->analog.delta)
+				delta += APPLY_SCALE(portentry->analog.delta, keyscale);
 			else if (info->lastdigital != 2)
 				/* increment only once when first pressed */
-				delta += keyscale;
+				delta += APPLY_SCALE(1, keyscale);
 			info->lastdigital = 2;
 		}
 
@@ -3303,7 +3156,7 @@ static void update_analog_port(int portnum)
 		/* applying the deltas so that we only return this frame's delta */
 		/* note that centering only works for relative controls */
 		/* no need to check if absolute here because it is checked by the validity tests */
-		if (port->analog.reset)
+		if (portentry->analog.reset)
 			info->accum = 0;
 
 		/* apply the delta to the accumulated value */
@@ -3314,13 +3167,13 @@ static void update_analog_port(int portnum)
 		/* was pressed, apply autocentering */
 		if (info->autocenter)
 		{
-			double center = APPLY_INVERSE_SENSITIVITY(info->center, port->analog.sensitivity);
+			INT32 center = APPLY_INVERSE_SENSITIVITY(info->center, portentry->analog.sensitivity);
 			if (info->lastdigital && !keypressed)
 			{
 				/* autocenter from positive values */
 				if (info->accum >= center)
 				{
-					info->accum -= (double)(port->analog.centerdelta) * info->keyscalepos;
+					info->accum -= APPLY_SCALE(portentry->analog.centerdelta, info->keyscalepos);
 					if (info->accum < center)
 					{
 						info->accum = center;
@@ -3331,7 +3184,7 @@ static void update_analog_port(int portnum)
 				/* autocenter from negative values */
 				else
 				{
-					info->accum += (double)(port->analog.centerdelta) * info->keyscaleneg;
+					info->accum += APPLY_SCALE(portentry->analog.centerdelta, info->keyscaleneg);
 					if (info->accum > center)
 					{
 						info->accum = center;
@@ -3353,28 +3206,25 @@ static void update_analog_port(int portnum)
  *
  *************************************/
 
-static void interpolate_analog_port(int portnum)
+static UINT32 merge_interpolated_analog_data(int portnum, UINT32 digital)
 {
 	analog_port_info *info;
+	UINT32 result = digital;
 
 profiler_mark(PROFILER_INPUT);
-
-	/* set the default mask and value */
-	port_info[portnum].analogmask = 0;
-	port_info[portnum].analog = 0;
 
 	/* loop over all analog ports in this port number */
 	for (info = port_info[portnum].analoginfo; info != NULL; info = info->next)
 	{
-		input_port_entry *port = info->port;
+		input_port_entry *portentry = info->portentry;
 
-		if (input_port_condition(info->port))
+		if (input_port_condition(portentry))
 		{
-			double current;
+			INT32 current;
 			INT32 value;
 
 			/* interpolate or not */
-			if (info->interpolate && !port->analog.reset && last_delta != 0)
+			if (info->interpolate && !portentry->analog.reset && last_delta != 0)
 			{
 				attoseconds_t time_since_last = attotime_to_attoseconds(attotime_sub(timer_get_time(), last_update)) / ATTOSECONDS_PER_SECOND_SQRT;
 				current = info->previous + ((INT64)(info->accum - info->previous) * time_since_last / last_delta);
@@ -3384,42 +3234,41 @@ profiler_mark(PROFILER_INPUT);
 
 			/* apply the min/max and then the sensitivity */
 			current = apply_analog_min_max(info, current);
-			current = APPLY_SENSITIVITY(current, port->analog.sensitivity);
+			current = APPLY_SENSITIVITY(current, portentry->analog.sensitivity);
 
 			/* apply reversal if needed */
-			if (port->analog.reverse)
-					current = info->reverse_val - current;
-			else
-			if (info->single_scale)
+			if (portentry->analog.reverse)
+				current = info->reverse_val - current;
+			else if (info->single_scale)
 				/* it's a pedal or the default value is equal to min/max */
 				/* so we need to adjust the center to the minimum */
 				current -= INPUT_ABSOLUTE_MIN;
 
 			/* map differently for positive and negative values */
-			if (current >= 0 )
-				value = (INT32)(current * info->scalepos);
+			if (current >= 0)
+				value = APPLY_SCALE(current, info->scalepos);
 			else
-				value = (INT32)(current * info->scaleneg);
-			value += port->default_value;
+				value = APPLY_SCALE(current, info->scaleneg);
+			value += portentry->default_value;
 
-			/* store croshair position before any remapping */
-			info->crosshair_pos = (INT32)value & (port->mask >> info->shift);
+			/* store crosshair position before any remapping */
+			info->crosshair_pos = (INT32)value & (portentry->mask >> info->shift);
 
 			/* remap the value if needed */
-			if (port->analog.remap_table)
-				value = info->port->analog.remap_table[value];
+			if (portentry->analog.remap_table)
+				value = info->portentry->analog.remap_table[value];
 
 			/* invert bits if needed */
-			if (port->analog.invert)
+			if (portentry->analog.invert)
 				value = ~value;
 
 			/* insert into the port */
-			port_info[portnum].analogmask |= info->port->mask;
-			port_info[portnum].analog = (port_info[portnum].analog & ~port->mask) | ((value << info->shift) & port->mask);
+			result = (result & ~portentry->mask) | ((value << info->shift) & portentry->mask);
 		}
 	}
 
 profiler_mark(PROFILER_END);
+	return result;
 }
 
 
@@ -3430,37 +3279,29 @@ profiler_mark(PROFILER_END);
  *
  *************************************/
 
-UINT32 readinputport(int port)
+UINT32 readinputport(int portnum)
 {
-	input_port_info *portinfo = &port_info[port];
+	input_port_info *portinfo = &port_info[portnum];
 	custom_port_info *custom;
 	UINT32 result;
+	
+	/* start with the digital */
+	result = portinfo->defvalue ^ portinfo->digital;
 
-	/* interpolate analog values */
-	interpolate_analog_port(port);
+	/* merge in analog portions */
+	result = merge_interpolated_analog_data(portnum, result);
 
 	/* update custom values */
 	for (custom = portinfo->custominfo; custom; custom = custom->next)
-		if (input_port_condition(custom->port))
+		if (input_port_condition(custom->portentry))
 		{
 			/* replace the bits with bits from the custom routine */
-			input_port_entry *port = custom->port;
-			portinfo->digital &= ~port->mask;
-			portinfo->digital |= ((*port->custom)(Machine, port->custom_param) << custom->shift) & port->mask;
+			input_port_entry *portentry = custom->portentry;
+			result &= ~portentry->mask;
+			result |= ((*portentry->custom)(Machine, portentry->custom_param) << custom->shift) & portentry->mask;
 		}
 
-	/* compute the current result: default value XOR the digital, merged with the analog */
-	result = ((portinfo->defvalue ^ portinfo->digital) & ~portinfo->analogmask) | portinfo->analog;
-
-	/* if we have analog data, update the recording state */
-	if (port_info[port].analoginfo)
-		update_playback_record(Machine, port, result);
-
-	/* if we're playing back, use the recorded value for inputs instead */
-	if (Machine->playback_file != NULL)
-		result = portinfo->playback;
-
-	/* handle VBLANK bits after inputs */
+	/* handle VBLANK bits */
 	if (portinfo->vblank)
 	{
 		/* reset the VBLANK bits to their default value, regardless of inputs */
@@ -3476,9 +3317,9 @@ UINT32 readinputport(int port)
 
 UINT32 readinputportbytag(const char *tag)
 {
-	int port = port_tag_to_index(tag);
-	if (port != -1)
-		return readinputport(port);
+	int portnum = port_tag_to_index(tag);
+	if (portnum != -1)
+		return readinputport(portnum);
 
 	/* otherwise fail horribly */
 	fatalerror("Unable to locate input port '%s'", tag);
@@ -3488,25 +3329,10 @@ UINT32 readinputportbytag(const char *tag)
 
 UINT32 readinputportbytag_safe(const char *tag, UINT32 defvalue)
 {
-	int port = port_tag_to_index(tag);
-	if (port != -1)
-		return readinputport(port);
+	int portnum = port_tag_to_index(tag);
+	if (portnum != -1)
+		return readinputport(portnum);
 	return defvalue;
-}
-
-
-
-/*************************************
- *
- *  Input port writing
- *
- *************************************/
-
-void input_port_set_digital_value(int portnum, UINT32 value, UINT32 mask)
-{
-	input_port_info *portinfo = &port_info[portnum];
-	portinfo->digital &= ~mask;
-	portinfo->digital |= value;
 }
 
 
@@ -3521,13 +3347,13 @@ UINT32 get_crosshair_pos(int port_num, UINT8 player, UINT8 axis)
 {
 	input_port_info *portinfo = &port_info[port_num];
 	analog_port_info *info;
-	input_port_entry *port;
+	input_port_entry *portentry;
 	UINT32 result = 0;
 
 	for (info = portinfo->analoginfo; info; info = info->next)
 	{
-		port = info->port;
-		if (port->player == player && port->analog.crossaxis == axis)
+		portentry = info->portentry;
+		if (portentry->player == player && portentry->analog.crossaxis == axis)
 		{
 			result = info->crosshair_pos;
 			break;
@@ -3591,4 +3417,375 @@ static void autoselect_device(const input_port_entry *ipt, int type1, int type2,
 				input_device_class_enable(autoenable, TRUE);
 				break;
 			}
+}
+
+
+
+/***************************************************************************
+    PLAYBACK AND RECORD
+***************************************************************************/
+
+/*-------------------------------------------------
+    playback_read_uint8 - read an 8-bit value
+    from the playback file
+-------------------------------------------------*/
+
+static UINT8 playback_read_uint8(running_machine *machine)
+{
+	UINT8 result;
+
+	/* protect against NULL handles if previous reads fail */
+	if (machine->playback_file == NULL)
+		return 0;
+
+	/* read the value; if we fail, end playback */
+	if (mame_fread(machine->playback_file, &result, sizeof(result)) != sizeof(result))
+	{
+		playback_end(machine, "End of file");
+		return 0;
+	}
+	
+	/* return the appropriate value */
+	return result;
+}
+
+
+/*-------------------------------------------------
+    record_write_uint8 - write an 8-bit value
+    to the record file
+-------------------------------------------------*/
+
+static void record_write_uint8(running_machine *machine, UINT8 data)
+{
+	UINT8 result = data;
+
+	/* protect against NULL handles if previous reads fail */
+	if (machine->record_file == NULL)
+		return;
+
+	/* read the value; if we fail, end playback */
+	if (mame_fwrite(machine->record_file, &result, sizeof(result)) != sizeof(result))
+		record_end(machine, "Out of space");
+}
+
+
+/*-------------------------------------------------
+    playback_read_uint32 - read a 32-bit value
+    from the playback file
+-------------------------------------------------*/
+
+static UINT32 playback_read_uint32(running_machine *machine)
+{
+	UINT32 result;
+
+	/* protect against NULL handles if previous reads fail */
+	if (machine->playback_file == NULL)
+		return 0;
+
+	/* read the value; if we fail, end playback */
+	if (mame_fread(machine->playback_file, &result, sizeof(result)) != sizeof(result))
+	{
+		playback_end(machine, "End of file");
+		return 0;
+	}
+	
+	/* return the appropriate value */
+	return LITTLE_ENDIANIZE_INT32(result);
+}
+
+
+/*-------------------------------------------------
+    record_write_uint32 - write a 32-bit value
+    to the record file
+-------------------------------------------------*/
+
+static void record_write_uint32(running_machine *machine, UINT32 data)
+{
+	UINT32 result = LITTLE_ENDIANIZE_INT32(data);
+
+	/* protect against NULL handles if previous reads fail */
+	if (machine->record_file == NULL)
+		return;
+
+	/* read the value; if we fail, end playback */
+	if (mame_fwrite(machine->record_file, &result, sizeof(result)) != sizeof(result))
+		record_end(machine, "Out of space");
+}
+
+
+/*-------------------------------------------------
+    playback_read_uint64 - read a 64-bit value
+    from the playback file
+-------------------------------------------------*/
+
+static UINT64 playback_read_uint64(running_machine *machine)
+{
+	UINT64 result;
+
+	/* protect against NULL handles if previous reads fail */
+	if (machine->playback_file == NULL)
+		return 0;
+
+	/* read the value; if we fail, end playback */
+	if (mame_fread(machine->playback_file, &result, sizeof(result)) != sizeof(result))
+	{
+		playback_end(machine, "End of file");
+		return 0;
+	}
+	
+	/* return the appropriate value */
+	return LITTLE_ENDIANIZE_INT64(result);
+}
+
+
+/*-------------------------------------------------
+    record_write_uint64 - write a 64-bit value
+    to the record file
+-------------------------------------------------*/
+
+static void record_write_uint64(running_machine *machine, UINT64 data)
+{
+	UINT64 result = LITTLE_ENDIANIZE_INT64(data);
+
+	/* protect against NULL handles if previous reads fail */
+	if (machine->record_file == NULL)
+		return;
+
+	/* read the value; if we fail, end playback */
+	if (mame_fwrite(machine->record_file, &result, sizeof(result)) != sizeof(result))
+		record_end(machine, "Out of space");
+}
+
+
+/*-------------------------------------------------
+    playback_init - initialize INP playback
+-------------------------------------------------*/
+
+static time_t playback_init(running_machine *machine)
+{
+	const char *filename = options_get_string(mame_options(), OPTION_PLAYBACK);
+	UINT8 header[INP_HEADER_SIZE];
+	file_error filerr;
+	time_t basetime;
+	
+	/* if no file, nothing to do */
+	if (filename[0] == 0)
+		return 0;
+
+	/* open the playback file */
+	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_READ, &machine->playback_file);
+	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
+
+	/* read the header and verify that it is a modern version; if not, print an error */
+	if (mame_fread(machine->playback_file, header, sizeof(header)) != sizeof(header))
+		fatalerror("Input file is corrupt or invalid (missing header)");
+	if (memcmp(header, "MAMEINP\0", 8) != 0)
+		fatalerror("Input file invalid or in an older, unsupported format");
+	if (header[0x10] != INP_HEADER_MAJVERSION)
+		fatalerror("Input file format version mismatch");
+
+	/* output info to console */
+	mame_printf_info("Input file: %s\n", filename);
+	mame_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
+	basetime = header[0x08] | (header[0x09] << 8) | (header[0x0a] << 16) | (header[0x0b] << 24) |
+				((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
+	mame_printf_info("Created %s", ctime(&basetime));
+	mame_printf_info("Recorded using %s\n", header + 0x20);
+	
+	/* verify the header against the current game */
+	if (memcmp(machine->gamedrv->name, header + 0x14, strlen(machine->gamedrv->name) + 1) != 0)
+		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
+	
+	return basetime;
+}
+
+
+/*-------------------------------------------------
+    record_init - initialize INP recording
+-------------------------------------------------*/
+
+static void record_init(running_machine *machine)
+{
+	const char *filename = options_get_string(mame_options(), OPTION_RECORD);
+	UINT8 header[INP_HEADER_SIZE];
+	mame_system_time systime;
+	file_error filerr;
+
+	/* if no file, nothing to do */
+	if (filename[0] == 0)
+		return;
+
+	/* open the record file  */
+	filerr = mame_fopen(SEARCHPATH_INPUTLOG, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &machine->record_file);
+	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
+
+	/* get the base time */
+	mame_get_base_datetime(machine, &systime);
+
+	/* fill in the header */
+	memset(header, 0, sizeof(header));
+	memcpy(header, "MAMEINP\0", 8);
+	header[0x08] = systime.time >> 0;
+	header[0x09] = systime.time >> 8;
+	header[0x0a] = systime.time >> 16;
+	header[0x0b] = systime.time >> 24;
+	header[0x0c] = systime.time >> 32;
+	header[0x0d] = systime.time >> 40;
+	header[0x0e] = systime.time >> 48;
+	header[0x0f] = systime.time >> 56;
+	header[0x10] = INP_HEADER_MAJVERSION;
+	header[0x11] = INP_HEADER_MINVERSION;
+	strcpy((char *)header + 0x14, machine->gamedrv->name);
+	sprintf((char *)header + 0x20, APPNAME " %s", build_version);
+	
+	/* write it */
+	mame_fwrite(machine->record_file, header, sizeof(header));
+}
+
+
+/*-------------------------------------------------
+    playback_end - end INP playback
+-------------------------------------------------*/
+
+static void playback_end(running_machine *machine, const char *message)
+{
+	/* only applies if we have a live file */
+	if (machine->playback_file != NULL)
+	{
+		/* close the file */
+		mame_fclose(machine->playback_file);
+		machine->playback_file = NULL;
+		
+		/* pop a message */
+		if (message != NULL)
+			popmessage("Playback Ended\nReason: %s", message);
+		
+		/* display speed stats */
+		playback_accumulated_speed /= playback_accumulated_frames;
+		mame_printf_info("Total playback frames: %d\n", (UINT32)playback_accumulated_frames);
+		mame_printf_info("Average recorded speed: %d%%\n", (UINT32)((playback_accumulated_speed * 200 + 1) >> 21));
+	}
+}
+
+
+/*-------------------------------------------------
+    record_end - end INP recording
+-------------------------------------------------*/
+
+static void record_end(running_machine *machine, const char *message)
+{
+	/* only applies if we have a live file */
+	if (machine->record_file != NULL)
+	{
+		/* close the file */
+		mame_fclose(machine->record_file);
+		machine->record_file = NULL;
+		
+		/* pop a message */
+		if (message != NULL)
+			popmessage("Recording Ended\nReason: %s", message);
+	}
+}
+
+
+/*-------------------------------------------------
+    playback_frame - start of frame callback for 
+    playback
+-------------------------------------------------*/
+
+static void playback_frame(running_machine *machine, attotime curtime)
+{
+	/* if playing back, fetch the information and verify */
+	if (machine->playback_file != NULL)
+	{
+		attotime readtime;
+		
+		/* first the absolute time */
+		readtime.seconds = playback_read_uint32(machine);
+		readtime.attoseconds = playback_read_uint64(machine);
+		if (attotime_compare(readtime, curtime) != 0)
+			playback_end(machine, "Out of sync");
+		
+		/* then the speed */
+		playback_accumulated_speed += playback_read_uint32(machine);
+		playback_accumulated_frames++;
+	}
+}
+		
+
+/*-------------------------------------------------
+    record_frame - start of frame callback for 
+    recording
+-------------------------------------------------*/
+
+static void record_frame(running_machine *machine, attotime curtime)
+{
+	/* if recording, record information about the current frame */
+	if (machine->record_file != NULL)
+	{
+		/* first the absolute time */
+		record_write_uint32(machine, curtime.seconds);
+		record_write_uint64(machine, curtime.attoseconds);
+		
+		/* then the current speed */
+		record_write_uint32(machine, video_get_speed_percent(machine) * (double)(1 << 20));
+	}
+}
+		
+
+/*-------------------------------------------------
+    playback_port - per-port callback for playback
+-------------------------------------------------*/
+
+static void playback_port(running_machine *machine, input_port_info *portinfo)
+{
+	/* if playing back, fetch information about this port */
+	if (machine->playback_file != NULL)
+	{
+		analog_port_info *analog;
+
+		/* read the digital value */
+		portinfo->digital = playback_read_uint32(machine);
+		
+		/* loop over analog ports and save their data */
+		for (analog = portinfo->analoginfo; analog != NULL; analog = analog->next)
+		{
+			/* read current and previous values */
+			analog->accum = playback_read_uint32(machine);
+			analog->previous = playback_read_uint32(machine);
+			
+			/* read configuration information */
+			analog->portentry->analog.sensitivity = playback_read_uint32(machine);
+			analog->portentry->analog.reverse = playback_read_uint8(machine);
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    record_port - per-port callback for record
+-------------------------------------------------*/
+
+static void record_port(running_machine *machine, input_port_info *portinfo)
+{
+	/* if recording, store information about this port */
+	if (machine->record_file != NULL)
+	{
+		analog_port_info *analog;
+
+		/* store the digital value */
+		record_write_uint32(machine, portinfo->digital);
+		
+		/* loop over analog ports and save their data */
+		for (analog = portinfo->analoginfo; analog != NULL; analog = analog->next)
+		{
+			/* store current and previous values */
+			record_write_uint32(machine, analog->accum);
+			record_write_uint32(machine, analog->previous);
+			
+			/* store configuration information */
+			record_write_uint32(machine, analog->portentry->analog.sensitivity);
+			record_write_uint8(machine, analog->portentry->analog.reverse);
+		}
+	}
 }

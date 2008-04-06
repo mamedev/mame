@@ -1608,6 +1608,17 @@ const char *video_get_speed_text(running_machine *machine)
 
 
 /*-------------------------------------------------
+    video_get_speed_percent - return the current 
+    effective speed percentage
+-------------------------------------------------*/
+
+double video_get_speed_percent(running_machine *machine)
+{
+	return global.speed_percent;
+}
+
+
+/*-------------------------------------------------
     video_get_frameskip - return the current
     actual frameskip (-1 means autoframeskip)
 -------------------------------------------------*/
