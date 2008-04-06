@@ -225,7 +225,7 @@ static WRITE16_HANDLER(via_w)
 
 static READ8_HANDLER(via_b_in)
 {
-	return input_port_3_r(machine,0);
+	return input_port_read_indexed(machine, 3);
 }
 
 
@@ -447,8 +447,8 @@ static READ8_HANDLER(dips1_r)
 {
 	switch(bmc_input)
 	{
-			case 0x00:	return  input_port_1_r(machine,0);
-			case 0x40:	return  input_port_2_r(machine,0);
+			case 0x00:	return  input_port_read_indexed(machine, 1);
+			case 0x40:	return  input_port_read_indexed(machine, 2);
 	}
 	logerror("unknown input - %X (PC=%X)\n",bmc_input,activecpu_get_previouspc());
 	return 0xff;

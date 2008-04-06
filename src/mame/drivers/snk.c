@@ -328,16 +328,16 @@ static int snk_input_port_r( running_machine *machine, int which ){
 		case SNK_ROT_PLAYER1: return snk_rot( machine, 0 );
 		case SNK_ROT_PLAYER2: return snk_rot( machine, 1 );
 
-		case SNK_INP1: return input_port_1_r(machine,0);
-		case SNK_INP2: return input_port_2_r(machine,0);
-		case SNK_INP3: return input_port_3_r(machine,0);
-		case SNK_INP4: return input_port_4_r(machine,0);
-		case SNK_INP5: return input_port_5_r(machine,0);
-		case SNK_INP6: return input_port_6_r(machine,0);
-		case SNK_INP7: return input_port_7_r(machine,0);
-		case SNK_INP8: return input_port_8_r(machine,0);
-		case SNK_INP9: return input_port_9_r(machine,0);
-		case SNK_INP10: return input_port_10_r(machine,0);
+		case SNK_INP1: return input_port_read_indexed(machine, 1);
+		case SNK_INP2: return input_port_read_indexed(machine, 2);
+		case SNK_INP3: return input_port_read_indexed(machine, 3);
+		case SNK_INP4: return input_port_read_indexed(machine, 4);
+		case SNK_INP5: return input_port_read_indexed(machine, 5);
+		case SNK_INP6: return input_port_read_indexed(machine, 6);
+		case SNK_INP7: return input_port_read_indexed(machine, 7);
+		case SNK_INP8: return input_port_read_indexed(machine, 8);
+		case SNK_INP9: return input_port_read_indexed(machine, 9);
+		case SNK_INP10: return input_port_read_indexed(machine, 10);
 		case SNK_INP11: return input_port_11_r(machine,0);
 
 		default:

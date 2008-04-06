@@ -77,9 +77,9 @@ READ8_HANDLER( tnzs_port1_r )
 
 	switch (tnzs_input_select & 0x0f)
 	{
-		case 0x0a:	data = input_port_4_r(machine,0); break;
-		case 0x0c:	data = input_port_2_r(machine,0); break;
-		case 0x0d:	data = input_port_3_r(machine,0); break;
+		case 0x0a:	data = input_port_read_indexed(machine, 4); break;
+		case 0x0c:	data = input_port_read_indexed(machine, 2); break;
+		case 0x0d:	data = input_port_read_indexed(machine, 3); break;
 		default:	data = 0xff; break;
 	}
 
@@ -90,7 +90,7 @@ READ8_HANDLER( tnzs_port1_r )
 
 READ8_HANDLER( tnzs_port2_r )
 {
-	int data = input_port_4_r(machine,0);
+	int data = input_port_read_indexed(machine, 4);
 
 //  logerror("I8742:%04x  Read %02x from port 2\n", activecpu_get_previouspc(), data);
 

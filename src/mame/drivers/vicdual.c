@@ -352,8 +352,8 @@ static READ8_HANDLER( safari_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -436,8 +436,8 @@ static READ8_HANDLER( frogs_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -544,8 +544,8 @@ static READ8_HANDLER( headon_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -2098,8 +2098,8 @@ static READ8_HANDLER( nsub_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x08)  ret = input_port_1_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -2193,9 +2193,9 @@ static READ8_HANDLER( invinco_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine,0);
-	if (offset & 0x02)  ret = input_port_1_r(machine,0);
-	if (offset & 0x08)  ret = input_port_2_r(machine,0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x02)  ret = input_port_read_indexed(machine, 1);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 2);
 
 	return ret;
 }

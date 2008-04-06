@@ -18,12 +18,12 @@ static INTERRUPT_GEN( kopunch_interrupt )
 {
 	if (cpu_getiloops() == 0)
 	{
-		if (~input_port_1_r(machine,0) & 0x80)	/* coin 1 */
+		if (~input_port_read_indexed(machine, 1) & 0x80)	/* coin 1 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xf7);	/* RST 30h */
 			return;
 		}
-		else if (~input_port_1_r(machine,0) & 0x08)	/* coin 2 */
+		else if (~input_port_read_indexed(machine, 1) & 0x08)	/* coin 2 */
 		{
 			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xef);	/* RST 28h */
 			return;
@@ -39,7 +39,7 @@ static READ8_HANDLER( kopunch_in_r )
 	if (offset == 0)
 		return mame_rand(machine);
 	else
-		return (mame_rand(machine) & 0x07) | input_port_1_r(machine,0);
+		return (mame_rand(machine) & 0x07) | input_port_read_indexed(machine, 1);
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )

@@ -470,7 +470,7 @@ static void josvolly_8741_w(running_machine *machine,int num,int offset,int data
 			break;
 		case 2:
 #if 1
-			mcu->rxd = input_port_4_r(machine,0);  /* DSW2 */
+			mcu->rxd = input_port_read_indexed(machine, 4);  /* DSW2 */
 			mcu->sts |= 0x01; /* RD ready */
 #endif
 			break;

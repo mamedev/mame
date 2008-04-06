@@ -75,7 +75,7 @@ static int subs_steering_2(running_machine *machine)
 	int this_val;
 	int delta;
 
-	this_val=input_port_4_r(machine,0);
+	this_val=input_port_read_indexed(machine, 4);
 
 	delta=this_val-last_val;
 	last_val=this_val;

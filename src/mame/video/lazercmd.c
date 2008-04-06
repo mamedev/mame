@@ -32,7 +32,7 @@ static void plot_pattern(running_machine *machine, bitmap_t *bitmap, int x, int 
 	int xbit, ybit, size;
 
     size = 2;
-	if (input_port_2_r(machine,0) & 0x40)
+	if (input_port_read_indexed(machine, 2) & 0x40)
     {
 		size = 4;
     }

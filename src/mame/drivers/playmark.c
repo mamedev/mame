@@ -137,7 +137,7 @@ static READ16_HANDLER( wbeachvl_port0_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_0_r(machine,0) & 0x7f) | bit;
+	return (input_port_read_indexed(machine, 0) & 0x7f) | bit;
 }
 
 static READ16_HANDLER( hotmind_port2_r )
@@ -146,7 +146,7 @@ static READ16_HANDLER( hotmind_port2_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_2_r(machine,0) & 0x7f) | bit;
+	return (input_port_read_indexed(machine, 2) & 0x7f) | bit;
 }
 
 static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )

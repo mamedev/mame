@@ -444,11 +444,11 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return input_port_0_r(machine,0);
-		case 0x02: return input_port_1_r(machine,0);
-		case 0x04: return input_port_2_r(machine,0);
-		case 0x08: return input_port_3_r(machine,0);
-		case 0x00: return input_port_4_r(machine,0);
+		case 0x01: return input_port_read_indexed(machine, 0);
+		case 0x02: return input_port_read_indexed(machine, 1);
+		case 0x04: return input_port_read_indexed(machine, 2);
+		case 0x08: return input_port_read_indexed(machine, 3);
+		case 0x00: return input_port_read_indexed(machine, 4);
 	}
 	return 0xff;
 }

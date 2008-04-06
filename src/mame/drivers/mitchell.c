@@ -193,7 +193,7 @@ static READ8_HANDLER( pang_port5_r )
 		if (pang_port5_kludge)	/* hack... music doesn't work otherwise */
 			bit ^= 0x08;
 
-	return (input_port_0_r(machine,0) & 0x76) | bit;
+	return (input_port_read_indexed(machine, 0) & 0x76) | bit;
 }
 
 static WRITE8_HANDLER( eeprom_cs_w )

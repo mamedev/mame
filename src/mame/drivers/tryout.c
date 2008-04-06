@@ -183,7 +183,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( tryout_interrupt )
 {
-	if ((input_port_3_r(machine,0) & 0x1c)!=0x1c)
+	if ((input_port_read_indexed(machine, 3) & 0x1c)!=0x1c)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 }
 

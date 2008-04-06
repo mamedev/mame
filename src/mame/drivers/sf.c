@@ -166,12 +166,12 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
-	return (scale[input_port_7_r(machine,0)]<<8)|scale[input_port_5_r(machine,0)];
+	return (scale[input_port_read_indexed(machine, 7)]<<8)|scale[input_port_read_indexed(machine, 5)];
 }
 
 static READ16_HANDLER( button2_r )
 {
-	return (scale[input_port_8_r(machine,0)]<<8)|scale[input_port_6_r(machine,0)];
+	return (scale[input_port_read_indexed(machine, 8)]<<8)|scale[input_port_read_indexed(machine, 6)];
 }
 
 

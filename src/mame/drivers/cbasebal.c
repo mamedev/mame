@@ -122,7 +122,7 @@ static READ8_HANDLER( eeprom_r )
 
 	bit = EEPROM_read_bit() << 7;
 
-	return (input_port_2_r(machine,0) & 0x7f) | bit;
+	return (input_port_read_indexed(machine, 2) & 0x7f) | bit;
 }
 
 static WRITE8_HANDLER( eeprom_cs_w )

@@ -177,9 +177,9 @@ static WRITE8_HANDLER(graph_control_w)
 static READ8_HANDLER (controls_r)
 {
 	if(sbw_system&2)
-		return input_port_2_r(machine,0);
+		return input_port_read_indexed(machine, 2);
 	else
-		return input_port_3_r(machine,0);
+		return input_port_read_indexed(machine, 3);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

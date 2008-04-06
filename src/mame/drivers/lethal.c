@@ -230,7 +230,7 @@ static NVRAM_HANDLER( lethalen )
 
 static READ8_HANDLER( control2_r )
 {
-	return 0x02 | EEPROM_read_bit() | (input_port_1_r(machine,0) & 0xf0);
+	return 0x02 | EEPROM_read_bit() | (input_port_read_indexed(machine, 1) & 0xf0);
 }
 
 static WRITE8_HANDLER( control2_w )

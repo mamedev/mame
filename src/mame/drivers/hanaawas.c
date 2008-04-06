@@ -69,7 +69,7 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_0_r(machine,0) & 0xf0) | ordinal;
+	return (input_port_read_indexed(machine, 0) & 0xf0) | ordinal;
 }
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )

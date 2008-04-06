@@ -892,7 +892,7 @@ static int sfl_int=0;
 static READ8_HANDLER( sfl_input_r )
 {
 	sfl_int^=0x80;//vblank flag ?
-	return sfl_int|input_port_1_r(machine,0);
+	return sfl_int|input_port_read_indexed(machine, 1);
 }
 
 static ADDRESS_MAP_START( sflush_map, ADDRESS_SPACE_PROGRAM, 8 )

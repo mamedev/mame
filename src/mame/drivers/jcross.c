@@ -73,7 +73,7 @@ static READ8_HANDLER( sound_nmi_ack_r )
 
 static READ8_HANDLER( jcross_port_0_r )
 {
-	return(input_port_0_r(machine,0) | sound_cpu_busy);
+	return(input_port_read_indexed(machine, 0) | sound_cpu_busy);
 }
 
 static WRITE8_HANDLER(jcross_vregs0_w){jcross_vregs[0]=data;}

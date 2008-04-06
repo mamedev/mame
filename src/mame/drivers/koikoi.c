@@ -104,7 +104,7 @@ static READ8_HANDLER(io_r)
 {
 	if(!offset)
 	{
-			return input_port_1_r(machine,0)^ioram[4]; //coin
+			return input_port_read_indexed(machine, 1)^ioram[4]; //coin
 	}
 	return 0;
 }

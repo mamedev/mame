@@ -234,7 +234,7 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 		videoram_pg_index = data & 1;
 		memory_set_bank(1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_3_r(machine,0) & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read_indexed(machine, 3) & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -257,7 +257,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 		videoram_pg_index = data & 1;
 		memory_set_bank(1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_3_r(machine,0) & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read_indexed(machine, 3) & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);

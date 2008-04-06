@@ -70,13 +70,13 @@ static WRITE8_HANDLER( b_via_0_pa_w )
 		switch (data & 0x03)
 		{
 		case 0:
-			pbus = input_port_0_r(machine,0);
+			pbus = input_port_read_indexed(machine, 0);
 			break;
 		case 1:
-			pbus = input_port_1_r(machine,0) | (input_port_2_r(machine,0) << 4);
+			pbus = input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 4);
 			break;
 		case 2:
-			pbus = input_port_3_r(machine,0);
+			pbus = input_port_read_indexed(machine, 3);
 			break;
 		case 3:
 			pbus = 0xff;

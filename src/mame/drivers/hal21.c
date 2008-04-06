@@ -551,7 +551,7 @@ GFXDECODE_END
 
 static READ8_HANDLER( CPUC_ready_r ) { snk_sound_busy_bit = 0; return 0; }
 
-static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_0_r(machine,0) | snk_sound_busy_bit; }
+static READ8_HANDLER( hal21_input_port_0_r ) { return input_port_read_indexed(machine, 0) | snk_sound_busy_bit; }
 
 static WRITE8_HANDLER( hal21_soundcommand_w ) { hal21_sound_scheduler(machine, 1, data); }
 static WRITE8_HANDLER( hal21_soundack_w ) { hal21_sound_scheduler(machine,2, data); }

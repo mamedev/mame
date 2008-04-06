@@ -381,14 +381,14 @@ READ8_HANDLER( nb1413m3_inputport0_r )
 	switch (nb1413m3_type)
 	{
 		case NB1413M3_PASTELG:
-			return ((input_port_3_r(machine,0) & 0xfe) | (nb1413m3_busyflag & 0x01));
+			return ((input_port_read_indexed(machine, 3) & 0xfe) | (nb1413m3_busyflag & 0x01));
 		case NB1413M3_TAIWANMB:
-			return ((input_port_3_r(machine,0) & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
+			return ((input_port_read_indexed(machine, 3) & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
-			return ((input_port_2_r(machine,0) & 0xfe) | (nb1413m3_busyflag & 0x01));
+			return ((input_port_read_indexed(machine, 2) & 0xfe) | (nb1413m3_busyflag & 0x01));
 		default:
-			return ((input_port_2_r(machine,0) & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
+			return ((input_port_read_indexed(machine, 2) & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
 	}
 }
 
@@ -537,7 +537,7 @@ READ8_HANDLER( nb1413m3_inputport3_r )
 		case NB1413M3_MAIKO:
 		case NB1413M3_MMAIKO:
 		case NB1413M3_HANAOJI:
-			return ((input_port_13_r(machine,0) & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
+			return ((input_port_read_indexed(machine, 13) & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
 			break;
 		default:
 			return 0xff;

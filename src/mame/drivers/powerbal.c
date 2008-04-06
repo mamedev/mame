@@ -63,7 +63,7 @@ static NVRAM_HANDLER( magicstk )
 
 static READ16_HANDLER( magicstk_port2_r )
 {
-	return (input_port_2_r(machine,0) & 0xfe) | EEPROM_read_bit();
+	return (input_port_read_indexed(machine, 2) & 0xfe) | EEPROM_read_bit();
 }
 
 static WRITE16_HANDLER( magicstk_coin_eeprom_w )

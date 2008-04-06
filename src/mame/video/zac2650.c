@@ -37,7 +37,7 @@ READ8_HANDLER( zac_s2636_r )
 
 READ8_HANDLER( tinvader_port_0_r )
 {
-	return input_port_0_r(machine,0) - CollisionBackground;
+	return input_port_read_indexed(machine, 0) - CollisionBackground;
 }
 
 /*****************************************/
