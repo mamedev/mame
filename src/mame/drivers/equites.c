@@ -412,7 +412,7 @@ static float cymvol,hihatvol;
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
 {
-	UINT8 frq = readinputportbytag(FRQ_ADJUSTER_TAG);
+	UINT8 frq = input_port_read(machine, FRQ_ADJUSTER_TAG);
 
 	msm5232_set_clock(sndti_token(SOUND_MSM5232, 0), MSM5232_MIN_CLOCK + frq * (MSM5232_MAX_CLOCK - MSM5232_MIN_CLOCK) / 100);
 //popmessage("8155: C %02x A %02x  AY: A %02x B %02x Unk:%x", eq8155_port_c,eq8155_port_a,ay_port_a,ay_port_b,eq_cymbal_ctrl&15);
@@ -643,7 +643,7 @@ static WRITE8_HANDLER(equites_8155_w)
 #if HVOLTAGE_DEBUG
 static READ16_HANDLER(hvoltage_debug_r)
 {
-	return(readinputport(2));
+	return(input_port_read_indexed(machine, 2));
 }
 #endif
 

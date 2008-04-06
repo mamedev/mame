@@ -48,16 +48,16 @@ static UINT8 *actfancr_ram;
 
 static READ8_HANDLER( actfan_control_0_r )
 {
-	return readinputport(2); /* VBL */
+	return input_port_read_indexed(machine, 2); /* VBL */
 }
 
 static READ8_HANDLER( actfan_control_1_r )
 {
 	switch (offset) {
-		case 0: return readinputport(0); /* Player 1 */
-		case 1: return readinputport(1); /* Player 2 */
-		case 2: return readinputport(3); /* Dip 1 */
-		case 3: return readinputport(4); /* Dip 2 */
+		case 0: return input_port_read_indexed(machine, 0); /* Player 1 */
+		case 1: return input_port_read_indexed(machine, 1); /* Player 2 */
+		case 2: return input_port_read_indexed(machine, 3); /* Dip 1 */
+		case 3: return input_port_read_indexed(machine, 4); /* Dip 2 */
 	}
 	return 0xff;
 }
@@ -72,11 +72,11 @@ static WRITE8_HANDLER( triothep_control_select_w )
 static READ8_HANDLER( triothep_control_r )
 {
 	switch (trio_control_select) {
-		case 0: return readinputportbytag("IN0"); /* Player 1 */
-		case 1: return readinputportbytag("IN1"); /* Player 2 */
-		case 2: return readinputportbytag("DSW1"); /* Dip 1 */
-		case 3: return readinputportbytag("DSW2"); /* Dip 2 */
-		case 4: return readinputportbytag("IN2"); /* VBL */
+		case 0: return input_port_read(machine, "IN0"); /* Player 1 */
+		case 1: return input_port_read(machine, "IN1"); /* Player 2 */
+		case 2: return input_port_read(machine, "DSW1"); /* Dip 1 */
+		case 3: return input_port_read(machine, "DSW2"); /* Dip 2 */
+		case 4: return input_port_read(machine, "IN2"); /* VBL */
 	}
 
 	return 0xff;

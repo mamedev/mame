@@ -175,14 +175,14 @@ static MACHINE_RESET( megasys1_hachoo )
                         [ Main CPU - System A / Z ]
 ***************************************************************************/
 
-static READ16_HANDLER( coins_r )	{return readinputport(0);}	// < 00 | Coins >
-static READ16_HANDLER( player1_r )	{return readinputport(1);}	// < 00 | Player 1 >
-static READ16_HANDLER( player2_r )	{return readinputport(2) * 256 +
-									        readinputport(3);}		// < Reserve | Player 2 >
-static READ16_HANDLER( dsw1_r )		{return readinputport(4);}							//   DSW 1
-static READ16_HANDLER( dsw2_r )		{return readinputport(5);}							//   DSW 2
-static READ16_HANDLER( dsw_r )		{return readinputport(4) * 256 +
-									        readinputport(5);}		// < DSW 1 | DSW 2 >
+static READ16_HANDLER( coins_r )	{return input_port_read_indexed(machine, 0);}	// < 00 | Coins >
+static READ16_HANDLER( player1_r )	{return input_port_read_indexed(machine, 1);}	// < 00 | Player 1 >
+static READ16_HANDLER( player2_r )	{return input_port_read_indexed(machine, 2) * 256 +
+									        input_port_read_indexed(machine, 3);}		// < Reserve | Player 2 >
+static READ16_HANDLER( dsw1_r )		{return input_port_read_indexed(machine, 4);}							//   DSW 1
+static READ16_HANDLER( dsw2_r )		{return input_port_read_indexed(machine, 5);}							//   DSW 2
+static READ16_HANDLER( dsw_r )		{return input_port_read_indexed(machine, 4) * 256 +
+									        input_port_read_indexed(machine, 5);}		// < DSW 1 | DSW 2 >
 
 
 #define INTERRUPT_NUM_A		3

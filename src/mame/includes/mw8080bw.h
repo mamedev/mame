@@ -40,7 +40,7 @@ extern const char layout_invaders[];
 #define TORNBASE_CAB_TYPE_UPRIGHT_OLD	(0)
 #define TORNBASE_CAB_TYPE_UPRIGHT_NEW	(1)
 #define TORNBASE_CAB_TYPE_COCKTAIL		(2)
-UINT8 tornbase_get_cabinet_type(void);
+UINT8 tornbase_get_cabinet_type(running_machine *machine);
 
 #define DESERTGU_GUN_X_PORT_TAG			("GUNX")
 #define DESERTGU_GUN_Y_PORT_TAG			("GUNY")
@@ -63,7 +63,7 @@ void phantom2_set_cloud_counter(UINT16 data);
 CUSTOM_INPUT( invaders_in2_control_r );
 UINT8 invaders_is_flip_screen(void);
 void invaders_set_flip_screen(UINT8 data);
-int invaders_is_cabinet_cocktail(void);
+int invaders_is_cabinet_cocktail(running_machine *machine);
 
 #define BLUESHRK_SPEAR_PORT_TAG			("SPEAR")
 

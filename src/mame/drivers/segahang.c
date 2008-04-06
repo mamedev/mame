@@ -39,7 +39,7 @@ static UINT16 *workram;
 
 static UINT8 adc_select;
 
-static void (*i8751_vblank_hook)(void);
+static void (*i8751_vblank_hook)(running_machine *machine);
 
 
 
@@ -150,13 +150,13 @@ static READ16_HANDLER( hangon_io_r )
 			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x1000/2: /* Input ports and DIP switches */
-			return readinputport(offset & 3);
+			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x3000/2: /* PPI @ 4C */
 			return ppi8255_1_r(machine, offset & 3);
 
 		case 0x3020/2: /* ADC0804 data output */
-			return readinputport(4 + adc_select);
+			return input_port_read_indexed(machine, 4 + adc_select);
 	}
 
 	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
@@ -195,14 +195,14 @@ static READ16_HANDLER( sharrier_io_r )
 			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x0010/2: /* Input ports and DIP switches */
-			return readinputport(offset & 3);
+			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x0020/2: /* PPI @ 4C */
 			if (offset == 2) return 0;
 			return ppi8255_1_r(machine, offset & 3);
 
 		case 0x0030/2: /* ADC0804 data output */
-			return readinputport(4 + adc_select);
+			return input_port_read_indexed(machine, 4 + adc_select);
 	}
 
 	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
@@ -312,7 +312,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
-		(*i8751_vblank_hook)();
+		(*i8751_vblank_hook)(machine);
 	irq4_line_hold(machine, cpunum);
 }
 
@@ -324,9 +324,9 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
  *
  *************************************/
 
-static void sharrier_i8751_sim(void)
+static void sharrier_i8751_sim(running_machine *machine)
 {
-	workram[0x492/2] = (readinputport(4) << 8) | readinputport(5);
+	workram[0x492/2] = (input_port_read_indexed(machine, 4) << 8) | input_port_read_indexed(machine, 5);
 }
 
 

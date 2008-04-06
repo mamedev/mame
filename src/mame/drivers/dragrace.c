@@ -20,7 +20,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (readinputport(5 + i))
+		switch (input_port_read_indexed(machine, 5 + i))
 		{
 		case 0x01: dragrace_gear[i] = 1; break;
 		case 0x02: dragrace_gear[i] = 2; break;
@@ -31,7 +31,7 @@ static TIMER_CALLBACK( dragrace_frame_callback )
 	}
 
 	/* watchdog is disabled during service mode */
-	watchdog_enable(machine, readinputport(0) & 0x20);
+	watchdog_enable(machine, input_port_read_indexed(machine, 0) & 0x20);
 }
 
 
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( dragrace_misc_clear_w )
 
 static READ8_HANDLER( dragrace_input_r )
 {
-	int val = readinputport(2);
+	int val = input_port_read_indexed(machine, 2);
 
 	UINT8 maskA = 1 << (offset % 8);
 	UINT8 maskB = 1 << (offset / 8);
@@ -125,7 +125,7 @@ static READ8_HANDLER( dragrace_input_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int in = readinputport(i);
+		int in = input_port_read_indexed(machine, i);
 
 		if (dragrace_gear[i] != 0)
 		{
@@ -151,7 +151,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int dial = readinputport(3 + i);
+		int dial = input_port_read_indexed(machine, 3 + i);
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;

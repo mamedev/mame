@@ -83,7 +83,7 @@ static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 
 static READ8_HANDLER( sgladiat_inp0_r )
 {
-	return(readinputportbytag("IN0") | snk_sound_busy_bit);
+	return(input_port_read(machine, "IN0") | snk_sound_busy_bit);
 }
 
 static WRITE8_HANDLER( sglatiat_flipscreen_w )

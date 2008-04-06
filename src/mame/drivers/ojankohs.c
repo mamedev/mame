@@ -146,18 +146,18 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 	int ret;
 
 	switch (ojankohs_portselect) {
-		case 0x01:	ret = readinputportbytag("IN4");	break;
-		case 0x02:	ret = readinputportbytag("IN5"); break;
-		case 0x04:	ret = readinputportbytag("IN6"); break;
-		case 0x08:	ret = readinputportbytag("IN7"); break;
-		case 0x10:	ret = readinputportbytag("IN8"); break;
+		case 0x01:	ret = input_port_read(machine, "IN4");	break;
+		case 0x02:	ret = input_port_read(machine, "IN5"); break;
+		case 0x04:	ret = input_port_read(machine, "IN6"); break;
+		case 0x08:	ret = input_port_read(machine, "IN7"); break;
+		case 0x10:	ret = input_port_read(machine, "IN8"); break;
 		case 0x20:	ret = 0xff; break;
 		case 0x3f:	ret = 0xff;
-					ret &= readinputportbytag("IN4");
-					ret &= readinputportbytag("IN5");
-					ret &= readinputportbytag("IN6");
-					ret &= readinputportbytag("IN7");
-					ret &= readinputportbytag("IN8");
+					ret &= input_port_read(machine, "IN4");
+					ret &= input_port_read(machine, "IN5");
+					ret &= input_port_read(machine, "IN6");
+					ret &= input_port_read(machine, "IN7");
+					ret &= input_port_read(machine, "IN8");
 					break;
 		default:	ret = 0xff;
 					logerror("PC:%04X unknown %02X\n", activecpu_get_pc(), ojankohs_portselect);
@@ -174,48 +174,48 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 
 	for (i = 0; i < 5; i++) {
 		if (~ojankohs_portselect & (1 << i))
-			ret |= readinputport(i + offset * 5 + 2);
+			ret |= input_port_read_indexed(machine, i + offset * 5 + 2);
 	}
 
-	return (ret & 0x3f) | (readinputport(12 + offset) & 0xc0);
+	return (ret & 0x3f) | (input_port_read_indexed(machine, 12 + offset) & 0xc0);
 }
 
 static READ8_HANDLER( ojankohs_ay8910_0_r )
 {
 	// DIPSW 1
-	return (((readinputportbytag("DSW1") & 0x01) << 7) | ((readinputportbytag("DSW1") & 0x02) << 5) |
-	        ((readinputportbytag("DSW1") & 0x04) << 3) | ((readinputportbytag("DSW1") & 0x08) << 1) |
-	        ((readinputportbytag("DSW1") & 0x10) >> 1) | ((readinputportbytag("DSW1") & 0x20) >> 3) |
-	        ((readinputportbytag("DSW1") & 0x40) >> 5) | ((readinputportbytag("DSW1") & 0x80) >> 7));
+	return (((input_port_read(machine, "DSW1") & 0x01) << 7) | ((input_port_read(machine, "DSW1") & 0x02) << 5) |
+	        ((input_port_read(machine, "DSW1") & 0x04) << 3) | ((input_port_read(machine, "DSW1") & 0x08) << 1) |
+	        ((input_port_read(machine, "DSW1") & 0x10) >> 1) | ((input_port_read(machine, "DSW1") & 0x20) >> 3) |
+	        ((input_port_read(machine, "DSW1") & 0x40) >> 5) | ((input_port_read(machine, "DSW1") & 0x80) >> 7));
 }
 
 static READ8_HANDLER( ojankohs_ay8910_1_r )
 {
 	// DIPSW 1
-	return (((readinputportbytag("DSW2") & 0x01) << 7) | ((readinputportbytag("DSW2") & 0x02) << 5) |
-	        ((readinputportbytag("DSW2") & 0x04) << 3) | ((readinputportbytag("DSW2") & 0x08) << 1) |
-	        ((readinputportbytag("DSW2") & 0x10) >> 1) | ((readinputportbytag("DSW2") & 0x20) >> 3) |
-	        ((readinputportbytag("DSW2") & 0x40) >> 5) | ((readinputportbytag("DSW2") & 0x80) >> 7));
+	return (((input_port_read(machine, "DSW2") & 0x01) << 7) | ((input_port_read(machine, "DSW2") & 0x02) << 5) |
+	        ((input_port_read(machine, "DSW2") & 0x04) << 3) | ((input_port_read(machine, "DSW2") & 0x08) << 1) |
+	        ((input_port_read(machine, "DSW2") & 0x10) >> 1) | ((input_port_read(machine, "DSW2") & 0x20) >> 3) |
+	        ((input_port_read(machine, "DSW2") & 0x40) >> 5) | ((input_port_read(machine, "DSW2") & 0x80) >> 7));
 }
 
 static READ8_HANDLER( ojankoy_ay8910_0_r )
 {
-	return readinputportbytag("DSW1");				// DIPSW 1
+	return input_port_read(machine, "DSW1");				// DIPSW 1
 }
 
 static READ8_HANDLER( ojankoy_ay8910_1_r )
 {
-	return readinputportbytag("DSW2");				// DIPSW 2
+	return input_port_read(machine, "DSW2");				// DIPSW 2
 }
 
 static READ8_HANDLER( ccasino_dipsw3_r )
 {
-	return (readinputportbytag("DSW3") ^ 0xff);		// DIPSW 3
+	return (input_port_read(machine, "DSW3") ^ 0xff);		// DIPSW 3
 }
 
 static READ8_HANDLER( ccasino_dipsw4_r )
 {
-	return (readinputportbytag("DSW4") ^ 0xff);		// DIPSW 4
+	return (input_port_read(machine, "DSW4") ^ 0xff);		// DIPSW 4
 }
 
 static WRITE8_HANDLER( ojankoy_coinctr_w )

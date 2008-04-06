@@ -306,12 +306,12 @@ static READ16_HANDLER( lastfght_c00002_r )
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (mame_rand(Machine) & 0x1c00) | readinputport(0);
+	return (mame_rand(Machine) & 0x1c00) | input_port_read_indexed(machine, 0);
 }
 
 static READ16_HANDLER( lastfght_c00004_r )
 {
-	return readinputport(1);
+	return input_port_read_indexed(machine, 1);
 }
 
 static READ16_HANDLER( lastfght_c00006_r )
@@ -319,7 +319,7 @@ static READ16_HANDLER( lastfght_c00006_r )
 	// low byte:
 	// bit 7 = protection?
 	// bit 5 = blitter?
-	return readinputport(2);
+	return input_port_read_indexed(machine, 2);
 }
 
 static WRITE16_HANDLER( lastfght_c00006_w )

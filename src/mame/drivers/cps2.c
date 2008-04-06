@@ -848,9 +848,9 @@ static READ16_HANDLER( kludge_r )
 static READ16_HANDLER( joy_or_paddle_r )
 {
 	if (readpaddle != 0)
-		return (readinputportbytag("IN0"));
+		return (input_port_read(machine, "IN0"));
 	else
-		return (readinputportbytag("PADDLE1") & 0xff) | (readinputportbytag("PADDLE2") << 8);
+		return (input_port_read(machine, "PADDLE1") & 0xff) | (input_port_read(machine, "PADDLE2") << 8);
 }
 
 

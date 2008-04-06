@@ -48,6 +48,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
 
@@ -93,7 +94,7 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
 
 static UINT8 arcadia_cia_0_porta_r(void)
 {
-	return readinputportbytag("CIA0PORTA");
+	return input_port_read(Machine, "CIA0PORTA");
 }
 
 static void arcadia_cia_0_porta_w(UINT8 data)
@@ -133,7 +134,7 @@ static void arcadia_cia_0_porta_w(UINT8 data)
 
 static UINT8 arcadia_cia_0_portb_r(void)
 {
-	return readinputportbytag("CIA0PORTB");
+	return input_port_read(Machine, "CIA0PORTB");
 }
 
 static void arcadia_cia_0_portb_w(UINT8 data)

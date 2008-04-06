@@ -70,7 +70,7 @@ static CUSTOM_INPUT( ticket_status )
 
 static CUSTOM_INPUT( cclownz_paddle )
 {
-	int value = readinputportbytag("PADDLE");
+	int value = input_port_read(machine, "PADDLE");
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 

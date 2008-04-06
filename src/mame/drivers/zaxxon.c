@@ -422,7 +422,7 @@ static CUSTOM_INPUT( razmataz_dial_r )
 	int num = (FPTR)param;
 	int delta, res;
 
-	delta = readinputportbytag(dialname[num]);
+	delta = input_port_read(machine, dialname[num]);
 
 	if (delta < 0x80)
 	{

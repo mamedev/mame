@@ -655,11 +655,11 @@ static READ8_HANDLER( mux_input_r )
 		t1 = input_override[offset];	// strobe 0-7 data 0-4
 		t2 = input_override[offset+idx];	// strobe 8-B data 0-4
 
-		t1 = (sc2_Inputs[offset]   & t1) | ( ( readinputport(offset+1)   & ~t1) & 0x1F);
+		t1 = (sc2_Inputs[offset]   & t1) | ( ( input_port_read_indexed(machine, offset+1)   & ~t1) & 0x1F);
 		if (idx == 8)
-			t2 = (sc2_Inputs[offset+8] & t2) | ( ( readinputport(offset+1+8) & ~t2) << 5);
+			t2 = (sc2_Inputs[offset+8] & t2) | ( ( input_port_read_indexed(machine, offset+1+8) & ~t2) << 5);
 		else
-			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( readinputport(offset+1+4) & ~t2) << 2) & 0x60);
+			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read_indexed(machine, offset+1+4) & ~t2) << 2) & 0x60);
 
 		sc2_Inputs[offset]   = (sc2_Inputs[offset]   & ~0x1F) | t1;
 		sc2_Inputs[offset+idx] = (sc2_Inputs[offset+idx] & ~0x60) | t2;

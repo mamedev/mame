@@ -221,7 +221,7 @@ static READ32_HANDLER( ps4_eeprom_r )
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
 
-	return readinputportbytag("JP4")<<16;
+	return input_port_read(machine, "JP4")<<16;
 }
 
 static INTERRUPT_GEN(psikyosh_interrupt)
@@ -234,17 +234,17 @@ static READ32_HANDLER(hotgmck_io32_r) /* used by hotgmck/hgkairak */
 	int ret = 0xff;
 	int sel = (ps4_io_select[0] & 0x0000ff00) >> 8;
 
-	if (sel & 1) ret &= readinputport(0+4*offset);
-	if (sel & 2) ret &= readinputport(1+4*offset);
-	if (sel & 4) ret &= readinputport(2+4*offset);
-	if (sel & 8) ret &= readinputport(3+4*offset);
+	if (sel & 1) ret &= input_port_read_indexed(machine, 0+4*offset);
+	if (sel & 2) ret &= input_port_read_indexed(machine, 1+4*offset);
+	if (sel & 4) ret &= input_port_read_indexed(machine, 2+4*offset);
+	if (sel & 8) ret &= input_port_read_indexed(machine, 3+4*offset);
 
-	return ret<<24 | readinputport(8);
+	return ret<<24 | input_port_read_indexed(machine, 8);
 }
 
 static READ32_HANDLER(ps4_io32_r) /* used by loderndf/hotdebut */
 {
-	return ((readinputport(0+4*offset) << 24) | (readinputport(1+4*offset) << 16) | (readinputport(2+4*offset) << 8) | (readinputport(3+4*offset) << 0));
+	return ((input_port_read_indexed(machine, 0+4*offset) << 24) | (input_port_read_indexed(machine, 1+4*offset) << 16) | (input_port_read_indexed(machine, 2+4*offset) << 8) | (input_port_read_indexed(machine, 3+4*offset) << 0));
 }
 
 static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )

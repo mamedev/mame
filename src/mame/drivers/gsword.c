@@ -177,7 +177,7 @@ static int gsword_protect_hack;
 static int gsword_coins_in(void)
 {
 	/* emulate 8741 coin slot */
-	if (readinputport(4)&0xc0)
+	if (input_port_read_indexed(machine, 4)&0xc0)
 	{
 		logerror("Coin In\n");
 		return 0x80;
@@ -215,11 +215,11 @@ static READ8_HANDLER( gsword_8741_2_r )
 	switch (offset)
 	{
 	case 0x01: /* start button , coins */
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	case 0x02: /* Player 1 Controller */
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 0x04: /* Player 2 Controller */
-		return readinputport(3);
+		return input_port_read_indexed(machine, 3);
 //  default:
 //      logerror("8741-2 unknown read %d PC=%04x\n",offset,activecpu_get_pc());
 	}
@@ -232,11 +232,11 @@ static READ8_HANDLER( gsword_8741_3_r )
 	switch (offset)
 	{
 	case 0x01: /* start button  */
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 	case 0x02: /* Player 1 Controller? */
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 0x04: /* Player 2 Controller? */
-		return readinputport(3);
+		return input_port_read_indexed(machine, 3);
 	}
 	/* unknown */
 //  logerror("8741-3 unknown read %d PC=%04x\n",offset,activecpu_get_pc());

@@ -93,12 +93,12 @@ static WRITE8_HANDLER( spinner_select_w )
 
 static READ8_HANDLER( spinner_r )
 {
-	return readinputport(5 + spinner);
+	return input_port_read_indexed(machine, 5 + spinner);
 }
 
 static READ8_HANDLER( gigas_spinner_r )
 {
-	return readinputport( spinner );
+	return input_port_read_indexed(machine,  spinner );
 }
 
 static MACHINE_RESET( pbillrd )

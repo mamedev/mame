@@ -136,14 +136,14 @@ static READ8_HANDLER( popper_input_ports_r )
 	switch (offset)
 	{
 		//           player inputs        dsw1                           dsw2
-		case 0: data=readinputport(0) | ((readinputport(4)&0x02)<<5) | ((readinputport(5)&0x01)<<4); break;
-		case 1: data=readinputport(1) | ((readinputport(4)&0x01)<<6) | ((readinputport(5)&0x02)<<3); break;
-		case 2: data=readinputport(2) | ((readinputport(4)&0x08)<<3) | ((readinputport(5)&0x04)<<2); break;
-		case 3: data=readinputport(3) | ((readinputport(4)&0x04)<<4) | ((readinputport(5)&0x08)<<1); break;
-		case 4: data=                   ((readinputport(4)&0x20)<<2) | ((readinputport(5)&0x10)<<1); break;
-		case 5: data=                   ((readinputport(4)&0x10)<<3) | ((readinputport(5)&0x20)<<0); break;
-		case 6: data=                   ((readinputport(4)&0x80)<<0) | ((readinputport(5)&0x40)>>1); break;
-		case 7: data=                   ((readinputport(4)&0x40)<<1) | ((readinputport(5)&0x80)>>2); break;
+		case 0: data=input_port_read_indexed(machine, 0) | ((input_port_read_indexed(machine, 4)&0x02)<<5) | ((input_port_read_indexed(machine, 5)&0x01)<<4); break;
+		case 1: data=input_port_read_indexed(machine, 1) | ((input_port_read_indexed(machine, 4)&0x01)<<6) | ((input_port_read_indexed(machine, 5)&0x02)<<3); break;
+		case 2: data=input_port_read_indexed(machine, 2) | ((input_port_read_indexed(machine, 4)&0x08)<<3) | ((input_port_read_indexed(machine, 5)&0x04)<<2); break;
+		case 3: data=input_port_read_indexed(machine, 3) | ((input_port_read_indexed(machine, 4)&0x04)<<4) | ((input_port_read_indexed(machine, 5)&0x08)<<1); break;
+		case 4: data=                   ((input_port_read_indexed(machine, 4)&0x20)<<2) | ((input_port_read_indexed(machine, 5)&0x10)<<1); break;
+		case 5: data=                   ((input_port_read_indexed(machine, 4)&0x10)<<3) | ((input_port_read_indexed(machine, 5)&0x20)<<0); break;
+		case 6: data=                   ((input_port_read_indexed(machine, 4)&0x80)<<0) | ((input_port_read_indexed(machine, 5)&0x40)>>1); break;
+		case 7: data=                   ((input_port_read_indexed(machine, 4)&0x40)<<1) | ((input_port_read_indexed(machine, 5)&0x80)>>2); break;
 	}
 	return data;
 }

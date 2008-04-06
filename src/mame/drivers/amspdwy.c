@@ -47,7 +47,7 @@ VIDEO_UPDATE( amspdwy );
 static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
 { \
 	static UINT8 wheel_old, ret; \
-	UINT8 wheel = readinputport(5 + _n_); \
+	UINT8 wheel = input_port_read_indexed(machine, 5 + _n_); \
 	if (wheel != wheel_old) \
 	{ \
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000); \
@@ -55,7 +55,7 @@ static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
 		else					ret = ((-wheel) & 0xf) | 0x10; \
 		wheel_old = wheel; \
 	} \
-	return ret | readinputport(2 + _n_); \
+	return ret | input_port_read_indexed(machine, 2 + _n_); \
 }
 AMSPDWY_WHEEL_R( 0 )
 AMSPDWY_WHEEL_R( 1 )
@@ -63,7 +63,7 @@ AMSPDWY_WHEEL_R( 1 )
 
 static READ8_HANDLER( amspdwy_sound_r )
 {
-	return (YM2151_status_port_0_r(machine,0) & ~ 0x30) | readinputport(4);
+	return (YM2151_status_port_0_r(machine,0) & ~ 0x30) | input_port_read_indexed(machine, 4);
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )

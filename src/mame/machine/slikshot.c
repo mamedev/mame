@@ -545,8 +545,8 @@ VIDEO_UPDATE( slikshot )
 	VIDEO_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
-	xbuffer[ybuffer_next % YBUFFER_COUNT] = readinputportbytag_safe("FAKEX", 0);
-	ybuffer[ybuffer_next % YBUFFER_COUNT] = readinputportbytag_safe("FAKEY", 0);
+	xbuffer[ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEX", 0);
+	ybuffer[ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEY", 0);
 	ybuffer_next++;
 
 	/* determine where to draw the starting point */

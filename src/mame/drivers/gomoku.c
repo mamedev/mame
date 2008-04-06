@@ -52,7 +52,7 @@ static READ8_HANDLER( input_port_r )
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((readinputport(i) >> offset) & 1) << i;
+		res |= ((input_port_read_indexed(machine, i) >> offset) & 1) << i;
 
 	return res;
 }

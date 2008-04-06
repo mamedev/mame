@@ -130,22 +130,22 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return readinputportbytag("MAHJONG_P2_1");
+			return input_port_read(machine, "MAHJONG_P2_1");
 
 		case 0x53:
-			return readinputportbytag("MAHJONG_P2_2");
+			return input_port_read(machine, "MAHJONG_P2_2");
 
 		case 0x57:
-			return readinputportbytag("MAHJONG_P2_3");
+			return input_port_read(machine, "MAHJONG_P2_3");
 
 		case 0x5b:
-			return readinputportbytag("MAHJONG_P2_4");
+			return input_port_read(machine, "MAHJONG_P2_4");
 
 		case 0x5d:
-			return readinputportbytag("MAHJONG_P2_5");
+			return input_port_read(machine, "MAHJONG_P2_5");
 
 		case 0x5e:
-			return readinputportbytag("MAHJONG_P2_6");
+			return input_port_read(machine, "MAHJONG_P2_6");
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", chinsan_port_select);
@@ -159,22 +159,22 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return readinputportbytag("MAHJONG_P1_1");
+			return input_port_read(machine, "MAHJONG_P1_1");
 
 		case 0x53:
-			return readinputportbytag("MAHJONG_P1_2");
+			return input_port_read(machine, "MAHJONG_P1_2");
 
 		case 0x57:
-			return readinputportbytag("MAHJONG_P1_3");
+			return input_port_read(machine, "MAHJONG_P1_3");
 
 		case 0x5b:
-			return readinputportbytag("MAHJONG_P1_4");
+			return input_port_read(machine, "MAHJONG_P1_4");
 
 		case 0x5d:
-			return readinputportbytag("MAHJONG_P1_5");
+			return input_port_read(machine, "MAHJONG_P1_5");
 
 		case 0x5e:
-			return readinputportbytag("MAHJONG_P1_6");
+			return input_port_read(machine, "MAHJONG_P1_6");
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", chinsan_port_select);

@@ -78,11 +78,11 @@ static READ8_HANDLER( input_mux0_r )
 {
 	/* low value in the given bit selects */
 	if (!(input_mux & 0x01))
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	else if (!(input_mux & 0x02))
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	else if (!(input_mux & 0x04))
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 	return 0xff;
 }
 

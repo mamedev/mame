@@ -490,14 +490,14 @@ static READ16_HANDLER( sys18_io_r )
 						if(io_reg[0x0F] & 0x01)
 							return io_reg[0x00];
 						else
-							return readinputport(0);
+							return input_port_read_indexed(machine, 0);
 						break;
 
 					case 0x01: /* Port B - 2P controls */
 						if(io_reg[0x0F] & 0x02)
 							return io_reg[0x01];
 						else
-							return readinputport(1);
+							return input_port_read_indexed(machine, 1);
 						break;
 
 					case 0x02: /* Port C - Bidirectional I/O port */
@@ -518,21 +518,21 @@ static READ16_HANDLER( sys18_io_r )
 						if(io_reg[0x0F] & 0x10)
 							return io_reg[0x04];
 						else
-							return readinputport(2);
+							return input_port_read_indexed(machine, 2);
 						break;
 
 					case 0x05: /* Port F - DIP switch #1 */
 						if(io_reg[0x0F] & 0x20)
 							return io_reg[0x05];
 						else
-							return readinputport(3);
+							return input_port_read_indexed(machine, 3);
 						break;
 
 					case 0x06: /* Port G - DIP switch #2 */
 						if(io_reg[0x0F] & 0x40)
 							return io_reg[0x06];
 						else
-							return readinputport(4);
+							return input_port_read_indexed(machine, 4);
 						break;
 
 					case 0x07: /* Port H - Tile banking control */

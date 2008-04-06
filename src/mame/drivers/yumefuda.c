@@ -161,14 +161,14 @@ static READ8_HANDLER( mux_r )
 {
 	switch(mux_data)
 	{
-		case 0x00: return readinputport(0);
-		case 0x01: return readinputport(1);
-		case 0x02: return readinputport(2);
-		case 0x04: return readinputport(3);
-		case 0x08: return readinputport(4);
+		case 0x00: return input_port_read_indexed(machine, 0);
+		case 0x01: return input_port_read_indexed(machine, 1);
+		case 0x02: return input_port_read_indexed(machine, 2);
+		case 0x04: return input_port_read_indexed(machine, 3);
+		case 0x08: return input_port_read_indexed(machine, 4);
 		/* FIXME: Was this a quick hack? */
-		case 0x10: return 0xff; //return readinputport(5);
-		case 0x20: return 0xff; //return readinputport(6);
+		case 0x10: return 0xff; //return input_port_read_indexed(machine, 5);
+		case 0x20: return 0xff; //return input_port_read_indexed(machine, 6);
 	}
 	return 0xff;
 }

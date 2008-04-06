@@ -279,10 +279,10 @@ static READ16_HANDLER( standard_io_r )
 			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x1000/2:
-			return readinputport(offset & 3);
+			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x2000/2:
-			return readinputport(4 + (offset & 1));
+			return input_port_read_indexed(machine, 4 + (offset & 1));
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return 0xffff;
@@ -580,25 +580,25 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (video_control & 0xf)
 					{
-						case 0x00: return readinputportbytag("P1");
-						case 0x04: return readinputportbytag("ANALOGX1");
-						case 0x08: return readinputportbytag("ANALOGY1");
-						case 0x0c: return readinputportbytag("UNUSED");
+						case 0x00: return input_port_read(machine, "P1");
+						case 0x04: return input_port_read(machine, "ANALOGX1");
+						case 0x08: return input_port_read(machine, "ANALOGY1");
+						case 0x0c: return input_port_read(machine, "UNUSED");
 					}
 					break;
 				}
 
 				case 0x02:
-					return readinputportbytag("DIAL1") | (readinputportbytag("DIAL2") << 4);
+					return input_port_read(machine, "DIAL1") | (input_port_read(machine, "DIAL2") << 4);
 
 				case 0x03:
 				{
 					switch (video_control & 0xf)
 					{
-						case 0x00: return readinputportbytag("P2");
-						case 0x04: return readinputportbytag("ANALOGX2");
-						case 0x08: return readinputportbytag("ANALOGY2");
-						case 0x0c: return readinputportbytag("POW2");
+						case 0x00: return input_port_read(machine, "P2");
+						case 0x04: return input_port_read(machine, "ANALOGX2");
+						case 0x08: return input_port_read(machine, "ANALOGY2");
+						case 0x0c: return input_port_read(machine, "POW2");
 					}
 					break;
 				}
@@ -628,9 +628,9 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* upper bit of the trackball controls */
 				case 0:
 				{
-					UINT8 buttons = readinputportbytag("SERVICE");
-					UINT8 analog1 = readinputportbytag((video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-					UINT8 analog2 = readinputportbytag((video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = input_port_read(machine, "SERVICE");
+					UINT8 analog1 = input_port_read(machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+					UINT8 analog2 = input_port_read(machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
 					buttons |= (analog1 & 0x80) >> 1;
 					buttons |= (analog2 & 0x80);
 					return buttons;
@@ -640,8 +640,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 1 select switch mapped to bit 7 */
 				case 1:
 				{
-					UINT8 buttons = readinputportbytag("BUTTONS1");
-					UINT8 analog = readinputportbytag((video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+					UINT8 buttons = input_port_read(machine, "BUTTONS1");
+					UINT8 analog = input_port_read(machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 
@@ -649,13 +649,13 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				case 2:
 				{
 					if (video_control & 4)
-						return (readinputportbytag("ANALOGZ1") >> 4) | (readinputportbytag("ANALOGZ2") & 0xf0);
+						return (input_port_read(machine, "ANALOGZ1") >> 4) | (input_port_read(machine, "ANALOGZ2") & 0xf0);
 					else
 					{
 						static UINT8 last_buttons1 = 0;
 						static UINT8 last_buttons2 = 0;
-						UINT8 buttons1 = readinputportbytag("BUTTONS1");
-						UINT8 buttons2 = readinputportbytag("BUTTONS2");
+						UINT8 buttons1 = input_port_read(machine, "BUTTONS1");
+						UINT8 buttons2 = input_port_read(machine, "BUTTONS2");
 
 						if (!(buttons1 & 0x01))
 							last_buttons1 = 0;
@@ -683,8 +683,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 2 select switch mapped to bit 7 */
 				case 3:
 				{
-					UINT8 buttons = readinputportbytag("BUTTONS2");
-					UINT8 analog = readinputportbytag((video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = input_port_read(machine, "BUTTONS2");
+					UINT8 analog = input_port_read(machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 			}
@@ -714,10 +714,10 @@ static READ16_HANDLER( pshot16a_custom_io_r )
 				case 1:
 					switch ((read_port++)&3)
 					{
-						case 0: return readinputportbytag("P1");
-						case 1: return readinputportbytag("P2");
-						case 2: return readinputportbytag("P3");
-						case 3: return readinputportbytag("P4");
+						case 0: return input_port_read(machine, "P1");
+						case 1: return input_port_read(machine, "P2");
+						case 2: return input_port_read(machine, "P3");
+						case 3: return input_port_read(machine, "P4");
 					}
 
 					break;
@@ -740,8 +740,8 @@ static READ16_HANDLER( sdi_custom_io_r )
 		case 0x1000/2:
 			switch (offset & 3)
 			{
-				case 1:	return readinputportbytag((video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-				case 3:	return readinputportbytag((video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+				case 1:	return input_port_read(machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+				case 3:	return input_port_read(machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
 			}
 			break;
 	}
@@ -765,12 +765,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (readinputportbytag_safe(portname[mj_input_num], 0xff) != 0xff)
+					if (input_port_read_safe(machine, portname[mj_input_num], 0xff) != 0xff)
 						return 0xff & ~(1 << mj_input_num);
 					return 0xff;
 
 				case 2:
-					return readinputportbytag_safe(portname[mj_input_num], 0xff);
+					return input_port_read_safe(machine, portname[mj_input_num], 0xff);
 			}
 			break;
 	}

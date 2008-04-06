@@ -446,7 +446,7 @@ WRITE64_HANDLER( dc_maple_w )
 									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
 									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
 
-									a = readinputportbytag("IN0"); // put keys here
+									a = input_port_read(machine, "IN0"); // put keys here
 									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
 									pos = 0x11;
 									tocopy = 17;
@@ -524,10 +524,10 @@ WRITE64_HANDLER( dc_maple_w )
 												// first function
 												maple0x86data2[pos+ 9]=1; // report
 												maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
-												maple0x86data2[pos+11]=readinputportbytag("IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
-												maple0x86data2[pos+12]=readinputportbytag("IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
-												maple0x86data2[pos+13]=readinputportbytag("IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
-												maple0x86data2[pos+14]=readinputportbytag("IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
+												maple0x86data2[pos+11]=input_port_read(machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
+												maple0x86data2[pos+12]=input_port_read(machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
+												maple0x86data2[pos+13]=input_port_read(machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
+												maple0x86data2[pos+14]=input_port_read(machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
 												// second function
 												maple0x86data2[pos+15]=1; // report
 												maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)

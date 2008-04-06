@@ -165,7 +165,7 @@ static READ8_HANDLER( cliff_port_r )
 {
 	if ( port_bank < 7 )
 	{
-		return readinputport( port_bank );
+		return input_port_read_indexed(machine,  port_bank );
 	}
 
 	/* output is pulled up for non-mapped ports */

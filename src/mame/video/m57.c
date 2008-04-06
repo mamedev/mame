@@ -158,7 +158,7 @@ VIDEO_START( m57 )
 WRITE8_HANDLER( m57_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	flipscreen = (data & 0x01) ^ (~readinputportbytag("DSW2") & 0x01);
+	flipscreen = (data & 0x01) ^ (~input_port_read(machine, "DSW2") & 0x01);
 	tilemap_set_flip(bg_tilemap, flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	coin_counter_w(0,data & 0x02);

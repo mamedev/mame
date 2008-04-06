@@ -101,7 +101,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	if ((readinputport(2) & 0x70) != 0x70) return 0xff;
+	if ((input_port_read_indexed(machine, 2) & 0x70) != 0x70) return 0xff;
 	return 0;
 }
 
@@ -545,11 +545,11 @@ static INTERRUPT_GEN( firetrap )
 
 	/* Check for coin IRQ */
 	if (cpu_getiloops()) {
-		if ((readinputport(5) & 0x7) != 0x7 && !latch) {
-			coin_command_pending=~readinputport(5);
+		if ((input_port_read_indexed(machine, 5) & 0x7) != 0x7 && !latch) {
+			coin_command_pending=~input_port_read_indexed(machine, 5);
 			latch=1;
 		}
-		if ((readinputport(5) & 0x7) == 0x7)
+		if ((input_port_read_indexed(machine, 5) & 0x7) == 0x7)
 			latch=0;
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu

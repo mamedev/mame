@@ -389,7 +389,7 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( dipswitches_r )
 {
-	return (readinputport(0) & 0xfffe) | ts;
+	return (input_port_read_indexed(machine, 0) & 0xfffe) | ts;
 }
 
 /*
@@ -448,8 +448,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tx1_ppi_latch_w )
 {
-	tx1_ppi_latch_a = ((readinputportbytag("AN_BRAKE") & 0xf) << 4) | (readinputportbytag("AN_ACCELERATOR") & 0xf);
-	tx1_ppi_latch_b = readinputportbytag("AN_STEERING");
+	tx1_ppi_latch_a = ((input_port_read(machine, "AN_BRAKE") & 0xf) << 4) | (input_port_read(machine, "AN_ACCELERATOR") & 0xf);
+	tx1_ppi_latch_b = input_port_read(machine, "AN_STEERING");
 }
 
 static READ8_HANDLER( tx1_ppi_porta_r )
@@ -459,7 +459,7 @@ static READ8_HANDLER( tx1_ppi_porta_r )
 
 static READ8_HANDLER( tx1_ppi_portb_r )
 {
-	return readinputportbytag("PPI_PORTD") | tx1_ppi_latch_b;
+	return input_port_read(machine, "PPI_PORTD") | tx1_ppi_latch_b;
 }
 
 static ADDRESS_MAP_START( tx1_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
@@ -535,11 +535,11 @@ static READ8_HANDLER( bb_analog_r )
 {
 	if ( offset == 1 )
 	{
-		return ((readinputportbytag("AN_ACCELERATOR") & 0xf) << 4) | readinputportbytag("AN_STEERING");
+		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
 	}
 	else
 	{
-		return (readinputportbytag("AN_BRAKE") & 0xf) << 4;
+		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
 	}
 }
 
@@ -547,11 +547,11 @@ static READ8_HANDLER( bbjr_analog_r )
 {
 	if ( offset == 0 )
 	{
-		return ((readinputportbytag("AN_ACCELERATOR") & 0xf) << 4) | readinputportbytag("AN_STEERING");
+		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
 	}
 	else
 	{
-		return (readinputportbytag("AN_BRAKE") & 0xf) << 4;
+		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
 	}
 }
 

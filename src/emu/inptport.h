@@ -938,8 +938,8 @@ void input_port_update_defaults(void);
 
 UINT32 get_crosshair_pos(int port_num, UINT8 player, UINT8 axis);
 
-UINT32 readinputport(int port);
-UINT32 readinputportbytag(const char *tag);
-UINT32 readinputportbytag_safe(const char *tag, UINT32 defvalue);
+UINT32 input_port_read_indexed(running_machine *machine, int port);
+UINT32 input_port_read(running_machine *machine, const char *tag);
+UINT32 input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue);
 
 #endif	/* __INPTPORT_H__ */

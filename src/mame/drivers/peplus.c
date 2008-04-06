@@ -419,8 +419,8 @@ static READ8_HANDLER( peplus_crtc_lpen1_r )
 static READ8_HANDLER( peplus_crtc_lpen2_r )
 {
     UINT8 ret_val = 0x00;
-    UINT8 x_val = readinputportbytag_safe("TOUCH_X",0x00);
-    UINT8 y_val = (0x19 - readinputportbytag_safe("TOUCH_Y",0x00));
+    UINT8 x_val = input_port_read_safe(machine, "TOUCH_X",0x00);
+    UINT8 y_val = (0x19 - input_port_read_safe(machine, "TOUCH_Y",0x00));
     UINT16 t_val = y_val * 0x28 + (x_val+1);
 
 	switch(vid_register) {
@@ -530,7 +530,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		sda = i2cmem_read(0, I2CMEM_SDA);
 	}
 
-	if ((readinputportbytag_safe("SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
+	if ((input_port_read_safe(machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
 		coin_state = 1; // Start Coin Cycle
 		last_cycles = activecpu_gettotalcycles();
 	} else {
@@ -566,7 +566,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	}
 
 	if (curr_cycles - last_door > 6000) { // Guessing with 6000
-		if ((readinputportbytag_safe("DOOR",0xff) & 0x01) == 0x01) {
+		if ((input_port_read_safe(machine, "DOOR",0xff) & 0x01) == 0x01) {
 			door_open = (!door_open & 0x01);
 		} else {
 			door_open = 1;
@@ -963,7 +963,7 @@ static MACHINE_RESET( peplus )
     autohold_addr = 0x5e7e; // AutoHold Address
 
     if (autohold_addr)
-        program_ram[autohold_addr] = readinputportbytag_safe("AUTOHOLD",0x00) & 0x01;
+        program_ram[autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
 */
 }
 

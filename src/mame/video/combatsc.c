@@ -346,7 +346,7 @@ static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 
 static READ8_HANDLER( combascb_io_r )
 {
-	return readinputport(offset);
+	return input_port_read_indexed(machine, offset);
 }
 
 static WRITE8_HANDLER( combascb_priority_w )

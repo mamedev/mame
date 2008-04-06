@@ -90,7 +90,7 @@ static MACHINE_RESET( eprom )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int result = readinputport(1);
+	int result = input_port_read_indexed(machine, 1);
 
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0004;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0008;
@@ -103,7 +103,7 @@ static READ16_HANDLER( special_port1_r )
 static READ16_HANDLER( adc_r )
 {
 	static int last_offset;
-	int result = readinputport(2 + (last_offset & 3));
+	int result = input_port_read_indexed(machine, 2 + (last_offset & 3));
 	last_offset = offset;
 	return result;
 }

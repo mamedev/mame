@@ -446,8 +446,8 @@ static VIDEO_UPDATE( exidy440 )
 	{
 		int i;
 
-		int beamx = ((readinputport(4) & 0xff) * (HBSTART - HBEND)) >> 8;
-		int beamy = ((readinputport(5) & 0xff) * (VBSTART - VBEND)) >> 8;
+		int beamx = ((input_port_read_indexed(screen->machine, 4) & 0xff) * (HBSTART - HBEND)) >> 8;
+		int beamy = ((input_port_read_indexed(screen->machine, 5) & 0xff) * (VBSTART - VBEND)) >> 8;
 
 		/* The timing of this FIRQ is very important. The games look for an FIRQ
             and then wait about 650 cycles, clear the old FIRQ, and wait a

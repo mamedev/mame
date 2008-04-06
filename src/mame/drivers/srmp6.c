@@ -348,14 +348,14 @@ static WRITE16_HANDLER( srmp6_input_select_w )
 static READ16_HANDLER( srmp6_inputs_r )
 {
 	if (offset == 0)			// DSW
-		return readinputport(4);
+		return input_port_read_indexed(machine, 4);
 
 	switch(srmp6_input_select)	// inputs
 	{
-		case 1<<0: return readinputport(0);
-		case 1<<1: return readinputport(1);
-		case 1<<2: return readinputport(2);
-		case 1<<3: return readinputport(3);
+		case 1<<0: return input_port_read_indexed(machine, 0);
+		case 1<<1: return input_port_read_indexed(machine, 1);
+		case 1<<2: return input_port_read_indexed(machine, 2);
+		case 1<<3: return input_port_read_indexed(machine, 3);
 	}
 
 	return 0;

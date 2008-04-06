@@ -319,10 +319,10 @@ static READ8_HANDLER(read_a00x)
  switch(offset)
  {
 	case 0x02: return reg_a002;
-	case 0x04: return readinputportbytag("A004");
-  case 0x05: return readinputportbytag("A005");
+	case 0x04: return input_port_read(machine, "A004");
+  case 0x05: return input_port_read(machine, "A005");
   case 0x0c: return input_port_0_r(machine,0); // stats / reset
-	case 0x0e: return readinputportbytag("A00E");// coin/reset
+	case 0x0e: return input_port_read(machine, "A00E");// coin/reset
  }
 
 
@@ -411,8 +411,8 @@ static WRITE8_HANDLER(yscroll_w)
 	scrolly=data;
 }
 
-static READ8_HANDLER(portA_r) {	return readinputportbytag("YM_PortA"); }
-static READ8_HANDLER(portB_r) {	return readinputportbytag("YM_PortB");}
+static READ8_HANDLER(portA_r) {	return input_port_read(machine, "YM_PortA"); }
+static READ8_HANDLER(portB_r) {	return input_port_read(machine, "YM_PortB");}
 
 static const struct YM2203interface ym2203_interface_0 =
 {

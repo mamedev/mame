@@ -41,10 +41,10 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	memset(potsense, 0, sizeof potsense);
 
-	potsense[readinputport(1)] |= 1;
-	potsense[readinputport(2)] |= 2;
-	potsense[readinputport(3)] |= 4;
-	potsense[readinputport(4)] |= 8;
+	potsense[input_port_read_indexed(machine, 1)] |= 1;
+	potsense[input_port_read_indexed(machine, 2)] |= 2;
+	potsense[input_port_read_indexed(machine, 3)] |= 4;
+	potsense[input_port_read_indexed(machine, 4)] |= 8;
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
@@ -79,7 +79,7 @@ static MACHINE_RESET( flyball )
 
 static READ8_HANDLER( flyball_input_r )
 {
-	return readinputport(0) & readinputport(5);
+	return input_port_read_indexed(machine, 0) & input_port_read_indexed(machine, 5);
 }
 
 static READ8_HANDLER( flyball_scanline_r )

@@ -1058,10 +1058,10 @@ static READ64_HANDLER( model3_ctrl_r )
 			{
 				if(model3_controls_bank & 0x1) {
 					eeprom_bit = EEPROM_read_bit() << 5;
-					return ((readinputport(1) & ~0x20) | eeprom_bit) << 24;
+					return ((input_port_read_indexed(machine, 1) & ~0x20) | eeprom_bit) << 24;
 				}
 				else {
-					return (readinputport(0)) << 24;
+					return (input_port_read_indexed(machine, 0)) << 24;
 				}
 			}
 			break;
@@ -1069,11 +1069,11 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 1:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)readinputport(2) << 56;
+				return (UINT64)input_port_read_indexed(machine, 2) << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return readinputport(3) << 24;
+				return input_port_read_indexed(machine, 3) << 24;
 			}
 			break;
 
@@ -1107,7 +1107,7 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 7:
 			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
-				UINT8 adc_data = readinputport(5 + adc_channel);
+				UINT8 adc_data = input_port_read_indexed(machine, 5 + adc_channel);
 				adc_channel++;
 				adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
@@ -1159,32 +1159,32 @@ static WRITE64_HANDLER( model3_ctrl_w )
 						switch(lightgun_reg_sel)		/* read lightrun register */
 						{
 							case 0:		/* player 1 gun X-position, lower 8-bits */
-								model3_serial_fifo2 = readinputport(6) & 0xff;
+								model3_serial_fifo2 = input_port_read_indexed(machine, 6) & 0xff;
 								break;
 							case 1:		/* player 1 gun X-position, upper 2-bits */
-								model3_serial_fifo2 = (readinputport(6) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read_indexed(machine, 6) >> 8) & 0x3;
 								break;
 							case 2:		/* player 1 gun Y-position, lower 8-bits */
-								model3_serial_fifo2 = readinputport(5) & 0xff;
+								model3_serial_fifo2 = input_port_read_indexed(machine, 5) & 0xff;
 								break;
 							case 3:		/* player 1 gun Y-position, upper 2-bits */
-								model3_serial_fifo2 = (readinputport(5) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read_indexed(machine, 5) >> 8) & 0x3;
 								break;
 							case 4:		/* player 2 gun X-position, lower 8-bits */
-								model3_serial_fifo2 = readinputport(8) & 0xff;
+								model3_serial_fifo2 = input_port_read_indexed(machine, 8) & 0xff;
 								break;
 							case 5:		/* player 2 gun X-position, upper 2-bits */
-								model3_serial_fifo2 = (readinputport(8) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read_indexed(machine, 8) >> 8) & 0x3;
 								break;
 							case 6:		/* player 2 gun Y-position, lower 8-bits */
-								model3_serial_fifo2 = readinputport(7) & 0xff;
+								model3_serial_fifo2 = input_port_read_indexed(machine, 7) & 0xff;
 								break;
 							case 7:		/* player 2 gun Y-position, upper 2-bits */
-								model3_serial_fifo2 = (readinputport(7) >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read_indexed(machine, 7) >> 8) & 0x3;
 								break;
 							case 8:		/* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
 								model3_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
-								if(readinputport(9) & 0x1) {
+								if(input_port_read_indexed(machine, 9) & 0x1) {
 									model3_serial_fifo2 |= 0x01;
 								}
 								break;

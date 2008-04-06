@@ -28,7 +28,7 @@ static CUSTOM_INPUT( get_collision )
 
 static CUSTOM_INPUT( get_joystick )
 {
-	UINT8 joy = readinputportbytag(param) & 3;
+	UINT8 joy = input_port_read(machine, param) & 3;
 
 	if (joy == 1)
 	{
@@ -52,9 +52,9 @@ static TIMER_CALLBACK( nmi_callback	)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	watchdog_enable(machine, readinputport(0) & 0x40);
+	watchdog_enable(machine, input_port_read_indexed(machine, 0) & 0x40);
 
-	if (readinputport(0) & 0x40)
+	if (input_port_read_indexed(machine, 0) & 0x40)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, nmi_callback);
@@ -75,21 +75,21 @@ static READ8_HANDLER( ultratnk_wram_r )
 
 static READ8_HANDLER( ultratnk_analog_r )
 {
-	return (readinputportbytag("ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine, "ANALOG") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( ultratnk_coin_r )
 {
-	return (readinputportbytag("COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine, "COIN") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( ultratnk_collision_r )
 {
-	return (readinputportbytag("COLLISION") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine, "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
 static READ8_HANDLER( ultratnk_options_r )
 {
-	return (readinputportbytag("DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(machine, "DIP") >> (2 * (offset & 3))) & 3;
 }
 
 

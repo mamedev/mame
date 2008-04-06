@@ -716,8 +716,8 @@ static READ8_HANDLER( bosco_dsw_r )
 {
 	int bit0,bit1;
 
-	bit0 = (readinputportbytag("DSWB") >> offset) & 1;
-	bit1 = (readinputportbytag("DSWA") >> offset) & 1;
+	bit0 = (input_port_read(machine, "DSWB") >> offset) & 1;
+	bit1 = (input_port_read(machine, "DSWA") >> offset) & 1;
 
 	return bit0 | (bit1 << 1);
 }
@@ -771,14 +771,14 @@ static WRITE8_HANDLER( bosco_latch_w )
 }
 
 
-static READ8_HANDLER( in0_l )	{ return readinputportbytag("IN0"); }		// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return readinputportbytag("IN0") >> 4; }	// coins
-static READ8_HANDLER( in1_l )	{ return readinputportbytag("IN1"); }		// P1 joystick
-static READ8_HANDLER( in1_h )	{ return readinputportbytag("IN1") >> 4; }	// P2 joystick
-static READ8_HANDLER( dipA_l )	{ return readinputportbytag("DSWA"); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return readinputportbytag("DSWA") >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return readinputportbytag("DSWB"); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return readinputportbytag("DSWB") >> 4; }	// dips B
+static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0"); }		// fire and start buttons
+static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }	// coins
+static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "IN1"); }		// P1 joystick
+static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "IN1") >> 4; }	// P2 joystick
+static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSWA"); }		// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSWA") >> 4; }	// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSWB"); }		// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSWB") >> 4; }	// dips B
 static WRITE8_HANDLER( out_0 )
 {
 	set_led_status(1,data & 1);

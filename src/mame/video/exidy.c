@@ -70,17 +70,17 @@ VIDEO_START( exidy )
  *
  *************************************/
 
-INLINE void latch_condition(int collision)
+INLINE void latch_condition(running_machine *machine, int collision)
 {
 	collision ^= collision_invert;
-	int_condition = (readinputportbytag("INTSOURCE") & ~0x1c) | (collision & collision_mask);
+	int_condition = (input_port_read(machine, "INTSOURCE") & ~0x1c) | (collision & collision_mask);
 }
 
 
 INTERRUPT_GEN( exidy_vblank_interrupt )
 {
 	/* latch the current condition */
-	latch_condition(0);
+	latch_condition(machine, 0);
 	int_condition &= ~0x80;
 
 	/* set the IRQ line */
@@ -283,7 +283,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static TIMER_CALLBACK( collision_irq_callback )
 {
 	/* latch the collision bits */
-	latch_condition(param);
+	latch_condition(machine, param);
 
 	/* set the IRQ line */
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);

@@ -301,7 +301,7 @@ static READ8_HANDLER( disk_iobank_r )
 {
 	printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,activecpu_get_pc());
 	if(offset == 1)
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 
 	return disk_data[offset];
 }

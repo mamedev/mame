@@ -283,25 +283,25 @@ READ32_HANDLER( policetr_video_r )
 	{
 		/* latch 0x00 is player 1's gun X coordinate */
 		case 0x00:
-			inputval = ((readinputport(3) & 0xff) * width) >> 8;
+			inputval = ((input_port_read_indexed(machine, 3) & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x01 is player 1's gun Y coordinate */
 		case 0x01:
-			inputval = ((readinputport(4) & 0xff) * height) >> 8;
+			inputval = ((input_port_read_indexed(machine, 4) & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 
 		/* latch 0x02 is player 2's gun X coordinate */
 		case 0x02:
-			inputval = ((readinputport(5) & 0xff) * width) >> 8;
+			inputval = ((input_port_read_indexed(machine, 5) & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x03 is player 2's gun Y coordinate */
 		case 0x03:
-			inputval = ((readinputport(6) & 0xff) * height) >> 8;
+			inputval = ((input_port_read_indexed(machine, 6) & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 

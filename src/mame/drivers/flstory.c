@@ -163,7 +163,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( victnine_port_5_r )
 {
-	return (victnine_mcu_status_r(machine,0) & 3) | (readinputport(5) & ~3);
+	return (victnine_mcu_status_r(machine,0) & 3) | (input_port_read_indexed(machine, 5) & ~3);
 }
 
 static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )

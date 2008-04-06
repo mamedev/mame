@@ -702,17 +702,17 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( nova_input_port_0_r )
 {
-	return readinputport(0)<<24 | readinputport(1)<<16 | readinputport(2)<<8 | readinputport(3);
+	return input_port_read_indexed(machine, 0)<<24 | input_port_read_indexed(machine, 1)<<16 | input_port_read_indexed(machine, 2)<<8 | input_port_read_indexed(machine, 3);
 }
 
 static READ32_HANDLER( nova_input_port_3_r )
 {
-	return readinputport(8) | 0xffffff00;
+	return input_port_read_indexed(machine, 8) | 0xffffff00;
 }
 
 static READ32_HANDLER( nova_input_port_dip_r )
 {
-	return readinputport(4)<<24 | readinputport(5)<<16 | readinputport(6)<<8 | readinputport(7);
+	return input_port_read_indexed(machine, 4)<<24 | input_port_read_indexed(machine, 5)<<16 | input_port_read_indexed(machine, 6)<<8 | input_port_read_indexed(machine, 7);
 }
 
 static UINT32 timer_0_temp[4];

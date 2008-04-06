@@ -57,7 +57,7 @@ READ8_HANDLER( simpsons_eeprom_r )
 
 	res |= 0x20;//konami_eeprom_ack() << 5; /* add the ack */
 
-	res |= readinputport( 5 ) & 1; /* test switch */
+	res |= input_port_read_indexed(machine,  5 ) & 1; /* test switch */
 
 	if (init_eeprom_count)
 	{

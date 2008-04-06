@@ -532,7 +532,7 @@ static WRITE16_HANDLER( scudhamm_motor_command_w )
 
 READ16_HANDLER( scudhamm_analog_r )
 {
-	return readinputport(1);
+	return input_port_read_indexed(machine, 1);
 }
 
 /*
@@ -627,17 +627,17 @@ static READ16_HANDLER( armchmp2_analog_r )
 	int armdelta;
 	static int armold = 0;
 
-	armdelta = readinputport(1) - armold;
-	armold = readinputport(1);
+	armdelta = input_port_read_indexed(machine, 1) - armold;
+	armold = input_port_read_indexed(machine, 1);
 
 	return ~( scudhamm_motor_command + armdelta );	// + x : x<=0 and player loses, x>0 and player wins
 }
 
 static READ16_HANDLER( armchmp2_buttons_r )
 {
-	int arm_x = readinputport(1);
+	int arm_x = input_port_read_indexed(machine, 1);
 
-	UINT16 ret = readinputport(0);
+	UINT16 ret = input_port_read_indexed(machine, 0);
 
 	if (arm_x < 0x40)		ret &= ~1;
 	else if (arm_x > 0xc0)	ret &= ~2;

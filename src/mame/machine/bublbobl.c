@@ -181,7 +181,7 @@ WRITE8_HANDLER( bublbobl_mcu_ddr4_w )
 READ8_HANDLER( bublbobl_mcu_port1_r )
 {
 //logerror("%04x: 6801U4 port 1 read\n",activecpu_get_pc());
-	port1_in = readinputport(0);
+	port1_in = input_port_read_indexed(machine, 0);
 	return (port1_out & ddr1) | (port1_in & ~ddr1);
 }
 
@@ -230,7 +230,7 @@ WRITE8_HANDLER( bublbobl_mcu_port2_w )
 		{
 			// read
 			if ((address & 0x0800) == 0x0000)
-				port3_in = readinputport((address & 3) + 1);
+				port3_in = input_port_read_indexed(machine, (address & 3) + 1);
 			else if ((address & 0x0c00) == 0x0c00)
 				port3_in = bublbobl_mcu_sharedram[address & 0x03ff];
 //          logerror("reading %02x from shared RAM %04x\n",port3_in,address);
@@ -451,7 +451,7 @@ WRITE8_HANDLER( bublbobl_68705_portB_w )
 			if ((address & 0x0800) == 0x0000)
 			{
 //logerror("%04x: 68705 read input port %02x\n",activecpu_get_pc(),address);
-				latch = readinputport((address & 3) + 1);
+				latch = input_port_read_indexed(machine, (address & 3) + 1);
 			}
 			else if ((address & 0x0c00) == 0x0c00)
 			{

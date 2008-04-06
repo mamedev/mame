@@ -191,7 +191,7 @@ static INTERRUPT_GEN( wwfsstars_interrupt )
 
 static READ16_HANDLER( input_port_2_word_r_cust )
 {
-	return readinputport(2) | vblank;
+	return input_port_read_indexed(machine, 2) | vblank;
 }
 
 /*******************************************************************************

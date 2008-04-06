@@ -181,16 +181,16 @@ these make the game a bit easier for testing purposes
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	int fake = readinputport(6+offset);
+	int fake = input_port_read_indexed(machine, 6+offset);
 
-	return ((fake & 0x01) ? fake  : readinputport(4+offset));
+	return ((fake & 0x01) ? fake  : input_port_read_indexed(machine, 4+offset));
 }
 
 #else
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	return readinputport(4+offset);
+	return input_port_read_indexed(machine, 4+offset);
 }
 
 #endif

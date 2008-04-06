@@ -164,31 +164,31 @@ Stephh's log (2006.09.20) :
 READ16_HANDLER( cps1_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	int control = readinputportbytag(dswname[offset]);
+	int control = input_port_read(machine, dswname[offset]);
 	return control << 8 | control;
 }
 
 READ16_HANDLER( cps1_in0_r )
 {
-	int buttons = readinputportbytag("IN0");
+	int buttons = input_port_read(machine, "IN0");
 	return buttons << 8 | buttons;
 }
 
 READ16_HANDLER( cps1_in1_r )
 {
-	int buttons = readinputportbytag("IN1");
+	int buttons = input_port_read(machine, "IN1");
 	return buttons;
 }
 
 READ16_HANDLER( cps1_in2_r )
 {
-	int buttons = readinputportbytag("IN2");
+	int buttons = input_port_read(machine, "IN2");
 	return buttons << 8 | buttons;
 }
 
 READ16_HANDLER( cps1_in3_r )
 {
-	int buttons = readinputportbytag("IN3");
+	int buttons = input_port_read(machine, "IN3");
 	return buttons << 8 | buttons;
 }
 
@@ -197,22 +197,22 @@ static int dial[2];
 
 static READ16_HANDLER( forgottn_dial_0_r )
 {
-	return ((readinputportbytag("DIAL0") - dial[0]) >> (8*offset)) & 0xff;
+	return ((input_port_read(machine, "DIAL0") - dial[0]) >> (8*offset)) & 0xff;
 }
 
 static READ16_HANDLER( forgottn_dial_1_r )
 {
-	return ((readinputportbytag("DIAL1") - dial[1]) >> (8*offset)) & 0xff;
+	return ((input_port_read(machine, "DIAL1") - dial[1]) >> (8*offset)) & 0xff;
 }
 
 static WRITE16_HANDLER( forgottn_dial_0_reset_w )
 {
-	dial[0] = readinputportbytag("DIAL0");
+	dial[0] = input_port_read(machine, "DIAL0");
 }
 
 static WRITE16_HANDLER( forgottn_dial_1_reset_w )
 {
-	dial[1] = readinputportbytag("DIAL1");
+	dial[1] = input_port_read(machine, "DIAL1");
 }
 
 

@@ -203,20 +203,20 @@ nthbyte( const UINT32 *pSource, int offs )
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static void
-ReadAnalogDrivingPorts( UINT16 *gas, UINT16 *brake, UINT16 *steer )
+ReadAnalogDrivingPorts( running_machine *machine, UINT16 *gas, UINT16 *brake, UINT16 *steer )
 {
-	*gas   = readinputport(2);
-	*brake = readinputport(3);
-	*steer = readinputport(4);
+	*gas   = input_port_read_indexed(machine, 2);
+	*brake = input_port_read_indexed(machine, 3);
+	*steer = input_port_read_indexed(machine, 4);
 }
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static UINT16
-AnalogAsDigital( void )
+AnalogAsDigital( running_machine *machine )
 {
-	UINT16 stick = readinputport(1);
-	UINT16 gas   = readinputport(2);
-	UINT16 steer = readinputport(4);
+	UINT16 stick = input_port_read_indexed(machine, 1);
+	UINT16 gas   = input_port_read_indexed(machine, 2);
+	UINT16 steer = input_port_read_indexed(machine, 4);
 	UINT16 result = 0xffff;
 
 	switch( namcos22_gametype )
@@ -263,12 +263,12 @@ AnalogAsDigital( void )
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static void
-HandleCoinage(int slots)
+HandleCoinage(running_machine *machine, int slots)
 {
 	UINT16 *share16 = (UINT16 *)namcos22_shareram;
 	UINT32 coin_state;
 
-	coin_state = readinputport(1) & 0x1200;
+	coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 
 	if (!(coin_state & 0x1000) && (old_coin_state & 0x1000))
 	{
@@ -292,15 +292,15 @@ HandleCoinage(int slots)
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static void
-HandleDrivingIO( void )
+HandleDrivingIO( running_machine *machine )
 {
 	if( nthbyte(namcos22_system_controller,0x18)!=0 )
 	{
-		UINT16 flags = readinputport(1);
+		UINT16 flags = input_port_read_indexed(machine, 1);
 		UINT16 gas,brake,steer;
-		ReadAnalogDrivingPorts( &gas, &brake, &steer );
+		ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
 
-		HandleCoinage(2);
+		HandleCoinage(machine, 2);
 
 		switch (namcos22_gametype)
 		{
@@ -348,22 +348,22 @@ HandleDrivingIO( void )
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
 static void
-HandleCyberCommandoIO( void )
+HandleCyberCommandoIO( running_machine *machine )
 {
 	if( nthbyte(namcos22_system_controller,0x18)!=0 )
 	{
-		UINT16 flags = readinputport(1);
+		UINT16 flags = input_port_read_indexed(machine, 1);
 
-		UINT16 volume0 = readinputport(2)*0x10;
-		UINT16 volume1 = readinputport(3)*0x10;
-		UINT16 volume2 = readinputport(4)*0x10;
-		UINT16 volume3 = readinputport(5)*0x10;
+		UINT16 volume0 = input_port_read_indexed(machine, 2)*0x10;
+		UINT16 volume1 = input_port_read_indexed(machine, 3)*0x10;
+		UINT16 volume2 = input_port_read_indexed(machine, 4)*0x10;
+		UINT16 volume3 = input_port_read_indexed(machine, 5)*0x10;
 
 		namcos22_shareram[0x030/4] = (flags<<16)|volume0;
 		namcos22_shareram[0x034/4] = (volume1<<16)|volume2;
 		namcos22_shareram[0x038/4] = volume3<<16;
 
-		HandleCoinage(1);
+		HandleCoinage(machine, 1);
 	}
 } /* HandleCyberCommandoIO */
 
@@ -1299,14 +1299,14 @@ static READ32_HANDLER( namcos22_portbit_r )
 }
 static WRITE32_HANDLER( namcos22_portbit_w )
 {
-	unsigned dat50000008 = AnalogAsDigital();
+	unsigned dat50000008 = AnalogAsDigital(machine);
 	unsigned dat5000000a = 0xffff;
 	mSys22PortBits = (dat50000008<<16)|dat5000000a;
 }
 
 static READ32_HANDLER( namcos22_dipswitch_r )
 {
-	return readinputport(0)<<16;
+	return input_port_read_indexed(machine, 0)<<16;
 }
 
 static READ32_HANDLER( namcos22_mcuram_r )
@@ -1376,8 +1376,8 @@ static WRITE32_HANDLER( spotram_w )
 
 static READ32_HANDLER( namcos22_gun_r )
 {
-	int xpos = readinputport(1)*640/0xff;
-	int ypos = readinputport(2)*480/0xff;
+	int xpos = input_port_read_indexed(machine, 1)*640/0xff;
+	int ypos = input_port_read_indexed(machine, 2)*480/0xff;
 	switch( offset )
 	{
 	case 0: /* 430000 */
@@ -1541,11 +1541,11 @@ static READ8_HANDLER( mcu_port5_r )
 		{
 			if (mFrameCount & 1)
 			{
-				return readinputportbytag_safe("MCUP5A", 0xff) | 0x80;
+				return input_port_read_safe(machine, "MCUP5A", 0xff) | 0x80;
 			}
 			else
 			{
-				return readinputportbytag_safe("MCUP5A", 0xff) & 0x7f;
+				return input_port_read_safe(machine, "MCUP5A", 0xff) & 0x7f;
 			}
 		}
 		else
@@ -1564,11 +1564,11 @@ static READ8_HANDLER( mcu_port5_r )
 	{
 		if (p4 & 8)
 		{
-			return readinputportbytag_safe("MCUP5A", 0xff);
+			return input_port_read_safe(machine, "MCUP5A", 0xff);
 		}
 		else
 		{
-			return readinputportbytag_safe("MCUP5B", 0xff);
+			return input_port_read_safe(machine, "MCUP5B", 0xff);
 		}
 	}
 }
@@ -1611,8 +1611,8 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 {
 	static UINT16 ddx, ddy;
 
-	ddx = ((readinputport(2)^0xff)-1)<<2;
-	ddy = (readinputport(3)-1)<<2;
+	ddx = ((input_port_read_indexed(machine, 2)^0xff)-1)<<2;
+	ddy = (input_port_read_indexed(machine, 3)-1)<<2;
 
 	switch (offset)
 	{
@@ -1625,7 +1625,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 			// and timer A3 is configured by the MCU program to cause an interrupt each time
 			// it's clocked.  by counting the number of interrupts in a frame, we can determine
 			// how fast the user is pedaling.
-			if( readinputport(1) & 0x10 )
+			if( input_port_read_indexed(machine, 1) & 0x10 )
 			{
 				int i;
 				for (i = 0; i < 16; i++)
@@ -1654,12 +1654,12 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 // 0 H+L = swing, 1 H+L = edge
 static READ8_HANDLER( alpineracer_mcu_adc_r )
 {
-	UINT16 swing = (0xff-readinputport(2))<<2;
-	UINT16 edge = (0xff-readinputport(3))<<2;
+	UINT16 swing = (0xff-input_port_read_indexed(machine, 2))<<2;
+	UINT16 edge = (0xff-input_port_read_indexed(machine, 3))<<2;
 
 	// fake out the centering a bit
-	if (readinputport(2) == 0x80) swing = 0x200;
-	if (readinputport(3) == 0x80) edge = 0x200;
+	if (input_port_read_indexed(machine, 2) == 0x80) swing = 0x200;
+	if (input_port_read_indexed(machine, 3) == 0x80) edge = 0x200;
 
 	switch (offset)
 	{
@@ -1688,7 +1688,7 @@ static READ8_HANDLER( alpineracer_mcu_adc_r )
 static READ8_HANDLER( cybrcycc_mcu_adc_r )
 {
 	UINT16 gas,brake,steer;
-	ReadAnalogDrivingPorts( &gas, &brake, &steer );
+	ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
 
 	gas <<= 2;
 	brake <<= 2;
@@ -1730,9 +1730,9 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 {
 	UINT16 pedal, x, y;
 
-	pedal = readinputport(1)<<2;
-	x = readinputport(2)<<2;
-	y = readinputport(3)<<2;
+	pedal = input_port_read_indexed(machine, 1)<<2;
+	x = input_port_read_indexed(machine, 2)<<2;
+	y = input_port_read_indexed(machine, 3)<<2;
 
 
 	switch (offset)
@@ -2127,7 +2127,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 	switch( namcos22_gametype )
 	{
 	case NAMCOS22_RIDGE_RACER:
-		HandleDrivingIO();
+		HandleDrivingIO(machine);
 		irq_level1 = 4;
 		irq_level2 = 5;
 		// 1:0a0b6
@@ -2140,7 +2140,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 
 	case NAMCOS22_RIDGE_RACER2:
-		HandleDrivingIO();
+		HandleDrivingIO(machine);
 		irq_level1 = 1;
 		irq_level2 = 5;
 		//1:0d10c  40000005
@@ -2153,11 +2153,11 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 
 	case NAMCOS22_RAVE_RACER:
-		HandleDrivingIO();
+		HandleDrivingIO(machine);
 		break;
 
 	case NAMCOS22_VICTORY_LAP:
-		HandleDrivingIO();
+		HandleDrivingIO(machine);
 		// a54 indir to 21c2 (hblank?)
 		// a5a (rte)
 		// a5c (rte)
@@ -2170,7 +2170,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 
 	case NAMCOS22_ACE_DRIVER:
-		HandleDrivingIO();
+		HandleDrivingIO(machine);
 		// 9f8 (rte)
 		// 9fa (rte)
 		// 9fc (rte)
@@ -2188,7 +2188,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		//move.b  #$35, $40000004.l
 		//
 		//move.b  #$34, $40000004.l
-		HandleCyberCommandoIO();
+		HandleCyberCommandoIO(machine);
 		irq_level1 = nthbyte(namcos22_system_controller,0x04)&0x7;
 		irq_level2 = nthbyte(namcos22_system_controller,0x02)&0x7;
 		break;
@@ -4331,7 +4331,7 @@ static DRIVER_INIT( ridgeraj )
 
 	install_c74_speedup();
 
-	old_coin_state = readinputport(1) & 0x1200;
+	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
 }
 
@@ -4341,7 +4341,7 @@ static DRIVER_INIT( ridger2j )
 
 	install_c74_speedup();
 
-	old_coin_state = readinputport(1) & 0x1200;
+	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
 }
 
@@ -4351,7 +4351,7 @@ static DRIVER_INIT( acedrvr )
 
 	install_c74_speedup();
 
-	old_coin_state = readinputport(1) & 0x1200;
+	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
 }
 
@@ -4361,7 +4361,7 @@ static DRIVER_INIT( victlap )
 
 	install_c74_speedup();
 
-	old_coin_state = readinputport(1) & 0x1200;
+	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
 }
 
@@ -4371,7 +4371,7 @@ static DRIVER_INIT( raveracw )
 
 	install_c74_speedup();
 
-	old_coin_state = readinputport(1) & 0x1200;
+	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
 }
 
@@ -4388,7 +4388,7 @@ static DRIVER_INIT( cybrcomm )
 
 	install_c74_speedup();
 
-	old_coin_state = readinputport(1) & 0x1200;
+	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
 }
 

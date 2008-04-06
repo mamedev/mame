@@ -437,10 +437,10 @@ READ16_HANDLER( volfied_cchip_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x03: return readinputportbytag("F00007");    /* STARTn + SERVICE1 */
-		case 0x04: return readinputportbytag("F00009");    /* COINn */
-		case 0x05: return readinputportbytag("F0000B");    /* Player controls + TILT */
-		case 0x06: return readinputportbytag("F0000D");    /* Player controls (cocktail) */
+		case 0x03: return input_port_read(machine, "F00007");    /* STARTn + SERVICE1 */
+		case 0x04: return input_port_read(machine, "F00009");    /* COINn */
+		case 0x05: return input_port_read(machine, "F0000B");    /* Player controls + TILT */
+		case 0x06: return input_port_read(machine, "F0000D");    /* Player controls (cocktail) */
 		case 0x08: return cc_port;
 		}
 	}

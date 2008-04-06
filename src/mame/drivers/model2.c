@@ -433,7 +433,7 @@ static WRITE32_HANDLER(ctrl0_w)
 
 static READ32_HANDLER(ctrl0_r)
 {
-	UINT32 ret = readinputport(0);
+	UINT32 ret = input_port_read_indexed(machine, 0);
 	ret <<= 16;
 	if(model2_ctrlmode==0)
 	{
@@ -447,25 +447,25 @@ static READ32_HANDLER(ctrl0_r)
 }
 static READ32_HANDLER(ctrl1_r)
 {
-	return readinputport(1) | readinputport(2)<<16;
+	return input_port_read_indexed(machine, 1) | input_port_read_indexed(machine, 2)<<16;
 }
 
 static READ32_HANDLER(ctrl10_r)
 {
-	return readinputport(0) | readinputport(1)<<16;
+	return input_port_read_indexed(machine, 0) | input_port_read_indexed(machine, 1)<<16;
 }
 
 static READ32_HANDLER(ctrl14_r)
 {
-	return readinputport(2);
+	return input_port_read_indexed(machine, 2);
 }
 
 static READ32_HANDLER(analog_r)
 {
 	if (offset)
-		return readinputport(5);
+		return input_port_read_indexed(machine, 5);
 
-	return readinputport(3) | readinputport(4)<<16;
+	return input_port_read_indexed(machine, 3) | input_port_read_indexed(machine, 4)<<16;
 }
 
 static READ32_HANDLER(fifoctl_r)

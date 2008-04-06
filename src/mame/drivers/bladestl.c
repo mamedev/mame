@@ -57,7 +57,7 @@ static READ8_HANDLER( trackball_r )
 	int curr,delta;
 
 
-	curr = readinputport(5 + offset);
+	curr = input_port_read_indexed(machine, 5 + offset);
 	delta = (curr - last[offset]) & 0xff;
 	last[offset] = curr;
 	return (delta & 0x80) | (curr >> 1);

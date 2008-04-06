@@ -388,12 +388,12 @@ static READ16_HANDLER( outrun_custom_io_r )
 			return ppi8255_0_r(machine, offset & 3);
 
 		case 0x10/2:
-			return readinputport(offset & 3);
+			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x30/2:
 		{
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-			return readinputportbytag_safe(ports[adc_select], 0x0010);
+			return input_port_read_safe(machine, ports[adc_select], 0x0010);
 		}
 
 		case 0x60/2:
@@ -451,12 +451,12 @@ static READ16_HANDLER( shangon_custom_io_r )
 		case 0x1002/2:
 		case 0x1004/2:
 		case 0x1006/2:
-			return readinputport(offset & 3);
+			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x3020/2:
 		{
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return readinputportbytag_safe(ports[adc_select], 0x0010);
+			return input_port_read_safe(machine, ports[adc_select], 0x0010);
 		}
 	}
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);

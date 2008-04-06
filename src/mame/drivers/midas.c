@@ -180,7 +180,7 @@ static VIDEO_UPDATE( livequiz )
 
 static READ16_HANDLER( livequiz_eeprom_r )
 {
-	return readinputport(2) | (EEPROM_read_bit() << 3);
+	return input_port_read_indexed(machine, 2) | (EEPROM_read_bit() << 3);
 }
 
 static WRITE16_HANDLER( livequiz_eeprom_w )

@@ -246,8 +246,8 @@ static void sio_dip_handler( int n_data )
 	{
 		if( m_b_lastclock )
 		{
-			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( readinputport( 7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
-			psx_sio_input( 0, PSX_SIO_IN_DATA, ( ( readinputport( 7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( 0, PSX_SIO_IN_DATA, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
 			m_n_dip_bit++;
 			m_n_dip_bit &= 7;
 		}

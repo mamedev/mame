@@ -451,7 +451,7 @@ static CUSTOM_INPUT( custom_49way_r )
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[readinputportbytag(namey) >> 4] << 4) | translate49[readinputportbytag(namex) >> 4];
+	return (translate49[input_port_read(machine, namey) >> 4] << 4) | translate49[input_port_read(machine, namex) >> 4];
 }
 
 
@@ -464,7 +464,7 @@ static WRITE32_HANDLER( keypad_select_w )
 
 static CUSTOM_INPUT( keypad_r )
 {
-	UINT32 bits = readinputportbytag(param);
+	UINT32 bits = input_port_read(machine, param);
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -487,7 +487,7 @@ static READ32_HANDLER( analog_r )
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
 		logerror("%06X:analog_r(%X)\n", activecpu_get_pc(), offset);
-	return readinputportbytag(tags[offset & 3]);
+	return input_port_read(machine, tags[offset & 3]);
 }
 
 
@@ -553,8 +553,8 @@ static WRITE32_HANDLER( invasn_gun_w )
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }
 			};
-			gun_x[player] = readinputportbytag(names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
-			gun_y[player] = readinputportbytag(names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
+			gun_x[player] = input_port_read(machine, names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
+			gun_y[player] = input_port_read(machine, names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
 			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(machine->primary_screen, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}

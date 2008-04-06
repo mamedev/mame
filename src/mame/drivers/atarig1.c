@@ -110,7 +110,7 @@ static WRITE16_HANDLER( mo_command_w )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int temp = readinputport(0);
+	int temp = input_port_read_indexed(machine, 0);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x1000;
 	temp ^= 0x2000;		/* A2DOK always high for now */
 	return temp;
@@ -127,11 +127,11 @@ static READ16_HANDLER( a2d_data_r )
 {
 	/* Pit Fighter has no A2D, just another input port */
 	if (atarig1_pitfight)
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 
 	/* otherwise, assume it's hydra */
 	if (which_input < 3)
-		return readinputport(1 + which_input) << 8;
+		return input_port_read_indexed(machine, 1 + which_input) << 8;
 
 	return 0;
 }

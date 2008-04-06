@@ -368,7 +368,7 @@ static UINT8 cannonb_bit_to_read;
 static MACHINE_RESET( mschamp )
 {
 	UINT8 *rom = memory_region(REGION_CPU1) + 0x10000;
-	int whichbank = readinputportbytag("GAME") & 1;
+	int whichbank = input_port_read(machine, "GAME") & 1;
 
 	memory_configure_bank(1, 0, 2, &rom[0x0000], 0x8000);
 	memory_configure_bank(2, 0, 2, &rom[0x4000], 0x8000);
@@ -405,7 +405,7 @@ static INTERRUPT_GEN( pacman_interrupt )
 		int portnum = port_tag_to_index("FAKE");
 		if (portnum != -1)
 		{
-			UINT8 value = readinputport(portnum);
+			UINT8 value = input_port_read_indexed(machine, portnum);
 			if ((value & 7) == 5 || (value & 6) == 2)
 				irq0_line_hold(machine, cpunum);
 		}

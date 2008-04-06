@@ -326,8 +326,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 1:	// dip switches
 			switch (offset)
 			{
-				case 0: result = readinputportbytag("DIPSW1"); break;
-				case 1: result = readinputportbytag("DIPSW2"); break;
+				case 0: result = input_port_read(machine, "DIPSW1"); break;
+				case 1: result = input_port_read(machine, "DIPSW2"); break;
 				case 2: result = 0x02;                         break;
 			}
 			break;
@@ -335,8 +335,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 2:	// player inputs
 			switch (offset)
 			{
-				case 0: result = readinputportbytag("PAD1"); break;
-				case 1: result = readinputportbytag("PAD2"); break;
+				case 0: result = input_port_read(machine, "PAD1"); break;
+				case 1: result = input_port_read(machine, "PAD2"); break;
 				case 2: result = 0x01;                       break;
 			}
 			break;

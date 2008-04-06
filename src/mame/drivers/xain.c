@@ -245,7 +245,7 @@ static WRITE8_HANDLER( xain_68705_w )
 
 static READ8_HANDLER( xain_input_port_4_r )
 {
-	return readinputport(4) | vblank;
+	return input_port_read_indexed(machine, 4) | vblank;
 }
 
 static INTERRUPT_GEN( xain_interrupt )

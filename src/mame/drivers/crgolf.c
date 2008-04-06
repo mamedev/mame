@@ -81,13 +81,13 @@ static MACHINE_START( crgolf )
 
 static READ8_HANDLER( switch_input_r )
 {
-	return readinputport(port_select);
+	return input_port_read_indexed(machine, port_select);
 }
 
 
 static READ8_HANDLER( analog_input_r )
 {
-	return ((readinputport(7) >> 4) | (readinputport(8) & 0xf0)) ^ 0x88;
+	return ((input_port_read_indexed(machine, 7) >> 4) | (input_port_read_indexed(machine, 8) & 0xf0)) ^ 0x88;
 }
 
 

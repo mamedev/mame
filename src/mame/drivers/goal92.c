@@ -41,15 +41,15 @@ static READ16_HANDLER( goal92_inputs_r )
 	switch(offset)
 	{
 		case 0:
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 1:
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 		case 2:
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 3:
-			return readinputport(3);
+			return input_port_read_indexed(machine, 3);
 		case 7:
-			return readinputport(4);
+			return input_port_read_indexed(machine, 4);
 
 		default:
 			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n",offset, mem_mask,activecpu_get_pc());

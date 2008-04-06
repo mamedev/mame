@@ -165,7 +165,7 @@ static MACHINE_RESET( rpunch )
 
 static READ16_HANDLER( common_port_r )
 {
-	return readinputport(offset) | readinputport(2);
+	return input_port_read_indexed(machine, offset) | input_port_read_indexed(machine, 2);
 }
 
 

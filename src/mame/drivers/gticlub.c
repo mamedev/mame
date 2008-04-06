@@ -205,7 +205,7 @@ static void adc1038_di_w(int bit)
 	adc1038_data_in = bit & 1;
 }
 
-static void adc1038_clk_w(int bit)
+static void adc1038_clk_w(running_machine *machine, int bit)
 {
 	// GTI Club doesn't sync on SARS
 	if (adc1038_gticlub_hack)
@@ -216,10 +216,10 @@ static void adc1038_clk_w(int bit)
 
 			switch (adc1038_adr)
 			{
-				case 0: adc1038_adc_data = readinputport(4); break;
-				case 1: adc1038_adc_data = readinputport(5); break;
-				case 2: adc1038_adc_data = readinputport(6); break;
-				case 3: adc1038_adc_data = readinputport(7); break;
+				case 0: adc1038_adc_data = input_port_read_indexed(machine, 4); break;
+				case 1: adc1038_adc_data = input_port_read_indexed(machine, 5); break;
+				case 2: adc1038_adc_data = input_port_read_indexed(machine, 6); break;
+				case 3: adc1038_adc_data = input_port_read_indexed(machine, 7); break;
 				case 4: adc1038_adc_data = 0x000; break;
 				case 5: adc1038_adc_data = 0x000; break;
 				case 6: adc1038_adc_data = 0x000; break;
@@ -255,16 +255,16 @@ static void adc1038_clk_w(int bit)
 	adc1038_clk = bit;
 }
 
-static int adc1038_sars_r(void)
+static int adc1038_sars_r(running_machine *machine)
 {
 	adc1038_cycle = 0;
 
 	switch (adc1038_adr)
 	{
-		case 0: adc1038_adc_data = readinputport(4); break;
-		case 1: adc1038_adc_data = readinputport(5); break;
-		case 2: adc1038_adc_data = readinputport(6); break;
-		case 3: adc1038_adc_data = readinputport(7); break;
+		case 0: adc1038_adc_data = input_port_read_indexed(machine, 4); break;
+		case 1: adc1038_adc_data = input_port_read_indexed(machine, 5); break;
+		case 2: adc1038_adc_data = input_port_read_indexed(machine, 6); break;
+		case 3: adc1038_adc_data = input_port_read_indexed(machine, 7); break;
 		case 4: adc1038_adc_data = 0x000; break;
 		case 5: adc1038_adc_data = 0x000; break;
 		case 6: adc1038_adc_data = 0x000; break;
@@ -285,19 +285,19 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= readinputport(0) << 24;
+			r |= input_port_read_indexed(machine, 0) << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= readinputport(1) << 16;
+			r |= input_port_read_indexed(machine, 1) << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= (adc1038_sars_r() << 7) << 8;
+			r |= (adc1038_sars_r(machine) << 7) << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= readinputport(3) << 0;
+			r |= input_port_read_indexed(machine, 3) << 0;
 		}
 		return r;
 	}
@@ -357,7 +357,7 @@ static WRITE32_HANDLER( sysreg_w )
 			}
 
 			adc1038_di_w((data >> 24) & 1);
-			adc1038_clk_w((data >> 25) & 1);
+			adc1038_clk_w(machine, (data >> 25) & 1);
 
 			set_cgboard_id((data >> 28) & 0x3);
 		}

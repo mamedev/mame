@@ -149,24 +149,24 @@ static READ16_HANDLER( wwfwfest_inputs_read )
 	switch (offset)
 	{
 	case 0x00:
-	tmp = readinputport(0) | readinputport(4) << 8;
+	tmp = input_port_read_indexed(machine, 0) | input_port_read_indexed(machine, 4) << 8;
 	tmp &= 0xcfff;
-	tmp |= ((readinputport(7) & 0xc0) << 6);
+	tmp |= ((input_port_read_indexed(machine, 7) & 0xc0) << 6);
 	break;
 	case 0x01:
-	tmp = readinputport(1);
+	tmp = input_port_read_indexed(machine, 1);
 	tmp &= 0xc0ff;
-	tmp |= ((readinputport(7) & 0x3f)<<8);
+	tmp |= ((input_port_read_indexed(machine, 7) & 0x3f)<<8);
 	break;
 	case 0x02:
-	tmp = readinputport(2);
+	tmp = input_port_read_indexed(machine, 2);
 	tmp &= 0xc0ff;
-	tmp |= ((readinputport(6) & 0x3f)<<8);
+	tmp |= ((input_port_read_indexed(machine, 6) & 0x3f)<<8);
 	break;
 	case 0x03:
-	tmp = (readinputport(3) | readinputport(5) << 8) ;
+	tmp = (input_port_read_indexed(machine, 3) | input_port_read_indexed(machine, 5) << 8) ;
 	tmp &= 0xfcff;
-	tmp |= ((readinputport(6) & 0xc0) << 2);
+	tmp |= ((input_port_read_indexed(machine, 6) & 0xc0) << 2);
 	break;
 	}
 

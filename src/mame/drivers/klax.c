@@ -47,7 +47,7 @@ static void update_interrupts(running_machine *machine)
 static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(readinputport(0) & 0x800))
+	if ((scanline & 32) == 0 && !(input_port_read_indexed(screen->machine, 0) & 0x800))
 		atarigen_scanline_int_gen(screen->machine, 0);
 }
 

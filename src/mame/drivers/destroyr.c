@@ -50,7 +50,7 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 
 	/* PCB supports two dials, but cab has only got one */
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, readinputport(3), 0), NULL, 0, destroyr_dial_callback);
+	timer_set(video_screen_get_time_until_pos(machine->primary_screen, input_port_read_indexed(machine, 3), 0), NULL, 0, destroyr_dial_callback);
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, destroyr_frame_callback);
 }
 
@@ -137,7 +137,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 	if (offset == 0)
 	{
-		UINT8 ret = readinputport(0);
+		UINT8 ret = input_port_read_indexed(machine, 0);
 
 		if (destroyr_potsense[0] && destroyr_potmask[0])
 			ret |= 4;
@@ -149,7 +149,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 	if (offset == 1)
 	{
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	}
 
 	logerror("unmapped input port %d\n", offset);

@@ -128,7 +128,7 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
 static READ16_HANDLER( unico_gunx_0_msb_r )
 {
-	int x=readinputportbytag("X0");
+	int x=input_port_read(machine, "X0");
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
@@ -139,7 +139,7 @@ static READ16_HANDLER( unico_gunx_0_msb_r )
 
 static READ16_HANDLER( unico_guny_0_msb_r )
 {
-	int y=readinputportbytag("Y0");
+	int y=input_port_read(machine, "Y0");
 
 	y=0x18+((y*0xe0)/0xff);
 
@@ -148,7 +148,7 @@ static READ16_HANDLER( unico_guny_0_msb_r )
 
 static READ16_HANDLER( unico_gunx_1_msb_r )
 {
-	int x=readinputportbytag("X1");
+	int x=input_port_read(machine, "X1");
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
@@ -159,7 +159,7 @@ static READ16_HANDLER( unico_gunx_1_msb_r )
 
 static READ16_HANDLER( unico_guny_1_msb_r )
 {
-	int y=readinputportbytag("Y1");
+	int y=input_port_read(machine, "Y1");
 
 	y=0x18+((y*0xe0)/0xff);
 
@@ -214,10 +214,10 @@ ADDRESS_MAP_END
                                 Zero Point 2
 ***************************************************************************/
 
-static READ32_HANDLER( zeropnt2_coins_r )			{ return (readinputportbytag("IN0") << 16) | 0xffff; }
-static READ32_HANDLER( zeropnt2_dsw1_r )			{ return (readinputportbytag("DSW1") << 16) | 0xffff; }
-static READ32_HANDLER( zeropnt2_dsw2_r )			{ return (readinputportbytag("DSW2") << 16) | 0xffff; }
-static READ32_HANDLER( zeropnt2_buttons_r )			{ return ((readinputportbytag("IN7") | ((EEPROM_read_bit() & 0x01) << 7)) << 16) | 0xffff; }
+static READ32_HANDLER( zeropnt2_coins_r )			{ return (input_port_read(machine, "IN0") << 16) | 0xffff; }
+static READ32_HANDLER( zeropnt2_dsw1_r )			{ return (input_port_read(machine, "DSW1") << 16) | 0xffff; }
+static READ32_HANDLER( zeropnt2_dsw2_r )			{ return (input_port_read(machine, "DSW2") << 16) | 0xffff; }
+static READ32_HANDLER( zeropnt2_buttons_r )			{ return ((input_port_read(machine, "IN7") | ((EEPROM_read_bit() & 0x01) << 7)) << 16) | 0xffff; }
 
 static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(machine,0,0)-0x0800) << 16; }
 static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(machine,0,0)+0x0800) << 16; }

@@ -466,7 +466,7 @@ READ8_HANDLER( qix_68705_portB_r )
 
 	UINT8 ddr = state->_68705_ddr[1];
 	UINT8 out = state->_68705_port_out[1];
-	UINT8 in = (readinputport(1) & 0x0f) | ((readinputport(1) & 0x80) >> 3);
+	UINT8 in = (input_port_read_indexed(machine, 1) & 0x0f) | ((input_port_read_indexed(machine, 1) & 0x80) >> 3);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -477,7 +477,7 @@ READ8_HANDLER( qix_68705_portC_r )
 
 	UINT8 ddr = state->_68705_ddr[2];
 	UINT8 out = state->_68705_port_out[2];
-	UINT8 in = (state->coinctrl & 0x08) | ((readinputport(1) & 0x70) >> 4);
+	UINT8 in = (state->coinctrl & 0x08) | ((input_port_read_indexed(machine, 1) & 0x70) >> 4);
 	return (out & ddr) | (in & ~ddr);
 }
 
@@ -598,7 +598,7 @@ static READ8_HANDLER( slither_trak_lr_r )
 {
 	qix_state *state = machine->driver_data;
 
-	return readinputport(state->flip ? 6 : 4);
+	return input_port_read_indexed(machine, state->flip ? 6 : 4);
 }
 
 
@@ -606,5 +606,5 @@ static READ8_HANDLER( slither_trak_ud_r )
 {
 	qix_state *state = machine->driver_data;
 
-	return readinputport(state->flip ? 5 : 3);
+	return input_port_read_indexed(machine, state->flip ? 5 : 3);
 }

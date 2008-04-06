@@ -414,7 +414,7 @@ void ssio_reset_w(int state)
 READ8_HANDLER( ssio_input_port_r )
 {
 	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
-	UINT8 result = readinputportbytag_safe(port[offset], 0xff);
+	UINT8 result = input_port_read_safe(machine, port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
 		         ((*ssio_custom_input[offset])(machine, offset) & ssio_custom_input_mask[offset]);

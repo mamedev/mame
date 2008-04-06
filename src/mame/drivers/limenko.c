@@ -39,7 +39,7 @@ static UINT32 *mainram;
 
 static READ32_HANDLER( port2_r )
 {
-	return (EEPROM_read_bit() << 23) | (readinputport(2) & ~(1<<23));
+	return (EEPROM_read_bit() << 23) | (input_port_read_indexed(machine, 2) & ~(1<<23));
 }
 
 static WRITE32_HANDLER( eeprom_w )

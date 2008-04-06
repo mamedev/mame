@@ -104,7 +104,7 @@ static MACHINE_RESET( midvplus )
 
 static READ32_HANDLER( port0_r )
 {
-	UINT16 val = readinputport(0);
+	UINT16 val = input_port_read_indexed(machine, 0);
 	UINT16 diff = val ^ last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
@@ -126,13 +126,13 @@ static READ32_HANDLER( port0_r )
 
 static READ32_HANDLER( port1_r )
 {
-	return (readinputport(1) << 16) | readinputport(1);
+	return (input_port_read_indexed(machine, 1) << 16) | input_port_read_indexed(machine, 1);
 }
 
 
 static READ32_HANDLER( port2_r )
 {
-	return (readinputport(2) << 16) | readinputport(2);
+	return (input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 2);
 }
 
 
@@ -169,7 +169,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		int which = (data >> adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		adc_data = readinputport(3 + which);
+		adc_data = input_port_read_indexed(machine, 3 + which);
 		timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
 	}
 	else

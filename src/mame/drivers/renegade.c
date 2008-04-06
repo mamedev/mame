@@ -489,7 +489,7 @@ static INTERRUPT_GEN( renegade_interrupt )
 {
 /*
     static int coin;
-    int port = readinputport(1) & 0xc0;
+    int port = input_port_read_indexed(machine, 1) & 0xc0;
     if (port != 0xc0)
     {
         if (coin == 0)

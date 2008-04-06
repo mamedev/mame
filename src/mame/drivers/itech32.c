@@ -354,7 +354,7 @@ static MACHINE_RESET( drivedge )
 
 static READ16_HANDLER( special_port3_r )
 {
-	int result = readinputport(3);
+	int result = input_port_read_indexed(machine, 3);
 	if (sound_int_state) result ^= 0x08;
 	return result;
 }
@@ -362,7 +362,7 @@ static READ16_HANDLER( special_port3_r )
 
 static READ16_HANDLER( special_port4_r )
 {
-	int result = readinputport(4);
+	int result = input_port_read_indexed(machine, 4);
 	if (sound_int_state) result ^= 0x08;
 	return result;
 }
@@ -370,8 +370,8 @@ static READ16_HANDLER( special_port4_r )
 
 static READ16_HANDLER( trackball_r )
 {
-	int lower = readinputportbytag("TRACKX1");
-	int upper = readinputportbytag("TRACKY1");
+	int lower = input_port_read(machine, "TRACKX1");
+	int upper = input_port_read(machine, "TRACKY1");
 
 	return (lower & 15) | ((upper & 15) << 4);
 }
@@ -379,8 +379,8 @@ static READ16_HANDLER( trackball_r )
 
 static READ32_HANDLER( trackball32_8bit_r )
 {
-	int lower = readinputportbytag("TRACKX1");
-	int upper = readinputportbytag("TRACKY1");
+	int lower = input_port_read(machine, "TRACKX1");
+	int upper = input_port_read(machine, "TRACKY1");
 
 	return (lower & 255) | ((upper & 255) << 8);
 }
@@ -398,8 +398,8 @@ static READ32_HANDLER( trackball32_4bit_r )
 		int upper, lower;
 		int dx, dy;
 
-		int curx = readinputportbytag("TRACKX1");
-		int cury = readinputportbytag("TRACKY1");
+		int curx = input_port_read(machine, "TRACKX1");
+		int cury = input_port_read(machine, "TRACKY1");
 
 		dx = curx - effx;
 		if (dx < -0x80) dx += 0x100;
@@ -437,8 +437,8 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 		int upper, lower;
 		int dx, dy;
 
-		int curx = readinputportbytag("TRACKX2");
-		int cury = readinputportbytag("TRACKY2");
+		int curx = input_port_read(machine, "TRACKX2");
+		int cury = input_port_read(machine, "TRACKY2");
 
 		dx = curx - effx;
 		if (dx < -0x80) dx += 0x100;
@@ -473,7 +473,7 @@ static READ32_HANDLER( trackball32_4bit_combined_r )
 
 static READ32_HANDLER( drivedge_steering_r )
 {
-	int val = readinputport(5) * 2 - 0x100;
+	int val = input_port_read_indexed(machine, 5) * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
 	return val << 16;
 }
@@ -481,7 +481,7 @@ static READ32_HANDLER( drivedge_steering_r )
 
 static READ32_HANDLER( drivedge_gas_r )
 {
-	int val = readinputport(6);
+	int val = input_port_read_indexed(machine, 6);
 	return val << 16;
 }
 

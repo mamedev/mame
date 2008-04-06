@@ -36,7 +36,7 @@ static UINT8 cidelsa_ef_r(void)
         EF4     Coin 1
     */
 
-	return readinputportbytag("EF");
+	return input_port_read(Machine, "EF");
 }
 
 static void cidelsa_q_w(int q)

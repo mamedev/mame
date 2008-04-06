@@ -64,11 +64,11 @@ static READ8_HANDLER( canyon_switches_r )
 {
 	UINT8 val = 0;
 
-	if ((readinputport(2) >> (offset & 7)) & 1)
+	if ((input_port_read_indexed(machine, 2) >> (offset & 7)) & 1)
 	{
 		val |= 0x80;
 	}
-	if ((readinputport(1) >> (offset & 3)) & 1)
+	if ((input_port_read_indexed(machine, 1) >> (offset & 3)) & 1)
 	{
 		val |= 0x01;
 	}
@@ -79,7 +79,7 @@ static READ8_HANDLER( canyon_switches_r )
 
 static READ8_HANDLER( canyon_options_r )
 {
-	return (readinputport(0) >> (2 * (~offset & 3))) & 3;
+	return (input_port_read_indexed(machine, 0) >> (2 * (~offset & 3))) & 3;
 }
 
 

@@ -76,7 +76,7 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 	discrete_sound_w(machine, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
 	discrete_sound_w(machine, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
 
-	is_witch_hunt = readinputport(2) == 0x40;
+	is_witch_hunt = input_port_read_indexed(machine, 2) == 0x40;
 	bit = ~triplhnt_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
@@ -108,21 +108,21 @@ static READ8_HANDLER( triplhnt_cmos_r )
 static READ8_HANDLER( triplhnt_input_port_4_r )
 {
 	watchdog_reset_w(machine, 0, 0);
-	return readinputport(4);
+	return input_port_read_indexed(machine, 4);
 }
 
 
 static READ8_HANDLER( triplhnt_misc_r )
 {
 	triplhnt_update_misc(machine, offset);
-	return readinputport(7) | triplhnt_hit_code;
+	return input_port_read_indexed(machine, 7) | triplhnt_hit_code;
 }
 
 
 static READ8_HANDLER( triplhnt_da_latch_r )
 {
-	int cross_x = readinputport(8);
-	int cross_y = readinputport(9);
+	int cross_x = input_port_read_indexed(machine, 8);
+	int cross_y = input_port_read_indexed(machine, 9);
 
 	triplhnt_da_latch = offset;
 

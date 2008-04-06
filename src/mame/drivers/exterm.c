@@ -140,7 +140,7 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 	UINT16 port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = readinputport(3 + which);
+	UINT8 trackball_pos = input_port_read_indexed(machine, 3 + which);
 
 	/* Calculate the change from the last position. */
 	UINT8 trackball_diff = trackball_old[which] - trackball_pos;

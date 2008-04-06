@@ -53,15 +53,15 @@ static UINT16 *realbrk_dsw_select;
 static READ16_HANDLER( realbrk_dsw_r )
 {
 	UINT16 sel = ~realbrk_dsw_select[0];
-	if (sel & 0x01)	return	(readinputport(2) & 0x00ff) << 8;		// DSW1 low bits
-	if (sel & 0x02)	return	(readinputport(3) & 0x00ff) << 8;		// DSW2 low bits
-	if (sel & 0x04)	return	(readinputport(4) & 0x00ff) << 8;		// DSW3 low bits
-	if (sel & 0x08)	return	(readinputport(5) & 0x00ff) << 8;		// DSW4 low bits
+	if (sel & 0x01)	return	(input_port_read_indexed(machine, 2) & 0x00ff) << 8;		// DSW1 low bits
+	if (sel & 0x02)	return	(input_port_read_indexed(machine, 3) & 0x00ff) << 8;		// DSW2 low bits
+	if (sel & 0x04)	return	(input_port_read_indexed(machine, 4) & 0x00ff) << 8;		// DSW3 low bits
+	if (sel & 0x08)	return	(input_port_read_indexed(machine, 5) & 0x00ff) << 8;		// DSW4 low bits
 
-	if (sel & 0x10)	return	((readinputport(2) & 0x0300) << 0) |	// DSWs high 2 bits
-							((readinputport(3) & 0x0300) << 2) |
-							((readinputport(4) & 0x0300) << 4) |
-							((readinputport(5) & 0x0300) << 6) ;
+	if (sel & 0x10)	return	((input_port_read_indexed(machine, 2) & 0x0300) << 0) |	// DSWs high 2 bits
+							((input_port_read_indexed(machine, 3) & 0x0300) << 2) |
+							((input_port_read_indexed(machine, 4) & 0x0300) << 4) |
+							((input_port_read_indexed(machine, 5) & 0x0300) << 6) ;
 
 	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",activecpu_get_pc(),realbrk_dsw_select[0]);
 	return 0xffff;

@@ -106,7 +106,7 @@ static void namconb1_install_palette(running_machine *machine)
  * communication with the sound CPU.
  */
 static void
-handle_mcu( void )
+handle_mcu( running_machine *machine )
 {
 	static int toggle;
 	static UINT16 credits;
@@ -115,18 +115,18 @@ handle_mcu( void )
 	static int old_p2;
 	static int old_p3;
 	static int old_p4;
-	int new_coin_state = readinputport(0)&0x3; /* coin1,2 */
-	unsigned dsw = readinputport(1)<<16;
-	unsigned p1 = readinputport(2);
-	unsigned p2 = readinputport(3);
+	int new_coin_state = input_port_read_indexed(machine, 0)&0x3; /* coin1,2 */
+	unsigned dsw = input_port_read_indexed(machine, 1)<<16;
+	unsigned p1 = input_port_read_indexed(machine, 2);
+	unsigned p2 = input_port_read_indexed(machine, 3);
 	unsigned p3;
 	unsigned p4;
 	toggle = !toggle;
 	if( toggle ) dsw &= ~(0x80<<16);
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
 	{
-		p3 = readinputport(4);
-		p4 = readinputport(5);
+		p3 = input_port_read_indexed(machine, 4);
+		p4 = input_port_read_indexed(machine, 5);
 	}
 	else
 	{
@@ -161,7 +161,7 @@ static void
 video_update_common(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bROZ )
 {
 	int pri;
-	handle_mcu();
+	handle_mcu(machine);
 	namconb1_install_palette(machine);
 
 	if( bROZ )

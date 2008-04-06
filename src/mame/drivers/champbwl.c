@@ -159,8 +159,8 @@ static UINT8 last_trackball_val[2] = {0,0};
 static READ8_HANDLER( trackball_r )
 {
 	UINT8 ret;
-	UINT8 port4 = readinputport(4);
-	UINT8 port5 = readinputport(5);
+	UINT8 port4 = input_port_read_indexed(machine, 4);
+	UINT8 port5 = input_port_read_indexed(machine, 5);
 
 	ret = (((port4 - last_trackball_val[0]) & 0x0f)<<4) | ((port5 - last_trackball_val[1]) & 0x0f);
 

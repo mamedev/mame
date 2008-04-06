@@ -261,10 +261,10 @@ static TIMER_CALLBACK(microtouch_timer_callback)
 	}
 
 	// send format tablet packet
-	if ( readinputportbytag("TOUCH") & 0x01 )
+	if ( input_port_read(machine, "TOUCH") & 0x01 )
 	{
-		int tx = readinputportbytag("TOUCH_X");
-		int ty = readinputportbytag("TOUCH_Y");
+		int tx = input_port_read(machine, "TOUCH_X");
+		int ty = input_port_read(machine, "TOUCH_Y");
 
 		if ( microtouch.touch_callback == NULL ||
 			 microtouch.touch_callback( &tx, &ty ) != 0 )
@@ -864,7 +864,7 @@ static const ppi8255_interface crt250_ppi8255_intf =
 
 static READ8_HANDLER(meritm_ay8930_port_a_r)
 {
-	return readinputportbytag_safe("DSW", 0);
+	return input_port_read_safe(machine, "DSW", 0);
 };
 
 static WRITE8_HANDLER(meritm_ay8930_port_b_w)
@@ -922,12 +922,12 @@ static WRITE8_HANDLER(meritm_audio_pio_port_b_w)
 
 static READ8_HANDLER(meritm_io_pio_port_a_r)
 {
-	return readinputportbytag("PIO1_PORTA");
+	return input_port_read(machine, "PIO1_PORTA");
 };
 
 static READ8_HANDLER(meritm_io_pio_port_b_r)
 {
-	return readinputportbytag("PIO1_PORTB");
+	return input_port_read(machine, "PIO1_PORTB");
 };
 
 static WRITE8_HANDLER(meritm_io_pio_port_a_w)

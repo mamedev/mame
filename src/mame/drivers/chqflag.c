@@ -125,8 +125,8 @@ static READ8_HANDLER( analog_read_r )
 	static int accel, wheel;
 
 	switch (analog_ctrl & 0x03){
-		case 0x00: return (accel = readinputport(5));	/* accelerator */
-		case 0x01: return (wheel = readinputport(6));	/* steering */
+		case 0x00: return (accel = input_port_read_indexed(machine, 5));	/* accelerator */
+		case 0x01: return (wheel = input_port_read_indexed(machine, 6));	/* steering */
 		case 0x02: return accel;						/* accelerator (previous?) */
 		case 0x03: return wheel;						/* steering (previous?) */
 	}

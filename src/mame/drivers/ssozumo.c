@@ -34,7 +34,7 @@ static INTERRUPT_GEN( ssozumo_interrupt )
 {
 	static int coin;
 
-	if ((readinputport(0) & 0xc0) != 0xc0)
+	if ((input_port_read_indexed(machine, 0) & 0xc0) != 0xc0)
 	{
 		if (coin == 0)
 		{

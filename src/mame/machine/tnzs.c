@@ -117,7 +117,7 @@ READ8_HANDLER( arknoid2_sh_f000_r )
 
 //  logerror("PC %04x: read input %04x\n", activecpu_get_pc(), 0xf000 + offset);
 
-	val = readinputport(7 + offset/2);
+	val = input_port_read_indexed(machine, 7 + offset/2);
 	if (offset & 1)
 	{
 		return ((val >> 8) & 0xff);
@@ -247,7 +247,7 @@ static READ8_HANDLER( mcu_arknoid2_r )
 					}
 					else return mcu_credits;
 				}
-				else return readinputport(2);	/* buttons */
+				else return input_port_read_indexed(machine, 2);	/* buttons */
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -338,16 +338,16 @@ static READ8_HANDLER( mcu_extrmatn_r )
 		switch (mcu_command)
 		{
 			case 0x01:
-				return readinputport(2) ^ 0xff;	/* player 1 joystick + buttons */
+				return input_port_read_indexed(machine, 2) ^ 0xff;	/* player 1 joystick + buttons */
 
 			case 0x02:
-				return readinputport(3) ^ 0xff;	/* player 2 joystick + buttons */
+				return input_port_read_indexed(machine, 3) ^ 0xff;	/* player 2 joystick + buttons */
 
 			case 0x1a:
-				return (readinputport(5) | (readinputport(6) << 1));
+				return (input_port_read_indexed(machine, 5) | (input_port_read_indexed(machine, 6) << 1));
 
 			case 0x21:
-				return readinputport(4) & 0x0f;
+				return input_port_read_indexed(machine, 4) & 0x0f;
 
 			case 0x41:
 				return mcu_credits;
@@ -375,7 +375,7 @@ static READ8_HANDLER( mcu_extrmatn_r )
 					else return mcu_credits;
 				}
 				/* buttons */
-				else return ((readinputport(2) & 0xf0) | (readinputport(3) >> 4)) ^ 0xff;
+				else return ((input_port_read_indexed(machine, 2) & 0xf0) | (input_port_read_indexed(machine, 3) >> 4)) ^ 0xff;
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -660,9 +660,9 @@ INTERRUPT_GEN( arknoid2_interrupt )
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
 			coin  = 0;
-			coin |= ((readinputport(5) & 1) << 0);
-			coin |= ((readinputport(6) & 1) << 1);
-			coin |= ((readinputport(4) & 3) << 2);
+			coin |= ((input_port_read_indexed(machine, 5) & 1) << 0);
+			coin |= ((input_port_read_indexed(machine, 6) & 1) << 1);
+			coin |= ((input_port_read_indexed(machine, 4) & 3) << 2);
 			coin ^= 0x0c;
 			mcu_handle_coins(coin);
 			break;

@@ -224,7 +224,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 \
 static READ32_HANDLER( io32_##_N_##_r ) \
 { \
-	return (readinputport( _N_ ) << 16) | readinputport( _N_ ); \
+	return (input_port_read_indexed(machine,  _N_ ) << 16) | input_port_read_indexed(machine,  _N_ ); \
 }
 
 FUUKI32_INPUT( 0 ) /* $800000.l Coins Inputs */

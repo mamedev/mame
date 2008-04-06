@@ -144,14 +144,14 @@ static WRITE16_HANDLER( vmetal_mid2tileram_w )
 }
 
 
-static READ16_HANDLER ( varia_dips_bit8_r ) { return ((readinputport(3) & 0x80) << 0) | ((readinputport(2) & 0x80) >> 1); }
-static READ16_HANDLER ( varia_dips_bit7_r ) { return ((readinputport(3) & 0x40) << 1) | ((readinputport(2) & 0x40) >> 0); }
-static READ16_HANDLER ( varia_dips_bit6_r ) { return ((readinputport(3) & 0x20) << 2) | ((readinputport(2) & 0x20) << 1); }
-static READ16_HANDLER ( varia_dips_bit5_r ) { return ((readinputport(3) & 0x10) << 3) | ((readinputport(2) & 0x10) << 2); }
-static READ16_HANDLER ( varia_dips_bit4_r ) { return ((readinputport(3) & 0x08) << 4) | ((readinputport(2) & 0x08) << 3); }
-static READ16_HANDLER ( varia_dips_bit3_r ) { return ((readinputport(3) & 0x04) << 5) | ((readinputport(2) & 0x04) << 4); }
-static READ16_HANDLER ( varia_dips_bit2_r ) { return ((readinputport(3) & 0x02) << 6) | ((readinputport(2) & 0x02) << 5); }
-static READ16_HANDLER ( varia_dips_bit1_r ) { return ((readinputport(3) & 0x01) << 7) | ((readinputport(2) & 0x01) << 6); }
+static READ16_HANDLER ( varia_dips_bit8_r ) { return ((input_port_read_indexed(machine, 3) & 0x80) << 0) | ((input_port_read_indexed(machine, 2) & 0x80) >> 1); }
+static READ16_HANDLER ( varia_dips_bit7_r ) { return ((input_port_read_indexed(machine, 3) & 0x40) << 1) | ((input_port_read_indexed(machine, 2) & 0x40) >> 0); }
+static READ16_HANDLER ( varia_dips_bit6_r ) { return ((input_port_read_indexed(machine, 3) & 0x20) << 2) | ((input_port_read_indexed(machine, 2) & 0x20) << 1); }
+static READ16_HANDLER ( varia_dips_bit5_r ) { return ((input_port_read_indexed(machine, 3) & 0x10) << 3) | ((input_port_read_indexed(machine, 2) & 0x10) << 2); }
+static READ16_HANDLER ( varia_dips_bit4_r ) { return ((input_port_read_indexed(machine, 3) & 0x08) << 4) | ((input_port_read_indexed(machine, 2) & 0x08) << 3); }
+static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read_indexed(machine, 3) & 0x04) << 5) | ((input_port_read_indexed(machine, 2) & 0x04) << 4); }
+static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read_indexed(machine, 3) & 0x02) << 6) | ((input_port_read_indexed(machine, 2) & 0x02) << 5); }
+static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read_indexed(machine, 3) & 0x01) << 7) | ((input_port_read_indexed(machine, 2) & 0x01) << 6); }
 
 static WRITE16_HANDLER( vmetal_control_w )
 {

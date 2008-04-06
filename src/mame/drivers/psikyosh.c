@@ -404,7 +404,7 @@ static READ32_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return ((EEPROM_read_bit() << 28) | (readinputport(4) << 24)); /* EEPROM | Region */
+		return ((EEPROM_read_bit() << 28) | (input_port_read_indexed(machine, 4) << 24)); /* EEPROM | Region */
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -419,7 +419,7 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 
 static READ32_HANDLER(io32_r)
 {
-	return ((readinputport(0) << 24) | (readinputport(1) << 16) | (readinputport(2) << 8) | (readinputport(3) << 0));
+	return ((input_port_read_indexed(machine, 0) << 24) | (input_port_read_indexed(machine, 1) << 16) | (input_port_read_indexed(machine, 2) << 8) | (input_port_read_indexed(machine, 3) << 0));
 }
 
 static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )

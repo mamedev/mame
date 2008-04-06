@@ -290,11 +290,11 @@ static int snk_sound_register;
 /*********************************************************************/
 
 
-static int snk_rot( int which ){
+static int snk_rot( running_machine *machine, int which ){
 	static int last_value[2] = {0, 0};
 	static int cp_count[2] = {0, 0};
 	int bttn;
-	int value = readinputport(which + 1);
+	int value = input_port_read_indexed(machine, which + 1);
 
 	/* For Guerilla War we add a 0xf0 value for 1 input read once every 8 rotations.
      * 0xf0 isn't a valid direction, but avoids the "joystick error" protection
@@ -325,8 +325,8 @@ static int snk_input_port_r( running_machine *machine, int which ){
 			return value;
 		}
 
-		case SNK_ROT_PLAYER1: return snk_rot( 0 );
-		case SNK_ROT_PLAYER2: return snk_rot( 1 );
+		case SNK_ROT_PLAYER1: return snk_rot( machine, 0 );
+		case SNK_ROT_PLAYER2: return snk_rot( machine, 1 );
 
 		case SNK_INP1: return input_port_1_r(machine,0);
 		case SNK_INP2: return input_port_2_r(machine,0);

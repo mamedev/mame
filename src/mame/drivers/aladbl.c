@@ -143,9 +143,9 @@ static WRITE16_HANDLER( aladbl_w )
 
 static READ16_HANDLER( aladbl_r )
 {
-	if (activecpu_get_pc()==0x1b2a56) return (readinputportbytag("MCU") & 0xff0f);             // coins
+	if (activecpu_get_pc()==0x1b2a56) return (input_port_read(machine, "MCU") & 0xff0f);             // coins
 	if (activecpu_get_pc()==0x1b2a72) return 0x0000;
-	if (activecpu_get_pc()==0x1b2d24) return (readinputportbytag("MCU") & 0x00f0) | 0x1200;    // difficulty
+	if (activecpu_get_pc()==0x1b2d24) return (input_port_read(machine, "MCU") & 0x00f0) | 0x1200;    // difficulty
 	if (activecpu_get_pc()==0x1b2d4e) return 0x0000;
 
 	logerror("aladbl_r : %06x\n",activecpu_get_pc());

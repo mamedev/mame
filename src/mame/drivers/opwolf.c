@@ -140,13 +140,13 @@ static WRITE16_HANDLER( cchip_w )
 static READ16_HANDLER( opwolf_in_r )
 {
 	static const char *const inname[2] = { "IN0", "IN1" };
-	return readinputportbytag(inname[offset]);
+	return input_port_read(machine, inname[offset]);
 }
 
 static READ16_HANDLER( opwolf_dsw_r )
 {
 	static const char *const dswname[2] = { "DSWA", "DSWB" };
-	return readinputportbytag(dswname[offset]);
+	return input_port_read(machine, dswname[offset]);
 }
 
 static READ16_HANDLER( opwolf_lightgun_r )
@@ -156,10 +156,10 @@ static READ16_HANDLER( opwolf_lightgun_r )
 	switch (offset)
 	{
 		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-			scaled=(readinputportbytag(P1X_PORT_TAG) * 320 ) / 256;
+			scaled=(input_port_read(machine, P1X_PORT_TAG) * 320 ) / 256;
 			return (scaled + 0x15 + opwolf_gun_xoffs);
 		case 0x01:	/* P1Y */
-			return (readinputportbytag(P1Y_PORT_TAG) - 0x24 + opwolf_gun_yoffs);
+			return (input_port_read(machine, P1Y_PORT_TAG) - 0x24 + opwolf_gun_yoffs);
 	}
 
 	return 0xff;
@@ -167,12 +167,12 @@ static READ16_HANDLER( opwolf_lightgun_r )
 
 static READ8_HANDLER( z80_input1_r )
 {
-	return readinputportbytag("IN0");	/* irrelevant mirror ? */
+	return input_port_read(machine, "IN0");	/* irrelevant mirror ? */
 }
 
 static READ8_HANDLER( z80_input2_r )
 {
-	return readinputportbytag("IN0");	/* needed for coins */
+	return input_port_read(machine, "IN0");	/* needed for coins */
 }
 
 

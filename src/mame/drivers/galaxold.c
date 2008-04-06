@@ -546,9 +546,9 @@ ADDRESS_MAP_END
 
 
 static READ8_HANDLER( scramb2_protection_r ) { return 0x25; }
-static READ8_HANDLER( scramb2_port0_r ) { return (readinputport(0)>>offset)&0x1; }
-static READ8_HANDLER( scramb2_port1_r ) { return (readinputport(1)>>offset)&0x1; }
-static READ8_HANDLER( scramb2_port2_r ) { return (readinputport(2)>>offset)&0x1; }
+static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read_indexed(machine, 0)>>offset)&0x1; }
+static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read_indexed(machine, 1)>>offset)&0x1; }
+static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read_indexed(machine, 2)>>offset)&0x1; }
 
 static ADDRESS_MAP_START( scramb2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)

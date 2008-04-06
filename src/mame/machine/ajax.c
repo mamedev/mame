@@ -116,16 +116,16 @@ READ8_HANDLER( ajax_ls138_f10_r )
 			data = mame_rand(Machine);
 			break;
 		case 0x04:	/* 2P inputs */
-			data = readinputport(5);
+			data = input_port_read_indexed(machine, 5);
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
 			if (offset & 0x02)
-				data = readinputport(offset & 0x01);
+				data = input_port_read_indexed(machine, offset & 0x01);
 			else
-				data = readinputport(3 + (offset & 0x01));
+				data = input_port_read_indexed(machine, 3 + (offset & 0x01));
 			break;
 		case 0x07:	/* DIPSW #3 */
-			data = readinputport(2);
+			data = input_port_read_indexed(machine, 2);
 			break;
 
 		default:

@@ -47,9 +47,9 @@ static DRIVER_INIT( dominos )
 }
 
 
-static int service_mode(void)
+static int service_mode(running_machine *machine)
 {
-	UINT8 v = readinputport(2);
+	UINT8 v = input_port_read_indexed(machine, 2);
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -80,7 +80,7 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = readinputport(6 + i) - dial[i];
+			signed char delta = input_port_read_indexed(machine, 6 + i) - dial[i];
 
 			if (delta < 0)
 			{
@@ -93,7 +93,7 @@ static INTERRUPT_GEN( sprint2 )
 
 			dial[i] += delta;
 
-			switch (readinputport(4 + i) & 15)
+			switch (input_port_read_indexed(machine, 4 + i) & 15)
 			{
 			case 1: gear[i] = 1; break;
 			case 2: gear[i] = 2; break;
@@ -109,9 +109,9 @@ static INTERRUPT_GEN( sprint2 )
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(machine, !service_mode());
+	watchdog_enable(machine, !service_mode(machine));
 
-	if (!service_mode())
+	if (!service_mode(machine))
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -124,13 +124,13 @@ static READ8_HANDLER( sprint2_wram_r )
 
 static READ8_HANDLER( sprint2_dip_r )
 {
-	return (readinputport(0) << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (input_port_read_indexed(machine, 0) << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
 static READ8_HANDLER( sprint2_input_A_r )
 {
-	UINT8 val = readinputport(1);
+	UINT8 val = input_port_read_indexed(machine, 1);
 
 	if (GAME_IS_SPRINT2)
 	{
@@ -148,7 +148,7 @@ static READ8_HANDLER( sprint2_input_A_r )
 
 static READ8_HANDLER( sprint2_input_B_r )
 {
-	UINT8 val = readinputport(2);
+	UINT8 val = input_port_read_indexed(machine, 2);
 
 	if (GAME_IS_SPRINT1)
 	{

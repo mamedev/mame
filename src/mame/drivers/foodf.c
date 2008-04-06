@@ -202,7 +202,7 @@ static WRITE16_HANDLER( digital_w )
 
 static READ16_HANDLER( analog_r )
 {
-	return readinputport(whichport);
+	return input_port_read_indexed(machine, whichport);
 }
 
 
@@ -353,7 +353,7 @@ GFXDECODE_END
 
 static READ8_HANDLER( pot_r )
 {
-	return (readinputport(5) >> offset) << 7;
+	return (input_port_read_indexed(machine, 5) >> offset) << 7;
 }
 
 static const struct POKEYinterface pokey_interface =

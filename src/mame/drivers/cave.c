@@ -311,17 +311,17 @@ static int cave_region_byte;
 
 static READ16_HANDLER( cave_input1_r )
 {
-	return readinputport(1) | ((EEPROM_read_bit() & 0x01) << 11);
+	return input_port_read_indexed(machine, 1) | ((EEPROM_read_bit() & 0x01) << 11);
 }
 
 static READ16_HANDLER( guwange_input1_r )
 {
-	return readinputport(1) | ((EEPROM_read_bit() & 0x01) << 7);
+	return input_port_read_indexed(machine, 1) | ((EEPROM_read_bit() & 0x01) << 7);
 }
 
 static READ16_HANDLER( gaia_dsw_r )
 {
-	return readinputport(2) | (readinputport(3) << 8);
+	return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3) << 8);
 }
 
 static WRITE16_HANDLER( cave_eeprom_msb_w )
@@ -870,12 +870,12 @@ static WRITE16_HANDLER( korokoro_eeprom_msb_w )
 
 static READ16_HANDLER( korokoro_input0_r )
 {
-	return readinputport(0) | (hopper ? 0 : 0x8000);
+	return input_port_read_indexed(machine, 0) | (hopper ? 0 : 0x8000);
 }
 
 static READ16_HANDLER( korokoro_input1_r )
 {
-	return readinputport(1) | ((EEPROM_read_bit() & 0x01) << 12);
+	return input_port_read_indexed(machine, 1) | ((EEPROM_read_bit() & 0x01) << 12);
 }
 
 static ADDRESS_MAP_START( korokoro_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1077,7 +1077,7 @@ ADDRESS_MAP_END
 static READ16_HANDLER( sailormn_input0_r )
 {
 //  watchdog_reset16_r(0,0);    // written too rarely for mame.
-	return readinputport(0);
+	return input_port_read_indexed(machine, 0);
 }
 
 static READ16_HANDLER( agallet_irq_cause_r )
@@ -1984,7 +1984,7 @@ static MACHINE_RESET( cave )
 	/* modify the eeprom on a reset with the desired region for the games that have the
        region factory set in eeprom */
 	if (cave_region_byte >= 0)
-		EEPROM_get_data_pointer(0)[cave_region_byte] =  readinputport(2);
+		EEPROM_get_data_pointer(0)[cave_region_byte] =  input_port_read_indexed(machine, 2);
 }
 
 static const struct YMZ280Binterface ymz280b_intf =

@@ -56,17 +56,17 @@ PALETTE_INIT( toypop );
 
 ***************************************************************************/
 
-static READ8_HANDLER( in0_l )	{ return readinputport(0); }		// P1 joystick
-static READ8_HANDLER( in0_h )	{ return readinputport(0) >> 4; }	// P2 joystick
-static READ8_HANDLER( in1_l )	{ return readinputport(1); }		// fire and start buttons
-static READ8_HANDLER( in1_h )	{ return readinputport(1) >> 4; }	// coins
-static READ8_HANDLER( dipA_l )	{ return readinputport(2); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return readinputport(2) >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return readinputport(3); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return readinputport(3) >> 4; }	// dips B
-static READ8_HANDLER( in2_l )	{ return readinputport(4); }		// P1 joystick left in liblrabl
-static READ8_HANDLER( in2_h )	{ return readinputport(4) >> 4; }	// P2 joystick left in liblrabl
-static READ8_HANDLER( in3 )		{ return readinputport(5); }		// test, cocktail, optional buttons
+static READ8_HANDLER( in0_l )	{ return input_port_read_indexed(machine, 0); }		// P1 joystick
+static READ8_HANDLER( in0_h )	{ return input_port_read_indexed(machine, 0) >> 4; }	// P2 joystick
+static READ8_HANDLER( in1_l )	{ return input_port_read_indexed(machine, 1); }		// fire and start buttons
+static READ8_HANDLER( in1_h )	{ return input_port_read_indexed(machine, 1) >> 4; }	// coins
+static READ8_HANDLER( dipA_l )	{ return input_port_read_indexed(machine, 2); }		// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read_indexed(machine, 2) >> 4; }	// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read_indexed(machine, 3); }		// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read_indexed(machine, 3) >> 4; }	// dips B
+static READ8_HANDLER( in2_l )	{ return input_port_read_indexed(machine, 4); }		// P1 joystick left in liblrabl
+static READ8_HANDLER( in2_h )	{ return input_port_read_indexed(machine, 4) >> 4; }	// P2 joystick left in liblrabl
+static READ8_HANDLER( in3 )		{ return input_port_read_indexed(machine, 5); }		// test, cocktail, optional buttons
 static WRITE8_HANDLER( out_coin0 )
 {
 	coin_lockout_global_w(data & 4);

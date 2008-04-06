@@ -77,7 +77,7 @@ static UINT8 pot_wheel = 0;
 static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 {
 	if (ACCESSING_BITS_0_7)
-		pot_wheel = ~readinputport(2) & 0xff;
+		pot_wheel = ~input_port_read_indexed(machine, 2) & 0xff;
 }
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
@@ -102,7 +102,7 @@ static READ16_HANDLER( blmbycar_pot_wheel_r )
 
 static READ16_HANDLER( blmbycar_opt_wheel_r )
 {
-	return	(~readinputport(2) & 0xff) << 8;
+	return	(~input_port_read_indexed(machine, 2) & 0xff) << 8;
 }
 
 

@@ -86,7 +86,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 VIDEO_UPDATE( orbit )
 {
-	orbit_flip_screen = readinputport(3) & 8;
+	orbit_flip_screen = input_port_read_indexed(screen->machine, 3) & 8;
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 

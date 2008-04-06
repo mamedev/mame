@@ -371,7 +371,7 @@ static INTERRUPT_GEN( master_interrupt )
 	else
 	{
 		static int oldsteer;
-		int newsteer = readinputport(3)&0xf;
+		int newsteer = input_port_read_indexed(machine, 3)&0xf;
 		if( newsteer!=oldsteer )
 		{
 			if( imola_steerlatch==0 )

@@ -354,7 +354,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ16_HANDLER( in0_r )
 {
-	return readinputport(0) | (pending_command ? 0x80 : 0);
+	return input_port_read_indexed(machine, 0) | (pending_command ? 0x80 : 0);
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )

@@ -489,7 +489,7 @@ static READ32_HANDLER( eeprom_r )
 	//      excpuint stat, objdma stat, eeprom do
 
 	// note: racin' force expects bit 1 of the eeprom port to toggle
-	return(readinputport(6)<<24 | readinputport(7)<<16 | readinputport(0)<<8 | EEPROM_read_bit() | gx_rdport1_3);
+	return(input_port_read_indexed(machine, 6)<<24 | input_port_read_indexed(machine, 7)<<16 | input_port_read_indexed(machine, 0)<<8 | EEPROM_read_bit() | gx_rdport1_3);
 }
 
 static WRITE32_HANDLER( eeprom_w )
@@ -870,9 +870,9 @@ static double adc0834_callback( int input )
 	switch( input )
 	{
 	case ADC083X_CH0:
-		return ( (double)5 * readinputport( 9 ) ) / 255; // steer
+		return ( (double)5 * input_port_read_indexed(Machine,  9 ) ) / 255; // steer
 	case ADC083X_CH1:
-		return ( (double)5 * readinputport( 10 ) ) / 255; // gas
+		return ( (double)5 * input_port_read_indexed(Machine,  10 ) ) / 255; // gas
 	case ADC083X_VREF:
 		return 5;
 	}
@@ -881,23 +881,23 @@ static double adc0834_callback( int input )
 
 static READ32_HANDLER( le2_gun_H_r )
 {
-	int p1x = readinputport(9)*287/0xff+22;
-	int p2x = readinputport(11)*287/0xff+22;
+	int p1x = input_port_read_indexed(machine, 9)*287/0xff+22;
+	int p2x = input_port_read_indexed(machine, 11)*287/0xff+22;
 
 	return (p1x<<16)|p2x;
 }
 
 static READ32_HANDLER( le2_gun_V_r )
 {
-	int p1y = readinputport(10)*223/0xff+1;
-	int p2y = readinputport(12)*223/0xff+1;
+	int p1y = input_port_read_indexed(machine, 10)*223/0xff+1;
+	int p2y = input_port_read_indexed(machine, 12)*223/0xff+1;
 
 	return (p1y<<16)|p2y;
 }
 
 static READ32_HANDLER( service_r )
 {
-	int res = (readinputport(1)<<24) | (readinputport(8)<<8);
+	int res = (input_port_read_indexed(machine, 1)<<24) | (input_port_read_indexed(machine, 8)<<8);
 
 	if (init_eeprom_count)
 	{
@@ -910,7 +910,7 @@ static READ32_HANDLER( service_r )
 
 static READ32_HANDLER( players_r )
 {
-	return (readinputport(2)<<24) | (readinputport(3)<<16) | (readinputport(4)<<8) | (readinputport(5));
+	return (input_port_read_indexed(machine, 2)<<24) | (input_port_read_indexed(machine, 3)<<16) | (input_port_read_indexed(machine, 4)<<8) | (input_port_read_indexed(machine, 5));
 }
 
 

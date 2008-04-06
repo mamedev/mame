@@ -43,8 +43,8 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	*x = (((readinputport(4 + player * 2) & 0xff) * (visarea->max_x - visarea->min_x)) >> 8) + visarea->min_x;
-	*y = (((readinputport(5 + player * 2) & 0xff) * (visarea->max_y - visarea->min_y)) >> 8) + visarea->min_y;
+	*x = (((input_port_read_indexed(machine, 4 + player * 2) & 0xff) * (visarea->max_x - visarea->min_x)) >> 8) + visarea->min_x;
+	*y = (((input_port_read_indexed(machine, 5 + player * 2) & 0xff) * (visarea->max_y - visarea->min_y)) >> 8) + visarea->min_y;
 }
 
 

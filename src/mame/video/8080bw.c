@@ -24,10 +24,10 @@ static UINT8 schaser_background_select;
 
 
 
-void c8080bw_flip_screen_w(int data)
+void c8080bw_flip_screen_w(running_machine *machine, int data)
 {
 	color_map = data;
-	c8080bw_flip_screen = data && (readinputportbytag(CABINET_PORT_TAG) & 0x01);
+	c8080bw_flip_screen = data && (input_port_read(machine, CABINET_PORT_TAG) & 0x01);
 }
 
 

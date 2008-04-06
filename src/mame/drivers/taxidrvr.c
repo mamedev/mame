@@ -61,7 +61,7 @@ static READ8_HANDLER( p1b_r )
 
 static READ8_HANDLER( p1c_r )
 {
-	return (s2 << 7) | (s4 << 6) | ((readinputportbytag("IN2") & 1) << 4);
+	return (s2 << 7) | (s4 << 6) | ((input_port_read(machine, "IN2") & 1) << 4);
 }
 
 static WRITE8_HANDLER( p1a_w )

@@ -46,9 +46,9 @@ static READ8_HANDLER(sharedram_r)
 	static INT32 oldinput=0;
 	INT32 coincnt;
 #ifdef MAME_DEBUG
-	INT32	input=readinputport(13);
+	INT32	input=input_port_read_indexed(machine, 13);
 #else
-	INT32	input=readinputport(10);
+	INT32	input=input_port_read_indexed(machine, 10);
 #endif
 
 	if(input&3)

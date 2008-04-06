@@ -332,8 +332,8 @@ static READ16_HANDLER( topspeed_input_bypass_r )
 {
 	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = readinputportbytag_safe(STEER_PORT_TAG,0x00);
-	int fake = readinputportbytag_safe(FAKE_PORT_TAG,0x00);
+	int analogue_steer = input_port_read_safe(machine, STEER_PORT_TAG,0x00);
+	int fake = input_port_read_safe(machine, FAKE_PORT_TAG,0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{

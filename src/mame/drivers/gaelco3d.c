@@ -354,10 +354,10 @@ static WRITE16_HANDLER( sound_status_w )
  *
  *************************************/
 
-static READ32_HANDLER( input_port_0_020_r ) { return readinputport(0) << 16; }
-static READ32_HANDLER( input_port_1_020_r ) { return readinputport(1) << 16; }
-static READ32_HANDLER( input_port_2_020_r ) { return readinputport(2) << 16; }
-static READ32_HANDLER( input_port_3_020_r ) { return readinputport(3) << 16; }
+static READ32_HANDLER( input_port_0_020_r ) { return input_port_read_indexed(machine, 0) << 16; }
+static READ32_HANDLER( input_port_1_020_r ) { return input_port_read_indexed(machine, 1) << 16; }
+static READ32_HANDLER( input_port_2_020_r ) { return input_port_read_indexed(machine, 2) << 16; }
+static READ32_HANDLER( input_port_3_020_r ) { return input_port_read_indexed(machine, 3) << 16; }
 
 
 static CUSTOM_INPUT( analog_bit_r )
@@ -393,10 +393,10 @@ static WRITE16_HANDLER( analog_port_latch_w )
 	{
 		if (!(data & 0xff))
 		{
-			analog_ports[0] = readinputportbytag_safe("ANALOG0", 0);
-			analog_ports[1] = readinputportbytag_safe("ANALOG1", 0);
-			analog_ports[2] = readinputportbytag_safe("ANALOG2", 0);
-			analog_ports[3] = readinputportbytag_safe("ANALOG3", 0);
+			analog_ports[0] = input_port_read_safe(machine, "ANALOG0", 0);
+			analog_ports[1] = input_port_read_safe(machine, "ANALOG1", 0);
+			analog_ports[2] = input_port_read_safe(machine, "ANALOG2", 0);
+			analog_ports[3] = input_port_read_safe(machine, "ANALOG3", 0);
 		}
 	}
 	else

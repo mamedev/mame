@@ -97,44 +97,44 @@ static WRITE8_HANDLER( tunhunt_control_w )
 
 static READ8_HANDLER( tunhunt_button_r )
 {
-	int data = readinputportbytag("IN0");
+	int data = input_port_read(machine, "IN0");
 	return ((data>>offset)&1)?0x00:0x80;
 }
 
 
 static READ8_HANDLER( dsw1_r )
 {
-	return readinputportbytag("DSW")&0xff;
+	return input_port_read(machine, "DSW")&0xff;
 }
 
 
 static READ8_HANDLER( dsw2_0r )
 {
-	return (readinputportbytag("DSW")&0x0100)?0x80:0x00;
+	return (input_port_read(machine, "DSW")&0x0100)?0x80:0x00;
 }
 
 
 static READ8_HANDLER( dsw2_1r )
 {
-	return (readinputportbytag("DSW")&0x0200)?0x80:0x00;
+	return (input_port_read(machine, "DSW")&0x0200)?0x80:0x00;
 }
 
 
 static READ8_HANDLER( dsw2_2r )
 {
-	return (readinputportbytag("DSW")&0x0400)?0x80:0x00;
+	return (input_port_read(machine, "DSW")&0x0400)?0x80:0x00;
 }
 
 
 static READ8_HANDLER( dsw2_3r )
 {
-	return (readinputportbytag("DSW")&0x0800)?0x80:0x00;
+	return (input_port_read(machine, "DSW")&0x0800)?0x80:0x00;
 }
 
 
 static READ8_HANDLER( dsw2_4r )
 {
-	return (readinputportbytag("DSW")&0x1000)?0x80:0x00;
+	return (input_port_read(machine, "DSW")&0x1000)?0x80:0x00;
 }
 
 

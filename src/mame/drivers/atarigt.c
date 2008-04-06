@@ -106,13 +106,13 @@ static void cage_irq_callback(int reason)
 
 static READ32_HANDLER( inputs_01_r )
 {
-	return (readinputportbytag("IN0") << 16) | readinputportbytag("IN1");
+	return (input_port_read(machine, "IN0") << 16) | input_port_read(machine, "IN1");
 }
 
 
 static READ32_HANDLER( special_port2_r )
 {
-	int temp = readinputportbytag("IN2");
+	int temp = input_port_read(machine, "IN2");
 	temp ^= 0x0001;		/* /A2DRDY always high for now */
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
@@ -121,7 +121,7 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	int temp = readinputportbytag("IN3");
+	int temp = input_port_read(machine, "IN3");
 	if (atarigen_video_int_state) temp ^= 0x0001;
 	if (atarigen_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -131,7 +131,7 @@ static READ32_HANDLER( special_port3_r )
 #if (HACK_TMEK_CONTROLS)
 INLINE void compute_fake_pots(int *pots)
 {
-	int fake = readinputportbytag("FAKE");
+	int fake = input_port_read(machine, "FAKE");
 
 	pots[0] = pots[1] = pots[2] = pots[3] = 0x80;
 
@@ -168,7 +168,7 @@ static READ32_HANDLER( analog_port0_r )
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (readinputportbytag("IN4") << 24) | (readinputportbytag("IN5") << 8);
+	return (input_port_read(machine, "IN4") << 24) | (input_port_read(machine, "IN5") << 8);
 #endif
 }
 
@@ -180,7 +180,7 @@ static READ32_HANDLER( analog_port1_r )
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (readinputportbytag("IN6") << 24) | (readinputportbytag("IN7") << 8);
+	return (input_port_read(machine, "IN6") << 24) | (input_port_read(machine, "IN7") << 8);
 #endif
 }
 

@@ -229,7 +229,7 @@ static READ8_HANDLER( block_input_r )
 	{
 		int delta;
 
-		delta = (readinputport(4 + offset) - dial[offset]) & 0xff;
+		delta = (input_port_read_indexed(machine, 4 + offset) - dial[offset]) & 0xff;
 		if (delta & 0x80)
 		{
 			delta = (-delta) & 0xff;
@@ -256,7 +256,7 @@ static READ8_HANDLER( block_input_r )
 	{
 		int res;
 
-		res = readinputport(2 + offset) & 0xf7;
+		res = input_port_read_indexed(machine, 2 + offset) & 0xf7;
 		if (dir[offset]) res |= 0x08;
 
 		return res;
@@ -268,8 +268,8 @@ static WRITE8_HANDLER( block_dial_control_w )
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
-		dial[0] = readinputport(4);
-		dial[1] = readinputport(5);
+		dial[0] = input_port_read_indexed(machine, 4);
+		dial[1] = input_port_read_indexed(machine, 5);
 	}
 	else if (data == 0x80)
 		dial_selected = 0;
@@ -285,7 +285,7 @@ static READ8_HANDLER( mahjong_input_r )
 	int i;
 
 	for (i = 0;i < 5;i++)
-		if (keymatrix & (0x80 >> i)) return readinputport(2 + 5 * offset + i);
+		if (keymatrix & (0x80 >> i)) return input_port_read_indexed(machine, 2 + 5 * offset + i);
 
 	return 0xff;
 }
@@ -304,22 +304,22 @@ static READ8_HANDLER( input_r )
 	{
 		case 0:
 		default:
-			return readinputport(1 + offset);
+			return input_port_read_indexed(machine, 1 + offset);
 			break;
 		case 1:	/* Mahjong games */
 			if (offset) return mahjong_input_r(machine,offset-1);
-			else return readinputport(1);
+			else return input_port_read_indexed(machine, 1);
 			break;
 		case 2:	/* Block Block - dial control */
 			if (offset) return block_input_r(machine,offset-1);
-			else return readinputport(1);
+			else return input_port_read_indexed(machine, 1);
 			break;
 		case 3:	/* Super Pang - simulate START 1 press to initialize EEPROM */
-			if (offset || init_eeprom_count == 0) return readinputport(1 + offset);
+			if (offset || init_eeprom_count == 0) return input_port_read_indexed(machine, 1 + offset);
 			else
 			{
 				init_eeprom_count--;
-				return readinputport(1) & ~0x08;
+				return input_port_read_indexed(machine, 1) & ~0x08;
 			}
 			break;
 	}

@@ -216,14 +216,14 @@ static WRITE8_HANDLER( gladiatr_bankswitch_w )
 
 static READ8_HANDLER( gladiator_dsw1_r )
 {
-	int orig = readinputportbytag("DSW1")^0xff;
+	int orig = input_port_read(machine, "DSW1")^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
 static READ8_HANDLER( gladiator_dsw2_r )
 {
-	int orig = readinputportbytag("DSW2")^0xff;
+	int orig = input_port_read(machine, "DSW2")^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
@@ -232,15 +232,15 @@ static READ8_HANDLER( gladiator_controll_r )
 {
 	int coins = 0;
 
-	if( readinputportbytag("COINS") & 0xc0 ) coins = 0x80;
+	if( input_port_read(machine, "COINS") & 0xc0 ) coins = 0x80;
 	switch(offset)
 	{
 	case 0x01: /* start button , coins */
-		return readinputportbytag("IN0") | coins;
+		return input_port_read(machine, "IN0") | coins;
 	case 0x02: /* Player 1 Controller , coins */
-		return readinputportbytag("IN1") | coins;
+		return input_port_read(machine, "IN1") | coins;
 	case 0x04: /* Player 2 Controller , coins */
-		return readinputportbytag("IN2") | coins;
+		return input_port_read(machine, "IN2") | coins;
 	}
 	/* unknown */
 	return 0;
@@ -251,7 +251,7 @@ static READ8_HANDLER( gladiator_button3_r )
 	switch(offset)
 	{
 	case 0x01: /* button 3 */
-		return readinputportbytag("IN3");
+		return input_port_read(machine, "IN3");
 	}
 	/* unknown */
 	return 0;
@@ -278,7 +278,7 @@ static MACHINE_RESET( gladiator )
 /* YM2203 port A handler (input) */
 static READ8_HANDLER( gladiator_dsw3_r )
 {
-	return readinputportbytag("DSW3");
+	return input_port_read(machine, "DSW3");
 }
 /* YM2203 port B handler (output) */
 static WRITE8_HANDLER( gladiator_int_control_w )

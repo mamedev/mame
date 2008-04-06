@@ -225,9 +225,9 @@ DRIVER_INIT( dingoe )
 static READ8_HANDLER( kingball_IN0_r )
 {
 	if (kingball_speech_dip)
-		return (readinputport(0) & ~0x40) | ((readinputport(3) & 0x01) << 6);
+		return (input_port_read_indexed(machine, 0) & ~0x40) | ((input_port_read_indexed(machine, 3) & 0x01) << 6);
 	else
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 }
 
 static READ8_HANDLER( kingball_IN1_r )
@@ -236,7 +236,7 @@ static READ8_HANDLER( kingball_IN1_r )
        that it's working, doesn't actually use return value, so we can just use
        rand() */
 
-	return (readinputport(1) & ~0x20) | (mame_rand(Machine) & 0x20);
+	return (input_port_read_indexed(machine, 1) & ~0x20) | (mame_rand(Machine) & 0x20);
 }
 
 WRITE8_HANDLER( kingball_speech_dip_w )
@@ -282,12 +282,12 @@ READ8_HANDLER( scramblb_protection_2_r )
 
 static READ8_HANDLER( azurian_IN1_r )
 {
-	return (readinputport(1) & ~0x40) | ((readinputport(3) & 0x01) << 6);
+	return (input_port_read_indexed(machine, 1) & ~0x40) | ((input_port_read_indexed(machine, 3) & 0x01) << 6);
 }
 
 static READ8_HANDLER( azurian_IN2_r )
 {
-	return (readinputport(2) & ~0x04) | ((readinputport(3) & 0x02) << 1);
+	return (input_port_read_indexed(machine, 2) & ~0x04) | ((input_port_read_indexed(machine, 3) & 0x02) << 1);
 }
 
 
@@ -300,12 +300,12 @@ WRITE8_HANDLER( _4in1_bank_w )
 
 READ8_HANDLER( _4in1_input_port_1_r )
 {
-	return (readinputport(1) & ~0xc0) | (readinputport(3+_4in1_bank) & 0xc0);
+	return (input_port_read_indexed(machine, 1) & ~0xc0) | (input_port_read_indexed(machine, 3+_4in1_bank) & 0xc0);
 }
 
 READ8_HANDLER( _4in1_input_port_2_r )
 {
-	return (readinputport(2) & 0x04) | (readinputport(3+_4in1_bank) & ~0xc4);
+	return (input_port_read_indexed(machine, 2) & 0x04) | (input_port_read_indexed(machine, 3+_4in1_bank) & ~0xc4);
 }
 
 
@@ -320,17 +320,17 @@ static void gmgalax_select_game(int game)
 
 READ8_HANDLER( gmgalax_input_port_0_r )
 {
-	return readinputport(gmgalax_selected_game ? 3 : 0);
+	return input_port_read_indexed(machine, gmgalax_selected_game ? 3 : 0);
 }
 
 READ8_HANDLER( gmgalax_input_port_1_r )
 {
-	return readinputport(gmgalax_selected_game ? 4 : 1);
+	return input_port_read_indexed(machine, gmgalax_selected_game ? 4 : 1);
 }
 
 READ8_HANDLER( gmgalax_input_port_2_r )
 {
-	return readinputport(gmgalax_selected_game ? 5 : 2);
+	return input_port_read_indexed(machine, gmgalax_selected_game ? 5 : 2);
 }
 
 

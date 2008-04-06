@@ -83,7 +83,7 @@ static MACHINE_RESET( atarig42 )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int temp = readinputport(2);
+	int temp = input_port_read_indexed(machine, 2);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -93,7 +93,7 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( a2d_select_w )
 {
-	analog_data = readinputport(4 + (offset != 0));
+	analog_data = input_port_read_indexed(machine, 4 + (offset != 0));
 }
 
 

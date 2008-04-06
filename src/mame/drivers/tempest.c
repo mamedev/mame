@@ -320,11 +320,11 @@ static CUSTOM_INPUT( tempest_knob_r )
 
 	if (tempest_player_select)
 	{
-		ret = readinputportbytag(TEMPEST_KNOB_P2_TAG);
+		ret = input_port_read(machine, TEMPEST_KNOB_P2_TAG);
 	}
 	else
 	{
-		ret = readinputportbytag(TEMPEST_KNOB_P1_TAG);
+		ret = input_port_read(machine, TEMPEST_KNOB_P1_TAG);
 	}
 
 	return ret;
@@ -336,11 +336,11 @@ static CUSTOM_INPUT( tempest_buttons_r )
 
 	if (tempest_player_select)
 	{
-		ret = readinputportbytag(TEMPEST_BUTTONS_P2_TAG);
+		ret = input_port_read(machine, TEMPEST_BUTTONS_P2_TAG);
 	}
 	else
 	{
-		ret = readinputportbytag(TEMPEST_BUTTONS_P1_TAG);
+		ret = input_port_read(machine, TEMPEST_BUTTONS_P1_TAG);
 	}
 
 	return ret;
@@ -349,7 +349,7 @@ static CUSTOM_INPUT( tempest_buttons_r )
 
 static READ8_HANDLER( tempest_IN0_r )
 {
-	int res = readinputport(0);
+	int res = input_port_read_indexed(machine, 0);
 
 	if (avgdvg_done())
 		res |= 0x40;
@@ -364,13 +364,13 @@ static READ8_HANDLER( tempest_IN0_r )
 
 static READ8_HANDLER( input_port_1_bit_r )
 {
-	return (readinputport(1) & (1 << offset)) ? 0 : 228;
+	return (input_port_read_indexed(machine, 1) & (1 << offset)) ? 0 : 228;
 }
 
 
 static READ8_HANDLER( input_port_2_bit_r )
 {
-	return (readinputport(2) & (1 << offset)) ? 0 : 228;
+	return (input_port_read_indexed(machine, 2) & (1 << offset)) ? 0 : 228;
 }
 
 

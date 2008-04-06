@@ -45,9 +45,9 @@ extern VIDEO_EOF( redclash );
 */
 static INTERRUPT_GEN( redclash_interrupt )
 {
-	if (readinputport(4) & 1)	/* Left Coin */
+	if (input_port_read_indexed(machine, 4) & 1)	/* Left Coin */
 		cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
-	else if (readinputport(4) & 2)	/* Right Coin */
+	else if (input_port_read_indexed(machine, 4) & 2)	/* Right Coin */
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 

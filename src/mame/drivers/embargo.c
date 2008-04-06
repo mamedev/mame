@@ -58,7 +58,7 @@ static VIDEO_UPDATE( embargo )
 
 static READ8_HANDLER( input_port_bit_r )
 {
-	return (readinputport(1) << (7 - input_select)) & 0x80;
+	return (input_port_read_indexed(machine, 1) << (7 - input_select)) & 0x80;
 }
 
 
@@ -82,14 +82,14 @@ static READ8_HANDLER( dial_r )
 
 	if (dial_enable_1 && !dial_enable_2)
 	{
-		lo = readinputport(3);
-		hi = readinputport(4);
+		lo = input_port_read_indexed(machine, 3);
+		hi = input_port_read_indexed(machine, 4);
 	}
 
 	if (dial_enable_2 && !dial_enable_1)
 	{
-		lo = readinputport(5);
-		hi = readinputport(6);
+		lo = input_port_read_indexed(machine, 5);
+		hi = input_port_read_indexed(machine, 6);
 	}
 
 	lo = 12 * lo / 256;

@@ -281,8 +281,8 @@ static READ8_HANDLER( kageki_csport_r )
 {
 	int	dsw, dsw1, dsw2;
 
-	dsw1 = readinputportbytag("DSWA");
-	dsw2 = readinputportbytag("DSWB");
+	dsw1 = input_port_read(machine, "DSWA");
+	dsw2 = input_port_read(machine, "DSWB");
 
 	switch (kageki_csport_sel)
 	{

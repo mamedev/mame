@@ -120,13 +120,13 @@ static INT8 maxrpm_p2_shift;
 
 static READ8_HANDLER( demoderm_ip1_r )
 {
-	return readinputportbytag(input_mux ? "MONO.IP1.ALT" : "MONO.IP1");
+	return input_port_read(machine, input_mux ? "MONO.IP1.ALT" : "MONO.IP1");
 }
 
 
 static READ8_HANDLER( demoderm_ip2_r )
 {
-	return readinputportbytag(input_mux ? "MONO.IP2.ALT" : "MONO.IP2");
+	return input_port_read(machine, input_mux ? "MONO.IP2.ALT" : "MONO.IP2");
 }
 
 
@@ -157,8 +157,8 @@ static READ8_HANDLER( maxrpm_ip1_r )
 static READ8_HANDLER( maxrpm_ip2_r )
 {
 	static const UINT8 shift_bits[5] = { 0x00, 0x05, 0x06, 0x01, 0x02 };
-	UINT8 start = readinputportbytag("MONO.IP0");
-	UINT8 shift = readinputportbytag("SHIFT");
+	UINT8 start = input_port_read(machine, "MONO.IP0");
+	UINT8 shift = input_port_read(machine, "SHIFT");
 
 	/* reset on a start */
 	if (!(start & 0x08))
@@ -231,7 +231,7 @@ static WRITE8_HANDLER( maxrpm_op6_w )
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		latched_input = readinputportbytag(inputs[maxrpm_adc_select]);
+		latched_input = input_port_read(machine, inputs[maxrpm_adc_select]);
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
 	/* unfortunately the behavior below doesn't match up with the inputs on the */
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( maxrpm_op6_w )
 
 static READ8_HANDLER( rampage_ip4_r )
 {
-	return readinputportbytag("MONO.IP4") | (soundsgood_status_r(machine,0) << 7);
+	return input_port_read(machine, "MONO.IP4") | (soundsgood_status_r(machine,0) << 7);
 }
 
 
@@ -276,7 +276,7 @@ static WRITE8_HANDLER( rampage_op6_w )
 
 static READ8_HANDLER( powerdrv_ip2_r )
 {
-	return readinputportbytag("MONO.IP2") | (soundsgood_status_r(machine, 0) << 7);
+	return input_port_read(machine, "MONO.IP2") | (soundsgood_status_r(machine, 0) << 7);
 }
 
 
@@ -320,7 +320,7 @@ static WRITE8_HANDLER( powerdrv_op6_w )
 
 static READ8_HANDLER( stargrds_ip0_r )
 {
-	UINT8 result = readinputportbytag(input_mux ? "MONO.IP0.ALT" : "MONO.IP0");
+	UINT8 result = input_port_read(machine, input_mux ? "MONO.IP0.ALT" : "MONO.IP0");
 	return result | ((soundsgood_status_r(machine, 0) << 4) & 0x10);
 }
 
@@ -361,14 +361,14 @@ static WRITE8_HANDLER( stargrds_op6_w )
 
 static READ8_HANDLER( spyhunt_ip1_r )
 {
-	return readinputportbytag("SSIO.IP1") | (csdeluxe_status_r(machine, 0) << 5);
+	return input_port_read(machine, "SSIO.IP1") | (csdeluxe_status_r(machine, 0) << 5);
 }
 
 
 static READ8_HANDLER( spyhunt_ip2_r )
 {
 	/* multiplexed steering wheel/gas pedal */
-	return readinputportbytag(input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
+	return input_port_read(machine, input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
 }
 
 
@@ -420,9 +420,9 @@ static READ8_HANDLER( turbotag_ip2_r )
 {
 	/* multiplexed steering wheel/gas pedal */
 	if (input_mux)
-		return readinputportbytag("SSIO.IP2.ALT");
+		return input_port_read(machine, "SSIO.IP2.ALT");
 
-	return readinputportbytag("SSIO.IP2") + 5 * (video_screen_get_frame_number(machine->primary_screen) & 1);
+	return input_port_read(machine, "SSIO.IP2") + 5 * (video_screen_get_frame_number(machine->primary_screen) & 1);
 }
 
 

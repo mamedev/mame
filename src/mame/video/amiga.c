@@ -166,10 +166,10 @@ VIDEO_START( amiga )
  *
  *************************************/
 
-UINT32 amiga_gethvpos(void)
+UINT32 amiga_gethvpos(const device_config *screen)
 {
-	UINT32 hvpos = (last_scanline << 8) | (video_screen_get_hpos(Machine->primary_screen) >> 2);
-	UINT32 latchedpos = readinputportbytag_safe("HVPOS", 0);
+	UINT32 hvpos = (last_scanline << 8) | (video_screen_get_hpos(screen) >> 2);
+	UINT32 latchedpos = input_port_read_safe(screen->machine, "HVPOS", 0);
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */

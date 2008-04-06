@@ -54,7 +54,7 @@ VIDEO_UPDATE( maddonna );
 
 static READ16_HANDLER( oneshot_in0_word_r )
 {
-	int data = readinputport(0);
+	int data = input_port_read_indexed(machine, 0);
 
 	switch (data & 0x0c)
 	{

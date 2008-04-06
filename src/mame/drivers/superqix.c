@@ -195,7 +195,7 @@ static int from_mcu_pending, from_z80_pending, invert_coin_lockout;
 static READ8_HANDLER( in4_mcu_r )
 {
 //  logerror("%04x: in4_mcu_r\n",activecpu_get_pc());
-	return readinputport(4) | (from_mcu_pending << 6) | (from_z80_pending << 7);
+	return input_port_read_indexed(machine, 4) | (from_mcu_pending << 6) | (from_z80_pending << 7);
 }
 
 static READ8_HANDLER( sqix_from_mcu_r )
@@ -268,11 +268,11 @@ static READ8_HANDLER( mcu_p3_r )
 {
 	if ((port1 & 0x10) == 0)
 	{
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	}
 	else if ((port1 & 0x20) == 0)
 	{
-		return readinputport(2) | (from_mcu_pending << 6) | (from_z80_pending << 7);
+		return input_port_read_indexed(machine, 2) | (from_mcu_pending << 6) | (from_z80_pending << 7);
 	}
 	else if ((port1 & 0x40) == 0)
 	{
@@ -297,7 +297,7 @@ static READ8_HANDLER( nmi_ack_r )
 
 static READ8_HANDLER( bootleg_in0_r )
 {
-	return BITSWAP8(readinputport(0), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(input_port_read_indexed(machine, 0), 0,1,2,3,4,5,6,7);
 }
 
 static WRITE8_HANDLER( bootleg_flipscreen_w )
@@ -318,14 +318,14 @@ static WRITE8_HANDLER( bootleg_flipscreen_w )
  * connected to the 68705 which acts as a counter.
  */
 
-static int read_dial(int player)
+static int read_dial(running_machine *machine, int player)
 {
 	int newpos;
 	static int oldpos[2];
 	static int sign[2];
 
 	/* get the new position and adjust the result */
-	newpos = readinputport(3 + player);
+	newpos = input_port_read_indexed(machine, 3 + player);
 	if (newpos != oldpos[player])
 	{
 		sign[player] = ((newpos - oldpos[player]) & 0x80) >> 7;
@@ -401,11 +401,11 @@ static WRITE8_HANDLER( hotsmash_68705_portC_w )
 		switch (data & 0x07)
 		{
 			case 0x0:	// dsw A
-				portA_in = readinputport(0);
+				portA_in = input_port_read_indexed(machine, 0);
 				break;
 
 			case 0x1:	// dsw B
-				portA_in = readinputport(1);
+				portA_in = input_port_read_indexed(machine, 1);
 				break;
 
 			case 0x2:
@@ -424,11 +424,11 @@ logerror("%04x: z80 reads command %02x\n",activecpu_get_pc(),from_z80);
 				break;
 
 			case 0x6:
-				portA_in = read_dial(0);
+				portA_in = read_dial(machine, 0);
 				break;
 
 			case 0x7:
-				portA_in = read_dial(1);
+				portA_in = read_dial(machine, 1);
 				break;
 		}
 	}
@@ -449,7 +449,7 @@ logerror("%04x: z80 reads answer %02x\n",activecpu_get_pc(),from_mcu);
 static READ8_HANDLER(hotsmash_ay_port_a_r)
 {
 //logerror("%04x: ay_port_a_r and mcu_pending is %d\n",activecpu_get_pc(),from_mcu_pending);
-	return readinputport(2) | ((from_mcu_pending^1) << 7);
+	return input_port_read_indexed(machine, 2) | ((from_mcu_pending^1) << 7);
 }
 
 /**************************************************************************
@@ -469,10 +469,10 @@ static READ8_HANDLER(pbillian_from_mcu_r)
 
 	switch (from_z80)
 	{
-		case 0x01: return readinputport(4 + 2 * curr_player);
-		case 0x02: return readinputport(5 + 2 * curr_player);
-		case 0x04: return readinputport(0);
-		case 0x08: return readinputport(1);
+		case 0x01: return input_port_read_indexed(machine, 4 + 2 * curr_player);
+		case 0x02: return input_port_read_indexed(machine, 5 + 2 * curr_player);
+		case 0x04: return input_port_read_indexed(machine, 0);
+		case 0x08: return input_port_read_indexed(machine, 1);
 		case 0x80: curr_player = 0; return 0;
 		case 0x81: curr_player = 1; return 0;
 	}
@@ -485,7 +485,7 @@ static READ8_HANDLER(pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",activecpu_get_pc());
 	 /* bits 76------  MCU status bits */
-	return (mame_rand(Machine)&0xc0)|readinputport(3);
+	return (mame_rand(Machine)&0xc0)|input_port_read_indexed(machine, 3);
 }
 
 

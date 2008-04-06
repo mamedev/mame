@@ -192,7 +192,7 @@ static WRITE8_HANDLER( controller_select_w )
 
 static READ8_HANDLER( controller_r )
 {
-	return readinputportbytag((controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
+	return input_port_read(machine, (controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
 
 

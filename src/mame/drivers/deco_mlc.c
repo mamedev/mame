@@ -118,13 +118,13 @@ static int mlc_raster_table[9][256];
 
 static READ32_HANDLER( avengrs_control_r )
 {
-	return (readinputport(1)<<16) | (EEPROM_read_bit()<<23) | readinputport(0);
+	return (input_port_read_indexed(machine, 1)<<16) | (EEPROM_read_bit()<<23) | input_port_read_indexed(machine, 0);
 }
 
 static READ32_HANDLER(test2_r)
 {
 //  if (offset==0)
-//      return readinputport(0); //0xffffffff;
+//      return input_port_read_indexed(machine, 0); //0xffffffff;
 //   logerror("%08x:  Test2_r %d\n",activecpu_get_pc(),offset);
 	return mame_rand(Machine); //0xffffffff;
 }

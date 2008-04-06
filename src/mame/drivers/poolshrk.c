@@ -72,10 +72,10 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 
 static READ8_HANDLER( poolshrk_input_r )
 {
-	UINT8 val = readinputport(offset & 3);
+	UINT8 val = input_port_read_indexed(machine, offset & 3);
 
-	int x = readinputport(4 + (offset & 1));
-	int y = readinputport(6 + (offset & 1));
+	int x = input_port_read_indexed(machine, 4 + (offset & 1));
+	int y = input_port_read_indexed(machine, 6 + (offset & 1));
 
 	if (x >= poolshrk_da_latch) val |= 8;
 	if (y >= poolshrk_da_latch) val |= 4;

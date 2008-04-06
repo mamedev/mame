@@ -161,7 +161,7 @@ static WRITE8_HANDLER( custom_io_w )
 {
 	switch (data)
 	{
-		case 0x00: protection_res = readinputport(7); break;
+		case 0x00: protection_res = input_port_read_indexed(machine, 7); break;
 		case 0x20: protection_res = 0x49; break;
 		case 0x21: protection_res = 0x47; break;
 		case 0x22: protection_res = 0x53; break;

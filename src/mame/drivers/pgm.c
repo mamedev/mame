@@ -2061,7 +2061,7 @@ static READ16_HANDLER( killbld_prot_r )
 		else if(kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x89911400|readinputport(4); // region
+			protvalue = 0x89911400|input_port_read_indexed(machine, 4); // region
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 		}
@@ -2140,7 +2140,7 @@ static READ16_HANDLER(ddp2_protram_r)
 {
 	if (PGMLOGERROR) logerror("prot_r %04x, %04x\n", offset,ddp2_protram[offset]);
 
-	if (offset == 0x02/2) return readinputport(4);
+	if (offset == 0x02/2) return input_port_read_indexed(machine, 4);
 
 	if (offset == 0x1f00/2) return 0;
 
@@ -2252,7 +2252,7 @@ static READ16_HANDLER( olds_r16 )
 			res=olds_cmd3;
 		else if(kb_cmd==5)
 		{
-			UINT32 protvalue = 0x900000|readinputport(4); // region from protection device.
+			UINT32 protvalue = 0x900000|input_port_read_indexed(machine, 4); // region from protection device.
 			res=(protvalue>>(8*(ptr-1)))&0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}

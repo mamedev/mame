@@ -1400,7 +1400,7 @@ static WRITE32_HANDLER( analog_port_w )
 {
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", activecpu_get_pc(), data);
-	pending_analog_read = readinputport(4 + (data & 7));
+	pending_analog_read = input_port_read_indexed(machine, 4 + (data & 7));
 }
 
 
@@ -1418,39 +1418,39 @@ static READ32_HANDLER( carnevil_gun_r )
 	switch (offset)
 	{
 		case 0:		/* low 8 bits of X */
-			result = (readinputport(4) << 4) & 0xff;
+			result = (input_port_read_indexed(machine, 4) << 4) & 0xff;
 			break;
 
 		case 1:		/* upper 4 bits of X */
-			result = (readinputport(4) >> 4) & 0x0f;
-			result |= (readinputport(8) & 0x03) << 4;
+			result = (input_port_read_indexed(machine, 4) >> 4) & 0x0f;
+			result |= (input_port_read_indexed(machine, 8) & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:		/* low 8 bits of Y */
-			result = (readinputport(5) << 2) & 0xff;
+			result = (input_port_read_indexed(machine, 5) << 2) & 0xff;
 			break;
 
 		case 3:		/* upper 4 bits of Y */
-			result = (readinputport(5) >> 6) & 0x03;
+			result = (input_port_read_indexed(machine, 5) >> 6) & 0x03;
 			break;
 
 		case 4:		/* low 8 bits of X */
-			result = (readinputport(6) << 4) & 0xff;
+			result = (input_port_read_indexed(machine, 6) << 4) & 0xff;
 			break;
 
 		case 5:		/* upper 4 bits of X */
-			result = (readinputport(6) >> 4) & 0x0f;
-			result |= (readinputport(8) & 0x30);
+			result = (input_port_read_indexed(machine, 6) >> 4) & 0x0f;
+			result |= (input_port_read_indexed(machine, 8) & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:		/* low 8 bits of Y */
-			result = (readinputport(7) << 2) & 0xff;
+			result = (input_port_read_indexed(machine, 7) << 2) & 0xff;
 			break;
 
 		case 7:		/* upper 4 bits of Y */
-			result = (readinputport(7) >> 6) & 0x03;
+			result = (input_port_read_indexed(machine, 7) >> 6) & 0x03;
 			break;
 	}
 	return result;

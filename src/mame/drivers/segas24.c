@@ -510,19 +510,19 @@ static UINT8 hotrod_io_r(running_machine *machine, int port)
 {
 	switch(port) {
 	case 0:
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	case 1:
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 2:
 		return 0xff;
 	case 3:
 		return 0xff;
 	case 4:
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 	case 5: // Dip switches
-		return readinputport(3);
+		return input_port_read_indexed(machine, 3);
 	case 6:
-		return readinputport(4);
+		return input_port_read_indexed(machine, 4);
 	case 7: // DAC
 		return 0xff;
 	}
@@ -534,20 +534,20 @@ static UINT8 dcclub_io_r(running_machine *machine, int port)
 	switch(port) {
 	case 0: {
 		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
-		return (readinputport(0) & 0xf) | ((~pos[readinputport(5)>>4]<<4) & 0xf0);
+		return (input_port_read_indexed(machine, 0) & 0xf) | ((~pos[input_port_read_indexed(machine, 5)>>4]<<4) & 0xf0);
 	}
 	case 1:
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 2:
 		return 0xff;
 	case 3:
 		return 0xff;
 	case 4:
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 	case 5: // Dip switches
-		return readinputport(3);
+		return input_port_read_indexed(machine, 3);
 	case 6:
-		return readinputport(4);
+		return input_port_read_indexed(machine, 4);
 	case 7: // DAC
 		return 0xff;
 	}
@@ -564,15 +564,15 @@ static UINT8 mahmajn_io_r(running_machine *machine, int port)
 	case 1:
 		return 0xff;
 	case 2:
-		return readinputport(cur_input_line);
+		return input_port_read_indexed(machine, cur_input_line);
 	case 3:
 		return 0xff;
 	case 4:
-		return readinputport(8);
+		return input_port_read_indexed(machine, 8);
 	case 5: // Dip switches
-		return readinputport(9);
+		return input_port_read_indexed(machine, 9);
 	case 6:
-		return readinputport(10);
+		return input_port_read_indexed(machine, 10);
 	case 7: // DAC
 		return 0xff;
 	}
@@ -583,19 +583,19 @@ static UINT8 gground_io_r(running_machine *machine, int port)
 {
 	switch(port) {
 	case 0:
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	case 1:
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 2: // P3 inputs
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 	case 3:
 		return 0xff;
 	case 4:
-		return readinputport(3);
+		return input_port_read_indexed(machine, 3);
 	case 5: // Dip switches
-		return readinputport(4);
+		return input_port_read_indexed(machine, 4);
 	case 6:
-		return readinputport(5);
+		return input_port_read_indexed(machine, 5);
 	case 7: // DAC
 		return 0xff;
 	}
@@ -636,7 +636,7 @@ static WRITE16_HANDLER( hotrod3_ctrl_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		data &= 3;
-		hotrod_ctrl_cur = readinputport(9+data);
+		hotrod_ctrl_cur = input_port_read_indexed(machine, 9+data);
 	}
 }
 
@@ -646,21 +646,21 @@ static READ16_HANDLER( hotrod3_ctrl_r )
 		switch(offset) {
 			// Steering dials
 		case 0:
-			return readinputport(5) & 0xff;
+			return input_port_read_indexed(machine, 5) & 0xff;
 		case 1:
-			return readinputport(5) >> 8;
+			return input_port_read_indexed(machine, 5) >> 8;
 		case 2:
-			return readinputport(6) & 0xff;
+			return input_port_read_indexed(machine, 6) & 0xff;
 		case 3:
-			return readinputport(6) >> 8;
+			return input_port_read_indexed(machine, 6) >> 8;
 		case 4:
-			return readinputport(7) & 0xff;
+			return input_port_read_indexed(machine, 7) & 0xff;
 		case 5:
-			return readinputport(7) >> 8;
+			return input_port_read_indexed(machine, 7) >> 8;
 		case 6:
-			return readinputport(8) & 0xff;
+			return input_port_read_indexed(machine, 8) & 0xff;
 		case 7:
-			return readinputport(8) >> 8;
+			return input_port_read_indexed(machine, 8) >> 8;
 
 		case 8: { // Serial ADCs for the accel
 			int v = hotrod_ctrl_cur & 0x80;

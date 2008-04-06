@@ -63,13 +63,13 @@ static READ8_HANDLER( flkatck_ls138_r )
 	switch ((offset & 0x1c) >> 2){
 		case 0x00:	/* inputs + DIPSW #3 + coinsw */
 			if (offset & 0x02)
-				data = readinputport(2 + (offset & 0x01));
+				data = input_port_read_indexed(machine, 2 + (offset & 0x01));
 			else
-				data = readinputport(4 + (offset & 0x01));
+				data = input_port_read_indexed(machine, 4 + (offset & 0x01));
 			break;
 		case 0x01:	/* DIPSW #1 & DIPSW #2 */
 			if (offset & 0x02)
-				data = readinputport(1 - (offset & 0x01));
+				data = input_port_read_indexed(machine, 1 - (offset & 0x01));
 			break;
 	}
 

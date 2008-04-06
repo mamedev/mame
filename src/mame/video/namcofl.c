@@ -87,24 +87,24 @@ static UINT8 credits1, credits2;
 	static int old_coin_state;
 
 static void
-handle_mcu( void )
+handle_mcu( running_machine *machine )
 	{
 	UINT8 *IORAM = (UINT8 *)namcofl_mcuram;
 	static int toggle;
-	int new_coin_state = readinputport(3)&0x30;
-	unsigned p1 = readinputport(0);
-	unsigned p2 = readinputport(2);
-	unsigned p3 = readinputport(1);
-	unsigned p4 = readinputport(3);
+	int new_coin_state = input_port_read_indexed(machine, 3)&0x30;
+	unsigned p1 = input_port_read_indexed(machine, 0);
+	unsigned p2 = input_port_read_indexed(machine, 2);
+	unsigned p3 = input_port_read_indexed(machine, 1);
+	unsigned p4 = input_port_read_indexed(machine, 3);
 
 	IORAM[BYTE4_XOR_LE(0x6000)] = p1;
 	IORAM[BYTE4_XOR_LE(0x6003)] = p2;
 	IORAM[BYTE4_XOR_LE(0x6005)] = p3;
 	IORAM[BYTE4_XOR_LE(0x60b8)] = p4;
 
-	IORAM[BYTE4_XOR_LE(0x6014)] = readinputport(6)-1;	// handle
-	IORAM[BYTE4_XOR_LE(0x6016)] = readinputport(5);	// brake
-	IORAM[BYTE4_XOR_LE(0x6018)] = readinputport(4);	// accelerator
+	IORAM[BYTE4_XOR_LE(0x6014)] = input_port_read_indexed(machine, 6)-1;	// handle
+	IORAM[BYTE4_XOR_LE(0x6016)] = input_port_read_indexed(machine, 5);	// brake
+	IORAM[BYTE4_XOR_LE(0x6018)] = input_port_read_indexed(machine, 4);	// accelerator
 
 	if (!(new_coin_state & 0x20) && (old_coin_state & 0x20))
 	{
@@ -145,7 +145,7 @@ VIDEO_UPDATE( namcofl )
 {
 	int pri;
 
-	handle_mcu();
+	handle_mcu(screen->machine);
 	namcofl_install_palette(screen->machine);
 
 	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
@@ -180,7 +180,7 @@ static int FLobjcode2tile( int code )
 VIDEO_START( namcofl )
 {
 	credits1 = credits2 = 0;
-	old_coin_state = readinputport(3)&0x30;
+	old_coin_state = input_port_read_indexed(machine, 3)&0x30;
 
 	namco_tilemap_init( NAMCONB1_TILEGFX, memory_region(NAMCONB1_TILEMASKREGION), TilemapCB );
 	namco_obj_init(NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);

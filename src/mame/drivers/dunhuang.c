@@ -345,7 +345,7 @@ static UINT8 dunhuang_hopper;
 static WRITE8_HANDLER( dunhuang_input_w )	{	dunhuang_input = data;	}
 static READ8_HANDLER( dunhuang_service_r )
 {
-	return readinputport(5)
+	return input_port_read_indexed(machine, 5)
 	 | ((dunhuang_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
@@ -353,21 +353,21 @@ static READ8_HANDLER( dunhuang_service_r )
 
 static READ8_HANDLER( dunhuang_dsw_r )
 {
-	if (!(dunhuang_input & 0x01))	return readinputport(0);
-	if (!(dunhuang_input & 0x02))	return readinputport(1);
-	if (!(dunhuang_input & 0x04))	return readinputport(2);
-	if (!(dunhuang_input & 0x08))	return readinputport(3);
-	if (!(dunhuang_input & 0x10))	return readinputport(4);
+	if (!(dunhuang_input & 0x01))	return input_port_read_indexed(machine, 0);
+	if (!(dunhuang_input & 0x02))	return input_port_read_indexed(machine, 1);
+	if (!(dunhuang_input & 0x04))	return input_port_read_indexed(machine, 2);
+	if (!(dunhuang_input & 0x08))	return input_port_read_indexed(machine, 3);
+	if (!(dunhuang_input & 0x10))	return input_port_read_indexed(machine, 4);
 	logerror("%06x: warning, unknown dsw bits read, dunhuang_input = %02x\n", activecpu_get_pc(), dunhuang_input);
 	return 0xff;
 }
 static READ8_HANDLER( dunhuang_input_r )
 {
-	if (!(dunhuang_input & 0x01))	return readinputport(6);
-	if (!(dunhuang_input & 0x02))	return readinputport(7);
-	if (!(dunhuang_input & 0x04))	return readinputport(8);
-	if (!(dunhuang_input & 0x08))	return readinputport(9);
-	if (!(dunhuang_input & 0x10))	return readinputport(10);
+	if (!(dunhuang_input & 0x01))	return input_port_read_indexed(machine, 6);
+	if (!(dunhuang_input & 0x02))	return input_port_read_indexed(machine, 7);
+	if (!(dunhuang_input & 0x04))	return input_port_read_indexed(machine, 8);
+	if (!(dunhuang_input & 0x08))	return input_port_read_indexed(machine, 9);
+	if (!(dunhuang_input & 0x10))	return input_port_read_indexed(machine, 10);
 	logerror("%06x: warning, unknown input bits read, dunhuang_input = %02x\n", activecpu_get_pc(), dunhuang_input);
 	return 0xff;
 }

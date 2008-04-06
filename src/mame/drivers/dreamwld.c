@@ -193,13 +193,13 @@ static READ32_HANDLER( dreamwld_protdata_r )
 
 static READ32_HANDLER( dreamwld_inputs_r )
 {
-	return readinputport(1)|(readinputport(0)<<16);
+	return input_port_read_indexed(machine, 1)|(input_port_read_indexed(machine, 0)<<16);
 }
 
 static READ32_HANDLER( dreamwld_dips_r )
 {
 	int x;
-	x= readinputport(2);
+	x= input_port_read_indexed(machine, 2);
 	return x|(x<<16);
 }
 

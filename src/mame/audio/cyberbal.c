@@ -41,8 +41,8 @@ void cyberbal_sound_reset(void)
 
 READ8_HANDLER( cyberbal_special_port3_r )
 {
-	int temp = readinputport(3);
-	if (!(readinputport(0) & 0x8000)) temp ^= 0x80;
+	int temp = input_port_read_indexed(machine, 3);
+	if (!(input_port_read_indexed(machine, 0) & 0x8000)) temp ^= 0x80;
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x40;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x20;
 	return temp;

@@ -26,9 +26,9 @@ static WRITE8_HANDLER(videopin_out1_w);
 static WRITE8_HANDLER(videopin_out2_w);
 
 
-static void update_plunger(void)
+static void update_plunger(running_machine *machine)
 {
-	UINT8 val = readinputport(3);
+	UINT8 val = input_port_read_indexed(machine, 3);
 
 	if (prev != val)
 	{
@@ -51,7 +51,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	int scanline = param;
 
-	update_plunger();
+	update_plunger(machine);
 
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
@@ -94,7 +94,7 @@ static READ8_HANDLER( videopin_misc_r )
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = readinputport(2);
+	UINT8 val = input_port_read_indexed(machine, 2);
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{

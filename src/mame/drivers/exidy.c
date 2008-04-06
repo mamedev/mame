@@ -145,7 +145,7 @@ static UINT8 last_dial;
 static CUSTOM_INPUT( teetert_input_direction_r )
 {
 	int result = 0;
-	UINT8 dial = readinputportbytag("DIAL");
+	UINT8 dial = input_port_read(machine, "DIAL");
 
 	if (dial != last_dial)
 	{
@@ -164,7 +164,7 @@ static CUSTOM_INPUT( teetert_input_direction_r )
 
 static CUSTOM_INPUT( teetert_input_movement_r )
 {
-	UINT8 dial = readinputportbytag("DIAL");
+	UINT8 dial = input_port_read(machine, "DIAL");
 
 	return (dial != last_dial) ? 1 : 0;
 }

@@ -253,7 +253,7 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 
 static VIDEO_UPDATE( madalien )
 {
-	int flip = BIT(readinputportbytag("DIP"), 6) && BIT(*madalien_video_control, 0);
+	int flip = BIT(input_port_read(screen->machine, "DIP"), 6) && BIT(*madalien_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//

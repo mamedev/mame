@@ -8,6 +8,7 @@
 
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/amiga.h"
 #include "sound/es5503.h"
 
@@ -30,7 +31,7 @@
 
 static UINT8 mquake_cia_0_porta_r(void)
 {
-	return readinputportbytag("CIA0PORTA");
+	return input_port_read(Machine, "CIA0PORTA");
 }
 
 static void mquake_cia_0_porta_w(UINT8 data)
@@ -124,7 +125,7 @@ static WRITE16_HANDLER( output_w )
 static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
-		return readinputportbytag("COINCHIP");
+		return input_port_read(machine, "COINCHIP");
 	logerror("%06x:coin_chip_r(%02x) & %04x\n", activecpu_get_pc(), offset, mem_mask ^ 0xffff);
 	return 0xffff;
 }

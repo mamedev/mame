@@ -153,7 +153,7 @@ static VIDEO_UPDATE( wcvol95 )
 
 static READ32_HANDLER(hvysmsh_eeprom_r)
 {
-	return (EEPROM_read_bit()<<24) | readinputport(0) | (readinputport(1)<<16);
+	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1)<<16);
 }
 
 static WRITE32_HANDLER(hvysmsh_eeprom_w)
@@ -196,7 +196,7 @@ static WRITE32_HANDLER(hvysmsh_oki_1_w)
 
 static READ32_HANDLER(wcvol95_eeprom_r)
 {
-	return (EEPROM_read_bit()<<24) | readinputport(0) | ((readinputport(1)&0xff)<<16);
+	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | ((input_port_read_indexed(machine, 1)&0xff)<<16);
 }
 
 static WRITE32_HANDLER(wcvol95_eeprom_w)

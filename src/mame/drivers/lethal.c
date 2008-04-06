@@ -177,8 +177,8 @@ maybe some priority issues / sprite placement issues..
 #define SOUND_CLOCK		XTAL_18_432MHz
 
 
-#define GUNX( a ) (( ( readinputport( a ) * 287 ) / 0xff ) + 16)
-#define GUNY( a ) (( ( readinputport( a ) * 223 ) / 0xff ) + 10)
+#define GUNX( a ) (( ( input_port_read_indexed(machine,  a ) * 287 ) / 0xff ) + 16)
+#define GUNY( a ) (( ( input_port_read_indexed(machine,  a ) * 223 ) / 0xff ) + 10)
 
 VIDEO_START(lethalen);
 VIDEO_UPDATE(lethalen);

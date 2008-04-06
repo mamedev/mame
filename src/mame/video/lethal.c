@@ -10,8 +10,8 @@
 #include "driver.h"
 #include "video/konamiic.h"
 
-#define GUNX( a ) ( ( readinputport( a ) * 287 ) / 0xff )
-#define GUNY( a ) ( ( readinputport( a ) * 223 ) / 0xff )
+#define GUNX( a ) ( ( input_port_read_indexed(machine,  a ) * 287 ) / 0xff )
+#define GUNY( a ) ( ( input_port_read_indexed(machine,  a ) * 223 ) / 0xff )
 
 static int sprite_colorbase;
 static int layer_colorbase[4];

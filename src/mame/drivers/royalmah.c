@@ -251,9 +251,9 @@ static READ8_HANDLER ( majs101b_dsw_r )
 {
 	switch (dsw_select)
 	{
-		case 0x00: return readinputport(13);	/* DSW3 */
-		case 0x20: return readinputport(14);	/* DSW4 */
-		case 0x40: return readinputport(12);	/* DSW2 */
+		case 0x00: return input_port_read_indexed(machine, 13);	/* DSW3 */
+		case 0x20: return input_port_read_indexed(machine, 14);	/* DSW4 */
+		case 0x40: return input_port_read_indexed(machine, 12);	/* DSW2 */
 	}
 	return 0;
 }
@@ -271,9 +271,9 @@ static READ8_HANDLER ( suzume_dsw_r )
 	{
 		switch (suzume_bank)
 		{
-			case 0x08: return readinputport(14);	/* DSW4 */
-			case 0x10: return readinputport(13);	/* DSW3 */
-			case 0x18: return readinputport(12);	/* DSW2 */
+			case 0x08: return input_port_read_indexed(machine, 14);	/* DSW4 */
+			case 0x10: return input_port_read_indexed(machine, 13);	/* DSW3 */
+			case 0x18: return input_port_read_indexed(machine, 12);	/* DSW2 */
 		}
 		return 0;
 	}
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 
 static READ8_HANDLER( mjapinky_dsw_r )
 {
-	if (rombank == 0x0e)	return readinputport(13);
+	if (rombank == 0x0e)	return input_port_read_indexed(machine, 13);
 	else					return *(memory_region(REGION_CPU1) + 0x10000 + 0x8000 * rombank);
 }
 
@@ -502,11 +502,11 @@ static READ8_HANDLER( janptr96_dswsel_r )
 
 static READ8_HANDLER( janptr96_dsw_r )
 {
-	if (~dsw_select & 0x01) return readinputportbytag("DSW4");
-	if (~dsw_select & 0x02) return readinputportbytag("DSW3");
-	if (~dsw_select & 0x04) return readinputportbytag("DSW2");
-	if (~dsw_select & 0x08) return readinputportbytag("DSW1");
-	if (~dsw_select & 0x10) return readinputportbytag("DSWTOP");
+	if (~dsw_select & 0x01) return input_port_read(machine, "DSW4");
+	if (~dsw_select & 0x02) return input_port_read(machine, "DSW3");
+	if (~dsw_select & 0x04) return input_port_read(machine, "DSW2");
+	if (~dsw_select & 0x08) return input_port_read(machine, "DSW1");
+	if (~dsw_select & 0x10) return input_port_read(machine, "DSWTOP");
 	return 0xff;
 }
 
@@ -572,10 +572,10 @@ static READ8_HANDLER( mjifb_rom_io_r )
 
 	switch(offset)
 	{
-		case 0x8000:	return readinputport(14);		// dsw 4
-		case 0x8200:	return readinputport(13);		// dsw 3
+		case 0x8000:	return input_port_read_indexed(machine, 14);		// dsw 4
+		case 0x8200:	return input_port_read_indexed(machine, 13);		// dsw 3
 		case 0x9001:	return AY8910_read_port_0_r(machine,0);	// inputs
-		case 0x9011:	return readinputport(10);
+		case 0x9011:	return input_port_read_indexed(machine, 10);
 	}
 
 	logerror("%04X: unmapped input read at %04X\n", activecpu_get_pc(), offset);
@@ -624,19 +624,19 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjifb_p3_r )
 {
-	return readinputport(11) >> 6;
+	return input_port_read_indexed(machine, 11) >> 6;
 }
 static READ8_HANDLER( mjifb_p5_r )
 {
-	return readinputport(11);
+	return input_port_read_indexed(machine, 11);
 }
 static READ8_HANDLER( mjifb_p6_r )
 {
-	return readinputport(12);
+	return input_port_read_indexed(machine, 12);
 }
 static READ8_HANDLER( mjifb_p7_r )
 {
-	return readinputport(12) >> 4;
+	return input_port_read_indexed(machine, 12) >> 4;
 }
 static READ8_HANDLER( mjifb_p8_r )
 {
@@ -679,10 +679,10 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 
 	switch(offset)
 	{
-		case 0x8000:	return readinputport(14);		// dsw 2
-		case 0x8001:	return readinputport(13);		// dsw 1
+		case 0x8000:	return input_port_read_indexed(machine, 14);		// dsw 2
+		case 0x8001:	return input_port_read_indexed(machine, 13);		// dsw 1
 		case 0x9001:	return AY8910_read_port_0_r(machine,0);	// inputs
-		case 0x9011:	return readinputport(10);
+		case 0x9011:	return input_port_read_indexed(machine, 10);
 	}
 
 	logerror("%04X: unmapped input read at %04X\n", activecpu_get_pc(), offset);
@@ -795,11 +795,11 @@ static READ8_HANDLER( cafetime_dsw_r )
 {
 	switch( dsw_select )
 	{
-		case 0x00: return readinputportbytag("DSW1");
-		case 0x01: return readinputportbytag("DSW2");
-		case 0x02: return readinputportbytag("DSW3");
-		case 0x03: return readinputportbytag("DSW4");
-		case 0x04: return readinputportbytag("DSWTOP");
+		case 0x00: return input_port_read(machine, "DSW1");
+		case 0x01: return input_port_read(machine, "DSW2");
+		case 0x02: return input_port_read(machine, "DSW3");
+		case 0x03: return input_port_read(machine, "DSW4");
+		case 0x04: return input_port_read(machine, "DSWTOP");
 	}
 	logerror("%04X: unmapped dsw read %02X\n", activecpu_get_pc(), dsw_select);
 	return 0xff;

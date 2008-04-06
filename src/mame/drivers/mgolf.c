@@ -71,9 +71,9 @@ static VIDEO_UPDATE( mgolf )
 }
 
 
-static void update_plunger(void)
+static void update_plunger(running_machine *machine)
 {
-	UINT8 val = readinputport(5);
+	UINT8 val = input_port_read_indexed(machine, 5);
 
 	if (prev != val)
 	{
@@ -96,7 +96,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	int scanline = param;
 
-	update_plunger();
+	update_plunger(machine);
 
 	cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 
@@ -138,13 +138,13 @@ static READ8_HANDLER( mgolf_wram_r )
 
 static READ8_HANDLER( mgolf_dial_r )
 {
-	UINT8 val = readinputport(1);
+	UINT8 val = input_port_read_indexed(machine, 1);
 
-	if ((readinputport(4) + 0x00) & 0x20)
+	if ((input_port_read_indexed(machine, 4) + 0x00) & 0x20)
 	{
 		val |= 0x01;
 	}
-	if ((readinputport(4) + 0x10) & 0x20)
+	if ((input_port_read_indexed(machine, 4) + 0x10) & 0x20)
 	{
 		val |= 0x02;
 	}
@@ -157,7 +157,7 @@ static READ8_HANDLER( mgolf_misc_r )
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
-	UINT8 val = readinputport(3);
+	UINT8 val = input_port_read_indexed(machine, 3);
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{

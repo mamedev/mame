@@ -154,7 +154,7 @@ static INPUT_CHANGED( coin2_inserted )
 
 static CUSTOM_INPUT( ladybug_p1_control_r )
 {
-	return readinputportbytag(LADYBUG_P1_CONTROL_PORT_TAG);
+	return input_port_read(machine, LADYBUG_P1_CONTROL_PORT_TAG);
 }
 
 static CUSTOM_INPUT( ladybug_p2_control_r )
@@ -162,10 +162,10 @@ static CUSTOM_INPUT( ladybug_p2_control_r )
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (readinputportbytag("DSW0") & 0x20)
-		ret = readinputportbytag(LADYBUG_P2_CONTROL_PORT_TAG);
+	if (input_port_read(machine, "DSW0") & 0x20)
+		ret = input_port_read(machine, LADYBUG_P2_CONTROL_PORT_TAG);
 	else
-		ret = readinputportbytag(LADYBUG_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(machine, LADYBUG_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }

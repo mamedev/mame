@@ -205,8 +205,8 @@ static WRITE8_HANDLER( mrflea_select3_w ){
 /*******************************************************/
 
 static READ8_HANDLER( mrflea_input0_r ){
-	if( mrflea_select0 == 0x0f ) return readinputport(0);
-	if( mrflea_select0 == 0x0e ) return readinputport(1);
+	if( mrflea_select0 == 0x0f ) return input_port_read_indexed(machine, 0);
+	if( mrflea_select0 == 0x0e ) return input_port_read_indexed(machine, 1);
 	return 0x00;
 }
 
@@ -215,8 +215,8 @@ static READ8_HANDLER( mrflea_input1_r ){
 }
 
 static READ8_HANDLER( mrflea_input2_r ){
-	if( mrflea_select2 == 0x0f ) return readinputport(2);
-	if( mrflea_select2 == 0x0e ) return readinputport(3);
+	if( mrflea_select2 == 0x0f ) return input_port_read_indexed(machine, 2);
+	if( mrflea_select2 == 0x0e ) return input_port_read_indexed(machine, 3);
 	return 0x00;
 }
 

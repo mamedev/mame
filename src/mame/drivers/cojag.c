@@ -368,7 +368,7 @@ static READ32_HANDLER( jaguar_wave_rom_r )
 
 static READ32_HANDLER( jamma_r )
 {
-	return readinputport(0) | (readinputport(1) << 16);
+	return input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1) << 16);
 }
 
 
@@ -381,7 +381,7 @@ static READ32_HANDLER( status_r )
 	// D5     = /VOLUMEUP
 	// D4     = /VOLUMEDOWN
 	// D3-D0  = ACTC4-1
-	return readinputport(2) | (readinputport(2) << 16);
+	return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2) << 16);
 }
 
 

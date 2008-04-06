@@ -94,10 +94,10 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 static int touchscreen;
 
-static void show_touchscreen(void)
+static void show_touchscreen(running_machine *machine)
 {
 #ifdef MAME_DEBUG
-	popmessage("% d] %03x %03x - %d",touchscreen,readinputportbytag("TSCREEN_X")&0x1ff,readinputportbytag("TSCREEN_Y"),okibank);
+	popmessage("% d] %03x %03x - %d",touchscreen,input_port_read(machine, "TSCREEN_X")&0x1ff,input_port_read(machine, "TSCREEN_Y"),okibank);
 #endif
 }
 
@@ -106,7 +106,7 @@ static WRITE16_HANDLER( tmaster_tscreen_reset_w )
 	if (ACCESSING_BITS_0_7 && data == 0x05)
 	{
 		touchscreen = 0;
-		show_touchscreen();
+		show_touchscreen(machine);
 	}
 }
 
@@ -116,7 +116,7 @@ static READ16_HANDLER( tmaster_tscreen_next_r )
 		touchscreen++;
 	if (touchscreen == 6)
 		touchscreen = -1;
-	show_touchscreen();
+	show_touchscreen(machine);
 
 	return 0;
 }
@@ -134,17 +134,17 @@ static READ16_HANDLER( tmaster_tscreen_x_lo_r )
 {
 	UINT16 val = 0;
 
-	int press1 = readinputportbytag("TSCREEN_X") & 0x4000;
-	int press2 = readinputportbytag("TSCREEN_X") & 0x8000;
+	int press1 = input_port_read(machine, "TSCREEN_X") & 0x4000;
+	int press2 = input_port_read(machine, "TSCREEN_X") & 0x8000;
 	if (press1)	press2 = 1;
 
 	switch (touchscreen)
 	{
 		case 1:	val = press1 ? 0 : 1<<6;	break;	// press
-		case 2:	val = readinputportbytag("TSCREEN_X") & 0x003;	break;
-		case 3:	val = (readinputportbytag("TSCREEN_X") >> 2) & 0x7f;	break;
+		case 2:	val = input_port_read(machine, "TSCREEN_X") & 0x003;	break;
+		case 3:	val = (input_port_read(machine, "TSCREEN_X") >> 2) & 0x7f;	break;
 		case 4:	val = 0;	break;
-		case 5:	val = ((readinputportbytag("TSCREEN_Y")^0xff) >> 1) & 0x7f;	break;
+		case 5:	val = ((input_port_read(machine, "TSCREEN_Y")^0xff) >> 1) & 0x7f;	break;
 
 		default:
 			return 0;
@@ -383,7 +383,7 @@ static READ16_HANDLER( tmaster_blitter_r )
 
 static READ16_HANDLER( tmaster_coins_r )
 {
-	return readinputportbytag("COIN")|(mame_rand(Machine)&0x0800);
+	return input_port_read(machine, "COIN")|(mame_rand(Machine)&0x0800);
 }
 
 static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )

@@ -38,7 +38,7 @@ static WRITE8_HANDLER( xxmissio_bank_sel_w )
 
 static READ8_HANDLER( xxmissio_status_r )
 {
-	xxmissio_status = (xxmissio_status | 2) & ( readinputportbytag("IN2") | 0xfd );
+	xxmissio_status = (xxmissio_status | 2) & ( input_port_read(machine, "IN2") | 0xfd );
 	return xxmissio_status;
 }
 

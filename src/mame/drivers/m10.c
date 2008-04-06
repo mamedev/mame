@@ -181,10 +181,10 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	/* I have NO IDEA if this is correct or not */
 	state->bottomline = ~data & 0x20;
 
-	if (readinputportbytag("CAB") & 0x01)
+	if (input_port_read(machine, "CAB") & 0x01)
 		state->flip = ~data & 0x10;
 
-	if (!(readinputportbytag("CAB") & 0x02))
+	if (!(input_port_read(machine, "CAB") & 0x02))
 		sound_global_enable(~data & 0x80);
 
 	/* sound command in lower 4 bytes */
@@ -257,10 +257,10 @@ static WRITE8_HANDLER( m11_ctrl_w )
 
 	state->bottomline = ~data & 0x20;
 
-	if (readinputportbytag("CAB") & 0x01)
+	if (input_port_read(machine, "CAB") & 0x01)
 		state->flip = ~data & 0x10;
 
-	if (!(readinputportbytag("CAB") & 0x02))
+	if (!(input_port_read(machine, "CAB") & 0x02))
 		sound_global_enable(~data & 0x80);
 }
 
@@ -287,9 +287,9 @@ static WRITE8_HANDLER( m15_ctrl_w )
 	if (data & 0xF0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
-	if (readinputportbytag("CAB") & 0x01)
+	if (input_port_read(machine, "CAB") & 0x01)
 		state->flip = ~data & 0x04;
-	if (!(readinputportbytag("CAB") & 0x02))
+	if (!(input_port_read(machine, "CAB") & 0x02))
 		sound_global_enable(~data & 0x08);
 }
 

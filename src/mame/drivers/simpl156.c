@@ -141,7 +141,7 @@ static READ32_HANDLER( simpl156_inputs_read )
 	int eep = EEPROM_read_bit();
 	UINT32 returndata;
 
-	returndata = readinputport(0)^0xffff0000;
+	returndata = input_port_read_indexed(machine, 0)^0xffff0000;
 
 	returndata^= ( (eep<<8)  );
 	return returndata;
@@ -172,7 +172,7 @@ static READ32_HANDLER(  simpl156_system_r )
 {
 	UINT32 returndata;
 
-	returndata = readinputport(1);
+	returndata = input_port_read_indexed(machine, 1);
 
 	return returndata;
 }

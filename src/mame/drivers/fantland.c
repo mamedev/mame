@@ -179,20 +179,20 @@ static READ8_HANDLER( borntofi_inputs_r )
 	static int old_x[2], old_y[2], old_f[2];
 	static UINT8 ret[2];
 
-	switch (readinputport(7) & 0x03)
+	switch (input_port_read_indexed(machine, 7) & 0x03)
 	{
 		case 3:
-		case 1:	return readinputport(0 + offset);	// Lightgun buttons
-		case 2:	return readinputport(4 + offset);	// Joystick
+		case 1:	return input_port_read_indexed(machine, 0 + offset);	// Lightgun buttons
+		case 2:	return input_port_read_indexed(machine, 4 + offset);	// Joystick
 	}
 
 	// Trackball
 
-	x = readinputport(13 + offset * 2);
-	y = readinputport(12 + offset * 2);
+	x = input_port_read_indexed(machine, 13 + offset * 2);
+	y = input_port_read_indexed(machine, 12 + offset * 2);
 	f = video_screen_get_frame_number(machine->primary_screen);
 
-	ret[offset]	=	(ret[offset] & 0x14) | (readinputport(2 + offset) & 0xc3);
+	ret[offset]	=	(ret[offset] & 0x14) | (input_port_read_indexed(machine, 2 + offset) & 0xc3);
 
 	x =  (x & 0x7f) - (x & 0x80);
 	y =  (y & 0x7f) - (y & 0x80);
@@ -696,7 +696,7 @@ INPUT_PORTS_END
 static CUSTOM_INPUT( wheelrun_wheel_r )
 {
 	int player = (FPTR)param;
-	int delta = readinputport(4 + player);
+	int delta = input_port_read_indexed(machine, 4 + player);
 	delta = (delta & 0x7f) - (delta & 0x80) + 4;
 
 	if		(delta > 7)	delta = 7;

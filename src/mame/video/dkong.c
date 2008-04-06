@@ -840,7 +840,7 @@ static void check_palette(running_machine *machine)
 	num = port_tag_to_index("VIDHW");
 	if (num>=0)
 	{
-		newset = readinputport(num);
+		newset = input_port_read_indexed(machine, num);
 		if (newset != state->vidhw)
 		{
 			state->vidhw = newset;

@@ -218,13 +218,13 @@ static READ16_HANDLER( twin16_input_r )
 {
 	switch( offset )
 	{
-		case 0x00: return readinputport(0); // coin
-		case 0x01: return readinputport(1); // p1
-		case 0x02: return readinputport(2); // p2
-		case 0x03: return readinputport(3); // p3 (Dark Adventure)
-		case 0x08: return readinputport(5); // DSW1
-		case 0x09: return readinputport(4); // DSW2
-		case 0x0c: return readinputport(6); // DSW3
+		case 0x00: return input_port_read_indexed(machine, 0); // coin
+		case 0x01: return input_port_read_indexed(machine, 1); // p1
+		case 0x02: return input_port_read_indexed(machine, 2); // p2
+		case 0x03: return input_port_read_indexed(machine, 3); // p3 (Dark Adventure)
+		case 0x08: return input_port_read_indexed(machine, 5); // DSW1
+		case 0x09: return input_port_read_indexed(machine, 4); // DSW2
+		case 0x0c: return input_port_read_indexed(machine, 6); // DSW3
 	}
 	return 0;
 }

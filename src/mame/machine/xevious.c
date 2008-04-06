@@ -170,10 +170,10 @@ READ8_HANDLER( battles_input_port_r )
 	switch ( offset )
 	{
 		default:
-		case 0: return ~BITSWAP8(readinputport(0),6,7,5,4,3,2,1,0) >> 4;
-		case 1: return ~readinputport(1) & 0x0f;
-		case 2: return ~readinputport(1) >> 4;
-		case 3: return ~readinputport(0) & 0x0f;
+		case 0: return ~BITSWAP8(input_port_read_indexed(machine, 0),6,7,5,4,3,2,1,0) >> 4;
+		case 1: return ~input_port_read_indexed(machine, 1) & 0x0f;
+		case 2: return ~input_port_read_indexed(machine, 1) >> 4;
+		case 3: return ~input_port_read_indexed(machine, 0) & 0x0f;
 	}
 }
 

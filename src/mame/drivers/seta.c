@@ -1520,7 +1520,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 /* DSW reading for 16 bit CPUs */
 static READ16_HANDLER( seta_dsw_r )
 {
-	UINT16 dsw = readinputport(3);
+	UINT16 dsw = input_port_read_indexed(machine, 3);
 	if (offset == 0)	return (dsw >> 8) & 0xff;
 	else				return (dsw >> 0) & 0xff;
 }
@@ -1530,12 +1530,12 @@ static READ16_HANDLER( seta_dsw_r )
 
 static READ8_HANDLER( dsw1_r )
 {
-	return (readinputport(3) >> 8) & 0xff;
+	return (input_port_read_indexed(machine, 3) >> 8) & 0xff;
 }
 
 static READ8_HANDLER( dsw2_r )
 {
-	return (readinputport(3) >> 0) & 0xff;
+	return (input_port_read_indexed(machine, 3) >> 0) & 0xff;
 }
 
 
@@ -1654,15 +1654,15 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER ( calibr50_ip_r )
 {
-	int dir1 = readinputportbytag("IN4") & 0xfff;	// analog port
-	int dir2 = readinputportbytag("IN5") & 0xfff;	// analog port
+	int dir1 = input_port_read(machine, "IN4") & 0xfff;	// analog port
+	int dir2 = input_port_read(machine, "IN5") & 0xfff;	// analog port
 
 	switch (offset)
 	{
-		case 0x00/2:	return readinputportbytag("IN0");	// p1
-		case 0x02/2:	return readinputportbytag("IN1");	// p2
+		case 0x00/2:	return input_port_read(machine, "IN0");	// p1
+		case 0x02/2:	return input_port_read(machine, "IN1");	// p2
 
-		case 0x08/2:	return readinputport(2);	// Coins
+		case 0x08/2:	return input_port_read_indexed(machine, 2);	// Coins
 
 		case 0x10/2:	return (dir1&0xff);			// lower 8 bits of p1 rotation
 		case 0x12/2:	return (dir1>>8);			// upper 4 bits of p1 rotation
@@ -1729,10 +1729,10 @@ static READ16_HANDLER( usclssic_dsw_r )
 {
 	switch (offset)
 	{
-		case 0/2:	return (readinputport(3) >>  8) & 0xf;
-		case 2/2:	return (readinputport(3) >> 12) & 0xf;
-		case 4/2:	return (readinputport(3) >>  0) & 0xf;
-		case 6/2:	return (readinputport(3) >>  4) & 0xf;
+		case 0/2:	return (input_port_read_indexed(machine, 3) >>  8) & 0xf;
+		case 2/2:	return (input_port_read_indexed(machine, 3) >> 12) & 0xf;
+		case 4/2:	return (input_port_read_indexed(machine, 3) >>  0) & 0xf;
+		case 6/2:	return (input_port_read_indexed(machine, 3) >>  4) & 0xf;
 	}
 	return 0;
 }
@@ -1741,8 +1741,8 @@ static READ16_HANDLER( usclssic_trackball_x_r )
 {
 	switch (offset)
 	{
-		case 0/2:	return (readinputport(0) >> 0) & 0xff;
-		case 2/2:	return (readinputport(0) >> 8) & 0xff;
+		case 0/2:	return (input_port_read_indexed(machine, 0) >> 0) & 0xff;
+		case 2/2:	return (input_port_read_indexed(machine, 0) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1751,8 +1751,8 @@ static READ16_HANDLER( usclssic_trackball_y_r )
 {
 	switch (offset)
 	{
-		case 0/2:	return (readinputport(1) >> 0) & 0xff;
-		case 2/2:	return (readinputport(1) >> 8) & 0xff;
+		case 0/2:	return (input_port_read_indexed(machine, 1) >> 0) & 0xff;
+		case 2/2:	return (input_port_read_indexed(machine, 1) >> 8) & 0xff;
 	}
 	return 0;
 }
@@ -1960,7 +1960,7 @@ static int gun_input_bit = 0, gun_input_src = 0;
 
 static READ16_HANDLER( zombraid_gun_r ) // Serial interface
 {
-	int data = readinputport(4 + gun_input_src); // Input Ports 5-8
+	int data = input_port_read_indexed(machine, 4 + gun_input_src); // Input Ports 5-8
 	return (data >> gun_input_bit) & 1;
 }
 
@@ -2371,10 +2371,10 @@ ADDRESS_MAP_END
 static READ16_HANDLER( krzybowl_input_r )
 {
 	// analog ports
-	int dir1x = readinputport(4) & 0xfff;
-	int dir1y = readinputport(5) & 0xfff;
-	int dir2x = readinputport(6) & 0xfff;
-	int dir2y = readinputport(7) & 0xfff;
+	int dir1x = input_port_read_indexed(machine, 4) & 0xfff;
+	int dir1y = input_port_read_indexed(machine, 5) & 0xfff;
+	int dir2x = input_port_read_indexed(machine, 6) & 0xfff;
+	int dir2y = input_port_read_indexed(machine, 7) & 0xfff;
 
 	switch (offset)
 	{
@@ -2604,9 +2604,9 @@ static READ16_HANDLER( kiwame_input_r )
 
 	switch( offset )
 	{
-		case 0x00/2:	return readinputport( i );
+		case 0x00/2:	return input_port_read_indexed(machine,  i );
 		case 0x02/2:	return 0xffff;
-		case 0x04/2:	return readinputport( 2 );
+		case 0x04/2:	return input_port_read_indexed(machine,  2 );
 //      case 0x06/2:
 		case 0x08/2:	return 0xffff;
 
@@ -2885,21 +2885,21 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( downtown_ip_r )
 {
-	int dir1 = readinputport(4);	// analog port
-	int dir2 = readinputport(5);	// analog port
+	int dir1 = input_port_read_indexed(machine, 4);	// analog port
+	int dir2 = input_port_read_indexed(machine, 5);	// analog port
 
 	dir1 = (~ (0x800 >> ((dir1 * 12)/0x100)) ) & 0xfff;
 	dir2 = (~ (0x800 >> ((dir2 * 12)/0x100)) ) & 0xfff;
 
 	switch (offset)
 	{
-		case 0:	return (readinputport(2) & 0xf0) + (dir1>>8);	// upper 4 bits of p1 rotation + coins
+		case 0:	return (input_port_read_indexed(machine, 2) & 0xf0) + (dir1>>8);	// upper 4 bits of p1 rotation + coins
 		case 1:	return (dir1&0xff);			// lower 8 bits of p1 rotation
-		case 2:	return readinputport(0);	// p1
+		case 2:	return input_port_read_indexed(machine, 0);	// p1
 		case 3:	return 0xff;				// ?
 		case 4:	return (dir2>>8);			// upper 4 bits of p2 rotation + ?
 		case 5:	return (dir2&0xff);			// lower 8 bits of p2 rotation
-		case 6:	return readinputport(1);	// p2
+		case 6:	return input_port_read_indexed(machine, 1);	// p2
 		case 7:	return 0xff;				// ?
 	}
 
@@ -3102,9 +3102,9 @@ ADDRESS_MAP_END
 static READ16_HANDLER( inttoote_dsw_r )
 {
 	int shift = offset * 4;
-	return	((((readinputport(0) >> shift)     & 0xf)) << 0) |
-			((((readinputport(1) >> shift)     & 0xf)) << 4) |
-			((((readinputport(1) >> (shift+8)) & 0xf)) << 8) ;
+	return	((((input_port_read_indexed(machine, 0) >> shift)     & 0xf)) << 0) |
+			((((input_port_read_indexed(machine, 1) >> shift)     & 0xf)) << 4) |
+			((((input_port_read_indexed(machine, 1) >> (shift+8)) & 0xf)) << 8) ;
 }
 
 static UINT16 *inttoote_key_select;
@@ -3112,11 +3112,11 @@ static READ16_HANDLER( inttoote_key_r )
 {
 	switch( *inttoote_key_select )
 	{
-		case 0x08:	return readinputport(4+0);
-		case 0x10:	return readinputport(4+1);
-		case 0x20:	return readinputport(4+2);
-		case 0x40:	return readinputport(4+3);
-		case 0x80:	return readinputport(4+4);
+		case 0x08:	return input_port_read_indexed(machine, 4+0);
+		case 0x10:	return input_port_read_indexed(machine, 4+1);
+		case 0x20:	return input_port_read_indexed(machine, 4+2);
+		case 0x40:	return input_port_read_indexed(machine, 4+3);
+		case 0x80:	return input_port_read_indexed(machine, 4+4);
 	}
 	logerror("%06X: unknown read, select = %04x\n",activecpu_get_pc(),*inttoote_key_select);
 	return 0xffff;

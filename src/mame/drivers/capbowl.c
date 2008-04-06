@@ -111,7 +111,7 @@ static UINT8 last_trackball_val[2];
 
 static INTERRUPT_GEN( capbowl_interrupt )
 {
-	if (readinputport(4) & 1)	/* get status of the F2 key */
+	if (input_port_read_indexed(machine, 4) & 1)	/* get status of the F2 key */
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 

@@ -205,37 +205,37 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 	switch( port )
 	{
 		case 0x08:				/* trackball y coords bottom 8 bits for 2nd player */
-			return readinputportbytag(P2TRACKY_PORT_TAG);
+			return input_port_read(machine, P2TRACKY_PORT_TAG);
 
 		case 0x09:				/* trackball y coords top 8 bits for 2nd player */
-			if (readinputportbytag(P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(machine, P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0a:				/* trackball x coords bottom 8 bits for 2nd player */
-			return readinputportbytag(P2TRACKX_PORT_TAG);
+			return input_port_read(machine, P2TRACKX_PORT_TAG);
 
 		case 0x0b:				/* trackball x coords top 8 bits for 2nd player */
-			if (readinputportbytag(P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(machine, P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		case 0x0c:				/* trackball y coords bottom 8 bits for 1st player */
-			return readinputportbytag(P1TRACKY_PORT_TAG);
+			return input_port_read(machine, P1TRACKY_PORT_TAG);
 
 		case 0x0d:				/* trackball y coords top 8 bits for 1st player */
-			if (readinputportbytag(P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(machine, P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0e:				/* trackball x coords bottom 8 bits for 1st player */
-			return readinputportbytag(P1TRACKX_PORT_TAG);
+			return input_port_read(machine, P1TRACKX_PORT_TAG);
 
 		case 0x0f:				/* trackball x coords top 8 bits for 1st player */
-			if (readinputportbytag(P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(machine, P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;

@@ -670,7 +670,7 @@ VIDEO_UPDATE( st0016 )
 	{
 		if(ISMACS1)
 		{
-			if(!(readinputportbytag("SYS1")&1))	//fake coins - MACS2 system
+			if(!(input_port_read(screen->machine, "SYS1")&1))	//fake coins - MACS2 system
 			{
 				macs_ram2[0]++;
 			}

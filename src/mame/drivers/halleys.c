@@ -1430,7 +1430,7 @@ static VIDEO_UPDATE( halleys )
 	else
 		fillbitmap(bitmap, bgcolor, cliprect);
 
-	if (readinputportbytag("FAKE")) copy_scroll_xp(bitmap, render_layer[3], *scrollx0, *scrolly0); // not used???
+	if (input_port_read(screen->machine, "FAKE")) copy_scroll_xp(bitmap, render_layer[3], *scrollx0, *scrolly0); // not used???
 	copy_scroll_xp(bitmap, render_layer[2], *scrollx1, *scrolly1);
 	copy_fixed_2b (bitmap, render_layer[1]);
 	copy_fixed_xp (bitmap, render_layer[0]);
@@ -1593,7 +1593,7 @@ static READ8_HANDLER( coin_lockout_r )
 {
 	// This is a hack, but it lets you coin up when COIN1 or COIN2 are signaled.
 	// See NMI for the twisted logic that is involved in handling coin input.
-	int inp = readinputportbytag("IN0");
+	int inp = input_port_read(machine, "IN0");
 	int result = 0x01; // dual coin slots
 
 	if (inp & 0x80) result |= 0x02;
@@ -1605,7 +1605,7 @@ static READ8_HANDLER( coin_lockout_r )
 
 static READ8_HANDLER( io_mirror_r )
 {
-	return(readinputport(offset + 3));
+	return(input_port_read_indexed(machine, offset + 3));
 }
 
 

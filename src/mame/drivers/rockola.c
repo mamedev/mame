@@ -1000,7 +1000,7 @@ static INTERRUPT_GEN( satansat_interrupt )
 {
 	if (cpu_getiloops() != 0)
 	{
-		UINT8 val = readinputportbytag("IN2");
+		UINT8 val = input_port_read(machine, "IN2");
 
 		coin_counter_w(0, val & 1);
 
@@ -1016,7 +1016,7 @@ static INTERRUPT_GEN( rockola_interrupt )
 {
 	if (cpu_getiloops() != 0)
 	{
-		UINT8 val = readinputportbytag("IN2");
+		UINT8 val = input_port_read(machine, "IN2");
 
 		coin_counter_w(0, val & 1);
 		coin_counter_w(1, val & 2);

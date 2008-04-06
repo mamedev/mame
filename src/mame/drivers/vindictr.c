@@ -64,7 +64,7 @@ static MACHINE_RESET( vindictr )
 
 static READ16_HANDLER( port1_r )
 {
-	int result = readinputport(1);
+	int result = input_port_read_indexed(machine, 1);
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0004;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0008;
 	result ^= 0x0010;

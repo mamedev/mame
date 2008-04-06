@@ -162,8 +162,8 @@ static WRITE16_HANDLER(cyclwarr_cpu_bb_w) { COMBINE_DATA(&cyclwarr_cpub_ram[offs
 static READ16_HANDLER(cyclwarr_palette_r) { return paletteram16[offset]; }
 static READ16_HANDLER(cyclwarr_sprite_r) { return spriteram16[offset]; }
 static WRITE16_HANDLER(cyclwarr_sprite_w) { COMBINE_DATA(&spriteram16[offset]); }
-static READ16_HANDLER(cyclwarr_input_r) { return readinputport(offset); }
-static READ16_HANDLER(cyclwarr_input2_r) { return readinputport(offset+4); }
+static READ16_HANDLER(cyclwarr_input_r) { return input_port_read_indexed(machine, offset); }
+static READ16_HANDLER(cyclwarr_input2_r) { return input_port_read_indexed(machine, offset+4); }
 static WRITE16_HANDLER(bigfight_a20000_w) { COMBINE_DATA(&bigfight_a20000[offset]); }
 static WRITE16_HANDLER(bigfight_a40000_w) { COMBINE_DATA(&bigfight_a40000[offset]); }
 static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset]); }

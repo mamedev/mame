@@ -236,7 +236,7 @@ static READ16_HANDLER( io_chip_r )
 				return misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return readinputport(offset);
+			return input_port_read_indexed(machine, offset);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -330,7 +330,7 @@ static READ16_HANDLER( misc_io_r )
 
 		/* video control latch */
 		case 0x2000/2:
-			return readinputport(4 + (offset & 1));
+			return input_port_read_indexed(machine, 4 + (offset & 1));
 	}
 	if (custom_io_r)
 		return custom_io_r(machine, offset, mem_mask);
@@ -419,13 +419,13 @@ static READ16_HANDLER( ddcrew_custom_io_r )
 	switch (offset)
 	{
 		case 0x3020/2:
-			return readinputportbytag("P3");
+			return input_port_read(machine, "P3");
 
 		case 0x3022/2:
-			return readinputportbytag("P4");
+			return input_port_read(machine, "P4");
 
 		case 0x3024/2:
-			return readinputportbytag("P34START");
+			return input_port_read(machine, "P34START");
 	}
 	return segaic16_open_bus_r(machine,0,0);
 }
@@ -460,19 +460,19 @@ static WRITE16_HANDLER( lghost_custom_io_w )
 	switch (offset)
 	{
 		case 0x3010/2:
-			lghost_value = 255 - readinputportbytag("GUNY1");
+			lghost_value = 255 - input_port_read(machine, "GUNY1");
 			break;
 
 		case 0x3012/2:
-			lghost_value = readinputportbytag("GUNX1");
+			lghost_value = input_port_read(machine, "GUNX1");
 			break;
 
 		case 0x3014/2:
-			lghost_value = 255 - readinputportbytag(lghost_select ? "GUNY3" : "GUNY2");
+			lghost_value = 255 - input_port_read(machine, lghost_select ? "GUNY3" : "GUNY2");
 			break;
 
 		case 0x3016/2:
-			lghost_value = readinputportbytag(lghost_select ? "GUNX3" : "GUNX2");
+			lghost_value = input_port_read(machine, lghost_select ? "GUNX3" : "GUNX2");
 			break;
 
 		case 0x3020/2:
@@ -494,22 +494,22 @@ static READ16_HANDLER( wwally_custom_io_r )
 	switch (offset)
 	{
 		case 0x3000/2:
-			return (readinputportbytag("TRACKX1") - wwally_last_x[0]) & 0xff;
+			return (input_port_read(machine, "TRACKX1") - wwally_last_x[0]) & 0xff;
 
 		case 0x3004/2:
-			return (readinputportbytag("TRACKY1") - wwally_last_y[0]) & 0xff;
+			return (input_port_read(machine, "TRACKY1") - wwally_last_y[0]) & 0xff;
 
 		case 0x3008/2:
-			return (readinputportbytag("TRACKX2") - wwally_last_x[1]) & 0xff;
+			return (input_port_read(machine, "TRACKX2") - wwally_last_x[1]) & 0xff;
 
 		case 0x300c/2:
-			return (readinputportbytag("TRACKY2") - wwally_last_y[1]) & 0xff;
+			return (input_port_read(machine, "TRACKY2") - wwally_last_y[1]) & 0xff;
 
 		case 0x3010/2:
-			return (readinputportbytag("TRACKX3") - wwally_last_x[2]) & 0xff;
+			return (input_port_read(machine, "TRACKX3") - wwally_last_x[2]) & 0xff;
 
 		case 0x3014/2:
-			return (readinputportbytag("TRACKY3") - wwally_last_y[2]) & 0xff;
+			return (input_port_read(machine, "TRACKY3") - wwally_last_y[2]) & 0xff;
 	}
 	return segaic16_open_bus_r(machine,0,0);
 }
@@ -521,20 +521,20 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 	{
 		case 0x3000/2:
 		case 0x3004/2:
-			wwally_last_x[0] = readinputportbytag("TRACKX1");
-			wwally_last_y[0] = readinputportbytag("TRACKY1");
+			wwally_last_x[0] = input_port_read(machine, "TRACKX1");
+			wwally_last_y[0] = input_port_read(machine, "TRACKY1");
 			break;
 
 		case 0x3008/2:
 		case 0x300c/2:
-			wwally_last_x[1] = readinputportbytag("TRACKX2");
-			wwally_last_y[1] = readinputportbytag("TRACKY2");
+			wwally_last_x[1] = input_port_read(machine, "TRACKX2");
+			wwally_last_y[1] = input_port_read(machine, "TRACKY2");
 			break;
 
 		case 0x3010/2:
 		case 0x3014/2:
-			wwally_last_x[2] = readinputportbytag("TRACKX3");
-			wwally_last_y[2] = readinputportbytag("TRACKY3");
+			wwally_last_x[2] = input_port_read(machine, "TRACKX3");
+			wwally_last_y[2] = input_port_read(machine, "TRACKY3");
 			break;
 	}
 }

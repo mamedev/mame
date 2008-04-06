@@ -32,13 +32,13 @@ static READ16_HANDLER( stadhero_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
-			return (readinputport(0) + (readinputport(1) << 8));
+			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 
 		case 2: /* Credits, start buttons */
-			return readinputport(2) | (readinputport(2)<<8);
+			return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<8);
 
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return (readinputport(3) + (readinputport(4) << 8));
+			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),0x30c000+offset);

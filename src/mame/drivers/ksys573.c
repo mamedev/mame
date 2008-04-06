@@ -205,6 +205,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cdrom.h"
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
@@ -300,11 +301,11 @@ static READ32_HANDLER( jamma_r )
 	switch (offset)
 	{
 	case 0:
-		data = readinputport(0);
+		data = input_port_read_indexed(machine, 0);
 		break;
 	case 1:
 	{
-		data = readinputport(1);
+		data = input_port_read_indexed(machine, 1);
 		data |= 0x000000c0;
 
 		if( has_ds2401[ security_cart_number ] )
@@ -340,10 +341,10 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 	case 2:
-		data = readinputport(2);
+		data = input_port_read_indexed(machine, 2);
 		break;
 	case 3:
-		data = readinputport(3);
+		data = input_port_read_indexed(machine, 3);
 		break;
 	}
 
@@ -1385,13 +1386,13 @@ static double analogue_inputs_callback( int input )
 	switch( input )
 	{
 	case ADC083X_CH0:
-		return (double) ( readinputportbytag_safe( "analog0", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(Machine,  "analog0", 0 ) * 5 ) / 255;
 	case ADC083X_CH1:
-		return (double) ( readinputportbytag_safe( "analog1", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(Machine,  "analog1", 0 ) * 5 ) / 255;
 	case ADC083X_CH2:
-		return (double) ( readinputportbytag_safe( "analog2", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(Machine,  "analog2", 0 ) * 5 ) / 255;
 	case ADC083X_CH3:
-		return (double) ( readinputportbytag_safe( "analog3", 0 ) * 5 ) / 255;
+		return (double) ( input_port_read_safe(Machine,  "analog3", 0 ) * 5 ) / 255;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
@@ -1537,10 +1538,10 @@ static const struct PSXSPUinterface konami573_psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static void update_mode( void )
+static void update_mode( running_machine *machine )
 {
-	int cart = readinputportbytag( "CART" );
-	int cd = readinputportbytag( "CD" );
+	int cart = input_port_read(machine,  "CART" );
+	int cd = input_port_read(machine,  "CD" );
 	static SCSIInstance *new_cdrom;
 
 	if( chiptype[ 1 ] != 0 )
@@ -1570,7 +1571,7 @@ static void update_mode( void )
 
 static INTERRUPT_GEN( sys573_vblank )
 {
-	update_mode();
+	update_mode(machine);
 
 	if( strcmp( machine->gamedrv->name, "ddr2ml" ) == 0 )
 	{
@@ -1604,8 +1605,8 @@ static READ32_HANDLER( ge765pwbba_r )
 	switch( offset )
 	{
 	case 0x26:
-		uPD4701_y_add( 0, readinputportbytag_safe( "uPD4701_y", 0 ) );
-		uPD4701_switches_set( 0, readinputportbytag_safe( "uPD4701_switches", 0 ) );
+		uPD4701_y_add( 0, input_port_read_safe(machine,  "uPD4701_y", 0 ) );
+		uPD4701_switches_set( 0, input_port_read_safe(machine,  "uPD4701_switches", 0 ) );
 
 		uPD4701_cs_w( 0, 0 );
 		uPD4701_xy_w( 0, 1 );
@@ -1881,7 +1882,7 @@ static void gn845pwbb_clk_w( int offset, int data )
 
 static CUSTOM_INPUT( gn845pwbb_read )
 {
-	return readinputportbytag( "STAGE" ) & stage_mask;
+	return input_port_read(machine,  "STAGE" ) & stage_mask;
 }
 
 static void gn845pwbb_output_callback( int offset, int data )

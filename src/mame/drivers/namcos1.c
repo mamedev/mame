@@ -412,7 +412,7 @@ static WRITE8_HANDLER( firq_ack_w )
 
 static READ8_HANDLER( dsw_r )
 {
-	int ret = readinputportbytag("DIPSW");
+	int ret = input_port_read(machine, "DIPSW");
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }

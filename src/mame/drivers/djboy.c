@@ -225,9 +225,9 @@ ProtectionOut( int i, UINT8 data )
 } /* ProtectionOut */
 
 static int
-GetLives( void )
+GetLives( running_machine *machine )
 {
-	int dsw = readinputport(4);
+	int dsw = input_port_read_indexed(machine, 4);
 	switch( dsw&0x30 )
 	{
 	case 0x10: return 3;
@@ -240,7 +240,7 @@ GetLives( void )
 
 static WRITE8_HANDLER( coinplus_w )
 {
-	int dsw = readinputport(3);
+	int dsw = input_port_read_indexed(machine, 3);
 	coin_counter_w( 0, data&1 );
 	coin_counter_w( 1, data&2 );
 	if( data&1 )
@@ -268,9 +268,9 @@ static WRITE8_HANDLER( coinplus_w )
 } /* coinplus_w */
 
 static void
-OutputProtectionState( int i, int type )
+OutputProtectionState( running_machine *machine, int i, int type )
 {
-	int io = ~readinputport(0);
+	int io = ~input_port_read_indexed(machine, 0);
 	int dat = 0x00;
 
 	switch( mDjBoyState )
@@ -337,7 +337,7 @@ OutputProtectionState( int i, int type )
 		{ /* p1 start */
 			dat = 0x16;
 			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			lives[0] = GetLives();
+			lives[0] = GetLives(machine);
 			logerror( "P1 START!\n" );
 			coin-=4;
 		}
@@ -345,8 +345,8 @@ OutputProtectionState( int i, int type )
 		{ /* p2 start */
 			dat = 0x0a;
 			mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
-			lives[0] = GetLives();
-			lives[1] = GetLives();
+			lives[0] = GetLives(machine);
+			lives[1] = GetLives(machine);
 			logerror( "P2 START!\n" );
 			coin-=8;
 		}
@@ -364,7 +364,7 @@ OutputProtectionState( int i, int type )
 			if( (io&1) && lives[0]==0 )
 			{
 				dat = 0x12; /* continue (P1) */
-				lives[0] = GetLives();
+				lives[0] = GetLives(machine);
 				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
 				coin-=4;
 				logerror( "P1 CONTINUE!\n" );
@@ -372,7 +372,7 @@ OutputProtectionState( int i, int type )
 			else if( (io&2) && lives[1]==0 )
 			{
 				dat = 0x08; /* continue (P2) */
-				lives[1] = GetLives();
+				lives[1] = GetLives(machine);
 				mDjBoyState = eDJBOY_ACTIVE_GAMEPLAY;
 				coin-=4;
 				logerror( "P2 CONTINUE!\n" );
@@ -385,7 +385,7 @@ OutputProtectionState( int i, int type )
 } /* OutputProtectionState */
 
 static void
-CommonProt( int i, int type )
+CommonProt( running_machine *machine, int i, int type )
 {
 	int displayedCredits = coin/4;
 	if( displayedCredits>9 )
@@ -393,8 +393,8 @@ CommonProt( int i, int type )
 		displayedCredits = 9;
 	}
 	ProtectionOut( i++, displayedCredits );
-	ProtectionOut( i++, readinputport(0) ); /* COIN/START */
-	OutputProtectionState( i, type );
+	ProtectionOut( i++, input_port_read_indexed(machine, 0) ); /* COIN/START */
+	OutputProtectionState( machine, i, type );
 } /* CommonProt */
 
 static WRITE8_HANDLER( beast_data_w )
@@ -408,7 +408,7 @@ static WRITE8_HANDLER( beast_data_w )
 	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
 	{
 		logerror( "[DSW1_WRITEBACK]\n" );
-		ProtectionOut( 0, readinputport(4) ); /* DSW2 */
+		ProtectionOut( 0, input_port_read_indexed(machine, 4) ); /* DSW2 */
 		prot_mode = ePROT_WAIT_DSW2_WRITEBACK;
 	}
 	else if( prot_mode == ePROT_WAIT_DSW2_WRITEBACK )
@@ -454,11 +454,11 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0x01: // pc=7389
-			OutputProtectionState( 0, 0x01 );
+			OutputProtectionState( machine, 0, 0x01 );
 			break;
 
 		case 0x02:
-			CommonProt( 0,0x02 );
+			CommonProt( machine,0,0x02 );
 			break;
 
 		case 0x03: /* prepare for memory write to protection device ram (pc == 0x7987) */ // -> 0x02
@@ -472,48 +472,48 @@ static WRITE8_HANDLER( beast_data_w )
 			ProtectionOut( 1,0 ); // ?
 			ProtectionOut( 2,0 ); // ?
 			ProtectionOut( 3,0 ); // ?
-			CommonProt(    4,0x04 );
+			CommonProt(    machine, 4,0x04 );
 			break;
 
 		case 0x05: /* 0x71f4 */
-			ProtectionOut( 0,readinputport(1) ); // to $42
+			ProtectionOut( 0,input_port_read_indexed(machine, 1) ); // to $42
 			ProtectionOut( 1,0 ); // ?
-			ProtectionOut( 2,readinputport(2) ); // to $43
+			ProtectionOut( 2,input_port_read_indexed(machine, 2) ); // to $43
 			ProtectionOut( 3,0 ); // ?
 			ProtectionOut( 4,0 ); // ?
-			CommonProt(    5,0x05 );
+			CommonProt(    machine, 5,0x05 );
 			break;
 
 		case 0x07:
-			CommonProt( 0,0x07 );
+			CommonProt( machine, 0,0x07 );
 			break;
 
 		case 0x08: /* pc == 0x727a */
-			ProtectionOut( 0,readinputport(0) ); /* COIN/START */
-			ProtectionOut( 1,readinputport(1) ); /* JOY1 */
-			ProtectionOut( 2,readinputport(2) ); /* JOY2 */
-			ProtectionOut( 3,readinputport(3) ); /* DSW1 */
-			ProtectionOut( 4,readinputport(4) ); /* DSW2 */
-			CommonProt(    5, 0x08 );
+			ProtectionOut( 0,input_port_read_indexed(machine, 0) ); /* COIN/START */
+			ProtectionOut( 1,input_port_read_indexed(machine, 1) ); /* JOY1 */
+			ProtectionOut( 2,input_port_read_indexed(machine, 2) ); /* JOY2 */
+			ProtectionOut( 3,input_port_read_indexed(machine, 3) ); /* DSW1 */
+			ProtectionOut( 4,input_port_read_indexed(machine, 4) ); /* DSW2 */
+			CommonProt(    machine, 5, 0x08 );
 			break;
 
 		case 0x09:
 			ProtectionOut( 0,0 ); // ?
 			ProtectionOut( 1,0 ); // ?
 			ProtectionOut( 2,0 ); // ?
-			CommonProt(    3, 0x09 );
+			CommonProt(    machine, 3, 0x09 );
 			break;
 
 		case 0x0a:
-			CommonProt( 0,0x0a );
+			CommonProt( machine,0,0x0a );
 			break;
 
 		case 0x0c:
-			CommonProt( 1,0x0c );
+			CommonProt( machine,1,0x0c );
 			break;
 
 		case 0x0d:
-			CommonProt( 2,0x0d );
+			CommonProt( machine,2,0x0d );
 			break;
 
 		case 0xfe: /* prepare for memory read from protection device ram (pc == 0x79ee, 0x7a3f) */
@@ -531,7 +531,7 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0xff: /* read DSW (pc == 0x714d) */
-			ProtectionOut( 0,readinputport(3) ); /* DSW1 */
+			ProtectionOut( 0,input_port_read_indexed(machine, 3) ); /* DSW1 */
 			prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
 			break;
 

@@ -58,23 +58,23 @@ static READ32_HANDLER( f3_control_r )
 		case 0x0: /* MSW: Test switch, coins, eeprom access, LSW: Player Buttons, Start, Tilt, Service */
 			e=EEPROM_read_bit();
 			e=e|(e<<8);
-			return ((e | readinputport(2) | (readinputport(2)<<8))<<16) /* top byte may be mirror of bottom byte??  see bubblem */
-					| readinputport(1);
+			return ((e | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<8))<<16) /* top byte may be mirror of bottom byte??  see bubblem */
+					| input_port_read_indexed(machine, 1);
 
 		case 0x1: /* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
-			return (coin_word[0]<<16) | readinputport(0) | 0xff00;
+			return (coin_word[0]<<16) | input_port_read_indexed(machine, 0) | 0xff00;
 
 		case 0x2: /* Analog control 1 */
-			return ((readinputport(3)&0xf)<<12) | ((readinputport(3)&0xff0)>>4);
+			return ((input_port_read_indexed(machine, 3)&0xf)<<12) | ((input_port_read_indexed(machine, 3)&0xff0)>>4);
 
 		case 0x3: /* Analog control 2 */
-			return ((readinputport(4)&0xf)<<12) | ((readinputport(4)&0xff0)>>4);
+			return ((input_port_read_indexed(machine, 4)&0xf)<<12) | ((input_port_read_indexed(machine, 4)&0xff0)>>4);
 
 		case 0x4: /* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
-			return readinputport(5)<<8;
+			return input_port_read_indexed(machine, 5)<<8;
 
 		case 0x5: /* Player 3 & 4 joysticks (Player 1 top fire buttons in Kaiser Knuckle) */
-			return (coin_word[1]<<16) | readinputport(6);
+			return (coin_word[1]<<16) | input_port_read_indexed(machine, 6);
 	}
 
 	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset);

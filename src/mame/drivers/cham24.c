@@ -106,8 +106,8 @@ static WRITE8_HANDLER( cham24_IN0_w )
 	in_0_shift = 0;
 	in_1_shift = 0;
 
-	in_0 = readinputport(0);
-	in_1 = readinputport(1);
+	in_0 = input_port_read_indexed(machine, 0);
+	in_1 = input_port_read_indexed(machine, 1);
 
 }
 

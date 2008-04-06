@@ -87,9 +87,9 @@ logerror("%04x: keyboard_r\n",activecpu_get_pc());
 
 			for (i = 0;i < 31;i++)
 			{
-				if (readinputport(2 + i/16) & (1<<(i&15))) return i+1;
+				if (input_port_read_indexed(machine, 2 + i/16) & (1<<(i&15))) return i+1;
 			}
-			if (readinputport(3) & 0x8000) return 0x80;	// coin
+			if (input_port_read_indexed(machine, 3) & 0x8000) return 0x80;	// coin
 			return 0;
 		}
 		case 0x5c7b:	// rmhaihai, rmhaisei, rmhaijin

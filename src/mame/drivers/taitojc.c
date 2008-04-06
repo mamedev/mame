@@ -421,7 +421,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= ((readinputport(0) & 0x2) << 2) << 24;
+				r |= ((input_port_read_indexed(machine, 0) & 0x2) << 2) << 24;
 			}
 			return r;
 		}
@@ -430,7 +430,7 @@ static READ32_HANDLER ( jc_control_r )
 			if (ACCESSING_BITS_24_31)
 			{
 				UINT32 data = EEPROM_read_bit() & 1;
-				data |= readinputport(0) & 0xfe;
+				data |= input_port_read_indexed(machine, 0) & 0xfe;
 				r |= data << 24;
 			}
 			return r;
@@ -439,7 +439,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= readinputport(1) << 24;
+				r |= input_port_read_indexed(machine, 1) << 24;
 			}
 			return r;
 		}
@@ -447,7 +447,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= readinputport(2) << 24;
+				r |= input_port_read_indexed(machine, 2) << 24;
 			}
 			return r;
 		}
@@ -463,7 +463,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= readinputport(3) << 24;
+				r |= input_port_read_indexed(machine, 3) << 24;
 			}
 			return r;
 		}
@@ -869,7 +869,7 @@ static WRITE8_HANDLER(hc11_data_w)
 
 static READ8_HANDLER(hc11_analog_r)
 {
-	return readinputport(4 + offset);
+	return input_port_read_indexed(machine, 4 + offset);
 }
 
 

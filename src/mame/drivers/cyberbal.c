@@ -105,7 +105,7 @@ static MACHINE_RESET( cyberb2p )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int temp = readinputport(0);
+	int temp = input_port_read_indexed(machine, 0);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -113,7 +113,7 @@ static READ16_HANDLER( special_port0_r )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int temp = readinputport(2);
+	int temp = input_port_read_indexed(machine, 2);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x2000;
 	return temp;
 }

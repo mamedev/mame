@@ -304,7 +304,7 @@ static READ16_HANDLER( srmp2_input_1_r )
 
 			for (t = 0 ; t < 8 ; t ++)
 			{
-				if (!(readinputport(j) & ( 1 << t )))
+				if (!(input_port_read_indexed(machine, j) & ( 1 << t )))
 				{
 					return (i + t);
 				}
@@ -313,7 +313,7 @@ static READ16_HANDLER( srmp2_input_1_r )
 	}
 	else								/* Analizer and memory reset keys */
 	{
-		return readinputportbytag("IN7");
+		return input_port_read(machine, "IN7");
 	}
 
 	return 0xffff;
@@ -527,7 +527,7 @@ static READ8_HANDLER( srmp3_input_r )
 
 			for (t = 0 ; t < 8 ; t ++)
 			{
-				if (!(readinputport(j) & ( 1 << t )))
+				if (!(input_port_read_indexed(machine, j) & ( 1 << t )))
 				{
 					keydata = (i + t);
 				}
@@ -540,7 +540,7 @@ static READ8_HANDLER( srmp3_input_r )
 
 	if ((activecpu_get_pc() == 0x8926) || (activecpu_get_pc() == 0x7822))	/* Analizer and memory reset keys */
 	{
-		keydata = readinputport(7);
+		keydata = input_port_read_indexed(machine, 7);
 	}
 
 	return keydata;

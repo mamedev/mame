@@ -923,7 +923,7 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 static READ32_HANDLER( spi_controls1_r )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		return (readinputport(1) << 8) | readinputport(0) | 0xffff0000;
+		return (input_port_read_indexed(machine, 1) << 8) | input_port_read_indexed(machine, 0) | 0xffff0000;
 	}
 	return 0xffffffff;
 }
@@ -931,7 +931,7 @@ static READ32_HANDLER( spi_controls1_r )
 static READ32_HANDLER( spi_controls2_r )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		return ((readinputport(2) | 0xffffff00) & ~0x40) | (EEPROM_read_bit() << 6);
+		return ((input_port_read_indexed(machine, 2) | 0xffffff00) & ~0x40) | (EEPROM_read_bit() << 6);
 	}
 	return 0xffffffff;
 }
@@ -995,12 +995,12 @@ static WRITE8_HANDLER( z80_bank_w )
 
 static READ8_HANDLER( z80_jp1_r )
 {
-	return readinputport(3);
+	return input_port_read_indexed(machine, 3);
 }
 
 static READ8_HANDLER( z80_coin_r )
 {
-	return readinputport(4);
+	return input_port_read_indexed(machine, 4);
 }
 
 static READ32_HANDLER( soundrom_r )
@@ -1971,7 +1971,7 @@ static READ32_HANDLER ( rfjet_speedup_r )
 		cpu_spinuntil_int(); // idle
 		// Hack to enter test mode
 		r = spimainram[(0x002894c-0x800)/4] & (~0x400);
-		return r | (((readinputport(2) ^ 0xFF)<<8) & 0x400);
+		return r | (((input_port_read_indexed(machine, 2) ^ 0xFF)<<8) & 0x400);
 	}
 
 	/* rfjetj */

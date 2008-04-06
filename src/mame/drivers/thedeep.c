@@ -338,7 +338,7 @@ static INTERRUPT_GEN( thedeep_interrupt )
 	{
 		if (protection_command != 0x59)
 		{
-			int coins = readinputport(4);
+			int coins = input_port_read_indexed(machine, 4);
 			if		(coins & 1)	protection_data = 1;
 			else if	(coins & 2)	protection_data = 2;
 			else if	(coins & 4)	protection_data = 3;

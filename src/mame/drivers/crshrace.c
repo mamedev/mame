@@ -173,7 +173,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static READ16_HANDLER( country_sndpending_r )
 {
-	return readinputport(5) | (pending_command ? 0x8000 : 0);
+	return input_port_read_indexed(machine, 5) | (pending_command ? 0x8000 : 0);
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )

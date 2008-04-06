@@ -383,7 +383,7 @@ static READ8_HANDLER( intercept_v256_r )
 }
 
 
-static void get_pens(pen_t *pens)
+static void get_pens(running_machine *machine, pen_t *pens)
 {
 	static const int resistances_wg[] = { 750, 0 };
 	static const int resistances_el[] = { 1.0 / ((1.0 / 750.0) + (1.0 / 360.0)), 0 };
@@ -391,7 +391,7 @@ static void get_pens(pen_t *pens)
 	int color;
 	double color_weights[2];
 
-	if (readinputportbytag(MONITOR_TYPE_PORT_TAG) == 0)
+	if (input_port_read(machine, MONITOR_TYPE_PORT_TAG) == 0)
 		compute_resistor_weights(0, 0xff, -1.0,
 								 2, resistances_wg, color_weights, 0, 270,
 								 2, resistances_wg, color_weights, 0, 270,
@@ -423,7 +423,7 @@ static VIDEO_UPDATE( berzerk )
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
-	get_pens(pens);
+	get_pens(screen->machine, pens);
 
 	for (offs = 0; offs < berzerk_videoram_size; offs++)
 	{

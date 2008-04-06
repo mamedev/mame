@@ -552,7 +552,7 @@ static READ16_HANDLER( io_r )
 		case 0x01:
 		case 0x02:
 		{
-			return readinputport(offset);
+			return input_port_read_indexed(machine, offset);
 		}
 		case 0x30:
 		{

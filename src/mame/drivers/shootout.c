@@ -291,7 +291,7 @@ static INTERRUPT_GEN( shootout_interrupt )
 {
 	static int coin = 0;
 
-	if ( readinputport( 2 ) & 0xc0 ) {
+	if ( input_port_read_indexed(machine,  2 ) & 0xc0 ) {
 		if ( coin == 0 ) {
 			coin = 1;
 			nmi_line_pulse(machine, cpunum);

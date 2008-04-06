@@ -448,7 +448,7 @@ static READ32_HANDLER( rabbit_input_r )
 {
 	int rv;
 
-	rv = (readinputport(1)<<16)|(readinputport(0));
+	rv = (input_port_read_indexed(machine, 1)<<16)|(input_port_read_indexed(machine, 0));
 	rv &= ~1;
 	rv |= EEPROM_read_bit();	// as per code at 4d932
 	return rv;
@@ -458,7 +458,7 @@ static READ32_HANDLER( tmmjprd_input_r )
 {
 	int rv;
 
-	rv = (readinputport(1)<<16)|(readinputport(0));
+	rv = (input_port_read_indexed(machine, 1)<<16)|(input_port_read_indexed(machine, 0));
 	rv &= ~0x80;
 	rv |= (EEPROM_read_bit()<<7);	// as per code at 778
 	return rv;

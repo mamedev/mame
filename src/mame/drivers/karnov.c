@@ -326,11 +326,11 @@ static READ16_HANDLER( karnov_control_r )
 {
 	switch (offset<<1) {
 		case 0: /* Player controls */
-			return ( readinputportbytag("IN0") + (readinputportbytag("IN1")<<8));
+			return ( input_port_read(machine, "IN0") + (input_port_read(machine, "IN1")<<8));
 		case 2: /* Start buttons & VBL */
-			return readinputportbytag("IN2");
+			return input_port_read(machine, "IN2");
 		case 4: /* Dipswitch A & B */
-			return ( readinputportbytag("DSW1") + (readinputportbytag("DSW2")<<8));
+			return ( input_port_read(machine, "DSW1") + (input_port_read(machine, "DSW2")<<8));
 		case 6: /* i8751 return values */
 			return i8751_return;
 	}
@@ -652,13 +652,13 @@ static INTERRUPT_GEN( karnov_interrupt )
 	static int latch;
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (readinputport(3) == coin_mask) latch=1;
-	if (readinputport(3) != coin_mask && latch) {
+	if (input_port_read_indexed(machine, 3) == coin_mask) latch=1;
+	if (input_port_read_indexed(machine, 3) != coin_mask && latch) {
 		if (i8751_needs_ack) {
 			/* i8751 is busy - queue the command */
-			i8751_coin_pending=readinputport(3) | 0x8000;
+			i8751_coin_pending=input_port_read_indexed(machine, 3) | 0x8000;
 		} else {
-			i8751_return=readinputport(3) | 0x8000;
+			i8751_return=input_port_read_indexed(machine, 3) | 0x8000;
 			cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 			i8751_needs_ack=1;
 		}

@@ -291,7 +291,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static READ8_HANDLER( leta_r )
 {
-	return readinputport(2 + offset);
+	return input_port_read_indexed(machine, 2 + offset);
 }
 
 

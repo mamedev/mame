@@ -46,7 +46,7 @@ static emu_timer *mcu_timer;
 
 static READ8_HANDLER( mcu_portA_r )
 {
-	portA_in = readinputport(5) | (readinputport(4) << 4) | (readinputport(0) << 5);
+	portA_in = input_port_read_indexed(machine, 5) | (input_port_read_indexed(machine, 4) << 4) | (input_port_read_indexed(machine, 0) << 5);
 	return (portA_in & ~ddrA) | (portA_out & ddrA);
 }
 

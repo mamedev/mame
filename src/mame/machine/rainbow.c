@@ -760,10 +760,10 @@ static TIMER_CALLBACK( cchip_timer )
 	coin_counter_w(1, CRAM[0][8] & 0x20);
 	coin_counter_w(0, CRAM[0][8] & 0x10);
 
-	CRAM[0][3] = readinputportbytag("800007");    /* STARTn + SERVICE1 */
-	CRAM[0][4] = readinputportbytag("800009");    /* COINn */
-	CRAM[0][5] = readinputportbytag("80000B");    /* Player controls + TILT */
-	CRAM[0][6] = readinputportbytag("80000D");    /* Player controls (cocktail) */
+	CRAM[0][3] = input_port_read(machine, "800007");    /* STARTn + SERVICE1 */
+	CRAM[0][4] = input_port_read(machine, "800009");    /* COINn */
+	CRAM[0][5] = input_port_read(machine, "80000B");    /* Player controls + TILT */
+	CRAM[0][6] = input_port_read(machine, "80000D");    /* Player controls (cocktail) */
 }
 
 /*************************************

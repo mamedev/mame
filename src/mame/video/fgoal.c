@@ -51,7 +51,7 @@ VIDEO_UPDATE( fgoal )
 
 	/* draw color overlay foreground and background */
 
-	if (fgoal_player == 1 && (readinputport(1) & 0x40))
+	if (fgoal_player == 1 && (input_port_read_indexed(screen->machine, 1) & 0x40))
 	{
 		drawgfxzoom(fgbitmap, screen->machine->gfx[0],
 			0, (fgoal_player << 2) | current_color,

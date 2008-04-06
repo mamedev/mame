@@ -670,11 +670,11 @@ void model1_tgp_reset(int swa);
 static READ16_HANDLER( io_r )
 {
 	if(offset < 0x8)
-		return readinputport(offset);
+		return input_port_read_indexed(machine, offset);
 	if(offset < 0x10) {
 		offset -= 0x8;
 		if(offset < 3)
-			return readinputport(offset+8) | 0xff00;
+			return input_port_read_indexed(machine, offset+8) | 0xff00;
 		return 0xff;
 	}
 

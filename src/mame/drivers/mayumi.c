@@ -60,7 +60,7 @@ static READ8_HANDLER( key_matrix_r )
 	for (i=0; i<5; i++)
 	{
 		if (p & (1 << i))
-			ret &= readinputport(i+7-offset*5);
+			ret &= input_port_read_indexed(machine, i+7-offset*5);
 	}
 
 	return ret;

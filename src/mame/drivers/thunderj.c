@@ -78,7 +78,7 @@ static MACHINE_RESET( thunderj )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int result = readinputport(2);
+	int result = input_port_read_indexed(machine, 2);
 
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0004;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0008;

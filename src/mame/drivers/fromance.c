@@ -203,15 +203,15 @@ static READ8_HANDLER( fromance_keymatrix_r )
 	int ret = 0xff;
 
 	if (fromance_portselect & 0x01)
-		ret &= readinputport(4);
+		ret &= input_port_read_indexed(machine, 4);
 	if (fromance_portselect & 0x02)
-		ret &= readinputport(5);
+		ret &= input_port_read_indexed(machine, 5);
 	if (fromance_portselect & 0x04)
-		ret &= readinputport(6);
+		ret &= input_port_read_indexed(machine, 6);
 	if (fromance_portselect & 0x08)
-		ret &= readinputport(7);
+		ret &= input_port_read_indexed(machine, 7);
 	if (fromance_portselect & 0x10)
-		ret &= readinputport(8);
+		ret &= input_port_read_indexed(machine, 8);
 
 	return ret;
 }

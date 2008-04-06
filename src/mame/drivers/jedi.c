@@ -215,8 +215,8 @@ static READ8_HANDLER( a2d_data_r )
 
 	switch (state->a2d_select)
 	{
-		case 0: ret = readinputport(2); break;
-		case 2: ret = readinputport(3); break;
+		case 0: ret = input_port_read_indexed(machine, 2); break;
+		case 2: ret = input_port_read_indexed(machine, 3); break;
 	}
 
 	return ret;

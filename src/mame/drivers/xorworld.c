@@ -76,7 +76,7 @@ static NVRAM_HANDLER( xorworld )
 /* the EEPROM is read thru bit 4 */
 static READ16_HANDLER( xorworld_input_r )
 {
-	return readinputport(0) | ((EEPROM_read_bit() & 0x01) << 4);
+	return input_port_read_indexed(machine, 0) | ((EEPROM_read_bit() & 0x01) << 4);
 }
 
 static WRITE16_HANDLER( eeprom_chip_select_w )

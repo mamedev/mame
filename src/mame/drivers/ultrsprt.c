@@ -52,7 +52,7 @@ static READ32_HANDLER( eeprom_r )
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
-		r |= (((EEPROM_read_bit()) << 1) | (readinputport(6) << 3)) << 24;
+		r |= (((EEPROM_read_bit()) << 1) | (input_port_read_indexed(machine, 6) << 3)) << 24;
 
 	return r;
 }
@@ -69,12 +69,12 @@ static WRITE32_HANDLER( eeprom_w )
 
 static READ32_HANDLER( control1_r )
 {
-	return (readinputport(0) << 28) | ((readinputport(1) & 0xfff) << 16) | (readinputport(2) & 0xfff);
+	return (input_port_read_indexed(machine, 0) << 28) | ((input_port_read_indexed(machine, 1) & 0xfff) << 16) | (input_port_read_indexed(machine, 2) & 0xfff);
 }
 
 static READ32_HANDLER( control2_r )
 {
-	return (readinputport(3) << 28) | ((readinputport(4) & 0xfff) << 16) | (readinputport(5) & 0xfff);
+	return (input_port_read_indexed(machine, 3) << 28) | ((input_port_read_indexed(machine, 4) & 0xfff) << 16) | (input_port_read_indexed(machine, 5) & 0xfff);
 }
 
 static WRITE32_HANDLER( int_ack_w )

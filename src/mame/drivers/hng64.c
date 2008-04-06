@@ -729,12 +729,12 @@ static READ32_HANDLER( hng64_dualport_r )
 		//SamSho64
 //      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};
 		//RoadsEdge
-//      case 0x00:  return readinputportbytag("IPT_TEST");
+//      case 0x00:  return input_port_read(machine, "IPT_TEST");
 
 		//Fatfurwa
 		case 0x00:  return 0x00000400;
-		case 0x04:  return readinputportbytag("IPT_NONE")       | (readinputportbytag("FATFURWA_TST_ETC")<<16);
-		case 0x08:  return readinputportbytag("FATFURWA_PLR_2") | (readinputportbytag("FATFURWA_PLR_1")<<16);
+		case 0x04:  return input_port_read(machine, "IPT_NONE")       | (input_port_read(machine, "FATFURWA_TST_ETC")<<16);
+		case 0x08:  return input_port_read(machine, "FATFURWA_PLR_2") | (input_port_read(machine, "FATFURWA_PLR_1")<<16);
 
 		// This takes care of the 'machine' error code
 		case 0x600: return no_machine_error_code;

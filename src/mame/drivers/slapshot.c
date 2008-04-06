@@ -212,7 +212,7 @@ static READ16_HANDLER( slapshot_service_input_r )
 
 static READ16_HANDLER( opwolf3_adc_r )
 {
-	return readinputport(6 + offset)<<8;
+	return input_port_read_indexed(machine, 6 + offset)<<8;
 }
 
 static WRITE16_HANDLER( opwolf3_adc_req_w )

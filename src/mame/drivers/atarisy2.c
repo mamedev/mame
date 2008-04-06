@@ -425,9 +425,9 @@ static WRITE16_HANDLER( adc_strobe_w )
 static READ16_HANDLER( adc_r )
 {
 	if (which_adc < pedal_count)
-		return ~readinputport(3 + which_adc);
+		return ~input_port_read_indexed(machine, 3 + which_adc);
 
-	return readinputport(3 + which_adc) | 0xff00;
+	return input_port_read_indexed(machine, 3 + which_adc) | 0xff00;
 }
 
 
@@ -444,8 +444,8 @@ static READ8_HANDLER( leta_r )
 				static double last_angle;
 				static int rotations;
 
-				int analogx = readinputport(7) - 128;
-				int analogy = readinputport(8) - 128;
+				int analogx = input_port_read_indexed(machine, 7) - 128;
+				int analogy = input_port_read_indexed(machine, 8) - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
@@ -481,7 +481,7 @@ static READ8_HANDLER( leta_r )
 		}
 	}
 
-	return readinputport(7 + (offset & 3));
+	return input_port_read_indexed(machine, 7 + (offset & 3));
 }
 
 

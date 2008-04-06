@@ -76,12 +76,12 @@ VIDEO_START( oneshot )
 	tilemap_set_transparent_pen(oneshot_fg_tilemap,0);
 }
 
-static void draw_crosshairs( bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_crosshairs( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
     int xpos,ypos;
     /* get gun raw coordonates (player 1) */
-    gun_x_p1 = (readinputport(5) & 0xff) * 320 / 256;
-    gun_y_p1 = (readinputport(6) & 0xff) * 240 / 256;
+    gun_x_p1 = (input_port_read_indexed(machine, 5) & 0xff) * 320 / 256;
+    gun_y_p1 = (input_port_read_indexed(machine, 6) & 0xff) * 240 / 256;
 
     /* compute the coordonates for drawing (from routine at 0x009ab0) */
     xpos = gun_x_p1;
@@ -95,8 +95,8 @@ static void draw_crosshairs( bitmap_t *bitmap, const rectangle *cliprect )
 
 
     /* get gun raw coordonates (player 2) */
-    gun_x_p2 = (readinputport(7) & 0xff) * 320 / 256;
-    gun_y_p2 = (readinputport(8) & 0xff) * 240 / 256;
+    gun_x_p2 = (input_port_read_indexed(machine, 7) & 0xff) * 320 / 256;
+    gun_y_p2 = (input_port_read_indexed(machine, 8) & 0xff) * 240 / 256;
     /* compute the coordonates for drawing (from routine at 0x009b6e) */
     xpos = gun_x_p2;
     ypos = gun_y_p2;
@@ -177,7 +177,7 @@ VIDEO_UPDATE( oneshot )
 	tilemap_draw(bitmap,cliprect,oneshot_mid_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,oneshot_fg_tilemap,0,0);
-	draw_crosshairs(bitmap,cliprect);
+	draw_crosshairs(screen->machine,bitmap,cliprect);
 	return 0;
 }
 
@@ -191,7 +191,7 @@ VIDEO_UPDATE( maddonna )
 	tilemap_draw(bitmap,cliprect,oneshot_fg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,oneshot_bg_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
-//  draw_crosshairs(bitmap,cliprect); // not a gun game
+//  draw_crosshairs(screen->machine,bitmap,cliprect); // not a gun game
 
 //  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", oneshot_scroll[0],oneshot_scroll[1],oneshot_scroll[2],oneshot_scroll[3],oneshot_scroll[4],oneshot_scroll[5],oneshot_scroll[6],oneshot_scroll[7]);
 	return 0;

@@ -104,7 +104,7 @@ static int mcu63701_command;
 static int inputs[4];
 
 #if 0	// default - more sensitive (state change and timing measured on real board?)
-static void mcu63705_update_inputs(void)
+static void mcu63705_update_inputs(running_machine *machine)
 {
 	static int running[2],jumped[2];
 	int buttons[2];
@@ -116,8 +116,8 @@ static void mcu63705_update_inputs(void)
 		static int prev[2][2],countup[2][2],countdown[2][2];
 		int curr[2][2];
 
-		curr[p][0] = readinputport(2+p) & 0x01;
-		curr[p][1] = readinputport(2+p) & 0x02;
+		curr[p][0] = input_port_read_indexed(machine, 2+p) & 0x01;
+		curr[p][1] = input_port_read_indexed(machine, 2+p) & 0x02;
 
 		for (j = 0;j <= 1;j++)
 		{
@@ -152,7 +152,7 @@ static void mcu63705_update_inputs(void)
 		static int prev[2];
 		int curr[2];
 
-		curr[p] = readinputport(2+p) & 0x30;
+		curr[p] = input_port_read_indexed(machine, 2+p) & 0x30;
 
 		if (jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
@@ -163,13 +163,13 @@ static void mcu63705_update_inputs(void)
 		prev[p] = curr[p];
 	}
 
-	inputs[0] = readinputport(2) & 0xcf;
-	inputs[1] = readinputport(3) & 0x0f;
+	inputs[0] = input_port_read_indexed(machine, 2) & 0xcf;
+	inputs[1] = input_port_read_indexed(machine, 3) & 0x0f;
 	inputs[2] = running[0] | buttons[0];
 	inputs[3] = running[1] | buttons[1];
 }
 #else	// alternate - less sensitive
-static void mcu63705_update_inputs(void)
+static void mcu63705_update_inputs(running_machine *machine)
 {
 #define DBLTAP_TOLERANCE 5
 
@@ -187,7 +187,7 @@ static void mcu63705_update_inputs(void)
 
 	for (p=0; p<=1; p++)
 	{
-		curr_port[p] = readinputport(p+2);
+		curr_port[p] = input_port_read_indexed(machine, p+2);
 		curr_dash[p] = 0;
 
 		if (curr_port[p] & R)
@@ -242,7 +242,7 @@ static READ8_HANDLER( mcu63701_r )
 		case 1: return inputs[1];
 		case 2: return inputs[2];
 		case 3: return inputs[3];
-		case 4: return readinputport(4);
+		case 4: return input_port_read_indexed(machine, 4);
 	}
 }
 
@@ -250,13 +250,13 @@ static WRITE8_HANDLER( mcu63701_w )
 {
 //  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",activecpu_get_pc(),data);
 	mcu63701_command = data;
-	mcu63705_update_inputs();
+	mcu63705_update_inputs(machine);
 }
 
 
 static READ8_HANDLER( port_0_r )
 {
-	int port = readinputport(0);
+	int port = input_port_read_indexed(machine, 0);
 
 	toggle^=0x02;	/* mcu63701_busy flag */
 

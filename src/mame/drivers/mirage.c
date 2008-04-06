@@ -133,7 +133,7 @@ static VIDEO_UPDATE(mirage)
 
 static READ16_HANDLER( mirage_controls_r )
 {
-	return readinputportbytag("SYSTEM_IN");
+	return input_port_read(machine, "SYSTEM_IN");
 }
 
 static READ16_HANDLER( random_readers )
@@ -143,7 +143,7 @@ static READ16_HANDLER( random_readers )
 
 static READ16_HANDLER( mirage_input_r )
 {
-	UINT16 port = readinputportbytag("MIRAGE0");
+	UINT16 port = input_port_read(machine, "MIRAGE0");
 	return port;
 }
 

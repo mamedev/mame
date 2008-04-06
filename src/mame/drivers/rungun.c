@@ -94,21 +94,21 @@ static READ16_HANDLER( rng_sysregs_r )
 	switch (offset)
 	{
 		case 0x00/2:
-			if (readinputport(1) & 0x20)
-				return(readinputport(2) | readinputport(4)<<8);
+			if (input_port_read_indexed(machine, 1) & 0x20)
+				return(input_port_read_indexed(machine, 2) | input_port_read_indexed(machine, 4)<<8);
 			else
 			{
-				data = readinputport(2) & readinputport(4);
+				data = input_port_read_indexed(machine, 2) & input_port_read_indexed(machine, 4);
 				return(data<<8 | data);
 			}
 		break;
 
 		case 0x02/2:
-			if (readinputport(1) & 0x20)
-				return(readinputport(3) | readinputport(5)<<8);
+			if (input_port_read_indexed(machine, 1) & 0x20)
+				return(input_port_read_indexed(machine, 3) | input_port_read_indexed(machine, 5)<<8);
 			else
 			{
-				data = readinputport(3) & readinputport(5);
+				data = input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 5);
 				return(data<<8 | data);
 			}
 		break;
@@ -125,7 +125,7 @@ static READ16_HANDLER( rng_sysregs_r )
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = readinputport(1) | EEPROM_read_bit();
+				data = input_port_read_indexed(machine, 1) | EEPROM_read_bit();
 
 				if (init_eeprom_count)
 				{

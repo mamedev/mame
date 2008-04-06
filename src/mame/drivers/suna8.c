@@ -490,10 +490,10 @@ static READ8_HANDLER( hardhead_ip_r )
 {
 	switch (*hardhead_ip)
 	{
-		case 0:	return readinputport(0);
-		case 1:	return readinputport(1);
-		case 2:	return readinputport(2);
-		case 3:	return readinputport(3);
+		case 0:	return input_port_read_indexed(machine, 0);
+		case 1:	return input_port_read_indexed(machine, 1);
+		case 2:	return input_port_read_indexed(machine, 2);
+		case 3:	return input_port_read_indexed(machine, 3);
 		default:
 			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n",activecpu_get_pc(),*hardhead_ip);
 			return 0xff;

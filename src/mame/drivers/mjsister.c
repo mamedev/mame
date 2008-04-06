@@ -141,7 +141,7 @@ static READ8_HANDLER( mjsister_keys_r )
 	for (i=0; i<6; i++)
 	{
 		if (p & (1 << i))
-			ret |= readinputport(i+3);
+			ret |= input_port_read_indexed(machine, i+3);
 	}
 
 	return ret;

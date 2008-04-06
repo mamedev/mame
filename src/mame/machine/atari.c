@@ -80,12 +80,12 @@ void atari_interrupt_cb(int mask)
 
 static READ8_HANDLER(atari_pia_pa_r)
 {
-	return atari_input_disabled() ? 0xFF : readinputportbytag_safe("djoy_0_1", 0);
+	return atari_input_disabled() ? 0xFF : input_port_read_safe(machine, "djoy_0_1", 0);
 }
 
 static READ8_HANDLER(atari_pia_pb_r)
 {
-	return atari_input_disabled() ? 0xFF : readinputportbytag_safe("djoy_2_3", 0);
+	return atari_input_disabled() ? 0xFF : input_port_read_safe(machine, "djoy_2_3", 0);
 }
 
 static WRITE8_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(data); }
@@ -521,7 +521,7 @@ static const UINT8 keys[64][4] = {
 };
 
 
-void a800_handle_keyboard(void)
+void a800_handle_keyboard(running_machine *machine)
 {
 	static int atari_last = 0xff;
 	int i, modifiers, atari_code;
@@ -540,7 +540,7 @@ void a800_handle_keyboard(void)
 	for( i = 0; i < 64; i++ )
 	{
 		sprintf(tag, "keyboard_%d", i / 16);
-		if( readinputportbytag_safe(tag, 0) & (1 << (i&15)) )
+		if( input_port_read_safe(machine, tag, 0) & (1 << (i&15)) )
 		{
 			atari_code = keys[i][modifiers];
 			if( atari_code != AKEY_NONE )
@@ -566,7 +566,7 @@ void a800_handle_keyboard(void)
 #define VKEY_BREAK		0x10
 
 /* absolutely no clue what to do here :((( */
-void a5200_handle_keypads(void)
+void a5200_handle_keypads(running_machine *machine)
 {
 	int i, modifiers;
 	static int atari_last = 0xff;
@@ -584,7 +584,7 @@ void a5200_handle_keypads(void)
 	/* check keypad */
 	for (i = 0; i < 16; i++)
 	{
-		if( readinputportbytag("keypad") & (1 << i) )
+		if( input_port_read(machine, "keypad") & (1 << i) )
 		{
 			if( i == atari_last )
 				return;
@@ -600,7 +600,7 @@ void a5200_handle_keypads(void)
 	}
 
 	/* check top button */
-	if ((readinputportbytag("djoy_b") & 0x10) == 0)
+	if ((input_port_read(machine, "djoy_b") & 0x10) == 0)
 	{
 		if (atari_last == 0xFE)
 			return;
@@ -714,7 +714,7 @@ static void cart_reset(running_machine *machine)
 
 static UINT8 console_read(void)
 {
-	return readinputportbytag("console");
+	return input_port_read(Machine, "console");
 }
 
 

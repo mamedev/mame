@@ -119,7 +119,7 @@ static READ16_HANDLER( mweeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = readinputport(1) | EEPROM_read_bit();
+		int res = input_port_read_indexed(machine, 1) | EEPROM_read_bit();
 
 		if (init_eeprom_count)
 		{
@@ -139,7 +139,7 @@ static READ16_HANDLER( vseeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = readinputport(1) | EEPROM_read_bit();
+		int res = input_port_read_indexed(machine, 1) | EEPROM_read_bit();
 
 		if (init_eeprom_count)
 		{
@@ -173,10 +173,10 @@ static READ16_HANDLER( dddeeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return (readinputport(1) | EEPROM_read_bit())<<8;
+		return (input_port_read_indexed(machine, 1) | EEPROM_read_bit())<<8;
 	}
 
-	return readinputport(3);
+	return input_port_read_indexed(machine, 3);
 }
 
 static WRITE16_HANDLER( mmeeprom_w )
@@ -316,27 +316,27 @@ static WRITE16_HANDLER( irq_ack_w )
 
 static READ16_HANDLER( player1_r )
 {
-	return readinputport(2) | (readinputport(3)<<8);
+	return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3)<<8);
 }
 
 static READ16_HANDLER( player2_r )
 {
-	return readinputport(4) | (readinputport(5)<<8);
+	return input_port_read_indexed(machine, 4) | (input_port_read_indexed(machine, 5)<<8);
 }
 
 static READ16_HANDLER( mmplayer1_r )
 {
-	return readinputport(2) | (readinputport(4)<<8);
+	return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 4)<<8);
 }
 
 static READ16_HANDLER( mmplayer2_r )
 {
-	return readinputport(3) | (readinputport(5)<<8);
+	return input_port_read_indexed(machine, 3) | (input_port_read_indexed(machine, 5)<<8);
 }
 
 static READ16_HANDLER( mmcoins_r )
 {
-	int res = readinputport(0);
+	int res = input_port_read_indexed(machine, 0);
 
 	if (init_eeprom_count)
 	{
@@ -349,7 +349,7 @@ static READ16_HANDLER( mmcoins_r )
 
 static READ16_HANDLER( dddcoins_r )
 {
-	int res = (readinputport(0)<<8) | readinputport(2);
+	int res = (input_port_read_indexed(machine, 0)<<8) | input_port_read_indexed(machine, 2);
 
 	if (init_eeprom_count)
 	{

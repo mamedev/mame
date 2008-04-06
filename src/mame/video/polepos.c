@@ -518,7 +518,7 @@ VIDEO_UPDATE( polepos )
 /* original arcade doesn't work in this way */
 #ifdef MAME_DEBUG
 	{
-		int in = readinputport( 0 );
+		int in = input_port_read_indexed(screen->machine,  0 );
 		static int lastin;
 
 		if ((in ^ lastin) & polepos_gear_bit)

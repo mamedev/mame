@@ -258,7 +258,7 @@ static WRITE8_HANDLER( seawolf2_sound_2_w )  // Port 41
 static CUSTOM_INPUT( ebases_trackball_r )
 {
 	static const char *const names[] = { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-	return readinputportbytag(names[input_select]);
+	return input_port_read(machine, names[input_select]);
 }
 
 
@@ -285,7 +285,7 @@ static READ8_HANDLER( spacezap_io_r )
 {
 	coin_counter_w(0, (offset >> 8) & 1);
 	coin_counter_w(1, (offset >> 9) & 1);
-	return readinputportbytag_safe("P3HANDLE", 0xff);
+	return input_port_read_safe(machine, "P3HANDLE", 0xff);
 }
 
 
@@ -474,7 +474,7 @@ static READ8_HANDLER( demndrgn_io_r )
 static CUSTOM_INPUT( demndragn_joystick_r )
 {
 	static const char *const names[] = { "MOVEX", "MOVEY" };
-	return readinputportbytag(names[input_select]);
+	return input_port_read(machine, names[input_select]);
 }
 
 

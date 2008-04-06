@@ -293,7 +293,7 @@ static const UINT8 spinnerTable[64] =
 
 static READ8_HANDLER( omegrace_spinner1_r )
 {
-	return (spinnerTable[readinputport(4) & 0x3f]);
+	return (spinnerTable[input_port_read_indexed(machine, 4) & 0x3f]);
 }
 
 

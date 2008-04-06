@@ -98,7 +98,7 @@ static READ8_HANDLER( io_port_r )
 {
 	gameplan_state *state = machine->driver_data;
 
-	return readinputport(state->current_port);
+	return input_port_read_indexed(machine, state->current_port);
 }
 
 

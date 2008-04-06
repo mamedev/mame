@@ -54,11 +54,11 @@ static READ8_HANDLER( runaway_input_r )
 {
 	UINT8 val = 0;
 
-	if (readinputport(0) & (1 << offset))
+	if (input_port_read_indexed(machine, 0) & (1 << offset))
 	{
 		val |= 0x80;
 	}
-	if (readinputport(1) & (1 << offset))
+	if (input_port_read_indexed(machine, 1) & (1 << offset))
 	{
 		val |= 0x40;
 	}
@@ -69,7 +69,7 @@ static READ8_HANDLER( runaway_input_r )
 
 static READ8_HANDLER( runaway_pot_r )
 {
-	return (readinputport(4) << (7 - offset)) & 0x80;
+	return (input_port_read_indexed(machine, 4) << (7 - offset)) & 0x80;
 }
 
 

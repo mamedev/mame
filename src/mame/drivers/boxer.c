@@ -45,12 +45,12 @@ static TIMER_CALLBACK( periodic_callback )
 
 		memset(mask, 0, sizeof mask);
 
-		mask[readinputport(3)] |= 0x01;
-		mask[readinputport(4)] |= 0x02;
-		mask[readinputport(5)] |= 0x04;
-		mask[readinputport(6)] |= 0x08;
-		mask[readinputport(7)] |= 0x10;
-		mask[readinputport(8)] |= 0x20;
+		mask[input_port_read_indexed(machine, 3)] |= 0x01;
+		mask[input_port_read_indexed(machine, 4)] |= 0x02;
+		mask[input_port_read_indexed(machine, 5)] |= 0x04;
+		mask[input_port_read_indexed(machine, 6)] |= 0x08;
+		mask[input_port_read_indexed(machine, 7)] |= 0x10;
+		mask[input_port_read_indexed(machine, 8)] |= 0x20;
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
@@ -88,9 +88,9 @@ static MACHINE_RESET( boxer )
 
 static READ8_HANDLER( boxer_input_r )
 {
-	UINT8 val = readinputport(0);
+	UINT8 val = input_port_read_indexed(machine, 0);
 
-	if (readinputport(9) < video_screen_get_vpos(machine->primary_screen))
+	if (input_port_read_indexed(machine, 9) < video_screen_get_vpos(machine->primary_screen))
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -112,11 +112,11 @@ static READ8_HANDLER( boxer_misc_r )
 		break;
 
 	case 2:
-		val = readinputport(1);
+		val = input_port_read_indexed(machine, 1);
 		break;
 
 	case 3:
-		val = readinputport(2);
+		val = input_port_read_indexed(machine, 2);
 		break;
 	}
 

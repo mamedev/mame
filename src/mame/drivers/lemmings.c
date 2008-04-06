@@ -33,10 +33,10 @@ static WRITE16_HANDLER( lemmings_control_w )
 static READ16_HANDLER( lemmings_trackball_r )
 {
 	switch (offset) {
-	case 0: return readinputport(4); break;
-	case 1: return readinputport(5); break;
-	case 4: return readinputport(6); break;
-	case 5: return readinputport(7); break;
+	case 0: return input_port_read_indexed(machine, 4); break;
+	case 1: return input_port_read_indexed(machine, 5); break;
+	case 4: return input_port_read_indexed(machine, 6); break;
+	case 5: return input_port_read_indexed(machine, 7); break;
 	}
 	return 0;
 }
@@ -46,13 +46,13 @@ static READ16_HANDLER( lemmings_prot_r )
 {
  	switch (offset<<1) {
 		case 0x41a: /* Player input */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 
 		case 0x320: /* Coins */
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 
 		case 0x4e6: /* Dips */
-			return (readinputport(2) + (readinputport(3) << 8));
+			return (input_port_read_indexed(machine, 2) + (input_port_read_indexed(machine, 3) << 8));
 	}
 
 	return 0;

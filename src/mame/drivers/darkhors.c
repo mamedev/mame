@@ -234,7 +234,7 @@ static NVRAM_HANDLER( darkhors )
 static READ32_HANDLER( darkhors_eeprom_r )
 {
 	// bit 31?
-	return readinputport(4) | ((EEPROM_read_bit() & 1) << (7+16));
+	return input_port_read_indexed(machine, 4) | ((EEPROM_read_bit() & 1) << (7+16));
 }
 
 static WRITE32_HANDLER( darkhors_eeprom_w )
@@ -302,8 +302,8 @@ static READ32_HANDLER( darkhors_input_sel_r )
 	int bit_p1 = mask_to_bit((input_sel & 0x00ff0000) >> 16);
 	int bit_p2 = mask_to_bit((input_sel & 0xff000000) >> 24);
 
-	return	(readinputport(5 + bit_p1) & 0x00ffffff) |
-			(readinputport(5 + bit_p2) & 0xff000000) ;
+	return	(input_port_read_indexed(machine, 5 + bit_p1) & 0x00ffffff) |
+			(input_port_read_indexed(machine, 5 + bit_p2) & 0xff000000) ;
 }
 
 static WRITE32_HANDLER( darkhors_unk1_w )

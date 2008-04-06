@@ -133,7 +133,7 @@ static READ8_HANDLER( marinedt_port1_r )
 //might need to be reversed for cocktail stuff
 
 	/* x/y multiplexed */
-	return readinputport(3 + ((marinedt_pf&0x08)>>3));
+	return input_port_read_indexed(machine, 3 + ((marinedt_pf&0x08)>>3));
 }
 
 static READ8_HANDLER( marinedt_coll_r )

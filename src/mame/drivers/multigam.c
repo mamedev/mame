@@ -100,11 +100,11 @@ static WRITE8_HANDLER( multigam_IN0_w )
 	in_0_shift = 0;
 	in_1_shift = 0;
 
-	in_0 = readinputport(0);
-	in_1 = readinputport(1);
+	in_0 = input_port_read_indexed(machine, 0);
+	in_1 = input_port_read_indexed(machine, 1);
 
 	multigam_in_dsw_shift = 0;
-	multigam_in_dsw = readinputport(3);
+	multigam_in_dsw = input_port_read_indexed(machine, 3);
 }
 
 static READ8_HANDLER( multigam_IN1_r )
@@ -117,7 +117,7 @@ static READ8_HANDLER( multigam_inputs_r )
 	/* bit 0: serial input (dsw)
        bit 1: coin */
 	return ((multigam_in_dsw >> multigam_in_dsw_shift++) & 0x01) |
-			readinputport(2);
+			input_port_read_indexed(machine, 2);
 }
 
 

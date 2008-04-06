@@ -60,7 +60,7 @@ WRITE8_HANDLER( invadpt2_sh_port_2_w )
 	if (rising_bits & 0x08) sample_start_n(0, 4, 6, 0);		/* FLEET */
 	if (rising_bits & 0x10) sample_start_n(0, 3, 7, 0);		/* SAUCER HIT */
 
-    c8080bw_flip_screen_w(data & 0x20);
+    c8080bw_flip_screen_w(machine, data & 0x20);
 
 	port_2_last = data;
 }
@@ -145,7 +145,7 @@ WRITE8_HANDLER( lrescue_sh_port_2_w )
 	if (rising_bits & 0x10) sample_start(3, 6, 0);		/* Shooting Star and Rescue Ship sounds */
 	if (~data & 0x10 && port_2_last & 0x10) sample_stop (3);	/* This makes the rescue ship sound beep on and off */
 
-	c8080bw_flip_screen_w(data & 0x20);
+	c8080bw_flip_screen_w(machine, data & 0x20);
 
 	port_2_last = data;
 }
@@ -196,7 +196,7 @@ WRITE8_HANDLER( ballbomb_sh_port_2_w )
 	if (data & 0x04) sample_start(0, 4, 0);		/* Plane is dropping new balloons at start of level */
 	if (rising_bits & 0x10) sample_start(2, 2, 0);		/* Balloon hit and bomb drops */
 
-	c8080bw_flip_screen_w(data & 0x20);
+	c8080bw_flip_screen_w(machine, data & 0x20);
 
 	port_2_last = data;
 }
@@ -623,7 +623,7 @@ WRITE8_HANDLER( polaris_sh_port_3_w )
 
 	coin_lockout_global_w(data & 0x04);  /* SX8 */
 
-	c8080bw_flip_screen_w(data & 0x20);  /* SX11 */
+	c8080bw_flip_screen_w(machine, data & 0x20);  /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
 	discrete_sound_w(machine, POLARIS_SX6_EN, data & 0x01);
@@ -854,7 +854,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 
 	schaser_background_control_w(data & 0x18);
 
-	c8080bw_flip_screen_w(data & 0x20);
+	c8080bw_flip_screen_w(machine, data & 0x20);
 }
 
 
@@ -998,7 +998,7 @@ WRITE8_HANDLER( lupin3_sh_port_2_w )
 	if (rising_bits & 0x08) sample_start(3, 0, 0);		/* start intermission, end game */
 	//if (rising_bits & 0x10) sample_start(3, 9, 0);        /* Dog barking */
 
-	c8080bw_flip_screen_w(data & 0x20);
+	c8080bw_flip_screen_w(machine, data & 0x20);
 
 	port_2_last = data;
 }
@@ -1030,7 +1030,7 @@ WRITE8_HANDLER( schasrcv_sh_port_2_w )
 
 	sound_global_enable(data & 0x10);
 
-	c8080bw_flip_screen_w(data & 0x20);
+	c8080bw_flip_screen_w(machine, data & 0x20);
 }
 
 
@@ -1065,7 +1065,7 @@ WRITE8_HANDLER( yosakdon_sh_port_2_w )
 
 	if (rising_bits & 0x10) sample_start(2, 7, 0);			/* Game Over */
 
-	c8080bw_flip_screen_w(data & 0x20);
+	c8080bw_flip_screen_w(machine, data & 0x20);
 
 	port_2_last = data;
 }

@@ -54,13 +54,13 @@ static READ16_HANDLER( darkseal_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return (readinputport(3) + (readinputport(4) << 8));
+			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (readinputport(0) + (readinputport(1) << 8));
+			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 
 		case 4: /* Credits */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 	}
 
 	return ~0;

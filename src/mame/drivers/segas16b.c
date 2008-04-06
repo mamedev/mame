@@ -1120,10 +1120,10 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
-			return readinputport(offset & 3);
+			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x2000/2:
-			return readinputport(4 + (offset & 1));
+			return input_port_read_indexed(machine, 4 + (offset & 1));
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
 	return segaic16_open_bus_r(machine,0,0);
@@ -1379,7 +1379,7 @@ static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs
 	}
 
 	/* read inputs */
-	workram[inputoffs] = ~readinputport(0) << 8;
+	workram[inputoffs] = ~input_port_read_indexed(machine, 0) << 8;
 }
 
 static void altbeasj_i8751_sim(running_machine *machine)
@@ -1458,8 +1458,8 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x2cd0/2] = (readinputport(1) << 8) | readinputport(3);
-	workram[0x2c96/2] = readinputport(0) << 8;
+	workram[0x2cd0/2] = (input_port_read_indexed(machine, 1) << 8) | input_port_read_indexed(machine, 3);
+	workram[0x2c96/2] = input_port_read_indexed(machine, 0) << 8;
 }
 
 
@@ -1479,9 +1479,9 @@ static void tturf_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x01e6/2] = readinputport(0) << 8;
-	workram[0x01e8/2] = readinputport(1) << 8;
-	workram[0x01ea/2] = readinputport(3) << 8;
+	workram[0x01e6/2] = input_port_read_indexed(machine, 0) << 8;
+	workram[0x01e8/2] = input_port_read_indexed(machine, 1) << 8;
+	workram[0x01ea/2] = input_port_read_indexed(machine, 3) << 8;
 }
 
 
@@ -1518,7 +1518,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 	}
 
 	/* read inputs */
-	workram[0x2082/2] = readinputport(0);
+	workram[0x2082/2] = input_port_read_indexed(machine, 0);
 }
 
 
@@ -1554,14 +1554,14 @@ static READ16_HANDLER( dunkshot_custom_io_r )
 		case 0x3000/2:
 			switch ((offset/2) & 7)
 			{
-				case 0:	return (readinputportbytag("ANALOGX1") << 4) >> (8 * (offset & 1));
-				case 1:	return (readinputportbytag("ANALOGY1") << 4) >> (8 * (offset & 1));
-				case 2:	return (readinputportbytag("ANALOGX2") << 4) >> (8 * (offset & 1));
-				case 3:	return (readinputportbytag("ANALOGY2") << 4) >> (8 * (offset & 1));
-				case 4:	return (readinputportbytag("ANALOGX3") << 4) >> (8 * (offset & 1));
-				case 5:	return (readinputportbytag("ANALOGY3") << 4) >> (8 * (offset & 1));
-				case 6:	return (readinputportbytag("ANALOGX4") << 4) >> (8 * (offset & 1));
-				case 7:	return (readinputportbytag("ANALOGY4") << 4) >> (8 * (offset & 1));
+				case 0:	return (input_port_read(machine, "ANALOGX1") << 4) >> (8 * (offset & 1));
+				case 1:	return (input_port_read(machine, "ANALOGY1") << 4) >> (8 * (offset & 1));
+				case 2:	return (input_port_read(machine, "ANALOGX2") << 4) >> (8 * (offset & 1));
+				case 3:	return (input_port_read(machine, "ANALOGY2") << 4) >> (8 * (offset & 1));
+				case 4:	return (input_port_read(machine, "ANALOGX3") << 4) >> (8 * (offset & 1));
+				case 5:	return (input_port_read(machine, "ANALOGY3") << 4) >> (8 * (offset & 1));
+				case 6:	return (input_port_read(machine, "ANALOGX4") << 4) >> (8 * (offset & 1));
+				case 7:	return (input_port_read(machine, "ANALOGY4") << 4) >> (8 * (offset & 1));
 			}
 			break;
 	}
@@ -1605,7 +1605,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					hwc_input_value = readinputportbytag_safe(portname[offset & 3], 0xff);
+					hwc_input_value = input_port_read_safe(machine, portname[offset & 3], 0xff);
 					break;
 
 				case 0x30/2:
@@ -1637,10 +1637,10 @@ static READ16_HANDLER( passshtj_custom_io_r )
 		case 0x3000/2:
 			switch (offset & 3)
 			{
-				case 0:	return readinputportbytag("P1");
-				case 1:	return readinputportbytag("P2");
-				case 2:	return readinputportbytag("P3");
-				case 3:	return readinputportbytag("P4");
+				case 0:	return input_port_read(machine, "P1");
+				case 1:	return input_port_read(machine, "P2");
+				case 2:	return input_port_read(machine, "P3");
+				case 3:	return input_port_read(machine, "P4");
 			}
 			break;
 	}
@@ -1662,10 +1662,10 @@ static READ16_HANDLER( sdi_custom_io_r )
 		case 0x3000/2:
 			switch ((offset/2) & 3)
 			{
-				case 0:	return readinputportbytag("ANALOGX1");
-				case 1:	return readinputportbytag("ANALOGY1");
-				case 2:	return readinputportbytag("ANALOGX2");
-				case 3:	return readinputportbytag("ANALOGY2");
+				case 0:	return input_port_read(machine, "ANALOGX1");
+				case 1:	return input_port_read(machine, "ANALOGY1");
+				case 2:	return input_port_read(machine, "ANALOGX2");
+				case 3:	return input_port_read(machine, "ANALOGY2");
 			}
 			break;
 	}
@@ -1689,12 +1689,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (readinputportbytag_safe(portname[mj_input_num], 0xff) != 0xff)
+					if (input_port_read_safe(machine, portname[mj_input_num], 0xff) != 0xff)
 						return 0xff & ~(1 << mj_input_num);
 					return 0xff;
 
 				case 2:
-					return readinputportbytag_safe(portname[mj_input_num], 0xff);
+					return input_port_read_safe(machine, portname[mj_input_num], 0xff);
 			}
 			break;
 	}

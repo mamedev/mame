@@ -158,10 +158,10 @@ static READ8_HANDLER( thief_io_r )
 {
 	switch( thief_input_select )
 	{
-		case 0x01: return readinputport(0); /* dsw#1 */
-		case 0x02: return readinputport(1); /* dsw#2 */
-		case 0x04: return readinputport(2); /* inp#1 */
-		case 0x08: return readinputport(3); /* inp#2 */
+		case 0x01: return input_port_read_indexed(machine, 0); /* dsw#1 */
+		case 0x02: return input_port_read_indexed(machine, 1); /* dsw#2 */
+		case 0x04: return input_port_read_indexed(machine, 2); /* inp#1 */
+		case 0x08: return input_port_read_indexed(machine, 3); /* inp#2 */
 	}
 	return 0x00;
 }

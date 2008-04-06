@@ -78,10 +78,10 @@ Dip locations verified from manual for:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
-extern void (*toybox_mcu_run)(void);	/* one of the following */
-void bloodwar_mcu_run(void);
-void bonkadv_mcu_run(void);
-void gtmr_mcu_run(void);
+extern void (*toybox_mcu_run)(running_machine *machine);	/* one of the following */
+void bloodwar_mcu_run(running_machine *machine);
+void bonkadv_mcu_run(running_machine *machine);
+void gtmr_mcu_run(running_machine *machine);
 
 /***************************************************************************
 
@@ -603,10 +603,10 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gtmr_wheel_r )
 {
-	if ( (readinputport(4) & 0x1800) == 0x10)	// DSW setting
-		return	readinputport(5)<<8;			// 360' Wheel
+	if ( (input_port_read_indexed(machine, 4) & 0x1800) == 0x10)	// DSW setting
+		return	input_port_read_indexed(machine, 5)<<8;			// 360' Wheel
 	else
-		return	readinputport(5);				// 270' Wheel
+		return	input_port_read_indexed(machine, 5);				// 270' Wheel
 }
 
 static WRITE16_HANDLER( gtmr_oki_0_bank_w )
@@ -708,16 +708,16 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gtmr2_wheel_r )
 {
-	switch (readinputport(4) & 0x1800)
+	switch (input_port_read_indexed(machine, 4) & 0x1800)
 	{
 		case 0x0000:	// 270' A. Wheel
-			return	(readinputport(5));
+			return	(input_port_read_indexed(machine, 5));
 			break;
 		case 0x1000:	// 270' D. Wheel
-			return	(readinputport(6) << 8);
+			return	(input_port_read_indexed(machine, 6) << 8);
 			break;
 		case 0x0800:	// 360' Wheel
-			return	(readinputport(7) << 8);
+			return	(input_port_read_indexed(machine, 7) << 8);
 			break;
 		default:
 			logerror("gtmr2_wheel_r : read at %06x with joystick\n", activecpu_get_pc());
@@ -728,7 +728,7 @@ static READ16_HANDLER( gtmr2_wheel_r )
 
 static READ16_HANDLER( gtmr2_IN1_r )
 {
-	return	(readinputport(1) & (readinputport(8) | ~0x7100));
+	return	(input_port_read_indexed(machine, 1) & (input_port_read_indexed(machine, 8) | ~0x7100));
 }
 
 static ADDRESS_MAP_START( gtmr2_readmem, ADDRESS_SPACE_PROGRAM, 16 )

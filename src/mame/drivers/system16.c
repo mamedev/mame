@@ -1201,7 +1201,7 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( ga_io_players_r ) {
-	return (readinputport(0) << 8) | readinputport(1);
+	return (input_port_read_indexed(machine, 0) << 8) | input_port_read_indexed(machine, 1);
 }
 static READ16_HANDLER( ga_io_service_r )
 {
@@ -1401,35 +1401,35 @@ static int passht4b_io3_val;
 static READ16_HANDLER( passht4b_service_r )
 {
 	UINT16 val=input_port_2_word_r(machine,offset,0);
-	if(!(readinputport(0) & 0x40)) val&=0xef;
-	if(!(readinputport(1) & 0x40)) val&=0xdf;
-	if(!(readinputport(5) & 0x40)) val&=0xbf;
-	if(!(readinputport(6) & 0x40)) val&=0x7f;
+	if(!(input_port_read_indexed(machine, 0) & 0x40)) val&=0xef;
+	if(!(input_port_read_indexed(machine, 1) & 0x40)) val&=0xdf;
+	if(!(input_port_read_indexed(machine, 5) & 0x40)) val&=0xbf;
+	if(!(input_port_read_indexed(machine, 6) & 0x40)) val&=0x7f;
 
-	passht4b_io3_val=(readinputport(0)<<4) | (readinputport(5)&0xf);
-	passht4b_io2_val=(readinputport(1)<<4) | (readinputport(6)&0xf);
+	passht4b_io3_val=(input_port_read_indexed(machine, 0)<<4) | (input_port_read_indexed(machine, 5)&0xf);
+	passht4b_io2_val=(input_port_read_indexed(machine, 1)<<4) | (input_port_read_indexed(machine, 6)&0xf);
 
 	passht4b_io1_val=0xff;
 
 	// player 1 buttons
-	if(!(readinputport(0) & 0x10)) passht4b_io1_val &=0xfe;
-	if(!(readinputport(0) & 0x20)) passht4b_io1_val &=0xfd;
-	if(!(readinputport(0) & 0x80)) passht4b_io1_val &=0xfc;
+	if(!(input_port_read_indexed(machine, 0) & 0x10)) passht4b_io1_val &=0xfe;
+	if(!(input_port_read_indexed(machine, 0) & 0x20)) passht4b_io1_val &=0xfd;
+	if(!(input_port_read_indexed(machine, 0) & 0x80)) passht4b_io1_val &=0xfc;
 
 	// player 2 buttons
-	if(!(readinputport(1) & 0x10)) passht4b_io1_val &=0xfb;
-	if(!(readinputport(1) & 0x20)) passht4b_io1_val &=0xf7;
-	if(!(readinputport(1) & 0x80)) passht4b_io1_val &=0xf3;
+	if(!(input_port_read_indexed(machine, 1) & 0x10)) passht4b_io1_val &=0xfb;
+	if(!(input_port_read_indexed(machine, 1) & 0x20)) passht4b_io1_val &=0xf7;
+	if(!(input_port_read_indexed(machine, 1) & 0x80)) passht4b_io1_val &=0xf3;
 
 	// player 3 buttons
-	if(!(readinputport(5) & 0x10)) passht4b_io1_val &=0xef;
-	if(!(readinputport(5) & 0x20)) passht4b_io1_val &=0xdf;
-	if(!(readinputport(5) & 0x80)) passht4b_io1_val &=0xcf;
+	if(!(input_port_read_indexed(machine, 5) & 0x10)) passht4b_io1_val &=0xef;
+	if(!(input_port_read_indexed(machine, 5) & 0x20)) passht4b_io1_val &=0xdf;
+	if(!(input_port_read_indexed(machine, 5) & 0x80)) passht4b_io1_val &=0xcf;
 
 	// player 4 buttons
-	if(!(readinputport(6) & 0x10)) passht4b_io1_val &=0xbf;
-	if(!(readinputport(6) & 0x20)) passht4b_io1_val &=0x7f;
-	if(!(readinputport(6) & 0x80)) passht4b_io1_val &=0x3f;
+	if(!(input_port_read_indexed(machine, 6) & 0x10)) passht4b_io1_val &=0xbf;
+	if(!(input_port_read_indexed(machine, 6) & 0x20)) passht4b_io1_val &=0x7f;
+	if(!(input_port_read_indexed(machine, 6) & 0x80)) passht4b_io1_val &=0x3f;
 
 	return val;
 }

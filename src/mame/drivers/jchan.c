@@ -220,7 +220,7 @@ This will benefit galpani3 and other kaneko16 games with TOYBOX MCU.
 ***************************************************************************/
 static UINT16 *mcu_ram, jchan_mcu_com[4];
 
-static void jchan_mcu_run(void)
+static void jchan_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command = mcu_ram[0x0010/2];		/* command nb */
 	UINT16 mcu_offset  = mcu_ram[0x0012/2] / 2;	/* offset in shared RAM where MCU will write */
@@ -302,7 +302,7 @@ static void jchan_mcu_run(void)
 
 		case 0x03: 	// DSW
 		{
-			mcu_ram[mcu_offset] = readinputport(3);
+			mcu_ram[mcu_offset] = input_port_read_indexed(machine, 3);
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n",activecpu_get_pc(),mcu_command,mcu_offset*2);
 		}
 		break;
@@ -377,7 +377,7 @@ static WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
 	if (jchan_mcu_com[3] != 0xFFFF)	return; \
 \
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	jchan_mcu_run(); \
+	jchan_mcu_run(machine); \
 }
 
 JCHAN_MCU_COM_W(0)
@@ -455,8 +455,8 @@ static READ16_HANDLER ( jchan_ctrl_r )
 {
 	switch(offset)
 	{
-		case 0/2: return readinputport(0); // Player 1 controls
-		case 2/2: return readinputport(1); // Player 2 controls
+		case 0/2: return input_port_read_indexed(machine, 0); // Player 1 controls
+		case 2/2: return input_port_read_indexed(machine, 1); // Player 2 controls
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
 	return jchan_ctrl[offset];

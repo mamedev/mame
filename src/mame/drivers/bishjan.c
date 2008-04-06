@@ -224,10 +224,10 @@ static READ16_HANDLER( bishjan_input_r )
 
 	for (i = 0; i < 5; i++)
 		if (bishjan_input & (1 << i))
-			res = readinputport(4+i);
+			res = input_port_read_indexed(machine, 4+i);
 
 	return	(res << 8) |
-			readinputport(3) |
+			input_port_read_indexed(machine, 3) |
 			((bishjan_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }

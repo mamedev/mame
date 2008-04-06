@@ -416,7 +416,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 static READ16_HANDLER( othunder_lightgun_r )
 {
 	static const char *const dswname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return readinputportbytag(dswname[offset]);
+	return input_port_read(machine, dswname[offset]);
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )

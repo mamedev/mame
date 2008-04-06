@@ -152,29 +152,29 @@ static void strtheat_decrypt_rom_B(void)
 
 static READ8_HANDLER( strtheat_inputport_0_r )
 {
-	if(readinputport(3) & 0x40)
+	if(input_port_read_indexed(machine, 3) & 0x40)
 	{
 		/* Joystick inputs */
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (readinputport(0) & ~3) | (readinputport(4) & 3);
+		return (input_port_read_indexed(machine, 0) & ~3) | (input_port_read_indexed(machine, 4) & 3);
 	}
 }
 
 static READ8_HANDLER( strtheat_inputport_1_r )
 {
-	if(readinputport(3) & 0x40)
+	if(input_port_read_indexed(machine, 3) & 0x40)
 	{
 		/* Joystick inputs */
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (readinputport(1) & ~3) | (readinputport(5) & 3);
+		return (input_port_read_indexed(machine, 1) & ~3) | (input_port_read_indexed(machine, 5) & 3);
 	}
 }
 

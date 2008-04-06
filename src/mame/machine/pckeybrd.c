@@ -17,6 +17,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/pckeybrd.h"
 
 #ifdef MESS
@@ -508,7 +509,7 @@ static UINT32 at_keyboard_readport(int port)
 {
 	UINT32 result = 0;
 	if (keyboard.ports[port] >= 0)
-		result = readinputport(keyboard.ports[port]);
+		result = input_port_read_indexed(Machine, keyboard.ports[port]);
 	return result;
 }
 

@@ -554,7 +554,7 @@ VIDEO_UPDATE( macross )
 }
 
 /*coin setting MCU simulation*/
-static void mcu_run(UINT8 dsw_setting)
+static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 {
 	static UINT8 read_coin;
 	static UINT8 old_value;
@@ -563,24 +563,24 @@ static void mcu_run(UINT8 dsw_setting)
 	/*needed because of the uncompatibility of the dsw settings.*/
 	if(dsw_setting)
 	{
-		dsw_a = (readinputport(2+dsw_setting) & 0x7);
-		dsw_b = (readinputport(2+dsw_setting) & 0x38) >> 3;
+		dsw_a = (input_port_read_indexed(machine, 2+dsw_setting) & 0x7);
+		dsw_b = (input_port_read_indexed(machine, 2+dsw_setting) & 0x38) >> 3;
 	}
 	else
 	{
-		dsw_a = (readinputport(2) & 0x0700) >> 8;
-		dsw_b = (readinputport(2) & 0x3800) >> 11;
+		dsw_a = (input_port_read_indexed(machine, 2) & 0x0700) >> 8;
+		dsw_b = (input_port_read_indexed(machine, 2) & 0x3800) >> 11;
 	}
 
 	read_coin = old_value;
-	old_value = readinputport(0);
+	old_value = input_port_read_indexed(machine, 0);
 
 	if(dsw_a == 0 || dsw_b == 0)
 		nmk16_mainram[0x9000/2]|=0x4000; //free_play
 
 	if(read_coin != old_value)
 	{
-		if(!(readinputport(0) & 0x01))//COIN1
+		if(!(input_port_read_indexed(machine, 0) & 0x01))//COIN1
 		{
 			switch(dsw_a & 7)
 			{
@@ -615,7 +615,7 @@ static void mcu_run(UINT8 dsw_setting)
 			}
 		}
 
-		if(!(readinputport(0) & 0x02))//COIN2
+		if(!(input_port_read_indexed(machine, 0) & 0x02))//COIN2
 		{
 			switch(dsw_b & 7)
 			{
@@ -650,19 +650,19 @@ static void mcu_run(UINT8 dsw_setting)
 			}
 		}
 
-		if(!(readinputport(0) & 0x04))//SERVICE_COIN
+		if(!(input_port_read_indexed(machine, 0) & 0x04))//SERVICE_COIN
 			nmk16_mainram[0xef00/2]++;
 
 		if(nmk16_mainram[0xef00/2] >= 1 && (nmk16_mainram[0x9000/2] & 0x8000))/*enable start button*/
 		{
 			/*Start a 1-player game,but don't decrement if the player 1 is already playing*/
-			if((!(readinputport(0) & 0x08)) /*START1*/
+			if((!(input_port_read_indexed(machine, 0) & 0x08)) /*START1*/
 			&& (!(nmk16_mainram[0x9000/2] & 0x0200)) /*PLAYER-1 playing*/
 			)
 				nmk16_mainram[0xef00/2]--;
 
 			/*Start a 2-players game,but don't decrement if the player 2 is already playing*/
-			if((!(readinputport(0) & 0x10))
+			if((!(input_port_read_indexed(machine, 0) & 0x10))
 			&& (!(nmk16_mainram[0x9000/2] & 0x0100))
 			)
 			{
@@ -679,7 +679,7 @@ static void mcu_run(UINT8 dsw_setting)
 
 VIDEO_UPDATE( tdragon )
 {
-	mcu_run(1);
+	mcu_run(screen->machine, 1);
 
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
@@ -696,7 +696,7 @@ VIDEO_UPDATE( tdragon )
 
 VIDEO_UPDATE( hachamf )
 {
-	mcu_run(0);
+	mcu_run(screen->machine, 0);
 
 	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
 
@@ -1052,8 +1052,8 @@ static void video_update(running_machine *machine, bitmap_t *bitmap, const recta
 	if (dsw_flipscreen)
 	{
 
-		flip_screen_x_set(~readinputport(2) & 0x0100);
-		flip_screen_y_set(~readinputport(2) & 0x0200);
+		flip_screen_x_set(~input_port_read_indexed(machine, 2) & 0x0100);
+		flip_screen_y_set(~input_port_read_indexed(machine, 2) & 0x0200);
 	}
 
 	tilemap_set_scrollx(tilemap_0, 0, afega_scroll_0[1] + xoffset);

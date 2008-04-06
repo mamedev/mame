@@ -1708,21 +1708,21 @@ INPUT_PORTS_START( aladbl )
 INPUT_PORTS_END
 
 
-#define MODE_BUTTON(player) ( (readinputport(player) & 0x800) >> 11 )
-#define Z_BUTTON(player) ( (readinputport(player) & 0x400) >> 10 )
-#define Y_BUTTON(player) ( (readinputport(player) & 0x200) >> 9 )
-#define X_BUTTON(player) ( (readinputport(player) & 0x100) >> 8 )
+#define MODE_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x800) >> 11 )
+#define Z_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x400) >> 10 )
+#define Y_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x200) >> 9 )
+#define X_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x100) >> 8 )
 
 
-#define START_BUTTON(player) ( (readinputport(player) & 0x80) >> 7 )
-#define C_BUTTON(player)     ( (readinputport(player) & 0x40) >> 6 )
-#define B_BUTTON(player)     ( (readinputport(player) & 0x20) >> 5 )
-#define A_BUTTON(player)     ( (readinputport(player) & 0x10) >> 4 )
-#define RIGHT_BUTTON(player) ( (readinputport(player) & 0x08) >> 3 )
-#define LEFT_BUTTON(player)  ( (readinputport(player) & 0x04) >> 2 )
-#define DOWN_BUTTON(player)  ( (readinputport(player) & 0x02) >> 1 )
-#define UP_BUTTON(player)    ( (readinputport(player) & 0x01) >> 0 )
-#define MD_RESET_BUTTON      ( (readinputportbytag_safe("RESET",0x00)      & 0x01) >> 0 )
+#define START_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x80) >> 7 )
+#define C_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x40) >> 6 )
+#define B_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x20) >> 5 )
+#define A_BUTTON(player)     ( (input_port_read_indexed(Machine, player) & 0x10) >> 4 )
+#define RIGHT_BUTTON(player) ( (input_port_read_indexed(Machine, player) & 0x08) >> 3 )
+#define LEFT_BUTTON(player)  ( (input_port_read_indexed(Machine, player) & 0x04) >> 2 )
+#define DOWN_BUTTON(player)  ( (input_port_read_indexed(Machine, player) & 0x02) >> 1 )
+#define UP_BUTTON(player)    ( (input_port_read_indexed(Machine, player) & 0x01) >> 0 )
+#define MD_RESET_BUTTON      ( (input_port_read_safe(Machine, "RESET",0x00)      & 0x01) >> 0 )
 
 static UINT8 megadrive_io_data_regs[3];
 static UINT8 megadrive_io_ctrl_regs[3];
@@ -2909,7 +2909,7 @@ static UINT16 vdp_get_word_from_68k_mem_svp(UINT32 source)
 /* emulate testmode plug */
 static UINT8 megadrive_io_read_data_port_svp(int portnum)
 {
-	if (portnum == 0 && readinputportbytag_safe("MEMORY_TEST", 0x00))
+	if (portnum == 0 && input_port_read_safe(Machine, "MEMORY_TEST", 0x00))
 	{
 		return (megadrive_io_data_regs[0] & 0xc0);
 	}
@@ -4755,7 +4755,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	switch (readinputportbytag_safe("REGION",0x00))
+	switch (input_port_read_safe(machine, "REGION",0x00))
 	{
 
 		case 1: // US

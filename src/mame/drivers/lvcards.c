@@ -136,7 +136,7 @@ static WRITE8_HANDLER(control_port_2a_w)
 
 static READ8_HANDLER( payout_r )
 {
-	result = readinputport(2);
+	result = input_port_read_indexed(machine, 2);
 
 	if (payout)
 	{

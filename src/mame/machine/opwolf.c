@@ -532,8 +532,8 @@ READ16_HANDLER( opwolf_cchip_data_r )
 static TIMER_CALLBACK( cchip_timer )
 {
 	// Update input ports, these are used by both the 68k directly and by the c-chip
-	cchip_ram[0x4]=readinputportbytag("IN0");
-	cchip_ram[0x5]=readinputportbytag("IN1");
+	cchip_ram[0x4]=input_port_read(machine, "IN0");
+	cchip_ram[0x5]=input_port_read(machine, "IN1");
 
 	// Coin slots
 	if (cchip_ram[0x4]!=cchip_last_04)

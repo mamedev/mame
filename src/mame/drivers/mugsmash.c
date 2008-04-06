@@ -161,16 +161,16 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 	switch (offset)
 	{
 		case 0 :
-			data = (readinputport(0) & 0xff) | ((readinputport(3) & 0xc0) << 6) | ((readinputport(2) & 0x03) << 8);
+			data = (input_port_read_indexed(machine, 0) & 0xff) | ((input_port_read_indexed(machine, 3) & 0xc0) << 6) | ((input_port_read_indexed(machine, 2) & 0x03) << 8);
 			break;
 		case 1 :
-			data = (readinputport(1) & 0xff) | ((readinputport(3) & 0x3f) << 8);
+			data = (input_port_read_indexed(machine, 1) & 0xff) | ((input_port_read_indexed(machine, 3) & 0x3f) << 8);
 			break;
 		case 2 :
-			data = ((readinputport(4) & 0x3f) << 8);
+			data = ((input_port_read_indexed(machine, 4) & 0x3f) << 8);
 			break;
 		case 3 :
-			data = ((readinputport(4) & 0xc0) << 2);
+			data = ((input_port_read_indexed(machine, 4) & 0xc0) << 2);
 			break;
 	}
 

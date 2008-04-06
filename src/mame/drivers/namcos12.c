@@ -1145,16 +1145,16 @@ static READ32_HANDLER( system11gun_r )
 	switch( offset )
 	{
 	case 0:
-		data = readinputport( 3 );
+		data = input_port_read_indexed(machine,  3 );
 		break;
 	case 1:
-		data = ( readinputport( 4 ) ) | ( ( readinputport( 4 ) + 1 ) << 16 );
+		data = ( input_port_read_indexed(machine,  4 ) ) | ( ( input_port_read_indexed(machine,  4 ) + 1 ) << 16 );
 		break;
 	case 2:
-		data = readinputport( 5 );
+		data = input_port_read_indexed(machine,  5 );
 		break;
 	case 3:
-		data = ( readinputport( 6 ) ) | ( ( readinputport( 6 ) + 1 ) << 16 );
+		data = ( input_port_read_indexed(machine,  6 ) ) | ( ( input_port_read_indexed(machine,  6 ) + 1 ) << 16 );
 		break;
 	}
 	verboselog( 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -1387,7 +1387,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 	int index = port_tag_to_index("IN3");
 	if( index != -1 )
 	{
-		int rv = readinputport( index ) << 6;
+		int rv = input_port_read_indexed(machine,  index ) << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{
@@ -1406,7 +1406,7 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 	int index = port_tag_to_index("IN4");
 	if( index != -1 )
 	{
-		int rv = readinputport( index ) << 6;
+		int rv = input_port_read_indexed(machine,  index ) << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{

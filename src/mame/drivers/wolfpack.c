@@ -58,13 +58,13 @@ static MACHINE_RESET( wolfpack )
 
 static READ8_HANDLER( wolfpack_input_r )
 {
-	UINT8 val = readinputport(0);
+	UINT8 val = input_port_read_indexed(machine, 0);
 
-	if (((readinputport(2) + 0) / 2) & 1)
+	if (((input_port_read_indexed(machine, 2) + 0) / 2) & 1)
 	{
 		val |= 1;
 	}
-	if (((readinputport(2) + 1) / 2) & 1)
+	if (((input_port_read_indexed(machine, 2) + 1) / 2) & 1)
 	{
 		val |= 2;
 	}

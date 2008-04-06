@@ -100,7 +100,7 @@ static INTERRUPT_GEN( tagteam_interrupt )
 	static int coin;
 	int port;
 
-	port = readinputportbytag("IN0") & 0xc0;
+	port = input_port_read(machine, "IN0") & 0xc0;
 
 	if (port != 0xc0)    /* Coin */
 	{

@@ -331,9 +331,9 @@ static READ32_HANDLER( captaven_prot_r )
 {
 	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
 	switch (offset<<2) {
-	case 0x0a0: return readinputport(0); /* Player 1 & 2 controls */
-	case 0x158: return readinputport(1); /* Player 3 & 4 controls */
-	case 0xed4: return readinputport(2); /* Misc */
+	case 0x0a0: return input_port_read_indexed(machine, 0); /* Player 1 & 2 controls */
+	case 0x158: return input_port_read_indexed(machine, 1); /* Player 3 & 4 controls */
+	case 0xed4: return input_port_read_indexed(machine, 2); /* Misc */
 	}
 
 	logerror("%08x: Unmapped protection read %04x\n",activecpu_get_pc(),offset<<2);
@@ -343,14 +343,14 @@ static READ32_HANDLER( captaven_prot_r )
 static READ32_HANDLER( captaven_soundcpu_r )
 {
 	/* Top byte - top bit low == sound cpu busy, bottom word is dips */
-	return 0xffff0000 | readinputport(3);
+	return 0xffff0000 | input_port_read_indexed(machine, 3);
 }
 
 static READ32_HANDLER( fghthist_control_r )
 {
 	switch (offset) {
-	case 0: return 0xffff0000 | readinputport(0);
-	case 1: return 0xffff0000 | readinputport(1); //check top bits??
+	case 0: return 0xffff0000 | input_port_read_indexed(machine, 0);
+	case 1: return 0xffff0000 | input_port_read_indexed(machine, 1); //check top bits??
 	case 2: return 0xfffffffe | EEPROM_read_bit();
 	}
 
@@ -375,7 +375,7 @@ static WRITE32_HANDLER( fghthist_eeprom_w )
 static READ32_HANDLER( dragngun_service_r )
 {
 //  logerror("%08x:Read service\n",activecpu_get_pc());
-	return readinputport(3);
+	return input_port_read_indexed(machine, 3);
 }
 
 static READ32_HANDLER( lockload_gun_mirror_r )
@@ -383,8 +383,8 @@ static READ32_HANDLER( lockload_gun_mirror_r )
 //logerror("%08x:Read gun %d\n",activecpu_get_pc(),offset);
 //return ((mame_rand(Machine)%0xffff)<<16) | mame_rand(Machine)%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return readinputport(5) | ((mame_rand(Machine)%0xff)<<16);
-	return readinputport(4) | readinputport(6) | (readinputport(6)<<16) | (readinputport(6)<<24); //((mame_rand(Machine)%0xff)<<16);
+		return input_port_read_indexed(machine, 5) | ((mame_rand(Machine)%0xff)<<16);
+	return input_port_read_indexed(machine, 4) | input_port_read_indexed(machine, 6) | (input_port_read_indexed(machine, 6)<<16) | (input_port_read_indexed(machine, 6)<<24); //((mame_rand(Machine)%0xff)<<16);
 }
 
 static READ32_HANDLER( dragngun_prot_r )
@@ -398,9 +398,9 @@ static READ32_HANDLER( dragngun_prot_r )
 //definitely vblank in locked load
 
 	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | readinputport(0); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | readinputport(1) | strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | readinputport(2); /* IN2 (Dip switch) */
+	case 0x140/2: return 0xffff0000 | input_port_read_indexed(machine, 0); /* IN0 */
+	case 0xadc/2: return 0xffff0000 | input_port_read_indexed(machine, 1) | strobe; /* IN1 */
+	case 0x6a0/2: return 0xffff0000 | input_port_read_indexed(machine, 2); /* IN2 (Dip switch) */
 	}
 	return 0xffffffff;
 }
@@ -411,10 +411,10 @@ static READ32_HANDLER( dragngun_lightgun_r )
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (dragngun_lightgun_port) {
-	case 4: return readinputport(4); break;
-	case 5: return readinputport(5); break;
-	case 6: return readinputport(6); break;
-	case 7: return readinputport(7); break;
+	case 4: return input_port_read_indexed(machine, 4); break;
+	case 5: return input_port_read_indexed(machine, 5); break;
+	case 6: return input_port_read_indexed(machine, 6); break;
+	case 7: return input_port_read_indexed(machine, 7); break;
 	}
 
 //  logerror("Illegal lightgun port %d read \n",dragngun_lightgun_port);
@@ -460,8 +460,8 @@ static int tattass_eprom_bit;
 static READ32_HANDLER( tattass_prot_r )
 {
 	switch (offset<<1) {
-	case 0x280: return readinputport(0) << 16; /* IN0 */
-	case 0x4c4: return readinputport(1) << 16; /* IN1 */
+	case 0x280: return input_port_read_indexed(machine, 0) << 16; /* IN0 */
+	case 0x4c4: return input_port_read_indexed(machine, 1) << 16; /* IN1 */
 	case 0x35a: return tattass_eprom_bit << 16;
 	}
 
@@ -623,8 +623,8 @@ static READ32_HANDLER( nslasher_prot_r )
 {
 
 	switch (offset<<1) {
-	case 0x280: return readinputport(0) << 16| 0xffff; /* IN0 */
-	case 0x4c4: return readinputport(1) << 16| 0xffff; /* IN1 */
+	case 0x280: return input_port_read_indexed(machine, 0) << 16| 0xffff; /* IN0 */
+	case 0x4c4: return input_port_read_indexed(machine, 1) << 16| 0xffff; /* IN1 */
 	case 0x35a: return (EEPROM_read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 

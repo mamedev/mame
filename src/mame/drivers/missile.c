@@ -658,21 +658,21 @@ static READ8_HANDLER( missile_r )
 		if (ctrld)	/* trackball */
 		{
 			if (!flipscreen)
-		  	    result = ((readinputport(5) << 4) & 0xf0) | (readinputport(4) & 0x0f);
+		  	    result = ((input_port_read_indexed(machine, 5) << 4) & 0xf0) | (input_port_read_indexed(machine, 4) & 0x0f);
 			else
-		  	    result = ((readinputport(7) << 4) & 0xf0) | (readinputport(6) & 0x0f);
+		  	    result = ((input_port_read_indexed(machine, 7) << 4) & 0xf0) | (input_port_read_indexed(machine, 6) & 0x0f);
 		}
 		else	/* buttons */
-			result = readinputport(0);
+			result = input_port_read_indexed(machine, 0);
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = readinputport(1);
+		result = input_port_read_indexed(machine, 1);
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = readinputport(2);
+		result = input_port_read_indexed(machine, 2);
 
 	/* anything else */
 	else

@@ -212,7 +212,7 @@ VIDEO_UPDATE( mario )
 	mario_state	*state = screen->machine->driver_data;
 	int t;
 
-	t = readinputportbytag("MONITOR");
+	t = input_port_read(screen->machine, "MONITOR");
 	if (t != state->monitor)
 	{
 		state->monitor = t;

@@ -208,7 +208,7 @@ READ8_HANDLER( decocass_input_r )
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = readinputport(offset & 7);
+		data = input_port_read_indexed(machine, offset & 7);
 		break;
 	case 3: case 4: case 5: case 6:
 		data = decocass_quadrature_decoder[(offset & 7) - 3];

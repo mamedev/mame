@@ -175,11 +175,11 @@ static READ32_HANDLER( aleck_dips_r )
 {
 	if (offset == 0)
 	{
-		return (readinputport(3));
+		return (input_port_read_indexed(machine, 3));
 	}
 	else if (offset == 1)
 	{
-		return (readinputport(4));
+		return (input_port_read_indexed(machine, 4));
 	}
 
 	return 0;

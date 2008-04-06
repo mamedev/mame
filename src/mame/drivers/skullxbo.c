@@ -96,7 +96,7 @@ static MACHINE_RESET( skullxbo )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int temp = readinputport(1);
+	int temp = input_port_read_indexed(machine, 1);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
 	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
 	return temp;

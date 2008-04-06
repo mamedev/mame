@@ -87,7 +87,7 @@ static WRITE16_HANDLER( track_reset_w )
 	int i;
 
 	for (i = 0;i < 4;i++)
-		last[i] = readinputport(3+i);
+		last[i] = input_port_read_indexed(machine, 3+i);
 }
 
 static READ16_HANDLER( track_r )
@@ -95,10 +95,10 @@ static READ16_HANDLER( track_r )
 	switch (offset)
 	{
 		default:
-		case 0:	return (( readinputport(3) - last[0]) & 0x00ff)		  | (((readinputport(5) - last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((readinputport(3) - last[0]) & 0xff00) >> 8) | (( readinputport(5) - last[2]) & 0xff00);		/* X hi */
-		case 2:	return (( readinputport(4) - last[1]) & 0x00ff)		  | (((readinputport(6) - last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((readinputport(4) - last[1]) & 0xff00) >> 8) | (( readinputport(6) - last[3]) & 0xff00);		/* Y hi */
+		case 0:	return (( input_port_read_indexed(machine, 3) - last[0]) & 0x00ff)		  | (((input_port_read_indexed(machine, 5) - last[2]) & 0x00ff) << 8);	/* X lo */
+		case 1:	return (((input_port_read_indexed(machine, 3) - last[0]) & 0xff00) >> 8) | (( input_port_read_indexed(machine, 5) - last[2]) & 0xff00);		/* X hi */
+		case 2:	return (( input_port_read_indexed(machine, 4) - last[1]) & 0x00ff)		  | (((input_port_read_indexed(machine, 6) - last[3]) & 0x00ff) << 8);	/* Y lo */
+		case 3:	return (((input_port_read_indexed(machine, 4) - last[1]) & 0xff00) >> 8) | (( input_port_read_indexed(machine, 6) - last[3]) & 0xff00);		/* Y hi */
 	}
 }
 

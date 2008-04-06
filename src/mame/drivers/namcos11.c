@@ -575,16 +575,16 @@ static INTERRUPT_GEN( namcos11_vblank )
 	UINT16 n_coin;
 	UINT32 n_input;
 
-	n_input = ( readinputportbytag( "PLAYER1" ) << 16 );
+	n_input = ( input_port_read(machine,  "PLAYER1" ) << 16 );
 	SHRAM( 0xbd00 ) = n_input | ( ( n_input & ~SHRAM( 0xbd00 ) ) >> 8 ) | ( SHRAM( 0xbd00 ) & 0x0000ffff );
 
-	n_input = readinputportbytag( "PLAYER2" ) | ( readinputportbytag( "PLAYER3" ) << 16 );
+	n_input = input_port_read(machine,  "PLAYER2" ) | ( input_port_read(machine,  "PLAYER3" ) << 16 );
 	SHRAM( 0xbd04 ) = n_input | ( ( n_input & ~SHRAM( 0xbd04 ) ) >> 8 );
 
-	n_input = readinputportbytag( "PLAYER4" );
+	n_input = input_port_read(machine,  "PLAYER4" );
 	SHRAM( 0xbd08 ) = n_input | ( ( n_input & ~SHRAM( 0xbd08 ) ) >> 8 ) | ( SHRAM( 0xbd08 ) & 0xffff0000 );
 
-	n_coin = readinputportbytag( "COIN" );
+	n_coin = input_port_read(machine,  "COIN" );
 
 	if( ( n_coin & m_n_oldcoin & 0x08 ) != 0 )
 	{
@@ -627,14 +627,14 @@ static INTERRUPT_GEN( namcos11_vblank )
 
 		SHRAM( 0xbd30 ) = ( SHRAM( 0xbd30 ) & 0x0000ffff ) | ( 0x0080 << 16 );
 
-		SHRAM( 0xbd08 ) = ( SHRAM( 0xbd08 ) & 0x0000ffff ) | ( readinputportbytag( "STEERING" ) << 16 );
-		SHRAM( 0xbd0c ) = ( SHRAM( 0xbd0c ) & 0xffff0000 ) | ( readinputportbytag( "GAS" ) << 0 );
+		SHRAM( 0xbd08 ) = ( SHRAM( 0xbd08 ) & 0x0000ffff ) | ( input_port_read(machine,  "STEERING" ) << 16 );
+		SHRAM( 0xbd0c ) = ( SHRAM( 0xbd0c ) & 0xffff0000 ) | ( input_port_read(machine,  "GAS" ) << 0 );
 	}
 }
 
 static TIMER_CALLBACK( mcu_timer )
 {
-	SHRAM( 0xbd00 ) = ( SHRAM( 0xbd00 ) & 0xffffff00 ) | readinputportbytag( "SWITCH" );
+	SHRAM( 0xbd00 ) = ( SHRAM( 0xbd00 ) & 0xffffff00 ) | input_port_read(machine,  "SWITCH" );
 }
 
 static UINT32 m_n_bankoffset;
@@ -715,16 +715,16 @@ static READ32_HANDLER( lightgun_r )
 	switch( offset )
 	{
 	case 0:
-		data = readinputportbytag( "GUN1X" );
+		data = input_port_read(machine,  "GUN1X" );
 		break;
 	case 1:
-		data = ( readinputportbytag( "GUN1Y" ) ) | ( ( readinputportbytag( "GUN1Y" ) + 1 ) << 16 );
+		data = ( input_port_read(machine,  "GUN1Y" ) ) | ( ( input_port_read(machine,  "GUN1Y" ) + 1 ) << 16 );
 		break;
 	case 2:
-		data = readinputportbytag( "GUN2X" );
+		data = input_port_read(machine,  "GUN2X" );
 		break;
 	case 3:
-		data = ( readinputportbytag( "GUN2Y" ) ) | ( ( readinputportbytag( "GUN2Y" ) + 1 ) << 16 );
+		data = ( input_port_read(machine,  "GUN2Y" ) ) | ( ( input_port_read(machine,  "GUN2Y" ) + 1 ) << 16 );
 		break;
 	}
 	verboselog( 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );

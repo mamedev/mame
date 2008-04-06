@@ -73,9 +73,9 @@ static INTERRUPT_GEN( yamyam_interrupt )
 	{
 		if (input_ports_hack)
 		{
-			rambase[0x004] = readinputport(4);	/* COIN */
-			rambase[0x005] = readinputport(3);	/* IN1 */
-			rambase[0x006] = readinputport(2);	/* IN0 */
+			rambase[0x004] = input_port_read_indexed(machine, 4);	/* COIN */
+			rambase[0x005] = input_port_read_indexed(machine, 3);	/* IN1 */
+			rambase[0x006] = input_port_read_indexed(machine, 2);	/* IN0 */
 		}
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
 	}

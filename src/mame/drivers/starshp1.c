@@ -17,7 +17,7 @@ static int starshp1_analog_in_select;
 
 static INTERRUPT_GEN( starshp1_interrupt )
 {
-	if ((readinputport(0) & 0x90) != 0x90)
+	if ((input_port_read_indexed(machine, 0) & 0x90) != 0x90)
 		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 }
 
@@ -69,26 +69,26 @@ static READ8_HANDLER( starshp1_port_1_r )
 	switch (starshp1_analog_in_select)
 	{
 	case 0:
-		val = readinputport(4);
+		val = input_port_read_indexed(machine, 4);
 		break;
 	case 1:
-		val = readinputport(5);
+		val = input_port_read_indexed(machine, 5);
 		break;
 	case 2:
 		val = 0x20; /* DAC feedback, not used */
 		break;
 	case 3:
-		val = readinputport(3);
+		val = input_port_read_indexed(machine, 3);
 		break;
 	}
 
-	return (val & 0x3f) | readinputport(1);
+	return (val & 0x3f) | input_port_read_indexed(machine, 1);
 }
 
 
 static READ8_HANDLER( starshp1_port_2_r )
 {
-	return readinputport(2) | (starshp1_collision_latch & 0x0f);
+	return input_port_read_indexed(machine, 2) | (starshp1_collision_latch & 0x0f);
 }
 
 

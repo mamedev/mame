@@ -95,7 +95,7 @@ static WRITE8_HANDLER( changela_68705_ddrA_w )
 
 static READ8_HANDLER( changela_68705_portB_r )
 {
-	return (portB_out & ddrB) | (readinputport(4) & ~ddrB);
+	return (portB_out & ddrB) | (input_port_read_indexed(machine, 4) & ~ddrB);
 }
 
 static WRITE8_HANDLER( changela_68705_portB_w )
@@ -177,7 +177,7 @@ static READ8_HANDLER( changela_25_r )
 
 static READ8_HANDLER( changela_30_r )
 {
-	return readinputport(7) & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
+	return input_port_read_indexed(machine, 7) & 0x0f;	//wheel control (clocked input) signal on bits 3,2,1,0
 }
 
 static READ8_HANDLER( changela_31_r )
@@ -186,7 +186,7 @@ static READ8_HANDLER( changela_31_r )
        or if the new value is greater than the old value, and it did wrap around,
        then we are moving LEFT. */
 	static UINT8 prev_value = 0;
-	UINT8 curr_value = readinputport(7);
+	UINT8 curr_value = input_port_read_indexed(machine, 7);
 	static int dir = 0;
 
 	if( (curr_value < prev_value && (prev_value - curr_value) < 0x80)
@@ -204,7 +204,7 @@ static READ8_HANDLER( changela_31_r )
 
 static READ8_HANDLER( changela_2c_r )
 {
-	int val = readinputport(5);
+	int val = input_port_read_indexed(machine, 5);
 
     val = (val&0x30) | ((val&1)<<7) | (((val&1)^1)<<6);
 
@@ -221,7 +221,7 @@ static READ8_HANDLER( changela_2d_r )
 		v8 = 1;
 
 	/* Gas pedal is made up of 2 switches, 1 active low, 1 active high */
-	switch(readinputport(6) & 0x03)
+	switch(input_port_read_indexed(machine, 6) & 0x03)
 	{
 		case 0x02:
 			gas = 0x80;
@@ -234,7 +234,7 @@ static READ8_HANDLER( changela_2d_r )
 			break;
 	}
 
-	return (readinputport(6) & 0x20) | gas | (v8<<4);
+	return (input_port_read_indexed(machine, 6) & 0x20) | gas | (v8<<4);
 }
 
 static WRITE8_HANDLER( mcu_PC0_w )

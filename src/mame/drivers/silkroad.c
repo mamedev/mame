@@ -148,13 +148,13 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 /* player inputs */
 static READ32_HANDLER(io32_r)
 {
-	return ((readinputport(0) << 16) |  (readinputport(1) << 0));
+	return ((input_port_read_indexed(machine, 0) << 16) |  (input_port_read_indexed(machine, 1) << 0));
 }
 
 /* dipswitches */
 static READ32_HANDLER(io32_1_r)
 {
-	return readinputport(2)<<16;
+	return input_port_read_indexed(machine, 2)<<16;
 }
 
 /* sound I/O */

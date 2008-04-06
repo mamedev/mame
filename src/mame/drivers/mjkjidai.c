@@ -110,12 +110,12 @@ static READ8_HANDLER( keyboard_r )
 	{
 		if (~keyb & (1 << i))
 		{
-			res = readinputport(4+i) & 0x3f;
+			res = input_port_read_indexed(machine, 4+i) & 0x3f;
 			break;
 		}
 	}
 
-	res |= (readinputport(3) & 0xc0);
+	res |= (input_port_read_indexed(machine, 3) & 0xc0);
 
 	if (nvram_init_count)
 	{

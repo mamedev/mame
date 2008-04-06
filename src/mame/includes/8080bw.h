@@ -69,7 +69,7 @@ WRITE8_HANDLER( shuttlei_sh_port_2_w );
 
 extern UINT8 *c8080bw_colorram;
 
-void c8080bw_flip_screen_w(int data);
+void c8080bw_flip_screen_w(running_machine *machine, int data);
 void c8080bw_screen_red_w(int data);
 void schaser_background_control_w(int data);
 

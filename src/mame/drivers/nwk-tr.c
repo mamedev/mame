@@ -556,11 +556,11 @@ static double adc12138_input_callback(int input)
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = readinputport(4) - 0x800; break;
-		case 1:		value = readinputport(5); break;
-		case 2:		value = readinputport(6); break;
-		case 3:		value = readinputport(7); break;
-		case 4:		value = readinputport(8); break;
+		case 0:		value = input_port_read_indexed(Machine, 4) - 0x800; break;
+		case 1:		value = input_port_read_indexed(Machine, 5); break;
+		case 2:		value = input_port_read_indexed(Machine, 6); break;
+		case 3:		value = input_port_read_indexed(Machine, 7); break;
+		case 4:		value = input_port_read_indexed(Machine, 8); break;
 	}
 
 	return (double)(value) / 2047.0;
@@ -573,15 +573,15 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= readinputport(0) << 24;
+			r |= input_port_read_indexed(machine, 0) << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= readinputport(1) << 16;
+			r |= input_port_read_indexed(machine, 1) << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= readinputport(2) << 8;
+			r |= input_port_read_indexed(machine, 2) << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -592,7 +592,7 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= readinputport(3) << 24;
+			r |= input_port_read_indexed(machine, 3) << 24;
 		}
 	}
 	return r;

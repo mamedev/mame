@@ -226,9 +226,9 @@ READ8_HANDLER( irobot_control_r )
 {
 
 	if (irobot_control_num == 0)
-		return readinputport (5);
+		return input_port_read_indexed(machine, 5);
 	else if (irobot_control_num == 1)
-		return readinputport (6);
+		return input_port_read_indexed(machine, 6);
 	return 0;
 
 }

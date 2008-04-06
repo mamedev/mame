@@ -482,13 +482,13 @@ static VIDEO_UPDATE ( raiden2 )
 
 static INTERRUPT_GEN( raiden2_interrupt )
 {
-	mainram[0x740/2] = readinputport(2) | (readinputport(3) << 8);
+	mainram[0x740/2] = input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3) << 8);
 	mainram[0x742/2] = 0xffff;
-	mainram[0x744/2] = readinputport(0) | (readinputport(1) << 8);
+	mainram[0x744/2] = input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1) << 8);
 	mainram[0x746/2] = 0xffff;
 	mainram[0x748/2] = 0xffff;
 	mainram[0x74a/2] = 0xffff;
-	mainram[0x74c/2] = readinputport(4) | 0xff00;
+	mainram[0x74c/2] = input_port_read_indexed(machine, 4) | 0xff00;
 	mainram[0x74e/2] = 0xffff;
 
 	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc0/4);	/* VBL */
@@ -1872,7 +1872,7 @@ static WRITE16_HANDLER( rdx_v33_eeprom_w )
 
 static READ16_HANDLER( rdx_v33_eeprom_r )
 {
-	return readinputport(0) | (EEPROM_read_bit()<<4);
+	return input_port_read_indexed(machine, 0) | (EEPROM_read_bit()<<4);
 }
 
 
@@ -1906,7 +1906,7 @@ static WRITE16_HANDLER( mcu_prog_offs_w )
 
 static READ16_HANDLER( r2_playerin_r )
 {
-	return readinputport(1);
+	return input_port_read_indexed(machine, 1);
 }
 static READ16_HANDLER( rdx_v33_oki_r )
 {

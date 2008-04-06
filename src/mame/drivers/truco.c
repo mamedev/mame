@@ -133,7 +133,7 @@ static INTERRUPT_GEN( truco_interrupt )
 	/* coinup */
 	static int trigger = 0;
 
-	if ( readinputport( 2 ) & 1 )
+	if ( input_port_read_indexed(machine,  2 ) & 1 )
 	{
 		if ( trigger == 0 )
 		{

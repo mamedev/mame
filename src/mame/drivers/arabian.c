@@ -148,7 +148,7 @@ static READ8_HANDLER( custom_cpu_r )
 		case 3:
 		case 4:
 		case 5:
-			return readinputport(2 + offset);
+			return input_port_read_indexed(machine, 2 + offset);
 
 		/* busy flag; this is polled to check the custom CPU's readiness */
 		/* we just toggle it on and off until the main CPU gets the result */

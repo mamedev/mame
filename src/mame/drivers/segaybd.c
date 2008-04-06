@@ -256,7 +256,7 @@ static READ16_HANDLER( io_chip_r )
 				return misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return readinputport(offset);
+			return input_port_read_indexed(machine, offset);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -357,7 +357,7 @@ static WRITE16_HANDLER( analog_w )
 {
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (misc_io_data[0x08/2] & 3)) : (offset & 3);
-	int value = readinputportbytag_safe(ports[selected], 0xff);
+	int value = input_port_read_safe(machine, ports[selected], 0xff);
 	analog_data[offset & 3] = value;
 }
 

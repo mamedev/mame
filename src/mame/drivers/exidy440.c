@@ -290,7 +290,7 @@ static CUSTOM_INPUT( firq_vblank_r )
 static CUSTOM_INPUT( hitnmiss_button1_r )
 {
 	/* button 1 shows up in two bits */
-	UINT32 button1 = readinputportbytag("HITNMISS_BUTTON1");
+	UINT32 button1 = input_port_read(machine, "HITNMISS_BUTTON1");
 	return (button1 << 1) | button1;
 }
 
@@ -343,7 +343,7 @@ static READ8_HANDLER( exidy440_input_port_3_r )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	return readinputport(3);
+	return input_port_read_indexed(machine, 3);
 }
 
 

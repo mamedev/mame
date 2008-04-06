@@ -1034,7 +1034,7 @@ static void input_port_exit(running_machine *machine);
 static void input_port_frame(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
-static void update_digital_joysticks(void);
+static void update_digital_joysticks(running_machine *machine);
 static void update_analog_port(int port);
 static void autoselect_device(const input_port_entry *ipt, int type1, int type2, int type3, const char *option, const char *ananame);
 
@@ -2605,9 +2605,9 @@ int input_port_condition(const input_port_entry *in)
 	switch (in->condition.condition)
 	{
 		case PORTCOND_EQUALS:
-			return ((readinputport(in->condition.portnum) & in->condition.mask) == in->condition.value);
+			return ((input_port_read_indexed(Machine, in->condition.portnum) & in->condition.mask) == in->condition.value);
 		case PORTCOND_NOTEQUALS:
-			return ((readinputport(in->condition.portnum) & in->condition.mask) != in->condition.value);
+			return ((input_port_read_indexed(Machine, in->condition.portnum) & in->condition.mask) != in->condition.value);
 	}
 	return 1;
 }
@@ -2771,7 +2771,7 @@ profiler_mark(PROFILER_INPUT);
 			update_analog_port(portnum);
 
 	/* update the digital joysticks first */
-	update_digital_joysticks();
+	update_digital_joysticks(machine);
 
 	/* compute default values for all the ports */
 	input_port_update_defaults();
@@ -2884,7 +2884,7 @@ profiler_mark(PROFILER_INPUT);
 			{
 				input_port_entry *portentry = changed->portentry;
 
-				UINT32 new_unmasked_value = readinputport(portnum);
+				UINT32 new_unmasked_value = input_port_read_indexed(machine, portnum);
 				UINT32 newval = (new_unmasked_value       & portentry->mask) >> changed->shift;
 				UINT32 oldval = (portentry->changed_last_value & portentry->mask) >> changed->shift;
 
@@ -2918,7 +2918,7 @@ profiler_mark(PROFILER_END);
  *
  *************************************/
 
-static void update_digital_joysticks(void)
+static void update_digital_joysticks(running_machine *machine)
 {
 	int player, joyindex;
 
@@ -2984,7 +2984,7 @@ static void update_digital_joysticks(void)
 					if ((info->current4way & (JOYDIR_UP_BIT | JOYDIR_DOWN_BIT)) &&
 						(info->current4way & (JOYDIR_LEFT_BIT | JOYDIR_RIGHT_BIT)))
 					{
-						if (mame_rand(Machine) & 1)
+						if (mame_rand(machine) & 1)
 							info->current4way &= ~(JOYDIR_LEFT_BIT | JOYDIR_RIGHT_BIT);
 						else
 							info->current4way &= ~(JOYDIR_UP_BIT | JOYDIR_DOWN_BIT);
@@ -3279,7 +3279,7 @@ profiler_mark(PROFILER_END);
  *
  *************************************/
 
-UINT32 readinputport(int portnum)
+UINT32 input_port_read_indexed(running_machine *machine, int portnum)
 {
 	input_port_info *portinfo = &port_info[portnum];
 	custom_port_info *custom;
@@ -3298,7 +3298,7 @@ UINT32 readinputport(int portnum)
 			/* replace the bits with bits from the custom routine */
 			input_port_entry *portentry = custom->portentry;
 			result &= ~portentry->mask;
-			result |= ((*portentry->custom)(Machine, portentry->custom_param) << custom->shift) & portentry->mask;
+			result |= ((*portentry->custom)(machine, portentry->custom_param) << custom->shift) & portentry->mask;
 		}
 
 	/* handle VBLANK bits */
@@ -3308,18 +3308,18 @@ UINT32 readinputport(int portnum)
 		result = (result & ~portinfo->vblank) | (portinfo->defvalue & portinfo->vblank);
 
 		/* toggle VBLANK if we're in a VBLANK state */
-		if (video_screen_get_vblank(Machine->primary_screen))
+		if (video_screen_get_vblank(machine->primary_screen))
 			result ^= portinfo->vblank;
 	}
 	return result;
 }
 
 
-UINT32 readinputportbytag(const char *tag)
+UINT32 input_port_read(running_machine *machine, const char *tag)
 {
 	int portnum = port_tag_to_index(tag);
 	if (portnum != -1)
-		return readinputport(portnum);
+		return input_port_read_indexed(machine, portnum);
 
 	/* otherwise fail horribly */
 	fatalerror("Unable to locate input port '%s'", tag);
@@ -3327,11 +3327,11 @@ UINT32 readinputportbytag(const char *tag)
 }
 
 
-UINT32 readinputportbytag_safe(const char *tag, UINT32 defvalue)
+UINT32 input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue)
 {
 	int portnum = port_tag_to_index(tag);
 	if (portnum != -1)
-		return readinputport(portnum);
+		return input_port_read_indexed(machine, portnum);
 	return defvalue;
 }
 

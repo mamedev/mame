@@ -264,7 +264,7 @@ static READ8_HANDLER( mrokumei_keyboard_r )
 		{
 			if (keyb & (1 << i))
 			{
-				res = readinputport(3+i) & 0x3f;
+				res = input_port_read_indexed(machine, 3+i) & 0x3f;
 				break;
 			}
 		}
@@ -398,7 +398,7 @@ static MACHINE_RESET( reikaids_upd7807 )
 
 static READ8_HANDLER( reikaids_io_r )
 {
-	int res = readinputport(2);	// bit 4 = coin, bit 5 = service
+	int res = input_port_read_indexed(machine, 2);	// bit 4 = coin, bit 5 = service
 
 	res |= BIT(upd7807_portc,2) * 0x01;		// bit 0 = upd7807 status
 	res |= BIT(upd7807_portc,6) * 0x02;		// bit 1 = upd7807 data
@@ -468,7 +468,7 @@ static READ8_HANDLER( pteacher_io_r )
 
 static READ8_HANDLER( pteacher_keyboard_r )
 {
-	int dips = readinputport(0);
+	int dips = input_port_read_indexed(machine, 0);
 
 //  logerror("%04x: keyboard_r with port A = %02x\n",activecpu_get_pc(),upd7807_porta);
 
@@ -476,7 +476,7 @@ static READ8_HANDLER( pteacher_keyboard_r )
 	{
 		/* player 1 + dip switches */
 		int row = (upd7807_porta & 0x07);
-		return readinputport(2 + row) | (((dips >> row) & 1) << 5);	// 0-5
+		return input_port_read_indexed(machine, 2 + row) | (((dips >> row) & 1) << 5);	// 0-5
 	}
 	if (upd7807_porta & 0x08)
 	{

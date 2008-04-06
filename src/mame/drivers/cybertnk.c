@@ -236,7 +236,7 @@ static READ16_HANDLER( io_r )
 	switch( offset )
 	{
 		case 2/2:
-			return ( (readinputportbytag("DSW1") << 8) | readinputportbytag("DSW2") );
+			return ( (input_port_read(machine, "DSW1") << 8) | input_port_read(machine, "DSW2") );
 
 		// 0x00110007 is controller device select
 		// 0x001100D5 is controller data
@@ -245,15 +245,15 @@ static READ16_HANDLER( io_r )
 			switch( (io_ram[7/2]) & 0xff )
 			{
 				case 0:
-					io_ram[0xd5/2] = readinputportbytag("TRAVERSE");
+					io_ram[0xd5/2] = input_port_read(machine, "TRAVERSE");
 					break;
 
 				case 0x20:
-					io_ram[0xd5/2] = readinputportbytag("ELEVATE");
+					io_ram[0xd5/2] = input_port_read(machine, "ELEVATE");
 					break;
 
 				case 0x40:
-					io_ram[0xd5/2] = readinputportbytag("ACCEL");
+					io_ram[0xd5/2] = input_port_read(machine, "ACCEL");
 					break;
 
 				case 0x42:
@@ -265,7 +265,7 @@ static READ16_HANDLER( io_r )
 					break;
 
 				case 0x60:
-					io_ram[0xd5/2] = readinputportbytag("HANDLE");
+					io_ram[0xd5/2] = input_port_read(machine, "HANDLE");
 					break;
 
 				default:
@@ -274,13 +274,13 @@ static READ16_HANDLER( io_r )
 			return 0;
 
 		case 6/2:
-			return readinputportbytag("IN0"); // high half
+			return input_port_read(machine, "IN0"); // high half
 
 		case 9/2:
-			return readinputportbytag("IN0"); // low half
+			return input_port_read(machine, "IN0"); // low half
 
 		case 0xb/2:
-			return readinputportbytag("DSW3");
+			return input_port_read(machine, "DSW3");
 
 		case 0xd5/2:
 			return io_ram[offset]; // controller data

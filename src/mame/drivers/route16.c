@@ -174,10 +174,10 @@ static READ8_HANDLER( ttmahjng_input_port_matrix_r )
 
 	switch (ttmahjng_port_select)
 	{
-	case 1:  ret = readinputport(2); break;
-	case 2:  ret = readinputport(3); break;
-	case 4:  ret = readinputport(4); break;
-	case 8:  ret = readinputport(5); break;
+	case 1:  ret = input_port_read_indexed(machine, 2); break;
+	case 2:  ret = input_port_read_indexed(machine, 3); break;
+	case 4:  ret = input_port_read_indexed(machine, 4); break;
+	case 8:  ret = input_port_read_indexed(machine, 5); break;
 	default: break;
 	}
 

@@ -241,8 +241,8 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 
 	int width = visarea->max_x + 1 - visarea->min_x;
 	int height = visarea->max_y + 1 - visarea->min_y;
-	*x = visarea->min_x + (((readinputport(3 + player * 2) & 0xff) * width) >> 8);
-	*y = visarea->min_y + (((readinputport(4 + player * 2) & 0xff) * height) >> 8);
+	*x = visarea->min_x + (((input_port_read_indexed(machine, 3 + player * 2) & 0xff) * width) >> 8);
+	*y = visarea->min_y + (((input_port_read_indexed(machine, 4 + player * 2) & 0xff) * height) >> 8);
 }
 
 
@@ -741,7 +741,7 @@ READ32_HANDLER( cojag_gun_input_r )
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 2:
-			return readinputport(7) << 16;
+			return input_port_read_indexed(machine, 7) << 16;
 	}
 	return 0;
 }

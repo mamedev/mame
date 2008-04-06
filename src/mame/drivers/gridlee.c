@@ -174,7 +174,7 @@ static READ8_HANDLER( analog_port_r )
 	UINT8 newval;
 
 	/* first read the new trackball value and compute the signed delta */
-	newval = readinputport(offset + 2 * gridlee_cocktail_flip);
+	newval = input_port_read_indexed(machine, offset + 2 * gridlee_cocktail_flip);
 	delta = (int)newval - (int)last_analog_input[offset];
 
 	/* handle the case where we wrap around from 0x00 to 0xff, or vice versa */

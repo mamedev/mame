@@ -253,8 +253,8 @@ static READ8_HANDLER( spacduel_IN3_r )
 	int res1;
 	int res2;
 
-	res1 = readinputportbytag("IN3");
-	res2 = readinputportbytag("IN4");
+	res1 = input_port_read(machine, "IN3");
+	res2 = input_port_read(machine, "IN4");
 	res = 0x00;
 
 	switch (offset & 0x07)

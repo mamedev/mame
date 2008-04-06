@@ -39,12 +39,12 @@ static WRITE8_HANDLER( input_port_select_w )
 }
 
 
-static UINT8 difficulty_input_port_r(int bit)
+static UINT8 difficulty_input_port_r(running_machine *machine, int bit)
 {
 	UINT8 ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8	raw = readinputportbytag("FAKE");
+	UINT8	raw = input_port_read(machine, "FAKE");
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;		/* expert */
@@ -63,12 +63,12 @@ static READ8_HANDLER( input_port_r )
 
 	switch (input_port_select)
 	{
-	case 0x01:	ret = readinputportbytag("IN0"); break;
-	case 0x02:	ret = readinputportbytag("IN1"); break;
-	case 0x04:	ret = (readinputportbytag("IN2") & 0xf0) |
-					   difficulty_input_port_r(0) |
-					  (difficulty_input_port_r(3) << 2); break;
-	case 0x08:	ret = readinputportbytag("IN3"); break;
+	case 0x01:	ret = input_port_read(machine, "IN0"); break;
+	case 0x02:	ret = input_port_read(machine, "IN1"); break;
+	case 0x04:	ret = (input_port_read(machine, "IN2") & 0xf0) |
+					   difficulty_input_port_r(machine, 0) |
+					  (difficulty_input_port_r(machine, 3) << 2); break;
+	case 0x08:	ret = input_port_read(machine, "IN3"); break;
 	case 0x10:
 	case 0x20:	break;	/* these two are not really used */
 	default: logerror("Unexpected port read: %02X\n", input_port_select);
@@ -107,8 +107,8 @@ static WRITE8_HANDLER( analog_reset_w )
 
 	analog_port_val = 0xff;
 
-	timer_adjust_oneshot(analog_timer_1, compute_duration(readinputportbytag("AN1")), 0x02);
-	timer_adjust_oneshot(analog_timer_2, compute_duration(readinputportbytag("AN2")), 0x01);
+	timer_adjust_oneshot(analog_timer_1, compute_duration(input_port_read(machine, "AN1")), 0x02);
+	timer_adjust_oneshot(analog_timer_2, compute_duration(input_port_read(machine, "AN2")), 0x01);
 }
 
 

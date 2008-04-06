@@ -42,13 +42,13 @@ static READ16_HANDLER( zerozone_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return readinputport(0); /* IN0 */
+			return input_port_read_indexed(machine, 0); /* IN0 */
 		case 0x01:
-			return (readinputport(1) | (readinputport(2) << 8)); /* IN1 & IN2 */
+			return (input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 8)); /* IN1 & IN2 */
 		case 0x04:
-			return (readinputport(4) << 8);
+			return (input_port_read_indexed(machine, 4) << 8);
 		case 0x05:
-			return readinputport(3);
+			return input_port_read_indexed(machine, 3);
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",activecpu_get_pc(),0x800000+offset);

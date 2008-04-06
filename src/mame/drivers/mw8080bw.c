@@ -319,8 +319,8 @@ static WRITE8_HANDLER( seawolf_periscope_lamp_w )
 
 static CUSTOM_INPUT( seawolf_erase_input_r )
 {
-	return readinputportbytag(SEAWOLF_ERASE_SW_PORT_TAG) &
-		   readinputportbytag(SEAWOLF_ERASE_DIP_PORT_TAG);
+	return input_port_read(machine, SEAWOLF_ERASE_SW_PORT_TAG) &
+		   input_port_read(machine, SEAWOLF_ERASE_DIP_PORT_TAG);
 }
 
 
@@ -542,15 +542,15 @@ MACHINE_DRIVER_END
 #define TORNBASE_CAB_TYPE_PORT_TAG		("CAB")
 
 
-UINT8 tornbase_get_cabinet_type()
+UINT8 tornbase_get_cabinet_type(running_machine *machine)
 {
-	return readinputportbytag(TORNBASE_CAB_TYPE_PORT_TAG);
+	return input_port_read(machine, TORNBASE_CAB_TYPE_PORT_TAG);
 }
 
 
 static CUSTOM_INPUT( tornbase_hit_left_input_r )
 {
-	return readinputportbytag(TORNBASE_L_HIT_PORT_TAG);
+	return input_port_read(machine, TORNBASE_L_HIT_PORT_TAG);
 }
 
 
@@ -558,16 +558,16 @@ static CUSTOM_INPUT( tornbase_hit_right_input_r )
 {
 	UINT32 ret;
 
-	switch (tornbase_get_cabinet_type())
+	switch (tornbase_get_cabinet_type(machine))
 	{
 	case TORNBASE_CAB_TYPE_UPRIGHT_OLD:
-		ret = readinputportbytag(TORNBASE_L_HIT_PORT_TAG);
+		ret = input_port_read(machine, TORNBASE_L_HIT_PORT_TAG);
 		break;
 
 	case TORNBASE_CAB_TYPE_UPRIGHT_NEW:
 	case TORNBASE_CAB_TYPE_COCKTAIL:
 	default:
-		ret = readinputportbytag(TORNBASE_R_HIT_PORT_TAG);
+		ret = input_port_read(machine, TORNBASE_R_HIT_PORT_TAG);
 		break;
 	}
 
@@ -579,16 +579,16 @@ static CUSTOM_INPUT( tornbase_pitch_left_input_r )
 {
 	UINT32 ret;
 
-	switch (tornbase_get_cabinet_type())
+	switch (tornbase_get_cabinet_type(machine))
 	{
 	case TORNBASE_CAB_TYPE_UPRIGHT_OLD:
 	case TORNBASE_CAB_TYPE_UPRIGHT_NEW:
-		ret = readinputportbytag(TORNBASE_L_PITCH_PORT_TAG);
+		ret = input_port_read(machine, TORNBASE_L_PITCH_PORT_TAG);
 		break;
 
 	case TORNBASE_CAB_TYPE_COCKTAIL:
 	default:
-		ret = readinputportbytag(TORNBASE_R_PITCH_PORT_TAG);
+		ret = input_port_read(machine, TORNBASE_R_PITCH_PORT_TAG);
 		break;
 	}
 
@@ -598,14 +598,14 @@ static CUSTOM_INPUT( tornbase_pitch_left_input_r )
 
 static CUSTOM_INPUT( tornbase_pitch_right_input_r )
 {
-	return readinputportbytag(TORNBASE_L_PITCH_PORT_TAG);
+	return input_port_read(machine, TORNBASE_L_PITCH_PORT_TAG);
 }
 
 
 static CUSTOM_INPUT( tornbase_score_input_r )
 {
-	return readinputportbytag(TORNBASE_SCORE_SW_PORT_TAG) &
-		   readinputportbytag(TORNBASE_SCORE_DIP_PORT_TAG);
+	return input_port_read(machine, TORNBASE_SCORE_SW_PORT_TAG) &
+		   input_port_read(machine, TORNBASE_SCORE_DIP_PORT_TAG);
 }
 
 
@@ -1182,9 +1182,9 @@ static CUSTOM_INPUT( desertgu_gun_input_r )
 	UINT32 ret;
 
 	if (desertgu_controller_select)
-		ret = readinputportbytag(DESERTGU_GUN_X_PORT_TAG);
+		ret = input_port_read(machine, DESERTGU_GUN_X_PORT_TAG);
 	else
-		ret = readinputportbytag(DESERTGU_GUN_Y_PORT_TAG);
+		ret = input_port_read(machine, DESERTGU_GUN_Y_PORT_TAG);
 
 	return ret;
 }
@@ -1195,9 +1195,9 @@ static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 	UINT32 ret;
 
 	if (desertgu_controller_select)
-		ret = readinputportbytag(DESERTGU_DIP_SW_0_1_SET_2_TAG);
+		ret = input_port_read(machine, DESERTGU_DIP_SW_0_1_SET_2_TAG);
 	else
-		ret = readinputportbytag(DESERTGU_DIP_SW_0_1_SET_1_TAG);
+		ret = input_port_read(machine, DESERTGU_DIP_SW_0_1_SET_1_TAG);
 
 	return ret;
 }
@@ -1308,10 +1308,10 @@ static CUSTOM_INPUT( dplay_pitch_left_input_r )
 {
 	UINT32 ret;
 
-	if (readinputportbytag(DPLAY_CAB_TYPE_PORT_TAG) == DPLAY_CAB_TYPE_UPRIGHT)
-		ret = readinputportbytag(DPLAY_L_PITCH_PORT_TAG);
+	if (input_port_read(machine, DPLAY_CAB_TYPE_PORT_TAG) == DPLAY_CAB_TYPE_UPRIGHT)
+		ret = input_port_read(machine, DPLAY_L_PITCH_PORT_TAG);
 	else
-		ret = readinputportbytag(DPLAY_R_PITCH_PORT_TAG);
+		ret = input_port_read(machine, DPLAY_R_PITCH_PORT_TAG);
 
 	return ret;
 }
@@ -1319,7 +1319,7 @@ static CUSTOM_INPUT( dplay_pitch_left_input_r )
 
 static CUSTOM_INPUT( dplay_pitch_right_input_r )
 {
-	return readinputportbytag(DPLAY_L_PITCH_PORT_TAG);
+	return input_port_read(machine, DPLAY_L_PITCH_PORT_TAG);
 }
 
 
@@ -1698,11 +1698,11 @@ static CUSTOM_INPUT( clowns_controller_r )
 
 	if (clowns_controller_select)
 	{
-		ret = readinputportbytag(CLOWNS_CONTROLLER_P2_TAG);
+		ret = input_port_read(machine, CLOWNS_CONTROLLER_P2_TAG);
 	}
 	else
 	{
-		ret = readinputportbytag(CLOWNS_CONTROLLER_P1_TAG);
+		ret = input_port_read(machine, CLOWNS_CONTROLLER_P1_TAG);
 	}
 
 	return ret;
@@ -2447,7 +2447,7 @@ void invaders_set_flip_screen(UINT8 data)
 
 static CUSTOM_INPUT( invaders_coin_input_r )
 {
-	UINT32 ret = readinputportbytag(INVADERS_COIN_INPUT_PORT_TAG);
+	UINT32 ret = input_port_read(machine, INVADERS_COIN_INPUT_PORT_TAG);
 
 	coin_counter_w(0, !ret);
 
@@ -2462,10 +2462,10 @@ static CUSTOM_INPUT( invaders_sw6_sw7_r )
 	/* upright PCB : switches visible
        cocktail PCB: HI */
 
-	if (invaders_is_cabinet_cocktail())
+	if (invaders_is_cabinet_cocktail(machine))
 		ret = 0x03;
 	else
-		ret = readinputportbytag(INVADERS_SW6_SW7_PORT_TAG);
+		ret = input_port_read(machine, INVADERS_SW6_SW7_PORT_TAG);
 
 	return ret;
 }
@@ -2478,10 +2478,10 @@ static CUSTOM_INPUT( invaders_sw5_r )
 	/* upright PCB : switch visible
        cocktail PCB: HI */
 
-	if (invaders_is_cabinet_cocktail())
+	if (invaders_is_cabinet_cocktail(machine))
 		ret = 0x01;
 	else
-		ret = readinputportbytag(INVADERS_SW5_PORT_TAG);
+		ret = input_port_read(machine, INVADERS_SW5_PORT_TAG);
 
 	return ret;
 }
@@ -2494,10 +2494,10 @@ static CUSTOM_INPUT( invaders_in0_control_r )
 	/* upright PCB : P1 controls
        cocktail PCB: HI */
 
-	if (invaders_is_cabinet_cocktail())
+	if (invaders_is_cabinet_cocktail(machine))
 		ret = 0x07;
 	else
-		ret = readinputportbytag(INVADERS_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(machine, INVADERS_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
@@ -2510,18 +2510,18 @@ CUSTOM_INPUT( invaders_in2_control_r )
 	/* upright PCB : P1 controls
        cocktail PCB: P2 controls */
 
-	if (invaders_is_cabinet_cocktail())
-		ret = readinputportbytag(INVADERS_P2_CONTROL_PORT_TAG);
+	if (invaders_is_cabinet_cocktail(machine))
+		ret = input_port_read(machine, INVADERS_P2_CONTROL_PORT_TAG);
 	else
-		ret = readinputportbytag(INVADERS_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(machine, INVADERS_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
 
 
-int invaders_is_cabinet_cocktail()
+int invaders_is_cabinet_cocktail(running_machine *machine)
 {
-	return readinputportbytag(INVADERS_CAB_TYPE_PORT_TAG);
+	return input_port_read(machine, INVADERS_CAB_TYPE_PORT_TAG);
 }
 
 
@@ -2647,7 +2647,7 @@ MACHINE_DRIVER_END
 
 static CUSTOM_INPUT( blueshrk_coin_input_r )
 {
-	UINT32 ret = readinputportbytag(BLUESHRK_COIN_INPUT_PORT_TAG);
+	UINT32 ret = input_port_read(machine, BLUESHRK_COIN_INPUT_PORT_TAG);
 
 	coin_counter_w(0, !ret);
 
@@ -2724,7 +2724,7 @@ MACHINE_DRIVER_END
 #ifdef UNUSED_FUNCTION
 static UINT32 invad2ct_coin_input_r(void *param)
 {
-	UINT32 ret = readinputportbytag(INVAD2CT_COIN_INPUT_PORT_TAG);
+	UINT32 ret = input_port_read(machine, INVAD2CT_COIN_INPUT_PORT_TAG);
 
 	coin_counter_w(0, !ret);
 

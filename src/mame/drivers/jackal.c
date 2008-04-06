@@ -52,7 +52,7 @@ static int irq_enable;
 
 static READ8_HANDLER( topgunbl_rotary_r )
 {
-	return (1 << (readinputport(5 + offset) * 8 / 256)) ^ 0xff;
+	return (1 << (input_port_read_indexed(machine, 5 + offset) * 8 / 256)) ^ 0xff;
 }
 
 static WRITE8_HANDLER( jackal_flipscreen_w )

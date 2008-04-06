@@ -514,7 +514,7 @@ INPUT_PORTS_END
 /***************************************************************************/
 
 static void
-simulate_mcu( void )
+simulate_mcu( running_machine *machine )
 {
 	int i;
 	UINT16 data;
@@ -524,11 +524,11 @@ simulate_mcu( void )
 
 	if (is_na2)
 	{
-		mcu_ram[0xfc0/2] = readinputport(0x0); /* dipswitch */
+		mcu_ram[0xfc0/2] = input_port_read_indexed(machine, 0x0); /* dipswitch */
 
 		for( i=1; i<=4; i++ )
 		{
-			data = readinputport(i)<<8;
+			data = input_port_read_indexed(machine, i)<<8;
 			switch( namcona1_gametype )
 			{
 			case NAMCO_KNCKHEAD:
@@ -547,11 +547,11 @@ simulate_mcu( void )
 				if( data&0x4000 ) data |= 0x10; /* jump */
 				if( i==1 )
 				{
-					if( readinputport(1)&0x80 ) data |= 0x80; /* P1 start */
+					if( input_port_read_indexed(machine, 1)&0x80 ) data |= 0x80; /* P1 start */
 				}
 				if( i==2 )
 				{
-					if( readinputport(2)&0x80 ) data |= 0x80; /* P2 start */
+					if( input_port_read_indexed(machine, 2)&0x80 ) data |= 0x80; /* P2 start */
 				}
 				break;
 
@@ -570,7 +570,7 @@ simulate_mcu( void )
 		mcu_ram[0xfc0/2+0x08] = 0xffff; /* analog6,7 */
 		mcu_ram[0xfc0/2+0x09] = 0xffff; /* encoder0,1 */
 
-		poll_coins = readinputport(5); /* coin input */
+		poll_coins = input_port_read_indexed(machine, 5); /* coin input */
 		if( (poll_coins&0x8)&~(mCoinState&0x8) ) mCoinCount[0]++;
 		if( (poll_coins&0x4)&~(mCoinState&0x4) ) mCoinCount[1]++;
 		if( (poll_coins&0x2)&~(mCoinState&0x2) ) mCoinCount[2]++;
@@ -581,14 +581,14 @@ simulate_mcu( void )
 		mcu_ram[0xfc0/2+0xb] = (mCoinCount[2]<<8)|mCoinCount[3];
 
 		/* special handling for F/A */
-		data = ~((readinputport(1)<<8)|readinputport(2));
+		data = ~((input_port_read_indexed(machine, 1)<<8)|input_port_read_indexed(machine, 2));
 		mcu_ram[0xffc/2] = data;
 		mcu_ram[0xffe/2] = data;
 
 		if( namcona1_gametype == NAMCO_XDAY2 )
 		{
-			int p1 = readinputport(1);
-			int p2 = readinputport(2);
+			int p1 = input_port_read_indexed(machine, 1);
+			int p2 = input_port_read_indexed(machine, 2);
 			UINT32 code = 0;
 			if( p2&0x40 ) code |= 0x2000; // enter (top-level of self-test)
 			if( p2&0x20 ) code |= 0x1000; // exit  (top-level of self-test)
@@ -1195,19 +1195,19 @@ static READ8_HANDLER( port7_r )
 	switch (mcu_port6 & 0xe0)
 	{
 		case 0x40:
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 			break;
 
   		case 0x60:
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 			break;
 
 		case 0x20:
-			return readinputport(4);
+			return input_port_read_indexed(machine, 4);
 			break;
 
 		case 0x00:
-			return readinputport(3);
+			return input_port_read_indexed(machine, 3);
 			break;
 	}
 
@@ -1256,7 +1256,7 @@ static MACHINE_RESET( namcona1_mcu )
 static READ8_HANDLER( portana_r )
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = readinputport(2);
+	UINT8 port = input_port_read_indexed(machine, 2);
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
@@ -1275,7 +1275,7 @@ static INTERRUPT_GEN( namcona1_interrupt )
 	int level = cpu_getiloops(); /* 0,1,2,3,4 */
 	if( level==0 )
 	{
-		simulate_mcu();
+		simulate_mcu(machine);
 	}
 	if( mEnableInterrupts )
 	{

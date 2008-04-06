@@ -617,7 +617,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = readinputport(3+i);
+			curr = input_port_read_indexed(machine, 3+i);
 			diff[i] = (curr - prev[i]);
 			prev[i] = curr;
 		}
@@ -629,7 +629,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 		case 0:
 			return (diff[0] & 0xff) | ((diff[2] & 0xff) << 8);
 		case 1:
-			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (readinputport(0) & 0xe0e0);
+			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (input_port_read_indexed(machine, 0) & 0xe0e0);
 		case 2:
 			return (diff[1] & 0xff) | ((diff[3] & 0xff) << 8);
 		case 3:

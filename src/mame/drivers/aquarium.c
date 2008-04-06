@@ -75,7 +75,7 @@ VIDEO_UPDATE(aquarium);
 static MACHINE_RESET( aquarium )
 {
 	UINT16 *RAM = (UINT16 *)memory_region(REGION_CPU1);
-	int data = readinputportbytag("FAKE");
+	int data = input_port_read(machine, "FAKE");
 
 	/* Language : 0x0000 = Japanese - Other value = English */
 

@@ -169,7 +169,7 @@ static READ8_HANDLER( trackball_r )
 		{
 			UINT8 curr;
 
-			curr = readinputport(4 + i);
+			curr = input_port_read_indexed(machine, 4 + i);
 
 			dir[i] = curr - pos[i];
 			sign[i] = dir[i] & 0x80;

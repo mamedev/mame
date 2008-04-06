@@ -781,7 +781,7 @@ VIDEO_UPDATE( atari )
 
 	VIDEO_UPDATE_CALL(generic_bitmapped);
 
-	new_tv_artifacts = readinputportbytag_safe("artifacts", 0);
+	new_tv_artifacts = input_port_read_safe(screen->machine, "artifacts", 0);
 	if( tv_artifacts != new_tv_artifacts )
 	{
 		tv_artifacts = new_tv_artifacts;
@@ -1492,7 +1492,7 @@ static void antic_scanline_dma(int param)
  *
  *****************************************************************************/
 
-static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_count)
+static void generic_atari_interrupt(running_machine *machine, void (*handle_keyboard)(running_machine *machine), int button_count)
 {
 	int button_port, i;
 
@@ -1506,7 +1506,7 @@ static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_co
 
     if( antic.scanline == VBL_START )
     {
-		button_port = readinputportbytag_safe("djoy_b", 0);
+		button_port = input_port_read_safe(machine, "djoy_b", 0);
 
 		/* specify buttons relevant to this Atari variant */
 		for (i = 0; i < button_count; i++)
@@ -1520,7 +1520,7 @@ static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_co
 		for (i = button_count; i < 4; i++)
 			gtia.r.but[i] = 1;
 
-		handle_keyboard();
+		handle_keyboard(machine);
 
 		/* do nothing new for the rest of the frame */
 		antic.modelines = video_screen_get_height(Machine->primary_screen) - VBL_START;
@@ -1544,20 +1544,20 @@ static void generic_atari_interrupt(void (*handle_keyboard)(void), int button_co
 
 INTERRUPT_GEN( a400_interrupt )
 {
-	generic_atari_interrupt(a800_handle_keyboard, 4);
+	generic_atari_interrupt(machine, a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800_interrupt )
 {
-	generic_atari_interrupt(a800_handle_keyboard, 4);
+	generic_atari_interrupt(machine, a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800xl_interrupt )
 {
-	generic_atari_interrupt(a800_handle_keyboard, 2);
+	generic_atari_interrupt(machine, a800_handle_keyboard, 2);
 }
 
 INTERRUPT_GEN( a5200_interrupt )
 {
-	generic_atari_interrupt(a5200_handle_keypads, 4);
+	generic_atari_interrupt(machine, a5200_handle_keypads, 4);
 }

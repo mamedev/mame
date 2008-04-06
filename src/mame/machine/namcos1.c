@@ -1257,9 +1257,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (readinputportbytag("CONTROL0")&0x90) | qstrobe | (readinputportbytag("PADDLE0")&0x0f);
+			ret = (input_port_read(machine, "CONTROL0")&0x90) | qstrobe | (input_port_read(machine, "PADDLE0")&0x0f);
 		else
-			ret = (readinputportbytag("CONTROL0")&0x90) | qstrobe | (readinputportbytag("PADDLE1")&0x0f);
+			ret = (input_port_read(machine, "CONTROL0")&0x90) | qstrobe | (input_port_read(machine, "PADDLE1")&0x0f);
 
 		qstrobe ^= 0x40;
 
@@ -1270,9 +1270,9 @@ static READ8_HANDLER( quester_paddle_r )
 		int ret;
 
 		if (!qnum)
-			ret = (readinputportbytag("CONTROL1")&0x90) | qnum | (readinputportbytag("PADDLE0")>>4);
+			ret = (input_port_read(machine, "CONTROL1")&0x90) | qnum | (input_port_read(machine, "PADDLE0")>>4);
 		else
-			ret = (readinputportbytag("CONTROL1")&0x90) | qnum | (readinputportbytag("PADDLE1")>>4);
+			ret = (input_port_read(machine, "CONTROL1")&0x90) | qnum | (input_port_read(machine, "PADDLE1")>>4);
 
 		if (!qstrobe) qnum ^= 0x20;
 
@@ -1302,7 +1302,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	{
 		int inp = input_count;
 
-		if (inp == 4) res = readinputportbytag("CONTROL0");
+		if (inp == 4) res = input_port_read(machine, "CONTROL0");
 		else
 		{
 			char portname[4];
@@ -1311,7 +1311,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 			static int counter[4];
 
 			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
-			res = readinputportbytag(portname);
+			res = input_port_read(machine, portname);
 			if (res & 0x80)
 			{
 				if (counter[inp] >= 0)
@@ -1335,7 +1335,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 				counter[inp] = -1;
 #else
 			sprintf(portname,"IN%d",inp);	/* IN0-IN3 */
-			res = readinputportbytag(portname);
+			res = input_port_read(machine, portname);
 			if (res & 1) res = 0x7f;		/* weak */
 			else if (res & 2) res = 0x48;	/* medium */
 			else if (res & 4) res = 0x40;	/* strong */
@@ -1346,7 +1346,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 	}
 	else
 	{
-		res = readinputportbytag("CONTROL1") & 0x8f;
+		res = input_port_read(machine, "CONTROL1") & 0x8f;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
            much time reading the inputs and won't have enough cycles to play two
@@ -1388,13 +1388,13 @@ static READ8_HANDLER( faceoff_inputs_r )
 
 	if (offset == 0)
 	{
-		res = (readinputportbytag("CONTROL0") & 0x80) | stored_input[0];
+		res = (input_port_read(machine, "CONTROL0") & 0x80) | stored_input[0];
 
 		return res;
 	}
 	else
 	{
-		res = readinputportbytag("CONTROL1") & 0x80;
+		res = input_port_read(machine, "CONTROL1") & 0x80;
 
 		/* the strobe cannot happen too often, otherwise the MCU will waste too
            much time reading the inputs and won't have enough cycles to play two
@@ -1409,15 +1409,15 @@ static READ8_HANDLER( faceoff_inputs_r )
 			switch (input_count)
 			{
 				case 0:
-					stored_input[0] = readinputportbytag("IN0") & 0x1f;
-					stored_input[1] = (readinputportbytag("IN3") & 0x07) << 3;
+					stored_input[0] = input_port_read(machine, "IN0") & 0x1f;
+					stored_input[1] = (input_port_read(machine, "IN3") & 0x07) << 3;
 
 				case 3:
-					stored_input[0] = readinputportbytag("IN2") & 0x1f;
+					stored_input[0] = input_port_read(machine, "IN2") & 0x1f;
 
 				case 4:
-					stored_input[0] = readinputportbytag("IN1") & 0x1f;
-					stored_input[1] = readinputportbytag("IN3") & 0x18;
+					stored_input[0] = input_port_read(machine, "IN1") & 0x1f;
+					stored_input[1] = input_port_read(machine, "IN3") & 0x18;
 			}
 
 			input_count = (input_count + 1) & 7;

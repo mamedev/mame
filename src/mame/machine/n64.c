@@ -1092,7 +1092,7 @@ static UINT8 calc_mempack_crc(UINT8 *buffer, int length)
 	return crc;
 }
 
-static int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata)
+static int pif_channel_handle_command(running_machine *machine, int channel, int slength, UINT8 *sdata, int rlength, UINT8 *rdata)
 {
 	int i;
 	UINT8 command = sdata[0];
@@ -1156,9 +1156,9 @@ static int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, in
 			{
 				case 0:
 				{
-					buttons = readinputport((channel*3) + 0);
-					x = readinputport((channel*3) + 1) - 128;
-					y = readinputport((channel*3) + 2) - 128;
+					buttons = input_port_read_indexed(machine, (channel*3) + 0);
+					x = input_port_read_indexed(machine, (channel*3) + 1) - 128;
+					y = input_port_read_indexed(machine, (channel*3) + 2) - 128;
 
 					rdata[0] = (buttons >> 8) & 0xff;
 					rdata[1] = (buttons >> 0) & 0xff;
@@ -1319,7 +1319,7 @@ static int pif_channel_handle_command(int channel, int slength, UINT8 *sdata, in
 	return 0;
 }
 
-static void handle_pif(void)
+static void handle_pif(running_machine *machine)
 {
 	int j;
 
@@ -1371,7 +1371,7 @@ static void handle_pif(void)
 						send_buffer[j] = pif_cmd[cmd_ptr++];
 					}
 
-					res = pif_channel_handle_command(channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
+					res = pif_channel_handle_command(machine, channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
 
 					if (res == 0)
 					{
@@ -1411,7 +1411,7 @@ static void handle_pif(void)
     */
 }
 
-static void pif_dma(int direction)
+static void pif_dma(running_machine *machine, int direction)
 {
 	int i;
 	UINT32 *src, *dst;
@@ -1438,7 +1438,7 @@ static void pif_dma(int direction)
 	}
 	else				// PIF RAM -> RDRAM
 	{
-		handle_pif();
+		handle_pif(machine);
 
 		dst = (UINT32*)&rdram[(si_dram_addr & 0x1fffffff) / 4];
 
@@ -1483,13 +1483,13 @@ WRITE32_HANDLER( n64_si_reg_w )
 		case 0x04/4:		// SI_PIF_ADDR_RD64B_REG
 			// PIF RAM -> RDRAM
 			si_pif_addr = data;
-			pif_dma(0);
+			pif_dma(machine, 0);
 			break;
 
 		case 0x10/4:		// SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
 			si_pif_addr = data;
-			pif_dma(1);
+			pif_dma(machine, 1);
 			break;
 
 		case 0x18/4:		// SI_STATUS_REG

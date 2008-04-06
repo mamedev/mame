@@ -78,13 +78,13 @@ static READ8_HANDLER( horiz_pos_r )
 }
 
 
-static void move_motor(stactics_state *state)
+static void move_motor(running_machine *machine, stactics_state *state)
 {
 	 /* monitor motor under joystick control */
     if (*state->motor_on & 0x01)
     {
-		int ip3 = readinputport(3);
-		int ip4 = readinputport(4);
+		int ip3 = input_port_read_indexed(machine, 3);
+		int ip4 = input_port_read_indexed(machine, 4);
 
 		/* up */
 		if (((ip4 & 0x01) == 0) && (state->vert_pos > -128))
@@ -157,7 +157,7 @@ static INTERRUPT_GEN( stactics_interrupt )
 {
 	stactics_state *state = machine->driver_data;
 
-	move_motor(state);
+	move_motor(machine, state);
 
     cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }

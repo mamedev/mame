@@ -52,11 +52,11 @@ static READ8_HANDLER( skyraid_alpha_num_r)
 
 static READ8_HANDLER( skyraid_port_0_r )
 {
-	UINT8 val = readinputport(0);
+	UINT8 val = input_port_read_indexed(machine, 0);
 
-	if (readinputport(4) > analog_range)
+	if (input_port_read_indexed(machine, 4) > analog_range)
 		val |= 0x40;
-	if (readinputport(5) > analog_range)
+	if (input_port_read_indexed(machine, 5) > analog_range)
 		val |= 0x80;
 
 	return val;

@@ -61,7 +61,7 @@ MACHINE_RESET( pc10 )
  *************************************/
 READ8_HANDLER( pc10_port_0_r )
 {
-	return readinputport( 0 ) | ( ( ~pc10_int_detect & 1 ) << 3 );
+	return input_port_read_indexed(machine,  0 ) | ( ( ~pc10_int_detect & 1 ) << 3 );
 }
 
 WRITE8_HANDLER( pc10_SDCS_w )
@@ -183,8 +183,8 @@ WRITE8_HANDLER( pc10_in0_w )
 		return;
 
 	/* load up the latches */
-	input_latch[0] = readinputport( 3 );
-	input_latch[1] = readinputport( 4 );
+	input_latch[0] = input_port_read_indexed(machine,  3 );
+	input_latch[1] = input_port_read_indexed(machine,  4 );
 
 	/* apply any masking from the BIOS */
 	if ( cntrl_mask )
@@ -218,9 +218,9 @@ READ8_HANDLER( pc10_in1_r )
 	/* do the gun thing */
 	if ( pc10_gun_controller )
 	{
-		int trigger = readinputport( 3 );
-		int x = readinputport( 5 );
-		int y = readinputport( 6 );
+		int trigger = input_port_read_indexed(machine,  3 );
+		int x = input_port_read_indexed(machine,  5 );
+		int y = input_port_read_indexed(machine,  6 );
 		UINT32 pix, color_base;
 
 		/* no sprite hit (yet) */

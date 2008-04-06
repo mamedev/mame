@@ -230,7 +230,7 @@ static WRITE16_HANDLER( rockn_soundvolume_w )
 
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
-	return	( readinputportbytag("IN1") &  0xfcff ) |
+	return	( input_port_read(machine, "IN1") &  0xfcff ) |
 			(           mame_rand(Machine) & ~0xfcff ) |
 			(      1 << (8 + (mame_rand(Machine)&1)) );
 }
@@ -306,7 +306,7 @@ static WRITE16_HANDLER( rocknms_main2sub_w )
 
 static READ16_HANDLER( rocknms_port_0_r )
 {
-	return ((readinputport(0) & 0xfffc ) | (rocknms_sub2main & 0x0003));
+	return ((input_port_read_indexed(machine, 0) & 0xfffc ) | (rocknms_sub2main & 0x0003));
 }
 
 static WRITE16_HANDLER( rocknms_sub2main_w )

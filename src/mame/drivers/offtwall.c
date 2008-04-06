@@ -90,7 +90,7 @@ static WRITE16_HANDLER( offtwall_atarivc_w )
 
 static READ16_HANDLER( special_port3_r )
 {
-	int result = readinputport(3);
+	int result = input_port_read_indexed(machine, 3);
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }

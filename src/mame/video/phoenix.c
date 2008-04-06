@@ -293,14 +293,14 @@ WRITE8_HANDLER( phoenix_scroll_w )
 READ8_HANDLER( phoenix_input_port_0_r )
 {
 	if (cocktail_mode)
-		return (readinputportbytag("IN0") & 0x07) | (readinputportbytag("IN1") & 0xf8);
+		return (input_port_read(machine, "IN0") & 0x07) | (input_port_read(machine, "IN1") & 0xf8);
 	else
-		return readinputportbytag("IN0");
+		return input_port_read(machine, "IN0");
 }
 
 READ8_HANDLER( pleiads_input_port_0_r )
 {
-	int ret = readinputportbytag("IN0") & 0xf7;
+	int ret = input_port_read(machine, "IN0") & 0xf7;
 
 	/* handle Pleiads protection */
 	switch (pleiads_protection_question)
@@ -323,7 +323,7 @@ READ8_HANDLER( pleiads_input_port_0_r )
 
 READ8_HANDLER( survival_input_port_0_r )
 {
-	int ret = readinputportbytag("IN0");
+	int ret = input_port_read(machine, "IN0");
 
 	if (survival_protection_value)
 	{

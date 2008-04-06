@@ -674,15 +674,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (readinputport(0) & 0xff) << 24;
+		r |= (input_port_read_indexed(machine, 0) & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (readinputport(1) & 0xff) << 8;
+		r |= (input_port_read_indexed(machine, 1) & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (readinputport(2) & 0xff);
+		r |= (input_port_read_indexed(machine, 2) & 0xff);
 	}
 
 	return r;
@@ -692,11 +692,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return readinputport(3) | 0x01000100;
+		return input_port_read_indexed(machine, 3) | 0x01000100;
 	}
 	else
 	{
-		return readinputport(4) | 0x01000100;
+		return input_port_read_indexed(machine, 4) | 0x01000100;
 	}
 }
 
@@ -1383,11 +1383,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return readinputport(3) << 24;
+		return input_port_read_indexed(machine, 3) << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return readinputport(4) << 24;
+		return input_port_read_indexed(machine, 4) << 24;
 	}
 
 	return 0;
@@ -1471,7 +1471,7 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = readinputport(5 + keyboard);
+		UINT32 kbstate = input_port_read_indexed(machine, 5 + keyboard);
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != keyboard_state[keyboard])

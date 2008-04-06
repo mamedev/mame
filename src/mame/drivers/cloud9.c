@@ -248,7 +248,7 @@ static WRITE8_HANDLER( cloud9_coin_counter_w )
 
 static READ8_HANDLER( leta_r )
 {
-	return readinputport(3 + offset);
+	return input_port_read_indexed(machine, 3 + offset);
 }
 
 

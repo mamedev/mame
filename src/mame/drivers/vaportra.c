@@ -38,11 +38,11 @@ static READ16_HANDLER( vaportra_control_r )
 	switch (offset<<1)
 	{
 		case 4: /* Dip Switches */
-			return (readinputport(4) + (readinputport(3) << 8));
+			return (input_port_read_indexed(machine, 4) + (input_port_read_indexed(machine, 3) << 8));
 		case 2: /* Credits */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (readinputport(0) + (readinputport(1) << 8));
+			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 	}
 
 	logerror("Unknown control read at %d\n",offset);

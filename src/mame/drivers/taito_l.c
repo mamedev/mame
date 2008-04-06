@@ -620,35 +620,35 @@ static int trackx,tracky;
 static READ8_HANDLER( horshoes_tracky_reset_r )
 {
 	/* reset the trackball counter */
-	tracky = readinputportbytag("AN0");
+	tracky = input_port_read(machine, "AN0");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_trackx_reset_r )
 {
 	/* reset the trackball counter */
-	trackx = readinputportbytag("AN1");
+	trackx = input_port_read(machine, "AN1");
 	return 0;
 }
 
 static READ8_HANDLER( horshoes_tracky_lo_r )
 {
-	return (readinputportbytag("AN0") - tracky) & 0xff;
+	return (input_port_read(machine, "AN0") - tracky) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_tracky_hi_r )
 {
-	return (readinputportbytag("AN0") - tracky) >> 8;
+	return (input_port_read(machine, "AN0") - tracky) >> 8;
 }
 
 static READ8_HANDLER( horshoes_trackx_lo_r )
 {
-	return (readinputportbytag("AN1") - trackx) & 0xff;
+	return (input_port_read(machine, "AN1") - trackx) & 0xff;
 }
 
 static READ8_HANDLER( horshoes_trackx_hi_r )
 {
-	return (readinputportbytag("AN1") - trackx) >> 8;
+	return (input_port_read(machine, "AN1") - trackx) >> 8;
 }
 
 

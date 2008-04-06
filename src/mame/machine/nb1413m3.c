@@ -401,53 +401,53 @@ READ8_HANDLER( nb1413m3_inputport1_r )
 		case NB1413M3_TAIWANMB:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return readinputport(4);
-				case 0x02:	return readinputport(5);
-				case 0x04:	return readinputport(6);
-				case 0x08:	return readinputport(7);
-				case 0x10:	return readinputport(8);
-				default:	return (readinputport(4) & readinputport(5) & readinputport(6) & readinputport(7) & readinputport(8));
+				case 0x01:	return input_port_read_indexed(machine, 4);
+				case 0x02:	return input_port_read_indexed(machine, 5);
+				case 0x04:	return input_port_read_indexed(machine, 6);
+				case 0x08:	return input_port_read_indexed(machine, 7);
+				case 0x10:	return input_port_read_indexed(machine, 8);
+				default:	return (input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7) & input_port_read_indexed(machine, 8));
 			}
 			break;
 		case NB1413M3_HYHOO:
 		case NB1413M3_HYHOO2:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x07)
 			{
-				case 0x01:	return readinputport(3);
-				case 0x02:	return readinputport(4);
+				case 0x01:	return input_port_read_indexed(machine, 3);
+				case 0x02:	return input_port_read_indexed(machine, 4);
 				case 0x04:	return 0xff;
 				default:	return 0xff;
 			}
 			break;
 		case NB1413M3_MSJIKEN:
 		case NB1413M3_TELMAHJN:
-			if (readinputport(0) & 0x80)
+			if (input_port_read_indexed(machine, 0) & 0x80)
 			{
 				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 				{
-					case 0x01:	return readinputport(3);
-					case 0x02:	return readinputport(4);
-					case 0x04:	return readinputport(5);
-					case 0x08:	return readinputport(6);
-					case 0x10:	return readinputport(7);
-					default:	return (readinputport(3) & readinputport(4) & readinputport(5) & readinputport(6) & readinputport(7));
+					case 0x01:	return input_port_read_indexed(machine, 3);
+					case 0x02:	return input_port_read_indexed(machine, 4);
+					case 0x04:	return input_port_read_indexed(machine, 5);
+					case 0x08:	return input_port_read_indexed(machine, 6);
+					case 0x10:	return input_port_read_indexed(machine, 7);
+					default:	return (input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7));
 				}
 			}
-			else return readinputport(14);
+			else return input_port_read_indexed(machine, 14);
 			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
-			return readinputport(3);
+			return input_port_read_indexed(machine, 3);
 			break;
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return readinputport(3);
-				case 0x02:	return readinputport(4);
-				case 0x04:	return readinputport(5);
-				case 0x08:	return readinputport(6);
-				case 0x10:	return readinputport(7);
-				default:	return (readinputport(3) & readinputport(4) & readinputport(5) & readinputport(6) & readinputport(7));
+				case 0x01:	return input_port_read_indexed(machine, 3);
+				case 0x02:	return input_port_read_indexed(machine, 4);
+				case 0x04:	return input_port_read_indexed(machine, 5);
+				case 0x08:	return input_port_read_indexed(machine, 6);
+				case 0x10:	return input_port_read_indexed(machine, 7);
+				default:	return (input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7));
 			}
 			break;
 	}
@@ -462,12 +462,12 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 		case NB1413M3_TAIWANMB:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return readinputport(9);
-				case 0x02:	return readinputport(10);
-				case 0x04:	return readinputport(11);
-				case 0x08:	return readinputport(12);
-				case 0x10:	return readinputport(13);
-				default:	return (readinputport(9) & readinputport(10) & readinputport(11) & readinputport(12) & readinputport(13));
+				case 0x01:	return input_port_read_indexed(machine, 9);
+				case 0x02:	return input_port_read_indexed(machine, 10);
+				case 0x04:	return input_port_read_indexed(machine, 11);
+				case 0x08:	return input_port_read_indexed(machine, 12);
+				case 0x10:	return input_port_read_indexed(machine, 13);
+				default:	return (input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12) & input_port_read_indexed(machine, 13));
 			}
 			break;
 		case NB1413M3_HYHOO:
@@ -476,39 +476,39 @@ READ8_HANDLER( nb1413m3_inputport2_r )
 			{
 				case 0x01:	return 0xff;
 				case 0x02:	return 0xff;
-				case 0x04:	return readinputport(5);
+				case 0x04:	return input_port_read_indexed(machine, 5);
 				default:	return 0xff;
 			}
 			break;
 		case NB1413M3_MSJIKEN:
 		case NB1413M3_TELMAHJN:
-			if (readinputport(0) & 0x80)
+			if (input_port_read_indexed(machine, 0) & 0x80)
 			{
 				switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 				{
-					case 0x01:	return readinputport(8);
-					case 0x02:	return readinputport(9);
-					case 0x04:	return readinputport(10);
-					case 0x08:	return readinputport(11);
-					case 0x10:	return readinputport(12);
-					default:	return (readinputport(8) & readinputport(9) & readinputport(10) & readinputport(11) & readinputport(12));
+					case 0x01:	return input_port_read_indexed(machine, 8);
+					case 0x02:	return input_port_read_indexed(machine, 9);
+					case 0x04:	return input_port_read_indexed(machine, 10);
+					case 0x08:	return input_port_read_indexed(machine, 11);
+					case 0x10:	return input_port_read_indexed(machine, 12);
+					default:	return (input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12));
 				}
 			}
-			else return readinputport(13);
+			else return input_port_read_indexed(machine, 13);
 			break;
 		case NB1413M3_PAIRSNB:
 		case NB1413M3_PAIRSTEN:
-			return readinputport(4);
+			return input_port_read_indexed(machine, 4);
 			break;
 		default:
 			switch ((nb1413m3_inputport ^ 0xff) & 0x1f)
 			{
-				case 0x01:	return readinputport(8);
-				case 0x02:	return readinputport(9);
-				case 0x04:	return readinputport(10);
-				case 0x08:	return readinputport(11);
-				case 0x10:	return readinputport(12);
-				default:	return (readinputport(8) & readinputport(9) & readinputport(10) & readinputport(11) & readinputport(12));
+				case 0x01:	return input_port_read_indexed(machine, 8);
+				case 0x02:	return input_port_read_indexed(machine, 9);
+				case 0x04:	return input_port_read_indexed(machine, 10);
+				case 0x08:	return input_port_read_indexed(machine, 11);
+				case 0x10:	return input_port_read_indexed(machine, 12);
+				default:	return (input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12));
 			}
 			break;
 	}
@@ -551,16 +551,16 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 	{
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 			break;
 		case NB1413M3_TAIWANMB:
-			return ((readinputport(0) & 0xf0) | ((readinputport(1) & 0xf0) >> 4));
+			return ((input_port_read_indexed(machine, 0) & 0xf0) | ((input_port_read_indexed(machine, 1) & 0xf0) >> 4));
 			break;
 		case NB1413M3_OTONANO:
 		case NB1413M3_MJCAMERA:
 		case NB1413M3_IDHIMITU:
 		case NB1413M3_KAGUYA2:
-			return (((readinputport(0) & 0x0f) << 4) | (readinputport(1) & 0x0f));
+			return (((input_port_read_indexed(machine, 0) & 0x0f) << 4) | (input_port_read_indexed(machine, 1) & 0x0f));
 			break;
 		case NB1413M3_SCANDAL:
 		case NB1413M3_SCANDALM:
@@ -572,7 +572,7 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_UCHUUAI:
 		case NB1413M3_TOKIMBSJ:
 		case NB1413M3_TOKYOGAL:
-			return ((readinputport(0) & 0x0f) | ((readinputport(1) & 0x0f) << 4));
+			return ((input_port_read_indexed(machine, 0) & 0x0f) | ((input_port_read_indexed(machine, 1) & 0x0f) << 4));
 			break;
 		case NB1413M3_TRIPLEW1:
 		case NB1413M3_NTOPSTAR:
@@ -583,13 +583,13 @@ READ8_HANDLER( nb1413m3_dipsw1_r )
 		case NB1413M3_MJLSTORY:
 		case NB1413M3_QMHAYAKU:
 		case NB1413M3_MJGOTTUB:
-			return (((readinputport(1) & 0x01) >> 0) | ((readinputport(1) & 0x04) >> 1) |
-			        ((readinputport(1) & 0x10) >> 2) | ((readinputport(1) & 0x40) >> 3) |
-			        ((readinputport(0) & 0x01) << 4) | ((readinputport(0) & 0x04) << 3) |
-			        ((readinputport(0) & 0x10) << 2) | ((readinputport(0) & 0x40) << 1));
+			return (((input_port_read_indexed(machine, 1) & 0x01) >> 0) | ((input_port_read_indexed(machine, 1) & 0x04) >> 1) |
+			        ((input_port_read_indexed(machine, 1) & 0x10) >> 2) | ((input_port_read_indexed(machine, 1) & 0x40) >> 3) |
+			        ((input_port_read_indexed(machine, 0) & 0x01) << 4) | ((input_port_read_indexed(machine, 0) & 0x04) << 3) |
+			        ((input_port_read_indexed(machine, 0) & 0x10) << 2) | ((input_port_read_indexed(machine, 0) & 0x40) << 1));
 			break;
 		default:
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 			break;
 	}
 }
@@ -600,16 +600,16 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 	{
 		case NB1413M3_KANATUEN:
 		case NB1413M3_KYUHITO:
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 			break;
 		case NB1413M3_TAIWANMB:
-			return (((readinputport(0) & 0x0f) << 4) | (readinputport(1) & 0x0f));
+			return (((input_port_read_indexed(machine, 0) & 0x0f) << 4) | (input_port_read_indexed(machine, 1) & 0x0f));
 			break;
 		case NB1413M3_OTONANO:
 		case NB1413M3_MJCAMERA:
 		case NB1413M3_IDHIMITU:
 		case NB1413M3_KAGUYA2:
-			return ((readinputport(0) & 0xf0) | ((readinputport(1) & 0xf0) >> 4));
+			return ((input_port_read_indexed(machine, 0) & 0xf0) | ((input_port_read_indexed(machine, 1) & 0xf0) >> 4));
 			break;
 		case NB1413M3_SCANDAL:
 		case NB1413M3_SCANDALM:
@@ -621,7 +621,7 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_UCHUUAI:
 		case NB1413M3_TOKIMBSJ:
 		case NB1413M3_TOKYOGAL:
-			return (((readinputport(0) & 0xf0) >> 4) | (readinputport(1) & 0xf0));
+			return (((input_port_read_indexed(machine, 0) & 0xf0) >> 4) | (input_port_read_indexed(machine, 1) & 0xf0));
 			break;
 		case NB1413M3_TRIPLEW1:
 		case NB1413M3_NTOPSTAR:
@@ -632,25 +632,25 @@ READ8_HANDLER( nb1413m3_dipsw2_r )
 		case NB1413M3_MJLSTORY:
 		case NB1413M3_QMHAYAKU:
 		case NB1413M3_MJGOTTUB:
-			return (((readinputport(1) & 0x02) >> 1) | ((readinputport(1) & 0x08) >> 2) |
-			        ((readinputport(1) & 0x20) >> 3) | ((readinputport(1) & 0x80) >> 4) |
-			        ((readinputport(0) & 0x02) << 3) | ((readinputport(0) & 0x08) << 2) |
-			        ((readinputport(0) & 0x20) << 1) | ((readinputport(0) & 0x80) << 0));
+			return (((input_port_read_indexed(machine, 1) & 0x02) >> 1) | ((input_port_read_indexed(machine, 1) & 0x08) >> 2) |
+			        ((input_port_read_indexed(machine, 1) & 0x20) >> 3) | ((input_port_read_indexed(machine, 1) & 0x80) >> 4) |
+			        ((input_port_read_indexed(machine, 0) & 0x02) << 3) | ((input_port_read_indexed(machine, 0) & 0x08) << 2) |
+			        ((input_port_read_indexed(machine, 0) & 0x20) << 1) | ((input_port_read_indexed(machine, 0) & 0x80) << 0));
 			break;
 		default:
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 			break;
 	}
 }
 
 READ8_HANDLER( nb1413m3_dipsw3_l_r )
 {
-	return ((readinputport(2) & 0xf0) >> 4);
+	return ((input_port_read_indexed(machine, 2) & 0xf0) >> 4);
 }
 
 READ8_HANDLER( nb1413m3_dipsw3_h_r )
 {
-	return ((readinputport(2) & 0x0f) >> 0);
+	return ((input_port_read_indexed(machine, 2) & 0x0f) >> 0);
 }
 
 WRITE8_HANDLER( nb1413m3_outcoin_w )

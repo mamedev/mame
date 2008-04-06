@@ -104,7 +104,7 @@ static READ32_HANDLER( eolith_custom_r )
     */
 	eolith_speedup_read();
 
-	return (readinputport(0) & ~0x308) | (EEPROM_read_bit() << 3) | (mame_rand(Machine) & 0x300);
+	return (input_port_read_indexed(machine, 0) & ~0x308) | (EEPROM_read_bit() << 3) | (mame_rand(Machine) & 0x300);
 }
 
 static WRITE32_HANDLER( systemcontrol_w )

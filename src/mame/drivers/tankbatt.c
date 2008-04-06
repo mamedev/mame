@@ -81,7 +81,7 @@ static READ8_HANDLER( tankbatt_in0_r )
 {
 	int val;
 
-	val = readinputport(0);
+	val = input_port_read_indexed(machine, 0);
 	return ((val << (7-offset)) & 0x80);
 }
 
@@ -89,7 +89,7 @@ static READ8_HANDLER( tankbatt_in1_r )
 {
 	int val;
 
-	val = readinputport(1);
+	val = input_port_read_indexed(machine, 1);
 	return ((val << (7-offset)) & 0x80);
 }
 
@@ -97,7 +97,7 @@ static READ8_HANDLER( tankbatt_dsw_r )
 {
 	int val;
 
-	val = readinputport(2);
+	val = input_port_read_indexed(machine, 2);
 	return ((val << (7-offset)) & 0x80);
 }
 
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( tankbatt_interrupt )
 {
-	if ((readinputport (0) & 0x60) == 0) cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	if ((input_port_read_indexed(machine, 0) & 0x60) == 0) cpunum_set_input_line(machine, 0,0,HOLD_LINE);
 	else if (tankbatt_nmi_enable) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
 }
 

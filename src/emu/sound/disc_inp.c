@@ -122,7 +122,7 @@ static void dss_adjustment_step(node_description *node)
 	if (DSS_ADJUSTMENT__ENABLE)
 	{
 		struct dss_adjustment_context *context = node->context;
-		INT32 rawportval = readinputport(context->port);
+		INT32 rawportval = input_port_read_indexed(Machine, context->port);
 
 		/* only recompute if the value changed from last time */
 		if (rawportval != context->lastpval)

@@ -591,7 +591,7 @@ static CUSTOM_INPUT( eeprom_bit_r )
 }
 
 
-static UINT16 common_io_chip_r(int which, offs_t offset, UINT16 mem_mask)
+static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0x1f/2;
 
@@ -611,7 +611,7 @@ static UINT16 common_io_chip_r(int which, offs_t offset, UINT16 mem_mask)
 				return misc_io_data[which][offset];
 
 			/* otherwise, return an input port */
-			return readinputport(which*8 + offset);
+			return input_port_read_indexed(machine, which*8 + offset);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -700,7 +700,7 @@ static void common_io_chip_w(int which, offs_t offset, UINT16 data, UINT16 mem_m
 
 static READ16_HANDLER( io_chip_r )
 {
-	return common_io_chip_r(0, offset, mem_mask);
+	return common_io_chip_r(machine, 0, offset, mem_mask);
 }
 
 
@@ -712,8 +712,8 @@ static WRITE16_HANDLER( io_chip_w )
 
 static READ32_HANDLER( io_chip_0_r )
 {
-	return common_io_chip_r(0, offset*2+0, mem_mask) |
-	      (common_io_chip_r(0, offset*2+1, mem_mask >> 16) << 16);
+	return common_io_chip_r(machine, 0, offset*2+0, mem_mask) |
+	      (common_io_chip_r(machine, 0, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
@@ -728,8 +728,8 @@ static WRITE32_HANDLER( io_chip_0_w )
 
 static READ32_HANDLER( io_chip_1_r )
 {
-	return common_io_chip_r(1, offset*2+0, mem_mask) |
-	      (common_io_chip_r(1, offset*2+1, mem_mask >> 16) << 16);
+	return common_io_chip_r(machine, 1, offset*2+0, mem_mask) |
+	      (common_io_chip_r(machine, 1, offset*2+1, mem_mask >> 16) << 16);
 }
 
 
@@ -868,7 +868,7 @@ static WRITE16_HANDLER( analog_custom_io_w )
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			analog_value[offset & 3] = readinputportbytag_safe(names[offset & 3], 0);
+			analog_value[offset & 3] = input_port_read_safe(machine, names[offset & 3], 0);
 			return;
 	}
 	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
@@ -884,7 +884,7 @@ static READ16_HANDLER( extra_custom_io_r )
 		case 0x22/2:
 		case 0x24/2:
 		case 0x26/2:
-			return readinputportbytag_safe(names[offset & 3], 0xffff);
+			return input_port_read_safe(machine, names[offset & 3], 0xffff);
 	}
 
 	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
@@ -901,7 +901,7 @@ static WRITE16_HANDLER( orunners_custom_io_w )
 		case 0x12/2:
 		case 0x14/2:
 		case 0x16/2:
-			analog_value[offset & 3] = readinputportbytag_safe(names[analog_bank * 4 + (offset & 3)], 0);
+			analog_value[offset & 3] = input_port_read_safe(machine, names[analog_bank * 4 + (offset & 3)], 0);
 			return;
 
 		case 0x20/2:
@@ -924,7 +924,7 @@ static READ16_HANDLER( sonic_custom_io_r )
 		case 0x0c/2:
 		case 0x10/2:
 		case 0x14/2:
-			return (UINT8)(readinputportbytag(names[offset/2]) - sonic_last[offset/2]);
+			return (UINT8)(input_port_read(machine, names[offset/2]) - sonic_last[offset/2]);
 	}
 
 	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
@@ -941,8 +941,8 @@ static WRITE16_HANDLER( sonic_custom_io_w )
 		case 0x00/2:
 		case 0x08/2:
 		case 0x10/2:
-			sonic_last[offset/2 + 0] = readinputportbytag(names[offset/2 + 0]);
-			sonic_last[offset/2 + 1] = readinputportbytag(names[offset/2 + 1]);
+			sonic_last[offset/2 + 0] = input_port_read(machine, names[offset/2 + 0]);
+			sonic_last[offset/2 + 1] = input_port_read(machine, names[offset/2 + 1]);
 			return;
 	}
 

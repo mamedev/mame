@@ -92,7 +92,7 @@ static MACHINE_RESET( friskyt )
 
 static READ8_HANDLER( friskyt_portB_r )
 {
-	return (portb & 0x9f) | (readinputport(6) & 0x60);
+	return (portb & 0x9f) | (input_port_read_indexed(machine, 6) & 0x60);
 }
 
 static WRITE8_HANDLER( friskyt_portB_w )

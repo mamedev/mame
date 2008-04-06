@@ -203,12 +203,12 @@ F94B
 
 static READ32_HANDLER( finalgdr_input0_r )
 {
-	return readinputport(0) << 16;
+	return input_port_read_indexed(machine, 0) << 16;
 }
 
 static READ32_HANDLER( finalgdr_input1_r )
 {
-	return readinputport(1) << 16;
+	return input_port_read_indexed(machine, 1) << 16;
 }
 
 static WRITE32_HANDLER( finalgdr_oki_bank_w )

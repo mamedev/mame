@@ -133,32 +133,32 @@ static READ8_HANDLER( tehkanwc_track_0_r )
 {
 	int joy;
 
-	joy = readinputport(10) >> (2*offset);
+	joy = input_port_read_indexed(machine, 10) >> (2*offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return readinputport(3 + offset) - track0[offset];
+	return input_port_read_indexed(machine, 3 + offset) - track0[offset];
 }
 
 static READ8_HANDLER( tehkanwc_track_1_r )
 {
 	int joy;
 
-	joy = readinputport(10) >> (4+2*offset);
+	joy = input_port_read_indexed(machine, 10) >> (4+2*offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return readinputport(6 + offset) - track1[offset];
+	return input_port_read_indexed(machine, 6 + offset) - track1[offset];
 }
 
 static WRITE8_HANDLER( tehkanwc_track_0_reset_w )
 {
 	/* reset the trackball counters */
-	track0[offset] = readinputport(3 + offset) + data;
+	track0[offset] = input_port_read_indexed(machine, 3 + offset) + data;
 }
 
 static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 {
 	/* reset the trackball counters */
-	track1[offset] = readinputport(6 + offset) + data;
+	track1[offset] = input_port_read_indexed(machine, 6 + offset) + data;
 }
 
 

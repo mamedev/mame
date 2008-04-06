@@ -409,7 +409,7 @@ PALETTE_INIT( amiga );
 VIDEO_START( amiga );
 VIDEO_UPDATE( amiga );
 
-UINT32 amiga_gethvpos(void);
+UINT32 amiga_gethvpos(const device_config *screen);
 void copper_setpc(UINT32 pc);
 void amiga_set_genlock_color(UINT16 color);
 void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline);

@@ -150,7 +150,7 @@ static READ8_HANDLER( vendetta_eeprom_r )
 
 	res |= 0x02;//konami_eeprom_ack() << 5; /* add the ack */
 
-	res |= readinputport( 3 ) & 0x0c; /* test switch */
+	res |= input_port_read_indexed(machine,  3 ) & 0x0c; /* test switch */
 
 	if (init_eeprom_count)
 	{

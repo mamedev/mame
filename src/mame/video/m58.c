@@ -203,7 +203,7 @@ VIDEO_START( yard )
 WRITE8_HANDLER( yard_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set((data & 0x01) ^ (~readinputportbytag("DSW2") & 0x01));
+	flip_screen_set((data & 0x01) ^ (~input_port_read(machine, "DSW2") & 0x01));
 
 	coin_counter_w(0, data & 0x02);
 	coin_counter_w(1, data & 0x20);

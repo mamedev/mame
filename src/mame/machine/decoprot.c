@@ -129,16 +129,16 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 {
 	switch (offset<<1) {
 		case 0x110: /* Player input */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 
 		case 0x36c: /* Coins */
 		case 0x334: /* Probably also, c6, 2c0, 2e0, 4b2, 46a, 4da, rohga is 44c */
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 		case 0x0dc:
-			return readinputport(1)<<4;
+			return input_port_read_indexed(machine, 1)<<4;
 
 		case 0x494: /* Dips */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 
 		case 0x244:
 			return deco16_prot_ram[0];
@@ -361,9 +361,9 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 
 		/* Player 1 & 2 controls, read in IRQ then written *back* to protection device */
 		case 0x50: /* written to 9e byte */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 0x6f8: /* written to 76 byte */
-			return (readinputport(0)>>8)|(readinputport(0)<<8); /* byte swap IN0 */
+			return (input_port_read_indexed(machine, 0)>>8)|(input_port_read_indexed(machine, 0)<<8); /* byte swap IN0 */
 
 		case 0x5c: /* After coin insert, high 0x8000 bit set starts game */
 			return deco16_prot_ram[0x3b];
@@ -373,9 +373,9 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return ((deco16_prot_ram[0x9e/2]&0xff00)>>8) | ((deco16_prot_ram[0x9e/2]&0x00ff)<<8);
 
 		case 0xac: /* Dip switches */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 0xc2:
-			return readinputport(2) ^ deco16_prot_ram[0x2c/2];
+			return input_port_read_indexed(machine, 2) ^ deco16_prot_ram[0x2c/2];
 
 		case 0x5d4: /* The state of the dips last frame */
 			return deco16_prot_ram[0x34/2];
@@ -387,7 +387,7 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return (((deco16_prot_ram[0]&0xfff0)>>0) | ((deco16_prot_ram[0]&0x000c)>>2) | ((deco16_prot_ram[0]&0x0003)<<2)) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x76a: /* Coins */
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 
 		case 0x284: /* Bit shifting with inverted mask register */
 			return (((deco16_prot_ram[0x40/2]&0xfff0)>>0) | ((deco16_prot_ram[0x40/2]&0x0007)<<1) | ((deco16_prot_ram[0x40/2]&0x0008)>>3)) & (~deco16_prot_ram[0x36/2]);
@@ -401,7 +401,7 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return (((deco16_prot_ram[0x6a/2]&0x00f0)<<4) | ((deco16_prot_ram[0x6a/2]&0x0f00)<<4) | ((deco16_prot_ram[0x6a/2]&0x0007)<<5) | ((deco16_prot_ram[0x6a/2]&0x0008)<<1)) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x7d6: /* XOR IN0 */
-			return readinputport(0) ^ deco16_prot_ram[0x2c/2];
+			return input_port_read_indexed(machine, 0) ^ deco16_prot_ram[0x2c/2];
 		case 0x4b4:
 			return ((deco16_prot_ram[0x32/2]&0x00f0)<<8) | ((deco16_prot_ram[0x32/2]&0x000e)<<7) | ((deco16_prot_ram[0x32/2]&0x0001)<<11);
 	}
@@ -462,15 +462,15 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 
  	switch (offset*2) {
 		case 0xac: /* Dip switches */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 0xc2: /* Dip switches */
-			return readinputport(2) ^ deco16_prot_ram[0x2c/2];
+			return input_port_read_indexed(machine, 2) ^ deco16_prot_ram[0x2c/2];
 		case 0x46: /* Coins */
-			return readinputport(1) ^ deco16_prot_ram[0x2c/2];
+			return input_port_read_indexed(machine, 1) ^ deco16_prot_ram[0x2c/2];
 		case 0x50: /* Player 1 & 2 input ports */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 0x63c: /* Player 1 & 2 input ports */
-			return readinputport(0) ^ deco16_prot_ram[0x2c/2];
+			return input_port_read_indexed(machine, 0) ^ deco16_prot_ram[0x2c/2];
 
 		case 0x5f4:
 			return deco16_prot_ram[0x18/2];
@@ -645,13 +645,13 @@ READ16_HANDLER( deco16_104_cninja_prot_r )
 			return deco16_prot_ram[15];
 
 		case 0x36: /* Dip switches */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 
 		case 0x1c8: /* Coins */
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 
 		case 0x22c: /* Player 1 & 2 input ports */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 	}
 
 	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset);
@@ -741,15 +741,15 @@ READ16_HANDLER( deco16_146_funkyjet_prot_r )
 			return ((deco16_prot_ram[0x78e>>1]>>4)&0xff00) | (deco16_prot_ram[0x78e>>1]&0x000f) | ((deco16_prot_ram[0x78e>>1]<<8)&0xf000);
 
 		case 0x00c >> 1: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (readinputport(0) + (readinputport(1) << 8));
+			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 		case 0x778 >> 1: /* Credits */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 0x382 >> 1: /* DIPS */
-			return (readinputport(3) + (readinputport(4) << 8));
+			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
 	}
 
 	if (activecpu_get_pc()!=0xc0ea)
-		logerror("CPU #0 PC %06x: warning - read unmapped control address %06x (ctrl %04x)\n",activecpu_get_pc(),offset<<1, readinputport(0));
+		logerror("CPU #0 PC %06x: warning - read unmapped control address %06x (ctrl %04x)\n",activecpu_get_pc(),offset<<1, input_port_read_indexed(machine, 0));
 
 	return 0;
 }
@@ -858,14 +858,14 @@ READ16_HANDLER( deco16_104_rohga_prot_r )
 
 	switch (offset) {
 		case 0x88/2: /* Player 1 & 2 input ports */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 0x36c/2:
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 		case 0x44c/2:
 
-			return ((readinputport(1)&0x7)<<13)|((readinputport(1)&0x8)<<9);
+			return ((input_port_read_indexed(machine, 1)&0x7)<<13)|((input_port_read_indexed(machine, 1)&0x8)<<9);
 		case 0x292/2: /* Dips */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 
 		case 0x44/2:
 			return ((((DECO_PORT(0x2c)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
@@ -1242,11 +1242,11 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 	switch (offset)
 	{
 	case 0x582: /* Player 1 & Player 2 */
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	case 0x04c: /* Coins/VBL */
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 0x672: /* Dip switches */
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 
 	case 0x13a:
 		return ((DECO_PORT(0x190)&0x00f0)<<8) | ((DECO_PORT(0x190)&0x0003)<<10) | ((DECO_PORT(0x190)&0x000c)<<6);
@@ -1304,8 +1304,8 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 	/*********************************************************************************/
 
-//  case 0x582: return readinputport(0); /* IN0 */
-//  case 0x672: return readinputport(1); /* IN1 */
+//  case 0x582: return input_port_read_indexed(machine, 0); /* IN0 */
+//  case 0x672: return input_port_read_indexed(machine, 1); /* IN1 */
 //  case 0x04c: return EEPROM_read_bit();
 
 	case 0x468:
@@ -1653,8 +1653,8 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 	/* Special case inputs, because this is the only game with an eprom */
 	switch (addr)
 	{
-	case 0x582: return (readinputport(0)<<16) | 0xffff; /* IN0 */
-	case 0x672: return (readinputport(1)<<16) | 0xffff; /* IN1 */
+	case 0x582: return (input_port_read_indexed(machine, 0)<<16) | 0xffff; /* IN0 */
+	case 0x672: return (input_port_read_indexed(machine, 1)<<16) | 0xffff; /* IN1 */
 	case 0x04c: return (EEPROM_read_bit()<<16) | 0xffff;
 	}
 

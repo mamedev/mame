@@ -141,19 +141,19 @@ static INTERRUPT_GEN( irq4_gen )
 
 static READ32_HANDLER( port0_r )
 {
-	return readinputport(0) << 16;
+	return input_port_read_indexed(machine, 0) << 16;
 }
 
 
 static READ32_HANDLER( port1_r )
 {
-	return (readinputport(1) << 16) | (EEPROM_read_bit() << 29);
+	return (input_port_read_indexed(machine, 1) << 16) | (EEPROM_read_bit() << 29);
 }
 
 
 static READ32_HANDLER( port2_r )
 {
-	return readinputport(2) << 16;
+	return input_port_read_indexed(machine, 2) << 16;
 }
 
 

@@ -79,7 +79,7 @@
 static MACHINE_START( grchamp )
 {
 	/* if the coin system is 1 way, lock Coin B (Page 40) */
-	if (readinputport(1) & 0x10)
+	if (input_port_read_indexed(machine, 1) & 0x10)
 		coin_lockout_w(1, 1);
 }
 

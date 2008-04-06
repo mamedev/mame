@@ -28,12 +28,12 @@ Be sure to keep returning a direction until steering_reset is called,
 because D6 and D7 are apparently checked at different times, and a
 change in-between can affect the direction you move.
 ***************************************************************************/
-static int nitedrvr_steering(void)
+static int nitedrvr_steering(running_machine *machine)
 {
 	int this_val;
 	int delta;
 
-	this_val = readinputport(5);
+	this_val = input_port_read_indexed(machine, 5);
 
 	delta=this_val-last_steering_val;
 	last_steering_val=this_val;
@@ -107,7 +107,7 @@ READ8_HANDLER( nitedrvr_in0_r )
 {
 	int gear;
 
-	gear = readinputport(2);
+	gear = input_port_read_indexed(machine, 2);
 	if (gear & 0x10)				nitedrvr_gear=1;
 	else if (gear & 0x20)			nitedrvr_gear=2;
 	else if (gear & 0x40)			nitedrvr_gear=3;
@@ -116,16 +116,16 @@ READ8_HANDLER( nitedrvr_in0_r )
 	switch (offset & 0x03)
 	{
 		case 0x00:						/* No remapping necessary */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 0x01:						/* No remapping necessary */
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 		case 0x02:						/* Remap our gear shift */
 			if (nitedrvr_gear==1)		return 0xE0;
 			else if (nitedrvr_gear==2)	return 0xD0;
 			else if (nitedrvr_gear==3)	return 0xB0;
 			else						return 0x70;
 		case 0x03:						/* Remap our steering */
-			return (readinputport(3) | nitedrvr_steering());
+			return (input_port_read_indexed(machine, 3) | nitedrvr_steering(machine));
 		default:
 			return 0xFF;
 	}
@@ -169,7 +169,7 @@ READ8_HANDLER( nitedrvr_in1_r )
 
 	ac_line=(ac_line+1) % 3;
 
-	port = readinputport(4);
+	port = input_port_read_indexed(machine, 4);
 	if (port & 0x10)				nitedrvr_track=0;
 	else if (port & 0x20)			nitedrvr_track=1;
 	else if (port & 0x40)			nitedrvr_track=2;

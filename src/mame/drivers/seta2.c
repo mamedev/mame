@@ -564,11 +564,11 @@ static READ16_HANDLER( mj4simai_p1_r )
 {
 	switch (keyboard_row)
 	{
-		case 0x01: return readinputport(3);
-		case 0x02: return readinputport(4);
-		case 0x04: return readinputport(5);
-		case 0x08: return readinputport(6);
-		case 0x10: return readinputport(7);
+		case 0x01: return input_port_read_indexed(machine, 3);
+		case 0x02: return input_port_read_indexed(machine, 4);
+		case 0x04: return input_port_read_indexed(machine, 5);
+		case 0x08: return input_port_read_indexed(machine, 6);
+		case 0x10: return input_port_read_indexed(machine, 7);
 		default:   logerror("p1_r with keyboard_row = %02x\n",keyboard_row); return 0xffff;
 	}
 }
@@ -686,7 +686,7 @@ static READ16_HANDLER( pzlbowl_protection_r )
 
 static READ16_HANDLER( pzlbowl_coins_r )
 {
-	return readinputport(4) | (mame_rand(Machine) & 0x80 );
+	return input_port_read_indexed(machine, 4) | (mame_rand(Machine) & 0x80 );
 }
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
@@ -770,12 +770,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( samshoot_lightgun1_r )
 {
-//  popmessage("%02x %02x",readinputport(3),readinputport(2));
-	return (readinputport(2) << 8) | readinputport(3);
+//  popmessage("%02x %02x",input_port_read_indexed(machine, 3),input_port_read_indexed(machine, 2));
+	return (input_port_read_indexed(machine, 2) << 8) | input_port_read_indexed(machine, 3);
 }
 static READ16_HANDLER( samshoot_lightgun2_r )
 {
-	return (readinputport(4) << 8) | readinputport(5);
+	return (input_port_read_indexed(machine, 4) << 8) | input_port_read_indexed(machine, 5);
 }
 
 static WRITE16_HANDLER( samshoot_coin_w )

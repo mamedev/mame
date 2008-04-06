@@ -117,9 +117,9 @@ static WRITE8_HANDLER( nbmj9195_inputportsel_w )
 	nbmj9195_inputport = (data ^ 0xff);
 }
 
-static int nbmj9195_dipsw_r(void)
+static int nbmj9195_dipsw_r(running_machine *machine)
 {
-	return ((((readinputport(0) & 0xff) | ((readinputport(1) & 0xff) << 8)) >> nbmj9195_dipswbitsel) & 0x01);
+	return ((((input_port_read_indexed(machine, 0) & 0xff) | ((input_port_read_indexed(machine, 1) & 0xff) << 8)) >> nbmj9195_dipswbitsel) & 0x01);
 }
 
 static void nbmj9195_dipswbitsel_w(int data)
@@ -149,19 +149,19 @@ static void mscoutm_inputportsel_w(int data)
 static READ8_HANDLER( mscoutm_dipsw_0_r )
 {
 	// DIPSW A
-	return (((readinputport(0) & 0x01) << 7) | ((readinputport(0) & 0x02) << 5) |
-	        ((readinputport(0) & 0x04) << 3) | ((readinputport(0) & 0x08) << 1) |
-	        ((readinputport(0) & 0x10) >> 1) | ((readinputport(0) & 0x20) >> 3) |
-	        ((readinputport(0) & 0x40) >> 5) | ((readinputport(0) & 0x80) >> 7));
+	return (((input_port_read_indexed(machine, 0) & 0x01) << 7) | ((input_port_read_indexed(machine, 0) & 0x02) << 5) |
+	        ((input_port_read_indexed(machine, 0) & 0x04) << 3) | ((input_port_read_indexed(machine, 0) & 0x08) << 1) |
+	        ((input_port_read_indexed(machine, 0) & 0x10) >> 1) | ((input_port_read_indexed(machine, 0) & 0x20) >> 3) |
+	        ((input_port_read_indexed(machine, 0) & 0x40) >> 5) | ((input_port_read_indexed(machine, 0) & 0x80) >> 7));
 }
 
 static READ8_HANDLER( mscoutm_dipsw_1_r )
 {
 	// DIPSW B
-	return (((readinputport(1) & 0x01) << 7) | ((readinputport(1) & 0x02) << 5) |
-	        ((readinputport(1) & 0x04) << 3) | ((readinputport(1) & 0x08) << 1) |
-	        ((readinputport(1) & 0x10) >> 1) | ((readinputport(1) & 0x20) >> 3) |
-	        ((readinputport(1) & 0x40) >> 5) | ((readinputport(1) & 0x80) >> 7));
+	return (((input_port_read_indexed(machine, 1) & 0x01) << 7) | ((input_port_read_indexed(machine, 1) & 0x02) << 5) |
+	        ((input_port_read_indexed(machine, 1) & 0x04) << 3) | ((input_port_read_indexed(machine, 1) & 0x08) << 1) |
+	        ((input_port_read_indexed(machine, 1) & 0x10) >> 1) | ((input_port_read_indexed(machine, 1) & 0x20) >> 3) |
+	        ((input_port_read_indexed(machine, 1) & 0x40) >> 5) | ((input_port_read_indexed(machine, 1) & 0x80) >> 7));
 }
 
 
@@ -182,29 +182,29 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = readinputport(2);
+				portdata = input_port_read_indexed(machine, 2);
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (mscoutm_inputport)
 				{
 					case 0x01:
-						portdata = readinputport(3);
+						portdata = input_port_read_indexed(machine, 3);
 						break;
 					case 0x02:
-						portdata = readinputport(4);
+						portdata = input_port_read_indexed(machine, 4);
 						break;
 					case 0x04:
-						portdata = readinputport(5);
+						portdata = input_port_read_indexed(machine, 5);
 						break;
 					case 0x08:
-						portdata = readinputport(6);
+						portdata = input_port_read_indexed(machine, 6);
 						break;
 					case 0x10:
-						portdata = readinputport(7);
+						portdata = input_port_read_indexed(machine, 7);
 						break;
 					default:
-						portdata = (readinputport(3) & readinputport(4) & readinputport(5) & readinputport(6) & readinputport(7));
+						portdata = (input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & input_port_read_indexed(machine, 7));
 						break;
 				}
 				break;
@@ -213,22 +213,22 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 				switch (mscoutm_inputport)
 				{
 					case 0x01:
-						portdata = readinputport(8);
+						portdata = input_port_read_indexed(machine, 8);
 						break;
 					case 0x02:
-						portdata = readinputport(9);
+						portdata = input_port_read_indexed(machine, 9);
 						break;
 					case 0x04:
-						portdata = readinputport(10);
+						portdata = input_port_read_indexed(machine, 10);
 						break;
 					case 0x08:
-						portdata = readinputport(11);
+						portdata = input_port_read_indexed(machine, 11);
 						break;
 					case 0x10:
-						portdata = readinputport(12);
+						portdata = input_port_read_indexed(machine, 12);
 						break;
 					default:
-						portdata = (readinputport(8) & readinputport(9) & readinputport(10) & readinputport(11) & readinputport(12));
+						portdata = (input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & input_port_read_indexed(machine, 12));
 						break;
 				}
 				break;
@@ -267,29 +267,29 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = ((readinputport(2) & 0xfe) | nbmj9195_outcoin_flag);
+				portdata = ((input_port_read_indexed(machine, 2) & 0xfe) | nbmj9195_outcoin_flag);
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (nbmj9195_inputport)
 				{
 					case 0x01:
-						portdata = readinputport(3);
+						portdata = input_port_read_indexed(machine, 3);
 						break;
 					case 0x02:
-						portdata = readinputport(4);
+						portdata = input_port_read_indexed(machine, 4);
 						break;
 					case 0x04:
-						portdata = readinputport(5);
+						portdata = input_port_read_indexed(machine, 5);
 						break;
 					case 0x08:
-						portdata = readinputport(6);
+						portdata = input_port_read_indexed(machine, 6);
 						break;
 					case 0x10:
-						portdata = ((readinputport(7) & 0x7f) | (nbmj9195_dipsw_r() << 7));
+						portdata = ((input_port_read_indexed(machine, 7) & 0x7f) | (nbmj9195_dipsw_r(machine) << 7));
 						break;
 					default:
-						portdata = (readinputport(3) & readinputport(4) & readinputport(5) & readinputport(6) & (readinputport(12) & 0x7f));
+						portdata = (input_port_read_indexed(machine, 3) & input_port_read_indexed(machine, 4) & input_port_read_indexed(machine, 5) & input_port_read_indexed(machine, 6) & (input_port_read_indexed(machine, 12) & 0x7f));
 						break;
 				}
 				break;
@@ -298,22 +298,22 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 				switch (nbmj9195_inputport)
 				{
 					case 0x01:
-						portdata = readinputport(8);
+						portdata = input_port_read_indexed(machine, 8);
 						break;
 					case 0x02:
-						portdata = readinputport(9);
+						portdata = input_port_read_indexed(machine, 9);
 						break;
 					case 0x04:
-						portdata = readinputport(10);
+						portdata = input_port_read_indexed(machine, 10);
 						break;
 					case 0x08:
-						portdata = readinputport(11);
+						portdata = input_port_read_indexed(machine, 11);
 						break;
 					case 0x10:
-						portdata = readinputport(12) & 0x7f;
+						portdata = input_port_read_indexed(machine, 12) & 0x7f;
 						break;
 					default:
-						portdata = (readinputport(8) & readinputport(9) & readinputport(10) & readinputport(11) & (readinputport(12) & 0x7f));
+						portdata = (input_port_read_indexed(machine, 8) & input_port_read_indexed(machine, 9) & input_port_read_indexed(machine, 10) & input_port_read_indexed(machine, 11) & (input_port_read_indexed(machine, 12) & 0x7f));
 						break;
 				}
 				break;

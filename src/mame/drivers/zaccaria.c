@@ -79,7 +79,7 @@ logerror("PC %04x: portsel = %02x\n",activecpu_get_pc(),data);
 
 static READ8_HANDLER( zaccaria_dsw_r )
 {
-	return readinputport(dsw);
+	return input_port_read_indexed(machine, dsw);
 }
 
 

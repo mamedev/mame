@@ -87,14 +87,14 @@ MACHINE_RESET( cinemat )
 
 static READ8_HANDLER( inputs_r )
 {
-	return (readinputportbytag("INPUTS") >> offset) & 1;
+	return (input_port_read(machine, "INPUTS") >> offset) & 1;
 }
 
 
 static READ8_HANDLER( switches_r )
 {
 	static const UINT8 switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
-	return (readinputportbytag("SWITCHES") >> switch_shuffle[offset]) & 1;
+	return (input_port_read(machine, "SWITCHES") >> switch_shuffle[offset]) & 1;
 }
 
 
@@ -154,7 +154,7 @@ static UINT8 joystick_read(void)
 	if (port_tag_to_index("ANALOGX") != -1)
 	{
 		int xval = (INT16)(cpunum_get_reg(0, CCPU_X) << 4) >> 4;
-		return (readinputportbytag(mux_select ? "ANALOGX" : "ANALOGY") - xval) < 0x800;
+		return (input_port_read(Machine, mux_select ? "ANALOGX" : "ANALOGY") - xval) < 0x800;
 	}
 	return 0;
 }
@@ -173,7 +173,7 @@ static READ8_HANDLER( speedfrk_wheel_r )
 	int delta_wheel;
 
     /* the shift register is cleared once per 'frame' */
-    delta_wheel = (INT8)readinputportbytag("WHEEL") / 8;
+    delta_wheel = (INT8)input_port_read(machine, "WHEEL") / 8;
     if (delta_wheel > 3)
         delta_wheel = 3;
     else if (delta_wheel < -3)
@@ -186,14 +186,14 @@ static READ8_HANDLER( speedfrk_wheel_r )
 static READ8_HANDLER( speedfrk_gear_r )
 {
 	static int gear = 0x0e;
-    int gearval = readinputportbytag("GEAR");
+    int gearval = input_port_read(machine, "GEAR");
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
         gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(readinputportbytag("INPUTS") & 0x80))
+	if (!(input_port_read(machine, "INPUTS") & 0x80))
         gear &= ~0x08;
 
 	return (gear >> offset) & 1;
@@ -239,9 +239,9 @@ static READ8_HANDLER( sundance_inputs_r )
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
-		return (readinputportbytag(sundance_port_map[offset].portname) & sundance_port_map[offset].bitmask) ? 0 : 1;
+		return (input_port_read(machine, sundance_port_map[offset].portname) & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
-		return (readinputportbytag("INPUTS") >> offset) & 1;
+		return (input_port_read(machine, "INPUTS") >> offset) & 1;
 }
 
 
@@ -254,7 +254,7 @@ static READ8_HANDLER( sundance_inputs_r )
 
 static READ8_HANDLER( boxingb_dial_r )
 {
-	int value = readinputportbytag("DIAL");
+	int value = input_port_read(machine, "DIAL");
 	if (!mux_select) offset += 4;
 	return (value >> offset) & 1;
 }

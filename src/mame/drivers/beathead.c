@@ -270,19 +270,19 @@ static WRITE32_HANDLER( eeprom_enable_w )
 
 static READ32_HANDLER( input_0_r )
 {
-	return readinputport(0);
+	return input_port_read_indexed(machine, 0);
 }
 
 
 static READ32_HANDLER( input_1_r )
 {
-	return readinputport(1);
+	return input_port_read_indexed(machine, 1);
 }
 
 
 static READ32_HANDLER( input_2_r )
 {
-	int result = readinputport(2);
+	int result = input_port_read_indexed(machine, 2);
 	if (atarigen_sound_to_cpu_ready) result ^= 0x10;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x20;
 	return result;
@@ -291,7 +291,7 @@ static READ32_HANDLER( input_2_r )
 
 static READ32_HANDLER( input_3_r )
 {
-	return readinputport(3);
+	return input_port_read_indexed(machine, 3);
 }
 
 

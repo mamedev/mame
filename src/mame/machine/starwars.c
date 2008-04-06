@@ -129,7 +129,7 @@ WRITE8_HANDLER( starwars_out_w )
 
 READ8_HANDLER( starwars_input_1_r )
 {
-	int x = readinputport(1);
+	int x = input_port_read_indexed(machine, 1);
 
 	/* set the matrix processor flag */
 	if (math_run)
@@ -158,11 +158,11 @@ READ8_HANDLER( starwars_adc_r )
 {
 	/* pitch */
 	if (control_num == kPitch)
-		return readinputport(4);
+		return input_port_read_indexed(machine, 4);
 
 	/* yaw */
 	else if (control_num == kYaw)
-		return readinputport(5);
+		return input_port_read_indexed(machine, 5);
 
 	/* default to unused thrust */
 	else

@@ -142,7 +142,7 @@ READ16_HANDLER( midyunit_protection_r )
 
 READ16_HANDLER( midyunit_input_r )
 {
-	return readinputport(offset);
+	return input_port_read_indexed(machine, offset);
 }
 
 
@@ -156,15 +156,15 @@ READ16_HANDLER( midyunit_input_r )
 static READ16_HANDLER( term2_input_r )
 {
 	if (offset != 2)
-		return readinputport(offset);
+		return input_port_read_indexed(machine, offset);
 
 	switch (term2_analog_select)
 	{
 		default:
-		case 0:  return readinputport(2);  break;
-		case 1:  return readinputport(6);  break;
-		case 2:  return readinputport(7);  break;
-		case 3:  return readinputport(8);  break;
+		case 0:  return input_port_read_indexed(machine, 2);  break;
+		case 1:  return input_port_read_indexed(machine, 6);  break;
+		case 2:  return input_port_read_indexed(machine, 7);  break;
+		case 3:  return input_port_read_indexed(machine, 8);  break;
 	}
 }
 

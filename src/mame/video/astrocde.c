@@ -532,51 +532,51 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 			break;
 
 		case 0x10:	/* player 1 handle */
-			result = readinputportbytag_safe("P1HANDLE", 0xff);
+			result = input_port_read_safe(machine, "P1HANDLE", 0xff);
 			break;
 
 		case 0x11:	/* player 2 handle */
-			result = readinputportbytag_safe("P2HANDLE", 0xff);
+			result = input_port_read_safe(machine, "P2HANDLE", 0xff);
 			break;
 
 		case 0x12:	/* player 3 handle */
-			result = readinputportbytag_safe("P3HANDLE", 0xff);
+			result = input_port_read_safe(machine, "P3HANDLE", 0xff);
 			break;
 
 		case 0x13:	/* player 4 handle */
-			result = readinputportbytag_safe("P4HANDLE", 0xff);
+			result = input_port_read_safe(machine, "P4HANDLE", 0xff);
 			break;
 
 		case 0x14:	/* keypad column 0 */
-			result = readinputportbytag_safe("KEYPAD0", 0xff);
+			result = input_port_read_safe(machine, "KEYPAD0", 0xff);
 			break;
 
 		case 0x15:	/* keypad column 1 */
-			result = readinputportbytag_safe("KEYPAD1", 0xff);
+			result = input_port_read_safe(machine, "KEYPAD1", 0xff);
 			break;
 
 		case 0x16:	/* keypad column 2 */
-			result = readinputportbytag_safe("KEYPAD2", 0xff);
+			result = input_port_read_safe(machine, "KEYPAD2", 0xff);
 			break;
 
 		case 0x17:	/* keypad column 3 */
-			result = readinputportbytag_safe("KEYPAD3", 0xff);
+			result = input_port_read_safe(machine, "KEYPAD3", 0xff);
 			break;
 
 		case 0x1c:	/* player 1 knob */
-			result = readinputportbytag_safe("P1_KNOB", 0xff);
+			result = input_port_read_safe(machine, "P1_KNOB", 0xff);
 			break;
 
 		case 0x1d:	/* player 2 knob */
-			result = readinputportbytag_safe("P2_KNOB", 0xff);
+			result = input_port_read_safe(machine, "P2_KNOB", 0xff);
 			break;
 
 		case 0x1e:	/* player 3 knob */
-			result = readinputportbytag_safe("P3_KNOB", 0xff);
+			result = input_port_read_safe(machine, "P3_KNOB", 0xff);
 			break;
 
 		case 0x1f:	/* player 4 knob */
-			result = readinputportbytag_safe("P4_KNOB", 0xff);
+			result = input_port_read_safe(machine, "P4_KNOB", 0xff);
 			break;
 	}
 

@@ -125,7 +125,7 @@ static TIMER_CALLBACK( scanline_callback )
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
-		UINT8 potvalue = readinputportbytag("PADDLE");
+		UINT8 potvalue = input_port_read(machine, "PADDLE");
 		timer_adjust_oneshot(pot_timer, video_screen_get_time_until_pos(machine->primary_screen, 72 + (potvalue / 2), (potvalue % 2) * 128), 0);
 	}
 
@@ -156,25 +156,25 @@ static READ8_HANDLER( switches_r )
 
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
-		result &= (readinputportbytag("DIPS") << 6) | 0x3f;
+		result &= (input_port_read(machine, "DIPS") << 6) | 0x3f;
 	if ((offset & 0x0b) == 0x01)
-		result &= (readinputportbytag("DIPS") << 4) | 0x3f;
+		result &= (input_port_read(machine, "DIPS") << 4) | 0x3f;
 	if ((offset & 0x0b) == 0x02)
-		result &= (readinputportbytag("DIPS") << 0) | 0x3f;
+		result &= (input_port_read(machine, "DIPS") << 0) | 0x3f;
 	if ((offset & 0x0b) == 0x03)
-		result &= (readinputportbytag("DIPS") << 2) | 0x3f;
+		result &= (input_port_read(machine, "DIPS") << 2) | 0x3f;
 
 	/* other switches are selected by ADR0+ADR1+ADR2 if ADR4 == 0 */
 	if ((offset & 0x17) == 0x00)
-		result &= (readinputportbytag("SELECT") << 7) | 0x7f;
+		result &= (input_port_read(machine, "SELECT") << 7) | 0x7f;
 	if ((offset & 0x17) == 0x04)
 		result &= ((pot_trigger[0] & ~pot_mask[0]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x05)
 		result &= ((pot_trigger[1] & ~pot_mask[1]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x06)
-		result &= readinputportbytag("SERVE");
+		result &= input_port_read(machine, "SERVE");
 	if ((offset & 0x17) == 0x07)
-		result &= (readinputportbytag("SELECT") << 6) | 0x7f;
+		result &= (input_port_read(machine, "SELECT") << 6) | 0x7f;
 
 	return result;
 }

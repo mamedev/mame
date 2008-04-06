@@ -144,19 +144,19 @@ static READ8_HANDLER( inputport_r )
 	switch (inputport_selected)
 	{
 		case 0x00:	/* DSW A (bits 0-4) */
-			return (readinputport(0) & 0xf8) >> 3; break;
+			return (input_port_read_indexed(machine, 0) & 0xf8) >> 3; break;
 		case 0x01:	/* DSW A (bits 5-7), DSW B (bits 0-1) */
-			return ((readinputport(0) & 0x07) << 2) | ((readinputport(1) & 0xc0) >> 6); break;
+			return ((input_port_read_indexed(machine, 0) & 0x07) << 2) | ((input_port_read_indexed(machine, 1) & 0xc0) >> 6); break;
 		case 0x02:	/* DSW B (bits 2-6) */
-			return (readinputport(1) & 0x3e) >> 1; break;
+			return (input_port_read_indexed(machine, 1) & 0x3e) >> 1; break;
 		case 0x03:	/* DSW B (bit 7), DSW C (bits 0-3) */
-			return ((readinputport(1) & 0x01) << 4) | (readinputport(2) & 0x0f); break;
+			return ((input_port_read_indexed(machine, 1) & 0x01) << 4) | (input_port_read_indexed(machine, 2) & 0x0f); break;
 		case 0x04:	/* coins, start */
-			return readinputport(3); break;
+			return input_port_read_indexed(machine, 3); break;
 		case 0x05:	/* 2P controls */
-			return readinputport(5); break;
+			return input_port_read_indexed(machine, 5); break;
 		case 0x06:	/* 1P controls */
-			return readinputport(4); break;
+			return input_port_read_indexed(machine, 4); break;
 		default:
 			return 0xff;
 	}

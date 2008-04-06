@@ -54,7 +54,7 @@ static READ8_HANDLER( r6532_1_ram_r )
 
 static READ16_HANDLER( tourtabl_read_input_port )
 {
-	return readinputport(offset);
+	return input_port_read_indexed(machine, offset);
 }
 
 static READ8_HANDLER( tourtabl_get_databus_contents )

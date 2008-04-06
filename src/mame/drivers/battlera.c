@@ -62,11 +62,11 @@ static WRITE8_HANDLER( control_data_w )
 static READ8_HANDLER( control_data_r )
 {
 	switch (control_port_select) {
-		case 0xfe: return readinputportbytag("IN0"); /* Player 1 */
-		case 0xfd: return readinputportbytag("IN1"); /* Player 2 */
-		case 0xfb: return readinputportbytag("IN2"); /* Coins */
-		case 0xf7: return readinputportbytag("DSW2"); /* Dip 2 */
-		case 0xef: return readinputportbytag("DSW1"); /* Dip 1 */
+		case 0xfe: return input_port_read(machine, "IN0"); /* Player 1 */
+		case 0xfd: return input_port_read(machine, "IN1"); /* Player 2 */
+		case 0xfb: return input_port_read(machine, "IN2"); /* Coins */
+		case 0xf7: return input_port_read(machine, "DSW2"); /* Dip 2 */
+		case 0xef: return input_port_read(machine, "DSW1"); /* Dip 1 */
 	}
 
     return 0xff;

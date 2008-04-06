@@ -319,9 +319,9 @@ static READ8_HANDLER( solarfox_ip0_r )
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
 	if (mcr_cocktail_flip)
-		return readinputportbytag("SSIO.IP0") | 0x08;
+		return input_port_read(machine, "SSIO.IP0") | 0x08;
 	else
-		return ((readinputportbytag("SSIO.IP0") & ~0x14) | 0x08) | ((readinputportbytag("SSIO.IP0") & 0x08) >> 1) | ((readinputportbytag("SSIO.IP2") & 0x01) << 4);
+		return ((input_port_read(machine, "SSIO.IP0") & ~0x14) | 0x08) | ((input_port_read(machine, "SSIO.IP0") & 0x08) >> 1) | ((input_port_read(machine, "SSIO.IP2") & 0x01) << 4);
 }
 
 
@@ -329,9 +329,9 @@ static READ8_HANDLER( solarfox_ip1_r )
 {
 	/*  same deal as above */
 	if (mcr_cocktail_flip)
-		return readinputportbytag("SSIO.IP1") | 0xf0;
+		return input_port_read(machine, "SSIO.IP1") | 0xf0;
 	else
-		return (readinputportbytag("SSIO.IP1") >> 4) | 0xf0;
+		return (input_port_read(machine, "SSIO.IP1") >> 4) | 0xf0;
 }
 
 
@@ -344,7 +344,7 @@ static READ8_HANDLER( solarfox_ip1_r )
 
 static READ8_HANDLER( kick_ip1_r )
 {
-	return (readinputportbytag("DIAL2") << 4) & 0xf0;
+	return (input_port_read(machine, "DIAL2") << 4) & 0xf0;
 }
 
 
@@ -364,18 +364,18 @@ static WRITE8_HANDLER( wacko_op4_w )
 static READ8_HANDLER( wacko_ip1_r )
 {
 	if (!input_mux)
-		return readinputportbytag("SSIO.IP1");
+		return input_port_read(machine, "SSIO.IP1");
 	else
-		return readinputportbytag("SSIO.IP1.ALT");
+		return input_port_read(machine, "SSIO.IP1.ALT");
 }
 
 
 static READ8_HANDLER( wacko_ip2_r )
 {
 	if (!input_mux)
-		return readinputportbytag("SSIO.IP2");
+		return input_port_read(machine, "SSIO.IP2");
 	else
-		return readinputportbytag("SSIO.IP2.ALT");
+		return input_port_read(machine, "SSIO.IP2.ALT");
 }
 
 
@@ -388,7 +388,7 @@ static READ8_HANDLER( wacko_ip2_r )
 
 static READ8_HANDLER( kroozr_ip1_r )
 {
-	int dial = readinputportbytag("DIAL");
+	int dial = input_port_read(machine, "DIAL");
 	return ((dial & 0x80) >> 1) | ((dial & 0x70) >> 4);
 }
 
@@ -581,13 +581,13 @@ static WRITE8_HANDLER( nflfoot_op4_w )
 
 static READ8_HANDLER( demoderb_ip1_r )
 {
-	return readinputportbytag(input_mux ? "SSIO.IP1.ALT" : "SSIO.IP1");
+	return input_port_read(machine, input_mux ? "SSIO.IP1.ALT" : "SSIO.IP1");
 }
 
 
 static READ8_HANDLER( demoderb_ip2_r )
 {
-	return readinputportbytag(input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
+	return input_port_read(machine, input_mux ? "SSIO.IP2.ALT" : "SSIO.IP2");
 }
 
 

@@ -66,7 +66,7 @@ static READ16_HANDLER( special_port1_r )
 {
 	static int h256 = 0x0400;
 
-	int result = readinputport(1);
+	int result = input_port_read_indexed(machine, 1);
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0200;
 	result ^= h256 ^= 0x0400;

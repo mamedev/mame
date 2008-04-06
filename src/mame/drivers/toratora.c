@@ -39,7 +39,7 @@ static UINT8 clear_tv;
 static READ8_HANDLER( port_b_u3_r )
 {
 	logerror("%04x: read DIP\n",activecpu_get_pc());
-	return readinputport(1);
+	return input_port_read_indexed(machine, 1);
 }
 
 

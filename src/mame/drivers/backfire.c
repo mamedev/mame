@@ -231,20 +231,20 @@ static READ32_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
 	int backfire_screen = mame_rand(Machine)&1;
-	return ((EEPROM_read_bit()<<24) | readinputport(0) | (readinputport(3)<<16)) ^  (backfire_screen << 26) ;
+	return ((EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 3)<<16)) ^  (backfire_screen << 26) ;
 }
 
 static READ32_HANDLER(backfire_control2_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
-	return (EEPROM_read_bit()<<24) | readinputport(1) | (readinputport(1)<<16);
+	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 1)<<16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
-	return (EEPROM_read_bit()<<24) | readinputport(2) | (readinputport(2)<<16);
+	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<16);
 }
 #endif
 
@@ -306,7 +306,7 @@ static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
 {
-	return readinputport(4);
+	return input_port_read_indexed(machine, 4);
 }
 
 READ32_HANDLER( backfire_wheel1_r )

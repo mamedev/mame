@@ -138,19 +138,19 @@ static READ16_HANDLER( dassault_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (readinputport(0) + (readinputport(1) << 8));
+			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return (readinputport(6) + (readinputport(7) << 8));
+			return (input_port_read_indexed(machine, 6) + (input_port_read_indexed(machine, 7) << 8));
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return readinputport(3);
+			return input_port_read_indexed(machine, 3);
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return readinputport(4);
+			return input_port_read_indexed(machine, 4);
 
 		case 8: /* VBL, Credits */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 	}
 
 	return 0xffff;
@@ -165,7 +165,7 @@ static WRITE16_HANDLER( dassault_control_w )
 
 static READ16_HANDLER( dassault_sub_control_r )
 {
-	return readinputport(5);
+	return input_port_read_indexed(machine, 5);
 }
 
 static WRITE16_HANDLER( dassault_sound_w )

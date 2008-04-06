@@ -128,13 +128,13 @@ static MACHINE_START( dcheese )
 
 static READ16_HANDLER( port_0_r )
 {
-	return (readinputport(0) & 0xff7f) | (EEPROM_read_bit() << 7);
+	return (input_port_read_indexed(machine, 0) & 0xff7f) | (EEPROM_read_bit() << 7);
 }
 
 
 static READ16_HANDLER( port_2_r )
 {
-	return (readinputport(2) & 0xff1f) | (!soundlatch_full << 7) | (ticket_dispenser_r(machine, 0) >> 2);
+	return (input_port_read_indexed(machine, 2) & 0xff1f) | (!soundlatch_full << 7) | (ticket_dispenser_r(machine, 0) >> 2);
 }
 
 

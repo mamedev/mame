@@ -125,9 +125,9 @@ READ16_HANDLER( cchip1_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x00: return readinputportbytag("IN0");    /* Player 1 controls + START1 */
-		case 0x01: return readinputportbytag("IN1");    /* Player 2 controls + START2 */
-		case 0x02: return readinputportbytag("IN2");    /* COINn + SERVICE1 + TILT */
+		case 0x00: return input_port_read(machine, "IN0");    /* Player 1 controls + START1 */
+		case 0x01: return input_port_read(machine, "IN1");    /* Player 2 controls + START2 */
+		case 0x02: return input_port_read(machine, "IN2");    /* COINn + SERVICE1 + TILT */
 		case 0x03: return cc_port;
 		}
 	}

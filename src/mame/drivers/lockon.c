@@ -359,10 +359,10 @@ static READ8_HANDLER( adc_r )
 {
 	switch (offset)
 	{
-		case 0:  return readinputportbytag("ADC_BANK");
-		case 1:  return readinputportbytag("ADC_PITCH");
-		case 2:  return readinputportbytag("ADC_MISSILE");
-		case 3:  return readinputportbytag("ADC_HOVER");
+		case 0:  return input_port_read(machine, "ADC_BANK");
+		case 1:  return input_port_read(machine, "ADC_PITCH");
+		case 2:  return input_port_read(machine, "ADC_MISSILE");
+		case 3:  return input_port_read(machine, "ADC_HOVER");
 		default: return 0;
 	}
 }

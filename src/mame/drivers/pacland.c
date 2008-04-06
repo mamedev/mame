@@ -210,8 +210,8 @@ static READ8_HANDLER( pacland_input_r )
 {
 	int shift = 4 * (offset & 1);
 	int port = offset & 2;
-	int r = ( readinputport( port+0 ) << shift ) & 0xf0;
-	r |= ( readinputport( port+1 ) >> (4-shift) ) & 0x0f;
+	int r = ( input_port_read_indexed(machine,  port+0 ) << shift ) & 0xf0;
+	r |= ( input_port_read_indexed(machine,  port+1 ) >> (4-shift) ) & 0x0f;
 	return r;
 }
 

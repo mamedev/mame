@@ -86,7 +86,7 @@
 
 static INTERRUPT_GEN( redalert_vblank_interrupt )
 {
-	if( readinputport(3) )
+	if( input_port_read_indexed(machine, 3) )
 		/* the service coin as conntected to the CPU's RDY pin as well */
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 

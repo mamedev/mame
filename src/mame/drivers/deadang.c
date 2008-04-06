@@ -53,11 +53,11 @@ extern VIDEO_UPDATE( deadang );
 
 static READ16_HANDLER( ghunter_trackball_low_r )
 {
-	return (readinputport(3) & 0xff) | ((readinputport(4) & 0xff) << 8);
+	return (input_port_read_indexed(machine, 3) & 0xff) | ((input_port_read_indexed(machine, 4) & 0xff) << 8);
 }
 static READ16_HANDLER( ghunter_trackball_high_r )
 {
-	return ((readinputport(3) & 0x0f00) >> 4) | (readinputport(4) & 0x0f00);
+	return ((input_port_read_indexed(machine, 3) & 0x0f00) >> 4) | (input_port_read_indexed(machine, 4) & 0x0f00);
 }
 
 /* Memory Maps */

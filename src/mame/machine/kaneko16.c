@@ -270,7 +270,7 @@ FFFE : probably polled by MCU, needs to be kept alive (cleared by main cpu - IT2
 00207FE0 : may serves for relocating code (written as .l)
 */
 
-static void calc3_mcu_run(void);
+static void calc3_mcu_run(running_machine *machine);
 
 static int calc3_mcu_status, calc3_mcu_command_offset;
 
@@ -284,14 +284,14 @@ void calc3_mcu_init(void)
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
 	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
-	calc3_mcu_run();
+	calc3_mcu_run(machine);
 }
 
 #define CALC3_MCU_COM_W(_n_)				\
 WRITE16_HANDLER( calc3_mcu_com##_n_##_w )	\
 {											\
 	calc3_mcu_status |= (1 << _n_);			\
-	calc3_mcu_run();						\
+	calc3_mcu_run(machine);					\
 }
 
 CALC3_MCU_COM_W(0)
@@ -312,7 +312,7 @@ CALC3_MCU_COM_W(3)
     - Supply code snippets to the 68000
 */
 
-static void calc3_mcu_run(void)
+static void calc3_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command;
 
@@ -343,7 +343,7 @@ static void calc3_mcu_run(void)
 
 			// execute the command:
 
-			kaneko16_mcu_ram[param1 / 2] = ~readinputport(4);	// DSW
+			kaneko16_mcu_ram[param1 / 2] = ~input_port_read_indexed(machine, 4);	// DSW
 			kaneko16_mcu_ram[param2 / 2] = 0xffff;				// ? -1 / anything else
 
 			calc3_mcu_command_offset = param3 / 2;	// where next command will be written?
@@ -542,10 +542,10 @@ probably the MCU model string, so this one should be in internal MCU ROM (anothe
 TODO: look at this one since this remark is only driver-based.
 */
 
-void (*toybox_mcu_run)(void);	/* One of the following */
-void bloodwar_mcu_run(void);
-void bonkadv_mcu_run(void);
-void gtmr_mcu_run(void);
+void (*toybox_mcu_run)(running_machine *machine);	/* One of the following */
+void bloodwar_mcu_run(running_machine *machine);
+void bonkadv_mcu_run(running_machine *machine);
+void gtmr_mcu_run(running_machine *machine);
 
 static UINT16 toybox_mcu_com[4];
 
@@ -564,7 +564,7 @@ WRITE16_HANDLER( toybox_mcu_com##_n_##_w )				\
 	if (toybox_mcu_com[3] != 0xFFFF)	return;			\
 														\
 	memset(toybox_mcu_com, 0, 4 * sizeof( UINT16 ) );	\
-	toybox_mcu_run();									\
+	toybox_mcu_run(machine);							\
 }
 
 TOYBOX_MCU_COM_W(0)
@@ -586,7 +586,7 @@ READ16_HANDLER( toybox_mcu_status_r )
                                 Blood Warrior
 ***************************************************************************/
 
-void bloodwar_mcu_run(void)
+void bloodwar_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
@@ -620,7 +620,7 @@ void bloodwar_mcu_run(void)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = readinputport(4);
+			kaneko16_mcu_ram[mcu_offset] = input_port_read_indexed(machine, 4);
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -700,7 +700,7 @@ void bloodwar_mcu_run(void)
                                 Bonk's Adventure
 ***************************************************************************/
 
-void bonkadv_mcu_run(void)
+void bonkadv_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
@@ -747,7 +747,7 @@ void bonkadv_mcu_run(void)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = readinputport(4);
+			kaneko16_mcu_ram[mcu_offset] = input_port_read_indexed(machine, 4);
 			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
 		}
 		break;
@@ -820,7 +820,7 @@ void bonkadv_mcu_run(void)
     - Read the DSWs
 */
 
-void gtmr_mcu_run(void)
+void gtmr_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command	=	kaneko16_mcu_ram[0x0010/2];
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
@@ -855,7 +855,7 @@ void gtmr_mcu_run(void)
 
 		case 0x03:	// DSW
 		{
-			kaneko16_mcu_ram[mcu_offset] = readinputport(4);
+			kaneko16_mcu_ram[mcu_offset] = input_port_read_indexed(machine, 4);
 		}
 		break;
 

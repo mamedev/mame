@@ -99,8 +99,8 @@ static READ16_HANDLER( leta_r )
 	/* when reading the even ports, do a real analog port update */
 	if (which == 0)
 	{
-		int dx = (INT8)readinputport(2);
-		int dy = (INT8)readinputport(3);
+		int dx = (INT8)input_port_read_indexed(machine, 2);
+		int dy = (INT8)input_port_read_indexed(machine, 3);
 
 		cur[0] = dx + dy;
 		cur[1] = dx - dy;
@@ -140,7 +140,7 @@ static WRITE16_HANDLER( adpcm_w )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int result = readinputport(0);
+	int result = input_port_read_indexed(machine, 0);
 
 	if ((result & 0x0800) && atarigen_get_hblank(machine->primary_screen))
 		result &= ~0x0800;

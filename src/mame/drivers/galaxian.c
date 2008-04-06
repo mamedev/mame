@@ -360,28 +360,28 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 static READ8_HANDLER( konami_porta_0_r )
 {
 //  logerror("%04X:ppi0_porta_r\n", activecpu_get_pc());
-	return readinputportbytag("IN0");
+	return input_port_read(machine, "IN0");
 }
 
 
 static READ8_HANDLER( konami_portb_0_r )
 {
 //  logerror("%04X:ppi0_portb_r\n", activecpu_get_pc());
-	return readinputportbytag("IN1");
+	return input_port_read(machine, "IN1");
 }
 
 
 static READ8_HANDLER( konami_portc_0_r )
 {
 	logerror("%04X:ppi0_portc_r\n", activecpu_get_pc());
-	return readinputportbytag("IN2");
+	return input_port_read(machine, "IN2");
 }
 
 
 static READ8_HANDLER( konami_portc_1_r )
 {
 	logerror("%04X:ppi1_portc_r\n", activecpu_get_pc());
-	return readinputportbytag("IN3");
+	return input_port_read(machine, "IN3");
 }
 
 
@@ -761,7 +761,7 @@ static CUSTOM_INPUT( gmgalax_port_r )
 	const char *portname = param;
 	if (gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
-	return readinputportbytag(portname);
+	return input_port_read(machine, portname);
 }
 
 
@@ -817,7 +817,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 
 static CUSTOM_INPUT( azurian_port_r )
 {
-	return (readinputportbytag("FAKE") >> (FPTR)param) & 1;
+	return (input_port_read(machine, "FAKE") >> (FPTR)param) & 1;
 }
 
 
@@ -831,7 +831,7 @@ static CUSTOM_INPUT( azurian_port_r )
 static CUSTOM_INPUT( kingball_muxbit_r )
 {
 	/* multiplex the service mode switch with a speech DIP switch */
-	return (readinputportbytag("FAKE") >> kingball_speech_dip) & 1;
+	return (input_port_read(machine, "FAKE") >> kingball_speech_dip) & 1;
 }
 
 

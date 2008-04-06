@@ -7038,7 +7038,7 @@ static DRIVER_INIT( ms5plus )
 
 static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 {
-	int harddip3 = readinputportbytag("HARDDIP") & 1;
+	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
 	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(NEOGEO_REGION_MAIN_CPU_BIOS)+0x20000+harddip3*0x20000);
 }
 

@@ -1782,12 +1782,12 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
 
 static READ32_HANDLER( cps3_io1_r )
 {
-	return readinputport(0);
+	return input_port_read_indexed(machine, 0);
 }
 
 static READ32_HANDLER( cps3_io2_r )
 {
-	return readinputport(1);
+	return input_port_read_indexed(machine, 1);
 }
 
 // this seems to be dma active flags, and maybe vblank... not if it is anything else

@@ -248,27 +248,27 @@ static READ16_HANDLER( niyanpai_dipsw_r )
 {
 	UINT8 dipsw_a, dipsw_b;
 
-	dipsw_a = (((readinputport(0) & 0x01) << 7) | ((readinputport(0) & 0x02) << 5) |
-			   ((readinputport(0) & 0x04) << 3) | ((readinputport(0) & 0x08) << 1) |
-			   ((readinputport(0) & 0x10) >> 1) | ((readinputport(0) & 0x20) >> 3) |
-			   ((readinputport(0) & 0x40) >> 5) | ((readinputport(0) & 0x80) >> 7));
+	dipsw_a = (((input_port_read_indexed(machine, 0) & 0x01) << 7) | ((input_port_read_indexed(machine, 0) & 0x02) << 5) |
+			   ((input_port_read_indexed(machine, 0) & 0x04) << 3) | ((input_port_read_indexed(machine, 0) & 0x08) << 1) |
+			   ((input_port_read_indexed(machine, 0) & 0x10) >> 1) | ((input_port_read_indexed(machine, 0) & 0x20) >> 3) |
+			   ((input_port_read_indexed(machine, 0) & 0x40) >> 5) | ((input_port_read_indexed(machine, 0) & 0x80) >> 7));
 
-	dipsw_b = (((readinputport(1) & 0x01) << 7) | ((readinputport(1) & 0x02) << 5) |
-			   ((readinputport(1) & 0x04) << 3) | ((readinputport(1) & 0x08) << 1) |
-			   ((readinputport(1) & 0x10) >> 1) | ((readinputport(1) & 0x20) >> 3) |
-			   ((readinputport(1) & 0x40) >> 5) | ((readinputport(1) & 0x80) >> 7));
+	dipsw_b = (((input_port_read_indexed(machine, 1) & 0x01) << 7) | ((input_port_read_indexed(machine, 1) & 0x02) << 5) |
+			   ((input_port_read_indexed(machine, 1) & 0x04) << 3) | ((input_port_read_indexed(machine, 1) & 0x08) << 1) |
+			   ((input_port_read_indexed(machine, 1) & 0x10) >> 1) | ((input_port_read_indexed(machine, 1) & 0x20) >> 3) |
+			   ((input_port_read_indexed(machine, 1) & 0x40) >> 5) | ((input_port_read_indexed(machine, 1) & 0x80) >> 7));
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
 
 static READ16_HANDLER( niyanpai_inputport_0_r )
 {
-	return ((readinputport(3) << 8) | (readinputport(4) << 0));
+	return ((input_port_read_indexed(machine, 3) << 8) | (input_port_read_indexed(machine, 4) << 0));
 }
 
 static READ16_HANDLER( niyanpai_inputport_1_r )
 {
-	return ((readinputport(2) << 8) | 0xff);
+	return ((input_port_read_indexed(machine, 2) << 8) | 0xff);
 }
 
 static READ16_HANDLER( musobana_inputport_0_r )
@@ -277,12 +277,12 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 	switch ((musobana_inputport ^ 0xff00) >> 8)
 	{
-		case 0x01:	portdata = ((readinputport(3) << 8) | (readinputport(8))); break;
-		case 0x02:	portdata = ((readinputport(4) << 8) | (readinputport(9))); break;
-		case 0x04:	portdata = ((readinputport(5) << 8) | (readinputport(10))); break;
-		case 0x08:	portdata = ((readinputport(6) << 8) | (readinputport(11))); break;
-		case 0x10:	portdata = ((readinputport(7) << 8) | (readinputport(12))); break;
-		default:	portdata = (((readinputport(3) << 8) | (readinputport(8)))) & (((readinputport(4) << 8) | (readinputport(9)))) & (((readinputport(5) << 8) | (readinputport(10)))) & (((readinputport(6) << 8) | (readinputport(11)))) & (((readinputport(7) << 8) | (readinputport(12)))); break;
+		case 0x01:	portdata = ((input_port_read_indexed(machine, 3) << 8) | (input_port_read_indexed(machine, 8))); break;
+		case 0x02:	portdata = ((input_port_read_indexed(machine, 4) << 8) | (input_port_read_indexed(machine, 9))); break;
+		case 0x04:	portdata = ((input_port_read_indexed(machine, 5) << 8) | (input_port_read_indexed(machine, 10))); break;
+		case 0x08:	portdata = ((input_port_read_indexed(machine, 6) << 8) | (input_port_read_indexed(machine, 11))); break;
+		case 0x10:	portdata = ((input_port_read_indexed(machine, 7) << 8) | (input_port_read_indexed(machine, 12))); break;
+		default:	portdata = (((input_port_read_indexed(machine, 3) << 8) | (input_port_read_indexed(machine, 8)))) & (((input_port_read_indexed(machine, 4) << 8) | (input_port_read_indexed(machine, 9)))) & (((input_port_read_indexed(machine, 5) << 8) | (input_port_read_indexed(machine, 10)))) & (((input_port_read_indexed(machine, 6) << 8) | (input_port_read_indexed(machine, 11)))) & (((input_port_read_indexed(machine, 7) << 8) | (input_port_read_indexed(machine, 12)))); break;
 	}
 
 	return (portdata);
@@ -298,7 +298,7 @@ static READ16_HANDLER( musobana_inputport_1_r )
 	if (tmp68301_parallel_interface_r(machine, 0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
 	else musobana_outcoin_flag = 1;
 
-	return (((readinputport(2) & 0xdf) | ((musobana_outcoin_flag & 0x01) << 5)) << 8);
+	return (((input_port_read_indexed(machine, 2) & 0xdf) | ((musobana_outcoin_flag & 0x01) << 5)) << 8);
 }
 
 static WRITE16_HANDLER ( musobana_inputport_w )

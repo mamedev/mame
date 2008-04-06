@@ -45,6 +45,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "memconv.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
@@ -106,7 +107,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 
 static UINT8 cd32_cia_0_porta_r(void)
 {
-	return readinputportbytag("CIA0PORTA");
+	return input_port_read(Machine, "CIA0PORTA");
 }
 
 static void cd32_cia_0_porta_w(UINT8 data)
@@ -148,7 +149,7 @@ static void cd32_cia_0_portb_w(UINT8 data)
 
 static READ32_HANDLER( dipswitch_r )
 {
-	return readinputportbytag("DIPSW1");
+	return input_port_read(machine, "DIPSW1");
 }
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )

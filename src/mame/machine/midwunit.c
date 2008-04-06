@@ -188,7 +188,7 @@ READ16_HANDLER( midwunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return readinputport(offset);
+			return input_port_read_indexed(machine, offset);
 
 		case 4:
 			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(machine,0,0);
@@ -211,7 +211,7 @@ READ16_HANDLER( midxunit_io_r )
 		case 1:
 		case 2:
 		case 3:
-			return readinputport(offset);
+			return input_port_read_indexed(machine, offset);
 
 		default:
 			logerror("%08X:Unknown I/O read from %d\n", activecpu_get_pc(), offset);
@@ -223,7 +223,7 @@ READ16_HANDLER( midxunit_io_r )
 
 READ16_HANDLER( midxunit_analog_r )
 {
-	return readinputport(midxunit_analog_port);
+	return input_port_read_indexed(machine, midxunit_analog_port);
 }
 
 

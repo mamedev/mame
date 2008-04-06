@@ -96,7 +96,7 @@ static READ8_HANDLER( key_matrix_r )
 	{
 		case 0x02:
 		{
-			switch(readinputport(1))
+			switch(input_port_read_indexed(machine, 1))
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;
@@ -115,7 +115,7 @@ static READ8_HANDLER( key_matrix_r )
 		}
 		case 0x04:
 		{
-			switch(readinputport(2))
+			switch(input_port_read_indexed(machine, 2))
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;

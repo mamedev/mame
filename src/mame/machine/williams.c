@@ -568,13 +568,13 @@ WRITE8_HANDLER( williams_port_select_w )
 
 READ8_HANDLER( williams_input_port_0_3_r )
 {
-	return readinputport(port_select ? 3 : 0);
+	return input_port_read_indexed(machine, port_select ? 3 : 0);
 }
 
 
 READ8_HANDLER( williams_input_port_1_4_r )
 {
-	return readinputport(port_select ? 4 : 1);
+	return input_port_read_indexed(machine, port_select ? 4 : 1);
 }
 
 
@@ -606,7 +606,7 @@ READ8_HANDLER( williams_input_port_1_4_r )
 READ8_HANDLER( williams_49way_port_0_r )
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[readinputportbytag("49WAYX") >> 4] << 4) | translate49[readinputportbytag("49WAYY") >> 4];
+	return (translate49[input_port_read(machine, "49WAYX") >> 4] << 4) | translate49[input_port_read(machine, "49WAYY") >> 4];
 }
 
 
@@ -615,7 +615,7 @@ READ8_HANDLER( williams_input_port_49way_0_5_r )
 	if (port_select)
 		return williams_49way_port_0_r(machine,0);
 	else
-		return readinputport(5);
+		return input_port_read_indexed(machine, 5);
 }
 
 

@@ -217,8 +217,8 @@ static READ16_HANDLER( konamigt_input_word_r )
     bit 12-15: accel
 */
 
-	int data=readinputport(7);
-	int data2=readinputport(6);
+	int data=input_port_read_indexed(machine, 7);
+	int data2=input_port_read_indexed(machine, 6);
 
 	int ret=0x0000;
 

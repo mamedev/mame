@@ -78,43 +78,43 @@ static READ16_HANDLER( pow_spriteram16_r )
 
 static READ16_HANDLER( control_1_r )
 {
-	return (readinputportbytag("IN0") + (readinputportbytag("IN1") << 8));
+	return (input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 }
 
 static READ16_HANDLER( control_2_r )
 {
-	return readinputportbytag("IN2");
+	return input_port_read(machine, "IN2");
 }
 
 static READ16_HANDLER( dip_1_r )
 {
-	return readinputportbytag("DSW1") << 8;
+	return input_port_read(machine, "DSW1") << 8;
 }
 
 static READ16_HANDLER( dip_2_r )
 {
-	return readinputportbytag("DSW2") << 8;
+	return input_port_read(machine, "DSW2") << 8;
 }
 
 static READ16_HANDLER( rotary_1_r )
 {
-	return (( ~(1 << readinputportbytag("ROT1")) )<<8)&0xff00;
+	return (( ~(1 << input_port_read(machine, "ROT1")) )<<8)&0xff00;
 }
 
 static READ16_HANDLER( rotary_2_r )
 {
-	return (( ~(1 << readinputportbytag("ROT2")) )<<8)&0xff00;
+	return (( ~(1 << input_port_read(machine, "ROT2")) )<<8)&0xff00;
 }
 
 static READ16_HANDLER( rotary_lsb_r )
 {
-	return ((( ~(1 << readinputportbytag("ROT2"))  ) <<4)&0xf000)
-		 + ((( ~(1 << readinputportbytag("ROT1"))  )    )&0x0f00);
+	return ((( ~(1 << input_port_read(machine, "ROT2"))  ) <<4)&0xf000)
+		 + ((( ~(1 << input_port_read(machine, "ROT1"))  )    )&0x0f00);
 }
 
 static READ16_HANDLER( protcontrols_r )
 {
-	return readinputport(offset) ^ invert_controls;
+	return input_port_read_indexed(machine, offset) ^ invert_controls;
 }
 
 static WRITE16_HANDLER( protection_w )

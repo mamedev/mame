@@ -125,9 +125,9 @@ VIDEO_UPDATE( wizdfire );
 VIDEO_UPDATE( nitrobal );
 WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
-static READ16_HANDLER( rohga_dip3_r ) { return readinputport(3); }
-static READ16_HANDLER( nitrobal_control_r ) { return readinputport(3); }
-static READ16_HANDLER( schmeisr_control_r ) { return readinputport(1); }
+static READ16_HANDLER( rohga_dip3_r ) { return input_port_read_indexed(machine, 3); }
+static READ16_HANDLER( nitrobal_control_r ) { return input_port_read_indexed(machine, 3); }
+static READ16_HANDLER( schmeisr_control_r ) { return input_port_read_indexed(machine, 1); }
 
 /**********************************************************************************/
 

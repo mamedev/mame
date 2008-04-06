@@ -135,7 +135,7 @@ static UINT8 ninjakun_io_a002_ctrl;
 
 static READ8_HANDLER( ninjakun_io_A002_r )
 {
-	return ninjakun_io_a002_ctrl | readinputport(2); /* vblank */
+	return ninjakun_io_a002_ctrl | input_port_read_indexed(machine, 2); /* vblank */
 }
 
 static WRITE8_HANDLER( ninjakun_cpu1_io_A002_w )

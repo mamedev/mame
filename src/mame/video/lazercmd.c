@@ -57,7 +57,7 @@ VIDEO_UPDATE( lazercmd )
 {
 	int i,x,y;
 
-	int video_inverted = readinputport(2) & 0x20;
+	int video_inverted = input_port_read_indexed(screen->machine, 2) & 0x20;
 
 	/* The first row of characters are invisible */
 	for (i = 0; i < (VERT_RES - 1) * HORZ_RES; i++)

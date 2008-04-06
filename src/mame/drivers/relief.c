@@ -104,7 +104,7 @@ static MACHINE_RESET( relief )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int result = readinputport(2);
+	int result = input_port_read_indexed(machine, 2);
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
 	if (!(result & 0x0080) || atarigen_get_hblank(machine->primary_screen)) result ^= 0x0001;
 	return result;

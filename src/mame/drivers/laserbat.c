@@ -91,7 +91,7 @@ static WRITE8_HANDLER( laserbat_input_mux_w )
 static READ8_HANDLER( laserbat_input_r )
 {
 	// Add coktail inputs
-	return readinputport(0 + laserbat_input_mux);
+	return input_port_read_indexed(machine, 0 + laserbat_input_mux);
 }
 
 static WRITE8_HANDLER( laserbat_cnteff_w )

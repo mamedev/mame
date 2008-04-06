@@ -222,17 +222,17 @@ static READ8_HANDLER( stooges_IN4_r )
 	{
 		case 0:
 		default:
-			joy = ((readinputportbytag("IN4") >> 0) & 0x0f);	/* joystick 1 */
+			joy = ((input_port_read(machine, "IN4") >> 0) & 0x0f);	/* joystick 1 */
 			break;
 		case 1:
-			joy = ((readinputportbytag("IN5") >> 0) & 0x0f);	/* joystick 2 */
+			joy = ((input_port_read(machine, "IN5") >> 0) & 0x0f);	/* joystick 2 */
 			break;
 		case 2:
-			joy = ((readinputportbytag("IN5") >> 4) & 0x0f);	/* joystick 3 */
+			joy = ((input_port_read(machine, "IN5") >> 4) & 0x0f);	/* joystick 3 */
 			break;
 	}
 
-	return joy | (readinputportbytag("IN4") & 0xf0);
+	return joy | (input_port_read(machine, "IN4") & 0xf0);
 }
 
 static WRITE8_HANDLER( reactor_output_w )

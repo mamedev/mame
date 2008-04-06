@@ -141,7 +141,7 @@ VIDEO_UPDATE( vicdual_color )
 
 VIDEO_UPDATE( vicdual_bw_or_color )
 {
-	if (vicdual_is_cabinet_color())
+	if (vicdual_is_cabinet_color(screen->machine))
 		VIDEO_UPDATE_CALL(vicdual_color);
 	else
 		VIDEO_UPDATE_CALL(vicdual_bw);

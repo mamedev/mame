@@ -67,12 +67,12 @@ static READ16_HANDLER( mahjong_panel_r )
 {
 	switch(sengokumj_mux_data)
 	{
-		case 1:    return readinputport(2);
-		case 2:    return readinputport(3);
-		case 4:    return readinputport(4);
-		case 8:    return readinputport(5);
-		case 0x10: return readinputport(6);
-		case 0x20: return readinputport(7);
+		case 1:    return input_port_read_indexed(machine, 2);
+		case 2:    return input_port_read_indexed(machine, 3);
+		case 4:    return input_port_read_indexed(machine, 4);
+		case 8:    return input_port_read_indexed(machine, 5);
+		case 0x10: return input_port_read_indexed(machine, 6);
+		case 0x20: return input_port_read_indexed(machine, 7);
 	}
 
 	return 0xffff;

@@ -193,7 +193,7 @@ GFXDECODE_END
 #ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( progolf_interrupt )
 {
-	//if (readinputport(2) & 0xc0)
+	//if (input_port_read_indexed(machine, 2) & 0xc0)
 		cpunum_set_input_line(machine, 0, /*0*/INPUT_LINE_NMI, /*HOLD_LINE*/PULSE_LINE);
 }
 #endif

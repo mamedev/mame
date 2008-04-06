@@ -81,7 +81,7 @@ static MACHINE_RESET( atarigx2 )
 
 static READ32_HANDLER( special_port2_r )
 {
-	int temp = readinputport(2);
+	int temp = input_port_read_indexed(machine, 2);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -91,7 +91,7 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	int temp = readinputport(3);
+	int temp = input_port_read_indexed(machine, 3);
 	return (temp << 16) | temp;
 }
 
@@ -111,9 +111,9 @@ static READ32_HANDLER( a2d_data_r )
 	switch (offset)
 	{
 		case 0:
-			return (readinputport(5) << 24) | (readinputport(6) << 8);
+			return (input_port_read_indexed(machine, 5) << 24) | (input_port_read_indexed(machine, 6) << 8);
 		case 1:
-			return (readinputport(7) << 24) | (readinputport(8) << 8);
+			return (input_port_read_indexed(machine, 7) << 24) | (input_port_read_indexed(machine, 8) << 8);
 	}
 
 	return 0;
@@ -1169,7 +1169,7 @@ static READ32_HANDLER( atarigx2_protection_r )
 
 static READ32_HANDLER( inputs_01_r )
 {
-	return (readinputport(0) << 16) | readinputport(1);
+	return (input_port_read_indexed(machine, 0) << 16) | input_port_read_indexed(machine, 1);
 }
 
 

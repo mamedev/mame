@@ -332,7 +332,7 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 
 	sprintf(tag, "IN%s-%d", (const char *)param, controller_select & 0x01);
 
-	return readinputportbytag(tag);
+	return input_port_read(machine, tag);
 }
 
 
@@ -351,10 +351,10 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = readinputportbytag("MAHJONG1"); break;
-	case 0x12: ret = readinputportbytag("MAHJONG2"); break;
-	case 0x1b: ret = readinputportbytag("MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = readinputportbytag("MAHJONG4"); break;
+	case 0x09: ret = input_port_read(machine, "MAHJONG1"); break;
+	case 0x12: ret = input_port_read(machine, "MAHJONG2"); break;
+	case 0x1b: ret = input_port_read(machine, "MAHJONG3"); break; /* player 1 normal inputs? */
+	case 0x24: ret = input_port_read(machine, "MAHJONG4"); break;
 	}
 
 	return ret;

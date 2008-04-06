@@ -146,7 +146,7 @@ static const UINT16 mHoreKidProtData[] =
 
 static READ16_HANDLER( horekid_IN2_r )
 {
-	int data = readinputportbytag("IN1");
+	int data = input_port_read(machine, "IN1");
 
 	if (!(data & 0x40))		// FAKE button 3 for "Debug Mode"
 	{

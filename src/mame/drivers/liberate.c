@@ -70,11 +70,11 @@ static READ8_HANDLER( deco16_io_r )
 	const UINT8 *ROM = memory_region(REGION_CPU1);
 
 	if (deco16_bank) {
-		if (offset==0) return readinputportbytag("IN1"); /* Player 1 controls */
-		if (offset==1) return readinputportbytag("IN2"); /* Player 2 controls */
-		if (offset==2) return readinputportbytag("IN3"); /* Vblank, coins */
-		if (offset==3) return readinputportbytag("DSW1"); /* Dip 1 */
-		if (offset==4) return readinputportbytag("DSW2"); /* Dip 2 */
+		if (offset==0) return input_port_read(machine, "IN1"); /* Player 1 controls */
+		if (offset==1) return input_port_read(machine, "IN2"); /* Player 2 controls */
+		if (offset==2) return input_port_read(machine, "IN3"); /* Vblank, coins */
+		if (offset==3) return input_port_read(machine, "DSW1"); /* Dip 1 */
+		if (offset==4) return input_port_read(machine, "DSW2"); /* Dip 2 */
 
 		logerror("%04x:  Read input %d\n",activecpu_get_pc(),offset);
 		return 0xff;
@@ -498,7 +498,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( deco16_interrupt )
 {
 	static int latch=0;
-	int p=~readinputport(3);
+	int p=~input_port_read_indexed(machine, 3);
 	if (p&0x43 && !latch) {
 		cpunum_set_input_line(machine, 0,DECO16_IRQ_LINE,ASSERT_LINE);
 		latch=1;

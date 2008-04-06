@@ -604,18 +604,18 @@ WRITE8_HANDLER( superpac_flipscreen_w );
 ***************************************************************************/
 
 static int mux;
-static READ8_HANDLER( in0_l )	{ return readinputportbytag("IN0"); }		// P1 joystick
-static READ8_HANDLER( in0_h )	{ return readinputportbytag("IN0") >> 4; }	// P2 joystick
-static READ8_HANDLER( in1_l )	{ return readinputportbytag("IN1"); }		// fire and start buttons
-static READ8_HANDLER( in1_h )	{ return readinputportbytag("IN1") >> 4; }	// coins
-static READ8_HANDLER( in2 )		{ return readinputportbytag("DSW0"); }		// test, cocktail, optional buttons
-static READ8_HANDLER( dipA_l )	{ return readinputportbytag("DSW1"); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return readinputportbytag("DSW1") >> 4; }	// dips A
-static READ8_HANDLER( dipB_mux )	{ return readinputportbytag("DSW2") >> (4*mux); }	// dips B
+static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0"); }		// P1 joystick
+static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }	// P2 joystick
+static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "IN1"); }		// fire and start buttons
+static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "IN1") >> 4; }	// coins
+static READ8_HANDLER( in2 )		{ return input_port_read(machine, "DSW0"); }		// test, cocktail, optional buttons
+static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSW1"); }		// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSW1") >> 4; }	// dips A
+static READ8_HANDLER( dipB_mux )	{ return input_port_read(machine, "DSW2") >> (4*mux); }	// dips B
 static READ8_HANDLER( dipB_muxi )	// dips B
 {
 	// bits are interleaved in Phozon
-	return BITSWAP8(readinputport(4),6,4,2,0,7,5,3,1) >> (4*mux);
+	return BITSWAP8(input_port_read_indexed(machine, 4),6,4,2,0,7,5,3,1) >> (4*mux);
 }
 static WRITE8_HANDLER( out_mux )	{ mux = data & 1; }
 static WRITE8_HANDLER( out_lamps )

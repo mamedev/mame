@@ -269,10 +269,10 @@ static INTERRUPT_GEN( bang_interrupt )
 	}
 }
 
-static READ16_HANDLER(p1_gun_x) {return (readinputport(3)*320/0x100)+1;}
-static READ16_HANDLER(p1_gun_y) {return (readinputport(5)*240/0x100)-4;}
-static READ16_HANDLER(p2_gun_x) {return (readinputport(4)*320/0x100)+1;}
-static READ16_HANDLER(p2_gun_y) {return (readinputport(6)*240/0x100)-4;}
+static READ16_HANDLER(p1_gun_x) {return (input_port_read_indexed(machine, 3)*320/0x100)+1;}
+static READ16_HANDLER(p1_gun_y) {return (input_port_read_indexed(machine, 5)*240/0x100)-4;}
+static READ16_HANDLER(p2_gun_x) {return (input_port_read_indexed(machine, 4)*320/0x100)+1;}
+static READ16_HANDLER(p2_gun_y) {return (input_port_read_indexed(machine, 6)*240/0x100)-4;}
 
 static ADDRESS_MAP_START( bang_readmem, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) /* ROM */

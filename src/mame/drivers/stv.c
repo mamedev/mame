@@ -507,7 +507,7 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
-static UINT8 stv_SMPC_r8 (int offset)
+static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 {
 	int return_data;
 
@@ -518,13 +518,13 @@ static UINT8 stv_SMPC_r8 (int offset)
 		return_data = 0x20 ^ 0xff;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = readinputport(0);
+		return_data = input_port_read_indexed(machine, 0);
 
 	if (offset == 0x77)//PDR2 read
 		return_data=  (0xfe | EEPROM_read_bit());
 
 //  if (offset == 0x33) //country code
-//      return_data = readinputport(7);
+//      return_data = input_port_read_indexed(machine, 7);
 
 	if (activecpu_get_pc()==0x060020E6) return_data = 0x10;//???
 
@@ -683,7 +683,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 				smpc_ram[0x31]=0x00;  //?
 
-				//smpc_ram[0x33]=readinputport(7);
+				//smpc_ram[0x33]=input_port_read_indexed(machine, 7);
 
 				smpc_ram[0x35]=0x00;
 				smpc_ram[0x37]=0x00;
@@ -769,10 +769,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(offset+byte) << 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(offset+byte) << 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(offset+byte) << 8;  }
-	if (ACCESSING_BITS_0_7)	{ byte = 3; readdata = stv_SMPC_r8(offset+byte) << 0;  }
+	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(machine, offset+byte) << 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(machine, offset+byte) << 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(machine, offset+byte) << 8;  }
+	if (ACCESSING_BITS_0_7)	{ byte = 3; readdata = stv_SMPC_r8(machine, offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -952,21 +952,21 @@ static READ32_HANDLER ( stv_io_r32 )
 		case 0:
 		switch(port_sel)
 		{
-			case 0x77: return 0xff000000|(readinputport(2) << 16) |0x0000ff00|(readinputport(3));
+			case 0x77: return 0xff000000|(input_port_read_indexed(machine, 2) << 16) |0x0000ff00|(input_port_read_indexed(machine, 3));
 			case 0x67:
 			{
 				switch(mux_data)
 				{
 					/*Mahjong panel interface,bit wise(ACTIVE LOW)*/
-					case 0xfe:	return 0xff000000 | (readinputport(7)  << 16) | 0x0000ff00 | (readinputport(12));
-					case 0xfd:  return 0xff000000 | (readinputport(8)  << 16) | 0x0000ff00 | (readinputport(13));
-					case 0xfb:	return 0xff000000 | (readinputport(9)  << 16) | 0x0000ff00 | (readinputport(14));
-					case 0xf7:	return 0xff000000 | (readinputport(10) << 16) | 0x0000ff00 | (readinputport(15));
-					case 0xef:  return 0xff000000 | (readinputport(11) << 16) | 0x0000ff00 | (readinputport(16));
+					case 0xfe:	return 0xff000000 | (input_port_read_indexed(machine, 7)  << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 12));
+					case 0xfd:  return 0xff000000 | (input_port_read_indexed(machine, 8)  << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 13));
+					case 0xfb:	return 0xff000000 | (input_port_read_indexed(machine, 9)  << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 14));
+					case 0xf7:	return 0xff000000 | (input_port_read_indexed(machine, 10) << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 15));
+					case 0xef:  return 0xff000000 | (input_port_read_indexed(machine, 11) << 16) | 0x0000ff00 | (input_port_read_indexed(machine, 16));
 					/*Joystick panel*/
 					default:
 					//popmessage("%02x MUX DATA",mux_data);
-				    return (readinputport(2) << 16) | (readinputport(3));
+				    return (input_port_read_indexed(machine, 2) << 16) | (input_port_read_indexed(machine, 3));
 				}
 			}
 			case 0x47:
@@ -976,12 +976,12 @@ static READ32_HANDLER ( stv_io_r32 )
 					int data1 = 0, data2 = 0;
 
 					/* Critter Crusher */
-					data1 = readinputport(7);
+					data1 = input_port_read_indexed(machine, 7);
 					data1 = BITSWAP8(data1, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data1 |= (readinputport(2) & 1) ? 0x0 : 0x4;
-					data2 = readinputport(8);
+					data1 |= (input_port_read_indexed(machine, 2) & 1) ? 0x0 : 0x4;
+					data2 = input_port_read_indexed(machine, 8);
 					data2 = BITSWAP8(data2, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data2 |= (readinputport(2) & 1) ? 0x0 : 0x4;
+					data2 |= (input_port_read_indexed(machine, 2) & 1) ? 0x0 : 0x4;
 
 					return 0xff000000 | data1 << 16 | 0x0000ff00 | data2;
 				}
@@ -989,21 +989,21 @@ static READ32_HANDLER ( stv_io_r32 )
 			//default:
 			default:
 			//popmessage("%02x PORT SEL",port_sel);
-			return (readinputport(2) << 16) | (readinputport(3));
+			return (input_port_read_indexed(machine, 2) << 16) | (input_port_read_indexed(machine, 3));
 		}
 		case 1:
 		if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
 		{
-			return ((readinputport(4) << 16) & ((readinputport(2) & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
+			return ((input_port_read_indexed(machine, 4) << 16) & ((input_port_read_indexed(machine, 2) & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		}
 		else
 		{
-			return (readinputport(4) << 16) | (ioga[1]);
+			return (input_port_read_indexed(machine, 4) << 16) | (ioga[1]);
 		}
 		case 2:
 		switch(port_sel)
 		{
-			case 0x77:	return (readinputport(5) << 16) | (readinputport(6));
+			case 0x77:	return (input_port_read_indexed(machine, 5) << 16) | (input_port_read_indexed(machine, 6));
 			case 0x67:	return 0xffffffff;/**/
 			case 0x20:  return 0xffff0000 | (ioga[2] & 0xffff);
 			case 0x10:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
@@ -2521,7 +2521,7 @@ DRIVER_INIT ( stv )
     smpc_ram[0x2d] = DectoBCD(systime.local_time.minute);
     smpc_ram[0x2f] = DectoBCD(systime.local_time.second);
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
-//  smpc_ram[0x33] = readinputport(7);
+//  smpc_ram[0x33] = input_port_read_indexed(machine, 7);
  	smpc_ram[0x5f] = 0x10;
 
  	#ifdef MAME_DEBUG

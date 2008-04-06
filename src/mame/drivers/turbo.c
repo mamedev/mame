@@ -410,7 +410,7 @@ static READ8_HANDLER( turbo_8279_r )
 		{
 			/* read sensor RAM */
 			case 0x40:
-				result = ~readinputport(1);  /* DSW 1 - inverted! */
+				result = ~input_port_read_indexed(machine, 1);  /* DSW 1 - inverted! */
 				break;
 
 			/* read display RAM */
@@ -545,7 +545,7 @@ static READ8_HANDLER( turbo_collision_r )
 {
 	turbo_state *state = machine->driver_data;
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	return readinputport(3) | (state->turbo_collision & 15);
+	return input_port_read_indexed(machine, 3) | (state->turbo_collision & 15);
 }
 
 
@@ -560,14 +560,14 @@ static WRITE8_HANDLER( turbo_collision_clear_w )
 static READ8_HANDLER( turbo_analog_r )
 {
 	turbo_state *state = machine->driver_data;
-	return readinputport(4) - state->turbo_last_analog;
+	return input_port_read_indexed(machine, 4) - state->turbo_last_analog;
 }
 
 
 static WRITE8_HANDLER( turbo_analog_reset_w )
 {
 	turbo_state *state = machine->driver_data;
-	state->turbo_last_analog = readinputport(4);
+	state->turbo_last_analog = input_port_read_indexed(machine, 4);
 }
 
 
@@ -606,8 +606,8 @@ static READ8_HANDLER( buckrog_cpu2_command_r )
 
 static READ8_HANDLER( buckrog_port_2_r )
 {
-	int inp1 = readinputport(2);
-	int inp2 = readinputport(3);
+	int inp1 = input_port_read_indexed(machine, 2);
+	int inp2 = input_port_read_indexed(machine, 3);
 
 	return  (((inp2 >> 6) & 1) << 7) |
 			(((inp2 >> 4) & 1) << 6) |
@@ -622,8 +622,8 @@ static READ8_HANDLER( buckrog_port_2_r )
 
 static READ8_HANDLER( buckrog_port_3_r )
 {
-	int inp1 = readinputport(2);
-	int inp2 = readinputport(3);
+	int inp1 = input_port_read_indexed(machine, 2);
+	int inp2 = input_port_read_indexed(machine, 3);
 
 	return  (((inp2 >> 7) & 1) << 7) |
 			(((inp2 >> 5) & 1) << 6) |

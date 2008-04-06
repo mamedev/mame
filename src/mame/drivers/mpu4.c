@@ -705,7 +705,7 @@ static const pia6821_interface pia_ic4_intf =
 static READ8_HANDLER( pia_ic5_porta_r )
 {
 	LOG(("%04x IC5 PIA Read of Port A (AUX1)\n",activecpu_get_previouspc()));
-	return readinputportbytag("AUX1");
+	return input_port_read(machine, "AUX1");
 }
 
 
@@ -716,7 +716,7 @@ static READ8_HANDLER( pia_ic5_portb_r )
 	coin_lockout_w(1, (pia_get_output_b(2) & 0x02) );
 	coin_lockout_w(2, (pia_get_output_b(2) & 0x04) );
 	coin_lockout_w(3, (pia_get_output_b(2) & 0x08) );
-	return readinputportbytag("AUX2");
+	return input_port_read(machine, "AUX2");
 }
 
 
@@ -956,8 +956,8 @@ static READ8_HANDLER( pia_ic8_porta_r )
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia_set_input_cb1(2, (readinputportbytag("AUX2") & 0x80));
-	return readinputport(input_read);
+	pia_set_input_cb1(2, (input_port_read(machine, "AUX2") & 0x80));
+	return input_port_read_indexed(machine, input_read);
 }
 
 

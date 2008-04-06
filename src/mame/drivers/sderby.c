@@ -93,7 +93,7 @@ static READ16_HANDLER ( sderby_input_r )
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 0x02 >> 1:
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
@@ -108,11 +108,11 @@ static READ16_HANDLER( roulette_input_r )
 	switch (offset)
 	{
 	case 0x00 >>1:
-		return readinputport(0);
+		return input_port_read_indexed(machine, 0);
 	case 0x02 >>1:
-		return readinputport(1);
+		return input_port_read_indexed(machine, 1);
 	case 0x04 >>1:
-		return readinputport(2);
+		return input_port_read_indexed(machine, 2);
 	}
 	return 0xffff;
 

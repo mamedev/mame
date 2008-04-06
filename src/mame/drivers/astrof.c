@@ -123,7 +123,7 @@ static INPUT_CHANGED( service_coin_inserted )
 
 static CUSTOM_INPUT( astrof_p1_controls_r )
 {
-	return readinputportbytag("P1");
+	return input_port_read(machine, "P1");
 }
 
 
@@ -134,10 +134,10 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 	/* on an upright cabinets, a single set of controls
        is connected to both sets of pins on the edge
        connector */
-	if (readinputportbytag("CAB"))
-		ret = readinputportbytag("P2");
+	if (input_port_read(machine, "CAB"))
+		ret = input_port_read(machine, "P2");
 	else
-		ret = readinputportbytag("P1");
+		ret = input_port_read(machine, "P1");
 
 	return ret;
 }
@@ -223,7 +223,7 @@ static WRITE8_HANDLER( tomahawk_videoram_w )
 
 static WRITE8_HANDLER( video_control_1_w )
 {
-	flipscreen = ((data >> 0) & 0x01) & readinputportbytag("FLIP");
+	flipscreen = ((data >> 0) & 0x01) & input_port_read(machine, "FLIP");
 
 	/* this ties to the CLR pin of the shift registers */
 	screen_off = (data & 0x02) ? TRUE : FALSE;

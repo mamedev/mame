@@ -86,7 +86,7 @@ WRITE16_HANDLER( stlforce_bg_videoram_w );
 
 static READ16_HANDLER( stlforce_input_port_1_r )
 {
-	return (readinputport(1) & ~0x40) | (EEPROM_read_bit() << 6);
+	return (input_port_read_indexed(machine, 1) & ~0x40) | (EEPROM_read_bit() << 6);
 }
 
 static WRITE16_HANDLER( eeprom_w )

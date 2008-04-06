@@ -70,7 +70,7 @@ static READ8_HANDLER( scrambls_input_port_2_r )
 
 	UINT8 res;
 
-	res = readinputport(2);
+	res = input_port_read_indexed(machine, 2);
 
 /*logerror("%04x: read IN2\n",activecpu_get_pc());*/
 
@@ -99,12 +99,12 @@ static READ8_HANDLER( scrambls_input_port_2_r )
 
 static READ8_HANDLER( ckongs_input_port_1_r )
 {
-	return (readinputport(1) & 0xfc) | ((readinputport(2) & 0x06) >> 1);
+	return (input_port_read_indexed(machine, 1) & 0xfc) | ((input_port_read_indexed(machine, 2) & 0x06) >> 1);
 }
 
 static READ8_HANDLER( ckongs_input_port_2_r )
 {
-	return (readinputport(2) & 0xf9) | ((readinputport(1) & 0x03) << 1);
+	return (input_port_read_indexed(machine, 2) & 0xf9) | ((input_port_read_indexed(machine, 1) & 0x03) << 1);
 }
 
 
@@ -118,24 +118,24 @@ static READ8_HANDLER( moonwar_input_port_0_r )
 	UINT8 sign;
 	UINT8 delta;
 
-	delta = (moonwar_port_select ? readinputport(3) : readinputport(4));
+	delta = (moonwar_port_select ? input_port_read_indexed(machine, 3) : input_port_read_indexed(machine, 4));
 
 	sign = (delta & 0x80) >> 3;
 	delta &= 0x0f;
 
-	return ((readinputport(0) & 0xe0) | delta | sign );
+	return ((input_port_read_indexed(machine, 0) & 0xe0) | delta | sign );
 }
 
 
 /* the coinage DIPs are spread accross two input ports */
 static READ8_HANDLER( stratgyx_input_port_2_r )
 {
-	return (readinputport(2) & ~0x06) | ((readinputport(4) << 1) & 0x06);
+	return (input_port_read_indexed(machine, 2) & ~0x06) | ((input_port_read_indexed(machine, 4) << 1) & 0x06);
 }
 
 static READ8_HANDLER( stratgyx_input_port_3_r )
 {
-	return (readinputport(3) & ~0x03) | ((readinputport(4) >> 2) & 0x03);
+	return (input_port_read_indexed(machine, 3) & ~0x03) | ((input_port_read_indexed(machine, 4) >> 2) & 0x03);
 }
 
 
@@ -151,7 +151,7 @@ static READ8_HANDLER( darkplnt_input_port_1_r )
 							  0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
 	UINT8 val;
 
-	val = readinputport(1);
+	val = input_port_read_indexed(machine, 1);
 
 	return ((val & 0x03) | (remap[val >> 2] << 2));
 }

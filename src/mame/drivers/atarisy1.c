@@ -214,15 +214,15 @@ static READ16_HANDLER( joystick_r )
 
 	/* digital joystick type */
 	if (joystick_type == 1)
-		newval = (readinputport(0) & (0x80 >> offset)) ? 0xf0 : 0x00;
+		newval = (input_port_read_indexed(machine, 0) & (0x80 >> offset)) ? 0xf0 : 0x00;
 
 	/* Hall-effect analog joystick */
 	else if (joystick_type == 2)
-		newval = readinputport(offset & 1);
+		newval = input_port_read_indexed(machine, offset & 1);
 
 	/* Road Blasters gas pedal */
 	else if (joystick_type == 3)
-		newval = readinputport(1);
+		newval = input_port_read_indexed(machine, 1);
 
 	/* the A4 bit enables/disables joystick IRQs */
 	joystick_int_enable = ((offset >> 3) & 1) ^ 1;
@@ -268,13 +268,13 @@ static READ16_HANDLER( trakball_r )
 
 			if (player == 0)
 			{
-				posx = (INT8)readinputport(0);
-				posy = (INT8)readinputport(1);
+				posx = (INT8)input_port_read_indexed(machine, 0);
+				posy = (INT8)input_port_read_indexed(machine, 1);
 			}
 			else
 			{
-				posx = (INT8)readinputport(2);
-				posy = (INT8)readinputport(3);
+				posx = (INT8)input_port_read_indexed(machine, 2);
+				posy = (INT8)input_port_read_indexed(machine, 3);
 			}
 
 			cur[player][0] = posx + posy;
@@ -286,7 +286,7 @@ static READ16_HANDLER( trakball_r )
 
 	/* Road Blasters steering wheel */
 	else if (trackball_type == 2)
-		result = readinputport(0);
+		result = input_port_read_indexed(machine, 0);
 
 	return result;
 }
@@ -301,7 +301,7 @@ static READ16_HANDLER( trakball_r )
 
 static READ16_HANDLER( port4_r )
 {
-	int temp = readinputport(4);
+	int temp = input_port_read_indexed(machine, 4);
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -316,11 +316,11 @@ static READ16_HANDLER( port4_r )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	int temp = readinputport(5);
+	int temp = input_port_read_indexed(machine, 5);
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x08;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x10;
-	if (!(readinputport(4) & 0x0040)) temp ^= 0x80;
+	if (!(input_port_read_indexed(machine, 4) & 0x0040)) temp ^= 0x80;
 
 	return temp;
 }

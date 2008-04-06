@@ -265,57 +265,57 @@ static WRITE16_HANDLER( alpha_microcontroller_w )
 
 static READ16_HANDLER( kyros_dip_r )
 {
-	return readinputportbytag("IN1")<<8;
+	return input_port_read(machine, "IN1")<<8;
 }
 
 static READ16_HANDLER( control_1_r )
 {
 	if (invert_controls)
-		return ~(readinputportbytag("IN0") + (readinputportbytag("IN1") << 8));
+		return ~(input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 
-	return (readinputport(0) + (readinputport(1) << 8));
+	return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 }
 
 static READ16_HANDLER( control_2_r )
 {
 	if (invert_controls)
-		return ~(readinputportbytag("IN3") + ((~(1 << (readinputportbytag("IN5") * 12 / 256))) << 8));
+		return ~(input_port_read(machine, "IN3") + ((~(1 << (input_port_read(machine, "IN5") * 12 / 256))) << 8));
 
-	return readinputportbytag("IN3") + /* Low byte of CN1 */
-		((~(1 << (readinputportbytag("IN5") * 12 / 256))) << 8);
+	return input_port_read(machine, "IN3") + /* Low byte of CN1 */
+		((~(1 << (input_port_read(machine, "IN5") * 12 / 256))) << 8);
 }
 
 static READ16_HANDLER( control_2_V_r )
 {
-	return readinputportbytag("IN3");
+	return input_port_read(machine, "IN3");
 }
 
 static READ16_HANDLER( control_3_r )
 {
 	if (invert_controls)
-		return ~((( ~(1 << (readinputportbytag("IN6") * 12 / 256)) )<<8)&0xff00);
+		return ~((( ~(1 << (input_port_read(machine, "IN6") * 12 / 256)) )<<8)&0xff00);
 
-	return (( ~(1 << (readinputportbytag("IN6") * 12 / 256)) )<<8)&0xff00;
+	return (( ~(1 << (input_port_read(machine, "IN6") * 12 / 256)) )<<8)&0xff00;
 }
 
 /* High 4 bits of CN1 & CN2 */
 static READ16_HANDLER( control_4_r )
 {
 	if (invert_controls)
-		return ~(((( ~(1 << (readinputportbytag("IN6") * 12 / 256))  ) <<4)&0xf000)
-		 + ((( ~(1 << (readinputportbytag("IN5") * 12 / 256))  )    )&0x0f00));
+		return ~(((( ~(1 << (input_port_read(machine, "IN6") * 12 / 256))  ) <<4)&0xf000)
+		 + ((( ~(1 << (input_port_read(machine, "IN5") * 12 / 256))  )    )&0x0f00));
 
-	return ((( ~(1 << (readinputportbytag("IN6") * 12 / 256))  ) <<4)&0xf000)
-		 + ((( ~(1 << (readinputportbytag("IN5") * 12 / 256))  )    )&0x0f00);
+	return ((( ~(1 << (input_port_read(machine, "IN6") * 12 / 256))  ) <<4)&0xf000)
+		 + ((( ~(1 << (input_port_read(machine, "IN5") * 12 / 256))  )    )&0x0f00);
 }
 
 static READ16_HANDLER( jongbou_inputs_r )
 {
-	UINT8 inp1 = readinputportbytag("IN3");
-	UINT8 inp2 = readinputportbytag("IN4");
+	UINT8 inp1 = input_port_read(machine, "IN3");
+	UINT8 inp2 = input_port_read(machine, "IN4");
 	inp1 = ((inp1 & 0x01) << 3) + ((inp1 & 0x02) << 1) + ((inp1 & 0x04) >> 1) + ((inp1 & 0x08) >> 3);
 	inp2 = ((inp2 & 0x01) << 3) + ((inp2 & 0x02) << 1) + ((inp2 & 0x04) >> 1) + ((inp2 & 0x08) >> 3);
-	return readinputportbytag("IN0") | inp1 | inp2 << 4;
+	return input_port_read(machine, "IN0") | inp1 | inp2 << 4;
 }
 
 /******************************************************************************/
@@ -381,14 +381,14 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
 			trigstate++;
-			if ((readinputportbytag("IN2")&0x3)==3) latch=0;
-			if ((readinputportbytag("IN2")&0x1)==0 && !latch)
+			if ((input_port_read(machine, "IN2")&0x3)==3) latch=0;
+			if ((input_port_read(machine, "IN2")&0x1)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(coin_id&0xff);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
 				latch=1;
 
-				coinvalue = (~readinputportbytag("IN1")>>1) & 7;
+				coinvalue = (~input_port_read(machine, "IN1")>>1) & 7;
 				deposits1++;
 				if (deposits1 == coinage1[coinvalue][0])
 				{
@@ -398,13 +398,13 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 				else
 					credits = 0;
 			}
-			else if ((readinputportbytag("IN2")&0x2)==0 && !latch)
+			else if ((input_port_read(machine, "IN2")&0x2)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(coin_id>>8);	// coinB
 				shared_ram[0x22] = (source&0xff00)|0x0;
 				latch=1;
 
-				coinvalue = (~readinputportbytag("IN1")>>1) & 7;
+				coinvalue = (~input_port_read(machine, "IN1")>>1) & 7;
 				deposits2++;
 				if (deposits2 == coinage2[coinvalue][0])
 				{
@@ -460,7 +460,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			shared_ram[0] = (source&0xff00)|readinputportbytag("IN4");
+			shared_ram[0] = (source&0xff00)|input_port_read(machine, "IN4");
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -468,8 +468,8 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((readinputportbytag("IN2")&0x3)==3) latch=0;
-			if ((readinputportbytag("IN2")&0x1)==0 && !latch)
+			if ((input_port_read(machine, "IN2")&0x3)==3) latch=0;
+			if ((input_port_read(machine, "IN2")&0x1)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(coin_id&0xff);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
@@ -478,9 +478,9 @@ static READ16_HANDLER( alpha_II_trigger_r )
 				if ((coin_id&0xff) == 0x22)
 				{
 					if(!strcmp(machine->gamedrv->name, "btlfildb"))
-						coinvalue = (readinputportbytag("IN4")>>0) & 7;
+						coinvalue = (input_port_read(machine, "IN4")>>0) & 7;
 					else
-						coinvalue = (~readinputportbytag("IN4")>>0) & 7;
+						coinvalue = (~input_port_read(machine, "IN4")>>0) & 7;
 
 					deposits1++;
 					if (deposits1 == coinage1[coinvalue][0])
@@ -492,7 +492,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 						credits = 0;
 				}
 			}
-			else if ((readinputportbytag("IN2")&0x2)==0 && !latch)
+			else if ((input_port_read(machine, "IN2")&0x2)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(coin_id>>8);	// coinB
 				shared_ram[0x22] = (source&0xff00)|0x0;
@@ -501,9 +501,9 @@ static READ16_HANDLER( alpha_II_trigger_r )
 				if ((coin_id>>8) == 0x22)
 				{
 					if(!strcmp(machine->gamedrv->name, "btlfildb"))
-						coinvalue = (readinputportbytag("IN4")>>0) & 7;
+						coinvalue = (input_port_read(machine, "IN4")>>0) & 7;
 					else
-						coinvalue = (~readinputportbytag("IN4")>>0) & 7;
+						coinvalue = (~input_port_read(machine, "IN4")>>0) & 7;
 
 					deposits2++;
 					if (deposits2 == coinage2[coinvalue][0])
@@ -556,14 +556,14 @@ static READ16_HANDLER( alpha_V_trigger_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 1 */
-			shared_ram[0] = (source&0xff00)|readinputportbytag("IN4");
+			shared_ram[0] = (source&0xff00)|input_port_read(machine, "IN4");
 			return 0;
 		case 0x22: /* Coin value */
 			shared_ram[0x22] = (source&0xff00)|(credits&0x00ff);
 			return 0;
 		case 0x29: /* Query microcontroller for coin insert */
-			if ((readinputportbytag("IN2")&0x3)==3) latch=0;
-			if ((readinputportbytag("IN2")&0x1)==0 && !latch)
+			if ((input_port_read(machine, "IN2")&0x3)==3) latch=0;
+			if ((input_port_read(machine, "IN2")&0x1)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(coin_id&0xff);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
@@ -571,7 +571,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					coinvalue = (~readinputportbytag("IN4")>>1) & 7;
+					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
 					deposits1++;
 					if (deposits1 == coinage1[coinvalue][0])
 					{
@@ -582,7 +582,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 						credits = 0;
 				}
 			}
-			else if ((readinputportbytag("IN2")&0x2)==0 && !latch)
+			else if ((input_port_read(machine, "IN2")&0x2)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(coin_id>>8);	// coinB
 				shared_ram[0x22] = (source&0xff00)|0x0;
@@ -590,7 +590,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					coinvalue = (~readinputportbytag("IN4")>>1) & 7;
+					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
 					deposits2++;
 					if (deposits2 == coinage2[coinvalue][0])
 					{
@@ -616,11 +616,11 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			break;
 
 		case 0x1f00: /* Dipswitch 1 */
-			shared_ram[0x1f00] = (source&0xff00)|readinputportbytag("IN4");
+			shared_ram[0x1f00] = (source&0xff00)|input_port_read(machine, "IN4");
 			return 0;
 		case 0x1f29: /* Query microcontroller for coin insert */
-			if ((readinputportbytag("IN2")&0x3)==3) latch=0;
-			if ((readinputportbytag("IN2")&0x1)==0 && !latch)
+			if ((input_port_read(machine, "IN2")&0x3)==3) latch=0;
+			if ((input_port_read(machine, "IN2")&0x1)==0 && !latch)
 			{
 				shared_ram[0x1f29] = (source&0xff00)|(coin_id&0xff);	// coinA
 				shared_ram[0x1f22] = (source&0xff00)|0x0;
@@ -628,7 +628,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id&0xff) == 0x22)
 				{
-					coinvalue = (~readinputportbytag("IN4")>>1) & 7;
+					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
 					deposits1++;
 					if (deposits1 == coinage1[coinvalue][0])
 					{
@@ -639,7 +639,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 						credits = 0;
 				}
 			}
-			else if ((readinputportbytag("IN2")&0x2)==0 && !latch)
+			else if ((input_port_read(machine, "IN2")&0x2)==0 && !latch)
 			{
 				shared_ram[0x1f29] = (source&0xff00)|(coin_id>>8);	// coinB
 				shared_ram[0x1f22] = (source&0xff00)|0x0;
@@ -647,7 +647,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 
 				if ((coin_id>>8) == 0x22)
 				{
-					coinvalue = (~readinputportbytag("IN4")>>1) & 7;
+					coinvalue = (~input_port_read(machine, "IN4")>>1) & 7;
 					deposits2++;
 					if (deposits2 == coinage2[coinvalue][0])
 					{
@@ -668,7 +668,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
                the microcontroller supplies it (it does for all the other games,
                but usually to 0x0 in RAM) when 0x21 is read (code at 0x009332) */
 			source=shared_ram[0x0163];
-			shared_ram[0x0163] = (source&0x00ff)|(readinputportbytag("IN4")<<8);
+			shared_ram[0x0163] = (source&0x00ff)|(input_port_read(machine, "IN4")<<8);
 
 			return 0;
 		case 0x1ffe:  /* Custom ID check */

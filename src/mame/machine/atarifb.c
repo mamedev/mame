@@ -161,14 +161,14 @@ READ8_HANDLER( atarifb_in0_r )
 		int new_x,new_y;
 
 		/* Read player 1 trackball */
-		new_x = readinputport(3);
+		new_x = input_port_read_indexed(machine, 3);
 		if (new_x != counter_x)
 		{
 			sign_x_1 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = readinputport(2);
+		new_y = input_port_read_indexed(machine, 2);
 		if (new_y != counter_y)
 		{
 			sign_y_1 = (new_y - counter_y) & 0x80;
@@ -192,14 +192,14 @@ READ8_HANDLER( atarifb_in2_r )
 		int new_x,new_y;
 
 		/* Read player 2 trackball */
-		new_x = readinputport(5);
+		new_x = input_port_read_indexed(machine, 5);
 		if (new_x != counter_x)
 		{
 			sign_x_2 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = readinputport(4);
+		new_y = input_port_read_indexed(machine, 4);
 		if (new_y != counter_y)
 		{
 			sign_y_2 = (new_y - counter_y) & 0x80;
@@ -234,14 +234,14 @@ READ8_HANDLER( atarifb4_in0_r )
 		int new_x,new_y;
 
 		/* Read player 1 trackball */
-		new_x = readinputport(4);
+		new_x = input_port_read_indexed(machine, 4);
 		if (new_x != counter_x)
 		{
 			sign_x_1 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = readinputport(3);
+		new_y = input_port_read_indexed(machine, 3);
 		if (new_y != counter_y)
 		{
 			sign_y_1 = (new_y - counter_y) & 0x80;
@@ -257,14 +257,14 @@ READ8_HANDLER( atarifb4_in0_r )
 		int new_x,new_y;
 
 		/* Read player 2 trackball */
-		new_x = readinputport(6);
+		new_x = input_port_read_indexed(machine, 6);
 		if (new_x != counter_x)
 		{
 			sign_x_2 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = readinputport(5);
+		new_y = input_port_read_indexed(machine, 5);
 		if (new_y != counter_y)
 		{
 			sign_y_2 = (new_y - counter_y) & 0x80;
@@ -291,14 +291,14 @@ READ8_HANDLER( atarifb4_in2_r )
 		int new_x,new_y;
 
 		/* Read player 3 trackball */
-		new_x = readinputport(8);
+		new_x = input_port_read_indexed(machine, 8);
 		if (new_x != counter_x)
 		{
 			sign_x_3 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = readinputport(7);
+		new_y = input_port_read_indexed(machine, 7);
 		if (new_y != counter_y)
 		{
 			sign_y_3 = (new_y - counter_y) & 0x80;
@@ -314,14 +314,14 @@ READ8_HANDLER( atarifb4_in2_r )
 		int new_x,new_y;
 
 		/* Read player 4 trackball */
-		new_x = readinputport(10);
+		new_x = input_port_read_indexed(machine, 10);
 		if (new_x != counter_x)
 		{
 			sign_x_4 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = readinputport(9);
+		new_y = input_port_read_indexed(machine, 9);
 		if (new_y != counter_y)
 		{
 			sign_y_4 = (new_y - counter_y) & 0x80;

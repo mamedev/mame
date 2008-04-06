@@ -78,14 +78,14 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 		break;
 
 		case 1:
-			if (~readinputport(4) & 0x03)
+			if (~input_port_read_indexed(machine, 4) & 0x03)
 				{ if (!coin) { coin = 1; cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE); } }
 			else
 				coin = 0;
 		break;
 
 		case 2:
-			if (readinputport(5)) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+			if (input_port_read_indexed(machine, 5)) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -104,11 +104,11 @@ static WRITE8_HANDLER( bwp3_nmimask_w ) { bwp3_nmimask = data & 0x80; }
 
 static READ8_HANDLER( bwp1_io_r )
 {
-	if (offset == 0) return(readinputport(0));
-	if (offset == 1) return(readinputport(1));
-	if (offset == 2) return(readinputport(2));
-	if (offset == 3) return(readinputport(3));
-	if (offset == 4) return(readinputport(4));
+	if (offset == 0) return(input_port_read_indexed(machine, 0));
+	if (offset == 1) return(input_port_read_indexed(machine, 1));
+	if (offset == 2) return(input_port_read_indexed(machine, 2));
+	if (offset == 3) return(input_port_read_indexed(machine, 3));
+	if (offset == 4) return(input_port_read_indexed(machine, 4));
 
 	return((bwp123_membase[0])[0x1b00 + offset]);
 }

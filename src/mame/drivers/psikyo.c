@@ -101,9 +101,9 @@ static MACHINE_RESET( psikyo )
 
 ***************************************************************************/
 
-static int psikyo_readcoinport(int has_mcu)
+static int psikyo_readcoinport(running_machine *machine, int has_mcu)
 {
-	int ret = readinputport(1) & ~0x84;
+	int ret = input_port_read_indexed(machine, 1) & ~0x84;
 
 	if (has_mcu)
 	{
@@ -142,9 +142,9 @@ static READ32_HANDLER( sngkace_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return (readinputport(0) << 16) | 0xffff;
-		case 0x1:	return (readinputport(2) << 16) | readinputport(4);
-		case 0x2:	return (psikyo_readcoinport(0) << 16) | readinputport(3);
+		case 0x0:	return (input_port_read_indexed(machine, 0) << 16) | 0xffff;
+		case 0x1:	return (input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 4);
+		case 0x2:	return (psikyo_readcoinport(machine, 0) << 16) | input_port_read_indexed(machine, 3);
 		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 					return 0;
 	}
@@ -154,8 +154,8 @@ static READ32_HANDLER( gunbird_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return (readinputport(0) << 16) | psikyo_readcoinport(0);
-		case 0x1:	return (readinputport(2) << 16) | readinputport(3);
+		case 0x0:	return (input_port_read_indexed(machine, 0) << 16) | psikyo_readcoinport(machine, 0);
+		case 0x1:	return (input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 3);
 		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 					return 0;
 	}
@@ -310,8 +310,8 @@ static READ32_HANDLER( s1945_input_r )
 {
 	switch(offset)
 	{
-		case 0x0:	return (readinputport(0) << 16) | psikyo_readcoinport(1);
-		case 0x1:	return (((readinputport(2) << 16) | readinputport(3)) & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
+		case 0x0:	return (input_port_read_indexed(machine, 0) << 16) | psikyo_readcoinport(machine, 1);
+		case 0x1:	return (((input_port_read_indexed(machine, 2) << 16) | input_port_read_indexed(machine, 3)) & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
 		case 0x2:	return s1945_mcu_r(machine, offset-1, mem_mask);
 		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
 					return 0;

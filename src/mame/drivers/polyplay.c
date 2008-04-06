@@ -148,7 +148,7 @@ static INTERRUPT_GEN( coin_interrupt )
 {
 	static int last = 0;
 
-	if (readinputport(0) & 0x80)
+	if (input_port_read_indexed(machine, 0) & 0x80)
 		last = 0;
 	else
 	{

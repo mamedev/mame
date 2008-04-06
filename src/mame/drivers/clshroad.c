@@ -56,10 +56,10 @@ static WRITE8_HANDLER( clshroad_sharedram_w )	{	clshroad_sharedram[offset] = dat
 
 static READ8_HANDLER( clshroad_input_r )
 {
-	return	((~readinputportbytag("IN0") & (1 << offset)) ? 1 : 0) |
-			((~readinputportbytag("IN1") & (1 << offset)) ? 2 : 0) |
-			((~readinputportbytag("DSW1") & (1 << offset)) ? 4 : 0) |
-			((~readinputportbytag("DSW2") & (1 << offset)) ? 8 : 0) ;
+	return	((~input_port_read(machine, "IN0") & (1 << offset)) ? 1 : 0) |
+			((~input_port_read(machine, "IN1") & (1 << offset)) ? 2 : 0) |
+			((~input_port_read(machine, "DSW1") & (1 << offset)) ? 4 : 0) |
+			((~input_port_read(machine, "DSW2") & (1 << offset)) ? 8 : 0) ;
 }
 
 

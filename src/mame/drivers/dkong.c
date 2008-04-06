@@ -593,19 +593,19 @@ static READ8_HANDLER( dkong_in2_r )
 #if DEBUG_DISC_SOUND
 	static UINT8 ui_snd = 0;
 	static UINT8 lst = 0;
-	if  (!lst && (readinputportbytag("TST") & 0x01))
+	if  (!lst && (input_port_read(machine, "TST") & 0x01))
 	{
 		ui_snd = (ui_snd + 1) % 10;
 		popmessage("Sound %d", ui_snd);
 	}
-	lst = readinputportbytag("TST") & 0x01;
+	lst = input_port_read(machine, "TST") & 0x01;
 	if (ui_snd<8)
-		dkongjr_snd_w1(ui_snd, (readinputportbytag("TST") & 0x02)>>1);
+		dkongjr_snd_w1(ui_snd, (input_port_read(machine, "TST") & 0x02)>>1);
 	else
-		dkongjr_snd_w2(ui_snd-8, (readinputportbytag("TST") & 0x02)>>1);
+		dkongjr_snd_w2(ui_snd-8, (input_port_read(machine, "TST") & 0x02)>>1);
 #endif
 
-	r = (readinputportbytag("IN2") & 0xBF) | (dkong_audio_status_r(machine,0) << 6);
+	r = (input_port_read(machine, "IN2") & 0xBF) | (dkong_audio_status_r(machine,0) << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coint */

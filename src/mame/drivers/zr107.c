@@ -171,20 +171,20 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= readinputport(0) << 24;
+			r |= input_port_read_indexed(machine, 0) << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= readinputport(1) << 16;
+			r |= input_port_read_indexed(machine, 1) << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
 			int adc_bit = adc083x_do_read(0);
-			r |= ((readinputport(2) & 0x7f) | (adc_bit << 7)) << 8;
+			r |= ((input_port_read_indexed(machine, 2) & 0x7f) | (adc_bit << 7)) << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= readinputport(3) << 0;
+			r |= input_port_read_indexed(machine, 3) << 0;
 		}
 	}
 	else if (offset == 1)
@@ -249,11 +249,11 @@ static double adc0838_callback(int input)
 	switch (input)
 	{
 		case ADC083X_CH0:
-			return (double)(5 * readinputport(4)) / 255.0;
+			return (double)(5 * input_port_read_indexed(Machine, 4)) / 255.0;
 		case ADC083X_CH1:
-			return (double)(5 * readinputport(5)) / 255.0;
+			return (double)(5 * input_port_read_indexed(Machine, 5)) / 255.0;
 		case ADC083X_CH2:
-			return (double)(5 * readinputport(6)) / 255.0;
+			return (double)(5 * input_port_read_indexed(Machine, 6)) / 255.0;
 		case ADC083X_CH3:
 			return 0;
 		case ADC083X_COM:

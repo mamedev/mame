@@ -835,18 +835,18 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 
 READ8_HANDLER( namcos2_input_port_0_r )
 {
-	int data=readinputport(0);
+	int data=input_port_read_indexed(machine, 0);
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_10_r )
 {
-	int data=readinputport(10);
+	int data=input_port_read_indexed(machine, 10);
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_12_r )
 {
-	int data=readinputport(12);
+	int data=input_port_read_indexed(machine, 12);
 	return data;
 }

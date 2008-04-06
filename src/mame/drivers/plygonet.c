@@ -107,7 +107,7 @@ static READ32_HANDLER( polygonet_eeprom_r )
 	}
 	else
 	{
-		return (readinputport(0)<<24);
+		return (input_port_read_indexed(machine, 0)<<24);
 	}
 
 	/* FIXME: code will never execute */

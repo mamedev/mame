@@ -75,7 +75,7 @@ static READ8_HANDLER( s2636_portA_r )
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
 	// do based on the game code.
-	switch(readinputport(1))
+	switch(input_port_read_indexed(machine, 1))
 	{
 		case 0:  // Normal play
 			return 0xf0;

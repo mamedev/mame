@@ -332,13 +332,13 @@ static READ16_HANDLER( superman_dsw_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return  readinputportbytag("DSWA") & 0x0f;
+			return  input_port_read(machine, "DSWA") & 0x0f;
 		case 0x01:
-			return (readinputportbytag("DSWA") & 0xf0) >> 4;
+			return (input_port_read(machine, "DSWA") & 0xf0) >> 4;
 		case 0x02:
-			return  readinputportbytag("DSWB") & 0x0f;
+			return  input_port_read(machine, "DSWB") & 0x0f;
 		case 0x03:
-			return (readinputportbytag("DSWB") & 0xf0) >> 4;
+			return (input_port_read(machine, "DSWB") & 0xf0) >> 4;
 		default:
 			logerror("taitox unknown dsw read offset: %04x\n", offset);
 			return 0x00;
@@ -350,11 +350,11 @@ static READ16_HANDLER( daisenpu_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return readinputportbytag("IN0");    /* Player 1 controls + START1 */
+			return input_port_read(machine, "IN0");    /* Player 1 controls + START1 */
 		case 0x01:
-			return readinputportbytag("IN1");    /* Player 2 controls + START2 */
+			return input_port_read(machine, "IN1");    /* Player 2 controls + START2 */
 		case 0x02:
-			return readinputportbytag("IN2");    /* COINn + SERVICE1 + TILT */
+			return input_port_read(machine, "IN2");    /* COINn + SERVICE1 + TILT */
 
 		default:
 			logerror("taitox unknown input read offset: %04x\n", offset);

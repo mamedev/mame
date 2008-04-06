@@ -58,7 +58,7 @@ static READ8_HANDLER( jamma_if_read_dsw )
 {
 	UINT8 dsw_val;
 
-	dsw_val = readinputportbytag( "DSW" );
+	dsw_val = input_port_read(machine,  "DSW" );
 
 	if ( BIT( offset, 7 ) == 0 )
 	{
@@ -100,11 +100,11 @@ static UINT8 jamma_if_read_joystick( void )
 {
 	if ( jamma_if_control_latch & 0x10 )
 	{
-		return readinputportbytag( "IN" );
+		return input_port_read(Machine,  "IN" );
 	}
 	else
 	{
-		return readinputportbytag( "IN" ) | 0x08;
+		return input_port_read(Machine,  "IN" ) | 0x08;
 	}
 }
 

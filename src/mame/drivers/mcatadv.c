@@ -156,7 +156,7 @@ UINT16* mcatadv_vidregs;
 
 static READ16_HANDLER( mcatadv_dsw_r )
 {
-	return readinputport(2+offset) << 8;
+	return input_port_read_indexed(machine, 2+offset) << 8;
 }
 
 static WRITE16_HANDLER( mcat_soundlatch_w )

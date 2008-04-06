@@ -204,7 +204,7 @@ static INTERRUPT_GEN( cosmica_interrupt )
 
     if (pixel_clock == 0)
     {
-		if (readinputport(3) & 1)	/* Left Coin */
+		if (input_port_read_indexed(machine, 3) & 1)	/* Left Coin */
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
@@ -218,7 +218,7 @@ static INTERRUPT_GEN( cosmicg_interrupt )
     It makes sense and works fine, but I cannot be 100% sure this is correct,
     as I have no Cosmic Guerilla console :-) . */
 
-	if ((readinputport(2) & 1)) /* Coin */
+	if ((input_port_read_indexed(machine, 2) & 1)) /* Coin */
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
 		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 6);
 	else

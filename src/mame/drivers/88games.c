@@ -78,9 +78,9 @@ static READ8_HANDLER( cheat1_r )
 	static int cheat = 0;
 	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
-	res = readinputportbytag("IN1");
+	res = input_port_read(machine, "IN1");
 
-	if ((readinputportbytag("IN0") & 0x08) == 0)
+	if ((input_port_read(machine, "IN0") & 0x08) == 0)
 	{
 		res |= 0x55;
 		res &= bits[cheat];
@@ -96,9 +96,9 @@ static READ8_HANDLER( cheat2_r )
 	static int cheat = 0;
 	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
-	res = readinputportbytag("IN2");
+	res = input_port_read(machine, "IN2");
 
-	if ((readinputportbytag("IN0") & 0x08) == 0)
+	if ((input_port_read(machine, "IN0") & 0x08) == 0)
 	{
 		res |= 0x55;
 		res &= bits[cheat];

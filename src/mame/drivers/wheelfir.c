@@ -59,12 +59,12 @@ static READ16_HANDLER( wheelfir_rand1 )
 
 
 
-	return readinputport(0)^toggle_bit;// mame_rand(Machine);
+	return input_port_read_indexed(machine, 0)^toggle_bit;// mame_rand(Machine);
 }
 
 static READ16_HANDLER( wheelfir_rand2 )
 {
-	return readinputport(1);// mame_rand(Machine);
+	return input_port_read_indexed(machine, 1);// mame_rand(Machine);
 }
 
 

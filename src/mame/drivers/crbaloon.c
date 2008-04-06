@@ -75,7 +75,7 @@ static CUSTOM_INPUT( pc3092_r )
 
 	/* enable coin & start input? Wild guess!!! */
 	if (pc3092_data[1] & 0x02)
-		ret = readinputportbytag("PC3092");
+		ret = input_port_read(machine, "PC3092");
 	else
 		ret = 0x00;
 
@@ -145,7 +145,7 @@ static READ8_HANDLER( pc3259_r )
 
 	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", safe_activecpu_get_pc(), reg, ret);
 
-	return ret | (readinputportbytag("DSW1") & 0xf0);
+	return ret | (input_port_read(machine, "DSW1") & 0xf0);
 }
 
 

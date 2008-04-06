@@ -169,8 +169,8 @@ static MACHINE_RESET( firetrk )
 
 static READ8_HANDLER( firetrk_dip_r )
 {
-	UINT8 val0 = readinputportbytag("DIP_0");
-	UINT8 val1 = readinputportbytag("DIP_1");
+	UINT8 val0 = input_port_read(machine, "DIP_0");
+	UINT8 val1 = input_port_read(machine, "DIP_1");
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -181,8 +181,8 @@ static READ8_HANDLER( firetrk_dip_r )
 
 static READ8_HANDLER( montecar_dip_r )
 {
-	UINT8 val0 = readinputportbytag("DIP_0");
-	UINT8 val1 = readinputportbytag("DIP_1");
+	UINT8 val0 = input_port_read(machine, "DIP_0");
+	UINT8 val1 = input_port_read(machine, "DIP_1");
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -244,7 +244,7 @@ static READ8_HANDLER( firetrk_input_r )
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 new_dial = readinputportbytag_safe((i ? "STEER_2" : "STEER_1"), 0);
+		UINT32 new_dial = input_port_read_safe(machine, (i ? "STEER_2" : "STEER_1"), 0);
 		INT32 delta = new_dial - dial[i];
 
 		if (delta != 0)
@@ -256,9 +256,9 @@ static READ8_HANDLER( firetrk_input_r )
 		}
 	}
 
-	return ((readinputportbytag_safe("BIT_0", 0) & (1 << offset)) ? 0x01 : 0) |
-		   ((readinputportbytag_safe("BIT_6", 0) & (1 << offset)) ? 0x40 : 0) |
-		   ((readinputportbytag_safe("BIT_7", 0) & (1 << offset)) ? 0x80 : 0);
+	return ((input_port_read_safe(machine, "BIT_0", 0) & (1 << offset)) ? 0x01 : 0) |
+		   ((input_port_read_safe(machine, "BIT_6", 0) & (1 << offset)) ? 0x40 : 0) |
+		   ((input_port_read_safe(machine, "BIT_7", 0) & (1 << offset)) ? 0x80 : 0);
 }
 
 

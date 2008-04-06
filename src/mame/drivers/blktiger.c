@@ -54,7 +54,7 @@ static WRITE8_HANDLER( blktiger_bankswitch_w )
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )
 {
-	if (readinputportbytag("COIN_LOCKOUT") & 0x01)
+	if (input_port_read(machine, "COIN_LOCKOUT") & 0x01)
 	{
 		coin_lockout_w(0,~data & 0x01);
 		coin_lockout_w(1,~data & 0x02);

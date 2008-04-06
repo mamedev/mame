@@ -302,7 +302,7 @@ static INTERRUPT_GEN( metlclsh_interrupt2 )
 	if (cpu_getiloops() == 0)
 		return;
 	/* generate NMI on coin insertion */
-	if ((~readinputport(2) & 0xc0) || (~readinputport(3) & 0x40))
+	if ((~input_port_read_indexed(machine, 2) & 0xc0) || (~input_port_read_indexed(machine, 3) & 0x40))
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 

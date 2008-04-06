@@ -84,7 +84,7 @@ static WRITE16_HANDLER( main_sound_w )
 
 static READ16_HANDLER( special_port_4_r )
 {
-	int result = readinputport(4) & ~0x81;
+	int result = input_port_read_indexed(machine, 4) & ~0x81;
 
 	if (sound_to_main_ready)
 		result |= 0x01;

@@ -147,10 +147,10 @@ static READ8_HANDLER( geebee_in_r )
 	int res;
 
 	offset &= 3;
-	res = readinputport(offset);
+	res = input_port_read_indexed(machine, offset);
 	if (offset == 3)
 	{
-		res = readinputport(3 + (flip_screen_get() & 1));	// read player 2 input in cocktail mode
+		res = input_port_read_indexed(machine, 3 + (flip_screen_get() & 1));	// read player 2 input in cocktail mode
 		if (handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -218,13 +218,13 @@ static WRITE8_HANDLER( geebee_out7_w )
 /* Read Switch Inputs */
 static READ8_HANDLER( warpwarp_sw_r )
 {
-	return (readinputport(0) >> (offset & 7)) & 1;
+	return (input_port_read_indexed(machine, 0) >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
 static READ8_HANDLER( warpwarp_dsw1_r )
 {
-	return (readinputport(1) >> (offset & 7)) & 1;
+	return (input_port_read_indexed(machine, 1) >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
@@ -232,7 +232,7 @@ static READ8_HANDLER( warpwarp_vol_r )
 {
 	int res;
 
-	res = readinputport(2 + (flip_screen_get() & 1));
+	res = input_port_read_indexed(machine, 2 + (flip_screen_get() & 1));
 	if (handle_joystick)
 	{
 		if (res & 1) return 0x0f;

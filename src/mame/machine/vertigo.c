@@ -126,7 +126,7 @@ READ16_HANDLER( vertigo_io_convert )
 	if (offset > 2)
 		adc_result = 0;
 	else
-		adc_result = readinputport(offset);
+		adc_result = input_port_read_indexed(machine, offset);
 
 	update_irq_encoder(INPUT_LINE_IRQ2, ASSERT_LINE);
 	return 0;
@@ -143,14 +143,14 @@ READ16_HANDLER( vertigo_io_adc )
 READ16_HANDLER( vertigo_coin_r )
 {
 	update_irq_encoder(INPUT_LINE_IRQ6, CLEAR_LINE);
-	return (readinputportbytag("COIN"));
+	return (input_port_read(machine, "COIN"));
 }
 
 
 INTERRUPT_GEN( vertigo_interrupt )
 {
 	/* Coin inputs cause IRQ6 */
-	if ((readinputportbytag("COIN") & 0x7) < 0x7)
+	if ((input_port_read(machine, "COIN") & 0x7) < 0x7)
 		update_irq_encoder(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
 

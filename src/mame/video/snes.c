@@ -1443,7 +1443,7 @@ static void snes_update_objects(UINT8 screen, UINT16 curline )
              * Stop drawing if exceeded 32 objects and
              * enforcing that limit is enabled */
 			range_over++;
-			if( range_over == 32 ) //&& (readinputport( 16 ) & 0x10) )
+			if( range_over == 32 ) //&& (input_port_read_indexed(machine,  16 ) & 0x10) )
 			{
 				/* Set the flag in STAT77 register */
 				snes_ram[STAT77] |= 0x40;
@@ -1984,7 +1984,7 @@ static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline )
 
 		if( !debug_options.input_count-- )
 		{
-			UINT8 toggles = readinputport( 10 );
+			UINT8 toggles = input_port_read_indexed(machine,  10 );
 			if( toggles & 0x1 )
 				debug_options.bg_disabled[0] = !debug_options.bg_disabled[0];
 			if( toggles & 0x2 )
@@ -2001,7 +2001,7 @@ static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline )
 				debug_options.bg_disabled[5] = !debug_options.bg_disabled[5];
 			if( toggles & 0x80 )
 				debug_options.windows_disabled = !debug_options.windows_disabled;
-			toggles = readinputport( 11 );
+			toggles = input_port_read_indexed(machine,  11 );
 			if( toggles & 0x4 )
 				debug_options.transparency_disabled = !debug_options.transparency_disabled;
 			debug_options.input_count = 5;
@@ -2111,9 +2111,9 @@ static UINT8 snes_dbg_video(bitmap_t *bitmap, UINT16 curline )
 	}
 	/* Just for testing, draw as many tiles as possible */
 	{
-		UINT8 adjust = readinputport( 1 );
-		UINT8 dip = readinputport( 9 );
-		UINT8 inp = readinputport( 11 );
+		UINT8 adjust = input_port_read_indexed(machine,  1 );
+		UINT8 dip = input_port_read_indexed(machine,  9 );
+		UINT8 inp = input_port_read_indexed(machine,  11 );
 		UINT8 dt = 1 << ((dip & 0x3) - 1);
 		UINT8 dm = 1 << (((dip & 0xc) >> 2) - 1);
 		if( dt )

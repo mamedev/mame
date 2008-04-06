@@ -374,7 +374,7 @@ static READ16_HANDLER( metro_soundstatus_r )
 
 static READ16_HANDLER( daitorid_soundstatus_r )
 {
-	return readinputport(0) | (busy_sndcpu ? 0x80 : 0x00);
+	return input_port_read_indexed(machine, 0) | (busy_sndcpu ? 0x80 : 0x00);
 }
 
 static WRITE16_HANDLER( metro_soundstatus_w )
@@ -908,9 +908,9 @@ ADDRESS_MAP_END
 /* Really weird way of mapping 3 DSWs */
 static READ16_HANDLER( balcube_dsw_r )
 {
-	UINT16 dsw1 = readinputport(2) >> 0;
-	UINT16 dsw2 = readinputport(2) >> 8;
-	UINT16 dsw3 = readinputport(3);
+	UINT16 dsw1 = input_port_read_indexed(machine, 2) >> 0;
+	UINT16 dsw2 = input_port_read_indexed(machine, 2) >> 8;
+	UINT16 dsw3 = input_port_read_indexed(machine, 3);
 
 	switch (offset*2)
 	{
@@ -1415,11 +1415,11 @@ static READ16_HANDLER( gakusai_input_r )
 {
 	UINT16 input_sel = (*gakusai_input_sel) ^ 0x3e;
 	// Bit 0 ??
-	if (input_sel & 0x0002)	return readinputport(0);
-	if (input_sel & 0x0004)	return readinputport(1);
-	if (input_sel & 0x0008)	return readinputport(2);
-	if (input_sel & 0x0010)	return readinputport(3);
-	if (input_sel & 0x0020)	return readinputport(4);
+	if (input_sel & 0x0002)	return input_port_read_indexed(machine, 0);
+	if (input_sel & 0x0004)	return input_port_read_indexed(machine, 1);
+	if (input_sel & 0x0008)	return input_port_read_indexed(machine, 2);
+	if (input_sel & 0x0010)	return input_port_read_indexed(machine, 3);
+	if (input_sel & 0x0020)	return input_port_read_indexed(machine, 4);
 	return 0xffff;
 }
 
@@ -2097,7 +2097,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( puzzlet_dsw_r )
 {
-	return readinputport(3);
+	return input_port_read_indexed(machine, 3);
 }
 
 static WRITE16_HANDLER( puzzlet_irq_enable_w )

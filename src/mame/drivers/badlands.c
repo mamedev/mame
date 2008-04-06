@@ -139,7 +139,7 @@ static void scanline_update(const device_config *screen, int scanline)
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		atarigen_6502_irq_ack_r(screen->machine, 0);
-	else if (!(readinputport(0) & 0x40))
+	else if (!(input_port_read_indexed(screen->machine, 0) & 0x40))
 		atarigen_6502_irq_gen(screen->machine, 0);
 }
 
@@ -240,8 +240,8 @@ static READ8_HANDLER( audio_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = readinputport(3);
-			if (!(readinputport(0) & 0x0080)) result ^= 0x90;
+			result = input_port_read_indexed(machine, 3);
+			if (!(input_port_read_indexed(machine, 0) & 0x0080)) result ^= 0x90;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
@@ -633,7 +633,7 @@ static void scanline_update_bootleg(const device_config *screen, int scanline)
 	/* sound IRQ is on 32V */
 //  if (scanline & 32)
 //      atarigen_6502_irq_ack_r(screen->machine, 0);
-//  else if (!(readinputport(0) & 0x40))
+//  else if (!(input_port_read_indexed(machine, 0) & 0x40))
 //      atarigen_6502_irq_gen(screen->machine, 0);
 }
 

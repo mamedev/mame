@@ -503,10 +503,10 @@ static WRITE8_HANDLER( bios_ctrl_w )
 }
 
 
-static READ8_HANDLER( megaplay_r0) { return readinputportbytag("BIOS_IN0") ; }
-static READ8_HANDLER( megaplay_r1) { return readinputportbytag("BIOS_IN1") ; }
-static READ8_HANDLER( megaplay_r2) { return readinputportbytag("BIOS_DSW0") ; }
-static READ8_HANDLER( megaplay_r3) { return readinputportbytag("BIOS_DSW1") ; }
+static READ8_HANDLER( megaplay_r0) { return input_port_read(machine, "BIOS_IN0") ; }
+static READ8_HANDLER( megaplay_r1) { return input_port_read(machine, "BIOS_IN1") ; }
+static READ8_HANDLER( megaplay_r2) { return input_port_read(machine, "BIOS_DSW0") ; }
+static READ8_HANDLER( megaplay_r3) { return input_port_read(machine, "BIOS_DSW1") ; }
 
 static int mt_bank_bank_pos = 0;
 static int mt_bank_partial = 0;

@@ -865,7 +865,7 @@ static READ8_HANDLER( chipset_r )
 		}
 		case 0x22:
 		{
-			val = 0x40 | readinputportbytag("JOYSTICK");
+			val = 0x40 | input_port_read(machine, "JOYSTICK");
 			break;
 		}
 		default:
@@ -1409,7 +1409,7 @@ static WRITE8_HANDLER( latch_w )
 
 				/* Clock is low */
 				if (!(data & 0x08))
-					mux_input = readinputport(input_strobe);
+					mux_input = input_port_read_indexed(machine, input_strobe);
 			}
 			break;
 		}

@@ -133,17 +133,17 @@ static WRITE16_HANDLER( cninja_irq_w )
 	logerror("%08x:  Unmapped IRQ write %d %04x\n",activecpu_get_pc(),offset,data);
 }
 
-static READ16_HANDLER( robocop2_dip3_r ) { return readinputport(3); }
+static READ16_HANDLER( robocop2_dip3_r ) { return input_port_read_indexed(machine, 3); }
 
 static READ16_HANDLER( robocop2_prot_r )
 {
  	switch (offset<<1) {
 		case 0x41a: /* Player 1 & 2 input ports */
-			return readinputport(0);
+			return input_port_read_indexed(machine, 0);
 		case 0x320: /* Coins */
-			return readinputport(1);
+			return input_port_read_indexed(machine, 1);
 		case 0x4e6: /* Dip switches */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 0x504: /* PC: 6b6.  b4, 2c, 36 written before read */
 			logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset);
 			return 0x84;

@@ -274,7 +274,7 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
  *
  *************************************/
 
-static void turbo_prepare_sprites(turbo_state *state, UINT8 y, sprite_info *info)
+static void turbo_prepare_sprites(running_machine *machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
 	const UINT8 *pr1119 = memory_region(REGION_PROMS) + 0x200;
 	int sprnum;
@@ -334,7 +334,7 @@ static void turbo_prepare_sprites(turbo_state *state, UINT8 y, sprite_info *info
                     VR1 = 310 Ohm
                     VR2 = 910 Ohm
             */
-			info->step[level] = sprite_xscale(xscale, 1.0e3 * readinputportbytag("VR1") / 100.0, 1.0e3 * readinputportbytag("VR2") / 100.0, 100e-12);
+			info->step[level] = sprite_xscale(xscale, 1.0e3 * input_port_read(machine, "VR1") / 100.0, 1.0e3 * input_port_read(machine, "VR2") / 100.0, 100e-12);
 		}
 	}
 }
@@ -428,7 +428,7 @@ VIDEO_UPDATE( turbo )
 
 		/* compute the sprite information; we use y-1 since this info was computed during HBLANK */
 		/* on the previous scanline */
-		turbo_prepare_sprites(state, y, &sprinfo);
+		turbo_prepare_sprites(screen->machine, state, y, &sprinfo);
 
 		/* loop over columns */
 		for (x = 0; x <= cliprect->max_x; x += TURBO_X_SCALE)

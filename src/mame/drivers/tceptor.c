@@ -150,22 +150,22 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 
 static READ8_HANDLER( dsw0_r )
 {
-	return fix_input0(readinputport(0), readinputport(1));
+	return fix_input0(input_port_read_indexed(machine, 0), input_port_read_indexed(machine, 1));
 }
 
 static READ8_HANDLER( dsw1_r )
 {
-	return fix_input1(readinputport(0), readinputport(1));
+	return fix_input1(input_port_read_indexed(machine, 0), input_port_read_indexed(machine, 1));
 }
 
 static READ8_HANDLER( input0_r )
 {
-	return fix_input0(readinputport(2), readinputport(3));
+	return fix_input0(input_port_read_indexed(machine, 2), input_port_read_indexed(machine, 3));
 }
 
 static READ8_HANDLER( input1_r )
 {
-	return fix_input1(readinputport(2), readinputport(3));
+	return fix_input1(input_port_read_indexed(machine, 2), input_port_read_indexed(machine, 3));
 }
 
 static READ8_HANDLER( readFF )

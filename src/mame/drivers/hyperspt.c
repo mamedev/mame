@@ -45,7 +45,7 @@ static READ8_HANDLER( konami_IN1_r )
 	static int cheat = 0;
 	static const int bits[] = { 0xee, 0xff, 0xbb, 0xaa };
 
-	res = readinputportbytag("IN1");
+	res = input_port_read(machine, "IN1");
 
 	if ((res & 0x80) == 0)
 	{

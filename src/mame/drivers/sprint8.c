@@ -34,7 +34,7 @@ static TIMER_CALLBACK( input_callback )
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = readinputport(8 + i) >> 4;
+		UINT8 val = input_port_read_indexed(machine, 8 + i) >> 4;
 
 		signed char delta = (val - dial[i]) & 15;
 
@@ -71,7 +71,7 @@ static READ8_HANDLER( sprint8_collision_r )
 
 static READ8_HANDLER( sprint8_input_r )
 {
-	UINT8 val = readinputport(offset);
+	UINT8 val = input_port_read_indexed(machine, offset);
 
 	if (steer_dir[offset])
 	{

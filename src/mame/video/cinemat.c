@@ -243,7 +243,7 @@ VIDEO_UPDATE( cinemat )
 
 VIDEO_UPDATE( spacewar )
 {
-	int sw_option = readinputportbytag("INPUTS");
+	int sw_option = input_port_read(screen->machine, "INPUTS");
 
 	VIDEO_UPDATE_CALL(cinemat);
 

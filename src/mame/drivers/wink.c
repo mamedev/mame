@@ -46,12 +46,12 @@ static WRITE8_HANDLER( wink_coin_counter_w )
 
 static READ8_HANDLER( analog_port_r )
 {
-	return readinputport(0 /*+ 2 * player_mux*/);
+	return input_port_read_indexed(machine, 0 /*+ 2 * player_mux*/);
 }
 
 static READ8_HANDLER( player_inputs_r )
 {
-	return readinputport(1 /*+ 2 * player_mux*/);
+	return input_port_read_indexed(machine, 1 /*+ 2 * player_mux*/);
 }
 
 static WRITE8_HANDLER( sound_irq_w )

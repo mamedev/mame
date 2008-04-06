@@ -257,7 +257,7 @@ static VIDEO_UPDATE( mystston )
 {
 	mystston_state *state = screen->machine->driver_data;
 
-	int flip = (*state->video_control & 0x80) ^ ((readinputportbytag("DSW1") & 0x20) << 2);
+	int flip = (*state->video_control & 0x80) ^ ((input_port_read(screen->machine, "DSW1") & 0x20) << 2);
 
 	set_palette(screen->machine, state);
 

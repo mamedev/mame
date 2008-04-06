@@ -355,11 +355,11 @@ static READ16_HANDLER( tumblepopb_controls_r )
  	switch (offset<<1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (readinputport(0) + (readinputport(1) << 8));
+			return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
 		case 2: /* Dips */
-			return (readinputport(3) + (readinputport(4) << 8));
+			return (input_port_read_indexed(machine, 3) + (input_port_read_indexed(machine, 4) << 8));
 		case 8: /* Credits */
-			return readinputport(2);
+			return input_port_read_indexed(machine, 2);
 		case 10: /* ? */
 		case 12:
         	return 0;
@@ -3360,7 +3360,7 @@ static READ16_HANDLER( bcstory_1a0_read )
 {
 //  mame_printf_debug("bcstory_io %06x\n",activecpu_get_pc());
 	if (activecpu_get_pc()==0x0560) return 0x1a0;
-	else return readinputport(2);
+	else return input_port_read_indexed(machine, 2);
 }
 
 static DRIVER_INIT ( bcstory )

@@ -242,7 +242,7 @@ VIDEO_UPDATE( geebee )
 {
 	/* use an overlay only in upright mode */
 	if (geebee_handleoverlay)
-		output_set_value("overlay", (readinputport(2) & 0x01) == 0);
+		output_set_value("overlay", (input_port_read_indexed(screen->machine, 2) & 0x01) == 0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

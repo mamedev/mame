@@ -60,25 +60,25 @@
 
 static READ16_HANDLER( switches_r )
 {
-	return (readinputport(0) | (avgdvg_done() ? 1 : 0));
+	return (input_port_read_indexed(machine, 0) | (avgdvg_done() ? 1 : 0));
 }
 
 
 static READ16_HANDLER( trackball_r )
 {
-	return (readinputport(4) << 4) | readinputport(3);
+	return (input_port_read_indexed(machine, 4) << 4) | input_port_read_indexed(machine, 3);
 }
 
 
 static READ8_HANDLER( input_1_r )
 {
-	return (readinputport(1) << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read_indexed(machine, 1) << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
 static READ8_HANDLER( input_2_r )
 {
-	return (readinputport(2) << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read_indexed(machine, 2) << (7 - (offset - POT0_C))) & 0x80;
 }
 
 

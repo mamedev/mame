@@ -491,7 +491,7 @@ static UINT16 *gdfs_blitram;
 
 static READ16_HANDLER( gdfs_eeprom_r )
 {
-	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ readinputport(5 + gdfs_lightgun_select)) | (EEPROM_read_bit() << 8);
+	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read_indexed(machine, 5 + gdfs_lightgun_select)) | (EEPROM_read_bit() << 8);
 }
 
 static WRITE16_HANDLER( gdfs_eeprom_w )
@@ -644,10 +644,10 @@ ADDRESS_MAP_END
 static READ16_HANDLER( hypreact_input_r )
 {
 	UINT16 input_sel = *ssv_input_sel;
-	if (input_sel & 0x0001)	return readinputport(5);
-	if (input_sel & 0x0002)	return readinputport(6);
-	if (input_sel & 0x0004)	return readinputport(7);
-	if (input_sel & 0x0008)	return readinputport(8);
+	if (input_sel & 0x0001)	return input_port_read_indexed(machine, 5);
+	if (input_sel & 0x0002)	return input_port_read_indexed(machine, 6);
+	if (input_sel & 0x0004)	return input_port_read_indexed(machine, 7);
+	if (input_sel & 0x0008)	return input_port_read_indexed(machine, 8);
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",activecpu_get_pc(),input_sel);
 	return 0xffff;
 }
@@ -792,10 +792,10 @@ ADDRESS_MAP_END
 static READ16_HANDLER( srmp4_input_r )
 {
 	UINT16 input_sel = *ssv_input_sel;
-	if (input_sel & 0x0002)	return readinputport(5);
-	if (input_sel & 0x0004)	return readinputport(6);
-	if (input_sel & 0x0008)	return readinputport(7);
-	if (input_sel & 0x0010)	return readinputport(8);
+	if (input_sel & 0x0002)	return input_port_read_indexed(machine, 5);
+	if (input_sel & 0x0004)	return input_port_read_indexed(machine, 6);
+	if (input_sel & 0x0008)	return input_port_read_indexed(machine, 7);
+	if (input_sel & 0x0010)	return input_port_read_indexed(machine, 8);
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",activecpu_get_pc(),input_sel);
 	return 0xffff;
 }
@@ -841,10 +841,10 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 static READ16_HANDLER( srmp7_input_r )
 {
 	UINT16 input_sel = *ssv_input_sel;
-	if (input_sel & 0x0002)	return readinputport(5);
-	if (input_sel & 0x0004)	return readinputport(6);
-	if (input_sel & 0x0008)	return readinputport(7);
-	if (input_sel & 0x0010)	return readinputport(8);
+	if (input_sel & 0x0002)	return input_port_read_indexed(machine, 5);
+	if (input_sel & 0x0004)	return input_port_read_indexed(machine, 6);
+	if (input_sel & 0x0008)	return input_port_read_indexed(machine, 7);
+	if (input_sel & 0x0010)	return input_port_read_indexed(machine, 8);
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",activecpu_get_pc(),input_sel);
 	return 0xffff;
 }
@@ -898,7 +898,7 @@ static UINT16 serial;
 
 static READ16_HANDLER( sxyreact_ballswitch_r )
 {
-	return readinputport(5);
+	return input_port_read_indexed(machine, 5);
 }
 
 static READ16_HANDLER( sxyreact_dial_r )
@@ -913,7 +913,7 @@ static WRITE16_HANDLER( sxyreact_dial_w )
 		static int old;
 
 		if (data & 0x20)
-			serial = readinputport(6) & 0xff;
+			serial = input_port_read_indexed(machine, 6) & 0xff;
 
 		if ( (old & 0x40) && !(data & 0x40) )	// $40 -> $00
 			serial <<= 1;						// shift 1 bit
@@ -1071,11 +1071,11 @@ static READ16_HANDLER( eaglshot_trackball_r )
 {
 	switch(trackball_select)
 	{
-		case 0x60:	return (readinputport(5) >> 8) & 0xff;
-		case 0x40:	return (readinputport(5) >> 0) & 0xff;
+		case 0x60:	return (input_port_read_indexed(machine, 5) >> 8) & 0xff;
+		case 0x40:	return (input_port_read_indexed(machine, 5) >> 0) & 0xff;
 
-		case 0x70:	return (readinputport(6) >> 8) & 0xff;
-		case 0x50:	return (readinputport(6) >> 0) & 0xff;
+		case 0x70:	return (input_port_read_indexed(machine, 6) >> 8) & 0xff;
+		case 0x50:	return (input_port_read_indexed(machine, 6) >> 0) & 0xff;
 	}
 	return 0;
 }

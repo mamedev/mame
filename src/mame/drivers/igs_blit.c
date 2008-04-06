@@ -334,7 +334,7 @@ static READ16_HANDLER( igs_##NUM##_input_r )	\
 												\
 	for (i = 0; i < NUM; i++)					\
 		if ((~igs_input_sel) & (1 << i) )		\
-			ret = readinputport(i);				\
+			ret = input_port_read_indexed(machine, i);				\
 												\
 	/* 0x0100 is blitter busy */				\
 	return 	(ret & 0xff) | 0x0000;				\
@@ -663,11 +663,11 @@ static READ16_HANDLER( chmplst2_magic_r )
 	switch(igs_magic[0])
 	{
 		case 0x01:
-			if (~igs_input_sel2 & 0x01)	return readinputport(4);
-			if (~igs_input_sel2 & 0x02)	return readinputport(5);
-			if (~igs_input_sel2 & 0x04)	return readinputport(6);
-			if (~igs_input_sel2 & 0x08)	return readinputport(7);
-			if (~igs_input_sel2 & 0x10)	return readinputport(8);
+			if (~igs_input_sel2 & 0x01)	return input_port_read_indexed(machine, 4);
+			if (~igs_input_sel2 & 0x02)	return input_port_read_indexed(machine, 5);
+			if (~igs_input_sel2 & 0x04)	return input_port_read_indexed(machine, 6);
+			if (~igs_input_sel2 & 0x08)	return input_port_read_indexed(machine, 7);
+			if (~igs_input_sel2 & 0x10)	return input_port_read_indexed(machine, 8);
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs_magic = %02x\n", activecpu_get_pc(), igs_magic[0]);
@@ -736,9 +736,9 @@ static READ16_HANDLER( chindrag_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return readinputport(4);
-		case 0x01:	return readinputport(5);
-		case 0x02:	return readinputport(6);
+		case 0x00:	return input_port_read_indexed(machine, 4);
+		case 0x01:	return input_port_read_indexed(machine, 5);
+		case 0x02:	return input_port_read_indexed(machine, 6);
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -803,7 +803,7 @@ static READ16_HANDLER( grtwall_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return readinputport(5);
+		case 0x00:	return input_port_read_indexed(machine, 5);
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -873,11 +873,11 @@ static READ16_HANDLER( lhb_input2_r )
 		case 0:		return igs_input_sel2;
 
 		case 1:
-			if (~igs_input_sel2 & 0x01)	return readinputport(6);
-			if (~igs_input_sel2 & 0x02)	return readinputport(7);
-			if (~igs_input_sel2 & 0x04)	return readinputport(8);
-			if (~igs_input_sel2 & 0x08)	return readinputport(9);
-			if (~igs_input_sel2 & 0x10)	return readinputport(10);
+			if (~igs_input_sel2 & 0x01)	return input_port_read_indexed(machine, 6);
+			if (~igs_input_sel2 & 0x02)	return input_port_read_indexed(machine, 7);
+			if (~igs_input_sel2 & 0x04)	return input_port_read_indexed(machine, 8);
+			if (~igs_input_sel2 & 0x08)	return input_port_read_indexed(machine, 9);
+			if (~igs_input_sel2 & 0x10)	return input_port_read_indexed(machine, 10);
 
 			logerror("%06x: warning, reading with igs_input_sel2 = %02x\n", activecpu_get_pc(), igs_input_sel2);
 			break;
@@ -918,8 +918,8 @@ static READ16_HANDLER( vbowl_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return readinputport(5);
-		case 0x01:	return readinputport(6);
+		case 0x00:	return input_port_read_indexed(machine, 5);
+		case 0x01:	return input_port_read_indexed(machine, 6);
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -985,14 +985,14 @@ static READ16_HANDLER( xymg_magic_r )
 {
 	switch(igs_magic[0])
 	{
-		case 0x00:	return readinputport(3);
+		case 0x00:	return input_port_read_indexed(machine, 3);
 
 		case 0x02:
-			if (~igs_input_sel2 & 0x01)	return readinputport(4);
-			if (~igs_input_sel2 & 0x02)	return readinputport(5);
-			if (~igs_input_sel2 & 0x04)	return readinputport(6);
-			if (~igs_input_sel2 & 0x08)	return readinputport(7);
-			if (~igs_input_sel2 & 0x10)	return readinputport(8);
+			if (~igs_input_sel2 & 0x01)	return input_port_read_indexed(machine, 4);
+			if (~igs_input_sel2 & 0x02)	return input_port_read_indexed(machine, 5);
+			if (~igs_input_sel2 & 0x04)	return input_port_read_indexed(machine, 6);
+			if (~igs_input_sel2 & 0x08)	return input_port_read_indexed(machine, 7);
+			if (~igs_input_sel2 & 0x10)	return input_port_read_indexed(machine, 8);
 			/* fall through */
 		default:
 			logerror("%06x: warning, reading with igs_magic = %02x\n", activecpu_get_pc(), igs_magic[0]);
@@ -1194,7 +1194,7 @@ static UINT16 *vbowl_trackball;
 static VIDEO_EOF( vbowl )
 {
 	vbowl_trackball[0] = vbowl_trackball[1];
-	vbowl_trackball[1] = (readinputport(8) << 8) | readinputport(7);
+	vbowl_trackball[1] = (input_port_read_indexed(machine, 8) << 8) | input_port_read_indexed(machine, 7);
 }
 
 static WRITE16_HANDLER( vbowl_pen_hi_w )

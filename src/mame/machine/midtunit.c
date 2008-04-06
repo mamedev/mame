@@ -105,7 +105,7 @@ READ16_HANDLER( midtunit_cmos_r )
 
 READ16_HANDLER( midtunit_input_r )
 {
-	return readinputport(offset);
+	return input_port_read_indexed(machine, offset);
 }
 
 

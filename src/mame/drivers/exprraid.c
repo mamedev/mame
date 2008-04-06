@@ -105,7 +105,7 @@ static WRITE8_HANDLER( sound_cpu_command_w )
 
 static READ8_HANDLER( vblank_r )
 {
-	return readinputport( 0 );
+	return input_port_read_indexed(machine,  0 );
 }
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -288,7 +288,7 @@ static INTERRUPT_GEN( exprraid_interrupt )
 {
 	static int coin = 0;
 
-	if ( ( ~readinputport( 3 ) ) & 0xc0 ) {
+	if ( ( ~input_port_read_indexed(machine,  3 ) ) & 0xc0 ) {
 		if ( coin == 0 ) {
 			coin = 1;
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);

@@ -77,7 +77,7 @@ static WRITE32_HANDLER( vega_misc_w )
 static READ32_HANDLER( vegaeo_custom_read )
 {
 	eolith_speedup_read();
-	return readinputport(0);
+	return input_port_read_indexed(machine, 0);
 }
 static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM

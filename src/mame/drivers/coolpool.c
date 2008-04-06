@@ -255,20 +255,20 @@ static TIMER_CALLBACK( amerdart_iop_response )
 			break;
 
 		case 0x100:
-			iop_answer = (INT8)(-readinputportbytag("YAXIS2") - readinputportbytag("XAXIS2")) << 6;
+			iop_answer = (INT8)(-input_port_read(machine, "YAXIS2") - input_port_read(machine, "XAXIS2")) << 6;
 			break;
 		case 0x101:
-			iop_answer = (INT8)(-readinputportbytag("YAXIS2") + readinputportbytag("XAXIS2")) << 6;
+			iop_answer = (INT8)(-input_port_read(machine, "YAXIS2") + input_port_read(machine, "XAXIS2")) << 6;
 			break;
 		case 0x102:
-			iop_answer = (INT8)(-readinputportbytag("YAXIS1") - readinputportbytag("XAXIS1")) << 6;
+			iop_answer = (INT8)(-input_port_read(machine, "YAXIS1") - input_port_read(machine, "XAXIS1")) << 6;
 			break;
 		case 0x103:
-			iop_answer = (INT8)(-readinputportbytag("YAXIS1") + readinputportbytag("XAXIS1")) << 6;
+			iop_answer = (INT8)(-input_port_read(machine, "YAXIS1") + input_port_read(machine, "XAXIS1")) << 6;
 			break;
 
 		case 0x500:
-			iop_answer = readinputport(0);
+			iop_answer = input_port_read_indexed(machine, 0);
 			break;
 	}
 
@@ -420,9 +420,9 @@ static READ16_HANDLER( coolpool_input_r )
 	static UINT8 oldx, oldy;
 	static UINT16 lastresult;
 
-	int result = (readinputportbytag("IN1") & 0x00ff) | (lastresult & 0xff00);
-	UINT8 newx = readinputportbytag("XAXIS");
-	UINT8 newy = readinputportbytag("YAXIS");
+	int result = (input_port_read(machine, "IN1") & 0x00ff) | (lastresult & 0xff00);
+	UINT8 newx = input_port_read(machine, "XAXIS");
+	UINT8 newy = input_port_read(machine, "YAXIS");
 	int dx = (INT8)(newx - oldx);
 	int dy = (INT8)(newy - oldy);
 

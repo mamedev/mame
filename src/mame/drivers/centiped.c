@@ -507,7 +507,7 @@ static WRITE8_HANDLER( irq_ack_w )
  * to prevent the counter from wrapping around between reads.
  */
 
-INLINE int read_trackball(int idx, int switch_port)
+INLINE int read_trackball(running_machine *machine, int idx, int switch_port)
 {
 	UINT8 newpos;
 
@@ -517,10 +517,10 @@ INLINE int read_trackball(int idx, int switch_port)
 
 	/* if we're to read the dipswitches behind the trackball data, do it now */
 	if (dsw_select)
-		return (readinputport(switch_port) & 0x7f) | sign[idx];
+		return (input_port_read_indexed(machine, switch_port) & 0x7f) | sign[idx];
 
 	/* get the new position and adjust the result */
-	newpos = readinputport(6 + idx);
+	newpos = input_port_read_indexed(machine, 6 + idx);
 	if (newpos != oldpos[idx])
 	{
 		sign[idx] = (newpos - oldpos[idx]) & 0x80;
@@ -528,30 +528,30 @@ INLINE int read_trackball(int idx, int switch_port)
 	}
 
 	/* blend with the bits from the switch port */
-	return (readinputport(switch_port) & 0x70) | (oldpos[idx] & 0x0f) | sign[idx];
+	return (input_port_read_indexed(machine, switch_port) & 0x70) | (oldpos[idx] & 0x0f) | sign[idx];
 }
 
 
 static READ8_HANDLER( centiped_IN0_r )
 {
-	return read_trackball(0, 0);
+	return read_trackball(machine, 0, 0);
 }
 
 
 static READ8_HANDLER( centiped_IN2_r )
 {
-	return read_trackball(1, 2);
+	return read_trackball(machine, 1, 2);
 }
 
 
 static READ8_HANDLER( milliped_IN1_r )
 {
-	return read_trackball(1, 1);
+	return read_trackball(machine, 1, 1);
 }
 
 static READ8_HANDLER( milliped_IN2_r )
 {
-	UINT8 data = readinputport(2);
+	UINT8 data = input_port_read_indexed(machine, 2);
 
 	/* MSH - 15 Feb, 2007
      * The P2 X Joystick inputs are not properly handled in
@@ -562,7 +562,7 @@ static READ8_HANDLER( milliped_IN2_r )
      */
 	if (0 != control_select) {
 		/* Bottom 4 bits is our joystick inputs */
-		UINT8 joy2data = readinputport(3) & 0x0f;
+		UINT8 joy2data = input_port_read_indexed(machine, 3) & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
 		data |= (joy2data & 0x0a) >> 1; /* flip left and up */
 		data |= (joy2data & 0x05) << 1; /* flip right and down */
@@ -584,7 +584,7 @@ static WRITE8_HANDLER( control_select_w )
 
 static READ8_HANDLER( mazeinv_input_r )
 {
-	return readinputport(6 + control_select);
+	return input_port_read_indexed(machine, 6 + control_select);
 }
 
 

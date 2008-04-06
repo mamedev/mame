@@ -56,7 +56,7 @@ static READ8_HANDLER( keyboard_0_r )
 	int i;
 
 	for (i = 0;i < 5;i++)
-		if (~keyb & (1 << i)) res &= readinputport(4+i);
+		if (~keyb & (1 << i)) res &= input_port_read_indexed(machine, 4+i);
 
 	return res;
 }

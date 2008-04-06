@@ -525,7 +525,7 @@ static READ32_HANDLER( trackball_r )
 
 		for( axis = 0; axis < 2; axis++ )
 		{
-			value = readinputport( axis + 3 );
+			value = input_port_read_indexed(machine,  axis + 3 );
 			diff = value - trackball_prev[ axis ];
 			trackball_prev[ axis ] = value;
 			trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -610,7 +610,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 		for( axis = 0; axis < 4; axis++ )
 		{
-			value = readinputport( axis + 3 );
+			value = input_port_read_indexed(machine,  axis + 3 );
 			diff = value - btc_trackball_prev[ axis ];
 			btc_trackball_prev[ axis ] = value;
 			btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );

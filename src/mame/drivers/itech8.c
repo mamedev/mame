@@ -714,7 +714,7 @@ static WRITE8_HANDLER( rimrockn_bank_w )
 /* used by most games */
 static READ8_HANDLER( special_port0_r )
 {
-	UINT8 result = readinputport(0);
+	UINT8 result = input_port_read_indexed(machine, 0);
 	result = (result & 0xfe) | (pia_portb_data & 0x01);
 	return result;
 }
@@ -723,7 +723,7 @@ static READ8_HANDLER( special_port0_r )
 /* used by Rim Rockin' Basketball */
 static READ8_HANDLER( special_port1_r )
 {
-	UINT8 result = readinputport(1);
+	UINT8 result = input_port_read_indexed(machine, 1);
 	result = (result & 0x7f) | ((pia_portb_data & 0x01) << 7);
 	return result;
 }

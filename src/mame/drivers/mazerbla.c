@@ -440,7 +440,7 @@ static READ8_HANDLER( zpu_inputs_r )
 
 	if (bcd_7445<10)
 	{
-		ret = readinputport( bcd_7445 );
+		ret = input_port_read_indexed(machine,  bcd_7445 );
 	}
 	return ret;
 }

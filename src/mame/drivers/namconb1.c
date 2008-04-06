@@ -664,10 +664,10 @@ static READ32_HANDLER( gunbulet_gun_r )
 
 	switch( offset )
 	{
-	case 0: case 1: result = (UINT8)(0x0f+readinputport(7)*224/255); break; /* Y (p2) */
-	case 2: case 3: result = (UINT8)(0x26+readinputport(6)*288/314); break; /* X (p2) */
-	case 4: case 5: result = (UINT8)(0x0f+readinputport(5)*224/255); break; /* Y (p1) */
-	case 6: case 7: result = (UINT8)(0x26+readinputport(4)*288/314); break; /* X (p1) */
+	case 0: case 1: result = (UINT8)(0x0f+input_port_read_indexed(machine, 7)*224/255); break; /* Y (p2) */
+	case 2: case 3: result = (UINT8)(0x26+input_port_read_indexed(machine, 6)*288/314); break; /* X (p2) */
+	case 4: case 5: result = (UINT8)(0x0f+input_port_read_indexed(machine, 5)*224/255); break; /* Y (p1) */
+	case 6: case 7: result = (UINT8)(0x26+input_port_read_indexed(machine, 4)*288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */

@@ -195,7 +195,7 @@ static VIDEO_START( jalmah )
 }
 
 #define MCU_READ(_number_,_bit_,_offset_,_retval_)\
-if((0xffff - readinputport(_number_)) & _bit_) { jm_regs[_offset_] = _retval_; }
+if((0xffff - input_port_read_indexed(machine, _number_)) & _bit_) { jm_regs[_offset_] = _retval_; }
 
 /*RAM-based protection handlings*/
 static void daireika_mcu_run(running_machine *machine)

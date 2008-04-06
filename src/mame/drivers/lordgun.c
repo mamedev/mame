@@ -55,7 +55,7 @@ WRITE16_HANDLER( lordgun_vram_1_w );
 WRITE16_HANDLER( lordgun_vram_2_w );
 WRITE16_HANDLER( lordgun_vram_3_w );
 
-void lordgun_update_gun(int i);
+void lordgun_update_gun(running_machine *machine, int i);
 
 VIDEO_START( lordgun );
 VIDEO_UPDATE( lordgun );
@@ -111,7 +111,7 @@ static WRITE8_HANDLER(fake2_w)
 
 static READ8_HANDLER( lordgun_eeprom_r )
 {
-	return readinputport(0) | ((EEPROM_read_bit() & 1) << 7);
+	return input_port_read_indexed(machine, 0) | ((EEPROM_read_bit() & 1) << 7);
 }
 
 static WRITE8_HANDLER( lordgun_eeprom_w )
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( lordgun_eeprom_w )
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
 		if ( (data & (0x04 << i)) && !(old & (0x04 << i)) )
-			lordgun_update_gun(i);
+			lordgun_update_gun(machine, i);
 
 	// latch the bit
 	EEPROM_write_bit(data & 0x40);

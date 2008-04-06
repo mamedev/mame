@@ -89,9 +89,9 @@ static WRITE8_HANDLER( joinem_misc_w )
 
 static READ8_HANDLER( joinem_input1_r )
 {
-	UINT8 ret = readinputport(1) & ~0x20;
+	UINT8 ret = input_port_read_indexed(machine, 1) & ~0x20;
 
-	if((readinputport(4) & 0x80) && !joinem_snd_bit)
+	if((input_port_read_indexed(machine, 4) & 0x80) && !joinem_snd_bit)
 		ret |= 0x20;
 
 	return ret;
@@ -918,7 +918,7 @@ static INTERRUPT_GEN( joinem_interrupts )
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 	else
 	{
-		if(!(readinputport(4) & 0x80))
+		if(!(input_port_read_indexed(machine, 4) & 0x80))
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }

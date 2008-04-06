@@ -24,6 +24,7 @@
 **********************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/amiga.h"
 
 
@@ -209,7 +210,7 @@ static void upscope_cia_1_porta_w(UINT8 data)
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", nvram_address_latch);
-			nvram_data_latch = (nvram_address_latch == 0) ? readinputportbytag("IO0") : 0xff;
+			nvram_data_latch = (nvram_address_latch == 0) ? input_port_read(Machine, "IO0") : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */
