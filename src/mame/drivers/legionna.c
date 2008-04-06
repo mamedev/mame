@@ -898,44 +898,43 @@ INPUT_PORTS_END
 
 /*****************************************************************************/
 
-
-static const gfx_layout legionna_charlayout =
+static const gfx_layout legionna_new_charlayout =
 {
 	8,8,
-	RGN_FRAC(1,4),	/* other half is BK3, decoded in char2layout */
+	RGN_FRAC(1,1),
 	4,
-	{ 0, 4, 4096*16*8+0, 4096*16*8+4 },
-	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
+	{ 0, 4, 8, 12 },
+	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
 };
 
-static const gfx_layout heatbrl_charlayout =
+
+void descramble_legionnaire_gfx(UINT8* src)
 {
-	8,8,
-	RGN_FRAC(1,2),	/* second half is junk, like legionna we may need a different decode */
-	4,
-	{ 0, 4, 4096*16*8+0, 4096*16*8+4 },
-	{ 3, 2, 1, 0, 8+3, 8+2, 8+1, 8+0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
-	16*8
-};
+	UINT8 *buffer;
+	int len = 0x10000;
+	
+	/*  rearrange gfx */
+	buffer = malloc_or_die(len);
+	{
+		int i;
+		for (i = 0;i < len; i++)
+		{
+			buffer[i] = src[BITSWAP24(i,
+			23,22,21,20,
+			19,18,17,16,
+			6,5,15,14,13,12,
+			11,10,9,8,
+			7,4,
+			3,2,1,0)];
+		}
+		memcpy(src,buffer,len);
+		free(buffer);
+	}
 
+}
 
-static const gfx_layout legionna_char2layout =
-{
-	16,16,
-	256,	/* Can't use RGN_FRAC as (1,16) not supported */
-	4,
-	{ 0, 4, 4096*16*8+0, 4096*16*8+4 },
-	{ 3, 2, 1, 0, 11, 10, 9, 8,
-	  1024*16*8 +3,  1024*16*8 +2,  1024*16*8 +1, 1024*16*8 +0,
-	  1024*16*8 +11, 1024*16*8 +10, 1024*16*8 +9, 1024*16*8 +8 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-	  512*16*8 +0*16, 512*16*8 +1*16, 512*16*8 +2*16, 512*16*8 +3*16,
-	  512*16*8 +4*16, 512*16*8 +5*16, 512*16*8 +6*16, 512*16*8 +7*16 },
-	16*8
-};
 
 static const gfx_layout legionna_tilelayout =
 {
@@ -964,27 +963,27 @@ static const gfx_layout legionna_spritelayout =
 };
 
 static GFXDECODE_START( legionna )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, legionna_charlayout,   48*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, legionna_new_charlayout,   48*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, legionna_char2layout,  32*16, 16 )	/* example BK3 decode */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, legionna_tilelayout,   32*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( REGION_GFX5, 0, legionna_tilelayout,   32*16, 16 )	/* this should be the BK3 decode */
+	GFXDECODE_ENTRY( REGION_GFX5, 0, legionna_tilelayout,   32*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX6, 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( heatbrl )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, heatbrl_charlayout,    48*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, legionna_char2layout,  32*16, 16 )	/* unused */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, legionna_tilelayout,   32*16, 16 ) /* unused */
 	GFXDECODE_ENTRY( REGION_GFX2, 0, legionna_spritelayout,  0*16, 8*16 )
 	GFXDECODE_ENTRY( REGION_GFX5, 0, legionna_tilelayout,   32*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX6, 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( sdgndmrb )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, heatbrl_charlayout,    48*16, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, legionna_new_charlayout,    48*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX4, 0, legionna_char2layout,  32*16, 16 )	/* unused */
+	GFXDECODE_ENTRY( REGION_GFX4, 0, legionna_tilelayout,  32*16, 16 )	/* unused */
 	GFXDECODE_ENTRY( REGION_GFX2, 0, legionna_spritelayout,  0*16, 8*16 )
 	GFXDECODE_ENTRY( REGION_GFX5, 0, legionna_tilelayout,   32*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX6, 0, legionna_tilelayout,   16*16, 16 )
@@ -1241,24 +1240,31 @@ ROM_START( legionna )
 	ROM_LOAD( "6",   0x00000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 
-	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )	/* chars, some BK3 tiles too */
-	ROM_LOAD( "8",   0x010000, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
+	ROM_REGION( 0x020000, REGION_USER1, ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )
+	ROM_LOAD16_BYTE( "8",   0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
 
+	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )  /* FG Tiles */
+	ROM_COPY( REGION_USER1, 0x010000, 0x000000, 0x010000 )
+	
+	ROM_REGION( 0x010000, REGION_GFX5, ROMREGION_DISPOSE )  /* BK3 */
+	ROM_COPY( REGION_USER1, 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */
+	
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_USER2, ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD( "back",     0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
-
-	ROM_REGION( 0x020000, REGION_GFX4, ROMREGION_DISPOSE )	/* example BK3 decode */
-	ROM_COPY( REGION_GFX1, 0x00000, 0x00000, 0x20000 )
-
-	ROM_REGION( 0x020000, REGION_GFX5, ROMREGION_DISPOSE )	/* we _should_ decode all BK3 tiles here */
-
-	ROM_REGION( 0x080000, REGION_GFX6, ROMREGION_DISPOSE )	/* LBK tiles (plus BK3 at end) */
-	ROM_COPY( REGION_GFX3, 0x80000, 0x00000, 0x80000 )
+	
+	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )  /* MBK */
+	ROM_COPY( REGION_USER2, 0x000000, 0x000000, 0x80000 )
+	
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE )
+	/* Not Used */
+	
+	ROM_REGION( 0x80000, REGION_GFX6, ROMREGION_DISPOSE )	/* LBK */
+	ROM_COPY( REGION_USER2, 0x080000, 0x000000, 0x78000 )
 
 	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
@@ -1275,25 +1281,32 @@ ROM_START( legionnu )
 	ROM_LOAD( "6",   0x00000, 0x08000, CRC(fe7b8d06) SHA1(1e5b52ea4b4042940e2ee2db75c7c0f24973422a) )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 
-	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )	/* chars, some BK3 tiles too */
-	ROM_LOAD( "8",   0x010000, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
+	ROM_REGION( 0x020000, REGION_USER1, ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
+	ROM_LOAD16_BYTE( "7",   0x000000, 0x10000, CRC(88e26809) SHA1(40ee55d3b5329b6f657e0621d93c4caf6a035fdf) )	/* chars, some BK3 tiles too */
+	ROM_LOAD16_BYTE( "8",   0x000001, 0x10000, CRC(06e35407) SHA1(affeeb97b7f3cfa9b65a584ebe25c16a5b2c9a89) )
 
+	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )  /* FG Tiles */
+	ROM_COPY( REGION_USER1, 0x010000, 0x000000, 0x010000 )
+	
+	ROM_REGION( 0x010000, REGION_GFX5, ROMREGION_DISPOSE )  /* BK3 */
+	ROM_COPY( REGION_USER1, 0x000000, 0x000000, 0x010000 ) /* decrambled in INIT */	
+	
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(d35602f5) SHA1(79379abf1c8131df47f81f42b2dc6876926a4e9d) )	/* sprites */
 	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(351d3917) SHA1(014562ac55c09227c08275df3129df19d81af164) )
 
-	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, REGION_USER2, ROMREGION_DISPOSE ) /* load the tiles here so we can split them up into the required regions by hand */
 	ROM_LOAD( "back",     0x000000, 0x100000, CRC(58280989) SHA1(e3eef1f52829a91b8f87cfe27776a1f12679b3ca) )	/* 3 sets of tiles ('MBK','LBK','BK3') */
 
-	ROM_REGION( 0x020000, REGION_GFX4, ROMREGION_DISPOSE )	/* example BK3 decode */
-	ROM_COPY( REGION_GFX1, 0x00000, 0x00000, 0x20000 )
-
-	ROM_REGION( 0x020000, REGION_GFX5, ROMREGION_DISPOSE )	/* we _should_ decode all BK3 tiles here */
-
-	ROM_REGION( 0x080000, REGION_GFX6, ROMREGION_DISPOSE )	/* LBK tiles (plus BK3 at end) */
-	ROM_COPY( REGION_GFX3, 0x80000, 0x00000, 0x80000 )
-
+	ROM_REGION( 0x80000, REGION_GFX3, ROMREGION_DISPOSE )  /* MBK */
+	ROM_COPY( REGION_USER2, 0x000000, 0x000000, 0x80000 )
+	
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE )
+	/* Not Used */
+	
+	ROM_REGION( 0x80000, REGION_GFX6, ROMREGION_DISPOSE )	/* LBK */
+	ROM_COPY( REGION_USER2, 0x080000, 0x000000, 0x78000 )
+	
 	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* ADPCM samples */
 	ROM_LOAD( "5",   0x00000, 0x20000, CRC(21d09bde) SHA1(8dce5011e083706ac7b57c5aee4b79d30fa8d4cb) )
 ROM_END
@@ -1310,8 +1323,8 @@ ROM_START( heatbrl )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD( "barrel.5",   0x010000, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
+	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
@@ -1320,7 +1333,8 @@ ROM_START( heatbrl )
 	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )	/* MBK tiles */
 	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
 
-	ROM_REGION( 0x020000, REGION_GFX4, ROMREGION_DISPOSE )	/* not used */
+	ROM_REGION( 0x020000, REGION_GFX4, ROMREGION_DISPOSE )	/* not used? */
+	ROM_COPY( REGION_GFX1, 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
 
 	ROM_REGION( 0x080000, REGION_GFX5, ROMREGION_DISPOSE )	/* BK3 tiles */
 	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
@@ -1344,8 +1358,8 @@ ROM_START( heatbrlo )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD( "barrel.5",   0x010000, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
+	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 /* Sprite + tilemap gfx roms not dumped, for now we use ones from heatbrlu
 Readme mentions as undumped:
@@ -1383,8 +1397,8 @@ ROM_START( heatbrlu )
 	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
-	ROM_LOAD( "barrel.5",   0x010000, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
+	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
@@ -1467,8 +1481,8 @@ ROM_START( godzilla )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "11.620",       0x000000, 0x010000, CRC(58e0e41f) SHA1(563c633eb3d4df41e467c93957c74b540a0ae43c) )
-	ROM_LOAD( "10.615",       0x010000, 0x010000, CRC(9c22bc13) SHA1(a94d9ed63ee1f5e358ebcaf517e6a1c986fa5d96) )
+	ROM_LOAD16_BYTE( "11.620",       0x000000, 0x010000, CRC(58e0e41f) SHA1(563c633eb3d4df41e467c93957c74b540a0ae43c) )
+	ROM_LOAD16_BYTE( "10.615",       0x000001, 0x010000, CRC(9c22bc13) SHA1(a94d9ed63ee1f5e358ebcaf517e6a1c986fa5d96) )
 
 	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj1.748",     0x300000, 0x100000, CRC(146bacb0) SHA1(1331f04f3d9e6236cec7524e9da1782ed1916ff7) ) // this might be half size like denjinmk, same pcb..
@@ -1584,8 +1598,8 @@ ROM_START( denjinmk )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "rom7.620",       0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
-	ROM_LOAD( "rom8.615",       0x010000, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
+	ROM_LOAD16_BYTE( "rom7.620",       0x000000, 0x010000, CRC(e1f759b1) SHA1(ddc60e78e7791a59c59403dd4089b3f6e1ecf8cb) )
+	ROM_LOAD16_BYTE( "rom8.615",       0x000001, 0x010000, CRC(cc36af0d) SHA1(69c2ae38f03be79be4d138fcc73a6a86407eb285) )
 
 	ROM_REGION( 0x500000, REGION_GFX2, ROMREGION_DISPOSE )
     ROM_LOAD( "obj-0-3.748",     0x000000, 0x100000, BAD_DUMP CRC(3dcc7b04) SHA1(3c3ad5ddc18a42046348dcb54e65f6173c003d72) ) /* half size?# 0,1 */
@@ -1680,8 +1694,8 @@ ROM_START( sdgndmrb )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
-	ROM_LOAD( "rb-f2.615",    0x010000, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
+	ROM_LOAD16_BYTE( "rb-f1.620",    0x000000, 0x010000, CRC(792c403d) SHA1(3c606af696fe8f3d6edefdab3940bd5eb341bca9) )
+	ROM_LOAD16_BYTE( "rb-f2.615",    0x000001, 0x010000, CRC(a30e0903) SHA1(b9e7646da1ccab6dadaca6beda08125b34946653) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "rb-spr01.748", 0x000000, 0x100000, CRC(11a3479d) SHA1(4d2d06d62da02c6e9884735de8c319f37ca1715c) )
@@ -1718,8 +1732,8 @@ ROM_START( cupsoc )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD( "seibu5.7y",    0x010000, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
+	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
+	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
@@ -1751,8 +1765,8 @@ ROM_START( cupsoc2 )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "scc_06.bin",   0x000000, 0x010000, CRC(f1a18ec6) SHA1(43f8ec3fc541b8dc2a17533329dd3448afadcb3b) )
-	ROM_LOAD( "scc_05.bin",   0x010000, 0x010000, CRC(c0358503) SHA1(e87991c6a6f3e060a1b03b4899fa891510fca15f) )
+	ROM_LOAD16_BYTE( "scc_06.bin",   0x000000, 0x010000, CRC(f1a18ec6) SHA1(43f8ec3fc541b8dc2a17533329dd3448afadcb3b) )
+	ROM_LOAD16_BYTE( "scc_05.bin",   0x000001, 0x010000, CRC(c0358503) SHA1(e87991c6a6f3e060a1b03b4899fa891510fca15f) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
@@ -1787,8 +1801,8 @@ ROM_START( olysoc92 )
 	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD( "seibu5.7y",    0x010000, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
+	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
+	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
@@ -1849,8 +1863,8 @@ ROM_START( cupsocbl )
 	ROM_CONTINUE(			  0x000000, 0x08000 )
 
 	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD( "seibu5.7y",    0x010000, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
+	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
+	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
@@ -1888,25 +1902,7 @@ ROM_START( cupsocbl )
 	ROM_LOAD( "sc_03.bin",    0x000000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
 ROM_END
 
-static DRIVER_INIT( legionna )
-{
-	/* Unscramble gfx: quarters 1&2 swapped, quarters 3&4 swapped */
 
-	UINT8 *gfx = memory_region(REGION_GFX1);
-	int len = memory_region_length(REGION_GFX1)/2;
-	int a,i;
-
-	for (i = 0; i < len/2; i++)
-	{
-		a = gfx[i];
-		gfx[i] = gfx[i + len/2];
-		gfx[i+len/2] = a;
-
-		a = gfx[i+len];
-		gfx[i+len] = gfx[i + len/2 + len];
-		gfx[i + len/2 +len] = a;
-	}
-}
 
 #define CUPSOC_DEBUG_MODE 1
 
@@ -1928,13 +1924,19 @@ static DRIVER_INIT( denjinmk )
 	ROM[0x5fe4/2] = 0x4e71;
 }
 
+DRIVER_INIT( legiongfx )
+{
+	descramble_legionnaire_gfx( memory_region(REGION_GFX5) );
+}
 
-GAME( 1992, legionna, 0,        legionna, legionna, legionna, ROT0, "Tad", "Legionnaire (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, legionnu, legionna, legionna, legionna, legionna, ROT0, "Tad (Fabtek license)", "Legionnaire (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (World old version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,        ROT0, "Tad", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+
+GAME( 1992, legionna, 0,        legionna, legionna, legiongfx, ROT0, "Tad", "Legionnaire (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, legionnu, legionna, legionna, legionna, legiongfx, ROT0, "Tad (Fabtek license)", "Legionnaire (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+
+GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World old version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,        ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, sdgndmrb, 0,        sdgndmrb, sdgndmrb, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
@@ -1943,4 +1945,4 @@ GAME( 1993, denjinmk, 0,        denjinmk, godzilla, denjinmk, ROT0, "Banpresto",
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING ) // Seibu Cup Soccer 'Selection'?
 GAME( 1992, cupsoc2,  cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsocbl, cupsoc,   cupsocbl, cupsoc,   cupsoc,   ROT0, "bootleg", "Seibu Cup Soccer (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1992, cupsocbl, cupsoc,   cupsocbl, cupsoc,   cupsoc,   ROT0, "bootleg", "Seibu Cup Soccer (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND ) // Seibu Cup Soccer 'Selection'
