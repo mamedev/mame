@@ -6297,9 +6297,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( denjinmk )	/* (c) 199? Banpresto */
 	DRIVER( sdgndmrb )	/* (c) 1993 Banpresto */
 	DRIVER( cupsoc )	/* (c) 1992 Seibu */
-	DRIVER( cupsoc2 )	/* (c) 1992 Seibu */
+	DRIVER( cupsocs )	/* (c) 1992 Seibu */
+	DRIVER( cupsocs2 )	/* (c) 1992 Seibu */
+	DRIVER( cupsocsb )	/* bootleg */
 	DRIVER( olysoc92 )	/* (c) 1992 Seibu */
-	DRIVER( cupsocbl )	/* bootleg */
 	DRIVER( goal92 )	/* bootleg */
 
 	/* Jaleco games */
