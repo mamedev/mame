@@ -523,8 +523,16 @@ static void move3y_prot_jsr(void)
 
 READ16_HANDLER( legionna_mcu_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
+
 		/*********************************************************************
 		400-5ff -  Protection reads
 		*********************************************************************/
@@ -554,8 +562,6 @@ READ16_HANDLER( legionna_mcu_r )
 		case (0x74c/2):	return input_port_3_word_r(machine,0,0);
 
 	}
-
-	return cop_mcu_ram[offset];
 }
 
 
@@ -565,6 +571,11 @@ WRITE16_HANDLER( legionna_mcu_w )
 
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
 
 		/*********************************************************************
 		400-5ff -  Protection writes
@@ -973,8 +984,15 @@ static void cop2_move2_prot(void)
 
 READ16_HANDLER( heatbrl_mcu_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
 
 	    /*********************************************************************
 		400-5ff -  Protection reads
@@ -1011,20 +1029,20 @@ READ16_HANDLER( heatbrl_mcu_r )
 		case (0x74c/2): return input_port_3_word_r(machine,0,0);
 
 	}
-//logerror("CPU0 PC %06x unknown MCU read offset: %04x\n",activecpu_get_previouspc(),offset);
-
-	return cop_mcu_ram[offset];
 }
 
 WRITE16_HANDLER( heatbrl_mcu_w )
 {
-
-	logerror("cop2w %04x %04x\n",offset*2,data);
-
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
+
 		/*********************************************************************
 		400-5ff -  Protection writes
 		*********************************************************************/
@@ -1159,8 +1177,16 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 
 READ16_HANDLER( sdgndmrb_cop_mcu_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
+
 		/*hit protection*/
 		case (0x580/2): { return xy_check; }
 
@@ -1194,19 +1220,25 @@ READ16_HANDLER( sdgndmrb_cop_mcu_r )
 		case (0x74c/2): return input_port_3_word_r(machine,0,0);
 		case (0x75c/2): return input_port_5_word_r(machine,0,0);
 	}
-
-	return cop_mcu_ram[offset];
 }
 
 WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-	logerror("cop2w %04x %04x\n",offset*2,data);
-
 
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
+
+		/*********************************************************************
+		400-5ff -  Protection writes
+		*********************************************************************/
+
 		case (0x40c/2): { dma_size = cop_mcu_ram[offset]; break; }
 
 		/*DMA source address*/
@@ -1418,8 +1450,16 @@ WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 
 READ16_HANDLER( denjinmk_cop_mcu_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
+
 		/* BCD protection */
 		case (0x590/2): { return ((prot_bcd[0] & 0x0000ffff) >> 0 ) + 0x3030; }
 		case (0x592/2): { return ((prot_bcd[0] & 0xffff0000) >> 16) + 0x3030; }
@@ -1443,17 +1483,24 @@ READ16_HANDLER( denjinmk_cop_mcu_r )
 		case (0x75c/2): return input_port_5_word_r(machine,0,0);
 
 	}
-	return cop_mcu_ram[offset];
 }
 
 WRITE16_HANDLER( denjinmk_cop_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-	logerror("cop2w %04x %04x\n",offset*2,data);
-
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
+
+		/*********************************************************************
+		400-5ff -  Protection writes
+		*********************************************************************/
+
 		case (0x420/2):	{ prot_bcd[0] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x422/2): { prot_bcd[1] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x424/2): { prot_bcd[2] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
@@ -1484,8 +1531,16 @@ WRITE16_HANDLER( denjinmk_cop_mcu_w )
 
 READ16_HANDLER( godzilla_cop_mcu_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
+
 		/* BCD protection */
 		case (0x590/2): { return ((prot_bcd[0] & 0x0000ffff) >> 0 ) + 0x3030; }
 		case (0x592/2): { return ((prot_bcd[0] & 0xffff0000) >> 16) + 0x3030; }
@@ -1506,16 +1561,24 @@ READ16_HANDLER( godzilla_cop_mcu_r )
 		case (0x748/2): return input_port_4_word_r(machine,0,0);
 		case (0x74c/2): return input_port_3_word_r(machine,0,0);
 	}
-	return cop_mcu_ram[offset];
 }
 
 WRITE16_HANDLER( godzilla_cop_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-
 	switch (offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
+
+		/*********************************************************************
+		400-5ff -  Protection writes
+		*********************************************************************/
+
 		case (0x420/2):	{ prot_bcd[0] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x422/2): { prot_bcd[1] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x424/2): { prot_bcd[2] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
@@ -1573,8 +1636,16 @@ WRITE16_HANDLER( godzilla_cop_mcu_w )
 
 READ16_HANDLER( copdx_0_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch(offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
+
 		//case (0x47e/2):
 		//case (0x5b0/2):
 		//case (0x5b4/2):
@@ -1590,8 +1661,6 @@ READ16_HANDLER( copdx_0_r )
 		case (0x74c/2): return seibu_main_word_r(machine,3,0);
 		case (0x754/2): return seibu_main_word_r(machine,5,0);
 	}
-
-	return cop_mcu_ram[offset];
 }
 
 static UINT16 cop_fct;
@@ -1664,13 +1733,20 @@ static void cop_reg_w(UINT16 data,UINT8 offset,UINT8 mask)
 
 WRITE16_HANDLER( copdx_0_w )
 {
-	logerror("cop0 %04x %04x\n",offset*2,data);
-
 
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	switch(offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
+
+		/*********************************************************************
+		400-5ff -  Protection writes
+		*********************************************************************/
 
 		case (0x432/2): { copd2_set_tabledata(data, machine); break; }
 		case (0x434/2): { copd2_set_tableoffset(data, machine); break; }
@@ -1786,8 +1862,16 @@ WRITE16_HANDLER( copdx_0_w )
 
 READ16_HANDLER( copdxbl_0_r )
 {
+	UINT16 retvalue = cop_mcu_ram[offset];
+
 	switch(offset)
 	{
+		default:
+		{
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			return retvalue;
+		}
+
 		//case (0x47e/2):
 		//case (0x5b0/2):
 		//case (0x5b4/2):
@@ -1799,8 +1883,6 @@ READ16_HANDLER( copdxbl_0_r )
 		case (0x70c/2):	return input_port_3_word_r(machine,0,0);
 		case (0x71c/2): return input_port_5_word_r(machine,0,0);
 	}
-
-	return cop_mcu_ram[offset];
 }
 
 WRITE16_HANDLER( copdxbl_0_w )
@@ -1809,6 +1891,18 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 	switch(offset)
 	{
+
+		default:
+		{
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			break;
+		}
+
+		/*********************************************************************
+		400-5ff -  Protection writes
+		*********************************************************************/
+
+
 		case (0x4a0/2):
 		case (0x4a2/2):
 		case (0x4a4/2):
