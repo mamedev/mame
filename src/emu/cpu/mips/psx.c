@@ -3086,7 +3086,7 @@ static UINT32 getcp2dr( int n_reg )
 	{
 		mipscpu.cp2dr[ n_reg ].d = (INT32)(INT16)mipscpu.cp2dr[ n_reg ].d;
 	}
-	else if( n_reg == 17 || n_reg == 18 || n_reg == 19 )
+	else if( n_reg == 16 || n_reg == 17 || n_reg == 18 || n_reg == 19 )
 	{
 		mipscpu.cp2dr[ n_reg ].d = (UINT32)(UINT16)mipscpu.cp2dr[ n_reg ].d;
 	}
