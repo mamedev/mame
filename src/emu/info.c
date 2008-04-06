@@ -868,6 +868,10 @@ static void print_game_info(FILE *out, const game_driver *game)
 	/* start tracking resources and allocate the machine and input configs */
 	begin_resource_tracking();
 	config = machine_config_alloc(game->machine_config);
+#ifdef MESS
+	/* temporary hook until MESS device transition is complete */
+	mess_devices_setup(config, game);
+#endif /* MESS */
 	input = input_port_allocate(game->ipt, NULL);
 
 	/* print the header and the game name */
