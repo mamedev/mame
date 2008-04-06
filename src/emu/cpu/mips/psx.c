@@ -3082,7 +3082,7 @@ static void setcp3cr( int reg, UINT32 n_value )
 
 static UINT32 getcp2dr( int n_reg )
 {
-	if( n_reg == 1 || n_reg == 3 || n_reg == 5 || n_reg == 8 || n_reg == 9 || n_reg == 10 || n_reg == 11 )
+	if( n_reg == 1 || n_reg == 3 || n_reg == 5 || n_reg == 8 || n_reg == 9 || n_reg == 10 || n_reg == 11 || n_reg == 28 )
 	{
 		mipscpu.cp2dr[ n_reg ].d = (INT32)(INT16)mipscpu.cp2dr[ n_reg ].d;
 	}
@@ -3111,9 +3111,9 @@ static void setcp2dr( int n_reg, UINT32 n_value )
 	}
 	else if( n_reg == 28 )
 	{
-		IR1 = ( IRGB & 0x1f ) << 4;
-		IR2 = ( IRGB & 0x3e0 ) >> 1;
-		IR3 = ( IRGB & 0x7c00 ) >> 6;
+		IR1 = ( IRGB & 0x1f ) << 7;
+		IR2 = ( IRGB & 0x3e0 ) << 2;
+		IR3 = ( IRGB & 0x7c00 ) >> 3;
 	}
 	else if( n_reg == 30 )
 	{
