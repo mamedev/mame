@@ -42,7 +42,7 @@
  *  is complicated. Left over instruction fetches are currently emulated as they are the most
  *  'interesting' and have no impact on the rest of the emulation.
  *
- *  MTC0 timing is not emulated, switching to user mode while in kernal space continues
+ *  MTC0 timing is not emulated, switching to user mode while in kernel space continues
  *  execution for another two instructions before taking an exception. Using RFE to do the same
  *  thing causes the exception straight away, unless the RFE is the first instructio that follows
  *  an MTC0 instruction.
@@ -3080,6 +3080,19 @@ static void setcp3cr( int reg, UINT32 n_value )
 #define ZSF4 ( mipscpu.cp2cr[ 30 ].w.l )
 #define FLAG ( mipscpu.cp2cr[ 31 ].d )
 
+short betweenINT16( INT16 v, INT16 l, INT16 u )
+{
+	if( v < l )
+	{
+		return l;
+	}
+	if( v > u )
+	{
+		return u;
+	}
+	return v;
+}
+
 static UINT32 getcp2dr( int n_reg )
 {
 	if( n_reg == 1 || n_reg == 3 || n_reg == 5 || n_reg == 8 || n_reg == 9 || n_reg == 10 || n_reg == 11 || n_reg == 28 )
@@ -3092,7 +3105,7 @@ static UINT32 getcp2dr( int n_reg )
 	}
 	else if( n_reg == 29 )
 	{
-		ORGB = ( ( IR1 >> 7 ) & 0x1f ) | ( ( IR2 >> 2 ) & 0x3e0 ) | ( ( IR3 << 3 ) & 0x7c00 );
+		ORGB = betweenINT16( (INT16)IR1 >> 7, 0, 0x1f ) | ( betweenINT16( (INT16)IR2 >> 7, 0, 0x1f ) << 5 ) | ( betweenINT16( (INT16)IR3 >> 7, 0, 0x1f ) << 10 );
 	}
 	GTELOG( "get CP2DR%u=%08x", n_reg, mipscpu.cp2dr[ n_reg ].d );
 	return mipscpu.cp2dr[ n_reg ].d;
