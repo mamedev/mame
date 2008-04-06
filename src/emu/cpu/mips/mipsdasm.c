@@ -31,10 +31,18 @@ static const char *const s_cpugenreg[] =
 
 static const char *const s_cp0genreg[] =
 {
-	"Index", "Random", "EntryLo", "cp0r3", "Context", "cp0r5", "cp0r6", "cp0r7",
-	"BadVAddr", "cp0r9", "EntryHi", "cp0r11", "SR", "Cause", "EPC", "PRId",
+	"!Index", "!Random", "!EntryLo", "BPC", "!Context", "BDA", "TAR", "DCIC",
+	"BadA", "BDAM", "!EntryHi", "BPCM", "SR", "Cause", "EPC", "PRId",
 	"cp0r16", "cp0r17", "cp0r18", "cp0r19", "cp0r20", "cp0r21", "cp0r22", "cp0r23",
 	"cp0r24", "cp0r25", "cp0r26", "cp0r27", "cp0r28", "cp0r29", "cp0r30", "cp0r31"
+};
+
+static const char *const s_cp0ctlreg[] =
+{
+	"cp0cr0", "cp0cr1", "cp0cr2", "cp0cr3", "cp0cr4", "cp0cr5", "cp0cr6", "cp0cr7",
+	"cp0cr8", "cp0cr9", "cp0cr10", "cp0cr11", "cp0cr12", "cp0cr13", "cp0cr14", "cp0cr15",
+	"cp0cr16", "cp0cr17", "cp0cr18", "cp0cr19", "cp0cr20", "cp0cr21", "cp0cr22", "cp0cr23",
+	"cp0cr24", "cp0cr25", "cp0cr26", "cp0cr27", "cp0cr28", "cp0cr29", "cp0cr30", "cp0cr31"
 };
 
 static const char *const s_cp1genreg[] =
@@ -69,6 +77,22 @@ static const char *const s_cp2ctlreg[] =
 	"ofx", "ofy", "h", "dqa", "dqb", "zsf3", "zsf4", "flag"
 };
 
+static const char *const s_cp3genreg[] =
+{
+	"cp3r0", "cp3r1", "cp3r2", "cp3r3", "cp3r4", "cp3r5", "cp3r6", "cp3r7",
+	"cp3r8", "cp3r9", "cp3r10", "cp3r11", "cp3r12", "cp3r13", "cp3r14", "cp3r15",
+	"cp3r16", "cp3r17", "cp3r18", "cp3r19", "cp3r20", "cp3r21", "cp3r22", "cp3r22",
+	"cp3r23", "cp3r24", "cp3r25", "cp3r26", "cp3r27", "cp3r28", "cp3r29", "cp3r30"
+};
+
+static const char *const s_cp3ctlreg[] =
+{
+	"cp3cr0", "cp3cr1", "cp3cr2", "cp3cr3", "cp3cr4", "cp3cr5", "cp3cr6", "cp3cr7",
+	"cp3cr8", "cp3cr9", "cp3cr10", "cp3cr11", "cp3cr12", "cp3cr13", "cp3cr14", "cp3cr15",
+	"cp3cr16", "cp3cr17", "cp3cr18", "cp3cr19", "cp3cr20", "cp3cr21", "cp3cr22", "cp3cr23",
+	"cp3cr24", "cp3cr25", "cp3cr26", "cp3cr27", "cp3cr28", "cp3cr29", "cp3cr30", "cp3cr31"
+};
+
 static const char *const s_gtesf[] =
 {
 	"0", "12"
@@ -94,7 +118,7 @@ static const char *const s_gtelm[] =
 	"0", "1"
 };
 
-static char *make_address( UINT32 pc, UINT32 op )
+static char *effective_address( UINT32 pc, UINT32 op )
 {
 	static char s_address[ 20 ];
 #ifndef STANDALONE
@@ -109,13 +133,64 @@ static char *make_address( UINT32 pc, UINT32 op )
 	return s_address;
 }
 
+static UINT32 relative_address( UINT32 pc, UINT32 op )
+{
+	UINT32 nextpc = pc + 4;
+#ifndef STANDALONE
+	if( pc == activecpu_get_pc() && activecpu_get_reg( MIPS_DELAYR ) == 32 )
+	{
+		nextpc = activecpu_get_reg( MIPS_DELAYV );
+	}
+#endif
+	return nextpc + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 );
+}
+
+static UINT32 jump_address( UINT32 pc, UINT32 op )
+{
+	UINT32 nextpc = pc + 4;
+#ifndef STANDALONE
+	if( pc == activecpu_get_pc() && activecpu_get_reg( MIPS_DELAYR ) == 32 )
+	{
+		nextpc = activecpu_get_reg( MIPS_DELAYV );
+	}
+#endif
+	return ( nextpc & 0xf0000000 ) + ( INS_TARGET( op ) << 2 );
+}
+
+static UINT32 fetch_op( const UINT8 *opram )
+{
+	return ( opram[ 3 ] << 24 ) | ( opram[ 2 ] << 16 ) | ( opram[ 1 ] << 8 ) | ( opram[ 0 ] << 0 );
+}
+
+static char *upper_address( UINT32 op, const UINT8 *opram )
+{
+	static char s_address[ 20 ];
+	UINT32 nextop = fetch_op( opram );
+
+	if( INS_OP( nextop ) == OP_ORI && INS_RT( op ) == INS_RS( nextop ) )
+	{
+		sprintf( s_address, "$%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) | INS_IMMEDIATE( nextop ) );
+	}
+	else if( INS_OP( nextop ) == OP_ADDIU && INS_RT( op ) == INS_RS( nextop ) )
+	{
+		sprintf( s_address, "$%04x ; 0x%08x", INS_IMMEDIATE( op ), ( INS_IMMEDIATE( op ) << 16 ) + (INT16) INS_IMMEDIATE( nextop ) );
+	}
+	else
+	{
+		sprintf( s_address, "$%04x", INS_IMMEDIATE( op ) );
+	}
+
+	return s_address;
+}
+
 unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 {
 	UINT32 op;
 	const UINT8 *oldopram;
+	UINT32 flags = 0;
 
 	oldopram = opram;
-	op = ( opram[ 3 ] << 24 ) | ( opram[ 2 ] << 16 ) | ( opram[ 1 ] << 8 ) | ( opram[ 0 ] << 0 );
+	op = fetch_op( opram );
 	opram += 4;
 
 	sprintf( buffer, "dw      $%08x", op );
@@ -152,61 +227,47 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			sprintf( buffer, "srav    %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ] );
 			break;
 		case FUNCT_JR:
-			if( INS_RD( op ) == 0 )
+			sprintf( buffer, "jr      %s", s_cpugenreg[ INS_RS( op ) ] );
+			if( INS_RS( op ) == 31 )
 			{
-				sprintf( buffer, "jr      %s", s_cpugenreg[ INS_RS( op ) ] );
+				flags = DASMFLAG_STEP_OUT;
 			}
 			break;
 		case FUNCT_JALR:
 			sprintf( buffer, "jalr    %s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ] );
+			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
 			break;
 		case FUNCT_SYSCALL:
 			sprintf( buffer, "syscall $%05x", INS_CODE( op ) );
+			flags = DASMFLAG_STEP_OVER;
 			break;
 		case FUNCT_BREAK:
 			sprintf( buffer, "break   $%05x", INS_CODE( op ) );
+			flags = DASMFLAG_STEP_OVER;
 			break;
 		case FUNCT_MFHI:
 			sprintf( buffer, "mfhi    %s", s_cpugenreg[ INS_RD( op ) ] );
 			break;
 		case FUNCT_MTHI:
-			if( INS_RD( op ) == 0 )
-			{
-				sprintf( buffer, "mthi    %s", s_cpugenreg[ INS_RS( op ) ] );
-			}
+			sprintf( buffer, "mthi    %s", s_cpugenreg[ INS_RS( op ) ] );
 			break;
 		case FUNCT_MFLO:
 			sprintf( buffer, "mflo    %s", s_cpugenreg[ INS_RD( op ) ] );
 			break;
 		case FUNCT_MTLO:
-			if( INS_RD( op ) == 0 )
-			{
-				sprintf( buffer, "mtlo    %s", s_cpugenreg[ INS_RS( op ) ] );
-			}
+			sprintf( buffer, "mtlo    %s", s_cpugenreg[ INS_RS( op ) ] );
 			break;
 		case FUNCT_MULT:
-			if( INS_RD( op ) == 0 )
-			{
-				sprintf( buffer, "mult    %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
-			}
+			sprintf( buffer, "mult    %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_MULTU:
-			if( INS_RD( op ) == 0 )
-			{
-				sprintf( buffer, "multu   %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
-			}
+			sprintf( buffer, "multu   %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_DIV:
-			if( INS_RD( op ) == 0 )
-			{
-				sprintf( buffer, "div     %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
-			}
+			sprintf( buffer, "div     %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_DIVU:
-			if( INS_RD( op ) == 0 )
-			{
-				sprintf( buffer, "divu    %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
-			}
+			sprintf( buffer, "divu    %s,%s", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
 			break;
 		case FUNCT_ADD:
 			sprintf( buffer, "add     %s,%s,%s", s_cpugenreg[ INS_RD( op ) ], s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ] );
@@ -241,45 +302,50 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 		}
 		break;
 	case OP_REGIMM:
-		switch( INS_RT( op ) )
+		switch( INS_RT_REGIMM( op ) )
 		{
 		case RT_BLTZ:
-			sprintf( buffer, "bltz    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			if( INS_RT( op ) == RT_BLTZAL )
+			{
+				sprintf( buffer, "bltzal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
+			}
+			else
+			{
+				sprintf( buffer, "bltz    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+			}
 			break;
 		case RT_BGEZ:
-			sprintf( buffer, "bgez    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
-			break;
-		case RT_BLTZAL:
-			sprintf( buffer, "bltzal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
-			break;
-		case RT_BGEZAL:
-			sprintf( buffer, "bgezal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			if( INS_RT( op ) == RT_BGEZAL )
+			{
+				sprintf( buffer, "bgezal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
+			}
+			else
+			{
+				sprintf( buffer, "bgez    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+			}
 			break;
 		}
 		break;
 	case OP_J:
-		sprintf( buffer, "j       $%08x", ( ( pc + 4 ) & 0xF0000000 ) + ( INS_TARGET( op ) << 2 ) );
+		sprintf( buffer, "j       $%08x", jump_address( pc, op ) );
 		break;
 	case OP_JAL:
-		sprintf( buffer, "jal     $%08x", ( ( pc + 4 ) & 0xF0000000 ) + ( INS_TARGET( op ) << 2 ) );
+		sprintf( buffer, "jal     $%08x", jump_address( pc, op ) );
+		flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
 		break;
 	case OP_BEQ:
-		sprintf( buffer, "beq     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+		sprintf( buffer, "beq     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
 		break;
 	case OP_BNE:
-		sprintf( buffer, "bne     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+		sprintf( buffer, "bne     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
 		break;
 	case OP_BLEZ:
-		if( INS_RT( op ) == 0 )
-		{
-			sprintf( buffer, "blez    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
-		}
+		sprintf( buffer, "blez    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
 		break;
 	case OP_BGTZ:
-		if( INS_RT( op ) == 0 )
-		{
-			sprintf( buffer, "bgtz    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
-		}
+		sprintf( buffer, "bgtz    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
 		break;
 	case OP_ADDI:
 		sprintf( buffer, "addi    %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
@@ -303,7 +369,7 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 		sprintf( buffer, "xori    %s,%s,$%04x", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], INS_IMMEDIATE( op ) );
 		break;
 	case OP_LUI:
-		sprintf( buffer, "lui     %s,$%04x", s_cpugenreg[ INS_RT( op ) ], INS_IMMEDIATE( op ) );
+		sprintf( buffer, "lui     %s,%s", s_cpugenreg[ INS_RT( op ) ], upper_address( op, opram ) );
 		break;
 	case OP_COP0:
 		switch( INS_RS( op ) )
@@ -311,17 +377,24 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 		case RS_MFC:
 			sprintf( buffer, "mfc0    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp0genreg[ INS_RD( op ) ] );
 			break;
+		case RS_CFC:
+			sprintf( buffer, "!cfc0    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp0ctlreg[ INS_RD( op ) ] );
+			break;
 		case RS_MTC:
 			sprintf( buffer, "mtc0    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp0genreg[ INS_RD( op ) ] );
 			break;
+		case RS_CTC:
+			sprintf( buffer, "!ctc0    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp0ctlreg[ INS_RD( op ) ] );
+			break;
 		case RS_BC:
-			switch( INS_RT( op ) )
+		case RS_BC_ALT:
+			switch( INS_BC( op ) )
 			{
-			case RT_BCF:
-				sprintf( buffer, "bc0f    $%08x", pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			case BC_BCF:
+				sprintf( buffer, "bc0f    $%08x", relative_address( pc, op ) );
 				break;
-			case RT_BCT:
-				sprintf( buffer, "bc0t    $%08x", pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			case BC_BCT:
+				sprintf( buffer, "bc0t    $%08x", relative_address( pc, op ) );
 				break;
 			}
 			break;
@@ -333,19 +406,19 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 
 				switch( INS_CF( op ) )
 				{
-				case 1:
-					sprintf( buffer, "tlbr" );
+				case CF_TLBR:
+					sprintf( buffer, "!tlbr" );
 					break;
-				case 4:
-					sprintf( buffer, "tlbwi" );
+				case CF_TLBWI:
+					sprintf( buffer, "!tlbwi" );
 					break;
-				case 6:
-					sprintf( buffer, "tlbwr" );
+				case CF_TLBWR:
+					sprintf( buffer, "!tlbwr" );
 					break;
-				case 8:
-					sprintf( buffer, "tlbp" );
+				case CF_TLBP:
+					sprintf( buffer, "!tlbp" );
 					break;
-				case 16:
+				case CF_RFE:
 					sprintf( buffer, "rfe" );
 					break;
 				}
@@ -370,13 +443,14 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			sprintf( buffer, "ctc1    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp1ctlreg[ INS_RD( op ) ] );
 			break;
 		case RS_BC:
-			switch( INS_RT( op ) )
+		case RS_BC_ALT:
+			switch( INS_BC( op ) )
 			{
-			case RT_BCF:
-				sprintf( buffer, "bc1f    $%08x", pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			case BC_BCF:
+				sprintf( buffer, "bc1f    $%08x", relative_address( pc, op ) );
 				break;
-			case RT_BCT:
-				sprintf( buffer, "bc1t    $%08x", pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			case BC_BCT:
+				sprintf( buffer, "bc1t    $%08x", relative_address( pc, op ) );
 				break;
 			}
 			break;
@@ -406,13 +480,14 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			sprintf( buffer, "ctc2    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp2ctlreg[ INS_RD( op ) ] );
 			break;
 		case RS_BC:
-			switch( INS_RT( op ) )
+		case RS_BC_ALT:
+			switch( INS_BC( op ) )
 			{
-			case RT_BCF:
-				sprintf( buffer, "bc2f    $%08x", pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			case BC_BCF:
+				sprintf( buffer, "bc2f    $%08x", relative_address( pc, op ) );
 				break;
-			case RT_BCT:
-				sprintf( buffer, "bc2t    $%08x", pc + 4 + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 ) );
+			case BC_BCT:
+				sprintf( buffer, "bc2t    $%08x", relative_address( pc, op ) );
 				break;
 			}
 			break;
@@ -567,54 +642,103 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			break;
 		}
 		break;
+	case OP_COP3:
+		switch( INS_RS( op ) )
+		{
+		case RS_MFC:
+			sprintf( buffer, "mfc3    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp3genreg[ INS_RD( op ) ] );
+			break;
+		case RS_CFC:
+			sprintf( buffer, "cfc3    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp3ctlreg[ INS_RD( op ) ] );
+			break;
+		case RS_MTC:
+			sprintf( buffer, "mtc3    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp3genreg[ INS_RD( op ) ] );
+			break;
+		case RS_CTC:
+			sprintf( buffer, "ctc3    %s,%s",  s_cpugenreg[ INS_RT( op ) ], s_cp3ctlreg[ INS_RD( op ) ] );
+			break;
+		case RS_BC:
+		case RS_BC_ALT:
+			switch( INS_BC( op ) )
+			{
+			case BC_BCF:
+				sprintf( buffer, "bc3f    $%08x", relative_address( pc, op ) );
+				break;
+			case BC_BCT:
+				sprintf( buffer, "bc3t    $%08x", relative_address( pc, op ) );
+				break;
+			}
+			break;
+		default:
+			switch( INS_CO( op ) )
+			{
+			case 1:
+				sprintf( buffer, "cop3    $%07x", INS_COFUN( op ) );
+				break;
+			}
+			break;
+		}
+		break;
 	case OP_LB:
-		sprintf( buffer, "lb      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lb      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LH:
-		sprintf( buffer, "lh      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lh      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LWL:
-		sprintf( buffer, "lwl     %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lwl     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LW:
-		sprintf( buffer, "lw      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lw      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LBU:
-		sprintf( buffer, "lbu     %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lbu     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LHU:
-		sprintf( buffer, "lhu     %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lhu     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LWR:
-		sprintf( buffer, "lwr     %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lwr     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SB:
-		sprintf( buffer, "sb      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "sb      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SH:
-		sprintf( buffer, "sh      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "sh      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SWL:
-		sprintf( buffer, "swl     %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "swl     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SW:
-		sprintf( buffer, "sw      %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "sw      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SWR:
-		sprintf( buffer, "swr     %s,%s", s_cpugenreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "swr     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		break;
+	case OP_LWC0:
+		sprintf( buffer, "lwc0    %s,%s", s_cp0genreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LWC1:
-		sprintf( buffer, "lwc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lwc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_LWC2:
-		sprintf( buffer, "lwc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "lwc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		break;
+	case OP_LWC3:
+		sprintf( buffer, "lwc3    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		break;
+	case OP_SWC0:
+		sprintf( buffer, "swc0    %s,%s", s_cp0genreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SWC1:
-		sprintf( buffer, "swc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "swc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	case OP_SWC2:
-		sprintf( buffer, "swc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], make_address( pc, op ) );
+		sprintf( buffer, "swc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		break;
+	case OP_SWC3:
+		sprintf( buffer, "swc3    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
 		break;
 	}
-	return ( opram - oldopram ) | DASMFLAG_SUPPORTED;
+	return ( opram - oldopram ) | flags | DASMFLAG_SUPPORTED;
 }

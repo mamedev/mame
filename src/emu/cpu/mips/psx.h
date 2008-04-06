@@ -3,11 +3,15 @@
 
 #include "cpuintrf.h"
 
+#define MIPS_DELAYR_PC ( 32 )
+#define MIPS_DELAYR_NOTPC ( 33 )
+
 enum
 {
 	MIPS_PC = 1,
 	MIPS_DELAYV, MIPS_DELAYR,
 	MIPS_HI, MIPS_LO,
+	MIPS_BIU,
 	MIPS_R0, MIPS_R1,
 	MIPS_R2, MIPS_R3,
 	MIPS_R4, MIPS_R5,
@@ -32,14 +36,6 @@ enum
 	MIPS_CP0R10, MIPS_CP0R11,
 	MIPS_CP0R12, MIPS_CP0R13,
 	MIPS_CP0R14, MIPS_CP0R15,
-	MIPS_CP0R16, MIPS_CP0R17,
-	MIPS_CP0R18, MIPS_CP0R19,
-	MIPS_CP0R20, MIPS_CP0R21,
-	MIPS_CP0R22, MIPS_CP0R23,
-	MIPS_CP0R24, MIPS_CP0R25,
-	MIPS_CP0R26, MIPS_CP0R27,
-	MIPS_CP0R28, MIPS_CP0R29,
-	MIPS_CP0R30, MIPS_CP0R31,
 	MIPS_CP2DR0, MIPS_CP2DR1,
 	MIPS_CP2DR2, MIPS_CP2DR3,
 	MIPS_CP2DR4, MIPS_CP2DR5,
@@ -97,7 +93,9 @@ enum
 #define INS_CODE( op ) ( ( op >> 6 ) & 0xfffff )
 #define INS_CO( op ) ( ( op >> 25 ) & 1 )
 #define INS_COFUN( op ) ( op & 0x1ffffff )
-#define INS_CF( op ) ( op & 63 )
+#define INS_CF( op ) ( op & 31 )
+#define INS_BC( op ) ( ( op >> 16 ) & 1 )
+#define INS_RT_REGIMM( op ) ( ( op >> 16 ) & 1 )
 
 #define GTE_OP( op ) ( ( op >> 20 ) & 31 )
 #define GTE_SF( op ) ( ( op >> 19 ) & 1 )
@@ -128,6 +126,7 @@ enum
 #define OP_COP0 ( 16 )
 #define OP_COP1 ( 17 )
 #define OP_COP2 ( 18 )
+#define OP_COP3 ( 19 )
 #define OP_LB ( 32 )
 #define OP_LH ( 33 )
 #define OP_LWL ( 34 )
@@ -140,10 +139,14 @@ enum
 #define OP_SWL ( 42 )
 #define OP_SW ( 43 )
 #define OP_SWR ( 46 )
+#define OP_LWC0 ( 48 )
 #define OP_LWC1 ( 49 )
 #define OP_LWC2 ( 50 )
+#define OP_LWC3 ( 51 )
+#define OP_SWC0 ( 56 )
 #define OP_SWC1 ( 57 )
 #define OP_SWC2 ( 58 )
+#define OP_SWC3 ( 59 )
 
 /* OP_SPECIAL */
 #define FUNCT_SLL ( 0 )
@@ -187,12 +190,17 @@ enum
 #define RS_MTC ( 4 )
 #define RS_CTC ( 6 )
 #define RS_BC ( 8 )
+#define RS_BC_ALT ( 12 )
 
-/* RS_BC */
-#define RT_BCF ( 0 )
-#define RT_BCT ( 1 )
+/* BC_BC */
+#define BC_BCF ( 0 )
+#define BC_BCT ( 1 )
 
 /* OP_COP0 */
+#define CF_TLBR ( 1 )
+#define CF_TLBWI ( 2 )
+#define CF_TLBWR ( 6 )
+#define CF_TLBP ( 8 )
 #define CF_RFE ( 16 )
 
 #ifdef ENABLE_DEBUGGER

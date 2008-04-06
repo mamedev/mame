@@ -241,6 +241,7 @@ enum _cpu_type
 	CPU_MB86233,
 	CPU_SSP1601,
 	CPU_MINX,
+	CPU_CXD8661R,
     CPU_COUNT
 };
 typedef enum _cpu_type cpu_type;

@@ -1377,8 +1377,9 @@ $(CPUOBJ)/spc700/spc700.o:	$(CPUSRC)/spc700/spc700.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_PSXCPU=$(if $(filter PSXCPU,$(CPUS)),1,0)
+CPUDEFS += -DHAS_CXD8661R=$(if $(filter CXD8661R,$(CPUS)),1,0)
 
-ifneq ($(filter PSXCPU,$(CPUS)),)
+ifneq ($(filter PSXCPU CXD8661R,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/psx.o
 DBGOBJS += $(CPUOBJ)/mips/mipsdasm.o

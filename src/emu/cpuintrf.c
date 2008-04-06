@@ -213,6 +213,7 @@ void mb8844_get_info(UINT32 state, cpuinfo *info);
 void mb86233_get_info(UINT32 state, cpuinfo *info);
 void ssp1601_get_info(UINT32 state, cpuinfo *info);
 void minx_get_info(UINT32 state, cpuinfo *info);
+void cxd8661r_get_info(UINT32 state, cpuinfo *info);
 
 
 
@@ -823,6 +824,9 @@ static const struct
 #endif
 #if (HAS_MINX)
 	{ CPU_MINX, minx_get_info },
+#endif
+#if (HAS_CXD8661R)
+	{ CPU_CXD8661R, cxd8661r_get_info },
 #endif
 };
 

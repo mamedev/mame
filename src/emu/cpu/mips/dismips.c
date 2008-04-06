@@ -42,7 +42,7 @@ static struct
 
 static UINT8 *filebuf;
 static UINT32 offset;
-static const UINT8 order[] = { 0, 1, 2, 3 };
+static UINT8 order[] = { 0, 1, 2, 3 };
 
 static const char *const Options[]=
 {
@@ -307,6 +307,8 @@ int main( int argc, char *argv[] )
 			}
 			break;
 		}
+
+		i &= DASMFLAG_LENGTHMASK;
 
 		printf( "%08x: ", pc + offset );
 		for( j = 0; j < i; j++ )
