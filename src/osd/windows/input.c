@@ -1229,7 +1229,7 @@ static const char *dinput_device_item_name(device_info *devinfo, int offset, con
 		return utf8_from_tstring(namestring);
 
 	// otherwise, allocate space to add the suffix
-	combined = malloc_or_die(_tcslen(namestring) + 1 + _tcslen(suffix) + 1);
+	combined = malloc_or_die(sizeof(TCHAR) * (_tcslen(namestring) + 1 + _tcslen(suffix) + 1));
 	_tcscpy(combined, namestring);
 	_tcscat(combined, TEXT(" "));
 	_tcscat(combined, suffix);
