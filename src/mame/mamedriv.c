@@ -6433,7 +6433,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pspikesk )	/* (c) 1991 Video System Co. (Korea) */
 	DRIVER( svolly91 )	/* (c) 1991 Video System Co. (Japan) */
 	DRIVER( pspikesb )	/* bootleg */
-	DRIVER( pallavol )	/* bootleg */
+	DRIVER( spikes91 )	/* bootleg */
 	DRIVER( pspikesc )	/* bootleg */
 	DRIVER( karatblz )	/* (c) 1991 Video System Co. */
 	DRIVER( karatblu )	/* (c) 1991 Video System Co. (US) */

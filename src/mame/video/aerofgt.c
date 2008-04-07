@@ -476,20 +476,63 @@ static void pspikesb_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	}
 }
 
+static void spikes91_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
+{
+	int i;
+	UINT8 *lookup;
+	lookup = memory_region(REGION_USER1);
+	spritepalettebank = 1;
+
+	for (i = aerofgt_spriteram3_size/2 - 4 ; i >= 4 ; i -= 4)
+	{
+		int xpos,ypos,color,flipx,flipy,code,realcode;
+
+		code = aerofgt_spriteram3[i + 0] & 0x1fff;
+
+		if (!code) continue;
+
+		xpos = (aerofgt_spriteram3[i + 2] & 0x01ff) - 16;
+		ypos = 256 - (aerofgt_spriteram3[i + 1] & 0x00ff) - 26;
+		flipy = 0;
+		flipx = aerofgt_spriteram3[i + 3] & 0x8000;
+		color = ((aerofgt_spriteram3[i + 3] & 0x00f0) >> 4);
+
+		// look-up table
+		// RZ notes:
+		// in game it's necessary an or with 0x2000;
+		// probably a bit switch the table
+		// almost sure no line swap in the look-up table
+
+		code |= 0x2000;
+		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
+
+		drawgfx(bitmap,machine->gfx[sprite_gfx],
+				realcode,
+				color,
+				flipx,flipy,
+				xpos,ypos,
+				cliprect,TRANSPARENCY_PEN,15);
+
+		/* wrap around y */
+		drawgfx(bitmap,machine->gfx[sprite_gfx],
+				realcode,
+				color,
+				flipx,flipy,
+				xpos,ypos + 512,
+				cliprect,TRANSPARENCY_PEN,15);
+	}
+}
+
 static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	int attr_start;//,base,first;
-//  int notdraw = 0;
+	int attr_start,last;
 
-//  base = chip * 0x0200;
-//  first = 4 * aerofgt_spriteram3[0x1fe + base];
+	last = ((aerofgt_rasterram[0x404/2] << 5) - 0x8000) / 2; 
 
-	for (attr_start = aerofgt_spriteram3_size/2 - 4 /* - 16 */;attr_start >= 0;attr_start -= 4)
+	for (attr_start = aerofgt_spriteram3_size / 2 - 4 ; attr_start >= last ; attr_start -= 4)
 	{
 		int code;
 		int ox,oy,sx,sy,zoomx,zoomy,flipx,flipy,color,pri;
-// some other drivers still use this wrong table, they have to be upgraded
-//      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
 		ox = aerofgt_spriteram3[attr_start + 1] & 0x01ff;
 		oy = aerofgt_spriteram3[attr_start + 0] & 0x01ff;
@@ -500,22 +543,54 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		zoomx = (aerofgt_spriteram3[attr_start + 1] & 0xf000) >> 12;
 		zoomy = (aerofgt_spriteram3[attr_start + 0] & 0xf000) >> 12;
 		pri = aerofgt_spriteram3[attr_start + 2] & 0x0010;
-//      code = aerofgt_spriteram3[attr_start + 3] & 0x3fff;
 		code = aerofgt_spriteram3[attr_start + 3] & 0x1fff;
-
-//      if ((!(aerofgt_spriteram3[attr_start + 0])) & (!(aerofgt_spriteram3[attr_start + 1])) &
-//          (!(aerofgt_spriteram3[attr_start + 2])) & (!(aerofgt_spriteram3[attr_start + 3]))) notdraw = 1;
-
-//      if (notdraw) continue;
 
 		if (!(aerofgt_spriteram3[attr_start + 2] & 0x0040)) code |= 0x2000;
 
 		zoomx = 32 + zoomx;
 		zoomy = 32 + zoomy;
 
-		sy = ((oy + 16) & 0x1ff) - 16;
+		sy = ((oy + 16 - 1) & 0x1ff) - 16;
 
-		sx = ((ox + 16) & 0x1ff) - 16;
+		sx = ((ox + 16 + 3) & 0x1ff) - 16;
+
+		pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+				code,
+				color,
+				flipx,flipy,
+				sx,sy,
+				cliprect,TRANSPARENCY_PEN,15,
+				zoomx << 11,zoomy << 11,
+				pri ? 0 : 0x2);
+
+	}
+
+	last = ((aerofgt_rasterram[0x402/2] << 5) - 0x8000) / 2;
+
+	for (attr_start = ((aerofgt_spriteram3_size / 2) / 2) - 4 ; attr_start >= last ; attr_start -= 4)
+	{
+		int code;
+		int ox,oy,sx,sy,zoomx,zoomy,flipx,flipy,color,pri;
+
+		ox = aerofgt_spriteram3[attr_start + 1] & 0x01ff;
+		oy = aerofgt_spriteram3[attr_start + 0] & 0x01ff;
+		flipx = aerofgt_spriteram3[attr_start + 2] & 0x0800;
+		flipy = aerofgt_spriteram3[attr_start + 2] & 0x8000;
+		color = aerofgt_spriteram3[attr_start + 2] & 0x000f;
+
+		zoomx = (aerofgt_spriteram3[attr_start + 1] & 0xf000) >> 12;
+		zoomy = (aerofgt_spriteram3[attr_start + 0] & 0xf000) >> 12;
+		pri = aerofgt_spriteram3[attr_start + 2] & 0x0010;
+		code = aerofgt_spriteram3[attr_start + 3] & 0x1fff;
+
+		if (!(aerofgt_spriteram3[attr_start + 2] & 0x0040)) code |= 0x2000;
+
+		zoomx = 32 + zoomx;
+		zoomy = 32 + zoomy;
+
+		sy = ((oy + 16 - 1) & 0x1ff) - 16;
+
+		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
 		pdrawgfxzoom(bitmap,machine->gfx[sprite_gfx + (code >= 0x1000 ? 0 : 1)],
 				code,
@@ -579,6 +654,22 @@ VIDEO_UPDATE( pspikesb )
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	pspikesb_draw_sprites(screen->machine,bitmap,cliprect);
+	return 0;
+}
+
+VIDEO_UPDATE( spikes91 )
+{
+	int i,scrolly;
+
+	tilemap_set_scroll_rows(bg1_tilemap,256);
+	scrolly = bg1scrolly;
+
+	for (i = 0;i < 256;i++)
+		tilemap_set_scrollx(bg1_tilemap,(i + scrolly) & 0xff,aerofgt_rasterram[i+0x01f0/2]+0x96+0x16);
+	tilemap_set_scrolly(bg1_tilemap,0,scrolly);
+
+	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
+	spikes91_draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
 

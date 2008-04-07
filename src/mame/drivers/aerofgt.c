@@ -92,6 +92,7 @@ VIDEO_START( spinlbrk );
 VIDEO_START( turbofrc );
 VIDEO_UPDATE( pspikes );
 VIDEO_UPDATE( pspikesb );
+VIDEO_UPDATE( spikes91 );
 VIDEO_UPDATE( karatblz );
 VIDEO_UPDATE( spinlbrk );
 VIDEO_UPDATE( turbofrc );
@@ -192,7 +193,7 @@ static ADDRESS_MAP_START( pspikesb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(pspikesb_oki_banking_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pallavol_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( spikes91_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
@@ -1149,7 +1150,7 @@ static const gfx_layout aerofgt_spritelayout =
 	128*8
 };
 
-static const gfx_layout pallavol_spritelayout =
+static const gfx_layout spikes91_spritelayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
@@ -1202,9 +1203,9 @@ static GFXDECODE_START( pspikesb )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, pspikesb_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static GFXDECODE_START( pallavol )
+static GFXDECODE_START( spikes91 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, pspikesb_charlayout,      0, 64 )	/* colors    0-1023 in 8 banks */
-	GFXDECODE_ENTRY( REGION_GFX2, 0, pallavol_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
+	GFXDECODE_ENTRY( REGION_GFX2, 0, spikes91_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
 
@@ -1298,11 +1299,11 @@ static MACHINE_DRIVER_START( pspikes )
 	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( pallavol )
+static MACHINE_DRIVER_START( spikes91 )
 
 /* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(pallavol_map,0)
+	MDRV_CPU_PROGRAM_MAP(spikes91_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)/* all irq vectors are the same */
 
 	/* + Z80 for sound */
@@ -1314,11 +1315,11 @@ static MACHINE_DRIVER_START( pallavol )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8+4, 44*8+4-1, 0*8, 30*8-1)
-	MDRV_GFXDECODE(pallavol)
+	MDRV_GFXDECODE(spikes91)
 	MDRV_PALETTE_LENGTH(2048)
 
 	MDRV_VIDEO_START(pspikes)
-	MDRV_VIDEO_UPDATE(pspikesb)
+	MDRV_VIDEO_UPDATE(spikes91)
 
 	/* sound hardware */
 	/* the sound hardware is completely different on this:
@@ -1762,7 +1763,7 @@ ROM_END
 
 /*
 
-Pallavolo (Italian Power Spikes bootleg)
+1991 Spikes (Italian bootleg)
 
 Anno    1991
 Produttore
@@ -1810,7 +1811,7 @@ original game
 
 */
 
-ROM_START( pallavol )
+ROM_START( spikes91 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "7.ic2",    0x00001, 0x20000, CRC(41e38d7e) SHA1(d0c226a8b61a2311c781ed5747d78b8dbddbc7ef) )
 	ROM_LOAD16_BYTE( "8.ic3",    0x00000, 0x20000, CRC(9c488daa) SHA1(8336fec855786c6cc6a836d86b74e130d60013b7) )
@@ -1827,7 +1828,7 @@ ROM_START( pallavol )
 	ROM_LOAD( "13.ic120",   0x80000, 0x40000, CRC(89213a8c) SHA1(8524d5c14669d9b03f1fe050c4318d4111bc8ef7) )
 	ROM_LOAD( "14.ic121",   0xc0000, 0x40000, CRC(468cbf5b) SHA1(60fbc2771e40f8de51a51891b8ddcc14e2b1e52c) )
 
-	ROM_REGION( 0x020000, REGION_USER1, 0 ) /* ??? Unknown, interleaved - near sprite roms, lookup tables? */
+	ROM_REGION( 0x020000, REGION_USER1, 0 ) /* lookup tables for the sprites  */
 	ROM_LOAD( "10.ic104",   0x00000, 0x10000, CRC(769ade77) SHA1(9cb581d02592c69f37d4b5a902d3515f40915ec4) )
 	ROM_LOAD( "9.ic103",    0x10000, 0x10000, CRC(201cb748) SHA1(f78d384e4e9c5996a278f76fb4d5f28812a27de5) )
 
@@ -2335,7 +2336,7 @@ GAME( 1991, pspikes,  0,        pspikes,  pspikes,  0, ROT0,   "Video System Co.
 GAME( 1991, pspikesk, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Power Spikes (Korea)", GAME_NO_COCKTAIL )
 GAME( 1991, svolly91, pspikes,  pspikes,  pspikes,  0, ROT0,   "Video System Co.", "Super Volley '91 (Japan)", GAME_NO_COCKTAIL )
 GAME( 1991, pspikesb, pspikes,  pspikesb, pspikesb, 0, ROT0,   "bootleg",          "Power Spikes (bootleg)", GAME_NO_COCKTAIL )
-GAME( 1991, pallavol, pspikes,  pallavol, pspikes,	0, ROT0,   "bootleg",          "Pallavolo (Italian Power Spikes bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL )
+GAME( 1991, spikes91, pspikes,  spikes91, pspikes,  0, ROT0,   "bootleg",          "1991 Spikes (Italian bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_NO_COCKTAIL )
 GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, 0, ROT0,   "bootleg",          "Power Spikes (China)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World?)", GAME_NO_COCKTAIL )
 GAME( 1991, karatblu, karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_NO_COCKTAIL )
@@ -2345,5 +2346,5 @@ GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  0, ROT270, "Video System Co.
 GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 1)", GAME_NO_COCKTAIL )
 GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 2)", GAME_NO_COCKTAIL )
 GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", GAME_NO_COCKTAIL )
-GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97,   0, ROT0,   "Comad",            "Beach Festival World Championship 1997", GAME_NO_COCKTAIL )
