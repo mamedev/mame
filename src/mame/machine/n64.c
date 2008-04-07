@@ -208,9 +208,6 @@ static void sp_dma(int direction)
 	}
 }
 
-
-
-
 static void sp_set_status(UINT32 status)
 {
 	if (status & 0x1)
@@ -566,7 +563,7 @@ const rsp_config n64_rsp_config =
 
 
 // Video Interface
-static UINT32 n64_vi_width;
+UINT32 n64_vi_width; // This needs to be non-static
 UINT32 n64_vi_origin;
 UINT32 n64_vi_control;
 static UINT32 n64_vi_burst, n64_vi_vsync,  n64_vi_hsync,  n64_vi_leap,  n64_vi_hstart, n64_vi_vstart;
@@ -703,10 +700,10 @@ WRITE32_HANDLER( n64_vi_reg_w )
 
         /*
         Uncomment this for convenient homebrew debugging
+        */
         case 0x44/4:        // TEMP DEBUG
             printf( "E Ping: %08x\n", data );
             break;
-        */
 
 		default:
 			logerror("vi_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
@@ -725,13 +722,14 @@ static UINT32 ai_status = 0;
 
 static emu_timer *audio_timer;
 
-#define SOUNDBUFFER_LENGTH	0x20000
-#define AUDIO_DMA_DEPTH		2
+#define AUDIO_DMA_DEPTH     2
+
+static void start_audio_dma(void);
 
 typedef struct
 {
-	UINT32 address;
-	UINT32 length;
+    UINT32 address;
+    UINT32 length;
 } AUDIO_DMA;
 
 static AUDIO_DMA audio_fifo[AUDIO_DMA_DEPTH];
@@ -741,158 +739,191 @@ static int audio_fifo_num = 0;
 
 static void audio_fifo_push(UINT32 address, UINT32 length)
 {
-	AUDIO_DMA *current;
-	attotime period;
+    AUDIO_DMA *current;
 
-	if (audio_fifo_num == AUDIO_DMA_DEPTH)
-	{
-		mame_printf_debug("audio_fifo_push: tried to push to full DMA FIFO!!!\n");
-	}
+    //FILE *audio_dump = fopen( "audio.bin", "a+b" );
+    //fwrite((INT16*)rdram+(address/2),length,1,audio_dump);
+    //fclose(audio_dump);
+
+    if (audio_fifo_num == AUDIO_DMA_DEPTH)
+    {
+        mame_printf_debug("audio_fifo_push: tried to push to full DMA FIFO!!!\n");
+    }
 
 //  mame_printf_debug("fifo_push: adr %08x len %08x\n", address, length);
 
-	audio_fifo[audio_fifo_wpos].address = address;
-	audio_fifo[audio_fifo_wpos].length = length;
-	current = &audio_fifo[audio_fifo_wpos];
+    audio_fifo[audio_fifo_wpos].address = address;
+    audio_fifo[audio_fifo_wpos].length = length;
+    current = &audio_fifo[audio_fifo_wpos];
 
-	audio_fifo_wpos++;
-	audio_fifo_num++;
+    audio_fifo_wpos++;
+    audio_fifo_num++;
 
-	if (audio_fifo_wpos >= AUDIO_DMA_DEPTH)
-	{
-		audio_fifo_wpos = 0;
-	}
+    if (audio_fifo_wpos >= AUDIO_DMA_DEPTH)
+    {
+        audio_fifo_wpos = 0;
+    }
 
-	if (audio_fifo_num >= AUDIO_DMA_DEPTH)
-	{
-		ai_status |= 0x80000001;	// FIFO full
-	}
+    if (audio_fifo_num >= AUDIO_DMA_DEPTH)
+    {
+        ai_status |= 0x80000001;    // FIFO full
+    }
 
-	// adjust the timer
-	period = attotime_mul(ATTOTIME_IN_HZ(DACRATE_NTSC), (ai_dacrate + 1) * (current->length / 4));
-	timer_adjust_oneshot(audio_timer, period, 0);
+    if (! (ai_status & 0x40000000))
+    {
+        signal_rcp_interrupt(AI_INTERRUPT);
+        start_audio_dma();
+    }
 }
 
 static void audio_fifo_pop(void)
 {
-	audio_fifo_rpos++;
-	audio_fifo_num--;
+    audio_fifo_rpos++;
+    audio_fifo_num--;
 
-	if (audio_fifo_num < 0)
-	{
-		fatalerror("audio_fifo_pop: FIFO underflow!\n");
-	}
+    if (audio_fifo_num < 0)
+    {
+        fatalerror("audio_fifo_pop: FIFO underflow!\n");
+    }
 
-	if (audio_fifo_rpos >= AUDIO_DMA_DEPTH)
-	{
-		audio_fifo_rpos = 0;
-	}
+    if (audio_fifo_rpos >= AUDIO_DMA_DEPTH)
+    {
+        audio_fifo_rpos = 0;
+    }
 
-	if (audio_fifo_num < AUDIO_DMA_DEPTH)
-	{
-		ai_status &= ~0x80000001;	// FIFO not full
-	}
-
-	ai_len = 0;
+    if (audio_fifo_num < AUDIO_DMA_DEPTH)
+    {
+        ai_status &= ~0x80000001;   // FIFO not full
+        signal_rcp_interrupt(AI_INTERRUPT);
+    }
 }
 
 static AUDIO_DMA *audio_fifo_get_top(void)
 {
-	if (audio_fifo_num > 0)
-	{
-		return &audio_fifo[audio_fifo_rpos];
-	}
-	else
-	{
-		return NULL;
-	}
+    if (audio_fifo_num > 0)
+    {
+        return &audio_fifo[audio_fifo_rpos];
+    }
+    else
+    {
+        return NULL;
+    }
 }
 
 static void start_audio_dma(void)
 {
-	INT16 *ram = (INT16*)rdram;
-	AUDIO_DMA *current = audio_fifo_get_top();
+    INT16 *ram = (INT16*)rdram;
+    AUDIO_DMA *current = audio_fifo_get_top();
+    attotime period;
 
-	ram = &ram[current->address/2];
+  static FILE * audio_dump = NULL;
+
+  if (audio_dump == NULL)
+      audio_dump = fopen("audio_dump.raw","wb");
+
+  fwrite(&ram[current->address/2],current->length,1,audio_dump);
+
+    ram = &ram[current->address/2];
 
 //  mame_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
 
-	dmadac_transfer(0, 2, 2, 2, current->length/4, ram);
+    dmadac_transfer(0, 2, 2, 2, current->length/4, ram);
+
+    ai_status |= 0x40000000;
+
+   // adjust the timer
+   period = attotime_mul(ATTOTIME_IN_HZ(DACRATE_NTSC), (ai_dacrate + 1) * (current->length / 4));
+   timer_adjust_oneshot(audio_timer, period, 0);
 }
 
 static TIMER_CALLBACK( audio_timer_callback )
 {
-	audio_fifo_pop();
+    audio_fifo_pop();
 
-	// keep playing if there's another DMA queued
-	if (audio_fifo_get_top() != NULL)
-	{
-		start_audio_dma();
-		signal_rcp_interrupt(AI_INTERRUPT);
-	}
+    // keep playing if there's another DMA queued
+    if (audio_fifo_get_top() != NULL)
+    {
+        start_audio_dma();
+        signal_rcp_interrupt(AI_INTERRUPT);
+    }
+    else
+    {
+        ai_status &= ~0x40000000;
+    }
 }
 
 READ32_HANDLER( n64_ai_reg_r )
 {
-	switch (offset)
-	{
-		case 0x04/4:		// AI_LEN_REG
-		{
-			return ai_len;
-		}
+    switch (offset)
+    {
+        case 0x04/4:        // AI_LEN_REG
+        {
+            if (ai_status & 0x80000001)
+            {
+                return ai_len;
+            }
+            else if (ai_status & 0x40000000)
+            {
+                double secs_left = attotime_to_double(attotime_sub(timer_firetime(audio_timer),timer_get_time()));
+                unsigned int samples_left = secs_left * DACRATE_NTSC / (ai_dacrate + 1);
+                return samples_left * 4;
+            }
+            else return 0;
+        }
 
-		case 0x0c/4:		// AI_STATUS_REG
-			return ai_status;
+        case 0x0c/4:        // AI_STATUS_REG
+            return ai_status;
 
-		default:
-			logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
-			break;
-	}
+        default:
+            logerror("ai_reg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+            break;
+    }
 
-	return 0;
+    return 0;
 }
 
 WRITE32_HANDLER( n64_ai_reg_w )
 {
 //  UINT16 *ram = (UINT16*)rdram;
 
-	switch (offset)
-	{
-		case 0x00/4:		// AI_DRAM_ADDR_REG
+    switch (offset)
+    {
+        case 0x00/4:        // AI_DRAM_ADDR_REG
 //          mame_printf_debug("ai_dram_addr = %08X at %08X\n", data, activecpu_get_pc());
-			ai_dram_addr = data & 0xffffff;
-			break;
+            ai_dram_addr = data & 0xffffff;
+            break;
 
-		case 0x04/4:		// AI_LEN_REG
+        case 0x04/4:        // AI_LEN_REG
 //          mame_printf_debug("ai_len = %08X at %08X\n", data, activecpu_get_pc());
-			ai_len = data & 0x3ffff;		// Hardware v2.0 has 18 bits, v1.0 has 15 bits
-			audio_fifo_push(ai_dram_addr, ai_len);
-			break;
+            ai_len = data & 0x3ffff;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
+            audio_fifo_push(ai_dram_addr, ai_len);
+            break;
 
-		case 0x08/4:		// AI_CONTROL_REG
+        case 0x08/4:        // AI_CONTROL_REG
 //          mame_printf_debug("ai_control = %08X at %08X\n", data, activecpu_get_pc());
-			ai_control = data;
-			break;
+            ai_control = data;
+            break;
 
-		case 0x0c/4:
-			clear_rcp_interrupt(AI_INTERRUPT);
-			break;
+        case 0x0c/4:
+            clear_rcp_interrupt(AI_INTERRUPT);
+            break;
 
-		case 0x10/4:		// AI_DACRATE_REG
-			ai_dacrate = data & 0x3fff;
-			dmadac_set_frequency(0, 2, (double)DACRATE_NTSC / (double)(ai_dacrate+1));
-			dmadac_enable(0, 2, 1);
-			break;
+        case 0x10/4:        // AI_DACRATE_REG
+            ai_dacrate = data & 0x3fff;
+            dmadac_set_frequency(0, 2, (double)DACRATE_NTSC / (double)(ai_dacrate+1));
+            printf( "frequency: %f\n", (double)DACRATE_NTSC / (double)(ai_dacrate+1) );
+            dmadac_enable(0, 2, 1);
+            break;
 
-		case 0x14/4:		// AI_BITRATE_REG
+        case 0x14/4:        // AI_BITRATE_REG
 //          mame_printf_debug("ai_bitrate = %08X\n", data);
-			ai_bitrate = data & 0xf;
-			break;
+            ai_bitrate = data & 0xf;
+            break;
 
-		default:
-			logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
-			break;
-	}
+        default:
+            logerror("ai_reg_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+            break;
+    }
 }
 
 
@@ -1156,9 +1187,9 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 			{
 				case 0:
 				{
-					buttons = input_port_read_indexed(machine, (channel*3) + 0);
-					x = input_port_read_indexed(machine, (channel*3) + 1) - 128;
-					y = input_port_read_indexed(machine, (channel*3) + 2) - 128;
+                    buttons = input_port_read_indexed(machine, (channel*3) + 0);
+                    x = input_port_read_indexed(machine, (channel*3) + 1) - 128;
+                    y = input_port_read_indexed(machine, (channel*3) + 2) - 128;
 
 					rdata[0] = (buttons >> 8) & 0xff;
 					rdata[1] = (buttons >> 0) & 0xff;
@@ -1371,7 +1402,7 @@ static void handle_pif(running_machine *machine)
 						send_buffer[j] = pif_cmd[cmd_ptr++];
 					}
 
-					res = pif_channel_handle_command(machine, channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
+                    res = pif_channel_handle_command(machine, channel, bytes_to_send, send_buffer, bytes_to_recv, recv_buffer);
 
 					if (res == 0)
 					{
@@ -1483,13 +1514,13 @@ WRITE32_HANDLER( n64_si_reg_w )
 		case 0x04/4:		// SI_PIF_ADDR_RD64B_REG
 			// PIF RAM -> RDRAM
 			si_pif_addr = data;
-			pif_dma(machine, 0);
+            pif_dma(machine, 0);
 			break;
 
 		case 0x10/4:		// SI_PIF_ADDR_WR64B_REG
 			// RDRAM -> PIF RAM
 			si_pif_addr = data;
-			pif_dma(machine, 1);
+            pif_dma(machine, 1);
 			break;
 
 		case 0x18/4:		// SI_STATUS_REG
