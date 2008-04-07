@@ -741,10 +741,6 @@ static void audio_fifo_push(UINT32 address, UINT32 length)
 {
     AUDIO_DMA *current;
 
-    //FILE *audio_dump = fopen( "audio.bin", "a+b" );
-    //fwrite((INT16*)rdram+(address/2),length,1,audio_dump);
-    //fclose(audio_dump);
-
     if (audio_fifo_num == AUDIO_DMA_DEPTH)
     {
         mame_printf_debug("audio_fifo_push: tried to push to full DMA FIFO!!!\n");
@@ -816,12 +812,12 @@ static void start_audio_dma(void)
     AUDIO_DMA *current = audio_fifo_get_top();
     attotime period;
 
-  static FILE * audio_dump = NULL;
-
-  if (audio_dump == NULL)
-      audio_dump = fopen("audio_dump.raw","wb");
-
-  fwrite(&ram[current->address/2],current->length,1,audio_dump);
+    //static FILE * audio_dump = NULL;
+    //
+    //if (audio_dump == NULL)
+    //    audio_dump = fopen("audio_dump.raw","wb");
+    //
+    //fwrite(&ram[current->address/2],current->length,1,audio_dump);
 
     ram = &ram[current->address/2];
 
