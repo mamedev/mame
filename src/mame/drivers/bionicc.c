@@ -26,6 +26,7 @@ Note: These issues have been verified on a real PCB and are not emulation bugs:
       - sprite / background priority ( see level 1: birds walk through
         branches of different trees )
       - see the beginning of level 3: background screwed
+      - gray tiles around the title in Top Secret
 
 ToDo:
 - get rid of input port hack
