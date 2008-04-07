@@ -1032,6 +1032,7 @@ static int default_ports_lookup[__ipt_max][MAX_PLAYERS];
 
 static void input_port_exit(running_machine *machine);
 static void input_port_frame(running_machine *machine);
+static void input_port_frame_update(running_machine *machine);
 static void input_port_load(int config_type, xml_data_node *parentnode);
 static void input_port_save(int config_type, xml_data_node *parentnode);
 static void update_digital_joysticks(running_machine *machine);
@@ -1425,7 +1426,7 @@ static void input_port_postload(void)
 	}
 
 	/* run an initial update */
-	input_port_frame(Machine);
+	input_port_frame_update(Machine);
 }
 
 
@@ -2747,14 +2748,21 @@ void input_port_update_defaults(void)
 
 static void input_port_frame(running_machine *machine)
 {
-	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
-	attotime curtime = timer_get_time();
-	int portnum, bitnum;
-	
 	/* if we're paused, don't do anything */
 	if (mame_is_paused(machine))
 		return;
 
+	/* otherwise, use the common code */
+	input_port_frame_update(machine);
+}
+
+
+static void input_port_frame_update(running_machine *machine)
+{
+	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
+	attotime curtime = timer_get_time();
+	int portnum, bitnum;
+	
 profiler_mark(PROFILER_INPUT);
 
 	/* record/playback information about the current frame */
