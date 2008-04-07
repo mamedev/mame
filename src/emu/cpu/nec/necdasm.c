@@ -7,6 +7,20 @@
 
 #include "cpuintrf.h"
 
+typedef struct _nec_config nec_config;
+struct _nec_config
+{
+	const UINT8*	v25v35_decryptiontable; // internal decryption table
+};
+
+/* default configuration */
+static const nec_config default_config =
+{
+	NULL
+};
+
+static const nec_config *Iconfig;
+
 enum {
 	PARAM_REG8 = 1,		/* 8-bit register */
 	PARAM_REG16,		/* 16-bit register */
@@ -1437,7 +1451,7 @@ static void handle_fpu(char *s, UINT8 op1, UINT8 op2)
 	}
 }
 
-static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
+static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1 )
 {
 	int i;
 	UINT8 op2;
@@ -1446,6 +1460,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 	{
 		case TWO_BYTE:
 			op2 = FETCHD();
+			if (Iconfig->v25v35_decryptiontable) op2 = Iconfig->v25v35_decryptiontable[op2];
 			decode_opcode( s, &necv_opcode_table2[op2], op1 );
 			return;
 
@@ -1455,19 +1470,22 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1)
 		case SEG_SS:
 			segment = op->flags;
 			op2 = FETCH();
+			if (Iconfig->v25v35_decryptiontable) op2 = Iconfig->v25v35_decryptiontable[op2];
 			decode_opcode( s, &necv_opcode_table1[op2], op1 );
 			return;
 
 		case PREFIX:
 			s += sprintf( s, "%-8s", op->mnemonic );
 			op2 = FETCH();
+			if (Iconfig->v25v35_decryptiontable) op2 = Iconfig->v25v35_decryptiontable[op2];
 			decode_opcode( s, &necv_opcode_table1[op2], op1 );
 			return;
 
 		case GROUP:
 			handle_modrm( modrm_string );
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
-				if( mame_stricmp(op->mnemonic, group_op_table[i].mnemonic) == 0 ) {
+				if( mame_stricmp(op->mnemonic, group_op_table[i].mnemonic) == 0 )
+				{
 					decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
 					return;
 				}
@@ -1506,9 +1524,11 @@ handle_unknown:
 	sprintf(s, "???");
 }
 
-int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom)
+int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *_config)
 {
 	UINT8 op;
+	const nec_config *config = _config ? _config : &default_config;
+	Iconfig = config;
 
 	opcode_ptr = opcode_ptr_base = oprom;
 	pc = eip;
@@ -1516,6 +1536,8 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom)
 	segment = 0;
 
 	op = FETCH();
+
+	if (Iconfig->v25v35_decryptiontable) op = Iconfig->v25v35_decryptiontable[op]; 
 
 	decode_opcode( buffer, &necv_opcode_table1[op], op );
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
