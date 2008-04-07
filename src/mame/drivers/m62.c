@@ -1390,6 +1390,8 @@ static MACHINE_DRIVER_START( ldrun3 )
 
 	/* video hardware */
 	MDRV_GFXDECODE(ldrun3)
+	MDRV_VIDEO_START(ldrun2)
+	MDRV_VIDEO_UPDATE(ldrun)
 MACHINE_DRIVER_END
 
 
