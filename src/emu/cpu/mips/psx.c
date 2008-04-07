@@ -2962,7 +2962,7 @@ static UINT32 getcp3cr( int reg )
 	return program_read_dword_32le( mipscpu.pc + 4 );
 }
 
-static void setcp3cr( int reg, UINT32 n_value )
+static void setcp3cr( int reg, UINT32 value )
 {
 }
 
@@ -3080,97 +3080,130 @@ static void setcp3cr( int reg, UINT32 n_value )
 #define ZSF4 ( mipscpu.cp2cr[ 30 ].w.l )
 #define FLAG ( mipscpu.cp2cr[ 31 ].d )
 
-short betweenINT16( INT16 v, INT16 l, INT16 u )
+INLINE INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
 {
-	if( v < l )
+	if( value > max )
 	{
-		return l;
+		FLAG |= flag;
+		return max;
 	}
-	if( v > u )
+	else if( value < min )
 	{
-		return u;
+		FLAG |= flag;
+		return min;
 	}
-	return v;
+	return value;
 }
 
-static UINT32 getcp2dr( int n_reg )
+static UINT32 getcp2dr( int reg )
 {
-	if( n_reg == 1 || n_reg == 3 || n_reg == 5 || n_reg == 8 || n_reg == 9 || n_reg == 10 || n_reg == 11 || n_reg == 28 )
+	switch( reg )
 	{
-		mipscpu.cp2dr[ n_reg ].d = (INT32)(INT16)mipscpu.cp2dr[ n_reg ].d;
+	case 1:
+	case 3:
+	case 5:
+	case 8:
+	case 9:
+	case 10:
+	case 11:
+		mipscpu.cp2dr[ reg ].d = (INT32)(INT16)mipscpu.cp2dr[ reg ].d;
+		break;
+
+	case 7:
+	case 16:
+	case 17:
+	case 18:
+	case 19:
+		mipscpu.cp2dr[ reg ].d = (UINT32)(UINT16)mipscpu.cp2dr[ reg ].d;
+		break;
+
+	case 15:
+		mipscpu.cp2dr[ reg ].d = SXY2;
+		break;
+
+	case 28:
+	case 29:
+		mipscpu.cp2dr[ reg ].d = LIM( (INT16)IR1 >> 7, 0x1f, 0, 0 ) | ( LIM( (INT16)IR2 >> 7, 0x1f, 0, 0 ) << 5 ) | ( LIM( (INT16)IR3 >> 7, 0x1f, 0, 0 ) << 10 );
+		break;
 	}
-	else if( n_reg == 16 || n_reg == 17 || n_reg == 18 || n_reg == 19 )
-	{
-		mipscpu.cp2dr[ n_reg ].d = (UINT32)(UINT16)mipscpu.cp2dr[ n_reg ].d;
-	}
-	else if( n_reg == 29 )
-	{
-		ORGB = betweenINT16( (INT16)IR1 >> 7, 0, 0x1f ) | ( betweenINT16( (INT16)IR2 >> 7, 0, 0x1f ) << 5 ) | ( betweenINT16( (INT16)IR3 >> 7, 0, 0x1f ) << 10 );
-	}
-	GTELOG( "get CP2DR%u=%08x", n_reg, mipscpu.cp2dr[ n_reg ].d );
-	return mipscpu.cp2dr[ n_reg ].d;
+
+	GTELOG( "get CP2DR%u=%08x", reg, mipscpu.cp2dr[ reg ].d );
+	return mipscpu.cp2dr[ reg ].d;
 }
 
-static void setcp2dr( int n_reg, UINT32 n_value )
+static void setcp2dr( int reg, UINT32 value )
 {
-	GTELOG( "set CP2DR%u=%08x", n_reg, n_value );
-	mipscpu.cp2dr[ n_reg ].d = n_value;
+	GTELOG( "set CP2DR%u=%08x", reg, value );
 
-	if( n_reg == 15 )
+	switch( reg )
 	{
+	case 15:
 		SXY0 = SXY1;
 		SXY1 = SXY2;
-		SXY2 = SXYP;
-	}
-	else if( n_reg == 28 )
-	{
-		IR1 = ( IRGB & 0x1f ) << 7;
-		IR2 = ( IRGB & 0x3e0 ) << 2;
-		IR3 = ( IRGB & 0x7c00 ) >> 3;
-	}
-	else if( n_reg == 30 )
-	{
-		UINT32 n_lzcs = LZCS;
-		UINT32 n_lzcr = 0;
+		SXY2 = value;
+		break;
 
-		if( ( n_lzcs & 0x80000000 ) == 0 )
+	case 28:
+		IR1 = ( value & 0x1f ) << 7;
+		IR2 = ( value & 0x3e0 ) << 2;
+		IR3 = ( value & 0x7c00 ) >> 3;
+		break;
+
+	case 30:
+	{
+		UINT32 lzcs = value;
+		UINT32 lzcr = 0;
+
+		if( ( lzcs & 0x80000000 ) == 0 )
 		{
-			n_lzcs = ~n_lzcs;
+			lzcs = ~lzcs;
 		}
-		while( ( n_lzcs & 0x80000000 ) != 0 )
+		while( ( lzcs & 0x80000000 ) != 0 )
 		{
-			n_lzcr++;
-			n_lzcs <<= 1;
+			lzcr++;
+			lzcs <<= 1;
 		}
-		LZCR = n_lzcr;
+		LZCR = lzcr;
+		break;
 	}
+
+	case 31:
+		value = mipscpu.cp2dr[ reg ].d;
+		break;
+	}
+
+	mipscpu.cp2dr[ reg ].d = value;
 }
 
-static UINT32 getcp2cr( int n_reg )
+static UINT32 getcp2cr( int reg )
 {
-	GTELOG( "get CP2CR%u=%08x", n_reg, mipscpu.cp2cr[ n_reg ].d );
-	return mipscpu.cp2cr[ n_reg ].d;
+	GTELOG( "get CP2CR%u=%08x", reg, mipscpu.cp2cr[ reg ].d );
+
+	return mipscpu.cp2cr[ reg ].d;
 }
 
-static void setcp2cr( int n_reg, UINT32 n_value )
+static void setcp2cr( int reg, UINT32 value )
 {
-	GTELOG( "set CP2CR%u=%08x", n_reg, n_value );
-	mipscpu.cp2cr[ n_reg ].d = n_value;
-}
+	GTELOG( "set CP2CR%u=%08x", reg, value );
 
-INLINE INT32 LIM( INT32 n_value, INT32 n_max, INT32 n_min, UINT32 n_flag )
-{
-	if( n_value > n_max )
+	switch( reg )
 	{
-		FLAG |= n_flag;
-		return n_max;
+	case 4:
+	case 12:
+	case 20:
+	case 26:
+	case 27:
+	case 29:
+	case 30:
+		value = (INT32)(INT16) value;
+		break;
+
+	case 31:
+		value = ( mipscpu.cp2cr[ reg ].d & 0x80000fff ) | ( value & ~0x80000fff );
+		break;
 	}
-	else if( n_value < n_min )
-	{
-		FLAG |= n_flag;
-		return n_min;
-	}
-	return n_value;
+
+	mipscpu.cp2cr[ reg ].d = value;
 }
 
 INLINE INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag )
