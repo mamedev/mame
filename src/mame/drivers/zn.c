@@ -379,10 +379,7 @@ static ADDRESS_MAP_START( zn_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( link_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( link_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( link_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static void zn_driver_init( void )
@@ -1257,29 +1254,18 @@ static NVRAM_HANDLER( coh1000ta )
 	}
 }
 
-static ADDRESS_MAP_START( fx1a_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0xe001, 0xe001) AM_READ(YM2610_read_port_0_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0xe200, 0xe200) AM_READ(SMH_NOP)
-	AM_RANGE(0xe201, 0xe201) AM_READ(taitosound_slave_comm_r)
-	AM_RANGE(0xea00, 0xea00) AM_READ(SMH_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fx1a_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
+static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK10)	/* Fallthrough */
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2610_read_port_0_r, YM2610_data_port_0_A_w)
+	AM_RANGE(0xe002, 0xe002) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
-	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
+	AM_RANGE(0xe200, 0xe200) AM_READWRITE(SMH_NOP, taitosound_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_READWRITE(taitosound_slave_comm_r, taitosound_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
+	AM_RANGE(0xee00, 0xee00) AM_NOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(fx1a_sound_bankswitch_w)
 ADDRESS_MAP_END
@@ -1305,7 +1291,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 
 	MDRV_CPU_ADD( Z80, 16000000 / 4 )
 	/* audio CPU */	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP( fx1a_sound_readmem, fx1a_sound_writemem )
+	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map, 0 )
 	MDRV_MACHINE_RESET( coh1000ta )
 	MDRV_NVRAM_HANDLER( coh1000ta )
 
@@ -2752,7 +2738,7 @@ static MACHINE_DRIVER_START( coh1002ml )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
 	MDRV_CPU_ADD( Z80, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( link_readmem, link_writemem )
+	MDRV_CPU_PROGRAM_MAP( link_map, 0 )
 
 	MDRV_MACHINE_RESET( coh1002m )
 	MDRV_NVRAM_HANDLER( at28c16_0 )

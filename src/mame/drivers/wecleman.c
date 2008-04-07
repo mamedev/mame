@@ -688,24 +688,17 @@ static WRITE8_HANDLER( wecleman_K00723216_bank_w )
 	K007232_set_bank( 0, 0, ~data&1 );	//* (wecleman062gre)
 }
 
-static ADDRESS_MAP_START( wecleman_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)	// ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)	// RAM
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)	// Protection
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)	// From main CPU
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)	// K007232 (Reading offset 5/b triggers the sample)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)	// YM2151
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wecleman_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)	// ROM
-	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)	// RAM
+static ADDRESS_MAP_START( wecleman_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8500, 0x8500) AM_WRITE(SMH_NOP)	// incresed with speed (global volume)?
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)	// Protection
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)	// Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITE(SMH_NOP)	// ?
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)	// K007232
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)	// From main CPU
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)	// K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	// YM2151
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)	// Samples banking
 ADDRESS_MAP_END
 
@@ -803,24 +796,16 @@ HOTCHASE_K007232_RW(0)
 HOTCHASE_K007232_RW(1)
 HOTCHASE_K007232_RW(2)
 
-static ADDRESS_MAP_START( hotchase_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)	// RAM
-	AM_RANGE(0x1000, 0x100d) AM_READ(hotchase_K007232_0_r)	// 3 x  K007232
-	AM_RANGE(0x2000, 0x200d) AM_READ(hotchase_K007232_1_r)
-	AM_RANGE(0x3000, 0x300d) AM_READ(hotchase_K007232_2_r)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)	// From main CPU (Read on IRQ)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)	// ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hotchase_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)	// RAM
-	AM_RANGE(0x1000, 0x100d) AM_WRITE(hotchase_K007232_0_w)	// 3 x K007232
-	AM_RANGE(0x2000, 0x200d) AM_WRITE(hotchase_K007232_1_w)
-	AM_RANGE(0x3000, 0x300d) AM_WRITE(hotchase_K007232_2_w)
+static ADDRESS_MAP_START( hotchase_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x1000, 0x100d) AM_READWRITE(hotchase_K007232_0_r, hotchase_K007232_0_w)	// 3 x K007232
+	AM_RANGE(0x2000, 0x200d) AM_READWRITE(hotchase_K007232_1_r, hotchase_K007232_1_w)
+	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_K007232_2_r, hotchase_K007232_2_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w)	// Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)	// ? (written with 0 on IRQ, 1 on FIRQ)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)	// From main CPU (Read on IRQ)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(SMH_NOP)	// Command acknowledge ?
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)	// ROM
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -1123,7 +1108,7 @@ static MACHINE_DRIVER_START( wecleman )
 	/* Schems: can be reset, no nmi, soundlatch, 3.58MHz */
 	MDRV_CPU_ADD(Z80, 3579545)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(wecleman_sound_readmem,wecleman_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(wecleman_sound_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -1179,7 +1164,7 @@ static MACHINE_DRIVER_START( hotchase )
 
 	MDRV_CPU_ADD(M6809, 3579545 / 2)
 	/* audio CPU */	/* 3.579/2 MHz - PCB is drawn in one set's readme */
-	MDRV_CPU_PROGRAM_MAP(hotchase_sound_readmem,hotchase_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(hotchase_sound_map,0)
 	MDRV_CPU_PERIODIC_INT( hotchase_sound_timer, 496 )
 
 	/* Amuse: every 2 ms */
