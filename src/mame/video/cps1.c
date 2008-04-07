@@ -120,30 +120,31 @@ Fixed registers
 
 
 A special note has to be made about tile/sprite codes. Even if all graphics are
-stored together in the same ROMs, all test conducted on the boards seem to show
-that the hardware knows which part of the ROM space is 8x8 tiles, 16x16 tiles,
-16x16 spites, 32x32 tiles, and only draws tiles if their code falls in the valid
-range. If a tile is out of range, it is replaced by transparent pixels.
+stored together in the same ROMs, the hardware knows which part of the ROM space
+is 8x8 tiles, 16x16 tiles, 16x16 spites, 32x32 tiles, and all games tested only
+draw tiles if their code falls in the valid range. If a tile is out of range, it
+is replaced by transparent pixels.
 Ideally, this shouldn't be important as far as the emulation is concerned, since
 games should only request tiles from valid ranges. In practice, many games contain
 bugs which make them try to display out of range tiles. The masking applied by
 the hardware therefore needs to be emulated properly, otherwise glitches appear.
 
 The ROM board (B-board) changes from game to game, so the implementation details
-may vary, but the tile ranges seem to be controlled by a PAL found on the B-board
-(see the table above).
+may vary, but in general the tile ranges are controlled by a PAL found on the
+B-board (see the table at the top of this file).
 
-The A-board passes, it seems (this hasn't been verified accurately), 23 bits of
-address to the B-board when requesting gfx ROM data. The ROM board returns 64
-bits of data, that is 16 4bpp pixels.
-The 23 address bits should be laid out like this (this is unverified speculation):
+The A-board passes 23 bits of address to the B-board when requesting gfx ROM data.
+The B-board selects 64 bits of data, that is 16 4bpp pixels, and returns half of
+them depending on a signal from the C board.
+The 23 address bits are laid out this way (note that the top 3 bits select the
+tile type; the purpose of the top bit is unknown):
 
- 8x 8 tt??ccccccccccccccccyyy
-16x16 tt?ccccccccccccccccyyyy
-32x32 tt?ccccccccccccccyyyyyx
+sprite  000ccccccccccccccccyyyy
+scroll1 001?ccccccccccccccccyyy
+scroll2 010ccccccccccccccccyyyy
+scroll3 011ccccccccccccccyyyyyx
 
 where
-t is the tile type (8x8, 16x16 tile, 16x16 sprite, 32x32; not known which is which)
 c is the tile code
 y is the y position in the tile
 x is the x position in the tile (only applicable to 32x32 tiles)
@@ -157,15 +158,15 @@ only one bank.
 
 The above would mean that
 1) 8x8 and 16x16 tiles have a 16-bit tile code, while
-   32x32 tiles have a 14-bit tile code (possibly 15-bit, but no game needs that.
-	  Some CPS2 games (ssf2, xmcota) set bit 14, but it seems redundant)
+   32x32 tiles have a 14-bit tile code
 2) which ROM bank to use is determined by
-   the top 9 bits of a 8x8 tile code,
-   top 10 bits of a 16x16 tile code,
-   top 11 bits of a 32x32 tile code
-	
-Presumably, when the tile code is out of range, the PAL doesn't output any OE signal
-so no ROM is read and 0xffffffffffffffff is returned.
+   bits 15-7 of a 8x8 tile code,
+   bits 15-6 of a 16x16 tile code,
+   bits 13-4 of a 32x32 tile code
+
+If the PAL decides that the tile code is out of range and doesn't output any /OE
+signal, no ROM is read and pullup resistors force the result to all 1 (which
+means a transparent tile).
 
 Note that there are several known cases (nemo, cawing, 3wonders, varth, etc.) where
 16x16 tiles are used for BOTH sprites and scroll2.
@@ -213,11 +214,7 @@ qad
 * layer enable mask incomplete
 
 varth
-* the background color during startup is brown, while it should most likely be
-  black. This is caused by the background color palette entry (0xbff), however
-  that entry is definitely correct and used by other games (3wonders, mtwins)
-  to make the background different from black.
-  The boot screen of some CPS2 games also has a blue background instead of black,
+* The boot screen of some CPS2 games has a blue background instead of black,
   however that might be the correct behaviour.
 
 
@@ -445,7 +442,7 @@ static const struct gfx_range mapper_0224B[] =
 	{ -1 }
 };
 
-static const struct gfx_range mapper_MS24B[] =
+static const struct gfx_range mapper_MS24B[] =	// verified from the PAL
 {
 	/* start  end     type             bank */
 	{ 0x0000, 0x3fff, GFXTYPE_SPRITES, 0 },
@@ -507,7 +504,8 @@ static const struct gfx_range mapper_RT24B[] =
 	{ 0x7000, 0x7fff, GFXTYPE_SCROLL3,                   0 },
 
 	{ 0x0000, 0x27ff, GFXTYPE_SCROLL3,                   1 },	// 8000-a7ff physical
-	{ 0x2800, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },	// a800-ffff physical
+	{ 0x2800, 0x77ff, GFXTYPE_SCROLL2,                   1 },	// a800-f7ff physical
+	{ 0x7800, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },	// f800-ffff physical
 	{ -1 }
 };
 
