@@ -504,8 +504,8 @@ static const struct gfx_range mapper_RT24B[] =
 	{ 0x7000, 0x7fff, GFXTYPE_SCROLL3,                   0 },
 
 	{ 0x0000, 0x27ff, GFXTYPE_SCROLL3,                   1 },	// 8000-a7ff physical
-	{ 0x2800, 0x77ff, GFXTYPE_SCROLL2,                   1 },	// a800-f7ff physical
-	{ 0x7800, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },	// f800-ffff physical
+	{ 0x2800, 0x53ff, GFXTYPE_SCROLL2,                   1 },	// a800-d3ff physical
+	{ 0x5400, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },	// d400-ffff physical
 	{ -1 }
 };
 
