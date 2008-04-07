@@ -2001,11 +2001,11 @@ static int mips_execute( int cycles )
 			break;
 
 		case OP_BLEZ:
-			mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] < 0 || (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] == (INT32)mipscpu.r[ INS_RT( mipscpu.op ) ] );
+			mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] < 0 || mipscpu.r[ INS_RS( mipscpu.op ) ] == mipscpu.r[ INS_RT( mipscpu.op ) ] );
 			break;
 
 		case OP_BGTZ:
-			mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] >= 0 && (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] != (INT32)mipscpu.r[ INS_RT( mipscpu.op ) ] );
+			mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] >= 0 && mipscpu.r[ INS_RS( mipscpu.op ) ] != mipscpu.r[ INS_RT( mipscpu.op ) ] );
 			break;
 
 		case OP_ADDI:
