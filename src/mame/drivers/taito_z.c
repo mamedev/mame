@@ -520,8 +520,6 @@ Chips:  uPD72105C
 TODO Lists
 ==========
 
-Add cpu idle time skip to improve speed.
-
 Is the no-Z80 sound handling correct: some voices in Bshark
 aren't that clear.
 
@@ -581,6 +579,8 @@ Landscape in the background can be made to scroll rapidly with DSW.
 True to original?
 
 Some layer offsets are out a little.
+
+Road layer has wrong colors--regression?
 
 
 Battle Shark
@@ -777,6 +777,7 @@ J1100256A VIDEO PCB
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
 #include "sound/2610intf.h"
+#include "sound/flt_vol.h"
 
 VIDEO_START( taitoz );
 VIDEO_START( spacegun );
@@ -1399,6 +1400,26 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 #endif
 
 
+/**** sound pan control ****/
+static WRITE8_HANDLER( taitoz_pancontrol )
+{
+//	static UINT8 taitoz_pandata[4];
+
+	offset = offset&3;
+
+//	taitoz_pandata[offset] = data;
+//	popmessage(" pan %02x %02x %02x %02x", taitoz_pandata[0], taitoz_pandata[1], taitoz_pandata[2], taitoz_pandata[3] );
+
+	flt_volume_set_volume(offset, data / 255.0f);
+}
+
+static WRITE16_HANDLER( spacegun_pancontrol )
+{
+	if (ACCESSING_BITS_0_7)
+		taitoz_pancontrol(machine,offset,data & 0xff);
+}
+
+
 /***********************************************************
                    SAVE STATES
 ***********************************************************/
@@ -1595,7 +1616,7 @@ static ADDRESS_MAP_START( bshark_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x110000, 0x113fff) AM_WRITE(sharedram_w)
-//  AM_RANGE(0x400000, 0x400007) AM_WRITE(SMH_NOP)   // pan ???
+	AM_RANGE(0x400000, 0x400007) AM_WRITE(spacegun_pancontrol)  /* pan */
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2610_control_port_0_A_lsb_w)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2610_data_port_0_A_lsb_w)
 	AM_RANGE(0x600004, 0x600005) AM_WRITE(YM2610_control_port_0_B_lsb_w)
@@ -1784,7 +1805,7 @@ static ADDRESS_MAP_START( spacegun_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00006, 0xc00007) AM_WRITE(YM2610_data_port_0_B_lsb_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(SMH_NOP)	// interrupt controller?
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(SMH_NOP)
-//  AM_RANGE(0xc20000, 0xc20003) AM_WRITE(YM2610_????)  /* Pan (acc. to Raine) */
+	AM_RANGE(0xc20000, 0xc20007) AM_WRITE(spacegun_pancontrol)  /* pan */
 //  AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP)    /* ??? */
 	AM_RANGE(0xf00000, 0xf00007) AM_WRITE(spacegun_lightgun_w)
 ADDRESS_MAP_END
@@ -1904,7 +1925,7 @@ static ADDRESS_MAP_START( z80_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0xe200, 0xe200) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_WRITE(taitosound_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE(SMH_NOP) /* pan */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(taitoz_pancontrol) /* pan */
 	AM_RANGE(0xee00, 0xee00) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
@@ -2003,8 +2024,8 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 3 for accel [7 levels] */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)	/* main accel key */
 
 	PORT_START      /* IN1: b3 not mapped: standardized on holding b4=lo gear */
@@ -2012,9 +2033,9 @@ static INPUT_PORTS_START( contcirc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)	/* gear shift lo/hi */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* gear shift lo/hi */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)	/* 3 for brake [7 levels] */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)	/* main brake key */
 
 	PORT_START      /* IN2, unused */
@@ -2862,14 +2883,26 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_VIDEO_UPDATE(contcirc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+	MDRV_SPEAKER_ADD("front", 0.0, 0.0,  0.7)
+	MDRV_SPEAKER_ADD("rear",  0.0, 0.0,  1.3)
+	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD(YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  0.25)
-	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 2.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 
 //  MDRV_SOUND_ADD(CUSTOM, subwoofer_interface)
 MACHINE_DRIVER_END
@@ -2909,13 +2942,24 @@ static MACHINE_DRIVER_START( chasehq )
 	/* sound hardware */
 	MDRV_SPEAKER_ADD("front",  0.0, 0.0, 0.7)
 	MDRV_SPEAKER_ADD("rear",   0.0, 0.0, 1.3)
+	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD(YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "rear",  0.25)
-	MDRV_SOUND_ROUTE(0, "front", 0.25)
-	MDRV_SOUND_ROUTE(1, "rear",  1.0)
-	MDRV_SOUND_ROUTE(2, "front", 1.0)
+	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 1.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 1.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 1.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -2959,8 +3003,19 @@ static MACHINE_DRIVER_START( enforce )
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 20.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 20.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 20.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 20.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 
 //  MDRV_SOUND_ADD(CUSTOM, subwoofer_interface)
 MACHINE_DRIVER_END
@@ -3002,8 +3057,19 @@ static MACHINE_DRIVER_START( bshark )
 	MDRV_SOUND_CONFIG(ym2610_interfaceb)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 28.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 28.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 28.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 28.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3047,8 +3113,19 @@ static MACHINE_DRIVER_START( sci )
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 2.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3088,13 +3165,24 @@ static MACHINE_DRIVER_START( nightstr )
 	/* sound hardware */
 	MDRV_SPEAKER_ADD("front",  0.0, 0.0, 0.7)
 	MDRV_SPEAKER_ADD("rear",   0.0, 0.0, 1.3)
+	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD(YM2610, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "front", 0.25)
-	MDRV_SOUND_ROUTE(0, "rear",  0.25)
-	MDRV_SOUND_ROUTE(1, "front", 1.0)
-	MDRV_SOUND_ROUTE(2, "rear",  1.0)
+	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 2.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rear", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "front", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3138,8 +3226,19 @@ static MACHINE_DRIVER_START( aquajack )
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 2.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 2.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3179,8 +3278,19 @@ static MACHINE_DRIVER_START( spacegun )
 	MDRV_SOUND_CONFIG(ym2610_interfaceb)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 8.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 8.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 8.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3224,8 +3334,19 @@ static MACHINE_DRIVER_START( dblaxle )
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 8.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 8.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 8.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -3268,8 +3389,19 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_SOUND_CONFIG(ym2610_interface)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
-	MDRV_SOUND_ROUTE(2, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)
+	MDRV_SOUND_ROUTE(1, "2610.1.r", 8.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.l", 8.0)
+	MDRV_SOUND_ROUTE(2, "2610.2.r", 8.0)
+
+	MDRV_SOUND_ADD_TAG("2610.1.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.1.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.r", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
+	MDRV_SOUND_ADD_TAG("2610.2.l", FILTER_VOLUME, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -4086,7 +4218,7 @@ ROM_START( dblaxle )
 	ROM_LOAD16_WORD( "c78-04.3", 0x00000, 0x80000, CRC(cc1aa37c) SHA1(cfa2eb338dc81c98c637c2f0b14d2baea8b115f5) )	/* STY spritemap */
 
 	ROM_REGION( 0x180000, REGION_SOUND1, 0 )	/* ADPCM samples */
-	ROM_LOAD( "c78-12.33", 0x000000, 0x80000, CRC(fbb39585) SHA1(4b7cdf9a3fba71155871b3e52d2301e50bf817ca) )	// Half size ??
+	ROM_LOAD( "c78-12.33", 0x000000, 0x80000, BAD_DUMP CRC(fbb39585) SHA1(4b7cdf9a3fba71155871b3e52d2301e50bf817ca) )	// Half size ??
 	// ??? gap 0x80000-fffff //
 	ROM_LOAD( "c78-13.46", 0x100000, 0x80000, CRC(1b363aa2) SHA1(0aae3988024654e98cc0c784307b1c329c8f0783) )
 
