@@ -33,11 +33,6 @@
 #include "machine/8237dma.h"
 #include "machine/pckeybrd.h"
 
-#ifdef MESS
-#include "machine/pc_fdc.h"
-#include "machine/pc_hdc.h"
-#endif /* MESS */
-
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
 	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
@@ -50,159 +45,6 @@
 static emu_timer *pc_keyboard_timer;
 
 static TIMER_CALLBACK( pc_keyb_timer );
-
-#define LOG_PORT80 0
-
-
-/*************************************************************************
- *
- *      PC DMA stuff
- *
- *************************************************************************/
-
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
-static offs_t pc_page_offset_mask;
-
-
-
-READ8_HANDLER(pc_page_r)
-{
-	return 0xFF;
-}
-
-
-
-WRITE8_HANDLER(pc_page_w)
-{
-	switch(offset % 4) {
-	case 1:
-		dma_offset[0][2] = data;
-		break;
-	case 2:
-		dma_offset[0][3] = data;
-		break;
-	case 3:
-		dma_offset[0][0] = dma_offset[0][1] = data;
-		break;
-	}
-}
-
-
-
-READ16_HANDLER(pc_page16le_r) { return read16le_with_read8_handler(pc_page_r, machine, offset, mem_mask); }
-WRITE16_HANDLER(pc_page16le_w) { write16le_with_write8_handler(pc_page_w, machine, offset, data, mem_mask); }
-
-
-
-READ8_HANDLER(at_page8_r)
-{
-	UINT8 data = at_pages[offset % 0x10];
-
-	switch(offset % 8) {
-	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
-		break;
-	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
-		break;
-	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
-		break;
-	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
-		break;
-	}
-	return data;
-}
-
-
-
-WRITE8_HANDLER(at_page8_w)
-{
-	at_pages[offset % 0x10] = data;
-
-	if (LOG_PORT80 && (offset == 0))
-		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data, (unsigned) activecpu_get_reg(REG_PC));
-
-	switch(offset % 8) {
-	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
-		break;
-	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
-		break;
-	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
-		break;
-	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
-		break;
-	}
-}
-
-
-
-READ32_HANDLER(at_page32_r)
-{
-	return read32le_with_read8_handler(at_page8_r, machine, offset, mem_mask);
-}
-
-
-
-WRITE32_HANDLER(at_page32_w)
-{
-	write32le_with_write8_handler(at_page8_w, machine, offset, data, mem_mask);
-}
-
-
-
-static UINT8 pc_dma_read_byte(int channel, offs_t offset)
-{
-	UINT8 result;
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
-		& pc_page_offset_mask;
-
-	cpuintrf_push_context(0);
-	result = program_read_byte(page_offset + offset);
-	cpuintrf_pop_context();
-
-	return result;
-}
-
-
-
-static void pc_dma_write_byte(int channel, offs_t offset, UINT8 data)
-{
-	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
-		& pc_page_offset_mask;
-
-	cpuintrf_push_context(0);
-	program_write_byte(page_offset + offset, data);
-	cpuintrf_pop_context();
-}
-
-
-
-static const struct dma8237_interface pc_dma =
-{
-	0,
-	1.0e-6,	// 1us
-
-	pc_dma_read_byte,
-	pc_dma_write_byte,
-
-#ifdef MESS
-	{ 0, 0, pc_fdc_dack_r, pc_hdc_dack_r },
-	{ 0, 0, pc_fdc_dack_w, pc_hdc_dack_w },
-	pc_fdc_set_tc_state
-#else
-	{ 0, 0, 0, 0 },
-	{ 0, 0, 0, 0 },
-	0
-#endif
-};
-
 
 
 /* ----------------------------------------------------------------------- */
@@ -236,20 +78,6 @@ void init_pc_common(UINT32 flags)
 
 	/* PIC */
 	pic8259_init(2, pc_pic_set_int_line);
-
-	/* DMA */
-	if (flags & PCCOMMON_DMA8237_AT)
-	{
-		dma8237_init(2);
-		dma8237_config(0, &pc_dma);
-		pc_page_offset_mask = 0xFF0000;
-	}
-	else
-	{
-		dma8237_init(1);
-		dma8237_config(0, &pc_dma);
-		pc_page_offset_mask = 0x0F0000;
-	}
 
 	pc_keyboard_timer = timer_alloc(pc_keyb_timer, NULL);
 }

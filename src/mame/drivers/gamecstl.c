@@ -119,24 +119,24 @@ static VIDEO_UPDATE(gamecstl)
 	return 0;
 }
 
-static READ8_HANDLER(at_dma8237_1_r)
+static READ8_DEVICE_HANDLER(at_dma8237_2_r)
 {
-	return dma8237_1_r(machine, offset / 2);
+	return dma8237_r(device, offset / 2);
 }
 
-static WRITE8_HANDLER(at_dma8237_1_w)
+static WRITE8_DEVICE_HANDLER(at_dma8237_2_w)
 {
-	dma8237_1_w(machine, offset / 2, data);
+	dma8237_w(device, offset / 2, data);
 }
 
-static READ32_HANDLER(at32_dma8237_1_r)
+static READ32_DEVICE_HANDLER(at32_dma8237_2_r)
 {
-	return read32le_with_read8_handler(at_dma8237_1_r, machine, offset, mem_mask);
+	return read32le_with_read8_device_handler(at_dma8237_2_r, device, offset, mem_mask);
 }
 
-static WRITE32_HANDLER(at32_dma8237_1_w)
+static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 {
-	write32le_with_write8_handler(at_dma8237_1_w, machine, offset, data, mem_mask);
+	write32le_with_write8_device_handler(at_dma8237_2_w, device, offset, data, mem_mask);
 }
 
 
@@ -334,7 +334,125 @@ static WRITE32_HANDLER(bios_ram_w)
 }
 
 
+/*************************************************************************
+ *
+ *      PC DMA stuff
+ *
+ *************************************************************************/
+
+static UINT8 dma_offset[2][4];
+static UINT8 at_pages[0x10];
+
+
+static READ8_HANDLER(at_page8_r)
+{
+	UINT8 data = at_pages[offset % 0x10];
+
+	switch(offset % 8) {
+	case 1:
+		data = dma_offset[(offset / 8) & 1][2];
+		break;
+	case 2:
+		data = dma_offset[(offset / 8) & 1][3];
+		break;
+	case 3:
+		data = dma_offset[(offset / 8) & 1][1];
+		break;
+	case 7:
+		data = dma_offset[(offset / 8) & 1][0];
+		break;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER(at_page8_w)
+{
+	at_pages[offset % 0x10] = data;
+
+	switch(offset % 8) {
+	case 1:
+		dma_offset[(offset / 8) & 1][2] = data;
+		break;
+	case 2:
+		dma_offset[(offset / 8) & 1][3] = data;
+		break;
+	case 3:
+		dma_offset[(offset / 8) & 1][1] = data;
+		break;
+	case 7:
+		dma_offset[(offset / 8) & 1][0] = data;
+		break;
+	}
+}
+
+
+static DMA8237_MEM_READ( pc_dma_read_byte )
+{
+	UINT8 result;
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	cpuintrf_push_context(0);
+	result = program_read_byte(page_offset + offset);
+	cpuintrf_pop_context();
+
+	return result;
+}
+
+
+static DMA8237_MEM_WRITE( pc_dma_write_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	cpuintrf_push_context(0);
+	program_write_byte(page_offset + offset, data);
+	cpuintrf_pop_context();
+}
+
+
+static const struct dma8237_interface dma8237_1_config =
+{
+	0,
+	1.0e-6, // 1us
+
+	pc_dma_read_byte,
+	pc_dma_write_byte,
+
+	{ 0, 0, NULL, NULL },
+	{ 0, 0, NULL, NULL },
+	NULL
+};
+
+
+static const struct dma8237_interface dma8237_2_config =
+{
+	0, 
+	1.0e-6, // 1us 
+
+	NULL,
+	NULL,
+
+	{ NULL, NULL, NULL, NULL },
+	{ NULL, NULL, NULL, NULL },
+	NULL
+};
+
+static READ32_HANDLER(at_page32_r)
+{
+	return read32le_with_read8_handler(at_page8_r, machine, offset, mem_mask);
+}
+
+
+static WRITE32_HANDLER(at_page32_w)
+{
+	write32le_with_write8_handler(at_page8_w, machine, offset, data, mem_mask);
+}
+
+
 DEV_READWRITE8TO32LE( gamecstl_pit8254_32le, pit8253_r, pit8253_w )
+DEV_READWRITE8TO32LE( gamecstl_dma8237_32le, dma8237_r, dma8237_w )
 
 
 /*****************************************************************************/
@@ -351,14 +469,14 @@ static ADDRESS_MAP_START( gamecstl_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gamecstl_io, ADDRESS_SPACE_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(dma8237_32le_0_r,			dma8237_32le_0_w)
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", gamecstl_dma8237_32le_r, gamecstl_dma8237_32le_w)
 	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, "pit8254", gamecstl_pit8254_32le_r, gamecstl_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
 	AM_RANGE(0x00a0, 0x00bf) AM_READWRITE(pic8259_32le_1_r,			pic8259_32le_1_w)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE(at32_dma8237_1_r,			at32_dma8237_1_w)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide0_r, ide0_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
@@ -442,7 +560,6 @@ static MACHINE_RESET(gamecstl)
 {
 	memory_set_bankptr(1, memory_region(REGION_USER1) + 0x30000);
 
-	dma8237_reset();
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
@@ -481,6 +598,12 @@ static MACHINE_DRIVER_START(gamecstl)
 
 	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( gamecstl_pit8254_config )
+
+	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
+	MDRV_DEVICE_CONFIG( dma8237_1_config )
+
+	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
+	MDRV_DEVICE_CONFIG( dma8237_2_config )
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -541,7 +664,7 @@ static DRIVER_INIT( gamecstl )
 {
 	bios_ram = auto_malloc(0x10000);
 
-	init_pc_common(PCCOMMON_KEYBOARD_AT | PCCOMMON_DMA8237_AT);
+	init_pc_common(PCCOMMON_KEYBOARD_AT);
 	mc146818_init(MC146818_STANDARD);
 
 	intel82439tx_init();

@@ -4,8 +4,22 @@
 
 **********************************************************************/
 
-#ifndef DMA8237_H
-#define DMA8237_H
+#ifndef __DMA8237_H_
+#define __DMA8237_H_
+
+#define DMA8237		DEVICE_GET_INFO_NAME(dma8237)
+
+typedef UINT8 (*dma8237_mem_read_func)(const device_config *device, int channel, offs_t offset);
+typedef void  (*dma8237_mem_write_func)(const device_config *device, int channel, offs_t offset, UINT8 data);
+typedef int   (*dma8237_channel_read_func)(const device_config *device);
+typedef void  (*dma8237_channel_write_func)(const device_config *device, int data);
+typedef void  (*dma8237_out_eop_func)(const device_config *device, int state);
+
+#define DMA8237_MEM_READ(name)			UINT8 name(const device_config *device, int channel, offs_t offset)
+#define DMA8237_MEM_WRITE(name)			void  name(const device_config *device, int channel, offs_t offset, UINT8 data)
+#define DMA8237_CHANNEL_READ(name)		int   name(const device_config *device)
+#define DMA8237_CHANNEL_WRITE(name)		void  name(const device_config *device, int data)
+#define DMA8237_OUT_EOP(name)			void  name(const device_config *device, int state)
 
 struct dma8237_interface
 {
@@ -16,46 +30,25 @@ struct dma8237_interface
 	double bus_speed;
 
 	/* accessors to main memory */
-	UINT8	(*memory_read_func)(int channel, offs_t offset);
-	void    (*memory_write_func)(int channel, offs_t offset, UINT8 data);
+	dma8237_mem_read_func		memory_read_func;
+	dma8237_mem_write_func		memory_write_func;
 
 	/* channel accesors */
-	int     (*channel_read_func[4])(void);
-	void    (*channel_write_func[4])(int data);
+	dma8237_channel_read_func	channel_read_func[4];
+	dma8237_channel_write_func	channel_write_func[4];
 
 	/* function to call when DMA completes */
-	void    (*out_eop_func)(int state);
+	dma8237_out_eop_func		out_eop_func;
 };
 
 
-
-int dma8237_init(int count);
-void dma8237_config(int which, const struct dma8237_interface *intf);
-void dma8237_reset(void);
-
-void dma8237_drq_write(int which, int channel, int state);
+/* device interface */
+DEVICE_GET_INFO( dma8237 );
+READ8_DEVICE_HANDLER( dma8237_r );
+WRITE8_DEVICE_HANDLER( dma8237_w );
+void dma8237_drq_write(const device_config *device, int channel, int state);
 
 /* unfortunate hack for the interim for PC HDC */
-void dma8237_run_transfer(int which, int channel);
+void dma8237_run_transfer(const device_config *device, int channel);
 
-READ8_HANDLER( dma8237_0_r );
-READ8_HANDLER( dma8237_1_r );
-WRITE8_HANDLER( dma8237_0_w );
-WRITE8_HANDLER( dma8237_1_w );
-
-READ16_HANDLER( dma8237_16le_0_r );
-READ16_HANDLER( dma8237_16le_1_r );
-WRITE16_HANDLER( dma8237_16le_0_w );
-WRITE16_HANDLER( dma8237_16le_1_w );
-
-READ32_HANDLER( dma8237_32le_0_r );
-READ32_HANDLER( dma8237_32le_1_r );
-WRITE32_HANDLER( dma8237_32le_0_w );
-WRITE32_HANDLER( dma8237_32le_1_w );
-
-READ64_HANDLER( dma8237_64be_0_r );
-READ64_HANDLER( dma8237_64be_1_r );
-WRITE64_HANDLER( dma8237_64be_0_w );
-WRITE64_HANDLER( dma8237_64be_1_w );
-
-#endif /* DMA8237_H */
+#endif /* __DMA8237_H_ */
