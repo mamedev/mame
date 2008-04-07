@@ -53,11 +53,9 @@ TODO:
 #include "sound/ay8910.h"
 
 
-extern UINT8 *sonson_scroll;
-
 WRITE8_HANDLER( sonson_videoram_w );
 WRITE8_HANDLER( sonson_colorram_w );
-WRITE8_HANDLER( sonson_scroll_w );
+WRITE8_HANDLER( sonson_scrollx_w );
 WRITE8_HANDLER( sonson_flipscreen_w );
 
 PALETTE_INIT( sonson );
@@ -67,6 +65,8 @@ VIDEO_UPDATE( sonson );
 static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 {
 	static int last;
+
+	data &= 1;
 
 	if (last == 0 && data == 1)
 	{
@@ -79,42 +79,32 @@ static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_RAM
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(sonson_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_WRITE(sonson_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sonson_scrollx_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x3003, 0x3003) AM_READ(input_port_1_r)	/* IN1 */
 	AM_RANGE(0x3004, 0x3004) AM_READ(input_port_2_r)	/* IN2 */
 	AM_RANGE(0x3005, 0x3005) AM_READ(input_port_3_r)	/* DSW0 */
 	AM_RANGE(0x3006, 0x3006) AM_READ(input_port_4_r)	/* DSW1 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x13ff) AM_WRITE(sonson_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_WRITE(sonson_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2020, 0x207f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(SMH_RAM) AM_BASE(&sonson_scroll)
-	AM_RANGE(0x3008, 0x3008) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x3008, 0x3008) AM_WRITENOP	// might be Y scroll, but the game always sets it to 0
 	AM_RANGE(0x3010, 0x3010) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(sonson_flipscreen_w)
 	AM_RANGE(0x3019, 0x3019) AM_WRITE(sonson_sh_irqtrigger_w)
-	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -239,19 +229,18 @@ static MACHINE_DRIVER_START( sonson )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6809,12000000/6)	/* 2 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(M6809,12000000/6)
 	/* audio CPU */	/* 2 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* FIRQs are triggered by the main CPU */
 
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 1*8, 31*8-1)

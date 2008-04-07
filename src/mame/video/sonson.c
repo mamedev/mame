@@ -8,7 +8,6 @@
 
 #include "driver.h"
 
-UINT8 *sonson_scroll;
 static tilemap *bg_tilemap;
 
 /***************************************************************************
@@ -107,13 +106,17 @@ WRITE8_HANDLER( sonson_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
+WRITE8_HANDLER( sonson_scrollx_w )
+{
+	int row;
+
+	for (row = 5; row < 32; row++)
+		tilemap_set_scrollx(bg_tilemap, row, data);
+}
+
 WRITE8_HANDLER( sonson_flipscreen_w )
 {
-	if (flip_screen_get() != (~data & 0x01))
-	{
-		flip_screen_set(~data & 0x01);
-		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
-	}
+	flip_screen_set(~data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -164,11 +167,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( sonson )
 {
-	int row;
-
-	for (row = 5; row < 32; row++)
-		tilemap_set_scrollx(bg_tilemap, row, *sonson_scroll);
-
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
