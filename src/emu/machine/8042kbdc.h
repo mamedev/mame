@@ -23,6 +23,7 @@ struct kbdc8042_interface
 	kbdc8042_type_t type;
 	void (*set_gate_a20)(int a20);
 	void (*keyboard_interrupt)(int state);
+	int (*get_out2)(running_machine *machine);
 };
 
 

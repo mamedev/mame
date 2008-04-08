@@ -1066,9 +1066,13 @@ static void ide_interrupt(int state)
 	pic8259_set_irq_line(1, 6, state);
 }
 
+static int mediagx_get_out2(running_machine *machine) {
+	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
+}
+
 static const struct kbdc8042_interface at8042 =
 {
-	KBDC8042_AT386, set_gate_a20, keyboard_interrupt
+	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
 static const struct ide_interface ide_intf =
