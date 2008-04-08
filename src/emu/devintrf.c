@@ -108,6 +108,7 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	device->static_config = NULL;
 	device->inline_config = (configlen == 0) ? NULL : (device->tag + strlen(tag) + 1);
 	device->token = NULL;
+	device->machine = NULL;
 	strcpy(device->tag, tag);
 
 	/* reset the inline_config to 0 */
