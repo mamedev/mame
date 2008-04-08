@@ -3561,6 +3561,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( smgpu2 )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( smgpu1 )	/* (c) 1989 (FD1094, decrypted) */
 	DRIVER( smgpj )		/* (c) 1989 (FD1094, decrypted) */
+	DRIVER( smgpja )	/* (c) 1989 (FD1094, decrypted) */
 
 	/* Y-Board */
 	DRIVER( gforce2 )	/* (c) 1988 */
