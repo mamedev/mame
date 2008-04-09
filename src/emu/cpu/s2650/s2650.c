@@ -191,7 +191,7 @@ INLINE UINT8 ARG(void)
  * RDMEM
  * read memory byte from addr
  ***************************************************************/
-#define RDMEM(addr) program_read_byte_8(addr)
+#define RDMEM(addr) program_read_byte_8le(addr)
 
 /***************************************************************
  * handy table to build PC relative offsets
@@ -508,7 +508,7 @@ static const int S2650_relative[0x100] =
  * Store source register to memory addr (CC unchanged)
  ***************************************************************/
 #define M_STR(address,source)									\
-	program_write_byte_8(address, source)
+	program_write_byte_8le(address, source)
 
 /***************************************************************
  * M_AND
@@ -653,7 +653,7 @@ static const int S2650_relative[0x100] =
  ***************************************************************/
 #define M_SPSU()												\
 {																\
-	R0 = ((S.psu & ~PSU34) | (io_read_byte_8(S2650_SENSE_PORT) & SI)); \
+	R0 = ((S.psu & ~PSU34) | (io_read_byte_8le(S2650_SENSE_PORT) & SI)); \
 	SET_CC(R0); 												\
 }
 
@@ -723,7 +723,7 @@ static const int S2650_relative[0x100] =
 #define M_TPSU()												\
 {																\
 	UINT8 tpsu = ARG(); 										\
-    UINT8 rpsu = (S.psu | (io_read_byte_8(S2650_SENSE_PORT) & SI)); \
+    UINT8 rpsu = (S.psu | (io_read_byte_8le(S2650_SENSE_PORT) & SI)); \
 	S.psl &= ~CC;												\
 	if( (rpsu & tpsu) != tpsu )									\
 		S.psl |= 0x80;											\
@@ -855,7 +855,7 @@ static int s2650_get_sense(void)
 {
 	/* OR'd with Input to allow for external connections */
 
-    return (((S.psu & SI) ? 1 : 0) | ((io_read_byte_8(S2650_SENSE_PORT) & SI) ? 1 : 0));
+    return (((S.psu & SI) ? 1 : 0) | ((io_read_byte_8le(S2650_SENSE_PORT) & SI) ? 1 : 0));
 }
 
 static int s2650_execute(int cycles)
@@ -989,7 +989,7 @@ static int s2650_execute(int cycles)
 			case 0x32:		/* REDC,2 */
 			case 0x33:		/* REDC,3 */
 				s2650_ICount -= 6;
-				S.reg[S.r] = io_read_byte_8(S2650_CTRL_PORT);
+				S.reg[S.r] = io_read_byte_8le(S2650_CTRL_PORT);
 				SET_CC( S.reg[S.r] );
 				break;
 
@@ -1079,7 +1079,7 @@ static int s2650_execute(int cycles)
 			case 0x56:		/* REDE,2 v */
 			case 0x57:		/* REDE,3 v */
 				s2650_ICount -= 9;
-				S.reg[S.r] = io_read_byte_8( ARG() );
+				S.reg[S.r] = io_read_byte_8le( ARG() );
 				SET_CC(S.reg[S.r]);
 				break;
 
@@ -1138,7 +1138,7 @@ static int s2650_execute(int cycles)
 			case 0x72:		/* REDD,2 */
 			case 0x73:		/* REDD,3 */
 				s2650_ICount -= 6;
-				S.reg[S.r] = io_read_byte_8(S2650_DATA_PORT);
+				S.reg[S.r] = io_read_byte_8le(S2650_DATA_PORT);
 				SET_CC(S.reg[S.r]);
 				break;
 
@@ -1294,7 +1294,7 @@ static int s2650_execute(int cycles)
 			case 0xb2:		/* WRTC,2 */
 			case 0xb3:		/* WRTC,3 */
 				s2650_ICount -= 6;
-				io_write_byte_8(S2650_CTRL_PORT,S.reg[S.r]);
+				io_write_byte_8le(S2650_CTRL_PORT,S.reg[S.r]);
 				break;
 
 			case 0xb4:		/* TPSU */
@@ -1380,7 +1380,7 @@ static int s2650_execute(int cycles)
 			case 0xd6:		/* WRTE,2 v */
 			case 0xd7:		/* WRTE,3 v */
 				s2650_ICount -= 9;
-				io_write_byte_8( ARG(), S.reg[S.r] );
+				io_write_byte_8le( ARG(), S.reg[S.r] );
 				break;
 
 			case 0xd8:		/* BIRR,0 (*)a */
@@ -1438,7 +1438,7 @@ static int s2650_execute(int cycles)
 			case 0xf2:		/* WRTD,2 */
 			case 0xf3:		/* WRTD,3 */
 				s2650_ICount -= 6;
-				io_write_byte_8(S2650_DATA_PORT, S.reg[S.r]);
+				io_write_byte_8le(S2650_DATA_PORT, S.reg[S.r]);
 				break;
 
 			case 0xf4:		/* TMI,0  v */

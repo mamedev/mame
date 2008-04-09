@@ -12,11 +12,11 @@
 #define INSTRUCTION(mnemonic) INLINE void (mnemonic)(UINT8 opcode)
 
 #define ROM(addr)			cpu_readop(addr)
-#define RAM_W(addr, value)	(data_write_byte_8(addr, value))
-#define RAM_R(addr)			(data_read_byte_8(addr))
+#define RAM_W(addr, value)	(data_write_byte_8le(addr, value))
+#define RAM_R(addr)			(data_read_byte_8le(addr))
 
-#define IN(addr)			io_read_byte_8(addr)
-#define OUT(addr, value)	io_write_byte_8(addr, value)
+#define IN(addr)			io_read_byte_8le(addr)
+#define OUT(addr, value)	io_write_byte_8le(addr, value)
 
 #define A				R.A
 #define B				R.B

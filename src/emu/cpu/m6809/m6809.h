@@ -19,12 +19,12 @@ void m6809e_get_info(UINT32 state, cpuinfo *info);
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
 /* ASG 971005 -- changed to program_read_byte_8/cpu_writemem16 */
-#define M6809_RDMEM(Addr) ((unsigned)program_read_byte_8(Addr))
+#define M6809_RDMEM(Addr) ((unsigned)program_read_byte_8be(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define M6809_WRMEM(Addr,Value) (program_write_byte_8(Addr,Value))
+#define M6809_WRMEM(Addr,Value) (program_write_byte_8be(Addr,Value))
 
 /****************************************************************************/
 /* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */

@@ -26,45 +26,17 @@ static UINT16 m68008_read_immediate_16(offs_t address)
 	return (cpu_readop(addr) << 8) | (cpu_readop(addr + 1));
 }
 
-static UINT16 readword_d8(offs_t address)
-{
-	UINT16 result = program_read_byte_8(address) << 8;
-	return result | program_read_byte_8(address + 1);
-}
-
-static void writeword_d8(offs_t address, UINT16 data)
-{
-	program_write_byte_8(address, data >> 8);
-	program_write_byte_8(address + 1, data);
-}
-
-static UINT32 readlong_d8(offs_t address)
-{
-	UINT32 result = program_read_byte_8(address) << 24;
-	result |= program_read_byte_8(address + 1) << 16;
-	result |= program_read_byte_8(address + 2) << 8;
-	return result | program_read_byte_8(address + 3);
-}
-
-static void writelong_d8(offs_t address, UINT32 data)
-{
-	program_write_byte_8(address, data >> 24);
-	program_write_byte_8(address + 1, data >> 16);
-	program_write_byte_8(address + 2, data >> 8);
-	program_write_byte_8(address + 3, data);
-}
-
 /* interface for 20/22-bit address bus, 8-bit data bus (68008) */
 static const struct m68k_memory_interface interface_d8 =
 {
 	0,
 	m68008_read_immediate_16,
-	program_read_byte_8,
-	readword_d8,
-	readlong_d8,
-	program_write_byte_8,
-	writeword_d8,
-	writelong_d8
+	program_read_byte_8be,
+	program_read_word_8be,
+	program_read_dword_8be,
+	program_write_byte_8be,
+	program_write_word_8be,
+	program_write_dword_8be
 };
 
 /****************************************************************************
@@ -76,18 +48,6 @@ static UINT16 read_immediate_16(offs_t address)
 	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
 }
 
-static UINT32 readlong_d16(offs_t address)
-{
-	UINT32 result = program_read_word_16be(address) << 16;
-	return result | program_read_word_16be(address + 2);
-}
-
-static void writelong_d16(offs_t address, UINT32 data)
-{
-	program_write_word_16be(address, data >> 16);
-	program_write_word_16be(address + 2, data);
-}
-
 /* interface for 24-bit address bus, 16-bit data bus (68000, 68010) */
 static const struct m68k_memory_interface interface_d16 =
 {
@@ -95,10 +55,10 @@ static const struct m68k_memory_interface interface_d16 =
 	read_immediate_16,
 	program_read_byte_16be,
 	program_read_word_16be,
-	readlong_d16,
+	program_read_dword_16be,
 	program_write_byte_16be,
 	program_write_word_16be,
-	writelong_d16
+	program_write_dword_16be
 };
 
 /****************************************************************************

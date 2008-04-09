@@ -613,15 +613,15 @@ static void m6800_tx(int value)
 	m6800.port2_data = (m6800.port2_data & 0xef) | (value << 4);
 
 	if(m6800.port2_ddr == 0xff)
-		io_write_byte_8(M6803_PORT2,m6800.port2_data);
+		io_write_byte_8be(M6803_PORT2,m6800.port2_data);
 	else
-		io_write_byte_8(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
-			| (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+		io_write_byte_8be(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
+			| (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
 }
 
 static int m6800_rx(void)
 {
-	return (io_read_byte_8(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
+	return (io_read_byte_8be(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
 }
 
 static TIMER_CALLBACK(m6800_tx_tick)
@@ -2293,20 +2293,20 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x01:
 			return m6800.port2_ddr;
 		case 0x02:
-			return (io_read_byte_8(M6803_PORT1) & (m6800.port1_ddr ^ 0xff))
+			return (io_read_byte_8be(M6803_PORT1) & (m6800.port1_ddr ^ 0xff))
 					| (m6800.port1_data & m6800.port1_ddr);
 		case 0x03:
-			return (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff))
+			return (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff))
 					| (m6800.port2_data & m6800.port2_ddr);
 		case 0x04:
 			return m6800.port3_ddr;
 		case 0x05:
 			return m6800.port4_ddr;
 		case 0x06:
-			return (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff))
+			return (io_read_byte_8be(M6803_PORT3) & (m6800.port3_ddr ^ 0xff))
 					| (m6800.port3_data & m6800.port3_ddr);
 		case 0x07:
-			return (io_read_byte_8(M6803_PORT4) & (m6800.port4_ddr ^ 0xff))
+			return (io_read_byte_8be(M6803_PORT4) & (m6800.port4_ddr ^ 0xff))
 					| (m6800.port4_data & m6800.port4_ddr);
 		case 0x08:
 			m6800.pending_tcsr = 0;
@@ -2391,10 +2391,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				m6800.port1_ddr = data;
 				if(m6800.port1_ddr == 0xff)
-					io_write_byte_8(M6803_PORT1,m6800.port1_data);
+					io_write_byte_8be(M6803_PORT1,m6800.port1_data);
 				else
-					io_write_byte_8(M6803_PORT1,(m6800.port1_data & m6800.port1_ddr)
-						| (io_read_byte_8(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT1,(m6800.port1_data & m6800.port1_ddr)
+						| (io_read_byte_8be(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
 			}
 			break;
 		case 0x01:
@@ -2402,10 +2402,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				m6800.port2_ddr = data;
 				if(m6800.port2_ddr == 0xff)
-					io_write_byte_8(M6803_PORT2,m6800.port2_data);
+					io_write_byte_8be(M6803_PORT2,m6800.port2_data);
 				else
-					io_write_byte_8(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
-						| (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
+						| (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
 
 				if (m6800.port2_ddr & 2)
 					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpu_getactivecpu(),activecpu_get_pc());
@@ -2414,10 +2414,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x02:
 			m6800.port1_data = data;
 			if(m6800.port1_ddr == 0xff)
-				io_write_byte_8(M6803_PORT1,m6800.port1_data);
+				io_write_byte_8be(M6803_PORT1,m6800.port1_data);
 			else
-				io_write_byte_8(M6803_PORT1,(m6800.port1_data & m6800.port1_ddr)
-					| (io_read_byte_8(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT1,(m6800.port1_data & m6800.port1_ddr)
+					| (io_read_byte_8be(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
 			if (m6800.trcsr & M6800_TRCSR_TE)
@@ -2429,20 +2429,20 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				m6800.port2_data = data;
 			}
 			if(m6800.port2_ddr == 0xff)
-				io_write_byte_8(M6803_PORT2,m6800.port2_data);
+				io_write_byte_8be(M6803_PORT2,m6800.port2_data);
 			else
-				io_write_byte_8(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
-					| (io_read_byte_8(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
+					| (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
 			break;
 		case 0x04:
 			if (m6800.port3_ddr != data)
 			{
 				m6800.port3_ddr = data;
 				if(m6800.port3_ddr == 0xff)
-					io_write_byte_8(M6803_PORT3,m6800.port3_data);
+					io_write_byte_8be(M6803_PORT3,m6800.port3_data);
 				else
-					io_write_byte_8(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
-						| (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
+						| (io_read_byte_8be(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
 			}
 			break;
 		case 0x05:
@@ -2450,27 +2450,27 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				m6800.port4_ddr = data;
 				if(m6800.port4_ddr == 0xff)
-					io_write_byte_8(M6803_PORT4,m6800.port4_data);
+					io_write_byte_8be(M6803_PORT4,m6800.port4_data);
 				else
-					io_write_byte_8(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
-						| (io_read_byte_8(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
+						| (io_read_byte_8be(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
 			}
 			break;
 		case 0x06:
 			m6800.port3_data = data;
 			if(m6800.port3_ddr == 0xff)
-				io_write_byte_8(M6803_PORT3,m6800.port3_data);
+				io_write_byte_8be(M6803_PORT3,m6800.port3_data);
 			else
-				io_write_byte_8(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
-					| (io_read_byte_8(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
+					| (io_read_byte_8be(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
 			break;
 		case 0x07:
 			m6800.port4_data = data;
 			if(m6800.port4_ddr == 0xff)
-				io_write_byte_8(M6803_PORT4,m6800.port4_data);
+				io_write_byte_8be(M6803_PORT4,m6800.port4_data);
 			else
-				io_write_byte_8(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
-					| (io_read_byte_8(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
+					| (io_read_byte_8be(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
 			break;
 		case 0x08:
 			m6800.tcsr = data;

@@ -1309,7 +1309,7 @@ void ppu2c0x_spriteram_dma (int num, const UINT8 page)
 //logerror("   sprite DMA: %d (scanline: %d)\n", page, chips[num].scanline);
 	for (i = 0; i < SPRITERAM_SIZE; i++)
 	{
-		UINT8 spriteData = program_read_byte_8 (address + i);
+		UINT8 spriteData = program_read_byte(address + i);
 		ppu2c0x_w (num, PPU_SPRITE_DATA, spriteData);
 	}
 

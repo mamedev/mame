@@ -107,11 +107,11 @@ int q = I.AF.b.h+R; 							\
 
 #define M_IN													\
 	I.XX.d=ARG();												\
-	I.AF.b.h=io_read_byte_8(I.XX.d);
+	I.AF.b.h=io_read_byte_8le(I.XX.d);
 
 #define M_OUT													\
 	I.XX.d=ARG();												\
-	io_write_byte_8(I.XX.d,I.AF.b.h)
+	io_write_byte_8le(I.XX.d,I.AF.b.h)
 
 #define M_DAD(R) {                                              \
 	int q = I.HL.d + I.R.d; 									\

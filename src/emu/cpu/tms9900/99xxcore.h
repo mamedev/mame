@@ -777,14 +777,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		int val;
 
 		TMS99XX_ICOUNT -= 2;
-		val = program_read_byte_8(addr);
-		return (val << 8) | program_read_byte_8(addr+1);
+		val = program_read_byte_8be(addr);
+		return (val << 8) | program_read_byte_8be(addr+1);
 	}
-	#define writeword(addr,data)  { TMS99XX_ICOUNT -= 2; program_write_byte_8((addr), (data) >> 8); program_write_byte_8((addr) + 1, (data) & 0xff); }
+	#define writeword(addr,data)  { TMS99XX_ICOUNT -= 2; program_write_byte_8be((addr), (data) >> 8); program_write_byte_8be((addr) + 1, (data) & 0xff); }
 
 #if 0
-	#define readbyte(addr)        (TMS99XX_ICOUNT -= 2, program_read_byte_8(addr))
-	#define writebyte(addr,data)  { TMS99XX_ICOUNT -= 2; program_write_byte_8((addr),(data)); }
+	#define readbyte(addr)        (TMS99XX_ICOUNT -= 2, program_read_byte_8be(addr))
+	#define writebyte(addr,data)  { TMS99XX_ICOUNT -= 2; program_write_byte_8be((addr),(data)); }
 #else
 	/*This is how it really works*/
 	/*Note that every writebyte must match a readbyte (which is indeed the case)*/
@@ -795,13 +795,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		TMS99XX_ICOUNT -= 2;
 		if (addr & 1)
 		{
-			extra_byte = program_read_byte_8(addr-1);
-			return program_read_byte_8(addr);
+			extra_byte = program_read_byte_8be(addr-1);
+			return program_read_byte_8be(addr);
 		}
 		else
 		{
-			int val = program_read_byte_8(addr);
-			extra_byte = program_read_byte_8(addr+1);
+			int val = program_read_byte_8be(addr);
+			extra_byte = program_read_byte_8be(addr+1);
 			return val;
 		}
 	}
@@ -810,13 +810,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		TMS99XX_ICOUNT -= 2;
 		if (addr & 1)
 		{
-			program_write_byte_8(addr-1, extra_byte);
-			program_write_byte_8(addr, data);
+			program_write_byte_8be(addr-1, extra_byte);
+			program_write_byte_8be(addr, data);
 		}
 		else
 		{
-			program_write_byte_8(addr, data);
-			program_write_byte_8(addr+1, extra_byte);
+			program_write_byte_8be(addr, data);
+			program_write_byte_8be(addr+1, extra_byte);
 		}
 	}
 #endif
@@ -836,7 +836,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else
 		{
 			TMS99XX_ICOUNT -= 2;
-			return (program_read_byte_8(addr) << 8) + program_read_byte_8(addr + 1);
+			return (program_read_byte_8be(addr) << 8) + program_read_byte_8be(addr + 1);
 		}
 	}
 	static void writeword(int addr, int data)
@@ -847,8 +847,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (!(addr < 0x2000))
 		{
 			TMS99XX_ICOUNT -= 2;
-			program_write_byte_8(addr, data >> 8);
-			program_write_byte_8(addr + 1, data & 0xff);
+			program_write_byte_8be(addr, data >> 8);
+			program_write_byte_8be(addr + 1, data & 0xff);
 		}
 	}
 
@@ -865,13 +865,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			TMS99XX_ICOUNT -= 2;
 			if (addr & 1)
 			{
-				extra_byte = program_read_byte_8(addr-1);
-				return program_read_byte_8(addr);
+				extra_byte = program_read_byte_8be(addr-1);
+				return program_read_byte_8be(addr);
 			}
 			else
 			{
-				int val = program_read_byte_8(addr);
-				extra_byte = program_read_byte_8(addr+1);
+				int val = program_read_byte_8be(addr);
+				extra_byte = program_read_byte_8be(addr+1);
 				return val;
 			}
 		}
@@ -886,13 +886,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			TMS99XX_ICOUNT -= 2;
 			if (addr & 1)
 			{
-				program_write_byte_8(addr-1, extra_byte);
-				program_write_byte_8(addr, data);
+				program_write_byte_8be(addr-1, extra_byte);
+				program_write_byte_8be(addr, data);
 			}
 			else
 			{
-				program_write_byte_8(addr, data);
-				program_write_byte_8(addr+1, extra_byte);
+				program_write_byte_8be(addr, data);
+				program_write_byte_8be(addr+1, extra_byte);
 		}
 	}
 	}
@@ -909,8 +909,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{
 			int reply;
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			reply = program_read_byte_8(addr);
-			return (reply << 8) | program_read_byte_8(addr + 1);
+			reply = program_read_byte_8be(addr);
+			return (reply << 8) | program_read_byte_8be(addr + 1);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -920,8 +920,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{
 			int reply;
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			reply = program_read_byte_8(addr);
-			return (reply << 8) | program_read_byte_8(addr + 1);
+			reply = program_read_byte_8be(addr);
+			return (reply << 8) | program_read_byte_8be(addr + 1);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -944,8 +944,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (I.is_mp9537))
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			program_write_byte_8(addr, data >> 8);
-			program_write_byte_8(addr + 1, data & 0xff);
+			program_write_byte_8be(addr, data >> 8);
+			program_write_byte_8be(addr + 1, data & 0xff);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -954,8 +954,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_word;
-			program_write_byte_8(addr, data >> 8);
-			program_write_byte_8(addr + 1, data & 0xff);
+			program_write_byte_8be(addr, data >> 8);
+			program_write_byte_8be(addr + 1, data & 0xff);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -974,7 +974,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (I.is_mp9537))
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			return program_read_byte_8(addr);
+			return program_read_byte_8be(addr);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -983,7 +983,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			return program_read_byte_8(addr);
+			return program_read_byte_8be(addr);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -1013,7 +1013,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (I.is_mp9537))
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			program_write_byte_8(addr, data);
+			program_write_byte_8be(addr, data);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -1022,7 +1022,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			TMS99XX_ICOUNT -= I.memory_wait_states_byte;
-			program_write_byte_8(addr, data);
+			program_write_byte_8be(addr, data);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -2049,7 +2049,7 @@ typedef enum
 	CRU_PRIVILEGE_VIOLATION = -1
 } cru_error_code;
 
-#define WRITEPORT(port, data) io_write_byte_8(port, data)
+#define WRITEPORT(port, data) io_write_byte_8be(port, data)
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
 /* on tms9940, we have to handle internal CRU ports */
@@ -2268,7 +2268,7 @@ static void external_instruction_notify(int ext_op_ID)
     read at the same address.  This seems to be impossible to emulate efficiently, so, if you need
     to emulate this, you're in trouble.
 */
-#define READPORT(port) io_read_byte_8(port)
+#define READPORT(port) io_read_byte_8be(port)
 
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)

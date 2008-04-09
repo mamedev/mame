@@ -1086,43 +1086,19 @@ static void nec_init(int index, int clock, const void *_config, int (*irqcallbac
  *****************************************************************************/
 
 #if (HAS_V20||HAS_V25)
-static UINT16 read_word_8(offs_t addr)
-{
-	UINT16 result = program_read_byte_8(addr);
-	return result | (program_read_byte_8(addr + 1) << 8);
-}
-
-static void write_word_8(offs_t addr, UINT16 data)
-{
-	program_write_byte_8(addr, data);
-	program_write_byte_8(addr + 1, data >> 8);
-}
-
-static UINT16 read_port_word_8(offs_t addr)
-{
-	UINT16 result = io_read_byte_8(addr);
-	return result | (io_read_byte_8(addr + 1) << 8);
-}
-
-static void write_port_word_8(offs_t addr, UINT16 data)
-{
-	io_write_byte_8(addr, data);
-	io_write_byte_8(addr + 1, data >> 8);
-}
-
 static void configure_memory_8bit(void)
 {
 	I.mem.fetch_xor = 0;
 
-	I.mem.rbyte = program_read_byte_8;
-	I.mem.rword = read_word_8;
-	I.mem.wbyte = program_write_byte_8;
-	I.mem.wword = write_word_8;
+	I.mem.rbyte = program_read_byte_8le;
+	I.mem.rword = program_read_word_8le;
+	I.mem.wbyte = program_write_byte_8le;
+	I.mem.wword = program_write_word_8le;
 
-	I.mem.rbyte_port = io_read_byte_8;
-	I.mem.rword_port = read_port_word_8;
-	I.mem.wbyte_port = io_write_byte_8;
-	I.mem.wword_port = write_port_word_8;
+	I.mem.rbyte_port = io_read_byte_8le;
+	I.mem.rword_port = io_read_word_8le;
+	I.mem.wbyte_port = io_write_byte_8le;
+	I.mem.wword_port = io_write_word_8le;
 }
 #endif
 

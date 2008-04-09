@@ -70,20 +70,20 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 #define DefaultBase(Seg) ((seg_prefix && (Seg==DS || Seg==SS)) ? prefix_base : I.sregs[Seg] << 4)
 
-#define GetMemB(Seg,Off) ((UINT8)program_read_byte_8((DefaultBase(Seg)+(Off))))
-#define GetMemW(Seg,Off) ((UINT16) program_read_byte_8((DefaultBase(Seg)+(Off))) + (program_read_byte_8((DefaultBase(Seg)+((Off)+1)))<<8) )
+#define GetMemB(Seg,Off) ((UINT8)program_read_byte_8le((DefaultBase(Seg)+(Off))))
+#define GetMemW(Seg,Off) ((UINT16) program_read_byte_8le((DefaultBase(Seg)+(Off))) + (program_read_byte_8le((DefaultBase(Seg)+((Off)+1)))<<8) )
 
-#define PutMemB(Seg,Off,x) { program_write_byte_8((DefaultBase(Seg)+(Off)),(x)); }
+#define PutMemB(Seg,Off,x) { program_write_byte_8le((DefaultBase(Seg)+(Off)),(x)); }
 #define PutMemW(Seg,Off,x) { PutMemB(Seg,Off,(x)&0xff); PutMemB(Seg,(Off)+1,(BYTE)((x)>>8)); }
 
 /* Todo:  Remove these later - plus readword could overflow */
-#define ReadByte(ea) ((BYTE)program_read_byte_8((ea)))
-#define ReadWord(ea) (program_read_byte_8((ea))+(program_read_byte_8(((ea)+1))<<8))
-#define WriteByte(ea,val) { program_write_byte_8((ea),val); }
-#define WriteWord(ea,val) { program_write_byte_8((ea),(BYTE)(val)); program_write_byte_8(((ea)+1),(val)>>8); }
+#define ReadByte(ea) ((BYTE)program_read_byte_8le((ea)))
+#define ReadWord(ea) (program_read_byte_8le((ea))+(program_read_byte_8le(((ea)+1))<<8))
+#define WriteByte(ea,val) { program_write_byte_8le((ea),val); }
+#define WriteWord(ea,val) { program_write_byte_8le((ea),(BYTE)(val)); program_write_byte_8le(((ea)+1),(val)>>8); }
 
-#define read_port(port) io_read_byte_8(port)
-#define write_port(port,val) io_write_byte_8(port,val)
+#define read_port(port) io_read_byte_8le(port)
+#define write_port(port,val) io_write_byte_8le(port,val)
 
 #define FETCH (cpu_readop_arg((I.sregs[CS]<<4)+I.ip++))
 #define FETCHOP (cpu_readop((I.sregs[CS]<<4)+I.ip++))

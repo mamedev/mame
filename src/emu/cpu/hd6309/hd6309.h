@@ -20,12 +20,12 @@ void hd6309_get_info(UINT32 state, cpuinfo *info);
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
 /* ASG 971005 -- changed to program_read_byte_8/cpu_writemem16 */
-#define HD6309_RDMEM(Addr) ((unsigned)program_read_byte_8(Addr))
+#define HD6309_RDMEM(Addr) ((unsigned)program_read_byte_8be(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define HD6309_WRMEM(Addr,Value) (program_write_byte_8(Addr,Value))
+#define HD6309_WRMEM(Addr,Value) (program_write_byte_8be(Addr,Value))
 
 /****************************************************************************/
 /* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */

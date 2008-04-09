@@ -385,23 +385,23 @@ static void check_interrupts(void);
 #define SAME_SRCF_DST  (decode)->same_srcf_dst
 
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
-static UINT32 program_read_dword_16be(offs_t address)
+static UINT32 internal_program_read_dword_16be(offs_t address)
 {
 	return (program_read_word_16be(address & ~1) << 16) | program_read_word_16be((address & ~1) + 2);
 }
 
-static void program_write_dword_16be(offs_t address, UINT32 data)
+static void internal_program_write_dword_16be(offs_t address, UINT32 data)
 {
 	program_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
 	program_write_word_16be((address & ~1)+2, data & 0xffff);
 }
 
-static UINT32 io_read_dword_16be(offs_t address)
+static UINT32 internal_io_read_dword_16be(offs_t address)
 {
 	return (io_read_word_16be(address & ~1)<< 16) | io_read_word_16be((address & ~1) + 2);
 }
 
-static void io_write_dword_16be(offs_t address, UINT32 data)
+static void internal_io_write_dword_16be(offs_t address, UINT32 data)
 {
 	io_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
 	io_write_word_16be((address & ~1)+2, data & 0xffff);
@@ -1586,13 +1586,13 @@ static void e116_init(int index, int clock, const void *config, int (*irqcallbac
 {
 	hyp_cpu_read_byte      = program_read_byte_16be;
 	hyp_cpu_read_half_word = program_read_word_16be;
-	hyp_cpu_read_word      = program_read_dword_16be;
-	hyp_cpu_read_io_word   = io_read_dword_16be;
+	hyp_cpu_read_word      = internal_program_read_dword_16be;
+	hyp_cpu_read_io_word   = internal_io_read_dword_16be;
 
 	hyp_cpu_write_byte      = program_write_byte_16be;
 	hyp_cpu_write_half_word = program_write_word_16be;
-	hyp_cpu_write_word      = program_write_dword_16be;
-	hyp_cpu_write_io_word   = io_write_dword_16be;
+	hyp_cpu_write_word      = internal_program_write_dword_16be;
+	hyp_cpu_write_io_word   = internal_io_write_dword_16be;
 
 	hyp_type_16bit = 1;
 

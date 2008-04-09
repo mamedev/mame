@@ -114,10 +114,10 @@ static int i8x41_ICount;
 
 static I8X41 i8x41;
 
-#define RM(a)	program_read_byte_8(a)
-#define WM(a,v) program_write_byte_8(a,v)
-#define RP(a)	io_read_byte_8(a)
-#define WP(a,v) io_write_byte_8(a,v)
+#define RM(a)	program_read_byte_8le(a)
+#define WM(a,v) program_write_byte_8le(a,v)
+#define RP(a)	io_read_byte_8le(a)
+#define WP(a,v) io_write_byte_8le(a,v)
 #define ROP(pc) cpu_readop(pc)
 #define ROP_ARG(pc) cpu_readop_arg(pc)
 

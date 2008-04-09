@@ -159,16 +159,16 @@ static UINT32	addr;
 #define R16D8( N,R,I )		mode##N = MODE_R16D8;	r##N = R;	r##N##b = I;
 #define R16R8( N,R,g )		mode##N = MODE_R16R8;	r##N = R;	r##N##b = g;
 
-INLINE UINT8  RM8 (UINT32 a)	{ return program_read_byte_8( a ); }
+INLINE UINT8  RM8 (UINT32 a)	{ return program_read_byte_8le( a ); }
 INLINE UINT16 RM16(UINT32 a)	{ return RM8(a) | (RM8( (a+1) & 0xffff ) << 8); }
 
-INLINE void WM8 (UINT32 a, UINT8  v)	{ program_write_byte_8( a, v ); }
+INLINE void WM8 (UINT32 a, UINT8  v)	{ program_write_byte_8le( a, v ); }
 INLINE void WM16(UINT32 a, UINT16 v)	{ WM8(a,v);	WM8( (a+1) & 0xffff, v >> 8); }
 
-INLINE UINT8  RX8 (UINT32 a, UINT32 base)	{ return program_read_byte_8( base | a ); }
+INLINE UINT8  RX8 (UINT32 a, UINT32 base)	{ return program_read_byte_8le( base | a ); }
 INLINE UINT16 RX16(UINT32 a, UINT32 base)	{ return RX8(a,base) | (RX8( (a+1) & 0xffff, base ) << 8); }
 
-INLINE void WX8 (UINT32 a, UINT8  v, UINT32 base)	{ program_write_byte_8( base | a, v ); }
+INLINE void WX8 (UINT32 a, UINT8  v, UINT32 base)	{ program_write_byte_8le( base | a, v ); }
 INLINE void WX16(UINT32 a, UINT16 v, UINT32 base)	{ WX8(a,v,base);	WX8( (a+1) & 0xffff, v >> 8, base); }
 
 INLINE UINT8  READ8(void)	{ UINT8 b0 = RM8( addr++ ); addr &= 0xffff; return b0; }
@@ -2276,7 +2276,7 @@ FFED    BX      R/W     Reset   Description
 
 static READ8_HANDLER( t90_internal_registers_r )
 {
-	#define RIO		io_read_byte_8( T90_IOBASE+offset )
+	#define RIO		io_read_byte_8le( T90_IOBASE+offset )
 
 	UINT8 data = T90.internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2484,7 +2484,7 @@ static TIMER_CALLBACK( t90_timer4_callback )
 
 static WRITE8_HANDLER( t90_internal_registers_w )
 {
-	#define WIO		io_write_byte_8( T90_IOBASE+offset, data )
+	#define WIO		io_write_byte_8le( T90_IOBASE+offset, data )
 
 	UINT8 out_mask;
 	UINT8 old = T90.internal_registers[offset];

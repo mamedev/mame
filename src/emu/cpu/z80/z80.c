@@ -565,17 +565,17 @@ INLINE void BURNODD(int cycles, int opcodes, int cyclesum)
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-#define IN(port)   ((UINT8)io_read_byte_8(port))
+#define IN(port)   ((UINT8)io_read_byte_8le(port))
 
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-#define OUT(port,value) io_write_byte_8(port,value)
+#define OUT(port,value) io_write_byte_8le(port,value)
 
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(addr) (UINT8)program_read_byte_8(addr)
+#define RM(addr) (UINT8)program_read_byte_8le(addr)
 
 /***************************************************************
  * Read a word from given memory location
@@ -589,7 +589,7 @@ INLINE void RM16( UINT32 addr, PAIR *r )
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(addr,value) program_write_byte_8(addr,value)
+#define WM(addr,value) program_write_byte_8le(addr,value)
 
 /***************************************************************
  * Write a word to given memory location

@@ -119,8 +119,8 @@ static ADDRESS_MAP_START(m6509_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8(offset); }
-static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8(offset, data); }
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
+static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
 
 static void m6509_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {

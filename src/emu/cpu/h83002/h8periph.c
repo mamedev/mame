@@ -400,52 +400,52 @@ UINT8 h8_register_read8(UINT32 address)
 			val = io_read_byte(H8_SERIAL_B);
 			break;
 		case 0xe0:
-			val = io_read_byte_8(H8_ADC_0_H);
+			val = io_read_byte(H8_ADC_0_H);
 			break;
 		case 0xe1:
-			val = io_read_byte_8(H8_ADC_0_L);
+			val = io_read_byte(H8_ADC_0_L);
 			break;
 		case 0xe2:
-			val = io_read_byte_8(H8_ADC_1_H);
+			val = io_read_byte(H8_ADC_1_H);
 			break;
 		case 0xe3:
-			val = io_read_byte_8(H8_ADC_1_L);
+			val = io_read_byte(H8_ADC_1_L);
 			break;
 		case 0xe4:
-			val = io_read_byte_8(H8_ADC_2_H);
+			val = io_read_byte(H8_ADC_2_H);
 			break;
 		case 0xe5:
-			val = io_read_byte_8(H8_ADC_2_L);
+			val = io_read_byte(H8_ADC_2_L);
 			break;
 		case 0xe6:
-			val = io_read_byte_8(H8_ADC_3_H);
+			val = io_read_byte(H8_ADC_3_H);
 			break;
 		case 0xe7:
-			val = io_read_byte_8(H8_ADC_3_L);
+			val = io_read_byte(H8_ADC_3_L);
 			break;
 		case 0xe8:		// adc status
 			val = 0x80;
 			break;
 		case 0xc7:    		// port 4 data
-			val = io_read_byte_8(H8_PORT4);
+			val = io_read_byte(H8_PORT4);
 			break;
 		case 0xcb:    		// port 6 data
-			val = io_read_byte_8(H8_PORT6);
+			val = io_read_byte(H8_PORT6);
 			break;
 		case 0xce:		// port 7 data
-			val = io_read_byte_8(H8_PORT7);
+			val = io_read_byte(H8_PORT7);
 			break;
 		case 0xcf:		// port 8 data
-			val = io_read_byte_8(H8_PORT8);
+			val = io_read_byte(H8_PORT8);
 			break;
 		case 0xd2:		// port 9 data
-			val = io_read_byte_8(H8_PORT9);
+			val = io_read_byte(H8_PORT9);
 			break;
 		case 0xd3:		// port a data
-			val = io_read_byte_8(H8_PORTA);
+			val = io_read_byte(H8_PORTA);
 			break;
 		case 0xd6:		// port b data
-			val = io_read_byte_8(H8_PORTB);
+			val = io_read_byte(H8_PORTB);
 			break;
 		case 0xf6:
 			val = h8_ISR_r();
@@ -482,25 +482,25 @@ void h8_register_write8(UINT32 address, UINT8 val)
 			io_write_byte(H8_SERIAL_B, val);
 			break;
 		case 0xc7:
-			io_write_byte_8(H8_PORT4, val);
+			io_write_byte(H8_PORT4, val);
 			break;
 		case 0xcb:    		// port 6 data
-			io_write_byte_8(H8_PORT6, val);
+			io_write_byte(H8_PORT6, val);
 			break;
 		case 0xce:		// port 7 data
-			io_write_byte_8(H8_PORT7, val);
+			io_write_byte(H8_PORT7, val);
 			break;
 		case 0xcf:		// port 8 data
-			io_write_byte_8(H8_PORT8, val);
+			io_write_byte(H8_PORT8, val);
 			break;
 		case 0xd2:		// port 9 data
-			io_write_byte_8(H8_PORT9, val);
+			io_write_byte(H8_PORT9, val);
 			break;
 		case 0xd3:		// port a data
-			io_write_byte_8(H8_PORTA, val);
+			io_write_byte(H8_PORTA, val);
 			break;
 		case 0xd6:		// port b data
-			io_write_byte_8(H8_PORTB, val);
+			io_write_byte(H8_PORTB, val);
 			break;
 		case 0xf6:
 			h8_ISR_w(val);
@@ -684,53 +684,53 @@ UINT8 h8_3007_register_read8(UINT32 address)
 			val = io_read_byte(H8_SERIAL_B);
 			break;
 		case 0xe0:
-			val = io_read_byte_8(H8_ADC_0_H);
+			val = io_read_byte(H8_ADC_0_H);
 			break;
 		case 0xe1:
-			val = io_read_byte_8(H8_ADC_0_L);
+			val = io_read_byte(H8_ADC_0_L);
 			break;
 		case 0xe2:
-			val = io_read_byte_8(H8_ADC_1_H);
+			val = io_read_byte(H8_ADC_1_H);
 			break;
 		case 0xe3:
-			val = io_read_byte_8(H8_ADC_1_L);
+			val = io_read_byte(H8_ADC_1_L);
 			break;
 		case 0xe4:
-			val = io_read_byte_8(H8_ADC_2_H);
+			val = io_read_byte(H8_ADC_2_H);
 			break;
 		case 0xe5:
-			val = io_read_byte_8(H8_ADC_2_L);
+			val = io_read_byte(H8_ADC_2_L);
 			break;
 		case 0xe6:
-			val = io_read_byte_8(H8_ADC_3_H);
+			val = io_read_byte(H8_ADC_3_H);
 			break;
 		case 0xe7:
-			val = io_read_byte_8(H8_ADC_3_L);
+			val = io_read_byte(H8_ADC_3_L);
 			break;
 		case 0xe8:		// adc status
 			val = 0x80;
 			break;
 
 		case 0xd3:    		// port 4 data
-			val = io_read_byte_8(H8_PORT4);
+			val = io_read_byte(H8_PORT4);
 			break;
 		case 0xd5:    		// port 6 data
-			val = io_read_byte_8(H8_PORT6);
+			val = io_read_byte(H8_PORT6);
 			break;
 		case 0xd6:		// port 7 data
-			val = io_read_byte_8(H8_PORT7);
+			val = io_read_byte(H8_PORT7);
 			break;
 		case 0xd7:		// port 8 data
-			val = io_read_byte_8(H8_PORT8);
+			val = io_read_byte(H8_PORT8);
 			break;
 		case 0xd8:		// port 9 data
-			val = io_read_byte_8(H8_PORT9);
+			val = io_read_byte(H8_PORT9);
 			break;
 		case 0xd9:		// port a data
-			val = io_read_byte_8(H8_PORTA);
+			val = io_read_byte(H8_PORTA);
 			break;
 		case 0xda:		// port b data
-			val = io_read_byte_8(H8_PORTB);
+			val = io_read_byte(H8_PORTB);
 			break;
 		default:
 			val = h8.per_regs[reg];
@@ -766,25 +766,25 @@ void h8_3007_register_write8(UINT32 address, UINT8 val)
 				io_write_byte(H8_SERIAL_B, val);
 				break;
 			case 0xd3:
-				io_write_byte_8(H8_PORT4, val);
+				io_write_byte(H8_PORT4, val);
 				break;
 			case 0xd5:		// port 6 data
-				io_write_byte_8(H8_PORT6, val);
+				io_write_byte(H8_PORT6, val);
 				break;
 			case 0xd6:		// port 7 data
-				io_write_byte_8(H8_PORT7, val);
+				io_write_byte(H8_PORT7, val);
 				break;
 			case 0xd7:		// port 8 data
-				io_write_byte_8(H8_PORT8, val);
+				io_write_byte(H8_PORT8, val);
 				break;
 			case 0xd8:		// port 9 data
-				io_write_byte_8(H8_PORT9, val);
+				io_write_byte(H8_PORT9, val);
 				break;
 			case 0xd9:		// port a data
-				io_write_byte_8(H8_PORTA, val);
+				io_write_byte(H8_PORTA, val);
 				break;
 			case 0xda:		// port b data
-				io_write_byte_8(H8_PORTB, val);
+				io_write_byte(H8_PORTB, val);
 				break;
 		}
 	}

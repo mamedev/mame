@@ -291,6 +291,7 @@ static int describe_instruction_special(mips3_state *mips, UINT32 op, opcode_des
 		case 0x08:	/* JR */
 			desc->gpr.used |= REGFLAG_R(RSREG);
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc->targetpc = BRANCH_TARGET_DYNAMIC;
 			desc->delayslots = 1;
 			return TRUE;
 
@@ -298,6 +299,7 @@ static int describe_instruction_special(mips3_state *mips, UINT32 op, opcode_des
 			desc->gpr.used |= REGFLAG_R(RSREG);
 			desc->gpr.modified |= REGFLAG_R(RDREG);
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc->targetpc = BRANCH_TARGET_DYNAMIC;
 			desc->delayslots = 1;
 			return TRUE;
 

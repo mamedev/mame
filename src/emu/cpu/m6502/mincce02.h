@@ -66,6 +66,6 @@
 
 #define PEEK_OP()	cpu_readop(PCW)
 
-#define RDMEM(addr)			program_read_byte_8(addr); m65ce02_ICount -= 1
-#define WRMEM(addr,data)	program_write_byte_8(addr,data); m65ce02_ICount -= 1
+#define RDMEM(addr)			program_read_byte_8le(addr); m65ce02_ICount -= 1
+#define WRMEM(addr,data)	program_write_byte_8le(addr,data); m65ce02_ICount -= 1
 

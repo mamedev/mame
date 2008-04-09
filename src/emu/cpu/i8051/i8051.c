@@ -191,7 +191,7 @@ static READ32_HANDLER((*hold_eram_iaddr_callback));
  * Read a byte from External Code Memory (Usually Program Rom(s) Space)
  *****************************************************************************
  This area is mapped from 0-FFFF internally (64K) */
-#define CODEMEM_R(a)	(UINT8)program_read_byte_8(a)
+#define CODEMEM_R(a)	(UINT8)program_read_byte_8le(a)
 /*****************************************************************************
  * Read/Write a byte from/to External Data Memory (Usually RAM or other I/O)
  *****************************************************************************
@@ -202,8 +202,8 @@ static READ32_HANDLER((*hold_eram_iaddr_callback));
  addresses, w/o any contention.
  As far as the 8051 program code which is executing knows data memory still lives
  in the 0-FFFF range.*/
-#define DATAMEM_R(a)	(UINT8)data_read_byte_8(a)
-#define DATAMEM_W(a,v)	data_write_byte_8(a,v)
+#define DATAMEM_R(a)	(UINT8)data_read_byte_8le(a)
+#define DATAMEM_W(a,v)	data_write_byte_8le(a,v)
 
 /***************************************************************
  * Read/Write a byte from/to the Internal RAM

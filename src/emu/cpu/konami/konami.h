@@ -23,12 +23,12 @@ void konami_get_info(UINT32 state, cpuinfo *info);
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define KONAMI_RDMEM(Addr) ((unsigned)program_read_byte_8(Addr))
+#define KONAMI_RDMEM(Addr) ((unsigned)program_read_byte_8be(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define KONAMI_WRMEM(Addr,Value) (program_write_byte_8(Addr,Value))
+#define KONAMI_WRMEM(Addr,Value) (program_write_byte_8be(Addr,Value))
 
 /****************************************************************************/
 /* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */

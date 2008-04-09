@@ -89,8 +89,8 @@ static int m6502_ICount = 0;
 
 static m6502_Regs m6502;
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8(offset); }
-static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8(offset, data); }
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
+static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
 
 /***************************************************************
  * include the opcode macros, functions and tables

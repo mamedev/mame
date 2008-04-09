@@ -176,12 +176,12 @@ static UINT16 ARG16(void)
 
 static UINT8 RM(UINT32 a)
 {
-	return program_read_byte_8(a);
+	return program_read_byte_8le(a);
 }
 
 static void WM(UINT32 a, UINT8 v)
 {
-	program_write_byte_8(a, v);
+	program_write_byte_8le(a, v);
 }
 
 INLINE void execute_one(int opcode)

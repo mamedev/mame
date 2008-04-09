@@ -68,11 +68,11 @@ static int mb88_icount;
 
 #define READOP(a) 			(cpu_readop(a))
 
-#define RDMEM(a)			(data_read_byte_8(a))
-#define WRMEM(a,v)			(data_write_byte_8((a), (v)))
+#define RDMEM(a)			(data_read_byte_8be(a))
+#define WRMEM(a,v)			(data_write_byte_8be((a), (v)))
 
-#define READPORT(a)			(io_read_byte_8(a))
-#define WRITEPORT(a,v)		(io_write_byte_8((a), (v)))
+#define READPORT(a)			(io_read_byte_8be(a))
+#define WRITEPORT(a,v)		(io_write_byte_8be((a), (v)))
 
 #define TEST_ST()			(mb88.st & 1)
 #define TEST_ZF()			(mb88.zf & 1)

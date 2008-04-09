@@ -61,14 +61,14 @@ static const UINT8 sm8500_b2w[8] = {
 };
 
 UINT8 sm85cpu_mem_readbyte( UINT32 offset ) {
-	return ( offset < 0x10 ) ? regs.register_base[offset] : program_read_byte_8( offset );
+	return ( offset < 0x10 ) ? regs.register_base[offset] : program_read_byte_8be( offset );
 }
 
 void sm85cpu_mem_writebyte( UINT32 offset, UINT8 data ) {
 	if ( offset < 0x10 ) {
 		regs.register_base[offset] = data;
 	} else {
-		program_write_byte_8( offset, data );
+		program_write_byte_8be( offset, data );
 	}
 }
 

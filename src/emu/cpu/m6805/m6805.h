@@ -61,12 +61,12 @@ extern void hd63705_get_info(UINT32 state, cpuinfo *info);
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define M6805_RDMEM(Addr) ((unsigned)program_read_byte_8(Addr))
+#define M6805_RDMEM(Addr) ((unsigned)program_read_byte_8be(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define M6805_WRMEM(Addr,Value) (program_write_byte_8(Addr,Value))
+#define M6805_WRMEM(Addr,Value) (program_write_byte_8be(Addr,Value))
 
 /****************************************************************************/
 /* M6805_RDOP() is identical to M6805_RDMEM() except it is used for reading */

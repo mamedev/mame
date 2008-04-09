@@ -24,7 +24,7 @@
  ***************************************************************/
 #define IN(port)												\
 	(((port ^ IO_IOCR) & 0xffc0) == 0) ?						\
-		z180_readcontrol(port) : io_read_byte_8(port)
+		z180_readcontrol(port) : io_read_byte_8le(port)
 
 /***************************************************************
  * Output a byte to given I/O port
@@ -32,7 +32,7 @@
 #define OUT(port,value) 										\
 	if (((port ^ IO_IOCR) & 0xffc0) == 0)						\
 		z180_writecontrol(port,value);							\
-	else io_write_byte_8(port,value)
+	else io_write_byte_8le(port,value)
 
 /***************************************************************
  * MMU calculate the memory managemant lookup table
@@ -68,7 +68,7 @@ INLINE void z180_mmu( void )
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(addr)	program_read_byte_8(MMU_REMAP_ADDR(addr))
+#define RM(addr)	program_read_byte_8le(MMU_REMAP_ADDR(addr))
 UINT8 z180_readmem(offs_t offset)
 {
 	return RM(offset);
@@ -77,7 +77,7 @@ UINT8 z180_readmem(offs_t offset)
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(addr,value) program_write_byte_8(MMU_REMAP_ADDR(addr),value)
+#define WM(addr,value) program_write_byte_8le(MMU_REMAP_ADDR(addr),value)
 void z180_writemem(offs_t offset, UINT8 data)
 {
 	WM(offset, data);

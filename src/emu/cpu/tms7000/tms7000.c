@@ -57,8 +57,8 @@ static int tms7000_icount;
 static int tms7000_div_by_16_trigger;
 static int tms7000_cycles_per_INT2;
 
-#define RM(Addr) ((unsigned)program_read_byte_8(Addr))
-#define WM(Addr,Value) (program_write_byte_8(Addr,Value))
+#define RM(Addr) ((unsigned)program_read_byte_8be(Addr))
+#define WM(Addr,Value) (program_write_byte_8be(Addr,Value))
 
 INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
 {
@@ -619,19 +619,19 @@ static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 			break;
 
 		case 0x06: /* Port B write */
-			io_write_byte_8( TMS7000_PORTB, data );
+			io_write_byte_8be( TMS7000_PORTB, data );
 			tms7000.pf[ 0x06 ] = data;
 			break;
 
 		case 0x08: /* Port C write */
 			temp1 = data & tms7000.pf[ 0x09 ];	/* Mask off input bits */
-			io_write_byte_8( TMS7000_PORTC, temp1 );
+			io_write_byte_8be( TMS7000_PORTC, temp1 );
 			tms7000.pf[ 0x08 ] = temp1;
 			break;
 
 		case 0x0a: /* Port D write */
 			temp1 = data & tms7000.pf[ 0x0b ];	/* Mask off input bits */
-			io_write_byte_8( TMS7000_PORTD, temp1 );
+			io_write_byte_8be( TMS7000_PORTD, temp1 );
 			tms7000.pf[ 0x0a ] = temp1;
 			break;
 
@@ -666,7 +666,7 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 			break;
 
 		case 0x04: /* Port A read */
-			result = io_read_byte_8( TMS7000_PORTA );
+			result = io_read_byte_8be( TMS7000_PORTA );
 			break;
 
 
@@ -677,14 +677,14 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 
 		case 0x08: /* Port C read */
 			temp1 = tms7000.pf[ 0x08 ] & tms7000.pf[ 0x09 ];	/* Get previous output bits */
-			temp2 = io_read_byte_8( TMS7000_PORTC );			/* Read port */
+			temp2 = io_read_byte_8be( TMS7000_PORTC );			/* Read port */
 			temp3 = temp2 & (~tms7000.pf[ 0x09 ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;
 
 		case 0x0a: /* Port D read */
 			temp1 = tms7000.pf[ 0x0a ] & tms7000.pf[ 0x0b ];	/* Get previous output bits */
-			temp2 = io_read_byte_8( TMS7000_PORTD );			/* Read port */
+			temp2 = io_read_byte_8be( TMS7000_PORTD );			/* Read port */
 			temp3 = temp2 & (~tms7000.pf[ 0x0b ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;

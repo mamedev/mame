@@ -1042,9 +1042,9 @@ static void mips_update_memory_handlers( void )
 		mipscpu.readbyte = program_read_byte_32le;
 		mipscpu.readhalf = program_read_word_32le;
 		mipscpu.readword = program_read_dword_32le;
-		mipscpu.readword_masked = program_read_masked_32le;
+		mipscpu.readword_masked = program_read_dword_masked_32le;
 		mipscpu.writeword = program_write_dword_32le;
-		mipscpu.writeword_masked = program_write_masked_32le;
+		mipscpu.writeword_masked = program_write_dword_masked_32le;
 	}
 }
 

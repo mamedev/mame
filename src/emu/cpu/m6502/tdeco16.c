@@ -189,7 +189,7 @@ OP(27) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB2 ZPG ?? */
 OP(47) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB4 ZPG ?? */
 OP(67) {
 	int tmp; RD_IMM;
-	m6502.a=io_read_byte_8(0);
+	m6502.a=io_read_byte_8le(0);
 
 //  logerror("%04x: VBL (0x67)\n",activecpu_get_pc());
 
@@ -275,7 +275,7 @@ OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(4b) { int tmp; m6502_ICount -= 1; RD_IMM;
 	logerror("%04x: OP4B %02x\n",activecpu_get_pc(),tmp);
 
-//  m6502.a=io_read_byte_8(0);
+//  m6502.a=io_read_byte_8le(0);
 
 //tilt??
 
@@ -367,7 +367,7 @@ OP(6f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR6 ZPG ?? */
 OP(8f) { int tmp; m6502_ICount -= 1; RD_IMM;
 	logerror("%04x: BANK (8F) %02x\n",activecpu_get_pc(),tmp);
 
-	io_write_byte_8(0,tmp);
+	io_write_byte_8le(0,tmp);
 
 //swap bank in/out
 

@@ -109,6 +109,7 @@ typedef enum _mips3_flavor mips3_flavor;
 #define EXCEPTION_BADCOP	11
 #define EXCEPTION_OVERFLOW	12
 #define EXCEPTION_TRAP		13
+#define EXCEPTION_COUNT		16
 
 
 

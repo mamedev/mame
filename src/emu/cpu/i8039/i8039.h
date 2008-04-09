@@ -205,25 +205,25 @@ extern void m58715_get_info(UINT32 state, cpuinfo *info);
 /*
  *   Input a UINT8 from given I/O port
  */
-#define I8039_In(Port) ((UINT8)io_read_byte_8(Port))
+#define I8039_In(Port) ((UINT8)io_read_byte_8le(Port))
 
 
 /*
  *   Output a UINT8 to given I/O port
  */
-#define I8039_Out(Port,Value) (io_write_byte_8(Port,Value))
+#define I8039_Out(Port,Value) (io_write_byte_8le(Port,Value))
 
 
 /*
  *   Read a UINT8 from given memory location
  */
-#define I8039_RDMEM(A) ((unsigned)program_read_byte_8(A))
+#define I8039_RDMEM(A) ((unsigned)program_read_byte_8le(A))
 
 
 /*
  *   Write a UINT8 to given memory location
  */
-#define I8039_WRMEM(A,V) (program_write_byte_8(A,V))
+#define I8039_WRMEM(A,V) (program_write_byte_8le(A,V))
 
 
 /*

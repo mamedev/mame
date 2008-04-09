@@ -61,8 +61,8 @@ static int ccpu_icount;
 #define RDMEM(a)			(data_read_word_16be((a) * 2) & 0xfff)
 #define WRMEM(a,v)			(data_write_word_16be((a) * 2, (v)))
 
-#define READPORT(a)			(io_read_byte_8(a))
-#define WRITEPORT(a,v)		(io_write_byte_8((a), (v)))
+#define READPORT(a)			(io_read_byte_8be(a))
+#define WRITEPORT(a,v)		(io_write_byte_8be((a), (v)))
 
 #define SET_A0()			do { ccpu.a0flag = ccpu.A; } while (0)
 #define SET_CMP_VAL(x)		do { ccpu.cmpacc = *ccpu.acc; ccpu.cmpval = (x) & 0xfff; } while (0)

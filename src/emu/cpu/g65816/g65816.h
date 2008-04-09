@@ -91,9 +91,9 @@ void g65816_get_info(UINT32 state, cpuinfo *info);
 #undef G65816_CALL_DEBUGGER
 #define G65816_CALL_DEBUGGER CALL_DEBUGGER
 
-#define g65816_read_8(addr) 			program_read_byte_8(addr)
-#define g65816_write_8(addr,data)		program_write_byte_8(addr,data)
-#define g65816_read_8_immediate(A)		program_read_byte_8(A)
+#define g65816_read_8(addr) 			program_read_byte_8be(addr)
+#define g65816_write_8(addr,data)		program_write_byte_8be(addr,data)
+#define g65816_read_8_immediate(A)		program_read_byte_8be(A)
 #define g65816_jumping(A)				change_pc(A)
 #define g65816_branching(A)
 

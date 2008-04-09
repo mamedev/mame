@@ -29,16 +29,9 @@ static UINT32 compute_prid_register(const mips3_state *mips);
 static void tlb_write_common(mips3_state *mips, int index);
 static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which);
 
-static UINT64 program_read_qword_32be(offs_t offset);
 static UINT64 program_read_qword_masked_32be(offs_t offset, UINT64 mem_mask);
-
-static void program_write_qword_32be(offs_t offset, UINT64 data);
 static void program_write_qword_masked_32be(offs_t offset, UINT64 data, UINT64 mem_mask);
-
-static UINT64 program_read_qword_32le(offs_t offset);
 static UINT64 program_read_qword_masked_32le(offs_t offset, UINT64 mem_mask);
-
-static void program_write_qword_32le(offs_t offset, UINT64 data);
 static void program_write_qword_masked_32le(offs_t offset, UINT64 data, UINT64 mem_mask);
 
 
@@ -52,14 +45,14 @@ static const memory_accessors be_memory =
 	program_read_byte_32be,
 	program_read_word_32be,
 	program_read_dword_32be,
-	program_read_masked_32be,
+	program_read_dword_masked_32be,
 	program_read_qword_32be,
 	program_read_qword_masked_32be,
 
 	program_write_byte_32be,
 	program_write_word_32be,
 	program_write_dword_32be,
-	program_write_masked_32be,
+	program_write_dword_masked_32be,
 	program_write_qword_32be,
 	program_write_qword_masked_32be
 };
@@ -69,14 +62,14 @@ static const memory_accessors le_memory =
 	program_read_byte_32le,
 	program_read_word_32le,
 	program_read_dword_32le,
-	program_read_masked_32le,
+	program_read_dword_masked_32le,
 	program_read_qword_32le,
 	program_read_qword_masked_32le,
 
 	program_write_byte_32le,
 	program_write_word_32le,
 	program_write_dword_32le,
-	program_write_masked_32le,
+	program_write_dword_masked_32le,
 	program_write_qword_32le,
 	program_write_qword_masked_32le
 };
@@ -875,18 +868,6 @@ static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    program_read_qword_32be - read a 64-bit
-    big-endian value
--------------------------------------------------*/
-
-static UINT64 program_read_qword_32be(offs_t offset)
-{
-	UINT64 result = (UINT64)program_read_dword_32be(offset) << 32;
-	return result | program_read_dword_32be(offset + 4);
-}
-
-
-/*-------------------------------------------------
     program_read_qword_masked_32be - read a 64-bit
     big-endian value with explicit masking
 -------------------------------------------------*/
@@ -895,22 +876,10 @@ static UINT64 program_read_qword_masked_32be(offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)program_read_masked_32be(offset, mem_mask >> 32) << 32;
+		result |= (UINT64)program_read_dword_masked_32be(offset, mem_mask >> 32) << 32;
 	if (ACCESSING_BITS_0_31)
-		result |= program_read_masked_32be(offset + 4, mem_mask);
+		result |= program_read_dword_masked_32be(offset + 4, mem_mask);
 	return result;
-}
-
-
-/*-------------------------------------------------
-    program_read_qword_32le - read a 64-bit
-    little-endian value
--------------------------------------------------*/
-
-static UINT64 program_read_qword_32le(offs_t offset)
-{
-	UINT64 result = program_read_dword_32le(offset);
-	return result | ((UINT64)program_read_dword_32le(offset + 4) << 32);
 }
 
 
@@ -923,22 +892,10 @@ static UINT64 program_read_qword_masked_32le(offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= program_read_masked_32le(offset, mem_mask);
+		result |= program_read_dword_masked_32le(offset, mem_mask);
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)program_read_masked_32le(offset + 4, mem_mask >> 32) << 32;
+		result |= (UINT64)program_read_dword_masked_32le(offset + 4, mem_mask >> 32) << 32;
 	return result;
-}
-
-
-/*-------------------------------------------------
-    program_write_qword_32be - write a 64-bit
-    big-endian value
--------------------------------------------------*/
-
-static void program_write_qword_32be(offs_t offset, UINT64 data)
-{
-	program_write_dword_32be(offset, data >> 32);
-	program_write_dword_32be(offset + 4, data);
 }
 
 
@@ -950,21 +907,9 @@ static void program_write_qword_32be(offs_t offset, UINT64 data)
 static void program_write_qword_masked_32be(offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
-		program_write_masked_32be(offset, data >> 32, mem_mask >> 32);
+		program_write_dword_masked_32be(offset, data >> 32, mem_mask >> 32);
 	if (ACCESSING_BITS_0_31)
-		program_write_masked_32be(offset + 4, data, mem_mask);
-}
-
-
-/*-------------------------------------------------
-    program_write_qword_32le - write a 64-bit
-    little-endian value
--------------------------------------------------*/
-
-static void program_write_qword_32le(offs_t offset, UINT64 data)
-{
-	program_write_dword_32le(offset, data);
-	program_write_dword_32le(offset + 4, data >> 32);
+		program_write_dword_masked_32be(offset + 4, data, mem_mask);
 }
 
 
@@ -976,7 +921,7 @@ static void program_write_qword_32le(offs_t offset, UINT64 data)
 static void program_write_qword_masked_32le(offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
-		program_write_masked_32le(offset, data, mem_mask);
+		program_write_dword_masked_32le(offset, data, mem_mask);
 	if (ACCESSING_BITS_32_63)
-		program_write_masked_32le(offset + 4, data >> 32, mem_mask >> 32);
+		program_write_dword_masked_32le(offset + 4, data >> 32, mem_mask >> 32);
 }

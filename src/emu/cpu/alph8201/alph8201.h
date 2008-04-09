@@ -44,12 +44,12 @@ extern void alpha8301_get_info(UINT32 state, cpuinfo *info);
 /*
  *   Read a UINT8 from given memory location
  */
-#define ALPHA8201_RDMEM(A) ((unsigned)program_read_byte_8(A))
+#define ALPHA8201_RDMEM(A) ((unsigned)program_read_byte_8le(A))
 
 /*
  *   Write a UINT8 to given memory location
  */
-#define ALPHA8201_WRMEM(A,V) (program_write_byte_8(A,V))
+#define ALPHA8201_WRMEM(A,V) (program_write_byte_8le(A,V))
 
 /*
  *   ALPHA8201_RDOP() is identical to ALPHA8201_RDMEM() except it is used for reading

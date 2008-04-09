@@ -81,12 +81,12 @@
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
-#define RDMEM(addr) program_read_byte_8(addr); m6502_ICount -= 1
+#define RDMEM(addr) program_read_byte_8le(addr); m6502_ICount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
-#define WRMEM(addr,data) program_write_byte_8(addr,data); m6502_ICount -= 1
+#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502_ICount -= 1
 
 /***************************************************************
  *  BRA  branch relative
