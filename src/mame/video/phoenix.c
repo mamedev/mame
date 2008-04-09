@@ -234,7 +234,7 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 		videoram_pg_index = data & 1;
 		memory_set_bank(1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_read_indexed(machine, 3) & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read(machine, "CAB") & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -257,7 +257,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 		videoram_pg_index = data & 1;
 		memory_set_bank(1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_read_indexed(machine, 3) & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read(machine, "CAB") & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -290,35 +290,33 @@ WRITE8_HANDLER( phoenix_scroll_w )
 }
 
 
-READ8_HANDLER( phoenix_input_port_0_r )
+CUSTOM_INPUT( player_input_r )
 {
 	if (cocktail_mode)
-		return (input_port_read(machine, "IN0") & 0x07) | (input_port_read(machine, "IN1") & 0xf8);
+		return (input_port_read(machine, "CTRL") & 0xf0) >> 4;
 	else
-		return input_port_read(machine, "IN0");
+		return (input_port_read(machine, "CTRL") & 0x0f) >> 0;
 }
 
-READ8_HANDLER( pleiads_input_port_0_r )
+CUSTOM_INPUT( pleiads_protection_r )
 {
-	int ret = input_port_read(machine, "IN0") & 0xf7;
-
 	/* handle Pleiads protection */
 	switch (pleiads_protection_question)
 	{
 	case 0x00:
 	case 0x20:
 		/* Bit 3 is 0 */
+		return 0;
 		break;
 	case 0x0c:
 	case 0x30:
 		/* Bit 3 is 1 */
-		ret	|= 0x08;
+		return 1;
 		break;
 	default:
 		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, activecpu_get_pc());
+		return 0;
 	}
-
-	return ret;
 }
 
 READ8_HANDLER( survival_input_port_0_r )

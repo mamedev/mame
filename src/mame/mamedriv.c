@@ -548,9 +548,9 @@ const game_driver * const drivers[] =
 	DRIVER( fenix )		/* bootleg */
 	DRIVER( falcon )	/* bootleg */
 	DRIVER( vautour )	/* bootleg (Jeutel) */
-	DRIVER( vautour2 )	/* bootleg */
+	DRIVER( falconz )	/* bootleg */
+	DRIVER( vautourz )	/* bootleg */
 	DRIVER( griffon )	/* bootleg (Videotron) */
-	DRIVER( falcona )	/* bootleg */
 	DRIVER( nextfase )	/* bootleg */
 	DRIVER( pleiads )	/* (c) 1981 Tehkan */
 	DRIVER( pleiadbl )	/* bootleg */

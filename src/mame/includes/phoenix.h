@@ -63,8 +63,8 @@ WRITE8_HANDLER( phoenix_videoreg_w );
 WRITE8_HANDLER( pleiads_videoreg_w );
 WRITE8_HANDLER( phoenix_scroll_w );
 
-READ8_HANDLER( phoenix_input_port_0_r );
-READ8_HANDLER( pleiads_input_port_0_r );
+CUSTOM_INPUT( player_input_r );
+CUSTOM_INPUT( pleiads_protection_r );
 READ8_HANDLER( survival_input_port_0_r );
 READ8_HANDLER( survival_protection_r );
 
