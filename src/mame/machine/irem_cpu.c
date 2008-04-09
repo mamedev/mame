@@ -304,7 +304,7 @@ const UINT8 gussun_decryption_table[256] = {
     0x63,xxxx,xxxx,0x36,xxxx,0x52,0xb1,0x5b, 0x68,0xcd,xxxx,xxxx,xxxx,0xa8,xxxx,xxxx, /* 00 */
 //  gggg                          gggg            gggg                gggg
     xxxx,xxxx,0x75,0x24,0x08,0x83,0x32,0xe9, xxxx,0x79,xxxx,0x8f,0x22,xxxx,0xac,xxxx, /* 10 */
-//                      ????                      pppp      gggg
+//                      pppp                      pppp      gggg
     0x5d,0xa5,0x11,0x51,0x0a,0x29,xxxx,xxxx ,0xf8,0x98,0x91,0x40,0x28,0x00,0x03,0x5f, /* 20 */
 //            gggg           gggg            gggg gggg      gggg gggg pppp
     0x26,xxxx,xxxx,0x8b,0x2f,0x02,xxxx,xxxx, 0x8e,0xab,xxxx,xxxx,0xbc,0x90,0xb3,xxxx, /* 30 */
@@ -324,7 +324,7 @@ const UINT8 gussun_decryption_table[256] = {
     xxxx,0xa3,xxxx,xxxx,0x12,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
 //                      gggg           gggg                 ????      gggg gggg
     0x42,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0x0c,0x4b,xxxx,0xa4,xxxx,xxxx,xxxx, /* b0 */
-//  gggg      gggg ???? gggg      gggg            pppp pppp      gggg
+//  gggg      gggg pppp gggg      gggg            pppp pppp      gggg
     xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
 //            gggg                                                         pppp
     0x85,0x2e,0x06,0xc7,0x05,xxxx,0x8a,0x5a, 0x58,0xbe,xxxx,0x4e,xxxx,0x1f,0x23,xxxx, /* d0 */
@@ -343,19 +343,18 @@ missing opcode:
 "gggg" -> very probably
 "pppp" -> probably
 "????" -> missing
-"0xHH" -> right code (not supported)
 
-14 -> 08 (2097b 20980 - routine from 2097a) (08 30) to handle the player number -> probably 08
-ab -> 4f?(19570 - routine from 194e1 to 19619) (when the water go up)
-b3 -> 19 (216b6 - 216cf - 16663 (when you rotate a piece) - 175f1 - 17d2a - 17d36
+ab -> 4f?(1956f - routine from 194e1 to 19619 - bp 19567) (when the water go up) (48, 
 
 rz probably:
+14 -> 08 (2097b 20980 - routine from 2097a) (08 30) to handle the player number -> 08
 19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
 5a -> 7c (195eb - (222fc - routine from 222ed to ) (7x j...) no 70,71,79,7a,7b ok (78,7c) -> 7c
 63 -> 7d (1df7f, 1df8c, 1df95, 21f08 - routine from 1df27 to ) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
 7b -> 0d
 82 -> 78 (78,7c) -> 78
 86 -> 2d
+b3 -> b6 (216b6 - 216cf - 16663 (when you rotate a piece) - 175f1 - 17d2a - 17d36) -> b6
 b9 -> 0c (21210 - routine from 2117e to ) 2 bytes -> to handle messages in level 0 (learning level)
 ba -> 4b (1094d, 10b28 - routine from 10948 to 10b73) one byte -> probably 4b
 ce -> 01 (10236 - routine from 1017e to 10254) (01, 09, 19, 21, 29, 31) -> probably 01
