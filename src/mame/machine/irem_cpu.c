@@ -322,7 +322,7 @@ const UINT8 gussun_decryption_table[256] = {
     xxxx,xxxx,0x9d,xxxx,0xbb,xxxx,xxxx,0xcb, 0xa9,0xcf,xxxx,0x60,0x43,0x56,xxxx,xxxx, /* 90 */
 //            gggg                     gggg
     xxxx,0xa3,xxxx,xxxx,0x12,xxxx,0xfa,0xb4, xxxx,0x81,0xe6,0x48,0x80,0x8c,0xd4,xxxx, /* a0 */
-//                      gggg           gggg                 ????      gggg gggg
+//                      gggg           gggg                 pppp      gggg gggg
     0x42,xxxx,0x84,0xb6,0x77,0x3d,0x3e,xxxx, xxxx,0x0c,0x4b,xxxx,0xa4,xxxx,xxxx,xxxx, /* b0 */
 //  gggg      gggg pppp gggg      gggg            pppp pppp      gggg
     xxxx,0xff,0x47,xxxx,0x55,0x1e,xxxx,0x59, 0x93,xxxx,xxxx,xxxx,0x88,0xc1,0x01,0xb2, /* c0 */
@@ -344,8 +344,6 @@ missing opcode:
 "pppp" -> probably
 "????" -> missing
 
-ab -> 4f?(1956f - routine from 194e1 to 19619 - bp 19567) (when the water go up) (48, 
-
 rz probably:
 14 -> 08 (2097b 20980 - routine from 2097a) (08 30) to handle the player number -> 08
 19 -> 79 (1df45 routine from 1df27 / 2282f - routine from 2281f to 22871) no 70,78,7a,7b,7c,7e,7f(ok) ok 79,7d
@@ -354,6 +352,7 @@ rz probably:
 7b -> 0d
 82 -> 78 (78,7c) -> 78
 86 -> 2d
+ab -> 48 (1956f - routine from 194e1 to 19619 - bp 19567) (when the water go up) -> 48 
 b3 -> b6 (216b6 - 216cf - 16663 (when you rotate a piece) - 175f1 - 17d2a - 17d36) -> b6
 b9 -> 0c (21210 - routine from 2117e to ) 2 bytes -> to handle messages in level 0 (learning level)
 ba -> 4b (1094d, 10b28 - routine from 10948 to 10b73) one byte -> probably 4b
