@@ -4,8 +4,8 @@
 TODO:
 - dynamic screen resolution
 - bg pen (or the pen of the lower tilemap?)
-- hook up roz tilemaps with roz enable / disable and tweak it (mainly missing offsets)
-- sprites with shadow bit have bad colors
+- roz centering
+- sprites, that have the shadow bit set but aren't shadows, have bad colors
 - check if the data&0x8000 condition in tilemaps is valid even when 4bpp mode it's used
 - namco logo in emeralda demo is missing (it's used with a roz effect)
 - invisible dolphin sprite in emeralda instruction screen
@@ -390,7 +390,7 @@ static void pdraw_tile(running_machine *machine,
 						if (pri[x] <= priority)
 						{
 							int c = source[x_index>>16];
-							dest[x] = pal_base + c;
+							dest[x] = pal_base + c;	
 						}
 
 						pri[x] = 0xff;
@@ -409,6 +409,11 @@ static void pdraw_tile(running_machine *machine,
 								{
 									pen_t *palette_shadow_table = machine->shadow_table;
 									dest[x] = palette_shadow_table[dest[x]];
+								}
+								else if( bShadow && !((gfx_region == 0 && color == 0x0f) || (gfx_region == 1 && color == 0xff)))
+								{
+									//bad colors!
+									dest[x] = pal_base + c;
 								}
 								else
 								{
@@ -588,34 +593,38 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			}
 			else
 			{
-				tilemap_set_scrollx( bg_tilemap[which], 0, scrollx );
-				tilemap_set_scrolly( bg_tilemap[which], 0, scrolly );
-				tilemap_draw_primask( bitmap, &clip, bg_tilemap[which], 0, primask, 0 );
+				// used in emeraldia
+				if(which == 1 && namcona1_vreg[0x8a/2] == 0xfd /* maybe reg & 0x4 */)
+				{
+					INT32 incxx = ((INT16)namcona1_vreg[0xc0/2])<<8; //or incyy ?
+					INT32 incxy = ((INT16)namcona1_vreg[0xc2/2])<<8;
+					INT32 incyx = ((INT16)namcona1_vreg[0xc4/2])<<8;
+					INT32 incyy = ((INT16)namcona1_vreg[0xc6/2])<<8; //or incxx ?
+					UINT32 startx = (INT32)(INT16)namcona1_vreg[0xc8/2]<<12;
+					UINT32 starty = (INT32)(INT16)namcona1_vreg[0xca/2]<<12;
+					//namcona1_vreg[0xcc/2]; // changes dx/dy ?
 
-#if 0
-				INT16 incxy, incyx, incxx, incyy;
-				INT16 xoffset, yoffset;
-				UINT32 startx,starty;
+					// all ROZ parameters now in 16.16 format
 
-				incxx = (INT16)namcona1_vreg[0xc0/2]; // or incyy ?
-				incxy = (INT16)namcona1_vreg[0xc2/2];
-				incyx = (INT16)namcona1_vreg[0xc4/2];
-				incyy = (INT16)namcona1_vreg[0xc6/2]; // or incxx ?
-				xoffset = namcona1_vreg[0xc8/2];
-				yoffset = namcona1_vreg[0xca/2];
-				//namcona1_vreg[0xcc/2]; // ?
+					// now, apply adjustments to startx, starty to translate the
+					// ROZ plane.  Note that these are corrected by the inc parameters
+					// to account for scale/rotate state.
+					int dx = 46; // horizontal adjust in pixels
+					int dy = -8; // vertical adjust in pixels
+					startx += dx*incxx + dy*incyx;
+					starty += dx*incyx + dy*incyy;
 
-				startx = ((xoffset + a) << 12);
-				starty = ((yoffset + b) << 12);
+					tilemap_draw_roz_primask(bitmap, &clip, bg_tilemap[which],
+						startx, starty, incxx, incxy, incyx, incyy,
+						0, 0, primask, 0);
 
-				popmessage("scrollx = %x - scrolly = %x - xo = %d - yo = %d",scrollx,scrolly,xoffset,yoffset);
-
-				tilemap_draw_roz_primask(bitmap, &clip, bg_tilemap[which],
-					startx , starty ,
-					incxx << 8, incxy << 8, incyx << 8, incyy << 8,
-					0, 0, primask, 0);
-#endif
-
+				}
+				else
+				{
+					tilemap_set_scrollx( bg_tilemap[which], 0, scrollx );
+					tilemap_set_scrolly( bg_tilemap[which], 0, scrolly );
+					tilemap_draw_primask( bitmap, &clip, bg_tilemap[which], 0, primask, 0 );
+				}			
 			}
 		}
 	}
@@ -651,7 +660,7 @@ VIDEO_UPDATE( namcona1 )
 		} /* next tilemap */
 		fillbitmap( priority_bitmap,0,cliprect );
 
-		// It fixes bg in emeralda
+		// It fixes bg in emeralda	
 		fillbitmap( bitmap,/* 0 */ 0xff,cliprect );
 
 		for( priority = 0; priority<8; priority++ )
