@@ -18,6 +18,15 @@ MAIN BOARD:
 2600-27ff Background attribute RAM #2
 4000-ffff ROM
 
+
+2008.04.04: Small note regarding DipSwitches. Locations and values have been 
+verified with the manual for both Mat Mania and Mania Challenge. 
+Exciting Hour DIPs confirmed with crazykong diplist, no manual available ATM.
+Notice that the manual for Mat Mania lists DSW2:3,4 as Unused, but they 
+correctly affect the timer speed during the game. Also, default difficulty 
+in Mat Mania is Normal, while manual for Mania Challenge reports Easy. 
+The driver has been updated accordingly.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -82,10 +91,10 @@ static ADDRESS_MAP_START( matmania_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x077f) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_0_r)
-	AM_RANGE(0x3010, 0x3010) AM_READ(input_port_1_r)
-	AM_RANGE(0x3020, 0x3020) AM_READ(input_port_2_r)
-	AM_RANGE(0x3030, 0x3030) AM_READ(input_port_3_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")
+	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1")
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2")
+	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1")
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -110,10 +119,10 @@ static ADDRESS_MAP_START( maniach_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x077f) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_0_r)
-	AM_RANGE(0x3010, 0x3010) AM_READ(input_port_1_r)
-	AM_RANGE(0x3020, 0x3020) AM_READ(input_port_2_r)
-	AM_RANGE(0x3030, 0x3030) AM_READ(input_port_3_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")
+	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1")
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2")
+	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3040, 0x3040) AM_READ(maniach_mcu_r)
 	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
@@ -191,7 +200,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( matmania )
-	PORT_START	/* IN0 */
+	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -201,7 +210,7 @@ static INPUT_PORTS_START( matmania )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 
-	PORT_START	/* IN1 */
+	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -211,50 +220,54 @@ static INPUT_PORTS_START( matmania )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* DSW1 */
-	PORT_DIPNAME(0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(   0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(   0x02, DEF_STR( Medium ) )
-	PORT_DIPSETTING(   0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME(0x0c, 0x0c, "Tournament Time" )    // Tournament time is always 3:00, but time per 1 second is shorter.
-	PORT_DIPSETTING(   0x00, "2:12" )
-	PORT_DIPSETTING(   0x04, "2:24" )
-	PORT_DIPSETTING(   0x08, "2:30" )
-	PORT_DIPSETTING(   0x0c, "2:36" )
-	PORT_DIPNAME(0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(   0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(   0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(   0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-	PORT_DIPNAME(0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(   0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-
-	PORT_START	/* DSW2 */
-	PORT_DIPNAME(0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_START_TAG("DSW1")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(   0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(   0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(   0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(   0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME(0x0c, 0x0c, DEF_STR( Coin_B ) )
+	PORT_DIPNAME(0x0c, 0x0c, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(   0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(   0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(   0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(   0x04, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME(0x10, 0x10, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME(0x10, 0x10, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(   0x10, DEF_STR( On ) )
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Cabinet ) )    // The default setting should be cocktail.
-	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
+	PORT_DIPNAME(0x20, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )		/* The default setting should be cocktail. */
 	PORT_DIPSETTING(   0x20, DEF_STR( Cocktail ) )
-	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )		/* Listed as always ON among DIPs in the manual */
+
+	PORT_START_TAG("DSW2")
+	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(   0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(   0x02, DEF_STR( Medium ) )		/* According to the manual, default is Medium */
+	PORT_DIPSETTING(   0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME(0x0c, 0x0c, "Tournament Time" )		PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(   0x00, "2:12" )					/* Tournament time is always 3:00, but time per 1 second is shorter. */
+	PORT_DIPSETTING(   0x04, "2:24" )					
+	PORT_DIPSETTING(   0x08, "2:30" )					
+	PORT_DIPSETTING(   0x0c, "2:36" )
+	PORT_DIPUNUSED_DIPLOC(0x10, IP_ACTIVE_LOW, "SW2:5")	/* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_LOW, "SW2:6")	/* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x40, IP_ACTIVE_LOW, "SW2:7")	/* Listed as Unused */
+	PORT_DIPUNUSED_DIPLOC(0x80, IP_ACTIVE_LOW, "SW2:8")	/* Listed as Unused */
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( maniach )
+	PORT_INCLUDE( matmania )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(   0x03, DEF_STR( Easy ) )			/* According to the manual, default for this game is Easy */
+	PORT_DIPSETTING(   0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(   0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -660,6 +673,6 @@ ROM_END
 
 
 GAME( 1985, matmania, 0,        matmania, matmania, 0, ROT270, "Technos (Taito America license)", "Mat Mania", 0 )
-GAME( 1985, excthour, matmania, matmania, matmania, 0, ROT270, "Technos (Taito license)", "Exciting Hour", 0 )
-GAME( 1986, maniach,  0,        maniach,  matmania, 0, ROT270, "Technos (Taito America license)", "Mania Challenge (set 1)", 0 )
-GAME( 1986, maniach2, maniach,  maniach,  matmania, 0, ROT270, "Technos (Taito America license)", "Mania Challenge (set 2)" , 0)	/* earlier version? */
+GAME( 1985, excthour, matmania, matmania, maniach,  0, ROT270, "Technos (Taito license)", "Exciting Hour", 0 )
+GAME( 1986, maniach,  0,        maniach,  maniach,  0, ROT270, "Technos (Taito America license)", "Mania Challenge (set 1)", 0 )
+GAME( 1986, maniach2, maniach,  maniach,  maniach,  0, ROT270, "Technos (Taito America license)", "Mania Challenge (set 2)" , 0)	/* earlier version? */
