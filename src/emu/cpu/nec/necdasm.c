@@ -1476,6 +1476,7 @@ static void decode_opcode(char *s, const I386_OPCODE *op, UINT8 op1 )
 		case PREFIX:
 			s += sprintf( s, "%-8s", op->mnemonic );
 			op2 = FETCH();
+			if (Iconfig->v25v35_decryptiontable) op2 = Iconfig->v25v35_decryptiontable[op2];
 			decode_opcode( s, &necv_opcode_table1[op2], op1 );
 			return;
 
