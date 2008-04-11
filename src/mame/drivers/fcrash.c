@@ -122,6 +122,28 @@ static void fcrash_render_high_layer(bitmap_t *bitmap, const rectangle *cliprect
 	}
 }
 
+static void fcrash_build_palette(running_machine *machine)
+{
+	int offset;
+
+	for (offset = 0; offset < 32*6*16; offset++)
+	{
+		int palette = cps1_gfxram[0x14000/2 + offset];
+		int r, g, b, bright;
+
+		// from my understanding of the schematics, when the 'brightness'
+		// component is set to 0 it should reduce brightness to 1/3
+
+		bright = 0x0f + ((palette>>12)<<1);
+
+		r = ((palette>>8)&0x0f) * 0x11 * bright / 0x2d;
+		g = ((palette>>4)&0x0f) * 0x11 * bright / 0x2d;
+		b = ((palette>>0)&0x0f) * 0x11 * bright / 0x2d;
+
+		palette_set_color (machine, offset, MAKE_RGB(r, g, b));
+	}
+}
+
 static VIDEO_UPDATE( fcrash )
 {
    	int layercontrol,l0,l1,l2,l3;
@@ -136,7 +158,7 @@ static VIDEO_UPDATE( fcrash )
 	cps1_get_video_base();
 
 	/* Build palette */
-	cps1_build_palette(screen->machine);
+	fcrash_build_palette(screen->machine);
 
 	fcrash_update_transmasks();
 
@@ -172,7 +194,7 @@ static VIDEO_UPDATE( fcrash )
 	tilemap_set_enable(cps1_bg_tilemap[2],1);
 
 	/* Blank screen */
-	fillbitmap(bitmap,4095,cliprect);
+	fillbitmap(bitmap,0xbff,cliprect);
 
 	fillbitmap(priority_bitmap,0,cliprect);
 	l0 = (layercontrol >> 0x06) & 03;

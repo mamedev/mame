@@ -74,7 +74,6 @@ WRITE16_HANDLER( cps1_gfxram_w );
 
 VIDEO_START( cps1 );
 VIDEO_START( cps2 );
-void cps1_build_palette(running_machine *machine);
 
 WRITE16_HANDLER( cps2_objram_bank_w );
 READ16_HANDLER( cps2_objram1_r );

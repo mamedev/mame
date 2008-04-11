@@ -1,51 +1,83 @@
 /***************************************************************************
 
-These are some of the CPS-B chip numbers:
+The CPS1 system is made of 3 boards: A, B and C. The first two games also exist
+a 2-board setups, where the C-board is integrated into the B-board.
 
-NAME                                        CPS-B #                     C-board PAL's  B-board PAL's
-Forgotten Worlds / Lost Worlds              CPS-B-01  DL-0411-10001     None           LWCH1 & LW10
-Ghouls 'n Ghosts                            CPS-B-01  DL-0411-10001     None           DM620 & LW10
-Strider                                     CPS-B-01  DL-0411-10001     None           ST24M1 & LW10 or ST22B
-Dynasty Wars                                CPS-B-02  DL-0411-10002     ?              ?
-Willow                                      CPS-B-03  DL-0411-10003     None           WL24B & LW10
-UN Squadron / Area 88                       CPS-B-11  DL-0411-10004     None           AR24B & LW10
-Street Fighter II (ETC Rev G)               CPS-B-11  DL-0411-10004     None           STF29 & IOB1
-Final Fight (World / Japan)                 CPS-B-04  DL-0411-10005     None           S224B & LW10
-Final Fight (US)                            CPS-B-04* DL-0411-10001     None           S224B & LW10
-                                            *actually CPS-B-01, the original number was scratched out and "04" stamped over it
-Varth                                       CPS-B-04  DL-0411-10005     None           VA24B & LW10
-1941                                        CPS-B-05  DL-0411-10006     ?              YI24B & ?
-Street Fighter II (US Rev D)                CPS-B-05  DL-0411-10006     C632           STF29 & IOB1
-Mercs (US)                                  CPS-B-12  DL-0411-10007     C628           0224B & IOB1
-Street Fighter II (Japan Rev C)             CPS-B-12  DL-0411-10007     C632           STF29 & IOB1
-Magic Sword (US)                            CPS-B-13  DL-0411-10008     None           MS24B & IOB1
-Street Fighter II (Japan)                   CPS-B-13  DL-0411-10008     C632           STF29 & IOB1
-Chiki Chiki Boys / Mega Twins               CPS-B-14  DL-0411-10009     ?              CK24B & IOB1
-Street Fighter II (US Rev I)                CPS-B-14  DL-0411-10009     C632           STF29 & IOB1
-Nemo                                        CPS-B-15  DL-0411-10010     ?              NM24B & ?
-Carrier Air Wing                            CPS-B-16  DL-0411-10011     None           CA24B & IOB1
-Street Fighter II                           CPS-B-17  DL-0411-10012     C632           STF29 & IOB1
-Three Wonders*                              CPS-B-21  DL-0921-10014     IOC1 & C632    RT24B & IOB1
-King of Dragons*                            CPS-B-21  DL-0921-10014     IOC1 & C632    KD29B & IOB1
-Captain Commando* (US)                      CPS-B-21  DL-0921-10014     IOC1 & C632    CC63B, CCPRG & IOB1
-Knights of the Round*                       CPS-B-21  DL-0921-10014     IOC1 & C632    KR63B, BPRG1 & IOB1
-Street Fighter II' Champion Edition         CPS-B-21  DL-0921-10014     IOC1 & C632    S9263B, BPRG1 & IOB1
-Capcom World 2*                             CPS-B-21  DL-0921-10014     IOC1           Q522B & IOB1
-Quiz and Dragons (US)*                      CPS-B-21  DL-0921-10014     IOC1           QD22B & IOB1
-Quiz and Dragons (Japan)*                   CPS-B-21  DL-0921-10014     IOC1           ? & IOB1
-Warriors of Fate*                           CPS-B-21  DL-0921-10014     IOC1           TK263B, BPRG1 & IOB1
-Street Fighter II Turbo Hyper Fighting      CPS-B-21  DL-0921-10014     IOC1 & C632    S9263B, BPRG1 & IOB1
-Cadillacs and Dinosaurs*                    CPS-B-21  DL-0921-10014     IOC1           CD63B, BPRG1 & IOB1
-Punisher*                                   CPS-B-21  DL-0921-10014     IOC1           PS63B, BPRG1 & IOB1
-Saturday Night Slam Masters*                CPS-B-21  DL-0921-10014     IOC1           MB63B, BPRG1 & IOB1
-Muscle Bomber Duo*                          CPS-B-21  DL-0921-10014     ?              ?
-Pnickies                                    CPS-B-21? DL-0921-10014?    ?              ?
-Pang 3                                      CPS-B-21  DL-0921-10014     IOC1 & C632    CP1B1F, CP1B8K & CP1B9KA
-Megaman the Power Battle                    CPS-B-21  DL-0921-10014     IOC1 & C632    RCM63B, BPRG1 & IOB1
+There are several revisions of the A-board, but they are functionally equivalent
+and interchangeable except for 89626A-4 DASH used by sf2 which has a 12MHz xtal
+replacing the 10Hz one. Note that it's likely that from one point onwards Capcom
+simply switched to make only 89626A-4 DASH board, that is all games after a
+certain point should use the 12MHz xtal not just sf2.
+Verified: Quiz and Dragons (US) comes with the DASH version (original pcb with sticker).
 
-Street Fighter Zero changer system (Japan)  CPS-B-21  DL-0921-10014     ?              ?
+Known A-board revisions:
+88617A-4
+88617A-5
+88617A-7
+88617A-7b
+89626A-4
+89626A-4 DASH
 
+NAME                                        Year  B-board #      B-board PALs      C-board #         CPS-B #           C-board PALs
+------------------------------------------- ----  --------  ---------------------  ---------  -----------------------  -------------
+Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  None
+  (alt B-board revision)                          88621B-2  LW621            LWIO  ?
+Ghouls 'n Ghosts (World / US)               1988  88620B-2  DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
+  (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
+Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
+  (alt B-board version)                           89624B-3  ST24B2           LWIO                                          
+  (alt B-board revision)                          ?         ST22B            ?
+Dynasty Wars                                1989  ?         ?                      ?          CPS-B-02  DL-0411-10002
+Willow                                      1989  89624B-3  WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
+UN Squadron / Area 88                       1989  89624B-3  AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
+  (alt B-board revision)                    1989  88622B-2  AR22B            LWIO
+Final Fight (first rev)                     1989  89624B-3  S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
+Final Fight (US 900112)                                                            ?          CPS-B-04@ DL-0411-10001  None
+Final Fight (US 900613)                                                            ?          CPS-B-05  DL-0411-10006
+Final Fight (Japan 900305)                                                         ?          CPS-B-02  DL-0411-10002
+1941                                        1990  ?         YI24B            ?     88622-C-5  CPS-B-05  DL-0411-10006  ?
+Mercs (US)                                  1990  89624B-3  0224B            IOB1  90628-C-1  CPS-B-12  DL-0411-10007  C628
+Magic Sword (US)                            1990  89624B-3  MS24B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
+Chiki Chiki Boys / Mega Twins               1990  89624B-3  CK24B            IOB1  88622-C-5  CPS-B-14  DL-0411-10009  None
+Nemo                                        1990  89624B-3  NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
+Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
+  (alt B-board revision)                          89625B-1  CA22B
+Street Fighter II (910214)                  1991  ?         STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
+Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012       
+Street Fighter II (US 910228)                                                                 CPS-B-18  ?
+Street Fighter II (Japan 910306)                                                              CPS-B-12  DL-0411-10007
+Street Fighter II (US 910318)                                                                 CPS-B-05  DL-0411-10006
+Street Fighter II (US 910411)                                                                 CPS-B-15  DL-0411-10010
+Street Fighter II (World 910522)                                                              CPS-B-11  DL-0411-10004
+Street Fighter II (US 910522)                                                                 CPS-B-14  DL-0411-10009
+Street Fighter II (US 911101)                                                                 CPS-B-17  DL-0411-10012       
+Street Fighter II (Japan 911210)                                                              CPS-B-13  DL-0411-10008
+Three Wonders*                              1991  89624B-3  RT24B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
+  (alt B-board revision)                          89625B-1  RT22B            IOB1
+King of Dragons*                            1991  90629B-3  KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Captain Commando*                           1991  91635B-2  CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Knights of the Round*                       1991  91635B-2  KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
+Street Fighter II' Champion Edition         1992  91635B-2  S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Varth (World / US)                          1992  89624B-3  VA24B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
+Varth (Japan)*                              1992  ?         ?                      ?          CPS-B-21  DL-0921-10014  ?
+Capcom World 2*                             1992  ?         Q522B            IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
+Quiz and Dragons (US)*                      1992  89625B-1  QD22B            IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Quiz and Dragons (Japan)*                   1994  ?         ?                IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
+Warriors of Fate*                           1992  ?         TK263B    BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Street Fighter II Turbo Hyper Fighting      1992  91635B-2  S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Cadillacs and Dinosaurs*                    1993  ?         CD63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Punisher*                                   1993  91635B-2  PS63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Saturday Night Slam Masters*                1993  ?         MB63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Muscle Bomber Duo*                          1993  ?         ?                      92641C-1   CPS-B-21  DL-0921-10014  ?
+Quiz Tonosama no Yabou 2                    1995  ?         ?                      ?          ?
+Pnickies                                    1994  ?         ?                      ?          CPS-B-21? DL-0921-10014? ?
+Pang 3                                      1995  94916-10  CP1B1F,CP1B8K,CP1B9KA  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
+Megaman the Power Battle                    1995  ?         RCM63B   BPRG1   IOB1  ?          CPS-B-21  DL-0921-10014  C632  IOC1
+
+@actually CPS-B-01, the original number was scratched out and "04" stamped over it
 *denotes Suicide Battery
+
+The C628/C632 PALs on some C-boards probably handle the extra inputs (6 buttons/third player).
 
 You can set the suicide CPS-B-21 chips to their default layer register and priority bit values
 if you pull pins 45 and 46 high (floating the pins seems to work, too). The default is the same
@@ -59,7 +91,14 @@ OUTPUT PORTS
 0x04-0x05     Scroll2 (16x16) RAM base (/256)
 0x06-0x07     Scroll3 (32x32) RAM base (/256)
 0x08-0x09     rowscroll RAM base (/256)
-0x0a-0x0b     Palette base (/256)
+0x0a-0x0b     Palette base (/256) after this register is written to, the palette
+              is copied from gfxram to the dedicated ram. The palette control
+              register (see below) determines how the copy should happen.
+              Tests on a msword pcb show that the minimum alignment for the palette
+              is 0x400 bytes. The hardware seems to ignore bit 1, while when bit 0
+              is set the palette doesn't seem to be copied. However, some games set
+              bit 0 during boot (ghouls, strider, 1941) so it still isn't clear
+              what bit 0 should actually do.
 0x0c-0x0d     Scroll 1 X
 0x0e-0x0f     Scroll 1 Y
 0x10-0x11     Scroll 2 X
@@ -71,15 +110,44 @@ OUTPUT PORTS
 0x1c-0x1d     Starfield 2 X
 0x1e-0x1f     Starfield 2 Y
 0x20-0x21     start offset for the rowscroll matrix
-0x22-0x23     unknown but widely used - usually 0x0e. bit 0 enables rowscroll
-              on layer 2. bit 15 is flip screen.
+0x22-0x23     video control. Usually 0x0e.
+              bit 0 enables rowscroll on layer 2.
+              bit 15 is flip screen.
+              ghouls sets bit 14. Purpose unknown.
+              1941 uses bits 1-3 by setting them to 0 on screen transitions,
+              however it also uses the normal layer control register so there
+              doesn't seem to be an obvious effect.
+
+              Games known to use rowscroll:
+              SF2
+              Mega Twins (underwater, cave)
+              Carrier Air Wing (hazy background at beginning of mission 8, put 07 at ff8501 to jump there)
+              Magic Sword (fire on floor 3; screen distort after continue)
+              Varth (title screen)
+              Captain Commando (end game sequence)
+
+              Tests done on msword at the beginning of gameplay (many thanks to Corrado Tomaselli for these):
+              3e  is the default value set by the game (not 0e like most games)
+              3c  the last two rows of scroll1 are repeated on the whole screen
+              3a  scroll2 is disabled
+              36  scroll3 is disabled
+              2e  no visible differences
+              1e  no visible differences
+              one might suspect that bits 4&5 should disable the star layers, but
+              Strider sets this register to 0x0e so that's not possible.
+
+              TODO:
+              the scroll2/scroll3 disable bits are supported by the emulation,
+			  while the scroll1 weird effect is not (it doesn't seem to make a
+              difference on any game).
 
 
 Some registers move from game to game.. following example strider
 0x66-0x67   Layer control register
             bits 14-15 seem to be unused
                 ghouls sets bits 15 in service mode when you press button 2 in
-                the input test
+                the input test, with no apparent effect on the pcb.
+                qtono2 sets them both at the game over screen.
             bits 6-13 (4 groups of 2 bits) select layer draw order
             bits 1-5 enable the three tilemap layers and the two starfield
                 layers (the bit order changes from game to game).
@@ -87,32 +155,38 @@ Some registers move from game to game.. following example strider
             bit 0 could be rowscroll related. It is set by captain commando,
                 varth, mtwins, mssword, cawing while rowscroll is active. However
                 kodj and sf2 do NOT set this bit while they are using rowscroll.
-                Games known to use row scrolling:
-                SF2
-                Mega Twins (underwater, cave)
-                Carrier Air Wing (hazy background at beginning of mission 8, put 07 at ff8501 to jump there)
-                Magic Sword (fire on floor 3; screen distort after continue)
-                Varth (title screen)
-                Captain Commando (end game sequence)
+                Tests on the msword pcb show that even if this bit is not set,
+                rowscroll still works. Therefore, the purpose of this bit is unclear.
 0x68-0x69   Priority mask \   Tiles in the layer just below sprites can have
 0x6a-0x6b   Priority mask |   four priority levels, each one associated with one
 0x6c-0x6d   Priority mask |   of these masks. The masks indicate pens in the tile
 0x6e-0x6f   Priority mask /   that have priority over sprites.
-0x70-0x71   Control register (usually 0x003f). The details of how this register
-            works are unknown, but it definitely affects the palette, and games
-            always set it together with the palette base register.
-            Experiments on the real board show that values different from 0x3f in
-            the low 6 bits cause wrong colors. The other bits seem to be unused.
-            There is one CPS2 game (Slammasters II) setting this to 0x2f: the
-            purpose is unknown.
-            The only other places where this register seems to be set to a value
-            different from 0x3f is during startup tests. Examples:
+0x70-0x71   Palette control register. This indicates which palette
+            pages to copy when the palette base register is written to.
+            There is one CPS2 game (Slammasters II) setting this to 0x2f; all the other
+            games normally set it to 0x3f, though in some cases different values are
+            used during boot:
             ghouls  0x02 (and palette base is set to 9105; palette base is 9100 normally)
             strider 0x02 (and palette base is set to 9145; palette base is 9140 normally)
             1941    0x02 (and palette base is set to 9145; palette base is 9140 normally)
             unsquad 0x0f
             kod     0x0f
             mtwins  0x0f
+
+            bit 0: copy page 0 (sprites)
+            bit 1: copy page 1 (scroll1)
+            bit 2: copy page 2 (scroll2)
+            bit 3: copy page 3 (scroll3)
+            bit 4: copy page 4 (stars1)
+            bit 5: copy page 5 (stars2)
+
+            An important quirk is that if bit 0 is not set (sprite page is not copied)
+			page 0 in gfxram is not skipped but instead is copied to page 1; that is,
+            all pages are moved down by one. For the other pages, if the bit is not
+            set the gfxram page is skipped.
+
+            bits 0-3 have been verified with reasonable confidence on a msword pcb,
+            while bits 4-5 are only supposed.
 
 Fixed registers
 0x80-0x81     Sound command
@@ -129,9 +203,9 @@ games should only request tiles from valid ranges. In practice, many games conta
 bugs which make them try to display out of range tiles. The masking applied by
 the hardware therefore needs to be emulated properly, otherwise glitches appear.
 
-The ROM board (B-board) changes from game to game, so the implementation details
-may vary, but in general the tile ranges are controlled by a PAL found on the
-B-board (see the table at the top of this file).
+There are various versions of the ROM board (B-board), so the implementation
+details may vary, but in general the tile ranges are controlled by a PAL found
+on the B-board (see the table at the top of this file).
 
 The A-board passes 23 bits of address to the B-board when requesting gfx ROM data.
 The B-board selects 64 bits of data, that is 16 4bpp pixels, and returns half of
@@ -143,6 +217,7 @@ sprite  000ccccccccccccccccyyyy
 scroll1 001?ccccccccccccccccyyy
 scroll2 010ccccccccccccccccyyyy
 scroll3 011ccccccccccccccyyyyyx
+stars   100000000sxxxxxyyyyyyyy (to be verified)
 
 where
 c is the tile code
@@ -191,6 +266,9 @@ CPS2:
 * Sprites are currently lagged by one frame to keep sync with backgrounds. This causes
   sprites to stay on screen one frame longer (visable in VSAV attract mode).
 
+* The boot screen of some CPS2 games has a blue background instead of black,
+  however that might be the correct behaviour.
+
 Marvel Vs. Capcom
 * Sometimes currupt gfx are displayed on the 32x32 layer as the screen flashes at the
   start of super combo moves. The problem seems to be due to tiles being fetched before
@@ -213,10 +291,6 @@ distortion as expected.
 qad
 * layer enable mask incomplete
 
-varth
-* The boot screen of some CPS2 games has a blue background instead of black,
-  however that might be the correct behaviour.
-
 
 Unknown issues
 ==============
@@ -233,8 +307,6 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 
 #define VERBOSE 0
 
-#define CPS1_DUMP_VIDEO 0
-
 /********************************************************************
 
             Configuration table:
@@ -248,7 +320,6 @@ The games seem to use them to mark platforms, kill zones and no-go areas.
 #define GFXTYPE_SCROLL2   (1<<2)
 #define GFXTYPE_SCROLL3   (1<<3)
 #define GFXTYPE_STARS     (1<<4)
-#define GFXTYPE_UNKNOWN   (0)
 
 
 struct gfx_range
@@ -256,9 +327,9 @@ struct gfx_range
 	// start and end are as passed by the game (shift adjusted to be all
 	// in the same scale a 8x8 tiles): they don't necessarily match the
 	// position in ROM.
+	int type;
 	int start;
 	int end;
-	int type;
 	int bank;
 };
 
@@ -283,12 +354,13 @@ struct CPS1config
 
 	int layer_control;
 	int priority[4];
-	int control_reg;  /* Control register? seems to be always 0x3f */
+	int palette_control;  /* Control register? seems to be always 0x3f */
 
 	/* ideally, the layer enable masks should consist of only one bit, */
 	/* but in many cases it is unknown which bit is which. */
 	int layer_enable_mask[5];
 
+	int bank_size;
 	const struct gfx_range *bank_mapper;
 
 	int bank_scroll1;
@@ -307,7 +379,7 @@ struct CPS1config
 static const struct CPS1config *cps1_game_config;
 
 
-/*                 CPSB ID    multiply protection  ctrl     priority masks   unknwn     layer enable masks  */
+/*                 CPSB ID    multiply protection  ctrl     priority masks   palctrl    layer enable masks  */
 #define CPS_B_01 0x00,0x0000, 0,0,0,0, /* n/a */   0x66,{0x68,0x6a,0x6c,0x6e},0x70, {0x02,0x04,0x08,0x30,0x30}
 #define CPS_B_02 0x60,0x0002, 0,0,0,0, /* n/a */   0x6c,{0x6a,0x68,0x66,0x64},0x62, {0x02,0x04,0x08,0x00,0x00}
 #define CPS_B_03 0x00,0x0000, 0,0,0,0, /* n/a */   0x70,{0x6e,0x6c,0x6a,0x68},0x66, {0x20,0x10,0x08,0x00,0x00}
@@ -337,356 +409,471 @@ static const struct CPS1config *cps1_game_config;
 #define HACK_B_1 0x00,0x0000, 0x00,0x00,0x00,0x00, 0x54,{0x52,0x50,0x4e,0x4c},0x5c, {0xff,0xff,0xff,0x00,0x00}
 
 
-static const struct gfx_range mapper_LWCH1[] =
+static const struct gfx_range mapper_LWCHR[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x03ff, GFXTYPE_STARS,   0 },
-	{ 0x0400, 0x0fff, GFXTYPE_UNKNOWN, 0 },	// empty
-	{ 0x1000, 0x3fff, GFXTYPE_SCROLL2, 0 },
-	{ 0x4000, 0x7fff, GFXTYPE_SCROLL3, 0 },
+	// verified from PAL dump (PAL16P8B @ 3A):
+	// bank size = 8000
+	// bank 0 = pin 16
+	// bank 1 = pin 19
+	// pin 12 and pin 14 are always enabled (except for stars)
+	// note that allowed codes go up to 0x1ffff but physical ROM is half that size
 
-	{ 0x0000, 0x7fff, GFXTYPE_SPRITES, 1 },	// 8000-efff physical
-	{ 0xf000, 0xffff, GFXTYPE_SCROLL1, 1 },
-	{ -1 }
+	/* type            start    end      bank */
+	{ GFXTYPE_STARS,   0x00000, 0x1ffff, 0 },
+	{ GFXTYPE_SCROLL2, 0x00000, 0x1ffff, 0 },
+	{ GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x00000, 0x07fff, 1 },
+	{ GFXTYPE_SCROLL1, 0x00000, 0x1ffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_DM620[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x1fff, GFXTYPE_SPRITES, 0 },
-	{ 0x2000, 0x3fff, GFXTYPE_SCROLL1, 0 },
-	{ 0x4000, 0x7fff, GFXTYPE_SCROLL2, 0 },
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x1fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x2000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4000, 0x7fff, 0 },
 
-	{ 0x8000, 0x9fff, GFXTYPE_SCROLL3, 1 },
-	{ 0x2000, 0x7fff, GFXTYPE_SPRITES, 1 },	// a000-ffff physical
-	{ -1 }
+	{ GFXTYPE_SCROLL3, 0x8000, 0x9fff, 1 },
+	{ GFXTYPE_SPRITES, 0x2000, 0x7fff, 1 },	// a000-ffff physical
+	{ 0 }
 };
 
 static const struct gfx_range mapper_ST24M1[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x03ff, GFXTYPE_STARS,   0 },
-	{ 0x0400, 0x4fff, GFXTYPE_SPRITES, 0 },
-	{ 0x5000, 0x7fff, GFXTYPE_SCROLL2, 0 },
+	// verified from PAL dump:
+	// bank size = 4000
+	// bank 0 = pin 19
+	// bank 1 = pin 16
+	// bank 2 = pin 14
+	// bank 3 = pin 12
 
-	{ 0x0000, 0x6fff, GFXTYPE_SCROLL3, 1 },	// 8000-efff physical
-	{ 0x7000, 0x7fff, GFXTYPE_SCROLL1, 1 },	// f000-ffff physical
-	{ -1 }
+	/* type            start    end      bank */
+	{ GFXTYPE_STARS,   0x00000, 0x1ffff, 0 },
+	{ GFXTYPE_SPRITES, 0x00000, 0x03fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x04000, 0x04fff, 1 },
+	{ GFXTYPE_SCROLL2, 0x04000, 0x07fff, 1 },
+
+	{ GFXTYPE_SCROLL3, 0x00000, 0x03fff, 2 },
+
+	{ GFXTYPE_SCROLL3, 0x04000, 0x07fff, 3 },
+	{ GFXTYPE_SCROLL1, 0x07000, 0x07fff, 3 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_dynwar[] =	// unknown PAL
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x5fff, GFXTYPE_SPRITES, 0 },
-	{ 0x6000, 0x7fff, GFXTYPE_SCROLL1, 0 },
+	/* type            start  end      bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x6000, 0x7fff, 0 },
 
-	{ 0x0000, 0x3fff, GFXTYPE_SCROLL3, 1 },	// 8000-bfff physical
-	{ 0x4000, 0x7fff, GFXTYPE_SCROLL2, 1 },	// c000-ffff physical
-	{ -1 }
+	{ GFXTYPE_SCROLL3, 0x0000, 0x3fff, 1 },	// 8000-bfff physical
+	{ GFXTYPE_SCROLL2, 0x4000, 0x7fff, 1 },	// c000-ffff physical
+	{ 0 }
 };
 
 static const struct gfx_range mapper_WL24B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x4fff, GFXTYPE_SPRITES, 0 },
-	{ 0x5000, 0x6fff, GFXTYPE_SCROLL3, 0 },
-	{ 0x7000, 0x7fff, GFXTYPE_SCROLL1, 0 },
+	// verified from PAL dump:
+	// bank size = 8000
+	// bank 0 = pin 16
+	// bank 1 = pin 12
+	// pin 14 and pin 19 are never enabled
 
-	{ 0x0000, 0x3fff, GFXTYPE_SCROLL2, 1 },	// 8000-bfff physical
-	{ 0xc000, 0xffff, GFXTYPE_UNKNOWN, 1 },	// empty
-	{ -1 }
+	/* type            start  end      bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x4fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x5000, 0x6fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x7000, 0x7fff, 0 },
+
+	{ GFXTYPE_SCROLL2, 0x0000, 0x3fff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_S224B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x43ff, GFXTYPE_SPRITES, 0 },
-	{ 0x4400, 0x4bff, GFXTYPE_SCROLL1, 0 },
-	{ 0x4c00, 0x5fff, GFXTYPE_SCROLL3, 0 },
-	{ 0x6000, 0x7fff, GFXTYPE_SCROLL2, 0 },
-	{ -1 }
+	// verified from PAL dump:
+	// bank size = 8000
+	// bank 0 = pin 16
+	// pin 12 & pin 14 give an alternate half-size mapping which would allow to
+	// populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12
+	// 0 00000 - 03fff
+	// pin 14
+	// 0 04000 - 043ff
+	// 1 04400 - 04bff
+	// 2 06000 - 07fff
+	// 3 04c00 - 05fff
+	// pin 19 is never enabled
+
+	/* type            start  end      bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x43ff, 0 },
+	{ GFXTYPE_SCROLL1, 0x4400, 0x4bff, 0 },
+	{ GFXTYPE_SCROLL3, 0x4c00, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x6000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_YI24B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x1fff, GFXTYPE_SPRITES, 0 },
-	{ 0x2000, 0x3fff, GFXTYPE_SCROLL3, 0 },
-	{ 0x4000, 0x47ff, GFXTYPE_SCROLL1, 0 },
-	{ 0x4800, 0x7fff, GFXTYPE_SCROLL2, 0 },
-	{ -1 }
+	// verified from JED:
+	// bank size = 8000
+	// bank 0 = pin 16
+	// pin 12 & pin 14 give an alternate half-size mapping which would allow to
+	// populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12
+	// 0 0000-1fff
+	// 3 2000-3fff
+	// pin 14
+	// 1 4000-47ff
+	// 2 4800-7fff
+	// pin 19 is never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x1fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x2000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x4000, 0x47ff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4800, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_AR24B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x2fff, GFXTYPE_SPRITES, 0 },
-	{ 0x3000, 0x3fff, GFXTYPE_SCROLL1, 0 },
-	{ 0x4000, 0x5fff, GFXTYPE_SCROLL2, 0 },
-	{ 0x6000, 0x7fff, GFXTYPE_SCROLL3, 0 },
-	{ -1 }
+	// verified from JED:
+	// bank size = 8000
+	// bank 0 = pin 16
+	// pin 12 & pin 14 give an alternate half-size mapping which would allow to
+	// populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12
+	// 0 0000-2fff
+	// 1 3000-3fff
+	// pin 14
+	// 2 4000-5fff
+	// 3 6000-7fff
+	// pin 19 is never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4000, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x6000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_0224B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x0bff, GFXTYPE_SCROLL1, 0 },
-	{ 0x0c00, 0x3bff, GFXTYPE_SCROLL2, 0 },
-	{ 0x3c00, 0x4bff, GFXTYPE_SCROLL3, 0 },
-	{ 0x4c00, 0x7fff, GFXTYPE_SPRITES, 0 },
+	// verified from PAL dump:
+	// bank size = 8000
+	// bank 0 = pin 19
+	// bank 1 = pin 12
+	// pin 16 & pin 14 appear to be an alternate half-size mapping for bank 0
+	// but scroll1 is missing:
+	// pin 16
+	// 2 00c00 - 03bff
+	// 3 03c00 - 03fff
+	// pin 14
+	// 3 04000 - 04bff
+	// 0 04c00 - 07fff
 
-	{ 0x8000, 0xa7ff, GFXTYPE_SPRITES, 1 },
-	{ 0xa800, 0xb7ff, GFXTYPE_SCROLL2, 1 },
-	{ 0xb800, 0xbfff, GFXTYPE_SCROLL3, 1 },
-	{ 0xc000, 0xffff, GFXTYPE_UNKNOWN, 1 },	// empty
-	{ -1 }
+	/* type            start   end     bank */
+	{ GFXTYPE_SCROLL1, 0x0000, 0x0bff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0c00, 0x3bff, 0 },
+	{ GFXTYPE_SCROLL3, 0x3c00, 0x4bff, 0 },
+	{ GFXTYPE_SPRITES, 0x4c00, 0x7fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x8000, 0xa7ff, 1 },
+	{ GFXTYPE_SCROLL2, 0xa800, 0xb7ff, 1 },
+	{ GFXTYPE_SCROLL3, 0xb800, 0xbfff, 1 },
+	{ 0 }
 };
 
-static const struct gfx_range mapper_MS24B[] =	// verified from the PAL
+static const struct gfx_range mapper_MS24B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x3fff, GFXTYPE_SPRITES, 0 },
-	{ 0x4000, 0x4fff, GFXTYPE_SCROLL1, 0 },
-	{ 0x5000, 0x6fff, GFXTYPE_SCROLL2, 0 },
-	{ 0x7000, 0x7fff, GFXTYPE_SCROLL3, 0 },
-	{ -1 }
+	// verified from PAL dump:
+	// bank size = 8000
+	// bank 0 = pin 16 or pin 14 (for 16-bit or 8-bit ROMs)
+	// pin 12 is enabled only for sprites, purpose unknown
+	// 0 0000-3fff
+	// pin 19 is never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x4000, 0x4fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x5000, 0x6fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_CK24B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x2fff, GFXTYPE_SPRITES, 0 },
-	{ 0x3000, 0x3fff, GFXTYPE_SCROLL1, 0 },
-	{ 0x4000, 0x6fff, GFXTYPE_SCROLL2, 0 },
-	{ 0x7000, 0x7fff, GFXTYPE_SCROLL3, 0 },
-	{ -1 }
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x3000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4000, 0x6fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_NM24B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x3fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x4000, 0x47ff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x4800, 0x67ff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x6800, 0x7fff, GFXTYPE_SCROLL3,                   0 },
-	{ -1 }
+	// verified from PAL dump:
+	// bank size = 8000
+	// bank 0 = pin 16
+	// pin 12 & pin 14 give an alternate half-size mapping which would allow to
+	// populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12
+	// 0 00000 - 03fff
+	// 2 00000 - 03fff
+	// pin 14
+	// 1 04000 - 047ff
+	// 0 04800 - 067ff
+	// 2 04800 - 067ff
+	// 3 06800 - 07fff
+	// pin 19 is never enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x4000, 0x47ff, 0 },
+	{ GFXTYPE_SPRITES, 0x4800, 0x67ff, 0 },
+	{ GFXTYPE_SCROLL2, 0x4800, 0x67ff, 0 },
+	{ GFXTYPE_SCROLL3, 0x6800, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_CA24B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x2fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x3000, 0x4fff, GFXTYPE_SCROLL3,                   0 },
-	{ 0x5000, 0x57ff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x5800, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ -1 }
+	// verified from PAL dump:
+	// bank size = 8000
+	// bank 0 = pin 16
+	// pin 12 & pin 14 give an alternate half-size mapping which would allow to
+	// populate the 8-bit ROM sockets instead of the 16-bit ones:
+	// pin 12
+	// 0 0000-2fff
+	// 2 0000-2fff
+	// 3 3000-3fff
+	// pin 14
+	// 3 4000-4fff
+	// 1 5000-57ff
+	// 0 5800-7fff
+	// 2 5800-7fff
+	// pin 19 is never enabled (actually it is always enabled when PAL pin 1 is 1, purpose unknown)
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0000, 0x2fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x3000, 0x4fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x5000, 0x57ff, 0 },
+	{ GFXTYPE_SPRITES, 0x5800, 0x7fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x5800, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_STF29[] =
 {
-	/* start   end      type             bank */
-	{ 0x00000, 0x07fff, GFXTYPE_SPRITES, 0 },
+	/* type            start    end      bank */
+	{ GFXTYPE_SPRITES, 0x00000, 0x07fff, 0 },
 
-	{ 0x08000, 0x0ffff, GFXTYPE_SPRITES, 1 },
+	{ GFXTYPE_SPRITES, 0x08000, 0x0ffff, 1 },
 
-	{ 0x10000, 0x11fff, GFXTYPE_SPRITES, 2 },
-	{ 0x02000, 0x03fff, GFXTYPE_SCROLL3, 2 },	// 12000-13fff physical
-	{ 0x04000, 0x04fff, GFXTYPE_SCROLL1, 2 },	// 14000-14fff physical
-	{ 0x05000, 0x07fff, GFXTYPE_SCROLL2, 2 },	// 15000-17fff physical
-	{ -1 }
+	{ GFXTYPE_SPRITES, 0x10000, 0x11fff, 2 },
+	{ GFXTYPE_SCROLL3, 0x02000, 0x03fff, 2 },	// 12000-13fff physical
+	{ GFXTYPE_SCROLL1, 0x04000, 0x04fff, 2 },	// 14000-14fff physical
+	{ GFXTYPE_SCROLL2, 0x05000, 0x07fff, 2 },	// 15000-17fff physical
+	{ 0 }
 };
 
 static const struct gfx_range mapper_RT24B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x53ff, GFXTYPE_SPRITES,                   0 },
-	{ 0x5400, 0x6fff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x7000, 0x7fff, GFXTYPE_SCROLL3,                   0 },
+	/* type                              start   end     bank */
+	{ GFXTYPE_SPRITES,                   0x0000, 0x53ff, 0 },
+	{ GFXTYPE_SCROLL1,                   0x5400, 0x6fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x7000, 0x7fff, 0 },
 
-	{ 0x0000, 0x27ff, GFXTYPE_SCROLL3,                   1 },	// 8000-a7ff physical
-	{ 0x2800, 0x53ff, GFXTYPE_SCROLL2,                   1 },	// a800-d3ff physical
-	{ 0x5400, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },	// d400-ffff physical
-	{ -1 }
+	{ GFXTYPE_SCROLL3,                   0x0000, 0x27ff, 1 },	// 8000-a7ff physical
+	{ GFXTYPE_SCROLL2,                   0x2800, 0x53ff, 1 },	// a800-d3ff physical
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x5400, 0x7fff, 1 },	// d400-ffff physical
+	{ 0 }
 };
 
 static const struct gfx_range mapper_KD29B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x7fff, GFXTYPE_SPRITES, 0 },
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
 
-	{ 0x8000, 0x8fff, GFXTYPE_SPRITES, 1 },
-	{ 0x9000, 0xbfff, GFXTYPE_SCROLL2, 1 },
-	{ 0xc000, 0xd7ff, GFXTYPE_SCROLL1, 1 },
-	{ 0xd800, 0xffff, GFXTYPE_SCROLL3, 1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES, 0x8000, 0x8fff, 1 },
+	{ GFXTYPE_SCROLL2, 0x9000, 0xbfff, 1 },
+	{ GFXTYPE_SCROLL1, 0xc000, 0xd7ff, 1 },
+	{ GFXTYPE_SCROLL3, 0xd800, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_CC63B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x7fff, GFXTYPE_SPRITES, 0 },
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
 
-	{ 0x8000, 0x9fff, GFXTYPE_SPRITES, 1 },
-	{ 0xa000, 0xbfff, GFXTYPE_SCROLL3, 1 },
-	{ 0xc000, 0xcfff, GFXTYPE_SCROLL1, 1 },
-	{ 0xd000, 0xffff, GFXTYPE_SCROLL2, 1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES, 0x8000, 0x9fff, 1 },
+	{ GFXTYPE_SCROLL3, 0xa000, 0xbfff, 1 },
+	{ GFXTYPE_SCROLL1, 0xc000, 0xcfff, 1 },
+	{ GFXTYPE_SCROLL2, 0xd000, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_KR63B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x7fff, GFXTYPE_SPRITES, 0 },
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
 
-	{ 0x8000, 0x87ff, GFXTYPE_SPRITES, 1 },
-	{ 0x8800, 0x97ff, GFXTYPE_SCROLL1, 1 },
-	{ 0x9800, 0xcfff, GFXTYPE_SCROLL2, 1 },
-	{ 0xd000, 0xffff, GFXTYPE_SCROLL3, 1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES, 0x8000, 0x87ff, 1 },
+	{ GFXTYPE_SCROLL1, 0x8800, 0x97ff, 1 },
+	{ GFXTYPE_SCROLL2, 0x9800, 0xcfff, 1 },
+	{ GFXTYPE_SCROLL3, 0xd000, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_S9263B[] =
 {
-	/* start  end     type             bank */
-	{ 0x00000, 0x07fff, GFXTYPE_SPRITES, 0 },
+	/* type            start    end      bank */
+	{ GFXTYPE_SPRITES, 0x00000, 0x07fff, 0 },
 
-	{ 0x08000, 0x0ffff, GFXTYPE_SPRITES, 1 },
+	{ GFXTYPE_SPRITES, 0x08000, 0x0ffff, 1 },
 
-	{ 0x10000, 0x11fff, GFXTYPE_SPRITES, 2 },
-	{ 0x02000, 0x03fff, GFXTYPE_SCROLL3, 2 },	// 12000-13fff physical
-	{ 0x04000, 0x04fff, GFXTYPE_SCROLL1, 2 },	// 14000-14fff physical
-	{ 0x05000, 0x07fff, GFXTYPE_SCROLL2, 2 },	// 15000-17fff physical
-	{ -1 }
+	{ GFXTYPE_SPRITES, 0x10000, 0x11fff, 2 },
+	{ GFXTYPE_SCROLL3, 0x02000, 0x03fff, 2 },	// 12000-13fff physical
+	{ GFXTYPE_SCROLL1, 0x04000, 0x04fff, 2 },	// 14000-14fff physical
+	{ GFXTYPE_SCROLL2, 0x05000, 0x07fff, 2 },	// 15000-17fff physical
+	{ 0 }
 };
 
 static const struct gfx_range mapper_VA24B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x57ff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x5800, 0x5fff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x6000, 0x7fff, GFXTYPE_SCROLL3,                   0 },
-	{ -1 }
+	/* type                              start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x57ff, 0 },
+	{ GFXTYPE_SCROLL1,                   0x5800, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x6000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_Q522B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x6fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x7000, 0x77ff, GFXTYPE_SCROLL3,                   0 },
-	{ 0x7800, 0x7fff, GFXTYPE_SCROLL1,                   0 },
-	{ -1 }
+	/* type                              start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x6fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x7000, 0x77ff, 0 },
+	{ GFXTYPE_SCROLL1,                   0x7800, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_TK263B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x7fff, GFXTYPE_SPRITES,                   0 },
+	/* type                              start   end     bank */
+	{ GFXTYPE_SPRITES,                   0x0000, 0x7fff, 0 },
 
-	{ 0x8000, 0xcfff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },
-	{ 0xd000, 0xdfff, GFXTYPE_SCROLL1,                   1 },
-	{ 0xe000, 0xffff, GFXTYPE_SCROLL3,                   1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xcfff, 1 },
+	{ GFXTYPE_SCROLL1,                   0xd000, 0xdfff, 1 },
+	{ GFXTYPE_SCROLL3,                   0xe000, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_CD63B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x0fff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x1000, 0x7fff, GFXTYPE_SPRITES,                   0 },
+	/* type                              start   end     bank */
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
+	{ GFXTYPE_SPRITES,                   0x1000, 0x7fff, 0 },
 
-	{ 0x8000, 0xdfff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },
-	{ 0xe000, 0xffff, GFXTYPE_SCROLL3,                   1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xdfff, 1 },
+	{ GFXTYPE_SCROLL3,                   0xe000, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_PS63B[] =
 {
-	/* start  end     type             bank */
-	{ 0x0000, 0x0fff, GFXTYPE_SCROLL1, 0 },
-	{ 0x1000, 0x7fff, GFXTYPE_SPRITES, 0 },
+	/* type            start   end     bank */
+	{ GFXTYPE_SCROLL1, 0x0000, 0x0fff, 0 },
+	{ GFXTYPE_SPRITES, 0x1000, 0x7fff, 0 },
 
-	{ 0x8000, 0xa7ff, GFXTYPE_SPRITES, 1 },
-	{ 0xa800, 0xdbff, GFXTYPE_SCROLL2, 1 },
-	{ 0xdc00, 0xffff, GFXTYPE_SCROLL3, 1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES, 0x8000, 0xa7ff, 1 },
+	{ GFXTYPE_SCROLL2, 0xa800, 0xdbff, 1 },
+	{ GFXTYPE_SCROLL3, 0xdc00, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_MB63B[] =
 {
-	/* start  end     type                                 bank */
-	{ 0x00000, 0x00fff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x01000, 0x07fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
+	/* type                              start    end      bank */
+	{ GFXTYPE_SCROLL1,                   0x00000, 0x00fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x01000, 0x07fff, 0 },
 
-	{ 0x08000, 0x0ffff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x08000, 0x0ffff, 1 },
 
-	{ 0x10000, 0x167ff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 2 },
-	{ 0x16800, 0x17fff, GFXTYPE_SCROLL3,                   2 },
-	{ -1 }
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x10000, 0x167ff, 2 },
+	{ GFXTYPE_SCROLL3,                   0x16800, 0x17fff, 2 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_QD22B[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x07ff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x0800, 0x27ff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x2800, 0x3fff, GFXTYPE_SCROLL3,                   0 },
-	{ 0x4000, 0x7fff, GFXTYPE_UNKNOWN,                   0 },	// empty
-	{ -1 }
+	/* type                              start   end     bank */
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x07ff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0800, 0x27ff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x2800, 0x3fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_qadj[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x07ff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x0800, 0x1fff, GFXTYPE_SCROLL3,                   0 },
-	{ 0x2000, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ -1 }
+	/* type                              start   end     bank */
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x07ff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x0800, 0x1fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x2000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_qtono2[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x0fff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x1000, 0x3fff, GFXTYPE_SCROLL3,                   0 },
-	{ 0x4000, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
+	/* type                              start   end     bank */
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x1000, 0x3fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x4000, 0x7fff, 0 },
 
-	{ 0x8000, 0xffff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xffff, 1 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_RCM63B[] =
 {
-	/* start  end     type                                 bank */
-	{ 0x00000, 0x017ff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x01800, 0x07fff, GFXTYPE_SPRITES,                   0 },
+	/* type                              start    end      bank */
+	{ GFXTYPE_SCROLL1,                   0x00000, 0x017ff, 0 },
+	{ GFXTYPE_SPRITES,                   0x01800, 0x07fff, 0 },
 
-	{ 0x08000, 0x0ffff, GFXTYPE_SPRITES,                   1 },
+	{ GFXTYPE_SPRITES,                   0x08000, 0x0ffff, 1 },
 
-	{ 0x10000, 0x17fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 2 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x10000, 0x17fff, 2 },
 
-	{ 0x18000, 0x19fff, GFXTYPE_SCROLL2,                   3 },
-	{ 0x1a000, 0x1ffff, GFXTYPE_SCROLL3,                   3 },
-	{ -1 }
+	{ GFXTYPE_SCROLL2,                   0x18000, 0x19fff, 3 },
+	{ GFXTYPE_SCROLL3,                   0x1a000, 0x1ffff, 3 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_pnickj[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x0fff, GFXTYPE_SCROLL1,                   0 },
-	{ 0x1000, 0x5fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
-	{ 0x6000, 0x7fff, GFXTYPE_SCROLL3,                   0 },
-	{ -1 }
+	/* type                              start   end     bank */
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x1000, 0x5fff, 0 },
+	{ GFXTYPE_SCROLL3,                   0x6000, 0x7fff, 0 },
+	{ 0 }
 };
 
 static const struct gfx_range mapper_pang3[] =
 {
-	/* start  end     type                               bank */
-	{ 0x0000, 0x7fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0 },
+	/* type                              start   end     bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
 
-	{ 0x8000, 0x9fff, GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 1 },
-	{ 0xa000, 0xbfff, GFXTYPE_SCROLL1,                   1 },
-	{ 0xc000, 0xffff, GFXTYPE_SCROLL3,                   1 },
-	{ -1 }
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0x9fff, 1 },
+	{ GFXTYPE_SCROLL1,                   0xa000, 0xbfff, 1 },
+	{ GFXTYPE_SCROLL3,                   0xc000, 0xffff, 1 },
+	{ 0 }
 };
 
 
@@ -699,150 +886,240 @@ static const struct gfx_range mapper_pang3[] =
  */
 static const struct gfx_range mapper_cps2[] =
 {
-	/* start   end      type             bank */
-	{ 0x00000, 0x07fff, GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 4 },	// 20000-27fff physical
-	{ 0x08000, 0x0ffff, GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 5 },	// 28000-2ffff physical
-	{ 0x10000, 0x17fff,                   GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 6 },	// 30000-37fff physical
-	{ 0x18000, 0x1ffff,                   GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 7 },	// 38000-3ffff physical
-	{ -1 }
+	/* type                                                start    end      bank */
+	{ GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 4 },	// 20000-27fff physical
+	{ GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 5 },	// 28000-2ffff physical
+	{                   GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x10000, 0x17fff, 6 },	// 30000-37fff physical
+	{                   GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x18000, 0x1ffff, 7 },	// 38000-3ffff physical
+	{ 0 }
 };
 
 
 
 static const struct CPS1config cps1_config_table[]=
 {
-	/* name       CPSB     gfx mapper  kludge */
-	{"forgottn", CPS_B_01, mapper_LWCH1 },
-	{"lostwrld", CPS_B_01, mapper_LWCH1 },
-	{"ghouls",   CPS_B_01, mapper_DM620 },
-	{"ghoulsu",  CPS_B_01, mapper_DM620 },
-	{"daimakai", CPS_B_01, mapper_DM620 },
-	{"strider",  CPS_B_01, mapper_ST24M1 },
-	{"stridrua", CPS_B_01, mapper_ST24M1 },
-	{"striderj", CPS_B_01, mapper_ST24M1 },
-	{"stridrja", CPS_B_01, mapper_ST24M1 },
-	{"dynwar",   CPS_B_02, mapper_dynwar },
-	{"dynwarj",  CPS_B_02, mapper_dynwar },
-	{"willow",   CPS_B_03, mapper_WL24B },
-	{"willowj",  CPS_B_03, mapper_WL24B },
-	{"willowje", CPS_B_03, mapper_WL24B },
-	{"ffight",   CPS_B_04, mapper_S224B },
-	{"ffightu",  CPS_B_04, mapper_S224B },
-	{"ffightua", CPS_B_01, mapper_S224B },
-	{"ffightub", CPS_B_05, mapper_S224B },
-	{"ffightj",  CPS_B_04, mapper_S224B },
-	{"ffightj1", CPS_B_02, mapper_S224B },
-	{"1941",     CPS_B_05, mapper_YI24B },
-	{"1941j",    CPS_B_05, mapper_YI24B },
-	{"unsquad",  CPS_B_11, mapper_AR24B },	/* CPSB ID not checked, but it's the same as sf2eg */
-	{"area88",   CPS_B_11, mapper_AR24B },	/* CPSB ID not checked, but it's the same as sf2eg */
-	{"mercs",    CPS_B_12, mapper_0224B },	/* (uses port 74) */
-	{"mercsu",   CPS_B_12, mapper_0224B },	/* (uses port 74) */
-	{"mercsua",  CPS_B_12, mapper_0224B },	/* (uses port 74) */
-	{"mercsj",   CPS_B_12, mapper_0224B },	/* (uses port 74) */
-	{"msword",   CPS_B_13, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mswordr1", CPS_B_13, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mswordu",  CPS_B_13, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mswordj",  CPS_B_13, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
-	{"mtwins",   CPS_B_14, mapper_CK24B },
-	{"chikij",   CPS_B_14, mapper_CK24B },
-	{"nemo",     CPS_B_15, mapper_NM24B },
-	{"nemoj",    CPS_B_15, mapper_NM24B },
-	{"cawing",   CPS_B_16, mapper_CA24B },
-	{"cawingr1", CPS_B_16, mapper_CA24B },
-	{"cawingu",  CPS_B_16, mapper_CA24B },
-	{"cawingj",  CPS_B_16, mapper_CA24B },
-	{"sf2",      CPS_B_11, mapper_STF29 },
-	{"sf2eb",    CPS_B_17, mapper_STF29 },
-	{"sf2ua",    CPS_B_17, mapper_STF29 },
-	{"sf2ub",    CPS_B_17, mapper_STF29 },
-	{"sf2ud",    CPS_B_05, mapper_STF29 },
-	{"sf2ue",    CPS_B_18, mapper_STF29 },
-	{"sf2uf",    CPS_B_15, mapper_STF29 },
-	{"sf2ui",    CPS_B_14, mapper_STF29 },
-	{"sf2uk",    CPS_B_17, mapper_STF29 }, // check CPS_B
-	{"sf2j",     CPS_B_13, mapper_STF29 },
-	{"sf2ja",    CPS_B_17, mapper_STF29 },
-	{"sf2jc",    CPS_B_12, mapper_STF29 },
+	/* name       CPSB     bank size gfx mapper  kludge */
+	{"forgottn", CPS_B_01, 0x8000, mapper_LWCHR },
+	{"lostwrld", CPS_B_01, 0x8000, mapper_LWCHR },
+	{"ghouls",   CPS_B_01, 0x8000, mapper_DM620 },
+	{"ghoulsu",  CPS_B_01, 0x8000, mapper_DM620 },
+	{"daimakai", CPS_B_01, 0x8000, mapper_DM620 },
+	{"strider",  CPS_B_01, 0x4000, mapper_ST24M1 },
+	{"stridrua", CPS_B_01, 0x4000, mapper_ST24M1 },
+	{"striderj", CPS_B_01, 0x4000, mapper_ST24M1 },
+	{"stridrja", CPS_B_01, 0x4000, mapper_ST24M1 },
+	{"dynwar",   CPS_B_02, 0x8000, mapper_dynwar },
+	{"dynwarj",  CPS_B_02, 0x8000, mapper_dynwar },
+	{"willow",   CPS_B_03, 0x8000, mapper_WL24B },
+	{"willowj",  CPS_B_03, 0x8000, mapper_WL24B },
+	{"willowje", CPS_B_03, 0x8000, mapper_WL24B },
+	{"ffight",   CPS_B_04, 0x8000, mapper_S224B },
+	{"ffightu",  CPS_B_04, 0x8000, mapper_S224B },
+	{"ffightua", CPS_B_01, 0x8000, mapper_S224B },
+	{"ffightub", CPS_B_05, 0x8000, mapper_S224B },
+	{"ffightj",  CPS_B_04, 0x8000, mapper_S224B },
+	{"ffightj1", CPS_B_02, 0x8000, mapper_S224B },
+	{"1941",     CPS_B_05, 0x8000, mapper_YI24B },
+	{"1941j",    CPS_B_05, 0x8000, mapper_YI24B },
+	{"unsquad",  CPS_B_11, 0x8000, mapper_AR24B },	/* CPSB ID not checked, but it's the same as sf2eg */
+	{"area88",   CPS_B_11, 0x8000, mapper_AR24B },	/* CPSB ID not checked, but it's the same as sf2eg */
+	{"mercs",    CPS_B_12, 0x8000, mapper_0224B },	/* (uses port 74) */
+	{"mercsu",   CPS_B_12, 0x8000, mapper_0224B },	/* (uses port 74) */
+	{"mercsua",  CPS_B_12, 0x8000, mapper_0224B },	/* (uses port 74) */
+	{"mercsj",   CPS_B_12, 0x8000, mapper_0224B },	/* (uses port 74) */
+	{"msword",   CPS_B_13, 0x8000, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
+	{"mswordr1", CPS_B_13, 0x8000, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
+	{"mswordu",  CPS_B_13, 0x8000, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
+	{"mswordj",  CPS_B_13, 0x8000, mapper_MS24B },	/* CPSB ID not checked, but it's the same as sf2j */
+	{"mtwins",   CPS_B_14, 0x8000, mapper_CK24B },
+	{"chikij",   CPS_B_14, 0x8000, mapper_CK24B },
+	{"nemo",     CPS_B_15, 0x8000, mapper_NM24B },
+	{"nemoj",    CPS_B_15, 0x8000, mapper_NM24B },
+	{"cawing",   CPS_B_16, 0x8000, mapper_CA24B },
+	{"cawingr1", CPS_B_16, 0x8000, mapper_CA24B },
+	{"cawingu",  CPS_B_16, 0x8000, mapper_CA24B },
+	{"cawingj",  CPS_B_16, 0x8000, mapper_CA24B },
+	{"sf2",      CPS_B_11, 0x8000, mapper_STF29 },
+	{"sf2eb",    CPS_B_17, 0x8000, mapper_STF29 },
+	{"sf2ua",    CPS_B_17, 0x8000, mapper_STF29 },
+	{"sf2ub",    CPS_B_17, 0x8000, mapper_STF29 },
+	{"sf2ud",    CPS_B_05, 0x8000, mapper_STF29 },
+	{"sf2ue",    CPS_B_18, 0x8000, mapper_STF29 },
+	{"sf2uf",    CPS_B_15, 0x8000, mapper_STF29 },
+	{"sf2ui",    CPS_B_14, 0x8000, mapper_STF29 },
+	{"sf2uk",    CPS_B_17, 0x8000, mapper_STF29 }, // check CPS_B
+	{"sf2j",     CPS_B_13, 0x8000, mapper_STF29 },
+	{"sf2ja",    CPS_B_17, 0x8000, mapper_STF29 },
+	{"sf2jc",    CPS_B_12, 0x8000, mapper_STF29 },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
-	{"3wonders", BATTRY_1, mapper_RT24B },
-	{"3wonderu", BATTRY_1, mapper_RT24B },
-	{"wonder3",  BATTRY_1, mapper_RT24B },
-	{"kod",      BATTRY_2, mapper_KD29B },
-	{"kodu",     BATTRY_2, mapper_KD29B },
-	{"kodj",     BATTRY_2, mapper_KD29B },
-	{"kodb",     BATTRY_2, mapper_KD29B },	/* bootleg, doesn't use multiply protection */
-	{"captcomm", BATTRY_3, mapper_CC63B },
-	{"captcomu", BATTRY_3, mapper_CC63B },
-	{"captcomj", BATTRY_3, mapper_CC63B },
-	{"knights",  BATTRY_4, mapper_KR63B },
-	{"knightsu", BATTRY_4, mapper_KR63B },
-	{"knightsj", BATTRY_4, mapper_KR63B },
-	{"sf2ce",    NOBATTRY, mapper_S9263B },
-	{"sf2ceua",  NOBATTRY, mapper_S9263B },
-	{"sf2ceub",  NOBATTRY, mapper_S9263B },
-	{"sf2ceuc",  NOBATTRY, mapper_S9263B },
-	{"sf2cej",   NOBATTRY, mapper_S9263B },
-	{"sf2rb",    NOBATTRY, mapper_S9263B },
-	{"sf2rb2",   NOBATTRY, mapper_S9263B },
-	{"sf2red",   NOBATTRY, mapper_S9263B },
-	{"sf2v004",  NOBATTRY, mapper_S9263B },
-	{"sf2accp2", NOBATTRY, mapper_S9263B },
-	{"sf2m1",    NOBATTRY, mapper_S9263B },
-	{"sf2m2",    NOBATTRY, mapper_S9263B },
-	{"sf2m3",    NOBATTRY, mapper_S9263B },
-	{"sf2m4",    HACK_B_1, mapper_S9263B, 1 },
-	{"sf2m5",    NOBATTRY, mapper_S9263B, 1 },
-	{"sf2m6",    NOBATTRY, mapper_S9263B, 1 },
-	{"sf2m7",    NOBATTRY, mapper_S9263B, 1 },
-	{"sf2yyc",   NOBATTRY, mapper_S9263B, 1 },
-	{"sf2koryu", NOBATTRY, mapper_S9263B, 1 },
-	{"varth",    CPS_B_04, mapper_VA24B },	/* CPSB test has been patched out (60=0008) */
-	{"varthr1",  CPS_B_04, mapper_VA24B },	/* CPSB test has been patched out (60=0008) */
-	{"varthu",   CPS_B_04, mapper_VA24B },	/* CPSB test has been patched out (60=0008) */
-	{"varthj",   BATTRY_5, mapper_VA24B },	/* CPSB test has been patched out (72=0001) */
-	{"cworld2j", BATTRY_6, mapper_Q522B },	/* The 0x76 priority values are incorrect values */
-	{"wof",      NOBATTRY, mapper_TK263B },	/* bootleg? */
-	{"wofa",     NOBATTRY, mapper_TK263B },	/* bootleg? */
-	{"wofu",     QSOUND_1, mapper_TK263B },
-	{"wofj",     QSOUND_1, mapper_TK263B },
-	{"dino",     QSOUND_2, mapper_CD63B },	/* layer enable never used */
-	{"dinou",    QSOUND_2, mapper_CD63B },	/* layer enable never used */
-	{"dinoj",    QSOUND_2, mapper_CD63B },	/* layer enable never used */
-	{"punisher", QSOUND_3, mapper_PS63B },
-	{"punishru", QSOUND_3, mapper_PS63B },
-	{"punishrj", QSOUND_3, mapper_PS63B },
-	{"slammast", QSOUND_4, mapper_MB63B },
-	{"slammasu", QSOUND_4, mapper_MB63B },
-	{"mbomberj", QSOUND_4, mapper_MB63B },
-	{"mbombrd",  QSOUND_5, mapper_MB63B },
-	{"mbombrdj", QSOUND_5, mapper_MB63B },
-	{"sf2hf",    NOBATTRY, mapper_S9263B },
-	{"sf2t",     NOBATTRY, mapper_S9263B },
-	{"sf2tj",    NOBATTRY, mapper_S9263B },
-	{"qad",      BATTRY_7, mapper_QD22B },	/* TODO: layer enable */
-	{"qadj",     NOBATTRY, mapper_qadj },
-	{"qtono2",   NOBATTRY, mapper_qtono2 },
-	{"megaman",  NOBATTRY, mapper_RCM63B },
-	{"rockmanj", NOBATTRY, mapper_RCM63B },
-	{"pnickj",   NOBATTRY, mapper_pnickj },
-	{"pang3",    NOBATTRY, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
-	{"pang3j",   NOBATTRY, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"3wonders", BATTRY_1, 0x8000, mapper_RT24B },
+	{"3wonderu", BATTRY_1, 0x8000, mapper_RT24B },
+	{"wonder3",  BATTRY_1, 0x8000, mapper_RT24B },
+	{"kod",      BATTRY_2, 0x8000, mapper_KD29B },
+	{"kodu",     BATTRY_2, 0x8000, mapper_KD29B },
+	{"kodj",     BATTRY_2, 0x8000, mapper_KD29B },
+	{"kodb",     BATTRY_2, 0x8000, mapper_KD29B },	/* bootleg, doesn't use multiply protection */
+	{"captcomm", BATTRY_3, 0x8000, mapper_CC63B },
+	{"captcomu", BATTRY_3, 0x8000, mapper_CC63B },
+	{"captcomj", BATTRY_3, 0x8000, mapper_CC63B },
+	{"knights",  BATTRY_4, 0x8000, mapper_KR63B },
+	{"knightsu", BATTRY_4, 0x8000, mapper_KR63B },
+	{"knightsj", BATTRY_4, 0x8000, mapper_KR63B },
+	{"sf2ce",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2ceua",  NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2ceub",  NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2ceuc",  NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2cej",   NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2rb",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2rb2",   NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2red",   NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2v004",  NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2accp2", NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2m1",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2m2",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2m3",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2m4",    HACK_B_1, 0x8000, mapper_S9263B, 1 },
+	{"sf2m5",    NOBATTRY, 0x8000, mapper_S9263B, 1 },
+	{"sf2m6",    NOBATTRY, 0x8000, mapper_S9263B, 1 },
+	{"sf2m7",    NOBATTRY, 0x8000, mapper_S9263B, 1 },
+	{"sf2yyc",   NOBATTRY, 0x8000, mapper_S9263B, 1 },
+	{"sf2koryu", NOBATTRY, 0x8000, mapper_S9263B, 1 },
+	{"varth",    CPS_B_04, 0x8000, mapper_VA24B },	/* CPSB test has been patched out (60=0008) */
+	{"varthr1",  CPS_B_04, 0x8000, mapper_VA24B },	/* CPSB test has been patched out (60=0008) */
+	{"varthu",   CPS_B_04, 0x8000, mapper_VA24B },	/* CPSB test has been patched out (60=0008) */
+	{"varthj",   BATTRY_5, 0x8000, mapper_VA24B },	/* CPSB test has been patched out (72=0001) */
+	{"cworld2j", BATTRY_6, 0x8000, mapper_Q522B },	/* The 0x76 priority values are incorrect values */
+	{"wof",      NOBATTRY, 0x8000, mapper_TK263B },	/* bootleg? */
+	{"wofa",     NOBATTRY, 0x8000, mapper_TK263B },	/* bootleg? */
+	{"wofu",     QSOUND_1, 0x8000, mapper_TK263B },
+	{"wofj",     QSOUND_1, 0x8000, mapper_TK263B },
+	{"dino",     QSOUND_2, 0x8000, mapper_CD63B },	/* layer enable never used */
+	{"dinou",    QSOUND_2, 0x8000, mapper_CD63B },	/* layer enable never used */
+	{"dinoj",    QSOUND_2, 0x8000, mapper_CD63B },	/* layer enable never used */
+	{"punisher", QSOUND_3, 0x8000, mapper_PS63B },
+	{"punishru", QSOUND_3, 0x8000, mapper_PS63B },
+	{"punishrj", QSOUND_3, 0x8000, mapper_PS63B },
+	{"slammast", QSOUND_4, 0x8000, mapper_MB63B },
+	{"slammasu", QSOUND_4, 0x8000, mapper_MB63B },
+	{"mbomberj", QSOUND_4, 0x8000, mapper_MB63B },
+	{"mbombrd",  QSOUND_5, 0x8000, mapper_MB63B },
+	{"mbombrdj", QSOUND_5, 0x8000, mapper_MB63B },
+	{"sf2hf",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2t",     NOBATTRY, 0x8000, mapper_S9263B },
+	{"sf2tj",    NOBATTRY, 0x8000, mapper_S9263B },
+	{"qad",      BATTRY_7, 0x8000, mapper_QD22B },	/* TODO: layer enable */
+	{"qadj",     NOBATTRY, 0x8000, mapper_qadj },
+	{"qtono2",   NOBATTRY, 0x8000, mapper_qtono2 },
+	{"megaman",  NOBATTRY, 0x8000, mapper_RCM63B },
+	{"rockmanj", NOBATTRY, 0x8000, mapper_RCM63B },
+	{"pnickj",   NOBATTRY, 0x8000, mapper_pnickj },
+	{"pang3",    NOBATTRY, 0x8000, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
+	{"pang3j",   NOBATTRY, 0x8000, mapper_pang3 },	/* EEPROM port is among the CPS registers (handled by DRIVER_INIT) */
 	#ifdef MESS
-	{"sfzch",    NOBATTRY, mapper_cps2 },
+	{"sfzch",    NOBATTRY, 0x8000, mapper_cps2 },
 	#endif
 
     /* CPS2 games */
-	{"cps2",     NOBATTRY, mapper_cps2 },
+	{"cps2",     NOBATTRY, 0x8000, mapper_cps2 },
 
 	{0}		/* End of table */
 };
+
+
+
+/* Public variables */
+UINT16 *cps1_gfxram;
+UINT16 *cps1_output;
+
+size_t cps1_gfxram_size;
+size_t cps1_output_size;
+
+/* Offset of each palette entry */
+#define cps1_palette_entries (32*6)  /* Number colour schemes in palette */
+
+static const int cps1_scroll_size =0x4000;	/* scroll1, scroll2, scroll3 */
+static const int cps1_obj_size    =0x0800;
+static const int cps1_other_size  =0x0800;
+static const int cps1_palette_align=0x0400;	/* minimum alignment is a single palette page (512 colors). Verified on pcb. */
+static const int cps1_palette_size=cps1_palette_entries*32; /* Size of palette RAM */
+
+static UINT16 *cps1_scroll1;
+static UINT16 *cps1_scroll2;
+static UINT16 *cps1_scroll3;
+static UINT16 *cps1_obj;
+static UINT16 *cps1_buffered_obj;
+UINT16 *cps1_other;
+
+/* Working variables */
+static int cps1_last_sprite_offset;     /* Offset of the last sprite */
+static int cps1_stars_enabled[2];          /* Layer enabled [Y/N] */
+
+tilemap *cps1_bg_tilemap[3];
+
+
+int cps1_scroll1x, cps1_scroll1y;
+int cps1_scroll2x, cps1_scroll2y;
+int cps1_scroll3x, cps1_scroll3y;
+static int stars1x, stars1y, stars2x, stars2y;
+
+
+/* Output ports */
+#define CPS1_OBJ_BASE           0x00    /* Base address of objects */
+#define CPS1_SCROLL1_BASE       0x02    /* Base address of scroll 1 */
+#define CPS1_SCROLL2_BASE       0x04    /* Base address of scroll 2 */
+#define CPS1_SCROLL3_BASE       0x06    /* Base address of scroll 3 */
+#define CPS1_OTHER_BASE         0x08    /* Base address of other video */
+#define CPS1_PALETTE_BASE       0x0a    /* Base address of palette */
+#define CPS1_SCROLL1_SCROLLX    0x0c    /* Scroll 1 X */
+#define CPS1_SCROLL1_SCROLLY    0x0e    /* Scroll 1 Y */
+#define CPS1_SCROLL2_SCROLLX    0x10    /* Scroll 2 X */
+#define CPS1_SCROLL2_SCROLLY    0x12    /* Scroll 2 Y */
+#define CPS1_SCROLL3_SCROLLX    0x14    /* Scroll 3 X */
+#define CPS1_SCROLL3_SCROLLY    0x16    /* Scroll 3 Y */
+#define CPS1_STARS1_SCROLLX     0x18    /* Stars 1 X */
+#define CPS1_STARS1_SCROLLY     0x1a    /* Stars 1 Y */
+#define CPS1_STARS2_SCROLLX     0x1c    /* Stars 2 X */
+#define CPS1_STARS2_SCROLLY     0x1e    /* Stars 2 Y */
+#define CPS1_ROWSCROLL_OFFS     0x20    /* base of row scroll offsets in other RAM */
+#define CPS1_VIDEOCONTROL       0x22    /* flip screen, rowscroll enable */
+
+#define CPS1_SCROLL2_WIDTH      0x40
+#define CPS1_SCROLL2_HEIGHT     0x40
+
+
+/*
+CPS1 VIDEO RENDERER
+
+*/
+/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
+static const int stars_rom_size = 0x2000;
+
+/* PSL: CPS2 support */
+static const int cps2_obj_size    =0x2000;
+UINT16 *cps2_objram1,*cps2_objram2;
+UINT16 *cps2_output;
+
+size_t cps2_output_size;
+static UINT16 *cps2_buffered_obj;
+static int pri_ctrl;				/* Sprite layer priorities */
+static int cps2_objram_bank;
+static int cps2_last_sprite_offset;     /* Offset of the last sprite */
+
+#define CPS2_OBJ_BASE	0x00	/* Unknown (not base address of objects). Could be bass address of bank used when object swap bit set? */
+#define CPS2_OBJ_UK1	0x02	/* Unknown (nearly always 0x807d, or 0x808e when screen flipped) */
+#define CPS2_OBJ_PRI	0x04	/* Layers priorities */
+#define CPS2_OBJ_UK2	0x06	/* Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX) */
+#define CPS2_OBJ_XOFFS	0x08	/* X offset (usually 0x0040) */
+#define CPS2_OBJ_YOFFS	0x0a	/* Y offset (always 0x0010) */
 
 
 static int cps_version;
 int cps1_scanline1;
 int cps1_scanline2;
 int cps1_scancalls;
+
+
+static void cps1_build_palette(running_machine *machine, const UINT16* const palette_base);
 
 
 static MACHINE_RESET( cps )
@@ -955,6 +1232,7 @@ READ16_HANDLER( cps1_output_r )
 	return cps1_output[offset];
 }
 
+
 WRITE16_HANDLER( cps1_output_w )
 {
 	data = COMBINE_DATA(&cps1_output[offset]);
@@ -971,8 +1249,8 @@ WRITE16_HANDLER( cps1_output_w )
 
 
 #ifdef MAME_DEBUG
-if (cps1_game_config->control_reg && offset == cps1_game_config->control_reg/2 && data != 0x3f)
-	logerror("control_reg = %04x",data);
+if (cps1_game_config->palette_control && offset == cps1_game_config->palette_control/2 && data != 0x3f)
+	logerror("palette_control = %04x",data);
 #endif
 if (VERBOSE)
 {
@@ -982,106 +1260,28 @@ if (offset > 0x22/2 &&
 		offset != cps1_game_config->priority[1]/2 &&
 		offset != cps1_game_config->priority[2]/2 &&
 		offset != cps1_game_config->priority[3]/2 &&
-		offset != cps1_game_config->control_reg/2)
+		offset != cps1_game_config->palette_control/2)
 	logerror("PC %06x: write %02x to output port %02x\n",activecpu_get_pc(),data,offset*2);
 
 #ifdef MAME_DEBUG
-if (offset == 0x22/2 && (data & ~0x8001) != 0x0e)
-	logerror("port 22 = %04x",data);
 if (cps1_game_config->priority[0] && offset == cps1_game_config->priority[0]/2 && data != 0x00)
 	popmessage("priority0 %04x",data);
 #endif
 }
+
+	/*
+	The main CPU writes the palette to gfxram, and the CPS-B custom copies it
+	to the real palette RAM, which is separated from gfxram.
+	This is done ONLY after the palette base register is written to. It is not
+	known what the exact timing should be, how long it should take and when it
+	should happen. We are assuming that the copy happens immediately, since it
+	fixes glitches in the ghouls intro, but it might happen at next vblank.
+	*/
+	if (offset == CPS1_PALETTE_BASE/2)
+		cps1_build_palette(machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
 }
 
 
-
-/* Public variables */
-UINT16 *cps1_gfxram;
-UINT16 *cps1_output;
-
-size_t cps1_gfxram_size;
-size_t cps1_output_size;
-
-/* Offset of each palette entry */
-#define cps1_palette_entries (32*6)  /* Number colour schemes in palette */
-
-static const int cps1_scroll_size =0x4000;	/* scroll1, scroll2, scroll3 */
-static const int cps1_obj_size    =0x0800;
-static const int cps1_other_size  =0x0800;
-static const int cps1_palette_align=0x0800;	/* can't be larger than this, breaks ringdest & batcirc otherwise */
-static const int cps1_palette_size=cps1_palette_entries*32; /* Size of palette RAM */
-
-static UINT16 *cps1_scroll1;
-static UINT16 *cps1_scroll2;
-static UINT16 *cps1_scroll3;
-static UINT16 *cps1_obj;
-static UINT16 *cps1_buffered_obj;
-static UINT16 *cps1_palette;
-UINT16 *cps1_other;
-static UINT16 *cps1_old_palette;
-
-/* Working variables */
-static int cps1_last_sprite_offset;     /* Offset of the last sprite */
-static int cps1_stars_enabled[2];          /* Layer enabled [Y/N] */
-
-tilemap *cps1_bg_tilemap[3];
-
-
-int cps1_scroll1x, cps1_scroll1y;
-int cps1_scroll2x, cps1_scroll2y;
-int cps1_scroll3x, cps1_scroll3y;
-static int stars1x, stars1y, stars2x, stars2y;
-
-
-/* Output ports */
-#define CPS1_OBJ_BASE			0x00    /* Base address of objects */
-#define CPS1_SCROLL1_BASE       0x02    /* Base address of scroll 1 */
-#define CPS1_SCROLL2_BASE       0x04    /* Base address of scroll 2 */
-#define CPS1_SCROLL3_BASE       0x06    /* Base address of scroll 3 */
-#define CPS1_OTHER_BASE			0x08    /* Base address of other video */
-#define CPS1_PALETTE_BASE       0x0a    /* Base address of palette */
-#define CPS1_SCROLL1_SCROLLX    0x0c    /* Scroll 1 X */
-#define CPS1_SCROLL1_SCROLLY    0x0e    /* Scroll 1 Y */
-#define CPS1_SCROLL2_SCROLLX    0x10    /* Scroll 2 X */
-#define CPS1_SCROLL2_SCROLLY    0x12    /* Scroll 2 Y */
-#define CPS1_SCROLL3_SCROLLX    0x14    /* Scroll 3 X */
-#define CPS1_SCROLL3_SCROLLY    0x16    /* Scroll 3 Y */
-#define CPS1_STARS1_SCROLLX     0x18    /* Stars 1 X */
-#define CPS1_STARS1_SCROLLY     0x1a    /* Stars 1 Y */
-#define CPS1_STARS2_SCROLLX     0x1c    /* Stars 2 X */
-#define CPS1_STARS2_SCROLLY     0x1e    /* Stars 2 Y */
-
-#define CPS1_ROWSCROLL_OFFS     0x20    /* base of row scroll offsets in other RAM */
-
-#define CPS1_SCROLL2_WIDTH      0x40
-#define CPS1_SCROLL2_HEIGHT     0x40
-
-
-/*
-CPS1 VIDEO RENDERER
-
-*/
-/* first 0x4000 of gfx ROM are used, but 0x0000-0x1fff is == 0x2000-0x3fff */
-static const int stars_rom_size = 0x2000;
-
-/* PSL: CPS2 support */
-static const int cps2_obj_size    =0x2000;
-UINT16 *cps2_objram1,*cps2_objram2;
-UINT16 *cps2_output;
-
-size_t cps2_output_size;
-static UINT16 *cps2_buffered_obj;
-static int pri_ctrl;				/* Sprite layer priorities */
-static int cps2_objram_bank;
-static int cps2_last_sprite_offset;     /* Offset of the last sprite */
-
-#define CPS2_OBJ_BASE	0x00	/* Unknown (not base address of objects). Could be bass address of bank used when object swap bit set? */
-#define CPS2_OBJ_UK1	0x02	/* Unknown (nearly always 0x807d, or 0x808e when screen flipped) */
-#define CPS2_OBJ_PRI	0x04	/* Layers priorities */
-#define CPS2_OBJ_UK2	0x06	/* Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX) */
-#define CPS2_OBJ_XOFFS	0x08	/* X offset (usually 0x0040) */
-#define CPS2_OBJ_YOFFS	0x0a	/* Y offset (always 0x0010) */
 
 INLINE int cps2_port(int offset)
 {
@@ -1176,89 +1376,9 @@ DRIVER_INIT( cps2_video )
 }
 
 
-#if CPS1_DUMP_VIDEO
-static void cps1_dump_video(void)
-{
-	FILE *fp;
-	fp=fopen("SCROLL1.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_scroll1, cps1_scroll_size, 1, fp);
-		fclose(fp);
-	}
-	fp=fopen("SCROLL2.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_scroll2, cps1_scroll_size, 1, fp);
-		fclose(fp);
-	}
-	fp=fopen("SCROLL3.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_scroll3, cps1_scroll_size, 1, fp);
-		fclose(fp);
-	}
-
-    fp=fopen("OBJ.DMP", "w+b");
-    if (fp)
-    {
-        fwrite(cps1_obj, cps1_obj_size, 1, fp);
-        fclose(fp);
-    }
-    if (cps_version == 2)
-    {
-        /* PSL: CPS2 support */
-        fp=fopen("OBJCPS2.DMP", "w+b");
-        if (fp)
-        {
-            fwrite(cps2_objram1, cps2_obj_size, 1, fp);
-            fwrite(cps2_objram2, cps2_obj_size, 1, fp);
-            fclose(fp);
-        }
-        fp=fopen("CPS2OUTP.DMP", "w+b");
-        if (fp)
-        {
-            fwrite(cps2_output, cps2_output_size, 1, fp);
-            fclose(fp);
-        }
-
-    }
-
-
-	fp=fopen("OTHER.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_other, cps1_other_size, 1, fp);
-		fclose(fp);
-	}
-
-	fp=fopen("PALETTE.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_palette, cps1_palette_size, 1, fp);
-		fclose(fp);
-	}
-
-	fp=fopen("OUTPUT.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_output, cps1_output_size, 1, fp);
-		fclose(fp);
-	}
-	fp=fopen("VIDEO.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(cps1_gfxram, cps1_gfxram_size, 1, fp);
-		fclose(fp);
-	}
-
-}
-#endif
-
-
 void cps1_get_video_base(void )
 {
-	int layercontrol, scroll1xoff, scroll2xoff, scroll3xoff;
+	int layercontrol, videocontrol, scroll1xoff, scroll2xoff, scroll3xoff;
 
 	/* Re-calculate the VIDEO RAM base */
 	if (cps1_scroll1 != cps1_base(CPS1_SCROLL1_BASE,cps1_scroll_size))
@@ -1293,7 +1413,6 @@ void cps1_get_video_base(void )
 		scroll2xoff = 0;
 		scroll3xoff = 0;
 	}
-	cps1_palette=cps1_base(CPS1_PALETTE_BASE,cps1_palette_align);
 	cps1_other=cps1_base(CPS1_OTHER_BASE,cps1_other_size);
 
 	/* Get scroll values */
@@ -1310,9 +1429,10 @@ void cps1_get_video_base(void )
 
 	/* Get layer enable bits */
 	layercontrol=cps1_port(cps1_game_config->layer_control);
+	videocontrol=cps1_port(CPS1_VIDEOCONTROL);
 	tilemap_set_enable(cps1_bg_tilemap[0],layercontrol & cps1_game_config->layer_enable_mask[0]);
-	tilemap_set_enable(cps1_bg_tilemap[1],layercontrol & cps1_game_config->layer_enable_mask[1]);
-	tilemap_set_enable(cps1_bg_tilemap[2],layercontrol & cps1_game_config->layer_enable_mask[2]);
+	tilemap_set_enable(cps1_bg_tilemap[1],(layercontrol & cps1_game_config->layer_enable_mask[1]) && (videocontrol & 4));
+	tilemap_set_enable(cps1_bg_tilemap[2],(layercontrol & cps1_game_config->layer_enable_mask[2]) && (videocontrol & 8));
 	cps1_stars_enabled[0] = layercontrol & cps1_game_config->layer_enable_mask[3];
 	cps1_stars_enabled[1] = layercontrol & cps1_game_config->layer_enable_mask[4];
 
@@ -1401,12 +1521,14 @@ static int gfxrom_bank_mapper(running_machine *machine, int type, int code)
 
 	code <<= shift;
 
-	while (range->start != -1)
+	while (range->type)
 	{
 		if (code >= range->start && code <= range->end)
 		{
 			if (range->type & type)
-				return ((code & 0x7fff) + (range->bank * 0x8000)) >> shift;
+			{
+				return ((code & (cps1_game_config->bank_size - 1)) + (range->bank * cps1_game_config->bank_size)) >> shift;
+			}
 		}
 
 		++range;
@@ -1547,8 +1669,6 @@ static VIDEO_START( cps )
 
 	memset(empty_tile,0xff,sizeof(empty_tile));
 
-	cps1_old_palette=auto_malloc(cps1_palette_size);
-	memset(cps1_old_palette, 0x00, cps1_palette_size);
 	for (i = 0;i < cps1_palette_entries*16;i++)
 	{
 		palette_set_color(machine,i,MAKE_RGB(0,0,0));
@@ -1578,7 +1698,6 @@ static VIDEO_START( cps )
 	cps1_output[CPS1_SCROLL2_BASE/2] = 0x9040;
 	cps1_output[CPS1_SCROLL3_BASE/2] = 0x9080;
 	cps1_output[CPS1_OTHER_BASE/2]   = 0x9100;
-	cps1_output[CPS1_PALETTE_BASE/2] = 0x90c0;
 
 	assert_always(cps1_game_config, "cps1_game_config hasn't been set up yet");
 
@@ -1607,26 +1726,43 @@ VIDEO_START( cps2 )
 
 ***************************************************************************/
 
-void cps1_build_palette(running_machine *machine)
+static void cps1_build_palette(running_machine *machine, const UINT16* const palette_base)
 {
-	int offset;
+	int offset, page;
+	const UINT16 *palette_ram = palette_base;
 
-	for (offset = 0; offset < cps1_palette_entries*16; offset++)
+	int ctrl = cps1_port(cps1_game_config->palette_control);
+
+	/*
+	The palette is copied only for pages that are enabled in the ctrl
+	register. Note that if the sprite palette (page 0) is skipped, the
+	all the following pages are scaled down by one.
+	*/
+	for (page = 0; page < 6; ++page)
 	{
-		int palette = cps1_palette[offset];
-
-		if (palette != cps1_old_palette[offset])
+		if (BIT(ctrl,page))
 		{
-			int red, green, blue, bright;
+			for (offset = 0; offset < 0x200; ++offset)
+			{
+				int palette = *(palette_ram++);
+				int r, g, b, bright;
 
-			bright = 0x10 + (palette>>12);
+				// from my understanding of the schematics, when the 'brightness'
+				// component is set to 0 it should reduce brightness to 1/3
 
-			red   = ((palette>>8)&0x0f) * bright * 0x11 / 0x1f;
-			green = ((palette>>4)&0x0f) * bright * 0x11 / 0x1f;
-			blue  = ((palette>>0)&0x0f) * bright * 0x11 / 0x1f;
+				bright = 0x0f + ((palette>>12)<<1);
 
-			palette_set_color (machine, offset, MAKE_RGB(red, green, blue));
-			cps1_old_palette[offset] = palette;
+				r = ((palette>>8)&0x0f) * 0x11 * bright / 0x2d;
+				g = ((palette>>4)&0x0f) * 0x11 * bright / 0x2d;
+				b = ((palette>>0)&0x0f) * 0x11 * bright / 0x2d;
+
+				palette_set_color (machine, 0x200*page + offset, MAKE_RGB(r, g, b));
+			}
+		}
+		else
+		{
+			if (page > 0)
+				palette_ram += 0x200;
 		}
 	}
 }
@@ -2177,7 +2313,7 @@ static void cps1_render_high_layer(bitmap_t *bitmap, const rectangle *cliprect, 
 VIDEO_UPDATE( cps1 )
 {
 	int layercontrol,l0,l1,l2,l3;
-	int videocontrol=cps1_port(0x22);
+	int videocontrol=cps1_port(CPS1_VIDEOCONTROL);
 
 
 	flip_screen_set(videocontrol & 0x8000);
@@ -2193,8 +2329,6 @@ VIDEO_UPDATE( cps1 )
 	{
 		cps2_find_last_sprite();
 	}
-	/* Build palette */
-	cps1_build_palette(screen->machine);
 
 	cps1_update_transmasks();
 
@@ -2300,12 +2434,6 @@ if (0 && input_code_pressed(KEYCODE_Z))
 		cps2_render_sprites(screen->machine,bitmap,cliprect,primasks);
 	}
 
-#if CPS1_DUMP_VIDEO
-	if (input_code_pressed(KEYCODE_F))
-	{
-		cps1_dump_video();
-	}
-#endif
 	return 0;
 }
 
@@ -2331,4 +2459,3 @@ void cps2_objram_latch(void)
 	cps2_set_sprite_priorities();
 	memcpy(cps2_buffered_obj, cps2_objbase(), cps2_obj_size);
 }
-
