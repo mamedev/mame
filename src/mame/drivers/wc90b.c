@@ -68,6 +68,18 @@ the original machine.
 Last but not least, the set of ROMs i have for Euro League seem to have
 the sprites corrupted. The game seems to be exactly the same as the
 World Cup 90 bootleg.
+
+Noted added by ClawGrip 28-Mar-2008:
+-----------------------------------
+-Dumped and added the all the PCB GALs.
+-Removed the second YM2203, Ernesto said it wasn't present on his board,
+ and also isn't on mine.
+-My PCB has a different ROM (a05.bin), but only two bytes are different.
+ Dox suggested that it can be just a year or text mod, so I decided not
+ to include my set. If anyone wants it, please mail me:
+ clawgrip at hotmail dot com. I can't find any graphical difference
+ between my set and the one already on MAME. 
+
 */
 
 #include "driver.h"
@@ -151,56 +163,35 @@ static WRITE8_HANDLER( adpcm_data_w )
 }
 
 
-static ADDRESS_MAP_START( wc90b_readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM) /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_RAM) /* fg video ram */
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM) /* bg video ram */
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) /* tx video ram */
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xf800, 0xfbff) AM_READ(wc90b_shared_r)
+static ADDRESS_MAP_START( wc90b_map1, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_WRITE(wc90b_fgvideoram_w) AM_BASE(&wc90b_fgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(1)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90b_shared_r, wc90b_shared_w) AM_BASE(&wc90b_shared)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
+	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_BASE(&wc90b_scroll1y)
+	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_BASE(&wc90b_scroll1x)
+	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_BASE(&wc90b_scroll2y)
+	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_BASE(&wc90b_scroll2x)
 	AM_RANGE(0xfd00, 0xfd00) AM_READ(input_port_0_r) /* Stick 1, Coin 1 & Start 1 */
 	AM_RANGE(0xfd02, 0xfd02) AM_READ(input_port_1_r) /* Stick 2, Coin 2 & Start 2 */
 	AM_RANGE(0xfd06, 0xfd06) AM_READ(input_port_2_r) /* DIP Switch A */
 	AM_RANGE(0xfd08, 0xfd08) AM_READ(input_port_3_r) /* DIP Switch B */
-	AM_RANGE(0xfd00, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wc90b_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc1ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc200, 0xe1ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xf800, 0xfbff) AM_READ(wc90b_shared_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wc90b_writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(wc90b_fgvideoram_w) AM_BASE(&wc90b_fgvideoram)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(wc90b_shared_w) AM_BASE(&wc90b_shared)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
-	AM_RANGE(0xfd04, 0xfd04) AM_WRITE(SMH_RAM) AM_BASE(&wc90b_scroll1y)
-	AM_RANGE(0xfd06, 0xfd06) AM_WRITE(SMH_RAM) AM_BASE(&wc90b_scroll1x)
-	AM_RANGE(0xfd08, 0xfd08) AM_WRITE(SMH_RAM) AM_BASE(&wc90b_scroll2y)
-	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITE(SMH_RAM) AM_BASE(&wc90b_scroll2x)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wc90b_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(wc90b_shared_w)
+static ADDRESS_MAP_START( wc90b_map2, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe800, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(2)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90b_shared_r, wc90b_shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
 ADDRESS_MAP_END
 
@@ -211,8 +202,6 @@ static ADDRESS_MAP_START( sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
 	AM_RANGE(0xe801, 0xe801) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_READWRITE(YM2203_status_port_1_r, YM2203_control_port_1_w)
-	AM_RANGE(0xec01, 0xec01) AM_READWRITE(YM2203_read_port_1_r, YM2203_write_port_1_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -391,18 +380,17 @@ static const struct MSM5205interface msm5205_interface =
 static MACHINE_DRIVER_START( wc90b )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wc90b_readmem1,wc90b_writemem1)
+	MDRV_CPU_ADD(Z80, XTAL_14MHz/2)
+	MDRV_CPU_PROGRAM_MAP(wc90b_map1,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wc90b_readmem2,wc90b_writemem2)
+	MDRV_CPU_ADD(Z80, XTAL_14MHz/2)
+	MDRV_CPU_PROGRAM_MAP(wc90b_map2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 2510000) // based on goal92 speed measured by guru (although maybe it should be 10mhz / 4 which is close)
-	/* audio CPU */	/* 2.51 MHz */
+	MDRV_CPU_ADD(Z80, XTAL_19_6608MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu,0)
-								/* IRQs are triggered by the main CPU */
+	/* IRQs are triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -423,14 +411,11 @@ static MACHINE_DRIVER_START( wc90b )
 
 	MDRV_SOUND_ADD(YM2203, 2510000/2)
 	MDRV_SOUND_CONFIG(ym2203_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MDRV_SOUND_ADD(YM2203, 2510000/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD(MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
 ROM_START( wc90b )
@@ -467,7 +452,67 @@ ROM_START( wc90b )
 	ROM_LOAD( "151_a17.bin",  0x050000, 0x10000, CRC(228429d8) SHA1(3b2dbea53807929c24d593c469a83172f7747f66) )
 	ROM_LOAD( "152_a18.bin",  0x060000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
 	ROM_LOAD( "153_a19.bin",  0x070000, 0x10000, CRC(f36390a9) SHA1(e5ea36e91b3ced068281524ee79d0432f489715c) )
+
+	ROM_REGION( 0x1000, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "el_ic39_gal16v8_0.bin", 0x0000, 0x0117, NO_DUMP SHA1(894b345b395097acf6cf52ab8bc922099f97a85f) )
+	ROM_LOAD( "el_ic44_gal16v8_1.bin", 0x0200, 0x0117, NO_DUMP SHA1(fd41f55d857995fe87217dd9679c42760c241dc4) )
+	ROM_LOAD( "el_ic54_gal16v8_2.bin", 0x0400, 0x0117, NO_DUMP SHA1(f6d138fe42549219e11ee8524b05fe3c2b43f5d3) )
+	ROM_LOAD( "el_ic100_gal16v8_3.bin", 0x0600, 0x0117, NO_DUMP SHA1(515fcdf378e75ed078f54439fefce8807403bdd5) )
+	ROM_LOAD( "el_ic143_gal16v8_4.bin", 0x0800, 0x0117, NO_DUMP SHA1(fbe632437eac2418da7a3c3e947cfd36f6211407) )
 ROM_END
 
 
+#if 0
+/* Different bootleg set with only one new ROM, a05 (added as "el_ic98_27c512_05.bin"), not included because it's
+probably just a minor text mod from the supported set (only two bytes differs), although I cannot find the difference:
+   Comparing files a05.bin and el_ic98_27c512_05.bin
+    00000590: 0F 0B
+    00000591: FF FA
+*/
+ROM_START( wc90ba )
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )
+	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )	/* c000-ffff is not used */
+	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )	/* banked at f000-f7ff */
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )  /* Second CPU */
+	ROM_LOAD( "a04.bin",              0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
+	ROM_LOAD( "el_ic98_27c512_05.bin",0x10000, 0x10000, CRC(c70d8c13) SHA1(365718725ea7d0355c68ba703b7f9624cb1134bc) )
+
+	ROM_REGION( 0x18000, REGION_CPU3, 0 )
+	ROM_LOAD( "a01.bin",      0x00000, 0x8000, CRC(3d317622) SHA1(ae4e8c5247bc215a2769786cb8639bce2f80db22) )
+	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
+
+	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "a06.bin",      0x000000, 0x04000, CRC(3b5387b7) SHA1(b839b4eafe8bf6f9e841e19fee1bdb64a66f3448) )
+	ROM_LOAD( "a08.bin",      0x004000, 0x04000, CRC(c622a5a3) SHA1(468c8c24af1f6f244228b66df04cb0ea81c1875e) )
+	ROM_LOAD( "a10.bin",      0x008000, 0x04000, CRC(0923d9f6) SHA1(4b10ee3fc17bb63cda51b2a978d066b6a140a551) )
+	ROM_LOAD( "a20.bin",      0x00c000, 0x04000, CRC(b8dec83e) SHA1(fe617ddccdd0dbd05ca09a1507074aa14b529322) )
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "a07.bin",      0x000000, 0x20000, CRC(38c31817) SHA1(cb24ed8702d62066366924c033c07ffc78bd1fad) )
+	ROM_LOAD( "a09.bin",      0x020000, 0x20000, CRC(32e39e29) SHA1(44f22ed6c983541c7fea5857ba0456aaa87b36d1) )
+	ROM_LOAD( "a11.bin",      0x040000, 0x20000, CRC(5ccec796) SHA1(2cc191a4267819eb31962726e2ed4567c825c39e) )
+	ROM_LOAD( "a21.bin",      0x060000, 0x20000, CRC(0c54a091) SHA1(3eecb285b5a7bbc310c87492516d7ffb2841aa3b) )
+
+	ROM_REGION( 0x080000, REGION_GFX3, ROMREGION_DISPOSE | ROMREGION_INVERT )
+	ROM_LOAD( "146_a12.bin",  0x000000, 0x10000, CRC(d5a60096) SHA1(a8e351a4b020b4fc2b2cb7d3f0fdfb43fc44d7d9) )
+	ROM_LOAD( "147_a13.bin",  0x010000, 0x10000, CRC(36bbf467) SHA1(627b5847ffb098c92edfd58c25391799f3b209e0) )
+	ROM_LOAD( "148_a14.bin",  0x020000, 0x10000, CRC(26371c18) SHA1(0887041d86dc9f19dad264ae27dc56fb89ac3265) )
+	ROM_LOAD( "149_a15.bin",  0x030000, 0x10000, CRC(75aa9b86) SHA1(0c221bd2e8a5472bb0e515f27fb72b0c8e8c0ca4) )
+	ROM_LOAD( "150_a16.bin",  0x040000, 0x10000, CRC(0da825f9) SHA1(cfba0c85fc767726c1d63f87468335d1c2f1eed8) )
+	ROM_LOAD( "151_a17.bin",  0x050000, 0x10000, CRC(228429d8) SHA1(3b2dbea53807929c24d593c469a83172f7747f66) )
+	ROM_LOAD( "152_a18.bin",  0x060000, 0x10000, CRC(516b6c09) SHA1(9d02514dece864b087f67886009ce54bd51b5575) )
+	ROM_LOAD( "153_a19.bin",  0x070000, 0x10000, CRC(f36390a9) SHA1(e5ea36e91b3ced068281524ee79d0432f489715c) )
+
+	ROM_REGION( 0x1000, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "el_ic39_gal16v8_0.bin", 0x0000, 0x0117, NO_DUMP SHA1(894b345b395097acf6cf52ab8bc922099f97a85f) )
+	ROM_LOAD( "el_ic44_gal16v8_1.bin", 0x0200, 0x0117, NO_DUMP SHA1(fd41f55d857995fe87217dd9679c42760c241dc4) )
+	ROM_LOAD( "el_ic54_gal16v8_2.bin", 0x0400, 0x0117, NO_DUMP SHA1(f6d138fe42549219e11ee8524b05fe3c2b43f5d3) )
+	ROM_LOAD( "el_ic100_gal16v8_3.bin", 0x0600, 0x0117, NO_DUMP SHA1(515fcdf378e75ed078f54439fefce8807403bdd5) )
+	ROM_LOAD( "el_ic143_gal16v8_4.bin", 0x0800, 0x0117, NO_DUMP SHA1(fbe632437eac2418da7a3c3e947cfd36f6211407) )
+ROM_END
+#endif
+
+
 GAME( 1989, wc90b, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+//GAME( 1989, wc90ba, wc90, wc90b, wc90b, 0, ROT0, "bootleg", "Euro League (alt version)", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
