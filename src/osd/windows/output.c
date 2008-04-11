@@ -74,7 +74,7 @@ static int create_window_class(void);
 static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 static LRESULT register_client(HWND hwnd, LPARAM id);
 static LRESULT unregister_client(HWND hwnd, LPARAM id);
-static LRESULT send_id_string(HWND hwnd, LPARAM id);
+static LRESULT send_id_string(running_machine *machine, HWND hwnd, LPARAM id);
 static void notifier_callback(const char *outname, INT32 value, void *param);
 
 
@@ -197,7 +197,7 @@ static LRESULT CALLBACK output_window_proc(HWND wnd, UINT message, WPARAM wparam
 
 	// get a string for an ID
 	else if (message == om_mame_get_id_string)
-		return send_id_string((HWND)wparam, lparam);
+		return send_id_string(Machine, (HWND)wparam, lparam);
 
 	else
 		return DefWindowProc(wnd, message, wparam, lparam);
@@ -262,7 +262,7 @@ static LRESULT unregister_client(HWND hwnd, LPARAM id)
 //  send_id_string
 //============================================================
 
-static LRESULT send_id_string(HWND hwnd, LPARAM id)
+static LRESULT send_id_string(running_machine *machine, HWND hwnd, LPARAM id)
 {
 	copydata_id_string *temp;
 	COPYDATASTRUCT copydata;
@@ -271,7 +271,7 @@ static LRESULT send_id_string(HWND hwnd, LPARAM id)
 
 	// id 0 is the name of the game
 	if (id == 0)
-		name = Machine->gamedrv->name;
+		name = machine->gamedrv->name;
 	else
 		name = output_id_to_name(id);
 
@@ -298,7 +298,7 @@ static LRESULT send_id_string(HWND hwnd, LPARAM id)
 
 
 //============================================================
-//  send_id_string
+//  notifier_callback
 //============================================================
 
 static void notifier_callback(const char *outname, INT32 value, void *param)

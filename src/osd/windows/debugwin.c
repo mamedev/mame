@@ -220,7 +220,7 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 //static void generic_create_window(int type);
 static void generic_recompute_children(debugwin_info *info);
 
-static void memory_create_window(void);
+static void memory_create_window(running_machine *machine);
 static void memory_recompute_children(debugwin_info *info);
 static void memory_process_string(debugwin_info *info, const char *string);
 static void memory_update_menu(debugwin_info *info);
@@ -235,10 +235,10 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 static void disasm_update_caption(HWND wnd);
 
-static void console_create_window(void);
+static void console_create_window(running_machine *machine);
 static void console_recompute_children(debugwin_info *info);
 static void console_process_string(debugwin_info *info, const char *string);
-static void console_set_cpunum(int cpunum);
+static void console_set_cpunum(running_machine *machine, int cpunum);
 
 static HMENU create_standard_menubar(void);
 static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
@@ -259,18 +259,18 @@ void osd_wait_for_debugger(void)
 
 	// create a console window
 	if (main_console == NULL)
-		console_create_window();
+		console_create_window(Machine);
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
-		console_set_cpunum(cpu_getactivecpu());
+		console_set_cpunum(Machine, cpu_getactivecpu());
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = TRUE;
 	smart_show_all(TRUE);
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll();
+	wininput_poll(Machine);
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
@@ -289,7 +289,7 @@ void osd_wait_for_debugger(void)
 
 		// process everything else
 		default:
-			winwindow_dispatch_message(&message);
+			winwindow_dispatch_message(Machine, &message);
 			break;
 	}
 
@@ -1673,7 +1673,7 @@ static void generic_recompute_children(debugwin_info *info)
 //  log_create_window
 //============================================================
 
-static void log_create_window(void)
+static void log_create_window(running_machine *machine)
 {
 	debugwin_info *info;
 	char title[256];
@@ -1681,7 +1681,7 @@ static void log_create_window(void)
 	RECT bounds;
 
 	// create the window
-	_snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+	_snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
 	info = debug_window_create(title, NULL);
 	if (info == NULL || !debug_view_create(info, 0, DVT_LOG))
 		return;
@@ -1718,7 +1718,7 @@ static void log_create_window(void)
 //  memory_determine_combo_items
 //============================================================
 
-static void memory_determine_combo_items(void)
+static void memory_determine_combo_items(running_machine *machine)
 {
 	memorycombo_item **tail = &memorycombo;
 	UINT32 cpunum, spacenum;
@@ -1755,11 +1755,11 @@ static void memory_determine_combo_items(void)
 	{
 		TCHAR* t_memory_region_name;
 		UINT8 *base = memory_region(rgnnum);
-		UINT32 type = memory_region_type(Machine, rgnnum);
+		UINT32 type = memory_region_type(machine, rgnnum);
 		if (base != NULL && type > REGION_INVALID && (type - REGION_INVALID) < ARRAY_LENGTH(memory_region_names))
 		{
 			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			UINT32 flags = memory_region_flags(Machine, rgnnum);
+			UINT32 flags = memory_region_flags(machine, rgnnum);
 			UINT8 width, little_endian;
 			memset(ci, 0, sizeof(*ci));
 			ci->base = base;
@@ -1841,7 +1841,7 @@ static void memory_update_selection(debugwin_info *info, memorycombo_item *ci)
 //  memory_create_window
 //============================================================
 
-static void memory_create_window(void)
+static void memory_create_window(running_machine *machine)
 {
 	int curcpu = cpu_getactivecpu(), cursel = 0;
 	memorycombo_item *ci, *selci = NULL;
@@ -1900,7 +1900,7 @@ static void memory_create_window(void)
 
 	// populate the combobox
 	if (memorycombo == NULL)
-		memory_determine_combo_items();
+		memory_determine_combo_items(machine);
 	for (ci = memorycombo; ci; ci = ci->next)
 	{
 		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)ci->name);
@@ -2547,7 +2547,7 @@ static void disasm_update_caption(HWND wnd)
 //  console_create_window
 //============================================================
 
-void console_create_window(void)
+void console_create_window(running_machine *machine)
 {
 	debugwin_info *info;
 	int bestwidth, bestheight;
@@ -2560,7 +2560,7 @@ void console_create_window(void)
 	if (info == NULL)
 		return;
 	main_console = info;
-	console_set_cpunum(0);
+	console_set_cpunum(machine, 0);
 
 	// create the views
 	if (!debug_view_create(info, 0, DVT_DISASSEMBLY))
@@ -2610,7 +2610,7 @@ void console_create_window(void)
 	info->minwidth = 0;
 	info->maxwidth = 0;
 	for (cpunum = MAX_CPU - 1; (INT32)cpunum >= 0; cpunum--)
-		if (Machine->config->cpu[cpunum].type != CPU_DUMMY)
+		if (machine->config->cpu[cpunum].type != CPU_DUMMY)
 		{
 			UINT32 regchars, dischars, conchars;
 			UINT32 minwidth, maxwidth;
@@ -2749,7 +2749,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 //  console_set_cpunum
 //============================================================
 
-static void console_set_cpunum(int cpunum)
+static void console_set_cpunum(running_machine *machine, int cpunum)
 {
 	char title[256], curtitle[256];
 
@@ -2760,7 +2760,7 @@ static void console_set_cpunum(int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", Machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU %d (%s)", machine->gamedrv->name, cpu_getactivecpu(), activecpu_name());
 	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (strcmp(title, curtitle))
 		win_set_window_text_utf8(main_console->wnd, title);
@@ -2822,7 +2822,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 		switch (LOWORD(wparam))
 		{
 			case ID_NEW_MEMORY_WND:
-				memory_create_window();
+				memory_create_window(Machine);
 				return 1;
 
 			case ID_NEW_DISASM_WND:
@@ -2830,7 +2830,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				return 1;
 
 			case ID_NEW_LOG_WND:
-				log_create_window();
+				log_create_window(Machine);
 				return 1;
 
 			case ID_RUN_AND_HIDE:

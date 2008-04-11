@@ -106,25 +106,25 @@ extern win_window_info *win_window_list;
 void winwindow_init(running_machine *machine);
 
 // creation/deletion of windows
-void winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config);
+void winwindow_video_window_create(running_machine *machine, int index, win_monitor_info *monitor, const win_window_config *config);
 
 BOOL winwindow_has_focus(void);
-void winwindow_update_cursor_state(void);
+void winwindow_update_cursor_state(running_machine *machine);
 void winwindow_video_window_update(win_window_info *window);
 win_monitor_info *winwindow_video_window_monitor(win_window_info *window, const RECT *proposed);
 
 LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 void winwindow_toggle_full_screen(void);
 
-void winwindow_process_events_periodic(void);
-void winwindow_process_events(int ingame);
+void winwindow_process_events_periodic(running_machine *machine);
+void winwindow_process_events(running_machine *machine, int ingame);
 
-void winwindow_ui_pause_from_window_thread(int pause);
-void winwindow_ui_pause_from_main_thread(int pause);
-int winwindow_ui_is_paused(void);
+void winwindow_ui_pause_from_window_thread(running_machine *machine, int pause);
+void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause);
+int winwindow_ui_is_paused(running_machine *machine);
 
 void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param);
-void winwindow_dispatch_message(MSG *message);
+void winwindow_dispatch_message(running_machine *machine, MSG *message);
 
 #if HAS_WINDOW_MENU
 int win_create_menu(running_machine *machine, HMENU *menus);

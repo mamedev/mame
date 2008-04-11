@@ -419,9 +419,9 @@ static int device_verify_caps(d3d_info *d3d);
 static int device_test_cooperative(d3d_info *d3d);
 
 // video modes
-static int config_adapter_mode(win_window_info *window);
+static int config_adapter_mode(running_machine *machine, win_window_info *window);
 static int get_adapter_for_monitor(d3d_info *d3d, win_monitor_info *monitor);
-static void pick_best_mode(win_window_info *window);
+static void pick_best_mode(running_machine *machine, win_window_info *window);
 static int update_window_size(win_window_info *window);
 
 // drawing
@@ -512,7 +512,7 @@ static int drawd3d_window_init(win_window_info *window)
 	}
 
 	// configure the adapter for the mode we want
-	if (config_adapter_mode(window))
+	if (config_adapter_mode(Machine, window))
 		goto error;
 
 	// create the device immediately for the full screen case (defer for window mode)
@@ -1120,7 +1120,7 @@ static int device_test_cooperative(d3d_info *d3d)
 //  config_adapter_mode
 //============================================================
 
-static int config_adapter_mode(win_window_info *window)
+static int config_adapter_mode(running_machine *machine, win_window_info *window)
 {
 	d3d_adapter_identifier identifier;
 	d3d_info *d3d = window->drawdata;
@@ -1184,7 +1184,7 @@ static int config_adapter_mode(win_window_info *window)
 
 		// if we're allowed to switch resolutions, override with something better
 		if (video_config.switchres)
-			pick_best_mode(window);
+			pick_best_mode(machine, window);
 	}
 
 	// see if we can handle the device type
@@ -1236,9 +1236,9 @@ static int get_adapter_for_monitor(d3d_info *d3d, win_monitor_info *monitor)
 //  pick_best_mode
 //============================================================
 
-static void pick_best_mode(win_window_info *window)
+static void pick_best_mode(running_machine *machine, win_window_info *window)
 {
-	const device_config *primary_screen = video_screen_first(Machine->config);
+	const device_config *primary_screen = video_screen_first(machine->config);
 	double target_refresh = 60.0;
 	INT32 target_width, target_height;
 	d3d_info *d3d = window->drawdata;

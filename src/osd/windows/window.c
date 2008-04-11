@@ -129,9 +129,9 @@ static void winwindow_video_window_destroy(win_window_info *window);
 static void draw_video_contents(win_window_info *window, HDC dc, int update);
 
 static unsigned __stdcall thread_entry(void *param);
-static int complete_create(win_window_info *window);
+static int complete_create(running_machine *machine, win_window_info *window);
 static void create_window_class(void);
-static void set_starting_view(int index, win_window_info *window, const char *view);
+static void set_starting_view(running_machine *machine, int index, win_window_info *window, const char *view);
 
 static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int adjustment);
 static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain);
@@ -309,7 +309,7 @@ static void winwindow_exit(running_machine *machine)
 //  (main thread)
 //============================================================
 
-void winwindow_process_events_periodic(void)
+void winwindow_process_events_periodic(running_machine *machine)
 {
 	DWORD currticks = GetTickCount();
 
@@ -318,7 +318,7 @@ void winwindow_process_events_periodic(void)
 	// update once every 1/8th of a second
 	if (currticks - last_event_check < 1000 / 8)
 		return;
-	winwindow_process_events(TRUE);
+	winwindow_process_events(machine, TRUE);
 }
 
 
@@ -345,7 +345,7 @@ static BOOL is_mame_window(HWND hwnd)
 //  (main thread)
 //============================================================
 
-void winwindow_process_events(int ingame)
+void winwindow_process_events(running_machine *machine, int ingame)
 {
 	MSG message;
 
@@ -432,12 +432,12 @@ void winwindow_process_events(int ingame)
 
 			// dispatch if necessary
 			if (dispatch)
-				winwindow_dispatch_message(&message);
+				winwindow_dispatch_message(machine, &message);
 		}
 	} while (ui_temp_pause > 0);
 
 	// update the cursor state after processing events
-	winwindow_update_cursor_state();
+	winwindow_update_cursor_state(machine);
 }
 
 
@@ -447,7 +447,7 @@ void winwindow_process_events(int ingame)
 //  (main thread)
 //============================================================
 
-void winwindow_dispatch_message(MSG *message)
+void winwindow_dispatch_message(running_machine *machine, MSG *message)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -456,12 +456,12 @@ void winwindow_dispatch_message(MSG *message)
 	{
 		// special case for quit
 		case WM_QUIT:
-			mame_schedule_exit(Machine);
+			mame_schedule_exit(machine);
 			break;
 
 		// temporary pause from the window thread
 		case WM_USER_UI_TEMP_PAUSE:
-			winwindow_ui_pause_from_main_thread(message->wParam);
+			winwindow_ui_pause_from_main_thread(machine, message->wParam);
 			break;
 
 		// execute arbitrary function
@@ -535,7 +535,7 @@ BOOL winwindow_has_focus(void)
 //  (main thread)
 //============================================================
 
-void winwindow_update_cursor_state(void)
+void winwindow_update_cursor_state(running_machine *machine)
 {
 	static POINT saved_cursor_pos = { -1, -1 };
 
@@ -547,7 +547,7 @@ void winwindow_update_cursor_state(void)
 	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
-	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!mame_is_paused(Machine) && wininput_should_hide_mouse())))
+	if (winwindow_has_focus() && ((!video_config.windowed && !win_has_menu(win_window_list)) || (!mame_is_paused(machine) && wininput_should_hide_mouse())))
 	{
 		win_window_info *window = win_window_list;
 		RECT bounds;
@@ -588,7 +588,7 @@ void winwindow_update_cursor_state(void)
 //  (main thread)
 //============================================================
 
-void winwindow_video_window_create(int index, win_monitor_info *monitor, const win_window_config *config)
+void winwindow_video_window_create(running_machine *machine, int index, win_monitor_info *monitor, const win_window_config *config)
 {
 	win_window_info *window, *win;
 	char option[20];
@@ -624,7 +624,7 @@ void winwindow_video_window_create(int index, win_monitor_info *monitor, const w
 
 	// set the specific view
 	sprintf(option, "view%d", index);
-	set_starting_view(index, window, options_get_string(mame_options(), option));
+	set_starting_view(machine, index, window, options_get_string(mame_options(), option));
 
 	// remember the current values in case they change
 	window->targetview = render_target_get_view(window->target);
@@ -633,9 +633,9 @@ void winwindow_video_window_create(int index, win_monitor_info *monitor, const w
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->title, APPNAME ": %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+		sprintf(window->title, APPNAME ": %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
 	else
-		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", Machine->gamedrv->description, Machine->gamedrv->name, index);
+		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
 
 	// set the initial maximized state
 	window->startmaximized = options_get_bool(mame_options(), WINOPTION_MAXIMIZE);
@@ -651,7 +651,7 @@ void winwindow_video_window_create(int index, win_monitor_info *monitor, const w
 			Sleep(1);
 	}
 	else
-		window->init_state = complete_create(window) ? -1 : 1;
+		window->init_state = complete_create(machine, window) ? -1 : 1;
 
 	// handle error conditions
 	if (window->init_state == -1)
@@ -840,7 +840,7 @@ static void create_window_class(void)
 //  (main thread)
 //============================================================
 
-static void set_starting_view(int index, win_window_info *window, const char *view)
+static void set_starting_view(running_machine *machine, int index, win_window_info *window, const char *view)
 {
 	const char *defview = options_get_string(mame_options(), WINOPTION_VIEW);
 	int viewindex = -1;
@@ -873,7 +873,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 	// if we don't have a match, default to the nth view
 	if (viewindex == -1)
 	{
-		int scrcount = video_screen_count(Machine->config);
+		int scrcount = video_screen_count(machine->config);
 
 		// if we have enough screens to be one per monitor, assign in order
 		if (video_config.numscreens >= scrcount)
@@ -921,7 +921,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 //  (main thread)
 //============================================================
 
-void winwindow_ui_pause_from_main_thread(int pause)
+void winwindow_ui_pause_from_main_thread(running_machine *machine, int pause)
 {
 	int old_temp_pause = ui_temp_pause;
 
@@ -934,9 +934,9 @@ void winwindow_ui_pause_from_main_thread(int pause)
 		if (ui_temp_pause++ == 0)
 		{
 			// only call mame_pause if we weren't already paused due to some external reason
-			ui_temp_was_paused = mame_is_paused(Machine);
+			ui_temp_was_paused = mame_is_paused(machine);
 			if (!ui_temp_was_paused)
-				mame_pause(Machine, TRUE);
+				mame_pause(machine, TRUE);
 
 			SetEvent(ui_pause_event);
 		}
@@ -950,7 +950,7 @@ void winwindow_ui_pause_from_main_thread(int pause)
 		{
 			// but only do it if we were the ones who initiated it
 			if (!ui_temp_was_paused)
-				mame_pause(Machine, FALSE);
+				mame_pause(machine, FALSE);
 
 			ResetEvent(ui_pause_event);
 		}
@@ -967,7 +967,7 @@ void winwindow_ui_pause_from_main_thread(int pause)
 //  (window thread)
 //============================================================
 
-void winwindow_ui_pause_from_window_thread(int pause)
+void winwindow_ui_pause_from_window_thread(running_machine *machine, int pause)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -984,7 +984,7 @@ void winwindow_ui_pause_from_window_thread(int pause)
 
 	// otherwise, we just do it directly
 	else
-		winwindow_ui_pause_from_main_thread(pause);
+		winwindow_ui_pause_from_main_thread(machine, pause);
 }
 
 
@@ -1016,9 +1016,9 @@ void winwindow_ui_exec_on_main_thread(void (*func)(void *), void *param)
 //  winwindow_ui_is_paused
 //============================================================
 
-int winwindow_ui_is_paused(void)
+int winwindow_ui_is_paused(running_machine *machine)
 {
-	return mame_is_paused(Machine) && ui_temp_was_paused;
+	return mame_is_paused(machine) && ui_temp_was_paused;
 }
 
 
@@ -1145,7 +1145,7 @@ static unsigned __stdcall thread_entry(void *param)
 				case WM_USER_FINISH_CREATE_WINDOW:
 				{
 					win_window_info *window = (win_window_info *)message.lParam;
-					window->init_state = complete_create(window) ? -1 : 1;
+					window->init_state = complete_create(Machine, window) ? -1 : 1;
 					dispatch = FALSE;
 					break;
 				}
@@ -1169,7 +1169,7 @@ static unsigned __stdcall thread_entry(void *param)
 //  (window thread)
 //============================================================
 
-static int complete_create(win_window_info *window)
+static int complete_create(running_machine *machine, win_window_info *window)
 {
 	RECT monitorbounds, client;
 	int tempwidth, tempheight;
@@ -1183,7 +1183,7 @@ static int complete_create(win_window_info *window)
 
 	// create the window menu if needed
 #if HAS_WINDOW_MENU
-	if (win_create_menu(Machine, &menu))
+	if (win_create_menu(machine, &menu))
 		return 1;
 #endif
 
@@ -1295,14 +1295,14 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		case WM_ENTERSIZEMOVE:
 			window->resize_state = RESIZE_STATE_RESIZING;
 		case WM_ENTERMENULOOP:
-			winwindow_ui_pause_from_window_thread(TRUE);
+			winwindow_ui_pause_from_window_thread(Machine, TRUE);
 			break;
 
 		// unpause the system when we stop a menu or resize and force a redraw
 		case WM_EXITSIZEMOVE:
 			window->resize_state = RESIZE_STATE_PENDING;
 		case WM_EXITMENULOOP:
-			winwindow_ui_pause_from_window_thread(FALSE);
+			winwindow_ui_pause_from_window_thread(Machine, FALSE);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 

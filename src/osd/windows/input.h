@@ -16,7 +16,7 @@
 //============================================================
 
 void wininput_init(running_machine *machine);
-void wininput_poll(void);
+void wininput_poll(running_machine *machine);
 
 void wininput_handle_mouse_button(int button, int down, int x, int y);
 BOOL wininput_handle_raw(HANDLE device);
