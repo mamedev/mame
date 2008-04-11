@@ -3376,7 +3376,7 @@ INLINE UINT16 read_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 me
 	entry = lookup_read_entry(space, address);
 	handler = &space->readhandlers[entry];
 	
-	DEBUG_HOOK_READ(spacenum, address & ~1, ~mem_mask);
+	DEBUG_HOOK_READ(spacenum, address & ~1, (UINT16)~mem_mask);
 	
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
@@ -3566,7 +3566,7 @@ INLINE void write_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 dat
 	entry = lookup_write_entry(space, address);
 	handler = &space->writehandlers[entry];
 	
-	DEBUG_HOOK_WRITE(spacenum, address & ~1, data, ~mem_mask);
+	DEBUG_HOOK_WRITE(spacenum, address & ~1, data, (UINT16)~mem_mask);
 	
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
@@ -3758,7 +3758,7 @@ INLINE UINT32 read_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 m
 	entry = lookup_read_entry(space, address);
 	handler = &space->readhandlers[entry];
 	
-	DEBUG_HOOK_READ(spacenum, address & ~3, ~mem_mask);
+	DEBUG_HOOK_READ(spacenum, address & ~3, (UINT32)~mem_mask);
 	
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
@@ -3978,7 +3978,7 @@ INLINE void write_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 da
 	entry = lookup_write_entry(space, address);
 	handler = &space->writehandlers[entry];
 	
-	DEBUG_HOOK_WRITE(spacenum, address & ~3, data, ~mem_mask);
+	DEBUG_HOOK_WRITE(spacenum, address & ~3, data, (UINT32)~mem_mask);
 	
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
