@@ -3280,6 +3280,7 @@ static void docop2( int gteop )
 	static const UINT32 *const p_n_fc[] = { &RFC, &GFC, &BFC };
 	static const UINT32 *const p_n_zc[] = { &n_zc, &n_zc, &n_zc };
 	static const UINT32 *const *const p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
+	INT64 mac0;
 
 	switch( GTE_FUNCT( gteop ) )
 	{
@@ -3725,28 +3726,27 @@ static void docop2( int gteop )
 			return;
 		}
 		break;
+
 	case 0x2d:
-		if( gteop == 0x158002d )
-		{
-			GTELOG( "AVSZ3" );
-			FLAG = 0;
+		GTELOG( "AVSZ3" );
+		FLAG = 0;
 
-			MAC0 = F( ( (INT64)(INT16)ZSF3 * SZ1 ) + ( (INT16)ZSF3 * SZ2 ) + ( (INT16)ZSF3 * SZ3 ) );
-			OTZ = Lm_D( (INT32)MAC0 >> 12 );
-			return;
-		}
-		break;
+		mac0 = F( (INT64)( ZSF3 * SZ1 ) + ( ZSF3 * SZ2 ) + ( ZSF3 * SZ3 ) );
+		OTZ = Lm_D( mac0 >> 12 );
+
+		MAC0 = mac0;
+		return;
+
 	case 0x2e:
-		if( gteop == 0x168002e )
-		{
-			GTELOG( "AVSZ4" );
-			FLAG = 0;
+		GTELOG( "AVSZ4" );
+		FLAG = 0;
 
-			MAC0 = F( ( (INT64)(INT16)ZSF4 * SZ0 ) + ( (INT16)ZSF4 * SZ1 ) + ( (INT16)ZSF4 * SZ2 ) + ( (INT16)ZSF4 * SZ3 ) );
-			OTZ = Lm_D( (INT32)MAC0 >> 12 );
-			return;
-		}
-		break;
+		mac0 = F( (INT64)( ZSF4 * SZ0 ) + ( ZSF4 * SZ1 ) + ( ZSF4 * SZ2 ) + ( ZSF4 * SZ3 ) );
+		OTZ = Lm_D( mac0 >> 12 );
+
+		MAC0 = mac0;
+		return;
+
 	case 0x30:
 		if( gteop == 0x0280030 )
 		{
