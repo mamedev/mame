@@ -395,13 +395,6 @@ static void decode_sprite32(running_machine *machine, int region)
 	free(dst);
 }
 
-static void mark_all_tiles_dirty(void)
-{
-	tilemap_mark_all_tiles_dirty(tx_tilemap);
-	tilemap_mark_all_tiles_dirty(bg1_tilemap);
-	tilemap_mark_all_tiles_dirty(bg2_tilemap);
-}
-
 VIDEO_START( tceptor )
 {
 	int gfx_index;
@@ -445,8 +438,6 @@ VIDEO_START( tceptor )
 	state_save_register_global(bg1_scroll_y);
 	state_save_register_global(bg2_scroll_x);
 	state_save_register_global(bg2_scroll_y);
-
-	state_save_register_func_postload(mark_all_tiles_dirty);
 }
 
 

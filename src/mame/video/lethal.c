@@ -49,7 +49,7 @@ VIDEO_START(lethalen)
 {
 	int i;
 
-	K053251_vh_start();
+	K053251_vh_start(machine);
 
 	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_8LE, 1, NULL, lethalen_tile_callback, 0);
 

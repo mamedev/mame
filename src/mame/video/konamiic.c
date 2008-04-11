@@ -1969,7 +1969,7 @@ static TILE_GET_INFO( K052109_get_tile_info1 ) { K052109_get_tile_info(machine,t
 static TILE_GET_INFO( K052109_get_tile_info2 ) { K052109_get_tile_info(machine,tileinfo,tile_index,2,K052109_colorram_B,K052109_videoram_B,K052109_videoram2_B); }
 
 
-static void K052109_tileflip_reset(void)
+static STATE_POSTLOAD( K052109_tileflip_reset )
 {
 	int data = K052109_ram[0x1e80];
 	tilemap_set_flip(K052109_tilemap[0],(data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2079,7 +2079,7 @@ void K052109_vh_start(running_machine *machine,int gfx_memory_region,int plane_o
 	state_save_register_global_array(K052109_dy);
 	state_save_register_global(has_extra_video_ram);
 
-	state_save_register_func_postload(K052109_tileflip_reset);
+	state_save_register_postload(machine, K052109_tileflip_reset, NULL);
 }
 
 READ8_HANDLER( K052109_r )
@@ -5077,7 +5077,7 @@ static int K053251_palette_index[5];
 static tilemap *K053251_tilemaps[5];
 static int K053251_tilemaps_set;
 
-static void K053251_reset_indexes(void)
+static STATE_POSTLOAD( K053251_reset_indexes )
 {
 	K053251_palette_index[0] = 32 * ((K053251_ram[9] >> 0) & 0x03);
 	K053251_palette_index[1] = 32 * ((K053251_ram[9] >> 2) & 0x03);
@@ -5086,12 +5086,12 @@ static void K053251_reset_indexes(void)
 	K053251_palette_index[4] = 16 * ((K053251_ram[10] >> 3) & 0x07);
 }
 
-void K053251_vh_start(void)
+void K053251_vh_start(running_machine *machine)
 {
 	K053251_set_tilemaps(NULL,NULL,NULL,NULL,NULL);
 
 	state_save_register_global_array(K053251_ram);
-	state_save_register_func_postload(K053251_reset_indexes);
+	state_save_register_postload(machine, K053251_reset_indexes, NULL);
 }
 
 void K053251_set_tilemaps(tilemap *ci0,tilemap *ci1,tilemap *ci2,tilemap *ci3,tilemap *ci4)
@@ -5615,6 +5615,13 @@ void K056832_set_tile_bank(int bank)
 	K056832_change_rombank();
 }
 
+static STATE_POSTLOAD( K056832_postload )
+{
+	K056832_UpdatePageLayout();
+	K056832_change_rambank();
+	K056832_change_rombank();
+}
+
 void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, int big,
 	int (*scrolld)[4][2],
 	void (*callback)(int layer, int *code, int *color, int *flags),
@@ -5825,9 +5832,7 @@ void K056832_vh_start(running_machine *machine, int gfx_memory_region, int bpp, 
 	state_save_register_global_array(K056832_dy);
 	state_save_register_global_array(K056832_LayerTileMode);
 
-	state_save_register_func_postload(K056832_UpdatePageLayout);
-	state_save_register_func_postload(K056832_change_rambank);
-	state_save_register_func_postload(K056832_change_rombank);
+	state_save_register_postload(machine, K056832_postload, NULL);
 }
 
 /* call if a game uses external linescroll */

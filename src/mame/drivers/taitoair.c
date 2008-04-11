@@ -355,13 +355,17 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	reset_sound_region();
 }
 
+static STATE_POSTLOAD( taitoair_postload )
+{
+	reset_sound_region();
+}
 
 static MACHINE_START( taitoair )
 {
 	dsp_HOLD_signal = ASSERT_LINE;
 
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, taitoair_postload, NULL);
 }
 
 

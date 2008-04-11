@@ -927,15 +927,18 @@ ROM_START( darius2 )
 	ROM_LOAD( "c07-12.107", 0x00000, 0x80000, CRC(e0b71258) SHA1(0258e308b643d723475824752ebffc4ea29d1ac4) )
 ROM_END
 
+static STATE_POSTLOAD( ninjaw_postload )
+{
+	parse_control();
+	reset_sound_region();
+}
 
 static MACHINE_START( ninjaw )
 {
 	cpua_ctrl = 0xff;
 	state_save_register_global(cpua_ctrl);
-	state_save_register_func_postload(parse_control);
-
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, ninjaw_postload, NULL);
 }
 
 static MACHINE_RESET( ninjaw )

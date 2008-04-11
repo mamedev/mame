@@ -18,6 +18,7 @@ CHANNEL_DEBUG enables the following keys:
 *********************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "k054539.h"
 #include <math.h>
@@ -592,7 +593,7 @@ static void K054539_w(int chip, offs_t offset, UINT8 data) //*
 	regbase[offset] = data;
 }
 
-static void reset_zones(void *param)
+static STATE_POSTLOAD( reset_zones )
 {
 	struct k054539_info *info = param;
 	int data = info->regs[0x22e];
@@ -662,7 +663,7 @@ static void *k054539_start(int sndindex, int clock, const void *config)
 
 	K054539_init_chip(info, clock, sndindex);
 
-	state_save_register_func_postload_ptr(reset_zones, info);
+	state_save_register_postload(Machine, reset_zones, info);
 	return info;
 }
 

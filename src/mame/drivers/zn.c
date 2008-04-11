@@ -382,11 +382,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
-static void zn_driver_init( void )
+static void zn_driver_init( running_machine *machine )
 {
 	int n_game;
 
-	psx_driver_init();
+	psx_driver_init(machine);
 
 	n_game = 0;
 	while( zn_config_table[ n_game ].s_name != NULL )
@@ -635,7 +635,7 @@ static DRIVER_INIT( coh1000c )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fbfffff, 0, 0, SMH_BANK3 );     /* country rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb60000, 0x1fb60003, 0, 0, zn_qsound_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 
 	if( strcmp( machine->gamedrv->name, "glpracr" ) == 0 ||
 		strcmp( machine->gamedrv->name, "glprac2l" ) == 0 )
@@ -867,7 +867,7 @@ static DRIVER_INIT( coh3002c )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fbfffff, 0, 0, SMH_BANK3 );     /* country rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb60000, 0x1fb60003, 0, 0, zn_qsound_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh3002c )
@@ -1215,7 +1215,7 @@ static DRIVER_INIT( coh1000ta )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, SMH_BANK2 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, SMH_BANK2 );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 	mb3773_init();
 }
 
@@ -1335,7 +1335,7 @@ static DRIVER_INIT( coh1000tb )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size2 - 1 ), 0, 0, SMH_BANK3 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fbe0000, 0x1fbe0000 + ( taitofx1_eeprom_size2 - 1 ), 0, 0, SMH_BANK3 );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 	mb3773_init();
 }
 
@@ -1526,7 +1526,7 @@ static DRIVER_INIT( coh3002t )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb40000, 0x1fb40003, 0, 0, coh3002t_unknown_w );
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb40000, 0x1fb40003, 0, 0, coh3002t_unknown_r );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh3002t )
@@ -1711,7 +1711,7 @@ static DRIVER_INIT( coh1000w )
 	// init hard disk
 	ide_controller_init(0, &atpsx_intf);
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1000w )
@@ -1899,7 +1899,7 @@ static DRIVER_INIT( coh1002e )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fa10300, 0x1fa10303, 0, 0, coh1002e_bank_w );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00007, 0, 0, coh1002e_latch_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1002e )
@@ -2243,7 +2243,7 @@ static DRIVER_INIT( coh1000a )
 		ide_controller_init( 0, &jdredd_ide_intf );
 	}
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1000a )
@@ -2390,7 +2390,7 @@ static DRIVER_INIT( coh1001l )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f7fffff, 0, 0, SMH_BANK1 ); /* banked rom */
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, coh1001l_bnk_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1001l )
@@ -2436,7 +2436,7 @@ static DRIVER_INIT( coh1002v )
 	memory_install_read32_handler ( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fbfffff, 0, 0, SMH_BANK2 );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, coh1002v_bnk_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1002v )
@@ -2661,7 +2661,7 @@ static DRIVER_INIT( coh1002m )
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, cbaj_z80_w );
 	memory_install_write32_handler( 0, ADDRESS_SPACE_PROGRAM, 0x1fb00004, 0x1fb00007, 0, 0, coh1002m_bank_w );
 
-	zn_driver_init();
+	zn_driver_init(machine);
 }
 
 static MACHINE_RESET( coh1002m )

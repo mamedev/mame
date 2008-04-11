@@ -1601,8 +1601,7 @@ UpdateRoad(running_machine *machine)
 	}
 }
 
-static void
-RoadMarkAllDirty(void)
+static STATE_POSTLOAD( RoadMarkAllDirty )
 {
 	memset( mpRoadDirty,0x01,ROAD_TILE_COUNT_MAX );
 	mbRoadSomethingIsDirty = 1;
@@ -1632,7 +1631,7 @@ namco_road_init(running_machine *machine, int gfxbank )
 
 					state_save_register_global_pointer(mpRoadDirty, ROAD_TILE_COUNT_MAX);
 					state_save_register_global_pointer(mpRoadRAM,   0x20000 / 2);
-					state_save_register_func_postload(RoadMarkAllDirty);
+					state_save_register_postload(machine, RoadMarkAllDirty, NULL);
 
 		}
 	}

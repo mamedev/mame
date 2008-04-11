@@ -44,7 +44,7 @@ static void sprite_callback(int *code,int *color,int *priority_mask)
 
 VIDEO_START( parodius )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
 	K053245_vh_start(machine,0,REGION_GFX2,NORMAL_PLANE_ORDER,sprite_callback);
 }

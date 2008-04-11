@@ -172,7 +172,7 @@ static UINT8 sound_reset_state;
  *
  *************************************/
 
-static void bankselect_postload(void);
+static STATE_POSTLOAD( bankselect_postload );
 
 
 
@@ -252,7 +252,7 @@ static MACHINE_START( atarisy2 )
 	state_save_register_global(which_adc);
 	state_save_register_global(p2portwr_state);
 	state_save_register_global(p2portrd_state);
-	state_save_register_func_postload(bankselect_postload);
+	state_save_register_postload(machine, bankselect_postload, NULL);
 	state_save_register_global(sound_reset_state);
 }
 
@@ -359,7 +359,7 @@ static WRITE16_HANDLER( bankselect_w )
 }
 
 
-static void bankselect_postload(void)
+static STATE_POSTLOAD( bankselect_postload )
 {
 	bankselect_w(Machine, 0, bankselect[0], 0);
 	bankselect_w(Machine, 1, bankselect[1], 0);

@@ -239,14 +239,14 @@ VIDEO_START( tmnt )
 
 VIDEO_START( punkshot )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,punkshot_sprite_callback);
 }
 
 VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
@@ -262,21 +262,21 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 
 VIDEO_START( sunsetbl )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,ssbl_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 }
 
 VIDEO_START( blswhstl )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,blswhstl_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,blswhstl_sprite_callback);
 }
 
 VIDEO_START( glfgreat )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,lgtnfght_sprite_callback);
 
@@ -290,14 +290,14 @@ VIDEO_START( glfgreat )
 
 VIDEO_START( thndrx2 )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K051960_vh_start(machine,REGION_GFX2,NORMAL_PLANE_ORDER,thndrx2_sprite_callback);
 }
 
 VIDEO_START( prmrsocr )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tmnt_tile_callback);
 	K053245_vh_start(machine,0, REGION_GFX2,NORMAL_PLANE_ORDER,prmrsocr_sprite_callback);
 

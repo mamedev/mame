@@ -460,10 +460,15 @@ static INTERRUPT_GEN( xmen_interrupt )
 	else irq3_line_hold(machine, cpunum);
 }
 
+static STATE_POSTLOAD( xmen_postload )
+{
+	sound_reset_bank();
+}
+
 static MACHINE_START( xmen )
 {
 	state_save_register_global(sound_curbank);
-	state_save_register_func_postload(sound_reset_bank);
+	state_save_register_postload(machine, xmen_postload, NULL);
 }
 
 static MACHINE_DRIVER_START( xmen )

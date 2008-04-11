@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/fm.h"
 #include "sound/2612intf.h"
@@ -79,7 +80,7 @@ static void ym2612_stream_update(void *param, stream_sample_t **inputs, stream_s
 }
 
 
-static void ym2612_postload(void *param)
+static STATE_POSTLOAD( ym2612_postload )
 {
 	struct ym2612_info *info = param;
 	YM2612Postload(info->chip);
@@ -108,7 +109,7 @@ static void *ym2612_start(int sndindex, int clock, const void *config)
 	/**** initialize YM2612 ****/
 	info->chip = YM2612Init(info,sndindex,clock,rate,timer_handler,IRQHandler);
 
-	state_save_register_func_postload_ptr(ym2612_postload, info);
+	state_save_register_postload(Machine, ym2612_postload, info);
 
 	if (info->chip)
 		return info;

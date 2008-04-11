@@ -33,13 +33,13 @@ static VIDEO_START( ninjaw_core )
 	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,taito_hide_pixels,0,0,0,0,0,2);
 
 	if (has_TC0110PCR())
-		TC0110PCR_vh_start();
+		TC0110PCR_vh_start(machine);
 
 	if (has_second_TC0110PCR())
-		TC0110PCR_1_vh_start();
+		TC0110PCR_1_vh_start(machine);
 
 	if (has_third_TC0110PCR())
-		TC0110PCR_2_vh_start();
+		TC0110PCR_2_vh_start(machine);
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	TC0100SCN_set_chip_colbanks(0x0,0x100,0x200);

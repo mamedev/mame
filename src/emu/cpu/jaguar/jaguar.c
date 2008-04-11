@@ -415,14 +415,19 @@ static void init_tables(void)
 			}
 }
 
+static STATE_POSTLOAD( jaguar_postload )
+{
+	update_register_banks();
+	check_irqs();
+}
+
 static void jaguar_state_register(int index, const char *type)
 {
 	state_save_register_item_array(type, index, jaguar.r);
 	state_save_register_item_array(type, index, jaguar.a);
 	state_save_register_item_array(type, index, jaguar.ctrl);
 	state_save_register_item(type, index, jaguar.ppc);
-	state_save_register_func_postload(update_register_banks);
-	state_save_register_func_postload(check_irqs);
+	state_save_register_postload(Machine, jaguar_postload, NULL);
 }
 
 static void jaguargpu_init(int index, int clock, const void *_config, int (*irqcallback)(int))

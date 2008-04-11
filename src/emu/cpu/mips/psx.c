@@ -1560,6 +1560,13 @@ INLINE int mips_store_data_address_breakpoint( UINT32 address )
 	return mips_data_address_breakpoint( DCIC_DW | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_W, address );
 }
 
+static STATE_POSTLOAD( mips_postload )
+{
+	mips_update_memory_handlers();
+	mips_update_address_masks();
+	mips_update_scratchpad();
+}
+
 static void mips_state_register( const char *type, int index )
 {
 	state_save_register_item( type, index, mipscpu.op );
@@ -1579,9 +1586,7 @@ static void mips_state_register( const char *type, int index )
 	state_save_register_item( type, index, mipscpu.multiplier_operation );
 	state_save_register_item( type, index, mipscpu.multiplier_operand1 );
 	state_save_register_item( type, index, mipscpu.multiplier_operand2 );
-	state_save_register_func_postload( mips_update_memory_handlers );
-	state_save_register_func_postload( mips_update_address_masks );
-	state_save_register_func_postload( mips_update_scratchpad );
+	state_save_register_postload( Machine, mips_postload, NULL );
 }
 
 static void mips_init( int index, int clock, const void *config, int (*irqcallback)(int) )

@@ -241,7 +241,7 @@ enum { K053251_CI0=0,K053251_CI1,K053251_CI2,K053251_CI3,K053251_CI4 };
 int K053251_get_priority(int ci);
 int K053251_get_palette_index(int ci);
 void K053251_set_tilemaps(tilemap *ci0,tilemap *ci1,tilemap *ci2,tilemap *ci3,tilemap *ci4);
-void K053251_vh_start(void);
+void K053251_vh_start(running_machine *machine);
 
 
 WRITE8_HANDLER( K054000_w );

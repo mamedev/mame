@@ -502,7 +502,7 @@ INLINE void update_bank(int bank)
 }
 
 
-static void slapstic_postload(void)
+static STATE_POSTLOAD( slapstic_postload )
 {
 	update_bank(slapstic_bank());
 }
@@ -1639,7 +1639,7 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
     SAVE STATE
 ***************************************************************************/
 
-void atarigen_init_save_state(void)
+void atarigen_init_save_state(running_machine *machine)
 {
 	state_save_register_global(atarigen_scanline_int_state);
 	state_save_register_global(atarigen_sound_int_state);
@@ -1683,5 +1683,5 @@ void atarigen_init_save_state(void)
 	state_save_register_global(playfield2_latch);
 
 	/* need a postload to reset the state */
-	state_save_register_func_postload(slapstic_postload);
+	state_save_register_postload(machine, slapstic_postload, NULL);
 }

@@ -100,6 +100,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "upd7759.h"
 
@@ -579,7 +580,7 @@ static void upd7759_reset(struct upd7759_chip *chip)
 }
 
 
-static void upd7759_postload(void *param)
+static STATE_POSTLOAD( upd7759_postload )
 {
 	struct upd7759_chip *chip = (struct upd7759_chip *)param;
 	chip->rom = chip->rombase + chip->romoffset;
@@ -615,7 +616,7 @@ static void register_for_save(struct upd7759_chip *chip, int index)
 	state_save_register_item("upd7759", index, chip->sample);
 
 	state_save_register_item("upd7759", index, chip->romoffset);
-	state_save_register_func_postload_ptr(upd7759_postload, chip);
+	state_save_register_postload(Machine, upd7759_postload, chip);
 }
 
 

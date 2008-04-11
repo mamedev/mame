@@ -566,10 +566,15 @@ static GFXDECODE_START( dleague )
 GFXDECODE_END
 
 
+static STATE_POSTLOAD( taitoh_postload )
+{
+	reset_sound_region();
+}
+
 static MACHINE_START( taitoh )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, taitoh_postload, NULL);
 }
 
 

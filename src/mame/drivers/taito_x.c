@@ -995,11 +995,15 @@ static const struct YM2151interface ym2151_interface =
 	irqhandler
 };
 
+static STATE_POSTLOAD( taitox_postload )
+{
+	reset_sound_region();
+}
 
 static MACHINE_START( taitox )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, taitox_postload, NULL);
 }
 
 /**************************************************************************/

@@ -141,8 +141,8 @@ VIDEO_UPDATE( neogeo );
 READ16_HANDLER( neogeo_video_register_r );
 WRITE16_HANDLER( neogeo_video_register_w );
 
-void neogeo_set_palette_bank(UINT8 data);
-void neogeo_set_screen_dark(UINT8 data);
+void neogeo_set_palette_bank(running_machine *machine, UINT8 data);
+void neogeo_set_screen_dark(running_machine *machine, UINT8 data);
 READ16_HANDLER( neogeo_paletteram_r );
 WRITE16_HANDLER( neogeo_paletteram_w );
 

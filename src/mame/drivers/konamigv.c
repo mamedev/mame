@@ -313,7 +313,7 @@ static void konamigv_exit(running_machine *machine)
 
 static DRIVER_INIT( konamigv )
 {
-	psx_driver_init();
+	psx_driver_init(machine);
 
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(&scsi_intf);

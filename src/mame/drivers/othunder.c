@@ -441,10 +441,15 @@ static void reset_sound_region(void)
 	memory_set_bankptr( 10, memory_region(REGION_CPU2) + (banknum * 0x4000) + 0x10000 );
 }
 
+static STATE_POSTLOAD( othunder_postload )
+{
+	reset_sound_region();
+}
+
 static MACHINE_START( othunder )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, othunder_postload, NULL);
 }
 
 

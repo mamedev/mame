@@ -316,7 +316,7 @@ static void h8_setreg32(UINT8 reg, UINT32 data)
 	h8.regs[reg] = data;
 }
 
-static void h8_onstateload(void)
+static STATE_POSTLOAD( h8_onstateload )
 {
 	h8_set_ccr(h8.ccr);
 }
@@ -344,7 +344,7 @@ static void h8_init(int index, int clock, const void *config, int (*irqcallback)
 	state_save_register_item("H8/3002", index, h8.h8TCNT3);
 	state_save_register_item("H8/3002", index, h8.h8TCNT4);
 
-	state_save_register_func_postload(h8_onstateload);
+	state_save_register_postload(Machine, h8_onstateload, NULL);
 
 	h8_itu_init();
 }

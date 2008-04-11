@@ -850,6 +850,11 @@ static GFXDECODE_START( dadandrn )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, bglayout_8bpp, 0x0000, 8 )
 GFXDECODE_END
 
+static STATE_POSTLOAD( mystwarr_postload )
+{
+	reset_sound_region();
+}
+
 static MACHINE_START( mystwarr )
 {
 	/* set default bankswitch */
@@ -860,7 +865,7 @@ static MACHINE_START( mystwarr )
 
 	state_save_register_global(mw_irq_control);
 	state_save_register_global(cur_sound_region);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, mystwarr_postload, NULL);
 }
 
 static MACHINE_RESET(mystwarr)

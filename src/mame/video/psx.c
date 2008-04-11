@@ -547,7 +547,7 @@ static int DebugTextureDisplay( bitmap_t *bitmap )
 
 #endif
 
-static void updatevisiblearea( void )
+static STATE_POSTLOAD( updatevisiblearea )
 {
 	rectangle visarea;
 	float refresh;
@@ -617,7 +617,7 @@ static void updatevisiblearea( void )
 	video_screen_configure(Machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
-static void psx_gpu_init( void )
+static void psx_gpu_init( running_machine *machine )
 {
 	int n_line;
 	int n_level;
@@ -772,19 +772,19 @@ static void psx_gpu_init( void )
 	state_save_register_global( psxgpu.n_iy );
 	state_save_register_global( psxgpu.n_ti );
 
-	state_save_register_func_postload( updatevisiblearea );
+	state_save_register_postload( machine, updatevisiblearea, NULL );
 }
 
 VIDEO_START( psx_type1 )
 {
 	m_n_gputype = 1;
-	psx_gpu_init();
+	psx_gpu_init(machine);
 }
 
 VIDEO_START( psx_type2 )
 {
 	m_n_gputype = 2;
-	psx_gpu_init();
+	psx_gpu_init(machine);
 }
 
 VIDEO_UPDATE( psx )
@@ -3694,7 +3694,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			m_n_twy = 0;
 			m_n_twh = 255;
 			m_n_tww = 255;
-			updatevisiblearea();
+			updatevisiblearea(machine, NULL);
 			break;
 		case 0x01:
 			verboselog( 1, "not handled: reset command buffer\n" );
@@ -3748,7 +3748,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			{
 				m_b_reverseflag = ( data >> 7 ) & 1;
 			}
-			updatevisiblearea();
+			updatevisiblearea(machine, NULL);
 			break;
 		case 0x09:
 			verboselog( 1, "not handled: GPU Control 0x09: %08x\n", data );

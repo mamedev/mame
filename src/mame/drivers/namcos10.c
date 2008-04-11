@@ -304,12 +304,12 @@ static void memcpy32le( UINT32 *dst, UINT8 *src, int len )
 	}
 }
 
-static void memm_driver_init( void )
+static void memm_driver_init( running_machine *machine )
 {
-	psx_driver_init();
+	psx_driver_init(machine);
 }
 
-static void memn_driver_init( void )
+static void memn_driver_init( running_machine *machine )
 {
 	UINT8 *BIOS = (UINT8 *)memory_region( REGION_USER1 );
 	UINT8 *ROM = (UINT8 *)memory_region( REGION_USER2 );
@@ -317,7 +317,7 @@ static void memn_driver_init( void )
 	memcpy32le( (UINT32 *)( BIOS + 0x0000000 ), ROM + 0x08000, 0x001c000 );
 	memcpy32le( (UINT32 *)( BIOS + 0x0020000 ), ROM + 0x24000, 0x03dffff );
 
-	psx_driver_init();
+	psx_driver_init(machine);
 }
 
 static void decrypt_bios( int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
@@ -336,37 +336,37 @@ static void decrypt_bios( int b15, int b14, int b13, int b12, int b11, int b10, 
 
 static DRIVER_INIT( mrdrilr2 )
 {
-	memm_driver_init();
+	memm_driver_init(machine);
 	decrypt_bios( 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3 );
 }
 
 static DRIVER_INIT( gjspace )
 {
-	memn_driver_init();
+	memn_driver_init(machine);
 	decrypt_bios( 0x0, 0x2, 0xe, 0xd, 0xf, 0x6, 0xc, 0x7, 0x5, 0x1, 0x9, 0x8, 0xa, 0x3, 0x4, 0xb );
 }
 
 static DRIVER_INIT( mrdrilrg )
 {
-	memn_driver_init();
+	memn_driver_init(machine);
 	decrypt_bios( 0x6, 0x4, 0x7, 0x5, 0x2, 0x1, 0x0, 0x3, 0xc, 0xd, 0xe, 0xf, 0x8, 0x9, 0xb, 0xa );
 }
 
 static DRIVER_INIT( knpuzzle )
 {
-	memn_driver_init();
+	memn_driver_init(machine);
 	decrypt_bios( 0x6, 0x7, 0x4, 0x5, 0x2, 0x0, 0x3, 0x1, 0xc, 0xd, 0xe, 0xf, 0x9, 0xb, 0x8, 0xa );
 }
 
 static DRIVER_INIT( startrgn )
 {
-	memn_driver_init();
+	memn_driver_init(machine);
 	decrypt_bios( 0x6, 0x5, 0x4, 0x7, 0x1, 0x3, 0x0, 0x2, 0xc, 0xd, 0xe, 0xf, 0x8, 0xb, 0xa, 0x9 );
 }
 
 static DRIVER_INIT( gamshara )
 {
-	memn_driver_init();
+	memn_driver_init(machine);
 	decrypt_bios( 0x5, 0x4, 0x7, 0x6, 0x0, 0x1, 0x3, 0x2, 0xd, 0xf, 0xc, 0xe, 0x8, 0x9, 0xa, 0xb );
 }
 

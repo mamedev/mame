@@ -31,9 +31,9 @@ MACHINE_RESET( demonwld );
 MACHINE_RESET( vimana );
 MACHINE_RESET( zerozone );	/* hack for ZeroWing/OutZone. See video */
 
-extern void toaplan1_driver_savestate(void);
-extern void demonwld_driver_savestate(void);
-extern void vimana_driver_savestate(void);
+extern void toaplan1_driver_savestate(running_machine *machine);
+extern void demonwld_driver_savestate(running_machine *machine);
+extern void vimana_driver_savestate(running_machine *machine);
 
 
 extern int toaplan1_unk_reset_port;

@@ -447,7 +447,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 }
 
 
-static void profbank_banksw_restore(void)
+static STATE_POSTLOAD( profbank_banksw_restore )
 {
 	profpac_banksw_w(Machine, 0, profpac_bank);
 }
@@ -1727,7 +1727,7 @@ static DRIVER_INIT( profpac )
 
 	/* reset banking */
 	profpac_banksw_w(machine, 0, 0);
-	state_save_register_func_postload(profbank_banksw_restore);
+	state_save_register_postload(machine, profbank_banksw_restore, NULL);
 }
 
 
@@ -1741,7 +1741,7 @@ static DRIVER_INIT( demndrgn )
 
 	/* reset banking */
 	profpac_banksw_w(machine, 0, 0);
-	state_save_register_func_postload(profbank_banksw_restore);
+	state_save_register_postload(machine, profbank_banksw_restore, NULL);
 }
 
 
@@ -1760,7 +1760,7 @@ static DRIVER_INIT( tenpindx )
 
 	/* reset banking */
 	profpac_banksw_w(machine, 0, 0);
-	state_save_register_func_postload(profbank_banksw_restore);
+	state_save_register_postload(machine, profbank_banksw_restore, NULL);
 }
 
 

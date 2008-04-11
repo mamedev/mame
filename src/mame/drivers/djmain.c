@@ -1183,6 +1183,11 @@ static const struct K054539interface k054539_interface =
  *
  *************************************/
 
+static STATE_POSTLOAD( djmain_postload )
+{
+	sndram_set_bank();
+}
+
 static MACHINE_START( djmain )
 {
 	UINT8 *region = memory_region(REGION_SOUND1);
@@ -1193,7 +1198,7 @@ static MACHINE_START( djmain )
 	state_save_register_global(v_ctrl);
 	state_save_register_global_array(obj_regs);
 
-	state_save_register_func_postload(sndram_set_bank);
+	state_save_register_postload(machine, djmain_postload, NULL);
 }
 
 

@@ -1424,10 +1424,15 @@ static WRITE16_HANDLER( spacegun_pancontrol )
                    SAVE STATES
 ***********************************************************/
 
+static STATE_POSTLOAD( taitoz_postload )
+{
+	parse_control();
+	reset_sound_region();
+}
+
 static MACHINE_START( taitoz )
 {
 	state_save_register_global(cpua_ctrl);
-	state_save_register_func_postload(parse_control);
 
 	/* these are specific to various games: we ought to split the inits */
 	state_save_register_global(sci_int6);
@@ -1435,7 +1440,7 @@ static MACHINE_START( taitoz )
 	state_save_register_global(ioc220_port);
 
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, taitoz_postload, NULL);
 }
 
 
@@ -4333,10 +4338,15 @@ static DRIVER_INIT( taitoz )
 	cpua_ctrl = 0xff;
 }
 
+static STATE_POSTLOAD( bshark_postload )
+{
+	parse_control_noz80();
+}
+
 static DRIVER_INIT( bshark )
 {
 	cpua_ctrl = 0xff;
-	state_save_register_func_postload(parse_control_noz80);
+	state_save_register_postload(machine, bshark_postload, NULL);
 
 	state_save_register_global(eep_latch);
 }

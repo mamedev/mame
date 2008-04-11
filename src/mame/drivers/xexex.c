@@ -608,12 +608,17 @@ static MACHINE_RESET( xexex )
 	K054539_init_flags(0, K054539_REVERSE_STEREO);
 }
 
+static STATE_POSTLOAD( xexex_postload )
+{
+	parse_control2();
+	reset_sound_region();
+}
+
 static MACHINE_START( xexex )
 {
 	state_save_register_global(cur_control2);
-	state_save_register_func_postload(parse_control2);
 	state_save_register_global(cur_sound_region);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, xexex_postload, NULL);
 
 	resume_trigger = 1000;
 

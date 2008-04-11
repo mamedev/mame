@@ -24,7 +24,7 @@ static void taitoz_core_vh_start(running_machine *machine, int x_offs)
 		TC0150ROD_vh_start();
 
 	if (has_TC0110PCR())
-		TC0110PCR_vh_start();
+		TC0110PCR_vh_start(machine);
 }
 
 VIDEO_START( taitoz )

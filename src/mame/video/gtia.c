@@ -29,8 +29,8 @@ gtia_struct gtia;
 #define VERBOSE			0
 
 static void gtia_reset(running_machine *machine);
-static void gtia_state(void);
-static void gtia_state_postload(void);
+static void gtia_state(running_machine *machine);
+static STATE_POSTLOAD( gtia_state_postload );
 
 /**********************************************
  * split a color into hue and luminance values
@@ -64,7 +64,7 @@ static void gtia_state_postload(void);
  *
  *************************************/
 
-void gtia_init(const gtia_interface *intf)
+void gtia_init(running_machine *machine, const gtia_interface *intf)
 {
 	memset(&gtia, 0, sizeof(gtia));
 	gtia.intf = *intf;
@@ -72,12 +72,12 @@ void gtia_init(const gtia_interface *intf)
 	add_reset_callback(Machine, gtia_reset);
 
 	/* state saves */
-	gtia_state();
+	gtia_state(machine);
 }
 
 
 
-static void gtia_state(void)
+static void gtia_state(running_machine *machine)
 {
 	state_save_register_global(gtia.r.m0pf);
 	state_save_register_global(gtia.r.m1pf);
@@ -140,7 +140,7 @@ static void gtia_state(void)
 	state_save_register_global(gtia.w.gractl);
 	state_save_register_global(gtia.w.hitclr);
 	state_save_register_global(gtia.w.cons);
-	state_save_register_func_postload(gtia_state_postload);
+	state_save_register_postload(machine, gtia_state_postload, NULL);
 }
 
 
@@ -758,7 +758,7 @@ WRITE8_HANDLER( atari_gtia_w )
 
 
 
-static void gtia_state_postload(void)
+static STATE_POSTLOAD( gtia_state_postload )
 {
 	recalc_p0();
 	recalc_p1();

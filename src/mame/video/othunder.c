@@ -29,7 +29,7 @@ VIDEO_START( othunder )
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,4,0,0,0,0,0,0);
 
 	if (has_TC0110PCR())
-		TC0110PCR_vh_start();
+		TC0110PCR_vh_start(machine);
 }
 
 

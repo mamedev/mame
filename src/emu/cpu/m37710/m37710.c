@@ -1041,7 +1041,7 @@ static offs_t m37710_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
 }
 #endif /* ENABLE_DEBUGGER */
 
-static void m37710_restore_state(void)
+static STATE_POSTLOAD( m37710_restore_state )
 {
 	// restore proper function pointers
 	m37710i_set_execution_mode((FLAG_M>>4) | (FLAG_X>>4));
@@ -1112,7 +1112,7 @@ static void m37710_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].seconds);
 	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].attoseconds);
 
-	state_save_register_func_postload(m37710_restore_state);
+	state_save_register_postload(Machine, m37710_restore_state, NULL);
 }
 
 /**************************************************************************

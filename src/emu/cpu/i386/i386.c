@@ -489,7 +489,7 @@ static void i386_debug_setup(void)
 
 /*************************************************************************/
 
-static void i386_postload(void)
+static STATE_POSTLOAD( i386_postload )
 {
 	int i;
 	for (i = 0; i < 6; i++)
@@ -581,7 +581,7 @@ static void i386_init(int index, int clock, const void *config, int (*irqcallbac
 	state_save_register_item(state_type, index, I.ldtr.flags);
 	state_save_register_item(state_type, index,  I.irq_state);
 	state_save_register_item(state_type, index, I.performed_intersegment_jump);
-	state_save_register_func_postload(i386_postload);
+	state_save_register_postload(Machine, i386_postload, NULL);
 }
 
 static void build_opcode_table(UINT32 features)

@@ -800,7 +800,7 @@ static DRIVER_INIT( namcos11 )
 	timer = timer_alloc( mcu_timer , NULL);
 	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 600 ), 0, ATTOTIME_IN_HZ( 600 ) );
 
-	psx_driver_init();
+	psx_driver_init(machine);
 	namcoc7x_on_driver_init();
 	namcoc7x_set_host_ram(namcos11_sharedram);
 

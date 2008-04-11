@@ -19,8 +19,21 @@
 
 
 /***************************************************************************
+    TYPE DEFINTIONS
+***************************************************************************/
+
+typedef void (*state_presave_func)(running_machine *machine, void *param);
+typedef void (*state_postload_func)(running_machine *machine, void *param);
+
+
+
+/***************************************************************************
     MACROS
 ***************************************************************************/
+
+#define STATE_PRESAVE(name) void name(running_machine *machine, void *param)
+#define STATE_POSTLOAD(name) void name(running_machine *machine, void *param)
+
 
 #define IS_COMPATIBLE_TYPE(_valtype, _checktype)										\
 	(sizeof(_valtype) == sizeof(_checktype) && TYPES_COMPATIBLE(typeof(_valtype), _checktype))
@@ -88,14 +101,8 @@ int state_save_get_reg_count(void);
 void state_save_register_memory(const char *module, UINT32 instance, const char *name, void *val, UINT32 valsize, UINT32 valcount);
 void state_save_register_bitmap(const char *module, UINT32 instance, const char *name, bitmap_t *val);
 
-void state_save_register_func_presave(void (*func)(void));
-void state_save_register_func_postload(void (*func)(void));
-
-void state_save_register_func_presave_int(void (*func)(int), int param);
-void state_save_register_func_postload_int(void (*func)(int), int param);
-
-void state_save_register_func_presave_ptr(void (*func)(void *), void *param);
-void state_save_register_func_postload_ptr(void (*func)(void *), void *param);
+void state_save_register_presave(running_machine *machine, state_presave_func func, void *param);
+void state_save_register_postload(running_machine *machine, state_postload_func func, void *param);
 
 /* Save and load functions */
 /* The tags are a hack around the current cpu structures */

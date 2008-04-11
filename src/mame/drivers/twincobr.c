@@ -1080,7 +1080,7 @@ ROM_END
 
 static DRIVER_INIT( twincobr )
 {
-	twincobr_driver_savestate();
+	twincobr_driver_savestate(machine);
 }
 
 

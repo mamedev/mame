@@ -1439,7 +1439,7 @@ static const struct C352interface c352_interface =
 
 static DRIVER_INIT( namcos12 )
 {
-	psx_driver_init();
+	psx_driver_init(machine);
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 

@@ -220,12 +220,17 @@ static void set_m92_bank(void)
 	memory_set_bankptr(1,&RAM[bankaddress]);
 }
 
+static STATE_POSTLOAD( m92_postload )
+{
+	set_m92_bank();
+}
+
 static MACHINE_START( m92 )
 {
 	state_save_register_global(irqvector);
 	state_save_register_global(sound_status);
 	state_save_register_global(bankaddress);
-	state_save_register_func_postload(set_m92_bank);
+	state_save_register_postload(machine, m92_postload, NULL);
 
 	scanline_timer = timer_alloc(m92_scanline_interrupt, NULL);
 }

@@ -387,7 +387,7 @@ INLINE void WM32( UINT32 mAddr, PAIR *p )
 	WM( (mAddr+3)&0xffff, p->b.l );
 }
 
-static void UpdateState( void )
+static void UpdateState(void)
 {
 	if ( hd6309.md & MD_EM )
 	{
@@ -511,6 +511,10 @@ static void hd6309_set_context(void *src)
 	UpdateState();
 }
 
+static STATE_POSTLOAD( hd6309_postload )
+{
+	UpdateState();
+}
 
 static void hd6309_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
@@ -525,7 +529,7 @@ static void hd6309_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("hd6309", index, DP);
 	state_save_register_item("hd6309", index, CC);
 	state_save_register_item("hd6309", index, MD);
-	state_save_register_func_postload( UpdateState );
+	state_save_register_postload(Machine, hd6309_postload, NULL);
 	state_save_register_item("hd6309", index, hd6309.int_state);
 	state_save_register_item("hd6309", index, hd6309.nmi_state);
 	state_save_register_item("hd6309", index, hd6309.irq_state[0]);

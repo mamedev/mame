@@ -238,7 +238,7 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
     STATE SAVE
 ---------------------------------------------------------------*/
 
-void atarigen_init_save_state(void);
+void atarigen_init_save_state(running_machine *machine);
 
 /***************************************************************************
     GENERAL ATARI NOTES

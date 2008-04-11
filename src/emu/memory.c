@@ -428,7 +428,7 @@ static void memory_init_allocate(const machine_config *config);
 static void *allocate_memory_block(int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
 static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *base, size_t numbytes);
 static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t bytestart, offs_t byteend, UINT8 *base);
-static void memory_init_locate(void);
+static void memory_init_locate(running_machine *machine);
 static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress);
 static genf *get_static_handler(int databits, int readorwrite, int spacenum, int which);
 static void memory_exit(running_machine *machine);
@@ -513,7 +513,7 @@ void memory_init(running_machine *machine)
 	memory_init_allocate(machine->config);
 
 	/* find all the allocated pointers */
-	memory_init_locate();
+	memory_init_locate(machine);
 
 	/* dump the final memory configuration */
 	mem_dump();
@@ -2384,7 +2384,7 @@ static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs
     reattach_banks - reconnect banks after a load
 -------------------------------------------------*/
 
-static void reattach_banks(void)
+static STATE_POSTLOAD( reattach_banks )
 {
 	int banknum;
 
@@ -2404,7 +2404,7 @@ static void reattach_banks(void)
     into the final allocated memory
 -------------------------------------------------*/
 
-static void memory_init_locate(void)
+static void memory_init_locate(running_machine *machine)
 {
 	int cpunum, spacenum, banknum;
 
@@ -2452,7 +2452,7 @@ static void memory_init_locate(void)
 		}
 
 	/* request a callback to fix up the banks when done */
-	state_save_register_func_postload(reattach_banks);
+	state_save_register_postload(machine, reattach_banks, NULL);
 }
 
 

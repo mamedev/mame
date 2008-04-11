@@ -70,6 +70,7 @@ Revision History:
 #include <math.h>
 
 #include "sndintrf.h"		/* use M.A.M.E. */
+#include "deprecat.h"		/* use M.A.M.E. */
 
 #include "ymdeltat.h"
 
@@ -1820,7 +1821,7 @@ static void OPLResetChip(FM_OPL *OPL)
 }
 
 
-static void OPL_postload(void *param)
+static STATE_POSTLOAD( OPL_postload )
 {
 	FM_OPL *OPL = (FM_OPL *)param;
 	int slot, ch;
@@ -1970,7 +1971,7 @@ static void OPL_save_state(FM_OPL *OPL, const char *statename, int index)
 	state_save_register_item(statename, index, OPL->statusmask);
 	state_save_register_item(statename, index, OPL->mode);
 
-	state_save_register_func_postload_ptr(OPL_postload, OPL);
+	state_save_register_postload(Machine, OPL_postload, OPL);
 }
 
 

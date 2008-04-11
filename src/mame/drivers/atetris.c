@@ -110,6 +110,12 @@ static void reset_bank(void)
 }
 
 
+static STATE_POSTLOAD( atetris_postload )
+{
+	reset_bank();
+}
+
+
 static MACHINE_START( atetris )
 {
 	/* Allocate interrupt timer */
@@ -118,7 +124,7 @@ static MACHINE_START( atetris )
 	/* Set up save state */
 	state_save_register_global(current_bank);
 	state_save_register_global(nvram_write_enable);
-	state_save_register_func_postload(reset_bank);
+	state_save_register_postload(machine, atetris_postload, NULL);
 }
 
 

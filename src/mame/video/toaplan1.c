@@ -317,12 +317,12 @@ static void toaplan1_set_scrolls(void)
 	tilemap_set_scrolly(pf4_tilemap,0,(pf4_scrolly >> 7) - (tiles_offsety - scrolly_offs));
 }
 
-static void rallybik_flipscreen(void)
+static STATE_POSTLOAD( rallybik_flipscreen )
 {
 	rallybik_bcu_flipscreen_w(Machine, 0, bcu_flipscreen, 0);
 }
 
-static void toaplan1_flipscreen(void)
+static STATE_POSTLOAD( toaplan1_flipscreen )
 {
 	toaplan1_bcu_flipscreen_w(Machine, 0, bcu_flipscreen, 0);
 }
@@ -368,7 +368,7 @@ VIDEO_START( rallybik )
 	state_save_register_global(pf_voffs);
 	state_save_register_global(spriteram_offs);
 
-	state_save_register_func_postload(rallybik_flipscreen);
+	state_save_register_postload(machine, rallybik_flipscreen, NULL);
 }
 
 VIDEO_START( toaplan1 )
@@ -418,7 +418,7 @@ VIDEO_START( toaplan1 )
 	state_save_register_global(pf_voffs);
 	state_save_register_global(spriteram_offs);
 
-	state_save_register_func_postload(toaplan1_flipscreen);
+	state_save_register_postload(machine, toaplan1_flipscreen, NULL);
 }
 
 

@@ -82,5 +82,5 @@ void YM2151SetIrqHandler(void *chip, void (*handler)(int irq));
 void YM2151SetPortWriteHandler(void *chip, write8_machine_func handler);
 
 /* refresh chip when load state */
-void YM2151Postload(void *chip);
+STATE_POSTLOAD( YM2151Postload );
 #endif /*_H_YM2151_*/

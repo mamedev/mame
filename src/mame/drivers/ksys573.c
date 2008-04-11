@@ -1491,7 +1491,7 @@ static DRIVER_INIT( konami573 )
 {
 	int i;
 
-	psx_driver_init();
+	psx_driver_init(machine);
 	atapi_init(machine);
 	psx_dma_install_read_handler(5, cdrom_dma_read);
 	psx_dma_install_write_handler(5, cdrom_dma_write);

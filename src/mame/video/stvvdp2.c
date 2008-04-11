@@ -97,7 +97,7 @@ static int stv_vdp2_render_rbg0;
 
 UINT32* stv_vdp2_cram;
 void video_update_vdp1(running_machine *machine);
-int stv_vdp1_start ( void );
+int stv_vdp1_start (running_machine *machine);
 static void stv_vdp2_dynamic_res_change(void);
 static void refresh_palette_data(void);
 static int stv_vdp2_window_process(int x,int y);
@@ -5238,7 +5238,7 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 	return stv_vdp2_regs[offset];
 }
 
-static void stv_vdp2_state_save_postload(void)
+static STATE_POSTLOAD( stv_vdp2_state_save_postload )
 {
 	UINT8 *stv_vdp2_vram_decode = stv_vdp2_gfx_decode;
 	int offset;
@@ -5288,7 +5288,7 @@ static int stv_vdp2_start (running_machine *machine)
 	state_save_register_global_pointer(stv_vdp2_regs, 0x040000/4);
 	state_save_register_global_pointer(stv_vdp2_vram, 0x100000/4);
 	state_save_register_global_pointer(stv_vdp2_cram, 0x080000/4);
-	state_save_register_func_postload(stv_vdp2_state_save_postload);
+	state_save_register_postload(machine, stv_vdp2_state_save_postload, NULL);
 
 	return 0;
 }
@@ -5298,7 +5298,7 @@ VIDEO_START( stv_vdp2 )
 {
 	stv_vdp2_roz_bitmap[0] =  stv_vdp2_roz_bitmap[1] = NULL;
 	stv_vdp2_start(machine);
-	stv_vdp1_start();
+	stv_vdp1_start(machine);
 	debug.l_en = 0xff;
 	debug.error = 0xffffffff;
 	debug.roz = 0;

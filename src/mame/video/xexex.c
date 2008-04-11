@@ -40,7 +40,7 @@ VIDEO_START( xexex )
 
 	cur_alpha = 0;
 
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K054338_vh_start();
 	K053250_vh_start(1, &region);
 

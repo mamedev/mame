@@ -191,7 +191,7 @@ INLINE void update_volumes(struct YMZ280BVoice *voice)
 }
 
 
-static void YMZ280B_state_save_update_step(void *param)
+static STATE_POSTLOAD( YMZ280B_state_save_update_step )
 {
 	struct YMZ280BChip *chip = param;
 	int j;
@@ -690,7 +690,7 @@ static void *ymz280b_start(int sndindex, int clock, const void *config)
 		}
 	}
 
-	state_save_register_func_postload_ptr(YMZ280B_state_save_update_step, chip);
+	state_save_register_postload(Machine, YMZ280B_state_save_update_step, chip);
 
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);

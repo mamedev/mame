@@ -46,13 +46,6 @@ static TILE_GET_INFO( get_piv2_tile_info )
 	common_get_piv_tile_info(machine,tileinfo,tile_index,2);
 }
 
-static void dirty_piv_tilemaps(void)
-{
-	tilemap_mark_all_tiles_dirty(wgp_piv_tilemap[0]);
-	tilemap_mark_all_tiles_dirty(wgp_piv_tilemap[1]);
-	tilemap_mark_all_tiles_dirty(wgp_piv_tilemap[2]);
-}
-
 
 static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,int piv_xoffs,int piv_yoffs)
 {
@@ -63,7 +56,7 @@ static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,in
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
 
 	if (has_TC0110PCR())
-		TC0110PCR_vh_start();
+		TC0110PCR_vh_start(machine);
 
 	wgp_piv_xoffs = piv_xoffs;
 	wgp_piv_yoffs = piv_yoffs;
@@ -84,9 +77,6 @@ static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,in
        applies rowscroll manually */
 
 	TC0100SCN_set_colbanks(0x80,0xc0,0x40);
-
-	/* colors from saved states are often screwy (and this doesn't help...) */
-	state_save_register_func_postload(dirty_piv_tilemaps);
 }
 
 VIDEO_START( wgp )

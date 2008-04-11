@@ -802,6 +802,10 @@ static TIMER_CALLBACK( cojag_scanline_update )
 	} while (!adjust_object_timer(machine, vc));
 }
 
+static STATE_POSTLOAD( cojag_postload )
+{
+	update_cpu_irq();
+}
 
 VIDEO_START( cojag )
 {
@@ -818,7 +822,7 @@ VIDEO_START( cojag )
 	state_save_register_global_array(blitter_regs);
 	state_save_register_global_array(gpu_regs);
 	state_save_register_global(cpu_irq_state);
-	state_save_register_func_postload(update_cpu_irq);
+	state_save_register_postload(machine, cojag_postload, NULL);
 }
 
 

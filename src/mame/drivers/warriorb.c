@@ -735,11 +735,15 @@ ROM_START( warriorb )
 //  ROM_LOAD( "d24-16.79", 0x00000, 0xa??, NO_DUMP )
 ROM_END
 
+static STATE_POSTLOAD( warriorb_postload )
+{
+	reset_sound_region();
+}
 
 static MACHINE_START( warriorb )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, warriorb_postload, NULL);
 }
 
 static MACHINE_RESET( taito_dualscreen )

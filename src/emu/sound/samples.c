@@ -494,7 +494,7 @@ static void sample_update_sound(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void samples_postload(void *param)
+static STATE_POSTLOAD( samples_postload )
 {
 	struct samples_info *info = param;
 	int i;
@@ -566,7 +566,7 @@ static void *samples_start(int sndindex, int clock, const void *config)
         state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].loop);
         state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].paused);
 	}
-	state_save_register_func_postload_ptr(samples_postload, info);
+	state_save_register_postload(Machine, samples_postload, info);
 
 	/* initialize any custom handlers */
 	if (intf->start)

@@ -29,6 +29,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "multipcm.h"
 
@@ -101,7 +102,7 @@ typedef struct MultiPCM_t
 
 } MultiPCMT;
 
-static void MultiPCM_postload(void *param)
+static STATE_POSTLOAD( MultiPCM_postload )
 {
 	MultiPCMT *mpcm = param;
 	int j;
@@ -329,7 +330,7 @@ static void *multipcm_start(int sndindex, int clock, const void *config)
 		state_save_register_item(mname, sndindex, mpcm->curvoice);
 	}
 
-	state_save_register_func_postload_ptr(MultiPCM_postload, mpcm);
+	state_save_register_postload(Machine, MultiPCM_postload, mpcm);
 
 	return mpcm;
 }

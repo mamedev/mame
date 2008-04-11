@@ -1155,6 +1155,10 @@ ROM_END
 
 
 
+static STATE_POSTLOAD( quizf1_postload )
+{
+	set_m90_bank();
+}
 
 static DRIVER_INIT( quizf1 )
 {
@@ -1162,7 +1166,7 @@ static DRIVER_INIT( quizf1 )
 	set_m90_bank();
 
 	state_save_register_global(bankaddress);
-	state_save_register_func_postload(set_m90_bank);
+	state_save_register_postload(machine, quizf1_postload, NULL);
 }
 
 

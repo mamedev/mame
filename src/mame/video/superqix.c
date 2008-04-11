@@ -64,11 +64,6 @@ VIDEO_START( pbillian )
 	state_save_register_global(pbillian_show_power);
 }
 
-static void superqix_postload(void)
-{
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-}
-
 VIDEO_START( superqix )
 {
 	fg_bitmap[0] = auto_bitmap_alloc(256, 256, video_screen_get_format(machine->primary_screen));
@@ -82,7 +77,6 @@ VIDEO_START( superqix )
 	state_save_register_global(show_bitmap);
 	state_save_register_global_bitmap(fg_bitmap[0]);
 	state_save_register_global_bitmap(fg_bitmap[1]);
-	state_save_register_func_postload(superqix_postload);
 }
 
 

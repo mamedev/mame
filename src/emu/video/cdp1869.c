@@ -144,7 +144,7 @@ static TIMER_CALLBACK( prd_changed_tick )
 
 /* State Save Postload */
 
-static void cdp1869_state_save_postload(void *param)
+static STATE_POSTLOAD( cdp1869_state_save_postload )
 {
 	update_prd_changed_timer(param);
 }
@@ -804,7 +804,7 @@ static DEVICE_START( cdp1869 )
 	// register for state saving
 
 	state_save_combine_module_and_tag(unique_tag, "CDP1869", device->tag);
-	state_save_register_func_postload_ptr(cdp1869_state_save_postload, cdp1869);
+	state_save_register_postload(device->machine, cdp1869_state_save_postload, cdp1869);
 
 	state_save_register_item(unique_tag, 0, cdp1869->dispoff);
 	state_save_register_item(unique_tag, 0, cdp1869->fresvert);

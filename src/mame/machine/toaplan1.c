@@ -129,7 +129,7 @@ static void demonwld_dsp(int enable)
 		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
-static void demonwld_restore_dsp(void)
+static STATE_POSTLOAD( demonwld_restore_dsp )
 {
 	demonwld_dsp(demonwld_dsp_on);
 }
@@ -299,7 +299,7 @@ MACHINE_RESET( toaplan1 )
 	toaplan1_unk_reset_port = 0;
 	coin_lockout_global_w(0);
 }
-void toaplan1_driver_savestate(void)
+void toaplan1_driver_savestate(running_machine *machine)
 {
 	state_save_register_global(toaplan1_intenable);
 	state_save_register_global(toaplan1_coin_count);
@@ -319,14 +319,14 @@ MACHINE_RESET( demonwld )
 	main_ram_seg = 0;
 	dsp_execute = 0;
 }
-void demonwld_driver_savestate(void)
+void demonwld_driver_savestate(running_machine *machine)
 {
 	state_save_register_global(demonwld_dsp_on);
 	state_save_register_global(dsp_addr_w);
 	state_save_register_global(main_ram_seg);
 	state_save_register_global(demonwld_dsp_BIO);
 	state_save_register_global(dsp_execute);
-	state_save_register_func_postload(demonwld_restore_dsp);
+	state_save_register_postload(machine, demonwld_restore_dsp, NULL);
 }
 
 MACHINE_RESET( vimana )
@@ -335,7 +335,7 @@ MACHINE_RESET( vimana )
 	vimana_credits = 0;
 	vimana_latch = 0;
 }
-void vimana_driver_savestate(void)
+void vimana_driver_savestate(running_machine *machine)
 {
 	state_save_register_global(vimana_credits);
 	state_save_register_global(vimana_latch);

@@ -171,6 +171,13 @@ static TILE_GET_INFO( chaknpop_get_tx_tile_info )
   Initialize video hardware emulation
 ***************************************************************************/
 
+static STATE_POSTLOAD( chaknpop_postload )
+{
+	set_vram_bank();
+	tx_tilemap_mark_all_dirty();
+}
+
+
 VIDEO_START( chaknpop )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
@@ -194,8 +201,7 @@ VIDEO_START( chaknpop )
 	state_save_register_global(flip_x);
 	state_save_register_global(flip_y);
 
-	state_save_register_func_postload(set_vram_bank);
-	state_save_register_func_postload(tx_tilemap_mark_all_dirty);
+	state_save_register_postload(machine, chaknpop_postload, NULL);
 }
 
 

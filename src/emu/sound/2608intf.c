@@ -12,6 +12,7 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "ay8910.h"
 #include "2608intf.h"
@@ -110,7 +111,7 @@ static void ym2608_stream_update(void *param, stream_sample_t **inputs, stream_s
 }
 
 
-static void ym2608_postload(void *param)
+static STATE_POSTLOAD( ym2608_postload )
 {
 	struct ym2608_info *info = param;
 	YM2608Postload(info->chip);
@@ -149,7 +150,7 @@ static void *ym2608_start(int sndindex, int clock, const void *config)
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_func_postload_ptr(ym2608_postload, info);
+	state_save_register_postload(Machine, ym2608_postload, info);
 
 	if (info->chip)
 		return info;

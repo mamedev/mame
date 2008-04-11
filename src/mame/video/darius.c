@@ -36,11 +36,6 @@ static TILE_GET_INFO( get_fg_tile_info )
 	actual_get_fg_tile_info(machine, tileinfo, tile_index, darius_fg_ram, 2);
 }
 
-static void dirty_fg_tilemap(void)
-{
-	tilemap_mark_all_tiles_dirty(fg_tilemap);
-}
-
 /***************************************************************************/
 
 VIDEO_START( darius )
@@ -50,12 +45,9 @@ VIDEO_START( darius )
 	spritelist = auto_malloc(0x800 * sizeof(*spritelist));
 
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	PC080SN_vh_start(1,1,-16,8,0,1,1);
+	PC080SN_vh_start(machine,1,1,-16,8,0,1,1);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
-
-	/* colors from saved states are often screwy (and this doesn't help...) */
-	state_save_register_func_postload(dirty_fg_tilemap);
 }
 
 /***************************************************************************/

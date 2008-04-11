@@ -102,7 +102,7 @@ static const tms34010_config default_config =
 
 static void check_interrupt(void);
 static TIMER_CALLBACK( scanline_callback );
-static void tms34010_state_postload(void);
+static STATE_POSTLOAD( tms34010_state_postload );
 
 
 /***************************************************************************
@@ -672,7 +672,7 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 	state_save_register_item("tms34010", index, state.pixelshift);
 	state_save_register_item("tms34010", index, state.gfxcycles);
 	state_save_register_item_pointer("tms34010", index, (&state.regs[0].reg), ARRAY_LENGTH(state.regs));
-	state_save_register_func_postload(tms34010_state_postload);
+	state_save_register_postload(Machine, tms34010_state_postload, NULL);
 }
 
 static void tms34010_reset(void)
@@ -1622,7 +1622,7 @@ int tms34020_get_DPYSTRT(int cpu)
     SAVE STATE
 ***************************************************************************/
 
-static void tms34010_state_postload(void)
+static STATE_POSTLOAD( tms34010_state_postload )
 {
 	change_pc(TOBYTE(PC));
 	set_raster_op();

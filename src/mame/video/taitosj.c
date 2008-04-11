@@ -154,7 +154,7 @@ static void set_pens(running_machine *machine)
 }
 
 
-static void taitosj_postload(void)
+static STATE_POSTLOAD( taitosj_postload )
 {
 	memset(dirtycharacter1, 1, sizeof(dirtycharacter1));
 	memset(dirtycharacter2, 1, sizeof(dirtycharacter2));
@@ -221,7 +221,7 @@ VIDEO_START( taitosj )
 
 	compute_draw_order();
 
-	state_save_register_func_postload(taitosj_postload);
+	state_save_register_postload(machine, taitosj_postload, NULL);
 }
 
 

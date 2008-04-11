@@ -16,10 +16,10 @@ static void warriorb_core_vh_start(running_machine *machine, int x_offs,int mult
 	TC0100SCN_vh_start(machine,chips,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,multiscrn_xoffs);
 
 	if (has_TC0110PCR())
-		TC0110PCR_vh_start();
+		TC0110PCR_vh_start(machine);
 
 	if (has_second_TC0110PCR())
-		TC0110PCR_1_vh_start();
+		TC0110PCR_1_vh_start(machine);
 
 	/* Ensure palette from correct TC0110PCR used for each screen */
 	TC0100SCN_set_chip_colbanks(0,0x100,0x0);

@@ -111,7 +111,7 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	}
 
 	if (has_TC0110PCR())
-		TC0110PCR_vh_start();
+		TC0110PCR_vh_start(machine);
 
 	if (has_TC0280GRD())
 		TC0280GRD_vh_start(TC0280GRD_GFX_NUM);

@@ -50,6 +50,6 @@ VIDEO_UPDATE(st0016);
 
 extern UINT32 st0016_game;
 
-void st0016_save_init(void);
+void st0016_save_init(running_machine *machine);
 
 

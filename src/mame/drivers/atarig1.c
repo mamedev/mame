@@ -161,7 +161,7 @@ INLINE void update_bank(int bank)
 }
 
 
-static void pitfighb_state_postload(void)
+static STATE_POSTLOAD( pitfighb_state_postload )
 {
 	int bank = bslapstic_bank;
 	bslapstic_bank = -1;
@@ -964,7 +964,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 		pitfighb_cheap_slapstic_init();
 		state_save_register_global(bslapstic_bank);
 		state_save_register_global(bslapstic_primed);
-		state_save_register_func_postload(pitfighb_state_postload);
+		state_save_register_postload(machine, pitfighb_state_postload, NULL);
 	}
 	else if (slapstic != 0)
 		atarigen_slapstic_init(0, slapstic_base, 0, slapstic);

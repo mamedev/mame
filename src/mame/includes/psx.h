@@ -54,7 +54,7 @@ extern void psx_sio_input( int, int, int );
 WRITE32_HANDLER( psx_mdec_w );
 READ32_HANDLER( psx_mdec_r );
 extern void psx_machine_init( void );
-extern void psx_driver_init( void );
+extern void psx_driver_init( running_machine *machine );
 
 #define PSX_H ( 1 )
 #endif

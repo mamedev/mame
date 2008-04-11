@@ -3851,10 +3851,15 @@ static const struct YM2203interface ym2203_interface =
                       MACHINE DRIVERS
 ***********************************************************/
 
+static STATE_POSTLOAD( f2_postload )
+{
+	reset_sound_region();
+}
+
 static MACHINE_START( f2 )
 {
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, f2_postload, NULL);
 }
 
 static MACHINE_RESET( qcrayon )
@@ -5901,11 +5906,16 @@ static DRIVER_INIT( yesnoj )
 	state_save_register_global(yesnoj_dsw);
 }
 
+static STATE_POSTLOAD( driveout_postload )
+{
+	reset_driveout_sound_region();
+}
+
 static DRIVER_INIT( driveout )
 {
 	state_save_register_global(driveout_sound_latch);
 	state_save_register_global(oki_bank);
-	state_save_register_func_postload(reset_driveout_sound_region);
+	state_save_register_postload(machine, driveout_postload, NULL);
 }
 
 

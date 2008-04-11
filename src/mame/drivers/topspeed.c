@@ -679,15 +679,18 @@ static const struct MSM5205interface msm5205_interface =
                      MACHINE DRIVERS
 ***********************************************************/
 
+static STATE_POSTLOAD( topspeed_postload )
+{
+	parse_control();
+	reset_sound_region();
+}
+
 static MACHINE_START( topspeed )
 {
 	state_save_register_global(cpua_ctrl);
-	state_save_register_func_postload(parse_control);
-
 	state_save_register_global(ioc220_port);
-
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, topspeed_postload, NULL);
 }
 
 static MACHINE_DRIVER_START( topspeed )

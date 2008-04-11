@@ -9,7 +9,7 @@ UINT16 *topspeed_raster_ctrl;
 VIDEO_START( topspeed )
 {
 	/* (chips, gfxnum, x_offs, y_offs, y_invert, opaque, dblwidth) */
-	PC080SN_vh_start(2,1,0,8,0,0,0);
+	PC080SN_vh_start(machine,2,1,0,8,0,0,0);
 }
 
 

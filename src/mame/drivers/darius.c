@@ -1192,16 +1192,21 @@ static DRIVER_INIT( darius )
 }
 
 
+static STATE_POSTLOAD( darius_postload )
+{
+	parse_control();
+	reset_sound_region();
+}
+
 static MACHINE_START( darius )
 {
 	state_save_register_global(cpua_ctrl);
-	state_save_register_func_postload(parse_control);
 
 	// (there are other sound vars that may need saving too) //
 	state_save_register_global(banknum);
 	state_save_register_global(adpcm_command);
 	state_save_register_global(nmi_enable);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, darius_postload, NULL);
 }
 
 

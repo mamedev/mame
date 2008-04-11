@@ -41,7 +41,7 @@ VIDEO_START( gijoe )
 {
 	int i;
 
-	K053251_vh_start();
+	K053251_vh_start(machine);
 	K056832_vh_start(machine, REGION_GFX1, K056832_BPP_4, 1, NULL, gijoe_tile_callback, 0);
 
 	K056832_linemap_enable(1);

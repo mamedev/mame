@@ -75,8 +75,8 @@ struct _colortable_t
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void palette_presave(void);
-static void palette_postload(void);
+static void palette_presave(running_machine *machine, void *param);
+static void palette_postload(running_machine *machine, void *param);
 static void palette_exit(running_machine *machine);
 static void allocate_palette(running_machine *machine, palette_private *palette);
 static void allocate_color_tables(running_machine *machine, palette_private *palette);
@@ -151,8 +151,8 @@ void palette_init(running_machine *machine)
 		palette->save_bright = auto_malloc(sizeof(*palette->save_bright) * numcolors);
 		state_save_register_global_pointer(palette->save_pen, numcolors);
 		state_save_register_global_pointer(palette->save_bright, numcolors);
-		state_save_register_func_presave(palette_presave);
-		state_save_register_func_postload(palette_postload);
+		state_save_register_presave(machine, palette_presave, palette);
+		state_save_register_postload(machine, palette_postload, palette);
 	}
 }
 
@@ -534,17 +534,17 @@ pen_t get_white_pen(running_machine *machine)
     for saving
 -------------------------------------------------*/
 
-static void palette_presave(void)
+static void palette_presave(running_machine *machine, void *param)
 {
-	int numcolors = palette_get_num_colors(Machine->palette);
-	palette_private *palette = Machine->palette_data;
+	int numcolors = palette_get_num_colors(machine->palette);
+	palette_private *palette = param;
 	int index;
 
 	/* fill the save arrays with updated pen and brightness information */
 	for (index = 0; index < numcolors; index++)
 	{
-		palette->save_pen[index] = palette_entry_get_color(Machine->palette, index);
-		palette->save_bright[index] = palette_entry_get_contrast(Machine->palette, index);
+		palette->save_pen[index] = palette_entry_get_color(machine->palette, index);
+		palette->save_bright[index] = palette_entry_get_contrast(machine->palette, index);
 	}
 }
 
@@ -554,17 +554,17 @@ static void palette_presave(void)
     actually update the palette
 -------------------------------------------------*/
 
-static void palette_postload(void)
+static void palette_postload(running_machine *machine, void *param)
 {
-	int numcolors = palette_get_num_colors(Machine->palette);
-	palette_private *palette = Machine->palette_data;
+	int numcolors = palette_get_num_colors(machine->palette);
+	palette_private *palette = param;
 	int index;
 
 	/* reset the pen and brightness for each entry */
 	for (index = 0; index < numcolors; index++)
 	{
-		palette_entry_set_color(Machine->palette, index, palette->save_pen[index]);
-		palette_entry_set_contrast(Machine->palette, index, palette->save_bright[index]);
+		palette_entry_set_color(machine->palette, index, palette->save_pen[index]);
+		palette_entry_set_contrast(machine->palette, index, palette->save_bright[index]);
 	}
 }
 

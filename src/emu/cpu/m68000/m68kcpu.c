@@ -978,14 +978,14 @@ static struct {
 	UINT8 halted;
 } m68k_substate;
 
-static void m68k_prepare_substate(void)
+static void m68k_prepare_substate(running_machine *machine, void *param)
 {
 	m68k_substate.sr = m68ki_get_sr();
 	m68k_substate.stopped = (CPU_STOPPED & STOP_LEVEL_STOP) != 0;
 	m68k_substate.halted  = (CPU_STOPPED & STOP_LEVEL_HALT) != 0;
 }
 
-static void m68k_post_load(void)
+static void m68k_post_load(running_machine *machine, void *param)
 {
 	m68ki_set_sr_noint_nosp(m68k_substate.sr);
 	CPU_STOPPED = m68k_substate.stopped ? STOP_LEVEL_STOP : 0
@@ -1014,8 +1014,8 @@ void m68k_state_register(const char *type, int index)
 	state_save_register_item(type, index, m68k_substate.halted);
 	state_save_register_item(type, index, CPU_PREF_ADDR);
 	state_save_register_item(type, index, CPU_PREF_DATA);
-	state_save_register_func_presave(m68k_prepare_substate);
-	state_save_register_func_postload(m68k_post_load);
+	state_save_register_presave(Machine, m68k_prepare_substate, NULL);
+	state_save_register_postload(Machine, m68k_post_load, NULL);
 }
 
 #endif /* M68K_COMPILE_FOR_MAME */

@@ -7,7 +7,7 @@
 
 /*----------- defined in drivers/wardner.c -----------*/
 
-extern void wardner_restore_bank(void);
+extern STATE_POSTLOAD( wardner_restore_bank );
 
 /*----------- defined in machine/twincobr.c -----------*/
 
@@ -35,8 +35,8 @@ WRITE8_HANDLER(   wardner_coin_dsp_w );
 MACHINE_RESET( twincobr );
 MACHINE_RESET( wardner );
 
-extern void twincobr_driver_savestate(void);
-extern void wardner_driver_savestate(void);
+extern void twincobr_driver_savestate(running_machine *machine);
+extern void wardner_driver_savestate(running_machine *machine);
 
 extern int toaplan_main_cpu;	/* Main CPU type.  0 = 68000, 1 = Z80 */
 extern int twincobr_intenable;

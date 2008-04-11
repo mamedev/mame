@@ -2081,7 +2081,7 @@ void video_update_vdp1(running_machine *machine)
 	//popmessage("%04x %04x",STV_VDP1_EWRR_X3,STV_VDP1_EWRR_Y3);
 }
 
-static void stv_vdp1_state_save_postload(void)
+static STATE_POSTLOAD( stv_vdp1_state_save_postload )
 {
 	UINT8 *vdp1 = stv_vdp1_gfx_decode;
 	int offset;
@@ -2103,7 +2103,7 @@ static void stv_vdp1_state_save_postload(void)
 	}
 }
 
-int stv_vdp1_start ( void )
+int stv_vdp1_start ( running_machine *machine )
 {
 	stv_vdp1_regs = auto_malloc ( 0x040000 );
 	stv_vdp1_vram = auto_malloc ( 0x100000 );
@@ -2143,6 +2143,6 @@ int stv_vdp1_start ( void )
 	state_save_register_global(stv_vdp1_clear_framebuffer_on_next_frame);
 	state_save_register_global(stvvdp1_local_x);
 	state_save_register_global(stvvdp1_local_y);
-	state_save_register_func_postload(stv_vdp1_state_save_postload);
+	state_save_register_postload(machine, stv_vdp1_state_save_postload, NULL);
 	return 0;
 }

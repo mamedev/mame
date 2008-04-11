@@ -45,7 +45,7 @@ static void sprite_callback(int *code,int *color,int *priority_mask)
 
 VIDEO_START( simpsons )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,tile_callback);
 	K053247_vh_start(machine,REGION_GFX2,53,23,NORMAL_PLANE_ORDER,sprite_callback);

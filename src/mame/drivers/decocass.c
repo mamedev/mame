@@ -1118,7 +1118,7 @@ static DRIVER_INIT( decocass )
 		decrypted[A] = swap_bits_5_6(rom[A]);
 
 	/* Call the state save setup code in machine/decocass.c */
-	decocass_machine_state_save_init();
+	decocass_machine_state_save_init(machine);
 	/* and in video/decocass.c, too */
 	decocass_video_state_save_init();
 }

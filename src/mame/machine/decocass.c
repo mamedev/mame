@@ -1589,7 +1589,7 @@ WRITE8_HANDLER( decocass_de0091_w )
  *  state save setup
  *
  ***************************************************************************/
-static void decocass_state_save_postload(void)
+static STATE_POSTLOAD( decocass_state_save_postload )
 {
 #if 0
 	/* fix me - this won't work anymore */
@@ -1608,9 +1608,9 @@ static void decocass_state_save_postload(void)
 }
 
 /* To be called once from driver_init, i.e. decocass_init */
-void decocass_machine_state_save_init(void)
+void decocass_machine_state_save_init(running_machine *machine)
 {
-	state_save_register_func_postload(decocass_state_save_postload);
+	state_save_register_postload(machine, decocass_state_save_postload, NULL);
 	state_save_register_global(tape_dir);
 	state_save_register_global(tape_speed);
 	state_save_register_global(tape_time0.seconds);

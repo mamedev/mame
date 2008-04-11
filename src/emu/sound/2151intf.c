@@ -8,6 +8,7 @@
 
 #include "sndintrf.h"
 #include "streams.h"
+#include "deprecat.h"
 #include "fm.h"
 #include "2151intf.h"
 #include "ym2151.h"
@@ -29,10 +30,10 @@ static void ym2151_update(void *param, stream_sample_t **inputs, stream_sample_t
 }
 
 
-static void ym2151_postload(void *param)
+static STATE_POSTLOAD( ym2151_postload )
 {
 	struct ym2151_info *info = param;
-	YM2151Postload(info->chip);
+	YM2151Postload(machine, info->chip);
 }
 
 
@@ -54,7 +55,7 @@ static void *ym2151_start(int sndindex, int clock, const void *config)
 
 	info->chip = YM2151Init(sndindex,clock,rate);
 
-	state_save_register_func_postload_ptr(ym2151_postload, info);
+	state_save_register_postload(Machine, ym2151_postload, info);
 
 	if (info->chip != 0)
 	{

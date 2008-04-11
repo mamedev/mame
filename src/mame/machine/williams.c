@@ -433,9 +433,9 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
  *
  *************************************/
 
-static void williams2_postload(void)
+static STATE_POSTLOAD( williams2_postload )
 {
-	williams2_bank_select_w(Machine, 0, vram_bank);
+	williams2_bank_select_w(machine, 0, vram_bank);
 }
 
 
@@ -460,7 +460,7 @@ MACHINE_RESET( williams2 )
 	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 
 	state_save_register_global(vram_bank);
-	state_save_register_func_postload(williams2_postload);
+	state_save_register_postload(machine, williams2_postload, NULL);
 }
 
 
@@ -711,9 +711,9 @@ WRITE8_HANDLER( williams2_7segment_w )
  *
  *************************************/
 
-static void defender_postload(void)
+static STATE_POSTLOAD( defender_postload )
 {
-	defender_bank_select_w(Machine, 0, vram_bank);
+	defender_bank_select_w(machine, 0, vram_bank);
 }
 
 
@@ -725,7 +725,7 @@ MACHINE_RESET( defender )
 	memory_configure_bank(1, 0, 9, &memory_region(REGION_CPU1)[0x10000], 0x1000);
 	defender_bank_select_w(machine, 0, 0);
 
-	state_save_register_func_postload(defender_postload);
+	state_save_register_postload(machine, defender_postload, NULL);
 }
 
 

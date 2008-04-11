@@ -857,9 +857,9 @@ MACHINE_DRIVER_END
 static UINT8 maze_tone_timing_state;
 
 
-static void maze_update_discrete(void)
+static STATE_POSTLOAD( maze_update_discrete )
 {
-	maze_write_discrete(Machine, maze_tone_timing_state);
+	maze_write_discrete(machine, maze_tone_timing_state);
 }
 
 
@@ -880,7 +880,7 @@ static MACHINE_START( maze )
 
 	/* setup for save states */
 	state_save_register_global(maze_tone_timing_state);
-	state_save_register_func_postload(maze_update_discrete);
+	state_save_register_postload(machine, maze_update_discrete, NULL);
 
 	MACHINE_START_CALL(mw8080bw);
 }

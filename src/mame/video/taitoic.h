@@ -17,7 +17,7 @@ int has_TC0480SCP(void);
 
 /***************************************************************************/
 
-void PC080SN_vh_start(int chips,int gfxnum,int x_offset,int y_offset,int y_invert,int opaque,int dblwidth);
+void PC080SN_vh_start(running_machine *machine,int chips,int gfxnum,int x_offset,int y_offset,int y_invert,int opaque,int dblwidth);
 READ16_HANDLER ( PC080SN_word_0_r );
 WRITE16_HANDLER( PC080SN_word_0_w );
 WRITE16_HANDLER( PC080SN_xscroll_word_0_w );
@@ -172,9 +172,9 @@ void TC0150ROD_draw(bitmap_t *bitmap,const rectangle *cliprect,int y_offs,int pa
 
 /***************************************************************************/
 
-void TC0110PCR_vh_start(void);
-void TC0110PCR_1_vh_start(void);	/* 2nd chip */
-void TC0110PCR_2_vh_start(void);	/* 3rd chip */
+void TC0110PCR_vh_start(running_machine *machine);
+void TC0110PCR_1_vh_start(running_machine *machine);	/* 2nd chip */
+void TC0110PCR_2_vh_start(running_machine *machine);	/* 3rd chip */
 READ16_HANDLER ( TC0110PCR_word_r );
 READ16_HANDLER ( TC0110PCR_word_1_r );	/* 2nd chip */
 READ16_HANDLER ( TC0110PCR_word_2_r );	/* 3rd chip */

@@ -476,7 +476,7 @@ static void VLM5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
 }
 
 
-static void VLM5030_restore_state(void *param)
+static STATE_POSTLOAD( VLM5030_restore_state )
 {
 	struct vlm5030_info *chip = param;
 	int i;
@@ -680,7 +680,7 @@ static void *vlm5030_start(int sndindex, int clock, const void *config)
 	state_save_register_item(VLM_NAME,sndindex,chip->target_pitch);
 	state_save_register_item_array(VLM_NAME,sndindex,chip->target_k);
 	state_save_register_item_array(VLM_NAME,sndindex,chip->x);
-	state_save_register_func_postload_ptr(VLM5030_restore_state, chip);
+	state_save_register_postload(Machine, VLM5030_restore_state, chip);
 
 	return chip;
 }

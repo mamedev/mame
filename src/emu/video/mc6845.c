@@ -108,7 +108,7 @@ struct _mc6845_t
 };
 
 
-static void mc6845_state_save_postload(void *param);
+static STATE_POSTLOAD( mc6845_state_save_postload );
 static void recompute_parameters(mc6845_t *mc6845, int postload);
 static void update_de_changed_timer(mc6845_t *mc6845);
 static void update_hsync_changed_timers(mc6845_t *mc6845);
@@ -132,7 +132,7 @@ INLINE mc6845_t *get_safe_token(const device_config *device)
 }
 
 
-static void mc6845_state_save_postload(void *param)
+static STATE_POSTLOAD( mc6845_state_save_postload )
 {
 	recompute_parameters(param, TRUE);
 }
@@ -723,7 +723,7 @@ static void common_start(const device_config *device, int device_type)
 	/* register for state saving */
 	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
 
-	state_save_register_func_postload_ptr(mc6845_state_save_postload, mc6845);
+	state_save_register_postload(device->machine, mc6845_state_save_postload, mc6845);
 
 	state_save_register_item(unique_tag, 0, mc6845->clock);
 	state_save_register_item(unique_tag, 0, mc6845->hpixels_per_column);

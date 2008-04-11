@@ -1,5 +1,6 @@
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "2203intf.h"
 #include "fm.h"
@@ -97,7 +98,7 @@ static void ym2203_stream_update(void *param, stream_sample_t **inputs, stream_s
 }
 
 
-static void ym2203_postload(void *param)
+static STATE_POSTLOAD( ym2203_postload )
 {
 	struct ym2203_info *info = param;
 	YM2203Postload(info->chip);
@@ -128,7 +129,7 @@ static void *ym2203_start(int sndindex, int clock, const void *config)
 	/* Initialize FM emurator */
 	info->chip = YM2203Init(info,sndindex,clock,rate,timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_func_postload_ptr(ym2203_postload, info);
+	state_save_register_postload(Machine, ym2203_postload, info);
 
 	if (info->chip)
 		return info;

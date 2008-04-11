@@ -70,7 +70,7 @@ static MACHINE_RESET( klaxp )
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, eprom_scanline_update, 8);
 	atarijsa_reset();
-	atarigen_init_save_state();
+	atarigen_init_save_state(machine);
 }
 
 

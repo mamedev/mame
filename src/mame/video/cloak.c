@@ -165,6 +165,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
+static STATE_POSTLOAD( cloak_postload )
+{
+	set_current_bitmap_videoram_pointer();
+}
+
 VIDEO_START( cloak )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -181,7 +186,7 @@ VIDEO_START( cloak )
 	state_save_register_global_pointer(bitmap_videoram1, 256*256);
 	state_save_register_global_pointer(bitmap_videoram2, 256*256);
 	state_save_register_global_pointer(palette_ram, NUM_PENS);
-	state_save_register_func_postload(set_current_bitmap_videoram_pointer);
+	state_save_register_postload(machine, cloak_postload, NULL);
 }
 
 static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)

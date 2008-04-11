@@ -71,7 +71,7 @@ extern READ8_HANDLER( i8041_p1_r );
 extern WRITE8_HANDLER( i8041_p2_w );
 extern READ8_HANDLER( i8041_p2_r );
 
-void decocass_machine_state_save_init(void);
+void decocass_machine_state_save_init(running_machine *machine);
 
 /*----------- defined in video/decocass.c -----------*/
 extern WRITE8_HANDLER( decocass_paletteram_w );

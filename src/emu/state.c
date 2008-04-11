@@ -51,13 +51,6 @@ enum
 	SS_MSB_FIRST = 0x02
 };
 
-enum
-{
-	FUNC_NOPARAM,
-	FUNC_INTPARAM,
-	FUNC_PTRPARAM
-};
-
 
 
 /***************************************************************************
@@ -81,18 +74,12 @@ typedef struct _ss_func ss_func;
 struct _ss_func
 {
 	ss_func *		next;				/* pointer to next entry */
-	int				type;				/* type of callback */
 	union
 	{
-		void (*voidf)(void);
-		void (*intf)(int param);
-		void (*ptrf)(void *param);
+		state_presave_func presave;		/* presave callback */
+		state_postload_func postload;	/* postload callback */
 	} func;								/* function pointers */
-	union
-	{
-		int intp;
-		void *ptrp;
-	} param;							/* parameters */
+	void *			param;				/* function parameter */
 	int				tag;				/* saving tag */
 };
 
@@ -305,57 +292,11 @@ void state_save_register_bitmap(const char *module, UINT32 instance, const char 
 ***************************************************************************/
 
 /*-------------------------------------------------
-    register_func_void - register a function
-    callback that takes no parameters
+    state_save_register_presave - 
+    register a pre-save function callback
 -------------------------------------------------*/
 
-static void register_func_void(ss_func **root, void (*func)(void))
-{
-	ss_func **cur;
-
-	/* check for invalid timing */
-	if (!ss_registration_allowed)
-	{
-		logerror("Attempt to register callback function after state registration is closed!");
-		if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-			fatalerror("Attempt to register callback function after state registration is closed!");
-		ss_illegal_regs++;
-		return;
-	}
-
-	/* scan for duplicates and push through to the end */
-	for (cur = root; *cur; cur = &(*cur)->next)
-		if ((*cur)->func.voidf == func && (*cur)->tag == ss_current_tag)
-			fatalerror("Duplicate save state function (%d, 0x%p)", ss_current_tag, func);
-
-	/* allocate a new entry */
-	*cur = malloc_or_die(sizeof(ss_func));
-
-	/* fill it in */
-	(*cur)->next       = NULL;
-	(*cur)->type       = FUNC_NOPARAM;
-	(*cur)->func.voidf = func;
-	(*cur)->tag        = ss_current_tag;
-	restrack_register_object(OBJTYPE_STATEREG, *cur, (root == &ss_prefunc_reg) ? 1 : 2, __FILE__, __LINE__);
-}
-
-void state_save_register_func_presave(void (*func)(void))
-{
-	register_func_void(&ss_prefunc_reg, func);
-}
-
-void state_save_register_func_postload(void (*func)(void))
-{
-	register_func_void(&ss_postfunc_reg, func);
-}
-
-
-/*-------------------------------------------------
-    register_func_int - register a function
-    callback that takes an integer parameter
--------------------------------------------------*/
-
-static void register_func_int(ss_func **root, void (*func)(int), int param)
+void state_save_register_presave(running_machine *machine, state_presave_func func, void *param)
 {
 	ss_func **cur;
 
@@ -364,71 +305,49 @@ static void register_func_int(ss_func **root, void (*func)(int), int param)
 		fatalerror("Attempt to register callback function after state registration is closed!");
 
 	/* scan for duplicates and push through to the end */
-	for (cur = root; *cur; cur = &(*cur)->next)
-		if ((*cur)->func.intf == func && (*cur)->param.intp == param && (*cur)->tag == ss_current_tag)
-			fatalerror("Duplicate save state function (%d, %d, %p)", ss_current_tag, param, func);
-
-	/* allocate a new entry */
-	*cur = malloc_or_die(sizeof(ss_func));
-
-	/* fill it in */
-	(*cur)->next       = NULL;
-	(*cur)->type       = FUNC_INTPARAM;
-	(*cur)->func.intf  = func;
-	(*cur)->param.intp = param;
-	(*cur)->tag        = ss_current_tag;
-	restrack_register_object(OBJTYPE_STATEREG, *cur, (root == &ss_prefunc_reg) ? 1 : 2, __FILE__, __LINE__);
-}
-
-void state_save_register_func_presave_int(void (*func)(int), int param)
-{
-	register_func_int(&ss_prefunc_reg, func, param);
-}
-
-void state_save_register_func_postload_int(void (*func)(int), int param)
-{
-	register_func_int(&ss_postfunc_reg, func, param);
-}
-
-
-/*-------------------------------------------------
-    register_func_ptr - register a function
-    callback that takes a void * parameter
--------------------------------------------------*/
-
-static void register_func_ptr(ss_func **root, void (*func)(void *), void *param)
-{
-	ss_func **cur;
-
-	/* check for invalid timing */
-	if (!ss_registration_allowed)
-		fatalerror("Attempt to register callback function after state registration is closed!");
-
-	/* scan for duplicates and push through to the end */
-	for (cur = root; *cur; cur = &(*cur)->next)
-		if ((*cur)->func.ptrf == func && (*cur)->param.ptrp == param && (*cur)->tag == ss_current_tag)
+	for (cur = &ss_prefunc_reg; *cur; cur = &(*cur)->next)
+		if ((*cur)->func.presave == func && (*cur)->param == param && (*cur)->tag == ss_current_tag)
 			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
 
 	/* allocate a new entry */
 	*cur = malloc_or_die(sizeof(ss_func));
 
 	/* fill it in */
-	(*cur)->next       = NULL;
-	(*cur)->type       = FUNC_PTRPARAM;
-	(*cur)->func.ptrf  = func;
-	(*cur)->param.ptrp = param;
-	(*cur)->tag        = ss_current_tag;
-	restrack_register_object(OBJTYPE_STATEREG, *cur, (root == &ss_prefunc_reg) ? 1 : 2, __FILE__, __LINE__);
+	(*cur)->next         = NULL;
+	(*cur)->func.presave = func;
+	(*cur)->param        = param;
+	(*cur)->tag          = ss_current_tag;
+	restrack_register_object(OBJTYPE_STATEREG, *cur, 1, __FILE__, __LINE__);
 }
 
-void state_save_register_func_presave_ptr(void (*func)(void *), void * param)
-{
-	register_func_ptr(&ss_prefunc_reg, func, param);
-}
 
-void state_save_register_func_postload_ptr(void (*func)(void *), void * param)
+/*-------------------------------------------------
+    state_save_register_postload - 
+    register a post-load function callback
+-------------------------------------------------*/
+
+void state_save_register_postload(running_machine *machine, state_postload_func func, void *param)
 {
-	register_func_ptr(&ss_postfunc_reg, func, param);
+	ss_func **cur;
+
+	/* check for invalid timing */
+	if (!ss_registration_allowed)
+		fatalerror("Attempt to register callback function after state registration is closed!");
+
+	/* scan for duplicates and push through to the end */
+	for (cur = &ss_postfunc_reg; *cur; cur = &(*cur)->next)
+		if ((*cur)->func.postload == func && (*cur)->param == param && (*cur)->tag == ss_current_tag)
+			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
+
+	/* allocate a new entry */
+	*cur = malloc_or_die(sizeof(ss_func));
+
+	/* fill it in */
+	(*cur)->next          = NULL;
+	(*cur)->func.postload = func;
+	(*cur)->param         = param;
+	(*cur)->tag           = ss_current_tag;
+	restrack_register_object(OBJTYPE_STATEREG, *cur, 2, __FILE__, __LINE__);
 }
 
 
@@ -594,35 +513,6 @@ static int compute_size_and_offsets(void)
 
 
 /*-------------------------------------------------
-    call_hook_functions - loop through all the
-    hook functions and call them
--------------------------------------------------*/
-
-static int call_hook_functions(ss_func *funclist)
-{
-	ss_func *func;
-	int count = 0;
-
-	/* iterate over the list of functions */
-	for (func = funclist; func; func = func->next)
-		if (func->tag == ss_current_tag)
-		{
-			count++;
-
-			/* call with the appropriate parameters */
-			switch (func->type)
-			{
-				case FUNC_NOPARAM:	(func->func.voidf)();					break;
-				case FUNC_INTPARAM:	(func->func.intf)(func->param.intp);	break;
-				case FUNC_PTRPARAM:	(func->func.ptrf)(func->param.ptrp);	break;
-			}
-		}
-
-	return count;
-}
-
-
-/*-------------------------------------------------
     get_signature - compute the signature, which
     is a CRC over the structure of the data
 -------------------------------------------------*/
@@ -768,13 +658,21 @@ int state_save_save_begin(mame_file *file)
 void state_save_save_continue(void)
 {
 	ss_entry *entry;
-	int count;
+	ss_func *func;
+	int count = 0;
 
 	LOG(("Saving tag %d\n", ss_current_tag));
 
 	/* call the pre-save functions */
 	LOG(("  calling pre-save functions\n"));
-	count = call_hook_functions(ss_prefunc_reg);
+
+	/* iterate over the list of functions */
+	for (func = ss_prefunc_reg; func; func = func->next)
+		if (func->tag == ss_current_tag)
+		{
+			count++;
+			(*func->func.presave)(Machine, func->param);
+		}
 	LOG(("    %d functions called\n", count));
 
 	/* then copy in all the data */
@@ -873,8 +771,9 @@ int state_save_load_begin(mame_file *file)
 void state_save_load_continue(void)
 {
 	ss_entry *entry;
+	ss_func *func;
 	int need_convert;
-	int count;
+	int count = 0;
 
 	/* first determine whether or not we need to convert the endianness of the data */
 #ifdef LSB_FIRST
@@ -898,7 +797,12 @@ void state_save_load_continue(void)
 
 	/* call the post-load functions */
 	LOG(("  calling post-load functions\n"));
-	count = call_hook_functions(ss_postfunc_reg);
+	for (func = ss_postfunc_reg; func; func = func->next)
+		if (func->tag == ss_current_tag)
+		{
+			count++;
+			(*func->func.postload)(Machine, func->param);
+		}
 	LOG(("    %d functions called\n", count));
 }
 

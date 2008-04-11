@@ -935,13 +935,17 @@ However sync to vblank is lacking, which is causing the
 graphics glitches.
 ***********************************************************/
 
+static STATE_POSTLOAD( wgp_postload )
+{
+	parse_control();
+	reset_sound_region();
+}
+
 static MACHINE_START( wgp )
 {
 	state_save_register_global(cpua_ctrl);
-	state_save_register_func_postload(parse_control);
-
 	state_save_register_global(banknum);
-	state_save_register_func_postload(reset_sound_region);
+	state_save_register_postload(machine, wgp_postload, NULL);
 }
 
 static MACHINE_DRIVER_START( wgp )

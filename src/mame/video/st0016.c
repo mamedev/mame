@@ -418,7 +418,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void st0016_postload(void)
+static STATE_POSTLOAD( st0016_postload )
 {
 	int i;
 	st0016_rom_bank_w(Machine,0,st0016_rom_bank);
@@ -427,7 +427,7 @@ static void st0016_postload(void)
 }
 
 
-void st0016_save_init(void)
+void st0016_save_init(running_machine *machine)
 {
 	state_save_register_global(st0016_spr_bank);
 	state_save_register_global(st0016_spr2_bank);
@@ -438,7 +438,7 @@ void st0016_save_init(void)
 	state_save_register_global_pointer(st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	state_save_register_global_pointer(st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
 	state_save_register_global_pointer(st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
-	state_save_register_func_postload(st0016_postload);
+	state_save_register_postload(machine, st0016_postload, NULL);
 }
 
 
@@ -499,7 +499,7 @@ VIDEO_START( st0016 )
 
 	}
 
-	st0016_save_init();
+	st0016_save_init(machine);
 }
 
 

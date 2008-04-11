@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "poly.h"
+#include "deprecat.h"
 #include "eminline.h"
 #include "mame.h"
 #include "state.h"
@@ -206,7 +207,7 @@ struct _poly_manager
 static void **allocate_array(size_t *itemsize, UINT32 itemcount);
 static void free_array(void **array);
 static void *poly_item_callback(void *param, int threadid);
-static void poly_state_presave(void *param);
+static STATE_PRESAVE( poly_state_presave );
 
 
 
@@ -360,7 +361,7 @@ poly_manager *poly_alloc(int max_polys, size_t extra_data_size, UINT8 flags)
 		poly->queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
 	/* request a pre-save callback for synchronization */
-	state_save_register_func_presave_ptr(poly_state_presave, poly);
+	state_save_register_presave(Machine, poly_state_presave, poly);
 	return poly;
 }
 
@@ -1420,7 +1421,7 @@ static void *poly_item_callback(void *param, int threadid)
     ensure everything is synced before saving
 -------------------------------------------------*/
 
-static void poly_state_presave(void *param)
+static STATE_PRESAVE( poly_state_presave )
 {
 	poly_manager *poly = param;
 	poly_wait(poly, "pre-save");

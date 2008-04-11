@@ -207,7 +207,7 @@ static void twincobr_dsp(int enable)
 	}
 }
 
-static void twincobr_restore_dsp(void)
+static STATE_POSTLOAD( twincobr_restore_dsp )
 {
 	twincobr_dsp(twincobr_dsp_on);
 }
@@ -325,7 +325,7 @@ MACHINE_RESET( twincobr )
 	fsharkbt_8741 = -1;			/* Reset the Flying Shark Bootleg MCU */
 	twincobr_dsp_BIO = CLEAR_LINE;
 }
-void twincobr_driver_savestate(void)
+void twincobr_driver_savestate(running_machine *machine)
 {
 	state_save_register_global(toaplan_main_cpu);
 	state_save_register_global(twincobr_intenable);
@@ -335,7 +335,7 @@ void twincobr_driver_savestate(void)
 	state_save_register_global(twincobr_dsp_BIO);
 	state_save_register_global(dsp_execute);
 	state_save_register_global(fsharkbt_8741);
-	state_save_register_func_postload(twincobr_restore_dsp);
+	state_save_register_postload(machine, twincobr_restore_dsp, NULL);
 }
 
 MACHINE_RESET( wardner )
@@ -349,7 +349,7 @@ MACHINE_RESET( wardner )
 	twincobr_dsp_BIO = CLEAR_LINE;
 	wardner_membank = 0;
 }
-void wardner_driver_savestate(void)
+void wardner_driver_savestate(running_machine *machine)
 {
 	state_save_register_global(toaplan_main_cpu);
 	state_save_register_global(twincobr_intenable);
@@ -359,6 +359,6 @@ void wardner_driver_savestate(void)
 	state_save_register_global(twincobr_dsp_BIO);
 	state_save_register_global(dsp_execute);
 	state_save_register_global(wardner_membank);
-	state_save_register_func_postload(wardner_restore_bank);	/* Restore the Main CPU bank */
-	state_save_register_func_postload(twincobr_restore_dsp);
+	state_save_register_postload(machine, wardner_restore_bank, NULL);	/* Restore the Main CPU bank */
+	state_save_register_postload(machine, twincobr_restore_dsp, NULL);
 }

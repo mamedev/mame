@@ -168,7 +168,7 @@ static pen_t get_pen(UINT16 data)
 }
 
 
-static void regenerate_pens(void)
+static STATE_POSTLOAD( regenerate_pens )
 {
 	int i;
 
@@ -177,24 +177,24 @@ static void regenerate_pens(void)
 }
 
 
-void neogeo_set_palette_bank(UINT8 data)
+void neogeo_set_palette_bank(running_machine *machine, UINT8 data)
 {
 	if (data != palette_bank)
 	{
 		palette_bank = data;
 
-		regenerate_pens();
+		regenerate_pens(machine, NULL);
 	}
 }
 
 
-void neogeo_set_screen_dark(UINT8 data)
+void neogeo_set_screen_dark(running_machine *machine, UINT8 data)
 {
 	if (data != screen_dark)
 	{
 		screen_dark = data;
 
-		regenerate_pens();
+		regenerate_pens(machine, NULL);
 	}
 }
 
@@ -899,7 +899,7 @@ VIDEO_START( neogeo )
 	state_save_register_global(auto_animation_counter);
 	state_save_register_global(auto_animation_frame_counter);
 
-	state_save_register_func_postload(regenerate_pens);
+	state_save_register_postload(machine, regenerate_pens, NULL);
 }
 
 

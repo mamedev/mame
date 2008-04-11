@@ -166,7 +166,7 @@ struct _streams_private
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void stream_postload(void *param);
+static STATE_POSTLOAD( stream_postload );
 static void allocate_resample_buffers(streams_private *strdata, sound_stream *stream);
 static void allocate_output_buffers(streams_private *strdata, sound_stream *stream);
 static void recompute_sample_rate_data(streams_private *strdata, sound_stream *stream);
@@ -374,7 +374,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	/* create a unique tag for saving */
 	sprintf(statetag, "stream.%d", stream->index);
 	state_save_register_item(statetag, 0, stream->sample_rate);
-	state_save_register_func_postload_ptr(stream_postload, stream);
+	state_save_register_postload(Machine, stream_postload, stream);
 
 	/* allocate space for the inputs */
 	if (inputs > 0)
@@ -633,9 +633,9 @@ void stream_set_output_gain(sound_stream *stream, int output, float gain)
     stream_postload - save/restore callback
 -------------------------------------------------*/
 
-static void stream_postload(void *param)
+static STATE_POSTLOAD( stream_postload )
 {
-	streams_private *strdata = Machine->streams_data;
+	streams_private *strdata = machine->streams_data;
 	sound_stream *stream = param;
 	int outputnum;
 

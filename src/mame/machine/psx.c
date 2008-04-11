@@ -1535,7 +1535,7 @@ void psx_machine_init( void )
 	psx_gpu_reset();
 }
 
-static void psx_postload( void )
+static STATE_POSTLOAD( psx_postload )
 {
 	int n;
 
@@ -1559,7 +1559,7 @@ static void psx_postload( void )
 	mdec_cos_precalc();
 }
 
-void psx_driver_init( void )
+void psx_driver_init( running_machine *machine )
 {
 	int n;
 
@@ -1648,5 +1648,5 @@ void psx_driver_init( void )
 	state_save_register_global_array( m_p_n_mdec_quantize_uv );
 	state_save_register_global_array( m_p_n_mdec_cos );
 
-	state_save_register_func_postload( psx_postload );
+	state_save_register_postload( machine, psx_postload, NULL );
 }

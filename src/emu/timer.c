@@ -104,7 +104,7 @@ static attotime callback_timer_expire_time;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void timer_postload(void);
+static STATE_POSTLOAD( timer_postload );
 static void timer_logtimers(void);
 static void timer_remove(emu_timer *which);
 
@@ -280,7 +280,7 @@ void timer_init(running_machine *machine)
 	state_save_push_tag(0);
 	state_save_register_item("timer", 0, global_basetime.seconds);
 	state_save_register_item("timer", 0, global_basetime.attoseconds);
-	state_save_register_func_postload(timer_postload);
+	state_save_register_postload(machine, timer_postload, NULL);
 	state_save_pop_tag();
 
 	/* reset the timers */
@@ -427,7 +427,7 @@ static void timer_register_save(emu_timer *timer)
     timer_postload - after loading a save state
 -------------------------------------------------*/
 
-static void timer_postload(void)
+static STATE_POSTLOAD( timer_postload )
 {
 	emu_timer *privlist = NULL;
 	emu_timer *t;

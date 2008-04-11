@@ -19,7 +19,7 @@
 
 void twincobr_flipscreen(int flip);
 void twincobr_display(int enable);
-static void twincobr_restore_screen(void);
+static STATE_POSTLOAD( twincobr_restore_screen );
 
 INT32 twincobr_fg_rom_bank;
 INT32 twincobr_bg_ram_bank;
@@ -151,10 +151,10 @@ VIDEO_START( toaplan0 )
 	state_save_register_global(twincobr_bg_ram_bank);
 	state_save_register_global(twincobr_flip_screen);
 	state_save_register_global(wardner_sprite_hack);
-	state_save_register_func_postload(twincobr_restore_screen);
+	state_save_register_postload(machine, twincobr_restore_screen, NULL);
 }
 
-static void twincobr_restore_screen(void)
+static STATE_POSTLOAD( twincobr_restore_screen )
 {
 	twincobr_display(twincobr_display_on);
 	twincobr_flipscreen(twincobr_flip_screen);

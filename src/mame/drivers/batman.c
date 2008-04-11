@@ -63,7 +63,7 @@ static MACHINE_RESET( batman )
 	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 	atarigen_scanline_timer_reset(machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
-	atarigen_init_save_state();
+	atarigen_init_save_state(machine);
 	state_save_register_global(latch_data);
 
 }

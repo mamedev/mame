@@ -48,7 +48,7 @@ static void xmen_sprite_callback(int *code,int *color,int *priority_mask)
 
 VIDEO_START( xmen )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
 	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);
@@ -60,7 +60,7 @@ static UINT16 *K053247_ram;
 
 VIDEO_START( xmen6p )
 {
-	K053251_vh_start();
+	K053251_vh_start(machine);
 
 	K052109_vh_start(machine,REGION_GFX1,NORMAL_PLANE_ORDER,xmen_tile_callback);
 	K053247_vh_start(machine,REGION_GFX2,53,-2,NORMAL_PLANE_ORDER,xmen_sprite_callback);

@@ -342,7 +342,7 @@ static const struct AM53CF96interface scsi_intf =
 
 static DRIVER_INIT( konamigq )
 {
-	psx_driver_init();
+	psx_driver_init(machine);
 
 	m_p_n_pcmram = memory_region( REGION_SOUND1 ) + 0x80000;
 }

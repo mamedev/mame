@@ -128,7 +128,7 @@ static TILE_GET_INFO( sys24_tile_info_1w )
 	SET_TILE_INFO(sys24_char_gfx_index, val & sys24_tile_mask, (val >> 7) & 0xff, 0);
 }
 
-static void sys24_tile_dirtyall(void)
+static STATE_POSTLOAD( sys24_tile_dirtyall )
 {
 	memset(sys24_char_dirtymap, 1, SYS24_TILES);
 	sys24_char_dirty = 1;
@@ -170,7 +170,7 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	state_save_register_global_pointer(sys24_tile_ram, 0x10000/2);
 	state_save_register_global_pointer(sys24_char_ram, 0x80000/2);
-	state_save_register_func_postload(sys24_tile_dirtyall);
+	state_save_register_postload(machine, sys24_tile_dirtyall, NULL);
 }
 
 void sys24_tile_update(running_machine *machine)

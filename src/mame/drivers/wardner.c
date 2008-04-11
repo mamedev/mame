@@ -172,7 +172,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 	}
 }
 
-void wardner_restore_bank(void)
+STATE_POSTLOAD( wardner_restore_bank )
 {
 	wardner_ramrom_bank_sw(Machine,0,1);	/* Dummy value to ensure restoration */
 	wardner_ramrom_bank_sw(Machine,0,wardner_membank);
@@ -674,7 +674,7 @@ ROM_END
 
 static DRIVER_INIT( wardner )
 {
-	wardner_driver_savestate();	/* Save-State stuff in src/machine/twincobr.c */
+	wardner_driver_savestate(machine);	/* Save-State stuff in src/machine/twincobr.c */
 }
 
 

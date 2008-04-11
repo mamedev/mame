@@ -1068,7 +1068,12 @@ PC  :000029F8: BT      $000029EC
 	return ps4_ram[0x00001c/4];
 }
 
-static void install_hotgmck_pcm_bank(void)
+static STATE_POSTLOAD( hotgmck_pcm_bank_postload )
+{
+	set_hotgmck_pcm_bank((FPTR)param);
+}
+
+static void install_hotgmck_pcm_bank(running_machine *machine)
 {
 	UINT8 *ymf_pcm = memory_region(REGION_SOUND1);
 	UINT8 *pcm_rom = memory_region(REGION_SOUND2);
@@ -1080,8 +1085,8 @@ static void install_hotgmck_pcm_bank(void)
 	set_hotgmck_pcm_bank(1);
 
 	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
-	state_save_register_func_postload_int(set_hotgmck_pcm_bank, 0);
-	state_save_register_func_postload_int(set_hotgmck_pcm_bank, 1);
+	state_save_register_postload(machine, hotgmck_pcm_bank_postload, (void *)0);
+	state_save_register_postload(machine, hotgmck_pcm_bank_postload, (void *)1);
 }
 
 static DRIVER_INIT( hotgmck )
@@ -1089,7 +1094,7 @@ static DRIVER_INIT( hotgmck )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x5800000, 0x5800007, 0, 0, hotgmck_io32_r ); // Different Inputs
-	install_hotgmck_pcm_bank();	// Banked PCM ROM
+	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }
 
 static DRIVER_INIT( loderndf )

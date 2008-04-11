@@ -62,12 +62,6 @@ static TILE_GET_INFO( get_fg_tilemap_info )
 		0);
 }
 
-static void all_tiles_dirty(void)
-{
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
-	tilemap_mark_all_tiles_dirty(fg_tilemap);
-}
-
 VIDEO_START( renegade )
 {
 	bg_tilemap = tilemap_create(get_bg_tilemap_info, tilemap_scan_rows,      16, 16, 64, 16);
@@ -77,7 +71,6 @@ VIDEO_START( renegade )
 	tilemap_set_scrolldx(bg_tilemap, 256, 0);
 
 	state_save_register_global(renegade_scrollx);
-	state_save_register_func_postload(all_tiles_dirty);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

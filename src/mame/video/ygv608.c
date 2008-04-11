@@ -474,7 +474,7 @@ static TILE_GET_INFO( get_tile_info_B_16 )
 	}
 }
 
-static void ygv608_postload(void)
+static STATE_POSTLOAD( ygv608_postload )
 {
 	int i;
 
@@ -485,7 +485,7 @@ static void ygv608_postload(void)
 		SetPostShortcuts(i);
 }
 
-static void ygv608_register_state_save(void)
+static void ygv608_register_state_save(running_machine *machine)
 {
 	state_save_register_item_array("ygv608", 0, ygv608.ports.b);
 	state_save_register_item_array("ygv608", 0, ygv608.regs.b);
@@ -494,7 +494,7 @@ static void ygv608_register_state_save(void)
 	state_save_register_item_2d_array("ygv608", 0, ygv608.scroll_data_table);
 	state_save_register_item_2d_array("ygv608", 0, ygv608.colour_palette);
 
-	state_save_register_func_postload(ygv608_postload);
+	state_save_register_postload(machine, ygv608_postload, NULL);
 }
 
 static void ygv608_exit(running_machine *machine)
@@ -534,7 +534,7 @@ VIDEO_START( ygv608 )
 	tilemap_A = NULL;
 	tilemap_B = NULL;
 
-	ygv608_register_state_save();
+	ygv608_register_state_save(machine);
 	add_exit_callback(machine, ygv608_exit);
 }
 

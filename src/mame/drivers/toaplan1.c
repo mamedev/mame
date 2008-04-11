@@ -2089,19 +2089,19 @@ ROM_END
 
 static DRIVER_INIT( toaplan1 )
 {
-	toaplan1_driver_savestate();
+	toaplan1_driver_savestate(machine);
 }
 
 static DRIVER_INIT( demonwld )
 {
-	toaplan1_driver_savestate();
-	demonwld_driver_savestate();
+	toaplan1_driver_savestate(machine);
+	demonwld_driver_savestate(machine);
 }
 
 static DRIVER_INIT( vimana )
 {
-	toaplan1_driver_savestate();
-	vimana_driver_savestate();
+	toaplan1_driver_savestate(machine);
+	vimana_driver_savestate(machine);
 }
 
 

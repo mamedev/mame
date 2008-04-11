@@ -1386,9 +1386,9 @@ int YM2151ReadStatus( void *_chip )
 /*
 *   state save support for MAME
 */
-void YM2151Postload(void *chip)
+STATE_POSTLOAD( YM2151Postload )
 {
-	YM2151 *YM2151_chip = (YM2151 *)chip;
+	YM2151 *YM2151_chip = (YM2151 *)param;
 	int j;
 
 	for (j=0; j<8; j++)
@@ -1494,10 +1494,10 @@ static void ym2151_state_save_register( YM2151 *chip, int sndindex )
 
 	state_save_register_item_array(buf1, sndindex, chip->connect);
 
-	state_save_register_func_postload_ptr(YM2151Postload, chip);
+	state_save_register_postload(Machine, YM2151Postload, chip);
 }
 #else
-void YM2151Postload(void *chip)
+STATE_POSTLOAD( YM2151Postload )
 {
 }
 
