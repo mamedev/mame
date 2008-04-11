@@ -92,7 +92,7 @@ enum
 	XTAL_17_73447MHz	= 17734470,		/* 4 times the PAL subcarrier */
 	XTAL_18MHz   		= 18000000,		/* S.A.R, Ikari Warriors 3 */
 	XTAL_18_432MHz  	= 18432000,		/* Extremely common, used on 100's of PCBs */
-        XTAL_19_6608MHz		= 19660800,		/* Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
+	XTAL_19_6608MHz		= 19660800,		/* Euro League (bootleg), labeled as "UKI 19.6608 20PF" */
 	XTAL_19_923MHz		= 19923000,		/* Cinematronics vectors */
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by some Taito games */
 	XTAL_20MHz   		= 20000000,

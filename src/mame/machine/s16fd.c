@@ -26,6 +26,9 @@ static UINT16 *fd1094_cacheregion[CACHE_ENTRIES]; // a cache region where CACHE_
 static int fd1094_cached_states[CACHE_ENTRIES]; // array of cached state numbers
 static int fd1094_current_cacheposition; // current position in cache array
 
+static int fd1094_state;
+static int fd1094_selected_state;
+
 static void (*fd1094_set_decrypted)(UINT8 *);
 
 void *fd1094_get_decrypted_base(void)
@@ -51,6 +54,16 @@ static void fd1094_setstate_and_decrypt(int state)
 {
 	int i;
 	UINT32 addr;
+
+	switch (state & 0x300)
+	{
+	case 0x000:
+	case FD1094_STATE_RESET:
+		fd1094_selected_state = state & 0xff;
+		break;
+	}
+
+	fd1094_state = state;
 
 	cpunum_set_info_int(0, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
@@ -142,6 +155,20 @@ void fd1094_machine_init(void)
 	cpunum_set_irq_callback(0, fd1094_int_callback);
 }
 
+static STATE_POSTLOAD( fd1094_postload )
+{
+	if (fd1094_state != -1)
+	{
+		int selected_state = fd1094_selected_state;
+		int state = fd1094_state;
+
+		fd1094_machine_init();
+
+		fd1094_setstate_and_decrypt(selected_state);
+		fd1094_setstate_and_decrypt(state);
+	}
+}
+
 
 #ifdef ENABLE_DEBUGGER
 static void key_changed(void)
@@ -186,7 +213,8 @@ void fd1094_driver_init(void (*set_decrypted)(UINT8 *))
 		fd1094_cacheregion[i] = auto_malloc(fd1094_cpuregionsize);
 		fd1094_cached_states[i] = -1;
 	}
-	fd1094_current_cacheposition = 0;
+  	fd1094_current_cacheposition = 0;
+	fd1094_state = -1;
 
 #ifdef ENABLE_DEBUGGER
 	/* key debugging */
@@ -196,4 +224,8 @@ void fd1094_driver_init(void (*set_decrypted)(UINT8 *))
 		fd1094_init_debugging(REGION_CPU1, REGION_USER1, REGION_USER2, key_changed);
 	}
 #endif
+
+	state_save_register_global(fd1094_selected_state);
+	state_save_register_global(fd1094_state);
+	state_save_register_postload(Machine, fd1094_postload, NULL);
 }

@@ -22,6 +22,9 @@ static UINT16* s24_fd1094_cacheregion[S16_NUMCACHE]; // a cache region where S16
 static int fd1094_cached_states[S16_NUMCACHE]; // array of cached state numbers
 static int fd1094_current_cacheposition; // current position in cache array
 
+static int fd1094_state;
+static int fd1094_selected_state;
+
 /* this function checks the cache to see if the current state is cached,
    if it is then it copies the cached data to the user region where code is
    executed from, if its not cached then it gets decrypted to the current
@@ -30,6 +33,16 @@ static void s24_fd1094_setstate_and_decrypt(int state)
 {
 	int i;
 	UINT32 addr;
+
+	switch (state & 0x300)
+	{
+	case 0x000:
+	case FD1094_STATE_RESET:
+		fd1094_selected_state = state & 0xff;
+		break;
+	}
+
+	fd1094_state = state;
 
 	cpunum_set_info_int(1, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
@@ -123,6 +136,20 @@ void s24_fd1094_machine_init(void)
 	cpunum_set_irq_callback(1, s24_fd1094_int_callback);
 }
 
+static STATE_POSTLOAD( s24_fd1094_postload )
+{
+	if (fd1094_state != -1)
+	{
+		int selected_state = fd1094_selected_state;
+		int state = fd1094_state;
+
+		s24_fd1094_machine_init();
+
+		s24_fd1094_setstate_and_decrypt(selected_state);
+		s24_fd1094_setstate_and_decrypt(state);
+	}
+}
+
 /* startup function, to be called from DRIVER_INIT (once on startup) */
 void s24_fd1094_driver_init(void)
 {
@@ -146,4 +173,10 @@ void s24_fd1094_driver_init(void)
 		fd1094_cached_states[i] = -1;
 
 	fd1094_current_cacheposition = 0;
+
+	fd1094_state = -1;
+
+	state_save_register_global(fd1094_selected_state);
+	state_save_register_global(fd1094_state);
+	state_save_register_postload(Machine, s24_fd1094_postload, NULL);
 }

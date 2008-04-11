@@ -31,6 +31,7 @@ extern VIDEO_START( snk );
 extern VIDEO_START( sgladiat );
 
 extern VIDEO_UPDATE( tnk3 );
+extern VIDEO_UPDATE( athena );
 extern VIDEO_UPDATE( ikari );
 extern VIDEO_UPDATE( tdfever );
 extern VIDEO_UPDATE( gwar );

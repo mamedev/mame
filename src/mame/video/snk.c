@@ -169,6 +169,7 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 	const gfx_element *gfx = machine->gfx[2];
 
 	int tile_number, attributes, color, sx, sy;
+	int yflip;
 	int offs;
 
 	for(offs = 0; offs < 50*4; offs+=4)
@@ -176,9 +177,8 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 		if(*(UINT32*)(spriteram+offs) == 0 || *(UINT32*)(spriteram+offs) == -1) continue;
 
 		tile_number = spriteram[offs+1];
-		attributes  = spriteram[offs+3]; /* YBBX.CCCC */
+		attributes  = spriteram[offs+3]; /* YBFX.CCCC */
 		if(attributes & 0x40) tile_number |= 256;
-		if(attributes & 0x20) tile_number |= 512;
 
 		color = attributes & 0xf;
 		sx =  xscroll - spriteram[offs+2];
@@ -189,8 +189,9 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 		sy &= 0x1ff;
 		if (sx > 512-16) sx -= 512;
 		if (sy > 512-16) sy -= 512;
+		yflip = attributes & 0x20;
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
+		drawgfx(bitmap,gfx,tile_number,color,0,yflip,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
 	}
 }
 
@@ -226,6 +227,80 @@ VIDEO_UPDATE( tnk3 )
 		if(attributes & 0x01) sp_scrollx += 256;
 		if(attributes & 0x08) sp_scrolly += 256;
 		tnk3_draw_sprites(screen->machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
+	}
+
+	{
+		int bank = (attributes & 0x40) ? 1:0;
+
+		tnk3_draw_text(screen->machine, bitmap, cliprect, bank, &ram[0xf800] );
+		tnk3_draw_status(screen->machine, bitmap, cliprect, bank, &ram[0xfc00] );
+	}
+	return 0;
+}
+
+void athena_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
+{
+	const gfx_element *gfx = machine->gfx[2];
+
+	int tile_number, attributes, color, sx, sy;
+	int offs;
+
+	for(offs = 0; offs < 50*4; offs+=4)
+	{
+		if(*(UINT32*)(spriteram+offs) == 0 || *(UINT32*)(spriteram+offs) == -1) continue;
+
+		tile_number = spriteram[offs+1];
+		attributes  = spriteram[offs+3]; /* YBBX.CCCC */
+		if(attributes & 0x40) tile_number |= 256;
+		if(attributes & 0x20) tile_number |= 512;
+
+		color = attributes & 0xf;
+		sx =  xscroll - spriteram[offs+2];
+		if(!(attributes & 0x80)) sx += 256;
+		sy = -yscroll + spriteram[offs];
+		if(attributes & 0x10) sy += 256;
+		sx &= 0x1ff;
+		sy &= 0x1ff;
+		if (sx > 512-16) sx -= 512;
+		if (sy > 512-16) sy -= 512;
+
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
+	}
+}
+
+/* Same as tnk3 but sprite attribute bit 5 is extra bank bit instead of y-flip. */
+VIDEO_UPDATE( athena )
+{
+	UINT8 *ram = snk_rambase - 0xd000;
+	int attributes = ram[0xc800];
+	/*
+        X-------
+        -X------    character bank (for text layer)
+        --X-----
+        ---X----    scrolly MSB (background)
+        ----X---    scrolly MSB (sprites)
+        -----X--
+        ------X-    scrollx MSB (background)
+        -------X    scrollx MSB (sprites)
+    */
+
+	/* to be moved to memmap */
+	spriteram = &ram[0xd000];
+
+	{
+		int bg_scrollx = -ram[0xcc00] + 15;
+		int bg_scrolly = -ram[0xcb00] + 8;
+		if(attributes & 0x02) bg_scrollx += 256;
+		if(attributes & 0x10) bg_scrolly += 256;
+		tnk3_draw_background(screen->machine, bitmap, cliprect, bg_scrollx, bg_scrolly, 64, 64, 0 );
+	}
+
+	{
+		int sp_scrollx = ram[0xca00] + 29;
+		int sp_scrolly = ram[0xc900] + 9;
+		if(attributes & 0x01) sp_scrollx += 256;
+		if(attributes & 0x08) sp_scrolly += 256;
+		athena_draw_sprites(screen->machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
 	}
 
 	{
