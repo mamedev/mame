@@ -511,7 +511,7 @@ static INPUT_PORTS_START(taitowlf)
 	PORT_START_TAG("pc_keyboard_7")
 INPUT_PORTS_END
 
-static int irq_callback(int irqline)
+static IRQ_CALLBACK(irq_callback)
 {
 	int r = 0;
 	r = pic8259_acknowledge(1);

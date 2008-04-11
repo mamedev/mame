@@ -26,7 +26,7 @@
  *
  *************************************/
 
-static int aztarac_irq_callback(int irqline)
+static IRQ_CALLBACK(aztarac_irq_callback)
 {
 	return 0xc;
 }

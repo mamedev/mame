@@ -5090,20 +5090,20 @@ MACHINE_DRIVER_END
 
 
 /* Callback when the genesis enters interrupt code */
-static int genesis_int_callback (int irq)
+static IRQ_CALLBACK(genesis_int_callback)
 {
-	if (irq==4)
+	if (irqline==4)
 	{
 		megadrive_irq4_pending = 0;
 	}
 
-	if (irq==6)
+	if (irqline==6)
 	{
 		megadrive_irq6_pending = 0;
 	//  mame_printf_debug("clear pending!\n");
 	}
 
-	return (0x60+irq*4)/4; // vector address
+	return (0x60+irqline*4)/4; // vector address
 }
 
 static int megadriv_tas_callback(void)

@@ -256,7 +256,7 @@ static MACHINE_RESET( horshoes )
 
 static int last_irq_level;
 
-static int irq_callback(int irqline)
+static IRQ_CALLBACK(irq_callback)
 {
 	return irq_adr_table[last_irq_level];
 }

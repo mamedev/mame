@@ -204,7 +204,7 @@ static void update_irq_state(void)
 	cpunum_set_input_line(Machine, 0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
-static int ssv_irq_callback(int level)
+static IRQ_CALLBACK(ssv_irq_callback)
 {
 	int i;
 	for ( i = 0; i <= 7; i++ )

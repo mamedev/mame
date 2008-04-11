@@ -189,10 +189,10 @@ static void update_irq_state(void)
 
 
 /* For games that supply an *IRQ Vector* on the data bus */
-static int metro_irq_callback(int int_level)
+static IRQ_CALLBACK(metro_irq_callback)
 {
 //  logerror("CPU #0 PC %06X: irq callback returns %04X\n",activecpu_get_pc(),metro_irq_vectors[int_level]);
-	return metro_irq_vectors[int_level]&0xff;
+	return metro_irq_vectors[irqline]&0xff;
 }
 
 static MACHINE_RESET( metro )

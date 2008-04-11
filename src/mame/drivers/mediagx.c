@@ -953,7 +953,7 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 INPUT_PORTS_END
 
-static int irq_callback(int irqline)
+static IRQ_CALLBACK(irq_callback)
 {
 	int r;
 	r = pic8259_acknowledge(1);

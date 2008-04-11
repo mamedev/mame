@@ -76,14 +76,14 @@ static void update_irq_state(void)
 }
 
 
-static int irq_callback(int which)
+static IRQ_CALLBACK(irq_callback)
 {
 	/* auto-ack the IRQ */
-	irq_state[which] = 0;
+	irq_state[irqline] = 0;
 	update_irq_state();
 
 	/* vector is 0x40 + index */
-	return 0x40 + which;
+	return 0x40 + irqline;
 }
 
 

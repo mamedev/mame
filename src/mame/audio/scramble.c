@@ -112,7 +112,7 @@ WRITE8_HANDLER( froggrmc_sh_irqtrigger_w )
 }
 
 
-static int scramble_sh_irq_callback(int irqline)
+static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
@@ -126,7 +126,7 @@ static int scramble_sh_irq_callback(int irqline)
 	return 0xff;
 }
 
-static int sfx_sh_irq_callback(int irqline)
+static IRQ_CALLBACK(sfx_sh_irq_callback)
 {
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this

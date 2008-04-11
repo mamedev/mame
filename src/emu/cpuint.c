@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 #ifdef ENABLE_DEBUGGER
 #include "debug/debugcpu.h"
@@ -76,7 +77,7 @@ int (*const cpu_irq_callbacks[MAX_CPU])(int) =
 	cpu_7_irq_callback
 };
 
-static int (*drv_irq_callbacks[MAX_CPU])(int);
+static int (*drv_irq_callbacks[MAX_CPU])(running_machine *, int);
 
 
 
@@ -318,7 +319,7 @@ void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int 
  *
  *************************************/
 
-void cpunum_set_irq_callback(int cpunum, int (*callback)(int))
+void cpunum_set_irq_callback(int cpunum, int (*callback)(running_machine *, int))
 {
 	drv_irq_callbacks[cpunum] = callback;
 }
@@ -331,7 +332,7 @@ void cpunum_set_irq_callback(int cpunum, int (*callback)(int))
  *
  *************************************/
 
-INLINE int cpu_irq_callback(int cpunum, int line)
+INLINE int cpu_irq_callback(running_machine *machine, int cpunum, int line)
 {
 	int vector = input_line_vector[cpunum][line];
 
@@ -347,7 +348,7 @@ INLINE int cpu_irq_callback(int cpunum, int line)
 
 	/* if there's a driver callback, run it */
 	if (drv_irq_callbacks[cpunum])
-		vector = (*drv_irq_callbacks[cpunum])(line);
+		vector = (*drv_irq_callbacks[cpunum])(machine, line);
 
 #ifdef ENABLE_DEBUGGER
 	/* notify the debugger */
@@ -358,14 +359,14 @@ INLINE int cpu_irq_callback(int cpunum, int line)
 	return vector;
 }
 
-static int cpu_0_irq_callback(int line) { return cpu_irq_callback(0, line); }
-static int cpu_1_irq_callback(int line) { return cpu_irq_callback(1, line); }
-static int cpu_2_irq_callback(int line) { return cpu_irq_callback(2, line); }
-static int cpu_3_irq_callback(int line) { return cpu_irq_callback(3, line); }
-static int cpu_4_irq_callback(int line) { return cpu_irq_callback(4, line); }
-static int cpu_5_irq_callback(int line) { return cpu_irq_callback(5, line); }
-static int cpu_6_irq_callback(int line) { return cpu_irq_callback(6, line); }
-static int cpu_7_irq_callback(int line) { return cpu_irq_callback(7, line); }
+static int cpu_0_irq_callback(int line) { return cpu_irq_callback(Machine, 0, line); }
+static int cpu_1_irq_callback(int line) { return cpu_irq_callback(Machine, 1, line); }
+static int cpu_2_irq_callback(int line) { return cpu_irq_callback(Machine, 2, line); }
+static int cpu_3_irq_callback(int line) { return cpu_irq_callback(Machine, 3, line); }
+static int cpu_4_irq_callback(int line) { return cpu_irq_callback(Machine, 4, line); }
+static int cpu_5_irq_callback(int line) { return cpu_irq_callback(Machine, 5, line); }
+static int cpu_6_irq_callback(int line) { return cpu_irq_callback(Machine, 6, line); }
+static int cpu_7_irq_callback(int line) { return cpu_irq_callback(Machine, 7, line); }
 
 
 

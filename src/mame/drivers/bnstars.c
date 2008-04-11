@@ -1289,13 +1289,13 @@ static const struct YMF271interface ymf271_interface2 =
 
 static UINT16 irqreq;
 
-static int irq_callback(int irqline)
+static IRQ_CALLBACK(irq_callback)
 {
 	int i;
 	for(i=15; i>=0 && !(irqreq & (1<<i)); i--);
 	irqreq &= ~(1<<i);
 	if(!irqreq)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	return i;
 }
 

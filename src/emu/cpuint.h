@@ -17,6 +17,7 @@
 #include "memory.h"
 
 #define INTERRUPT_GEN(func)		void func(running_machine *machine, int cpunum)
+#define IRQ_CALLBACK(func)		int func(running_machine *machine, int irqline)
 
 
 
@@ -50,7 +51,7 @@ void cpunum_set_input_line_vector(int cpunum, int irqline, int vector);
 void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int line, int state, int vector);
 
 /* Install a driver callback for IRQ acknowledge */
-void cpunum_set_irq_callback(int cpunum, int (*callback)(int irqline));
+void cpunum_set_irq_callback(int cpunum, int (*callback)(running_machine *machine, int irqline));
 
 
 #endif	/* __CPUINT_H__ */

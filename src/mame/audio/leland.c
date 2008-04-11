@@ -611,7 +611,7 @@ void leland_80186_sound_init(void)
  *
  *************************************/
 
-static int int_callback(int line)
+static IRQ_CALLBACK(int_callback)
 {
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i80186.intr.poll_status & 0x1f);
 
@@ -1093,7 +1093,7 @@ static READ16_HANDLER( i80186_internal_port_r )
 		case 0x24/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", activecpu_get_pc());
 			if (i80186.intr.poll_status & 0x8000)
-				int_callback(0);
+				int_callback(machine, 0);
 			return i80186.intr.poll_status;
 
 		case 0x26/2:

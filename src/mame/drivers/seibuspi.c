@@ -1731,7 +1731,7 @@ static INTERRUPT_GEN( spi_interrupt )
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
 }
 
-static int spi_irq_callback(int irq)
+static IRQ_CALLBACK(spi_irq_callback)
 {
 	return 0x20;
 }

@@ -714,7 +714,7 @@ static void irq_raise(int level)
 	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
 }
 
-static int irq_callback(int irqline)
+static IRQ_CALLBACK(irq_callback)
 {
 	return last_irq;
 }

@@ -21,9 +21,9 @@ static int tmp68301_irq_vector[8];
 
 static void tmp68301_update_timer( int i );
 
-static int tmp68301_irq_callback(int int_level)
+static IRQ_CALLBACK(tmp68301_irq_callback)
 {
-	int vector = tmp68301_irq_vector[int_level];
+	int vector = tmp68301_irq_vector[irqline];
 //  logerror("CPU #0 PC %06X: irq callback returns %04X for level %x\n",activecpu_get_pc(),vector,int_level);
 	return vector;
 }

@@ -211,7 +211,7 @@ static WRITE32_HANDLER(IntAck_w)
 		IntHigh=(data>>8)&7;
 }
 
-static int icallback(int line)
+static IRQ_CALLBACK(icallback)
 {
 	int i;
 	UINT32 IntPend=program_read_dword_32le(0x01800c0c);

@@ -86,10 +86,10 @@ static void s24_fd1094_cmp_callback(UINT32 val, int reg)
 }
 
 /* Callback when the s24_fd1094 enters interrupt code */
-static int s24_fd1094_int_callback (int irq)
+static IRQ_CALLBACK(s24_fd1094_int_callback)
 {
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_IRQ);
-	return (0x60+irq*4)/4; // vector address
+	return (0x60+irqline*4)/4; // vector address
 }
 
 static void s24_fd1094_rte_callback (void)
