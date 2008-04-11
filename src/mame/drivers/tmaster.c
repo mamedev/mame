@@ -31,6 +31,7 @@ Touch Master 8000 *(?)
 
 * There is a reported "Minnesota" version with modifications due to legal issues
   Touch Master 5000 is labeled "DOMESTIC" (AKA "Standard"), is there an EXPORT version?
+  Is there a Touch Master 6000?  TM5K is version 7.10, then TM7K is version 8, TM8K is version 9.04
   Starting with Touch Master 2000, each later version is a chipswap for the mainboard.
    IE: Touch Master 8000 chips can update any Touch Master mainboard 2000 through 7000
 
@@ -969,7 +970,7 @@ J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Label
 ROM_START( tm5k )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm5k_v7_10.u51", 0x000000, 0x100000, CRC(df0bd25e) SHA1(db1a197ed4c868743397f3823f3f1d42b9329f80) ) /* TOUCHMASTER 5000 U51 DOMESTIC 7.10 (Standard 10-9-98) */
-	ROM_LOAD16_BYTE( "tm5k_v7_10.u52", 0x000001, 0x100000, CRC(ddf9e8dc) SHA1(3228f2eba067bdf1bd639116bffc589585ea3e72) ) /* TOUCHMASTER 5000 U55 DOMESTIC 7.10 (Standard 10-9-98) */
+	ROM_LOAD16_BYTE( "tm5k_v7_10.u52", 0x000001, 0x100000, CRC(ddf9e8dc) SHA1(3228f2eba067bdf1bd639116bffc589585ea3e72) ) /* TOUCHMASTER 5000 U52 DOMESTIC 7.10 (Standard 10-9-98) */
 
 	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm5k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Labeled GRAPHIC U38  7.0 */
@@ -981,6 +982,50 @@ ROM_START( tm5k )
 
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
 	ROM_LOAD( "tm5k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Labeled SOUND U8  7.0 */
+ROM_END
+
+/***************************************************************************
+
+Touchmaster 7000
+by Midway (c) 1998
+touchscreen game
+
+All chips are ST M27C801
+---------------------------
+
+Name Board Location        Version               Use                      Checksum
+-----------------------------------------------------------------------------------
+tm7k_sound.u8              8.0  Audio Program & sounds          F474 (same as TM5K)
+tm7k_v8.u51                8.00 Game Program & Cpu instructions 82A5
+tm7k_v8.u52                8.00 Game Program & Cpu instructions 81E1
+tm7k_graphic.u36           8.0  Video Images & Graphics         DB7F (same as TM5K)
+tm7k_graphic.u37           8.0  Video Images & Graphics         7461
+tm7k_graphic.u38           8.0  Video Images & Graphics         EDCE (same as TM5K)
+tm7k_graphic.u39           8.0  Video Images & Graphics         2BB6
+tm7k_graphic.u40           8.0  Video Images & Graphics         B103
+tm7k_graphic.u41           8.0  Video Images & Graphics         11CA
+
+J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Labeled A-21657-005
+-----------------------------------------------------------------------------------
+
+
+***************************************************************************/
+
+ROM_START( tm7k )
+	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm7k_v8.u51", 0x000000, 0x100000, CRC(83ec3da7) SHA1(37fa7183e7acc2eab35ac431d99cbbfe4862979e) ) /* TOUCHMASTER 7000 U51 DOMESTIC 8.00 (Standard 03/26/99) */
+	ROM_LOAD16_BYTE( "tm7k_v8.u52", 0x000001, 0x100000, CRC(e2004282) SHA1(aa73029f31e2062cabedfcd778db97b314624ae8) ) /* TOUCHMASTER 7000 U52 DOMESTIC 8.00 (Standard 03/26/99) */
+
+	ROM_REGION( 0x600000, REGION_GFX1, 0 )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm7k_graphic.u38", 0x000000, 0x100000, CRC(93038e7c) SHA1(448f69bf51ac992f6b35b471cba9675c67984cd7) ) /* Labeled GRAPHIC U38  8.0 */
+	ROM_LOAD16_BYTE( "tm7k_graphic.u36", 0x000001, 0x100000, CRC(5453a44a) SHA1(094439a56336ca933b0b7ede8c057546d1d490b2) ) /* Labeled GRAPHIC U36  8.0 */
+	ROM_LOAD16_BYTE( "tm7k_graphic.u39", 0x200000, 0x100000, CRC(26af8da8) SHA1(02555b1597a4962f1fd0c3ffc89e5c8338aa3085) ) /* Labeled GRAPHIC U39  8.0 */
+	ROM_LOAD16_BYTE( "tm7k_graphic.u37", 0x200001, 0x100000, CRC(9a705043) SHA1(cffb31859544c1c4082be78b3bca5ad9cd0d2a45) ) /* Labeled GRAPHIC U37  8.0 */
+	ROM_LOAD16_BYTE( "tm7k_graphic.u41", 0x400000, 0x100000, CRC(99b6edda) SHA1(c0ee2834fdbfbc1159a6d08c45552d4d9c1c4ea4) ) /* Labeled GRAPHIC U41  8.0 */
+	ROM_LOAD16_BYTE( "tm7k_graphic.u40", 0x400001, 0x100000, CRC(a3925379) SHA1(74836325ab10466e23105a3b54fc706c0dd5f06c) ) /* Labeled GRAPHIC U40  8.0 */
+
+	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) // Samples
+	ROM_LOAD( "tm7k_sound.u8", 0x00000, 0x100000, CRC(c6070a60) SHA1(2dc20bf2217a36374b5a691133ad43f53dbe29ca) ) /* Labeled SOUND U8  8.0 */
 ROM_END
 
 /***************************************************************************
@@ -1098,6 +1143,29 @@ Protection starts:
 
 }
 
+static DRIVER_INIT( tm7k )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
+
+	// protection
+	ROM[0x81594/2] = 0x4e75;
+
+	ROM[0x81564/2] = 0x6004;
+	ROM[0x8158c/2] = 0x6002;
+/*
+Protection starts:
+
+ 81552: addi.w  #$76c, D0       0640 076C
+ 81556: move.w  D0, $207104.l   33C0 0020 7104
+ 8155C: moveq   #$f, D0         700F
+ 8155E: and.w   (A4), D0        C054
+ 81560: cmpi.w  #$3, D0         0C40 0003
+ 81564: bcs     $8156A          6504          <-- First patch goes here
+
+*/
+
+}
+
 static DRIVER_INIT( galgames )
 {
 	// configure memory banks
@@ -1112,4 +1180,5 @@ GAME( 1996, tm,       0, tm,       tmaster,  0,        ROT0, "Midway",          
 GAME( 1997, tm3k,     0, tm3k,     tmaster,  tm3k,     ROT0, "Midway",                         "Touchmaster 3000 (v5.01)",  GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS)	// imp. graphics due to bad dump
 GAME( 1998, tm4k,     0, tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02)",  GAME_NOT_WORKING )
 GAME( 1998, tm5k,     0, tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10)",  GAME_NOT_WORKING )
+GAME( 1999, tm7k,     0, tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.00)",  GAME_NOT_WORKING )
 GAME( 1998, galgbios, 0, galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )
