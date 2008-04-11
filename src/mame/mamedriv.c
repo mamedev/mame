@@ -2007,6 +2007,7 @@ const game_driver * const drivers[] =
 	DRIVER( dendeg2x )	/* E52 (c) 1998 Taito Corporation */
 	DRIVER( sidebs )	/* E23 (c) 1996 Taito Corporation */
 	DRIVER( sidebs2 )	/* E38 (c) 1997 Taito Corporation */
+	DRIVER( sidebs2j )	/* E38 (c) 1997 Taito Corporation */
 	DRIVER( dangcurv )	/* E09 (c) 1995 Taito Corporation */
 
 	/* Taito "Wolf" System */
