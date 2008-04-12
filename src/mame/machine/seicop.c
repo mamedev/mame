@@ -60,9 +60,11 @@ static UINT16 cop_438;
 static UINT16 cop_43a;
 static UINT16 cop_43c;
 
-static UINT16 cop_clearfill_address;
-static UINT16 cop_clearfill_length;
-static UINT16 cop_clearfill_value;
+static UINT16 cop_clearfill_address[0x200];
+static UINT16 cop_clearfill_length[0x200];
+static UINT16 cop_clearfill_value[0x200];
+static UINT16 cop_clearfill_lasttrigger = 0;
+
 
 static UINT16 copd2_offs = 0;
 
@@ -994,7 +996,7 @@ READ16_HANDLER( heatbrl_mcu_r )
 	{
 		default:
 		{
-			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			printf("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
 			return retvalue;
 		}
 
@@ -1014,8 +1016,8 @@ READ16_HANDLER( heatbrl_mcu_r )
 		case (0x59a/2): { return ((prot_bcd[2] & 0xffff0000) >> 16) + 0x3030; }
 		case (0x59c/2): { return 0x3030; }
 
-	  //case (0x5b0/2): return (cop_mcu_ram[offset]); /* bit 15 is branched on a few times in the $1938 area */
-		case (0x5b4/2):	return (0); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */
+	    case (0x5b0/2): return (0xffff); /* bit 15 is branched on a few times in the $1938 area */
+		case (0x5b4/2):	return (0xffff); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */
 
 		/*********************************************************************
         700-7ff - Non-protection reads
@@ -1069,22 +1071,56 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		/* Layer Clearing */
 		case (0x478/2): /* clear address */
 		{
-			cop_clearfill_address = data; // << 6 to get actual address
-			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_address<<6);
+			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
+			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
 			break;
 		}
 
 		case (0x47a/2): /* clear length */
 		{
-			cop_clearfill_length = data;
-			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_length<<5);
+			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
 
-			/* do the fill */
+			break;
+		}
+
+		case (0x47c/2): /* clear value? */
+		{
+			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			break;
+		}
+
+		/* unknown, related to clears? / DMA? */
+		case (0x47e/2):
+		{
+			cop_clearfill_lasttrigger = data;
+			printf("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
+			if (data>=0x1ff)
+			{
+				printf("invalid!, >0x1ff\n");
+				cop_clearfill_lasttrigger = 0;
+			}
+
+			break;
+		}
+
+		/* hmm, this would be strange the 6xx range should be video regs?? */
+		case (0x6fc/2):
+		{
+			printf("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
+
+			// I think the value it writes here must match the other value for anything to happen.. maybe */
+			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
+			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+
+			/* do the fill  */
+			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
 			{
 				UINT32 length, address;
 				int i;
-				address = cop_clearfill_address << 6;
-				length = (cop_clearfill_length+1) << 5;
+				address = cop_clearfill_address[cop_clearfill_lasttrigger] << 6;
+				length = (cop_clearfill_length[cop_clearfill_lasttrigger]+1) << 5;
 
 				for (i=address;i<address+length;i+=2)
 				{
@@ -1093,16 +1129,6 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 			}
 			break;
 		}
-
-		case (0x47c/2): /* clear value? */
-		{
-			cop_clearfill_value = data;
-			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_value<<5);
-			break;
-		}
-
-		/* unknown, related to clears? / DMA? */
-		//case (0x47e/2): { break; }
 
 
 		/* Registers */
@@ -1202,6 +1228,7 @@ READ16_HANDLER( sdgndmrb_cop_mcu_r )
 		case (0x59c/2): { return 0x3030; }
 
 		case (0x5b0/2):
+			return 2;
 			/*check if the DMA has been finished*/
 			if(dma_status == 1)
 			{
@@ -1257,40 +1284,72 @@ WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 		case (0x43a/2):	{cop_43a = data; break;	}
 		case (0x43c/2): {cop_43c = data; break;	}
 
-		case (0x478/2):
+
+		/* Odd, this is a video register */
+		case (0x470/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
+
+		/* Layer Clearing */
+		case (0x478/2): /* clear address */
 		{
-			static UINT16 i;
-			/*
-            AM_RANGE(0x100800, 0x100fff) AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-            AM_RANGE(0x101000, 0x1017ff) AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-            AM_RANGE(0x101800, 0x101fff) AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-            AM_RANGE(0x102000, 0x102fff) AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-            */
-			switch(cop_mcu_ram[offset])
+			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
+			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			break;
+		}
+
+		case (0x47a/2): /* clear length */
+		{
+			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
+
+			break;
+		}
+
+		case (0x47c/2): /* clear value? */
+		{
+			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			break;
+		}
+
+		/* unknown, related to clears? / DMA? */
+		case (0x47e/2):
+		{
+			cop_clearfill_lasttrigger = data;
+			printf("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
+			if (data>=0x1ff)
 			{
-				/*txt layer clearance*/
-				case 0x4080:
-				for(i=0;i<0x1000;i+=2)
-					program_write_word(i+0x102000,0x0000);
-				break;
-				case 0x4100: break;
-				case 0x41c0: break;
-				//default: popmessage("%04x",cop_mcu_ram[offset]);
+				printf("invalid!, >0x1ff\n");
+				cop_clearfill_lasttrigger = 0;
+			}
+
+			break;
+		}
+
+		/* hmm, this would be strange the 6xx range should be video regs?? */
+		case (0x6fc/2):
+		{
+			printf("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
+
+			// I think the value it writes here must match the other value for anything to happen.. maybe */
+			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
+			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+
+			/* do the fill  */
+			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
+			{
+				UINT32 length, address;
+				int i;
+				address = cop_clearfill_address[cop_clearfill_lasttrigger] << 6;
+				length = (cop_clearfill_length[cop_clearfill_lasttrigger]+1) << 5;
+
+				for (i=address;i<address+length;i+=2)
+				{
+					program_write_word(i, 0x0000);
+				}
 			}
 			break;
 		}
 
-		/*sprite ram clear(Guess)*/
-		case (0x47e/2):
-		{
-			static UINT16 i;
-			if(cop_mcu_ram[0x47e/2] == 0x118)
-			{
-				for(i=0;i<0x800;i+=2)
-					program_write_word((0x107000 | i),0x0000);
-			}
-			break;
-		}
 
 		/* MCU registers */
 		case (0x4c0/2):	{ prot_data[0] = cop_mcu_ram[offset]; ram_addr[0] = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
@@ -1441,7 +1500,7 @@ WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 		/* Seems a mirror for the choices in the test menu... */
 		case (0x67c/2): break;
 		case (0x680/2): break;
-		case (0x6fc/2): break;
+		//case (0x6fc/2): break;
 
 		case (0x700/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
 		case (0x704/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
@@ -1514,8 +1573,67 @@ WRITE16_HANDLER( denjinmk_cop_mcu_w )
 		case (0x43c/2): {cop_43c = data; break;	}
 
 
-		/* again, strange, this is a video register */
-		case (0x470/2):	{ denjinmk_setgfxbank( cop_mcu_ram[offset] ); break; }
+		/* Layer Clearing */
+		case (0x478/2): /* clear address */
+		{
+			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
+			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			break;
+		}
+
+		case (0x47a/2): /* clear length */
+		{
+			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
+
+			break;
+		}
+
+		case (0x47c/2): /* clear value? */
+		{
+			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			break;
+		}
+
+		/* unknown, related to clears? / DMA? */
+		case (0x47e/2):
+		{
+			cop_clearfill_lasttrigger = data;
+			printf("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
+			if (data>=0x1ff)
+			{
+				printf("invalid!, >0x1ff\n");
+				cop_clearfill_lasttrigger = 0;
+			}
+
+			break;
+		}
+
+		/* hmm, this would be strange the 6xx range should be video regs?? */
+		case (0x6fc/2):
+		{
+			printf("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
+
+			// I think the value it writes here must match the other value for anything to happen.. maybe */
+			if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
+
+			/* do the fill  */
+			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
+			{
+				UINT32 length, address;
+				int i;
+				address = cop_clearfill_address[cop_clearfill_lasttrigger] << 6;
+				length = (cop_clearfill_length[cop_clearfill_lasttrigger]+1) << 5;
+
+				for (i=address;i<address+length;i+=2)
+				{
+					program_write_word(i, 0x0000);
+				}
+			}
+			break;
+		}
+
 
 		case (0x620/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
 		case (0x622/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
@@ -1591,6 +1709,7 @@ WRITE16_HANDLER( godzilla_cop_mcu_w )
 		case (0x43a/2):	{cop_43a = data; break;	}
 		case (0x43c/2): {cop_43c = data; break;	}
 
+
 		/* Layer Clear */
 		case (0x478/2):
 		{
@@ -1614,6 +1733,8 @@ WRITE16_HANDLER( godzilla_cop_mcu_w )
 			break;
 		}
 
+
+
 		case (0x620/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
 		case (0x622/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
 		case (0x624/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
@@ -1636,7 +1757,7 @@ WRITE16_HANDLER( godzilla_cop_mcu_w )
  *******************************************************************************************/
 
 
-READ16_HANDLER( copdx_0_r )
+READ16_HANDLER( cupsoc_cop_mcu_r )
 {
 	UINT16 retvalue = cop_mcu_ram[offset];
 
@@ -1740,7 +1861,7 @@ static void cop_reg_w(UINT16 data,UINT8 offset,UINT8 mask)
 	//popmessage("%08x",cop_reg[offset]);
 }
 
-WRITE16_HANDLER( copdx_0_w )
+WRITE16_HANDLER( cupsoc_cop_mcu_w )
 {
 
 	COMBINE_DATA(&cop_mcu_ram[offset]);
@@ -1783,16 +1904,71 @@ WRITE16_HANDLER( copdx_0_w )
 			break;
 		/*layer clearance,but the bootleg doesn't send values,so this function is an
           original left-over.*/
-		case (0x478/2):
+		/* Odd, this is a video register */
+		case (0x470/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
+
+		/* Layer Clearing */
+		case (0x478/2): /* clear address */
 		{
-			/*
-    AM_RANGE(0x100800, 0x100fff) AM_READWRITE(SMH_RAM,legionna_background_w) AM_BASE(&legionna_back_data)
-    AM_RANGE(0x101000, 0x1017ff) AM_READWRITE(SMH_RAM,legionna_foreground_w) AM_BASE(&legionna_fore_data)
-    AM_RANGE(0x101800, 0x101fff) AM_READWRITE(SMH_RAM,legionna_midground_w) AM_BASE(&legionna_mid_data)
-    AM_RANGE(0x102000, 0x102fff) AM_READWRITE(SMH_RAM,legionna_text_w) AM_BASE(&legionna_textram)
-            */
+			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
+			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
 			break;
 		}
+
+		case (0x47a/2): /* clear length */
+		{
+			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
+
+			break;
+		}
+
+		case (0x47c/2): /* clear value? */
+		{
+			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
+			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			break;
+		}
+
+		/* unknown, related to clears? / DMA? */
+		case (0x47e/2):
+		{
+			cop_clearfill_lasttrigger = data;
+			printf("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
+			if (data>=0x1ff)
+			{
+				printf("invalid!, >0x1ff\n");
+				cop_clearfill_lasttrigger = 0;
+			}
+
+			break;
+		}
+
+		/* hmm, this would be strange the 6xx range should be video regs?? */
+		case (0x6fc/2):
+		{
+			printf("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
+
+			// I think the value it writes here must match the other value for anything to happen.. maybe */
+			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
+			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+
+			/* do the fill  */
+			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
+			{
+				UINT32 length, address;
+				int i;
+				address = cop_clearfill_address[cop_clearfill_lasttrigger] << 6;
+				length = (cop_clearfill_length[cop_clearfill_lasttrigger]+1) << 5;
+
+				for (i=address;i<address+length;i+=2)
+				{
+					program_write_word(i, 0x0000);
+				}
+			}
+			break;
+		}
+
 
 		/* Trigger Macro Command */
 		case (0x500/2):

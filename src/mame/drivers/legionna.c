@@ -91,8 +91,8 @@ extern READ16_HANDLER( denjinmk_cop_mcu_r );
 extern WRITE16_HANDLER( denjinmk_cop_mcu_w );
 extern READ16_HANDLER( sdgndmrb_cop_mcu_r );
 extern WRITE16_HANDLER( sdgndmrb_cop_mcu_w );
-extern READ16_HANDLER( copdx_0_r );
-extern WRITE16_HANDLER( copdx_0_w );
+extern READ16_HANDLER( cupsoc_cop_mcu_r );
+extern WRITE16_HANDLER( cupsoc_cop_mcu_w );
 extern READ16_HANDLER( copdxbl_0_r );
 extern WRITE16_HANDLER( copdxbl_0_w );
 
@@ -210,7 +210,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cupsoc_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(copdx_0_r,copdx_0_w) AM_BASE(&cop_mcu_ram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_READWRITE(cupsoc_cop_mcu_r,cupsoc_cop_mcu_w) AM_BASE(&cop_mcu_ram)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM AM_READWRITE(SMH_RAM,legionna_background_w) AM_BASE(&legionna_back_data)
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
 	AM_RANGE(0x101800, 0x101fff) AM_RAM AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
