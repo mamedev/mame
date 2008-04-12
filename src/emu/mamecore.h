@@ -91,11 +91,16 @@ typedef union
 #ifdef LSB_FIRST
 	struct { UINT8 l,h,h2,h3; } b;
 	struct { UINT16 l,h; } w;
+	struct { INT8 l,h,h2,h3; } sb;
+	struct { INT16 l,h; } sw;
 #else
 	struct { UINT8 h3,h2,h,l; } b;
+	struct { INT8 h3,h2,h,l; } sb;
 	struct { UINT16 h,l; } w;
+	struct { INT16 h,l; } sw;
 #endif
 	UINT32 d;
+	INT32 sd;
 } PAIR;
 
 
@@ -110,12 +115,19 @@ typedef union
 	struct { UINT8 l,h,h2,h3,h4,h5,h6,h7; } b;
 	struct { UINT16 l,h,h2,h3; } w;
 	struct { UINT32 l,h; } d;
+	struct { INT8 l,h,h2,h3,h4,h5,h6,h7; } sb;
+	struct { INT16 l,h,h2,h3; } sw;
+	struct { INT32 l,h; } sd;
 #else
 	struct { UINT8 h7,h6,h5,h4,h3,h2,h,l; } b;
 	struct { UINT16 h3,h2,h,l; } w;
 	struct { UINT32 h,l; } d;
+	struct { INT8 h7,h6,h5,h4,h3,h2,h,l; } sb;
+	struct { INT16 h3,h2,h,l; } sw;
+	struct { INT32 h,l; } sd;
 #endif
-	UINT64 lw;
+	UINT64 q;
+	INT64 sq;
 } PAIR64;
 
 

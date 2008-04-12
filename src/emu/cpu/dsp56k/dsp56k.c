@@ -50,11 +50,11 @@
 #define Y1		dsp56k.aluDataRegs[1].w.h
 #define Y0		dsp56k.aluDataRegs[1].w.l
 
-#define A		dsp56k.aluAccumRegs[0].lw
+#define A		dsp56k.aluAccumRegs[0].q
 #define A2		dsp56k.aluAccumRegs[0].b.h4
 #define A1		dsp56k.aluAccumRegs[0].w.h
 #define A0		dsp56k.aluAccumRegs[0].w.l
-#define B		dsp56k.aluAccumRegs[1].lw
+#define B		dsp56k.aluAccumRegs[1].q
 #define B2		dsp56k.aluAccumRegs[1].b.h4
 #define B1		dsp56k.aluAccumRegs[1].w.h
 #define B0		dsp56k.aluAccumRegs[1].w.l

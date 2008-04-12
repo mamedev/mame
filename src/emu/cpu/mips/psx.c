@@ -2997,17 +2997,17 @@ static void setcp3cr( int reg, UINT32 value )
 #define IR2  ( mipscpu.cp2dr[ 10 ].d )
 #define IR3  ( mipscpu.cp2dr[ 11 ].d )
 #define SXY0 ( mipscpu.cp2dr[ 12 ].d )
-#define SX0  ( mipscpu.cp2dr[ 12 ].w.l )
-#define SY0  ( mipscpu.cp2dr[ 12 ].w.h )
+#define SX0  ( mipscpu.cp2dr[ 12 ].sw.l )
+#define SY0  ( mipscpu.cp2dr[ 12 ].sw.h )
 #define SXY1 ( mipscpu.cp2dr[ 13 ].d )
-#define SX1  ( mipscpu.cp2dr[ 13 ].w.l )
-#define SY1  ( mipscpu.cp2dr[ 13 ].w.h )
+#define SX1  ( mipscpu.cp2dr[ 13 ].sw.l )
+#define SY1  ( mipscpu.cp2dr[ 13 ].sw.h )
 #define SXY2 ( mipscpu.cp2dr[ 14 ].d )
-#define SX2  ( mipscpu.cp2dr[ 14 ].w.l )
-#define SY2  ( mipscpu.cp2dr[ 14 ].w.h )
+#define SX2  ( mipscpu.cp2dr[ 14 ].sw.l )
+#define SY2  ( mipscpu.cp2dr[ 14 ].sw.h )
 #define SXYP ( mipscpu.cp2dr[ 15 ].d )
-#define SXP  ( mipscpu.cp2dr[ 15 ].w.l )
-#define SYP  ( mipscpu.cp2dr[ 15 ].w.h )
+#define SXP  ( mipscpu.cp2dr[ 15 ].sw.l )
+#define SYP  ( mipscpu.cp2dr[ 15 ].sw.h )
 #define SZ0  ( mipscpu.cp2dr[ 16 ].w.l )
 #define SZ1  ( mipscpu.cp2dr[ 17 ].w.l )
 #define SZ2  ( mipscpu.cp2dr[ 18 ].w.l )
@@ -3081,8 +3081,8 @@ static void setcp3cr( int reg, UINT32 value )
 #define H   ( mipscpu.cp2cr[ 26 ].w.l )
 #define DQA ( mipscpu.cp2cr[ 27 ].w.l )
 #define DQB ( mipscpu.cp2cr[ 28 ].d )
-#define ZSF3 ( mipscpu.cp2cr[ 29 ].w.l )
-#define ZSF4 ( mipscpu.cp2cr[ 30 ].w.l )
+#define ZSF3 ( mipscpu.cp2cr[ 29 ].sw.l )
+#define ZSF4 ( mipscpu.cp2cr[ 30 ].sw.l )
 #define FLAG ( mipscpu.cp2cr[ 31 ].d )
 
 INLINE INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
@@ -3111,7 +3111,7 @@ static UINT32 getcp2dr( int reg )
 	case 9:
 	case 10:
 	case 11:
-		mipscpu.cp2dr[ reg ].d = (INT32)(INT16)mipscpu.cp2dr[ reg ].d;
+		mipscpu.cp2dr[ reg ].d = (INT32)mipscpu.cp2dr[ reg ].sw.l;
 		break;
 
 	case 7:
@@ -3119,7 +3119,7 @@ static UINT32 getcp2dr( int reg )
 	case 17:
 	case 18:
 	case 19:
-		mipscpu.cp2dr[ reg ].d = (UINT32)(UINT16)mipscpu.cp2dr[ reg ].d;
+		mipscpu.cp2dr[ reg ].d = (UINT32)mipscpu.cp2dr[ reg ].w.l;
 		break;
 
 	case 15:
@@ -3309,18 +3309,14 @@ static void docop2( int gteop )
 			return;
 		}
 		break;
-	case 0x06:
-		if( gteop == 0x0400006 ||
-			gteop == 0x1400006 ||
-			gteop == 0x0155cc6 )
-		{
-			GTELOG( "NCLIP" );
-			FLAG = 0;
 
-			MAC0 = F( ( (INT64)(INT16)SX0 * (INT16)SY1 ) + ( (INT16)SX1 * (INT16)SY2 ) + ( (INT16)SX2 * (INT16)SY0 ) - ( (INT16)SX0 * (INT16)SY2 ) - ( (INT16)SX1 * (INT16)SY0 ) - ( (INT16)SX2 * (INT16)SY1 ) );
-			return;
-		}
-		break;
+	case 0x06:
+		GTELOG( "NCLIP" );
+		FLAG = 0;
+
+		MAC0 = F( (INT64)( SX0 * SY1 ) + ( SX1 * SY2 ) + ( SX2 * SY0 ) - ( SX0 * SY2 ) - ( SX1 * SY0 ) - ( SX2 * SY1 ) );
+		return;
+
 	case 0x0c:
 		if( GTE_OP( gteop ) == 0x17 )
 		{
