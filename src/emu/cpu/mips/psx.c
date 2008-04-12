@@ -2992,7 +2992,7 @@ static void setcp3cr( int reg, UINT32 value )
 #define B    ( mipscpu.cp2dr[ 6 ].b.h2 )
 #define CODE ( mipscpu.cp2dr[ 6 ].b.h3 )
 #define OTZ  ( mipscpu.cp2dr[ 7 ].w.l )
-#define IR0  ( mipscpu.cp2dr[ 8 ].d )
+#define IR0  ( mipscpu.cp2dr[ 8 ].sw.l )
 #define IR1  ( mipscpu.cp2dr[ 9 ].d )
 #define IR2  ( mipscpu.cp2dr[ 10 ].d )
 #define IR3  ( mipscpu.cp2dr[ 11 ].d )
@@ -3029,9 +3029,9 @@ static void setcp3cr( int reg, UINT32 value )
 #define CD2  ( mipscpu.cp2dr[ 22 ].b.h3 )
 #define RES1 ( mipscpu.cp2dr[ 23 ].d )
 #define MAC0 ( mipscpu.cp2dr[ 24 ].d )
-#define MAC1 ( mipscpu.cp2dr[ 25 ].d )
-#define MAC2 ( mipscpu.cp2dr[ 26 ].d )
-#define MAC3 ( mipscpu.cp2dr[ 27 ].d )
+#define MAC1 ( mipscpu.cp2dr[ 25 ].sd )
+#define MAC2 ( mipscpu.cp2dr[ 26 ].sd )
+#define MAC3 ( mipscpu.cp2dr[ 27 ].sd )
 #define IRGB ( mipscpu.cp2dr[ 28 ].d )
 #define ORGB ( mipscpu.cp2dr[ 29 ].d )
 #define LZCS ( mipscpu.cp2dr[ 30 ].d )
@@ -3049,9 +3049,9 @@ static void setcp3cr( int reg, UINT32 value )
 #define R32 ( mipscpu.cp2cr[ 3 ].w.h )
 #define D3  ( mipscpu.cp2cr[ 4 ].d )
 #define R33 ( mipscpu.cp2cr[ 4 ].w.l )
-#define TRX ( mipscpu.cp2cr[ 5 ].d )
-#define TRY ( mipscpu.cp2cr[ 6 ].d )
-#define TRZ ( mipscpu.cp2cr[ 7 ].d )
+#define TRX ( mipscpu.cp2cr[ 5 ].sd )
+#define TRY ( mipscpu.cp2cr[ 6 ].sd )
+#define TRZ ( mipscpu.cp2cr[ 7 ].sd )
 #define L11 ( mipscpu.cp2cr[ 8 ].w.l )
 #define L12 ( mipscpu.cp2cr[ 8 ].w.h )
 #define L13 ( mipscpu.cp2cr[ 9 ].w.l )
@@ -3061,9 +3061,9 @@ static void setcp3cr( int reg, UINT32 value )
 #define L31 ( mipscpu.cp2cr[ 11 ].w.l )
 #define L32 ( mipscpu.cp2cr[ 11 ].w.h )
 #define L33 ( mipscpu.cp2cr[ 12 ].w.l )
-#define RBK ( mipscpu.cp2cr[ 13 ].d )
-#define GBK ( mipscpu.cp2cr[ 14 ].d )
-#define BBK ( mipscpu.cp2cr[ 15 ].d )
+#define RBK ( mipscpu.cp2cr[ 13 ].sd )
+#define GBK ( mipscpu.cp2cr[ 14 ].sd )
+#define BBK ( mipscpu.cp2cr[ 15 ].sd )
 #define LR1 ( mipscpu.cp2cr[ 16 ].w.l )
 #define LR2 ( mipscpu.cp2cr[ 16 ].w.h )
 #define LR3 ( mipscpu.cp2cr[ 17 ].w.l )
@@ -3073,9 +3073,9 @@ static void setcp3cr( int reg, UINT32 value )
 #define LB1 ( mipscpu.cp2cr[ 19 ].w.l )
 #define LB2 ( mipscpu.cp2cr[ 19 ].w.h )
 #define LB3 ( mipscpu.cp2cr[ 20 ].w.l )
-#define RFC ( mipscpu.cp2cr[ 21 ].d )
-#define GFC ( mipscpu.cp2cr[ 22 ].d )
-#define BFC ( mipscpu.cp2cr[ 23 ].d )
+#define RFC ( mipscpu.cp2cr[ 21 ].sd )
+#define GFC ( mipscpu.cp2cr[ 22 ].sd )
+#define BFC ( mipscpu.cp2cr[ 23 ].sd )
 #define OFX ( mipscpu.cp2cr[ 24 ].d )
 #define OFY ( mipscpu.cp2cr[ 25 ].d )
 #define H   ( mipscpu.cp2cr[ 26 ].w.l )
@@ -3229,7 +3229,7 @@ INLINE INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int
 #define A3( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 28 ), -(INT64)0x80000000, ( 1 << 25 ) )
 #define Lm_B1( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 24 ) )
 #define Lm_B2( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 23 ) )
-#define Lm_B3( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 22 ) )
+#define Lm_B3( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 22 ) )
 #define Lm_C1( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 21 ) )
 #define Lm_C2( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 20 ) )
 #define Lm_C3( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 19 ) )
@@ -3264,9 +3264,9 @@ static void docop2( int gteop )
 	UINT16 n_v2;
 	UINT16 n_v3;
 	const UINT16 *const *p_n_mx;
-	const UINT32 *const *p_n_cv;
+	const INT32 *const *p_n_cv;
 	static const UINT16 n_zm = 0;
-	static const UINT32 n_zc = 0;
+	static const INT32 n_zc = 0;
 	static const UINT16 *const p_n_vx[] = { &VX0, &VX1, &VX2 };
 	static const UINT16 *const p_n_vy[] = { &VY0, &VY1, &VY2 };
 	static const UINT16 *const p_n_vz[] = { &VZ0, &VZ1, &VZ2 };
@@ -3275,11 +3275,11 @@ static void docop2( int gteop )
 	static const UINT16 *const p_n_cm[] = { &LR1, &LR2, &LR3, &LG1, &LG2, &LG3, &LB1, &LB2, &LB3 };
 	static const UINT16 *const p_n_zm[] = { &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm };
 	static const UINT16 *const *const p_p_n_mx[] = { p_n_rm, p_n_lm, p_n_cm, p_n_zm };
-	static const UINT32 *const p_n_tr[] = { &TRX, &TRY, &TRZ };
-	static const UINT32 *const p_n_bk[] = { &RBK, &GBK, &BBK };
-	static const UINT32 *const p_n_fc[] = { &RFC, &GFC, &BFC };
-	static const UINT32 *const p_n_zc[] = { &n_zc, &n_zc, &n_zc };
-	static const UINT32 *const *const p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
+	static const INT32 *const p_n_tr[] = { &TRX, &TRY, &TRZ };
+	static const INT32 *const p_n_bk[] = { &RBK, &GBK, &BBK };
+	static const INT32 *const p_n_fc[] = { &RFC, &GFC, &BFC };
+	static const INT32 *const p_n_zc[] = { &n_zc, &n_zc, &n_zc };
+	static const INT32 *const *const p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
 	INT64 mac0;
 
 	switch( GTE_FUNCT( gteop ) )
@@ -3333,33 +3333,37 @@ static void docop2( int gteop )
 			return;
 		}
 		break;
-	case 0x10:
-		if( gteop == 0x0780010 )
-		{
-			GTELOG( "DPCS" );
-			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)R << 16 ) + ( (INT64)(INT16)IR0 * ( Lm_B1( (INT32)RFC - ( R << 4 ), 0 ) ) ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)G << 16 ) + ( (INT64)(INT16)IR0 * ( Lm_B1( (INT32)GFC - ( G << 4 ), 0 ) ) ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)B << 16 ) + ( (INT64)(INT16)IR0 * ( Lm_B1( (INT32)BFC - ( B << 4 ), 0 ) ) ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 0 );
-			IR2 = Lm_B2( (INT32)MAC2, 0 );
-			IR3 = Lm_B3( (INT32)MAC3, 0 );
-			CD0 = CD1;
-			CD1 = CD2;
-			CD2 = CODE;
-			R0 = R1;
-			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
-			G0 = G1;
-			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
-			B0 = B1;
-			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
-			return;
+	case 0x10:
+		GTELOG( "DPCS" );
+		FLAG = 0;
+
+		n_lm = GTE_LM( gteop );
+
+		if( GTE_SF( gteop ) == 1 )
+		{
+			MAC1 = ( ( R << 16 ) + ( IR0 * Lm_B1( A1( (INT64) RFC - ( R << 4 ) ), 0 ) ) ) >> 12;
+			MAC2 = ( ( G << 16 ) + ( IR0 * Lm_B2( A2( (INT64) GFC - ( G << 4 ) ), 0 ) ) ) >> 12;
+			MAC3 = ( ( B << 16 ) + ( IR0 * Lm_B3( A3( (INT64) BFC - ( B << 4 ) ), 0 ) ) ) >> 12;
 		}
-		break;
+		else
+		{
+			MAC1 = ( ( R << 16 ) + ( IR0 * Lm_B1( A1( ( (INT64) ( RFC << 12 ) - ( R << 16 ) ) ), 0 ) ) );
+			MAC2 = ( ( G << 16 ) + ( IR0 * Lm_B2( A2( ( (INT64) ( GFC << 12 ) - ( G << 16 ) ) ), 0 ) ) );
+			MAC3 = ( ( B << 16 ) + ( IR0 * Lm_B3( A3( ( (INT64) ( BFC << 12 ) - ( B << 16 ) ) ), 0 ) ) );
+		}
+
+		IR1 = Lm_B1( MAC1, n_lm );
+		IR2 = Lm_B2( MAC2, n_lm );
+		IR3 = Lm_B3( MAC3, n_lm );
+		RGB0 = RGB1;
+		RGB1 = RGB2;
+		CD2 = CODE;
+		R2 = Lm_C1( MAC1 >> 4 );
+		G2 = Lm_C2( MAC2 >> 4 );
+		B2 = Lm_C3( MAC3 >> 4 );
+		return;
+
 	case 0x11:
 		if( gteop == 0x0980011 )
 		{
