@@ -62,6 +62,7 @@ static UINT16 cop_43c;
 
 static UINT16 cop_clearfill_address;
 static UINT16 cop_clearfill_length;
+static UINT16 cop_clearfill_value;
 
 static UINT16 copd2_offs = 0;
 
@@ -69,6 +70,7 @@ extern UINT16* legionna_scrollram16;
 extern UINT8 sdgndmrb_pri_n;
 extern void heatbrl_setgfxbank(UINT16 data);
 extern void denjinmk_setgfxbank(UINT16 data);
+extern UINT16 legionna_layer_disable;
 
 void copd2_set_tableoffset(UINT16 data, running_machine *machine)
 {
@@ -1071,28 +1073,35 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_address<<6);
 			break;
 		}
-		
+
 		case (0x47a/2): /* clear length */
 		{
 			cop_clearfill_length = data;
 			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_length<<5);
-			
+
 			/* do the fill */
 			{
 				UINT32 length, address;
 				int i;
 				address = cop_clearfill_address << 6;
 				length = (cop_clearfill_length+1) << 5;
-				
+
 				for (i=address;i<address+length;i+=2)
 				{
 					program_write_word(i, 0x0000);
-				}			
-			}		
+				}
+			}
+			break;
 		}
-		
 
-		/* unknown, related to clears? */
+		case (0x47c/2): /* clear value? */
+		{
+			cop_clearfill_value = data;
+			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_value<<5);
+			break;
+		}
+
+		/* unknown, related to clears? / DMA? */
 		//case (0x47e/2): { break; }
 
 
@@ -1147,7 +1156,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
         *********************************************************************/
 
 		// 65a bit 0 is flipscreen
-		// 65c probably layer disables, like Dcon? Used on screen when you press P1-4 start (values 13, 11, 0 seen)
+		case (0x65c/2): { legionna_layer_disable = cop_mcu_ram[offset]; break; } // 65c probably layer disables, like Dcon? Used on screen when you press P1-4 start (values 13, 11, 0 seen)
 		// 660 - 66a scroll control;  is there a layer priority switch...?
 		case (0x660/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
 		case (0x662/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }

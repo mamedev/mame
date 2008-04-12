@@ -9,7 +9,7 @@
 UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 
 static tilemap *background_layer,*foreground_layer,*midground_layer,*text_layer;
-//static int legionna_enable;
+UINT16 legionna_layer_disable;
 
 /******************************************************************************/
 
@@ -159,6 +159,7 @@ VIDEO_START( legionna )
 	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 	midground_layer =  tilemap_create(get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
 	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	legionna_layer_disable = 0x0000;
 
 	legionna_scrollram16 = auto_malloc(0x60);
 
@@ -174,6 +175,7 @@ VIDEO_START( denjinmk )
 	foreground_layer = tilemap_create(get_fore_tile_info_denji,tilemap_scan_rows,16,16,32,32);
 	midground_layer =  tilemap_create(get_mid_tile_info_denji, tilemap_scan_rows,16,16,32,32);
 	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	legionna_layer_disable = 0x0000;
 
 	legionna_scrollram16 = auto_malloc(0x60);
 
@@ -189,6 +191,7 @@ VIDEO_START( cupsoc )
 	foreground_layer = tilemap_create(get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 	midground_layer =  tilemap_create(get_mid_tile_info_cupsoc, tilemap_scan_rows,16,16,32,32);
 	text_layer =       tilemap_create(get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
+	legionna_layer_disable = 0x0000;
 
 	legionna_scrollram16 = auto_malloc(0x60);
 
@@ -311,42 +314,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( legionna )
 {
-#if LAYER_DB
-	static int dislayer[5];	/* Layer toggles to help get the layers correct */
-#endif
-
-#if LAYER_DB
-if (input_code_pressed_once (KEYCODE_Z))
-	{
-		dislayer[0] ^= 1;
-		popmessage("bg0: %01x",dislayer[0]);
-	}
-
-	if (input_code_pressed_once (KEYCODE_X))
-	{
-		dislayer[1] ^= 1;
-		popmessage("bg1: %01x",dislayer[1]);
-	}
-
-	if (input_code_pressed_once (KEYCODE_C))
-	{
-		dislayer[2] ^= 1;
-		popmessage("bg2: %01x",dislayer[2]);
-	}
-
-	if (input_code_pressed_once (KEYCODE_V))
-	{
-		dislayer[3] ^= 1;
-		popmessage("sprites: %01x",dislayer[3]);
-	}
-
-	if (input_code_pressed_once (KEYCODE_B))
-	{
-		dislayer[4] ^= 1;
-		popmessage("text: %01x",dislayer[4]);
-	}
-#endif
-
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( background_layer, 0, legionna_scrollram16[0] );
 	tilemap_set_scrolly( background_layer, 0, legionna_scrollram16[1] );
@@ -355,33 +322,24 @@ if (input_code_pressed_once (KEYCODE_Z))
 	tilemap_set_scrollx( foreground_layer, 0, legionna_scrollram16[4] );
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
 
-//  if ((legionna_enable&1)!=1)
 
 	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);	/* wrong color? */
 
-#if LAYER_DB
-	if (dislayer[2]==0)
-#endif
-	tilemap_draw(bitmap,cliprect,foreground_layer,TILEMAP_DRAW_OPAQUE,0);
+	/* legionna_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
-#if LAYER_DB
-	if (dislayer[1]==0)
-#endif
-	tilemap_draw(bitmap,cliprect,midground_layer,0,0);
+	if (!(legionna_layer_disable&0x0020)) tilemap_draw(bitmap,cliprect,foreground_layer,TILEMAP_DRAW_OPAQUE,0);
+
+	if (!(legionna_layer_disable&0x0010)) tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
 	draw_sprites(screen->machine, bitmap,cliprect,3);
-#if LAYER_DB
-	if (dislayer[0]==0)
-#endif
-	tilemap_draw(bitmap,cliprect,background_layer,0,0);
+
+	if (!(legionna_layer_disable&0x0002)) tilemap_draw(bitmap,cliprect,background_layer,0,0);
+
 	draw_sprites(screen->machine,bitmap,cliprect,2);
 	draw_sprites(screen->machine,bitmap,cliprect,1);
 	draw_sprites(screen->machine,bitmap,cliprect,0);
 
-#if LAYER_DB
-	if (dislayer[4]==0)
-#endif
-	tilemap_draw(bitmap,cliprect,text_layer,0,0);
+	if (!(legionna_layer_disable&0x0001)) tilemap_draw(bitmap,cliprect,text_layer,0,0);
 
 	return 0;
 }
