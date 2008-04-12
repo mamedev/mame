@@ -515,10 +515,7 @@ const char *xml_normalize_string(const char *string)
 				case '<'  : d += sprintf(d, "&lt;"); break;
 				case '>'  : d += sprintf(d, "&gt;"); break;
 				default:
-					if (*string >= ' ' && *string <= '~')
-						*d++ = *string;
-					else
-						d += sprintf(d, "&#%d;", (unsigned)(unsigned char)*string);
+					*d++ = *string;
 			}
 			++string;
 		}
