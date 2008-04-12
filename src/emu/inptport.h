@@ -14,6 +14,8 @@
 #ifndef __INPTPORT_H__
 #define __INPTPORT_H__
 
+#include <time.h>
+
 #include "memory.h"
 #include "inputseq.h"
 #include "tokenize.h"
@@ -895,7 +897,6 @@ struct _inp_header
 ***************************************************************************/
 
 #define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
-
 
 
 /***************************************************************************
