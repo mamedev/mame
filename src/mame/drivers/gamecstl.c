@@ -428,8 +428,8 @@ static const struct dma8237_interface dma8237_1_config =
 
 static const struct dma8237_interface dma8237_2_config =
 {
-	0, 
-	1.0e-6, // 1us 
+	0,
+	1.0e-6, // 1us
 
 	NULL,
 	NULL,

@@ -390,7 +390,7 @@ static void pdraw_tile(running_machine *machine,
 						if (pri[x] <= priority)
 						{
 							int c = source[x_index>>16];
-							dest[x] = pal_base + c;	
+							dest[x] = pal_base + c;
 						}
 
 						pri[x] = 0xff;
@@ -624,7 +624,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 					tilemap_set_scrollx( bg_tilemap[which], 0, scrollx );
 					tilemap_set_scrolly( bg_tilemap[which], 0, scrolly );
 					tilemap_draw_primask( bitmap, &clip, bg_tilemap[which], 0, primask, 0 );
-				}			
+				}
 			}
 		}
 	}
@@ -660,7 +660,7 @@ VIDEO_UPDATE( namcona1 )
 		} /* next tilemap */
 		fillbitmap( priority_bitmap,0,cliprect );
 
-		// It fixes bg in emeralda	
+		// It fixes bg in emeralda
 		fillbitmap( bitmap,/* 0 */ 0xff,cliprect );
 
 		for( priority = 0; priority<8; priority++ )

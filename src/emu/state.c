@@ -292,7 +292,7 @@ void state_save_register_bitmap(const char *module, UINT32 instance, const char 
 ***************************************************************************/
 
 /*-------------------------------------------------
-    state_save_register_presave - 
+    state_save_register_presave -
     register a pre-save function callback
 -------------------------------------------------*/
 
@@ -322,7 +322,7 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 
 
 /*-------------------------------------------------
-    state_save_register_postload - 
+    state_save_register_postload -
     register a post-load function callback
 -------------------------------------------------*/
 

@@ -2762,7 +2762,7 @@ static void input_port_frame_update(running_machine *machine)
 	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
 	attotime curtime = timer_get_time();
 	int portnum, bitnum;
-	
+
 profiler_mark(PROFILER_INPUT);
 
 	/* record/playback information about the current frame */
@@ -3292,7 +3292,7 @@ UINT32 input_port_read_indexed(running_machine *machine, int portnum)
 	input_port_info *portinfo = &port_info[portnum];
 	custom_port_info *custom;
 	UINT32 result;
-	
+
 	/* start with the digital */
 	result = portinfo->defvalue ^ portinfo->digital;
 
@@ -3452,7 +3452,7 @@ static UINT8 playback_read_uint8(running_machine *machine)
 		playback_end(machine, "End of file");
 		return 0;
 	}
-	
+
 	/* return the appropriate value */
 	return result;
 }
@@ -3496,7 +3496,7 @@ static UINT32 playback_read_uint32(running_machine *machine)
 		playback_end(machine, "End of file");
 		return 0;
 	}
-	
+
 	/* return the appropriate value */
 	return LITTLE_ENDIANIZE_INT32(result);
 }
@@ -3540,7 +3540,7 @@ static UINT64 playback_read_uint64(running_machine *machine)
 		playback_end(machine, "End of file");
 		return 0;
 	}
-	
+
 	/* return the appropriate value */
 	return LITTLE_ENDIANIZE_INT64(result);
 }
@@ -3575,7 +3575,7 @@ static time_t playback_init(running_machine *machine)
 	UINT8 header[INP_HEADER_SIZE];
 	file_error filerr;
 	time_t basetime;
-	
+
 	/* if no file, nothing to do */
 	if (filename[0] == 0)
 		return 0;
@@ -3599,11 +3599,11 @@ static time_t playback_init(running_machine *machine)
 				((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
 	mame_printf_info("Created %s", ctime(&basetime));
 	mame_printf_info("Recorded using %s\n", header + 0x20);
-	
+
 	/* verify the header against the current game */
 	if (memcmp(machine->gamedrv->name, header + 0x14, strlen(machine->gamedrv->name) + 1) != 0)
 		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
-	
+
 	return basetime;
 }
 
@@ -3645,7 +3645,7 @@ static void record_init(running_machine *machine)
 	header[0x11] = INP_HEADER_MINVERSION;
 	strcpy((char *)header + 0x14, machine->gamedrv->name);
 	sprintf((char *)header + 0x20, APPNAME " %s", build_version);
-	
+
 	/* write it */
 	mame_fwrite(machine->record_file, header, sizeof(header));
 }
@@ -3663,11 +3663,11 @@ static void playback_end(running_machine *machine, const char *message)
 		/* close the file */
 		mame_fclose(machine->playback_file);
 		machine->playback_file = NULL;
-		
+
 		/* pop a message */
 		if (message != NULL)
 			popmessage("Playback Ended\nReason: %s", message);
-		
+
 		/* display speed stats */
 		playback_accumulated_speed /= playback_accumulated_frames;
 		mame_printf_info("Total playback frames: %d\n", (UINT32)playback_accumulated_frames);
@@ -3688,7 +3688,7 @@ static void record_end(running_machine *machine, const char *message)
 		/* close the file */
 		mame_fclose(machine->record_file);
 		machine->record_file = NULL;
-		
+
 		/* pop a message */
 		if (message != NULL)
 			popmessage("Recording Ended\nReason: %s", message);
@@ -3697,7 +3697,7 @@ static void record_end(running_machine *machine, const char *message)
 
 
 /*-------------------------------------------------
-    playback_frame - start of frame callback for 
+    playback_frame - start of frame callback for
     playback
 -------------------------------------------------*/
 
@@ -3707,22 +3707,22 @@ static void playback_frame(running_machine *machine, attotime curtime)
 	if (machine->playback_file != NULL)
 	{
 		attotime readtime;
-		
+
 		/* first the absolute time */
 		readtime.seconds = playback_read_uint32(machine);
 		readtime.attoseconds = playback_read_uint64(machine);
 		if (attotime_compare(readtime, curtime) != 0)
 			playback_end(machine, "Out of sync");
-		
+
 		/* then the speed */
 		playback_accumulated_speed += playback_read_uint32(machine);
 		playback_accumulated_frames++;
 	}
 }
-		
+
 
 /*-------------------------------------------------
-    record_frame - start of frame callback for 
+    record_frame - start of frame callback for
     recording
 -------------------------------------------------*/
 
@@ -3734,12 +3734,12 @@ static void record_frame(running_machine *machine, attotime curtime)
 		/* first the absolute time */
 		record_write_uint32(machine, curtime.seconds);
 		record_write_uint64(machine, curtime.attoseconds);
-		
+
 		/* then the current speed */
 		record_write_uint32(machine, video_get_speed_percent(machine) * (double)(1 << 20));
 	}
 }
-		
+
 
 /*-------------------------------------------------
     playback_port - per-port callback for playback
@@ -3754,14 +3754,14 @@ static void playback_port(running_machine *machine, input_port_info *portinfo)
 
 		/* read the digital value */
 		portinfo->digital = playback_read_uint32(machine);
-		
+
 		/* loop over analog ports and save their data */
 		for (analog = portinfo->analoginfo; analog != NULL; analog = analog->next)
 		{
 			/* read current and previous values */
 			analog->accum = playback_read_uint32(machine);
 			analog->previous = playback_read_uint32(machine);
-			
+
 			/* read configuration information */
 			analog->portentry->analog.sensitivity = playback_read_uint32(machine);
 			analog->portentry->analog.reverse = playback_read_uint8(machine);
@@ -3783,14 +3783,14 @@ static void record_port(running_machine *machine, input_port_info *portinfo)
 
 		/* store the digital value */
 		record_write_uint32(machine, portinfo->digital);
-		
+
 		/* loop over analog ports and save their data */
 		for (analog = portinfo->analoginfo; analog != NULL; analog = analog->next)
 		{
 			/* store current and previous values */
 			record_write_uint32(machine, analog->accum);
 			record_write_uint32(machine, analog->previous);
-			
+
 			/* store configuration information */
 			record_write_uint32(machine, analog->portentry->analog.sensitivity);
 			record_write_uint8(machine, analog->portentry->analog.reverse);

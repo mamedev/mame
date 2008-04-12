@@ -1403,12 +1403,12 @@ static READ16_HANDLER( taitoz_msb_sound_r )
 /**** sound pan control ****/
 static WRITE8_HANDLER( taitoz_pancontrol )
 {
-//	static UINT8 taitoz_pandata[4];
+//  static UINT8 taitoz_pandata[4];
 
 	offset = offset&3;
 
-//	taitoz_pandata[offset] = data;
-//	popmessage(" pan %02x %02x %02x %02x", taitoz_pandata[0], taitoz_pandata[1], taitoz_pandata[2], taitoz_pandata[3] );
+//  taitoz_pandata[offset] = data;
+//  popmessage(" pan %02x %02x %02x %02x", taitoz_pandata[0], taitoz_pandata[1], taitoz_pandata[2], taitoz_pandata[3] );
 
 	flt_volume_set_volume(offset, data / 255.0f);
 }

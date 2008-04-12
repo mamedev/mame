@@ -1608,7 +1608,7 @@ const char *video_get_speed_text(running_machine *machine)
 
 
 /*-------------------------------------------------
-    video_get_speed_percent - return the current 
+    video_get_speed_percent - return the current
     effective speed percentage
 -------------------------------------------------*/
 
@@ -1988,7 +1988,7 @@ static void update_refresh_speed(running_machine *machine)
 			UINT32 original_speed = original_speed_setting();
 			const device_config *screen;
 			UINT32 target_speed;
-			
+
 			/* find the screen with the shortest frame period (max refresh rate) */
 			for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 			{
@@ -1999,7 +1999,7 @@ static void update_refresh_speed(running_machine *machine)
 			/* compute a target speed as an integral percentage */
 			target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(min_frame_period));
 			target_speed = MIN(target_speed, original_speed);
-			
+
 			/* if we changed, log that verbosely */
 			if (target_speed != global.speed)
 			{

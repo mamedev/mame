@@ -2449,7 +2449,7 @@ static int mips_execute( int cycles )
 				{
 					mips_breakpoint_exception();
 				}
-				else 
+				else
 				{
 					UINT32 data = mipscpu.readword( address );
 

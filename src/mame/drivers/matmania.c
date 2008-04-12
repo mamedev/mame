@@ -19,12 +19,12 @@ MAIN BOARD:
 4000-ffff ROM
 
 
-2008.04.04: Small note regarding DipSwitches. Locations and values have been 
-verified with the manual for both Mat Mania and Mania Challenge. 
+2008.04.04: Small note regarding DipSwitches. Locations and values have been
+verified with the manual for both Mat Mania and Mania Challenge.
 Exciting Hour DIPs confirmed with crazykong diplist, no manual available ATM.
-Notice that the manual for Mat Mania lists DSW2:3,4 as Unused, but they 
-correctly affect the timer speed during the game. Also, default difficulty 
-in Mat Mania is Normal, while manual for Mania Challenge reports Easy. 
+Notice that the manual for Mat Mania lists DSW2:3,4 as Unused, but they
+correctly affect the timer speed during the game. Also, default difficulty
+in Mat Mania is Normal, while manual for Mania Challenge reports Easy.
 The driver has been updated accordingly.
 
 ***************************************************************************/
@@ -248,8 +248,8 @@ static INPUT_PORTS_START( matmania )
 	PORT_DIPSETTING(   0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME(0x0c, 0x0c, "Tournament Time" )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(   0x00, "2:12" )					/* Tournament time is always 3:00, but time per 1 second is shorter. */
-	PORT_DIPSETTING(   0x04, "2:24" )					
-	PORT_DIPSETTING(   0x08, "2:30" )					
+	PORT_DIPSETTING(   0x04, "2:24" )
+	PORT_DIPSETTING(   0x08, "2:30" )
 	PORT_DIPSETTING(   0x0c, "2:36" )
 	PORT_DIPUNUSED_DIPLOC(0x10, IP_ACTIVE_LOW, "SW2:5")	/* Listed as Unused */
 	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_LOW, "SW2:6")	/* Listed as Unused */

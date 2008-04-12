@@ -2979,7 +2979,7 @@ INLINE UINT32 lookup_write_entry(const address_space *space, offs_t address)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_byte_generic - read a byte from an 
+    read_byte_generic - read a byte from an
     arbitrary address space
 -------------------------------------------------*/
 
@@ -2990,23 +2990,23 @@ INLINE UINT8 read_byte_generic(UINT8 spacenum, offs_t address)
 	offs_t offset;
 	UINT32 entry;
 	UINT8 result;
-	
+
 	profiler_mark(PROFILER_MEMREAD);
 
 	address &= space->bytemask;
 	entry = lookup_read_entry(space, address);
 	handler = &space->readhandlers[entry];
-	
+
 	DEBUG_HOOK_READ(spacenum, address, 0xff);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 		result = bank_ptr[entry][offset];
 	else
 		result = (*handler->handler.read.mhandler8)(handler->object, offset);
-	
+
 	profiler_mark(PROFILER_END);
-	
+
 	return result;
 }
 
@@ -3170,7 +3170,7 @@ UINT64 io_read_qword_8be(offs_t address)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_byte_generic - write a byte to an 
+    write_byte_generic - write a byte to an
     arbitrary address space
 -------------------------------------------------*/
 
@@ -3180,21 +3180,21 @@ INLINE void write_byte_generic(UINT8 spacenum, offs_t address, UINT8 data)
 	const handler_data *handler;
 	offs_t offset;
 	UINT32 entry;
-	
+
 	profiler_mark(PROFILER_MEMWRITE);
 
 	address &= space->bytemask;
 	entry = lookup_write_entry(space, address);
 	handler = &space->writehandlers[entry];
-	
+
 	DEBUG_HOOK_WRITE(spacenum, address, data, 0xff);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 		bank_ptr[entry][offset] = data;
 	else
 		(*handler->handler.write.mhandler8)(handler->object, offset, data);
-	
+
 	profiler_mark(PROFILER_END);
 }
 
@@ -3358,7 +3358,7 @@ void io_write_qword_8be(offs_t address, UINT64 data)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_word_masked_generic - read a word from 
+    read_word_masked_generic - read a word from
     an arbitrary address space
 -------------------------------------------------*/
 
@@ -3369,23 +3369,23 @@ INLINE UINT16 read_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 me
 	offs_t offset;
 	UINT32 entry;
 	UINT16 result;
-	
+
 	profiler_mark(PROFILER_MEMREAD);
 
 	address &= space->bytemask;
 	entry = lookup_read_entry(space, address);
 	handler = &space->readhandlers[entry];
-	
+
 	DEBUG_HOOK_READ(spacenum, address & ~1, (UINT16)~mem_mask);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 		result = *(UINT16 *)&bank_ptr[entry][offset & ~1];
 	else
 		result = (*handler->handler.read.mhandler16)(handler->object, offset >> 1, mem_mask);
-	
+
 	profiler_mark(PROFILER_END);
-	
+
 	return result;
 }
 
@@ -3549,7 +3549,7 @@ UINT64 io_read_qword_16be(offs_t address)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_word_masked_generic - write a masked 
+    write_word_masked_generic - write a masked
     word to an arbitrary address space
 -------------------------------------------------*/
 
@@ -3559,15 +3559,15 @@ INLINE void write_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 dat
 	const handler_data *handler;
 	offs_t offset;
 	UINT32 entry;
-	
+
 	profiler_mark(PROFILER_MEMWRITE);
 
 	address &= space->bytemask;
 	entry = lookup_write_entry(space, address);
 	handler = &space->writehandlers[entry];
-	
+
 	DEBUG_HOOK_WRITE(spacenum, address & ~1, data, (UINT16)~mem_mask);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 	{
@@ -3576,7 +3576,7 @@ INLINE void write_word_masked_generic(UINT8 spacenum, offs_t address, UINT16 dat
 	}
 	else
 		(*handler->handler.write.mhandler16)(handler->object, offset >> 1, data, mem_mask);
-	
+
 	profiler_mark(PROFILER_END);
 }
 
@@ -3740,7 +3740,7 @@ void io_write_qword_16be(offs_t address, UINT64 data)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_dword_masked_generic - read a dword from 
+    read_dword_masked_generic - read a dword from
     an arbitrary address space
 -------------------------------------------------*/
 
@@ -3751,23 +3751,23 @@ INLINE UINT32 read_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 m
 	offs_t offset;
 	UINT32 entry;
 	UINT32 result;
-	
+
 	profiler_mark(PROFILER_MEMREAD);
 
 	address &= space->bytemask;
 	entry = lookup_read_entry(space, address);
 	handler = &space->readhandlers[entry];
-	
+
 	DEBUG_HOOK_READ(spacenum, address & ~3, (UINT32)~mem_mask);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 		result = *(UINT32 *)&bank_ptr[entry][offset & ~3];
 	else
 		result = (*handler->handler.read.mhandler32)(handler->object, offset >> 2, mem_mask);
-	
+
 	profiler_mark(PROFILER_END);
-	
+
 	return result;
 }
 
@@ -3961,7 +3961,7 @@ UINT64 io_read_qword_32be(offs_t address)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_dword_masked_generic - write a masked 
+    write_dword_masked_generic - write a masked
     dword to an arbitrary address space
 -------------------------------------------------*/
 
@@ -3971,15 +3971,15 @@ INLINE void write_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 da
 	const handler_data *handler;
 	offs_t offset;
 	UINT32 entry;
-	
+
 	profiler_mark(PROFILER_MEMWRITE);
 
 	address &= space->bytemask;
 	entry = lookup_write_entry(space, address);
 	handler = &space->writehandlers[entry];
-	
+
 	DEBUG_HOOK_WRITE(spacenum, address & ~3, data, (UINT32)~mem_mask);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 	{
@@ -3988,7 +3988,7 @@ INLINE void write_dword_masked_generic(UINT8 spacenum, offs_t address, UINT32 da
 	}
 	else
 		(*handler->handler.write.mhandler32)(handler->object, offset >> 2, data, mem_mask);
-	
+
 	profiler_mark(PROFILER_END);
 }
 
@@ -4182,7 +4182,7 @@ void io_write_qword_32be(offs_t address, UINT64 data)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    read_qword_masked_generic - read a qword from 
+    read_qword_masked_generic - read a qword from
     an arbitrary address space
 -------------------------------------------------*/
 
@@ -4193,23 +4193,23 @@ INLINE UINT64 read_qword_masked_generic(UINT8 spacenum, offs_t address, UINT64 m
 	offs_t offset;
 	UINT32 entry;
 	UINT64 result;
-	
+
 	profiler_mark(PROFILER_MEMREAD);
 
 	address &= space->bytemask;
 	entry = lookup_read_entry(space, address);
 	handler = &space->readhandlers[entry];
-	
+
 	DEBUG_HOOK_READ(spacenum, address & ~7, ~mem_mask);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 		result = *(UINT64 *)&bank_ptr[entry][offset & ~7];
 	else
 		result = (*handler->handler.read.mhandler64)(handler->object, offset >> 3, mem_mask);
-	
+
 	profiler_mark(PROFILER_END);
-	
+
 	return result;
 }
 
@@ -4403,7 +4403,7 @@ UINT64 io_read_qword_masked_64be(offs_t address, UINT64 mem_mask)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    write_qword_masked_generic - write a masked 
+    write_qword_masked_generic - write a masked
     dword to an arbitrary address space
 -------------------------------------------------*/
 
@@ -4413,15 +4413,15 @@ INLINE void write_qword_masked_generic(UINT8 spacenum, offs_t address, UINT64 da
 	const handler_data *handler;
 	offs_t offset;
 	UINT32 entry;
-	
+
 	profiler_mark(PROFILER_MEMWRITE);
 
 	address &= space->bytemask;
 	entry = lookup_write_entry(space, address);
 	handler = &space->writehandlers[entry];
-	
+
 	DEBUG_HOOK_WRITE(spacenum, address & ~7, data, ~mem_mask);
-	
+
 	offset = (address - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 	{
@@ -4430,7 +4430,7 @@ INLINE void write_qword_masked_generic(UINT8 spacenum, offs_t address, UINT64 da
 	}
 	else
 		(*handler->handler.write.mhandler64)(handler->object, offset >> 3, data, mem_mask);
-	
+
 	profiler_mark(PROFILER_END);
 }
 

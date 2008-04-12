@@ -255,7 +255,7 @@ static INPUT_PORTS_START( megazone )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_0C ) )            "Not use"
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_0C ) )            "Not use"
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( megazona )

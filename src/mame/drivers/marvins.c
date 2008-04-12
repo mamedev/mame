@@ -20,11 +20,11 @@ AT08XX03:
    (great now I can fall under the skyway like I did at Chuck'n Cheese;)
  - fixed Vanguard2 scroll offsets
  - tuned music tempo and wavegen frequency
- 
-2008.04.04: Small note regarding DipSwitches. Locations and values have been 
-verified with the manual for both Marvin's Maze and Mad Crasher. Vanguard II 
+
+2008.04.04: Small note regarding DipSwitches. Locations and values have been
+verified with the manual for both Marvin's Maze and Mad Crasher. Vanguard II
 DIPs have been checked against jammaboards diplist, no manual available ATM.
-DSW2:7 in madcrash is listed as Difficulty, but it's not clear how it affects 
+DSW2:7 in madcrash is listed as Difficulty, but it's not clear how it affects
 the gameplay difficulty
 
 */

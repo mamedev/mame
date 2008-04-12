@@ -527,7 +527,7 @@ static void aerfboot_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 {
 	int attr_start,last;
 
-	last = ((aerofgt_rasterram[0x404/2] << 5) - 0x8000) / 2; 
+	last = ((aerofgt_rasterram[0x404/2] << 5) - 0x8000) / 2;
 
 	for (attr_start = aerofgt_spriteram3_size / 2 - 4 ; attr_start >= last ; attr_start -= 4)
 	{

@@ -78,7 +78,7 @@ Noted added by ClawGrip 28-Mar-2008:
  Dox suggested that it can be just a year or text mod, so I decided not
  to include my set. If anyone wants it, please mail me:
  clawgrip at hotmail dot com. I can't find any graphical difference
- between my set and the one already on MAME. 
+ between my set and the one already on MAME.
 
 */
 

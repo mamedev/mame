@@ -25,7 +25,7 @@ Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWI
 Ghouls 'n Ghosts (World / US)               1988  88620B-2  DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
   (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
 Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
-  (alt B-board version)                           89624B-3  ST24B2           LWIO                                          
+  (alt B-board version)                           89624B-3  ST24B2           LWIO
   (alt B-board revision)                          ?         ST22B            ?
 Dynasty Wars                                1989  ?         ?                      ?          CPS-B-02  DL-0411-10002
 Willow                                      1989  89624B-3  WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
@@ -43,14 +43,14 @@ Nemo                                        1990  89624B-3  NM24B            IOB
 Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
   (alt B-board revision)                          89625B-1  CA22B
 Street Fighter II (910214)                  1991  ?         STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
-Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012       
+Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012
 Street Fighter II (US 910228)                                                                 CPS-B-18  ?
 Street Fighter II (Japan 910306)                                                              CPS-B-12  DL-0411-10007
 Street Fighter II (US 910318)                                                                 CPS-B-05  DL-0411-10006
 Street Fighter II (US 910411)                                                                 CPS-B-15  DL-0411-10010
 Street Fighter II (World 910522)                                                              CPS-B-11  DL-0411-10004
 Street Fighter II (US 910522)                                                                 CPS-B-14  DL-0411-10009
-Street Fighter II (US 911101)                                                                 CPS-B-17  DL-0411-10012       
+Street Fighter II (US 911101)                                                                 CPS-B-17  DL-0411-10012
 Street Fighter II (Japan 911210)                                                              CPS-B-13  DL-0411-10008
 Three Wonders*                              1991  89624B-3  RT24B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
   (alt B-board revision)                          89625B-1  RT22B            IOB1
@@ -138,7 +138,7 @@ OUTPUT PORTS
 
               TODO:
               the scroll2/scroll3 disable bits are supported by the emulation,
-			  while the scroll1 weird effect is not (it doesn't seem to make a
+              while the scroll1 weird effect is not (it doesn't seem to make a
               difference on any game).
 
 
@@ -181,7 +181,7 @@ Some registers move from game to game.. following example strider
             bit 5: copy page 5 (stars2)
 
             An important quirk is that if bit 0 is not set (sprite page is not copied)
-			page 0 in gfxram is not skipped but instead is copied to page 1; that is,
+            page 0 in gfxram is not skipped but instead is copied to page 1; that is,
             all pages are moved down by one. For the other pages, if the bit is not
             set the gfxram page is skipped.
 
@@ -1270,13 +1270,13 @@ if (cps1_game_config->priority[0] && offset == cps1_game_config->priority[0]/2 &
 }
 
 	/*
-	The main CPU writes the palette to gfxram, and the CPS-B custom copies it
-	to the real palette RAM, which is separated from gfxram.
-	This is done ONLY after the palette base register is written to. It is not
-	known what the exact timing should be, how long it should take and when it
-	should happen. We are assuming that the copy happens immediately, since it
-	fixes glitches in the ghouls intro, but it might happen at next vblank.
-	*/
+    The main CPU writes the palette to gfxram, and the CPS-B custom copies it
+    to the real palette RAM, which is separated from gfxram.
+    This is done ONLY after the palette base register is written to. It is not
+    known what the exact timing should be, how long it should take and when it
+    should happen. We are assuming that the copy happens immediately, since it
+    fixes glitches in the ghouls intro, but it might happen at next vblank.
+    */
 	if (offset == CPS1_PALETTE_BASE/2)
 		cps1_build_palette(machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
 }
@@ -1535,7 +1535,7 @@ static int gfxrom_bank_mapper(running_machine *machine, int type, int code)
 	}
 
 #ifdef MAME_DEBUG
-//	popmessage("tile %02x/%04x out of range", type,code>>shift);
+//  popmessage("tile %02x/%04x out of range", type,code>>shift);
 #endif
 
 	return -1;
@@ -1577,8 +1577,8 @@ static TILE_GET_INFO( get_tile0_info )
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL1, code);
 
 	/* allows us to reproduce a problem seen with a ffight board where USA and Japanese
-		 roms have been mixed to be reproduced (ffightua) -- it looks like each column
-		 should alternate between the left and right side of the 16x16 tiles */
+         roms have been mixed to be reproduced (ffightua) -- it looks like each column
+         should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
 	SET_TILE_INFO(
@@ -1734,10 +1734,10 @@ static void cps1_build_palette(running_machine *machine, const UINT16* const pal
 	int ctrl = cps1_port(cps1_game_config->palette_control);
 
 	/*
-	The palette is copied only for pages that are enabled in the ctrl
-	register. Note that if the sprite palette (page 0) is skipped, the
-	all the following pages are scaled down by one.
-	*/
+    The palette is copied only for pages that are enabled in the ctrl
+    register. Note that if the sprite palette (page 0) is skipped, the
+    all the following pages are scaled down by one.
+    */
 	for (page = 0; page < 6; ++page)
 	{
 		if (BIT(ctrl,page))

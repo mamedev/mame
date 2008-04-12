@@ -1536,7 +1536,7 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config
 
 	op = FETCH();
 
-	if (Iconfig->v25v35_decryptiontable) op = Iconfig->v25v35_decryptiontable[op]; 
+	if (Iconfig->v25v35_decryptiontable) op = Iconfig->v25v35_decryptiontable[op];
 
 	decode_opcode( buffer, &necv_opcode_table1[op], op );
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;

@@ -534,8 +534,8 @@ READ16_HANDLER( legionna_mcu_r )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection reads
-		*********************************************************************/
+        400-5ff -  Protection reads
+        *********************************************************************/
 
 		case (0x470/2):	return (mame_rand(machine) &0xffff); /* read PC $110a, could be some sort of control word:  sometimes a bit is changed then it's poked back in... */
 		case (0x582/2):	return (0); /* read PC $3594 */
@@ -547,8 +547,8 @@ READ16_HANDLER( legionna_mcu_r )
 
 
 		/*********************************************************************
-		700-7ff - Non-protection reads
-		*********************************************************************/
+        700-7ff - Non-protection reads
+        *********************************************************************/
 
 		/* Seibu Sound System */
 		case (0x708/2):	return seibu_main_word_r(machine,2,0);
@@ -578,8 +578,8 @@ WRITE16_HANDLER( legionna_mcu_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
         /* Trigger Table upload */
 		case (0x432/2): { copd2_set_tabledata(data, machine); break; }
@@ -621,8 +621,8 @@ WRITE16_HANDLER( legionna_mcu_w )
 		}
 
 		/*********************************************************************
-		600-6ff - Video Registers
-		*********************************************************************/
+        600-6ff - Video Registers
+        *********************************************************************/
 
 		// 61a bit 0 is flipscreen
 		// 61c probably layer disables, like Dcon
@@ -635,8 +635,8 @@ WRITE16_HANDLER( legionna_mcu_w )
 		case (0x62a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
 		/*********************************************************************
-		700-7ff - Output (Seibu Sound System)
-		*********************************************************************/
+        700-7ff - Output (Seibu Sound System)
+        *********************************************************************/
 
 		case (0x700/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
 		case (0x704/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
@@ -995,8 +995,8 @@ READ16_HANDLER( heatbrl_mcu_r )
 		}
 
 	    /*********************************************************************
-		400-5ff -  Protection reads
-		*********************************************************************/
+        400-5ff -  Protection reads
+        *********************************************************************/
 
 		case (0x580/2):	{ return xy_check; } /*hit protection*/
 		case (0x582/2):	{ if(input_code_pressed(KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
@@ -1010,12 +1010,12 @@ READ16_HANDLER( heatbrl_mcu_r )
 		case (0x59a/2): { return ((prot_bcd[2] & 0xffff0000) >> 16) + 0x3030; }
 		case (0x59c/2): { return 0x3030; }
 
-	  //case (0x5b0/2):	return (cop_mcu_ram[offset]); /* bit 15 is branched on a few times in the $1938 area */
+	  //case (0x5b0/2): return (cop_mcu_ram[offset]); /* bit 15 is branched on a few times in the $1938 area */
 		case (0x5b4/2):	return (0); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */
 
 		/*********************************************************************
-		700-7ff - Non-protection reads
-		*********************************************************************/
+        700-7ff - Non-protection reads
+        *********************************************************************/
 
 		/* Seibu Sound System */
 		case (0x7c8/2):	return seibu_main_word_r(machine,2,0);
@@ -1044,8 +1044,8 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
 		case (0x420/2):	{ prot_bcd[0] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x422/2): { prot_bcd[1] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
@@ -1150,8 +1150,8 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 
 
 		/*********************************************************************
-		600-6ff - Video Registers
-		*********************************************************************/
+        600-6ff - Video Registers
+        *********************************************************************/
 
 		// 65a bit 0 is flipscreen
 		// 65c probably layer disables, like Dcon? Used on screen when you press P1-4 start (values 13, 11, 0 seen)
@@ -1164,8 +1164,8 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		case (0x66a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
 		/*********************************************************************
-		700-7ff - Output (Seibu Sound System)
-		*********************************************************************/
+        700-7ff - Output (Seibu Sound System)
+        *********************************************************************/
 
 		case (0x7c0/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
 		case (0x7c4/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
@@ -1236,8 +1236,8 @@ WRITE16_HANDLER( sdgndmrb_cop_mcu_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
 		case (0x40c/2): { dma_size = cop_mcu_ram[offset]; break; }
 
@@ -1498,8 +1498,8 @@ WRITE16_HANDLER( denjinmk_cop_mcu_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
 		case (0x420/2):	{ prot_bcd[0] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x422/2): { prot_bcd[1] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
@@ -1576,8 +1576,8 @@ WRITE16_HANDLER( godzilla_cop_mcu_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
 		case (0x420/2):	{ prot_bcd[0] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 		case (0x422/2): { prot_bcd[1] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
@@ -1745,8 +1745,8 @@ WRITE16_HANDLER( copdx_0_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
 		case (0x432/2): { copd2_set_tabledata(data, machine); break; }
 		case (0x434/2): { copd2_set_tableoffset(data, machine); break; }
@@ -1899,8 +1899,8 @@ WRITE16_HANDLER( copdxbl_0_w )
 		}
 
 		/*********************************************************************
-		400-5ff -  Protection writes
-		*********************************************************************/
+        400-5ff -  Protection writes
+        *********************************************************************/
 
 
 		case (0x4a0/2):
