@@ -21,16 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "memconv.h"
-#include "machine/8255ppi.h"
-
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/mc146818.h"
 #include "machine/pcshare.h"
-
-#include "machine/8237dma.h"
 #include "machine/pckeybrd.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
@@ -43,31 +34,11 @@
 
 
 static emu_timer *pc_keyboard_timer;
-
+static void (*set_keyb_int)(int);
 static TIMER_CALLBACK( pc_keyb_timer );
 
 
-/* ----------------------------------------------------------------------- */
-
-static void pc_pic_set_int_line(int which, int interrupt)
-{
-	switch(which)
-	{
-		case 0:
-			/* Master */
-			cpunum_set_input_line(Machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
-			break;
-
-		case 1:
-			/* Slave */
-			pic8259_set_irq_line(0, 2, interrupt);
-			break;
-	}
-}
-
-
-
-void init_pc_common(UINT32 flags)
+void init_pc_common(UINT32 flags, void (*set_keyb_int_func)(int))
 {
 	/* PC-XT keyboard */
 	if (flags & PCCOMMON_KEYBOARD_AT)
@@ -76,8 +47,7 @@ void init_pc_common(UINT32 flags)
 		at_keyboard_init(AT_KEYBOARD_TYPE_PC);
 	at_keyboard_set_scan_code_set(1);
 
-	/* PIC */
-	pic8259_init(2, pc_pic_set_int_line);
+	set_keyb_int = set_keyb_int_func;
 
 	pc_keyboard_timer = timer_alloc(pc_keyb_timer, NULL);
 }
@@ -140,7 +110,9 @@ void pc_keyb_set_clock(int on)
 void pc_keyb_clear(void)
 {
 	pc_keyb.data = 0;
-	pic8259_set_irq_line(0, 1, 0);
+	if ( set_keyb_int ) {
+		set_keyb_int(0);
+	}
 }
 
 void pc_keyboard(void)
@@ -154,7 +126,9 @@ void pc_keyboard(void)
 		if ( (data=at_keyboard_read())!=-1) {
 			pc_keyb.data = data;
 			DBG_LOG(1,"KB_scancode",("$%02x\n", pc_keyb.data));
-			pic8259_set_irq_line(0, 1, 1);
+			if ( set_keyb_int ) {
+				set_keyb_int(1);
+			}
 			pc_keyb.self_test = 0;
 		}
 	}

@@ -4,31 +4,23 @@
 
 **********************************************************************/
 
-#ifndef PIC8259_H
-#define PIC8259_H
+#ifndef __PIC8259_H_
+#define __PIC8259_H_
 
-int pic8259_init(int count, void (*set_int_line)(int which, int interrupt));
-int pic8259_acknowledge(int which);
-void pic8259_set_irq_line(int which, int irq, int state);
+#define PIC8259	DEVICE_GET_INFO_NAME(pic8259)
 
-READ8_HANDLER ( pic8259_0_r );
-READ8_HANDLER ( pic8259_1_r );
-WRITE8_HANDLER ( pic8259_0_w );
-WRITE8_HANDLER ( pic8259_1_w );
+typedef void (*pic8259_set_int_line_func)(const device_config *device, int interrupt);
+#define PIC8259_SET_INT_LINE(name)	void name(const device_config *device, int interrupt)
 
-READ16_HANDLER ( pic8259_16le_0_r );
-READ16_HANDLER ( pic8259_16le_1_r );
-WRITE16_HANDLER ( pic8259_16le_0_w );
-WRITE16_HANDLER ( pic8259_16le_1_w );
+struct pic8259_interface {
+	/* Called when int line changes */
+	pic8259_set_int_line_func	set_int_line;
+};
 
-READ32_HANDLER ( pic8259_32le_0_r );
-READ32_HANDLER ( pic8259_32le_1_r );
-WRITE32_HANDLER ( pic8259_32le_0_w );
-WRITE32_HANDLER ( pic8259_32le_1_w );
+DEVICE_GET_INFO(pic8259);
+READ8_DEVICE_HANDLER( pic8259_r );
+WRITE8_DEVICE_HANDLER( pic8259_w );
+int pic8259_acknowledge(const device_config *device);
+void pic8259_set_irq_line(const device_config *device, int irq, int state);
 
-READ64_HANDLER ( pic8259_64be_0_r );
-READ64_HANDLER ( pic8259_64be_1_r );
-WRITE64_HANDLER ( pic8259_64be_0_w );
-WRITE64_HANDLER ( pic8259_64be_1_w );
-
-#endif /* PIC8259_H */
+#endif /* __PIC8259_H_ */

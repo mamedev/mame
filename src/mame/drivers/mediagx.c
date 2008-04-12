@@ -119,6 +119,14 @@ static UINT8 ad1847_regs[16];
 static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
 
+static struct {
+	const device_config	*pit8254;
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
+} mediagx_devices;
+
 
 // Display controller registers
 #define DC_UNLOCK				0x00/4
@@ -468,7 +476,7 @@ static READ32_HANDLER( io20_r )
 	// 0x20 - 0x21, PIC
 	if (ACCESSING_BITS_0_15)
 	{
-		r |= pic8259_32le_0_r(machine, offset, mem_mask);
+		r |= read32le_with_read8_device_handler( pic8259_r, (device_config*)mediagx_devices.pic8259_1, offset, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -488,7 +496,7 @@ static WRITE32_HANDLER( io20_w )
 	// 0x20 - 0x21, PIC
 	if (ACCESSING_BITS_0_15)
 	{
-		pic8259_32le_0_w(machine, offset, data, mem_mask);
+		write32le_with_write8_device_handler( pic8259_w, (device_config*)mediagx_devices.pic8259_1, offset, data, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -839,6 +847,7 @@ static WRITE32_HANDLER(at_page32_w)
 
 DEV_READWRITE8TO32LE( mediagx_pit8254_32le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO32LE( mediagx_dma8237_32le, dma8237_r, dma8237_w )
+DEV_READWRITE8TO32LE( mediagx_pic8259_32le, pic8259_r, pic8259_w )
 
 
 /*****************************************************************************/
@@ -863,7 +872,7 @@ static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00af) AM_READWRITE(pic8259_32le_1_r,			pic8259_32le_1_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", mediagx_pic8259_32le_r, mediagx_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00cf) AM_DEVREADWRITE(DMA8237, "dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP		// I/O delay port
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide0_r, ide0_w)
@@ -956,10 +965,10 @@ INPUT_PORTS_END
 static IRQ_CALLBACK(irq_callback)
 {
 	int r;
-	r = pic8259_acknowledge(1);
+	r = pic8259_acknowledge( mediagx_devices.pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge(0);
+		r = pic8259_acknowledge( mediagx_devices.pic8259_1);
 	}
 	return r;
 }
@@ -980,11 +989,49 @@ static MACHINE_RESET(mediagx)
 
 	dmadac_enable(0, 2, 1);
 	ide_controller_reset(0);
+
+	mediagx_devices.pit8254 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	mediagx_devices.pic8259_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
+	mediagx_devices.pic8259_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
+	mediagx_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	mediagx_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( mediagx_pic8259_1_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( mediagx_pic8259_2_set_int_line ) {
+	pic8259_set_irq_line( mediagx_devices.pic8259_1, 2, interrupt);
+}
+
+
+static const struct pic8259_interface mediagx_pic8259_1_config = {
+	mediagx_pic8259_1_set_int_line
+};
+
+
+static const struct pic8259_interface mediagx_pic8259_2_config = {
+	mediagx_pic8259_2_set_int_line
+};
+
+
+/*************************************************************
+ *
+ * pit8254 configuration
+ *
+ *************************************************************/
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	pic8259_set_irq_line(0, 0, state);
+	pic8259_set_irq_line( mediagx_devices.pic8259_1, 0, state);
 }
 
 
@@ -1026,6 +1073,12 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_2_config )
 
+	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
+	MDRV_DEVICE_CONFIG( mediagx_pic8259_1_config )
+
+	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
+	MDRV_DEVICE_CONFIG( mediagx_pic8259_2_config )
+
 	MDRV_NVRAM_HANDLER( mc146818 )
 
  	/* video hardware */
@@ -1058,16 +1111,16 @@ static void set_gate_a20(int a20)
 
 static void keyboard_interrupt(int state)
 {
-	pic8259_set_irq_line(0, 1, state);
+	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
 
 static void ide_interrupt(int state)
 {
-	pic8259_set_irq_line(1, 6, state);
+	pic8259_set_irq_line(mediagx_devices.pic8259_2, 6, state);
 }
 
 static int mediagx_get_out2(running_machine *machine) {
-	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
+	return pit8253_get_output( mediagx_devices.pit8254, 2 );
 }
 
 static const struct kbdc8042_interface at8042 =
@@ -1086,9 +1139,13 @@ static const struct pci_device_info cx5510 =
 	cx5510_pci_w
 };
 
+static void mediagx_set_keyb_int(int state) {
+	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
+}
+
 static void init_mediagx(running_machine *machine)
 {
-	init_pc_common(PCCOMMON_KEYBOARD_AT);
+	init_pc_common(PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 	mc146818_init(MC146818_STANDARD);
 
 	pci_init();

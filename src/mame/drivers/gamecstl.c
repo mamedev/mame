@@ -56,6 +56,15 @@
 static UINT32 *cga_ram;
 static UINT32 *bios_ram;
 
+static struct {
+	const device_config	*pit8254;
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
+} gamecstl_devices;
+
+
 static const rgb_t cga_palette[16] =
 {
 	MAKE_RGB( 0x00, 0x00, 0x00 ), MAKE_RGB( 0x00, 0x00, 0xaa ), MAKE_RGB( 0x00, 0xaa, 0x00 ), MAKE_RGB( 0x00, 0xaa, 0xaa ),
@@ -453,6 +462,7 @@ static WRITE32_HANDLER(at_page32_w)
 
 DEV_READWRITE8TO32LE( gamecstl_pit8254_32le, pit8253_r, pit8253_w )
 DEV_READWRITE8TO32LE( gamecstl_dma8237_32le, dma8237_r, dma8237_w )
+DEV_READWRITE8TO32LE( gamecstl_pic8259_32le, pic8259_r, pic8259_w )
 
 
 /*****************************************************************************/
@@ -470,12 +480,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gamecstl_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE(DMA8237, "dma8237_1", gamecstl_dma8237_32le_r, gamecstl_dma8237_32le_w)
-	AM_RANGE(0x0020, 0x003f) AM_READWRITE(pic8259_32le_0_r,			pic8259_32le_0_w)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE(PIC8259, "pic8259_1", gamecstl_pic8259_32le_r, gamecstl_pic8259_32le_w)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE(PIT8254, "pit8254", gamecstl_pit8254_32le_r, gamecstl_pit8254_32le_w)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_READWRITE(pic8259_32le_1_r,			pic8259_32le_1_w)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_2", gamecstl_pic8259_32le_r, gamecstl_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide0_r, ide0_w)
@@ -548,10 +558,10 @@ INPUT_PORTS_END
 static IRQ_CALLBACK(irq_callback)
 {
 	int r = 0;
-	r = pic8259_acknowledge(1);
+	r = pic8259_acknowledge(gamecstl_devices.pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge(0);
+		r = pic8259_acknowledge(gamecstl_devices.pic8259_1);
 	}
 	return r;
 }
@@ -561,11 +571,50 @@ static MACHINE_RESET(gamecstl)
 	memory_set_bankptr(1, memory_region(REGION_USER1) + 0x30000);
 
 	cpunum_set_irq_callback(0, irq_callback);
+
+	gamecstl_devices.pit8254 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	gamecstl_devices.pic8259_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
+	gamecstl_devices.pic8259_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
+	gamecstl_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	gamecstl_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
+
+
+/*************************************************************
+ *
+ * pic8259 configuration
+ *
+ *************************************************************/
+
+static PIC8259_SET_INT_LINE( gamecstl_pic8259_1_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+
+static PIC8259_SET_INT_LINE( gamecstl_pic8259_2_set_int_line ) {
+	pic8259_set_irq_line( gamecstl_devices.pic8259_1, 2, interrupt);
+}
+
+
+static const struct pic8259_interface gamecstl_pic8259_1_config = {
+	gamecstl_pic8259_1_set_int_line
+};
+
+
+static const struct pic8259_interface gamecstl_pic8259_2_config = {
+	gamecstl_pic8259_2_set_int_line
+};
+
+
+/*************************************************************
+ *
+ * pit8254 configuration
+ *
+ *************************************************************/
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-    pic8259_set_irq_line(0, 0, state);
+    pic8259_set_irq_line(gamecstl_devices.pic8259_1, 0, state);
 }
 
 static const struct pit8253_config gamecstl_pit8254_config =
@@ -605,6 +654,12 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_2_config )
 
+	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
+	MDRV_DEVICE_CONFIG( gamecstl_pic8259_1_config )
+
+	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
+	MDRV_DEVICE_CONFIG( gamecstl_pic8259_2_config )
+
 	MDRV_NVRAM_HANDLER( mc146818 )
 
  	/* video hardware */
@@ -642,16 +697,16 @@ static void set_gate_a20(int a20)
 
 static void keyboard_interrupt(int state)
 {
-	pic8259_set_irq_line(0, 1, state);
+	pic8259_set_irq_line( gamecstl_devices.pic8259_1, 1, state);
 }
 
 static void ide_interrupt(int state)
 {
-	pic8259_set_irq_line(1, 6, state);
+	pic8259_set_irq_line( gamecstl_devices.pic8259_2, 6, state);
 }
 
 static int gamecstl_get_out2(running_machine *machine) {
-	return pit8253_get_output((device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" ), 2 );
+	return pit8253_get_output( gamecstl_devices.pit8254, 2 );
 }
 
 static const struct kbdc8042_interface at8042 =
@@ -664,11 +719,15 @@ static const struct ide_interface ide_intf =
 	ide_interrupt
 };
 
+static void gamecstl_set_keyb_int(int state) {
+	pic8259_set_irq_line(gamecstl_devices.pic8259_1, 1, state);
+}
+
 static DRIVER_INIT( gamecstl )
 {
 	bios_ram = auto_malloc(0x10000);
 
-	init_pc_common(PCCOMMON_KEYBOARD_AT);
+	init_pc_common(PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
 	mc146818_init(MC146818_STANDARD);
 
 	intel82439tx_init();
