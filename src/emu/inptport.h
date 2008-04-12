@@ -849,7 +849,7 @@ struct _inp_header
 
 /* categories */
 #define PORT_CATEGORY(_category) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_CHAR, 8, _category, 24),
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_CATEGORY, 8, _category, 24),
 
 #define PORT_CATEGORY_CLASS(_mask, _default, _name) \
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_CATEGORY_NAME, 8), \
