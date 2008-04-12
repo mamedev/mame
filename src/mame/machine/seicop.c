@@ -1653,15 +1653,22 @@ READ16_HANDLER( copdx_0_r )
 		//case (0x5b4/2):
 		//  return cop_mcu_ram[offset];
 
+		/* returning 0xffff for some inputs for now, breaks coinage but
+		   allows cupsoc to boot */
 		case (0x700/2): return input_port_1_word_r(machine,0,0);
 		case (0x704/2): return input_port_2_word_r(machine,0,0);
 		case (0x708/2): return input_port_4_word_r(machine,0,0);
 		case (0x70c/2): return input_port_3_word_r(machine,0,0);
-
+		case (0x714/2): return 0xffff;
 		case (0x71c/2): return input_port_5_word_r(machine,0,0);
-		case (0x748/2):	return seibu_main_word_r(machine,2,0);
-		case (0x74c/2): return seibu_main_word_r(machine,3,0);
-		case (0x754/2): return seibu_main_word_r(machine,5,0);
+
+		case (0x740/2): return 0xffff;
+		case (0x744/2): return 0xffff;
+		case (0x748/2):	return 0xffff;//seibu_main_word_r(machine,2,0);
+		case (0x74c/2): return 0xffff;//seibu_main_word_r(machine,3,0);
+		case (0x754/2): return 0xffff;//seibu_main_word_r(machine,5,0);
+		case (0x75c/2): return 0xffff;
+
 	}
 }
 
