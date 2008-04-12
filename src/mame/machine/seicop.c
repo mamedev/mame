@@ -60,6 +60,8 @@ static UINT16 cop_438;
 static UINT16 cop_43a;
 static UINT16 cop_43c;
 
+static UINT16 cop_clearfill_address;
+static UINT16 cop_clearfill_length;
 
 static UINT16 copd2_offs = 0;
 
@@ -1039,7 +1041,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 	{
 		default:
 		{
-			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			printf("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
 			break;
 		}
 
@@ -1063,44 +1065,35 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		case (0x470/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
 
 		/* Layer Clearing */
-		case (0x478/2):
+		case (0x478/2): /* clear address */
 		{
-			static UINT16 i;
-			/*
-            AM_RANGE(0x100800, 0x100fff) AM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
-            AM_RANGE(0x101000, 0x1017ff) AM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
-            AM_RANGE(0x101800, 0x101fff) AM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
-            AM_RANGE(0x102000, 0x102fff) AM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-            */
-			switch(cop_mcu_ram[offset])
-			{
-				/*layer clearance*/
-				case 0x4080:
-				/*text layer*/
-				for(i=0;i<0x1000;i+=2)
-					program_write_word(i+0x102000,0x0000);
-				/*background layer*/
-				for(i=0;i<0x800;i+=2)
-					program_write_word(i+0x100800,0x0000);
-				break;
-				case 0x4100: break;
-				case 0x41c0: break;
-				//default: popmessage("%04x",cop_mcu_ram[offset]);
-			}
+			cop_clearfill_address = data; // << 6 to get actual address
+			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_address<<6);
 			break;
 		}
+		
+		case (0x47a/2): /* clear length */
+		{
+			cop_clearfill_length = data;
+			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, cop_clearfill_length<<5);
+			
+			/* do the fill */
+			{
+				UINT32 length, address;
+				int i;
+				address = cop_clearfill_address << 6;
+				length = (cop_clearfill_length+1) << 5;
+				
+				for (i=address;i<address+length;i+=2)
+				{
+					program_write_word(i, 0x0000);
+				}			
+			}		
+		}
+		
 
-		/*sprite ram clear(Guess)*/
-		case (0x47e/2):
-		{
-			static UINT16 i;
-			if(cop_mcu_ram[0x47e/2] == 0x118)
-			{
-				for(i=0;i<0x800;i+=2)
-					program_write_word((0x103000 | i),0x0000);
-			}
-			break;
-		}
+		/* unknown, related to clears? */
+		//case (0x47e/2): { break; }
 
 
 		/* Registers */
