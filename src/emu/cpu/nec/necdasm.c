@@ -916,8 +916,8 @@ static void handle_modrm(char* s)
 	{
 		case 0: s += sprintf( s, "bw+ix" ); break;
 		case 1: s += sprintf( s, "bw+iy" ); break;
-		case 2: s += sprintf( s, "bw+ix" ); break;
-		case 3: s += sprintf( s, "bw+iy" ); break;
+		case 2: s += sprintf( s, "bp+ix" ); break;
+		case 3: s += sprintf( s, "bp+iy" ); break;
 		case 4: s += sprintf( s, "ix" ); break;
 		case 5: s += sprintf( s, "iy" ); break;
 		case 6:
