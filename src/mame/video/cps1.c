@@ -840,13 +840,12 @@ static const struct gfx_range mapper_CD63B_table[] =
 #define mapper_PS63B	{ 0x8000, 0x8000, 0, 0 }, mapper_PS63B_table
 static const struct gfx_range mapper_PS63B_table[] =
 {
-	/* type            start   end     bank */
-	{ GFXTYPE_SCROLL1, 0x0000, 0x0fff, 0 },
-	{ GFXTYPE_SPRITES, 0x1000, 0x7fff, 0 },
+	/* type                              start   end     bank */
+	{ GFXTYPE_SCROLL1,                   0x0000, 0x0fff, 0 },
+	{ GFXTYPE_SPRITES,                   0x1000, 0x7fff, 0 },
 
-	{ GFXTYPE_SPRITES, 0x8000, 0xa7ff, 1 },
-	{ GFXTYPE_SCROLL2, 0xa800, 0xdbff, 1 },
-	{ GFXTYPE_SCROLL3, 0xdc00, 0xffff, 1 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xdbff, 1 },
+	{ GFXTYPE_SCROLL3,                   0xdc00, 0xffff, 1 },
 	{ 0 }
 };
 
