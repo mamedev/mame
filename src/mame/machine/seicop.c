@@ -144,7 +144,7 @@ void copd2_set_tabledata(UINT16 data, running_machine *machine)
 
 
 /*Movement protection*//*Legionnaire,Heated Barrel*/
-static UINT32 ram_addr[5];
+static UINT32 cop_register[5];
 /*Sprite DMA protection*//*SD Gundam*/
 static UINT8 dma_status;
 static UINT32 dma_src;
@@ -290,42 +290,42 @@ static void moveprot_jsr(void)
 {
 	static INT16 x_axis,y_axis;
 	static UINT16 move_data,distance,move_type;
-	move_data = program_read_word(ram_addr[0]+0x36);
-	x_axis = program_read_word(ram_addr[0]+0x08);
-	y_axis = program_read_word(ram_addr[0]+0x04);
+	move_data = program_read_word(cop_register[0]+0x36);
+	x_axis = program_read_word(cop_register[0]+0x08);
+	y_axis = program_read_word(cop_register[0]+0x04);
 
 	distance = (move_data & 0xf);
 	move_type = (move_data & 0xf0)>>4;
 	switch(move_type)
 	{
 		case 0x0f://right
-			program_write_word(ram_addr[0]+0x08,x_axis+distance);
+			program_write_word(cop_register[0]+0x08,x_axis+distance);
 			//program_write_word(0x110004,);
 			break;
 		case 0x0b://up
-			program_write_word(ram_addr[0]+0x04,y_axis-distance);
+			program_write_word(cop_register[0]+0x04,y_axis-distance);
 			break;
 		case 0x07://left
-			program_write_word(ram_addr[0]+0x08,x_axis-distance);
+			program_write_word(cop_register[0]+0x08,x_axis-distance);
 			break;
 		case 0x03://down
-			program_write_word(ram_addr[0]+0x04,y_axis+distance);
+			program_write_word(cop_register[0]+0x04,y_axis+distance);
 			break;
 		case 0x0d://up-right
-			program_write_word(ram_addr[0]+0x08,x_axis+distance);
-			program_write_word(ram_addr[0]+0x04,y_axis-distance);
+			program_write_word(cop_register[0]+0x08,x_axis+distance);
+			program_write_word(cop_register[0]+0x04,y_axis-distance);
 			break;
 		case 0x09://up-left
-			program_write_word(ram_addr[0]+0x04,y_axis-distance);
-			program_write_word(ram_addr[0]+0x08,x_axis-distance);
+			program_write_word(cop_register[0]+0x04,y_axis-distance);
+			program_write_word(cop_register[0]+0x08,x_axis-distance);
 			break;
 		case 0x01://down-right
-			program_write_word(ram_addr[0]+0x04,y_axis+distance);
-			program_write_word(ram_addr[0]+0x08,x_axis+distance);
+			program_write_word(cop_register[0]+0x04,y_axis+distance);
+			program_write_word(cop_register[0]+0x08,x_axis+distance);
 			break;
 		case 0x05://down-left
-			program_write_word(ram_addr[0]+0x04,y_axis+distance);
-			program_write_word(ram_addr[0]+0x08,x_axis-distance);
+			program_write_word(cop_register[0]+0x04,y_axis+distance);
+			program_write_word(cop_register[0]+0x08,x_axis-distance);
 			break;
 		default:
 			logerror("Warning: \"0x205\" command called with move_type parameter = %02x\n",move_type);
@@ -355,10 +355,10 @@ static void moveprot_jsr(void)
 static void move2prot_jsr(void)
 {
 	static INT16 x_pl,y_pl,x_en,y_en,res;
-	x_pl = program_read_word(ram_addr[1]+0x8);
-	y_pl = program_read_word(ram_addr[1]+0x4);
-	x_en = program_read_word(ram_addr[0]+0x8);
-	y_en = program_read_word(ram_addr[0]+0x4);
+	x_pl = program_read_word(cop_register[1]+0x8);
+	y_pl = program_read_word(cop_register[1]+0x4);
+	x_en = program_read_word(cop_register[0]+0x8);
+	y_en = program_read_word(cop_register[0]+0x4);
 
 	res = 0;
 	if(x_en > x_pl)
@@ -370,7 +370,7 @@ static void move2prot_jsr(void)
 	//if(y_en > y_pl)
 	//  res|=0x40;
 
-	program_write_word(ram_addr[0]+0x36,res);
+	program_write_word(cop_register[0]+0x36,res);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -378,29 +378,29 @@ static void move2prot_jsr(void)
 static void move3x_prot_jsr(void)
 {
 	static INT16 x_pl,x_en,x_dis;
-	x_pl = program_read_word(ram_addr[1]+0x8);
-	x_en = program_read_word(ram_addr[0]+0x8);
-	x_dis = ((program_read_word(ram_addr[0]+0x34) & 0xf0) >> 4);
+	x_pl = program_read_word(cop_register[1]+0x8);
+	x_en = program_read_word(cop_register[0]+0x8);
+	x_dis = ((program_read_word(cop_register[0]+0x34) & 0xf0) >> 4);
 
 	if(x_en > x_pl)
 		x_dis^=0xffff;
 
-	program_write_word(ram_addr[0]+0x36,-0x40);/*enable command*/
-	program_write_word(ram_addr[0]+0x14,x_dis);
+	program_write_word(cop_register[0]+0x36,-0x40);/*enable command*/
+	program_write_word(cop_register[0]+0x14,x_dis);
 }
 
 static void move3y_prot_jsr(void)
 {
 	static INT16 y_pl,y_en,y_dis;
-	y_pl = program_read_word(ram_addr[1]+0x4);
-	y_en = program_read_word(ram_addr[0]+0x4);
-	y_dis = (program_read_word(ram_addr[0]+0x34) & 0xf);
+	y_pl = program_read_word(cop_register[1]+0x4);
+	y_en = program_read_word(cop_register[0]+0x4);
+	y_dis = (program_read_word(cop_register[0]+0x34) & 0xf);
 
 	if(y_en > y_pl)
 		y_dis^=0xffff;
 
-	program_write_word(ram_addr[0]+0x36,-0x80);/*enable command*/
-	program_write_word(ram_addr[0]+0x10,y_dis);
+	program_write_word(cop_register[0]+0x36,-0x80);/*enable command*/
+	program_write_word(cop_register[0]+0x10,y_dis);
 }
 #endif
 
@@ -516,26 +516,26 @@ static void dma_transfer(void)
 		/*Sprite Color*/
 		param = program_read_word(0x100400) & 0x3f;
 		/*Write the entire parameters [offs+0]*/
-		program_write_word(ram_addr[5]+4,program_read_word(dma_src) + param);
+		program_write_word(cop_register[5]+4,program_read_word(dma_src) + param);
 		/*Sprite Priority (guess)*/
 		//param = ((program_read_word(0x100400) & 0x40) ? 0x4000 : 0);
 		/*Write the sprite number [offs+1]*/
-		program_write_word(ram_addr[5]+6,program_read_word(dma_src+2));
+		program_write_word(cop_register[5]+6,program_read_word(dma_src+2));
 		/*Sprite Relative x/y coords*/
 		rel_xy = program_read_word(dma_src+4); /*???*/
 		/*temporary hardwired,it should point to 0x4c0/0x4a0*/
 		abs_x = (program_read_word(0x110008) - program_read_word(0x10048e));
 		abs_y = (program_read_word(0x110004) - program_read_word(0x10048c));
-		program_write_word(ram_addr[5]+8,((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff);
-		program_write_word(ram_addr[5]+10,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
-		ram_addr[5]+=8;
+		program_write_word(cop_register[5]+8,((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff);
+		program_write_word(cop_register[5]+10,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
+		cop_register[5]+=8;
 		dma_src+=6;
 	}
 }
 
 
 /*
-    switch(program_read_word(ram_addr[2]))
+    switch(program_read_word(cop_register[2]))
     {
         case 0xb4: xparam = 0x0c/2; break;
         case 0xb8: xparam = 0x10/2; break;
@@ -572,13 +572,13 @@ static UINT16 hit_check_jsr(void)
 
 	/*Here we check the destination sprite width*/
 	/*0x4a4/0x4c4*/
-	xparam = check_calc(program_read_word(ram_addr[2]));
+	xparam = check_calc(program_read_word(cop_register[2]));
 	/*Here we check the destination sprite height*/
 	/*0x4a6/0x4c6*/
-	yparam = check_calc(program_read_word(ram_addr[3]));
+	yparam = check_calc(program_read_word(cop_register[3]));
 
 	if(!xparam || !yparam)
-		popmessage("SRC:%04x %04x DST:%04x %04x V:%08x %08x",xsrc,ysrc,xdst,ydst,program_read_word(ram_addr[2]),program_read_word(ram_addr[3]));
+		popmessage("SRC:%04x %04x DST:%04x %04x V:%08x %08x",xsrc,ysrc,xdst,ydst,program_read_word(cop_register[2]),program_read_word(cop_register[3]));
 	if(xdst >= (xsrc-xparam) && ydst >= (ysrc-yparam) &&
 	   xdst <= (xsrc+xparam) && ydst <= (ysrc+yparam))
 		return 0;//sprites collide
@@ -604,11 +604,11 @@ static void cop2_move3_prot(void)
 	static INT16 y_pl,y_en;
 	static INT16 x_dis,y_dis;
 	static INT16 dir,dis;
-	x_pl = program_read_word(ram_addr[1]+0x8);
-	x_en = program_read_word(ram_addr[0]+0x8);
-	dis = ((program_read_word(ram_addr[0]+0x34) & 0xf0) >> 4);
-	y_pl = program_read_word(ram_addr[1]+0x4);
-	y_en = program_read_word(ram_addr[0]+0x4);
+	x_pl = program_read_word(cop_register[1]+0x8);
+	x_en = program_read_word(cop_register[0]+0x8);
+	dis = ((program_read_word(cop_register[0]+0x34) & 0xf0) >> 4);
+	y_pl = program_read_word(cop_register[1]+0x4);
+	y_en = program_read_word(cop_register[0]+0x4);
 
 	/*
     xxxx ---- select the direction of the enemy sprite
@@ -647,7 +647,7 @@ static void cop2_move3_prot(void)
 			dir = DOWN;
 	}
 
-	program_write_word(ram_addr[0]+0x36,dir);
+	program_write_word(cop_register[0]+0x36,dir);
 
 	/*TODO*/
 	x_dis = (x_pl-x_en);
@@ -671,8 +671,8 @@ static void cop2_move3_prot(void)
 	//if(x_en > x_pl)
 	//  x_dis^=0xffff;
 
-	program_write_word(ram_addr[0]+0x10,y_dis);
-	program_write_word(ram_addr[0]+0x14,x_dis);
+	program_write_word(cop_register[0]+0x10,y_dis);
+	program_write_word(cop_register[0]+0x14,x_dis);
 }
 
 /**/
@@ -684,13 +684,13 @@ static UINT16 cop2_hit_prot(void)
 	static INT16 param1,param2;
 	static INT16 val;
 
-	param1 = program_read_word(ram_addr[2]);
-	param2 = program_read_word(ram_addr[3]);
+	param1 = program_read_word(cop_register[2]);
+	param2 = program_read_word(cop_register[3]);
 
-	xsrc = program_read_word(ram_addr[0]+0x8) + program_read_word(ram_addr[0]+0x14);
-	ysrc = program_read_word(ram_addr[0]+0x4) + program_read_word(ram_addr[0]+0x10);
-	xdst = program_read_word(ram_addr[1]+0x8) + program_read_word(ram_addr[1]+0x14);
-	ydst = program_read_word(ram_addr[1]+0x4) + program_read_word(ram_addr[1]+0x10);
+	xsrc = program_read_word(cop_register[0]+0x8) + program_read_word(cop_register[0]+0x14);
+	ysrc = program_read_word(cop_register[0]+0x4) + program_read_word(cop_register[0]+0x10);
+	xdst = program_read_word(cop_register[1]+0x8) + program_read_word(cop_register[1]+0x14);
+	ydst = program_read_word(cop_register[1]+0x4) + program_read_word(cop_register[1]+0x10);
 
 //  xp = (param1 & 0x00f0) >> 4;
 //  yp = (param1 & 0x0f00) >> 8;
@@ -720,9 +720,9 @@ static void cop2_move2_prot(void)
 	static INT16 xsrc,ysrc;
 	static INT16 param2;
 
-	xsrc = program_read_word(ram_addr[0]+0x14);
-	ysrc = program_read_word(ram_addr[0]+0x10);
-	param2 = program_read_word(ram_addr[3]);
+	xsrc = program_read_word(cop_register[0]+0x14);
+	ysrc = program_read_word(cop_register[0]+0x10);
+	param2 = program_read_word(cop_register[3]);
 
 	switch(param2)
 	{
@@ -736,8 +736,8 @@ static void cop2_move2_prot(void)
 		case 0x18:  ysrc++; xsrc++; break; //down-right
 	}
 
-	program_write_word(ram_addr[0]+0x14,xsrc);
-	program_write_word(ram_addr[0]+0x10,ysrc);
+	program_write_word(cop_register[0]+0x14,xsrc);
+	program_write_word(cop_register[0]+0x10,ysrc);
 }
 
 
@@ -1200,21 +1200,62 @@ static WRITE16_HANDLER( generic_cop_w )
 		}
 
 		/* Registers */
-		case (0x0a0/2): { ram_addr[0] = (ram_addr[0]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c0/2): { ram_addr[0] = (ram_addr[0]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a0/2): { cop_register[0] = (cop_register[0]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0c0/2): { cop_register[0] = (cop_register[0]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0a2/2): { ram_addr[1] = (ram_addr[1]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c2/2): { ram_addr[1] = (ram_addr[1]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0a2/2): { cop_register[1] = (cop_register[1]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0c2/2): { cop_register[1] = (cop_register[1]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
-		case (0x0a4/2): { ram_addr[2] = (ram_addr[2]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c4/2): { ram_addr[2] = (ram_addr[2]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x0a4/2): { cop_register[2] = (cop_register[2]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0c4/2): { cop_register[2] = (cop_register[2]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
 
-		case (0x0a6/2): { ram_addr[3] = (ram_addr[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c6/2): { ram_addr[3] = (ram_addr[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0a6/2): { cop_register[3] = (cop_register[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0c6/2): { cop_register[3] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
 		/* was dma_dst */
-		case (0x0a8/2): { ram_addr[4] = (ram_addr[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c8/2): { ram_addr[4] = (ram_addr[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0a8/2): { cop_register[4] = (cop_register[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0c8/2): { cop_register[4] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+
+		case (0x100/2):
+		{
+			int i;
+			int command;
+
+			printf("%06x: COPX execute table macro command %04x %04x\n", activecpu_get_pc(), data, cop_mcu_ram[offset]);
+
+			command = -1;
+			/* search the uploaded 'trigger' table for a matching trigger*/
+			/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
+			for (i=0;i<32;i++)
+			{
+				if (cop_mcu_ram[offset]==copd2_table_4[i])
+				{
+					printf("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					command = i;
+				}
+			}
+
+			if (command==-1)
+			{
+				printf("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
+				break;
+			}
+			else
+			{
+				int j;
+				command*=0x8;
+				printf("     Sequence: ");
+				for (j=0;j<0x8;j++)
+				{
+					printf("%04x ", copd2_table[command+j]);
+				}
+				printf("\n");
+			}
+
+
+			break;
+		}
+
 
 		/* hmm, this would be strange the 6xx range should be video regs?? */
 		case (0x2fc/2):
@@ -1301,7 +1342,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		/* Odd, this is a video register */
 		case (0x070/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
 
-
+#if 1 // turn off to get the generic sequence logging
 		/* Macros Command Trigger */
 		case (0x100/2):
 		{
@@ -1335,7 +1376,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 			}
 			break;
 		}
-
+#endif
 
 		/*********************************************************************
         600-6ff - Video Registers
@@ -1420,27 +1461,27 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 				/*???*/
 				case 0x8100:
 				{
-					UINT32 src = ram_addr[0];
+					UINT32 src = cop_register[0];
 					program_write_word(src+0x36,0xffc0);
 					break;
 				}
 				case 0x8900:
 				{
-					UINT32 src = ram_addr[0];
+					UINT32 src = cop_register[0];
 					program_write_word(src+0x36,0xff80);
 					break;
 				}
 				/*Right*/
 				case 0x0205:
 				{
-					UINT32 src = ram_addr[0];
+					UINT32 src = cop_register[0];
 					INT16 y = program_read_word(src+0x4);
 					INT16 x = program_read_word(src+0x8);
 					INT16 y_rel = program_read_word(src+0x10);
 					INT16 x_rel = program_read_word(src+0x14);
 					program_write_word(src+0x4,(y+y_rel));
 					program_write_word(src+0x8,(x+x_rel));
-					/*logerror("%08x %08x %08x %08x %08x\n",ram_addr[0],
+					/*logerror("%08x %08x %08x %08x %08x\n",cop_register[0],
 												   program_read_word(cop_reg[0]+0x4),
 												   program_read_word(cop_reg[0]+0x8),
 												   program_read_word(cop_reg[0]+0x10),
@@ -1450,13 +1491,13 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 				/*???*/
 				case 0x3bb0:
 				{
-					//UINT32 dst = ram_addr[0];
-					//UINT32 dst = ram_addr[1];
+					//UINT32 dst = cop_register[0];
+					//UINT32 dst = cop_register[1];
 					//program_write_word(dst,  mame_rand(Machine)/*program_read_word(src)*/);
 					//program_write_word(dst+2,mame_rand(Machine)/*program_read_word(src+2)*/);
 					//program_write_word(dst+4,mame_rand(Machine)/*program_read_word(src+4)*/);
 					//program_write_word(dst+6,mame_rand(Machine)/*program_read_word(src+6)*/);
-					//logerror("%04x\n",ram_addr[0]);
+					//logerror("%04x\n",cop_register[0]);
 					break;
 				}
 				default:
@@ -1685,13 +1726,13 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 			{
 				case 0xa180:/*do the job [1]*/
 				{
-					//popmessage("%08x %08x %04x",dma_src,ram_addr[5]+4,dma_size);
+					//popmessage("%08x %08x %04x",dma_src,cop_register[5]+4,dma_size);
 					/*fix the offset for easier reading*/
 					dma_src+=4;
-					//ram_addr[5]+=4;
+					//cop_register[5]+=4;
 					s_i = dma_size;
-					//ram_addr[5]+=((program_read_word(0x110000) & 0x000f) * 8);
-					//program_write_word(0x1004c8,ram_addr[5] & 0xffff);
+					//cop_register[5]+=((program_read_word(0x110000) & 0x000f) * 8);
+					//program_write_word(0x1004c8,cop_register[5] & 0xffff);
 					//dma_status = 1;
 					break;
 				}
@@ -1887,16 +1928,16 @@ WRITE16_HANDLER( legionna_mcu_w )
 			{
 				static UINT16 xy_data[2];
 				static UINT8 k;
-				xy_data[0] = program_read_word(ram_addr[2]);
-				xy_data[1] = program_read_word(ram_addr[3]);
+				xy_data[0] = program_read_word(cop_register[2]);
+				xy_data[1] = program_read_word(cop_register[3]);
 				k = (cop_mcu_ram[offset] == 0x0205) ? ENEMY : PLAYER;
-				protection_move_jsr(ram_addr[0],k);
-				//protection_move_jsr(ram_addr[1]); //???
-				//popmessage("%08x %08x %04x %04x",ram_addr[0],ram_addr[1],xy_data[0],xy_data[1]);
+				protection_move_jsr(cop_register[0],k);
+				//protection_move_jsr(cop_register[1]); //???
+				//popmessage("%08x %08x %04x %04x",cop_register[0],cop_register[1],xy_data[0],xy_data[1]);
 			}
 			else if(cop_mcu_ram[offset] == 0x3bb0 || cop_mcu_ram[offset] == 0x138e)
 			{
-				protection_hit_jsr(ram_addr[0],ram_addr[1]);
+				protection_hit_jsr(cop_register[0],cop_register[1]);
 			}
 			break;
 		}
