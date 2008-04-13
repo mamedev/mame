@@ -117,14 +117,6 @@ extern VIDEO_UPDATE( sdgndmrb );
 extern UINT16 *legionna_back_data,*legionna_fore_data,*legionna_mid_data,*legionna_scrollram16,*legionna_textram;
 
 
-static WRITE16_HANDLER( legionna_paletteram16_w )	/* xBBBBxRRRRxGGGGx */
-{
-	int a;
-	COMBINE_DATA(&paletteram16[offset]);
-	a = paletteram16[offset];
-	palette_set_color_rgb(Machine,offset,pal4bit(a >> 1),pal4bit(a >> 6),pal4bit(a >> 11));
-}
-
 /*****************************************************************************/
 
 
@@ -139,7 +131,7 @@ static ADDRESS_MAP_START( legionna_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x104000, 0x104fff) AM_RAM /* The 4000-4fff area contains PALETTE words and may be extra paletteram? */
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x106000, 0x106fff) AM_RAM /* is this used outside inits ?? */
-	AM_RANGE(0x107000, 0x107fff) AM_RAM AM_WRITE(legionna_paletteram16_w) AM_BASE(&paletteram16)	/* palette xRRRRxGGGGxBBBBx ? */
+	AM_RANGE(0x107000, 0x107fff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)	/* palette xRRRRxGGGGxBBBBx ? */
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM /* main ram */
 ADDRESS_MAP_END
 
