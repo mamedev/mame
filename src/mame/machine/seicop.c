@@ -1571,9 +1571,9 @@ READ16_HANDLER( godzilla_mcu_r )
 			break;
 
 		/* Non-protection reads */
-		case (0x3c8/2):	return seibu_main_word_r(machine,2,0);
-		case (0x3cc/2):	return seibu_main_word_r(machine,3,0);
-		case (0x3d4/2):	return seibu_main_word_r(machine,5,0);
+		case (0x308/2):	return seibu_main_word_r(machine,2,0);
+		case (0x30c/2):	return seibu_main_word_r(machine,3,0);
+		case (0x314/2):	return seibu_main_word_r(machine,5,0);
 
 		/* Inputs */
 		case (0x340/2): return input_port_1_word_r(machine,0,0);
@@ -1601,10 +1601,10 @@ WRITE16_HANDLER( godzilla_mcu_w )
 		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
 		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
-		case (0x3c0/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x3c4/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x3d0/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x3d8/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
 	}
 }
 
@@ -1855,8 +1855,8 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 			break;
 
 		/* Seems a mirror for the choices in the test menu... */
-		case (0x27c/2): break;
-		case (0x280/2): break;
+		//case (0x27c/2): break;
+		//case (0x280/2): break;
 		//case (0x6fc/2): break;
 
 		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
