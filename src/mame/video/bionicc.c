@@ -131,16 +131,23 @@ WRITE16_HANDLER( bionicc_txvideoram_w )
 
 WRITE16_HANDLER( bionicc_paletteram_w )
 {
-	int red, green, blue, bright;
+	int r, g, b, bright;
 	data = COMBINE_DATA(&paletteram16[offset]);
 
-	bright = 0x10 + (data&0x0f);
+	bright = (data&0x0f);
 
-	red   = ((data>>12)&0x0f) * bright * 0x11 / 0x1f;
-	green = ((data>>8 )&0x0f) * bright * 0x11 / 0x1f;
-	blue  = ((data>>4 )&0x0f) * bright * 0x11 / 0x1f;
+	r = ((data>>12)&0x0f) * 0x11;
+	g = ((data>>8 )&0x0f) * 0x11;
+	b = ((data>>4 )&0x0f) * 0x11;
+	
+	if ((bright & 0x08) == 0)
+	{
+		r = r * (0x07 + bright) / 0x0e;
+		g = g * (0x07 + bright) / 0x0e;
+		b = b * (0x07 + bright) / 0x0e;
+	}
 
-	palette_set_color (machine, offset, MAKE_RGB(red, green, blue));
+	palette_set_color (machine, offset, MAKE_RGB(r, g, b));
 }
 
 WRITE16_HANDLER( bionicc_scroll_w )
