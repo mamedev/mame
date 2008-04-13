@@ -49,6 +49,7 @@
 #include "driver.h"
 #include "audio/seibu.h"
 
+#define seibu_cop_log printf
 
 UINT16 *cop_mcu_ram;
 
@@ -1125,7 +1126,7 @@ static READ16_HANDLER( generic_cop_r )
 	switch (offset)
 	{
 		default:
-			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
 			return retvalue;
 			break;
 
@@ -1147,7 +1148,7 @@ static WRITE16_HANDLER( generic_cop_w )
 	switch (offset)
 	{
 		default:
-			printf("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
 			break;
 
 		/* BCD Protection */
@@ -1166,14 +1167,14 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x078/2): /* clear address */
 		{
 			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
-			printf("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* clear length */
 		{
 			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
-			printf("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
+			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
 
 			break;
 		}
@@ -1181,7 +1182,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07c/2): /* clear value? */
 		{
 			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
-			printf("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
 			break;
 		}
 
@@ -1189,10 +1190,10 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07e/2):
 		{
 			cop_clearfill_lasttrigger = data;
-			printf("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
+			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
 			if (data>=0x1ff)
 			{
-				printf("invalid!, >0x1ff\n");
+				seibu_cop_log("invalid!, >0x1ff\n");
 				cop_clearfill_lasttrigger = 0;
 			}
 
@@ -1213,15 +1214,15 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x0c6/2): { cop_register[3] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
 		/* was dma_dst */
-		case (0x0a8/2): { cop_register[4] = (cop_register[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
-		case (0x0c8/2): { cop_register[4] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+		case (0x0a8/2): { cop_register[4] = (cop_register[4]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
 		case (0x100/2):
 		{
 			int i;
 			int command;
 
-			printf("%06x: COPX execute table macro command %04x %04x\n", activecpu_get_pc(), data, cop_mcu_ram[offset]);
+			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", activecpu_get_pc(), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
 
 			command = -1;
 			/* search the uploaded 'trigger' table for a matching trigger*/
@@ -1230,26 +1231,26 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				if (cop_mcu_ram[offset]==copd2_table_4[i])
 				{
-					printf("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
 					command = i;
 				}
 			}
 
 			if (command==-1)
 			{
-				printf("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
+				seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
 				break;
 			}
 			else
 			{
 				int j;
 				command*=0x8;
-				printf("     Sequence: ");
+				seibu_cop_log("     Sequence: ");
 				for (j=0;j<0x8;j++)
 				{
-					printf("%04x ", copd2_table[command+j]);
+					seibu_cop_log("%04x ", copd2_table[command+j]);
 				}
-				printf("\n");
+				seibu_cop_log("\n");
 			}
 
 
@@ -1260,7 +1261,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* hmm, this would be strange the 6xx range should be video regs?? */
 		case (0x2fc/2):
 		{
-			printf("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
+			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
 
 			// I think the value it writes here must match the other value for anything to happen.. maybe */
 			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
@@ -1372,7 +1373,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 					break;
 				}
 				default:
-					logerror("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],activecpu_get_previouspc());
+					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],activecpu_get_previouspc());
 			}
 			break;
 		}
@@ -1769,7 +1770,7 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 					break;
 				}
 				default:
-					logerror("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],activecpu_get_previouspc());
+					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],activecpu_get_previouspc());
 			}
 			break;
 		}
