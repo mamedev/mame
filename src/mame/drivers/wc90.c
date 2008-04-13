@@ -116,43 +116,21 @@ static WRITE8_HANDLER( wc90_sound_command_w )
 
 
 
-static ADDRESS_MAP_START( wc90_readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM) /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_RAM) /* fg video ram */
-	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM) /* bg video ram */
-	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) /* tx video ram */
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xf800, 0xfbff) AM_READ(wc90_shared_r)
+static ADDRESS_MAP_START( wc90_map_1, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM		/* Main RAM */
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_WRITE(wc90_fgvideoram_w) AM_BASE(&wc90_fgvideoram)	/* fg video ram */
+	AM_RANGE(0xb000, 0xbfff) AM_RAM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_WRITE(wc90_bgvideoram_w) AM_BASE(&wc90_bgvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_WRITE(wc90_txvideoram_w) AM_BASE(&wc90_txvideoram)	/* tx video ram */
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90_shared_r, wc90_shared_w) AM_BASE(&wc90_shared)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(input_port_0_r) /* Stick 1 */
 	AM_RANGE(0xfc02, 0xfc02) AM_READ(input_port_1_r) /* Stick 2 */
 	AM_RANGE(0xfc05, 0xfc05) AM_READ(input_port_4_r) /* Start & Coin */
 	AM_RANGE(0xfc06, 0xfc06) AM_READ(input_port_2_r) /* DIP Switch A */
 	AM_RANGE(0xfc07, 0xfc07) AM_READ(input_port_3_r) /* DIP Switch B */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wc90_readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xf800, 0xfbff) AM_READ(wc90_shared_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wc90_writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(wc90_fgvideoram_w) AM_BASE(&wc90_fgvideoram)
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(wc90_bgvideoram_w) AM_BASE(&wc90_bgvideoram)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(wc90_txvideoram_w) AM_BASE(&wc90_txvideoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(wc90_shared_w) AM_BASE(&wc90_shared)
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(SMH_RAM) AM_BASE(&wc90_scroll0ylo)
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(SMH_RAM) AM_BASE(&wc90_scroll0yhi)
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(SMH_RAM) AM_BASE(&wc90_scroll0xlo)
@@ -170,36 +148,28 @@ static ADDRESS_MAP_START( wc90_writemem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(wc90_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wc90_writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(wc90_shared_w)
+static ADDRESS_MAP_START( wc90_map_2, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90_shared_r, wc90_shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ(YM2608_status_port_0_A_r)
-	AM_RANGE(0xf802, 0xf802) AM_READ(YM2608_status_port_0_B_r)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(YM2608_status_port_0_A_r, YM2608_control_port_0_A_w)
+	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2608_data_port_0_A_w)
+	AM_RANGE(0xf802, 0xf802) AM_READWRITE(YM2608_status_port_0_B_r, YM2608_control_port_0_B_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE(YM2608_data_port_0_B_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP) /* ??? adpcm ??? */
 	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2608_control_port_0_A_w)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2608_data_port_0_A_w)
-	AM_RANGE(0xf802, 0xf802) AM_WRITE(YM2608_control_port_0_B_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(YM2608_data_port_0_B_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( wc90 )
@@ -347,17 +317,17 @@ static MACHINE_DRIVER_START( wc90 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wc90_readmem1,wc90_writemem1)
+	MDRV_CPU_PROGRAM_MAP(wc90_map_1,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80, 6000000)	/* 6.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(wc90_readmem2,wc90_writemem2)
+	MDRV_CPU_PROGRAM_MAP(wc90_map_2,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD(Z80, 4000000)
 	/* audio CPU */	/* 4 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-								/* NMIs are triggered by the main CPU */
+	MDRV_CPU_ADD(Z80, 4000000)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	/* NMIs are triggered by the main CPU */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
