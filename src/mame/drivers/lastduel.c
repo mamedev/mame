@@ -28,9 +28,11 @@ WRITE16_HANDLER( lastduel_scroll2_w );
 WRITE16_HANDLER( madgear_scroll1_w );
 WRITE16_HANDLER( madgear_scroll2_w );
 WRITE16_HANDLER( lastduel_scroll_w );
+WRITE16_HANDLER( lastduel_palette_word_w );
 VIDEO_START( lastduel );
 VIDEO_START( madgear );
 VIDEO_UPDATE( lastduel );
+VIDEO_UPDATE( madgear );
 VIDEO_EOF( lastduel );
 
 extern UINT16 *lastduel_vram,*lastduel_scroll2,*lastduel_scroll1;
@@ -65,11 +67,11 @@ static ADDRESS_MAP_START( lastduel_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xfc4000, 0xfc4001) AM_WRITE(lastduel_flip_w)
 	AM_RANGE(0xfc4002, 0xfc4003) AM_WRITE(lastduel_sound_w)
-	AM_RANGE(0xfc8000, 0xfc8007) AM_WRITE(lastduel_scroll_w)
+	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE(lastduel_scroll_w)
 	AM_RANGE(0xfcc000, 0xfcdfff) AM_WRITE(lastduel_vram_w) AM_BASE(&lastduel_vram)
 	AM_RANGE(0xfd0000, 0xfd3fff) AM_WRITE(lastduel_scroll1_w) AM_BASE(&lastduel_scroll1)
 	AM_RANGE(0xfd4000, 0xfd7fff) AM_WRITE(lastduel_scroll2_w) AM_BASE(&lastduel_scroll2)
-	AM_RANGE(0xfd8000, 0xfd87ff) AM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfd8000, 0xfd87ff) AM_WRITE(lastduel_palette_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfe0000, 0xffffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -93,8 +95,8 @@ static ADDRESS_MAP_START( madgear_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc4000, 0xfc4001) AM_WRITE(lastduel_flip_w)
 	AM_RANGE(0xfc4002, 0xfc4003) AM_WRITE(lastduel_sound_w)
 	AM_RANGE(0xfc8000, 0xfc9fff) AM_WRITE(lastduel_vram_w) AM_BASE(&lastduel_vram)
-	AM_RANGE(0xfcc000, 0xfcc7ff) AM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfd0000, 0xfd0007) AM_WRITE(lastduel_scroll_w)
+	AM_RANGE(0xfcc000, 0xfcc7ff) AM_WRITE(lastduel_palette_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xfd0000, 0xfd000f) AM_WRITE(lastduel_scroll_w)
 	AM_RANGE(0xfd4000, 0xfd7fff) AM_WRITE(madgear_scroll1_w) AM_BASE(&lastduel_scroll1)
 	AM_RANGE(0xfd8000, 0xfdffff) AM_WRITE(madgear_scroll2_w) AM_BASE(&lastduel_scroll2)
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)
@@ -322,7 +324,7 @@ static MACHINE_DRIVER_START( madgear )
 
 	MDRV_VIDEO_START(madgear)
 	MDRV_VIDEO_EOF(lastduel)
-	MDRV_VIDEO_UPDATE(lastduel)
+	MDRV_VIDEO_UPDATE(madgear)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -803,6 +805,44 @@ ROM_START( ledstorm )
 	ROM_LOAD( "63s141.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) )	/* priority (not used) */
 ROM_END
 
+ROM_START( ledstrm2 )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 256K for 68000 code */
+	ROM_LOAD16_BYTE( "lsu-04.bin", 0x00000, 0x20000, CRC(56a2f079) SHA1(da581c117d92ac5c1e8e44324f1aed2858a3cdc8) )
+	ROM_LOAD16_BYTE( "lsu-03.bin", 0x00001, 0x20000, CRC(9b6408c0) SHA1(8ef8349f58c62a2d626b1053eae2032d168d602c) )
+	ROM_LOAD16_BYTE( "ls-02.bin", 0x40000, 0x20000, CRC(05c0285e) SHA1(b155d2d0c41f614bd324813c5d3d87a6765ad812) )
+	ROM_LOAD16_BYTE( "ls-01.bin", 0x40001, 0x20000, CRC(8bf934dd) SHA1(f2287a4361af4986eb010dfbfb6de3a3d4124937) )
+
+	ROM_REGION(  0x18000 , REGION_CPU2, 0 ) /* audio CPU */
+	ROM_LOAD( "ls-07.bin",    0x00000,  0x08000, CRC(98af7838) SHA1(a0b87b9ce3c1b0e5d7696ffaab9cea483b9ee928) )
+	ROM_CONTINUE(             0x10000,  0x08000 )
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE ) // Sprite roms not dumped from this revision of the game
+	ROM_LOAD( "mg_m11.rom",   0x000000, 0x10000, BAD_DUMP CRC(ee319a64) SHA1(ce8d65fdac3ec1009b22764807c03dd96b340660) )	/* Interleaved sprites */
+	ROM_LOAD( "07",           0x010000, 0x10000, BAD_DUMP CRC(7152b212) SHA1(b021496e8b3c22c018907e6e374a7401d3843570) )
+	ROM_LOAD( "mg_m12.rom",   0x020000, 0x10000, BAD_DUMP CRC(887ef120) SHA1(9d57b497334d64df9a4ab7f15824dcc6a333f73d) )
+	ROM_LOAD( "08",           0x030000, 0x10000, BAD_DUMP CRC(72e5d525) SHA1(209def4206e9b66be9879f0105d3f04980f156da) )
+	ROM_LOAD( "mg_m13.rom",   0x040000, 0x10000, BAD_DUMP CRC(eae07db4) SHA1(59c4ff48d906b2bb101fbebe06383940fdff064f) )
+	ROM_LOAD( "09",           0x050000, 0x10000, BAD_DUMP CRC(7b5175cb) SHA1(8d8d4953dd787308bed75345af6789899d2afded) )
+	ROM_LOAD( "mg_m14.rom",   0x060000, 0x10000, BAD_DUMP CRC(21e5424c) SHA1(2f7c5d974c847bb14eaf278545bca653919110ba) )
+	ROM_LOAD( "10",           0x070000, 0x10000, BAD_DUMP CRC(6db7ca64) SHA1(389cc93b9bfe2824a0de9796e79c6d452d09567e) )
+
+	ROM_REGION( 0x08000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "ls-08.bin",    0x000000, 0x08000, CRC(8803cf49) SHA1(7a01a05f760d8e2472fdbc1d10b53094babe295e) )	/* 8x8 text */
+
+	ROM_REGION( 0x40000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "ls-12",        0x000000, 0x40000, CRC(6c1b2c6c) SHA1(18f22129f13c6bfa7e285f0e09a35644272f6ecb) )
+
+	ROM_REGION( 0x80000, REGION_GFX4, ROMREGION_DISPOSE )
+	ROM_LOAD( "ls-11",        0x000000, 0x80000, CRC(6bf81c64) SHA1(2289978c6bdb6e4f86e7094e861df147e757e249) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 ) /* ADPCM */
+	ROM_LOAD( "ls-06",        0x00000, 0x20000, CRC(88d39a5b) SHA1(8fb2d1d26e2ffb93dfc9cf8f23bb81eb64496c2b) )
+	ROM_LOAD( "ls-05",        0x20000, 0x20000, CRC(b06e03b5) SHA1(7d17e5cfb57866c60146bea1a4535e961c73327c) )
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "63s141.14k",   0x0000, 0x0100, CRC(7f862e1e) SHA1(7134c4f741463007a177d55922e1284d132f60e3) )	/* priority (not used) */
+ROM_END
+
 /******************************************************************************/
 
 GAME( 1988, lastduel, 0,        lastduel, lastduel, 0, ROT270, "Capcom", "Last Duel (US set 1)", 0 )
@@ -811,3 +851,4 @@ GAME( 1988, lstduelb, lastduel, lastduel, lastduel, 0, ROT270, "bootleg", "Last 
 GAME( 1989, madgear,  0,        madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (US)", 0 )
 GAME( 1989, madgearj, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Mad Gear (Japan)", 0 )
 GAME( 1988, ledstorm, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm (US)", 0 )
+GAME( 1988, ledstrm2, madgear,  madgear,  madgear,  0, ROT270, "Capcom", "Led Storm Rally 2011 (US)", 0 )

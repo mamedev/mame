@@ -2346,7 +2346,8 @@ V-V                           TP-027
 	DRIVER( lstduelb )	/* bootleg */
 	DRIVER( madgear )	/*  2/1989 (c) 1989 (US) */
 	DRIVER( madgearj )	/*  2/1989 (c) 1989 (Japan) */
-	DRIVER( ledstorm )	/*  2/1989 (c) 1989 (US) */
+	DRIVER( ledstorm )	/*  1988 (c) 1988 (US) */
+	DRIVER( ledstrm2 )	/*  1988 (c) 1988 (US) */
 	/*  3/1989 Dokaben (baseball) - see below among "Mitchell" games */
 	/*  8/1989 Dokaben 2 (baseball) - see below among "Mitchell" games */
 	/* 10/1989 Capcom Baseball - see below among "Mitchell" games */

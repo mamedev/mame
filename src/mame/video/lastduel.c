@@ -12,7 +12,7 @@ UINT16 *lastduel_vram,*lastduel_scroll2,*lastduel_scroll1;
 
 static tilemap *bg_tilemap,*fg_tilemap,*tx_tilemap;
 
-static int sprite_flipy_mask,sprite_pri_mask;
+static int sprite_flipy_mask,sprite_pri_mask,tilemap_priority;
 
 
 
@@ -97,6 +97,7 @@ VIDEO_START( lastduel )
 
 	sprite_flipy_mask = 0x40;
 	sprite_pri_mask = 0x00;
+	tilemap_priority = 0;
 }
 
 VIDEO_START( madgear )
@@ -108,9 +109,11 @@ VIDEO_START( madgear )
 	tilemap_set_transmask(fg_tilemap,0,0xffff,0x8000);
 	tilemap_set_transmask(fg_tilemap,1,0x80ff,0xff00);
 	tilemap_set_transparent_pen(tx_tilemap,3);
+	tilemap_set_transparent_pen(bg_tilemap,15);
 
 	sprite_flipy_mask = 0x80;
 	sprite_pri_mask = 0x10;
+	tilemap_priority = 0;
 }
 
 
@@ -136,7 +139,7 @@ WRITE16_HANDLER( lastduel_flip_w )
 
 WRITE16_HANDLER( lastduel_scroll_w )
 {
-	static UINT16 scroll[4];
+	static UINT16 scroll[8];
 
 	data = COMBINE_DATA(&scroll[offset]);
 	switch (offset)
@@ -145,6 +148,10 @@ WRITE16_HANDLER( lastduel_scroll_w )
 		case 1: tilemap_set_scrollx(fg_tilemap,0,data); break;
 		case 2: tilemap_set_scrolly(bg_tilemap,0,data); break;
 		case 3: tilemap_set_scrollx(bg_tilemap,0,data); break;
+		case 7: tilemap_priority=data; break;
+		default:
+			logerror("Unmapped video write %d %04x\n", offset, data);
+			break;
 	}
 }
 
@@ -178,7 +185,20 @@ WRITE16_HANDLER( madgear_scroll2_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
 }
 
-
+WRITE16_HANDLER( lastduel_palette_word_w )
+{
+	int red, green, blue, bright;
+	data = COMBINE_DATA(&paletteram16[offset]);
+	
+	// Brightness parameter interpreted same way as CPS1
+	bright = 0x10 + (data&0x0f);
+	
+	red   = ((data>>12)&0x0f) * bright * 0x11 / 0x1f;
+	green = ((data>>8 )&0x0f) * bright * 0x11 / 0x1f;
+	blue  = ((data>>4 )&0x0f) * bright * 0x11 / 0x1f;
+	
+	palette_set_color (machine, offset, MAKE_RGB(red, green, blue));
+}
 
 /***************************************************************************
 
@@ -243,6 +263,27 @@ VIDEO_UPDATE( lastduel )
 	return 0;
 }
 
+VIDEO_UPDATE( madgear )
+{
+	if (tilemap_priority)
+	{
+		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE,0);
+		draw_sprites(screen->machine,bitmap,cliprect,0);
+		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
+		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+		draw_sprites(screen->machine,bitmap,cliprect,1);
+	}
+	else
+	{
+		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER1,0);
+		draw_sprites(screen->machine,bitmap,cliprect,0);
+		tilemap_draw(bitmap,cliprect,fg_tilemap,TILEMAP_DRAW_LAYER0,0);
+		draw_sprites(screen->machine,bitmap,cliprect,1);
+	}
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	return 0;
+}
 
 VIDEO_EOF( lastduel )
 {
