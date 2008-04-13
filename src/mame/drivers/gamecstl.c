@@ -57,11 +57,11 @@ static UINT32 *cga_ram;
 static UINT32 *bios_ram;
 
 static struct {
-	const device_config	*pit8254;
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	device_config	*pit8254;
+	device_config	*pic8259_1;
+	device_config	*pic8259_2;
+	device_config	*dma8237_1;
+	device_config	*dma8237_2;
 } gamecstl_devices;
 
 

@@ -120,11 +120,11 @@ static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
 
 static struct {
-	const device_config	*pit8254;
-	const device_config	*pic8259_1;
-	const device_config	*pic8259_2;
-	const device_config	*dma8237_1;
-	const device_config	*dma8237_2;
+	device_config	*pit8254;
+	device_config	*pic8259_1;
+	device_config	*pic8259_2;
+	device_config	*dma8237_1;
+	device_config	*dma8237_2;
 } mediagx_devices;
 
 
@@ -476,7 +476,7 @@ static READ32_HANDLER( io20_r )
 	// 0x20 - 0x21, PIC
 	if (ACCESSING_BITS_0_15)
 	{
-		r |= read32le_with_read8_device_handler( pic8259_r, (device_config*)mediagx_devices.pic8259_1, offset, mem_mask);
+		r |= read32le_with_read8_device_handler( pic8259_r, mediagx_devices.pic8259_1, offset, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
@@ -496,7 +496,7 @@ static WRITE32_HANDLER( io20_w )
 	// 0x20 - 0x21, PIC
 	if (ACCESSING_BITS_0_15)
 	{
-		write32le_with_write8_device_handler( pic8259_w, (device_config*)mediagx_devices.pic8259_1, offset, data, mem_mask);
+		write32le_with_write8_device_handler( pic8259_w, mediagx_devices.pic8259_1, offset, data, mem_mask);
 	}
 
 	// 0x22, 0x23, Cyrix configuration registers
