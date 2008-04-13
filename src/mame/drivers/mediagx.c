@@ -120,11 +120,11 @@ static UINT32 ad1847_sample_counter = 0;
 static UINT32 ad1847_sample_rate;
 
 static struct {
-	device_config	*pit8254;
-	device_config	*pic8259_1;
-	device_config	*pic8259_2;
-	device_config	*dma8237_1;
-	device_config	*dma8237_2;
+	const device_config	*pit8254;
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
 } mediagx_devices;
 
 
@@ -990,11 +990,11 @@ static MACHINE_RESET(mediagx)
 	dmadac_enable(0, 2, 1);
 	ide_controller_reset(0);
 
-	mediagx_devices.pit8254 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
-	mediagx_devices.pic8259_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
-	mediagx_devices.pic8259_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
-	mediagx_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	mediagx_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	mediagx_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	mediagx_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
+	mediagx_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
+	mediagx_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	mediagx_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
 
 /*************************************************************

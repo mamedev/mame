@@ -57,11 +57,11 @@ static UINT32 *cga_ram;
 static UINT32 *bios_ram;
 
 static struct {
-	device_config	*pit8254;
-	device_config	*pic8259_1;
-	device_config	*pic8259_2;
-	device_config	*dma8237_1;
-	device_config	*dma8237_2;
+	const device_config	*pit8254;
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
 } gamecstl_devices;
 
 
@@ -572,11 +572,11 @@ static MACHINE_RESET(gamecstl)
 
 	cpunum_set_irq_callback(0, irq_callback);
 
-	gamecstl_devices.pit8254 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
-	gamecstl_devices.pic8259_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
-	gamecstl_devices.pic8259_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
-	gamecstl_devices.dma8237_1 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
-	gamecstl_devices.dma8237_2 = (device_config*)device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+	gamecstl_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	gamecstl_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
+	gamecstl_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
+	gamecstl_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	gamecstl_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
 
 

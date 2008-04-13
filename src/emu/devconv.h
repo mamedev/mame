@@ -85,23 +85,23 @@
  *
  *************************************/
 
-INLINE UINT16 read16be_with_read8_device_handler(read8_device_func handler, void *param, offs_t offset, UINT16 mem_mask)
+INLINE UINT16 read16be_with_read8_device_handler(read8_device_func handler, const device_config *device, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 result = 0;
 	if ((mem_mask & 0xff00) != 0xff00)
-		result |= ((UINT16)(*handler)(param, offset * 2 + 0)) << 8;
+		result |= ((UINT16)(*handler)(device, offset * 2 + 0)) << 8;
 	if ((mem_mask & 0x00ff) != 0x00ff)
-		result |= ((UINT16)(*handler)(param, offset * 2 + 1)) << 0;
+		result |= ((UINT16)(*handler)(device, offset * 2 + 1)) << 0;
 	return result;
 }
 
 
-INLINE void write16be_with_write8_device_handler(write8_device_func handler, void *param, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void write16be_with_write8_device_handler(write8_device_func handler, const device_config *device, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if ((mem_mask & 0xff00) != 0xff00)
-		(*handler)(param, offset * 2 + 0, data >> 8);
+		(*handler)(device, offset * 2 + 0, data >> 8);
 	if ((mem_mask & 0x00ff) != 0x00ff)
-		(*handler)(param, offset * 2 + 1, data >> 0);
+		(*handler)(device, offset * 2 + 1, data >> 0);
 }
 
 
@@ -111,23 +111,23 @@ INLINE void write16be_with_write8_device_handler(write8_device_func handler, voi
  *
  *************************************/
 
-INLINE UINT16 read16le_with_read8_device_handler(read8_device_func handler, void *param, offs_t offset, UINT16 mem_mask)
+INLINE UINT16 read16le_with_read8_device_handler(read8_device_func handler, const device_config *device, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 result = 0;
 	if ((mem_mask & 0x00ff) != 0x00ff)
-		result |= ((UINT16) (*handler)(param, offset * 2 + 0)) << 0;
+		result |= ((UINT16) (*handler)(device, offset * 2 + 0)) << 0;
 	if ((mem_mask & 0xff00) != 0xff00)
-		result |= ((UINT16) (*handler)(param, offset * 2 + 1)) << 8;
+		result |= ((UINT16) (*handler)(device, offset * 2 + 1)) << 8;
 	return result;
 }
 
 
-INLINE void write16le_with_write8_device_handler(write8_device_func handler, void *param, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void write16le_with_write8_device_handler(write8_device_func handler, const device_config *device, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if ((mem_mask & 0x00ff) != 0x00ff)
-		(*handler)(param, offset * 2 + 0, data >> 0);
+		(*handler)(device, offset * 2 + 0, data >> 0);
 	if ((mem_mask & 0xff00) != 0xff00)
-		(*handler)(param, offset * 2 + 1, data >> 8);
+		(*handler)(device, offset * 2 + 1, data >> 8);
 }
 
 
@@ -137,23 +137,23 @@ INLINE void write16le_with_write8_device_handler(write8_device_func handler, voi
  *
  *************************************/
 
-INLINE UINT32 read32be_with_read8_device_handler(read8_device_func handler, void *param, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_read8_device_handler(read8_device_func handler, const device_config *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= read16be_with_read8_device_handler(handler, param, offset * 2 + 0, mem_mask >> 16) << 16;
+		result |= read16be_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask >> 16) << 16;
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= read16be_with_read8_device_handler(handler, param, offset * 2 + 1, mem_mask) << 0;
+		result |= read16be_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask) << 0;
 	return result;
 }
 
 
-INLINE void write32be_with_write8_device_handler(write8_device_func handler, void *param, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_write8_device_handler(write8_device_func handler, const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		write16be_with_write8_device_handler(handler, param, offset * 2 + 0, data >> 16, mem_mask >> 16);
+		write16be_with_write8_device_handler(handler, device, offset * 2 + 0, data >> 16, mem_mask >> 16);
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		write16be_with_write8_device_handler(handler, param, offset * 2 + 1, data, mem_mask);
+		write16be_with_write8_device_handler(handler, device, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -163,23 +163,23 @@ INLINE void write32be_with_write8_device_handler(write8_device_func handler, voi
  *
  *************************************/
 
-INLINE UINT32 read32le_with_read8_device_handler(read8_device_func handler, void *param, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_read8_device_handler(read8_device_func handler, const device_config *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= read16le_with_read8_device_handler(handler, param, offset * 2 + 0, mem_mask) << 0;
+		result |= read16le_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask) << 0;
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= read16le_with_read8_device_handler(handler, param, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= read16le_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
 
-INLINE void write32le_with_write8_device_handler(write8_device_func handler, void *param, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_write8_device_handler(write8_device_func handler, const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		write16le_with_write8_device_handler(handler, param, offset * 2 + 0, data, mem_mask);
+		write16le_with_write8_device_handler(handler, device, offset * 2 + 0, data, mem_mask);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		write16le_with_write8_device_handler(handler, param, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		write16le_with_write8_device_handler(handler, device, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -189,23 +189,23 @@ INLINE void write32le_with_write8_device_handler(write8_device_func handler, voi
  *
  *************************************/
 
-INLINE UINT32 read32be_with_16be_device_handler(read16_device_func handler, void *param, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_16be_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= (*handler)(param, offset * 2 + 0, mem_mask >> 16) << 16;
+		result |= (*handler)(device, offset * 2 + 0, mem_mask >> 16) << 16;
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= (*handler)(param, offset * 2 + 1, mem_mask) << 0;
+		result |= (*handler)(device, offset * 2 + 1, mem_mask) << 0;
 	return result;
 }
 
 
-INLINE void write32be_with_16be_device_handler(write16_device_func handler, void *param, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_16be_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		(*handler)(param, offset * 2 + 0, data >> 16, mem_mask >> 16);
+		(*handler)(device, offset * 2 + 0, data >> 16, mem_mask >> 16);
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		(*handler)(param, offset * 2 + 1, data, mem_mask);
+		(*handler)(device, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -215,23 +215,23 @@ INLINE void write32be_with_16be_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT32 read32le_with_16le_device_handler(read16_device_func handler, void *param, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_16le_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= (*handler)(param, offset * 2 + 0, mem_mask) << 0;
+		result |= (*handler)(device, offset * 2 + 0, mem_mask) << 0;
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= (*handler)(param, offset * 2 + 1, mem_mask >> 16) << 16;
+		result |= (*handler)(device, offset * 2 + 1, mem_mask >> 16) << 16;
 	return result;
 }
 
 
-INLINE void write32le_with_16le_device_handler(write16_device_func handler, void *param, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_16le_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		(*handler)(param, offset * 2 + 0, data, mem_mask);
+		(*handler)(device, offset * 2 + 0, data, mem_mask);
 	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		(*handler)(param, offset * 2 + 1, data >> 16, mem_mask >> 16);
+		(*handler)(device, offset * 2 + 1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -241,20 +241,20 @@ INLINE void write32le_with_16le_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT32 read32be_with_16le_device_handler(read16_device_func handler, void *param, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_16le_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	result = read32le_with_16le_device_handler(handler, param, offset, mem_mask);
+	result = read32le_with_16le_device_handler(handler, device, offset, mem_mask);
 	return FLIPENDIAN_INT32(result);
 }
 
 
-INLINE void write32be_with_16le_device_handler(write16_device_func handler, void *param, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_16le_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	data = FLIPENDIAN_INT32(data);
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	write32le_with_16le_device_handler(handler, param, offset, data, mem_mask);
+	write32le_with_16le_device_handler(handler, device, offset, data, mem_mask);
 }
 
 
@@ -264,20 +264,20 @@ INLINE void write32be_with_16le_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT32 read32le_with_16be_device_handler(read16_device_func handler, void *param, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_16be_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	result = read32be_with_16be_device_handler(handler, param, offset, mem_mask);
+	result = read32be_with_16be_device_handler(handler, device, offset, mem_mask);
 	return FLIPENDIAN_INT32(result);
 }
 
 
-INLINE void write32le_with_16be_device_handler(write16_device_func handler, void *param, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_16be_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	data = FLIPENDIAN_INT32(data);
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
-	write32be_with_16be_device_handler(handler, param, offset, data, mem_mask);
+	write32be_with_16be_device_handler(handler, device, offset, data, mem_mask);
 }
 
 
@@ -287,23 +287,23 @@ INLINE void write32le_with_16be_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT64 read64be_with_read8_device_handler(read8_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_read8_device_handler(read8_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)read32be_with_read8_device_handler(handler, param, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)read32be_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask >> 32) << 32;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)read32be_with_read8_device_handler(handler, param, offset * 2 + 1, mem_mask) << 0;
+		result |= (UINT64)read32be_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_write8_device_handler(write8_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_write8_device_handler(write8_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		write32be_with_write8_device_handler(handler, param, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		write32be_with_write8_device_handler(handler, device, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		write32be_with_write8_device_handler(handler, param, offset * 2 + 1, data, mem_mask);
+		write32be_with_write8_device_handler(handler, device, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -313,23 +313,23 @@ INLINE void write64be_with_write8_device_handler(write8_device_func handler, voi
  *
  *************************************/
 
-INLINE UINT64 read64le_with_read8_device_handler(read8_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_read8_device_handler(read8_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)read32le_with_read8_device_handler(handler, param, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)read32le_with_read8_device_handler(handler, device, offset * 2 + 0, mem_mask >> 0) << 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)read32le_with_read8_device_handler(handler, param, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)read32le_with_read8_device_handler(handler, device, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_write8_device_handler(write8_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_write8_device_handler(write8_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		write32le_with_write8_device_handler(handler, param, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		write32le_with_write8_device_handler(handler, device, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		write32le_with_write8_device_handler(handler, param, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		write32le_with_write8_device_handler(handler, device, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -339,23 +339,23 @@ INLINE void write64le_with_write8_device_handler(write8_device_func handler, voi
  *
  *************************************/
 
-INLINE UINT32 read64be_with_16be_device_handler(read16_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64be_with_16be_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)read32be_with_16be_device_handler(handler, param, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)read32be_with_16be_device_handler(handler, device, offset * 2 + 0, mem_mask >> 32) << 32;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)read32be_with_16be_device_handler(handler, param, offset * 2 + 1, mem_mask >> 0) << 0;
+		result |= (UINT64)read32be_with_16be_device_handler(handler, device, offset * 2 + 1, mem_mask >> 0) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_16be_device_handler(write16_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_16be_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		write32be_with_16be_device_handler(handler, param, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		write32be_with_16be_device_handler(handler, device, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		write32be_with_16be_device_handler(handler, param, offset * 2 + 1, data >> 0, mem_mask >> 0);
+		write32be_with_16be_device_handler(handler, device, offset * 2 + 1, data >> 0, mem_mask >> 0);
 }
 
 
@@ -365,23 +365,23 @@ INLINE void write64be_with_16be_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT32 read64le_with_16le_device_handler(read16_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64le_with_16le_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)read32le_with_16le_device_handler(handler, param, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)read32le_with_16le_device_handler(handler, device, offset * 2 + 0, mem_mask >> 0) << 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)read32le_with_16le_device_handler(handler, param, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)read32le_with_16le_device_handler(handler, device, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_16le_device_handler(write16_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_16le_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		write32le_with_16le_device_handler(handler, param, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		write32le_with_16le_device_handler(handler, device, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		write32le_with_16le_device_handler(handler, param, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		write32le_with_16le_device_handler(handler, device, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -391,23 +391,23 @@ INLINE void write64le_with_16le_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT32 read64be_with_16le_device_handler(read16_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64be_with_16le_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)read32be_with_16le_device_handler(handler, param, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)read32be_with_16le_device_handler(handler, device, offset * 2 + 0, mem_mask >> 32) << 32;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)read32be_with_16le_device_handler(handler, param, offset * 2 + 1, mem_mask >> 0) << 0;
+		result |= (UINT64)read32be_with_16le_device_handler(handler, device, offset * 2 + 1, mem_mask >> 0) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_16le_device_handler(write16_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_16le_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		write32be_with_16le_device_handler(handler, param, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		write32be_with_16le_device_handler(handler, device, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		write32be_with_16le_device_handler(handler, param, offset * 2 + 1, data >> 0, mem_mask >> 0);
+		write32be_with_16le_device_handler(handler, device, offset * 2 + 1, data >> 0, mem_mask >> 0);
 }
 
 
@@ -417,23 +417,23 @@ INLINE void write64be_with_16le_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT32 read64le_with_16be_device_handler(read16_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64le_with_16be_device_handler(read16_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)read32le_with_16be_device_handler(handler, param, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)read32le_with_16be_device_handler(handler, device, offset * 2 + 0, mem_mask >> 0) << 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)read32le_with_16be_device_handler(handler, param, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)read32le_with_16be_device_handler(handler, device, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_16be_device_handler(write16_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_16be_device_handler(write16_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		write32le_with_16be_device_handler(handler, param, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		write32le_with_16be_device_handler(handler, device, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		write32le_with_16be_device_handler(handler, param, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		write32le_with_16be_device_handler(handler, device, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -443,23 +443,23 @@ INLINE void write64le_with_16be_device_handler(write16_device_func handler, void
  *
  *************************************/
 
-INLINE UINT64 read64be_with_32be_device_handler(read32_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_32be_device_handler(read32_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)(*handler)(param, offset * 2 + 0, mem_mask >> 32) << 32;
+		result |= (UINT64)(*handler)(device, offset * 2 + 0, mem_mask >> 32) << 32;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)(*handler)(param, offset * 2 + 1, mem_mask >> 0) << 0;
+		result |= (UINT64)(*handler)(device, offset * 2 + 1, mem_mask >> 0) << 0;
 	return result;
 }
 
 
-INLINE void write64be_with_32be_device_handler(write32_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_32be_device_handler(write32_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		(*handler)(param, offset * 2 + 0, data >> 32, mem_mask >> 32);
+		(*handler)(device, offset * 2 + 0, data >> 32, mem_mask >> 32);
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		(*handler)(param, offset * 2 + 1, data >>  0, mem_mask >>  0);
+		(*handler)(device, offset * 2 + 1, data >>  0, mem_mask >>  0);
 }
 
 
@@ -469,23 +469,23 @@ INLINE void write64be_with_32be_device_handler(write32_device_func handler, void
  *
  *************************************/
 
-INLINE UINT64 read64le_with_32le_device_handler(read32_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_32le_device_handler(read32_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (UINT64)(*handler)(param, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (UINT64)(*handler)(device, offset * 2 + 0, mem_mask >> 0) << 0;
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)(*handler)(param, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (UINT64)(*handler)(device, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-INLINE void write64le_with_32le_device_handler(write32_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_32le_device_handler(write32_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		(*handler)(param, offset * 2 + 0, data >> 0, mem_mask >> 0);
+		(*handler)(device, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		(*handler)(param, offset * 2 + 1, data >> 32, mem_mask >> 32);
+		(*handler)(device, offset * 2 + 1, data >> 32, mem_mask >> 32);
 }
 
 
@@ -495,20 +495,20 @@ INLINE void write64le_with_32le_device_handler(write32_device_func handler, void
  *
  *************************************/
 
-INLINE UINT64 read64be_with_32le_device_handler(read32_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_32le_device_handler(read32_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64le_with_32le_device_handler(handler, param, offset, mem_mask);
+	result = read64le_with_32le_device_handler(handler, device, offset, mem_mask);
 	return FLIPENDIAN_INT64(result);
 }
 
 
-INLINE void write64be_with_32le_device_handler(write32_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_32le_device_handler(write32_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64le_with_32le_device_handler(handler, param, offset, data, mem_mask);
+	write64le_with_32le_device_handler(handler, device, offset, data, mem_mask);
 }
 
 
@@ -518,20 +518,20 @@ INLINE void write64be_with_32le_device_handler(write32_device_func handler, void
  *
  *************************************/
 
-INLINE UINT64 read64le_with_32be_device_handler(read32_device_func handler, void *param, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_32be_device_handler(read32_device_func handler, const device_config *device, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	result = read64be_with_32be_device_handler(handler, param, offset, mem_mask);
+	result = read64be_with_32be_device_handler(handler, device, offset, mem_mask);
 	return FLIPENDIAN_INT64(result);
 }
 
 
-INLINE void write64le_with_32be_device_handler(write32_device_func handler, void *param, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_32be_device_handler(write32_device_func handler, const device_config *device, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	write64be_with_32be_device_handler(handler, param, offset, data, mem_mask);
+	write64be_with_32be_device_handler(handler, device, offset, data, mem_mask);
 }
 
 
