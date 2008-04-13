@@ -131,11 +131,16 @@ WRITE16_HANDLER( bionicc_txvideoram_w )
 
 WRITE16_HANDLER( bionicc_paletteram_w )
 {
-	/* The bottom bits are 'intensity' here, but level 2 of Top Secret shows that even
-    when intensity is zero the colour is not reduced to pure black, (the sky should stay
-    at dark blue rather than absolute black) */
+	int red, green, blue, bright;
 	data = COMBINE_DATA(&paletteram16[offset]);
-	paletteram16_RRRRGGGGBBBBIIII_word_w(machine,offset,(data & 0xfff0) | ((data & 0x0007) << 1) | 1, 0);
+
+	bright = 0x10 + (data&0x0f);
+
+	red   = ((data>>12)&0x0f) * bright * 0x11 / 0x1f;
+	green = ((data>>8 )&0x0f) * bright * 0x11 / 0x1f;
+	blue  = ((data>>4 )&0x0f) * bright * 0x11 / 0x1f;
+
+	palette_set_color (machine, offset, MAKE_RGB(red, green, blue));
 }
 
 WRITE16_HANDLER( bionicc_scroll_w )
