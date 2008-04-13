@@ -75,7 +75,7 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 /* machine/seicop.c */
 extern READ16_HANDLER( raiden2_cop2_r );
 extern WRITE16_HANDLER( raiden2_cop2_w );
-extern void cop_init(void);
+//extern void cop_init(void);
 
 
 
@@ -482,14 +482,6 @@ static VIDEO_UPDATE ( raiden2 )
 
 static INTERRUPT_GEN( raiden2_interrupt )
 {
-	mainram[0x740/2] = input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3) << 8);
-	mainram[0x742/2] = 0xffff;
-	mainram[0x744/2] = input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1) << 8);
-	mainram[0x746/2] = 0xffff;
-	mainram[0x748/2] = 0xffff;
-	mainram[0x74a/2] = 0xffff;
-	mainram[0x74c/2] = input_port_read_indexed(machine, 4) | 0xff00;
-	mainram[0x74e/2] = 0xffff;
 
 	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
@@ -518,22 +510,22 @@ static void sprcpt_init(void)
 }
 
 
-static WRITE16_HANDLER(sprcpt_adr_w)
+WRITE16_HANDLER(sprcpt_adr_w)
 {
 	combine32(&sprcpt_adr, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_data_1_w)
+WRITE16_HANDLER(sprcpt_data_1_w)
 {
 	combine32(sprcpt_data_1+sprcpt_adr, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_data_2_w)
+WRITE16_HANDLER(sprcpt_data_2_w)
 {
 	combine32(sprcpt_data_2+sprcpt_adr, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_data_3_w)
+WRITE16_HANDLER(sprcpt_data_3_w)
 {
 	combine32(sprcpt_data_3+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -543,7 +535,7 @@ static WRITE16_HANDLER(sprcpt_data_3_w)
 	}
 }
 
-static WRITE16_HANDLER(sprcpt_data_4_w)
+WRITE16_HANDLER(sprcpt_data_4_w)
 {
 	combine32(sprcpt_data_4+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -553,17 +545,17 @@ static WRITE16_HANDLER(sprcpt_data_4_w)
 	}
 }
 
-static WRITE16_HANDLER(sprcpt_val_1_w)
+WRITE16_HANDLER(sprcpt_val_1_w)
 {
 	combine32(sprcpt_val+0, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_val_2_w)
+WRITE16_HANDLER(sprcpt_val_2_w)
 {
 	combine32(sprcpt_val+1, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER(sprcpt_flags_1_w)
+WRITE16_HANDLER(sprcpt_flags_1_w)
 {
 	combine32(&sprcpt_flags1, offset, data, mem_mask);
 	if(offset == 1) {
@@ -592,7 +584,7 @@ static WRITE16_HANDLER(sprcpt_flags_1_w)
 	}
 }
 
-static WRITE16_HANDLER(sprcpt_flags_2_w)
+WRITE16_HANDLER(sprcpt_flags_2_w)
 {
 	COMBINE_DATA(&sprcpt_flags2);
 	if(offset == 0) {
@@ -741,24 +733,18 @@ static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 static MACHINE_RESET(raiden2)
 {
 	sprcpt_init();
-	cop_init();
+	//cop_init();
 }
 
 
 /* MEMORY MAPS */
 
-static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00400, 0x005ff) AM_READWRITE(raiden2_cop2_r, raiden2_cop2_w)
+extern UINT16* cop_mcu_ram;
+extern WRITE16_HANDLER( raiden2_mcu_w );
+extern READ16_HANDLER( raiden2_mcu_r );
 
-	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
-	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
-	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
-	AM_RANGE(0x006ac, 0x006af) AM_WRITE(sprcpt_flags_1_w)
-	AM_RANGE(0x006b0, 0x006b3) AM_WRITE(sprcpt_data_1_w)
-	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
-	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
-	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
-	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
+static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
 
 	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
@@ -1052,7 +1038,9 @@ YM2151   OKI M6295 VOI2  Z8400A
 ROM_START( raiden2 )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) )
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("prg1",   0x000001, 0x80000, CRC(4609b5f2) SHA1(272d2aa75b8ea4d133daddf42c4fc9089093df2e) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "snd",  0x000000, 0x10000, CRC(f51a28f9) SHA1(7ae2e2ba0c8159a544a8fd2bb0c2c694ba849302) )
@@ -1100,7 +1088,9 @@ S5 U0724     27C1024     ROM7        966D
 ROM_START( raiden2a )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2e",  0x000001, 0x80000, CRC(458d619c) SHA1(842bf0eeb5d192a6b188f4560793db8dad697683) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom5",  0x000000, 0x10000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
@@ -1127,7 +1117,9 @@ ROM_END
 ROM_START( raiden2b )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rom5",  0x000000, 0x10000, CRC(8f130589) SHA1(e58c8beaf9f27f063ffbcb0ab4600123c25ce6f3) )
@@ -1193,7 +1185,9 @@ CUSTOM:       SEI150
 ROM_START( raiden2c )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "rd2_5.110",  0x000000, 0x10000,  CRC(c2028ba2) SHA1(f6a9322b669ff82dea6ecf52ad3bd5d0901cce1b) )
@@ -1221,7 +1215,9 @@ ROM_END
 ROM_START( raiden2d )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("seibu1",   0x000000, 0x80000, CRC(c1fc70f5) SHA1(a054f5ae9583972c406d9cf871340d5e072d71a3) )
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("seibu2",   0x000001, 0x80000, CRC(28d5365f) SHA1(21efe29c2d373229c2ff302d86e59c2c94fa6d03) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "seibu5",  0x000000, 0x10000, CRC(5db9f922) SHA1(8257aab98657fe44df19d2a48d85fcf65b3d98c6) )
@@ -1289,7 +1285,9 @@ r2_voi2.bin   262144  0x8cf0d17e  TC534000P Dumped as 27C040. 1'st and
 ROM_START( raiden2e )
 	ROM_REGION( 0x200000, REGION_USER1, 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("r2_prg_0.bin",   0x000000, 0x80000, CRC(2abc848c) SHA1(1df4276d0074fcf1267757fa0b525a980a520f3d) )
+	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("r2_prg_1.bin",   0x000001, 0x80000, CRC(509ade43) SHA1(7cdee7bb00a6a1c7899d10b96385d54c261f6f5a) )
+	ROM_RELOAD(0x100001, 0x80000)
 
 	ROM_REGION( 0x20000, REGION_CPU2, 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "r2_snd.bin",  0x000000, 0x10000, CRC(6bad0a3e) SHA1(eb7ae42353e1984cd60b569c26cdbc3b025a7da6) )
@@ -1822,7 +1820,7 @@ static DRIVER_INIT (raiden2)
 	/* wrong , there must be some banking this just stops it crashing */
 	UINT8 *RAM = memory_region(REGION_USER1);
 
-	memory_set_bankptr(1,&RAM[0x000000]);
+	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_set_bankptr(2,&RAM[0x040000]);
 
 	raiden2_decrypt_sprites();
