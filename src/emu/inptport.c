@@ -156,7 +156,6 @@ struct _analog_port_info
 	UINT8				single_scale;		/* scale joystick differently if default is between min/max */
 	UINT8				interpolate;		/* should we do linear interpolation for mid-frame reads? */
 	UINT8				lastdigital;		/* was the last modification caused by a digital form? */
-	UINT32				crosshair_pos;		/* position of fake crosshair */
 };
 
 
@@ -3210,6 +3209,41 @@ static void update_analog_port(int portnum)
 
 /*************************************
  *
+ *  Apply analogue port settings
+ *
+ *************************************/
+
+INT32 apply_analogue_settings(INT32 current, analog_port_info *info)
+{
+	INT32 value;
+	input_port_entry *portentry = info->portentry;
+
+	/* apply the min/max and then the sensitivity */
+	current = apply_analog_min_max(info, current);
+	current = APPLY_SENSITIVITY(current, portentry->analog.sensitivity);
+
+	/* apply reversal if needed */
+	if (portentry->analog.reverse)
+		current = info->reverse_val - current;
+	else if (info->single_scale)
+		/* it's a pedal or the default value is equal to min/max */
+		/* so we need to adjust the center to the minimum */
+		current -= INPUT_ABSOLUTE_MIN;
+
+	/* map differently for positive and negative values */
+	if (current >= 0)
+		value = APPLY_SCALE(current, info->scalepos);
+	else
+		value = APPLY_SCALE(current, info->scaleneg);
+	value += portentry->default_value;
+
+	return value;
+}
+
+
+
+/*************************************
+ *
  *  Analog port interpolation
  *
  *************************************/
@@ -3240,27 +3274,7 @@ profiler_mark(PROFILER_INPUT);
 			else
 				current = info->accum;
 
-			/* apply the min/max and then the sensitivity */
-			current = apply_analog_min_max(info, current);
-			current = APPLY_SENSITIVITY(current, portentry->analog.sensitivity);
-
-			/* apply reversal if needed */
-			if (portentry->analog.reverse)
-				current = info->reverse_val - current;
-			else if (info->single_scale)
-				/* it's a pedal or the default value is equal to min/max */
-				/* so we need to adjust the center to the minimum */
-				current -= INPUT_ABSOLUTE_MIN;
-
-			/* map differently for positive and negative values */
-			if (current >= 0)
-				value = APPLY_SCALE(current, info->scalepos);
-			else
-				value = APPLY_SCALE(current, info->scaleneg);
-			value += portentry->default_value;
-
-			/* store crosshair position before any remapping */
-			info->crosshair_pos = (INT32)value & (portentry->mask >> info->shift);
+			value = apply_analogue_settings(current, info);
 
 			/* remap the value if needed */
 			if (portentry->analog.remap_table)
@@ -3361,9 +3375,9 @@ UINT32 get_crosshair_pos(int port_num, UINT8 player, UINT8 axis)
 	for (info = portinfo->analoginfo; info; info = info->next)
 	{
 		portentry = info->portentry;
-		if (portentry->player == player && portentry->analog.crossaxis == axis)
+		if (portentry->player == player && portentry->analog.crossaxis == axis && input_port_condition(portentry))
 		{
-			result = info->crosshair_pos;
+			result = apply_analogue_settings(info->accum, info) & (portentry->mask >> info->shift);
 			break;
 		}
 	}
