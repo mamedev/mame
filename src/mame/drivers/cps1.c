@@ -161,17 +161,11 @@ Stephh's log (2006.09.20) :
 
 #include "cps1.h"       /* External CPS1 definitions */
 
-READ16_HANDLER( cps1_dsw_r )
+READ16_HANDLER( cps1_input_r )
 {
-	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	int control = input_port_read(machine, dswname[offset]);
-	return control << 8 | control;
-}
-
-READ16_HANDLER( cps1_in0_r )
-{
-	int buttons = input_port_read(machine, "IN0");
-	return buttons << 8 | buttons;
+	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
+	int in = input_port_read(machine, dswname[offset]);
+	return in << 8;
 }
 
 READ16_HANDLER( cps1_in1_r )
@@ -216,8 +210,6 @@ static WRITE16_HANDLER( forgottn_dial_1_reset_w )
 }
 
 
-static int cps1_sound_fade_timer;
-
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(REGION_CPU2);
@@ -236,21 +228,16 @@ static WRITE8_HANDLER( cps1_oki_pin7_w )
 	OKIM6295_set_pin7(0, (data & 1));
 }
 
-static WRITE16_HANDLER( cps1_sound_fade_w )
-{
-	if (ACCESSING_BITS_0_7)
-		cps1_sound_fade_timer = data & 0xff;
-}
-
-static READ8_HANDLER( cps1_snd_fade_timer_r )
-{
-	return cps1_sound_fade_timer;
-}
-
-static WRITE16_HANDLER( cps1_sound_command_w )
+static WRITE16_HANDLER( cps1_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(machine,0,data & 0xff);
+}
+
+static WRITE16_HANDLER( cps1_soundlatch2_w )
+{
+	if (ACCESSING_BITS_0_7)
+		soundlatch2_w(machine,0,data & 0xff);
 }
 
 WRITE16_HANDLER( cps1_coinctrl_w )
@@ -263,8 +250,11 @@ WRITE16_HANDLER( cps1_coinctrl_w )
 		coin_counter_w(1,data & 0x0200);
 		coin_lockout_w(0,~data & 0x0400);
 		coin_lockout_w(1,~data & 0x0800);
+
+		// bit 15 = CPS-A custom reset?
 	}
 
+	// there's no trace of this in the Forgotten Worlds schematics
 	if (ACCESSING_BITS_0_7)
 	{
 		/* mercs sets bit 0 */
@@ -282,13 +272,6 @@ static WRITE16_HANDLER( cpsq_coinctrl2_w )
 		coin_lockout_w(2,~data & 0x02);
 		coin_counter_w(3,data & 0x04);
 		coin_lockout_w(3,~data & 0x08);
-/*
-    {
-       char baf[40];
-       sprintf(baf,"0xf1c004=%04x", data);
-       popmessage(baf);
-       }
-*/
     }
 }
 
@@ -449,67 +432,60 @@ WRITE16_HANDLER( cps1_eeprom_port_w )
 
 
 
-static ADDRESS_MAP_START( cps1_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)             /* 68000 ROM */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ(cps1_in1_r)            /* Player input ports */
-	AM_RANGE(0x800010, 0x800011) AM_READ(cps1_in1_r)            /* ?? */
-	AM_RANGE(0x800018, 0x800019) AM_READ(cps1_in0_r)            /* System input ports */
-	AM_RANGE(0x80001a, 0x80001f) AM_READ(cps1_dsw_r)            /* Dip Switches */
-	AM_RANGE(0x800020, 0x800021) AM_READ(SMH_NOP)             /* ? Used by Rockman ? */
-	AM_RANGE(0x800052, 0x800055) AM_READ(forgottn_dial_0_r)     /* Forgotten Worlds */
-	AM_RANGE(0x80005a, 0x80005d) AM_READ(forgottn_dial_1_r)     /* Forgotten Worlds */
-	AM_RANGE(0x800176, 0x800177) AM_READ(cps1_in2_r)            /* Extra input ports */
-	AM_RANGE(0x800178, 0x800179) AM_READ(cps1_in3_r)            /* Player 4 controls ("Captain Commando") */
-	AM_RANGE(0x8001fc, 0x8001fd) AM_READ(cps1_in2_r)            /* Extra input ports ("SF Rev E") */
-	AM_RANGE(0x800100, 0x8001ff) AM_READ(cps1_output_r)         /* Output ports */
-	AM_RANGE(0x900000, 0x92ffff) AM_READ(SMH_RAM)	            /* SF2CE executes code from here */
-	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)		/* Slammasters protection */
-	AM_RANGE(0xf18000, 0xf19fff) AM_READ(qsound_sharedram1_r)	/* Q RAM */
-	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)            /* Player 3 controls (later games) */
-	AM_RANGE(0xf1c002, 0xf1c003) AM_READ(cps1_in3_r)            /* Player 4 controls ("Muscle Bombers") */
-	AM_RANGE(0xf1c006, 0xf1c007) AM_READ(cps1_eeprom_port_r)
-	AM_RANGE(0xf1e000, 0xf1ffff) AM_READ(qsound_sharedram2_r)	/* Q RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)             /* RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cps1_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)            /* ROM */
+	AM_RANGE(0x800010, 0x800011) AM_READ(cps1_in1_r)            /* mirror? */
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_input_r)          /* System input ports / Dip Switches */
+	AM_RANGE(0x800020, 0x800021) AM_READNOP                     /* ? Used by Rockman ? */
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800040, 0x800041) AM_WRITE(forgottn_dial_0_reset_w)
 	AM_RANGE(0x800048, 0x800049) AM_WRITE(forgottn_dial_1_reset_w)
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(cps1_sound_command_w) /* Sound command */
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(cps1_sound_fade_w)
-	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* Output ports */
-	AM_RANGE(0x900000, 0x92ffff) AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)
-	AM_RANGE(0xf18000, 0xf19fff) AM_WRITE(qsound_sharedram1_w)  /* Q RAM */
-	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)     /* Coin control2 (later games) */
-	AM_RANGE(0xf1c006, 0xf1c007) AM_WRITE(cps1_eeprom_port_w)
-	AM_RANGE(0xf1e000, 0xf1ffff) AM_WRITE(qsound_sharedram2_w)  /* Q RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)            /* RAM */
+	AM_RANGE(0x800052, 0x800055) AM_READ(forgottn_dial_0_r)     /* Forgotten Worlds */
+	AM_RANGE(0x80005a, 0x80005d) AM_READ(forgottn_dial_1_r)     /* Forgotten Worlds */
+	AM_RANGE(0x800176, 0x800177) AM_READ(cps1_in2_r)            /* Extra input ports (on C-board) */
+	AM_RANGE(0x800178, 0x800179) AM_READ(cps1_in3_r)            /* Player 4 controls (on C-board) ("Captain Commando") */
+	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w) 	/* Sound command */
+	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
+	AM_RANGE(0x8001fc, 0x8001fd) AM_READ(cps1_in2_r)            /* Extra input ports ("SF Rev E") */
+	AM_RANGE(0x800100, 0x8001ff) AM_READWRITE(cps1_output_r, cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* CPS-B custom */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xd000, 0xd7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf001, 0xf001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
-	AM_RANGE(0xf00a, 0xf00a) AM_READ(cps1_snd_fade_timer_r) /* Sound timer fade */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(cps1_snd_bankswitch_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
+	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)	/* Sound command */
+	AM_RANGE(0xf00a, 0xf00a) AM_READ(soundlatch2_r) /* Sound timer fade */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( qsound_map, ADDRESS_SPACE_PROGRAM, 8 )
+
+static ADDRESS_MAP_START( qsound_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x800000, 0x800001) AM_READ(cps1_in1_r)            /* Player input ports */
+	AM_RANGE(0x800010, 0x800011) AM_READ(cps1_in1_r)            /* mirror? */
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_input_r)          /* System input ports / Dip Switches */
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
+	AM_RANGE(0x800100, 0x8001ff) AM_READWRITE(cps1_output_r, cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* CPS-B custom */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)		/* Slammasters protection */
+	AM_RANGE(0xf18000, 0xf19fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)  /* Q RAM */
+	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)            /* Player 3 controls (later games) */
+	AM_RANGE(0xf1c002, 0xf1c003) AM_READ(cps1_in3_r)            /* Player 4 controls ("Muscle Bombers") */
+	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)     /* Coin control2 (later games) */
+	AM_RANGE(0xf1c006, 0xf1c007) AM_READWRITE(cps1_eeprom_port_r, cps1_eeprom_port_w)
+	AM_RANGE(0xf1e000, 0xf1ffff) AM_READWRITE(qsound_sharedram2_r, qsound_sharedram2_w)  /* Q RAM */
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( qsound_sub_map, ADDRESS_SPACE_PROGRAM, 8 )	// used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)	/* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&qsound_sharedram1)
@@ -3454,12 +3430,12 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(cps1_readmem,cps1_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
 	MDRV_CPU_ADD_TAG("sound", Z80, 3579545)
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sub_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -3512,10 +3488,11 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_IMPORT_FROM(cps1_12MHz)
 
 	MDRV_CPU_REPLACE("main", M68000, 12000000)
+	MDRV_CPU_PROGRAM_MAP(qsound_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
 	MDRV_CPU_REPLACE("sound", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(qsound_map,0)
+	MDRV_CPU_PROGRAM_MAP(qsound_sub_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
 	MDRV_NVRAM_HANDLER(qsound)

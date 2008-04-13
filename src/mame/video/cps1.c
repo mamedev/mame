@@ -44,7 +44,7 @@ Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB
   (alt B-board revision - Japan)                  89625B-1  CA22B
 Street Fighter II (910214)                  1991  ?         STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
 Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012       
-Street Fighter II (US 910228)                                                                 CPS-B-18  ?
+Street Fighter II (US 910228)                                                      ?          CPS-B-18  ?
 Street Fighter II (Japan 910306)                                                              CPS-B-12  DL-0411-10007
 Street Fighter II (US 910318)                                                                 CPS-B-05  DL-0411-10006
 Street Fighter II (US 910411)                                                                 CPS-B-15  DL-0411-10010

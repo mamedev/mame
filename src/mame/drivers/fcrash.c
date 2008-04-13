@@ -218,8 +218,7 @@ static VIDEO_UPDATE( fcrash )
 static ADDRESS_MAP_START( fcrash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)             /* 68000 ROM */
 	AM_RANGE(0x880000, 0x880001) AM_READ(cps1_in1_r)            /* Player input ports */
-	AM_RANGE(0x880008, 0x880009) AM_READ(cps1_in0_r)            /* System input ports */
-	AM_RANGE(0x88000a, 0x88000f) AM_READ(cps1_dsw_r)            /* Dip Switches */
+	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_input_r)          /* System input ports / Dip Switches */
 	AM_RANGE(0x800100, 0x8001ff) AM_READ(cps1_output_r)         /* Output ports */
 	AM_RANGE(0x900000, 0x92ffff) AM_READ(SMH_RAM)	            /* SF2CE executes code from here */
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)

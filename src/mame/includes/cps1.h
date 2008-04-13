@@ -3,7 +3,7 @@
 
 /*----------- defined in drivers/cps1.c -----------*/
 
-ADDRESS_MAP_EXTERN(qsound_map, 8);
+ADDRESS_MAP_EXTERN(qsound_sub_map, 8);
 
 READ16_HANDLER( qsound_sharedram1_r );
 WRITE16_HANDLER( qsound_sharedram1_w );
@@ -15,8 +15,7 @@ INTERRUPT_GEN( cps1_qsound_interrupt );
 
 extern const struct QSound_interface qsound_interface;
 
-READ16_HANDLER( cps1_dsw_r );
-READ16_HANDLER( cps1_in0_r );
+READ16_HANDLER( cps1_input_r );
 READ16_HANDLER( cps1_in1_r );
 READ16_HANDLER( cps1_in2_r );
 READ16_HANDLER( cps1_in3_r );
