@@ -192,7 +192,11 @@ INLINE UINT8 pull(void) {
 INLINE void daa_a(void)
 {
 	if ((R.A & 0x0f) > 0x09 || (R.PSW & A_FLAG))
+	{
 		R.A += 0x06;
+		if ( ! ( R.A & 0xf0 ) )
+			SET(C_FLAG);
+	}
 	if ((R.A & 0xf0) > 0x90 || (R.PSW & C_FLAG))
 	{
 		R.A += 0x60;
