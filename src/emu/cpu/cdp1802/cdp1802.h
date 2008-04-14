@@ -3,13 +3,6 @@
 
 #include "cpuintrf.h"
 
-#define CDP1802_CYCLES_RESET 		8
-#define CDP1802_CYCLES_INIT			8 // really 9, but needs to be 8 to synchronize cdp1861 video timings
-#define CDP1802_CYCLES_FETCH		8
-#define CDP1802_CYCLES_EXECUTE		8
-#define CDP1802_CYCLES_DMA			8
-#define CDP1802_CYCLES_INTERRUPT	8
-
 enum {
 	CDP1802_INPUT_LINE_INT,
 	CDP1802_INPUT_LINE_DMAIN,
@@ -23,28 +16,20 @@ enum {
 	EF4 = 0x08
 };
 
-enum {
-	CDP1802_STATE_0_FETCH,
-	CDP1802_STATE_1_RESET,
-	CDP1802_STATE_1_INIT,
-	CDP1802_STATE_1_EXECUTE,
-	CDP1802_STATE_2_DMA_IN,
-	CDP1802_STATE_2_DMA_OUT,
-	CDP1802_STATE_3_INT
-};
-
-enum {
-	CDP1802_STATE_CODE_S0_FETCH,
-	CDP1802_STATE_CODE_S1_EXECUTE,
-	CDP1802_STATE_CODE_S2_DMA,
-	CDP1802_STATE_CODE_S3_INTERRUPT
-};
-
-enum {
+typedef enum _cdp1802_control_mode cdp1802_control_mode;
+enum _cdp1802_control_mode {
 	CDP1802_MODE_LOAD,
 	CDP1802_MODE_RESET,
 	CDP1802_MODE_PAUSE,
 	CDP1802_MODE_RUN
+};
+
+typedef enum _cdp1802_state cdp1802_state;
+enum _cdp1802_state {
+	CDP1802_STATE_CODE_S0_FETCH,
+	CDP1802_STATE_CODE_S1_EXECUTE,
+	CDP1802_STATE_CODE_S2_DMA,
+	CDP1802_STATE_CODE_S3_INTERRUPT
 };
 
 // CDP1802 Registers
@@ -83,18 +68,49 @@ enum {
 
 void cdp1802_get_info(UINT32 state, cpuinfo *info);
 
+typedef cdp1802_control_mode (*cdp1802_mode_read_func)(running_machine *machine);
+#define CDP1802_MODE_READ(name) cdp1802_control_mode name(running_machine *machine)
+
+typedef UINT8 (*cdp1802_ef_read_func)(running_machine *machine);
+#define CDP1802_EF_READ(name) UINT8 name(running_machine *machine)
+
+typedef void (*cdp1802_sc_write_func)(running_machine *machine, cdp1802_state state);
+#define CDP1802_SC_WRITE(name) void name(running_machine *machine, cdp1802_state state)
+
+typedef void (*cdp1802_q_write_func)(running_machine *machine, int level);
+#define CDP1802_Q_WRITE(name) void name(running_machine *machine, int level)
+
+typedef UINT8 (*cdp1802_dma_read_func)(running_machine *machine);
+#define CDP1802_DMA_READ(name) UINT8 name(running_machine *machine)
+
+typedef void (*cdp1802_dma_write_func)(running_machine *machine, UINT8 data);
+#define CDP1802_DMA_WRITE(name) void name(running_machine *machine, UINT8 data)
+
+/* interface */
+typedef struct _cdp1802_interface cdp1802_interface;
+struct _cdp1802_interface
+{
+	/* if specified, this gets called for every change of the mode pins (pins 2 and 3) */
+	cdp1802_mode_read_func	mode_r;
+
+	/* if specified, this gets called for every change read of the external flags (pins 21 thru 24) */
+	cdp1802_ef_read_func	ef_r;
+
+	/* if specified, this gets called for every change of the processor state (pins 5 and 6) */
+	cdp1802_sc_write_func	sc_w;
+
+	/* if specified, this gets called for every change of the Q pin (pin 4) */
+	cdp1802_q_write_func	q_w;
+
+	/* if specified, this gets called for every DMA read */
+	cdp1802_dma_read_func	dma_r;
+	
+	/* if specified, this gets called for every DMA write */
+	cdp1802_dma_write_func	dma_w;
+};
+
 #ifdef ENABLE_DEBUGGER
 offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 #endif
-
-typedef struct
-{
-	UINT8 (*mode_r)(void);
-	UINT8 (*ef_r)(void);
-	void (*sc_w)(int state);
-	void (*q_w)(int level);
-	UINT8 (*dma_r)(void);
-	void (*dma_w)(UINT8 data);
-} CDP1802_CONFIG;
 
 #endif

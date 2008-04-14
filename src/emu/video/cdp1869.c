@@ -12,8 +12,6 @@
     - connect to sound system when possible
     - white noise
     - scanline based update
-    - fix flashing spaceship in destryer/altair
-    - fix flashing player in draco
 
 */
 

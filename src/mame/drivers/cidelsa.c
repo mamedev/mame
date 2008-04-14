@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "cpu/cop400/cop400.h"
 #include "video/cdp1869.h"
@@ -20,14 +19,14 @@
 
 /* CDP1802 Interface */
 
-static UINT8 cidelsa_mode_r(void)
+static CDP1802_MODE_READ( cidelsa_mode_r )
 {
-	cidelsa_state *state = Machine->driver_data;
+	cidelsa_state *state = machine->driver_data;
 
 	return state->cdp1802_mode;
 }
 
-static UINT8 cidelsa_ef_r(void)
+static CDP1802_EF_READ( cidelsa_ef_r )
 {
 	/*
         EF1     CDP1869 _PRD
@@ -36,17 +35,17 @@ static UINT8 cidelsa_ef_r(void)
         EF4     Coin 1
     */
 
-	return input_port_read(Machine, "EF");
+	return input_port_read(machine, "EF");
 }
 
-static void cidelsa_q_w(int q)
+static CDP1802_Q_WRITE( cidelsa_q_w )
 {
-	cidelsa_state *state = Machine->driver_data;
+	cidelsa_state *state = machine->driver_data;
 
-	state->cdp1802_q = q;
+	state->cdp1802_q = level;
 }
 
-static const CDP1802_CONFIG cidelsa_cdp1802_config =
+static const cdp1802_interface cidelsa_cdp1802_config =
 {
 	cidelsa_mode_r,		// MODE
 	cidelsa_ef_r,		// EF
@@ -669,7 +668,7 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1980, destryer, 0, 		destryer, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, destryea, destryer, destryea, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, altair,   0, 		altair,   altair,   0, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, destryer, 0, 		destryer, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, destryea, destryer, destryea, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, altair,   0, 		altair,   altair,   0, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, draco,    0, 		draco,    draco,    0, ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

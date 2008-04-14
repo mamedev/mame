@@ -3,9 +3,26 @@
 #include "deprecat.h"
 #include "cdp1802.h"
 
+#define CDP1802_CYCLES_RESET 		8
+#define CDP1802_CYCLES_INIT			8 // really 9, but needs to be 8 to synchronize cdp1861 video timings
+#define CDP1802_CYCLES_FETCH		8
+#define CDP1802_CYCLES_EXECUTE		8
+#define CDP1802_CYCLES_DMA			8
+#define CDP1802_CYCLES_INTERRUPT	8
+
+enum {
+	CDP1802_STATE_0_FETCH,
+	CDP1802_STATE_1_RESET,
+	CDP1802_STATE_1_INIT,
+	CDP1802_STATE_1_EXECUTE,
+	CDP1802_STATE_2_DMA_IN,
+	CDP1802_STATE_2_DMA_OUT,
+	CDP1802_STATE_3_INT
+};
+
 typedef struct
 {
-	CDP1802_CONFIG *config;
+	const cdp1802_interface *intf;
 
 	UINT8 p, x, d, b, t;
 	UINT16 r[16];
@@ -49,7 +66,7 @@ static void cdp1802_set_context (void *src)
 
 static void cdp1802_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	cdp1802.config = (CDP1802_CONFIG *) config;
+	cdp1802.intf = (cdp1802_interface *) config;
 
 	cdp1802.mode = CDP1802_MODE_RESET;
 	cdp1802.prevmode = cdp1802.mode;
@@ -160,9 +177,9 @@ INLINE void cdp1802_long_skip(int taken)
 
 static void cdp1802_sample_ef(void)
 {
-	if (cdp1802.config->ef_r)
+	if (cdp1802.intf->ef_r)
 	{
-		cdp1802.ef = cdp1802.config->ef_r() & 0x0f;
+		cdp1802.ef = cdp1802.intf->ef_r(Machine) & 0x0f;
 	}
 	else
 	{
@@ -172,25 +189,25 @@ static void cdp1802_sample_ef(void)
 
 static void cdp1802_output_state_code(void)
 {
-	if (cdp1802.config->sc_w)
+	if (cdp1802.intf->sc_w)
 	{
 		switch (cdp1802.state)
 		{
 		case CDP1802_STATE_0_FETCH:
-			cdp1802.config->sc_w(CDP1802_STATE_CODE_S0_FETCH);
+			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S0_FETCH);
 			break;
 
 		case CDP1802_STATE_1_EXECUTE:
-			cdp1802.config->sc_w(CDP1802_STATE_CODE_S1_EXECUTE);
+			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S1_EXECUTE);
 			break;
 
 		case CDP1802_STATE_2_DMA_IN:
 		case CDP1802_STATE_2_DMA_OUT:
-			cdp1802.config->sc_w(CDP1802_STATE_CODE_S2_DMA);
+			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S2_DMA);
 			break;
 
 		case CDP1802_STATE_3_INT:
-			cdp1802.config->sc_w(CDP1802_STATE_CODE_S3_INTERRUPT);
+			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S3_INTERRUPT);
 			break;
 		}
 	}
@@ -477,18 +494,18 @@ static void cdp1802_run(void)
 			case 0xa:
 				Q = 0;
 
-				if (cdp1802.config->q_w)
+				if (cdp1802.intf->q_w)
 				{
-					cdp1802.config->q_w(Q);
+					cdp1802.intf->q_w(Machine, Q);
 				}
 				break;
 
 			case 0xb:
 				Q = 1;
 
-				if (cdp1802.config->q_w)
+				if (cdp1802.intf->q_w)
 				{
-					cdp1802.config->q_w(Q);
+					cdp1802.intf->q_w(Machine, Q);
 				}
 				break;
 
@@ -719,9 +736,9 @@ static void cdp1802_run(void)
 
     case CDP1802_STATE_2_DMA_IN:
 
-		if (cdp1802.config->dma_r)
+		if (cdp1802.intf->dma_r)
 		{
-			MW(R[0], cdp1802.config->dma_r());
+			MW(R[0], cdp1802.intf->dma_r(Machine));
 		}
 
 		R[0] = R[0] + 1;
@@ -752,9 +769,9 @@ static void cdp1802_run(void)
 
     case CDP1802_STATE_2_DMA_OUT:
 
-		if (cdp1802.config->dma_w)
+		if (cdp1802.intf->dma_w)
 		{
-	        cdp1802.config->dma_w(M(R[0]));
+	        cdp1802.intf->dma_w(Machine, M(R[0]));
 		}
 
 		R[0] = R[0] + 1;
@@ -812,7 +829,7 @@ static int cdp1802_execute(int cycles)
 	cdp1802_ICount = cycles;
 
 	cdp1802.prevmode = cdp1802.mode;
-	cdp1802.mode = cdp1802.config->mode_r();
+	cdp1802.mode = cdp1802.intf->mode_r(Machine);
 
 	do
 	{
