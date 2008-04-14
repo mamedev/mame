@@ -3361,22 +3361,6 @@ UINT32 input_port_read_safe(running_machine *machine, const char *tag, UINT32 de
 
 /*************************************
  *
- *  Input port writing
- *
- *************************************/
-
-void input_port_set_digital_value(running_machine *machine, int port_num, UINT32 value, UINT32 mask)
-{
-	/* used by MESS for natural keyboard input */
-	input_port_info *portinfo = &port_info[port_num];
-	portinfo->digital &= ~mask;
-	portinfo->digital |= value;
-}
-
-
-
-/*************************************
- *
  *  Return position of crosshair axis
  *
  *************************************/

@@ -144,7 +144,6 @@ REF. 970429
 
 #include "driver.h"
 #include "deprecat.h"
-#include "memconv.h"
 #include "gaelco3d.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -253,7 +252,6 @@ static WRITE16_HANDLER( irq_ack_w )
 {
 	cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
 }
-static WRITE32_HANDLER( irq_ack_020_w ) { if (ACCESSING_BITS_16_31) irq_ack_w(machine, offset, data >> 16, mem_mask >> 16); }
 
 
 
@@ -271,7 +269,6 @@ static READ16_HANDLER( eeprom_data_r )
 	logerror("eeprom_data_r(%02X)\n", result);
 	return result;
 }
-static READ32_HANDLER( eeprom_data_020_r ) { return eeprom_data_r(machine, offset, mem_mask) << 16; }
 
 
 static WRITE16_HANDLER( eeprom_data_w )
@@ -279,7 +276,6 @@ static WRITE16_HANDLER( eeprom_data_w )
 	if (ACCESSING_BITS_0_7)
 		EEPROM_write_bit(data & 0x01);
 }
-static WRITE32_HANDLER( eeprom_data_020_w ) { if (ACCESSING_BITS_0_15) eeprom_data_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( eeprom_clock_w )
@@ -287,7 +283,6 @@ static WRITE16_HANDLER( eeprom_clock_w )
 	if (ACCESSING_BITS_0_7)
 		EEPROM_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
-static WRITE32_HANDLER( eeprom_clock_020_w ) { if (ACCESSING_BITS_0_15) eeprom_clock_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( eeprom_cs_w )
@@ -295,7 +290,6 @@ static WRITE16_HANDLER( eeprom_cs_w )
 	if (ACCESSING_BITS_0_7)
 		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( eeprom_cs_020_w ) { if (ACCESSING_BITS_0_15) eeprom_cs_w(machine, offset, data, mem_mask); }
 
 
 
@@ -319,13 +313,12 @@ static WRITE16_HANDLER( sound_data_w )
 	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
-static WRITE32_HANDLER( sound_data_020_w ) { if (ACCESSING_BITS_16_31) sound_data_w(machine, offset, data >> 16, mem_mask >> 16); }
 
 
 static READ16_HANDLER( sound_data_r )
 {
 	logerror("sound_data_r(%02X)\n", sound_data);
-	cpunum_set_input_line(Machine, 2, ADSP2115_IRQ2, CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, ADSP2115_IRQ2, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -337,7 +330,6 @@ static READ16_HANDLER( sound_status_r )
 		return sound_status;
 	return 0xffff;
 }
-static READ32_HANDLER( sound_status_020_r ) { if (ACCESSING_BITS_0_15) return sound_status_r(machine, offset, mem_mask); return ~0; }
 
 
 static WRITE16_HANDLER( sound_status_w )
@@ -353,12 +345,6 @@ static WRITE16_HANDLER( sound_status_w )
  *  Input ports
  *
  *************************************/
-
-static READ32_HANDLER( input_port_0_020_r ) { return input_port_read_indexed(machine, 0) << 16; }
-static READ32_HANDLER( input_port_1_020_r ) { return input_port_read_indexed(machine, 1) << 16; }
-static READ32_HANDLER( input_port_2_020_r ) { return input_port_read_indexed(machine, 2) << 16; }
-static READ32_HANDLER( input_port_3_020_r ) { return input_port_read_indexed(machine, 3) << 16; }
-
 
 static CUSTOM_INPUT( analog_bit_r )
 {
@@ -383,7 +369,6 @@ static WRITE16_HANDLER( analog_port_clock_w )
 	else
 		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( analog_port_clock_020_w ) { if (ACCESSING_BITS_0_15) analog_port_clock_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( analog_port_latch_w )
@@ -402,7 +387,6 @@ static WRITE16_HANDLER( analog_port_latch_w )
 	else
 		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( analog_port_latch_020_w ) { if (ACCESSING_BITS_0_15) analog_port_latch_w(machine, offset, data, mem_mask); }
 
 
 
@@ -444,9 +428,8 @@ static WRITE16_HANDLER( tms_reset_w )
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
 	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( tms_reset_020_w ) { if (ACCESSING_BITS_0_15) tms_reset_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_irq_w )
@@ -455,16 +438,14 @@ static WRITE16_HANDLER( tms_irq_w )
 	/* done after uploading, and after modifying the comm area */
 	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 	if (ACCESSING_BITS_0_7)
-		cpunum_set_input_line(Machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
-static WRITE32_HANDLER( tms_irq_020_w ) { if (ACCESSING_BITS_0_15) tms_irq_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_control3_w )
 {
 	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
 }
-static WRITE32_HANDLER( tms_control3_020_w ) { if (ACCESSING_BITS_0_15) tms_control3_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( tms_comm_w )
@@ -472,7 +453,6 @@ static WRITE16_HANDLER( tms_comm_w )
 	COMBINE_DATA(&tms_comm_base[offset ^ tms_offset_xor]);
 	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset*2, data, ~mem_mask);
 }
-static WRITE32_HANDLER( tms_comm_020_w ) { write32be_with_16be_handler(tms_comm_w, machine, offset, data, mem_mask); }
 
 
 
@@ -708,7 +688,6 @@ static WRITE16_HANDLER( led_0_w )
 	if (ACCESSING_BITS_0_7)
 		set_led_status(0, data != 0);
 }
-static WRITE32_HANDLER( led_0_020_w ) { if (ACCESSING_BITS_0_15) led_0_w(machine, offset, data, mem_mask); }
 
 
 static WRITE16_HANDLER( led_1_w )
@@ -717,7 +696,6 @@ static WRITE16_HANDLER( led_1_w )
 	if (ACCESSING_BITS_0_7)
 		set_led_status(1, data != 0);
 }
-static WRITE32_HANDLER( led_1_020_w ) { if (ACCESSING_BITS_0_15) led_1_w(machine, offset, data, mem_mask); }
 
 
 
@@ -758,29 +736,29 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(SMH_RAM, gaelco3d_paletteram_020_w) AM_BASE(&paletteram32)
-	AM_RANGE(0x51000c, 0x51000f) AM_READ(input_port_0_020_r)
-	AM_RANGE(0x51001c, 0x51001f) AM_READ(input_port_1_020_r)
-	AM_RANGE(0x51002c, 0x51002f) AM_READ(input_port_2_020_r)
-	AM_RANGE(0x51003c, 0x51003f) AM_READ(input_port_3_020_r)
-	AM_RANGE(0x510040, 0x510043) AM_READ(sound_status_020_r)
-	AM_RANGE(0x510040, 0x510043) AM_WRITE(sound_data_020_w)
-	AM_RANGE(0x510100, 0x510103) AM_READ(eeprom_data_020_r)
-	AM_RANGE(0x510100, 0x510103) AM_WRITE(irq_ack_020_w)
+	AM_RANGE(0x51000c, 0x51000f) AM_READ16(input_port_0_word_r, 16)
+	AM_RANGE(0x51001c, 0x51001f) AM_READ16(input_port_1_word_r, 16)
+	AM_RANGE(0x51002c, 0x51002f) AM_READ16(input_port_2_word_r, 16)
+	AM_RANGE(0x51003c, 0x51003f) AM_READ16(input_port_3_word_r, 16)
+	AM_RANGE(0x510040, 0x510043) AM_READ16(sound_status_r, 0)
+	AM_RANGE(0x510040, 0x510043) AM_WRITE16(sound_data_w, 16)
+	AM_RANGE(0x510100, 0x510103) AM_READ16(eeprom_data_r, 16)
+	AM_RANGE(0x510100, 0x510103) AM_WRITE16(irq_ack_w, 16)
 	AM_RANGE(0x510104, 0x510107) AM_WRITE(unknown_107_w)
-	AM_RANGE(0x510110, 0x510113) AM_WRITE(eeprom_data_020_w)
-	AM_RANGE(0x510114, 0x510117) AM_WRITE(tms_control3_020_w)
-	AM_RANGE(0x510118, 0x51011b) AM_WRITE(eeprom_clock_020_w)
-	AM_RANGE(0x510120, 0x510123) AM_WRITE(eeprom_cs_020_w)
+	AM_RANGE(0x510110, 0x510113) AM_WRITE16(eeprom_data_w, 0)
+	AM_RANGE(0x510114, 0x510117) AM_WRITE16(tms_control3_w, 0)
+	AM_RANGE(0x510118, 0x51011b) AM_WRITE16(eeprom_clock_w, 0)
+	AM_RANGE(0x510120, 0x510123) AM_WRITE16(eeprom_cs_w, 0)
 	AM_RANGE(0x510124, 0x510127) AM_WRITE(unknown_127_w)
-	AM_RANGE(0x510128, 0x51012b) AM_WRITE(tms_reset_020_w)
-	AM_RANGE(0x510130, 0x510133) AM_WRITE(tms_irq_020_w)
+	AM_RANGE(0x510128, 0x51012b) AM_WRITE16(tms_reset_w, 0)
+	AM_RANGE(0x510130, 0x510133) AM_WRITE16(tms_irq_w, 0)
 	AM_RANGE(0x510134, 0x510137) AM_WRITE(unknown_137_w)
 	AM_RANGE(0x510138, 0x51013b) AM_WRITE(unknown_13a_w)
-	AM_RANGE(0x510144, 0x510147) AM_WRITE(led_0_020_w)
-	AM_RANGE(0x510154, 0x510157) AM_WRITE(analog_port_clock_020_w)
-	AM_RANGE(0x510164, 0x510167) AM_WRITE(analog_port_latch_020_w)
-	AM_RANGE(0x510174, 0x510177) AM_WRITE(led_1_020_w)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_020_w) AM_BASE((UINT32 **)&tms_comm_base)
+	AM_RANGE(0x510144, 0x510147) AM_WRITE16(led_0_w, 0)
+	AM_RANGE(0x510154, 0x510157) AM_WRITE16(analog_port_clock_w, 0)
+	AM_RANGE(0x510164, 0x510167) AM_WRITE16(analog_port_latch_w, 0)
+	AM_RANGE(0x510174, 0x510177) AM_WRITE16(led_1_w, 0)
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, SHIFT_PACKED) AM_BASE((UINT32 **)&tms_comm_base)
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_BASE((UINT32 **)&m68k_ram_base)
 ADDRESS_MAP_END
 

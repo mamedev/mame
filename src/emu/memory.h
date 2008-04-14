@@ -23,6 +23,11 @@
     CONSTANTS
 ***************************************************************************/
 
+/* stub handler shift amounts */
+#define SHIFT_PACKED		1
+
+
+
 /* address spaces */
 enum
 {
@@ -192,10 +197,14 @@ struct _address_map_entry
 	offs_t					addrmirror;			/* mirror bits */
 	offs_t					addrmask;			/* mask bits */
 	read_handler 			read;				/* read handler callback */
+	UINT8					read_bits;			/* bits for the read handler callback (0=default, 1=8, 2=16, 3=32) */
+	UINT8					read_shift;			/* shift value for the read handler */
 	const char *			read_name;			/* read handler callback name */
 	device_type				read_devtype;		/* read device type for device references */
 	const char *			read_devtag;		/* read tag for the relevant device */
 	write_handler 			write;				/* write handler callback */
+	UINT8					write_bits;			/* bits for the write handler callback (0=default, 1=8, 2=16, 3=32) */
+	UINT8					write_shift;		/* shift value for the write handler */
 	const char *			write_name;			/* write handler callback name */
 	device_type				write_devtype;		/* read device type for device references */
 	const char *			write_devtag;		/* read tag for the relevant device */
@@ -284,6 +293,8 @@ union _addrmap16_token
 	write16_device_func		dwrite;				/* pointer to native device write handler */
 	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
 	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
+	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read_handler			read;				/* generic read handlers */
 	write_handler			write;				/* generic write handlers */
 	device_type				devtype;			/* device type */
@@ -304,8 +315,12 @@ union _addrmap32_token
 	write32_device_func		dwrite;				/* pointer to native device write handler */
 	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
 	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
+	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
 	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read16_device_func		dread16;			/* pointer to 16-bit device read handler */
+	write16_device_func		dwrite16;			/* pointer to 16-bit device write handler */
 	read_handler			read;				/* generic read handlers */
 	write_handler			write;				/* generic write handlers */
 	device_type				devtype;			/* device type */
@@ -326,10 +341,16 @@ union _addrmap64_token
 	write64_device_func		dwrite;				/* pointer to native device write handler */
 	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
 	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
+	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
 	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read16_device_func		dread16;			/* pointer to 16-bit device read handler */
+	write16_device_func		dwrite16;			/* pointer to 16-bit device write handler */
 	read32_machine_func		mread32;			/* pointer to 32-bit machine read handler */
 	write32_machine_func	mwrite32;			/* pointer to 32-bit machine write handler */
+	read32_device_func		dread32;			/* pointer to 32-bit device read handler */
+	write32_device_func		dwrite32;			/* pointer to 32-bit device write handler */
 	read_handler			read;				/* generic read handlers */
 	write_handler			write;				/* generic write handlers */
 	device_type				devtype;			/* device type */
@@ -574,31 +595,103 @@ union _addrmap64_token
 	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_MIRROR, 8, _mirror, 32),
 
 #define AM_READ(_handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_READ, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 0, 2, 0, 6), \
 	TOKEN_PTR(mread, _handler), \
 	TOKEN_STRING(#_handler),
 
+#define AM_READ8(_handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 1, 2, (_shift), 6), \
+	TOKEN_PTR(mread8, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_READ16(_handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 2, 2, (_shift), 6), \
+	TOKEN_PTR(mread16, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_READ32(_handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 3, 2, (_shift), 6), \
+	TOKEN_PTR(mread32, _handler), \
+	TOKEN_STRING(#_handler),
+
 #define AM_WRITE(_handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_WRITE, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 0, 2, 0, 6), \
 	TOKEN_PTR(mwrite, _handler), \
 	TOKEN_STRING(#_handler),
 
+#define AM_WRITE8(_handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 1, 2, (_shift), 6), \
+	TOKEN_PTR(mwrite8, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_WRITE16(_handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 2, 2, (_shift), 6), \
+	TOKEN_PTR(mwrite16, _handler), \
+	TOKEN_STRING(#_handler),
+
+#define AM_WRITE32(_handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 3, 2, (_shift), 6), \
+	TOKEN_PTR(mwrite32, _handler), \
+	TOKEN_STRING(#_handler),
+
 #define AM_DEVREAD(_type, _tag, _handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_DEVICE_READ, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 0, 2, 0, 6), \
 	TOKEN_PTR(dread, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
+#define AM_DEVREAD8(_type, _tag, _handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 1, 2, (_shift), 6), \
+	TOKEN_PTR(dread8, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVREAD16(_type, _tag, _handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 2, 2, (_shift), 6), \
+	TOKEN_PTR(dread16, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVREAD32(_type, _tag, _handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 3, 2, (_shift), 6), \
+	TOKEN_PTR(dread32, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
 #define AM_DEVWRITE(_type, _tag, _handler) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_DEVICE_WRITE, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 0, 2, 0, 6), \
 	TOKEN_PTR(dwrite, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
+#define AM_DEVWRITE8(_type, _tag, _handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 1, 2, (_shift), 6), \
+	TOKEN_PTR(dwrite8, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVWRITE16(_type, _tag, _handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 2, 2, (_shift), 6), \
+	TOKEN_PTR(dwrite16, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
+#define AM_DEVWRITE32(_type, _tag, _handler, _shift) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 3, 2, (_shift), 6), \
+	TOKEN_PTR(dwrite32, _handler), \
+	TOKEN_STRING(#_handler), \
+	TOKEN_PTR(devtype, _type), \
+	TOKEN_STRING(_tag),
+
 #define AM_READ_PORT(_tag) \
-	TOKEN_UINT32_PACK1(ADDRMAP_TOKEN_READ_PORT, 8), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_PORT, 8, 0, 2, 0, 6), \
 	TOKEN_STRING(_tag),
 
 #define AM_REGION(_region, _offs) \
@@ -624,7 +717,13 @@ union _addrmap64_token
 
 /* common shortcuts */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
+#define AM_READWRITE8(_read,_write,_shift)	AM_READ8(_read,_shift) AM_WRITE8(_write,_shift)
+#define AM_READWRITE16(_read,_write,_shift)	AM_READ16(_read,_shift) AM_WRITE16(_write,_shift)
+#define AM_READWRITE32(_read,_write,_shift)	AM_READ32(_read,_shift) AM_WRITE32(_write,_shift)
 #define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
+#define AM_DEVREADWRITE8(_type,_tag,_read,_write,_shift) AM_DEVREAD8(_type,_tag,_read,_shift) AM_DEVWRITE8(_type,_tag,_write,_shift)
+#define AM_DEVREADWRITE16(_type,_tag,_read,_write,_shift) AM_DEVREAD16(_type,_tag,_read,_shift) AM_DEVWRITE16(_type,_tag,_write,_shift)
+#define AM_DEVREADWRITE32(_type,_tag,_read,_write,_shift) AM_DEVREAD32(_type,_tag,_read,_shift) AM_DEVWRITE32(_type,_tag,_write,_shift)
 #define AM_ROM								AM_READ(SMH_ROM)
 #define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
 #define AM_WRITEONLY						AM_WRITE(SMH_RAM)

@@ -454,7 +454,6 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "memconv.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
@@ -828,37 +827,9 @@ static void via_irq(int state)
 
 /*************************************
  *
- *  16-bit memory shunts
+ *  16-bit-specific handlers
  *
  *************************************/
-
-static READ16_HANDLER( blitter16_r )
-{
-	return read16be_with_read8_handler(itech8_blitter_r, machine, offset, mem_mask);
-}
-
-
-static READ16_HANDLER( tms34061_16_r )
-{
-	/* since multiple XY accesses can move the pointer multiple times, we have to */
-	/* be careful to only perform one read per access here; fortunately, the low */
-	/* bit doesn't matter in XY addressing mode */
-	if ((offset & 0x700) == 0x100)
-	{
-		int result = itech8_tms34061_r(machine, offset * 2);
-		return (result << 8) | result;
-	}
-	else
-		return (itech8_tms34061_r(machine, offset * 2 + 0) << 8) + itech8_tms34061_r(machine, offset * 2 + 1);
-}
-
-
-static WRITE16_HANDLER( sound_data16_w )
-{
-	if (ACCESSING_BITS_8_15)
-		sound_data_w(machine, 0, data >> 8);
-}
-
 
 static WRITE16_HANDLER( grom_bank16_w )
 {
@@ -874,29 +845,10 @@ static WRITE16_HANDLER( display_page16_w )
 }
 
 
-static WRITE16_HANDLER( tms34061_latch16_w )
-{
-	if (ACCESSING_BITS_8_15)
-		tms34061_latch_w(machine, 0, data >> 8);
-}
-
-
-static WRITE16_HANDLER( blitter16_w )
-{
-	write16be_with_write8_handler(itech8_blitter_w, machine, offset, data, mem_mask);
-}
-
-
 static WRITE16_HANDLER( palette16_w )
 {
 	if (ACCESSING_BITS_8_15)
 		itech8_palette_w(machine, offset / 8, data >> 8);
-}
-
-
-static WRITE16_HANDLER( tms34061_16_w )
-{
-	write16be_with_write8_handler(itech8_tms34061_w, machine, offset, data, mem_mask);
 }
 
 
@@ -981,14 +933,14 @@ static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION(REGION_CPU1, 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_BASE((void *)&main_ram) AM_SIZE(&main_ram_size)
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100080, 0x100081) AM_WRITE(sound_data16_w)
+	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 8)
 	AM_RANGE(0x100100, 0x100101) AM_READWRITE(input_port_0_word_r, grom_bank16_w) AM_BASE((void *)&itech8_grom_bank)
 	AM_RANGE(0x100180, 0x100181) AM_READWRITE(input_port_1_word_r, display_page16_w)
-	AM_RANGE(0x100240, 0x100241) AM_WRITE(tms34061_latch16_w)
+	AM_RANGE(0x100240, 0x100241) AM_WRITE8(tms34061_latch_w, 8)
 	AM_RANGE(0x100280, 0x100281) AM_READWRITE(input_port_2_word_r, SMH_NOP)
-	AM_RANGE(0x100300, 0x10031f) AM_READWRITE(blitter16_r, blitter16_w)
+	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, SHIFT_PACKED)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
-	AM_RANGE(0x110000, 0x110fff) AM_READWRITE(tms34061_16_r, tms34061_16_w)
+	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(itech8_tms34061_r, itech8_tms34061_w, SHIFT_PACKED)
 ADDRESS_MAP_END
 
 
