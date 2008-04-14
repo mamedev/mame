@@ -241,7 +241,7 @@ static void m68008_get_context(void *dst)
 
 static void m68008_set_context(void *src)
 {
-	if (m68k_memory_intf.read8 != program_read_byte_8)
+	if (m68k_memory_intf.read8 != program_read_byte_8be)
 		m68k_memory_intf = interface_d8;
 	m68k_set_context(src);
 }

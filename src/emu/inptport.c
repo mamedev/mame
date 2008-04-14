@@ -2904,7 +2904,7 @@ profiler_mark(PROFILER_INPUT);
 
 #ifdef MESS
 	/* less MESS to MESSy things */
-	inputx_update();
+	inputx_update(machine);
 #endif
 
 	/* handle playback/record */
@@ -3355,6 +3355,22 @@ UINT32 input_port_read_safe(running_machine *machine, const char *tag, UINT32 de
 	if (portnum != -1)
 		return input_port_read_indexed(machine, portnum);
 	return defvalue;
+}
+
+
+
+/*************************************
+ *
+ *  Input port writing
+ *
+ *************************************/
+
+void input_port_set_digital_value(running_machine *machine, int port_num, UINT32 value, UINT32 mask)
+{
+	/* used by MESS for natural keyboard input */
+	input_port_info *portinfo = &port_info[port_num];
+	portinfo->digital &= ~mask;
+	portinfo->digital |= value;
 }
 
 

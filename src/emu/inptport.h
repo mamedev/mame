@@ -937,6 +937,8 @@ int input_ui_pressed_repeat(int code, int speed);
 
 void input_port_update_defaults(void);
 
+void input_port_set_digital_value(running_machine *machine, int port_num, UINT32 value, UINT32 mask);
+
 UINT32 get_crosshair_pos(int port_num, UINT8 player, UINT8 axis);
 
 UINT32 input_port_read_indexed(running_machine *machine, int port);
