@@ -44,7 +44,7 @@ Chiki Chiki Boys / Mega Twins               1990  89624B-3  CK24B            IOB
 Nemo                                        1990  89624B-3  NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
 Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
   (alt B-board revision - Japan)                  89625B-1  CA22B
-Street Fighter II (910214)                  1991  ?         STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
+Street Fighter II (910214)                  1991  89622B-3  STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
 Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012       
 Street Fighter II (US 910228)                                                      ?          CPS-B-18  ?
 Street Fighter II (Japan 910306)                                                              CPS-B-12  DL-0411-10007
@@ -720,17 +720,27 @@ static const struct gfx_range mapper_STF29_table[] =
 };
 
 
-#define mapper_RT24B	{ 0x8000, 0x8000, 0, 0 }, mapper_RT24B_table
-static const struct gfx_range mapper_RT24B_table[] =
+#define mapper_RT22B	{ 0x4000, 0x4000, 0x4000, 0x4000 }, mapper_RT22B_table
+static const struct gfx_range mapper_RT22B_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SPRITES,                   0x0000, 0x53ff, 0 },
-	{ GFXTYPE_SCROLL1,                   0x5400, 0x6fff, 0 },
-	{ GFXTYPE_SCROLL3,                   0x7000, 0x7fff, 0 },
+	// verified from PAL dump:
+	// bank 0 = pin 19
+	// bank 1 = pin 16
+	// bank 2 = pin 14
+	// bank 3 = pin 12
 
-	{ GFXTYPE_SCROLL3,                   0x0000, 0x27ff, 1 },	// 8000-a7ff physical
-	{ GFXTYPE_SCROLL2,                   0x2800, 0x53ff, 1 },	// a800-d3ff physical
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x5400, 0x7fff, 1 },	// d400-ffff physical
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+
+	{ GFXTYPE_SPRITES, 0x4000, 0x53ff, 1 },
+	{ GFXTYPE_SCROLL1, 0x5400, 0x6fff, 1 },
+	{ GFXTYPE_SCROLL3, 0x7000, 0x7fff, 1 },
+
+	{ GFXTYPE_SCROLL3, 0x0000, 0x3fff, 2 },
+	{ GFXTYPE_SCROLL2, 0x2800, 0x3fff, 2 },
+
+	{ GFXTYPE_SCROLL2, 0x4000, 0x7fff, 3 },
+	{ GFXTYPE_SPRITES, 0x5400, 0x7fff, 3 },
 	{ 0 }
 };
 
@@ -865,13 +875,17 @@ static const struct gfx_range mapper_MB63B_table[] =
 };
 
 
-#define mapper_QD22B	{ 0x8000, 0, 0, 0 }, mapper_QD22B_table
+#define mapper_QD22B	{ 0x4000, 0, 0, 0 }, mapper_QD22B_table
 static const struct gfx_range mapper_QD22B_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SCROLL1,                   0x0000, 0x07ff, 0 },
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x0800, 0x27ff, 0 },
-	{ GFXTYPE_SCROLL3,                   0x2800, 0x3fff, 0 },
+	// verified from PAL dump:
+	// bank 0 = pin 19
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x0000, 0x3fff, 0 },
+	{ GFXTYPE_SCROLL3, 0x0000, 0x3fff, 0 },
 	{ 0 }
 };
 
@@ -1014,9 +1028,9 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ja",    CPS_B_17, mapper_STF29 },
 	{"sf2jc",    CPS_B_12, mapper_STF29 },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
-	{"3wonders", BATTRY_1, mapper_RT24B },
-	{"3wonderu", BATTRY_1, mapper_RT24B },
-	{"wonder3",  BATTRY_1, mapper_RT24B },
+	{"3wonders", BATTRY_1, mapper_RT22B },
+	{"3wonderu", BATTRY_1, mapper_RT22B },
+	{"wonder3",  BATTRY_1, mapper_RT22B },
 	{"kod",      BATTRY_2, mapper_KD29B },
 	{"kodu",     BATTRY_2, mapper_KD29B },
 	{"kodj",     BATTRY_2, mapper_KD29B },
