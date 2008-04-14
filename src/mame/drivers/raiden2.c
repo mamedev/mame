@@ -733,6 +733,8 @@ static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 static MACHINE_RESET(raiden2)
 {
 	sprcpt_init();
+	MACHINE_RESET_CALL(seibu_sound_1);
+
 	//cop_init();
 }
 
@@ -993,7 +995,6 @@ static MACHINE_DRIVER_START( raiden2 )
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_MACHINE_RESET(seibu_sound_1)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
