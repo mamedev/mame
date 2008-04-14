@@ -129,6 +129,10 @@ WRITE16_HANDLER( rocknms_sub_priority_w )
 	}
 }
 
+READ16_HANDLER( nndmseal_priority_r )
+{
+	return tetrisp2_priority[offset] | 0xff00;
+}
 
 
 /***************************************************************************
@@ -282,6 +286,12 @@ VIDEO_START( tetrisp2 )
 	tilemap_set_transparent_pen(tilemap_bg,0);
 	tilemap_set_transparent_pen(tilemap_fg,0);
 	tilemap_set_transparent_pen(tilemap_rot,0);
+}
+
+VIDEO_START( nndmseal )
+{
+	VIDEO_START_CALL( tetrisp2 );
+	tilemap_set_scrolldx(tilemap_bg, -4,-4);
 }
 
 VIDEO_START( rockntread )

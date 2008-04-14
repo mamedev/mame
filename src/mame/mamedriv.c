@@ -6342,6 +6342,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( scudhamm )	/* (c) 1994 Jaleco */
 	DRIVER( tetrisp2 )	/* (c) 1997 Jaleco */
 	DRIVER( teplus2j )	/* (c) 1997 Jaleco */
+	DRIVER( nndmseal )	/* (c) 1997 I'Max/Jaleco */
 	DRIVER( stepstag )	/* (c) 1999 Jaleco */
 	DRIVER( rockn )		/* (c) 1999 Jaleco */
 	DRIVER( rockna )	/* (c) 1999 Jaleco */

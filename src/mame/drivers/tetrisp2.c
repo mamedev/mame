@@ -35,6 +35,7 @@ Notes:
 
 #include "driver.h"
 #include "deprecat.h"
+#include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "rocknms.lh"
 
@@ -71,6 +72,7 @@ WRITE16_HANDLER( tetrisp2_priority_w );
 WRITE16_HANDLER( rockn_priority_w );
 READ16_HANDLER( rocknms_sub_priority_r );
 WRITE16_HANDLER( rocknms_sub_priority_w );
+READ16_HANDLER( nndmseal_priority_r );
 
 WRITE16_HANDLER( tetrisp2_vram_bg_w );
 WRITE16_HANDLER( tetrisp2_vram_fg_w );
@@ -82,15 +84,19 @@ WRITE16_HANDLER( rocknms_sub_vram_rot_w );
 
 VIDEO_START( tetrisp2 );
 VIDEO_UPDATE( tetrisp2 );
+
 VIDEO_START( rockntread );
 VIDEO_UPDATE( rockntread );
+
 VIDEO_START( rocknms );
 VIDEO_UPDATE( rocknms );
+
+VIDEO_START( nndmseal );
 
 /***************************************************************************
 
 
-                                    Sound
+                              System Registers
 
 
 ***************************************************************************/
@@ -218,6 +224,34 @@ static READ16_HANDLER( rockn_soundvolume_r )
 static WRITE16_HANDLER( rockn_soundvolume_w )
 {
 	rockn_soundvolume = data;
+}
+
+
+static WRITE16_HANDLER( nndmseal_sound_bank_w )
+{
+	static int bank_lo, bank_hi;
+
+	if (ACCESSING_BITS_0_7)
+	{
+		UINT8 *rom = memory_region(REGION_SOUND2);
+
+		if (data & 0x04)
+		{
+			bank_lo = data & 0x03;
+
+			memcpy(memory_region(REGION_SOUND1), rom + (bank_lo * 0x80000), 0x20000);
+
+//          logerror("PC:%06X sound bank_lo = %02X\n",activecpu_get_pc(),bank_lo);
+		}
+		else
+		{
+			bank_hi = data & 0x03;
+
+			memcpy(memory_region(REGION_SOUND1) + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
+
+//          logerror("PC:%06X sound bank_hi = %02X\n",activecpu_get_pc(),bank_hi);
+		}
+	}
 }
 
 /***************************************************************************
@@ -378,6 +412,75 @@ static ADDRESS_MAP_START( tetrisp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w						)	// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITE(SMH_NOP									)	// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITE(SMH_NOP									)	// Lev 2 irq ack
+ADDRESS_MAP_END
+
+
+static WRITE16_HANDLER( nndmseal_coincounter_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		coin_counter_w( 0,  data  & 0x0001 );
+		//                  data  & 0x0004 ?
+		coin_lockout_w( 0,(~data) & 0x0008 );
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		set_led_status( 0, data & 0x1000 );	// +
+		set_led_status( 1, data & 0x2000 );	// -
+		set_led_status( 2, data & 0x4000 );	// Cancel
+		set_led_status( 3, data & 0x8000 );	// OK
+	}
+//  popmessage("%04x",data);
+}
+
+static WRITE16_HANDLER( nndmseal_b20000_w )
+{
+	// leds?
+//  popmessage("%04x",data);
+}
+
+static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Object RAM
+	AM_RANGE(0x104000, 0x107fff) AM_RAM	// Spare Object RAM
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM	// Work RAM
+	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE(nndmseal_priority_r, SMH_RAM) AM_BASE(&tetrisp2_priority	)	// Priority
+	AM_RANGE(0x300000, 0x31ffff) AM_READWRITE(SMH_RAM, tetrisp2_palette_w) AM_BASE(&paletteram16		)	// Palette
+	AM_RANGE(0x400000, 0x403fff) AM_READWRITE(SMH_RAM, tetrisp2_vram_fg_w) AM_BASE(&tetrisp2_vram_fg	)	// Foreground
+	AM_RANGE(0x404000, 0x407fff) AM_READWRITE(SMH_RAM, tetrisp2_vram_bg_w) AM_BASE(&tetrisp2_vram_bg	)	// Background
+
+	AM_RANGE(0x408000, 0x409fff) AM_RAM	// ???
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM	// Line
+
+	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE(SMH_RAM, tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot	)	// Rotation
+	AM_RANGE(0x650000, 0x651fff) AM_READWRITE(SMH_RAM, tetrisp2_vram_rot_w)	// Rotation (mirror)
+
+	AM_RANGE(0x800000, 0x800003) AM_READWRITE( OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )	// Sound
+
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size	)	// NVRAM
+
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(nndmseal_coincounter_w)	// Coin Counter
+	AM_RANGE(0xb20000, 0xb20001) AM_WRITE(nndmseal_b20000_w)		// ???
+
+	AM_RANGE(0xb40000, 0xb4000b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_fg	)	// Foreground Scrolling
+	AM_RANGE(0xb40010, 0xb4001b) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_scroll_bg	)	// Background Scrolling
+	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITE(SMH_NOP)	// scr_size
+
+	AM_RANGE(0xb60000, 0xb6002f) AM_WRITE(SMH_RAM) AM_BASE(&tetrisp2_rotregs)	// Rotation Registers
+
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(nndmseal_sound_bank_w)
+
+	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w	)	// system param
+	AM_RANGE(0xba001a, 0xba001b) AM_WRITE(SMH_NOP				)	// Lev 4 irq ack
+	AM_RANGE(0xba001e, 0xba001f) AM_WRITE(SMH_NOP				)	// Lev 2 irq ack
+
+	AM_RANGE(0xbe0000, 0xbe0001) AM_READ     (SMH_NOP			)	// INT-level1 dummy read
+	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS"			)	// Inputs
+	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("COINS"			)	// ""
+	AM_RANGE(0xbe0006, 0xbe0007) AM_READ_PORT("PRINT"			)	// ""
+	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW"				)	// ""
+
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r		)	// Watchdog
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rockn1_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -705,6 +808,122 @@ static INPUT_PORTS_START( teplus2j )
 	PORT_DIPNAME( 0x1000, 0x1000, "Unknown 2-5" ) PORT_DIPLOCATION("SW2:5") /* F.B.I. Logo in "World" set */
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+/***************************************************************************
+                            Nandemo Seal Iinkai
+***************************************************************************/
+
+static INPUT_PORTS_START( nndmseal )
+
+	PORT_START_TAG("BUTTONS") // be0002.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME( "OK" )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_NAME( "Cancel" )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_NAME( "-" )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_NAME( "+" )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("COINS") // be0004.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE2 )	// (keep pressed during boot for test mode)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1    )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN  )
+
+	PORT_START_TAG("DSW") // be0008.w
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Time?" )
+	PORT_DIPSETTING(      0x0000, "35" )
+	PORT_DIPSETTING(      0x0040, "45" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0f00, "0" )
+	PORT_DIPSETTING(      0x0e00, "1" )
+	PORT_DIPSETTING(      0x0d00, "2" )
+	PORT_DIPSETTING(      0x0c00, "3" )
+	PORT_DIPSETTING(      0x0b00, "4" )
+	PORT_DIPSETTING(      0x0a00, "5" )
+	PORT_DIPSETTING(      0x0900, "6" )
+	PORT_DIPSETTING(      0x0800, "7" )
+	PORT_DIPSETTING(      0x0700, "8" )
+	PORT_DIPSETTING(      0x0600, "9" )
+	PORT_DIPSETTING(      0x0500, "a" )
+	PORT_DIPSETTING(      0x0400, "b" )
+	PORT_DIPSETTING(      0x0300, "c" )
+	PORT_DIPSETTING(      0x0200, "d" )
+	PORT_DIPSETTING(      0x0100, "e" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+
+	PORT_START_TAG("PRINT") // be0006.w
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1  ) PORT_NAME("Print 1?")	// Press both to print (and alternate with ok too).
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME("Print 2?")	// Hold them for some seconds to bring up a "caution" message.
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH,IPT_SPECIAL )	// ?
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 INPUT_PORTS_END
 
 
@@ -1064,6 +1283,39 @@ static MACHINE_DRIVER_START( tetrisp2 )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( nndmseal )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M68000, XTAL_12MHz)
+	MDRV_CPU_PROGRAM_MAP(nndmseal_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+
+	MDRV_NVRAM_HANDLER(tetrisp2)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(0x180, 0xf0)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x180-1, 0, 0xf0-1)
+
+	MDRV_GFXDECODE(tetrisp2)
+	MDRV_PALETTE_LENGTH(0x8000)
+
+	MDRV_VIDEO_START(nndmseal)	// bg layer offset
+	MDRV_VIDEO_UPDATE(tetrisp2)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(OKIM6295, XTAL_2MHz)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( rockn )
 
 	/* basic machine hardware */
@@ -1095,7 +1347,6 @@ static MACHINE_DRIVER_START( rockn )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
-
 
 
 static MACHINE_DRIVER_START( rockn2 )
@@ -1275,6 +1526,88 @@ ROM_START( teplus2j ) /* Version 2.2 */
 
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "96019-07.7", 0x000000, 0x400000, CRC(a8a61954) SHA1(86c3db10b348ba1f44ff696877b8b20845fa53de) )
+ROM_END
+
+/***************************************************************************
+
+Nandemo Seal Iinkai
+(c)1996 I'max/Jaleco
+
+Mainboard:
+NS-96205 9601
+EB-00-20110-0
+
+Daughterboard:
+NS-96206A
+96017
+EB-00-20111-1
+
+
+CPU: TMP68000P-12
+
+Sound: M6295 (on daughterboard)
+
+OSC: 12.000MHz (X1)
+     42.9545MHz(OSC1)
+     2.000MHz(X1 on daughterboard. silk print says 4MHz)
+
+Custom chips:
+GS91022-04
+GS91022-05
+SS91022-03
+SS91022-05
+
+PLDs:
+PS96017-01 (XILINX XC7336)
+96017-02 (18CV8P)
+96017-03 (18CV8P)
+96017-04 (18CV8P on daughterboard)
+
+Others:
+CR2032 battery
+Centronics printer port
+
+ROMs:(all ROMs are on daughterboard)
+1.1 - Programs (TMS 27C020)
+3.3 /
+(actual label is "Cawaii 1 Ver1.1" & "Cawaii 3 Ver1.1")
+
+MR97006-01.2 (42pin mask ROM, read as 32M byte mode)
+MR97006-02.5 (same as above)
+MR97001-01.6 (same as above)
+MR96017-04.9 (same as above, samples)
+
+MR97006-04.8 (32pin mask ROM, read as 534000)
+
+
+dumped by sayu
+--- Team Japump!!! ---
+
+***************************************************************************/
+
+ROM_START( nndmseal )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )		// 68000 Code
+	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x40000, CRC(45acea25) SHA1(f2f2e78be261c3d8c0145a639bc3771f0588401d) )	// 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "3.3", 0x00001, 0x40000, CRC(0754d96a) SHA1(1da44994e8bcfd8832755e298c0125b38cfdd16e) )	// 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x100, REGION_GFX1, ROMREGION_DISPOSE | ROMREGION_ERASE )	/* 8x8x8 (Sprites) */
+	// unused
+
+	ROM_REGION( 0x400000, REGION_GFX2, ROMREGION_DISPOSE )	// 16x16x8 (Background)
+	ROM_LOAD( "mr97006-02.5", 0x000000, 0x200000, CRC(4793f84e) SHA1(05acba6cc8a527a6050af79a460b08c4676287aa) )
+	ROM_LOAD( "mr97001-01.6", 0x200000, 0x200000, CRC(dd648e8a) SHA1(7036ab30d0ea179c59d74c1fbe4372968722ec0f) )
+
+	ROM_REGION( 0x200000, REGION_GFX3, ROMREGION_DISPOSE )	// 16x16x8 (Rotation)
+	ROM_LOAD( "mr97006-01.2", 0x000000, 0x200000, CRC(32283485) SHA1(14ccd25389b97825d9a727809c3a1de803687c16) )
+
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE )	// 8x8x8 (Foreground)
+	ROM_LOAD( "mr97006-04.8", 0x000000, 0x100000, CRC(6726a25b) SHA1(4ea49c014477229eaf9de4a0b9bf83021b82c095) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, ROMREGION_ERASE )	// Samples
+	// filled in from REGION_SOUND2
+
+	ROM_REGION( 0x200000, REGION_SOUND2, 0 )	// Samples
+	ROM_LOAD( "mr96017-04.9", 0x000000, 0x200000, CRC(c2e7b444) SHA1(e2b9d3d94720d01beff1108ef3dfbff805ddd1fd) )
 ROM_END
 
 /***************************************************************************
@@ -1645,12 +1978,14 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, tetrisp2, 0,        tetrisp2, tetrisp2, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1997, teplus2j, tetrisp2, tetrisp2, teplus2j, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1997, tetrisp2, 0,        tetrisp2, tetrisp2, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (World)",           GAME_SUPPORTS_SAVE )
+GAME( 1997, teplus2j, tetrisp2, tetrisp2, teplus2j, 0,       ROT0,   "Jaleco / The Tetris Company", "Tetris Plus 2 (Japan)",           GAME_SUPPORTS_SAVE )
 
-GAME( 1999, rockn,    0,        rockn,    rockn,   rockn,    ROT270, "Jaleco", "Rock'n Tread (Japan)", GAME_SUPPORTS_SAVE)
-GAME( 1999, rockna,   rockn,    rockn,    rockn,   rockn1,   ROT270, "Jaleco", "Rock'n Tread (Japan, alternate)", GAME_SUPPORTS_SAVE)
-GAME( 1999, rockn2,   0,        rockn2,   rockn,   rockn2,   ROT270, "Jaleco", "Rock'n Tread 2 (Japan)", GAME_SUPPORTS_SAVE)
-GAME( 1999, rocknms,  0,        rocknms,  rocknms, rocknms,  ROT0,   "Jaleco", "Rock'n MegaSession (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1999, rockn3,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco", "Rock'n 3 (Japan)", GAME_SUPPORTS_SAVE)
-GAME( 2000, rockn4,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco (PCCWJ)", "Rock'n 4 (Japan, prototype)", GAME_SUPPORTS_SAVE)
+GAME( 1997, nndmseal, 0,        nndmseal, nndmseal, rockn,   ROT0 | ORIENTATION_FLIP_X, "I'Max/Jaleco", "Nandemo Seal Iinkai",         GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+
+GAME( 1999, rockn,    0,        rockn,    rockn,   rockn,    ROT270, "Jaleco",                      "Rock'n Tread (Japan)",            GAME_SUPPORTS_SAVE )
+GAME( 1999, rockna,   rockn,    rockn,    rockn,   rockn1,   ROT270, "Jaleco",                      "Rock'n Tread (Japan, alternate)", GAME_SUPPORTS_SAVE )
+GAME( 1999, rockn2,   0,        rockn2,   rockn,   rockn2,   ROT270, "Jaleco",                      "Rock'n Tread 2 (Japan)",          GAME_SUPPORTS_SAVE )
+GAME( 1999, rocknms,  0,        rocknms,  rocknms, rocknms,  ROT0,   "Jaleco",                      "Rock'n MegaSession (Japan)",      GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, rockn3,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco",                      "Rock'n 3 (Japan)",                GAME_SUPPORTS_SAVE )
+GAME( 2000, rockn4,   0,        rockn2,   rockn,   rockn3,   ROT270, "Jaleco (PCCWJ)",              "Rock'n 4 (Japan, prototype)",     GAME_SUPPORTS_SAVE )
