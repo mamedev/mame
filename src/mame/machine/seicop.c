@@ -1981,10 +1981,14 @@ READ16_HANDLER( raiden2_mcu_r )
 			return generic_cop_r(machine, offset, mem_mask);
 			break;
 
-		case (0x340/2): return input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 3) << 8);
-		case (0x344/2): return input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1) << 8);
-		case (0x34c/2): return input_port_read_indexed(machine, 4) | 0xff00;
+		case (0x340/2): return input_port_read_indexed(machine, 3) | (input_port_read_indexed(machine, 4) << 8);
+		case (0x344/2): return input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 8);
+		case (0x34c/2): return input_port_read_indexed(machine, 5) | 0xff00;
 
+		/* Inputs */
+		case (0x308/2):	return seibu_main_word_r(machine,2,0);
+		case (0x30c/2):	return seibu_main_word_r(machine,3,0);
+		case (0x314/2): return seibu_main_word_r(machine,5,0);
 
 	}
 }
@@ -2026,6 +2030,12 @@ WRITE16_HANDLER( raiden2_mcu_w )
 		case (0x2bc/2): sprcpt_adr_w(machine,offset,data,mem_mask); break;
 		case (0x2be/2): sprcpt_adr_w(machine,offset,data,mem_mask); break;
 		case (0x2ce/2): sprcpt_flags_2_w(machine,offset,data,mem_mask); break;
+
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+
 
 	}
 }
