@@ -14,6 +14,7 @@ static int charpalettebank,spritepalettebank;
 
 static tilemap *bg1_tilemap,*bg2_tilemap;
 static int sprite_gfx;
+static int spikes91_lookup;
 
 
 /***************************************************************************
@@ -206,6 +207,11 @@ WRITE16_HANDLER( pspikesb_gfxbank_w )
 
 	setbank(bg1_tilemap,0,(data & 0xf000) >> 12);
 	setbank(bg1_tilemap,1,(data & 0x0f00) >> 8);
+}
+
+WRITE16_HANDLER( spikes91_lookup_w )
+{
+	spikes91_lookup = data;
 }
 
 WRITE16_HANDLER( karatblz_gfxbank_w )
@@ -497,13 +503,8 @@ static void spikes91_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		flipx = aerofgt_spriteram3[i + 3] & 0x8000;
 		color = ((aerofgt_spriteram3[i + 3] & 0x00f0) >> 4);
 
-		// look-up table
-		// RZ notes:
-		// in game it's necessary an or with 0x2000;
-		// probably a bit switch the table
-		// almost sure no line swap in the look-up table
+		if (spikes91_lookup==1) code |= 0x2000;
 
-		code |= 0x2000;
 		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
 
 		drawgfx(bitmap,machine->gfx[sprite_gfx],

@@ -76,6 +76,7 @@ WRITE16_HANDLER( aerofgt_bg1videoram_w );
 WRITE16_HANDLER( aerofgt_bg2videoram_w );
 WRITE16_HANDLER( pspikes_gfxbank_w );
 WRITE16_HANDLER( pspikesb_gfxbank_w );
+WRITE16_HANDLER( spikes91_lookup_w );
 WRITE16_HANDLER( karatblz_gfxbank_w );
 WRITE16_HANDLER( spinlbrk_gfxbank_w );
 WRITE16_HANDLER( turbofrc_gfxbank_w );
@@ -203,11 +204,11 @@ static ADDRESS_MAP_START( spikes91_map, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0xffd200, 0xffd201) AM_WRITE(pspikesb_gfxbank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r) 
 	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r) AM_WRITE(pspikes_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_NOP
-	AM_RANGE(0xfff008, 0xfff009) AM_NOP
+	AM_RANGE(0xfff006, 0xfff007) AM_NOP 
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(spikes91_lookup_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pspikesc_map, ADDRESS_SPACE_PROGRAM, 16 )
