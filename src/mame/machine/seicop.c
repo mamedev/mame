@@ -1645,6 +1645,8 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 			generic_cop_w(machine, offset, data, mem_mask);
 			break;
 
+		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
+
 		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
 		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
 		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }

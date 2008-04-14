@@ -27,6 +27,11 @@ void denjinmk_setgfxbank(UINT16 data)
 	fore_gfx_bank = (data &0x2000) >> 1;//???
 	back_gfx_bank = (data &0x4000) >> 2;
 	mid_gfx_bank  = (data &0x8000) >> 3;//???
+
+	tilemap_mark_all_tiles_dirty (background_layer);
+	tilemap_mark_all_tiles_dirty (foreground_layer);
+	tilemap_mark_all_tiles_dirty (midground_layer);
+	tilemap_mark_all_tiles_dirty (text_layer);
 }
 
 #ifdef UNUSED_FUNCTION
