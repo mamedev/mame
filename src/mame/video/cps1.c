@@ -27,8 +27,9 @@ Ghouls 'n Ghosts (World / US)               1988  88620B-2  DM620            LWI
 Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
   (alt B-board revision)                          89624B-3  ST24B2           LWIO                                          
   (alt B-board revision)                          ?         ST22B            ?
-Dynasty Wars                                1989  ?         ?                      ?          CPS-B-02  DL-0411-10002
+Dynasty Wars                                1989  88622B-3  TK22B            IOB1  88622-C-2  CPS-B-02  DL-0411-10002
 Willow                                      1989  89624B-3  WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
+  (alt C-board revision)                                                           88622-C-2
 UN Squadron / Area 88                       1989  89624B-3  AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
   (alt B-board revision - Japan)                  88622B-2  AR22B            LWIO
 Final Fight (first rev)                     1989  89624B-3  S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
@@ -37,6 +38,7 @@ Final Fight (US 900613)                                                         
 Final Fight (Japan 900305) (alt B-board revision) ?         ?                      ?          CPS-B-02  DL-0411-10002
 1941                                        1990  ?         YI24B            ?     88622-C-5  CPS-B-05  DL-0411-10006  ?
 Mercs                                       1990  89624B-3  0224B            IOB1  90628-C-1  CPS-B-12  DL-0411-10007  C628
+  (alt C-board revision)                                                           90628-C-2
 Magic Sword                                 1990  89624B-3  MS24B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
 Chiki Chiki Boys / Mega Twins               1990  89624B-3  CK24B            IOB1  88622-C-5  CPS-B-14  DL-0411-10009  None
 Nemo                                        1990  89624B-3  NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
@@ -483,8 +485,8 @@ static const struct gfx_range mapper_ST22B_table[] =
 };
 
 
-#define mapper_dynwar	{ 0x8000, 0x8000, 0, 0 }, mapper_dynwar_table
-static const struct gfx_range mapper_dynwar_table[] =	// unknown PAL
+#define mapper_TK22B	{ 0x8000, 0x8000, 0, 0 }, mapper_TK22B_table
+static const struct gfx_range mapper_TK22B_table[] =	// unknown PAL
 {
 	/* type            start  end      bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x5fff, 0 },
@@ -968,8 +970,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"stridrua", CPS_B_01, mapper_ST22B },
 	{"striderj", CPS_B_01, mapper_ST22B },
 	{"stridrja", CPS_B_01, mapper_ST22B },
-	{"dynwar",   CPS_B_02, mapper_dynwar },
-	{"dynwarj",  CPS_B_02, mapper_dynwar },
+	{"dynwar",   CPS_B_02, mapper_TK22B },
+	{"dynwarj",  CPS_B_02, mapper_TK22B },
 	{"willow",   CPS_B_03, mapper_WL24B },
 	{"willowj",  CPS_B_03, mapper_WL24B },
 	{"willowje", CPS_B_03, mapper_WL24B },
