@@ -987,7 +987,7 @@ ROM_END
 /***************************************************************************
 
 Touchmaster 7000
-by Midway (c) 1998
+by Midway (c) 1999
 touchscreen game
 
 All chips are ST M27C801
