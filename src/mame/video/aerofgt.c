@@ -211,7 +211,7 @@ WRITE16_HANDLER( pspikesb_gfxbank_w )
 
 WRITE16_HANDLER( spikes91_lookup_w )
 {
-	spikes91_lookup = data;
+	spikes91_lookup = data & 1;
 }
 
 WRITE16_HANDLER( karatblz_gfxbank_w )
@@ -503,7 +503,7 @@ static void spikes91_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		flipx = aerofgt_spriteram3[i + 3] & 0x8000;
 		color = ((aerofgt_spriteram3[i + 3] & 0x00f0) >> 4);
 
-		if (spikes91_lookup==1) code |= 0x2000;
+		code |= spikes91_lookup * 0x2000;
 
 		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
 
