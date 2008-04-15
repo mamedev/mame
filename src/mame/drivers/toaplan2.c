@@ -288,8 +288,8 @@ To Do / Unknowns:
 
 
 /**************** Machine stuff ******************/
-#define HD64x180	0		/* Define if CPU support is available */
-#define V25			0
+#define USE_HD64x180	0		/* Define if CPU support is available */
+#define USE_V25		0
 
 #define CPU_2_NONE		0x00
 #define CPU_2_Z80		0x5a
@@ -381,6 +381,13 @@ void kbash_okisnd_w(running_machine *machine, int data);
 void fixeight_okisnd_w(running_machine *machine, int data);
 void batsugun_okisnd_w(running_machine *machine, int data);
 
+MACHINE_RESET(batsugun);
+#if USE_V25
+static READ16_HANDLER( batsugun_share_r );
+static READ16_HANDLER( batsugun_share2_r );
+static WRITE16_HANDLER( batsugun_share_w );
+static WRITE16_HANDLER( batsugun_share2_w );
+#endif
 
 /***************************************************************************
   Initialisation handlers
@@ -413,13 +420,13 @@ static MACHINE_RESET( ghox )
 
 static MACHINE_RESET( dogyuun )
 {
-	MACHINE_RESET_CALL(toaplan2);
+	MACHINE_RESET_CALL(batsugun);
 	mcu_data = 0xffaa;
 }
 
 static MACHINE_RESET( vfive )
 {
-	MACHINE_RESET_CALL(toaplan2);
+	MACHINE_RESET_CALL(batsugun);
 	mcu_data = 0xffaa;
 }
 
@@ -457,8 +464,12 @@ static DRIVER_INIT( T2_noZ80 )
 
 static DRIVER_INIT( fixeight )
 {
+	#if USE_V25
+
+	#else
 	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2 );
 	memory_set_bankptr(2, fixeight_sec_cpu_mem);
+	#endif
 
 	toaplan2_sub_cpu = CPU_2_V25;
 }
@@ -662,6 +673,28 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
 	}
 }
+
+WRITE16_HANDLER( toaplan2_v25_coin_word_w )
+{
+	// logerror("toaplan2_v25_coin_word_w %04x\n",data);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		toaplan2_coin_w(machine, offset, data & 0x0f);
+
+		#if USE_V25
+		/* only the ram-based V25 based games access the following bits */
+		//cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		#endif
+
+	}
+	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
+	{
+		logerror("Writing unknown upper MSB command (%04x) to coin control\n",data & 0xff00);
+	}
+}
+
 
 static WRITE16_HANDLER( shippumd_coin_word_w )
 {
@@ -1397,10 +1430,12 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)
-#if V25
-	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
-	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)
+#if USE_V25
+//	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
+//	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x210000, 0x21efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
+	AM_RANGE(0x21f000, 0x21ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, dogyuun_snd_cpu_w)	/* V25+ status/command port */
@@ -1537,7 +1572,16 @@ static ADDRESS_MAP_START( pipibibi_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
+#if USE_V25
+// guess, could be wrong
+WRITE16_HANDLER( fixeight_subcpu_ctrl )
+{
+	/* 0x18 used */
+	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+}
+#endif
 
+/* this one is rather different to the other v25 based ones, shared ram is moved for example */
 static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
@@ -1546,11 +1590,14 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
-#if V25
-	AM_RANGE(0x28e000, 0x28fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $28f000 status port */
-	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+#if USE_V25
+//	AM_RANGE(0x28e000, 0x28fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $28f000 status port */
+//	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x280000, 0x28efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
+	AM_RANGE(0x28f000, 0x28ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl) // guess!!!
 #else
+	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
 	AM_RANGE(0x28e000, 0x28efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w) AM_BASE(&fixeight_sec_cpu_mem)	/* V25+ Command/Status port */
 //  AM_RANGE(0x28f002, 0x28f003) AM_READ(SMH_RAM)             /* part of shared ram */
@@ -1604,10 +1651,12 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-#if V25
-	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
-	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock */
+#if USE_V25
+//	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
+//	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x210000, 0x21efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
+	AM_RANGE(0x21f000, 0x21ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, vfive_snd_cpu_w)	/* V25+ Command/Status port */
@@ -1625,18 +1674,66 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
+#if USE_V25
+static UINT8* batsugun_share;
+static UINT8* batsugun_share2;
+
+static READ16_HANDLER( batsugun_share_r )
+{
+	return batsugun_share[offset] | batsugun_share[offset]<<8;
+
+}
+
+static WRITE16_HANDLER( batsugun_share_w )
+{
+	/*
+	if (ACCESSING_BITS_8_15)
+	{
+		batsugun_share[offset] = data >> 8;
+	}
+	*/
+	if (ACCESSING_BITS_0_7)
+	{
+		batsugun_share[offset] = data;
+	}
+}
+
+
+static READ16_HANDLER( batsugun_share2_r )
+{
+	return batsugun_share2[offset] | batsugun_share2[offset]<<8;
+}
+
+static WRITE16_HANDLER( batsugun_share2_w )
+{
+	/*
+	if (ACCESSING_BITS_8_15)
+	{
+		batsugun_share2[offset] = data >> 8;
+	}
+	*/
+
+	if (ACCESSING_BITS_0_7)
+	{
+		batsugun_share2[offset] = data;
+	}
+}
+#endif
+
 static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-	AM_RANGE(0x210000, 0x21bbff) AM_RAM
-#if V25
-	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
-	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
+#if USE_V25
+//	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
+//	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+	AM_RANGE(0x210000, 0x21efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
+	AM_RANGE(0x21f000, 0x21ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
+	AM_RANGE(0x210000, 0x21bbff) AM_RAM
 	AM_RANGE(0x21e000, 0x21efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
 	AM_RANGE(0x21f000, 0x21f001) AM_READWRITE(toaplan2_snd_cpu_r, batsugun_snd_cpu_w)	/* V25+ Command/Status port */
 	AM_RANGE(0x21f004, 0x21f005) AM_READ_PORT("DSWA")
@@ -1908,7 +2005,7 @@ ADDRESS_MAP_END
 
 
 
-#if HD64x180
+#if USE_HD64x180
 static ADDRESS_MAP_START( hd647180_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM			/* Internal 512 bytes of RAM */
@@ -1916,20 +2013,22 @@ ADDRESS_MAP_END
 #endif
 
 
-#if V25
+#if USE_V25
+
+/* this seems to be the map for the ROM based game, Knuckle Bash */
 static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
 	AM_RANGE(0x04000, 0x04000) AM_READWRITE(YM2151_status_port_0_r, YM2151_register_port_0_w)
 	AM_RANGE(0x04001, 0x04001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x04002, 0x04002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
-	AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
+//	AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
 	AM_RANGE(0x0400a, 0x0400a) AM_READ_PORT("IN2")
 	AM_RANGE(0x0400c, 0x0400c) AM_READ_PORT("SYS")
 	AM_RANGE(0x0400e, 0x0400e) AM_WRITE(toaplan2_coin_w)
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
-	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)	/* External shared RAM (ROM for KBASH) */
+//	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)	/* External shared RAM (ROM for KBASH) */
 ADDRESS_MAP_END
 
 
@@ -1938,6 +2037,39 @@ static ADDRESS_MAP_START( V25_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0061, 0x0061) AM_READ_PORT("DSWA")	/* Directly mapped I/O ports */
 	AM_RANGE(0x0062, 0x0062) AM_READ_PORT("JMPR")	/* Directly mapped I/O ports */
 ADDRESS_MAP_END
+
+
+/* the others upload the V25 code into shared RAM and have this map (incomplete)
+
+  Batsugun code is not encrypted, but requires additional v25 features to be emulated.
+
+  Others are encrypted
+*/
+
+
+
+
+static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x00000) AM_WRITE( YM2151_register_port_0_w )
+	AM_RANGE(0x00001, 0x00001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+
+	AM_RANGE(0x07800, 0x07fff) AM_RAM AM_SHARE(6)
+
+	AM_RANGE(0x40000, 0x477ff) AM_RAM AM_SHARE(7)
+
+	AM_RANGE(0x87800, 0x87fff) AM_RAM AM_SHARE(6)
+
+	AM_RANGE(0xa0000, 0xa77ff) AM_RAM AM_SHARE(7) AM_BASE(&batsugun_share2)
+	AM_RANGE(0xa7800, 0xa7fff) AM_RAM AM_SHARE(6)
+
+	AM_RANGE(0xff800, 0xfffff) AM_RAM AM_SHARE(6) AM_BASE(&batsugun_share)
+ADDRESS_MAP_END
+
+
+
+
+
+
 #endif
 
 
@@ -3299,7 +3431,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if HD64x180
+#if USE_HD64x180
 	MDRV_CPU_ADD(Z180, 10000000)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem, 0)
 #endif
@@ -3338,7 +3470,7 @@ static MACHINE_DRIVER_START( ghox )
 	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if HD64x180
+#if USE_HD64x180
 	MDRV_CPU_ADD(Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem, 0)
 #endif
@@ -3376,10 +3508,10 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if V25
-	MDRV_CPU_ADD(Z180, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
-	MDRV_CPU_IO_MAP(V25_port, 0)
+#if USE_V25
+	MDRV_CPU_ADD(V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
+	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
 
 	MDRV_MACHINE_RESET(dogyuun)
@@ -3419,8 +3551,9 @@ static MACHINE_DRIVER_START( kbash )
 	MDRV_CPU_PROGRAM_MAP(kbash_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if V25
-	MDRV_CPU_ADD(Z180, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
+	/* ROM based v25 */
+#if USE_V25
+	MDRV_CPU_ADD(V25, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
 	MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3654,13 +3787,13 @@ static MACHINE_DRIVER_START( fixeight )
 	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if V25
-	MDRV_CPU_ADD(Z180, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
-	MDRV_CPU_IO_MAP(V25_port, 0)
+#if USE_V25
+	MDRV_CPU_ADD(V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
+	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MDRV_MACHINE_RESET(batsugun)
 //  MDRV_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
 
 	/* video hardware */
@@ -3731,10 +3864,10 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if V25
-	MDRV_CPU_ADD(Z180, 10000000)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
-	MDRV_CPU_IO_MAP(V25_port, 0)
+#if USE_V25
+	MDRV_CPU_ADD(V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
+	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
 
 	MDRV_MACHINE_RESET(vfive)
@@ -3762,6 +3895,23 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+MACHINE_RESET(batsugun)
+{
+	#if USE_V25
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	#endif
+}
+
+void batsugun_ym2151_irqhandler(int linestate)
+{
+	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
+//	update_irq_lines(Machine, linestate ? assert : clear);
+}
+
+const struct YM2151interface batsugun_ym2151_interface =
+{
+	batsugun_ym2151_irqhandler
+};
 
 static MACHINE_DRIVER_START( batsugun )
 
@@ -3770,13 +3920,13 @@ static MACHINE_DRIVER_START( batsugun )
 	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-#if V25
-	MDRV_CPU_ADD(Z180, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
-	MDRV_CPU_IO_MAP(V25_port, 0)
+#if USE_V25
+	MDRV_CPU_ADD(V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
+	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MDRV_MACHINE_RESET(batsugun)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3799,6 +3949,7 @@ static MACHINE_DRIVER_START( batsugun )
 
 	MDRV_SOUND_ADD(YM2151, 27000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_CONFIG(batsugun_ym2151_interface)
 
 	MDRV_SOUND_ADD(OKIM6295, 32000000/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7low)
@@ -4069,7 +4220,7 @@ ROM_START( tekipaki )
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
 	ROM_LOAD16_BYTE( "tp020-2.bin", 0x000001, 0x010000, CRC(7222de8e) SHA1(8352ae23efc24a2e20cc24b6d37cb8fc6b1a730c) )
 
-#if HD64x180
+#if USE_HD64x180
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, NO_DUMP )
@@ -4086,7 +4237,7 @@ ROM_START( ghox )
 	ROM_LOAD16_BYTE( "tp021-01.u10", 0x000000, 0x020000, CRC(9e56ac67) SHA1(daf241d9e55a6e60fc004ed61f787641595b1e62) )
 	ROM_LOAD16_BYTE( "tp021-02.u11", 0x000001, 0x020000, CRC(15cac60f) SHA1(6efa3a50a5dfe6ef4072738d6a7d0d95dca8a675) )
 
-#if HD64x180
+#if USE_HD64x180
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound HD647180 code */
 	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
 	ROM_LOAD( "hd647180.021", 0x00000, 0x08000, NO_DUMP )
@@ -4104,7 +4255,7 @@ ROM_START( dogyuun )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp022.mcu", 0x00000, 0x08000, NO_DUMP )
 #endif
@@ -4128,7 +4279,7 @@ ROM_START( kbash )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x88000, REGION_CPU2, 0 )			/* Sound CPU code */
 	ROM_LOAD( "kbash02.bin", 0x80000, 0x08000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
 #else
@@ -4235,7 +4386,7 @@ ROM_START( fixeight )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-001-Turbo  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Secondary CPU code */
 //  ROM_LOAD( "tp-026.mcu", 0x0000, 0x8000, NO_DUMP )
 #endif
@@ -4280,7 +4431,7 @@ ROM_START( grindstm )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp027.mcu", 0x8000, 0x8000, NO_DUMP )
 #endif
@@ -4297,7 +4448,7 @@ ROM_START( grindsta )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp027.mcu", 0x8000, 0x8000, NO_DUMP )
 #endif
@@ -4314,7 +4465,7 @@ ROM_START( vfive )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp027.mcu", 0x8000, 0x8000, NO_DUMP )
 #endif
@@ -4331,7 +4482,7 @@ ROM_START( batsugun )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp030.mcu", 0x8000, 0x8000, NO_DUMP )
 #endif
@@ -4357,7 +4508,7 @@ ROM_START( batsugna )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp030.mcu", 0x8000, 0x8000, NO_DUMP )
 #endif
@@ -4383,7 +4534,7 @@ ROM_START( batugnsp )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */
 	/* Its likely to be a NEC V25+ (PLCC94). */
-#if V25
+#if USE_V25
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )			/* Sound CPU code */
 //  ROM_LOAD( "tp030.mcu", 0x8000, 0x8000, NO_DUMP )
 #endif
