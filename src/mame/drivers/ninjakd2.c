@@ -8,8 +8,7 @@ The peculiar feature of this hardware is the ability to disable clearing of the
 sprite framebuffer, therefore overdrawing new sprites on top of the ones drawn
 in the previous frames.
 When sprite overdrawing is enabled, not all sprites leave trails: only the ones
-using color codes C, D, and E. Sprites using color code F have the special
-effect of clearing the trails which have been left by other sprites.
+using color codes C, D, and E.
 
 
 Game              Board

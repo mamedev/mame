@@ -6,6 +6,7 @@ UINT8* ninjakd2_fg_videoram;
 
 static int sprite_overdraw_enabled;
 static int next_sprite_overdraw_enabled;
+static int sprites_updated;
 static bitmap_t *sp_bitmap;
 // in robokid and omegaf big sprites are laid out differently in ROM
 static int robokid_sprites;
@@ -388,33 +389,12 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 				{
 					int const tile = code ^ (x << big_xshift) ^ (y << big_yshift);
 
-					// sprites with color = 0x0f erase pixels that use palettes C-F
-					if (sprite_overdraw_enabled && color == 0x0f)
-					{
-						const UINT8* const srcgfx = gfx->gfxdata + tile * gfx->char_modulo;
-						int xx,yy;
-
-						for (yy = 0; yy < 16; ++yy)
-						{
-							for (xx = 0; xx < 16; ++xx)
-							{
-								UINT16* const ptr = BITMAP_ADDR16(bitmap, sy + yy, sx + xx);
-								int const offset = (flipx ? (15 - xx) : xx) + (flipy ? (15 - yy) : yy ) * gfx->line_modulo;;
-
-								if (srcgfx[offset] != 15 && (*ptr & 0xf0) >= 0xc0)
-									*ptr = 15;
-							}
-						}
-					}
-					else
-					{
-						drawgfx(bitmap, gfx,
-								tile,
-								color,
-								flipx,flipy,
-								sx + 16*x, sy + 16*y,
-								0, TRANSPARENCY_PEN, 15);
-					}
+					drawgfx(bitmap, gfx,
+							tile,
+							color,
+							flipx,flipy,
+							sx + 16*x, sy + 16*y,
+							0, TRANSPARENCY_PEN, 15);
 
 					++sprites_drawn;
 					if (sprites_drawn >= 96)
@@ -437,7 +417,7 @@ static void draw_sprites(running_machine* const machine, bitmap_t* const bitmap)
 static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap, const rectangle* const cliprect)
 {
 	// if sprite overdraw is disabled, clear the sprite framebuffer
-	// if sprite overdraw is enabled, only clear palettes 0-B, and leave C-F on screen
+	// if sprite overdraw is enabled, only clear palettes 0-B and F, and leave C-E on screen
 	if (!sprite_overdraw_enabled)
 		fillbitmap(sp_bitmap, 15, cliprect);
 	else
@@ -449,18 +429,37 @@ static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap
 			for (x = 0; x < sp_bitmap->width; ++x)
 			{
 				UINT16* const ptr = BITMAP_ADDR16(sp_bitmap, y, x);
-				if ((*ptr & 0xf0) < 0xc0)
-				{
+
+				int pal = (*ptr & 0xf0) >> 4;
+
+				if (pal < 0xc || pal == 0xf)
 					*ptr = 15;
-				}
 			}
 		}
 	}
 }
 
 
+static void update_sprites(running_machine* const machine)
+{
+	erase_sprites(machine, sp_bitmap, 0);
+
+	// we want to erase the sprites with the old setting and draw them with the
+	// new one. Not doing this causes a glitch in Ninja Kid II when taking the top
+	// exit from stage 3.
+	sprite_overdraw_enabled = next_sprite_overdraw_enabled;
+
+	draw_sprites(machine, sp_bitmap);
+}
+
+
 VIDEO_UPDATE( ninjakd2 )
 {
+	// updating sprites here instead than in video_eof avoids a palette glitch
+	// at the end of the "rainbow sky" screens.
+	update_sprites(screen->machine);
+	sprites_updated = 1;
+
 	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
@@ -474,6 +473,9 @@ VIDEO_UPDATE( ninjakd2 )
 
 VIDEO_UPDATE( robokid )
 {
+	update_sprites(screen->machine);
+	sprites_updated = 1;
+
 	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
@@ -491,6 +493,9 @@ VIDEO_UPDATE( robokid )
 
 VIDEO_UPDATE( omegaf )
 {
+	update_sprites(screen->machine);
+	sprites_updated = 1;
+
 	fillbitmap(bitmap, 0, cliprect);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
@@ -509,12 +514,8 @@ VIDEO_UPDATE( omegaf )
 
 VIDEO_EOF( ninjakd2 )
 {
-	erase_sprites(machine, sp_bitmap, 0);
+	if (!sprites_updated)
+		update_sprites(machine);
 
-	// we want to erase the sprites with the old setting and draw them with the
-	// new one. Not doing this causes a glitch in Ninja Kid II when taking the top
-	// exit from stage 3.
-	sprite_overdraw_enabled = next_sprite_overdraw_enabled;
-
-	draw_sprites(machine, sp_bitmap);
+	sprites_updated = 0;
 }
