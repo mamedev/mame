@@ -2232,16 +2232,16 @@ static DRIVER_INIT( gottlieb )
 static DRIVER_INIT( stooges )
 {
 	gottlieb_sound_init();
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x05804, 0x05804, 0, 0, stooges_IN4_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0, stooges_output_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05804, 0x05804, 0, 0, stooges_IN4_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0, stooges_output_w);
 }
 
 static DRIVER_INIT( laserdsc )
 {
 	gottlieb_sound_init();
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0, usvsthem_video_outputs_w);      /* OUT1 */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0, gottlieb_laserdisc_command_w);	/* command for the player */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0, gottlieb_laserdisc_mpx_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0, usvsthem_video_outputs_w);      /* OUT1 */
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0, gottlieb_laserdisc_command_w);	/* command for the player */
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0, gottlieb_laserdisc_mpx_w);
 }
 
 

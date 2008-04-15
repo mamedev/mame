@@ -221,7 +221,7 @@ static void update_gpu_irq(void)
 }
 
 
-void jaguar_external_int(int state)
+void jaguar_external_int(const device_config *device, int state)
 {
 	if (state != CLEAR_LINE)
 		gpu_irq_state |= 1;
@@ -238,7 +238,7 @@ void jaguar_external_int(int state)
  *
  *************************************/
 
-void cojag_sound_init(void)
+void cojag_sound_init(running_machine *machine)
 {
 	int i;
 
@@ -271,7 +271,7 @@ void cojag_sound_init(void)
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	memory_install_write32_handler(2, ADDRESS_SPACE_PROGRAM, 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
+	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
 #endif
 }
 

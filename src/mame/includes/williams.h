@@ -9,7 +9,7 @@
 
 /*----------- defined in drivers/williams.c -----------*/
 
-void defender_install_io_space(void);
+void defender_install_io_space(running_machine *machine);
 
 
 /*----------- defined in machine/williams.c -----------*/

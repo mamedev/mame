@@ -1230,13 +1230,13 @@ static READ32_HANDLER( mjgtaste_speedup_r )
 
 static DRIVER_INIT( soldivid )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
 	use_factory_eeprom=EEPROM_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
 	use_factory_eeprom=EEPROM_DEFAULT;
 }
 
@@ -1244,13 +1244,13 @@ static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
 	use_factory_eeprom=EEPROM_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
 	use_factory_eeprom=EEPROM_DEFAULT;
 }
 
@@ -1258,7 +1258,7 @@ static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
 	use_factory_eeprom=EEPROM_DEFAULT;
 }
 
@@ -1266,25 +1266,25 @@ static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
 	use_factory_eeprom=EEPROM_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
 	use_factory_eeprom=EEPROM_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
 	use_factory_eeprom=EEPROM_GNBARICH;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
 	use_factory_eeprom=EEPROM_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }

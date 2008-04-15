@@ -18,6 +18,8 @@
 #include "machine/idectrl.h"
 #include "cpu/i386/i386.h"
 
+static void ide_interrupt(const device_config *device, int state);
+
 static UINT32 *cga_ram;
 static UINT32 *bios_ram;
 
@@ -277,25 +279,25 @@ static WRITE32_HANDLER( pnp_data_w )
 
 
 
-static READ32_HANDLER( ide0_r )
+static READ32_DEVICE_HANDLER( ide_r )
 {
-	return ide_controller32_0_r(machine, 0x1f0/4 + offset, mem_mask);
+	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
 }
 
-static WRITE32_HANDLER( ide0_w )
+static WRITE32_DEVICE_HANDLER( ide_w )
 {
-	ide_controller32_0_w(machine, 0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
 }
 
-static READ32_HANDLER( fdc_r )
+static READ32_DEVICE_HANDLER( fdc_r )
 {
-	return ide_controller32_0_r(machine, 0x3f0/4 + offset, mem_mask);
+	return ide_controller32_r(device, 0x3f0/4 + offset, mem_mask);
 }
 
-static WRITE32_HANDLER( fdc_w )
+static WRITE32_DEVICE_HANDLER( fdc_w )
 {
 	//mame_printf_debug("FDC: write %08X, %08X, %08X\n", data, offset, mem_mask);
-	ide_controller32_0_w(machine, 0x3f0/4 + offset, data, mem_mask);
+	ide_controller32_w(device, 0x3f0/4 + offset, data, mem_mask);
 }
 
 
@@ -454,11 +456,11 @@ static ADDRESS_MAP_START(taitowlf_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE(PIC8259, "pic8259_2", taitowlf_pic8259_32le_r, taitowlf_pic8259_32le_w)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE(DMA8237, "dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide0_r, ide0_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
 	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
 ADDRESS_MAP_END
@@ -625,6 +627,8 @@ static MACHINE_DRIVER_START(taitowlf)
 
 	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
 	MDRV_DEVICE_CONFIG( taitowlf_pic8259_2_config )
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	MDRV_NVRAM_HANDLER( mc146818 )
 
@@ -666,7 +670,7 @@ static void keyboard_interrupt(int state)
 	pic8259_set_irq_line(taitowlf_devices.pic8259_1, 1, state);
 }
 
-static void ide_interrupt(int state)
+static void ide_interrupt(const device_config *device, int state)
 {
 	pic8259_set_irq_line(taitowlf_devices.pic8259_2, 6, state);
 }
@@ -678,11 +682,6 @@ static int taitowlf_get_out2(running_machine *machine) {
 static const struct kbdc8042_interface at8042 =
 {
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, taitowlf_get_out2
-};
-
-static const struct ide_interface ide_intf =
-{
-	ide_interrupt
 };
 
 static void taitowlf_set_keyb_int(int state) {
@@ -703,8 +702,6 @@ static DRIVER_INIT( taitowlf )
 	pci_add_device(0, 7, &intel82371ab);
 
 	kbdc8042_init(&at8042);
-
-	ide_controller_init(0, &ide_intf);
 }
 
 /*****************************************************************************/

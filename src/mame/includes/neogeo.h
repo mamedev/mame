@@ -83,22 +83,22 @@ void neo_pcm2_swap(int value);
 /*----------- defined in machine/neoprot.c -----------*/
 
 void neogeo_reset_rng(void);
-void fatfury2_install_protection(void);
+void fatfury2_install_protection(running_machine *machine);
 void mslugx_install_protection(void);
-void kof99_install_protection(void);
-void garou_install_protection(void);
-void garouo_install_protection(void);
-void mslug3_install_protection(void);
-void kof2000_install_protection(void);
-void install_kof98_protection(void);
-void install_pvc_protection(void);
+void kof99_install_protection(running_machine *machine);
+void garou_install_protection(running_machine *machine);
+void garouo_install_protection(running_machine *machine);
+void mslug3_install_protection(running_machine *machine);
+void kof2000_install_protection(running_machine *machine);
+void install_kof98_protection(running_machine *machine);
+void install_pvc_protection(running_machine *machine);
 
 
 /*----------- defined in machine/neoboot.c -----------*/
 
 void kog_px_decrypt(void);
 void neogeo_bootleg_cx_decrypt(void);
-void install_kof10th_protection(void);
+void install_kof10th_protection(running_machine *machine);
 void decrypt_kof10th(void);
 void decrypt_kf10thep(void);
 void decrypt_kf2k5uni(void);
@@ -106,14 +106,14 @@ void neogeo_bootleg_sx_decrypt(int value);
 void kf2k2mp_decrypt(void);
 void kof2km2_px_decrypt(void);
 void decrypt_cthd2003(void);
-void patch_cthd2003(void);
+void patch_cthd2003(running_machine *machine);
 void decrypt_ct2k3sp(void);
 void decrypt_ct2k3sa(void);
 void patch_ct2k3sa(void);
 void decrypt_kof2k4se_68k(void);
 void lans2004_decrypt_68k(void);
 void lans2004_vx_decrypt(void);
-void install_ms5plus_protection(void);
+void install_ms5plus_protection(running_machine *machine);
 void svcboot_px_decrypt( void );
 void svcboot_cx_decrypt( void );
 void svcplus_px_decrypt( void );
@@ -122,11 +122,11 @@ void svcplusa_px_decrypt( void );
 void svcsplus_px_decrypt( void );
 void svcsplus_px_hack( void );
 void kof2003b_px_decrypt( void );
-void kof2003b_install_protection(void);
+void kof2003b_install_protection(running_machine *machine);
 void kof2k3pl_px_decrypt( void );
 void kof2k3up_px_decrypt( void );
-void kof2k3up_install_protection(void);
-void kf2k3pl_install_protection(void);
+void kof2k3up_install_protection(running_machine *machine);
+void kf2k3pl_install_protection(running_machine *machine);
 void samsh5bl_px_decrypt( void );
 
 

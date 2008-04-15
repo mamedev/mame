@@ -20,7 +20,7 @@ extern UINT16* megadrive_ram;
 extern UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl);
 extern void megadriv_stop_scanline_timer(void);
 
-void megatech_set_megadrive_z80_as_megadrive_z80(void);
+void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine);
 
 extern READ8_HANDLER (megatech_sms_ioport_dc_r);
 extern READ8_HANDLER (megatech_sms_ioport_dd_r);

@@ -664,7 +664,7 @@ static WRITE8_HANDLER( unknown_w )
 }
 
 /* Main bankswitching routine */
-static void set_bank(int banknum, const bankhandler *handler)
+static void set_bank(running_machine *machine, int banknum, const bankhandler *handler)
 {
 	int bankstart = (banknum & 7) * 0x2000;
 	int cpunum = (banknum >> 3) & 1;
@@ -677,12 +677,12 @@ static void set_bank(int banknum, const bankhandler *handler)
 	if (!handler->bank_handler_r)
 	{
 		if (namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_r[banknum]);
+			memory_install_read8_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_r[banknum]);
 	}
 	else
 	{
 		if (!namcos1_active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_r[banknum]);
+			memory_install_read8_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_r[banknum]);
 	}
 
 	/* write handlers (except for the 0xe000-0xffff range) */
@@ -691,12 +691,12 @@ static void set_bank(int banknum, const bankhandler *handler)
 		if (!handler->bank_handler_w)
 		{
 			if (namcos1_active_bank[banknum].bank_handler_w)
-				memory_install_write8_handler(cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_w[banknum]);
+				memory_install_write8_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, ram_bank_handler_w[banknum]);
 		}
 		else
 		{
 			if (!namcos1_active_bank[banknum].bank_handler_r)
-				memory_install_write8_handler(cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_w[banknum]);
+				memory_install_write8_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_w[banknum]);
 		}
 	}
 
@@ -704,7 +704,7 @@ static void set_bank(int banknum, const bankhandler *handler)
 	namcos1_active_bank[banknum] = *handler;
 }
 
-static void namcos1_bankswitch(int cpu, offs_t offset, UINT8 data)
+static void namcos1_bankswitch(running_machine *machine, int cpu, offs_t offset, UINT8 data)
 {
 	int bank = (cpu*8) + (( offset >> 9) & 0x07);
 
@@ -719,7 +719,7 @@ static void namcos1_bankswitch(int cpu, offs_t offset, UINT8 data)
 		chip[bank] |= (data & 0x03) << 8;
 	}
 
-	set_bank(bank, &namcos1_bank_element[chip[bank]]);
+	set_bank(machine, bank, &namcos1_bank_element[chip[bank]]);
 
 	/* unmapped bank warning */
 	if( namcos1_active_bank[bank].bank_handler_r == unknown_r)
@@ -736,7 +736,7 @@ WRITE8_HANDLER( namcos1_bankswitch_w )
 {
 //  logerror("cpu %d: namcos1_bankswitch_w offset %04x data %02x\n",cpu_getactivecpu(),offset,data);
 
-	namcos1_bankswitch(cpu_getactivecpu(), offset, data);
+	namcos1_bankswitch(machine, cpu_getactivecpu(), offset, data);
 }
 
 /* Sub cpu set start bank port */
@@ -745,8 +745,8 @@ WRITE8_HANDLER( namcos1_subcpu_bank_w )
 //  logerror("namcos1_subcpu_bank_w offset %04x data %02x\n",offset,data);
 
 	/* Prepare code for CPU 1 */
-	namcos1_bankswitch( 1, 0x0e00, 0x03 );
-	namcos1_bankswitch( 1, 0x0e01, data );
+	namcos1_bankswitch( machine, 1, 0x0e00, 0x03 );
+	namcos1_bankswitch( machine, 1, 0x0e01, data );
 }
 
 /*******************************************************************************
@@ -842,23 +842,23 @@ MACHINE_RESET( namcos1 )
 
 	/* Point all of our bankhandlers to the error handlers */
 	for (bank = 0; bank < 2*8 ; bank++)
-		set_bank(bank, &unknown_handler);
+		set_bank(machine, bank, &unknown_handler);
 
 	/* Default MMU setup for Cpu 0 */
-	namcos1_bankswitch(0, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
-	namcos1_bankswitch(0, 0x0001, 0x80 );
-	namcos1_bankswitch(0, 0x0200, 0x01 ); /* bank1 = 0x180(RAM) - evidence: berabohm */
-	namcos1_bankswitch(0, 0x0201, 0x80 );
+	namcos1_bankswitch(machine, 0, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
+	namcos1_bankswitch(machine, 0, 0x0001, 0x80 );
+	namcos1_bankswitch(machine, 0, 0x0200, 0x01 ); /* bank1 = 0x180(RAM) - evidence: berabohm */
+	namcos1_bankswitch(machine, 0, 0x0201, 0x80 );
 
-	namcos1_bankswitch(0, 0x0e00, 0x03 ); /* bank7 = 0x3ff(PRG7) */
-	namcos1_bankswitch(0, 0x0e01, 0xff );
+	namcos1_bankswitch(machine, 0, 0x0e00, 0x03 ); /* bank7 = 0x3ff(PRG7) */
+	namcos1_bankswitch(machine, 0, 0x0e01, 0xff );
 
 	/* Default MMU setup for Cpu 1 */
-	namcos1_bankswitch(1, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
-	namcos1_bankswitch(1, 0x0001, 0x80 );
+	namcos1_bankswitch(machine, 1, 0x0000, 0x01 ); /* bank0 = 0x180(RAM) - evidence: wldcourt */
+	namcos1_bankswitch(machine, 1, 0x0001, 0x80 );
 
-	namcos1_bankswitch(1, 0x0e00, 0x03); /* bank7 = 0x3ff(PRG7) */
-	namcos1_bankswitch(1, 0x0e01, 0xff);
+	namcos1_bankswitch(machine, 1, 0x0e00, 0x03); /* bank7 = 0x3ff(PRG7) */
+	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
 	/* stop all CPUs */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
@@ -1283,7 +1283,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT( quester )
 {
 	namcos1_driver_init(NULL);
-	memory_install_read8_handler(3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, quester_paddle_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, quester_paddle_r);
 }
 
 
@@ -1372,7 +1372,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT( berabohm )
 {
 	namcos1_driver_init(NULL);
-	memory_install_read8_handler(3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
 }
 
 
@@ -1434,5 +1434,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT( faceoff )
 {
 	namcos1_driver_init(NULL);
-	memory_install_read8_handler(3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }

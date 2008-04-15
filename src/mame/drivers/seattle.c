@@ -566,7 +566,7 @@ static MACHINE_RESET( seattle )
 
 	/* reset the other devices */
 	galileo_reset();
-	ide_controller_reset(0);
+	devtag_reset(machine, IDE_CONTROLLER, "ide");
 	voodoo_reset(0);
 	if (board_config == SEATTLE_WIDGET_CONFIG)
 		widget_reset();
@@ -582,16 +582,10 @@ static MACHINE_RESET( seattle )
  *
  *************************************/
 
-static void ide_interrupt(int state)
+static void ide_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(Machine, 0, IDE_IRQ_NUM, state);
+	cpunum_set_input_line(device->machine, 0, IDE_IRQ_NUM, state);
 }
-
-
-static const struct ide_interface ide_intf =
-{
-	ide_interrupt
-};
 
 
 
@@ -1728,9 +1722,9 @@ static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_READWRITE(voodoo_0_r, seattle_voodoo_w)
-	AM_RANGE(0x0a000000, 0x0a0003ff) AM_READWRITE(ide_controller32_0_r, ide_controller32_0_w)
+	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
-	AM_RANGE(0x0a000f00, 0x0a000f07) AM_READWRITE(ide_bus_master32_0_r, ide_bus_master32_0_w)
+	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_bus_master32_r, ide_bus_master32_w)
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
@@ -2464,6 +2458,8 @@ static MACHINE_DRIVER_START( seattle_common )
 
 	MDRV_MACHINE_RESET(seattle)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2726,10 +2722,9 @@ ROM_END
  *
  *************************************/
 
-static void init_common(int ioasic, int serialnum, int yearoffs, int config)
+static void init_common(running_machine *machine, int ioasic, int serialnum, int yearoffs, int config)
 {
 	/* initialize the subsystems */
-	ide_controller_init(0, &ide_intf);
 	midway_ioasic_init(ioasic, serialnum, yearoffs, ioasic_irq);
 
 	/* switch off the configuration */
@@ -2738,25 +2733,21 @@ static void init_common(int ioasic, int serialnum, int yearoffs, int config)
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_NOP);
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_NOP);
+			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_NOP, SMH_NOP);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r);
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_w);
+			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			smc91c94_init(&ethernet_intf);
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_r);
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_w);
+			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
-			memory_install_read32_handler (0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r);
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_w);
+			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			smc91c94_init(&ethernet_intf);
 			break;
 	}
@@ -2776,8 +2767,8 @@ static void add_speedup(offs_t pc, UINT32 op)
 
 static DRIVER_INIT( wg3dh )
 {
-	dcs2_init(2, 0x3839);
-	init_common(MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
+	dcs2_init(machine, 2, 0x3839);
+	init_common(machine, MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
 	add_speedup(0x8004413C, 0x0C0054B4);		/* confirmed */
@@ -2788,8 +2779,8 @@ static DRIVER_INIT( wg3dh )
 
 static DRIVER_INIT( mace )
 {
-	dcs2_init(2, 0x3839);
-	init_common(MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
+	dcs2_init(machine, 2, 0x3839);
+	init_common(machine, MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 	add_speedup(0x800108F8, 0x8C420000);		/* confirmed */
@@ -2798,8 +2789,8 @@ static DRIVER_INIT( mace )
 
 static DRIVER_INIT( sfrush )
 {
-	cage_init(REGION_USER2, 0x5236);
-	init_common(MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
+	cage_init(machine, REGION_USER2, 0x5236);
+	init_common(machine, MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
 	add_speedup(0x80059F34, 0x3C028012);		/* confirmed */
@@ -2810,8 +2801,8 @@ static DRIVER_INIT( sfrush )
 
 static DRIVER_INIT( sfrushrk )
 {
-	cage_init(REGION_USER2, 0x5329);
-	init_common(MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
+	cage_init(machine, REGION_USER2, 0x5329);
+	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
 	add_speedup(0x800343E8, 0x3C028012);		/* confirmed */
@@ -2823,8 +2814,8 @@ static DRIVER_INIT( sfrushrk )
 
 static DRIVER_INIT( calspeed )
 {
-	dcs2_init(2, 0x39c0);
-	init_common(MIDWAY_IOASIC_CALSPEED, 328/* others? */, 100, SEATTLE_WIDGET_CONFIG);
+	dcs2_init(machine, 2, 0x39c0);
+	init_common(machine, MIDWAY_IOASIC_CALSPEED, 328/* others? */, 100, SEATTLE_WIDGET_CONFIG);
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
@@ -2835,8 +2826,8 @@ static DRIVER_INIT( calspeed )
 
 static DRIVER_INIT( vaportrx )
 {
-	dcs2_init(2, 0x39c2);
-	init_common(MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
+	dcs2_init(machine, 2, 0x39c2);
+	init_common(machine, MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	add_speedup(0x80049F14, 0x3C028020);		/* confirmed */
@@ -2847,8 +2838,8 @@ static DRIVER_INIT( vaportrx )
 
 static DRIVER_INIT( biofreak )
 {
-	dcs2_init(2, 0x3835);
-	init_common(MIDWAY_IOASIC_STANDARD, 231/* no alternates */, 80, SEATTLE_CONFIG);
+	dcs2_init(machine, 2, 0x3835);
+	init_common(machine, MIDWAY_IOASIC_STANDARD, 231/* no alternates */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 }
@@ -2856,8 +2847,8 @@ static DRIVER_INIT( biofreak )
 
 static DRIVER_INIT( blitz )
 {
-	dcs2_init(2, 0x39c2);
-	init_common(MIDWAY_IOASIC_BLITZ99, 444/* or 528 */, 80, SEATTLE_CONFIG);
+	dcs2_init(machine, 2, 0x39c2);
+	init_common(machine, MIDWAY_IOASIC_BLITZ99, 444/* or 528 */, 80, SEATTLE_CONFIG);
 
 	/* for some reason, the code in the ROM appears buggy; this is a small patch to fix it */
 	rombase[0x934/4] += 4;
@@ -2870,8 +2861,8 @@ static DRIVER_INIT( blitz )
 
 static DRIVER_INIT( blitz99 )
 {
-	dcs2_init(2, 0x0afb);
-	init_common(MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
+	dcs2_init(machine, 2, 0x0afb);
+	init_common(machine, MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 	add_speedup(0x8014E41C, 0x3C038025);		/* confirmed */
@@ -2881,8 +2872,8 @@ static DRIVER_INIT( blitz99 )
 
 static DRIVER_INIT( blitz2k )
 {
-	dcs2_init(2, 0x0b5d);
-	init_common(MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
+	dcs2_init(machine, 2, 0x0b5d);
+	init_common(machine, MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 	add_speedup(0x8015773C, 0x3C038025);		/* confirmed */
@@ -2892,12 +2883,11 @@ static DRIVER_INIT( blitz2k )
 
 static DRIVER_INIT( carnevil )
 {
-	dcs2_init(2, 0x0af7);
-	init_common(MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
+	dcs2_init(machine, 2, 0x0af7);
+	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
 	add_speedup(0x8015176C, 0x3C03801A);		/* confirmed */
@@ -2907,8 +2897,8 @@ static DRIVER_INIT( carnevil )
 
 static DRIVER_INIT( hyprdriv )
 {
-	dcs2_init(2, 0x0af7);
-	init_common(MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
+	dcs2_init(machine, 2, 0x0af7);
+	init_common(machine, MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	add_speedup(0x801643BC, 0x3C03801B);		/* confirmed */

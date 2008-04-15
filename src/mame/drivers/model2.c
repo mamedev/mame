@@ -3911,8 +3911,7 @@ ROM_END
 
 static DRIVER_INIT( genprot )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 }
 
@@ -3920,8 +3919,7 @@ static DRIVER_INIT( pltkids )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -3932,8 +3930,7 @@ static DRIVER_INIT( zerogun )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -3942,15 +3939,14 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x240000, 0x24ffff, 0, 0, maxx_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x240000, 0x24ffff, 0, 0, maxx_r );
 }
 
 static DRIVER_INIT( sgt24h )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	ROM[0x56578/4] = 0x08000004;
@@ -3961,8 +3957,7 @@ static DRIVER_INIT( doa )
 {
 	UINT32 *ROM = (UINT32 *)memory_region(REGION_CPU1);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	protstate = protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;

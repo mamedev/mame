@@ -51,5 +51,5 @@ enum
 
 
 /* IDE ASIC maps the IDE registers */
-READ32_HANDLER( midway_ide_asic_r );
-WRITE32_HANDLER( midway_ide_asic_w );
+READ32_DEVICE_HANDLER( midway_ide_asic_r );
+WRITE32_DEVICE_HANDLER( midway_ide_asic_w );

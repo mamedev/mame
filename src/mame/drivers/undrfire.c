@@ -1015,7 +1015,7 @@ static DRIVER_INIT( undrfire )
 	int data;
 
 	/* Speedup handlers */
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x2004f8, 0x2004fb, 0, 0, main_cycle_r);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2004f8, 0x2004fb, 0, 0, main_cycle_r);
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

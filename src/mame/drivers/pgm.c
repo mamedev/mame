@@ -1735,12 +1735,11 @@ static DRIVER_INIT( orlegend )
 {
 	pgm_basic_init();
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
 }
 
-static void drgwld2_common_init(void)
+static void drgwld2_common_init(running_machine *machine)
 {
 	pgm_basic_init();
 	pgm_dw2_decrypt();
@@ -1750,13 +1749,13 @@ static void drgwld2_common_init(void)
     select and after failing in the 2nd stage (probably there are other checks
     out there).
     */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
 }
 
 static DRIVER_INIT( drgw2 )
 {	/* incomplete? */
 	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
-	drgwld2_common_init();
+	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
        although some addresses may be missing */
@@ -1768,7 +1767,7 @@ static DRIVER_INIT( drgw2 )
 static DRIVER_INIT( drgw2c )
 {
 	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
-	drgwld2_common_init();
+	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
        although some addresses may be missing */
@@ -1780,7 +1779,7 @@ static DRIVER_INIT( drgw2c )
 static DRIVER_INIT( drgw2j )
 {
 	UINT16 *mem16 = (UINT16 *)memory_region(REGION_CPU1);
-	drgwld2_common_init();
+	drgwld2_common_init(machine);
 	/* These ROM patches are not hacks, the protection device
        overlays the normal ROM code, this has been confirmed on a real PCB
        although some addresses may be missing */
@@ -1793,12 +1792,11 @@ static DRIVER_INIT( kov )
 {
 	pgm_basic_init();
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_w16);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
 	/* 0x4f0000 - ? is actually ram shared with the protection device,
       the protection device provides the region code */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
  	pgm_kov_decrypt();
 }
@@ -1825,9 +1823,9 @@ static DRIVER_INIT( pstar )
 	pgm_basic_init();
  	pgm_pstar_decrypt();
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4f0025, 0, 0, PSTARS_protram_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, PSTARS_r16);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500005, 0, 0, PSTARS_w16);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4f0025, 0, 0, PSTARS_protram_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, PSTARS_r16);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500005, 0, 0, PSTARS_w16);
 }
 
 
@@ -1836,12 +1834,11 @@ static DRIVER_INIT( kovsh )
 {
 	pgm_basic_init();
 
-//  memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16);
-//  memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_w16);
+//  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
 	/* 0x4f0000 - ? is actually ram shared with the protection device,
       the protection device provides the region code */
-//  memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+//  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
  	pgm_kovsh_decrypt();
 }
@@ -1850,12 +1847,11 @@ static DRIVER_INIT( djlzz )
 {
 	pgm_basic_init();
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_w16);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
 	/* 0x4f0000 - ? is actually ram shared with the protection device,
       the protection device provides the region code */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
  	pgm_djlzz_decrypt();
 }
@@ -1864,8 +1860,7 @@ static DRIVER_INIT( dw3 )
 {
 	pgm_basic_init();
 
-//  memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xda0000, 0xdaffff, 0, 0, dw3_prot_r);
-//  memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xda0000, 0xdaffff, 0, 0, dw3_prot_w);
+//  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xda0000, 0xdaffff, 0, 0, dw3_prot_r, dw3_prot_w);
 
  	pgm_dw3_decrypt();
 }
@@ -2113,8 +2108,7 @@ static DRIVER_INIT( killbld )
 	mem16[0x108a42/2]=0x5202;
 	mem16[0x108a44/2]=0x0c02;
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd40000, 0xd40003, 0, 0, killbld_prot_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd40000, 0xd40003, 0, 0, killbld_prot_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd40000, 0xd40003, 0, 0, killbld_prot_r, killbld_prot_w);
 }
 
 /* ddp2 rubbish */
@@ -2165,11 +2159,9 @@ static DRIVER_INIT( ddp2 )
 
 	ddp2_protram = auto_malloc(0x2000);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_r, ddp2_asic27_0xd10000_w);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd00000, 0xd01fff, 0, 0, ddp2_protram_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xd00000, 0xd01fff, 0, 0, ddp2_protram_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd00000, 0xd01fff, 0, 0, ddp2_protram_r, ddp2_protram_w);
 }
 
 static DRIVER_INIT( puzzli2 )
@@ -2182,12 +2174,11 @@ static DRIVER_INIT( puzzli2 )
 
 	pgm_basic_init();
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_w16);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500000, 0x500003, 0, 0, ASIC28_r16, ASIC28_w16);
 
 	/* 0x4f0000 - ? is actually ram shared with the protection device,
       the protection device provides the region code */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
  	pgm_puzzli2_decrypt();
 
@@ -2318,8 +2309,7 @@ static DRIVER_INIT( olds )
 
 	pgm_basic_init();
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xDCB400, 0xDCB403, 0, 0, olds_r16);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xdcb400, 0xdcb403, 0, 0, olds_w16);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xdcb400, 0xdcb403, 0, 0, olds_r16, olds_w16);
 
 }
 

@@ -348,7 +348,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 	}
 }
 
-static void multigam_init_smb3(void)
+static void multigam_init_smb3(running_machine *machine)
 {
 	UINT8* dst = memory_region( REGION_CPU1 );
 	UINT8* src = memory_region( REGION_USER1 );
@@ -356,7 +356,7 @@ static void multigam_init_smb3(void)
 	memcpy(&dst[0x8000], &src[0xa0000 + 0x3c000], 0x4000);
 	memcpy(&dst[0xc000], &src[0xa0000 + 0x3c000], 0x4000);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
 
 	memory_set_bankptr(1, multigmc_mmc3_6000_ram);
 
@@ -389,12 +389,12 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 
 	if ( data == 0xa8 )
 	{
-		multigam_init_smb3();
+		multigam_init_smb3(machine);
 		return;
 	}
 	else
 	{
-		memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
 		memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x6000);
 	}
 

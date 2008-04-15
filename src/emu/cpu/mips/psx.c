@@ -1252,24 +1252,21 @@ static WRITE32_HANDLER( psx_berr_w )
 	mipscpu.berr = 1;
 }
 
-static void mips_update_scratchpad( void )
+static void mips_update_scratchpad( running_machine *machine )
 {
 	int cpu = cpu_getactivecpu();
 
 	if( ( mipscpu.biu & BIU_RAM ) == 0 )
 	{
-		memory_install_read32_handler ( cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r );
-		memory_install_write32_handler( cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_w );
+		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
 	}
 	else if( ( mipscpu.biu & BIU_DS ) == 0 )
 	{
-		memory_install_read32_handler ( cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r );
-		memory_install_write32_handler( cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_NOP );
+		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
 	}
 	else
 	{
-		memory_install_read32_handler ( cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32 );
-		memory_install_write32_handler( cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32 );
+		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
 
 		memory_set_bankptr( 32, mipscpu.dcache );
 	}
@@ -1564,7 +1561,7 @@ static STATE_POSTLOAD( mips_postload )
 {
 	mips_update_memory_handlers();
 	mips_update_address_masks();
-	mips_update_scratchpad();
+	mips_update_scratchpad(machine);
 }
 
 static void mips_state_register( const char *type, int index )
@@ -1605,7 +1602,7 @@ static void mips_reset( void )
 
 	mips_update_memory_handlers();
 	mips_update_address_masks();
-	mips_update_scratchpad();
+	mips_update_scratchpad(Machine);
 
 	mips_set_cp0r( CP0_SR, SR_BEV );
 	mips_set_cp0r( CP0_CAUSE, 0x00000000 );
@@ -2887,7 +2884,7 @@ static WRITE32_HANDLER( psx_biu_w )
 
 	if( ( old & ( BIU_RAM | BIU_DS ) ) != ( mipscpu.biu & ( BIU_RAM | BIU_DS ) ) )
 	{
-		mips_update_scratchpad();
+		mips_update_scratchpad(machine);
 	}
 }
 

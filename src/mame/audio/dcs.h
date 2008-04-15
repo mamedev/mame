@@ -13,7 +13,7 @@ MACHINE_DRIVER_EXTERN( dcs2_audio_dsio );
 MACHINE_DRIVER_EXTERN( dcs2_audio_denver );
 
 void dcs_init(void);
-void dcs2_init(int dram_in_mb, offs_t polling_offset);
+void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset);
 void dcs_set_auto_ack(int state);
 
 void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(void), UINT16 (*fifo_status_r)(void));

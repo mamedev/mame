@@ -46,30 +46,9 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "memconv.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
-
-static READ32_HANDLER( amiga_cia32_r )
-{
-	return read32be_with_16be_handler(amiga_cia_r, machine, offset, mem_mask);
-}
-
-static WRITE32_HANDLER( amiga_cia32_w )
-{
-	write32be_with_16be_handler(amiga_cia_w, machine, offset, data, mem_mask);
-}
-
-static READ32_HANDLER( amiga_custom32_r )
-{
-	return read32be_with_16be_handler(amiga_custom_r, machine, offset, mem_mask);
-}
-
-static WRITE32_HANDLER( amiga_custom32_w )
-{
-	write32be_with_16be_handler(amiga_custom_w, machine, offset, data, mem_mask);
-}
 
 static WRITE32_HANDLER( aga_overlay_w )
 {
@@ -83,10 +62,10 @@ static WRITE32_HANDLER( aga_overlay_w )
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_BANK1);
+			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_BANK1);
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
+			memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -158,8 +137,8 @@ static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x800000, 0x800003) AM_READ( dipswitch_r )
 	AM_RANGE(0xb80000, 0xb8003f) AM_READWRITE(amiga_akiko32_r, amiga_akiko32_w)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia32_r, amiga_cia32_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom32_r, amiga_custom32_w) AM_BASE((UINT32**)&amiga_custom_regs)
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE((UINT32**)&amiga_custom_regs)
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION(REGION_USER1, 0x80000)	/* CD32 Extended ROM */
 	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION(REGION_USER1, 0x0)		/* Kickstart */

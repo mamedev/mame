@@ -536,8 +536,8 @@ static DRIVER_INIT( beathead )
 	atarijsa3_init_adpcm(REGION_SOUND1);
 
 	/* prepare the speedups */
-	speedup_data = memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
-	movie_speedup_data = memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
+	speedup_data = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
+	movie_speedup_data = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
 }
 
 

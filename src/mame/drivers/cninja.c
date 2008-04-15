@@ -1778,13 +1778,13 @@ static void cninja_patch(void)
 
 static DRIVER_INIT( cninja )
 {
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
 	cninja_patch();
 }
 
 static DRIVER_INIT( stoneage )
 {
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
 }
 
 static DRIVER_INIT( mutantf )

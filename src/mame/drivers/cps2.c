@@ -7155,7 +7155,7 @@ static DRIVER_INIT( ssf2tb )
 static DRIVER_INIT ( pzloop2 )
 {
 	DRIVER_INIT_CALL(cps2);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
 

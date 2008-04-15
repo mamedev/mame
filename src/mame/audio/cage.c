@@ -152,7 +152,7 @@ static WRITE32_HANDLER( speedup_w );
  *
  *************************************/
 
-void cage_init(int boot_region, offs_t speedup)
+void cage_init(running_machine *machine, int boot_region, offs_t speedup)
 {
 	attotime cage_cpu_clock_period;
 
@@ -170,7 +170,7 @@ void cage_init(int boot_region, offs_t speedup)
 	timer[1] = timer_alloc(cage_timer_callback, NULL);
 
 	if (speedup)
-		speedup_ram = memory_install_write32_handler(cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = memory_install_write32_handler(machine, cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
 }
 
 

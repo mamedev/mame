@@ -234,7 +234,7 @@ static WRITE8_HANDLER( cvsd_protection_w )
 }
 
 
-static void init_generic(int bpp, int sound, int prot_start, int prot_end)
+static void init_generic(running_machine *machine, int bpp, int sound, int prot_start, int prot_end)
 {
 	offs_t gfx_chunk = midyunit_gfx_rom_size / 4;
 	UINT8 d1, d2, d3, d4, d5, d6;
@@ -290,25 +290,25 @@ static void init_generic(int bpp, int sound, int prot_start, int prot_end)
 	{
 		case SOUND_CVSD_SMALL:
 			williams_cvsd_init(0);
-			memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, cvsd_protection_w);
+			memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, cvsd_protection_w);
 			cvsd_protection_base = memory_region(REGION_CPU2) + 0x10000 + (prot_start - 0x8000);
 			break;
 
 		case SOUND_CVSD:
 			williams_cvsd_init(0);
-			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
+			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(9, auto_malloc(0x80));
 			break;
 
 		case SOUND_ADPCM:
 			williams_adpcm_init();
-			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
+			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(9, auto_malloc(0x80));
 			break;
 
 		case SOUND_NARC:
 			williams_narc_init();
-			memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
+			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, prot_start, prot_end, 0, 0, SMH_BANK9, SMH_BANK9);
 			memory_set_bankptr(9, auto_malloc(0x80));
 			break;
 
@@ -331,7 +331,7 @@ static void init_generic(int bpp, int sound, int prot_start, int prot_end)
 DRIVER_INIT( narc )
 {
 	/* common init */
-	init_generic(8, SOUND_NARC, 0xcdff, 0xce29);
+	init_generic(machine, 8, SOUND_NARC, 0xcdff, 0xce29);
 }
 
 
@@ -361,7 +361,7 @@ DRIVER_INIT( trog )
 	prot_data = &trog_protection_data;
 
 	/* common init */
-	init_generic(4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
+	init_generic(machine, 4, SOUND_CVSD_SMALL, 0x9eaf, 0x9ed9);
 }
 
 
@@ -370,7 +370,7 @@ DRIVER_INIT( trog )
 DRIVER_INIT( smashtv )
 {
 	/* common init */
-	init_generic(6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
+	init_generic(machine, 6, SOUND_CVSD_SMALL, 0x9cf6, 0x9d21);
 }
 
 
@@ -388,7 +388,7 @@ DRIVER_INIT( hiimpact )
 	prot_data = &hiimpact_protection_data;
 
 	/* common init */
-	init_generic(6, SOUND_CVSD, 0x9b79, 0x9ba3);
+	init_generic(machine, 6, SOUND_CVSD, 0x9b79, 0x9ba3);
 }
 
 
@@ -406,7 +406,7 @@ DRIVER_INIT( shimpact )
 	prot_data = &shimpact_protection_data;
 
 	/* common init */
-	init_generic(6, SOUND_CVSD, 0x9c06, 0x9c15);
+	init_generic(machine, 6, SOUND_CVSD, 0x9c06, 0x9c15);
 }
 
 
@@ -422,7 +422,7 @@ DRIVER_INIT( strkforc )
 	prot_data = &strkforc_protection_data;
 
 	/* common init */
-	init_generic(4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
+	init_generic(machine, 4, SOUND_CVSD_SMALL, 0x9f7d, 0x9fa7);
 }
 
 
@@ -451,19 +451,19 @@ DRIVER_INIT( mkyunit )
 	prot_data = &mk_protection_data;
 
 	/* common init */
-	init_generic(6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
+	init_generic(machine, 6, SOUND_ADPCM, 0xfb9c, 0xfbc6);
 }
 
 DRIVER_INIT( mkyawdim )
 {
 	/* common init */
-	init_generic(6, SOUND_YAWDIM, 0, 0);
+	init_generic(machine, 6, SOUND_YAWDIM, 0, 0);
 }
 
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(write16_machine_func hack_w)
+static void term2_init_common(running_machine *machine, write16_machine_func hack_w)
 {
 	/* protection */
 	static const struct protection_data term2_protection_data =
@@ -474,20 +474,20 @@ static void term2_init_common(write16_machine_func hack_w)
 	prot_data = &term2_protection_data;
 
 	/* common init */
-	init_generic(6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
+	init_generic(machine, 6, SOUND_ADPCM, 0xfa8d, 0xfa9c);
 
 	/* special inputs */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x01c00000, 0x01c0005f, 0, 0, term2_input_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x01e00000, 0x01e0001f, 0, 0, term2_sound_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c00000, 0x01c0005f, 0, 0, term2_input_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01e00000, 0x01e0001f, 0, 0, term2_sound_w);
 
 	/* HACK: this prevents the freeze on the movies */
 	/* until we figure whats causing it, this is better than nothing */
-	t2_hack_mem = memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x010aa0e0, 0x010aa0ff, 0, 0, hack_w);
+	t2_hack_mem = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x010aa0e0, 0x010aa0ff, 0, 0, hack_w);
 }
 
-DRIVER_INIT( term2 ) { term2_init_common(term2_hack_w); }
-DRIVER_INIT( term2la2 ) { term2_init_common(term2la2_hack_w); }
-DRIVER_INIT( term2la1 ) { term2_init_common(term2la1_hack_w); }
+DRIVER_INIT( term2 ) { term2_init_common(machine, term2_hack_w); }
+DRIVER_INIT( term2la2 ) { term2_init_common(machine, term2la2_hack_w); }
+DRIVER_INIT( term2la1 ) { term2_init_common(machine, term2la1_hack_w); }
 
 
 
@@ -505,7 +505,7 @@ DRIVER_INIT( totcarn )
 	prot_data = &totcarn_protection_data;
 
 	/* common init */
-	init_generic(6, SOUND_ADPCM, 0xfc04, 0xfc2e);
+	init_generic(machine, 6, SOUND_ADPCM, 0xfc04, 0xfc2e);
 }
 
 

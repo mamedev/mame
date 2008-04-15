@@ -422,12 +422,12 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_USER1) + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
-		memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
 	if ((data & 0x80) && memory_region(REGION_USER2) != NULL)
@@ -438,11 +438,11 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
 			memory_set_bankptr(2, memory_region(REGION_USER2) + 0x4000 * bank);
 		}
 		else
-			memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -1674,56 +1674,56 @@ ROM_END
 static DRIVER_INIT( seawolf2 )
 {
 	astrocade_video_config = 0x00;
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x40, 0x40, 0, 0xff18, seawolf2_sound_1_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x41, 0x41, 0, 0xff18, seawolf2_sound_2_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x42, 0x43, 0, 0xff18, seawolf2_lamps_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x40, 0x40, 0, 0xff18, seawolf2_sound_1_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x41, 0x41, 0, 0xff18, seawolf2_sound_2_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x42, 0x43, 0, 0xff18, seawolf2_lamps_w);
 }
 
 
 static DRIVER_INIT( ebases )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0xff07, ebases_coin_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x28, 0x28, 0, 0xff07, ebases_trackball_select_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0xff07, ebases_coin_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x28, 0x28, 0, 0xff07, ebases_trackball_select_w);
 }
 
 
 static DRIVER_INIT( spacezap )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
 }
 
 
 static DRIVER_INIT( wow )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, wow_io_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, wow_speech_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, wow_io_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, wow_speech_r);
 }
 
 
 static DRIVER_INIT( gorf )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, gorf_io_1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x16, 0x16, 0x0fff, 0xff00, gorf_io_2_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, gorf_speech_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, gorf_io_1_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x16, 0x16, 0x0fff, 0xff00, gorf_io_2_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x17, 0x17, 0xffff, 0xff00, gorf_speech_r);
 }
 
 
 static DRIVER_INIT( robby )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, robby_io_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x0fff, 0xff00, robby_io_r);
 }
 
 
 static DRIVER_INIT( profpac )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
 
 	/* reset banking */
 	profpac_banksw_w(machine, 0, 0);
@@ -1734,10 +1734,10 @@ static DRIVER_INIT( profpac )
 static DRIVER_INIT( demndrgn )
 {
 	astrocade_video_config = 0x00;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x1c, 0x1c, 0x0000, 0xff00, port_tag_to_handler8("FIREX"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x1d, 0x1d, 0x0000, 0xff00, port_tag_to_handler8("FIREY"));
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x1c, 0x1c, 0x0000, 0xff00, port_tag_to_handler8("FIREX"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x1d, 0x1d, 0x0000, 0xff00, port_tag_to_handler8("FIREY"));
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
 
 	/* reset banking */
 	profpac_banksw_w(machine, 0, 0);
@@ -1748,15 +1748,15 @@ static DRIVER_INIT( demndrgn )
 static DRIVER_INIT( tenpindx )
 {
 	astrocade_video_config = 0x00;
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x60, 0x60, 0x0000, 0xff00, port_tag_to_handler8("P60"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x61, 0x61, 0x0000, 0xff00, port_tag_to_handler8("P61"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x62, 0x62, 0x0000, 0xff00, port_tag_to_handler8("P62"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x63, 0x63, 0x0000, 0xff00, port_tag_to_handler8("P63"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x64, 0x64, 0x0000, 0xff00, port_tag_to_handler8("P64"));
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x60, 0x60, 0x0000, 0xff00, port_tag_to_handler8("P60"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x61, 0x61, 0x0000, 0xff00, port_tag_to_handler8("P61"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x62, 0x62, 0x0000, 0xff00, port_tag_to_handler8("P62"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x63, 0x63, 0x0000, 0xff00, port_tag_to_handler8("P63"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x64, 0x64, 0x0000, 0xff00, port_tag_to_handler8("P64"));
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
 
 	/* reset banking */
 	profpac_banksw_w(machine, 0, 0);

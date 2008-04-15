@@ -1403,8 +1403,7 @@ static DRIVER_INIT(megat4te)
 
 	ds1204_init(0, megat4te_ds1204_nvram);
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_w );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r );
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 

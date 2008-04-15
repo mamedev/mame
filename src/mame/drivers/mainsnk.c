@@ -458,7 +458,7 @@ ROM_END
 
 static DRIVER_INIT ( canvas )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, input_port_0_r );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, input_port_0_r );
 }
 
 ROM_START( canvas )

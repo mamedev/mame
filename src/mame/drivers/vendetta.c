@@ -97,7 +97,7 @@ Notes:
 /* prototypes */
 static MACHINE_RESET( vendetta );
 static void vendetta_banking( int lines );
-static void vendetta_video_banking( int select );
+static void vendetta_video_banking( running_machine *machine, int select );
 
 VIDEO_START( vendetta );
 VIDEO_START( esckids );
@@ -183,7 +183,7 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 
 	irq_enabled = ( data >> 6 ) & 1;
 
-	vendetta_video_banking( data & 1 );
+	vendetta_video_banking( machine, data & 1 );
 }
 
 /********************************************/
@@ -201,18 +201,18 @@ static WRITE8_HANDLER( vendetta_K052109_w ) {
 
 static offs_t video_banking_base;
 
-static void vendetta_video_banking( int select )
+static void vendetta_video_banking( running_machine *machine, int select )
 {
 	if ( select & 1 )
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, SMH_BANK4, paletteram_xBBBBBGGGGGRRRRR_be_w );
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, SMH_BANK4, paletteram_xBBBBBGGGGGRRRRR_be_w );
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
 		memory_set_bankptr(4, paletteram);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r, vendetta_K052109_w );
-		memory_install_readwrite8_handler(0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K052109_r, K052109_w );
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r, vendetta_K052109_w );
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K052109_r, K052109_w );
 	}
 }
 
@@ -848,7 +848,7 @@ static MACHINE_RESET( vendetta )
 
 	/* init banks */
 	memory_set_bankptr( 1, &memory_region(REGION_CPU1)[0x10000] );
-	vendetta_video_banking( 0 );
+	vendetta_video_banking( machine, 0 );
 }
 
 

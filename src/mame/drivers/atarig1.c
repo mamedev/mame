@@ -196,10 +196,10 @@ static READ16_HANDLER( pitfighb_cheap_slapstic_r )
 }
 
 
-static void pitfighb_cheap_slapstic_init(void)
+static void pitfighb_cheap_slapstic_init(running_machine *machine)
 {
 	/* install a read handler */
-	bslapstic_base = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
+	bslapstic_base = memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x038000, 0x03ffff, 0, 0, pitfighb_cheap_slapstic_r);
 
 	/* allocate memory for a copy of bank 0 */
 	bslapstic_bank0 = auto_malloc(0x2000);
@@ -961,7 +961,7 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 	atarigen_eeprom_default = NULL;
 	if (slapstic == -1)
 	{
-		pitfighb_cheap_slapstic_init();
+		pitfighb_cheap_slapstic_init(machine);
 		state_save_register_global(bslapstic_bank);
 		state_save_register_global(bslapstic_primed);
 		state_save_register_postload(machine, pitfighb_state_postload, NULL);

@@ -559,7 +559,7 @@ static DRIVER_INIT( xfiles )
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xf0c8b440, 0xf0c8b447, 0, 0, SMH_NOP );
+//  memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0c8b440, 0xf0c8b447, 0, 0, SMH_NOP );
 
 	flash_roms = 2;
 }
@@ -579,7 +579,7 @@ static DRIVER_INIT( kdynastg )
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x12341234, 0x12341243, 0, 0, SMH_NOP );
+//  memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x12341234, 0x12341243, 0, 0, SMH_NOP );
 
 	flash_roms = 4;
 }

@@ -2239,15 +2239,15 @@ static void security_w(UINT8 data)
 
 /*****************************************************************************/
 
-static void init_lights(write32_machine_func out1, write32_machine_func out2, write32_machine_func out3)
+static void init_lights(running_machine *machine, write32_machine_func out1, write32_machine_func out2, write32_machine_func out3)
 {
 	if(!out1) out1 = lamp_output_w;
 	if(!out2) out1 = lamp_output2_w;
 	if(!out3) out1 = lamp_output3_w;
 
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000804, 0x7d000807, 0, 0, out1);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000320, 0x7d000323, 0, 0, out2);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x7d000324, 0x7d000327, 0, 0, out3);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7d000804, 0x7d000807, 0, 0, out1);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7d000320, 0x7d000323, 0, 0, out2);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7d000324, 0x7d000327, 0, 0, out3);
 }
 
 static void init_firebeat(running_machine *machine)
@@ -2273,19 +2273,19 @@ static void init_firebeat(running_machine *machine)
 
 	set_ibutton(rom);
 
-	init_lights(NULL, NULL, NULL);
+	init_lights(machine, NULL, NULL, NULL);
 }
 
 static DRIVER_INIT(ppp)
 {
 	init_firebeat(machine);
-	init_lights(lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
+	init_lights(machine, lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
 }
 
 static DRIVER_INIT(ppd)
 {
 	init_firebeat(machine);
-	init_lights(lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
+	init_lights(machine, lamp_output_ppp_w, lamp_output2_ppp_w, lamp_output3_ppp_w);
 
 	cur_cab_data = ppd_cab_data;
 }
@@ -2300,7 +2300,7 @@ static void init_keyboard(void)
 static DRIVER_INIT(kbm)
 {
 	init_firebeat(machine);
-	init_lights(lamp_output_kbm_w, NULL, NULL);
+	init_lights(machine, lamp_output_kbm_w, NULL, NULL);
 
 	init_keyboard();
 

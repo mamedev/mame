@@ -4233,24 +4233,21 @@ static READ16_HANDLER( mcuc74_speedup_r )
 	return su_82;
 }
 
-static void install_c74_speedup(void)
+static void install_c74_speedup(running_machine *machine)
 {
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x80, 0x81, 0, 0, mcuc74_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x80, 0x81, 0, 0, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
 }
 
-static void install_130_speedup(void)
+static void install_130_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
 }
 
-static void install_141_speedup(void)
+static void install_141_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.41 MCU BIOS
-	memory_install_read16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu141_speedup_r);
-	memory_install_write16_handler(3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
 }
 
 static void namcos22_init( enum namcos22_gametype game_type )
@@ -4269,34 +4266,34 @@ static DRIVER_INIT( alpiner )
 {
 	namcos22s_init(NAMCOS22_ALPINE_RACER);
 
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
-	install_130_speedup();
+	install_130_speedup(machine);
 }
 
 static DRIVER_INIT( alpiner2 )
 {
 	namcos22s_init(NAMCOS22_ALPINE_RACER_2);
 
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
-	install_130_speedup();
+	install_130_speedup(machine);
 }
 
 static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(NAMCOS22_ALPINE_SURFER);
 
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
-	install_141_speedup();
+	install_141_speedup(machine);
 }
 
 static DRIVER_INIT( airco22 )
 {
 	namcos22s_init(NAMCOS22_AIR_COMBAT22);
 
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
 
 static DRIVER_INIT( propcycl )
@@ -4320,16 +4317,16 @@ static DRIVER_INIT( propcycl )
 
 	namcos22s_init(NAMCOS22_PROP_CYCLE);
 
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
 
-	install_141_speedup();
+	install_141_speedup(machine);
 }
 
 static DRIVER_INIT( ridgeraj )
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER);
 
-	install_c74_speedup();
+	install_c74_speedup(machine);
 
 	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
@@ -4339,7 +4336,7 @@ static DRIVER_INIT( ridger2j )
 {
 	namcos22_init(NAMCOS22_RIDGE_RACER2);
 
-	install_c74_speedup();
+	install_c74_speedup(machine);
 
 	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
@@ -4349,7 +4346,7 @@ static DRIVER_INIT( acedrvr )
 {
 	namcos22_init(NAMCOS22_ACE_DRIVER);
 
-	install_c74_speedup();
+	install_c74_speedup(machine);
 
 	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
@@ -4359,7 +4356,7 @@ static DRIVER_INIT( victlap )
 {
 	namcos22_init(NAMCOS22_VICTORY_LAP);
 
-	install_c74_speedup();
+	install_c74_speedup(machine);
 
 	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
@@ -4369,7 +4366,7 @@ static DRIVER_INIT( raveracw )
 {
 	namcos22_init(NAMCOS22_RAVE_RACER);
 
-	install_c74_speedup();
+	install_c74_speedup(machine);
 
 	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
@@ -4386,7 +4383,7 @@ static DRIVER_INIT( cybrcomm )
 
 	namcos22_init(NAMCOS22_CYBER_COMMANDO);
 
-	install_c74_speedup();
+	install_c74_speedup(machine);
 
 	old_coin_state = input_port_read_indexed(machine, 1) & 0x1200;
 	credits1 = credits2 = 0;
@@ -4401,16 +4398,16 @@ static DRIVER_INIT( cybrcyc )
 
 	namcos22s_init(NAMCOS22_CYBER_CYCLES);
 
-	memory_install_read8_handler(3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
 
-	install_130_speedup();
+	install_130_speedup(machine);
 }
 
 static DRIVER_INIT( timecris )
 {
 	namcos22s_init(NAMCOS22_TIME_CRISIS);
 
-	install_130_speedup();
+	install_130_speedup(machine);
 }
 
 /************************************************************************************/

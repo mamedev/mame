@@ -1281,149 +1281,128 @@ int memory_get_log_unmap(int spacenum)
 
 
 /*-------------------------------------------------
-    memory_install_readX_handler - install dynamic
-    read handler for X-bit case
+    memory_install_handlerX - install
+    dynamic machine read and write handlers for 
+    X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_read_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (handler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_read_handler()");
-	space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT8 *_memory_install_read8_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT16 *_memory_install_read16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT32 *_memory_install_read32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT64 *_memory_install_read64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-
-/*-------------------------------------------------
-    memory_install_writeX_handler - install dynamic
-    write handler for X-bit case
--------------------------------------------------*/
-
-void *_memory_install_write_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (handler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_write_handler()");
-	space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT8 *_memory_install_write8_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT16 *_memory_install_write16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT32 *_memory_install_write32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT64 *_memory_install_write64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_machine_func handler, const char *handler_name)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)handler, Machine, handler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-
-/*-------------------------------------------------
-    memory_install_readwriteX_handler - install
-    dynamic read and write handlers for X-bit case
--------------------------------------------------*/
-
-void *_memory_install_readwrite_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
+void *_memory_install_handler(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_readwrite_handler()");
-	space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, Machine, rhandler_name);
-	space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, Machine, whandler_name);
+		fatalerror("fatal: can only use static banks with memory_install_handler()");
+	if (rhandler != 0)
+		space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, machine, rhandler_name);
+	if (whandler != 0)
+		space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT8 *_memory_install_readwrite8_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
-	space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT16 *_memory_install_readwrite16_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
-	space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT32 *_memory_install_readwrite32_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
-	space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT64 *_memory_install_readwrite64_handler(int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, Machine, rhandler_name);
-	space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, Machine, whandler_name);
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
+}
+
+
+/*-------------------------------------------------
+    memory_install_device_handlerX - 
+    install dynamic device read and write handlers 
+    for X-bit case
+-------------------------------------------------*/
+
+void *_memory_install_device_handler(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
+		fatalerror("fatal: can only use static banks with memory_install_device_handler()");
+	if (rhandler != 0)
+		space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, (void *)device, rhandler_name);
+	if (whandler != 0)
+		space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
+}
+
+UINT8 *_memory_install_device_handler8(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
+}
+
+UINT16 *_memory_install_device_handler16(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
+}
+
+UINT32 *_memory_install_device_handler32(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
+}
+
+UINT64 *_memory_install_device_handler64(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	addrspace_data *space = &cpudata[cpunum].space[spacenum];
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }

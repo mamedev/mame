@@ -2316,7 +2316,7 @@ static DRIVER_INIT( moremorp )
 //      hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, moremorp_0a_read );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, moremorp_0a_read );
 }
 
 
@@ -2712,7 +2712,7 @@ static DRIVER_INIT(4in1boot)
 		memcpy(src,buffer,len);
 		free(buffer);
 	}
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, _4in1_02_read );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, _4in1_02_read );
 }
 
 static DRIVER_INIT(snowbro3)
@@ -2739,7 +2739,7 @@ static READ16_HANDLER( _3in1_read )
 
 static DRIVER_INIT( 3in1semi )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, _3in1_read );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, _3in1_read );
 }
 
 static READ16_HANDLER( cookbib3_read )
@@ -2749,7 +2749,7 @@ static READ16_HANDLER( cookbib3_read )
 
 static DRIVER_INIT( cookbib3 )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, cookbib3_read );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x200001, 0, 0, cookbib3_read );
 }
 
 

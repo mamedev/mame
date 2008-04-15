@@ -32,10 +32,10 @@ extern UINT32 *jaguar_wave_rom;
 void jaguar_dsp_suspend(void);
 void jaguar_dsp_resume(void);
 
-void cojag_sound_init(void);
+void cojag_sound_init(running_machine *machine);
 void cojag_sound_reset(void);
 
-void jaguar_external_int(int state);
+void jaguar_external_int(const device_config *device, int state);
 
 READ16_HANDLER( jaguar_jerry_regs_r );
 WRITE16_HANDLER( jaguar_jerry_regs_w );

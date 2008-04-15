@@ -781,7 +781,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7007, 0, 0, protection_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7007, 0, 0, protection_r);
 }
 
 

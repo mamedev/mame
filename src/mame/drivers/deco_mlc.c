@@ -725,7 +725,7 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	mainCpuIsArm=0;
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound();
 }
 

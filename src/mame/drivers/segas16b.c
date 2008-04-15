@@ -1028,7 +1028,7 @@ static void sound_w(UINT8 data)
 }
 
 
-static void system16b_generic_init(int _rom_board)
+static void system16b_generic_init(running_machine *machine, int _rom_board)
 {
 	/* set the ROM board */
 	rom_board = _rom_board;
@@ -1041,7 +1041,7 @@ static void system16b_generic_init(int _rom_board)
 	workram              = auto_malloc(0x04000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(0, region_info_list[rom_board], sound_w, NULL);
+	segaic16_memory_mapper_init(machine, 0, region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
@@ -1077,9 +1077,9 @@ static MACHINE_RESET( system16b )
 	static const UINT8 alternate_banklist[] = { 0,255,255,255, 255,255,255,3, 255,255,255,2, 255,1,0,255 };
 	int i;
 
-	segaic16_memory_mapper_reset();
+	segaic16_memory_mapper_reset(machine);
 	if (i8751_initial_config != NULL)
-		segaic16_memory_mapper_config(i8751_initial_config);
+		segaic16_memory_mapper_config(machine, i8751_initial_config);
 	segaic16_tilemap_reset(0);
 
 	fd1094_machine_init();
@@ -6060,31 +6060,31 @@ ROM_END
 
 static DRIVER_INIT( generic_5358_small )
 {
-	system16b_generic_init(ROM_BOARD_171_5358_SMALL);
+	system16b_generic_init(machine, ROM_BOARD_171_5358_SMALL);
 }
 
 
 static DRIVER_INIT( generic_5358 )
 {
-	system16b_generic_init(ROM_BOARD_171_5358);
+	system16b_generic_init(machine, ROM_BOARD_171_5358);
 }
 
 
 static DRIVER_INIT( generic_5521 )
 {
-	system16b_generic_init(ROM_BOARD_171_5521);
+	system16b_generic_init(machine, ROM_BOARD_171_5521);
 }
 
 
 static DRIVER_INIT( generic_5704 )
 {
-	system16b_generic_init(ROM_BOARD_171_5704);
+	system16b_generic_init(machine, ROM_BOARD_171_5704);
 }
 
 
 static DRIVER_INIT( generic_5797 )
 {
-	system16b_generic_init(ROM_BOARD_171_5797);
+	system16b_generic_init(machine, ROM_BOARD_171_5797);
 }
 
 
@@ -6262,7 +6262,7 @@ static DRIVER_INIT( wrestwar_8751 )
 
 static DRIVER_INIT( atomicp )
 {
-	system16b_generic_init(ROM_BOARD_ATOMICP);
+	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
 	disable_screen_blanking = 1;
 	segaic16_display_enable = 1;
 	atomicp_sound_rate = 10000;
@@ -6271,7 +6271,7 @@ static DRIVER_INIT( atomicp )
 
 static DRIVER_INIT( snapper )
 {
-	system16b_generic_init(ROM_BOARD_ATOMICP);
+	system16b_generic_init(machine, ROM_BOARD_ATOMICP);
 	disable_screen_blanking = 1;
 	segaic16_display_enable = 1;
 	atomicp_sound_rate = 2500;

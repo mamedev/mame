@@ -523,7 +523,7 @@ static DRIVER_INIT( iqblock )
 	paletteram_2       = rom + 0x12800;
 	iqblock_fgvideoram = rom + 0x16800;
 	iqblock_bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
 	iqblock_video_type=1;
 }
 
@@ -545,7 +545,7 @@ static DRIVER_INIT( grndtour )
 	paletteram_2       = rom + 0x12800;
 	iqblock_fgvideoram = rom + 0x16800;
 	iqblock_bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
 	iqblock_video_type=0;
 }
 

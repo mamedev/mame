@@ -2916,7 +2916,7 @@ static UINT8 megadrive_io_read_data_port_svp(int portnum)
 	return megadrive_io_read_data_port_3button(portnum);
 }
 
-static void svp_init(void)
+static void svp_init(running_machine *machine)
 {
 	UINT8 *ROM;
 
@@ -2924,12 +2924,12 @@ static void svp_init(void)
 
 	/* SVP stuff */
 	svp.dram = auto_malloc(0x20000);
-	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
 	memory_set_bankptr( 2, svp.dram );
-	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM, 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
 
 	svp.iram = auto_malloc(0x800);
 	memory_set_bankptr( 3, svp.iram );
@@ -5186,7 +5186,7 @@ DRIVER_INIT( megadrie )
 DRIVER_INIT( megadsvp )
 {
 	megadriv_init_common(machine);
-	svp_init();
+	svp_init(machine);
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 0;
 	hazemdchoice_megadriv_framerate = 60;
@@ -5218,41 +5218,30 @@ static WRITE8_HANDLER( z80_unmapped_w )
 
 
 /* sets the megadrive z80 to it's normal ports / map */
-void megatech_set_megadrive_z80_as_megadrive_z80(void)
+void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_read8_handler (1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r);
-	memory_install_write8_handler(1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
 	/* catch any addresses that don't get mapped */
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_w);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr( 1, genz80.z80_prgram );
 
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK6);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK6);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK6, SMH_BANK6);
 	memory_set_bankptr( 6, genz80.z80_prgram );
 
 
 	// not allowed??
-//  memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK1);
-//  memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK1);
+//  memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
 
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read);
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read);
-	memory_install_read8_handler (1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data);
-
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_write);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_write);
-
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
-
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_write_68k_banked_data);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read, megadriv_z80_YM2612_write);
+	memory_install_write8_handler    (machine, 1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_write8_handler    (machine, 1, ADDRESS_SPACE_PROGRAM, 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_PROGRAM, 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
 

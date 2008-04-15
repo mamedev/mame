@@ -215,7 +215,7 @@ DRIVER_INIT( dingoe )
 			rom[i] = BITSWAP8(rom[i],7,6,5,0,3,2,1,4);
 	}
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
 
 }
 
@@ -337,25 +337,25 @@ READ8_HANDLER( gmgalax_input_port_2_r )
 DRIVER_INIT( pisces )
 {
 	/* the coin lockout was replaced */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( checkmaj )
 {
 	/* for the title screen */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
 }
 
 DRIVER_INIT( dingo )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, dingo_3000_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x3035, 0x3035, 0, 0, dingo_3035_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, dingo_3000_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3035, 0x3035, 0, 0, dingo_3035_r);
 }
 
 DRIVER_INIT( kingball )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, kingball_IN0_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xa800, 0, 0, kingball_IN1_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, kingball_IN0_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa800, 0xa800, 0, 0, kingball_IN1_r);
 
 	state_save_register_global(kingball_speech_dip);
 	state_save_register_global(kingball_sound);
@@ -376,7 +376,7 @@ static UINT8 decode_mooncrst(UINT8 data,offs_t addr)
 
 DRIVER_INIT( mooncrsu )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( mooncrst )
@@ -393,7 +393,7 @@ DRIVER_INIT( mooncrst )
 
 DRIVER_INIT( mooncrgx )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( moonqsr )
@@ -477,8 +477,8 @@ DRIVER_INIT( azurian )
 {
 	DRIVER_INIT_CALL(pisces);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6800, 0x6800, 0, 0, azurian_IN1_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0, azurian_IN2_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6800, 0x6800, 0, 0, azurian_IN1_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0, azurian_IN2_r);
 }
 
 DRIVER_INIT( 4in1 )
@@ -506,7 +506,7 @@ INTERRUPT_GEN( hunchbks_vh_interrupt )
 DRIVER_INIT( ladybugg )
 {
 /* Doesn't actually use the bank, but it mustn't have a coin lock! */
-memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
+memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( gmgalax )

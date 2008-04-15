@@ -475,57 +475,57 @@ static WRITE16_HANDLER( protection_w )
 		copy_le(&protection_ram[0x0fe0],protection_crc,CRC_LEN);
 }
 
-static void install_protection_handler(const UINT8 *code,const UINT8 *crc)
+static void install_protection_handler(running_machine *machine, const UINT8 *code,const UINT8 *crc)
 {
 	protection_ram = auto_malloc(0x1000);
 	protection_code = code;
 	protection_crc =  crc;
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(1, protection_ram);
 }
 
 static DRIVER_INIT( bchopper )
 {
-	install_protection_handler(bchopper_code,bchopper_crc);
+	install_protection_handler(machine, bchopper_code,bchopper_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( mrheli )
 {
-	install_protection_handler(bchopper_code,mrheli_crc);
+	install_protection_handler(machine, bchopper_code,mrheli_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspirit )
 {
-	install_protection_handler(nspirit_code,nspirit_crc);
+	install_protection_handler(machine, nspirit_code,nspirit_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspiritj )
 {
-	install_protection_handler(nspirit_code,nspiritj_crc);
+	install_protection_handler(machine, nspirit_code,nspiritj_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( imgfight )
 {
-	install_protection_handler(imgfight_code,imgfight_crc);
+	install_protection_handler(machine, imgfight_code,imgfight_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
 }
 
 static DRIVER_INIT( loht )
 {
-	install_protection_handler(loht_code,loht_crc);
+	install_protection_handler(machine, loht_code,loht_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
@@ -546,45 +546,44 @@ static DRIVER_INIT( loht_mcu )
 
 	protection_ram = auto_malloc(0x10000);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_r, m72_main_mcu_w);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 }
 
 
 static DRIVER_INIT( xmultipl )
 {
-	install_protection_handler(xmultipl_code,xmultipl_crc);
+	install_protection_handler(machine, xmultipl_code,xmultipl_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, xmultipl_sample_trigger_w);
 }
 
 static DRIVER_INIT( dbreed72 )
 {
-	install_protection_handler(dbreed72_code,dbreed72_crc);
+	install_protection_handler(machine, dbreed72_code,dbreed72_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dbreed72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
 {
-	install_protection_handler(airduel_code,airduel_crc);
+	install_protection_handler(machine, airduel_code,airduel_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
-	install_protection_handler(dkgenm72_code,dkgenm72_crc);
+	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
 
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( gallop )
 {
-	memory_install_write16_handler(0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
 }
 
 

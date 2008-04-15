@@ -1095,7 +1095,7 @@ static DRIVER_INIT( tmek )
 	atarigen_eeprom_default = NULL;
 	atarigt_is_primrage = 0;
 
-	cage_init(REGION_USER1, 0x4fad);
+	cage_init(machine, REGION_USER1, 0x4fad);
 	cage_set_irq_handler(cage_irq_callback);
 
 	/* setup protection */
@@ -1103,16 +1103,16 @@ static DRIVER_INIT( tmek )
 	protection_w = tmek_protection_w;
 
 	/* temp hack */
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
 }
 
 
-static void primrage_init_common(offs_t cage_speedup)
+static void primrage_init_common(running_machine *machine, offs_t cage_speedup)
 {
 	atarigen_eeprom_default = NULL;
 	atarigt_is_primrage = 1;
 
-	cage_init(REGION_USER1, cage_speedup);
+	cage_init(machine, REGION_USER1, cage_speedup);
 	cage_set_irq_handler(cage_irq_callback);
 
 	/* install protection */
@@ -1120,8 +1120,8 @@ static void primrage_init_common(offs_t cage_speedup)
 	protection_w = primrage_protection_w;
 }
 
-static DRIVER_INIT( primrage ) { primrage_init_common(0x42f2); }
-static DRIVER_INIT( primraga ) { primrage_init_common(0x48a4); }
+static DRIVER_INIT( primrage ) { primrage_init_common(machine, 0x42f2); }
+static DRIVER_INIT( primraga ) { primrage_init_common(machine, 0x48a4); }
 
 
 

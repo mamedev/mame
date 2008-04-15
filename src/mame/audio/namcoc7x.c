@@ -67,10 +67,7 @@ void namcoc7x_on_driver_init(void)
 	// install speedup cheat
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 		if (Machine->config->cpu[cpunum].type == CPU_M37702)
-		{
-			memory_install_read16_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, speedup_r);
-			memory_install_write16_handler(cpunum, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, speedup_w);
-		}
+			memory_install_readwrite16_handler(Machine, cpunum, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }
 
 void namcoc7x_set_host_ram(UINT32 *hostram)

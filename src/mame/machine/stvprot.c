@@ -284,10 +284,9 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_standard_protection(void)
+void install_standard_protection(running_machine *machine)
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, a_bus_ctrl_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x04fffff0, 0x04ffffff, 0, 0, a_bus_ctrl_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, a_bus_ctrl_r, a_bus_ctrl_w);
 }
 
 static READ32_HANDLER(astrass_prot_r)
@@ -318,11 +317,10 @@ static WRITE32_HANDLER(astrass_prot_w)
 	}
 }
 
-void install_astrass_protection(void)
+void install_astrass_protection(running_machine *machine)
 {
 	ctrl_index = -1;
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, astrass_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x04fffff0, 0x04ffffff, 0, 0, astrass_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4fffff0, 0x4ffffff, 0, 0, astrass_prot_r, astrass_prot_w);
 }
 
 
@@ -460,15 +458,13 @@ static WRITE32_HANDLER( decathlt_prot_w )
 
 }
 
-void install_decathlt_protection(void)
+void install_decathlt_protection(running_machine *machine)
 {
 	/* It uploads 2 tables here, then performs what looks like a number of transfers, setting
        a source address of some kind (scrambled?) and then making many reads from a single address */
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x37FFFF0, 0x37FFFFF, 0, 0, decathlt_prot_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x37FFFF0, 0x37FFFFF, 0, 0, decathlt_prot_w);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x37FFFF0, 0x37FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
 	/* It uploads 2 tables here too, but nothing else, mirror? unused? */
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_r);
-//  memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_w);
+//  memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
 }
 
 void stv_register_protection_savestates(void)

@@ -935,7 +935,7 @@ ROM_END
 
 static DRIVER_INIT( coolpool )
 {
-	memory_install_read16_handler(1, ADDRESS_SPACE_IO, 0x07, 0x07, 0, 0, coolpool_input_r);
+	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_IO, 0x07, 0x07, 0, 0, coolpool_input_r);
 }
 
 

@@ -666,7 +666,7 @@ static DRIVER_INIT( ataxx )
 	leland_rotate_memory(1);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x03, 0, 0, ataxx_trackball_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x03, 0, 0, ataxx_trackball_r);
 }
 
 
@@ -689,7 +689,7 @@ static DRIVER_INIT( ataxxj )
 	leland_rotate_memory(1);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x03, 0, 0, ataxx_trackball_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x03, 0, 0, ataxx_trackball_r);
 }
 
 
@@ -712,9 +712,9 @@ static DRIVER_INIT( wsf )
 	leland_rotate_memory(1);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
 }
 
 
@@ -737,14 +737,14 @@ static DRIVER_INIT( indyheat )
 	leland_rotate_memory(1);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x00, 0x02, 0, 0, indyheat_wheel_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x08, 0x0b, 0, 0, indyheat_analog_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_9_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_10_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x02, 0, 0, indyheat_wheel_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x08, 0x0b, 0, 0, indyheat_analog_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_9_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_10_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_11_r);
 
 	/* set up additional output ports */
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x08, 0x0b, 0, 0, indyheat_analog_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x08, 0x0b, 0, 0, indyheat_analog_w);
 }
 
 
@@ -767,9 +767,9 @@ static DRIVER_INIT( brutforc )
 	leland_rotate_memory(1);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
 }
 
 
@@ -792,13 +792,13 @@ static DRIVER_INIT( asylum )
 	leland_rotate_memory(1);
 
 	/* asylum appears to have some extra RAM for the slave CPU */
-	memory_install_readwrite8_handler(1, ADDRESS_SPACE_PROGRAM, 0xf000, 0xfffb, 0, 0, SMH_BANK4, SMH_BANK4);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xf000, 0xfffb, 0, 0, SMH_BANK4, SMH_BANK4);
 	memory_set_bankptr(4, auto_malloc(0x1000));
 
 	/* set up additional input ports */
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
 }
 
 

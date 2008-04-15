@@ -1178,8 +1178,8 @@ static DRIVER_INIT( abattle )
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
 
@@ -1192,8 +1192,8 @@ static DRIVER_INIT( afire )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
 }
 
 
@@ -1206,8 +1206,8 @@ static DRIVER_INIT( sstarbtl )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
 

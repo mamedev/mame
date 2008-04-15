@@ -1018,7 +1018,7 @@ ROM_END
 static DRIVER_INIT( condor )
 {
 	/* additional inputs for coinage */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5000, 0, 0, port_tag_to_handler8("DSW1") );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x5000, 0, 0, port_tag_to_handler8("DSW1") );
 }
 
 static DRIVER_INIT( survival )

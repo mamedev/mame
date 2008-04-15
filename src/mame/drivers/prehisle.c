@@ -371,7 +371,7 @@ static READ16_HANDLER( world_cycle_r )
 
 static DRIVER_INIT( prehisle )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, world_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, world_cycle_r);
 }
 
 static READ16_HANDLER( usa_cycle_r )
@@ -388,7 +388,7 @@ static READ16_HANDLER( usa_cycle_r )
 
 static DRIVER_INIT( prehislu )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, usa_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, usa_cycle_r);
 }
 
 static READ16_HANDLER( jap_cycle_r )
@@ -405,7 +405,7 @@ static READ16_HANDLER( jap_cycle_r )
 
 static DRIVER_INIT( gensitou )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, jap_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, jap_cycle_r);
 }
 
 /******************************************************************************/

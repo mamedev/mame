@@ -418,7 +418,7 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode();
 
 	/* install a protection (?) workaround */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
 }
 
 

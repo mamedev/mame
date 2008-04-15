@@ -916,13 +916,13 @@ static DRIVER_INIT (paradise)
 static DRIVER_INIT (tgtball)
 {
 	paradise_sprite_inc = 4;
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
 }
 
 static DRIVER_INIT (torus)
 {
 	paradise_sprite_inc = 4;
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
 }
 
 

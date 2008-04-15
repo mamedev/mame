@@ -658,7 +658,7 @@ static WRITE16_HANDLER( twrldc94_mcu_w )
 
 static DRIVER_INIT( twrldc94 )
 {
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
 }
 
 /*** GAME DRIVERS ************************************************************/

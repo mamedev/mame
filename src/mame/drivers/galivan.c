@@ -1038,16 +1038,16 @@ static WRITE8_HANDLER( youmab_84_w )
 
 static DRIVER_INIT( youmab )
 {
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, SMH_BANK2);
 	memory_set_bankptr( 2, memory_region(REGION_USER2) );
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
-	memory_install_write8_handler(0, ADDRESS_SPACE_IO, 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
 
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xd81f, 0, 0, SMH_NOP); // scrolling isn't here..
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xd81f, 0, 0, SMH_NOP); // scrolling isn't here..
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
 
 }
 

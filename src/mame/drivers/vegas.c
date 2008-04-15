@@ -484,8 +484,11 @@ static struct dynamic_address
 {
 	offs_t			start;
 	offs_t			end;
-	read32_machine_func	read;
-	write32_machine_func	write;
+	read32_machine_func	mread;
+	write32_machine_func mwrite;
+	read32_device_func	dread;
+	write32_device_func dwrite;
+	const device_config *device;
 	const char *	rdname;
 	const char *	wrname;
 } dynamic[MAX_DYNAMIC_ADDRESSES];
@@ -501,8 +504,8 @@ static struct dynamic_address
 
 static void vblank_assert(int state);
 static TIMER_CALLBACK( nile_timer_callback );
-static void ide_interrupt(int state);
-static void remap_dynamic_addresses(void);
+static void ide_interrupt(const device_config *device, int state);
+static void remap_dynamic_addresses(running_machine *machine);
 
 
 
@@ -595,7 +598,7 @@ static MACHINE_RESET( vegas )
 	}
 
 	/* reset subsystems */
-	ide_controller_reset(0);
+	devtag_reset(machine, IDE_CONTROLLER, "ide");
 	voodoo_reset(0);
 	smc91c94_reset();
 
@@ -772,22 +775,22 @@ static WRITE32_HANDLER( pci_ide_w )
 	{
 		case 0x04:		/* address register */
 			pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses();
+			remap_dynamic_addresses(machine);
 			break;
 
 		case 0x05:		/* address register */
 			pci_ide_regs[offset] &= 0xfffffffc;
-			remap_dynamic_addresses();
+			remap_dynamic_addresses(machine);
 			break;
 
 		case 0x08:		/* address register */
 			pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses();
+			remap_dynamic_addresses(machine);
 			break;
 
 		case 0x14:		/* interrupt pending */
 			if (data & 4)
-				ide_interrupt(0);
+				ide_interrupt(device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide"), 0);
 			break;
 	}
 	if (LOG_PCI)
@@ -845,14 +848,14 @@ static WRITE32_HANDLER( pci_3dfx_w )
 				pci_3dfx_regs[offset] &= 0xff000000;
 			else
 				pci_3dfx_regs[offset] &= 0xfe000000;
-			remap_dynamic_addresses();
+			remap_dynamic_addresses(machine);
 			break;
 
 		case 0x05:		/* address register */
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				pci_3dfx_regs[offset] &= 0xfe000000;
-				remap_dynamic_addresses();
+				remap_dynamic_addresses(machine);
 			}
 			break;
 
@@ -860,7 +863,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				pci_3dfx_regs[offset] &= 0xffffff00;
-				remap_dynamic_addresses();
+				remap_dynamic_addresses(machine);
 			}
 			break;
 
@@ -868,7 +871,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= VOODOO_BANSHEE)
 			{
 				pci_3dfx_regs[offset] &= 0xffff0000;
-				remap_dynamic_addresses();
+				remap_dynamic_addresses(machine);
 			}
 			break;
 
@@ -1159,7 +1162,7 @@ static WRITE32_HANDLER( nile_w )
 
 		case NREG_PCIINIT1+0:	/* PCI master */
 			if (((olddata & 0xe) == 0xa) != ((nile_regs[offset] & 0xe) == 0xa))
-				remap_dynamic_addresses();
+				remap_dynamic_addresses(machine);
 			logit = 0;
 			break;
 
@@ -1247,7 +1250,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_DCS8:
 		case NREG_PCIW0:
 		case NREG_PCIW1:
-			remap_dynamic_addresses();
+			remap_dynamic_addresses(machine);
 			break;
 	}
 
@@ -1263,7 +1266,7 @@ static WRITE32_HANDLER( nile_w )
  *
  *************************************/
 
-static void ide_interrupt(int state)
+static void ide_interrupt(const device_config *device, int state)
 {
 	ide_irq_state = state;
 	if (state)
@@ -1272,11 +1275,6 @@ static void ide_interrupt(int state)
 		nile_irq_state &= ~0x800;
 	update_nile_irqs();
 }
-
-static const struct ide_interface ide_intf =
-{
-	ide_interrupt
-};
 
 
 
@@ -1480,27 +1478,27 @@ static WRITE32_HANDLER( asic_fifo_w )
 }
 
 
-static READ32_HANDLER( ide_main_r )
+static READ32_DEVICE_HANDLER( ide_main_r )
 {
-	return ide_controller32_0_r(machine, 0x1f0/4 + offset, mem_mask);
+	return ide_controller32_r(device, 0x1f0/4 + offset, mem_mask);
 }
 
 
-static WRITE32_HANDLER( ide_main_w )
+static WRITE32_DEVICE_HANDLER( ide_main_w )
 {
-	ide_controller32_0_w(machine, 0x1f0/4 + offset, data, mem_mask);
+	ide_controller32_w(device, 0x1f0/4 + offset, data, mem_mask);
 }
 
 
-static READ32_HANDLER( ide_alt_r )
+static READ32_DEVICE_HANDLER( ide_alt_r )
 {
-	return ide_controller32_0_r(machine, 0x3f4/4 + offset, mem_mask);
+	return ide_controller32_r(device, 0x3f4/4 + offset, mem_mask);
 }
 
 
-static WRITE32_HANDLER( ide_alt_w )
+static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
-	ide_controller32_0_w(machine, 0x3f4/4 + offset, data, mem_mask);
+	ide_controller32_w(device, 0x3f4/4 + offset, data, mem_mask);
 }
 
 
@@ -1537,31 +1535,47 @@ static WRITE32_HANDLER( dcs3_fifo_full_w )
  *
  *************************************/
 
-#define add_dynamic_address(s,e,r,w)	_add_dynamic_address(s,e,r,w,#r,#w)
+#define add_dynamic_address(s,e,r,w)			_add_dynamic_address(s,e,r,w,#r,#w)
+#define add_dynamic_device_address(d,s,e,r,w)	_add_dynamic_device_address(d,s,e,r,w,#r,#w)
 
 INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_machine_func read, write32_machine_func write, const char *rdname, const char *wrname)
 {
 	dynamic[dynamic_count].start = start;
 	dynamic[dynamic_count].end = end;
-	dynamic[dynamic_count].read = read;
-	dynamic[dynamic_count].write = write;
+	dynamic[dynamic_count].mread = read;
+	dynamic[dynamic_count].mwrite = write;
+	dynamic[dynamic_count].dread = NULL;
+	dynamic[dynamic_count].dwrite = NULL;
+	dynamic[dynamic_count].device = NULL;
+	dynamic[dynamic_count].rdname = rdname;
+	dynamic[dynamic_count].wrname = wrname;
+	dynamic_count++;
+}
+
+INLINE void _add_dynamic_device_address(const device_config *device, offs_t start, offs_t end, read32_device_func read, write32_device_func write, const char *rdname, const char *wrname)
+{
+	dynamic[dynamic_count].start = start;
+	dynamic[dynamic_count].end = end;
+	dynamic[dynamic_count].mread = NULL;
+	dynamic[dynamic_count].mwrite = NULL;
+	dynamic[dynamic_count].dread = read;
+	dynamic[dynamic_count].dwrite = write;
+	dynamic[dynamic_count].device = device;
 	dynamic[dynamic_count].rdname = rdname;
 	dynamic[dynamic_count].wrname = wrname;
 	dynamic_count++;
 }
 
 
-static void remap_dynamic_addresses(void)
+static void remap_dynamic_addresses(running_machine *machine)
 {
+	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
 	offs_t base;
 	int addr;
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
-	{
-		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_NOP);
-		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_NOP);
-	}
+		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	/* the build the list of stuff */
 	dynamic_count = 0;
@@ -1639,15 +1653,15 @@ static void remap_dynamic_addresses(void)
 		/* IDE controller */
 		base = pci_ide_regs[0x04] & 0xfffffff0;
 		if (base >= ramsize && base < 0x20000000)
-			add_dynamic_address(base + 0x0000, base + 0x000f, ide_main_r, ide_main_w);
+			add_dynamic_device_address(ide, base + 0x0000, base + 0x000f, ide_main_r, ide_main_w);
 
 		base = pci_ide_regs[0x05] & 0xfffffffc;
 		if (base >= ramsize && base < 0x20000000)
-			add_dynamic_address(base + 0x0000, base + 0x0003, ide_alt_r, ide_alt_w);
+			add_dynamic_device_address(ide, base + 0x0000, base + 0x0003, ide_alt_r, ide_alt_w);
 
 		base = pci_ide_regs[0x08] & 0xfffffff0;
 		if (base >= ramsize && base < 0x20000000)
-			add_dynamic_address(base + 0x0000, base + 0x0007, ide_bus_master32_0_r, ide_bus_master32_0_w);
+			add_dynamic_device_address(ide, base + 0x0000, base + 0x0007, ide_bus_master32_r, ide_bus_master32_w);
 
 		/* 3dfx card */
 		base = pci_3dfx_regs[0x04] & 0xfffffff0;
@@ -1680,10 +1694,10 @@ static void remap_dynamic_addresses(void)
 	for (addr = 0; addr < dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
-		if (dynamic[addr].read)
-			_memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].read, dynamic[addr].wrname);
-		if (dynamic[addr].write)
-			_memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].write, dynamic[addr].wrname);
+		if (dynamic[addr].mread != NULL || dynamic[addr].mwrite != NULL)
+			_memory_install_handler32(machine, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
+			_memory_install_device_handler32(dynamic[addr].device, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 	}
 
 	if (LOG_DYNAMIC)
@@ -2220,6 +2234,8 @@ static MACHINE_DRIVER_START( vegascore )
 
 	MDRV_MACHINE_RESET(vegas)
 	MDRV_NVRAM_HANDLER(timekeeper_save)
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2438,7 +2454,7 @@ ROM_END
  *
  *************************************/
 
-static void init_common(int ioasic, int serialnum)
+static void init_common(running_machine *machine, int ioasic, int serialnum)
 {
 	static const struct smc91c9x_interface ethernet_intf =
 	{
@@ -2446,7 +2462,6 @@ static void init_common(int ioasic, int serialnum)
 	};
 
 	/* initialize the subsystems */
-	ide_controller_init(0, &ide_intf);
 	midway_ioasic_init(ioasic, serialnum, 80, ioasic_irq);
 	midway_ioasic_set_auto_ack(1);
 	smc91c94_init(&ethernet_intf);
@@ -2470,8 +2485,8 @@ static void add_speedup(offs_t pc, UINT32 op)
 
 static DRIVER_INIT( gauntleg )
 {
-	dcs2_init(4, 0x0b5d);
-	init_common(MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
+	dcs2_init(machine, 4, 0x0b5d);
+	init_common(machine, MIDWAY_IOASIC_CALSPEED, 340/* 340=39", 322=27", others? */);
 
 	/* speedups */
 	add_speedup(0x80015430, 0x8CC38060);		/* confirmed */
@@ -2483,8 +2498,8 @@ static DRIVER_INIT( gauntleg )
 
 static DRIVER_INIT( gauntdl )
 {
-	dcs2_init(4, 0x0b5d);
-	init_common(MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
+	dcs2_init(machine, 4, 0x0b5d);
+	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 346/* 347, others? */);
 
 	/* speedups */
 	add_speedup(0x800158B8, 0x8CC3CC40);		/* confirmed */
@@ -2496,8 +2511,8 @@ static DRIVER_INIT( gauntdl )
 
 static DRIVER_INIT( warfa )
 {
-	dcs2_init(4, 0x0b5d);
-	init_common(MIDWAY_IOASIC_MACE, 337/* others? */);
+	dcs2_init(machine, 4, 0x0b5d);
+	init_common(machine, MIDWAY_IOASIC_MACE, 337/* others? */);
 
 	/* speedups */
 	add_speedup(0x8009436C, 0x0C031663);		/* confirmed */
@@ -2506,8 +2521,8 @@ static DRIVER_INIT( warfa )
 
 static DRIVER_INIT( tenthdeg )
 {
-	dcs2_init(4, 0x0afb);
-	init_common(MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
+	dcs2_init(machine, 4, 0x0afb);
+	init_common(machine, MIDWAY_IOASIC_GAUNTDL, 330/* others? */);
 
 	/* speedups */
 	add_speedup(0x80051CD8, 0x0C023C15);		/* confirmed */
@@ -2519,51 +2534,51 @@ static DRIVER_INIT( tenthdeg )
 
 static DRIVER_INIT( roadburn )
 {
-	dcs2_init(4, 0);	/* no place to hook :-( */
-	init_common(MIDWAY_IOASIC_STANDARD, 325/* others? */);
+	dcs2_init(machine, 4, 0);	/* no place to hook :-( */
+	init_common(machine, MIDWAY_IOASIC_STANDARD, 325/* others? */);
 }
 
 
 static DRIVER_INIT( nbashowt )
 {
-	dcs2_init(4, 0);
-	init_common(MIDWAY_IOASIC_MACE, 528/* or 478 or 487 */);
+	dcs2_init(machine, 4, 0);
+	init_common(machine, MIDWAY_IOASIC_MACE, 528/* or 478 or 487 */);
 }
 
 
 static DRIVER_INIT( nbanfl )
 {
-	dcs2_init(4, 0);
-	init_common(MIDWAY_IOASIC_BLITZ99, 498/* or 478 or 487 */);
+	dcs2_init(machine, 4, 0);
+	init_common(machine, MIDWAY_IOASIC_BLITZ99, 498/* or 478 or 487 */);
 	/* NOT: MACE */
 }
 
 
 static DRIVER_INIT( sf2049 )
 {
-	dcs2_init(8, 0);
-	init_common(MIDWAY_IOASIC_STANDARD, 336/* others? */);
+	dcs2_init(machine, 8, 0);
+	init_common(machine, MIDWAY_IOASIC_STANDARD, 336/* others? */);
 }
 
 
 static DRIVER_INIT( sf2049se )
 {
-	dcs2_init(8, 0);
-	init_common(MIDWAY_IOASIC_SFRUSHRK, 336/* others? */);
+	dcs2_init(machine, 8, 0);
+	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 336/* others? */);
 }
 
 
 static DRIVER_INIT( sf2049te )
 {
-	dcs2_init(8, 0);
-	init_common(MIDWAY_IOASIC_SFRUSHRK, 348/* others? */);
+	dcs2_init(machine, 8, 0);
+	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 348/* others? */);
 }
 
 
 static DRIVER_INIT( cartfury )
 {
-	dcs2_init(4, 0);
-	init_common(MIDWAY_IOASIC_CARNEVIL, 495/* others? */);
+	dcs2_init(machine, 4, 0);
+	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 495/* others? */);
 }
 
 

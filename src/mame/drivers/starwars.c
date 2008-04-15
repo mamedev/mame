@@ -578,11 +578,10 @@ static DRIVER_INIT( esb )
 	memory_set_opbase_handler(0, esb_setopbase);
 
 	/* install read/write handlers for it */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
 
 	/* install additional banking */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, SMH_BANK2);
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;

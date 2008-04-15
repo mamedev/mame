@@ -2088,7 +2088,7 @@ static DRIVER_INIT( tfrceacb )
 {
 	/* disable the palette bank switching from the protection chip */
 	segac2_common_init(NULL);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x800001, 0, 0, SMH_NOP);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x800001, 0, 0, SMH_NOP);
 }
 
 static DRIVER_INIT( borench )
@@ -2173,36 +2173,36 @@ static DRIVER_INIT( pclub )
 {
 	segac2_common_init(prot_func_pclub);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 static DRIVER_INIT( pclubjv2 )
 {
 	segac2_common_init(prot_func_pclubjv2);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 static DRIVER_INIT( pclubjv4 )
 {
 	segac2_common_init(prot_func_pclubjv4);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 static DRIVER_INIT( pclubjv5 )
 {
 	segac2_common_init(prot_func_pclubjv5);
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, print_club_camera_w);
 }
 
 

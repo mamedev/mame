@@ -2470,8 +2470,7 @@ static DRIVER_INIT( twotiger )
 	mcr_init(90010, 91399, 90913);
 	mcr_sound_init(MCR_SSIO);
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
 }
 
 

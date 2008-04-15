@@ -1101,8 +1101,7 @@ static DRIVER_INIT( zookeep )
 
 static DRIVER_INIT( slither )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9bff, 0, 0, pia_1_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9bff, 0, 0, pia_1_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9bff, 0, 0, pia_1_r, pia_1_w);
 }
 
 

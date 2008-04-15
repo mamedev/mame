@@ -160,7 +160,7 @@ static UINT8 sound_r(void)
 }
 
 
-static void system18_generic_init(int _rom_board)
+static void system18_generic_init(running_machine *machine, int _rom_board)
 {
 	/* set the ROM board */
 	rom_board = _rom_board;
@@ -173,7 +173,7 @@ static void system18_generic_init(int _rom_board)
 	workram              = auto_malloc(0x04000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(0, region_info_list[rom_board], sound_w, sound_r);
+	segaic16_memory_mapper_init(machine, 0, region_info_list[rom_board], sound_w, sound_r);
 
 	/* init the FD1094 */
 	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
@@ -199,7 +199,7 @@ static TIMER_CALLBACK( boost_interleave )
 
 static MACHINE_RESET( system18 )
 {
-	segaic16_memory_mapper_reset();
+	segaic16_memory_mapper_reset(machine);
 	segaic16_tilemap_reset(0);
 	fd1094_machine_init();
 
@@ -2199,17 +2199,17 @@ ROM_END
 
 static DRIVER_INIT( generic_shad )
 {
-	system18_generic_init(ROM_BOARD_171_SHADOW);
+	system18_generic_init(machine, ROM_BOARD_171_SHADOW);
 }
 
 static DRIVER_INIT( generic_5874 )
 {
-	system18_generic_init(ROM_BOARD_171_5874);
+	system18_generic_init(machine, ROM_BOARD_171_5874);
 }
 
 static DRIVER_INIT( generic_5987 )
 {
-	system18_generic_init(ROM_BOARD_171_5987);
+	system18_generic_init(machine, ROM_BOARD_171_5987);
 }
 
 

@@ -3551,8 +3551,8 @@ static DRIVER_INIT(konamigx)
 			switch (gameDefs[i].special)
 	{
 				case 1:	// LE2 guns
-		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
-		memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
+		memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
+		memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
 					break;
 
 				case 2:	// tkmmpzdm hack
@@ -3588,7 +3588,7 @@ static DRIVER_INIT(konamigx)
 					break;
 
 				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
-		memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
+		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
 					break;
 
 				case 8: // tbyahhoo
@@ -3603,14 +3603,14 @@ static DRIVER_INIT(konamigx)
 	switch (readback)
 	{
 		case BPP5:
-			memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
 		break;
 
 		case BPP66:
-			memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
 
 		case BPP6:
-			memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
+			memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
 		break;
 	}
 

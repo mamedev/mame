@@ -3045,7 +3045,7 @@ static DRIVER_INIT( cps3_speedups )
 
 	//printf("speedup %08x %08x\n",cps3_speedup_ram_address,cps3_speedup_code_address);
 
-	if (cps3_speedup_code_address!=0) memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
+	if (cps3_speedup_code_address!=0) memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
 }
 
 

@@ -85,7 +85,7 @@ static struct compare_timer_chip compare_timer[2];
  *
  *************************************/
 
-static void update_memory_mapping(struct memory_mapper_chip *chip);
+static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip);
 
 
 
@@ -127,7 +127,7 @@ READ16_HANDLER( segaic16_open_bus_r )
  *
  *************************************/
 
-void segaic16_memory_mapper_init(int cpunum, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void))
+void segaic16_memory_mapper_init(running_machine *machine, int cpunum, const struct segaic16_memory_map_entry *entrylist, void (*sound_w_callback)(UINT8), UINT8 (*sound_r_callback)(void))
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
@@ -139,27 +139,27 @@ void segaic16_memory_mapper_init(int cpunum, const struct segaic16_memory_map_en
 	chip->sound_r = sound_r_callback;
 
 	/* create the initial regions */
-	segaic16_memory_mapper_reset();
+	segaic16_memory_mapper_reset(machine);
 }
 
 
-void segaic16_memory_mapper_reset(void)
+void segaic16_memory_mapper_reset(running_machine *machine)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
 	/* zap to 0 and remap everything */
 	memset(chip->regs, 0, sizeof(chip->regs));
-	update_memory_mapping(chip);
+	update_memory_mapping(machine, chip);
 }
 
 
-void segaic16_memory_mapper_config(const UINT8 *map_data)
+void segaic16_memory_mapper_config(running_machine *machine, const UINT8 *map_data)
 {
 	struct memory_mapper_chip *chip = &memory_mapper;
 
 	/* zap to 0 and remap everything */
 	memcpy(&chip->regs[0x10], map_data, 0x10);
-	update_memory_mapping(chip);
+	update_memory_mapping(machine, chip);
 }
 
 
@@ -198,7 +198,7 @@ void segaic16_memory_mapper_set_decrypted(UINT8 *decrypted)
 }
 
 
-static void memory_mapper_w(struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
+static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
 {
 	UINT8 oldval;
 
@@ -275,7 +275,7 @@ static void memory_mapper_w(struct memory_mapper_chip *chip, offs_t offset, UINT
 		case 0x1c:	case 0x1d:
 		case 0x1e:	case 0x1f:
 			if (oldval != data)
-				update_memory_mapping(chip);
+				update_memory_mapping(machine, chip);
 			break;
 
 		default:
@@ -323,15 +323,14 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 }
 
 
-static void update_memory_mapping(struct memory_mapper_chip *chip)
+static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip)
 {
 	int rgnum;
 
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_read16_handler (chip->cpunum, ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r);
-	memory_install_write16_handler(chip->cpunum, ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_w);
+	memory_install_readwrite16_handler(machine, chip->cpunum, ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
@@ -365,9 +364,9 @@ static void update_memory_mapping(struct memory_mapper_chip *chip)
 
 		/* map it */
 		if (read)
-			memory_install_read16_handler(chip->cpunum, ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
+			memory_install_read16_handler(machine, chip->cpunum, ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
 		if (write)
-			memory_install_write16_handler(chip->cpunum, ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
+			memory_install_write16_handler(machine, chip->cpunum, ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
 
 		/* set the bank pointer */
 		if (banknum && read)
@@ -405,7 +404,7 @@ READ8_HANDLER( segaic16_memory_mapper_r )
 
 WRITE8_HANDLER( segaic16_memory_mapper_w )
 {
-	memory_mapper_w(&memory_mapper, offset, data);
+	memory_mapper_w(machine, &memory_mapper, offset, data);
 }
 
 
@@ -418,7 +417,7 @@ READ16_HANDLER( segaic16_memory_mapper_lsb_r )
 WRITE16_HANDLER( segaic16_memory_mapper_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_mapper_w(&memory_mapper, offset, data & 0xff);
+		memory_mapper_w(machine, &memory_mapper, offset, data & 0xff);
 }
 
 

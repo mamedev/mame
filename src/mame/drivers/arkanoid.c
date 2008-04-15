@@ -1082,47 +1082,47 @@ ROM_END
 
 /* Driver Initialization */
 
-static void arkanoid_bootleg_init( void )
+static void arkanoid_bootleg_init( running_machine *machine )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
 }
 
 static DRIVER_INIT( arkangc )
 {
 	arkanoid_bootleg_id = ARKANGC;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkangc2 )
 {
 	arkanoid_bootleg_id = ARKANGC2;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkblock )
 {
 	arkanoid_bootleg_id = ARKBLOCK;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkbloc2 )
 {
 	arkanoid_bootleg_id = ARKBLOC2;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( arkgcbl )
 {
 	arkanoid_bootleg_id = ARKGCBL;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 static DRIVER_INIT( paddle2 )
 {
 	arkanoid_bootleg_id = PADDLE2;
-	arkanoid_bootleg_init();
+	arkanoid_bootleg_init(machine);
 }
 
 

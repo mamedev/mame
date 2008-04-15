@@ -3167,7 +3167,7 @@ static DRIVER_INIT( jongbou )
 
 	alpha68k_video_banking = jongbou_video_banking;
 
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
 }
 
 static DRIVER_INIT( paddlema )
@@ -3178,7 +3178,7 @@ static DRIVER_INIT( paddlema )
 
 static DRIVER_INIT( timesold )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, timesold_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, timesold_cycle_r);
 	invert_controls=0;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3186,7 +3186,7 @@ static DRIVER_INIT( timesold )
 
 static DRIVER_INIT( timesol1 )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, timesol1_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, timesol1_cycle_r);
 	invert_controls=1;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3194,7 +3194,7 @@ static DRIVER_INIT( timesol1 )
 
 static DRIVER_INIT( btlfield )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, btlfield_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, btlfield_cycle_r);
 	invert_controls=1;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3209,7 +3209,7 @@ static DRIVER_INIT( btlfildb )
 
 static DRIVER_INIT( skysoldr )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
 	memory_set_bankptr(8, (memory_region(REGION_USER1))+0x40000);
 	invert_controls=0;
 	microcontroller_id=0;
@@ -3233,7 +3233,7 @@ static DRIVER_INIT( goldmeda )
 
 static DRIVER_INIT( skyadvnt )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
 	invert_controls=0;
 	microcontroller_id=0x8814;
 	coin_id=0x22|(0x22<<8);
@@ -3241,7 +3241,7 @@ static DRIVER_INIT( skyadvnt )
 
 static DRIVER_INIT( skyadvnu )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40008, 0x40009, 0, 0, skyadvnt_cycle_r);
 	invert_controls=0;
 	microcontroller_id=0x8814;
 	coin_id=0x23|(0x24<<8);
@@ -3249,7 +3249,7 @@ static DRIVER_INIT( skyadvnu )
 
 static DRIVER_INIT( gangwars )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
 	memory_set_bankptr(8, memory_region(REGION_USER1));
 	invert_controls=0;
 	microcontroller_id=0x8512;
@@ -3258,7 +3258,7 @@ static DRIVER_INIT( gangwars )
 
 static DRIVER_INIT( gangwarb )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
 	memory_set_bankptr(8, memory_region(REGION_USER1));
 	invert_controls=0;
 	microcontroller_id=0x8512;

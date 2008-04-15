@@ -1236,20 +1236,18 @@ ROM_END
 static DRIVER_INIT( gyrodine )
 {
 	/* add watchdog */
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe000, 0, 0, watchdog_reset_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe000, 0, 0, watchdog_reset_w);
 }
 
 
 static DRIVER_INIT( srdmissn )
 {
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_BANK1);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_BANK1);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe7ff, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(1, shared_ram);
 
 	/* extra RAM on sub CPU  */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, SMH_BANK2);
-	memory_install_write8_handler(1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, SMH_BANK2);
+	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x8800, 0x8fff, 0, 0, SMH_BANK2, SMH_BANK2);
 	memory_set_bankptr(2, auto_malloc(0x800));
 }
 

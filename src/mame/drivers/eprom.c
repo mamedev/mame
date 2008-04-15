@@ -733,10 +733,8 @@ static DRIVER_INIT( eprom )
 	atarijsa_init(machine, 1, 0x0002);
 
 	/* install CPU synchronization handlers */
-	sync_data = memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_r);
-	sync_data = memory_install_read16_handler(1, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_r);
-	sync_data = memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_w);
-	sync_data = memory_install_write16_handler(1, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_w);
+	sync_data = memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
+	sync_data = memory_install_readwrite16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
 }
 
 

@@ -1457,16 +1457,15 @@ static DRIVER_INIT( razmataz )
 	DRIVER_INIT_CALL(zaxxon);
 
 	/* additional input ports are wired */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, port_tag_to_handler8("SW08"));
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, port_tag_to_handler8("SW0C"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, port_tag_to_handler8("SW08"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, port_tag_to_handler8("SW0C"));
 
 	/* unknown behavior expected here */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
 
 	/* connect the universal sound board */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_data_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 
 	/* additional state saving */
 	state_save_register_global_array(razmataz_dial_pos);
@@ -1480,8 +1479,7 @@ static DRIVER_INIT( ixion )
 	DRIVER_INIT_CALL(zaxxon);
 
 	/* connect the universal sound board */
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r);
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_data_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 }
 
 

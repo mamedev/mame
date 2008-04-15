@@ -1595,8 +1595,7 @@ ROM_END
 
 static DRIVER_INIT( tigerh )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, tigerh_mcu_r );
-	memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, tigerh_mcu_w  );
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
 
 }
 
@@ -1608,13 +1607,13 @@ static READ8_HANDLER( getstar_mcu_r )
 
 static DRIVER_INIT( getstar )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_r );
-//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_r );
+//  memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
 }
 
 static DRIVER_INIT( getstarb )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_e803_r );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_e803_r );
 }
 
 static READ8_HANDLER( gtstarba_port_0_read )
@@ -1642,8 +1641,8 @@ static READ8_HANDLER( gtstarba_dpram_r )
 
 static DRIVER_INIT( gtstarba )
 {
-	memory_install_read8_handler(0, ADDRESS_SPACE_IO, 0x0, 0x0, 0, 0, gtstarba_port_0_read );
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc80f, 0, 0, gtstarba_dpram_r );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0, 0x0, 0, 0, gtstarba_port_0_read );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc80f, 0, 0, gtstarba_dpram_r );
 }
 
 
@@ -1674,8 +1673,8 @@ static READ8_HANDLER( slapfigh_mcu_r )
 static DRIVER_INIT( slapfigh )
 {
 	slapfigh_prot_pos = 0;
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
-//  memory_install_write8_handler(0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, slapfigh_mcu_r );
+//  memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe803, 0xe803, 0, 0, getstar_mcu_w  );
 }
 
 

@@ -7279,7 +7279,7 @@ static DRIVER_INIT( slammast )
 static DRIVER_INIT( pang3 )
 {
 	/* Pang 3 EEPROM interface is at a different address */
-	memory_install_readwrite16_handler (0, ADDRESS_SPACE_PROGRAM, 0x80017a, 0x80017b, 0, 0, cps1_eeprom_port_r, cps1_eeprom_port_w);
+	memory_install_readwrite16_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x80017a, 0x80017b, 0, 0, cps1_eeprom_port_r, cps1_eeprom_port_w);
 
 	DRIVER_INIT_CALL(cps1);
 }

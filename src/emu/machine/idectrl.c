@@ -10,11 +10,9 @@
 #include "deprecat.h"
 
 
-/*************************************
- *
- *  Debugging
- *
- *************************************/
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
 
 #define VERBOSE						0
 #define PRINTF_IDE_COMMANDS			0
@@ -26,11 +24,9 @@
 
 
 
-/*************************************
- *
- *  Constants
- *
- *************************************/
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 #define IDE_DISK_SECTOR_SIZE			512
 
@@ -97,140 +93,143 @@
 
 
 
-/*************************************
- *
- *  Type definitions
- *
- *************************************/
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-struct ide_state
+typedef struct _ide_state ide_state;
+struct _ide_state
 {
-	UINT8	adapter_control;
-	UINT8	status;
-	UINT8	error;
-	UINT8	command;
-	UINT8	interrupt_pending;
-	UINT8	precomp_offset;
+	const device_config *device;
+	
+	UINT8			adapter_control;
+	UINT8			status;
+	UINT8			error;
+	UINT8			command;
+	UINT8			interrupt_pending;
+	UINT8			precomp_offset;
 
-	UINT8	buffer[IDE_DISK_SECTOR_SIZE];
-	UINT8	features[IDE_DISK_SECTOR_SIZE];
-	UINT16	buffer_offset;
-	UINT16	sector_count;
+	UINT8			buffer[IDE_DISK_SECTOR_SIZE];
+	UINT8			features[IDE_DISK_SECTOR_SIZE];
+	UINT16			buffer_offset;
+	UINT16			sector_count;
 
-	UINT16	block_count;
-	UINT16	sectors_until_int;
-	UINT8	verify_only;
+	UINT16			block_count;
+	UINT16			sectors_until_int;
+	UINT8			verify_only;
 
-	UINT8	dma_active;
-	UINT8	dma_cpu;
-	UINT8	dma_address_xor;
-	UINT8	dma_last_buffer;
-	offs_t	dma_address;
-	offs_t	dma_descriptor;
-	UINT32	dma_bytes_left;
+	UINT8			dma_active;
+	UINT8			dma_cpu;
+	UINT8			dma_address_xor;
+	UINT8			dma_last_buffer;
+	offs_t			dma_address;
+	offs_t			dma_descriptor;
+	UINT32			dma_bytes_left;
 
-	UINT8	bus_master_command;
-	UINT8	bus_master_status;
-	UINT32	bus_master_descriptor;
+	UINT8			bus_master_command;
+	UINT8			bus_master_status;
+	UINT32			bus_master_descriptor;
 
-	UINT16	cur_cylinder;
-	UINT8	cur_sector;
-	UINT8	cur_head;
-	UINT8	cur_head_reg;
+	UINT16			cur_cylinder;
+	UINT8			cur_sector;
+	UINT8			cur_head;
+	UINT8			cur_head_reg;
 
-	UINT32	cur_lba;
+	UINT32			cur_lba;
 
-	UINT16	num_cylinders;
-	UINT8	num_sectors;
-	UINT8	num_heads;
+	UINT16			num_cylinders;
+	UINT8			num_sectors;
+	UINT8			num_heads;
 
-	UINT8	config_unknown;
-	UINT8	config_register[IDE_CONFIG_REGISTERS];
-	UINT8	config_register_num;
+	UINT8			config_unknown;
+	UINT8			config_register[IDE_CONFIG_REGISTERS];
+	UINT8			config_register_num;
 
-	const struct ide_interface *intf;
-	hard_disk_file *	disk;
-	emu_timer *	last_status_timer;
-	emu_timer *	reset_timer;
+	hard_disk_file *disk;
+	emu_timer *		last_status_timer;
+	emu_timer *		reset_timer;
 
-	UINT8	master_password_enable;
-	UINT8	user_password_enable;
+	UINT8			master_password_enable;
+	UINT8			user_password_enable;
 	const UINT8 *	master_password;
 	const UINT8 *	user_password;
 };
 
 
 
-/*************************************
- *
- *  Local variables
- *
- *************************************/
-
-static struct ide_state idestate[MAX_IDE_CONTROLLERS];
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
 static TIMER_CALLBACK( reset_callback );
 
-static void ide_build_features(struct ide_state *ide);
+static void ide_build_features(ide_state *ide);
 
-static void continue_read(struct ide_state *ide);
-static void read_sector_done(struct ide_state *ide);
+static void continue_read(ide_state *ide);
+static void read_sector_done(ide_state *ide);
 static TIMER_CALLBACK( read_sector_done_callback );
-static void read_first_sector(struct ide_state *ide);
-static void read_next_sector(struct ide_state *ide);
+static void read_first_sector(ide_state *ide);
+static void read_next_sector(ide_state *ide);
 
-static UINT32 ide_controller_read(struct ide_state *ide, offs_t offset, int size);
-static void ide_controller_write(struct ide_state *ide, offs_t offset, int size, UINT32 data);
+static UINT32 ide_controller_read(const device_config *device, offs_t offset, int size);
+static void ide_controller_write(const device_config *device, offs_t offset, int size, UINT32 data);
 
 
 
-/*************************************
- *
- *  Interrupts
- *
- *************************************/
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-INLINE void signal_interrupt(struct ide_state *ide)
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, an IDE controller
+-------------------------------------------------*/
+
+INLINE ide_state *get_safe_token(const device_config *device)
 {
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == IDE_CONTROLLER);
+
+	return (ide_state *)device->token;
+}
+
+
+INLINE void signal_interrupt(ide_state *ide)
+{
+	const ide_config *config = ide->device->inline_config;
+	
 	LOG(("IDE interrupt assert\n"));
 
 	/* signal an interrupt */
-	if (ide->intf->interrupt)
-		(*ide->intf->interrupt)(ASSERT_LINE);
+	if (config->interrupt != NULL)
+		(*config->interrupt)(ide->device, ASSERT_LINE);
 	ide->interrupt_pending = 1;
 	ide->bus_master_status |= IDE_BUSMASTER_STATUS_IRQ;
 }
 
 
-INLINE void clear_interrupt(struct ide_state *ide)
+INLINE void clear_interrupt(ide_state *ide)
 {
+	const ide_config *config = ide->device->inline_config;
+
 	LOG(("IDE interrupt clear\n"));
 
 	/* clear an interrupt */
-	if (ide->intf->interrupt)
-		(*ide->intf->interrupt)(CLEAR_LINE);
+	if (config->interrupt != NULL)
+		(*config->interrupt)(ide->device, CLEAR_LINE);
 	ide->interrupt_pending = 0;
 }
 
 
 
-/*************************************
- *
- *  Delayed interrupt handling
- *
- *************************************/
+/***************************************************************************
+    DELAYED INTERRUPT HANDLING
+***************************************************************************/
 
 static TIMER_CALLBACK( delayed_interrupt )
 {
-	struct ide_state *ide = ptr;
+	ide_state *ide = ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	signal_interrupt(ide);
 }
@@ -238,14 +237,14 @@ static TIMER_CALLBACK( delayed_interrupt )
 
 static TIMER_CALLBACK( delayed_interrupt_buffer_ready )
 {
-	struct ide_state *ide = ptr;
+	ide_state *ide = ptr;
 	ide->status &= ~IDE_STATUS_BUSY;
 	ide->status |= IDE_STATUS_BUFFER_READY;
 	signal_interrupt(ide);
 }
 
 
-INLINE void signal_delayed_interrupt(struct ide_state *ide, attotime time, int buffer_ready)
+INLINE void signal_delayed_interrupt(ide_state *ide, attotime time, int buffer_ready)
 {
 	/* clear buffer ready and set the busy flag */
 	ide->status &= ~IDE_STATUS_BUFFER_READY;
@@ -260,163 +259,29 @@ INLINE void signal_delayed_interrupt(struct ide_state *ide, attotime time, int b
 
 
 
-/*************************************
- *
- *  Initialization & reset
- *
- *************************************/
+/***************************************************************************
+    INITIALIZATION AND RESET
+***************************************************************************/
 
-static void ide_controller_exit(running_machine *machine)
+UINT8 *ide_get_features(const device_config *device)
 {
-	int i;
-
-	/* close all open hard disks */
-	for (i = 0; i < MAX_IDE_CONTROLLERS; i++)
-		if (idestate[i].disk)
-		{
-			hard_disk_close(idestate[i].disk);
-			idestate[i].disk = NULL;
-		}
-}
-
-
-int ide_controller_init_custom(int which, const struct ide_interface *intf, chd_file *diskhandle)
-{
-	struct ide_state *ide = &idestate[which];
-	const hard_disk_info *hdinfo;
-
-	/* must be called during init phase */
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "ide_controller_init can only be called at init time");
-	add_exit_callback(Machine, ide_controller_exit);
-
-	/* NULL interface is immediate failure */
-	if (!intf)
-		return 1;
-
-	/* reset the IDE state */
-	memset(ide, 0, sizeof(*ide));
-	ide->intf = intf;
-
-	/* set MAME harddisk handle */
-	ide->disk = hard_disk_open(diskhandle);
-
-	/* get and copy the geometry */
-	if (ide->disk)
-	{
-		hdinfo = hard_disk_get_info(ide->disk);
-		ide->num_cylinders = hdinfo->cylinders;
-		ide->num_sectors = hdinfo->sectors;
-		ide->num_heads = hdinfo->heads;
-		if (hdinfo->sectorbytes != IDE_DISK_SECTOR_SIZE)
-			/* wrong sector len */
-			return 1;
-#if PRINTF_IDE_COMMANDS
-		mame_printf_debug("CHS: %d %d %d\n", ide->num_cylinders, ide->num_heads, ide->num_sectors);
-#endif
-	}
-
-	/* build the features page */
-	ide_build_features(ide);
-
-	/* create a timer for timing status */
-	ide->last_status_timer = timer_alloc(NULL, NULL);
-	ide->reset_timer = timer_alloc(reset_callback, ide);
-
-	/* register ide status */
-	state_save_register_item("ide", which, ide->adapter_control);
-	state_save_register_item("ide", which, ide->status);
-	state_save_register_item("ide", which, ide->error);
-	state_save_register_item("ide", which, ide->command);
-	state_save_register_item("ide", which, ide->interrupt_pending);
-	state_save_register_item("ide", which, ide->precomp_offset);
-
-	state_save_register_item_array("ide", which, ide->buffer);
-	state_save_register_item_array("ide", which, ide->features);
-	state_save_register_item("ide", which, ide->buffer_offset);
-	state_save_register_item("ide", which, ide->sector_count);
-
-	state_save_register_item("ide", which, ide->block_count);
-	state_save_register_item("ide", which, ide->sectors_until_int);
-
-	state_save_register_item("ide", which, ide->dma_active);
-	state_save_register_item("ide", which, ide->dma_cpu);
-	state_save_register_item("ide", which, ide->dma_address_xor);
-	state_save_register_item("ide", which, ide->dma_last_buffer);
-	state_save_register_item("ide", which, ide->dma_address);
-	state_save_register_item("ide", which, ide->dma_descriptor);
-	state_save_register_item("ide", which, ide->dma_bytes_left);
-
-	state_save_register_item("ide", which, ide->bus_master_command);
-	state_save_register_item("ide", which, ide->bus_master_status);
-	state_save_register_item("ide", which, ide->bus_master_descriptor);
-
-	state_save_register_item("ide", which, ide->cur_cylinder);
-	state_save_register_item("ide", which, ide->cur_sector);
-	state_save_register_item("ide", which, ide->cur_head);
-	state_save_register_item("ide", which, ide->cur_head_reg);
-
-	state_save_register_item("ide", which, ide->cur_lba);
-
-	state_save_register_item("ide", which, ide->num_cylinders);
-	state_save_register_item("ide", which, ide->num_sectors);
-	state_save_register_item("ide", which, ide->num_heads);
-
-	state_save_register_item("ide", which, ide->config_unknown);
-	state_save_register_item_array("ide", which, ide->config_register);
-	state_save_register_item("ide", which, ide->config_register_num);
-
-	state_save_register_item("ide", which, ide->master_password_enable);
-	state_save_register_item("ide", which, ide->user_password_enable);
-
-	return 0;
-}
-
-int ide_controller_init(int which, const struct ide_interface *intf)
-{
-	/* we only support one hard disk right now; get a handle to it */
-	return ide_controller_init_custom(which, intf, get_disk_handle(0));
-}
-
-
-static void ide_controller_reset_ptr(struct ide_state *ide)
-{
-	LOG(("IDE controller reset performed\n"));
-
-	/* reset the drive state */
-	ide->status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
-	ide->error = IDE_ERROR_DEFAULT;
-	ide->buffer_offset = 0;
-	ide->master_password_enable = (ide->master_password != NULL);
-	ide->user_password_enable = (ide->user_password != NULL);
-	clear_interrupt(ide);
-}
-
-
-void ide_controller_reset(int which)
-{
-	ide_controller_reset_ptr(&idestate[which]);
-}
-
-
-UINT8 *ide_get_features(int which)
-{
-	struct ide_state *ide = &idestate[which];
+	ide_state *ide = get_safe_token(device);
 	return ide->features;
 }
 
 
-void ide_set_master_password(int which, const UINT8 *password)
+void ide_set_master_password(const device_config *device, const UINT8 *password)
 {
-	struct ide_state *ide = &idestate[which];
+	ide_state *ide = get_safe_token(device);
 
 	ide->master_password = password;
 	ide->master_password_enable = (ide->master_password != NULL);
 }
 
 
-void ide_set_user_password(int which, const UINT8 *password)
+void ide_set_user_password(const device_config *device, const UINT8 *password)
 {
-	struct ide_state *ide = &idestate[which];
+	ide_state *ide = get_safe_token(device);
 
 	ide->user_password = password;
 	ide->user_password_enable = (ide->user_password != NULL);
@@ -425,7 +290,7 @@ void ide_set_user_password(int which, const UINT8 *password)
 
 static TIMER_CALLBACK( reset_callback )
 {
-	ide_controller_reset_ptr(ptr);
+	device_reset(ptr);
 }
 
 
@@ -488,7 +353,7 @@ INLINE int convert_to_offset_and_size16(offs_t *offset, UINT32 mem_mask)
  *
  *************************************/
 
-INLINE UINT32 lba_address(struct ide_state *ide)
+INLINE UINT32 lba_address(ide_state *ide)
 {
 	/* LBA direct? */
 	if (ide->cur_head_reg & 0x40)
@@ -507,7 +372,7 @@ INLINE UINT32 lba_address(struct ide_state *ide)
  *
  *************************************/
 
-INLINE void next_sector(struct ide_state *ide)
+INLINE void next_sector(ide_state *ide)
 {
 	/* LBA direct? */
 	if (ide->cur_head_reg & 0x40)
@@ -561,7 +426,7 @@ static void swap_strncpy(UINT8 *dst, const char *src, int field_size_in_words)
 }
 
 
-static void ide_build_features(struct ide_state *ide)
+static void ide_build_features(ide_state *ide)
 {
 	int total_sectors = ide->num_cylinders * ide->num_heads * ide->num_sectors;
 	int sectors_per_track = ide->num_heads * ide->num_sectors;
@@ -729,14 +594,14 @@ static void ide_build_features(struct ide_state *ide)
 
 static TIMER_CALLBACK( security_error_done )
 {
-	struct ide_state *ide = ptr;
+	ide_state *ide = ptr;
 
 	/* clear error state */
 	ide->status &= ~IDE_STATUS_ERROR;
 	ide->status |= IDE_STATUS_DRIVE_READY;
 }
 
-static void security_error(struct ide_state *ide)
+static void security_error(ide_state *ide)
 {
 	/* set error state */
 	ide->status |= IDE_STATUS_ERROR;
@@ -754,7 +619,7 @@ static void security_error(struct ide_state *ide)
  *
  *************************************/
 
-static void continue_read(struct ide_state *ide)
+static void continue_read(ide_state *ide)
 {
 	/* reset the totals */
 	ide->buffer_offset = 0;
@@ -787,7 +652,7 @@ static void continue_read(struct ide_state *ide)
 }
 
 
-static void write_buffer_to_dma(struct ide_state *ide)
+static void write_buffer_to_dma(ide_state *ide)
 {
 	int bytesleft = IDE_DISK_SECTOR_SIZE;
 	UINT8 *data = ide->buffer;
@@ -834,7 +699,7 @@ static void write_buffer_to_dma(struct ide_state *ide)
 }
 
 
-static void read_sector_done(struct ide_state *ide)
+static void read_sector_done(ide_state *ide)
 {
 	int lba = lba_address(ide), count = 0;
 
@@ -901,7 +766,7 @@ static TIMER_CALLBACK( read_sector_done_callback )
 }
 
 
-static void read_first_sector(struct ide_state *ide)
+static void read_first_sector(ide_state *ide)
 {
 	/* mark ourselves busy */
 	ide->status |= IDE_STATUS_BUSY;
@@ -925,7 +790,7 @@ static void read_first_sector(struct ide_state *ide)
 }
 
 
-static void read_next_sector(struct ide_state *ide)
+static void read_next_sector(ide_state *ide)
 {
 	/* mark ourselves busy */
 	ide->status |= IDE_STATUS_BUSY;
@@ -952,10 +817,10 @@ static void read_next_sector(struct ide_state *ide)
  *
  *************************************/
 
-static void write_sector_done(struct ide_state *ide);
+static void write_sector_done(ide_state *ide);
 static TIMER_CALLBACK( write_sector_done_callback );
 
-static void continue_write(struct ide_state *ide)
+static void continue_write(ide_state *ide)
 {
 	/* reset the totals */
 	ide->buffer_offset = 0;
@@ -985,7 +850,7 @@ static void continue_write(struct ide_state *ide)
 }
 
 
-static void read_buffer_from_dma(struct ide_state *ide)
+static void read_buffer_from_dma(ide_state *ide)
 {
 	int bytesleft = IDE_DISK_SECTOR_SIZE;
 	UINT8 *data = ide->buffer;
@@ -1032,7 +897,7 @@ static void read_buffer_from_dma(struct ide_state *ide)
 }
 
 
-static void write_sector_done(struct ide_state *ide)
+static void write_sector_done(ide_state *ide)
 {
 	int lba = lba_address(ide), count = 0;
 
@@ -1110,7 +975,7 @@ static TIMER_CALLBACK( write_sector_done_callback )
  *
  *************************************/
 
-static void handle_command(struct ide_state *ide, UINT8 command)
+static void handle_command(ide_state *ide, UINT8 command)
 {
 	/* implicitly clear interrupts here */
 	clear_interrupt(ide);
@@ -1309,8 +1174,9 @@ static void handle_command(struct ide_state *ide, UINT8 command)
  *
  *************************************/
 
-static UINT32 ide_controller_read(struct ide_state *ide, offs_t offset, int size)
+static UINT32 ide_controller_read(const device_config *device, offs_t offset, int size)
 {
+	ide_state *ide = get_safe_token(device);
 	UINT32 result = 0;
 
 	/* logit */
@@ -1420,8 +1286,10 @@ static UINT32 ide_controller_read(struct ide_state *ide, offs_t offset, int size
  *
  *************************************/
 
-static void ide_controller_write(struct ide_state *ide, offs_t offset, int size, UINT32 data)
+static void ide_controller_write(const device_config *device, offs_t offset, int size, UINT32 data)
 {
+	ide_state *ide = get_safe_token(device);
+	
 	/* logit */
 	if (offset != IDE_ADDR_DATA)
 		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", activecpu_get_previouspc(), offset, data, size));
@@ -1568,8 +1436,10 @@ static void ide_controller_write(struct ide_state *ide, offs_t offset, int size,
  *
  *************************************/
 
-static UINT32 ide_bus_master_read(struct ide_state *ide, offs_t offset, int size)
+static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, int size)
 {
+	ide_state *ide = get_safe_token(device);
+	
 	LOG(("%08X:ide_bus_master_read(%d, %d)\n", activecpu_get_previouspc(), offset, size));
 
 	/* command register */
@@ -1595,8 +1465,10 @@ static UINT32 ide_bus_master_read(struct ide_state *ide, offs_t offset, int size
  *
  *************************************/
 
-static void ide_bus_master_write(struct ide_state *ide, offs_t offset, int size, UINT32 data)
+static void ide_bus_master_write(const device_config *device, offs_t offset, int size, UINT32 data)
 {
+	ide_state *ide = get_safe_token(device);
+
 	LOG(("%08X:ide_bus_master_write(%d, %d, %08X)\n", activecpu_get_previouspc(), offset, size, data));
 
 	/* command register */
@@ -1663,21 +1535,21 @@ static void ide_bus_master_write(struct ide_state *ide, offs_t offset, int size,
  *************************************/
 
 /*
-    ide_bus_0_r()
+    ide_bus_r()
 
     Read a 16-bit word from the IDE bus directly.
 
     select: 0->CS1Fx active, 1->CS3Fx active
     offset: register offset (state of DA2-DA0)
 */
-int ide_bus_0_r(int select, int offset)
+int ide_bus_r(const device_config *device, int select, int offset)
 {
 	offset += select ? 0x3f0 : 0x1f0;
-	return ide_controller_read(&idestate[0], offset, (offset == 0x1f0) ? 2 : 1);
+	return ide_controller_read(device, offset, (offset == 0x1f0) ? 2 : 1);
 }
 
 /*
-    ide_bus_0_w()
+    ide_bus_w()
 
     Write a 16-bit word to the IDE bus directly.
 
@@ -1685,23 +1557,23 @@ int ide_bus_0_r(int select, int offset)
     offset: register offset (state of DA2-DA0)
     data: data written (state of D0-D15 or D0-D7)
 */
-void ide_bus_0_w(int select, int offset, int data)
+void ide_bus_w(const device_config *device, int select, int offset, int data)
 {
 	offset += select ? 0x3f0 : 0x1f0;
 	if (offset == 0x1f0)
-		ide_controller_write(&idestate[0], offset, 2, data);
+		ide_controller_write(device, offset, 2, data);
 	else
-		ide_controller_write(&idestate[0], offset, 1, data & 0xff);
+		ide_controller_write(device, offset, 1, data & 0xff);
 }
 
-int ide_controller_0_r(int reg)
+int ide_controller_r(const device_config *device, int reg)
 {
-	return ide_controller_read(&idestate[0], reg, 1);
+	return ide_controller_read(device, reg, 1);
 }
 
-void ide_controller_0_w(int reg, int data)
+void ide_controller_w(const device_config *device, int reg, int data)
 {
-	ide_controller_write(&idestate[0], reg, 1, data);
+	ide_controller_write(device, reg, 1, data);
 }
 
 
@@ -1711,47 +1583,47 @@ void ide_controller_0_w(int reg, int data)
  *
  *************************************/
 
-READ32_HANDLER( ide_controller32_0_r )
+READ32_DEVICE_HANDLER( ide_controller32_r )
 {
 	int size;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	return ide_controller_read(&idestate[0], offset, size) << ((offset & 3) * 8);
+	return ide_controller_read(device, offset, size) << ((offset & 3) * 8);
 }
 
 
-WRITE32_HANDLER( ide_controller32_0_w )
+WRITE32_DEVICE_HANDLER( ide_controller32_w )
 {
 	int size;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	ide_controller_write(&idestate[0], offset, size, data >> ((offset & 3) * 8));
+	ide_controller_write(device, offset, size, data >> ((offset & 3) * 8));
 }
 
 
-READ32_HANDLER( ide_bus_master32_0_r )
+READ32_DEVICE_HANDLER( ide_bus_master32_r )
 {
 	int size;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	return ide_bus_master_read(&idestate[0], offset, size) << ((offset & 3) * 8);
+	return ide_bus_master_read(device, offset, size) << ((offset & 3) * 8);
 }
 
 
-WRITE32_HANDLER( ide_bus_master32_0_w )
+WRITE32_DEVICE_HANDLER( ide_bus_master32_w )
 {
 	int size;
 
 	offset *= 4;
 	size = convert_to_offset_and_size32(&offset, mem_mask);
 
-	ide_bus_master_write(&idestate[0], offset, size, data >> ((offset & 3) * 8));
+	ide_bus_master_write(device, offset, size, data >> ((offset & 3) * 8));
 }
 
 
@@ -1762,23 +1634,203 @@ WRITE32_HANDLER( ide_bus_master32_0_w )
  *
  *************************************/
 
-READ16_HANDLER( ide_controller16_0_r )
+READ16_DEVICE_HANDLER( ide_controller16_r )
 {
 	int size;
 
 	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
-	return ide_controller_read(&idestate[0], offset, size) << ((offset & 1) * 8);
+	return ide_controller_read(device, offset, size) << ((offset & 1) * 8);
 }
 
 
-WRITE16_HANDLER( ide_controller16_0_w )
+WRITE16_DEVICE_HANDLER( ide_controller16_w )
 {
 	int size;
 
 	offset *= 2;
 	size = convert_to_offset_and_size16(&offset, mem_mask);
 
-	ide_controller_write(&idestate[0], offset, size, data >> ((offset & 1) * 8));
+	ide_controller_write(device, offset, size, data >> ((offset & 1) * 8));
+}
+
+
+
+/***************************************************************************
+    DEVICE INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+static DEVICE_START( ide_controller )
+{
+	ide_state *ide = get_safe_token(device);
+	const hard_disk_info *hdinfo;
+	const ide_config *config;
+	char unique_tag[50];
+
+	/* validate some basic stuff */
+	assert(device != NULL);
+	assert(device->static_config == NULL);
+	assert(device->inline_config != NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+	
+	/* store a pointer back to the device */
+	ide->device = device;
+
+	/* set MAME harddisk handle */
+	config = device->inline_config;
+	ide->disk = hard_disk_open(get_disk_handle(config->disknum));
+
+	/* get and copy the geometry */
+	if (ide->disk != NULL)
+	{
+		hdinfo = hard_disk_get_info(ide->disk);
+		if (hdinfo->sectorbytes == IDE_DISK_SECTOR_SIZE)
+		{
+			ide->num_cylinders = hdinfo->cylinders;
+			ide->num_sectors = hdinfo->sectors;
+			ide->num_heads = hdinfo->heads;
+#if PRINTF_IDE_COMMANDS
+			mame_printf_debug("CHS: %d %d %d\n", ide->num_cylinders, ide->num_heads, ide->num_sectors);
+#endif
+		}
+	}
+
+	/* build the features page */
+	ide_build_features(ide);
+
+	/* create a timer for timing status */
+	ide->last_status_timer = timer_alloc(NULL, NULL);
+	ide->reset_timer = timer_alloc(reset_callback, (void *)device);
+
+	/* create the name for save states */
+	assert(strlen(device->tag) < 30);
+	state_save_combine_module_and_tag(unique_tag, "ide_controller", device->tag);
+
+	/* register ide states */
+	state_save_register_item(unique_tag, 0, ide->adapter_control);
+	state_save_register_item(unique_tag, 0, ide->status);
+	state_save_register_item(unique_tag, 0, ide->error);
+	state_save_register_item(unique_tag, 0, ide->command);
+	state_save_register_item(unique_tag, 0, ide->interrupt_pending);
+	state_save_register_item(unique_tag, 0, ide->precomp_offset);
+
+	state_save_register_item_array(unique_tag, 0, ide->buffer);
+	state_save_register_item_array(unique_tag, 0, ide->features);
+	state_save_register_item(unique_tag, 0, ide->buffer_offset);
+	state_save_register_item(unique_tag, 0, ide->sector_count);
+
+	state_save_register_item(unique_tag, 0, ide->block_count);
+	state_save_register_item(unique_tag, 0, ide->sectors_until_int);
+
+	state_save_register_item(unique_tag, 0, ide->dma_active);
+	state_save_register_item(unique_tag, 0, ide->dma_cpu);
+	state_save_register_item(unique_tag, 0, ide->dma_address_xor);
+	state_save_register_item(unique_tag, 0, ide->dma_last_buffer);
+	state_save_register_item(unique_tag, 0, ide->dma_address);
+	state_save_register_item(unique_tag, 0, ide->dma_descriptor);
+	state_save_register_item(unique_tag, 0, ide->dma_bytes_left);
+
+	state_save_register_item(unique_tag, 0, ide->bus_master_command);
+	state_save_register_item(unique_tag, 0, ide->bus_master_status);
+	state_save_register_item(unique_tag, 0, ide->bus_master_descriptor);
+
+	state_save_register_item(unique_tag, 0, ide->cur_cylinder);
+	state_save_register_item(unique_tag, 0, ide->cur_sector);
+	state_save_register_item(unique_tag, 0, ide->cur_head);
+	state_save_register_item(unique_tag, 0, ide->cur_head_reg);
+
+	state_save_register_item(unique_tag, 0, ide->cur_lba);
+
+	state_save_register_item(unique_tag, 0, ide->num_cylinders);
+	state_save_register_item(unique_tag, 0, ide->num_sectors);
+	state_save_register_item(unique_tag, 0, ide->num_heads);
+
+	state_save_register_item(unique_tag, 0, ide->config_unknown);
+	state_save_register_item_array(unique_tag, 0, ide->config_register);
+	state_save_register_item(unique_tag, 0, ide->config_register_num);
+
+	state_save_register_item(unique_tag, 0, ide->master_password_enable);
+	state_save_register_item(unique_tag, 0, ide->user_password_enable);
+}
+
+
+/*-------------------------------------------------
+    device exit callback
+-------------------------------------------------*/
+
+static DEVICE_STOP( ide_controller )
+{
+	ide_state *ide = get_safe_token(device);
+
+	/* close the hard disk */	
+	if (ide->disk != NULL)
+		hard_disk_close(ide->disk);
+}
+
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET( ide_controller )
+{
+	ide_state *ide = get_safe_token(device);
+
+	LOG(("IDE controller reset performed\n"));
+
+	/* reset the drive state */
+	ide->status = IDE_STATUS_DRIVE_READY | IDE_STATUS_SEEK_COMPLETE;
+	ide->error = IDE_ERROR_DEFAULT;
+	ide->buffer_offset = 0;
+	ide->master_password_enable = (ide->master_password != NULL);
+	ide->user_password_enable = (ide->user_password != NULL);
+	clear_interrupt(ide);
+}
+
+
+/*-------------------------------------------------
+    device set info callback
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO( ide_controller )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+/*-------------------------------------------------
+    device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO( ide_controller )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ide_state);			break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(ide_config);			break;
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(ide_controller); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ide_controller); break;
+		case DEVINFO_FCT_STOP:					info->stop = DEVICE_STOP_NAME(ide_controller); break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(ide_controller);break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "IDE Controller";				break;
+		case DEVINFO_STR_FAMILY:				info->s = "Disk Controller";			break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
 }

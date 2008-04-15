@@ -176,7 +176,7 @@ static const UINT8 cf_card_tuples[] =
 	0x00, 0x01, 0x00, 0x00,		// CCR base (0x00000100)
 };
 
-static READ64_HANDLER(cf_card_data_r)
+static READ64_DEVICE_HANDLER(cf_card_data_r)
 {
 	UINT64 r = 0;
 
@@ -186,7 +186,7 @@ static READ64_HANDLER(cf_card_data_r)
 		{
 			case 0x8:	// Duplicate Even RD Data
 			{
-				r |= ide_bus_0_r(0, 0) << 16;
+				r |= ide_bus_r(device, 0, 0) << 16;
 				break;
 			}
 
@@ -199,7 +199,7 @@ static READ64_HANDLER(cf_card_data_r)
 	return r;
 }
 
-static WRITE64_HANDLER(cf_card_data_w)
+static WRITE64_DEVICE_HANDLER(cf_card_data_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -207,7 +207,7 @@ static WRITE64_HANDLER(cf_card_data_w)
 		{
 			case 0x8:	// Duplicate Even RD Data
 			{
-				ide_bus_0_w(0, 0, (data >> 16) & 0xffff);
+				ide_bus_w(device, 0, 0, (data >> 16) & 0xffff);
 				break;
 			}
 
@@ -219,7 +219,7 @@ static WRITE64_HANDLER(cf_card_data_w)
 	}
 }
 
-static READ64_HANDLER(cf_card_r)
+static READ64_DEVICE_HANDLER(cf_card_r)
 {
 	UINT64 r = 0;
 
@@ -238,7 +238,7 @@ static READ64_HANDLER(cf_card_r)
 				case 0x6:	// Select Card/Head
 				case 0x7:	// Status
 				{
-					r |= ide_bus_0_r(0, offset & 7) << 16;
+					r |= ide_bus_r(device, 0, offset & 7) << 16;
 					break;
 				}
 
@@ -247,13 +247,13 @@ static READ64_HANDLER(cf_card_r)
 
 				case 0xd:	// Duplicate Error
 				{
-					r |= ide_bus_0_r(0, 1) << 16;
+					r |= ide_bus_r(device, 0, 1) << 16;
 					break;
 				}
 				case 0xe:	// Alt Status
 				case 0xf:	// Drive Address
 				{
-					r |= ide_bus_0_r(1, offset & 7) << 16;
+					r |= ide_bus_r(device, 1, offset & 7) << 16;
 					break;
 				}
 
@@ -282,7 +282,7 @@ static READ64_HANDLER(cf_card_r)
 	return r;
 }
 
-static WRITE64_HANDLER(cf_card_w)
+static WRITE64_DEVICE_HANDLER(cf_card_w)
 {
 	//printf("compact_flash_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), activecpu_get_pc());
 
@@ -301,7 +301,7 @@ static WRITE64_HANDLER(cf_card_w)
 				case 0x6:	// Select Card/Head
 				case 0x7:	// Command
 				{
-					ide_bus_0_w(0, offset & 7, (data >> 16) & 0xffff);
+					ide_bus_w(device, 0, offset & 7, (data >> 16) & 0xffff);
 					break;
 				}
 
@@ -310,13 +310,13 @@ static WRITE64_HANDLER(cf_card_w)
 
 				case 0xd:	// Duplicate Features
 				{
-					ide_bus_0_w(0, 1, (data >> 16) & 0xffff);
+					ide_bus_w(device, 0, 1, (data >> 16) & 0xffff);
 					break;
 				}
 				case 0xe:	// Device Ctl
 				case 0xf:	// Reserved
 				{
-					ide_bus_0_w(1, offset & 7, (data >> 16) & 0xffff);
+					ide_bus_w(device, 1, offset & 7, (data >> 16) & 0xffff);
 					break;
 				}
 
@@ -342,7 +342,7 @@ static WRITE64_HANDLER(cf_card_w)
 						// cylinder low register is set to 0x00
 						// cylinder high register is set to 0x00
 
-						ide_bus_0_w(1, 6, 0x04);
+						ide_bus_w(device, 1, 6, 0x04);
 					}
 					break;
 				}
@@ -366,7 +366,7 @@ static WRITE64_HANDLER(unk2_w)
 
 
 
-static READ64_HANDLER(ata_r)
+static READ64_DEVICE_HANDLER(ata_r)
 {
 	UINT64 r = 0;
 
@@ -374,19 +374,19 @@ static READ64_HANDLER(ata_r)
 	{
 		int reg = (offset >> 4) & 0x7;
 
-		r |= ide_bus_0_r((offset & 0x80) ? 1 : 0, reg) << 16;
+		r |= ide_bus_r(device, (offset & 0x80) ? 1 : 0, reg) << 16;
 	}
 
 	return r;
 }
 
-static WRITE64_HANDLER(ata_w)
+static WRITE64_DEVICE_HANDLER(ata_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
 		int reg = (offset >> 4) & 0x7;
 
-		ide_bus_0_w((offset & 0x80) ? 1 : 0, reg, (UINT16)(data >> 16));
+		ide_bus_w(device, (offset & 0x80) ? 1 : 0, reg, (UINT16)(data >> 16));
 	}
 }
 
@@ -597,7 +597,7 @@ static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
 	AM_RANGE(0xfec00000, 0xfedfffff) AM_READWRITE(pci_config_addr_r, pci_config_addr_w)
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
-	AM_RANGE(0xff300000, 0xff300fff) AM_READWRITE(ata_r, ata_w)
+	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ata_r, ata_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
 	AM_RANGE(0xffe30000, 0xffe31fff) AM_READWRITE(m48t58_r, m48t58_w)
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
@@ -625,9 +625,14 @@ static INTERRUPT_GEN(viper_vblank)
 {
 
 }
+
+static void ide_interrupt(const device_config *device, int state)
+{
+}
+
 static MACHINE_RESET(viper)
 {
-	ide_controller_reset(0);
+	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 
 static MACHINE_DRIVER_START(viper)
@@ -641,6 +646,8 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_MACHINE_RESET(viper)
 
 	MDRV_NVRAM_HANDLER(timekeeper_0)
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
  	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -661,10 +668,6 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static void ide_interrupt(int state)
-{
-}
-
 static const struct pci_device_info mpc8240 =
 {
 	mpc8240_pci_r,
@@ -677,11 +680,6 @@ static const struct pci_device_info voodoo3 =
 	voodoo3_pci_w
 };
 
-static const struct ide_interface ide_intf =
-{
-	ide_interrupt
-};
-
 static DRIVER_INIT(viper)
 {
 	UINT8 *nvram;
@@ -689,8 +687,6 @@ static DRIVER_INIT(viper)
 	pci_init();
 	pci_add_device(0, 0, &mpc8240);
 	pci_add_device(0, 12, &voodoo3);
-
-	ide_controller_init(0, &ide_intf);
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
@@ -700,12 +696,12 @@ static DRIVER_INIT(viper)
 
 static DRIVER_INIT(vipercf)
 {
+	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+
 	DRIVER_INIT_CALL(viper);
 
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r );
-	memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_w );
-	memory_install_read64_handler( 0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_r );
-	memory_install_write64_handler(0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_w );
+	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
+	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
 }
 
 static DRIVER_INIT(ppp2nd)

@@ -937,7 +937,7 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 
@@ -952,7 +952,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(1, ADDRESS_SPACE_PROGRAM, 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 

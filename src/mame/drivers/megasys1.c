@@ -3881,14 +3881,13 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_handler(1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, OKIM6295_data_0_both_w);
-	memory_install_write16_handler(1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, OKIM6295_data_1_both_w);
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, OKIM6295_data_0_both_w);
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, OKIM6295_data_1_both_w);
 }
 
 static DRIVER_INIT( peekaboo )
 {
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, protection_peekaboo_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, protection_peekaboo_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
 }
 
 static DRIVER_INIT( phantasm )
@@ -3924,8 +3923,7 @@ static DRIVER_INIT( soldam )
 	astyanax_rom_decode(0);
 
 	/* Sprite RAM is mirrored. Why? */
-	memory_install_read16_handler(0, ADDRESS_SPACE_PROGRAM, 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 static DRIVER_INIT( stdragon )

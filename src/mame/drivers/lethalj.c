@@ -776,21 +776,21 @@ ROM_END
 static DRIVER_INIT( ripribit )
 {
 	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
 }
 
 
 static DRIVER_INIT( cfarm )
 {
 	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
 }
 
 
 static DRIVER_INIT( cclownz )
 {
 	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
 }
 
 

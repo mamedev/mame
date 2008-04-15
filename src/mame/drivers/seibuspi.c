@@ -1749,9 +1749,9 @@ static MACHINE_RESET( spi )
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 	cpunum_set_irq_callback(0, spi_irq_callback);
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
 
 	z80_rom = auto_malloc(0x40000);
 	memory_set_bankptr(4, z80_rom);
@@ -1823,8 +1823,8 @@ static MACHINE_RESET( sxx2f )
 
 	memcpy(z80_rom, rom, 0x40000);
 
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sb_coin_r);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sb_coin_r);
 	cpunum_set_irq_callback(0, spi_irq_callback);
 
 	sb_coin_latch = 0;
@@ -1995,28 +1995,28 @@ static void init_spi(running_machine *machine)
 
 static DRIVER_INIT( rdft )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x00298d0, 0x00298d3, 0, 0, rdft_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00298d0, 0x00298d3, 0, 0, rdft_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyu )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0018cb4, 0x0018cb7, 0, 0, senkyu_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0018cb4, 0x0018cb7, 0, 0, senkyu_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyua )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0018c9c, 0x0018c9f, 0, 0, senkyua_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0018c9c, 0x0018c9f, 0, 0, senkyua_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( batlball )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0018db4, 0x0018db7, 0, 0, batlball_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0018db4, 0x0018db7, 0, 0, batlball_speedup_r );
 
 	init_spi(machine);
 }
@@ -2024,21 +2024,21 @@ static DRIVER_INIT( batlball )
 static DRIVER_INIT( ejanhs )
 {
 //  idle skip doesn't work properly?
-//  memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x002d224, 0x002d227, 0, 0, ejanhs_speedup_r );
+//  memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002d224, 0x002d227, 0, 0, ejanhs_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1 )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x001e2e0, 0x001e2e3, 0, 0, viprp1_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x001e2e0, 0x001e2e3, 0, 0, viprp1_speedup_r );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1o )
 {
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x001d49c, 0x001d49f, 0, 0, viprp1o_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x001d49c, 0x001d49f, 0, 0, viprp1o_speedup_r );
 
 	init_spi(machine);
 }
@@ -2050,12 +2050,12 @@ static void init_rf2(running_machine *machine)
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
 	seibuspi_rise10_text_decrypt(memory_region(REGION_GFX1));
 	seibuspi_rise10_bg_decrypt(memory_region(REGION_GFX2), memory_region_length(REGION_GFX2));
 	seibuspi_rise10_sprite_decrypt(memory_region(REGION_GFX3), 0x600000);
 
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
 
 static DRIVER_INIT( rdft2 )
@@ -2074,12 +2074,12 @@ static DRIVER_INIT( rfjet )
 	intelflash_init( 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( 1, FLASH_INTEL_E28F008SA, NULL );
 
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(REGION_GFX1));
 	seibuspi_rise11_bg_decrypt(memory_region(REGION_GFX2), memory_region_length(REGION_GFX2));
 	seibuspi_rise11_sprite_decrypt(memory_region(REGION_GFX3), 0x800000);
 
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
 
 /* SYS386 */

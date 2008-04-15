@@ -141,7 +141,7 @@ static READ8_HANDLER( sound_data_r )
 
 
 
-static void outrun_generic_init(void)
+static void outrun_generic_init(running_machine *machine)
 {
 	/* allocate memory for regions not automatically assigned */
 	segaic16_spriteram_0 = auto_malloc(0x01000);
@@ -151,7 +151,7 @@ static void outrun_generic_init(void)
 	workram              = auto_malloc(0x08000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(0, outrun_info, sound_data_w, NULL);
+	segaic16_memory_mapper_init(machine, 0, outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(segaic16_memory_mapper_set_decrypted);
@@ -267,9 +267,9 @@ static MACHINE_RESET( outrun )
 	fd1094_machine_init();
 
 	/* reset misc components */
-	segaic16_memory_mapper_reset();
+	segaic16_memory_mapper_reset(machine);
 	if (custom_map)
-		segaic16_memory_mapper_config(custom_map);
+		segaic16_memory_mapper_config(machine, custom_map);
 	segaic16_tilemap_reset(0);
 
 	/* hook the RESET line, which resets CPU #1 */
@@ -1677,7 +1677,7 @@ ROM_END
 
 static DRIVER_INIT( outrun )
 {
-	outrun_generic_init();
+	outrun_generic_init(machine);
 	custom_io_r = outrun_custom_io_r;
 	custom_io_w = outrun_custom_io_w;
 }
@@ -1690,7 +1690,7 @@ static DRIVER_INIT( outrunb )
 	UINT8 *byte;
 	int i, length;
 
-	outrun_generic_init();
+	outrun_generic_init(machine);
 	custom_map = memory_map;
 	custom_io_r = outrun_custom_io_r;
 	custom_io_w = outrun_custom_io_w;
@@ -1728,7 +1728,7 @@ static DRIVER_INIT( outrunb )
 
 static DRIVER_INIT( shangon )
 {
-	outrun_generic_init();
+	outrun_generic_init(machine);
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;
 }
@@ -1737,7 +1737,7 @@ static DRIVER_INIT( shangon )
 static DRIVER_INIT( shangon3 )
 {
 	extern void fd1089_decrypt_0034(void);
-	outrun_generic_init();
+	outrun_generic_init(machine);
 	fd1089_decrypt_0034();
 	custom_io_r = shangon_custom_io_r;
 	custom_io_w = shangon_custom_io_w;

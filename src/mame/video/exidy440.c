@@ -201,7 +201,7 @@ WRITE8_HANDLER( exidy440_control_w )
 	int oldvis = palettebank_vis;
 
 	/* extract the various bits */
-	exidy440_bank_select(data >> 4);
+	exidy440_bank_select(machine, data >> 4);
 	firq_enable = (data >> 3) & 1;
 	firq_select = (data >> 2) & 1;
 	palettebank_io = (data >> 1) & 1;

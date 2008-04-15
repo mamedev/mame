@@ -91,7 +91,7 @@ static MACHINE_RESET( midvplus )
 	timer[0] = timer_alloc(NULL, NULL);
 	timer[1] = timer_alloc(NULL, NULL);
 
-	ide_controller_reset(0);
+	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 
 
@@ -537,7 +537,7 @@ static ADDRESS_MAP_START( midvplus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
-	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(midway_ide_asic_r, midway_ide_asic_w)
+	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", midway_ide_asic_r, midway_ide_asic_w)
 	AM_RANGE(0x9c0000, 0x9c7fff) AM_READWRITE(SMH_RAM, midvunit_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE(midvplus_misc_r, midvplus_misc_w) AM_BASE(&midvplus_misc)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(&midvunit_textureram)
@@ -1044,6 +1044,8 @@ static MACHINE_DRIVER_START( midvplus )
 
 	MDRV_MACHINE_RESET(midvplus)
 	MDRV_NVRAM_HANDLER(midway_serial_pic2)
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, NULL)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
@@ -1406,45 +1408,45 @@ static READ32_HANDLER( generic_speedup_r )
 }
 
 
-static void init_crusnusa_common(offs_t speedup)
+static void init_crusnusa_common(running_machine *machine, offs_t speedup)
 {
 	dcs_init();
 	adc_shift = 24;
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
-static DRIVER_INIT( crusnusa ) { init_crusnusa_common(0xc93e); }
-static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(0xc957); }
-static DRIVER_INIT( crusnu21 ) { init_crusnusa_common(0xc051); }
+static DRIVER_INIT( crusnusa ) { init_crusnusa_common(machine, 0xc93e); }
+static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(machine, 0xc957); }
+static DRIVER_INIT( crusnu21 ) { init_crusnusa_common(machine, 0xc051); }
 
 
-static void init_crusnwld_common(offs_t speedup)
+static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 {
 	dcs_init();
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 450 or 460 */
 	midway_serial_pic_init(450);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
 
 	/* install strange protection device */
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
 
 	/* speedups */
 	if (speedup)
-		generic_speedup = memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
+		generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
-static DRIVER_INIT( crusnwld ) { init_crusnwld_common(0xd4c0); }
+static DRIVER_INIT( crusnwld ) { init_crusnwld_common(machine, 0xd4c0); }
 #if 0
-static DRIVER_INIT( crusnw20 ) { init_crusnwld_common(0xd49c); }
-static DRIVER_INIT( crusnw13 ) { init_crusnwld_common(0); }
+static DRIVER_INIT( crusnw20 ) { init_crusnwld_common(machine, 0xd49c); }
+static DRIVER_INIT( crusnw13 ) { init_crusnwld_common(machine, 0); }
 #endif
 
 static DRIVER_INIT( offroadc )
@@ -1453,31 +1455,24 @@ static DRIVER_INIT( offroadc )
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 230 or 234 */
 	midway_serial_pic2_init(230, 94);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
-	memory_install_write32_handler(0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
 }
 
-
-static const struct ide_interface ide_intf =
-{
-	0
-};
 
 static DRIVER_INIT( wargods )
 {
 	UINT8 default_nvram[256];
 
 	/* initialize the subsystems */
-	dcs2_init(2, 0x3839);
-	ide_controller_init(0, &ide_intf);
+	dcs2_init(machine, 2, 0x3839);
 	midway_ioasic_init(0, 452/* no alternates */, 94, NULL);
 	adc_shift = 16;
 
@@ -1493,7 +1488,7 @@ static DRIVER_INIT( wargods )
 	midway_serial_pic2_set_default_nvram(default_nvram);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(0, ADDRESS_SPACE_PROGRAM, 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
 }
 
 

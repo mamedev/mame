@@ -1,37 +1,78 @@
 /***************************************************************************
 
-    Generic (PC-style) IDE controller implementation
+    idectrl.h
+
+    Generic (PC-style) IDE controller implementation.
+
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
+
+#pragma once
+
+#ifndef __IDECTRL_H__
+#define __IDECTRL_H__
 
 #include "harddisk.h"
 
 
-#define MAX_IDE_CONTROLLERS			1
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-struct ide_interface
+typedef struct _ide_config ide_config;
+struct _ide_config
 {
-	void 	(*interrupt)(int state);
+	UINT32	disknum;
+	void 	(*interrupt)(const device_config *device, int state);
 };
 
-int ide_controller_init(int which, const struct ide_interface *intf);
-int ide_controller_init_custom(int which, const struct ide_interface *intf, chd_file *diskhandle);
-void ide_controller_reset(int which);
-UINT8 *ide_get_features(int which);
 
-void ide_set_master_password(int which, const UINT8 *password);
-void ide_set_user_password(int which, const UINT8 *password);
 
-int ide_bus_0_r(int select, int offset);
-void ide_bus_0_w(int select, int offset, int data);
+/***************************************************************************
+    TIMER DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
-int ide_controller_0_r(int reg);
-void ide_controller_0_w(int reg, int data);
+#define MDRV_IDE_CONTROLLER_ADD(_tag, _disknum, _callback) \
+	MDRV_DEVICE_ADD(_tag, IDE_CONTROLLER) \
+	MDRV_DEVICE_CONFIG_DATA32(ide_config, disknum, _disknum) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback)
 
-READ32_HANDLER( ide_controller32_0_r );
-WRITE32_HANDLER( ide_controller32_0_w );
-READ32_HANDLER( ide_bus_master32_0_r );
-WRITE32_HANDLER( ide_bus_master32_0_w );
+#define MDRV_IDE_CONTROLLER_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, IDE_CONTROLLER)
 
-READ16_HANDLER( ide_controller16_0_r );
-WRITE16_HANDLER( ide_controller16_0_w );
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+UINT8 *ide_get_features(const device_config *device);
+
+void ide_set_master_password(const device_config *device, const UINT8 *password);
+void ide_set_user_password(const device_config *device, const UINT8 *password);
+
+int ide_bus_r(const device_config *config, int select, int offset);
+void ide_bus_w(const device_config *config, int select, int offset, int data);
+
+int ide_controller_r(const device_config *config, int reg);
+void ide_controller_w(const device_config *config, int reg, int data);
+
+READ32_DEVICE_HANDLER( ide_controller32_r );
+WRITE32_DEVICE_HANDLER( ide_controller32_w );
+READ32_DEVICE_HANDLER( ide_bus_master32_r );
+WRITE32_DEVICE_HANDLER( ide_bus_master32_w );
+
+READ16_DEVICE_HANDLER( ide_controller16_r );
+WRITE16_DEVICE_HANDLER( ide_controller16_w );
+
+
+/* ----- timer device interface ----- */
+
+/* device get info callback */
+#define IDE_CONTROLLER DEVICE_GET_INFO_NAME(ide_controller)
+DEVICE_GET_INFO( ide_controller );
+
+
+#endif	/* __IDECTRL_H__ */

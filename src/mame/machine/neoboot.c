@@ -172,11 +172,11 @@ static WRITE16_HANDLER( kof10th_bankswitch_w )
 	}
 }
 
-void install_kof10th_protection ( void )
+void install_kof10th_protection ( running_machine *machine )
 {
-	memory_install_read16_handler(0,  ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof10th_RAMB_r);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x23ffff, 0, 0, kof10th_custom_w);
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x240000, 0x2fffff, 0, 0, kof10th_bankswitch_w);
+	memory_install_read16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof10th_RAMB_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x23ffff, 0, 0, kof10th_custom_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x240000, 0x2fffff, 0, 0, kof10th_bankswitch_w);
 }
 
 void decrypt_kof10th( void )
@@ -425,14 +425,14 @@ static WRITE16_HANDLER ( cthd2003_bankswitch_w )
 	}
 }
 
-void patch_cthd2003( void )
+void patch_cthd2003( running_machine *machine )
 {
 	/* patches thanks to razoola */
 	int i;
 	UINT16 *mem16 = (UINT16 *)memory_region(NEOGEO_REGION_MAIN_CPU_CARTRIDGE);
 
 	/* special ROM banking handler */
-	memory_install_write16_handler(0, ADDRESS_SPACE_PROGRAM, 0x2ffff0, 0x2fffff, 0, 0, cthd2003_bankswitch_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ffff0, 0x2fffff, 0, 0, cthd2003_bankswitch_w);
 
 	// theres still a problem on the character select screen but it seems to be related to cpu core timing issues,
 	// overclocking the 68k prevents it.
@@ -660,10 +660,10 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 	}
 }
 
-void install_ms5plus_protection(void)
+void install_ms5plus_protection(running_machine *machine)
 {
 	// special ROM banking handler / additional protection
-	memory_install_readwrite16_handler(0, ADDRESS_SPACE_PROGRAM,0x2ffff0, 0x2fffff,0, 0, mslug5_prot_r, ms5plus_bankswitch_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM,0x2ffff0, 0x2fffff,0, 0, mslug5_prot_r, ms5plus_bankswitch_w);
 }
 
 
@@ -903,9 +903,9 @@ void kof2003b_px_decrypt( void )
     free( buf );
 }
 
-void kof2003b_install_protection(void)
+void kof2003b_install_protection(running_machine *machine)
 {
-    memory_install_readwrite16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
+    memory_install_readwrite16_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
 }
 
 
@@ -932,9 +932,9 @@ void kof2k3pl_px_decrypt( void )
 	rom[0xf38ac/2] = 0x4e75;
 }
 
-void kf2k3pl_install_protection(void)
+void kf2k3pl_install_protection(running_machine *machine)
 {
-    memory_install_readwrite16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003p_w );
+    memory_install_readwrite16_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003p_w );
 }
 
 
@@ -965,9 +965,9 @@ void kof2k3up_px_decrypt( void )
 	}
 }
 
-void kof2k3up_install_protection(void)
+void kof2k3up_install_protection(running_machine *machine)
 {
-    memory_install_readwrite16_handler( 0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
+    memory_install_readwrite16_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
 }
 
 /* samsho5bl */

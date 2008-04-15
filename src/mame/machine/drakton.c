@@ -104,7 +104,7 @@ static void drakton_decrypt_rom_B(void)
 DRIVER_INIT( drakton )
 {
 
-	memory_install_read8_handler(0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little

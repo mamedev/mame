@@ -211,38 +211,38 @@ static WRITE16_HANDLER( k054539_word_w )
 #define IDE_STD_OFFSET	(0x1f0/2)
 #define IDE_ALT_OFFSET	(0x3f6/2)
 
-static READ16_HANDLER( ide_std_r )
+static READ16_DEVICE_HANDLER( ide_std_r )
 {
 	if (offset & 0x01)
-		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
 	else
-		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x0000);
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x0000);
 }
 
-static WRITE16_HANDLER( ide_std_w )
+static WRITE16_DEVICE_HANDLER( ide_std_w )
 {
 	if (offset & 0x01)
-		ide_controller16_0_w(machine, IDE_STD_OFFSET + offset/2, data << 8, 0x00ff);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data << 8, 0x00ff);
 	else
-		ide_controller16_0_w(machine, IDE_STD_OFFSET + offset/2, data, 0x0000);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data, 0x0000);
 }
 
-static READ16_HANDLER( ide_alt_r )
+static READ16_DEVICE_HANDLER( ide_alt_r )
 {
 	if (offset == 0)
-		return ide_controller16_0_r(machine, IDE_ALT_OFFSET, 0xff00);
+		return ide_controller16_r(device, IDE_ALT_OFFSET, 0xff00);
 
 	return 0;
 }
 
-static WRITE16_HANDLER( ide_alt_w )
+static WRITE16_DEVICE_HANDLER( ide_alt_w )
 {
 	if (offset == 0)
-		ide_controller16_0_w(machine, IDE_ALT_OFFSET, data, 0xff00);
+		ide_controller16_w(device, IDE_ALT_OFFSET, data, 0xff00);
 }
 
 
-static READ16_HANDLER( gp2_ide_std_r )
+static READ16_DEVICE_HANDLER( gp2_ide_std_r )
 {
 	if (offset & 0x01)
 	{
@@ -260,9 +260,9 @@ static READ16_HANDLER( gp2_ide_std_r )
 					break;
 			}
 		}
-		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
 	} else {
-		return ide_controller16_0_r(machine, IDE_STD_OFFSET + offset/2, 0x0000);
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x0000);
 	}
 }
 
@@ -290,14 +290,14 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 	}
 }
 
-static void ide_interrupt(int state)
+static void ide_interrupt(const device_config *device, int state)
 {
 	if (control & 0x0008)
 	{
 		if (state != CLEAR_LINE)
-			cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+			cpunum_set_input_line(device->machine, 0, 4, HOLD_LINE);
 		else
-			cpunum_set_input_line(Machine, 0, 4, CLEAR_LINE);
+			cpunum_set_input_line(device->machine, 0, 4, CLEAR_LINE);
 	}
 }
 
@@ -316,7 +316,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 }
 
-static void gp2_ide_interrupt(int state)
+static void gp2_ide_interrupt(const device_config *device, int state)
 {
 	if (control & 0x0010)
 	{
@@ -325,9 +325,9 @@ static void gp2_ide_interrupt(int state)
 			if (gp2_irq_control)
 				gp2_irq_control = 0;
 			else
-				cpunum_set_input_line(Machine, 0, 5, HOLD_LINE);
+				cpunum_set_input_line(device->machine, 0, 5, HOLD_LINE);
 		} else {
-			cpunum_set_input_line(Machine, 0, 5, CLEAR_LINE);
+			cpunum_set_input_line(device->machine, 0, 5, CLEAR_LINE);
 		}
 	}
 }
@@ -351,8 +351,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x881fff) AM_READ(K056832_ram_word_r)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_READ(K056832_ram_word_r)	/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)				/* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_READ(ide_std_r)				/* IDE control regs */
-	AM_RANGE(0xa4000c, 0xa4000f) AM_READ(ide_alt_r)				/* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREAD(IDE_CONTROLLER, "ide", ide_std_r)				/* IDE control regs */
+	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREAD(IDE_CONTROLLER, "ide", ide_alt_r)				/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READ(sndram_r)				/* sound ram */
 ADDRESS_MAP_END
 
@@ -370,8 +370,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80045f) AM_WRITE(k054539_word_w)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(K056832_ram_word_w)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_WRITE(K056832_ram_word_w)	/* vram (mirror) */
-	AM_RANGE(0xa00000, 0xa0000f) AM_WRITE(ide_std_w)			/* IDE control regs */
-	AM_RANGE(0xa4000c, 0xa4000f) AM_WRITE(ide_alt_w)			/* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE(IDE_CONTROLLER, "ide", ide_std_w)			/* IDE control regs */
+	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVWRITE(IDE_CONTROLLER, "ide", ide_alt_w)			/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_WRITE(sndram_w)				/* sound ram */
 ADDRESS_MAP_END
 
@@ -388,8 +388,8 @@ static ADDRESS_MAP_START( gp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x881fff) AM_READ(gp2_vram_r)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READ(gp2_vram_mirror_r)		/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)				/* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r)			/* IDE control regs */
-	AM_RANGE(0xa4000c, 0xa4000f) AM_READ(ide_alt_r)				/* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREAD(IDE_CONTROLLER, "ide", gp2_ide_std_r)			/* IDE control regs */
+	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREAD(IDE_CONTROLLER, "ide", ide_alt_r)				/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READ(sndram_r)				/* sound ram */
 ADDRESS_MAP_END
 
@@ -407,8 +407,8 @@ static ADDRESS_MAP_START( gp2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80045f) AM_WRITE(k054539_word_w)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_WRITE(gp2_vram_w)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_WRITE(gp2_vram_mirror_w)	/* vram (mirror) */
-	AM_RANGE(0xa00000, 0xa0000f) AM_WRITE(ide_std_w)			/* IDE control regs */
-	AM_RANGE(0xa4000c, 0xa4000f) AM_WRITE(ide_alt_w)			/* IDE status control reg */
+	AM_RANGE(0xa00000, 0xa0000f) AM_DEVWRITE(IDE_CONTROLLER, "ide", ide_std_w)			/* IDE control regs */
+	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVWRITE(IDE_CONTROLLER, "ide", ide_alt_w)			/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_WRITE(sndram_w)				/* sound ram */
 ADDRESS_MAP_END
 
@@ -589,23 +589,6 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  IDE interfaces
- *
- *************************************/
-
-static const struct ide_interface ide_intf =
-{
-	ide_interrupt,
-};
-
-static const struct ide_interface gp2_ide_intf =
-{
-	gp2_ide_interrupt,
-};
-
-
-/*************************************
- *
  *  Sound interfaces
  *
  *************************************/
@@ -648,7 +631,7 @@ static MACHINE_RESET( qdrmfgp )
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;
-	ide_controller_reset(0);
+	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 
 static MACHINE_RESET( qdrmfgp2 )
@@ -660,7 +643,7 @@ static MACHINE_RESET( qdrmfgp2 )
 
 	/* reset the IDE controller */
 	gp2_irq_control = 0;
-	ide_controller_reset(0);
+	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 
 
@@ -680,6 +663,8 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_MACHINE_START(qdrmfgp)
 	MDRV_MACHINE_RESET(qdrmfgp)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -713,6 +698,8 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_MACHINE_START(qdrmfgp)
 	MDRV_MACHINE_RESET(qdrmfgp2)
 	MDRV_NVRAM_HANDLER(generic_1fill)
+	
+	MDRV_IDE_CONTROLLER_ADD("ide", 0, gp2_ide_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -780,28 +767,10 @@ ROM_END
 
 /*************************************
  *
- *  Driver-specific init
- *
- *************************************/
-
-static DRIVER_INIT( qdrmfgp )
-{
-	/* spin up the hard disk */
-	ide_controller_init(0, &ide_intf);
-}
-
-static DRIVER_INIT( qdrmfgp2 )
-{
-	/* spin up the hard disk */
-	ide_controller_init(0, &gp2_ide_intf);
-}
-
-/*************************************
- *
  *  Game drivers
  *
  *************************************/
 
 /*     year  rom       clone     machine   inputs    init */
-GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp,  qdrmfgp,  ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
-GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, qdrmfgp2, ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )
+GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp,  0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
+GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )
