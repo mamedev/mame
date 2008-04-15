@@ -40,6 +40,13 @@ TODO:
   & reset
 - Scrolling in Cuby Bop's Game seems incorrect.
 
+puzznici note
+- this set is a bootleg, it uses a converted board without the MCU and has
+  a hacked copyright message.  The tilemap data for one of the girls appears
+  to be corrupt, however this is correct, the bootleggers overwrote part of
+  the data with the expected response sequence from the MCU in order to simulate
+  it.
+
 */
 
 
@@ -936,6 +943,25 @@ static ADDRESS_MAP_START( puzznic_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
 	AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
+	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	// Control register, function unknown
+ADDRESS_MAP_END
+
+/* bootleg, doesn't have the MCU */
+static ADDRESS_MAP_START( puzznici_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_READ
+	COMMON_SINGLE_READ
+	AM_RANGE(0xa800, 0xa800) AM_READ(SMH_NOP)	// Watchdog
+	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)	// Wrong, used to overcome protection
+//	AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
+	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( puzznici_writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	COMMON_BANKS_WRITE
+	COMMON_SINGLE_WRITE
+	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
+//	AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
+//	AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	// Control register, function unknown
 ADDRESS_MAP_END
 
@@ -2477,6 +2503,16 @@ static MACHINE_DRIVER_START( puzznic )
 	MDRV_MACHINE_RESET(puzznic)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( puzznici )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(plotting)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(puzznici_readmem,puzznici_writemem)
+
+	MDRV_MACHINE_RESET(puzznic)
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( horshoes )
 
@@ -2893,13 +2929,10 @@ ROM_START( puzznicj )
 	ROM_LOAD( "u09.ic9",   0x20000, 0x20000, CRC(3c115f8b) SHA1(8d518be01b7c4d6d993d5d9b62aab719a5c8baca) )
 ROM_END
 
-ROM_START( puzznici )
+ROM_START( puzznici ) /* bootleg */
 	ROM_REGION( 0x30000, REGION_CPU1, 0 )
 	ROM_LOAD( "1.ic11",  0x00000, 0x20000, CRC(4612f5e0) SHA1(dc07a365414666568537d31ef01b58f2362cadaf) )
 	ROM_RELOAD(          0x10000, 0x20000 )
-
-	ROM_REGION( 0x0800, REGION_CPU2, 0 )	/* 2k for the microcontroller */
-	ROM_LOAD( "mc68705p", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x40000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "u10.ic10",  0x00000, 0x20000, CRC(4264056c) SHA1(d2d8a170ae0f361093a5384935238605a59e5938) )
@@ -3078,7 +3111,7 @@ GAME( 1989, plottinu, plotting, plotting, plotting, 0,        ROT0,   "Taito Ame
 GAME( 1989, flipull,  plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 GAME( 1989, puzznic,  0,        puzznic,  puzznic,  0,        ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
 GAME( 1989, puzznicj, puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Japan)", 0 )
-GAME( 1989, puzznici, puzznic,  puzznic,  puzznic,  0,        ROT0,   "Taito Corporation", "Puzznic (Italy)", 0 )
+GAME( 1989, puzznici, puzznic,  puzznici, puzznic,  0,        ROT0,   "bootleg", "Puzznic (Italian bootleg)", 0 )
 GAME( 1990, horshoes, 0,        horshoes, horshoes, 0,        ROT270, "Taito America Corporation", "American Horseshoes (US)", 0 )
 GAME( 1990, palamed,  0,        palamed,  palamed,  0,        ROT0,   "Taito Corporation", "Palamedes (Japan)", 0 )
 GAME( 1993, cachat,   0,        cachat,   cachat,   0,        ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
