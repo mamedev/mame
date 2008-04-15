@@ -198,13 +198,13 @@ struct _address_map_entry
 	offs_t					addrmask;			/* mask bits */
 	read_handler 			read;				/* read handler callback */
 	UINT8					read_bits;			/* bits for the read handler callback (0=default, 1=8, 2=16, 3=32) */
-	UINT8					read_shift;			/* shift value for the read handler */
+	UINT8					read_mask;			/* mask bits indicating which subunits to process */
 	const char *			read_name;			/* read handler callback name */
 	device_type				read_devtype;		/* read device type for device references */
 	const char *			read_devtag;		/* read tag for the relevant device */
 	write_handler 			write;				/* write handler callback */
 	UINT8					write_bits;			/* bits for the write handler callback (0=default, 1=8, 2=16, 3=32) */
-	UINT8					write_shift;		/* shift value for the write handler */
+	UINT8					write_mask;			/* mask bits indicating which subunits to process */
 	const char *			write_name;			/* write handler callback name */
 	device_type				write_devtype;		/* read device type for device references */
 	const char *			write_devtag;		/* read tag for the relevant device */
@@ -553,6 +553,31 @@ union _addrmap64_token
 #define address_map_0 NULL
 
 
+/* maps a full 64-bit mask down to an 8-bit byte mask */
+#define UNITMASK8(x) \
+	((((UINT64)(x) >> (63-7)) & 0x80) | \
+	 (((UINT64)(x) >> (55-6)) & 0x40) | \
+	 (((UINT64)(x) >> (47-5)) & 0x20) | \
+	 (((UINT64)(x) >> (39-4)) & 0x10) | \
+	 (((UINT64)(x) >> (31-3)) & 0x08) | \
+	 (((UINT64)(x) >> (23-2)) & 0x04) | \
+	 (((UINT64)(x) >> (15-1)) & 0x02) | \
+	 (((UINT64)(x) >> ( 7-0)) & 0x01))
+
+/* maps a full 64-bit mask down to a 4-bit word mask */
+#define UNITMASK16(x) \
+	((((UINT64)(x) >> (63-3)) & 0x08) | \
+	 (((UINT64)(x) >> (47-2)) & 0x04) | \
+	 (((UINT64)(x) >> (31-1)) & 0x02) | \
+	 (((UINT64)(x) >> (15-0)) & 0x01))
+
+/* maps a full 64-bit mask down to a 2-bit dword mask */
+#define UNITMASK32(x) \
+	((((UINT64)(x) >> (63-1)) & 0x02) | \
+	 (((UINT64)(x) >> (31-0)) & 0x01))
+
+
+
 /* start/end tags for the address map */
 #define ADDRESS_MAP_START(_name, _space, _bits) \
 	const addrmap##_bits##_token address_map_##_name[] = { \
@@ -595,103 +620,103 @@ union _addrmap64_token
 	TOKEN_UINT64_PACK2(ADDRMAP_TOKEN_MIRROR, 8, _mirror, 32),
 
 #define AM_READ(_handler) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 0, 2, 0, 6), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(mread, _handler), \
 	TOKEN_STRING(#_handler),
 
-#define AM_READ8(_handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 1, 2, (_shift), 6), \
+#define AM_READ8(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 8, 8, UNITMASK8(_unitmask), 8), \
 	TOKEN_PTR(mread8, _handler), \
 	TOKEN_STRING(#_handler),
 
-#define AM_READ16(_handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 2, 2, (_shift), 6), \
+#define AM_READ16(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 16, 8, UNITMASK16(_unitmask), 8), \
 	TOKEN_PTR(mread16, _handler), \
 	TOKEN_STRING(#_handler),
 
-#define AM_READ32(_handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 3, 2, (_shift), 6), \
+#define AM_READ32(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 32, 8, UNITMASK32(_unitmask), 8), \
 	TOKEN_PTR(mread32, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_WRITE(_handler) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 0, 2, 0, 6), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(mwrite, _handler), \
 	TOKEN_STRING(#_handler),
 
-#define AM_WRITE8(_handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 1, 2, (_shift), 6), \
+#define AM_WRITE8(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 8, 8, UNITMASK8(_unitmask), 8), \
 	TOKEN_PTR(mwrite8, _handler), \
 	TOKEN_STRING(#_handler),
 
-#define AM_WRITE16(_handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 2, 2, (_shift), 6), \
+#define AM_WRITE16(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 16, 8, UNITMASK16(_unitmask), 8), \
 	TOKEN_PTR(mwrite16, _handler), \
 	TOKEN_STRING(#_handler),
 
-#define AM_WRITE32(_handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 3, 2, (_shift), 6), \
+#define AM_WRITE32(_handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 32, 8, UNITMASK32(_unitmask), 8), \
 	TOKEN_PTR(mwrite32, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_DEVREAD(_type, _tag, _handler) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 0, 2, 0, 6), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(dread, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define AM_DEVREAD8(_type, _tag, _handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 1, 2, (_shift), 6), \
+#define AM_DEVREAD8(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 8, 8, UNITMASK8(_unitmask), 8), \
 	TOKEN_PTR(dread8, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define AM_DEVREAD16(_type, _tag, _handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 2, 2, (_shift), 6), \
+#define AM_DEVREAD16(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 16, 8, UNITMASK16(_unitmask), 8), \
 	TOKEN_PTR(dread16, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define AM_DEVREAD32(_type, _tag, _handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 3, 2, (_shift), 6), \
+#define AM_DEVREAD32(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_READ, 8, 32, 8, UNITMASK32(_unitmask), 8), \
 	TOKEN_PTR(dread32, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
 #define AM_DEVWRITE(_type, _tag, _handler) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 0, 2, 0, 6), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 0, 8, 0, 8), \
 	TOKEN_PTR(dwrite, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define AM_DEVWRITE8(_type, _tag, _handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 1, 2, (_shift), 6), \
+#define AM_DEVWRITE8(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 8, 8, UNITMASK8(_unitmask), 8), \
 	TOKEN_PTR(dwrite8, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define AM_DEVWRITE16(_type, _tag, _handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 2, 2, (_shift), 6), \
+#define AM_DEVWRITE16(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 16, 8, UNITMASK16(_unitmask), 8), \
 	TOKEN_PTR(dwrite16, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
-#define AM_DEVWRITE32(_type, _tag, _handler, _shift) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 3, 2, (_shift), 6), \
+#define AM_DEVWRITE32(_type, _tag, _handler, _unitmask) \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_DEVICE_WRITE, 8, 32, 8, UNITMASK32(_unitmask), 8), \
 	TOKEN_PTR(dwrite32, _handler), \
 	TOKEN_STRING(#_handler), \
 	TOKEN_PTR(devtype, _type), \
 	TOKEN_STRING(_tag),
 
 #define AM_READ_PORT(_tag) \
-	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_PORT, 8, 0, 2, 0, 6), \
+	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ_PORT, 8, 0, 8, 0, 8), \
 	TOKEN_STRING(_tag),
 
 #define AM_REGION(_region, _offs) \

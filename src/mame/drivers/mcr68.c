@@ -331,9 +331,9 @@ static ADDRESS_MAP_START( zwackery_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x084000, 0x084fff) AM_RAM
 	AM_RANGE(0x100000, 0x10000f) AM_READWRITE(zwackery_6840_r, mcr68_6840_upper_w)
-	AM_RANGE(0x104000, 0x104007) AM_READWRITE8(pia_2_r, pia_2_w, 8)
-	AM_RANGE(0x108000, 0x108007) AM_READWRITE8(pia_3_r, pia_3_w, 0)
-	AM_RANGE(0x10c000, 0x10c007) AM_READWRITE8(pia_4_r, pia_4_w, 0)
+	AM_RANGE(0x104000, 0x104007) AM_READWRITE8(pia_2_r, pia_2_w, 0xff00)
+	AM_RANGE(0x108000, 0x108007) AM_READWRITE8(pia_3_r, pia_3_w, 0x00ff)
+	AM_RANGE(0x10c000, 0x10c007) AM_READWRITE8(pia_4_r, pia_4_w, 0x00ff)
 	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(SMH_RAM, zwackery_videoram_w) AM_BASE(&videoram16) AM_SIZE(&videoram_size)
 	AM_RANGE(0x802000, 0x803fff) AM_READWRITE(SMH_RAM, zwackery_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc00000, 0xc00fff) AM_READWRITE(SMH_RAM, zwackery_spriteram_w) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)

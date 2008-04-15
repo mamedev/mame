@@ -933,14 +933,14 @@ static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION(REGION_CPU1, 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_BASE((void *)&main_ram) AM_SIZE(&main_ram_size)
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 8)
+	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
 	AM_RANGE(0x100100, 0x100101) AM_READWRITE(input_port_0_word_r, grom_bank16_w) AM_BASE((void *)&itech8_grom_bank)
 	AM_RANGE(0x100180, 0x100181) AM_READWRITE(input_port_1_word_r, display_page16_w)
-	AM_RANGE(0x100240, 0x100241) AM_WRITE8(tms34061_latch_w, 8)
+	AM_RANGE(0x100240, 0x100241) AM_WRITE8(tms34061_latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READWRITE(input_port_2_word_r, SMH_NOP)
-	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, SHIFT_PACKED)
+	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, 0xffff)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
-	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(itech8_tms34061_r, itech8_tms34061_w, SHIFT_PACKED)
+	AM_RANGE(0x110000, 0x110fff) AM_READWRITE8(itech8_tms34061_r, itech8_tms34061_w, 0xffff)
 ADDRESS_MAP_END
 
 

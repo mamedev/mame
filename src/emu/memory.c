@@ -245,7 +245,8 @@ struct _handler_data
 	const char *			name;					/* name of the handler */
 	memory_handler			subhandler;				/* function pointer for subhandler */
 	void *					subobject;				/* object associated with the subhandler */
-	UINT32					subshift;				/* shift for the subhandler */
+	UINT8					subunits;				/* number of subunits to access */
+	UINT8					subshift[8];			/* shift amounts for up to 8 subunits */
 	offs_t					bytestart;				/* byte-adjusted start address for handler */
 	offs_t					byteend;				/* byte-adjusted end address for handler */
 	offs_t					bytemask;				/* byte-adjusted mask against the final address */
@@ -417,11 +418,12 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 static void memory_init_cpudata(const machine_config *config);
 static void memory_init_preflight(const machine_config *config);
 static void memory_init_populate(running_machine *machine);
-static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlershift, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
-static void space_map_range(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlershift, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
+static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
+static void space_map_range(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
 static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
 static genf *bank_assign_dynamic(int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
 static UINT8 table_assign_handler(handler_data *table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask);
+static void table_compute_subhandler(handler_data *table, UINT8 entry, read_or_write readorwrite, int spacebits, int spaceendian, int handlerbits, int handlerunitmask);
 static void table_populate_range(table_data *tabledata, offs_t bytestart, offs_t byteend, UINT8 handler);
 static void table_populate_range_mirrored(table_data *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
 static UINT8 subtable_alloc(table_data *tabledata);
@@ -436,7 +438,7 @@ static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *
 static address_map_entry *assign_intersecting_blocks(addrspace_data *space, offs_t bytestart, offs_t byteend, UINT8 *base);
 static void memory_init_locate(running_machine *machine);
 static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress);
-static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits, int spaceendian, int handlerdbits, int handlershift);
+static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits, int handlerdbits);
 static genf *get_static_handler(int handlerbits, int readorwrite, int spacenum, int which);
 static void memory_exit(running_machine *machine);
 static void mem_dump(void);
@@ -790,19 +792,21 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 
 			case ADDRMAP_TOKEN_READ:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 2, entry->read_shift, 6);
+				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
 				entry->read_name = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_WRITE:
 				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 2, entry->write_shift, 6);
+				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
 				entry->write_name = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_READ:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->read_bits, 8, entry->read_mask, 8);
 				entry->read = TOKEN_GET_PTR(tokens, read);
 				entry->read_name = TOKEN_GET_STRING(tokens);
 				entry->read_devtype = TOKEN_GET_PTR(tokens, devtype);
@@ -810,6 +814,8 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_WRITE:
+				TOKEN_UNGET_UINT32(tokens);
+				TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, entry->write_bits, 8, entry->write_mask, 8);
 				entry->write = TOKEN_GET_PTR(tokens, write);
 				entry->write_name = TOKEN_GET_STRING(tokens);
 				entry->write_devtype = TOKEN_GET_PTR(tokens, devtype);
@@ -1626,7 +1632,7 @@ static void memory_init_populate(running_machine *machine)
 
 						if (entry->read.generic != NULL)
 						{
-							int bits = (entry->read_bits == 0) ? space->dbits : (4 << entry->read_bits);
+							int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
 							void *object = machine;
 							if (entry->read_devtype != NULL)
 							{
@@ -1634,11 +1640,11 @@ static void memory_init_populate(running_machine *machine)
 								if (object == NULL)
 									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
 							}
-							space_map_range_private(space, ROW_READ, bits, entry->read_shift, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->read.generic, object, entry->read_name);
+							space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->read.generic, object, entry->read_name);
 						}
 						if (entry->write.generic != NULL)
 						{
-							int bits = (entry->write_bits == 0) ? space->dbits : (4 << entry->write_bits);
+							int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
 							void *object = machine;
 							if (entry->write_devtype != NULL)
 							{
@@ -1646,7 +1652,7 @@ static void memory_init_populate(running_machine *machine)
 								if (object == NULL)
 									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
 							}
-							space_map_range_private(space, ROW_WRITE, bits, entry->write_shift, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->write.generic, object, entry->write_name);
+							space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->write.generic, object, entry->write_name);
 						}
 					}
 				}
@@ -1661,7 +1667,7 @@ static void memory_init_populate(running_machine *machine)
     banks to dynamically assigned banks
 -------------------------------------------------*/
 
-static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlershift, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name)
+static void space_map_range_private(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name)
 {
 	/* translate ROM to RAM/UNMAP here */
 	if (HANDLER_IS_ROM(handler))
@@ -1685,7 +1691,7 @@ static void space_map_range_private(addrspace_data *space, read_or_write readorw
 	}
 
 	/* then do a normal installation */
-	space_map_range(space, readorwrite, handlerbits, handlershift, addrstart, addrend, addrmask, addrmirror, handler, object, handler_name);
+	space_map_range(space, readorwrite, handlerbits, handlerunitmask, addrstart, addrend, addrmask, addrmirror, handler, object, handler_name);
 }
 
 
@@ -1695,7 +1701,7 @@ static void space_map_range_private(addrspace_data *space, read_or_write readorw
     space
 -------------------------------------------------*/
 
-static void space_map_range(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlershift, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name)
+static void space_map_range(addrspace_data *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name)
 {
 	table_data *tabledata = (readorwrite == ROW_WRITE) ? &space->write : &space->read;
 	offs_t bytestart, byteend, bytemask, bytemirror;
@@ -1717,7 +1723,6 @@ static void space_map_range(addrspace_data *space, read_or_write readorwrite, in
 	assert_always(!HANDLER_IS_RAM(handler), "space_map_range called with RAM after initialization");
 	assert_always(addrstart <= addrend, "space_map_range called with start greater than end");
 	assert_always(handlerbits <= space->dbits, "space_map_range called with handlers larger than the address space");
-	assert_always(handlershift == SHIFT_PACKED || handlerbits + handlershift <= space->dbits, "space_map_range called with out-of-range handlershift");
 	assert_always((bytestart & (space->dbits / 8 - 1)) == 0, "space_map_range called with misaligned start address");
 	assert_always((byteend & (space->dbits / 8 - 1)) == (space->dbits / 8 - 1), "space_map_range called with misaligned end address");
 
@@ -1730,20 +1735,7 @@ static void space_map_range(addrspace_data *space, read_or_write readorwrite, in
 
 	/* fix up the handler if a stub is required */
 	if (handlerbits != space->dbits)
-	{
-		handler_data *hdata = &tabledata->handlers[entry];
-		
-		assert_always(!HANDLER_IS_STATIC(entry), "space_map_range called with static handlers and mismatched data bus widths"); 
-		
-		/* copy raw data to the subhandler data */
-		hdata->subobject = hdata->object;
-		hdata->subhandler = hdata->handler;
-		hdata->subshift = handlershift;
-		
-		/* fill in a stub as the real handler */
-		hdata->object = hdata;
-		hdata->handler = get_stub_handler(readorwrite, space->dbits, space->endianness, handlerbits, handlershift);
-	}
+		table_compute_subhandler(tabledata->handlers, entry, readorwrite, space->dbits, space->endianness, handlerbits, handlerunitmask);
 
 	/* populate it */
 	table_populate_range_mirrored(tabledata, bytestart, byteend, bytemirror, entry);
@@ -1868,6 +1860,52 @@ static UINT8 table_assign_handler(handler_data *table, void *object, genf *handl
 			return entry;
 	}
 	return 0;
+}
+
+
+/*-------------------------------------------------
+    table_compute_subhandler - compute data for
+    a subhandler
+-------------------------------------------------*/
+
+static void table_compute_subhandler(handler_data *table, UINT8 entry, read_or_write readorwrite, int spacebits, int spaceendian, int handlerbits, int handlerunitmask)
+{
+	int maxunits = spacebits / handlerbits;
+	handler_data *hdata = &table[entry];
+	int unitnum;
+	
+	assert_always(!HANDLER_IS_STATIC(entry), "table_compute_subhandler called with static handlers and mismatched data bus widths"); 
+
+	/* copy raw data to the subhandler data */
+	hdata->subobject = hdata->object;
+	hdata->subhandler = hdata->handler;
+	
+	/* fill in a stub as the real handler */
+	hdata->object = hdata;
+	hdata->handler = get_stub_handler(readorwrite, spacebits, handlerbits);
+
+	/* compute the number of subunits */
+	hdata->subunits = 0;
+	for (unitnum = 0; unitnum < maxunits; unitnum++)
+		if (handlerunitmask & (1 << unitnum))
+			hdata->subunits++;
+	assert_always(hdata->subunits > 0, "table_compute_subhandler called with no bytes specified in mask");
+
+	/* then fill in the shifts based on the endianness */
+	if (spaceendian == CPU_IS_LE)
+	{
+		UINT8 *unitshift = &hdata->subshift[0];
+		for (unitnum = 0; unitnum < maxunits; unitnum++)
+			if (handlerunitmask & (1 << unitnum))
+				*unitshift++ = unitnum * handlerbits;
+	}
+	else
+	{
+		UINT8 *unitshift = &hdata->subshift[hdata->subunits];
+		for (unitnum = 0; unitnum < maxunits; unitnum++)
+			if (handlerunitmask & (1 << unitnum))
+				*--unitshift = unitnum * handlerbits;
+	}
 }
 
 
@@ -3000,183 +3038,145 @@ static void mem_dump(void)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    stub_read8_from_16_shifted - return a 16-bit
-    value from a single byte access in a 
-    particular lane
--------------------------------------------------*/
-
-static READ16_HANDLER( stub_read8_from_16_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT8)(mem_mask >> handler->subshift) != 0xff)
-		return (*handler->subhandler.read.mhandler8)(handler->subobject, offset) << handler->subshift;
-	else
-		return 0;
-}
-
-
-/*-------------------------------------------------
-    stub_read8_from_16le_packed - return a 16-bit
+    stub_read8_from_16 - return a 16-bit
     value combined from one or more byte accesses
 -------------------------------------------------*/
 
-static READ16_HANDLER( stub_read8_from_16le_packed )
+static READ16_HANDLER( stub_read8_from_16 )
 {
-	handler_data *handler = (handler_data *)machine;
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
 	UINT16 result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 2 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 2 + 1) << 8;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT8)(mem_mask >> shift) != 0xff)
+			result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset) << shift;
+		offset++;
+	}
 	return result;
 }
 
 
 /*-------------------------------------------------
-    stub_read8_from_16be_packed - return a 16-bit
+    stub_read8_from_32 - return a 32-bit
     value combined from one or more byte accesses
 -------------------------------------------------*/
 
-static READ16_HANDLER( stub_read8_from_16be_packed )
+static READ32_HANDLER( stub_read8_from_32 )
 {
-	handler_data *handler = (handler_data *)machine;
-	UINT16 result = 0;
-	if (ACCESSING_BITS_8_15)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 2 + 0) << 8;
-	if (ACCESSING_BITS_0_7)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 2 + 1) << 0;
-	return result;
-}
-
-
-/*-------------------------------------------------
-    stub_read8_from_32_shifted - return a 32-bit
-    value from a single byte access in a 
-    particular lane
--------------------------------------------------*/
-
-static READ32_HANDLER( stub_read8_from_32_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT8)(mem_mask >> handler->subshift) != 0xff)
-		return (*handler->subhandler.read.mhandler8)(handler->subobject, offset) << handler->subshift;
-	else
-		return 0;
-}
-
-
-/*-------------------------------------------------
-    stub_read8_from_32le_packed - return a 32-bit
-    value combined from one or more byte accesses
--------------------------------------------------*/
-
-static READ32_HANDLER( stub_read8_from_32le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
 	UINT32 result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 3) << 24;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT8)(mem_mask >> shift) != 0xff)
+			result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset) << shift;
+		offset++;
+	}
 	return result;
 }
 
 
 /*-------------------------------------------------
-    stub_read8_from_32be_packed - return a 32-bit
+    stub_read8_from_64 - return a 64-bit
     value combined from one or more byte accesses
 -------------------------------------------------*/
 
-static READ32_HANDLER( stub_read8_from_32be_packed )
+static READ64_HANDLER( stub_read8_from_64 )
 {
-	handler_data *handler = (handler_data *)machine;
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	UINT64 result = 0;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT8)(mem_mask >> shift) != 0xff)
+			result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset) << shift;
+		offset++;
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    stub_read16_from_32 - return a 32-bit
+    value combined from one or more word accesses
+-------------------------------------------------*/
+
+static READ32_HANDLER( stub_read16_from_32 )
+{
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
 	UINT32 result = 0;
-	if (ACCESSING_BITS_24_31)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 0) << 24;
-	if (ACCESSING_BITS_16_23)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 1) << 16;
-	if (ACCESSING_BITS_8_15)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 2) << 8;
-	if (ACCESSING_BITS_0_7)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 4 + 3) << 0;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT16)(mem_mask >> shift) != 0xffff)
+			result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset, mem_mask >> shift) << shift;
+		offset++;
+	}
 	return result;
 }
 
 
 /*-------------------------------------------------
-    stub_read8_from_64_shifted - return a 64-bit
-    value from a single byte access in a 
-    particular lane
+    stub_read16_from_64 - return a 64-bit
+    value combined from one or more word accesses
 -------------------------------------------------*/
 
-static READ64_HANDLER( stub_read8_from_64_shifted )
+static READ64_HANDLER( stub_read16_from_64 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT8)(mem_mask >> handler->subshift) != 0xff)
-		return (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset) << handler->subshift;
-	else
-		return 0;
-}
-
-
-/*-------------------------------------------------
-    stub_read8_from_64le_packed - return a 64-bit
-    value combined from one or more byte accesses
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read8_from_64le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
 	UINT64 result = 0;
-	if (ACCESSING_BITS_0_7)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 0) << 0;
-	if (ACCESSING_BITS_8_15)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 1) << 8;
-	if (ACCESSING_BITS_16_23)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 2) << 16;
-	if (ACCESSING_BITS_24_31)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 3) << 24;
-	if (ACCESSING_BITS_32_39)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 4) << 32;
-	if (ACCESSING_BITS_40_47)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 5) << 40;
-	if (ACCESSING_BITS_48_55)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 6) << 48;
-	if (ACCESSING_BITS_56_63)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 7) << 56;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT16)(mem_mask >> shift) != 0xffff)
+			result |= (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset, mem_mask >> shift) << shift;
+		offset++;
+	}
 	return result;
 }
 
 
 /*-------------------------------------------------
-    stub_read8_from_64be_packed - return a 64-bit
-    value combined from one or more byte accesses
+    stub_read32_from_64 - return a 64-bit
+    value combined from one or more dword accesses
 -------------------------------------------------*/
 
-static READ64_HANDLER( stub_read8_from_64be_packed )
+static READ64_HANDLER( stub_read32_from_64 )
 {
-	handler_data *handler = (handler_data *)machine;
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
 	UINT64 result = 0;
-	if (ACCESSING_BITS_56_63)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 0) << 56;
-	if (ACCESSING_BITS_48_55)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 1) << 48;
-	if (ACCESSING_BITS_40_47)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 2) << 40;
-	if (ACCESSING_BITS_32_39)
-		result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 3) << 32;
-	if (ACCESSING_BITS_24_31)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 4) << 24;
-	if (ACCESSING_BITS_16_23)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 5) << 16;
-	if (ACCESSING_BITS_8_15)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 6) << 8;
-	if (ACCESSING_BITS_0_7)
-		result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset * 8 + 7) << 0;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT32)(mem_mask >> shift) != 0xffffffff)
+			result |= (UINT64)(*handler->subhandler.read.mhandler32)(handler->subobject, offset, mem_mask >> shift) << shift;
+		offset++;
+	}
 	return result;
 }
 
@@ -3187,478 +3187,134 @@ static READ64_HANDLER( stub_read8_from_64be_packed )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    stub_write8_from_16_shifted - write a 16-bit
-    value to a single byte lane
--------------------------------------------------*/
-
-static WRITE16_HANDLER( stub_write8_from_16_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT8)(mem_mask >> handler->subshift) != 0xff)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> handler->subshift);
-}
-
-
-/*-------------------------------------------------
-    stub_write8_from_16le_packed - convert a 16-bit
+    stub_write8_from_16 - convert a 16-bit
     write to one or more byte accesses
 -------------------------------------------------*/
 
-static WRITE16_HANDLER( stub_write8_from_16le_packed )
+static WRITE16_HANDLER( stub_write8_from_16 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if (ACCESSING_BITS_0_7)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 2 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 2 + 1, data >> 8);
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT8)(mem_mask >> shift) != 0xff)
+			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
+		offset++;
+	}
 }
 
 
 /*-------------------------------------------------
-    stub_write8_from_16be_packed - convert a 16-bit
+    stub_write8_from_32 - convert a 32-bit
     write to one or more byte accesses
 -------------------------------------------------*/
 
-static WRITE16_HANDLER( stub_write8_from_16be_packed )
+static WRITE32_HANDLER( stub_write8_from_32 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if (ACCESSING_BITS_8_15)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 2 + 0, data >> 8);
-	if (ACCESSING_BITS_0_7)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 2 + 1, data >> 0);
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT8)(mem_mask >> shift) != 0xff)
+			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
+		offset++;
+	}
 }
 
 
 /*-------------------------------------------------
-    stub_write8_from_32_shifted - write a 32-bit
-    value to a single byte lane
--------------------------------------------------*/
-
-static WRITE32_HANDLER( stub_write8_from_32_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT8)(mem_mask >> handler->subshift) != 0xff)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> handler->subshift);
-}
-
-
-/*-------------------------------------------------
-    stub_write8_from_32le_packed - convert a 32-bit
+    stub_write8_from_64 - convert a 64-bit
     write to one or more byte accesses
 -------------------------------------------------*/
 
-static WRITE32_HANDLER( stub_write8_from_32le_packed )
+static WRITE64_HANDLER( stub_write8_from_64 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if (ACCESSING_BITS_0_7)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 3, data >> 24);
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT8)(mem_mask >> shift) != 0xff)
+			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
+		offset++;
+	}
 }
 
 
 /*-------------------------------------------------
-    stub_write8_from_32be_packed - convert a 32-bit
-    write to one or more byte accesses
--------------------------------------------------*/
-
-static WRITE32_HANDLER( stub_write8_from_32be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	if (ACCESSING_BITS_24_31)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 0, data >> 24);
-	if (ACCESSING_BITS_16_23)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 1, data >> 16);
-	if (ACCESSING_BITS_8_15)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 2, data >> 8);
-	if (ACCESSING_BITS_0_7)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 4 + 3, data >> 0);
-}
-
-
-/*-------------------------------------------------
-    stub_write8_from_64_shifted - write a 64-bit
-    value to a single byte lane
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write8_from_64_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT8)(mem_mask >> handler->subshift) != 0xff)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> handler->subshift);
-}
-
-
-/*-------------------------------------------------
-    stub_write8_from_64le_packed - convert a 64-bit
-    write to one or more byte accesses
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write8_from_64le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	if (ACCESSING_BITS_0_7)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 0, data >> 0);
-	if (ACCESSING_BITS_8_15)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 1, data >> 8);
-	if (ACCESSING_BITS_16_23)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 2, data >> 16);
-	if (ACCESSING_BITS_24_31)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 3, data >> 24);
-	if (ACCESSING_BITS_32_39)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 4, data >> 32);
-	if (ACCESSING_BITS_40_47)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 5, data >> 40);
-	if (ACCESSING_BITS_48_55)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 6, data >> 48);
-	if (ACCESSING_BITS_56_63)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 7, data >> 56);
-}
-
-
-/*-------------------------------------------------
-    stub_write8_from_64be_packed - convert a 64-bit
-    write to one or more byte accesses
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write8_from_64be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	if (ACCESSING_BITS_56_63)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 0, data >> 56);
-	if (ACCESSING_BITS_48_55)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 1, data >> 48);
-	if (ACCESSING_BITS_40_47)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 2, data >> 40);
-	if (ACCESSING_BITS_32_39)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 3, data >> 32);
-	if (ACCESSING_BITS_24_31)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 4, data >> 24);
-	if (ACCESSING_BITS_16_23)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 5, data >> 16);
-	if (ACCESSING_BITS_8_15)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 6, data >> 8);
-	if (ACCESSING_BITS_0_7)
-		(*handler->subhandler.write.mhandler8)(handler->subobject, offset * 8 + 7, data >> 0);
-}
-
-
-
-/***************************************************************************
-    STUB HANDLERS THAT MAP TO WORD READS
-***************************************************************************/
-
-/*-------------------------------------------------
-    stub_read16_from_32_shifted - return a 32-bit
-    value from a single word access in a 
-    particular lane
--------------------------------------------------*/
-
-static READ32_HANDLER( stub_read16_from_32_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT16)(mem_mask >> handler->subshift) != 0xffff)
-		return (*handler->subhandler.read.mhandler16)(handler->subobject, offset, mem_mask >> handler->subshift) << handler->subshift;
-	else
-		return 0;
-}
-
-
-/*-------------------------------------------------
-    stub_read16_from_32le_packed - return a 32-bit
-    value combined from one or more word accesses
--------------------------------------------------*/
-
-static READ32_HANDLER( stub_read16_from_32le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	UINT32 result = 0;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 2 + 0, mem_mask >> 0) << 0;
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 2 + 1, mem_mask >> 16) << 16;
-	return result;
-}
-
-
-/*-------------------------------------------------
-    stub_read16_from_32be_packed - return a 32-bit
-    value combined from one or more word accesses
--------------------------------------------------*/
-
-static READ32_HANDLER( stub_read16_from_32be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	UINT32 result = 0;
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 2 + 0, mem_mask >> 16) << 16;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 2 + 1, mem_mask >> 0) << 0;
-	return result;
-}
-
-
-/*-------------------------------------------------
-    stub_read16_from_64_shifted - return a 64-bit
-    value from a single word access in a 
-    particular lane
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read16_from_64_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT16)(mem_mask >> handler->subshift) != 0xffff)
-		return (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset, mem_mask >> handler->subshift) << handler->subshift;
-	else
-		return 0;
-}
-
-
-/*-------------------------------------------------
-    stub_read16_from_64le_packed - return a 64-bit
-    value combined from one or more word accesses
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read16_from_64le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	UINT32 result = 0;
-	if ((mem_mask & U64(0x000000000000ffff)) != U64(0x000000000000ffff))
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 0, mem_mask >> 0) << 0;
-	if ((mem_mask & U64(0x00000000ffff0000)) != U64(0x00000000ffff0000))
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 1, mem_mask >> 16) << 16;
-	if ((mem_mask & U64(0x0000ffff00000000)) != U64(0x0000ffff00000000))
-		result |= (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 2, mem_mask >> 32) << 32;
-	if ((mem_mask & U64(0xffff000000000000)) != U64(0xffff000000000000))
-		result |= (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 3, mem_mask >> 48) << 48;
-	return result;
-}
-
-
-/*-------------------------------------------------
-    stub_read16_from_64be_packed - return a 64-bit
-    value combined from one or more word accesses
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read16_from_64be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	UINT32 result = 0;
-	if ((mem_mask & U64(0xffff000000000000)) != U64(0xffff000000000000))
-		result |= (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 0, mem_mask >> 48) << 48;
-	if ((mem_mask & U64(0x0000ffff00000000)) != U64(0x0000ffff00000000))
-		result |= (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 1, mem_mask >> 32) << 32;
-	if ((mem_mask & U64(0x00000000ffff0000)) != U64(0x00000000ffff0000))
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 2, mem_mask >> 16) << 16;
-	if ((mem_mask & U64(0x000000000000ffff)) != U64(0x000000000000ffff))
-		result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset * 4 + 3, mem_mask >> 0) << 0;
-	return result;
-}
-
-
-
-/***************************************************************************
-    STUB HANDLERS THAT MAP TO WORD WRITES
-***************************************************************************/
-
-/*-------------------------------------------------
-    stub_write16_from_32_shifted - write a 32-bit
-    value to a single word lane
--------------------------------------------------*/
-
-static WRITE32_HANDLER( stub_write16_from_32_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT16)(mem_mask >> handler->subshift) != 0xffff)
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset, data >> handler->subshift, mem_mask >> handler->subshift);
-}
-
-
-/*-------------------------------------------------
-    stub_write16_from_32le_packed - convert a 32-bit
+    stub_write16_from_32 - convert a 32-bit
     write to one or more word accesses
 -------------------------------------------------*/
 
-static WRITE32_HANDLER( stub_write16_from_32le_packed )
+static WRITE32_HANDLER( stub_write16_from_32 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 2 + 0, data >> 0, mem_mask >> 0);
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 2 + 1, data >> 16, mem_mask >> 16);
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT16)(mem_mask >> shift) != 0xffff)
+			(*handler->subhandler.write.mhandler16)(handler->subobject, offset, data >> shift, mem_mask >> shift);
+		offset++;
+	}
 }
 
 
 /*-------------------------------------------------
-    stub_write16_from_32be_packed - convert a 32-bit
+    stub_write16_from_64 - convert a 64-bit
     write to one or more word accesses
 -------------------------------------------------*/
 
-static WRITE32_HANDLER( stub_write16_from_32be_packed )
+static WRITE64_HANDLER( stub_write16_from_64 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if ((mem_mask & 0xffff0000) != 0xffff0000)
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 2 + 0, data >> 16, mem_mask >> 16);
-	if ((mem_mask & 0x0000ffff) != 0x0000ffff)
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 2 + 1, data >> 0, mem_mask >> 0);
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT16)(mem_mask >> shift) != 0xffff)
+			(*handler->subhandler.write.mhandler16)(handler->subobject, offset, data >> shift, mem_mask >> shift);
+		offset++;
+	}
 }
 
 
 /*-------------------------------------------------
-    stub_write16_from_64_shifted - write a 64-bit
-    value to a single word lane
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write16_from_64_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT16)(mem_mask >> handler->subshift) != 0xffff)
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset, data >> handler->subshift, mem_mask >> handler->subshift);
-}
-
-
-/*-------------------------------------------------
-    stub_write16_from_64le_packed - convert a 64-bit
+    stub_write32_from_64 - convert a 64-bit
     write to one or more word accesses
 -------------------------------------------------*/
 
-static WRITE64_HANDLER( stub_write16_from_64le_packed )
+static WRITE64_HANDLER( stub_write32_from_64 )
 {
-	handler_data *handler = (handler_data *)machine;
-	if ((mem_mask & U64(0x000000000000ffff)) != U64(0x000000000000ffff))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 0, data >> 0, mem_mask >> 0);
-	if ((mem_mask & U64(0x00000000ffff0000)) != U64(0x00000000ffff0000))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 1, data >> 16, mem_mask >> 16);
-	if ((mem_mask & U64(0x0000ffff00000000)) != U64(0x0000ffff00000000))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 2, data >> 32, mem_mask >> 32);
-	if ((mem_mask & U64(0xffff000000000000)) != U64(0xffff000000000000))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 3, data >> 48, mem_mask >> 48);
-}
-
-
-/*-------------------------------------------------
-    stub_write16_from_64be_packed - convert a 64-bit
-    write to one or more word accesses
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write16_from_64be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((mem_mask & U64(0xffff000000000000)) != U64(0xffff000000000000))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 0, data >> 48, mem_mask >> 48);
-	if ((mem_mask & U64(0x0000ffff00000000)) != U64(0x0000ffff00000000))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 1, data >> 32, mem_mask >> 32);
-	if ((mem_mask & U64(0x00000000ffff0000)) != U64(0x00000000ffff0000))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 2, data >> 16, mem_mask >> 16);
-	if ((mem_mask & U64(0x000000000000ffff)) != U64(0x000000000000ffff))
-		(*handler->subhandler.write.mhandler16)(handler->subobject, offset * 4 + 3, data >> 0, mem_mask >> 0);
-}
-
-
-
-/***************************************************************************
-    STUB HANDLERS THAT MAP TO DWORD READS
-***************************************************************************/
-
-/*-------------------------------------------------
-    stub_read32_from_64_shifted - return a 64-bit
-    value from a single dword access in a 
-    particular lane
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read32_from_64_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT32)(mem_mask >> handler->subshift) != 0xffffffff)
-		return (UINT64)(*handler->subhandler.read.mhandler32)(handler->subobject, offset, mem_mask >> handler->subshift) << handler->subshift;
-	else
-		return 0;
-}
-
-
-/*-------------------------------------------------
-    stub_read32_from_64le_packed - return a 64-bit
-    value combined from one or more dword accesses
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read32_from_64le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	UINT32 result = 0;
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (*handler->subhandler.read.mhandler32)(handler->subobject, offset * 2 + 0, mem_mask >> 0) << 0;
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)(*handler->subhandler.read.mhandler32)(handler->subobject, offset * 2 + 1, mem_mask >> 32) << 32;
-	return result;
-}
-
-
-/*-------------------------------------------------
-    stub_read32_from_64be_packed - return a 64-bit
-    value combined from one or more dword accesses
--------------------------------------------------*/
-
-static READ64_HANDLER( stub_read32_from_64be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	UINT32 result = 0;
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		result |= (UINT64)(*handler->subhandler.read.mhandler32)(handler->subobject, offset * 2 + 0, mem_mask >> 32) << 32;
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		result |= (*handler->subhandler.read.mhandler32)(handler->subobject, offset * 2 + 1, mem_mask >> 0) << 0;
-	return result;
-}
-
-
-
-/***************************************************************************
-    STUB HANDLERS THAT MAP TO DWORD WRITES
-***************************************************************************/
-
-/*-------------------------------------------------
-    stub_write32_from_64_shifted - write a 64-bit
-    value to a single word lane
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write32_from_64_shifted )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((UINT32)(mem_mask >> handler->subshift) != 0xffffffff)
-		(*handler->subhandler.write.mhandler32)(handler->subobject, offset, data >> handler->subshift, mem_mask >> handler->subshift);
-}
-
-
-/*-------------------------------------------------
-    stub_write32_from_64le_packed - convert a 64-bit
-    write to one or more word accesses
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write32_from_64le_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		(*handler->subhandler.write.mhandler32)(handler->subobject, offset * 2 + 0, data >> 0, mem_mask >> 0);
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		(*handler->subhandler.write.mhandler32)(handler->subobject, offset * 2 + 1, data >> 32, mem_mask >> 32);
-}
-
-
-/*-------------------------------------------------
-    stub_write32_from_64be_packed - convert a 64-bit
-    write to one or more word accesses
--------------------------------------------------*/
-
-static WRITE64_HANDLER( stub_write32_from_64be_packed )
-{
-	handler_data *handler = (handler_data *)machine;
-	if ((mem_mask & U64(0xffffffff00000000)) != U64(0xffffffff00000000))
-		(*handler->subhandler.write.mhandler32)(handler->subobject, offset * 2 + 0, data >> 32, mem_mask >> 32);
-	if ((mem_mask & U64(0x00000000ffffffff)) != U64(0x00000000ffffffff))
-		(*handler->subhandler.write.mhandler32)(handler->subobject, offset * 2 + 1, data >> 0, mem_mask >> 0);
+	const handler_data *handler = (const handler_data *)machine;
+	const UINT8 *subshift = handler->subshift;
+	int subunits = handler->subunits;
+	
+	offset *= subunits;
+	while (subunits-- != 0)
+	{
+		int shift = *subshift++;
+		if ((UINT32)(mem_mask >> shift) != 0xffffffff)
+			(*handler->subhandler.write.mhandler32)(handler->subobject, offset, data >> shift, mem_mask >> shift);
+		offset++;
+	}
 }
 
 
@@ -3672,7 +3328,7 @@ static WRITE64_HANDLER( stub_write32_from_64be_packed )
     stub handler
 -------------------------------------------------*/
 
-static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits, int spaceendian, int handlerdbits, int handlershift)
+static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits, int handlerdbits)
 {
 	memory_handler result = { 0 };
 	
@@ -3683,69 +3339,27 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 		if (spacedbits == 16)
 		{
 			if (handlerdbits == 8)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.read.mhandler16 = stub_read8_from_16_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.read.mhandler16 = stub_read8_from_16le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.read.mhandler16 = stub_read8_from_16be_packed;
-			}
+				result.read.mhandler16 = stub_read8_from_16;
 		}
 		
 		/* 32-bit read stubs */
 		else if (spacedbits == 32)
 		{
 			if (handlerdbits == 8)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.read.mhandler32 = stub_read8_from_32_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.read.mhandler32 = stub_read8_from_32le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.read.mhandler32 = stub_read8_from_32be_packed;
-			}
+				result.read.mhandler32 = stub_read8_from_32;
 			else if (handlerdbits == 16)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.read.mhandler32 = stub_read16_from_32_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.read.mhandler32 = stub_read16_from_32le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.read.mhandler32 = stub_read16_from_32be_packed;
-			}
+				result.read.mhandler32 = stub_read16_from_32;
 		}
 		
 		/* 64-bit read stubs */
 		else if (spacedbits == 64)
 		{
 			if (handlerdbits == 8)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.read.mhandler64 = stub_read8_from_64_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.read.mhandler64 = stub_read8_from_64le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.read.mhandler64 = stub_read8_from_64be_packed;
-			}
+				result.read.mhandler64 = stub_read8_from_64;
 			else if (handlerdbits == 16)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.read.mhandler64 = stub_read16_from_64_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.read.mhandler64 = stub_read16_from_64le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.read.mhandler64 = stub_read16_from_64be_packed;
-			}
+				result.read.mhandler64 = stub_read16_from_64;
 			else if (handlerdbits == 32)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.read.mhandler64 = stub_read32_from_64_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.read.mhandler64 = stub_read32_from_64le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.read.mhandler64 = stub_read32_from_64be_packed;
-			}
+				result.read.mhandler64 = stub_read32_from_64;
 		}
 	}
 	
@@ -3756,69 +3370,27 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 		if (spacedbits == 16)
 		{
 			if (handlerdbits == 8)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.write.mhandler16 = stub_write8_from_16_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.write.mhandler16 = stub_write8_from_16le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.write.mhandler16 = stub_write8_from_16be_packed;
-			}
+				result.write.mhandler16 = stub_write8_from_16;
 		}
 		
 		/* 32-bit write stubs */
 		else if (spacedbits == 32)
 		{
 			if (handlerdbits == 8)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.write.mhandler32 = stub_write8_from_32_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.write.mhandler32 = stub_write8_from_32le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.write.mhandler32 = stub_write8_from_32be_packed;
-			}
+				result.write.mhandler32 = stub_write8_from_32;
 			else if (handlerdbits == 16)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.write.mhandler32 = stub_write16_from_32_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.write.mhandler32 = stub_write16_from_32le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.write.mhandler32 = stub_write16_from_32be_packed;
-			}
+				result.write.mhandler32 = stub_write16_from_32;
 		}
 		
 		/* 64-bit write stubs */
 		else if (spacedbits == 64)
 		{
 			if (handlerdbits == 8)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.write.mhandler64 = stub_write8_from_64_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.write.mhandler64 = stub_write8_from_64le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.write.mhandler64 = stub_write8_from_64be_packed;
-			}
+				result.write.mhandler64 = stub_write8_from_64;
 			else if (handlerdbits == 16)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.write.mhandler64 = stub_write16_from_64_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.write.mhandler64 = stub_write16_from_64le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.write.mhandler64 = stub_write16_from_64be_packed;
-			}
+				result.write.mhandler64 = stub_write16_from_64;
 			else if (handlerdbits == 32)
-			{
-				if (handlershift != SHIFT_PACKED)
-					result.write.mhandler64 = stub_write32_from_64_shifted;
-				else if (spaceendian == CPU_IS_LE)
-					result.write.mhandler64 = stub_write32_from_64le_packed;
-				else if (spaceendian == CPU_IS_BE)
-					result.write.mhandler64 = stub_write32_from_64be_packed;
-			}
+				result.write.mhandler64 = stub_write32_from_64;
 		}
 	}
 	
