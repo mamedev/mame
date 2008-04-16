@@ -6449,6 +6449,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( aerofgtc )	/* (c) 1992 Video System Co. */
 	DRIVER( sonicwi )	/* (c) 1992 Video System Co. (Japan) */
 	DRIVER( aerfboot )	/* bootleg */
+	DRIVER( aerfboo2 )	/* bootleg */
 	DRIVER( wbbc97 )	/* (c) 1997 Comad */
 	DRIVER( welltris )	/* (c) 1991 Video System Co. (Japan) */
 	DRIVER( welltrij )	/* (c) 1991 Video System Co. (Japan) */
