@@ -5048,8 +5048,6 @@ ROM_START( passshta )
 	ROM_LOAD16_BYTE( "opr11862.b1",  0x00001, 0x10000, CRC(b6e94727) SHA1(0838e034f1f10d9cd1312c8c94b5c57387c0c271) )
 	ROM_LOAD16_BYTE( "opr11865.b5",  0x00000, 0x10000, CRC(17e8d5d5) SHA1(ac1074b0a705be13c6e3391441e6cfec1d2b3f8a) )
 	ROM_LOAD16_BYTE( "opr11863.b2",  0x20001, 0x10000, CRC(3e670098) SHA1(2cfc83f4294be30cd868738886ac546bd8489962) )
-//  only 1 byte different, probably bad
-//  ROM_LOAD16_BYTE( "17.2b",        0x20001, 0x10000, CRC(66f38725) SHA1(f12076cc5a2ed66cbd7182a3786087121ec65b5c) )
 	ROM_LOAD16_BYTE( "opr11866.b6",  0x20000, 0x10000, CRC(50eb71cc) SHA1(463b4917ca19c7f4ad2c2845caa104d5e4a2dda3) )
 	ROM_LOAD16_BYTE( "opr11864.b3",  0x40001, 0x10000, CRC(05733ca8) SHA1(1dbc7c99450ebe6a9fd8c0244fd3cb38b74984ef) )
 	ROM_LOAD16_BYTE( "opr11867.b7",  0x40000, 0x10000, CRC(81e49697) SHA1(a70fa409e3555ad6c8f28930a7026fdf2deb8c65) )
@@ -5289,10 +5287,37 @@ ROM_END
  **************************************************************************************************************************
 
     Shinobi, Sega System 16B
+    CPU: 68000
+    ROM Board: 171-5521
+*/
+ROM_START( shinobi5 )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "epr11360.a7", 0x00000, 0x20000, CRC(b1f67ab9) SHA1(83eddd1ef3fbe58f1f8e8d57229fabf1907fc371) )
+	ROM_LOAD16_BYTE( "epr11359.a5", 0x00001, 0x20000, CRC(0f0306e1) SHA1(eebe7c88e5f665d1d0920fb9b545e20b05be9b52) )
+
+	ROM_REGION( 0x60000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "epr11363.a14", 0x00000, 0x20000, CRC(40914168) SHA1(cf0508e8c852c24ec3d2fc4a4013aec631d2271f) )
+	ROM_LOAD( "epr11364.a15", 0x20000, 0x20000, CRC(e63649a4) SHA1(042dded1ff964889571f63d2642b2b21b75f9763) )
+	ROM_LOAD( "epr11365.a16", 0x40000, 0x20000, CRC(1ef55d20) SHA1(314590881a2f18339b7b9c16010e408aa0164e04) )
+
+	ROM_REGION16_BE( 0x80000, REGION_GFX2, 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "epr11366.b1", 0x00001, 0x20000, CRC(319ede73) SHA1(c48ba4694ff677f30cc1ced3a3ad11c0feb1122d) )
+	ROM_LOAD16_BYTE( "epr11368.b5", 0x00000, 0x20000, CRC(0377d7ce) SHA1(14f9674c142b78bf8b458beccfef93cc3e722c03) )
+	ROM_LOAD16_BYTE( "epr11367.b2", 0x40001, 0x20000, CRC(1d06c5c7) SHA1(3a44f5a2058b96f212930c2e838eda1ce1036818) )
+	ROM_LOAD16_BYTE( "epr11369.b6", 0x40000, 0x20000, CRC(d751d2a2) SHA1(3659948beacfc8dde5c50775859aa3fed537f768) )
+
+	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* sound CPU */
+	ROM_LOAD( "epr11361.a10", 0x00000, 0x08000, CRC(1f47ebcb) SHA1(32837f3f1dd5ff309d1d955c1a738c444b248d3d) )
+	ROM_LOAD( "epr11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) )
+ROM_END
+
+
+/**************************************************************************************************************************
+
+    Shinobi, Sega System 16B
     CPU: 68000 + MC8123B (317-0054)
     ROM Board: 171-5521
  Game Nunmber: 834-6499-03
-
 */
 ROM_START( shinobi4 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
@@ -5311,8 +5336,7 @@ ROM_START( shinobi4 )
 	ROM_LOAD16_BYTE( "epr11369.b6", 0x40000, 0x20000, CRC(d751d2a2) SHA1(3659948beacfc8dde5c50775859aa3fed537f768) )
 
 	ROM_REGION( 0x50000, REGION_CPU2, 0 ) /* sound CPU */
-//	ROM_LOAD( "eprxxxxx.a10", 0x00000, 0x08000, CRC(1f47ebcb) SHA1(32837f3f1dd5ff309d1d955c1a738c444b248d3d) ) /* Decrypted version of epr11377.a10 below from bootleg? */
-	ROM_LOAD( "epr11377.a10", 0x00000, 0x08000, CRC(0fb6af34) SHA1(ae9da18bd2db317ed96c5f642f90cc1eba60ba99) )
+	ROM_LOAD( "epr11377.a10", 0x00000, 0x08000, CRC(0fb6af34) SHA1(ae9da18bd2db317ed96c5f642f90cc1eba60ba99) ) /* MC8123B (317-0054) encrypted version of epr11361.a10 above */
 	ROM_LOAD( "epr11362.a11", 0x10000, 0x20000, CRC(256af749) SHA1(041bd007ea7708c6d69f07865828b9bd17a139f5) )
 
 	ROM_REGION( 0x2000, REGION_USER2, 0 ) /* MC8123 key */
@@ -5326,8 +5350,8 @@ ROM_END
 */
 ROM_START( shinobi3 )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 code */
-	ROM_LOAD16_BYTE( "epr11299.a4",  0x00000, 0x10000, CRC(b930399d) SHA1(955ff2948e1990463631b0bc5c7f5275384236cc) )
-	ROM_LOAD16_BYTE( "epr11298.a1",  0x00001, 0x10000, CRC(343f4c46) SHA1(2cf5d00462ad85ae9a2e16d59171c8ab85e10f49) )
+	ROM_LOAD16_BYTE( "epr11299.a4", 0x00000, 0x10000, CRC(b930399d) SHA1(955ff2948e1990463631b0bc5c7f5275384236cc) )
+	ROM_LOAD16_BYTE( "epr11298.a1", 0x00001, 0x10000, CRC(343f4c46) SHA1(2cf5d00462ad85ae9a2e16d59171c8ab85e10f49) )
 	ROM_LOAD16_BYTE( "epr11283.a5", 0x20000, 0x10000, CRC(9d46e707) SHA1(37ab25b3b37365c9f45837bfb6ec80652691dd4c) )
 	ROM_LOAD16_BYTE( "epr11281.a2", 0x20001, 0x10000, CRC(7961d07e) SHA1(38cbdab35f901532c0ad99ad0083513abd2ff182) )
 
@@ -6328,6 +6352,7 @@ GAME( 1990, ryukyu,   0,        system16b,      ryukyu,   generic_5704,  ROT0,  
 GAME( 1987, defense,  sdi,      system16b,      sdi,      defense_5358,  ROT0,   "Sega",           "Defense (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdib,     sdi,      system16b,      sdi,      defense_5358,  ROT0,   "Sega",           "SDI - Strategic Defense Initiative (System 16B, FD1089A 317-0028)", 0 )
 GAME( 1987, sdibl,    sdi,      system16b,      sdi,      sdi_5358,      ROT0,   "bootleg",        "SDI - Strategic Defense Initiative (bootleg)", 0 )
+GAME( 1987, shinobi5, shinobi,  system16b,      shinobi,  generic_5521,  ROT0,   "Sega",           "Shinobi (set 5, System 16B, unprotected)", 0 )
 GAME( 1987, shinobi4, shinobi,  system16b,      shinobi,  shinobi4_5521, ROT0,   "Sega",           "Shinobi (set 4, System 16B, MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi3, shinobi,  system16b,      shinobi,  shinobi3_5358, ROT0,   "Sega",           "Shinobi (set 3, System 16B, MC-8123B 317-0054)", 0 )
 GAME( 1987, shinobi2, shinobi,  system16b,      shinobi,  generic_5358,  ROT0,   "Sega",           "Shinobi (set 2, System 16B, FD1094 317-0049)", 0 )

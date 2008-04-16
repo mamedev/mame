@@ -3453,8 +3453,9 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( sdib )		/* (c) 1987 (FD1089A, decrypted) */
 	DRIVER( sdibl )		/* (c) 1987 bootleg */
 	DRIVER( defense )	/* (c) 1987 (FD1094, decrypted) */
-	DRIVER( shinobi4 )	/* (c) 1987 */
-	DRIVER( shinobi3 )	/* (c) 1987 */
+	DRIVER( shinobi5 )	/* (c) 1987 */
+	DRIVER( shinobi4 )	/* (c) 1987 (MC-8123B) */
+	DRIVER( shinobi3 )	/* (c) 1987 (MC-8123B) */
 	DRIVER( shinobi2 )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( sonicbom )	/* (c) 1987 (FD1094, decrypted) */
 	DRIVER( sjryuko )	/* (c) 1988 White Board (FD1094, decrypted) */
