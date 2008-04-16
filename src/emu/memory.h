@@ -26,7 +26,7 @@
 /* address spaces */
 enum
 {
-	ADDRESS_SPACE_PROGRAM = 0,			/* program address space */
+	ADDRESS_SPACE_PROGRAM = 0,		/* program address space */
 	ADDRESS_SPACE_DATA,				/* data address space */
 	ADDRESS_SPACE_IO,				/* I/O address space */
 	ADDRESS_SPACES					/* maximum number of address spaces */

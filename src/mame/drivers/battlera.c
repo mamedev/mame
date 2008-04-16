@@ -74,27 +74,19 @@ static READ8_HANDLER( control_data_r )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( battlera_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_READ(HuC6270_debug_r) /* Cheat to view vram data */
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
-	AM_RANGE(0x1fe000, 0x1fe001) AM_READ(HuC6270_register_r)
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(control_data_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( battlera_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x10ffff) AM_WRITE(HuC6270_debug_w) /* Cheat to edit vram data */
+static ADDRESS_MAP_START( battlera_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_READWRITE(HuC6270_debug_r, HuC6270_debug_w) /* Cheat to edit vram data */
 	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(battlera_sound_w)
 	AM_RANGE(0x1e1000, 0x1e13ff) AM_WRITE(battlera_palette_w) AM_BASE(&paletteram)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1fe000, 0x1fe001) AM_WRITE(HuC6270_register_w)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(8) /* Main ram */
+	AM_RANGE(0x1fe000, 0x1fe001) AM_READWRITE(HuC6270_register_r, HuC6270_register_w)
 	AM_RANGE(0x1fe002, 0x1fe003) AM_WRITE(HuC6270_data_w)
-	AM_RANGE(0x1ff000, 0x1ff001) AM_WRITE(control_data_w)
+	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battlera_portwrite, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( battlera_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(HuC6270_register_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(HuC6270_data_w)
 ADDRESS_MAP_END
@@ -133,19 +125,13 @@ static WRITE8_HANDLER( battlera_adpcm_reset_w )
 	MSM5205_reset_w(0,0);
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK7) /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
- 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+ 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(YM2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(C6280_0_w)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK7) /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_WRITE(battlera_adpcm_reset_w)
+	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
+	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(soundlatch_r, battlera_adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
 ADDRESS_MAP_END
 
@@ -260,13 +246,12 @@ static MACHINE_DRIVER_START( battlera )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(H6280,21477200/3)
-	MDRV_CPU_PROGRAM_MAP(battlera_readmem,battlera_writemem)
-	MDRV_CPU_IO_MAP(0,battlera_portwrite)
+	MDRV_CPU_PROGRAM_MAP(battlera_map,0)
+	MDRV_CPU_IO_MAP(battlera_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
 	MDRV_CPU_ADD(H6280,21477200/3)
-	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
