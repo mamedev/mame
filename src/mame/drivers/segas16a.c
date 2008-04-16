@@ -3179,7 +3179,7 @@ GAME( 1986, fantzone, 0,        system16a_no7751, fantzone, generic_16a, ROT0,  
 GAME( 1986, fantzon1, fantzone, system16a_no7751, fantzone, generic_16a, ROT0,   "Sega",           "Fantasy Zone (set 1, unprotected)", 0 )
 GAME( 1988, pshot16a, passsht,  system16a,        pshot16a, pshot16a,    ROT270, "Sega",           "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", 0 )
 GAME( 1987, sdi,      0,        system16a_no7751, sdi,      sdi,         ROT0,   "Sega",           "SDI - Strategic Defense Initiative (Europe, System 16A, FD1089B 317-0027)", 0 )
-GAME( 1987, shinobi,  0,        system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 5, System 16A, unprotected)", 0 )
+GAME( 1987, shinobi,  0,        system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 6, System 16A, unprotected)", 0 )
 GAME( 1987, shinobi1, shinobi,  system16a,        shinobi,  generic_16a, ROT0,   "Sega",           "Shinobi (set 1, System 16A, FD1094 317-0050)", 0 )
 GAME( 1987, shinobls, shinobi,  system16a,        shinobi,  generic_16a, ROT0,   "[Sega] (Star bootleg)", "Shinobi (Star bootleg, System 16A)", 0 )
 GAME( 1987, sjryuko1, sjryuko,  system16a,        sjryuko,  sjryukoa,    ROT0,   "White Board",    "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", 0 )
