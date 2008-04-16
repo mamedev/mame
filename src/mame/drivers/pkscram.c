@@ -99,11 +99,11 @@ static ADDRESS_MAP_START( pkscramble_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
-	AM_RANGE(0x044000, 0x044fff) AM_RAM AM_WRITE(pkscramble_fgtilemap_w) AM_BASE(&pkscramble_fgtilemap_ram) // fg tilemap
-	AM_RANGE(0x045000, 0x045fff) AM_RAM AM_WRITE(pkscramble_mdtilemap_w) AM_BASE(&pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM AM_WRITE(pkscramble_bgtilemap_w) AM_BASE(&pkscramble_bgtilemap_ram) // bg tilemap
+	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_BASE(&pkscramble_fgtilemap_ram) // fg tilemap
+	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_BASE(&pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)
+	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_BASE(&pkscramble_bgtilemap_ram) // bg tilemap
 	AM_RANGE(0x047000, 0x047fff) AM_RAM // unused
-	AM_RANGE(0x048000, 0x048fff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x049000, 0x049001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x049004, 0x049005) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x049008, 0x049009) AM_WRITE(pkscramble_output_w)

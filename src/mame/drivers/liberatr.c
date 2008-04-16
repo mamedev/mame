@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_BASE(&liberatr_x)
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_BASE(&liberatr_y)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_RAM, liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x403f) AM_READ(atari_vg_earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(liberatr_input_port_0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ(input_port_1_r)
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_BASE(&liberatr_x)
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_BASE(&liberatr_y)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(SMH_RAM, liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x4000) AM_READ(liberatr_input_port_0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ(input_port_1_r)
 	AM_RANGE(0x4000, 0x400f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_base_ram)

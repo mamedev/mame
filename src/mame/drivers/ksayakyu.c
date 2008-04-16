@@ -118,8 +118,8 @@ static ADDRESS_MAP_START( maincpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
 	AM_RANGE(0xa807, 0xa807) AM_READ(SMH_NOP) /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(SMH_RAM, ksayakyu_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_READWRITE(SMH_RAM, SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )

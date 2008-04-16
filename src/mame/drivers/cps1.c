@@ -449,7 +449,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
 	AM_RANGE(0x8001fc, 0x8001fd) AM_READ(cps1_in2_r)            /* Extra input ports ("SF Rev E") */
 	AM_RANGE(0x800100, 0x8001ff) AM_READWRITE(cps1_output_r, cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* CPS-B custom */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( qsound_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_input_r)          /* System input ports / Dip Switches */
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800100, 0x8001ff) AM_READWRITE(cps1_output_r, cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* CPS-B custom */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)		/* Slammasters protection */
 	AM_RANGE(0xf18000, 0xf19fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)  /* Q RAM */
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)            /* Player 3 controls (later games) */

@@ -118,7 +118,7 @@ static WRITE8_HANDLER( redalert_interrupt_clear_w )
 
 static ADDRESS_MAP_START( redalert_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(SMH_RAM, redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&redalert_charmap_videoram)
 	AM_RANGE(0x5000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demoneye_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(SMH_RAM, redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&redalert_charmap_videoram)
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP

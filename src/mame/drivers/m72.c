@@ -644,8 +644,8 @@ static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	\
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)			\
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM										\
 ADDRESS_MAP_END
@@ -664,8 +664,8 @@ static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -675,8 +675,8 @@ static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
@@ -686,8 +686,8 @@ static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE(&majtitle_rowscrollram)
 	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xac000, 0xaffff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
+	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)	/* larger than the other games */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE(&spriteram16_2)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
@@ -705,8 +705,8 @@ static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -718,8 +718,8 @@ static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITE(SMH_RAM)	/* leftover from protection?? */
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd0000, 0xd3fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -732,8 +732,8 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 AM_RANGE(0xb4000, 0xb4001) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x80000, 0x83fff) AM_READWRITE(SMH_RAM, m72_videoram1_w) AM_BASE(&m72_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_READWRITE(SMH_RAM, m72_videoram2_w) AM_BASE(&m72_videoram2)
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE(&m72_videoram2)
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END

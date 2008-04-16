@@ -414,11 +414,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drgnbowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_READWRITE(SMH_RAM, gaiden_videoram_w) AM_BASE(&gaiden_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(SMH_RAM, gaiden_videoram2_w) AM_BASE(&gaiden_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(SMH_RAM, gaiden_videoram3_w) AM_BASE(&gaiden_videoram3)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE(&gaiden_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_BASE(&gaiden_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_BASE(&gaiden_videoram3)
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x07a000, 0x07a001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x07a002, 0x07a003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x07a004, 0x07a005) AM_READ(input_port_2_word_r)

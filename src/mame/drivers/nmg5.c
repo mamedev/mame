@@ -291,7 +291,7 @@ static WRITE8_HANDLER( oki_banking_w )
 static ADDRESS_MAP_START( nmg5_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
@@ -303,15 +303,15 @@ static ADDRESS_MAP_START( nmg5_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x18000e, 0x18000f) AM_WRITE(priority_reg_w)
 	AM_RANGE(0x300002, 0x300009) AM_WRITE(SMH_RAM) AM_BASE(&scroll_ram)
 	AM_RANGE(0x30000a, 0x30000f) AM_WRITENOP
-	AM_RANGE(0x320000, 0x321fff) AM_RAM AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&nmg5_bitmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pclubys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
@@ -322,8 +322,8 @@ static ADDRESS_MAP_START( pclubys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x48000c, 0x48000d) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x48000e, 0x48000f) AM_WRITE(priority_reg_w)
 	AM_RANGE(0x500002, 0x500009) AM_WRITE(SMH_RAM) AM_BASE(&scroll_ram)
-	AM_RANGE(0x520000, 0x521fff) AM_RAM AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x522000, 0x523fff) AM_RAM AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&nmg5_bitmap)
 ADDRESS_MAP_END
 

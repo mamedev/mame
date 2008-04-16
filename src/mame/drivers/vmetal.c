@@ -215,9 +215,9 @@ static WRITE16_HANDLER( vmetal_es8712_w )
 
 static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_READWRITE(SMH_RAM, vmetal_texttileram_w) AM_BASE(&vmetal_texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_READWRITE(SMH_RAM, vmetal_mid1tileram_w) AM_BASE(&vmetal_mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_READWRITE(SMH_RAM, vmetal_mid2tileram_w) AM_BASE(&vmetal_mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE(&vmetal_texttileram)
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE(&vmetal_mid1tileram)
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE(&vmetal_mid2tileram)
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 

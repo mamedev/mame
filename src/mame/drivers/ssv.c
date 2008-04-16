@@ -434,7 +434,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000c, 0x21000d) AM_READ(input_port_4_word_r	)	/*  Coins   */	\
 	AM_RANGE(0x21000e, 0x21000f) AM_READ(SMH_NOP				)	/*          */	\
 	AM_RANGE(0x300000, 0x30007f) AM_READ(ES5506_data_0_word_r	)	/*  Sound   */	\
-	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(SMH_RAM, dsp_w) AM_BASE(&dsp_ram)   \
+	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)   \
 	AM_RANGE(_ROM, 0xffffff) AM_READ(SMH_BANK1			)	/*  ROM     */	    \
 //AM_RANGE(0x990000, 0x99007f) AM_READ(fake_r)
 

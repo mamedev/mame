@@ -78,9 +78,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&aeroboto_mainram) // main  RAM
 	AM_RANGE(0x0800, 0x08ff) AM_RAM // tile color buffer; copied to 0x2000
 	AM_RANGE(0x0900, 0x09ff) AM_WRITE(SMH_RAM) // a backup of default tile colors
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(SMH_RAM, aeroboto_videoram_w) AM_BASE(&aeroboto_videoram) // tile RAM
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_BASE(&aeroboto_videoram) // tile RAM
 	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE(&aeroboto_hscroll) // horizontal scroll regs
-	AM_RANGE(0x2000, 0x20ff) AM_READWRITE(SMH_RAM, aeroboto_tilecolor_w) AM_BASE(&aeroboto_tilecolor) // tile color RAM
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_BASE(&aeroboto_tilecolor) // tile color RAM
 	AM_RANGE(0x1840, 0x27ff) AM_WRITE(SMH_NOP) // cleared during custom LSI test
 	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size) // sprite RAM
 	AM_RANGE(0x2900, 0x2fff) AM_WRITE(SMH_NOP) // cleared along with sprite RAM

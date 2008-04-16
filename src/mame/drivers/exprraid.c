@@ -112,8 +112,8 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00ff, 0x00ff) AM_READ(vblank_r) /* HACK!!!! see init_exprraid below */
     AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE(&main_ram)
     AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-    AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(exprraid_videoram_w) AM_BASE(&videoram)
-    AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(exprraid_colorram_w) AM_BASE(&colorram)
+    AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE(&videoram)
+    AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
 	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
     AM_RANGE(0x1800, 0x1800) AM_READ(input_port_1_r) /* DSW 0 */

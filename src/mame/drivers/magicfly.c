@@ -467,8 +467,8 @@ static ADDRESS_MAP_START( magicfly_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    /* MK48Z02B NVRAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(magicfly_videoram_w) AM_BASE(&videoram)        /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_WRITE(magicfly_colorram_w) AM_BASE(&colorram)        /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_BASE(&videoram)        /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_BASE(&colorram)        /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)  /* multiplexed input port */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_w)      /* input selector */
 	AM_RANGE(0xc000, 0xffff) AM_ROM               /* ROM space */

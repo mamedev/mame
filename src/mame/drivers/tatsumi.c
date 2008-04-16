@@ -178,8 +178,8 @@ static WRITE16_HANDLER(cyclwarr_sound_w)
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x08fff) AM_READWRITE(SMH_RAM, apache3_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE(SMH_RAM, roundup5_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITE(SMH_NOP) // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ(input_port_3_word_r) // Dip 1+2
 	AM_RANGE(0x0f000, 0x0f001) AM_WRITE(SMH_NOP) // todo
@@ -221,14 +221,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roundup5_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_READWRITE(SMH_RAM, roundup5_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
 	AM_RANGE(0x0d000, 0x0d001) AM_READ(input_port_3_word_r) /* Dip 1+2 */
 	AM_RANGE(0x0d400, 0x0d40f) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown0)
 	AM_RANGE(0x0d800, 0x0d801) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown1) // VRAM2 X scroll (todo)
 	AM_RANGE(0x0dc00, 0x0dc01) AM_WRITE(SMH_RAM) AM_BASE(&roundup5_unknown2) // VRAM2 Y scroll (todo)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE(roundup5_control_w)
-	AM_RANGE(0x0f000, 0x0ffff) AM_READWRITE(SMH_RAM, roundup5_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0f000, 0x0ffff) AM_RAM_WRITE(roundup5_palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(roundup_v30_z80_r, roundup_v30_z80_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_READWRITE(tatsumi_v30_68000_r, tatsumi_v30_68000_w)
 	AM_RANGE(0x30000, 0x3ffff) AM_READWRITE(roundup5_vram_r, roundup5_vram_w)

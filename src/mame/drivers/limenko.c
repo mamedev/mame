@@ -104,12 +104,12 @@ static WRITE32_HANDLER( spotty_soundlatch_w )
 static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&mainram)
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION(REGION_USER2,0)
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM AM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32)
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM AM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?
@@ -131,12 +131,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&mainram)
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM AM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM AM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM AM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32)
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM AM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?

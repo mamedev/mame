@@ -207,9 +207,9 @@ static WRITE8_HANDLER( nvram_enable_w )
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(SMH_RAM, atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_READWRITE(SMH_RAM, paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_READWRITE(SMH_RAM, nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
+	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_READWRITE(pokey2_r, pokey2_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)
@@ -224,9 +224,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atetrsb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(SMH_RAM, atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x2000, 0x20ff) AM_READWRITE(SMH_RAM, paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_READWRITE(SMH_RAM, nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x2802, 0x2802) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0x2804, 0x2804) AM_WRITE(SN76496_1_w)
 	AM_RANGE(0x2806, 0x2806) AM_WRITE(SN76496_2_w)

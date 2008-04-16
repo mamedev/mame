@@ -217,7 +217,7 @@ static WRITE8_HANDLER( output_port_1_w )
 static ADDRESS_MAP_START( hitme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_READWRITE(SMH_RAM, hitme_vidram_w) AM_BASE(&hitme_vidram)
+	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE(&hitme_vidram)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
 	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)

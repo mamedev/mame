@@ -83,8 +83,8 @@ static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK(1)	/* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -92,8 +92,8 @@ static ADDRESS_MAP_START( bootleg_main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
-	AM_RANGE(0xe0000, 0xe03ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
+	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -194,7 +194,7 @@ static WRITE8_HANDLER( videopin_note_dvsr_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x07ff) AM_RAM AM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
+	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE(&videopin_video_ram)
 	AM_RANGE(0x0800, 0x0800) AM_READWRITE(videopin_misc_r, videopin_note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)

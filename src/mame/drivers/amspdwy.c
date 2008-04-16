@@ -75,8 +75,8 @@ static WRITE8_HANDLER( amspdwy_sound_w )
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												// ROM
 	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_BASE(&paletteram)// Palette
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, amspdwy_videoram_w) AM_BASE(&videoram)	// Layer, mirrored?
-	AM_RANGE(0x9800, 0x9bff) AM_READWRITE(SMH_RAM, amspdwy_colorram_w) AM_BASE(&colorram)	// Layer
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE(&videoram)	// Layer, mirrored?
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE(&colorram)	// Layer
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM												// Unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP                                        // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)							// DSW 1

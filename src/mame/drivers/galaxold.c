@@ -747,9 +747,9 @@ static ADDRESS_MAP_START( bongo, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8400, 0x87ff) AM_WRITE(SMH_NOP) // not used
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, galaxold_videoram_w) AM_BASE(&galaxold_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_WRITE(SMH_NOP) // not used
-	AM_RANGE(0x9800, 0x983f) AM_READWRITE(SMH_RAM, galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x9860, 0x987f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
@@ -772,7 +772,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hunchbkg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_READWRITE(SMH_RAM, galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ(input_port_0_r)
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0x6000) AM_WRITE(galaxold_coin_counter_w)
@@ -835,11 +835,11 @@ static ADDRESS_MAP_START( tazzmang, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_READ(input_port_2_r) /* mirror */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x883f) AM_READWRITE(SMH_RAM, galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x8840, 0x885f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x8860, 0x887f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x8880, 0x8bff) AM_WRITENOP
-	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(SMH_RAM, galaxold_videoram_w) AM_BASE(&galaxold_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_READ(input_port_0_r) /* mirror */
@@ -857,7 +857,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( racknrol, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1400, 0x143f) AM_MIRROR(0x6000) AM_READWRITE(SMH_RAM, galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x1400, 0x143f) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x1440, 0x14bf) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_READ(input_port_0_r)

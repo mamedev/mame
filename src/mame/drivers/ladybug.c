@@ -89,8 +89,8 @@ static ADDRESS_MAP_START( ladybug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
 	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SN76496_0_w)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(SMH_RAM, ladybug_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(SMH_RAM, ladybug_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_2_r)	/* IN2 */
 ADDRESS_MAP_END
 

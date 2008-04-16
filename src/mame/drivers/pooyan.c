@@ -57,8 +57,8 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(pooyan_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_WRITE(pooyan_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)

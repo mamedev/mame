@@ -120,8 +120,8 @@ static ADDRESS_MAP_START( gunsmoke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_WRITE(gunsmoke_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_WRITE(gunsmoke_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(&gunsmoke_scrollx)
 	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE(&gunsmoke_scrolly)
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)	// sprites and bg enable

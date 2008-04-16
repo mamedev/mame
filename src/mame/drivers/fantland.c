@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( wheelrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
 	AM_RANGE(0x70000, 0x7ffff) AM_ROM
 
-	AM_RANGE(0x52000, 0x521ff) AM_READWRITE(SMH_RAM, paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
+	AM_RANGE(0x52000, 0x521ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w	) AM_BASE(&paletteram	)
 
 	AM_RANGE(0x53000, 0x53000) AM_READWRITE( input_port_0_r, borntofi_nmi_enable_w )
 	AM_RANGE(0x53001, 0x53001) AM_READ( input_port_1_r )

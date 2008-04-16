@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( blueprnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, blueprnt_flipscreen_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_WRITE(blueprnt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

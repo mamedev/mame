@@ -146,7 +146,7 @@ static WRITE8_HANDLER( bg_bank_w )
 static ADDRESS_MAP_START( cultures_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(1)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_WRITE(bg0_videoram_w) AM_BASE(&bg0_videoram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_BASE(&bg0_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END

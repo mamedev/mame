@@ -471,8 +471,8 @@ static ADDRESS_MAP_START( pmpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_WRITE(pmpoker_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(pmpoker_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -483,8 +483,8 @@ static ADDRESS_MAP_START( jokerpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0848, 0x084b) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM AM_WRITE(pmpoker_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pmpoker_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(pmpoker_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END

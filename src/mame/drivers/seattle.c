@@ -1731,14 +1731,14 @@ static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_BASE(&generic_nvram32) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE(seattle_watchdog_w)
-	AM_RANGE(0x17300000, 0x17300003) AM_READWRITE(SMH_RAM, seattle_interrupt_enable_w) AM_BASE(&interrupt_enable)
-	AM_RANGE(0x17400000, 0x17400003) AM_READWRITE(SMH_RAM, interrupt_config_w) AM_BASE(&interrupt_config)
+	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE(seattle_interrupt_enable_w) AM_BASE(&interrupt_enable)
+	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE(interrupt_config_w) AM_BASE(&interrupt_config)
 	AM_RANGE(0x17500000, 0x17500003) AM_READ(interrupt_state_r)
 	AM_RANGE(0x17600000, 0x17600003) AM_READ(interrupt_state2_r)
 	AM_RANGE(0x17700000, 0x17700003) AM_WRITE(vblank_clear_w)
 	AM_RANGE(0x17800000, 0x17800003) AM_NOP
 	AM_RANGE(0x17900000, 0x17900003) AM_READWRITE(status_leds_r, status_leds_w)
-	AM_RANGE(0x17f00000, 0x17f00003) AM_READWRITE(SMH_RAM, asic_reset_w) AM_BASE(&asic_reset)
+	AM_RANGE(0x17f00000, 0x17f00003) AM_RAM_WRITE(asic_reset_w) AM_BASE(&asic_reset)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION(REGION_USER1, 0) AM_BASE(&rombase)
 ADDRESS_MAP_END
 

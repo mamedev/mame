@@ -140,9 +140,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w					)	// Sound
 	AM_RANGE(0x800188, 0x800189) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP												)	// ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM AM_WRITE(yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM AM_WRITE(yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
+	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
 	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE(&spriteram16) AM_SIZE(&spriteram_size					)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

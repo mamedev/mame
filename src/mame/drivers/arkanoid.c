@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ(arkanoid_68705_input_0_r)  /* mainly an input port, with 2 bits from the 68705 */
 	AM_RANGE(0xd010, 0xd010) AM_READWRITE(input_port_1_r, watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
@@ -504,7 +504,7 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd00c, 0xd00c) AM_READ(input_port_0_r)
 	AM_RANGE(0xd010, 0xd010) AM_READWRITE(input_port_1_r, watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ(arkanoid_input_2_r) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */

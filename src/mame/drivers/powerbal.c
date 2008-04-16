@@ -106,11 +106,11 @@ static WRITE16_HANDLER( oki_banking )
 
 static ADDRESS_MAP_START( magicstk_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM AM_WRITE(bigtwin_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
-	AM_RANGE(0x098180, 0x09917f) AM_READWRITE(SMH_RAM, magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
+	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
 	AM_RANGE(0x0c2010, 0x0c2011) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x0c2012, 0x0c2013) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x0c2014, 0x0c2015) AM_READWRITE(magicstk_port2_r, magicstk_coin_eeprom_w)
@@ -125,11 +125,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerbal_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x088000, 0x0883ff) AM_RAM AM_WRITE(bigtwin_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP
 	AM_RANGE(0x094004, 0x094005) AM_WRITE(tile_banking_w)
-	AM_RANGE(0x098000, 0x098fff) AM_READWRITE(SMH_RAM, magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
+	AM_RANGE(0x098000, 0x098fff) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
 	AM_RANGE(0x099000, 0x09bfff) AM_RAM // not used
 	AM_RANGE(0x0c2010, 0x0c2011) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x0c2012, 0x0c2013) AM_READ(input_port_1_word_r)

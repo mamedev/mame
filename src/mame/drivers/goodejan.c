@@ -101,9 +101,9 @@ static READ16_HANDLER( goodejan_read_ff )
 
 static ADDRESS_MAP_START( goodejan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0afff) AM_RAM
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_WRITE(goodejan_bgvram_w) AM_BASE(&goodejan_bgvram)
-	AM_RANGE(0x0d000, 0x0dfff) AM_RAM AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM AM_WRITE(goodejan_txvram_w) AM_BASE(&goodejan_txvram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(goodejan_bgvram_w) AM_BASE(&goodejan_bgvram)
+	AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(goodejan_txvram_w) AM_BASE(&goodejan_txvram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

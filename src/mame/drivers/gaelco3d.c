@@ -708,7 +708,7 @@ static WRITE16_HANDLER( led_1_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(SMH_RAM, gaelco3d_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x51000c, 0x51000d) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x51001c, 0x51001d) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x51002c, 0x51002d) AM_READ(input_port_2_word_r)
@@ -735,7 +735,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(SMH_RAM, gaelco3d_paletteram_020_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_020_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x51000c, 0x51000f) AM_READ16(input_port_0_word_r, 0xffff0000)
 	AM_RANGE(0x51001c, 0x51001f) AM_READ16(input_port_1_word_r, 0xffff0000)
 	AM_RANGE(0x51002c, 0x51002f) AM_READ16(input_port_2_word_r, 0xffff0000)

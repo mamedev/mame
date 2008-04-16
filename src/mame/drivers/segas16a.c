@@ -811,10 +811,10 @@ static NVRAM_HANDLER( system16a )
 static ADDRESS_MAP_START( system16a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_READWRITE(SMH_RAM, segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_READWRITE(SMH_RAM, segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
+	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
+	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
 	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_READWRITE(SMH_RAM, segaic16_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE(&workram)

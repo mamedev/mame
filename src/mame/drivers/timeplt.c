@@ -122,8 +122,8 @@ static READ8_HANDLER( psurge_protection_r )
 static ADDRESS_MAP_START( timeplt_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(SMH_RAM, timeplt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_READWRITE(SMH_RAM, timeplt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)
@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( psurge_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
-	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(SMH_RAM, timeplt_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_READWRITE(SMH_RAM, timeplt_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(timeplt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(timeplt_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(&spriteram_2)

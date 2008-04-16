@@ -388,8 +388,8 @@ static WRITE8_HANDLER(frogf_ppi8255_1_w)
 static ADDRESS_MAP_START( frogf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
-	AM_RANGE(0x9000, 0x903f) AM_RAM AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x9060, 0x90ff) AM_RAM
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_flip_screen_x_w)
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( ad2083_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(&galaxold_videoram)
-	AM_RANGE(0x5000, 0x503f) AM_RAM AM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
+	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x5060, 0x507f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x6004, 0x6004) AM_WRITE(hotshock_flip_screen_w)

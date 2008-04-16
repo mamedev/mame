@@ -773,16 +773,21 @@ union _addrmap64_token
 #define AM_READWRITE8(_read,_write,_shift)	AM_READ8(_read,_shift) AM_WRITE8(_write,_shift)
 #define AM_READWRITE16(_read,_write,_shift)	AM_READ16(_read,_shift) AM_WRITE16(_write,_shift)
 #define AM_READWRITE32(_read,_write,_shift)	AM_READ32(_read,_shift) AM_WRITE32(_write,_shift)
+
 #define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
 #define AM_DEVREADWRITE8(_type,_tag,_read,_write,_shift) AM_DEVREAD8(_type,_tag,_read,_shift) AM_DEVWRITE8(_type,_tag,_write,_shift)
 #define AM_DEVREADWRITE16(_type,_tag,_read,_write,_shift) AM_DEVREAD16(_type,_tag,_read,_shift) AM_DEVWRITE16(_type,_tag,_write,_shift)
 #define AM_DEVREADWRITE32(_type,_tag,_read,_write,_shift) AM_DEVREAD32(_type,_tag,_read,_shift) AM_DEVWRITE32(_type,_tag,_write,_shift)
+
 #define AM_ROM								AM_READ(SMH_ROM)
-#define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
-#define AM_WRITEONLY						AM_WRITE(SMH_RAM)
-#define AM_UNMAP							AM_READWRITE(SMH_UNMAP, SMH_UNMAP)
 #define AM_ROMBANK(_bank)					AM_READ(SMH_BANK(_bank))
+
+#define AM_RAM								AM_READWRITE(SMH_RAM, SMH_RAM)
 #define AM_RAMBANK(_bank)					AM_READWRITE(SMH_BANK(_bank), SMH_BANK(_bank))
+#define AM_RAM_WRITE(_write)				AM_READWRITE(SMH_RAM, _write)
+#define AM_WRITEONLY						AM_WRITE(SMH_RAM)
+
+#define AM_UNMAP							AM_READWRITE(SMH_UNMAP, SMH_UNMAP)
 #define AM_NOP								AM_READWRITE(SMH_NOP, SMH_NOP)
 #define AM_READNOP							AM_READ(SMH_NOP)
 #define AM_WRITENOP							AM_WRITE(SMH_NOP)

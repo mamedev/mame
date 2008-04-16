@@ -928,7 +928,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	// Video
 	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)									// Sprites
 	AM_RANGE(0x20010000, 0x20010013) AM_READ(hng64_random_read)
-	AM_RANGE(0x20100000, 0x2017ffff) AM_READWRITE(SMH_RAM, hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
+	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)									// Video Registers
 	AM_RANGE(0x20200000, 0x20203fff) AM_READWRITE(SMH_RAM,hng64_pal_w) AM_BASE(&paletteram32)			// Palette
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)				// Transition Control

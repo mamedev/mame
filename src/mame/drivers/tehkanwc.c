@@ -245,8 +245,8 @@ static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE(5) /* unused part of the palette RAM, I think? Gridiron uses it */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE(6) AM_WRITE(tehkanwc_videoram2_w) AM_BASE(&tehkanwc_videoram2)
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE(7) AM_BASE(&spriteram) AM_SIZE(&spriteram_size) /* sprites */
-	AM_RANGE(0xec00, 0xec01) AM_RAM AM_WRITE(tehkanwc_scroll_x_w)
-	AM_RANGE(0xec02, 0xec02) AM_RAM AM_WRITE(tehkanwc_scroll_y_w)
+	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
+	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
 	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w) /* track 0 x/y */
 	AM_RANGE(0xf802, 0xf802) AM_READWRITE(input_port_9_r, gridiron_led0_w) /* Coin & Start */
 	AM_RANGE(0xf803, 0xf803) AM_READ(input_port_5_r) /* joy0 - button */

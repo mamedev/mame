@@ -567,15 +567,15 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 	/* 1st sprite layer */
 //  AM_RANGE(0x500000, 0x5005ff) AM_RAM //     grid tested ($924-$97c), cleared ($982-$9a4) until $503fff
 //  AM_RANGE(0x500600, 0x503fff) AM_RAM // [B] grid tested, cleared ($b68-$be6)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM AM_WRITE(jchan_suprnova_sprite32_w) AM_BASE(&jchan_spriteram)
-	AM_RANGE(0x600000, 0x60003f) AM_RAM AM_WRITE(jchan_suprnova_sprite32regs_w) AM_BASE(&jchan_sprregs)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_w) AM_BASE(&jchan_spriteram)
+	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_w) AM_BASE(&jchan_sprregs)
 
 	/* (0x700000, 0x707fff) = palette zone - but there seems to be 'sub-zones' used differently */
 //  AM_RANGE(0x700000, 0x707fff) AM_RAM //     grid tested, cleared ($dbc-$e3a), $2000 bytes (8Kb) copied from $aae40 ($e40-$e56)
 //  AM_RANGE(0x708000, 0x70ffff) AM_RAM // [E] grid tested, cleared ($d1c-$d9a), $8000 bytes (32Kb) copied from $a2e40 ($da0-$db6)
 	AM_RANGE(0x700000, 0x707fff) AM_RAM // palette for tilemaps?
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
-//  AM_RANGE(0x700000, 0x70ffff) AM_RAM AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
+	AM_RANGE(0x708000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
+//  AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
 
 	AM_RANGE(0xf00000, 0xf00003) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(&jchan_ctrl)
 	AM_RANGE(0xf00004, 0xf00005) AM_READ(input_port_2_word_r) // DSW2
@@ -594,11 +594,11 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400002, 0x403fff) AM_RAM
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x500fff) AM_RAM // AM_READWRITE(SMH_RAM, kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1) // Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_RAM // AM_READWRITE(SMH_RAM, kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0) //
+	AM_RANGE(0x500000, 0x500fff) AM_RAM // AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1) // Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM // AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0) //
 	AM_RANGE(0x502000, 0x502fff) AM_RAM // AM_RAM AM_BASE(&kaneko16_vscroll_1)                                  //
 	AM_RANGE(0x503000, 0x503fff) AM_RAM // AM_RAM AM_BASE(&kaneko16_vscroll_0)                                  //
-	AM_RANGE(0x600000, 0x60001f) AM_RAM // AM_READWRITE(SMH_RAM, kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)   // Layers 0 Regs
+	AM_RANGE(0x600000, 0x60001f) AM_RAM // AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)   // Layers 0 Regs
 
 	/* 2nd sprite layer? - [C] grid tested, cleared ($1e2a), also cleared at startup ($7dc-$80a) */
 	AM_RANGE(0x700000, 0x703fff) AM_RAM // AM_BASE(&jchan_spriteram) AM_WRITE(jchan_suprnova_sprite32_w)

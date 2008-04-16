@@ -1257,15 +1257,15 @@ static ADDRESS_MAP_START( bnstars_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM AM_WRITE(ms32_pal1_ram_w) AM_BASE(&ms32_pal_ram[1])
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM AM_WRITE(ms32_pal0_ram_w) AM_BASE(&ms32_pal_ram[0])
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM AM_WRITE(ms32_roz1_ram_w) AM_BASE(&ms32_roz1_ram)
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM AM_WRITE(ms32_roz0_ram_w) AM_BASE(&ms32_roz0_ram)
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM AM_WRITE(ms32_spramx_w) AM_BASE(&ms32_spram)
-	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM AM_WRITE(ms32_tx1_ram_w) AM_BASE(&ms32_tx1_ram)
-	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM AM_WRITE(ms32_bg1_ram_w) AM_BASE(&ms32_bg1_ram)
- 	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM AM_WRITE(ms32_tx0_ram_w) AM_BASE(&ms32_tx0_ram)
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM AM_WRITE(ms32_bg0_ram_w) AM_BASE(&ms32_bg0_ram)
+	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE(ms32_pal1_ram_w) AM_BASE(&ms32_pal_ram[1])
+	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_BASE(&ms32_pal_ram[0])
+	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_BASE(&ms32_roz1_ram)
+	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_BASE(&ms32_roz0_ram)
+	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_BASE(&ms32_spram)
+	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_BASE(&ms32_tx1_ram)
+	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_BASE(&ms32_bg1_ram)
+ 	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_BASE(&ms32_tx0_ram)
+	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_BASE(&ms32_bg0_ram)
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
 	AM_RANGE(0xffe00000, 0xffffffff) AM_READWRITE(SMH_BANK1, SMH_ROM)

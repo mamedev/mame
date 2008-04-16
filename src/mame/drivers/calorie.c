@@ -204,9 +204,9 @@ static ADDRESS_MAP_START( calorie_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(calorie_fg_w) AM_BASE(&calorie_fg)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(calorie_fg_w) AM_BASE(&calorie_fg)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(&calorie_sprites)
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(calorie_bg_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_0_r)
 	AM_RANGE(0xf001, 0xf001) AM_READ(input_port_1_r)

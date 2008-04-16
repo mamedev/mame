@@ -225,7 +225,7 @@ static WRITE8_HANDLER( rastan_msm5205_stop_w )
 static ADDRESS_MAP_START( rastan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x350008, 0x350009) AM_WRITE(SMH_NOP)	/* 0 only (often) ? */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)	/* sprite palette bank, coin counters & lockout */
 	AM_RANGE(0x390000, 0x390001) AM_READ(input_port_0_word_r)

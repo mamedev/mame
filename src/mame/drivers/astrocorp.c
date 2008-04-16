@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( astrocorp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x058000, 0x058001 ) AM_WRITE( astrocorp_eeprom_w )
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE( astrocorp_outputs_w )
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ( astrocorp_eeprom_r )
-	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM AM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
+	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE( astrocorp_palette_w ) AM_BASE( &paletteram16 )
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM
 	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE( astrocorp_sound_bank_w )
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE( astrocorp_enable_w )

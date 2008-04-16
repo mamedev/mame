@@ -148,10 +148,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
     AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
-	AM_RANGE(0x501000, 0x501fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
-	AM_RANGE(0x502000, 0x503fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
-	AM_RANGE(0x504000, 0x50400b) AM_RAM AM_WRITE(sderby_scroll_w)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
+	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE(sderby_scroll_w)
 	AM_RANGE(0x50400e, 0x50400f) AM_WRITE( SMH_NOP )
 
 	AM_RANGE(0x708000, 0x70800d) AM_READ(roulette_input_r) AM_WRITE(SMH_NOP) // what are the writes?

@@ -202,8 +202,8 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(&trvmadns_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc01f) AM_RAM AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE(&paletteram)
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_WRITE(trvmadns_tileram_w) AM_BASE(&trvmadns_tileram)
+	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE(&trvmadns_tileram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
 ADDRESS_MAP_END

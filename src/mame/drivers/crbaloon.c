@@ -203,8 +203,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM		/* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, crbaloon_videoram_w) AM_BASE(&crbaloon_videoram)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, crbaloon_colorram_w) AM_BASE(&crbaloon_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_videoram_w) AM_BASE(&crbaloon_videoram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE(crbaloon_colorram_w) AM_BASE(&crbaloon_colorram)
 	AM_RANGE(0x5800, 0x7fff) AM_NOP
 ADDRESS_MAP_END
 

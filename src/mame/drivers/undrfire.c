@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( undrfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)		/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_WRITE(color_ram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM							/* single bytes, blending ??? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
 	AM_RANGE(0xf00000, 0xf00007) AM_READ(undrfire_lightgun_r)	/* stick coords read at $11b2-bc */

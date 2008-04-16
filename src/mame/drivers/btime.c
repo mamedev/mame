@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( lnc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE(&rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
 	AM_RANGE(0x7800, 0x7bff) AM_WRITE(SMH_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(input_port_3_r, SMH_NOP)     /* ??? */
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( mmonkey_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE(&rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_READWRITE(SMH_RAM, lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
 	AM_RANGE(0x7800, 0x7bff) AM_WRITE(SMH_RAM) AM_BASE(&btime_colorram)  /* this is just here to initialize the pointer */
 	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_3_r)
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( disco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_BASE(&rambase)
-	AM_RANGE(0x2000, 0x7fff) AM_READWRITE(SMH_RAM, deco_charram_w) AM_BASE(&deco_charram)
+	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(deco_charram_w) AM_BASE(&deco_charram)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(&btime_colorram)
 	AM_RANGE(0x8800, 0x881f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)

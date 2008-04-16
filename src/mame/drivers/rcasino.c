@@ -171,8 +171,8 @@ static READ8_HANDLER( rcasino_port_11_r )
 static ADDRESS_MAP_START( rcasino_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM AM_WRITE(rcasino_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_WRITE(rcasino_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(rcasino_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(rcasino_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rcasino_io_map, ADDRESS_SPACE_IO, 8 )

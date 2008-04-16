@@ -2366,7 +2366,7 @@ static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x067fffff) AM_ROM AM_READWRITE( cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
 	AM_RANGE(0x06800000, 0x06ffffff) AM_ROM AM_READWRITE( cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
 
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM AM_WRITE( cps3_0xc0000000_ram_w ) AM_BASE(&cps3_0xc0000000_ram) /* Executes code from here */
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE( cps3_0xc0000000_ram_w ) AM_BASE(&cps3_0xc0000000_ram) /* Executes code from here */
 ADDRESS_MAP_END
 
 

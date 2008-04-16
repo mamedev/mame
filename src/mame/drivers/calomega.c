@@ -508,8 +508,8 @@ static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -521,8 +521,8 @@ static ADDRESS_MAP_START( sys905_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x10c4, 0x10c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x10c8, 0x10cb) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

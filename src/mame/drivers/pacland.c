@@ -247,8 +247,8 @@ static WRITE8_HANDLER( pacland_irq_2_ctrl_w )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_RAM, pacland_videoram_w) AM_BASE(&pacland_videoram)
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(SMH_RAM, pacland_videoram2_w) AM_BASE(&pacland_videoram2)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(pacland_videoram_w) AM_BASE(&pacland_videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(pacland_videoram2_w) AM_BASE(&pacland_videoram2)
 	AM_RANGE(0x2000, 0x37ff) AM_RAM AM_BASE(&pacland_spriteram)
 	AM_RANGE(0x3800, 0x3801) AM_WRITE(pacland_scroll0_w)
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(pacland_scroll1_w)

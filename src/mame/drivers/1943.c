@@ -67,8 +67,8 @@ static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITENOP // ???
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_WRITE(c1943_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_WRITE(c1943_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(&c1943_scrollx)
 	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE(&c1943_scrolly)
 	AM_RANGE(0xd803, 0xd804) AM_RAM AM_BASE(&c1943_bgscrollx)

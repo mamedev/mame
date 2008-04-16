@@ -195,8 +195,8 @@ static WRITE8_HANDLER( bagman_coin_counter_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_WRITE(bagman_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_WRITE(bagman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
@@ -223,8 +223,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_WRITE(bagman_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_WRITE(bagman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x9800, 0x981f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */

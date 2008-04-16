@@ -113,7 +113,7 @@ static WRITE16_HANDLER( sound_irq_trigger_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)/* Palette */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)/* Palette */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(input_port_0_word_r)	/* Coins + Service */
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ(input_port_1_word_r)	/* 1P controls */
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ(input_port_2_word_r)	/* 2P controls */

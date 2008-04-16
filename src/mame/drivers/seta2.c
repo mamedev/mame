@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x700006, 0x700007 ) AM_READ( watchdog_reset16_r )	// Watchdog?
 
 	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	// Sprites
-	AM_RANGE( 0x840000, 0x84ffff ) AM_READWRITE(SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
+	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_BASE(&seta2_vregs)	// Video Registers
 
 	AM_RANGE( 0x900000, 0x903fff ) AM_READWRITE( seta_sound_word_r, seta_sound_word_w	)	// Sound

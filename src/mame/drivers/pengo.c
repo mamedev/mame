@@ -97,8 +97,8 @@
 
 static ADDRESS_MAP_START( pengo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(SMH_RAM, pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size) /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(SMH_RAM, pacman_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size) /* video and color RAM, scratchpad RAM, sprite codes */
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
@@ -120,7 +120,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jrpacmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, jrpacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)

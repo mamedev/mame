@@ -91,10 +91,10 @@ static ADDRESS_MAP_START( good_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x280002, 0x280003) AM_READ( input_port_1_word_r )
 	AM_RANGE(0x280004, 0x280005) AM_READ( input_port_2_word_r )
 
-	AM_RANGE(0x800000, 0x8007ff) AM_READWRITE(SMH_RAM, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 
-	AM_RANGE(0x820000, 0x820fff) AM_READWRITE(SMH_RAM, fg_tilemapram_w) AM_BASE(&fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_READWRITE(SMH_RAM, bg_tilemapram_w) AM_BASE(&bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE(&fg_tilemapram)
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE(&bg_tilemapram)
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

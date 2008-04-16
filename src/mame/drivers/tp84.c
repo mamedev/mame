@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x6000, 0x679f) AM_RAM
-	AM_RANGE(0x67a0, 0x67ff) AM_READWRITE(SMH_RAM, tp84_spriteram_w) AM_BASE(&tp84_spriteram)
+	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE(tp84_spriteram_w) AM_BASE(&tp84_spriteram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

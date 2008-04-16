@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( drill_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x41c000, 0x41dfff) AM_RAM AM_BASE(&textram)
 	AM_RANGE(0x41e000, 0x41ffff) AM_RAM AM_BASE(&charram)
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE(&unkram)// video stuff, 460000 - video regs ?
-	AM_RANGE(0x500000, 0x501fff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x502000, 0x503fff) AM_RAM
 	AM_RANGE(0x700000, 0x70000f) AM_READ(drill_unk_r) AM_WRITE(SMH_NOP) // i/o
 	AM_RANGE(0x600000, 0x600001) AM_READ(YM2610_status_port_0_A_lsb_r) AM_WRITE(YM2610_control_port_0_A_lsb_w)

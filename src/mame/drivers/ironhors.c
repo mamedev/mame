@@ -57,7 +57,7 @@ static WRITE8_HANDLER( ironhors_filter_w )
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
-	AM_RANGE(0x0003, 0x0003) AM_RAM AM_WRITE(ironhors_charbank_w)
+	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(ironhors_charbank_w)
 	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE(&ironhors_interrupt_enable)
 	AM_RANGE(0x0005, 0x001f) AM_RAM
 	AM_RANGE(0x0020, 0x003f) AM_RAM AM_BASE(&ironhors_scroll)
@@ -73,8 +73,8 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // ???
 	AM_RANGE(0x1a00, 0x1a01) AM_WRITENOP // ???
 	AM_RANGE(0x1c00, 0x1dff) AM_WRITENOP // ???
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_WRITE(ironhors_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_WRITE(ironhors_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&spriteram_2)
 	AM_RANGE(0x3100, 0x37ff) AM_RAM

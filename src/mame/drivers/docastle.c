@@ -211,8 +211,8 @@ static ADDRESS_MAP_START( docastle_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_READWRITE(SMH_RAM, docastle_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_READWRITE(SMH_RAM, docastle_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -255,8 +255,8 @@ static ADDRESS_MAP_START( dorunrun_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_READWRITE(SMH_RAM, docastle_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_READWRITE(SMH_RAM, docastle_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
@@ -285,8 +285,8 @@ static ADDRESS_MAP_START( idsoccer_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_READWRITE(SMH_RAM, docastle_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_READWRITE(SMH_RAM, docastle_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(idsoccer_adpcm_status_r, idsoccer_adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
 ADDRESS_MAP_END

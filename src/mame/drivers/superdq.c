@@ -217,7 +217,7 @@ static WRITE8_HANDLER( superdq_ld_w )
 static ADDRESS_MAP_START( superdq_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM AM_WRITE(superdq_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superdq_io, ADDRESS_SPACE_IO, 8 )

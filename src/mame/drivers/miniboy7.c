@@ -182,8 +182,8 @@ static VIDEO_UPDATE( miniboy7 )
 
 static ADDRESS_MAP_START( miniboy7_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* battery backed RAM? */
-	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_WRITE(miniboy7_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_WRITE(miniboy7_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0x25ff) AM_RAM	/* looks like videoram */
 	AM_RANGE(0x2600, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)

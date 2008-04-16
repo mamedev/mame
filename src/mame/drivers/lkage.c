@@ -84,7 +84,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 static ADDRESS_MAP_START( lkage, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* work ram */
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE(&paletteram)
 	AM_RANGE(0xf000, 0xf003) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&lkage_vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITE(SMH_NOP)

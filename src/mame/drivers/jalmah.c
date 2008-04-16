@@ -536,12 +536,12 @@ static ADDRESS_MAP_START( jalmah, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x080020, 0x08003f) AM_READ(SMH_RAM) AM_WRITE(jalmah_scroll_w)
 	AM_RANGE(0x080040, 0x080041) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_READWRITE(SMH_RAM, paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_READWRITE(SMH_RAM, sc0_vram_w) AM_BASE(&sc0_vram)
-	AM_RANGE(0x094000, 0x097fff) AM_READWRITE(SMH_RAM, sc1_vram_w) AM_BASE(&sc1_vram)
-	AM_RANGE(0x098000, 0x09bfff) AM_READWRITE(SMH_RAM, sc2_vram_w) AM_BASE(&sc2_vram)
-	AM_RANGE(0x09c000, 0x09ffff) AM_READWRITE(SMH_RAM, sc3_vram_w) AM_BASE(&sc3_vram)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_READWRITE(SMH_RAM, sc3_vram_w) /*urashima mirror*/
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) /* Palette RAM */
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)
+	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(&sc1_vram)
+	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(&sc2_vram)
+	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(&sc3_vram)
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(sc3_vram_w) /*urashima mirror*/
 	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE(&jm_regs)/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM AM_BASE(&jm_ram)
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/

@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( readwritemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(SMH_RAM, zvideoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(zvideoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(spaceg_colorram_r, SMH_RAM) AM_BASE(&unkram)
 
 

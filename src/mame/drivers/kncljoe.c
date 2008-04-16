@@ -55,7 +55,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_RAM, kncljoe_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE(&kncljoe_scrollregs)
 	AM_RANGE(0xd800, 0xd800) AM_READ(input_port_0_r) /* IN 0 */
 	AM_RANGE(0xd801, 0xd801) AM_READ(input_port_1_r) /* IN 1 */

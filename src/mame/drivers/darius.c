@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( darius_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd80000, 0xd80fff) AM_READ(SMH_RAM)	/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_READWRITE(SMH_RAM, darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3) AM_BASE(&darius_fg_ram)
 	AM_RANGE(0xe10000, 0xe10fff) AM_READ(SMH_RAM)		/* ??? */
 ADDRESS_MAP_END
 
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( darius_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x04ffff) AM_READ(SMH_RAM)	/* local RAM */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xe08000, 0xe0ffff) AM_READWRITE(SMH_RAM, darius_fg_layer_w) AM_SHARE(3)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE(3)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )

@@ -291,9 +291,9 @@ static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITE(SMH_NOP)
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE( &spriteram32 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE(&paletteram32)  // real palette?
-	AM_RANGE(0x800000, 0x801fff) AM_READWRITE(SMH_RAM, dreamwld_bg_videoram_w ) AM_BASE( &dreamwld_bg_videoram )
-	AM_RANGE(0x802000, 0x803fff) AM_READWRITE(SMH_RAM, dreamwld_bg2_videoram_w ) AM_BASE( &dreamwld_bg2_videoram )
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(dreamwld_palette_w) AM_BASE(&paletteram32)  // real palette?
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE( &dreamwld_bg_videoram )
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE( &dreamwld_bg2_videoram )
 	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE( &dreamwld_bg_scroll )  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ(dreamwld_inputs_r)

@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( mole_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
 	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
 	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(mole_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(mole_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
 	AM_RANGE(0x8c00, 0x8c00) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_WRITE(AY8910_control_port_0_w)

@@ -113,8 +113,8 @@ static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ(input_port_4_r)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_WRITE(pingpong_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_WRITE(pingpong_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM

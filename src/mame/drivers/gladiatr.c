@@ -386,10 +386,10 @@ static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(SMH_RAM, gladiatr_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(SMH_RAM, gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, gladiatr_textram_w) AM_BASE(&gladiatr_textram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* battery backed RAM */
 ADDRESS_MAP_END
 
@@ -425,10 +425,10 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(SMH_RAM, gladiatr_paletteram_w) AM_BASE(&paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(SMH_RAM, gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, gladiatr_textram_w) AM_BASE(&gladiatr_textram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE(&gladiatr_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE(&gladiatr_colorram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE(&gladiatr_textram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size) /* battery backed RAM */
 ADDRESS_MAP_END
 

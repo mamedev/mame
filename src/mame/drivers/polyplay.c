@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( polyplay_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
 	AM_RANGE(0xe800, 0xebff) AM_ROM
-	AM_RANGE(0xec00, 0xf7ff) AM_READWRITE(SMH_RAM, polyplay_characterram_w) AM_BASE(&polyplay_characterram)
+	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_BASE(&polyplay_characterram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 

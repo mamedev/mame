@@ -80,8 +80,8 @@ static WRITE8_HANDLER( sound_select_w )
 
 static ADDRESS_MAP_START( lasso_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(SMH_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(SMH_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
 	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
@@ -115,8 +115,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chameleo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(SMH_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(SMH_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x107f) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
 	AM_RANGE(0x1080, 0x10ff) AM_RAM
@@ -146,8 +146,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wwjgtin_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(SMH_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_READWRITE(SMH_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(SMH_RAM) AM_BASE(&lasso_back_color)
@@ -176,8 +176,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pinbo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(SMH_RAM, lasso_videoram_w) AM_BASE(&lasso_videoram)
-	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(SMH_RAM, lasso_colorram_w) AM_BASE(&lasso_colorram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(lasso_videoram_w) AM_BASE(&lasso_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(lasso_colorram_w) AM_BASE(&lasso_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(&lasso_spriteram) AM_SIZE(&lasso_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(pinbo_video_control_w)

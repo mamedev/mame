@@ -894,7 +894,7 @@ static void decode_and_filter_cvsd(UINT8 *input, int bytes, int maskbits, int fr
 static ADDRESS_MAP_START( exidy440_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_READWRITE(m6844_r, m6844_w) AM_BASE(&m6844_data)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_READWRITE(SMH_RAM, sound_volume_w) AM_BASE(&sound_volume)
+	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_RAM_WRITE(sound_volume_w) AM_BASE(&sound_volume)
 	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_READWRITE(sound_command_r, SMH_NOP)
 	AM_RANGE(0x8c00, 0x93ff) AM_NOP
 	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&sound_banks)

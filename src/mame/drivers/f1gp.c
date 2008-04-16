@@ -251,8 +251,8 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf10000, 0xf103ff) AM_RAM //unused
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&sharedram)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(f1gp_fgvideoram_w) AM_BASE(&f1gp_fgvideoram)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ(input_port_2_word_r)

@@ -177,9 +177,9 @@ static READ8_HANDLER( readFF )
 
 static ADDRESS_MAP_START( m6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(SMH_RAM, tceptor_tile_ram_w) AM_BASE(&tceptor_tile_ram)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(SMH_RAM, tceptor_tile_attr_w) AM_BASE(&tceptor_tile_attr)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(SMH_RAM, tceptor_bg_ram_w) AM_BASE(&tceptor_bg_ram)	// background (VIEW RAM)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_BASE(&tceptor_tile_ram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_BASE(&tceptor_tile_attr)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_BASE(&tceptor_bg_ram)	// background (VIEW RAM)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(SMH_NOP)				// 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f00) AM_READ(SMH_NOP)				// unknown

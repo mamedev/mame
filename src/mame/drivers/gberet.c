@@ -147,12 +147,12 @@ static WRITE8_HANDLER( mrgoemon_flipscreen_w )
 
 static ADDRESS_MAP_START( gberet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE(&spriteram_2)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_WRITE(gberet_scroll_w) AM_BASE(&gberet_scrollram)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE(&gberet_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
@@ -168,8 +168,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gberetb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM
 	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
@@ -189,12 +189,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrgoemon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE(&spriteram_2)
 	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_WRITE(gberet_scroll_w) AM_BASE(&gberet_scrollram)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE(&gberet_scrollram)
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(mrgoemon_flipscreen_w)

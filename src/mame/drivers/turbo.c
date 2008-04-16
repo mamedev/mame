@@ -663,7 +663,7 @@ static ADDRESS_MAP_START( turbo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_WRITE(turbo_coin_and_lamp_w)
 	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(turbo_state, sprite_position)
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(turbo_analog_reset_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(turbo_collision_clear_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
@@ -693,7 +693,7 @@ static ADDRESS_MAP_START( subroc3d_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x07fc) AM_READ(input_port_3_r)				// INPUT 253
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff) 														// HANDLE CL
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)	// FIX PAGE
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)	// FIX PAGE
 	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
 	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)
@@ -710,7 +710,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buckrog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(SMH_RAM, turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)		// FIX PAGE
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)		// FIX PAGE
 	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_0_r, buckrog_ppi8255_0_w)	// 8255
 	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)			// 8255
 	AM_RANGE(0xd800, 0xd801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)			// 8279

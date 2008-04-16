@@ -70,9 +70,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08000f) AM_READ(zerozone_input_r)
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(zerozone_sound_w)
-	AM_RANGE(0x088000, 0x0881ff) AM_READWRITE(SMH_RAM, paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0881ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x098000, 0x098001) AM_RAM		/* Watchdog? */
-	AM_RANGE(0x09ce00, 0x09ffff) AM_READWRITE(SMH_RAM, zerozone_tilemap_w) AM_BASE(&zerozone_videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x09ce00, 0x09ffff) AM_RAM_WRITE(zerozone_tilemap_w) AM_BASE(&zerozone_videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITE(zerozone_tilebank_w)
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM		/* Never read from */

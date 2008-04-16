@@ -793,9 +793,9 @@ static ADDRESS_MAP_START( suprtrio_main_cpu, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE(&suprtrio_control)
-	AM_RANGE(0xa20000, 0xa20fff) AM_RAM AM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
-	AM_RANGE(0xa22000, 0xa22fff) AM_RAM AM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
-	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_BASE(&tumblepb_pf1_data)
+	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_BASE(&tumblepb_pf2_data)
+	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r) AM_WRITE(suprtrio_tilebank_w)
 

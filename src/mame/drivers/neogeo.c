@@ -1053,7 +1053,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE(neogeo_paletteram_r, neogeo_paletteram_w)
 	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROMBANK(NEOGEO_BANK_BIOS)
-	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_READWRITE(SMH_RAM, save_ram_w) AM_BASE(&save_ram)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_RAM_WRITE(save_ram_w) AM_BASE(&save_ram)
 	AM_RANGE(0xe00000, 0xffffff) AM_READ(neogeo_unmapped_r)
 ADDRESS_MAP_END
 

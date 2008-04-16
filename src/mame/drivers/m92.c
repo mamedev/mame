@@ -368,7 +368,7 @@ static WRITE16_HANDLER( m92_sound_status_w )
 /* appears to be an earlier board */
 static ADDRESS_MAP_START( lethalth_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_READWRITE(SMH_RAM, m92_vram_w) AM_BASE(&m92_vram_data)
+	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(&m92_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( m92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK(1)
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK(2)	/* Mirror of rom:  Used by In The Hunt as protection */
-	AM_RANGE(0xd0000, 0xdffff) AM_READWRITE(SMH_RAM, m92_vram_w) AM_BASE(&m92_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m92_vram_w) AM_BASE(&m92_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
 	AM_RANGE(0xf8000, 0xf87ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf8800, 0xf8fff) AM_READWRITE(m92_paletteram_r, m92_paletteram_w)

@@ -413,8 +413,8 @@ static ADDRESS_MAP_START( reactor_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x02000, 0x020ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x03000, 0x033ff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, gottlieb_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(SMH_RAM, gottlieb_charram_w) AM_BASE(&gottlieb_charram)
+	AM_RANGE(0x03000, 0x033ff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x04000, 0x04fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)
 	AM_RANGE(0x06000, 0x0601f) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x07000, 0x07000) AM_READWRITE(input_port_0_r, watchdog_reset_w)	/* DSW */
 	AM_RANGE(0x07001, 0x07001) AM_READWRITE(input_port_1_r, gottlieb_track_reset_w)	/* buttons */
@@ -431,8 +431,8 @@ static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_REGION(REGION_CPU1, 0x1000)	/* or ROM */
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_REGION(REGION_CPU1, 0x2000) 	/* or ROM */
 	AM_RANGE(0x03000, 0x037ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)	// argusg wants to check this
-	AM_RANGE(0x03800, 0x03bff) AM_MIRROR(0x0400) AM_READWRITE(SMH_RAM, gottlieb_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(SMH_RAM, gottlieb_charram_w) AM_BASE(&gottlieb_charram)
+	AM_RANGE(0x03800, 0x03bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x04000, 0x04fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE(&gottlieb_charram)
 	AM_RANGE(0x05000, 0x0501f) AM_WRITE(gottlieb_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x05800, 0x05800) AM_READWRITE(input_port_0_r, watchdog_reset_w)	/* DSW */
 	AM_RANGE(0x05801, 0x05801) AM_READWRITE(input_port_1_r, gottlieb_track_reset_w)	/* buttons */

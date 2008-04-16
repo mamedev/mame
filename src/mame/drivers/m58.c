@@ -25,7 +25,7 @@
 
 static ADDRESS_MAP_START( yard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_WRITE(yard_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(yard_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(yard_scroll_panel_w)
 	AM_RANGE(0xc820, 0xc87f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xa000, 0xa000) AM_RAM AM_BASE(&yard_scroll_x_low)

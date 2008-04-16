@@ -719,10 +719,10 @@ static ADDRESS_MAP_START( alpha68k_II_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READ(SMH_NOP) /* IRQ ack? */
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(SMH_NOP) /* IRQ ack? */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READ(SMH_NOP) /* watchdog? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SMH_RAM, alpha68k_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x300000, 0x3001ff) AM_READWRITE(alpha_II_trigger_r, alpha_microcontroller_w)
-	AM_RANGE(0x400000, 0x400fff) AM_READWRITE(SMH_RAM, alpha68k_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(alpha68k_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK(8)
 ADDRESS_MAP_END
 
@@ -735,12 +735,12 @@ static ADDRESS_MAP_START( alpha68k_V_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d8000, 0x0d8001) AM_READNOP /* IRQ ack? */
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READNOP /* IRQ ack? */
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READNOP /* watchdog? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SMH_RAM, alpha68k_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(alpha68k_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0x300000, 0x303fff) AM_READ(alpha_V_trigger_r)
 	AM_RANGE(0x300000, 0x3001ff) AM_WRITE(alpha_microcontroller_w)
 	AM_RANGE(0x303e00, 0x303fff) AM_WRITE(alpha_microcontroller_w) /* Gang Wars mirror */
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(SMH_RAM, alpha68k_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(alpha68k_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x83ffff) AM_ROMBANK(8)
 ADDRESS_MAP_END
 

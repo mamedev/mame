@@ -478,7 +478,7 @@ static ADDRESS_MAP_START( tharrier_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0883ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x090000, 0x093fff) AM_READ(nmk_bgvideoram_r)
 	AM_RANGE(0x09d000, 0x09d7ff) AM_READ(nmk_txvideoram_r)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -507,12 +507,12 @@ static ADDRESS_MAP_START( mustang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(SMH_NOP)	// frame number?
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mustangb_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -524,12 +524,12 @@ static ADDRESS_MAP_START( mustangb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(SMH_NOP)	// frame number?
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(seibu_main_mustb_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
 
@@ -542,12 +542,12 @@ static ADDRESS_MAP_START( twinactn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(SMH_NOP)	// frame number?
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(afega_soundlatch_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
 
@@ -780,12 +780,12 @@ static ADDRESS_MAP_START( hachamf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	/* Video Region */
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 	/* Main RAM, inc sprites, shared with MCU */
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_WRITE(hachamf_mainram_w) AM_BASE(&nmk16_mainram) // ram is shared with MCU
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(hachamf_mainram_w) AM_BASE(&nmk16_mainram) // ram is shared with MCU
 ADDRESS_MAP_END
 
 
@@ -854,7 +854,7 @@ static ADDRESS_MAP_START( tdragon_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x0b9000, 0x0bdfff) AM_READ(SMH_RAM) /* Work RAM */
 //  AM_RANGE(0x0be000, 0x0befff) AM_READ(SMH_RAM) /* Work RAM */
 //  AM_RANGE(0x0bf000, 0x0bffff) AM_READ(SMH_RAM) /* Work RAM */
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_WRITE( tdragon_mainram_w ) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM_WRITE( tdragon_mainram_w ) AM_BASE(&nmk16_mainram)
 
 
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_READ(SMH_RAM)  /* Palette RAM */
@@ -976,7 +976,7 @@ static ADDRESS_MAP_START( macross_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x090000, 0x093fff) AM_READ(nmk_bgvideoram_r)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_READ(nmk_txvideoram_r)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1012,7 +1012,7 @@ static ADDRESS_MAP_START( gunnail_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x08c000, 0x08c1ff) AM_RAM AM_WRITE(gunnail_scrollx_w) AM_BASE(&gunnail_scrollram)
+	AM_RANGE(0x08c000, 0x08c1ff) AM_RAM_WRITE(gunnail_scrollx_w) AM_BASE(&gunnail_scrollram)
 	AM_RANGE(0x08c200, 0x08c201) AM_WRITE(gunnail_scrolly_w)
 	AM_RANGE(0x08c202, 0x08c7ff) AM_RAM // extra scroll registers (used after a boss is killed and in level 5)
 	AM_RANGE(0x090000, 0x093fff) AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
@@ -4838,17 +4838,17 @@ static ADDRESS_MAP_START( afega, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080012, 0x080013) AM_READ(afega_unknown_r)
 	AM_RANGE(0x080000, 0x08001d) AM_WRITE(SMH_RAM)				//
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(afega_soundlatch_w)		// To Sound CPU
-/**/AM_RANGE(0x084000, 0x084003) AM_RAM AM_WRITE(afega_scroll0_w)	// Scroll on redhawkb (mirror or changed?..)
-/**/AM_RANGE(0x084004, 0x084007) AM_RAM AM_WRITE(afega_scroll1_w)   // Scroll on redhawkb (mirror or changed?..)
+/**/AM_RANGE(0x084000, 0x084003) AM_RAM_WRITE(afega_scroll0_w)	// Scroll on redhawkb (mirror or changed?..)
+/**/AM_RANGE(0x084004, 0x084007) AM_RAM_WRITE(afega_scroll1_w)   // Scroll on redhawkb (mirror or changed?..)
 	AM_RANGE(0x080020, 0x087fff) AM_WRITE(SMH_RAM)				//
-/**/AM_RANGE(0x088000, 0x0885ff) AM_READWRITE(SMH_RAM, paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) // Palette
+/**/AM_RANGE(0x088000, 0x0885ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) // Palette
 	AM_RANGE(0x088600, 0x08bfff) AM_WRITE(SMH_RAM)				//
-/**/AM_RANGE(0x08c000, 0x08c003) AM_RAM AM_WRITE(afega_scroll0_w) AM_BASE(&afega_scroll_0)	// Scroll
-/**/AM_RANGE(0x08c004, 0x08c007) AM_RAM AM_WRITE(afega_scroll1_w) AM_BASE(&afega_scroll_1)	//
+/**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_BASE(&afega_scroll_0)	// Scroll
+/**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE(afega_scroll1_w) AM_BASE(&afega_scroll_1)	//
 	AM_RANGE(0x08c008, 0x08ffff) AM_WRITE(SMH_RAM)				//
-/**/AM_RANGE(0x090000, 0x091fff) AM_READWRITE(SMH_RAM, afega_vram_0_w) AM_BASE(&afega_vram_0)	// Layer 0
+/**/AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(afega_vram_0_w) AM_BASE(&afega_vram_0)	// Layer 0
 /**/AM_RANGE(0x092000, 0x093fff) AM_RAM								// ?
-/**/AM_RANGE(0x09c000, 0x09c7ff) AM_READWRITE(SMH_RAM, afega_vram_1_w) AM_BASE(&afega_vram_1)	// Layer 1
+/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(afega_vram_1_w) AM_BASE(&afega_vram_1)	// Layer 1
 
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_SHARE(1) AM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE(1) AM_WRITE(nmk16_mainram_strange_w)

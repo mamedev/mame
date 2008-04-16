@@ -405,12 +405,12 @@ static ADDRESS_MAP_START( punchout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_bigsprite1)
 	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_bigsprite2)
-	AM_RANGE(0xdffd, 0xdffd) AM_READWRITE(SMH_RAM, punchout_palettebank_w) AM_BASE(&punchout_palettebank)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(SMH_RAM, punchout_topTilemap_ram_w) AM_BASE(&punchout_topTilemap_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, punchout_bigsprite1ram_w) AM_BASE(&punchout_bigsprite1ram)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, punchout_bigsprite2ram_w) AM_BASE(&punchout_bigsprite2ram)
+	AM_RANGE(0xdffd, 0xdffd) AM_RAM_WRITE(punchout_palettebank_w) AM_BASE(&punchout_palettebank)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_topTilemap_ram_w) AM_BASE(&punchout_topTilemap_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_bigsprite1ram_w) AM_BASE(&punchout_bigsprite1ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_bigsprite2ram_w) AM_BASE(&punchout_bigsprite2ram)
 	AM_RANGE(0xf000, 0xf03f) AM_RAM AM_BASE(&punchout_botTilemap_scroll_ram)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(SMH_RAM, punchout_botTilemap_ram_w) AM_BASE(&punchout_botTilemap_ram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_botTilemap_ram_w) AM_BASE(&punchout_botTilemap_ram)
 ADDRESS_MAP_END
 
 
@@ -420,12 +420,12 @@ static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xdff0, 0xdff7) AM_RAM AM_BASE(&punchout_bigsprite1)
 	AM_RANGE(0xdff8, 0xdffc) AM_RAM AM_BASE(&punchout_bigsprite2)
-	AM_RANGE(0xdffd, 0xdffd) AM_READWRITE(SMH_RAM, punchout_palettebank_w) AM_BASE(&punchout_palettebank)
-	AM_RANGE(0xd800, 0xdfff) AM_READWRITE(SMH_RAM, armwrest_fgTilemap_ram_w) AM_BASE(&armwrest_fgTilemap_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_READWRITE(SMH_RAM, punchout_bigsprite1ram_w) AM_BASE(&punchout_bigsprite1ram)
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, punchout_bigsprite2ram_w) AM_BASE(&punchout_bigsprite2ram)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, punchout_botTilemap_ram_w) AM_BASE(&punchout_botTilemap_ram)
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(SMH_RAM, punchout_topTilemap_ram_w) AM_BASE(&punchout_topTilemap_ram)
+	AM_RANGE(0xdffd, 0xdffd) AM_RAM_WRITE(punchout_palettebank_w) AM_BASE(&punchout_palettebank)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fgTilemap_ram_w) AM_BASE(&armwrest_fgTilemap_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_bigsprite1ram_w) AM_BASE(&punchout_bigsprite1ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_bigsprite2ram_w) AM_BASE(&punchout_bigsprite2ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_botTilemap_ram_w) AM_BASE(&punchout_botTilemap_ram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_topTilemap_ram_w) AM_BASE(&punchout_topTilemap_ram)
 ADDRESS_MAP_END
 
 

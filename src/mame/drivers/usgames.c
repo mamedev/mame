@@ -81,8 +81,8 @@ static ADDRESS_MAP_START( usgames_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2070, 0x2070) AM_READ(input_port_3_r)
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2401, 0x2401) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -101,8 +101,8 @@ static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2441, 0x2441) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x2460, 0x2460) AM_WRITE(usgames_rombank_w)
 	AM_RANGE(0x2470, 0x2470) AM_READ(input_port_3_r)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(usgames_charram_w) AM_BASE(&usgames_charram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(usgames_videoram_w) AM_BASE(&usgames_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

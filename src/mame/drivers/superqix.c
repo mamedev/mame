@@ -529,12 +529,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xe100, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, superqix_videoram_w) AM_BASE(&superqix_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(superqix_videoram_w) AM_BASE(&superqix_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(SMH_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -548,7 +548,7 @@ static ADDRESS_MAP_START( pbillian_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(SMH_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( hotsmash_port_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(SMH_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -572,12 +572,12 @@ static ADDRESS_MAP_START( sqix_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0408, 0x0408) AM_READ(mcu_acknowledge_r)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
-	AM_RANGE(0x0800, 0x77ff) AM_READWRITE(SMH_RAM, superqix_bitmapram_w) AM_BASE(&superqix_bitmapram)
-	AM_RANGE(0x8800, 0xf7ff) AM_READWRITE(SMH_RAM, superqix_bitmapram2_w) AM_BASE(&superqix_bitmapram2)
+	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_BASE(&superqix_bitmapram)
+	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_BASE(&superqix_bitmapram2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_port_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_READWRITE(SMH_RAM, paletteram_BBGGRRII_w) AM_BASE(&paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE(&paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_READ(AY8910_read_port_0_r)
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0403, 0x0403) AM_WRITE(AY8910_control_port_0_w)
@@ -587,8 +587,8 @@ static ADDRESS_MAP_START( bootleg_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(bootleg_flipscreen_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ(input_port_2_r)
-	AM_RANGE(0x0800, 0x77ff) AM_READWRITE(SMH_RAM, superqix_bitmapram_w) AM_BASE(&superqix_bitmapram)
-	AM_RANGE(0x8800, 0xf7ff) AM_READWRITE(SMH_RAM, superqix_bitmapram2_w) AM_BASE(&superqix_bitmapram2)
+	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE(superqix_bitmapram_w) AM_BASE(&superqix_bitmapram)
+	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_BASE(&superqix_bitmapram2)
 ADDRESS_MAP_END
 
 

@@ -183,8 +183,8 @@ static ADDRESS_MAP_START( pitboss_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_NOP //dips ?
 //  AM_RANGE(0xc000, 0xc002) AM_NOP
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, phrcraze_attr_w) AM_BASE(&phrcraze_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, phrcraze_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -194,8 +194,8 @@ static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc004, 0xc007) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0xc008, 0xc00b) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, phrcraze_attr_w) AM_BASE(&phrcraze_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, phrcraze_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -209,8 +209,8 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa003) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
 	AM_RANGE(0xc000, 0xc003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, phrcraze_attr_w) AM_BASE(&phrcraze_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, phrcraze_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -229,8 +229,8 @@ static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, phrcraze_attr_w) AM_BASE(&phrcraze_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, phrcraze_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -249,8 +249,8 @@ static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, phrcraze_attr_w) AM_BASE(&phrcraze_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, phrcraze_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
@@ -269,8 +269,8 @@ static ADDRESS_MAP_START( trvwhziv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(SMH_RAM, phrcraze_attr_w) AM_BASE(&phrcraze_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_RAM, phrcraze_bg_w) AM_BASE(&videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
 	AM_RANGE(0xf800, 0xfbff) AM_WRITE(palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 

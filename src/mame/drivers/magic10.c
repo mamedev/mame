@@ -79,11 +79,11 @@ static READ16_HANDLER( magic102_r )
 
 static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM AM_WRITE(paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x400002, 0x400003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_misc_w)
@@ -95,11 +95,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x300000, 0x3001ff) AM_RAM AM_WRITE(paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x500002, 0x500003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_misc_w)
@@ -111,11 +111,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x400000, 0x4001ff) AM_RAM AM_WRITE(paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_READ(magic102_r)
 	AM_RANGE(0x500004, 0x500005) AM_READNOP // gives credits
 	AM_RANGE(0x500006, 0x500007) AM_READNOP // gives credits

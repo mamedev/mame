@@ -82,7 +82,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_READWRITE(SMH_RAM, deadang_foreground_w) AM_BASE(&deadang_video_data)
+	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(deadang_foreground_w) AM_BASE(&deadang_video_data)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x08000, 0x08001) AM_WRITE(deadang_bank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(watchdog_reset16_w)

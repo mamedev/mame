@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( namcofl_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x30284000, 0x3028bfff) AM_RAM	AM_BASE(&namcofl_mcuram) /* shared RAM with C75 MCU */
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ( fl_network_r )	/* network registers */
-	AM_RANGE(0x30400000, 0x3040ffff) AM_READWRITE(SMH_RAM, namcofl_paletteram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
 	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)

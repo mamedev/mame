@@ -801,7 +801,7 @@ static ADDRESS_MAP_START( hcrash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x090000, 0x091fff) AM_RAM AM_WRITE(salamander_palette_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(nemesis_irq_enable_word_w)          /* irq enable */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(salamand_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ(input_port_4_word_r)

@@ -537,10 +537,10 @@ static ADDRESS_MAP_START( wecleman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	// RAM
 	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_BASE(&wecleman_protection_ram)
 	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r)	// MCU read
-	AM_RANGE(0x080000, 0x080011) AM_READWRITE(SMH_RAM, blitter_w) AM_BASE(&blitter_regs)	// Blitter
-	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, wecleman_pageram_w) AM_BASE(&wecleman_pageram)	// Background Layers
-	AM_RANGE(0x108000, 0x108fff) AM_READWRITE(SMH_RAM, wecleman_txtram_w) AM_BASE(&wecleman_txtram)	// Text Layer
-	AM_RANGE(0x110000, 0x110fff) AM_READWRITE(SMH_RAM, wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE(&blitter_regs)	// Blitter
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wecleman_pageram_w) AM_BASE(&wecleman_pageram)	// Background Layers
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(wecleman_txtram_w) AM_BASE(&wecleman_txtram)	// Text Layer
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE(1)	// Shared with main CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(&spriteram16)	// Sprites
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)	// To sound CPU
@@ -596,12 +596,12 @@ static WRITE16_HANDLER( hotchase_soundlatch_w );
 static ADDRESS_MAP_START( hotchase_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x063fff) AM_RAM										// RAM (weird size!?)
-	AM_RANGE(0x080000, 0x080011) AM_READWRITE(SMH_RAM, blitter_w) AM_BASE(&blitter_regs)	// Blitter
+	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_BASE(&blitter_regs)	// Blitter
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(hotchase_K051316_0_r, hotchase_K051316_0_w)	// Background
 	AM_RANGE(0x101000, 0x10101f) AM_WRITE(hotchase_K051316_ctrl_0_w)	// Background Ctrl
 	AM_RANGE(0x102000, 0x102fff) AM_READWRITE(hotchase_K051316_1_r, hotchase_K051316_1_w)	// Foreground
 	AM_RANGE(0x103000, 0x10301f) AM_WRITE(hotchase_K051316_ctrl_1_w)	// Foreground Ctrl
-	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(SMH_RAM, hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x110000, 0x111fff) AM_RAM_WRITE(hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE(1)					// Shared with sub CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(&spriteram16)	// Sprites
 	// Input Ports:

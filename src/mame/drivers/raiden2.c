@@ -752,14 +752,14 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_READWRITE(SMH_RAM, raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(SMH_RAM, raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_READWRITE(SMH_RAM, raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_READWRITE(SMH_RAM, raiden2_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_READWRITE(SMH_RAM, w1x) AM_BASE(&w1ram)
-	AM_RANGE(0x1f000, 0x1ffff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK(1)
 	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK(2)
@@ -2021,13 +2021,13 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_READWRITE(SMH_RAM, raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_READWRITE(SMH_RAM, raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_READWRITE(SMH_RAM, raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_READWRITE(SMH_RAM, raiden2_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_READWRITE(SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
 	/* not sure of bank sizes etc. */
 	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK(1)

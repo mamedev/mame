@@ -166,9 +166,9 @@ static WRITE8_HANDLER( adpcm_data_w )
 static ADDRESS_MAP_START( wc90b_map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_WRITE(wc90b_fgvideoram_w) AM_BASE(&wc90b_fgvideoram)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_BASE(&wc90b_fgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(1)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90b_shared_r, wc90b_shared_w) AM_BASE(&wc90b_shared)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( wc90b_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(2)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90b_shared_r, wc90b_shared_w)

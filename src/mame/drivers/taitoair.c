@@ -379,7 +379,7 @@ static ADDRESS_MAP_START( airsys_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w)	/* Pause the TMS32025 */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM              		/* "gradiation ram (0)" */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM            			/* "gradiation ram (1)" */
-	AM_RANGE(0x188000, 0x18bfff) AM_READWRITE(SMH_RAM, airsys_paletteram16_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x188000, 0x18bfff) AM_RAM_WRITE(airsys_paletteram16_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x800000, 0x820fff) AM_READWRITE(TC0080VCO_word_r, TC0080VCO_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE(&taitoair_line_ram)	/* "line ram" */
 	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE(&dsp_ram)	/* "dsp common ram" (TMS320C25) */

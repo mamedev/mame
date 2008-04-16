@@ -325,9 +325,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfea000, 0xfebfff) AM_READ(atarigen_sound_upper_r)
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_READWRITE(SMH_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM_WRITE(atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -589,9 +589,9 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_READWRITE(SMH_RAM, atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffe000, 0xffefff) AM_READWRITE(SMH_RAM, atarigen_playfield_w) AM_BASE(&atarigen_playfield)
-	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE(SMH_RAM, atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
+	AM_RANGE(0xfff000, 0xfff1ff) AM_RAM_WRITE(atarimo_0_spriteram_expanded_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

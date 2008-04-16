@@ -132,10 +132,10 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc500, 0xc500) AM_READ(input_port_4_r)
 	AM_RANGE(0xc600, 0xc600) AM_WRITE(mainsnk_c600_w)
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(SMH_RAM, mainsnk_bgram_w) AM_BASE(&mainsnk_bgram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(mainsnk_bgram_w) AM_BASE(&mainsnk_bgram)
 	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(SMH_RAM, mainsnk_fgram_w) AM_BASE(&mainsnk_fgram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(mainsnk_fgram_w) AM_BASE(&mainsnk_fgram)
 	AM_RANGE(0xf400, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 

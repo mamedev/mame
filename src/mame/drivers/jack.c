@@ -177,8 +177,8 @@ static ADDRESS_MAP_START( joinem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb504, 0xb504) AM_READ(input_port_4_r)
 	AM_RANGE(0xb506, 0xb507) AM_READWRITE(jack_flipscreen_r, jack_flipscreen_w)
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(joinem_misc_w)
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_WRITE(jack_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xbc00, 0xbfff) AM_RAM AM_WRITE(jack_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xb800, 0xbbff) AM_RAM_WRITE(jack_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xbc00, 0xbfff) AM_RAM_WRITE(jack_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
 

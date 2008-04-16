@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ(input_port_2_r) /* player#2 */
 	AM_RANGE(0xb803, 0xb803) AM_READ(input_port_3_r) /* player#1 */
 	AM_RANGE(0xc000, 0xc002) AM_WRITE(SMH_RAM) AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SHARE(3)
 ADDRESS_MAP_END
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ(input_port_2_r) /* player#2 */
 	AM_RANGE(0xb803, 0xb803) AM_READ(input_port_3_r) /* player#1 */
 	AM_RANGE(0xc000, 0xc002) AM_WRITE(SMH_RAM) AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE(&videoram) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE(&spriteram) AM_SHARE(3)
 ADDRESS_MAP_END
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( chinhero_bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb801, 0xb801) AM_READ(input_port_1_r) /* coin/start */
 	AM_RANGE(0xb802, 0xb802) AM_READ(input_port_2_r) /* player#2 */
 	AM_RANGE(0xb803, 0xb803) AM_READ(input_port_3_r) /* player#1 */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, shangkid_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE(3)
 ADDRESS_MAP_END
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( shangkid_bbx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb801, 0xb801) AM_READ(input_port_1_r) /* coin/start */
 	AM_RANGE(0xb802, 0xb802) AM_READ(input_port_2_r) /* player#2 */
 	AM_RANGE(0xb803, 0xb803) AM_READ(input_port_3_r) /* player#1 */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(SMH_RAM, shangkid_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE(3)
 ADDRESS_MAP_END

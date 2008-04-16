@@ -111,11 +111,11 @@ static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x06000, 0x067ff) AM_RAM
 	AM_RANGE(0x07800, 0x097ff) AM_RAM
 	AM_RANGE(0x09800, 0x099ff) AM_RAM
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_WRITE(sengokmj_bgvram_w) AM_BASE(&sengokmj_bgvram)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM AM_WRITE(sengokmj_fgvram_w) AM_BASE(&sengokmj_fgvram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM AM_WRITE(sengokmj_mdvram_w) AM_BASE(&sengokmj_mdvram)
-	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM AM_WRITE(sengokmj_txvram_w) AM_BASE(&sengokmj_txvram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(sengokmj_bgvram_w) AM_BASE(&sengokmj_bgvram)
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(sengokmj_fgvram_w) AM_BASE(&sengokmj_fgvram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(sengokmj_mdvram_w) AM_BASE(&sengokmj_mdvram)
+	AM_RANGE(0x0d800, 0x0e7ff) AM_RAM_WRITE(sengokmj_txvram_w) AM_BASE(&sengokmj_txvram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM AM_BASE(&spriteram16)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END

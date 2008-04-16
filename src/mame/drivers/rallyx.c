@@ -311,7 +311,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 
 static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(SMH_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE(&rallyx_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_1_r)
@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jungler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(SMH_RAM, rallyx_videoram_w) AM_BASE(&rallyx_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE(&rallyx_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
 	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_1_r)

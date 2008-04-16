@@ -1021,7 +1021,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x260001) AM_WRITENOP		// Vertical synchronization register
 	AM_RANGE(0x270000, 0x270001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x280000, 0x29ffff) AM_READWRITE(sys24_char_r, sys24_char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_READWRITE(SMH_RAM, system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x404000, 0x40401f) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
 	AM_RANGE(0x600000, 0x63ffff) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
@@ -1060,7 +1060,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x260001) AM_WRITENOP		// Vertical synchronization register
 	AM_RANGE(0x270000, 0x270001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x280000, 0x29ffff) AM_READWRITE(sys24_char_r, sys24_char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_READWRITE(SMH_RAM, system24temp_sys16_paletteram1_w)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(system24temp_sys16_paletteram1_w)
 	AM_RANGE(0x404000, 0x40401f) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
 	AM_RANGE(0x600000, 0x63ffff) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)

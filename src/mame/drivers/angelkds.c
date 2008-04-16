@@ -217,11 +217,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_READWRITE(SMH_RAM, angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_READWRITE(SMH_RAM, angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_READWRITE(SMH_RAM, angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE(&angelkds_bgtopvideoram) /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE(&angelkds_bgbotvideoram) /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE(&angelkds_txvideoram)
 	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE(&spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_READWRITE(SMH_RAM, angelkds_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)

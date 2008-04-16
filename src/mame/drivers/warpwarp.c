@@ -301,7 +301,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 
 static ADDRESS_MAP_START( geebee_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_WRITE(geebee_videoram_w) AM_BASE(&geebee_videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(geebee_videoram_w) AM_BASE(&geebee_videoram)
 	AM_RANGE(0x2400, 0x27ff) AM_WRITE(geebee_videoram_w) /* mirror used by kaiteik due to a bug */
 	AM_RANGE(0x3000, 0x37ff) AM_ROM			/* 3000-33ff in GeeBee */
     AM_RANGE(0x4000, 0x40ff) AM_RAM
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bombbee_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
 	AM_RANGE(0x6010, 0x601f) AM_READWRITE(warpwarp_vol_r, warpwarp_music1_w)
@@ -331,7 +331,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warpwarp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_ROM
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
 	AM_RANGE(0xc010, 0xc01f) AM_READWRITE(warpwarp_vol_r, warpwarp_music1_w)

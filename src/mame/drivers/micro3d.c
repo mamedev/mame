@@ -749,7 +749,7 @@ static ADDRESS_MAP_START( hostmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x980000, 0x980001) AM_RAM                           /* ADC0844 */
 	AM_RANGE(0x9a0000, 0x9a0007) AM_READWRITE(tms_host_r, tms_host_w)  /* TMS34010 Interface */
 	AM_RANGE(0x9c0000, 0x9c0001) AM_RAM                            /* ????? Write: 80, A0 and 00 (8-bit high byte) */
-	AM_RANGE(0x9e0000, 0x9e00cf) AM_READWRITE(SMH_RAM, m68901_w) AM_BASE(&m68901_base)  /* 68901 Multifunction Peripheral */
+	AM_RANGE(0x9e0000, 0x9e00cf) AM_RAM_WRITE(m68901_w) AM_BASE(&m68901_base)  /* 68901 Multifunction Peripheral */
 	AM_RANGE(0xa00000, 0xa000cf) AM_READWRITE(m68681_r, m68681_w) AM_BASE(&m68681_base)   /* 68681 UART */
 	AM_RANGE(0xa20000, 0xa20001) AM_RAM                           /* XY joystick input - sign? */
 	AM_RANGE(0xa40002, 0xa40003) AM_RAM                           /* XY joystick input - actual values */
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( vgbmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800000, 0x00bfffff) AM_RAM                         /* 512kB Main DRAM */
 	AM_RANGE(0x00c00000, 0x00c0000f) AM_READ(input_port_2_word_r)   /* TI Monitor Mode switch */
 	AM_RANGE(0x00e00000, 0x00e0000f) AM_RAM //WRITE(mystery2_w)                        /* CREGCLK ??? byte write here. */
-	AM_RANGE(0x02000000, 0x0200ffff) AM_READWRITE(SMH_RAM, paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) //      AM_RANGE(0x02010000, 0x027fffff) AM_RAM                         // ??????????? Mirror of VRAM???
+	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM_WRITE(paletteram16_BBBBBRRRRRGGGGGG_word_w) AM_BASE(&paletteram16) //      AM_RANGE(0x02010000, 0x027fffff) AM_RAM                         // ??????????? Mirror of VRAM???
 	AM_RANGE(0x02600000, 0x0260000f) AM_RAM                         // XFER3dk???? 16-bit write
 	AM_RANGE(0x02c00000, 0x02c0003f) AM_READ(ti_uart_r)            /* SCN UART */
 	AM_RANGE(0x02e00000, 0x02e0003f) AM_WRITE(ti_uart_w)

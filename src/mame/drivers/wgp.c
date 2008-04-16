@@ -669,7 +669,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x502000, 0x517fff) AM_READWRITE(wgp_pivram_word_r,wgp_pivram_word_w) AM_BASE(&wgp_pivram) /* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_READWRITE(wgp_piv_ctrl_word_r,wgp_piv_ctrl_word_w) AM_BASE(&wgp_piv_ctrlram)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)	/* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )	/* LAN areas not mapped... */

@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( xorworld_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
 	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
 	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_WRITE(xorworld_videoram16_w) AM_BASE(&videoram16)
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE(&videoram16)
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE(&spriteram16)
 	AM_RANGE(0xffc880, 0xffc881) AM_WRITENOP
 	AM_RANGE(0xffc882, 0xffc883) AM_WRITENOP

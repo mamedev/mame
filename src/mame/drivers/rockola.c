@@ -366,10 +366,10 @@ static CUSTOM_INPUT( sasuke_count_r )
 
 static ADDRESS_MAP_START( sasuke_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x8fff) AM_ROM
@@ -385,10 +385,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( satansat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x4000, 0x97ff) AM_ROM
@@ -404,10 +404,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanguard_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x3100, 0x3102) AM_WRITE(vanguard_sound_w)
@@ -425,10 +425,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantasy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x2001, 0x2001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0x2100, 0x2103) AM_WRITE(fantasy_sound_w)
@@ -445,10 +445,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pballoon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(rockola_videoram2_w) AM_BASE(&rockola_videoram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(rockola_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(rockola_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(rockola_charram_w) AM_BASE(&rockola_charram)
 	AM_RANGE(0x3000, 0x9fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)

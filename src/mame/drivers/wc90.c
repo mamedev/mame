@@ -119,11 +119,11 @@ static WRITE8_HANDLER( wc90_sound_command_w )
 static ADDRESS_MAP_START( wc90_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM		/* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_WRITE(wc90_fgvideoram_w) AM_BASE(&wc90_fgvideoram)	/* fg video ram */
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90_fgvideoram_w) AM_BASE(&wc90_fgvideoram)	/* fg video ram */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_WRITE(wc90_bgvideoram_w) AM_BASE(&wc90_bgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90_bgvideoram_w) AM_BASE(&wc90_bgvideoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_WRITE(wc90_txvideoram_w) AM_BASE(&wc90_txvideoram)	/* tx video ram */
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90_txvideoram_w) AM_BASE(&wc90_txvideoram)	/* tx video ram */
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90_shared_r, wc90_shared_w) AM_BASE(&wc90_shared)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(input_port_0_r) /* Stick 1 */
@@ -151,9 +151,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wc90_map_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, SMH_ROM)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(wc90_shared_r, wc90_shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)

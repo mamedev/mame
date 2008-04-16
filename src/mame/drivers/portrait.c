@@ -125,8 +125,8 @@ static WRITE8_HANDLER( portrait_negative_scroll_w )
 
 static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_READWRITE(SMH_RAM, portrait_bgvideo_write) AM_BASE(&portrait_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(SMH_RAM, portrait_fgvideo_write) AM_BASE(&portrait_fgvideoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE(&portrait_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE(&portrait_fgvideoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w)

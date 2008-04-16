@@ -161,9 +161,9 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 static ADDRESS_MAP_START( ppmast93_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM) AM_WRITENOP AM_REGION(REGION_CPU1, 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_WRITE(ppmast93_bgram_w) AM_BASE(&ppmast93_bgram) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE(&ppmast93_bgram) AM_SHARE(1)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_WRITE(ppmast93_fgram_w) AM_BASE(&ppmast93_fgram) AM_SHARE(2)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_BASE(&ppmast93_fgram) AM_SHARE(2)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

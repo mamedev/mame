@@ -504,13 +504,13 @@ static ADDRESS_MAP_START( kickgoal_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800004, 0x800005) AM_WRITE(actionhw_snd_w)
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
 	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
-	AM_RANGE(0xa00000, 0xa03fff) AM_READWRITE(SMH_RAM, kickgoal_fgram_w) AM_BASE(&kickgoal_fgram) /* FG Layer */
-	AM_RANGE(0xa04000, 0xa07fff) AM_READWRITE(SMH_RAM, kickgoal_bgram_w) AM_BASE(&kickgoal_bgram) /* Higher BG Layer */
-	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE(SMH_RAM, kickgoal_bg2ram_w) AM_BASE(&kickgoal_bg2ram) /* Lower BG Layer */
-	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE(SMH_RAM, SMH_RAM) // more tilemap?
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_BASE(&kickgoal_fgram) /* FG Layer */
+	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE(kickgoal_bgram_w) AM_BASE(&kickgoal_bgram) /* Higher BG Layer */
+	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE(kickgoal_bg2ram_w) AM_BASE(&kickgoal_bg2ram) /* Lower BG Layer */
+	AM_RANGE(0xa0c000, 0xa0ffff) AM_RAM_WRITE(SMH_RAM) // more tilemap?
 	AM_RANGE(0xa10000, 0xa1000f) AM_WRITE(SMH_RAM) AM_BASE(&kickgoal_scrram) /* Scroll Registers */
 	AM_RANGE(0xb00000, 0xb007ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* Sprites */
-	AM_RANGE(0xc00000, 0xc007ff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16) /* Palette */ // actionhw reads this
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16) /* Palette */ // actionhw reads this
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

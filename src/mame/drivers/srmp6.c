@@ -580,7 +580,7 @@ static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION(REGION_USER1, 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
-	AM_RANGE(0x480000, 0x480fff) AM_READWRITE(SMH_RAM, paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x4d0000, 0x4d0001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 
 	// OBJ RAM: checked [$400000-$47dfff]

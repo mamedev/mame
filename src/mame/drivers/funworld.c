@@ -900,7 +900,7 @@ static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c01, 0x0c01) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4000, 0x4000) AM_READNOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
@@ -916,7 +916,7 @@ static ADDRESS_MAP_START( magiccrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x3600, 0x36ff) AM_RAM	// some games use $3603-05 range for protection.
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -931,7 +931,7 @@ static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	// some unknown reads
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM	// some games use $3e03-05 range for protection.
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -944,7 +944,7 @@ static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2c01, 0x2c01) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x2e00, 0x2e00) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x2e01, 0x2e01) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -954,7 +954,7 @@ static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )	// RAM 64K (8
 	AM_RANGE(0x1000, 0x1000) AM_READNOP	// input port?
 	AM_RANGE(0x3000, 0x3004) AM_READNOP	// input port?
 	AM_RANGE(0x5000, 0x5001) AM_READNOP	// input port?
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM	AM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

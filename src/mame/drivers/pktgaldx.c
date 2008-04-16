@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x112000, 0x1127ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(OKIM6295_data_0_lsb_w)
 	AM_RANGE(0x140006, 0x140007) AM_READ(OKIM6295_status_0_lsb_r)

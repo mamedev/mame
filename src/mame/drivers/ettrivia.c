@@ -123,8 +123,8 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
 	AM_RANGE(0xb000, 0xb000) AM_READ(b000_r) AM_WRITE(b000_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(b800_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_WRITE(ettrivia_fg_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_WRITE(ettrivia_bg_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ettrivia_fg_w) AM_BASE(&fg_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_BASE(&bg_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )

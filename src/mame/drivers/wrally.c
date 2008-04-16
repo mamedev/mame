@@ -103,10 +103,10 @@ static WRITE16_HANDLER( unknown_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_WRITE(wrally_vram_w) AM_BASE(&wrally_videoram)		/* encrypted Video RAM */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_BASE(&wrally_videoram)		/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(&wrally_vregs)			/* Video Registers */
 	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(SMH_NOP)						/* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)/* Palette */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)/* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&wrally_spriteram)		/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r)			/* DSW #1 & #2 */
 	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r)			/* INPUT 1P & 2P, COINSW, STARTSW */

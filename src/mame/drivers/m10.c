@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(SMH_RAM, m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
 	AM_RANGE(0xa300, 0xa300) AM_READ(input_port_0_r)
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(SMH_RAM, m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)
@@ -505,8 +505,8 @@ static ADDRESS_MAP_START( m15_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_READ(SMH_ROM) AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(SMH_RAM, m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(SMH_RAM, m15_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE(&colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_BASE_MEMBER(m10_state, chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_3_r)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_1_r)

@@ -81,8 +81,8 @@ static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_WRITE(sonson_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_WRITE(sonson_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(sonson_scrollx_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_0_r)	/* IN0 */

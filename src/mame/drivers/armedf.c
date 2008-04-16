@@ -251,12 +251,12 @@ static ADDRESS_MAP_START( terraf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM AM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM AM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM AM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x078002, 0x078003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x078004, 0x078005) AM_READ(input_port_2_word_r)
@@ -276,12 +276,12 @@ static ADDRESS_MAP_START( kodure_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM AM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM AM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM AM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x078002, 0x078003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x078004, 0x078005) AM_READ(input_port_2_word_r)
@@ -298,13 +298,13 @@ static ADDRESS_MAP_START( cclimbr2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM AM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM 
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
-	AM_RANGE(0x070000, 0x070fff) AM_RAM AM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM AM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x078002, 0x078003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x078004, 0x078005) AM_READ(input_port_2_word_r)
@@ -321,13 +321,13 @@ static ADDRESS_MAP_START( legion_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM AM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
-	AM_RANGE(0x070000, 0x070fff) AM_RAM AM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM AM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x078002, 0x078003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x078004, 0x078005) AM_READ(input_port_2_word_r)
@@ -346,13 +346,13 @@ static ADDRESS_MAP_START( legiono_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040040, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
-	AM_RANGE(0x064000, 0x064fff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM AM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
 	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
-	AM_RANGE(0x070000, 0x070fff) AM_RAM AM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x074000, 0x074fff) AM_RAM AM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x074000, 0x074fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
 	AM_RANGE(0x078000, 0x078001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x078002, 0x078003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x078004, 0x078005) AM_READ(input_port_2_word_r)
@@ -369,10 +369,10 @@ static ADDRESS_MAP_START( armedf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
-	AM_RANGE(0x066000, 0x066fff) AM_RAM AM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
-	AM_RANGE(0x067000, 0x067fff) AM_RAM AM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
-	AM_RANGE(0x068000, 0x069fff) AM_RAM AM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
-	AM_RANGE(0x06a000, 0x06afff) AM_RAM AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x066000, 0x066fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_BASE(&armedf_bg_videoram)
+	AM_RANGE(0x067000, 0x067fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)
+	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
+	AM_RANGE(0x06a000, 0x06afff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x06b000, 0x06bfff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x06c002, 0x06c003) AM_READ(input_port_1_word_r)

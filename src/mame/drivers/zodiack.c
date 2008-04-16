@@ -61,12 +61,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(SMH_NOP,watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_READWRITE(SMH_RAM, zodiack_attributes_w) AM_BASE(&zodiack_attributesram)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE(&zodiack_attributesram)
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(&zodiack_bulletsram) AM_SIZE(&zodiack_bulletsram_size)
 	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_READWRITE(SMH_RAM, zodiack_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xb000, 0xb3ff) AM_READWRITE(SMH_RAM, zodiack_videoram2_w) AM_BASE(&zodiack_videoram2)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE(&zodiack_videoram2)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
