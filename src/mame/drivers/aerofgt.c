@@ -204,10 +204,10 @@ static ADDRESS_MAP_START( spikes91_map, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0xffd200, 0xffd201) AM_WRITE(pspikesb_gfxbank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r) 
+	AM_RANGE(0xfff000, 0xfff001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ(input_port_1_word_r) AM_WRITE(pspikes_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READWRITE(input_port_2_word_r, aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_NOP 
+	AM_RANGE(0xfff006, 0xfff007) AM_NOP
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(spikes91_lookup_w)
 ADDRESS_MAP_END
 
@@ -1222,8 +1222,8 @@ static const gfx_layout aerfboo2_spritelayout =
 	4,
 	{ 0,1,2,3 },
 	{ 28,24,20,16,12,8,4,0,60,56,52,48,44,40,36,32 },
-	{ 
-		0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 
+	{
+		0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64
 	},
 	16*64
 };
@@ -1673,10 +1673,7 @@ static MACHINE_DRIVER_START( aerfboo2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68000,20000000/2)	/* 10 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(aerfboo2_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
-
-//	MDRV_CPU_ADD(Z80,8000000/2) /* 4 MHz ??? */
-//	MDRV_CPU_PROGRAM_MAP(aerfboot_sound_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2390,13 +2387,10 @@ ROM_END
 
 ROM_START( aerfboo2 )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 68000 code */
-//	ROM_LOAD16_BYTE( "afb_ep2.u3",  0x00000, 0x40000, CRC(2bb9edf7) SHA1(cf0a62070fc0803dd8c473c375f6a2d1884ba2bf) )
-//	ROM_LOAD16_BYTE( "afb_ep3.u2",  0x00001, 0x40000, CRC(475d3df3) SHA1(58bde24e9dea2fb0d7ae4f2a574b06bc1a33a13d) )
 	ROM_LOAD16_BYTE( "p2",  0x00000, 0x40000, CRC(6c4ec09b) SHA1(cdfb8c59ddd6360487fee017d5093636aa52c5c2) )
 	ROM_LOAD16_BYTE( "p1",  0x00001, 0x40000, CRC(841c513a) SHA1(819e634f0aec29b1863c9cf0118cc33154d10037) )
 
-//	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-//	ROM_LOAD( "afb_ep1.u17",  0x0000, 0x8000, CRC(d41b5ab2) SHA1(17d9b999c9af1f332d67e7ce1a2f71fd08178303) )
+	/* No z80 on this bootleg */
 
 	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "g5"        ,   0x000000, 0x80000, CRC(1c2bd86c) SHA1(f16d7eba967d76faaaeae5101db43141ef9e2eed) )
@@ -2410,15 +2404,9 @@ ROM_START( aerfboo2 )
 	ROM_LOAD32_BYTE( "g4"        ,   0x000002, 0x80000, CRC(97725694) SHA1(59316e4be043e0b7111c6777b36bcfd39c899e72) )
 	ROM_LOAD32_BYTE( "g3"        ,   0x000003, 0x80000, CRC(7be8cef0) SHA1(b227252fd288e8eb06507397f3ad625465dc1b0a) )
 
-//	ROM_REGION( 0x140000, REGION_SOUND1, ROMREGION_ERASEFF ) /* sound samples */
-//	ROM_LOAD( "afb_ep5.u29",  0x000000, 0x20000, CRC(3559609a) SHA1(6f0b633bf74f41487fc98dcdc43a83eb67f3d14c) )
-//	ROM_LOAD( "afb_ep4.u30",  0x040000, 0x20000, CRC(f9652163) SHA1(d8c1fcf44b350cc65378869e4eb188ea232b4948) )
-//	ROM_CONTINUE(			  0x080000, 0x20000 )
-//	ROM_CONTINUE(			  0x0c0000, 0x20000 )
-//	ROM_CONTINUE(			  0x100000, 0x20000 )
 	ROM_REGION( 0x100000, REGION_SOUND1, 0 ) /* sound samples */
-	ROM_LOAD( "s1"        ,     0x00000, 0x80000, CRC(9e09813d) SHA1(582a36b5a46f4d8eaedca22e583b6949535d24a5) )
-	ROM_LOAD( "s2"        ,     0x80000, 0x80000, CRC(2e316ee8) SHA1(a163dddee6d8cfd1286059ee561e3a01df49381b) )
+	ROM_LOAD( "s2"        ,     0x00000, 0x80000, CRC(2e316ee8) SHA1(a163dddee6d8cfd1286059ee561e3a01df49381b) )
+	ROM_LOAD( "s1"        ,     0x80000, 0x80000, CRC(9e09813d) SHA1(582a36b5a46f4d8eaedca22e583b6949535d24a5) )
 
 ROM_END
 
