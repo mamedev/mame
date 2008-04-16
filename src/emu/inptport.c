@@ -2813,7 +2813,7 @@ profiler_mark(PROFILER_INPUT);
 						/* (MESS-specific) check for disabled keyboard */
 						if (portentry->type == IPT_KEYBOARD && osd_keyboard_disabled())
 							continue;
-#endif
+#endif /* MESS */
 						/* skip locked-out coin inputs */
 						if (portentry->type >= IPT_COIN1 && portentry->type <= IPT_COIN8 && coinlockedout[portentry->type - IPT_COIN1])
 						{
@@ -2885,6 +2885,11 @@ profiler_mark(PROFILER_INPUT);
 				/* note that analog ports are handled instantaneously at port read time */
 			}
 
+#ifdef MESS
+		/* hook for MESS's natural keyboard support */
+		mess_input_port_update_hook(portnum, &portinfo->digital);
+#endif /* MESS */
+
 		/* call changed handlers */
 		for (changed = portinfo->changedinfo; changed; changed = changed->next)
 			if (input_port_condition(changed->portentry))
@@ -2901,11 +2906,6 @@ profiler_mark(PROFILER_INPUT);
 				portentry->changed_last_value = new_unmasked_value;
 			}
 	}
-
-#ifdef MESS
-	/* less MESS to MESSy things */
-	inputx_update(machine);
-#endif
 
 	/* handle playback/record */
 	for (portnum = 0; portnum < MAX_INPUT_PORTS; portnum++)
