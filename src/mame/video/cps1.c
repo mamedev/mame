@@ -275,9 +275,6 @@ CPS2:
 * Sprites are currently lagged by one frame to keep sync with backgrounds. This causes
   sprites to stay on screen one frame longer (visable in VSAV attract mode).
 
-* The boot screen of some CPS2 games has a blue background instead of black,
-  however that might be the correct behaviour.
-
 Marvel Vs. Capcom
 * Sometimes currupt gfx are displayed on the 32x32 layer as the screen flashes at the
   start of super combo moves. The problem seems to be due to tiles being fetched before
@@ -2441,7 +2438,21 @@ VIDEO_UPDATE( cps1 )
 
 
 	/* Blank screen */
-	fillbitmap(bitmap,0xbff,cliprect);
+	if (cps_version == 1)
+	{
+		// CPS1 games use pen 0xbff as background color; this is used in 3wonders,
+		// mtwins (explosion during attract), mercs (intermission).
+		fillbitmap(bitmap,0xbff,cliprect);
+	}
+	else
+	{
+		// CPS2 apparently always force the background to black. Several games would
+		// should a blue screen during boot if we used the same code as CPS1.
+		// Maybe Capcom changed the background handling due to the problems that
+		// it caused on several monitors (because the background extended into the
+		// blanking area instead of going black, causing the monitor to clip).
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	}
 
 	cps1_render_stars(screen, bitmap,cliprect);
 
