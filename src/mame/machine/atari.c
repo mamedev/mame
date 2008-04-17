@@ -650,7 +650,7 @@ DRIVER_INIT( atari )
  *************************************/
 
 #ifdef MESS
-static void a800_setbank(int n)
+static void a800_setbank(running_machine *machine, int n)
 {
 	void *read_addr;
 	void *write_addr;
@@ -701,7 +701,7 @@ static void cart_reset(running_machine *machine)
 {
 #ifdef MESS
 	if (a800_cart_loaded)
-		a800_setbank(1);
+		a800_setbank(machine, 1);
 #endif /* MESS */
 }
 
@@ -861,12 +861,12 @@ DEVICE_IMAGE_UNLOAD( a800_cart )
 	if( image_index_in_device(image) > 0 )
 	{
 		a800_cart_is_16k = 0;
-		a800_setbank(1);
+		a800_setbank(image->machine, 1);
     }
 	else
 	{
 		a800_cart_loaded = 0;
-		a800_setbank(0);
+		a800_setbank(image->machine, 0);
     }
 }
 #endif
