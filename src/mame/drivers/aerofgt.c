@@ -99,6 +99,7 @@ VIDEO_UPDATE( spinlbrk );
 VIDEO_UPDATE( turbofrc );
 VIDEO_UPDATE( aerofgt );
 VIDEO_UPDATE( aerfboot );
+VIDEO_UPDATE( aerfboo2 );
 VIDEO_START( wbbc97 );
 VIDEO_UPDATE( wbbc97 );
 
@@ -362,7 +363,7 @@ static ADDRESS_MAP_START( aerfboo2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
 	AM_RANGE(0x0e4000, 0x0e7fff) AM_RAM AM_BASE(&aerofgt_spriteram2) AM_SIZE(&aerofgt_spriteram2_size)
 	AM_RANGE(0x0f8000, 0x0fbfff) AM_RAM	/* work RAM */
-	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM //AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+	AM_RANGE(0x0fc000, 0x0fc7ff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 	AM_RANGE(0x0fd000, 0x0fd7ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0fe000, 0x0fe001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x0fe002, 0x0fe003) AM_READ(input_port_1_word_r)
@@ -373,11 +374,10 @@ static ADDRESS_MAP_START( aerfboo2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0fe006, 0x0fe007) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
 	AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
-//  AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
+//	AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
 	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP
 	AM_RANGE(0x0fe402, 0x0fe403) AM_WRITENOP
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */
-	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbbc97_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1687,7 +1687,7 @@ static MACHINE_DRIVER_START( aerfboo2 )
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(turbofrc)
-	MDRV_VIDEO_UPDATE(aerfboot)
+	MDRV_VIDEO_UPDATE(aerfboo2)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2459,5 +2459,5 @@ GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.
 GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 2)", GAME_NO_COCKTAIL )
 GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", GAME_NO_COCKTAIL )
 GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
-GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_NOT_WORKING)
+GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", GAME_NO_COCKTAIL | GAME_NO_SOUND )
 GAME( 1997, wbbc97,   0,        wbbc97,   wbbc97,   0, ROT0,   "Comad",            "Beach Festival World Championship 1997", GAME_NO_COCKTAIL )
