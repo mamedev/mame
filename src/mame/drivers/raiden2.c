@@ -1,5 +1,14 @@
-/*
+/* raiden 2 board test note 17/04/08 (based on test by dox)
 
+ rom banking is at 6c9, bit 0x80
+  -- the game only writes this directly at startup, must be written indirectly by
+     one of the protection commands? or mirrored?
+  value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
+  value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
+
+*/
+
+/*
 Raiden 2 Hardware
 
 Games on this PCB / Similar PCBs
