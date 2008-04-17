@@ -132,6 +132,7 @@ struct _cdp1869_interface
 	/* if specified, this gets called for every change of the predisplay pin (CDP1870/76 pin 1) */
 	cdp1869_on_prd_changed_func		on_prd_changed;
 };
+#define CDP1869_INTERFACE(name) const cdp1869_interface (name) =
 
 /* device interface */
 DEVICE_GET_INFO( cdp1869_video );
@@ -139,7 +140,7 @@ DEVICE_GET_INFO( cdp1869_video );
 /* palette initialization */
 PALETTE_INIT( cdp1869 );
 
-/* io port access */
+/* register access */
 WRITE8_DEVICE_HANDLER( cdp1869_out3_w );
 WRITE8_DEVICE_HANDLER( cdp1869_out4_w );
 WRITE8_DEVICE_HANDLER( cdp1869_out5_w );
@@ -154,7 +155,7 @@ WRITE8_DEVICE_HANDLER ( cdp1869_charram_w );
 READ8_DEVICE_HANDLER ( cdp1869_pageram_r );
 WRITE8_DEVICE_HANDLER ( cdp1869_pageram_w );
 
-/* updates the screen */
+/* screen update */
 void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectangle *cliprect);
 
 #endif

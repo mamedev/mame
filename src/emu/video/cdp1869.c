@@ -2,8 +2,8 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/cdp1869.h"
 #include "sound/cdp1869.h"
+#include "video/cdp1869.h"
 
 /*
 
@@ -569,7 +569,10 @@ WRITE8_DEVICE_HANDLER( cdp1869_pageram_w )
 		pma = offset;
 	}
 
-	cdp1869->intf->page_ram_w(device, pma, data);
+	if (cdp1869->intf->page_ram_w)
+	{
+		cdp1869->intf->page_ram_w(device, pma, data);
+	}
 }
 
 /* Character RAM Access */
@@ -610,7 +613,10 @@ WRITE8_DEVICE_HANDLER( cdp1869_charram_w )
 			cma &= 0x07;
 		}
 
-		cdp1869->intf->char_ram_w(device, pma, cma, data);
+		if (cdp1869->intf->char_ram_w)
+		{
+			cdp1869->intf->char_ram_w(device, pma, cma, data);
+		}
 	}
 }
 
@@ -776,10 +782,8 @@ static DEVICE_START( cdp1869 )
 	cdp1869->intf = device->static_config;
 
 	assert(cdp1869->intf->page_ram_r != NULL);
-	assert(cdp1869->intf->page_ram_w != NULL);
 	assert(cdp1869->intf->pcb_r != NULL);
 	assert(cdp1869->intf->char_ram_r != NULL);
-	assert(cdp1869->intf->char_ram_w != NULL);
 
 	// set initial values
 

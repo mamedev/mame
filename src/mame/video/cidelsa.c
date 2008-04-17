@@ -182,7 +182,7 @@ static const cdp1869_interface altair_cdp1869_intf =
 	cidelsa_prd_changed,
 };
 
-static const cdp1869_interface draco_cdp1869_intf =
+static CDP1869_INTERFACE( draco_cdp1869_intf )
 {
 	SCREEN_TAG,
 	DRACO_CHR2,
