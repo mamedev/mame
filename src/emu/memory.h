@@ -468,7 +468,7 @@ union _addrmap64_token
 
 /* wrappers for dynamic read handler installation */
 #define memory_install_read_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
-	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, rhandler, (FPTR)NULL, #rhandler, NULL)
 #define memory_install_read8_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
 	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 #define memory_install_read16_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
@@ -492,7 +492,7 @@ union _addrmap64_token
 
 /* wrappers for dynamic write handler installation */
 #define memory_install_write_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
-	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, (FPTR)NULL, whandler, NULL, #whandler)
 #define memory_install_write8_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
 	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 #define memory_install_write16_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
