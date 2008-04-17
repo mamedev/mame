@@ -181,7 +181,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		sx = spriteram_area3[offs+1] + 256 * (spriteram_area2[offs+1] & 1);
 		if (sx > 320) sx -= 512;
 
-		sy = 255 - spriteram_area1[offs];
+		sy = 255 - spriteram_area1[offs] + 2;
+		if (sy > 0xf0) sy -= 256;
+
 		if (flipscreen) sy = 240 - sy;
 
 		color = spriteram_area1[offs+1] & 0x1f;
