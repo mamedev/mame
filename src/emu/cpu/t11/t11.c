@@ -202,24 +202,21 @@ static void t11_check_irqs(void)
 	/* compare the priority of the interrupt to the PSW */
 	if (irq->priority > priority)
 	{
-		/* get the priority of this interrupt */
-		int new_pc = RWORD(irq->vector);
-		int new_psw = RWORD(irq->vector + 2);
+		int vector = irq->vector;
+		int new_pc, new_psw;
 
-		/* call the callback */
-		if (t11.irq_callback)
+		/* call the callback; if we don't get -1 back, use the return value as our vector */
+		if (t11.irq_callback != NULL)
 		{
-			int vector = 0;
-
-			if (t11.irq_state & 8) vector = 3;
-			else if (t11.irq_state & 4) vector = 2;
-			else if (t11.irq_state & 2) vector = 1;
-			(*t11.irq_callback)(vector);
+			int new_vector = (*t11.irq_callback)(t11.irq_state & 15);
+			if (new_vector != -1)
+				vector = new_vector;
 		}
 
-		/* kludge for 720 - fix me! */
-		if (new_pc == 0)
-			return;
+		/* fetch the new PC and PSW from that vector */
+		assert((vector & 3) == 0);
+		new_pc = RWORD(vector);
+		new_psw = RWORD(vector + 2);
 
 		/* push the old state, set the new one */
 		PUSH(PSW);
@@ -459,7 +456,7 @@ void t11_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(t11);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
