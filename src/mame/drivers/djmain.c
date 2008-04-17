@@ -1232,7 +1232,7 @@ static MACHINE_DRIVER_START( djmain )
 
 	MDRV_MACHINE_START(djmain)
 	MDRV_MACHINE_RESET(djmain)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */

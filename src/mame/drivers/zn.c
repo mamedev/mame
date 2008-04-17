@@ -1692,7 +1692,7 @@ static void atpsx_dma_write( UINT32 n_address, INT32 n_size )
 static DRIVER_INIT( coh1000w )
 {
 	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
-	
+
 	memory_install_read32_handler            ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f1fffff, 0, 0, SMH_BANK1 );
 	memory_install_write32_handler           ( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f000003, 0, 0, SMH_NOP );
 	memory_install_readwrite32_device_handler( ide,     0, ADDRESS_SPACE_PROGRAM, 0x1f7e4000, 0x1f7e4fff, 0, 0, ide_controller32_r, ide_controller32_w );
@@ -1717,7 +1717,7 @@ static MACHINE_DRIVER_START( coh1000w )
 
 	MDRV_MACHINE_RESET( coh1000w )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, atpsx_interrupt)
 MACHINE_DRIVER_END
 
@@ -2251,7 +2251,7 @@ static MACHINE_DRIVER_START( coh1000a_ide )
 
 	MDRV_MACHINE_RESET( coh1000a )
 	MDRV_NVRAM_HANDLER( at28c16_0 )
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, jdredd_ide_interrupt)
 MACHINE_DRIVER_END
 

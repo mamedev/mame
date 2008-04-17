@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( aerfboo2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0fe006, 0x0fe007) AM_WRITE(aerofgt_bg2scrolly_w)
 	AM_RANGE(0x0fe008, 0x0fe00b) AM_WRITE(turbofrc_gfxbank_w)
 	AM_RANGE(0x0fe010, 0x0fe011) AM_WRITENOP
-//	AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
+//  AM_RANGE(0x0fe012, 0x0fe013) AM_WRITE(aerfboot_soundlatch_w)
 	AM_RANGE(0x0fe400, 0x0fe401) AM_WRITENOP
 	AM_RANGE(0x0fe402, 0x0fe403) AM_WRITENOP
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* used only for the scroll registers */

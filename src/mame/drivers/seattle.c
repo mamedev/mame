@@ -2458,7 +2458,7 @@ static MACHINE_DRIVER_START( seattle_common )
 
 	MDRV_MACHINE_RESET(seattle)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */

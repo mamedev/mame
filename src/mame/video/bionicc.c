@@ -139,7 +139,7 @@ WRITE16_HANDLER( bionicc_paletteram_w )
 	r = ((data>>12)&0x0f) * 0x11;
 	g = ((data>>8 )&0x0f) * 0x11;
 	b = ((data>>4 )&0x0f) * 0x11;
-	
+
 	if ((bright & 0x08) == 0)
 	{
 		r = r * (0x07 + bright) / 0x0e;

@@ -1044,7 +1044,7 @@ static MACHINE_DRIVER_START( midvplus )
 
 	MDRV_MACHINE_RESET(midvplus)
 	MDRV_NVRAM_HANDLER(midway_serial_pic2)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, NULL)
 
 	/* sound hardware */

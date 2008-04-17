@@ -1055,7 +1055,7 @@ static MACHINE_DRIVER_START(mediagx)
 
 	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
 	MDRV_DEVICE_CONFIG( mediagx_pic8259_2_config )
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	MDRV_NVRAM_HANDLER( mc146818 )

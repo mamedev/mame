@@ -1432,8 +1432,8 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)
 #if USE_V25
-//	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
-//	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+//  AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $21f000 status port */
+//  AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x210000, 0x21efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
 	AM_RANGE(0x21f000, 0x21ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
@@ -1591,8 +1591,8 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 #if USE_V25
-//	AM_RANGE(0x28e000, 0x28fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $28f000 status port */
-//	AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+//  AM_RANGE(0x28e000, 0x28fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $28f000 status port */
+//  AM_RANGE(0x28fc00, 0x28ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x280000, 0x28efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
 	AM_RANGE(0x28f000, 0x28ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl) // guess!!!
@@ -1653,8 +1653,8 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock */
 #if USE_V25
-//	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
-//	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+//  AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $21f000 status port */
+//  AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x210000, 0x21efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
 	AM_RANGE(0x21f000, 0x21ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
@@ -1687,11 +1687,11 @@ static READ16_HANDLER( batsugun_share_r )
 static WRITE16_HANDLER( batsugun_share_w )
 {
 	/*
-	if (ACCESSING_BITS_8_15)
-	{
-		batsugun_share[offset] = data >> 8;
-	}
-	*/
+    if (ACCESSING_BITS_8_15)
+    {
+        batsugun_share[offset] = data >> 8;
+    }
+    */
 	if (ACCESSING_BITS_0_7)
 	{
 		batsugun_share[offset] = data;
@@ -1707,11 +1707,11 @@ static READ16_HANDLER( batsugun_share2_r )
 static WRITE16_HANDLER( batsugun_share2_w )
 {
 	/*
-	if (ACCESSING_BITS_8_15)
-	{
-		batsugun_share2[offset] = data >> 8;
-	}
-	*/
+    if (ACCESSING_BITS_8_15)
+    {
+        batsugun_share2[offset] = data >> 8;
+    }
+    */
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1728,8 +1728,8 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
 #if USE_V25
-//	AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)	/* $21f000 status port */
-//	AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)	/* 16-bit on 68000 side, 8-bit on V25+ side */
+//  AM_RANGE(0x21e000, 0x21fbff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)   /* $21f000 status port */
+//  AM_RANGE(0x21fc00, 0x21ffff) AM_READWRITE(V25_sharedram_r, V25_sharedram_w) AM_BASE(&V25_shared_ram)    /* 16-bit on 68000 side, 8-bit on V25+ side */
 	AM_RANGE(0x210000, 0x21efff) AM_RAM AM_READWRITE( batsugun_share2_r, batsugun_share2_w )
 	AM_RANGE(0x21f000, 0x21ffff) AM_RAM AM_READWRITE( batsugun_share_r, batsugun_share_w )
 #else
@@ -2022,13 +2022,13 @@ static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x04000, 0x04000) AM_READWRITE(YM2151_status_port_0_r, YM2151_register_port_0_w)
 	AM_RANGE(0x04001, 0x04001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0x04002, 0x04002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
-//	AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
+//  AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
 	AM_RANGE(0x0400a, 0x0400a) AM_READ_PORT("IN2")
 	AM_RANGE(0x0400c, 0x0400c) AM_READ_PORT("SYS")
 	AM_RANGE(0x0400e, 0x0400e) AM_WRITE(toaplan2_coin_w)
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM							/* Internal 512 bytes of RAM */
-//	AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)	/* External shared RAM (ROM for KBASH) */
+//  AM_RANGE(0x80000, 0x87fff) AM_RAM AM_BASE(&V25_sharedram)   /* External shared RAM (ROM for KBASH) */
 ADDRESS_MAP_END
 
 
@@ -3905,7 +3905,7 @@ MACHINE_RESET(batsugun)
 void batsugun_ym2151_irqhandler(int linestate)
 {
 	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
-//	update_irq_lines(Machine, linestate ? assert : clear);
+//  update_irq_lines(Machine, linestate ? assert : clear);
 }
 
 const struct YM2151interface batsugun_ym2151_interface =

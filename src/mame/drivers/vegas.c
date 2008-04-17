@@ -2234,7 +2234,7 @@ static MACHINE_DRIVER_START( vegascore )
 
 	MDRV_MACHINE_RESET(vegas)
 	MDRV_NVRAM_HANDLER(timekeeper_save)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */

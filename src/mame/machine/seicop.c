@@ -1423,7 +1423,7 @@ READ16_HANDLER( cupsoc_mcu_r )
 		//  return cop_mcu_ram[offset];
 
 		/* returning 0xffff for some inputs for now, breaks coinage but
-		   allows cupsoc to boot */
+           allows cupsoc to boot */
 		case (0x300/2): return input_port_1_word_r(machine,0,0);
 		case (0x304/2): return input_port_2_word_r(machine,0,0);
 		case (0x308/2): return input_port_4_word_r(machine,0,0);
@@ -1483,10 +1483,10 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 					program_write_word(src+0x4,(y+y_rel));
 					program_write_word(src+0x8,(x+x_rel));
 					/*logerror("%08x %08x %08x %08x %08x\n",cop_register[0],
-												   program_read_word(cop_reg[0]+0x4),
-												   program_read_word(cop_reg[0]+0x8),
-												   program_read_word(cop_reg[0]+0x10),
-												   program_read_word(cop_reg[0]+0x14));*/
+                                                   program_read_word(cop_reg[0]+0x4),
+                                                   program_read_word(cop_reg[0]+0x8),
+                                                   program_read_word(cop_reg[0]+0x10),
+                                                   program_read_word(cop_reg[0]+0x14));*/
 					break;
 				}
 				/*???*/

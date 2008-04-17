@@ -101,7 +101,7 @@ typedef struct _ide_state ide_state;
 struct _ide_state
 {
 	const device_config *device;
-	
+
 	UINT8			adapter_control;
 	UINT8			status;
 	UINT8			error;
@@ -198,7 +198,7 @@ INLINE ide_state *get_safe_token(const device_config *device)
 INLINE void signal_interrupt(ide_state *ide)
 {
 	const ide_config *config = ide->device->inline_config;
-	
+
 	LOG(("IDE interrupt assert\n"));
 
 	/* signal an interrupt */
@@ -1289,7 +1289,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 static void ide_controller_write(const device_config *device, offs_t offset, int size, UINT32 data)
 {
 	ide_state *ide = get_safe_token(device);
-	
+
 	/* logit */
 	if (offset != IDE_ADDR_DATA)
 		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", activecpu_get_previouspc(), offset, data, size));
@@ -1439,7 +1439,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, int size)
 {
 	ide_state *ide = get_safe_token(device);
-	
+
 	LOG(("%08X:ide_bus_master_read(%d, %d)\n", activecpu_get_previouspc(), offset, size));
 
 	/* command register */
@@ -1678,7 +1678,7 @@ static DEVICE_START( ide_controller )
 	assert(device->inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
-	
+
 	/* store a pointer back to the device */
 	ide->device = device;
 
@@ -1768,7 +1768,7 @@ static DEVICE_STOP( ide_controller )
 {
 	ide_state *ide = get_safe_token(device);
 
-	/* close the hard disk */	
+	/* close the hard disk */
 	if (ide->disk != NULL)
 		hard_disk_close(ide->disk);
 }

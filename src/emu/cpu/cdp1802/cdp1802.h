@@ -104,7 +104,7 @@ struct _cdp1802_interface
 
 	/* if specified, this gets called for every DMA read */
 	cdp1802_dma_read_func	dma_r;
-	
+
 	/* if specified, this gets called for every DMA write */
 	cdp1802_dma_write_func	dma_w;
 };

@@ -685,7 +685,7 @@ static MACHINE_DRIVER_START( kinst )
 
 	MDRV_MACHINE_START(kinst)
 	MDRV_MACHINE_RESET(kinst)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */

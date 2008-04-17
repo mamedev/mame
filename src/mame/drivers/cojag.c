@@ -1003,7 +1003,7 @@ static MACHINE_DRIVER_START( cojagr3k )
 
 	MDRV_MACHINE_RESET(cojag)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, jaguar_external_int)
 
 	/* video hardware */

@@ -189,14 +189,14 @@ WRITE16_HANDLER( lastduel_palette_word_w )
 {
 	int red, green, blue, bright;
 	data = COMBINE_DATA(&paletteram16[offset]);
-	
+
 	// Brightness parameter interpreted same way as CPS1
 	bright = 0x10 + (data&0x0f);
-	
+
 	red   = ((data>>12)&0x0f) * bright * 0x11 / 0x1f;
 	green = ((data>>8 )&0x0f) * bright * 0x11 / 0x1f;
 	blue  = ((data>>4 )&0x0f) * bright * 0x11 / 0x1f;
-	
+
 	palette_set_color (machine, offset, MAKE_RGB(red, green, blue));
 }
 

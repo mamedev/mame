@@ -1282,7 +1282,7 @@ int memory_get_log_unmap(int spacenum)
 
 /*-------------------------------------------------
     memory_install_handlerX - install
-    dynamic machine read and write handlers for 
+    dynamic machine read and write handlers for
     X-bit case
 -------------------------------------------------*/
 
@@ -1345,8 +1345,8 @@ UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spac
 
 
 /*-------------------------------------------------
-    memory_install_device_handlerX - 
-    install dynamic device read and write handlers 
+    memory_install_device_handlerX -
+    install dynamic device read and write handlers
     for X-bit case
 -------------------------------------------------*/
 
@@ -1852,13 +1852,13 @@ static void table_compute_subhandler(handler_data *table, UINT8 entry, read_or_w
 	int maxunits = spacebits / handlerbits;
 	handler_data *hdata = &table[entry];
 	int unitnum;
-	
-	assert_always(!HANDLER_IS_STATIC(entry), "table_compute_subhandler called with static handlers and mismatched data bus widths"); 
+
+	assert_always(!HANDLER_IS_STATIC(entry), "table_compute_subhandler called with static handlers and mismatched data bus widths");
 
 	/* copy raw data to the subhandler data */
 	hdata->subobject = hdata->object;
 	hdata->subhandler = hdata->handler;
-	
+
 	/* fill in a stub as the real handler */
 	hdata->object = hdata;
 	hdata->handler = get_stub_handler(readorwrite, spacebits, handlerbits);
@@ -1952,8 +1952,8 @@ static void table_populate_range(table_data *tabledata, offs_t bytestart, offs_t
 
 
 /*-------------------------------------------------
-    table_populate_range_mirrored - assign a 
-    memory handler to a range of addresses 
+    table_populate_range_mirrored - assign a
+    memory handler to a range of addresses
     including mirrors
 -------------------------------------------------*/
 
@@ -3027,7 +3027,7 @@ static READ16_HANDLER( stub_read8_from_16 )
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
 	UINT16 result = 0;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3051,7 +3051,7 @@ static READ32_HANDLER( stub_read8_from_32 )
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
 	UINT32 result = 0;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3075,7 +3075,7 @@ static READ64_HANDLER( stub_read8_from_64 )
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
 	UINT64 result = 0;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3099,7 +3099,7 @@ static READ32_HANDLER( stub_read16_from_32 )
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
 	UINT32 result = 0;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3123,7 +3123,7 @@ static READ64_HANDLER( stub_read16_from_64 )
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
 	UINT64 result = 0;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3147,7 +3147,7 @@ static READ64_HANDLER( stub_read32_from_64 )
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
 	UINT64 result = 0;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3175,7 +3175,7 @@ static WRITE16_HANDLER( stub_write8_from_16 )
 	const handler_data *handler = (const handler_data *)machine;
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3197,7 +3197,7 @@ static WRITE32_HANDLER( stub_write8_from_32 )
 	const handler_data *handler = (const handler_data *)machine;
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3219,7 +3219,7 @@ static WRITE64_HANDLER( stub_write8_from_64 )
 	const handler_data *handler = (const handler_data *)machine;
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3241,7 +3241,7 @@ static WRITE32_HANDLER( stub_write16_from_32 )
 	const handler_data *handler = (const handler_data *)machine;
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3263,7 +3263,7 @@ static WRITE64_HANDLER( stub_write16_from_64 )
 	const handler_data *handler = (const handler_data *)machine;
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3285,7 +3285,7 @@ static WRITE64_HANDLER( stub_write32_from_64 )
 	const handler_data *handler = (const handler_data *)machine;
 	const UINT8 *subshift = handler->subshift;
 	int subunits = handler->subunits;
-	
+
 	offset *= subunits;
 	while (subunits-- != 0)
 	{
@@ -3310,7 +3310,7 @@ static WRITE64_HANDLER( stub_write32_from_64 )
 static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits, int handlerdbits)
 {
 	memory_handler result = { 0 };
-	
+
 	/* read stubs */
 	if (readorwrite == ROW_READ)
 	{
@@ -3320,7 +3320,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 			if (handlerdbits == 8)
 				result.read.mhandler16 = stub_read8_from_16;
 		}
-		
+
 		/* 32-bit read stubs */
 		else if (spacedbits == 32)
 		{
@@ -3329,7 +3329,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 			else if (handlerdbits == 16)
 				result.read.mhandler32 = stub_read16_from_32;
 		}
-		
+
 		/* 64-bit read stubs */
 		else if (spacedbits == 64)
 		{
@@ -3341,7 +3341,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 				result.read.mhandler64 = stub_read32_from_64;
 		}
 	}
-	
+
 	/* write stubs */
 	else if (readorwrite == ROW_WRITE)
 	{
@@ -3351,7 +3351,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 			if (handlerdbits == 8)
 				result.write.mhandler16 = stub_write8_from_16;
 		}
-		
+
 		/* 32-bit write stubs */
 		else if (spacedbits == 32)
 		{
@@ -3360,7 +3360,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 			else if (handlerdbits == 16)
 				result.write.mhandler32 = stub_write16_from_32;
 		}
-		
+
 		/* 64-bit write stubs */
 		else if (spacedbits == 64)
 		{
@@ -3372,7 +3372,7 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 				result.write.mhandler64 = stub_write32_from_64;
 		}
 	}
-	
+
 	assert(result.read.generic != NULL);
 	return result;
 }

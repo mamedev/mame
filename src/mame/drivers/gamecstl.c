@@ -661,7 +661,7 @@ static MACHINE_DRIVER_START(gamecstl)
 
 	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
 	MDRV_DEVICE_CONFIG( gamecstl_pic8259_2_config )
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	MDRV_NVRAM_HANDLER( mc146818 )

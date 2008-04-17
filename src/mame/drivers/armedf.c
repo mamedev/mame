@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( cclimbr2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 	AM_RANGE(0x064000, 0x064fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x068000, 0x069fff) AM_RAM_WRITE(armedf_text_videoram_w) AM_BASE(&terraf_text_videoram)
-	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM 
+	AM_RANGE(0x06a000, 0x06a9ff) AM_RAM
 	AM_RANGE(0x06c000, 0x06c9ff) AM_RAM
 	AM_RANGE(0x06ca00, 0x06cbff) AM_WRITEONLY
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_BASE(&armedf_fg_videoram)

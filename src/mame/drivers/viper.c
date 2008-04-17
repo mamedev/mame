@@ -646,7 +646,7 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_MACHINE_RESET(viper)
 
 	MDRV_NVRAM_HANDLER(timekeeper_0)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
  	/* video hardware */

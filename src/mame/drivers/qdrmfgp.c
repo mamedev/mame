@@ -663,7 +663,7 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_MACHINE_START(qdrmfgp)
 	MDRV_MACHINE_RESET(qdrmfgp)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, ide_interrupt)
 
 	/* video hardware */
@@ -698,7 +698,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_MACHINE_START(qdrmfgp)
 	MDRV_MACHINE_RESET(qdrmfgp2)
 	MDRV_NVRAM_HANDLER(generic_1fill)
-	
+
 	MDRV_IDE_CONTROLLER_ADD("ide", 0, gp2_ide_interrupt)
 
 	/* video hardware */

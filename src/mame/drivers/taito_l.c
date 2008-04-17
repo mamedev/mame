@@ -952,7 +952,7 @@ static ADDRESS_MAP_START( puzznici_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_SINGLE_READ
 	AM_RANGE(0xa800, 0xa800) AM_READ(SMH_NOP)	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(SMH_RAM)	// Wrong, used to overcome protection
-//	AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
+//  AM_RANGE(0xb800, 0xb800) AM_READ(mcu_data_r)
 	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
 ADDRESS_MAP_END
 
@@ -960,8 +960,8 @@ static ADDRESS_MAP_START( puzznici_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	COMMON_BANKS_WRITE
 	COMMON_SINGLE_WRITE
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(SMH_RAM)	// Wrong, used to overcome protection
-//	AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
-//	AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
+//  AM_RANGE(0xb800, 0xb800) AM_WRITE(mcu_data_w)
+//  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	// Control register, function unknown
 ADDRESS_MAP_END
 
