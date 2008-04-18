@@ -24,6 +24,8 @@
 /* 4. February 2000 PeT ply inw dew */
 /* 4. February 2000 PeT fixed relative word operand */
 /* 9. May 2000 PeT added m4510 */
+/* 18.April 2008 Roberto Fresca fixed bbr, bbs, rmb & smb displayment,
+   showing the correct bit to operate */
 
 #include "debugger.h"
 #include "m6502.h"
@@ -589,7 +591,7 @@ static unsigned internal_m6502_dasm(const struct op6502_info *opinfo, char *buff
 
 	dst += sprintf(dst, "%-5s", token[opc]);
 	if( opc == bbr || opc == bbs || opc == rmb || opc == smb )
-		dst += sprintf(dst, "%d,", (op >> 3) & 7);
+		dst += sprintf(dst, "%d,", (op >> 4) & 7);
 
 	switch(arg)
 	{
