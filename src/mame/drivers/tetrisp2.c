@@ -1572,12 +1572,12 @@ ROMs:(all ROMs are on daughterboard)
 3.3 /
 (actual label is "Cawaii 1 Ver1.1" & "Cawaii 3 Ver1.1")
 
-MR97006-01.2 (42pin mask ROM, read as 32M byte mode)
+MR97006-01.2 (42pin mask ROM, read as 16M, byte mode)
 MR97006-02.5 (same as above)
 MR97001-01.6 (same as above)
 MR96017-04.9 (same as above, samples)
 
-MR97006-04.8 (32pin mask ROM, read as 534000)
+MR97006-04.8 (32pin mask ROM, read as 8M)
 
 
 dumped by sayu
