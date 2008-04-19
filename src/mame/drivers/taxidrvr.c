@@ -93,22 +93,49 @@ static WRITE8_HANDLER( p8910_0b_w )
 }
 
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[5] =
 {
-	5, 										/* 5 chips */
-	{ p0a_r, NULL,  NULL,  NULL,  NULL  },	/* Port A read */
-	{ NULL,  p1b_r, NULL,  NULL,  NULL  },	/* Port B read */
-	{ p0c_r, p1c_r, NULL,  NULL,  NULL  },	/* Port C read */
-	{ NULL,  p1a_w, p2a_w, p3a_w, p4a_w },	/* Port A write */
-	{ p0b_w, NULL,  p2b_w, p3b_w, p4b_w },	/* Port B write */
-	{ p0c_w, p1c_w, p2c_w, p3c_w, p4c_w }	/* Port C write */
+	{
+		p0a_r,		/* Port A read */
+		NULL,		/* Port B read */
+		p0c_r,		/* Port C read */
+		NULL,		/* Port A write */
+		p0b_w,		/* Port B write */
+		p0c_w		/* Port C write */
+	},
+	{
+		NULL,		/* Port A read */
+		p1b_r,		/* Port B read */
+		p1c_r,		/* Port C read */
+		p1a_w,		/* Port A write */
+		NULL,		/* Port B write */
+		p1c_w		/* Port C write */
+	},
+	{
+		NULL,		/* Port A read */
+		NULL,		/* Port B read */
+		NULL,		/* Port C read */
+		p2a_w,		/* Port A write */
+		p2b_w,		/* Port B write */
+		p2c_w		/* Port C write */
+	},
+	{
+		NULL,		/* Port A read */
+		NULL,		/* Port B read */
+		NULL,		/* Port C read */
+		p3a_w,		/* Port A write */
+		p3b_w,		/* Port B write */
+		p3c_w		/* Port C write */
+	},
+	{
+		NULL,		/* Port A read */
+		NULL,		/* Port B read */
+		NULL,		/* Port C read */
+		p4a_w,		/* Port A write */
+		p4b_w,		/* Port B write */
+		p4c_w		/* Port C write */
+	}
 };
-
-static MACHINE_RESET( taxidrvr )
-{
-	ppi8255_init(&ppi8255_intf);
-}
-
 
 
 static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
@@ -120,10 +147,10 @@ static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xf3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf400, 0xf403) AM_READ(ppi8255_0_r)
-	AM_RANGE(0xf480, 0xf483) AM_READ(ppi8255_2_r)
-	AM_RANGE(0xf500, 0xf503) AM_READ(ppi8255_3_r)
-	AM_RANGE(0xf580, 0xf583) AM_READ(ppi8255_4_r)
+	AM_RANGE(0xf400, 0xf403) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0xf480, 0xf483) AM_DEVREAD(PPI8255, "ppi8255_2", ppi8255_r)
+	AM_RANGE(0xf500, 0xf503) AM_DEVREAD(PPI8255, "ppi8255_3", ppi8255_r)
+	AM_RANGE(0xf580, 0xf583) AM_DEVREAD(PPI8255, "ppi8255_4", ppi8255_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -141,10 +168,10 @@ static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xebff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram2)	/* bg1 tilemap */
 	AM_RANGE(0xec00, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram0)	/* fg tilemap */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram3)	/* bg2 tilemap */
-	AM_RANGE(0xf400, 0xf403) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0xf480, 0xf483) AM_WRITE(ppi8255_2_w)	/* "sprite1" placement */
-	AM_RANGE(0xf500, 0xf503) AM_WRITE(ppi8255_3_w)	/* "sprite2" placement */
-	AM_RANGE(0xf580, 0xf583) AM_WRITE(ppi8255_4_w)	/* "sprite3" placement */
+	AM_RANGE(0xf400, 0xf403) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0xf480, 0xf483) AM_DEVWRITE(PPI8255, "ppi8255_2", ppi8255_w)	/* "sprite1" placement */
+	AM_RANGE(0xf500, 0xf503) AM_DEVWRITE(PPI8255, "ppi8255_3", ppi8255_w)	/* "sprite2" placement */
+	AM_RANGE(0xf580, 0xf583) AM_DEVWRITE(PPI8255, "ppi8255_4", ppi8255_w)	/* "sprite3" placement */
 //  AM_RANGE(0xf780, 0xf781) AM_WRITE(SMH_RAM)     /* more scroll registers? */
 	AM_RANGE(0xf782, 0xf787) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_scroll)	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
@@ -154,7 +181,7 @@ static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa003) AM_READ(ppi8255_1_r)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_2_r)
@@ -166,7 +193,7 @@ static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa003) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem3, ADDRESS_SPACE_PROGRAM, 8 )
@@ -375,7 +402,21 @@ static MACHINE_DRIVER_START( taxidrvr )
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_RESET(taxidrvr)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[2] )
+
+	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[3] )
+
+	MDRV_DEVICE_ADD( "ppi8255_4", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[4] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

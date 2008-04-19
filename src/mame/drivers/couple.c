@@ -125,23 +125,32 @@ static const struct AY8910interface ay8910_interface =
 };
 #endif
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2,
-	{ input_port_0_r,   input_port_1_r },	/* Port A read */
-	{ input_port_2_r,   input_port_3_r },	/* Port B read */
-	{ NULL,   			input_port_4_r },	/* Port C read */
-	{ NULL,   			NULL           },	/* Port A write */
-	{ NULL,   			NULL           },	/* Port B write */
-	{ NULL,   			NULL           },	/* Port C write */
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_2_r,				/* Port B read */
+		NULL,						/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL						/* Port C write */
+	},
+	{
+		input_port_1_r,				/* Port A read */
+		input_port_3_r,				/* Port B read */
+		input_port_4_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL						/* Port C write */
+	}
 };
 
 static ADDRESS_MAP_START( merit_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK(1)
 	AM_RANGE( 0xa000, 0xbfff ) AM_RAM AM_BASE(&backup_ram)
-	AM_RANGE( 0xc004, 0xc007 ) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE( 0xc008, 0xc00a ) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE( 0xc004, 0xc007 ) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0xc008, 0xc00a ) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE( 0xc00b, 0xc00b ) AM_WRITE(merit_prot_w)
 //  AM_RANGE( 0xc000, 0xc00f ) AM_READ(dummy_inputs_r)
 //  AM_RANGE( 0xc008, 0xc008 ) AM_READ(input_port_0_r)
@@ -158,11 +167,6 @@ static ADDRESS_MAP_START( merit_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(AY8910_write_port_0_w)
 ADDRESS_MAP_END
-
-static MACHINE_RESET( couple )
-{
-   ppi8255_init(&ppi8255_intf);
-}
 
 static PALETTE_INIT( couple )
 {
@@ -435,7 +439,11 @@ static MACHINE_DRIVER_START( couple )
 	MDRV_CPU_IO_MAP(merit_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(couple)
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

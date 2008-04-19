@@ -1473,8 +1473,6 @@ MACHINE_RESET( tx1 )
  *************************************/
 MACHINE_START( tx1 )
 {
-	ppi8255_init(&tx1_ppi8255_intf);
-
 	/* Initialise for each game */
 	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
 
@@ -1487,8 +1485,6 @@ MACHINE_START( tx1 )
 
 MACHINE_START( buggyboy )
 {
-	ppi8255_init(&buggyboy_ppi8255_intf);
-
 	/* Initialise for each game */
 	prom = (UINT16*)memory_region(REGION_USER1) + (0x8000 >> 1);
 

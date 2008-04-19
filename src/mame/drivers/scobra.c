@@ -88,44 +88,24 @@ static const struct AY8910interface hustler_ay8910_interface =
 	frogger_portB_r
 };
 
-static READ8_HANDLER(scobra_type2_ppi8255_0_r)
+static READ8_DEVICE_HANDLER(scobra_type2_ppi8255_r)
 {
-	return ppi8255_0_r(machine, offset >> 2);
+	return ppi8255_r(device, offset >> 2);
 }
 
-static READ8_HANDLER(scobra_type2_ppi8255_1_r)
+static WRITE8_DEVICE_HANDLER(scobra_type2_ppi8255_w)
 {
-	return ppi8255_1_r(machine, offset >> 2);
+	ppi8255_w(device, offset >> 2, data);
 }
 
-static WRITE8_HANDLER(scobra_type2_ppi8255_0_w)
+static READ8_DEVICE_HANDLER(hustler_ppi8255_r)
 {
-	ppi8255_0_w(machine, offset >> 2, data);
+	return ppi8255_r(device, offset >> 3);
 }
 
-static WRITE8_HANDLER(scobra_type2_ppi8255_1_w)
+static WRITE8_DEVICE_HANDLER(hustler_ppi8255_w)
 {
-	ppi8255_1_w(machine, offset >> 2, data);
-}
-
-static READ8_HANDLER(hustler_ppi8255_0_r)
-{
-	return ppi8255_0_r(machine, offset >> 3);
-}
-
-static READ8_HANDLER(hustler_ppi8255_1_r)
-{
-	return ppi8255_1_r(machine, offset >> 3);
-}
-
-static WRITE8_HANDLER(hustler_ppi8255_0_w)
-{
-	ppi8255_0_w(machine, offset >> 3, data);
-}
-
-static WRITE8_HANDLER(hustler_ppi8255_1_w)
-{
-	ppi8255_1_w(machine, offset >> 3, data);
+	ppi8255_w(device, offset >> 3, data);
 }
 
 static ADDRESS_MAP_START( type1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -133,8 +113,8 @@ static ADDRESS_MAP_START( type1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8c00, 0x8fff) AM_READ(galaxold_videoram_r)	/* mirror */
 	AM_RANGE(0x9000, 0x90ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9803) AM_READ(ppi8255_0_r)
-	AM_RANGE(0xa000, 0xa003) AM_READ(ppi8255_1_r)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
@@ -147,8 +127,8 @@ static ADDRESS_MAP_START( type1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9040, 0x905f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x9060, 0x907f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x9803) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0xa000, 0xa003) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0x9800, 0x9803) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_coin_counter_w)
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_stars_enable_w)
@@ -162,8 +142,8 @@ static ADDRESS_MAP_START( type2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x93ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9400, 0x97ff) AM_READ(galaxold_videoram_r)	/* mirror */
 	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xa000, 0xa00f) AM_READ(scobra_type2_ppi8255_0_r)
-	AM_RANGE(0xa800, 0xa80f) AM_READ(scobra_type2_ppi8255_1_r)
+	AM_RANGE(0xa000, 0xa00f) AM_DEVREAD(PPI8255, "ppi8255_0", scobra_type2_ppi8255_r)
+	AM_RANGE(0xa800, 0xa80f) AM_DEVREAD(PPI8255, "ppi8255_1", scobra_type2_ppi8255_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( type2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -175,8 +155,8 @@ static ADDRESS_MAP_START( type2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8880, 0x88ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x93ff) AM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_WRITE(galaxold_videoram_w)	/* mirror */
-	AM_RANGE(0xa000, 0xa00f) AM_WRITE(scobra_type2_ppi8255_0_w)
-	AM_RANGE(0xa800, 0xa80f) AM_WRITE(scobra_type2_ppi8255_1_w)
+	AM_RANGE(0xa000, 0xa00f) AM_DEVWRITE(PPI8255, "ppi8255_0", scobra_type2_ppi8255_w)
+	AM_RANGE(0xa800, 0xa80f) AM_DEVWRITE(PPI8255, "ppi8255_1", scobra_type2_ppi8255_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_coin_counter_0_w)
@@ -190,8 +170,8 @@ static ADDRESS_MAP_START( hustler_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x90ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xd000, 0xd01f) AM_READ(hustler_ppi8255_0_r)
-	AM_RANGE(0xe000, 0xe01f) AM_READ(hustler_ppi8255_1_r)
+	AM_RANGE(0xd000, 0xd01f) AM_DEVREAD(PPI8255, "ppi8255_0", hustler_ppi8255_r)
+	AM_RANGE(0xe000, 0xe01f) AM_DEVREAD(PPI8255, "ppi8255_1", hustler_ppi8255_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -206,8 +186,8 @@ static ADDRESS_MAP_START( hustler_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa80e, 0xa80e) AM_WRITE(SMH_NOP)	/* coin counters */
-	AM_RANGE(0xd000, 0xd01f) AM_WRITE(hustler_ppi8255_0_w)
-	AM_RANGE(0xe000, 0xe01f) AM_WRITE(hustler_ppi8255_1_w)
+	AM_RANGE(0xd000, 0xd01f) AM_DEVWRITE(PPI8255, "ppi8255_0", hustler_ppi8255_w)
+	AM_RANGE(0xe000, 0xe01f) AM_DEVWRITE(PPI8255, "ppi8255_1", hustler_ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustlerb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -215,8 +195,8 @@ static ADDRESS_MAP_START( hustlerb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x90ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xc100, 0xc103) AM_READ(ppi8255_0_r)
-	AM_RANGE(0xc200, 0xc203) AM_READ(ppi8255_1_r)
+	AM_RANGE(0xc100, 0xc103) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0xc200, 0xc203) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustlerb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -231,8 +211,8 @@ static ADDRESS_MAP_START( hustlerb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(SMH_NOP)	/* coin counters */
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xc100, 0xc103) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0xc200, 0xc203) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0xc100, 0xc103) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0xc200, 0xc203) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mimonkey_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -240,8 +220,8 @@ static ADDRESS_MAP_START( mimonkey_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8c00, 0x8fff) AM_READ(galaxold_videoram_r)	/* mirror */
 	AM_RANGE(0x9000, 0x90ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9803) AM_READ(ppi8255_0_r)
-	AM_RANGE(0xa000, 0xa003) AM_READ(ppi8255_1_r)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -255,8 +235,8 @@ static ADDRESS_MAP_START( mimonkey_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9040, 0x905f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x9060, 0x907f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x9803) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0xa000, 0xa003) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0x9800, 0x9803) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa800, 0xa802) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
@@ -265,59 +245,59 @@ static ADDRESS_MAP_START( mimonkey_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( anteatg_ppi8255_0_reg0_r )
+static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg0_r )
 {
-	return ppi8255_0_r(machine, 0);
+	return ppi8255_r(device, 0);
 }
 
-static READ8_HANDLER( anteatg_ppi8255_0_reg1_r )
+static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg1_r )
 {
-	return ppi8255_0_r(machine, 1);
+	return ppi8255_r(device, 1);
 }
 
-static READ8_HANDLER( anteatg_ppi8255_0_reg2_r )
+static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg2_r )
 {
-	return ppi8255_0_r(machine, 2);
+	return ppi8255_r(device, 2);
 }
 
-static READ8_HANDLER( anteatg_ppi8255_0_reg3_r )
+static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg3_r )
 {
-	return ppi8255_0_r(machine, 3);
+	return ppi8255_r(device, 3);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_0_reg0_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg0_w )
 {
-	ppi8255_0_w(machine, 0, data);
+	ppi8255_w(device, 0, data);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_0_reg1_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg1_w )
 {
-	ppi8255_0_w(machine, 1, data);
+	ppi8255_w(device, 1, data);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_0_reg2_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg2_w )
 {
-	ppi8255_0_w(machine, 2, data);
+	ppi8255_w(device, 2, data);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_0_reg3_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg3_w )
 {
-	ppi8255_0_w(machine, 3, data);
+	ppi8255_w(device, 3, data);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_1_reg0_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_1_reg0_w )
 {
-	ppi8255_1_w(machine, 0, data);
+	ppi8255_w(device, 0, data);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_1_reg1_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_1_reg1_w )
 {
-	ppi8255_1_w(machine, 1, data);
+	ppi8255_w(device, 1, data);
 }
 
-static WRITE8_HANDLER( anteatg_ppi8255_1_reg3_w )
+static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_1_reg3_w )
 {
-	ppi8255_1_w(machine, 3, data);
+	ppi8255_w(device, 3, data);
 }
 
 static ADDRESS_MAP_START( anteatg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -330,10 +310,10 @@ static ADDRESS_MAP_START( anteatg_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8300, 0x98ff) AM_READ(SMH_ROM)
 	AM_RANGE(0xa300, 0xa7ff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf521, 0xf521) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xf612, 0xf612) AM_READ(anteatg_ppi8255_0_reg0_r)
-	AM_RANGE(0xf631, 0xf631) AM_READ(anteatg_ppi8255_0_reg1_r)
-	AM_RANGE(0xf710, 0xf710) AM_READ(anteatg_ppi8255_0_reg2_r)
-	AM_RANGE(0xf753, 0xf753) AM_READ(anteatg_ppi8255_0_reg3_r)
+	AM_RANGE(0xf612, 0xf612) AM_DEVREAD(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg0_r)
+	AM_RANGE(0xf631, 0xf631) AM_DEVREAD(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg1_r)
+	AM_RANGE(0xf710, 0xf710) AM_DEVREAD(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg2_r)
+	AM_RANGE(0xf753, 0xf753) AM_DEVREAD(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg3_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( anteatg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -344,9 +324,9 @@ static ADDRESS_MAP_START( anteatg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2040, 0x205f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x2060, 0x207f) AM_WRITE(SMH_RAM) AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x2080, 0x20ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2423, 0x2423) AM_WRITE(anteatg_ppi8255_1_reg3_w)
-	AM_RANGE(0x2450, 0x2450) AM_WRITE(anteatg_ppi8255_1_reg0_w)
-	AM_RANGE(0x2511, 0x2511) AM_WRITE(anteatg_ppi8255_1_reg1_w)
+	AM_RANGE(0x2423, 0x2423) AM_DEVWRITE(PPI8255, "ppi8255_1", anteatg_ppi8255_1_reg3_w)
+	AM_RANGE(0x2450, 0x2450) AM_DEVWRITE(PPI8255, "ppi8255_1", anteatg_ppi8255_1_reg0_w)
+	AM_RANGE(0x2511, 0x2511) AM_DEVWRITE(PPI8255, "ppi8255_1", anteatg_ppi8255_1_reg1_w)
 	AM_RANGE(0x2621, 0x2621) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x2624, 0x2624) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x2647, 0x2647) AM_WRITE(galaxold_flip_screen_y_w)
@@ -358,10 +338,10 @@ static ADDRESS_MAP_START( anteatg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7c00, 0x7fff) AM_WRITE(galaxold_videoram_w)	/* mirror */
 	AM_RANGE(0x8300, 0x98ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa300, 0xa7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf612, 0xf612) AM_WRITE(anteatg_ppi8255_0_reg0_w)
-	AM_RANGE(0xf631, 0xf631) AM_WRITE(anteatg_ppi8255_0_reg1_w)
-	AM_RANGE(0xf710, 0xf710) AM_WRITE(anteatg_ppi8255_0_reg2_w)
-	AM_RANGE(0xf753, 0xf753) AM_WRITE(anteatg_ppi8255_0_reg3_w)
+	AM_RANGE(0xf612, 0xf612) AM_DEVWRITE(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg0_w)
+	AM_RANGE(0xf631, 0xf631) AM_DEVWRITE(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg1_w)
+	AM_RANGE(0xf710, 0xf710) AM_DEVWRITE(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg2_w)
+	AM_RANGE(0xf753, 0xf753) AM_DEVWRITE(PPI8255, "ppi8255_0", anteatg_ppi8255_0_reg3_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( anteatgb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -373,8 +353,8 @@ static ADDRESS_MAP_START( anteatgb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x7aff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8300, 0x98ff) AM_READ(SMH_ROM)
 	AM_RANGE(0xa300, 0xa7ff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf300, 0xf303) AM_READ(ppi8255_0_r)
-	AM_RANGE(0xfe00, 0xfe03) AM_READ(ppi8255_1_r)
+	AM_RANGE(0xf300, 0xf303) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0xfe00, 0xfe03) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( anteatgb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -395,8 +375,8 @@ static ADDRESS_MAP_START( anteatgb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x7aff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8300, 0x98ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa300, 0xa7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf300, 0xf303) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0xfe00, 0xfe03) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0xf300, 0xf303) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0xfe00, 0xfe03) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 ADDRESS_MAP_END
 
 static UINT8 *scobra_soundram;
@@ -1393,6 +1373,12 @@ static MACHINE_DRIVER_START( type1 )
 
 	MDRV_MACHINE_RESET(scramble)
 
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[1] )
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
@@ -1419,6 +1405,18 @@ static MACHINE_DRIVER_START( type1 )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( superbon )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(type1)
+
+	/* device config overrides */
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[1] )
+MACHINE_DRIVER_END
+
 /* same as regular type 1, the only difference that it has long bullets */
 static MACHINE_DRIVER_START( armorcar )
 
@@ -1438,6 +1436,13 @@ static MACHINE_DRIVER_START( moonwar )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type1)
+
+	/* device config overrides */
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 1 for bg */
@@ -1516,6 +1521,13 @@ static MACHINE_DRIVER_START( stratgyx )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type2)
 
+	/* device config overrides */
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( stratgyx_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( stratgyx_ppi8255_intf[1] )
+
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
@@ -1528,6 +1540,13 @@ static MACHINE_DRIVER_START( darkplnt )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type2)
+
+	/* device config overrides */
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( darkplnt_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( darkplnt_ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
@@ -1549,6 +1568,13 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_CPU_IO_MAP(hustler_sound_readport,hustler_sound_writeport)
 
 	MDRV_MACHINE_RESET(scramble)
+
+	/* device config overrides */
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

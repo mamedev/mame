@@ -102,21 +102,28 @@ static WRITE8_HANDLER( sound_w )
 //  popmessage("%02x",data);
 }
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2, 									/* 2 chips */
-	{ input_port_0_r, input_port_2_r },	/* Port A read */
-	{ port1_r, 	NULL },			/* Port B read */
-	{ NULL,		portC_r },		/* Port C read */
-	{ NULL,		NULL },			/* Port A write */
-	{ NULL,		lamps_w },		/* Port B write */
-	{ sound_w,	NULL },			/* Port C write */
+	{
+		input_port_0_r,				/* Port A read */
+		port1_r,					/* Port B read */
+		NULL,						/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		sound_w,					/* Port C write */
+	},
+	{
+		input_port_2_r,				/* Port A read */
+		NULL,						/* Port B read */
+		portC_r,					/* Port C read */
+		NULL,						/* Port A write */
+		lamps_w,					/* Port B write */
+		NULL						/* Port C write */
+	}
 };
 
 static MACHINE_RESET( findout )
 {
-	ppi8255_init(&ppi8255_intf);
-
 	ticket_dispenser_init(100, 1, 1);
 }
 
@@ -183,8 +190,8 @@ static WRITE8_HANDLER( signature_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4800, 0x4803) AM_READ(ppi8255_0_r)
-	AM_RANGE(0x5000, 0x5003) AM_READ(ppi8255_1_r)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
@@ -194,8 +201,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x47ff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0x5000, 0x5003) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
 	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
 	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
@@ -463,6 +470,12 @@ static MACHINE_DRIVER_START( findout )
 
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

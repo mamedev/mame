@@ -188,9 +188,9 @@ static WRITE8_HANDLER( w6 )
 
 static ADDRESS_MAP_START( smstrv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM
-	AM_RANGE(0x00800, 0x00803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x01000, 0x01005) AM_RAM
-	AM_RANGE(0x01800, 0x01803) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x01800, 0x01803) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
@@ -205,22 +205,25 @@ static VIDEO_UPDATE( smstrv )
 	return 0;
 }
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2, 					/* 2 chips */
-	{ r1, r4 },			/* Port A read */
-	{ r2, r5 },			/* Port B read */
-	{ r3, r6 },			/* Port C read */
-	{ w1, w4 },			/* Port A write */
-	{ w2, w5 },			/* Port B write */
-	{ w3, w6 },			/* Port C write */
+	{
+		r1,			/* Port A read */
+		r2,			/* Port B read */
+		r3,			/* Port C read */
+		w1,			/* Port A write */
+		w2,			/* Port B write */
+		w3			/* Port C write */
+	},
+	{
+		r4,			/* Port A read */
+		r5,			/* Port B read */
+		r6,			/* Port C read */
+		w4,			/* Port A write */
+		w5,			/* Port B write */
+		w6			/* Port C write */
+	}
 };
-
-
-static MACHINE_RESET( smstrv )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 
 static MACHINE_DRIVER_START( smstrv )
@@ -230,7 +233,12 @@ static MACHINE_DRIVER_START( smstrv )
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)
-	MDRV_MACHINE_RESET(smstrv)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

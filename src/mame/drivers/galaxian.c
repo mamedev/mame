@@ -397,15 +397,24 @@ static WRITE8_HANDLER( konami_portc_1_w )
 }
 
 
-static const ppi8255_interface konami_ppi8255_intf =
+static const ppi8255_interface konami_ppi8255_intf[2] =
 {
-	2,
-	{ konami_porta_0_r, NULL },				/* Port A read */
-	{ konami_portb_0_r, NULL },				/* Port B read */
-	{ konami_portc_0_r, konami_portc_1_r },	/* Port C read */
-	{ NULL, soundlatch_w },					/* Port A write */
-	{ NULL, konami_sound_control_w },		/* Port B write */
-	{ konami_portc_0_w, konami_portc_1_w }, /* Port C write */
+	{
+		konami_porta_0_r,				/* Port A read */
+		konami_portb_0_r,				/* Port B read */
+		konami_portc_0_r,				/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		konami_portc_0_w				/* Port C write */
+	},
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		konami_portc_1_r,				/* Port C read */
+		soundlatch_w,					/* Port A write */
+		konami_sound_control_w,			/* Port B write */
+		konami_portc_1_w				/* Port C write */
+	}
 };
 
 
@@ -420,8 +429,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x0100) result &= ppi8255_0_r(machine, offset & 3);
-	if (offset & 0x0200) result &= ppi8255_1_r(machine, offset & 3);
+	if (offset & 0x0100) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
+	if (offset & 0x0200) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 	return result;
 }
 
@@ -429,8 +438,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 static WRITE8_HANDLER( theend_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) ppi8255_0_w(machine, offset & 3, data);
-	if (offset & 0x0200) ppi8255_1_w(machine, offset & 3, data);
+	if (offset & 0x0100) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
+	if (offset & 0x0200) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
 }
 
 
@@ -438,6 +447,27 @@ static WRITE8_HANDLER( theend_coin_counter_w )
 {
 	coin_counter_w(0, data & 0x80);
 }
+
+
+static const ppi8255_interface theend_ppi8255_intf[2] =
+{
+	{
+		konami_porta_0_r,				/* Port A read */
+		konami_portb_0_r,				/* Port B read */
+		konami_portc_0_r,				/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		theend_coin_counter_w			/* Port C write */
+	},
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		konami_portc_1_r,				/* Port C read */
+		soundlatch_w,					/* Port A write */
+		konami_sound_control_w,			/* Port B write */
+		konami_portc_1_w				/* Port C write */
+	}
+};
 
 
 
@@ -488,6 +518,26 @@ static CUSTOM_INPUT( scramble_protection_alt_r )
 }
 
 
+static const ppi8255_interface scramble_ppi8255_intf[2] =
+{
+	{
+		konami_porta_0_r,				/* Port A read */
+		konami_portb_0_r,				/* Port B read */
+		konami_portc_0_r,				/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		konami_portc_0_w				/* Port C write */
+	},
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		scramble_protection_r,			/* Port C read */
+		soundlatch_w,					/* Port A write */
+		konami_sound_control_w,			/* Port B write */
+		scramble_protection_w			/* Port C write */
+	}
+};
+
 
 /*************************************
  *
@@ -519,7 +569,7 @@ static READ8_HANDLER( sfx_sample_io_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x04) result &= ppi8255_2_r(machine, offset & 3);
+	if (offset & 0x04) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3);
 	return result;
 }
 
@@ -527,7 +577,7 @@ static READ8_HANDLER( sfx_sample_io_r )
 static WRITE8_HANDLER( sfx_sample_io_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) ppi8255_2_w(machine, offset & 3, data);
+	if (offset & 0x04) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3, data);
 	if (offset & 0x10) DAC_0_signed_data_w(machine, offset, data);
 }
 
@@ -544,15 +594,32 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 }
 
 
-static const ppi8255_interface sfx_ppi8255_intf =
+static const ppi8255_interface sfx_ppi8255_intf[3] =
 {
-	3,
-	{ konami_porta_0_r, NULL, soundlatch2_r },		/* Port A read */
-	{ konami_portb_0_r, NULL, NULL },				/* Port B read */
-	{ konami_portc_0_r, konami_portc_1_r, NULL },	/* Port C read */
-	{ NULL, soundlatch_w, NULL },					/* Port A write */
-	{ NULL, konami_sound_control_w, NULL },			/* Port B write */
-	{ konami_portc_0_w, konami_portc_1_w, NULL },	/* Port C write */
+	{
+		konami_porta_0_r,				/* Port A read */
+		konami_portb_0_r,				/* Port B read */
+		konami_portc_0_r,				/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		konami_portc_0_w				/* Port C write */
+	},
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		konami_portc_1_r,				/* Port C read */
+		soundlatch_w,					/* Port A write */
+		konami_sound_control_w,			/* Port B write */
+		konami_portc_1_w				/* Port C write */
+	},
+	{
+		soundlatch2_r,					/* Port A read */
+		NULL,							/* Port B read */
+		NULL,							/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		NULL							/* Port C write */
+	}
 };
 
 
@@ -567,8 +634,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_1_r(machine, (offset >> 1) & 3);
-	if (offset & 0x2000) result &= ppi8255_0_r(machine, (offset >> 1) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 1) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 1) & 3);
 	return result;
 }
 
@@ -576,8 +643,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 static WRITE8_HANDLER( frogger_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_1_w(machine, (offset >> 1) & 3, data);
-	if (offset & 0x2000) ppi8255_0_w(machine, (offset >> 1) & 3, data);
+	if (offset & 0x1000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 1) & 3, data);
+	if (offset & 0x2000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 1) & 3, data);
 }
 
 
@@ -623,8 +690,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_0_r(machine, (offset >> 3) & 3);
-	if (offset & 0x2000) result &= ppi8255_1_r(machine, (offset >> 3) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 3) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 3) & 3);
 	return result;
 }
 
@@ -632,8 +699,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 static WRITE8_HANDLER( frogf_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_0_w(machine, (offset >> 3) & 3, data);
-	if (offset & 0x2000) ppi8255_1_w(machine, (offset >> 3) & 3, data);
+	if (offset & 0x1000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 3) & 3, data);
+	if (offset & 0x2000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 3) & 3, data);
 }
 
 
@@ -644,10 +711,10 @@ static WRITE8_HANDLER( frogf_ppi8255_w )
  *
  *************************************/
 
-static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_0_r(machine, (offset >> 4) & 3); }
-static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_1_r(machine, (offset >> 4) & 3); }
-static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_0_w(machine, (offset >> 4) & 3, data); }
-static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_1_w(machine, (offset >> 4) & 3, data); }
+static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 4) & 3); }
+static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 4) & 3); }
+static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 4) & 3, data); }
+static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 4) & 3, data); }
 
 
 
@@ -730,6 +797,27 @@ static WRITE8_HANDLER( scorpion_sound_control_w )
 		mame_printf_debug("Secondary sound = %02X\n", scorpion_sound_data);
 //  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_activecpu_get_pc(), data);
 }
+
+
+static const ppi8255_interface scorpion_ppi8255_intf[2] =
+{
+	{
+		konami_porta_0_r,				/* Port A read */
+		konami_portb_0_r,				/* Port B read */
+		konami_portc_0_r,				/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		konami_portc_0_w				/* Port C write */
+	},
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		scorpion_protection_r,			/* Port C read */
+		soundlatch_w,					/* Port A write */
+		konami_sound_control_w,			/* Port B write */
+		scorpion_protection_w			/* Port C write */
+	}
+};
 
 
 
@@ -1148,8 +1236,8 @@ static ADDRESS_MAP_START( scobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x4000) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x4400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x4700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE(&spriteram)
-	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x9800, 0x9803) AM_MIRROR(0x47fc) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x47fc) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x47f8) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x47f8) AM_WRITE(coin_count_0_w)
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x47f8) AM_WRITE(scramble_background_enable_w)
@@ -1582,6 +1670,17 @@ static MACHINE_DRIVER_START( galaxian_sound )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( konami_base )
+	MDRV_IMPORT_FROM( galaxian_base )
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( konami_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( konami_ppi8255_intf[1] )
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	/* 2nd CPU to drive sound */
@@ -1758,7 +1857,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( frogger )
-	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_base)
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
@@ -1778,7 +1877,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( froggers )
-	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_base)
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
@@ -1788,7 +1887,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( frogf )
-	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_base)
 	MDRV_IMPORT_FROM(konami_sound_1x_ay8910)
 
 	/* alternate memory map */
@@ -1798,7 +1897,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( turtles )
-	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_base)
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
@@ -1814,11 +1913,33 @@ static MACHINE_DRIVER_START( theend )
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( theend_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( theend_ppi8255_intf[1] )
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( scramble )
+	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
+
+	/* alternate memory map */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(theend_map,0)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[1] )
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( explorer )
-	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_base)
 
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("main")
@@ -1843,6 +1964,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM(theend)
 
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( scorpion_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( scorpion_ppi8255_intf[1] )
+
 	/* extra AY8910 with I/O ports */
 	MDRV_SOUND_ADD_TAG("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
 	MDRV_SOUND_CONFIG(scorpion_ay8910_interface)
@@ -1865,6 +1992,15 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
 	MDRV_CPU_IO_MAP(sfx_sample_portmap,0)
 
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( sfx_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( sfx_ppi8255_intf[1] )
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( sfx_ppi8255_intf[2] )
+
 	/* port on 1st 8910 is used for communication */
 	MDRV_SOUND_MODIFY("8910.0")
 	MDRV_SOUND_CONFIG(sfx_ay8910_interface)
@@ -1876,7 +2012,7 @@ MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( scobra )
-	MDRV_IMPORT_FROM(galaxian_base)
+	MDRV_IMPORT_FROM(konami_base)
 	MDRV_IMPORT_FROM(konami_sound_2x_ay8910)
 
 	/* alternate memory map */
@@ -2079,21 +2215,6 @@ static void common_init(
 	galaxian_draw_background_ptr = (draw_background != NULL) ? draw_background : galaxian_draw_background;
 	galaxian_extend_tile_info_ptr = extend_tile_info;
 	galaxian_extend_sprite_info_ptr = extend_sprite_info;
-}
-
-
-static void konami_common_init(
-	running_machine *machine,
-	galaxian_draw_bullet_func draw_bullet,
-	galaxian_draw_background_func draw_background,
-	galaxian_extend_tile_info_func extend_tile_info,
-	galaxian_extend_sprite_info_func extend_sprite_info)
-{
-	/* basic configuration */
-	common_init(machine, draw_bullet, draw_background, extend_tile_info, extend_sprite_info);
-
-	/* configure Konami sound */
-	ppi8255_init(&konami_ppi8255_intf);
 }
 
 
@@ -2441,29 +2562,24 @@ static DRIVER_INIT( scorpnmc )
 static DRIVER_INIT( theend )
 {
 	/* video extensions */
-	konami_common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
+	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
 
 	/* coin counter on the upper bit of port C */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6802, 0x6802, 0, 0x7f8, SMH_UNMAP);
-	ppi8255_set_portCwrite(0, theend_coin_counter_w);
 }
 
 
 static DRIVER_INIT( scramble )
 {
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
-
-	/* configure protection */
-	ppi8255_set_portCread (1, scramble_protection_r);
-	ppi8255_set_portCwrite(1, scramble_protection_w);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 }
 
 
 static DRIVER_INIT( explorer )
 {
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog works for writes as well? (or is it just disabled?) */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0x7ff, watchdog_reset_w);
@@ -2485,9 +2601,6 @@ static DRIVER_INIT( sfx )
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, upper_extend_tile_info, NULL);
 	galaxian_sfx_tilemap = TRUE;
 
-	/* sfx uses 3 x 8255, so we need a non-standard interface */
-	ppi8255_init(&sfx_ppi8255_intf);
-
 	/* sound board has space for extra ROM */
 	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(REGION_CPU2));
@@ -2497,7 +2610,7 @@ static DRIVER_INIT( sfx )
 static DRIVER_INIT( atlantis )
 {
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog is at $7800? (or is it just disabled?) */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7000, 0x7000, 0, 0x7ff, SMH_UNMAP);
@@ -2508,14 +2621,14 @@ static DRIVER_INIT( atlantis )
 static DRIVER_INIT( scobra )
 {
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 }
 
 
 static DRIVER_INIT( losttomb )
 {
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decrypt */
 	decode_losttomb_gfx();
@@ -2525,7 +2638,7 @@ static DRIVER_INIT( losttomb )
 static DRIVER_INIT( frogger )
 {
 	/* video extensions */
-	konami_common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 	galaxian_frogger_adjust = TRUE;
 
 	/* decrypt */
@@ -2554,7 +2667,7 @@ static DRIVER_INIT( froggrmc )
 static DRIVER_INIT( froggers )
 {
 	/* video extensions */
-	konami_common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
+	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
 	/* decrypt */
 	decode_frogger_sound();
@@ -2564,7 +2677,7 @@ static DRIVER_INIT( froggers )
 static DRIVER_INIT( turtles )
 {
 	/* video extensions */
-	konami_common_init(machine, NULL, turtles_draw_background, NULL, NULL);
+	common_init(machine, NULL, turtles_draw_background, NULL, NULL);
 }
 
 
@@ -2573,21 +2686,17 @@ static DRIVER_INIT( amidar )
 {
 	/* no existing amidar sets run on Amidar hardware as described by Amidar schematics! */
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, amidar_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, amidar_draw_background, NULL, NULL);
 }
 #endif
 
 
 static DRIVER_INIT( scorpion )
 {
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* hook up AY8910 */
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
-
-	/* configure protection */
-	ppi8255_set_portCwrite(1, scorpion_protection_w);
-	ppi8255_set_portCread(1, scorpion_protection_r);
 
 	/* extra ROM */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
@@ -2620,7 +2729,7 @@ static DRIVER_INIT( scorpion )
 static DRIVER_INIT( anteater )
 {
 	/* video extensions */
-	konami_common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* decode graphics */
 	decode_anteater_gfx();

@@ -191,8 +191,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc004, 0xc007) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xc008, 0xc00b) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
@@ -206,8 +206,8 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0x5800, 0x58ff) AM_WRITE(med_offset_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xa000, 0xa003) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xc000, 0xc003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe001) AM_WRITENOP // 6845 crt
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(phrcraze_attr_w) AM_BASE(&phrcraze_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(phrcraze_bg_w) AM_BASE(&videoram)
@@ -223,8 +223,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc008, 0xc00b) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
-	AM_RANGE(0xc00c, 0xc00f) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc00c, 0xc00f) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -243,8 +243,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc004, 0xc007) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xc008, 0xc00b) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -263,8 +263,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( trvwhziv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xc004, 0xc007) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xc008, 0xc00b) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
@@ -770,15 +770,24 @@ static GFXDECODE_START( merit )
 	GFXDECODE_ENTRY( REGION_GFX2, 8, tiles8x8x1_layout, 0, 128 ) // flipped tiles
 GFXDECODE_END
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2, 						/* 2 chips */
-	{ input_port_0_r, input_port_3_r },	/* Port A read */
-	{ input_port_1_r, NULL },		/* Port B read */
-	{ input_port_2_r, NULL },		/* Port C read */
-	{ NULL,		NULL },		/* Port A write */
-	{ NULL,		led1_w },		/* Port B write */
-	{ NULL,		misc_w },		/* Port C write */
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL						/* Port C write */
+	},
+	{
+		input_port_3_r,				/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		NULL,						/* Port A write */
+		led1_w,						/* Port B write */
+		misc_w						/* Port C write */
+	}
 };
 
 static const struct AY8910interface merit_ay8912_interface =
@@ -786,11 +795,6 @@ static const struct AY8910interface merit_ay8912_interface =
 	0,0,
 	led2_w,0
 };
-
-static MACHINE_RESET( merit )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 
 static MACHINE_DRIVER_START( pitboss )
@@ -800,7 +804,12 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	MDRV_MACHINE_RESET(merit)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -113,20 +113,13 @@ static WRITE8_HANDLER( port_C_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	1, 							/* 1 chip */
-	{ input_port_0_r },			/* Port A read */
-	{ input_port_1_r },			/* Port B read */
-	{ input_port_2_r },			/* Port C read */
-	{ 0 },						/* Port A write */
-	{ 0 },						/* Port B write */
-	{ port_C_w },				/* Port C write */
+	input_port_0_r,			/* Port A read */
+	input_port_1_r,			/* Port B read */
+	input_port_2_r,			/* Port C read */
+	NULL,					/* Port A write */
+	NULL,					/* Port B write */
+	port_C_w				/* Port C write */
 };
-
-static MACHINE_RESET( iqblock )
-{
-	ppi8255_init(&ppi8255_intf);
-}
-
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -141,8 +134,8 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0x5080, 0x5083) AM_READ(ppi8255_0_r)
+	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
+	AM_RANGE(0x5080, 0x5083) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
 	AM_RANGE(0x5090, 0x5090) AM_READ(input_port_3_r)
 	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_4_r)
 	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w) // UM3567_register_port_0_w
@@ -158,8 +151,8 @@ static ADDRESS_MAP_START( pokerigs_portmap, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 //  AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0x5080, 0x5083) AM_READ(ppi8255_0_r)
+	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
+	AM_RANGE(0x5080, 0x5083) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
 	AM_RANGE(0x5090, 0x5090) AM_READ(input_port_3_r) AM_WRITENOP
 	AM_RANGE(0x5091, 0x5091) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x50a0, 0x50a0) AM_READ(input_port_4_r)
@@ -308,7 +301,8 @@ static MACHINE_DRIVER_START( iqblock )
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
-	MDRV_MACHINE_RESET(iqblock)
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -339,7 +333,8 @@ static MACHINE_DRIVER_START( cabaret )
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
-	MDRV_MACHINE_RESET(iqblock)
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -370,7 +365,8 @@ static MACHINE_DRIVER_START( pokerigs )
 	MDRV_CPU_IO_MAP(pokerigs_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
-	MDRV_MACHINE_RESET(iqblock)
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

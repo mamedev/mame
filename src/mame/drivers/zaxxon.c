@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_lockout_w)
 	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
-	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
 	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
 	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( congo_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_WRITE(SN76496_1_w)
 ADDRESS_MAP_END
 
@@ -892,6 +892,34 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ * PPI8255 configurations
+ *
+ *************************************/
+
+static const ppi8255_interface zaxxon_ppi_intf =
+{
+	NULL,
+	NULL,
+	NULL,
+	zaxxon_sound_a_w,
+	zaxxon_sound_b_w,
+	zaxxon_sound_c_w
+};
+
+
+static const ppi8255_interface congo_ppi_intf =
+{
+	soundlatch_r,
+	NULL,
+	NULL,
+	NULL,
+	congo_sound_b_w,
+	congo_sound_c_w
+};
+
+
+/*************************************
+ *
  *  Graphics definitions
  *
  *************************************/
@@ -935,6 +963,9 @@ static MACHINE_DRIVER_START( root )
 	MDRV_CPU_VBLANK_INT("main", vblank_int)
 
 	MDRV_MACHINE_START(zaxxon)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( zaxxon_ppi_intf )
 
 	/* video hardware */
 	MDRV_GFXDECODE(zaxxon)
@@ -991,6 +1022,9 @@ static MACHINE_DRIVER_START( congo )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(congo_map, 0)
+
+	MDRV_DEVICE_MODIFY( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( congo_ppi_intf )
 
 	MDRV_CPU_ADD(Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)
@@ -1413,48 +1447,27 @@ static void zaxxonb_decode(void)
  *
  *************************************/
 
-static DRIVER_INIT( zaxxon )
-{
-	static const ppi8255_interface ppi_intf =
-	{
-		1,
-		{ 0 },
-		{ 0 },
-		{ 0 },
-		{ zaxxon_sound_a_w },
-		{ zaxxon_sound_b_w },
-		{ zaxxon_sound_c_w }
-	};
-
-	ppi8255_init(&ppi_intf);
-}
-
-
 static DRIVER_INIT( zaxxonb )
 {
 	zaxxonb_decode();
-	DRIVER_INIT_CALL(zaxxon);
 }
 
 
 static DRIVER_INIT( szaxxon )
 {
 	szaxxon_decode();
-	DRIVER_INIT_CALL(zaxxon);
 }
 
 
 static DRIVER_INIT( futspy )
 {
 	futspy_decode();
-	DRIVER_INIT_CALL(zaxxon);
 }
 
 
 static DRIVER_INIT( razmataz )
 {
 	nprinces_decode();
-	DRIVER_INIT_CALL(zaxxon);
 
 	/* additional input ports are wired */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
@@ -1476,26 +1489,9 @@ static DRIVER_INIT( razmataz )
 static DRIVER_INIT( ixion )
 {
 	szaxxon_decode();
-	DRIVER_INIT_CALL(zaxxon);
 
 	/* connect the universal sound board */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
-}
-
-
-static DRIVER_INIT( congo )
-{
-	static const ppi8255_interface ppi_intf =
-	{
-		1,
-		{ soundlatch_r },
-		{ 0 },
-		{ 0 },
-		{ 0 },
-		{ congo_sound_b_w },
-		{ congo_sound_c_w }
-	};
-	ppi8255_init(&ppi_intf);
 }
 
 
@@ -1507,8 +1503,8 @@ static DRIVER_INIT( congo )
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   zaxxon,   ROT90,  "Sega",    "Zaxxon (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon,   zaxxon,   ROT90,  "Sega",    "Zaxxon (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonb,  ROT90,  "bootleg", "Jackson", GAME_SUPPORTS_SAVE )
 GAME( 1982, szaxxon,  0,      zaxxon,   szaxxon,  szaxxon,  ROT90,  "Sega",    "Super Zaxxon", GAME_SUPPORTS_SAVE )
 GAME( 1984, futspy,   0,      futspy,   futspy,   futspy,   ROT90,  "Sega",    "Future Spy", GAME_SUPPORTS_SAVE )
@@ -1520,5 +1516,5 @@ GAME( 1983, ixion,    0,      razmataz, ixion,    ixion,    ROT270, "Sega",    "
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,    congo,    congo,    ROT90,  "Sega",    "Congo Bongo", GAME_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,    congo,    congo,    ROT90,  "Sega",    "Tip Top", GAME_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo", GAME_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Tip Top", GAME_SUPPORTS_SAVE )

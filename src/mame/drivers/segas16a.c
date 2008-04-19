@@ -198,13 +198,12 @@ static WRITE8_HANDLER( tilemap_sound_w );
 
 static const ppi8255_interface single_ppi_intf =
 {
-	1,
-	{ NULL },
-	{ NULL },
-	{ NULL },
-	{ soundlatch_w },
-	{ video_control_w },
-	{ tilemap_sound_w }
+	NULL,
+	NULL,
+	NULL,
+	soundlatch_w,
+	video_control_w,
+	tilemap_sound_w
 };
 
 
@@ -228,9 +227,6 @@ static void system16a_generic_init(running_machine *machine)
 	custom_io_w = NULL;
 	lamp_changed_w = NULL;
 	i8751_vblank_hook = NULL;
-
-	/* configure the 8255 interface */
-	ppi8255_init(&single_ppi_intf);
 }
 
 
@@ -266,7 +262,7 @@ static MACHINE_RESET( system16a )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	ppi8255_0_w(machine, param >> 8, param & 0xff);
+	ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), param >> 8, param & 0xff);
 }
 
 
@@ -276,7 +272,7 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return ppi8255_0_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
 
 		case 0x1000/2:
 			return input_port_read_indexed(machine, offset & 3);
@@ -396,7 +392,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
 static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
-	ppi8255_set_portC(0, 0x00);
+	ppi8255_set_portC(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x00);
 	return soundlatch_r(machine, offset);
 }
 
@@ -1791,6 +1787,9 @@ static MACHINE_DRIVER_START( system16a )
 
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( single_ppi_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

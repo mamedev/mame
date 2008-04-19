@@ -64,38 +64,6 @@ MACHINE_RESET( explorer )
 	MACHINE_RESET_CALL(galaxold);
 }
 
-static READ8_HANDLER( scrambls_input_port_2_r )
-{
-  static const UINT8 mask[] = { 0x20, 0x20, 0x80, 0xA0, 0xA0, 0xA0, 0xA0, 0xA0 };
-
-	UINT8 res;
-
-	res = input_port_read_indexed(machine, 2);
-
-/*logerror("%04x: read IN2\n",activecpu_get_pc());*/
-
-  /*
-    p_security_2B : process(security_count)
-    begin
-      -- I am not sure what this chip does yet, but this gets us past the initial check for now.
-      case security_count is
-        when "000" => net_1e10_i <= '0'; net_1e12_i <= '1';
-        when "001" => net_1e10_i <= '0'; net_1e12_i <= '1';
-        when "010" => net_1e10_i <= '1'; net_1e12_i <= '0';
-        when "011" => net_1e10_i <= '1'; net_1e12_i <= '1';
-        when "100" => net_1e10_i <= '1'; net_1e12_i <= '1';
-        when "101" => net_1e10_i <= '1'; net_1e12_i <= '1';
-        when "110" => net_1e10_i <= '1'; net_1e12_i <= '1';
-        when "111" => net_1e10_i <= '1'; net_1e12_i <= '1';
-        when others => null;
-      end case;
-    end process;
-  */
-  res = (res & ~((1<<7)|(1<<5))) | mask[security_2B_counter];
-  security_2B_counter = (security_2B_counter + 1) & 0x07;
-
-	return res;
-}
 
 static READ8_HANDLER( ckongs_input_port_1_r )
 {
@@ -182,39 +150,6 @@ static READ8_HANDLER( scramble_protection_r )
 	}
 }
 
-static READ8_HANDLER( scrambls_protection_r )
-{
-	/*logerror("%04x: read protection\n",activecpu_get_pc());*/
-
-  /*
-    p_security_6J : process(xb)
-    begin
-      -- chip K10A PAL16L8
-      -- equations from Mark @ http://www.leopardcats.com/
-      xbo(3 downto 0) <= xb(3 downto 0);
-      xbo(4) <= not(xb(0) or xb(1) or xb(2) or xb(3));
-      xbo(5) <= not((not xb(2) and not xb(0)) or (not xb(2) and not xb(1)) or (not xb(3) and not xb(0)) or (not xb(3) and not xb(1)));
-
-      xbo(6) <= not(not xb(0) and not xb(3));
-      xbo(7) <= not((not xb(1)) or xb(2));
-    end process;
-  */
-  UINT8 xbo = xb & 0x0f;
-
-  xbo |= ( ~(xb | (xb>>1) | (xb>>2) | (xb>>3)) & 0x01) << 4;
-  xbo |= ( ~( (~(xb>>2)&~xb) | (~(xb>>2)&~(xb>>1)) | (~(xb>>3)&~xb) | (~(xb>>3)&~(xb>>1)) ) & 0x01) << 5;
-  xbo |= ( ~(~xb&~(xb>>3)) & 0x01) << 6;
-  xbo |= ( ~(~(xb>>1)|(xb>>2)) & 0x01) << 7;
-
-  return (xbo);
-}
-
-
-static WRITE8_HANDLER( theend_coin_counter_w )
-{
-	coin_counter_w(0, data & 0x80);
-}
-
 
 static READ8_HANDLER( mariner_protection_1_r )
 {
@@ -259,9 +194,9 @@ static READ8_HANDLER( cavelon_banksw_r )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_0_r(machine, offset - 0x0100);
+		return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_1_r(machine, offset - 0x0200);
+		return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset - 0x0200);
 
 	return 0xff;
 }
@@ -271,9 +206,9 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_0_w(machine, offset - 0x0100, data);
+		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_1_w(machine, offset - 0x0200, data);
+		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset - 0x0200, data);
 }
 
 
@@ -288,124 +223,211 @@ WRITE8_HANDLER( hunchbks_mirror_w )
 }
 
 
-static const ppi8255_interface ppi8255_intf =
+const ppi8255_interface scramble_ppi_ppi8255_intf[2] =
 {
-	2, 								/* 2 chips */
-	{input_port_0_r, 0},			/* Port A read */
-	{input_port_1_r, 0},			/* Port B read */
-	{input_port_2_r, 0},			/* Port C read */
-	{0, soundlatch_w},				/* Port A write */
-	{0, scramble_sh_irqtrigger_w},	/* Port B write */
-	{0, 0}, 						/* Port C write */
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
 };
 
-/* extra chip for sample latch */
-static const ppi8255_interface sfx_ppi8255_intf =
+
+const ppi8255_interface stratgyx_ppi8255_intf[2] =
 {
-	3, 									/* 3 chips */
-	{input_port_0_r, 0, soundlatch2_r},	/* Port A read */
-	{input_port_1_r, 0, 0},				/* Port B read */
-	{input_port_2_r, 0, 0},				/* Port C read */
-	{0, soundlatch_w, 0},				/* Port A write */
-	{0, scramble_sh_irqtrigger_w, 0},	/* Port B write */
-	{0, 0, 0}, 							/* Port C write */
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_1_r,				/* Port B read */
+		stratgyx_input_port_2_r,	/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		stratgyx_input_port_3_r,	/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
 };
 
-/* extra chip for sample latch */
-static const ppi8255_interface monsterz_ppi8255_intf =
+
+const ppi8255_interface moonwar_ppi8255_intf[2] =
 {
-	3, 									/* 3 chips */
-	{input_port_0_r, 0, 0},	/* Port A read */
-	{input_port_1_r, 0, 0},				/* Port B read */
-	{input_port_2_r, 0, 0},				/* Port C read */
-	{0, soundlatch_w, 0},				/* Port A write */
-	{0, scramble_sh_irqtrigger_w, 0},	/* Port B write */
-	{0, 0, 0}, 							/* Port C write */
+	{
+		moonwar_input_port_0_r,		/* Port A read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		moonwar_port_select_w 		/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
+};
+
+
+const ppi8255_interface darkplnt_ppi8255_intf[2] =
+{
+	{
+		input_port_0_r,				/* Port A read */
+		darkplnt_input_port_1_r,	/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
+};
+
+
+const ppi8255_interface scramble_ppi8255_intf[2] =
+{
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		scramble_protection_r,		/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		scramble_protection_w		/* Port C write */
+	}
+};
+
+
+const ppi8255_interface ckongs_ppi8255_intf[2] =
+{
+	{
+		input_port_0_r,				/* Port A read */
+		ckongs_input_port_1_r,		/* Port B read */
+		ckongs_input_port_2_r,		/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
+};
+
+
+const ppi8255_interface mars_ppi8255_intf[2] =
+{
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		input_port_3_r,				/* Port C read */
+		soundlatch_w,				/* Port A write */
+		scramble_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
+};
+
+
+const ppi8255_interface mrkougar_ppi8255_intf[2] =
+{
+	{
+		input_port_0_r,				/* Port A read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL 						/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		soundlatch_w,				/* Port A write */
+		mrkougar_sh_irqtrigger_w,	/* Port B write */
+		NULL						/* Port C write */
+	}
 };
 
 
 DRIVER_INIT( scramble_ppi )
 {
-	ppi8255_init(&ppi8255_intf);
 }
 
 DRIVER_INIT( scobra )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( atlantis )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( scramble )
 {
 	DRIVER_INIT_CALL(atlantis);
-
-	ppi8255_set_portCread (1, scramble_protection_r);
-	ppi8255_set_portCwrite(1, scramble_protection_w);
-}
-
-DRIVER_INIT( scrambls )
-{
-	DRIVER_INIT_CALL(atlantis);
-
-	ppi8255_set_portCread(0, scrambls_input_port_2_r);
-	ppi8255_set_portCread(1, scrambls_protection_r);
-	ppi8255_set_portCwrite(1, scramble_protection_w);
-}
-
-DRIVER_INIT( theend )
-{
-	DRIVER_INIT_CALL(scramble_ppi);
-
-	ppi8255_set_portCwrite(0, theend_coin_counter_w);
 }
 
 DRIVER_INIT( stratgyx )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
-
-	ppi8255_set_portCread(0, stratgyx_input_port_2_r);
-	ppi8255_set_portCread(1, stratgyx_input_port_3_r);
 }
 
 DRIVER_INIT( tazmani2 )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
-}
-
-DRIVER_INIT( amidar )
-{
-	DRIVER_INIT_CALL(scramble_ppi);
-
-	/* Amidar has a the DIP switches connected to port C of the 2nd 8255 */
-	ppi8255_set_portCread(1, input_port_3_r);
 }
 
 DRIVER_INIT( ckongs )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
-	ppi8255_set_portBread(0, ckongs_input_port_1_r);
-	ppi8255_set_portCread(0, ckongs_input_port_2_r);
 }
 
 DRIVER_INIT( mariner )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	/* extra ROM */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
 	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5800);
@@ -421,10 +443,6 @@ DRIVER_INIT( frogger )
 {
 	offs_t A;
 	UINT8 *ROM;
-
-
-	DRIVER_INIT_CALL(scramble_ppi);
-
 
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	ROM = memory_region(REGION_CPU2);
@@ -442,9 +460,6 @@ DRIVER_INIT( froggers )
 	offs_t A;
 	UINT8 *ROM;
 
-
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	/* the first ROM of the second CPU has data lines D0 and D1 swapped. Decode it. */
 	ROM = memory_region(REGION_CPU2);
 	for (A = 0;A < 0x0800;A++)
@@ -455,10 +470,6 @@ DRIVER_INIT( devilfsh )
 {
 	offs_t i;
 	UINT8 *RAM;
-
-
-	DRIVER_INIT_CALL(scramble_ppi);
-
 
 	/* Address lines are scrambled on the main CPU */
 
@@ -487,9 +498,6 @@ DRIVER_INIT( devilfsh )
 DRIVER_INIT( mars )
 {
 	DRIVER_INIT_CALL(devilfsh);
-
-	/* extra port */
-	ppi8255_set_portCread(1, input_port_3_r);
 }
 
 DRIVER_INIT( hotshock )
@@ -502,8 +510,6 @@ DRIVER_INIT( hotshock )
 DRIVER_INIT( cavelon )
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
-
-	DRIVER_INIT_CALL(scramble_ppi);
 
 	/* banked ROM */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1);
@@ -521,22 +527,11 @@ DRIVER_INIT( cavelon )
 
 DRIVER_INIT( moonwar )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
-	/* special handler for the spinner */
-	ppi8255_set_portAread (0, moonwar_input_port_0_r);
-	ppi8255_set_portCwrite(0, moonwar_port_select_w);
-
 	state_save_register_global(moonwar_port_select);
 }
 
 DRIVER_INIT( darkplnt )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
-	/* special handler for the spinner */
-	ppi8255_set_portBread(0, darkplnt_input_port_1_r);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb00a, 0xb00a, 0, 0, darkplnt_bullet_color_w);
 }
 
@@ -573,22 +568,16 @@ DRIVER_INIT( mimonkey )
 		ctr++;
 	}
 
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonsco )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
 }
 
 DRIVER_INIT( mimonscr )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
 }
 
@@ -782,9 +771,6 @@ DRIVER_INIT( hustler )
 	offs_t A;
 
 
-	DRIVER_INIT_CALL(scramble_ppi);
-
-
 	for (A = 0;A < 0x4000;A++)
 	{
 		UINT8 xormask;
@@ -822,9 +808,6 @@ DRIVER_INIT( hustler )
 DRIVER_INIT( billiard )
 {
 	offs_t A;
-
-
-	DRIVER_INIT_CALL(scramble_ppi);
 
 
 	for (A = 0;A < 0x4000;A++)
@@ -874,58 +857,10 @@ DRIVER_INIT( billiard )
 DRIVER_INIT( mrkougar )
 {
 	DRIVER_INIT_CALL(devilfsh);
-
-	/* no sound enabled bit */
-	ppi8255_set_portBwrite(1, mrkougar_sh_irqtrigger_w);
 }
 
 DRIVER_INIT( mrkougb )
 {
-	DRIVER_INIT_CALL(scramble_ppi);
-
-	/* no sound enabled bit */
-	ppi8255_set_portBwrite(1, mrkougar_sh_irqtrigger_w);
-}
-
-DRIVER_INIT( sfx )
-{
-	ppi8255_init(&sfx_ppi8255_intf);
-}
-
-DRIVER_INIT( monsterz )
-{
-	ppi8255_init(&monsterz_ppi8255_intf);
-
-	/* extra ROM */
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(REGION_CPU2) + 0x3000);
-}
-
-static READ8_HANDLER( scorpion_prot_r )
-{
-	/* HACK! return register C */
-	return activecpu_get_reg(Z80_C) & 0xff;
-}
-
-static READ8_HANDLER( scorpion_sound_status_r )
-{
-	return 1;
-}
-
-DRIVER_INIT( scorpion )
-{
-	ppi8255_init(&ppi8255_intf);
-
-	ppi8255_set_portCread(1, scorpion_prot_r);
-
-	/* extra ROM */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5800, 0x67ff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(REGION_CPU1) + 0x5800);
-
-	/* no background related */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6803, 0x6803, 0, 0, SMH_NOP);
-
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, scorpion_sound_status_r);
 }
 
 DRIVER_INIT( ad2083 )

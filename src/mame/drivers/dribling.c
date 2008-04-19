@@ -159,9 +159,9 @@ static WRITE8_HANDLER( shr_w )
 static READ8_HANDLER( ioread )
 {
 	if (offset & 0x08)
-		return ppi8255_0_r(machine, offset & 3);
+		return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_1_r(machine, offset & 3);
+		return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 	return 0xff;
 }
 
@@ -169,9 +169,9 @@ static READ8_HANDLER( ioread )
 static WRITE8_HANDLER( iowrite )
 {
 	if (offset & 0x08)
-		ppi8255_0_w(machine, offset & 3, data);
+		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_1_w(machine, offset & 3, data);
+		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
 	else if (offset & 0x40)
 	{
 		dr = ds;
@@ -187,21 +187,25 @@ static WRITE8_HANDLER( iowrite )
  *
  *************************************/
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2,
-	{ dsr_r,        NULL           },
-	{ input_mux0_r, NULL           },
-	{ NULL,         input_port_3_r },
-	{ NULL,         sound_w        },
-	{ NULL,         pb_w           },
-	{ misc_w,       shr_w          }
+	{
+		dsr_r,
+		input_mux0_r,
+		NULL,
+		NULL,
+		NULL,
+		misc_w
+	},
+	{
+		NULL,
+		NULL,
+		input_port_3_r,
+		sound_w,
+		pb_w,
+		shr_w
+	}
 };
-
-static MACHINE_RESET( dribling )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 
 
@@ -303,7 +307,11 @@ static MACHINE_DRIVER_START( dribling )
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", dribling_irq_gen)
 
-	MDRV_MACHINE_RESET(dribling)
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

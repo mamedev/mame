@@ -219,8 +219,8 @@ static ADDRESS_MAP_START( cpu0_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_BASE(&vram1)
 	AM_RANGE(0x9800, 0xa7ff) AM_RAM_WRITE(vram2_w) AM_BASE(&vram2)
-	AM_RANGE(0xb800, 0xb803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xb810, 0xb813) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xb800, 0xb803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb810, 0xb813) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xb830, 0xb830) AM_NOP
 	AM_RANGE(0xb840, 0xb840) AM_NOP
 ADDRESS_MAP_END
@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu1_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_READWRITE(ppi8255_2_r, ppi8255_2_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, ADDRESS_SPACE_IO, 8 )
@@ -307,15 +307,32 @@ static const struct z80_irq_daisy_chain daisy_chain_sound[] =
 	{ 0, 0, 0, 0, -1 }		/* end mark */
 };
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[3] =
 {
-	3,
-	{ input_port_0_r, input_port_1_r, NULL },	/* Port A read */
-	{ NULL,           input_port_2_r, NULL },	/* Port B read */
-	{ NULL,           protection_r,	  NULL },	/* Port C read */
-	{ NULL,           NULL,	          NULL },	/* Port A write */
-	{ NULL,           NULL,           NULL },	/* Port B write */
-	{ vidctrl_w,      protection_w,   NULL },	/* Port C write */
+	{
+		input_port_0_r,				/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		vidctrl_w					/* Port C write */
+	},
+	{
+		input_port_1_r,				/* Port A read */
+		input_port_2_r,				/* Port B read */
+		protection_r,				/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		protection_w				/* Port C write */
+	},
+	{
+		NULL,						/* Port A read */
+		NULL,						/* Port B read */
+		NULL,						/* Port C read */
+		NULL,						/* Port A write */
+		NULL,						/* Port B write */
+		NULL						/* Port C write */
+	}
 };
 
 static const struct YM2203interface ym2203_interface =
@@ -349,7 +366,6 @@ static MACHINE_RESET( pipeline )
 {
 	ctc_intf.baseclock = cpunum_get_clock(0);
 	z80ctc_init(0, &ctc_intf);
-	ppi8255_init(&ppi8255_intf);
 }
 
 static MACHINE_DRIVER_START( pipeline )
@@ -366,6 +382,15 @@ static MACHINE_DRIVER_START( pipeline )
 
 	MDRV_CPU_ADD(M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[2] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

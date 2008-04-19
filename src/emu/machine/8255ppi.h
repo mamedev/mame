@@ -6,84 +6,44 @@
 
 *********************************************************************/
 
-#ifndef _8255PPI_H_
-#define _8255PPI_H_
+#ifndef __8255PPI_H_
+#define __8255PPI_H_
 
-#define MAX_8255 8
+#define PPI8255		DEVICE_GET_INFO_NAME(ppi8255)
+
 
 typedef struct
 {
-	int num;							 /* number of PPIs to emulate */
-	read8_machine_func portAread[MAX_8255];
-	read8_machine_func portBread[MAX_8255];
-	read8_machine_func portCread[MAX_8255];
-	write8_machine_func portAwrite[MAX_8255];
-	write8_machine_func portBwrite[MAX_8255];
-	write8_machine_func portCwrite[MAX_8255];
+	read8_machine_func portAread;
+	read8_machine_func portBread;
+	read8_machine_func portCread;
+	write8_machine_func portAwrite;
+	write8_machine_func portBwrite;
+	write8_machine_func portCwrite;
 } ppi8255_interface;
 
 
-/* Init */
-void ppi8255_init( const ppi8255_interface *intfce);
+/* device interface */
+DEVICE_GET_INFO(ppi8255);
 
-/* Read/Write */
-UINT8 ppi8255_r ( int which, offs_t offset );
-void ppi8255_w( int which, offs_t offset, UINT8 data );
+READ8_DEVICE_HANDLER( ppi8255_r );
+WRITE8_DEVICE_HANDLER( ppi8255_w );
 
-void ppi8255_set_portAread( int which, read8_machine_func portAread);
-void ppi8255_set_portBread( int which, read8_machine_func portBread);
-void ppi8255_set_portCread( int which, read8_machine_func portCread);
 
-void ppi8255_set_portAwrite( int which, write8_machine_func portAwrite);
-void ppi8255_set_portBwrite( int which, write8_machine_func portBwrite);
-void ppi8255_set_portCwrite( int which, write8_machine_func portCwrite);
+void ppi8255_set_portAread( const device_config *device, read8_machine_func portAread );
+void ppi8255_set_portBread( const device_config *device, read8_machine_func portBread );
+void ppi8255_set_portCread( const device_config *device, read8_machine_func portCread );
 
-void ppi8255_set_portA( int which, UINT8 data );
-void ppi8255_set_portB( int which, UINT8 data );
-void ppi8255_set_portC( int which, UINT8 data );
+void ppi8255_set_portAwrite( const device_config *device, write8_machine_func portAwrite );
+void ppi8255_set_portBwrite( const device_config *device, write8_machine_func portBwrite );
+void ppi8255_set_portCwrite( const device_config *device, write8_machine_func portCwrite );
 
-UINT8 ppi8255_get_portA( int which );
-UINT8 ppi8255_get_portB( int which );
-UINT8 ppi8255_get_portC( int which );
+void ppi8255_set_portA( const device_config *device, UINT8 data );
+void ppi8255_set_portB( const device_config *device, UINT8 data );
+void ppi8255_set_portC( const device_config *device, UINT8 data );
 
-/* Helpers */
-READ8_HANDLER( ppi8255_0_r );
-READ8_HANDLER( ppi8255_1_r );
-READ8_HANDLER( ppi8255_2_r );
-READ8_HANDLER( ppi8255_3_r );
-READ8_HANDLER( ppi8255_4_r );
-READ8_HANDLER( ppi8255_5_r );
-READ8_HANDLER( ppi8255_6_r );
-READ8_HANDLER( ppi8255_7_r );
-WRITE8_HANDLER( ppi8255_0_w );
-WRITE8_HANDLER( ppi8255_1_w );
-WRITE8_HANDLER( ppi8255_2_w );
-WRITE8_HANDLER( ppi8255_3_w );
-WRITE8_HANDLER( ppi8255_4_w );
-WRITE8_HANDLER( ppi8255_5_w );
-WRITE8_HANDLER( ppi8255_6_w );
-WRITE8_HANDLER( ppi8255_7_w );
+UINT8 ppi8255_get_portA( const device_config *device );
+UINT8 ppi8255_get_portB( const device_config *device );
+UINT8 ppi8255_get_portC( const device_config *device );
 
-READ16_HANDLER( ppi8255_16le_0_r );
-READ16_HANDLER( ppi8255_16le_1_r );
-READ16_HANDLER( ppi8255_16le_2_r );
-READ16_HANDLER( ppi8255_16le_3_r );
-READ16_HANDLER( ppi8255_16le_4_r );
-READ16_HANDLER( ppi8255_16le_5_r );
-READ16_HANDLER( ppi8255_16le_6_r );
-READ16_HANDLER( ppi8255_16le_7_r );
-WRITE16_HANDLER( ppi8255_16le_0_w );
-WRITE16_HANDLER( ppi8255_16le_1_w );
-WRITE16_HANDLER( ppi8255_16le_2_w );
-WRITE16_HANDLER( ppi8255_16le_3_w );
-WRITE16_HANDLER( ppi8255_16le_4_w );
-WRITE16_HANDLER( ppi8255_16le_5_w );
-WRITE16_HANDLER( ppi8255_16le_6_w );
-WRITE16_HANDLER( ppi8255_16le_7_w );
-
-#ifdef MESS
-/* Peek at the ports */
-UINT8 ppi8255_peek( int which, offs_t offset );
-#endif
-
-#endif /* _8255PPI_H_ */
+#endif /* __8255PPI_H_ */

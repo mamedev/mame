@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( vroulet_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0x80, 0x83) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -233,23 +233,25 @@ static WRITE8_HANDLER( ppi8255_a_w ){}// watchdog ?
 static WRITE8_HANDLER( ppi8255_b_w ){}// lamps ?
 static WRITE8_HANDLER( ppi8255_c_w ){}
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2, 							        // 2 chips
-	{ input_port_0_r,	NULL },	        // Port A read
-	{ input_port_1_r,	NULL },			// Port B read
-	{ input_port_2_r,	NULL },			// Port C read
-	{ NULL,				ppi8255_a_w },  // Port A write
-	{ NULL,				ppi8255_b_w },  // Port B write
-	{ NULL,				ppi8255_c_w },  // Port C write
+	{
+		input_port_0_r,	        // Port A read
+		input_port_1_r,			// Port B read
+		input_port_2_r,			// Port C read
+		NULL,					// Port A write
+		NULL,					// Port B write
+		NULL					// Port C write
+	},
+	{
+		NULL,					// Port A read
+		NULL,					// Port B read
+		NULL,					// Port C read
+		ppi8255_a_w,			// Port A write
+		ppi8255_b_w,			// Port B write
+		ppi8255_c_w				// Port C write
+	}
 };
-
-/* Machine Initialization */
-
-static MACHINE_RESET( vroulet )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 /* Machine Driver */
 
@@ -260,9 +262,13 @@ static MACHINE_DRIVER_START( vroulet )
 	MDRV_CPU_IO_MAP(vroulet_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(vroulet)
-
 	MDRV_NVRAM_HANDLER(generic_1fill)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	// video hardware
 

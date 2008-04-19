@@ -11,6 +11,8 @@
 
 ***************************************************************************/
 
+#include "machine/8255ppi.h"
+
 /*----------- defined in video/galaxian.c -----------*/
 
 extern UINT8 *galaxold_videoram;
@@ -152,15 +154,35 @@ READ8_HANDLER( gmgalax_input_port_2_r );
 
 /*----------- defined in machine/scramble.c -----------*/
 
+extern const ppi8255_interface scramble_ppi_ppi8255_intf[2];
+extern const ppi8255_interface stratgyx_ppi8255_intf[2];
+extern const ppi8255_interface moonwar_ppi8255_intf[2];
+extern const ppi8255_interface darkplnt_ppi8255_intf[2];
+extern const ppi8255_interface scramble_ppi8255_intf[2];
+extern const ppi8255_interface ckongs_ppi8255_intf[2];
+extern const ppi8255_interface mars_ppi8255_intf[2];
+extern const ppi8255_interface mrkougar_ppi8255_intf[2];
+
+
 DRIVER_INIT( scramble_ppi );
-DRIVER_INIT( amidar );
+DRIVER_INIT( scobra );
+DRIVER_INIT( atlantis );
+DRIVER_INIT( scramble );
+DRIVER_INIT( stratgyx );
+DRIVER_INIT( tazmani2 );
+DRIVER_INIT( ckongs );
+DRIVER_INIT( mariner );
 DRIVER_INIT( frogger );
 DRIVER_INIT( froggers );
-DRIVER_INIT( scobra );
-DRIVER_INIT( stratgyx );
+DRIVER_INIT( devilfsh );
+DRIVER_INIT( mars );
+DRIVER_INIT( hotshock );
+DRIVER_INIT( cavelon );
 DRIVER_INIT( moonwar );
 DRIVER_INIT( darkplnt );
-DRIVER_INIT( tazmani2 );
+DRIVER_INIT( mimonkey );
+DRIVER_INIT( mimonsco );
+DRIVER_INIT( mimonscr );
 DRIVER_INIT( anteater );
 DRIVER_INIT( rescue );
 DRIVER_INIT( minefld );
@@ -168,24 +190,8 @@ DRIVER_INIT( losttomb );
 DRIVER_INIT( superbon );
 DRIVER_INIT( hustler );
 DRIVER_INIT( billiard );
-DRIVER_INIT( mimonkey );
-DRIVER_INIT( mimonsco );
-DRIVER_INIT( atlantis );
-DRIVER_INIT( scramble );
-DRIVER_INIT( scrambls );
-DRIVER_INIT( theend );
-DRIVER_INIT( ckongs );
-DRIVER_INIT( mariner );
-DRIVER_INIT( mars );
-DRIVER_INIT( devilfsh );
-DRIVER_INIT( hotshock );
-DRIVER_INIT( cavelon );
 DRIVER_INIT( mrkougar );
 DRIVER_INIT( mrkougb );
-DRIVER_INIT( mimonscr );
-DRIVER_INIT( sfx );
-DRIVER_INIT( monsterz );
-DRIVER_INIT( scorpion );
 DRIVER_INIT( ad2083 );
 
 MACHINE_RESET( scramble );

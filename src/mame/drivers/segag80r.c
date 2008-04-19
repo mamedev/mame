@@ -300,6 +300,12 @@ static WRITE8_HANDLER( coin_count_w )
  *
  *************************************/
 
+static READ8_HANDLER( sindbadm_portb_r )
+{
+	return input_port_read(machine, "FC");
+}
+
+
 static WRITE8_HANDLER( sindbadm_soundport_w )
 {
 	soundlatch_w(machine,0,data);
@@ -331,6 +337,24 @@ static WRITE8_HANDLER( sindbadm_SN76496_1_w )
 
 /*************************************
  *
+ *  PPI 8255 configurations
+ *
+ *************************************/
+
+static const ppi8255_interface sindbadm_ppi_intf =
+{
+	NULL,
+	sindbadm_portb_r,
+	NULL,
+	sindbadm_soundport_w,
+	NULL,
+	sindbadm_misc_w
+};
+
+
+
+/*************************************
+ *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -355,9 +379,20 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( main_ppi8255_portmap, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
+	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
+	AM_RANGE(0xfc, 0xfc) AM_READ_PORT("FC")
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( sindbadm_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
 ADDRESS_MAP_END
 
@@ -854,6 +889,9 @@ static MACHINE_DRIVER_START( 005 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(g80r_base)
 
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(main_ppi8255_portmap,0)
+
 	/* sound boards */
 	MDRV_IMPORT_FROM(005_sound_board)
 MACHINE_DRIVER_END
@@ -880,6 +918,9 @@ static MACHINE_DRIVER_START( monsterb )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(g80r_base)
+
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(main_ppi8255_portmap,0)
 
 	/* background board changes */
 	MDRV_GFXDECODE(monsterb)
@@ -912,6 +953,9 @@ static MACHINE_DRIVER_START( sindbadm )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_IO_MAP(sindbadm_portmap,0)
 	MDRV_CPU_VBLANK_INT("main", sindbadm_vblank_start)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( sindbadm_ppi_intf )
 
 	/* video hardware */
 	MDRV_GFXDECODE(monsterb)
@@ -1414,9 +1458,6 @@ static DRIVER_INIT( 005 )
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_NONE;
-
-	/* install the 8255 PPI for the sound board */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0c, 0x0f, 0, 0, ppi8255_0_r, ppi8255_0_w);
 }
 
 
@@ -1452,9 +1493,6 @@ static DRIVER_INIT( monsterb )
 	/* install background board handlers */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, monsterb_back_port_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, monsterb_vidram_w);
-
-	/* install Monster Bash sound board */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0c, 0x0f, 0, 0, ppi8255_0_r, ppi8255_0_w);
 }
 
 
@@ -1472,9 +1510,6 @@ static DRIVER_INIT( monster2 )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, pignewt_back_port_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, pignewt_vidram_w);
-
-	/* install Monster Bash sound board */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0c, 0x0f, 0, 0, ppi8255_0_r, ppi8255_0_w);
 }
 
 
@@ -1500,17 +1535,6 @@ static DRIVER_INIT( pignewt )
 
 static DRIVER_INIT( sindbadm )
 {
-	static ppi8255_interface ppi_intf =
-	{
-		1,
-		{ 0 },
-		{ 0 },
-		{ 0 },
-		{ sindbadm_soundport_w },
-		{ 0 },
-		{ sindbadm_misc_w }
-	};
-
 	/* configure the encrypted Z80 */
 	sindbadm_decode();
 	sega_security(0);
@@ -1521,11 +1545,6 @@ static DRIVER_INIT( sindbadm )
 	/* install background board handlers */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x40, 0x41, 0, 0, sindbadm_back_port_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, sindbadm_vidram_w);
-
-	/* install the 8255 PPI for the sound board */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x80, 0x83, 0, 0, ppi8255_0_r, ppi8255_0_w);
-	ppi_intf.portBread[0] = port_tag_to_handler8("FC");
-	ppi8255_init(&ppi_intf);
 }
 
 

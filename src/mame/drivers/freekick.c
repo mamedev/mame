@@ -221,8 +221,8 @@ static ADDRESS_MAP_START( freekckb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)	// tilemap
 	AM_RANGE(0xe800, 0xe8ff) AM_READ(SMH_RAM)	// sprites
-	AM_RANGE(0xec00, 0xec03) AM_READ(ppi8255_0_r)
-	AM_RANGE(0xf000, 0xf003) AM_READ(ppi8255_1_r)
+	AM_RANGE(0xec00, 0xec03) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
+	AM_RANGE(0xf000, 0xf003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_3_r)
 	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_4_r)
 	AM_RANGE(0xf802, 0xf802) AM_READ(SMH_NOP)	//MUST return bit 0 = 0, otherwise game resets
@@ -234,8 +234,8 @@ static ADDRESS_MAP_START( freekckb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(freek_videoram_w) AM_BASE(&freek_videoram)
 	AM_RANGE(0xe800, 0xe8ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xec00, 0xec03) AM_WRITE(ppi8255_0_w)
-	AM_RANGE(0xf000, 0xf003) AM_WRITE(ppi8255_1_w)
+	AM_RANGE(0xec00, 0xec03) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
+	AM_RANGE(0xf000, 0xf003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(coin_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(nmi_enable_w)
@@ -597,21 +597,25 @@ static READ8_HANDLER( snd_rom_r )
 	return memory_region(REGION_USER1)[romaddr & 0x7fff];
 }
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2, 										/* 1 chips */
-	{ NULL,             input_port_0_r },	/* Port A read */
-	{ NULL,             input_port_1_r },	/* Port B read */
-	{ snd_rom_r,        input_port_2_r },	/* Port C read */
-	{ snd_rom_addr_l_w, NULL },				/* Port A write */
-	{ snd_rom_addr_h_w, NULL },				/* Port B write */
-	{ NULL,             NULL },				/* Port C write */
+	{
+		NULL,							/* Port A read */
+		NULL,							/* Port B read */
+		snd_rom_r,						/* Port C read */
+		snd_rom_addr_l_w,				/* Port A write */
+		snd_rom_addr_h_w,				/* Port B write */
+		NULL							/* Port C write */
+	},
+	{
+		input_port_0_r,					/* Port A read */
+		input_port_1_r,					/* Port B read */
+		input_port_2_r,					/* Port C read */
+		NULL,							/* Port A write */
+		NULL,							/* Port B write */
+		NULL							/* Port C write */
+	}
 };
-
-static MACHINE_RESET( freekckb )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 
 
@@ -709,7 +713,11 @@ static MACHINE_DRIVER_START( freekckb )
 	MDRV_CPU_PROGRAM_MAP(freekckb_readmem,freekckb_writemem)
 	MDRV_CPU_IO_MAP(freekckb_readport,freekckb_writeport)
 
-	MDRV_MACHINE_RESET(freekckb)
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	MDRV_VIDEO_UPDATE(freekick)
 MACHINE_DRIVER_END

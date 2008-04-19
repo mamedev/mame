@@ -63,15 +63,24 @@ static READ8_HANDLER( adc_status_r );
  *
  *************************************/
 
-static const ppi8255_interface hangon_ppi_intf =
+static const ppi8255_interface hangon_ppi_intf[2] =
 {
-	2,
-	{ NULL,            NULL },
-	{ NULL,            NULL },
-	{ NULL,            adc_status_r },
-	{ soundlatch_w,    sub_control_adc_w },
-	{ video_lamps_w,   NULL },
-	{ tilemap_sound_w, NULL }
+	{
+		NULL,
+		NULL,
+		NULL,
+		soundlatch_w,
+		video_lamps_w,
+		tilemap_sound_w
+	},
+	{
+		NULL,
+		NULL,
+		adc_status_r,
+		sub_control_adc_w,
+		NULL,
+		NULL
+	}
 };
 
 
@@ -84,9 +93,6 @@ static const ppi8255_interface hangon_ppi_intf =
 
 static void hangon_generic_init(void)
 {
-	/* configure the 8255 interface */
-	ppi8255_init(&hangon_ppi_intf);
-
 	/* reset the custom handlers and other pointers */
 	i8751_vblank_hook = NULL;
 }
@@ -138,7 +144,7 @@ static INTERRUPT_GEN( hangon_irq )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	ppi8255_0_w(machine, param >> 8, param & 0xff);
+	ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), param >> 8, param & 0xff);
 }
 
 
@@ -147,13 +153,13 @@ static READ16_HANDLER( hangon_io_r )
 	switch (offset & 0x3020/2)
 	{
 		case 0x0000/2: /* PPI @ 4B */
-			return ppi8255_0_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 
 		case 0x1000/2: /* Input ports and DIP switches */
 			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x3000/2: /* PPI @ 4C */
-			return ppi8255_1_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 
 		case 0x3020/2: /* ADC0804 data output */
 			return input_port_read_indexed(machine, 4 + adc_select);
@@ -176,7 +182,7 @@ static WRITE16_HANDLER( hangon_io_w )
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
-				ppi8255_1_w(machine, offset & 3, data & 0xff);
+				ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data & 0xff);
 				return;
 
 			case 0x3020/2: /* ADC0804 */
@@ -192,14 +198,14 @@ static READ16_HANDLER( sharrier_io_r )
 	switch (offset & 0x0030/2)
 	{
 		case 0x0000/2:
-			return ppi8255_0_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
 
 		case 0x0010/2: /* Input ports and DIP switches */
 			return input_port_read_indexed(machine, offset & 3);
 
 		case 0x0020/2: /* PPI @ 4C */
 			if (offset == 2) return 0;
-			return ppi8255_1_r(machine, offset & 3);
+			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
 
 		case 0x0030/2: /* ADC0804 data output */
 			return input_port_read_indexed(machine, 4 + adc_select);
@@ -222,7 +228,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
-				ppi8255_1_w(machine, offset & 3, data & 0xff);
+				ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data & 0xff);
 				return;
 
 			case 0x0030/2: /* ADC0804 */
@@ -346,7 +352,7 @@ static void sound_irq(int irq)
 static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
-	ppi8255_set_portC(0, 0x00);
+	ppi8255_set_portC(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), 0x00);
 	return soundlatch_r(machine, offset);
 }
 
@@ -856,6 +862,12 @@ static MACHINE_DRIVER_START( hangon_base )
 
 	MDRV_MACHINE_RESET(hangon)
 	MDRV_INTERLEAVE(100)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( hangon_ppi_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( hangon_ppi_intf[1] )
 
 	/* video hardware */
 	MDRV_GFXDECODE(segahang)

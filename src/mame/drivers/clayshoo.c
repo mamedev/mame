@@ -132,22 +132,29 @@ static void create_analog_timers(void)
  *
  *************************************/
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2, 							/* 2 chips */
-	{ 0, 0 },					/* Port A read */
-	{ 0, input_port_r },		/* Port B read */
-	{ 0, 0 },					/* Port C read */
-	{ 0, input_port_select_w },	/* Port A write */
-	{ 0, 0 },					/* Port B write */
-	{ 0, 0 /* sound effects */},/* Port C write */
+	{
+		NULL,					/* Port A read */
+		NULL,					/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* Port C write */
+	},
+	{
+		NULL,					/* Port A read */
+		input_port_r,			/* Port B read */
+		NULL,					/* Port C read */
+		input_port_select_w,	/* Port A write */
+		NULL,					/* Port B write */
+		NULL					/* sound effects, Port C write */
+	}
 };
 
 
 static MACHINE_START( clayshoo )
 {
-	ppi8255_init(&ppi8255_intf);
-
 	create_analog_timers();
 
 	/* register for state saving */
@@ -216,8 +223,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x20, 0x23) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 
@@ -313,6 +320,11 @@ static MACHINE_DRIVER_START( clayshoo )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 MACHINE_DRIVER_END
 
 

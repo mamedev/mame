@@ -392,6 +392,18 @@ static INTERRUPT_GEN( master_interrupt )
 	}
 } /* master_interrupt */
 
+
+static const ppi8255_interface ppi8255_intf =
+{
+	NULL,		/* Port A read */
+	NULL,		/* Port B read */
+	NULL,		/* Port C read */
+	NULL,		/* Port A write */
+	NULL,		/* Port B write */
+	NULL		/* Port C write */
+};
+
+
 static MACHINE_DRIVER_START( imolagp )
 	MDRV_CPU_ADD(Z80,8000000) /* ? */
 	MDRV_CPU_PROGRAM_MAP(imolagp_master,0)
@@ -404,6 +416,9 @@ static MACHINE_DRIVER_START( imolagp )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(100)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -513,21 +528,6 @@ ROM_START( imolagp )
 	ROM_LOAD( "xe.bin", 0x3c00, 0x400, CRC(e0e81120) SHA1(14a77dfd069be342df4dbb1b747443c6d121d3fe) ) // ? car+misc
 ROM_END
 
-static const ppi8255_interface ppi8255_intf =
-{
-	1, 			/* 1 chips */
-	{0},		/* Port A read */
-	{0},		/* Port B read */
-	{0},		/* Port C read */
-	{0},		/* Port A write */
-	{0},		/* Port B write */
-	{0}, 		/* Port C write */
-};
-
-static DRIVER_INIT( imolagp )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 /*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,   FULLNAME */
-GAME( 1981,imolagp, 0,        imolagp, imolagp, imolagp, ROT90,   "Alberici", "Imola Grand Prix", GAME_WRONG_COLORS )
+GAME( 1981,imolagp, 0,        imolagp, imolagp, 0, ROT90,   "Alberici", "Imola Grand Prix", GAME_WRONG_COLORS )

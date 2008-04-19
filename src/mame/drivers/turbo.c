@@ -267,6 +267,43 @@ static WRITE8_HANDLER( turbo_ppi3c_w )
 }
 
 
+static const ppi8255_interface turbo_8255_intf[4] =
+{
+	{
+		NULL,
+		NULL,
+		NULL,
+		turbo_ppi0a_w,
+		turbo_ppi0b_w,
+		turbo_ppi0c_w
+	},
+	{
+		NULL,
+		NULL,
+		NULL,
+		turbo_ppi1a_w,
+		turbo_ppi1b_w,
+		turbo_ppi1c_w
+	},
+	{
+		NULL,
+		NULL,
+		NULL,
+		turbo_sound_a_w,
+		turbo_sound_b_w,
+		turbo_sound_c_w
+	},
+	{
+		turbo_analog_r,
+		input_port_2_r,
+		NULL,
+		NULL,
+		NULL,
+		turbo_ppi3c_w
+	}
+};
+
+
 
 /*************************************
  *
@@ -310,6 +347,27 @@ static WRITE8_HANDLER( subroc3d_ppi0b_w )
 	set_led_status(0, data & 0x04);
 	state->subroc3d_flip = (data >> 4) & 1;
 }
+
+
+static const ppi8255_interface subroc3d_8255_intf[2] =
+{
+	{
+		NULL,
+		NULL,
+		NULL,
+		subroc3d_ppi0a_w,
+		subroc3d_ppi0b_w,
+		subroc3d_ppi0c_w
+	},
+	{
+		NULL,
+		NULL,
+		NULL,
+		subroc3d_sound_a_w,
+		subroc3d_sound_b_w,
+		subroc3d_sound_c_w
+	}
+};
 
 
 
@@ -362,6 +420,28 @@ static WRITE8_HANDLER( buckrog_ppi1c_w )
 	coin_counter_w(1, data & 0x20);
 	set_led_status(0, data & 0x40);
 }
+
+
+static const ppi8255_interface buckrog_8255_intf[2] =
+{
+	{
+		NULL,
+		NULL,
+		NULL,
+		buckrog_ppi0a_w,
+		buckrog_ppi0b_w,
+		buckrog_ppi0c_w
+	},
+	{
+		NULL,
+		NULL,
+		NULL,
+		buckrog_sound_a_w,
+		buckrog_sound_b_w,
+		buckrog_ppi1c_w
+	}
+};
+
 
 
 
@@ -599,7 +679,7 @@ static READ8_HANDLER( buckrog_cpu2_command_r )
 {
 	/* assert ACK */
 	turbo_state *state = machine->driver_data;
-	ppi8255_set_portC(0, 0x00);
+	ppi8255_set_portC(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), 0x00);
 	return state->buckrog_command;
 }
 
@@ -638,11 +718,11 @@ static READ8_HANDLER( buckrog_port_3_r )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-    ppi8255_0_w(machine, param >> 8, param & 0xff);
+    ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), param >> 8, param & 0xff);
 }
 
 
-static WRITE8_HANDLER( buckrog_ppi8255_0_w )
+static WRITE8_DEVICE_HANDLER( buckrog_ppi8255_0_w )
 {
 	/* the port C handshaking signals control the sub CPU IRQ, */
 	/* so we have to sync whenever we access this PPI */
@@ -666,10 +746,10 @@ static ADDRESS_MAP_START( turbo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(turbo_collision_clear_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
-	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_READWRITE(ppi8255_2_r, ppi8255_2_w)
-	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_READWRITE(ppi8255_3_r, ppi8255_3_w)
+	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xfc00, 0xfc01) AM_MIRROR(0x00fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)
 	AM_RANGE(0xfd00, 0xfdff) AM_READ(input_port_0_r)
 	AM_RANGE(0xfe00, 0xfeff) AM_READ(turbo_collision_r)
@@ -694,8 +774,8 @@ static ADDRESS_MAP_START( subroc3d_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff) 														// HANDLE CL
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)	// FIX PAGE
-	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)
 ADDRESS_MAP_END
 
@@ -711,8 +791,8 @@ static ADDRESS_MAP_START( buckrog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, videoram)		// FIX PAGE
-	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_0_r, buckrog_ppi8255_0_w)	// 8255
-	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)			// 8255
+	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, buckrog_ppi8255_0_w)	// 8255
+	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)			// 8255
 	AM_RANGE(0xd800, 0xd801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)			// 8279
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(turbo_state, sprite_position)				// CONT RAM
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_MEMBER(turbo_state, spriteram)						// CONT RAM
@@ -1002,6 +1082,18 @@ static MACHINE_DRIVER_START( turbo )
 	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( turbo_8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( turbo_8255_intf[1] )
+
+	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
+	MDRV_DEVICE_CONFIG( turbo_8255_intf[2] )
+
+	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
+	MDRV_DEVICE_CONFIG( turbo_8255_intf[3] )
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MDRV_GFXDECODE(turbo)
@@ -1027,6 +1119,12 @@ static MACHINE_DRIVER_START( subroc3d )
 	MDRV_CPU_ADD(Z80, MASTER_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( subroc3d_8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( subroc3d_8255_intf[1] )
 
 	/* video hardware */
 	MDRV_GFXDECODE(turbo)
@@ -1059,6 +1157,12 @@ static MACHINE_DRIVER_START( buckrog )
 
 	MDRV_INTERLEAVE(10)
 	MDRV_MACHINE_RESET(buckrog)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( buckrog_8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( buckrog_8255_intf[1] )
 
 	/* video hardware */
 	MDRV_GFXDECODE(turbo)
@@ -1522,63 +1626,15 @@ static void turbo_rom_decode(void)
  *
  *************************************/
 
-static DRIVER_INIT( turbo )
-{
-	static const ppi8255_interface turbo_8255_intf =
-	{
-		4,
-		{ NULL,          NULL,          NULL,            turbo_analog_r },
-		{ NULL,          NULL,          NULL,            input_port_2_r },
-		{ NULL,          NULL,          NULL,            NULL },
-		{ turbo_ppi0a_w, turbo_ppi1a_w, turbo_sound_a_w, NULL },
-		{ turbo_ppi0b_w, turbo_ppi1b_w, turbo_sound_b_w, NULL },
-		{ turbo_ppi0c_w, turbo_ppi1c_w, turbo_sound_c_w, turbo_ppi3c_w }
-	};
-	ppi8255_init(&turbo_8255_intf);
-}
-
 static DRIVER_INIT( turbo_enc )
 {
 	turbo_rom_decode();
-	DRIVER_INIT_CALL(turbo);
 }
 
-
-static DRIVER_INIT( subroc3d )
-{
-	static const ppi8255_interface subroc3d_8255_intf =
-	{
-		2,
-		{ NULL,             NULL },
-		{ NULL,             NULL },
-		{ NULL,             NULL },
-		{ subroc3d_ppi0a_w, subroc3d_sound_a_w },
-		{ subroc3d_ppi0b_w, subroc3d_sound_b_w },
-		{ subroc3d_ppi0c_w, subroc3d_sound_c_w }
-	};
-	ppi8255_init(&subroc3d_8255_intf);
-}
-
-
-static DRIVER_INIT( buckrog )
-{
-	static const ppi8255_interface buckrog_8255_intf =
-	{
-		2,
-		{ NULL,            NULL },
-		{ NULL,            NULL },
-		{ NULL,            NULL },
-		{ buckrog_ppi0a_w, buckrog_sound_a_w },
-		{ buckrog_ppi0b_w, buckrog_sound_b_w },
-		{ buckrog_ppi0c_w, buckrog_ppi1c_w }
-	};
-	ppi8255_init(&buckrog_8255_intf);
-}
 
 static DRIVER_INIT( buckrog_enc )
 {
 	buckrog_decode();
-	DRIVER_INIT_CALL(buckrog);
 }
 
 
@@ -1589,10 +1645,10 @@ static DRIVER_INIT( buckrog_enc )
  *
  *************************************/
 
-GAMEL( 1981, turbo,    0,       turbo,    turbo,    turbo,       ROT270,             "Sega", "Turbo", 0, layout_turbo )
+GAMEL( 1981, turbo,    0,       turbo,    turbo,    0,           ROT270,             "Sega", "Turbo", 0, layout_turbo )
 GAMEL( 1981, turboa,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 1)", 0, layout_turbo )
 GAMEL( 1981, turbob,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,             "Sega", "Turbo (encrypted set 2)", 0, layout_turbo )
-GAMEL( 1982, subroc3d, 0,       subroc3d, subroc3d, subroc3d,    ORIENTATION_FLIP_X, "Sega", "Subroc-3D", 0, layout_subroc3d )
+GAMEL( 1982, subroc3d, 0,       subroc3d, subroc3d, 0,           ORIENTATION_FLIP_X, "Sega", "Subroc-3D", 0, layout_subroc3d )
 GAMEL( 1982, buckrog,  0,       buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", 0, layout_buckrog )
 GAMEL( 1982, zoom909,  buckrog, buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Zoom 909", GAME_IMPERFECT_COLORS, layout_buckrog ) // bad PROM
-GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  buckrog,     ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", 0, layout_buckrog )
+GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", 0, layout_buckrog )

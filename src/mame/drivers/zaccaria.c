@@ -232,13 +232,12 @@ static const pia6821_interface pia_1_intf =
 
 static const ppi8255_interface ppi8255_intf =
 {
-	1, 								/* 1 chip */
-	{input_port_3_r},				/* Port A read */
-	{input_port_4_r},				/* Port B read */
-	{input_port_5_r},				/* Port C read */
-	{0},							/* Port A write */
-	{0},							/* Port B write */
-	{zaccaria_dsw_sel_w}, 			/* Port C write */
+	input_port_3_r,					/* Port A read */
+	input_port_4_r,					/* Port B read */
+	input_port_5_r,					/* Port C read */
+	NULL,							/* Port A write */
+	NULL,							/* Port B write */
+	zaccaria_dsw_sel_w, 			/* Port C write */
 };
 
 
@@ -250,7 +249,6 @@ static MACHINE_START( zaccaria )
 
 static MACHINE_RESET( zaccaria )
 {
-	ppi8255_init(&ppi8255_intf);
 	pia_reset();
 }
 
@@ -345,7 +343,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6c00, 0x6c07) AM_READ(zaccaria_prot2_r)
 	AM_RANGE(0x6e00, 0x6e00) AM_READWRITE(zaccaria_dsw_r, sound_command_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
@@ -651,6 +649,9 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	MDRV_MACHINE_START(zaccaria)
 	MDRV_MACHINE_RESET(zaccaria)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

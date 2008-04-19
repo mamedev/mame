@@ -109,26 +109,25 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dealer_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_READ(ppi8255_0_r)
+	AM_RANGE(0x10, 0x13) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
 	AM_RANGE(0x38, 0x38) AM_READ(input_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dealer_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_WRITE(ppi8255_0_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
 //  AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static const ppi8255_interface ppi8255_intf =
 {
-	1, 					/* 1 chip */
-	{ input_port_2_r },	/* Port A read */
-	{ NULL },			/* Port B read */
-	{ NULL },			/* Port C read */
-	{ NULL },			/* Port A write */
-	{ NULL },			/* Port B write */
-	{ NULL },			/* Port C write */
+	input_port_2_r,	/* Port A read */
+	NULL,			/* Port B read */
+	NULL,			/* Port C read */
+	NULL,			/* Port A write */
+	NULL,			/* Port B write */
+	NULL,			/* Port C write */
 };
 
 /*************************************
@@ -376,6 +375,9 @@ static MACHINE_DRIVER_START( dealer )
 	MDRV_CPU_IO_MAP(dealer_readport,dealer_writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
+
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(epos)
 
@@ -558,8 +560,6 @@ ROM_END
 static MACHINE_RESET( dealer )
 {
 	memory_set_bankptr(1, memory_region(REGION_CPU1));
-
-	ppi8255_init(&ppi8255_intf);
 }
 
 static DRIVER_INIT( dealer )

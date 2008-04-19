@@ -65,15 +65,24 @@ static UINT8 color_latch;
 static WRITE8_HANDLER( astinvad_sound1_w );
 static WRITE8_HANDLER( astinvad_sound2_w );
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2,
-	{ input_port_0_r, NULL },
-	{ input_port_1_r, input_port_3_r },
-	{ input_port_2_r, NULL },
-	{ NULL, astinvad_sound1_w },
-	{ NULL, astinvad_sound2_w },
-	{ NULL, NULL },
+	{
+		input_port_0_r,
+		input_port_1_r,
+		input_port_2_r,
+		NULL,
+		NULL,
+		NULL
+	},
+	{
+		NULL,
+		input_port_3_r,
+		NULL,
+		astinvad_sound1_w,
+		astinvad_sound2_w,
+		NULL
+	}
 };
 
 
@@ -195,7 +204,6 @@ static TIMER_CALLBACK( kamizake_int_gen )
 
 static MACHINE_START( kamikaze )
 {
-	ppi8255_init(&ppi8255_intf);
 	int_timer = timer_alloc(kamizake_int_gen, NULL);
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 128, 0), 128);
 }
@@ -221,9 +229,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_0_r(machine, offset);
+		result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset);
 	if (!(offset & 8))
-		result &= ppi8255_1_r(machine, offset);
+		result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset);
 	return result;
 }
 
@@ -232,9 +240,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_0_w(machine, offset, data);
+		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset, data);
 	if (!(offset & 8))
-		ppi8255_1_w(machine, offset, data);
+		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset, data);
 }
 
 
@@ -504,6 +512,12 @@ static MACHINE_DRIVER_START( kamikaze )
 	MDRV_CPU_IO_MAP(kamikaze_portmap,0)
 
 	MDRV_MACHINE_START(kamikaze)
+
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(astinvad)

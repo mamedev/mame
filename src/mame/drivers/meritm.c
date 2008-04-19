@@ -696,7 +696,7 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(v9938_1_status_r, v9938_1_command_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x40, 0x43) AM_READWRITE(z80pio_0_r, z80pio_0_w)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(z80pio_1_r, z80pio_1_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
@@ -722,7 +722,7 @@ static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x21, 0x21) AM_READWRITE(v9938_1_status_r, v9938_1_command_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(v9938_1_palette_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(v9938_1_register_w)
-	AM_RANGE(0x30, 0x33) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x40, 0x43) AM_READWRITE(z80pio_0_r, z80pio_0_w)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(z80pio_1_r, z80pio_1_w)
 	AM_RANGE(0x60, 0x67) AM_READWRITE(pc16552d_0_r,pc16552d_0_w)
@@ -831,24 +831,22 @@ static WRITE8_HANDLER(meritm_crt250_port_b_w)
 
 static const ppi8255_interface crt260_ppi8255_intf =
 {
-	1,
-	{ 0 }, /* Port A read */
-	{ 0 }, /* Port B read */
-	{ meritm_8255_port_c_r }, /* Port C read */
-	{ 0 }, /* Port A write (used) */
-	{ 0 }, /* Port B write (used LMP x DRIVE) */
-	{ 0 }  /* Port C write */
+	NULL,						/* Port A read */
+	NULL,						/* Port B read */
+	meritm_8255_port_c_r,		/* Port C read */
+	NULL,						/* Port A write (used) */
+	NULL,						/* Port B write (used LMP x DRIVE) */
+	NULL						/* Port C write */
 };
 
 static const ppi8255_interface crt250_ppi8255_intf =
 {
-	1,
-	{ 0 }, /* Port A read */
-	{ 0 }, /* Port B read */
-	{ meritm_8255_port_c_r }, /* Port C read */
-	{ 0 }, /* Port A write (used) */
-	{ meritm_crt250_port_b_w }, /* Port B write (used LMP x DRIVE) */
-	{ 0 }  /* Port C write */
+	NULL,						/* Port A read */
+	NULL,						/* Port B read */
+	meritm_8255_port_c_r,		/* Port C read */
+	NULL,						/* Port A write (used) */
+	meritm_crt250_port_b_w,		/* Port B write (used LMP x DRIVE) */
+	NULL						/* Port C write */
 };
 
 /*************************************
@@ -984,7 +982,6 @@ static MACHINE_START(merit_common)
 
 static MACHINE_START(meritm_crt250)
 {
-	ppi8255_init(&crt250_ppi8255_intf);
 	memory_configure_bank(1, 0, 8, memory_region(REGION_CPU1), 0x10000);
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks();
@@ -1001,7 +998,6 @@ static MACHINE_START(meritm_crt250_questions)
 
 static MACHINE_START(meritm_crt260)
 {
-	ppi8255_init(&crt260_ppi8255_intf);
 	meritm_ram = auto_malloc( 0x8000 );
 	memset( meritm_ram, 0x8000, 0x00 );
 	memory_configure_bank(1, 0, 128, memory_region(REGION_CPU1), 0x8000);
@@ -1047,6 +1043,9 @@ static MACHINE_DRIVER_START(meritm_crt250)
 
 	MDRV_MACHINE_START(meritm_crt250)
 
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( crt250_ppi8255_intf )
+
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -1084,6 +1083,9 @@ static MACHINE_DRIVER_START(meritm_crt260)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(meritm_map,0)
 	MDRV_CPU_IO_MAP(meritm_io_map,0)
+
+	MDRV_DEVICE_MODIFY( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( crt260_ppi8255_intf )
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_MSEC(1200))	// DS1232, TD connected to VCC
 	MDRV_MACHINE_START(meritm_crt260)

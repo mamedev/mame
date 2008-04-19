@@ -233,8 +233,8 @@ static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0x5000, 0x5003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
 	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_3_1_w)
@@ -259,8 +259,8 @@ static ADDRESS_MAP_START( gselect_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
 	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
 	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_2_2_w)
-	AM_RANGE(0x4800, 0x4803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0x5000, 0x5003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(SMH_RAM) AM_BASE(&drawctrl)
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(getrivia_bitmap_w) AM_BASE(&videoram)
 ADDRESS_MAP_END
@@ -270,8 +270,8 @@ static ADDRESS_MAP_START( amuse_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0x5000, 0x5003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
 	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_3_1_w)
@@ -286,8 +286,8 @@ static ADDRESS_MAP_START( gepoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x4800, 0x4803) AM_READWRITE(ppi8255_0_r, ppi8255_0_w)
-	AM_RANGE(0x5000, 0x5003) AM_READWRITE(ppi8255_1_r, ppi8255_1_w)
+	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
 	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_2_2_w)
 	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_2_1_w)
@@ -418,38 +418,53 @@ INPUT_PORTS_END
 
 
 
-static const ppi8255_interface getrivia_ppi8255_intf =
+static const ppi8255_interface getrivia_ppi8255_intf[2] =
 {
-	2, 						/* 2 chips */
-	{ input_port_0_r, input_port_2_r },  /* Port A read */
-	{ port1_r,        NULL },            /* Port B read */
-	{ NULL,           NULL },            /* Port C read */
-	{ NULL,           NULL },            /* Port A write */
-	{ NULL,           lamps_w },         /* Port B write */
-	{ sound_w,        lamps2_w },        /* Port C write */
+	{
+		input_port_0_r,			/* Port A read */
+		port1_r,				/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		sound_w					/* Port C write */
+	},
+	{
+		input_port_2_r,			/* Port A read */
+		NULL,					/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		lamps_w,				/* Port B write */
+		lamps2_w				/* Port C write */
+	}
 };
 
-static const ppi8255_interface gselect_ppi8255_intf =
+static const ppi8255_interface gselect_ppi8255_intf[2] =
 {
-	2, 						/* 2 chips */
-	{ input_port_0_r, input_port_2_r },  /* Port A read */
-	{ input_port_1_r, NULL },            /* Port B read */
-	{ NULL,           input_port_3_r },  /* Port C read */
-	{ NULL,           NULL },            /* Port A write */
-	{ NULL,           lamps_w },         /* Port B write */
-	{ sound2_w,       nmi_w },           /* Port C write */
+	{
+		input_port_0_r,			/* Port A read */
+		input_port_1_r,			/* Port B read */
+		NULL,					/* Port C read */
+		NULL,					/* Port A write */
+		NULL,					/* Port B write */
+		sound2_w				/* Port C write */
+	},
+	{
+		input_port_2_r,			/* Port A read */
+		NULL,					/* Port B read */
+		input_port_3_r,			/* Port C read */
+		NULL,					/* Port A write */
+		lamps_w,				/* Port B write */
+		nmi_w					/* Port C write */
+	}
 };
 
 static MACHINE_RESET( getrivia )
 {
-	ppi8255_init(&getrivia_ppi8255_intf);
-
 	ticket_dispenser_init(100, 1, 1);
 }
 
 static MACHINE_RESET( gselect )
 {
-	ppi8255_init(&gselect_ppi8255_intf);
 }
 
 static MACHINE_DRIVER_START( getrivia )
@@ -473,6 +488,12 @@ static MACHINE_DRIVER_START( getrivia )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( getrivia_ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( getrivia_ppi8255_intf[1] )
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -489,6 +510,12 @@ static MACHINE_DRIVER_START( gselect )
 	MDRV_CPU_PROGRAM_MAP(gselect_map,0)
 
 	MDRV_MACHINE_RESET(gselect)
+
+	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( gselect_ppi8255_intf[0] )
+
+	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( gselect_ppi8255_intf[1] )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( amuse )

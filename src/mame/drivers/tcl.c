@@ -86,21 +86,25 @@ static GFXDECODE_START( tcl )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, charlayout2,     0, 16 ) /* wrong */
 GFXDECODE_END
 
-static const ppi8255_interface ppi8255_intf =
+static const ppi8255_interface ppi8255_intf[2] =
 {
-	2,
-	{ NULL, NULL },
-	{ NULL, NULL },
-	{ NULL, NULL },
-	{ NULL, NULL },
-	{ NULL, NULL },
-	{ NULL, NULL },
+	{
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+	{
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	}
 };
-
-static MACHINE_RESET( tcl )
-{
-	ppi8255_init(&ppi8255_intf);
-}
 
 
 static MACHINE_DRIVER_START( tcl )
@@ -123,7 +127,11 @@ static MACHINE_DRIVER_START( tcl )
 	MDRV_VIDEO_START(tcl)
 	MDRV_VIDEO_UPDATE(tcl)
 
-	MDRV_MACHINE_RESET(tcl)
+	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
+
+	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
