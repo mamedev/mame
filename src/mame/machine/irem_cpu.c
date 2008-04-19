@@ -108,27 +108,27 @@ const UINT8 bomberman_decryption_table[256] = {
 
 
 const UINT8 lethalth_decryption_table[256] = {
-   0x7d,0x26,0x5d,xxxx,0xba,xxxx,0x1e,0x5e, 0xb8,xxxx,0xbc,0xe8,0x01,xxxx,0x4a,0x25, /* 00 */
-// ???? !!!! !!!!      !!!!      !!!! !!!!  !!!!      !!!! !!!! !!!!           !!!!
+   0x7f,0x26,0x5d,xxxx,0xba,xxxx,0x1e,0x5e, 0xb8,xxxx,0xbc,0xe8,0x01,xxxx,0x4a,0x25, /* 00 */
+// ssss !!!! !!!!      !!!!      !!!! !!!!  !!!!      !!!! !!!! !!!!           !!!!
    xxxx,0xbd,xxxx,0x22,0x10,xxxx,0x02,0x57, 0x70,xxxx,0x7e,xxxx,0xe7,0x52,xxxx,0xa9, /* 10 */
 //                !!!!           !!!! !!!!            ????      !!!! !!!!      gggg
    xxxx,xxxx,0xc6,0x06,0xa0,0xfe,0xcf,0x8e, 0x43,0x8f,0x2d,xxxx,0xd4,0x85,0x75,0xa2, /* 20 */
 //           !!!! !!!!      !!!! !!!! !!!!  !!!!                          !!!! !!!!
-   0x3d,xxxx,xxxx,0x38,0x78,0x89,0xd1,0x80, 0x3b,0x72,0x07,xxxx,0x42,0x37,0x0a,0x18, /* 30 */
-// gggg           !!!! ???? !!!! !!!! !!!!  !!!! !!!! !!!!                !!!!
+   0x3d,xxxx,xxxx,0x38,0x7c,0x89,0xd1,0x80, 0x3b,0x72,0x07,xxxx,0x42,0x37,0x0a,0x18, /* 30 */
+// gggg           !!!! ???? !!!! !!!! !!!!  !!!! !!!! !!!!           ssss !!!!
    0x88,0xb4,0x98,0x8b,0xb9,0x9c,0xad,0x0e, 0x2b,xxxx,0xbf,xxxx,0x55,xxxx,0x56,0xb0, /* 40 */
-// !!!!           !!!! !!!! !!!! !!!!       gggg      !!!!      !!!!      !!!! !!!!
+// !!!!      pppp !!!! !!!! !!!! !!!!       gggg      !!!!      !!!!      !!!! !!!!
    0x93,0x91,xxxx,0xeb,xxxx,0x50,0x41,0x29, 0x47,xxxx,xxxx,0x60,xxxx,0xab,xxxx,xxxx, /* 50 */
-//      !!!! !!!!      !!!!      !!!! !!!!                      !!!!      !!!!
+// pppp !!!! !!!!      !!!!      !!!! !!!!                      !!!!      !!!!
    0xc3,0xe2,0xd0,0xb2,0x11,0x79,xxxx,0x08, xxxx,0xfb,xxxx,0x2c,0x23,xxxx,0x28,0x0d, /* 60 */
 // !!!! !!!! !!!! !!!!      ????                 !!!!           !!!!
-   xxxx,xxxx,xxxx,0x83,0x3c,xxxx,0x1b,0x34, 0x5b,xxxx,0x40,xxxx,xxxx,0x04,0xfc,0x30, /* 70 */
-//                !!!! !!!!                 !!!!                     !!!! !!!! ????
+   xxxx,xxxx,xxxx,0x83,0x3c,xxxx,0x1b,0x34, 0x5b,xxxx,0x40,xxxx,xxxx,0x04,0xfc,0xcd, /* 70 */
+//                !!!! !!!!                 !!!!                     !!!! !!!! ssss
    0xb1,0xf3,0x8a,xxxx,xxxx,0x87,xxxx,xxxx, xxxx,xxxx,xxxx,xxxx,0xbe,0x84,0x1f,0xe6, /* 80 */
 //      !!!! !!!!                                               !!!!      !!!! !!!!
    0xff,xxxx,0x12,xxxx,0xb5,0x36,xxxx,0xb3, xxxx,xxxx,xxxx,0xd2,0x4e,xxxx,xxxx,xxxx, /* 90 */
 // !!!!                     !!!!      !!!!
-   0xa5,xxxx,xxxx,0xc7,xxxx,0x27,0x0b,xxxx, 0x20,xxxx,xxxx,xxxx,xxxx,xxxx,0x61,0x7f, /* A0 */
+   0xa5,xxxx,xxxx,0xc7,xxxx,0x27,0x0b,xxxx, 0x20,xxxx,xxxx,xxxx,xxxx,xxxx,0x61,0x7d, /* A0 */
 // !!!!           !!!!           !!!!                                     !!!! ????
    xxxx,xxxx,0x86,0x0f,xxxx,0xb7,xxxx,0x4f, xxxx,xxxx,0xc0,0xfd,xxxx,0x39,xxxx,0x77, /* B0 */
 //           !!!! !!!!                                !!!!           !!!!      !!!!
@@ -147,25 +147,33 @@ missing opcode:
 "!!!!" -> checked against gussun
 "gggg" -> very probably
 "pppp" -> probably
+"ssss" -> sure
 "????" -> missing
 
-00 -> (79,7d,"7f") ->
+
 1a -> (78,7c,7e) ->
 34 -> (78,7c,7e) -> 78
 
 65 -> (79,
-af -> (79,7d,7f) (strange 71) ->
+af -> (79,7d) (strange 71) ->
 d9 -> (11e07 from 11de6) (70,78    -> to handle a01ce=000-7d0 -> 0x78
 ed -> (p76,78,7c,7e) ->
 fb ->
 
 probably:
-7f -> 30 (little machine in the game)
+42 -> 0x98 (083a3)
+50 -> 0x93 (083a7)
 c5 -> (18d56 - from 1844f) (71,73,76,79,7a,7d,7e) -> to handle level number (a008d=00-0f) -> 0x76
 
 very probably:
 48 -> 0x2b
 e5 -> 0x73
+
+sure:
+00 -> 0x7f
+3d -> 0x37
+7f -> 0xcd (little machine in the game - 16058)
+
 */
 // 0x2c (0xd4) complete guess
 // 0x2d (0x85) complete guess
