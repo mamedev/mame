@@ -2405,15 +2405,15 @@ static int mips_execute( int cycles )
 					switch( load_type )
 					{
 					case 0:
-						data = ( data & 0x00ffffff ) | ( mipscpu.readword_masked( address, 0xff000000 ) << 24 );
+						data = ( data & 0x00ffffff ) | ( mipscpu.readword_masked( address, 0x000000ff ) << 24 );
 						break;
 
 					case 1:
-						data = ( data & 0x0000ffff ) | ( mipscpu.readword_masked( address, 0xffff0000 ) << 16 );
+						data = ( data & 0x0000ffff ) | ( mipscpu.readword_masked( address, 0x0000ffff ) << 16 );
 						break;
 
 					case 2:
-						data = ( data & 0x000000ff ) | ( mipscpu.readword_masked( address, 0xffffff00 ) << 8 );
+						data = ( data & 0x000000ff ) | ( mipscpu.readword_masked( address, 0x00ffffff ) << 8 );
 						break;
 
 					case 3:
@@ -2548,11 +2548,11 @@ static int mips_execute( int cycles )
 						break;
 
 					case 2:
-						data = ( data & 0xffff0000 ) | ( mipscpu.readword_masked( address, 0x0000ffff ) >> 16 );
+						data = ( data & 0xffff0000 ) | ( mipscpu.readword_masked( address, 0xffff0000 ) >> 16 );
 						break;
 
 					case 3:
-						data = ( data & 0xffffff00 ) | ( mipscpu.readword_masked( address, 0x000000ff ) >> 24 );
+						data = ( data & 0xffffff00 ) | ( mipscpu.readword_masked( address, 0xff000000 ) >> 24 );
 						break;
 					}
 
@@ -2580,7 +2580,7 @@ static int mips_execute( int cycles )
 				else
 				{
 					int shift = 8 * ( address & 3 );
-					mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << shift, ~( 0xff << shift ) );
+					mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << shift, 0xff << shift );
 
 					if( breakpoint )
 					{
@@ -2610,7 +2610,7 @@ static int mips_execute( int cycles )
 				else
 				{
 					int shift = 8 * ( address & 2 );
-					mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << shift, ~( 0xffff << shift ) );
+					mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << shift, 0xffff << shift );
 
 					if( breakpoint )
 					{
@@ -2646,15 +2646,15 @@ static int mips_execute( int cycles )
 					switch( save_type )
 					{
 					case 0:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 24, 0xffffff00 );
+						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 24, 0x000000ff );
 						break;
 
 					case 1:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 16, 0xffff0000 );
+						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 16, 0x0000ffff );
 						break;
 
 					case 2:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 8, 0xff000000 );
+						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 8, 0x00ffffff );
 						break;
 
 					case 3:
@@ -2725,15 +2725,15 @@ static int mips_execute( int cycles )
 						break;
 
 					case 1:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 8, 0x000000ff );
+						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 8, 0xffffff00 );
 						break;
 
 					case 2:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 16, 0x0000ffff );
+						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 16, 0xffff0000 );
 						break;
 
 					case 3:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 24, 0x00ffffff );
+						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 24, 0xff000000 );
 						break;
 					}
 

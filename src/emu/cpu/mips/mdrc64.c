@@ -1538,12 +1538,12 @@ static void append_direct_ram_write(drc_core *drc, int size, UINT8 flags, void *
 		else
 		{
 			emit_mov_r32_r32(DRCTOP, REG_P4, REG_P3);										// mov   p4,p3
+			emit_not_r32(DRCTOP, REG_P3);													// not   p3
+			emit_and_r32_r32(DRCTOP, REG_P4, REG_P2);										// and   p4,p2
 			if (raxrel)
 				emit_and_r32_m32(DRCTOP, REG_P3, MBISD(REG_RAX, REG_P1, 1, 0));				// and   p3,[p1 + rax]
 			else
 				emit_and_r32_m32(DRCTOP, REG_P3, MDRCISD(adjbase, REG_P1, 1, 0));			// and   p3,[p1 + adjbase]
-			emit_not_r32(DRCTOP, REG_P4);													// not   p4
-			emit_and_r32_r32(DRCTOP, REG_P4, REG_P2);										// and   p4,p2
 			emit_or_r32_r32(DRCTOP, REG_P4, REG_P3);										// or    p4,p3
 			if (raxrel)
 				emit_mov_m32_r32(DRCTOP, MBISD(REG_RAX, REG_P1, 1, 0), REG_P4);				// mov   [p1 + rax],p4
@@ -1574,12 +1574,12 @@ static void append_direct_ram_write(drc_core *drc, int size, UINT8 flags, void *
 			if (mips3.core->bigendian)
 				emit_ror_r64_imm(DRCTOP, REG_P3, 32);										// ror   p3,32
 			emit_mov_r64_r64(DRCTOP, REG_P4, REG_P3);										// mov   p4,p3
+			emit_not_r64(DRCTOP, REG_P3);													// not   p3
+			emit_and_r64_r64(DRCTOP, REG_P4, REG_P2);										// and   p4,p2
 			if (raxrel)
 				emit_and_r64_m64(DRCTOP, REG_P3, MBISD(REG_RAX, REG_P1, 1, 0));				// and   p3,[p1 + rax]
 			else
 				emit_and_r64_m64(DRCTOP, REG_P3, MDRCISD(adjbase, REG_P1, 1, 0));			// and   p3,[p1 + adjbase]
-			emit_not_r64(DRCTOP, REG_P4);													// not   p4
-			emit_and_r64_r64(DRCTOP, REG_P4, REG_P2);										// and   p4,p2
 			emit_or_r64_r64(DRCTOP, REG_P4, REG_P3);										// or    p4,p3
 			if (raxrel)
 				emit_mov_m64_r64(DRCTOP, MBISD(REG_RAX, REG_P1, 1, 0), REG_P4);				// mov   [p1 + rax],p4
@@ -2130,7 +2130,7 @@ static int emit_fixed_word_read(drc_core *drc, compiler_state *compiler, const o
 	if (fastram == NULL)
 	{
 		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~3);										// mov  p1,address & ~3
-		if (mask != 0)
+		if (mask != 0xffffffff)
 		{
 			emit_mov_r32_imm(DRCTOP, REG_P2, (INT32)mask);									// mov  p2,mask
 			emit_call(DRCTOP, mips3.drcdata->general.read_word_masked);						// call read_word_masked
@@ -2187,7 +2187,7 @@ static int emit_fixed_double_read(drc_core *drc, compiler_state *compiler, const
 	if (fastram == NULL)
 	{
 		emit_mov_r32_imm(DRCTOP, REG_P1, address & ~7);										// mov  p1,address & ~7
-		if (mask != 0)
+		if (mask != U64(0xffffffffffffffff))
 		{
 			emit_mov_r64_imm(DRCTOP, REG_P2, mask);											// mov  p2,mask
 			emit_call(DRCTOP, mips3.drcdata->general.read_double_masked);					// call read_double_masked
@@ -2351,7 +2351,7 @@ static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const 
 			emit_mov_r64_imm(DRCTOP, REG_P2, CONSTVAL(srcreg));								// mov  p2,constval
 		else if (X86REG(srcreg) != REG_P2)
 			emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));								// mov  p2,srcreg
-		if (mask == 0)
+		if (mask == 0xffffffff)
 			emit_call(DRCTOP, mips3.drcdata->general.write_word);							// call write_word
 		else
 		{
@@ -2370,7 +2370,7 @@ static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const 
 		int raxrel = ((INT32)fastdisp != fastdisp);
 
 		/* non-masked case */
-		if (mask == 0)
+		if (mask == 0xffffffff)
 		{
 			/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
 			if (raxrel)
@@ -2404,8 +2404,8 @@ static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const 
 			if (ISCONST(srcreg))
 			{
 				emit_mov_r32_m32(DRCTOP, REG_P2, MBD(REG_RAX, 0));							// mov  p2,[rax]
-				emit_and_r32_imm(DRCTOP, REG_P2, mask);										// and  p2,mask
-				emit_or_r32_imm(DRCTOP, REG_P2, CONSTVAL(srcreg) & ~mask);					// or   p2,constval & ~mask
+				emit_and_r32_imm(DRCTOP, REG_P2, ~mask);									// and  p2,~mask
+				emit_or_r32_imm(DRCTOP, REG_P2, CONSTVAL(srcreg) & mask);					// or   p2,constval & mask
 				emit_mov_m32_r32(DRCTOP, MBD(REG_RAX, 0), REG_P2);							// mov  [rax],p2
 			}
 			else
@@ -2413,8 +2413,8 @@ static int emit_fixed_word_write(drc_core *drc, compiler_state *compiler, const 
 				emit_mov_r32_m32(DRCTOP, REG_P3, MBD(REG_RAX, 0));							// mov  p3,[rax]
 				if (X86REG(srcreg) != REG_P2)
 					emit_mov_r32_r32(DRCTOP, REG_P2, X86REG(srcreg));						// mov  p2,srcreg
-				emit_and_r32_imm(DRCTOP, REG_P3, mask);										// and  p3,mask
-				emit_and_r32_imm(DRCTOP, REG_P2, ~mask);									// and  p2,~mask
+				emit_and_r32_imm(DRCTOP, REG_P3, ~mask);									// and  p3,~mask
+				emit_and_r32_imm(DRCTOP, REG_P2, mask);										// and  p2,mask
 				emit_or_r32_r32(DRCTOP, REG_P3, REG_P2);									// or   p3,p2
 				emit_mov_m32_r32(DRCTOP, MBD(REG_RAX, 0), REG_P3);							// mov  [rax],p3
 			}
@@ -2444,7 +2444,7 @@ static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, cons
 			emit_mov_r64_imm(DRCTOP, REG_P2, CONSTVAL(srcreg));								// mov  p2,constval
 		else if (X86REG(srcreg) != REG_P2)
 			emit_mov_r64_r64(DRCTOP, REG_P2, X86REG(srcreg));								// mov  p2,srcreg
-		if (mask == 0)
+		if (mask == U64(0xffffffffffffffff))
 			emit_call(DRCTOP, mips3.drcdata->general.write_double);							// call write_double
 		else
 		{
@@ -2478,7 +2478,7 @@ static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, cons
 		}
 
 		/* non-masked case */
-		if (mask == 0)
+		if (mask == U64(0xffffffffffffffff))
 		{
 			/* if we can't fit the delta to fastram within an INT32, load RAX with the full address here */
 			if (raxrel)
@@ -2507,13 +2507,13 @@ static int emit_fixed_double_write(drc_core *drc, compiler_state *compiler, cons
 				emit_mov_r64_imm(DRCTOP, REG_RAX, (UINT64)fastram);							// mov  rax,fastram
 			else
 				emit_lea_r64_m64(DRCTOP, REG_RAX, MDRC(fastram));							// lea  rax,[fastram]
-			emit_mov_r64_imm(DRCTOP, REG_P4, mask);											// mov  p4,mask
+			emit_mov_r64_imm(DRCTOP, REG_P4, ~mask);										// mov  p4,~mask
 
 			/* always write rax-relative */
 			if (ISCONST(srcreg))
 			{
 				emit_and_r64_m64(DRCTOP, REG_P4, MBD(REG_RAX, 0));							// and  p4,[rax]
-				emit_mov_r64_imm(DRCTOP, REG_P3, constval & ~mask);							// mov  p3,constval & ~mask
+				emit_mov_r64_imm(DRCTOP, REG_P3, constval & mask);							// mov  p3,constval & mask
 				emit_or_r64_r64(DRCTOP, REG_P4, REG_P3);									// or   p4,p3
 				emit_mov_m64_r64(DRCTOP, MBD(REG_RAX, 0), REG_P4);							// mov  [rax],p4
 			}
@@ -5013,9 +5013,9 @@ static int compile_load(drc_core *drc, compiler_state *compiler, const opcode_de
 		else if (size == 2)
 			was_fixed = emit_fixed_half_read(drc, compiler, desc, destreg, is_unsigned, CONSTVAL(rs) + SIMMVAL);
 		else if (size == 4)
-			was_fixed = emit_fixed_word_read(drc, compiler, desc, destreg, is_unsigned, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_word_read(drc, compiler, desc, destreg, is_unsigned, CONSTVAL(rs) + SIMMVAL, 0xffffffff);
 		else
-			was_fixed = emit_fixed_double_read(drc, compiler, desc, destreg, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_double_read(drc, compiler, desc, destreg, CONSTVAL(rs) + SIMMVAL, U64(0xffffffffffffffff));
 	}
 
 	/* otherwise, we just need to call the appropriate subroutine */
@@ -5078,9 +5078,9 @@ static int compile_load_cop(drc_core *drc, compiler_state *compiler, const opcod
 	{
 		/* perform a fixed read if we can */
 		if (size == 4)
-			was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, CONSTVAL(rs) + SIMMVAL, 0xffffffff);
 		else
-			was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, CONSTVAL(rs) + SIMMVAL, U64(0xffffffffffffffff));
 	}
 
 	/* otherwise, we just need to call the appropriate subroutine */
@@ -5133,9 +5133,9 @@ static int compile_loadx_cop(drc_core *drc, compiler_state *compiler, const opco
 	{
 		/* perform a fixed read if we can */
 		if (size == 4)
-			was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, CONSTVAL(rs) + CONSTVAL(rt), 0);
+			was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, CONSTVAL(rs) + CONSTVAL(rt), 0xffffffff);
 		else
-			was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, CONSTVAL(rs) + CONSTVAL(rt), 0);
+			was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, CONSTVAL(rs) + CONSTVAL(rt), U64(0xffffffffffffffff));
 	}
 
 	/* otherwise, we just need to call the appropriate subroutine */
@@ -5198,7 +5198,7 @@ static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, co
 			shift ^= 0x18;
 
 		/* read the double value into rax, handling exceptions */
-		was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, addr, is_right ? (~((UINT32)-1 << shift)) : (~((UINT32)-1 >> shift)));
+		was_fixed = emit_fixed_word_read(drc, compiler, desc, REG_RAX, FALSE, addr, is_right ? ((UINT32)-1 << shift) : ((UINT32)-1 >> shift));
 
 		/* handle writing back the register */
 		if (RTREG != 0)
@@ -5236,7 +5236,6 @@ static int compile_load_word_partial(drc_core *drc, compiler_state *compiler, co
 		else
 			emit_shl_r32_cl(DRCTOP, REG_P2);												// shl  p2,cl
 		emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);						// mov  [sp+savecl],cl
-		emit_not_r32(DRCTOP, REG_P2);														// not  p2
 		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);											// mov  p1,eax
 		emit_call(DRCTOP, mips3.drcdata->general.read_word_masked);							// call general.read_word_masked
 		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
@@ -5300,7 +5299,7 @@ static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, 
 			shift ^= 0x38;
 
 		/* read the double value into rax, handling exceptions */
-		was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, addr, is_right ? (~((UINT64)-1 << shift)) : (~((UINT64)-1 >> shift)));
+		was_fixed = emit_fixed_double_read(drc, compiler, desc, REG_RAX, addr, is_right ? ((UINT64)-1 << shift) : ((UINT64)-1 >> shift));
 
 		/* handle writing back the register */
 		if (RTREG != 0)
@@ -5343,7 +5342,6 @@ static int compile_load_double_partial(drc_core *drc, compiler_state *compiler, 
 		else
 			emit_shl_r64_cl(DRCTOP, REG_P2);												// shl  p2,cl
 		emit_mov_m8_r8(DRCTOP, MBD(REG_RSP, SPOFFS_SAVECL), REG_CL);						// mov  [sp+savecl],cl
-		emit_not_r64(DRCTOP, REG_P2);														// not  p2
 		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);											// mov  p1,eax
 		emit_call(DRCTOP, mips3.drcdata->general.read_double_masked);						// call general.read_double_masked
 		oob_request_callback(drc, COND_NO_JUMP, oob_exception_cleanup, compiler, desc, mips3.drcdata->generate_tlbload_exception);
@@ -5406,9 +5404,9 @@ static int compile_store(drc_core *drc, compiler_state *compiler, const opcode_d
 		else if (size == 2)
 			was_fixed = emit_fixed_half_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL);
 		else if (size == 4)
-			was_fixed = emit_fixed_word_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_word_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL, 0xffffffff);
 		else
-			was_fixed = emit_fixed_double_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_double_write(drc, compiler, desc, rt, CONSTVAL(rs) + SIMMVAL, U64(0xffffffffffffffff));
 	}
 
 	/* otherwise, we just need to call the appropriate subroutine */
@@ -5467,9 +5465,9 @@ static int compile_store_cop(drc_core *drc, compiler_state *compiler, const opco
 	{
 		/* perform a fixed write if we can */
 		if (size == 4)
-			was_fixed = emit_fixed_word_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_word_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + SIMMVAL, 0xffffffff);
 		else
-			was_fixed = emit_fixed_double_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + SIMMVAL, 0);
+			was_fixed = emit_fixed_double_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + SIMMVAL, U64(0xffffffffffffffff));
 	}
 
 	/* otherwise, we just need to call the appropriate subroutine */
@@ -5522,9 +5520,9 @@ static int compile_storex_cop(drc_core *drc, compiler_state *compiler, const opc
 	{
 		/* perform a fixed write if we can */
 		if (size == 4)
-			was_fixed = emit_fixed_word_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + CONSTVAL(rt), 0);
+			was_fixed = emit_fixed_word_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + CONSTVAL(rt), 0xffffffff);
 		else
-			was_fixed = emit_fixed_double_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + CONSTVAL(rt), 0);
+			was_fixed = emit_fixed_double_write(drc, compiler, desc, REG_P2, CONSTVAL(rs) + CONSTVAL(rt), U64(0xffffffffffffffff));
 	}
 
 	/* otherwise, we just need to call the appropriate subroutine */
@@ -5594,13 +5592,13 @@ static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, c
 		{
 			if (ISCONST(rt))
 				rt = MAKE_CONST((UINT32)CONSTVAL(rt) >> shift);
-			mask = ~((UINT64)-1 >> shift);
+			mask = (UINT32)-1 >> shift;
 		}
 		else
 		{
 			if (ISCONST(rt))
 				rt = MAKE_CONST((UINT32)CONSTVAL(rt) << shift);
-			mask = ~((UINT64)-1 << shift);
+			mask = (UINT32)-1 << shift;
 		}
 
 		/* perform a fixed write */
@@ -5629,7 +5627,6 @@ static int compile_store_word_partial(drc_core *drc, compiler_state *compiler, c
 			emit_shl_r32_cl(DRCTOP, REG_P2);												// shl  p2,cl
 		}
 		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);											// mov  p1,eax
-		emit_not_r32(DRCTOP, REG_P3);														// not  p3
 
 		/* perform the write */
 		emit_call(DRCTOP, mips3.drcdata->general.write_word_masked);						// call general.write_word_masked
@@ -5685,13 +5682,13 @@ static int compile_store_double_partial(drc_core *drc, compiler_state *compiler,
 		{
 			if (ISCONST(rt))
 				rt = MAKE_CONST((UINT64)CONSTVAL(rt) >> shift);
-			mask = ~((UINT64)-1 >> shift);
+			mask = (UINT64)-1 >> shift;
 		}
 		else
 		{
 			if (ISCONST(rt))
 				rt = MAKE_CONST((UINT64)CONSTVAL(rt) << shift);
-			mask = ~((UINT64)-1 << shift);
+			mask = (UINT64)-1 << shift;
 		}
 
 		/* perform a fixed write */
@@ -5720,7 +5717,6 @@ static int compile_store_double_partial(drc_core *drc, compiler_state *compiler,
 			emit_shl_r64_cl(DRCTOP, REG_P2);										// shl  p2,cl
 		}
 		emit_mov_r32_r32(DRCTOP, REG_P1, REG_EAX);									// mov  p1,eax
-		emit_not_r64(DRCTOP, REG_P3);												// not  p3
 
 		/* perform the write */
 		emit_call(DRCTOP, mips3.drcdata->general.write_double_masked);				// call general.write_double_masked

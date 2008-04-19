@@ -1963,7 +1963,7 @@ static void lwl_be(UINT32 op)
 	UINT32 mask = 0xffffffffUL << shift;
 	UINT32 temp;
 
-	if (RWORD_MASKED(offs & ~3, &temp, ~(mask >> shift)) && RTREG)
+	if (RWORD_MASKED(offs & ~3, &temp, mask >> shift) && RTREG)
 		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp << shift));
 }
 
@@ -1974,7 +1974,7 @@ static void lwr_be(UINT32 op)
 	UINT32 mask = 0xffffffffUL >> shift;
 	UINT32 temp;
 
-	if (RWORD_MASKED(offs & ~3, &temp, ~(mask << shift)) && RTREG)
+	if (RWORD_MASKED(offs & ~3, &temp, mask << shift) && RTREG)
 		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp >> shift));
 }
 
@@ -1985,7 +1985,7 @@ static void ldl_be(UINT32 op)
 	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	UINT64 temp;
 
-	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask >> shift)) && RTREG)
+	if (RDOUBLE_MASKED(offs & ~7, &temp, mask >> shift) && RTREG)
 		RTVAL64 = (RTVAL64 & ~mask) | (temp << shift);
 }
 
@@ -1996,7 +1996,7 @@ static void ldr_be(UINT32 op)
 	UINT64 mask = U64(0xffffffffffffffff) >> shift;
 	UINT64 temp;
 
-	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask << shift)) && RTREG)
+	if (RDOUBLE_MASKED(offs & ~7, &temp, mask << shift) && RTREG)
 		RTVAL64 = (RTVAL64 & ~mask) | (temp >> shift);
 }
 
@@ -2004,7 +2004,7 @@ static void swl_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 3);
-	UINT32 mask = ~(0xffffffffUL >> shift);
+	UINT32 mask = 0xffffffffUL >> shift;
 	WWORD_MASKED(offs & ~3, RTVAL32 >> shift, mask);
 }
 
@@ -2012,7 +2012,7 @@ static void swr_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 3);
-	UINT32 mask = ~(0xffffffffUL << shift);
+	UINT32 mask = 0xffffffffUL << shift;
 	WWORD_MASKED(offs & ~3, RTVAL32 << shift, mask);
 }
 
@@ -2020,7 +2020,7 @@ static void sdl_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	UINT64 mask = ~(U64(0xffffffffffffffff) >> shift);
+	UINT64 mask = U64(0xffffffffffffffff) >> shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
@@ -2028,7 +2028,7 @@ static void sdr_be(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	UINT64 mask = ~(U64(0xffffffffffffffff) << shift);
+	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
 
@@ -2041,7 +2041,7 @@ static void lwl_le(UINT32 op)
 	UINT32 mask = 0xffffffffUL << shift;
 	UINT32 temp;
 
-	if (RWORD_MASKED(offs & ~3, &temp, ~(mask >> shift)) && RTREG)
+	if (RWORD_MASKED(offs & ~3, &temp, mask >> shift) && RTREG)
 		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp << shift));
 }
 
@@ -2052,7 +2052,7 @@ static void lwr_le(UINT32 op)
 	UINT32 mask = 0xffffffffUL >> shift;
 	UINT32 temp;
 
-	if (RWORD_MASKED(offs & ~3, &temp, ~(mask << shift)) && RTREG)
+	if (RWORD_MASKED(offs & ~3, &temp, mask << shift) && RTREG)
 		RTVAL64 = (INT32)((RTVAL32 & ~mask) | (temp >> shift));
 }
 
@@ -2063,7 +2063,7 @@ static void ldl_le(UINT32 op)
 	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	UINT64 temp;
 
-	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask >> shift)) && RTREG)
+	if (RDOUBLE_MASKED(offs & ~7, &temp, mask >> shift) && RTREG)
 		RTVAL64 = (RTVAL64 & ~mask) | (temp << shift);
 }
 
@@ -2074,7 +2074,7 @@ static void ldr_le(UINT32 op)
 	UINT64 mask = U64(0xffffffffffffffff) >> shift;
 	UINT64 temp;
 
-	if (RDOUBLE_MASKED(offs & ~7, &temp, ~(mask << shift)) && RTREG)
+	if (RDOUBLE_MASKED(offs & ~7, &temp, mask << shift) && RTREG)
 		RTVAL64 = (RTVAL64 & ~mask) | (temp >> shift);
 }
 
@@ -2082,7 +2082,7 @@ static void swl_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 3);
-	UINT32 mask = ~(0xffffffffUL >> shift);
+	UINT32 mask = 0xffffffffUL >> shift;
 	WWORD_MASKED(offs & ~3, RTVAL32 >> shift, mask);
 }
 
@@ -2090,7 +2090,7 @@ static void swr_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 3);
-	UINT32 mask = ~(0xffffffffUL << shift);
+	UINT32 mask = 0xffffffffUL << shift;
 	WWORD_MASKED(offs & ~3, RTVAL32 << shift, mask);
 }
 
@@ -2098,7 +2098,7 @@ static void sdl_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	UINT64 mask = ~(U64(0xffffffffffffffff) >> shift);
+	UINT64 mask = U64(0xffffffffffffffff) >> shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
@@ -2106,7 +2106,7 @@ static void sdr_le(UINT32 op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	UINT64 mask = ~(U64(0xffffffffffffffff) << shift);
+	UINT64 mask = U64(0xffffffffffffffff) << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
 

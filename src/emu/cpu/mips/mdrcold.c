@@ -725,9 +725,9 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags)
 					{
 						emit_mov_r32_m32(DRCTOP, REG_ECX, MBD(REG_ESP, 12));				// mov   ecx,[esp+12]
 						emit_mov_r32_r32(DRCTOP, REG_EAX, REG_ECX);							// mov   eax,ecx
-						emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase));			// and   ecx,[ebx+fastbase]
-						emit_not_r32(DRCTOP, REG_EAX);										// not   eax
+						emit_not_r32(DRCTOP, REG_ECX);										// not   ecx
 						emit_and_r32_m32(DRCTOP, REG_EAX, MBD(REG_ESP, 8));					// and   eax,[esp+8]
+						emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase));			// and   ecx,[ebx+fastbase]
 						emit_or_r32_r32(DRCTOP, REG_EAX, REG_ECX);							// or    eax,ecx
 						emit_mov_m32_r32(DRCTOP, MBD(REG_EBX, fastbase), REG_EAX);			// mov   [ebx+fastbase],eax
 					}
@@ -757,16 +757,16 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags)
 						{
 							emit_mov_r32_m32(DRCTOP, REG_ECX, MBD(REG_ESP, 16));			// mov   ecx,[esp+16]
 							emit_mov_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// mov   eax,ecx
-							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase+4));	// and   ecx,[ebx+fastbase+4]
-							emit_not_r32(DRCTOP, REG_EAX);									// not   eax
+							emit_not_r32(DRCTOP, REG_ECX);									// not   ecx
 							emit_and_r32_m32(DRCTOP, REG_EAX, MBD(REG_ESP, 8));				// and   eax,[esp+8]
+							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase+4));	// and   ecx,[ebx+fastbase+4]
 							emit_or_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// or    eax,ecx
 							emit_mov_m32_r32(DRCTOP, MBD(REG_EBX, fastbase+4), REG_EAX);	// mov   [ebx+fastbase+4],eax
 							emit_mov_r32_m32(DRCTOP, REG_ECX, MBD(REG_ESP, 20));			// mov   ecx,[esp+20]
 							emit_mov_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// mov   eax,ecx
-							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase));		// and   ecx,[ebx+fastbase]
-							emit_not_r32(DRCTOP, REG_EAX);									// not   eax
+							emit_not_r32(DRCTOP, REG_ECX);									// not   ecx
 							emit_and_r32_m32(DRCTOP, REG_EAX, MBD(REG_ESP, 12));			// and   eax,[esp+12]
+							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase));		// and   ecx,[ebx+fastbase]
 							emit_or_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// or    eax,ecx
 							emit_mov_m32_r32(DRCTOP, MBD(REG_EBX, fastbase), REG_EAX);		// mov   [ebx+fastbase],eax
 						}
@@ -774,16 +774,16 @@ static void append_readwrite_and_translate(drc_core *drc, int size, UINT8 flags)
 						{
 							emit_mov_r32_m32(DRCTOP, REG_ECX, MBD(REG_ESP, 16));			// mov   ecx,[esp+16]
 							emit_mov_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// mov   eax,ecx
-							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase));		// and   ecx,[ebx+fastbase]
-							emit_not_r32(DRCTOP, REG_EAX);									// not   eax
+							emit_not_r32(DRCTOP, REG_ECX);									// not   ecx
 							emit_and_r32_m32(DRCTOP, REG_EAX, MBD(REG_ESP, 8));				// and   eax,[esp+8]
+							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase));		// and   ecx,[ebx+fastbase]
 							emit_or_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// or    eax,ecx
 							emit_mov_m32_r32(DRCTOP, MBD(REG_EBX, fastbase), REG_EAX);		// mov   [ebx+fastbase],eax
 							emit_mov_r32_m32(DRCTOP, REG_ECX, MBD(REG_ESP, 20));			// mov   ecx,[esp+20]
 							emit_mov_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// mov   eax,ecx
-							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase+4));	// and   ecx,[ebx+fastbase+4]
-							emit_not_r32(DRCTOP, REG_EAX);									// not   eax
+							emit_not_r32(DRCTOP, REG_ECX);									// not   ecx
 							emit_and_r32_m32(DRCTOP, REG_EAX, MBD(REG_ESP, 12));			// and   eax,[esp+12]
+							emit_and_r32_m32(DRCTOP, REG_ECX, MBD(REG_EBX, fastbase+4));	// and   ecx,[ebx+fastbase+4]
 							emit_or_r32_r32(DRCTOP, REG_EAX, REG_ECX);						// or    eax,ecx
 							emit_mov_m32_r32(DRCTOP, MBD(REG_EBX, fastbase+4), REG_EAX);	// mov   [ebx+fastbase+4],eax
 						}
@@ -1474,8 +1474,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			emit_shr_r32_cl(DRCTOP, REG_EBP);												// shr  ebp,cl
 			emit_shrd_r32_r32_cl(DRCTOP, REG_EBX, REG_EBP);									// shrd ebx,ebp,cl
 			emit_shr_r32_cl(DRCTOP, REG_EBP);												// shr  ebp,cl
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
-			emit_not_r32(DRCTOP, REG_EBP);													// not  ebp
 			emit_push_r32(DRCTOP, REG_ECX);													// push ecx
 			emit_push_r32(DRCTOP, REG_EBP);													// push ebp
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
@@ -1521,8 +1519,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			emit_shl_r32_cl(DRCTOP, REG_EBX);												// shl  ebx,cl
 			emit_shld_r32_r32_cl(DRCTOP, REG_EBP, REG_EBX);									// shld ebp,ebx,cl
 			emit_shl_r32_cl(DRCTOP, REG_EBX);												// shl  ebx,cl
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
-			emit_not_r32(DRCTOP, REG_EBP);													// not  ebp
 			emit_push_r32(DRCTOP, REG_ECX);													// push ecx
 			emit_push_r32(DRCTOP, REG_EBP);													// push ebp
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
@@ -1668,7 +1664,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			if (!mips3.core->bigendian)
 				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
 			emit_shr_r32_cl(DRCTOP, REG_EBX);												// shr  ebx,cl
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
 			emit_push_r32(DRCTOP, REG_ECX);													// push ecx
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
 			emit_push_r32(DRCTOP, REG_EAX);													// push eax
@@ -1776,7 +1771,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			if (mips3.core->bigendian)
 				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
 			emit_shl_r32_cl(DRCTOP, REG_EBX);												// shl  ebx,cl
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
 			emit_push_r32(DRCTOP, REG_ECX);													// push ecx
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
 			emit_push_r32(DRCTOP, REG_EAX);													// push eax
@@ -1882,7 +1876,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			if (!mips3.core->bigendian)
 				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
 			emit_shr_r32_cl(DRCTOP, REG_EBX);												// shr  ebx,cl
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
 			if (RTREG != 0)
 			{
@@ -1937,8 +1930,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			emit_shr_r32_cl(DRCTOP, REG_EBP);												// shr  ebp,cl
 			emit_shrd_r32_r32_cl(DRCTOP, REG_EBX, REG_EBP);									// shrd ebx,ebp,cl
 			emit_shr_r32_cl(DRCTOP, REG_EBP);												// shr  ebp,cl
-			emit_not_r32(DRCTOP, REG_EBP);													// not  ebp
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
 			emit_push_r32(DRCTOP, REG_EBP);													// push ebp
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
 			if (RTREG != 0)
@@ -1979,8 +1970,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			emit_shl_r32_cl(DRCTOP, REG_EBX);												// shl  ebx,cl
 			emit_shld_r32_r32_cl(DRCTOP, REG_EBP, REG_EBX);									// shld ebp,ebx,cl
 			emit_shl_r32_cl(DRCTOP, REG_EBX);												// shl  ebx,cl
-			emit_not_r32(DRCTOP, REG_EBP);													// not  ebp
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
 			emit_push_r32(DRCTOP, REG_EBP);													// push ebp
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
 			if (RTREG != 0)
@@ -2018,7 +2007,6 @@ static UINT32 recompile_instruction(drc_core *drc, UINT32 pc, UINT32 physpc)
 			if (mips3.core->bigendian)
 				emit_xor_r32_imm(DRCTOP, REG_ECX, 0x18);									// xor  ecx,0x18
 			emit_shl_r32_cl(DRCTOP, REG_EBX);												// shl  ebx,cl
-			emit_not_r32(DRCTOP, REG_EBX);													// not  ebx
 			emit_push_r32(DRCTOP, REG_EBX);													// push ebx
 			if (RTREG != 0)
 			{
