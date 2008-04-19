@@ -228,7 +228,7 @@ static int validate_inlines(void)
 	INT64 resulti64, expectedi64;
 	UINT64 resultu64, expectedu64;
 	INT32 remainder, expremainder;
-	UINT32 uremainder, expuremainder;
+	UINT32 uremainder, expuremainder, bigu32 = 0xffffffff;
 	int error = FALSE;
 
 	/* use only non-zero, positive numbers */
@@ -278,7 +278,7 @@ static int validate_inlines(void)
 
 	while ((INT64)testi32a * (INT64)0x7fffffff < testi64a)
 		testi64a /= 2;
-	while ((UINT64)testu32a * (UINT64)0xffffffff < testu64a)
+	while ((UINT64)testu32a * (UINT64)bigu32 < testu64a)
 		testu64a /= 2;
 
 	resulti32 = div_64x32(testi64a, testi32a);
