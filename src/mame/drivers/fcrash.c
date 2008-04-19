@@ -4,14 +4,13 @@
 
 Final Crash is a bootleg of Final Fight
 
-Final Fight is by Capcom and runs on CPS1 hardawre
+Final Fight is by Capcom and runs on CPS1 hardware
 The bootleg was manufactured by Playmark of Italy
 
 this driver depends heavily on cps1.c, but has been
 kept apart in an attempt to keep cps1.c clutter free
 
-todo:
-Add Sound (very different to CPS1)
+Sound is very different from CPS1.
 
 ---
 
@@ -36,19 +35,75 @@ from 2.bin to 9.bin program eproms
 #include "driver.h"
 #include "cpu/m68000/m68kmame.h"
 #include "cps1.h"
+#include "sound/2203intf.h"
+#include "sound/msm5205.h"
+
+
+static int sample_buffer1, sample_buffer2;
+static int sample_select1, sample_select2;
+
+static WRITE16_HANDLER( fcrash_soundlatch_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		soundlatch_w(machine,0,data & 0xff);
+		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	}
+}
+
+static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
+{
+	UINT8 *RAM = memory_region(REGION_CPU2);
+	int bankaddr;
+
+	sndti_set_output_gain(SOUND_MSM5205, 0, 0, (data & 0x08) ? 0.0 : 1.0);
+	sndti_set_output_gain(SOUND_MSM5205, 1, 0, (data & 0x10) ? 0.0 : 1.0);
+
+	bankaddr = ((data & 7) * 0x4000);
+	memory_set_bankptr(1,&RAM[0x10000 + bankaddr]);
+}
+
+static void m5205_int1(int data)
+{
+	MSM5205_data_w(0, sample_buffer1 & 0x0F);
+	sample_buffer1 >>= 4;
+	sample_select1 ^= 1;
+	if (sample_select1 == 0)
+		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+}
+
+static void m5205_int2(int data)
+{
+	MSM5205_data_w(1, sample_buffer2 & 0x0F);
+	sample_buffer2 >>= 4;
+	sample_select2 ^= 1;
+}
+
+
+static WRITE8_HANDLER( fcrash_msm5205_0_data_w )
+{
+    sample_buffer1 = data;
+}
+
+static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
+{
+    sample_buffer2 = data;
+}
+
+
 
 /* not verified */
-#define CPS1_ROWSCROLL_OFFS     0x20    /* base of row scroll offsets in other RAM */
+#define CPS1_ROWSCROLL_OFFS     (0x20/2)    /* base of row scroll offsets in other RAM */
 
 static void fcrash_update_transmasks(void)
 {
 	int i;
 	int priority[4];
 
-	priority[0]=0x66;
-	priority[1]=0x70;
-	priority[2]=0x68;
-	priority[3]=0x72;
+	priority[0]=0x26;
+	priority[1]=0x30;
+	priority[2]=0x28;
+	priority[3]=0x32;
 
 	for (i = 0;i < 4;i++)
 	{
@@ -56,7 +111,7 @@ static void fcrash_update_transmasks(void)
 
 		/* Get transparency registers */
 		if (priority[i])
-			mask = cps1_port(priority[i]) ^ 0xffff;
+			mask = cps1_cps_b_regs[priority[i]/2] ^ 0xffff;
 		else mask = 0xffff;	/* completely transparent if priority masks not defined (mercs, qad) */
 
 		tilemap_set_transmask(cps1_bg_tilemap[0],i,mask,0x8000);
@@ -146,13 +201,13 @@ static void fcrash_build_palette(running_machine *machine)
 
 static VIDEO_UPDATE( fcrash )
 {
-   	int layercontrol,l0,l1,l2,l3;
-	int videocontrol=cps1_port(0x22);
+	int layercontrol,l0,l1,l2,l3;
+	int videocontrol=cps1_cps_a_regs[0x22/2];
 
 
 	flip_screen_set(videocontrol & 0x8000);
 
- 	layercontrol = cps1_output[0x60/2];
+ 	layercontrol = cps1_cps_b_regs[0x20/2];
 
 	/* Get video memory base registers */
 	cps1_get_video_base();
@@ -172,7 +227,7 @@ static VIDEO_UPDATE( fcrash )
 
 		tilemap_set_scroll_rows(cps1_bg_tilemap[1],1024);
 
-		otheroffs = cps1_port(CPS1_ROWSCROLL_OFFS);
+		otheroffs = cps1_cps_a_regs[CPS1_ROWSCROLL_OFFS];
 
 		for (i = 0;i < 256;i++)
 			tilemap_set_scrollx(cps1_bg_tilemap[1],(i - scrly) & 0x3ff,cps1_scroll2x + cps1_other[(i + otheroffs) & 0x3ff]);
@@ -215,23 +270,32 @@ static VIDEO_UPDATE( fcrash )
 }
 
 
-static ADDRESS_MAP_START( fcrash_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)             /* 68000 ROM */
-	AM_RANGE(0x880000, 0x880001) AM_READ(cps1_in1_r)            /* Player input ports */
-	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_input_r)          /* System input ports / Dip Switches */
-	AM_RANGE(0x800100, 0x8001ff) AM_READ(cps1_output_r)         /* Output ports */
-	AM_RANGE(0x900000, 0x92ffff) AM_READ(SMH_RAM)	            /* SF2CE executes code from here */
-	AM_RANGE(0xf1c000, 0xf1c001) AM_READ(cps1_in2_r)
-	AM_RANGE(0xf1c002, 0xf1c003) AM_READ(cps1_in3_r)
-	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)             /* RAM */
+
+static ADDRESS_MAP_START( fcrash_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
+	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
+	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */
+	AM_RANGE(0x880000, 0x880001) AM_READ(cps1_in1_r)          /* Player input ports */
+	AM_RANGE(0x880006, 0x880007) AM_WRITE(fcrash_soundlatch_w) 	/* Sound command */
+	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_dsw_r)          /* System input ports / Dip Switches */
+	AM_RANGE(0x890000, 0x890001) AM_WRITENOP	// palette related?
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fcrash_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)            /* ROM */
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
-	AM_RANGE(0x800100, 0x8001ff) AM_WRITE(cps1_output_w) AM_BASE(&cps1_output) AM_SIZE(&cps1_output_size)  /* Output ports */
-	AM_RANGE(0x900000, 0x92ffff) AM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)
-	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM)            /* RAM */
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
+	AM_RANGE(0xd801, 0xd801) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0xdc00, 0xdc00) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
+	AM_RANGE(0xdc01, 0xdc01) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(fcrash_snd_bankswitch_w)
+	AM_RANGE(0xe400, 0xe400) AM_READ(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcrash_msm5205_0_data_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(fcrash_msm5205_1_data_w)
 ADDRESS_MAP_END
 
 
@@ -340,16 +404,29 @@ static INPUT_PORTS_START( fcrash )
 INPUT_PORTS_END
 
 
+
+static const struct MSM5205interface msm5205_interface1 =
+{
+	m5205_int1,	/* interrupt function */
+	MSM5205_S96_4B		/* 4KHz 4-bit */
+};
+
+static const struct MSM5205interface msm5205_interface2 =
+{
+	m5205_int2,	/* interrupt function */
+	MSM5205_S96_4B		/* 4KHz 4-bit */
+};
+
+
 static MACHINE_DRIVER_START( fcrash )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("main", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(fcrash_readmem,fcrash_writemem)
+	MDRV_CPU_PROGRAM_MAP(fcrash_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps1_interrupt)
 
-//  MDRV_CPU_ADD_TAG("sound", Z80, 4000000) /* ???? */
-//  /* audio CPU */
-//  MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_ADD_TAG("sound", Z80, 24000000/6) /* ? */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -365,6 +442,29 @@ static MACHINE_DRIVER_START( fcrash )
 	MDRV_VIDEO_START(cps1)
 	MDRV_VIDEO_EOF(cps1)
 	MDRV_VIDEO_UPDATE(fcrash)
+
+	// sound hardware
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD(YM2203, 24000000/6)	/* ? */
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+	MDRV_SOUND_ROUTE(1, "mono", 0.10)
+	MDRV_SOUND_ROUTE(2, "mono", 0.10)
+	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+
+	MDRV_SOUND_ADD(YM2203, 24000000/6)	/* ? */
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+	MDRV_SOUND_ROUTE(1, "mono", 0.10)
+	MDRV_SOUND_ROUTE(2, "mono", 0.10)
+	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+
+	MDRV_SOUND_ADD(MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_CONFIG(msm5205_interface1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD(MSM5205, 24000000/64)	/* ? */
+	MDRV_SOUND_CONFIG(msm5205_interface2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 
@@ -405,4 +505,4 @@ ROM_START( fcrash )
 	ROM_RELOAD(          0x10000, 0x20000 )
 ROM_END
 
-GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)",GAME_NO_SOUND )
+GAME( 1990, fcrash,   ffight,  fcrash,     fcrash,   cps1,     ROT0,   "Playmark, bootleg [Capcom]", "Final Crash (World, bootleg)", 0 )
