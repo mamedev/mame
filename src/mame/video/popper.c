@@ -4,6 +4,8 @@ Omori Electric CAD (OEC) 1983
 */
 
 #include "driver.h"
+#include "video/resnet.h"
+
 #include "deprecat.h"
 
 static tilemap *popper_p123_tilemap, *popper_p0_tilemap, *popper_ol_p123_tilemap, *popper_ol_p0_tilemap;
@@ -12,31 +14,48 @@ size_t popper_spriteram_size;
 static INT32 popper_flipscreen, popper_e002, popper_gfx_bank;
 static rectangle tilemap_clip;
 
+
+/***************************************************************************
+ * 
+ * Color guns - from schematics
+ * 
+ ***************************************************************************/
+
+static const res_net_decode_info popper_decode_info =
+{
+	1,		// there may be two proms needed to construct color
+	0,		// start at 0
+	63,	// end at 255
+	//  R,   G,   B, 
+	{   0,   0,   0, },		// offsets
+	{   0,   3,   6, },		// shifts
+	{0x07,0x07,0x03, }	    // masks
+};
+
+static const res_net_info popper_net_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT,
+	{
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
+		{ RES_NET_AMP_NONE, 0, 0, 2, {  470, 220,   0 } } 
+	}
+};
+
+/***************************************************************************
+ * 
+ * PALETTE_INIT
+ * 
+ ***************************************************************************/
+
 PALETTE_INIT( popper )
 {
-	int i;
+	rgb_t	*rgb;
 
-	for (i = 0;i < machine->config->total_colors; i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
-
-		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
-		bit1 = (*color_prom >> 6) & 0x01;
-		bit2 = (*color_prom >> 7) & 0x01;
-		b = 0x97 * bit1 + 0x68 * bit2;
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-		color_prom++;
-	}
+	rgb = compute_res_net_all(color_prom, &popper_decode_info, &popper_net_info);
+	palette_set_colors(machine, 0, rgb, 64);
+	palette_normalize_range(machine->palette, 0, 63, 0, 255);
+	free(rgb);
 }
 
 WRITE8_HANDLER( popper_ol_videoram_w )
