@@ -6,7 +6,7 @@ Megadrive / Genesis Rewrite, Take 65498465432356345250432.3  August 06
 Thanks to:
 Charles Macdonald for much useful information (cgfm2.emuviews.com)
 
-Long Decription names mostly taken from the Good Gen database
+Long Decription names mostly taken from the GoodGen database
 
 ToDo:
 
