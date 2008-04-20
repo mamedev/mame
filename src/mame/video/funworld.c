@@ -46,7 +46,6 @@
     * Joker Card (Ver.A267BC, encrypted),               Vesely Svet,        1993.
     * Mongolfier New (italian),                         bootleg,            199?.
     * Soccer New (italian),                             bootleg,            199?.
-    * Snooker 10 (Ver 1.11),                            Sandii',            1998.
     * Saloon (french, encrypted),                       unknown,            199?.
 
 
@@ -155,11 +154,6 @@ VIDEO_START(funworld)
 VIDEO_START(magiccrd)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
-}
-
-VIDEO_START(snookr10)
-{
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 32);
 }
 
 VIDEO_UPDATE(funworld)

@@ -1603,6 +1603,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/skylncr.o \
 	$(DRIVERS)/sliver.o \
 	$(DRIVERS)/smstrv.o \
+	$(DRIVERS)/snookr10.o $(VIDEO)/snookr10.o \
 	$(DRIVERS)/sprcros2.o $(VIDEO)/sprcros2.o \
 	$(DRIVERS)/ssfindo.o \
 	$(DRIVERS)/ssingles.o \

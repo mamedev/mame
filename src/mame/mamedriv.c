@@ -7868,8 +7868,12 @@ Other Sun games
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
-	DRIVER( snookr10 )	/* (c) 1998 Sandiy */
 	DRIVER( saloon )	/* 199? unknown */
+
+	/* Sandii' */
+	DRIVER( snookr10 )	/* (c) 1998 Sandii' */
+	DRIVER( apple10 )	/* (c) 1998 Sandii' */
+	DRIVER( tenballs )	/* 1997 unknown */
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
