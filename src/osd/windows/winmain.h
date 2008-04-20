@@ -48,6 +48,7 @@
 #define WINOPTION_AUDIO_LATENCY			"audio_latency"
 #define WINOPTION_PRIORITY				"priority"
 #define WINOPTION_MULTITHREADING		"multithreading"
+#define WINOPTION_WATCHDOG				"watchdog"
 #define WINOPTION_OSLOG					"oslog"
 
 

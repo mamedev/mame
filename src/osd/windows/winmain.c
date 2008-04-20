@@ -65,7 +65,6 @@ typedef BOOL (WINAPI *av_revert_mm_thread_characteristics_ptr)(HANDLE AvrtHandle
 int _CRT_glob = 0;
 
 
-
 //============================================================
 //  LOCAL VARIABLES
 //============================================================
@@ -78,6 +77,10 @@ static av_revert_mm_thread_characteristics_ptr av_revert_mm_thread_characteristi
 
 static char mapfile_name[MAX_PATH];
 static LPTOP_LEVEL_EXCEPTION_FILTER pass_thru_filter;
+
+static HANDLE watchdog_exit_event;
+static HANDLE watchdog_thread;
+
 
 #ifndef MESS
 static const TCHAR helpfile[] = TEXT("docs\\windows.txt");
@@ -101,6 +104,7 @@ static void osd_exit(running_machine *machine);
 
 static void soft_link_functions(void);
 static int is_double_click_start(int argc);
+static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info);
 static const char *lookup_symbol(UINT32 address);
 static int get_code_base_size(UINT32 *base, UINT32 *size);
@@ -120,6 +124,7 @@ const options_entry mame_win_options[] =
 	// debugging options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS DEBUGGING OPTIONS" },
 	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ "watchdog;wdog",            "0",        0,                 "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
@@ -239,9 +244,10 @@ int main(int argc, char **argv)
 	// soft-link optional functions
 	soft_link_functions();
 
+	// compute the name of the mapfile
 	strcpy(mapfile_name, argv[0]);
 	ext = strchr(mapfile_name, '.');
-	if (ext)
+	if (ext != NULL)
 		strcpy(ext, ".map");
 	else
 		strcat(mapfile_name, ".map");
@@ -267,6 +273,8 @@ static void output_oslog(running_machine *machine, const char *buffer)
 
 void osd_init(running_machine *machine)
 {
+	int watchdog = options_get_int(mame_options(), WINOPTION_WATCHDOG);
+	
 	// thread priority
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
@@ -295,11 +303,33 @@ void osd_init(running_machine *machine)
 //          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
 
 	start_profiler();
+
+	// if a watchdog thread is requested, create one
+	if (watchdog != 0)
+	{
+		watchdog_exit_event = CreateEvent(NULL, TRUE, FALSE, NULL);
+		assert_always(watchdog_exit_event != NULL, "Failed to create watchdog event");
+		watchdog_thread = CreateThread(NULL, 0, watchdog_thread_entry, (LPVOID)watchdog, 0, NULL);
+		assert_always(watchdog_thread != NULL, "Failed to create watchdog thread");
+	}
 }
 
 
+//============================================================
+//  osd_exit
+//============================================================
+
 static void osd_exit(running_machine *machine)
 {
+	// take down the watchdog thread if it exists
+	if (watchdog_thread != NULL)
+	{
+		SetEvent(watchdog_exit_event);
+		WaitForSingleObject(watchdog_thread, INFINITE);
+		watchdog_exit_event = NULL;
+		watchdog_thread = NULL;
+	}
+
 	stop_profiler();
 
 	// turn off our multimedia tasks
@@ -357,6 +387,22 @@ static int is_double_click_start(int argc)
 
 	// try to determine if MAME was simply double-clicked
 	return (argc <= 1 && startup_info.dwFlags && !(startup_info.dwFlags & STARTF_USESTDHANDLES));
+}
+
+
+//============================================================
+//  watchdog_thread_entry
+//============================================================
+
+static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
+{
+	DWORD timeout = (int)(FPTR)lpParameter * 1000;
+	DWORD wait_result;
+	
+	wait_result = WaitForSingleObject(watchdog_exit_event, timeout);
+	if (wait_result == WAIT_TIMEOUT)
+		TerminateProcess(GetCurrentProcess(), -1);
+	return 0;
 }
 
 
@@ -550,13 +596,14 @@ static const char *lookup_symbol(UINT32 address)
 
 	// parse the file, looking for map entries
 	while (fgets(line, sizeof(line) - 1, map))
-		if (!strncmp(line, "                0x", 18))
+		if (strncmp(line, "                0x", 18) == 0)
 			if (sscanf(line, "                0x%08x %s", &addr, symbol) == 2)
 				if (addr <= address && addr > best_addr)
 				{
 					best_addr = addr;
 					strcpy(best_symbol, symbol);
 				}
+	fclose(map);
 
 	// create the final result
 	if (address - best_addr > 0x10000)
@@ -575,6 +622,7 @@ static int get_code_base_size(UINT32 *base, UINT32 *size)
 {
 	FILE *	map = fopen(mapfile_name, "r");
 	char	line[1024];
+	int result = 0;
 
 	// if no file, return nothing
 	if (map == NULL)
@@ -584,8 +632,12 @@ static int get_code_base_size(UINT32 *base, UINT32 *size)
 	while (fgets(line, sizeof(line) - 1, map))
 		if (!strncmp(line, ".text           0x", 18))
 			if (sscanf(line, ".text           0x%08x 0x%x", base, size) == 2)
-				return 1;
+			{
+				result = 1;
+				break;
+			}
 
+	fclose(map);
 	return 0;
 }
 
@@ -624,6 +676,8 @@ static int map_entries;
 static HANDLE profiler_thread;
 static DWORD profiler_thread_id;
 static volatile UINT8 profiler_thread_exit;
+
+
 
 //============================================================
 //  compare_base
