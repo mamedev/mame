@@ -7462,18 +7462,18 @@ GAME( 1990, cawingu,  cawing,   cps1_10MHz, cawing,   cps1,     ROT0,   "Capcom"
 GAME( 1990, cawingj,  cawing,   cps1_10MHz, cawing,   cps1,     ROT0,   "Capcom", "U.S. Navy (Japan 901012)", 0 )
 GAME( 1990, nemo,     0,        cps1_10MHz, nemo,     cps1,     ROT0,   "Capcom", "Nemo (World 901130)" , 0)						// "ETC"
 GAME( 1990, nemoj,    nemo,     cps1_10MHz, nemo,     cps1,     ROT0,   "Capcom", "Nemo (Japan 901120)", 0 )
-GAME( 1991, sf2,      0,        cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (World 910522)" , 0)	// "ETC"
-GAME( 1991, sf2eb,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (World 910214)" , 0)	// "ETC"
-GAME( 1991, sf2ua,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910206)", 0 )
-GAME( 1991, sf2ub,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910214)", 0 )
-GAME( 1991, sf2ud,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910318)", 0 )
-GAME( 1991, sf2ue,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910228)", 0 )
-GAME( 1991, sf2uf,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910411)", 0 )
-GAME( 1991, sf2ui,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910522)", 0 )
-GAME( 1991, sf2uk,    sf2,      cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 911101)", 0 )
-GAME( 1991, sf2j,     sf2,      cps1_12MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (Japan 911210)", 0 )
-GAME( 1991, sf2ja,    sf2,      cps1_12MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (Japan 910214)", 0 )
-GAME( 1991, sf2jc,    sf2,      cps1_12MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (Japan 910306)", 0 )
+GAME( 1991, sf2,      0,        cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (World 910522)" , 0)	// "ETC"
+GAME( 1991, sf2eb,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (World 910214)" , 0)	// "ETC"
+GAME( 1991, sf2ua,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910206)", 0 )
+GAME( 1991, sf2ub,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910214)", 0 )
+GAME( 1991, sf2ud,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910318)", 0 )
+GAME( 1991, sf2ue,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910228)", 0 )
+GAME( 1991, sf2uf,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910411)", 0 )
+GAME( 1991, sf2ui,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 910522)", 0 )
+GAME( 1991, sf2uk,    sf2,      cps1_10MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (US 911101)", 0 )
+GAME( 1991, sf2j,     sf2,      cps1_10MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (Japan 911210)", 0 )
+GAME( 1991, sf2ja,    sf2,      cps1_10MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (Japan 910214)", 0 )
+GAME( 1991, sf2jc,    sf2,      cps1_10MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II - The World Warrior (Japan 910306)", 0 )
 GAME( 1991, 3wonders, 0,        cps1_10MHz, 3wonders, cps1,     ROT0,   "Capcom", "Three Wonders (World 910520)" , 0)					// "ETC"
 GAME( 1991, 3wonderu, 3wonders, cps1_10MHz, 3wonders, cps1,     ROT0,   "Capcom", "Three Wonders (US 910520)", 0 )
 GAME( 1991, wonder3,  3wonders, cps1_10MHz, 3wonders, cps1,     ROT0,   "Capcom", "Wonder 3 (Japan 910520)", 0 )
