@@ -243,5 +243,5 @@ VIDEO_UPDATE( bionicc )
 
 VIDEO_EOF( bionicc )
 {
-	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
 }

@@ -182,10 +182,10 @@ WRITE8_HANDLER( decocass_nmi_reset_w )
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
 {
 	/* just latch the analog controls here */
-	decocass_quadrature_decoder[0] = input_port_3_r(machine, 0);
-	decocass_quadrature_decoder[1] = input_port_4_r(machine, 0);
-	decocass_quadrature_decoder[2] = input_port_5_r(machine, 0);
-	decocass_quadrature_decoder[3] = input_port_6_r(machine, 0);
+	decocass_quadrature_decoder[0] = input_port_read_indexed(machine,3);
+	decocass_quadrature_decoder[1] = input_port_read_indexed(machine,4);
+	decocass_quadrature_decoder[2] = input_port_read_indexed(machine,5);
+	decocass_quadrature_decoder[3] = input_port_read_indexed(machine,6);
 }
 
 WRITE8_HANDLER( decocass_adc_w )

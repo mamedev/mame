@@ -311,13 +311,13 @@ static WRITE32_DEVICE_HANDLER( kinst_ide_w )
 
 static READ32_DEVICE_HANDLER( kinst_ide_extra_r )
 {
-	return ide_controller32_r(device, 0x3f6/4, 0xff00ffff) >> 16;
+	return ide_controller32_r(device, 0x3f6/4, 0x00ff0000) >> 16;
 }
 
 
 static WRITE32_DEVICE_HANDLER( kinst_ide_extra_w )
 {
-	ide_controller32_w(device, 0x3f6/4, data << 16, 0xff00ffff);
+	ide_controller32_w(device, 0x3f6/4, data << 16, 0x00ff0000);
 }
 
 

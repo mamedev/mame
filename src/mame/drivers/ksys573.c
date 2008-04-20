@@ -527,7 +527,7 @@ static READ32_HANDLER( atapi_r )
 {
 	int reg, data;
 
-	if (mem_mask == 0xffff0000)	// word-wide command read
+	if (mem_mask == 0x0000ffff)	// word-wide command read
 	{
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
@@ -599,7 +599,7 @@ static READ32_HANDLER( atapi_r )
 		int shift;
 		reg = offset<<1;
 		shift = 0;
-		if (mem_mask == 0xff00ffff)
+		if (mem_mask == 0x00ff0000)
 		{
 			reg += 1;
 			shift = 16;
@@ -650,7 +650,7 @@ static WRITE32_HANDLER( atapi_w )
 
 	verboselog( 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	if (mem_mask == 0xffff0000)	// word-wide command write
+	if (mem_mask == 0x0000ffff)	// word-wide command write
 	{
 		verboselog( 2, "atapi_w: data=%04x\n", data );
 
@@ -756,7 +756,7 @@ static WRITE32_HANDLER( atapi_w )
 	else
 	{
 		reg = offset<<1;
-		if (mem_mask == 0xff00ffff)
+		if (mem_mask == 0x00ff0000)
 		{
 			reg += 1;
 			data >>= 16;

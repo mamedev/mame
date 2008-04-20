@@ -440,7 +440,7 @@ VIDEO_EOF( twin16 )
 
 	need_process_spriteram = 1;
 
-	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
 }
 
 VIDEO_UPDATE( twin16 )

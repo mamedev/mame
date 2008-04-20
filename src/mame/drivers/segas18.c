@@ -335,7 +335,7 @@ static READ16_HANDLER( misc_io_r )
 	if (custom_io_r)
 		return custom_io_r(machine, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -368,7 +368,7 @@ static WRITE16_HANDLER( misc_io_w )
 		custom_io_w(machine, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -427,7 +427,7 @@ static READ16_HANDLER( ddcrew_custom_io_r )
 		case 0x3024/2:
 			return input_port_read(machine, "P34START");
 	}
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -451,7 +451,7 @@ static READ16_HANDLER( lghost_custom_io_r )
 			lghost_value <<= 1;
 			return result;
 	}
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -511,7 +511,7 @@ static READ16_HANDLER( wwally_custom_io_r )
 		case 0x3014/2:
 			return (input_port_read(machine, "TRACKY3") - wwally_last_y[2]) & 0xff;
 	}
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 

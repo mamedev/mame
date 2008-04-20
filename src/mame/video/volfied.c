@@ -34,7 +34,7 @@ READ16_HANDLER( volfied_video_ram_r )
 
 WRITE16_HANDLER( volfied_video_ram_w )
 {
-	mem_mask |= ~video_mask;
+	mem_mask &= video_mask;
 
 	COMBINE_DATA(&video_ram[offset]);
 }

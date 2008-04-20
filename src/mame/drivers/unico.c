@@ -219,10 +219,10 @@ static READ32_HANDLER( zeropnt2_dsw1_r )			{ return (input_port_read(machine, "D
 static READ32_HANDLER( zeropnt2_dsw2_r )			{ return (input_port_read(machine, "DSW2") << 16) | 0xffff; }
 static READ32_HANDLER( zeropnt2_buttons_r )			{ return ((input_port_read(machine, "IN7") | ((EEPROM_read_bit() & 0x01) << 7)) << 16) | 0xffff; }
 
-static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(machine,0,0)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(machine,0,0)+0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(machine,0,0)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(machine,0,0)+0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(machine,0,0xffff)-0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(machine,0,0xffff)+0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(machine,0,0xffff)-0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(machine,0,0xffff)+0x0800) << 16; }
 
 static READ32_HANDLER ( zeropnt2_oki0_r )			{ return OKIM6295_status_0_r(machine,0) << 16; }
 static READ32_HANDLER ( zeropnt2_oki1_r )			{ return OKIM6295_status_1_r(machine,0) << 16; }

@@ -2612,7 +2612,7 @@ WRITE16_HANDLER( TC0100SCN_ctrl_word_2_w )
 
 READ32_HANDLER( TC0100SCN_ctrl_long_r )
 {
-	return (TC0100SCN_ctrl_word_0_r(machine,offset*2,0)<<16)|TC0100SCN_ctrl_word_0_r(machine,offset*2+1,0);
+	return (TC0100SCN_ctrl_word_0_r(machine,offset*2,0xffff)<<16)|TC0100SCN_ctrl_word_0_r(machine,offset*2+1,0xffff);
 }
 
 WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
@@ -2623,30 +2623,30 @@ WRITE32_HANDLER( TC0100SCN_ctrl_long_w )
 
 READ32_HANDLER( TC0100SCN_long_r )
 {
-	return (TC0100SCN_word_0_r(machine,offset*2,0)<<16)|TC0100SCN_word_0_r(machine,offset*2+1,0);
+	return (TC0100SCN_word_0_r(machine,offset*2,0xffff)<<16)|TC0100SCN_word_0_r(machine,offset*2+1,0xffff);
 }
 
 WRITE32_HANDLER( TC0100SCN_long_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		int oldword = TC0100SCN_word_0_r(machine,offset*2,0);
+		int oldword = TC0100SCN_word_0_r(machine,offset*2,0xffff);
 		int newword = data>>16;
 		if (!ACCESSING_BITS_16_23)
 			newword |= (oldword &0x00ff);
 		if (!ACCESSING_BITS_24_31)
 			newword |= (oldword &0xff00);
-		TC0100SCN_word_0_w(machine,offset*2,newword,0);
+		TC0100SCN_word_0_w(machine,offset*2,newword,0xffff);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		int oldword = TC0100SCN_word_0_r(machine,(offset*2)+1,0);
+		int oldword = TC0100SCN_word_0_r(machine,(offset*2)+1,0xffff);
 		int newword = data&0xffff;
 		if (!ACCESSING_BITS_0_7)
 			newword |= (oldword &0x00ff);
 		if (!ACCESSING_BITS_8_15)
 			newword |= (oldword &0xff00);
-		TC0100SCN_word_0_w(machine,(offset*2)+1,newword,0);
+		TC0100SCN_word_0_w(machine,(offset*2)+1,newword,0xffff);
 	}
 }
 
@@ -3281,7 +3281,7 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 
 READ32_HANDLER( TC0480SCP_ctrl_long_r )
 {
-	return (TC0480SCP_ctrl_word_r(machine,offset*2,0)<<16)|TC0480SCP_ctrl_word_r(machine,offset*2+1,0);
+	return (TC0480SCP_ctrl_word_r(machine,offset*2,0xffff)<<16)|TC0480SCP_ctrl_word_r(machine,offset*2+1,0xffff);
 }
 
 /* TODO: byte access ? */
@@ -3294,30 +3294,30 @@ WRITE32_HANDLER( TC0480SCP_ctrl_long_w )
 
 READ32_HANDLER( TC0480SCP_long_r )
 {
-	return (TC0480SCP_word_r(machine,offset*2,0)<<16)|TC0480SCP_word_r(machine,offset*2+1,0);
+	return (TC0480SCP_word_r(machine,offset*2,0xffff)<<16)|TC0480SCP_word_r(machine,offset*2+1,0xffff);
 }
 
 WRITE32_HANDLER( TC0480SCP_long_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		int oldword = TC0480SCP_word_r(machine,offset*2,0);
+		int oldword = TC0480SCP_word_r(machine,offset*2,0xffff);
 		int newword = data>>16;
 		if (!ACCESSING_BITS_16_23)
 			newword |= (oldword &0x00ff);
 		if (!ACCESSING_BITS_24_31)
 			newword |= (oldword &0xff00);
-		TC0480SCP_word_w(machine,offset*2,newword,0);
+		TC0480SCP_word_w(machine,offset*2,newword,0xffff);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		int oldword = TC0480SCP_word_r(machine,(offset*2)+1,0);
+		int oldword = TC0480SCP_word_r(machine,(offset*2)+1,0xffff);
 		int newword = data&0xffff;
 		if (!ACCESSING_BITS_0_7)
 			newword |= (oldword &0x00ff);
 		if (!ACCESSING_BITS_8_15)
 			newword |= (oldword &0xff00);
-		TC0480SCP_word_w(machine,(offset*2)+1,newword,0);
+		TC0480SCP_word_w(machine,(offset*2)+1,newword,0xffff);
 	}
 }
 

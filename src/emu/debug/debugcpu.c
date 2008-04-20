@@ -1320,7 +1320,7 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 	within_debugger_code = TRUE;
 
 	/* adjust address, size & value_to_write based on mem_mask. */
-	if( mem_mask != 0 )
+	if (mem_mask != 0)
 	{
 		const debug_cpu_info *info = &debug_cpuinfo[cpunum];
 		int address_offset = 0;
@@ -1340,13 +1340,9 @@ static void check_watchpoints(int cpunum, int spacenum, int type, offs_t address
 		}
 
 		if (info->endianness == CPU_IS_LE)
-		{
 			address += address_offset;
-		}
 		else
-		{
 			address += bus_size - size - address_offset;
-		}
 	}
 
 	/* if we are a write watchpoint, stash the value that will be written */

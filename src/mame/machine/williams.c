@@ -863,7 +863,7 @@ WRITE8_HANDLER( blaster_bank_select_w )
 static READ8_HANDLER( lottofun_input_port_0_r )
 {
 	/* merge in the ticket dispenser status */
-	return input_port_0_r(machine,offset) | ticket_dispenser_r(machine,offset);
+	return input_port_read_indexed(machine,0) | ticket_dispenser_r(machine,offset);
 }
 
 

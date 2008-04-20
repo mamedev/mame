@@ -99,7 +99,7 @@ VIDEO_START( blstroid )
 static TIMER_CALLBACK( irq_off )
 {
 	/* clear the interrupt */
-	atarigen_scanline_int_ack_w(machine, 0, 0, 0);
+	atarigen_scanline_int_ack_w(machine, 0, 0, 0xffff);
 }
 
 

@@ -1159,7 +1159,7 @@ static READ32_HANDLER( atapi_command_r )
 {
 	UINT16 r;
 //  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
-	if (mem_mask == 0x0000ffff)
+	if (ACCESSING_BITS_16_31)
 	{
 		r = atapi_command_reg_r(offset*2);
 		return ATAPI_ENDIAN(r) << 16;
@@ -1175,7 +1175,7 @@ static WRITE32_HANDLER( atapi_command_w )
 {
 //  printf("atapi_command_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 
-	if (mem_mask == 0x0000ffff)
+	if (ACCESSING_BITS_16_31)
 	{
 		atapi_command_reg_w(offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
 	}
@@ -1191,7 +1191,7 @@ static READ32_HANDLER( atapi_control_r )
 	UINT16 r;
 //  printf("atapi_control_r: %08X, %08X\n", offset, mem_mask);
 
-	if (mem_mask == 0x0000ffff)
+	if (ACCESSING_BITS_16_31)
 	{
 		r = atapi_control_reg_r(offset*2);
 		return ATAPI_ENDIAN(r) << 16;
@@ -1205,7 +1205,7 @@ static READ32_HANDLER( atapi_control_r )
 
 static WRITE32_HANDLER( atapi_control_w )
 {
-	if (mem_mask == 0x0000ffff)
+	if (ACCESSING_BITS_16_31)
 	{
 		atapi_control_reg_w(offset*2, ATAPI_ENDIAN(data >> 16) & 0xff);
 	}

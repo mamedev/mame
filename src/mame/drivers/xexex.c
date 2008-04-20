@@ -207,7 +207,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
-	res = EEPROM_read_bit() | input_port_1_r(machine, 0);
+	res = EEPROM_read_bit() | input_port_read_indexed(machine,1);
 
 	if (init_eeprom_count)
 	{

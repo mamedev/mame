@@ -360,7 +360,7 @@ static READ16_HANDLER( misc_io_r )
 	if (custom_io_r)
 		return custom_io_r(machine, offset, mem_mask);
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -371,7 +371,7 @@ static WRITE16_HANDLER( misc_io_w )
 		custom_io_w(machine, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -397,7 +397,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -434,7 +434,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			segaic16_sprites_draw_0_w(machine, offset, data, mem_mask);
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -456,7 +456,7 @@ static READ16_HANDLER( shangon_custom_io_r )
 		}
 	}
 	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -489,7 +489,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* ADC trigger */
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 

@@ -1323,7 +1323,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	model3_irq_state &= ~0x40;
 
 	// serial configuration writes
-	if ((mem_mask == U64(0x00ffffffffffffff)) && (offset == 0))
+	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
 		SCSP_MidiIn(machine, 0, (data>>56)&0xff, 0);
 

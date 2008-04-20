@@ -637,11 +637,11 @@ static WRITE32_HANDLER( timekeeper_w )
 	{
 		COMBINE_DATA(&timekeeper_nvram[offset]);
 		if (offset*4 >= 0x7ff0)
-			if (LOG_TIMEKEEPER) logerror("timekeeper_w(%04X & %08X) = %08X\n", offset*4, ~mem_mask, data);
+			if (LOG_TIMEKEEPER) logerror("timekeeper_w(%04X & %08X) = %08X\n", offset*4, mem_mask, data);
 		cmos_unlocked = 0;
 	}
 	else
-		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%08X:timekeeper_w(%04X,%08X & %08X) without CMOS unlocked\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 
@@ -1111,34 +1111,34 @@ static WRITE32_HANDLER( nile_w )
 	{
 		case NREG_CPUSTAT+0:	/* CPU status */
 		case NREG_CPUSTAT+1:	/* CPU status */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: CPU status(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
 		case NREG_INTCTRL+0:	/* Interrupt control */
 		case NREG_INTCTRL+1:	/* Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs();
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs();
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			update_nile_irqs();
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
 		case NREG_INTCLR+1:		/* Interrupt clear */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			nile_irq_state &= ~(nile_regs[offset] & ~0xf00);
 			update_nile_irqs();
@@ -1146,7 +1146,7 @@ static WRITE32_HANDLER( nile_w )
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
 		case NREG_INTPPES+1:	/* PCI Interrupt control */
-			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: PCI interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			break;
 
@@ -1171,7 +1171,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_T2CTRL+1:		/* general purpose timer control (control bits) */
 		case NREG_T3CTRL+1:		/* watchdog timer control (control bits) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", activecpu_get_pc(), which, offset*4, data, ~mem_mask);
+			if (LOG_NILE) logerror("%08X:NILE WRITE: timer %d control(%03X) = %08X & %08X\n", activecpu_get_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			/* timer just enabled? */
@@ -1200,7 +1200,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_T2CNTR:		/* general purpose timer control (counter) */
 		case NREG_T3CNTR:		/* watchdog timer control (counter) */
 			which = (offset - NREG_T0CTRL) / 4;
-			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", activecpu_get_pc(), which, offset*4, data, ~mem_mask);
+			if (LOG_TIMERS) logerror("%08X:NILE WRITE: timer %d counter(%03X) = %08X & %08X\n", activecpu_get_pc(), which, offset*4, data, mem_mask);
 			logit = 0;
 
 			if (nile_regs[offset - 1] & 1)
@@ -1255,7 +1255,7 @@ static WRITE32_HANDLER( nile_w )
 	}
 
 	if (LOG_NILE && logit)
-		logerror("%06X:nile write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+		logerror("%06X:nile write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 }
 
 

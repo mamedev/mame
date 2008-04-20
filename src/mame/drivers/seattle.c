@@ -1018,7 +1018,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_0_w(machine, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0);
+				voodoo_0_w(machine, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1169,7 +1169,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which = offset % 4;
 
 			if (LOG_DMA)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 
 			/* keep the read only activity bit */
 			galileo.reg[offset] &= ~0x4000;
@@ -1240,7 +1240,7 @@ static WRITE32_HANDLER( galileo_w )
 
 		case GREG_INT_STATE:
 			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, ~mem_mask);
+				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			galileo.reg[offset] = oldata & data;
 			update_galileo_irqs();
 			break;
@@ -1278,11 +1278,11 @@ static WRITE32_HANDLER( galileo_w )
 		case GREG_CONFIG_ADDRESS:
 		case GREG_INT_MASK:
 			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			break;
 
 		default:
-			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -1467,18 +1467,18 @@ static WRITE32_HANDLER( carnevil_gun_w )
 static READ32_HANDLER( ethernet_r )
 {
 	if (!(offset & 8))
-		return smc91c94_r(machine, offset & 7, mem_mask | 0x0000);
+		return smc91c94_r(machine, offset & 7, mem_mask & 0xffff);
 	else
-		return smc91c94_r(machine, offset & 7, mem_mask | 0xff00);
+		return smc91c94_r(machine, offset & 7, mem_mask & 0x00ff);
 }
 
 
 static WRITE32_HANDLER( ethernet_w )
 {
 	if (!(offset & 8))
-		smc91c94_w(machine, offset & 7, data & 0xffff, mem_mask | 0x0000);
+		smc91c94_w(machine, offset & 7, data & 0xffff, mem_mask | 0xffff);
 	else
-		smc91c94_w(machine, offset & 7, data & 0x00ff, mem_mask | 0xff00);
+		smc91c94_w(machine, offset & 7, data & 0x00ff, mem_mask | 0x00ff);
 }
 
 
@@ -1535,7 +1535,7 @@ static READ32_HANDLER( widget_r )
 	}
 
 	if (LOG_WIDGET)
-		logerror("Widget read (%02X) = %08X & %08X\n", offset*4, result, ~mem_mask);
+		logerror("Widget read (%02X) = %08X & %08X\n", offset*4, result, mem_mask);
 	return result;
 }
 
@@ -1543,7 +1543,7 @@ static READ32_HANDLER( widget_r )
 static WRITE32_HANDLER( widget_w )
 {
 	if (LOG_WIDGET)
-		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, ~mem_mask);
+		logerror("Widget write (%02X) = %08X & %08X\n", offset*4, data, mem_mask);
 
 	switch (offset)
 	{

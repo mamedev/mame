@@ -571,14 +571,14 @@ static READ32_HANDLER( hng64_random_read )
 
 static READ32_HANDLER( hng64_com_r )
 {
-	logerror("com read  (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, ~mem_mask, hng64_com_ram[offset]);
+	logerror("com read  (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
 	return hng64_com_ram[offset] ;
 }
 
 
 static WRITE32_HANDLER( hng64_com_w )
 {
-	logerror("com write (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, ~mem_mask, data);
+	logerror("com write (PC=%08x): %08x %08x = %08x\n", activecpu_get_pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&hng64_com_ram[offset]);
 }
 
@@ -588,7 +588,7 @@ static UINT32 hng64_com_shared_b;
 
 static WRITE32_HANDLER( hng64_com_share_w )
 {
-	logerror("commw  (PC=%08x): %08x %08x %08x\n", activecpu_get_pc(), data, (offset*4)+0xc0001000, ~mem_mask);
+	logerror("commw  (PC=%08x): %08x %08x %08x\n", activecpu_get_pc(), data, (offset*4)+0xc0001000, mem_mask);
 
 	if (offset==0x0) COMBINE_DATA(&hng64_com_shared_a);
 	if (offset==0x1) COMBINE_DATA(&hng64_com_shared_b);
@@ -596,7 +596,7 @@ static WRITE32_HANDLER( hng64_com_share_w )
 
 static READ32_HANDLER( hng64_com_share_r )
 {
-	logerror("commr  (PC=%08x): %08x %08x\n", activecpu_get_pc(), (offset*4)+0xc0001000, ~mem_mask);
+	logerror("commr  (PC=%08x): %08x %08x\n", activecpu_get_pc(), (offset*4)+0xc0001000, mem_mask);
 
 //  if(offset==0x0) return hng64_com_shared_a;
 //  if(offset==0x1) return hng64_com_shared_b;
@@ -709,7 +709,7 @@ static READ32_HANDLER( hng64_sram_r )
 
 static WRITE32_HANDLER( hng64_sram_w )
 {
-	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, ~mem_mask, activecpu_get_pc());
+	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, mem_mask, activecpu_get_pc());
 	COMBINE_DATA (&hng64_sram[offset]);
 }
 

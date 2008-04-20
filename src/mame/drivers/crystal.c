@@ -168,7 +168,7 @@ static READ32_HANDLER(FlipCount_r)
 
 static WRITE32_HANDLER(FlipCount_w)
 {
-	if((~mem_mask)&0x00ff0000)
+	if(mem_mask&0x00ff0000)
 	{
 		int fc=(data>>16)&0xff;
 		if(fc==1)
@@ -200,14 +200,14 @@ static READ32_HANDLER(Input_r)
 static WRITE32_HANDLER(IntAck_w)
 {
 	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
-	if((~mem_mask)&0xff)
+	if(mem_mask&0xff)
 	{
 		IntPend&=~(1<<(data&0x1f));
 		program_write_dword_32le(0x01800c0c,IntPend);
 		if(!IntPend)
 			cpunum_set_input_line(machine, 0,SE3208_INT,CLEAR_LINE);
 	}
-	if((~mem_mask)&0xff00)
+	if(mem_mask&0xff00)
 		IntHigh=(data>>8)&7;
 }
 

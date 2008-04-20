@@ -142,7 +142,7 @@ READ32_HANDLER( cps3_sound_r )
 
 	if (offset < 0x80)
 	{
-		return chip.voice[offset / 8].regs[offset & 7] & ~mem_mask;
+		return chip.voice[offset / 8].regs[offset & 7] & mem_mask;
 	}
 	else if (offset == 0x80)
 	{

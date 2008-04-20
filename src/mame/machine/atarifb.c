@@ -152,7 +152,7 @@ READ8_HANDLER( atarifb_in0_r )
 			  (sign_x_2 >> 6) |
 			  (sign_y_1 >> 5) |
 			  (sign_x_1 >> 4) |
-			  input_port_0_r(machine, offset);
+			  input_port_read_indexed(machine,0);
 		return val;
 	}
 	else
@@ -184,7 +184,7 @@ READ8_HANDLER( atarifb_in2_r )
 {
 	if ((CTRLD & 0x20)==0x00)
 	{
-		return input_port_1_r(machine, offset);
+		return input_port_read_indexed(machine,1);
 	}
 	else
 	{
@@ -282,7 +282,7 @@ READ8_HANDLER( atarifb4_in2_r )
 {
 	if ((CTRLD & 0x40)==0x00)
 	{
-		return input_port_2_r(machine, offset);
+		return input_port_read_indexed(machine,2);
 	}
 	else if ((CTRLD & 0x60) == 0x60)
 	/* LD1 and LD2 both high, return Team 2 right player (player 3) */

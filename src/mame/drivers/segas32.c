@@ -854,7 +854,7 @@ static READ16_HANDLER( analog_custom_io_r )
 			analog_value[offset & 3] <<= 1;
 			return result;
 	}
-	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
+	logerror("%06X:unknown analog_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -871,7 +871,7 @@ static WRITE16_HANDLER( analog_custom_io_w )
 			analog_value[offset & 3] = input_port_read_safe(machine, names[offset & 3], 0);
 			return;
 	}
-	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	logerror("%06X:unknown analog_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -887,7 +887,7 @@ static READ16_HANDLER( extra_custom_io_r )
 			return input_port_read_safe(machine, names[offset & 3], 0xffff);
 	}
 
-	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
+	logerror("%06X:unknown extra_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -908,7 +908,7 @@ static WRITE16_HANDLER( orunners_custom_io_w )
 			analog_bank = data & 1;
 			return;
 	}
-	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	logerror("%06X:unknown orunners_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -927,7 +927,7 @@ static READ16_HANDLER( sonic_custom_io_r )
 			return (UINT8)(input_port_read(machine, names[offset/2]) - sonic_last[offset/2]);
 	}
 
-	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask ^ 0xffff);
+	logerror("%06X:unknown sonic_custom_io_r(%X) & %04X\n", activecpu_get_pc(), offset*2, mem_mask);
 	return 0xffff;
 }
 
@@ -946,7 +946,7 @@ static WRITE16_HANDLER( sonic_custom_io_w )
 			return;
 	}
 
-	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	logerror("%06X:unknown sonic_custom_io_w(%X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -959,7 +959,7 @@ static WRITE16_HANDLER( sonic_custom_io_w )
 
 static WRITE16_HANDLER( random_number_16_w )
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask  ^ 0xffff);
+//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 static READ16_HANDLER( random_number_16_r )
@@ -969,7 +969,7 @@ static READ16_HANDLER( random_number_16_r )
 
 static WRITE32_HANDLER( random_number_32_w )
 {
-//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask  ^ 0xffff);
+//  mame_printf_debug("%06X:random_seed_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 static READ32_HANDLER( random_number_32_r )

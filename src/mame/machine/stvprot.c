@@ -356,7 +356,7 @@ static READ32_HANDLER( decathlt_prot_r )
 
 static WRITE32_HANDLER( decathlt_prot_w )
 {
-	decathlt_protregs[offset] = (data&~mem_mask)|(decathlt_protregs[offset]&mem_mask);
+	decathlt_protregs[offset] = (data&mem_mask)|(decathlt_protregs[offset]&~mem_mask);
 //  decathlt_protregs[0] = 0x0c00000/4;
 
 	if (offset==0) // seems to set a (scrambled?) source address
@@ -370,7 +370,7 @@ static WRITE32_HANDLER( decathlt_prot_w )
 
 	if (offset==1) // uploads 2 tables...
 	{
-		if (mem_mask==0x0000ffff)
+		if (mem_mask==0xffff0000)
 		{
 			if (data == 0x80000000)
 			{
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( decathlt_prot_w )
 
 //          mame_printf_info("ARGH! %08x %08x\n",mem_mask,data);
 		}
-		else if (mem_mask==0xffff0000)
+		else if (mem_mask==0x0000ffff)
 		{
 			if (decathlt_prot_uploadmode==1)
 			{

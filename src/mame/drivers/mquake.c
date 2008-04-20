@@ -126,13 +126,13 @@ static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
 		return input_port_read(machine, "COINCHIP");
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", activecpu_get_pc(), offset, mem_mask ^ 0xffff);
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", activecpu_get_pc(), offset, mem_mask);
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", activecpu_get_pc(), offset, data, mem_mask ^ 0xffff);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)

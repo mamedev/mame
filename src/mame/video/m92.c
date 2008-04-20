@@ -93,7 +93,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
 	if (offset==4)
 	{
-			buffer_spriteram16_w(machine,0,0,0);
+			buffer_spriteram16_w(machine,0,0,0xffff);
 		m92_sprite_buffer_busy = 0;
 
 		/* Pixel clock is 26.6666 MHz, we have 0x800 bytes, or 0x400 words

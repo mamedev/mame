@@ -247,8 +247,8 @@ static MACHINE_RESET( cojag )
 	jaguar_dsp_resume();
 
 	/* halt the CPUs */
-	jaguargpu_ctrl_w(1, G_CTRL, 0, 0);
-	jaguardsp_ctrl_w(2, D_CTRL, 0, 0);
+	jaguargpu_ctrl_w(1, G_CTRL, 0, 0xffffffff);
+	jaguardsp_ctrl_w(2, D_CTRL, 0, 0xffffffff);
 
 	/* init the sound system */
 	cojag_sound_reset();
@@ -297,8 +297,8 @@ static WRITE32_HANDLER( misc_control_w )
 		jaguar_dsp_resume();
 
 		/* halt the CPUs */
-		jaguargpu_ctrl_w(1, G_CTRL, 0, 0);
-		jaguardsp_ctrl_w(2, D_CTRL, 0, 0);
+		jaguargpu_ctrl_w(1, G_CTRL, 0, 0xffffffff);
+		jaguardsp_ctrl_w(2, D_CTRL, 0, 0xffffffff);
 	}
 
 	/* adjust banking */

@@ -1008,11 +1008,11 @@ static READ32_HANDLER( soundrom_r )
 	UINT8 *sound = (UINT8*)memory_region(REGION_USER2);
 	UINT16 *sound16 = (UINT16*)memory_region(REGION_USER2);
 
-	if (mem_mask == 0xffffff00)
+	if (mem_mask == 0x000000ff)
 	{
 		return sound[offset];
 	}
-	else if (mem_mask == 0x00000000)
+	else if (mem_mask == 0xffffffff)
 	{
 		if (offset < 0x100000)
 		{

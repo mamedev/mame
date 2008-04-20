@@ -129,7 +129,7 @@ static READ16_HANDLER( shared_ram_r )
 	UINT16 result = shared_ram[offset];
 
 	/* look for a byte access, and then check for the high bit and a TAS opcode */
-	if (mem_mask != 0 && (result & ~mem_mask & 0x8080))
+	if (mem_mask != 0xffff && (result & mem_mask & 0x8080))
 	{
 		offs_t ppc = activecpu_get_previouspc();
 		if (ppc < 0xa0000)

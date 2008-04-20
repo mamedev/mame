@@ -112,10 +112,10 @@ static READ8_HANDLER( quasar_IO_r )
 {
 	UINT8 ans = 0;
 
-	if (IOpage == 0) ans = input_port_0_r(machine, 0);
-	if (IOpage == 1) ans = input_port_1_r(machine, 0);
-	if (IOpage == 2) ans = input_port_2_r(machine, 0);
-	if (IOpage == 3) ans = input_port_3_r(machine, 0);
+	if (IOpage == 0) ans = input_port_read_indexed(machine,0);
+	if (IOpage == 1) ans = input_port_read_indexed(machine,1);
+	if (IOpage == 2) ans = input_port_read_indexed(machine,2);
+	if (IOpage == 3) ans = input_port_read_indexed(machine,3);
 
 	return ans;
 }
@@ -147,10 +147,10 @@ static READ8_HANDLER( quasar_sh_command_r )
 	Quasar_T1 = 0;
 
 	// Testing ...
-	// return input_port_5_r(0);
+	// return input_port_read_indexed(machine,5);
 
 	// Add in sound DIP switch
-	return (Quasar_Command) + (input_port_5_r(machine, 0) & 0x30);
+	return (Quasar_Command) + (input_port_read_indexed(machine, 5) & 0x30);
 }
 
 static READ8_HANDLER( Quasar_T1_r )

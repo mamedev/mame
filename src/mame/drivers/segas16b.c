@@ -1126,7 +1126,7 @@ static READ16_HANDLER( standard_io_r )
 			return input_port_read_indexed(machine, 4 + (offset & 1));
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -1156,7 +1156,7 @@ static WRITE16_HANDLER( standard_io_w )
 			coin_counter_w(0, data & 0x01);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -1205,7 +1205,7 @@ static READ16_HANDLER( rom_5797_bank_math_r )
 			/* compare registers */
 			return segaic16_compare_timer_0_r(machine, offset & 7, mem_mask);
 	}
-	return segaic16_open_bus_r(machine,0,0);
+	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
 
@@ -1241,7 +1241,7 @@ static READ16_HANDLER( unknown_rgn2_r )
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
-	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask ^ 0xffff);
+	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
 	segaic16_compare_timer_1_w(machine, offset & 7, data, mem_mask);
 }
 
@@ -1368,7 +1368,7 @@ static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs
 	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* set tile banks */
-	rom_5704_bank_w(machine, 1, workram[0x3094/2] & 0x00ff, 0xff00);
+	rom_5704_bank_w(machine, 1, workram[0x3094/2] & 0x00ff, 0x00ff);
 
 	/* process any new sound data */
 	temp = workram[soundoffs];

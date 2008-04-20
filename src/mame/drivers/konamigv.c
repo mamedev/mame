@@ -456,7 +456,7 @@ static READ32_HANDLER( flash_r )
 	int reg = offset*2;
 	int shift = 0;
 
-	if (mem_mask == 0x0000ffff)
+	if (mem_mask == 0xffff0000)
 	{
 		reg++;
 		shift = 16;
@@ -486,7 +486,7 @@ static WRITE32_HANDLER( flash_w )
 	int reg = offset*2;
 	int chip;
 
-	if (mem_mask == 0x0000ffff)
+	if (mem_mask == 0xffff0000)
 	{
 		reg++;
 		data>>= 16;
@@ -517,7 +517,7 @@ static WRITE32_HANDLER( flash_w )
 
 static READ32_HANDLER( trackball_r )
 {
-	if( offset == 0 && mem_mask == 0xffff0000 )
+	if( offset == 0 && mem_mask == 0x0000ffff )
 	{
 		int axis;
 		UINT16 diff;
@@ -573,11 +573,11 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( btcflash_r )
 {
-	if (mem_mask == 0xffff0000)
+	if (mem_mask == 0x0000ffff)
 	{
 		return intelflash_read(0, offset*2);
 	}
-	else if (mem_mask == 0x0000ffff)
+	else if (mem_mask == 0xffff0000)
 	{
 		return intelflash_read(0, (offset*2)+1)<<16;
 	}
@@ -587,11 +587,11 @@ static READ32_HANDLER( btcflash_r )
 
 static WRITE32_HANDLER( btcflash_w )
 {
-	if (mem_mask == 0xffff0000)
+	if (mem_mask == 0x0000ffff)
 	{
 		intelflash_write(0, offset*2, data&0xffff);
 	}
-	else if (mem_mask == 0x0000ffff)
+	else if (mem_mask == 0xffff0000)
 	{
 		intelflash_write(0, (offset*2)+1, (data>>16)&0xffff);
 	}
@@ -601,7 +601,7 @@ static READ32_HANDLER( btc_trackball_r )
 {
 //  mame_printf_debug( "r %08x %08x %08x\n", activecpu_get_pc(), offset, mem_mask );
 
-	if( offset == 1 && mem_mask == 0x0000ffff )
+	if( offset == 1 && mem_mask == 0xffff0000 )
 	{
 		int axis;
 		UINT16 diff;
@@ -674,7 +674,7 @@ static READ32_HANDLER( tokimeki_serial_r )
 static WRITE32_HANDLER( tokimeki_serial_w )
 {
 	/*
-        serial EEPROM-like device here: when mem_mask == 0xffffff00 only,
+        serial EEPROM-like device here: when mem_mask == 0x000000ff only,
 
         0x40 = chip enable
         0x20 = clock

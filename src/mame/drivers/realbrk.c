@@ -73,14 +73,14 @@ static READ16_HANDLER( pkgnsh_input_r )
 	{
 		case 0x00/2: return 0xffff;
 		case 0x02/2: return 0xffff;
-		case 0x04/2: return input_port_0_word_r(machine,0,0);/*Service buttons*/
-		case 0x06/2: return input_port_1_word_r(machine,0,0);/*DIP 2*/
-		case 0x08/2: return input_port_2_word_r(machine,0,0);/*DIP 1*/
-		case 0x0a/2: return input_port_3_word_r(machine,0,0);/*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return input_port_4_word_r(machine,0,0);/*Handle 1p*/
-		case 0x0e/2: return input_port_5_word_r(machine,0,0);/*Buttons 1p*/
-		case 0x10/2: return input_port_6_word_r(machine,0,0);/*Handle 2p*/
-		case 0x12/2: return input_port_7_word_r(machine,0,0);/*Buttons 2p*/
+		case 0x04/2: return input_port_read_indexed(machine,0);/*Service buttons*/
+		case 0x06/2: return input_port_read_indexed(machine,1);/*DIP 2*/
+		case 0x08/2: return input_port_read_indexed(machine,2);/*DIP 1*/
+		case 0x0a/2: return input_port_read_indexed(machine,3);/*DIP 1+2 Hi-Bits*/
+		case 0x0c/2: return input_port_read_indexed(machine,4);/*Handle 1p*/
+		case 0x0e/2: return input_port_read_indexed(machine,5);/*Buttons 1p*/
+		case 0x10/2: return input_port_read_indexed(machine,6);/*Handle 2p*/
+		case 0x12/2: return input_port_read_indexed(machine,7);/*Buttons 2p*/
 	}
 	return 0xffff;
 }
@@ -92,22 +92,22 @@ static READ16_HANDLER( pkgnshdx_input_r )
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
-		case 0x02/2: return input_port_0_word_r(machine,0,0);/*Service buttons*/
+		case 0x02/2: return input_port_read_indexed(machine,0);/*Service buttons*/
 		/*DSW,same handling as realbrk*/
 		case 0x04/2:
-			if (sel & 0x01)	return	(input_port_1_word_r(machine,0,0) & 0x00ff) << 8;		// DSW1 low bits
-			if (sel & 0x02)	return	(input_port_2_word_r(machine,0,0) & 0x00ff) << 8;		// DSW2 low bits
-			if (sel & 0x04)	return	(input_port_3_word_r(machine,0,0) & 0x00ff) << 8;		// DSW3 low bits
-			if (sel & 0x08)	return	(input_port_4_word_r(machine,0,0) & 0x00ff) << 8;		// DSW4 low bits
+			if (sel & 0x01)	return	(input_port_read_indexed(machine,1) & 0x00ff) << 8;		// DSW1 low bits
+			if (sel & 0x02)	return	(input_port_read_indexed(machine,2) & 0x00ff) << 8;		// DSW2 low bits
+			if (sel & 0x04)	return	(input_port_read_indexed(machine,3) & 0x00ff) << 8;		// DSW3 low bits
+			if (sel & 0x08)	return	(input_port_read_indexed(machine,4) & 0x00ff) << 8;		// DSW4 low bits
 
-			if (sel & 0x10)	return	((input_port_1_word_r(machine,0,0) & 0x0300) << 0) |	// DSWs high 2 bits
-									((input_port_2_word_r(machine,0,0) & 0x0300) << 2) |
-									((input_port_3_word_r(machine,0,0) & 0x0300) << 4) |
-									((input_port_4_word_r(machine,0,0) & 0x0300) << 6) ;
+			if (sel & 0x10)	return	((input_port_read_indexed(machine,1) & 0x0300) << 0) |	// DSWs high 2 bits
+									((input_port_read_indexed(machine,2) & 0x0300) << 2) |
+									((input_port_read_indexed(machine,3) & 0x0300) << 4) |
+									((input_port_read_indexed(machine,4) & 0x0300) << 6) ;
 
 			return 0xffff;
-		case 0x06/2: return input_port_6_word_r(machine,0,0);/*Buttons+Handle 2p*/
-		case 0x08/2: return input_port_5_word_r(machine,0,0);/*Buttons+Handle 1p*/
+		case 0x06/2: return input_port_read_indexed(machine,6);/*Buttons+Handle 2p*/
+		case 0x08/2: return input_port_read_indexed(machine,5);/*Buttons+Handle 1p*/
 		case 0x0a/2: return 0xffff;
 		case 0x0c/2: return 0xffff;
 		case 0x0e/2: return 0xffff;

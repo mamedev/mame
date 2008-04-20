@@ -58,10 +58,10 @@ VIDEO_START( beathead )
 WRITE32_HANDLER( beathead_vram_transparent_w )
 {
 	/* writes to this area appear to handle transparency */
-	if (!(data & 0x000000ff)) mem_mask |= 0x000000ff;
-	if (!(data & 0x0000ff00)) mem_mask |= 0x0000ff00;
-	if (!(data & 0x00ff0000)) mem_mask |= 0x00ff0000;
-	if (!(data & 0xff000000)) mem_mask |= 0xff000000;
+	if (!(data & 0x000000ff)) mem_mask &= ~0x000000ff;
+	if (!(data & 0x0000ff00)) mem_mask &= ~0x0000ff00;
+	if (!(data & 0x00ff0000)) mem_mask &= ~0x00ff0000;
+	if (!(data & 0xff000000)) mem_mask &= ~0xff000000;
 	COMBINE_DATA(&videoram32[offset]);
 }
 
@@ -71,7 +71,7 @@ WRITE32_HANDLER( beathead_vram_bulk_w )
 	/* it appears that writes to this area pass in a mask for 4 words in VRAM */
 	/* allowing them to be filled from a preset latch */
 	offset &= ~3;
-	data = data & ~mem_mask & 0x0f0f0f0f;
+	data = data & mem_mask & 0x0f0f0f0f;
 
 	/* for now, just handle the bulk fill case; the others we'll catch later */
 	if (data == 0x0f0f0f0f)

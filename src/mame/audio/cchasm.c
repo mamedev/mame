@@ -22,7 +22,7 @@ READ8_HANDLER( cchasm_snd_io_r )
     switch (offset & 0x61 )
     {
     case 0x00:
-        coin = (input_port_3_r (machine, offset) >> 4) & 0x7;
+        coin = (input_port_read_indexed(machine, 3) >> 4) & 0x7;
         if (coin != 0x7) coin |= 0x8;
         return sound_flags | coin;
 
@@ -119,11 +119,11 @@ READ16_HANDLER( cchasm_io_r )
 		sound_flags &= ~0x40;
 		return soundlatch4_r (machine,offset) << 8;
 	case 0x2:
-		return (sound_flags| (input_port_3_r (machine, offset) & 0x07) | 0x08) << 8;
+		return (sound_flags| (input_port_read_indexed(machine, 3) & 0x07) | 0x08) << 8;
 	case 0x5:
-		return input_port_2_r (machine, offset) << 8;
+		return input_port_read_indexed(machine, 2) << 8;
 	case 0x8:
-		return input_port_1_r (machine, offset) << 8;
+		return input_port_read_indexed(machine, 1) << 8;
 	default:
 		return 0xff << 8;
 	}
@@ -169,7 +169,7 @@ static z80ctc_interface ctc_intf =
 
 static TIMER_CALLBACK( cchasm_sh_update )
 {
-    if ((input_port_3_r (machine, 0) & 0x70) != 0x70)
+    if ((input_port_read_indexed(machine, 3) & 0x70) != 0x70)
         z80ctc_0_trg0_w (machine, 0, 1);
 }
 

@@ -81,13 +81,13 @@ static READ16_HANDLER( ioc_r )
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_0_word_r(machine,0,mem_mask);	/* DSW */
+			return input_port_read_indexed(machine,0);	/* DSW */
 
 		case 0x84/2:
-			return input_port_1_word_r(machine,0,mem_mask);	/* IN0 */
+			return input_port_read_indexed(machine,1);	/* IN0 */
 
 		case 0x86/2:
-			return input_port_2_word_r(machine,0,mem_mask);	/* IN1 */
+			return input_port_read_indexed(machine,2);	/* IN1 */
 
 		case 0x50:
 		case 0x51:

@@ -894,7 +894,7 @@ static WRITE8_HANDLER( coininhib_w )
 
 static READ8_HANDLER( coin_input_r )
 {
-	return input_port_0_r(machine, 0);
+	return input_port_read_indexed(machine, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////

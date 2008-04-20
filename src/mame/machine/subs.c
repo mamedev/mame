@@ -29,7 +29,7 @@ subs_interrupt
 INTERRUPT_GEN( subs_interrupt )
 {
 	/* only do NMI interrupt if not in TEST mode */
-	if ((input_port_2_r(machine, 0) & 0x40)==0x40)
+	if ((input_port_read_indexed(machine, 2) & 0x40)==0x40)
 		cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
 }
 
@@ -46,7 +46,7 @@ static int subs_steering_1(running_machine *machine)
 	int this_val;
 	int delta;
 
-	this_val=input_port_3_r(machine, 0);
+	this_val=input_port_read_indexed(machine, 3);
 
 	delta=this_val-last_val;
 	last_val=this_val;
@@ -112,7 +112,7 @@ subs_control_r
 ***************************************************************************/
 READ8_HANDLER( subs_control_r )
 {
-	int inport = input_port_1_r(machine, offset);
+	int inport = input_port_read_indexed(machine, 1);
 
 	switch (offset & 0x07)
 	{
@@ -134,7 +134,7 @@ subs_coin_r
 ***************************************************************************/
 READ8_HANDLER( subs_coin_r )
 {
-	int inport = input_port_2_r(machine, offset);
+	int inport = input_port_read_indexed(machine, 2);
 
 	switch (offset & 0x07)
 	{
@@ -156,7 +156,7 @@ subs_options_r
 ***************************************************************************/
 READ8_HANDLER( subs_options_r )
 {
-	int opts = input_port_0_r(machine, offset);
+	int opts = input_port_read_indexed(machine, 0);
 
 	switch (offset & 0x03)
 	{

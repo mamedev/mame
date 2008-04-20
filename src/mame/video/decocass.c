@@ -608,7 +608,7 @@ VIDEO_UPDATE( decocass )
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
-	if (0xc0 != (input_port_2_r(screen->machine, 0) & 0xc0))  /* coin slots assert an NMI */
+	if (0xc0 != (input_port_read_indexed(screen->machine, 2) & 0xc0))  /* coin slots assert an NMI */
 		cpunum_set_input_line(screen->machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (watchdog_flip & 0x04))

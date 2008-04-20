@@ -3941,16 +3941,16 @@ static void h8_set_info(UINT32 state, cpuinfo *info)
 
 static READ16_HANDLER( h8_itu_r )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		// 16-bit read
 		return h8_register_read8(offset*2 + 0xffff10)<<8 | h8_register_read8((offset*2) + 1 + 0xffff10);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		return h8_register_read8(offset*2 + 0xffff10)<<8;
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		return h8_register_read8((offset*2) + 1 + 0xffff10);
 	}
@@ -3960,17 +3960,17 @@ static READ16_HANDLER( h8_itu_r )
 
 static WRITE16_HANDLER( h8_itu_w )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		// 16-bit write
 		h8_register_write8(offset*2 + 0xffff10, data>>8);
 		h8_register_write8((offset*2) + 1 + 0xffff10, data&0xff);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		h8_register_write8(offset*2 + 0xffff10, data>>8);
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		h8_register_write8((offset*2) + 1 + 0xffff10, data&0xff);
 	}
@@ -3978,16 +3978,16 @@ static WRITE16_HANDLER( h8_itu_w )
 
 static READ16_HANDLER( h8_3007_itu_r )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		// 16-bit read
 		return h8_3007_register_read8(offset*2 + 0xffff20)<<8 | h8_3007_register_read8((offset*2) + 1 + 0xffff20);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		return h8_3007_register_read8(offset*2 + 0xffff20)<<8;
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		return h8_3007_register_read8((offset*2) + 1 + 0xffff20);
 	}
@@ -3996,17 +3996,17 @@ static READ16_HANDLER( h8_3007_itu_r )
 }
 static WRITE16_HANDLER( h8_3007_itu_w )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		// 16-bit write
 		h8_3007_register_write8(offset*2 + 0xffff20, data>>8);
 		h8_3007_register_write8((offset*2) + 1 + 0xffff20, data&0xff);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		h8_3007_register_write8(offset*2 + 0xffff20, data>>8);
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		h8_3007_register_write8((offset*2) + 1 + 0xffff20, data&0xff);
 	}
@@ -4014,16 +4014,16 @@ static WRITE16_HANDLER( h8_3007_itu_w )
 
 static READ16_HANDLER( h8_3007_itu1_r )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		// 16-bit read
 		return h8_3007_register1_read8(offset*2 + 0xfee000)<<8 | h8_3007_register1_read8((offset*2) + 1 + 0xfee000);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		return h8_3007_register1_read8(offset*2 + 0xfee000)<<8;
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		return h8_3007_register1_read8((offset*2) + 1 + 0xfee000);
 	}
@@ -4032,17 +4032,17 @@ static READ16_HANDLER( h8_3007_itu1_r )
 }
 static WRITE16_HANDLER( h8_3007_itu1_w )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		// 16-bit write
 		h8_3007_register1_write8(offset*2 + 0xfee000, data>>8);
 		h8_3007_register1_write8((offset*2) + 1 + 0xfee000, data&0xff);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		h8_3007_register1_write8(offset*2 + 0xfee000, data>>8);
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		h8_3007_register1_write8((offset*2) + 1 + 0xfee000, data&0xff);
 	}

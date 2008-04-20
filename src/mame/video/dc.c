@@ -52,12 +52,12 @@ INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)
 	*shift = 0;
 
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != U64(0x00000000ffffffff)) && (mem_mask != U64(0xffffffff00000000)))
+	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		assert_always(0, "Wrong mask!\n");
 	}
 
-	if (mem_mask == U64(0x00000000ffffffff))
+	if (mem_mask == U64(0xffffffff00000000))
 	{
 		reg++;
 		*shift = 32;
@@ -199,7 +199,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 	static UINT32 ignoretexalpha,flipuv,clampuv,filtermode,sstexture,mmdadjust,tsinstruction;
 	static UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect;
 
-	if (!mem_mask) 	// 64 bit
+	if (mem_mask == U64(0xffffffffffffffff)) 	// 64 bit
 	{
 		tafifo_buff[tafifo_pos]=(UINT32)data;
 		tafifo_buff[tafifo_pos+1]=(UINT32)(data >> 32);

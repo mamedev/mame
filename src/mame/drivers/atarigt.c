@@ -93,7 +93,7 @@ static void cage_irq_callback(int reason)
 	if (reason)
 		atarigen_sound_int_gen(Machine, 0);
 	else
-		atarigen_sound_int_ack_w(Machine,0,0,0);
+		atarigen_sound_int_ack_w(Machine,0,0,0xffff);
 }
 
 
@@ -231,7 +231,7 @@ static WRITE32_HANDLER( mo_command_w )
 
 static WRITE32_HANDLER( led_w )
 {
-//  logerror("LED = %08X & %08X\n", data, ~mem_mask);
+//  logerror("LED = %08X & %08X\n", data, mem_mask);
 }
 
 
@@ -1078,14 +1078,14 @@ static WRITE32_HANDLER( tmek_pf_w )
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", activecpu_get_pc(), 0xd72000 + offset*4, data, ~mem_mask, (UINT32)activecpu_get_reg(M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", activecpu_get_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)activecpu_get_reg(M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", activecpu_get_pc(), 0xd72000 + offset*4, data, ~mem_mask, (UINT32)activecpu_get_reg(M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", activecpu_get_pc(), 0xd72000 + offset*4, data, mem_mask, (UINT32)activecpu_get_reg(M68K_A3) - 2);
 
 	atarigen_playfield32_w(machine, offset, data, mem_mask);
 }

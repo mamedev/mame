@@ -146,7 +146,7 @@ static READ8_HANDLER( fcombat_protection_r )
 static READ8_HANDLER( fcombat_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return fcombat_cocktail_flip ? input_port_1_r(machine,offset) : input_port_0_r(machine,offset);
+	return fcombat_cocktail_flip ? input_port_read_indexed(machine, 1) : input_port_read_indexed(machine, 0);
 }
 
 

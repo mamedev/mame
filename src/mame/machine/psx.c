@@ -86,13 +86,13 @@ WRITE32_HANDLER( psx_irq_w )
 	switch( offset )
 	{
 	case 0x00:
-		verboselog( 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqdata, ( m_n_irqdata & mem_mask ) | ( m_n_irqdata & m_n_irqmask & data ) );
-		m_n_irqdata = ( m_n_irqdata & mem_mask ) | ( m_n_irqdata & m_n_irqmask & data );
+		verboselog( 2, "psx irq data ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqdata, ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data ) );
+		m_n_irqdata = ( m_n_irqdata & ~mem_mask ) | ( m_n_irqdata & m_n_irqmask & data );
 		psx_irq_update();
 		break;
 	case 0x01:
-		verboselog( 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqmask, ( m_n_irqmask & mem_mask ) | data );
-		m_n_irqmask = ( m_n_irqmask & mem_mask ) | data;
+		verboselog( 2, "psx irq mask ( %08x, %08x ) %08x -> %08x\n", data, mem_mask, m_n_irqmask, ( m_n_irqmask & ~mem_mask ) | data );
+		m_n_irqmask = ( m_n_irqmask & ~mem_mask ) | data;
 		if( ( m_n_irqmask & ~( 0x1 | 0x08 | 0x10 | 0x20 | 0x40 | 0x80 | 0x100 | 0x200 | 0x400 ) ) != 0 )
 		{
 			verboselog( 0, "psx_irq_w( %08x, %08x, %08x ) unknown irq\n", offset, data, mem_mask );
@@ -403,13 +403,13 @@ WRITE32_HANDLER( psx_dma_w )
 		{
 		case 0x0:
 			verboselog( 1, "psx_dma_w( %04x, %08x, %08x ) dpcp\n", offset, data, mem_mask );
-			m_n_dpcp = ( m_n_dpcp & mem_mask ) | data;
+			m_n_dpcp = ( m_n_dpcp & ~mem_mask ) | data;
 			break;
 		case 0x1:
-			m_n_dicr = ( m_n_dicr & mem_mask ) |
-				( ~mem_mask & 0x80000000 & m_n_dicr ) |
-				( ~data & ~mem_mask & 0x7f000000 & m_n_dicr ) |
-				( data & ~mem_mask & 0x00ffffff );
+			m_n_dicr = ( m_n_dicr & ~mem_mask ) |
+				( mem_mask & 0x80000000 & m_n_dicr ) |
+				( ~data & mem_mask & 0x7f000000 & m_n_dicr ) |
+				( data & mem_mask & 0x00ffffff );
 /* todo: find out whether to do this instead of dma_interrupt_update()
 
             if( ( m_n_dicr & 0x7f000000 ) != 0 )

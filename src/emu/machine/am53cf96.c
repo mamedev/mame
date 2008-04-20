@@ -45,7 +45,7 @@ READ32_HANDLER( am53cf96_r )
 	static const int states[] = { 0, 0, 1, 1, 2, 3, 4, 5, 6, 7, 0 };
 
 	reg = offset * 2;
-	if (mem_mask == 0xffffff00)
+	if (mem_mask == 0x000000ff)
 	{
 		shift = 0;
 	}
@@ -96,7 +96,7 @@ WRITE32_HANDLER( am53cf96_w )
 
 	reg = offset * 2;
 	val = data;
-	if (mem_mask == 0xffffff00)
+	if (mem_mask == 0x000000ff)
 	{
 	}
 	else

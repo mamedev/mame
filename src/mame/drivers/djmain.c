@@ -212,7 +212,7 @@ static READ32_HANDLER( obj_rom_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 2;
 
-	if (~mem_mask & 0xff00ff00)
+	if (~mem_mask & 0x00ff00ff)
 		offset++;
 
 	return mem8[offset] * 0x01010101;
@@ -310,24 +310,24 @@ static WRITE32_HANDLER( turntable_select_w )
 static READ32_DEVICE_HANDLER( ide_std_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0x00ff) >> 8;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0x0000) << 16;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset, 0xffff) << 16;
 }
 
 static WRITE32_DEVICE_HANDLER( ide_std_w )
 {
 	if (ACCESSING_BITS_0_7)
-		ide_controller16_w(device, IDE_STD_OFFSET + offset, data << 8, 0x00ff);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, IDE_STD_OFFSET + offset, data >> 16, 0x0000);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset, data >> 16, 0xffff);
 }
 
 
 static READ32_DEVICE_HANDLER( ide_alt_r )
 {
 	if (offset == 0)
-		return ide_controller16_r(device, IDE_ALT_OFFSET, 0xff00) << 24;
+		return ide_controller16_r(device, IDE_ALT_OFFSET, 0x00ff) << 24;
 
 	return 0;
 }
@@ -335,7 +335,7 @@ static READ32_DEVICE_HANDLER( ide_alt_r )
 static WRITE32_DEVICE_HANDLER( ide_alt_w )
 {
 	if (offset == 0 && ACCESSING_BITS_16_23)
-		ide_controller16_w(device, IDE_ALT_OFFSET, data >> 24, 0xff00);
+		ide_controller16_w(device, IDE_ALT_OFFSET, data >> 24, 0x00ff);
 }
 
 
@@ -402,17 +402,17 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 
 static WRITE32_HANDLER( unknown590000_w )
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, ~mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown802000_w )
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, ~mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknownc02000_w )
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, ~mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
 }
 
 

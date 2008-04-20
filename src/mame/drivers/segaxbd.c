@@ -482,7 +482,7 @@ static READ16_HANDLER( smgp_excs_r )
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 

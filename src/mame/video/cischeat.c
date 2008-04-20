@@ -225,7 +225,7 @@ READ16_HANDLER( bigrun_vregs_r )
 		case 0x0004/2 : return input_port_read_indexed(machine, 3);	// Motor Limit Switches
 		case 0x0006/2 : return input_port_read_indexed(machine, 4);	// DSW 1 & 2
 
-		case 0x0008/2 :	return soundlatch2_word_r(machine,0,0);	// From sound cpu
+		case 0x0008/2 :	return soundlatch2_word_r(machine,0,0xffff);	// From sound cpu
 
 		case 0x0010/2 :
 			switch (cischeat_ip_select & 0x3)
@@ -274,7 +274,7 @@ WRITE16_HANDLER( bigrun_vregs_w )
 			break;
 
 		case 0x000a/2   :	// to sound cpu
-			soundlatch_word_w(machine,0,new_data,0);
+			soundlatch_word_w(machine,0,new_data,0xffff);
 			break;
 
 		case 0x000c/2   :	break;	// ??
@@ -386,7 +386,7 @@ WRITE16_HANDLER( cischeat_vregs_w )
 		case 0x2208/2   : break;	// watchdog reset
 
 		case 0x2300/2   :	/* Sound CPU: reads latch during int 4, and stores command */
-							soundlatch_word_w(machine,0,new_data,0);
+							soundlatch_word_w(machine,0,new_data,0xffff);
 							cpunum_set_input_line(machine, 3,4,HOLD_LINE);
 							break;
 
@@ -505,7 +505,7 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x0014/2   :	break;
 
 		/* Usually written in sequence, but not always */
-		case 0x0008/2   :	soundlatch_word_w(machine,0,new_data,0);	break;
+		case 0x0008/2   :	soundlatch_word_w(machine,0,new_data,0xffff);	break;
 		case 0x0018/2   :	cpunum_set_input_line(machine, 3,4,HOLD_LINE);	break;
 
 		case 0x0010/2   :	break;
@@ -1350,9 +1350,9 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 #if 1
 	popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
 						scudhamm_motor_command,
-						scudhamm_motor_pos_r(screen->machine,0,0),
-						scudhamm_motor_status_r(screen->machine,0,0),
-						scudhamm_analog_r(screen->machine,0,0) );
+						scudhamm_motor_pos_r(screen->machine,0,0xffff),
+						scudhamm_motor_status_r(screen->machine,0,0xffff),
+						scudhamm_analog_r(screen->machine,0,0xffff) );
 #endif
 
 }

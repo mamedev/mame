@@ -140,16 +140,16 @@ static UINT8 last = 0;
 	if (timer & 0x100) popmessage("watchdog!");
 
 
-	if (last != (input_port_0_r(machine, 0) & 0x0f))
+	if (last != (input_port_read_indexed(machine, 0) & 0x0f))
 	{
-		last = input_port_0_r(machine, 0) & 0x0f;
+		last = input_port_read_indexed(machine, 0) & 0x0f;
 		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
 	}
-	pia_set_input_a(0, input_port_0_r(machine, 0) & 0x0f, 0);
+	pia_set_input_a(0, input_port_read_indexed(machine, 0) & 0x0f, 0);
 
-	pia_set_input_ca1(0, input_port_0_r(machine, 0) & 0x10);
+	pia_set_input_ca1(0, input_port_read_indexed(machine, 0) & 0x10);
 
-	pia_set_input_ca2(0, input_port_0_r(machine, 0) & 0x20);
+	pia_set_input_ca2(0, input_port_read_indexed(machine, 0) & 0x20);
 }
 
 static READ8_HANDLER( timer_r )

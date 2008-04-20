@@ -908,5 +908,5 @@ VIDEO_EOF( dooyong )
 
 VIDEO_EOF( rshark )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0xffff);
 }

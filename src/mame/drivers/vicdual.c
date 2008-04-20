@@ -270,8 +270,8 @@ static READ8_HANDLER( depthch_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine, 0);
-	if (offset & 0x08)  ret = input_port_1_r(machine, 0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine, 0);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine, 1);
 
 	return ret;
 }
@@ -555,9 +555,9 @@ static READ8_HANDLER( sspaceat_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine, 0);
-	if (offset & 0x04)  ret = input_port_1_r(machine, 0);
-	if (offset & 0x08)  ret = input_port_2_r(machine, 0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine,0);
+	if (offset & 0x04)  ret = input_port_read_indexed(machine,1);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine,2);
 
 	return ret;
 }
@@ -744,10 +744,10 @@ static READ8_HANDLER( headon2_io_r )
 {
 	UINT8 ret = 0;
 
-	if (offset & 0x01)  ret = input_port_0_r(machine, 0);
+	if (offset & 0x01)  ret = input_port_read_indexed(machine,0);
  	if (offset & 0x02)  /* schematics show this as in input port, but never read from */
-	if (offset & 0x04)  ret = input_port_1_r(machine, 0);
-	if (offset & 0x08)  ret = input_port_2_r(machine, 0);
+	if (offset & 0x04)  ret = input_port_read_indexed(machine,1);
+	if (offset & 0x08)  ret = input_port_read_indexed(machine,2);
 	if (offset & 0x12)  logerror("********* Read from port %x\n", offset);
 
 	return ret;

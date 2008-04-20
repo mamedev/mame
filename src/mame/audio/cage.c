@@ -506,7 +506,7 @@ UINT16 main_from_cage_r(void)
 		logerror("%06X:main read data = %04X\n", activecpu_get_pc(), soundlatch_word_r(Machine, 0, 0));
 	cage_to_cpu_ready = 0;
 	update_control_lines();
-	return soundlatch_word_r(Machine, 0, 0);
+	return soundlatch_word_r(Machine, 0, 0xffff);
 }
 
 

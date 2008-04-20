@@ -226,7 +226,7 @@ static WRITE16_HANDLER( kodure_io_w )
 		int i;
 		for (i = 0; i < 0x1000; i++)
 		{
-			armedf_text_videoram_w(machine,i, ' ', 0);
+			armedf_text_videoram_w(machine,i, ' ', 0xffff);
 		}
 	}
 }

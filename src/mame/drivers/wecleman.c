@@ -408,9 +408,9 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch ( (wecleman_selected_ip >> 5) & 3 )
 	{												// From WEC Le Mans Schems:
-		case 0:  return input_port_4_r(machine, offset);		// Accel - Schems: Accelevr
+		case 0:  return input_port_read_indexed(machine,4);		// Accel - Schems: Accelevr
 		case 1:  return ~0;							// ????? - Schems: Not Used
-		case 2:  return input_port_5_r(machine, offset);		// Wheel - Schems: Handlevr
+		case 2:  return input_port_read_indexed(machine,5);		// Wheel - Schems: Handlevr
 		case 3:  return ~0;							// Table - Schems: Turnvr
 
 		default: return ~0;

@@ -510,5 +510,5 @@ VIDEO_UPDATE( gaelco2_dual )
 VIDEO_EOF( gaelco2 )
 {
 	/* sprites are one frame ahead */
-	buffer_spriteram16_w(machine, 0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0xffff);
 }

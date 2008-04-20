@@ -807,8 +807,8 @@ READ16_HANDLER( neogeo_video_register_r )
 	UINT16 ret;
 
 	/* accessing the LSB only is not mapped */
-	if (mem_mask == 0xff00)
-		ret = neogeo_unmapped_r(machine, 0, 0) & 0x00ff;
+	if (mem_mask == 0x00ff)
+		ret = neogeo_unmapped_r(machine, 0, 0xffff) & 0x00ff;
 	else
 	{
 		switch (offset)
@@ -828,10 +828,10 @@ READ16_HANDLER( neogeo_video_register_r )
 WRITE16_HANDLER( neogeo_video_register_w )
 {
 	/* accessing the LSB only is not mapped */
-	if (mem_mask != 0xff00)
+	if (mem_mask != 0x00ff)
 	{
 		/* accessing the MSB only stores same data in MSB and LSB */
-		if (mem_mask == 0x00ff)
+		if (mem_mask == 0xff00)
 			data = (data & 0xff00) | (data >> 8);
 
 		switch (offset)

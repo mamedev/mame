@@ -248,7 +248,7 @@ static WRITE32_HANDLER( eeprom_data_w )
 {
 	if (eeprom_enabled)
 	{
-		mem_mask |= 0xffffff00;
+		mem_mask &= 0x000000ff;
 		COMBINE_DATA(generic_nvram32 + offset);
 		eeprom_enabled = 0;
 	}
@@ -304,7 +304,7 @@ static READ32_HANDLER( input_3_r )
 
 static READ32_HANDLER( sound_data_r )
 {
-	return atarigen_sound_r(machine,offset,0);
+	return atarigen_sound_r(machine,offset,0xffff);
 }
 
 

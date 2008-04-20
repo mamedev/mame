@@ -191,7 +191,7 @@ READ16_HANDLER( midwunit_io_r )
 			return input_port_read_indexed(machine, offset);
 
 		case 4:
-			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(machine,0,0);
+			return (midway_serial_pic_status_r() << 12) | midwunit_sound_state_r(machine,0,0xffff);
 
 		default:
 			logerror("%08X:Unknown I/O read from %d\n", activecpu_get_pc(), offset);
@@ -281,7 +281,7 @@ READ16_HANDLER( midxunit_uart_r )
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
 			else
 			{
-				int temp = midwunit_sound_state_r(machine, 0, 0);
+				int temp = midwunit_sound_state_r(machine, 0, 0xffff);
 				result |= (temp & 0x800) >> 9;
 				result |= (~temp & 0x400) >> 10;
 				timer_call_after_resynch(NULL, 0, 0);
@@ -296,7 +296,7 @@ READ16_HANDLER( midxunit_uart_r )
 
 			/* non-loopback case: read from the DCS system */
 			else
-				result = midwunit_sound_r(machine, 0, 0);
+				result = midwunit_sound_r(machine, 0, 0xffff);
 			break;
 
 		case 5:	/* register 5 seems to be like 3, but with in/out swapped */
@@ -308,7 +308,7 @@ READ16_HANDLER( midxunit_uart_r )
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
 			else
 			{
-				int temp = midwunit_sound_state_r(machine, 0, 0);
+				int temp = midwunit_sound_state_r(machine, 0, 0xffff);
 				result |= (temp & 0x800) >> 11;
 				result |= (~temp & 0x400) >> 8;
 				timer_call_after_resynch(NULL, 0, 0);

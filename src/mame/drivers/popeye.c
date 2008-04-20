@@ -463,8 +463,8 @@ static READ8_HANDLER( popeye_portA_r )
 	int res;
 
 
-	res = input_port_3_r(machine,offset);
-	res |= (input_port_4_r(machine,offset) << (7-dswbit)) & 0x80;
+	res = input_port_read_indexed(machine,3);
+	res |= (input_port_read_indexed(machine,4) << (7-dswbit)) & 0x80;
 
 	return res;
 }

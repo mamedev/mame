@@ -376,7 +376,7 @@ static const struct YM2151interface ym2151_interface =
 
 static VIDEO_EOF( wwfwfest )
 {
-	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
 }
 
 /*******************************************************************************

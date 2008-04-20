@@ -180,9 +180,9 @@ static WRITE16_HANDLER( digital_w )
 		/* bit 1 = UPDATE */
 
 		if (!(data & 0x04))
-			atarigen_scanline_int_ack_w(machine,0,0,0);
+			atarigen_scanline_int_ack_w(machine,0,0,0xffff);
 		if (!(data & 0x08))
-			atarigen_video_int_ack_w(machine,0,0,0);
+			atarigen_video_int_ack_w(machine,0,0,0xffff);
 
 		output_set_led_value(0, (data >> 4) & 1);
 		output_set_led_value(1, (data >> 5) & 1);

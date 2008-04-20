@@ -2473,7 +2473,7 @@ static WRITE32_HANDLER ( w60ffc44_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask ^ 0xffffffff);
+	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask);
 	//sinit_w(offset,data,mem_mask);
 }
 
@@ -2481,7 +2481,7 @@ static WRITE32_HANDLER ( w60ffc48_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask ^ 0xffffffff);
+	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
 }
 

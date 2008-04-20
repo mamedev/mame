@@ -142,7 +142,7 @@ static WRITE32_HANDLER( vram_w )
 {
 	UINT32 *dest = &vram[offset+(0x40000/4)*vbuffer];
 
-	if (mem_mask == 0)
+	if (mem_mask == 0xffffffff)
 	{
 		if (~data & 0x80000000)
 			*dest = (*dest & 0x0000ffff) | (data & 0xffff0000);
@@ -150,8 +150,8 @@ static WRITE32_HANDLER( vram_w )
 		if (~data & 0x00008000)
 			*dest = (*dest & 0xffff0000) | (data & 0x0000ffff);
 	}
-	else if (((mem_mask == 0x0000ffff) && (~data & 0x80000000)) ||
-	    	 ((mem_mask == 0xffff0000) && (~data & 0x00008000)))
+	else if (((mem_mask == 0xffff0000) && (~data & 0x80000000)) ||
+	    	 ((mem_mask == 0x0000ffff) && (~data & 0x00008000)))
 		COMBINE_DATA(dest);
 }
 
@@ -182,7 +182,7 @@ static READ32_HANDLER( vblank_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	activecpu_adjust_icount(-100);
-	return input_port_0_dword_r(machine, offset, 0);
+	return input_port_read_indexed(machine, 0);
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )

@@ -142,7 +142,7 @@ DRIVER_INIT( armwrest );
 
 static READ8_HANDLER( punchout_input_3_r )
 {
-	int data = input_port_3_r(machine, offset);
+	int data = input_port_read_indexed(machine,3);
 	/* bit 4 is busy pin level */
 	if( VLM5030_BSY() ) data &= ~0x10;
 	else data |= 0x10;

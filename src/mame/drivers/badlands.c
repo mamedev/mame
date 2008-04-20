@@ -166,7 +166,7 @@ static MACHINE_RESET( badlands )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	int pedal_state = input_port_4_r(machine, 0);
+	int pedal_state = input_port_read_indexed(machine, 4);
 	int i;
 
 	/* update the pedals once per frame */

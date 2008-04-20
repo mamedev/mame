@@ -161,12 +161,12 @@ static MACHINE_RESET( tickee )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_1_r(machine, offset) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
+	return input_port_read_indexed(machine,1) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
 }
 
 static READ8_HANDLER( port2_r )
 {
-	return input_port_3_r(machine, offset) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
+	return input_port_read_indexed(machine,3) | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
 }
 
 

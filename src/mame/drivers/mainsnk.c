@@ -117,7 +117,7 @@ static READ8_HANDLER( sound_ack_r )
 
 static READ8_HANDLER( mainsnk_port_0_r )
 {
-	int result = input_port_0_r( machine, 0 );
+	int result = input_port_read_indexed( machine, 0 );
 	if( !sound_cpu_ready ) result |= 0x20;
 	return result;
 }

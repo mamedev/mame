@@ -436,7 +436,7 @@ static WRITE16_HANDLER( ssriders_protection_w )
 			{
 				if ((program_read_word(0x180006 + 128*i) >> 8) == logical_pri)
 				{
-					K053245_word_w(machine,8*i,hardware_pri,0xff00);
+					K053245_word_w(machine,8*i,hardware_pri,0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -491,7 +491,7 @@ static READ16_HANDLER( blswhstl_coin_r )
 
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
-	res = input_port_2_word_r(machine,0,0);
+	res = input_port_read_indexed(machine,2);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -507,7 +507,7 @@ static READ16_HANDLER( blswhstl_eeprom_r )
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
-	res = EEPROM_read_bit() | input_port_3_word_r(machine,0,0);
+	res = EEPROM_read_bit() | input_port_read_indexed(machine,3);
 	return res;
 }
 
@@ -520,7 +520,7 @@ static READ16_HANDLER( ssriders_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = EEPROM_read_bit() | input_port_3_word_r(machine,0,0);
+	res = EEPROM_read_bit() | input_port_read_indexed(machine,3);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -539,7 +539,7 @@ static READ16_HANDLER( sunsetbl_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
-	res = EEPROM_read_bit() | input_port_3_word_r(machine,0,0);
+	res = EEPROM_read_bit() | input_port_read_indexed(machine,3);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -598,7 +598,7 @@ static READ16_HANDLER( thndrx2_in0_r )
 {
 	int res;
 
-	res = input_port_0_word_r(machine,0,0);
+	res = input_port_read_indexed(machine,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -616,7 +616,7 @@ static READ16_HANDLER( thndrx2_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = (EEPROM_read_bit() << 8) | input_port_1_word_r(machine,0,0);
+	res = (EEPROM_read_bit() << 8) | input_port_read_indexed(machine,1);
 	toggle ^= 0x0800;
 	return (res ^ toggle);
 }
@@ -650,7 +650,7 @@ static READ16_HANDLER( prmrsocr_IN0_r )
 	/* bit 9 is service button */
 	int res;
 
-	res = input_port_0_word_r(machine,0,0);
+	res = input_port_read_indexed(machine,0);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -663,7 +663,7 @@ static READ16_HANDLER( prmrsocr_eeprom_r )
 {
 	/* bit 8 is EEPROM data */
 	/* bit 9 is EEPROM ready */
-	return (EEPROM_read_bit() << 8) | input_port_1_word_r(machine,0,0);
+	return (EEPROM_read_bit() << 8) | input_port_read_indexed(machine,1);
 }
 
 static WRITE16_HANDLER( prmrsocr_eeprom_w )
@@ -916,7 +916,7 @@ static void tmnt2_put_word(running_machine *machine, UINT32 addr, UINT16 data)
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			K053245_word_w(machine, offs, data, 0);
+			K053245_word_w(machine, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;

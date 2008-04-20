@@ -553,12 +553,12 @@ static WRITE32_HANDLER( rabbit_audio_w )
 #if VERBOSE_AUDIO_LOG
 	int reg, voice, base, i;
 
-	if (mem_mask == 0x0000ffff)
+	if (mem_mask == 0xffff0000)
 	{
 		reg = offset*2;
 		data >>= 16;
 	}
-	else if (mem_mask == 0xffff0000)
+	else if (mem_mask == 0x0000ffff)
 	{
 		reg = (offset*2)+1;
 		data &= 0xffff;
@@ -722,7 +722,7 @@ static WRITE32_HANDLER( rabbit_eeprom_write )
 {
 	// don't disturb the EEPROM if we're not actually writing to it
 	// (in particular, data & 0x100 here with mask = ffff00ff looks to be the watchdog)
-	if (mem_mask == 0x00ffffff)
+	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
 		EEPROM_write_bit(data & 0x01000000);

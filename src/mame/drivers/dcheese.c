@@ -207,7 +207,7 @@ static WRITE8_HANDLER( bsmt_data_w )
 	if (offset % 2 == 0)
 		sound_msb_latch = data;
 	else
-		BSMT2000_data_0_w(machine, offset/2, (sound_msb_latch << 8) | data, 0);
+		BSMT2000_data_0_w(machine, offset/2, (sound_msb_latch << 8) | data, 0xffff);
 }
 
 

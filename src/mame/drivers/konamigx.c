@@ -594,7 +594,6 @@ static struct { UINT32 offs, pc, mask, data; } waitskip;
 static READ32_HANDLER(waitskip_r)
 {
 	UINT32 data = gx_workram[waitskip.offs+offset];
-	mem_mask = ~mem_mask;
 
 	if (activecpu_get_pc() == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{

@@ -157,7 +157,7 @@ static void update_irq_state(void)
 {
 	/*  Get the pending IRQs (only the enabled ones, e.g. where
         irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(Machine,0,0) & ~*metro_irq_enable;
+	UINT16 irq = metro_irq_cause_r(Machine,0,0xffff) & ~*metro_irq_enable;
 
 	if (irq_line == -1)	/* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
@@ -2151,12 +2151,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( puzzlet_port7_r )
 {
-	return input_port_2_word_r(machine,0,0);
+	return input_port_read_indexed(machine,2);
 }
 
 static READ8_HANDLER( puzzlet_serB_r )
 {
-	return input_port_0_word_r(machine,0,0);	// coin
+	return input_port_read_indexed(machine,0);	// coin
 }
 
 static WRITE8_HANDLER( puzzlet_portb_w )

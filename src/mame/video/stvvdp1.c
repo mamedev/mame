@@ -356,7 +356,7 @@ WRITE32_HANDLER ( stv_vdp1_vram_w )
 
 //  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
 //  {
-//      logerror("cpu #%d (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), offset*4, data, mem_mask ^ 0xffffffff);
+//      logerror("cpu #%d (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), offset*4, data, mem_mask);
 //  }
 
 	data = stv_vdp1_vram[offset];

@@ -5878,11 +5878,11 @@ static int K056832_rom_read_b(int offset, int blksize, int blksize2, int zerosec
 
 READ16_HANDLER( K056832_5bpp_rom_word_r )
 {
-	if (mem_mask == 0x00ff)
+	if (mem_mask == 0xff00)
 	{
 		return K056832_rom_read_b(offset*2, 4, 5, 0)<<8;
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		return K056832_rom_read_b(offset*2+1, 4, 5, 0)<<16;
 	}
@@ -5895,19 +5895,19 @@ READ16_HANDLER( K056832_5bpp_rom_word_r )
 
 READ32_HANDLER( K056832_5bpp_rom_long_r )
 {
-	if (mem_mask == 0x00ffffff)
+	if (mem_mask == 0xff000000)
 	{
 		return K056832_rom_read_b(offset*4, 4, 5, 0)<<24;
 	}
-	else if (mem_mask == 0xff00ffff)
+	else if (mem_mask == 0x00ff0000)
 	{
 		return K056832_rom_read_b(offset*4+1, 4, 5, 0)<<16;
 	}
-	else if (mem_mask == 0xffff00ff)
+	else if (mem_mask == 0x0000ff00)
 	{
 		return K056832_rom_read_b(offset*4+2, 4, 5, 0)<<8;
 	}
-	else if (mem_mask == 0xffffff00)
+	else if (mem_mask == 0x000000ff)
 	{
 		return K056832_rom_read_b(offset*4+3, 4, 5, 1);
 	}
@@ -5920,19 +5920,19 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 
 READ32_HANDLER( K056832_6bpp_rom_long_r )
 {
-	if (mem_mask == 0x00ffffff)
+	if (mem_mask == 0xff000000)
 	{
 		return K056832_rom_read_b(offset*4, 4, 6, 0)<<24;
 	}
-	else if (mem_mask == 0xff00ffff)
+	else if (mem_mask == 0x00ff0000)
 	{
 		return K056832_rom_read_b(offset*4+1, 4, 6, 0)<<16;
 	}
-	else if (mem_mask == 0xffff00ff)
+	else if (mem_mask == 0x0000ff00)
 	{
 		return K056832_rom_read_b(offset*4+2, 4, 6, 0)<<8;
 	}
-	else if (mem_mask == 0xffffff00)
+	else if (mem_mask == 0x000000ff)
 	{
 		return K056832_rom_read_b(offset*4+3, 4, 6, 0);
 	}
@@ -6206,8 +6206,7 @@ WRITE16_HANDLER( K056832_ram_word_w )
 	UINT16 old_mask, old_data;
 
 	tile_ptr = &K056832_videoram[K056832_SelectedPagex4096+offset];
-	old_mask = mem_mask;
-	mem_mask = ~mem_mask;
+	old_mask = ~mem_mask;
 	old_data = *tile_ptr;
 	data = (data & mem_mask) | (old_data & old_mask);
 
@@ -6248,8 +6247,7 @@ WRITE32_HANDLER( K056832_ram_long_w )
 	UINT32 old_mask, old_data;
 
 	tile_ptr = &K056832_videoram[K056832_SelectedPagex4096+offset*2];
-	old_mask = mem_mask;
-	mem_mask = ~mem_mask;
+	old_mask = ~mem_mask;
 	old_data = (UINT32)tile_ptr[0]<<16 | (UINT32)tile_ptr[1];
 	data = (data & mem_mask) | (old_data & old_mask);
 
@@ -6402,11 +6400,11 @@ WRITE8_HANDLER( K056832_w )
 {
 	if (offset & 1)
 	{
-		K056832_word_w(machine, (offset>>1), data, 0xff00);
+		K056832_word_w(machine, (offset>>1), data, 0x00ff);
 	}
 	else
 	{
-		K056832_word_w(machine, (offset>>1), data<<8, 0x00ff);
+		K056832_word_w(machine, (offset>>1), data<<8, 0xff00);
 	}
 }
 
@@ -6414,11 +6412,11 @@ WRITE8_HANDLER( K056832_b_w )
 {
 	if (offset & 1)
 	{
-		K056832_b_word_w(machine, (offset>>1), data, 0xff00);
+		K056832_b_word_w(machine, (offset>>1), data, 0x00ff);
 	}
 	else
 	{
-		K056832_b_word_w(machine, (offset>>1), data<<8, 0x00ff);
+		K056832_b_word_w(machine, (offset>>1), data<<8, 0xff00);
 	}
 }
 
@@ -7194,7 +7192,7 @@ WRITE32_HANDLER( K055555_long_w )
 
 WRITE16_HANDLER( K055555_word_w )
 {
-	if (mem_mask == 0xff00)
+	if (mem_mask == 0x00ff)
 	{
 		K055555_write_reg(offset, data&0xff);
 	}

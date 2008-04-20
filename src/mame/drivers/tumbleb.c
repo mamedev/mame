@@ -316,7 +316,7 @@ UINT16* suprtrio_control;
 
 static WRITE16_HANDLER( tumblepb_oki_w )
 {
-	if (mem_mask==0x0000)
+	if (mem_mask==0xffff)
 	{
 		OKIM6295_data_0_w(machine,0,data&0xff);
 		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);

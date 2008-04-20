@@ -170,7 +170,7 @@ static READ16_HANDLER( pirates_in1_r )
 		bit = 1;
 
 	/* bit 4 is EEPROM data, bit 7 is protection */
-	return input_port_1_word_r(machine,0,0) | (EEPROM_read_bit() << 4) | (bit << 7);
+	return input_port_read_indexed(machine,1) | (EEPROM_read_bit() << 4) | (bit << 7);
 }
 
 

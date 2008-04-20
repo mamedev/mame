@@ -1219,22 +1219,22 @@ READ8_HANDLER( grudge_steering_r )
 
 READ8_HANDLER( shrike_shared_6809_r )
 {
-  UINT16 mem_mask = offset & 1 ? 0xff : 0xff00;
+  UINT16 mem_mask = offset & 1 ? 0xff00 : 0x00ff;
 
   switch( offset )
   {
     case 6: // return OK for 68k status register until motors hooked up
       return 0;
     default:
-      return ( shrike_shared[offset >> 1] & mem_mask ) >> ( ~mem_mask & 8 );
+      return ( shrike_shared[offset >> 1] & ~mem_mask ) >> ( mem_mask & 8 );
   }
 }
 
 
 WRITE8_HANDLER( shrike_shared_6809_w )
 {
-  UINT16 mem_mask = offset & 1 ? 0xff : 0xff00;
-  shrike_shared[offset >> 1] = ( shrike_shared[offset >> 1] & ~mem_mask ) | ( data << ( ~mem_mask & 0x8 ) );
+  UINT16 mem_mask = offset & 1 ? 0xff00 : 0x00ff;
+  shrike_shared[offset >> 1] = ( shrike_shared[offset >> 1] & mem_mask ) | ( data << ( mem_mask & 0x8 ) );
 }
 
 // uses movep, so writes even 8 bit addresses to odd 16 bit addresses, reads as 16 bit from odd addresses
@@ -1246,6 +1246,6 @@ WRITE16_HANDLER( shrike_io_68k_w )
 
 READ16_HANDLER( shrike_io_68k_r )
 {
-  return ( shrike_io[offset] & ~mem_mask ) >> ( 8 & mem_mask );
+  return ( shrike_io[offset] & mem_mask ) >> ( 8 & ~mem_mask );
 }
 

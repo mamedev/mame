@@ -87,7 +87,7 @@ static MACHINE_RESET( aquarium )
 static READ16_HANDLER( aquarium_coins_r )
 {
 	int data;
-	data = (input_port_2_word_r(machine,0,mem_mask) & 0x7fff);	/* IN1 */
+	data = (input_port_read_indexed(machine,2) & 0x7fff);	/* IN1 */
 	data |= aquarium_snd_ack;
 	aquarium_snd_ack = 0;
 	return data;

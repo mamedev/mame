@@ -123,8 +123,8 @@ static WRITE16_HANDLER( protection_w )
 			program_write_word(0xffc00c, 0xc0);
 			program_write_word(0xffc00e, 0);
 
-			sf_fg_scroll_w(machine, 0, d1, 0);
-			sf_bg_scroll_w(machine, 0, d2, 0);
+			sf_fg_scroll_w(machine, 0, d1, 0xffff);
+			sf_bg_scroll_w(machine, 0, d2, 0xffff);
 			break;
 		}
 	case 4:
@@ -144,7 +144,7 @@ static WRITE16_HANDLER( protection_w )
 				}
 				program_write_word(0xffc682, d1);
 				program_write_word(0xffc00e, off);
-				sf_bg_scroll_w(machine, 0, d1, 0);
+				sf_bg_scroll_w(machine, 0, d1, 0xffff);
 			}
 			break;
 		}

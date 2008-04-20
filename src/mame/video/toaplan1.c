@@ -319,12 +319,12 @@ static void toaplan1_set_scrolls(void)
 
 static STATE_POSTLOAD( rallybik_flipscreen )
 {
-	rallybik_bcu_flipscreen_w(Machine, 0, bcu_flipscreen, 0);
+	rallybik_bcu_flipscreen_w(machine, 0, bcu_flipscreen, 0xffff);
 }
 
 static STATE_POSTLOAD( toaplan1_flipscreen )
 {
-	toaplan1_bcu_flipscreen_w(Machine, 0, bcu_flipscreen, 0);
+	toaplan1_bcu_flipscreen_w(machine, 0, bcu_flipscreen, 0xffff);
 }
 
 
@@ -1230,18 +1230,18 @@ VIDEO_UPDATE( demonwld )
 
 VIDEO_EOF( rallybik )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0xffff);
 }
 
 VIDEO_EOF( toaplan1 )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0xffff);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 }
 
 VIDEO_EOF( samesame )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0);
+	buffer_spriteram16_w(machine, 0, 0, 0xffff);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 	cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);	/* Frame done */
 }

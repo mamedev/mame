@@ -119,7 +119,7 @@ static READ16_HANDLER( rng_sysregs_r )
                 bit8 : freeze
                 bit9 : joysticks layout(auto detect???)
             */
-			return(input_port_0_word_r(machine, 0, 0));
+			return input_port_read_indexed(machine, 0);
 		break;
 
 		case 0x06/2:

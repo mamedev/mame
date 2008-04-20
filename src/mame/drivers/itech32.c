@@ -757,31 +757,6 @@ static READ32_HANDLER( drivedge_tms2_speedup_r )
  *
  *************************************/
 
-static READ32_HANDLER( input_port_0_msw_r )
-{
-	return input_port_0_word_r(machine,offset,0) << 16;
-}
-
-static READ32_HANDLER( input_port_1_msw_r )
-{
-	return input_port_1_word_r(machine,offset,0) << 16;
-}
-
-static READ32_HANDLER( input_port_2_msw_r )
-{
-	return input_port_2_word_r(machine,offset,0) << 16;
-}
-
-static READ32_HANDLER( input_port_3_msw_r )
-{
-	return input_port_3_word_r(machine,offset,0) << 16;
-}
-
-static READ32_HANDLER( input_port_4_msw_r )
-{
-	return special_port4_r(machine,offset,0) << 16;
-}
-
 static WRITE32_HANDLER( int1_ack32_w )
 {
 	int1_ack_w(machine, offset, data, mem_mask);
@@ -931,14 +906,14 @@ AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
 AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 #endif
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x080000, 0x080003) AM_READ(input_port_3_msw_r)
-	AM_RANGE(0x082000, 0x082003) AM_READ(input_port_4_msw_r)
+	AM_RANGE(0x080000, 0x080003) AM_READ16(input_port_3_word_r, 0xffff0000)
+	AM_RANGE(0x082000, 0x082003) AM_READ16(special_port4_r, 0xffff0000)
 	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
 	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
 	AM_RANGE(0x08a000, 0x08a003) AM_READWRITE(drivedge_gas_r, SMH_NOP)
-	AM_RANGE(0x08c000, 0x08c003) AM_READWRITE(input_port_0_msw_r, SMH_NOP)
-	AM_RANGE(0x08e000, 0x08e003) AM_READWRITE(input_port_1_msw_r, SMH_NOP)
+	AM_RANGE(0x08c000, 0x08c003) AM_READWRITE16(input_port_0_word_r, SMH_NOP, 0xffff0000)
+	AM_RANGE(0x08e000, 0x08e003) AM_READWRITE16(input_port_1_word_r, SMH_NOP, 0xffff0000)
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_BASE(&drivedge_zbuf_control)
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
 	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_BASE(&paletteram32)
@@ -946,7 +921,7 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE((UINT32 **)&itech32_video)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
 	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE(tms_reset_clear_w)
-	AM_RANGE(0x200000, 0x200003) AM_READ(input_port_2_msw_r)
+	AM_RANGE(0x200000, 0x200003) AM_READ16(input_port_2_word_r, 0xffff0000)
 	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(tms1_68k_ram_w) AM_SHARE(1)
 	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(tms2_68k_ram_w) AM_SHARE(2)
 	AM_RANGE(0x380000, 0x380003) AM_WRITENOP // AM_WRITE(watchdog_reset16_w)
@@ -968,11 +943,11 @@ ADDRESS_MAP_END
 /*------ 68EC020-based memory layout ------*/
 static ADDRESS_MAP_START( itech020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE((UINT32 **)&main_ram) AM_SIZE(&main_ram_size)
-	AM_RANGE(0x080000, 0x080003) AM_READWRITE(input_port_0_msw_r, int1_ack32_w)
-	AM_RANGE(0x100000, 0x100003) AM_READ(input_port_1_msw_r)
-	AM_RANGE(0x180000, 0x180003) AM_READ(input_port_2_msw_r)
-	AM_RANGE(0x200000, 0x200003) AM_READ(input_port_3_msw_r)
-	AM_RANGE(0x280000, 0x280003) AM_READ(input_port_4_msw_r)
+	AM_RANGE(0x080000, 0x080003) AM_READ16(input_port_0_word_r, 0xffff0000) AM_WRITE(int1_ack32_w)
+	AM_RANGE(0x100000, 0x100003) AM_READ16(input_port_1_word_r, 0xffff0000)
+	AM_RANGE(0x180000, 0x180003) AM_READ16(input_port_2_word_r, 0xffff0000)
+	AM_RANGE(0x200000, 0x200003) AM_READ16(input_port_3_word_r, 0xffff0000)
+	AM_RANGE(0x280000, 0x280003) AM_READ16(special_port4_r, 0xffff0000)
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(itech020_color1_w)
 	AM_RANGE(0x380000, 0x380003) AM_WRITE(itech020_color2_w)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(watchdog_reset32_w)

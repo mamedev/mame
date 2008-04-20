@@ -572,7 +572,7 @@ READ16_HANDLER( c352_0_r )
 
 WRITE16_HANDLER( c352_0_w )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		c352_write_reg16(sndti_token(SOUND_C352, 0), offset*2, data);
 	}

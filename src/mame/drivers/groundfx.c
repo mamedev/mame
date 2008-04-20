@@ -164,13 +164,13 @@ static READ32_HANDLER( groundfx_input_r )
 	{
 		case 0x00:
 		{
-			return (input_port_0_word_r(machine,0,0) << 16) | input_port_1_word_r(machine,0,0) |
+			return (input_port_read_indexed(machine,0) << 16) | input_port_read_indexed(machine,1) |
 				  (EEPROM_read_bit() << 7) | frame_counter;
 		}
 
 		case 0x01:
 		{
-			return input_port_2_word_r(machine,0,0) | (coin_word << 16);
+			return input_port_read_indexed(machine,2) | (coin_word << 16);
 		}
  	}
 
@@ -215,7 +215,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 static READ32_HANDLER( groundfx_adc_r )
 {
-	return (input_port_3_word_r(machine,0,0) << 8) | input_port_4_word_r(machine,0,0);
+	return (input_port_read_indexed(machine,3) << 8) | input_port_read_indexed(machine,4);
 }
 
 static WRITE32_HANDLER( groundfx_adc_w )

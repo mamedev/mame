@@ -204,7 +204,7 @@ READ16_HANDLER(genesis_ctrl_r)
 /* from MESS */
 WRITE16_HANDLER(genesis_ctrl_w)
 {
-	data &= ~mem_mask;
+	data &= mem_mask;
 
 /*  logerror("genesis_ctrl_w %x, %x\n", offset, data); */
 

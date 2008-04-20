@@ -9,7 +9,7 @@ WRITE32_HANDLER( eolith_vram_w )
 {
 	UINT32 *dest = &vram[offset+(0x40000/4)*eolith_buffer];
 
-	if (mem_mask == 0)
+	if (mem_mask == 0xffffffff)
 	{
 		if (~data & 0x80000000)
 			*dest = (*dest & 0x0000ffff) | (data & 0xffff0000);
@@ -17,8 +17,8 @@ WRITE32_HANDLER( eolith_vram_w )
 		if (~data & 0x00008000)
 			*dest = (*dest & 0xffff0000) | (data & 0x0000ffff);
 	}
-	else if (((mem_mask == 0x0000ffff) && (~data & 0x80000000)) ||
-	    	 ((mem_mask == 0xffff0000) && (~data & 0x00008000)))
+	else if (((mem_mask == 0xffff0000) && (~data & 0x80000000)) ||
+	    	 ((mem_mask == 0x0000ffff) && (~data & 0x00008000)))
 		COMBINE_DATA(dest);
 }
 

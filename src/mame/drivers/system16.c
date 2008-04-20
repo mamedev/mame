@@ -1205,7 +1205,7 @@ static READ16_HANDLER( ga_io_players_r ) {
 }
 static READ16_HANDLER( ga_io_service_r )
 {
-	return (input_port_2_word_r(machine,0,0) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
+	return (input_port_read_indexed(machine,2) << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
 }
 
 static ADDRESS_MAP_START( goldnaxe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1400,7 +1400,7 @@ static int passht4b_io3_val;
 
 static READ16_HANDLER( passht4b_service_r )
 {
-	UINT16 val=input_port_2_word_r(machine,offset,0);
+	UINT16 val=input_port_read_indexed(machine,2);
 	if(!(input_port_read_indexed(machine, 0) & 0x40)) val&=0xef;
 	if(!(input_port_read_indexed(machine, 1) & 0x40)) val&=0xdf;
 	if(!(input_port_read_indexed(machine, 5) & 0x40)) val&=0xbf;
@@ -1908,11 +1908,11 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( tt_io_player1_r )
-{ return input_port_0_r( machine, offset ) << 8; }
+{ return input_port_read_indexed(machine,0) << 8; }
 static READ16_HANDLER( tt_io_player2_r )
-{ return input_port_1_r( machine, offset ) << 8; }
+{ return input_port_read_indexed(machine,1) << 8; }
 static READ16_HANDLER( tt_io_service_r )
-{ return input_port_2_r( machine, offset ) << 8; }
+{ return input_port_read_indexed(machine,2) << 8; }
 
 
 

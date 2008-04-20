@@ -434,7 +434,7 @@ static READ8_HANDLER( claypign_protection_r )
 
 static READ8_HANDLER( topsecex_input_port_5_r )
 {
-	return (input_port_5_r(machine, offset) & 1) ? 0x01 : 0x02;
+	return (input_port_read_indexed(machine, 5) & 1) ? 0x01 : 0x02;
 }
 
 

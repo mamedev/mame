@@ -1534,7 +1534,7 @@ static UINT32 cic_status = 0x00000000;
 
 READ32_HANDLER( n64_pif_ram_r )
 {
-    /*mame_printf_debug( "pif_ram_r: %08X, %08X = %08X\n", offset << 2, mem_mask, ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & ~mem_mask );*/
+    /*mame_printf_debug( "pif_ram_r: %08X, %08X = %08X\n", offset << 2, mem_mask, ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & mem_mask );*/
     if( offset == ( 0x24 / 4 ) )
     {
         cic_status = 0x00000080;
@@ -1543,26 +1543,26 @@ READ32_HANDLER( n64_pif_ram_r )
     {
         return cic_status;
     }
-    return ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & ~mem_mask;
+    return ( ( pif_ram[offset*4+0] << 24 ) | ( pif_ram[offset*4+1] << 16 ) | ( pif_ram[offset*4+2] <<  8 ) | ( pif_ram[offset*4+3] <<  0 ) ) & mem_mask;
 }
 
 WRITE32_HANDLER( n64_pif_ram_w )
 {
     /*mame_printf_debug("pif_ram_w: %08X, %08X, %08X\n", data, offset << 4, mem_mask);*/
     /*
-    if( (~mem_mask) & 0xff000000 )
+    if( mem_mask & 0xff000000 )
     {
         pif_ram[offset*4+0] = ( data >> 24 ) & 0x000000ff;
     }
-    if( (~mem_mask) & 0x00ff0000 )
+    if( mem_mask & 0x00ff0000 )
     {
         pif_ram[offset*4+1] = ( data >> 16 ) & 0x000000ff;
     }
-    if( (~mem_mask) & 0x0000ff00 )
+    if( mem_mask & 0x0000ff00 )
     {
         pif_ram[offset*4+2] = ( data >>  8 ) & 0x000000ff;
     }
-    if( (~mem_mask) & 0x000000ff )
+    if( mem_mask & 0x000000ff )
     {
         pif_ram[offset*4+3] = ( data >>  0 ) & 0x000000ff;
     }

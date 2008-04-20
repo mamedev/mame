@@ -1194,7 +1194,7 @@ static READ32_HANDLER( taitofx1a_ymsound_r )
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
-	if (mem_mask == 0xffff0000)
+	if (mem_mask == 0x0000ffff)
 	{
 		taitosound_port_w(machine, 0, data&0xff);
 	}
@@ -1678,7 +1678,7 @@ static void atpsx_dma_read( UINT32 n_address, INT32 n_size )
 	n_size <<= 2;
 	while( n_size > 0 )
 	{
-		psxwritebyte( n_address, ide_controller32_r( ide, 0x1f0 / 4, 0xffffff00 ) );
+		psxwritebyte( n_address, ide_controller32_r( ide, 0x1f0 / 4, 0x000000ff ) );
 		n_address++;
 		n_size--;
 	}
@@ -2132,12 +2132,12 @@ static READ32_DEVICE_HANDLER( jdredd_ide_r )
 	int shift = 0;
 	int ret;
 
-	if (mem_mask == 0xff00ffff)
+	if (mem_mask == 0x00ff0000)
 	{
 		shift = 16;
 		reg++;
 	}
-	else if (mem_mask == 0xffff0000)	// code sometimes reads shorts from the DATA register
+	else if (mem_mask == 0x0000ffff)	// code sometimes reads shorts from the DATA register
 	{
 		if (reg != 0)
 		{
@@ -2156,7 +2156,7 @@ static WRITE32_DEVICE_HANDLER( jdredd_ide_w )
 {
 	int reg = offset*2;
 
-	if (mem_mask == 0xff00ffff)
+	if (mem_mask == 0x00ff0000)
 	{
 		data >>= 16;
 		reg++;

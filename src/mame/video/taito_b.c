@@ -162,7 +162,7 @@ static void hitice_clear_pixel_bitmap(running_machine *machine)
 	int i;
 
     for (i = 0;i < 0x40000;i++)
-		hitice_pixelram_w(machine,i,0,0);
+		hitice_pixelram_w(machine,i,0,0xffff);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

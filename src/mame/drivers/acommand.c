@@ -281,7 +281,7 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance Thru Tests)
             */
-			return input_port_0_word_r(machine,0,0);
+			return input_port_read_indexed(machine,0);
 		case 0x0014/2:
 			/*
                 write 0x40,read (~0x08)
@@ -315,7 +315,7 @@ static READ16_HANDLER(ac_devices_r)
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_1_word_r(machine,0,0);
+			return input_port_read_indexed(machine,1);
 	}
 	return ac_devram[offset];
 }

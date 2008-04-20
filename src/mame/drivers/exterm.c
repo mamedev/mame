@@ -156,8 +156,7 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 	aimpos[which] = (aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_1_word_r(machine, 0, mem_mask) :
-				   input_port_0_word_r(machine, 0, mem_mask);
+	port = which ? input_port_read_indexed(machine,1) : input_port_read_indexed(machine,0);
 
 	return (port & 0xc0ff) | (aimpos[which] << 8);
 }

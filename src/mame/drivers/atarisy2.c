@@ -361,8 +361,8 @@ static WRITE16_HANDLER( bankselect_w )
 
 static STATE_POSTLOAD( bankselect_postload )
 {
-	bankselect_w(Machine, 0, bankselect[0], 0);
-	bankselect_w(Machine, 1, bankselect[1], 0);
+	bankselect_w(machine, 0, bankselect[0], 0xffff);
+	bankselect_w(machine, 1, bankselect[1], 0xffff);
 }
 
 
@@ -375,7 +375,7 @@ static STATE_POSTLOAD( bankselect_postload )
 
 static READ16_HANDLER( switch_r )
 {
-	int result = input_port_1_r(machine, offset) | (input_port_2_r(machine, offset) << 8);
+	int result = input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 8);
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x20;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x10;
@@ -386,12 +386,12 @@ static READ16_HANDLER( switch_r )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	int result = input_port_0_r(machine, offset);
+	int result = input_port_read_indexed(machine, 0);
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x01;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x02;
 	if (!has_tms5220 || tms5220_ready_r()) result ^= 0x04;
-	if (!(input_port_2_r(machine, offset) & 0x80)) result ^= 0x10;
+	if (!(input_port_read_indexed(machine, 2) & 0x80)) result ^= 0x10;
 
 	return result;
 }
@@ -639,7 +639,7 @@ static READ16_HANDLER( sound_r )
 	atarigen_update_interrupts(machine);
 
 	/* handle it normally otherwise */
-	return atarigen_sound_r(machine,offset,0);
+	return atarigen_sound_r(machine,offset,0xffff);
 }
 
 

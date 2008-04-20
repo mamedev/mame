@@ -272,7 +272,7 @@ static VIDEO_UPDATE( bigfghtr )
 
 static VIDEO_EOF( bigfghtr )
 {
-	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
 }
 
 
@@ -317,7 +317,7 @@ static READ16_HANDLER(sharedram_r)
 			break;
 
 			case 0x46/2:
-				return (input_port_0_word_r(machine,0,0)&0xffff)^0xffff;
+				return (input_port_read_indexed(machine,0)&0xffff)^0xffff;
 
 
 		}

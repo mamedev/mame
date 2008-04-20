@@ -297,7 +297,7 @@ static WRITE16_HANDLER( standard_io_w )
 				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask ^ 0xffff);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -549,12 +549,12 @@ static void quartet_i8751_sim(running_machine *machine)
 	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 
 	/* X scroll values */
-	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0);
-	segaic16_textram_0_w(machine, 0xffa/2, workram[0x0d18/2], 0);
+	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0xffff);
+	segaic16_textram_0_w(machine, 0xffa/2, workram[0x0d18/2], 0xffff);
 
 	/* page values */
-	segaic16_textram_0_w(machine, 0xe9e/2, workram[0x0d1c/2], 0);
-	segaic16_textram_0_w(machine, 0xe9c/2, workram[0x0d1e/2], 0);
+	segaic16_textram_0_w(machine, 0xe9e/2, workram[0x0d1c/2], 0xffff);
+	segaic16_textram_0_w(machine, 0xe9c/2, workram[0x0d1e/2], 0xffff);
 }
 
 

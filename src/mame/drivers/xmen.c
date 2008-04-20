@@ -76,7 +76,7 @@ logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (EEPROM_read_bit() << 6) | input_port_2_word_r(machine,0,0);
+	res = (EEPROM_read_bit() << 6) | input_port_read_indexed(machine,2);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -93,7 +93,7 @@ logerror("%06x xmen6p_eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (EEPROM_read_bit() << 6) | input_port_2_word_r(machine,0,0);
+	res = (EEPROM_read_bit() << 6) | input_port_read_indexed(machine,2);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;

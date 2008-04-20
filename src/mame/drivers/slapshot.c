@@ -202,8 +202,8 @@ static READ16_HANDLER( slapshot_service_input_r )
 	switch (offset)
 	{
 		case 0x03:
-			return ((input_port_3_word_r(machine,0,0) & 0xef) |
-				  (input_port_5_word_r(machine,0,0) & 0x10))  << 8;	/* IN3 + service switch */
+			return ((input_port_read_indexed(machine,3) & 0xef) |
+				  (input_port_read_indexed(machine,5) & 0x10))  << 8;	/* IN3 + service switch */
 
 		default:
 			return TC0640FIO_r(machine,offset) << 8;

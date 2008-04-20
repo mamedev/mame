@@ -1029,12 +1029,12 @@ static READ16_HANDLER( contcirc_input_bypass_r )
 
 	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_6_word_r(machine,0,0);
+	int fake = input_port_read_indexed(machine,6);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_5_word_r(machine,0,0) - 0x80) * 0xc0) / 0x100;
+		steer = ((input_port_read_indexed(machine,5) - 0x80) * 0xc0) / 0x100;
 
 	}
 	else	/* Digital steer */
@@ -1069,12 +1069,12 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 
 	UINT8 port = TC0220IOC_port_r(machine,0);	/* read port number */
 	int steer = 0;
-	int fake = input_port_10_word_r(machine,0,0);
+	int fake = input_port_read_indexed(machine,10);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero */
-		steer = input_port_9_word_r(machine,0,0) - 0x80;
+		steer = input_port_read_indexed(machine,9) - 0x80;
 	}
 	else	/* Digital steer */
 	{
@@ -1091,16 +1091,16 @@ static READ16_HANDLER( chasehq_input_bypass_r )
 	switch (port)
 	{
 		case 0x08:
-			return input_port_5_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,5);
 
 		case 0x09:
-			return input_port_6_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,6);
 
 		case 0x0a:
-			return input_port_7_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,7);
 
 		case 0x0b:
-			return input_port_8_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,8);
 
 		case 0x0c:
 			return steer &0xff;
@@ -1119,16 +1119,16 @@ static READ16_HANDLER( bshark_stick_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_5_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,5);
 
 		case 0x01:
-			return input_port_6_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,6);
 
 		case 0x02:
-			return input_port_7_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,7);
 
 		case 0x03:
-			return input_port_8_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,8);
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n",activecpu_get_pc(),offset);
@@ -1152,16 +1152,16 @@ static READ16_HANDLER( nightstr_stick_r )
 	switch (offset)
 	{
 		case 0x00:
-			return nightstr_stick[(input_port_5_word_r(machine,0,mem_mask) * 0x64) / 0x100];
+			return nightstr_stick[(input_port_read_indexed(machine,5) * 0x64) / 0x100];
 
 		case 0x01:
-			return nightstr_stick[(input_port_6_word_r(machine,0,mem_mask) * 0x64) / 0x100];
+			return nightstr_stick[(input_port_read_indexed(machine,6) * 0x64) / 0x100];
 
 		case 0x02:
-			return input_port_7_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,7);
 
 		case 0x03:
-			return input_port_8_word_r(machine,0,mem_mask);
+			return input_port_read_indexed(machine,8);
 	}
 
 logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n",activecpu_get_pc(),offset);
@@ -1184,12 +1184,12 @@ static WRITE16_HANDLER( bshark_stick_w )
 static READ16_HANDLER( sci_steer_input_r )
 {
 	int steer = 0;
-	int fake = input_port_6_word_r(machine,0,0);
+	int fake = input_port_read_indexed(machine,6);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0xc0 */
-		steer = ((input_port_5_word_r(machine,0,0) - 0x80) * 0xc0) / 0x100;
+		steer = ((input_port_read_indexed(machine,5) - 0x80) * 0xc0) / 0x100;
 	}
 	else	/* Digital steer */
 	{
@@ -1235,16 +1235,16 @@ static READ16_HANDLER( spacegun_lightgun_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_5_word_r(machine,0,mem_mask);	/* P1X */
+			return input_port_read_indexed(machine,5);	/* P1X */
 
 		case 0x01:
-			return input_port_6_word_r(machine,0,mem_mask);	/* P1Y */
+			return input_port_read_indexed(machine,6);	/* P1Y */
 
 		case 0x02:
-			return input_port_7_word_r(machine,0,mem_mask);	/* P2X */
+			return input_port_read_indexed(machine,7);	/* P2X */
 
 		case 0x03:
-			return input_port_8_word_r(machine,0,mem_mask);	/* P2Y */
+			return input_port_read_indexed(machine,8);	/* P2Y */
 	}
 
 	return 0x0;
@@ -1267,12 +1267,12 @@ static WRITE16_HANDLER( spacegun_lightgun_w )
 static READ16_HANDLER( dblaxle_steer_input_r )
 {
 	int steer = 0;
-	int fake = input_port_6_word_r(machine,0,0);
+	int fake = input_port_read_indexed(machine,6);
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
 		/* center around zero and reduce span to 0x80 */
-		steer = ((input_port_5_word_r(machine,0,0) - 0x80) * 0x80) / 0x100;
+		steer = ((input_port_read_indexed(machine,5) - 0x80) * 0x80) / 0x100;
 	}
 	else	/* Digital steer */
 	{

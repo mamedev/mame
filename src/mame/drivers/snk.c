@@ -320,7 +320,7 @@ static int snk_input_port_r( running_machine *machine, int which ){
 	switch( snk_io[which] ){
 		case SNK_INP0:
 		{
-			int value = input_port_0_r( machine,0 );
+			int value = input_port_read_indexed( machine,0 );
 			if( (snk_sound_register & 0x04) == 0 ) value &= ~snk_sound_busy_bit;
 			return value;
 		}

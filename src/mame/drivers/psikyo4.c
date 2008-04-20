@@ -305,7 +305,7 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 		}
 	} else {
 		/* I believe this to be seperate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
-		if((data & ~mem_mask) != 0)
+		if((data & mem_mask) != 0)
 			logerror("Unk Scr 1 rgb? brt write %08x mask %08x\n", data, mem_mask);
 	}
 }
@@ -332,7 +332,7 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 		}
 	} else {
 		/* I believe this to be seperate rgb brightness due to strings in hotdebut, unused in 4 dumped games */
-		if((data & ~mem_mask) != 0)
+		if((data & mem_mask) != 0)
 			logerror("Unk Scr 2 rgb? brt write %08x mask %08x\n", data, mem_mask);
 	}
 }

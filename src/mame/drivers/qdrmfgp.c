@@ -47,15 +47,15 @@ static INT32 gp2_irq_control;
 static READ16_HANDLER( i_port1_r )
 {
 	if (control & 0x0080)
-		return input_port_0_word_r(machine,0,0);
+		return input_port_read_indexed(machine,0);
 	else
-		return input_port_1_word_r(machine,0,0);
+		return input_port_read_indexed(machine,1);
 }
 
 static READ16_HANDLER( i_port2_r )
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
-	return (input_port_2_word_r(machine,0,0) & 0xfffc) | 0x0003;
+	return (input_port_read_indexed(machine,2) & 0xfffc) | 0x0003;
 }
 
 
@@ -214,23 +214,23 @@ static WRITE16_HANDLER( k054539_word_w )
 static READ16_DEVICE_HANDLER( ide_std_r )
 {
 	if (offset & 0x01)
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
 	else
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x0000);
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xffff);
 }
 
 static WRITE16_DEVICE_HANDLER( ide_std_w )
 {
 	if (offset & 0x01)
-		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data << 8, 0x00ff);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data << 8, 0xff00);
 	else
-		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data, 0x0000);
+		ide_controller16_w(device, IDE_STD_OFFSET + offset/2, data, 0xffff);
 }
 
 static READ16_DEVICE_HANDLER( ide_alt_r )
 {
 	if (offset == 0)
-		return ide_controller16_r(device, IDE_ALT_OFFSET, 0xff00);
+		return ide_controller16_r(device, IDE_ALT_OFFSET, 0x00ff);
 
 	return 0;
 }
@@ -238,7 +238,7 @@ static READ16_DEVICE_HANDLER( ide_alt_r )
 static WRITE16_DEVICE_HANDLER( ide_alt_w )
 {
 	if (offset == 0)
-		ide_controller16_w(device, IDE_ALT_OFFSET, data, 0xff00);
+		ide_controller16_w(device, IDE_ALT_OFFSET, data, 0x00ff);
 }
 
 
@@ -260,9 +260,9 @@ static READ16_DEVICE_HANDLER( gp2_ide_std_r )
 					break;
 			}
 		}
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x00ff) >> 8;
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xff00) >> 8;
 	} else {
-		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0x0000);
+		return ide_controller16_r(device, IDE_STD_OFFSET + offset/2, 0xffff);
 	}
 }
 

@@ -143,10 +143,10 @@ static READ16_HANDLER( K056800_68k_r )
 static WRITE16_HANDLER( K056800_68k_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K056800_sound_w(machine, (offset*2)+0, (data >> 8) & 0xff, 0xffff);
+		K056800_sound_w(machine, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
 
 	if (ACCESSING_BITS_0_7)
-		K056800_sound_w(machine, (offset*2)+1, (data >> 0) & 0xff, 0xffff);
+		K056800_sound_w(machine, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )

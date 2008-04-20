@@ -142,7 +142,7 @@ static MACHINE_RESET( sshangha )
          orientation when entering the "test mode"
          (check the game code from 0x0006b8 to 0x0006f0).
        I can't tell however if this is accurate or not. */
-	sshangha_control_0_w(machine, 0, 0x10, 0xff00);
+	sshangha_control_0_w(machine, 0, 0x10, 0x00ff);
 }
 
 /******************************************************************************/

@@ -225,7 +225,7 @@ static int copper_execute_next(running_machine *machine, int xpos)
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", last_scanline, xpos / 2, amiga_custom_names[copper_pending_offset & 0xff], copper_pending_data);
 
-		amiga_custom_w(machine, copper_pending_offset, copper_pending_data, 0);
+		amiga_custom_w(machine, copper_pending_offset, copper_pending_data, 0xffff);
 		copper_pending_offset = 0;
 	}
 

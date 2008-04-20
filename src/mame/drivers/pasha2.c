@@ -140,17 +140,17 @@ static WRITE16_HANDLER( bitmap_1_w )
 	// handle overlapping pixels without writing them
 	switch(mem_mask)
 	{
-		case 0:
-			bitmap_1_w(machine,offset,data,0x00ff);
+		case 0xffff:
 			bitmap_1_w(machine,offset,data,0xff00);
+			bitmap_1_w(machine,offset,data,0x00ff);
 			return;
 
-		case 0x00ff:
+		case 0xff00:
 			if((data & 0xff00) == 0xff00)
 				return;
 		break;
 
-		case 0xff00:
+		case 0x00ff:
 			if((data & 0x00ff) == 0x00ff)
 				return;
 		break;

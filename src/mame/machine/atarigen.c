@@ -521,7 +521,7 @@ static OPBASE_HANDLER( atarigen_slapstic_setopbase )
 		{
 			atarigen_slapstic_last_pc = pc;
 			atarigen_slapstic_last_address = address;
-			atarigen_slapstic_r(machine, (address >> 1) & 0x3fff, 0);
+			atarigen_slapstic_r(machine, (address >> 1) & 0x3fff, 0xffff);
 		}
 		return ~0;
 	}
@@ -733,21 +733,21 @@ WRITE32_HANDLER( atarigen_sound_upper32_w )
 READ16_HANDLER( atarigen_sound_r )
 {
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(machine, 0, 0, 0);
+	atarigen_sound_int_ack_w(machine, 0, 0, 0xffff);
 	return atarigen_sound_to_cpu | 0xff00;
 }
 
 READ16_HANDLER( atarigen_sound_upper_r )
 {
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(machine, 0, 0, 0);
+	atarigen_sound_int_ack_w(machine, 0, 0, 0xffff);
 	return (atarigen_sound_to_cpu << 8) | 0x00ff;
 }
 
 READ32_HANDLER( atarigen_sound_upper32_r )
 {
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack32_w(machine, 0, 0, 0);
+	atarigen_sound_int_ack32_w(machine, 0, 0, 0xffff);
 	return (atarigen_sound_to_cpu << 24) | 0x00ffffff;
 }
 
@@ -808,7 +808,7 @@ static TIMER_CALLBACK( delayed_sound_reset )
 
 	/* reset the sound write state */
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(machine, 0, 0, 0);
+	atarigen_sound_int_ack_w(machine, 0, 0, 0xffff);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -1237,7 +1237,7 @@ static void atarivc_common_w(const device_config *screen, offs_t offset, UINT16 
 
 		/* scanline IRQ ack here */
 		case 0x1e:
-			atarigen_scanline_int_ack_w(screen->machine, 0, 0, 0);
+			atarigen_scanline_int_ack_w(screen->machine, 0, 0, 0xffff);
 			break;
 
 		/* log anything else */

@@ -221,26 +221,26 @@ static WRITE8_HANDLER( input_port_select_w )
 
 static READ8_HANDLER( royalmah_player_1_port_r )
 {
-	int ret = (input_port_0_r(machine,offset) & 0xc0) | 0x3f;
+	int ret = (input_port_read_indexed(machine,0) & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_0_r(machine,offset);
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_1_r(machine,offset);
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_2_r(machine,offset);
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_3_r(machine,offset);
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_4_r(machine,offset);
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_read_indexed(machine,0);
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_read_indexed(machine,1);
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_read_indexed(machine,2);
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_read_indexed(machine,3);
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_read_indexed(machine,4);
 
 	return ret;
 }
 
 static READ8_HANDLER( royalmah_player_2_port_r )
 {
-	int ret = (input_port_5_r(machine,offset) & 0xc0) | 0x3f;
+	int ret = (input_port_read_indexed(machine,5) & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_5_r(machine,offset);
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_6_r(machine,offset);
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_7_r(machine,offset);
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_8_r(machine,offset);
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_9_r(machine,offset);
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_read_indexed(machine,5);
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_read_indexed(machine,6);
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_read_indexed(machine,7);
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_read_indexed(machine,8);
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_read_indexed(machine,9);
 
 	return ret;
 }

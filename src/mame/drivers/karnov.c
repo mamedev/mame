@@ -288,7 +288,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
-			buffer_spriteram16_w(machine,0,0,0);
+			buffer_spriteram16_w(machine,0,0,0xffff);
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */

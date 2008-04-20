@@ -562,7 +562,7 @@ static MEMCARD_HANDLER( neogeo )
 static WRITE16_HANDLER( audio_command_w )
 {
 	/* accessing the LSB only is not mapped */
-	if (mem_mask != 0xff00)
+	if (mem_mask != 0x00ff)
 	{
 		soundlatch_w(machine, 0, data >> 8);
 
@@ -1013,7 +1013,7 @@ static MACHINE_RESET( neogeo )
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		system_control_w(machine, offs, 0, 0xff00);
+		system_control_w(machine, offs, 0, 0x00ff);
 
 	neogeo_reset_rng();
 

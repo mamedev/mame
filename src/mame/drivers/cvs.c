@@ -279,12 +279,12 @@ static READ8_HANDLER( cvs_input_r )
 	/* the lower 4 (or 3?) bits select the port to read */
 	switch (offset & 0x0f)	/* might be 0x07 */
 	{
-	case 0x00:  ret = input_port_0_r(machine, 0); break;
-	case 0x02:  ret = input_port_1_r(machine, 0); break;
-	case 0x03:  ret = input_port_2_r(machine, 0); break;
-	case 0x04:  ret = input_port_3_r(machine, 0); break;
-	case 0x06:  ret = input_port_4_r(machine, 0); break;
-	case 0x07:  ret = input_port_5_r(machine, 0); break;
+	case 0x00:  ret = input_port_read_indexed(machine, 0); break;
+	case 0x02:  ret = input_port_read_indexed(machine, 1); break;
+	case 0x03:  ret = input_port_read_indexed(machine, 2); break;
+	case 0x04:  ret = input_port_read_indexed(machine, 3); break;
+	case 0x06:  ret = input_port_read_indexed(machine, 4); break;
+	case 0x07:  ret = input_port_read_indexed(machine, 5); break;
 	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", activecpu_get_pc(), offset & 0x0f); break;
 	}
 

@@ -245,10 +245,10 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch (hcrash_selected_ip & 0xf)
 	{												// From WEC Le Mans Schems:
-		case 0xc:  return input_port_8_r(machine,offset);	// Accel - Schems: Accelevr
-		case 0:    return input_port_8_r(machine,offset);
-		case 0xd:  return input_port_9_r(machine,offset);	// Wheel - Schems: Handlevr
-		case 1:    return input_port_9_r(machine,offset);
+		case 0xc:  return input_port_read_indexed(machine,8);	// Accel - Schems: Accelevr
+		case 0:    return input_port_read_indexed(machine,8);
+		case 0xd:  return input_port_read_indexed(machine,9);	// Wheel - Schems: Handlevr
+		case 1:    return input_port_read_indexed(machine,9);
 
 		default: return ~0;
 	}

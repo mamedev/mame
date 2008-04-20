@@ -410,7 +410,7 @@ WRITE8_HANDLER( segaic16_memory_mapper_w )
 
 READ16_HANDLER( segaic16_memory_mapper_lsb_r )
 {
-	return memory_mapper_r(&memory_mapper, offset, segaic16_open_bus_r(machine,0,0));
+	return memory_mapper_r(&memory_mapper, offset, segaic16_open_bus_r(machine,0,0xffff));
 }
 
 

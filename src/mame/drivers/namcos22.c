@@ -1148,7 +1148,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		int i;
 		for( i=0; i<4; i++ )
 		{
-			if( (mask&0xff000000)==0 )
+			if( (mask&0xff000000)!=0 )
 			{
 				int offs = offset*4+i;
 				if(offs<4 || offs>=8)
@@ -1166,7 +1166,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 
 	if( mbSuperSystem22 )
 	{
-		if (offset == 0x14/4 && mem_mask == 0xffff00ff)
+		if (offset == 0x14/4 && mem_mask == 0x0000ff00)
 		{ /* SUBCPU enable for Super System 22 */
 			if (data)
 			{
@@ -1180,7 +1180,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 	}
 	else
 	{
-		if (offset == 0x18/4 && mem_mask == 0xffff00ff)
+		if (offset == 0x18/4 && mem_mask == 0x0000ff00)
 		{ /* SUBCPU enable on System 22 (guessed, but too early crashes Rave Racer so it's a good test) */
 			if (data == 0xff00)
 			{

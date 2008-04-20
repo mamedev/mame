@@ -38,7 +38,7 @@ static WRITE16_HANDLER( darkseal_control_w )
 {
 	switch (offset<<1) {
     case 6: /* DMA flag */
-		buffer_spriteram16_w(machine,0,0,0);
+		buffer_spriteram16_w(machine,0,0,0xffff);
 		return;
     case 8: /* Sound CPU write */
 		soundlatch_w(machine,0,data & 0xff);

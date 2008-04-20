@@ -219,11 +219,11 @@ READ8_HANDLER( thepit_input_port_0_r )
        horizontal flip switch. (This is how the real PCB does it) */
 	if (thepit_flip_screen_x)
 	{
-		return input_port_3_r(machine,offset);
+		return input_port_read_indexed(machine, 3);
 	}
 	else
 	{
-		return input_port_0_r(machine,offset);
+		return input_port_read_indexed(machine, 0);
 	}
 }
 

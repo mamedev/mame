@@ -38,7 +38,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 {
 	switch (offset<<1) {
 	case 0: /* DMA flag */
-		buffer_spriteram16_w(machine,0,0,0);
+		buffer_spriteram16_w(machine,0,0,0xffff);
 		return;
 
 	case 6: /* IRQ ack */

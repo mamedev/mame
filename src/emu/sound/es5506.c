@@ -1711,7 +1711,7 @@ INLINE void es5505_reg_write_high(struct ES5506Chip *chip, struct ES5506Voice *v
 								  ((data << 2) & (CONTROL_CA0 | CONTROL_CA1));
 			}
 			if (LOG_COMMANDS && eslog)
-				fprintf(eslog, "%06x:voice %d, control=%04x (raw=%04x & %04x)\n", activecpu_get_previouspc(), chip->current_page & 0x1f, voice->control, data, mem_mask ^ 0xffff);
+				fprintf(eslog, "%06x:voice %d, control=%04x (raw=%04x & %04x)\n", activecpu_get_previouspc(), chip->current_page & 0x1f, voice->control, data, mem_mask);
 			break;
 
 		case 0x01:	/* O4(n-1) */
@@ -1847,7 +1847,7 @@ static void es5505_reg_write(struct ES5506Chip *chip, offs_t offset, UINT16 data
 {
 	struct ES5506Voice *voice = &chip->voice[chip->current_page & 0x1f];
 
-//  logerror("%04x:ES5505 write %02x/%02x = %04x & %04x\n", activecpu_get_previouspc(), chip->current_page, offset, data, mem_mask ^ 0xffff);
+//  logerror("%04x:ES5505 write %02x/%02x = %04x & %04x\n", activecpu_get_previouspc(), chip->current_page, offset, data, mem_mask);
 
 	/* force an update */
 	stream_update(chip->stream);

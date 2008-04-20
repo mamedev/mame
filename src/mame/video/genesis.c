@@ -370,9 +370,9 @@ WRITE16_HANDLER( genesis_vdp_w )
 	{
 		case 0x00:	/* Write data */
 		case 0x01:
-			if (mem_mask)
+			if (mem_mask != 0xffff)
 			{
-				data &= ~mem_mask;
+				data &= mem_mask;
 				 if (ACCESSING_BITS_8_15)
 				 	data |= data >> 8;
 				 else
@@ -383,9 +383,9 @@ WRITE16_HANDLER( genesis_vdp_w )
 
 		case 0x02:	/* Control Write */
 		case 0x03:
-			if (mem_mask)
+			if (mem_mask != 0xffff)
 			{
-				data &= ~mem_mask;
+				data &= mem_mask;
 				 if (ACCESSING_BITS_8_15)
 				 	data |= data >> 8;
 				 else

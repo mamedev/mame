@@ -669,16 +669,16 @@ static READ16_HANDLER( m37710_internal_word_r )
 
 static WRITE16_HANDLER( m37710_internal_word_w )
 {
-	if (mem_mask == 0)
+	if (mem_mask == 0xffff)
 	{
 		m37710_internal_w((offset*2), data & 0xff);
 		m37710_internal_w((offset*2)+1, data>>8);
 	}
-	else if (mem_mask == 0xff)
+	else if (mem_mask == 0xff00)
 	{
 		m37710_internal_w((offset*2)+1, data>>8);
 	}
-	else if (mem_mask == 0xff00)
+	else if (mem_mask == 0x00ff)
 	{
 		m37710_internal_w((offset*2), data & 0xff);
 	}

@@ -215,6 +215,6 @@ popmessage("gfxctrl = %02x",gfxctrl);
 
 VIDEO_EOF( crshrace )
 {
-	buffer_spriteram16_w(machine,0,0,0);
-	buffer_spriteram16_2_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_2_w(machine,0,0,0xffff);
 }

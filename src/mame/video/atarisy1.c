@@ -380,7 +380,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		    ((offset & 0xc0) == 0x40 && (newword == 0xffff || oldword == 0xffff)))
 		{
 			/* if the timer is in the active bank, update the display list */
-			atarimo_0_spriteram_w(machine, offset, data, 0);
+			atarimo_0_spriteram_w(machine, offset, data, 0xffff);
 			update_timers(machine, video_screen_get_vpos(machine->primary_screen));
 		}
 
@@ -393,7 +393,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 	}
 
 	/* let the MO handler do the basic work */
-	atarimo_0_spriteram_w(machine, offset, data, 0);
+	atarimo_0_spriteram_w(machine, offset, data, 0xffff);
 }
 
 
@@ -407,7 +407,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 static TIMER_CALLBACK( int3off_callback )
 {
 	/* clear the state */
-	atarigen_scanline_int_ack_w(machine, 0, 0, 0);
+	atarigen_scanline_int_ack_w(machine, 0, 0, 0xffff);
 }
 
 

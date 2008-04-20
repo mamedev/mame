@@ -133,7 +133,7 @@ static WRITE32_HANDLER( latch_w )
         D0  = CC.R
     */
 
-	logerror("latch_w(%08X) & %08X\n", data, ~mem_mask);
+	logerror("latch_w(%08X) & %08X\n", data, mem_mask);
 
 	/* upper byte */
 	if (ACCESSING_BITS_24_31)

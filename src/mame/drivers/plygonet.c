@@ -216,18 +216,18 @@ static WRITE32_HANDLER( dsp_shared_ram_write )
 		return;
 	}
 
-	if (mem_mask == (0x00000000))
+	if (mem_mask == (0xffffffff))
 	{
 		/* write the data to the dsp56k as well */
 		dsp56k_shared_ram_16[(offset<<1)]   = (dsp_shared_ram[offset] & 0xffff0000) >> 16 ;
 		dsp56k_shared_ram_16[(offset<<1)+1] = (dsp_shared_ram[offset] & 0x0000ffff) ;
 	}
-	else if (mem_mask == (0x0000ffff))
+	else if (mem_mask == (0xffff0000))
 	{
 		/* write to the 'current' dsp56k byte */
 		dsp56k_shared_ram_16[(offset<<1)]   = (dsp_shared_ram[offset] & 0xffff0000) >> 16 ;
 	}
-	else if (mem_mask == (0xffff0000))
+	else if (mem_mask == (0x0000ffff))
 	{
 		/* write to the 'next' dsp56k byte */
 		dsp56k_shared_ram_16[(offset<<1)+1] = (dsp_shared_ram[offset] & 0x0000ffff) ;
@@ -267,12 +267,12 @@ static READ32_HANDLER( dsp_host_interface_r )
 {
 	UINT8 hi_addr  = offset<<1;
 
-	if (mem_mask == (~0x0000ff00))
+	if (mem_mask == 0x0000ff00)
 		hi_addr++;
 
 	logerror("CALLING dsp_host_interface_read %x = %x [%x] (@%x)\n", hi_addr, dsp56k_host_interface_read(hi_addr), mem_mask, activecpu_get_pc());
 
-	if (mem_mask == (~0x0000ff00))
+	if (mem_mask == 0x0000ff00)
 		return dsp56k_host_interface_read(hi_addr) << 8;
 	else
 		return dsp56k_host_interface_read(hi_addr) << 24;
@@ -284,7 +284,7 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 	UINT8 dsp_data;
 	UINT8 hi_addr  = offset<<1;
 
-	if (mem_mask == (~0x0000ff00))				/* The second byte */
+	if (mem_mask == 0x0000ff00)				/* The second byte */
 	{
 		hi_addr++;
 		dsp_data = data >> 8;

@@ -60,8 +60,8 @@ static READ16_HANDLER( nvram_r )
 
 static READ16_HANDLER( joystick_r )
 {
-    return (((input_port_0_r (machine,offset) - 0xf) << 8) |
-            ((input_port_1_r (machine,offset) - 0xf) & 0xff));
+    return (((input_port_read_indexed(machine, 0) - 0xf) << 8) |
+            ((input_port_read_indexed(machine, 1) - 0xf) & 0xff));
 }
 
 

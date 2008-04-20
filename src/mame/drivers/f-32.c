@@ -98,7 +98,7 @@ static READ32_HANDLER( f32_input_port_1_r )
 	if ((activecpu_get_pc() == 0x000379de) ||
 	    (activecpu_get_pc() == 0x000379cc) ) activecpu_adjust_icount(-100);
 	//else printf("PC %08x\n", activecpu_get_pc() );
-	return input_port_1_dword_r(machine, 0, 0);
+	return input_port_read_indexed(machine, 1);
 }
 
 

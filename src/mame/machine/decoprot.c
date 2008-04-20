@@ -1729,9 +1729,9 @@ READ16_HANDLER( dietgo_104_prot_r )
 {
 	switch (offset * 2)
 	{
-	case 0x298: return input_port_0_word_r(machine, 0, 0);
-	case 0x342: return input_port_1_word_r(machine, 0, 0);
-	case 0x506: return input_port_2_word_r(machine, 0, 0);
+	case 0x298: return input_port_read_indexed(machine,0);
+	case 0x342: return input_port_read_indexed(machine,1);
+	case 0x506: return input_port_read_indexed(machine,2);
 	}
 
 	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",activecpu_get_pc(),offset<<1);
@@ -1756,9 +1756,9 @@ READ16_HANDLER( deco16_104_pktgaldx_prot_r )
 	const UINT16* prot_ram=deco16_prot_ram;
 	switch (offset * 2)
 	{
-	case 0x5b2: return input_port_0_word_r(machine, 0, 0);
-	case 0x44c: return input_port_1_word_r(machine, 0, 0);
-	case 0x042: return input_port_2_word_r(machine, 0, 0);
+	case 0x5b2: return input_port_read_indexed(machine,0);
+	case 0x44c: return input_port_read_indexed(machine,1);
+	case 0x042: return input_port_read_indexed(machine,2);
 
 	case 0x510: return DECO_PORT(0);
 	case 0x51a: return DECO_PORT(2);

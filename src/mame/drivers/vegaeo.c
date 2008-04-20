@@ -25,26 +25,26 @@ static WRITE32_HANDLER( vega_vram_w )
 {
 	switch(mem_mask)
 	{
-		case 0:
-			vega_vram_w(machine,offset,data,0x00ffffff);
-			vega_vram_w(machine,offset,data,0xff00ffff);
-			vega_vram_w(machine,offset,data,0xffff00ff);
-			vega_vram_w(machine,offset,data,0xffffff00);
-			return;
-
-		case 0x0000ffff:
-			vega_vram_w(machine,offset,data,0x00ffffff);
-			vega_vram_w(machine,offset,data,0xff00ffff);
+		case 0xffffffff:
+			vega_vram_w(machine,offset,data,0xff000000);
+			vega_vram_w(machine,offset,data,0x00ff0000);
+			vega_vram_w(machine,offset,data,0x0000ff00);
+			vega_vram_w(machine,offset,data,0x000000ff);
 			return;
 
 		case 0xffff0000:
-			vega_vram_w(machine,offset,data,0xffff00ff);
-			vega_vram_w(machine,offset,data,0xffffff00);
+			vega_vram_w(machine,offset,data,0xff000000);
+			vega_vram_w(machine,offset,data,0x00ff0000);
+			return;
+
+		case 0x0000ffff:
+			vega_vram_w(machine,offset,data,0x0000ff00);
+			vega_vram_w(machine,offset,data,0x000000ff);
 			return;
 
 		default:
 			// don't write transparent pen
-			if((data & ~mem_mask) == ~mem_mask)
+			if((data & mem_mask) == mem_mask)
 				return;
 	}
 

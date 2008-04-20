@@ -361,7 +361,7 @@ static void akiko_set_cd_status( UINT32 status )
 #if LOG_AKIKO_CD
 		logerror( "Akiko CD IRQ\n" );
 #endif
-		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0);
+		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
 

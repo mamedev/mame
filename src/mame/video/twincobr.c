@@ -290,37 +290,37 @@ WRITE16_HANDLER( twincobr_exscroll_w )	/* Extra unused video layer */
 WRITE8_HANDLER( wardner_txlayer_w )
 {
 	int shift = 8 * (offset & 1);
-	twincobr_txoffs_w(machine, offset / 2, data << shift, 0xff00 >> shift);
+	twincobr_txoffs_w(machine, offset / 2, data << shift, 0xff << shift);
 }
 
 WRITE8_HANDLER( wardner_bglayer_w )
 {
 	int shift = 8 * (offset & 1);
-	twincobr_bgoffs_w(machine, offset / 2, data << shift, 0xff00 >> shift);
+	twincobr_bgoffs_w(machine, offset / 2, data << shift, 0xff << shift);
 }
 
 WRITE8_HANDLER( wardner_fglayer_w )
 {
 	int shift = 8 * (offset & 1);
-	twincobr_fgoffs_w(machine, offset / 2, data << shift, 0xff00 >> shift);
+	twincobr_fgoffs_w(machine, offset / 2, data << shift, 0xff << shift);
 }
 
 WRITE8_HANDLER( wardner_txscroll_w )
 {
 	int shift = 8 * (offset & 1);
-	twincobr_txscroll_w(machine, offset / 2, data << shift, 0xff00 >> shift);
+	twincobr_txscroll_w(machine, offset / 2, data << shift, 0xff << shift);
 }
 
 WRITE8_HANDLER( wardner_bgscroll_w )
 {
 	int shift = 8 * (offset & 1);
-	twincobr_bgscroll_w(machine, offset / 2, data << shift, 0xff00 >> shift);
+	twincobr_bgscroll_w(machine, offset / 2, data << shift, 0xff << shift);
 }
 
 WRITE8_HANDLER( wardner_fgscroll_w )
 {
 	int shift = 8 * (offset & 1);
-	twincobr_fgscroll_w(machine, offset / 2, data << shift, 0xff00 >> shift);
+	twincobr_fgscroll_w(machine, offset / 2, data << shift, 0xff << shift);
 }
 
 WRITE8_HANDLER( wardner_exscroll_w )	/* Extra unused video layer */
@@ -338,9 +338,9 @@ READ8_HANDLER( wardner_videoram_r )
 {
 	int shift = 8 * (offset & 1);
 	switch (offset/2) {
-		case 0: return twincobr_txram_r(machine,0,0) >> shift; break;
-		case 1: return twincobr_bgram_r(machine,0,0) >> shift; break;
-		case 2: return twincobr_fgram_r(machine,0,0) >> shift; break;
+		case 0: return twincobr_txram_r(machine,0,0xffff) >> shift; break;
+		case 1: return twincobr_bgram_r(machine,0,0xffff) >> shift; break;
+		case 2: return twincobr_fgram_r(machine,0,0xffff) >> shift; break;
 	}
 	return 0;
 }
@@ -349,9 +349,9 @@ WRITE8_HANDLER( wardner_videoram_w )
 {
 	int shift = 8 * (offset & 1);
 	switch (offset/2) {
-		case 0: twincobr_txram_w(machine,0,data << shift, 0xff00 >> shift); break;
-		case 1: twincobr_bgram_w(machine,0,data << shift, 0xff00 >> shift); break;
-		case 2: twincobr_fgram_w(machine,0,data << shift, 0xff00 >> shift); break;
+		case 0: twincobr_txram_w(machine,0,data << shift, 0xff << shift); break;
+		case 1: twincobr_bgram_w(machine,0,data << shift, 0xff << shift); break;
+		case 2: twincobr_fgram_w(machine,0,data << shift, 0xff << shift); break;
 	}
 }
 
@@ -517,5 +517,5 @@ VIDEO_EOF( toaplan0 )
 	/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
         There are no CPU output registers that control this so we
         assume it happens automatically every frame, at the end of vblank */
-	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
 }

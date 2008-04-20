@@ -230,14 +230,14 @@ static WRITE16_HANDLER( sound_cmd_w )
 static READ8_HANDLER( soundlatch_lo_r )
 {
 //  sound_flag1 = 0;
-	return soundlatch_word_r(machine,offset,0) & 0xff;
+	return soundlatch_word_r(machine,offset,0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
 static READ8_HANDLER( soundlatch_hi_r )
 {
 //  sound_flag2 = 0;
-	return soundlatch_word_r(machine,offset,0) >> 8;
+	return soundlatch_word_r(machine,offset,0xff00) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
@@ -578,7 +578,7 @@ static READ16_HANDLER( donpachi_videoregs_r )
 		case 0:
 		case 1:
 		case 2:
-		case 3:	return cave_irq_cause_r(machine,offset,0);
+		case 3:	return cave_irq_cause_r(machine,offset,0xffff);
 
 		default:	return 0x0000;
 	}

@@ -124,7 +124,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 {
 	UINT16 level;
 //Perform write
-	system32_workram[CLEARED_LEVELS / 2] = (data & ~mem_mask) | (system32_workram[CLEARED_LEVELS / 2] & mem_mask);
+	system32_workram[CLEARED_LEVELS / 2] = (data & mem_mask) | (system32_workram[CLEARED_LEVELS / 2] & ~mem_mask);
 
 //Refresh current level
 		if (system32_workram[CLEARED_LEVELS / 2] == 0)
@@ -155,7 +155,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 // and can write things into work RAM.  we simulate that here for burning rival.
 READ16_HANDLER(brival_protection_r)
 {
-	if (!mem_mask)	// only trap on word-wide reads
+	if (mem_mask == 0xffff)	// only trap on word-wide reads
 	{
 		switch (offset)
 		{
@@ -244,14 +244,14 @@ void darkedge_fd1149_vblank(void)
 WRITE16_HANDLER( darkedge_protection_w )
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		activecpu_get_pc(), 0xa00000 + 2*offset, data, mem_mask ^ 0xffff);
+		activecpu_get_pc(), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
 READ16_HANDLER( darkedge_protection_r )
 {
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		activecpu_get_pc(), 0xa00000 + 2*offset, mem_mask ^ 0xffff);
+		activecpu_get_pc(), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 

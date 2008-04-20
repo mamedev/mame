@@ -440,7 +440,7 @@ READ16_HANDLER( smc91c94_r )
 	}
 
 	if (LOG_ETHERNET && offset != EREG_BANK)
-		logerror("%08X:ethernet_r(%s) = %04X & %04X\n", activecpu_get_pc(), ethernet_regname[offset], result, mem_mask ^ 0xffff);
+		logerror("%08X:ethernet_r(%s) = %04X & %04X\n", activecpu_get_pc(), ethernet_regname[offset], result, mem_mask);
 	return result;
 }
 
@@ -463,11 +463,11 @@ WRITE16_HANDLER( smc91c94_w )
 
 	/* update the data generically */
 	olddata = ethernet.reg[offset];
-	mem_mask |= ~ethernet.regmask[offset];
+	mem_mask &= ethernet.regmask[offset];
 	COMBINE_DATA(&ethernet.reg[offset]);
 
 	if (LOG_ETHERNET && offset != 7)
-		logerror("%08X:ethernet_w(%s) = %04X & %04X\n", activecpu_get_pc(), ethernet_regname[offset], data, mem_mask ^ 0xffff);
+		logerror("%08X:ethernet_w(%s) = %04X & %04X\n", activecpu_get_pc(), ethernet_regname[offset], data, mem_mask);
 
 	/* handle it */
 	switch (offset)

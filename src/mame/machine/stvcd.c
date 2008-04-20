@@ -1351,15 +1351,15 @@ READ32_HANDLER( stvcd_r )
 
 		case 0x98000:
 		case 0x18000:
-			if (mem_mask == 0)
+			if (mem_mask == 0xffffffff)
 			{
 				rv = cd_readLong(offset);
 			}
-			else if (mem_mask == 0x0000ffff)
+			else if (mem_mask == 0xffff0000)
 			{
 				rv = cd_readWord(offset)<<16;
 			}
-			else if (mem_mask == 0xffff0000)
+			else if (mem_mask == 0x0000ffff)
 			{
 				rv = cd_readWord(offset);
 			}

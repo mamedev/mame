@@ -83,7 +83,7 @@ static amiga_audio *audio_state;
 
 static TIMER_CALLBACK( signal_irq )
 {
-	amiga_custom_w(machine, REG_INTREQ, 0x8000 | (0x80 << param), 0);
+	amiga_custom_w(machine, REG_INTREQ, 0x8000 | (0x80 << param), 0xffff);
 }
 
 

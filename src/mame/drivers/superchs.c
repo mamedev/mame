@@ -116,7 +116,7 @@ static READ32_HANDLER( superchs_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return (input_port_0_word_r(machine,0,0) << 16) | input_port_1_word_r(machine,0,0) |
+			return (input_port_read_indexed(machine,0) << 16) | input_port_read_indexed(machine,1) |
 				  (EEPROM_read_bit() << 7);
 
 		case 0x01:
@@ -177,12 +177,12 @@ static WRITE32_HANDLER( superchs_input_w )
 
 static READ32_HANDLER( superchs_stick_r )
 {
-	int fake = input_port_6_word_r(machine,0,0);
+	int fake = input_port_read_indexed(machine,6);
 	int accel;
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
-		steer = input_port_2_word_r(machine,0,0);
+		steer = input_port_read_indexed(machine,2);
 	}
 	else	/* Digital steer, with smoothing - speed depends on how often stick_r is called */
 	{
@@ -207,13 +207,13 @@ static READ32_HANDLER( superchs_stick_r )
 	}
 
 	/* Accelerator is an analogue input but the game treats it as digital (on/off) */
-	if (input_port_6_word_r(machine,0,0) & 0x1)	/* pressing B1 */
+	if (input_port_read_indexed(machine,6) & 0x1)	/* pressing B1 */
 		accel = 0x0;
 	else
 		accel = 0xff;
 
 	/* Todo: Verify brake - and figure out other input */
-	return (steer << 24) | (accel << 16) | (input_port_4_word_r(machine,0,0) << 8) | input_port_5_word_r(machine,0,0);
+	return (steer << 24) | (accel << 16) | (input_port_read_indexed(machine,4) << 8) | input_port_read_indexed(machine,5);
 }
 
 static WRITE32_HANDLER( superchs_stick_w )
@@ -221,7 +221,7 @@ static WRITE32_HANDLER( superchs_stick_w )
 	/* This is guess work - the interrupts are in groups of 4, with each writing to a
         different byte in this long word before the RTE.  I assume all but the last
         (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
-	if (mem_mask!=0x00ffffff)
+	if (mem_mask!=0xff000000)
 		cpunum_set_input_line(Machine, 0,3,HOLD_LINE);
 }
 

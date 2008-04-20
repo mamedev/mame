@@ -2014,7 +2014,7 @@ static UINT32 cmdfifo_execute(voodoo_state *v, cmdfifo_info *f)
 
 				/* loop over words */
 				for (i = 0; i < count; i++)
-					cycles += lfb_w(v, target++, *src++, 0, FALSE);
+					cycles += lfb_w(v, target++, *src++, 0xffffffff, FALSE);
 			}
 			else if ((command >> 30) == 3)
 			{
@@ -3535,13 +3535,13 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
 					cycles = texture_w(v, address, data);
 				else
 				{
-					UINT32 mem_mask = 0;
+					UINT32 mem_mask = 0xffffffff;
 
 					/* compute mem_mask */
 					if (address & 0x80000000)
-						mem_mask |= 0xffff0000;
+						mem_mask &= 0x0000ffff;
 					if (address & 0x40000000)
-						mem_mask |= 0x0000ffff;
+						mem_mask &= 0xffff0000;
 					address &= 0xffffff;
 
 					cycles = lfb_w(v, address, data, mem_mask, FALSE);
@@ -4384,7 +4384,7 @@ static void banshee_agp_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 me
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%08X:banshee_w(AGP:%s) = %08X & %08X\n", activecpu_get_pc(), banshee_agp_reg_name[offset], data, ~mem_mask);
+		logerror("%08X:banshee_w(AGP:%s) = %08X & %08X\n", activecpu_get_pc(), banshee_agp_reg_name[offset], data, mem_mask);
 }
 
 
@@ -4399,15 +4399,15 @@ static void banshee_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_ma
 	else if (offset < 0x100000/4)
 		banshee_agp_w(v, offset, data, mem_mask);
 	else if (offset < 0x200000/4)
-		logerror("%08X:banshee_w(2D:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0xfffff, data, ~mem_mask);
+		logerror("%08X:banshee_w(2D:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0xfffff, data, mem_mask);
 	else if (offset < 0x600000/4)
 		register_w(v, offset & 0x1fffff/4, data);
 	else if (offset < 0x800000/4)
-		logerror("%08X:banshee_w(TEX:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x1fffff, data, ~mem_mask);
+		logerror("%08X:banshee_w(TEX:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x1fffff, data, mem_mask);
 	else if (offset < 0xc00000/4)
-		logerror("%08X:banshee_w(RES:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x3fffff, data, ~mem_mask);
+		logerror("%08X:banshee_w(RES:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x3fffff, data, mem_mask);
 	else if (offset < 0x1000000/4)
-		logerror("%08X:banshee_w(YUV:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x3fffff, data, ~mem_mask);
+		logerror("%08X:banshee_w(YUV:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x3fffff, data, mem_mask);
 	else if (offset < 0x2000000/4)
 	{
 		UINT8 temp = v->fbi.lfb_stride;
@@ -4436,7 +4436,7 @@ static void banshee_fb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 		{
 			if (offset*4 <= v->fbi.mask)
 				COMBINE_DATA(&((UINT32 *)v->fbi.ram)[offset]);
-			logerror("%08X:banshee_fb_w(%X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, ~mem_mask);
+			logerror("%08X:banshee_fb_w(%X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 		}
 	}
 	else
@@ -4518,7 +4518,7 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 			if ((v->banshee.io[offset] ^ old) & 0x2800)
 				v->fbi.clut_dirty = TRUE;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_dacData:
@@ -4529,14 +4529,14 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 				v->fbi.clut_dirty = TRUE;
 			}
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_dac_w(%X) = %08X & %08X\n", activecpu_get_pc(), v->banshee.io[io_dacAddr] & 0x1ff, data, ~mem_mask);
+				logerror("%08X:banshee_dac_w(%X) = %08X & %08X\n", activecpu_get_pc(), v->banshee.io[io_dacAddr] & 0x1ff, data, mem_mask);
 			break;
 
 		case io_miscInit0:
 			COMBINE_DATA(&v->banshee.io[offset]);
 			v->fbi.yorigin = (data >> 18) & 0xfff;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vidScreenSize:
@@ -4550,14 +4550,14 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 			video_screen_set_visarea(v->screen, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
 			adjust_vblank_timer(v);
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_lfbMemoryConfig:
 			v->fbi.lfb_base = (data & 0x1fff) << 10;
 			v->fbi.lfb_stride = ((data >> 13) & 7) + 9;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vgab0:	case io_vgab4:	case io_vgab8:	case io_vgabc:
@@ -4576,7 +4576,7 @@ static void banshee_io_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem
 		default:
 			COMBINE_DATA(&v->banshee.io[offset]);
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, ~mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 	}
 }

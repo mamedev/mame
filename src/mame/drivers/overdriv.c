@@ -129,7 +129,7 @@ static READ16_HANDLER( eeprom_r )
 
 //logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
-	res = (EEPROM_read_bit() << 6) | input_port_0_word_r(machine,0,0);
+	res = (EEPROM_read_bit() << 6) | input_port_read_indexed(machine,0);
 
 	return res;
 }

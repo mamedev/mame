@@ -691,11 +691,11 @@ static WRITE32_HANDLER( sharedram_w )
 {
 	if (offset < 0xb0)
 	{
-		if (mem_mask == 0x0000ffff)
+		if (mem_mask == 0xffff0000)
 		{
 			namcoc7x_sound_write16((data>>16), offset*2);
 		}
-		else if (mem_mask == 0xffff0000)
+		else if (mem_mask == 0x0000ffff)
 		{
 			namcoc7x_sound_write16((data&0xffff), (offset*2)+1);
 		}

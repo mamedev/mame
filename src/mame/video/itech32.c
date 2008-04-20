@@ -1416,7 +1416,7 @@ WRITE16_HANDLER( bloodstm_video_w )
 
 READ16_HANDLER( bloodstm_video_r )
 {
-	return itech32_video_r(machine, offset / 2,0);
+	return itech32_video_r(machine, offset / 2, mem_mask);
 }
 
 
@@ -1438,7 +1438,7 @@ WRITE32_HANDLER( drivedge_zbuf_control_w )
 
 READ32_HANDLER( itech020_video_r )
 {
-	int result = itech32_video_r(machine,offset,0);
+	int result = itech32_video_r(machine, offset, mem_mask);
 	return (result << 16) | result;
 }
 

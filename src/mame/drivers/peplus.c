@@ -484,7 +484,7 @@ static READ8_HANDLER( peplus_sf000_r )
 /* External RAM Callback for I8052 */
 static READ32_HANDLER( peplus_external_ram_iaddr )
 {
-	if (mem_mask == 0xff) {
+	if (mem_mask == 0xffffff00) {
 		return (io_port[2] << 8) | offset;
 	} else {
 		return offset;

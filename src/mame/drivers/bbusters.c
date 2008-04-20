@@ -709,13 +709,13 @@ static INTERRUPT_GEN( bbuster )
 
 static VIDEO_EOF( bbuster )
 {
-	buffer_spriteram16_w(machine,0,0,0);
-	buffer_spriteram16_2_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_2_w(machine,0,0,0xffff);
 }
 
 static VIDEO_EOF( mechatt )
 {
-	buffer_spriteram16_w(machine,0,0,0);
+	buffer_spriteram16_w(machine,0,0,0xffff);
 }
 
 static MACHINE_DRIVER_START( bbusters )

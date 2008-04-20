@@ -768,11 +768,11 @@ READ16_HANDLER( copdxbl_0_r )
 		//case (0x5b4/2):
 		//  return cop_mcu_ram[offset];
 
-		case (0x700/2): return input_port_1_word_r(machine,0,0);
-		case (0x704/2):	return input_port_2_word_r(machine,0,0);
-		case (0x708/2):	return input_port_4_word_r(machine,0,0);
-		case (0x70c/2):	return input_port_3_word_r(machine,0,0);
-		case (0x71c/2): return input_port_5_word_r(machine,0,0);
+		case (0x700/2): return input_port_read_indexed(machine,1);
+		case (0x704/2):	return input_port_read_indexed(machine,2);
+		case (0x708/2):	return input_port_read_indexed(machine,4);
+		case (0x70c/2):	return input_port_read_indexed(machine,3);
+		case (0x71c/2): return input_port_read_indexed(machine,5);
 	}
 }
 
@@ -1313,15 +1313,15 @@ READ16_HANDLER( heatbrl_mcu_r )
         *********************************************************************/
 
 		/* Seibu Sound System */
-		case (0x3c8/2):	return seibu_main_word_r(machine,2,0);
-		case (0x3cc/2):	return seibu_main_word_r(machine,3,0);
-		case (0x3d4/2): return seibu_main_word_r(machine,5,0);
+		case (0x3c8/2):	return seibu_main_word_r(machine,2,0xffff);
+		case (0x3cc/2):	return seibu_main_word_r(machine,3,0xffff);
+		case (0x3d4/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_1_word_r(machine,0,0);
-		case (0x344/2):	return input_port_2_word_r(machine,0,0);
-		case (0x348/2): return input_port_4_word_r(machine,0,0);
-		case (0x34c/2): return input_port_3_word_r(machine,0,0);
+		case (0x340/2): return input_port_read_indexed(machine,1);
+		case (0x344/2):	return input_port_read_indexed(machine,2);
+		case (0x348/2): return input_port_read_indexed(machine,4);
+		case (0x34c/2): return input_port_read_indexed(machine,3);
 
 	}
 }
@@ -1397,10 +1397,10 @@ WRITE16_HANDLER( heatbrl_mcu_w )
         700-7ff - Output (Seibu Sound System)
         *********************************************************************/
 
-		case (0x3c0/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x3c4/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x3d0/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x3d8/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x3c0/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3c4/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3d0/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3d8/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1424,18 +1424,18 @@ READ16_HANDLER( cupsoc_mcu_r )
 
 		/* returning 0xffff for some inputs for now, breaks coinage but
            allows cupsoc to boot */
-		case (0x300/2): return input_port_1_word_r(machine,0,0);
-		case (0x304/2): return input_port_2_word_r(machine,0,0);
-		case (0x308/2): return input_port_4_word_r(machine,0,0);
-		case (0x30c/2): return input_port_3_word_r(machine,0,0);
+		case (0x300/2): return input_port_read_indexed(machine,1);
+		case (0x304/2): return input_port_read_indexed(machine,2);
+		case (0x308/2): return input_port_read_indexed(machine,4);
+		case (0x30c/2): return input_port_read_indexed(machine,3);
 		case (0x314/2): return 0xffff;
-		case (0x31c/2): return input_port_5_word_r(machine,0,0);
+		case (0x31c/2): return input_port_read_indexed(machine,5);
 
 		case (0x340/2): return 0xffff;
 		case (0x344/2): return 0xffff;
-		case (0x348/2):	return 0xffff;//seibu_main_word_r(machine,2,0);
-		case (0x34c/2): return 0xffff;//seibu_main_word_r(machine,3,0);
-		case (0x354/2): return 0xffff;//seibu_main_word_r(machine,5,0);
+		case (0x348/2):	return 0xffff;//seibu_main_word_r(machine,2,0xffff);
+		case (0x34c/2): return 0xffff;//seibu_main_word_r(machine,3,0xffff);
+		case (0x354/2): return 0xffff;//seibu_main_word_r(machine,5,0xffff);
 		case (0x35c/2): return 0xffff;
 	}
 }
@@ -1551,10 +1551,10 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 		case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
 		case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
-		case (0x340/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x344/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x350/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x358/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x340/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x344/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x350/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x358/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1571,15 +1571,15 @@ READ16_HANDLER( godzilla_mcu_r )
 			break;
 
 		/* Non-protection reads */
-		case (0x308/2):	return seibu_main_word_r(machine,2,0);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0);
-		case (0x314/2):	return seibu_main_word_r(machine,5,0);
+		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
+		case (0x314/2):	return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_1_word_r(machine,0,0);
-		case (0x344/2): return input_port_2_word_r(machine,0,0);
-		case (0x348/2): return input_port_4_word_r(machine,0,0);
-		case (0x34c/2): return input_port_3_word_r(machine,0,0);
+		case (0x340/2): return input_port_read_indexed(machine,1);
+		case (0x344/2): return input_port_read_indexed(machine,2);
+		case (0x348/2): return input_port_read_indexed(machine,4);
+		case (0x34c/2): return input_port_read_indexed(machine,3);
 	}
 }
 
@@ -1601,10 +1601,10 @@ WRITE16_HANDLER( godzilla_mcu_w )
 		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
 		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1622,16 +1622,16 @@ READ16_HANDLER( denjinmk_mcu_r )
 
 		/* Non-protection reads */
 
-		case (0x308/2):	return seibu_main_word_r(machine,2,0);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0);
-		case (0x314/2): return seibu_main_word_r(machine,5,0);
+		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_1_word_r(machine,0,0);
-		case (0x344/2):	return input_port_2_word_r(machine,0,0);
-		case (0x348/2): return input_port_4_word_r(machine,0,0);
-		case (0x34c/2): return input_port_3_word_r(machine,0,0);
-		case (0x35c/2): return input_port_5_word_r(machine,0,0);
+		case (0x340/2): return input_port_read_indexed(machine,1);
+		case (0x344/2):	return input_port_read_indexed(machine,2);
+		case (0x348/2): return input_port_read_indexed(machine,4);
+		case (0x34c/2): return input_port_read_indexed(machine,3);
+		case (0x35c/2): return input_port_read_indexed(machine,5);
 	}
 }
 
@@ -1654,10 +1654,10 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
 		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 
 	}
 }
@@ -1688,16 +1688,16 @@ READ16_HANDLER( sdgndmrb_mcu_r )
 			return cop_mcu_ram[offset];
 
 		/* Non-protection reads */
-		case (0x308/2): return seibu_main_word_r(machine,2,0);
-		case (0x30c/2): return seibu_main_word_r(machine,3,0);
-		case (0x314/2): return seibu_main_word_r(machine,5,0);
+		case (0x308/2): return seibu_main_word_r(machine,2,0xffff);
+		case (0x30c/2): return seibu_main_word_r(machine,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_1_word_r(machine,0,0);
-		case (0x344/2):	return input_port_2_word_r(machine,0,0);
-		case (0x348/2): return input_port_4_word_r(machine,0,0);
-		case (0x34c/2): return input_port_3_word_r(machine,0,0);
-		case (0x35c/2): return input_port_5_word_r(machine,0,0);
+		case (0x340/2): return input_port_read_indexed(machine,1);
+		case (0x344/2):	return input_port_read_indexed(machine,2);
+		case (0x348/2): return input_port_read_indexed(machine,4);
+		case (0x34c/2): return input_port_read_indexed(machine,3);
+		case (0x35c/2): return input_port_read_indexed(machine,5);
 	}
 }
 
@@ -1861,10 +1861,10 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 		//case (0x280/2): break;
 		//case (0x6fc/2): break;
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1899,15 +1899,15 @@ READ16_HANDLER( legionna_mcu_r )
         *********************************************************************/
 
 		/* Seibu Sound System */
-		case (0x308/2):	return seibu_main_word_r(machine,2,0);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0);
-		case (0x314/2): return seibu_main_word_r(machine,5,0);
+		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_1_word_r(machine,0,0);
-		case (0x344/2):	return input_port_2_word_r(machine,0,0);
-		case (0x348/2):	return input_port_0_word_r(machine,0,0);
-		case (0x34c/2):	return input_port_3_word_r(machine,0,0);
+		case (0x340/2): return input_port_read_indexed(machine,1);
+		case (0x344/2):	return input_port_read_indexed(machine,2);
+		case (0x348/2):	return input_port_read_indexed(machine,0);
+		case (0x34c/2):	return input_port_read_indexed(machine,3);
 
 	}
 }
@@ -1963,10 +1963,10 @@ WRITE16_HANDLER( legionna_mcu_w )
         700-7ff - Output (Seibu Sound System)
         *********************************************************************/
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1988,9 +1988,9 @@ READ16_HANDLER( raiden2_mcu_r )
 		case (0x34c/2): return input_port_read_indexed(machine, 5) | 0xff00;
 
 		/* Inputs */
-		case (0x308/2):	return seibu_main_word_r(machine,2,0);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0);
-		case (0x314/2): return seibu_main_word_r(machine,5,0);
+		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
 
 	}
 }
@@ -2033,10 +2033,10 @@ WRITE16_HANDLER( raiden2_mcu_w )
 		case (0x2be/2): sprcpt_adr_w(machine,offset,data,mem_mask); break;
 		case (0x2ce/2): sprcpt_flags_2_w(machine,offset,data,mem_mask); break;
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0xff00); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0xff00); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0xff00); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0xff00); break; }
+		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
 
 
 	}

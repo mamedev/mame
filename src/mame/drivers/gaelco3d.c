@@ -309,7 +309,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE16_HANDLER( sound_data_w )
 {
-	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
@@ -367,7 +367,7 @@ static WRITE16_HANDLER( analog_port_clock_w )
 		}
 	}
 	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 
@@ -385,7 +385,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 		}
 	}
 	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 
@@ -427,7 +427,7 @@ static WRITE16_HANDLER( tms_reset_w )
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
-	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -436,7 +436,7 @@ static WRITE16_HANDLER( tms_irq_w )
 {
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
-	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		cpunum_set_input_line(machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -444,14 +444,14 @@ static WRITE16_HANDLER( tms_irq_w )
 
 static WRITE16_HANDLER( tms_control3_w )
 {
-	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 
 static WRITE16_HANDLER( tms_comm_w )
 {
 	COMBINE_DATA(&tms_comm_base[offset ^ tms_offset_xor]);
-	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset*2, data, ~mem_mask);
+	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 }
 
 
@@ -650,7 +650,7 @@ static WRITE32_HANDLER( unknown_107_w )
 	if (ACCESSING_BITS_0_7)
 		logerror("%06X:unknown_107_w = %02X\n", activecpu_get_pc(), data & 0xff);
 	else
-		logerror("%06X:unknown_107_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%06X:unknown_107_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_127_w )
@@ -659,7 +659,7 @@ static WRITE32_HANDLER( unknown_127_w )
 	if (ACCESSING_BITS_0_7)
 		logerror("%06X:unknown_127_w = %02X\n", activecpu_get_pc(), data & 0xff);
 	else
-		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_137_w )
@@ -668,7 +668,7 @@ static WRITE32_HANDLER( unknown_137_w )
 	if (ACCESSING_BITS_0_7)
 		logerror("%06X:unknown_137_w = %02X\n", activecpu_get_pc(), data & 0xff);
 	else
-		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_13a_w )
@@ -677,7 +677,7 @@ static WRITE32_HANDLER( unknown_13a_w )
 	if (ACCESSING_BITS_0_15)
 		logerror("%06X:unknown_13a_w = %04X\n", activecpu_get_pc(), data & 0xffff);
 	else
-		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, ~mem_mask);
+		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
 }
 
 

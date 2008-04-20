@@ -737,7 +737,7 @@ WRITE16_HANDLER( hdgsp_io_w )
 	}
 
 	/* detect changes to HEBLNK and HSBLNK and force an update before they change */
-	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(machine, offset, 0))
+	if ((offset == REG_HEBLNK || offset == REG_HSBLNK) && data != tms34010_io_register_r(machine, offset, 0xffff))
 		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
 
 	tms34010_io_register_w(machine, offset, data, mem_mask);

@@ -1270,28 +1270,28 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 	/* handle partials */
 	if (!ACCESSING_BITS_8_15)
-		data = (i80186_internal_port_r(machine, offset, 0) & 0xff00) | (data & 0x00ff);
+		data = (i80186_internal_port_r(machine, offset, 0xff00) & 0xff00) | (data & 0x00ff);
 	else if (!ACCESSING_BITS_0_7)
-		data = (i80186_internal_port_r(machine, offset, 0) & 0x00ff) | (data & 0xff00);
+		data = (i80186_internal_port_r(machine, offset, 0x00ff) & 0x00ff) | (data & 0xff00);
 
 	switch (offset)
 	{
 		case 0x22/2:
-			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			handle_eoi(0x8000);
 			update_interrupt_state();
 			break;
 
 		case 0x24/2:
-			logerror("%05X:ERROR - write to 80186 interrupt poll = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			logerror("%05X:ERROR - write to 80186 interrupt poll = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			break;
 
 		case 0x26/2:
-			logerror("%05X:ERROR - write to 80186 interrupt poll status = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			logerror("%05X:ERROR - write to 80186 interrupt poll status = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			break;
 
 		case 0x28/2:
-			if (LOG_PORTS) logerror("%05X:80186 interrupt mask = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 interrupt mask = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.timer  = (i80186.intr.timer  & ~0x08) | ((data << 3) & 0x08);
 			i80186.intr.dma[0] = (i80186.intr.dma[0] & ~0x08) | ((data << 1) & 0x08);
 			i80186.intr.dma[1] = (i80186.intr.dma[1] & ~0x08) | ((data << 0) & 0x08);
@@ -1303,69 +1303,69 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 			break;
 
 		case 0x2a/2:
-			if (LOG_PORTS) logerror("%05X:80186 interrupt priority mask = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 interrupt priority mask = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.priority_mask = data & 0x0007;
 			update_interrupt_state();
 			break;
 
 		case 0x2c/2:
-			if (LOG_PORTS) logerror("%05X:80186 interrupt in-service = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 interrupt in-service = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.in_service = data & 0x00ff;
 			update_interrupt_state();
 			break;
 
 		case 0x2e/2:
-			if (LOG_PORTS) logerror("%05X:80186 interrupt request = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 interrupt request = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.request = (i80186.intr.request & ~0x00c0) | (data & 0x00c0);
 			update_interrupt_state();
 			break;
 
 		case 0x30/2:
-			if (LOG_PORTS) logerror("%05X:WARNING - wrote to 80186 interrupt status = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:WARNING - wrote to 80186 interrupt status = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.status = (i80186.intr.status & ~0x8000) | (data & 0x8000);
 			i80186.intr.status = (i80186.intr.status & ~0x0007) | (data & 0x0007);
 			update_interrupt_state();
 			break;
 
 		case 0x32/2:
-			if (LOG_PORTS) logerror("%05X:80186 timer interrupt contol = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 timer interrupt contol = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.timer = data & 0x000f;
 			break;
 
 		case 0x34/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA 0 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA 0 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.dma[0] = data & 0x000f;
 			break;
 
 		case 0x36/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA 1 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA 1 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.dma[1] = data & 0x000f;
 			break;
 
 		case 0x38/2:
-			if (LOG_PORTS) logerror("%05X:80186 INT 0 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 INT 0 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.ext[0] = data & 0x007f;
 			break;
 
 		case 0x3a/2:
-			if (LOG_PORTS) logerror("%05X:80186 INT 1 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 INT 1 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.ext[1] = data & 0x007f;
 			break;
 
 		case 0x3c/2:
-			if (LOG_PORTS) logerror("%05X:80186 INT 2 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 INT 2 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.ext[2] = data & 0x001f;
 			break;
 
 		case 0x3e/2:
-			if (LOG_PORTS) logerror("%05X:80186 INT 3 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 INT 3 interrupt control = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.intr.ext[3] = data & 0x001f;
 			break;
 
 		case 0x50/2:
 		case 0x58/2:
 		case 0x60/2:
-			if (LOG_PORTS) logerror("%05X:80186 Timer %d count = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 Timer %d count = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask);
 			which = (offset - 0x50/2) / 4;
 			internal_timer_update(which, data, -1, -1, -1);
 			break;
@@ -1373,14 +1373,14 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 		case 0x52/2:
 		case 0x5a/2:
 		case 0x62/2:
-			if (LOG_PORTS) logerror("%05X:80186 Timer %d max A = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 Timer %d max A = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask);
 			which = (offset - 0x50/2) / 4;
 			internal_timer_update(which, -1, data, -1, -1);
 			break;
 
 		case 0x54/2:
 		case 0x5c/2:
-			if (LOG_PORTS) logerror("%05X:80186 Timer %d max B = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 Timer %d max B = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask);
 			which = (offset - 0x50/2) / 4;
 			internal_timer_update(which, -1, -1, data, -1);
 			break;
@@ -1388,33 +1388,33 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 		case 0x56/2:
 		case 0x5e/2:
 		case 0x66/2:
-			if (LOG_PORTS) logerror("%05X:80186 Timer %d control = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask  ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 Timer %d control = %04X & %04X\n", activecpu_get_pc(), (offset - 0x50/2) / 4, data, mem_mask);
 			which = (offset - 0x50/2) / 4;
 			internal_timer_update(which, -1, -1, -1, data);
 			break;
 
 		case 0xa0/2:
-			if (LOG_PORTS) logerror("%05X:80186 upper chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 upper chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.mem.upper = data | 0xc038;
 			break;
 
 		case 0xa2/2:
-			if (LOG_PORTS) logerror("%05X:80186 lower chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 lower chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.mem.lower = (data & 0x3fff) | 0x0038;
 			break;
 
 		case 0xa4/2:
-			if (LOG_PORTS) logerror("%05X:80186 peripheral chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 peripheral chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.mem.peripheral = data | 0x0038;
 			break;
 
 		case 0xa6/2:
-			if (LOG_PORTS) logerror("%05X:80186 middle chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 middle chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.mem.middle = data | 0x01f8;
 			break;
 
 		case 0xa8/2:
-			if (LOG_PORTS) logerror("%05X:80186 middle P chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 middle P chip select = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 			i80186.mem.middle_size = data | 0x8038;
 
 			temp = (i80186.mem.peripheral & 0xffc0) << 4;
@@ -1434,7 +1434,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 		case 0xc0/2:
 		case 0xd0/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower source address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower source address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
 			stream_update(dma_stream);
 			i80186.dma[which].source = (i80186.dma[which].source & ~0x0ffff) | (data & 0x0ffff);
@@ -1442,7 +1442,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 		case 0xc2/2:
 		case 0xd2/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper source address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper source address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
 			stream_update(dma_stream);
 			i80186.dma[which].source = (i80186.dma[which].source & ~0xf0000) | ((data << 16) & 0xf0000);
@@ -1450,7 +1450,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 		case 0xc4/2:
 		case 0xd4/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower dest address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA%d lower dest address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
 			stream_update(dma_stream);
 			i80186.dma[which].dest = (i80186.dma[which].dest & ~0x0ffff) | (data & 0x0ffff);
@@ -1458,7 +1458,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 		case 0xc6/2:
 		case 0xd6/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper dest address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA%d upper dest address = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
 			stream_update(dma_stream);
 			i80186.dma[which].dest = (i80186.dma[which].dest & ~0xf0000) | ((data << 16) & 0xf0000);
@@ -1466,7 +1466,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 		case 0xc8/2:
 		case 0xd8/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA%d transfer count = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA%d transfer count = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
 			stream_update(dma_stream);
 			i80186.dma[which].count = data;
@@ -1474,14 +1474,14 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 		case 0xca/2:
 		case 0xda/2:
-			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 DMA%d control = %04X & %04X\n", activecpu_get_pc(), (offset - 0xc0/2) / 8, data, mem_mask);
 			which = (offset - 0xc0/2) / 8;
 			stream_update(dma_stream);
 			update_dma_control(which, data);
 			break;
 
 		case 0xfe/2:
-			if (LOG_PORTS) logerror("%05X:80186 relocation register = %04X & %04X\n", activecpu_get_pc(), data, mem_mask ^ 0xffff);
+			if (LOG_PORTS) logerror("%05X:80186 relocation register = %04X & %04X\n", activecpu_get_pc(), data, mem_mask);
 
 			/* we assume here there that this doesn't happen too often */
 			/* plus, we can't really remove the old memory range, so we also assume that it's */
@@ -1498,7 +1498,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 			break;
 
 		default:
-			logerror("%05X:80186 port %02X = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask ^ 0xffff);
+			logerror("%05X:80186 port %02X = %04X & %04X\n", activecpu_get_pc(), offset*2, data, mem_mask);
 			break;
 	}
 }
@@ -1923,13 +1923,13 @@ static WRITE16_HANDLER( ataxx_dac_control )
 		case 0x01:
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
-				dac_w(machine, offset, data, 0xff00);
+				dac_w(machine, offset, data, 0x00ff);
 			return;
 
 		case 0x03:
-			dac_w(machine, 0, ((data << 13) & 0xe000) | ((data << 10) & 0x1c00) | ((data << 7) & 0x0300), 0x00ff);
-			dac_w(machine, 2, ((data << 10) & 0xe000) | ((data <<  7) & 0x1c00) | ((data << 4) & 0x0300), 0x00ff);
-			dac_w(machine, 4, ((data <<  8) & 0xc000) | ((data <<  6) & 0x3000) | ((data << 4) & 0x0c00) | ((data << 2) & 0x0300), 0x00ff);
+			dac_w(machine, 0, ((data << 13) & 0xe000) | ((data << 10) & 0x1c00) | ((data << 7) & 0x0300), 0xff00);
+			dac_w(machine, 2, ((data << 10) & 0xe000) | ((data <<  7) & 0x1c00) | ((data << 4) & 0x0300), 0xff00);
+			dac_w(machine, 4, ((data <<  8) & 0xc000) | ((data <<  6) & 0x3000) | ((data << 4) & 0x0c00) | ((data << 2) & 0x0300), 0xff00);
 			return;
 	}
 

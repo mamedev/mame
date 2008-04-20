@@ -368,7 +368,7 @@ static TILE_GET_INFO( sailormn_get_tile_info_2 )
 
 INLINE void vram_w(UINT16 *VRAM, tilemap *TILEMAP, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
 {
-	if ((VRAM[offset] & ~mem_mask)==(data & ~mem_mask)) return;
+	if ((VRAM[offset] & mem_mask)==(data & mem_mask)) return;
 	COMBINE_DATA(&VRAM[offset]);
 	offset /= 2;
 	if			 ( offset < 0x1000/4 )	// 16x16 tilemap
@@ -391,7 +391,7 @@ INLINE void vram_w(UINT16 *VRAM, tilemap *TILEMAP, ATTR_UNUSED offs_t offset, AT
 INLINE void vram_8x8_w(UINT16 *VRAM, tilemap *TILEMAP,ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
 {
 	offset %= 0x4000/2;
-	if ((VRAM[offset] & ~mem_mask)==(data & ~mem_mask)) return;
+	if ((VRAM[offset] & mem_mask)==(data & mem_mask)) return;
 	COMBINE_DATA(&VRAM[offset + 0x0000/2]);
 	COMBINE_DATA(&VRAM[offset + 0x4000/2]);
 	tilemap_mark_tile_dirty(TILEMAP,offset/2);

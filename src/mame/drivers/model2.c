@@ -924,7 +924,7 @@ static void snd_latch_to_68k_w(int data)
 
 static READ32_HANDLER( model2_serial_r )
 {
-	if ((offset == 0) && (mem_mask == 0x0000ffff))
+	if ((offset == 0) && (mem_mask == 0xffff0000))
 	{
 		return 0x00070000;	// TxRdy RxRdy (zeroguna also needs bit 4 set)
 	}
@@ -934,7 +934,7 @@ static READ32_HANDLER( model2_serial_r )
 
 static WRITE32_HANDLER( model2o_serial_w )
 {
-	if (mem_mask == 0xffff0000)
+	if (mem_mask == 0x0000ffff)
 	{
 		snd_latch_to_68k_w(data&0xff);
 	}
@@ -1007,7 +1007,7 @@ static READ32_HANDLER( model2_prot_r )
 
 static WRITE32_HANDLER( model2_prot_w )
 {
-	if (mem_mask == 0xffff)
+	if (mem_mask == 0xffff0000)
 	{
 		data >>= 16;
 	}
@@ -1085,7 +1085,7 @@ static READ32_HANDLER( maxx_r )
 	if (offset <= 0x1f/4)
 	{
 		// special
-		if (mem_mask == 0x0000ffff)
+		if (mem_mask == 0xffff0000)
 		{
 			// 16-bit protection reads
 			model2_maxxstate++;
@@ -1106,7 +1106,7 @@ static READ32_HANDLER( maxx_r )
 				}
 			}
 		}
-		else if (mem_mask == 0)
+		else if (mem_mask == 0xffffffff)
 		{
 			// 32-bit read
 			if (offset == 0x22/4)
@@ -1127,7 +1127,7 @@ static int zflagi, zflag, sysres;
 
 static READ32_HANDLER( network_r )
 {
-	if ((mem_mask == 0) || (mem_mask == 0xffff0000) || (mem_mask == 0x0000ffff))
+	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
 		return 0xffffffff;
 	}
@@ -1137,11 +1137,11 @@ static READ32_HANDLER( network_r )
 		return model2_netram[offset];
 	}
 
-	if (mem_mask == 0xff00ffff)
+	if (mem_mask == 0x00ff0000)
 	{
 		return sysres<<16;
 	}
-	else if (mem_mask == 0xffffff00)
+	else if (mem_mask == 0x000000ff)
 	{
 		return zflagi;
 	}
@@ -1151,7 +1151,7 @@ static READ32_HANDLER( network_r )
 
 static WRITE32_HANDLER( network_w )
 {
-	if ((mem_mask == 0) || (mem_mask == 0xffff0000) || (mem_mask == 0x0000ffff))
+	if ((mem_mask == 0xffffffff) || (mem_mask == 0x0000ffff) || (mem_mask == 0xffff0000))
 	{
 		COMBINE_DATA(&model2_netram[offset+0x4000/4]);
 		return;
@@ -1163,11 +1163,11 @@ static WRITE32_HANDLER( network_w )
 		return;
 	}
 
-	if (mem_mask == 0xff00ffff)
+	if (mem_mask == 0x00ff0000)
 	{
 		sysres = data>>16;
 	}
-	else if (mem_mask == 0xffffff00)
+	else if (mem_mask == 0x000000ff)
 	{
 		zflagi = data;
 		zflag = 0;

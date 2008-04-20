@@ -197,19 +197,19 @@ static int track[2];
 
 static READ8_HANDLER( gottlieb_track_0_r )
 {
-	return input_port_2_r(machine, offset) - track[0];
+	return input_port_read_indexed(machine, 2) - track[0];
 }
 
 static READ8_HANDLER( gottlieb_track_1_r )
 {
-	return input_port_3_r(machine, offset) - track[1];
+	return input_port_read_indexed(machine, 3) - track[1];
 }
 
 static WRITE8_HANDLER( gottlieb_track_reset_w )
 {
 	/* reset the trackball counters */
-	track[0] = input_port_2_r(machine, offset);
-	track[1] = input_port_3_r(machine, offset);
+	track[0] = input_port_read_indexed(machine, 2);
+	track[1] = input_port_read_indexed(machine, 3);
 }
 
 static int joympx;

@@ -335,7 +335,7 @@ static READ16_HANDLER( tharrier_mcu_r )
 		return res << 8;
 	}
 	else
-		return ~input_port_1_word_r(machine,0,0);
+		return ~input_port_read_indexed(machine,1);
 }
 
 static WRITE16_HANDLER( macross2_sound_command_w )

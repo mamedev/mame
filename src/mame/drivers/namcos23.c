@@ -603,7 +603,7 @@ static READ32_HANDLER(sysctl_stat_r)
 static WRITE32_HANDLER( s23_mcuen_w )
 {
 	mame_printf_debug("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
-	if (mem_mask == 0xffff0000)
+	if (mem_mask == 0x0000ffff)
 	{
 		if (data)
 		{

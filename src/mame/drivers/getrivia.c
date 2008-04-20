@@ -121,7 +121,7 @@ static WRITE8_HANDLER( getrivia_bitmap_w )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_1_r(machine, 0) | (ticket_dispenser_0_r(machine, 0) >> 5);
+	return input_port_read_indexed(machine, 1) | (ticket_dispenser_0_r(machine, 0) >> 5);
 }
 
 static WRITE8_HANDLER( lamps_w )

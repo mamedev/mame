@@ -2594,7 +2594,7 @@ static WRITE16_HANDLER( kiwame_nvram_w )
 
 static READ16_HANDLER( kiwame_input_r )
 {
-	int row_select = kiwame_nvram_r( machine,0x10a/2,0 ) & 0x1f;
+	int row_select = kiwame_nvram_r( machine,0x10a/2,0x00ff ) & 0x1f;
 	int i;
 
 	for(i = 0; i < 5; i++)

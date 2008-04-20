@@ -835,15 +835,15 @@ transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 	}
 	if( dest>=0xf00000 && dest<=0xf02000 )
 	{
-		namcona1_paletteram_w( machine, (dest-0xf00000)/2, data, 0x0000 );
+		namcona1_paletteram_w( machine, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<=0xf80000 )
 	{
-		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0x0000 );
+		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xff8000 )
 	{
-		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0x0000 );
+		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff8000 && dest<=0xffdfff )
 	{
@@ -1111,8 +1111,8 @@ static READ16_HANDLER( na1mcu_shared_r )
 
 static WRITE16_HANDLER( na1mcu_shared_w )
 {
-	mem_mask = ((mem_mask>>8)&0xff) | ((mem_mask<<8)&0xff00);
-	data = ((data>>8)&0xff) | ((data<<8)&0xff00);
+	mem_mask = FLIPENDIAN_INT16(mem_mask);
+	data = FLIPENDIAN_INT16(data);
 
 	COMBINE_DATA(&namcona1_workram[offset]);
 }
