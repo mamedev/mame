@@ -4395,6 +4395,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( solomonj )	/* (c) 1986 Tecmo */
 	DRIVER( rygar )		/* 6002 - (c) 1986 Tecmo */
 	DRIVER( rygar2 )	/* 6002 - (c) 1986 Tecmo */
+	DRIVER( rygar3 )	/* 6002 - (c) 1986 Tecmo */
 	DRIVER( rygarj )	/* 6002 - (c) 1986 Tecmo */
 	DRIVER( gemini )	/* (c) 1987 Tecmo */
 	DRIVER( silkworm )	/* 6217 - (c) 1988 Tecmo */
