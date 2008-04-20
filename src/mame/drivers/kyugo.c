@@ -493,12 +493,12 @@ static const struct AY8910interface ay8910_interface =
 static MACHINE_DRIVER_START( gyrodine )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", Z80, 18432000 / 4)	/* 18.432 MHz crystal */
+	MDRV_CPU_ADD_TAG("main", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_IO_MAP(0,gyrodine_portmap)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-	MDRV_CPU_ADD_TAG("sub", Z80, 18432000 / 4)	/* 18.432 MHz crystal */
+	MDRV_CPU_ADD_TAG("sub", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(gyrodine_sub_map,0)
 	MDRV_CPU_IO_MAP(gyrodine_sub_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
@@ -525,11 +525,11 @@ static MACHINE_DRIVER_START( gyrodine )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD(AY8910, 1500000)
+	MDRV_SOUND_ADD(AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
