@@ -18,49 +18,27 @@ CPUOBJ = $(EMUOBJ)/cpu
 # Dynamic recompiler objects
 #-------------------------------------------------
 
-DRCOBJ = \
-	$(CPUOBJ)/drcbec.o \
-	$(CPUOBJ)/drcbeut.o \
-	$(CPUOBJ)/drccache.o \
-	$(CPUOBJ)/drcfe.o \
-	$(CPUOBJ)/drcuml.o \
-	$(CPUOBJ)/drcumld.o \
-	
-DRCDEPS = \
-	$(CPUSRC)/drcbeut.h \
-	$(CPUSRC)/drccache.h \
-	$(CPUSRC)/drcfe.h \
-	$(CPUSRC)/drcuml.h \
-	$(CPUSRC)/drcumld.h \
-
-
 ifdef PTR64
 
-DRCOBJ += \
-	$(CPUOBJ)/x64drc.o \
-	$(CPUOBJ)/x86log.o \
+DRCOBJ = $(CPUOBJ)/x64drc.o $(CPUOBJ)/x86log.o $(CPUOBJ)/drcfe.o
 
-DRCDEPS += \
-	$(CPUSRC)/x86emit.h \
-	$(CPUSRC)/x64drc.c \
-	$(CPUSRC)/x64drc.h \
-
-else
-
-DRCOBJ += \
-	$(CPUOBJ)/x86drc.o \
-	$(CPUOBJ)/x86log.o \
-
-DRCDEPS += \
-	$(CPUSRC)/x86emit.h \
-	$(CPUSRC)/x86drc.c \
-	$(CPUSRC)/x86drc.h \
-
-endif
-
+DRCDEPS = 	$(CPUSRC)/x86emit.h \
+			$(CPUSRC)/x64drc.c \
+			$(CPUSRC)/x64drc.h \
 
 $(DRCOBJ): $(DRCDEPS)
 
+else
+
+DRCOBJ = $(CPUOBJ)/x86drc.o $(CPUOBJ)/x86log.o $(CPUOBJ)/drcfe.o
+
+DRCDEPS = 	$(CPUSRC)/x86emit.h \
+			$(CPUSRC)/x86drc.c \
+			$(CPUSRC)/x86drc.h \
+
+$(DRCOBJ): $(DRCDEPS)
+
+endif
 
 
 #-------------------------------------------------
