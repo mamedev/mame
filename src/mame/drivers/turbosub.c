@@ -256,17 +256,17 @@ Self-tests (initiated by CPU 0)
 */
 
 static ADDRESS_MAP_START( game_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-        AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)
-        AM_RANGE(0x40ff, 0x40ff) AM_RAM                                 /* W */
-        AM_RANGE(0x41ff, 0x41ff) AM_RAM                                 /* W */
-        AM_RANGE(0x42ff, 0x4300) AM_RAM                                 /* W */
-        AM_RANGE(0x4800, 0x4800) AM_READWRITE(G_STATUS_R, G_STATUS_W)   /* Status port */
-        AM_RANGE(0x4C00, 0x4C00) AM_RAM                    		/* R/W - An input device? (doesn't enter auto mode depending on read) */
-        AM_RANGE(0x5000, 0x5000) AM_RAM                     		/* Write - related to 4C00. Bit 8 = ? bits0..3 =????  */
-        AM_RANGE(0x5400, 0x54ff) AM_RAM                                 /* UART buffer? */
-        AM_RANGE(0x5c00, 0x5c01) AM_READWRITE(UART_R, UART_W)           /* i8251A USART */
-        AM_RANGE(0x6000, 0xdfff) AM_READWRITE(SMH_BANK1, SMH_ROM)     /* Bank switched ROMs */
-        AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x40ff, 0x40ff) AM_RAM									/* W */
+	AM_RANGE(0x41ff, 0x41ff) AM_RAM									/* W */
+	AM_RANGE(0x42ff, 0x4300) AM_RAM									/* W */
+	AM_RANGE(0x4800, 0x4800) AM_READWRITE(G_STATUS_R, G_STATUS_W)	/* Status port */
+	AM_RANGE(0x4C00, 0x4C00) AM_RAM									/* R/W - An input device? (doesn't enter auto mode depending on read) */
+	AM_RANGE(0x5000, 0x5000) AM_RAM									/* Write - related to 4C00. Bit 8 = ? bits0..3 =????  */
+	AM_RANGE(0x5400, 0x54ff) AM_RAM									/* UART buffer? */
+	AM_RANGE(0x5c00, 0x5c01) AM_READWRITE(UART_R, UART_W)			/* i8251A USART */
+	AM_RANGE(0x6000, 0xdfff) AM_READWRITE(SMH_BANK1, SMH_ROM)		/* Bank switched ROMs */
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /*
@@ -283,10 +283,10 @@ Others: E064
 */
 
 static ADDRESS_MAP_START( frame_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-        AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)			/* 16kB RAM: Shared with game CPU */
-        AM_RANGE(0x4000, 0x4fff) AM_READWRITE(FDT_R, FDT_W)		/* 8kB RAM: Frame Drive Table (banked) */
-        AM_RANGE(0x6000, 0x6000) AM_READWRITE(F_STATUS_R, F_STATUS_W)	/* Status port */
-        AM_RANGE(0x8000, 0x8000) AM_WRITE(FRAME)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE(1)				/* 16kB RAM: Shared with game CPU */
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(FDT_R, FDT_W)		/* 8kB RAM: Frame Drive Table (banked) */
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(F_STATUS_R, F_STATUS_W)	/* Status port */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(FRAME)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -312,19 +312,19 @@ SWI3:  e13d
 /* Sound CPU */
 
 static ADDRESS_MAP_START( sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-        AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2008, 0x2008) AM_RAM		/* R=status line? D7 0=Ready? 1=Not ready? */
-	AM_RANGE(0x2009, 0x2009) AM_RAM         /* W (only written once - with value read from 2008) */
-	AM_RANGE(0x200a, 0x200b) AM_RAM         /* W 16-bit value during FIRQ */
-        AM_RANGE(0x200c, 0x200c) AM_RAM         /* W */
-        AM_RANGE(0x200d, 0x200d) AM_RAM         /* W - 03 */
-        AM_RANGE(0x200e, 0x200e) AM_RAM         /* R/W - communication with game processor */
-	AM_RANGE(0x200f, 0x200f) AM_RAM         /* R/W - communication with game processor */
-        AM_RANGE(0x2020, 0x2020) AM_RAM		/* W - 42 */
-        AM_RANGE(0x2021, 0x2021) AM_RAM		/* W - 42,1 and R during FIRQ? */
-        AM_RANGE(0x2022, 0x2023) AM_RAM		/* R/W rarely */
-        AM_RANGE(0x2024, 0x2025) AM_RAM		/* R/W rarely */
-        AM_RANGE(0x8000, 0x8006) AM_RAM		/* R */
+	AM_RANGE(0x2009, 0x2009) AM_RAM		/* W (only written once - with value read from 2008) */
+	AM_RANGE(0x200a, 0x200b) AM_RAM		/* W 16-bit value during FIRQ */
+	AM_RANGE(0x200c, 0x200c) AM_RAM		/* W */
+	AM_RANGE(0x200d, 0x200d) AM_RAM		/* W - 03 */
+	AM_RANGE(0x200e, 0x200e) AM_RAM		/* R/W - communication with game processor */
+	AM_RANGE(0x200f, 0x200f) AM_RAM		/* R/W - communication with game processor */
+	AM_RANGE(0x2020, 0x2020) AM_RAM		/* W - 42 */
+	AM_RANGE(0x2021, 0x2021) AM_RAM		/* W - 42,1 and R during FIRQ? */
+	AM_RANGE(0x2022, 0x2023) AM_RAM		/* R/W rarely */
+	AM_RANGE(0x2024, 0x2025) AM_RAM		/* R/W rarely */
+	AM_RANGE(0x8000, 0x8006) AM_RAM		/* R */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -350,8 +350,8 @@ static MACHINE_DRIVER_START( turbosub )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 34*8-1, 0, 34*8-1)
 
 	MDRV_PALETTE_LENGTH(512)
-        MDRV_MACHINE_RESET( turbosub )
-        MDRV_INTERLEAVE(100)
+	MDRV_MACHINE_RESET( turbosub )
+	MDRV_INTERLEAVE(100)
 
 	MDRV_VIDEO_START(turbosub)
 	MDRV_VIDEO_UPDATE(turbosub)
@@ -363,24 +363,24 @@ ROM_START( turbosub )
 
 	ROM_REGION( 0x48000, REGION_CPU1, 0 ) /* Bankswitched 6809 code */
 	ROM_LOAD( "turbosub.u82",    0x10000, 0x2000, CRC(de32eb6f) SHA1(90bf31a5adf261d47b4f52e93b5e97f343b7ebf0) )
-        ROM_CONTINUE(                0x20000, 0x2000 )
+		ROM_CONTINUE(                0x20000, 0x2000 )
 	ROM_LOAD( "turbosub.u81",    0x12000, 0x2000, CRC(9ae09613) SHA1(9b5ada4a21473b30be98bcc461129b6ed4e0bb11) )
-        ROM_CONTINUE(                0x22000, 0x2000 )
+		ROM_CONTINUE(                0x22000, 0x2000 )
 	ROM_LOAD( "turbosub.u87",    0x14000, 0x2000, CRC(ad2284f7) SHA1(8e11b8ad0a98dd1fe6ec8f7ea9e6e4f4a45d8a1b) )
-        ROM_CONTINUE(                0x24000, 0x2000 )
+		ROM_CONTINUE(                0x24000, 0x2000 )
 	ROM_LOAD( "turbosub.u86",    0x16000, 0x2000, CRC(4f51e6fd) SHA1(8f51ac6412aace29279ce7b02cad45ed681c2065) )
-        ROM_CONTINUE(                0x26000, 0x2000 )
+		ROM_CONTINUE(                0x26000, 0x2000 )
 
 	ROM_LOAD( "turbosub.u80",    0x30000, 0x2000, CRC(ff2e2870) SHA1(45f91d63ad91585482c9dd05290b204b007e3f44) )
-        ROM_CONTINUE(                0x40000, 0x2000 )
-        ROM_LOAD( "turbosub.u79",    0x32000, 0x2000, CRC(13680923) SHA1(14e3daa2178853cef1fd96a68305420c11fceb96) )
-        ROM_CONTINUE(                0x42000, 0x2000 )
+		ROM_CONTINUE(                0x40000, 0x2000 )
+	ROM_LOAD( "turbosub.u79",    0x32000, 0x2000, CRC(13680923) SHA1(14e3daa2178853cef1fd96a68305420c11fceb96) )
+		ROM_CONTINUE(                0x42000, 0x2000 )
 	ROM_LOAD( "turbosub.u84",    0x34000, 0x2000, CRC(7059842d) SHA1(c20a8accd3fc23bc4476e1d08798d7a80915d37c) )
-        ROM_CONTINUE(                0x44000, 0x2000 )
+		ROM_CONTINUE(                0x44000, 0x2000 )
 	ROM_LOAD( "turbosub.u83",    0x36000, 0x2000, CRC(31b86fc6) SHA1(8e56e8a75f653c3c4da2c9f31f739894beb194db) )
-        ROM_CONTINUE(                0x46000, 0x2000 )
+		ROM_CONTINUE(                0x46000, 0x2000 )
 
-        /* e000 - ffff = Upper half of U85 (lower half is blank) */
+	/* e000 - ffff = Upper half of U85 (lower half is blank) */
 	ROM_COPY( REGION_USER1, 0x18000+0x2000, 0xe000, 0x2000 )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
@@ -389,7 +389,7 @@ ROM_START( turbosub )
 	ROM_REGION( 0x10000, REGION_CPU3, 0 )
 	ROM_LOAD( "turbosub.u66",   0xc000, 0x4000, CRC(5091bf3d) SHA1(7ab872cef1562a45f7533c16bbbae8772673465b) )
 
-       	ROM_REGION( 0xc0000, REGION_USER2, 0) /* Unknown */
+	ROM_REGION( 0xc0000, REGION_USER2, 0) /* Unknown */
 	ROM_LOAD( "turbosub.u67",    0x00000, 0x4000, CRC(f8ae82e9) SHA1(fd27b9fe7872c3c680a1f71a4a5d5eeaa12e4a19) )
 	ROM_LOAD( "turbosub.u68",    0x04000, 0x4000, CRC(72e3d09b) SHA1(eefdfcd0c4c32e465f18d40f46cb5bc022c22bfd) )
 	ROM_LOAD( "turbosub.u69",    0x00000, 0x4000, CRC(ad04193b) SHA1(2f660302e60a7e68e079a8dd13266a77c077f939) )
