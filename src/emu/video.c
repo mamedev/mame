@@ -1063,13 +1063,12 @@ attotime video_screen_get_frame_period(const device_config *screen)
 
 	/* a lot of modules want to the period of the primary screen, so
        if we are screenless, return something reasonable so that we don't fall over */
-    if (video_screen_count(screen->machine->config) == 0)
-    {
-    	assert(screen == NULL);
-    	ret = DEFAULT_FRAME_PERIOD;
+	if (screen == NULL || video_screen_count(screen->machine->config) == 0)
+	{
+		ret = DEFAULT_FRAME_PERIOD;
 	}
-    else
-    {
+	else
+	{
 		screen_state *state = get_safe_token(screen);
 		ret = attotime_make(0, state->frame_period);
 	}
