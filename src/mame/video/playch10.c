@@ -10,8 +10,7 @@ extern int pc10_int_detect;
 extern int pc10_game_mode;
 extern int pc10_dispmask_old;
 
-/* from romload.c */
-extern int system_bios;
+static int pc10_bios;
 
 static tilemap *bg_tilemap;
 
@@ -98,6 +97,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( playch10 )
 {
+	const UINT8 *bios = memory_region(REGION_CPU1);
+	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
+
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
@@ -113,7 +115,7 @@ VIDEO_START( playch10 )
 VIDEO_UPDATE( playch10 )
 {
 	/* Dual monitor version */
-	if(system_bios == 1)
+	if (pc10_bios == 1)
 	{
 		const device_config *top_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "top");
 

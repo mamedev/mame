@@ -48,7 +48,7 @@ static open_chd *chd_list;
 static open_chd **chd_list_tailptr;
 
 /* system BIOS */
-int system_bios;
+static int system_bios;
 
 static int total_rom_load_warnings;
 
@@ -190,9 +190,7 @@ static int determine_bios_rom(const rom_entry *romp)
 	const char *specbios = options_get_string(mame_options(), OPTION_BIOS);
 	const rom_entry *rom;
 	int bios_count = 0;
-
-	/* set to default */
-	int bios_no = 1;
+	int bios_no = 0;
 
 	for (rom = romp;!ROMENTRY_ISEND(rom);rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
@@ -208,8 +206,13 @@ static int determine_bios_rom(const rom_entry *romp)
 			bios_count++;
 		}
 
-	if (bios_count == 0)
-		bios_no = 0;
+	if (bios_no == 0 && bios_count > 0)
+	{
+		if (specbios[0] != 0)
+			fatalerror("%s: no such bios\n", specbios);
+		/* set to default */
+		bios_no = 1;
+	}
 
 	debugload("Using System BIOS: %d\n", bios_no);
 
