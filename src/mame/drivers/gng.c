@@ -494,6 +494,41 @@ ROM_START( gngbl )
 	ROM_LOAD( "14.84490.1l",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) /* sprites 2 Plane 3-4 */
 ROM_END
 
+ROM_START( gngblita )
+	ROM_REGION( 0x18000, REGION_CPU1, 0 )
+	ROM_LOAD( "3",      0x04000, 0x4000, CRC(4859d068) SHA1(8b22772ea383ecaee01da696c0c7b568ab1e4615) ) 
+	ROM_LOAD( "4-5",    0x08000, 0x8000, CRC(233a4589) SHA1(c95c4dcbf53fac5a0c11466bc27369bf8328bd01) )
+	ROM_LOAD( "1-2",    0x10000, 0x8000, CRC(ed28e86e) SHA1(064871918547a56be330c6994d4db2c9932e14db) ) 
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "gg2.bin",      0x0000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
+
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "gg1.bin",      0x00000, 0x4000, CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) ) /* characters */
+
+	ROM_REGION( 0x18000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "gg11.bin",     0x00000, 0x4000, CRC(ddd56fa9) SHA1(f9d77eee5e2738b7e83ba02fcc55dd480391479f) ) /* tiles 0-1 Plane 1*/
+	ROM_LOAD( "gg10.bin",     0x04000, 0x4000, CRC(7302529d) SHA1(8434c994cc55d2586641f3b90b6b15fd65dfb67c) ) /* tiles 2-3 Plane 1*/
+	ROM_LOAD( "gg9.bin",      0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) /* tiles 0-1 Plane 2*/
+	ROM_LOAD( "gg8.bin",      0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) /* tiles 2-3 Plane 2*/
+	ROM_LOAD( "gg7.bin",      0x10000, 0x4000, CRC(e525207d) SHA1(1947f159189b3a53f1251d8653b6e7c65c91fc3c) ) /* tiles 0-1 Plane 3*/
+	ROM_LOAD( "gg6.bin",      0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) /* tiles 2-3 Plane 3*/
+
+	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE | ROMREGION_ERASEFF )
+	ROM_LOAD( "gg17.bin",     0x00000, 0x4000, CRC(93e50a8f) SHA1(42d367f57bb2fdf60a0445ac1533da99cfeaa617) ) /* sprites 0 Plane 1-2 */
+	ROM_LOAD( "gg16.bin",     0x04000, 0x4000, CRC(06d7e5ca) SHA1(9e06012bcd82f98fad43de666ef9a75979d940ab) ) /* sprites 1 Plane 1-2 */
+	ROM_LOAD( "gg15.bin",     0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) /* sprites 2 Plane 1-2 */
+	ROM_LOAD( "gg14.bin",     0x10000, 0x4000, CRC(6aaf12f9) SHA1(207a7407288182a4f3eddaea634c6a6452131182) ) /* sprites 0 Plane 3-4 */
+	ROM_LOAD( "gg13.bin",     0x14000, 0x4000, CRC(e80c3fca) SHA1(cb641c25bb04b970b2cbeca41adb792bbe142fb5) ) /* sprites 1 Plane 3-4 */
+	ROM_LOAD( "gg12.bin",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) /* sprites 2 Plane 3-4 */
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )
+	ROM_LOAD( "tbp24s10.14k", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  /* video timing (not used) */
+	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  /* priority (not used) */
+
+	ROM_REGION( 0x0100, REGION_PLDS, ROMREGION_DISPOSE )
+	ROM_LOAD( "gg-pal10l8.bin",  0x0000, 0x002c, CRC(87f1b7e0) SHA1(b719c3be7bd4a02660bb0887f752e9769cbd37d2) )
+ROM_END
 
 ROM_START( gngt )
 	ROM_REGION( 0x18000, REGION_CPU1, 0 )
@@ -674,6 +709,7 @@ static DRIVER_INIT( diamond )
 GAME( 1985, gng,	  0,   gng, gng,	  0,	   ROT0, "Capcom", "Ghosts'n Goblins (World? set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gnga,	  gng, gng, gng,	  0,	   ROT0, "Capcom", "Ghosts'n Goblins (World? set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngbl,	  gng, gng, gng,	  0,	   ROT0, "Capcom", "Ghosts'n Goblins (bootleg with Cross)", GAME_SUPPORTS_SAVE )
+GAME( 1985, gngblita,	  gng, gng, gng,	  0,	   ROT0, "Capcom", "Ghosts'n Goblins (Italian bootleg, harder)", GAME_SUPPORTS_SAVE )
 GAME( 1985, gngt,	  gng, gng, gng,	  0,	   ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", GAME_SUPPORTS_SAVE )
 GAME( 1985, makaimur, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1985, makaimuc, gng, gng, makaimur, 0,	   ROT0, "Capcom", "Makai-Mura (Japan Revision C)", GAME_SUPPORTS_SAVE )
