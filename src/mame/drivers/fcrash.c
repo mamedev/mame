@@ -135,7 +135,7 @@ static void fcrash_render_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		tileno = cps1_gfxram[base+pos];
 		xpos   = cps1_gfxram[base+pos+2];
-		ypos   = cps1_gfxram[base+pos-1];
+		ypos   = cps1_gfxram[base+pos-1]&0xff;
 		flipx  = cps1_gfxram[base+pos+1]&0x20;
 		flipy  = cps1_gfxram[base+pos+1]&0x40;
 		colour = cps1_gfxram[base+pos+1]&0x1f;
