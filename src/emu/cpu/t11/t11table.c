@@ -21,6 +21,7 @@ modes:
 */
 
 static void op_0000(void);
+static void halt(void);
 static void illegal(void);
 
 static void jmp_rgd(void);
@@ -168,7 +169,7 @@ static void asl_ded(void);
 static void asl_ix(void);
 static void asl_ixd(void);
 
-/*static void mark(void);*/
+static void mark(void);
 
 static void sxt_rg(void);
 static void sxt_rgd(void);
@@ -1112,7 +1113,7 @@ static void sub_ixd_ixd(void);
 static void (*const opcode_table[65536 >> 3])(void) =
 {
 	/* 0x0000 */
-	op_0000,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	op_0000,	halt,		illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
 	illegal,	jmp_rgd,	jmp_in,		jmp_ind,	jmp_de,		jmp_ded,	jmp_ix,		jmp_ixd,
 	rts,		illegal,	illegal,	illegal,	ccc,		ccc,		scc,		scc,
 	swab_rg,	swab_rgd,	swab_in,	swab_ind,	swab_de,	swab_ded,	swab_ix,	swab_ixd,
@@ -1177,7 +1178,7 @@ static void (*const opcode_table[65536 >> 3])(void) =
 	asr_rg,		asr_rgd,	asr_in,		asr_ind,	asr_de,		asr_ded,	asr_ix,		asr_ixd,
 	asl_rg,		asl_rgd,	asl_in,		asl_ind,	asl_de,		asl_ded,	asl_ix,		asl_ixd,
 	/* 0x0d00 */
-	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
+	mark,		mark,		mark,		mark,		mark,		mark,		mark,		mark,
 	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
 	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,	illegal,
 	sxt_rg,		sxt_rgd,	sxt_in,		sxt_ind,	sxt_de,		sxt_ded,	sxt_ix,		sxt_ixd,

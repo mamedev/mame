@@ -255,7 +255,7 @@ static void op_0000(void)
 {
 	switch (t11.op & 0x3f)
 	{
-		case 0x00:	/* HALT  */ t11_ICount = 0; break;
+		case 0x00:	/* HALT  */ halt(); break;
 		case 0x01:	/* WAIT  */ t11_ICount = 0; t11.wait_state = 1; break;
 		case 0x02:	/* RTI   */ t11_ICount -= 24; PC = POP(); PSW = POP(); change_pc(PC); t11_check_irqs(); break;
 		case 0x03:	/* BPT   */ t11_ICount -= 48; PUSH(PSW); PUSH(PC); PC = RWORD(0x0c); PSW = RWORD(0x0e); change_pc(PC); t11_check_irqs(); break;
@@ -264,6 +264,17 @@ static void op_0000(void)
 		case 0x06:	/* RTT   */ t11_ICount -= 33; PC = POP(); PSW = POP(); change_pc(PC); t11_check_irqs(); break;
 		default: 	illegal(); break;
 	}
+}
+
+static void halt(void)
+{
+	t11_ICount -= 48; 
+	PUSH(PSW); 
+	PUSH(PC); 
+	PC = RWORD(0x04); 
+	PSW = RWORD(0x06); 
+	change_pc(PC); 
+	t11_check_irqs();	
 }
 
 static void illegal(void)
@@ -275,7 +286,17 @@ static void illegal(void)
 	PSW = RWORD(0x0a);
 	change_pc(PC);
 	t11_check_irqs();
-PC = 0;
+}
+
+static void mark(void)
+{
+	t11_ICount -= 36;
+	
+	SP = SP + 2 * (t11.op & 0x3f);
+	PC = REGW(5);
+   	REGW(5) = POP();    	
+	
+	change_pc(PC);
 }
 
 static void jmp_rgd(void)       { t11_ICount -= 15; { JMP(RGD); } }
