@@ -27,10 +27,11 @@ Touch Master 7000 *
 Touch Master 8000 *(?)
 
 * There is a reported "Minnesota" version with modifications due to legal issues
-  Touch Master 5000 is labeled "DOMESTIC" (AKA "Standard"), is there an EXPORT version?
+  Touch Master (current set) is a Euro version, all other sets are "DOMESTIC" (AKA "Standard").
   Is there a Touch Master 6000?  TM5K is version 7.10, then TM7K is version 8, TM8K is version 9.04
   Starting with Touch Master 2000, each later version is a chipswap for the mainboard.
    IE: Touch Master 8000 chips can update any Touch Master mainboard 2000 through 7000
+  Each version (IE: 2000, 3000, 7000 ect) has different girls for Strip Poker ;-)
 
 Touch Master 8000 part lists:
 
@@ -44,6 +45,10 @@ A-5343-60194-5  U39 Graphics
 A-5343-60194-8  U40 Graphics
 A-5343-60194-9  U41 Graphics
 A-21657-007     Security Key
+
+Known Versions not dumped:
+  Touch Master 7000 V8.04
+  Touch Master 8000 V9.04 (from service bulletin)
 
 ******************************************************************
 
@@ -818,8 +823,8 @@ Dumped by ANY
 
 ROM_START( tm )
 	ROM_REGION( 0x200000, REGION_CPU1, 0 ) // 68000 Code
-	ROM_LOAD16_BYTE( "tmaster.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) )
-	ROM_LOAD16_BYTE( "tmaster.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) )
+	ROM_LOAD16_BYTE( "tmaster.u51", 0x000000, 0x080000, CRC(edaa5874) SHA1(48b99bc7f5a6453def265967ca7d8eefdf9dc97b) ) /* Ver: 3.00 Euro 11-25-96 */
+	ROM_LOAD16_BYTE( "tmaster.u52", 0x000001, 0x080000, CRC(e9fd30fc) SHA1(d91ea05d5f574603883336729fb9df705688945d) ) /* Ver: 3.00 Euro 11-25-96 */
 
 	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_ERASE )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tmaster.u38", 0x100000, 0x080000, CRC(68885ef6) SHA1(010602b59c33c3e490491a296ddaf8952e315b83) )
@@ -855,7 +860,7 @@ TM3K_u39.bin               5.0  Video Images & Graphics         6029
 TM3K_u40.bin               5.0  Video Images & Graphics         ccb4
 TM3K_u41.bin               5.0  Video Images & Graphics         54a7
 u62 (NOT INCLUDED)         N/A  Battery Memory Module           N/A
-J12 DALLAS DS1204V         N/A  Security Key (required for this Version) - Labeled A-21657-002
+J12 DALLAS DS1204V         N/A  Security Key (required for this Version???) - Labeled A-21657-002
 -----------------------------------------------------------------------------------
 
 SCN68681c1n40
@@ -1071,20 +1076,6 @@ ROM_START( galgbios )
 	// RAM, filled by the 68000 and fed to the OKI
 ROM_END
 
-static DRIVER_INIT( tm3k )
-{
-	// try this if you need to calibrate
-#if 0
-	UINT16 *ROM = (UINT16 *)memory_region( REGION_CPU1 );
-	// tscreen test
-	ROM[0x75e3c/2] = 0x4ef9;
-	ROM[0x75e3e/2] = 0x0007;
-	ROM[0x75e40/2] = 0x5e4a;
-
-	// tscreen test
-	ROM[0x765ca/2] = 0x7001;
-#endif
-}
 
 static DRIVER_INIT( tm4k )
 {
@@ -1163,9 +1154,9 @@ static DRIVER_INIT( galgames )
 	memory_configure_bank(4, 0, 1, memory_region(REGION_CPU1)+0x200000, 0x40000);
 }
 
-GAME( 1996, tm,       0, tm,       tm,       0,        ROT0, "Midway",                         "Touchmaster",               0 )
-GAME( 1997, tm3k,     0, tm3k,     tmaster,  tm3k,     ROT0, "Midway",                         "Touchmaster 3000 (v5.01)",  GAME_IMPERFECT_GRAPHICS)	// imp. graphics due to bad dump
-GAME( 1998, tm4k,     0, tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02)",  0 )
-GAME( 1998, tm5k,     0, tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10)",  0 )
-GAME( 1999, tm7k,     0, tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.00)",  0 )
+GAME( 1996, tm,       0, tm,       tm,       0,        ROT0, "Midway",                         "Touchmaster (v3.00 Euro)",           0 )
+GAME( 1997, tm3k,     0, tm3k,     tmaster,  0,        ROT0, "Midway",                         "Touchmaster 3000 (v5.01 Standard)",  GAME_IMPERFECT_GRAPHICS)	// imp. graphics due to bad dump
+GAME( 1998, tm4k,     0, tm3k,     tmaster,  tm4k,     ROT0, "Midway",                         "Touchmaster 4000 (v6.02 Standard)",  0 )
+GAME( 1998, tm5k,     0, tm3k,     tmaster,  tm5k,     ROT0, "Midway",                         "Touchmaster 5000 (v7.10 Standard)",  0 )
+GAME( 1999, tm7k,     0, tm3k,     tmaster,  tm7k,     ROT0, "Midway",                         "Touchmaster 7000 (v8.00 Standard)",  0 )
 GAME( 1998, galgbios, 0, galgames, galgames, galgames, ROT0, "Creative Electonics & Software", "Galaxy Games (BIOS v1.90)", GAME_IS_BIOS_ROOT )
