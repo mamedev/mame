@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( ldrun3_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(m62_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0x80, 0x80) AM_WRITE(m62_vscroll_low_w)
-	/* 0x81 used too, don't know what for */
+	AM_RANGE(0x81, 0x81) AM_WRITE(ldrun3_topbottom_mask_w)
 ADDRESS_MAP_END
 
 
@@ -1391,7 +1391,7 @@ static MACHINE_DRIVER_START( ldrun3 )
 	/* video hardware */
 	MDRV_GFXDECODE(ldrun3)
 	MDRV_VIDEO_START(ldrun2)
-	MDRV_VIDEO_UPDATE(ldrun)
+	MDRV_VIDEO_UPDATE(ldrun3)
 MACHINE_DRIVER_END
 
 

@@ -18,6 +18,7 @@ WRITE8_HANDLER( m62_hscroll_low_w );
 WRITE8_HANDLER( m62_hscroll_high_w );
 WRITE8_HANDLER( m62_vscroll_low_w );
 WRITE8_HANDLER( m62_vscroll_high_w );
+WRITE8_HANDLER( ldrun3_topbottom_mask_w );
 extern UINT8 *m62_tileram;
 extern UINT8 *m62_textram;
 
@@ -29,6 +30,8 @@ VIDEO_START( ldrun );
 VIDEO_UPDATE( ldrun );
 
 VIDEO_START( ldrun2 );
+
+VIDEO_UPDATE( ldrun3 );
 
 VIDEO_START( battroad );
 VIDEO_UPDATE( battroad );
