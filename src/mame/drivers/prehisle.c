@@ -357,59 +357,7 @@ ROM_END
 
 /******************************************************************************/
 
-static READ16_HANDLER( world_cycle_r )
-{
-	int pc=activecpu_get_pc();
-	int ret=prehisle_ram16[0x12];
 
-	if ((ret&0x8000) && (pc==0x260c || pc==0x268a || pc==0x2b0a || pc==0x34a8 || pc==0x6ae4 || pc==0x83ac || pc==0x25ce || pc==0x29c4)) {
-		cpu_spinuntil_int();
-		return ret&0x7fff;
-	}
-	return ret;
-}
-
-static DRIVER_INIT( prehisle )
-{
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, world_cycle_r);
-}
-
-static READ16_HANDLER( usa_cycle_r )
-{
-	int pc=activecpu_get_pc();
-	int ret=prehisle_ram16[0x12];
-
-	if ((ret&0x8000) && (pc==0x281e || pc==0x28a6 || pc==0x295a || pc==0x2868 || pc==0x8f98 || pc==0x3b1e)) {
-		cpu_spinuntil_int();
-		return ret&0x7fff;
-	}
-	return ret;
-}
-
-static DRIVER_INIT( prehislu )
-{
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, usa_cycle_r);
-}
-
-static READ16_HANDLER( jap_cycle_r )
-{
-	int pc=activecpu_get_pc();
-	int ret=prehisle_ram16[0x12];
-
-	if ((ret&0x8000) && (pc==0x34b6 /* Todo! */ )) {
-		cpu_spinuntil_int();
-		return ret&0x7fff;
-	}
-	return ret;
-}
-
-static DRIVER_INIT( gensitou )
-{
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70024, 0x70025, 0, 0, jap_cycle_r);
-}
-
-/******************************************************************************/
-
-GAME( 1989, prehisle, 0,		prehisle, prehisle, prehisle, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, prehislu, prehisle, prehisle, prehisle, prehislu, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, gensitou, prehisle, prehisle, prehisle, gensitou, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehisle, 0,		prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, prehislu, prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )
