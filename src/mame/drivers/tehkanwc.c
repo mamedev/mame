@@ -638,16 +638,22 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	tehkanwc_portA_w,
 	tehkanwc_portB_w
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	tehkanwc_portA_r,
-	tehkanwc_portB_r
+	tehkanwc_portB_r,
+	NULL,
+	NULL
 };
 
 static const struct MSM5205interface msm5205_interface =

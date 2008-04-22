@@ -620,10 +620,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
 	soundlatch2_r,
 	ay8910_port0a_w,
-	0
+	NULL
 };
 
 static const struct TMS5220interface tms5220_interface =

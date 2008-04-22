@@ -452,16 +452,20 @@ static WRITE8_HANDLER( grchamp_portB_2_w )
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	grchamp_portA_0_w,
 	grchamp_portB_0_w
 };
 
 static const struct AY8910interface ay8910_interface_3 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	grchamp_portA_2_w,
 	grchamp_portB_2_w
 };

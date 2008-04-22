@@ -5,10 +5,7 @@
 
 struct YM2203interface
 {
-	read8_machine_func portAread;
-	read8_machine_func portBread;
-	write8_machine_func portAwrite;
-	write8_machine_func portBwrite;
+	const struct AY8910interface ay8910_intf;
 	void (*handler)(int irq);
 };
 

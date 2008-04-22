@@ -905,40 +905,62 @@ static const struct Samplesinterface pbillian_samples_interface =
 
 static const struct AY8910interface pbillian_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	pbillian_ay_port_a_r,			/* port Aread */
-	input_port_2_r					/* port Bread */
+	input_port_2_r,					/* port Bread */
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface hotsmash_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	hotsmash_ay_port_a_r,			/* port Aread */
-	input_port_2_r					/* port Bread */
+	input_port_2_r,					/* port Bread */
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface sqix_ay8910_interface_1 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_3_r,	/* port Aread */
 	in4_mcu_r,		/* port Bread */
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface sqix_ay8910_interface_2 =
 {
-	input_port_1_r,	/* port Aread */
-	sqix_from_mcu_r,		/* port Bread */
-	0,								/* port Awrite */
-	sqix_z80_mcu_w				/* port Bwrite */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_1_r,		/* port Aread */
+	sqix_from_mcu_r,	/* port Bread */
+	NULL,				/* port Awrite */
+	sqix_z80_mcu_w		/* port Bwrite */
 };
 
 static const struct AY8910interface bootleg_ay8910_interface_1 =
 {
-	input_port_3_r,	/* port Aread */
-	input_port_4_r	/* port Bread */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_3_r,		/* port Aread */
+	input_port_4_r,		/* port Bread */
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface bootleg_ay8910_interface_2 =
 {
-	input_port_1_r,	/* port Aread */
-	bootleg_in0_r	/* port Bread */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_1_r,		/* port Aread */
+	bootleg_in0_r,		/* port Bread */
+	NULL,
+	NULL
 };
 
 

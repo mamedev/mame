@@ -246,7 +246,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static INTERRUPT_GEN( timelimt_irq ) {

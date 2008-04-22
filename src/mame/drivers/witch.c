@@ -416,18 +416,28 @@ static READ8_HANDLER(portB_r) {	return input_port_read(machine, "YM_PortB");}
 
 static const struct YM2203interface ym2203_interface_0 =
 {
-	portA_r,
-	portB_r,
-	NULL,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		portA_r,
+		portB_r,
+		NULL,
+		NULL
+	},
 	NULL
 };
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	NULL,
-	NULL,
-	xscroll_w,
-	yscroll_w
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		xscroll_w,
+		yscroll_w
+	},
+	NULL
 };
 
 static ADDRESS_MAP_START( map_main, ADDRESS_SPACE_PROGRAM, 8 )

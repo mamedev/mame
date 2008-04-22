@@ -190,18 +190,22 @@ static void adpcm_int(int data)
 
 static const struct AY8910interface irem_ay8910_interface_1 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	soundlatch_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	ay8910_0_portb_w
 };
 
 static const struct AY8910interface irem_ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ay8910_1_porta_w,
-	0
+	NULL
 };
 
 static const struct MSM5205interface irem_msm5205_interface_1 =

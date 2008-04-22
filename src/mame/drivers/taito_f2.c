@@ -3839,10 +3839,14 @@ static WRITE8_HANDLER( camltrya_porta_w )
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,	/* portA read */
-	0,
-	camltrya_porta_w,	/* portA write - not implemented */
-	0,	/* portB write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,				/* portA read */
+		NULL,
+		camltrya_porta_w,	/* portA write - not implemented */
+		NULL,				/* portB write */
+	},
 	irq_handler
 };
 

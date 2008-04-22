@@ -370,8 +370,12 @@ static READ8_HANDLER( pandoras_portB_r )
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	pandoras_portA_r,	// not used
-	pandoras_portB_r
+	pandoras_portB_r,
+	NULL,
+	NULL
 };
 
 static MACHINE_DRIVER_START( pandoras )

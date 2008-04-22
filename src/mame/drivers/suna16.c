@@ -1035,8 +1035,10 @@ static WRITE8_HANDLER( bestbest_ay8910_port_a_w )
 
 static const struct AY8910interface bestbest_ay8910_interface =
 {
-	0,							0,
-	bestbest_ay8910_port_a_w,	0
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,						NULL,
+	bestbest_ay8910_port_a_w,	NULL
 };
 
 static MACHINE_DRIVER_START( bestbest )

@@ -847,7 +847,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/gijoe.o $(VIDEO)/gijoe.o \
 	$(DRIVERS)/gradius3.o $(VIDEO)/gradius3.o \
 	$(DRIVERS)/gticlub.o $(VIDEO)/gticlub.o \
-	$(DRIVERS)/gyruss.o $(AUDIO)/gyruss.o $(VIDEO)/gyruss.o \
+	$(DRIVERS)/gyruss.o $(VIDEO)/gyruss.o \
 	$(DRIVERS)/hcastle.o $(VIDEO)/hcastle.o \
 	$(DRIVERS)/hexion.o $(VIDEO)/hexion.o \
 	$(DRIVERS)/hornet.o $(MACHINE)/konppc.o \

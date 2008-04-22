@@ -319,10 +319,15 @@ GFXDECODE_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	upd7759_0_port_w,
-	bladestl_port_B_w
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		upd7759_0_port_w,
+		bladestl_port_B_w
+	},
+	NULL
 };
 
 static const struct upd7759_interface upd7759_interface =

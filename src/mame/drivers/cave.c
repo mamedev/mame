@@ -2005,7 +2005,12 @@ static const struct YM2151interface ym2151_interface =
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,0,0,0,irqhandler
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	irqhandler
 };
 
 

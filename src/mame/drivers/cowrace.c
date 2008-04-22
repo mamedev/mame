@@ -152,9 +152,13 @@ INPUT_PORTS_END
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	soundlatch_r,	OKIM6295_status_0_r,	// read  A,B
-	0,				OKIM6295_data_0_w,		// write A,B
-	0
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		soundlatch_r,	OKIM6295_status_0_r,	// read  A,B
+		NULL,			OKIM6295_data_0_w,		// write A,B
+	},
+	NULL
 };
 
 

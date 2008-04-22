@@ -792,8 +792,10 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static const struct AY8910interface merit_ay8912_interface =
 {
-	0,0,
-	led2_w,0
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL, NULL,
+	led2_w, NULL
 };
 
 

@@ -2269,19 +2269,27 @@ static WRITE8_HANDLER( portA_w )
 
 static const struct YM2203interface ym2203_interface_triple =
 {
-	0,
-	0,
-	portA_w,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		portA_w,
+		NULL,
+	},
 	irqhandler
 };
 
 static const struct YM2203interface ym2203_interface_champwr =
 {
-	0,
-	0,
-	portA_w,
-	champwr_msm5205_volume_w,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		portA_w,
+		champwr_msm5205_volume_w,
+	},
 	irqhandler
 };
 
@@ -2301,8 +2309,15 @@ static const struct YM2610interface ym2610_interface =
 
 static const struct YM2203interface ym2203_interface_single =
 {
-	portA_r,
-	portB_r
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		portA_r,
+		portB_r,
+		NULL,
+		NULL
+	},
+	NULL
 };
 
 

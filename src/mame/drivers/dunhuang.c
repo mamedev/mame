@@ -666,9 +666,11 @@ GFXDECODE_END
 
 static const struct AY8910interface dunhuang_ay8910_interface =
 {
-//  A                   B
-	0,					dunhuang_dsw_r,	// R
-	dunhuang_input_w,	0				// W
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	//  A                   B
+	NULL,					dunhuang_dsw_r,	// R
+	dunhuang_input_w,		NULL			// W
 };
 
 static MACHINE_DRIVER_START( dunhuang )

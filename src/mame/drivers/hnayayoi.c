@@ -604,10 +604,14 @@ popmessage("irq");
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_0_r,
-	input_port_1_r,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_0_r,
+		input_port_1_r,
+		NULL,
+		NULL,
+	},
 	irqhandler
 };
 

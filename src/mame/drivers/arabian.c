@@ -332,8 +332,10 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ay8910_porta_w,
 	ay8910_portb_w
 };

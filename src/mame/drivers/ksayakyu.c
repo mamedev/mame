@@ -182,16 +182,20 @@ static WRITE8_HANDLER(dummy_w)
 
 static const struct AY8910interface ay8910_interface_1 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	soundlatch_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	dummy_w
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	dummy_w,
 	dummy_w
 };

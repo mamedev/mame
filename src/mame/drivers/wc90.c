@@ -309,7 +309,12 @@ static void irqhandler(int irq)
 
 static const struct YM2608interface ym2608_interface =
 {
-	0,0,0,0,irqhandler,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	irqhandler,
 	REGION_SOUND1
 };
 

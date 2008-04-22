@@ -2587,10 +2587,14 @@ static const struct YM2610interface ym2610_interface_crimec =
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	bankswitch_w,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		bankswitch_w,
+		NULL,
+	},
 	irqhandler
 };
 

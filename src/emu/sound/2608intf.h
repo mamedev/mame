@@ -2,13 +2,11 @@
 #define __2608INTF_H__
 
 #include "fm.h"
+#include "ay8910.h"
 
 struct YM2608interface
 {
-	read8_machine_func portAread;
-	read8_machine_func portBread;
-	write8_machine_func portAwrite;
-	write8_machine_func portBwrite;
+	const struct AY8910interface ay8910_intf;
 	void ( *handler )( int irq );	/* IRQ handler for the YM2608 */
 	int pcmrom;		/* Delta-T memory region ram/rom */
 };

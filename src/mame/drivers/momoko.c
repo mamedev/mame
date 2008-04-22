@@ -245,7 +245,15 @@ GFXDECODE_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	soundlatch_r
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		soundlatch_r,
+		NULL,
+		NULL,
+		NULL
+	},
+	NULL
 };
 
 static MACHINE_DRIVER_START( momoko )

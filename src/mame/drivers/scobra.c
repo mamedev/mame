@@ -84,8 +84,12 @@ GFXDECODE_END
 
 static const struct AY8910interface hustler_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	soundlatch_r,
-	frogger_portB_r
+	frogger_portB_r,
+	NULL,
+	NULL
 };
 
 static READ8_DEVICE_HANDLER(scobra_type2_ppi8255_r)
@@ -1355,8 +1359,12 @@ INPUT_PORTS_END
 
 static const struct AY8910interface scobra_ay8910_interface_2 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	soundlatch_r,
-	scramble_portB_r
+	scramble_portB_r,
+	NULL,
+	NULL
 };
 
 

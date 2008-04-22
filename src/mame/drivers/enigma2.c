@@ -391,6 +391,8 @@ static CUSTOM_INPUT( p2_controls_r )
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	sound_latch_r,
 	0,
 	0,

@@ -1577,8 +1577,10 @@ static const pia6821_interface pia1_intf =
 
 static const struct AY8910interface ay8910_intf =
 {
-	0,	/* portA in */
-	0,	/* portB in */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,				/* portA in  */
+	NULL,				/* portB in  */
 	funworld_lamp_a_w,	/* portA out */
 	funworld_lamp_b_w	/* portB out */
 };

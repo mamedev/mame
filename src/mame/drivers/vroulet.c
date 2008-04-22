@@ -221,10 +221,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
- input_port_3_r,// DSWA
- input_port_4_r,// DSWB
- 0,
- 0
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_3_r,// DSWA
+	input_port_4_r,// DSWB
+	NULL,
+	NULL
 };
 
 /* PPI8255 Interface */

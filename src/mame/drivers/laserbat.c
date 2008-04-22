@@ -660,10 +660,12 @@ static const pia6821_interface pia_0_intf =
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
 	soundlatch_r,
-	0,//ay8910_port0a_w,
-	0
+	NULL,//ay8910_port0a_w,
+	NULL
 };
 
 static MACHINE_START( catnmous )

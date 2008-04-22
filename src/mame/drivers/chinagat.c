@@ -483,10 +483,11 @@ static INTERRUPT_GEN( chinagat_interrupt )
 /* This is only on the second bootleg board */
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	chinagat_irq_handler
 };
 

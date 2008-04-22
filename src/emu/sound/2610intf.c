@@ -123,6 +123,12 @@ static STATE_POSTLOAD( ym2610_postload )
 static void *ym2610_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM2610interface generic_2610 = { 0 };
+	static const struct AY8910interface generic_ay8910 = 
+	{ 	
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	};
 	const struct YM2610interface *intf = config ? config : &generic_2610;
 	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
@@ -135,7 +141,7 @@ static void *ym2610_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610, sndindex, clock, 1, NULL, NULL, NULL, NULL);
+	info->psg = ay8910_start_ym(SOUND_YM2610, sndindex, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -175,6 +181,12 @@ static void ym2610b_stream_update(void *param, stream_sample_t **inputs, stream_
 static void *ym2610b_start(int sndindex, int clock, const void *config)
 {
 	static const struct YM2610interface generic_2610 = { 0 };
+	static const struct AY8910interface generic_ay8910 = 
+	{ 	
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	};
 	const struct YM2610interface *intf = config ? config : &generic_2610;
 	int rate = clock/72;
 	void *pcmbufa,*pcmbufb;
@@ -187,7 +199,7 @@ static void *ym2610b_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610B, sndindex, clock, 1, NULL, NULL, NULL, NULL);
+	info->psg = ay8910_start_ym(SOUND_YM2610B, sndindex, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */

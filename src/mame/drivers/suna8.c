@@ -1534,8 +1534,10 @@ static void soundirq(int state)
 
 static const struct AY8910interface hardhead_ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	suna8_play_samples_w,
 	suna8_samples_number_w
 };
@@ -1757,8 +1759,10 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface starfigh_ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	suna8_play_samples_w,
 	suna8_samples_number_w
 };

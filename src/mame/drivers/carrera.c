@@ -272,8 +272,12 @@ static READ8_HANDLER( unknown_r )
 /* these are set as input, but I have no idea which input port it uses is for the AY */
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	unknown_r,
 	unknown_r,
+	NULL,
+	NULL
 };
 
 static PALETTE_INIT(carrera)

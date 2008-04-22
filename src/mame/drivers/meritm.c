@@ -712,9 +712,11 @@ static WRITE8_HANDLER(meritm_ay8930_port_b_w)
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	meritm_ay8930_port_a_r, /* Port A read */
-	0, /* Port B read */
-	0, /* Port A write */
+	NULL, /* Port B read */
+	NULL, /* Port A write */
 	meritm_ay8930_port_b_w  /* Port B write */
 };
 

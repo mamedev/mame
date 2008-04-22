@@ -1038,8 +1038,12 @@ INPUT_PORTS_END
 
 static const struct AY8910interface srmp2_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_2_r,				/* Input A: DSW 2 */
 	input_port_1_r,				/* Input B: DSW 1 */
+	NULL,
+	NULL
 };
 
 

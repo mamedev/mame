@@ -463,9 +463,11 @@ static WRITE8_HANDLER(input_mux_w)
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	dips1_r,
-	0,
-	0,
+	NULL,
+	NULL,
 	input_mux_w
 };
 

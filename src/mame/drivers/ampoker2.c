@@ -845,7 +845,9 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
-0, 0, 0, 0	/* no ports used */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL, NULL, NULL, NULL	/* no ports used */
 };
 
 

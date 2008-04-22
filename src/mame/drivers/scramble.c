@@ -1717,38 +1717,60 @@ GFXDECODE_END
 
 static const struct AY8910interface scramble_ay8910_interface_2 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	soundlatch_r,
-	scramble_portB_r
+	scramble_portB_r,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface sfx_ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	soundlatch2_w,
 	sfx_sh_irqtrigger_w
 };
 
 static const struct AY8910interface explorer_ay8910_interface_1 =
 {
-	scramble_portB_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	scramble_portB_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface explorer_ay8910_interface_2 =
 {
-	hotshock_soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	hotshock_soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface hotshock_ay8910_interface_2 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	hotshock_soundlatch_r,
-	scramble_portB_r
+	scramble_portB_r,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface scorpion_ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	scorpion_extra_sound_w,
 	scorpion_sound_cmd_w,
 };

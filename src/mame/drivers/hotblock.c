@@ -178,8 +178,12 @@ static INTERRUPT_GEN( hotblocks_irq ) /* right? */
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_0_r,
 	input_port_1_r,
+	NULL,
+	NULL
 };
 
 

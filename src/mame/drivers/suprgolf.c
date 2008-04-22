@@ -264,10 +264,14 @@ static void irqhandler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_5_r,
-	input_port_6_r,
-	suprgolf_writeA,
-	suprgolf_writeB,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_5_r,
+		input_port_6_r,
+		suprgolf_writeA,
+		suprgolf_writeB,
+	},
 	irqhandler
 };
 static const gfx_layout gfxlayout =

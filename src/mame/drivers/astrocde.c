@@ -510,7 +510,12 @@ static z80ctc_interface ctc_intf =
 
 static const struct AY8910interface ay8912_interface =
 {
-	input_port_5_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_5_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 

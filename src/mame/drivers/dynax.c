@@ -3583,10 +3583,14 @@ INPUT_PORTS_END
 
 static const struct YM2203interface hanamai_ym2203_interface =
 {
-	input_port_1_r,				/* Port A Read: DSW */
-	input_port_0_r,				/* Port B Read: DSW */
-	0,							/* Port A Write */
-	0,							/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_1_r,				/* Port A Read: DSW */
+		input_port_0_r,				/* Port B Read: DSW */
+		NULL,							/* Port A Write */
+		NULL,							/* Port B Write */
+	},
 	sprtmtch_sound_callback		/* IRQ handler */
 };
 
@@ -3650,6 +3654,8 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface hnoridur_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_0_r		/* Port A Read: DSW */
 };
 
@@ -3700,10 +3706,14 @@ MACHINE_DRIVER_END
 
 static const struct YM2203interface sprtmtch_ym2203_interface =
 {
-	input_port_3_r,				/* Port A Read: DSW */
-	input_port_4_r,				/* Port B Read: DSW */
-	0,							/* Port A Write */
-	0,							/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_3_r,				/* Port A Read: DSW */
+		input_port_4_r,				/* Port B Read: DSW */
+		NULL,						/* Port A Write */
+		NULL,						/* Port B Write */
+	},
 	sprtmtch_sound_callback,	/* IRQ handler */
 };
 
@@ -3871,10 +3881,11 @@ MACHINE_DRIVER_END
 
 static const struct YM2203interface jantouki_ym2203_interface =
 {
-	0,							/* Port A Read: DSW */
-	0,							/* Port B Read: DSW */
-	0,							/* Port A Write */
-	0,							/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	jantouki_sound_callback		/* IRQ handler */
 };
 
@@ -4042,6 +4053,8 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface htengoku_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	// A            B
 	htengoku_dsw_r,	0,					// R
 	0,				htengoku_dsw_w		// W
@@ -4100,6 +4113,8 @@ static INTERRUPT_GEN( tenkai_interrupt )
 
 static const struct AY8910interface tenkai_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	// A                // B
 	tenkai_dsw_r,		0,				// Read
 	0,					tenkai_dswsel_w	// Write

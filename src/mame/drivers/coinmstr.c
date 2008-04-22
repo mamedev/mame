@@ -621,7 +621,12 @@ static MACHINE_RESET( trailblz )
 
 static const struct AY8910interface ay8912_interface =
 {
-	input_port_4_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_4_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static MACHINE_DRIVER_START( coinmstr )

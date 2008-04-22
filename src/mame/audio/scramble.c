@@ -377,12 +377,22 @@ static const struct TMS5110interface ad2083_tms5110_interface =
 
 static const struct AY8910interface ad2083_ay8910_interface_1 =
 {
-	scramble_portB_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	scramble_portB_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface ad2083_ay8910_interface_2 =
 {
-	hotshock_soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	hotshock_soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static ADDRESS_MAP_START( ad2083_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

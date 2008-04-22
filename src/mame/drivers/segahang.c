@@ -802,7 +802,12 @@ INPUT_PORTS_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,0,0,0,sound_irq
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	sound_irq
 };
 
 

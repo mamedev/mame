@@ -107,7 +107,15 @@ static STATE_POSTLOAD( ym2203_postload )
 
 static void *ym2203_start(int sndindex, int clock, const void *config)
 {
-	static const struct YM2203interface generic_2203 = { 0 };
+	static const struct YM2203interface generic_2203 = 
+	{
+		{ 	
+			AY8910_LEGACY_OUTPUT,
+			AY8910_DEFAULT_LOADS,
+			NULL, NULL, NULL, NULL
+		},
+		NULL
+	};
 	const struct YM2203interface *intf = config ? config : &generic_2203;
 	struct ym2203_info *info;
 	int rate = clock/72; /* ??? */
@@ -116,7 +124,7 @@ static void *ym2203_start(int sndindex, int clock, const void *config)
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2203, sndindex, clock, 3, intf->portAread, intf->portBread, intf->portAwrite, intf->portBwrite);
+	info->psg = ay8910_start_ym(SOUND_YM2203, sndindex, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */

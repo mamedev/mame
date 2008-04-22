@@ -320,10 +320,14 @@ static const struct MSM5205interface msm5205_interface =
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	writeA,
-	writeB,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		writeA,
+		writeB,
+	},
 	irqhandler
 };
 

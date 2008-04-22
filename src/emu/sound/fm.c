@@ -115,7 +115,7 @@
 #include "support.h"		/* use RAINE */
 #endif
 
-#include "ay8910.h"
+//#include "ay8910.h"
 #include "fm.h"
 
 

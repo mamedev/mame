@@ -360,8 +360,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	tankbust_soundlatch_r,
-	tankbust_soundtimer_r
+	tankbust_soundtimer_r,
+	NULL,
+	NULL
 };
 
 static MACHINE_DRIVER_START( tankbust )

@@ -422,10 +422,14 @@ static void irq_handler(int irq)
 
 static const struct YM2203interface ym2203_intf_sandscrp =
 {
-	input_port_4_r,	/* Port A Read - DSW 1 */
-	input_port_5_r,	/* Port B Read - DSW 2 */
-	0,	/* Port A Write */
-	0,	/* Port B Write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_4_r,	/* Port A Read - DSW 1 */
+		input_port_5_r,	/* Port B Read - DSW 2 */
+		NULL,	/* Port A Write */
+		NULL,	/* Port B Write */
+	},
 	irq_handler	/* IRQ handler */
 };
 

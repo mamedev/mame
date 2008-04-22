@@ -474,7 +474,12 @@ static void ym_irq(int state)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,0,0,0,ym_irq
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	ym_irq
 };
 
 static MACHINE_DRIVER_START( roldfrog )

@@ -563,7 +563,12 @@ static const struct TMS5220interface tms5220_interface =
 
 static const struct AY8910interface ay8910_interface =
 {
-	soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 

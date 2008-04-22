@@ -910,16 +910,22 @@ static READ8_HANDLER( unk_r )
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	unk_r,
-	0,
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		unk_r, NULL, NULL, NULL
+	},
 	irqhandler
 };
 
 static const struct YM2203interface ym2203_interface_2 =
 {
-	unk_r
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		unk_r, NULL, NULL, NULL
+	},
+	NULL
 };
 
 static const struct YM2151interface ym2151_interface =

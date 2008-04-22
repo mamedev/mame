@@ -6555,6 +6555,8 @@ MACHINE_DRIVER_END
 
 static const struct AY8910interface quiz365_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	quiz365_input_r,
 	0,
 	0,
@@ -6893,6 +6895,8 @@ static INTERRUPT_GEN( rtc_nmi_irq )
 
 static const struct AY8910interface mjmyster_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	0,
 	0,
 	0,
@@ -6941,6 +6945,8 @@ static INTERRUPT_GEN( hginga_irq )
 
 static const struct AY8910interface hginga_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	// A            B
 	hginga_dsw_r,	0,					// R
 	0,				ddenlovr_select_w		// W

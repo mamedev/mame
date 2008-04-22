@@ -128,8 +128,10 @@ static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
 
 static const struct AY8910interface redalert_ay8910_interface =
 {
-	soundlatch_r, 0,		/* port A/B read */
-	0, redalert_analog_w	/* port A/B write */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r, NULL,		/* port A/B read */
+	NULL, redalert_analog_w	/* port A/B write */
 };
 
 
@@ -312,8 +314,10 @@ ADDRESS_MAP_END
 
 static const struct AY8910interface demoneye_ay8910_interface =
 {
-	soundlatch_r, 0,	/* port A/B read */
-	0, 0				/* port A/B write */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r, NULL,	/* port A/B read */
+	NULL, NULL				/* port A/B write */
 };
 
 

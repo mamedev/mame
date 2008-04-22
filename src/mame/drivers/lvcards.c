@@ -458,8 +458,12 @@ GFXDECODE_END
 
 static const struct AY8910interface lcay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_3_r, //DSW0
-	input_port_4_r  //DSW1
+	input_port_4_r,  //DSW1
+	NULL,
+	NULL
 };
 
 

@@ -16,12 +16,26 @@ YMZ294: 0 I/O port
 
 #define ALL_8910_CHANNELS -1
 
+
+/* Internal resistance at Volume level 7 */
+
+#define AY8910_INTERNAL_RESISTANCE	(356)
+#define YM2149_INTERNAL_RESISTANCE	(353)
+#define AY8910_DEFAULT_LOADS		{1000, 1000, 1000}
+
+
+#define AY8910_LEGACY_OUTPUT		(1)
+#define AY8910_SINGLE_OUTPUT		(2)
+#define AY8910_DISCRETE_OUTPUT		(4)
+
 struct AY8910interface
 {
-	read8_machine_func portAread;
-	read8_machine_func portBread;
-	write8_machine_func portAwrite;
-	write8_machine_func portBwrite;
+	int					flags;			/* Flags */
+	int					res_load[3]; 	/* Load on channel in ohms */
+	read8_machine_func	portAread;
+	read8_machine_func	portBread;
+	write8_machine_func	portAwrite;
+	write8_machine_func	portBwrite;
 };
 
 void AY8910_set_volume(int chip,int channel,int volume);
@@ -77,9 +91,7 @@ WRITE16_HANDLER( AY8910_write_port_4_msb_w );
 
 /*********** An interface for SSG of YM2203 ***********/
 
-void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, int streams,
-		read8_machine_func portAread, read8_machine_func portBread,
-		write8_machine_func portAwrite, write8_machine_func portBwrite);
+void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const struct AY8910interface *intf);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);

@@ -458,10 +458,14 @@ static WRITE8_HANDLER( ym2203_out_b )
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_1_r,
-	0,
-	0,
-	ym2203_out_b,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_1_r,
+		NULL,
+		NULL,
+		ym2203_out_b,
+	},
 	ym2203_irq
 };
 

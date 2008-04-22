@@ -578,10 +578,14 @@ static WRITE8_HANDLER( unk )
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	unk,
-	unk,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		NULL,
+		unk,
+		unk,
+	},
 	irqhandler
 };
 

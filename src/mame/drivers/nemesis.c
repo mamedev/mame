@@ -2091,13 +2091,20 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	nemesis_portA_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	nemesis_portA_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	k005289_control_A_w,
 	k005289_control_B_w
 };

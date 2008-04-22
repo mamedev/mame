@@ -620,8 +620,10 @@ GFXDECODE_END
 
 static const struct AY8910interface tx1_ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	tx1_ay8910_a_w,
 	tx1_ay8910_b_w,
 };
@@ -630,17 +632,21 @@ static const struct AY8910interface tx1_ay8910_interface =
 /* YM2149 IC19 */
 static const struct AY8910interface buggyboy_ym2149_interface_1 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_1_r,
 	input_port_2_r,
-	0,
-	0,
+	NULL,
+	NULL,
 };
 
 /* YM2149 IC24 */
 static const struct AY8910interface buggyboy_ym2149_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	bb_ym1_a_w,
 	bb_ym1_b_w,
 };

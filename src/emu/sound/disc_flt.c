@@ -1104,13 +1104,14 @@ static void dst_rcfilter_sw_step(node_description *node)
 	struct dst_rcfilter_sw_context *context = node->context;
 	int i;
 	double rcexp;
+	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us=0, rs=0;
 
-	if(DST_RCFILTER_SW__ENABLE)
+	if (DST_RCFILTER_SW__ENABLE)
 	{
 		for (i=0;i<4;i++)
 		{
-			if ( ( (int)DST_RCFILTER_SW__SWITCH & (1<<i)) == 1)
+			if ( ( bits & (1<<i)) != 0)
 			{
 				us += context->vCap[i];
 				rs += DST_RCFILTER_SW__R;
@@ -1119,7 +1120,7 @@ static void dst_rcfilter_sw_step(node_description *node)
 		node->output[0] = CD4066_ON_RES / ( CD4066_ON_RES + rs) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
 		for (i=0;i<4;i++)
 		{
-			if ( ( (int)DST_RCFILTER_SW__SWITCH & (1<<i)) == 1)
+			if ( ( bits & (1<<i)) != 0)
 			{
 				rcexp = 1.0 - exp(-1.0 / ( CD4066_ON_RES * DST_RCFILTER_SW__C(i)) * discrete_current_context->sample_rate);
 				context->vCap[i] += ((node->output[0] - context->vCap[i]) * rcexp);

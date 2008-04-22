@@ -808,19 +808,27 @@ static void irqhandler(int irq)	/* assumes Z80 sandwiched between 68Ks */
 
 static const struct YM2203interface ym2203_interface_1 =
 {
-	0,		/* portA read */
-	0,
-	darius_write_portA0,	/* portA write */
-	darius_write_portB0,	/* portB write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,					/* portA read */
+		NULL,
+		darius_write_portA0,	/* portA write */
+		darius_write_portB0,	/* portB write */
+	},
 	irqhandler
 };
 
 static const struct YM2203interface ym2203_interface_2 =
 {
-	0,		/* portA read */
-	0,
-	darius_write_portA1,	/* portA write */
-	darius_write_portB1		/* portB write */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,					/* portA read */
+		NULL,
+		darius_write_portA1,	/* portA write */
+		darius_write_portB1		/* portB write */
+	},
 };
 
 

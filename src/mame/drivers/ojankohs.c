@@ -927,18 +927,24 @@ GFXDECODE_END
 
 static const struct AY8910interface ojankohs_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	ojankohs_ay8910_0_r,	/* read port #0 */
 	ojankohs_ay8910_1_r	/* read port #1 */
 };
 
 static const struct AY8910interface ojankoy_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	ojankoy_ay8910_0_r,		/* read port #0 */
 	ojankoy_ay8910_1_r,		/* read port #1 */
 };
 
 static const struct AY8910interface ojankoc_ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_0_r,			/* read port #0 */
 	input_port_1_r			/* read port #1 */
 };

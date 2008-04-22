@@ -301,7 +301,12 @@ static READ8_HANDLER( sound_r )
 
 static const struct AY8910interface ay8912_interface =
 {
-	sound_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	sound_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 //AY portA is fed by an input clock at 15625 Hz

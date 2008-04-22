@@ -222,10 +222,14 @@ static void irqhandler(int irq)
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_0_r,    /* DSW A */
-	input_port_1_r,    /* DSW B */
-	0,
-	0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_0_r,    /* DSW A */
+		input_port_1_r,    /* DSW B */
+		NULL,
+		NULL,
+	},
 	irqhandler
 };
 

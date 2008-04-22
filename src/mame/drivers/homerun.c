@@ -109,10 +109,15 @@ ADDRESS_MAP_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_3_r,
-	0,
-	0,
-	homerun_banking_w
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_3_r,
+		NULL,
+		NULL,
+		homerun_banking_w
+	},
+	NULL
 };
 
 

@@ -858,24 +858,30 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ay8910_portA_0_w, /* write port A */
 	ay8910_portB_0_w  /* write port B */
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ay8910_portA_1_w, /* write port A */
 	ay8910_portB_1_w  /* write port B */
 };
 
 static const struct AY8910interface ay8910_interface_3 =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	ay8910_portA_2_w, /* write port A */
 	ay8910_portB_2_w  /* write port B */
 };

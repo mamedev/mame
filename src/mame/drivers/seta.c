@@ -6674,8 +6674,15 @@ static INTERRUPT_GEN( seta_sub_interrupt )
 
 static const struct YM2203interface tndrcade_ym2203_interface =
 {
-	dsw1_r,		/* input A: DSW 1 */
-	dsw2_r		/* input B: DSW 2 */
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		dsw1_r,		/* input A: DSW 1 */
+		dsw2_r,		/* input B: DSW 2 */
+		NULL,
+		NULL
+	},
+	NULL
 };
 
 

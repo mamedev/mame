@@ -681,9 +681,11 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
-    leland_sound_port_r,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	leland_sound_port_r,
 	0,
-    leland_sound_port_w,
+	leland_sound_port_w,
 	0
 };
 

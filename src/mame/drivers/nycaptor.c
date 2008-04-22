@@ -296,8 +296,10 @@ static WRITE8_HANDLER(unk_w)
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	unk_w,
 	unk_w
 };

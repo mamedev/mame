@@ -428,8 +428,12 @@ static const struct CustomSound_interface pleiads_custom_interface =
 
 static const struct AY8910interface survival_ay8910_interface =
 {
-	0,
-	survival_protection_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	survival_protection_r,
+	NULL,
+	NULL
 };
 
 

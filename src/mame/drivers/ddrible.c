@@ -328,10 +328,15 @@ GFXDECODE_END
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	ddrible_vlm5030_busy_r,
-	ddrible_vlm5030_ctrl_w,
-	0
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL,
+		ddrible_vlm5030_busy_r,
+		ddrible_vlm5030_ctrl_w,
+		NULL
+	},
+	NULL
 };
 
 static const struct VLM5030interface vlm5030_interface =

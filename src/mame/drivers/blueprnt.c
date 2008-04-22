@@ -250,16 +250,22 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
 	soundlatch_r,
 	dipsw_w,
-	0
+	NULL
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_2_r,
-	input_port_3_r
+	input_port_3_r,
+	NULL,
+	NULL
 };
 
 /* Machine Driver */

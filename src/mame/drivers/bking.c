@@ -432,8 +432,10 @@ static WRITE8_HANDLER( portb_w )
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	DAC_0_signed_data_w,
 	portb_w
 };

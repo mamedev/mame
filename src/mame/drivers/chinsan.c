@@ -97,10 +97,14 @@ static WRITE8_HANDLER( ym_port_w2 )
 
 static const struct YM2203interface ym2203_interface =
 {
-	input_port_0_r,
-	input_port_1_r,
-	ym_port_w1,
-	ym_port_w2
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		input_port_0_r,
+		input_port_1_r,
+		ym_port_w1,
+		ym_port_w2
+	},
 };
 
 static WRITE8_HANDLER( chinsan_port00_w )

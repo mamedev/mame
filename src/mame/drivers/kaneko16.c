@@ -1649,15 +1649,21 @@ static INTERRUPT_GEN( kaneko16_interrupt )
 
 static const struct AY8910interface ay8910_intf_dsw =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_4_r,	/* input A: DSW 1 */
-	input_port_5_r	/* input B: DSW 2 */
+	input_port_5_r,	/* input B: DSW 2 */
+	NULL,
+	NULL,
 };
 
 static const struct AY8910interface ay8910_intf_eeprom =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	kaneko16_eeprom_r,		/* inputs  A:  0,EEPROM bit read */
-	0,						/* inputs  B */
-	0,						/* outputs A */
+	NULL,						/* inputs  B */
+	NULL,						/* outputs A */
 	kaneko16_eeprom_reset_w	/* outputs B:  0,EEPROM reset */
 };
 

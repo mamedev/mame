@@ -328,7 +328,11 @@ static void irqhandler(int irq)
 
 static const struct YM2203interface thedeep_ym2203_intf =
 {
-	0,0,0,0,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
 	irqhandler
 };
 

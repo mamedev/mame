@@ -201,10 +201,14 @@ static void sound_irq(int linestate)
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	compgolf_scrollx_lo_w,
-	compgolf_scrolly_lo_w,
+	{
+			AY8910_LEGACY_OUTPUT,
+			AY8910_DEFAULT_LOADS,
+			NULL,
+			NULL,
+			compgolf_scrollx_lo_w,
+			compgolf_scrolly_lo_w,
+	},
 	sound_irq
 };
 

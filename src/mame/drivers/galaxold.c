@@ -2322,12 +2322,22 @@ GFXDECODE_END
 
 static const struct AY8910interface checkmaj_ay8910_interface =
 {
-	soundlatch_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	soundlatch_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 static const struct AY8910interface bongo_ay8910_interface =
 {
-	input_port_3_r
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_3_r,
+	NULL,
+	NULL,
+	NULL
 };
 
 

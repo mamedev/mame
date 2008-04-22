@@ -161,8 +161,10 @@ static WRITE8_HANDLER( draco_ay8910_port_b_w )
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	draco_ay8910_port_a_w,
 	draco_ay8910_port_b_w
 };

@@ -1940,9 +1940,11 @@ static MACHINE_RESET( halleys )
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
+	NULL,
 	sndnmi_msk_w // port Bwrite
 };
 

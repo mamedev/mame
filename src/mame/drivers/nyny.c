@@ -461,8 +461,10 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_b_w )
 
 static const struct AY8910interface ay8910_37_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	nyny_ay8910_37_port_a_w,
 	nyny_ay8910_37_port_b_w
 };
@@ -470,8 +472,12 @@ static const struct AY8910interface ay8910_37_interface =
 
 static const struct AY8910interface ay8910_64_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	input_port_3_r,
-	input_port_2_r
+	input_port_2_r,
+	NULL,
+	NULL
 };
 
 

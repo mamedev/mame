@@ -673,7 +673,12 @@ static void sound_irq( int irq )
 
 static const struct YM2608interface ym2608_interface =
 {
-	0,0,0,0,sound_irq,
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	sound_irq,
 	REGION_SOUND1
 };
 
@@ -756,10 +761,10 @@ static MACHINE_DRIVER_START( bbusters )
 
 	MDRV_SOUND_ADD(YM2610, 8000000)
 	MDRV_SOUND_CONFIG(ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "left",  0.60)
-	MDRV_SOUND_ROUTE(0, "right", 0.60)
-	MDRV_SOUND_ROUTE(1, "left",  0.20)
-	MDRV_SOUND_ROUTE(2, "right", 0.20)
+	MDRV_SOUND_ROUTE(0, "left",  3.0)
+	MDRV_SOUND_ROUTE(0, "right", 3.0)
+	MDRV_SOUND_ROUTE(1, "left",  1.0)
+	MDRV_SOUND_ROUTE(2, "right", 1.0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mechatt )

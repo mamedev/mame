@@ -58,8 +58,7 @@ and 1 SFX channel controlled by an 8039:
 #include "driver.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
-#include "sound/dac.h"
-
+#include "sound/discrete.h"
 
 extern UINT8 *gyruss_videoram;
 extern UINT8 *gyruss_colorram;
@@ -73,11 +72,74 @@ VIDEO_START( gyruss );
 PALETTE_INIT( gyruss );
 VIDEO_UPDATE( gyruss );
 
-READ8_HANDLER( gyruss_portA_r );
-WRITE8_HANDLER( gyruss_filter0_w );
-WRITE8_HANDLER( gyruss_filter1_w );
-WRITE8_HANDLER( gyruss_sh_irqtrigger_w );
-WRITE8_HANDLER( gyruss_i8039_irq_w );
+/* The timer clock which feeds the upper 4 bits of                      */
+/* AY-3-8910 port A is based on the same clock                          */
+/* feeding the sound CPU Z80.  It is a divide by                        */
+/* 10240, formed by a standard divide by 1024,                          */
+/* followed by a divide by 10 using a 4 bit                             */
+/* bi-quinary count sequence. (See LS90 data sheet                      */
+/* for an example).                                                     */
+/*                                                                      */
+/* Bit 0 comes from the output of the divide by 1024                    */
+/*       0, 1, 0, 1, 0, 1, 0, 1, 0, 1                                   */
+/* Bit 1 comes from the QC output of the LS90 producing a sequence of   */
+/*       0, 0, 1, 1, 0, 0, 1, 1, 1, 0                                   */
+/* Bit 2 comes from the QD output of the LS90 producing a sequence of   */
+/*       0, 0, 0, 0, 1, 0, 0, 0, 0, 1                                   */
+/* Bit 3 comes from the QA output of the LS90 producing a sequence of   */
+/*       0, 0, 0, 0, 0, 1, 1, 1, 1, 1                                   */
+
+static const int gyruss_timer[10] =
+{
+	0x00, 0x01, 0x02, 0x03, 0x04, 0x09, 0x0a, 0x0b, 0x0a, 0x0d
+};
+
+static READ8_HANDLER( gyruss_portA_r )
+{
+	return gyruss_timer[(activecpu_gettotalcycles()/1024) % 10];
+}
+
+
+static WRITE8_HANDLER(gyruss_dac_w)
+{
+	discrete_sound_w(machine, NODE(16), data);
+}
+
+static void filter_w(running_machine *machine, int chip, int data)
+{
+	int i;
+
+	//printf("chip %d - %02x\n", chip, data);
+	for (i = 0;i < 3;i++)
+	{
+		/* low bit: 47000pF = 0.047uF */
+		/* high bit: 220000pF = 0.22uF */
+		discrete_sound_w(machine, NODE(3 * chip + i + 21), data & 3);
+		data >>= 2;
+	}
+}
+
+static WRITE8_HANDLER( gyruss_filter0_w )
+{
+	filter_w(machine, 0,data);
+}
+
+static WRITE8_HANDLER( gyruss_filter1_w )
+{
+	filter_w(machine, 1,data);
+}
+
+
+static WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
+{
+	/* writing to this register triggers IRQ on the sound CPU */
+	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
+}
+
+static WRITE8_HANDLER( gyruss_i8039_irq_w )
+{
+	cpunum_set_input_line(machine, 3, 0, PULSE_LINE);
+}
 
 
 static ADDRESS_MAP_START( main_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -139,7 +201,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(gyruss_dac_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
@@ -311,25 +373,145 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface_1 =
 {
-	0,
-	0,
-	0,
+	AY8910_DISCRETE_OUTPUT,
+	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
+	NULL,
+	NULL,
+	NULL,
 	gyruss_filter0_w
 };
 
 static const struct AY8910interface ay8910_interface_2 =
 {
-	0,
-	0,
-	0,
+	AY8910_DISCRETE_OUTPUT,
+	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
+	NULL,
+	NULL,
+	NULL,
 	gyruss_filter1_w
 };
 
 static const struct AY8910interface ay8910_interface_3 =
 {
-	gyruss_portA_r
+	AY8910_DISCRETE_OUTPUT,
+	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
+	gyruss_portA_r,
+	NULL,
+	NULL,
+	NULL
 };
 
+static const struct AY8910interface ay8910_interface_4 =
+{
+	AY8910_DISCRETE_OUTPUT,
+	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const struct AY8910interface ay8910_interface_5 =
+{
+	AY8910_DISCRETE_OUTPUT,
+	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
+	NULL,
+	NULL,
+	NULL,
+	NULL
+};
+
+static const discrete_mixer_desc konami_right_mixer_desc =
+	{DISC_MIXER_IS_RESISTOR,
+		{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
+		{0,0,0,0,0,0},	/* no variable resistors   */
+		{0,0,0,0,0,0},  /* no node capacitors      */
+		0, 200,  
+		CAP_U(0.1),
+		0,
+		0, 1};
+
+static const discrete_mixer_desc konami_left_mixer_desc =
+	{DISC_MIXER_IS_RESISTOR,
+	{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(4.7) },
+	{0,0,0,0,0,0},	/* no variable resistors   */
+	{0,0,0,0,0,0},  /* no node capacitors      */
+	0, 200,  
+	CAP_U(0.1),
+	0,
+	0, 1};
+
+static DISCRETE_SOUND_START( gyruss_sound )
+
+	/* Chip 1 right */
+	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_03, 2, 1.0, 0)
+
+	/* Chip 2 left */
+	DISCRETE_INPUTX_STREAM(NODE_04, 3, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_05, 4, 1.0, 0)
+	DISCRETE_INPUTX_STREAM(NODE_06, 5, 1.0, 0)
+
+	/* Chip 3 right */
+	/* Outputs are tied together after 3.3k resistor on each channel.
+	 * A/R + B/R + C/R = (A + B + C) / 3 * (1/(R/3))
+	 */
+	DISCRETE_INPUTX_STREAM(NODE_07, 6, 0.33, 0)
+	DISCRETE_INPUTX_STREAM(NODE_08, 7, 0.33, 0)
+	DISCRETE_INPUTX_STREAM(NODE_09, 8, 0.33, 0)
+
+	/* Chip 4 right */
+	DISCRETE_INPUTX_STREAM(NODE_10, 9, 0.33, 0)
+	DISCRETE_INPUTX_STREAM(NODE_11,10, 0.33, 0)
+	DISCRETE_INPUTX_STREAM(NODE_12,11, 0.33, 0)
+
+	/* Chip 5 left */
+	DISCRETE_INPUTX_STREAM(NODE_13,12, 0.33, 0)
+	DISCRETE_INPUTX_STREAM(NODE_14,13, 0.33, 0)
+	DISCRETE_INPUTX_STREAM(NODE_15,14, 0.33, 0)
+
+	/* DAC left */
+	/* Output voltage depends on load. Datasheet gives 2.4 as minimum.
+	 * This is in line with TTL, so 4V with no load seems adequate */
+	DISCRETE_INPUTX_DATA(NODE_16, 256.0 * 4.0 / 5.0, 0.0, 0.0) 
+
+	/* Chip 1 Filter enable */
+	DISCRETE_INPUT_DATA(NODE_21)
+	DISCRETE_INPUT_DATA(NODE_22)
+	DISCRETE_INPUT_DATA(NODE_23)
+
+	/* Chip 2 Filter enable */
+	DISCRETE_INPUT_DATA(NODE_24)
+	DISCRETE_INPUT_DATA(NODE_25)
+	DISCRETE_INPUT_DATA(NODE_26)
+
+	/* Chip 1 Filter */
+	DISCRETE_RCFILTER_SW(NODE_31, 1, NODE_01, NODE_21, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.047), CAP_U(0.22), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_32, 1, NODE_02, NODE_22, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.047), CAP_U(0.22), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_33, 1, NODE_03, NODE_23, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.047), CAP_U(0.22), 0, 0)
+
+	/* Chip 2 Filter */
+	DISCRETE_RCFILTER_SW(NODE_34, 1, NODE_04, NODE_24, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.047), CAP_U(0.22), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_35, 1, NODE_05, NODE_25, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.047), CAP_U(0.22), 0, 0)
+	DISCRETE_RCFILTER_SW(NODE_36, 1, NODE_06, NODE_26, AY8910_INTERNAL_RESISTANCE+1000, CAP_U(0.047), CAP_U(0.22), 0, 0)
+
+	/* Chip 3 */
+	DISCRETE_ADDER3(NODE_40, 1, NODE_07, NODE_08, NODE_09)
+	/* Chip 4 */
+	DISCRETE_ADDER3(NODE_41, 1, NODE_10, NODE_11, NODE_12)
+	/* Chip 5 */
+	DISCRETE_ADDER3(NODE_42, 1, NODE_13, NODE_14, NODE_15)
+	
+	/* right channel */
+	DISCRETE_MIXER5(NODE_50, 1, NODE_31, NODE_32, NODE_33, NODE_40, NODE_41, &konami_right_mixer_desc)
+	/* left channel */
+	DISCRETE_MIXER5(NODE_51, 1, NODE_34, NODE_35, NODE_36, NODE_42, NODE_16, &konami_left_mixer_desc)
+
+	DISCRETE_OUTPUT(NODE_50, 3.5 / 2 )
+	DISCRETE_OUTPUT(NODE_51, 3.5 / 2)
+
+DISCRETE_SOUND_END
 
 
 static MACHINE_DRIVER_START( gyruss )
@@ -375,42 +557,38 @@ static MACHINE_DRIVER_START( gyruss )
 
 	MDRV_SOUND_ADD(AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(0, "filter.0.0", 0.22)
-	MDRV_SOUND_ROUTE(1, "filter.0.1", 0.22)
-	MDRV_SOUND_ROUTE(2, "filter.0.2", 0.22)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 2)
 
 	MDRV_SOUND_ADD(AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(0, "filter.1.0", 0.22)
-	MDRV_SOUND_ROUTE(1, "filter.1.1", 0.22)
-	MDRV_SOUND_ROUTE(2, "filter.1.2", 0.22)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 3)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 4)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 5)
 
 	MDRV_SOUND_ADD(AY8910, 14318180/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.44)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 6)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 7)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 8)
 
 	MDRV_SOUND_ADD(AY8910, 14318180/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.44)
+	MDRV_SOUND_CONFIG(ay8910_interface_4)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 9)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 10)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 11)
 
 	MDRV_SOUND_ADD(AY8910, 14318180/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.44)
+	MDRV_SOUND_CONFIG(ay8910_interface_5)
+	MDRV_SOUND_ROUTE_EX(0, "konami", 1.0, 12)
+	MDRV_SOUND_ROUTE_EX(1, "konami", 1.0, 13)
+	MDRV_SOUND_ROUTE_EX(2, "konami", 1.0, 14)
 
-	MDRV_SOUND_ADD(DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.28)
-
-	MDRV_SOUND_ADD_TAG("filter.0.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.0.2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
-
-	MDRV_SOUND_ADD_TAG("filter.1.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.1.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
-	MDRV_SOUND_ADD_TAG("filter.1.2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(gyruss_sound)
+	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	MDRV_SOUND_ROUTE(1, "left",  1.0)
 MACHINE_DRIVER_END
 
 

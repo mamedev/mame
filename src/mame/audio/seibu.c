@@ -497,7 +497,12 @@ const struct YM2151interface seibu_ym2151_interface =
 
 const struct YM2203interface seibu_ym2203_interface =
 {
-	0,0,0,0,seibu_ym2203_irqhandler
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	seibu_ym2203_irqhandler
 };
 
 /***************************************************************************/

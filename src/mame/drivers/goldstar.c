@@ -275,10 +275,12 @@ GFXDECODE_END
 
 static const struct AY8910interface ay8910_interface =
 {
- input_port_7_r,	/* DSW 4 */
- input_port_6_r,	/* DSW 3 */
- 0,
- 0
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	input_port_7_r,	/* DSW 4 */
+	input_port_6_r,	/* DSW 3 */
+	NULL,
+	NULL
 };
 
 static MACHINE_DRIVER_START( goldstar )

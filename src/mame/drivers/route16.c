@@ -569,10 +569,12 @@ INPUT_PORTS_END
 
 static const struct AY8910interface stratvox_ay8910_interface =
 {
-	0,
-	0,
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 	stratvox_sn76477_w,  /* SN76477 commands (not used in Route 16?) */
-	0
+	NULL
 };
 
 

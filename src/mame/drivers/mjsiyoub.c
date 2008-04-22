@@ -67,8 +67,12 @@ INPUT_PORTS_END
 
 static const struct AY8910interface ay8910_interface =
 {
-	0,				/* Input A: DSW 2 */
-	0,				/* Input B: DSW 1 */
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,				/* Input A: DSW 2 */
+	NULL,				/* Input B: DSW 1 */
+	NULL,
+	NULL
 };
 
 static const struct MSM5205interface msm5205_interface =

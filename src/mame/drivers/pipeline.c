@@ -337,10 +337,12 @@ static const ppi8255_interface ppi8255_intf[3] =
 
 static const struct YM2203interface ym2203_interface =
 {
-	0,
-	0,
-	0,
-	0
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		NULL, NULL, NULL, NULL
+	},
+	NULL
 };
 
 static PALETTE_INIT(pipeline)

@@ -1471,6 +1471,8 @@ static WRITE8_HANDLER( sound_output_w )
 
 static const struct AY8910interface demon_ay8910_interface_1 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	sound_porta_r,
 	sound_portb_r,
 	0,
@@ -1479,6 +1481,8 @@ static const struct AY8910interface demon_ay8910_interface_1 =
 
 static const struct AY8910interface demon_ay8910_interface_3 =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	0,
 	0,
 	0,

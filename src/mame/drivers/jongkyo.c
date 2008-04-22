@@ -581,8 +581,12 @@ static PALETTE_INIT(jongkyo)
 
 static const struct AY8910interface ay8910_interface =
 {
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
 	keyboard1_r,
 	keyboard2_r,
+	NULL,
+	NULL
 };
 
 static MACHINE_DRIVER_START( jongkyo )
