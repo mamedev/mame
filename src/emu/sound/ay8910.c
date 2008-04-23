@@ -176,7 +176,6 @@ static ay_ym_param ay8910_param =
 	   4120,  2512,  1737,  1335,  1005,   747,   586,    451 },
 };
 
-#endif
 /* 
  * RL = 3000, Hacker Kay normalized pattern, 1.5V to 2.8V
  * These values correspond with guesses based on Gyruss schematics
@@ -190,10 +189,36 @@ static ay_ym_param ay8910_param =
 	   4189,  2557,  1772,  1363,  1028,  766,   602,  464 },
 };
 
+/* 
+ * RL = 1000, Hacker Kay normalized pattern, 0.75V to 2.05V
+ * These values correspond with guesses based on Gyruss schematics
+ * They work well with scramble as well.
+ */
+static ay_ym_param ay8910_param = 
+{
+	1371, 313,
+	16,
+	{ 93399, 33289, 25808, 19285, 13940, 9846,  7237,  4493,
+	   3814,  2337,  1629,  1263,   962,  727,   580,   458 },
+};
+#endif
+
+/* 
+ * RL = 1000, Hacker Kay normalized pattern, 0.2V to 1.5V
+ */
+static ay_ym_param ay8910_param = 
+{
+	5806, 300,
+	16,
+	{ 118996, 42698, 33105, 24770, 17925, 12678,  9331,  5807,
+        4936,  3038,  2129,  1658,  1271,   969,   781,   623 }
+};
+
 
 static void AY8910_write_reg(struct AY8910 *PSG, int r, int v)
 {
 
+	//if (r != 4 && r !=5) printf("%d %x %02x\n", PSG->index, r, v);
 	PSG->regs[r] = v;
 
 	/* A note about the period of tones, noise and envelope: for speed reasons,*/
