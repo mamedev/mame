@@ -912,8 +912,8 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
 	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
 	AM_RANGE(0x08a000, 0x08a003) AM_READWRITE(drivedge_gas_r, SMH_NOP)
-	AM_RANGE(0x08c000, 0x08c003) AM_READWRITE16(input_port_0_word_r, SMH_NOP, 0xffff0000)
-	AM_RANGE(0x08e000, 0x08e003) AM_READWRITE16(input_port_1_word_r, SMH_NOP, 0xffff0000)
+	AM_RANGE(0x08c000, 0x08c003) AM_READ16(input_port_0_word_r, 0xffff0000) AM_WRITENOP
+	AM_RANGE(0x08e000, 0x08e003) AM_READ16(input_port_1_word_r, 0xffff0000) AM_WRITENOP
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_BASE(&drivedge_zbuf_control)
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
 	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_BASE(&paletteram32)

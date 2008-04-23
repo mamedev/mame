@@ -720,7 +720,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 							 metro_blitter_regs[ 0x0a / 2 ];
 
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
-		UINT16 mask		=	(dst_offs & 0x80) ? 0xff00 : 0x00ff;
+		UINT16 mask		=	(dst_offs & 0x80) ? 0x00ff : 0xff00;
 
 //      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",activecpu_get_pc(),tmap,src_offs,dst_offs);
 

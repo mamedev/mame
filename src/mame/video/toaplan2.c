@@ -569,7 +569,7 @@ static void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT32 mem_mask, int co
 
 WRITE16_HANDLER( toaplan2_0_voffs_w )
 {
-	toaplan2_voffs_w(offset, data, mem_mask, 0xffff);
+	toaplan2_voffs_w(offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_voffs_w )
@@ -802,7 +802,7 @@ static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, i
 
 WRITE16_HANDLER( toaplan2_0_videoram16_w )
 {
-	toaplan2_videoram16_w(offset, data, mem_mask, 0xffff);
+	toaplan2_videoram16_w(offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_videoram16_w )
@@ -1068,7 +1068,7 @@ WRITE16_HANDLER( pipibibi_scroll_w )
 READ16_HANDLER( pipibibi_videoram16_r )
 {
 	toaplan2_voffs_w(0, offset, 0xffff, 0);
-	return toaplan2_videoram16_r(0, mem_mask);
+	return toaplan2_videoram16_r(0, 0);
 }
 
 WRITE16_HANDLER( pipibibi_videoram16_w)
@@ -1080,7 +1080,7 @@ WRITE16_HANDLER( pipibibi_videoram16_w)
 READ16_HANDLER( pipibibi_spriteram16_r )
 {
 	toaplan2_voffs_w(0, (0x1800 + offset), 0, 0);
-	return toaplan2_videoram16_r(0, mem_mask);
+	return toaplan2_videoram16_r(0, 0);
 }
 
 WRITE16_HANDLER( pipibibi_spriteram16_w )

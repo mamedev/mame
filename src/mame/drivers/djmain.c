@@ -212,7 +212,7 @@ static READ32_HANDLER( obj_rom_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 2;
 
-	if (~mem_mask & 0x00ff00ff)
+	if (mem_mask & 0xff00ff00)
 		offset++;
 
 	return mem8[offset] * 0x01010101;
