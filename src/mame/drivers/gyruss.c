@@ -426,7 +426,7 @@ static const discrete_mixer_desc konami_right_mixer_desc =
 		{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(3.3)/3 },
 		{0,0,0,0,0,0},	/* no variable resistors   */
 		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, 200,  
+		0, 200,
 		CAP_U(0.1),
 		0,
 		0, 1};
@@ -436,7 +436,7 @@ static const discrete_mixer_desc konami_left_mixer_desc =
 	{RES_K(2.2), RES_K(2.2), RES_K(2.2), RES_K(3.3)/3, RES_K(4.7) },
 	{0,0,0,0,0,0},	/* no variable resistors   */
 	{0,0,0,0,0,0},  /* no node capacitors      */
-	0, 200,  
+	0, 200,
 	CAP_U(0.1),
 	0,
 	0, 1};
@@ -474,7 +474,7 @@ static DISCRETE_SOUND_START( gyruss_sound )
 	/* DAC left */
 	/* Output voltage depends on load. Datasheet gives 2.4 as minimum.
 	 * This is in line with TTL, so 4V with no load seems adequate */
-	DISCRETE_INPUTX_DATA(NODE_16, 256.0 * 4.0 / 5.0, 0.0, 0.0) 
+	DISCRETE_INPUTX_DATA(NODE_16, 256.0 * 4.0 / 5.0, 0.0, 0.0)
 
 	/* Chip 1 Filter enable */
 	DISCRETE_INPUT_DATA(NODE_21)
@@ -502,7 +502,7 @@ static DISCRETE_SOUND_START( gyruss_sound )
 	DISCRETE_ADDER3(NODE_41, 1, NODE_10, NODE_11, NODE_12)
 	/* Chip 5 */
 	DISCRETE_ADDER3(NODE_42, 1, NODE_13, NODE_14, NODE_15)
-	
+
 	/* right channel */
 	DISCRETE_MIXER5(NODE_50, 1, NODE_31, NODE_32, NODE_33, NODE_40, NODE_41, &konami_right_mixer_desc)
 	/* left channel */
@@ -587,8 +587,8 @@ static MACHINE_DRIVER_START( gyruss )
 
 	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(gyruss_sound)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
-	MDRV_SOUND_ROUTE(1, "left",  1.0)
+	MDRV_SOUND_ROUTE(0, "right", 3.0)
+	MDRV_SOUND_ROUTE(1, "left",  3.0)
 MACHINE_DRIVER_END
 
 
