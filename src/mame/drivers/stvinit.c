@@ -566,9 +566,9 @@ DRIVER_INIT(diehard)
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060986ac, 0x060986af, 0, 0, diehard_speedup_r );
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0bd0, 0x060e0dcf, 0, 0, diehard_cmd_write );
 	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0bd0, 0x060e0dcf, 0, 0, diehard_cmd_read );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0dd8, 0, 0, diehard_cmd_ack_read );
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0dd8, 0, 0, diehard_cmd_ack_write_cpu0 );
-	memory_install_write32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0dd8, 0, 0, diehard_cmd_ack_write );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_read );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write_cpu0 );
+	memory_install_write32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write );
 
 
 	DRIVER_INIT_CALL(ic13);
