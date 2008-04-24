@@ -1989,11 +1989,13 @@ static void update_refresh_speed(running_machine *machine)
 			UINT32 target_speed;
 
 			/* find the screen with the shortest frame period (max refresh rate) */
+			/* note that we first check the token since this can get called before all screens are created */
 			for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
-			{
-				screen_state *state = get_safe_token(screen);
-				min_frame_period = MIN(min_frame_period, state->frame_period);
-			}
+				if (screen->token != NULL)
+				{
+					screen_state *state = get_safe_token(screen);
+					min_frame_period = MIN(min_frame_period, state->frame_period);
+				}
 
 			/* compute a target speed as an integral percentage */
 			target_speed = floor(minrefresh * 100.0 / ATTOSECONDS_TO_HZ(min_frame_period));
