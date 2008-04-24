@@ -52,8 +52,7 @@
     changing hardware accesses, program logics, graphics, plus protection and some I/O
     through the 2x high density PLDs.
 
-
-    Color palettes are normally stored in format RRRBBBGG inside a bipolar color PROM
+    Color palettes are normally stored in format GGBBBRRR inside a bipolar color PROM
     (old hardware), or repeated 64 times inside a regular 27c256 ROM (new hardware).
 
     - bits -
@@ -62,7 +61,6 @@
     --xx x---   Blue component.
     xx-- ----   Green component.
 
-
     Same as Funworld video hardware, this one was designed to manage 4096 tiles with a
     size of 8x4 pixels each. Also support 4bpp graphics and the palette limitation is
     8 bits for color codes (256 x 16 colors). It means the hardware was designed for more
@@ -70,21 +68,140 @@
 
     Color PROMs from current games are 512 bytes lenght, but they only use the first 256 bytes.
 
-    Normal hardware capabilities:
-
-    - bits -
-    7654 3210
-    xxxx xx--   tiles color (game tiles)    ;codes 0x00-0xdc
-    xxx- x-xx   tiles color (title).        :codes 0xe9-0xeb
-    xxxx -xxx   tiles color (background).   ;codes 0xf1-0xf7
+    Apple10, snookr10 and tenballs have the same sound ROM.
 
 
-    --- Issues / Protection ---
+
+    *** Issues / Protection ***
+
 
     * Apple 10
 
-    - Tiles and color palette are totally scrambled.
+    - Tile matrix and color palette are totally encrypted/scrambled.
 
+    You can see the following table, where 'Normal tile #' is the tile number called to be drawn, and
+    'Scrambled tile #' is the phisical tile position in the matrix:
+
+    Normal | Scrambled
+    tile # |  tile #  
+    -------+----------
+     0x00  |   0x00   \
+     0x01  |   0x80    |
+     0x02  |   0x40    | Big "0"
+     0x03  |   0xC0    |
+     0x04  |   0x20    |
+     0x05  |   0xA0   /
+    -------+----------
+     0x06  |   0x60   \
+     0x07  |   0xE0    |
+     0x08  |   0x10    | Big "1"
+     0x09  |   0x90    |
+     0x0A  |   0x50    |
+     0x0B  |   0xD0   /
+    -------+----------
+     0x0C  |   0x30   \
+     0x0D  |   0xB0    |
+     0x0E  |   0x70    | Big "2"
+     0x0F  |   0xF0    |
+     0x10  |   0x08    |
+     0x11  |   0x88   /
+    -------+----------
+     0x12  |   0x48   \
+     0x13  |   0xC8    |
+     0x14  |   0x28    | Big "3"
+     0x15  |   0xA8    |
+     0x16  |   0x68    |
+     0x17  |   0xE8   /
+    -------+----------
+     0x18  |   0x18   \
+     0x19  |   0x98    |
+     0x1A  |   0x58    | Big "4"
+     0x1B  |   0xD8    |
+     0x1C  |   0x38    |
+     0x1D  |   0xB8   /
+    -------+----------
+     0x1E  |   0x78   \
+     0x1F  |   0xF8    |
+     0x20  |   0x04    | Big "5"
+     0x21  |   0x84    |
+     0x22  |   0x44    |
+     0x23  |   0xC4   /
+    -------+----------
+     0x24  |   0x24   \
+     0x25  |   0xA4    |
+     0x26  |   0x64    | Big "6"
+     0x27  |   0xE4    |
+     0x28  |   0x14    |
+     0x29  |   0x94   /
+    -------+----------
+     0x2A  |   0x54   \
+     0x2B  |   0xD4    |
+     0x2C  |   0x34    | Big "7"
+     0x2D  |   0xB4    |
+     0x2E  |   0x74    |
+     0x2F  |   0xF4   /
+    -------+----------
+
+    So we extract the following decryption table: 
+
+    0 <-> 0;  1 <-> 8;  2 <-> 4;  3 <-> C 
+    4 <-> 2;  5 <-> A;  6 <-> 6;  7 <-> E 
+    8 <-> 1;  9 <-> 9;  A <-> 5;  B <-> D 
+    C <-> 3;  D <-> B;  E <-> 7;  F <-> F 
+
+    ...and then swap nibbles.
+
+    Also note that the values are inverted/mirrored bits of the original ones. 
+
+    0x01 (0001) <-> 0x08 (1000) 
+    0x02 (0010) <-> 0x04 (0100) 
+    0x03 (0011) <-> 0x0C (1100) 
+    0x04 (0100) <-> 0x04 (0010) 
+    0x05 (0101) <-> 0x0A (1010) 
+    ...and so on.
+
+    To properly decrypt the thing 'on the fly' as the hardware does, I applied a bitswap into TILE_GET_INFO.
+    This method rearrange the tile number for each tile called to be drawn.
+
+    The final algorhithm:                                               swapped nibbles
+                                                                       +-------+-------+
+    tile_offset = BITSWAP16((tile_offset & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7)
+                                                                        | | | ||| | | | 
+                                                                       inverted|inverted
+                                                                       bitorder|bitorder
+
+    Colors are scrambled in the following way: 
+
+      Normal   |  Scrambled
+      offset   |   offset
+   ------------+------------
+    0x00-0x0F  |  0x00-0x0F
+    0x10-0x1F  |  0x80-0x8F
+    0x20-0x2F  |  0x40-0x4F
+    0x30-0x3F  |  0xC0-0xCF
+    0x40-0x4F  |  0x20-0x2F
+    0x50-0x5F  |  0xA0-0xAF
+    0x60-0x6F  |  0x60-0x6F
+    0x70-0x7F  |  0xE0-0xEF
+   ------------+------------
+    0x80-0x8F  |  0x10-0x1F
+    0x90-0x9F  |  0x90-0x9F
+    0xA0-0xAF  |  0x50-0x5F
+    0xB0-0xBF  |  0xD0-0xDF
+    0xC0-0xCF  |  0x30-0x3F
+    0xD0-0xDF  |  0xB0-0xBF
+    0xE0-0xEF  |  0x70-0x7F
+    0xF0-0xFF  |  0xF0-0xFF
+
+
+    So, the algorhythm to partially decrypt the color codes is slightly different here:
+
+    BITSWAP16(color_index,15,14,13,12,11,10,9,8,4,5,6,7,3,2,1,0)
+                                                | | | |
+                                               1st nibble
+                                           inverted bitorder
+
+    Still need more analysis to fix the remaining wrong color codes.
 
 
 ***********************************************************************************
@@ -113,6 +230,12 @@
     *** Driver Updates ***
 
 
+    [2008/04/24]
+    - Decrypted the apple10 tile matrix.
+    - Partially decrypted the apple10 color codes.
+    - Added encryption notes.
+    - Updated technical notes.
+
     [2008/04/18]
     - Initial release. Support for snookr10, apple10 and tenballs.
     - Added technical/general notes.
@@ -137,7 +260,9 @@
 WRITE8_HANDLER( snookr10_videoram_w );
 WRITE8_HANDLER( snookr10_colorram_w );
 PALETTE_INIT( snookr10 );
+PALETTE_INIT( apple10 );
 VIDEO_START( snookr10 );
+VIDEO_START( apple10 );
 VIDEO_UPDATE( snookr10 );
 
 
@@ -219,6 +344,16 @@ static MACHINE_DRIVER_START( snookr10 )
 
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( apple10 )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(snookr10)
+	MDRV_CPU_MODIFY("main")
+
+	MDRV_PALETTE_INIT(apple10)
+	MDRV_VIDEO_START(apple10)
+
+MACHINE_DRIVER_END
 
 /*************************
 *        Rom Load        *
@@ -281,5 +416,5 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY     FULLNAME                FLAGS  */
 GAME( 1998, snookr10, 0,      snookr10, snookr10, 0,        ROT0, "Sandii'",  "Snooker 10 (Ver 1.11)", GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1998, apple10,  0,      snookr10, snookr10, 0,        ROT0, "Sandii'",  "Apple 10 (Ver 1.21)",   GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1998, apple10,  0,      apple10,  snookr10, 0,        ROT0, "Sandii'",  "Apple 10 (Ver 1.21)",   GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
 GAME( 1997, tenballs, 0,      snookr10, snookr10, 0,        ROT0, "unknown",  "Ten Balls (Ver 1.05)",  GAME_NO_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
