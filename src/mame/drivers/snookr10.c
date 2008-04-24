@@ -27,8 +27,8 @@
 
     HD-PLD: 2x AMD MACH231-15-JC/1-18JI/1
             (2x Lattice ispLSI1024-60LJ for earlier revisions)
- 
-    RAM:    1x 76C88AL-15, SRAM 8Kx8 
+
+    RAM:    1x 76C88AL-15, SRAM 8Kx8
     NVRAM:  1x 76C88AL-15, SRAM 8Kx8 (battery backed)
     ROMs:   4x 27C256
             (3x 27C256 for earlier revisions)
@@ -147,9 +147,9 @@ VIDEO_UPDATE( snookr10 );
 
 static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-//	AM_RANGE(0x1000, 0x1000) AM_READNOP	/* R/W */
-//	AM_RANGE(0x3000, 0x3004) AM_READNOP	/* reads (input port) */
-//	AM_RANGE(0x5000, 0x5001) AM_READNOP	/* writes */
+//  AM_RANGE(0x1000, 0x1000) AM_READNOP /* R/W */
+//  AM_RANGE(0x3000, 0x3004) AM_READNOP /* reads (input port) */
+//  AM_RANGE(0x5000, 0x5001) AM_READNOP /* writes */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(snookr10_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM	AM_WRITE(snookr10_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM

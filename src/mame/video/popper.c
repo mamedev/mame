@@ -14,9 +14,9 @@ static rectangle tilemap_clip;
 
 
 /***************************************************************************
- * 
+ *
  * Color guns - from schematics
- * 
+ *
  ***************************************************************************/
 
 static const res_net_decode_info popper_decode_info =
@@ -24,7 +24,7 @@ static const res_net_decode_info popper_decode_info =
 	1,		// there may be two proms needed to construct color
 	0,		// start at 0
 	63,	// end at 255
-	//  R,   G,   B, 
+	//  R,   G,   B,
 	{   0,   0,   0, },		// offsets
 	{   0,   3,   6, },		// shifts
 	{0x07,0x07,0x03, }	    // masks
@@ -36,14 +36,14 @@ static const res_net_info popper_net_info =
 	{
 		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_NONE, 0, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_NONE, 0, 0, 2, {  470, 220,   0 } } 
+		{ RES_NET_AMP_NONE, 0, 0, 2, {  470, 220,   0 } }
 	}
 };
 
 /***************************************************************************
- * 
+ *
  * PALETTE_INIT
- * 
+ *
  ***************************************************************************/
 
 PALETTE_INIT( popper )

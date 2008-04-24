@@ -93,13 +93,13 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 /***************************************************************************
 
-	68681 DUART <-> Microtouch touch screen controller communication
+    68681 DUART <-> Microtouch touch screen controller communication
 
 ***************************************************************************/
 
 static void duart_irq_handler(UINT8 vector)
 {
-	cpunum_set_input_line_and_vector(Machine, 0, 4, HOLD_LINE, vector);	
+	cpunum_set_input_line_and_vector(Machine, 0, 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(int channel, UINT8 data)

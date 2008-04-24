@@ -274,7 +274,7 @@ static void output_oslog(running_machine *machine, const char *buffer)
 void osd_init(running_machine *machine)
 {
 	int watchdog = options_get_int(mame_options(), WINOPTION_WATCHDOG);
-	
+
 	// thread priority
 	if (!options_get_bool(mame_options(), OPTION_DEBUG))
 		SetThreadPriority(GetCurrentThread(), options_get_int(mame_options(), WINOPTION_PRIORITY));
@@ -398,7 +398,7 @@ static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter)
 {
 	DWORD timeout = (int)(FPTR)lpParameter * 1000;
 	DWORD wait_result;
-	
+
 	wait_result = WaitForSingleObject(watchdog_exit_event, timeout);
 	if (wait_result == WAIT_TIMEOUT)
 		TerminateProcess(GetCurrentProcess(), -1);

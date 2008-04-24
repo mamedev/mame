@@ -268,13 +268,13 @@ static void op_0000(void)
 
 static void halt(void)
 {
-	t11_ICount -= 48; 
-	PUSH(PSW); 
-	PUSH(PC); 
-	PC = RWORD(0x04); 
-	PSW = RWORD(0x06); 
-	change_pc(PC); 
-	t11_check_irqs();	
+	t11_ICount -= 48;
+	PUSH(PSW);
+	PUSH(PC);
+	PC = RWORD(0x04);
+	PSW = RWORD(0x06);
+	change_pc(PC);
+	t11_check_irqs();
 }
 
 static void illegal(void)
@@ -291,11 +291,11 @@ static void illegal(void)
 static void mark(void)
 {
 	t11_ICount -= 36;
-	
+
 	SP = SP + 2 * (t11.op & 0x3f);
 	PC = REGW(5);
-   	REGW(5) = POP();    	
-	
+   	REGW(5) = POP();
+
 	change_pc(PC);
 }
 

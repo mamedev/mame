@@ -452,7 +452,7 @@ static void aerfboo2_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	int attr_start,base,first;
 
 	base = chip * 0x0200;
-//	first = 4 * aerofgt_spriteram3[0x1fe + base];
+//  first = 4 * aerofgt_spriteram3[0x1fe + base];
 	first = 0;
 
 	for (attr_start = base + 0x0200-4;attr_start >= first + base;attr_start -= 4)

@@ -1330,13 +1330,13 @@ WRITE16_HANDLER( cps1_cps_a_w )
 	data = COMBINE_DATA(&cps1_cps_a_regs[offset]);
 
 	/*
-	The main CPU writes the palette to gfxram, and the CPS-B custom copies it
-	to the real palette RAM, which is separated from gfxram.
-	This is done ONLY after the palette base register is written to. It is not
-	known what the exact timing should be, how long it should take and when it
-	should happen. We are assuming that the copy happens immediately, since it
-	fixes glitches in the ghouls intro, but it might happen at next vblank.
-	*/
+    The main CPU writes the palette to gfxram, and the CPS-B custom copies it
+    to the real palette RAM, which is separated from gfxram.
+    This is done ONLY after the palette base register is written to. It is not
+    known what the exact timing should be, how long it should take and when it
+    should happen. We are assuming that the copy happens immediately, since it
+    fixes glitches in the ghouls intro, but it might happen at next vblank.
+    */
 	if (offset == CPS1_PALETTE_BASE)
 		cps1_build_palette(machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
 
@@ -1679,7 +1679,7 @@ static int gfxrom_bank_mapper(running_machine *machine, int type, int code)
 	}
 
 #ifdef MAME_DEBUG
-//	popmessage("tile %02x/%04x out of range", type,code>>shift);
+//  popmessage("tile %02x/%04x out of range", type,code>>shift);
 #endif
 
 	return -1;
@@ -1721,8 +1721,8 @@ static TILE_GET_INFO( get_tile0_info )
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL1, code);
 
 	/* allows us to reproduce a problem seen with a ffight board where USA and Japanese
-		 roms have been mixed to be reproduced (ffightua) -- it looks like each column
-		 should alternate between the left and right side of the 16x16 tiles */
+         roms have been mixed to be reproduced (ffightua) -- it looks like each column
+         should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
 	SET_TILE_INFO(
@@ -1879,10 +1879,10 @@ static void cps1_build_palette(running_machine *machine, const UINT16* const pal
 	int ctrl = cps1_cps_b_regs[cps1_game_config->palette_control/2];
 
 	/*
-	The palette is copied only for pages that are enabled in the ctrl
-	register. Note that if the first palette pages are skipped, all
-	the following pages are scaled down.
-	*/
+    The palette is copied only for pages that are enabled in the ctrl
+    register. Note that if the first palette pages are skipped, all
+    the following pages are scaled down.
+    */
 	for (page = 0; page < 6; ++page)
 	{
 		if (BIT(ctrl,page))

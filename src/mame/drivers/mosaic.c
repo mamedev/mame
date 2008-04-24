@@ -284,7 +284,7 @@ static const struct YM2203interface ym2203_interface =
 		NULL,
 		NULL
 	},
-	NULL	
+	NULL
 };
 
 

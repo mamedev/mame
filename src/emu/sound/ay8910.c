@@ -7,41 +7,41 @@
 
   Based on various code snippets by Ville Hallik, Michael Cuddy,
   Tatsuyuki Satoh, Fabrice Frances, Nicola Salmoria.
-  
+
   Mostly rewritten by couriersud in 2008
-  
+
   TODO:
-  * The AY8930 has an extended mode which is currently 
+  * The AY8930 has an extended mode which is currently
     not emulated.
   * The YMZ284 only has one 1 output channel (mixed chan A,B,C).
     This should be forced.
   * YM2610 & YM2608 will need a separate flag in their config structures
     to distinguish between legacy and discrete mode.
-    
+
   The rewrite also introduces a generic model for the DAC. This model is
   not perfect, but allows channel mixing based on a parametrized approach.
-  This model also allows to factor in different loads on individual channels. 
+  This model also allows to factor in different loads on individual channels.
   If a better model is developped in the future or better measurements are
   available, the driver should be easy to change. The model is described
   later.
-  
+
   In order to not break hundreds of existing drivers by default the flag
   AY8910_LEGACY_OUTPUT is used by drivers not changed to take into account the
   new model. All outputs are normalized to the old output range (i.e. 0 .. 7ffff).
   In the case of channel mixing, output range is 0...3 * 7fff.
-  
-  The main difference between the AY-3-8910 and the YM2149 is, that the 
-  AY-3-8910 datasheet mentions, that fixed volume level 0, which is set by 
+
+  The main difference between the AY-3-8910 and the YM2149 is, that the
+  AY-3-8910 datasheet mentions, that fixed volume level 0, which is set by
   registers 8 to 10 is "channel off". The YM2149 mentions, that the generated
   signal has a 2V DC component. This is confirmed by measurements. The approach
   taken here is to assume the 2V DC offset for all outputs for the YM2149.
-  For the AY-3-8910, an offset is used if envelope is active for a channel. 
-  This is backed by oscilloscope pictures from the datasheet. If a fixed volume 
+  For the AY-3-8910, an offset is used if envelope is active for a channel.
+  This is backed by oscilloscope pictures from the datasheet. If a fixed volume
   is set, i.e. enveloppe is disabled, the output voltage is set to 0V. Recordings
   I found on the web for gyruss indicate, that the AY-3-8910 offset should
   be around 1.5V. This will also make sound levels more compatible with
   user descriptions.
-  
+
   The Model:
                      5V     5V
                       |      |
@@ -148,7 +148,7 @@ struct AY8910
 #define ENVELOPE_PERIOD(_psg)		(((_psg)->regs[AY_EFINE] | ((_psg)->regs[AY_ECOARSE]<<8)))
 
 
-static ay_ym_param ym2149_param = 
+static ay_ym_param ym2149_param =
 {
 	630, 801,
 	16,
@@ -156,7 +156,7 @@ static ay_ym_param ym2149_param =
 	   4763,  3521,  2403,  1737,  1123,   762,  438,   251 },
 };
 
-static ay_ym_param ym2149_paramE = 
+static ay_ym_param ym2149_paramE =
 {
 	630, 801,
 	32,
@@ -168,7 +168,7 @@ static ay_ym_param ym2149_paramE =
 
 #if 0
 /* RL = 1000, Hacker Kay normalized, 2.1V to 3.2V */
-static ay_ym_param ay8910_param = 
+static ay_ym_param ay8910_param =
 {
 	664, 913,
 	16,
@@ -176,12 +176,12 @@ static ay_ym_param ay8910_param =
 	   4120,  2512,  1737,  1335,  1005,   747,   586,    451 },
 };
 
-/* 
+/*
  * RL = 3000, Hacker Kay normalized pattern, 1.5V to 2.8V
  * These values correspond with guesses based on Gyruss schematics
  * They work well with scramble as well.
  */
-static ay_ym_param ay8910_param = 
+static ay_ym_param ay8910_param =
 {
 	930, 454,
 	16,
@@ -189,12 +189,12 @@ static ay_ym_param ay8910_param =
 	   4189,  2557,  1772,  1363,  1028,  766,   602,  464 },
 };
 
-/* 
+/*
  * RL = 1000, Hacker Kay normalized pattern, 0.75V to 2.05V
  * These values correspond with guesses based on Gyruss schematics
  * They work well with scramble as well.
  */
-static ay_ym_param ay8910_param = 
+static ay_ym_param ay8910_param =
 {
 	1371, 313,
 	16,
@@ -203,10 +203,10 @@ static ay_ym_param ay8910_param =
 };
 #endif
 
-/* 
+/*
  * RL = 1000, Hacker Kay normalized pattern, 0.2V to 1.5V
  */
-static ay_ym_param ay8910_param = 
+static ay_ym_param ay8910_param =
 {
 	5806, 300,
 	16,
@@ -252,7 +252,7 @@ static void AY8910_write_reg(struct AY8910 *PSG, int r, int v)
 				if (PSG->intf->portAwrite)
 					(*PSG->intf->portAwrite)(Machine, 0, (PSG->regs[AY_ENABLE] & 0x40) ? PSG->regs[AY_PORTA] : 0xff);
 			}
-	
+
 			if ((PSG->lastEnable == -1) ||
 			    ((PSG->lastEnable & 0x80) != (PSG->regs[AY_ENABLE] & 0x80)))
 			{
@@ -260,7 +260,7 @@ static void AY8910_write_reg(struct AY8910 *PSG, int r, int v)
 				if (PSG->intf->portBwrite)
 					(*PSG->intf->portBwrite)(Machine, 0, (PSG->regs[AY_ENABLE] & 0x80) ? PSG->regs[AY_PORTB] : 0xff);
 			}
-	
+
 			PSG->lastEnable = PSG->regs[AY_ENABLE];
 			break;
 		case AY_AVOL:
@@ -274,20 +274,20 @@ static void AY8910_write_reg(struct AY8910 *PSG, int r, int v)
 			break;
 		case AY_ESHAPE:
 			/* envelope shapes:
-	        C AtAlH
-	        0 0 x x  \___
-	        0 1 x x  /___
-	        1 0 0 0  \\\\
-	        1 0 0 1  \___
-	        1 0 1 0  \/\/
-	        1 0 1 1  \¯¯¯
-	        1 1 0 0  ////
-	        1 1 0 1  /¯¯¯
-	        1 1 1 0  /\/\
-	        1 1 1 1  /___
-	        The envelope counter on the AY-3-8910 has 16 steps. On the YM2149 it
-	        has twice the steps, happening twice as fast.
-	        */
+            C AtAlH
+            0 0 x x  \___
+            0 1 x x  /___
+            1 0 0 0  \\\\
+            1 0 0 1  \___
+            1 0 1 0  \/\/
+            1 0 1 1  \??????
+            1 1 0 0  ////
+            1 1 0 1  /??????
+            1 1 1 0  /\/\
+            1 1 1 1  /___
+            The envelope counter on the AY-3-8910 has 16 steps. On the YM2149 it
+            has twice the steps, happening twice as fast.
+            */
 			PSG->Attack = (PSG->regs[AY_ESHAPE] & 0x04) ? PSG->EnvP : 0x00;
 			if ((PSG->regs[AY_ESHAPE] & 0x08) == 0)
 			{
@@ -379,7 +379,7 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 	/* (ToneOn | ToneDisable) & (NoiseOn | NoiseDisable). */
 	/* Note that this means that if both tone and noise are disabled, the output */
 	/* is 1, not 0, and can be modulated changing the volume. */
-	
+
 	/* buffering loop */
 	while (length)
 	{
@@ -411,7 +411,7 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 			/* bit0, relying on the fact that after three shifts of the */
 			/* register, what now is bit3 will become bit0, and will */
 			/* invert, if necessary, bit14, which previously was bit17. */
-			if (PSG->RNG & 1) 
+			if (PSG->RNG & 1)
 				PSG->RNG ^= 0x24000; /* This version is called the "Galois configuration". */
 			PSG->RNG >>= 1;
 			PSG->CountN = 0;
@@ -425,7 +425,7 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		/* update envelope */
 		if (PSG->Holding == 0)
 		{
-			PSG->CountE++; 
+			PSG->CountE++;
 			if (PSG->CountE >= ENVELOPE_PERIOD(PSG))
 			{
 				PSG->CountE = 0;
@@ -473,8 +473,8 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		{
 			*(buf[0]++) = mix_3D(PSG);
 #if 0
-			*(buf[0]) = (  vol_enabled[0] * PSG->VolTable[PSG->Vol[0]] 
-			             + vol_enabled[1] * PSG->VolTable[PSG->Vol[1]] 
+			*(buf[0]) = (  vol_enabled[0] * PSG->VolTable[PSG->Vol[0]]
+			             + vol_enabled[1] * PSG->VolTable[PSG->Vol[1]]
 			             + vol_enabled[2] * PSG->VolTable[PSG->Vol[2]]) / PSG->step;
 #endif
 		}
@@ -511,7 +511,7 @@ INLINE void build_single_table(double rl, ay_ym_param *par, int normalize, INT32
 			rw += 1.0 / par->r_up;
 			rt += 1.0 / par->r_up;
 		}
-		
+
 		temp[j] = rw / rt;
 		if (temp[j] < min)
 			min = temp[j];
@@ -528,7 +528,7 @@ INLINE void build_single_table(double rl, ay_ym_param *par, int normalize, INT32
 		for (j=0; j < par->N; j++)
 			tab[j] = MAX_OUTPUT * temp[j];
 	}
-		
+
 }
 
 INLINE void build_3D_table(double rl, ay_ym_param *par, ay_ym_param *parE, int normalize, double factor, int zero_is_off, INT32 *tab)
@@ -539,7 +539,7 @@ INLINE void build_3D_table(double rl, ay_ym_param *par, ay_ym_param *parE, int n
 	double *temp;
 
 	temp = malloc(8*32*32*32*sizeof(*temp));
-	
+
 	for (e=0; e < 8; e++)
 		for (j1=0; j1 < 32; j1++)
 			for (j2=0; j2 < 32; j2++)
@@ -547,23 +547,23 @@ INLINE void build_3D_table(double rl, ay_ym_param *par, ay_ym_param *parE, int n
 				{
 					if (zero_is_off)
 					{
-						n  = (j1 != 0 || (e & 0x01)) ? 1 : 0; 
-						n += (j2 != 0 || (e & 0x02)) ? 1 : 0; 
-						n += (j3 != 0 || (e & 0x04)) ? 1 : 0; 
+						n  = (j1 != 0 || (e & 0x01)) ? 1 : 0;
+						n += (j2 != 0 || (e & 0x02)) ? 1 : 0;
+						n += (j3 != 0 || (e & 0x04)) ? 1 : 0;
 					}
 					else
 						n = 3.0;
-					
+
 					rt = n / par->r_up + 3.0 / par->r_down + 1.0 / rl;
 					rw = n / par->r_up;
-					
+
 					rw += 1.0 / ( (e & 0x01) ? parE->res[j1] : par->res[j1]);
 					rt += 1.0 / ( (e & 0x01) ? parE->res[j1] : par->res[j1]);
 					rw += 1.0 / ( (e & 0x02) ? parE->res[j2] : par->res[j2]);
 					rt += 1.0 / ( (e & 0x02) ? parE->res[j2] : par->res[j2]);
 					rw += 1.0 / ( (e & 0x04) ? parE->res[j3] : par->res[j3]);
 					rt += 1.0 / ( (e & 0x04) ? parE->res[j3] : par->res[j3]);
-						
+
 					indx = (e << 15) | (j3<<10) | (j2<<5) | j1;
 					temp[indx] = rw / rt;
 					if (temp[indx] < min)
@@ -582,9 +582,9 @@ INLINE void build_3D_table(double rl, ay_ym_param *par, ay_ym_param *parE, int n
 		for (j=0; j < 32*32*32*8; j++)
 			tab[j] = MAX_OUTPUT * temp[j];
 	}
-	
+
 	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
-	
+
 	free(temp);
 }
 
@@ -593,13 +593,13 @@ static void build_mixer_table(struct AY8910 *PSG)
 {
 	int	normalize = 0;
 	int	chan;
-	
+
 	if ((PSG->intf->flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
 		logerror("AY-3-8910/YM2149 using legacy output levels!\n");
 		normalize = 1;
 	}
-	
+
 	for (chan=0; chan < NUM_CHANNELS; chan++)
 	{
 		build_single_table(PSG->intf->res_load[chan], PSG->par, normalize, PSG->VolTable[chan], PSG->zero_is_off);
@@ -648,7 +648,7 @@ void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const struc
 	}
 	else
 		info->streams = 3;
-		
+
 	switch (chip_type)
 	{
 		case SOUND_AY8910:
@@ -673,7 +673,7 @@ void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const struc
 			info->zero_is_off = 0;
 			break;
 	}
-	info->EnvP = info->step * 16 - 1; 
+	info->EnvP = info->step * 16 - 1;
 
 	build_mixer_table(info);
 
@@ -710,7 +710,7 @@ void ay8910_reset_ym(void *chip)
 	PSG->OutputN = 0x01;
 	PSG->lastEnable = -1;	/* force a write */
 	for (i = 0;i < AY_PORTA;i++)
-		AY8910_write_reg(PSG,i,0);	
+		AY8910_write_reg(PSG,i,0);
 	PSG->ready = 1;
 }
 
@@ -761,15 +761,15 @@ int ay8910_read_ym(void *chip)
          */
 		if (PSG->intf->portAread)
 			PSG->regs[AY_PORTA] = (*PSG->intf->portAread)(Machine, 0);
-		else 
+		else
 			logerror("PC %04x: warning - read 8910 #%d Port A\n",activecpu_get_pc(),PSG->index);
 		break;
 	case AY_PORTB:
 		if ((PSG->regs[AY_ENABLE] & 0x80) != 0)
 			logerror("warning: read from 8910 #%d Port B set as output\n",PSG->index);
-		if (PSG->intf->portBread) 
+		if (PSG->intf->portBread)
 			PSG->regs[AY_PORTB] = (*PSG->intf->portBread)(Machine, 0);
-		else 
+		else
 			logerror("PC %04x: warning - read 8910 #%d Port B\n",activecpu_get_pc(),PSG->index);
 		break;
 	}
@@ -779,8 +779,8 @@ int ay8910_read_ym(void *chip)
 
 static void *ay8910_start(int sndindex, int clock, const void *config)
 {
-	static const struct AY8910interface generic_ay8910 = 
-	{ 	
+	static const struct AY8910interface generic_ay8910 =
+	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
@@ -791,8 +791,8 @@ static void *ay8910_start(int sndindex, int clock, const void *config)
 
 static void *ym2149_start(int sndindex, int clock, const void *config)
 {
-	static const struct AY8910interface generic_ay8910 = 
-	{ 	
+	static const struct AY8910interface generic_ay8910 =
+	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL

@@ -455,8 +455,8 @@ static DISCRETE_SOUND_START( gyruss_sound )
 
 	/* Chip 3 right */
 	/* Outputs are tied together after 3.3k resistor on each channel.
-	 * A/R + B/R + C/R = (A + B + C) / 3 * (1/(R/3))
-	 */
+     * A/R + B/R + C/R = (A + B + C) / 3 * (1/(R/3))
+     */
 	DISCRETE_INPUTX_STREAM(NODE_07, 6, 0.33, 0)
 	DISCRETE_INPUTX_STREAM(NODE_08, 7, 0.33, 0)
 	DISCRETE_INPUTX_STREAM(NODE_09, 8, 0.33, 0)
@@ -473,7 +473,7 @@ static DISCRETE_SOUND_START( gyruss_sound )
 
 	/* DAC left */
 	/* Output voltage depends on load. Datasheet gives 2.4 as minimum.
-	 * This is in line with TTL, so 4V with no load seems adequate */
+     * This is in line with TTL, so 4V with no load seems adequate */
 	DISCRETE_INPUTX_DATA(NODE_16, 256.0 * 4.0 / 5.0, 0.0, 0.0)
 
 	/* Chip 1 Filter enable */

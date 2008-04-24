@@ -1,11 +1,11 @@
 /*
-	Microtouch touch screen controller
+    Microtouch touch screen controller
 
-	Written by Mariusz Wojcieszek
+    Written by Mariusz Wojcieszek
 
-	Notes/ToDo:
-	- calibration mode (command CX)
-	- only tablet format is supported for returning touch screen state
+    Notes/ToDo:
+    - calibration mode (command CX)
+    - only tablet format is supported for returning touch screen state
 
 */
 
@@ -144,7 +144,7 @@ void microtouch_rx(int count, UINT8* data)
 		microtouch.rx_buffer[i+microtouch.rx_buffer_ptr] = data[i];
 		microtouch.rx_buffer_ptr++;
 	}
-	
+
 	if (microtouch.rx_buffer_ptr > 0 && (microtouch.rx_buffer[microtouch.rx_buffer_ptr-1] == 0x0d))
 	{
 		// check command

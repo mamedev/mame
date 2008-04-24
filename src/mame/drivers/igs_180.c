@@ -122,9 +122,9 @@ static void expand_sprites(void)
 
         7.b         765- ----           Color
                     ---4 ----           Flip X
-                    ---- 3210			Code (high)
+                    ---- 3210           Code (high)
 
-	Code = ROM Address / 2 = Pixel / 3
+    Code = ROM Address / 2 = Pixel / 3
 
 ***************************************************************************/
 
@@ -244,7 +244,7 @@ static VIDEO_UPDATE(igs_180)
 		if (mask != 0) layers_ctrl &= mask;
 	}
 #endif
-	
+
 	if (debug_viewer(bitmap,cliprect))
 		return 0;
 

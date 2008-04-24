@@ -120,9 +120,9 @@ static STATE_POSTLOAD( ym2608_postload )
 
 static void *ym2608_start(int sndindex, int clock, const void *config)
 {
-	static const struct YM2608interface generic_2608 = 
+	static const struct YM2608interface generic_2608 =
 	{
-		{ 	
+		{
 			AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 			AY8910_DEFAULT_LOADS,
 			NULL, NULL, NULL, NULL

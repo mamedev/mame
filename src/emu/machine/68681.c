@@ -1,19 +1,19 @@
 /*
-	68681 DUART
+    68681 DUART
 
-	Written by Mariusz Wojcieszek
+    Written by Mariusz Wojcieszek
 
-	Emulation is preliminary, only features required by Touch Master games are implemented
+    Emulation is preliminary, only features required by Touch Master games are implemented
 
-	ToDo:
-	- interrupts other than RXRDY
-	- timer/counter
-	- input port
-	- input port change
-	- output port
-	- output port when used as control signals
-	- MAME device interface
-	- multiple instances
+    ToDo:
+    - interrupts other than RXRDY
+    - timer/counter
+    - input port
+    - input port change
+    - output port
+    - output port when used as control signals
+    - MAME device interface
+    - multiple instances
 */
 
 #include "driver.h"
@@ -336,7 +336,7 @@ WRITE16_HANDLER(duart_68681_w)
 			break;
 		case 0x04: /* ACR */
 			duart_68681.ACR = data;
-			// TODO: 
+			// TODO:
 			//       bits 6-4: Counter/Timer Mode And Clock Source Select
 			//       bits 3-0: IP3-0 Change-Of-State Interrupt Enable
 			duart_68681_write_CSR(0, duart_68681.channel[0].CSR, data);
@@ -368,7 +368,7 @@ WRITE16_HANDLER(duart_68681_w)
 			// TODO: bits set to 1 causes corresponding output port bit to be set to 0
 			break;
 		case 0x0f: /* Reset Output Port Bits */
-			// TODO: bits set to 1 causes corresponding output port bit to be set to 1 
+			// TODO: bits set to 1 causes corresponding output port bit to be set to 1
 			break;
 		default:
 			logerror( "Writing 68681 reg %x with %04x\n", offset, data );

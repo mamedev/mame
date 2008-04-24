@@ -282,14 +282,14 @@ static READ8_HANDLER( konami_ay8910_r )
 static WRITE8_HANDLER( konami_ay8910_w )
 {
 	/* the decoding here is very simplistic, and you can address two simultaneously */
-	if (offset & 0x10) 
+	if (offset & 0x10)
 		AY8910_control_port_0_w(machine, 0, data);
-	else if (offset & 0x20) 
+	else if (offset & 0x20)
 		AY8910_write_port_0_w(machine, 0, data);
 
-	if (offset & 0x40) 
+	if (offset & 0x40)
 		AY8910_control_port_1_w(machine, 0, data);
-	else if (offset & 0x80) 
+	else if (offset & 0x80)
 		AY8910_write_port_1_w(machine, 0, data);
 }
 
@@ -665,9 +665,9 @@ static READ8_HANDLER( frogger_ay8910_r )
 static WRITE8_HANDLER( frogger_ay8910_w )
 {
 	/* the decoding here is very simplistic */
-	if (offset & 0x40) 
+	if (offset & 0x40)
 		AY8910_write_port_0_w(machine, 0, data);
-	else if (offset & 0x80) 
+	else if (offset & 0x80)
 		AY8910_control_port_0_w(machine, 0, data);
 }
 
@@ -1627,7 +1627,7 @@ static const discrete_mixer_desc konami_sound_mixer_desc =
 		{RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1), RES_K(5.1)},
 		{0,0,0,0,0,0},	/* no variable resistors   */
 		{0,0,0,0,0,0},  /* no node capacitors      */
-		0, RES_K(2.2),  
+		0, RES_K(2.2),
 		0,
 		CAP_U(0.15),
 		0, 1};

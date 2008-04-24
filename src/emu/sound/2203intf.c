@@ -107,9 +107,9 @@ static STATE_POSTLOAD( ym2203_postload )
 
 static void *ym2203_start(int sndindex, int clock, const void *config)
 {
-	static const struct YM2203interface generic_2203 = 
+	static const struct YM2203interface generic_2203 =
 	{
-		{ 	
+		{
 			AY8910_LEGACY_OUTPUT,
 			AY8910_DEFAULT_LOADS,
 			NULL, NULL, NULL, NULL

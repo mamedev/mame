@@ -2351,11 +2351,11 @@ static DRIVER_INIT( jolyc980 )
 
 *************************************************************************************************/
 
-//	UINT8 *ROM = memory_region(REGION_CPU1);
+//  UINT8 *ROM = memory_region(REGION_CPU1);
 
-//	ROM[0xc1fc] = 0x4c;
-//	ROM[0xc1fd] = 0x1c;
-//	ROM[0xc1fe] = 0x80;
+//  ROM[0xc1fc] = 0x4c;
+//  ROM[0xc1fd] = 0x1c;
+//  ROM[0xc1fe] = 0x80;
 
 	/* Initializing PIAs... */
 	pia_config(0, &pia0_intf);
@@ -2367,15 +2367,15 @@ static DRIVER_INIT( magiccda )
 
   For a serie of Mexican Rockwell's 65c02
   seems that opcode 0x91 is STA ($zp) instead of STA ($zp),y
-  ...or is patched with the correct opcode (0x92) by PLDs... 
+  ...or is patched with the correct opcode (0x92) by PLDs...
 
   In offset $C1C4, the code is trying to initialize both PIAs
   putting value 0x34 in $0800-$0803 & $0A00-$0A03.
-  
+
   The code use STA ($zp),y (opcode 0x91). As soon as register 'y'
   increments, almost all writes goes out of range.
 
-******************************************************************/  
+******************************************************************/
 {
 	UINT8 *ROM = memory_region(REGION_CPU1);
 

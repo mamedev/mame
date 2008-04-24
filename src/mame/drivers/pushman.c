@@ -430,7 +430,7 @@ static const struct YM2203interface ym2203_interface =
 			AY8910_LEGACY_OUTPUT,
 			AY8910_DEFAULT_LOADS,
 			NULL, NULL, NULL, NULL,
-	}, 
+	},
 	irqhandler
 };
 
