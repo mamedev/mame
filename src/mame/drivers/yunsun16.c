@@ -441,6 +441,82 @@ static INPUT_PORTS_START( bombkick )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/***************************************************************************
+                                Paparazzi
+***************************************************************************/
+
+static INPUT_PORTS_START( paprazzi )
+	PORT_START_TAG("IN0")	// $800000.w
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("IN1")	// $800019.b
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1   )
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_START1  )
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_START2  )
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW1")	// $80001b.b -> $ff0aca.b
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
+	PORT_DIPUNKNOWN( 0x0004, 0x0004 )  // $25bc
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Language ) )     
+	PORT_DIPSETTING(      0x0000, "Korean" ) 
+	PORT_DIPSETTING(      0x0008, DEF_STR( English ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Enemies" ) // soemthing else.. but related to enemy types    
+	PORT_DIPSETTING(      0x0000, "Type 1" ) 
+	PORT_DIPSETTING(      0x0010, "Type 2" )
+	PORT_DIPUNKNOWN( 0x0020, 0x0020 ) 
+	PORT_DIPNAME( 0x00c0, 0x0080, "Time" )
+	PORT_DIPSETTING(      0x0000, "80" ) 
+	PORT_DIPSETTING(      0x0040, "100" ) 
+	PORT_DIPSETTING(      0x0080, "120" ) 
+	PORT_DIPSETTING(      0x00c0, "150" )
+	
+	PORT_START_TAG("DSW2")	// $80001d.b -> $ff0acb.b
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) ) //not sure what is it . tested all 3 bits tested @ $be48
+	PORT_DIPSETTING(      0x0004, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( Easier ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Medium ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Harder ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPUNKNOWN( 0x0008, 0x0008 )  // $448a
+	PORT_DIPNAME( 0x0030, 0x0020, DEF_STR( Lives ) ) // $be24
+	PORT_DIPSETTING(      0x0020, "3" )
+	PORT_DIPSETTING(      0x0030, "2" )
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Gfx Viewer" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /***************************************************************************
 
@@ -797,6 +873,46 @@ ROM_START( bombkick )
 
 ROM_END
 
+/***************************************************************************
+
+                                Paparazzi
+
+YunSung YS-0211
+
+  CPU: 68HC000 P16
+Video: Actel A1020B PL84C
+  OSC: 16.000000 MHz
+Sound: AD-65 (OKI M6295)
+
+***************************************************************************/
+
+ROM_START( paprazzi )
+
+	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "u33.bin",       0x000000, 0x020000, CRC(91f33abd) SHA1(694868bc1ef612ba47cb38957d965f271bf16105) )
+	ROM_LOAD16_BYTE( "u32.bin",       0x000001, 0x020000, CRC(ad5a3fec) SHA1(a2db3f2926bdbb5bc44f307b919a0431c9deb76d) )
+
+	ROM_REGION( 0x200000*8, REGION_GFX1, ROMREGION_ERASEFF | ROMREGION_DISPOSE )	/* 16x16x8 */
+	ROMX_LOAD( "u67.bin",       0x000000, 0x080000, CRC(ea0b9e27) SHA1(e68f728158d0c42523002fe4270784891f5492ce) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u68.bin",       0x000002, 0x080000, CRC(6b7ff4dd) SHA1(b06036f08e8f65860077a71d91676bf5c2f804fc) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u69.bin",       0x000004, 0x080000, CRC(06749294) SHA1(375fe1c05355f789f846aa28b2012d08bfa2b2b5) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u70.bin",       0x000006, 0x080000, CRC(0adacdf8) SHA1(d33680e7139e78929284b81e880bd5baa45c6675) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u71.bin",       0x200000, 0x080000, CRC(69178fc4) SHA1(1ec06d360e098e15cfb673e5de7124a7c10757f8) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u72.bin",       0x200002, 0x080000, CRC(7c3384b9) SHA1(b9e1ba7ec009e15f1061c3994ed4cf48a8e700c6) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u73.bin",       0x200004, 0x080000, CRC(73fbc13e) SHA1(a19a05764ca010be025aae12fa82f97f5dc7d4b9) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u74.bin",       0x200006, 0x080000, CRC(f1afda11) SHA1(c62e318dde2ed7ac9b649764ccec8e991d2869c2) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x4 */
+	ROM_LOAD( "u20.bin",       0x000000, 0x040000, CRC(ccb0ad6b) SHA1(ca66b7c7cb1418a86f209d071935aa45bb0a6e7d) )
+	ROM_LOAD( "u21.bin",       0x040000, 0x040000, CRC(125badf0) SHA1(ae63469e1fb1328c554774ca8c47878df2b02b96) )
+	ROM_LOAD( "u22.bin",       0x080000, 0x040000, CRC(436499c7) SHA1(ec1390b6d5656c99d91cf6425d319f4796bcb28a) )
+	ROM_LOAD( "u23.bin",       0x0c0000, 0x040000, CRC(358280fe) SHA1(eac3cb65fe75bc2da14896734f4a339480b54a2c) )
+
+	ROM_REGION( 0x080000 * 2, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "u131.bin",      0x000000, 0x080000, CRC(bcf7aa12) SHA1(f7bf5258396ed0eb7e85eccf250c6d0a333a4d61) )
+	ROM_RELOAD(               0x080000, 0x080000             )
+
+ROM_END
 
 
 /***************************************************************************
@@ -809,5 +925,7 @@ ROM_END
 
 GAME( 19??, magicbub, 0,        magicbub, magicbub, magicbub, ROT0, "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL )
 GAME( 19??, magicbua, magicbub, magicbub, magicbua, magicbub, ROT0, "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL )
+GAME( 1996, paprazzi, 0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",    GAME_NO_COCKTAIL )
 GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0, "Yun Sung", "Shocking",     GAME_NO_COCKTAIL )
 GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0, "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL )
+
