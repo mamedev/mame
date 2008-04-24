@@ -400,7 +400,7 @@ static void sma_install_random_read_handler(running_machine *machine, int addr1,
 	state_save_register_global(neogeo_rng);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, addr1, addr1 + 1, 0, 0, sma_random_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, addr2, addr2 + 2, 0, 0, sma_random_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, addr2, addr2 + 1, 0, 0, sma_random_r);
 }
 
 
