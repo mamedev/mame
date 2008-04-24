@@ -91,7 +91,6 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/bfm_bd1.h"  // vfd
 #include "video/bfm_adr2.h"
@@ -290,7 +289,7 @@ static WRITE8_HANDLER( screen_ram_w )
 		r = ((data & 0x18)>>3) *  85;  // 00011000b = 0x18
 		g = ((data & 0x06)>>1) *  85;  // 00000110b = 0x06
 		b = ((data & 0x01)   ) * 255;
-		palette_set_color(Machine, pal, MAKE_RGB(r,g,b));
+		palette_set_color(machine, pal, MAKE_RGB(r,g,b));
 	}
 
 	if ( adder2_screen_page_reg & SL_ACCESS )

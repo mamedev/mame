@@ -34,7 +34,6 @@ dip: 6.7 7.7
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/custom.h"
 
@@ -87,9 +86,9 @@ static READ8_HANDLER( ports_r )
 static WRITE8_HANDLER( subcpu_reset_w )
 {
 	if (data & 1)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

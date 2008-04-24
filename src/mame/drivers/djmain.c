@@ -86,7 +86,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -232,7 +232,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (pending_vb_int && !DISABLE_VB_INT)
 		{
 			pending_vb_int = 0;
-			cpunum_set_input_line(Machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
 		}
 	}
 }

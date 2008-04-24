@@ -71,7 +71,6 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6809.h"
 
 /* Enable big switch statement for the main opcodes */

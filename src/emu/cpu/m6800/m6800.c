@@ -74,7 +74,6 @@ TODO:
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6800.h"
 
 #define VERBOSE 0
@@ -1965,12 +1964,12 @@ static WRITE8_HANDLER( m6803_internal_registers_w );
 
 READ8_HANDLER( hd63701_internal_registers_r )
 {
-	return m6803_internal_registers_r(Machine, offset);
+	return m6803_internal_registers_r(machine, offset);
 }
 
 WRITE8_HANDLER( hd63701_internal_registers_w )
 {
-	m6803_internal_registers_w(Machine, offset,data);
+	m6803_internal_registers_w(machine, offset,data);
 }
 #endif
 

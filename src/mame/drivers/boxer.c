@@ -9,7 +9,6 @@ Atari Boxer (prototype) driver
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 extern UINT8* boxer_tile_ram;
 extern UINT8* boxer_sprite_ram;
@@ -147,13 +146,13 @@ static WRITE8_HANDLER( boxer_pot_w )
 
 	pot_latch = data & 0x3f;
 
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 

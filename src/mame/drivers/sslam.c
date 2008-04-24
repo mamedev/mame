@@ -81,7 +81,6 @@ Notes:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8051/i8051.h"
 #include "sound/okim6295.h"
 

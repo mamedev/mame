@@ -54,7 +54,7 @@ WRITE8_HANDLER( battlera_palette_w )
 	if (offset%2) offset-=1;
 
 	pal_word=paletteram[offset] | (paletteram[offset+1]<<8);
-	palette_set_color_rgb(Machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
+	palette_set_color_rgb(machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 
 /******************************************************************************/

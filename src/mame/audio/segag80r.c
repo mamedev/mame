@@ -9,7 +9,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "segag80r.h"
 #include "machine/8255ppi.h"
@@ -938,7 +937,7 @@ static WRITE8_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	n7751_command = data & 0x07;
-	cpunum_set_input_line(Machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 

@@ -11,7 +11,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 /* from video */
@@ -50,7 +49,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static WRITE8_HANDLER( sound_reset_w )
 {
 	if ( data & 1 )
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE );
 }
 
 

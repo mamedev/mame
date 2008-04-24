@@ -314,7 +314,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                     //  cpu_spinuntil_trigger(6789);
 
                         // printf( "Clearing RSP_STATUS_HALT\n" );
-                        cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+                        cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
                         cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) & ~RSP_STATUS_HALT );
                         // RSP_STATUS &= ~RSP_STATUS_HALT;
                     //}
@@ -326,7 +326,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 if (data & 0x00000002)      // set halt
                 {
                     // printf( "Setting RSP_STATUS_HALT\n" );
-                    cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+                    cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
                     cpunum_set_info_int(1, CPUINFO_INT_REGISTER + RSP_SR, cpunum_get_info_int(1, CPUINFO_INT_REGISTER + RSP_SR) | RSP_STATUS_HALT );
                     // RSP_STATUS |= RSP_STATUS_HALT;
                 }

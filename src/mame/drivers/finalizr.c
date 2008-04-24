@@ -51,7 +51,7 @@ static WRITE8_HANDLER( finalizr_coin_w )
 
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
@@ -62,7 +62,7 @@ static WRITE8_HANDLER( i8039_irqen_w )
     */
 
 	if ((data & 0x80) == 0)
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( i8039_T1_r )

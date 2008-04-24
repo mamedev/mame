@@ -76,7 +76,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{ /* probably wrong but commands may go lost otherwise */
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }

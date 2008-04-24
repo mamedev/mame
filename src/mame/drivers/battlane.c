@@ -60,8 +60,8 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     /*
     if (~battlane_cpu_control & 0x08)
     {
-        cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-        cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+        cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+        cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
     }
     */
 
@@ -69,7 +69,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
         CPU2's SWI will trigger an 6809 IRQ on the master by resetting 0x04
         Master will respond by setting the bit back again
     */
-    cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
+    cpunum_set_input_line(machine, 0, M6809_IRQ_LINE,  data & 0x04 ? CLEAR_LINE : HOLD_LINE);
 
 	/*
     Slave function call (e.g. ROM test):
@@ -87,7 +87,7 @@ static WRITE8_HANDLER( battlane_cpu_command_w )
     FA96: 27 FA       BEQ   $FA92   ; Wait for bit to be set
     */
 
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, data & 0x02 ? CLEAR_LINE : HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( battlane_map, ADDRESS_SPACE_PROGRAM, 8 )

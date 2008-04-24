@@ -27,7 +27,6 @@ WHO AM I?      (In place of "ARIES ELECA")
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "crgolf.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -131,7 +130,7 @@ static WRITE8_HANDLER( main_to_sound_w )
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	return main_to_sound_data;
 }
 
@@ -158,7 +157,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	return sound_to_main_data;
 }
 

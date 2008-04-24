@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 
 
@@ -203,7 +202,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	{
 		/* 68705 is going to read data from the Z80 */
 		timer_call_after_resynch(NULL, 0,taitosj_mcu_data_real_r);
-		cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
+		cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 		portA_in = fromz80;
 		LOG(("%04x: 68705 <- Z80 %02x\n",activecpu_get_pc(),portA_in));
 	}

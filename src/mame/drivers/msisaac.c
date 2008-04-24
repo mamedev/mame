@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -83,7 +82,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }

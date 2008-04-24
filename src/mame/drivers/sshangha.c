@@ -83,7 +83,7 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 
 	if (offset == (0x260 >> 1)) {
 		//soundlatch_w(0,data&0xff);
-		//cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		//cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

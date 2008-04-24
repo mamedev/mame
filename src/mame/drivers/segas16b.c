@@ -1334,7 +1334,7 @@ static void upd7759_generate_nmi(int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(Machine, 2, 1, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, 1, PULSE_LINE);
 }
 #endif
 

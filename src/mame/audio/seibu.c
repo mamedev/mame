@@ -323,7 +323,7 @@ static void update_irq_lines(running_machine *machine, int param)
 
 WRITE8_HANDLER( seibu_irq_clear_w )
 {
-	update_irq_lines(Machine, VECTOR_INIT);
+	update_irq_lines(machine, VECTOR_INIT);
 }
 
 WRITE8_HANDLER( seibu_rst10_ack_w )
@@ -333,7 +333,7 @@ WRITE8_HANDLER( seibu_rst10_ack_w )
 
 WRITE8_HANDLER( seibu_rst18_ack_w )
 {
-	update_irq_lines(Machine, RST18_CLEAR);
+	update_irq_lines(machine, RST18_CLEAR);
 }
 
 void seibu_ym3812_irqhandler(int linestate)
@@ -443,7 +443,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
-				update_irq_lines(Machine, RST18_ASSERT);
+				update_irq_lines(machine, RST18_ASSERT);
 				break;
 			case 6:
 				/* just a guess */
@@ -474,7 +474,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
-	update_irq_lines(Machine, RST18_ASSERT);
+	update_irq_lines(machine, RST18_ASSERT);
 }
 
 /***************************************************************************/

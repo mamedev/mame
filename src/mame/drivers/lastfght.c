@@ -132,7 +132,7 @@ static WRITE16_HANDLER(colordac_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		colorram[clr_offset] = data;
-		palette_set_color_rgb(Machine, clr_offset/3,
+		palette_set_color_rgb(machine, clr_offset/3,
 			pal6bit(colorram[(clr_offset/3)*3+0]),
 			pal6bit(colorram[(clr_offset/3)*3+1]),
 			pal6bit(colorram[(clr_offset/3)*3+2])

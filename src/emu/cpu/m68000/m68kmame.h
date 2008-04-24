@@ -6,7 +6,6 @@
 /* ======================================================================== */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m68000.h"
 
 /* Configuration switches (see m68kconf.h for explanation) */

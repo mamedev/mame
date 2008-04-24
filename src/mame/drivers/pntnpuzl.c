@@ -263,7 +263,7 @@ static WRITE16_HANDLER( pntnpuzl_palette_w )
 		rgb[sub++] = data & 0xff;
 		if (sub == 3)
 		{
-			palette_set_color_rgb(Machine,indx++,pal6bit(rgb[0]),pal6bit(rgb[1]),pal6bit(rgb[2]));
+			palette_set_color_rgb(machine,indx++,pal6bit(rgb[0]),pal6bit(rgb[1]),pal6bit(rgb[2]));
 			sub = 0;
 			if (indx == 256) indx = 0;
 		}

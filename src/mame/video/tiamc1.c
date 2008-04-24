@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 UINT8 *tiamc1_tileram;
@@ -84,7 +83,7 @@ WRITE8_HANDLER( tiamc1_bg_hshift_w ) {
 
 WRITE8_HANDLER( tiamc1_palette_w )
 {
-	palette_set_color(Machine, offset, palette[data]);
+	palette_set_color(machine, offset, palette[data]);
 }
 
 PALETTE_INIT( tiamc1 )

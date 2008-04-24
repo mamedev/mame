@@ -4,7 +4,6 @@
  * video hardware for DJ Boy
  */
 #include "driver.h"
-#include "deprecat.h"
 #include "kan_pand.h"
 
 static UINT8 djboy_videoreg, djboy_scrollx, djboy_scrolly;
@@ -57,7 +56,7 @@ WRITE8_HANDLER( djboy_paletteram_w )
 	offset &= ~1;
 	val = (paletteram[offset]<<8) | paletteram[offset+1];
 
-	palette_set_color_rgb(Machine,offset/2,pal4bit(val >> 8),pal4bit(val >> 4),pal4bit(val >> 0));
+	palette_set_color_rgb(machine,offset/2,pal4bit(val >> 8),pal4bit(val >> 4),pal4bit(val >> 0));
 }
 
 VIDEO_UPDATE( djboy )

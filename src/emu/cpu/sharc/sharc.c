@@ -4,7 +4,6 @@
 */
 
 #include "sharc.h"
-#include "deprecat.h"
 #include "debugger.h"
 
 #ifdef ENABLE_DEBUGGER

@@ -5,7 +5,6 @@
  ***********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/i8x41/i8x41.h"
 #include "machine/decocass.h"
@@ -136,7 +135,7 @@ READ8_HANDLER( decocass_sound_command_r )
 {
 	UINT8 data = soundlatch_r(machine, 0);
 	LOG(4,("CPU #%d sound command <- $%02x\n", cpu_getactivecpu(), data));
-	cpunum_set_input_line(Machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
 	decocass_sound_ack &= ~0x80;
 	return data;
 }
@@ -282,14 +281,14 @@ WRITE8_HANDLER( decocass_reset_w )
 	decocass_reset = data;
 
 	/* CPU #1 active hight reset */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, data & 0x01 );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data & 0x01 );
 
 	/* on reset also remove the sound timer */
 	if (data & 1)
 		timer_adjust_oneshot(decocass_sound_timer, attotime_never, 0);
 
 	/* 8041 active low reset */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
 }
 
 static const char *dirnm(int speed)

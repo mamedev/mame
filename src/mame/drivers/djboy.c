@@ -657,7 +657,7 @@ static DRIVER_INIT( djboyj )
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )

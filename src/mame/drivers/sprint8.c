@@ -97,7 +97,7 @@ static WRITE8_HANDLER( sprint8_int_reset_w )
 	collision_reset = !(data & 1);
 
 	if (collision_reset)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 

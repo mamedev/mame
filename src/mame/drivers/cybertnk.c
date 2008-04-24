@@ -302,7 +302,7 @@ static WRITE16_HANDLER( io_w )
 		case 0:
 			// sound data
 			if (ACCESSING_BITS_0_7)
-				cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+				cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;

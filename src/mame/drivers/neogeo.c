@@ -309,7 +309,7 @@ static void audio_cpu_assert_nmi(void)
 
 static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

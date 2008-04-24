@@ -569,7 +569,7 @@ static WRITE16_HANDLER(paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		palette_set_color(Machine, offset, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(machine, offset, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 

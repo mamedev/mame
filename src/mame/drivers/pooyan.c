@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "pooyan.h"
 #include "audio/timeplt.h"
 
@@ -44,7 +43,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	irq_enable = data & 1;
 	if (!irq_enable)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

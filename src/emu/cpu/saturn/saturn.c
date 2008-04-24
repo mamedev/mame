@@ -20,7 +20,6 @@
  *
  *****************************************************************************/
 #include "debugger.h"
-#include "deprecat.h"
 
 #include "saturn.h"
 #include "sat.h"

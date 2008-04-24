@@ -656,7 +656,7 @@ WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
 	{
 		int code = offset/32;
 		COMBINE_DATA(&toaplan2_tx_gfxram16[offset]);
-		decodechar(Machine->gfx[2], code, toaplan2_tx_gfxram);
+		decodechar(machine->gfx[2], code, toaplan2_tx_gfxram);
 
 		tilemap_mark_all_tiles_dirty(tx_tilemap);
 	}
@@ -699,7 +699,7 @@ WRITE16_HANDLER( batrider_textdata_decode )
 
 	/* Decode text characters */
 	for (code = 0; code < 1024; code++)
-		decodechar (Machine->gfx[2], code, raizing_tx_gfxram);
+		decodechar (machine->gfx[2], code, raizing_tx_gfxram);
 	tilemap_mark_all_tiles_dirty(tx_tilemap);
 }
 

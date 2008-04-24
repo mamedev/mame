@@ -141,7 +141,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "rendlay.h"
 #include "rescap.h"
 #include "mw8080bw.h"

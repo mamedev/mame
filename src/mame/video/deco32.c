@@ -157,7 +157,7 @@ WRITE32_HANDLER( deco32_nonbuffered_palette_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	r = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE32_HANDLER( deco32_buffered_palette_w )
@@ -168,7 +168,7 @@ WRITE32_HANDLER( deco32_buffered_palette_w )
 
 WRITE32_HANDLER( deco32_palette_dma_w )
 {
-	const int m=Machine->config->total_colors;
+	const int m=machine->config->total_colors;
 	int r,g,b,i;
 
 	for (i=0; i<m; i++) {
@@ -185,7 +185,7 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 				g = (paletteram32[i] >> 8) & 0xff;
 				r = (paletteram32[i] >> 0) & 0xff;
 
-				palette_set_color(Machine,i,MAKE_RGB(r,g,b));
+				palette_set_color(machine,i,MAKE_RGB(r,g,b));
 			}
 		}
 	}

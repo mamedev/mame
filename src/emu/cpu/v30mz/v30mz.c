@@ -41,7 +41,6 @@
 ****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 
 typedef UINT8 BOOLEAN;
 typedef UINT8 BYTE;

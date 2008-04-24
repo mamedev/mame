@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 UINT8 *usgames_videoram,*usgames_charram;
 
@@ -63,7 +62,7 @@ WRITE8_HANDLER( usgames_charram_w )
 {
 	usgames_charram[offset] = data;
 
-	decodechar(Machine->gfx[0], offset/8, usgames_charram);
+	decodechar(machine->gfx[0], offset/8, usgames_charram);
 
 	tilemap_mark_all_tiles_dirty(usgames_tilemap);
 }

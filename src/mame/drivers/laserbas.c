@@ -72,7 +72,7 @@ static READ8_HANDLER( read_unk )
 
 static WRITE8_HANDLER(palette_w)
 {
-	palette_set_color_rgb(Machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
+	palette_set_color_rgb(machine,offset,pal3bit(data>>5),pal3bit(data>>2),pal2bit(data));
 }
 
 static WRITE8_HANDLER(vrambank_w)

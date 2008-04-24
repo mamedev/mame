@@ -2,7 +2,6 @@
 
 /* updated by Hans Andersson, dec 2005     */
 #include "driver.h"
-#include "deprecat.h"
 #include "video/resnet.h"
 #include "includes/grchamp.h"
 
@@ -55,21 +54,21 @@ PALETTE_INIT( grchamp )
 
 WRITE8_HANDLER( grchamp_left_w )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	state->leftram[offset] = data;
 	tilemap_mark_tile_dirty(state->left_tilemap, offset);
 }
 
 WRITE8_HANDLER( grchamp_center_w )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	state->centerram[offset] = data;
 	tilemap_mark_tile_dirty(state->center_tilemap, offset);
 }
 
 WRITE8_HANDLER( grchamp_right_w )
 {
-	grchamp_state *state = Machine->driver_data;
+	grchamp_state *state = machine->driver_data;
 	state->rightram[offset] = data;
 	tilemap_mark_tile_dirty(state->right_tilemap, offset);
 }

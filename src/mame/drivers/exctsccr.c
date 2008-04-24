@@ -48,7 +48,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -83,7 +82,7 @@ static WRITE8_HANDLER( exctsccr_DAC_data_w )
 
 static WRITE8_HANDLER( exctsccr_mcu_halt_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /***************************************************************************

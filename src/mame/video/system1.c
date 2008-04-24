@@ -8,7 +8,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "system1.h"
 
 UINT8 *system1_scroll_y;
@@ -105,7 +104,7 @@ WRITE8_HANDLER( system1_paletteram_w )
 		b = pal2bit(data >> 6);
 	}
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 static STATE_POSTLOAD( system1_postload )

@@ -12,7 +12,6 @@
 #include <limits.h>
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "m37710.h"
 
 

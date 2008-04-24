@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/tubep.h"
 #include "video/resnet.h"
 
@@ -557,7 +556,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
             /SINT line will be reasserted in XSize * YSize cycles (RH0 signal cycles)
             */
 			/* 1.clear the /SINT interrupt line */
-			cpunum_set_input_line(Machine, 3,0,CLEAR_LINE);
+			cpunum_set_input_line(machine, 3,0,CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
 			timer_set( attotime_mul(ATTOTIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), NULL, 0, sprite_timer_callback);

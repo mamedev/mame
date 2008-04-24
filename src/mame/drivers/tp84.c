@@ -65,7 +65,6 @@ C004      76489 #4 trigger
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/flt_rc.h"
 
@@ -129,7 +128,7 @@ static WRITE8_HANDLER( tp84_filter_w )
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 2,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
 }
 
 

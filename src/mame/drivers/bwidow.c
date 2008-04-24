@@ -214,7 +214,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
@@ -327,7 +326,7 @@ static WRITE8_HANDLER( bwidow_misc_w )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 

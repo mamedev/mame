@@ -91,7 +91,6 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 extern void decrypt156(void);
 
 #include "driver.h"
-#include "deprecat.h"
 #include "decocrpt.h"
 #include "deco32.h"
 #include "cpu/arm/arm.h"
@@ -164,7 +163,7 @@ static WRITE32_HANDLER( simpl156_palette_w )
 	color = offset;
 
 	dat = paletteram16[offset]&0xffff;
-	palette_set_color_rgb(Machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
+	palette_set_color_rgb(machine,color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 
 

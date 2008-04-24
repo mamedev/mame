@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "slapstic.h"
 #include "atarisy2.h"
@@ -241,7 +240,7 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
 	green = (color_table[(newword >> 8) & 15] * inten) >> 4;
 	blue = (color_table[(newword >> 4) & 15] * inten) >> 4;
-	palette_set_color(Machine, offset, MAKE_RGB(red, green, blue));
+	palette_set_color(machine, offset, MAKE_RGB(red, green, blue));
 }
 
 

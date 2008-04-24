@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/msm6242.h"
 
 static UINT8 msm6264_reg[3] = { 0, 0, 0 };
@@ -41,7 +40,7 @@ READ8_HANDLER( msm6242_r )
 	}
 	else /* otherwise, use the current time */
 	{
-		mame_get_current_datetime(Machine, &curtime);
+		mame_get_current_datetime(machine, &curtime);
 	}
 
 	switch(offset)
@@ -96,7 +95,7 @@ WRITE8_HANDLER( msm6242_w )
 
 			 if ( data & 1 )	/* was Hold set? */
 			 {
-			 	mame_get_current_datetime(Machine, &msm6264_hold_time);
+			 	mame_get_current_datetime(machine, &msm6264_hold_time);
 			 }
 
 			 return;

@@ -63,7 +63,7 @@ static WRITE32_HANDLER( vega_palette_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paldata = paletteram32[offset] & 0x7fff;
-	palette_set_color_rgb(Machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static WRITE32_HANDLER( vega_misc_w )

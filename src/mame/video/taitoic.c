@@ -533,7 +533,6 @@ Newer version of the I/O chip ?
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoic.h"
 
 #define TOPSPEED_ROAD_COLORS
@@ -4732,7 +4731,7 @@ static STATE_POSTLOAD( TC0110PCR_restore_colors )
 			}
 		}
 
-		palette_set_color(Machine, i + (chip << 12),MAKE_RGB(r,g,b));
+		palette_set_color(machine, i + (chip << 12),MAKE_RGB(r,g,b));
 	}
 }
 
@@ -4815,7 +4814,7 @@ WRITE16_HANDLER( TC0110PCR_word_w )
 		case 1:
 		{
 			TC0110PCR_ram[0][(TC0110PCR_addr[0])] = data & 0xffff;
-			palette_set_color_rgb(Machine,TC0110PCR_addr[0],pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+			palette_set_color_rgb(machine,TC0110PCR_addr[0],pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 			break;
 		}
 
@@ -4837,7 +4836,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_w )
 		case 1:
 		{
 			TC0110PCR_ram[0][(TC0110PCR_addr[0])] = data & 0xffff;
-			palette_set_color_rgb(Machine,TC0110PCR_addr[0],pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+			palette_set_color_rgb(machine,TC0110PCR_addr[0],pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 			break;
 		}
 
@@ -4860,7 +4859,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_1_w )
 		{
 			TC0110PCR_ram[1][(TC0110PCR_addr[1])] = data & 0xffff;
 			/* change a color in the second color area (4096-8191) */
-			palette_set_color_rgb(Machine,TC0110PCR_addr[1] + 4096,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+			palette_set_color_rgb(machine,TC0110PCR_addr[1] + 4096,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 			break;
 		}
 
@@ -4883,7 +4882,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_2_w )
 		{
 			TC0110PCR_ram[2][(TC0110PCR_addr[2])] = data & 0xffff;
 			/* change a color in the second color area (8192-12288) */
-			palette_set_color_rgb(Machine,TC0110PCR_addr[2] + 8192,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+			palette_set_color_rgb(machine,TC0110PCR_addr[2] + 8192,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 			break;
 		}
 
@@ -4907,7 +4906,7 @@ WRITE16_HANDLER( TC0110PCR_step1_rbswap_word_w )
 		case 1:
 		{
 			TC0110PCR_ram[0][(TC0110PCR_addr[0])] = data & 0xffff;
-			palette_set_color_rgb(Machine,TC0110PCR_addr[0],pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+			palette_set_color_rgb(machine,TC0110PCR_addr[0],pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 			break;
 		}
 
@@ -4931,7 +4930,7 @@ WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w )
 		case 1:
 		{
 			TC0110PCR_ram[0][(TC0110PCR_addr[0])] = data & 0xffff;
-			palette_set_color_rgb(Machine,TC0110PCR_addr[0],pal4bit(data >> 0),pal4bit(data >> 4),pal4bit(data >> 8));
+			palette_set_color_rgb(machine,TC0110PCR_addr[0],pal4bit(data >> 0),pal4bit(data >> 4),pal4bit(data >> 8));
 			break;
 		}
 

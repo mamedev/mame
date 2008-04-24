@@ -86,7 +86,7 @@ static WRITE8_HANDLER( to_main_w )
 
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }

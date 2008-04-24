@@ -63,7 +63,7 @@ static WRITE16_HANDLER( pushman_68705_w )
 
 	if (offset==1)
 	{
-        cpunum_set_input_line(Machine, 2,M68705_IRQ_LINE,HOLD_LINE);
+        cpunum_set_input_line(machine, 2,M68705_IRQ_LINE,HOLD_LINE);
 		cpu_spin();
 		new_latch=0;
 	}

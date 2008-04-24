@@ -11,7 +11,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
 
@@ -81,7 +80,7 @@ static WRITE8_HANDLER( runaway_led_w )
 
 static WRITE8_HANDLER( runaway_irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 

@@ -315,9 +315,9 @@ static WRITE16_HANDLER( io_chip_w )
             */
 			segaic16_set_display_enable(data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(machine,0,0);
-			cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		/* mute */

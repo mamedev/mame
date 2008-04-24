@@ -175,7 +175,6 @@ TODO:
 *******************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/2151intf.h"
 #include "sound/namco.h"
@@ -266,12 +265,12 @@ static READ8_HANDLER( dsw1_r )
 
 static WRITE8_HANDLER( int_ack1_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( int_ack2_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 

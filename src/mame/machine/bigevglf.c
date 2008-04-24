@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 static UINT8 from_mcu;
@@ -45,7 +44,7 @@ WRITE8_HANDLER( bigevglf_68705_portB_w )
 
 	if ((ddrB & 0x02) && (~portB_out & 0x02) && (data & 0x02)) /* positive going transition of the clock */
 	{
-		cpunum_set_input_line(Machine, 3,0,CLEAR_LINE);
+		cpunum_set_input_line(machine, 3,0,CLEAR_LINE);
 		main_sent = 0;
 
 	}
@@ -86,7 +85,7 @@ WRITE8_HANDLER( bigevglf_mcu_w )
 {
 	portA_in = data;
 	main_sent = 1;
-	cpunum_set_input_line(Machine, 3,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 3,0,ASSERT_LINE);
 }
 
 

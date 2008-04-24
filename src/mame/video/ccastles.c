@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "ccastles.h"
 #include "video/resnet.h"
 
@@ -125,7 +124,7 @@ WRITE8_HANDLER( ccastles_paletteram_w )
 	bit2 = (~b >> 2) & 0x01;
 	b = combine_3_weights(bweights, bit0, bit1, bit2);
 
-	palette_set_color(Machine, offset & 0x1f, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset & 0x1f, MAKE_RGB(r, g, b));
 }
 
 

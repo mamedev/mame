@@ -257,7 +257,7 @@ static WRITE8_HANDLER( palette_write )
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(Machine, pal_index, MAKE_RGB(r, g, b));
+	palette_set_color(machine, pal_index, MAKE_RGB(r, g, b));
 }
 
 /* PROGRAM MAP */

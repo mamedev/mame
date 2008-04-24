@@ -142,7 +142,7 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 {
-	cpunum_set_input_line(Machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )

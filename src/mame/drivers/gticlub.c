@@ -74,7 +74,7 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static void voodoo_vblank_0(int param)
@@ -349,11 +349,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
 			{
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40000000)	/* CG Board 0 IRQ Ack */
 			{
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 
 			adc1038_di_w((data >> 24) & 1);

@@ -66,7 +66,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -108,7 +107,7 @@ static CUSTOM_INPUT( champbas_watchdog_bit2 )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -129,14 +128,14 @@ static WRITE8_HANDLER( champbas_mcu_switch_w )
 
 static WRITE8_HANDLER( champbas_mcu_halt_w )
 {
-	int cpunum = mame_find_cpu_index(Machine, CPUTAG_MCU);
+	int cpunum = mame_find_cpu_index(machine, CPUTAG_MCU);
 
 	// MCU not present/not used in champbas
 	if (cpunum == -1)
 		return;
 
 	data &= 1;
-	cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, cpunum, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* champbja another protection */

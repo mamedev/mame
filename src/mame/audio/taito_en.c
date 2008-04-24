@@ -97,7 +97,7 @@ READ16_HANDLER(f3_68681_r)
 
 	/* IRQ ack */
 	if (offset==0xf) {
-		cpunum_set_input_line(Machine, 1, 6, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 6, CLEAR_LINE);
 		return 0;
 	}
 

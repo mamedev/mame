@@ -408,7 +408,7 @@ static WRITE32_HANDLER( taitojc_palette_w )
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
 
-	palette_set_color(Machine,offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine,offset, MAKE_RGB(r, g, b));
 }
 
 static READ32_HANDLER ( jc_control_r )
@@ -776,13 +776,13 @@ static WRITE32_HANDLER(dsp_shared_w)
 		{
 			if (!first_dsp_reset)
 			{
-				cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+				cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			first_dsp_reset = 0;
 		}
 		else
 		{
-			cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }

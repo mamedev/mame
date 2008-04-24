@@ -95,7 +95,6 @@ TO DO :
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
@@ -120,9 +119,9 @@ extern VIDEO_UPDATE( tehkanwc );
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
 	if (data)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

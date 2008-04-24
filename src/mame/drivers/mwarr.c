@@ -39,7 +39,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 static tilemap *bg_tilemap, *mlow_tilemap, *mhigh_tilemap, *tx_tilemap;
@@ -124,7 +123,7 @@ static WRITE16_HANDLER( mwarr_brightness_w )
 	brightness = (double)(data & 0xff);
 	for (i=0;i<0x800;i++)
 	{
-		palette_set_brightness(Machine, i, brightness/255);
+		palette_set_brightness(machine, i, brightness/255);
 	}
 }
 

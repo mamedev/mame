@@ -52,7 +52,7 @@ static WRITE8_HANDLER ( xxmissio_status_m_w )
 
 		case 0x40:
 			xxmissio_status &= ~0x08;
-			cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0x10);
+			cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0x10);
 			break;
 
 		case 0x80:
@@ -75,7 +75,7 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 		case 0x80:
 			xxmissio_status &= ~0x04;
-			cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0x10);
+			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x10);
 			break;
 	}
 }

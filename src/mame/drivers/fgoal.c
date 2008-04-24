@@ -17,7 +17,6 @@ Differences between these sets include
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/fgoal.h"
 
 UINT8* fgoal_video_ram;
@@ -129,7 +128,7 @@ static READ8_HANDLER( fgoal_switches_r )
 
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -137,7 +136,7 @@ static READ8_HANDLER( fgoal_nmi_reset_r )
 
 static READ8_HANDLER( fgoal_irq_reset_r )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	return 0;
 }

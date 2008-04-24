@@ -144,7 +144,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "machine/8255ppi.h"
 #include "cpu/i8039/i8039.h"
@@ -376,7 +375,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 }
@@ -428,8 +427,8 @@ static WRITE8_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(Machine, 2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 

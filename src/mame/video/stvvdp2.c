@@ -5109,7 +5109,7 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((stv_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((stv_vdp2_cram[offset] & 0x000000ff) >> 0);
-			palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+			palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5120,11 +5120,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(Machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 		/*Mode 1*/
@@ -5135,11 +5135,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(Machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(Machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 	}

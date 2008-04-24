@@ -21,7 +21,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 extern WRITE8_HANDLER( redclash_videoram_w );
@@ -53,7 +52,7 @@ static INTERRUPT_GEN( redclash_interrupt )
 
 static WRITE8_HANDLER( irqack_w )
 {
-	cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+	cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
 }
 
 

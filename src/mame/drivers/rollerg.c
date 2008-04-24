@@ -7,7 +7,6 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eeprom.h"
@@ -57,7 +56,7 @@ static READ8_HANDLER( rollerg_sound_r )
 
 static WRITE8_HANDLER( soundirq_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -67,7 +66,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 

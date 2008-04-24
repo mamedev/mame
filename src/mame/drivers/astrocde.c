@@ -449,7 +449,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 static STATE_POSTLOAD( profbank_banksw_restore )
 {
-	profpac_banksw_w(Machine, 0, profpac_bank);
+	profpac_banksw_w(machine, 0, profpac_bank);
 }
 
 

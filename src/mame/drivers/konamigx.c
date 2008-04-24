@@ -440,7 +440,7 @@ static WRITE32_HANDLER( esc_w )
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 		}
 	}
 	else
@@ -559,13 +559,13 @@ static WRITE32_HANDLER( control_w )
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -628,14 +628,14 @@ static WRITE32_HANDLER( ccu_w )
 		// vblank interrupt ACK
 		if (ACCESSING_BITS_24_31)
 		{
-			cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (ACCESSING_BITS_8_15)
 		{
-			cpunum_set_input_line(Machine, 0, 2, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -1096,7 +1096,7 @@ static WRITE32_HANDLER( type4_prot_w )
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cpunum_set_input_line(Machine, 0, 4, HOLD_LINE);
+					cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command

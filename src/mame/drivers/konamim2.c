@@ -96,7 +96,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cdrom.h"
 #include "cpu/powerpc/ppc.h"
 
@@ -228,7 +227,7 @@ static WRITE64_HANDLER(unk4_w)
 		if (data & 0x800000)
 		{
 			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpu_getactivecpu(), activecpu_get_pc());
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		unk20004 = (UINT32)(data);
@@ -323,7 +322,7 @@ static WRITE64_HANDLER(reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 			unk3 = 0;
 		}
 	}

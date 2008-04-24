@@ -18,7 +18,6 @@ Magic's 10 instruction for the 1st boot:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 static tilemap *layer0_tilemap, *layer1_tilemap, *layer2_tilemap;
@@ -46,7 +45,7 @@ static WRITE16_HANDLER( layer2_videoram_w )
 static WRITE16_HANDLER( paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb( Machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	palette_set_color_rgb( machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 static WRITE16_HANDLER( magic10_misc_w )

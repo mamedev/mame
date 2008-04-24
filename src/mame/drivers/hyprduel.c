@@ -128,24 +128,24 @@ static WRITE16_HANDLER( hypr_subcpu_control_w )
 		{
 			if (pc != 0x95f2)
 			{
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 				subcpu_resetline = 1;
 			} else {
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 				subcpu_resetline = -1;
 			}
 		}
 	} else {
 		if (subcpu_resetline == 1 && (data != 0x0c))
 		{
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 			subcpu_resetline = 0;
 			if (pc == 0xbb0 || pc == 0x9d30 || pc == 0xb19c)
 				cpu_spinuntil_time(ATTOTIME_IN_USEC(15000));		/* sync semaphore */
 		}
 		else if (subcpu_resetline == -1)
 		{
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 			subcpu_resetline = 0;
 		}
 	}

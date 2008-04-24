@@ -333,7 +333,7 @@ for (i = 0;i < 0xfe;i++)
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )

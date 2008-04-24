@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "fromance.h"
 
 
@@ -212,7 +211,7 @@ WRITE8_HANDLER( fromance_paletteram_w )
 
 	/* compute R,G,B */
 	palword = (local_paletteram[offset | 1] << 8) | local_paletteram[offset & ~1];
-	palette_set_color_rgb(Machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
+	palette_set_color_rgb(machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
 }
 
 

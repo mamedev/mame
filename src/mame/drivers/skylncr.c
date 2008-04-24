@@ -9,7 +9,6 @@
 *************************************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static tilemap *tmap, *tmap2;
@@ -123,7 +122,7 @@ static WRITE8_HANDLER( skylncr_paletteram_w )
 		paletteram[color] = data;
 		r = paletteram[(color/3*3)+0];	g = paletteram[(color/3*3)+1];	b = paletteram[(color/3*3)+2];
 		r = (r << 2) | (r >> 4);		g = (g << 2) | (g >> 4);		b = (b << 2) | (b >> 4);
-		palette_set_color(Machine,color/3,MAKE_RGB(r,g,b));
+		palette_set_color(machine,color/3,MAKE_RGB(r,g,b));
 		color = (color + 1) % (0x100*3);
 	}
 }
@@ -142,7 +141,7 @@ static WRITE8_HANDLER( skylncr_paletteram2_w )
 		paletteram_2[color] = data;
 		r = paletteram_2[(color/3*3)+0];	g = paletteram_2[(color/3*3)+1];	b = paletteram_2[(color/3*3)+2];
 		r = (r << 2) | (r >> 4);			g = (g << 2) | (g >> 4);			b = (b << 2) | (b >> 4);
-		palette_set_color(Machine,0x100 + color/3,MAKE_RGB(r,g,b));
+		palette_set_color(machine,0x100 + color/3,MAKE_RGB(r,g,b));
 		color = (color + 1) % (0x100*3);
 	}
 }

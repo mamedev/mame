@@ -201,7 +201,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	pending_command = 0;
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

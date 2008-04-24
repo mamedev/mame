@@ -114,8 +114,8 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(Machine, (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
-	palette_set_color_rgb(Machine, (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(machine, (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
+	palette_set_color_rgb(machine, (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 #define NUM_LAYERS	2
@@ -217,9 +217,9 @@ static WRITE32_HANDLER( sysreg_w )
 			EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (data & 0x10)
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 			else
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		return;
 	}
@@ -228,10 +228,10 @@ static WRITE32_HANDLER( sysreg_w )
 		if (ACCESSING_BITS_24_31)
 		{
 			if (data & 0x80000000)	/* CG Board 1 IRQ Ack */
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40000000)	/* CG Board 0 IRQ Ack */
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			set_cgboard_id((data >> 28) & 0x3);
 
@@ -325,7 +325,7 @@ static WRITE32_HANDLER( jetwave_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(Machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )

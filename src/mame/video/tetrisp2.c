@@ -39,7 +39,6 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 extern UINT16 tetrisp2_systemregs[0x10];
@@ -72,14 +71,14 @@ WRITE16_HANDLER( tetrisp2_palette_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(Machine,offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(machine,offset/2,pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 WRITE16_HANDLER( rocknms_sub_palette_w )
 {
 	data = COMBINE_DATA(&paletteram16_2[offset]);
 	if ((offset & 1) == 0)
-		palette_set_color_rgb(Machine,(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
+		palette_set_color_rgb(machine,(0x8000 + (offset/2)),pal5bit(data >> 1),pal5bit(data >> 6),pal5bit(data >> 11));
 }
 
 

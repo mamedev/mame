@@ -69,7 +69,6 @@ I/O read/write
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "sound/sn76496.h"
@@ -155,7 +154,7 @@ static WRITE8_HANDLER( paletteram_IIBBGGRR_w )
 	b = (data >> 2) & 0x0c;
 	if (b) b |= i;
 
-	palette_set_color_rgb(Machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(machine,offset,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 

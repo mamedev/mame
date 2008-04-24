@@ -9,7 +9,6 @@ K052591 emulation by Eddie Edwards
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -355,7 +354,7 @@ static WRITE8_HANDLER( thunderx_videobank_w )
 
 static WRITE8_HANDLER( thunderx_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( scontra_snd_bankswitch_w )

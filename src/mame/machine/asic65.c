@@ -480,7 +480,7 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65_tfull = 0;
-	cpunum_set_input_line(Machine, asic65_cpunum, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, asic65_cpunum, 0, CLEAR_LINE);
 	return asic65_tdata;
 }
 

@@ -51,7 +51,7 @@ WRITE16_HANDLER(roundup5_vram_w)
 
 	offset=offset%0xc000;
 
-	decodechar(Machine->gfx[1],offset/0x10,(UINT8 *)roundup5_vram);
+	decodechar(machine->gfx[1],offset/0x10,(UINT8 *)roundup5_vram);
 }
 
 
@@ -83,7 +83,7 @@ bit 0:  3.9kOhm resistor
 
 	offset&=~1;
 	word = ((paletteram16[offset] & 0xff)<<8) | (paletteram16[offset+1] & 0xff);
-	palette_set_color_rgb(Machine,offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
+	palette_set_color_rgb(machine,offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
 }
 
 
@@ -113,7 +113,7 @@ bit 0:  3.9kOhm resistor
 //  logerror("PAL: %04x %02x\n",offset,data);
 
 	data = paletteram16[offset];
-	palette_set_color_rgb(Machine,offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
+	palette_set_color_rgb(machine,offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 
 

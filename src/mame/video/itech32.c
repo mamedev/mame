@@ -6,7 +6,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "cpu/m68000/m68000.h"
 #include "itech32.h"
@@ -272,7 +271,7 @@ WRITE16_HANDLER( timekill_intensity_w )
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
 		for (i = 0; i < 8192; i++)
-			palette_set_brightness(Machine, i, intensity);
+			palette_set_brightness(machine, i, intensity);
 	}
 }
 
@@ -350,7 +349,7 @@ WRITE16_HANDLER( timekill_paletteram_w )
 	g = paletteram16[offset & ~1] >> 8;
 	b = paletteram16[offset |  1] >> 8;
 
-	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -367,7 +366,7 @@ WRITE16_HANDLER( bloodstm_paletteram_w )
 	g = paletteram16[offset & ~1] >> 8;
 	b = paletteram16[offset |  1] & 0xff;
 
-	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -381,7 +380,7 @@ WRITE32_HANDLER( drivedge_paletteram_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 16) & 0xff;
 
-	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -395,7 +394,7 @@ WRITE32_HANDLER( itech020_paletteram_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = paletteram32[offset] & 0xff;
 
-	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
 }
 
 

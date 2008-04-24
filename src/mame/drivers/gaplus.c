@@ -150,7 +150,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
@@ -275,7 +274,7 @@ static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 	int bit = !BIT(offset,11);
 	cpu_interrupt_enable(0,bit);
 	if (!bit)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
@@ -283,7 +282,7 @@ static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 	int bit = !BIT(offset,13);
 	cpu_interrupt_enable(2,bit);
 	if (!bit)
-		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
@@ -291,14 +290,14 @@ static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
 	int bit = offset & 1;
 	cpu_interrupt_enable(1,bit);
 	if (!bit)
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_sreset_w )
 {
 	int bit = !BIT(offset,11);
-    cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-    cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+    cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+    cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	mappy_sound_enable(bit);
 }
 

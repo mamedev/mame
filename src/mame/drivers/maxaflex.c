@@ -79,14 +79,14 @@ static WRITE8_HANDLER( mcu_portB_w )
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cpunum_set_input_line(Machine, 1, M6805_IRQ_LINE, CLEAR_LINE );
+		cpunum_set_input_line(machine, 1, M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
 	sound_global_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))

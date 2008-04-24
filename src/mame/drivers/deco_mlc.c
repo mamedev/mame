@@ -162,7 +162,7 @@ static WRITE32_HANDLER( avengrs_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 static READ32_HANDLER( avengrs_sound_r )
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpunum_set_input_line(Machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */

@@ -71,7 +71,7 @@ static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 	if (last == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpunum_set_input_line(Machine, 1,M6809_FIRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,M6809_FIRQ_LINE,HOLD_LINE);
 	}
 
 	last = data;

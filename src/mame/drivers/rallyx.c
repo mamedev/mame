@@ -183,7 +183,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "audio/timeplt.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
@@ -208,7 +207,7 @@ VIDEO_UPDATE( locomotn );
 static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
 	cpunum_set_input_line_vector(0, 0, data);
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -237,7 +236,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 		case 0x01:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */

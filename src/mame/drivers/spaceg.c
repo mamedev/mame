@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
@@ -256,14 +255,14 @@ int rgbcolor;
 		{
 			/* palette 1 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(Machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			palette_set_color_rgb(machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else
 		if ((offset>=0x300) && (offset<0x320)) /* 0xa300- 0xa31f */
 		{
 			/* palette 2 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(Machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			palette_set_color_rgb(machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else
 			logerror("palette? read from unkram offset = %04x\n",offset);

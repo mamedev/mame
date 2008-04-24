@@ -372,11 +372,11 @@ static WRITE16_HANDLER( irqctrl_w )
 
 		// Bit 0 : SUBINT
 		if ( (wecleman_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
-			cpunum_set_input_line(Machine, 1,4,HOLD_LINE);
+			cpunum_set_input_line(machine, 1,4,HOLD_LINE);
 
 		// Bit 1 : NSUBRST
-		if (data & 2)   cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE  );
-		else                    cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
+		if (data & 2)   cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE  );
+		else                    cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST

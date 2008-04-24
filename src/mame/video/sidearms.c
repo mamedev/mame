@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 extern int sidearms_gameid;
 
@@ -53,7 +52,7 @@ WRITE8_HANDLER( sidearms_c804_w )
 	/* bit 4 resets the sound CPU */
 	if (data & 0x10)
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 5 enables starfield */

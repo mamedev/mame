@@ -96,8 +96,8 @@ static READ16_HANDLER( cninja_irq_r )
 		return cninja_scanline;
 
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpunum_set_input_line(Machine, 0, 3, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 0, 4, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
 		return 0;
 	}
 

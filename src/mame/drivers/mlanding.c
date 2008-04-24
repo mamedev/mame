@@ -78,7 +78,7 @@ static WRITE16_HANDLER(ml_subreset_w)
 {
 	//wrong
 	if(activecpu_get_pc()==0x822)
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

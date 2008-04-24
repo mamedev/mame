@@ -78,7 +78,6 @@ Sonic Hedgehog 2        171-6215A   837-6963-62       610-0239-62          MPR-1
 
 */
 #include "driver.h"
-#include "deprecat.h"
 #include "genesis.h"
 #include "rendlay.h"
 #include "megadriv.h"
@@ -443,7 +442,7 @@ static WRITE8_HANDLER( megatech_cart_select_w )
 	mt_cart_select_reg = data;
 
 
-	megatech_select_game(Machine, mt_cart_select_reg);
+	megatech_select_game(machine, mt_cart_select_reg);
 
 /*
     if (mt_cart_select_reg==2)

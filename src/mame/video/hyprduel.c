@@ -55,7 +55,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 #define RASTER_LINES 262
 #define FIRST_VISIBLE_LINE 0
@@ -85,7 +84,7 @@ WRITE16_HANDLER( hyprduel_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	/* We need the ^0xff because we had to invert the pens in the gfx */
-	palette_set_color_rgb(Machine,offset^0xff,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(machine,offset^0xff,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 

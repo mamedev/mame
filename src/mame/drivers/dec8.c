@@ -238,7 +238,7 @@ static WRITE8_HANDLER( gondo_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		if (int_enable) cpunum_set_input_line (Machine, 0, M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
+		if (int_enable) cpunum_set_input_line (machine, 0, M6809_IRQ_LINE, HOLD_LINE); /* IRQ on *high* byte only */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpunum_set_input_line (Machine, 1, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		cpunum_set_input_line (machine, 1, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( lastmiss_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpunum_set_input_line (Machine, 0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		cpunum_set_input_line (machine, 0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -330,7 +330,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	switch (offset) {
 	case 0: /* High byte */
 		i8751_value=(i8751_value&0xff) | (data<<8);
-		cpunum_set_input_line (Machine, 0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		cpunum_set_input_line (machine, 0, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		i8751_value=(i8751_value&0xff00) | data;
@@ -474,16 +474,16 @@ static WRITE8_HANDLER( oscar_int_w )
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
 	switch (offset) {
 		case 0: /* IRQ2 */
-			cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
+			cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
 			return;
 		case 1: /* IRC 1 */
-			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
 			return;
 		case 2: /* IRQ 1 */
-			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
+			cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
 			return;
 		case 3: /* IRC 2 */
-			cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
 			return;
 	}
 }
@@ -497,18 +497,18 @@ static WRITE8_HANDLER( shackled_int_w )
     (The last interrupt has not finished and been ack'd when the new one occurs */
 	switch (offset) {
 		case 0: /* CPU 2 - IRQ acknowledge */
-			cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
             return;
         case 1: /* CPU 1 - IRQ acknowledge */
-			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
         	return;
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
+			cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
+            cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
             return;
 	}
 #endif
@@ -521,10 +521,10 @@ static WRITE8_HANDLER( shackled_int_w )
         case 2: /* i8751 - FIRQ acknowledge */
             return;
         case 3: /* IRQ 1 */
-			cpunum_set_input_line (Machine, 0, M6809_IRQ_LINE, HOLD_LINE);
+			cpunum_set_input_line (machine, 0, M6809_IRQ_LINE, HOLD_LINE);
 			return;
         case 4: /* IRQ 2 */
-            cpunum_set_input_line (Machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+            cpunum_set_input_line (machine, 1, M6809_IRQ_LINE, HOLD_LINE);
             return;
 	}
 }

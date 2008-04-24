@@ -194,7 +194,7 @@ static WRITE16_HANDLER( sound_command_w )
 static READ8_HANDLER( sound_command_r )
 {
 	sound_busy = 0;
-	cpunum_set_input_line(Machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 	return sound_data;
 }
 

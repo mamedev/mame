@@ -5,7 +5,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -580,7 +579,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 
 			case SOUND_YAWDIM:
 				soundlatch_w(machine, 0, data);
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}
 }

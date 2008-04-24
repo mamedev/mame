@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "m58.h"
 #include "video/resnet.h"
 

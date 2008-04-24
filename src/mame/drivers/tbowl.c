@@ -152,7 +152,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( tbowl_trigger_nmi )
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( readmem_6206C, ADDRESS_SPACE_PROGRAM, 8 )

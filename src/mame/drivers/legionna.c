@@ -73,7 +73,6 @@ Preliminary COP MCU memory map
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"

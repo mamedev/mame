@@ -620,7 +620,7 @@ static WRITE8_HANDLER( mmtr_w )
 			}
  		}
  	}
-	if ( data & 0x1F ) cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1072,7 +1072,7 @@ static WRITE8_HANDLER( uart2data_w )
 
 static WRITE8_HANDLER( vid_uart_tx_w )
 {
-	send_to_adder(Machine, data);
+	send_to_adder(machine, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////

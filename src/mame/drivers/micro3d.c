@@ -513,7 +513,7 @@ switch(offset)
 
       case 0x03:        M68681.TBA = value;                   // Fill transmit buffer
                         M68681.SRA |=0x0400;                  // Data has been sent - TX ready for more.
-                        if(M68681.IMR & 1)   cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+                        if(M68681.IMR & 1)   cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
 
 #if HOST_MONITOR_DISPLAY
                         mame_printf_debug("%c",value);                    // Port A - Monitor
@@ -541,9 +541,9 @@ switch(offset)
                         // Write to sound board
                         if(M68681.IMR & 0x1000)
                         {
-                        	cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+                        	cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
                         }
-                        cpunum_set_input_line(Machine, 2, I8051_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        cpunum_set_input_line(machine, 2, I8051_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
                         mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
                         break;
 

@@ -41,7 +41,6 @@ sprites.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 //static int scroll1[4];
 static int scroll2[4];
@@ -196,9 +195,9 @@ WRITE8_HANDLER( lastmiss_control_w )
 	scroll2[2]=(data>>6)&1;
 
 	if (data&0x80)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_HANDLER( shackled_control_w )

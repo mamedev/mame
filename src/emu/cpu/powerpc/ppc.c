@@ -3,7 +3,6 @@
 #include <setjmp.h>
 #include "ppc.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 #if (HAS_PPC603 || HAS_PPC601 || HAS_PPC604)
 static void ppc603_exception(int exception);

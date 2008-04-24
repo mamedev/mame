@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "foodf.h"
 #include "video/resnet.h"
@@ -108,7 +107,7 @@ WRITE16_HANDLER( foodf_paletteram_w )
 	bit1 = (newword >> 7) & 0x01;
 	b = combine_2_weights(bweights, bit0, bit1);
 
-	palette_set_color(Machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
 }
 
 

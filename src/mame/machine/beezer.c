@@ -61,9 +61,9 @@ static READ8_HANDLER( b_via_0_pb_r )
 static WRITE8_HANDLER( b_via_0_pa_w )
 {
 	if ((data & 0x08) == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{

@@ -16,7 +16,6 @@
 */
 
 #include "arm.h"
-#include "deprecat.h"
 #include "debugger.h"
 
 #define READ8(addr)			cpu_read8(addr)

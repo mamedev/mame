@@ -4,7 +4,6 @@
 
 ****************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 #include "render.h"
 #include "cpu/i86/i86.h"
@@ -1577,7 +1576,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 		}
 		case 0xe0:
 		{
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_TEST, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_TEST, CLEAR_LINE);
 			vregs.flags = data;
 			break;
 		}

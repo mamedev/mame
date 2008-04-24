@@ -17,7 +17,6 @@
 ********************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "v810.h"
 
 #define clkIF 3

@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 UINT8 *slapfight_dpram;
@@ -64,14 +63,14 @@ READ8_HANDLER( slapfight_dpram_r )
 /* Reset and hold sound CPU */
 WRITE8_HANDLER( slapfight_port_00_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	getstar_sh_intenabled = 0;
 }
 
 /* Release reset on sound CPU */
 WRITE8_HANDLER( slapfight_port_01_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /* Disable and clear hardware interrupt */
@@ -192,7 +191,7 @@ WRITE8_HANDLER( tigerh_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
+		if (main_sent) cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 		main_sent = 0;
 	}
 	if ((ddrB & 0x04) && (data & 0x04) && (~portB_out & 0x04))
@@ -233,7 +232,7 @@ WRITE8_HANDLER( tigerh_mcu_w )
 	from_main = data;
 	main_sent = 1;
 	mcu_sent=0;
-	cpunum_set_input_line(Machine, 2,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
 }
 
 READ8_HANDLER( tigerh_mcu_r )

@@ -126,7 +126,7 @@ WRITE8_HANDLER( rockola_flipscreen_w )
 		backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			palette_set_color(Machine, COLOR(1, i), palette[4 * backcolor + 0x20]);
+			palette_set_color(machine, COLOR(1, i), palette[4 * backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
@@ -275,7 +275,7 @@ WRITE8_HANDLER( satansat_backcolor_w )
 		backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			palette_set_color(Machine, COLOR(1, i), palette[backcolor + 0x10]);
+			palette_set_color(machine, COLOR(1, i), palette[backcolor + 0x10]);
 	}
 }
 

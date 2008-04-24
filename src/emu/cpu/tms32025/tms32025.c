@@ -119,7 +119,6 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "tms32025.h"
 
 

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "kan_pand.h"
 
 UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
@@ -45,7 +44,7 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
-	palette_set_color_rgb(Machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 

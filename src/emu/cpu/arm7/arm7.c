@@ -35,7 +35,6 @@
     **
 *****************************************************************************/
 #include "arm7.h"
-#include "deprecat.h"
 #include "debugger.h"
 #include "arm7core.h"   //include arm7 core
 

@@ -58,7 +58,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 static int color_bank;
 
@@ -105,7 +104,7 @@ WRITE16_HANDLER( suna16_paletteram16_w )
 {
 	offset += color_bank * 256;
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb( Machine, offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb( machine, offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 

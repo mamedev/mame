@@ -72,7 +72,7 @@ WRITE16_HANDLER( galpani2_bg8_##_n_##_w ) \
 WRITE16_HANDLER( galpani2_palette_##_n_##_w ) \
 { \
 	UINT16 newword = COMBINE_DATA(&galpani2_palette_##_n_[offset]); \
-	palette_set_color_rgb( Machine, offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) ); \
+	palette_set_color_rgb( machine, offset + 0x4000 + _n_ * 0x100, pal5bit(newword >> 5), pal5bit(newword >> 10), pal5bit(newword >> 0) ); \
 }
 
 galpani2_BG8_REGS_R( 0 )

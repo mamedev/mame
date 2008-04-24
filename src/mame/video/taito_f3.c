@@ -813,7 +813,7 @@ WRITE32_HANDLER( f3_palette_24bit_w )
 		b = (paletteram32[offset] >> 0) & 0xff;
 	}
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 /******************************************************************************/

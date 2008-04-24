@@ -113,7 +113,7 @@ static WRITE8_HANDLER( transmit_data_w )
 }
 static READ8_HANDLER( trigger_slave_nmi_r )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 

@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "atarisy1.h"
 
@@ -249,7 +248,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	/* sound CPU reset */
 	if (diff & 0x0080)
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(newselect & 0x0080)) atarigen_sound_reset();
 	}
 

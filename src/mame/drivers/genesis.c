@@ -217,7 +217,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 		if (data == 0x100)
 		{
 			z80running = 0;
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);	/* halt Z80 */
 			/* logerror("z80 stopped by 68k BusReq\n"); */
 		}
 		else
@@ -225,7 +225,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 			z80running = 1;
 //          memory_set_bankptr(1, &genesis_z80_ram[0]);
 
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
 			/* logerror("z80 started, BusReq ends\n"); */
 		}
 		return;
@@ -233,10 +233,10 @@ WRITE16_HANDLER(genesis_ctrl_w)
 	case 0x100:						/* Z80 CPU Reset */
 		if (data == 0x00)
 		{
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 			/* logerror("z80 reset, ram is %p\n", &genesis_z80_ram[0]); */
 			z80running = 0;
 			return;

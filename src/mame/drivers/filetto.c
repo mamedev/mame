@@ -374,9 +374,9 @@ static READ8_HANDLER( undefined_r )
 static WRITE8_HANDLER( nmi_enable_w )
 {
 	//if(data & 0x80)
-		//cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI,ASSERT_LINE);
+		//cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,ASSERT_LINE);
 	//if(!(data & 0x80))
-		//cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI,CLEAR_LINE);
+		//cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 static READ8_HANDLER( kludge_r )
@@ -437,7 +437,7 @@ static READ8_HANDLER( port_a_r )
 	}
 	else//keyboard emulation
 	{
-		cpunum_set_input_line(Machine, 0,1,PULSE_LINE);
+		cpunum_set_input_line(machine, 0,1,PULSE_LINE);
 		return 0x00;//Keyboard is disconnected
 		//return 0xaa;//Keyboard code
 	}
@@ -470,7 +470,7 @@ static WRITE8_HANDLER( wss_2_w )
 
 static WRITE8_HANDLER( sys_reset_w )
 {
-	cpunum_set_input_line(Machine, 0,INPUT_LINE_RESET,PULSE_LINE);
+	cpunum_set_input_line(machine, 0,INPUT_LINE_RESET,PULSE_LINE);
 }
 
 

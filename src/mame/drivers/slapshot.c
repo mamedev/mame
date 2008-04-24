@@ -171,7 +171,7 @@ static WRITE16_HANDLER( color_ram_word_w )
 		g = (color_ram[offset] &0xff00) >> 8;
 		b = (color_ram[offset] &0xff);
 
-		palette_set_color(Machine,offset/2,MAKE_RGB(r,g,b));
+		palette_set_color(machine,offset/2,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -218,7 +218,7 @@ static READ16_HANDLER( opwolf3_adc_r )
 static WRITE16_HANDLER( opwolf3_adc_req_w )
 {
 	/* 4 writes a frame - one for each analogue port */
-	cpunum_set_input_line(Machine, 0,3,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,3,HOLD_LINE);
 }
 
 /*****************************************************

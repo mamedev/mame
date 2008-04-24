@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", curr_scanline);
 	return;
 }
@@ -204,7 +204,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", curr_scanline);
 	return;
 }
@@ -239,7 +239,7 @@ static READ8_HANDLER( tubep_soundlatch_r )
 
 static READ8_HANDLER( tubep_sound_irq_ack )
 {
-	cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
 	return 0;
 }
 
@@ -409,7 +409,7 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 static WRITE8_HANDLER( rjammer_soundlatch_w )
 {
 	sound_latch = data;
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -594,7 +594,7 @@ static WRITE8_HANDLER( rjammer_voice_input_w )
             I do it here because this port (0x80) is first one accessed
             in the interrupt routine.
     */
-	cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE );
+	cpunum_set_input_line(machine, 2, 0, CLEAR_LINE );
 	return;
 }
 

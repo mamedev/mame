@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "balsente.h"
 
 
@@ -107,7 +106,7 @@ WRITE8_HANDLER( balsente_paletteram_w )
 	g = paletteram[(offset & ~3) + 1];
 	b = paletteram[(offset & ~3) + 2];
 
-	palette_set_color_rgb(Machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 

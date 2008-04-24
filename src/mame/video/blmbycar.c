@@ -29,7 +29,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 /* Variables needed by driver: */
 
@@ -50,7 +49,7 @@ UINT16 *blmbycar_vram_1, *blmbycar_scroll_1;
 WRITE16_HANDLER( blmbycar_palette_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb( Machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
+	palette_set_color_rgb( machine, offset, pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 }
 
 

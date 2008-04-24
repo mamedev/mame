@@ -36,7 +36,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "taito_f3.h"
 #include "sound/es5506.h"
@@ -119,12 +118,12 @@ static WRITE32_HANDLER( f3_control_w )
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_1_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_bankswitch_w )

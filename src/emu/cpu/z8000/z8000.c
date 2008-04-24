@@ -44,7 +44,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "z8000.h"
 #include "z8000cpu.h"
 #include "osd_cpu.h"

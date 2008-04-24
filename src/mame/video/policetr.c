@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/r3000.h"
 #include "policetr.h"
 
@@ -246,12 +245,12 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					cpunum_set_input_line(Machine, 0, R3000_IRQ4, CLEAR_LINE);
+					cpunum_set_input_line(machine, 0, R3000_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					cpunum_set_input_line(Machine, 0, R3000_IRQ5, CLEAR_LINE);
+					cpunum_set_input_line(machine, 0, R3000_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */
@@ -346,7 +345,7 @@ WRITE32_HANDLER( policetr_palette_data_w )
 		palette_data[palette_index] = (data >> 16) & 0xff;
 		if (++palette_index == 3)
 		{
-			palette_set_color(Machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
+			palette_set_color(machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
 			palette_index = 0;
 		}
 	}

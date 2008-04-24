@@ -50,7 +50,6 @@ Notes:
 *********************************************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/2413intf.h"
@@ -310,7 +309,7 @@ static WRITE8_HANDLER( dunhuang_paldata_w )
 {
 	dunhuang_paldata[dunhuang_paloffs] = data;
 
-	palette_set_color_rgb( Machine, dunhuang_paloffs/3,
+	palette_set_color_rgb( machine, dunhuang_paloffs/3,
 		pal6bit(dunhuang_paldata[(dunhuang_paloffs/3)*3+0]),
 		pal6bit(dunhuang_paldata[(dunhuang_paloffs/3)*3+1]),
 		pal6bit(dunhuang_paldata[(dunhuang_paloffs/3)*3+2])

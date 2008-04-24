@@ -28,7 +28,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -161,10 +160,10 @@ static WRITE32_HANDLER( paletteram32_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paldata = paletteram32[offset] & 0xffff;
-	palette_set_color_rgb(Machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 
 	paldata = (paletteram32[offset] >> 16) & 0xffff;
-	palette_set_color_rgb(Machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static READ32_HANDLER( wyvernwg_prot_r )

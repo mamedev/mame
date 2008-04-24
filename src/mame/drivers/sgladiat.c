@@ -20,7 +20,6 @@ AT08XX03:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "snk.h"
 #include "sound/ay8910.h"
@@ -75,7 +74,7 @@ static READ8_HANDLER( sgladiat_soundlatch_r )
 
 static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 {
-//  cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+//  cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 

@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "turbo.h"
 #include "video/resnet.h"
 
@@ -205,7 +204,7 @@ VIDEO_START( buckrog )
 
 WRITE8_HANDLER( turbo_videoram_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	state->videoram[offset] = data;
 	if (offset < 0x400)
 	{
@@ -217,7 +216,7 @@ WRITE8_HANDLER( turbo_videoram_w )
 
 WRITE8_HANDLER( buckrog_bitmap_w )
 {
-	turbo_state *state = Machine->driver_data;
+	turbo_state *state = machine->driver_data;
 	state->buckrog_bitmap_ram[offset] = data & 1;
 }
 

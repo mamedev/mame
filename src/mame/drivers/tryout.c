@@ -30,7 +30,7 @@ extern VIDEO_UPDATE( tryout );
 
 static WRITE8_HANDLER( tryout_nmi_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( tryout_sound_w )

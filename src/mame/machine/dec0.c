@@ -527,7 +527,7 @@ static WRITE16_HANDLER( robocop_68000_share_w )
 	robocop_shared_ram[offset]=data&0xff;
 
 	if (offset==0x7ff) /* A control address - not standard ram */
-		cpunum_set_input_line(Machine, 2,0,HOLD_LINE);
+		cpunum_set_input_line(machine, 2,0,HOLD_LINE);
 }
 
 /******************************************************************************/

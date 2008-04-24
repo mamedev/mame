@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT8 from_main,from_mcu;
 static int mcu_sent = 0,main_sent = 0;
@@ -56,7 +55,7 @@ WRITE8_HANDLER( nycaptor_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(Machine, 3,0,CLEAR_LINE);
+		if (main_sent) cpunum_set_input_line(machine, 3,0,CLEAR_LINE);
 		main_sent = 0;
 
 	}
@@ -103,7 +102,7 @@ WRITE8_HANDLER( nycaptor_mcu_w )
 
 	from_main = data;
 	main_sent = 1;
-	cpunum_set_input_line(Machine, 3,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 3,0,ASSERT_LINE);
 }
 
 READ8_HANDLER( nycaptor_mcu_r )

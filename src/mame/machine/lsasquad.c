@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 
 
@@ -32,7 +31,7 @@ WRITE8_HANDLER( lsasquad_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -145,7 +144,7 @@ WRITE8_HANDLER( lsasquad_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
+		if (main_sent) cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 		main_sent = 0;
 //logerror("read command %02x from main cpu\n",portA_in);
 	}
@@ -169,7 +168,7 @@ WRITE8_HANDLER( lsasquad_mcu_w )
 //logerror("%04x: mcu_w %02x\n",activecpu_get_pc(),data);
 	from_main = data;
 	main_sent = 1;
-	cpunum_set_input_line(Machine, 2,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
 }
 
 READ8_HANDLER( lsasquad_mcu_r )

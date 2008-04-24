@@ -268,7 +268,7 @@ static WRITE16_HANDLER( jumping_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	}
 }
 

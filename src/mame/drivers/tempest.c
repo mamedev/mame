@@ -304,7 +304,7 @@ static UINT8 tempest_player_select;
 
 static WRITE8_HANDLER( wdclr_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	watchdog_reset(Machine);
 }
 

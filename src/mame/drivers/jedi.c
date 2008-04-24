@@ -111,7 +111,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "jedi.h"
 
@@ -142,7 +141,7 @@ static TIMER_CALLBACK( generate_interrupt )
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 

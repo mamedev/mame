@@ -14,7 +14,6 @@ To enter service mode, keep 1&2 pressed on reset
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
@@ -71,7 +70,7 @@ static READ8_HANDLER( circusc_sh_timer_r )
 
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )

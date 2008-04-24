@@ -15,7 +15,6 @@ Tilemap flip flags were reversed
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
 
@@ -138,7 +137,7 @@ WRITE32_HANDLER ( skns_palette_ram_w )
 		r <<= 3;
 	}
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 

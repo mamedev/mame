@@ -16,7 +16,6 @@ DIP Locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -214,7 +213,7 @@ static WRITE8_HANDLER( bking3_68705_portB_w )
 	if (~data & 0x02)
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
+		if (main_sent) cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 		main_sent = 0;
 	}
 

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT8 *gottlieb_charram;
 
@@ -86,7 +85,7 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 
 	b = 0x10 * bit0 + 0x21 * bit1 + 0x46 * bit2 + 0x88 * bit3;
 
-	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 WRITE8_HANDLER( gottlieb_video_outputs_w )
@@ -142,7 +141,7 @@ WRITE8_HANDLER( gottlieb_charram_w )
 	{
 		gottlieb_charram[offset] = data;
 
-		decodechar(Machine->gfx[0], offset / 32, gottlieb_charram);
+		decodechar(machine->gfx[0], offset / 32, gottlieb_charram);
 
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}

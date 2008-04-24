@@ -99,10 +99,10 @@ WRITE8_HANDLER( taitosound_comm_w )
 //#endif
 			/* this does a hi-lo transition to reset the sound cpu */
 			if (data)
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
                 cpu_spin(); /* otherwise no sound in driftout */
             }
 			break;

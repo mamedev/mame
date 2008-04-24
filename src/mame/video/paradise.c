@@ -26,7 +26,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "paradise.h"
 
 /* Variables that driver has access to: */
@@ -54,7 +53,7 @@ WRITE8_HANDLER( paradise_palette_w )
 {
 	paletteram[offset] = data;
 	offset %= 0x800;
-	palette_set_color_rgb(Machine,offset,	paletteram[offset + 0x800 * 0],
+	palette_set_color_rgb(machine,offset,	paletteram[offset + 0x800 * 0],
 											paletteram[offset + 0x800 * 1],
 											paletteram[offset + 0x800 * 2]	);
 }
@@ -87,7 +86,7 @@ WRITE8_HANDLER( paradise_palbank_w )
 	int bank2 = (data & 0xf0);
 
 	for (i = 0; i < 15; i++)
-		palette_set_color_rgb(Machine,0x800+i,	paletteram[0x200 + bank2 + i + 0x800 * 0],
+		palette_set_color_rgb(machine,0x800+i,	paletteram[0x200 + bank2 + i + 0x800 * 0],
 												paletteram[0x200 + bank2 + i + 0x800 * 1],
 												paletteram[0x200 + bank2 + i + 0x800 * 2]	);
 	if (paradise_palbank != bank1)

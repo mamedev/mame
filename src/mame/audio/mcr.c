@@ -322,7 +322,7 @@ static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpunum_set_input_line(Machine, ssio_sound_cpu, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, ssio_sound_cpu, 0, CLEAR_LINE);
 	return 0xff;
 }
 

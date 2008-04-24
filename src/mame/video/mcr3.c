@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mcr.h"
 
 
@@ -150,7 +149,7 @@ WRITE8_HANDLER( mcr3_paletteram_w )
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */
-	palette_set_color_rgb(Machine, offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(machine, offset / 2, pal3bit(((offset & 1) << 2) + (data >> 6)), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 

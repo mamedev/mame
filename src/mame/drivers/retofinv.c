@@ -66,19 +66,19 @@ static UINT8 cpu2_m6000=0;
 
 static WRITE8_HANDLER( cpu1_reset_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( cpu2_reset_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( mcu_reset_w )
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
 	if (cpu_gettotalcpu() >= 4)
-		cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( cpu2_m6000_w )
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( irq0_ack_w )
 
 	cpu_interrupt_enable(0,bit);
 	if (!bit)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( irq1_ack_w )
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( irq1_ack_w )
 
 	cpu_interrupt_enable(1,bit);
 	if (!bit)
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( coincounter_w )

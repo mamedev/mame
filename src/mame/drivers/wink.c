@@ -12,7 +12,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static tilemap *bg_tilemap;
@@ -56,7 +55,7 @@ static READ8_HANDLER( player_inputs_r )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
 	//timer_call_after_resynch(NULL, 0, NULL);
 }

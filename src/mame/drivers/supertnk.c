@@ -96,7 +96,6 @@ CRU lines:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 
@@ -159,7 +158,7 @@ static INTERRUPT_GEN( supertnk_interrupt )
 
 static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 

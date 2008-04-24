@@ -779,7 +779,7 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if(data&0x20)
 		{
-			cpunum_set_input_line(Machine, CPU_MCU, HD63705_INT_ADCONV , PULSE_LINE);
+			cpunum_set_input_line(machine, CPU_MCU, HD63705_INT_ADCONV , PULSE_LINE);
 		}
 	}
 }

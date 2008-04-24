@@ -1,6 +1,5 @@
 // system 16 - 7751 emulation, based on monster bash code.
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/dac.h"
 
@@ -39,7 +38,7 @@ WRITE8_HANDLER( sys16_7751_audio_8255_w )
 
 	if ((data & 0x0f) != 8)
 	{
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);
 		timer_set(ATTOTIME_IN_USEC(300), NULL, data, trigger_7751_sound);
 	}
 }

@@ -138,7 +138,7 @@ WRITE8_HANDLER( exidy440_paletteram_w )
 		word = (local_paletteram[offset] << 8) + local_paletteram[offset + 1];
 
 		/* extract the 5-5-5 RGB colors */
-		palette_set_color_rgb(Machine, offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
+		palette_set_color_rgb(machine, offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 	}
 }
 
@@ -221,7 +221,7 @@ WRITE8_HANDLER( exidy440_control_w )
 		{
 			/* extract a word and the 5-5-5 RGB components */
 			int word = (local_paletteram[offset] << 8) + local_paletteram[offset + 1];
-			palette_set_color_rgb(Machine, i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
+			palette_set_color_rgb(machine, i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 		}
 	}
 }

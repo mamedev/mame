@@ -841,7 +841,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 
 static READ32_HANDLER( spi_int_r )
 {
-	cpunum_set_input_line(Machine, 0, 0,CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, 0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -913,9 +913,9 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
 			z80_prg_fifo_pos = 0;
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE );
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }

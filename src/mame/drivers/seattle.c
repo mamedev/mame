@@ -659,7 +659,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (vblank_irq_num != 0)
-		cpunum_set_input_line(Machine, 0, vblank_irq_num, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, vblank_irq_num, CLEAR_LINE);
 
 	/* VBLANK: compute the new IRQ vector */
 	irq = (*interrupt_config >> (2*VBLANK_IRQ_SHIFT)) & 3;
@@ -670,7 +670,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Widget: clear anything pending on the old IRQ */
 		if (widget.irq_num != 0)
-			cpunum_set_input_line(Machine, 0, widget.irq_num, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, widget.irq_num, CLEAR_LINE);
 
 		/* Widget: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*WIDGET_IRQ_SHIFT)) & 3;
@@ -682,7 +682,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Ethernet: clear anything pending on the old IRQ */
 		if (ethernet_irq_num != 0)
-			cpunum_set_input_line(Machine, 0, ethernet_irq_num, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, ethernet_irq_num, CLEAR_LINE);
 
 		/* Ethernet: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*ETHERNET_IRQ_SHIFT)) & 3;

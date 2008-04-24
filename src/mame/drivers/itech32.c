@@ -563,7 +563,7 @@ static WRITE32_HANDLER( sound_data32_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 	sound_int_state = 0;
 	return sound_data;
 }
@@ -669,7 +669,7 @@ static const struct via6522_interface drivedge_via_interface =
 
 static WRITE8_HANDLER( firq_clear_w )
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -682,8 +682,8 @@ static WRITE8_HANDLER( firq_clear_w )
 
 static WRITE32_HANDLER( tms_reset_assert_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -692,13 +692,13 @@ static WRITE32_HANDLER( tms_reset_clear_w )
 	/* kludge to prevent crash on first boot */
 	if ((tms1_ram[0] & 0xff000000) == 0)
 	{
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(Machine, 0);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		STOP_TMS_SPINNING(machine, 0);
 	}
 	if ((tms2_ram[0] & 0xff000000) == 0)
 	{
-		cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(Machine, 1);
+		cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+		STOP_TMS_SPINNING(machine, 1);
 	}
 }
 
@@ -707,7 +707,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
 	if (offset == 0) COMBINE_DATA(tms1_boot);
-	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(Machine, 0);
+	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(machine, 0);
 	if (!tms_spinning[0])
 		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
@@ -716,7 +716,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 static WRITE32_HANDLER( tms2_68k_ram_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(Machine, 1);
+	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(machine, 1);
 	if (!tms_spinning[1])
 		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }

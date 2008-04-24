@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 #include "madalien.h"

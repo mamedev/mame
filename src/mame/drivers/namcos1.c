@@ -395,17 +395,17 @@ DRIVER_INIT( tankfrce );
 
 static WRITE8_HANDLER( namcos1_sub_firq_w )
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(Machine, cpu_getactivecpu(), 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, cpu_getactivecpu(), 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( firq_ack_w )
 {
-	cpunum_set_input_line(Machine, cpu_getactivecpu(), M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, cpu_getactivecpu(), M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

@@ -8,7 +8,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 
 
@@ -79,7 +78,7 @@ WRITE8_HANDLER( ojankohs_palette_w )
 			((ojankohs_paletteram[offset + 1] & 0xe0) >> 5);
 	b = (ojankohs_paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color_rgb(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( ccasino_palette_w )
@@ -98,7 +97,7 @@ WRITE8_HANDLER( ccasino_palette_w )
 			((ojankohs_paletteram[offset + 1] & 0xe0) >> 5);
 	b = (ojankohs_paletteram[offset + 1] & 0x1f) >> 0;
 
-	palette_set_color_rgb(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( ojankoc_palette_w )
@@ -116,7 +115,7 @@ WRITE8_HANDLER( ojankoc_palette_w )
 	g = (color >>  5) & 0x1f;
 	b = (color >>  0) & 0x1f;
 
-	palette_set_color_rgb(Machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine,offset >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 

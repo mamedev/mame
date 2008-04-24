@@ -91,7 +91,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/pokey.h"
 #include "cloud9.h"
 
@@ -228,7 +227,7 @@ static WRITE8_HANDLER( irq_ack_w )
 {
 	if (irq_state)
 	{
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 		irq_state = 0;
 	}
 }

@@ -6,7 +6,6 @@ to be honest i think some of these cause more problems than they're worth ...
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvprot.h"
@@ -273,7 +272,7 @@ static READ32_HANDLER( hanagumi_speedup_r )
 static READ32_HANDLER( hanagumi_slave_off )
 {
 	/* just turn the slave off, i don't think the game needs it */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	return stv_workram_h[0x015438/4];
 }
@@ -464,7 +463,7 @@ static WRITE32_HANDLER(dnmtdeka_cmd_write)
 
 	if ( data != 0 ) dnmtdeka_pending_commands++;
 	//logerror( "CMD: Written by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpu_getactivecpu(), activecpu_get_pc(), offset, data, dnmtdeka_pending_commands );
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 }
 
 static READ32_HANDLER(dnmtdeka_cmd_read)
@@ -513,7 +512,7 @@ static WRITE32_HANDLER(diehard_cmd_write)
 
 	if ( data != 0 ) diehard_pending_commands++;
 	//logerror( "CMD: Written by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpu_getactivecpu(), activecpu_get_pc(), offset, data, diehard_pending_commands );
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 }
 
 static READ32_HANDLER(diehard_cmd_read)
@@ -537,7 +536,7 @@ static READ32_HANDLER(diehard_cmd_ack_read)
 	if ( (stv_workram_h[0x000e0dd8/4] & 0xff000000) == 0 &&
 		 diehard_pending_commands == 0 )
 	{
-		cpu_trigger(Machine, 1000);
+		cpu_trigger(machine, 1000);
 	}
 	return stv_workram_h[0x000e0dd8/4];
 }
@@ -556,7 +555,7 @@ static WRITE32_HANDLER(diehard_cmd_ack_write_cpu0)
 {
 	//logerror( "CMDACK: Write by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpu_getactivecpu(), activecpu_get_pc(), offset, data, diehard_pending_commands );
 	COMBINE_DATA(&stv_workram_h[0x000e0dd8/4]);
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 }
 
 DRIVER_INIT(diehard)
@@ -617,7 +616,7 @@ static READ32_HANDLER( bakubaku_speedup_r )
 
 static READ32_HANDLER( bakubaku_speedup2_r )
 {
-	if (activecpu_get_pc()==0x06033762) 	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	if (activecpu_get_pc()==0x06033762) 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 
 	return stv_workram_h[0x0033762/4];
 }
@@ -669,7 +668,7 @@ static READ32_HANDLER( groovef_speedup_r )
 /*
 static READ32_HANDLER( groovef_second_cpu_off_r )
 {
-    if (activecpu_get_pc()==0x060060c2)     cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+    if (activecpu_get_pc()==0x060060c2)     cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
     return 0;
 }
 */

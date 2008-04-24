@@ -71,7 +71,6 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/namco.h"
 
@@ -100,7 +99,7 @@ static WRITE8_HANDLER( sound_command_w )
 	sound_fetched = 0;
 	sound_command = data;
 	sound_cpu_ready = 0;
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( sound_command_r )

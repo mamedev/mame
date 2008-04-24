@@ -711,7 +711,7 @@ static READ8_HANDLER( ramdac_r )
 			if (*count == 0)
 			{
 				rgb_t color;
-				color = palette_get_color(Machine, ramdac.addr_r);
+				color = palette_get_color(machine, ramdac.addr_r);
 
 				ramdac.color_r[0] = RGB_RED(color);
 				ramdac.color_r[1] = RGB_GREEN(color);
@@ -755,7 +755,7 @@ static WRITE8_HANDLER( ramdac_w )
 			ramdac.color_w[ramdac.count_w] = pal6bit(data);
 			if (++ramdac.count_w == 3)
 			{
-				palette_set_color_rgb(Machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
+				palette_set_color_rgb(machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
 				ramdac.count_w = 0;
 				ramdac.addr_w++;
 			}
@@ -1292,7 +1292,7 @@ static MACHINE_RESET( bfcobra )
 
 	for (pal = 0; pal < 256; ++pal)
 	{
-		palette_set_color_rgb(Machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
+		palette_set_color_rgb(machine, pal, pal3bit((pal>>5)&7), pal3bit((pal>>2)&7), pal2bit(pal&3));
 	}
 
 	bank[0] = 1;
@@ -1380,7 +1380,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
-			cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, PULSE_LINE );
+			cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, PULSE_LINE );
 		}
  	}
 }

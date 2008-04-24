@@ -87,7 +87,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eeprom.h"

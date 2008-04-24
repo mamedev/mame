@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "mcr.h"
 
 
@@ -134,7 +133,7 @@ WRITE16_HANDLER( mcr68_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color_rgb(Machine, offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
+	palette_set_color_rgb(machine, offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
 
@@ -144,7 +143,7 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color_rgb(Machine, offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
+	palette_set_color_rgb(machine, offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
 

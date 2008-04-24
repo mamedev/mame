@@ -373,7 +373,7 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 
 	cpu_interrupt_enable(which,data);
 	if (!data)
-		cpunum_set_input_line(Machine, which, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, which, 0, CLEAR_LINE);
 }
 
 

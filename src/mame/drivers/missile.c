@@ -607,7 +607,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* color RAM */
 	else if (offset >= 0x4b00 && offset < 0x4c00)
-		palette_set_color_rgb(Machine, offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
+		palette_set_color_rgb(machine, offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
@@ -618,7 +618,7 @@ static WRITE8_HANDLER( missile_w )
 	{
 		if (irq_state)
 		{
-			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			irq_state = 0;
 		}
 	}

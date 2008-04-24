@@ -37,7 +37,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 #define MASTER_CLOCK 32000000
@@ -212,10 +211,10 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 	color = offset*2;
 
 	dat = paletteram32[offset]&0x7fff;
-	palette_set_color_rgb(Machine,color+1,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
+	palette_set_color_rgb(machine,color+1,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
 
 	dat = (paletteram32[offset]>>16)&0x7fff;
-	palette_set_color_rgb(Machine,color,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
+	palette_set_color_rgb(machine,color,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
 
 }
 

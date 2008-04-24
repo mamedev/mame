@@ -242,14 +242,14 @@ static WRITE8_HANDLER(pal_w)
 {
 	paletteram[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(Machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x100]));
+	palette_set_color_rgb(machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x100]));
 }
 
 static WRITE8_HANDLER(pal2_w)
 {
 	paletteram[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(Machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x200]));
+	palette_set_color_rgb(machine, offset, pal4bit(paletteram[offset] >> 4), pal4bit(paletteram[offset]), pal4bit(paletteram[offset+0x200]));
 }
 
 static READ8_HANDLER(pal_r)

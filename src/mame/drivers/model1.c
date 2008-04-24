@@ -880,7 +880,7 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	if (fifo_wptr >= FIFO_SIZE) fifo_wptr = 0;
 
 	// signal the 68000 that there's data waiting
-	cpunum_set_input_line(Machine, 1, 2, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
 	// give the 68k time to reply
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
 }

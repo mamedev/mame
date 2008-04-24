@@ -253,7 +253,7 @@ static WRITE32_HANDLER( paletteram32_macrossp_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -280,7 +280,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 		//logerror("%08x write soundcmd %08x (%08x)\n",activecpu_get_pc(),data,mem_mask);
 		soundlatch_word_w(machine,0,data >> 16,0xffff);
 		sndpending = 1;
-		cpunum_set_input_line(Machine, 1,2,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,2,HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 	}

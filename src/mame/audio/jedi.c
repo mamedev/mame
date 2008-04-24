@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/5220intf.h"
 #include "sound/pokey.h"
@@ -61,7 +60,7 @@ static SOUND_RESET( jedi )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -74,7 +73,7 @@ static WRITE8_HANDLER( irq_ack_w )
 
 WRITE8_HANDLER( jedi_audio_reset_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

@@ -101,7 +101,6 @@ z:      xxxx address bits a19 .. a16 for memory accesses with a15 1 ?
  */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6502.h"
 #include "m4510.h"
 

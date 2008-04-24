@@ -49,7 +49,6 @@ Games by Nihon Game/Culture Brain:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -80,18 +79,18 @@ static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 
 static WRITE8_HANDLER( shangkid_bbx_enable_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, data?0:1 );
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, data?0:1 );
 }
 
 static WRITE8_HANDLER( shangkid_cpu_reset_w )
 {
 	if( data == 0 )
 	{
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
@@ -115,7 +114,7 @@ static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 		{
 			if( data == 0x01 )
 				/* 0->1 transition triggers interrupt on Sound CPU */
-				cpunum_set_input_line(Machine, 2, 0, HOLD_LINE );
+				cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
 		}
 		break;
 
@@ -138,7 +137,7 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		{
 			if( data == 0x01 )
 				/* 0->1 transition triggers interrupt on Sound CPU */
-				cpunum_set_input_line(Machine, 2, 0, HOLD_LINE );
+				cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
 		}
 		else
 			memory_set_bank(2, data ? 0 : 1);

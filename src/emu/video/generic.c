@@ -677,7 +677,7 @@ PALETTE_INIT( RRRRR_GGGGGG_BBBBB )
 WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 {
 	paletteram[offset] = data;
-	palette_set_color_rgb(Machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
+	palette_set_color_rgb(machine, offset, pal3bit(data >> 5), pal3bit(data >> 2), pal2bit(data >> 0));
 }
 
 
@@ -688,7 +688,7 @@ WRITE8_HANDLER( paletteram_RRRGGGBB_w )
 WRITE8_HANDLER( paletteram_BBGGGRRR_w )
 {
 	paletteram[offset] = data;
-	palette_set_color_rgb(Machine, offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+	palette_set_color_rgb(machine, offset, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 }
 
 
@@ -701,7 +701,7 @@ WRITE8_HANDLER( paletteram_BBGGRRII_w )
 	int i = (data >> 0) & 3;
 
 	paletteram[offset] = data;
-	palette_set_color_rgb(Machine, offset, pal4bit(((data >> 0) & 0x0c) | i),
+	palette_set_color_rgb(machine, offset, pal4bit(((data >> 0) & 0x0c) | i),
 	                                   pal4bit(((data >> 2) & 0x0c) | i),
 	                                   pal4bit(((data >> 4) & 0x0c) | i));
 }
@@ -966,7 +966,7 @@ WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
 	data = paletteram16[offset];
-	palette_set_color_rgb(Machine, offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
+	palette_set_color_rgb(machine, offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
 	                                       pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
 	                                       pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
 }

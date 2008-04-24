@@ -5,7 +5,6 @@
  ***********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/decocass.h"
 
 static INT32 watchdog_count;
@@ -209,7 +208,7 @@ WRITE8_HANDLER( decocass_paletteram_w )
      * (ME/ input on 1st paletteram, inverter -> ME/ on 2nd)
      */
 	offset = (offset & 31) ^ 16;
-	colortable_palette_set_color(Machine->colortable, offset, MAKE_RGB(pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6)));
+	colortable_palette_set_color(machine->colortable, offset, MAKE_RGB(pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6)));
 }
 
 WRITE8_HANDLER( decocass_charram_w )

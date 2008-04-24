@@ -98,7 +98,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		gradius3_priority = data & 0x04;
 
 		/* bit 3 enables cpu B */
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
 		irqAen = data & 0x20;
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( sound_command_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 2,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )

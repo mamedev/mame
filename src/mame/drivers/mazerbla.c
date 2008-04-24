@@ -36,7 +36,6 @@ TO DO:
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 
 static UINT8 *cfb_ram;
@@ -284,7 +283,7 @@ static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
 {
 	zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 static READ8_HANDLER( cfb_zpu_int_req_clr )
@@ -293,7 +292,7 @@ static READ8_HANDLER( cfb_zpu_int_req_clr )
 
 	/* clear the INT line when there are no more interrupt requests */
 	if (zpu_int_vector==0xff)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -584,7 +583,7 @@ static WRITE8_HANDLER(cfb_backgnd_color_w)
 		bit0 = (data >> 0) & 0x01;
 		b = combine_3_weights(weights_b, bit0, bit1, bit2);
 
-		palette_set_color(Machine, 255, MAKE_RGB(r, g, b));
+		palette_set_color(machine, 255, MAKE_RGB(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
 	}
 }
@@ -977,7 +976,7 @@ UINT8 * rom = memory_region(REGION_CPU3) + (gfx_rom_bank * 0x2000) + 0x10000;
 						b = combine_3_weights(weights_b, bit0, bit1, bit2);
 
 						if ((x+y*16)<255)//keep color 255 free for use as background color
-							palette_set_color(Machine, x+y*16, MAKE_RGB(r, g, b));
+							palette_set_color(machine, x+y*16, MAKE_RGB(r, g, b));
 
 						lookup_RAM[ lookup_offs + x + y*16 ] = colour;
 					}
@@ -1114,11 +1113,11 @@ static INTERRUPT_GEN( sound_interrupt )
 
 static WRITE8_HANDLER( sound_int_clear_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 static WRITE8_HANDLER( sound_nmi_clear_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gg_led_ctrl_w )

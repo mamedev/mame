@@ -89,7 +89,6 @@ type1       type0           function
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "video/resnet.h"
 
@@ -524,9 +523,9 @@ WRITE16_HANDLER( sys16_paletteram_w )
 		gh = combine_6_weights(weights[1][1], g0, g1, g2, g3, g4, 1);
 		bh = combine_6_weights(weights[1][2], b0, b1, b2, b3, b4, 1);
 
-		palette_set_color( Machine, offset, MAKE_RGB(r, g, b) );
+		palette_set_color( machine, offset, MAKE_RGB(r, g, b) );
 
-		palette_set_color( Machine, offset+Machine->config->total_colors/2,MAKE_RGB(rs,gs,bs));
+		palette_set_color( machine, offset+machine->config->total_colors/2,MAKE_RGB(rs,gs,bs));
 	}
 }
 

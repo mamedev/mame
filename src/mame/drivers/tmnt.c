@@ -358,7 +358,7 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -636,7 +636,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (last == 0 && (data & 0x20) != 0)
-			cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+			cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 		last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -824,7 +824,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( ssriders_soundkludge_w )
 {
 	/* I think this is more than just a trigger */
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )

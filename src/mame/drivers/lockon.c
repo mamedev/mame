@@ -65,9 +65,9 @@ static WRITE16_HANDLER( adrst_w )
 	lockon_ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
-	cpunum_set_input_line(Machine, GROUND_CPU, INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(Machine, OBJECT_CPU, INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(Machine, SOUND_CPU,  INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, GROUND_CPU, INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, OBJECT_CPU, INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, SOUND_CPU,  INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ16_HANDLER( main_gnd_r )

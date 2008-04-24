@@ -345,7 +345,7 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 #ifdef PGMARM7SPEEDHACK
 //  cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	if (data!=0xaa) cpu_spinuntil_trigger(1000);
-	cpu_trigger(Machine, 1002);
+	cpu_trigger(machine, 1002);
 #else
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(100, 0));
@@ -376,11 +376,11 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-	cpu_trigger(Machine, 1000);
+	cpu_trigger(machine, 1000);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
 	cpu_spinuntil_trigger(1002);
 #else
-	cpunum_set_input_line(Machine, 2, ARM7_FIRQ_LINE, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, ARM7_FIRQ_LINE, PULSE_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
 	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif
@@ -419,8 +419,8 @@ static WRITE16_HANDLER ( z80_reset_w )
 
 	if(data == 0x5050) {
 		sndti_reset(SOUND_ICS2115, 0);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 		if(0) {
 			FILE *out;
 			out = fopen("z80ram.bin", "wb");
@@ -432,7 +432,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -487,11 +487,11 @@ static WRITE16_HANDLER( pgm_calendar_w )
 {
 	static mame_system_time systime;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 	// initialize the time, otherwise it crashes
 	if( !systime.time )
-		mame_get_base_datetime(Machine, &systime);
+		mame_get_base_datetime(machine, &systime);
 
 	CalCom <<= 1;
 	CalCom |= data & 1;
@@ -540,7 +540,7 @@ static WRITE16_HANDLER( pgm_calendar_w )
 				break;
 
 			case 0xf:  //Load Date
-				mame_get_base_datetime(Machine, &systime);
+				mame_get_base_datetime(machine, &systime);
 				break;
 		}
 	}

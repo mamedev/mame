@@ -35,7 +35,6 @@ Tomasz Slanina 20050225
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 
@@ -59,7 +58,7 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
 		{
 			a=paletteram[((i*8+j)*2)&0xff ];
 			b=paletteram[((i*8+j)*2+1)&0xff ];
-			palette_set_color_rgb(Machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			palette_set_color_rgb(machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }

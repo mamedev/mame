@@ -5,7 +5,6 @@ Atari Starship 1 video emulation
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/starshp1.h"
 
 UINT8 *starshp1_playfield_ram;

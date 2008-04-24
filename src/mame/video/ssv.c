@@ -136,7 +136,6 @@ Note: press Z to show some info on each sprite (debug builds only)
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "seta.h"
 #ifdef MAME_DEBUG
 #include "ui.h"
@@ -400,7 +399,7 @@ WRITE16_HANDLER( paletteram16_xrgb_swap_word_w )
 	g = data1 >> 8;
 	b = data1 & 0xff;
 
-	palette_set_color(Machine, offset>>1, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset>>1, MAKE_RGB(r, g, b));
 }
 
 /***************************************************************************

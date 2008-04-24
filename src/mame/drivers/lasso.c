@@ -28,7 +28,6 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "lasso.h"
 #include "sound/dac.h"

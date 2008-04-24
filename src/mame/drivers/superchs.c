@@ -34,7 +34,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -88,8 +87,8 @@ static WRITE32_HANDLER( cpua_ctrl_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) cpunum_set_input_line(Machine, 0,3,HOLD_LINE); /* Guess */
+		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		if (data&0x8000) cpunum_set_input_line(machine, 0,3,HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -108,7 +107,7 @@ static WRITE32_HANDLER( superchs_palette_w )
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( superchs_input_r )
@@ -222,7 +221,7 @@ static WRITE32_HANDLER( superchs_stick_w )
         different byte in this long word before the RTE.  I assume all but the last
         (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
 	if (mem_mask!=0xff000000)
-		cpunum_set_input_line(Machine, 0,3,HOLD_LINE);
+		cpunum_set_input_line(machine, 0,3,HOLD_LINE);
 }
 
 /***********************************************************

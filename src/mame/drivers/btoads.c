@@ -7,7 +7,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "btoads.h"
@@ -150,7 +149,7 @@ static WRITE8_HANDLER( sound_int_state_w )
 		sndti_reset(SOUND_BSMT2000, 0);
 
 	/* also clears interrupts */
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 	sound_int_state = data;
 }
 

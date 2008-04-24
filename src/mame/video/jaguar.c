@@ -733,11 +733,11 @@ READ32_HANDLER( cojag_gun_input_r )
 	switch (offset)
 	{
 		case 0:
-			get_crosshair_xy(Machine, 1, &beamx, &beamy);
+			get_crosshair_xy(machine, 1, &beamx, &beamy);
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 1:
-			get_crosshair_xy(Machine, 0, &beamx, &beamy);
+			get_crosshair_xy(machine, 0, &beamx, &beamy);
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 2:

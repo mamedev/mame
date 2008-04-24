@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT8 *popeye_background_pos;
 UINT8 *popeye_palettebank;

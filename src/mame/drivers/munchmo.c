@@ -64,7 +64,7 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )

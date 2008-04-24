@@ -331,7 +331,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		int r = BITSWAP8((x >>  0) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int g = BITSWAP8((x >>  5) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int b = BITSWAP8((x >> 10) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		palette_set_color_rgb(Machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -386,7 +386,7 @@ static WRITE8_HANDLER( nanajign_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(Machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -1263,7 +1263,7 @@ static WRITE8_HANDLER( tenkai_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(Machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 

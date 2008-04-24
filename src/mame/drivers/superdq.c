@@ -22,7 +22,6 @@
 
 #include "driver.h"
 #include "render.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/custom.h"
 #include "machine/laserdsc.h"
@@ -179,7 +178,7 @@ static WRITE8_HANDLER( superdq_io_w )
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	coin_counter_w( 0, data & 0x08 );
 	coin_counter_w( 1, data & 0x04 );

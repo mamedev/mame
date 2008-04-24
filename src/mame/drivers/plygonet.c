@@ -187,7 +187,7 @@ static WRITE32_HANDLER( sound_w )
 
 static WRITE32_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 }
 
 

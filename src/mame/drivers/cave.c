@@ -222,7 +222,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  sound_flag1 = 1;
 //  sound_flag2 = 1;
 	soundlatch_word_w(machine,offset,data,mem_mask);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 

@@ -35,7 +35,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "cpuintrf.h"
 #include "es5503.h"
 #include "streams.h"
@@ -377,7 +376,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 			case 0xe2:	// A/D converter
 				if (chip->adc_read)
 				{
-					return chip->adc_read(Machine, 0);
+					return chip->adc_read(machine, 0);
 				}
 				break;
 		}

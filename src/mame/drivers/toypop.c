@@ -30,7 +30,6 @@ TODO:
 ****************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "sound/namco.h"
 
@@ -162,7 +161,7 @@ static READ8_HANDLER( toypop_main_interrupt_enable_r )
 static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
 {
 	cpu_interrupt_enable(0,1);
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
@@ -173,7 +172,7 @@ static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
 static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
 {
 	cpu_interrupt_enable(1,1);
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
@@ -193,22 +192,22 @@ static INTERRUPT_GEN( toypop_main_interrupt )
 
 static WRITE8_HANDLER( toypop_sound_clear_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_sound_assert_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_clear_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( toypop_m68000_assert_w )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( disable_interrupts )

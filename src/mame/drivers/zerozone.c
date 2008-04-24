@@ -27,7 +27,6 @@ TODO:
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 VIDEO_START( zerozone );

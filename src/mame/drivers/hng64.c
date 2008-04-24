@@ -626,7 +626,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( hng64_port_read )

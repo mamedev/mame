@@ -146,7 +146,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	if (data==0x26) {
 		i8751_current_command=0;
 		i8751_return=0xff; /* This value is XOR'd and must equal 0 */
-		cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);
 		return;
 	}
 
@@ -193,7 +193,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Signal main cpu task is complete */
-	cpunum_set_input_line_and_vector(Machine, 0,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);
 	i8751_current_command=data;
 }
 

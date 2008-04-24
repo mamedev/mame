@@ -6,7 +6,6 @@
 
 #include "debugger.h"
 #include "cpuintrf.h"
-#include "deprecat.h"
 
 #include "host.h"
 #include "i86.h"

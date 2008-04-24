@@ -89,9 +89,9 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	/* the headlight (which have the shadow bit set) become highlights */
 	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	if (data & 0x08)
-		palette_set_shadow_factor(Machine,1/PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(machine,1/PALETTE_DEFAULT_SHADOW_FACTOR);
 	else
-		palette_set_shadow_factor(Machine,PALETTE_DEFAULT_SHADOW_FACTOR);
+		palette_set_shadow_factor(machine,PALETTE_DEFAULT_SHADOW_FACTOR);
 
 	if ((data & 0x80) != last)
 	{
@@ -102,7 +102,7 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 
 		/* only affect the background */
 		for (i = 512;i < 1024;i++)
-			palette_set_brightness(Machine,i,brt);
+			palette_set_brightness(machine,i,brt);
 	}
 
 //if ((data & 0xf8) && (data & 0xf8) != 0x88)
@@ -135,7 +135,7 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 
 

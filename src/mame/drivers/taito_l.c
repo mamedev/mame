@@ -312,7 +312,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	// fix Plotting test mode
 	if ((irq_enable & (1 << last_irq_level)) == 0)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( irq_enable_r )
@@ -1050,7 +1050,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER (evilston_snd_w)
 {
 	shared_ram[0x7fe]=data&0x7f;
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

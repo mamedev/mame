@@ -13,7 +13,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 static int sprite_flip, pow_charbase=0; //*
 static tilemap *fix_tilemap;
@@ -127,7 +126,7 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
 
-	palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 WRITE16_HANDLER( pow_video16_w )

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 
 
@@ -75,7 +74,7 @@ logerror("%04x: 68705 port B write %02x\n",activecpu_get_pc(),data);
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
+		if (main_sent) cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
 		main_sent = 0;
 logerror("read command %02x from main cpu\n",portA_in);
 	}
@@ -132,7 +131,7 @@ WRITE8_HANDLER( buggychl_mcu_w )
 logerror("%04x: mcu_w %02x\n",activecpu_get_pc(),data);
 	from_main = data;
 	main_sent = 1;
-	cpunum_set_input_line(Machine, 2,0,ASSERT_LINE);
+	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
 }
 
 READ8_HANDLER( buggychl_mcu_r )

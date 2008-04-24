@@ -166,9 +166,9 @@ WRITE16_HANDLER( vertigo_wsot_w )
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

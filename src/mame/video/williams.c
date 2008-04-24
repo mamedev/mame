@@ -92,7 +92,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/resnet.h"
 #include "williams.h"
 
@@ -379,7 +378,7 @@ WRITE8_HANDLER( williams2_paletteram_w )
 	b = ((entry_hi >> 0) & 15) * i;
 	g = ((entry_lo >> 4) & 15) * i;
 	r = ((entry_lo >> 0) & 15) * i;
-	palette_set_color(Machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 
 extern UINT8 *scotrsht_scroll;

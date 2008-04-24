@@ -3,7 +3,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT8 thief_read_mask, thief_write_mask;
 static UINT8 thief_video_control;
@@ -68,7 +67,7 @@ WRITE8_HANDLER( thief_color_map_w ){
 	int r = intensity[(data & 0x03) >> 0];
     int g = intensity[(data & 0x0C) >> 2];
     int b = intensity[(data & 0x30) >> 4];
-	palette_set_color( Machine,offset,MAKE_RGB(r,g,b) );
+	palette_set_color( machine,offset,MAKE_RGB(r,g,b) );
 }
 
 /***************************************************************************/

@@ -37,7 +37,6 @@
 /*****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -236,7 +235,7 @@ WRITE8_HANDLER( carnival_audio_2_w )
 
 	if ( bitsGoneHigh & OUT_PORT_2_MUSIC_RESET )
 		/* reset output is no longer asserted active low */
-		cpunum_set_input_line(Machine, CPU_MUSIC_ID, INPUT_LINE_RESET, PULSE_LINE );
+		cpunum_set_input_line(machine, CPU_MUSIC_ID, INPUT_LINE_RESET, PULSE_LINE );
 }
 
 

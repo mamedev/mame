@@ -5,7 +5,6 @@ Atari Poolshark Driver
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "poolshrk.h"
 #include "sound/discrete.h"
 
@@ -91,7 +90,7 @@ static READ8_HANDLER( poolshrk_input_r )
 
 static READ8_HANDLER( poolshrk_irq_reset_r )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	return 0;
 }

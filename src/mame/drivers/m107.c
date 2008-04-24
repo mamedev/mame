@@ -14,7 +14,6 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "m107.h"
 #include "machine/irem_cpu.h"
 #include "sound/2151intf.h"
@@ -146,7 +145,7 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 static WRITE16_HANDLER( m107_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpunum_set_input_line_and_vector(Machine, 0, 0, HOLD_LINE, M107_IRQ_3);
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_3);
 }
 
 /*****************************************************************************/

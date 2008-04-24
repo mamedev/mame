@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *bigtwin_bgvideoram;
 UINT16 *wbeachvl_videoram1,*wbeachvl_videoram2,*wbeachvl_videoram3;
@@ -251,7 +250,7 @@ WRITE16_HANDLER( bigtwin_paletteram_w )
 	g |= ((val & 0x04) >> 2);
 	b |= ((val & 0x02) >> 1);
 
-	palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 WRITE16_HANDLER( bigtwin_scroll_w )

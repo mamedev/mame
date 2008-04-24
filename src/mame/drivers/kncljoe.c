@@ -26,7 +26,6 @@ Updates:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
@@ -112,7 +111,7 @@ static READ8_HANDLER( m6803_port2_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER(unused_w)
@@ -257,7 +256,7 @@ static const struct AY8910interface ay8910_interface =
 
 static INTERRUPT_GEN (sound_nmi)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( kncljoe )

@@ -8,7 +8,6 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -101,7 +100,7 @@ char baf[40];
 
 static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( gbusters_snd_bankswitch_w )

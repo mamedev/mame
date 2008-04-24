@@ -329,7 +329,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
 }
 #endif
 

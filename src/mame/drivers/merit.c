@@ -31,7 +31,6 @@ Notes: it's important that REGION_USER1 is 0xa0000 bytes with empty space filled
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 
@@ -137,7 +136,7 @@ static WRITE8_HANDLER( palette_w )
 //      int bit = (i & 0x300)>>8;
 		offset = ((i & 0x7f)<<3) | ((i & 0x80) >> 5);
 
-		palette_set_color_rgb(Machine,i,
+		palette_set_color_rgb(machine,i,
 				pal4bit(BIT(paletteram[offset],0)*0x1 + BIT(paletteram[offset+1],0)*0x2 + BIT(paletteram[offset+2],0)*0x4 + BIT(paletteram[offset+3],0)*0x8),
 				pal4bit(BIT(paletteram[offset],1)*0x1 + BIT(paletteram[offset+1],1)*0x2 + BIT(paletteram[offset+2],1)*0x4 + BIT(paletteram[offset+3],1)*0x8),
 				pal4bit(BIT(paletteram[offset],2)*0x1 + BIT(paletteram[offset+1],2)*0x2 + BIT(paletteram[offset+2],2)*0x4 + BIT(paletteram[offset+3],2)*0x8));

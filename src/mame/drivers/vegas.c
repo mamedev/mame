@@ -660,7 +660,7 @@ static READ32_HANDLER( timekeeper_r )
 	{
 		/* get the time */
 		mame_system_time systime;
-		mame_get_base_datetime(Machine, &systime);
+		mame_get_base_datetime(machine, &systime);
 
 		/* return portions thereof */
 		switch (offset*4)

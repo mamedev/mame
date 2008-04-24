@@ -278,7 +278,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
 	/* D2 : SCONT1 - Tilemap origin bit 1 */
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 	sound_global_enable(data & 0x01);
@@ -291,8 +291,8 @@ static WRITE8_HANDLER( sub_control_adc_w )
 	/* D6 : INTR line on second CPU */
 	/* D5 : RESET line on second CPU */
 	/* D3-D2 : ADC_SELECT */
-	cpunum_set_input_line(Machine, 1, 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 	adc_select = (data >> 2) & 3;
 }
 

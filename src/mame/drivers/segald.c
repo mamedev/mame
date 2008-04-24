@@ -196,7 +196,7 @@ static WRITE8_HANDLER( astron_COLOR_write )
 	g = (lowBits  & 0xf0) >> 4;
 	b = (highBits & 0x0f);
 
-	/* palette_set_color(Machine, palIndex, r, g, b); */
+	/* palette_set_color(machine, palIndex, r, g, b); */
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, activecpu_get_pc());
 }
 

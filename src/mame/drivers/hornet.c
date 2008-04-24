@@ -416,14 +416,14 @@ static WRITE32_HANDLER(K037122_sram_w)
 		}
 		else if (offset >= 0x18000/4)
 		{
-			update_palette_color(Machine, chip, 0x18000, offset - (0x18000/4));
+			update_palette_color(machine, chip, 0x18000, offset - (0x18000/4));
 		}
 	}
 	else
 	{
 		if (offset < 0x8000/4)
 		{
-			update_palette_color(Machine, chip, 0, offset);
+			update_palette_color(machine, chip, 0, offset);
 		}
 		else if (offset >= 0x8000/4 && offset < 0x18000/4)
 		{
@@ -643,11 +643,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 			{
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
 			{
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 			set_cgboard_id((data >> 4) & 0x3);
 		}

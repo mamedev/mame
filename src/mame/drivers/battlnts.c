@@ -11,7 +11,6 @@ Preliminary driver by: Manuel Abadia <manu@teleline.es>
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/hd6309/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "video/konamiic.h"
@@ -30,7 +29,7 @@ static INTERRUPT_GEN( battlnts_interrupt )
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff);
+	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )

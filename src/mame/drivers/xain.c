@@ -208,28 +208,28 @@ static WRITE8_HANDLER( xain_main_irq_w )
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		cpunum_set_input_line(Machine, 0,INPUT_LINE_NMI,CLEAR_LINE);
+		cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,CLEAR_LINE);
+		cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
+		cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
+		cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,ASSERT_LINE);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( xain_irqA_assert_w )
 {
-	cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
+	cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( xain_irqB_clear_w )
 {
-	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 static READ8_HANDLER( xain_68705_r )

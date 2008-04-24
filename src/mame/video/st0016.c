@@ -105,8 +105,8 @@ WRITE8_HANDLER (st0016_palette_ram_w)
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		palette_set_color_rgb(Machine,UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	palette_set_color_rgb(Machine,color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		palette_set_color_rgb(machine,UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	palette_set_color_rgb(machine,color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
 READ8_HANDLER(st0016_character_ram_r)
@@ -117,7 +117,7 @@ READ8_HANDLER(st0016_character_ram_r)
 WRITE8_HANDLER(st0016_character_ram_w)
 {
 	st0016_charram[ST0016_CHAR_BANK_SIZE*st0016_char_bank+offset]=data;
-	decodechar(Machine->gfx[st0016_ramgfx], st0016_char_bank,(UINT8 *) st0016_charram);
+	decodechar(machine->gfx[st0016_ramgfx], st0016_char_bank,(UINT8 *) st0016_charram);
 }
 
 READ8_HANDLER(st0016_vregs_r)
@@ -421,9 +421,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static STATE_POSTLOAD( st0016_postload )
 {
 	int i;
-	st0016_rom_bank_w(Machine,0,st0016_rom_bank);
+	st0016_rom_bank_w(machine,0,st0016_rom_bank);
 	for(i=0;i<ST0016_MAX_CHAR_BANK;i++)
-		decodechar(Machine->gfx[st0016_ramgfx], i,(UINT8 *) st0016_charram);
+		decodechar(machine->gfx[st0016_ramgfx], i,(UINT8 *) st0016_charram);
 }
 
 

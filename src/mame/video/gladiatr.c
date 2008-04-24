@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT8 *gladiatr_videoram, *gladiatr_colorram, *gladiatr_textram;
 
@@ -118,7 +117,7 @@ WRITE8_HANDLER( gladiatr_paletteram_w )
 	g = (g << 1) + ((paletteram[offset + 0x400] >> 5) & 0x01);
 	b = (b << 1) + ((paletteram[offset + 0x400] >> 6) & 0x01);
 
-	palette_set_color_rgb(Machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 

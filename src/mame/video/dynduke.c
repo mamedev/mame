@@ -1,6 +1,5 @@
 
 #include "driver.h"
-#include "deprecat.h"
 
 static tilemap *bg_layer,*fg_layer,*tx_layer;
 UINT16 *dynduke_back_data,*dynduke_fore_data,*dynduke_scroll_ram;
@@ -16,7 +15,7 @@ WRITE16_HANDLER( dynduke_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	color=paletteram16[offset];
-	palette_set_color_rgb(Machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
+	palette_set_color_rgb(machine,offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 
 WRITE16_HANDLER( dynduke_background_w )

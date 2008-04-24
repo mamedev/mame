@@ -25,7 +25,6 @@ Dip locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
@@ -221,7 +220,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, 0, PULSE_LINE);
 }
 
 

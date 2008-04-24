@@ -223,7 +223,7 @@ INPUT_PORTS_END
 static WRITE16_HANDLER( galsnew_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb(Machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 static WRITE16_HANDLER( galsnew_6295_bankswitch_w )

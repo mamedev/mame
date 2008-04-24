@@ -63,7 +63,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "video/taitoic.h"
 #include "machine/eeprom.h"
@@ -97,7 +96,7 @@ static WRITE32_HANDLER( color_ram_w )
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
 
-		palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+		palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 	}
 }
 

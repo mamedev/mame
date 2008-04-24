@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define BMP_PAD		8
@@ -880,9 +879,9 @@ WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w )
 	g = ((newword >> 3) & 0x1E ) | ((newword >> 13) & 0x01);
 	b = ((newword >> 7) & 0x1E ) | ((newword >> 14) & 0x01);
 
-	palette_set_color_rgb(Machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	r>>=1; g>>=1; b>>=1;
-	palette_set_color_rgb(Machine, offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
+	palette_set_color_rgb(machine, offset+0x800, pal5bit(r)/2, pal5bit(g)/2, pal5bit(b)/2);
 }
 
 WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
@@ -891,7 +890,7 @@ WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w )
 
 	// the highest nibble has some unknown functions
 //  if (newword & 0xf000) logerror("MSN set on color %03x: %1x\n", offset, newword>>12);
-	palette_set_color_rgb(Machine, offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
+	palette_set_color_rgb(machine, offset, pal4bit(newword >> 0), pal4bit(newword >> 4), pal4bit(newword >> 8));
 }
 
 

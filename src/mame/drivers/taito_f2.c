@@ -846,7 +846,7 @@ static INT32 driveout_sound_latch = 0;
 
 static READ8_HANDLER( driveout_sound_command_r)
 {
-	cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n",driveout_sound_latch);
 	return driveout_sound_latch;
 }
@@ -887,7 +887,7 @@ static WRITE16_HANDLER ( driveout_sound_command_w )
 			else
 			{
 				driveout_sound_latch = ((data<<4) & 0xf0) | (driveout_sound_latch & 0x0f);
-				cpunum_set_input_line (Machine, 1, 0, ASSERT_LINE);
+				cpunum_set_input_line (machine, 1, 0, ASSERT_LINE);
 			}
 		}
 	}

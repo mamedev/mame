@@ -612,7 +612,7 @@ WRITE8_HANDLER( sindbadm_back_port_w )
 	{
 		/* port 0: irq ack */
 		case 0:
-			cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 			break;
 
 		/* port 1: background control

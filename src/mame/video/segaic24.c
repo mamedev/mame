@@ -23,7 +23,6 @@ System 24      68000x2  315-5292   315-5293  315-5294  315-5242        ym2151 da
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "segaic24.h"
 
 
@@ -65,7 +64,7 @@ WRITE16_HANDLER (system24temp_sys16_paletteram1_w)
 	r |= r >> 5;
 	g |= g >> 5;
 	b |= b >> 5;
-	set_color(Machine, offset, r, g, b, data & 0x8000);
+	set_color(machine, offset, r, g, b, data & 0x8000);
 }
 
 // - System 24

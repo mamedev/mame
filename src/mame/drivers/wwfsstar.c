@@ -141,10 +141,10 @@ static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 static WRITE16_HANDLER( wwfsstar_irqack_w )
 {
 	if(offset == 0)
-		cpunum_set_input_line(Machine, 0, 6, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
 
 	else
-		cpunum_set_input_line(Machine, 0, 5, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 5, CLEAR_LINE);
 }
 
 /*

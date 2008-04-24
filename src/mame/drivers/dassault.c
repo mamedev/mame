@@ -178,8 +178,8 @@ static WRITE16_HANDLER( dassault_sound_w )
 static READ16_HANDLER( dassault_irq_r )
 {
 	switch (offset) {
-		case 0: cpunum_set_input_line(Machine, 0, 5, CLEAR_LINE); break;
-		case 1: cpunum_set_input_line(Machine, 1, 6, CLEAR_LINE); break;
+		case 0: cpunum_set_input_line(machine, 0, 5, CLEAR_LINE); break;
+		case 1: cpunum_set_input_line(machine, 1, 6, CLEAR_LINE); break;
 	}
 	return shared_ram[(0xffc/2)+offset]; /* The values probably don't matter */
 }
@@ -187,8 +187,8 @@ static READ16_HANDLER( dassault_irq_r )
 static WRITE16_HANDLER( dassault_irq_w )
 {
 	switch (offset) {
-		case 0: cpunum_set_input_line(Machine, 0, 5, ASSERT_LINE); break;
-		case 1: cpunum_set_input_line(Machine, 1, 6, ASSERT_LINE); break;
+		case 0: cpunum_set_input_line(machine, 0, 5, ASSERT_LINE); break;
+		case 1: cpunum_set_input_line(machine, 1, 6, ASSERT_LINE); break;
 	}
 
 	COMBINE_DATA(&shared_ram[(0xffc/2)+offset]); /* The values probably don't matter */

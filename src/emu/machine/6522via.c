@@ -337,7 +337,7 @@ static TIMER_CALLBACK( via_t1_timeout )
 		UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
 		if (v->intf->out_b_func)
-			v->intf->out_b_func(Machine, 0, write_data);
+			v->intf->out_b_func(machine, 0, write_data);
 		else
 			logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_activecpu_get_pc(), write_data);
 	}

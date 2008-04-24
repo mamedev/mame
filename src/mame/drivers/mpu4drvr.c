@@ -1071,7 +1071,7 @@ static WRITE16_HANDLER( ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(Machine, entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
+			palette_set_color_rgb(machine, entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
 		}
 
 			/* Address register auto-increment */

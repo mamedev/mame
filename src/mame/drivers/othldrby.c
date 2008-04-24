@@ -68,7 +68,7 @@ static READ16_HANDLER( calendar_r )
 {
 	mame_system_time systime;
 
-	mame_get_base_datetime(Machine, &systime);
+	mame_get_base_datetime(machine, &systime);
 
 	switch (offset)
 	{

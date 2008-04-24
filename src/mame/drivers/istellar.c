@@ -22,7 +22,6 @@ Todo:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "render.h"
 #include "machine/laserdsc.h"
 
@@ -102,7 +101,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 	if (z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
 		z80_2_nmi_enable = 0;
 	}
 }

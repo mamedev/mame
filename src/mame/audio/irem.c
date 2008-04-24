@@ -145,7 +145,7 @@ static WRITE8_HANDLER( ay8910_1_porta_w )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 

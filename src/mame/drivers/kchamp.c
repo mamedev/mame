@@ -119,7 +119,7 @@ static WRITE8_HANDLER( control_w ) {
 
 static WRITE8_HANDLER( sound_reset_w ) {
 	if ( !( data & 1 ) )
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_control_w ) {
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( kc_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_reset_r ) {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 

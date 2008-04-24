@@ -12,7 +12,6 @@ Todo: Priority between tree0 and tree1.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 extern UINT8 changela_tree0_col;
@@ -785,7 +784,7 @@ WRITE8_HANDLER( changela_colors_w )
 	g = color_table[(c >> 3) & 0x07];
 	b = color_table[(c >> 6) & 0x07];
 
-	palette_set_color_rgb(Machine,color_index,r,g,b);
+	palette_set_color_rgb(machine,color_index,r,g,b);
 }
 
 

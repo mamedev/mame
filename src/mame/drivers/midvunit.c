@@ -19,7 +19,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/dcs.h"
@@ -147,7 +146,7 @@ static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 	{
-		cpunum_set_input_line(Machine, 0, 3, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
 		return adc_data << adc_shift;
 	}
 	else

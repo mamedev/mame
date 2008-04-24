@@ -586,9 +586,9 @@ WRITE8_HANDLER( namcos1_cpu_control_w )
 		namcos1_reset = data & 1;
 	}
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

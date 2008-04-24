@@ -68,7 +68,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "redalert.h"
 
@@ -96,7 +95,7 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 
 static READ8_HANDLER( redalert_interrupt_clear_r )
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
 	return video_screen_get_vpos(machine->primary_screen);

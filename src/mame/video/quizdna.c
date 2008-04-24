@@ -10,7 +10,6 @@ Video hardware
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT8 *quizdna_bg_ram;
 static UINT8 *quizdna_fg_ram;
@@ -133,7 +132,7 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 	g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);
 	b = ((d0 << 1) & 0x1e) | ((d1 >> 6) & 1);
 
-	palette_set_color_rgb(Machine,offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine,offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

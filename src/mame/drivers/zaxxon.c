@@ -305,7 +305,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/segacrpt.h"
 #include "machine/8255ppi.h"
 #include "audio/segasnd.h"
@@ -374,7 +373,7 @@ static WRITE8_HANDLER( int_enable_w )
 {
 	int_enabled = data & 1;
 	if (!int_enabled)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 

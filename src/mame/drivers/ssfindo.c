@@ -250,7 +250,7 @@ static WRITE32_HANDLER(FIFO_w)
 
 	if(!(data>>28))
 	{
-		palette_set_color_rgb(Machine, PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
+		palette_set_color_rgb(machine, PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
 		PS7500_FIFO[1]++; //autoinc
 	}
 }

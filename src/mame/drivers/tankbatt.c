@@ -56,7 +56,6 @@ Known issues:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
 
@@ -107,8 +106,8 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 	tankbatt_sound_enable = !data;
 	if (data != 0)
 	{
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
 	if (data) sample_stop (2);
@@ -120,8 +119,8 @@ static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 	tankbatt_nmi_enable = data;
 	if (data != 0)
 	{
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 //  interrupt_enable_w (offset, data);
 }

@@ -447,7 +447,7 @@ static WRITE8_HANDLER( exidy_shriot_w )
 		{
 			case 0:	/* port A */
 				if (has_mc3417)
-					cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+					cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				riot_porta_data = (riot_porta_data & ~riot_porta_ddr) | (data & riot_porta_ddr);
 				break;
 

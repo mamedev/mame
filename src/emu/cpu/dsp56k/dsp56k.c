@@ -19,7 +19,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "dsp56k.h"
 
 // #define PC_E000

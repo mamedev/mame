@@ -105,7 +105,7 @@ static WRITE16_HANDLER( pcup_prgbank_w )
 
 static WRITE16_HANDLER( paldat_w )
 {
-    palette_set_color_rgb(Machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+    palette_set_color_rgb(machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 static READ16_HANDLER( peno_rand )

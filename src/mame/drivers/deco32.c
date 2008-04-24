@@ -263,7 +263,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
 	switch (offset) {
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpunum_set_input_line(Machine, 0, ARM_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, CLEAR_LINE);
 		return 0;
 
 	case 3: /* Irq controller
@@ -607,9 +607,9 @@ static WRITE32_HANDLER( tattass_control_w )
 
 	/* Sound board reset control */
 	if (data&0x80)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bit 0x4 fade cancel? */
 	/* bit 0x8 ?? */

@@ -5,7 +5,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "debugger.h"
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
@@ -867,12 +866,12 @@ WRITE64_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 		}
         }
 

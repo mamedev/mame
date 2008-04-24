@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/avgdvg.h"
 #include "sound/5220intf.h"
 #include "cpu/m6502/m6502.h"
@@ -62,7 +61,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
 {
 	/* clear the line and reset the clock */
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	alpha_irq_clock = 0;
 	alpha_irq_clock_enable = 1;
 }
@@ -71,7 +70,7 @@ WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
 WRITE8_HANDLER( mhavoc_gamma_irq_ack_w )
 {
 	/* clear the line and reset the clock */
-	cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 	gamma_irq_clock = 0;
 }
 
@@ -320,7 +319,7 @@ WRITE8_HANDLER( mhavoc_out_0_w )
 	player_1 = (data >> 5) & 1;
 
 	/* Bit 3 = Gamma reset */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x08))
 	{
 		logerror("\t\t\t\t*** resetting gamma processor. ***\n");

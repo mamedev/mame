@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 
 static int gfxbank;
 
@@ -41,7 +40,7 @@ WRITE8_HANDLER( sichuan2_paletteram_w )
 
 	offset &= 0xff;
 
-	palette_set_color_rgb(Machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
+	palette_set_color_rgb(machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

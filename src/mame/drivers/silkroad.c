@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
@@ -142,7 +141,7 @@ VIDEO_UPDATE(silkroad);
 static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(Machine,offset,pal5bit(paletteram32[offset] >> (10+16)),pal5bit(paletteram32[offset] >> (5+16)),pal5bit(paletteram32[offset] >> (0+16)));
+	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> (10+16)),pal5bit(paletteram32[offset] >> (5+16)),pal5bit(paletteram32[offset] >> (0+16)));
 }
 
 /* player inputs */

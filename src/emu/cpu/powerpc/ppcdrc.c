@@ -5,7 +5,6 @@
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "ppc.h"
 #include "cpu/x86drc.h"
 

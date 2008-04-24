@@ -7,7 +7,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 #define BITMAP_WIDTH	304

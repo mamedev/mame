@@ -83,12 +83,12 @@ static INTERRUPT_GEN( iqblock_interrupt )
 
 static WRITE8_HANDLER( iqblock_irqack_w )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( iqblock_irqack_r )
 {
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	return 0;
 }
 

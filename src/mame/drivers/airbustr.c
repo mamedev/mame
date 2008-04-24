@@ -275,7 +275,7 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void airbustr_bankswitch(int cpunum, int data)
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( airbustr_paletteram_w )
 	paletteram[offset] = data;
 	val = (paletteram[offset | 1] << 8) | paletteram[offset & ~1];
 
-	palette_set_color_rgb(Machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
+	palette_set_color_rgb(machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
 
 static WRITE8_HANDLER( airbustr_coin_counter_w )

@@ -59,7 +59,6 @@ Word | Bit(s)           | Use
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "profiler.h"
 
 
@@ -212,7 +211,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 						if (flipy) dy = sy + sizey-15 - dy;
 						else dy = sy + dy;
 
-						drawgfx(rawbitmap,Machine->gfx[0],
+						drawgfx(rawbitmap,machine->gfx[0],
 								(tile & 0x0fff) | (code & 0xf000),
 								(tile >> 12) | (color & 0x70),
 								flipx,flipy,
@@ -226,7 +225,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 				int w;
 
 if (zoomx <= 1 && zoomy <= 1)
-	drawgfxzoom(rawbitmap,Machine->gfx[0],
+	drawgfxzoom(rawbitmap,machine->gfx[0],
 			code,
 			color,
 			flipx,flipy,
@@ -239,7 +238,7 @@ else
 
 				for (x = 0;x < w;x++)
 				{
-					drawgfxzoom(rawbitmap,Machine->gfx[0],
+					drawgfxzoom(rawbitmap,machine->gfx[0],
 							code,
 							color,
 							flipx,flipy,

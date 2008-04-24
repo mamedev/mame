@@ -262,7 +262,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )

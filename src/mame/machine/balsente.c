@@ -1014,8 +1014,8 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	counter_set_gate(0, (data >> 1) & 1);
 
 	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!(data & 0x04)) set_counter_0_ff(Machine, 1);
-	if (!(data & 0x10)) set_counter_0_ff(Machine, 0);
+	if (!(data & 0x04)) set_counter_0_ff(machine, 1);
+	if (!(data & 0x10)) set_counter_0_ff(machine, 0);
 
 	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
 	m6850_update_io();

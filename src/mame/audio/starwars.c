@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/5220intf.h"
 #include "includes/starwars.h"
@@ -88,7 +87,7 @@ READ8_HANDLER( starwars_m6532_r )
 
 		case 5: /* 0x85 - Read Interrupt Flag Register */
 			if (irq_flag)
-				cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+				cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 			temp = irq_flag;
 			irq_flag = 0;   /* Clear int flags */
 			return temp;
@@ -186,7 +185,7 @@ READ8_HANDLER( starwars_sin_r )
 {
 	port_A &= 0x7f; /* ready to receive new commands from main */
 	if (PA7_irq)
-		cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -240,6 +239,6 @@ WRITE8_HANDLER( starwars_soundrst_w )
 	port_A &= 0x3f;
 
 	/* reset sound CPU here  */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 }
 

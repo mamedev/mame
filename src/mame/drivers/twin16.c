@@ -53,7 +53,6 @@ Known Issues:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
@@ -171,13 +170,13 @@ static WRITE16_HANDLER( twin16_CPUA_register_w )
 	if( twin16_CPUA_register!=old )
 	{
 		if( (old&0x08)==0 && (twin16_CPUA_register&0x08) )
-			cpunum_set_input_line_and_vector(Machine, CPU_SOUND, 0, HOLD_LINE, 0xff );
+			cpunum_set_input_line_and_vector(machine, CPU_SOUND, 0, HOLD_LINE, 0xff );
 
 		if( (old&0x40) && (twin16_CPUA_register&0x40)==0 )
 			twin16_spriteram_process();
 
 		if( (old&0x10)==0 && (twin16_CPUA_register&0x10) )
-			cpunum_set_input_line(Machine, CPU_B, MC68000_IRQ_6, HOLD_LINE );
+			cpunum_set_input_line(machine, CPU_B, MC68000_IRQ_6, HOLD_LINE );
 
 		coin_counter_w( 0, twin16_CPUA_register&0x01 );
 		coin_counter_w( 1, twin16_CPUA_register&0x02 );
@@ -199,7 +198,7 @@ static WRITE16_HANDLER( twin16_CPUB_register_w )
 	{
 		if( (old&0x01)==0 && (twin16_CPUB_register&0x1) )
 		{
-			cpunum_set_input_line(Machine, CPU_A, MC68000_IRQ_6, HOLD_LINE );
+			cpunum_set_input_line(machine, CPU_A, MC68000_IRQ_6, HOLD_LINE );
 		}
 	}
 }
@@ -211,7 +210,7 @@ static WRITE16_HANDLER( fround_CPU_register_w )
 	if( twin16_CPUA_register!=old )
 	{
 		if( (old&0x08)==0 && (twin16_CPUA_register&0x08) )
-			cpunum_set_input_line_and_vector(Machine, CPU_SOUND, 0, HOLD_LINE, 0xff ); // trigger IRQ on sound CPU
+			cpunum_set_input_line_and_vector(machine, CPU_SOUND, 0, HOLD_LINE, 0xff ); // trigger IRQ on sound CPU
 	}
 }
 

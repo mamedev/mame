@@ -286,7 +286,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpunum_set_input_line(Machine, 0,2,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,2,HOLD_LINE);
 }
 
 
@@ -2956,7 +2956,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpunum_set_input_line(Machine, 0,4,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
 }
 
 

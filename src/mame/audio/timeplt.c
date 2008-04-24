@@ -11,7 +11,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/flt_rc.h"
 #include "timeplt.h"
@@ -110,7 +109,7 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 	if (timeplt_last_irq_state == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 	}
 
 	timeplt_last_irq_state = data;

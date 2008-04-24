@@ -87,7 +87,7 @@ static WRITE16_HANDLER( pkscramble_output_w )
 
 	if (!(out & 0x2000) && interrupt_line_active)
 	{
-	    cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+	    cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 		interrupt_line_active = 0;
 	}
 

@@ -132,7 +132,7 @@ static WRITE8_HANDLER( exzisus_sharedram_ac_w )
 
 static WRITE8_HANDLER( exzisus_cpub_reset_w )
 {
-	cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0

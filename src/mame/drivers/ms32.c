@@ -289,7 +289,7 @@ static READ32_HANDLER( ms32_sound_r )
 
 static WRITE32_HANDLER( reset_sub_w )
 {
-	if(data) cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
 
 

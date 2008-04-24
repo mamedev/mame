@@ -1244,7 +1244,7 @@ static WRITE16_HANDLER( winrun_dsp_complete_w )
 	if( data )
 	{
 		winrun_flushpoly();
-		cpunum_set_input_line(Machine, 4, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(machine, 4, INPUT_LINE_RESET, PULSE_LINE);
 		namcos21_ClearPolyFrameBuffer();
 	}
 }

@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "includes/docastle.h"
 
@@ -57,7 +56,7 @@ WRITE8_HANDLER( docastle_shared0_w )
 
 	if (offset == 8)
 		/* awake the master CPU */
-		cpu_trigger(Machine, 500);
+		cpu_trigger(machine, 500);
 }
 
 
@@ -79,5 +78,5 @@ WRITE8_HANDLER( docastle_shared1_w )
 
 WRITE8_HANDLER( docastle_nmitrigger_w )
 {
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }

@@ -54,7 +54,6 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "megasys1.h"
 
 /* Variables only used here: */
@@ -298,9 +297,9 @@ WRITE16_HANDLER( bigrun_vregs_w )
 		case 0x2208/2   : break;	// watchdog reset
 
 		/* Not sure about this one.. */
-		case 0x2308/2   :	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
-							cpunum_set_input_line(Machine, 3, INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		case 0x2308/2   :	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (new_data & 2) ? ASSERT_LINE : CLEAR_LINE );
+							cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, (new_data & 1) ? ASSERT_LINE : CLEAR_LINE );
 							break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);

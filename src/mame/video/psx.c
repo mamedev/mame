@@ -614,7 +614,7 @@ static STATE_POSTLOAD( updatevisiblearea )
 	visarea.min_x = visarea.min_y = 0;
 	visarea.max_x = m_n_screenwidth - 1;
 	visarea.max_y = m_n_screenheight - 1;
-	video_screen_configure(Machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
+	video_screen_configure(machine->primary_screen, m_n_screenwidth, m_n_screenheight, &visarea, HZ_TO_ATTOSECONDS(refresh));
 }
 
 static void psx_gpu_init( running_machine *machine )

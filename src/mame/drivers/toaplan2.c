@@ -684,8 +684,8 @@ WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 		#if USE_V25
 		/* only the ram-based V25 based games access the following bits */
-		//cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		//cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 		#endif
 
 	}
@@ -1238,20 +1238,20 @@ static WRITE16_HANDLER( raizing_clear_sndirq_w )
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cpunum_set_input_line(Machine, 0, raizing_sndirq_line, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, raizing_sndirq_line, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_sndirq_w )
 {
 	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cpunum_set_input_line(Machine, 0, raizing_sndirq_line, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, raizing_sndirq_line, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_clear_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1577,7 +1577,7 @@ ADDRESS_MAP_END
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	/* 0x18 used */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 }
 #endif
 

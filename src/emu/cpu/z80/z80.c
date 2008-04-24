@@ -94,7 +94,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "z80.h"
 #include "z80daisy.h"
 

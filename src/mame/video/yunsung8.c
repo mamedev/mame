@@ -28,7 +28,6 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 /* Variables that driver has access to: */
 
@@ -83,7 +82,7 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
 
 		/* BBBBBGGGGGRRRRRx */
-		palette_set_color_rgb(Machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
+		palette_set_color_rgb(machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
 	}
 	else
 	{

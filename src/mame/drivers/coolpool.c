@@ -25,7 +25,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
 #include "cpu/tms32025/tms32025.h"
@@ -221,7 +220,7 @@ static WRITE16_HANDLER( amerdart_misc_w )
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bits 10-15 are counted down over time */
 	if (data & 0x0400) amerdart_iop_echo = 1;
@@ -298,7 +297,7 @@ static WRITE16_HANDLER( coolpool_misc_w )
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -331,7 +330,7 @@ static WRITE16_HANDLER( coolpool_iop_w )
 static READ16_HANDLER( coolpool_iop_r )
 {
 	logerror("%08x:IOP read %04x\n",activecpu_get_pc(),iop_answer);
-	cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 
 	return iop_answer;
 }
@@ -357,7 +356,7 @@ static WRITE16_HANDLER( dsp_answer_w )
 {
 	logerror("%08x:IOP answer %04x\n",activecpu_get_pc(),data);
 	iop_answer = data;
-	cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 }
 
 

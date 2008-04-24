@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/vlm5030.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
@@ -90,7 +89,7 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
     if (last == 0 && data)
     {
         /* setting bit 0 low then high triggers IRQ on the sound CPU */
-        cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+        cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
     }
 
     last = data;

@@ -95,7 +95,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 static UINT32 *gstream_vram;
@@ -112,12 +111,12 @@ static WRITE32_HANDLER( gstream_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 
-	palette_set_color_rgb(Machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
+	palette_set_color_rgb(machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
 		                             pal5bit(paletteram32[offset] >> (6+16)),
 									 pal5bit(paletteram32[offset] >> (11+16)));
 
 
-	palette_set_color_rgb(Machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
+	palette_set_color_rgb(machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
 		                             pal5bit(paletteram32[offset] >> (6)),
 									 pal5bit(paletteram32[offset] >> (11)));
 }

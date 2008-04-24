@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "lockon.h"
 #include "video/resnet.h"
 #include "cpu/nec/nec.h"
@@ -170,7 +169,7 @@ PALETTE_INIT( lockon )
 			b = compute_res_net( (p1 & 0x1f), 2, &lockon_pd_net_info );
 		}
 
-		palette_set_color(Machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -330,8 +329,8 @@ WRITE16_HANDLER( lockon_ground_ctrl_w )
 
 static TIMER_CALLBACK( bufend_callback )
 {
-	cpunum_set_input_line_and_vector(Machine, GROUND_CPU, 0, HOLD_LINE, 0xff);
-	cpunum_set_input_line(Machine, OBJECT_CPU, NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	cpunum_set_input_line_and_vector(machine, GROUND_CPU, 0, HOLD_LINE, 0xff);
+	cpunum_set_input_line(machine, OBJECT_CPU, NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 /* Get data for a each 8x8x3 ground tile */
@@ -659,7 +658,7 @@ WRITE16_HANDLER( lockon_tza112_w )
 
 READ16_HANDLER( lockon_obj_4000_r )
 {
-	cpunum_set_input_line(Machine, OBJECT_CPU, NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	cpunum_set_input_line(machine, OBJECT_CPU, NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 
@@ -695,8 +694,8 @@ WRITE16_HANDLER( lockon_fb_clut_w )
 {
 	rgb_t color;
 
-	color = palette_get_color(Machine, 0x300 + (data & 0xff));
-	palette_set_color(Machine, 0x400 + offset, color);
+	color = palette_get_color(machine, 0x300 + (data & 0xff));
+	palette_set_color(machine, 0x400 + offset, color);
 }
 
 /* Rotation control register */

@@ -1785,14 +1785,14 @@ static WRITE8_HANDLER(internal_ram_write)
 /* Different chip types handle differently, for speed, simply call the chip's handler */
 static READ8_HANDLER(internal_ram_iread)
 {
-	return i8051.iram_iread(Machine,offset);
+	return i8051.iram_iread(machine,offset);
 }
 
 /* Writes the contents of the Internal RAM memory (BUT CALLED FROM AN INDIRECT ADDRESSING MODE)   */
 /* Different chip types handle differently, for speed, simply call the chip's handler */
 static WRITE8_HANDLER(internal_ram_iwrite)
 {
-	i8051.iram_iwrite(Machine,offset,data);
+	i8051.iram_iwrite(machine,offset,data);
 }
 
 /*Generate an external ram address for read/writing using indirect addressing mode */
@@ -1804,7 +1804,7 @@ static WRITE8_HANDLER(internal_ram_iwrite)
 static READ32_HANDLER(external_ram_iaddr)
 {
     if(i8051.eram_iaddr_callback)
-        return i8051.eram_iaddr_callback(Machine,offset,mem_mask);
+        return i8051.eram_iaddr_callback(machine,offset,mem_mask);
     else
         LOG(("i8051 #%d: external ram address requested (8 bit offset=%02x), but no callback available! at PC:%04x\n", cpu_getactivecpu(), offset, PC));
 

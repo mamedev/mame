@@ -244,13 +244,13 @@ static WRITE16_HANDLER( fromanc2_subcpu_w )
 {
 	fromanc2_datalatch1 = data;
 
-	cpunum_set_input_line(Machine, 2, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 	fromanc2_subcpu_int_flag = 0;
 }
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 	fromanc2_subcpu_nmi_flag = 0;
 
 	return (fromanc2_datalatch_2h << 8) | fromanc2_datalatch_2l;

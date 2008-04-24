@@ -407,7 +407,6 @@ STOP            01001000  10111011          12  stop
 
 #include "debugger.h"
 #include "upd7810.h"
-#include "deprecat.h"
 
 static UPD7810 upd7810;
 static int upd7810_icount;

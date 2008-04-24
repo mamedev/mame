@@ -119,7 +119,7 @@ static VIDEO_UPDATE( leprechn )
 
 static WRITE8_HANDLER( video_data_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	state->video_data = data;
 }
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( video_data_w )
 
 static WRITE8_HANDLER( gameplan_video_command_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	state->video_command = data & 0x07;
 }
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( gameplan_video_command_w )
 
 static WRITE8_HANDLER( leprechn_video_command_w )
 {
-	gameplan_state *state = Machine->driver_data;
+	gameplan_state *state = machine->driver_data;
 
 	state->video_command = (data >> 3) & 0x07;
 }

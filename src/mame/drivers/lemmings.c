@@ -69,7 +69,7 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 	g = (paletteram16[offset+1] >> 8) & 0xff;
 	r = (paletteram16[offset+1] >> 0) & 0xff;
 
-	palette_set_color(Machine,offset/2,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset/2,MAKE_RGB(r,g,b));
 }
 
 static WRITE16_HANDLER( lemmings_sound_w )
@@ -80,7 +80,7 @@ static WRITE16_HANDLER( lemmings_sound_w )
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
-	cpunum_set_input_line(Machine, 1,1,CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,1,CLEAR_LINE);
 }
 
 /******************************************************************************/

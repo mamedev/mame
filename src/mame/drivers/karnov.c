@@ -315,7 +315,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			cpunum_set_input_line(Machine, 0,7,CLEAR_LINE);
+			cpunum_set_input_line(machine, 0,7,CLEAR_LINE);
 			break;
 	}
 }

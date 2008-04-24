@@ -118,7 +118,6 @@ e000-e001   YM2203
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"
@@ -214,7 +213,7 @@ static WRITE8_HANDLER( protection_clock_w )
 
 static WRITE8_HANDLER( combasc_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( combasc_play_w )

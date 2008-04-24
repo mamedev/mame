@@ -362,7 +362,7 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	{
 		case 0x0e:
 			tmaster_draw();
-			cpunum_set_input_line(Machine, 0, 2, HOLD_LINE);
+			cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 			break;
 	}
 }
@@ -484,7 +484,7 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 		palette_data[palette_index] = data & 0xff;
 		if (++palette_index == 3)
 		{
-			palette_set_color(Machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
+			palette_set_color(machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
 			palette_index = 0;
 			palette_offset++;
 		}

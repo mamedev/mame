@@ -661,7 +661,7 @@ static TIMER_CALLBACK( sound_update )
 	profiler_mark(PROFILER_SOUND);
 
 	/* force all the speaker streams to generate the proper number of samples */
-	for (curspeak = speaker_output_first(Machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
+	for (curspeak = speaker_output_first(machine->config); curspeak != NULL; curspeak = speaker_output_next(curspeak))
 	{
 		speaker_info *spk = curspeak->token;
 		const stream_sample_t *stream_buf;

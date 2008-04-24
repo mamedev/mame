@@ -1497,7 +1497,7 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				if ( !(old_data&1) && (data&1) )
-					cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+					cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 				old_data = data;
 			}
 			break;
@@ -2704,7 +2704,7 @@ static READ8_HANDLER( wiggie_soundlatch_r )
 static WRITE16_HANDLER( wiggie_soundlatch_w )
 {
 	wiggie_soundlatch = data >> 8;
-	cpunum_set_input_line(Machine, 1,0, HOLD_LINE);
+	cpunum_set_input_line(machine, 1,0, HOLD_LINE);
 }
 
 

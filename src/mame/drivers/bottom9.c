@@ -97,7 +97,7 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,HOLD_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
 }
 
 static int nmienable;

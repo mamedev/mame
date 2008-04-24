@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 UINT16 *nemesis_videoram1b;
 UINT16 *nemesis_videoram2b;
@@ -94,7 +93,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_w )
 	else
 	{
 		if (data & 0x100)
-			cpunum_set_input_line_and_vector(Machine, 1, 0, HOLD_LINE, 0xff);
+			cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
 	}
 }
 
@@ -149,7 +148,7 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 	bit5=(data >>  14)&1;
 	b = MULTIPLIER;
 
-	palette_set_color(Machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( salamander_palette_word_w )
@@ -158,7 +157,7 @@ WRITE16_HANDLER( salamander_palette_word_w )
 	offset &= ~1;
 
 	data = ((paletteram16[offset] << 8) & 0xff00) | (paletteram16[offset+1] & 0xff);
-	palette_set_color_rgb(Machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb(machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 WRITE16_HANDLER( nemesis_videoram1b_word_w )

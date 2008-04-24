@@ -15,7 +15,6 @@ Todo:
 
 #include "driver.h"
 #include "render.h"
-#include "deprecat.h"
 #include "machine/laserdsc.h"
 #include "cpu/cop400/cop400.h"
 
@@ -156,7 +155,7 @@ static WRITE8_HANDLER(data_write_cop)
 
 static WRITE8_HANDLER(intrq_w)
 {
-	cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER(sc01_register_w)
@@ -181,7 +180,7 @@ static WRITE8_HANDLER(sc01_register_w)
 						SET_Z80_SSI_REQUEST();
 				        if (!(Z80_SSI_REQUEST()))
 							logerror("SETTING IRQ LINE sc01\n");
-				            cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+				            cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 						break;
 
 					default:
@@ -290,7 +289,7 @@ static WRITE8_HANDLER(cop_d_write)
 	/* Assert the Z80's interrupt line if necessary */
 	if (irq_flag)
 	{
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	}
 }
 

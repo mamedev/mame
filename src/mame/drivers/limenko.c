@@ -24,7 +24,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
@@ -64,13 +63,13 @@ static WRITE32_HANDLER( limenko_paletteram_w )
 	if(ACCESSING_BITS_0_15)
 	{
 		paldata = paletteram32[offset] & 0x7fff;
-		palette_set_color_rgb(Machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		palette_set_color_rgb(machine, offset * 2 + 1, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 
 	if(ACCESSING_BITS_16_31)
 	{
 		paldata = (paletteram32[offset] >> 16) & 0x7fff;
-		palette_set_color_rgb(Machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
+		palette_set_color_rgb(machine, offset * 2 + 0, pal5bit(paldata >> 0), pal5bit(paldata >> 5), pal5bit(paldata >> 10));
 	}
 }
 

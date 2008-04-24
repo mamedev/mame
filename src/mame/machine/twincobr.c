@@ -159,7 +159,7 @@ WRITE16_HANDLER( twincobr_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			LOG(("Turning the main CPU on\n"));
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		twincobr_dsp_BIO = ASSERT_LINE;

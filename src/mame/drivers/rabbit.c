@@ -473,7 +473,7 @@ static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(Machine,offset^0xff,MAKE_RGB(r,g,b));
+	palette_set_color(machine,offset^0xff,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( rabbit_tilemap0_r )
@@ -792,7 +792,7 @@ static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(Machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
+	palette_set_color(machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
 }
 
 

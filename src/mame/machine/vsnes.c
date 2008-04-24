@@ -1171,7 +1171,7 @@ static int ret;
 static WRITE8_HANDLER ( set_bnglngby_irq_w )
 {
 	ret = data;
-	cpunum_set_input_line(Machine, 0, 0, ( data & 2 ) ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, 0, 0, ( data & 2 ) ? ASSERT_LINE : CLEAR_LINE );
 	/* other values ??? */
 	/* 0, 4, 84 */
 }
@@ -1257,7 +1257,7 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 	ppu2c0x_set_videorom_bank( cpu_getactivecpu(), 0, 8, ( data & 4 ) ? 1 : 0, 512 );
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
-	cpunum_set_input_line(Machine, other_cpu, 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpunum_set_input_line(machine, other_cpu, 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* move along */
 	if ( cpu_getactivecpu() == 0 )

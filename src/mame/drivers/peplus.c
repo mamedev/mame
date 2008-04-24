@@ -151,7 +151,6 @@ Stephh's log (2007.11.28) :
 ***********************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "cpu/i8051/i8051.h"
 #include "machine/i2cmem.h"
@@ -258,7 +257,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(Machine, (15 + (i*16)), MAKE_RGB(r, g, b));
+		palette_set_color(machine, (15 + (i*16)), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -494,7 +493,7 @@ static READ32_HANDLER( peplus_external_ram_iaddr )
 /* Last Color in Every Palette is bgcolor */
 static READ8_HANDLER( peplus_bgcolor_r )
 {
-	return palette_get_color(Machine, 15); // Return bgcolor from First Palette
+	return palette_get_color(machine, 15); // Return bgcolor from First Palette
 }
 
 static READ8_HANDLER( peplus_dropdoor_r )

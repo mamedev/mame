@@ -247,7 +247,7 @@ static WRITE16_HANDLER( system_control_w )
 
 	dsp_HOLD_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",activecpu_get_previouspc(),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
 }
@@ -295,7 +295,7 @@ static WRITE16_HANDLER( airsys_paletteram16_w )	/* xxBBBBxRRRRxGGGG */
 	COMBINE_DATA(&paletteram16[offset]);
 
 	a = paletteram16[offset];
-	palette_set_color_rgb(Machine,offset,pal4bit(a >> 0),pal4bit(a >> 5),pal4bit(a >> 10));
+	palette_set_color_rgb(machine,offset,pal4bit(a >> 0),pal4bit(a >> 5),pal4bit(a >> 10));
 }
 
 

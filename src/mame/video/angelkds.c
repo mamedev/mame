@@ -7,7 +7,6 @@ enable / disable tilemap bits might be wrong
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 static tilemap *tx_tilemap,*bgbot_tilemap ,*bgtop_tilemap;
@@ -254,7 +253,7 @@ WRITE8_HANDLER( angelkds_paletteram_w )
 	paletteram[offset] = data;
 
 	no=offset & 0xff;
-	palette_set_color_rgb(Machine,no,pal4bit(paletteram[no]),pal4bit(paletteram[no]>>4),pal4bit(paletteram[no+0x100]));
+	palette_set_color_rgb(machine,no,pal4bit(paletteram[no]),pal4bit(paletteram[no]>>4),pal4bit(paletteram[no+0x100]));
 }
 
 /*** Video Start & Update

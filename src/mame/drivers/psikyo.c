@@ -381,7 +381,7 @@ static READ8_HANDLER( psikyo_soundlatch_r )
 
 static WRITE8_HANDLER( psikyo_clear_nmi_w )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
 	z80_nmi = 0;
 }
 

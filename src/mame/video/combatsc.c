@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 
 static tilemap *bg_tilemap[2];

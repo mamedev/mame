@@ -2262,13 +2262,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 
 		}
 	}
@@ -2278,13 +2278,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 	else // word access
@@ -2293,13 +2293,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 }
@@ -2312,13 +2312,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -2328,13 +2328,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 
 		}
@@ -2345,13 +2345,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE );
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(Machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}

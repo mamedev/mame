@@ -14,7 +14,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 extern UINT16 twin16_custom_video;
 extern UINT16 *twin16_gfx_rom;
@@ -50,7 +49,7 @@ WRITE16_HANDLER( twin16_paletteram_word_w )
 	offset &= ~1;
 
 	data = ((paletteram16[offset] & 0xff) << 8) | (paletteram16[offset + 1] & 0xff);
-	palette_set_color_rgb(Machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
+	palette_set_color_rgb(machine, offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 
 WRITE16_HANDLER( fround_gfx_bank_w )

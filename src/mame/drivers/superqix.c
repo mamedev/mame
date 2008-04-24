@@ -291,7 +291,7 @@ static WRITE8_HANDLER( mcu_p3_w )
 
 static READ8_HANDLER( nmi_ack_r )
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 

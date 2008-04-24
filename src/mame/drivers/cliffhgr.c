@@ -190,7 +190,7 @@ static WRITE8_HANDLER( cliff_coin_counter_w )
 static READ8_HANDLER( cliff_irq_ack_r )
 {
 	/* deassert IRQ on the CPU */
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 
 	return 0x00;
 }
