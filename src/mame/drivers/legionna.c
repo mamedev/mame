@@ -1368,6 +1368,42 @@ ROM_END
 
 ROM_START( heatbrl )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 68000 code */
+	ROM_LOAD32_BYTE( "1e_ver3.9k",   0x00000, 0x20000, CRC(6b41fbac) SHA1(aa987386be40439450bc02f97e57dc833b32fa63) )
+	ROM_LOAD32_BYTE( "2e_ver3.9m",   0x00001, 0x20000, CRC(dd21969b) SHA1(735e6984ac7b83c10bf4a90608fa3548db62cabc) )
+	ROM_LOAD32_BYTE( "3e_ver3.9f",   0x00002, 0x20000, CRC(09544a91) SHA1(5c24fbf642dd4c40ee21664bdc7b837e8a15b8bb) )
+	ROM_LOAD32_BYTE( "4e_ver3.9h",   0x00003, 0x20000, CRC(ebd34559) SHA1(9d565eb144b9239769a272990c1d1e22e72e3f0c) )
+
+	ROM_REGION( 0x20000, REGION_CPU2, 0 )	/* Z80 code, banked data */
+	ROM_LOAD( "barrel.7",   0x00000, 0x08000, CRC(0784dbd8) SHA1(bdf7f8a3a3eb346eb2aeaf4f9bfc49af059d04c9) )
+	ROM_CONTINUE(    0x10000, 0x08000 )	/* banked stuff */
+	ROM_COPY( REGION_CPU2, 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "barrel.6",   0x000000, 0x10000, CRC(bea3c581) SHA1(7f7f0a74bf106acaf57c182d47f0c707da2011bd) )	/* chars */
+	ROM_LOAD16_BYTE( "barrel.5",   0x000001, 0x10000, CRC(5604d155) SHA1(afc30347b1e1316ec25056c0c1576f78be5f1a72) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "obj1",     0x000000, 0x100000, CRC(f7a7c31c) SHA1(683e5c7a0732ff5fd56167dd82035ca050de0507) )	/* sprites */
+	ROM_LOAD( "obj2",     0x100000, 0x100000, CRC(24236116) SHA1(b27bd771cacd1587d4927e3f489c4f54b5dec110) )
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_LOAD( "bg-1",     0x000000, 0x100000, CRC(2f5d8baa) SHA1(0bf687c46c603150eadb304adcd78d53a338e615) )
+
+	ROM_REGION( 0x020000, REGION_GFX4, ROMREGION_DISPOSE )	/* not used? */
+	ROM_COPY( REGION_GFX1, 0x010000, 0x000000, 0x010000 ) // this is just corrupt tiles if we decode it
+
+	ROM_REGION( 0x080000, REGION_GFX5, ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_LOAD( "bg-3",     0x000000, 0x080000, CRC(83850e2d) SHA1(cdc2df8e3bc58319c50768ea2a05b9c7ddc2a652) )
+
+	ROM_REGION( 0x080000, REGION_GFX6, ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_LOAD( "bg-2",     0x000000, 0x080000, CRC(77ee4c6f) SHA1(a0072331bc970ba448ac5bb1ae5caa0332c82a99) )
+
+	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* ADPCM samples */
+	ROM_LOAD( "barrel.8",  0x00000, 0x20000, CRC(489e5b1d) SHA1(ecd69d87ed354d1d08dbe6c2890af5f05d9d67d0) )
+ROM_END
+
+ROM_START( heatbrl2 )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD32_BYTE( "1e_ver2.9k",   0x00000, 0x20000, CRC(b30bd632) SHA1(8684dd4787929886b0bce283301e492206ade9d9) )
 	ROM_LOAD32_BYTE( "2e_ver2.9m",   0x00001, 0x20000, CRC(f3a23056) SHA1(d8840468535ac59fede60ea5a2928410d9c7a33a) )
 	ROM_LOAD32_BYTE( "3e_ver2.9f",   0x00002, 0x20000, CRC(a2c41715) SHA1(a15b7a35ae0792ed00c47426d2e07c445acd8b8d) )
@@ -2036,7 +2072,8 @@ DRIVER_INIT( legiongfx )
 GAME( 1992, legionna, 0,        legionna, legionna, legiongfx, ROT0, "Tad", "Legionnaire (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, legionnu, legionna, legionna, legionna, legiongfx, ROT0, "Tad (Fabtek license)", "Legionnaire (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, heatbrl,  0,        heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World version 3)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, heatbrl2, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World version 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, heatbrlo, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (World old version)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,   ROT0, "Tad", "Heated Barrel (US)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 

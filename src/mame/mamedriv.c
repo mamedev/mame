@@ -6299,7 +6299,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( skysmash )	/* (c) 1990 Nihon System Inc. */
 	DRIVER( legionna )	/* (c) 1992 Tad (World) */
 	DRIVER( legionnu )	/* (c) 1992 Tad + Fabtek license (US) */
-	DRIVER( heatbrl )	/* (c) 1992 Tad (World) */
+	DRIVER( heatbrl )	/* (c) 1992 Tad (World version 3) */
+	DRIVER( heatbrl2 )	/* (c) 1992 Tad (World version 2) */
 	DRIVER( heatbrlo )	/* (c) 1992 Tad (World) */
 	DRIVER( heatbrlu )	/* (c) 1992 Tad (US) */
 	DRIVER( godzilla )	/* (c) 1993 Banpresto */
