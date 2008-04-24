@@ -536,7 +536,8 @@ INLINE void zdrawgfxzoom32GP( bitmap_t *bitmap, const gfx_element *gfx, const re
 
 	// cull off-screen objects
 	if (dst_x > dst_maxx || dst_y > dst_maxy) return;
-	if ((nozoom = (scalex == 0x10000 && scaley == 0x10000)))
+	nozoom = (scalex == 0x10000 && scaley == 0x10000);
+	if (nozoom)
 	{
 		dst_h = dst_w = 16;
 		src_fdy = src_fdx = 1;
@@ -1246,14 +1247,16 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 
 
 	// abort if object database failed to initialize
-	if (!(objpool = gx_objpool)) return;
+	objpool = gx_objpool;
+	if (!objpool) return;
 
 	// clear screen with backcolor and update flicker pulse
 	K054338_fill_backcolor(machine, bitmap, konamigx_wrport1_0 & 0x20);
 	parity ^= 1;
 
 	// abort if video has been disabled
-	if (!(disp = K055555_read_register(K55_INPUT_ENABLES))) return;
+	disp = K055555_read_register(K55_INPUT_ENABLES);
+	if (!disp) return;
 	cltc_shdpri = K054338_read_register(K338_REG_CONTROL);
 	if (!(cltc_shdpri & K338_CTL_KILL)) return;
 
@@ -1437,7 +1440,8 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		}
 		else
 		{
-			if ((shadow = k>>10 & 3)) // object has shadow?
+			shadow = k>>10 & 3;
+			if (shadow) // object has shadow?
 			{
 				if (shadow != 1 || K053246_objset1 & 0x20)
 				{
@@ -1670,7 +1674,8 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		alpha = 255;
 		if (drawmode & 2)
 		{
-			if ((alpha = color>>K055555_MIXSHIFT & 3)) alpha = K054338_set_alpha_level(alpha);
+			alpha = color>>K055555_MIXSHIFT & 3;
+			if (alpha) alpha = K054338_set_alpha_level(alpha);
 			if (alpha <= 0) continue;
 		}
 		color &= K055555_COLORMASK;
@@ -2219,7 +2224,9 @@ if((data1=obj[0])&0x80000000)\
 		srcend = src + count * 0x30;
 		do
 		{
-			if (!src[0] || !(i = src[7] & 0xf)) continue; // reject retired or zero-element groups
+			if (!src[0]) continue;
+			i = src[7] & 0xf;
+			if (!i) continue; // reject retired or zero-element groups
 			i <<= 2;
 			hoffs = src[5]>>16;
 			voffs = src[6]>>16;

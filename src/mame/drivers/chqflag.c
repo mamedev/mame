@@ -77,12 +77,11 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	coin_counter_w(0,data & 0x02);
 
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
-	if ((K051316_readroms = (data & 0x10))){
+	K051316_readroms = (data & 0x10);
+	if (K051316_readroms)
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_rom_1_r);	/* 051316 (ROM test) */
-	}
-	else{
+	else
 		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_1_r);		/* 051316 */
-	}
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Saunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */

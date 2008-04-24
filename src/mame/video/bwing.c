@@ -218,7 +218,8 @@ VIDEO_START( bwing )
 	fgfx = machine->gfx[2];
 	bgfx = machine->gfx[3];
 
-	if ((dwptr = fgfx->pen_usage))
+	dwptr = fgfx->pen_usage;
+	if (dwptr)
 	{
 		dwptr[0] = 0;
 		for(i=1; i<BW_NTILES; i++) dwptr[i] = -1;

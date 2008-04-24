@@ -1357,6 +1357,31 @@ static void init_alpha_blend_func(void)
 	} \
 }
 
+#define UPDATE_PIXMAP_SP(pf_num) \
+	if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs)) \
+	{ \
+		sprite_pri=sprite[pf_num]&pval; \
+		if(sprite_pri) \
+		{ \
+			if(sprite[pf_num]&0x100) break; \
+			if(!dpix_sp[sprite_pri]) \
+			{ \
+				if(!(pval&0xf0)) break; \
+				else {dpix_1_sprite(*dsti);*dsti=dval;break;} \
+			} \
+			if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;} \
+		} \
+	}
+
+#define UPDATE_PIXMAP_LP(pf_num) \
+	if (cx>=clip_al##pf_num && cx<clip_ar##pf_num && !(cx>=clip_bl##pf_num && cx<clip_br##pf_num)) \
+	{ \
+		tval=*tsrc##pf_num; \
+		if(tval&0xf0) \
+			if(dpix_lp[pf_num][pval>>4](clut[*src##pf_num])) {*dsti=dval;break;} \
+	}
+
+
 /*============================================================================*/
 
 INLINE void draw_scanlines(running_machine *machine,
@@ -1371,13 +1396,6 @@ INLINE void draw_scanlines(running_machine *machine,
 	int length;
 
 	const int x=46;
-
-	UINT32 sprite_noalp_0=sprite[0]&0x100;
-	UINT32 sprite_noalp_1=sprite[1]&0x100;
-	UINT32 sprite_noalp_2=sprite[2]&0x100;
-	UINT32 sprite_noalp_3=sprite[3]&0x100;
-	UINT32 sprite_noalp_4=sprite[4]&0x100;
-	UINT32 sprite_noalp_5=sprite[5]&0x100;
 
 	static UINT16 *src0=0,*src_s0=0,*src_e0=0,clip_al0=0,clip_ar0=0,clip_bl0=0,clip_br0=0;
 	static UINT8 *tsrc0=0,*tsrc_s0=0;
@@ -1457,80 +1475,12 @@ INLINE void draw_scanlines(running_machine *machine,
 					UINT8 sprite_pri;
 					switch(skip_layer_num)
 					{
-						case 0: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[0]&pval))
-								{
-									if(sprite_noalp_0) break;
-									if(!dpix_sp[sprite_pri]) break;
-									if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
-								}
-								if (cx>=clip_al0 && cx<clip_ar0 && !(cx>=clip_bl0 && cx<clip_br0)) {tval=*tsrc0;if(tval&0xf0) if(dpix_lp[0][pval>>4](clut[*src0])) {*dsti=dval;break;}}
-						case 1: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[1]&pval))
-								{
-									if(sprite_noalp_1) break;
-									if(!dpix_sp[sprite_pri])
-									{
-										if(!(pval&0xf0)) break;
-										else {dpix_1_sprite(*dsti);*dsti=dval;break;}
-									}
-									if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
-								}
-								if (cx>=clip_al1 && cx<clip_ar1 && !(cx>=clip_bl1 && cx<clip_br1)) {tval=*tsrc1;if(tval&0xf0) if(dpix_lp[1][pval>>4](clut[*src1])) {*dsti=dval;break;}}
-						case 2: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[2]&pval))
-								{
-									if(sprite_noalp_2) break;
-									if(!dpix_sp[sprite_pri])
-									{
-										if(!(pval&0xf0)) break;
-										else {dpix_1_sprite(*dsti);*dsti=dval;break;}
-									}
-									if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
-								}
-								if (cx>=clip_al2 && cx<clip_ar2 && !(cx>=clip_bl2 && cx<clip_br2)) {tval=*tsrc2;if(tval&0xf0) if(dpix_lp[2][pval>>4](clut[*src2])) {*dsti=dval;break;}}
-						case 3: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[3]&pval))
-								{
-									if(sprite_noalp_3) break;
-									if(!dpix_sp[sprite_pri])
-									{
-										if(!(pval&0xf0)) break;
-										else {dpix_1_sprite(*dsti);*dsti=dval;break;}
-									}
-									if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
-								}
-								if (cx>=clip_al3 && cx<clip_ar3 && !(cx>=clip_bl3 && cx<clip_br3)) {tval=*tsrc3;if(tval&0xf0) if(dpix_lp[3][pval>>4](clut[*src3])) {*dsti=dval;break;}}
-
-						case 4: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[4]&pval))
-								{
-									if(sprite_noalp_4) break;
-									if(!dpix_sp[sprite_pri])
-									{
-										if(!(pval&0xf0)) break;
-										else {dpix_1_sprite(*dsti);*dsti=dval;break;}
-									}
-									if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
-								}
-								if (cx>=clip_al4 && cx<clip_ar4 && !(cx>=clip_bl4 && cx<clip_br4)) {
-									tval=*tsrc4;
-									if(tval&0xf0)
-									{
-										if(dpix_lp[4][pval>>4](clut[*src4]))
-										{
-											*dsti=dval;
-											break;
-										}
-									}
-								}
-
-
-						case 5: if(cx>=clip_als && cx<clip_ars && !(cx>=clip_bls && cx<clip_brs) && (sprite_pri=sprite[5]&pval))
-								{
-									if(sprite_noalp_5) break;
-									if(!dpix_sp[sprite_pri])
-									{
-										if(!(pval&0xf0)) break;
-										else {dpix_1_sprite(*dsti);*dsti=dval;break;}
-									}
-									if(dpix_sp[sprite_pri][pval>>4](*dsti)) {*dsti=dval;break;}
-								}
+						case 0: UPDATE_PIXMAP_SP(0) UPDATE_PIXMAP_LP(0)
+						case 1: UPDATE_PIXMAP_SP(1) UPDATE_PIXMAP_LP(1)
+						case 2: UPDATE_PIXMAP_SP(2) UPDATE_PIXMAP_LP(2)
+						case 3: UPDATE_PIXMAP_SP(3) UPDATE_PIXMAP_LP(3)
+						case 4: UPDATE_PIXMAP_SP(4) UPDATE_PIXMAP_LP(4)
+						case 5: UPDATE_PIXMAP_SP(5)
 								if(!bgcolor) {if(!(pval&0xf0)) {*dsti=0;break;}}
 								else dpix_bg(bgcolor);
 								*dsti=dval;
@@ -1588,7 +1538,8 @@ static void visible_tile_check(running_machine *machine,
 	int opaque_all;
 	int total_elements;
 
-	if(!(alpha_mode=line_t->alpha_mode[line])) return;
+	alpha_mode=line_t->alpha_mode[line];
+	if(!alpha_mode) return;
 
 	total_elements=machine->gfx[1]->total_elements;
 

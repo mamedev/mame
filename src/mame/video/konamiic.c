@@ -6437,7 +6437,8 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 #define LINE_WIDTH 512
 
 #define DRAW_PIX(N) \
-	if ((pen = src_ptr[N])) \
+	pen = src_ptr[N]; \
+	if (pen) \
 	{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
 	{ xpr_ptr[count+N] = 0; }
 
@@ -6578,7 +6579,8 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	cmaxy = cliprect->max_y;
 
 	// flip correction registers
-	if ((flipy = K056832_regs[0] & 0x20))
+	flipy = K056832_regs[0] & 0x20;
+	if (flipy)
 	{
 		corr = K056832_regs[0x3c/2];
 		if (corr & 0x400)
@@ -6587,7 +6589,8 @@ void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	dy += corr;
 	ay = (unsigned)(dy - K056832_LayerOffset[layer][1]) % height;
 
-	if ((flipx = K056832_regs[0] & 0x10))
+	flipx = K056832_regs[0] & 0x10;
+	if (flipx)
 	{
 		corr = K056832_regs[0x3a/2];
 		if (corr & 0x800)
@@ -6855,7 +6858,8 @@ void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const r
 	cmaxy = cliprect->max_y;
 
 	// flip correction registers
-	if ((flipy = K056832_regs[0] & 0x20))
+	flipy = K056832_regs[0] & 0x20;
+	if (flipy)
 	{
 		corr = K056832_regs[0x3c/2];
 		if (corr & 0x400)
@@ -6864,7 +6868,8 @@ void K056832_tilemap_draw_dj(running_machine *machine, bitmap_t *bitmap, const r
 	dy += corr;
 	ay = (unsigned)(dy - K056832_LayerOffset[layer][1]) % height;
 
-	if ((flipx = K056832_regs[0] & 0x10))
+	flipx = K056832_regs[0] & 0x10;
+	if (flipx)
 	{
 		corr = K056832_regs[0x3a/2];
 		if (corr & 0x800)

@@ -201,15 +201,15 @@ static void InitDasm8201(void)
 		pdown = 0;
 		type = 0;
 		bit = 7;
-		while ( (chr=*p) && bit >= 0) {
-			p++;
+		while (*p && bit >= 0) {
+			chr = *p++;
 			switch (chr) {
 				case '1': bits |= 1<<bit;
 				case '0': mask |= 1<<bit; bit--; break;
-/*
-                case 'b':
-                    type |= 0x80;
-*/
+#if 0
+				case 'b':
+					type |= 0x80;
+#endif
 				case 'a':
 					pmask |= 1<<bit;
 					pdown  = bit;
