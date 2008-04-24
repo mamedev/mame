@@ -53,33 +53,29 @@ READ8_HANDLER( msm6242_r )
 		case MSM6264_REG_H1:
 		case MSM6264_REG_H10:
 		{
+			int	hour = systime->local_time.hour;
+
 			/* check for 12/24 hour mode */
 			if ( (msm6264_reg[2] & 0x04) == 0 ) /* 12 hour mode? */
 			{
-				int	hour = systime->local_time.hour;
-				int	pm = (hour >= 12) ? 1 : 0;
+				hour %= 12;
 
-				if ( pm ) hour -= 12;
-				if ( hour == 0 ) hour = 12;
-
-				if ( offset == MSM6264_REG_H1 )
-					return hour % 10;
-
-				return (hour / 10) | (pm << 2);
+				if ( hour == 0 )
+				hour = 12;
 			}
 
 			if ( offset == MSM6264_REG_H1 )
-				return systime->local_time.hour % 10;
+				return hour % 10;
 
-			return systime->local_time.hour / 10;
+			return hour / 10;
 		}
 
 		case MSM6264_REG_D1: return systime->local_time.mday % 10;
 		case MSM6264_REG_D10: return systime->local_time.mday / 10;
 		case MSM6264_REG_MO1: return (systime->local_time.month+1) % 10;
 		case MSM6264_REG_MO10: return (systime->local_time.month+1) / 10;
-		case MSM6264_REG_Y1: return (systime->local_time.year - 1900) % 10;
-		case MSM6264_REG_Y10: return (systime->local_time.year - 1900) / 10;
+		case MSM6264_REG_Y1: return systime->local_time.year % 10;
+		case MSM6264_REG_Y10: return (systime->local_time.year % 100) / 10;
 		case MSM6264_REG_W: return systime->local_time.weekday;
 		case MSM6264_REG_CD: return msm6264_reg[0];
 		case MSM6264_REG_CE: return msm6264_reg[1];
