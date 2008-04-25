@@ -2222,9 +2222,9 @@
  *                               .--|+ /
  *                     r4        |  | /
  *  vRef >------------ZZZZ-------'  |/
-  *
+ *
  * EXAMPLES: see Polaris
-*
+ *
  *          --------------------------------------------------
  *
  *     DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON
@@ -2245,6 +2245,46 @@
  *
  * EXAMPLES: see Polaris
  *
+ ***********************************************************************
+ *
+ * DISCRETE_SALLEN_KEY_FILTER - Sallen key low pass filter
+ *
+ *  Declaration syntax
+ *
+ *      DISCRETE_SALLEN_KEY_FILTER(name of node,
+ *                                 enable node or static value,
+ *                                 input node or static value,
+ *                                 type static value,
+ *                                 address of discrete_op_amp_filt_info)
+ *
+ *      discrete_op_amp_filt_info = {r1, r2, r3, r4, rF, c1, c2, c3, vRef, vP, vN}
+ *
+ * Note: Set all unused components to 0.
+ *
+ *  Types:
+ *
+ *     DISC_SALLEN_KEY_LOWPASS
+ *
+ *                              .---------.
+ *                              |         |
+ *                              |  |\     |
+ *                              |  | \    |
+ *                              `--|- \   |
+ *            R1       R2          |   >--+----> Netlist Node
+ *    IN >---ZZZZ--+--ZZZZ--+------|+ /   |
+ *                 |        |      | /    |
+ *                ---      ---     |/     |
+ *                --- C1   --- C2         |
+ *                 |        |             |
+ *                 |       gnd            |
+ *                 |                      |
+ *                 `----------------------'
+ * 
+ * EXAMPLES: see moon patrol, dkong
+ * 
+ * References:
+ *      http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
+ *      http://en.wikipedia.org/wiki/Sallen_Key_filter
  ***********************************************************************
  *
  * DISCRETE_RCDISC - Simple single pole RC discharge network
@@ -3239,6 +3279,11 @@ enum
 
 #define DISC_OP_AMP_FILTER_TYPE_MASK		(0xf0 | DISC_OP_AMP_IS_NORTON)	// Used only internally.
 
+/* Sallen-Key filter Opions */
+#define DISC_SALLEN_KEY_LOW_PASS			0x01
+#define DISC_SALLEN_KEY_HIGH_PASS			0x02
+
+
 /* Op Amp Oscillator Flags */
 #define DISC_OP_AMP_OSCILLATOR_1			0x00
 #define DISC_OP_AMP_OSCILLATOR_VCO_1		0x80
@@ -3830,6 +3875,7 @@ enum
 	DST_FILTER1,		/* 1st Order Filter, Low or High Pass */
 	DST_FILTER2,		/* 2nd Order Filter, Low, High, or Band Pass */
 	/* Component specific */
+	DST_SALLEN_KEY,		/* Sallen key filters */
 	DST_CRFILTER,		/* RC Bypass Filter (High Pass) */
 	DST_OP_AMP_FILT,	/* Op Amp filters */
 	DST_RCDISC,			/* Simple RC discharge */
@@ -3985,6 +4031,7 @@ enum
 #define DISCRETE_FILTER1(NODE,ENAB,INP0,FREQ,TYPE)                      { NODE, DST_FILTER1     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,FREQ,TYPE }, NULL, "1st Order Filter" },
 #define DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)                 { NODE, DST_FILTER2     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,FREQ,DAMP,TYPE }, NULL, "2nd Order Filter" },
 /* Component specific */
+#define DISCRETE_SALLEN_KEY_FILTER(NODE,ENAB,INP0,TYPE,INFO)            { NODE, DST_SALLEN_KEY  , 3, { ENAB,INP0,NODE_NC }, { ENAB,INP0,TYPE }, INFO, "Sallen-Key Filter" },
 #define DISCRETE_CRFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_CRFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "CR Filter" },
 #define DISCRETE_CRFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_CRFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "CR Filter to VREF" },
 #define DISCRETE_OP_AMP_FILTER(NODE,ENAB,INP0,INP1,TYPE,INFO)           { NODE, DST_OP_AMP_FILT , 4, { ENAB,INP0,INP1,NODE_NC }, { ENAB,INP0,INP1,TYPE }, INFO, "Op Amp Filter" },

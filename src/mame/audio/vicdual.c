@@ -304,6 +304,11 @@ static const discrete_lfsr_desc mm5837_lfsr =
 	16			          /* Output bit */
 };
 
+static const discrete_op_amp_filt_info headon_sallen_key_info = 
+	{ RES_K(15), RES_K(15), 0, 0, 0, 
+	  CAP_N(470), CAP_N(47), 0
+	};
+
 static DISCRETE_SOUND_START(headon)
 	/************************************************
      * Input register mapping for headon
@@ -418,7 +423,7 @@ static DISCRETE_SOUND_START(headon)
 	// http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
 	// f = w / 2 / pi  = 1 / ( 2 * pi * 15k*sqrt(470n*47n)) = 71 Hz
 	// Q = 1/2 * sqrt(470n/47n)= 1.58
-	DISCRETE_FILTER2(NODE_88, 1, NODE_87, 71, (1.0/1.58), DISC_FILTER_LOWPASS)
+	DISCRETE_SALLEN_KEY_FILTER(NODE_88, 1, NODE_87, DISC_SALLEN_KEY_LOW_PASS, &headon_sallen_key_info)
 
 	DISCRETE_MIXER2(NODE_95, 1, NODE_85, NODE_88, &headon_crash_mixer)
 	DISCRETE_TRANSFORM2(HEADON_CRASH_OUT, 1, NODE_95, 12, "01/")

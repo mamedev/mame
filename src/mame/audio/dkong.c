@@ -253,6 +253,11 @@ static const discrete_inverter_osc_desc dkong_inverter_osc_desc_walk =
 	DISC_OSC_INVERTER_IS_TYPE2
 	};
 
+static const discrete_op_amp_filt_info dkong_sallen_key_info = 
+	{ RES_K(5.6), RES_K(5.6), 0, 0, 0, 
+	  CAP_N(22), CAP_N(10), 0
+	};
+
 static DISCRETE_SOUND_START(dkong2b)
 
 	/************************************************/
@@ -356,7 +361,7 @@ static DISCRETE_SOUND_START(dkong2b)
      * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
      * Q = 1/2 * sqrt(22n/10n)= 0.74
      */
-	DISCRETE_FILTER2(NODE_73, 1, NODE_71, 1916, (1.0/0.74), DISC_FILTER_LOWPASS)
+	DISCRETE_SALLEN_KEY_FILTER(NODE_73, 1, NODE_71, DISC_SALLEN_KEY_LOW_PASS, &dkong_sallen_key_info)
 
 	/* Adjustment VR2 */
 #if DK_NO_FILTERS
@@ -626,7 +631,7 @@ static DISCRETE_SOUND_START(radarscp)
      * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
      * Q = 1/2 * sqrt(22n/10n)= 0.74
      */
-	DISCRETE_FILTER2(NODE_173, 1, NODE_171, 1916, (1.0/0.74), DISC_FILTER_LOWPASS)
+	DISCRETE_SALLEN_KEY_FILTER(NODE_173, 1, NODE_171, DISC_SALLEN_KEY_LOW_PASS, &dkong_sallen_key_info)
 
 	/* Adjustment VR3 */
 	DISCRETE_MULTIPLY(DS_OUT_DAC, 1, NODE_173, DS_ADJ_DAC)
@@ -855,7 +860,7 @@ static DISCRETE_SOUND_START(dkongjr)
      * Q = 1/2 * sqrt(22n/10n)= 0.74
      */
 
-	DISCRETE_FILTER2(DS_OUT_DAC, 1, NODE_171, 1916, (1.0/0.74), DISC_FILTER_LOWPASS)
+	DISCRETE_SALLEN_KEY_FILTER(DS_OUT_DAC, 1, NODE_171, DISC_SALLEN_KEY_LOW_PASS, &dkong_sallen_key_info)
 
 	/************************************************/
 	/* Amplifier                                    */

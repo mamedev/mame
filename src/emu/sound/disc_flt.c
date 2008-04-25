@@ -294,6 +294,62 @@ static void dst_filter2_reset(node_description *node)
 	node->output[0]=0;
 }
 
+/************************************************************************
+ *
+ * DST_SALLEN_KEY - Sallen-Key filter circuit
+ *
+ * input[0]    - Enable input value
+ * input[1]    - IN0 node
+ * input[3]    - Filter Type
+ *
+ * also passed discrete_op_amp_filt_info structure
+ *
+ * 2008, couriersud
+ ************************************************************************/
+#define DST_SALLEN_KEY__ENABLE	(*(node->input[0]))
+#define DST_SALLEN_KEY__INP0	(*(node->input[1]))
+#define DST_SALLEN_KEY__TYPE	(*(node->input[2]))
+
+static void dst_sallen_key_step(node_description *node)
+{
+	struct dss_filter2_context *context = node->context;
+	double gain = 1.0;
+
+	if (DST_SALLEN_KEY__ENABLE == 0.0)
+	{
+		gain = 0.0;
+	}
+
+	node->output[0] = -context->a1*context->y1 - context->a2*context->y2 +
+					context->b0*gain*DST_SALLEN_KEY__INP0 + context->b1*context->x1 + context->b2*context->x2;
+
+	context->x2 = context->x1;
+	context->x1 = gain * DST_SALLEN_KEY__INP0;
+	context->y2 = context->y1;
+	context->y1 = node->output[0];
+}
+
+static void dst_sallen_key_reset(node_description *node)
+{
+	struct dss_filter2_context *context = node->context;
+	const discrete_op_amp_filt_info *info = node->custom;
+	double freq, q;
+	
+	switch ((int) DST_SALLEN_KEY__TYPE)
+	{
+		case DISC_SALLEN_KEY_LOW_PASS:
+		    freq = 1.0 / ( 2.0 * M_PI * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
+		    q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
+		    break;
+		default:
+			fatalerror("Unknown sallen key filter type");
+	}
+	
+	calculate_filter2_coefficients(freq, 1.0 / q, DISC_FILTER_LOWPASS,
+								   &context->a1, &context->a2,
+								   &context->b0, &context->b1, &context->b2);
+	node->output[0]=0;
+}
 
 /************************************************************************
  *
