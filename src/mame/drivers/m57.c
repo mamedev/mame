@@ -244,7 +244,7 @@ static MACHINE_DRIVER_START( m57 )
 	MDRV_VIDEO_UPDATE(m57)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_small_audio)
+	MDRV_IMPORT_FROM(m52_sound_c_audio)
 MACHINE_DRIVER_END
 
 

@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( travrusa )
 	MDRV_VIDEO_UPDATE(travrusa)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_small_audio)
+	MDRV_IMPORT_FROM(m52_sound_c_audio)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( shtrider )
