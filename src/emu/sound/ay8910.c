@@ -218,7 +218,7 @@ static ay_ym_param ay8910_param =
 static void AY8910_write_reg(struct AY8910 *PSG, int r, int v)
 {
 
-	//if (r != 4 && r !=5) printf("%d %x %02x\n", PSG->index, r, v);
+	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	PSG->regs[r] = v;
 
 	/* A note about the period of tones, noise and envelope: for speed reasons,*/
@@ -386,7 +386,7 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		for (chan = 0; chan < NUM_CHANNELS; chan++)
 		{
 			PSG->Count[chan]++;
-			if (PSG->Count[chan] >= TONE_PERIOD(PSG, chan) * PSG->step)
+			if (PSG->Count[chan] >= TONE_PERIOD(PSG, chan))
 			{
 				PSG->Output[chan] ^= 1;
 				PSG->Count[chan] = 0;;
@@ -394,7 +394,7 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		}
 
 		PSG->CountN++;
-		if (PSG->CountN >= NOISE_PERIOD(PSG) * PSG->step)
+		if (PSG->CountN >= NOISE_PERIOD(PSG))
 		{
 			/* Is noise output going to change? */
 			if ((PSG->RNG + 1) & 2)	/* (bit0^bit1)? */
@@ -426,7 +426,7 @@ static void AY8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		if (PSG->Holding == 0)
 		{
 			PSG->CountE++;
-			if (PSG->CountE >= ENVELOPE_PERIOD(PSG))
+			if (PSG->CountE >= ENVELOPE_PERIOD(PSG) * PSG->step ) 
 			{
 				PSG->CountE = 0;
 				PSG->CountEnv--;
@@ -653,10 +653,11 @@ void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const struc
 	{
 		case SOUND_AY8910:
 		case SOUND_AY8930:
-			info->step = 1;
+			info->step = 2;
 			info->par = &ay8910_param;
 			info->parE = &ay8910_param;
 			info->zero_is_off = 1;
+			info->EnvP = 0x0F;
 			break;
 		case SOUND_YM2149:
 		case SOUND_YM2203:
@@ -667,20 +668,19 @@ void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const struc
 		case SOUND_YMZ294:
 		case SOUND_YM3439:
 		default:
-			info->step = 2;
+			info->step = 1;
 			info->par = &ym2149_param;
 			info->parE = &ym2149_paramE;
 			info->zero_is_off = 0;
+			info->EnvP = 0x1F;
 			break;
 	}
-	info->EnvP = info->step * 16 - 1;
 
 	build_mixer_table(info);
 
-	/* the step clock for the tone and noise generators is the chip clock    */
-	/* divided by 8 for the YM2149 and 16 for the AY-3-8910, To emulate a    */
-	/* full cycle, we have to use a divisor of 4 resp. 8                     */
-	info->Channel = stream_create(0,info->streams,clock / (8 / info->step),info,AY8910_update);
+	/* The envelope is pacing twice as fast for the YM2149 as for the AY-3-8910,    */
+	/* This handled by the step parameter. Consequently we use a divider of 8 here. */
+	info->Channel = stream_create(0,info->streams,clock / 8 ,info,AY8910_update);
 
 	ay8910_set_clock_ym(info,clock);
 	AY8910_statesave(info, sndindex);
@@ -717,7 +717,7 @@ void ay8910_reset_ym(void *chip)
 void ay8910_set_clock_ym(void *chip, int clock)
 {
 	struct AY8910 *PSG = chip;
-	stream_set_sample_rate(PSG->Channel, clock / (8 / PSG->step));
+	stream_set_sample_rate(PSG->Channel, clock / 8 );
 }
 
 void ay8910_write_ym(void *chip, int addr, int data)
