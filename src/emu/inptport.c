@@ -2137,7 +2137,7 @@ static void input_port_detokenize(input_port_init_params *param, const input_por
 #ifdef MESS
 			case INPUT_TOKEN_CHAR:
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, val, 24);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 				{
 					int ch;
 					for (ch = 0; portentry->keyboard.chars[ch] != 0; ch++)
