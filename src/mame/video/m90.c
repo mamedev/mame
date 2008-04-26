@@ -43,7 +43,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			tile,
 			color&0xf,
 			TILE_FLIPYX((color & 0xc0) >> 6));
-	if (color&0x30) tileinfo->category = 1; else tileinfo->category=0;
+			tileinfo->category = (color & 0x30) ? 1 : 0;
 }
 
 
@@ -153,7 +153,6 @@ static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap,cons
 WRITE16_HANDLER( m90_video_control_w )
 {
 	COMBINE_DATA(&m90_video_control_data[offset]);
-	printf("%04x-%04x ",offset,m90_video_control_data[offset]);
 }
 
 
@@ -274,7 +273,6 @@ VIDEO_UPDATE( m90 )
 		else
 			tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
-
 
 	draw_sprites(screen->machine,bitmap,cliprect);
 
