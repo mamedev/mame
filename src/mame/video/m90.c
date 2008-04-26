@@ -18,7 +18,7 @@
         Bit 0x04 - Playfield 2 width (0 is 64 tiles, 0x4 is 128 tiles)
         Bit 0x10 - Playfield 2 disable
         Bit 0x20 - Playfield 2 rowscroll enable
-    14: Bit 0x02 - unknown (set by hasamu)
+    14: Bits0x03 - Sprite/Tile Priority (related to sprite color)
 
     Emulation by Bryan McPhail, mish@tendril.co.uk, thanks to Chris Hardy!
 
@@ -43,7 +43,7 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			tile,
 			color&0xf,
 			TILE_FLIPYX((color & 0xc0) >> 6));
-	tileinfo->category = (color & 0x30) ? 1 : 0;
+	if (color&0x30) tileinfo->category = 1; else tileinfo->category=0;
 }
 
 
@@ -70,7 +70,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 {
 	int offs;
 
-	for (offs = 0x1f2/2;offs >= 0;offs -= 3)
+	for (offs = 0x1f2/2; offs >= 0; offs -= 3)
 	{
 		int x,y,sprite,colour,fx,fy,y_multi,i;
 
@@ -90,13 +90,31 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		y -= 16 * y_multi;
 
 		for (i = 0;i < y_multi;i++)
-			pdrawgfx(bitmap,machine->gfx[1],
+
+			if (m90_video_control_data[7] & 0x01)
+				pdrawgfx(bitmap,machine->gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
 					cliprect,TRANSPARENCY_PEN,0,
-					(colour & 0x08) ? 0x00 : 0x02);
+					(colour & 0x08) ? 0x00 : 0x02);			
+			else if (m90_video_control_data[7] & 0x02)
+				pdrawgfx(bitmap,machine->gfx[1],
+					sprite + (fy ? y_multi-1 - i : i),
+					colour,
+					fx,fy,
+					x,y+i*16,
+					cliprect,TRANSPARENCY_PEN,0,
+					((colour & 0x0c)==0x0c) ? 0x00 : 0x02);
+			else
+				pdrawgfx(bitmap,machine->gfx[1],
+					sprite + (fy ? y_multi-1 - i : i),
+					colour,
+					fx,fy,
+					x,y+i*16,
+					cliprect,TRANSPARENCY_PEN,0,
+					0x02);
 	}
 }
 
@@ -135,6 +153,7 @@ static void bootleg_draw_sprites(running_machine *machine, bitmap_t *bitmap,cons
 WRITE16_HANDLER( m90_video_control_w )
 {
 	COMBINE_DATA(&m90_video_control_data[offset]);
+	printf("%04x-%04x ",offset,m90_video_control_data[offset]);
 }
 
 
@@ -256,6 +275,8 @@ VIDEO_UPDATE( m90 )
 			tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
 	}
 
+
 	draw_sprites(screen->machine,bitmap,cliprect);
+
 	return 0;
 }
