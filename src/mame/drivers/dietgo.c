@@ -2,11 +2,6 @@
     Diet Go Go
 
     Driver by Bryan McPhail and David Haywood.
-
-    Todo:
-
-    Tile banking is incorrect after a world is completed (cutscene and map are corrupt)
-
 */
 
 #include "driver.h"
