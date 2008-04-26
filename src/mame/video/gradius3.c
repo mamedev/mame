@@ -98,6 +98,11 @@ READ16_HANDLER( gradius3_gfxrom_r )
 	return (gfxdata[2*offset+1] << 8) | gfxdata[2*offset];
 }
 
+READ16_HANDLER( gradius3_gfxram_r )
+{
+	return gradius3_gfxram[offset];
+}
+
 WRITE16_HANDLER( gradius3_gfxram_w )
 {
 	int oldword = gradius3_gfxram[offset];
