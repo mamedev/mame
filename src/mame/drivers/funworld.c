@@ -67,7 +67,7 @@
 
 
     All current games are running from a slightly modified to heavily hacked hardware.
-    Color palettes are normally stored in format RRRBBBGG inside a bipolar color PROM.
+    Color palettes are normally stored in format GGBBBRRR inside a bipolar color PROM.
 
     - bits -
     7654 3210
@@ -830,6 +830,11 @@
     - Moved snookr10 to its own driver.
     - Minor clean-up.
 
+    2008/04/27
+    - Fixed AY8910 volume to all games to avoid clips.
+    - Merge bigdeal and funworld machine drivers thanks to the AY8910 rewrite.
+    - Removed old unaccurate commentary about magiccrd tiles.
+
 
     *** TO DO ***
 
@@ -1515,10 +1520,6 @@ INPUT_PORTS_END
 *    Graphics Layouts    *
 *************************/
 
-/*  Magic Card tiles should be 4bpp, but the last two planes
-    have flipped tiles, half flipped (bottom half), and lack of others needed.
-    (See the text tiles at 0x0840) */
-
 static const gfx_layout charlayout =
 {
 	4,8,
@@ -1623,15 +1624,7 @@ static MACHINE_DRIVER_START( funworld )
 
 	MDRV_SOUND_ADD_TAG("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 8.0)	/* analyzed to avoid clips */
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( bigdeal )
-	MDRV_IMPORT_FROM(funworld)
-
-	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)	/* analyzed to avoid clips */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( magiccrd )
@@ -1650,7 +1643,7 @@ static MACHINE_DRIVER_START( magiccrd )
 
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)	/* analyzed to avoid clips */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( royalcrd )
@@ -2482,9 +2475,9 @@ GAME( 1993, jolyccrb, jollycrd, cuoreuno, jolycdcr, funworld, ROT0, "Soft Design
 GAME( 199?, jolycdit, jollycrd, cuoreuno, jolycdit, tabblue,  ROT0, "bootleg",         "Jolly Card (italian, blue TAB board, encrypted)", 0 )
 GAME( 1985, sjcd2kx3, jollycrd, funworld, funworld, funworld, ROT0, "M.P.",            "Super Joly 2000 - 3x",                            0 )
 GAME( 1986, jolycdab, jollycrd, funworld, funworld, funworld, ROT0, "Inter Games",     "Jolly Card (austrian, Funworld, bootleg)",        GAME_NOT_WORKING )
-GAME( 1986, bigdeal,  0,        bigdeal,  bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS )
-GAME( 1986, bigdealb, bigdeal,  bigdeal,  bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 2)",                     GAME_IMPERFECT_COLORS )
-GAME( 1986, jolycdat, bigdeal,  bigdeal,  bigdeal,  funworld, ROT0, "Funworld",        "Jolly Card (austrian, Funworld)",                 GAME_IMPERFECT_COLORS )
+GAME( 1986, bigdeal,  0,        funworld, bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 1)",                     GAME_IMPERFECT_COLORS )
+GAME( 1986, bigdealb, bigdeal,  funworld, bigdeal,  funworld, ROT0, "Funworld",        "Big Deal (hungarian, set 2)",                     GAME_IMPERFECT_COLORS )
+GAME( 1986, jolycdat, bigdeal,  funworld, bigdeal,  funworld, ROT0, "Funworld",        "Jolly Card (austrian, Funworld)",                 GAME_IMPERFECT_COLORS )
 GAME( 1996, cuoreuno, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Cuore 1 (italian)",                               0 )
 GAME( 1997, elephfam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, new)",                  0 )
 GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, old)",                  0 )
