@@ -1521,7 +1521,7 @@ static MACHINE_RESET( demon_sound )
 	last_portb_write = 0xff;
 
 	/* turn off channel A on AY8910 #0 because it is used as a low-pass filter */
-	AY8910_set_volume(0, 0, 0);
+	ay8910_set_volume(0, 0, 0);
 }
 
 
