@@ -238,30 +238,56 @@ static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectan
 	const UINT8 *base = videoram+0x400;
 	const gfx_element *gfx = machine->gfx[0];
 	int row;
-	for( row=0; row<4; row++ )
-	{
-		int sy,sx = (row&1)*8;
-		const UINT8 *source = base + (row&1)*32;
-		if( row>1 )
+	if (!flipscreen)
+		for( row=0; row<4; row++ )
 		{
-			sx+=256+16;
-		}
-		else
-		{
-			source+=30*32;
-		}
+			int sy,sx = (row&1)*8;
+			const UINT8 *source = base + (row&1)*32;
+			if( row>1 )
+			{
+				sx+=256+16;
+			}
+			else
+			{
+				source+=30*32;
+			}
 
-		for( sy=0; sy<256; sy+=8 )
-		{
-			int tile_number = *source++;
-			drawgfx( bitmap, gfx,
-			    tile_number, tile_number>>5,
-			    0,0, /* no flip */
-			    sx,sy,
-			    cliprect,
-			    TRANSPARENCY_NONE, 0xf );
+			for( sy=0; sy<256; sy+=8 )
+			{
+				int tile_number = *source++;
+				drawgfx( bitmap, gfx,
+				    tile_number, tile_number>>5,
+				    0,0,
+				    sx,sy,
+				    cliprect,
+				    TRANSPARENCY_NONE, 0xf );
+			}
 		}
-	}
+	else
+		for( row=0; row<4; row++ )
+		{
+			int sy,sx = (row&1)*8;
+			const UINT8 *source = base + 30*32 + 32 - (row&1)*32;
+			if( row>1 )
+			{
+				sx+=256+16;
+			}
+			else
+			{
+				source-=30*32;
+			}
+
+			for( sy=255; sy>=0; sy-=8 )
+			{
+				int tile_number = *source++;
+				drawgfx( bitmap, gfx,
+				    tile_number, tile_number>>5,
+				    1,1,
+				    sx,sy-5*8,
+				    cliprect,
+				    TRANSPARENCY_NONE, 0xf );
+			}
+		}
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
@@ -323,6 +349,74 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
+VIDEO_UPDATE( vangrd2 )
+{
+	cpuintrf_push_context(0);
+	{
+		int madcrash_vreg = (snk_gamegroup == 1) ? 0x00 : 0xf1; // Mad Crasher=0x00, VanguardII=0xf1
+
+		UINT8 sprite_partition = program_read_byte(0xfa00);
+
+		int attributes = program_read_byte(0x8600+madcrash_vreg); /* 0x20: normal, 0xa0: video flipped */
+		int bg_scrolly = program_read_byte(0xf800+madcrash_vreg);
+		int bg_scrollx = program_read_byte(0xf900+madcrash_vreg);
+		int scroll_attributes = program_read_byte(0xfb00+madcrash_vreg);
+		int sprite_scrolly = program_read_byte(0xfc00+madcrash_vreg);
+		int sprite_scrollx = program_read_byte(0xfd00+madcrash_vreg);
+		int fg_scrolly = program_read_byte(0xfe00+madcrash_vreg);
+		int fg_scrollx = program_read_byte(0xff00+madcrash_vreg);
+
+		rectangle finalclip = tilemap_clip;
+		sect_rect(&finalclip, cliprect);
+
+		if(video_bank != ((attributes & 8) >> 3))
+		{
+			video_bank = ((attributes & 8) >> 3);
+
+			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			tilemap_mark_all_tiles_dirty(fg_tilemap);
+		}
+
+		if( (scroll_attributes & 4)==0 ) bg_scrollx += 256;
+		if( scroll_attributes & 1 ) sprite_scrollx += 256;
+		if( scroll_attributes & 2 ) fg_scrollx += 256;
+
+		marvins_palette_bank_w(screen->machine, 0, program_read_byte(0xc800+madcrash_vreg));
+		update_palette(screen->machine, 1);
+
+		if( flipscreen != (attributes&0x80) )
+		{
+			flipscreen = attributes&0x80;
+			tilemap_set_flip( ALL_TILEMAPS, flipscreen?TILEMAP_FLIPY|TILEMAP_FLIPX:0);
+		}
+
+		if(!flipscreen) {
+			tilemap_set_scrollx( bg_tilemap,    0, bg_scrollx );
+			tilemap_set_scrolly( bg_tilemap,    0, bg_scrolly );
+			tilemap_set_scrollx( fg_tilemap,    0, fg_scrollx );
+			tilemap_set_scrolly( fg_tilemap,    0, fg_scrolly );
+			tilemap_set_scrollx( tx_tilemap,    0, 0 );
+			tilemap_set_scrolly( tx_tilemap,    0, 0 );
+		} else {
+			tilemap_set_scrollx( bg_tilemap,    0, bg_scrollx-14 );
+			tilemap_set_scrolly( bg_tilemap,    0, bg_scrolly+60 );
+			tilemap_set_scrollx( fg_tilemap,    0, fg_scrollx-32 );
+			tilemap_set_scrolly( fg_tilemap,    0, fg_scrolly+40 );
+			tilemap_set_scrollx( tx_tilemap,    0, 0 );
+			tilemap_set_scrolly( tx_tilemap,    0, 0 );
+		}
+
+		tilemap_draw(bitmap,&finalclip,bg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
+		draw_sprites(screen->machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 0, sprite_partition );
+		tilemap_draw(bitmap,&finalclip,fg_tilemap,0 ,0);
+		draw_sprites(screen->machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 1, sprite_partition );
+		tilemap_draw(bitmap,&finalclip,tx_tilemap,0 ,0);
+		draw_status(screen->machine,bitmap,cliprect );
+	}
+	cpuintrf_pop_context();
+	return 0;
+}
+
 VIDEO_UPDATE( marvins )
 {
 	cpuintrf_push_context(0);
@@ -367,8 +461,8 @@ VIDEO_UPDATE( marvins )
 		tilemap_set_scrolly( bg_tilemap,    0, bg_scrolly );
 		tilemap_set_scrollx( fg_tilemap,    0, fg_scrollx );
 		tilemap_set_scrolly( fg_tilemap,    0, fg_scrolly );
-		tilemap_set_scrollx( tx_tilemap,  0, 0 );
-		tilemap_set_scrolly( tx_tilemap,  0, 0 );
+		tilemap_set_scrollx( tx_tilemap,    0, 0 );
+		tilemap_set_scrolly( tx_tilemap,    0, 0 );
 
 		tilemap_draw(bitmap,&finalclip,fg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
 		draw_sprites(screen->machine,bitmap,cliprect, sprite_scrollx+29+1, sprite_scrolly+16, 0, sprite_partition );
@@ -434,12 +528,21 @@ VIDEO_UPDATE( madcrash )
 			tilemap_set_flip( ALL_TILEMAPS, flipscreen?TILEMAP_FLIPY|TILEMAP_FLIPX:0);
 		}
 
-		tilemap_set_scrollx( bg_tilemap, 0, bg_scrollx );
-		tilemap_set_scrolly( bg_tilemap, 0, bg_scrolly );
-		tilemap_set_scrollx( fg_tilemap, 0, fg_scrollx );
-		tilemap_set_scrolly( fg_tilemap, 0, fg_scrolly );
-		tilemap_set_scrollx( tx_tilemap,  0, 0 );
-		tilemap_set_scrolly( tx_tilemap,  0, 0 );
+		if(!flipscreen) {
+			tilemap_set_scrollx( bg_tilemap,    0, bg_scrollx );
+			tilemap_set_scrolly( bg_tilemap,    0, bg_scrolly );
+			tilemap_set_scrollx( fg_tilemap,    0, fg_scrollx );
+			tilemap_set_scrolly( fg_tilemap,    0, fg_scrolly );
+			tilemap_set_scrollx( tx_tilemap,    0, 0 );
+			tilemap_set_scrolly( tx_tilemap,    0, 0 );
+		} else {
+			tilemap_set_scrollx( bg_tilemap,    0, bg_scrollx );
+			tilemap_set_scrolly( bg_tilemap,    0, bg_scrolly );
+			tilemap_set_scrollx( fg_tilemap,    0, fg_scrollx );
+			tilemap_set_scrolly( fg_tilemap,    0, fg_scrolly+24 );
+			tilemap_set_scrollx( tx_tilemap,    0, 0 );
+			tilemap_set_scrolly( tx_tilemap,    0, -8 );
+		}
 
 		tilemap_draw(bitmap,&finalclip,bg_tilemap,TILEMAP_DRAW_OPAQUE ,0);
 		draw_sprites(screen->machine,bitmap,cliprect, sprite_scrollx+29, sprite_scrolly+17, 0, sprite_partition );
