@@ -93,7 +93,6 @@ static tilemap *vmetal_mid2tilemap;
 /* video/metro.c */
 extern UINT16 *metro_videoregs;
 void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-WRITE16_HANDLER( metro_paletteram_w );
 
 static READ16_HANDLER ( varia_crom_read )
 {
@@ -103,7 +102,7 @@ static READ16_HANDLER ( varia_crom_read )
 	UINT16 retdat;
 	offset = offset << 1;
 	offset |= (vmetal_videoregs[0x0ab/2]&0x7f) << 16;
-	retdat = ((cgrom[offset] <<8)| (cgrom[offset+1]))^0xffff; // invert because we inverted the data..
+	retdat = ((cgrom[offset] <<8)| (cgrom[offset+1]));
 //  popmessage("varia romread offset %06x data %04x",offset, retdat);
 
 	return retdat;
@@ -221,7 +220,7 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 
-	AM_RANGE(0x170000, 0x173fff) AM_READWRITE(SMH_RAM,metro_paletteram_w) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x170000, 0x173fff) AM_READWRITE(SMH_RAM,paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE(&paletteram16	)	// Palette
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(&vmetal_tlookup)
@@ -375,7 +374,7 @@ static TILE_GET_INFO( get_vmetal_texttilemap_tile_info )
 	tile = (data & 0xf) | (lookup & 0x7fff0);
 	color = ((lookup>>20) & 0x1f)+0xe0;
 	if (data & 0x8000) tile = 0;
-	SET_TILE_INFO(1, tile, color^0xf, TILE_FLIPYX(0x0));
+	SET_TILE_INFO(1, tile, color, TILE_FLIPYX(0x0));
 }
 
 
@@ -384,14 +383,14 @@ static TILE_GET_INFO( get_vmetal_mid1tilemap_tile_info )
 	UINT16 tile, color, data = vmetal_mid1tileram[tile_index];
 	get_vmetal_tlookup(data, &tile, &color);
 	if (data & 0x8000) tile = 0;
-	SET_TILE_INFO(0, tile, color^0xf, TILE_FLIPYX(0x0));
+	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
 }
 static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 {
 	UINT16 tile, color, data = vmetal_mid2tileram[tile_index];
 	get_vmetal_tlookup(data, &tile, &color);
 	if (data & 0x8000) tile = 0;
-	SET_TILE_INFO(0, tile, color^0xf, TILE_FLIPYX(0x0));
+	SET_TILE_INFO(0, tile, color, TILE_FLIPYX(0x0));
 }
 
 static VIDEO_START(varia)
@@ -399,9 +398,9 @@ static VIDEO_START(varia)
 	vmetal_texttilemap = tilemap_create(get_vmetal_texttilemap_tile_info,tilemap_scan_rows, 8, 8, 256,256);
 	vmetal_mid1tilemap = tilemap_create(get_vmetal_mid1tilemap_tile_info,tilemap_scan_rows,16,16, 256,256);
 	vmetal_mid2tilemap = tilemap_create(get_vmetal_mid2tilemap_tile_info,tilemap_scan_rows,16,16, 256,256);
-	tilemap_set_transparent_pen(vmetal_texttilemap,0);
-	tilemap_set_transparent_pen(vmetal_mid1tilemap,0);
-	tilemap_set_transparent_pen(vmetal_mid2tilemap,0);
+	tilemap_set_transparent_pen(vmetal_texttilemap,15);
+	tilemap_set_transparent_pen(vmetal_mid1tilemap,15);
+	tilemap_set_transparent_pen(vmetal_mid2tilemap,15);
 }
 
 static VIDEO_UPDATE(varia)
@@ -462,7 +461,7 @@ ROM_START( vmetal )
 	ROM_LOAD16_BYTE( "5b.u19", 0x00001, 0x80000, CRC(4933ac6c) SHA1(1a3303e32fcb08854d4d6e13f36ca99d92aed4cc) )
 	ROM_LOAD16_BYTE( "6b.u18", 0x00000, 0x80000, CRC(4eb939d5) SHA1(741ab05043fc3bd886162d878630e45da9359718) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_INVERT )
+	ROM_REGION( 0x800000, REGION_GFX1, 0 )
 	ROMX_LOAD( "1.u29", 0x000004, 0x200000, CRC(b470c168) SHA1(c30462dc134da1e71a94b36ef96ecd65c325b07e) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "2.u31", 0x000000, 0x200000, CRC(b36f8d60) SHA1(1676859d0fee4eb9897ce1601a2c9fd9a6dc4a43) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "3.u28", 0x000006, 0x200000, CRC(00fca765) SHA1(ca9010bd7f59367e483868018db9a9abf871386e) , ROM_GROUPWORD | ROM_SKIP(6))
@@ -481,7 +480,7 @@ ROM_START( vmetaln )
 	ROM_LOAD16_BYTE( "vm5.bin", 0x00001, 0x80000, CRC(43ef844e) SHA1(c673f34fcc9e406282c9008795b52d01a240099a) )
 	ROM_LOAD16_BYTE( "vm6.bin", 0x00000, 0x80000, CRC(cb292ab1) SHA1(41fdfe67e6cb848542fd5aa0dfde3b1936bb3a28) )
 
-	ROM_REGION( 0x800000, REGION_GFX1, ROMREGION_INVERT )
+	ROM_REGION( 0x800000, REGION_GFX1, 0 )
 	ROMX_LOAD( "1.u29", 0x000004, 0x200000, CRC(b470c168) SHA1(c30462dc134da1e71a94b36ef96ecd65c325b07e) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "2.u31", 0x000000, 0x200000, CRC(b36f8d60) SHA1(1676859d0fee4eb9897ce1601a2c9fd9a6dc4a43) , ROM_GROUPWORD | ROM_SKIP(6))
 	ROMX_LOAD( "3.u28", 0x000006, 0x200000, CRC(00fca765) SHA1(ca9010bd7f59367e483868018db9a9abf871386e) , ROM_GROUPWORD | ROM_SKIP(6))

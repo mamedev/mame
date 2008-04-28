@@ -948,6 +948,16 @@ WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w )
 
 
 /*-------------------------------------------------
+    GGGGG-RRRRR-BBBBB-x writes
+-------------------------------------------------*/
+
+WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w )
+{
+	COMBINE_DATA(&paletteram16[offset]);
+	set_color_555(offset, 6, 11, 1, paletteram16[offset]);
+}
+
+/*-------------------------------------------------
     RRRRR-GGGGG-BBBBB-x writes
 -------------------------------------------------*/
 

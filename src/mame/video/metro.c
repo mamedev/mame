@@ -128,8 +128,7 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 WRITE16_HANDLER( metro_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	/* We need the ^0xff because we had to invert the pens in the gfx */
-	palette_set_color_rgb(machine,offset^0xff,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 
@@ -202,15 +201,19 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 	{
 		int _code = code & 0x000f;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0) ^ 0x0f0) + 0x1000;
+		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo->flags = 0;
+		tileinfo->group = 0;
 	}
 	else
+	{
+		tileinfo->group = 0;
 		SET_TILE_INFO(
 				0,
 				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
+				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 }
 
 
@@ -238,21 +241,28 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 	{
 		int _code = code & 0x000f;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0) ^ 0x0f0) + 0x1000;
+		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo->flags = 0;
+		tileinfo->group = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
+	{
+		tileinfo->group = 1;
 		SET_TILE_INFO(
 				1,
 				(tile & 0xfffff) + 2*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 	else
+	{
+		tileinfo->group = 0;
 		SET_TILE_INFO(
 				0,
 				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
+				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 }
 
 /* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
@@ -279,21 +289,29 @@ INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinf
 	{
 		int _code = code & 0x000f;
 		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0) ^ 0x0f0) + 0x1000;
+		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo->flags = 0;
+		tileinfo->group = 0;
 	}
 	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
+	{
+		tileinfo->group = 1;
 		SET_TILE_INFO(
 				3,
 				(tile & 0xfffff) + 8*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+	}
 	else
+	{
+		tileinfo->group = 0;
 		SET_TILE_INFO(
 				2,
 				(tile & 0xfffff) + 4*(code & 0xf),
-				(((tile & 0x0ff00000) >> 20) ^ 0x0f) + 0x100,
+				(((tile & 0x0ff00000) >> 20)) + 0x100,
 				TILE_FLIPXY((code & 0x6000) >> 13));
+
+	}
 }
 
 
@@ -378,7 +396,7 @@ static void alloc_empty_tiles(void)
 
 	for (code = 0;code < 0x10;code++)
 		for (i = 0;i < 16*16;i++)
-			empty_tiles[16*16*code + i] = code ^ 0x0f;
+			empty_tiles[16*16*code + i] = code;
 }
 
 VIDEO_START( metro_14100 )
@@ -399,9 +417,15 @@ VIDEO_START( metro_14100 )
 	tilemap_16x16[1] = NULL;
 	tilemap_16x16[2] = NULL;
 
-	tilemap_set_transparent_pen(bg_tilemap[0],0);
-	tilemap_set_transparent_pen(bg_tilemap[1],0);
-	tilemap_set_transparent_pen(bg_tilemap[2],0);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
 }
 
 VIDEO_START( metro_14220 )
@@ -422,9 +446,14 @@ VIDEO_START( metro_14220 )
 	tilemap_16x16[1] = NULL;
 	tilemap_16x16[2] = NULL;
 
-	tilemap_set_transparent_pen(bg_tilemap[0],0);
-	tilemap_set_transparent_pen(bg_tilemap[1],0);
-	tilemap_set_transparent_pen(bg_tilemap[2],0);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
 
 	tilemap_set_scrolldx(bg_tilemap[0], -2, 2);
 	tilemap_set_scrolldx(bg_tilemap[1], -2, 2);
@@ -449,12 +478,25 @@ VIDEO_START( metro_14300 )
 	tilemap_16x16[1] = tilemap_create(get_tile_info_1_16x16_8bit,tilemap_scan_rows,16,16,WIN_NX,WIN_NY);
 	tilemap_16x16[2] = tilemap_create(get_tile_info_2_16x16_8bit,tilemap_scan_rows,16,16,WIN_NX,WIN_NY);
 
-	tilemap_set_transparent_pen(bg_tilemap[0],0);
-	tilemap_set_transparent_pen(bg_tilemap[1],0);
-	tilemap_set_transparent_pen(bg_tilemap[2],0);
-	tilemap_set_transparent_pen(tilemap_16x16[0],0);
-	tilemap_set_transparent_pen(tilemap_16x16[1],0);
-	tilemap_set_transparent_pen(tilemap_16x16[2],0);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+
+    tilemap_map_pen_to_layer(tilemap_16x16[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(tilemap_16x16[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(tilemap_16x16[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(tilemap_16x16[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
+    tilemap_map_pen_to_layer(tilemap_16x16[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
+    tilemap_map_pen_to_layer(tilemap_16x16[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
+
 }
 
 VIDEO_START( blzntrnd )
@@ -671,7 +713,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 								color_start >> 4,
 								flipx, flipy,
 								x, y,
-								cliprect, TRANSPARENCY_PEN, 0,
+								cliprect, TRANSPARENCY_PEN, 255,
 								zoom, zoom,
 								primask[pri]);
 			}
@@ -698,10 +740,10 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 				pdrawgfxzoom(	bitmap,&gfx,
 								0,
-								(color ^ 0x0f) + color_start,
+								color + color_start,
 								flipx, flipy,
 								x, y,
-								cliprect, TRANSPARENCY_PEN, 0,
+								cliprect, TRANSPARENCY_PEN, 15,
 								zoom, zoom,
 								primask[pri]);
 			}
@@ -873,7 +915,7 @@ VIDEO_UPDATE( metro )
 
 	/* The background color is selected by a register */
 	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,((metro_videoregs[0x12/2] & 0x0fff) ^ 0x0ff) + 0x1000,cliprect);
+	fillbitmap(bitmap,((metro_videoregs[0x12/2] & 0x0fff)) + 0x1000,cliprect);
 
 	/*  Screen Control Register:
 

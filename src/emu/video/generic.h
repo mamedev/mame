@@ -192,6 +192,7 @@ WRITE16_HANDLER( paletteram16_xGGGGGRRRRRBBBBB_word_w );
 WRITE16_HANDLER( paletteram16_xGGGGGBBBBBRRRRR_word_w );
 
 WRITE16_HANDLER( paletteram16_RRRRRGGGGGBBBBBx_word_w );
+WRITE16_HANDLER( paletteram16_GGGGGRRRRRBBBBBx_word_w );
 WRITE16_HANDLER( paletteram16_RRRRGGGGBBBBRGBx_word_w );
 
 /* 8-8-8 RGB palette write handlers */
