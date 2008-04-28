@@ -106,6 +106,8 @@ VIDEO_START( fortyl )
 {
 	fortyl_pixram1 = auto_malloc(0x4000);
 	fortyl_pixram2 = auto_malloc(0x4000);
+	memset(fortyl_pixram1,0,0x4000);
+	memset(fortyl_pixram2,0,0x4000);
 
 	pixel_bitmap1 = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
 	pixel_bitmap2 = auto_bitmap_alloc(256,256,video_screen_get_format(machine->primary_screen));
