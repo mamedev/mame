@@ -21,6 +21,18 @@
 static tilemap *bg_tilemap;
 
 
+WRITE8_HANDLER( snookr10_videoram_w )
+{
+	videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+}
+
+WRITE8_HANDLER( snookr10_colorram_w )
+{
+	colorram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+}
+
 PALETTE_INIT( snookr10 )
 {
 	int i;
@@ -52,6 +64,26 @@ PALETTE_INIT( snookr10 )
 	}
 }
 
+static TILE_GET_INFO( get_bg_tile_info )
+{
+/*  - bits -
+    7654 3210
+    xxxx ----   tiles color.
+    ---- xxxx   seems unused.
+*/
+	int offs = tile_index;
+	int attr = videoram[offs] + (colorram[offs] << 8);
+	int code = attr & 0xfff;
+	int color = colorram[offs] >> 4;
+
+	SET_TILE_INFO(0, code, color, 0);
+}
+
+/*********************************************************
+* Apple10 color and tile matrix are encrypted/scrambled. *
+*     For more information, see the driver notes.        *
+*********************************************************/
+
 PALETTE_INIT( apple10 )
 {
 	int i;
@@ -61,7 +93,9 @@ PALETTE_INIT( apple10 )
 
 	for (i = 0;i < machine->config->total_colors;i++)
 	{
-		int bit0,bit1,bit2,r,g,b,cn;
+		int bit0,bit1,bit2,r,g,b,cn,cnx;
+
+		cnx = 0;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
@@ -80,37 +114,10 @@ PALETTE_INIT( apple10 )
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* encrypted color matrix */
-		cn = BITSWAP16(i,15,14,13,12,11,10,9,8,4,5,6,7,3,2,1,0);
+		cn = BITSWAP8(i,4,5,6,7,2,3,0,1);
 
 		palette_set_color(machine, cn, MAKE_RGB(r,g,b));
 	}
-}
-
-WRITE8_HANDLER( snookr10_videoram_w )
-{
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-WRITE8_HANDLER( snookr10_colorram_w )
-{
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
-}
-
-static TILE_GET_INFO( get_bg_tile_info )
-{
-/*  - bits -
-    7654 3210
-    xxxx ----   tiles color.
-    ---- xxxx   seems unused.
-*/
-	int offs = tile_index;
-	int attr = videoram[offs] + (colorram[offs] << 8);
-	int code = attr & 0xfff;
-	int color = colorram[offs] >> 4;
-
-	SET_TILE_INFO(0, code, color, 0);
 }
 
 static TILE_GET_INFO( apple10_get_bg_tile_info )
