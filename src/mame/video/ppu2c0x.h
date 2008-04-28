@@ -94,6 +94,7 @@ struct _ppu2c0x_interface
 	int				color_base[MAX_PPU];			/* color base to use per ppu */
 	int				mirroring[MAX_PPU];				/* mirroring options (PPU_MIRROR_* flag) */
 	ppu2c0x_nmi_cb	nmi_handler[MAX_PPU];			/* NMI handler */
+	int				vram_enabled[MAX_PPU];			/* PPU uses vram together with vrom */
 };
 
 /* routines */
@@ -102,6 +103,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 
 void ppu2c0x_reset( int num, int scan_scale );
 void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank, int bank_size );
+void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank, int bank_size );
 void ppu2c0x_spriteram_dma(int num, const UINT8 page );
 void ppu2c0x_render( int num, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy );
 int ppu2c0x_get_pixel( int num, int x, int y );

@@ -83,7 +83,20 @@ static const ppu2c0x_interface ppu_interface =
 	{ 1 },					/* gfxlayout num */
 	{ 256 },				/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
-	{ ppu_irq }				/* irq */
+	{ ppu_irq },			/* irq */
+	{ 0 }					/* vram */
+};
+
+static const ppu2c0x_interface ppu_interface_hboard =
+{
+	PPU_2C03B,				/* type */
+	1,						/* num */
+	{ REGION_GFX2 },		/* vrom gfx region */
+	{ 1 },					/* gfxlayout num */
+	{ 256 },				/* color base */
+	{ PPU_MIRROR_NONE },	/* mirroring */
+	{ ppu_irq },			/* irq */
+	{ 1 }					/* vram */	
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -104,6 +117,17 @@ VIDEO_START( playch10 )
 		 8, 8, 32, 32);
 
 	ppu2c0x_init(machine, &ppu_interface );
+}
+
+VIDEO_START( playch10_hboard )
+{
+	const UINT8 *bios = memory_region(REGION_CPU1);
+	pc10_bios = (bios[3] == 0x2a) ? 1 : 2;
+
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
+		 8, 8, 32, 32);
+
+	ppu2c0x_init(machine, &ppu_interface_hboard );
 }
 
 /***************************************************************************

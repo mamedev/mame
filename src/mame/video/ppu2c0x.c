@@ -32,7 +32,8 @@ NES-specific:
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH	(32*8)	/* Visible screen width */
 #define VISIBLE_SCREEN_HEIGHT	(30*8)	/* Visible screen height */
-#define VIDEORAM_SIZE			0x4000	/* videoram size */
+#define VIDEOMEM_SIZE			0x4000	/* videomem size */
+#define VIDEOMEM_PAGE_SIZE		0x400	/* videomem page size */
 #define SPRITERAM_SIZE			0x100	/* spriteram size */
 #define SPRITERAM_MASK			(0x100-1)	/* spriteram size */
 #define CHARGEN_NUM_CHARS		512		/* max number of characters handled by the chargen */
@@ -67,6 +68,7 @@ static const pen_t default_colortable[] =
 typedef struct {
 	running_machine 		*machine;				/* execution context */
 	bitmap_t				*bitmap;				/* target bitmap */
+	UINT8					*videomem;				/* video mem */
 	UINT8					*videoram;				/* video ram */
 	UINT8					*spriteram;				/* sprite ram */
 	pen_t					*colortable;			/* color table modified at run time */
@@ -82,15 +84,17 @@ typedef struct {
 	ppu2c0x_vidaccess_cb	vidaccess_callback_proc;/* optional video access callback */
 	int						has_videorom;			/* whether we access a video rom or not */
 	int						videorom_banks;			/* number of banks in the videorom (if available) */
+	int						has_videoram;
+	int						videoram_banks_indices[0x2000/VIDEOMEM_PAGE_SIZE];
 	int						regs[PPU_MAX_REG];		/* registers */
 	int						refresh_data;			/* refresh-related */
 	int						refresh_latch;			/* refresh-related */
 	int						x_fine;					/* refresh-related */
 	int						toggle;					/* used to latch hi-lo scroll */
 	int						add;					/* vram increment amount */
-	int						videoram_addr;			/* videoram address pointer */
-	int						addr_latch;				/* videoram address latch */
-	int						data_latch;				/* latched videoram data */
+	int						videomem_addr;			/* videomem address pointer */
+	int						addr_latch;				/* videomem address latch */
+	int						data_latch;				/* latched videomem data */
 	int						buffered_data;
 	int						tile_page;				/* current tile page */
 	int						sprite_page;			/* current sprite page */
@@ -302,20 +306,28 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		chips[i].scanline = 0;
 		chips[i].scan_scale = 1;
 
-		/* allocate a screen bitmap, videoram and spriteram, a dirtychar array and the monochromatic colortable */
+		/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
 		chips[i].bitmap = auto_bitmap_alloc( VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT, video_screen_get_format(machine->primary_screen));
-		chips[i].videoram = auto_malloc( VIDEORAM_SIZE );
+		chips[i].videomem = auto_malloc( VIDEOMEM_SIZE );
+		chips[i].videoram = auto_malloc( VIDEOMEM_SIZE );
 		chips[i].spriteram = auto_malloc( SPRITERAM_SIZE );
 		chips[i].dirtychar = auto_malloc( CHARGEN_NUM_CHARS );
 		chips[i].colortable = auto_malloc( sizeof( default_colortable ) );
 		chips[i].colortable_mono = auto_malloc( sizeof( default_colortable_mono ) );
 
-		/* clear videoram & spriteram */
-		memset( chips[i].videoram, 0, VIDEORAM_SIZE );
+		/* clear videomem & spriteram */
+		memset( chips[i].videomem, 0, VIDEOMEM_SIZE );
+		memset( chips[i].videoram, 0, VIDEOMEM_SIZE );
 		memset( chips[i].spriteram, 0, SPRITERAM_SIZE );
+		memset( chips[i].videoram_banks_indices, 0xff, sizeof(chips[i].videoram_banks_indices) );
 
 		/* set all characters dirty */
 		memset( chips[i].dirtychar, 1, CHARGEN_NUM_CHARS );
+
+		if ( intf->vram_enabled[i] )
+		{
+			chips[i].has_videoram = 1;
+		}
 
 		/* initialize the video ROM portion, if available */
 		if ( ( intf->vrom_region[i] != REGION_INVALID ) && ( memory_region( intf->vrom_region[i] ) != 0 ) )
@@ -327,7 +339,14 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 			chips[i].videorom_banks = memory_region_length( intf->vrom_region[i] ) / 0x2000;
 
 			/* tweak the layout accordingly */
-			total = chips[i].videorom_banks * CHARGEN_NUM_CHARS;
+			if ( chips[i].has_videoram )
+			{
+				total = CHARGEN_NUM_CHARS;
+			}
+			else
+			{
+				total = chips[i].videorom_banks * CHARGEN_NUM_CHARS;
+			}
 		}
 		else
 		{
@@ -340,7 +359,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		/* now create the gfx region */
 		{
 			gfx_layout gl;
-			UINT8 *src = chips[i].has_videorom ? memory_region( intf->vrom_region[i] ) : chips[i].videoram;
+			UINT8 *src = (chips[i].has_videorom && !chips[i].has_videoram) ? memory_region( intf->vrom_region[i] ) : chips[i].videomem;
 
 			memcpy(&gl, &ppu_charlayout, sizeof(gl));
 			gl.total = total;
@@ -349,7 +368,7 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 			machine->gfx[intf->gfx_layout_number[i]]->total_colors = 8;
 		}
 
-		/* setup our videoram handlers based on mirroring */
+		/* setup our videomem handlers based on mirroring */
 		ppu2c0x_set_mirroring( i, intf->mirroring[i] );
 	}
 }
@@ -791,7 +810,7 @@ static void update_scanline(int num )
 				color_mask = 0xff;
 
 			/* cache the background pen */
-			if (this_ppu->videoram_addr >= 0x3f00)
+			if (this_ppu->videomem_addr >= 0x3f00)
 			{
 				// If the PPU's VRAM address happens to point into palette ram space while
 				// both the sprites and background are disabled, the PPU paints the scanline
@@ -799,10 +818,10 @@ static void update_scanline(int num )
 				// pen. Micro Machines makes use of this feature.
 				int penNum;
 
-				if (this_ppu->videoram_addr & 0x03)
-					penNum = this_ppu->videoram[this_ppu->videoram_addr & 0x3f1f] & 0x3f;
+				if (this_ppu->videomem_addr & 0x03)
+					penNum = this_ppu->videomem[this_ppu->videomem_addr & 0x3f1f] & 0x3f;
 				else
-					penNum = this_ppu->videoram[this_ppu->videoram_addr & 0x3f00] & 0x3f;
+					penNum = this_ppu->videomem[this_ppu->videomem_addr & 0x3f00] & 0x3f;
 
 				back_pen = penNum + intf->color_base[num];
 			}
@@ -879,11 +898,11 @@ logerror("vlbank starting\n");
 	/* decode any dirty chars if we're using vram */
 
 	/* first, check the master dirty char flag */
-	if ( !this_ppu->has_videorom && this_ppu->chars_are_dirty )
+	if ( (!this_ppu->has_videorom || this_ppu->has_videoram) && this_ppu->chars_are_dirty )
 	{
 		/* cache some values */
 		UINT8 *dirtyarray = this_ppu->dirtychar;
-		UINT8 *vram = this_ppu->videoram;
+		UINT8 *vram = this_ppu->videomem;
 		gfx_element *gfx = chips[num].machine->gfx[intf->gfx_layout_number[num]];
 
 		/* then iterate and decode */
@@ -972,7 +991,7 @@ void ppu2c0x_reset(int num, int scan_scale )
 	chips[num].x_fine = 0;
 	chips[num].toggle = 0;
 	chips[num].add = 1;
-	chips[num].videoram_addr = 0;
+	chips[num].videomem_addr = 0;
 	chips[num].addr_latch = 0;
 	chips[num].data_latch = 0;
 	chips[num].tile_page = 0;
@@ -1048,9 +1067,9 @@ int ppu2c0x_r( int num, offs_t offset )
 			break;
 
 		case PPU_DATA:
-			if ( this_ppu->videoram_addr >= 0x3f00  )
+			if ( this_ppu->videomem_addr >= 0x3f00  )
 			{
-				this_ppu->data_latch = this_ppu->videoram[this_ppu->videoram_addr & 0x3F1F];
+				this_ppu->data_latch = this_ppu->videomem[this_ppu->videomem_addr & 0x3F1F];
 				if (this_ppu->regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 					this_ppu->data_latch &= 0x30;
 			}
@@ -1058,14 +1077,14 @@ int ppu2c0x_r( int num, offs_t offset )
 				this_ppu->data_latch = this_ppu->buffered_data;
 
 			if ( ppu_latch )
-				(*ppu_latch)( this_ppu->videoram_addr & 0x3fff );
+				(*ppu_latch)( this_ppu->videomem_addr & 0x3fff );
 
-			if ( ( this_ppu->videoram_addr >= 0x2000 ) && ( this_ppu->videoram_addr <= 0x3fff ) )
-				this_ppu->buffered_data = this_ppu->ppu_page[ ( this_ppu->videoram_addr & 0xc00) >> 10][ this_ppu->videoram_addr & 0x3ff ];
+			if ( ( this_ppu->videomem_addr >= 0x2000 ) && ( this_ppu->videomem_addr <= 0x3fff ) )
+				this_ppu->buffered_data = this_ppu->ppu_page[ ( this_ppu->videomem_addr & 0xc00) >> 10][ this_ppu->videomem_addr & 0x3ff ];
 			else
-				this_ppu->buffered_data = this_ppu->videoram[ this_ppu->videoram_addr & 0x3fff ];
+				this_ppu->buffered_data = this_ppu->videomem[ this_ppu->videomem_addr & 0x3fff ];
 
-			this_ppu->videoram_addr += this_ppu->add;
+			this_ppu->videomem_addr += this_ppu->add;
 			break;
 
 		default:
@@ -1131,7 +1150,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				int i;
 				for (i = 0; i <= 0x1f; i ++)
 				{
-					UINT8 oldColor = this_ppu->videoram[i+0x3f00];
+					UINT8 oldColor = this_ppu->videomem[i+0x3f00];
 
 					this_ppu->colortable[i] = color_base + oldColor + (data & PPU_CONTROL1_COLOR_EMPHASIS)*2;
 				}
@@ -1183,7 +1202,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				this_ppu->refresh_latch |= data;
 				this_ppu->refresh_data = this_ppu->refresh_latch;
 
-				this_ppu->videoram_addr = this_ppu->refresh_latch;
+				this_ppu->videomem_addr = this_ppu->refresh_latch;
 //logerror("   vram addr write 2: %02x, %04x (scanline: %d)\n", data, this_ppu->refresh_latch, this_ppu->scanline);
 			}
 			else
@@ -1199,7 +1218,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 		case PPU_DATA:
 			{
-				int tempAddr = this_ppu->videoram_addr & 0x3fff;
+				int tempAddr = this_ppu->videomem_addr & 0x3fff;
 
 				if ( ppu_latch )
 					(*ppu_latch)( tempAddr );
@@ -1212,7 +1231,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				if ( tempAddr < 0x2000 )
 				{
 					/* if we have a videorom mapped there, dont write and log the problem */
-					if ( this_ppu->has_videorom )
+					if ( this_ppu->has_videorom && !this_ppu->has_videoram )
 					{
 						/* if there is a vidaccess callback, assume it coped with it */
 						if ( this_ppu->vidaccess_callback_proc == NULL )
@@ -1221,7 +1240,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 					else
 					{
 						/* store the data */
-						this_ppu->videoram[tempAddr] = data;
+						this_ppu->videomem[tempAddr] = data;
 
 						/* setup the master dirty switch */
 						this_ppu->chars_are_dirty = 1;
@@ -1237,11 +1256,11 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 
 					/* store the data */
 					if (tempAddr & 0x03)
-						this_ppu->videoram[tempAddr & 0x3F1F] = data;
+						this_ppu->videomem[tempAddr & 0x3F1F] = data;
 					else
 					{
-						this_ppu->videoram[0x3F10+(tempAddr&0xF)] = data;
-						this_ppu->videoram[0x3F00+(tempAddr&0xF)] = data;
+						this_ppu->videomem[0x3F10+(tempAddr&0xF)] = data;
+						this_ppu->videomem[0x3F00+(tempAddr&0xF)] = data;
 					}
 
 					/* As usual, some games attempt to write values > the number of colors so we must mask the data. */
@@ -1279,7 +1298,7 @@ void ppu2c0x_w( int num, offs_t offset, UINT8 data )
 				}
 
 				/* increment the address */
-				this_ppu->videoram_addr += this_ppu->add;
+				this_ppu->videomem_addr += this_ppu->add;
 			}
 			break;
 
@@ -1372,15 +1391,76 @@ void ppu2c0x_set_videorom_bank( int num, int start_page, int num_pages, int bank
 
 	bank &= ( chips[num].videorom_banks * ( CHARGEN_NUM_CHARS / bank_size ) ) - 1;
 
-	for( i = start_page; i < ( start_page + num_pages ); i++ )
-		chips[num].nes_vram[i] = bank * bank_size + 64 * ( i - start_page );
+	if (chips[num].has_videoram)
+	{
+		for ( i = start_page; i < start_page + num_pages; i++ )
+		{
+			if ( chips[num].videoram_banks_indices[i] != -1 )
+			{
+				memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);
+			}
+			chips[num].videoram_banks_indices[i] = -1;
+			memset( &chips[num].dirtychar[start_page*0x400 >> 4], 1, (num_pages*0x400 >> 4));
+		}
+		chips[num].chars_are_dirty = 1;
+	}
+	else
+	{
+		for( i = start_page; i < ( start_page + num_pages ); i++ )
+			chips[num].nes_vram[i] = bank * bank_size + 64 * ( i - start_page );
+	}
 
 	{
 		int vram_start = start_page * 0x400;
 		int count = num_pages * 0x400;
 		int rom_start = bank * bank_size * 16;
 
-		memcpy( &chips[num].videoram[vram_start], &memory_region( intf->vrom_region[num] )[rom_start], count );
+		memcpy( &chips[num].videomem[vram_start], &memory_region( intf->vrom_region[num] )[rom_start], count );
+	}
+}
+
+/*************************************
+ *
+ *  PPU VideoRAM banking
+ *
+ *************************************/
+void ppu2c0x_set_videoram_bank( int num, int start_page, int num_pages, int bank, int bank_size )
+{
+	int i;
+
+	/* check bounds */
+	if ( num >= intf->num )
+	{
+		logerror( "PPU(set vrom bank): Attempting to access an unmapped chip\n" );
+		return;
+	}
+
+	if ( !chips[num].has_videoram )
+	{
+		logerror( "PPU(set vram bank): Attempting to switch videoram banks and no ram is mapped\n" );
+		return;
+	}
+
+	bank &= ( CHARGEN_NUM_CHARS / bank_size ) - 1;
+
+	for ( i = start_page; i < start_page + num_pages; i++ )
+	{
+		if ( chips[num].videoram_banks_indices[i] != -1 )
+		{
+			memcpy( &chips[num].videoram[chips[num].videoram_banks_indices[i]*0x400], &chips[num].videomem[i*0x400], 0x400);
+		}
+		chips[num].videoram_banks_indices[i] = (bank * bank_size * 16)/0x400 + (i - start_page);
+		memset( &chips[num].dirtychar[start_page*0x400 >> 4], 1, (num_pages*0x400 >> 4));
+	}
+	chips[num].chars_are_dirty = 1;
+
+	{
+		int vram_start = start_page * 0x400;
+		int count = num_pages * 0x400;
+		int ram_start = bank * bank_size * 16;
+
+		logerror( "ppu2c0x_set_videoram_bank: vram_start = %04x, count = %04x, ram_start = %04x\n", vram_start, count, ram_start );
+		memcpy( &chips[num].videomem[vram_start], &chips[num].videoram[ram_start], count );
 	}
 }
 
@@ -1450,44 +1530,44 @@ void ppu2c0x_set_mirroring( int num, int mirroring )
 	if (this_ppu->mirror_state == PPU_MIRROR_4SCREEN)
 		return;
 
-	/* setup our videoram handlers based on mirroring */
+	/* setup our videomem handlers based on mirroring */
 	switch( mirroring )
 	{
 		case PPU_MIRROR_VERT:
-			this_ppu->ppu_page[0] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videoram[0x2400]);
-			this_ppu->ppu_page[2] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[3] = &(this_ppu->videoram[0x2400]);
+			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2400]);
+			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2400]);
 			break;
 
 		case PPU_MIRROR_HORZ:
-			this_ppu->ppu_page[0] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[2] = &(this_ppu->videoram[0x2400]);
-			this_ppu->ppu_page[3] = &(this_ppu->videoram[0x2400]);
+			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2400]);
+			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2400]);
 			break;
 
 		case PPU_MIRROR_HIGH:
-			this_ppu->ppu_page[0] = &(this_ppu->videoram[0x2400]);
-			this_ppu->ppu_page[1] = &(this_ppu->videoram[0x2400]);
-			this_ppu->ppu_page[2] = &(this_ppu->videoram[0x2400]);
-			this_ppu->ppu_page[3] = &(this_ppu->videoram[0x2400]);
+			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2400]);
+			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2400]);
+			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2400]);
+			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2400]);
 			break;
 
 		case PPU_MIRROR_LOW:
-			this_ppu->ppu_page[0] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[2] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[3] = &(this_ppu->videoram[0x2000]);
+			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2000]);
 			break;
 
 		case PPU_MIRROR_NONE:
 		case PPU_MIRROR_4SCREEN:
 		default:
-			this_ppu->ppu_page[0] = &(this_ppu->videoram[0x2000]);
-			this_ppu->ppu_page[1] = &(this_ppu->videoram[0x2400]);
-			this_ppu->ppu_page[2] = &(this_ppu->videoram[0x2800]);
-			this_ppu->ppu_page[3] = &(this_ppu->videoram[0x2c00]);
+			this_ppu->ppu_page[0] = &(this_ppu->videomem[0x2000]);
+			this_ppu->ppu_page[1] = &(this_ppu->videomem[0x2400]);
+			this_ppu->ppu_page[2] = &(this_ppu->videomem[0x2800]);
+			this_ppu->ppu_page[3] = &(this_ppu->videomem[0x2c00]);
 			break;
 	}
 
