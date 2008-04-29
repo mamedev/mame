@@ -173,6 +173,24 @@
     the supported set is the program rom that is double sized, having identical halves.
 
 
+    --- Super Game ---
+
+    If you have some points accumulated and need to grab the tokens/tickets, you must to play
+    a bonus game called SUPER GAME to get the points out. To enter the bonus game, you must
+    press STOP5 in the attract mode. The payout system is through this game.
+
+    5 themed items will be shown (cuores, balls, elephants, etc... depending of the game).
+    The joker will start to move from item to item quickly, but decreasing the speed gradually.
+    To beat the game, you need to push the start button in the exact moment when the joker is
+    located exactly in the center of the screen (item 3).
+
+    Depending of the DIP switches settings, you can grab the prize manually pressing the SCARICA
+    (payout) button, and then TICKET or HOPPER buttons. Press TICKET button to print a 100 points
+    ticket. Press HOPPER button to get tokens x10 points.
+
+    You have 1 attempt for each 100 earned points. If you lose the game, you lose the points.
+
+
     * Jolly Card (austrian, Funworld, bootleg)
 
     This one seems to have normal RAM instead of NVRAM.
@@ -272,7 +290,7 @@
     $0800 - $0803   PIA1            // Input Ports 0 & 1.
     $0A00 - $0A03   PIA2            // Input Ports 2 & 3.
     $0C00 - $0C00   AY-8910 (R/C)   // Read/Control.
-    $0C01 - $0C01   AY-8910 (W)     // Write.
+    $0C01 - $0C01   AY-8910 (W)     // Write. Lamps through output ports.
     $0E00 - $0E00   CRTC6845 (A)    // MC6845 adressing.
     $0E01 - $0E01   CRTC6845 (R/W)  // MC6845 Read/Write.
 
@@ -282,8 +300,8 @@
     $4000 - $4FFF   VideoRAM (magiccrd/royalcrd)
     $5000 - $5FFF   ColorRAM (magiccrd/royalcrd)
 
-    $6000 - $6FFF   VideoRAM (cuoreuno/elephfam)
-    $7000 - $7FFF   ColorRAM (cuoreuno/elephfam)
+    $6000 - $6FFF   VideoRAM (CMC italian games)
+    $7000 - $7FFF   ColorRAM (CMC italian games)
 
     $8000 - $FFFF   ROM (almost all games)
 
@@ -677,39 +695,39 @@
 ***********************************************************************************
 
 
-    *** Driver updates by Roberto Fresca ***
+    *** Driver Updates by Roberto Fresca ***
 
 
-    2005/09/08
+    [2005/09/08]
     - Added Cuore Uno, Elephant Family and Royal Card.
 
-    2005/09/19
+    [2005/09/19]
     - Added some clones.
     - Cleaned up and renamed all sets. Made parent-clone relationship.
 
-    2005/12/15
+    [2005/12/15]
     - Corrected CPU freq (2 MHz) in cuoreuno and elephfam (both have R65c02P2).
       (I suspect more games must have their CPU running at 2 MHz).
-    - Corrected videoram and colorram offset in cuoreuno and elephfam.
+    - Corrected videoram and colorram offsets in cuoreuno and elephfam.
     - To initialize the NVRAM in cuoreuno and elephfam:
       Start game, press and hold Service1 & Service2, press reset (F3),
       release Service1 & Service2 and press reset (F3) again.
 
-    2006/10/18
+    [2006/10/18]
     - Corrected the screen size and visible area to cuoreuno and elephfam based on mc6845 registers.
     - Added all inputs to cuoreuno and elephfam.
     - Added test mode DIP switch to cuoreuno and elephfam.
     - Managed cuoreuno and elephfam inputs to pass the initial checks. Now both games are playable.
     - Changed the cuoreuno full name to "Cuore 1" (as shown in the attract).
 
-    2006/10/22-28
+    [2006/10/22-28]
     - Corrected cuoreuno and elephfam graphics to 4bpp.
     - Fixed elephfam gfx planes.
     - Simulated cuoreuno palette based on screenshots.
     - Simulated elephfam palette based on screenshots.
 
 
-    2006/11/01 to 2006/12/04
+    [2006/11/01 to 2006/12/04]
 
     ******** REWRITE ********
 
@@ -753,7 +771,7 @@
     - Decrypted jolycdae and managed the planes to show correct colors. The set is working properly.
 
 
-    2006/12/24
+    [2006/12/24]
     - Fixed some incomplete inputs.
     - Added new working game: Pool 10.
     - Added new working game: Tortuga Family.
@@ -761,7 +779,7 @@
     - Added new game: Soccer New. Not working due to the lack of MCU emulation.
     - Updated technical notes.
 
-    2007/02/01
+    [2007/02/01]
     - All crystals documented via #defines.
     - All CPU and sound clocks derived from #defined crystal values.
     - Added DIPLOCATIONS to all games.
@@ -770,17 +788,17 @@
     - Modified the refresh rate to 60 fps according to some video evidences.
     - Updated technical notes.
 
-    2007/02/25
+    [2007/02/25]
     - Added new game: Snooker 10 (Ver 1.11). Preliminary.
         Properly decoded GFX
         Proper colors decoded.
     - Updated technical notes.
 
-    2007/09/21
+    [2007/09/21]
     - Added new game: Saloon (France, encrypted). Preliminary.
     - Updated technical notes.
 
-    2008/02/10
+    [2008/02/10]
     - Switched to XTAL def.
     - Fixed Magic Card II graphics issues.
     - Fixed Magic Card II inputs.
@@ -799,11 +817,11 @@
     - Updated technical notes.
     - Cleaned up the driver.
 
-    2008/02/22
+    [2008/02/22]
     - Switched the color decoding routines to use resnet code.
     - Added complete color connections to/from 74ls373 to the source.
 
-    2008/02/25
+    [2008/02/25]
     - Added new game: Royal Vegas Joker Card (fast deal, english gfx).
     - Added new game: Jolly Joker.
     - Added new game: Jolly Joker (50bet).
@@ -815,25 +833,31 @@
     - Added minor corrections.
     - Updated technical notes.
 
-    2008/03/14
+    [2008/03/14]
     - Added proper inputs to jolyc980.
     - Added temporary patch to allow bypass the "code" screen in jolyc980.
     - Updated technical notes.
 
-    2008/03/18
+    [2008/03/18]
     - Added new game: Pot Game (italian).
     - Updated technical notes.
 
-    2008/04/18
+    [2008/04/18]
     - Removed the temporary hack to jolyc980.
     - Updated technical notes regarding Magic Card II & Jolly Card Professional 2.0.
     - Moved snookr10 to its own driver.
     - Minor clean-up.
 
-    2008/04/27
+    [2008/04/27]
     - Fixed AY8910 volume to all games to avoid clips.
     - Merge bigdeal and funworld machine drivers thanks to the AY8910 rewrite.
     - Removed old unaccurate commentary about magiccrd tiles.
+
+    [2008/04/29]
+    All CMC italian games:
+    - Added TICKET and HOPPER buttons to allow payout through the SUPER GAME.
+    - Documented the featured SUPER GAME with complete instructions.
+    - Improved DIP switches to properly set the payout system.
 
 
     *** TO DO ***
@@ -1017,7 +1041,6 @@ static INPUT_PORTS_START( funworld )
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
-
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
@@ -1079,7 +1102,6 @@ static INPUT_PORTS_START( jolycdcr )
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
-
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
@@ -1140,7 +1162,6 @@ static INPUT_PORTS_START( jolycdit )
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
-
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
@@ -1261,7 +1282,6 @@ static INPUT_PORTS_START( bigdeal )
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
-
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
@@ -1323,7 +1343,6 @@ static INPUT_PORTS_START( magiccrd )
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
-
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
@@ -1385,7 +1404,6 @@ static INPUT_PORTS_START( royalcrd )
 
 	/* after nvram init, set the following one to 'manual'
     to allow the remote credits mode to work */
-
 	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
@@ -1393,24 +1411,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cuoreuno )
 	PORT_START_TAG("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Stop 1 / Switch Bet (1-Max)") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Clear / Bet / Prendi (Take)") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Start / Gioca (Play)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Stop 5 / Half Gamble / Super Game") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* no remote credits */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_NAME("Stop 1 / Switch Bet (1-Max)") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_NAME("Clear / Bet / Prendi (Take)") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start / Gioca (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_NAME("Stop 5 / Half Gamble / Super Game") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Stop 4 / Alta (High)") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_NAME("Stop 4 / Alta (High)") PORT_CODE(KEYCODE_V)
 
 	PORT_START_TAG("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stop 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_NAME("Stop 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1423,32 +1441,89 @@ static INPUT_PORTS_START( cuoreuno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )			PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )					PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )	PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPSETTING(    0x00, "Manual - User Choice 1" )
+	PORT_DIPSETTING(    0x20, "Manual - Coins" )
+	PORT_DIPSETTING(    0x40, "Manual - Tickets" )
+	PORT_DIPSETTING(    0x60, "Manual - User Choice 2" )
 
 	/* the following one (1st DSW) seems to be disconnected
-    to avoid the use of remote credits / manual payout */
+    to avoid the use of remote credits or direct payout */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )	PORT_DIPLOCATION("SW1:1")
+static INPUT_PORTS_START( pool10 )
+	PORT_START_TAG("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* no remote credits */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_NAME("Stop 1 / Switch Bet (1-Max)") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_NAME("Clear / Bet / Prendi (Take)") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start / Gioca (Play)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_NAME("Stop 5 / Half Gamble / Super Game") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_NAME("Stop 4 / Alta (High)") PORT_CODE(KEYCODE_V)
+
+	PORT_START_TAG("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_NAME("Stop 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+
+	PORT_START_TAG("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START_TAG("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )					PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x60, "Super Game Payment Type" )	PORT_DIPLOCATION("SW1:3,2")
+	PORT_DIPSETTING(    0x00, "Manual - User Choice 1" )
+	PORT_DIPSETTING(    0x20, "Manual - Coins" )
+	PORT_DIPSETTING(    0x40, "Manual - Tickets" )
+	PORT_DIPSETTING(    0x60, "Manual - User Choice 2" )
+
+	/* direct payout without play Super Game */
+	PORT_DIPNAME( 0x80, 0x80, "Direct Payout (tickets)" )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -2481,7 +2556,7 @@ GAME( 1986, jolycdat, bigdeal,  funworld, bigdeal,  funworld, ROT0, "Funworld", 
 GAME( 1996, cuoreuno, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Cuore 1 (italian)",                               0 )
 GAME( 1997, elephfam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, new)",                  0 )
 GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Elephant Family (italian, old)",                  0 )
-GAME( 1996, pool10,   0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
+GAME( 1996, pool10,   0,        cuoreuno, pool10,   funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
 GAME( 1996, pool10b,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 2)",                        0 )
 GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
 GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
