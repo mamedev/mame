@@ -85,24 +85,16 @@ static WRITE8_HANDLER( audio_dac_w)
 	timer_set( ATTOTIME_IN_HZ( 16000 ), NULL, 0, dac_irq );
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4400, 0x47ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x4c00, 0x4fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5000, 0x503f) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(trucocl_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(trucocl_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x5000, 0x503f) AM_READ(input_port_0_r)	/* IN0 */
 	AM_RANGE(0x5080, 0x5080) AM_WRITE(audio_dac_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( trucocl )
@@ -144,7 +136,7 @@ static INTERRUPT_GEN( trucocl_interrupt )
 static MACHINE_DRIVER_START( trucocl )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", trucocl_interrupt)
 
 	/* video hardware */
