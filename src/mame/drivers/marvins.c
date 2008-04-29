@@ -60,7 +60,6 @@ extern WRITE8_HANDLER( marvins_spriteram_w );
 extern VIDEO_START( marvins );
 extern VIDEO_UPDATE( marvins );
 extern VIDEO_UPDATE( madcrash );
-extern VIDEO_UPDATE( vangrd2 );
 
 extern WRITE8_HANDLER( marvins_palette_bank_w );
 
@@ -593,7 +592,7 @@ static MACHINE_DRIVER_START( vangrd2 )
 	MDRV_PALETTE_LENGTH((16+2)*16)
 
 	MDRV_VIDEO_START(marvins)
-	MDRV_VIDEO_UPDATE(vangrd2)
+	MDRV_VIDEO_UPDATE(madcrash)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -626,8 +625,6 @@ static MACHINE_DRIVER_START( madcrash )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(16, 16+256-1, 0, 0+216-1)
-	MDRV_VIDEO_START(marvins)
-	MDRV_VIDEO_UPDATE(madcrash)
 MACHINE_DRIVER_END
 
 
