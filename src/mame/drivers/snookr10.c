@@ -94,13 +94,20 @@
 
     --- Super Game ---
 
-    If you have some points accumulated, you're allowed to play a bonus game called SUPER GAME.
-    To enter the bonus game, you must press STOP5 in the attract mode. The payout system is
-    through this game.
+    If you have some points accumulated and need to grab the tokens/tickets, you must to play
+    a bonus game called SUPER GAME to get the points out. To enter the bonus game, you must
+    press STOP5 in the attract mode. The payout system is through this game.
 
-	5 balls will be shown. The joker will start to move from ball to ball increasing the speed.
+    5 themed items will be shown (apples, balls, etc... depending of the game).
+    The joker will start to move from item to item quickly, but decreasing the speed gradually.
     To beat the game, you need to push the start button in the exact moment when the joker is
-    located in the center of the screen (ball 3).
+    located exactly in the center of the screen (item 3).
+
+    Depending of the DIP switches settings, you can grab the prize manually pressing the SCARICA
+    (payout) button, and then TICKET or HOPPER buttons. Press TICKET button to print a 100 points
+    ticket. Press HOPPER button to get tokens x10 points.
+
+    You have 1 attempt for each 100 earned points. If you lose the game, you lose the points.
 
 
 
@@ -284,7 +291,7 @@
 
 
     [2008/04/28]
-    - Create a new machine driver for tenballs due to different memory map.
+    - Created a new machine driver for tenballs due to different memory map.
     - Worked all the input ports from the scratch.
     - Fixed the sound ROM_REGION.
     - Added the oki6295 emulation to all games.
@@ -292,7 +299,7 @@
     - Documented and calculated all bits related to lamps.
     - Adjusted palette lenght to 256 colors.
     - Totally decrypted the apple10 color matrix. Now colors are perfect.
-    - Create a new machine driver for apple10 due to encryption.
+    - Created a new machine driver for apple10 due to encryption.
     - Reverse engineering the code to complete the DIP switches.
     - Added diplocations to DIP switches.
     - Promoted snookr10, apple10 and tenballs to 'WORKING' state.
@@ -438,7 +445,7 @@ static INPUT_PORTS_START( snookr10 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_IMPULSE(2) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)	/* Input Test in stats mode */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_IMPULSE(2) PORT_NAME("Cancella (Cancel) / Play / Bet") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_IMPULSE(2) PORT_NAME("Stop 5 / Risk (Half Gamble)") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_IMPULSE(2) PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )	PORT_NAME("Estatistica (Stats)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Management")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_IMPULSE(2) PORT_NAME("Stop 4 / Alta (High)") PORT_CODE(KEYCODE_V)
@@ -446,12 +453,12 @@ static INPUT_PORTS_START( snookr10 )
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_IMPULSE(2) PORT_NAME("Stop 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_IMPULSE(2) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket In") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper In") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Scarico (Payout)") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Scarica (Payout)") PORT_CODE(KEYCODE_M)
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -493,7 +500,7 @@ static INPUT_PORTS_START( apple10 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_IMPULSE(2) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)	/* Input Test in stats mode */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_IMPULSE(2) PORT_NAME("Cancella (Cancel) / Play / Bet") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_IMPULSE(2) PORT_NAME("Stop 5 / Risk (Half Gamble)") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_IMPULSE(2) PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )	PORT_NAME("Estatistica (Stats)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Management")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_IMPULSE(2) PORT_NAME("Stop 4 / Alta (High)") PORT_CODE(KEYCODE_V)
@@ -501,12 +508,12 @@ static INPUT_PORTS_START( apple10 )
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_IMPULSE(2) PORT_NAME("Stop 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_IMPULSE(2) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket In") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper In") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Scarico (Payout)") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Scarica (Payout)") PORT_CODE(KEYCODE_M)
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -548,7 +555,7 @@ static INPUT_PORTS_START( tenballs )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )	PORT_IMPULSE(2) PORT_NAME("Stop 1") PORT_CODE(KEYCODE_Z)	/* no Input Test in stats mode */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 )	PORT_IMPULSE(2) PORT_NAME("Cancella (Cancel) / Play / Bet") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )		PORT_NAME("Start (Deal) / Raddoppio (Double-Up)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_IMPULSE(2) PORT_NAME("Stop 5 / Risk (Half Gamble)") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )	PORT_IMPULSE(2) PORT_NAME("Stop 5 / Risk (Half Gamble) / Super Game") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )	PORT_NAME("Estatistica (Stats)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 )	PORT_NAME("Management")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )	PORT_IMPULSE(2) PORT_NAME("Stop 4 / Alta (High)") PORT_CODE(KEYCODE_V)
@@ -556,12 +563,12 @@ static INPUT_PORTS_START( tenballs )
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	PORT_IMPULSE(2) PORT_NAME("Stop 2 / Bassa (Low)") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )	PORT_IMPULSE(2) PORT_NAME("Stop 3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket In") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper In") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Ticket") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Scarico (Payout)") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 )	PORT_NAME("Scarica (Payout)") PORT_CODE(KEYCODE_M)
 
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -574,7 +581,7 @@ static INPUT_PORTS_START( tenballs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
     /* tenballs seems a prototype, most DIP
-       switches seems to do nothing at all
+       switches seems to do nothing at all.
     */ 
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )		PORT_DIPLOCATION("SW1:7,8")
