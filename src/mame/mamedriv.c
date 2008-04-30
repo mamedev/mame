@@ -2595,7 +2595,8 @@ V-V                           TP-027
 	DRIVER( ddsomj )	/* 19/06/1996 (c) 1996 (Japan) */
 	DRIVER( ddsoma )	/* 19/06/1996 (c) 1996 (Asia) */
 	DRIVER( ddsomb )	/* 23/02/1996 (c) 1996 (Brazil) */
-	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (US) */
+	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (Euro) */
+	DRIVER( sfa2u )		/* 06/03/1996 (c) 1996 (US) */
 	DRIVER( sfz2j )		/* 27/02/1996 (c) 1996 (Japan) */
 	DRIVER( sfz2a )		/* 27/02/1996 (c) 1996 (Asia) */
 	DRIVER( sfz2b )		/* 31/05/1996 (c) 1996 (Brazil) */
@@ -7022,7 +7023,7 @@ Other Sun games
 	DRIVER( tgtball )	/* (c) 1995 Yun Sung */
 	DRIVER( tgtballa )	/* (c) 1995 Yun Sung */
 	DRIVER( torus )		/* (c) 1996 Yun Sung */
-	DRIVER( paprazzi )	/* (c) 1996 Yun Sung */	
+	DRIVER( paprazzi )	/* (c) 1996 Yun Sung */
 	DRIVER( madball )	/* (c) 1998 Yun Sung */
 	DRIVER( madballn )	/* (c) 1998 Yun Sung */
 	DRIVER( cannball )	/* (c) 1995 Yun Sung / Soft Visio */
