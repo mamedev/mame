@@ -48,7 +48,6 @@
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
   - megat3: u37 has bad size, should be 8MBit
-  - megat4: rom u32 was bad, currently using u32 from megat4te
   - megat5: has jmp $0000 in the initialization code causing infinite loop, is rom bad?
  */
 
@@ -908,7 +907,7 @@ static MACHINE_DRIVER_START(meritm_crt250)
 
   /* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910, SYSTEM_CLK/6)
+	MDRV_SOUND_ADD(AY8910, SYSTEM_CLK/12)
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -1025,9 +1024,9 @@ ROM_START( pitbossm )
 	ROM_LOAD( "6",  0x20000, 0x10000, CRC(47a9dfc7) SHA1(eca100003f5605bcf405f610a0458ccb67894d35) )
 	ROM_LOAD( "7",  0x30000, 0x10000, CRC(b9fb4203) SHA1(84b514d9739d9c2ab1081cfc7cdedb41155ee038) )
 	ROM_LOAD( "8",  0x40000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // == u16 on pitboss2/spitboss
-	ROM_RELOAD(		0x50000, 0x10000)
+	ROM_RELOAD(     0x50000, 0x10000)
 	ROM_LOAD( "9",  0x60000, 0x10000, CRC(27034061) SHA1(cff6be592a4a3ab01c204b081470f224e6186c4d) )
-	ROM_RELOAD(		0x70000, 0x10000)
+	ROM_RELOAD(     0x70000, 0x10000)
 
 
 	ROM_REGION( 0xc0000, REGION_USER1, 0 ) // extra data / extra banks?
@@ -1037,145 +1036,51 @@ ROM_START( pitbossm )
 ROM_END
 
 /*
-    Mega Touch 3
+    Mega Touch
     by Merit Industries
 
-    Dumped by NAZ!
-    on 9/20/1998
-
+    CTR-260 PB10004
 
     System Info
     -----------
      This is a counter top Touch screen game.
 
-    processor.. Z80
-    sound processor- YM2149
+    processor.. Z80 (Z0840006PSC)
+    sound chip Yamaha YM2149F
     other chips- two Yamaha V9938
              one LM1203
-             one PC165500N
+             one PC16550DN
              one PB255a or L5220574
              One Dallas DS1204 Data Key
-             One dallas DS1225Y 16k Non-volitile RAM
-             Two Z80APIO
-*/
+             One dallas DS1225Y 16k Non-volitile SRAM
+             Two Z80APIO (Z0842004PSC)
 
-ROM_START( megat3 )
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "megat3.u32",  0x000000, 0x80000, CRC(ac969296) SHA1(7e09e9141637339b83c21f2488560cdf8a460069) )
-	ROM_RELOAD(              0x080000, 0x80000)
-	ROM_LOAD( "megat3.u36",  0x100000, 0x80000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) )
-	ROM_RELOAD(              0x180000, 0x80000)
-	ROM_LOAD( "megat3.u37",  0x200000, 0x80000, BAD_DUMP CRC(96680164) SHA1(dfb8e07ba0e87316a947238e7a00fbf4d6ed5fe4) ) // should be 8MBit
-	ROM_RELOAD(              0x280000, 0x80000)
-	ROM_LOAD( "megat3.u38",  0x300000, 0x80000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) )
-	ROM_RELOAD(              0x380000, 0x80000)
-ROM_END
-
-ROM_START( megat4 )
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "megat4.u32",  0x000000, 0x100000, BAD_DUMP CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) // from megat4te dump
-	ROM_LOAD( "qs9255-02u36.bin",  0x100000, 0x80000, CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) )
-	ROM_RELOAD(              0x180000, 0x80000)
-	ROM_LOAD( "qs9255-02u37.bin",  0x200000, 0x80000, CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) )
-	ROM_RELOAD(              0x280000, 0x80000)
-	ROM_LOAD( "9255-40-01u38.bin",  0x300000, 0x80000, CRC(0d098424) SHA1(ef2810ccd636e69378fd353c8a95605274bb227f) )
-	ROM_RELOAD(              0x380000, 0x80000)
-ROM_END
-
-/*
-    Mega Touch 4
-    by Merit Industries
-
-    Dumped by Hugh McLenaghan!
-    on 08/29/2007
+    OSC 21.477270 MHz & 1.8432MHz (near the PC16550DN)
 
 
-    System Info
-    -----------
-     This is a counter top Touch screen game.
-
-    processor.. Z80
-    sound processor- YM2149
-    other chips- two Yamaha V9938
-             one LM1203
-             one PC165500N
-             one PB255a or L5220574
-             One Dallas DS1204 Data Key
-             One dallas DS1235Y 32k Non-volitile RAM
-             Two Z80APIO
-*/
-
-ROM_START( megat4te )
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "megat4.u32",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) )
-	ROM_LOAD( "megat4.u36",  0x100000, 0x080000, CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) )
-    ROM_RELOAD(              0x180000, 0x080000 )
-	ROM_LOAD( "megat4.u37",  0x200000, 0x080000, CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) )
-	ROM_RELOAD(              0x280000, 0x080000 )
-	ROM_LOAD( "megat4.u38",  0x300000, 0x080000, CRC(124d5b84) SHA1(3c2117f56d0dc406bfb508989729e36781e215a4) )
-	ROM_RELOAD(              0x380000, 0x080000 )
-
-    ROM_REGION( 0x8000, REGION_USER1, 0 ) // DS1644 nv ram
-	ROM_LOAD( "ds1644.u31",  0x00000,  0x8000,   CRC(0908bc39) SHA1(e6ec6238d6bf5c802e046407c0f25a83b09f6135) )
-
-ROM_END
-
-/*
-    Mega Touch 5
-    by Merit Industries
-
-    Dumped by NAZ!
-    on 9/20/1998
-
-
-    System Info
-    -----------
-     This is a counter top Touch screen game.
-
-    processor.. Z80
-    sound processor- YM2149
-    other chips- two Yamaha V9938
-             one LM1203
-             one PC165500N
-             one PB255a or L5220574
-             One Dallas DS1204 Data Key
-             One dallas DS1230Y 32k Non-volitile RAM
-             Two Z80APIO
-*/
-
-ROM_START( megat5 )
-	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "megat5.u32",  0x000000, 0x80000, BAD_DUMP CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) )
-	ROM_RELOAD(              0x080000, 0x80000)
-	ROM_LOAD( "megat5.u36",  0x100000, 0x80000, BAD_DUMP CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
-	ROM_RELOAD(              0x180000, 0x80000)
-	ROM_LOAD( "megat5.u37",  0x200000, 0x80000, BAD_DUMP CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
-	ROM_RELOAD(              0x280000, 0x80000)
-	ROM_LOAD( "megat5.u38",  0x300000, 0x80000, BAD_DUMP CRC(018e36c7) SHA1(8e9b457238a40b10d59887d13bac9c0a05c73614) )
-	ROM_RELOAD(              0x380000, 0x80000)
-ROM_END
-
-/*
-
-Megatouch 6 - Merit 1998
+Actual Megatouch 4 rom labels
 --------------------------------
 
-CPU:
-1 Z80
-1 8255
-1 16550
-2 x Z80 PIO
-2 x V9938
+9255-40-01
+ U32-R0      = 27C801
+C1996 MII
 
-Memory:
-2 x V53C8256HP45 256K X 8 Fast Page Mode CMOS DRAM
-1 DS1230 nv ram
+QS9255-02
+ U36-R0      = 27C040
+C1996 MII
 
-Sound:
-YM2149
+QS9255-02
+ U37-R0      = 27C040
+C1996 MII
 
-Actual rom labels:
-------------------
+9255-40-01
+ U38-R0E     = 27C4001 (AKA 27C040)
+C1996 MII
+
+
+ActualMegatouch 6 rom labels
+--------------------------------
+
 9255-60-01
  U32-R0      = 27C801
 C1997 MII
@@ -1189,33 +1094,123 @@ QS9255-08
 C1998 MII
 
 9255-80-01
- U36-R0      = 27C801
+ U38-R0A     = 27C801
 C1998 MII
 
 PAL:
-SC39440A.u19 = PALCE22V10H-25PC/4
-SC3980.u40   = PALCE16V8H-25
-SC39810A.u15 = PALCE16V8H-25
-SC3943.u20   = ATF16V8B25PC
+SC3944-0A.u19 = PALCE22V10H-25PC/4
+SC3980.u40    = PALCE16V8H-25
+SC398-10A.u51 = PALCE16V8H-25
+SC3943.u20    = ATF16V8B25PC
 
 */
 
+ROM_START( megat3 )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD( "megat3.u32",         0x000000, 0x80000, CRC(ac969296) SHA1(7e09e9141637339b83c21f2488560cdf8a460069) )
+	ROM_RELOAD(                     0x080000, 0x80000)
+	ROM_LOAD( "megat3.u36",         0x100000, 0x80000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) )
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "megat3.u37",         0x200000, 0x80000, BAD_DUMP CRC(96680164) SHA1(dfb8e07ba0e87316a947238e7a00fbf4d6ed5fe4) ) // should be 8MBit
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-20-01_u38-rof", 0x300000, 0x80000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) )
+	ROM_RELOAD(                     0x380000, 0x80000)
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat4 )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
+	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "qs9255-02_u37-ro",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-40-01_u38-roe", 0x300000, 0x80000,  CRC(407c5e57) SHA1(c7c907b3fd6a8e64dcc6c71288505980862effce) ) /* Location U38 */
+	ROM_RELOAD(                     0x380000, 0x80000)
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat4a )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
+	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "qs9255-02_u37-ro",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-40-01_u38-rod", 0x300000, 0x80000,  CRC(0d098424) SHA1(ef2810ccd636e69378fd353c8a95605274bb227f) ) /* Location U38 */
+	ROM_RELOAD(                     0x380000, 0x80000)
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat4te )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
+	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x80000)
+	ROM_LOAD( "qs9255-02_u37-ro",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
+	ROM_RELOAD(                     0x280000, 0x80000)
+	ROM_LOAD( "9255-50-01_u38-rod", 0x300000, 0x080000, CRC(124d5b84) SHA1(3c2117f56d0dc406bfb508989729e36781e215a4) ) /* Location U38 */
+	ROM_RELOAD(                     0x380000, 0x080000 )
+
+	ROM_REGION( 0x8000, REGION_USER1, 0 ) // DS1644 nv ram
+	ROM_LOAD( "ds1644.u31",  0x00000,  0x8000,   CRC(0908bc39) SHA1(e6ec6238d6bf5c802e046407c0f25a83b09f6135) )
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
+ROM_START( megat5 )
+	ROM_REGION( 0x400000, REGION_CPU1, 0 )
+	ROM_LOAD( "megat5.u32",  0x000000, 0x80000, BAD_DUMP CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) )
+	ROM_RELOAD(              0x080000, 0x80000)
+	ROM_LOAD( "megat5.u36",  0x100000, 0x80000, BAD_DUMP CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
+	ROM_RELOAD(              0x180000, 0x80000)
+	ROM_LOAD( "megat5.u37",  0x200000, 0x80000, BAD_DUMP CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
+	ROM_RELOAD(              0x280000, 0x80000)
+	ROM_LOAD( "megat5.u38",  0x300000, 0x80000, BAD_DUMP CRC(018e36c7) SHA1(8e9b457238a40b10d59887d13bac9c0a05c73614) )
+	ROM_RELOAD(              0x380000, 0x80000)
+
+	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
 ROM_START( megat6 )
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "u32-r0",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) )
-	ROM_LOAD( "u36-r0",  0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) )
-	ROM_RELOAD(          0x180000, 0x080000 )
-	ROM_LOAD( "u37-r0",  0x200000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) )
-	ROM_LOAD( "u38-r0",  0x300000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) )
+	ROM_LOAD( "9255-60-01_u32-ro",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
+	ROM_LOAD( "qs9255-08_u36-ro",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x080000 )
+	ROM_LOAD( "qs9255-08_u37-ro",   0x200000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) ) /* Location U37 */
+	ROM_LOAD( "9255-80-01_u38-roa", 0x300000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) ) /* Location U38 */
 
 	ROM_REGION( 0x8000, REGION_USER1, 0 ) // DS1230 nv ram
 	ROM_LOAD( "ds1230y.u31",  0x00000, 0x8000, CRC(51b6da5c) SHA1(1d53af89d7867bb48b9d46feff6fc3b7e8e80ac8) )
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
-	ROM_LOAD( "sc3943.u20.bin", 0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
-	ROM_LOAD( "sc3944-0a.bin",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
-	ROM_LOAD( "sc3980.bin",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
-	ROM_LOAD( "sc39810a.bin",   0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
 static DRIVER_INIT(megat3)
@@ -1265,8 +1260,9 @@ GAME( 1988, spitboss,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Su
 /* CRT 250 + question roms */
 GAME( 1994, pitbossm,  0,      meritm_crt250_questions, pitbossm, 0, ROT0, "Merit", "Pit Boss Megastar", GAME_IMPERFECT_GRAPHICS )
 /* CRT 260 */
-GAME( 1995, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
-GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, megat4te,  0,      meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF)", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
+GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROE)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, megat5,    0,      meritm_crt260, meritm_crt260, 0,	       ROT0, "Merit", "Megatouch 5", GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING )
-GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, megat6,    0,      meritm_crt260, meritm_crt260, megat6,   ROT0, "Merit", "Megatouch 6 (9255-80-01 ROA)", GAME_IMPERFECT_GRAPHICS )
