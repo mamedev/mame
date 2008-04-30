@@ -84,12 +84,10 @@
     to access the PROGRAMAZZIONE (program mode), where you can change the game parameters.
     Press START (key '1') to exit both modes.
 
+    To clear credits (and stats), just re-initialize the NVRAM.
+
     Only for the new hardware revision (snookr10 & apple10), pressing STOP 1 (key 'Z') in the
     stats mode, make the hidden Input Test mode to appear. Press RESET (F3) to exit the mode.
-
-    SCARICA (key 'M') is the payout key. This input is working properly in the Input Test mode,
-    but doesn't seems to work properly in game mode. Only attempt to print a ticket. Maybe this
-    issue is related to protection. To clear credits (and stats), just re-initialize the NVRAM.
 
 
     --- Super Game ---
