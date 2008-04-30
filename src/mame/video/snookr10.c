@@ -93,9 +93,7 @@ PALETTE_INIT( apple10 )
 
 	for (i = 0;i < machine->config->total_colors;i++)
 	{
-		int bit0,bit1,bit2,r,g,b,cn,cnx;
-
-		cnx = 0;
+		int bit0,bit1,bit2,r,g,b,cn;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
