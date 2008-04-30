@@ -4088,7 +4088,7 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_CPU_ADD(Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
 
-	MDRV_INTERLEAVE(10)
+	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_RESET(bgaregga)
 
