@@ -51,6 +51,7 @@
         added save state support.
 */
 
+#include "deprecat.h"
 #include "debugger.h"
 #include "m37710cm.h"
 

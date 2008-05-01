@@ -15,6 +15,7 @@
 #ifndef __DEPRECAT_H__
 #define __DEPRECAT_H__
 
+#include "mamecore.h"
 
 
 /*************************************

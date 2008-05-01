@@ -37,6 +37,7 @@ addresses take place.
 
 */
 
+#include "deprecat.h"
 #include "debugger.h"
 #include "m6509.h"
 

@@ -678,7 +678,7 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 
 		case 0x9:
 			ppc.spu.sptb = d;
-			ppc403_spu_tx_callback(Machine, NULL, cpu_getactivecpu());
+			ppc403_spu_tx_callback(NULL/* Machine */, NULL, cpu_getactivecpu());
 			break;
 
 		default:
