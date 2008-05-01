@@ -2646,6 +2646,27 @@ ROM_START( raimaisj )
 	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
 ROM_END
 
+ROM_START( raimaijo )
+	ROM_REGION( 0xb0000, REGION_CPU1, 0 )
+	ROM_LOAD( "b36-08.bin", 0x00000, 0x20000, CRC(f40b9178) SHA1(ccf5afcf08cac0d5b2d6ba74abd62d35412f0265) )
+	ROM_RELOAD(               0x10000, 0x20000 )
+	ROM_LOAD( "b36-09.bin",   0x30000, 0x20000, CRC(9c466e43) SHA1(2466a3f1f8124323008c9925f90e9a1d2edf1564) )
+
+	ROM_REGION( 0x1c000, REGION_CPU2, 0 )	/* sound (audio/rastan.c wants it as #2 */
+	ROM_LOAD( "b36-06.bin",   0x00000, 0x4000, CRC(29bbc4f8) SHA1(39a68729c6180c5f6cdf604e692018e7d6bf5591) )
+	ROM_CONTINUE(             0x10000, 0xc000 )
+
+	ROM_REGION( 0x10000, REGION_CPU3, 0 )
+	ROM_LOAD( "b36-07.bin",   0x00000, 0x10000, CRC(4f3737e6) SHA1(ff5f5d4ca5485441d03c8cb01a6a096941ab02eb) )
+
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "b36-01.bin",   0x00000, 0x80000, CRC(89355cb2) SHA1(433e929fe8b488af84e88486d9679468a3d9677a) )
+	ROM_LOAD( "b36-02.bin",   0x80000, 0x80000, CRC(e71da5db) SHA1(aa47ae02c359264c0a1f09ecc583eefd1ef1dfa4) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "b36-03.bin",   0x00000, 0x80000, CRC(96166516) SHA1(a6748218188cbd1b037f6c0845416665c0d55a7b) )
+ROM_END
+
 ROM_START( fhawk )
 	ROM_REGION( 0xb0000, REGION_CPU1, 0 )
 	ROM_LOAD( "b70-11.bin", 0x00000, 0x20000, CRC(7d9f7583) SHA1(d8fa7c66a81fb356fa9c72f377bfc31b1837eafb) )
@@ -3110,6 +3131,7 @@ static DRIVER_INIT( evilston )
 
 GAME( 1988, raimais,  0,        raimais,  raimais,  0,        ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
 GAME( 1988, raimaisj, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
+GAME( 1988, raimaijo, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan / First Revision)", 0 )
 GAME( 1988, fhawk,    0,        fhawk,    fhawk,    0,        ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
 GAME( 1988, fhawkj,   fhawk,    fhawk,    fhawkj,   0,        ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
 GAME( 1989, champwr,  0,        champwr,  champwr,  0,        ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", GAME_IMPERFECT_SOUND )

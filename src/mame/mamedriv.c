@@ -1761,6 +1761,7 @@ const game_driver * const drivers[] =
 	/* Taito L-System games */
 	DRIVER( raimais )	/* B36 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( raimaisj )	/* B36 (c) 1988 Taito Corporation */
+	DRIVER( raimaijo )	/* B36 (c) 1988 Taito Corporation */
 	DRIVER( kurikint )	/* B42 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( kurikinu )	/* B42 (c) 1988 Taito America Corporation (US) */
 	DRIVER( kurikinj )	/* B42 (c) 1988 Taito Corporation (Japan) */
