@@ -571,8 +571,8 @@ const UINT8 matchit2_decryption_table[256] = {
 //       new  new  new  new       new  new             new       new  new  new
 	0x49,0xb4,0xa9,xxxx,0xd3,0x8b,0xe8,0xb8, 0xa0,xxxx,xxxx,xxxx,0x84,xxxx,xxxx,xxxx, /* 30 */
 //  !!!! ???? new       !!!! new  new        new                 new
-	xxxx,xxxx,xxxx,xxxx,0x14,xxxx,0x25,xxxx, xxxx,0x5e,xxxx,0x87,0x56,0xb9,xxxx,0x39, /* 40 */
-//                      new       new             new       new  new  new  ???? new
+	xxxx,xxxx,xxxx,xxxx,0x14,xxxx,0x25,xxxx, xxxx,0x5e,xxxx,0x87,0x56,0xb9,0x4a,0x39, /* 40 */
+//                      new       new             new       new  new  new  new  new
 	0x89,xxxx,xxxx,xxxx,xxxx,0x1f,0xa4,xxxx, 0xf8,0x5f,0x21,0xb3,0x5b,xxxx,0x8d,xxxx, /* 50 */
 //  new                      new  !!!!       new  new  !!!! new            new
 	xxxx,0xc5,0x7c,0x07,xxxx,0x88,0xba,0x47, 0x35,0xfb,xxxx,0x7f,xxxx,xxxx,0xc6,0xeb, /* 60 */
@@ -602,8 +602,6 @@ Unknown (marked "????")
 from shisen 2:
 E4 -> pc: b08; f458, 1920 (99% 1 byte at boot and sometimes when a piece is selected)
           b65c (after one match is finished with the girl on the background or when you finish some levels in the other modes)
-         (16 37 3e 3f 41 4a 4d 4e 4f 90 91 95 96)
-4E -> pc: 7ac3, 7ae8 (after a 2 players match and in a 2 players match in "stalemate")
 
 Found (marked "!!!!")
 14 -> pc: 8b2a -> 42
@@ -613,6 +611,7 @@ Found (marked "!!!!")
 30 -> pc: 19af, 1986 -> 49
 31 -> pc: c804, c813, c822, 1358, c303, c312, c321, 1315, 1338 (2 bytes opcode) -> B4
 34 -> pc: 42cd -> D3
+4E -> pc: 7ac3, 7ae8 (after a 2 players match and in a 2 players match in "stalemate") -> 4a
 56 -> pc: 6587 (can be 6C, 6D, 6E, 6F, A4, A6, A7, AA, AC, AD, AE at boot) -> A4
 5A -> pc: ae83 (after an item is selected) (00 10 13 15 1B -1C already used- 1D 21 28) -> 21 (it's used to evidence tiles similar to the one selected)
 62 -> pc: 5b3f (jump 71, 7C) -> 7C
