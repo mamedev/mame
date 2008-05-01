@@ -1457,6 +1457,8 @@ INLINE void emit_int_3(x86code **emitptr)  { emit_op_simple(emitptr, OP_INT_3, O
 INLINE void emit_ret(x86code **emitptr)    { emit_op_simple(emitptr, OP_RETN, OP_32BIT); }
 INLINE void emit_cdq(x86code **emitptr)    { emit_op_simple(emitptr, OP_CDQ, OP_32BIT); }
 INLINE void emit_cmc(x86code **emitptr)    { emit_op_simple(emitptr, OP_CMC, OP_32BIT); }
+INLINE void emit_pushf(x86code **emitptr)  { emit_op_simple(emitptr, OP_PUSHF_Fv, OP_32BIT); }
+INLINE void emit_popf(x86code **emitptr)   { emit_op_simple(emitptr, OP_POPF_Fv, OP_32BIT); }
 
 #ifndef PTR64
 INLINE void emit_pushad(x86code **emitptr) { emit_op_simple(emitptr, OP_PUSHA, OP_32BIT); }
@@ -1588,6 +1590,26 @@ INLINE void emit_jcc(x86code **emitptr, UINT8 cond, x86code *target)
 
 
 /*-------------------------------------------------
+    emit_jecxz_*
+-------------------------------------------------*/
+
+INLINE void emit_jecxz_link(x86code **emitptr, emit_link *linkinfo)
+{
+	emit_op_simple(emitptr, OP_JrCXZ_Jb, OP_32BIT);
+	emit_byte(emitptr, 0);
+	linkinfo->target = *emitptr;
+	linkinfo->size = 1;
+}
+
+INLINE void emit_jecxz(x86code **emitptr, x86code *target)
+{
+	emit_link link;
+	emit_jecxz_link(emitptr, &link);
+	resolve_link(&target, &link);
+}
+
+
+/*-------------------------------------------------
     emit_call/jmp_*
 -------------------------------------------------*/
 
@@ -1602,6 +1624,17 @@ INLINE void emit_call_m64(x86code **emitptr, DECLARE_MEMPARAMS)	{ emit_op_modrm_
 INLINE void emit_jmp_r64(x86code **emitptr, UINT8 dreg)			{ emit_op_modrm_reg(emitptr, OP_G5, OP_32BIT, 4, dreg); }
 INLINE void emit_jmp_m64(x86code **emitptr, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_G5, OP_32BIT, 4, MEMPARAMS); }
 #endif
+
+
+/*-------------------------------------------------
+    emit_ret_*
+-------------------------------------------------*/
+
+INLINE void emit_ret_imm(x86code **emitptr, UINT16 imm)
+{
+	emit_op_simple(emitptr, OP_RETN_Iw, OP_32BIT);
+	emit_word(emitptr, imm);
+}
 
 
 

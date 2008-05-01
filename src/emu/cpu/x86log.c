@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 /* comment parameters */
-#define MAX_COMMENTS		1000
+#define MAX_COMMENTS		4000
 #define MAX_DATA_RANGES		1000
 #define COMMENT_POOL_SIZE	(MAX_COMMENTS * 40)
 
