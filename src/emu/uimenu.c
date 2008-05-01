@@ -123,7 +123,7 @@ static char select_game_buffer[40];
 static const game_driver *select_game_list[VISIBLE_GAMES_IN_LIST];
 static const game_driver **select_game_driver_list;
 
-static dip_descriptor dip_switch_model[MAX_PHYSICAL_DIPS];
+static dip_descriptor dip_switch_model[MAX_PHYSICAL_DIPS + 1];
 
 static bitmap_t *hilight_bitmap;
 static render_texture *hilight_texture;
@@ -227,10 +227,10 @@ INLINE const char *CLIB_DECL ATTR_PRINTF(1,2) menu_string_pool_add(const char *f
 
 INLINE int get_num_dips(void)
 {
-	int num = 0;
-
-	while (dip_switch_model[num].dip_name != NULL && num < MAX_PHYSICAL_DIPS)
-		num++;
+	int num;
+	for (num = 0; num < MAX_PHYSICAL_DIPS; num++)
+		if (dip_switch_model[num].dip_name == NULL)
+			break;
 
 	return num;
 }

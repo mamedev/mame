@@ -145,7 +145,7 @@ void copd2_set_tabledata(UINT16 data, running_machine *machine)
 
 
 /*Movement protection*//*Legionnaire,Heated Barrel*/
-static UINT32 cop_register[5];
+static UINT32 cop_register[6];
 /*Sprite DMA protection*//*SD Gundam*/
 static UINT8 dma_status;
 static UINT32 dma_src;
