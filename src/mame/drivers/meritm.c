@@ -32,7 +32,7 @@
   *Megatouch Video (c)1994?
   *Megatouch II (c)1995
   *Megatouch III (c)1995
-  *Megatouch IV (c)1996
+  Megatouch IV (c)1996
   Megatouch IV Tournament Edition (c)1996
   *Super Megatouch IV (c) 1996
   *Megatouch 5 (c)1997
