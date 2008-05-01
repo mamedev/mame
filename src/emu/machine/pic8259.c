@@ -54,9 +54,10 @@ struct pic8259
 	UINT32 vector_size : 1;
 	UINT32 cascade : 1;
 	UINT32 icw4_needed : 1;
-
+	UINT32 vector_addr_low;
 	/* ICW2 state */
 	UINT8 base;
+	UINT8 vector_addr_high;
 
 	/* ICW3 state */
 	UINT8 slave;
@@ -165,13 +166,17 @@ int pic8259_acknowledge(const device_config *device)
 		if ((pic8259->pending & mask) && !(pic8259->interrupt_mask & mask))
 		{
 			if (LOG_GENERAL)
-				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
-
+				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);			
 			pic8259->pending &= ~mask;
 			if (!pic8259->auto_eoi)
 				pic8259->in_service |= mask;
-
-			return irq + pic8259->base;
+			if (pic8259->is_x86) {
+				/* For x86 mode*/								
+				return irq + pic8259->base;
+			} else {
+				/* in case of 8080/85) */
+				return 0xcd0000 + (pic8259->vector_addr_high << 8) + pic8259->vector_addr_low + (irq << (3-pic8259->vector_size));
+			}
 		}
 	}
 	return 0;
@@ -223,6 +228,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 				pic8259->vector_size		= (data & 0x04) ? 1 : 0;
 				pic8259->cascade			= (data & 0x02) ? 0 : 1;
 				pic8259->icw4_needed		= (data & 0x01) ? 1 : 0;
+				pic8259->vector_addr_low	= (data & 0xe0);
 				pic8259->state			= STATE_ICW2;
 			}
 			else if (pic8259->state == STATE_READY)
@@ -319,6 +325,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 						logerror("pic8259_w(): ICW2; data=0x%02X\n", data);
 
 					pic8259->base = data & 0xf8;
+					pic8259->vector_addr_high = data ;
 					if (pic8259->cascade)
 						pic8259->state = STATE_ICW3;
 					else
@@ -391,6 +398,8 @@ static DEVICE_RESET( pic8259 ) {
 	pic8259->mode = 0;
 	pic8259->auto_eoi = 0;
 	pic8259->is_x86 = 0;
+	pic8259->vector_addr_low = 0;
+	pic8259->vector_addr_high = 0;
 }
 
 
