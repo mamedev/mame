@@ -334,7 +334,7 @@ static void dst_sallen_key_reset(node_description *node)
 	struct dss_filter2_context *context = node->context;
 	const discrete_op_amp_filt_info *info = node->custom;
 	double freq, q;
-	
+
 	switch ((int) DST_SALLEN_KEY__TYPE)
 	{
 		case DISC_SALLEN_KEY_LOW_PASS:
@@ -344,7 +344,7 @@ static void dst_sallen_key_reset(node_description *node)
 		default:
 			fatalerror("Unknown sallen key filter type");
 	}
-	
+
 	calculate_filter2_coefficients(freq, 1.0 / q, DISC_FILTER_LOWPASS,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);

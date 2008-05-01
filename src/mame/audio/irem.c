@@ -194,7 +194,7 @@ static void adpcm_int(int data)
  *
  *************************************/
 
-/* All 6 (3*2) AY-3-8910 outputs are tied together 
+/* All 6 (3*2) AY-3-8910 outputs are tied together
  * and put with 470 KOhm to gnd.
  * The following is a approximation */
 
@@ -232,7 +232,7 @@ static const struct MSM5205interface irem_msm5205_interface_2 =
 
 /*
  * http://newsgroups.derkeiler.com/Archive/Rec/rec.games.video.arcade.collecting/2006-06/msg03108.html
- * 
+ *
  * mentions, that moon patrol does work on moon ranger hardware.
  * There is no MSM5250, but a 74LS00 producing white noise for explosions
  */
@@ -261,7 +261,7 @@ static const struct MSM5205interface irem_msm5205_interface_2 =
  * C35 is disabled, the mixer would just deliver
  * no signals if it is enabled.
  * TODO: Check discrete mixer
- * 
+ *
  */
 
 static const discrete_mixer_desc m52_sound_c_stage1 =
@@ -269,13 +269,13 @@ static const discrete_mixer_desc m52_sound_c_stage1 =
 		{M52_R19, M52_R22 },
 		{      0,       0 },	/* variable resistors   */
 		{M52_C37,		0 },    /* node capacitors      */
-		       0, M52_R23,		/* rI, rF				*/
-		M52_C35*0,				/* cF					*/
-		0,						/* cAmp					*/
+		       0, M52_R23,		/* rI, rF               */
+		M52_C35*0,				/* cF                   */
+		0,						/* cAmp                 */
 		0, 1};
 
-static const discrete_op_amp_filt_info m52_sound_c_sallen_key = 
-	{ M52_R13, M52_R14, 0, 0, 0, 
+static const discrete_op_amp_filt_info m52_sound_c_sallen_key =
+	{ M52_R13, M52_R14, 0, 0, 0,
 	  M52_C32, M52_C38, 0
 	};
 
@@ -284,9 +284,9 @@ static const discrete_mixer_desc m52_sound_c_mix1 =
 		{M52_R25, M52_R15 },
 		{      0,       0 },	/* variable resistors   */
 		{      0,       0 },    /* node capacitors      */
-		       0, M52_VR1,		/* rI, rF				*/
-		0,						/* cF					*/
-		CAP_U(1),				/* cAmp					*/
+		       0, M52_VR1,		/* rI, rF               */
+		0,						/* cF                   */
+		CAP_U(1),				/* cAmp                 */
 		0, 1};
 
 static DISCRETE_SOUND_START( m52_sound_c )
@@ -390,27 +390,27 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( m52_sound_c_audio )
 
 	MDRV_SOUND_START(irem_audio)
-	
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD_TAG("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap,0)
 	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map,0)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	
+
 	MDRV_SOUND_ADD_TAG("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
-	
+
 	MDRV_SOUND_ADD_TAG("ay8910.0", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
-	
+
 	MDRV_SOUND_ADD_TAG("msm5250", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
 	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
-	
+
 	MDRV_SOUND_ADD_TAG("filtermix", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(m52_sound_c)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

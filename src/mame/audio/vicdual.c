@@ -304,8 +304,8 @@ static const discrete_lfsr_desc mm5837_lfsr =
 	16			          /* Output bit */
 };
 
-static const discrete_op_amp_filt_info headon_sallen_key_info = 
-	{ RES_K(15), RES_K(15), 0, 0, 0, 
+static const discrete_op_amp_filt_info headon_sallen_key_info =
+	{ RES_K(15), RES_K(15), 0, 0, 0,
 	  CAP_N(470), CAP_N(47), 0
 	};
 

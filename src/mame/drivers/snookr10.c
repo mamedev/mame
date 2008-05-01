@@ -119,7 +119,7 @@
     'Scrambled tile #' is the phisical tile position in the matrix:
 
     Normal | Scrambled
-    tile # |  tile #  
+    tile # |  tile #
     -------+----------
      0x00  |   0x00   \
      0x01  |   0x80    |
@@ -178,22 +178,22 @@
      0x2F  |   0xF4   /
     -------+----------
 
-    So we extract the following decryption table: 
+    So we extract the following decryption table:
 
-    0 <-> 0;  1 <-> 8;  2 <-> 4;  3 <-> C 
-    4 <-> 2;  5 <-> A;  6 <-> 6;  7 <-> E 
-    8 <-> 1;  9 <-> 9;  A <-> 5;  B <-> D 
-    C <-> 3;  D <-> B;  E <-> 7;  F <-> F 
+    0 <-> 0;  1 <-> 8;  2 <-> 4;  3 <-> C
+    4 <-> 2;  5 <-> A;  6 <-> 6;  7 <-> E
+    8 <-> 1;  9 <-> 9;  A <-> 5;  B <-> D
+    C <-> 3;  D <-> B;  E <-> 7;  F <-> F
 
     ...and then swap nibbles.
 
-    Also note that the values are inverted/mirrored bits of the original ones. 
+    Also note that the values are inverted/mirrored bits of the original ones.
 
-    0x01 (0001) <-> 0x08 (1000) 
-    0x02 (0010) <-> 0x04 (0100) 
-    0x03 (0011) <-> 0x0C (1100) 
-    0x04 (0100) <-> 0x04 (0010) 
-    0x05 (0101) <-> 0x0A (1010) 
+    0x01 (0001) <-> 0x08 (1000)
+    0x02 (0010) <-> 0x04 (0100)
+    0x03 (0011) <-> 0x0C (1100)
+    0x04 (0100) <-> 0x04 (0010)
+    0x05 (0101) <-> 0x0A (1010)
     ...and so on.
 
     To properly decrypt the thing 'on the fly' as the hardware does, I applied a bitswap into TILE_GET_INFO.
@@ -204,11 +204,11 @@
                                                                    +-------+ swapped digits 1 & 2
                                                                    |       |  +-------+------+
         tile_offset = BITSWAP16((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
-                                                                   | | |  |   | | | | || | | | 
+                                                                   | | |  |   | | | | || | | |
                                                                    inverted   inverted|inverted
                                                                    bitorder   bitorder|bitorder
 
-    Colors are scrambled in the following way: 
+    Colors are scrambled in the following way:
 
       Normal   |  Scrambled
       offset   |   offset
@@ -362,7 +362,7 @@ static WRITE8_HANDLER( output_port_0_w )
 /*-----------------------------
     PORT 0x5000 ;OUTPUT PORT A
 -------------------------------
-    BIT 0 = 
+    BIT 0 =
     BIT 1 = Lamps, bit0
     BIT 2 =
     BIT 3 = Lamps, bit1
@@ -372,10 +372,10 @@ static WRITE8_HANDLER( output_port_0_w )
     BIT 7 = Lamps, bit3
 ------------------------------*/
 {
-//	(data >> 1) & 1;	/* lamps, bit0 */
-//	(data >> 3) & 1;	/* lamps, bit1 */
-//	(data >> 5) & 1;	/* lamps, bit2 */
-//	(data >> 7) & 1;	/* lamps, bit3 */
+//  (data >> 1) & 1;    /* lamps, bit0 */
+//  (data >> 3) & 1;    /* lamps, bit1 */
+//  (data >> 5) & 1;    /* lamps, bit2 */
+//  (data >> 7) & 1;    /* lamps, bit3 */
 }
 
 static WRITE8_HANDLER( output_port_1_w )
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( output_port_1_w )
     BIT 7 =
 ------------------------------*/
 {
-//	(data & 1);			/* lamps, bit4 */
+//  (data & 1);         /* lamps, bit4 */
 }
 
 
@@ -580,7 +580,7 @@ static INPUT_PORTS_START( tenballs )
 
     /* tenballs seems a prototype, most DIP
        switches seems to do nothing at all.
-    */ 
+    */
 	PORT_START_TAG("SW1")
 	PORT_DIPNAME( 0x03, 0x00, "Pool Value" )		PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x03, "100" )

@@ -98,7 +98,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 					fx,fy,
 					x,y+i*16,
 					cliprect,TRANSPARENCY_PEN,0,
-					(colour & 0x08) ? 0x00 : 0x02);			
+					(colour & 0x08) ? 0x00 : 0x02);
 			else if (m90_video_control_data[7] & 0x02)
 				pdrawgfx(bitmap,machine->gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),

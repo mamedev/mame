@@ -27,7 +27,7 @@ YMZ294: 0 I/O port
  */
 #define AY8910_DEFAULT_LOADS		{1000, 1000, 1000}
 
-/* 
+/*
  * The following is used by all drivers not reviewed yet.
  * This will like the old behaviour, output between
  * 0 and 7FFF
@@ -51,8 +51,8 @@ YMZ294: 0 I/O port
 
 /*
  * The follwoing define causes the driver to output
- * raw volume levels, i.e. 0 .. 15 and 0..31. 
- * This is intended to be used in a subsequent 
+ * raw volume levels, i.e. 0 .. 15 and 0..31.
+ * This is intended to be used in a subsequent
  * mixing modul (i.e. mpatrol ties 6 channels from
  * AY-3-8910 together). Do not use it now.
  */

@@ -253,8 +253,8 @@ static const discrete_inverter_osc_desc dkong_inverter_osc_desc_walk =
 	DISC_OSC_INVERTER_IS_TYPE2
 	};
 
-static const discrete_op_amp_filt_info dkong_sallen_key_info = 
-	{ RES_K(5.6), RES_K(5.6), 0, 0, 0, 
+static const discrete_op_amp_filt_info dkong_sallen_key_info =
+	{ RES_K(5.6), RES_K(5.6), 0, 0, 0,
 	  CAP_N(22), CAP_N(10), 0
 	};
 

@@ -481,19 +481,19 @@ static INPUT_PORTS_START( paprazzi )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
 	PORT_DIPUNKNOWN( 0x0004, 0x0004 )  // $25bc
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Language ) )     
-	PORT_DIPSETTING(      0x0000, "Korean" ) 
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Language ) )
+	PORT_DIPSETTING(      0x0000, "Korean" )
 	PORT_DIPSETTING(      0x0008, DEF_STR( English ) )
-	PORT_DIPNAME( 0x0010, 0x0010, "Enemies" ) // soemthing else.. but related to enemy types    
-	PORT_DIPSETTING(      0x0000, "Type 1" ) 
+	PORT_DIPNAME( 0x0010, 0x0010, "Enemies" ) // soemthing else.. but related to enemy types
+	PORT_DIPSETTING(      0x0000, "Type 1" )
 	PORT_DIPSETTING(      0x0010, "Type 2" )
-	PORT_DIPUNKNOWN( 0x0020, 0x0020 ) 
+	PORT_DIPUNKNOWN( 0x0020, 0x0020 )
 	PORT_DIPNAME( 0x00c0, 0x0080, "Time" )
-	PORT_DIPSETTING(      0x0000, "80" ) 
-	PORT_DIPSETTING(      0x0040, "100" ) 
-	PORT_DIPSETTING(      0x0080, "120" ) 
+	PORT_DIPSETTING(      0x0000, "80" )
+	PORT_DIPSETTING(      0x0040, "100" )
+	PORT_DIPSETTING(      0x0080, "120" )
 	PORT_DIPSETTING(      0x00c0, "150" )
-	
+
 	PORT_START_TAG("DSW2")	// $80001d.b -> $ff0acb.b
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Difficulty ) ) //not sure what is it . tested all 3 bits tested @ $be48
 	PORT_DIPSETTING(      0x0004, DEF_STR( Easiest ) )

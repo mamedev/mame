@@ -96,7 +96,7 @@ static const ppu2c0x_interface ppu_interface_hboard =
 	{ 256 },				/* color base */
 	{ PPU_MIRROR_NONE },	/* mirroring */
 	{ ppu_irq },			/* irq */
-	{ 1 }					/* vram */	
+	{ 1 }					/* vram */
 };
 
 static TILE_GET_INFO( get_bg_tile_info )

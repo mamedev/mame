@@ -3939,7 +3939,7 @@ ROM_END
    from the number of the only new ROM found in this set (sthj23.bin), this could
    be from a 91635B, which would classify it as a hack since that board wasn't available at the
    time of release of this game.
-	All other ROMs copied from the US set
+    All other ROMs copied from the US set
 */
 ROM_START( striderj )
 	ROM_REGION( CODE_SIZE, REGION_CPU1, 0 )      /* 68000 code */

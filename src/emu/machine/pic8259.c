@@ -166,12 +166,12 @@ int pic8259_acknowledge(const device_config *device)
 		if ((pic8259->pending & mask) && !(pic8259->interrupt_mask & mask))
 		{
 			if (LOG_GENERAL)
-				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);			
+				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
 			pic8259->pending &= ~mask;
 			if (!pic8259->auto_eoi)
 				pic8259->in_service |= mask;
 			if (pic8259->is_x86) {
-				/* For x86 mode*/								
+				/* For x86 mode*/
 				return irq + pic8259->base;
 			} else {
 				/* in case of 8080/85) */

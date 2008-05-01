@@ -2279,9 +2279,9 @@
  *                 |       gnd            |
  *                 |                      |
  *                 `----------------------'
- * 
+ *
  * EXAMPLES: see moon patrol, dkong
- * 
+ *
  * References:
  *      http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
  *      http://en.wikipedia.org/wiki/Sallen_Key_filter
