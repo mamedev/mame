@@ -345,8 +345,11 @@ static WRITE8_HANDLER( yarunara_palette_w )
 			break;
 
 		case 0x1c:	// RTC
-			msm6242_w(machine,offset,data);
-			return;
+		{
+			const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+			msm6242_w(rtc, offset, data);
+		}
+		return;
 
 		default:
 			popmessage("palette_w with bank = %02x",hnoridur_bank);
@@ -1121,7 +1124,7 @@ static ADDRESS_MAP_START( htengoku_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x44, 0x44 ) AM_WRITE	( AY8910_write_port_0_w		)	//
 	AM_RANGE( 0x46, 0x46 ) AM_WRITE	( YM2413_register_port_0_w	)	// YM2413
 	AM_RANGE( 0x47, 0x47 ) AM_WRITE	( YM2413_data_port_0_w		)	//
-	AM_RANGE( 0x80, 0x8f ) AM_READWRITE( msm6242_r, msm6242_w	)	// 6242RTC
+	AM_RANGE( 0x80, 0x8f ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)	// 6242RTC
 	AM_RANGE( 0xa0, 0xa3 ) AM_WRITE ( ddenlovr_palette_base_w		)	// ddenlovr mixer chip
 	AM_RANGE( 0xa4, 0xa7 ) AM_WRITE ( ddenlovr_palette_mask_w		)
 	AM_RANGE( 0xa8, 0xab ) AM_WRITE ( ddenlovr_transparency_pen_w	)
@@ -1327,7 +1330,8 @@ static READ8_HANDLER( tenkai_8000_r )
 	}
 	else if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		return msm6242_r(machine,offset);
+		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+		return msm6242_r(rtc, offset);
 	}
 	else if (rombank == 0x12)
 	{
@@ -1342,7 +1346,8 @@ static WRITE8_HANDLER( tenkai_8000_w )
 {
 	if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		msm6242_w(machine,offset,data);
+		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+		msm6242_w(rtc, offset, data);
 		return;
 	}
 	else if (rombank == 0x12)
@@ -4094,6 +4099,9 @@ static MACHINE_DRIVER_START( htengoku )
 
 	MDRV_SOUND_ADD(YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	/* devices */
+	MDRV_DEVICE_ADD("rtc", MSM6242)
 MACHINE_DRIVER_END
 
 

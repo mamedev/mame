@@ -3146,7 +3146,7 @@ static ADDRESS_MAP_START( inttoote_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x700101) AM_READWRITE(inttoote_700000_r,SMH_RAM) AM_BASE(&inttoote_700000)
 
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(msm6242_lsb_r,msm6242_lsb_w)   // 6242RTC
+	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE8(MSM6242, "rtc", msm6242_r, msm6242_w, 0x00ff)   // 6242RTC
 
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE( seta_sound_word_r, seta_sound_word_w		)	// Sound
 
@@ -8156,6 +8156,9 @@ static MACHINE_DRIVER_START( inttoote )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	/* devices */
+	MDRV_DEVICE_ADD("rtc", MSM6242)
 MACHINE_DRIVER_END
 
 

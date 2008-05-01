@@ -541,7 +541,7 @@ static ADDRESS_MAP_START( janptr96_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x1c, 0x1c ) AM_READ( janptr96_dsw_r )
 	AM_RANGE( 0x20, 0x20 ) AM_READWRITE( janptr96_unknown_r, janptr96_rambank_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( mjderngr_palbank_w )
-	AM_RANGE( 0x60, 0x6f ) AM_READWRITE( msm6242_r, msm6242_w )
+	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
 	AM_RANGE( 0x81, 0x81 ) AM_READ( AY8910_read_port_0_r )
 	AM_RANGE( 0x82, 0x82 ) AM_WRITE( AY8910_write_port_0_w )
 	AM_RANGE( 0x83, 0x83 ) AM_WRITE( AY8910_control_port_0_w )
@@ -753,7 +753,7 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6fc3, 0x6fc3 ) AM_WRITE( AY8910_control_port_0_w )
 	AM_RANGE( 0x6fd0, 0x6fd0 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READWRITE( input_port_10_r, input_port_select_w )
-	AM_RANGE( 0x6fe0, 0x6fef ) AM_READWRITE( msm6242_r, msm6242_w )
+	AM_RANGE( 0x6fe0, 0x6fef ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
 	AM_RANGE( 0x6ff0, 0x6ff0 ) AM_READWRITE( janptr96_dsw_r, janptr96_dswsel_w )
 	AM_RANGE( 0x6ff1, 0x6ff1 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
@@ -828,7 +828,7 @@ static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7fe2, 0x7fe2 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x7fe3, 0x7fe3 ) AM_WRITE( cafetime_7fe3_w )
 	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
-	AM_RANGE( 0x7ff0, 0x7fff ) AM_READWRITE( msm6242_r, msm6242_w )
+	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
 	AM_RANGE( 0x8000, 0xffff ) AM_READ( SMH_BANK1 )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITE( SMH_RAM ) AM_BASE(&videoram)
 ADDRESS_MAP_END
@@ -3421,6 +3421,9 @@ static MACHINE_DRIVER_START( janptr96 )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 9, 255-8)
+
+	/* devices */
+	MDRV_DEVICE_ADD("rtc", MSM6242)
 MACHINE_DRIVER_END
 
 
@@ -3466,6 +3469,9 @@ static MACHINE_DRIVER_START( mjtensin )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+
+	/* devices */
+	MDRV_DEVICE_ADD("rtc", MSM6242)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cafetime )
@@ -3477,6 +3483,9 @@ static MACHINE_DRIVER_START( cafetime )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
+
+	/* devices */
+	MDRV_DEVICE_ADD("rtc", MSM6242)
 MACHINE_DRIVER_END
 
 /***************************************************************************

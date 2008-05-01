@@ -1,10 +1,26 @@
-#ifndef MSM6242_INCLUDE
-#define MSM6242_INCLUDE
+/***************************************************************************
 
-READ8_HANDLER( msm6242_r );
-WRITE8_HANDLER( msm6242_w );
+    MSM6242 Real Time Clock
 
-READ16_HANDLER( msm6242_lsb_r );
-WRITE16_HANDLER( msm6242_lsb_w );
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
-#endif
+***************************************************************************/
+
+#pragma once
+
+#ifndef __MSM6242_H__
+#define __MSM6242_H__
+
+
+#define MSM6242		DEVICE_GET_INFO_NAME(msm6242)
+
+
+/* device interface */
+DEVICE_GET_INFO( msm6242 );
+
+READ8_DEVICE_HANDLER( msm6242_r );
+WRITE8_DEVICE_HANDLER( msm6242_w );
+
+
+#endif /* __MSM6242_H__ */
