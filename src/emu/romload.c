@@ -185,14 +185,15 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
     from SystemBios structure and OPTION_BIOS
 -------------------------------------------------*/
 
-static int determine_bios_rom(const rom_entry *romp)
+static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 {
 	const char *specbios = options_get_string(mame_options(), OPTION_BIOS);
 	const rom_entry *rom;
 	int bios_count = 0;
 	int bios_no = 0;
 
-	for (rom = romp;!ROMENTRY_ISEND(rom);rom++)
+	/* look for a BIOS with a matching name */
+	for (rom = romp; !ROMENTRY_ISEND(rom); rom++)
 		if (ROMENTRY_ISSYSTEM_BIOS(rom))
 		{
 			const char *biosname = ROM_GETHASHDATA(rom);
@@ -200,22 +201,27 @@ static int determine_bios_rom(const rom_entry *romp)
 			char bios_number[3];
 
 			/* Allow '-bios n' to still be used */
-			sprintf(bios_number, "%d", bios_flags-1);
+			sprintf(bios_number, "%d", bios_flags - 1);
 			if (strcmp(bios_number, specbios) == 0 || strcmp(biosname, specbios) == 0)
 				bios_no = bios_flags;
 			bios_count++;
 		}
 
+	/* if none found, use the default */
 	if (bios_no == 0 && bios_count > 0)
 	{
-		if (specbios[0] != 0)
-			fatalerror("%s: no such bios\n", specbios);
+		/* if we got neither an empty string nor 'default' then warn the user */
+		if (specbios[0] != 0 && strcmp(specbios, "default") != 0)
+		{
+			sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s: invalid bios\n", specbios);
+			romdata->warnings++;
+		}
+
 		/* set to default */
 		bios_no = 1;
 	}
 
 	debugload("Using System BIOS: %d\n", bios_no);
-
 	return bios_no;
 }
 
@@ -316,18 +322,18 @@ static void dump_wrong_and_correct_checksums(rom_load_data* romdata, const char*
        activate this only in debug buils, but many developers only use
        release builds, so I keep it as is for now. */
 	wrong_functions = 0;
-	for (i=0;i<HASH_NUM_FUNCTIONS;i++)
-		if (hash_data_extract_printable_checksum(hash, 1<<i, chksum) == 2)
-			wrong_functions |= 1<<i;
+	for (i = 0; i < HASH_NUM_FUNCTIONS; i++)
+		if (hash_data_extract_printable_checksum(hash, 1 << i, chksum) == 2)
+			wrong_functions |= 1 << i;
 
 	if (wrong_functions)
 	{
-		for (i=0;i<HASH_NUM_FUNCTIONS;i++)
-			if (wrong_functions & (1<<i))
+		for (i = 0; i < HASH_NUM_FUNCTIONS; i++)
+			if (wrong_functions & (1 << i))
 			{
 				sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)],
 					"\tInvalid %s checksum treated as 0 (check leading zeros)\n",
-					hash_function_name(1<<i));
+					hash_function_name(1 << i));
 
 				romdata->warnings++;
 			}
@@ -1072,7 +1078,7 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 	memset(&romdata, 0, sizeof(romdata));
 
 	/* determine the correct biosset to load based on OPTION_BIOS string */
-	system_bios = determine_bios_rom(romp);
+	system_bios = determine_bios_rom(&romdata, romp);
 
 	romdata.romstotal = count_roms(romp);
 
