@@ -17,7 +17,8 @@ To Do:
 
 - Protection in tm4k and later games (where is DS1204 mapped?)
 - Coin optics
-- correct sound banking
+- Correct sound banking
+- Find cause and fix hang in Solitaire Erotic (all Touchmaster version hang in this game)
 
 To be dumped and added:
 
