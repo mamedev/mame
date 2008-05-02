@@ -225,8 +225,11 @@ VIDEO_START( cupsoc )
 
     +1   xx...... ........  Priority? (1=high?)
     +1   ..xxxxxx xxxxxxxx  Tile number
-    +2   xxxxxxxx xxxxxxxx  X coordinate (signed)
-    +3   xxxxxxxx xxxxxxxx  Y coordinate (signed)
+	
+    +2   ----xxxx xxxxxxxx  X coordinate (signed)
+	
+	+3   b------- --------  more tile banking used by Denjin Makai
+    +3   ----xxxx xxxxxxxx  Y coordinate (signed)
 
 *************************************************************************/
 
@@ -246,15 +249,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		sprite = spriteram16[offs+1];
 
 		sprite &= 0x3fff;
-		if(data & 0x40) sprite |= 0x4000;//tile banking,used in Denjin Makai
-
+		if(data & 0x0040) sprite |= 0x4000;//tile banking,used in Denjin Makai
+		if(spriteram16[offs+3] & 0x8000) sprite |= 0x8000;//tile banking?,used in Denjin Makai
+			
 		y = spriteram16[offs+3];
 		x = spriteram16[offs+2];
 
-		if (x &0x8000)	x = -(0x200-(x &0x1ff));
-		else	x &= 0x1ff;
-		if (y &0x8000)	y = -(0x200-(y &0x1ff));
-		else	y &= 0x1ff;
+		x&=0xfff;
+		y&=0xfff;
+		
+		if (x&0x800) x-=0x1000;
+		if (y&0x800) y-=0x1000;
+		
 
 		color = (data &0x3f) + 0x40;
 		fx =  (data &0x4000) >> 14;
