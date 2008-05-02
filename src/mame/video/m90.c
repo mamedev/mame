@@ -180,10 +180,12 @@ VIDEO_UPDATE( m90 )
 	static int last_pf1,last_pf2;
 	int pf1_base = m90_video_control_data[5] & 0x3;
 	int pf2_base = m90_video_control_data[6] & 0x3;
-	int i,pf1_enable,pf2_enable;
+	int i,pf1_enable,pf2_enable, video_enable;
 
+	if (m90_video_control_data[7]&0x04) video_enable=0; else video_enable=1;
 	if (m90_video_control_data[5]&0x10) pf1_enable=0; else pf1_enable=1;
 	if (m90_video_control_data[6]&0x10) pf2_enable=0; else pf2_enable=1;
+
 //  tilemap_set_enable(pf1_layer,pf1_enable);
 //  tilemap_set_enable(pf2_layer,pf2_enable);
 //  tilemap_set_enable(pf1_wide_layer,pf1_enable);
@@ -245,36 +247,40 @@ VIDEO_UPDATE( m90 )
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	if (!pf2_enable)
+	if (video_enable) {
+		if (!pf2_enable)
+			fillbitmap(bitmap,0,cliprect);
+
+		if (pf2_enable)
+		{
+			if (m90_video_control_data[6] & 0x4)
+				tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
+			else
+				tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
+
+			if (m90_video_control_data[6] & 0x4)
+				tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
+			else
+				tilemap_draw(bitmap,cliprect,pf2_layer,1,1);
+		}
+
+		if (pf1_enable)
+		{
+			if (m90_video_control_data[5] & 0x4)
+				tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
+			else
+				tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
+
+			if (m90_video_control_data[5] & 0x4)
+				tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
+			else
+				tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
+		}
+
+		draw_sprites(screen->machine,bitmap,cliprect);
+	} else {
 		fillbitmap(bitmap,0,cliprect);
-
-	if (pf2_enable)
-	{
-		if (m90_video_control_data[6] & 0x4)
-			tilemap_draw(bitmap,cliprect,pf2_wide_layer,0,0);
-		else
-			tilemap_draw(bitmap,cliprect,pf2_layer,0,0);
-
-		if (m90_video_control_data[6] & 0x4)
-			tilemap_draw(bitmap,cliprect,pf2_wide_layer,1,1);
-		else
-			tilemap_draw(bitmap,cliprect,pf2_layer,1,1);
 	}
-
-	if (pf1_enable)
-	{
-		if (m90_video_control_data[5] & 0x4)
-			tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
-		else
-			tilemap_draw(bitmap,cliprect,pf1_layer,0,0);
-
-		if (m90_video_control_data[5] & 0x4)
-			tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
-		else
-			tilemap_draw(bitmap,cliprect,pf1_layer,1,1);
-	}
-
-	draw_sprites(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
