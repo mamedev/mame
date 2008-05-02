@@ -4,7 +4,6 @@
 TODO:
 - dynamic screen resolution
 - bg pen (or the pen of the lower tilemap?)
-- roz centering
 - sprites, that have the shadow bit set but aren't shadows, have bad colors
 - check if the data&0x8000 condition in tilemaps is valid even when 4bpp mode it's used
 - namco logo in emeralda demo is missing (it's used with a roz effect)
@@ -596,23 +595,20 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 				// used in emeraldia
 				if(which == 1 && namcona1_vreg[0x8a/2] == 0xfd /* maybe reg & 0x4 */)
 				{
-					INT32 incxx = ((INT16)namcona1_vreg[0xc0/2])<<8; //or incyy ?
-					INT32 incxy = ((INT16)namcona1_vreg[0xc2/2])<<8;
-					INT32 incyx = ((INT16)namcona1_vreg[0xc4/2])<<8;
-					INT32 incyy = ((INT16)namcona1_vreg[0xc6/2])<<8; //or incxx ?
-					UINT32 startx = (INT32)(INT16)namcona1_vreg[0xc8/2]<<12;
-					UINT32 starty = (INT32)(INT16)namcona1_vreg[0xca/2]<<12;
-					//namcona1_vreg[0xcc/2]; // changes dx/dy ?
-
-					// all ROZ parameters now in 16.16 format
+					int incxx = ((INT16)namcona1_vreg[0xc0/2])<<8; // or incyy ?
+					int incxy = ((INT16)namcona1_vreg[0xc2/2])<<8;
+					int incyx = ((INT16)namcona1_vreg[0xc4/2])<<8;
+					int incyy = ((INT16)namcona1_vreg[0xc6/2])<<8; // or incxx ?
+					INT16 xoffset = namcona1_vreg[0xc8/2];
+					INT16 yoffset = namcona1_vreg[0xca/2];
+					int dx = 46;
+					int dy = -8;
 
 					// now, apply adjustments to startx, starty to translate the
 					// ROZ plane.  Note that these are corrected by the inc parameters
 					// to account for scale/rotate state.
-					int dx = 46; // horizontal adjust in pixels
-					int dy = -8; // vertical adjust in pixels
-					startx += dx*incxx + dy*incyx;
-					starty += dx*incyx + dy*incyy;
+					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
+					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
 
 					tilemap_draw_roz_primask(bitmap, &clip, bg_tilemap[which],
 						startx, starty, incxx, incxy, incyx, incyy,
