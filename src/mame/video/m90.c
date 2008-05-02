@@ -279,7 +279,7 @@ VIDEO_UPDATE( m90 )
 
 		draw_sprites(screen->machine,bitmap,cliprect);
 	} else {
-		fillbitmap(bitmap,0,cliprect);
+		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 	}
 
 	return 0;
