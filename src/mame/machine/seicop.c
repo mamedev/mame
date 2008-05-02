@@ -49,7 +49,7 @@
 #include "driver.h"
 #include "audio/seibu.h"
 
-#define seibu_cop_log printf
+#define seibu_cop_log logerror
 
 UINT16 *cop_mcu_ram;
 
@@ -1645,7 +1645,10 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 			generic_cop_w(machine, offset, data, mem_mask);
 			break;
 
+		//case (0x05a/2): { /* brightness?? */ break; }
 		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
+		
+		case (0x21c/2): { legionna_layer_disable = cop_mcu_ram[offset]; break; }
 
 		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
 		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
@@ -1653,6 +1656,9 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
 		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
 		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
+
+
+		//case (0x280/2): { /* trigger.. something */ break; }
 
 		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
