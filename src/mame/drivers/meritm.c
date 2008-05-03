@@ -31,7 +31,7 @@
   *Pit Boss Supertouch 30 (c)1994?
   *Megatouch Video (c)1994?
   *Megatouch II (c)1995
-  *Megatouch III (c)1995
+  Megatouch III (c)1995
   Megatouch III Tournament Edition (c)1996
   Megatouch IV (c)1996
   Megatouch IV Tournament Edition (c)1996
@@ -48,7 +48,6 @@
   - clean up V9938 interrupt implementation
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
-  - megat3: u37 is bad dump (half size) now using rom from megat3te
   - megat5: has jmp $0000 in the initialization code causing infinite loop, is rom bad?
  */
 
@@ -1108,13 +1107,14 @@ SC3943.u20    = ATF16V8B25PC
 
 ROM_START( megat3 )
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "megat3.u32",         0x000000, 0x80000, CRC(ac969296) SHA1(7e09e9141637339b83c21f2488560cdf8a460069) )
-	ROM_RELOAD(                     0x080000, 0x80000)
-	ROM_LOAD( "megat3.u36",         0x100000, 0x80000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) )
-	ROM_RELOAD(                     0x180000, 0x80000)
-	ROM_LOAD( "9255-01-r0.u37",     0x200000, 0x100000, BAD_DUMP CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) )
-	ROM_LOAD( "9255-20-01_u38-rof", 0x300000, 0x80000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) )
-	ROM_RELOAD(                     0x380000, 0x80000)
+	ROM_LOAD( "9255-20-01_u32-r0",  0x000000, 0x080000, CRC(ac969296) SHA1(7e09e9141637339b83c21f2488560cdf8a460069) ) /* Location U32 */
+	ROM_RELOAD(                     0x080000, 0x080000)
+	ROM_LOAD( "9255-01_u36-r0",     0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x080000)
+	ROM_LOAD( "9255-01_u37-r0",     0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_RELOAD(                     0x280000, 0x080000)
+	ROM_LOAD( "9255-20-01_u38-rof", 0x300000, 0x080000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) ) /* Location U38 */
+	ROM_RELOAD(                     0x380000, 0x080000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
 	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
@@ -1124,22 +1124,13 @@ ROM_START( megat3 )
 ROM_END
 
 
-/*
-     Megatouch 3 Tournament Edition
-     ------------------------------
-     Dumped by: Hugh McLenaghan
-     Dump Date: 2008-05-01
-     
-     PALs should be the same as the megatouch 3 since it's the same hardware.
-          
-*/
 ROM_START( megat3te )
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
-	ROM_LOAD( "9255-30-01-r0.u32",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) )
-	ROM_LOAD( "9255-01-r0.u36",     0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) )
+	ROM_LOAD( "9255-30-01_u32-r0",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
+	ROM_LOAD( "9255-01_u36-r0",     0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x080000)
-	ROM_LOAD( "9255-01-r0.u37",     0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) )
-	ROM_LOAD( "9255-30-0-r0e.u38",  0x300000, 0x080000, CRC(52ca7dd8) SHA1(9f44f158d67d7443405b87a18fc89d9c88be1dea) )
+	ROM_LOAD( "9255-01_u37-r0",     0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_LOAD( "9255-30-0_u38-r0e",  0x300000, 0x080000, CRC(52ca7dd8) SHA1(9f44f158d67d7443405b87a18fc89d9c88be1dea) ) /* Location U38 */
 	ROM_RELOAD(                     0x380000, 0x080000)
 
 	ROM_REGION( 0x1000, REGION_USER2, 0 ) // PALs
@@ -1249,6 +1240,7 @@ static DRIVER_INIT(megat3)
 		{ 0x51, 0xa1, 0xc0, 0x7c, 0x27, 0x6e, 0x51, 0xb9, 0xa5, 0xb2, 0x27, 0x0c, 0xb9, 0x88, 0x82, 0x2c };
 
 	ds1204_init(megat3_ds1204_key, megat3_ds1204_nvram);
+
 };
 
 
@@ -1294,14 +1286,17 @@ static DRIVER_INIT(megat6)
 	ds1204_init(0, megat6_ds1204_nvram);
 
 }
+
 /* CRT 250 */
 GAME( 1988, pitboss2,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, spitboss,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
+
 /* CRT 250 + question roms */
 GAME( 1994, pitbossm,  0,      meritm_crt250_questions, pitbossm, 0, ROT0, "Merit", "Pit Boss Megastar", GAME_IMPERFECT_GRAPHICS )
+
 /* CRT 260 */
 GAME( 1995, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, megat3te,  0,      meritm_crt260, meritm_crt260, megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 ROE)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3te,  megat3, meritm_crt260, meritm_crt260, megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 ROE)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4,    0,      meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROE)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4a,   megat4, meritm_crt260, meritm_crt260, megat4,   ROT0, "Merit", "Megatouch IV (9255-40-01 ROD)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4te,  megat4, meritm_crt260, meritm_crt260, megat4te, ROT0, "Merit", "Megatouch IV Tournament Edition (9255-50-01 ROD)", GAME_IMPERFECT_GRAPHICS )
