@@ -419,7 +419,7 @@ static int EG_Update(struct _SLOT *slot)
 			slot->EG.volume-=slot->EG.D1R;
 			if(slot->EG.volume<=0)
 				slot->EG.volume=0;
-			if(slot->EG.volume>>(EG_SHIFT+5)<slot->EG.DL)
+			if(slot->EG.volume>>(EG_SHIFT+5)<=slot->EG.DL)
 				slot->EG.state=DECAY2;
 			break;
 		case DECAY2:
