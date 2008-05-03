@@ -1112,7 +1112,6 @@ ROM_START( megat3 )
 	ROM_LOAD( "9255-01_u36-r0",     0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x080000)
 	ROM_LOAD( "9255-01_u37-r0",     0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
-	ROM_RELOAD(                     0x280000, 0x080000)
 	ROM_LOAD( "9255-20-01_u38-rof", 0x300000, 0x080000, CRC(85f48b91) SHA1(7a38644ac7ee55a254c037122af919fb268744a1) ) /* Location U38 */
 	ROM_RELOAD(                     0x380000, 0x080000)
 
