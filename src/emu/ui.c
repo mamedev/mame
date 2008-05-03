@@ -1377,6 +1377,12 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	else
 		video_set_fastforward(FALSE);
 
+#ifdef MESS
+	/* paste? */
+	if (input_ui_pressed(IPT_UI_PASTE))
+		ui_paste(machine);
+#endif /* MESS */
+
 	return 0;
 }
 

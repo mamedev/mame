@@ -981,7 +981,8 @@ static const input_port_default_entry default_ports_builtin[] =
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_UI,      UI_SHOW_PROFILER,    "Show Profiler",		SEQ_DEF_2(KEYCODE_F11, KEYCODE_LSHIFT) )
 #ifdef MESS
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_UI,      UI_TOGGLE_UI,        "UI Toggle",			SEQ_DEF_1(KEYCODE_SCRLOCK) )
-#endif
+	INPUT_PORT_DIGITAL_DEF( 0, IPG_UI,      UI_PASTE,			 "UI Paste Text",		SEQ_DEF_1(KEYCODE_PRTSCR) )
+#endif /* MESS */
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_UI,      UI_TOGGLE_DEBUG,     "Toggle Debugger",		SEQ_DEF_1(KEYCODE_F5) )
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_UI,      UI_SAVE_STATE,       "Save State",			SEQ_DEF_2(KEYCODE_F7, KEYCODE_LSHIFT) )
 	INPUT_PORT_DIGITAL_DEF( 0, IPG_UI,      UI_LOAD_STATE,       "Load State",			SEQ_DEF_3(KEYCODE_F7, SEQCODE_NOT, KEYCODE_LSHIFT) )
