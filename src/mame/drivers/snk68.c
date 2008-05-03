@@ -1,15 +1,15 @@
 /***************************************************************************
 
-    POW - Prisoners Of War (US)         A7008   SNK 1988
-    POW - Prisoners Of War (Japan)      A7008   SNK 1988
-    SAR - Search And Rescue (World)     A8007   SNK 1989
-    SAR - Search And Rescue (US)        A8007   SNK 1989
-    SAR - Search And Rescue (Japan)     A8007   SNK 1989
-    Street Smart (US version 1)         A8007   SNK 1989
-    Street Smart (US version 2)         A7008   SNK 1989
-    Street Smart (World version 1)      A8007   SNK 1989
-    Street Smart (Japan version 1)      A8007   SNK 1989
-    Ikari III - The Rescue (US)         A7007   SNK 1989
+    POW - Prisoners Of War (US version 1)    A7008   SNK 1988
+    POW - Prisoners Of War (Japan)           A7008   SNK 1988
+    SAR - Search And Rescue (World)          A8007   SNK 1989
+    SAR - Search And Rescue (US)             A8007   SNK 1989
+    SAR - Search And Rescue (Japan)          A8007   SNK 1989
+    Street Smart (US version 1)              A8007   SNK 1989
+    Street Smart (US version 2)              A7008   SNK 1989
+    Street Smart (World version 1)           A8007   SNK 1989
+    Street Smart (Japan version 1)           A8007   SNK 1989
+    Ikari III - The Rescue (US)              A7007   SNK 1989
 
     For some strange reason version 2 of Street Smart runs on Pow hardware!
 
@@ -854,20 +854,20 @@ MACHINE_DRIVER_END
 
 ROM_START( pow )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 )
-	ROM_LOAD16_BYTE( "dg1",   0x000000, 0x20000, CRC(8e71a8af) SHA1(72c2eb2316c2684491331e8adabcb2be084aa6a2) )
-	ROM_LOAD16_BYTE( "dg2",   0x000001, 0x20000, CRC(4287affc) SHA1(59dfb37296edd3b42231319a9f4df819d384db38) )
+	ROM_LOAD16_BYTE( "dg1ver1.j14",   0x000000, 0x20000, CRC(8e71a8af) SHA1(72c2eb2316c2684491331e8adabcb2be084aa6a2) )
+	ROM_LOAD16_BYTE( "dg2ver1.l14",   0x000001, 0x20000, CRC(4287affc) SHA1(59dfb37296edd3b42231319a9f4df819d384db38) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound CPU */
-	ROM_LOAD( "dg8",        0x000000, 0x10000, CRC(d1d61da3) SHA1(4e78643f8a7d44db3ff091acb0a5da1cc836e3cb) )
+	ROM_LOAD( "dg8.e25",   0x000000, 0x10000, CRC(d1d61da3) SHA1(4e78643f8a7d44db3ff091acb0a5da1cc836e3cb) )
 
 	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )	/* characters */
-	ROM_LOAD( "dg9",        0x000000, 0x08000, CRC(df864a08) SHA1(dd996070077efbbf9d784299b6563cab258e4a8e) )
-	ROM_LOAD( "dg10",       0x008000, 0x08000, CRC(9e470d53) SHA1(f7dc6ac39ade573480e87170a2781f0f72930580) )
+	ROM_LOAD( "dg9.l25",   0x000000, 0x08000, CRC(df864a08) SHA1(dd996070077efbbf9d784299b6563cab258e4a8e) )
+	ROM_LOAD( "dg10.m25",  0x008000, 0x08000, CRC(9e470d53) SHA1(f7dc6ac39ade573480e87170a2781f0f72930580) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "snk880.11a", 0x000000, 0x20000, CRC(e70fd906) SHA1(b9e734c074ee1c8ae73e6041d739ab30d2df7d62) )
 	ROM_LOAD( "snk880.12a", 0x020000, 0x20000, CRC(628b1aed) SHA1(1065ef835da03f7d9776e81c225c3ecdd2affae2) )
-	ROM_LOAD( "snk880.13a", 0x040000, 0x20000, CRC(19dc8868) SHA1(82aaf93fc8f4b3bf947d373d0f41cc0044207c34) )
+	ROM_LOAD( "snk880.13a", 0x040000, 0x20000, CRC(19dc8868) SHA1(82aaf93fc8f4b3bf947d373d0f41cc0044207c34) ) /* Also can be labeled as DG13 */
 	ROM_LOAD( "snk880.14a", 0x060000, 0x20000, CRC(47cd498b) SHA1(7fbc007f2d817c26af02fef233f5e0681a17052a) )
 	ROM_LOAD( "snk880.15a", 0x080000, 0x20000, CRC(7a90e957) SHA1(9650d7cdbcbbbcdd7f75a1c3c08a195aa456e169) )
 	ROM_LOAD( "snk880.16a", 0x0a0000, 0x20000, CRC(e40a6c13) SHA1(7ad9dfc65f8c8b316933f0fdd3bc7a243d6eff65) )
@@ -883,7 +883,7 @@ ROM_START( pow )
 	ROM_LOAD( "snk880.26a", 0x1e0000, 0x20000, CRC(9bc261c5) SHA1(f07fef465191d48ccc149d1a62e6382d3fc0ef9f) )
 
 	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	/* UPD7759 samples */
-	ROM_LOAD( "dg7",        0x000000, 0x10000, CRC(aba9a9d3) SHA1(5098cd3a064b8ede24797de8879a277d79e79d75) )
+	ROM_LOAD( "dg7.d20",  0x000000, 0x10000, CRC(aba9a9d3) SHA1(5098cd3a064b8ede24797de8879a277d79e79d75) )
 
 	ROM_REGION( 0x0100, REGION_PLDS, ROMREGION_DISPOSE )
 	ROM_LOAD( "pal20l10.a6", 0x0000, 0x00cc, CRC(c3d9e729) SHA1(f05f03eecf12b4d0793124ecd3195307be04046b) )
@@ -895,16 +895,16 @@ ROM_START( powj )
 	ROM_LOAD16_BYTE( "2-2",   0x000001, 0x20000, CRC(baa32354) SHA1(a235b82527dc025e699ba2e8e9797dac15ea9440) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* Sound CPU */
-	ROM_LOAD( "dg8",        0x000000, 0x10000, CRC(d1d61da3) SHA1(4e78643f8a7d44db3ff091acb0a5da1cc836e3cb) )
+	ROM_LOAD( "dg8.e25",   0x000000, 0x10000, CRC(d1d61da3) SHA1(4e78643f8a7d44db3ff091acb0a5da1cc836e3cb) )
 
 	ROM_REGION( 0x010000, REGION_GFX1, ROMREGION_DISPOSE )	/* characters */
-	ROM_LOAD( "dg9",        0x000000, 0x08000, CRC(df864a08) SHA1(dd996070077efbbf9d784299b6563cab258e4a8e) )
-	ROM_LOAD( "dg10",       0x008000, 0x08000, CRC(9e470d53) SHA1(f7dc6ac39ade573480e87170a2781f0f72930580) )
+	ROM_LOAD( "dg9.l25",   0x000000, 0x08000, CRC(df864a08) SHA1(dd996070077efbbf9d784299b6563cab258e4a8e) )
+	ROM_LOAD( "dg10.m25",  0x008000, 0x08000, CRC(9e470d53) SHA1(f7dc6ac39ade573480e87170a2781f0f72930580) )
 
 	ROM_REGION( 0x200000, REGION_GFX2, ROMREGION_DISPOSE )	/* sprites */
 	ROM_LOAD( "snk880.11a", 0x000000, 0x20000, CRC(e70fd906) SHA1(b9e734c074ee1c8ae73e6041d739ab30d2df7d62) )
 	ROM_LOAD( "snk880.12a", 0x020000, 0x20000, CRC(628b1aed) SHA1(1065ef835da03f7d9776e81c225c3ecdd2affae2) )
-	ROM_LOAD( "snk880.13a", 0x040000, 0x20000, CRC(19dc8868) SHA1(82aaf93fc8f4b3bf947d373d0f41cc0044207c34) )
+	ROM_LOAD( "snk880.13a", 0x040000, 0x20000, CRC(19dc8868) SHA1(82aaf93fc8f4b3bf947d373d0f41cc0044207c34) ) /* Also can be labeled as DG13 */
 	ROM_LOAD( "snk880.14a", 0x060000, 0x20000, CRC(47cd498b) SHA1(7fbc007f2d817c26af02fef233f5e0681a17052a) )
 	ROM_LOAD( "snk880.15a", 0x080000, 0x20000, CRC(7a90e957) SHA1(9650d7cdbcbbbcdd7f75a1c3c08a195aa456e169) )
 	ROM_LOAD( "snk880.16a", 0x0a0000, 0x20000, CRC(e40a6c13) SHA1(7ad9dfc65f8c8b316933f0fdd3bc7a243d6eff65) )
@@ -920,7 +920,7 @@ ROM_START( powj )
 	ROM_LOAD( "snk880.26a", 0x1e0000, 0x20000, CRC(9bc261c5) SHA1(f07fef465191d48ccc149d1a62e6382d3fc0ef9f) )
 
 	ROM_REGION( 0x10000, REGION_SOUND1, 0 )	/* UPD7759 samples */
-	ROM_LOAD( "dg7",        0x000000, 0x10000, CRC(aba9a9d3) SHA1(5098cd3a064b8ede24797de8879a277d79e79d75) )
+	ROM_LOAD( "dg7.d20",  0x000000, 0x10000, CRC(aba9a9d3) SHA1(5098cd3a064b8ede24797de8879a277d79e79d75) )
 
 	ROM_REGION( 0x0100, REGION_PLDS, ROMREGION_DISPOSE )
 	ROM_LOAD( "pal20l10.a6", 0x0000, 0x00cc, CRC(c3d9e729) SHA1(f05f03eecf12b4d0793124ecd3195307be04046b) )
@@ -1202,7 +1202,7 @@ static DRIVER_INIT( searchar )
 
 /******************************************************************************/
 
-GAME( 1988, pow,      0,        pow,     pow,       0,        ROT0,  "SNK", "P.O.W. - Prisoners of War (US)", 0 )
+GAME( 1988, pow,      0,        pow,     pow,       0,        ROT0,  "SNK", "P.O.W. - Prisoners of War (US version 1)", 0 )
 GAME( 1988, powj,     pow,      pow,     powj,      0,        ROT0,  "SNK", "Datsugoku - Prisoners of War (Japan)", 0 )
 GAME( 1989, searchar, 0,        searchar, searchar, searchar, ROT90, "SNK", "SAR - Search And Rescue (World)", 0 )
 GAME( 1989, sercharu, searchar, searchar, searchar, searchar, ROT90, "SNK", "SAR - Search And Rescue (US)", 0 )
