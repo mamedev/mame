@@ -2888,7 +2888,7 @@ profiler_mark(PROFILER_INPUT);
 
 #ifdef MESS
 		/* hook for MESS's natural keyboard support */
-		mess_input_port_update_hook(portnum, &portinfo->digital);
+		mess_input_port_update_hook(machine, portnum, &portinfo->digital);
 #endif /* MESS */
 
 		/* call changed handlers */
