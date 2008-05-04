@@ -243,7 +243,6 @@ const device_config *device_list_find_by_tag(const device_config *listhead, devi
 {
 	const device_config *curdev;
 
-	assert(type != NULL);
 	assert(tag != NULL);
 
 	/* find the device in the list */
