@@ -202,7 +202,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int flipy = attributes&0x80;
 		int flipx = attributes&0x40;
 
-		int tile_number = code + ((attributes & 0x20) << 3);
+		int tile_number = code & 0x3f;
+
+		int bank = 0;
+		if( code&0x80 ) bank += 1;
+		if( attributes&0x20 ) bank += 2;
 
 		if (flipscreen)
 		{
@@ -212,7 +216,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		drawgfx(bitmap,machine->gfx[1],
+		drawgfx(bitmap,machine->gfx[1+bank],
 			tile_number,
 			color,
 			flipx,flipy,

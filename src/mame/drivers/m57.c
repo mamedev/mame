@@ -198,7 +198,7 @@ INPUT_PORTS_END
 static const gfx_layout spritelayout =
 {
 	16,32,
-	RGN_FRAC(1,3),
+	64,
 	3,
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ STEP8(0,1), STEP8(16*8,1) },
@@ -208,7 +208,10 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( m57 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0x0000, gfx_8x8x3_planar,    0, 32 )
-	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout,     32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x0000, spritelayout, 32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x1000, spritelayout, 32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x2000, spritelayout, 32*8, 32 )
+	GFXDECODE_ENTRY( REGION_GFX2, 0x3000, spritelayout, 32*8, 32 )
 GFXDECODE_END
 
 
