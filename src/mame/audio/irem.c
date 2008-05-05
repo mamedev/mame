@@ -372,11 +372,11 @@ static MACHINE_DRIVER_START( irem_audio_base )
 
 	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD(AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD(MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
