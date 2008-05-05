@@ -657,13 +657,13 @@ static INTERRUPT_GEN( bomblord_interrupt )
 /* Basic hardware -- no decryption table is setup for CPU */
 static MACHINE_DRIVER_START( m90 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
+	MDRV_CPU_ADD_TAG("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	/* audio CPU */	
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -688,7 +688,7 @@ static MACHINE_DRIVER_START( m90 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
@@ -738,15 +738,15 @@ static const nec_config bomberman_config ={ 	bomberman_decryption_table, };
 static MACHINE_DRIVER_START( bombrman )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
+	MDRV_CPU_ADD_TAG("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_CONFIG(bomberman_config)
 
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	/* audio CPU */	
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -770,7 +770,7 @@ static MACHINE_DRIVER_START( bombrman )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
@@ -784,15 +784,15 @@ static const nec_config dynablaster_config ={ 	dynablaster_decryption_table, };
 static MACHINE_DRIVER_START( bbmanw )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", V30,32000000/4)
+	MDRV_CPU_ADD_TAG("main", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_CONFIG(dynablaster_config)
 
 	MDRV_CPU_PROGRAM_MAP(main_cpu,0)
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
-	/* audio CPU */	/* 3.579545 MHz */
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz) /* verified on pcb */
+	/* audio CPU */	
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(bbmanw_sound_readport,bbmanw_sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,128)	/* clocked by V1? (Vigilante) */
@@ -816,7 +816,7 @@ static MACHINE_DRIVER_START( bbmanw )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
@@ -848,7 +848,7 @@ static MACHINE_DRIVER_START( bootleg )
 	MDRV_CPU_IO_MAP(main_cpu_io,0)
 	MDRV_CPU_VBLANK_INT("main", m90_interrupt)
 
-	MDRV_CPU_ADD(Z80, 3579545)
+	MDRV_CPU_ADD(Z80, XTAL_3_579545MHz)
 	/* audio CPU */	/* 3.579545 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
@@ -873,7 +873,7 @@ static MACHINE_DRIVER_START( bootleg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(YM2151, 3579545)
+	MDRV_SOUND_ADD(YM2151, XTAL_3_579545MHz)
 	MDRV_SOUND_CONFIG(ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.90)
 	MDRV_SOUND_ROUTE(1, "mono", 0.90)
