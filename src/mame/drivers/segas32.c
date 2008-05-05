@@ -3817,21 +3817,20 @@ static READ16_HANDLER( arescue_handshake_r )
 
 static READ16_HANDLER( arescue_slavebusy_r )
 {
-	return 1; // prevents master trying to synch to slave.
+	return 0x100; // prevents master trying to synch to slave.
 }
 
 static DRIVER_INIT( arescue )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w, NULL);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00006, 0, 0, arescue_dsp_r, arescue_dsp_w);
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
 
 	dual_pcb_comms = auto_malloc(0x1000);
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810001, 0x810001, 0, 0, arescue_handshake_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x81000f, 0x81000f, 0, 0, arescue_slavebusy_r);
-
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810000, 0x810001, 0, 0, arescue_handshake_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
 }
 
 
@@ -3876,7 +3875,8 @@ static DRIVER_INIT( dbzvrvs )
 static WRITE16_HANDLER( f1en_comms_echo_w )
 {
 	// pretend that slave is following master op, enables attract mode video with sound
-	program_write_byte( 0x810049, data );
+	if (ACCESSING_BITS_0_7)
+		program_write_byte( 0x810049, data );
 }
 
 static DRIVER_INIT( f1en )
@@ -3887,7 +3887,7 @@ static DRIVER_INIT( f1en )
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810048, 0x810048, 0, 0, f1en_comms_echo_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
 }
 
 

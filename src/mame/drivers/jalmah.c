@@ -1906,8 +1906,8 @@ static DRIVER_INIT( daireika )
 	memory_set_bankptr(2, auto_malloc(0xf0026 - 0xf0020));
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00c0, 0xf00d5, 0, 0, SMH_BANK3, SMH_BANK3 );
 	memory_set_bankptr(3, auto_malloc(0xf00d6 - 0xf00c0));
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0100, 0xf0130, 0, 0, SMH_BANK4, SMH_BANK4 );
-	memory_set_bankptr(4, auto_malloc(0xf0130 - 0xf0100));
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0100, 0xf0131, 0, 0, SMH_BANK4, SMH_BANK4 );
+	memory_set_bankptr(4, auto_malloc(0xf0132 - 0xf0100));
 	mcu_prg = 0x11;
 }
 

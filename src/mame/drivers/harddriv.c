@@ -3718,7 +3718,7 @@ static void racedrvc_init_common(running_machine *machine, offs_t gsp_protection
 	rddsp32_sync[1] = memory_install_write32_handler(machine, hdcpu_dsp32, ADDRESS_SPACE_PROGRAM, 0x613e00, 0x613e03, 0, 0, rddsp32_sync1_w);
 
 	/* set up protection hacks */
-	hdgsp_protection = memory_install_write16_handler(machine, hdcpu_gsp, ADDRESS_SPACE_PROGRAM, TOBYTE(gsp_protection), TOBYTE(gsp_protection + 0x0f), 0, 0, hdgsp_protection_w);
+	hdgsp_protection = memory_install_write16_handler(machine, hdcpu_gsp, ADDRESS_SPACE_PROGRAM, gsp_protection, gsp_protection + 0x0f, 0, 0, hdgsp_protection_w);
 
 	/* set up gsp speedup handler */
 	hdgsp_speedup_addr[0] = memory_install_write16_handler(machine, hdcpu_gsp, ADDRESS_SPACE_PROGRAM, 0xfff76f60, 0xfff76f6f, 0, 0, rdgsp_speedup1_w);
@@ -3770,7 +3770,7 @@ static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_p
 	stmsp_sync[1] = &hdmsp_ram[TOWORD(0x99680)];
 	memory_install_write16_handler(machine, hdcpu_msp, ADDRESS_SPACE_PROGRAM, 0x99680, 0x9968f, 0, 0, stmsp_sync1_w);
 	stmsp_sync[2] = &hdmsp_ram[TOWORD(0x99d30)];
-	memory_install_write16_handler(machine, hdcpu_msp, ADDRESS_SPACE_PROGRAM, 0x99d30, 0x99d50, 0, 0, stmsp_sync2_w);
+	memory_install_write16_handler(machine, hdcpu_msp, ADDRESS_SPACE_PROGRAM, 0x99d30, 0x99d4f, 0, 0, stmsp_sync2_w);
 
 	/* set up protection hacks */
 	hdgsp_protection = memory_install_write16_handler(machine, hdcpu_gsp, ADDRESS_SPACE_PROGRAM, 0xfff965d0, 0xfff965df, 0, 0, hdgsp_protection_w);
