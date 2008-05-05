@@ -1695,6 +1695,21 @@ INLINE void emit_mov_m8_imm(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 imm) 	{ 
 
 
 /*-------------------------------------------------
+    emit_xchg_r8_*
+-------------------------------------------------*/
+
+INLINE void emit_xchg_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)
+{
+	if (dreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (sreg & 7), OP_32BIT, sreg);
+	else if (sreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_32BIT, dreg);
+	else
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Eb_Gb, OP_32BIT, dreg, sreg); 
+}
+
+
+/*-------------------------------------------------
     emit_mov_r16_*
 -------------------------------------------------*/
 
@@ -1714,6 +1729,21 @@ INLINE void emit_movzx_r16_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg) 						{
 INLINE void emit_movzx_r16_m8(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)					{ emit_op_modrm_mem(emitptr, OP_MOVZX_Gv_Eb, OP_16BIT, dreg, MEMPARAMS); }
 INLINE void emit_cmovcc_r16_r16(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_16BIT, dreg, sreg); }
 INLINE void emit_cmovcc_r16_m16(x86code **emitptr, UINT8 cond, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_16BIT, dreg, MEMPARAMS); }
+
+
+/*-------------------------------------------------
+    emit_xchg_r16_*
+-------------------------------------------------*/
+
+INLINE void emit_xchg_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)
+{
+	if (dreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (sreg & 7), OP_16BIT, sreg);
+	else if (sreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_16BIT, dreg);
+	else
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_16BIT, dreg, sreg); 
+}
 
 
 /*-------------------------------------------------
@@ -1740,6 +1770,21 @@ INLINE void emit_movzx_r32_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)						{
 INLINE void emit_movzx_r32_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)				{ emit_op_modrm_mem(emitptr, OP_MOVZX_Gv_Ew, OP_32BIT, dreg, MEMPARAMS); }
 INLINE void emit_cmovcc_r32_r32(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_32BIT, dreg, sreg); }
 INLINE void emit_cmovcc_r32_m32(x86code **emitptr, UINT8 cond, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_32BIT, dreg, MEMPARAMS); }
+
+
+/*-------------------------------------------------
+    emit_xchg_r32_*
+-------------------------------------------------*/
+
+INLINE void emit_xchg_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg)
+{
+	if (dreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (sreg & 7), OP_32BIT, sreg);
+	else if (sreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_32BIT, dreg);
+	else
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_32BIT, dreg, sreg); 
+}
 
 
 /*-------------------------------------------------
@@ -1781,8 +1826,22 @@ INLINE void emit_movzx_r64_m16(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)
 INLINE void emit_cmovcc_r64_r64(x86code **emitptr, UINT8 cond, UINT8 dreg, UINT8 sreg) 			{ emit_op_modrm_reg(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_64BIT, dreg, sreg); }
 INLINE void emit_cmovcc_r64_m64(x86code **emitptr, UINT8 cond, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CMOV_O_Gv_Ev + cond, OP_64BIT, dreg, MEMPARAMS); }
 
-#endif
 
+/*-------------------------------------------------
+    emit_xchg_r64_*
+-------------------------------------------------*/
+
+INLINE void emit_xchg_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg)
+{
+	if (dreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (sreg & 7), OP_64BIT, sreg);
+	else if (sreg == REG_EAX)
+		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_64BIT, dreg);
+	else
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_64BIT, dreg, sreg); 
+}
+
+#endif
 
 
 /***************************************************************************
