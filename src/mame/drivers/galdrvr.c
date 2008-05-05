@@ -4778,7 +4778,7 @@ GAME( 1981, armorca2, armorcar, scobra,   armorcar, scobra,   ROT90,  "Stern", "
 
 GAME( 1982, tazmania, 0,        scobra,   tazmania, scobra,   ROT90,  "Stern", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 
-GAME( 1982, anteater, 0,        scobra,   anteater, anteater, ROT90,  "[Stern] (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
+GAME( 1982, anteater, 0,        anteater, anteater, anteater, ROT90,  "[Stern] (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
 
 
 

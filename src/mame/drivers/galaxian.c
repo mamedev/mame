@@ -1741,7 +1741,7 @@ static MACHINE_DRIVER_START( konami_sound_1x_ay8910 )
 
 	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
 
@@ -1767,7 +1767,7 @@ static MACHINE_DRIVER_START( konami_sound_2x_ay8910 )
 
 	MDRV_SOUND_ADD_TAG("konami", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(konami_sound)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 MACHINE_DRIVER_END
 
 
@@ -2063,6 +2063,15 @@ static MACHINE_DRIVER_START( scobra )
 	/* alternate memory map */
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(scobra_map,0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( anteater )
+	MDRV_IMPORT_FROM(scobra)
+	
+	/* quiet down the sounds */
+	MDRV_SOUND_MODIFY("konami")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 MACHINE_DRIVER_END
 
 
