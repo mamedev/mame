@@ -2068,7 +2068,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( anteater )
 	MDRV_IMPORT_FROM(scobra)
-	
+
 	/* quiet down the sounds */
 	MDRV_SOUND_MODIFY("konami")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)

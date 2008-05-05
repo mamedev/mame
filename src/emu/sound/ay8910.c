@@ -66,34 +66,34 @@ where used to calibrate channel mixing for the YM2149. This was done using
 a least square approach using a fixed RL of 1K Ohm.
 
 For the AY measurements cited in e.g. openmsx as "Hacker Kay" for a single
-channel were taken. These were normalized to 0 ... 65535 and consequently 
+channel were taken. These were normalized to 0 ... 65535 and consequently
 adapted to an offset of 0.2V and a VPP of 1.3V. These measurements are in
 line e.g. with the formula used by pcmenc for the volume: vol(i) = exp(i/2-7.5).
 
 The following is documentation from the code moved here and amended to reflect
 the changes done:
- 
+
 Careful studies of the chip output prove that the chip counts up from 0
-until the counter becomes greater or equal to the period. This is an 
-important difference when the program is rapidly changing the period to 
-modulate the sound. This is worthwhile noting, since the datasheets 
+until the counter becomes greater or equal to the period. This is an
+important difference when the program is rapidly changing the period to
+modulate the sound. This is worthwhile noting, since the datasheets
 say, that the chip counts down.
 Also, note that period = 0 is the same as period = 1. This is mentioned
 in the YM2203 data sheets. However, this does NOT apply to the Envelope
 period. In that case, period = 0 is half as period = 1.
 
 Envelope shapes:
-	C AtAlH
-	0 0 x x  \___
-	0 1 x x  /___
-	1 0 0 0  \\\\
-	1 0 0 1  \___
-	1 0 1 0  \/\/
-	1 0 1 1  \```
-	1 1 0 0  ////
-	1 1 0 1  /```
-	1 1 1 0  /\/\
-	1 1 1 1  /___
+    C AtAlH
+    0 0 x x  \___
+    0 1 x x  /___
+    1 0 0 0  \\\\
+    1 0 0 1  \___
+    1 0 1 0  \/\/
+    1 0 1 1  \```
+    1 1 0 0  ////
+    1 1 0 1  /```
+    1 1 1 0  /\/\
+    1 1 1 1  /___
 
 The envelope counter on the AY-3-8910 has 16 steps. On the YM2149 it
 has twice the steps, happening twice as fast.
@@ -191,7 +191,7 @@ struct _ay8910_context
 
 /*************************************
  *
- *  Static 
+ *  Static
  *
  *************************************/
 
@@ -263,7 +263,7 @@ static const ay_ym_param ay8910_param =
 
 /*************************************
  *
- *  Inline 
+ *  Inline
  *
  *************************************/
 
@@ -380,7 +380,7 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 
 /*************************************
  *
- * Static functions 
+ * Static functions
  *
  *************************************/
 
@@ -547,7 +547,7 @@ static void ay8910_update(void *param,stream_sample_t **inputs, stream_sample_t 
 		if (psg->holding == 0)
 		{
 			psg->count_env++;
-			if (psg->count_env >= ENVELOPE_PERIOD(psg) * psg->step ) 
+			if (psg->count_env >= ENVELOPE_PERIOD(psg) * psg->step )
 			{
 				psg->count_env = 0;
 				psg->env_step--;
@@ -620,9 +620,9 @@ static void build_mixer_table(ay8910_context *psg)
 		build_single_table(psg->intf->res_load[chan], psg->par_env, normalize, psg->env_table[chan], 0);
 	}
 	/*
-	 * The previous implementation added all three channels up instead of averaging them.
-	 * The factor of 3 will force the same levels if normalizing is used.
-	 */
+     * The previous implementation added all three channels up instead of averaging them.
+     * The factor of 3 will force the same levels if normalizing is used.
+     */
 	build_3D_table(psg->intf->res_load[0], psg->par, psg->par_env, normalize, 3, psg->zero_is_off, psg->vol3d_table);
 }
 
@@ -651,8 +651,8 @@ static void ay8910_statesave(ay8910_context *psg, int sndindex)
 
 /*************************************
  *
- * Public functions 
- * 
+ * Public functions
+ *
  *   used by e.g. YM2203, YM2210 ...
  *
  *************************************/
@@ -813,7 +813,7 @@ int ay8910_read_ym(void *chip)
 /*************************************
  *
  * Sound Interface
- * 
+ *
  *************************************/
 
 static void *ay8910_start(int sndindex, int clock, const void *config)
@@ -948,7 +948,7 @@ void ymz294_get_info(void *token, UINT32 state, sndinfo *info)
 /*************************************
  *
  * Read/Write Handlers
- * 
+ *
  *************************************/
 
 READ8_HANDLER( AY8910_read_port_0_r ) { return ay8910_read_ym(sndti_token(SOUND_AY8910, 0)); }

@@ -5,9 +5,6 @@ todo:
 
 fix sound
 improve interrupts
-sprite flipping is incorrect for one of the enemies so its probably wrong
-screenshots look like the game has sprite zooming
-http://emustatus.rainemu.com/games/flower.htm
 
 
         FLOWER   CHIP PLACEMENT

@@ -1705,7 +1705,7 @@ INLINE void emit_xchg_r8_r8(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_32BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Eb_Gb, OP_32BIT, dreg, sreg); 
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Eb_Gb, OP_32BIT, dreg, sreg);
 }
 
 
@@ -1742,7 +1742,7 @@ INLINE void emit_xchg_r16_r16(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_16BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_16BIT, dreg, sreg); 
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_16BIT, dreg, sreg);
 }
 
 
@@ -1783,7 +1783,7 @@ INLINE void emit_xchg_r32_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_32BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_32BIT, dreg, sreg); 
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_32BIT, dreg, sreg);
 }
 
 
@@ -1838,7 +1838,7 @@ INLINE void emit_xchg_r64_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg)
 	else if (sreg == REG_EAX)
 		emit_op_reg(emitptr, OP_NOP | (dreg & 7), OP_64BIT, dreg);
 	else
- 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_64BIT, dreg, sreg); 
+ 		emit_op_modrm_reg(emitptr, OP_XCHG_Ev_Gv, OP_64BIT, dreg, sreg);
 }
 
 #endif
