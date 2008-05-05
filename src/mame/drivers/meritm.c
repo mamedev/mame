@@ -4,19 +4,23 @@
   Driver by Mariusz Wojcieszek
 
   CRT 250 (basic components, also used by CRT260)
-    Main CPU: 1xZ80B
-  Sound: 1xYM2149F (or compatible)
-    Video: 2xYamaha V9938 (MSX2 video chip!)
-  Other: 2xZ80APIO (I/O and interrupt controllers)
-         1x8255 (I/O)
+   Main CPU: Z80B
+      Sound: Yamaha YM2149F (or compatible)
+      Video: 2 Yamaha V9938 (MSX2 video chip!)
+      Other: 2 Z80APIO (I/O and interrupt controllers)
+             1 8255 (I/O)
 
   CRT 260 additional components:
   - Microtouch touch screen controller (SMT-3)
   - PC16550 UART (for communication with touch screen controller)
   - DS1204 Electronic Key (for protection)
   - DS1232 Reset and Watchdog
-  - DS1644 (megat4te) 32K NVRAM + RTC
   - MAX232 (for MegaLink)
+
+    One of the following Dalas Nonvolatile SRAM chips:
+    - DS1225Y 64K Non-volitile SRAM (Mega Touch 4)
+    - DS1230Y 256K Non-volitile SRAM (Mega Touch 6)
+    - DS1644 32K NVRAM + RTC (Tournament sets)
 
   Known Games:
 
@@ -1052,7 +1056,9 @@ ROM_END
              one PC16550DN
              one PB255a or L5220574
              One Dallas DS1204 Data Key
-             One dallas DS1225Y 16k Non-volitile SRAM
+             One Dallas DS1225Y 64k Non-volitile SRAM (Mega Touch 4)
+              or Dallas DS1230Y 256K Non-volitile SRAM (Mega Touch 6)
+              or Dallas DS1644 32K NVRAM + RTC (Tournament sets)
              Two Z80APIO (Z0842004PSC)
 
     OSC 21.477270 MHz & 1.8432MHz (near the PC16550DN)
@@ -1077,6 +1083,10 @@ C1996 MII
  U38-R0E     = 27C4001 (AKA 27C040)
 C1996 MII
 
+9255-40-01
+U5-B-RO1     =  Dalas DS1204V
+C1996 MII
+
 
 Actual Megatouch 6 rom labels
 --------------------------------
@@ -1096,6 +1106,11 @@ C1998 MII
 9255-80-01
  U38-R0A     = 27C801
 C1998 MII
+
+9255-80
+U5-B-RO1     =  Dalas DS1204V
+C1998 MII
+
 
 PAL:
 SC3944-0A.u19 = PALCE22V10H-25PC/4
@@ -1122,7 +1137,6 @@ ROM_START( megat3 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-
 ROM_START( megat3te )
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-30-01_u32-r0",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
@@ -1139,8 +1153,7 @@ ROM_START( megat3te )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-
-ROM_START( megat4 )
+ROM_START( megat4 ) /* Dalas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -1157,7 +1170,7 @@ ROM_START( megat4 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4a )
+ROM_START( megat4a ) /* Dalas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -1174,7 +1187,7 @@ ROM_START( megat4a )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4te )
+ROM_START( megat4te ) /* Dalas DS1204V security key at U5 labeled 9255-50-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -1212,7 +1225,7 @@ ROM_START( megat5 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat6 )
+ROM_START( megat6 ) /* Dalas DS1204V security key at U5 labeled 9255-80 U5-B-RO1 C1998 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-60-01_u32-ro",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
 	ROM_LOAD( "qs9255-08_u36-ro",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 */
@@ -1242,7 +1255,6 @@ static DRIVER_INIT(megat3)
 
 };
 
-
 static DRIVER_INIT(megat3te)
 {
 	static const UINT8 megat3_ds1204_key[8] =
@@ -1256,7 +1268,6 @@ static DRIVER_INIT(megat3te)
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
-
 
 static DRIVER_INIT(megat4)
 {
@@ -1287,8 +1298,8 @@ static DRIVER_INIT(megat6)
 }
 
 /* CRT 250 */
-GAME( 1988, pitboss2,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, spitboss,  0,    meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, pitboss2,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, spitboss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + question roms */
 GAME( 1994, pitbossm,  0,      meritm_crt250_questions, pitbossm, 0, ROT0, "Merit", "Pit Boss Megastar", GAME_IMPERFECT_GRAPHICS )
