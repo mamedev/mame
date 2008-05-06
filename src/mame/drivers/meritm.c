@@ -27,7 +27,7 @@
   CRT 250:
   Pit Boss II (c)1988
   Super Pit Boss (c)1988
-  *Pit Boss Superstar (c)1989
+  Pit Boss Superstar (c)1990
   *Pit Boss Superstar 30 (c)1993
   Pit Boss Megastar (c)1994
 
@@ -977,6 +977,27 @@ ROM_START( pitboss2 )
 	ROM_LOAD( "u16", 0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) )
 ROM_END
 
+
+/*   Pitboss Superstar 
+     -----------------
+     Dumped by: Hugh McLenaghan
+     Dump Date: 2008-05-01
+     
+*/
+
+ROM_START( pitbosss )
+	ROM_REGION( 0x80000, REGION_CPU1, 0 )
+	ROM_LOAD( "9221-10-0b.u9",  0x00000, 0x10000, CRC(e1fbf7cb) SHA1(e04163219c357cd3da2a78ba2590d453df8e9477) )
+	ROM_LOAD( "9221-10-0.u10",  0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9221-10-0b.u11", 0x20000, 0x10000, CRC(6d6dfaf3) SHA1(de76c577eef1bb6637aacffedcc40266af92506e) )
+	ROM_LOAD( "9221-10-0.u12",  0x30000, 0x10000, CRC(3577a203) SHA1(80f9c827ad9dea2c6af788bd3b46ab65e8c594eb) )
+	ROM_LOAD( "9221-10-0.u13",  0x40000, 0x10000, CRC(466f81f9) SHA1(88429d9ff53d27bf639200852a7bf61768c8fd1b) )
+	ROM_LOAD( "9221-10-0.u14",  0x50000, 0x10000, CRC(0720faa6) SHA1(1d78d711e3aab1ecf604ae7b9c374d27639a97c3) )
+	ROM_LOAD( "9221-10-0.u15",  0x60000, 0x10000, CRC(c302b4c2) SHA1(d62d4bb33a9ccb95d1e550f9e439be3316b94c99) )
+	ROM_LOAD( "9221-10-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
+ROM_END
+
+
 ROM_START( spitboss )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )
 	ROM_LOAD( "u9-0a.rom",  0x00000, 0x10000, CRC(e0c45c9c) SHA1(534bff67c8fee08f1c348275de8977659efa9f69) )
@@ -1300,6 +1321,7 @@ static DRIVER_INIT(megat6)
 /* CRT 250 */
 GAME( 1988, pitboss2,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss II", GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, spitboss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Super Pit Boss", GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosss,  0,      meritm_crt250, meritm_crt250, 0, ROT0, "Merit", "Pit Boss Superstar", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 250 + question roms */
 GAME( 1994, pitbossm,  0,      meritm_crt250_questions, pitbossm, 0, ROT0, "Merit", "Pit Boss Megastar", GAME_IMPERFECT_GRAPHICS )
