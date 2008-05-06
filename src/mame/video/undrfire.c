@@ -245,7 +245,7 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
 		zoomx =    (data & 0x007f0000) >> 16;
-		tilenum =  (data & 0x00007fff);
+		tilenum =  (data & 0x0000ffff);
 
 		data = spriteram32[offs+2];
 		priority = (data & 0x000c0000) >> 18;
