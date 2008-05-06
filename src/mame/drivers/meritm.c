@@ -17,7 +17,7 @@
   - DS1232 Reset and Watchdog
   - MAX232 (for MegaLink)
 
-    One of the following Dalas Nonvolatile SRAM chips:
+    One of the following Dallas Nonvolatile SRAM chips:
     - DS1225Y 64K Non-volitile SRAM (Mega Touch 4)
     - DS1230Y 256K Non-volitile SRAM (Mega Touch 6)
     - DS1644 32K NVRAM + RTC (Tournament sets)
@@ -977,14 +977,6 @@ ROM_START( pitboss2 )
 	ROM_LOAD( "u16", 0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) )
 ROM_END
 
-
-/*   Pitboss Superstar 
-     -----------------
-     Dumped by: Hugh McLenaghan
-     Dump Date: 2008-05-01
-     
-*/
-
 ROM_START( pitbosss )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )
 	ROM_LOAD( "9221-10-0b.u9",  0x00000, 0x10000, CRC(e1fbf7cb) SHA1(e04163219c357cd3da2a78ba2590d453df8e9477) )
@@ -996,7 +988,6 @@ ROM_START( pitbosss )
 	ROM_LOAD( "9221-10-0.u15",  0x60000, 0x10000, CRC(c302b4c2) SHA1(d62d4bb33a9ccb95d1e550f9e439be3316b94c99) )
 	ROM_LOAD( "9221-10-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
 ROM_END
-
 
 ROM_START( spitboss )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )
@@ -1105,7 +1096,7 @@ C1996 MII
 C1996 MII
 
 9255-40-01
-U5-B-RO1     =  Dalas DS1204V
+U5-B-RO1     =  Dallas DS1204V
 C1996 MII
 
 
@@ -1129,7 +1120,7 @@ C1998 MII
 C1998 MII
 
 9255-80
-U5-B-RO1     =  Dalas DS1204V
+U5-B-RO1     =  Dallas DS1204V
 C1998 MII
 
 
@@ -1174,7 +1165,7 @@ ROM_START( megat3te )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4 ) /* Dalas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
+ROM_START( megat4 ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -1191,7 +1182,7 @@ ROM_START( megat4 ) /* Dalas DS1204V security key at U5 labeled 9255-40-01 U5-B-
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4a ) /* Dalas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
+ROM_START( megat4a ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -1208,7 +1199,7 @@ ROM_START( megat4a ) /* Dalas DS1204V security key at U5 labeled 9255-40-01 U5-B
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat4te ) /* Dalas DS1204V security key at U5 labeled 9255-50-01 U5-B-RO1 C1996 MII */
+ROM_START( megat4te ) /* Dallas DS1204V security key at U5 labeled 9255-50-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-40-01_u32-ro",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-ro",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
@@ -1246,7 +1237,7 @@ ROM_START( megat5 )
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat6 ) /* Dalas DS1204V security key at U5 labeled 9255-80 U5-B-RO1 C1998 MII */
+ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO1 C1998 MII */
 	ROM_REGION( 0x400000, REGION_CPU1, 0 )
 	ROM_LOAD( "9255-60-01_u32-ro",  0x000000, 0x100000, CRC(f8f7f48e) SHA1(1bebe1f8898c60b795a0f794ca9b79e03d2744e4) ) /* Location U32 */
 	ROM_LOAD( "qs9255-08_u36-ro",   0x100000, 0x080000, CRC(800f5a1f) SHA1(4d3ee6fb896d6452aab1f279a3ee878284bd1acc) ) /* Location U36 */
