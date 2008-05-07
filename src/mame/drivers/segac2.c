@@ -799,10 +799,10 @@ static INPUT_PORTS_START( columns )
     /* The first level increase (from 0 to 1) is always after destroying
        35 jewels. Then, the level gets 1 level more every : */
     PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )     // 50 jewels
-    PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )   // 40 jewels
-    PORT_DIPSETTING(    0x30, DEF_STR( Hard ) )     // 35 jewels
-    PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )  // 25 jewels
+    PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )  // 50 jewels
+    PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )     // 40 jewels
+    PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )   // 35 jewels
+    PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )     // 25 jewels
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( columnsu )
@@ -823,13 +823,16 @@ static INPUT_PORTS_START( columnsu )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "Background Music" )	/* listed in the manual, ON by default */
+	PORT_DIPSETTING(    0x04, "BGM #1" )
+	PORT_DIPSETTING(    0x00, "BGM #2" )
     /* The first level increase (from 0 to 1) is always after destroying
        35 jewels. Then, the level gets 1 level more every : */
     PORT_DIPNAME( 0x30, 0x30, DEF_STR( Difficulty ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )     // 50 jewels
-    PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )   // 40 jewels
-    PORT_DIPSETTING(    0x30, DEF_STR( Hard ) )     // 35 jewels
-    PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )  // 25 jewels
+    PORT_DIPSETTING(    0x00, DEF_STR( Easiest ) )  // 50 jewels
+    PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )     // 40 jewels
+    PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )   // 35 jewels
+    PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )     // 25 jewels
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( columns2 )
