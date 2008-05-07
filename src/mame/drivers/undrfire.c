@@ -142,10 +142,10 @@ J1100342A
 |                                           TC511664-80     MB3771                             |
 |                                                                                            P1|
 |  MACH120   MACH120                                                                           |
-|                                     ENSONIC         30.4761MHz  16MHz   ADC0809              |
+|                                     ENSONIQ         30.4761MHz  16MHz   ADC0809              |
 |                                     ESP-R6                                                   |
-|                                                       ENSONIC                                |
-|                                     ENSONIC           5701     DSW1(8)  TC0510NIO            |
+|                                                       ENSONIQ                                |
+|                                     ENSONIQ           5701     DSW1(8)  TC0510NIO            |
 |                                     OTIS-R2                                                 Z|
 |                                                         93C46                                |
 |           C3                              C4                                                 |
@@ -221,9 +221,9 @@ static WRITE32_HANDLER( color_ram_w )
 
 	{
 		a = paletteram32[offset];
-		r = (a &0xff0000) >> 16;
-		g = (a &0xff00) >> 8;
-		b = (a &0xff);
+		r = (a & 0xff0000) >> 16;
+		g = (a & 0xff00) >> 8;
+		b = (a & 0xff);
 
 		palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 	}
@@ -234,9 +234,9 @@ static WRITE32_HANDLER( color_ram_w )
                 INTERRUPTS
 ***********************************************************/
 
-static TIMER_CALLBACK( undrfire_interrupt5 )
+static TIMER_CALLBACK( interrupt5 )
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
 }
 
 
@@ -388,7 +388,7 @@ static READ32_HANDLER( unknown_hardware_r )
 static WRITE32_HANDLER( unknown_int_req_w )
 {
 	/* 10000 cycle delay is arbitrary */
-	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, undrfire_interrupt5);
+	timer_set(ATTOTIME_IN_CYCLES(10000,0), NULL, 0, interrupt5);
 }
 
 
@@ -430,16 +430,16 @@ logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",active
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
 {
-		if (ACCESSING_BITS_0_15)
-		{
-			undrfire_rotate_ctrl[port_sel] = data;
-			return;
-		}
+	if (ACCESSING_BITS_0_15)
+	{
+		undrfire_rotate_ctrl[port_sel] = data;
+		return;
+	}
 
-		if (ACCESSING_BITS_16_31)
-		{
-			port_sel = (data &0x70000) >> 16;
-		}
+	if (ACCESSING_BITS_16_31)
+	{
+		port_sel = (data &0x70000) >> 16;
+	}
 }
 
 
@@ -461,7 +461,24 @@ static WRITE32_HANDLER( motor_control_w )
 
 static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data &0x1000) ? CLEAR_LINE : ASSERT_LINE);
+/*
+	........ ..xxxxxx   Lamp 1-6 enables
+	........ .x......   Vibration
+*/
+
+	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static READ32_HANDLER( cbombers_adc_r )
+{
+	return (input_port_read_indexed(machine, 3) << 24);
+}
+
+static WRITE32_HANDLER( cbombers_adc_w )
+{
+	/* One interrupt per input port (4 per frame, though only 2 used).
+        1000 cycle delay is arbitrary */
+	timer_set(ATTOTIME_IN_CYCLES(1000, 0), NULL, 0, interrupt5);
 }
 
 /***********************************************************
@@ -488,65 +505,33 @@ static ADDRESS_MAP_START( undrfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf00000, 0xf00007) AM_READ(undrfire_lightgun_r)	/* stick coords read at $11b2-bc */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbombers_readmem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_READ(SMH_RAM)	/* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_READ(SMH_RAM)	/* Sprite ram */
-	AM_RANGE(0x800000, 0x80ffff) AM_READ(TC0480SCP_long_r)
-	AM_RANGE(0x830000, 0x83002f) AM_READ(TC0480SCP_ctrl_long_r)
-//  AM_RANGE(0x340000, 0x340003) AM_READ(superchs_stick_r)  /* stick coord read */
 
-	AM_RANGE(0x500000, 0x500007) AM_READ(undrfire_input_r)
-	AM_RANGE(0xc00000, 0xc00007) AM_READ(undrfire_input_r)
-
-	AM_RANGE(0x700000, 0x7007ff) AM_READ(SMH_RAM)	/* Sound shared ram */
-
-	AM_RANGE(0x900000, 0x90ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(SMH_RAM)	/* Palette ram */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_READ(SMH_RAM)	/* Shared ram */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cbombers_writemem, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x21ffff) AM_WRITE(SMH_RAM)// AM_BASE(&superchs_ram)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(TC0480SCP_long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_WRITE(TC0480SCP_ctrl_long_w)
-
-	AM_RANGE(0x900000, 0x90ffff) AM_WRITE(TC0100SCN_long_w)	/* piv tilemaps */
-	AM_RANGE(0x920000, 0x92000f) AM_WRITE(TC0100SCN_ctrl_long_w)
-
+static ADDRESS_MAP_START( cbombers_cpua_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x1fffff) AM_ROM
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
-//  AM_RANGE(0x340000, 0x340003) AM_WRITE(superchs_stick_w) /* stick int request */
-
-//  AM_RANGE(0x500000, 0x500003) AM_WRITE(MWA32_NOP)
-	AM_RANGE(0x500000, 0x500007) AM_WRITE(undrfire_input_w)	/* eerom etc. */
-
-//  AM_RANGE(0x600000, 0x600007) AM_WRITE(unknown_int_req_w)    /* int request for unknown hardware */
-
-	AM_RANGE(0x700000, 0x7007ff) AM_WRITE(SMH_RAM) AM_BASE(&f3_shared_ram)
-
-	AM_RANGE(0x900000, 0x90ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_WRITE(color_ram_w) AM_BASE(&paletteram32)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_WRITE(SMH_RAM) AM_BASE(&shared_ram)
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
+	AM_RANGE(0x600000, 0x600007) AM_READWRITE(cbombers_adc_r, cbombers_adc_w)
+	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE(&f3_shared_ram)
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(TC0480SCP_long_r, TC0480SCP_long_w)		/* tilemaps */
+	AM_RANGE(0x830000, 0x83002f) AM_READWRITE(TC0480SCP_ctrl_long_r, TC0480SCP_ctrl_long_w)
+	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(TC0100SCN_long_r, TC0100SCN_long_w)		/* piv tilemaps */
+	AM_RANGE(0x920000, 0x92000f) AM_READWRITE(TC0100SCN_ctrl_long_r, TC0100SCN_ctrl_long_w)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE(&paletteram32)
+	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
+	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
+	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(&shared_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbombers_cpub_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x400000, 0x40ffff) AM_READ(SMH_RAM)	/* local ram */
-	AM_RANGE(0x800000, 0x80ffff) AM_READ(shared_ram_r)
-//  AM_RANGE(0xa00000, 0xa001ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cbombers_cpub_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( cbombers_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM	/* local ram */
 //  AM_RANGE(0x600000, 0x60ffff) AM_WRITE(TC0480SCP_word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(shared_ram_w)
-//  AM_RANGE(0xa00000, 0xa001ff) AM_WRITE(SMH_RAM)  /* Extra road control?? */
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
+//  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
-
 
 
 /***********************************************************
@@ -627,15 +612,15 @@ static INPUT_PORTS_START( cbombers )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* ? where is freeze input */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON5 ) /* ? where is freeze input */
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_PLAYER(1) // Nitro
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1) // Shift
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) // Accel
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1) // Brake
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Gear Shift") PORT_TOGGLE
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Nitro")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME("Accelerator")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_NAME("Brake")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -669,24 +654,8 @@ static INPUT_PORTS_START( cbombers )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	/* Gun inputs (real range is 0-0xffff: we use standard 0-255 and shift later) */
-
-	PORT_START_TAG("IN3")	/* IN 3, P1X */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START_TAG("IN4")	/* IN 4, P1Y */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(1)
-
-	PORT_START_TAG("IN5")	/* IN 5, P2X */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, -1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(2)
-
-	PORT_START_TAG("IN6")	/* IN 6, P2Y */
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_PLAYER(2)
-
-	PORT_START_TAG("FAKE")
-	PORT_BIT(    0x01, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Show gun target") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_START_TAG("IN3")	/* IN 3, steering wheel */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -793,13 +762,13 @@ static MACHINE_DRIVER_START( cbombers )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(cbombers_readmem, cbombers_writemem)
+	MDRV_CPU_PROGRAM_MAP(cbombers_cpua_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	TAITO_F3_SOUND_SYSTEM_CPU(16000000)
 
 	MDRV_CPU_ADD(M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(cbombers_cpub_readmem, cbombers_cpub_writemem)
+	MDRV_CPU_PROGRAM_MAP(cbombers_cpub_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_INTERLEAVE(8)	/* CPU slices - Need to interleave Cpu's 1 & 3 */
@@ -823,7 +792,7 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_VIDEO_UPDATE(cbombers)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(13343000)
+	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
 MACHINE_DRIVER_END
 
 
@@ -992,29 +961,12 @@ ROM_START( cbombers )
 ROM_END
 
 
-
-static READ32_HANDLER( main_cycle_r )
-{
-	int ptr;
-	if ((activecpu_get_sp()&2)==0) ptr=undrfire_ram[(activecpu_get_sp()&0x1ffff)/4];
-	else ptr=(((undrfire_ram[(activecpu_get_sp()&0x1ffff)/4])&0x1ffff)<<16) |
-	(undrfire_ram[((activecpu_get_sp()&0x1ffff)/4)+1]>>16);
-
-	if (activecpu_get_pc()==0x682 && ptr==0x1156)
-		cpu_spinuntil_int();
-
-	return undrfire_ram[0x4f8/4];
-}
-
 static DRIVER_INIT( undrfire )
 {
 	UINT32 offset,i;
 	UINT8 *gfx = memory_region(REGION_GFX3);
 	int size=memory_region_length(REGION_GFX3);
 	int data;
-
-	/* Speedup handlers */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2004f8, 0x2004fb, 0, 0, main_cycle_r);
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;
@@ -1072,4 +1024,4 @@ static DRIVER_INIT( cbombers )
 GAME( 1993, undrfire, 0,        undrfire, undrfire, undrfire, ROT0, "Taito Corporation Japan", "Under Fire (World)", 0 )
 GAME( 1993, undrfiru, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito America Corporation", "Under Fire (US)", 0 )
 GAME( 1993, undrfirj, undrfire, undrfire, undrfire, undrfire, ROT0, "Taito Corporation", "Under Fire (Japan)", 0 )
-GAME( 1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", GAME_NOT_WORKING )
+GAME( 1994, cbombers, 0,        cbombers, cbombers, cbombers, ROT0, "Taito Corporation", "Chase Bombers", 0 )
