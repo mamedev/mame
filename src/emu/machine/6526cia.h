@@ -34,6 +34,7 @@ struct _cia6526_interface
 /* configuration and reset */
 void cia_config(int which, const cia6526_interface *intf);
 void cia_reset(void);
+void cia_set_port_mask_value(int which, int p, int data);
 
 /* reading and writing */
 UINT8 cia_read(int which, offs_t offset);

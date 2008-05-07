@@ -67,6 +67,7 @@ struct _cia_port
 	UINT8		out;
 	UINT8		(*read)(void);
 	void		(*write)(UINT8);
+	UINT8		mask_value; /* in READ operation the value can be forced by a extern electric circuit */
 };
 
 struct _cia_state
@@ -166,6 +167,7 @@ void cia_config(int which, const cia6526_interface *intf)
 	{
 		cia->port[p].read = intf->port[p].read;
 		cia->port[p].write = intf->port[p].write;
+		cia->port[p].mask_value = 0xff;
 	}
 
 	/* setup timers */
@@ -190,10 +192,12 @@ void cia_config(int which, const cia6526_interface *intf)
 	state_save_register_item("6526cia", which, cia->port[0].latch);
 	state_save_register_item("6526cia", which, cia->port[0].in);
 	state_save_register_item("6526cia", which, cia->port[0].out);
+	state_save_register_item("6526cia", which, cia->port[0].mask_value);
 	state_save_register_item("6526cia", which, cia->port[1].ddr);
 	state_save_register_item("6526cia", which, cia->port[1].latch);
 	state_save_register_item("6526cia", which, cia->port[1].in);
 	state_save_register_item("6526cia", which, cia->port[1].out);
+	state_save_register_item("6526cia", which, cia->port[1].mask_value);
 	state_save_register_item("6526cia", which, cia->timer[0].latch);
 	state_save_register_item("6526cia", which, cia->timer[0].count);
 	state_save_register_item("6526cia", which, cia->timer[0].mode);
@@ -218,7 +222,11 @@ void cia_config(int which, const cia6526_interface *intf)
 	state_save_register_item("6526cia", which, cia->serial);
 }
 
-
+void cia_set_port_mask_value(int which, int p, int data)
+{
+	cia_state *cia = &cia_array[which];
+	cia->port[p].mask_value = data;
+}
 
 void cia_reset(void)
 {
@@ -235,9 +243,11 @@ void cia_reset(void)
 			cia->port[0].latch = 0x00;
 			cia->port[0].in = 0x00;
 			cia->port[0].out = 0x00;
+			cia->port[0].mask_value = 0xff;
 			cia->port[1].latch = 0x00;
 			cia->port[1].in = 0x00;
 			cia->port[1].out = 0x00;
+			cia->port[0].mask_value = 0xff;
 			cia->tod = 0;
 			cia->tod_latch = 0;
 			cia->alarm = 0;
@@ -569,8 +579,7 @@ UINT8 cia_read(int which, offs_t offset)
 		case CIA_PRB:
 			port = &cia->port[offset & 1];
 			data = port->read ? (*port->read)() : 0;
-			//data = data & (port->latch | ~port->ddr);
-			data = (data & ~port->ddr) | (port->latch & port->ddr);
+			data = ((data & ~port->ddr) | (port->latch & port->ddr)) & port->mask_value;
 			port->in = data;
 
 			if (offset == CIA_PRB)
