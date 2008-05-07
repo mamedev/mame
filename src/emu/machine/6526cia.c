@@ -222,10 +222,10 @@ void cia_config(int which, const cia6526_interface *intf)
 	state_save_register_item("6526cia", which, cia->serial);
 }
 
-void cia_set_port_mask_value(int which, int p, int data)
+void cia_set_port_mask_value(int which, int port, int data)
 {
 	cia_state *cia = &cia_array[which];
-	cia->port[p].mask_value = data;
+	cia->port[port].mask_value = data;
 }
 
 void cia_reset(void)
