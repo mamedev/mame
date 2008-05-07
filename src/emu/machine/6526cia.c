@@ -247,7 +247,7 @@ void cia_reset(void)
 			cia->port[1].latch = 0x00;
 			cia->port[1].in = 0x00;
 			cia->port[1].out = 0x00;
-			cia->port[0].mask_value = 0xff;
+			cia->port[1].mask_value = 0xff;
 			cia->tod = 0;
 			cia->tod_latch = 0;
 			cia->alarm = 0;
