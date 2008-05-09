@@ -1970,8 +1970,8 @@ ROM_START( qbertqub )
 	ROM_LOAD( "qq-rom0.bin",  0xe000, 0x2000, CRC(8ddbe438) SHA1(31112d711af5d4039491e99a0be0c088b3272482) )
 
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )
-	ROM_LOAD( "qb-snd1.bin",  0x7000, 0x800, CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
-	ROM_LOAD( "qb-snd2.bin",  0x7800, 0x800, CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
+	ROM_LOAD( "qq-snd1.bin",  0x7000, 0x800, BAD_DUMP CRC(15787c07) SHA1(8b7d03fbf2ebaa71b3a7e2f636a0d1bb9b796e43) )
+	ROM_LOAD( "qq-snd2.bin",  0x7800, 0x800, BAD_DUMP CRC(58437508) SHA1(09d8053e7e99679b602dcda230d64db7fe6cb7f5) )
 
 	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "qq-bg0.bin",   0x0000, 0x1000, CRC(050badde) SHA1(d049367e262cc6080e01d32227e86310166e00bb) )	/* chars */
@@ -2260,7 +2260,7 @@ GAME( 1983, mplanuk,  mplanets, gottlieb, mplanets, 0,        ROT270, "Gottlieb 
 GAME( 1983, krull,    0,        krull,    krull,    0,        ROT270, "Gottlieb", "Krull", 0 )
 GAME( 1983, kngtmare, 0,        gottlieb, kngtmare, 0,        ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
 GAME( 1983, sqbert,   0,        qbert,    qbert,    0,        ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
-GAME( 1983, qbertqub, 0,        qbert,    qbertqub, 0,        ROT270, "Mylstar", "Q*bert's Qubes", 0 )
+GAME( 1983, qbertqub, 0,        qbert,    qbertqub, 0,        ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
 GAME( 1983, mach3,    0,        gottlieb2,mach3,    laserdsc, ROT0,   "Mylstar", "M.A.C.H. 3", GAME_NOT_WORKING )
 GAME( 1983, screwloo, 0,        gottlieb2,screwloo, gottlieb, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1984, cobram3,  0,        gottlieb2,mach3,    laserdsc, ROT0,   "Data East","Cobra Command", GAME_NOT_WORKING )
