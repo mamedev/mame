@@ -3,11 +3,9 @@
 /*
 TODO:
 - dynamic screen resolution
-- bg pen (or the pen of the lower tilemap?)
-- sprites, that have the shadow bit set but aren't shadows, have bad colors
-- check if the data&0x8000 condition in tilemaps is valid even when 4bpp mode it's used
-- namco logo in emeralda demo is missing (it's used with a roz effect)
-- invisible dolphin sprite in emeralda instruction screen
+- is background pen configurable?
+- non-shadow pixels for sprites flagged to enable shadows have bad colors
+- dolphin sprite in emeralda instruction screen is missing because of an incorrectly emulated scanline irq
 */
 
 #include "driver.h"
@@ -20,18 +18,27 @@ UINT16 *namcona1_vreg;
 UINT16 *namcona1_scroll;
 UINT16 *namcona1_workram;
 UINT16 *namcona1_sparevram;
+UINT16 *namcona1_rozvideoram;
 
 /* private variables */
 static char *dirtychar;
 static char dirtygfx;
 static UINT16 *shaperam;
 static UINT16 *cgram;
+static tilemap *roz_tilemap;
+static int roz_palette;
+static int roz_dirty;
 static tilemap *bg_tilemap[NAMCONA1_NUM_TILEMAPS];
 static int tilemap_palette_bank[NAMCONA1_NUM_TILEMAPS];
 static int palette_is_dirty;
 
 static void tilemap_get_info(
-	running_machine *machine,tile_data *tileinfo,int tile_index,const UINT16 *tilemap_videoram,int tilemap_color,int use_4bpp_gfx )
+	running_machine *machine,
+	tile_data *tileinfo,
+	int tile_index,
+	const UINT16 *tilemap_videoram,
+	int tilemap_color,
+	int use_4bpp_gfx )
 {
 #ifdef LSB_FIRST
 	UINT16 *source;
@@ -77,10 +84,61 @@ static void tilemap_get_info(
 	}
 } /* tilemap_get_info */
 
-static TILE_GET_INFO( tilemap_get_info0 ){ tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+videoram16,tilemap_palette_bank[0],namcona1_vreg[0x58+6]&1); }
-static TILE_GET_INFO( tilemap_get_info1 ){ tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+videoram16,tilemap_palette_bank[1],namcona1_vreg[0x58+6]&2); }
-static TILE_GET_INFO( tilemap_get_info2 ){ tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+videoram16,tilemap_palette_bank[2],namcona1_vreg[0x58+6]&4); }
-static TILE_GET_INFO( tilemap_get_info3 ){ tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+videoram16,tilemap_palette_bank[3],namcona1_vreg[0x58+6]&8); }
+static TILE_GET_INFO( tilemap_get_info0 ){ tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+videoram16,tilemap_palette_bank[0],namcona1_vreg[0xbc/2]&1); }
+static TILE_GET_INFO( tilemap_get_info1 ){ tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+videoram16,tilemap_palette_bank[1],namcona1_vreg[0xbc/2]&2); }
+static TILE_GET_INFO( tilemap_get_info2 ){ tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+videoram16,tilemap_palette_bank[2],namcona1_vreg[0xbc/2]&4); }
+static TILE_GET_INFO( tilemap_get_info3 ){ tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+videoram16,tilemap_palette_bank[3],namcona1_vreg[0xbc/2]&8); }
+
+static TILE_GET_INFO( roz_get_info )
+{
+	/* each logical tile is constructed from 4*4 normal tiles */
+	int tilemap_color = roz_palette;
+	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16;
+	int c = tile_index%0x40;
+	int r = tile_index/0x40;
+	int data = namcona1_rozvideoram[(r/4)*0x40+c/4]+(c%4)+(r%4)*0x40;
+	int tile = data&0xfff;
+	int gfx = use_4bpp_gfx;
+	if( use_4bpp_gfx )
+	{
+		tilemap_color *= 0x10;
+		tilemap_color += (data & 0x7000)>>12;
+	}
+	if( data & 0x8000 )
+	{
+		SET_TILE_INFO( gfx,tile,tilemap_color,TILE_FORCE_LAYER0 );
+	}
+	else
+	{
+#ifdef LSB_FIRST
+		UINT16 *source;
+		static UINT8 mask_data[8];
+		source = shaperam+4*tile;
+		mask_data[0] = source[0]>>8;
+		mask_data[1] = source[0]&0xff;
+		mask_data[2] = source[1]>>8;
+		mask_data[3] = source[1]&0xff;
+		mask_data[4] = source[2]>>8;
+		mask_data[5] = source[2]&0xff;
+		mask_data[6] = source[3]>>8;
+		mask_data[7] = source[3]&0xff;
+#else
+		UINT8 *mask_data = (UINT8 *)(shaperam+4*tile);
+#endif
+		SET_TILE_INFO( gfx,tile,tilemap_color,0 );
+		tileinfo->mask_data = mask_data;
+	}
+} /* roz_get_info */
+
+WRITE16_HANDLER( namcona1_rozvideoram_w )
+{
+	COMBINE_DATA( &namcona1_rozvideoram[offset] );
+	roz_dirty = 1;
+}
+READ16_HANDLER( namcona1_rozvideoram_r )
+{
+	return namcona1_rozvideoram[offset];
+}
 
 /*************************************************************************/
 
@@ -229,7 +287,7 @@ static void update_gfx(running_machine *machine)
 
 	if( dirtygfx )
 	{
-		for( page = 0; page<4; page++ )
+		for( page = 0; page<NAMCONA1_NUM_TILEMAPS; page++ )
 		{
 			for( i=0; i<0x1000; i++ )
 			{
@@ -239,6 +297,17 @@ static void update_gfx(running_machine *machine)
 				}
 			}
 		}
+
+		pSource = namcona1_rozvideoram;
+		for( i=0; i<0x800; i++ )
+		{
+			if( dirtychar[*pSource++ & 0xfff] )
+			{ // todo: this checks only if top-left tile has changed
+				roz_dirty = 1;
+				break;
+			}
+		}
+
 		for( i = 0;i < 0x1000;i++ )
 		{
 			if( dirtychar[i] )
@@ -255,36 +324,35 @@ static void update_gfx(running_machine *machine)
 
 VIDEO_START( namcona1 )
 {
+	static const tile_get_info_func get_info[4] = { tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
 	int i;
 	gfx_element *gfx0,*gfx1,*gfx2;
-	static const tile_get_info_func get_info[4] =
-	{ tilemap_get_info0, tilemap_get_info1, tilemap_get_info2, tilemap_get_info3 };
+
+	roz_tilemap = tilemap_create( roz_get_info, tilemap_scan_rows, 8,8,64,64 );
+	roz_palette = -1;
 
 	for( i=0; i<NAMCONA1_NUM_TILEMAPS; i++ )
 	{
-		bg_tilemap[i] = tilemap_create(
-			get_info[i],
-			tilemap_scan_rows,
-			8,8,64,64 );
-
+		bg_tilemap[i] = tilemap_create( get_info[i], tilemap_scan_rows, 8,8,64,64 );
 		tilemap_palette_bank[i] = -1;
 	}
 
-	shaperam		= auto_malloc( 0x1000*4*2 );
-	cgram			= auto_malloc( 0x1000*0x20*2 );
-	dirtychar		= auto_malloc( 0x1000 );
+	shaperam		     = auto_malloc( 0x1000*4*2 );
+	cgram			     = auto_malloc( 0x1000*0x20*2 );
+	dirtychar		     = auto_malloc( 0x1000 );
+	namcona1_rozvideoram = auto_malloc( 0x1000 );
 
-		gfx0 = allocgfx( &cg_layout_8bpp );
-		gfx1 = allocgfx( &cg_layout_4bpp );
-		gfx2 = allocgfx( &shape_layout );
-			gfx0->total_colors = machine->config->total_colors/256;
-			machine->gfx[0] = gfx0;
+	gfx0 = allocgfx( &cg_layout_8bpp );
+	gfx0->total_colors = machine->config->total_colors/256;
+	machine->gfx[0] = gfx0;
 
-			gfx1->total_colors = machine->config->total_colors/16;
-			machine->gfx[1] = gfx1;
+	gfx1 = allocgfx( &cg_layout_4bpp );
+	gfx1->total_colors = machine->config->total_colors/16;
+	machine->gfx[1] = gfx1;
 
-			gfx2->total_colors = machine->config->total_colors/2;
-			machine->gfx[2] = gfx2;
+	gfx2 = allocgfx( &shape_layout );
+	gfx2->total_colors = machine->config->total_colors/2;
+	machine->gfx[2] = gfx2;
 } /* namcona1_vh_start */
 
 /*************************************************************************/
@@ -309,7 +377,7 @@ static void pdraw_tile(running_machine *machine,
 	UINT8 *mask_base = mask->gfxdata + (code % mask->total_elements) * mask->char_modulo;
 
 	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
-	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
+	int sprite_screen_width  = ((1<<16)*gfx->width+0x8000)>>16;
 
 	if (sprite_screen_width && sprite_screen_height)
 	{
@@ -404,22 +472,24 @@ static void pdraw_tile(running_machine *machine,
 								int c = source[x_index>>16];
 
 								/* render a shadow only if the sprites color is $F (8bpp) or $FF (4bpp) */
-								if( bShadow && ((gfx_region == 0 && color == 0x0f) || (gfx_region == 1 && color == 0xff)))
+								if( bShadow )
 								{
-									pen_t *palette_shadow_table = machine->shadow_table;
-									dest[x] = palette_shadow_table[dest[x]];
-								}
-								else if( bShadow && !((gfx_region == 0 && color == 0x0f) || (gfx_region == 1 && color == 0xff)))
-								{
-									//bad colors!
-									dest[x] = pal_base + c;
+									if( (gfx_region == 0 && color == 0x0f) ||
+									    (gfx_region == 1 && color == 0xff) )
+									{
+										pen_t *palette_shadow_table = machine->shadow_table;
+										dest[x] = palette_shadow_table[dest[x]];
+									}
+									else
+									{
+										dest[x] = pal_base + c;
+									}
 								}
 								else
 								{
 									dest[x] = pal_base + c;
 								}
 							}
-
 							pri[x] = 0xff;
 						}
 					}
@@ -483,6 +553,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				{
 					sx+=col*8;
 				}
+				sx = ((sx+16)&0x1ff)-8;
+				sy = ((sy+8)&0x1ff)-8;
 
 				if(color & 8)
 				{
@@ -491,9 +563,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						cliprect,
 						(tile & 0xfff) + row*64+col,
 						((color>>4)&0xf) * 0x10 + ((color & 0xf00) >> 8),
-						((sx+16)&0x1ff)-8,
-						((sy+8)&0x1ff)-8,
-						flipx,flipy,
+						sx,sy,flipx,flipy,
 						priority,
 						color & 0x4000, /* shadow */
 						tile & 0x8000, /* opaque */
@@ -506,9 +576,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						cliprect,
 						(tile & 0xfff) + row*64+col,
 						(color>>4)&0xf,
-						((sx+16)&0x1ff)-8,
-						((sy+8)&0x1ff)-8,
-						flipx,flipy,
+						sx,sy,flipx,flipy,
 						priority,
 						color & 0x4000, /* shadow */
 						tile & 0x8000, /* opaque */
@@ -593,7 +661,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			else
 			{
 				// used in emeraldia
-				if(which == 1 && namcona1_vreg[0x8a/2] == 0xfd /* maybe reg & 0x4 */)
+				if(which == NAMCONA1_NUM_TILEMAPS )// && namcona1_vreg[0x8a/2] == 0xfd /* maybe reg & 0x4 */)
 				{
 					int incxx = ((INT16)namcona1_vreg[0xc0/2])<<8; // or incyy ?
 					int incxy = ((INT16)namcona1_vreg[0xc2/2])<<8;
@@ -610,10 +678,9 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 					UINT32 startx = (xoffset<<12)+incxx*dx+incyx*dy;
 					UINT32 starty = (yoffset<<12)+incxy*dx+incyy*dy;
 
-					tilemap_draw_roz_primask(bitmap, &clip, bg_tilemap[which],
+					tilemap_draw_roz_primask(bitmap, &clip, roz_tilemap,
 						startx, starty, incxx, incxy, incyx, incyy,
 						0, 0, primask, 0);
-
 				}
 				else
 				{
@@ -646,30 +713,61 @@ VIDEO_UPDATE( namcona1 )
 		update_gfx(screen->machine);
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
-			static int tilemap_color;
-			tilemap_color = namcona1_vreg[0x58+(which&3)]&0xf;
+			int tilemap_color = namcona1_vreg[0xb0/2+(which&3)]&0xf;
 			if( tilemap_color!=tilemap_palette_bank[which] )
 			{
 				tilemap_mark_all_tiles_dirty( bg_tilemap[which] );
 				tilemap_palette_bank[which] = tilemap_color;
 			}
 		} /* next tilemap */
+
+		{
+			int color = namcona1_vreg[0xb0/2+5]&0xf;
+			if( color != roz_palette )
+			{
+				roz_dirty = 1;
+				roz_palette = color;
+			}
+		}
+		if( roz_dirty )
+		{
+			tilemap_mark_all_tiles_dirty( roz_tilemap );
+			roz_dirty = 0;
+		}
+
 		fillbitmap( priority_bitmap,0,cliprect );
 
-		// It fixes bg in emeralda
-		fillbitmap( bitmap,/* 0 */ 0xff,cliprect );
+		fillbitmap( bitmap, 0xff, cliprect ); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{
-			for( which=NAMCONA1_NUM_TILEMAPS-1; which>=0; which-- )
+			for( which=4; which>=0; which-- )
 			{
-				if( (namcona1_vreg[0x50+which]&0x7) == priority )
+				int pri = namcona1_vreg[0xa0/2+which]&0x7; /* likely wrong for roz plane */
+				if( pri == priority )
 				{
 					draw_background(screen->machine,bitmap,cliprect,which,priority);
 				}
 			} /* next tilemap */
 		} /* next priority level */
+
 		draw_sprites(screen->machine,bitmap,cliprect);
 	} /* gfx enabled */
 	return 0;
 }
+
+/*
+$efff20: sprite control: 0x3a,0x3e,0x3f
+            bit 0x01 selects spriteram bank
+
+               0    2    4    6    8    a    c    e
+$efff00:    src0 src1 src2 dst0 dst1 dst2 BANK [src
+$efff10:    src] [dst dst] #BYT BLIT eINT 001f 0001
+$efff20:    003f 003f IACK ---- ---- ---- ---- ----
+$efff80:    0050 0170 0020 0100 0000 00?? 0000 GFXE
+$efff90:    0000 0001 0002 0003 FLIP ---- ---- ----
+$efffa0:    PRI  PRI  PRI  PRI  ---- PRI? POSI ----     priority (0..7) + scanline interrupt?
+$efffb0:    CLR  CLR  CLR  CLR  0001 CLR? BPP  ----     color (0..f), bpp flag per layer
+$efffc0:    RZXX RZXY RZYX RZYY RZX0 RZY0 ???? ----     ROZ
+*/
+

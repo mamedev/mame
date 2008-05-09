@@ -974,9 +974,9 @@ static void namcona1_blit( running_machine *machine )
 
 	int num_bytes = namcona1_vreg[0xb];
 
-	int dest_offset, source_offset;
-	int dest_bytes_per_row, dst_pitch;
-	int source_bytes_per_row, src_pitch;
+	int dst_offset, src_offset;
+	int dst_bytes_per_row, dst_pitch;
+	int src_bytes_per_row, src_pitch;
 
 	(void)dst2;
 	(void)dst0;
@@ -990,8 +990,8 @@ static void namcona1_blit( running_machine *machine )
         dst0,dst1,dst2,
         gfxbank );*/
 
-	blit_setup( dst1, &dest_bytes_per_row, &dst_pitch, gfxbank);
-	blit_setup( src1, &source_bytes_per_row, &src_pitch, gfxbank );
+	blit_setup( dst1, &dst_bytes_per_row, &dst_pitch, gfxbank);
+	blit_setup( src1, &src_bytes_per_row, &src_pitch, gfxbank );
 
 	if( num_bytes&1 )
 	{
@@ -1002,33 +1002,38 @@ static void namcona1_blit( running_machine *machine )
 	{
 		dst_baseaddr += 0xf40000;
 	}
+	if( input_code_pressed(KEYCODE_N) )
+	{
+		printf( "src format=%04x baseaddr=%x width=%x pitch=%x\n", src1, src_baseaddr, src_bytes_per_row, src_pitch );
+		printf( "dst format=%04x baseaddr=%x width=%x pitch=%x\n", dst1, dst_baseaddr, dst_bytes_per_row, dst_pitch );
+	}
 
-	dest_offset		= 0;
-	source_offset	= 0;
+	dst_offset = 0;
+	src_offset = 0;
 
 	while( num_bytes>0 )
 	{
 		if( transfer_dword(machine,
-			dst_baseaddr + dest_offset,
-			src_baseaddr + source_offset ) )
+			dst_baseaddr + dst_offset,
+			src_baseaddr + src_offset ) )
 		{
 			return;
 		}
 
 		num_bytes -= 2;
 
-		dest_offset+=2;
-		if( dest_offset >= dest_bytes_per_row )
+		dst_offset+=2;
+		if( dst_offset >= dst_bytes_per_row )
 		{
 			dst_baseaddr += dst_pitch;
-			dest_offset = 0;
+			dst_offset = 0;
 		}
 
-		source_offset+=2;
-		if( source_offset >= source_bytes_per_row )
+		src_offset+=2;
+		if( src_offset >= src_bytes_per_row )
 		{
 			src_baseaddr += src_pitch;
-			source_offset = 0;
+			src_offset = 0;
 		}
 	}
 } /* namcona1_blit */
@@ -1085,8 +1090,9 @@ static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xff7fff) AM_READWRITE(namcona1_videoram_r, namcona1_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xffdfff) AM_RAM AM_BASE(&namcona1_sparevram)	/* spare videoram */
+	AM_RANGE(0xff0000, 0xff7fff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE(namcona1_rozvideoram_r, namcona1_rozvideoram_w) AM_BASE(&namcona1_rozvideoram)
+	AM_RANGE(0xff9000, 0xffdfff) AM_RAM AM_BASE(&namcona1_sparevram)	/* spare videoram */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(&spriteram16)			/* spriteram */
 ADDRESS_MAP_END
@@ -1270,17 +1276,38 @@ static ADDRESS_MAP_START( namcona1_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x1f) AM_READ( portana_r )
 ADDRESS_MAP_END
 
+static TIMER_CALLBACK( namcona1_posirq )
+{
+	video_screen_update_partial(machine->primary_screen, param);
+	cpunum_set_input_line(machine, 0/*CPU*/, 2+1, HOLD_LINE);
+}
+
 static INTERRUPT_GEN( namcona1_interrupt )
 {
 	int level = cpu_getiloops(); /* 0,1,2,3,4 */
+	int posirq = input_code_pressed(KEYCODE_M);
+
 	if( level==0 )
 	{
 		simulate_mcu(machine);
+		if( mEnableInterrupts && posirq )
+		{
+			if( level==2 && namcona1_vreg[0x1a/2]&(1<<2) )
+			{
+				int scanline = 192;//namcona1_vreg[0xac/2];
+				timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, namcona1_posirq );
+			}
+			if( level==3 && namcona1_vreg[0x1a/2]&(1<<3) )
+			{
+				cpunum_set_input_line(machine, 0, 3+1, HOLD_LINE);
+			}
+		}
 	}
-	if( mEnableInterrupts )
+	if( mEnableInterrupts && !posirq )
 	{
 		if( (namcona1_vreg[0x1a/2]&(1<<level))==0 )
 		{
+			if( level!=2 && level!=3 )	printf( "level = %d\n", level );
 			cpunum_set_input_line(machine, 0, level+1, HOLD_LINE);
 		}
 	}
@@ -1369,7 +1396,8 @@ static ADDRESS_MAP_START( namcona2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf01fff) AM_READ(namcona1_paletteram_r)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(namcona1_gfxram_r)
 	AM_RANGE(0xff0000, 0xff7fff) AM_READ(namcona1_videoram_r)
-	AM_RANGE(0xff8000, 0xffdfff) AM_READ(SMH_RAM)		/* spare videoram */
+	AM_RANGE(0xff8000, 0xff8fff) AM_READ(namcona1_rozvideoram_r )
+	AM_RANGE(0xff9000, 0xffdfff) AM_READ(SMH_RAM)		/* spare videoram */
 	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_READ(SMH_RAM)		/* spriteram */
 ADDRESS_MAP_END
@@ -1385,7 +1413,8 @@ static ADDRESS_MAP_START( namcona2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf01fff) AM_WRITE(namcona1_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_WRITE(namcona1_gfxram_w)
 	AM_RANGE(0xff0000, 0xff7fff) AM_WRITE(namcona1_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xffdfff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_sparevram)
+	AM_RANGE(0xff8000, 0xff8fff) AM_WRITE(namcona1_rozvideoram_w) AM_BASE(&namcona1_rozvideoram)
+	AM_RANGE(0xff9000, 0xffdfff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_sparevram)
 	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_scroll)
 	AM_RANGE(0xfff000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
 ADDRESS_MAP_END
