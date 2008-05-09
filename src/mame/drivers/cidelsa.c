@@ -45,7 +45,7 @@ static CDP1802_Q_WRITE( cidelsa_q_w )
 	state->cdp1802_q = level;
 }
 
-static const cdp1802_interface cidelsa_cdp1802_config =
+static CDP1802_INTERFACE( cidelsa_cdp1802_config )
 {
 	cidelsa_mode_r,		// MODE
 	cidelsa_ef_r,		// EF

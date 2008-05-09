@@ -12,6 +12,7 @@
     - connect to sound system when possible
     - white noise
     - scanline based update
+	- separate to CDP1869 and CDP1870/6
 
 */
 
@@ -857,7 +858,7 @@ DEVICE_GET_INFO( cdp1869_video )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "RCA CDP1869";					break;
-		case DEVINFO_STR_FAMILY:						info->s = "RCA CDP1869";					break;
+		case DEVINFO_STR_FAMILY:						info->s = "RCA CDP1800";					break;
 		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;

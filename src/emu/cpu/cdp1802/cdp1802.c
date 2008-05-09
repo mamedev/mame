@@ -175,11 +175,11 @@ INLINE void cdp1802_long_skip(int taken)
 	}
 }
 
-static void cdp1802_sample_ef(void)
+static void cdp1802_sample_ef(running_machine *machine)
 {
 	if (cdp1802.intf->ef_r)
 	{
-		cdp1802.ef = cdp1802.intf->ef_r(Machine) & 0x0f;
+		cdp1802.ef = cdp1802.intf->ef_r(machine) & 0x0f;
 	}
 	else
 	{
@@ -187,35 +187,39 @@ static void cdp1802_sample_ef(void)
 	}
 }
 
-static void cdp1802_output_state_code(void)
+static void cdp1802_output_state_code(running_machine *machine)
 {
 	if (cdp1802.intf->sc_w)
 	{
+		cdp1802_state state_code;
+
 		switch (cdp1802.state)
 		{
 		case CDP1802_STATE_0_FETCH:
-			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S0_FETCH);
+			state_code = CDP1802_STATE_CODE_S0_FETCH;
 			break;
 
 		case CDP1802_STATE_1_EXECUTE:
-			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S1_EXECUTE);
+			state_code = CDP1802_STATE_CODE_S1_EXECUTE;
 			break;
 
 		case CDP1802_STATE_2_DMA_IN:
 		case CDP1802_STATE_2_DMA_OUT:
-			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S2_DMA);
+			state_code = CDP1802_STATE_CODE_S2_DMA;
 			break;
 
 		case CDP1802_STATE_3_INT:
-			cdp1802.intf->sc_w(Machine, CDP1802_STATE_CODE_S3_INTERRUPT);
+			state_code = CDP1802_STATE_CODE_S3_INTERRUPT;
 			break;
 		}
+
+		cdp1802.intf->sc_w(machine, state_code);
 	}
 }
 
-static void cdp1802_run(void)
+static void cdp1802_run(running_machine *machine)
 {
-	cdp1802_output_state_code();
+	cdp1802_output_state_code(machine);
 
 	switch (cdp1802.state)
 	{
@@ -273,7 +277,7 @@ static void cdp1802_run(void)
 
 	case CDP1802_STATE_1_EXECUTE:
 
-		cdp1802_sample_ef();
+		cdp1802_sample_ef(machine);
 
 		switch (I)
 		{
@@ -496,7 +500,7 @@ static void cdp1802_run(void)
 
 				if (cdp1802.intf->q_w)
 				{
-					cdp1802.intf->q_w(Machine, Q);
+					cdp1802.intf->q_w(machine, Q);
 				}
 				break;
 
@@ -505,7 +509,7 @@ static void cdp1802_run(void)
 
 				if (cdp1802.intf->q_w)
 				{
-					cdp1802.intf->q_w(Machine, Q);
+					cdp1802.intf->q_w(machine, Q);
 				}
 				break;
 
@@ -552,7 +556,7 @@ static void cdp1802_run(void)
 			break;
 
 		case 0xc:
-			cdp1802_output_state_code();
+			cdp1802_output_state_code(machine);
 
 			switch (N)
 			{
@@ -738,7 +742,7 @@ static void cdp1802_run(void)
 
 		if (cdp1802.intf->dma_r)
 		{
-			MW(R[0], cdp1802.intf->dma_r(Machine));
+			MW(R[0], cdp1802.intf->dma_r(machine, R[0]));
 		}
 
 		R[0] = R[0] + 1;
@@ -771,7 +775,7 @@ static void cdp1802_run(void)
 
 		if (cdp1802.intf->dma_w)
 		{
-	        cdp1802.intf->dma_w(Machine, M(R[0]));
+	        cdp1802.intf->dma_w(machine, R[0], M(R[0]));
 		}
 
 		R[0] = R[0] + 1;
@@ -826,10 +830,12 @@ static void cdp1802_run(void)
 
 static int cdp1802_execute(int cycles)
 {
+	running_machine *machine = Machine;
+
 	cdp1802_ICount = cycles;
 
 	cdp1802.prevmode = cdp1802.mode;
-	cdp1802.mode = cdp1802.intf->mode_r(Machine);
+	cdp1802.mode = cdp1802.intf->mode_r(machine);
 
 	do
 	{
@@ -839,12 +845,12 @@ static int cdp1802_execute(int cycles)
 			I = 0;
 			N = 0;
 			cdp1802.state = CDP1802_STATE_1_EXECUTE;
-			cdp1802_run();
+			cdp1802_run(machine);
 			break;
 
 		case CDP1802_MODE_RESET:
 			cdp1802.state = CDP1802_STATE_1_RESET;
-			cdp1802_run();
+			cdp1802_run(machine);
 			break;
 
 		case CDP1802_MODE_PAUSE:
@@ -862,17 +868,17 @@ static int cdp1802_execute(int cycles)
 			case CDP1802_MODE_RESET:
 				cdp1802.prevmode = CDP1802_MODE_RUN;
 				cdp1802.state = CDP1802_STATE_1_INIT;
-				cdp1802_run();
+				cdp1802_run(machine);
 				break;
 
 			case CDP1802_MODE_PAUSE:
 				cdp1802.prevmode = CDP1802_MODE_RUN;
 				cdp1802.state = CDP1802_STATE_0_FETCH;
-				cdp1802_run();
+				cdp1802_run(machine);
 				break;
 
 			case CDP1802_MODE_RUN:
-				cdp1802_run();
+				cdp1802_run(machine);
 				break;
 			}
 			break;
