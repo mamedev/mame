@@ -1565,6 +1565,7 @@ const game_driver * const drivers[] =
 	DRIVER( pitnrun )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( pitnruna )	/* PR  (c) 1984 Taito Corporation */
 	DRIVER( lkage )		/* A54 (c) 1984 Taito Corporation */
+	DRIVER( lkageo )	/* A54 (c) 1984 Taito Corporation */
 	DRIVER( lkageb )	/* bootleg */
 	DRIVER( lkageb2 )	/* bootleg */
 	DRIVER( lkageb3 )	/* bootleg */
