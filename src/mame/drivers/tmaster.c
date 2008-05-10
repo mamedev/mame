@@ -174,11 +174,11 @@ static READ16_HANDLER(rtc_r)
 {
 	mame_system_time systime;
 
-	mame_get_current_datetime(Machine, &systime);
+	mame_get_current_datetime(machine, &systime);
 	rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
 	rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
 	rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
-	rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday+1);
+	rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday);
 	rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
 	rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
 	rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
@@ -421,7 +421,7 @@ static READ16_HANDLER( tmaster_blitter_r )
 
 static READ16_HANDLER( tmaster_coins_r )
 {
-	return input_port_read(machine, "COIN")|(mame_rand(Machine)&0x0800);
+	return input_port_read(machine, "COIN")|(mame_rand(machine)&0x0800);
 }
 
 static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
