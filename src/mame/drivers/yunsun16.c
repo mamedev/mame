@@ -14,8 +14,9 @@ Sound Chips  :  OKI M6295 + YM3812 [Optional]
 ---------------------------------------------------------------------------
 Year + Game         Board#
 ---------------------------------------------------------------------------
-19?? Magic Bubble     YS-1302 / YS102
-1997 Shocking
+199? Magic Bubble     YS-1302 / YS102
+1996 Paparazzi        YS-0211
+1997 Shocking         YS-0211
 1998 Bomb Kick        YS-0211
 ---------------------------------------------------------------------------
 
@@ -125,25 +126,25 @@ static WRITE16_HANDLER( yunsun16_sound_bank_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r					)	// P1 + P2
-	AM_RANGE(0x800018, 0x800019) AM_READ(input_port_1_word_r					)	// Coins
-	AM_RANGE(0x80001a, 0x80001b) AM_READ(input_port_2_word_r					)	// DSW1
-	AM_RANGE(0x80001c, 0x80001d) AM_READ(input_port_3_word_r					)	// DSW2
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(SMH_NOP								)	// ? (value: don't care)
-	AM_RANGE(0x800100, 0x800101) AM_WRITE(SMH_NOP								)	// ? $9100
-	AM_RANGE(0x800102, 0x800103) AM_WRITE(SMH_NOP								)	// ? $9080
-	AM_RANGE(0x800104, 0x800105) AM_WRITE(SMH_NOP								)	// ? $90c0
-	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(SMH_NOP								)	// ? $9000
+	AM_RANGE(0x800000, 0x800001) AM_READ(input_port_0_word_r				)	// P1 + P2
+	AM_RANGE(0x800018, 0x800019) AM_READ(input_port_1_word_r				)	// Coins
+	AM_RANGE(0x80001a, 0x80001b) AM_READ(input_port_2_word_r				)	// DSW1
+	AM_RANGE(0x80001c, 0x80001d) AM_READ(input_port_3_word_r				)	// DSW2
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(SMH_NOP						)	// ? (value: don't care)
+	AM_RANGE(0x800100, 0x800101) AM_WRITE(SMH_NOP						)	// ? $9100
+	AM_RANGE(0x800102, 0x800103) AM_WRITE(SMH_NOP						)	// ? $9080
+	AM_RANGE(0x800104, 0x800105) AM_WRITE(SMH_NOP						)	// ? $90c0
+	AM_RANGE(0x80010a, 0x80010b) AM_WRITE(SMH_NOP						)	// ? $9000
 	AM_RANGE(0x80010c, 0x80010f) AM_RAM AM_BASE(&yunsun16_scroll_1				)	// Scrolling
 	AM_RANGE(0x800114, 0x800117) AM_RAM AM_BASE(&yunsun16_scroll_0				)	// Scrolling
 	AM_RANGE(0x800154, 0x800155) AM_RAM AM_BASE(&yunsun16_priority				)	// Priority
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w					)	// Sound
 	AM_RANGE(0x800188, 0x800189) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// Sound
-	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP												)	// ? 0 (during int)
+	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP							)	// ? 0 (during int)
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(yunsun16_vram_0_w) AM_BASE(&yunsun16_vram_0	)	// Layer 0
-	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE(&spriteram16) AM_SIZE(&spriteram_size					)	// Sprites
+	AM_RANGE(0x910000, 0x910fff) AM_RAM	AM_BASE(&spriteram16) AM_SIZE(&spriteram_size	)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -185,10 +186,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0x11, 0x11) AM_WRITE(YM3812_write_port_0_w									)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r											)	// From Main CPU
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w			)	// M6295
+	AM_RANGE(0x10, 0x10) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w )	// YM3812
+	AM_RANGE(0x11, 0x11) AM_WRITE(YM3812_write_port_0_w )
+	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r )						// From Main CPU
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w )		// M6295
 ADDRESS_MAP_END
 
 
@@ -669,7 +670,9 @@ MACHINE_DRIVER_END
 
                                 Magic Bubble
 
-by Yun Sung YS1302
+Yun Sung 199x
+
+YunSung YS1302
 
 PCB Layout
 ----------
@@ -700,14 +703,14 @@ U23, 21, 22, 20, 131 ---27c010
 U67, 68, 69, 70 --------27c040
 U32, 33 ----------------27c020
 
-U143, 131 .......most likely sound
-U32, 33 .........most likely program
-U20-23 ..........most likely sprites
-U67-70 ..........most likely BG
+U143, 131 .......Sound CPU code & Samples
+U32, 33 .........Program code
+U20-23 ..........Sprites
+U67-70 ..........Backgrounds
 
 Actel A1020B is close to U67-70
 
-68HC000 p16 is close to  U32,33
+68HC000P16 is close to  U32,33
 
 16.000000 MHz
 
@@ -778,17 +781,20 @@ ROM_END
 
 /***************************************************************************
 
-                                Shocking
-Yunsung, 1997
+YunSung YS-0211 based games:
+
+Paparazzi (c) 1996
+Shocking  (c) 1997
+Bomb Kick (c) 1998
 
 PCB Layout
 ----------
 
 |-------------------------------------------------|
-|UPC1242  ROM.U131           ROM.U20     6116     |
-|     VOL M6295              ROM.U22     6116     |
-|  PAL 6264                  ROM.U21              |
-|      6264                  ROM.U23     6116     |
+|UPC1242    u131               u20       6116     |
+|     VOL M6295                u22       6116     |
+|  PAL 6264                    u21                |
+|      6264                    u23       6116     |
 |                                        6116     |
 |                  PAL                      PAL   |
 |J                 PAL                      PAL   |
@@ -797,17 +803,57 @@ PCB Layout
 |M  DSW2                PAL   ACTEL         PAL   |
 |A        PAL           PAL   A1020B  6116  6116  |
 |         PAL  PAL      PAL           6116  6116  |
-|              PAL                    ROM.U70     |
-|                62256                ROM.U69     |
-|        68000   62256                ROM.U68     |
-|                ROM.U32              ROM.U67     |
-|16MHz           ROM.U33           62256  62256   |
+|              PAL                      u70 u74   |
+|                62256                  u69 u73   |
+|        68000   62256                  u68 u72   |
+|                 u32                   u67 u71   |
+|16MHz            u33              62256  62256   |
 |-------------------------------------------------|
 Notes:
       68000 clock - 16MHz
       M6295 clock - 1.000MHz, sample rate 1000000Hz / 132
       HSync - 14.84kHz
       VSync - 60Hz
+
+***************************************************************************/
+
+/***************************************************************************
+
+                       Paparazzi  -  Yun Sung, 1996
+
+***************************************************************************/
+
+ROM_START( paprazzi )
+
+	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "u33.bin", 0x000000, 0x020000, CRC(91f33abd) SHA1(694868bc1ef612ba47cb38957d965f271bf16105) )
+	ROM_LOAD16_BYTE( "u32.bin", 0x000001, 0x020000, CRC(ad5a3fec) SHA1(a2db3f2926bdbb5bc44f307b919a0431c9deb76d) )
+
+	ROM_REGION( 0x200000*8, REGION_GFX1, ROMREGION_ERASEFF | ROMREGION_DISPOSE )	/* 16x16x8 */
+	ROMX_LOAD( "u67.bin", 0x000000, 0x080000, CRC(ea0b9e27) SHA1(e68f728158d0c42523002fe4270784891f5492ce) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u68.bin", 0x000002, 0x080000, CRC(6b7ff4dd) SHA1(b06036f08e8f65860077a71d91676bf5c2f804fc) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u69.bin", 0x000004, 0x080000, CRC(06749294) SHA1(375fe1c05355f789f846aa28b2012d08bfa2b2b5) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u70.bin", 0x000006, 0x080000, CRC(0adacdf8) SHA1(d33680e7139e78929284b81e880bd5baa45c6675) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u71.bin", 0x200000, 0x080000, CRC(69178fc4) SHA1(1ec06d360e098e15cfb673e5de7124a7c10757f8) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u72.bin", 0x200002, 0x080000, CRC(7c3384b9) SHA1(b9e1ba7ec009e15f1061c3994ed4cf48a8e700c6) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u73.bin", 0x200004, 0x080000, CRC(73fbc13e) SHA1(a19a05764ca010be025aae12fa82f97f5dc7d4b9) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "u74.bin", 0x200006, 0x080000, CRC(f1afda11) SHA1(c62e318dde2ed7ac9b649764ccec8e991d2869c2) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x4 */
+	ROM_LOAD( "u20.bin", 0x000000, 0x040000, CRC(ccb0ad6b) SHA1(ca66b7c7cb1418a86f209d071935aa45bb0a6e7d) )
+	ROM_LOAD( "u21.bin", 0x040000, 0x040000, CRC(125badf0) SHA1(ae63469e1fb1328c554774ca8c47878df2b02b96) )
+	ROM_LOAD( "u22.bin", 0x080000, 0x040000, CRC(436499c7) SHA1(ec1390b6d5656c99d91cf6425d319f4796bcb28a) )
+	ROM_LOAD( "u23.bin", 0x0c0000, 0x040000, CRC(358280fe) SHA1(eac3cb65fe75bc2da14896734f4a339480b54a2c) )
+
+	ROM_REGION( 0x080000 * 2, REGION_SOUND1, 0 )	/* Samples */
+	ROM_LOAD( "u131.bin", 0x000000, 0x080000, CRC(bcf7aa12) SHA1(f7bf5258396ed0eb7e85eccf250c6d0a333a4d61) )
+	ROM_RELOAD(           0x080000, 0x080000 )
+
+ROM_END
+
+/***************************************************************************
+
+                       Shocking  -  Yun Sung, 1997
 
 ***************************************************************************/
 
@@ -831,86 +877,38 @@ ROM_START( shocking )
 
 	ROM_REGION( 0x080000 * 2, REGION_SOUND1, 0 )	/* Samples */
 	ROM_LOAD( "yunsun16.131", 0x000000, 0x080000, CRC(d0a1bb8c) SHA1(10f33521bd6031ed73ee5c7be1382165925aa8f8) )
-	ROM_RELOAD(               0x080000, 0x080000             )
+	ROM_RELOAD(               0x080000, 0x080000 )
 
 ROM_END
 
 
 /***************************************************************************
 
-                                Bomb Kick
-
-YunSung YS-0211
-
-  CPU: 68HC000 P16
-Video: Actel A1020B PL84C
-  OSC: 16.000000 MHz
-Sound: Unmarked OKI M6295
+                       Bomb Kick  -  Yun Sung, 1998
 
 ***************************************************************************/
 
 ROM_START( bombkick )
 
 	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "bk_u33",       0x000000, 0x040000, CRC(d6eb50bf) SHA1(a24c31f212f86f066c35d39da137ef0933323e43) )
-	ROM_LOAD16_BYTE( "bk_u32",       0x000001, 0x040000, CRC(d55388a2) SHA1(928f1a8933b986cf099e184002660e30ee1aeb0a) )
+	ROM_LOAD16_BYTE( "bk_u33", 0x000000, 0x040000, CRC(d6eb50bf) SHA1(a24c31f212f86f066c35d39da137ef0933323e43) )
+	ROM_LOAD16_BYTE( "bk_u32", 0x000001, 0x040000, CRC(d55388a2) SHA1(928f1a8933b986cf099e184002660e30ee1aeb0a) )
 
 	ROM_REGION( 0x200000*8, REGION_GFX1, ROMREGION_ERASEFF | ROMREGION_DISPOSE )	/* 16x16x8 */
-	ROMX_LOAD( "bk_u67",       0x000000, 0x080000, CRC(1962f536) SHA1(36d3c73a322330058e963efcb9b81324724382cc) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "bk_u68",       0x000002, 0x080000, CRC(d80c75a4) SHA1(330c20d126b9f1f61f17750028c92843be55ec78) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "bk_u69",       0x000004, 0x080000, CRC(615e1e6f) SHA1(73875313010514ff5ca9e0bc96d6f93baaee391e) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "bk_u70",       0x000006, 0x080000, CRC(59817ef1) SHA1(d23df30b34223575d6a9c814f2ec3db990b18679) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "bk_u67", 0x000000, 0x080000, CRC(1962f536) SHA1(36d3c73a322330058e963efcb9b81324724382cc) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "bk_u68", 0x000002, 0x080000, CRC(d80c75a4) SHA1(330c20d126b9f1f61f17750028c92843be55ec78) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "bk_u69", 0x000004, 0x080000, CRC(615e1e6f) SHA1(73875313010514ff5ca9e0bc96d6f93baaee391e) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "bk_u70", 0x000006, 0x080000, CRC(59817ef1) SHA1(d23df30b34223575d6a9c814f2ec3db990b18679) , ROM_GROUPWORD | ROM_SKIP(6))
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x4 */
-	ROM_LOAD( "bk_u20",       0x000000, 0x040000, CRC(c2b83e3f) SHA1(8bcd862dbf56cf579058d045f89f900ebfea2f1d) )
-	ROM_LOAD( "bk_u21",       0x040000, 0x040000, CRC(d6890192) SHA1(3c26a08580ceecf2f61f008861a459e175c99ed9) )
-	ROM_LOAD( "bk_u22",       0x080000, 0x040000, CRC(9538c46c) SHA1(d7d0e167d5abc2ee81eae6fde152b2f5cc716c0e) )
-	ROM_LOAD( "bk_u23",       0x0c0000, 0x040000, CRC(e3831f3d) SHA1(096658ee5a7b83d774b671c0a38113533c8751d1) )
+	ROM_LOAD( "bk_u20", 0x000000, 0x040000, CRC(c2b83e3f) SHA1(8bcd862dbf56cf579058d045f89f900ebfea2f1d) )
+	ROM_LOAD( "bk_u21", 0x040000, 0x040000, CRC(d6890192) SHA1(3c26a08580ceecf2f61f008861a459e175c99ed9) )
+	ROM_LOAD( "bk_u22", 0x080000, 0x040000, CRC(9538c46c) SHA1(d7d0e167d5abc2ee81eae6fde152b2f5cc716c0e) )
+	ROM_LOAD( "bk_u23", 0x0c0000, 0x040000, CRC(e3831f3d) SHA1(096658ee5a7b83d774b671c0a38113533c8751d1) )
 
 	ROM_REGION( 0x080000 * 2, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "bk_u131",      0x000000, 0x080000, CRC(22cc5732) SHA1(38aefa4e543ea54e004eee428ee087121eb20905) )
-	ROM_RELOAD(               0x080000, 0x080000             )
-
-ROM_END
-
-/***************************************************************************
-
-                                Paparazzi
-
-YunSung YS-0211
-
-  CPU: 68HC000 P16
-Video: Actel A1020B PL84C
-  OSC: 16.000000 MHz
-Sound: AD-65 (OKI M6295)
-
-***************************************************************************/
-
-ROM_START( paprazzi )
-
-	ROM_REGION( 0x080000, REGION_CPU1, 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "u33.bin",       0x000000, 0x020000, CRC(91f33abd) SHA1(694868bc1ef612ba47cb38957d965f271bf16105) )
-	ROM_LOAD16_BYTE( "u32.bin",       0x000001, 0x020000, CRC(ad5a3fec) SHA1(a2db3f2926bdbb5bc44f307b919a0431c9deb76d) )
-
-	ROM_REGION( 0x200000*8, REGION_GFX1, ROMREGION_ERASEFF | ROMREGION_DISPOSE )	/* 16x16x8 */
-	ROMX_LOAD( "u67.bin",       0x000000, 0x080000, CRC(ea0b9e27) SHA1(e68f728158d0c42523002fe4270784891f5492ce) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u68.bin",       0x000002, 0x080000, CRC(6b7ff4dd) SHA1(b06036f08e8f65860077a71d91676bf5c2f804fc) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u69.bin",       0x000004, 0x080000, CRC(06749294) SHA1(375fe1c05355f789f846aa28b2012d08bfa2b2b5) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u70.bin",       0x000006, 0x080000, CRC(0adacdf8) SHA1(d33680e7139e78929284b81e880bd5baa45c6675) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u71.bin",       0x200000, 0x080000, CRC(69178fc4) SHA1(1ec06d360e098e15cfb673e5de7124a7c10757f8) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u72.bin",       0x200002, 0x080000, CRC(7c3384b9) SHA1(b9e1ba7ec009e15f1061c3994ed4cf48a8e700c6) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u73.bin",       0x200004, 0x080000, CRC(73fbc13e) SHA1(a19a05764ca010be025aae12fa82f97f5dc7d4b9) , ROM_GROUPWORD | ROM_SKIP(6))
-	ROMX_LOAD( "u74.bin",       0x200006, 0x080000, CRC(f1afda11) SHA1(c62e318dde2ed7ac9b649764ccec8e991d2869c2) , ROM_GROUPWORD | ROM_SKIP(6))
-
-	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE )	/* 16x16x4 */
-	ROM_LOAD( "u20.bin",       0x000000, 0x040000, CRC(ccb0ad6b) SHA1(ca66b7c7cb1418a86f209d071935aa45bb0a6e7d) )
-	ROM_LOAD( "u21.bin",       0x040000, 0x040000, CRC(125badf0) SHA1(ae63469e1fb1328c554774ca8c47878df2b02b96) )
-	ROM_LOAD( "u22.bin",       0x080000, 0x040000, CRC(436499c7) SHA1(ec1390b6d5656c99d91cf6425d319f4796bcb28a) )
-	ROM_LOAD( "u23.bin",       0x0c0000, 0x040000, CRC(358280fe) SHA1(eac3cb65fe75bc2da14896734f4a339480b54a2c) )
-
-	ROM_REGION( 0x080000 * 2, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "u131.bin",      0x000000, 0x080000, CRC(bcf7aa12) SHA1(f7bf5258396ed0eb7e85eccf250c6d0a333a4d61) )
-	ROM_RELOAD(               0x080000, 0x080000             )
+	ROM_LOAD( "bk_u131", 0x000000, 0x080000, CRC(22cc5732) SHA1(38aefa4e543ea54e004eee428ee087121eb20905) )
+	ROM_RELOAD(          0x080000, 0x080000 )
 
 ROM_END
 
@@ -923,9 +921,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 19??, magicbub, 0,        magicbub, magicbub, magicbub, ROT0, "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL )
-GAME( 19??, magicbua, magicbub, magicbub, magicbua, magicbub, ROT0, "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL )
+GAME( 199?, magicbub, 0,        magicbub, magicbub, magicbub, ROT0,   "Yun Sung", "Magic Bubble", GAME_NO_COCKTAIL )
+GAME( 199?, magicbua, magicbub, magicbub, magicbua, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL )
 GAME( 1996, paprazzi, 0,        shocking, paprazzi, 0,        ROT270, "Yun Sung", "Paparazzi",    GAME_NO_COCKTAIL )
-GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0, "Yun Sung", "Shocking",     GAME_NO_COCKTAIL )
-GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0, "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL )
+GAME( 1997, shocking, 0,        shocking, shocking, 0,        ROT0,   "Yun Sung", "Shocking",     GAME_NO_COCKTAIL )
+GAME( 1998, bombkick, 0,        shocking, bombkick, 0,        ROT0,   "Yun Sung", "Bomb Kick",    GAME_NO_COCKTAIL )
 
