@@ -15,7 +15,7 @@ Sound Chips  :  OKI M6295 + YM3812 [Optional]
 Year + Game         Board#
 ---------------------------------------------------------------------------
 199? Magic Bubble     YS-1302 / YS102
-1996 Paparazzi        YS-0211
+1996 Paparazzi        YS-0211? Looks identical
 1997 Shocking         YS-0211
 1998 Bomb Kick        YS-0211
 ---------------------------------------------------------------------------
@@ -783,7 +783,7 @@ ROM_END
 
 YunSung YS-0211 based games:
 
-Paparazzi (c) 1996
+Paparazzi (c) 1996 (no PCB label but looks identical)
 Shocking  (c) 1997
 Bomb Kick (c) 1998
 
@@ -800,14 +800,14 @@ PCB Layout
 |J                 PAL                      PAL   |
 |A  DSW1                       PAL                |
 |M                                                |
-|M  DSW2                PAL   ACTEL         PAL   |
-|A        PAL           PAL   A1020B  6116  6116  |
-|         PAL  PAL      PAL           6116  6116  |
-|              PAL                      u70 u74   |
-|                62256                  u69 u73   |
-|        68000   62256                  u68 u72   |
-|                 u32                   u67 u71   |
-|16MHz            u33              62256  62256   |
+|M  DSW2  PAL           PAL                 PAL   |
+|A        PAL           PAL   ACTEL   6116  6116  |
+|              PAL      PAL   A1020B  6116  6116  |
+|          6   PAL                      u70 u74   |
+|          8     62256                  u69 u73   |
+|          0     62256                  u68 u72   |
+|          0      u32                   u67 u71   |
+|16MHz     0      u33              62256  62256   |
 |-------------------------------------------------|
 Notes:
       68000 clock - 16MHz
