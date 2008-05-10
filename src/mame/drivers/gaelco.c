@@ -11,6 +11,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "gaelcrpt.h"
 
 extern UINT16 *gaelco_vregs;
 extern UINT16 *gaelco_videoram;
@@ -655,395 +656,12 @@ static INPUT_PORTS_START( squash )
 INPUT_PORTS_END
 
 
-static int lastpc=0;
-static int lastword=0;
-static int lastoffset=0;
-
-
-#define CARRY(bit) {carry[bit] = (dst[bit]>>1); dst[bit]&=1;}
-
-static int decrypt(int game, int key, int high_word, int low_word)
-{
-	static const int swaps[4][16] =
-	{
-		{ 5,7,9,12,2,14,13,15,3,6,8,11,4,10,0,1 },
-		{ 11,2,5,14,8,13,10,4,7,12,0,6,15,9,1,3 },
-		{ 7,0,11,12,13,1,6,8,9,5,4,10,14,3,15,2 },
-		{ 3,0,2,1,10,15,8,6,9,13,11,7,12,5,4,14 },
-	};
-
-	int dst[16],carry[16];
-	int i;
-	const int *s = swaps[key & 3];
-	int flag1 = BIT(high_word, 9) ^ BIT(high_word, 12) ^ 1;
-	int flag2 = game ? BIT(high_word, 10) : (BIT(high_word, 9) ^ BIT(high_word, 10));
-
-	if (game)
-		flag2 = -flag2;
-
-	for (i = 0; i < 16; i++)
-		dst[i] = BIT(low_word, s[15-i]);
-	for (i = 0; i < 16; i++)
-		carry[i] = 0;
-
-	if (flag1 && flag2)
-	{
-		dst[13] += game ? 0 : 1;											CARRY(13)
-		dst[2]  +=               carry[13];									CARRY(2)
-		dst[15] += 1           + carry[2];									CARRY(15)
-		dst[4]  +=             - carry[15];									CARRY(4)
-		dst[6]  += 1           - carry[4];									CARRY(6)
-		dst[7]  +=               carry[6];									CARRY(7)
-
-		dst[14] += game ? BIT(low_word, 9) : BIT(~low_word, 9);				CARRY(14)
-		dst[12] += game ? BIT(low_word, 9) : BIT(~low_word, 9);				CARRY(12)
-
-		dst[9]  += dst[15]     + carry[14];									CARRY(9)
-		dst[10] += dst[15]     + carry[12];									CARRY(10)
-
-		dst[5]  += BIT(~low_word, 5) + carry[9];							CARRY(5)
-		dst[1]  += BIT(~low_word, 5) + carry[10];							CARRY(1)
-
-		dst[3]  += 1           + dst[7]  - carry[5];						CARRY(3)
-		dst[11] += 1           + dst[7]  - carry[1];						CARRY(11)
-
-		dst[8]  += 1           + dst[6]  + carry[3];
-		dst[0]  += 1           + dst[6]  + carry[11];
-	}
-	else
-	{
-		dst[13] += BIT(key,2);												CARRY(13)
-		dst[2]  += BIT(key,3)  + carry[13];									CARRY(2)
-		dst[15] += BIT(key,4)  + carry[2];									CARRY(15)
-		dst[4]  += BIT(key,5)  - carry[15];									CARRY(4)
-		dst[6]  += BIT(key,6)  - carry[4];									CARRY(6)
-		dst[7]  += BIT(key,7)  + carry[6];									CARRY(7)
-
-		dst[14] += BIT(key,8);												CARRY(14)
-		dst[12] += BIT(key,8);												CARRY(12)
-
-		dst[9]  += BIT(key,9)  + carry[14];									CARRY(9)
-		dst[10] += BIT(key,9)  + carry[12];									CARRY(10)
-
-		dst[5]  += BIT(key,10) + carry[9];									CARRY(5)
-		dst[1]  += BIT(key,10) + carry[10];									CARRY(1)
-
-		dst[3]  += BIT(key,11) - flag1*dst[2]  - flag2*dst[13] - carry[5];	CARRY(3)
-		dst[11] += BIT(key,11) - flag1*dst[2]  - flag2*dst[13] - carry[1];	CARRY(11)
-
-		dst[8]  += BIT(key,12) + carry[3];
-		dst[0]  += BIT(key,12) + carry[11];
-	}
-
-	low_word = 0;
-	for (i = 0; i < 16; i++)
-		low_word |= (dst[i] & 1) << i;
-
-	switch (game)
-	{
-		default:
-		case 0:
-			return low_word ^ 0xf626;
-		case 1:
-			return low_word ^ 0x8626;
-	}
-}
-
-
-static int get_key(int game, int high_word)
-{
-	int src[16],dst[16],carry[16];
-	int i;
-	int flag1 = BIT(high_word, 9) ^ BIT(high_word, 12) ^ 1;
-	int flag2 = game ? BIT(high_word, 10) : (BIT(high_word, 9) ^ BIT(high_word, 10));
-	int temp;
-
-	for (i = 0; i < 16; i++)
-	{
-		src[i] = BIT(high_word,i);
-		dst[i] = 0;
-		carry[i] = 0;
-	}
-
-
-	dst[10] = flag1 ? (src[7] ^ src[12]) : src[5];
-
-	dst[8]  = flag2 ? (1 ^ src[6]) : 0;
-
-	dst[5]  = (flag1 ^ flag2) ? (1 ^ src[3]) : (1 ^ (src[5] | src[10]) ^ src[11]);
-
-	if (flag1 == 0 && flag2 == 0)
-		dst[6]  = dst[5] + src[2];									CARRY(6);
-	if (flag1 == 1 && flag2 == 0)
-		dst[6]  = dst[5] + src[8];									CARRY(6);
-	if (flag1 == 0 && flag2 == 1)
-		dst[6]  = dst[5] + src[13];									CARRY(6);
-
-	if (game == 0)
-	{
-		if (flag1 == 0 && flag2 == 0)
-		{
-			dst[7] = src[3];
-			dst[7] ^= (1^src[12]) & (1^src[5]) & src[0];
-			dst[7] ^= src[14] & src[5] & src[0];
-			dst[7] ^= ((1^src[12]) ^ src[11]) & (1^src[2]);
-			dst[7] ^= src[11] & src[6];
-			dst[7] ^= src[12] & src[5] & (1^src[2]);
-			dst[7] ^= src[12] & (1^src[11]) & (1^src[5]) & (1^src[6]);
-		}
-		if (flag1 == 1 && flag2 == 0)
-			dst[7] = 1 ^ src[15] ^ carry[6] ^ (src[8] & (1^src[3]));
-		if (flag1 == 0 && flag2 == 1)
-			dst[7] = 1 ^ src[14] ^ carry[6];
-	}
-	else
-	{
-		if (flag1 == 0 && flag2 == 0)
-		{
-			dst[7] = src[3];
-			dst[7] ^= ((1^src[14]) & (1^src[5])) & src[0];
-			dst[7] ^= src[6] ^ (src[14] & (1^src[11]));
-			dst[7] ^= src[5] & (1^src[6]^src[14]) & (1^src[11]);
-			dst[7] ^= (src[11] ^ src[5]) & src[2];
-			dst[7] ^= src[14] & (src[11] & (1^src[5]));
-		}
-		if (flag1 == 1 && flag2 == 0)
-			dst[7] = 1 ^ src[15] ^ carry[6] ^ (src[8] & (1^src[3]));
-		if (flag1 == 0 && flag2 == 1)
-			dst[7] = 1 ^ src[14] ^ carry[6];
-	}
-
-	if (game == 0)
-	{
-		temp = (src[5] | (src[9] & src[10]));
-	}
-	else
-	{
-		temp = src[5];
-	}
-
-	dst[0]  = src[3] ^ (src[6] | ((1^src[11]) & temp));
-
-	if (game == 0)
-	{
-		dst[1]  = src[15]
-				^ (temp & src[4] & src[3])
-				^ (temp & (src[11] ? (src[6] | src[4]) : (1^src[6])))
-				^ (src[13] ?
-					(src[6] & (1^temp) & src[4]) ^ ((1^temp) & (1^src[4]) & src[3])
-					^ (src[7] & src[8] & (1^src[9]) & temp & (src[6] ^ src[4] ^ src[3]))
-					^ ((1^src[11]) & (1^src[6]) & temp & src[7] & src[8] & (1^src[9]))
-				^ (src[10] & src[9] & src[8] & (1 ^ src[4] ^ src[3]))
-				^ (src[11] & src[10] & src[9] & src[8] & (1^src[6]))
-					:
-					(src[6] & (1^temp) & (1 ^ src[4] ^ src[8]))
-					^ ((1^temp) & (src[4] ? ((1^src[3]) & (1^src[8])) : (src[3] & src[8])))
-					^ (src[7] & (1^src[8]) & (1^src[9]) & (1^temp) & (src[6] ^ src[4] ^ src[3]))
-				^ (src[10] & src[9] & src[8] & (1 ^ src[4] ^ src[3]) & (1^src[5]))
-				^ (src[11] & src[10] & src[9] & src[8] & (1^src[6]) & (1^src[5]))
-				  )
-				 ;
-	}
-	else
-	{
-		dst[1]  = src[15]
-				^ (temp & src[4] & src[3])
-				^ (temp & (src[11] ? (src[6] | src[4]) : (1^src[6])))
-				^ (src[13] ?
-					(src[6] & (1^temp) & src[4]) ^ ((1^temp) & (1^src[4]) & src[3])
-					^ (src[7] & src[8] & src[9] & temp & (src[6] ^ src[4] ^ src[3]))
-					^ ((1^src[11]) & (1^src[6]) & temp & src[7] & src[8] & src[9])
-					:
-					(src[6] & (1^temp) & (1 ^ src[4] ^ src[8]))
-					^ ((1^temp) & (src[4] ? ((1^src[3]) & (1^src[8])) : (src[3] & src[8])))
-					^ (src[7] & (1^src[8]) & src[9] & (1^temp) & (src[6] ^ src[4] ^ src[3]))
-				  );
-	}
-
-	if (game == 0)
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[11] = src[0] ^ (src[5] ? src[14] : src[10]);
-		if (flag1 == 1 && flag2 == 0)
-			dst[11] = 0;
-		if (flag1 == 0 && flag2 == 1)
-			dst[11] = 0;
-	}
-	else
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[11] = src[0] ^ (src[5] ? src[10] : (1^src[14]));	// note src[10] == 0
-		if (flag1 == 1 && flag2 == 0)
-			dst[11] = 0;
-		if (flag1 == 0 && flag2 == 1)
-			dst[11] = 1;
-	}
-
-	dst[12] = dst[11];
-	if (flag1 == 0 && flag2 == 0)
-		dst[12] ^= src[10];
-	if (flag1 == 1 && flag2 == 0)
-		dst[12] ^= 0;
-	if (flag1 == 0 && flag2 == 1)
-		dst[12] ^= src[3] ^ (src[11] ? src[6] : (src[6] | src[5]));
-
-	if (game == 0)
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[4]  = src[6];
-		if (flag1 == 1 && flag2 == 0)
-			dst[4]  = src[0] ^ (src[14] ? (1^src[12]) : src[5]);
-		if (flag1 == 0 && flag2 == 1)
-			dst[4]  = src[7];
-	}
-	else
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[4]  = src[6];
-		if (flag1 == 1 && flag2 == 0)
-			dst[4]  = src[0] ^ (src[14] ? ((1^src[12]) | (1^src[5])) : (src[12] | src[5]));
-		if (flag1 == 0 && flag2 == 1)
-			dst[4]  = src[7];
-	}
-
-	if (game == 0)
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[9] = src[5] ^ (src[12] & (1^src[7])) ^ src[13];
-		if (flag1 == 1 && flag2 == 0)
-			dst[9] = 1 ^ src[4];
-		if (flag1 == 0 && flag2 == 1)
-			dst[9] = src[6] ^ ((1^src[11]) & src[5]);
-	}
-	else
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[9] = 1 ^ src[5] ^ ((1^src[12]) & src[7]) ^ src[13];
-		if (flag1 == 1 && flag2 == 0)
-			dst[9] = 1 ^ src[4];
-		if (flag1 == 0 && flag2 == 1)
-			dst[9] = src[6] ^ ((1^src[11]) & src[5]);
-	}
-
-	if (game == 0)
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[3] = src[12];
-		if (flag1 == 1 && flag2 == 0)
-			dst[3] = src[0] ^ (src[14] ? src[12] : (1^src[5]));
-		if (flag1 == 0 && flag2 == 1)
-			dst[3] = src[8] ^ ((1^src[13]) & (1^src[12]) & (1^src[5])) ^ (src[12] & (src[13] ? (src[7] & src[5]) : ((1^src[7]) & (1^src[5]))));
-	}
-	else
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[3] = src[12];
-		if (flag1 == 1 && flag2 == 0)
-			dst[3] = src[0] ^ (src[14] ? (src[5] & src[12]) : ((1^src[5]) & (1^src[12])));
-		if (flag1 == 0 && flag2 == 1)
-			dst[3] = src[8] ^ ((1^src[13]) & (src[12]) & (1^src[5])) ^ ((1^src[12]) & (src[13] ? (src[7] & src[5]) : ((1^src[7]) & (1^src[5]))));
-	}
-
-	if (game == 0)
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[2] = src[0];
-		if (flag1 == 1 && flag2 == 0)
-			dst[2] = src[1]
-					^ (src[3] & (1^src[2]))
-					^ ((1^src[11]) & src[6] & src[5])
-					^ ((1^src[12]) & (1^src[5]) & src[0] & (1^src[14]) & (src[6] ^ src[2] ^ src[3]))
-					^ (src[12] & (1^src[6]) & (1^src[5]) & src[3])
-					^ (src[2] & (1^src[5]) & (1^src[6]) & (1^src[12]))
-					^ (src[2] & src[5] & (1^src[6]) & src[11])
-					^ ((1 ^ src[2] ^ src[3]) & (1^src[5]) & src[6] & src[12])
-					^ (src[14] & (1^src[12]) & (src[2] ^ src[3] ^ src[6]) & (1^src[5]))
-					^ (src[14] & src[12] & src[5] & (1 ^ src[3] ^ src[2] ^ src[11]) & src[0])
-					^ (src[14] & src[12] & src[11] & src[6] & src[5] & src[0])
-				^ (src[12] & (1^src[5]) & src[3])
-				^ (src[12] & (1^src[5]) & src[0] & (1 ^ src[3] ^ src[2] ^ (src[11] & (1^src[6]))))
-				^ (src[12] & (1^src[5]) & (1^src[11]) & src[6] & src[2])
-				^ (src[12] & (1^src[5]) & src[11] & (src[6] ^ src[2]))
-					;
-		if (flag1 == 0 && flag2 == 1)
-			dst[2] = src[5];
-	}
-	else
-	{
-		if (flag1 == 0 && flag2 == 0)
-			dst[2] = src[0];
-		if (flag1 == 1 && flag2 == 0)
-			dst[2] = src[1]
-					^ (src[3] & (1^src[2]))
-					^ ((1^src[11]) & src[6] & src[5])
-					^ ((1^src[12]) & (1^src[5]) & src[0] & (1^src[14]) & (src[6] ^ src[2] ^ src[3]))
-					^ (src[12] & (1^src[6]) & (1^src[5]) & src[3])
-					^ (src[2] & (1^src[5]) & (1^src[6]) & (1^src[12]))
-					^ (src[2] & src[5] & (1^src[6]) & src[11])
-					^ ((1 ^ src[2] ^ src[3]) & (1^src[5]) & src[6] & src[12])
-					^ (src[14] & (1^src[12]) & (src[2] ^ src[3] ^ src[6]) & (1^src[5]))
-					^ (src[14] & src[12] & src[5] & (1 ^ src[3] ^ src[2] ^ src[11]) & src[0])
-					^ (src[14] & src[12] & src[11] & src[6] & src[5] & src[0]);
-		if (flag1 == 0 && flag2 == 1)
-			dst[2] = src[5];
-	}
-
-	if (game == 0)
-	{
-		dst[10] ^= 1;
-		dst[4]  ^= 1;
-		dst[2]  ^= 1;
-	}
-	else
-	{
-		dst[10] ^= 1;
-		dst[8]  ^= 1;
-		dst[4]  ^= 1;
-	}
-
-
-	high_word = 0;
-	for (i = 0; i < 16; i++)
-		high_word |= (dst[i] & 1) << i;
-
-	if (flag1 == 1 && flag2 == 1)
-		high_word &= 3;
-
-	return high_word;
-}
-
-
-static UINT16 squash_encrypt(int offset, int data, int game)
-{
-	int thispc = activecpu_get_pc();
-	int savedata = data;
-
-	/* check if 2nd half of 32 bit */
-	if(lastpc == thispc && offset == lastoffset + 1)
-	{
-		lastpc = 0;
-		data = decrypt(game, get_key(game, lastword), lastword, data);
-	}
-	else
-	{
-		/* code as 1st word */
-		lastword = data;
-		lastpc = thispc;
-		lastoffset = offset;
-
-		/* high word returned */
-		data = decrypt(game, 0x0000, 0x0400, lastword);
-
-		logerror("%8x : data1 = %4x > %4x @ %8x\n",activecpu_get_pc(),savedata,data,lastoffset);
-	}
-	return data;
-}
 
 static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 {
 //  mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 
-	data = squash_encrypt(offset,data,0);
+	data = gaelco_decrypt(offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&gaelco_videoram[offset]);
 
 	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
@@ -1054,15 +672,15 @@ static WRITE16_HANDLER(gaelco_encrypted_w)
 {
 //  mame_printf_debug("gaelco_encrypted_w!!\n");
 
-	 data = squash_encrypt(offset,data,0);
-        COMBINE_DATA(&gaelco_screen[offset]);
+	data = gaelco_decrypt(offset, data, 0x0f, 0x4228);
+	COMBINE_DATA(&gaelco_screen[offset]);
 }
 
 static WRITE16_HANDLER( thoop_vram_encrypted_w )
 {
 //  mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 
-	data = squash_encrypt(offset,data,1);
+	data = gaelco_decrypt(offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&gaelco_videoram[offset]);
 
 	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
@@ -1072,8 +690,8 @@ static WRITE16_HANDLER(thoop_encrypted_w)
 {
 //  mame_printf_debug("gaelco_encrypted_w!!\n");
 
-	 data = squash_encrypt(offset,data,1);
-     COMBINE_DATA(&gaelco_screen[offset]);
+	data = gaelco_decrypt(offset, data, 0x0e, 0x4228);
+	COMBINE_DATA(&gaelco_screen[offset]);
 }
 
 
@@ -1336,5 +954,5 @@ ROM_END
 GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, 0, ROT0, "Gaelco", "Big Karnak", 0 )
 GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  0, ROT0, "Gaelco", "Biomechanical Toy (unprotected)", 0 )
 GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, 0, ROT0, "Gaelco", "Maniac Square (prototype)", 0 )
-GAME( 1992, squash,   0,		squash,   squash,   0, ROT0, "Gaelco", "Squash (Ver. 1.0)", 0 )
-GAME( 1992, thoop,    0,		thoop,    thoop,    0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", 0 )
+GAME( 1992, squash,   0,        squash,   squash,   0, ROT0, "Gaelco", "Squash (Ver. 1.0)", 0 )
+GAME( 1992, thoop,    0,        thoop,    thoop,    0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", 0 )

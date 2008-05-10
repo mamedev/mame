@@ -710,7 +710,7 @@ $(MAMEOBJ)/fuuki.a: \
 	$(DRIVERS)/fuukifg3.o $(VIDEO)/fuukifg3.o \
 
 $(MAMEOBJ)/gaelco.a: \
-	$(DRIVERS)/gaelco.o $(VIDEO)/gaelco.o \
+	$(DRIVERS)/gaelco.o $(VIDEO)/gaelco.o $(MACHINE)/gaelcrpt.o \
 	$(DRIVERS)/gaelco2.o $(MACHINE)/gaelco2.o $(VIDEO)/gaelco2.o \
 	$(DRIVERS)/gaelco3d.o $(VIDEO)/gaelco3d.o \
 	$(DRIVERS)/glass.o $(VIDEO)/glass.o \
