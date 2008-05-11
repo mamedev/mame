@@ -22,31 +22,32 @@ NAME                                        Year  B-board #      B-board PALs   
 ------------------------------------------- ----  --------  ---------------------  ---------  -----------------------  -------------
 Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  None
   (alt B-board revision)                          88621B-2  LW621            LWIO  ?
-Ghouls 'n Ghosts (World / US)               1988  88620B-2  DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
+Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
   (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
 Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
   (alt B-board revision)                          89624B-2  ST24M2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
   (alt B-board revision)                          89624B-3  ST24B2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
   (alt B-board revision - Japan)                  ?         ST22B            ?
 Dynasty Wars                                1989  89624B-3  TK24B?           ?     88622-C-2  CPS-B-02  DL-0411-10002  None
-  (alt B-board revision - Japan)                  88622B-3  TK22B            IOB1
+  (alt B-board revision - Japan)                  88622B-3  TK22B            LWIO
 Willow                                      1989  89624B-3  WL24B            LWIO  88622-C-4  CPS-B-03  DL-0411-10003  None
   (alt B-board revision - Japan)                  88622B-3  WL22B            LWIO  88622-C-2  CPS-B-03  DL-0411-10003  None
 UN Squadron / Area 88                       1989  89624B-3  AR24B            LWIO  88622-C-4  CPS-B-11  DL-0411-10004  None
   (alt B-board revision - Japan)                  88622B-2  AR22B            LWIO
+  (alt B-board revision - Japan)                  88622B-3  AR22B            LWIO
 Final Fight (first rev)                     1989  89624B-3  S224B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
 Final Fight (US/Japan 900112)                                                      ?          CPS-B-04@ DL-0411-10001  None
 Final Fight (US 900613)                           89624B-3                   IOB1  88622-C-5  CPS-B-05  DL-0411-10006  None
 Final Fight (Japan 900305) (alt B-board revision) 88622B-2  S222B            LWIO  88622-C-5  CPS-B-02  DL-0411-10002  None
 1941                                        1990  ?         YI24B            ?     88622-C-5  CPS-B-05  DL-0411-10006  ?
-  (alt B-board revision - Japan)                  ?         ?                ?
+  (alt B-board revision - Japan)                  ?         YI22B?           ?
 Mercs                                       1990  89624B-3  O224B            IOB1  90628-C-1  CPS-B-12  DL-0411-10007  C628
-  (alt B-board revision - Japan)                  ?         ?                ?
+  (alt B-board revision - Japan)                  ?         O222B?           ?
   (alt C-board revision)                                                           90628-C-2
 Magic Sword                                 1990  89624B-3  MS24B            IOB1  88622-C-5  CPS-B-13  DL-0411-10008  None
   (alt B-board revision - Japan)                  89625B-1  MS22B            IOB1
 Chiki Chiki Boys / Mega Twins               1990  89624B-3  CK24B            IOB1  88622-C-5  CPS-B-14  DL-0411-10009  None
-  (alt B-board revision - Japan)                  ?         ?                ?
+  (alt B-board revision - Japan)                  ?         CK22B?           ?
 Nemo                                        1990  89624B-3  NM24B            IOB1  88622-C-5  CPS-B-15  DL-0411-10010  None
   (alt B-board revision - Japan)                  89625B-1  NM22B            ?
 Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB1  88622-C-5  CPS-B-16  DL-0411-10011  None
@@ -63,16 +64,16 @@ Street Fighter II (US 911101)                                                   
 Street Fighter II (Japan 911210)                                                              CPS-B-13  DL-0411-10008
 Three Wonders*                              1991  89624B-3  RT24B            LWIO  90630C-4   CPS-B-21  DL-0921-10014        IOC1
   (alt B-board revision - Japan)                  89625B-1  RT22B            IOB1
-  (alt B-board revision)                          91634B-2  ?                IOB1
+  (alt B-board revision)                          91634B-2  RT63B?           IOB1
 King of Dragons*                            1991  90629B-3  KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
 Captain Commando*                           1991  91635B-2  CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
 Knights of the Round*                       1991  91635B-2  KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
-  (alt B-board revision)                          ?         ?                ?
+  (alt B-board revision)                          ?         KR29B?           ?
 Street Fighter II' Champion Edition         1992  91635B-2  S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
   (alt B-board revision - Japan)                  91634B-2  S9263B    BPRG1  IOB1
 Varth (World)                               1992  89624B-3  VA24B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
   (alt B-board revision - US)                     ?         VA63B?           ?
-Varth (Japan)*                                    ?         ?                      ?          CPS-B-21  DL-0921-10014  ?
+Varth (Japan)*                                    ?         VA22B?           ?     ?          CPS-B-21  DL-0921-10014  ?
 Capcom World 2*                             1992  ?         Q522B            IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
 Quiz and Dragons (US)*                      1992  89625B-1  QD22B            IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
 Quiz and Dragons (Japan)*                   1994  ?         ?                IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
