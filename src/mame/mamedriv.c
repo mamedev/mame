@@ -7582,7 +7582,6 @@ Other Sun games
 	DRIVER( aztarac )	/* (c) 1983 Centuri (vector game) */
 	DRIVER( mole )		/* (c) 1982 Yachiyo Electronics, Ltd. */
 	DRIVER( thehand )	/* (c) 1981 T.I.C. */
-	DRIVER( gotya )		/* (c) 1981 Game-A-Tron */
 	DRIVER( mrjong )	/* (c) 1983 Kiwako */
 	DRIVER( crazyblk )	/* (c) 1983 Kiwako + ECI license */
 	DRIVER( blkbustr )	/* (c) 1983 Kiwako + ECI license */
@@ -7716,8 +7715,6 @@ Other Sun games
 	DRIVER( cfarm )		/* (c) 1999 LAI Games */
 	DRIVER( cclownz )	/* (c) 1999 LAI Games */
 	DRIVER( rotaryf )
-	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
-	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
 	DRIVER( portrait )	/* (c) 1983 Olympia */
 	DRIVER( portrata )	/* (c) 1983 Olympia */
 	DRIVER( enigma2 )	/* (c) 1981 Game Plan (Zilec Electronics license) */
@@ -7891,6 +7888,13 @@ Other Sun games
 	DRIVER( snookr10 )	/* (c) 1998 Sandii' */
 	DRIVER( apple10 )	/* (c) 1998 Sandii' */
 	DRIVER( tenballs )	/* 1997 unknown */
+
+	/* Game-A-Tron */
+	DRIVER( gotya )		/* (c) 1981 Game-A-Tron */
+	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
+	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
+	DRIVER( gatcards )	/* (c) 1983 Game-A-Tron */
+	DRIVER( gatslots )	/* (c) 1983 Game-A-Tron */
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */

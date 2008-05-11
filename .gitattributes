@@ -1458,6 +1458,7 @@ src/mame/drivers/galspnbl.c svneol=native#text/plain
 src/mame/drivers/gamecstl.c svneol=native#text/plain
 src/mame/drivers/gameplan.c svneol=native#text/plain
 src/mame/drivers/gaplus.c svneol=native#text/plain
+src/mame/drivers/gatron.c svneol=native#text/plain
 src/mame/drivers/gauntlet.c svneol=native#text/plain
 src/mame/drivers/gberet.c svneol=native#text/plain
 src/mame/drivers/gbusters.c svneol=native#text/plain
