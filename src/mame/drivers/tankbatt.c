@@ -149,29 +149,26 @@ static WRITE8_HANDLER( tankbatt_sh_fire_w )
 		sample_start (0, 0, 0);
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
-	AM_RANGE(0x0c08, 0x0c0f) AM_READ(tankbatt_in1_r)
-	AM_RANGE(0x0c18, 0x0c1f) AM_READ(tankbatt_dsw_r)
-	AM_RANGE(0x0200, 0x0bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_ROM)	/* for the reset / interrupt vectors */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x000f) AM_WRITE(SMH_RAM) AM_BASE(&tankbatt_bulletsram) AM_SIZE(&tankbatt_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x0800, 0x0bff) AM_WRITE(tankbatt_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x0000, 0x000f) AM_WRITE(SMH_RAM) AM_BASE(&tankbatt_bulletsram) AM_SIZE(&tankbatt_bulletsram_size)
-	AM_RANGE(0x0c18, 0x0c18) AM_WRITE(SMH_NOP) /* watchdog ?? */
+	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
+	AM_RANGE(0x0c08, 0x0c0f) AM_READ(tankbatt_in1_r)
 	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE(tankbatt_interrupt_enable_w)
 	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE(tankbatt_sh_engine_w)
 	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE(tankbatt_sh_fire_w)
 	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(tankbatt_sh_expl_w)
 	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(tankbatt_demo_interrupt_enable_w)
+	AM_RANGE(0x0c18, 0x0c1f) AM_READ(tankbatt_dsw_r)
+	AM_RANGE(0x0c18, 0x0c18) AM_WRITE(SMH_NOP)	/* watchdog ?? */
+	AM_RANGE(0x0200, 0x0bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0200, 0x07ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_ROM)	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static INTERRUPT_GEN( tankbatt_interrupt )
@@ -279,7 +276,7 @@ static MACHINE_DRIVER_START( tankbatt )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1000000)	/* 1 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", tankbatt_interrupt)
 
 	/* video hardware */

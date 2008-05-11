@@ -98,15 +98,14 @@ static WRITE16_HANDLER( sound_command_w )
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
-static ADDRESS_MAP_START( taotaido_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)			// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_READ(SMH_RAM)			// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READ(SMH_RAM)			// sprite tile look up
-	AM_RANGE(0xfe0000, 0xfeffff) AM_READ(SMH_RAM)			// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_READ(SMH_RAM)			// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_READ(SMH_RAM)			// rowscroll / rowselect / scroll ram
-
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_BASE(&taotaido_bgram)	// bg ram?
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE(&taotaido_spriteram)		// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE(&taotaido_spriteram2)		// sprite tile lookup ram
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM						// main ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// palette ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE(&taotaido_scrollram)		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ(input_port_0_word_r)	// player 1 inputs
 	AM_RANGE(0xffff82, 0xffff83) AM_READ(input_port_1_word_r)	// player 2 inputs
 	AM_RANGE(0xffff84, 0xffff85) AM_READ(input_port_2_word_r)	// system inputs
@@ -119,24 +118,12 @@ static ADDRESS_MAP_START( taotaido_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ(input_port_7_word_r)	// player 3 inputs (unused)
 	AM_RANGE(0xffffa2, 0xffffa3) AM_READ(input_port_8_word_r)	// player 4 inputs (unused)
 #endif
-
-	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r)	// guess - seems to be needed for all the sounds to work
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( taotaido_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(taotaido_bgvideoram_w) AM_BASE(&taotaido_bgram)	// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_WRITE(SMH_RAM) AM_BASE(&taotaido_spriteram)		// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(SMH_RAM) AM_BASE(&taotaido_spriteram2)		// sprite tile lookup ram
-	AM_RANGE(0xfe0000, 0xfeffff) AM_WRITE(SMH_RAM)						// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_WRITE(SMH_RAM) AM_BASE(&taotaido_scrollram)		// rowscroll / rowselect / scroll ram
-
 	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE(taotaido_tileregs_w)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITE(SMH_NOP)						// unknown
 	AM_RANGE(0xffff20, 0xffff21) AM_WRITE(SMH_NOP)						// unknown - flip screen related
 	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(taotaido_sprite_character_bank_select_w)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)					// seems right
+	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r)	// guess - seems to be needed for all the sounds to work
 ADDRESS_MAP_END
 
 /* sound cpu - same as aerofgt */
@@ -154,35 +141,22 @@ static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
 	memory_set_bankptr(1,rom + (data & 0x03) * 0x8000);
 }
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_BANK1)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x77ff) AM_ROM
+	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( taotaido_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x02, 0x02) AM_READ(YM2610_status_port_0_B_r)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( taotaido_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2610_control_port_0_A_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(YM2610_status_port_0_A_r, YM2610_control_port_0_A_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM2610_control_port_0_B_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(YM2610_status_port_0_B_r, YM2610_control_port_0_B_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2610_data_port_0_B_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(taotaido_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( taotaido )
@@ -359,13 +333,13 @@ static const struct YM2610interface ym2610_interface =
 
 static MACHINE_DRIVER_START( taotaido )
 	MDRV_CPU_ADD(M68000, 32000000/2)
-	MDRV_CPU_PROGRAM_MAP(taotaido_readmem,taotaido_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD(Z80,20000000/4) // ??
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(taotaido_sound_readport,taotaido_sound_writeport)
+	MDRV_CPU_ADD(Z80,20000000/4) // ??
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_port_map,0)
 								/* IRQs are triggered by the YM2610 */
 
 	MDRV_GFXDECODE(taotaido)

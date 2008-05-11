@@ -138,50 +138,35 @@ static const ppi8255_interface ppi8255_intf[5] =
 };
 
 
-static ADDRESS_MAP_START( readmem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xafff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb000, 0xbfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xd800, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xf3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf400, 0xf403) AM_DEVREAD(PPI8255, "ppi8255_0", ppi8255_r)
-	AM_RANGE(0xf480, 0xf483) AM_DEVREAD(PPI8255, "ppi8255_2", ppi8255_r)
-	AM_RANGE(0xf500, 0xf503) AM_DEVREAD(PPI8255, "ppi8255_3", ppi8255_r)
-	AM_RANGE(0xf580, 0xf583) AM_DEVREAD(PPI8255, "ppi8255_4", ppi8255_r)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem1, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)	/* ??? */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(SMH_RAM)	/* ??? */
-	AM_RANGE(0xa000, 0xafff) AM_WRITE(SMH_RAM)	/* ??? */
-	AM_RANGE(0xb000, 0xbfff) AM_WRITE(SMH_RAM)	/* ??? */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram4)	/* radar bitmap */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8fff) AM_RAM	/* ??? */
+	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
+	AM_RANGE(0xa000, 0xafff) AM_RAM	/* ??? */
+	AM_RANGE(0xb000, 0xbfff) AM_RAM	/* ??? */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&taxidrvr_vram4)			/* radar bitmap */
 	AM_RANGE(0xc800, 0xcfff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram5)	/* "sprite1" bitmap */
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram6)	/* "sprite2" bitmap */
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram7)	/* "sprite3" bitmap */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&taxidrvr_vram7)			/* "sprite3" bitmap */
+	AM_RANGE(0xe000, 0xf3ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe3ff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram1)	/* car tilemap */
 	AM_RANGE(0xe400, 0xebff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram2)	/* bg1 tilemap */
 	AM_RANGE(0xec00, 0xefff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram0)	/* fg tilemap */
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_vram3)	/* bg2 tilemap */
-	AM_RANGE(0xf400, 0xf403) AM_DEVWRITE(PPI8255, "ppi8255_0", ppi8255_w)
-	AM_RANGE(0xf480, 0xf483) AM_DEVWRITE(PPI8255, "ppi8255_2", ppi8255_w)	/* "sprite1" placement */
-	AM_RANGE(0xf500, 0xf503) AM_DEVWRITE(PPI8255, "ppi8255_3", ppi8255_w)	/* "sprite2" placement */
-	AM_RANGE(0xf580, 0xf583) AM_DEVWRITE(PPI8255, "ppi8255_4", ppi8255_w)	/* "sprite3" placement */
-//  AM_RANGE(0xf780, 0xf781) AM_WRITE(SMH_RAM)     /* more scroll registers? */
+	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
+	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
+	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE(PPI8255, "ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
+	//AM_RANGE(0xf780, 0xf781) AM_WRITE(SMH_RAM)     /* more scroll registers? */
 	AM_RANGE(0xf782, 0xf787) AM_WRITE(SMH_RAM) AM_BASE(&taxidrvr_scroll)	/* bg scroll (three copies always identical) */
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x6000, 0x67ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREAD(PPI8255, "ppi8255_1", ppi8255_r)
+static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ(input_port_1_r)
 	AM_RANGE(0xe002, 0xe002) AM_READ(input_port_2_r)
@@ -189,38 +174,19 @@ static ADDRESS_MAP_START( readmem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe004) AM_READ(input_port_4_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE(PPI8255, "ppi8255_1", ppi8255_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readmem3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READ(SMH_NOP)	/* irq ack? */
-	AM_RANGE(0xfc00, 0xffff) AM_READ(SMH_RAM)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem3, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport3, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x03, 0x03) AM_READ(AY8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport3, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cpu3_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( taxidrvr )
@@ -395,16 +361,16 @@ static MACHINE_DRIVER_START( taxidrvr )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem1,writemem1)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
+	MDRV_CPU_PROGRAM_MAP(cpu2_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(readmem3,writemem3)
-	MDRV_CPU_IO_MAP(readport3,writeport3)
+	MDRV_CPU_PROGRAM_MAP(cpu3_map,0)
+	MDRV_CPU_IO_MAP(cpu3_port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* ??? */
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */

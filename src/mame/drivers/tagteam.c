@@ -51,48 +51,32 @@ static WRITE8_HANDLER( sound_command_w )
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_1_r)     /* IN1 */
-	AM_RANGE(0x2001, 0x2001) AM_READ(input_port_0_r)     /* IN0 */
-	AM_RANGE(0x2002, 0x2002) AM_READ(input_port_2_r)     /* DSW2 */
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE(input_port_1_r, tagteam_flipscreen_w)
+	AM_RANGE(0x2001, 0x2001) AM_READWRITE(input_port_0_r, tagteam_control_w)
+	AM_RANGE(0x2002, 0x2002) AM_READWRITE(input_port_2_r, sound_command_w)
 	AM_RANGE(0x2003, 0x2003) AM_READ(input_port_3_r)     /* DSW1 */
-	AM_RANGE(0x4000, 0x43ff) AM_READ(tagteam_mirrorvideoram_r)
-	AM_RANGE(0x4400, 0x47ff) AM_READ(tagteam_mirrorcolorram_r)
-	AM_RANGE(0x4800, 0x4fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(tagteam_flipscreen_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(tagteam_control_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(sound_command_w)
 //  AM_RANGE(0x2003, 0x2003) AM_WRITE(SMH_NOP) /* Appears to increment when you're out of the ring */
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(tagteam_mirrorvideoram_w)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(tagteam_mirrorcolorram_w)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
+	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
+	AM_RANGE(0x4800, 0x4fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tagteam_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tagteam_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(AY8910_write_port_1_w)
 	AM_RANGE(0x2003, 0x2003) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(DAC_0_data_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(interrupt_enable_w)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
-
 
 
 static INTERRUPT_GEN( tagteam_interrupt )
@@ -271,12 +255,12 @@ static MACHINE_DRIVER_START( tagteam )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(M6502, 1500000)	/* 1.5 MHz ?? */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", tagteam_interrupt)
 
 	MDRV_CPU_ADD(M6502, 975000)
 	/* audio CPU */  /* 975 kHz ?? */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,16)   /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
