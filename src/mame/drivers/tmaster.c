@@ -25,7 +25,7 @@ To be dumped and added:
 Touch Master 2000
 Touch Master 6000
 Touch Master 7000 *
-Touch Master 8000 *(?)
+Touch Master 8000 *
 
 * There is a reported "Minnesota" version with modifications due to legal issues
   Touch Master (current set) is a Euro version, all other sets are "DOMESTIC" (AKA "Standard").
@@ -640,44 +640,44 @@ static INPUT_PORTS_START( tm )
 	PORT_INCLUDE(microtouch)
 
 	PORT_START_TAG("COIN") // IN3
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// m. coin 1 (coin optics?)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// m. coin 2 (coin optics?)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// dbv input (coin optics?)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )	// "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )	// "M. Coin 2 Input"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    ) PORT_IMPULSE(2)	// "DBV Input"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_COIN1    )	// (service coin?)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// service coin?
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW  )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// calibrate
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// "Calibrate"
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(2)	// e. coin 1
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )			// e. coin 2
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )			// e. coin 3
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )			// e. coin 4
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1  )	// "E. Coin 1" (ECA?) tmaster defaults to e. coin,
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2  )	// "E. Coin 2" (ECA?) rather than m. coin
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3  )	// "E. Coin 3" (ECA?) so they're coin1-coin4
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 4" (ECA?) 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmaster )
 	PORT_INCLUDE(microtouch)
 
 	PORT_START_TAG("COIN") // IN3
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1    ) PORT_IMPULSE(2)	// m. coin 1 (coin optics?)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNKNOWN  )			// m. coin 2 (coin optics?)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN  )			// dbv input (coin optics?)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1	   ) 	// "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN2	   ) 	// "M. Coin 2 Input"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1	   ) PORT_IMPULSE(2)	// "DBV Input"
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_COIN1    )	// (service coin?)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW  )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// calibrate
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// "Calibrate"
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// e. coin 1
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// e. coin 2
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// e. coin 3
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// e. coin 4
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN3  )	// "E. Coin 1" (ECA mech) The rest of the tm games
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 2" (ECA mech) Default to m. coin
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN5  )	// "E. Coin 3" (ECA mech) So these are coin3-coin6
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN6  )	// "E. Coin 4" (ECA mech)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( galgames )
