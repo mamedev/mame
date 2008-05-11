@@ -353,7 +353,7 @@ unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op)
 							sprintf(buffer, "nop");
 							else
 							sprintf(buffer, "sll    %s,%s,%d", reg[rd], reg[rt], shift);			break;
-				case 0x01:	sprintf(buffer, "mov%c   %s,%s,%d", ((op >> 16) & 1) ? 't' : 'f', reg[rd], reg[rt], (op >> 18) & 7); break;
+				case 0x01:	sprintf(buffer, "mov%c   %s,%s,%d", ((op >> 16) & 1) ? 't' : 'f', reg[rd], reg[rs], (op >> 18) & 7); break;
 				case 0x02:	sprintf(buffer, "srl    %s,%s,%d", reg[rd], reg[rt], shift);			break;
 				case 0x03:	sprintf(buffer, "sra    %s,%s,%d", reg[rd], reg[rt], shift);			break;
 				case 0x04:	sprintf(buffer, "sllv   %s,%s,%s", reg[rd], reg[rt], reg[rs]);			break;

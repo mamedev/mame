@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "mips3com.h"
 
 
@@ -1779,12 +1780,12 @@ int mips3_execute(int cycles)
 						break;
 					case 0x20:	/* ADD */
 						if (ENABLE_OVERFLOWS && RSVAL32 > ~RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
-						else RDVAL64 = (INT32)(RSVAL32 + RTVAL32);
+						else if (RDREG) RDVAL64 = (INT32)(RSVAL32 + RTVAL32);
 						break;
 					case 0x21:	/* ADDU */		if (RDREG) RDVAL64 = (INT32)(RSVAL32 + RTVAL32);				break;
 					case 0x22:	/* SUB */
 						if (ENABLE_OVERFLOWS && RSVAL32 < RTVAL32) generate_exception(EXCEPTION_OVERFLOW, 1);
-						else RDVAL64 = (INT32)(RSVAL32 - RTVAL32);
+						else if (RDREG) RDVAL64 = (INT32)(RSVAL32 - RTVAL32);
 						break;
 					case 0x23:	/* SUBU */		if (RDREG) RDVAL64 = (INT32)(RSVAL32 - RTVAL32);				break;
 					case 0x24:	/* AND */		if (RDREG) RDVAL64 = RSVAL64 & RTVAL64;							break;
@@ -1795,12 +1796,12 @@ int mips3_execute(int cycles)
 					case 0x2b:	/* SLTU */		if (RDREG) RDVAL64 = (UINT64)RSVAL64 < (UINT64)RTVAL64;			break;
 					case 0x2c:	/* DADD */
 						if (ENABLE_OVERFLOWS && RSVAL64 > ~RTVAL64) generate_exception(EXCEPTION_OVERFLOW, 1);
-						else RDVAL64 = RSVAL64 + RTVAL64;
+						else if (RDREG) RDVAL64 = RSVAL64 + RTVAL64;
 						break;
 					case 0x2d:	/* DADDU */		if (RDREG) RDVAL64 = RSVAL64 + RTVAL64;							break;
 					case 0x2e:	/* DSUB */
 						if (ENABLE_OVERFLOWS && RSVAL64 < RTVAL64) generate_exception(EXCEPTION_OVERFLOW, 1);
-						else RDVAL64 = RSVAL64 - RTVAL64;
+						else if (RDREG) RDVAL64 = RSVAL64 - RTVAL64;
 						break;
 					case 0x2f:	/* DSUBU */		if (RDREG) RDVAL64 = RSVAL64 - RTVAL64;							break;
 					case 0x30:	/* TGE */		if ((INT64)RSVAL64 >= (INT64)RTVAL64) generate_exception(EXCEPTION_TRAP, 1); break;

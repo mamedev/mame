@@ -5,7 +5,7 @@
     Generic dynamic recompiler frontend structures and utilities.
 
     Copyright Aaron Giles
-    Released for general use under the MAME license
+    Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
@@ -44,7 +44,7 @@ struct _drcfe_state
 	UINT32				window_end;					/* code window end offset = startpc + window_end */
 	UINT32				max_sequence;				/* maximum instructions to include in a sequence */
 
-	drcfe_describe_func		describe;					/* callback to describe a single instruction */
+	drcfe_describe_func	describe;					/* callback to describe a single instruction */
 	void *				param;						/* parameter for the callback */
 
 	/* CPU parameters */

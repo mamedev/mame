@@ -1608,6 +1608,25 @@ INLINE void emit_jecxz(x86code **emitptr, x86code *target)
 	resolve_link(&target, &link);
 }
 
+#ifdef PTR64
+
+INLINE void emit_jrcxz_link(x86code **emitptr, emit_link *linkinfo)
+{
+	emit_op_simple(emitptr, OP_JrCXZ_Jb, OP_64BIT);
+	emit_byte(emitptr, 0);
+	linkinfo->target = *emitptr;
+	linkinfo->size = 1;
+}
+
+INLINE void emit_jrcxz(x86code **emitptr, x86code *target)
+{
+	emit_link link;
+	emit_jrcxz_link(emitptr, &link);
+	resolve_link(&target, &link);
+}
+
+#endif
+
 
 /*-------------------------------------------------
     emit_call/jmp_*
@@ -2750,6 +2769,26 @@ INLINE void emit_fistp_m64(x86code **emitptr, DECLARE_MEMPARAMS)	{ emit_op_modrm
 
 INLINE void emit_ldmxcsr_m32(x86code **emitptr, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_G16, OP_32BIT, 2, MEMPARAMS); }
 INLINE void emit_stmxcsr_m32(x86code **emitptr, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_G16, OP_32BIT, 3, MEMPARAMS); }
+
+
+
+/***************************************************************************
+    MISC SSE EMITTERS
+***************************************************************************/
+
+INLINE void emit_movd_r128_r32(x86code **emitptr, UINT8 dreg, UINT8 sreg)				{ emit_op_modrm_reg(emitptr, OP_MOVD_Vd_Ed, OP_32BIT, dreg, sreg); }
+INLINE void emit_movd_r128_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)		{ emit_op_modrm_mem(emitptr, OP_MOVD_Vd_Ed, OP_32BIT, dreg, MEMPARAMS); }
+INLINE void emit_movd_r32_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)				{ emit_op_modrm_reg(emitptr, OP_MOVD_Ed_Vd, OP_32BIT, sreg, dreg); }
+INLINE void emit_movd_m32_r128(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)		{ emit_op_modrm_mem(emitptr, OP_MOVD_Ed_Vd, OP_32BIT, sreg, MEMPARAMS); }
+
+#ifdef PTR64
+
+INLINE void emit_movq_r128_r64(x86code **emitptr, UINT8 dreg, UINT8 sreg)				{ emit_op_modrm_reg(emitptr, OP_MOVD_Vd_Ed, OP_64BIT, dreg, sreg); }
+INLINE void emit_movq_r128_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)		{ emit_op_modrm_mem(emitptr, OP_MOVD_Vd_Ed, OP_64BIT, dreg, MEMPARAMS); }
+INLINE void emit_movq_r64_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)				{ emit_op_modrm_reg(emitptr, OP_MOVD_Ed_Vd, OP_64BIT, sreg, dreg); }
+INLINE void emit_movq_m64_r128(x86code **emitptr, DECLARE_MEMPARAMS, UINT8 sreg)		{ emit_op_modrm_mem(emitptr, OP_MOVD_Ed_Vd, OP_64BIT, sreg, MEMPARAMS); }
+
+#endif
 
 
 

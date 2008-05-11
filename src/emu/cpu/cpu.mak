@@ -18,27 +18,59 @@ CPUOBJ = $(EMUOBJ)/cpu
 # Dynamic recompiler objects
 #-------------------------------------------------
 
+DRCOBJ = \
+	$(CPUOBJ)/drcbec.o \
+	$(CPUOBJ)/drcbeut.o \
+	$(CPUOBJ)/drccache.o \
+	$(CPUOBJ)/drcfe.o \
+	$(CPUOBJ)/drcuml.o \
+	$(CPUOBJ)/drcumld.o \
+	
+DRCDEPS = \
+	$(CPUSRC)/drcbeut.h \
+	$(CPUSRC)/drccache.h \
+	$(CPUSRC)/drcfe.h \
+	$(CPUSRC)/drcuml.h \
+	$(CPUSRC)/drcumld.h \
+	$(CPUSRC)/drcumlsh.h \
+
+# fixme - need to make this work for other target architectures (PPC)
+
+ifndef FORCE_DRC_C_BACKEND
 ifdef PTR64
 
-DRCOBJ = $(CPUOBJ)/x64drc.o $(CPUOBJ)/x86log.o $(CPUOBJ)/drcfe.o
+DRCOBJ += \
+	$(CPUOBJ)/drcbex64.o \
+	$(CPUOBJ)/x64drc.o \
+	$(CPUOBJ)/x86log.o \
 
-DRCDEPS = 	$(CPUSRC)/x86emit.h \
-			$(CPUSRC)/x64drc.c \
-			$(CPUSRC)/x64drc.h \
+DRCDEPS += \
+	$(CPUSRC)/x86emit.h \
+	$(CPUSRC)/x64drc.c \
+	$(CPUSRC)/x64drc.h \
 
-$(DRCOBJ): $(DRCDEPS)
+DEFS += -DNATIVE_DRC=drcbe_x64_be_interface
 
 else
 
-DRCOBJ = $(CPUOBJ)/x86drc.o $(CPUOBJ)/x86log.o $(CPUOBJ)/drcfe.o
+DRCOBJ += \
+	$(CPUOBJ)/drcbex86.o \
+	$(CPUOBJ)/x86drc.o \
+	$(CPUOBJ)/x86log.o \
 
-DRCDEPS = 	$(CPUSRC)/x86emit.h \
-			$(CPUSRC)/x86drc.c \
-			$(CPUSRC)/x86drc.h \
+DRCDEPS += \
+	$(CPUSRC)/x86emit.h \
+	$(CPUSRC)/x86drc.c \
+	$(CPUSRC)/x86drc.h \
+
+DEFS += -DNATIVE_DRC=drcbe_x86_be_interface
+
+endif
+endif
+
 
 $(DRCOBJ): $(DRCDEPS)
 
-endif
 
 
 #-------------------------------------------------
@@ -793,23 +825,11 @@ CPUDEFS += -DHAS_RM7000=$(if $(filter RM7000,$(CPUS)),1,0)
 
 ifneq ($(filter R4600 R4650 R4700 R5000 QED5271 RM7000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
-CPUOBJS += $(CPUOBJ)/mips/mips3com.o
+CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3drc.o $(CPUOBJ)/mips/mips3fe.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
-
-ifdef X86_MIPS3_DRC
-CPUOBJS += $(CPUOBJ)/mips/mips3drc.o $(CPUOBJ)/mips/mips3fe.o $(DRCOBJ)
-else
-CPUOBJS += $(CPUOBJ)/mips/mips3.o
 endif
-endif
-
-$(CPUOBJ)/mips/mips3.o:		$(CPUSRC)/mips/mips3.c \
-							$(CPUSRC)/mips/mips3.h \
-							$(CPUSRC)/mips/mips3com.h
 
 $(CPUOBJ)/mips/mips3drc.o:	$(CPUSRC)/mips/mips3drc.c \
-							$(CPUSRC)/mips/mdrcold.c \
-							$(CPUSRC)/mips/mdrc64.c \
 							$(CPUSRC)/mips/mips3.h \
 							$(CPUSRC)/mips/mips3com.h \
 							$(CPUSRC)/mips/mips3fe.h \

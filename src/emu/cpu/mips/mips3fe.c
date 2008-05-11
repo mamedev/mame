@@ -5,7 +5,7 @@
     Front-end for MIPS3 recompiler
 
     Copyright Aaron Giles
-    Released for general use under the MAME license
+    Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/
@@ -465,6 +465,13 @@ static int describe_instruction_cop0(mips3_state *mips, UINT32 op, opcode_desc *
 	{
 		case 0x00:	/* MFCz */
 		case 0x01:	/* DMFCz */
+			if (RDREG == COP0_Count)
+				desc->cycles += MIPS3_COUNT_READ_CYCLES;
+			if (RDREG == COP0_Cause)
+				desc->cycles += MIPS3_CAUSE_READ_CYCLES;
+			desc->gpr.modified |= REGFLAG_R(RTREG);
+			return TRUE;
+		
 		case 0x02:	/* CFCz */
 			desc->gpr.modified |= REGFLAG_R(RTREG);
 			return TRUE;

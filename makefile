@@ -48,6 +48,7 @@ CROSS_BUILD_OSD = $(OSD)
 endif
 
 
+
 #-------------------------------------------------
 # specify OS target, which further differentiates
 # the underlying OS; supported values are:
@@ -105,8 +106,10 @@ endif
 # uncomment next line to include the internal profiler
 # PROFILER = 1
 
-# uncomment next line to use DRC MIPS3 engine
-X86_MIPS3_DRC = 1
+# uncomment the force the universal DRC to always use the C backend
+# you may need to do this if your target architecture does not have
+# a native backend
+# FORCE_DRC_C_BACKEND = 1
 
 # uncomment next line to use DRC PowerPC engine
 X86_PPC_DRC = 1

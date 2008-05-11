@@ -5,7 +5,7 @@
     Generic dynamic recompiler frontend structures and utilities.
 
     Copyright Aaron Giles
-    Released for general use under the MAME license
+    Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ****************************************************************************
@@ -33,13 +33,6 @@
 
 #ifndef __DRCFE_H__
 #define __DRCFE_H__
-
-#ifdef PTR64
-#include "x64drc.h"
-#else
-#include "x86drc.h"
-#endif
-
 
 
 /***************************************************************************
@@ -159,16 +152,6 @@ struct _drcfe_config
 	drcfe_describe_func	describe;				/* callback to describe a single instruction */
 };
 
-/*
-    for each register:
-        callback to load
-        callback to store
-        pointer to memory
-    if (pointer != NULL)
-        - can return reference to memory for operations
-    else
-        - must always load/store from register
-*/
 
 
 /***************************************************************************

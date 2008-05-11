@@ -5,7 +5,7 @@
     Front-end for MIPS3 recompiler
 
     Copyright Aaron Giles
-    Released for general use under the MAME license
+    Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
 ***************************************************************************/

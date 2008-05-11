@@ -3686,7 +3686,7 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 	}
 
 	/* modify the offset based on the mem_mask */
-	if (mem_mask)
+	if (mem_mask != 0xffffffff)
 	{
 		if (!ACCESSING_BITS_16_31)
 			offset |= 0x80000000;
@@ -3860,6 +3860,9 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 
 		/* return the current scanline for now */
 		case vRetrace:
+
+			/* eat some cycles since people like polling here */
+			activecpu_eat_cycles(10);
 			result = video_screen_get_vpos(v->screen);
 			break;
 
