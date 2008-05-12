@@ -18,6 +18,7 @@
 
 #ifdef _MSC_VER
 #include <float.h>
+#define isnan _isnan
 #endif
 
 
@@ -1442,7 +1443,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FCMP, 4, 1):		/* FSCMP   src1,src2              */
-				if (_isnan(FSPARAM0) || _isnan(FSPARAM1))
+				if (isnan(FSPARAM0) || isnan(FSPARAM1))
 					flags = DRCUML_FLAG_U;
 				else
 					flags = (FSPARAM0 < FSPARAM1) | ((FSPARAM0 == FSPARAM1) << 2);
@@ -1577,7 +1578,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FCMP, 8, 1):		/* FDCMP   src1,src2              */
-				if (_isnan(FDPARAM0) || _isnan(FDPARAM1))
+				if (isnan(FDPARAM0) || isnan(FDPARAM1))
 					flags = DRCUML_FLAG_U;
 				else
 					flags = (FDPARAM0 < FDPARAM1) | ((FDPARAM0 == FDPARAM1) << 2);
