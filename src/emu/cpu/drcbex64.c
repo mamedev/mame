@@ -1972,7 +1972,7 @@ static void emit_mov_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
     emit_mov_m64_p64 - move a 64-bit parameter
     into a memory location
 -------------------------------------------------*/
-
+#if 0
 static void emit_mov_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
 {
 	if (param->type == DRCUML_PTYPE_IMMEDIATE)
@@ -1993,7 +1993,7 @@ static void emit_mov_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAM
 	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
 		emit_mov_m64_r64(dst, MEMPARAMS, param->value);									// mov   [mem],param
 }
-
+#endif
 
 /*-------------------------------------------------
     emit_mov_p64_r64 - move a registers into a 
@@ -2801,7 +2801,7 @@ static void emit_movss_r128_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, co
     emit_movss_m32_p32 - move a 32-bit parameter
     into a memory location
 -------------------------------------------------*/
-
+#if 0
 static void emit_movss_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
 {
 	assert(param->type != DRCUML_PTYPE_IMMEDIATE);
@@ -2813,7 +2813,7 @@ static void emit_movss_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPAR
 	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
 		emit_movss_m32_r128(dst, MEMPARAMS, param->value);								// movss [mem],xmm0
 }
-
+#endif
 
 /*-------------------------------------------------
     emit_movss_p32_r128 - move a register into a 
@@ -2855,7 +2855,7 @@ static void emit_movsd_r128_p64(drcbe_state *drcbe, x86code **dst, UINT8 reg, co
     emit_movsd_m64_p64 - move a 64-bit parameter
     into a memory location
 -------------------------------------------------*/
-
+#if 0
 static void emit_movsd_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
 {
 	assert(param->type != DRCUML_PTYPE_IMMEDIATE);
@@ -2867,7 +2867,7 @@ static void emit_movsd_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPAR
 	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
 		emit_movsd_m64_r128(dst, MEMPARAMS, param->value);								// movsd [mem],xmm0
 }
-
+#endif
 
 /*-------------------------------------------------
     emit_movsd_p64_r128 - move a register into a 
@@ -3321,6 +3321,8 @@ static x86code *op_callh(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	drccodeptr *targetptr;
 	emit_link skip;
 
+	skip.target = 0;
+
 	/* validate instruction */
 	assert(inst->size == 4);
 	assert(inst->condflags == DRCUML_COND_ALWAYS || (inst->condflags >= COND_Z && inst->condflags < DRCUML_COND_MAX));
@@ -3356,6 +3358,8 @@ static x86code *op_ret(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 {
 	emit_link skip;
 
+	skip.target = 0;
+
 	/* validate instruction */
 	assert(inst->size == 4);
 	assert(inst->condflags == DRCUML_COND_ALWAYS || (inst->condflags >= COND_Z && inst->condflags < DRCUML_COND_MAX));
@@ -3384,6 +3388,8 @@ static x86code *op_callc(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 {
 	drcuml_parameter funcp, paramp;
 	emit_link skip;
+
+	skip.target = 0;
 
 	/* validate instruction */
 	assert(inst->size == 4);
