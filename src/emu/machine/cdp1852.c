@@ -43,6 +43,7 @@ static void set_sr_line(const device_config *device, int level)
 		if (cdp1852->sr != level)
 		{
 			cdp1852->intf->on_sr_changed(device, level);
+			cdp1852->sr = level;
 		}
 	}
 }

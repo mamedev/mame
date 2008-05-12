@@ -12,7 +12,7 @@
 				   DI0   3 |			 | 22  DI7
 				   DO0   4 |			 | 21  DO7
 				   DI1   5 |			 | 20  DI6
-				   DO1   6 |			 | 19  DO6
+				   DO1   6 |   CDP1852   | 19  DO6
 				   DI2   7 |			 | 18  DI5
 				   DO2   8 |			 | 17  DO5
 				   DI3   9 |			 | 16  DI4
