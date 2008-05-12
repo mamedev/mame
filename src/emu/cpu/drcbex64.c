@@ -819,13 +819,13 @@ static void drcbex64_reset(drcbe_state *drcbe)
 	emit_push_r64(dst, REG_R13);														// push  r13
 	emit_push_r64(dst, REG_R14);														// push  r14
 	emit_push_r64(dst, REG_R15);														// push  r15
-	emit_mov_r64_r64(dst, REG_RBP, REG_RCX);											// mov   rbp,rcx
+	emit_mov_r64_r64(dst, REG_RBP, REG_PARAM1);											// mov   rbp,param1
 	emit_sub_r64_imm(dst, REG_RSP, 32);													// sub   rsp,32
 	emit_mov_m64_r64(dst, MABS(drcbe, &drcbe->hashstacksave), REG_RSP);					// mov   [hashstacksave],rsp
 	emit_sub_r64_imm(dst, REG_RSP, 8);													// sub   rsp,8
 	emit_mov_m64_r64(dst, MABS(drcbe, &drcbe->stacksave), REG_RSP);						// mov   [stacksave],rsp
 	emit_stmxcsr_m32(dst, MABS(drcbe, &drcbe->ssemode));								// stmxcsr [ssemode]
-	emit_jmp_r64(dst, REG_RDX);															// jmp   rdx
+	emit_jmp_r64(dst, REG_PARAM2);														// jmp   param2
 	if (drcbe->log != NULL)
 		x86log_disasm_code_range(drcbe->log, "entry_point", (x86code *)drcbe->entry, *dst);
 
