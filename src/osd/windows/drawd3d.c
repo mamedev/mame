@@ -735,7 +735,7 @@ try_again:
 	d3d->presentation.MultiSampleType				= D3DMULTISAMPLE_NONE;
 	d3d->presentation.SwapEffect					= D3DSWAPEFFECT_DISCARD;
 	d3d->presentation.hDeviceWindow					= window->hwnd;
-	d3d->presentation.Windowed						= !window->fullscreen || HAS_WINDOW_MENU;
+	d3d->presentation.Windowed						= !window->fullscreen || win_has_menu(window);
 	d3d->presentation.EnableAutoDepthStencil		= FALSE;
 	d3d->presentation.AutoDepthStencilFormat		= D3DFMT_D16;
 	d3d->presentation.Flags							= 0;
@@ -1147,7 +1147,7 @@ static int config_adapter_mode(running_machine *machine, win_window_info *window
 	}
 
 	// choose a resolution: window mode case
-	if (!window->fullscreen || !video_config.switchres || HAS_WINDOW_MENU)
+	if (!window->fullscreen || !video_config.switchres || win_has_menu(window))
 	{
 		RECT client;
 
