@@ -125,6 +125,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		
 		if (high_priority != priority) continue;
 		
+		if (flip_screen_get()) {
+			sy = sy + 248;
+		}
+		
 		if (!color_effect) {
 			drawgfx(bitmap,gfx,number,
 					0x20 + color,xflip,yflip,
@@ -136,7 +140,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for (py = 0; py < gfx->height; py++){
 				/* get a pointer to the current line in the screen bitmap */
-				int ypos = ((sy + py) & 0xff);
+				int ypos = ((sy + py) & 0x1ff);
 				UINT16 *srcy = BITMAP_ADDR16(bitmap, ypos, 0);
 
 				int gfx_py = yflip ? (gfx->height - 1 - py) : py;
@@ -174,12 +178,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 ***************************************************************************/
 
 VIDEO_UPDATE( wrally )
-{	
+{
 	/* set scroll registers */
-	tilemap_set_scrolly(wrally_pant[0], 0, wrally_vregs[0]);
-	tilemap_set_scrollx(wrally_pant[0], 0, wrally_vregs[1]+4);
-	tilemap_set_scrolly(wrally_pant[1], 0, wrally_vregs[2]);
-	tilemap_set_scrollx(wrally_pant[1], 0, wrally_vregs[3]);
+	if (!flip_screen_get()) {
+		tilemap_set_scrolly(wrally_pant[0], 0, wrally_vregs[0]);
+		tilemap_set_scrollx(wrally_pant[0], 0, wrally_vregs[1]+4);
+		tilemap_set_scrolly(wrally_pant[1], 0, wrally_vregs[2]);
+		tilemap_set_scrollx(wrally_pant[1], 0, wrally_vregs[3]);
+	} else {
+		tilemap_set_scrolly(wrally_pant[0], 0, 248 - wrally_vregs[0]);
+		tilemap_set_scrollx(wrally_pant[0], 0, 1024 - wrally_vregs[1] - 4);
+		tilemap_set_scrolly(wrally_pant[1], 0, 248 - wrally_vregs[2]);
+		tilemap_set_scrollx(wrally_pant[1], 0, 1024 - wrally_vregs[3]);
+	}
 
 	/* draw tilemaps + sprites */
 	tilemap_draw(bitmap,cliprect,wrally_pant[1],TILEMAP_DRAW_OPAQUE,0);

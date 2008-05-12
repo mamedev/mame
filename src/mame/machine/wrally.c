@@ -29,6 +29,10 @@ WRITE16_HANDLER( wrally_vram_w )
 	tilemap_mark_tile_dirty(wrally_pant[(offset & 0x1fff) >> 12], ((offset << 1) & 0x1fff) >> 2);
 }
 
+WRITE16_HANDLER( wrally_flipscreen_w )
+{
+	flip_screen_set(data & 0x01);
+}
 
 WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {

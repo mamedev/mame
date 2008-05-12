@@ -92,7 +92,6 @@ extern UINT16 *wrally_vregs;
 extern UINT16 *wrally_videoram;
 extern UINT16 *wrally_spriteram;
 
-WRITE16_HANDLER( wrally_vram_w );
 VIDEO_START( wrally );
 VIDEO_UPDATE( wrally );
 
@@ -100,6 +99,8 @@ VIDEO_UPDATE( wrally );
 DRIVER_INIT( wrally );
 MACHINE_RESET( wrally );
 READ32_HANDLER( wrally_external_ram_iaddr );
+WRITE16_HANDLER( wrally_vram_w );
+WRITE16_HANDLER( wrally_flipscreen_w );
 WRITE16_HANDLER( OKIM6295_bankswitch_w );
 WRITE16_HANDLER( wrally_coin_counter_w );
 WRITE16_HANDLER( wrally_coin_lockout_w );
@@ -119,8 +120,8 @@ static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)	/* OKI6295 status/data register */
 	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)								/* Coin lockouts */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)								/* Coin counters */
-	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* sound muting */
-	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(SMH_NOP)												/* flip screen */
+	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* Sound muting */
+	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(wrally_flipscreen_w)									/* Flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(SMH_NOP)												/* ??? */
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE(1)												/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
