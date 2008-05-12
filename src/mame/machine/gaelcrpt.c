@@ -2,7 +2,7 @@
 
 Gaelco video RAM encryption
 
-Thanks to Javier Valero for information on the algorithm.
+Thanks to GAELCO SA for information on the algorithm.
 
 */
 
