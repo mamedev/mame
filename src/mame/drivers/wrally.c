@@ -2,13 +2,9 @@
 
 World Rally (c) 1993 Gaelco (Designed & Developed by Zigurat. Produced by Gaelco)
 
-Preliminary driver by Manuel Abadia <manu@teleline.es>
+Driver by Manuel Abadia, Mike Coates, Nicola Salmoria and Miguel Andel Horna
 
-Encyption tables provided by Mike Coates who connected a fluke to the PCB.
-Nicola Salmoria made the decode function based on that info.
-
-Current decryption is incomplete
-The DS5002FP has 32KB undumped gameplay code making the game unplayable :(
+Thanks to GAELCO SA for the DS5002FP code and information about the encryption
 
 Main PCB components:
 ====================
@@ -18,7 +14,7 @@ CPUs related:
 * 1xDS5002FP @ D12 (Dallas security processor @ 12 MHz)
 * 1xHM62256ALFP-8T (32KB NVSRAM) @ C11 (encrypted DS5002FP program code)
 * 1xLithium cell
-* 2xMS6264A-20NC (32KB SRAM) @ D14 & D15 (shared memory between M68000 & DS5002FP)
+* 2xMS6264A-20NC (16KB SRAM) @ D14 & D15 (shared memory between M68000 & DS5002FP)
 * 4x74LS157 (Quad 2 input multiplexer) @ F14, F15, F16 & F17 (used to select M68000 or DS5002FP address bus)
 * 4x74LS245 (Octal bus transceiver) @ C14, C15, C16 & C17 (used to store shared RAM data)
 * 2x74LS373 (Octal tristate latch) @ D16 & D17 (used by DS5002FP to access data from shared RAM)
@@ -26,7 +22,7 @@ CPUs related:
 * 1xOSC24MHz @ B20
 * 2xM27C4001 @ C22 & C23 (M68000 program ROMs)
 * 1xPAL20L8 @ B23 (handles 1st level M68000 memory map)
-    0 -> DTACK (M68000 data ack)
+    0 -> DTACK	M68000 data ack
     1 -> SELACT
     2 -> Input/sound (see below)
     3 -> ACTEXT
@@ -54,7 +50,17 @@ CPUs related:
     5 -> flip screen
     6 -> ENA/D?
     7 -> CKA/D?
-
+    
+* 1x16AS @ B15
+	0 -> OE
+	1 -> XSRL	Shared RAM @ D14
+	2 -> XSRH	Shared RAM @ D15
+	3 -> SAD	Shared Access with DS5002FP
+	4 -> SRE	Shared Access with M68000
+	5 -> TRANS
+	6 -> XLD
+	7 -> XHI
+    
 Sound related:
 ==============
 * 1xOKIM6295 @ C6
@@ -78,6 +84,7 @@ Palette related:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/ds5002fp/ds5002fp.h"
 #include "sound/okim6295.h"
 
 /* from video/wrally.c */
@@ -91,37 +98,48 @@ VIDEO_UPDATE( wrally );
 
 /* from machine/wrally.c */
 DRIVER_INIT( wrally );
+MACHINE_RESET( wrally );
+READ32_HANDLER( wrally_external_ram_iaddr );
 WRITE16_HANDLER( OKIM6295_bankswitch_w );
 WRITE16_HANDLER( wrally_coin_counter_w );
 WRITE16_HANDLER( wrally_coin_lockout_w );
 
-
-static WRITE16_HANDLER( unknown_w )
-{
-	popmessage("write %04x to %04x", data, offset*2 + 0x6a);
-}
-
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_BASE(&wrally_videoram)		/* encrypted Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(&wrally_vregs)			/* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(SMH_NOP)						/* CLR INT Video */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM_WRITE(paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&wrally_spriteram)		/* Sprite RAM */
-	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r)			/* DSW #1 & #2 */
-	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r)			/* INPUT 1P & 2P, COINSW, STARTSW */
-	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_2_word_r)			/* Wheel */
-	AM_RANGE(0x700008, 0x700009) AM_READ(input_port_3_word_r)			/* TESTSW & SERVICESW */
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)		/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(OKIM6295_status_0_lsb_r,OKIM6295_data_0_lsb_w)/* OKI6295 status register */
-	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)		/* Coin lockouts */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)		/* Coin counters */
-	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)						/* sound muting */
-	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(SMH_NOP)						/* flip screen */
-	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(unknown_w)					/* ??? */
-	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM					/* Work RAM (partially shared with DS5002FP) */
+static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
+	AM_RANGE(0x100000, 0x103fff) AM_READWRITE(SMH_RAM, wrally_vram_w) AM_BASE(&wrally_videoram)	/* encrypted Video RAM */
+	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE(&wrally_vregs)									/* Video Registers */
+	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(SMH_NOP)												/* CLR INT Video */
+	AM_RANGE(0x200000, 0x203fff) AM_READWRITE(SMH_RAM, paletteram16_xxxxBBBBRRRRGGGG_word_w) AM_BASE(&paletteram16)	/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(&wrally_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_0_word_r)									/* DSW #1 & #2 */
+	AM_RANGE(0x700002, 0x700003) AM_READ(input_port_1_word_r)									/* INPUT 1P & 2P, COINSW, STARTSW */
+	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_2_word_r)									/* Wheel */
+	AM_RANGE(0x700008, 0x700009) AM_READ(input_port_3_word_r)									/* TESTSW & SERVICESW */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)								/* OKI6295 bankswitch */
+	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)	/* OKI6295 status/data register */
+	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)								/* Coin lockouts */
+	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)								/* Coin counters */
+	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* sound muting */
+	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(SMH_NOP)												/* flip screen */
+	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(SMH_NOP)												/* ??? */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE(1)												/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dallas_rom, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* Code in NVRAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dallas_ram, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE(1)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
+ADDRESS_MAP_END
+
+/* DS5002FP configuration */
+static const ds5002fp_config dallas_config =
+{
+	0x88,			/* bootstrap loader MCON register */
+	0x00,			/* bootstrap loader RPCTL register */
+	0x80			/* bootstrap loader CRC register */
+};
 
 static INPUT_PORTS_START( wrally )
 PORT_START	/* DSW #1 & #2 */
@@ -174,29 +192,27 @@ PORT_START	/* INPUTS, COINSW & STARTSW */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 PORT_START	/* Wheel control? */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not implemented yet */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not implemented */
 
 PORT_START	/* INPUTS, TEST & SERVICE */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* Go to test mode NOW */
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
-
-
 
 static const gfx_layout wrally_tilelayout16 =
 {
@@ -216,21 +232,27 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-
 static MACHINE_DRIVER_START( wrally )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000,XTAL_24MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map,0)
+	MDRV_CPU_ADD(M68000,XTAL_24MHz/2)		/* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
+	
+	MDRV_CPU_ADD(DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
+	MDRV_CPU_CONFIG(dallas_config)
+	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
+	MDRV_CPU_DATA_MAP(dallas_ram, 0)
+	
+	MDRV_INTERLEAVE(640)					/* heavy sync */
+	MDRV_MACHINE_RESET(wrally)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 32*16-1)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
+	MDRV_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
 
 	MDRV_GFXDECODE(wrally)
 	MDRV_PALETTE_LENGTH(1024*8)
@@ -241,7 +263,7 @@ static MACHINE_DRIVER_START( wrally )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) /* verified on pcb */
+	MDRV_SOUND_ADD(OKIM6295, XTAL_1MHz) 					/* verified on pcb */
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -251,6 +273,9 @@ ROM_START( wrally )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"worldr17.c23",	0x000000, 0x080000, CRC(050f5629) SHA1(74fc2cd5114f3bc4b2429f1d8d7eeb1658f9f179) )
 	ROM_LOAD16_BYTE(	"worldr16.c22",	0x000001, 0x080000, CRC(9e0d126c) SHA1(369360b7ec2c3497af3bf62b4eba24c3d9f94675) )
+	
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
+	ROM_LOAD( "wrdallas.bin",	0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "worldr21.i13",	0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
@@ -276,6 +301,9 @@ ROM_START( wrallya )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"c23.bin",	0x000000, 0x080000, CRC(8b7d93c3) SHA1(ce4163eebc5d4a0c1266d650523b1ffc702d1b87) )
 	ROM_LOAD16_BYTE(	"c22.bin",	0x000001, 0x080000, CRC(56da43b6) SHA1(02db8f969ed5e7f5e5356c45c0312faf5f000335) )
+	
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
+	ROM_LOAD( "wrdallas.bin",	0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "worldr21.i13",	0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
@@ -304,6 +332,9 @@ ROM_START( wrallyb ) /* Board Marked 930217 */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(366595ad) SHA1(e16341ed9eacf9b729c28184268150ea9b62f185) )
 	ROM_LOAD16_BYTE( "rally.c22", 0x000001, 0x080000, CRC(0ad4ec6f) SHA1(991557cf25fe960b1c586e990e6019befe5a11d0) )
+	
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
+	ROM_LOAD( "wrdallas.bin",	0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
 	ROM_REGION( 0x400000, REGION_GFX1, ROMREGION_DISPOSE )
 	ROM_LOAD( "rally h-12.h12", 0x000000, 0x200000, CRC(38a44370) SHA1(cb427aa337232ae3a8effab3804d3d1d85d1f40b) )
@@ -321,6 +352,6 @@ ROM_START( wrallyb ) /* Board Marked 930217 */
 ROM_END
 
 
-GAME( 1993, wrally,  0, 	 wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 1)", GAME_NOT_WORKING )
-GAME( 1993, wrallya, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 2)", GAME_NOT_WORKING )
-GAME( 1993, wrallyb, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 3 - 930217)", GAME_NOT_WORKING )
+GAME( 1993, wrally,  0, 	 wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 1)", 0 )
+GAME( 1993, wrallya, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 2)", 0 )
+GAME( 1993, wrallyb, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 3 - 930217)", 0 )
