@@ -617,6 +617,20 @@ $(CPUOBJ)/i8051/i8051.o:	$(CPUSRC)/i8051/i8051.c \
 
 
 #-------------------------------------------------
+# DS5002FP
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_DS5002FP=$(if $(filter DS5002FP,$(CPUS)),1,0)
+
+ifneq ($(filter DS5002FP,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/ds5002fp
+CPUOBJS += $(CPUOBJ)/ds5002fp/ds5002fp.o
+DBGOBJS += $(CPUOBJ)/ds5002fp/ds5002fpdasm.o
+endif
+
+
+
+#-------------------------------------------------
 # Intel 80x86 series
 #-------------------------------------------------
 

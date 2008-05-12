@@ -61,6 +61,7 @@ void i8051_get_info(UINT32 state, cpuinfo *info);
 void i8052_get_info(UINT32 state, cpuinfo *info);
 void i8751_get_info(UINT32 state, cpuinfo *info);
 void i8752_get_info(UINT32 state, cpuinfo *info);
+void ds5002fp_get_info(UINT32 state, cpuinfo *info);
 void m6800_get_info(UINT32 state, cpuinfo *info);
 void m6801_get_info(UINT32 state, cpuinfo *info);
 void m6802_get_info(UINT32 state, cpuinfo *info);
@@ -400,6 +401,9 @@ static const struct
 #endif
 #if (HAS_I8752)
 	{ CPU_I8752, i8752_get_info },
+#endif
+#if (HAS_DS5002FP)
+	{ CPU_DS5002FP, ds5002fp_get_info },
 #endif
 #if (HAS_M6800)
 	{ CPU_M6800, m6800_get_info },
