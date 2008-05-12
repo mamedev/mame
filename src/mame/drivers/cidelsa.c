@@ -4,6 +4,7 @@
 #include "video/cdp1869.h"
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
+#include "machine/cdp1852.h"
 #include "cidelsa.h"
 
 /*
@@ -187,7 +188,24 @@ static WRITE8_HANDLER( destryer_out1_w )
     */
 }
 
-static WRITE8_HANDLER( altair_out1_w )
+/* CDP1852 Interfaces */
+
+static CDP1852_DATA_READ( cidelsa_in0_r )
+{
+	return input_port_read(device->machine, "IN0");
+}
+
+static CDP1852_DATA_READ( cidelsa_in1_r )
+{
+	return input_port_read(device->machine, "IN1");
+}
+
+static CDP1852_DATA_READ( cidelsa_in2_r )
+{
+	return input_port_read(device->machine, "IN2");
+}
+
+static CDP1852_DATA_WRITE( altair_out1_w )
 {
 	/*
       bit   description
@@ -207,9 +225,9 @@ static WRITE8_HANDLER( altair_out1_w )
 	set_led_status(2, data & 0x20); // FIRE
 }
 
-static WRITE8_HANDLER( draco_out1_w )
+static CDP1852_DATA_WRITE( draco_out1_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data;
 
 	/*
       bit   description
@@ -226,6 +244,51 @@ static WRITE8_HANDLER( draco_out1_w )
 
     state->draco_sound = (data & 0xe0) >> 5;
 }
+
+static CDP1852_INTERFACE( cidelsa_cdp1852_in0_intf )
+{
+	CDP1852_CLOCK_HIGH, // really tied to CDP1876 CMSEL (pin 32)
+	CDP1852_MODE_INPUT,
+	cidelsa_in0_r,
+	NULL,
+	NULL
+};
+
+static CDP1852_INTERFACE( cidelsa_cdp1852_in1_intf )
+{
+	CDP1852_CLOCK_HIGH,
+	CDP1852_MODE_INPUT,
+	cidelsa_in1_r,
+	NULL,
+	NULL
+};
+
+static CDP1852_INTERFACE( cidelsa_cdp1852_in2_intf )
+{
+	CDP1852_CLOCK_HIGH,
+	CDP1852_MODE_INPUT,
+	cidelsa_in2_r,
+	NULL,
+	NULL
+};
+
+static CDP1852_INTERFACE( altair_cdp1852_out1_intf )
+{
+	ALTAIR_CHR1 / 8, // CDP1802 TPB
+	CDP1852_MODE_OUTPUT,
+	NULL,
+	altair_out1_w,
+	NULL
+};
+
+static CDP1852_INTERFACE( draco_cdp1852_out1_intf )
+{
+	ALTAIR_CHR1 / 8, // CDP1802 TPB
+	CDP1852_MODE_OUTPUT,
+	NULL,
+	draco_out1_w,
+	NULL
+};
 
 /* Memory Maps */
 
@@ -265,10 +328,10 @@ static ADDRESS_MAP_START( altair_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( altair_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(altair_out1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1852, "IC23", cdp1852_data_r) AM_DEVWRITE(CDP1852, "IC26", cdp1852_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD(CDP1852, "IC24", cdp1852_data_r)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out4_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD(CDP1852, "IC25", cdp1852_data_r) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out4_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out5_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out6_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out7_w)
@@ -284,10 +347,10 @@ static ADDRESS_MAP_START( draco_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(draco_out1_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
+	AM_RANGE(0x01, 0x01) AM_DEVREAD(CDP1852, "IC29", cdp1852_data_r) AM_DEVWRITE(CDP1852, "IC32", cdp1852_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD(CDP1852, "IC30", cdp1852_data_r)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out3_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out4_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD(CDP1852, "IC31", cdp1852_data_r) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out4_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out5_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out6_w)
 	AM_RANGE(0x07, 0x07) AM_DEVWRITE(CDP1869_VIDEO, CDP1869_TAG, cdp1869_out7_w)
@@ -578,6 +641,20 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_MACHINE_START(cidelsa)
 	MDRV_MACHINE_RESET(cidelsa)
 
+	// input/output hardware
+
+	MDRV_DEVICE_ADD("IC23", CDP1852)
+	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in0_intf)
+
+	MDRV_DEVICE_ADD("IC24", CDP1852)
+	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in1_intf)
+
+	MDRV_DEVICE_ADD("IC25", CDP1852)
+	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in2_intf)
+
+	MDRV_DEVICE_ADD("IC26", CDP1852)
+	MDRV_DEVICE_CONFIG(altair_cdp1852_out1_intf)
+
 	// video hardware
 
 	MDRV_IMPORT_FROM(altair_video)
@@ -607,6 +684,20 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_CPU_ADD(COP420, DRACO_SND_CHR1) // COP402N
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
 	MDRV_CPU_IO_MAP(draco_sound_io_map, 0)
+
+	// input/output hardware
+
+	MDRV_DEVICE_ADD("IC29", CDP1852)
+	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in0_intf)
+
+	MDRV_DEVICE_ADD("IC30", CDP1852)
+	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in1_intf)
+
+	MDRV_DEVICE_ADD("IC31", CDP1852)
+	MDRV_DEVICE_CONFIG(cidelsa_cdp1852_in2_intf)
+
+	MDRV_DEVICE_ADD("IC32", CDP1852)
+	MDRV_DEVICE_CONFIG(draco_cdp1852_out1_intf)
 
 	// video hardware
 
