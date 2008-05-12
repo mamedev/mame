@@ -50,7 +50,7 @@ CPUs related:
     5 -> flip screen
     6 -> ENA/D?
     7 -> CKA/D?
-    
+
 * 1x16AS @ B15
 	0 -> OE
 	1 -> XSRL	Shared RAM @ D14
@@ -60,7 +60,7 @@ CPUs related:
 	5 -> TRANS
 	6 -> XLD
 	7 -> XHI
-    
+
 Sound related:
 ==============
 * 1xOKIM6295 @ C6
@@ -238,12 +238,12 @@ static MACHINE_DRIVER_START( wrally )
 	MDRV_CPU_ADD(M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_readmem, 0)
 	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
-	
+
 	MDRV_CPU_ADD(DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_CONFIG(dallas_config)
 	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
 	MDRV_CPU_DATA_MAP(dallas_ram, 0)
-	
+
 	MDRV_INTERLEAVE(640)					/* heavy sync */
 	MDRV_MACHINE_RESET(wrally)
 
@@ -274,7 +274,7 @@ ROM_START( wrally )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"worldr17.c23",	0x000000, 0x080000, CRC(050f5629) SHA1(74fc2cd5114f3bc4b2429f1d8d7eeb1658f9f179) )
 	ROM_LOAD16_BYTE(	"worldr16.c22",	0x000001, 0x080000, CRC(9e0d126c) SHA1(369360b7ec2c3497af3bf62b4eba24c3d9f94675) )
-	
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin",	0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
@@ -302,24 +302,18 @@ ROM_START( wrallya )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"c23.bin",	0x000000, 0x080000, CRC(8b7d93c3) SHA1(ce4163eebc5d4a0c1266d650523b1ffc702d1b87) )
 	ROM_LOAD16_BYTE(	"c22.bin",	0x000001, 0x080000, CRC(56da43b6) SHA1(02db8f969ed5e7f5e5356c45c0312faf5f000335) )
-	
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin",	0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
+	/* Graphic / Sound roms have the same content as the parent set, but different sized roms */
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "worldr21.i13",	0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
-	ROM_LOAD16_BYTE( "worldr20.i11",	0x000001, 0x080000, CRC(58b2809a) SHA1(8741ec544c54e2a2f5d17ac2f8400ee2ce382e83) )
-	ROM_LOAD16_BYTE( "worldr19.i09",	0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
-	ROM_LOAD16_BYTE( "worldr18.i07",	0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
-//  same data, different layout
-//  ROM_LOAD( "h12.bin",    0x000000, 0x100000, CRC(3353dc00) )
-//  ROM_LOAD( "h8.bin",     0x100000, 0x100000, CRC(58dcd024) )
+	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) )
+	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
 	ROM_REGION( 0x140000, REGION_SOUND1, 0 )	/* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "worldr14.c01",	0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(		0x040000, 0x080000 )
-	ROM_LOAD( "worldr15.c03",	0x0c0000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
+	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) )
+	ROM_RELOAD(		0x040000, 0x100000 )
 
 	ROM_REGION( 0x0514, REGION_PLDS, 0 ) /* PAL's and GAL's */
 	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x0104, NO_DUMP )
@@ -333,27 +327,18 @@ ROM_START( wrallyb ) /* Board Marked 930217 */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(366595ad) SHA1(e16341ed9eacf9b729c28184268150ea9b62f185) )
 	ROM_LOAD16_BYTE( "rally.c22", 0x000001, 0x080000, CRC(0ad4ec6f) SHA1(991557cf25fe960b1c586e990e6019befe5a11d0) )
-	
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin",	0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
+	/* Graphic / Sound roms have the same content as the parent set, but different sized roms */
 	ROM_REGION( 0x200000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "worldr21.i13",	0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
-	ROM_LOAD16_BYTE( "worldr20.i11",	0x000001, 0x080000, CRC(58b2809a) SHA1(8741ec544c54e2a2f5d17ac2f8400ee2ce382e83) )
-	ROM_LOAD16_BYTE( "worldr19.i09",	0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
-	ROM_LOAD16_BYTE( "worldr18.i07",	0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
-//  same data, different layout
-//  ROM_LOAD( "rally h-12.h12",    0x000000, 0x100000, CRC(3353dc00) )
-//  ROM_LOAD( "rally h-8.h8",     0x100000, 0x100000, CRC(58dcd024) )
+	ROM_LOAD( "rally h-12.h12", 0x000000, 0x100000, CRC(3353dc00) SHA1(db3b1686751dcaa231d66c08b5be81fcfe299ad9) )
+	ROM_LOAD( "rally h-8.h8",   0x100000, 0x100000, CRC(58dcd024) SHA1(384ff296d3c7c8e0c4469231d1940de3cea89fc2) )
 
 	ROM_REGION( 0x140000, REGION_SOUND1, 0 )	/* ADPCM samples - sound chip is OKIM6295 */
-	ROM_LOAD( "worldr14.c01",	0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
-	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(		0x040000, 0x080000 )
-	ROM_LOAD( "worldr15.c03",	0x0c0000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
-// 	same data, but in one ROM only
-//	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) )
-//	ROM_RELOAD(		0x040000, 0x100000 )
+	ROM_LOAD( "sound c-1.c1", 0x000000, 0x100000, CRC(2d69c9b8) SHA1(328cb3c928dc6921c0c3f0277f59bca6c747c504) )
+	ROM_RELOAD(		0x040000, 0x100000 )
 
 	ROM_REGION( 0x0514, REGION_PLDS, 0 ) /* PAL's and GAL's */
 	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x0104, NO_DUMP )
@@ -366,4 +351,4 @@ ROM_END
 
 GAME( 1993, wrally,  0, 	 wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 1)", 0 )
 GAME( 1993, wrallya, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 2)", 0 )
-GAME( 1993, wrallyb, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 3 - 930217)", 0 )
+GAME( 1993, wrallyb, wrally, wrally, wrally, wrally, ROT0, "Gaelco (Atari License)", "World Rally (US, 930217)", 0 )
