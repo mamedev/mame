@@ -301,7 +301,7 @@ void drcuml_disasm(const drcuml_instruction *inst, char *buffer)
 
 		/* if we are less than 8 characters, pad to 8 */
 		if (dest - buffer < 8)
-			dest += sprintf(dest, "%*s", 8 - (dest - buffer), "");
+			dest += sprintf(dest, "%*s", (int)(8 - (dest - buffer)), "");
 
 		/* otherwise, add a comma */
 		else
