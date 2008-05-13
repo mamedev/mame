@@ -591,17 +591,21 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 		}
 		else
 		{
-			/* generate voiced samples here */
-			if (tms->coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))
-			{
-				if (tms->pitch_count > 50)
-					current_val = 0;
-				else
-					current_val = tms->coeff->chirptable[tms->pitch_count];
+	                 /* generate voiced samples here */
+            /* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
+             * function has a chirp/peak and then a long chain of zeroes.
+             * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+             * and if the address reaches that point the ADDRESS incrementer is
+             * disabled, forcing all samples beyond 50d to be == 50d
+             * (address 50d holds zeroes)
+             */
 
-			}
-			else
-				current_val = (tms->coeff->chirptable[tms->pitch_count%sizeof(tms->coeff->chirptable)]);
+	  /*if (tms->coeff->subtype & (SUBTYPE_TMS5100 | SUBTYPE_M58817))*/
+
+		if (tms->pitch_count > 50)
+			current_val = tms->coeff->chirptable[50];
+		else
+			current_val = tms->coeff->chirptable[tms->pitch_count];
 		}
 
 

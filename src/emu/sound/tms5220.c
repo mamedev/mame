@@ -1,6 +1,6 @@
 /**********************************************************************************************
 
-     TMS5220 simulator
+     TMS5200/5220 simulator
 
      Written for MAME by Frank Palazzolo
      With help from Neill Corlett
@@ -10,6 +10,11 @@
      Chirp/excitation table fixes by Lord Nightmare
      Various fixes by Lord Nightmare
      Modularization by Lord Nightmare
+     
+     Much information regarding these lpc encoding comes from US patent 4,209,844
+     US patent 4,331,836 describes the complete 51xx chip
+     US patent 4,335,277 describes the complete 52xx chip
+     Special Thanks to Larry Brantingham for answering questions regarding the chip details
 
 ***********************************************************************************************/
 
@@ -109,25 +114,26 @@ struct tms5220
 	UINT8 RDB_flag;					/* whether we should read data register or status register */
 
 	/* flag for variant tmc0285/tms5200 emulation */
-	/* The TMC0285 AKA TMS5200 is an early variant of the TMS5220 used in
+	/* The TMC0285 AKA TMS5200 is an earlier variant of the TMS5220 used in
        the early releases of the Speech Module for the TI-99/4(a) computer,
        in Zaccaria's 'Money Money', and in a few other places.
-       The TMS5200 has a bug in its state machine PLA which causes it to
-       incorrectly use the LPC K3 parameter table for both K3 and K4.
-       (the chip has the unused K4 parameter in its internal ROM, but it is
-       never accessed due to the PLA bug)
-       The bug was fixed in the quickly-released TMS5220.
-       TI may have sold the remaining stocks of TMS5200s at a discount, and
-       apparently provided a special encoder to work around the bug.
-       Other than the bug, the two chips are identical.
-       Another variant of the TMS5220 is the TMS5220C/TSP5220C, which adds
-       an additional opcode (to select the data rate).
+       The TMS5200 has a different set of LPC coefficients, and a different
+       chirp table than the 5220 (which is not yet dumped)
+       Due to the vast superiority of the quality of the TMS5220, TI may have
+       sold the remaining stocks of TMS5200s at a discount, and provided a
+       special encoder to use the older tables.
+       Other than those differences, the two chips are identical.
+       Another variant of the TMS5220 is the TMS5220C/TSP5220C, which replaces
+       the X0X0 'NOP' opcode with an opcode to select the number of
+       interpolations per frame to either be defined at each frame, or be fixed
+       at either 8, 6, 4, or 2. The TMS5200/5220 is always fixed at 8.
      */
 	tms5220_variant variant;
     /* The TMS52xx has two different ways of providing output data: the
        analog speaker pin (which was usually used) and the Digital I/O pin.
-       The internal DAC used to feed the analog pin is only 8 bits, while the
-       digital pin gives full 12? bit resolution to the output data.
+       The internal DAC used to feed the analog pin is only 8 bits, and has the
+       funny clipping/clamping logic, while the digital pin gives full 12? bit
+       resolution of the output data.
      */
     UINT8 digital_select;
 };
@@ -361,17 +367,17 @@ void tms5220_data_write(void *chip, int data)
      tms5220_status_read -- read status or data from the TMS5220
 
       From the data sheet:
-        bit 0 = TS - Talk Status is active (high) when the VSP is processing speech data.
+        bit D0(bit 7) = TS - Talk Status is active (high) when the VSP is processing speech data.
                 Talk Status goes active at the initiation of a Speak command or after nine
                 bytes of data are loaded into the FIFO following a Speak External command. It
                 goes inactive (low) when the stop code (Energy=1111) is processed, or
                 immediately by a buffer empty condition or a reset command.
-        bit 1 = BL - Buffer Low is active (high) when the FIFO buffer is more than half empty.
+        bit D1(bit 6) = BL - Buffer Low is active (high) when the FIFO buffer is more than half empty.
                 Buffer Low is set when the "Last-In" byte is shifted down past the half-full
                 boundary of the stack. Buffer Low is cleared when data is loaded to the stack
                 so that the "Last-In" byte lies above the half-full boundary and becomes the
                 ninth data byte of the stack.
-        bit 2 = BE - Buffer Empty is active (high) when the FIFO buffer has run out of data
+        bit D2(bit 5) = BE - Buffer Empty is active (high) when the FIFO buffer has run out of data
                 while executing a Speak External command. Buffer Empty is set when the last bit
                 of the "Last-In" byte is shifted out to the Synthesis Section. This causes
                 Talk Status to be cleared. Speed is terminated at some abnormal point and the
@@ -623,7 +629,17 @@ tryagain:
         else
         {
             /* generate voiced samples here */
-			tms->excitation_data = chirptable[tms->pitch_count%sizeof(chirptable)];
+            /* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
+             * function has a chirp/peak and then a long chain of zeroes.
+             * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+             * and if the address reaches that point the ADDRESS incrementer is
+             * disabled, forcing all samples beyond 50d to be == 50d
+             * (address 50d holds zeroes)
+             */
+          if (tms->pitch_count > 50)
+              tms->excitation_data = chirptable[50];
+          else /*tms->pitch_count <= 50*/
+              tms->excitation_data = chirptable[tms->pitch_count];
         }
 
         /* Update LFSR every clock, like patent shows */
