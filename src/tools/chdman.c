@@ -1430,7 +1430,7 @@ static avi_error write_avi_frame(avi_file *avi, UINT32 framenum, const UINT8 *bu
 		}
 
 		/* write the samples */
-		avierr = avi_append_sound_samples(avi, chnum, temp, samples, 1);
+		avierr = avi_append_sound_samples(avi, chnum, temp, samples, 0);
 		if (avierr != AVIERR_NONE)
 			goto cleanup;
 	}
