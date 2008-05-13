@@ -115,8 +115,8 @@
 
             B) General encryption. Managed through hardware:
 
-                - Jolly Card (italian, blue TAB board, encrypted) & Magic Card II (Impera, Blue TAB board)
-                  use substitution for each byte nibble. See DRIVER_INIT for the algorithm.
+                - All games using the blue TAB PCB with 2x HY18CV85 (electrically-erasable PLDs), use
+                  complex operations for each byte nibble. See DRIVER_INIT for the final algorithm.
                 - Jolly Card (austrian, encrypted) use simple XOR with a fixed value.
 
     - Microcontroller. Some games are using an extra microcontroller mainly for protection.
@@ -858,6 +858,11 @@
     - Added TICKET and HOPPER buttons to allow payout through the SUPER GAME.
     - Documented the featured SUPER GAME with complete instructions.
     - Improved DIP switches to properly set the payout system.
+
+    [2008/05/13]
+    - Found the proper algorithm to decrypt the blue TAB PCB.
+    - Replaced the old decryption tables with the proper decryption scheme.
+    - Updated technical notes.
 
 
     *** TO DO ***
@@ -2305,75 +2310,38 @@ static DRIVER_INIT( funworld )
 
 static DRIVER_INIT( tabblue )
 {
-/*****************************************************************************
-   +----------------------------------------------------------------------+
-   | For TAB blue colored PCB with 2 HY18CV85 (electrically-erasable PLD) |
-   +----------------------------------------------------------------------+
+/****************************************************************************************************
 
-    The encryption seems to be...
+   +-------------------------+
+   | Blue TAB PCB Decryption |
+   +-------------------------+
 
-    For each nibble:
+    It perform by byte nibble a boolean XOR against the same value shifted to the right, then shift
+    the result to the left carring the less significant bit and losing the most significant one.
 
-    xe = (3 * xd) & 0f  ; where xe = encrypted value, xd = decrypted value.
 
-    and then 3 swapped pairs... (3,7) (b,f) (6,e)
+    Encrypted nibble:  0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F   
+    Bits:             0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111
+    -------------------------------------------------------------------------------------------------
+    Bits:             0000 0011 0110 0101 1100 1111 1010 1001 1000 1011 1110 1101 0100 0111 0010 0001
+    Decrypted nibble:  0    3    6    5    C    F    A    9    8    B    E    D    4    7    2    1
 
-    ...or cases (3,7,b,f) ^ 4
-    ...and cases (6,e) ^ 8
 
-    to get the same result.
-
-    Since the table is very short, we will substitute each nibble.
-
-*****************************************************************************/
+*****************************************************************************************************/
 
 	int x, na, nb, nad, nbd;
 	UINT8 *src = memory_region( REGION_GFX1 );
 
-	for (x=0x0000;x<0x10000;x++)
+
+	for (x=0x0000; x < 0x10000; x++)
 	{
-		na = src[x] & 0xf0;	/* nibble a */
-		nb = src[x] & 0x0f;	/* nibble b */
+		na = src[x] & 0xf0;		/* nibble A */
+		nb = src[x] << 4;		/* nibble B */
 
-		switch (na)
-		{
-			case 0x10: nad = 0x30; break;
-			case 0x20: nad = 0x60; break;
-			case 0x30: nad = 0x50; break;
-			case 0x40: nad = 0xc0; break;
-			case 0x50: nad = 0xf0; break;
-			case 0x60: nad = 0xa0; break;
-			case 0x70: nad = 0x90; break;
-			case 0x90: nad = 0xb0; break;
-			case 0xa0: nad = 0xe0; break;
-			case 0xb0: nad = 0xd0; break;
-			case 0xc0: nad = 0x40; break;
-			case 0xd0: nad = 0x70; break;
-			case 0xe0: nad = 0x20; break;
-			case 0xf0: nad = 0x10; break;
-			default: nad = na; break;
-		}
+			nad = (na ^ (na >> 1)) << 1;			/* nibble A decrypted */
+			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;	/* nibble B decrypted */
 
-		switch (nb)
-		{
-			case 0x01: nbd = 0x03; break;
-			case 0x02: nbd = 0x06; break;
-			case 0x03: nbd = 0x05; break;
-			case 0x04: nbd = 0x0c; break;
-			case 0x05: nbd = 0x0f; break;
-			case 0x06: nbd = 0x0a; break;
-			case 0x07: nbd = 0x09; break;
-			case 0x09: nbd = 0x0b; break;
-			case 0x0a: nbd = 0x0e; break;
-			case 0x0b: nbd = 0x0d; break;
-			case 0x0c: nbd = 0x04; break;
-			case 0x0d: nbd = 0x07; break;
-			case 0x0e: nbd = 0x02; break;
-			case 0x0f: nbd = 0x01; break;
-			default: nbd = nb; break;
-		}
-
-		src[x] = nad + nbd;	/* decrypted value */
+		src[x] = nad + nbd;		/* decrypted byte */
 	}
 
 	/* Initializing PIAs... */
@@ -2455,56 +2423,21 @@ static DRIVER_INIT( magiccda )
 }
 
 static DRIVER_INIT( magiccdb )
-/*** same as blue TAB pcb, with the magiccda patch ***/
+/*** same as blue TAB PCB, with the magiccda patch ***/
 {
 	int x, na, nb, nad, nbd;
 	UINT8 *src = memory_region( REGION_GFX1 );
-	UINT8 *ROM = memory_region( REGION_CPU1 );
+	UINT8 *ROM = memory_region(REGION_CPU1);
 
-	for (x=0x0000;x<0x10000;x++)
+	for (x=0x0000; x < 0x10000; x++)
 	{
-		na = src[x] & 0xf0;	/* nibble a */
-		nb = src[x] & 0x0f;	/* nibble b */
+		na = src[x] & 0xf0;		/* nibble A */
+		nb = src[x] << 4;		/* nibble B */
 
-		switch (na)
-		{
-			case 0x10: nad = 0x30; break;
-			case 0x20: nad = 0x60; break;
-			case 0x30: nad = 0x50; break;
-			case 0x40: nad = 0xc0; break;
-			case 0x50: nad = 0xf0; break;
-			case 0x60: nad = 0xa0; break;
-			case 0x70: nad = 0x90; break;
-			case 0x90: nad = 0xb0; break;
-			case 0xa0: nad = 0xe0; break;
-			case 0xb0: nad = 0xd0; break;
-			case 0xc0: nad = 0x40; break;
-			case 0xd0: nad = 0x70; break;
-			case 0xe0: nad = 0x20; break;
-			case 0xf0: nad = 0x10; break;
-			default: nad = na; break;
-		}
+			nad = (na ^ (na >> 1)) << 1;			/* nibble A decrypted */
+			nbd = ((nb ^ (nb >> 1)) >> 3) & 0x0f;	/* nibble B decrypted */
 
-		switch (nb)
-		{
-			case 0x01: nbd = 0x03; break;
-			case 0x02: nbd = 0x06; break;
-			case 0x03: nbd = 0x05; break;
-			case 0x04: nbd = 0x0c; break;
-			case 0x05: nbd = 0x0f; break;
-			case 0x06: nbd = 0x0a; break;
-			case 0x07: nbd = 0x09; break;
-			case 0x09: nbd = 0x0b; break;
-			case 0x0a: nbd = 0x0e; break;
-			case 0x0b: nbd = 0x0d; break;
-			case 0x0c: nbd = 0x04; break;
-			case 0x0d: nbd = 0x07; break;
-			case 0x0e: nbd = 0x02; break;
-			case 0x0f: nbd = 0x01; break;
-			default: nbd = nb; break;
-		}
-
-		src[x] = nad + nbd;	/* decrypted value */
+		src[x] = nad + nbd;		/* decrypted byte */
 	}
 
 	ROM[0xc1c6] = 0x92;
