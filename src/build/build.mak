@@ -41,7 +41,7 @@ FILE2STROBJS = \
 
 $(FILE2STR): $(FILE2STROBJS) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -54,7 +54,7 @@ PNG2BDCOBJS = \
 
 $(PNG2BDC): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
 
 
@@ -67,6 +67,6 @@ VERINFOOBJS = \
 
 $(VERINFO): $(VERINFOOBJS) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ -o $@
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
 endif
