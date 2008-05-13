@@ -65,6 +65,7 @@ const options_entry mame_core_options[] =
 	{ "playback;pb",                 NULL,        0,                 "playback an input file" },
 	{ "record;rec",                  NULL,        0,                 "record an input file" },
 	{ "mngwrite",                    NULL,        0,                 "optional filename to write a MNG movie of the current session" },
+	{ "aviwrite",                    NULL,        0,                 "optional filename to write an AVI movie of the current session" },
 	{ "wavwrite",                    NULL,        0,                 "optional filename to write a WAV file of the current session" },
 
 	/* performance options */

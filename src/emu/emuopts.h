@@ -64,6 +64,7 @@
 #define OPTION_PLAYBACK				"playback"
 #define OPTION_RECORD				"record"
 #define OPTION_MNGWRITE				"mngwrite"
+#define OPTION_AVIWRITE				"aviwrite"
 #define OPTION_WAVWRITE				"wavwrite"
 
 /* core performance options */

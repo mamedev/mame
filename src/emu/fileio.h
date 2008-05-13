@@ -163,6 +163,9 @@ void mame_closepath(mame_path *path);
 /* return the core_file underneath the mame_file */
 core_file *mame_core_file(mame_file *file);
 
+/* return the full filename for a given mame_file */
+const char *mame_file_full_name(mame_file *file);
+
 /* return a hash string for the file with the given functions */
 const char *mame_fhash(mame_file *file, UINT32 functions);
 

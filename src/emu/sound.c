@@ -753,6 +753,7 @@ static TIMER_CALLBACK( sound_update )
 	if (finalmix_offset > 0)
 	{
 		osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
+		video_avi_add_sound(machine, finalmix, finalmix_offset / 2);
 		if (wavfile != NULL)
 			wav_add_data_16(wavfile, finalmix, finalmix_offset);
 	}

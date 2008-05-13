@@ -461,6 +461,12 @@ Core state/playback options
 	for that, and reassemble the audio/video using offline tools. The
 	default is NULL (no recording).
 
+-aviwrite <filename>
+
+	Stream video and sound data to the given <filename> in AVI format,
+	producing an animation of the game session complete with sound. The
+	default is NULL (no recording).
+
 -wavwrite <filename>
 
 	Writes the final mixer output to the given <filename> in WAV format,

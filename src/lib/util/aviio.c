@@ -52,11 +52,6 @@
 #define HANDLER_DIB				AVI_FOURCC('D','I','B',' ')
 #define HANDLER_HFYU			AVI_FOURCC('h','f','y','u')
 
-#define FORMAT_UYVY				AVI_FOURCC('U','Y','V','Y')
-#define FORMAT_VYUY				AVI_FOURCC('V','Y','U','Y')
-#define FORMAT_YUY2				AVI_FOURCC('Y','U','Y','2')
-#define FORMAT_HFYU				AVI_FOURCC('H','F','Y','U')
-
 /* main AVI header files */
 #define AVIF_HASINDEX			0x00000010
 #define AVIF_MUSTUSEINDEX		0x00000020
@@ -223,6 +218,9 @@ static avi_error write_idx1_chunk(avi_file *file);
 static avi_error soundbuf_initialize(avi_file *file);
 static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum);
 static avi_error soundbuf_flush(avi_file *file, int only_flush_full);
+
+/* RGB helpers */
+static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_t *bitmap, UINT8 *data, UINT32 numbytes);
 
 /* YUY helpers */
 static avi_error yuv_decompress_to_yuy16(avi_stream *stream, const UINT8 *data, UINT32 numbytes, bitmap_t *bitmap);
@@ -928,6 +926,10 @@ avi_error avi_append_video_frame_yuy16(avi_file *file, const bitmap_t *bitmap)
 	avi_error avierr;
 	UINT32 maxlength;
 
+	/* validate our ability to handle the data */
+	if (stream->format != FORMAT_UYVY && stream->format != FORMAT_VYUY && stream->format != FORMAT_YUY2 && stream->format != FORMAT_HFYU)
+		return AVIERR_UNSUPPORTED_VIDEO_FORMAT;
+
 	/* double check bitmap format */
 	if (bitmap->format != BITMAP_FORMAT_YUY16)
 		return AVIERR_INVALID_BITMAP;
@@ -960,11 +962,61 @@ avi_error avi_append_video_frame_yuy16(avi_file *file, const bitmap_t *bitmap)
 
 
 /*-------------------------------------------------
+    avi_append_video_frame_rgb32 - append a frame
+    of video in RGB32 format
+-------------------------------------------------*/
+
+avi_error avi_append_video_frame_rgb32(avi_file *file, const bitmap_t *bitmap)
+{
+	avi_stream *stream = get_video_stream(file);
+	avi_error avierr;
+	UINT32 maxlength;
+
+	/* validate our ability to handle the data */
+	if (stream->format != 0)
+		return AVIERR_UNSUPPORTED_VIDEO_FORMAT;
+
+	/* depth must be 24 */
+	if (stream->depth != 24)
+		return AVIERR_UNSUPPORTED_VIDEO_FORMAT;
+
+	/* double check bitmap format */
+	if (bitmap->format != BITMAP_FORMAT_RGB32)
+		return AVIERR_INVALID_BITMAP;
+
+	/* write out any sound data first */
+	avierr = soundbuf_write_chunk(file, stream->chunks);
+	if (avierr != AVIERR_NONE)
+		return avierr;
+
+	/* make sure we have enough room */
+	maxlength = 3 * stream->width * stream->height;
+	avierr = expand_tempbuffer(file, maxlength);
+	if (avierr != AVIERR_NONE)
+		return avierr;
+
+	/* copy the RGB data to the destination */
+	avierr = rgb32_compress_to_rgb(stream, bitmap, file->tempbuffer, maxlength);
+	if (avierr != AVIERR_NONE)
+		return avierr;
+
+	/* set the info for this new chunk */
+	avierr = set_stream_chunk_info(stream, stream->chunks, file->writeoffs, maxlength + 8);
+	if (avierr != AVIERR_NONE)
+		return avierr;
+	stream->samples = file->info.video_numsamples = stream->chunks;
+
+	/* write the data */
+	return chunk_write(file, get_chunkid_for_stream(file, stream), file->tempbuffer, maxlength);
+}
+
+
+/*-------------------------------------------------
     avi_append_sound_samples - append sound
     samples
 -------------------------------------------------*/
 
-avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *samples, UINT32 numsamples)
+avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *samples, UINT32 numsamples, UINT32 sampleskip)
 {
 	UINT32 sampoffset = file->soundbuf_chansamples[channel];
 	UINT32 sampnum;
@@ -977,6 +1029,7 @@ avi_error avi_append_sound_samples(avi_file *file, int channel, const INT16 *sam
 	for (sampnum = 0; sampnum < numsamples; sampnum++)
 	{
 		INT16 data = *samples++;
+		samples += sampleskip;
 		data = LITTLE_ENDIANIZE_INT16(data);
 		file->soundbuf[sampoffset++ * file->info.audio_channels + channel] = data;
 	}
@@ -2235,6 +2288,57 @@ static avi_error soundbuf_flush(avi_file *file, int only_flush_full)
 
 	/* account for flushed chunks */
 	file->soundbuf_chunks = chunknum;
+	return AVIERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    rgb32_compress_to_rgb - "compress" an RGB32
+    bitmap to an RGB encoded frame
+-------------------------------------------------*/
+
+static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_t *bitmap, UINT8 *data, UINT32 numbytes)
+{
+	int height = MIN(stream->height, bitmap->height);
+	int width = MIN(stream->width, bitmap->width);
+	UINT8 *dataend = data + numbytes;
+	int x, y;
+
+	/* compressed video */
+	for (y = 0; y < height; y++)
+	{
+		const UINT32 *source = (UINT32 *)bitmap->base + y * bitmap->rowpixels;
+		UINT8 *dest = data + (stream->height - 1 - y) * stream->width * 3;
+
+		for (x = 0; x < width && dest < dataend; x++)
+		{
+			UINT32 pix = *source++;
+			*dest++ = RGB_BLUE(pix);
+			*dest++ = RGB_GREEN(pix);
+			*dest++ = RGB_RED(pix);
+		}
+		
+		/* fill in any blank space on the right */
+		for ( ; x < stream->width && dest < dataend; x++)
+		{
+			*dest++ = 0;
+			*dest++ = 0;
+			*dest++ = 0;
+		}
+	}
+	
+	/* fill in any blank space on the bottom */
+	for ( ; y < stream->height; y++)
+	{
+		UINT8 *dest = data + (stream->height - 1 - y) * stream->width * 3;
+		for (x = 0; x < stream->width && dest < dataend; x++)
+		{
+			*dest++ = 0;
+			*dest++ = 0;
+			*dest++ = 0;
+		}
+	}
+
 	return AVIERR_NONE;
 }
 

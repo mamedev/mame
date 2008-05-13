@@ -1314,14 +1314,14 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* toggle movie recording */
 	if (input_ui_pressed(IPT_UI_RECORD_MOVIE))
 	{
-		if (!video_is_movie_active(machine->primary_screen))
+		if (!video_mng_is_movie_active(machine->primary_screen))
 		{
-			video_movie_begin_recording(machine->primary_screen, NULL);
+			video_mng_begin_recording(machine->primary_screen, NULL);
 			popmessage("REC START");
 		}
 		else
 		{
-			video_movie_end_recording(machine->primary_screen);
+			video_mng_end_recording(machine->primary_screen);
 			popmessage("REC STOP");
 		}
 	}
