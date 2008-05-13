@@ -1,8 +1,9 @@
 /*
 
- TSI S14001A emulator v1.11
+ TSI S14001A emulator v1.20
  By Jonathan Gevaryahu ("Lord Nightmare") with help from Kevin Horton ("kevtris")
  MAME conversion and integration by R. Belmont
+ Clock Frequency control updated by Zsolt Vasvari
 
  Copyright Jonathan Gevaryahu.
 
@@ -293,8 +294,9 @@ static void s14001a_clock(S14001AChip *chip) /* called once per clock */
 {
 	UINT8 CurDelta; // Current delta
 
-	/* on even clocks, audio output is floating, /romen is low so rom data bus is driven, input is latched?
-     * on odd clocks, audio output is driven, /romen is high, state machine 2 is clocked*/
+	/* on even clocks, audio output is floating, /romen is low so rom data bus is driven
+         * on odd clocks, audio output is driven, /romen is high, state machine 2 is clocked
+         */
 	chip->oddeven = !(chip->oddeven); // invert the clock
 	if (chip->oddeven == 0) // even clock
         {
