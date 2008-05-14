@@ -4812,19 +4812,19 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( hmcompmx )	/* GX858 (c) 1999 */
 	DRIVER( bm4thmix )	/* GX847 (c) 1999 (Japan) */
 	DRIVER( bm5thmix )	/* GX981 (c) 1999 (Japan) */
-	DRIVER( bmclubmx )	/*       (c) 2000 (Japan) */
+	DRIVER( bmclubmx )	/* GX993 (c) 2000 (Japan) */
 	DRIVER( bmcorerm )	/* GXA05 (c) 1999 (Japan) */
 	DRIVER( bmdct )		/* GX995 (c) 2000 (Japan) */
 	DRIVER( bmcompm2 )	/* GX988 (c) 2000 (Japan) */
 	DRIVER( hmcompm2 )	/* GX988 (c) 2000 */
 	DRIVER( bm6thmix )	/* GXA21 (c) 2001 (Japan) */
-	DRIVER( bm7thmix )	/*       (c) 2001 (Japan) */
-	//DRIVER( bmfinal ) /*       (c) 2002 (Japan) */
+	DRIVER( bm7thmix )	/* GXB07 (c) 2001 (Japan) */
+	DRIVER( bmfinal )	/* GXC01 (c) 2002 (Japan) */
 
-	//DRIVER( popn1 )       /*       (c) 1998 (Japan) */
-	//DRIVER( popn2 )       /*       (c) 1998 (Japan) */
-	//DRIVER( popn3 )       /*       (c) 1999 (Japan) */
-	//DRIVER( popnstex )    /*       (c) 1999 (Japan) */
+	//DRIVER( popn1 )       /* GX803 (c) 1998 (Japan) */
+	//DRIVER( popn2 )       /* GX831 (c) 1998 (Japan) */
+	//DRIVER( popn3 )       /* GX980 (c) 1999 (Japan) */
+	//DRIVER( popnstex )    /* GX970 (c) 1999 (Japan) */
 
 	/* Firebeat games */
 	DRIVER( ppp )		/* GQ977 (c) 2000 */

@@ -1288,9 +1288,9 @@ ROM_START( bm1stmix )
 	ROM_LOAD16_BYTE( "753jaa10.27d", 0x100001, 0x80000, CRC(391F4BFD) SHA1(791c9889ea3ce639bbfb87934a1cad9aa3c9ccde) )
 
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
-	// There is an alternate image
-	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) ) /* ver 1.00 JA */
 	DISK_IMAGE( "753jaa11", 0, MD5(d56ec7b9877d1f26d7fc1cabed404947) SHA1(71d200d1bd3f1f3a01f4daa78dc9abcca8b8a1fb) )	/* ver 1.00 JA */
+	// There is an alternate image
+	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) )	/* ver 1.00 JA */
 ROM_END
 
 ROM_START( bm2ndmix )
@@ -1335,8 +1335,6 @@ ROM_START( bm2ndmxa )
 	DISK_IMAGE( "853jaa11", 0, MD5(37281741b748bea7dfa711a956649d1e) SHA1(03d6cc5aea5920163fbaba34c4f838ca605a87e3) )	/* ver 1.10 JA */
 ROM_END
 
-
-
 ROM_START( bm3rdmix )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "825jaa01.6a", 0x000000, 0x80000, CRC(CF7494A5) SHA1(994df0644817f44d135a16f04d8dae9ec73e3728) )
@@ -1356,7 +1354,7 @@ ROM_START( bm3rdmix )
 
 
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
-	DISK_IMAGE( "825jaa", 0, SHA1(dc10d8d281dd8153aeb620228e397aba0bbac198) MD5(3276e3ed57f1a6d9a18365054b0439ba) ) /* ver 1.00 JA */
+	DISK_IMAGE( "825jaa11", 0, SHA1(dc10d8d281dd8153aeb620228e397aba0bbac198) MD5(3276e3ed57f1a6d9a18365054b0439ba) )	/* ver 1.00 JA */
 ROM_END
 
 ROM_START( bmcompmx )
@@ -1463,7 +1461,7 @@ ROM_START( bmclubmx )
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "993jaa11.chd", 0, NO_DUMP )
 	// this image has not been verified
-//  DISK_IMAGE( "993jaa11.chd", 0, MD5(e26eb62d7cf3357585f5066da6063143) )  /* ver 1.00 JA */
+	//  DISK_IMAGE( "993jaa11.chd", 0, MD5(e26eb62d7cf3357585f5066da6063143) )  /* ver 1.00 JA */
 ROM_END
 
 ROM_START( bmcompm2 )
@@ -1589,9 +1587,32 @@ ROM_START( bm7thmix )
 	ROM_LOAD16_BYTE( "b07jaa10.27d", 0x100001, 0x80000, CRC(6B75BA9C) SHA1(aee922adc3bc0296ae6e08e461b20a9e5e72a2df) )
 
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
-	DISK_IMAGE( "b07jab11.chd", 0, NO_DUMP )
+	DISK_IMAGE( "b07jaa11", 0, MD5(8ee59f074ee79eb7a435a54b6745387c) SHA1(91957d353d2978ce46c5232dd182c056206eb722) )	/* ver 1.00 JA */
 	// this image has not been verified
 	//DISK_IMAGE( "b07jab11.chd", 0, MD5(0e9440787ca69567792095085e2a3619) )    /* ver 1.00 JA */
+ROM_END
+
+ROM_START( bmfinal )
+	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "c01jaa01.6a", 0x000000, 0x80000, CRC(A64EEFF7) SHA1(377eee1f41e3072f9154a7c17ec4c4f3fb63ea4a) )
+	ROM_LOAD16_BYTE( "c01jaa02.8a", 0x000001, 0x80000, CRC(599BDAC5) SHA1(f85aff020c92fcd3c2a42036615226b54e5bee98) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0)		/* SPRITE */
+	ROM_LOAD16_BYTE( "c01jaa03.19a", 0x000000, 0x80000, CRC(1C9C6EB7) SHA1(bd1a9d8ed78095328817f599f52d9d34e09e9275) )
+	ROM_LOAD16_BYTE( "c01jaa04.20a", 0x000001, 0x80000, CRC(4E5AA665) SHA1(22f3888a29497ff0a801cce620ca0373268e5cd9) )
+	ROM_LOAD16_BYTE( "c01jaa05.22a", 0x100000, 0x80000, CRC(37DAB217) SHA1(66b07c36e7749a4c9d9dfaca633958a4922c4562) )
+	ROM_LOAD16_BYTE( "c01jaa06.24a", 0x100001, 0x80000, CRC(D35C6818) SHA1(ce608603ea3662f8cda5cf958a676d64a0f74645) )
+
+	ROM_REGION( 0x200000, REGION_GFX2, 0 )		/* TILEMAP */
+	ROM_LOAD16_BYTE( "c01jaa07.22d", 0x000000, 0x80000, CRC(3E70F506) SHA1(d3cd0b48383bf2514b7f47fade8549ea8e3c5555) )
+	ROM_LOAD16_BYTE( "c01jaa08.23d", 0x000001, 0x80000, CRC(535E6065) SHA1(131f7eec4179145781bbd23474202f4eaf9cefd0) )
+	ROM_LOAD16_BYTE( "c01jaa09.25d", 0x100000, 0x80000, CRC(45CF93B1) SHA1(7c5082bcd1fe15761a0a965e25dda121904ff1bd) )
+	ROM_LOAD16_BYTE( "c01jaa10.27d", 0x100001, 0x80000, CRC(C9927749) SHA1(c2644877bda483e241381265e723ea8ab8357761) )
+
+	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
+	DISK_IMAGE( "c01jaa11", 0, NO_DUMP )
+	// this image has not been verified
+	//DISK_IMAGE( "c01jaa11", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )	/* ver 1.00 JA */
 ROM_END
 
 #if 0
@@ -1615,27 +1636,6 @@ ROM_START( bm3rdmxb )
 
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "825jab11", 0, MD5(f4360da10a932ba90e93469df7426d1d) SHA1(1) )  /* ver 1.01 JA */
-ROM_END
-
-ROM_START( bmfinal )
-	ROM_REGION( 0x100000, REGION_CPU1, 0 )		/* MC68EC020FG25 MPU */
-	ROM_LOAD16_BYTE( "c01jaa01.6a", 0x000000, 0x80000, CRC(A64EEFF7) SHA1(377eee1f41e3072f9154a7c17ec4c4f3fb63ea4a) )
-	ROM_LOAD16_BYTE( "c01jaa02.8a", 0x000001, 0x80000, CRC(599BDAC5) SHA1(f85aff020c92fcd3c2a42036615226b54e5bee98) )
-
-	ROM_REGION( 0x200000, REGION_GFX1, 0)		/* SPRITE */
-	ROM_LOAD16_BYTE( "c01jaa03.19a", 0x000000, 0x80000, CRC(1C9C6EB7) SHA1(bd1a9d8ed78095328817f599f52d9d34e09e9275) )
-	ROM_LOAD16_BYTE( "c01jaa04.20a", 0x000001, 0x80000, CRC(4E5AA665) SHA1(22f3888a29497ff0a801cce620ca0373268e5cd9) )
-	ROM_LOAD16_BYTE( "c01jaa05.22a", 0x100000, 0x80000, CRC(37DAB217) SHA1(66b07c36e7749a4c9d9dfaca633958a4922c4562) )
-	ROM_LOAD16_BYTE( "c01jaa06.24a", 0x100001, 0x80000, CRC(D35C6818) SHA1(ce608603ea3662f8cda5cf958a676d64a0f74645) )
-
-	ROM_REGION( 0x200000, REGION_GFX2, 0 )		/* TILEMAP */
-	ROM_LOAD16_BYTE( "c01jaa07.22d", 0x000000, 0x80000, CRC(3E70F506) SHA1(d3cd0b48383bf2514b7f47fade8549ea8e3c5555) )
-	ROM_LOAD16_BYTE( "c01jaa08.23d", 0x000001, 0x80000, CRC(535E6065) SHA1(131f7eec4179145781bbd23474202f4eaf9cefd0) )
-	ROM_LOAD16_BYTE( "c01jaa09.25d", 0x100000, 0x80000, CRC(45CF93B1) SHA1(7c5082bcd1fe15761a0a965e25dda121904ff1bd) )
-	ROM_LOAD16_BYTE( "c01jaa10.27d", 0x100001, 0x80000, CRC(C9927749) SHA1(c2644877bda483e241381265e723ea8ab8357761) )
-
-	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
-	DISK_IMAGE( "c01jaa11.chd", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )	/* ver 1.00 JA */
 ROM_END
 
 ROM_START( popn1 )
@@ -1916,7 +1916,6 @@ static DRIVER_INIT( bm7thmix )
 	ide_user_password = bm7thmix_user_password;
 }
 
-#if 0
 static DRIVER_INIT( bmfinal )
 {
 	static const UINT8 bmfinal_user_password[2 + 32] =
@@ -1933,7 +1932,7 @@ static DRIVER_INIT( bmfinal )
 	ide_master_password = beatmania_master_password;
 	ide_user_password = bmfinal_user_password;
 }
-#endif
+
 
 /*************************************
  *
@@ -1957,13 +1956,12 @@ GAME( 2000, hmcompm2, bmcompm2, djmain,   hmcompm2,  hmcompm2,  ROT0, "Konami", 
 GAME( 2000, bmdct,    0,        djmain,   bmdct,     bmdct,     ROT0, "Konami", "beatmania f. Dreams Come True (ver JA-A)", 0 )
 GAME( 2000, bmcorerm, 0,        djmain,   beatmania, bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
 GAME( 2001, bm6thmix, 0,        djmain,   beatmania, bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
-GAME( 2001, bm7thmix, 0,        djmain,   beatmania, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", GAME_NOT_WORKING ) // missing hd
+GAME( 2001, bm7thmix, 0,        djmain,   beatmania, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
+GAME( 2002, bmfinal,  0,        djmain,   beatmania, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", GAME_NOT_WORKING ) // missing hd
 
 #if 0
 // for reference, these sets have not been verified
 GAME( 1998, bm3rdmxb, bm3rdmix, djmain,   bm3rdmix,  beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-B)", 0 )
-
-GAME( 2002, bmfinal,  0,        djmain,   beatmania, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
 GAME( 1998, popn1,    0,        djmain,   popn1,     beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A)", 0 )
 GAME( 1998, popn2,    0,        djmain,   popnmusic, beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )
