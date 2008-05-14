@@ -2,10 +2,8 @@
 
 /*
 TODO:
-- dynamic screen resolution
-- is background pen configurable?
+- dynamic screen resolution (changes between emeralda test mode and normal game)
 - non-shadow pixels for sprites flagged to enable shadows have bad colors
-- dolphin sprite in emeralda instruction screen is missing because of an incorrectly emulated scanline irq
 */
 
 #include "driver.h"
@@ -19,6 +17,7 @@ UINT16 *namcona1_scroll;
 UINT16 *namcona1_workram;
 UINT16 *namcona1_sparevram;
 UINT16 *namcona1_rozvideoram;
+UINT16 *namcona1_pixmap;
 
 /* private variables */
 static char *dirtychar;
@@ -158,11 +157,7 @@ READ16_HANDLER( namcona1_videoram_r )
 static void
 UpdatePalette(running_machine *machine, int offset )
 {
-	UINT16 color;
-
-	color = paletteram16[offset];
-
-	/* -RRRRRGGGGGBBBBB */
+	UINT16 color = paletteram16[offset]; /* -RRRRRGGGGGBBBBB */
 	palette_set_color_rgb( machine, offset, pal5bit(color >> 10), pal5bit(color >> 5), pal5bit(color >> 0));
 } /* namcona1_paletteram_w */
 
@@ -279,7 +274,7 @@ WRITE16_HANDLER( namcona1_gfxram_w )
 	}
 } /* namcona1_gfxram_w */
 
-static void update_gfx(running_machine *machine)
+static void UpdateGfx(running_machine *machine)
 {
 	const UINT16 *pSource = videoram16;
 	int page;
@@ -302,7 +297,7 @@ static void update_gfx(running_machine *machine)
 		for( i=0; i<0x800; i++ )
 		{
 			if( dirtychar[*pSource++ & 0xfff] )
-			{ // todo: this checks only if top-left tile has changed
+			{
 				roz_dirty = 1;
 				break;
 			}
@@ -320,7 +315,7 @@ static void update_gfx(running_machine *machine)
 		}
 		dirtygfx = 0;
 	}
-} /* update_gfx */
+} /* UpdateGfx */
 
 VIDEO_START( namcona1 )
 {
@@ -337,10 +332,10 @@ VIDEO_START( namcona1 )
 		tilemap_palette_bank[i] = -1;
 	}
 
-	shaperam		     = auto_malloc( 0x1000*4*2 );
+	shaperam		     = auto_malloc( 0x2000*4 );
 	cgram			     = auto_malloc( 0x1000*0x20*2 );
 	dirtychar		     = auto_malloc( 0x1000 );
-	namcona1_rozvideoram = auto_malloc( 0x1000 );
+	namcona1_rozvideoram = auto_malloc( 0x4000 );
 
 	gfx0 = allocgfx( &cg_layout_8bpp );
 	gfx0->total_colors = machine->config->total_colors/256;
@@ -481,8 +476,8 @@ static void pdraw_tile(running_machine *machine,
 										dest[x] = palette_shadow_table[dest[x]];
 									}
 									else
-									{
-										dest[x] = pal_base + c;
+									{ // bad?
+										dest[x] = pal_base+c;
 									}
 								}
 								else
@@ -520,6 +515,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	for( which=0; which<0x100; which++ )
 	{ /* max 256 sprites */
+		int bpp4,palbase;
 		ypos	= source[0];	/* FHHH---Y YYYYYYYY    flipy, height, ypos */
 		tile	= source[1];	/* O???TTTT TTTTTTTT    opaque tile */
 		color	= source[2];	/* FSWWOOOO CCCCBPPP    flipx, shadow, width, color offset for 4bpp, color, 4bbp - 8bpp mode, pri*/
@@ -530,6 +526,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		height = ((ypos>>12)&0x7)+1;
 		flipy = ypos&0x8000;
 		flipx = color&0x8000;
+
+		if( color&8 )
+		{
+			palbase = ((color>>4)&0xf) * 0x10 + ((color & 0xf00) >> 8);
+			bpp4 = 1;
+		}
+		else
+		{
+			palbase = (color>>4)&0xf;
+			bpp4 = 0;
+		}
 
 		for( row=0; row<height; row++ )
 		{
@@ -542,6 +549,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				sy += row*8;
 			}
+			sy = ((sy+8)&0x1ff)-8;
+
 			for( col=0; col<width; col++ )
 			{
 				sx = (xpos&0x1ff)-10;
@@ -554,34 +563,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					sx+=col*8;
 				}
 				sx = ((sx+16)&0x1ff)-8;
-				sy = ((sy+8)&0x1ff)-8;
 
-				if(color & 8)
-				{
-					pdraw_tile(machine,
-						bitmap,
-						cliprect,
-						(tile & 0xfff) + row*64+col,
-						((color>>4)&0xf) * 0x10 + ((color & 0xf00) >> 8),
-						sx,sy,flipx,flipy,
-						priority,
-						color & 0x4000, /* shadow */
-						tile & 0x8000, /* opaque */
-						1 /* 4bpp gfx */ );
-				}
-				else
-				{
-					pdraw_tile(machine,
-						bitmap,
-						cliprect,
-						(tile & 0xfff) + row*64+col,
-						(color>>4)&0xf,
-						sx,sy,flipx,flipy,
-						priority,
-						color & 0x4000, /* shadow */
-						tile & 0x8000, /* opaque */
-						0 /* 8bpp gfx */ );
-				}
+				pdraw_tile(machine,
+					bitmap,
+					cliprect,
+					(tile & 0xfff) + row*64+col,
+					palbase,
+					sx,sy,flipx,flipy,
+					priority,
+					color & 0x4000, /* shadow */
+					tile & 0x8000, /* opaque */
+					bpp4 );
 
 			} /* next col */
 		} /* next row */
@@ -655,7 +647,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 				draw_pixel_line(
 					BITMAP_ADDR16(bitmap, line, 0),
 					BITMAP_ADDR8(priority_bitmap, line, 0),
-					namcona1_sparevram + (ydata-0x4000) + 25,
+					namcona1_rozvideoram + (ydata-0x4000) + 25,
 					paldata );
 			}
 			else
@@ -697,6 +689,7 @@ VIDEO_UPDATE( namcona1 )
 {
 	int which;
 	int priority;
+
 	/* int flipscreen = namcona1_vreg[0x98/2]; (TBA) */
 
 	if( namcona1_vreg[0x8e/2] )
@@ -710,7 +703,7 @@ VIDEO_UPDATE( namcona1 )
 			}
 			palette_is_dirty = 0;
 		}
-		update_gfx(screen->machine);
+		UpdateGfx(screen->machine);
 		for( which=0; which<NAMCONA1_NUM_TILEMAPS; which++ )
 		{
 			int tilemap_color = namcona1_vreg[0xb0/2+(which&3)]&0xf;
@@ -721,14 +714,15 @@ VIDEO_UPDATE( namcona1 )
 			}
 		} /* next tilemap */
 
-		{
-			int color = namcona1_vreg[0xb0/2+5]&0xf;
+		{ /* ROZ tilemap */
+			int color = namcona1_vreg[0xba/2]&0xf;
 			if( color != roz_palette )
 			{
 				roz_dirty = 1;
 				roz_palette = color;
 			}
 		}
+
 		if( roz_dirty )
 		{
 			tilemap_mark_all_tiles_dirty( roz_tilemap );
@@ -764,9 +758,9 @@ $efff20: sprite control: 0x3a,0x3e,0x3f
 $efff00:    src0 src1 src2 dst0 dst1 dst2 BANK [src
 $efff10:    src] [dst dst] #BYT BLIT eINT 001f 0001
 $efff20:    003f 003f IACK ---- ---- ---- ---- ----
-$efff80:    0050 0170 0020 0100 0000 00?? 0000 GFXE
+$efff80:    0050 0170 0020 0100 0000 POSI 0000 GFXE		POSI: scanline for POSIRQ
 $efff90:    0000 0001 0002 0003 FLIP ---- ---- ----
-$efffa0:    PRI  PRI  PRI  PRI  ---- PRI? POSI ----     priority (0..7) + scanline interrupt?
+$efffa0:    PRI  PRI  PRI  PRI  ---- PRI? --?? ----     priority (0..7)
 $efffb0:    CLR  CLR  CLR  CLR  0001 CLR? BPP  ----     color (0..f), bpp flag per layer
 $efffc0:    RZXX RZXY RZYX RZYY RZX0 RZY0 ???? ----     ROZ
 */
