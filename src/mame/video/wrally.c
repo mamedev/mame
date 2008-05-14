@@ -71,7 +71,7 @@ VIDEO_START( wrally )
 	wrally_pant[0] = tilemap_create(get_tile_info_wrally_screen0,tilemap_scan_rows,16,16,64,32);
 	wrally_pant[1] = tilemap_create(get_tile_info_wrally_screen1,tilemap_scan_rows,16,16,64,32);
 
-	tilemap_set_transparent_pen(wrally_pant[0],0);
+	tilemap_set_transmask(wrally_pant[0],0,0xff01,0x00ff); /* this layer is split in two (pens 1..7, pens 8-15) */
 	tilemap_set_transparent_pen(wrally_pant[1],0);
 }
 
@@ -194,12 +194,15 @@ VIDEO_UPDATE( wrally )
 
 	/* draw tilemaps + sprites */
 	tilemap_draw(bitmap,cliprect,wrally_pant[1],TILEMAP_DRAW_OPAQUE,0);
-	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(0),0);
-
-	draw_sprites(screen->machine,bitmap,cliprect,0);
+	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
+	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
 	
 	tilemap_draw(bitmap,cliprect,wrally_pant[1],TILEMAP_DRAW_CATEGORY(1),0);
-	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(1),0);
+	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
+
+	draw_sprites(screen->machine,bitmap,cliprect,0);
+
+	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
 	
 	draw_sprites(screen->machine,bitmap,cliprect,1);
 	
