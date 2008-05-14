@@ -7810,9 +7810,10 @@ Other Sun games
 	DRIVER( couplei )	/* (c) 1988 Merit */
 	DRIVER( pitboss2 )	/* (c) 1988 Merit */
 	DRIVER( spitboss )	/* (c) 1988 Merit */
-	DRIVER( pitbosss )  /* (c) 1990 Merit */
+	DRIVER( pitbosss )	/* (c) 1990 Merit */
 	DRIVER( pitbossm )	/* (c) 1994 Merit */
-	DRIVER( megat3 )	/* (c) 1995 Merit */
+	DRIVER( megat3 )	/* (c) 1996 Merit */
+	DRIVER( megat3a )	/* (c) 1995 Merit */
 	DRIVER( megat3te )	/* (c) 1996 Merit */
 	DRIVER( megat4 )	/* (c) 1996 Merit */
 	DRIVER( megat4a )	/* (c) 1996 Merit */
