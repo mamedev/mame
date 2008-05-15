@@ -828,13 +828,9 @@ transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 	{
 		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0xffff );
 	}
-	else if( dest>=0xff0000 && dest<0xff8000 )
+	else if( dest>=0xff0000 && dest<0xffc000 )
 	{
 		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0xffff );
-	}
-	else if( dest>=0xff8000 && dest<0xffc000 )
-	{
-		namcona1_rozvideoram_w( machine, (dest-0xff8000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
@@ -1049,8 +1045,7 @@ static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xff7fff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xffbfff) AM_READWRITE(namcona1_rozvideoram_r, namcona1_rozvideoram_w) AM_BASE(&namcona1_rozvideoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE(&spriteram16)			/* spriteram */
@@ -1309,7 +1304,7 @@ static MACHINE_DRIVER_START( namcona1 )
 	MDRV_SCREEN_SIZE(38*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(namcona1)
 	MDRV_VIDEO_UPDATE(namcona1)
@@ -1345,8 +1340,7 @@ static ADDRESS_MAP_START( namcona2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READ(namcona1_vreg_r)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READ(namcona1_paletteram_r)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(namcona1_gfxram_r)
-	AM_RANGE(0xff0000, 0xff7fff) AM_READ(namcona1_videoram_r)
-	AM_RANGE(0xff8000, 0xffbfff) AM_READ(namcona1_rozvideoram_r )
+	AM_RANGE(0xff0000, 0xffbfff) AM_READ(namcona1_videoram_r)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READ(SMH_RAM) /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_READ(SMH_RAM) /* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_READ(SMH_RAM) /* spriteram */
@@ -1366,8 +1360,7 @@ static ADDRESS_MAP_START( namcona2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_WRITE(namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_WRITE(namcona1_paletteram_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_WRITE(namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xff7fff) AM_WRITE(namcona1_videoram_w) AM_BASE(&videoram16)
-	AM_RANGE(0xff8000, 0xffbfff) AM_WRITE(namcona1_rozvideoram_w) AM_BASE(&namcona1_rozvideoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_WRITE(namcona1_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xffd000, 0xffdfff) AM_WRITE(SMH_RAM) /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_WRITE(SMH_RAM) AM_BASE(&namcona1_scroll)
 	AM_RANGE(0xfff000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
@@ -1398,7 +1391,7 @@ static MACHINE_DRIVER_START( namcona2 )
 	MDRV_SCREEN_SIZE(38*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
+	MDRV_PALETTE_LENGTH(0x2000)
 
 	MDRV_VIDEO_START(namcona1)
 	MDRV_VIDEO_UPDATE(namcona1)
