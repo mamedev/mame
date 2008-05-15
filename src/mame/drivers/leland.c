@@ -1881,13 +1881,13 @@ static void dasm_chunk(char *tag, UINT8 *base, UINT16 pc, UINT32 length, FILE *o
 {
 	extern unsigned DasmZ80(char *buffer, unsigned _pc);
 
-	UINT8 *old_rom = opcode_base;
-	UINT8 *old_ram = opcode_arg_base;
+	UINT8 *old_rom = opbase->rom;
+	UINT8 *old_ram = opbase->ram;
 	char buffer[256];
 	int count, offset, i;
 
 	fprintf(output, "\n\n\n%s:\n", tag);
-	opcode_base = opcode_arg_base = &base[-pc];
+	opbase->rom = opbase->ram = &base[-pc];
 	for (offset = 0; offset < length; offset += count)
 	{
 		count = DasmZ80(buffer, pc);
@@ -1904,8 +1904,8 @@ static void dasm_chunk(char *tag, UINT8 *base, UINT16 pc, UINT32 length, FILE *o
 				fprintf(output, "   ");
 		fprintf(output, "%s\n", buffer);
 	}
-	opcode_base = old_rom;
-	opcode_arg_base = old_ram;
+	opbase->rom = old_rom;
+	opbase->ram = old_ram;
 }
 #endif
 

@@ -236,7 +236,7 @@ static OPBASE_HANDLER( atarisy2_opbase_handler )
 	/* make sure slapstic area looks like ROM */
 	if (address >= 0x8000 && address < 0x8200)
 	{
-		opcode_base = opcode_arg_base = (UINT8 *)atarisy2_slapstic - 0x8000;
+		opbase->rom = opbase->ram = (UINT8 *)atarisy2_slapstic - 0x8000;
 		return ~0;
 	}
 	return address;

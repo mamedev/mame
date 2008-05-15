@@ -147,7 +147,7 @@ static OPBASE_HANDLER( sloop_opbase_handler )
 {
 	if  (address < 0x80000)
 	{
-		opcode_base = opcode_arg_base = (void *)sloop_base;
+		opbase->rom = opbase->ram = (void *)sloop_base;
 		return (offs_t)-1;
 	}
 	return address;

@@ -113,8 +113,8 @@ struct _debug_view_disasm
 	UINT8			right_column;				/* right column? */
 	UINT32			backwards_steps;			/* number of backwards steps */
 	UINT32			dasm_width;					/* width of the disassembly area */
-	UINT8 *			last_opcode_base;			/* last opcode base */
-	UINT8 *			last_opcode_arg_base;		/* last opcode arg base */
+	UINT8 *			last_opbase_rom;			/* last opbase.rom */
+	UINT8 *			last_opbase_ram;			/* last opbase.ram */
 	UINT32			last_change_count;			/* last comment change count */
 	offs_t			last_pcbyte;				/* last PC byte value */
 	UINT32			active_address;				/* the address cursor_row is pointing to */
@@ -1461,6 +1461,7 @@ static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const debug_cpu_i
 
 static int disasm_recompute(debug_view *view, offs_t pc, int startline, int lines, int original_cpunum)
 {
+	extern opbase_data opbase;
 	debug_view_disasm *dasmdata = view->extra_data;
 	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
 	int chunksize, minbytes, maxbytes, maxbytes_clamped;
@@ -1596,8 +1597,8 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 		memory_set_opbase(activecpu_get_physical_pc_byte());
 
 	/* update opcode base information */
-	dasmdata->last_opcode_base = opcode_base;
-	dasmdata->last_opcode_arg_base = opcode_arg_base;
+	dasmdata->last_opbase_rom = opbase.rom;
+	dasmdata->last_opbase_ram = opbase.ram;
 	dasmdata->last_change_count = debug_comment_all_change_count();
 
 	/* now longer need to recompute */
@@ -1613,6 +1614,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 static void disasm_update(debug_view *view)
 {
+	extern opbase_data opbase;
 	debug_view_disasm *dasmdata = view->extra_data;
 	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
 	offs_t pc = cpunum_get_reg(dasmdata->cpunum, REG_PC);
@@ -1676,7 +1678,7 @@ static void disasm_update(debug_view *view)
 	}
 
 	/* if the opcode base has changed, rework things */
-	if (opcode_base != dasmdata->last_opcode_base || opcode_arg_base != dasmdata->last_opcode_arg_base)
+	if (opbase.rom != dasmdata->last_opbase_rom || opbase.ram != dasmdata->last_opbase_ram)
 		dasmdata->recompute = TRUE;
 
 	/* if the comments have changed, redo it */

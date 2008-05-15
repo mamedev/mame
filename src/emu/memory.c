@@ -218,7 +218,7 @@ struct _memory_block
 	UINT8					spacenum;				/* which address space are we associated with? */
 	UINT8					isallocated;			/* did we allocate this ourselves? */
 	offs_t 					bytestart, byteend;		/* byte-normalized start/end for verifying a match */
-    UINT8 *					data;					/* pointer to the data for this block */
+	UINT8 *					data;					/* pointer to the data for this block */
 };
 
 typedef struct _bank_data bank_info;
@@ -293,14 +293,8 @@ struct _cpu_data
 	UINT8 *					region;					/* pointer to memory region */
 	size_t					regionsize;				/* size of region, in bytes */
 
-	opbase_handler_func 	opbase;					/* opcode base handler */
-
-	void *					op_ram;					/* dynamic RAM base pointer */
-	void *					op_rom;					/* dynamic ROM base pointer */
-	offs_t					op_mask;				/* dynamic ROM address mask */
-	offs_t					op_mem_min;				/* dynamic ROM/RAM min */
-	offs_t					op_mem_max;				/* dynamic ROM/RAM max */
-	UINT8		 			opcode_entry;			/* opcode base handler */
+	opbase_handler_func 	opbase_handler;			/* opcode base handler */
+	opbase_data				opbase;					/* dynamic opcode data */
 
 	UINT8					spacemask;				/* mask of which address spaces are used */
 	addrspace_data		 	space[ADDRESS_SPACES];	/* info about each address space */
@@ -312,12 +306,7 @@ struct _cpu_data
     GLOBAL VARIABLES
 ***************************************************************************/
 
-UINT8 *						opcode_base;					/* opcode base */
-UINT8 *						opcode_arg_base;				/* opcode argument base */
-offs_t						opcode_mask;					/* mask to apply to the opcode address */
-offs_t						opcode_memory_min;				/* opcode memory minimum */
-offs_t						opcode_memory_max;				/* opcode memory maximum */
-UINT8		 				opcode_entry;					/* opcode readmem entry */
+opbase_data					opbase;							/* opcode data */
 
 address_space				active_address_space[ADDRESS_SPACES];/* address space data */
 
@@ -329,7 +318,7 @@ static memory_block *		memory_block_list;				/* head of the list of memory block
 
 static int					cur_context;					/* current CPU context */
 
-static opbase_handler_func	opbasefunc;						/* opcode base override */
+static opbase_handler_func	opbase_handler;					/* opcode base override */
 
 static UINT8				debugger_access;				/* treat accesses as coming from the debugger */
 static UINT8				log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
@@ -439,7 +428,7 @@ static void mem_dump(void);
 
 INLINE void force_opbase_update(void)
 {
-	opcode_entry = 0xff;
+	opbase.entry = 0xff;
 	memory_set_opbase(activecpu_get_physical_pc_byte());
 }
 
@@ -552,21 +541,11 @@ void memory_set_context(int activecpu)
 	/* remember dynamic RAM/ROM */
 	if (cur_context != -1)
 	{
-		cpudata[cur_context].op_ram = opcode_arg_base;
-		cpudata[cur_context].op_rom = opcode_base;
-		cpudata[cur_context].op_mask = opcode_mask;
-		cpudata[cur_context].op_mem_min = opcode_memory_min;
-		cpudata[cur_context].op_mem_max = opcode_memory_max;
-		cpudata[cur_context].opcode_entry = opcode_entry;
+		cpudata[cur_context].opbase = opbase;
 	}
 	cur_context = activecpu;
 
-	opcode_arg_base = cpudata[activecpu].op_ram;
-	opcode_base = cpudata[activecpu].op_rom;
-	opcode_mask = cpudata[activecpu].op_mask;
-	opcode_memory_min = cpudata[activecpu].op_mem_min;
-	opcode_memory_max = cpudata[activecpu].op_mem_max;
-	opcode_entry = cpudata[activecpu].opcode_entry;
+	opbase = cpudata[activecpu].opbase;
 
 	/* program address space */
 	active_address_space[ADDRESS_SPACE_PROGRAM].bytemask = cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM].bytemask;
@@ -598,7 +577,7 @@ void memory_set_context(int activecpu)
 		active_address_space[ADDRESS_SPACE_IO].accessors = cpudata[activecpu].space[ADDRESS_SPACE_IO].accessors;
 	}
 
-	opbasefunc = cpudata[activecpu].opbase;
+	opbase_handler = cpudata[activecpu].opbase_handler;
 
 #ifdef ENABLE_DEBUGGER
 	if (activecpu != -1 && Machine->debug_mode)
@@ -890,7 +869,7 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
 				found = TRUE;
 
 				/* if we are executing from here, force an opcode base update */
-				if (cpu_getactivecpu() >= 0 && cpunum == cur_context && opcode_entry == banknum)
+				if (cpu_getactivecpu() >= 0 && cpunum == cur_context && opbase.entry == banknum)
 					force_opbase_update();
 			}
 
@@ -914,10 +893,10 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
 
 opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func function)
 {
-	opbase_handler_func old = cpudata[cpunum].opbase;
-	cpudata[cpunum].opbase = function;
+	opbase_handler_func old = cpudata[cpunum].opbase_handler;
+	cpudata[cpunum].opbase_handler = function;
 	if (cpunum == cpu_getactivecpu())
-		opbasefunc = function;
+		opbase_handler = function;
 	return old;
 }
 
@@ -935,9 +914,9 @@ void memory_set_opbase(offs_t byteaddress)
 	UINT8 entry;
 
 	/* allow overrides */
-	if (opbasefunc != NULL)
+	if (opbase_handler != NULL)
 	{
-		byteaddress = (*opbasefunc)(Machine, byteaddress);
+		byteaddress = (*opbase_handler)(Machine, byteaddress, &opbase);
 		if (byteaddress == ~0)
 			return;
 	}
@@ -949,7 +928,7 @@ void memory_set_opbase(offs_t byteaddress)
 		entry = space->readlookup[LEVEL2_INDEX(entry,byteaddress)];
 
 	/* keep track of current entry */
-	opcode_entry = entry;
+	opbase.entry = entry;
 
 	/* if we don't map to a bank, see if there are any banks we can map to */
 	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
@@ -980,11 +959,11 @@ void memory_set_opbase(offs_t byteaddress)
 
 	/* compute the adjusted base */
 	handlers = &active_address_space[ADDRESS_SPACE_PROGRAM].readhandlers[entry];
-	opcode_mask = handlers->bytemask;
-	opcode_arg_base = base - (handlers->bytestart & opcode_mask);
-	opcode_base = based - (handlers->bytestart & opcode_mask);
-	opcode_memory_min = handlers->bytestart;
-	opcode_memory_max = handlers->byteend;
+	opbase.mask = handlers->bytemask;
+	opbase.ram = base - (handlers->bytestart & opbase.mask);
+	opbase.rom = based - (handlers->bytestart & opbase.mask);
+	opbase.mem_min = handlers->bytestart;
+	opbase.mem_max = handlers->byteend;
 }
 
 
@@ -1059,34 +1038,24 @@ void *memory_get_op_ptr(int cpunum, offs_t byteaddress, int arg)
 	UINT8 entry;
 
 	/* if there is a custom mapper, use that */
-	if (cpudata[cpunum].opbase != NULL)
+	if (cpudata[cpunum].opbase_handler != NULL)
 	{
 		/* need to save opcode info */
-		UINT8 *saved_opcode_base = opcode_base;
-		UINT8 *saved_opcode_arg_base = opcode_arg_base;
-		offs_t saved_opcode_mask = opcode_mask;
-		offs_t saved_opcode_memory_min = opcode_memory_min;
-		offs_t saved_opcode_memory_max = opcode_memory_max;
-		UINT8 saved_opcode_entry = opcode_entry;
+		opbase_data saved_opbase = opbase;
 
 		/* query the handler */
-		offs_t new_byteaddress = (*cpudata[cpunum].opbase)(Machine, byteaddress);
+		offs_t new_byteaddress = (*cpudata[cpunum].opbase_handler)(Machine, byteaddress, &opbase);
 
 		/* if it returns ~0, we use whatever data the handler set */
 		if (new_byteaddress == ~0)
-			ptr = arg ? &opcode_arg_base[byteaddress] : &opcode_base[byteaddress];
+			ptr = arg ? &opbase.ram[byteaddress] : &opbase.rom[byteaddress];
 
 		/* otherwise, we use the new offset in the generic case below */
 		else
 			byteaddress = new_byteaddress;
 
 		/* restore opcode info */
-		opcode_base = saved_opcode_base;
-		opcode_arg_base = saved_opcode_arg_base;
-		opcode_mask = saved_opcode_mask;
-		opcode_memory_min = saved_opcode_memory_min;
-		opcode_memory_max = saved_opcode_memory_max;
-		opcode_entry = saved_opcode_entry;
+		opbase = saved_opbase;
 
 		/* if we got our pointer, we're done */
 		if (ptr != NULL)
@@ -1183,7 +1152,7 @@ void memory_set_bank(int banknum, int entrynum)
 	bankd_ptr[banknum] = bankdata[banknum].entryd[entrynum];
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (opcode_entry == banknum && cpu_getactivecpu() >= 0)
+	if (opbase.entry == banknum && cpu_getactivecpu() >= 0)
 		force_opbase_update();
 }
 
@@ -1226,7 +1195,7 @@ void memory_set_bankptr(int banknum, void *base)
 	bank_ptr[banknum] = base;
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (opcode_entry == banknum && cpu_getactivecpu() >= 0)
+	if (opbase.entry == banknum && cpu_getactivecpu() >= 0)
 		force_opbase_update();
 }
 
@@ -1459,12 +1428,12 @@ static void memory_init_cpudata(const machine_config *config)
 		}
 
 		/* set the RAM/ROM base */
-		cpu->op_ram = cpu->op_rom = memory_region(REGION_CPU1 + cpunum);
-		cpu->op_mask = cpu->space[ADDRESS_SPACE_PROGRAM].bytemask;
-		cpu->op_mem_min = 0;
-		cpu->op_mem_max = memory_region_length(REGION_CPU1 + cpunum);
-		cpu->opcode_entry = STATIC_UNMAP;
-		cpu->opbase = NULL;
+		cpu->opbase.ram = cpu->opbase.rom = memory_region(REGION_CPU1 + cpunum);
+		cpu->opbase.mask = cpu->space[ADDRESS_SPACE_PROGRAM].bytemask;
+		cpu->opbase.mem_min = 0;
+		cpu->opbase.mem_max = memory_region_length(REGION_CPU1 + cpunum);
+		cpu->opbase.entry = STATIC_UNMAP;
+		cpu->opbase_handler = NULL;
 	}
 }
 

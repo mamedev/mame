@@ -1072,7 +1072,7 @@ index=00000004  pagesize=01000000  vaddr=00000000C9000000  paddr=000000006900000
 
 static OPBASE_HANDLER( KL5C80_opbase_handler )
 {
-	opcode_base = opcode_arg_base = hng64_com_op_base;
+	opbase->rom = opbase->ram = hng64_com_op_base;
 	return ~0;
 }
 

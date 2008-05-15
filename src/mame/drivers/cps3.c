@@ -1355,31 +1355,31 @@ static OPBASE_HANDLER( cps3_opbase_handler )
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		opcode_base = opcode_arg_base = memory_region(REGION_USER1);
+		opbase->rom = opbase->ram = memory_region(REGION_USER1);
 		return ~0;
 	}
 	/* RAM */
 	else if (address >= 0x06000000 && address <= 0x06ffffff)
 	{
-		opcode_base = (UINT8*)decrypted_gamerom-0x06000000;
-		opcode_arg_base = (UINT8*)decrypted_gamerom-0x06000000;
+		opbase->rom = (UINT8*)decrypted_gamerom-0x06000000;
+		opbase->ram = (UINT8*)decrypted_gamerom-0x06000000;
 
-		if (cps3_isSpecial) opcode_arg_base = (UINT8*) memory_region(REGION_USER4)-0x06000000;
+		if (cps3_isSpecial) opbase->ram = (UINT8*) memory_region(REGION_USER4)-0x06000000;
 
 
 		return ~0;
 	}
 	else if (address >= 0xc0000000 && address <= 0xc00003ff)
 	{
-//      opcode_base = (void*)cps3_0xc0000000_ram_decrypted;
-		opcode_base = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
-		opcode_arg_base = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
+		//opbase->rom = (void*)cps3_0xc0000000_ram_decrypted;
+		opbase->rom = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
+		opbase->ram = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
 		return ~0;
 	}
 
 	/* anything else falls through to NOPs */
-	opcode_base = (UINT8*)cps3_nops-address;
-	opcode_arg_base = (UINT8*)cps3_nops-address;
+	opbase->rom = (UINT8*)cps3_nops-address;
+	opbase->ram = (UINT8*)cps3_nops-address;
 	return ~0;
 }
 
@@ -1704,17 +1704,8 @@ static void cps3_flashmain_w(int base, UINT32 offset, UINT32 data, UINT32 mem_ma
 		romdata[offset] = newdata;
 		romdata2[offset] = newdata^cps3_mask(0x6000000+real_offset, cps3_key1, cps3_key2);
 	}
-
-
-
-/*
-        opcode_base = (UINT8*)decrypted_gamerom-0x06000000;
-        opcode_arg_base = (UINT8*)decrypted_gamerom-0x06000000;
-
-        if (cps3_isSpecial) opcode_arg_base = (UINT8*) memory_region(REGION_USER4)-0x06000000;
-*/
-
 }
+
 static WRITE32_HANDLER( cps3_flash1_w )
 {
 	cps3_flashmain_w(0, offset,data,mem_mask);

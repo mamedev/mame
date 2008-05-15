@@ -365,14 +365,14 @@ static OPBASE_HANDLER( missile_opbase_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		opcode_base = opcode_arg_base = videoram - offset;
+		opbase->rom = opbase->ram = videoram - offset;
 		return ~0;
 	}
 
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		opcode_base = opcode_arg_base = memory_region(REGION_CPU1) - offset;
+		opbase->rom = opbase->ram = memory_region(REGION_CPU1) - offset;
 		return ~0;
 	}
 
@@ -389,7 +389,6 @@ static MACHINE_START( missile )
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
 	memory_set_opbase_handler(0, missile_opbase_handler);
-	opcode_base = opcode_arg_base = videoram;
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(adjust_cpu_speed, NULL);

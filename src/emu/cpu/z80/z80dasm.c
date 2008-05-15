@@ -455,7 +455,7 @@ unsigned z80_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 		if( op1 == 0xcb )
 		{
 			offset = (INT8) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opcode_arg_base! */
+			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];
@@ -466,7 +466,7 @@ unsigned z80_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 		if( op1 == 0xcb )
 		{
 			offset = (INT8) opram[pos++];
-			op1 = opram[pos++]; /* fourth byte from opcode_arg_base! */
+			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
 		else d = &mnemonic_xx[op1];

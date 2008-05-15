@@ -344,13 +344,13 @@ static void snes_init_ram(running_machine *machine)
 /* should we treat this as nvram in MAME? */
 static OPBASE_HANDLER(spc_opbase)
 {
-		opcode_base = opcode_arg_base = spc_ram;
+	opbase->rom = opbase->ram = spc_ram;
 	return ~0;
 }
 
 static OPBASE_HANDLER(snes_opbase)
 {
-	opcode_base = opcode_arg_base = snes_ram;
+	opbase->rom = opbase->ram = snes_ram;
 	return ~0;
 }
 
