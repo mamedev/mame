@@ -703,7 +703,7 @@ core_file *mame_core_file(mame_file *file)
 
 
 /*-------------------------------------------------
-    mame_file_full_name - return the full filename 
+    mame_file_full_name - return the full filename
     for a given mame_file
 -------------------------------------------------*/
 

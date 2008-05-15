@@ -10,7 +10,7 @@
      Chirp/excitation table fixes by Lord Nightmare
      Various fixes by Lord Nightmare
      Modularization by Lord Nightmare
-     
+
      Much information regarding these lpc encoding comes from US patent 4,209,844
      US patent 4,331,836 describes the complete 51xx chip
      US patent 4,335,277 describes the complete 52xx chip

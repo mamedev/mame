@@ -1,43 +1,43 @@
 /*****************************************************************************
  *   DS5002FP emulator by Manuel Abadia
- *   
+ *
  *   The emulator is just a modified version of the MCS-51 Family Emulator by Steve Ellenoff
- *    
+ *
  *   What has been added?
- *   	- Extra SFRs
- *   	- Bytewide Bus Support
- *   	- Memory Partition and Memory Range
- *   	- Bootstrap Configuration
- *   	- Power Fail Interrupt
- *   	- Timed Access
- *   	- Stop Mode
- *   	- Idle Mode
- *   	
+ *      - Extra SFRs
+ *      - Bytewide Bus Support
+ *      - Memory Partition and Memory Range
+ *      - Bootstrap Configuration
+ *      - Power Fail Interrupt
+ *      - Timed Access
+ *      - Stop Mode
+ *      - Idle Mode
+ *
  *   What is not implemented?
- *   	- Peripherals and Reprogrammable Peripheral Controller
- *   	- CRC-16   
- *   	- Watchdog timer   
- *   
+ *      - Peripherals and Reprogrammable Peripheral Controller
+ *      - CRC-16
+ *      - Watchdog timer
+ *
  *   The main features of the DS5002FP are:
- *   	- 100% code-compatible with 8051 
- *   	- Directly addresses 64kB program/64kB data memory 
- *   	- Nonvolatile memory control circuitry 
- *   	- 10-year data retention in the absence of power 
- *   	- In-system reprogramming via serial port 
- *   	- Dedicated memory bus, preserving four 8-bit ports for general purpose I/O 
- *   	- Power-fail reset 
- *   	- Early warning power-fail interrupt 
- *   	- Watchdog timer
- *   	- Accesses up to 128kB on the bytewide bus 
- *   	- Decodes memory for 32kB x 8 or 128kB x 8 SRAMs 
- *   	- Four additional decoded peripheral-chip enables 
- *   	- CRC hardware for checking memory validity 
- *   	- Optionally emulates an 8042-style slave interface 
- *   	- Memory encryption using an 80-bit encryption key 
- *   	- Automatic random generation of encryption keys 
- *   	- Self-destruct input for tamper protection 
- *   	- Optional top-coating prevents microprobe 
- *   
+ *      - 100% code-compatible with 8051
+ *      - Directly addresses 64kB program/64kB data memory
+ *      - Nonvolatile memory control circuitry
+ *      - 10-year data retention in the absence of power
+ *      - In-system reprogramming via serial port
+ *      - Dedicated memory bus, preserving four 8-bit ports for general purpose I/O
+ *      - Power-fail reset
+ *      - Early warning power-fail interrupt
+ *      - Watchdog timer
+ *      - Accesses up to 128kB on the bytewide bus
+ *      - Decodes memory for 32kB x 8 or 128kB x 8 SRAMs
+ *      - Four additional decoded peripheral-chip enables
+ *      - CRC hardware for checking memory validity
+ *      - Optionally emulates an 8042-style slave interface
+ *      - Memory encryption using an 80-bit encryption key
+ *      - Automatic random generation of encryption keys
+ *      - Self-destruct input for tamper protection
+ *      - Optional top-coating prevents microprobe
+ *
  *****************************************************************************/
 
 /*****************************************************************************
@@ -411,7 +411,7 @@ static READ32_HANDLER((*hold_ebram_iaddr_callback));
 #define GET_DMA			((R_RPCTL & 0x04)>>2)
 #define GET_RPCON		((R_RPCTL & 0x02)>>1)
 #define GET_RG0			((R_RPCTL & 0x01)>>0)
- 
+
 /*Add and Subtract Flag settings*/
 #define DO_ADD_FLAGS(a,d,c)	do_add_flags(a,d,c);
 #define DO_SUB_FLAGS(a,d,c)	do_sub_flags(a,d,c);
@@ -505,9 +505,9 @@ static const ds5002fp_config default_config =
 
 /* Memory Range (RG1 and RG0 @ MCON and RPCTL registers) */
 static const UINT16 ds5002fp_ranges[4] = {
-	0x1fff, 
-	0x3fff, 
-	0x7fff, 
+	0x1fff,
+	0x3fff,
+	0x7fff,
 	0xffff
 };
 
@@ -537,7 +537,7 @@ static const UINT32 ds5002fp_partitions[16] = {
 void ds5002fp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
 	const ds5002fp_config *config = _config ? _config : &default_config;
-	
+
 	ds5002fp.config = config;
 	ds5002fp_set_irq_callback(irqcallback);
 
@@ -595,7 +595,7 @@ void ds5002fp_reset(void)
 {
 	int (*save_irqcallback)(int);
 	const ds5002fp_config *save_config;
-	
+
 	save_irqcallback = ds5002fp.irq_callback;
 	save_config = ds5002fp.config;
 	memset(&ds5002fp, 0, sizeof(DS5002FP));
@@ -657,7 +657,7 @@ void ds5002fp_reset(void)
 
 	/* Flag as NO IRQ in Progress */
 	CLEAR_CURRENT_IRQ
-	
+
 	// set internal CPU state
 	ds5002fp.last_power_int = CLEAR_LINE;
 	ds5002fp.previous_ta = 0;
@@ -678,30 +678,30 @@ int ds5002fp_execute(int cycles)
 	if (R_PCON & 0x02) {
 		return cycles;
 	}
-	
+
 	ds5002fp_icount = cycles;
-	
+
 	//In idle mode, update timers and serial port (not sure if we need to do more things here)
 	if (R_PCON & 0x01) {
 		do {
 			//Update Timer (if any timers are running)
 			if((GET_TR0 && GET_ET0) || (GET_TR1 && GET_ET1))
 				update_timer(12);
-	
+
 			//Update Serial (if serial port sending data)
 			if(uart.sending)
 				update_serial(12);
-				
+
 			ds5002fp_icount -= 12;
 		} while( ds5002fp_icount > 0 );
-		
-		return cycles - ds5002fp_icount;
-	}	
 
-	do {	
+		return cycles - ds5002fp_icount;
+	}
+
+	do {
 		//Read next opcode
 		UINT8 op = cpu_readop(PC);
-		
+
 		//Store previous PC
 		PPC = PC;
 
@@ -1391,7 +1391,7 @@ int ds5002fp_execute(int cycles)
 			default:
 				illegal();
 		}
-		
+
 		//If the chip entered in stop mode, end execution
 		if (R_PCON & 0x02) {
 			return cycles;
@@ -1399,7 +1399,7 @@ int ds5002fp_execute(int cycles)
 
 		//Store # of used cycles for this opcode (for timer & serial check at top of code)
 		ds5002fp.prev_used_cycles = ds5002fp_cycles[op];
-		
+
 		// decrement the timed access window
 		if (ds5002fp.ta_window > 0) {
 			ds5002fp.ta_window -= ds5002fp_cycles[op];
@@ -1410,7 +1410,7 @@ int ds5002fp_execute(int cycles)
 
 		//Check for pending interrupts & handle - remove cycles used
 		ds5002fp_icount-=check_interrupts();
-		
+
 		//If the chip entered in idle mode, end the loop
 		if (R_PCON & 0x01) {
 			return cycles - ds5002fp_icount;
@@ -1460,7 +1460,7 @@ unsigned ds5002fp_get_reg(int regnum)
 	case DS5002FP_DPH:	return R_DPH;
 	case DS5002FP_DPL:	return R_DPL;
 	case DS5002FP_IE:	return R_IE;
-	
+
 	case DS5002FP_PCON:	return R_PCON;
 	case DS5002FP_MCON:	return R_MCON;
 	case DS5002FP_RPCTL:return R_RPCTL;
@@ -1582,8 +1582,8 @@ void ds5002fp_set_irq_line(int irqline, int state)
 			}
 			break;
 			//Note: we won't call check interrupts, we'll let the main loop catch it
-		
-		//Power Fail Interrupt	
+
+		//Power Fail Interrupt
 		case DS5002FP_PFI_LINE:
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
@@ -1629,7 +1629,7 @@ INLINE UINT8 check_interrupts(void)
 
 	//Check which interrupt(s) requests have occurred..
 	//NOTE: The order of checking is based on the internal/default priority levels when levels are the same
-	
+
 	// Power Fail Interrupt
 	if(GET_PFW) {
 		if (ds5002fp.last_power_int == CLEAR_LINE) {
@@ -1780,12 +1780,12 @@ static WRITE8_HANDLER(sfr_write)
 		case DPH:		R_DPH = data; break;
 		case PCON:
 			reg_mask1 = 0xb9;
-			
+
 			is_timed_access = (ds5002fp.ta_window > 0) && (R_TA == 0x55);
 			if (is_timed_access) {
 				reg_mask1 = 0xff;
 			}
-			R_PCON = (R_PCON & (~reg_mask1)) | (data & reg_mask1); 
+			R_PCON = (R_PCON & (~reg_mask1)) | (data & reg_mask1);
 			break;
 		case TCON:		R_TCON = data; break;
 		case TMOD:		R_TMOD = data; break;
@@ -1822,29 +1822,29 @@ static WRITE8_HANDLER(sfr_write)
 			OUT(3,data);
 			break;
 
-		case IP:		
+		case IP:
 			reg_mask1 = 0x7f;
-			
+
 			is_timed_access = (ds5002fp.ta_window > 0) && (R_TA == 0x55);
 			if (is_timed_access) {
 				reg_mask1 = 0xff;
 			}
-			R_IP = (R_IP & (~reg_mask1)) | (data & reg_mask1); 
+			R_IP = (R_IP & (~reg_mask1)) | (data & reg_mask1);
 			break;
-		
+
 		case CRCR:		reg_mask2 = 0x0f;
 						R_CRC = (R_CRC & (~reg_mask2)) | (data & reg_mask2);
-						LOG(("ds5002fp #%d: write to CRC register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data)); 
+						LOG(("ds5002fp #%d: write to CRC register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
 		case CRCL:		R_CRCL = data;
-						LOG(("ds5002fp #%d: write to CRCL register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data)); 
+						LOG(("ds5002fp #%d: write to CRCL register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
-		case CRCH:		R_CRCH = data; 
+		case CRCH:		R_CRCH = data;
 						LOG(("ds5002fp #%d: write to CRCH register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
 		case MCON:		reg_mask1 = 0x0f;
 						reg_mask2 = 0xf7;
-						
+
 						is_timed_access = (ds5002fp.ta_window > 0) && (R_TA == 0x55);
 						if (is_timed_access) {
 							reg_mask1 = 0xff;
@@ -1853,9 +1853,9 @@ static WRITE8_HANDLER(sfr_write)
 						R_MCON = (R_MCON & (~reg_mask2)) | (data & reg_mask2);
 						LOG(("ds5002fp #%d: write to MCON register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
-		case TA:		ds5002fp.previous_ta = R_TA;		
+		case TA:		ds5002fp.previous_ta = R_TA;
 						R_TA = data;
-						
+
 						// init the time window after having wrote 0xaa
 						if ((data == 0xaa) && (ds5002fp.ta_window == 0)) {
 							ds5002fp.ta_window = 4*12 + 2*12;
@@ -1863,7 +1863,7 @@ static WRITE8_HANDLER(sfr_write)
 						}
 						//LOG(("ds5002fp #%d: write to TA register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
-		case RNR:		R_RNR = data; 
+		case RNR:		R_RNR = data;
 						LOG(("ds5002fp #%d: write to RNR register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
 
@@ -1871,19 +1871,19 @@ static WRITE8_HANDLER(sfr_write)
 			R_PSW = data;
 			SET_PARITY;
 			break;
-			
+
 		case RPCTL:		reg_mask1 = 0xef;
 						reg_mask2 = 0xfe;
-			
+
 						is_timed_access = (ds5002fp.ta_window > 0) && (R_TA == 0x55);
 						if (is_timed_access) {
 							reg_mask1 = 0xff;
 						}
 						data = (R_RPCTL & (~reg_mask1)) | (data & reg_mask1);
-						R_RPCTL = (R_RPCTL & (~reg_mask2)) | (data & reg_mask2); 
-						LOG(("ds5002fp #%d: write to RPCTL register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data)); 
+						R_RPCTL = (R_RPCTL & (~reg_mask2)) | (data & reg_mask2);
+						LOG(("ds5002fp #%d: write to RPCTL register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
-		case RPS:		R_RPS = data; 
+		case RPS:		R_RPS = data;
 						LOG(("ds5002fp #%d: write to RPS register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, data));
 						break;
 
@@ -1939,7 +1939,7 @@ static READ8_HANDLER(sfr_read)
 			else
 				return IN(3);					//Read from actual port
 		case IP:		return R_IP;
-	
+
 		case CRCR:		LOG(("ds5002fp #%d: read CRC register at 0x%04x\n", cpu_getactivecpu(), PC));
 						return R_CRC;
 		case CRCL:		LOG(("ds5002fp #%d: read CRCL register at 0x%04x\n", cpu_getactivecpu(), PC));
@@ -1952,14 +1952,14 @@ static READ8_HANDLER(sfr_read)
 						return R_TA;
 		case RNR:		LOG(("ds5002fp #%d: read RNR register at 0x%04x\n", cpu_getactivecpu(), PC));
 						return R_RNR;
-		
+
 		case PSW:		return R_PSW;
-		
+
 		case RPCTL:		LOG(("ds5002fp #%d: read RPCTL register at 0x%04x\n", cpu_getactivecpu(), PC));
 						return R_RPCTL;
 		case RPS:		LOG(("ds5002fp #%d: read RPS register at 0x%04x\n", cpu_getactivecpu(), PC));
 						return R_RPS;
-		
+
 		case ACC:		return R_ACC;
 		case B:			return R_B;
 
@@ -2015,18 +2015,18 @@ static WRITE8_HANDLER(internal_ram_iwrite)
 }
 
 /* Generate an expanded bus/bytewide bus ram address for read/writing */
-/* 
-	The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the 
-	partition mode,	the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
-	
-	In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
-	
-	0x00000-0x0ffff -> data memory on the expanded bus
-	0x10000-0x1ffff -> data memory on the byte-wide bus
-	
-	For non-partitioned mode the following memory map is assumed:
-	
-	0x0000-0xffff -> data memory (the bus used to access it does not matter)
+/*
+    The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
+    partition mode, the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
+
+    In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
+
+    0x00000-0x0ffff -> data memory on the expanded bus
+    0x10000-0x1ffff -> data memory on the byte-wide bus
+
+    For non-partitioned mode the following memory map is assumed:
+
+    0x0000-0xffff -> data memory (the bus used to access it does not matter)
 */
 static READ32_HANDLER(external_ram_iaddr)
 {

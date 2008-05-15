@@ -34,7 +34,7 @@ tilemap *wrally_pant[2];
       1  | -------- --x----- | priority
       1  | -------- -x------ | flip y
       1  | -------- x------- | flip x
-      1  | ---xxxxx -------- | data used to handle collisions, speed, etc 
+      1  | ---xxxxx -------- | data used to handle collisions, speed, etc
       1  | xxx----- -------- | not used?
 */
 
@@ -43,9 +43,9 @@ static TILE_GET_INFO( get_tile_info_wrally_screen0 )
 	int data = wrally_videoram[tile_index << 1];
 	int data2 = wrally_videoram[(tile_index << 1) + 1];
 	int code = data & 0x3fff;
-	
+
 	tileinfo->category = (data2 >> 5) & 0x01;
-	
+
 	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
 }
 
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_tile_info_wrally_screen1 )
 	int data = wrally_videoram[(0x2000/2) + (tile_index << 1)];
 	int data2 = wrally_videoram[(0x2000/2) + (tile_index << 1) + 1];
 	int code = data & 0x3fff;
-	
+
 	tileinfo->category = (data2 >> 5) & 0x01;
 
 	SET_TILE_INFO(0, code, data2 & 0x1f, TILE_FLIPYX((data2 >> 6) & 0x03));
@@ -100,9 +100,9 @@ VIDEO_START( wrally )
       3  | --xxxxxx xxxxxxxx | sprite code
       3  | xx------ -------- | not used?
 
-    For shadows/highlights, the tile color below the sprite will be set	using a 
-	palette (from the 8 available) based on the gfx pen of the sprite. Only pens 
-	in the range 0x8-0xf are used.
+    For shadows/highlights, the tile color below the sprite will be set using a
+    palette (from the 8 available) based on the gfx pen of the sprite. Only pens
+    in the range 0x8-0xf are used.
 */
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
@@ -122,13 +122,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int color_effect = (color & 0x10) >> 4;
 		int high_priority = number >= 0x3700;
 		color = color & 0x0f;
-		
+
 		if (high_priority != priority) continue;
-		
+
 		if (flip_screen_get()) {
 			sy = sy + 248;
 		}
-		
+
 		if (!color_effect) {
 			drawgfx(bitmap,gfx,number,
 					0x20 + color,xflip,yflip,
@@ -196,15 +196,15 @@ VIDEO_UPDATE( wrally )
 	tilemap_draw(bitmap,cliprect,wrally_pant[1],TILEMAP_DRAW_OPAQUE,0);
 	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER0,0);
 	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(0) | TILEMAP_DRAW_LAYER1,0);
-	
+
 	tilemap_draw(bitmap,cliprect,wrally_pant[1],TILEMAP_DRAW_CATEGORY(1),0);
 	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER0,0);
 
 	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,wrally_pant[0],TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_LAYER1,0);
-	
+
 	draw_sprites(screen->machine,bitmap,cliprect,1);
-	
+
 	return 0;
 }

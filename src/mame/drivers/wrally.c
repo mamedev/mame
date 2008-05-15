@@ -22,7 +22,7 @@ CPUs related:
 * 1xOSC24MHz @ B20
 * 2xM27C4001 @ C22 & C23 (M68000 program ROMs)
 * 1xPAL20L8 @ B23 (handles 1st level M68000 memory map)
-    0 -> DTACK	M68000 data ack
+    0 -> DTACK  M68000 data ack
     1 -> SELACT
     2 -> Input/sound (see below)
     3 -> ACTEXT
@@ -52,14 +52,14 @@ CPUs related:
     7 -> CKA/D?
 
 * 1x16AS @ B15
-	0 -> OE
-	1 -> XSRL	Shared RAM @ D14
-	2 -> XSRH	Shared RAM @ D15
-	3 -> SAD	Shared Access with DS5002FP
-	4 -> SRE	Shared Access with M68000
-	5 -> TRANS
-	6 -> XLD
-	7 -> XHI
+    0 -> OE
+    1 -> XSRL   Shared RAM @ D14
+    2 -> XSRH   Shared RAM @ D15
+    3 -> SAD    Shared Access with DS5002FP
+    4 -> SRE    Shared Access with M68000
+    5 -> TRANS
+    6 -> XLD
+    7 -> XHI
 
 Sound related:
 ==============
@@ -274,7 +274,7 @@ ROM_START( wrally )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "worldr17.c23", 0x000000, 0x080000, CRC(050f5629) SHA1(74fc2cd5114f3bc4b2429f1d8d7eeb1658f9f179) ) /* Only difference compared to set 2 is how the Dallas DS5002FP */
 	ROM_LOAD16_BYTE( "worldr16.c22", 0x000001, 0x080000, CRC(9e0d126c) SHA1(369360b7ec2c3497af3bf62b4eba24c3d9f94675) ) /* power failure shows on screen, IE: "Tension  baja " */
-	
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin", 0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
@@ -302,7 +302,7 @@ ROM_START( wrallya )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "c23.bin", 0x000000, 0x080000, CRC(8b7d93c3) SHA1(ce4163eebc5d4a0c1266d650523b1ffc702d1b87) ) /* Only difference compared to set 1 is how the Dallas DS5002FP */
 	ROM_LOAD16_BYTE( "c22.bin", 0x000001, 0x080000, CRC(56da43b6) SHA1(02db8f969ed5e7f5e5356c45c0312faf5f000335) ) /* power failure shows on screen, IE: "Power  Failure" */
-	
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin", 0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 
@@ -330,7 +330,7 @@ ROM_START( wrallyb ) /* Board Marked 930217, Atari License */
 	ROM_REGION( 0x100000, REGION_CPU1, 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(366595ad) SHA1(e16341ed9eacf9b729c28184268150ea9b62f185) ) /* North & South America only... */
 	ROM_LOAD16_BYTE( "rally.c22", 0x000001, 0x080000, CRC(0ad4ec6f) SHA1(991557cf25fe960b1c586e990e6019befe5a11d0) )
-	
+
 	ROM_REGION( 0x10000, REGION_CPU2, 0 )	/* DS5002FP code */
 	ROM_LOAD( "wrdallas.bin", 0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
 

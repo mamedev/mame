@@ -1290,7 +1290,7 @@ ROM_START( bm1stmix )
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "753jaa11", 0, MD5(d56ec7b9877d1f26d7fc1cabed404947) SHA1(71d200d1bd3f1f3a01f4daa78dc9abcca8b8a1fb) )	/* ver 1.00 JA */
 	// There is an alternate image
-	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) )	/* ver 1.00 JA */
+	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) ) /* ver 1.00 JA */
 ROM_END
 
 ROM_START( bm2ndmix )
@@ -1612,7 +1612,7 @@ ROM_START( bmfinal )
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
 	DISK_IMAGE( "c01jaa11", 0, NO_DUMP )
 	// this image has not been verified
-	//DISK_IMAGE( "c01jaa11", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )	/* ver 1.00 JA */
+	//DISK_IMAGE( "c01jaa11", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )    /* ver 1.00 JA */
 ROM_END
 
 #if 0

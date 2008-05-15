@@ -947,7 +947,7 @@ static void namcona1_blit( running_machine *machine )
 	(void)src2;
 	(void)src0;
 /*
-	logerror( "0x%08x: blt(%08x,%08x,numBytes=%04x);src=%04x %04x %04x; dst=%04x %04x %04x; gfx=%04x\n",
+    logerror( "0x%08x: blt(%08x,%08x,numBytes=%04x);src=%04x %04x %04x; dst=%04x %04x %04x; gfx=%04x\n",
         activecpu_get_pc(),
         dst_baseaddr,src_baseaddr,num_bytes,
         src0,src1,src2,

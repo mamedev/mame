@@ -164,7 +164,7 @@ static DEVICE_RESET( cdp1852 )
 
 	// reset data register
 	cdp1852->data = 0;
-	
+
 	if (cdp1852->intf->mode == CDP1852_MODE_INPUT)
 	{
 		// reset service request flip-flop
@@ -174,7 +174,7 @@ static DEVICE_RESET( cdp1852 )
 	{
 		// output data
 		cdp1852->intf->data_w(device, 0);
-	
+
 		// reset service request flip-flop
 		set_sr_line(device, 0);
 	}

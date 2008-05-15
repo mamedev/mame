@@ -140,7 +140,7 @@ void drccache_free(drccache *cache)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    drccache_contains_pointer - return true if a 
+    drccache_contains_pointer - return true if a
     pointer is within the cache
 -------------------------------------------------*/
 
@@ -151,7 +151,7 @@ int drccache_contains_pointer(drccache *cache, const void *ptr)
 
 
 /*-------------------------------------------------
-    drccache_contains_near_pointer - return true 
+    drccache_contains_near_pointer - return true
     if a pointer is within the cache
 -------------------------------------------------*/
 
@@ -248,7 +248,7 @@ void *drccache_memory_alloc(drccache *cache, size_t bytes)
 
 
 /*-------------------------------------------------
-    drccache_memory_alloc_near - allocate 
+    drccache_memory_alloc_near - allocate
     permanent memory from the near part of the
     cache
 -------------------------------------------------*/
@@ -294,13 +294,13 @@ void drccache_memory_free(drccache *cache, void *memory, size_t bytes)
 
 	assert(bytes < MAX_PERMANENT_ALLOC);
 	assert(((drccodeptr)memory >= cache->near && (drccodeptr)memory < cache->base) || ((drccodeptr)memory >= cache->end && (drccodeptr)memory < cache->near + cache->size));
-	
+
 	/* determine which free list to add to */
 	if ((drccodeptr)memory < cache->base)
 		linkptr = &cache->nearfree[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
 	else
 		linkptr = &cache->free[(bytes + CACHE_ALIGNMENT - 1) / CACHE_ALIGNMENT];
- 
+
 	/* link is into the free list for our size */
 	link->next = *linkptr;
 	*linkptr = link;

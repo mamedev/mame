@@ -25,7 +25,7 @@ DRCOBJ = \
 	$(CPUOBJ)/drcfe.o \
 	$(CPUOBJ)/drcuml.o \
 	$(CPUOBJ)/drcumld.o \
-	
+
 DRCDEPS = \
 	$(CPUSRC)/drcbeut.h \
 	$(CPUSRC)/drccache.h \

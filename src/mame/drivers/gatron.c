@@ -69,7 +69,7 @@
 
     CPU at u13 still covered in black plastic.
     U05               M5L8255AP-5
-    U11	   SCP RAM    TC5516APL  (2Kx8)
+    U11    SCP RAM    TC5516APL  (2Kx8)
     U30    VRAM       HM6116LP-3 (2Kx8)
 
     1x 16MHz Crystal
@@ -85,7 +85,7 @@
 
     All games:
 
-	The first time the machine is turned on, will show the legend "DATA ERROR".
+    The first time the machine is turned on, will show the legend "DATA ERROR".
     You must to RESET (F3) the machine to initialize the NVRAM properly.
 
 
@@ -119,7 +119,7 @@
 
     The rest of buttons are self-explanatory.
 
-    
+
     * Slots Game:
 
     Pressing SERVICE 1 (key 9) you enter the Test/Setting Mode. You can test
@@ -349,7 +349,7 @@ static const gfx_layout charlayout =
 	3,
 	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },    /* bitplanes are separated */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
 	  8*8, 9*8, 10*8, 11*8, 12*8, 13*8, 14*8, 15*8 },
 	16*8	/* every char takes 16 consecutive bytes */
 

@@ -2246,7 +2246,7 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 ***************************************************************************/
 
 /*-------------------------------------------------
-    video_mng_is_movie_active - return true if a 
+    video_mng_is_movie_active - return true if a
     MNG movie is currently being recorded
 -------------------------------------------------*/
 
@@ -2375,10 +2375,10 @@ void video_avi_begin_recording(const device_config *screen, const char *name)
 	/* close any existing movie file */
 	if (state->avi_file != NULL)
 		video_avi_end_recording(screen);
-	
+
 	/* create a snapshot bitmap so we know what the target size is */
 	create_snapshot_bitmap(screen);
-		
+
 	/* build up information about this new movie */
 	info.video_format = 0;
 	info.video_timescale = 1000 * ATTOSECONDS_TO_HZ(state->frame_period);
@@ -2387,7 +2387,7 @@ void video_avi_begin_recording(const device_config *screen, const char *name)
 	info.video_width = global.snap_bitmap->width;
 	info.video_height = global.snap_bitmap->height;
 	info.video_depth = 24;
-	
+
 	info.audio_format = 0;
 	info.audio_timescale = 1;
 	info.audio_sampletime = screen->machine->sample_rate;
@@ -2395,20 +2395,20 @@ void video_avi_begin_recording(const device_config *screen, const char *name)
 	info.audio_channels = 2;
 	info.audio_samplebits = 16;
 	info.audio_samplerate = screen->machine->sample_rate;
-	
+
 	/* create a new temporary movie file */
 	if (name != NULL)
 		filerr = mame_fopen(SEARCHPATH_MOVIE, name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &tempfile);
 	else
 		filerr = mame_fopen_next(screen->machine, SEARCHPATH_MOVIE, "avi", &tempfile);
 	state->movie_frame = 0;
-	
+
 	/* if we succeeded, make a copy of the name and create the real file over top */
 	if (filerr == FILERR_NONE)
 	{
 		astring *fullname = astring_dupc(mame_file_full_name(tempfile));
 		mame_fclose(tempfile);
-		
+
 		/* create the file and free the string */
 		avierr = avi_create(astring_c(fullname), &info, &state->avi_file);
 		astring_free(fullname);
@@ -2477,7 +2477,7 @@ void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsa
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
 		screen_state *state = get_safe_token(screen);
-		
+
 		/* only record if we have a file */
 		if (state->avi_file != NULL)
 		{

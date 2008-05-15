@@ -462,8 +462,8 @@ static WRITE32_HANDLER( motor_control_w )
 static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
 {
 /*
-	........ ..xxxxxx   Lamp 1-6 enables
-	........ .x......   Vibration
+    ........ ..xxxxxx   Lamp 1-6 enables
+    ........ .x......   Vibration
 */
 
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);

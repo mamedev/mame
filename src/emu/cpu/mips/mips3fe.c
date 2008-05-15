@@ -471,7 +471,7 @@ static int describe_instruction_cop0(mips3_state *mips, UINT32 op, opcode_desc *
 				desc->cycles += MIPS3_CAUSE_READ_CYCLES;
 			desc->gpr.modified |= REGFLAG_R(RTREG);
 			return TRUE;
-		
+
 		case 0x02:	/* CFCz */
 			desc->gpr.modified |= REGFLAG_R(RTREG);
 			return TRUE;

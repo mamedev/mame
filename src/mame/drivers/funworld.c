@@ -2320,7 +2320,7 @@ static DRIVER_INIT( tabblue )
     the result to the left carring the less significant bit and losing the most significant one.
 
 
-    Encrypted nibble:  0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F   
+    Encrypted nibble:  0    1    2    3    4    5    6    7    8    9    A    B    C    D    E    F
     Bits:             0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1110 1111
     -------------------------------------------------------------------------------------------------
     Bits:             0000 0011 0110 0101 1100 1111 1010 1001 1000 1011 1110 1101 0100 0111 0010 0001

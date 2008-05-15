@@ -10,31 +10,31 @@
 
 ****************************************************************************
 
-	Future improvements/changes:
-	
-	* Write a back-end validator:
-		- checks all combinations of memory/register/immediate on all params
-		- checks behavior of all opcodes
-	
-	* Extend registers to 16? Depends on if PPC can use them
+    Future improvements/changes:
 
-	* New instructions?
-		- EXTRACT dst,src,shift,mask
-			dst = (src >> shift) & mask
+    * Write a back-end validator:
+        - checks all combinations of memory/register/immediate on all params
+        - checks behavior of all opcodes
 
-		- INSERT dst,src,shift,mask
-			dst = (dst & ~mask) | ((src << shift) & mask)
+    * Extend registers to 16? Depends on if PPC can use them
 
-		- VALID opcode_desc,handle,param
-			checksum/compare code referenced by opcode_desc; if not
-			matching, generate exception with handle,param
-		
-		- RECALL handle
-			change code at caller to call handle in the future
-			
-	* Add interface for getting hints from the backend:
-		- number of direct-mapped integer registers
-		- number of direct-mapped floating point registers
+    * New instructions?
+        - EXTRACT dst,src,shift,mask
+            dst = (src >> shift) & mask
+
+        - INSERT dst,src,shift,mask
+            dst = (dst & ~mask) | ((src << shift) & mask)
+
+        - VALID opcode_desc,handle,param
+            checksum/compare code referenced by opcode_desc; if not
+            matching, generate exception with handle,param
+
+        - RECALL handle
+            change code at caller to call handle in the future
+
+    * Add interface for getting hints from the backend:
+        - number of direct-mapped integer registers
+        - number of direct-mapped floating point registers
 
 ***************************************************************************/
 
@@ -350,7 +350,7 @@ void drcuml_reset(drcuml_state *drcuml)
 	/* if we error here, we are screwed */
 	if (setjmp(errorbuf) != 0)
 		fatalerror("Out of cache space in drcuml_reset");
-	
+
 	/* reset all handle code pointers */
 	for (handle = drcuml->handlelist; handle != NULL; handle = handle->next)
 		handle->code = NULL;
@@ -688,7 +688,7 @@ drcuml_codehandle *drcuml_handle_alloc(drcuml_state *drcuml, const char *name)
 	if (string == NULL)
 		return NULL;
 	strcpy(string, name);
-	
+
 	/* allocate a new handle info */
 	handle = drccache_memory_alloc_near(drcuml->cache, sizeof(*handle));
 	if (handle == NULL)
@@ -697,13 +697,13 @@ drcuml_codehandle *drcuml_handle_alloc(drcuml_state *drcuml, const char *name)
 		return NULL;
 	}
 	memset(handle, 0, sizeof(*handle));
-		
+
 	/* fill in the rest of the info and add to the list of handles */
 	handle->drcuml = drcuml;
 	handle->string = string;
 	handle->next = drcuml->handlelist;
 	drcuml->handlelist = handle;
-	
+
 	return handle;
 }
 
@@ -722,7 +722,7 @@ void drcuml_handle_set_codeptr(drcuml_codehandle *handle, drccodeptr code)
 
 
 /*-------------------------------------------------
-    drcuml_handle_codeptr - get the pointer from 
+    drcuml_handle_codeptr - get the pointer from
     a handle
 -------------------------------------------------*/
 

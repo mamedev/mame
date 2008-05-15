@@ -758,7 +758,7 @@ $efff20: sprite control: 0x3a,0x3e,0x3f
 $efff00:    src0 src1 src2 dst0 dst1 dst2 BANK [src
 $efff10:    src] [dst dst] #BYT BLIT eINT 001f 0001
 $efff20:    003f 003f IACK ---- ---- ---- ---- ----
-$efff80:    0050 0170 0020 0100 0000 POSI 0000 GFXE		POSI: scanline for POSIRQ
+$efff80:    0050 0170 0020 0100 0000 POSI 0000 GFXE     POSI: scanline for POSIRQ
 $efff90:    0000 0001 0002 0003 FLIP ---- ---- ----
 $efffa0:    PRI  PRI  PRI  PRI  ---- PRI? --?? ----     priority (0..7)
 $efffb0:    CLR  CLR  CLR  CLR  0001 CLR? BPP  ----     color (0..f), bpp flag per layer

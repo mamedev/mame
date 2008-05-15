@@ -2317,7 +2317,7 @@ static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_t *bitma
 			*dest++ = RGB_GREEN(pix);
 			*dest++ = RGB_RED(pix);
 		}
-		
+
 		/* fill in any blank space on the right */
 		for ( ; x < stream->width && dest < dataend; x++)
 		{
@@ -2326,7 +2326,7 @@ static avi_error rgb32_compress_to_rgb(avi_stream *stream, const bitmap_t *bitma
 			*dest++ = 0;
 		}
 	}
-	
+
 	/* fill in any blank space on the bottom */
 	for ( ; y < stream->height; y++)
 	{

@@ -12,7 +12,7 @@
     - connect to sound system when possible
     - white noise
     - scanline based update
-	- separate to CDP1869 and CDP1870/6
+    - separate to CDP1869 and CDP1870/6
 
 */
 
