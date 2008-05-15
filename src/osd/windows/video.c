@@ -71,7 +71,7 @@ static void init_monitors(void);
 static BOOL CALLBACK monitor_enum_callback(HMONITOR handle, HDC dc, LPRECT rect, LPARAM data);
 static win_monitor_info *pick_monitor(int index);
 
-static void check_osd_inputs(void);
+static void check_osd_inputs(running_machine *machine);
 
 static void extract_video_config(running_machine *machine);
 static void load_effect_overlay(running_machine *machine, const char *filename);
@@ -211,7 +211,7 @@ void osd_update(running_machine *machine, int skip_redraw)
 	// poll the joystick values here
 	winwindow_process_events(machine, TRUE);
 	wininput_poll(machine);
-	check_osd_inputs();
+	check_osd_inputs(machine);
 }
 
 
@@ -352,15 +352,15 @@ finishit:
 //  check_osd_inputs
 //============================================================
 
-static void check_osd_inputs(void)
+static void check_osd_inputs(running_machine *machine)
 {
 	// check for toggling fullscreen mode
-	if (input_ui_pressed(IPT_OSD_1))
+	if (input_ui_pressed(machine, IPT_OSD_1))
 		winwindow_toggle_full_screen();
 
 #ifdef MESS
 	// check for toggling menu bar
-	if (input_ui_pressed(IPT_OSD_2))
+	if (input_ui_pressed(machine, IPT_OSD_2))
 		win_toggle_menubar();
 #endif
 }

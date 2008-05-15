@@ -328,7 +328,7 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	int v = scanline_to_v(video_screen_get_vpos(machine->primary_screen));
+	int v = scanline_to_v(video_screen_get_vpos(field->port->machine->primary_screen));
 	return v < 24;
 }
 

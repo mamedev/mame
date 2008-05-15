@@ -244,7 +244,7 @@ static CUSTOM_INPUT( lightgun_pos_r )
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(machine->primary_screen, input_select, &x, &y);
+	get_lightgun_pos(field->port->machine->primary_screen, input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
@@ -252,14 +252,14 @@ static CUSTOM_INPUT( lightgun_pos_r )
 static CUSTOM_INPUT( lightgun_trigger_r )
 {
 	/* read the trigger control based on the input select */
-	return (input_port_read(machine, "TRIGGERS") >> input_select) & 1;
+	return (input_port_read(field->port->machine, "TRIGGERS") >> input_select) & 1;
 }
 
 
 static CUSTOM_INPUT( lightgun_holster_r )
 {
 	/* read the holster control based on the input select */
-	return (input_port_read(machine, "TRIGGERS") >> (2 + input_select)) & 1;
+	return (input_port_read(field->port->machine, "TRIGGERS") >> (2 + input_select)) & 1;
 }
 
 

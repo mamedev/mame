@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "exidy440.h"
 
 
@@ -154,7 +153,7 @@ READ8_HANDLER( exidy440_horizontal_pos_r )
 {
 	/* clear the FIRQ on a read here */
 	exidy440_firq_beam = 0;
-	exidy440_update_firq(Machine);
+	exidy440_update_firq(machine);
 
 	/* according to the schems, this value is only latched on an FIRQ
      * caused by collision or beam */
@@ -208,7 +207,7 @@ WRITE8_HANDLER( exidy440_control_w )
 	palettebank_vis = data & 1;
 
 	/* update the FIRQ in case we enabled something */
-	exidy440_update_firq(Machine);
+	exidy440_update_firq(machine);
 
 	/* if we're swapping palettes, change all the colors */
 	if (oldvis != palettebank_vis)
@@ -231,7 +230,7 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 {
 	/* clear the VBLANK FIRQ on a write here */
 	exidy440_firq_vblank = 0;
-	exidy440_update_firq(Machine);
+	exidy440_update_firq(machine);
 }
 
 

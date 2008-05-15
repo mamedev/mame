@@ -138,14 +138,14 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin1_inserted )
 {
 	/* left coin insertion causes an NMI */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin2_inserted )
 {
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
 }
 
 
@@ -154,7 +154,7 @@ static INPUT_CHANGED( coin2_inserted )
 
 static CUSTOM_INPUT( ladybug_p1_control_r )
 {
-	return input_port_read(machine, LADYBUG_P1_CONTROL_PORT_TAG);
+	return input_port_read(field->port->machine, LADYBUG_P1_CONTROL_PORT_TAG);
 }
 
 static CUSTOM_INPUT( ladybug_p2_control_r )
@@ -162,10 +162,10 @@ static CUSTOM_INPUT( ladybug_p2_control_r )
 	UINT32 ret;
 
 	/* upright cabinet only uses a single set of controls */
-	if (input_port_read(machine, "DSW0") & 0x20)
-		ret = input_port_read(machine, LADYBUG_P2_CONTROL_PORT_TAG);
+	if (input_port_read(field->port->machine, "DSW0") & 0x20)
+		ret = input_port_read(field->port->machine, LADYBUG_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(machine, LADYBUG_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(field->port->machine, LADYBUG_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }
@@ -202,7 +202,7 @@ static INPUT_PORTS_START( ladybug )
 	PORT_DIPNAME( 0x04, 0x04, "High Score Names" )
 	PORT_DIPSETTING(    0x00, "3 Letters" )
 	PORT_DIPSETTING(    0x04, "10 Letters" )
-	PORT_BIT(    0x08, 0x08, IPT_DIPSWITCH_NAME ) PORT_NAME("Rack Test (Cheat)") PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x08, 0x08, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Freeze" )
@@ -474,7 +474,7 @@ static INPUT_PORTS_START( dorodon )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x04, "20000" )
 	PORT_DIPSETTING(    0x00, "30000" )
-	PORT_BIT(    0x08, 0x08, IPT_DIPSWITCH_NAME ) PORT_NAME("Rack Test (Cheat)") PORT_CODE(KEYCODE_F1)
+	PORT_DIPNAME( 0x08, 0x08, "Rack Test (Cheat)" ) PORT_CODE(KEYCODE_F1)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Freeze" )

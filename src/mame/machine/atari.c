@@ -742,7 +742,7 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 
 	/* GTIA */
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (port_tag_to_index("console") >= 0)
+	if (input_port_by_tag(machine->portconfig, "console") != NULL)
 		gtia_intf.console_read = console_read;
 	if (sndti_exists(SOUND_DAC, 0))
 		gtia_intf.console_write = console_write;

@@ -293,9 +293,9 @@ WRITE8_HANDLER( phoenix_scroll_w )
 CUSTOM_INPUT( player_input_r )
 {
 	if (cocktail_mode)
-		return (input_port_read(machine, "CTRL") & 0xf0) >> 4;
+		return (input_port_read(field->port->machine, "CTRL") & 0xf0) >> 4;
 	else
-		return (input_port_read(machine, "CTRL") & 0x0f) >> 0;
+		return (input_port_read(field->port->machine, "CTRL") & 0x0f) >> 0;
 }
 
 CUSTOM_INPUT( pleiads_protection_r )

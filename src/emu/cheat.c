@@ -751,14 +751,14 @@ static int		ShiftKeyPressed(void);
 static int		ControlKeyPressed(void);
 static int		AltKeyPressed(void);
 
-static int		UIPressedRepeatThrottle(int code, int baseSpeed);
+static int		UIPressedRepeatThrottle(running_machine *machine, int code, int baseSpeed);
 
 /********** DIRECT KEY INPUT **********/
 static int		ReadHexInput(void);
 
 static char *	DoDynamicEditTextField(char * buf);
 static void		DoStaticEditTextField(char * buf, int size);
-static UINT32	DoEditHexField(UINT32 data);
+static UINT32	DoEditHexField(running_machine *machine, UINT32 data);
 static UINT32	DoEditHexFieldSigned(UINT32 data, UINT32 mask);
 static INT32	DoEditDecField(INT32 data, INT32 min, INT32 max);
 
@@ -777,7 +777,7 @@ static void		FreeStringTable(void);
 static char *	CreateStringCopy(char * buf);
 
 /********** ADDITIONAL MENU FOR CHEAT **********/
-static INT32	UserSelectValueMenu(int selection, CheatEntry * entry);
+static INT32	UserSelectValueMenu(running_machine *machine, int selection, CheatEntry * entry);
 
 /********** CHEAT MENU **********/
 static int		EnableDisableCheatMenu(running_machine *machine, int selection, int firstTime);
@@ -788,7 +788,7 @@ static int		DoSearchMenuMinimum(running_machine *machine, int selection);	// min
 static int		DoSearchMenuClassic(running_machine *machine, int selection);	// classic mode
 static int		DoSearchMenu(running_machine *machine, int selection);			// advanced mode
 static int		SelectSearchRegions(running_machine *machine, int selection, SearchInfo * search);
-static int		ViewSearchResults(int selection, int firstTime);
+static int		ViewSearchResults(running_machine *machine, int selection, int firstTime);
 
 static int		ChooseWatch(running_machine *machine, int selection);
 static int		EditWatch(running_machine *machine, WatchInfo * entry, int selection);
@@ -1187,7 +1187,7 @@ static void old_style_menu(const char **items, const char **subitems, char *flag
   UIPressedRepoeatThrottle - key repeat handling
 -------------------------------------------------*/
 
-static int UIPressedRepeatThrottle(int code, int baseSpeed)
+static int UIPressedRepeatThrottle(running_machine *machine, int code, int baseSpeed)
 {
 	static int	lastCode = -1;
 	static int	lastSpeed = -1;
@@ -1196,7 +1196,7 @@ static int UIPressedRepeatThrottle(int code, int baseSpeed)
 
 	const int	kDelayRampTimer = 10;
 
-	if(input_port_type_pressed(code, 0))
+	if(input_type_pressed(machine, code, 0))
 	{
 		if(lastCode != code)			// different key pressed
 		{
@@ -1227,7 +1227,7 @@ static int UIPressedRepeatThrottle(int code, int baseSpeed)
 			lastCode = -1;
 	}
 
-	return input_ui_pressed_repeat(code, lastSpeed);
+	return input_ui_pressed_repeat(machine, code, lastSpeed);
 }
 
 /*---------------------------------
@@ -1350,7 +1350,7 @@ static void DoStaticEditTextField(char * buf, int size)
   DoEditHexField - edit hex field with direct key input (unsigned)
 ------------------------------------------------------------------*/
 
-static UINT32 DoEditHexField(UINT32 data)
+static UINT32 DoEditHexField(running_machine *machine, UINT32 data)
 {
 	INT8	key;
 
@@ -1363,7 +1363,7 @@ static UINT32 DoEditHexField(UINT32 data)
 	}
 	else
 	{
-		if(input_ui_pressed(IPT_UI_CLEAR))
+		if(input_ui_pressed(machine, IPT_UI_CLEAR))
 		{
 			data = 0;
 
@@ -1713,7 +1713,7 @@ int cheat_menu(running_machine *machine, int selection)
 	ui_menu_draw(menu_item, total, sel, NULL);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		if(sel < (total - 1))
 			sel++;
@@ -1721,7 +1721,7 @@ int cheat_menu(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		if(sel > 0)
 			sel--;
@@ -1729,7 +1729,7 @@ int cheat_menu(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(sel)
 		{
@@ -1750,10 +1750,10 @@ int cheat_menu(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_RELOAD_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 		ReloadCheatDatabase(machine);
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(sel == kMenu_Return)
 			lastPstn = 0;			// if cursor is now on the return item, adjust cursor keeper
@@ -1973,7 +1973,7 @@ static char * CreateStringCopy(char * buf)
   UserSelectValueMenu - management for value-selection menu
 ------------------------------------------------------------*/
 
-static INT32 UserSelectValueMenu(int selection, CheatEntry * entry)
+static INT32 UserSelectValueMenu(running_machine *machine, int selection, CheatEntry * entry)
 {
 	char					buf[2048];
 	int						sel;
@@ -2040,13 +2040,13 @@ static INT32 UserSelectValueMenu(int selection, CheatEntry * entry)
 	ui_draw_message_window(buf);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
 		delta = -1;
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
 		delta = 1;
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		/* ### redundant?? probably can be removed ### */
 		if(!firstTime)
@@ -2093,7 +2093,7 @@ static INT32 UserSelectValueMenu(int selection, CheatEntry * entry)
 		sel = -1;
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		firstTime = 1;
 		sel = -1;
@@ -2161,7 +2161,7 @@ static INT32 UserSelectValueMenu(int selection, CheatEntry * entry)
   CommentMenu - management comment for code menu
 -------------------------------------------------*/
 
-static INT32 CommentMenu(int selection, CheatEntry * entry)
+static INT32 CommentMenu(running_machine *machine, int selection, CheatEntry * entry)
 {
 	char	buf[2048];
 	int		sel;
@@ -2184,7 +2184,7 @@ static INT32 CommentMenu(int selection, CheatEntry * entry)
 	ui_draw_message_window(buf);
 
 	/********** KEY HANDLING **********/
-	if(input_ui_pressed(IPT_UI_SELECT) || input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_SELECT) || input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -2221,11 +2221,11 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		switch(submenu_id)
 		{
 			case 1:
-				submenu_choice = CommentMenu(submenu_choice, &cheatList[sel]);
+				submenu_choice = CommentMenu(machine, submenu_choice, &cheatList[sel]);
 				break;
 
 			case 2:
-				submenu_choice = UserSelectValueMenu(submenu_choice, &cheatList[sel]);
+				submenu_choice = UserSelectValueMenu(machine, submenu_choice, &cheatList[sel]);
 				break;
 
 			case 3:
@@ -2343,7 +2343,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 	old_style_menu(menu_item, menu_subitem, flagBuf, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -2358,7 +2358,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -2380,7 +2380,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -2388,7 +2388,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -2401,7 +2401,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 	else
 		entry = NULL;
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
 		if((sel < (total - 1)) && entry)
 		{
@@ -2460,7 +2460,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
 		if((sel < (total - 1)) && entry)
 		{
@@ -2524,7 +2524,7 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(sel == (total - 1))
 		{
@@ -2574,12 +2574,12 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_WATCH_VALUE))
+	if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
 		WatchCheatEntry(entry, 0);
 
 	if(ShiftKeyPressed())
 	{
-		if(input_ui_pressed(IPT_UI_SAVE_CHEAT))			// shift + save = save all codes
+		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))			// shift + save = save all codes
 		{
 			for(i = 0; i < cheatListLength; i++)
 				SaveCheat(machine, &cheatList[i], 0, 0);
@@ -2587,17 +2587,17 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 			ui_popup_time(1, "%d cheats saved", cheatListLength);
 		}
 
-		if(input_ui_pressed(IPT_UI_ADD_CHEAT))			// shift + add = add new emypty code
+		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))			// shift + add = add new emypty code
 			AddCheatBefore(sel);
 
-		if(input_ui_pressed(IPT_UI_DELETE_CHEAT))		// shift + delete = delete selected code
+		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))		// shift + delete = delete selected code
 			DeleteCheatAt(sel);
 	}
 	else
 	{
 		if(ControlKeyPressed())
 		{
-			if(input_ui_pressed(IPT_UI_SAVE_CHEAT))		// ctrl + save = save activation key
+			if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))		// ctrl + save = save activation key
 			{
 				if((entry->flags & kCheatFlag_HasActivationKey1) || (entry->flags & kCheatFlag_HasActivationKey2))
 				{
@@ -2611,29 +2611,29 @@ static int EnableDisableCheatMenu(running_machine *machine, int selection, int f
 		}
 		else
 		{
-			if(input_ui_pressed(IPT_UI_SAVE_CHEAT))
+			if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 				SaveCheat(machine, entry, 0, 0);			// save current entry
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_EDIT_CHEAT) && entry)		// edit selected code
+	if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT) && entry)		// edit selected code
 	{
 		submenu_id = 3;
 		submenu_choice = 1;
 	}
 
-	if(input_ui_pressed(IPT_UI_RELOAD_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 		ReloadCheatDatabase(machine);
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : enable/disable -> add/edit ----- */
 		sel = -3;
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : enable/disable -> watchpoint list ----- */
 		sel = -5;
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -2699,7 +2699,7 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 	old_style_menu(menu_item, NULL, NULL, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -2707,7 +2707,7 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -2715,7 +2715,7 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -2723,7 +2723,7 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -2736,7 +2736,7 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 	else
 		entry = NULL;
 
-	if(input_ui_pressed(IPT_UI_SAVE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		if(ShiftKeyPressed())
 		{
@@ -2763,16 +2763,16 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_ADD_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 		AddCheatBefore(sel);			// insert empty code
 
-	if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 		DeleteCheatAt(sel);			// delete selected code
 
-	if(input_ui_pressed(IPT_UI_WATCH_VALUE))
+	if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
 		WatchCheatEntry(entry, 0);				// watch selected code
 
-	if(input_ui_pressed(IPT_UI_EDIT_CHEAT))		// edit selected code
+	if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))		// edit selected code
 	{
 		/* ----- if selected item is not return, go to edit menu ----- */
 		if(sel < (total - 1))
@@ -2782,7 +2782,7 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		/* ----- if selected item is return, return previous menu ----- */
 		if(sel >= (total - 1))
@@ -2798,18 +2798,18 @@ static int AddEditCheatMenu(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_RELOAD_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 		ReloadCheatDatabase(machine);
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : add/edit -> search ----- */
 		sel = -4;
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : add/edit -> enable/disable ----- */
 		sel = -2;
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -3706,7 +3706,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 	if(ShiftKeyPressed())
 		increment <<= 16;
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
 		editActive = 0;
 		dirty = 1;
@@ -4026,7 +4026,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
 		editActive = 0;
 		dirty = 1;
@@ -4345,7 +4345,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -4355,7 +4355,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		editActive = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -4365,7 +4365,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		editActive = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -4375,7 +4375,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		editActive = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -4385,7 +4385,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		editActive = 0;
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(editActive)
 		{
@@ -4447,7 +4447,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 			case kType_ActivationKey1:
 			case kType_ActivationKey2:
 			{
-				if(input_ui_pressed(IPT_UI_CANCEL))
+				if(input_ui_pressed(machine, IPT_UI_CANCEL))
 				{
 					if(info->fieldType == kType_ActivationKey1)
 					{
@@ -4483,7 +4483,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 					}
 					else
 					{
-						if((code != INPUT_CODE_INVALID) && !input_ui_pressed(IPT_UI_SELECT))
+						if((code != INPUT_CODE_INVALID) && !input_ui_pressed(machine, IPT_UI_SELECT))
 						{
 							if(info->fieldType == kType_ActivationKey1)
 							{
@@ -4508,7 +4508,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 				UINT32	temp = (action->originalDataField >> 0) & 0xFF;
 
 				temp++;
-				temp = DoEditHexField(temp) & 0xFF;
+				temp = DoEditHexField(machine, temp) & 0xFF;
 				temp--;
 
 				action->originalDataField = (action->originalDataField & 0xFFFFFF00) | ((temp << 0) & 0x000000FF);
@@ -4520,7 +4520,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 			{
 				UINT32	temp = (action->originalDataField >> 8) & 0xFF;
 
-				temp = DoEditHexField(temp) & 0xFF;
+				temp = DoEditHexField(machine, temp) & 0xFF;
 
 				action->originalDataField = (action->originalDataField & 0xFFFF00FF) | ((temp << 8) & 0x0000FF00);
 				action->data = action->originalDataField;
@@ -4531,7 +4531,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 			{
 				UINT32	temp = (action->originalDataField >> 16) & 0xFF;
 
-				temp = DoEditHexField(temp) & 0xFF;
+				temp = DoEditHexField(machine, temp) & 0xFF;
 
 				action->originalDataField = (action->originalDataField & 0xFF00FFFF) | ((temp << 16) & 0x00FF0000);
 				action->data = action->originalDataField;
@@ -4550,14 +4550,14 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 			break;
 
 			case kType_WriteMask:
-				action->extendData = DoEditHexField(action->extendData);
+				action->extendData = DoEditHexField(machine, action->extendData);
 				action->extendData &= info->extraData;
 				break;
 
 			case kType_AddMaximum:
 			case kType_SubtractMinimum:
 			case kType_WriteMatch:
-				action->extendData = DoEditHexField(action->extendData);
+				action->extendData = DoEditHexField(machine, action->extendData);
 				break;
 
 			case kType_RangeMinimum:
@@ -4567,14 +4567,14 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 				if(!TEST_FIELD(action->type, BytesUsed))
 				{
 					temp = (action->extendData >> 8) & 0xFF;
-					temp = DoEditHexField(temp) & 0xFF;
+					temp = DoEditHexField(machine, temp) & 0xFF;
 
 					action->extendData = (action->extendData & 0xFF) | ((temp << 8) & 0xFF00);
 				}
 				else
 				{
 					temp = (action->extendData >> 16) & 0xFFFF;
-					temp = DoEditHexField(temp) & 0xFFFF;
+					temp = DoEditHexField(machine, temp) & 0xFFFF;
 
 					action->extendData = (action->extendData & 0x0000FFFF) | ((temp << 16) & 0xFFFF0000);
 				}
@@ -4588,14 +4588,14 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 				if(!TEST_FIELD(action->type, BytesUsed))
 				{
 					temp = action->extendData & 0xFF;
-					temp = DoEditHexField(temp) & 0xFF;
+					temp = DoEditHexField(machine, temp) & 0xFF;
 
 					action->extendData = (action->extendData & 0xFF00) | (temp & 0x00FF);
 				}
 				else
 				{
 					temp = action->extendData & 0xFFFF;
-					temp = DoEditHexField(temp) & 0xFFFF;
+					temp = DoEditHexField(machine, temp) & 0xFFFF;
 
 					action->extendData = (action->extendData & 0xFFFF0000) | (temp & 0x0000FFFF);
 				}
@@ -4603,23 +4603,23 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 			break;
 
 			case kType_Data:
-				action->originalDataField = DoEditHexField(action->originalDataField);
+				action->originalDataField = DoEditHexField(machine, action->originalDataField);
 				action->originalDataField &= info->extraData;
 				action->data = action->originalDataField;
 				break;
 
 			case kType_Address:
-				action->address = DoEditHexField(action->address);
+				action->address = DoEditHexField(machine, action->address);
 				action->address &= info->extraData;
 				break;
 		}
 
-		if(input_ui_pressed(IPT_UI_CANCEL))
+		if(input_ui_pressed(machine, IPT_UI_CANCEL))
 			editActive = 0;
 	}
 	else
 	{
-		if(input_ui_pressed(IPT_UI_SAVE_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 		{
 			if(ControlKeyPressed())
 				if((entry->flags & kCheatFlag_HasActivationKey1) || (entry->flags & kCheatFlag_HasActivationKey2))
@@ -4634,13 +4634,13 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 				SaveCheat(machine, entry, 0, 0);			// save current entry
 		}
 
-		if(input_ui_pressed(IPT_UI_WATCH_VALUE))
+		if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
 			WatchCheatEntry(entry, 0);
 
-		if(input_ui_pressed(IPT_UI_ADD_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 			AddActionBefore(entry, info->subcheat);
 
-		if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 		{
 			if(!info->subcheat)
 			{
@@ -4654,7 +4654,7 @@ static int EditCheatMenu(running_machine *machine, CheatEntry * entry, int index
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		sel = -1;
 		editActive = 0;
@@ -4745,7 +4745,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 				break;
 
 			case kMenu_ViewResult:
-				submenuChoice = ViewSearchResults(submenuChoice, firstEntry);
+				submenuChoice = ViewSearchResults(machine, submenuChoice, firstEntry);
 				break;
 		}
 
@@ -4870,7 +4870,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 	old_style_menu(menuItem, menuSubItem, flagBuf, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		if(editActive)
 		{
@@ -4904,7 +4904,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		if(editActive)
 		{
@@ -4938,7 +4938,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -4946,7 +4946,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -4954,7 +4954,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
 	{
 		if(editActive)
 		{
@@ -4998,7 +4998,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
 	{
 		if(editActive)
 		{
@@ -5043,7 +5043,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(editActive)
 		{
@@ -5160,16 +5160,16 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : search -> watchpoint list ----- */
 		sel = -5;
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : search -> add/edit ----- */
 		sel = -3;
 
 	/* ----- edit mode ON/OFF ----- */
-	if(input_ui_pressed(IPT_UI_EDIT_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		if(editActive)
 			editActive = 0;
@@ -5181,14 +5181,14 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 	}
 
 	/* ----- memory save ----- */
-	if(input_ui_pressed(IPT_UI_CLEAR))
+	if(input_ui_pressed(machine, IPT_UI_CLEAR))
 	{
 		doneSaveMemory = 0;
 
 		doSearch = 1;
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		if(editActive)
 			editActive = 0;
@@ -5237,7 +5237,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 	{
 		if(searchItem == kItem_Value)
 		{
-			search->oldOptions.value = DoEditHexField(search->oldOptions.value);
+			search->oldOptions.value = DoEditHexField(machine, search->oldOptions.value);
 
 			search->oldOptions.value &= kSearchByteMaskTable[search->bytes];
 		}
@@ -5245,7 +5245,7 @@ static int DoSearchMenuMinimum(running_machine *machine, int selection)
 		{
 			if(searchItem == kItem_Timer)
 			{
-				search->oldOptions.delta = DoEditHexField(search->oldOptions.delta);
+				search->oldOptions.delta = DoEditHexField(machine, search->oldOptions.delta);
 
 				search->oldOptions.delta &= kSearchByteMaskTable[search->bytes];
 			}
@@ -5366,7 +5366,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 				break;
 
 			case kMenu_ViewResult:
-				submenuChoice = ViewSearchResults(submenuChoice, firstEntry);
+				submenuChoice = ViewSearchResults(machine, submenuChoice, firstEntry);
 				break;
 		}
 
@@ -5481,7 +5481,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 	if(AltKeyPressed())
 		increment <<= 4;
 
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -5493,7 +5493,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -5505,7 +5505,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -5513,7 +5513,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -5521,7 +5521,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
 	{
 		switch(sel)
 		{
@@ -5575,7 +5575,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
 	{
 		switch(sel)
 		{
@@ -5629,7 +5629,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(sel)
 		{
@@ -5714,16 +5714,16 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : search -> watchpoint list ----- */
 		sel = -5;
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : search -> add/edit ----- */
 		sel = -3;
 
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 	{
 		/* ----- if cursor is now on the return item, adjust cursor keeper ----- */
 		if(sel == kMenu_Return)
@@ -5766,7 +5766,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 	/* ----- edit a value if direct key input ----- */
 	if((sel == kMenu_ValueEqual) || (sel == kMenu_ValueNearTo))
 	{
-		search->oldOptions.value = DoEditHexField(search->oldOptions.value);
+		search->oldOptions.value = DoEditHexField(machine, search->oldOptions.value);
 
 		search->oldOptions.value &= kSearchByteMaskTable[search->bytes];
 	}
@@ -5774,7 +5774,7 @@ static int DoSearchMenuClassic(running_machine *machine, int selection)
 	{
 		if(sel == kMenu_Time)
 		{
-			search->oldOptions.delta = DoEditHexField(search->oldOptions.delta);
+			search->oldOptions.delta = DoEditHexField(machine, search->oldOptions.delta);
 
 			search->oldOptions.delta &= kSearchByteMaskTable[search->bytes];
 		}
@@ -5884,7 +5884,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 				break;
 
 			case kMenu_ViewResult:
-				submenuChoice = ViewSearchResults(submenuChoice, firstEntry);
+				submenuChoice = ViewSearchResults(machine, submenuChoice, firstEntry);
 				break;
 		}
 
@@ -6006,7 +6006,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 	if(ShiftKeyPressed())
 		increment <<= 16;
 
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -6018,7 +6018,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -6030,7 +6030,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -6038,7 +6038,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -6046,7 +6046,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
 	{
 		switch(sel)
 		{
@@ -6106,7 +6106,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
 	{
 		switch(sel)
 		{
@@ -6166,7 +6166,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(editActive)
 			editActive = 0;
@@ -6256,7 +6256,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 		switch(sel)
 		{
 			case kMenu_Value:
-				search->value = DoEditHexField(search->value);
+				search->value = DoEditHexField(machine, search->value);
 
 				search->value &= kSearchByteMaskTable[search->bytes];
 				break;
@@ -6267,7 +6267,7 @@ static int DoSearchMenu(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	/* ----- keep current cursor position ----- */
@@ -6342,7 +6342,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 	old_style_menu(menuItem, menuSubItem, NULL, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -6350,7 +6350,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -6358,7 +6358,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -6366,7 +6366,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -6374,7 +6374,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
 		if(sel < search->regionListLength)
 		{
@@ -6395,7 +6395,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
 		if(sel < search->regionListLength)
 		{
@@ -6416,7 +6416,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(ShiftKeyPressed())			// shift + delete = invalid region
 		{
@@ -6429,13 +6429,13 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(sel >= total - 1)
 			sel = -1;
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -6445,7 +6445,7 @@ static int SelectSearchRegions(running_machine *machine, int selection, SearchIn
   ViewSearchResults - management for search result menu
 --------------------------------------------------------*/
 
-static int ViewSearchResults(int selection, int firstTime)
+static int ViewSearchResults(running_machine *machine, int selection, int firstTime)
 {
 	enum
 	{
@@ -6612,7 +6612,7 @@ static int ViewSearchResults(int selection, int firstTime)
 	old_style_menu(menu_item, NULL, NULL, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -6620,7 +6620,7 @@ static int ViewSearchResults(int selection, int firstTime)
 			sel = kMenu_FirstResult;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -6628,7 +6628,7 @@ static int ViewSearchResults(int selection, int firstTime)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalFastKeyRepeatRate))
 	{
 		if(ShiftKeyPressed())
 			search->currentResultsPage = numPages - 1;				// shift + right = go to last PAGE
@@ -6648,7 +6648,7 @@ static int ViewSearchResults(int selection, int firstTime)
 		sel = kMenu_FirstResult;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalFastKeyRepeatRate))
 	{
 		if(ShiftKeyPressed())
 			search->currentResultsPage = 0;							// shift + left = go to first PAGE
@@ -6668,7 +6668,7 @@ static int ViewSearchResults(int selection, int firstTime)
 		sel = kMenu_FirstResult;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kHorizontalFastKeyRepeatRate))
 	{
 		sel -=fullMenuPageHeight;
 
@@ -6676,7 +6676,7 @@ static int ViewSearchResults(int selection, int firstTime)
 			sel = kMenu_FirstResult;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kHorizontalFastKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kHorizontalFastKeyRepeatRate))
 	{
 		sel +=fullMenuPageHeight;
 
@@ -6690,7 +6690,7 @@ static int ViewSearchResults(int selection, int firstTime)
 	if(input_code_pressed_once(KEYCODE_HOME))
 		search->currentResultsPage = 0;							// go to first PAGE
 
-	if(UIPressedRepeatThrottle(IPT_UI_PREV_GROUP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PREV_GROUP, kVerticalKeyRepeatRate))
 	{
 		search->currentRegionIdx--;								// go to previous REGION
 
@@ -6700,7 +6700,7 @@ static int ViewSearchResults(int selection, int firstTime)
 		sel = kMenu_FirstResult;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_NEXT_GROUP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_NEXT_GROUP, kVerticalKeyRepeatRate))
 	{
 		search->currentRegionIdx++;								// go to next REGION
 
@@ -6780,13 +6780,13 @@ static int ViewSearchResults(int selection, int firstTime)
 
 	if(selectedAddressGood)
 	{
-		if(input_ui_pressed(IPT_UI_WATCH_VALUE))
+		if(input_ui_pressed(machine, IPT_UI_WATCH_VALUE))
 			AddWatchFromResult(search, region, selectedAddress);		// watch selected result
 
-		if(input_ui_pressed(IPT_UI_ADD_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 			AddCheatFromResult(search, region, selectedAddress);		// add selected result as new code to cheat list
 
-		if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 		{
 			InvalidateRegionOffset(search, region, selectedOffset);		// delete selected result
 			search->numResults--;
@@ -6794,7 +6794,7 @@ static int ViewSearchResults(int selection, int firstTime)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(ShiftKeyPressed())
 		{
@@ -6807,7 +6807,7 @@ static int ViewSearchResults(int selection, int firstTime)
 		}
 	}
 
-	if((input_ui_pressed(IPT_UI_SELECT) && (sel == total - 1)) || input_ui_pressed(IPT_UI_CANCEL))
+	if((input_ui_pressed(machine, IPT_UI_SELECT) && (sel == total - 1)) || input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -6882,7 +6882,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 		watch = NULL;
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -6890,7 +6890,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -6898,7 +6898,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -6906,7 +6906,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -6916,15 +6916,15 @@ static int ChooseWatch(running_machine *machine, int selection)
 
 	if(ShiftKeyPressed())
 	{
-		if(input_ui_pressed(IPT_UI_ADD_CHEAT))				// shift + add = add new watchpoint
+		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))				// shift + add = add new watchpoint
 			AddWatchBefore(sel);
 
-		if(input_ui_pressed(IPT_UI_DELETE_CHEAT))			// shift + delete = delete selected watchpoint
+		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))			// shift + delete = delete selected watchpoint
 			DeleteWatchAt(sel);
 	}
 	else
 	{
-		if(input_ui_pressed(IPT_UI_SAVE_CHEAT))				// save = save selected watchpoint as watchpoint code
+		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))				// save = save selected watchpoint as watchpoint code
 		{
 			if(watch)
 			{
@@ -6938,7 +6938,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 			}
 		}
 
-		if(input_ui_pressed(IPT_UI_ADD_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 		{
 			if(watch)
 			{
@@ -6954,7 +6954,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 			}
 		}
 
-		if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 		{
 			if(ControlKeyPressed())
 			{
@@ -6969,7 +6969,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_EDIT_CHEAT))					// edit = edit selected watchpoint
+	if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))					// edit = edit selected watchpoint
 	{
 		if(sel < (total - 1))
 		{
@@ -6978,7 +6978,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(sel == (total - 1))						// return previous menu
 		{
@@ -6995,7 +6995,7 @@ static int ChooseWatch(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_CLEAR))
+	if(input_ui_pressed(machine, IPT_UI_CLEAR))
 	{
 		/* ----- reset all watchpoints ----- */
 		for(i = 0; i < watchListLength; i++)
@@ -7019,15 +7019,15 @@ static int ChooseWatch(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_IN, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : watchpoint list -> enable/disable ----- */
 		sel = -2;
 
-	if(UIPressedRepeatThrottle(IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_ZOOM_OUT, kVerticalKeyRepeatRate))
 		/* ----- quick menu switch : watchpoint list -> search ----- */
 		sel = -4;
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -7195,7 +7195,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 	if(ShiftKeyPressed())
 		increment <<= 16;
 
-	if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
 		editActive = 0;
 
@@ -7296,7 +7296,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
 		editActive = 0;
 
@@ -7389,7 +7389,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -7399,7 +7399,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		editActive = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -7409,7 +7409,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		editActive = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -7419,7 +7419,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		editActive = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -7429,7 +7429,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		editActive = 0;
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(editActive)
 			editActive = 0;
@@ -7463,7 +7463,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		{
 			case kMenu_Address:
 				entry->address = DoShift(entry->address, entry->addressShift);
-				entry->address = DoEditHexField(entry->address);
+				entry->address = DoEditHexField(machine, entry->address);
 				entry->address = DoShift(entry->address, -entry->addressShift);
 				entry->address &= cpuInfoList[entry->cpu].addressMask;
 				break;
@@ -7502,23 +7502,23 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 				break;
 
 			case kMenu_XOR:
-				entry->xor = DoEditHexField(entry->xor);
+				entry->xor = DoEditHexField(machine, entry->xor);
 				entry->xor &= kSearchByteMaskTable[kWatchSizeConversionTable[entry->elementBytes]];
 				break;
 		}
 
-		if(input_ui_pressed(IPT_UI_CANCEL))
+		if(input_ui_pressed(machine, IPT_UI_CANCEL))
 			editActive = 0;
 	}
 	else
 	{
-		if(input_ui_pressed(IPT_UI_ADD_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 			AddCheatFromWatch(entry);
 
-		if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 			entry->numElements = 0;
 
-		if(input_ui_pressed(IPT_UI_SAVE_CHEAT))
+		if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 		{
 			CheatEntry	tempEntry;
 
@@ -7530,7 +7530,7 @@ static int EditWatch(running_machine *machine, WatchInfo * entry, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -7630,7 +7630,7 @@ static int SelectOptions(running_machine *machine, int selection)
 	old_style_menu(menuItem, menuSubItem, NULL, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_RIGHT, kHorizontalSlowKeyRepeatRate))
 	{
 		switch(sel)
 		{
@@ -7667,7 +7667,7 @@ static int SelectOptions(running_machine *machine, int selection)
 		}
 	}
 
-	 if(UIPressedRepeatThrottle(IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
+	 if(UIPressedRepeatThrottle(machine, IPT_UI_LEFT, kHorizontalSlowKeyRepeatRate))
 	{
 		switch(sel)
 		{
@@ -7704,7 +7704,7 @@ static int SelectOptions(running_machine *machine, int selection)
 		}
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		if(sel < (kMenu_Max - 1))
 			sel++;
@@ -7712,7 +7712,7 @@ static int SelectOptions(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		if(sel > 0)
 			sel--;
@@ -7720,7 +7720,7 @@ static int SelectOptions(running_machine *machine, int selection)
 			sel = kMenu_Max - 1;
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		switch(sel)
 		{
@@ -7735,17 +7735,17 @@ static int SelectOptions(running_machine *machine, int selection)
 		}
 	}
 
-	if(input_ui_pressed(IPT_UI_SAVE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_SAVE_CHEAT))
 	{
 		SaveCheat(machine, NULL, 0, 2);
 
 		ui_popup_time(1, "command code saved");
 	}
 
-	if(input_ui_pressed(IPT_UI_RELOAD_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
 		ReloadCheatDatabase(machine);
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -7808,7 +7808,7 @@ static int SelectSearch(running_machine *machine, int selection)
 	old_style_menu(menuItem, NULL, NULL, sel, 0);
 
 	/********** KEY HANDLING **********/
-	if(UIPressedRepeatThrottle(IPT_UI_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel++;
 
@@ -7816,7 +7816,7 @@ static int SelectSearch(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_UP, kVerticalKeyRepeatRate))
 	{
 		sel--;
 
@@ -7824,7 +7824,7 @@ static int SelectSearch(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_UP, kVerticalKeyRepeatRate))
 	{
 		sel -= fullMenuPageHeight;
 
@@ -7832,7 +7832,7 @@ static int SelectSearch(running_machine *machine, int selection)
 			sel = 0;
 	}
 
-	if(UIPressedRepeatThrottle(IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
+	if(UIPressedRepeatThrottle(machine, IPT_UI_PAGE_DOWN, kVerticalKeyRepeatRate))
 	{
 		sel += fullMenuPageHeight;
 
@@ -7840,7 +7840,7 @@ static int SelectSearch(running_machine *machine, int selection)
 			sel = total - 1;
 	}
 
-	if(input_ui_pressed(IPT_UI_ADD_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_ADD_CHEAT))
 	{
 		AddSearchBefore(sel);
 
@@ -7848,19 +7848,19 @@ static int SelectSearch(running_machine *machine, int selection)
 		AllocateSearchRegions(&searchList[sel]);
 	}
 
-	if(input_ui_pressed(IPT_UI_DELETE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_DELETE_CHEAT))
 	{
 		if(searchListLength > 1)
 			DeleteSearchAt(sel);
 	}
 
-	if(input_ui_pressed(IPT_UI_EDIT_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_EDIT_CHEAT))
 	{
 		if(sel < total - 1)
 			currentSearchIdx = sel;
 	}
 
-	if(input_ui_pressed(IPT_UI_SELECT))
+	if(input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		if(sel >= total - 1)
 			sel = -1;
@@ -7868,7 +7868,7 @@ static int SelectSearch(running_machine *machine, int selection)
 			currentSearchIdx = sel;
 	}
 
-	if(input_ui_pressed(IPT_UI_CANCEL))
+	if(input_ui_pressed(machine, IPT_UI_CANCEL))
 		sel = -1;
 
 	return sel + 1;
@@ -7882,7 +7882,7 @@ static TIMER_CALLBACK( cheat_periodic )
 {
 	int	i;
 
-	if(input_ui_pressed(IPT_UI_TOGGLE_CHEAT))
+	if(input_ui_pressed(machine, IPT_UI_TOGGLE_CHEAT))
 	{
 		if(ShiftKeyPressed())
 		{

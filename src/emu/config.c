@@ -86,7 +86,7 @@ void config_init(running_machine *machine)
  *
  *************************************/
 
-void config_register(const char *nodename, config_callback_func load, config_callback_func save)
+void config_register(running_machine *machine, const char *nodename, config_callback_func load, config_callback_func save)
 {
 	config_type *newtype;
 	config_type **ptype;
@@ -122,7 +122,7 @@ int config_load_settings(running_machine *machine)
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
-		(*type->load)(CONFIG_TYPE_INIT, NULL);
+		(*type->load)(machine, CONFIG_TYPE_INIT, NULL);
 
 	/* now load the controller file */
 	if (controller[0] != 0)
@@ -162,7 +162,7 @@ int config_load_settings(running_machine *machine)
 
 	/* loop over all registrants and call their final function */
 	for (type = typelist; type; type = type->next)
-		(*type->load)(CONFIG_TYPE_FINAL, NULL);
+		(*type->load)(machine, CONFIG_TYPE_FINAL, NULL);
 
 	/* if we didn't find a saved config, return 0 so the main core knows that it */
 	/* is the first time the game is run and it should diplay the disclaimer. */
@@ -179,7 +179,7 @@ void config_save_settings(running_machine *machine)
 
 	/* loop over all registrants and call their init function */
 	for (type = typelist; type; type = type->next)
-		(*type->save)(CONFIG_TYPE_INIT, NULL);
+		(*type->save)(machine, CONFIG_TYPE_INIT, NULL);
 
 	/* save the defaults file */
 	filerr = mame_fopen(SEARCHPATH_CONFIG, "default.cfg", OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
@@ -202,7 +202,7 @@ void config_save_settings(running_machine *machine)
 
 	/* loop over all registrants and call their final function */
 	for (type = typelist; type; type = type->next)
-		(*type->save)(CONFIG_TYPE_FINAL, NULL);
+		(*type->save)(machine, CONFIG_TYPE_FINAL, NULL);
 }
 
 
@@ -288,7 +288,7 @@ static int config_load_xml(running_machine *machine, mame_file *file, int which_
 
 		/* loop over all registrants and call their load function */
 		for (type = typelist; type; type = type->next)
-			(*type->load)(which_type, xml_get_sibling(systemnode->child, type->name));
+			(*type->load)(machine, which_type, xml_get_sibling(systemnode->child, type->name));
 		count++;
 	}
 
@@ -343,7 +343,7 @@ static int config_save_xml(running_machine *machine, mame_file *file, int which_
 		xml_data_node *curnode = xml_add_child(systemnode, type->name, NULL);
 		if (!curnode)
 			goto error;
-		(*type->save)(which_type, curnode);
+		(*type->save)(machine, which_type, curnode);
 
 		/* if nothing was added, just nuke the node */
 		if (!curnode->value && !curnode->child)

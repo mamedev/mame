@@ -386,18 +386,18 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted_irq_hi )
 {
 	if (newval)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_irq_lo )
 {
 	if (!newval)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi_lo )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

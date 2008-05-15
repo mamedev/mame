@@ -264,7 +264,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (newval == 0)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(field->port->machine, 0, 0, ASSERT_LINE);
 }
 
 
@@ -290,7 +290,7 @@ static CUSTOM_INPUT( firq_vblank_r )
 static CUSTOM_INPUT( hitnmiss_button1_r )
 {
 	/* button 1 shows up in two bits */
-	UINT32 button1 = input_port_read(machine, "HITNMISS_BUTTON1");
+	UINT32 button1 = input_port_read(field->port->machine, "HITNMISS_BUTTON1");
 	return (button1 << 1) | button1;
 }
 

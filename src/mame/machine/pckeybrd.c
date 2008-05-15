@@ -188,7 +188,7 @@ typedef struct at_keyboard
 	int scan_code_set;
 	int last_code;
 
-	int ports[8];
+	const input_port_config *ports[8];
 } at_keyboard;
 
 static at_keyboard keyboard;
@@ -343,7 +343,7 @@ void at_keyboard_init(AT_KEYBOARD_TYPE type)
 	for (i = 0; i < sizeof(keyboard.ports) / sizeof(keyboard.ports[0]); i++)
 	{
 		sprintf(buf, "pc_keyboard_%d", i);
-		keyboard.ports[i] = port_tag_to_index(buf);
+		keyboard.ports[i] = input_port_by_tag(Machine->portconfig, buf);
 	}
 
 #ifdef MESS
@@ -508,8 +508,8 @@ static void at_keyboard_extended_scancode_insert(int code, int pressed)
 static UINT32 at_keyboard_readport(int port)
 {
 	UINT32 result = 0;
-	if (keyboard.ports[port] >= 0)
-		result = input_port_read_indexed(Machine, keyboard.ports[port]);
+	if (keyboard.ports[port] != NULL)
+		result = input_port_read_direct(keyboard.ports[port]);
 	return result;
 }
 

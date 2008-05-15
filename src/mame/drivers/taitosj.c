@@ -336,9 +336,9 @@ static CUSTOM_INPUT( kikstart_gear_r )
 		port_tag = "GEARP2";
 
 	/* gear MUST be 1, 2 or 3 */
-	if (input_port_read(machine, port_tag) & 0x01) kikstart_gears[player] = 0x02;
-	if (input_port_read(machine, port_tag) & 0x02) kikstart_gears[player] = 0x03;
-	if (input_port_read(machine, port_tag) & 0x04) kikstart_gears[player] = 0x01;
+	if (input_port_read(field->port->machine, port_tag) & 0x01) kikstart_gears[player] = 0x02;
+	if (input_port_read(field->port->machine, port_tag) & 0x02) kikstart_gears[player] = 0x03;
+	if (input_port_read(field->port->machine, port_tag) & 0x04) kikstart_gears[player] = 0x01;
 
 	return kikstart_gears[player];
 }

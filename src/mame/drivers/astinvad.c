@@ -212,7 +212,7 @@ static MACHINE_START( kamikaze )
 static INPUT_CHANGED( spaceint_coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

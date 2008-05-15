@@ -92,7 +92,7 @@ static WRITE8_HANDLER( brkthru_soundlatch_w )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an IRQ */
-	cpunum_set_input_line(machine, 0, 0, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(field->port->machine, 0, 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

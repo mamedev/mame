@@ -358,7 +358,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -421,7 +421,7 @@ static CUSTOM_INPUT( razmataz_dial_r )
 	int num = (FPTR)param;
 	int delta, res;
 
-	delta = input_port_read(machine, dialname[num]);
+	delta = input_port_read(field->port->machine, dialname[num]);
 
 	if (delta < 0x80)
 	{
@@ -1469,9 +1469,9 @@ static DRIVER_INIT( razmataz )
 	nprinces_decode();
 
 	/* additional input ports are wired */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, port_tag_to_handler8("SW04"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, port_tag_to_handler8("SW08"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, port_tag_to_handler8("SW0C"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW04"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc008, 0xc008, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW08"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00c, 0xc00c, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW0C"));
 
 	/* unknown behavior expected here */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);

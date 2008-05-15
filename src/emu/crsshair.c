@@ -182,7 +182,8 @@ static void create_bitmap(int player)
 
 void crosshair_init(running_machine *machine)
 {
-	input_port_entry *ipt;
+	const input_port_config *port;
+	const input_field_config *field;
 
 	/* request a callback upon exiting */
 	add_exit_callback(machine, crosshair_exit);
@@ -191,22 +192,23 @@ void crosshair_init(running_machine *machine)
 	memset(&global, 0, sizeof(global));
 
 	/* determine who needs crosshairs */
-	for (ipt = machine->input_ports; ipt->type != IPT_END; ipt++)
-		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
-		{
-			int player = ipt->player;
+	for (port = machine->portconfig; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if (field->crossaxis != CROSSHAIR_AXIS_NONE)
+			{
+				int player = field->player;
 
-			assert(player < MAX_PLAYERS);
+				assert(player < MAX_PLAYERS);
 
-			/* mark as used and visible */
-			global.used[player] = TRUE;
-			global.visible[player] = TRUE;
+				/* mark as used and visible */
+				global.used[player] = TRUE;
+				global.visible[player] = TRUE;
 
-			/* for now, use the main screen */
-			global.screen[player] = machine->primary_screen;
+				/* for now, use the main screen */
+				global.screen[player] = machine->primary_screen;
 
-			create_bitmap(player);
-		}
+				create_bitmap(player);
+			}
 
 	/* register the animation callback */
 	if (machine->primary_screen != NULL)
@@ -272,8 +274,7 @@ void crosshair_toggle(running_machine *machine)
 
 static void animate(const device_config *device, int vblank_state)
 {
-	input_port_entry *ipt;
-	int portnum = -1;
+	int player;
 
 	/* increment animation counter */
 	global.animation_counter += 0x04;
@@ -285,39 +286,9 @@ static void animate(const device_config *device, int vblank_state)
 		global.fade = 0xa0 + (0x60 * (~global.animation_counter & 0x7f) / 0x80);
 
 	/* read all the lightgun values */
-	for (ipt = device->machine->input_ports; ipt->type != IPT_END; ipt++)
-	{
-		/* keep track of the port number */
-		if (ipt->type == IPT_PORT)
-			portnum++;
-
-		/* compute the values */
-		if (ipt->analog.crossaxis != CROSSHAIR_AXIS_NONE)
-		{
-			float value = (float)(get_crosshair_pos(portnum, ipt->player, ipt->analog.crossaxis) - ipt->analog.min) / (float)(ipt->analog.max - ipt->analog.min);
-			if (ipt->analog.crossscale < 0)
-				value = -(1.0 - value) * ipt->analog.crossscale;
-			else
-				value *= ipt->analog.crossscale;
-			value += ipt->analog.crossoffset;
-
-			/* switch off the axis */
-			switch (ipt->analog.crossaxis)
-			{
-				case CROSSHAIR_AXIS_X:
-					global.x[ipt->player] = value;
-					if (ipt->analog.crossaltaxis != 0)
-						global.y[ipt->player] = ipt->analog.crossaltaxis;
-					break;
-
-				case CROSSHAIR_AXIS_Y:
-					global.y[ipt->player] = value;
-					if (ipt->analog.crossaltaxis != 0)
-						global.x[ipt->player] = ipt->analog.crossaltaxis;
-					break;
-			}
-		}
-	}
+	for (player = 0; player < MAX_PLAYERS; player++)
+		if (global.used[player])
+			input_port_get_crosshair_position(device->machine, player, &global.x[player], &global.y[player]);
 }
 
 

@@ -841,13 +841,13 @@ static INPUT_CHANGED( gmgalax_game_changed )
 
 	/* select the bank and graphics bank based on it */
 	memory_set_bank(1, gmgalax_selected_game);
-	galaxian_gfxbank_w(machine, 0, gmgalax_selected_game);
+	galaxian_gfxbank_w(field->port->machine, 0, gmgalax_selected_game);
 
 	/* reset the starts */
-	galaxian_stars_enable_w(machine, 0, 0);
+	galaxian_stars_enable_w(field->port->machine, 0, 0);
 
 	/* reset the CPU */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -856,7 +856,7 @@ static CUSTOM_INPUT( gmgalax_port_r )
 	const char *portname = param;
 	if (gmgalax_selected_game != 0)
 		portname += strlen(portname) + 1;
-	return input_port_read(machine, portname);
+	return input_port_read(field->port->machine, portname);
 }
 
 
@@ -912,7 +912,7 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 
 static CUSTOM_INPUT( azurian_port_r )
 {
-	return (input_port_read(machine, "FAKE") >> (FPTR)param) & 1;
+	return (input_port_read(field->port->machine, "FAKE") >> (FPTR)param) & 1;
 }
 
 
@@ -926,7 +926,7 @@ static CUSTOM_INPUT( azurian_port_r )
 static CUSTOM_INPUT( kingball_muxbit_r )
 {
 	/* multiplex the service mode switch with a speech DIP switch */
-	return (input_port_read(machine, "FAKE") >> kingball_speech_dip) & 1;
+	return (input_port_read(field->port->machine, "FAKE") >> kingball_speech_dip) & 1;
 }
 
 
@@ -935,7 +935,7 @@ static CUSTOM_INPUT( kingball_noise_r )
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
        that it's working, doesn't actually use return value, so we can just use
        rand() */
-	return mame_rand(machine) & 1;
+	return mame_rand(field->port->machine) & 1;
 }
 
 
@@ -2323,7 +2323,7 @@ static DRIVER_INIT( gmgalax )
 	memory_configure_bank(1, 0, 2, memory_region(REGION_CPU1) + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(machine, NULL, 0, 0);
+	gmgalax_game_changed(machine->portconfig->fieldlist, NULL, 0, 0);
 	state_save_register_global(gmgalax_selected_game);
 }
 

@@ -174,4 +174,32 @@ INLINE int input_seq_cmp(const input_seq *seqa, const input_seq *seqb)
 	return 0;
 }
 
+
+/*-------------------------------------------------
+    input_seq_append_or - append a code to a
+    sequence; if the sequence is non-empty, insert
+    an OR before the new code
+-------------------------------------------------*/
+
+INLINE void input_seq_append_or(input_seq *seq, input_code code)
+{
+	int codenum;
+	if (seq->code[0] == SEQCODE_END || seq->code[0] == SEQCODE_DEFAULT)
+	{
+		seq->code[0] = code;
+		seq->code[1] = SEQCODE_END;
+	}
+	else
+	{
+		for (codenum = 0; codenum < ARRAY_LENGTH(seq->code) - 2; codenum++)
+			if (seq->code[codenum] == SEQCODE_END)
+			{
+				seq->code[codenum++] = SEQCODE_OR;
+				seq->code[codenum++] = code;
+				seq->code[codenum++] = SEQCODE_END;
+			}
+	}
+}
+
+
 #endif	/* __INPUTSEQ_H__ */

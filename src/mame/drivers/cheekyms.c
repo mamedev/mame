@@ -26,7 +26,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -7202,8 +7202,8 @@ static DRIVER_INIT( jockeygp )
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
 	memory_set_bankptr(NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
-//  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x280000, 0x280001, 0, 0, port_tag_to_handler16("IN5") );
-//  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2c0000, 0x2c0001, 0, 0, port_tag_to_handler16("IN6") );
+//  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x280000, 0x280001, 0, 0, input_port_read_handler16(machine->portconfig, "IN5") );
+//  memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2c0000, 0x2c0001, 0, 0, input_port_read_handler16(machine->portconfig, "IN6") );
 
 	DRIVER_INIT_CALL(neogeo);
 }
@@ -7219,8 +7219,8 @@ static DRIVER_INIT( vliner )
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
 	memory_set_bankptr(NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x280000, 0x280001, 0, 0, port_tag_to_handler16("IN5") );
-    memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2c0000, 0x2c0001, 0, 0, port_tag_to_handler16("IN6") );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x280000, 0x280001, 0, 0, input_port_read_handler16(machine->portconfig, "IN5") );
+    memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2c0000, 0x2c0001, 0, 0, input_port_read_handler16(machine->portconfig, "IN6") );
 
 	DRIVER_INIT_CALL(neogeo);
 }
@@ -7229,7 +7229,7 @@ static DRIVER_INIT( vliner )
 static DRIVER_INIT( kog )
 {
 	/* overlay cartridge ROM */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0ffffe, 0x0fffff, 0, 0, port_tag_to_handler16("JUMPER") );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0ffffe, 0x0fffff, 0, 0, input_port_read_handler16(machine->portconfig, "JUMPER") );
 
 	kog_px_decrypt();
 	neogeo_bootleg_sx_decrypt(1);

@@ -252,8 +252,8 @@ static const render_quad_texuv oriented_texcoords[8] =
 
 /* core system */
 static void render_exit(running_machine *machine);
-static void render_load(int config_type, xml_data_node *parentnode);
-static void render_save(int config_type, xml_data_node *parentnode);
+static void render_load(running_machine *machine, int config_type, xml_data_node *parentnode);
+static void render_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
 /* render targets */
 static void release_render_list(render_primitive_list *list);
@@ -537,7 +537,7 @@ void render_init(running_machine *machine)
 	*current_container_ptr = NULL;
 
 	/* register callbacks */
-	config_register("video", render_load, render_save);
+	config_register(machine, "video", render_load, render_save);
 }
 
 
@@ -615,7 +615,7 @@ static void render_exit(running_machine *machine)
     configuration file
 -------------------------------------------------*/
 
-static void render_load(int config_type, xml_data_node *parentnode)
+static void render_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *targetnode;
 	xml_data_node *screennode;
@@ -733,7 +733,7 @@ static void render_load(int config_type, xml_data_node *parentnode)
     file
 -------------------------------------------------*/
 
-static void render_save(int config_type, xml_data_node *parentnode)
+static void render_save(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	render_target *target;
 	render_container *container;

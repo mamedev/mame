@@ -36,34 +36,33 @@
     settings for a game
 -------------------------------------------------*/
 
-static void print_game_switches(FILE *out, const game_driver *game, const input_port_entry *input)
+static void print_game_switches(FILE *out, const game_driver *game, const input_port_config *portlist)
 {
-	/* iterate over input entries until we run out */
-	while (input->type != IPT_END)
-	{
-		/* once we hit a name entry, start outputting */
-		if (input->type == IPT_DIPSWITCH_NAME)
-		{
-			int def = input->default_value;
-
-			/* output the switch name information */
-			fprintf(out, "\t\t<dipswitch name=\"%s\">\n", xml_normalize_string(input->name));
-
-			/* loop over settings */
-			for (input++; input->type == IPT_DIPSWITCH_SETTING; input++)
+	const input_port_config *port;
+	const input_field_config *field;
+	
+	/* iterate looking for DIP switches */
+	for (port = portlist; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if (field->type == IPT_DIPSWITCH)
 			{
-				fprintf(out, "\t\t\t<dipvalue name=\"%s\"", xml_normalize_string(input->name));
-				if (def == input->default_value)
-					fprintf(out, " default=\"yes\"");
-				fprintf(out, "/>\n");
-			}
+				const input_setting_config *setting;
 
-			/* terminate the switch entry */
-			fprintf(out, "\t\t</dipswitch>\n");
-		}
-		else
-			++input;
-	}
+				/* output the switch name information */
+				fprintf(out, "\t\t<dipswitch name=\"%s\">\n", xml_normalize_string(input_field_name(field)));
+
+				/* loop over settings */
+				for (setting = field->settinglist; setting != NULL; setting = setting->next)
+				{
+					fprintf(out, "\t\t\t<dipvalue name=\"%s\"", xml_normalize_string(setting->name));
+					if (setting->value == field->defvalue)
+						fprintf(out, " default=\"yes\"");
+					fprintf(out, "/>\n");
+				}
+
+				/* terminate the switch entry */
+				fprintf(out, "\t\t</dipswitch>\n");
+			}
 }
 
 
@@ -72,7 +71,7 @@ static void print_game_switches(FILE *out, const game_driver *game, const input_
     input
 -------------------------------------------------*/
 
-static void print_game_input(FILE *out, const game_driver *game, const input_port_entry *input)
+static void print_game_input(FILE *out, const game_driver *game, const input_port_config *portlist)
 {
 	/* fix me -- this needs to be cleaned up to match the core style */
 
@@ -97,6 +96,8 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		int				keydelta;		/* default analog keydelta */
 		int				reverse;		/* default analog reverse setting */
 	} control[ENDCONTROLTYPES];
+	const input_port_config *port;
+	const input_field_config *field;
 
 	for (i=0;i<ENDCONTROLTYPES;i++)
 	{
@@ -110,203 +111,177 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		control[i].reverse = 0;
 	}
 
-	while (input->type != IPT_END)
-	{
-		if (nplayer < input->player+1)
-			nplayer = input->player+1;
-
-		switch (input->type)
+	for (port = portlist; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			case IPT_JOYSTICK_LEFT:
-			case IPT_JOYSTICK_RIGHT:
+			if (nplayer < field->player+1)
+				nplayer = field->player+1;
 
-				/* if control not defined, start it off as horizontal 2-way */
-				if (control[cjoy].Xway == NULL)
-					control[cjoy].Xway = "joy2way";
-				else if (strcmp(control[cjoy].Xway,"joy2way") == 0)
-					;
-				/* if already defined as vertical, make it 4 or 8 way */
-				else if (strcmp(control[cjoy].Xway,"vjoy2way") == 0)
-				{
-					if (input->way == 4)
-						control[cjoy].Xway = "joy4way";
-					else
-						control[cjoy].Xway = "joy8way";
-				}
+			switch (field->type)
+			{
+				case IPT_JOYSTICK_LEFT:
+				case IPT_JOYSTICK_RIGHT:
+
+					/* if control not defined, start it off as horizontal 2-way */
+					if (control[cjoy].Xway == NULL)
+						control[cjoy].Xway = "joy2way";
+					else if (strcmp(control[cjoy].Xway,"joy2way") == 0)
+						;
+					/* if already defined as vertical, make it 4 or 8 way */
+					else if (strcmp(control[cjoy].Xway,"vjoy2way") == 0)
+					{
+						if (field->way == 4)
+							control[cjoy].Xway = "joy4way";
+						else
+							control[cjoy].Xway = "joy8way";
+					}
+					controlsyes = 1;
+					break;
+
+				case IPT_JOYSTICK_UP:
+				case IPT_JOYSTICK_DOWN:
+
+					/* if control not defined, start it off as vertical 2-way */
+					if (control[cjoy].Xway == NULL)
+						control[cjoy].Xway = "vjoy2way";
+					else if (strcmp(control[cjoy].Xway,"vjoy2way") == 0)
+						;
+					/* if already defined as horiz, make it 4 or 8way */
+					else if (strcmp(control[cjoy].Xway,"joy2way") == 0)
+					{
+						if (field->way == 4)
+							control[cjoy].Xway = "joy4way";
+						else
+							control[cjoy].Xway = "joy8way";
+					}
+					controlsyes = 1;
+					break;
+
+				case IPT_JOYSTICKRIGHT_UP:
+				case IPT_JOYSTICKRIGHT_DOWN:
+				case IPT_JOYSTICKLEFT_UP:
+				case IPT_JOYSTICKLEFT_DOWN:
+
+					/* if control not defined, start it off as vertical 2way */
+					if (control[cdoublejoy].Xway == NULL)
+						control[cdoublejoy].Xway = "vdoublejoy2way";
+					else if (strcmp(control[cdoublejoy].Xway,"vdoublejoy2way") == 0)
+						;
+					/* if already defined as horiz, make it 4 or 8 way */
+					else if (strcmp(control[cdoublejoy].Xway,"doublejoy2way") == 0)
+					{
+						if (field->way == 4)
+							control[cdoublejoy].Xway = "doublejoy4way";
+						else
+							control[cdoublejoy].Xway = "doublejoy8way";
+					}
+					controlsyes = 1;
+					break;
+
+				case IPT_JOYSTICKRIGHT_LEFT:
+				case IPT_JOYSTICKRIGHT_RIGHT:
+				case IPT_JOYSTICKLEFT_LEFT:
+				case IPT_JOYSTICKLEFT_RIGHT:
+
+					/* if control not defined, start it off as horiz 2-way */
+					if (control[cdoublejoy].Xway == NULL)
+						control[cdoublejoy].Xway = "doublejoy2way";
+					else if (strcmp(control[cdoublejoy].Xway,"doublejoy2way") == 0)
+						;
+					/* if already defined as vertical, make it 4 or 8 way */
+					else if (strcmp(control[cdoublejoy].Xway,"vdoublejoy2way") == 0)
+					{
+						if (field->way == 4)
+							control[cdoublejoy].Xway = "doublejoy4way";
+						else
+							control[cdoublejoy].Xway = "doublejoy8way";
+					}
+					controlsyes = 1;
+					break;
+
+				/* mark as an analog input, and get analog stats after switch */
+				case IPT_PADDLE:
+					analogcontrol = cpaddle;
+					break;
+				case IPT_DIAL:
+					analogcontrol = cdial;
+					break;
+				case IPT_TRACKBALL_X:
+				case IPT_TRACKBALL_Y:
+					analogcontrol = ctrackball;
+					break;
+				case IPT_AD_STICK_X:
+				case IPT_AD_STICK_Y:
+					analogcontrol = cAD_stick;
+					break;
+				case IPT_LIGHTGUN_X:
+				case IPT_LIGHTGUN_Y:
+					analogcontrol = clightgun;
+					break;
+				case IPT_PEDAL:
+				case IPT_PEDAL2:
+				case IPT_PEDAL3:
+					analogcontrol = cpedal;
+					break;
+
+				case IPT_BUTTON1:
+				case IPT_BUTTON2:
+				case IPT_BUTTON3:
+				case IPT_BUTTON4:
+				case IPT_BUTTON5:
+				case IPT_BUTTON6:
+				case IPT_BUTTON7:
+				case IPT_BUTTON8:
+				case IPT_BUTTON9:
+				case IPT_BUTTON10:
+				case IPT_BUTTON11:
+				case IPT_BUTTON12:
+				case IPT_BUTTON13:
+				case IPT_BUTTON14:
+				case IPT_BUTTON15:
+				case IPT_BUTTON16:
+					nbutton = MAX(nbutton, field->type - IPT_BUTTON1 + 1);
+					break;
+
+				case IPT_COIN1:
+				case IPT_COIN2:
+				case IPT_COIN3:
+				case IPT_COIN4:
+				case IPT_COIN5:
+				case IPT_COIN6:
+				case IPT_COIN7:
+				case IPT_COIN8:
+					ncoin = MAX(ncoin, field->type - IPT_COIN1 + 1);
+
+				case IPT_SERVICE :
+					service = "yes";
+					break;
+
+				case IPT_TILT :
+					tilt = "yes";
+					break;
+			}
+
+			/* get the analog stats */
+			if (analogcontrol)
+			{
 				controlsyes = 1;
-				break;
+				control[analogcontrol].analog = 1;
 
-			case IPT_JOYSTICK_UP:
-			case IPT_JOYSTICK_DOWN:
+				if (field->min)
+					control[analogcontrol].min = field->min;
+				if (field->max)
+					control[analogcontrol].max = field->max;
+				if (field->sensitivity)
+					control[analogcontrol].sensitivity = field->sensitivity;
+				if (field->delta)
+					control[analogcontrol].keydelta = field->delta;
+				if (field->flags & ANALOG_FLAG_REVERSE)
+					control[analogcontrol].reverse = 1;
 
-				/* if control not defined, start it off as vertical 2-way */
-				if (control[cjoy].Xway == NULL)
-					control[cjoy].Xway = "vjoy2way";
-				else if (strcmp(control[cjoy].Xway,"vjoy2way") == 0)
-					;
-				/* if already defined as horiz, make it 4 or 8way */
-				else if (strcmp(control[cjoy].Xway,"joy2way") == 0)
-				{
-					if (input->way == 4)
-						control[cjoy].Xway = "joy4way";
-					else
-						control[cjoy].Xway = "joy8way";
-				}
-				controlsyes = 1;
-				break;
-
-			case IPT_JOYSTICKRIGHT_UP:
-			case IPT_JOYSTICKRIGHT_DOWN:
-			case IPT_JOYSTICKLEFT_UP:
-			case IPT_JOYSTICKLEFT_DOWN:
-
-				/* if control not defined, start it off as vertical 2way */
-				if (control[cdoublejoy].Xway == NULL)
-					control[cdoublejoy].Xway = "vdoublejoy2way";
-				else if (strcmp(control[cdoublejoy].Xway,"vdoublejoy2way") == 0)
-					;
-				/* if already defined as horiz, make it 4 or 8 way */
-				else if (strcmp(control[cdoublejoy].Xway,"doublejoy2way") == 0)
-				{
-					if (input->way == 4)
-						control[cdoublejoy].Xway = "doublejoy4way";
-					else
-						control[cdoublejoy].Xway = "doublejoy8way";
-				}
-				controlsyes = 1;
-				break;
-
-			case IPT_JOYSTICKRIGHT_LEFT:
-			case IPT_JOYSTICKRIGHT_RIGHT:
-			case IPT_JOYSTICKLEFT_LEFT:
-			case IPT_JOYSTICKLEFT_RIGHT:
-
-				/* if control not defined, start it off as horiz 2-way */
-				if (control[cdoublejoy].Xway == NULL)
-					control[cdoublejoy].Xway = "doublejoy2way";
-				else if (strcmp(control[cdoublejoy].Xway,"doublejoy2way") == 0)
-					;
-				/* if already defined as vertical, make it 4 or 8 way */
-				else if (strcmp(control[cdoublejoy].Xway,"vdoublejoy2way") == 0)
-				{
-					if (input->way == 4)
-						control[cdoublejoy].Xway = "doublejoy4way";
-					else
-						control[cdoublejoy].Xway = "doublejoy8way";
-				}
-				controlsyes = 1;
-				break;
-
-			/* mark as an analog input, and get analog stats after switch */
-			case IPT_PADDLE:
-				analogcontrol = cpaddle;
-				break;
-			case IPT_DIAL:
-				analogcontrol = cdial;
-				break;
-			case IPT_TRACKBALL_X:
-			case IPT_TRACKBALL_Y:
-				analogcontrol = ctrackball;
-				break;
-			case IPT_AD_STICK_X:
-			case IPT_AD_STICK_Y:
-				analogcontrol = cAD_stick;
-				break;
-			case IPT_LIGHTGUN_X:
-			case IPT_LIGHTGUN_Y:
-				analogcontrol = clightgun;
-				break;
-			case IPT_PEDAL:
-			case IPT_PEDAL2:
-			case IPT_PEDAL3:
-				analogcontrol = cpedal;
-				break;
-
-			case IPT_BUTTON1:
-				if (nbutton<1) nbutton = 1;
-				break;
-			case IPT_BUTTON2:
-				if (nbutton<2) nbutton = 2;
-				break;
-			case IPT_BUTTON3:
-				if (nbutton<3) nbutton = 3;
-				break;
-			case IPT_BUTTON4:
-				if (nbutton<4) nbutton = 4;
-				break;
-			case IPT_BUTTON5:
-				if (nbutton<5) nbutton = 5;
-				break;
-			case IPT_BUTTON6:
-				if (nbutton<6) nbutton = 6;
-				break;
-			case IPT_BUTTON7:
-				if (nbutton<7) nbutton = 7;
-				break;
-			case IPT_BUTTON8:
-				if (nbutton<8) nbutton = 8;
-				break;
-			case IPT_BUTTON9:
-				if (nbutton<9) nbutton = 9;
-				break;
-			case IPT_BUTTON10:
-				if (nbutton<10) nbutton = 10;
-				break;
-
-			case IPT_COIN1:
-				if (ncoin < 1) ncoin = 1;
-				break;
-			case IPT_COIN2:
-				if (ncoin < 2) ncoin = 2;
-				break;
-			case IPT_COIN3:
-				if (ncoin < 3) ncoin = 3;
-				break;
-			case IPT_COIN4:
-				if (ncoin < 4) ncoin = 4;
-				break;
-			case IPT_COIN5:
-				if (ncoin < 5) ncoin = 5;
-				break;
-			case IPT_COIN6:
-				if (ncoin < 6) ncoin = 6;
-				break;
-			case IPT_COIN7:
-				if (ncoin < 7) ncoin = 7;
-				break;
-			case IPT_COIN8:
-				if (ncoin < 8) ncoin = 8;
-				break;
-			case IPT_SERVICE :
-				service = "yes";
-				break;
-			case IPT_TILT :
-				tilt = "yes";
-				break;
+				analogcontrol = 0;
+			}
 		}
-
-		/* get the analog stats */
-		if (analogcontrol)
-		{
-			controlsyes = 1;
-			control[analogcontrol].analog = 1;
-
-			if (input->analog.min)
-				control[analogcontrol].min = input->analog.min;
-			if (input->analog.max)
-				control[analogcontrol].max = input->analog.max;
-			if (input->analog.sensitivity)
-				control[analogcontrol].sensitivity = input->analog.sensitivity;
-			if (input->analog.delta)
-				control[analogcontrol].keydelta = input->analog.delta;
-			if (input->analog.reverse)
-				control[analogcontrol].reverse = 1;
-
-			analogcontrol = 0;
-		}
-
-		++input;
-	}
 
 	fprintf(out, "\t\t<input");
 	fprintf(out, " players=\"%d\"", nplayer);
@@ -856,7 +831,7 @@ static void print_game_driver(FILE *out, const game_driver *game, const machine_
 
 static void print_game_info(FILE *out, const game_driver *game)
 {
-	const input_port_entry *input;
+	const input_port_config *portconfig;
 	const game_driver *clone_of;
 	machine_config *config;
 	const char *start;
@@ -866,13 +841,12 @@ static void print_game_info(FILE *out, const game_driver *game)
 		return;
 
 	/* start tracking resources and allocate the machine and input configs */
-	begin_resource_tracking();
 	config = machine_config_alloc(game->machine_config);
 #ifdef MESS
 	/* temporary hook until MESS device transition is complete */
 	mess_devices_setup(config, game);
 #endif /* MESS */
-	input = input_port_allocate(game->ipt, NULL);
+	portconfig = input_port_config_alloc(game->ipt);
 
 	/* print the header and the game name */
 	fprintf(out, "\t<" XML_TOP);
@@ -922,8 +896,8 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_chips(out, game, config);
 	print_game_display(out, game, config);
 	print_game_sound(out, game, config);
-	print_game_input(out, game, input);
-	print_game_switches(out, game, input);
+	print_game_input(out, game, portconfig);
+	print_game_switches(out, game, portconfig);
 	print_game_driver(out, game, config);
 #ifdef MESS
 	print_game_device(out, game, config);
@@ -933,8 +907,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
 
-	/* release resources */
-	end_resource_tracking();
+	input_port_config_free(portconfig);
 	machine_config_free(config);
 }
 

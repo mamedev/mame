@@ -1382,10 +1382,10 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	int index = port_tag_to_index("IN3");
-	if( index != -1 )
+	const input_port_config *port = input_port_by_tag(machine->portconfig, "IN3");
+	if( port != NULL )
 	{
-		int rv = input_port_read_indexed(machine,  index ) << 6;
+		int rv = input_port_read_direct( port ) << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{
@@ -1401,10 +1401,10 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	int index = port_tag_to_index("IN4");
-	if( index != -1 )
+	const input_port_config *port = input_port_by_tag(machine->portconfig, "IN4");
+	if( port != NULL )
 	{
-		int rv = input_port_read_indexed(machine,  index ) << 6;
+		int rv = input_port_read_direct( port ) << 6;
 
 		if( ( offset & 1 ) != 0 )
 		{

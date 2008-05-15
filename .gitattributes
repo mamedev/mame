@@ -538,6 +538,7 @@ src/emu/info.c svneol=native#text/plain
 src/emu/info.h svneol=native#text/plain
 src/emu/inptport.c svneol=native#text/plain
 src/emu/inptport.h svneol=native#text/plain
+src/emu/inpttype.h svneol=native#text/plain
 src/emu/input.c svneol=native#text/plain
 src/emu/input.h svneol=native#text/plain
 src/emu/inputseq.c svneol=native#text/plain

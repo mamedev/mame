@@ -834,13 +834,13 @@ static TIMER_CALLBACK( scanline_callback )
 static void check_palette(running_machine *machine)
 {
 	dkong_state *state = machine->driver_data;
+	const input_port_config *port;
 	int newset;
-	int num;
 
-	num = port_tag_to_index("VIDHW");
-	if (num>=0)
+	port = input_port_by_tag(machine->portconfig, "VIDHW");
+	if (port != NULL)
 	{
-		newset = input_port_read_indexed(machine, num);
+		newset = input_port_read_direct(port);
 		if (newset != state->vidhw)
 		{
 			state->vidhw = newset;

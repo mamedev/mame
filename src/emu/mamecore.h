@@ -66,8 +66,6 @@ typedef struct _machine_config machine_config;
 typedef struct _rom_load_data rom_load_data;
 typedef struct _osd_create_params osd_create_params;
 typedef struct _gfx_element gfx_element;
-typedef struct _input_port_entry input_port_entry;
-typedef struct _input_port_default_entry input_port_default_entry;
 typedef struct _mame_file mame_file;
 
 

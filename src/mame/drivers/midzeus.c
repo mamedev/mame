@@ -451,7 +451,7 @@ static CUSTOM_INPUT( custom_49way_r )
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[input_port_read(machine, namey) >> 4] << 4) | translate49[input_port_read(machine, namex) >> 4];
+	return (translate49[input_port_read(field->port->machine, namey) >> 4] << 4) | translate49[input_port_read(field->port->machine, namex) >> 4];
 }
 
 
@@ -464,7 +464,7 @@ static WRITE32_HANDLER( keypad_select_w )
 
 static CUSTOM_INPUT( keypad_r )
 {
-	UINT32 bits = input_port_read(machine, param);
+	UINT32 bits = input_port_read(field->port->machine, param);
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{

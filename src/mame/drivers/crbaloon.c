@@ -75,7 +75,7 @@ static CUSTOM_INPUT( pc3092_r )
 
 	/* enable coin & start input? Wild guess!!! */
 	if (pc3092_data[1] & 0x02)
-		ret = input_port_read(machine, "PC3092");
+		ret = input_port_read(field->port->machine, "PC3092");
 	else
 		ret = 0x00;
 

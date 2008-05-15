@@ -1104,6 +1104,7 @@ static INPUT_PORTS_START( vimanan )
 	PORT_INCLUDE( vimana )
 
 	PORT_MODIFY("DSWA")		/* DSW A */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )

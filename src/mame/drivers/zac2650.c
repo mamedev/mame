@@ -217,7 +217,7 @@ static INPUT_PORTS_START( dodgem )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START_TAG("1E86")
-	PORT_BIT(    0x01, 0x01, IPT_DIPSWITCH_NAME ) PORT_NAME("Collision Detection (Cheat)")
+	PORT_DIPNAME( 0x01, 0x01, "Collision Detection (Cheat)" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 

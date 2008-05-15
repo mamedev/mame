@@ -64,13 +64,13 @@ Note 2: Lethal Justice uses a TMS34010FNL-50 instead of the TMS34010FNL-40
 
 static CUSTOM_INPUT( ticket_status )
 {
-	return ticket_dispenser_0_r(machine, 0) >> 7;
+	return ticket_dispenser_0_r(field->port->machine, 0) >> 7;
 }
 
 
 static CUSTOM_INPUT( cclownz_paddle )
 {
-	int value = input_port_read(machine, "PADDLE");
+	int value = input_port_read(field->port->machine, "PADDLE");
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 

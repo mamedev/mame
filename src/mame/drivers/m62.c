@@ -853,7 +853,7 @@ static INPUT_PORTS_START( ldrun4 )
 	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT(    0x80, 0x80, IPT_DIPSWITCH_NAME ) PORT_NAME("Service Mode (must set 2P game to No)") PORT_TOGGLE PORT_CODE(KEYCODE_F2)
+	PORT_DIPNAME( 0x80, 0x80, "Service Mode (must set 2P game to No)" ) PORT_TOGGLE PORT_CODE(KEYCODE_F2)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END

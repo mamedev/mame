@@ -699,42 +699,42 @@ BOOL wininput_handle_raw(HANDLE device)
 
 
 //============================================================
-//  osd_customize_inputport_list
+//  osd_customize_mapping_list
 //============================================================
 
-void osd_customize_inputport_list(input_port_default_entry *defaults)
+void osd_customize_input_type_list(input_type_desc *typelist)
 {
-	input_port_default_entry *idef = defaults;
-
-	// loop over all the defaults
-	for (idef = defaults; idef->type != IPT_END; idef++)
-		switch (idef->type)
+	input_type_desc *typedesc;
+	
+	// loop over the defaults
+	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
+		switch (typedesc->type)
 		{
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
-				input_seq_set_5(&idef->defaultseq, KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
+				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_TAB, SEQCODE_NOT, KEYCODE_LALT, SEQCODE_NOT, KEYCODE_RALT);
 				break;
 
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
-				idef->token = "TOGGLE_FULLSCREEN";
-				idef->name = "Toggle Fullscreen";
-				input_seq_set_2(&idef->defaultseq, KEYCODE_LALT, KEYCODE_ENTER);
+				typedesc->token = "TOGGLE_FULLSCREEN";
+				typedesc->name = "Toggle Fullscreen";
+				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_LALT, KEYCODE_ENTER);
 				break;
 
 #ifdef MESS
 			case IPT_OSD_2:
 				if (mess_use_new_ui())
 				{
-					idef->token = "TOGGLE_MENUBAR";
-					idef->name = "Toggle Menubar";
-					input_seq_set_1 (&idef->defaultseq, KEYCODE_SCRLOCK);
+					typedesc->token = "TOGGLE_MENUBAR";
+					typedesc->name = "Toggle Menubar";
+					input_seq_set_1 (&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_SCRLOCK);
 				}
 				break;
 
 			case IPT_UI_THROTTLE:
-				input_seq_set_0(&idef->defaultseq);
+				input_seq_set_0(&typedesc->seq[SEQ_TYPE_STANDARD]);
 				break;
 #endif /* MESS */
 		}

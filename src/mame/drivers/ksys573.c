@@ -1880,7 +1880,7 @@ static void gn845pwbb_clk_w( int offset, int data )
 
 static CUSTOM_INPUT( gn845pwbb_read )
 {
-	return input_port_read(machine,  "STAGE" ) & stage_mask;
+	return input_port_read(field->port->machine,  "STAGE" ) & stage_mask;
 }
 
 static void gn845pwbb_output_callback( int offset, int data )

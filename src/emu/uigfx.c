@@ -78,19 +78,19 @@ static ui_gfx_state ui_gfx;
 static void ui_gfx_exit(running_machine *machine);
 
 /* palette handling */
-static void palette_handle_keys(ui_gfx_state *state);
-static void palette_handler(ui_gfx_state *state);
+static void palette_handle_keys(running_machine *machine, ui_gfx_state *state);
+static void palette_handler(running_machine *machine, ui_gfx_state *state);
 
 /* graphics set handling */
-static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells);
+static void gfxset_handle_keys(running_machine *machine, ui_gfx_state *state, int xcells, int ycells);
 static void gfxset_draw_item(const gfx_element *gfx, int index, bitmap_t *bitmap, int dstx, int dsty, int color, int rotate);
 static void gfxset_update_bitmap(ui_gfx_state *state, int xcells, int ycells, gfx_element *gfx);
-static void gfxset_handler(ui_gfx_state *state);
+static void gfxset_handler(running_machine *machine, ui_gfx_state *state);
 
 /* tilemap handling */
-static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight);
+static void tilemap_handle_keys(running_machine *machine, ui_gfx_state *state, int viswidth, int visheight);
 static void tilemap_update_bitmap(ui_gfx_state *state, int width, int height);
-static void tilemap_handler(ui_gfx_state *state);
+static void tilemap_handler(running_machine *machine, ui_gfx_state *state);
 
 
 
@@ -170,7 +170,7 @@ again:
 			/* if we have a palette, display it */
 			if (machine->config->total_colors > 0)
 			{
-				palette_handler(state);
+				palette_handler(machine, state);
 				break;
 			}
 
@@ -181,7 +181,7 @@ again:
 			/* if we have graphics sets, display them */
 			if (machine->gfx[0] != NULL)
 			{
-				gfxset_handler(state);
+				gfxset_handler(machine, state);
 				break;
 			}
 
@@ -192,7 +192,7 @@ again:
 			/* if we have tilemaps, display them */
 			if (tilemap_count() > 0)
 			{
-				tilemap_handler(state);
+				tilemap_handler(machine, state);
 				break;
 			}
 
@@ -201,16 +201,16 @@ again:
 	}
 
 	/* handle keys */
-	if (input_ui_pressed(IPT_UI_SELECT))
+	if (input_ui_pressed(machine, IPT_UI_SELECT))
 	{
 		state->mode = (state->mode + 1) % 3;
 		state->bitmap_dirty = TRUE;
 	}
 
-	if (input_ui_pressed(IPT_UI_PAUSE))
+	if (input_ui_pressed(machine, IPT_UI_PAUSE))
 		mame_pause(machine, !mame_is_paused(machine));
 
-	if (input_ui_pressed(IPT_UI_CANCEL) || input_ui_pressed(IPT_UI_SHOW_GFX))
+	if (input_ui_pressed(machine, IPT_UI_CANCEL) || input_ui_pressed(machine, IPT_UI_SHOW_GFX))
 		goto cancel;
 
 	return uistate;
@@ -233,7 +233,7 @@ cancel:
     viewer
 -------------------------------------------------*/
 
-static void palette_handler(ui_gfx_state *state)
+static void palette_handler(running_machine *machine, ui_gfx_state *state)
 {
 	int total = state->palette.which ? colortable_palette_get_size(Machine->colortable) : Machine->config->total_colors;
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
@@ -344,7 +344,7 @@ static void palette_handler(ui_gfx_state *state)
 		}
 
 	/* handle keys */
-	palette_handle_keys(state);
+	palette_handle_keys(machine, state);
 }
 
 
@@ -353,15 +353,15 @@ static void palette_handler(ui_gfx_state *state)
     palette viewer
 -------------------------------------------------*/
 
-static void palette_handle_keys(ui_gfx_state *state)
+static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
 {
 	int rowcount, screencount;
 	int total;
 
 	/* handle zoom (minus,plus) */
-	if (input_ui_pressed(IPT_UI_ZOOM_OUT))
+	if (input_ui_pressed(machine, IPT_UI_ZOOM_OUT))
 		state->palette.count /= 2;
-	if (input_ui_pressed(IPT_UI_ZOOM_IN))
+	if (input_ui_pressed(machine, IPT_UI_ZOOM_IN))
 		state->palette.count *= 2;
 
 	/* clamp within range */
@@ -371,9 +371,9 @@ static void palette_handle_keys(ui_gfx_state *state)
 		state->palette.count = 64;
 
 	/* handle colormap selection (open bracket,close bracket) */
-	if (input_ui_pressed(IPT_UI_PREV_GROUP))
+	if (input_ui_pressed(machine, IPT_UI_PREV_GROUP))
 		state->palette.which--;
-	if (input_ui_pressed(IPT_UI_NEXT_GROUP))
+	if (input_ui_pressed(machine, IPT_UI_NEXT_GROUP))
 		state->palette.which++;
 
 	/* clamp within range */
@@ -390,17 +390,17 @@ static void palette_handle_keys(ui_gfx_state *state)
 	screencount = rowcount * rowcount;
 
 	/* handle keyboard navigation */
-	if (input_ui_pressed_repeat(IPT_UI_UP, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_UP, 4))
 		state->palette.offset -= rowcount;
-	if (input_ui_pressed_repeat(IPT_UI_DOWN, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_DOWN, 4))
 		state->palette.offset += rowcount;
-	if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
+	if (input_ui_pressed_repeat(machine, IPT_UI_PAGE_UP, 6))
 		state->palette.offset -= screencount;
-	if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
+	if (input_ui_pressed_repeat(machine, IPT_UI_PAGE_DOWN, 6))
 		state->palette.offset += screencount;
-	if (input_ui_pressed_repeat(IPT_UI_HOME, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_HOME, 4))
 		state->palette.offset = 0;
-	if (input_ui_pressed_repeat(IPT_UI_END, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_END, 4))
 		state->palette.offset = total;
 
 	/* clamp within range */
@@ -421,7 +421,7 @@ static void palette_handle_keys(ui_gfx_state *state)
     viewer
 -------------------------------------------------*/
 
-static void gfxset_handler(ui_gfx_state *state)
+static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 {
 	render_font *ui_font = ui_get_font();
 	int set = state->gfxset.set;
@@ -578,23 +578,23 @@ static void gfxset_handler(ui_gfx_state *state)
 						ARGB_WHITE, state->texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	/* handle keyboard navigation before drawing */
-	gfxset_handle_keys(state, xcells, ycells);
+	gfxset_handle_keys(machine, state, xcells, ycells);
 }
 
 
 /*-------------------------------------------------
-    gfxset_handler - handle keys for the graphics
-    viewer
+    gfxset_handle_keys - handle keys for the 
+    graphics viewer
 -------------------------------------------------*/
 
-static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells)
+static void gfxset_handle_keys(running_machine *machine, ui_gfx_state *state, int xcells, int ycells)
 {
 	ui_gfx_state oldstate = *state;
 	gfx_element *gfx;
 	int temp, set;
 
 	/* handle gfxset selection (open bracket,close bracket) */
-	if (input_ui_pressed(IPT_UI_PREV_GROUP))
+	if (input_ui_pressed(machine, IPT_UI_PREV_GROUP))
 	{
 		for (temp = state->gfxset.set - 1; temp >= 0; temp--)
 			if (Machine->gfx[temp] != NULL)
@@ -602,7 +602,7 @@ static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells)
 		if (temp >= 0)
 			state->gfxset.set = temp;
 	}
-	if (input_ui_pressed(IPT_UI_NEXT_GROUP))
+	if (input_ui_pressed(machine, IPT_UI_NEXT_GROUP))
 	{
 		for (temp = state->gfxset.set + 1; temp < MAX_GFX_ELEMENTS; temp++)
 			if (Machine->gfx[temp] != NULL)
@@ -616,9 +616,9 @@ static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells)
 	gfx = Machine->gfx[set];
 
 	/* handle cells per line (minus,plus) */
-	if (input_ui_pressed(IPT_UI_ZOOM_OUT))
+	if (input_ui_pressed(machine, IPT_UI_ZOOM_OUT))
 		state->gfxset.count[set] = xcells - 1;
-	if (input_ui_pressed(IPT_UI_ZOOM_IN))
+	if (input_ui_pressed(machine, IPT_UI_ZOOM_IN))
 		state->gfxset.count[set] = xcells + 1;
 
 	/* clamp within range */
@@ -628,21 +628,21 @@ static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells)
 		state->gfxset.count[set] = 32;
 
 	/* handle rotation (R) */
-	if (input_ui_pressed(IPT_UI_ROTATE))
+	if (input_ui_pressed(machine, IPT_UI_ROTATE))
 		state->gfxset.rotate[set] = orientation_add(ROT90, state->gfxset.rotate[set]);
 
 	/* handle navigation within the cells (up,down,pgup,pgdown) */
-	if (input_ui_pressed_repeat(IPT_UI_UP, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_UP, 4))
 		state->gfxset.offset[set] -= xcells;
-	if (input_ui_pressed_repeat(IPT_UI_DOWN, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_DOWN, 4))
 		state->gfxset.offset[set] += xcells;
-	if (input_ui_pressed_repeat(IPT_UI_PAGE_UP, 6))
+	if (input_ui_pressed_repeat(machine, IPT_UI_PAGE_UP, 6))
 		state->gfxset.offset[set] -= xcells * ycells;
-	if (input_ui_pressed_repeat(IPT_UI_PAGE_DOWN, 6))
+	if (input_ui_pressed_repeat(machine, IPT_UI_PAGE_DOWN, 6))
 		state->gfxset.offset[set] += xcells * ycells;
-	if (input_ui_pressed_repeat(IPT_UI_HOME, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_HOME, 4))
 		state->gfxset.offset[set] = 0;
-	if (input_ui_pressed_repeat(IPT_UI_END, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_END, 4))
 		state->gfxset.offset[set] = gfx->total_elements;
 
 	/* clamp within range */
@@ -652,9 +652,9 @@ static void gfxset_handle_keys(ui_gfx_state *state, int xcells, int ycells)
 		state->gfxset.offset[set] = 0;
 
 	/* handle color selection (left,right) */
-	if (input_ui_pressed_repeat(IPT_UI_LEFT, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_LEFT, 4))
 		state->gfxset.color[set] -= 1;
-	if (input_ui_pressed_repeat(IPT_UI_RIGHT, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_RIGHT, 4))
 		state->gfxset.color[set] += 1;
 
 	/* clamp within range */
@@ -838,7 +838,7 @@ static void gfxset_draw_item(const gfx_element *gfx, int index, bitmap_t *bitmap
     viewer
 -------------------------------------------------*/
 
-static void tilemap_handler(ui_gfx_state *state)
+static void tilemap_handler(running_machine *machine, ui_gfx_state *state)
 {
 	render_font *ui_font = ui_get_font();
 	float chwidth, chheight;
@@ -939,7 +939,7 @@ static void tilemap_handler(ui_gfx_state *state)
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(state->tilemap.rotate));
 
 	/* handle keyboard input */
-	tilemap_handle_keys(state, mapboxwidth, mapboxheight);
+	tilemap_handle_keys(machine, state, mapboxwidth, mapboxheight);
 }
 
 
@@ -948,16 +948,16 @@ static void tilemap_handler(ui_gfx_state *state)
     tilemap view
 -------------------------------------------------*/
 
-static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight)
+static void tilemap_handle_keys(running_machine *machine, ui_gfx_state *state, int viswidth, int visheight)
 {
 	ui_gfx_state oldstate = *state;
 	UINT32 mapwidth, mapheight;
 	int step;
 
 	/* handle tilemap selection (open bracket,close bracket) */
-	if (input_ui_pressed(IPT_UI_PREV_GROUP))
+	if (input_ui_pressed(machine, IPT_UI_PREV_GROUP))
 		state->tilemap.which--;
-	if (input_ui_pressed(IPT_UI_NEXT_GROUP))
+	if (input_ui_pressed(machine, IPT_UI_NEXT_GROUP))
 		state->tilemap.which++;
 
 	/* clamp within range */
@@ -970,9 +970,9 @@ static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight
 	tilemap_size_by_index(state->tilemap.which, &mapwidth, &mapheight);
 
 	/* handle zoom (minus,plus) */
-	if (input_ui_pressed(IPT_UI_ZOOM_OUT))
+	if (input_ui_pressed(machine, IPT_UI_ZOOM_OUT))
 		state->tilemap.zoom--;
-	if (input_ui_pressed(IPT_UI_ZOOM_IN))
+	if (input_ui_pressed(machine, IPT_UI_ZOOM_IN))
 		state->tilemap.zoom++;
 
 	/* clamp within range */
@@ -989,20 +989,20 @@ static void tilemap_handle_keys(ui_gfx_state *state, int viswidth, int visheight
 	}
 
 	/* handle rotation (R) */
-	if (input_ui_pressed(IPT_UI_ROTATE))
+	if (input_ui_pressed(machine, IPT_UI_ROTATE))
 		state->tilemap.rotate = orientation_add(ROT90, state->tilemap.rotate);
 
 	/* handle navigation (up,down,left,right) */
 	step = 8;
 	if (input_code_pressed(KEYCODE_LSHIFT)) step = 1;
 	if (input_code_pressed(KEYCODE_LCONTROL)) step = 64;
-	if (input_ui_pressed_repeat(IPT_UI_UP, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_UP, 4))
 		state->tilemap.yoffs -= step;
-	if (input_ui_pressed_repeat(IPT_UI_DOWN, 4))
+	if (input_ui_pressed_repeat(machine, IPT_UI_DOWN, 4))
 		state->tilemap.yoffs += step;
-	if (input_ui_pressed_repeat(IPT_UI_LEFT, 6))
+	if (input_ui_pressed_repeat(machine, IPT_UI_LEFT, 6))
 		state->tilemap.xoffs -= step;
-	if (input_ui_pressed_repeat(IPT_UI_RIGHT, 6))
+	if (input_ui_pressed_repeat(machine, IPT_UI_RIGHT, 6))
 		state->tilemap.xoffs += step;
 
 	/* clamp within range */

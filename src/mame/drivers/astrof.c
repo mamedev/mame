@@ -109,7 +109,7 @@ static TIMER_DEVICE_CALLBACK( irq_callback )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 	coin_counter_w(0, newval);
 }
 
@@ -117,13 +117,13 @@ static INPUT_CHANGED( coin_inserted )
 static INPUT_CHANGED( service_coin_inserted )
 {
 	/* service coin insertion causes an NMI */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static CUSTOM_INPUT( astrof_p1_controls_r )
 {
-	return input_port_read(machine, "P1");
+	return input_port_read(field->port->machine, "P1");
 }
 
 
@@ -134,10 +134,10 @@ static CUSTOM_INPUT( astrof_p2_controls_r )
 	/* on an upright cabinets, a single set of controls
        is connected to both sets of pins on the edge
        connector */
-	if (input_port_read(machine, "CAB"))
-		ret = input_port_read(machine, "P2");
+	if (input_port_read(field->port->machine, "CAB"))
+		ret = input_port_read(field->port->machine, "P2");
 	else
-		ret = input_port_read(machine, "P1");
+		ret = input_port_read(field->port->machine, "P1");
 
 	return ret;
 }

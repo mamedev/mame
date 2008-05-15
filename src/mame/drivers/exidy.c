@@ -145,7 +145,7 @@ static UINT8 last_dial;
 static CUSTOM_INPUT( teetert_input_direction_r )
 {
 	int result = 0;
-	UINT8 dial = input_port_read(machine, "DIAL");
+	UINT8 dial = input_port_read(field->port->machine, "DIAL");
 
 	if (dial != last_dial)
 	{
@@ -164,7 +164,7 @@ static CUSTOM_INPUT( teetert_input_direction_r )
 
 static CUSTOM_INPUT( teetert_input_movement_r )
 {
-	UINT8 dial = input_port_read(machine, "DIAL");
+	UINT8 dial = input_port_read(field->port->machine, "DIAL");
 
 	return (dial != last_dial) ? 1 : 0;
 }
@@ -500,7 +500,7 @@ static INPUT_PORTS_START( mtrap )
 	PORT_START_TAG("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow Button")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Red Button")
-	PORT_BIT( 0x04, 0x04, IPT_DIPSWITCH_NAME ) PORT_NAME( DEF_STR( Free_Play ))
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue Button")

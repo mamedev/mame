@@ -32,7 +32,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef UINT32 (*ui_menu_handler_func)(UINT32 state);
+typedef UINT32 (*ui_menu_handler_func)(running_machine *machine, UINT32 state);
 
 typedef struct _ui_menu_item ui_menu_item;
 struct _ui_menu_item
@@ -69,7 +69,7 @@ int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const me
 UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state);
 
 /* menu keyboard handling */
-int ui_menu_generic_keys(UINT32 *selected, int num_items, int visible_items);
+int ui_menu_generic_keys(running_machine *machine, UINT32 *selected, int num_items, int visible_items);
 
 /* menu stack management */
 void ui_menu_stack_reset(void);

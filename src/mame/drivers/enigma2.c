@@ -375,16 +375,16 @@ static WRITE8_HANDLER( enigma2_flip_screen_w )
 
 static CUSTOM_INPUT( p1_controls_r )
 {
-	return input_port_read(machine, "P1CONTROLS");
+	return input_port_read(field->port->machine, "P1CONTROLS");
 }
 
 
 static CUSTOM_INPUT( p2_controls_r )
 {
 	if (engima2_flip_screen)
-		return input_port_read(machine, "P2CONTROLS");
+		return input_port_read(field->port->machine, "P2CONTROLS");
 	else
-		return input_port_read(machine, "P1CONTROLS");
+		return input_port_read(field->port->machine, "P1CONTROLS");
 }
 
 

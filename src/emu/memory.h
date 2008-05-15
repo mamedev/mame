@@ -212,6 +212,7 @@ struct _address_map_entry
 	const char *			read_name;			/* read handler callback name */
 	device_type				read_devtype;		/* read device type for device references */
 	const char *			read_devtag;		/* read tag for the relevant device */
+	const char *			read_porttag;		/* tag for input port reading */
 	write_handler 			write;				/* write handler callback */
 	UINT8					write_bits;			/* bits for the write handler callback (0=default, 1=8, 2=16, 3=32) */
 	UINT8					write_mask;			/* mask bits indicating which subunits to process */

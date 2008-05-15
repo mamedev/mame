@@ -947,62 +947,234 @@ static int validate_gfx(int drivnum, const machine_config *config, const UINT32 
 
 
 /*-------------------------------------------------
-    display_valid_coin_order - display the
-    correct coin order
+    get_defstr_index - return the index of the
+    string assuming it is one of the default
+    strings
 -------------------------------------------------*/
 
-static void display_valid_coin_order(int drivnum, const input_port_entry *memory)
+static int get_defstr_index(const char *name, const game_driver *driver, int *error)
 {
-	const game_driver *driver = drivers[drivnum];
-	const input_port_entry *inp;
-	int	coin_list[1024];
-	int coin_len = 0;
-	int i, j;
+	UINT32 crc = quark_string_crc(name);
 	quark_entry *entry;
-
-	for (inp = memory; inp->type != IPT_END; inp++)
-	{
-		int		strindex = 0;
-		UINT32	crc;
-
-		if ( !inp->name || inp->name == IP_NAME_DEFAULT )
-			continue;
-
-		/* hash the string and look it up in the string table */
-		crc = quark_string_crc(inp->name);
-		for (entry = quark_table_get_first(defstr_table, crc); entry; entry = entry->next)
-			if (entry->crc == crc && !strcmp(inp->name, input_port_string_from_index(entry - defstr_table->entry)))
-			{
-				strindex = entry - defstr_table->entry;
-				break;
-			}
-
-		/* if its a coin entry, add it to our list, avoiding repetitions */
-		if ( strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C )
+	int strindex = 0;
+	
+	/* scan the quark table of input port strings */
+	for (entry = quark_table_get_first(defstr_table, crc); entry != NULL; entry = entry->next)
+		if (entry->crc == crc && strcmp(name, input_port_string_from_index(entry - defstr_table->entry)) == 0)
 		{
-			j = 1;
+			strindex = entry - defstr_table->entry;
+			break;
+		}
 
-			for( i = 0; i < coin_len; i++ )
-			{
-				if ( coin_list[i] == strindex )
-				{
-					j = 0;
-					break;
-				}
-			}
+	/* check for strings that should be DEF_STR */
+	if (strindex != 0 && name != input_port_string_from_index(strindex) && error != NULL)
+	{
+		mame_printf_error("%s: %s must use DEF_STR( %s )\n", driver->source_file, driver->name, name);
+		*error = TRUE;
+	}
+	
+	return strindex;
+}
 
-			if ( j )
-				coin_list[coin_len++] = strindex;
+
+/*-------------------------------------------------
+    validate_analog_input_field - validate an 
+    analog input field
+-------------------------------------------------*/
+
+static void validate_analog_input_field(const input_field_config *field, const game_driver *driver, int *error)
+{
+	INT32 analog_max = field->max;
+	INT32 analog_min = field->min;
+	int shift;
+
+	if (field->type == IPT_POSITIONAL || field->type == IPT_POSITIONAL_V)
+	{
+		for (shift = 0; (shift <= 31) && (~field->mask & (1 << shift)); shift++) ;
+		/* convert the positional max value to be in the bitmask for testing */
+		analog_max = (analog_max - 1) << shift;
+
+		/* positional port size must fit in bits used */
+		if (((field->mask >> shift) + 1) < field->max)
+		{
+			mame_printf_error("%s: %s has an analog port with a positional port size bigger then the mask size\n", driver->source_file, driver->name);
+			*error = TRUE;
+		}
+	}
+	else
+	{
+		/* only positional controls use PORT_WRAPS */
+		if (field->flags & ANALOG_FLAG_WRAPS)
+		{
+			mame_printf_error("%s: %s only positional analog ports use PORT_WRAPS\n", driver->source_file, driver->name);
+			*error = TRUE;
 		}
 	}
 
-	/* now display the proper coin entry list */
-	mame_printf_error( "%s: %s proper coin sort order should be:\n", driver->source_file, driver->name );
-	for (i = INPUT_STRING_9C_1C; i <= INPUT_STRING_1C_9C; i++)
-		for (j = 0; j < coin_len; j++)
-			/* if it's on our list, display it */
-			if (coin_list[j] == i)
-				mame_printf_error("%s\n", input_port_string_from_index(i));
+	/* analog ports must have a valid sensitivity */
+	if (field->sensitivity == 0)
+	{
+		mame_printf_error("%s: %s has an analog port with zero sensitivity\n", driver->source_file, driver->name);
+		*error = TRUE;
+	}
+
+	/* check that the default falls in the bitmask range */
+	if (field->defvalue & ~field->mask)
+	{
+		mame_printf_error("%s: %s has an analog port with a default value out of the bitmask range\n", driver->source_file, driver->name);
+		*error = TRUE;
+	}
+
+	/* tests for absolute devices */
+	if (field->type >= __ipt_analog_absolute_start && field->type <= __ipt_analog_absolute_end)
+	{
+		INT32 default_value = field->defvalue;
+
+		/* adjust for signed values */
+		if (analog_min > analog_max)
+		{
+			analog_min = -analog_min;
+			if (default_value > analog_max)
+				default_value = -default_value;
+		}
+
+		/* check that the default falls in the MINMAX range */
+		if (default_value < analog_min || default_value > analog_max)
+		{
+			mame_printf_error("%s: %s has an analog port with a default value out PORT_MINMAX range\n", driver->source_file, driver->name);
+			*error = TRUE;
+		}
+
+		/* check that the MINMAX falls in the bitmask range */
+		/* we use the unadjusted min for testing */
+		if (field->min & ~field->mask || analog_max & ~field->mask)
+		{
+			mame_printf_error("%s: %s has an analog port with a PORT_MINMAX value out of the bitmask range\n", driver->source_file, driver->name);
+			*error = TRUE;
+		}
+
+		/* absolute analog ports do not use PORT_RESET */
+		if (field->flags & ANALOG_FLAG_RESET)
+		{
+			mame_printf_error("%s: %s - absolute analog ports do not use PORT_RESET\n", driver->source_file, driver->name);
+			*error = TRUE;
+		}
+	}
+
+	/* tests for relative devices */
+	else
+	{
+		/* tests for non IPT_POSITIONAL relative devices */
+		if (field->type != IPT_POSITIONAL && field->type != IPT_POSITIONAL_V)
+		{
+			/* relative devices do not use PORT_MINMAX */
+			if (field->min != 0 || field->max != field->mask)
+			{
+				mame_printf_error("%s: %s - relative ports do not use PORT_MINMAX\n", driver->source_file, driver->name);
+				*error = TRUE;
+			}
+
+			/* relative devices do not use a default value */
+			/* the counter is at 0 on power up */
+			if (field->defvalue != 0)
+			{
+				mame_printf_error("%s: %s - relative ports do not use a default value other then 0\n", driver->source_file, driver->name);
+				*error = TRUE;
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    validate_dip_settings - validate a DIP switch
+    setting
+-------------------------------------------------*/
+
+static void validate_dip_settings(const input_field_config *field, const game_driver *driver, int *error)
+{
+	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
+	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
+	UINT8 coin_list[INPUT_STRING_1C_9C - INPUT_STRING_9C_1C] = { 0 };
+	const input_setting_config *setting;
+	int coin_error = FALSE;
+	
+	/* iterate through the settings */
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+	{
+		int strindex = get_defstr_index(setting->name, driver, error);
+		
+		/* note any coinage strings */
+		if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C)
+			coin_list[strindex - INPUT_STRING_9C_1C] = 1;
+
+		/* make sure demo sounds default to on */
+		if (field->name == demo_sounds && strindex == INPUT_STRING_On && field->defvalue != setting->value)
+		{
+			mame_printf_error("%s: %s Demo Sounds must default to On\n", driver->source_file, driver->name);
+			*error = TRUE;
+		}
+
+		/* check for bad demo sounds options */
+		if (field->name == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+		{
+			mame_printf_error("%s: %s has wrong Demo Sounds option %s (must be Off/On)\n", driver->source_file, driver->name, setting->name);
+			*error = TRUE;
+		}
+
+		/* check for bad flip screen options */
+		if (field->name == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
+		{
+			mame_printf_error("%s: %s has wrong Flip Screen option %s (must be Off/On)\n", driver->source_file, driver->name, setting->name);
+			*error = TRUE;
+		}
+
+		/* if we have a neighbor, compare ourselves to him */
+		if (setting->next != NULL)
+		{
+			int next_strindex = get_defstr_index(setting->next->name, driver, error);
+
+			/* check for inverted off/on dispswitch order */
+			if (strindex == INPUT_STRING_On && next_strindex == INPUT_STRING_Off)
+			{
+				mame_printf_error("%s: %s has inverted Off/On dipswitch order\n", driver->source_file, driver->name);
+				*error = TRUE;
+			}
+
+			/* check for inverted yes/no dispswitch order */
+			else if (strindex == INPUT_STRING_Yes && next_strindex == INPUT_STRING_No)
+			{
+				mame_printf_error("%s: %s has inverted No/Yes dipswitch order\n", driver->source_file, driver->name);
+				*error = TRUE;
+			}
+
+			/* check for inverted upright/cocktail dispswitch order */
+			else if (strindex == INPUT_STRING_Cocktail && next_strindex == INPUT_STRING_Upright)
+			{
+				mame_printf_error("%s: %s has inverted Upright/Cocktail dipswitch order\n", driver->source_file, driver->name);
+				*error = TRUE;
+			}
+
+			/* check for proper coin ordering */
+			else if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C && next_strindex >= INPUT_STRING_9C_1C && next_strindex <= INPUT_STRING_1C_9C &&
+					 strindex >= next_strindex && memcmp(&setting->condition, &setting->next->condition, sizeof(setting->condition)) == 0)
+			{
+				mame_printf_error("%s: %s has unsorted coinage %s > %s\n", driver->source_file, driver->name, setting->name, setting->next->name);
+				coin_error = *error = TRUE;
+			}
+		}
+	}
+	
+	/* if we have a coin error, demonstrate the correct way */
+	if (coin_error)
+	{
+		int entry;
+		
+		mame_printf_error("%s: %s proper coin sort order should be:\n", driver->source_file, driver->name);
+		for (entry = 0; entry < ARRAY_LENGTH(coin_list); entry++)
+			if (coin_list[entry])
+				mame_printf_error("%s\n", input_port_string_from_index(INPUT_STRING_9C_1C + entry));
+	}
 }
 
 
@@ -1010,28 +1182,25 @@ static void display_valid_coin_order(int drivnum, const input_port_entry *memory
     validate_inputs - validate input configuration
 -------------------------------------------------*/
 
-static int validate_inputs(int drivnum, const machine_config *config, input_port_entry **memory)
+static int validate_inputs(int drivnum, const machine_config *config)
 {
-	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
-	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
-	const input_port_entry *inp, *last_dipname_entry = NULL;
+	const input_port_config *portlist;
+	const input_port_config *scanport;
+	const input_port_config *port;
+	const input_field_config *field;
 	const game_driver *driver = drivers[drivnum];
-	const char *tag[MAX_INPUT_PORTS] = { 0 };
-	int portnum = 0;
 	int empty_string_found = FALSE;
-	int last_strindex = 0;
 	quark_entry *entry;
 	int error = FALSE;
-	int coin_error = FALSE;
 	UINT32 crc;
 
 	/* skip if no ports */
-	if (!driver->ipt)
+	if (driver->ipt == NULL)
 		return FALSE;
 
 	/* skip if we already validated these ports */
 	crc = (FPTR)driver->ipt;
-	for (entry = quark_table_get_first(inputs_table, crc); entry; entry = entry->next)
+	for (entry = quark_table_get_first(inputs_table, crc); entry != NULL; entry = entry->next)
 		if (entry->crc == crc && driver->ipt == drivers[entry - inputs_table->entry]->ipt)
 			return FALSE;
 
@@ -1039,267 +1208,80 @@ static int validate_inputs(int drivnum, const machine_config *config, input_port
 	quark_add(inputs_table, drivnum, crc);
 
 	/* allocate the input ports */
-	*memory = input_port_allocate(driver->ipt, *memory);
+	portlist = input_port_config_alloc(driver->ipt);
+
+	/* check for duplicate tags */
+	for (port = portlist; port != NULL; port = port->next)
+		if (port->tag != NULL)
+			for (scanport = port->next; scanport != NULL; scanport = scanport->next)
+				if (scanport->tag != NULL && strcmp(port->tag, scanport->tag) == 0)
+				{
+					mame_printf_error("%s: %s has a duplicate input port tag \"%s\"\n", driver->source_file, driver->name, port->tag);
+					error = TRUE;
+				}
 
 	/* iterate over the results */
-	for (inp = *memory; inp->type != IPT_END; inp++)
-	{
-		int strindex = 0;
-
-		/* check for duplicate tags */
-		if (inp->type == IPT_PORT)
+	for (port = portlist; port != NULL; port = port->next)
+		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			if (inp->start.tag != NULL && portnum < ARRAY_LENGTH(tag))
+			int strindex = 0;
+			
+			/* verify analog inputs */
+			if (input_type_is_analog(field->type))
+				validate_analog_input_field(field, driver, &error);
+
+			/* verify dip switches */
+			if (field->type == IPT_DIPSWITCH)
 			{
-				int scanport;
-
-				for (scanport = 0; scanport < portnum - 1; scanport++)
-					if (strcmp(inp->start.tag, tag[scanport]) == 0)
-					{
-						mame_printf_error("%s: %s has a duplicate input port tag \"%s\"\n", driver->source_file, driver->name, inp->start.tag);
-						error = TRUE;
-					}
-				tag[portnum++] = inp->start.tag;
-			}
-			continue;
-		}
-
-		if (port_type_is_analog(inp->type))
-		{
-			INT32 analog_max = inp->analog.max;
-			INT32 analog_min = inp->analog.min;
-			int shift;
-
-			if (inp->type == IPT_POSITIONAL || inp->type == IPT_POSITIONAL_V)
-			{
-				for (shift = 0; (shift <= 31) && (~inp->mask & (1 << shift)); shift++);
-				/* convert the positional max value to be in the bitmask for testing */
-				analog_max = (analog_max - 1) << shift;
-
-				/* positional port size must fit in bits used */
-				if (((inp->mask >> shift) + 1) < inp->analog.max)
+				/* dip switch fields must have a name */
+				if (field->name == NULL)
 				{
-					mame_printf_error("%s: %s has an analog port with a positional port size bigger then the mask size\n", driver->source_file, driver->name);
+					mame_printf_error("%s: %s has a DIP switch name or setting with no name\n", driver->source_file, driver->name);
 					error = TRUE;
 				}
+				
+				/* verify the settings list */
+				validate_dip_settings(field, driver, &error);
 			}
-			else
+			
+			/* look for invalid (0) types which should be mapped to IPT_OTHER */
+			if (field->type == IPT_INVALID)
 			{
-				/* only positional controls use PORT_WRAPS */
-				if (inp->analog.wraps)
-				{
-					mame_printf_error("%s: %s only positional analog ports use PORT_WRAPS\n", driver->source_file, driver->name);
-					error = TRUE;
-				}
-			}
-
-
-			/* analog ports must have a valid sensitivity */
-			if (inp->analog.sensitivity == 0)
-			{
-				mame_printf_error("%s: %s has an analog port with zero sensitivity\n", driver->source_file, driver->name);
+				mame_printf_error("%s: %s has an input port with an invalid type (0); use IPT_OTHER instead\n", driver->source_file, driver->name);
 				error = TRUE;
 			}
 
-			/* check that the default falls in the bitmask range */
-			if (inp->default_value & ~inp->mask)
+			/* verify names */
+			if (field->name != NULL)
 			{
-				mame_printf_error("%s: %s has an analog port with a default value out of the bitmask range\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-
-			/* tests for absolute devices */
-			if (port_type_is_analog_absolute(inp->type))
-			{
-				INT32 default_value = inp->default_value;
-
-				/* adjust for signed values */
-				if (analog_min > analog_max)
+				/* check for empty string */
+				if (field->name[0] == 0 && !empty_string_found)
 				{
-					analog_min = -analog_min;
-					if (default_value > analog_max)
-						default_value = -default_value;
+					mame_printf_error("%s: %s has an input with an empty string\n", driver->source_file, driver->name);
+					empty_string_found = error = TRUE;
 				}
 
-				/* check that the default falls in the MINMAX range */
-				if (default_value < analog_min || default_value > analog_max)
+				/* check for trailing spaces */
+				if (field->name[0] != 0 && field->name[strlen(field->name) - 1] == ' ')
 				{
-					mame_printf_error("%s: %s has an analog port with a default value out PORT_MINMAX range\n", driver->source_file, driver->name);
+					mame_printf_error("%s: %s input '%s' has trailing spaces\n", driver->source_file, driver->name, field->name);
 					error = TRUE;
 				}
 
-				/* check that the MINMAX falls in the bitmask range */
-				/* we use the unadjusted min for testing */
-				if (inp->analog.min & ~inp->mask || analog_max & ~inp->mask)
+				/* check for invalid UTF-8 */
+				if (!utf8_is_valid_string(field->name))
 				{
-					mame_printf_error("%s: %s has an analog port with a PORT_MINMAX value out of the bitmask range\n", driver->source_file, driver->name);
+					mame_printf_error("%s: %s input '%s' has invalid characters\n", driver->source_file, driver->name, field->name);
 					error = TRUE;
 				}
 
-				/* absolute analog ports do not use PORT_RESET */
-				if (inp->analog.reset)
-				{
-					mame_printf_error("%s: %s - absolute analog ports do not use PORT_RESET\n", driver->source_file, driver->name);
-					error = TRUE;
-				}
-			}
-			else
-			/* tests for relative devices */
-			{
-				/* tests for non IPT_POSITIONAL relative devices */
-				if (inp->type != IPT_POSITIONAL && inp->type != IPT_POSITIONAL_V)
-				{
-					/* relative devices do not use PORT_MINMAX */
-					if (inp->analog.min || inp->analog.max != inp->mask)
-					{
-					  mame_printf_error("%s: %s - relative ports do not use PORT_MINMAX\n", driver->source_file, driver->name);
-					  error = TRUE;
-					}
-
-					/* relative devices do not use a default value */
-					/* the counter is at 0 on power up */
-					if (inp->default_value)
-					{
-					  mame_printf_error("%s: %s - relative ports do not use a default value other then 0\n", driver->source_file, driver->name);
-					  error = TRUE;
-					}
-				}
+				/* look up the string and print an error if default strings are not used */
+				strindex = get_defstr_index(field->name, driver, &error);
 			}
 		}
-
-		/* clear the DIP switch tracking when we hit the first non-DIP entry */
-		if (last_dipname_entry != NULL && inp->type != IPT_DIPSWITCH_SETTING)
-			last_dipname_entry = NULL;
-
-		/* look for invalid (0) types which should be mapped to IPT_OTHER */
-		if (inp->type == IPT_INVALID)
-		{
-			mame_printf_error("%s: %s has an input port with an invalid type (0); use IPT_OTHER instead\n", driver->source_file, driver->name);
-			error = TRUE;
-		}
-
-		/* if this entry doesn't have a name, we don't care about the rest of this stuff */
-		if (inp->name == NULL || inp->name == IP_NAME_DEFAULT)
-		{
-			/* not allowed for dipswitches */
-			if (inp->type == IPT_DIPSWITCH_NAME || inp->type == IPT_DIPSWITCH_SETTING)
-			{
-				mame_printf_error("%s: %s has a DIP switch name or setting with no name\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-			last_strindex = 0;
-			continue;
-		}
-
-		/* check for empty string */
-		if (inp->name[0] == 0 && !empty_string_found)
-		{
-			mame_printf_error("%s: %s has an input with an empty string\n", driver->source_file, driver->name);
-			error = TRUE;
-			empty_string_found = TRUE;
-		}
-
-		/* check for trailing spaces */
-		if (inp->name[0] != 0 && inp->name[strlen(inp->name) - 1] == ' ')
-		{
-			mame_printf_error("%s: %s input '%s' has trailing spaces\n", driver->source_file, driver->name, inp->name);
-			error = TRUE;
-		}
-
-		/* check for invalid UTF-8 */
-		if (!utf8_is_valid_string(inp->name))
-		{
-			mame_printf_error("%s: %s input '%s' has invalid characters\n", driver->source_file, driver->name, inp->name);
-			error = TRUE;
-		}
-
-		/* hash the string and look it up in the string table */
-		crc = quark_string_crc(inp->name);
-		for (entry = quark_table_get_first(defstr_table, crc); entry; entry = entry->next)
-			if (entry->crc == crc && !strcmp(inp->name, input_port_string_from_index(entry - defstr_table->entry)))
-			{
-				strindex = entry - defstr_table->entry;
-				break;
-			}
-
-		/* check for strings that should be DEF_STR */
-		if (strindex != 0 && inp->name != input_port_string_from_index(strindex))
-		{
-			mame_printf_error("%s: %s must use DEF_STR( %s )\n", driver->source_file, driver->name, inp->name);
-			error = TRUE;
-		}
-
-		/* track the last dipswitch we encountered */
-		if (inp->type == IPT_DIPSWITCH_NAME)
-			last_dipname_entry = inp;
-
-		/* check for dipswitch ordering against the last entry */
-		if (inp[0].type == IPT_DIPSWITCH_SETTING && inp[-1].type == IPT_DIPSWITCH_SETTING && last_strindex != 0 && strindex != 0)
-		{
-			/* check for inverted off/on dispswitch order */
-			if (last_strindex == INPUT_STRING_On && strindex == INPUT_STRING_Off)
-			{
-				mame_printf_error("%s: %s has inverted Off/On dipswitch order\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-
-			/* check for inverted yes/no dispswitch order */
-			else if (last_strindex == INPUT_STRING_Yes && strindex == INPUT_STRING_No)
-			{
-				mame_printf_error("%s: %s has inverted No/Yes dipswitch order\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-
-			/* check for inverted upright/cocktail dispswitch order */
-			else if (last_strindex == INPUT_STRING_Cocktail && strindex == INPUT_STRING_Upright)
-			{
-				mame_printf_error("%s: %s has inverted Upright/Cocktail dipswitch order\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-
-			/* check for proper coin ordering */
-			else if (last_strindex >= INPUT_STRING_9C_1C && last_strindex <= INPUT_STRING_1C_9C && strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C &&
-					 last_strindex >= strindex && !memcmp(&inp[-1].condition, &inp[0].condition, sizeof(inp[-1].condition)))
-			{
-				mame_printf_error("%s: %s has unsorted coinage %s > %s\n", driver->source_file, driver->name, inp[-1].name, inp[0].name);
-				error = TRUE;
-				coin_error = TRUE;
-			}
-		}
-
-		/* check for invalid DIP switch entries */
-		if (last_dipname_entry && inp->type == IPT_DIPSWITCH_SETTING)
-		{
-			/* make sure demo sounds default to on */
-			if (last_dipname_entry->name == demo_sounds && strindex == INPUT_STRING_On &&
-				last_dipname_entry->default_value != inp->default_value)
-			{
-				mame_printf_error("%s: %s Demo Sounds must default to On\n", driver->source_file, driver->name);
-				error = TRUE;
-			}
-
-			/* check for bad flip screen options */
-			if (last_dipname_entry->name == flipscreen && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			{
-				mame_printf_error("%s: %s has wrong Flip Screen option %s (must be Off/On)\n", driver->source_file, driver->name, inp->name);
-				error = TRUE;
-			}
-
-			/* check for bad demo sounds options */
-			if (last_dipname_entry->name == demo_sounds && (strindex == INPUT_STRING_Yes || strindex == INPUT_STRING_No))
-			{
-				mame_printf_error("%s: %s has wrong Demo Sounds option %s (must be Off/On)\n", driver->source_file, driver->name, inp->name);
-				error = TRUE;
-			}
-		}
-
-		/* remember the last string index */
-		last_strindex = strindex;
-	}
-
-	if ( coin_error )
-		display_valid_coin_order(drivnum, *memory);
-
+	
+	/* free the config */
+	input_port_config_free(portlist);
 	return error;
 }
 
@@ -1393,7 +1375,6 @@ int mame_validitychecks(const game_driver *curdriver)
 	osd_ticks_t mess_checks = 0;
 #endif
 
-	input_port_entry *inputports = NULL;
 	int drivnum;
 	int error = FALSE;
 	UINT16 lsbtest;
@@ -1487,7 +1468,7 @@ int mame_validitychecks(const game_driver *curdriver)
 
 		/* validate input ports */
 		input_checks -= osd_profiling_ticks();
-		error = validate_inputs(drivnum, config, &inputports) || error;
+		error = validate_inputs(drivnum, config) || error;
 		input_checks += osd_profiling_ticks();
 
 		/* validate sounds and speakers */

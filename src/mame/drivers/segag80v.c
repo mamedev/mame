@@ -182,7 +182,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -313,7 +313,7 @@ static READ8_HANDLER( spinner_input_r )
 
 static CUSTOM_INPUT( elim4_joint_coin_r )
 {
-	return (input_port_read(machine, "COINS") & 0xf) != 0xf;
+	return (input_port_read(field->port->machine, "COINS") & 0xf) != 0xf;
 }
 
 

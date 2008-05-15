@@ -228,9 +228,9 @@ static CUSTOM_INPUT( suprridr_control_r )
 
 	/* screen flip multiplexes controls */
 	if (suprridr_is_screen_flipped())
-		ret = input_port_read(machine, SUPRRIDR_P2_CONTROL_PORT_TAG);
+		ret = input_port_read(field->port->machine, SUPRRIDR_P2_CONTROL_PORT_TAG);
 	else
-		ret = input_port_read(machine, SUPRRIDR_P1_CONTROL_PORT_TAG);
+		ret = input_port_read(field->port->machine, SUPRRIDR_P1_CONTROL_PORT_TAG);
 
 	return ret;
 }

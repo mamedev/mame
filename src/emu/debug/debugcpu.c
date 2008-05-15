@@ -828,7 +828,7 @@ void mame_debug_hook(offs_t curpc)
 		if (execution_state != EXECUTION_STATE_STOPPED && ++key_check_counter > 10000)
 		{
 			key_check_counter = 0;
-			if (input_ui_pressed(IPT_UI_DEBUG_BREAK))
+			if (input_ui_pressed(Machine, IPT_UI_DEBUG_BREAK))
 			{
 				execution_state = EXECUTION_STATE_STOPPED;
 				debug_console_printf("User-initiated break\n");

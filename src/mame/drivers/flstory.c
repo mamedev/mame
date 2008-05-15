@@ -373,7 +373,7 @@ static INPUT_PORTS_START( flstory )
 	PORT_DIPNAME( 0x20, 0x20, "Leave Off")		// Check code at 0x7859
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )		// (must be OFF or the game will
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )			// hang after the game is over !)
-	PORT_BIT(    0x40, 0x40, IPT_DIPSWITCH_NAME ) PORT_NAME("Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )

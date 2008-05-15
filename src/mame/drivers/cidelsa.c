@@ -373,14 +373,14 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( cdp1869_pcb_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = field->port->machine->driver_data;
 
 	return state->cdp1869_pcb;
 }
 
 static CUSTOM_INPUT( cdp1869_predisplay_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = field->port->machine->driver_data;
 
 	return state->cdp1869_prd;
 }

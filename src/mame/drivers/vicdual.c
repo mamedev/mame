@@ -95,10 +95,10 @@ static INPUT_CHANGED( coin_changed )
 		coin_counter_w(0, 1);
 		coin_counter_w(0, 0);
 
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(machine->primary_screen))), NULL, 0, clear_coin_status);
+		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(field->port->machine->primary_screen))), NULL, 0, clear_coin_status);
 	}
 }
 
@@ -142,19 +142,19 @@ static int get_vcounter(running_machine *machine)
 
 static CUSTOM_INPUT( vicdual_get_64v )
 {
-	return (get_vcounter(machine) >> 6) & 0x01;
+	return (get_vcounter(field->port->machine) >> 6) & 0x01;
 }
 
 
 static CUSTOM_INPUT( vicdual_get_vblank_comp )
 {
-	return (get_vcounter(machine) < VICDUAL_VBSTART);
+	return (get_vcounter(field->port->machine) < VICDUAL_VBSTART);
 }
 
 
 static CUSTOM_INPUT( vicdual_get_composite_blank_comp )
 {
-	return (vicdual_get_vblank_comp(machine, 0) && !video_screen_get_hblank(machine->primary_screen));
+	return (vicdual_get_vblank_comp(field, 0) && !video_screen_get_hblank(field->port->machine->primary_screen));
 }
 
 
@@ -2023,7 +2023,7 @@ static INPUT_PORTS_START( samurai )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_BIT(    0x08, 0x08, IPT_DIPSWITCH_NAME ) PORT_NAME("Infinite Lives")
+	PORT_DIPNAME( 0x08, 0x08, "Infinite Lives" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY

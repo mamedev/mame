@@ -151,7 +151,7 @@ static INPUT_PORTS_START( rollrace )
 	PORT_DIPSETTING( 	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 	0x40, DEF_STR( On ) )
 /*  PORT_DIPNAME( 0x80, 0x00, "Free Run" ) */
-	PORT_BIT(    0x80, 0x00, IPT_DIPSWITCH_NAME ) PORT_NAME("Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x80, 0x00, "Invulnerability (Cheat)" )
 	PORT_DIPSETTING( 	0x00, DEF_STR( Off ) ) /* test mode, you are invulnerable */
 	PORT_DIPSETTING( 	0x80, DEF_STR( On ) )	/* to 'static' objects */
 

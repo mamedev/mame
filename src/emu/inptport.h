@@ -19,10 +19,7 @@
 #include "memory.h"
 #include "inputseq.h"
 #include "tokenize.h"
-
-#ifdef MESS
 #include "unicode.h"
-#endif
 
 
 
@@ -30,35 +27,36 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_INPUT_PORTS		32
 #define MAX_PLAYERS			8
-#define MAX_BITS_PER_PORT	32
 
 #define IP_ACTIVE_HIGH		0x00000000
 #define IP_ACTIVE_LOW		0xffffffff
 
-#define INPUT_PORT_PAIR_ENTRIES	(sizeof(FPTR) / sizeof(UINT32))
-#define INPUT_PORT_PAIR_TOKENS	(2 * sizeof(UINT32) / sizeof(FPTR))
+
+/* flags for input_field_configs */
+#define FIELD_FLAG_UNUSED	0x01			/* set if this field is unused but relevant to other games on the same hw */
+#define FIELD_FLAG_COCKTAIL	0x02			/* set if this field is relevant only for cocktail cabinets */
+#define FIELD_FLAG_TOGGLE	0x04			/* set if this field should behave as a toggle */
+#define FIELD_FLAG_ROTATED	0x08			/* set if this field represents a rotated control */
+#define ANALOG_FLAG_REVERSE	0x10			/* analog only: reverse the sense of the axis */
+#define ANALOG_FLAG_RESET	0x20			/* analog only: always preload in->default for relative axes, returning only deltas */
+#define ANALOG_FLAG_WRAPS	0x40			/* analog only: positional count wraps around */
+#define ANALOG_FLAG_INVERT	0x80			/* analog only: bitwise invert bits */
 
 
+/* INP file information */
 #define INP_HEADER_SIZE			64
 #define INP_HEADER_MAJVERSION	2
 #define INP_HEADER_MINVERSION	0
-
-
-/* macro for a custom callback functions (PORT_CUSTOM) */
-#define CUSTOM_INPUT(name)	UINT32 name(running_machine *machine, void *param)
-
-/* macro for port changed callback functions (PORT_CHANGED) */
-#define INPUT_CHANGED(name)	void name(running_machine *machine, void *param, UINT32 oldval, UINT32 newval)
 
 
 /* sequence types for input_port_seq() call */
 enum _input_seq_type
 {
 	SEQ_TYPE_STANDARD = 0,
-	SEQ_TYPE_INCREMENT = 1,
-	SEQ_TYPE_DECREMENT = 2
+	SEQ_TYPE_INCREMENT,
+	SEQ_TYPE_DECREMENT,
+	SEQ_TYPE_TOTAL
 };
 typedef enum _input_seq_type input_seq_type;
 
@@ -108,13 +106,10 @@ enum
 	IPT_END,
 	IPT_UNKNOWN,
 	IPT_PORT,
-	IPT_DIPSWITCH_NAME,
-	IPT_DIPSWITCH_SETTING,
+	IPT_DIPSWITCH,
 	IPT_VBLANK,
-	IPT_CONFIG_NAME,			/* MESS only */
-	IPT_CONFIG_SETTING,			/* MESS only */
-	IPT_CATEGORY_NAME,			/* MESS only */
-	IPT_CATEGORY_SETTING,		/* MESS only */
+	IPT_CONFIG,
+	IPT_CATEGORY,				/* MESS only */
 
 	/* start buttons */
 	IPT_START1,
@@ -249,6 +244,7 @@ enum
 	IPT_ADJUSTER,
 
 	/* the following are special codes for user interface handling - not to be used by drivers! */
+#define __ipt_ui_start IPT_UI_CONFIGURE
 	IPT_UI_CONFIGURE,
 	IPT_UI_ON_SCREEN_DISPLAY,
 	IPT_UI_DEBUG_BREAK,
@@ -311,6 +307,7 @@ enum
 	IPT_OSD_14,
 	IPT_OSD_15,
 	IPT_OSD_16,
+#define __ipt_ui_end IPT_OSD_16
 
 	/* other meaning not mapped to standard defaults */
 	IPT_OTHER,
@@ -331,7 +328,7 @@ enum
 	INPUT_TOKEN_START,
 	INPUT_TOKEN_START_TAG,
 	INPUT_TOKEN_MODIFY,
-	INPUT_TOKEN_BIT,
+	INPUT_TOKEN_FIELD,
 	INPUT_TOKEN_SPECIAL_ONOFF,
 	INPUT_TOKEN_CODE,
 	INPUT_TOKEN_CODE_DEC,
@@ -375,12 +372,10 @@ enum
 	INPUT_TOKEN_ADJUSTER,
 	INPUT_TOKEN_CONFNAME,
 	INPUT_TOKEN_CONFSETTING,
-#ifdef MESS
 	INPUT_TOKEN_CHAR,
 	INPUT_TOKEN_CATEGORY,
 	INPUT_TOKEN_CATEGORY_NAME,
-	INPUT_TOKEN_CATEGORY_SETTING,
-#endif /* MESS */
+	INPUT_TOKEN_CATEGORY_SETTING
 };
 
 
@@ -505,13 +500,25 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-/* this is an opaque type */
-typedef struct _input_port_init_params input_port_init_params;
+/* input ports support up to 32 bits each */
+typedef UINT32 input_port_value;
 
 
-/* a custom input port callback function */
-typedef UINT32 (*input_port_custom_func)(running_machine *machine, void *param);
-typedef void (*input_port_changed_func)(running_machine *machine, void *param, UINT32 oldval, UINT32 newval);
+/* opaque types pointing to live state */
+typedef struct _input_port_state input_port_state;
+typedef struct _input_field_state input_field_state;
+
+
+/* forward declarations */
+typedef struct _input_port_config input_port_config;
+typedef struct _input_field_config input_field_config;
+
+
+/* custom input port callback function */
+typedef UINT32 (*input_field_custom_func)(const input_field_config *field, void *param);
+
+/* input port changed callback function */
+typedef void (*input_field_changed_func)(const input_field_config *field, void *param, UINT32 oldval, UINT32 newval);
 
 
 /* this type is used to encode input port definitions */
@@ -519,141 +526,164 @@ typedef union _input_port_token input_port_token;
 union _input_port_token
 {
 	TOKEN_COMMON_FIELDS
-	const input_port_token *tokenptr;
-	input_port_custom_func customptr;
-	input_port_changed_func changedptr;
+	const input_port_token *	tokenptr;
+	input_field_custom_func 	customptr;
+	input_field_changed_func 	changedptr;
 };
 
 
-/* In mamecore.h: typedef struct _input_port_default_entry input_port_default_entry; */
-struct _input_port_default_entry
+/* encapsulates a condition on a port field or setting */
+typedef struct _input_condition input_condition;
+struct _input_condition
 {
-	UINT32		type;			/* type of port; see enum above */
-	UINT8		group;			/* which group the port belongs to */
-	UINT8		player;			/* player number (0 is player 1) */
-	const char *token;			/* token used to store settings */
-	const char *name;			/* user-friendly name */
-	input_seq	defaultseq;		/* default input sequence */
-	input_seq	defaultincseq;	/* default input sequence to increment (analog ports only) */
-	input_seq	defaultdecseq;	/* default input sequence to decrement (analog ports only) */
+	const char *				tag;			/* tag of port whose condition is to be tested */
+	input_port_value			mask;			/* mask to apply to the port */
+	input_port_value			value;			/* value to compare against */
+	UINT8						condition;		/* condition to use */
 };
 
 
-/* In mamecore.h: typedef struct _input_port_entry input_port_entry; */
-struct _input_port_entry
+/* a single setting for a configuration or DIP switch */
+typedef struct _input_setting_config input_setting_config;
+struct _input_setting_config
 {
-	UINT32		mask;			/* bits affected */
-	UINT32		default_value;	/* default value for the bits affected */
-								/* you can also use one of the IP_ACTIVE defines above */
-	UINT32		type;			/* see enum above */
-	UINT8		unused;			/* The bit is not used by this game, but is used */
-								/* by other games running on the same hardware. */
-								/* This is different from IPT_UNUSED, which marks */
-								/* bits not connected to anything. */
-	UINT8		cocktail;		/* the bit is used in cocktail mode only */
-	UINT8		player;			/* the player associated with this port; note that */
-								/* player 1 is '0' */
-	UINT8		toggle;			/* When this is set, the key acts as a toggle - press */
-								/* it once and it goes on, press it again and it goes off. */
-								/* useful e.g. for some Test Mode dip switches. */
-	UINT8		impulse;		/* When this is set, when the key corresponding to */
-								/* the input bit is pressed it will be reported as */
-								/* pressed for a certain number of video frames and */
-								/* then released, regardless of the real status of */
-								/* the key. This is useful e.g. for some coin inputs. */
-								/* The number of frames the signal should stay active */
-								/* is specified in the "arg" field. */
-	UINT8		way;			/* Joystick modes of operation. 8WAY is the default, */
-								/* it prevents left/right or up/down to be pressed at */
-								/* the same time. 4WAY prevents diagonal directions. */
-								/* 2WAY should be used for joysticks wich move only */
-								/* on one axis (e.g. Battle Zone) */
-	UINT8		rotated;		/* Indicates the control is rotated 45 degrees. This */
-								/* is used as a hint for joystick mapping. */
-	UINT16		category;		/* (MESS-specific) category */
-	const char *name;			/* user-friendly name to display */
-	input_seq	seq;			/* input sequence affecting the input bits */
-	input_port_custom_func custom;/* custom callback routine */
-	void *		custom_param;	/* parameter for custom callback routine */
-	input_port_changed_func changed;/* changed callback routine */
-	void *		changed_param;	/* parameter for changed callback routine */
-	UINT32		changed_last_value; /* the last value for changed detection purposes */
-
-	/* valid if type is between __ipt_analog_start and __ipt_analog_end */
-	struct
-	{
-		INT32	min;				/* minimum value for absolute axes */
-		INT32	max;				/* maximum value for absolute axes */
-		INT32	sensitivity;		/* sensitivity (100=normal) */
-		INT32	delta;				/* delta to apply each frame a digital inc/dec key is pressed */
-		INT32	centerdelta;		/* delta to apply each frame no digital inputs are pressed */
-		UINT8	reverse;			/* reverse the sense of the analog axis */
-		UINT8	reset;				/* always preload in->default for relative axes, returning only deltas */
-		UINT8	crossaxis;			/* crosshair axis */
-		float	crossscale;			/* crosshair scale */
-		float	crossoffset;		/* crosshair offset */
-		float	crossaltaxis;		/* crosshair alternate axis value */
-		input_seq incseq;			/* increment sequence */
-		input_seq decseq;			/* decrement sequence */
-		UINT8	wraps;				/* positional count wraps around */
-		UINT8	invert;				/* bitwise invert bits */
-		UINT16	full_turn_count;	/* number of optical counts for 1 full turn of the original control */
-		const UINT32 *remap_table;	/* pointer to an array that remaps the port value */
-	} analog;
-
-	/* valid if type is IPT_PORT */
-	struct
-	{
-		const char *tag;		/* used to tag PORT_START declarations */
-	} start;
-
-	/* valid for most types */
-	struct
-	{
-		const char *tag;		/* port tag to use for condition */
-		UINT8	portnum;		/* port number for condition */
-		UINT8	condition;		/* condition to use */
-		UINT32	mask;			/* mask to apply to the port */
-		UINT32	value;			/* value to compare against */
-	} condition;
-
-	/* valid for IPT_DIPNAME */
-	struct
-	{
-		const char *swname;		/* name of the physical DIP switch */
-		UINT8	swnum;			/* physical switch number */
-		UINT8	invert;			/* is this an active-high DIP? */
-	} diploc[8];
-
-	/* valid if type is IPT_KEYBOARD */
-#ifdef MESS
-	struct
-	{
-		unicode_char chars[3];	/* (MESS-specific) unicode key data */
-	} keyboard;
-#endif /* MESS */
+	const input_setting_config *next;			/* pointer to next setting in sequence */
+	const input_field_config *	field;			/* pointer back to the field that owns us */
+	input_port_value			value;			/* value of the bits in this setting */
+	input_condition				condition;		/* condition under which this setting is valid */
+	const char *				name;			/* user-friendly name to display */
 };
 
 
+/* a mapping from a bit to a physical DIP switch description */
+typedef struct _input_field_diplocation input_field_diplocation;
+struct _input_field_diplocation
+{
+	input_field_diplocation *	next;			/* pointer to the next bit */
+	const char *				swname;			/* name of the physical DIP switch */
+	UINT8						swnum;			/* physical switch number */
+	UINT8						invert;			/* is this an active-high DIP? */
+};
+
+
+/* a single bitfield within an input port */
+struct _input_field_config
+{
+	/* generally-applicable data */
+	const input_field_config *	next;			/* pointer to next field in sequence */
+	const input_port_config *	port;			/* pointer back to the port that owns us */
+	input_port_value			mask;			/* mask of bits belonging to the field */
+	input_port_value			defvalue;		/* default value of these bits */
+	input_condition				condition;		/* condition under which this field is relevant */
+	UINT32						type;			/* IPT_* type for this port */
+	UINT8						player;			/* player number (0-based) */
+	UINT16						category;		/* (MESS-specific) category */
+	UINT32						flags;			/* combination of FIELD_FLAG_* and ANALOG_FLAG_* above */
+	UINT8						impulse;		/* number of frames before reverting to defvalue */
+	const char *				name;			/* user-friendly name to display */
+	input_seq					seq[SEQ_TYPE_TOTAL];/* sequences of all types */
+	input_field_custom_func		custom;			/* custom callback routine */
+	void *						custom_param;	/* parameter for custom callback routine */
+	input_field_changed_func 	changed;		/* changed callback routine */
+	void *						changed_param;	/* parameter for changed callback routine */
+
+	/* data relevant to analog control types */
+	INT32						min;			/* minimum value for absolute axes */
+	INT32						max;			/* maximum value for absolute axes */
+	INT32						sensitivity;	/* sensitivity (100=normal) */
+	INT32						delta;			/* delta to apply each frame a digital inc/dec key is pressed */
+	INT32						centerdelta;	/* delta to apply each frame no digital inputs are pressed */
+	UINT8						crossaxis;		/* crosshair axis */
+	float						crossscale;		/* crosshair scale */
+	float						crossoffset;	/* crosshair offset */
+	float						crossaltaxis;	/* crosshair alternate axis value */
+	UINT16						full_turn_count;/* number of optical counts for 1 full turn of the original control */
+	const input_port_value *	remap_table;	/* pointer to an array that remaps the port value */
+
+	/* data relevant to other specific types */
+	const input_setting_config *settinglist;	/* list of input_setting_configs */
+	const input_field_diplocation *diploclist;	/* list of locations for various bits */
+	UINT8						way;			/* digital joystick 2/4/8-way descriptions */
+	unicode_char 				chars[3];		/* (MESS-specific) unicode key data */
+
+	/* this field is only valid if the device is live */
+	input_field_state *			state;			/* live state of field (NULL if not live) */
+};
+
+
+/* user-controllable settings for a field */
+typedef struct _input_field_user_settings input_field_user_settings;
+struct _input_field_user_settings
+{
+	input_port_value			value;			/* for DIP switches */
+	input_seq					seq[SEQ_TYPE_TOTAL];/* sequences of all types */
+	INT32						sensitivity;	/* for analog controls */
+	INT32						delta;			/* for analog controls */
+	INT32						centerdelta;	/* for analog controls */
+	UINT8						reverse;		/* for analog controls */
+};
+
+
+/* a single input port configuration */
+struct _input_port_config
+{
+	const input_port_config *	next;			/* pointer to next port */
+	const char *				tag;			/* pointer to this port's tag */
+	const input_field_config *	fieldlist;		/* list of input_field_configs */
+
+	/* these two fields are only valid if the port is live */
+	input_port_state *			state;			/* live state of port (NULL if not live) */
+	running_machine *			machine;		/* machine if port is live */
+};
+
+
+/* describes a fundamental input type, including default input sequences */
+typedef struct _input_type_desc input_type_desc;
+struct _input_type_desc
+{
+	input_type_desc *			next;			/* next description in the list */
+	UINT32						type;			/* IPT_* for this entry */
+	UINT8						group;			/* which group the port belongs to */
+	UINT8						player;			/* player number (0 is player 1) */
+	const char *				token;			/* token used to store settings */
+	const char *				name;			/* user-friendly name */
+	input_seq					seq[SEQ_TYPE_TOTAL];/* default input sequence */
+};
+
+
+/* heaeder at the front of INP files */
 typedef struct _inp_header inp_header;
 struct _inp_header
 {
-	char	header[8];			/* +00: 8 byte header - must be "MAMEINP\0" */
-	UINT64	basetime;			/* +08: base time of recording */
-	UINT8	majversion;			/* +10: major INP version */
-	UINT8	minversion;			/* +11: minor INP version */
-	UINT8	reserved[2];		/* +12: must be zero */
-	char	gamename[12];		/* +14: game name string, NULL-terminated */
-	char	version[32];		/* +20: system version string, NULL-terminated */
+	char						header[8];		/* +00: 8 byte header - must be "MAMEINP\0" */
+	UINT64						basetime;		/* +08: base time of recording */
+	UINT8						majversion;		/* +10: major INP version */
+	UINT8						minversion;		/* +11: minor INP version */
+	UINT8						reserved[2];	/* +12: must be zero */
+	char						gamename[12];	/* +14: game name string, NULL-terminated */
+	char						version[32];	/* +20: system version string, NULL-terminated */
 };
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+/* macro for a custom callback functions (PORT_CUSTOM) */
+#define CUSTOM_INPUT(name)	UINT32 name(const input_field_config *field, void *param)
+
+/* macro for port changed callback functions (PORT_CHANGED) */
+#define INPUT_CHANGED(name)	void name(const input_field_config *field, void *param, UINT32 oldval, UINT32 newval)
+
+/* macro for wrapping a default string */
+#define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
 
 
 
 /***************************************************************************
     MACROS FOR BUILDING INPUT PORTS
 ***************************************************************************/
-
-#define IP_NAME_DEFAULT 				NULL
 
 /* start of table */
 #define INPUT_PORTS_START(_name) \
@@ -688,7 +718,7 @@ struct _inp_header
 
 /* input bit definition */
 #define PORT_BIT(_mask, _default, _type) \
-	TOKEN_UINT32_PACK2(INPUT_TOKEN_BIT, 8, _type, 24), \
+	TOKEN_UINT32_PACK2(INPUT_TOKEN_FIELD, 8, _type, 24), \
 	TOKEN_UINT64_PACK2(_mask, 32, _default, 32),
 
 #define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
@@ -845,7 +875,6 @@ struct _inp_header
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_CONFSETTING, 8, _default, 32), \
 	TOKEN_STRING(_name),
 
-#ifdef MESS
 /* keyboard chars */
 #define PORT_CHAR(_ch) \
 	TOKEN_UINT64_PACK2(INPUT_TOKEN_CHAR, 8, _ch, 32), \
@@ -862,7 +891,6 @@ struct _inp_header
 #define PORT_CATEGORY_ITEM(_default, _name, _category) \
 	TOKEN_UINT64_PACK3(INPUT_TOKEN_CATEGORY_SETTING, 8, _default, 32, _category, 16), \
 	TOKEN_STRING(_name),
-#endif /* MESS */
 
 
 
@@ -894,54 +922,120 @@ struct _inp_header
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-#define DEF_STR(str_num) ((const char *)INPUT_STRING_##str_num)
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-time_t input_port_init(running_machine *machine, const input_port_token *ipt);
+
+/* ----- core system management ----- */
+
+/* initialize the input ports, processing the given token list */
+time_t input_port_init(running_machine *machine, const input_port_token *tokens);
+
+
+
+/* ----- port configurations ----- */
+
+/* allocate a list of input ports from the given token list */
+const input_port_config *input_port_config_alloc(const input_port_token *tokens);
+
+/* free memory allocated from input_port_alloc */
+void input_port_config_free(const input_port_config *portlist);
+
+/* return the config that matches the given tag */
+const input_port_config *input_port_by_tag(const input_port_config *portlist, const char *tag);
+
+/* return the config that matches the given tag */
+const input_port_config *input_port_by_index(const input_port_config *portlist, int index);
+
+
+
+/* ----- accessors for input types ----- */
+
+/* return TRUE if the given type represents an analog control */
+int input_type_is_analog(int type);
+
+/* return the name for the given type/player */
+const char *input_type_name(running_machine *machine, int type, int player);
+
+/* return the group for the given type/player */
+int input_type_group(running_machine *machine, int type, int player);
+
+/* return the global input mapping sequence for the given type/player */
+const input_seq *input_type_seq(running_machine *machine, int type, int player, input_seq_type seqtype);
+
+/* change the global input sequence for the given type/player */
+void input_type_set_seq(running_machine *machine, int type, int player, input_seq_type seqtype, const input_seq *newseq);
+
+/* return TRUE if the sequence for the given input type/player is pressed */
+int input_type_pressed(running_machine *machine, int type, int player);
+
+/* return the list of default mappings */
+const input_type_desc *input_type_list(running_machine *machine);
+
+
+
+/* ----- accessors for input fields ----- */
+
+/* return the expanded string name of the field */
+const char *input_field_name(const input_field_config *field);
+
+/* return the input sequence for the given input field */
+const input_seq *input_field_seq(const input_field_config *field, input_seq_type seqtype);
+
+/* return the current settings for the given input field */
+void input_field_get_user_settings(const input_field_config *field, input_field_user_settings *settings);
+
+/* modify the current settings for the given input field */
+void input_field_set_user_settings(const input_field_config *field, const input_field_user_settings *settings);
+
+
+
+/* ----- user interface sequence reading ----- */
+
+/* return TRUE if a key down for the given user interface sequence is detected */
+int input_ui_pressed(running_machine *machine, int code);
+
+/* return TRUE if a key down for the given user interface sequence is detected, or if
+   autorepeat at the given speed is triggered */
+int input_ui_pressed_repeat(running_machine *machine, int code, int speed);
+
+
+
+/* ----- port reading ----- */
+
+/* return the value of an input port */
+input_port_value input_port_read_direct(const input_port_config *port);
+
+/* return the value of an input port specified by tag */
+input_port_value input_port_read(running_machine *machine, const char *tag);
+
+/* return the value of an input port specified by tag, or a default value if the port does not exist */
+input_port_value input_port_read_safe(running_machine *machine, const char *tag, input_port_value defvalue);
+
+/* return the value of an input port specified by index */
+input_port_value input_port_read_indexed(running_machine *machine, int portnum);
+
+/* return the extracted crosshair values for the given player */
+int input_port_get_crosshair_position(running_machine *machine, int player, float *x, float *y);
+
+/* force an update to the input port values based on current conditions */
+void input_port_update_defaults(running_machine *machine);
+
+
+
+/* ----- misc helper functions ----- */
+
+/* return the TRUE if the given condition attached is true */
+int input_condition_true(running_machine *machine, const input_condition *condition);
+
+/* convert an input_port_token to a default string */
 const char *input_port_string_from_token(const input_port_token token);
 
-input_port_entry *input_port_initialize(input_port_init_params *params, UINT32 type, const char *tag, UINT32 mask, UINT32 defval);
-input_port_entry *input_port_allocate(const input_port_token *ipt, input_port_entry *memory);
-void input_port_parse_diplocation(input_port_entry *in, const char *location);
+/* return a memory handler corresponding to a given input port tag */
+read8_machine_func input_port_read_handler8(const input_port_config *portlist, const char *tag);
+read16_machine_func input_port_read_handler16(const input_port_config *portlist, const char *tag);
+read32_machine_func input_port_read_handler32(const input_port_config *portlist, const char *tag);
+read64_machine_func input_port_read_handler64(const input_port_config *portlist, const char *tag);
 
-input_port_default_entry *get_input_port_list(void);
-const input_port_default_entry *get_input_port_list_defaults(void);
-
-int input_port_active(const input_port_entry *in);
-int port_type_is_analog(int type);
-int port_type_is_analog_absolute(int type);
-int port_type_in_use(int type);
-int port_type_to_group(int type, int player);
-int port_tag_to_index(const char *tag);
-read8_machine_func port_tag_to_handler8(const char *tag);
-read16_machine_func port_tag_to_handler16(const char *tag);
-read32_machine_func port_tag_to_handler32(const char *tag);
-read64_machine_func port_tag_to_handler64(const char *tag);
-const char *input_port_name(const input_port_entry *in);
-const input_seq *input_port_seq(input_port_entry *in, input_seq_type seqtype);
-const input_seq *input_port_default_seq(int type, int player, input_seq_type seqtype);
-int input_port_condition(const input_port_entry *in);
-
-const char *port_type_to_token(int type, int player);
-int token_to_port_type(const char *string, int *player);
-
-int input_port_type_pressed(int type, int player);
-int input_ui_pressed(int code);
-int input_ui_pressed_repeat(int code, int speed);
-
-void input_port_update_defaults(void);
-
-UINT32 get_crosshair_pos(int port_num, UINT8 player, UINT8 axis);
-
-UINT32 input_port_read_indexed(running_machine *machine, int port);
-UINT32 input_port_read(running_machine *machine, const char *tag);
-UINT32 input_port_read_safe(running_machine *machine, const char *tag, UINT32 defvalue);
 
 #endif	/* __INPTPORT_H__ */

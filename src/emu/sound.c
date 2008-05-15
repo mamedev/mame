@@ -114,8 +114,8 @@ static wav_file *wavfile;
 static void sound_reset(running_machine *machine);
 static void sound_exit(running_machine *machine);
 static void sound_pause(running_machine *machine, int pause);
-static void sound_load(int config_type, xml_data_node *parentnode);
-static void sound_save(int config_type, xml_data_node *parentnode);
+static void sound_load(running_machine *machine, int config_type, xml_data_node *parentnode);
+static void sound_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 static TIMER_CALLBACK( sound_update );
 static void start_sound_chips(void);
 static void route_sound(void);
@@ -223,7 +223,7 @@ void sound_init(running_machine *machine)
 	sound_set_attenuation(options_get_int(mame_options(), OPTION_VOLUME));
 
 	/* register callbacks */
-	config_register("mixer", sound_load, sound_save);
+	config_register(machine, "mixer", sound_load, sound_save);
 	add_pause_callback(machine, sound_pause);
 	add_reset_callback(machine, sound_reset);
 	add_exit_callback(machine, sound_exit);
@@ -577,7 +577,7 @@ void sound_global_enable(int enable)
     configuration file
 -------------------------------------------------*/
 
-static void sound_load(int config_type, xml_data_node *parentnode)
+static void sound_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *channelnode;
 	int mixernum;
@@ -610,7 +610,7 @@ static void sound_load(int config_type, xml_data_node *parentnode)
     file
 -------------------------------------------------*/
 
-static void sound_save(int config_type, xml_data_node *parentnode)
+static void sound_save(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	int mixernum;
 

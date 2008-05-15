@@ -151,12 +151,8 @@ static WRITE8_HANDLER( mux_select_w )
 
 static UINT8 joystick_read(void)
 {
-	if (port_tag_to_index("ANALOGX") != -1)
-	{
-		int xval = (INT16)(cpunum_get_reg(0, CCPU_X) << 4) >> 4;
-		return (input_port_read(Machine, mux_select ? "ANALOGX" : "ANALOGY") - xval) < 0x800;
-	}
-	return 0;
+	int xval = (INT16)(cpunum_get_reg(0, CCPU_X) << 4) >> 4;
+	return (input_port_read_safe(Machine, mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
 }
 
 

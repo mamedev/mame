@@ -332,7 +332,7 @@ static CUSTOM_INPUT( multiplexed_controller_r )
 
 	sprintf(tag, "IN%s-%d", (const char *)param, controller_select & 0x01);
 
-	return input_port_read(machine, tag);
+	return input_port_read(field->port->machine, tag);
 }
 
 
@@ -351,10 +351,10 @@ cpu #0 (PC=00C18C40): unmapped memory word write to 00380000 = 0000 & 00FF
 	{
 	default:
 	case 0x00: ret = 0x0000; break; /* nothing? */
-	case 0x09: ret = input_port_read(machine, "MAHJONG1"); break;
-	case 0x12: ret = input_port_read(machine, "MAHJONG2"); break;
-	case 0x1b: ret = input_port_read(machine, "MAHJONG3"); break; /* player 1 normal inputs? */
-	case 0x24: ret = input_port_read(machine, "MAHJONG4"); break;
+	case 0x09: ret = input_port_read(field->port->machine, "MAHJONG1"); break;
+	case 0x12: ret = input_port_read(field->port->machine, "MAHJONG2"); break;
+	case 0x1b: ret = input_port_read(field->port->machine, "MAHJONG3"); break; /* player 1 normal inputs? */
+	case 0x24: ret = input_port_read(field->port->machine, "MAHJONG4"); break;
 	}
 
 	return ret;
@@ -444,7 +444,7 @@ static void calendar_clock(void)
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	return (pd4990a_databit_r(machine, 0) << 1) | pd4990a_testbit_r(machine, 0);
+	return (pd4990a_databit_r(field->port->machine, 0) << 1) | pd4990a_testbit_r(field->port->machine, 0);
 }
 
 

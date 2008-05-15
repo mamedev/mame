@@ -207,7 +207,7 @@ static WRITE8_HANDLER( meadows_audio_w )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	cpunum_set_input_line_and_vector(field->port->machine, 0, 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
 
 

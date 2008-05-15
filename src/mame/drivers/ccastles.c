@@ -187,7 +187,7 @@ static TIMER_CALLBACK( clock_irq )
 
 static CUSTOM_INPUT( get_vblank )
 {
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = video_screen_get_vpos(field->port->machine->primary_screen);
 	return syncprom[scanline & 0xff] & 1;
 }
 

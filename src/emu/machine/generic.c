@@ -46,8 +46,8 @@ static UINT8 interrupt_enable[MAX_CPU];
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void counters_load(int config_type, xml_data_node *parentnode);
-static void counters_save(int config_type, xml_data_node *parentnode);
+static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode);
+static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void interrupt_reset(running_machine *machine);
 
 
@@ -93,7 +93,7 @@ void generic_machine_init(running_machine *machine)
 	state_save_register_item_array("cpu", 0, interrupt_enable);
 
 	/* register for configuration */
-	config_register("counters", counters_load, counters_save);
+	config_register(machine, "counters", counters_load, counters_save);
 
 	/* for memory cards, request save state and an exit callback */
 	if (machine->config->memcard_handler != NULL)
@@ -114,7 +114,7 @@ void generic_machine_init(running_machine *machine)
     and tickets
 -------------------------------------------------*/
 
-static void counters_load(int config_type, xml_data_node *parentnode)
+static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	xml_data_node *coinnode, *ticketnode;
 
@@ -153,7 +153,7 @@ static void counters_load(int config_type, xml_data_node *parentnode)
     and tickets
 -------------------------------------------------*/
 
-static void counters_save(int config_type, xml_data_node *parentnode)
+static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
 	int i;
 

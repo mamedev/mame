@@ -706,8 +706,6 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 	/* loop over tokens until we hit the end */
 	while (entrytype != ADDRMAP_TOKEN_END)
 	{
-		const char *tag;
-
 		/* unpack the token from the first entry */
 		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
 		switch (entrytype)
@@ -785,16 +783,7 @@ static void address_map_detokenize(address_map *map, const addrmap_token *tokens
 				break;
 
 			case ADDRMAP_TOKEN_READ_PORT:
-				tag = TOKEN_GET_STRING(tokens);
-				switch (map->databits)
-				{
-					case 8:		entry->read.mhandler8  = port_tag_to_handler8(tag);		break;
-					case 16:	entry->read.mhandler16 = port_tag_to_handler16(tag);	break;
-					case 32:	entry->read.mhandler32 = port_tag_to_handler32(tag);	break;
-					case 64:	entry->read.mhandler64 = port_tag_to_handler64(tag);	break;
-				}
-				if (entry->read.generic == NULL)
-					fatalerror("Non-existent port referenced: '%s'\n", tag);
+				entry->read_porttag = TOKEN_GET_STRING(tokens);
 				break;
 
 			case ADDRMAP_TOKEN_REGION:
@@ -1556,12 +1545,31 @@ static void memory_init_populate(running_machine *machine)
 					while (last_entry != space->map->entrylist)
 					{
 						const address_map_entry *entry;
+						read_handler rhandler;
+						write_handler whandler;
 
 						/* find the entry before the last one we processed */
 						for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
 						last_entry = entry;
+						rhandler = entry->read;
+						whandler = entry->write;
 
-						if (entry->read.generic != NULL)
+						/* if we have a read port tag, look it up */
+						if (entry->read_porttag != NULL)
+						{
+							switch (space->dbits)
+							{
+								case 8:		rhandler.mhandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
+								case 16:	rhandler.mhandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
+								case 32:	rhandler.mhandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
+								case 64:	rhandler.mhandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
+							}
+							if (rhandler.generic == NULL)
+								fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
+						}
+
+						/* install the read handler if present */
+						if (rhandler.generic != NULL)
 						{
 							int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
 							void *object = machine;
@@ -1571,9 +1579,11 @@ static void memory_init_populate(running_machine *machine)
 								if (object == NULL)
 									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
 							}
-							space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->read.generic, object, entry->read_name);
+							space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
 						}
-						if (entry->write.generic != NULL)
+						
+						/* install the write handler if present */
+						if (whandler.generic != NULL)
 						{
 							int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
 							void *object = machine;
@@ -1583,7 +1593,7 @@ static void memory_init_populate(running_machine *machine)
 								if (object == NULL)
 									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
 							}
-							space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, entry->write.generic, object, entry->write_name);
+							space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
 						}
 					}
 				}

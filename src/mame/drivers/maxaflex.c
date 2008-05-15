@@ -226,7 +226,7 @@ static MACHINE_RESET(supervisor_board)
 static INPUT_CHANGED( coin_inserted )
 {
 	if (!newval)
-		cpunum_set_input_line(machine, 1, M6805_IRQ_LINE, HOLD_LINE );
+		cpunum_set_input_line(field->port->machine, 1, M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int atari_input_disabled(void)

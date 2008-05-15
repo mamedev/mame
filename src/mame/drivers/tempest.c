@@ -320,11 +320,11 @@ static CUSTOM_INPUT( tempest_knob_r )
 
 	if (tempest_player_select)
 	{
-		ret = input_port_read(machine, TEMPEST_KNOB_P2_TAG);
+		ret = input_port_read(field->port->machine, TEMPEST_KNOB_P2_TAG);
 	}
 	else
 	{
-		ret = input_port_read(machine, TEMPEST_KNOB_P1_TAG);
+		ret = input_port_read(field->port->machine, TEMPEST_KNOB_P1_TAG);
 	}
 
 	return ret;
@@ -336,11 +336,11 @@ static CUSTOM_INPUT( tempest_buttons_r )
 
 	if (tempest_player_select)
 	{
-		ret = input_port_read(machine, TEMPEST_BUTTONS_P2_TAG);
+		ret = input_port_read(field->port->machine, TEMPEST_BUTTONS_P2_TAG);
 	}
 	else
 	{
-		ret = input_port_read(machine, TEMPEST_BUTTONS_P1_TAG);
+		ret = input_port_read(field->port->machine, TEMPEST_BUTTONS_P1_TAG);
 	}
 
 	return ret;

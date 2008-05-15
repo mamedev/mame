@@ -22,7 +22,7 @@
 
 struct dss_adjustment_context
 {
-	INT32		port;
+	const input_port_config *port;
 	INT32		lastpval;
 	INT32		pmin;
 	double		pscale;
@@ -122,7 +122,7 @@ static void dss_adjustment_step(node_description *node)
 	if (DSS_ADJUSTMENT__ENABLE)
 	{
 		struct dss_adjustment_context *context = node->context;
-		INT32 rawportval = input_port_read_indexed(Machine, context->port);
+		INT32 rawportval = input_port_read_direct(context->port);
 
 		/* only recompute if the value changed from last time */
 		if (rawportval != context->lastpval)
@@ -150,12 +150,12 @@ static void dss_adjustment_reset(node_description *node)
 
 	if (node->custom)
 	{
-		context->port = port_tag_to_index(node->custom);
-		if (context->port == -1)
+		context->port = input_port_by_tag(Machine->portconfig, node->custom);
+		if (context->port == NULL)
 			fatalerror("DISCRETE_ADJUSTMENT_TAG - NODE_%d has invalid tag", node->node-NODE_00);
 	}
 	else
-		context->port = DSS_ADJUSTMENT__PORT;
+		context->port = input_port_by_index(Machine->portconfig, DSS_ADJUSTMENT__PORT);
 
 	context->lastpval = 0x7fffffff;
 	context->pmin = DSS_ADJUSTMENT__PMIN;

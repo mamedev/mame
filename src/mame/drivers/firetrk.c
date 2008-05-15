@@ -34,13 +34,13 @@ static void set_service_mode(running_machine *machine, int enable)
 
 static INPUT_CHANGED( service_mode_switch_changed )
 {
-	set_service_mode(machine, newval);
+	set_service_mode(field->port->machine, newval);
 }
 
 
 static INPUT_CHANGED( firetrk_horn_changed )
 {
-	discrete_sound_w(machine, FIRETRUCK_HORN_EN, newval);
+	discrete_sound_w(field->port->machine, FIRETRUCK_HORN_EN, newval);
 }
 
 

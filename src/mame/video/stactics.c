@@ -114,7 +114,7 @@ WRITE8_HANDLER( stactics_scroll_ram_w )
 
 CUSTOM_INPUT( stactics_get_frame_count_d3 )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data;
 
 	return (state->frame_count >> 3) & 0x01;
 }
@@ -172,7 +172,7 @@ WRITE8_HANDLER( stactics_shot_flag_clear_w )
 
 CUSTOM_INPUT( stactics_get_shot_standby )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data;
 
 	return state->shot_standby;
 }
@@ -180,7 +180,7 @@ CUSTOM_INPUT( stactics_get_shot_standby )
 
 CUSTOM_INPUT( stactics_get_not_shot_arrive )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = field->port->machine->driver_data;
 
 	return !state->shot_arrive;
 }

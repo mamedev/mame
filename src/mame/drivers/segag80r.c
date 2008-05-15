@@ -160,7 +160,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

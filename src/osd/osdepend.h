@@ -40,6 +40,7 @@
 
 #include "mamecore.h"
 #include "osdcore.h"
+#include "inptport.h"
 #include "timer.h"
 
 
@@ -145,7 +146,7 @@ void osd_set_mastervolume(int attenuation);
   This function is called on startup, before reading the configuration from disk.
   Scan the list, and change the keys/joysticks you want.
 */
-void osd_customize_inputport_list(input_port_default_entry *defaults);
+void osd_customize_input_type_list(input_type_desc *typelist);
 
 
 
