@@ -2315,6 +2315,7 @@ V-V                           TP-027
 	DRIVER( lwings )	/* 11/1986 (c) 1986 */
 	DRIVER( lwings2 )	/* 11/1986 (c) 1986 */
 	DRIVER( lwingsjp )	/* 11/1986 (c) 1986 */
+	DRIVER( lwingsb )	/* 11/1986 (c) 1986 (bootleg)*/
 	DRIVER( sidearms )	/* 12/1986 (c) 1986 (World) */
 	DRIVER( sidearmr )	/* 12/1986 (c) 1986 + Romstar license (US) */
 	DRIVER( sidearjp )	/* 12/1986 (c) 1986 (Japan) */

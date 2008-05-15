@@ -1110,6 +1110,38 @@ ROM_START( lwingsjp )
 	ROM_LOAD( "63s141.15g",   0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
 ROM_END
 
+ROM_START( lwingsb )
+	ROM_REGION( 0x20000, REGION_CPU1, 0 )     /* 64k for code + 3*16k for the banked ROMs images */
+	ROM_LOAD( "ic17.bin",  0x00000, 0x8000, CRC(fe8a8823) SHA1(aa968fda368cc904b22ea68d7b5d4fcfba2227b1) )
+	ROM_LOAD( "ic18.bin",  0x10000, 0x8000, CRC(2a00cde8) SHA1(5b2ef3bb08aed1b99eee0c6d7f5b9d3af807c13e) )
+	ROM_LOAD( "ic19.bin",  0x18000, 0x8000, CRC(ec5cc201) SHA1(1043c6a9678c18fef920be91b0796c93b83e0f73) )
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 )
+	ROM_LOAD( "ic37.bin", 0x0000, 0x8000, CRC(a20337a2) SHA1(649e13a69ad9154657894fa7bf7c6e49b029a506) )
+
+	ROM_REGION( 0x04000, REGION_GFX1, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic60.bin",  0x00000, 0x4000, CRC(091d923c) SHA1(d686c860f147c4749ac1ee23cde5a7b570312622) ) /* characters */
+
+	ROM_REGION( 0x40000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic50.bin",  0x00000, 0x8000, CRC(5436392c) SHA1(c33925c87e61aad278bef57fe9a8148ff2d4377f) ) /* tiles */
+	ROM_LOAD( "ic49.bin",  0x08000, 0x8000, CRC(ffdbdd69) SHA1(746eb51ae2b70349bc51099092442fb05b02d64c) )
+	ROM_LOAD( "ic26.bin",  0x10000, 0x8000, CRC(fdd1908a) SHA1(0b2de3d2f8e50f11c57822147bec6f2d9c9ff586) )
+	ROM_LOAD( "ic25.bin",  0x18000, 0x8000, CRC(5c73d406) SHA1(85386f6b387a85d8df7d800ffcecb2590613a42c) )
+	ROM_LOAD( "ic2.bin",   0x20000, 0x8000, CRC(32e17b3c) SHA1(db5488b7c48cd0df4571104169e42ff4094f1abd) )
+	ROM_LOAD( "ic1.bin",   0x28000, 0x8000, CRC(52e533c1) SHA1(9f333c9fb6e35db1264286be5b4f7e4dd18150de) )
+	ROM_LOAD( "ic63.bin",  0x30000, 0x8000, CRC(99e134ba) SHA1(9818a6ad3146ed95b29b9aeba2331a0e8e2a76b5) )
+	ROM_LOAD( "ic62.bin",  0x38000, 0x8000, CRC(c8f28777) SHA1(d08571d34f96e7d33506e374d047647f131dce71) )
+
+	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "ic99.bin",  0x00000, 0x8000, CRC(163946da) SHA1(719735ccb965c91b152ef07d64393506808c8f55) )  /* sprites */
+	ROM_LOAD( "ic98.bin",  0x08000, 0x8000, CRC(7cc90a1d) SHA1(ff194749397f06ad054917664bd4583b0e4e8d92) )
+	ROM_LOAD( "ic87.bin",  0x10000, 0x8000, CRC(bca275ac) SHA1(c1cdf9f7f5e99ff85521f27565047455f0c2b78b) )
+	ROM_LOAD( "ic86.bin",  0x18000, 0x8000, CRC(3e396eda) SHA1(a736f108e0ed5fab6177f0d8a21feab8b686ee85) )
+
+	ROM_REGION( 0x0100, REGION_PROMS, 0 )
+	ROM_LOAD( "63s141.15g",   0x0000, 0x0100, CRC(d96bcc98) SHA1(99e69a624d5586e5eedacd2083fa68b36e7b5e40) )	/* timing (not used) */
+ROM_END
+
 ROM_START( sectionz )
 	ROM_REGION( 0x20000, REGION_CPU1, 0 )     /* 64k for code + 3*16k for the banked ROMs images */
 	ROM_LOAD( "6c_sz01.bin",  0x00000, 0x8000, CRC(69585125) SHA1(a341e3a5507e961d5763be6acf420695bb32709e) )
@@ -1461,6 +1493,7 @@ GAME( 1985, sctionza, sectionz, lwings,   sectionz, 0, ROT0,  "Capcom", "Section
 GAME( 1986, lwings,   0,        lwings,   lwings,   0, ROT90, "Capcom", "Legendary Wings (US set 1)", 0 )
 GAME( 1986, lwings2,  lwings,   lwings,   lwings,   0, ROT90, "Capcom", "Legendary Wings (US set 2)", 0 )
 GAME( 1986, lwingsjp, lwings,   lwings,   lwings,   0, ROT90, "Capcom", "Ares no Tsubasa (Japan)", 0 )
+GAME( 1986, lwingsb,  lwings,   lwings,   lwings,   0, ROT90, "bootleg", "Legendary Wings (bootleg)", 0 )
 GAME( 1986, trojan,   0,        trojan,   trojanls, 0, ROT0,  "Capcom", "Trojan (US)", 0 )
 GAME( 1986, trojanr,  trojan,   trojan,   trojan,   0, ROT0,  "Capcom (Romstar license)", "Trojan (Romstar)", 0 )
 GAME( 1986, trojanj,  trojan,   trojan,   trojan,   0, ROT0,  "Capcom", "Tatakai no Banka (Japan)", 0 )
