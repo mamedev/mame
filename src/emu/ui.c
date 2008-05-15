@@ -1554,7 +1554,7 @@ static void slider_init(running_machine *machine)
 		if (defval > 1000)
 			maxval = 2 * defval;
 
-		slider_config(&slider_list[slider_count++], 0, defval, maxval, 20, slider_mixervol, (void *)item);
+		slider_config(&slider_list[slider_count++], 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 	}
 
 	/* add analog adjusters */
@@ -1571,7 +1571,7 @@ static void slider_init(running_machine *machine)
 		/* add CPU overclocking */
 		numitems = cpu_gettotalcpu();
 		for (item = 0; item < numitems; item++)
-			slider_config(&slider_list[slider_count++], 10, 1000, 2000, 1, slider_overclock, (void *)item);
+			slider_config(&slider_list[slider_count++], 10, 1000, 2000, 1, slider_overclock, (void *)(FPTR)item);
 
 		/* add refresh rate tweaker */
 		slider_config(&slider_list[slider_count++], -10000, 0, 10000, 1000, slider_refresh, NULL);
