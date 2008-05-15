@@ -1969,33 +1969,6 @@ static void emit_mov_r64_p64(drcbe_state *drcbe, x86code **dst, UINT8 reg, const
 
 
 /*-------------------------------------------------
-    emit_mov_m64_p64 - move a 64-bit parameter
-    into a memory location
--------------------------------------------------*/
-#if 0
-static void emit_mov_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
-{
-	if (param->type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if (short_immediate(param->value))
-			emit_mov_m64_imm(dst, MEMPARAMS, param->value);								// mov   [mem],param
-		else
-		{
-			emit_mov_r64_imm(dst, REG_RAX, param->value);								// mov   rax,[param]
-			emit_mov_m64_r64(dst, MEMPARAMS, REG_RAX);									// mov   [mem],rax
-		}
-	}
-	else if (param->type == DRCUML_PTYPE_MEMORY)
-	{
-		emit_mov_r64_m64(dst, REG_RAX, MABS(drcbe, param->value));						// mov   rax,[param]
-		emit_mov_m64_r64(dst, MEMPARAMS, REG_EAX);										// mov   [mem],rax
-	}
-	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
-		emit_mov_m64_r64(dst, MEMPARAMS, param->value);									// mov   [mem],param
-}
-#endif
-
-/*-------------------------------------------------
     emit_mov_p64_r64 - move a registers into a 
     64-bit parameter
 -------------------------------------------------*/
@@ -2798,24 +2771,6 @@ static void emit_movss_r128_p32(drcbe_state *drcbe, x86code **dst, UINT8 reg, co
 
 
 /*-------------------------------------------------
-    emit_movss_m32_p32 - move a 32-bit parameter
-    into a memory location
--------------------------------------------------*/
-#if 0
-static void emit_movss_m32_p32(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
-{
-	assert(param->type != DRCUML_PTYPE_IMMEDIATE);
-	if (param->type == DRCUML_PTYPE_MEMORY)
-	{
-		emit_movss_r128_m32(dst, REG_XMM0, MABS(drcbe, param->value));					// movss xmm0,[param]
-		emit_movss_m32_r128(dst, MEMPARAMS, REG_XMM0);									// movss [mem],xmm0
-	}
-	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
-		emit_movss_m32_r128(dst, MEMPARAMS, param->value);								// movss [mem],xmm0
-}
-#endif
-
-/*-------------------------------------------------
     emit_movss_p32_r128 - move a register into a 
     32-bit parameter
 -------------------------------------------------*/
@@ -2850,24 +2805,6 @@ static void emit_movsd_r128_p64(drcbe_state *drcbe, x86code **dst, UINT8 reg, co
 	}
 }
 
-
-/*-------------------------------------------------
-    emit_movsd_m64_p64 - move a 64-bit parameter
-    into a memory location
--------------------------------------------------*/
-#if 0
-static void emit_movsd_m64_p64(drcbe_state *drcbe, x86code **dst, DECLARE_MEMPARAMS, const drcuml_parameter *param)
-{
-	assert(param->type != DRCUML_PTYPE_IMMEDIATE);
-	if (param->type == DRCUML_PTYPE_MEMORY)
-	{
-		emit_movsd_r128_m64(dst, REG_XMM0, MABS(drcbe, param->value));					// movsd xmm0,[param]
-		emit_movsd_m64_r128(dst, MEMPARAMS, REG_XMM0);									// movsd [mem],xmm0
-	}
-	else if (param->type == DRCUML_PTYPE_INT_REGISTER)
-		emit_movsd_m64_r128(dst, MEMPARAMS, param->value);								// movsd [mem],xmm0
-}
-#endif
 
 /*-------------------------------------------------
     emit_movsd_p64_r128 - move a register into a 
@@ -3319,9 +3256,7 @@ static x86code *op_callh(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 {
 	drcuml_parameter handp;
 	drccodeptr *targetptr;
-	emit_link skip;
-
-	skip.target = 0;
+	emit_link skip = { 0 };
 
 	/* validate instruction */
 	assert(inst->size == 4);
@@ -3356,9 +3291,7 @@ static x86code *op_callh(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 static x86code *op_ret(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	emit_link skip;
-
-	skip.target = 0;
+	emit_link skip = { 0 };
 
 	/* validate instruction */
 	assert(inst->size == 4);
@@ -3387,9 +3320,7 @@ static x86code *op_ret(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 static x86code *op_callc(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter funcp, paramp;
-	emit_link skip;
-
-	skip.target = 0;
+	emit_link skip = { 0 };
 
 	/* validate instruction */
 	assert(inst->size == 4);
