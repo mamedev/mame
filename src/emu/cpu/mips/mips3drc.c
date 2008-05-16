@@ -80,6 +80,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 /* exit codes */
 #define EXECUTE_OUT_OF_CYCLES			0
 #define EXECUTE_MISSING_CODE			1
+#define EXECUTE_UNMAPPED_CODE			2
 
 
 
@@ -194,7 +195,7 @@ struct _mips3_regs
 	drcuml_codehandle *	entry;						/* entry point */
 	drcuml_codehandle *	nocode;						/* nocode exception handler */
 	drcuml_codehandle *	out_of_cycles;				/* out of cycles exception handler */
-	drcuml_codehandle *	tlb_mismatch;				/* tlb mismatch at current PC */
+	drcuml_codehandle *	tlb_mismatch;				/* tlb mismatch handler */
 	drcuml_codehandle *	read8;						/* read byte */
 	drcuml_codehandle *	write8;						/* write byte */
 	drcuml_codehandle *	read16;						/* read half */
@@ -235,6 +236,7 @@ static void cfunc_printf_probe(void *param);
 static void static_generate_entry_point(drcuml_state *drcuml);
 static void static_generate_nocode_handler(drcuml_state *drcuml);
 static void static_generate_out_of_cycles(drcuml_state *drcuml);
+static void static_generate_tlb_mismatch(drcuml_state *drcuml);
 static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int recover, const char *name);
 static void static_generate_memory_accessor(drcuml_state *drcuml, int size, int iswrite, int ismasked, const char *name, drcuml_codehandle **handleptr);
 
@@ -749,6 +751,8 @@ static int mips3_execute(int cycles)
 		/* if we need to recompile, do it */
 		if (execute_result == EXECUTE_MISSING_CODE)
 			code_compile_block(drcuml, mips3.cstate->mode, mips3.core->pc);
+		else if (execute_result == EXECUTE_UNMAPPED_CODE)
+			fatalerror("Attempted to execute unmapped code at PC=%08X\n", mips3.core->pc);
 
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
 
@@ -837,6 +841,7 @@ static void code_flush_cache(drcuml_state *drcuml)
 	static_generate_entry_point(drcuml);
 	static_generate_nocode_handler(drcuml);
 	static_generate_out_of_cycles(drcuml);
+	static_generate_tlb_mismatch(drcuml);
 
 	/* append exception handlers for various types */
 	static_generate_exception(drcuml, EXCEPTION_INTERRUPT, TRUE,  "exception_interrupt");
@@ -1155,6 +1160,41 @@ static void static_generate_out_of_cycles(drcuml_state *drcuml)
 	UML_GETEXP(block, IREG(0));														// getexp  i0
 	UML_MOV(block, MEM(&mips3.core->pc), IREG(0));									// mov     <pc>,i0
 	UML_EXIT(block, IMM(EXECUTE_OUT_OF_CYCLES));									// exit    EXECUTE_OUT_OF_CYCLES
+
+	drcuml_block_end(block);
+}
+
+
+/*-------------------------------------------------
+    static_generate_tlb_mismatch - generate a
+    TLB mismatch handler
+-------------------------------------------------*/
+
+static void static_generate_tlb_mismatch(drcuml_state *drcuml)
+{
+	drcuml_block *block;
+	jmp_buf errorbuf;
+
+	/* if we get an error back, we're screwed */
+	if (setjmp(errorbuf) != 0)
+		fatalerror("Unrecoverable error in static_generate_tlb_mismatch");
+
+	/* forward references */
+	alloc_handle(drcuml, &mips3.exception[EXCEPTION_TLBLOAD], "exception_tlbload");
+
+	/* begin generating */
+	block = drcuml_block_begin(drcuml, 20, &errorbuf);
+
+	/* generate a hash jump via the current mode and PC */
+	alloc_handle(drcuml, &mips3.tlb_mismatch, "tlb_mismatch");
+	UML_HANDLE(block, mips3.tlb_mismatch);											// handle  tlb_mismatch
+	UML_RECOVER(block, IREG(0), MAPVAR_PC);											// recover i0,PC
+	UML_MOV(block, MEM(&mips3.core->pc), IREG(0));									// mov     <pc>,i0
+	UML_SHR(block, IREG(1), IREG(0), IMM(12));										// shr     i1,i0,12
+	UML_LOAD4(block, IREG(1), mips3.core->tlb_table, IREG(1));						// load4   i1,[tlb_table],i1
+	UML_TEST(block, IREG(1), IMM(2));												// test    i1,2
+	UML_EXHc(block, IF_NE, mips3.exception[EXCEPTION_TLBLOAD], IREG(0));			// exh     exception[TLBLOAD],i0
+	UML_EXIT(block, IMM(EXECUTE_OUT_OF_CYCLES));									// exit    EXECUTE_MISSING_CODE
 
 	drcuml_block_end(block);
 }
@@ -1584,21 +1624,40 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		UML_MOV(block, MEM(&mips3.core->pc), IMM(desc->pc));						// mov     [pc],desc->pc
 		UML_DEBUG(block, IMM(desc->pc));											// debug   desc->pc
 	}
+	
+	/* if we hit an unmapped address, fatal error */
+	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
+	{
+		UML_MOV(block, MEM(&mips3.core->pc), IMM(desc->pc));						// mov     [pc],desc->pc
+		UML_EXIT(block, IMM(EXECUTE_UNMAPPED_CODE));								// exit    EXECUTE_UNMAPPED_CODE
+	}
 
-	/* validate our TLB entry at this PC; if we fail, we need to recompile */
+	/* if we hit a compiler page fault, it's just like a TLB mismatch */
+	if (desc->flags & OPFLAG_COMPILER_PAGE_FAULT)
+		UML_EXH(block, mips3.tlb_mismatch, IMM(0));									// exh     tlb_mismatch,0
+	
+	/* validate our TLB entry at this PC; if we fail, we need to handle it */
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
-		UML_CMP(block, MEM(&mips3.core->tlb_table[desc->pc >> 12]),
-		               IMM(mips3.core->tlb_table[desc->pc >> 12]));					// cmp     [tlbentry],*tlbentry
-		UML_EXHc(block, IF_NE, mips3.tlb_mismatch, IMM(0));							// exh     tlb_mismatch,0,NE
+		/* if we currently have a valid TLB read entry, we just verify */
+		if (mips3.core->tlb_table[desc->pc >> 12] & 2)
+		{
+			UML_LOAD4(block, IREG(0), &mips3.core->tlb_table[desc->pc >> 12], IMM(0));// load4   i0,tlb_table[desc->pc >> 12]
+			UML_CMP(block, IREG(0), IMM(mips3.core->tlb_table[desc->pc >> 12]));	// cmp     i0,*tlbentry
+			UML_EXHc(block, IF_NE, mips3.tlb_mismatch, IMM(0));						// exh     tlb_mismatch,0,NE
+		}
+		
+		/* otherwise, we generate an unconditional exception */
+		else
+			UML_EXH(block, mips3.tlb_mismatch, IMM(0));								// exh     tlb_mismatch,0
 	}
 
 	/* if this is an invalid opcode, generate the exception now */
 	if (desc->flags & OPFLAG_INVALID_OPCODE)
 		UML_EXH(block, mips3.exception[EXCEPTION_INVALIDOP], IMM(0));				// exh     invalidop,0
 
-	/* otherwise, it's a regular instruction */
-	else
+	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
+	else if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
 	{
 		/* compile the instruction */
 		if (!generate_opcode(block, compiler, desc))

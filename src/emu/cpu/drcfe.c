@@ -278,7 +278,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 	{
 		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
 		/* mark as needing to validate; otherwise, just end the sequence here */
-		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_PAGE_FAULT | OPFLAG_VIRTUAL_NOOP;
+		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_PAGE_FAULT | OPFLAG_VIRTUAL_NOOP | OPFLAG_END_SEQUENCE;
 		return desc;
 	}
 
@@ -289,7 +289,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 	if (desc->opptr.v == NULL)
 	{
 		/* address is unmapped; report it as such */
-		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_UNMAPPED | OPFLAG_VIRTUAL_NOOP;
+		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_COMPILER_UNMAPPED | OPFLAG_VIRTUAL_NOOP | OPFLAG_END_SEQUENCE;
 		return desc;
 	}
 
