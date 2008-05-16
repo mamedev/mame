@@ -6990,6 +6990,7 @@ Other Sun games
 	DRIVER( dharmak )	/* (c) 1994 */
 	DRIVER( lastfort )	/* (c) 1994 */
 	DRIVER( lastfero )	/* (c) 1994 */
+	DRIVER( lastfork )	/* (c) 1994 */
 	DRIVER( lastforg )	/* (c) 1994 */
 	DRIVER( toride2g )	/* (c) 1994 */
 	DRIVER( torid2gg )	/* (c) 1994 */
