@@ -17,6 +17,8 @@
     * Optimize to avoid unnecessary reloads
 
     * Identify common pairs and optimize output
+    
+    * Add SSE4.1 support for ROUNDSS, ROUNDSD
 
 ****************************************************************************
 

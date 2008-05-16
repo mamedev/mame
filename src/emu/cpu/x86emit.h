@@ -518,6 +518,7 @@
 #define OP_INVD					0x0f08
 #define OP_WBINVD				0x0f09
 #define OP_UD2					0x0f0b
+#define OP_NOP0d_Ev				0x0f0d
 
 #define OP_MOVUPS_Vps_Wps		0x0f10
 #define OP_MOVSS_Vss_Wss		0xf30f10
@@ -545,6 +546,7 @@
 #define OP_MOVHPS_Mq_Vq			0x0f17
 #define OP_MOVHPD_Mq_Vq			0x660f17
 #define OP_PREFETCH_G16			0x0f18
+#define OP_NOP1f_Ev				0x0f1f
 
 #define OP_MOV_Rd_Cd			0x0f20
 #define OP_MOV_Rd_Dd			0x0f21
@@ -579,6 +581,7 @@
 #define OP_RDPMC				0x0f33
 #define OP_SYSENTER				0x0f34
 #define OP_SYSEXIT				0x0f35
+#define OP_GETSEC				0x0f37
 
 #define OP_CMOV_O_Gv_Ev			0x0f40
 #define OP_CMOV_NO_Gv_Ev		0x0f41
@@ -703,6 +706,8 @@
 #define OP_PCMPEQD_Pq_Qq		0x0f76
 #define OP_PCMPEQD_Vdq_Wdq		0x660f76
 #define OP_EMMS					0x0f77
+#define OP_VMREAD_Ed_Gd			0x0f78
+#define OP_VMWRITE_Gd_Ed		0x0f79
 #define OP_HADDPD_Vpd_Wpd		0x660f7c
 #define OP_HADDPS_Vps_Wps		0xf20f7c
 #define OP_HSUBPD_Vpd_Wpd		0x660f7d
@@ -799,6 +804,8 @@
 #define OP_LGS_Mp				0x0fb5
 #define OP_MOVZX_Gv_Eb			(0x0fb6 | OPFLAG_8BITRM)
 #define OP_MOVZX_Gv_Ew			0x0fb7
+#define OP_JMPE					0x0fb8
+#define OP_POPCNT_Gv_Ev			0xf30fb8
 #define OP_G10_INVALID			0x0fb9
 #define OP_G8_Ev_Ib				0x0fba
 #define OP_BTC_Ev_Gv			0x0fbb
@@ -927,6 +934,111 @@
 #define OP_PADDW_Vdq_Wdq		0x660ffd
 #define OP_PADDD_Pq_Qq			0x0ffe
 #define OP_PADDD_Vdq_Wdq		0x660ffe
+
+
+/* triple byte opcodes (0f 38) */
+#define OP_PSHUFB_Pq_Qq			0x0f3800
+#define OP_PSHUFB_Vdq_Wdq		0x660f3800
+#define OP_PHADDW_Pq_Qq			0x0f3801
+#define OP_PHADDW_Vdq_Wdq		0x660f3801
+#define OP_PHADDD_Pq_Qq			0x0f3802
+#define OP_PHADDD_Vdq_Wdq		0x660f3802
+#define OP_PHADDSW_Pq_Qq		0x0f3803
+#define OP_PHADDSW_Vdq_Wdq		0x660f3803
+#define OP_PMADDUBSW_Pq_Qq		0x0f3804
+#define OP_PMADDUBSW_Vdq_Wdq	0x660f3804
+#define OP_PHSUBW_Pq_Qq			0x0f3805
+#define OP_PHSUBW_Vdq_Wdq		0x660f3805
+#define OP_PHSUBD_Pq_Qq			0x0f3806
+#define OP_PHSUBD_Vdq_Wdq		0x660f3806
+#define OP_PHSUBSW_Pq_Qq		0x0f3807
+#define OP_PHSUBSW_Vdq_Wdq		0x660f3807
+#define OP_PSIGNB_Pq_Qq			0x0f3808
+#define OP_PSIGNB_Vdq_Wdq		0x660f3808
+#define OP_PSIGNW_Pq_Qq			0x0f3809
+#define OP_PSIGNW_Vdq_Wdq		0x660f3809
+#define OP_PSIGND_Pq_Qq			0x0f380a
+#define OP_PSIGND_Vdq_Wdq		0x660f380a
+#define OP_PMULHRSW_Pq_Qq		0x0f380b
+#define OP_PMULHRSW_Vdq_Wdq		0x660f380b
+
+#define OP_PBLENDVB_Vdq_Wdq		0x660f3810
+#define OP_PBLENDVPS_Vdq_Wdq	0x660f3814
+#define OP_PBLENDVPD_Vdq_Wdq	0x660f3815
+#define OP_PTEST_Vdq_Wdq		0x660f3817
+#define OP_PABSB_Pq_Qq			0x0f381c
+#define OP_PABSB_Vdq_Wdq		0x660f381c
+#define OP_PABSW_Pq_Qq			0x0f381d
+#define OP_PABSW_Vdq_Wdq		0x660f381d
+#define OP_PABSD_Pq_Qq			0x0f381e
+#define OP_PABSD_Vdq_Wdq		0x660f381e
+
+#define OP_PMOVSXBW_Vdq_Udq		0x660f3820
+#define OP_PMOVSXBD_Vdq_Udq		0x660f3821
+#define OP_PMOVSXBQ_Vdq_Udq		0x660f3822
+#define OP_PMOVSXWD_Vdq_Udq		0x660f3823
+#define OP_PMOVSXWQ_Vdq_Udq		0x660f3824
+#define OP_PMOVSXDQ_Vdq_Udq		0x660f3825
+#define OP_PMULDQ_Vdq_Udq		0x660f3828
+#define OP_PCMPEQQ_Vdq_Udq		0x660f3829
+#define OP_MOVNTDQA_Vdq_Udq		0x660f382a
+#define OP_PACKUSDW_Vdq_Udq		0x660f382b
+
+#define OP_PMOVZXBW_Vdq_Udq		0x660f3830
+#define OP_PMOVZXBD_Vdq_Udq		0x660f3831
+#define OP_PMOVZXBQ_Vdq_Udq		0x660f3832
+#define OP_PMOVZXWD_Vdq_Udq		0x660f3833
+#define OP_PMOVZXWQ_Vdq_Udq		0x660f3834
+#define OP_PMOVZXDQ_Vdq_Udq		0x660f3835
+#define OP_PMINSB_Vdq_Udq		0x660f3838
+#define OP_PMINSD_Vdq_Udq		0x660f3839
+#define OP_PMINUW_Vdq_Udq		0x660f383a
+#define OP_PMINUD_Vdq_Udq		0x660f383b
+#define OP_PMAXSB_Vdq_Udq		0x660f383c
+#define OP_PMAXSD_Vdq_Udq		0x660f383d
+#define OP_PMAXUW_Vdq_Udq		0x660f383e
+#define OP_PMAXUD_Vdq_Udq		0x660f383f
+
+#define OP_MULLD_Vdq_Wdq		0x660f3840
+#define OP_PHMINPOSUW_Vdq_Wdq	0x660f3841
+
+#define OP_NVEPT_Gd_Mdq			0x660f3880
+#define OP_NVVPID_Gd_Mdq		0x660f3881
+
+#define OP_MOVBE_Gv_Mv			0x0f38f0
+#define OP_CRC32_Gd_Eb			0xf20f38f0
+#define OP_MOVBE_Mv_Gv			0x0f38f1
+#define OP_CRC32_Gd_Ev			0xf20f38f1
+
+
+/* triple byte opcodes (0f 3a) */
+#define OP_ROUNDPS_Vdq_Wdq_Ib	0x660f3a08
+#define OP_ROUNDPD_Vdq_Wdq_Ib	0x660f3a09
+#define OP_ROUNDSS_Vss_Wss_Ib	0x660f3a0a
+#define OP_ROUNDSD_Vsd_Wsd_Ib	0x660f3a0b
+#define OP_BLENDPS_Vdq_Wdq_Ib	0x660f3a0c
+#define OP_BLENDPD_Vdq_Wdq_Ib	0x660f3a0d
+#define OP_PBLENDW_Vdq_Wdq_Ib	0x660f3a0e
+#define OP_PALIGNR_Pq_Qq_Ib		0x0f3a0f
+#define OP_PALIGNR_Vdq_Wdq_Ib	0x660f3a0f
+
+#define OP_EXTRB_Rd_Vdq_Ib		0x660f3a14
+#define OP_EXTRW_Rd_Vdq_Ib		0x660f3a15
+#define OP_EXTRD_Rd_Vdq_Ib		0x660f3a16
+#define OP_EXTRACTPS_Ed_Vdq_Ib	0x660f3a17
+
+#define OP_PINSRB_Vdq_Rd_Ib		0x660f3a20
+#define OP_INSERTPS_Vdq_Udq_Ib	0x660f3a21
+#define OP_PINSRD_Vdq_Ed_Ib		0x660f3a22
+
+#define OP_DPPS_Vdq_Wdq_Ib		0x660f3a40
+#define OP_DPPD_Vdq_Wdq_Ib		0x660f3a41
+#define OP_MPSADBW_Vdq_Wdq_Ib	0x660f3a42
+
+#define OP_PCMPESTRM_Vdq_Wdq_Ib	0x660f3a60
+#define OP_PCMPESTRI_Vdq_Wdq_Ib	0x660f3a61
+#define OP_PCMPISTRM_Vdq_Wdq_Ib	0x660f3a62
+#define OP_PCMPISTRI_Vdq_Wdq_Ib	0x660f3a63
 
 
 /* floating point opcodes */
@@ -2855,6 +2967,9 @@ INLINE void emit_cvttss2si_r64_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)		
 INLINE void emit_cvttss2si_r64_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTTSS2SI_Gd_Wss, OP_64BIT, dreg, MEMPARAMS); }
 #endif
 
+INLINE void emit_roundss_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDSS_Vss_Wss_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundss_r128_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDSS_Vss_Wss_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
+
 
 
 /***************************************************************************
@@ -2909,6 +3024,9 @@ INLINE void emit_cvtps2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPA
 
 INLINE void emit_cvttps2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CVTTPS2DQ_Vdq_Wps, OP_32BIT, dreg, sreg); }
 INLINE void emit_cvttps2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CVTTPS2DQ_Vdq_Wps, OP_32BIT, dreg, MEMPARAMS); }
+
+INLINE void emit_roundps_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPS_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundps_r128_m128_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDPS_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
 
 
 
@@ -2968,6 +3086,9 @@ INLINE void emit_cvttsd2si_r64_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)		
 INLINE void emit_cvttsd2si_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTTSD2SI_Gd_Wsd, OP_64BIT, dreg, MEMPARAMS); }
 #endif
 
+INLINE void emit_roundsd_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDSD_Vsd_Wsd_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundsd_r128_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDSD_Vsd_Wsd_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
+
 
 
 /***************************************************************************
@@ -3016,5 +3137,8 @@ INLINE void emit_cvtpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPA
 
 INLINE void emit_cvttpd2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, sreg); }
 INLINE void emit_cvttpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, MEMPARAMS); }
+
+INLINE void emit_roundpd_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundpd_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm) { emit_op_modrm_mem(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
 
 #endif
