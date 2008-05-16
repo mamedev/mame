@@ -639,9 +639,11 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	
 	/* generate a simple CPUID stub */
 	cpuid_ecx_stub = (UINT32 (*)(void))*dst;
+	emit_push_r32(dst, REG_EBX);														// push  ebx
 	emit_mov_r32_imm(dst, REG_EAX, 1);													// mov   eax,1
 	emit_cpuid(dst);																	// cpuid
 	emit_mov_r32_r32(dst, REG_EAX, REG_ECX);											// mov   eax,ecx
+	emit_pop_r32(dst, REG_EBX);															// pop   ebx
 	emit_ret(dst);																		// ret
 	
 	/* call it to determine if we have SSE3 support */
