@@ -155,6 +155,7 @@ struct _drcbe_state
 	UINT32 *				reghi[REG_MAX];			/* pointer to high part of data for each register */
 	double					fptemp;					/* temporary storage for floating point */
 
+	UINT8					sse3;					/* do we have SSE3 support? */
 	UINT16					fpumode;				/* saved FPU mode */
 	UINT16					fmodesave;				/* temporary location for saving */
 
@@ -624,6 +625,7 @@ static void drcbex86_free(drcbe_state *drcbe)
 
 static void drcbex86_reset(drcbe_state *drcbe)
 {
+	UINT32 (*cpuid_ecx_stub)(void);
 	x86code **dst;
 
 	/* output a note to the log */
@@ -634,6 +636,16 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	dst = (x86code **)drccache_begin_codegen(drcbe->cache, 500);
 	if (dst == NULL)
 		fatalerror("Out of cache space after a reset!");
+	
+	/* generate a simple CPUID stub */
+	cpuid_ecx_stub = (UINT32 (*)(void))*dst;
+	emit_mov_r32_imm(dst, REG_EAX, 1);													// mov   eax,1
+	emit_cpuid(dst);																	// cpuid
+	emit_mov_r32_r32(dst, REG_EAX, REG_ECX);											// mov   eax,ecx
+	emit_ret(dst);																		// ret
+	
+	/* call it to determine if we have SSE3 support */
+	drcbe->sse3 = (((*cpuid_ecx_stub)() & 1) != 0);
 
 	/* generate an entry point */
 	drcbe->entry = (x86_entry_point_func)*dst;
@@ -6638,15 +6650,40 @@ static x86code *op_ftoi4t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* general case */
-	emit_fld_p(&dst, inst->size, &srcp);												// fld   srcp
-	if (dstp.type == DRCUML_PTYPE_MEMORY)
-		emit_fisttp_m32(&dst, MABS(dstp.value));										// fisttp [dstp]
-	else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+	
+	/* non-SSE3 case */
+	if (!drcbe->sse3)
 	{
-		emit_fisttp_m32(&dst, MABS(drcbe->reglo[dstp.value]));							// fisttp reglo[dstp]
-		emit_mov_r32_m32(&dst, dstp.value, MABS(drcbe->reglo[dstp.value]));				// mov   dstp,reglo[dstp]
+		/* save and set the control word */
+		emit_fstcw_m16(&dst, MABS(&drcbe->fmodesave));									// fstcw [fmodesave]
+		emit_fldcw_m16(&dst, MABS(&fp_control[DRCUML_FMOD_TRUNC]));						// fldcw fpcontrol[DRCUML_FMOD_TRUNC]
+
+		/* general case */
+		emit_fld_p(&dst, inst->size, &srcp);											// fld   srcp
+		if (dstp.type == DRCUML_PTYPE_MEMORY)
+			emit_fistp_m32(&dst, MABS(dstp.value));										// fistp [dstp]
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+		{
+			emit_fistp_m32(&dst, MABS(drcbe->reglo[dstp.value]));						// fistp reglo[dstp]
+			emit_mov_r32_m32(&dst, dstp.value, MABS(drcbe->reglo[dstp.value]));			// mov   dstp,reglo[dstp]
+		}
+
+		/* restore control word and proceed */
+		emit_fldcw_m16(&dst, MABS(&drcbe->fmodesave));									// fldcw [fmodesave]
+	}
+	
+	/* SSE3 case */
+	else
+	{
+		/* general case */
+		emit_fld_p(&dst, inst->size, &srcp);											// fld   srcp
+		if (dstp.type == DRCUML_PTYPE_MEMORY)
+			emit_fisttp_m32(&dst, MABS(dstp.value));									// fisttp [dstp]
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+		{
+			emit_fisttp_m32(&dst, MABS(drcbe->reglo[dstp.value]));						// fisttp reglo[dstp]
+			emit_mov_r32_m32(&dst, dstp.value, MABS(drcbe->reglo[dstp.value]));			// mov   dstp,reglo[dstp]
+		}
 	}
 	return dst;
 }
@@ -6800,14 +6837,39 @@ static x86code *op_ftoi8t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
 
-	/* general case */
-	emit_fld_p(&dst, inst->size, &srcp);												// fld   srcp
-	if (dstp.type == DRCUML_PTYPE_MEMORY)
-		emit_fisttp_m64(&dst, MABS(dstp.value));										// fisttp [dstp]
-	else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+	/* non-SSE3 case */
+	if (!drcbe->sse3)
 	{
-		emit_fisttp_m64(&dst, MABS(drcbe->reglo[dstp.value]));							// fisttp reglo[dstp]
-		emit_mov_r32_m32(&dst, dstp.value, MABS(drcbe->reglo[dstp.value]));				// mov   dstp,reglo[dstp]
+		/* save and set the control word */
+		emit_fstcw_m16(&dst, MABS(&drcbe->fmodesave));									// fstcw [fmodesave]
+		emit_fldcw_m16(&dst, MABS(&fp_control[DRCUML_FMOD_TRUNC]));						// fldcw fpcontrol[DRCUML_FMOD_TRUNC]
+
+		/* general case */
+		emit_fld_p(&dst, inst->size, &srcp);											// fld   srcp
+		if (dstp.type == DRCUML_PTYPE_MEMORY)
+			emit_fistp_m64(&dst, MABS(dstp.value));										// fistp [dstp]
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+		{
+			emit_fistp_m64(&dst, MABS(drcbe->reglo[dstp.value]));						// fistp reglo[dstp]
+			emit_mov_r32_m32(&dst, dstp.value, MABS(drcbe->reglo[dstp.value]));			// mov   dstp,reglo[dstp]
+		}
+
+		/* restore control word and proceed */
+		emit_fldcw_m16(&dst, MABS(&drcbe->fmodesave));									// fldcw [fmodesave]
+	}
+	
+	/* SSE3 case */
+	else
+	{
+		/* general case */
+		emit_fld_p(&dst, inst->size, &srcp);											// fld   srcp
+		if (dstp.type == DRCUML_PTYPE_MEMORY)
+			emit_fisttp_m64(&dst, MABS(dstp.value));									// fisttp [dstp]
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+		{
+			emit_fisttp_m64(&dst, MABS(drcbe->reglo[dstp.value]));						// fisttp reglo[dstp]
+			emit_mov_r32_m32(&dst, dstp.value, MABS(drcbe->reglo[dstp.value]));			// mov   dstp,reglo[dstp]
+		}
 	}
 	return dst;
 }
@@ -7091,7 +7153,7 @@ static x86code *op_fcmp(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
-	assert((inst->condflags & ~(DRCUML_FLAG_C | DRCUML_FLAG_V | DRCUML_FLAG_Z | DRCUML_FLAG_S)) == 0);
+	assert((inst->condflags & ~(DRCUML_FLAG_C | DRCUML_FLAG_Z | DRCUML_FLAG_U)) == 0);
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &src1p, PTYPE_MF, &src2p, PTYPE_MF);

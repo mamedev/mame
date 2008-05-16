@@ -1459,6 +1459,7 @@ INLINE void emit_cdq(x86code **emitptr)    { emit_op_simple(emitptr, OP_CDQ, OP_
 INLINE void emit_cmc(x86code **emitptr)    { emit_op_simple(emitptr, OP_CMC, OP_32BIT); }
 INLINE void emit_pushf(x86code **emitptr)  { emit_op_simple(emitptr, OP_PUSHF_Fv, OP_32BIT); }
 INLINE void emit_popf(x86code **emitptr)   { emit_op_simple(emitptr, OP_POPF_Fv, OP_32BIT); }
+INLINE void emit_cpuid(x86code **emitptr)  { emit_op_simple(emitptr, OP_CPUID, OP_32BIT); }
 
 #ifndef PTR64
 INLINE void emit_pushad(x86code **emitptr) { emit_op_simple(emitptr, OP_PUSHA, OP_32BIT); }
