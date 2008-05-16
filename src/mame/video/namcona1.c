@@ -91,11 +91,11 @@ static TILE_GET_INFO( roz_get_info )
 {
 	/* each logical tile is constructed from 4*4 normal tiles */
 	int tilemap_color = roz_palette;
-	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16;
+	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16; /* ? */
 	int c = tile_index%0x40;
 	int r = tile_index/0x40;
-	int data = videoram16[0x8000/2+(r/4)*0x40+c/4]+(c%4)+(r%4)*0x40;
-	int tile = data&0xfff;
+	int data = videoram16[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
+	int tile = (data+(c%4)+(r%4)*0x40)&0xfff;
 	int gfx = use_4bpp_gfx;
 	if( use_4bpp_gfx )
 	{
@@ -153,20 +153,19 @@ READ16_HANDLER( namcona1_videoram_r )
 static void
 UpdatePalette(running_machine *machine, int offset )
 {
-	int r,g,b;
 	UINT16 data = paletteram16[offset]; /* -RRRRRGG GGGBBBBB */
-	palette_set_color_rgb( machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
-
 	/**
 	 * sprites can be configured to use an alternate interpretation of palette ram
 	 * (used in-game in Emeraldia)
 	 *
 	 * RRRGGGBB RRRGGGBB
 	 */
-	r = ((data&0x00e0)>>5)|((data&0xe000)>>(13-3));
-	g = ((data&0x001c)>>2)|((data&0x1c00)>>(10-3));
-	b = ((data&0x0003)>>0)|((data&0x0300)>>(8-2));
-	palette_set_color_rgb( machine, offset+0x1000, pal6bit(r), pal6bit(g), pal4bit(b) );
+	int r = (((data&0x00e0)>>5)+((data&0xe000)>>13)*2)*0xff/(0x7*3);
+	int g = (((data&0x001c)>>2)+((data&0x1c00)>>10)*2)*0xff/(0x7*3);
+	int b = (((data&0x0003)>>0)+((data&0x0300)>>8)*2)*0xff/(0x3*3);
+	palette_set_color_rgb( machine, offset+0x1000, r, g, b);
+
+	palette_set_color_rgb( machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 } /* namcona1_paletteram_w */
 
 READ16_HANDLER( namcona1_paletteram_r )
@@ -178,8 +177,7 @@ WRITE16_HANDLER( namcona1_paletteram_w )
 {
 	COMBINE_DATA( &paletteram16[offset] );
 	if( namcona1_vreg[0x8e/2] )
-	{
-		/* graphics enabled; update palette immediately */
+	{ /* graphics enabled; update palette immediately */
 		UpdatePalette(machine, offset );
 	}
 	else
@@ -735,7 +733,15 @@ VIDEO_UPDATE( namcona1 )
 		{
 			for( which=4; which>=0; which-- )
 			{
-				int pri = namcona1_vreg[0xa0/2+which]&0x7;
+				int pri;
+				if( which==4 )
+				{
+					pri = namcona1_vreg[0xa0/2+5]&0x7;
+				}
+				else
+				{
+					pri = namcona1_vreg[0xa0/2+which]&0x7;
+				}
 				if( pri == priority )
 				{
 					draw_background(screen->machine,bitmap,cliprect,which,priority);
@@ -749,6 +755,8 @@ VIDEO_UPDATE( namcona1 )
 }
 
 /*
+roz bad in emeraldaj - blit param?
+
 $efff20: sprite control: 0x3a,0x3e,0x3f
             bit 0x01 selects spriteram bank
 
@@ -756,10 +764,18 @@ $efff20: sprite control: 0x3a,0x3e,0x3f
 $efff00:    src0 src1 src2 dst0 dst1 dst2 BANK [src
 $efff10:    src] [dst dst] #BYT BLIT eINT 001f 0001
 $efff20:    003f 003f IACK ---- ---- ---- ---- ----
-$efff80:    0050 0170 0020 0100 0000 POSI 0000 GFXE     POSI: scanline for POSIRQ
+...
+$efff80:    0050 0170 0020 0100 0170 POS? 0000 GFXE
 $efff90:    0000 0001 0002 0003 FLIP ---- ---- ----
-$efffa0:    PRI  PRI  PRI  PRI  ---- PRI? --?? ----     priority (0..7)
-$efffb0:    CLR  CLR  CLR  CLR  0001 CLR? BPP  ----     color (0..f), bpp flag per layer
-$efffc0:    RZXX RZXY RZYX RZYY RZX0 RZY0 ???? ----     ROZ
-*/
+$efffa0:    PRI  PRI  PRI  PRI  ???? PRI  00c0 ----     priority (0..7)
+$efffb0:    CLR  CLR  CLR  CLR  0001 CLR  BPP  ----     color (0..f), bpp flag per layer
+$efffc0:    RZXX RZXY RZYX RZYY RZX0 RZY0 0044 ----     ROZ
 
+
+Emeralda:   0048 0177 0020 0100 0000 00f0 0000 0001     in-game
+            0050 0170 0020 0100 0000 00f0 0000 0001     self test
+
+NumanAth:   0050 0170 0020 0100 0170 00d8 0000 0001     in-game
+
+
+*/
