@@ -55,6 +55,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 
 #define SINGLE_INSTRUCTION_MODE			(0)
 #define PRINTF_EXCEPTIONS				(0)
+#define PRINTF_MMU						(1)
 
 #define PROBE_ADDRESS					~0
 
@@ -161,6 +162,8 @@ struct _mips3_cache_state
 	/* parameters for subroutines */
 	UINT64				numcycles;					/* return value from gettotalcycles */
 	UINT32				mode;						/* current global mode */
+	UINT32				arg0;						/* print_debug argument 1 */
+	UINT32				arg1;						/* print_debug argument 2 */
 
 	/* tables */
 	UINT8				fpmode[4];					/* FPU mode table */
@@ -976,6 +979,18 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    cfunc_get_cycles - compute the total number
+    of cycles executed so far
+-------------------------------------------------*/
+
+static void cfunc_get_cycles(void *param)
+{
+	UINT64 *dest = param;
+	*dest = activecpu_gettotalcycles();
+}
+
+
+/*-------------------------------------------------
     cfunc_printf_exception - log any exceptions that
     aren't interrupts
 -------------------------------------------------*/
@@ -988,14 +1003,14 @@ static void cfunc_printf_exception(void *param)
 
 
 /*-------------------------------------------------
-    cfunc_get_cycles - compute the total number
-    of cycles executed so far
+    cfunc_printf_debug - generic printf for
+    debugging
 -------------------------------------------------*/
 
-static void cfunc_get_cycles(void *param)
+static void cfunc_printf_debug(void *param)
 {
-	UINT64 *dest = param;
-	*dest = activecpu_gettotalcycles();
+	const char *format = param;
+	printf(format, mips3.cstate->arg0, mips3.cstate->arg1);
 }
 
 
@@ -1190,6 +1205,11 @@ static void static_generate_tlb_mismatch(drcuml_state *drcuml)
 	UML_HANDLE(block, mips3.tlb_mismatch);											// handle  tlb_mismatch
 	UML_RECOVER(block, IREG(0), MAPVAR_PC);											// recover i0,PC
 	UML_MOV(block, MEM(&mips3.core->pc), IREG(0));									// mov     <pc>,i0
+	if (PRINTF_MMU)
+	{
+		UML_MOV(block, MEM(&mips3.cstate->arg0), IREG(0));							// mov     [arg0],i0
+		UML_CALLC(block, cfunc_printf_debug, "TLB mismatch @ %08X\n");				// callc   printf_debug
+	}
 	UML_SHR(block, IREG(1), IREG(0), IMM(12));										// shr     i1,i0,12
 	UML_LOAD4(block, IREG(1), mips3.core->tlb_table, IREG(1));						// load4   i1,[tlb_table],i1
 	UML_TEST(block, IREG(1), IMM(2));												// test    i1,2
@@ -1268,7 +1288,8 @@ static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int
 	UML_OR(block, CPR032(COP0_Status), CPR032(COP0_Status), IMM(SR_EXL));			// or      [Status],[Status],SR_EXL
 
 	/* optionally print exceptions */
-	if (PRINTF_EXCEPTIONS && exception != EXCEPTION_INTERRUPT && exception != EXCEPTION_SYSCALL)
+	if ((PRINTF_EXCEPTIONS && exception != EXCEPTION_INTERRUPT && exception != EXCEPTION_SYSCALL) ||
+		(PRINTF_MMU && (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)))
 		UML_CALLC(block, cfunc_printf_exception, NULL);								// callc   cfunc_printf_exception,NULL
 
 	/* choose our target PC */
@@ -1634,7 +1655,14 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 
 	/* if we hit a compiler page fault, it's just like a TLB mismatch */
 	if (desc->flags & OPFLAG_COMPILER_PAGE_FAULT)
+	{
+		if (PRINTF_MMU)
+		{
+			UML_MOV(block, MEM(&mips3.cstate->arg0), IMM(desc->pc));				// mov     [arg0],desc->pc
+			UML_CALLC(block, cfunc_printf_debug, "Compiler page fault @ %08X\n");	// callc   printf_debug
+		}
 		UML_EXH(block, mips3.tlb_mismatch, IMM(0));									// exh     tlb_mismatch,0
+	}
 	
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
@@ -1642,6 +1670,11 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		/* if we currently have a valid TLB read entry, we just verify */
 		if (mips3.core->tlb_table[desc->pc >> 12] & 2)
 		{
+			if (PRINTF_MMU)
+			{
+				UML_MOV(block, MEM(&mips3.cstate->arg0), IMM(desc->pc));			// mov     [arg0],desc->pc
+				UML_CALLC(block, cfunc_printf_debug, "Checking TLB at @ %08X\n");	// callc   printf_debug
+			}
 			UML_LOAD4(block, IREG(0), &mips3.core->tlb_table[desc->pc >> 12], IMM(0));// load4   i0,tlb_table[desc->pc >> 12]
 			UML_CMP(block, IREG(0), IMM(mips3.core->tlb_table[desc->pc >> 12]));	// cmp     i0,*tlbentry
 			UML_EXHc(block, IF_NE, mips3.tlb_mismatch, IMM(0));						// exh     tlb_mismatch,0,NE
@@ -1649,7 +1682,14 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		
 		/* otherwise, we generate an unconditional exception */
 		else
+		{
+			if (PRINTF_MMU)
+			{
+				UML_MOV(block, MEM(&mips3.cstate->arg0), IMM(desc->pc));			// mov     [arg0],desc->pc
+				UML_CALLC(block, cfunc_printf_debug, "No valid TLB @ %08X\n");		// callc   printf_debug
+			}
 			UML_EXH(block, mips3.tlb_mismatch, IMM(0));								// exh     tlb_mismatch,0
+		}
 	}
 
 	/* if this is an invalid opcode, generate the exception now */
