@@ -1213,8 +1213,8 @@ static void static_generate_tlb_mismatch(drcuml_state *drcuml)
 	UML_SHR(block, IREG(1), IREG(0), IMM(12));										// shr     i1,i0,12
 	UML_LOAD4(block, IREG(1), mips3.core->tlb_table, IREG(1));						// load4   i1,[tlb_table],i1
 	UML_TEST(block, IREG(1), IMM(2));												// test    i1,2
-	UML_EXHc(block, IF_NE, mips3.exception[EXCEPTION_TLBLOAD], IREG(0));			// exh     exception[TLBLOAD],i0
-	UML_EXIT(block, IMM(EXECUTE_OUT_OF_CYCLES));									// exit    EXECUTE_MISSING_CODE
+	UML_EXHc(block, IF_NZ, mips3.exception[EXCEPTION_TLBLOAD], IREG(0));			// exh     exception[TLBLOAD],i0
+	UML_EXIT(block, IMM(EXECUTE_MISSING_CODE));										// exit    EXECUTE_MISSING_CODE
 
 	drcuml_block_end(block);
 }
@@ -1668,7 +1668,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
 		/* if we currently have a valid TLB read entry, we just verify */
-		if (mips3.core->tlb_table[desc->pc >> 12] & 2)
+		if (!(mips3.core->tlb_table[desc->pc >> 12] & 2))
 		{
 			if (PRINTF_MMU)
 			{
