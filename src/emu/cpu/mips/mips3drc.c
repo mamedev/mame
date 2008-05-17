@@ -1085,7 +1085,7 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 	UML_HANDLE(block, mips3.entry);													// handle  entry
 
 	/* reset the FPU mode */
-	UML_AND(block, IREG(0), CCR164(31), IMM(3));									// and     i0,ccr1[31],3
+	UML_AND(block, IREG(0), CCR132(31), IMM(3));									// and     i0,ccr1[31],3
 	UML_LOAD1U(block, IREG(0), &mips3.cstate->fpmode[0], IREG(0));					// load1u  i0,fpmode,i0
 	UML_SETFMOD(block, IREG(0));													// setfmod i0
 
@@ -2889,7 +2889,7 @@ static int generate_cop0(drcuml_block *block, compiler_state *compiler, const op
 
 		case 0x02:	/* CFCz */
 			if (RTREG != 0)
-				UML_DSEXT4(block, R32(RTREG), CCR032(RDREG));						// dsext4  <rtreg>,ccr0[rdreg]
+				UML_DSEXT4(block, R64(RTREG), CCR032(RDREG));						// dsext4  <rtreg>,ccr0[rdreg]
 			return TRUE;
 
 		case 0x04:	/* MTCz */
