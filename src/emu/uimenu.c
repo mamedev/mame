@@ -1762,7 +1762,7 @@ static UINT32 menu_select_game(running_machine *machine, UINT32 state)
 #ifdef MESS
 static UINT32 menu_file_manager(running_machine *machine, UINT32 state)
 {
-	int result = filemanager(state);
+	int result = filemanager(machine, state);
 	if (result == 0)
 	return ui_menu_stack_pop();
 	return result;
@@ -1778,7 +1778,7 @@ static UINT32 menu_file_manager(running_machine *machine, UINT32 state)
 #if HAS_WAVE
 static UINT32 menu_tape_control(running_machine *machine, UINT32 state)
 {
-	int result = tapecontrol(state);
+	int result = tapecontrol(machine, state);
 	if (result == 0)
 	return ui_menu_stack_pop();
 	return result;
