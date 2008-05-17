@@ -2967,8 +2967,8 @@ INLINE void emit_cvttss2si_r64_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)		
 INLINE void emit_cvttss2si_r64_m32(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTTSS2SI_Gd_Wss, OP_64BIT, dreg, MEMPARAMS); }
 #endif
 
-INLINE void emit_roundss_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDSS_Vss_Wss_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
-INLINE void emit_roundss_r128_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDSS_Vss_Wss_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
+INLINE void emit_roundss_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDSS_Vss_Wss_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundss_r128_m32_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDSS_Vss_Wss_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
 
 
 
@@ -3086,8 +3086,8 @@ INLINE void emit_cvttsd2si_r64_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)		
 INLINE void emit_cvttsd2si_r64_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS)	{ emit_op_modrm_mem(emitptr, OP_CVTTSD2SI_Gd_Wsd, OP_64BIT, dreg, MEMPARAMS); }
 #endif
 
-INLINE void emit_roundsd_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDSD_Vsd_Wsd_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
-INLINE void emit_roundsd_r128_m64(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDSD_Vsd_Wsd_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
+INLINE void emit_roundsd_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDSD_Vsd_Wsd_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundsd_r128_m64_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm)	{ emit_op_modrm_mem(emitptr, OP_ROUNDSD_Vsd_Wsd_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
 
 
 
@@ -3138,7 +3138,7 @@ INLINE void emit_cvtpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPA
 INLINE void emit_cvttpd2dq_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg)			{ emit_op_modrm_reg(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, sreg); }
 INLINE void emit_cvttpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS) 	{ emit_op_modrm_mem(emitptr, OP_CVTTPD2DQ_Vdq_Wpd, OP_32BIT, dreg, MEMPARAMS); }
 
-INLINE void emit_roundpd_r128_r128(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
-INLINE void emit_roundpd_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm) { emit_op_modrm_mem(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
+INLINE void emit_roundpd_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
+INLINE void emit_roundpd_r128_m128_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm) { emit_op_modrm_mem(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
 
 #endif

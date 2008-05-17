@@ -17,8 +17,6 @@
     * Optimize to avoid unnecessary reloads
 
     * Identify common pairs and optimize output
-    
-    * Add SSE4.1 support for ROUNDSS, ROUNDSD
 
 ****************************************************************************
 
@@ -267,6 +265,7 @@ struct _drcbe_state
 	x86code *				drcmap_get_value;		/* map lookup helper */
 	data_accessors			accessors[ADDRESS_SPACES];/* memory accessors */
 
+	UINT8					sse41;					/* do we have SSE4.1 support? */
 	UINT32					ssemode;				/* saved SSE mode */
 	UINT32					ssemodesave;			/* temporary location for saving */
 	UINT32					ssecontrol[4];			/* copy of the sse_control array */
@@ -356,6 +355,15 @@ static UINT8 condition_map[DRCUML_COND_MAX - DRCUML_COND_Z] =
 	COND_LE,	/* DRCUML_COND_LE,          requires SVZ */
 	COND_L,		/* DRCUML_COND_L,           requires SV */
 	COND_GE,	/* DRCUML_COND_GE,          requires SV */
+};
+
+/* rounding mode mapping table */
+static const UINT8 fprnd_map[4] =
+{
+	FPRND_CHOP,		/* DRCUML_FMOD_TRUNC,		truncate */
+	FPRND_NEAR,		/* DRCUML_FMOD_ROUND,		round */
+	FPRND_UP,		/* DRCUML_FMOD_CEIL,		round up */
+	FPRND_DOWN		/* DRCUML_FMOD_FLOOR		round down */
 };
 
 
@@ -794,6 +802,7 @@ static void drcbex64_free(drcbe_state *drcbe)
 
 static void drcbex64_reset(drcbe_state *drcbe)
 {
+	UINT32 (*cpuid_ecx_stub)(void);
 	x86code **dst;
 	int spacenum;
 
@@ -810,6 +819,18 @@ static void drcbex64_reset(drcbe_state *drcbe)
 	dst = (x86code **)drccache_begin_codegen(drcbe->cache, 500);
 	if (dst == NULL)
 		fatalerror("Out of cache space after a reset!");
+
+	/* generate a simple CPUID stub */
+	cpuid_ecx_stub = (UINT32 (*)(void))*dst;
+	emit_push_r64(dst, REG_RBX);														// push  rbx
+	emit_mov_r32_imm(dst, REG_EAX, 1);													// mov   eax,1
+	emit_cpuid(dst);																	// cpuid
+	emit_mov_r32_r32(dst, REG_EAX, REG_ECX);											// mov   eax,ecx
+	emit_pop_r64(dst, REG_RBX);															// pop   rbx
+	emit_ret(dst);																		// ret
+	
+	/* call it to determine if we have SSE4.1 support */
+	drcbe->sse41 = (((*cpuid_ecx_stub)() & 0x80000) != 0);
 
 	/* generate an entry point */
 	drcbe->entry = (x86_entry_point_func)*dst;
@@ -6656,146 +6677,87 @@ static x86code *op_ftoi4t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_ftoi4r - process a FTOI4R opcode
+    op_ftoi4x - process a FTOI4R/F/C opcode
 -------------------------------------------------*/
+
+static x86code *op_ftoi4x(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, int mode)
+{
+	drcuml_parameter dstp, srcp;
+	int dstreg;
+
+	/* validate instruction */
+	assert(inst->size == 4 || inst->size == 8);
+	assert(inst->condflags == DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
+
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+	
+	/* non-SSE4.1 case */
+	if (!drcbe->sse41 || inst->size == 8)
+	{
+		/* save and set the control word */
+		emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// stmxcsr [ssemodesave]
+		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[mode]));					// ldmxcsr fpcontrol[mode]
+
+		/* 32-bit form */
+		if (inst->size == 4)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtss2si dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);						// cvtss2si dstreg,srcp
+		}
+
+		/* 64-bit form */
+		else if (inst->size == 8)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsd2si dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);						// cvtsd2si dstreg,srcp
+		}
+
+		/* restore control word and proceed */
+		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// ldmxcsr [ssemodesave]
+	}
+	
+	/* SSE4.1 case */
+	else
+	{
+		/* 32-bit form */
+		if (srcp.type == DRCUML_PTYPE_MEMORY)
+			emit_roundss_r128_m32_imm(&dst, REG_XMM0, MABS(drcbe, srcp.value), fprnd_map[mode]);
+																						// roundss  xmm0,[srcp],mode
+		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+			emit_roundss_r128_r128_imm(&dst, REG_XMM0, srcp.value, fprnd_map[mode]);	// roundss  xmm0,srcp,mode
+		
+		/* store to the destination */
+		if (dstp.type == DRCUML_PTYPE_MEMORY)
+			emit_movd_m32_r128(&dst, MABS(drcbe, dstp.value), REG_XMM0);				// movd     [dstp],xmm0
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+			emit_movd_r32_r128(&dst, dstp.value, REG_XMM0);								// movd     dstp,xmm0
+	}
+	return dst;
+
+}
 
 static x86code *op_ftoi4r(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* save and set the control word */
-	emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// stmxcsr [ssemodesave]
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[DRCUML_FMOD_ROUND]));			// ldmxcsr fpcontrol[DRCUML_FMOD_ROUND]
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* restore control word and proceed */
-	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// ldmxcsr [ssemodesave]
-	return dst;
+	return op_ftoi4x(drcbe, dst, inst, DRCUML_FMOD_ROUND);
 }
-
-
-/*-------------------------------------------------
-    op_ftoi4f - process a FTOI4F opcode
--------------------------------------------------*/
 
 static x86code *op_ftoi4f(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* save and set the control word */
-	emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// stmxcsr [ssemodesave]
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[DRCUML_FMOD_FLOOR]));			// ldmxcsr fpcontrol[DRCUML_FMOD_FLOOR]
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* restore control word and proceed */
-	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// ldmxcsr [ssemodesave]
-	return dst;
+	return op_ftoi4x(drcbe, dst, inst, DRCUML_FMOD_FLOOR);
 }
-
-
-/*-------------------------------------------------
-    op_ftoi4c - process a FTOI4C opcode
--------------------------------------------------*/
 
 static x86code *op_ftoi4c(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* save and set the control word */
-	emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// stmxcsr [ssemodesave]
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[DRCUML_FMOD_CEIL]));			// ldmxcsr fpcontrol[DRCUML_FMOD_CEIL]
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* restore control word and proceed */
-	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// ldmxcsr [ssemodesave]
-	return dst;
+	return op_ftoi4x(drcbe, dst, inst, DRCUML_FMOD_CEIL);
 }
 
 
@@ -6886,146 +6848,87 @@ static x86code *op_ftoi8t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_ftoi8r - process a FTOI8R opcode
+    op_ftoi8x - process a FTOI8R/F/C opcode
 -------------------------------------------------*/
+
+static x86code *op_ftoi8x(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, int mode)
+{
+	drcuml_parameter dstp, srcp;
+	int dstreg;
+
+	/* validate instruction */
+	assert(inst->size == 4 || inst->size == 8);
+	assert(inst->condflags == DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
+
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+	
+	/* non-SSE4.1 case */
+	if (!drcbe->sse41 || inst->size == 4)
+	{
+		/* save and set the control word */
+		emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// stmxcsr [ssemodesave]
+		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[mode]));					// ldmxcsr fpcontrol[mode]
+
+		/* 32-bit form */
+		if (inst->size == 4)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtss2si dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);						// cvtss2si dstreg,srcp
+		}
+
+		/* 64-bit form */
+		else if (inst->size == 8)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsd2si dstreg,[srcp]
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+				emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);						// cvtsd2si dstreg,srcp
+		}
+
+		/* restore control word and proceed */
+		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// ldmxcsr [ssemodesave]
+	}
+	
+	/* SSE4.1 case */
+	else
+	{
+		/* 64-bit form */
+		if (srcp.type == DRCUML_PTYPE_MEMORY)
+			emit_roundsd_r128_m64_imm(&dst, REG_XMM0, MABS(drcbe, srcp.value), fprnd_map[mode]);
+																						// roundsd  xmm0,[srcp],mode
+		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+			emit_roundsd_r128_r128_imm(&dst, REG_XMM0, srcp.value, fprnd_map[mode]);	// roundsd  xmm0,srcp,mode
+		
+		/* store to the destination */
+		if (dstp.type == DRCUML_PTYPE_MEMORY)
+			emit_movq_m64_r128(&dst, MABS(drcbe, dstp.value), REG_XMM0);				// movq     [dstp],xmm0
+		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
+			emit_movq_r64_r128(&dst, dstp.value, REG_XMM0);								// movq     dstp,xmm0
+	}
+	return dst;
+
+}
 
 static x86code *op_ftoi8r(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* save and set the control word */
-	emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// stmxcsr [ssemodesave]
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[DRCUML_FMOD_ROUND]));			// ldmxcsr fpcontrol[DRCUML_FMOD_ROUND]
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* restore control word and proceed */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// ldmxcsr [ssemodesave]
-	return dst;
+	return op_ftoi8x(drcbe, dst, inst, DRCUML_FMOD_ROUND);
 }
-
-
-/*-------------------------------------------------
-    op_ftoi8f - process a FTOI8F opcode
--------------------------------------------------*/
 
 static x86code *op_ftoi8f(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* save and set the control word */
-	emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// stmxcsr [ssemodesave]
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[DRCUML_FMOD_FLOOR]));			// ldmxcsr fpcontrol[DRCUML_FMOD_FLOOR]
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* restore control word and proceed */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// ldmxcsr [ssemodesave]
-	return dst;
+	return op_ftoi8x(drcbe, dst, inst, DRCUML_FMOD_FLOOR);
 }
-
-
-/*-------------------------------------------------
-    op_ftoi8c - process a FTOI8C opcode
--------------------------------------------------*/
 
 static x86code *op_ftoi8c(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* save and set the control word */
-	emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// stmxcsr [ssemodesave]
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[DRCUML_FMOD_CEIL]));			// ldmxcsr fpcontrol[DRCUML_FMOD_CEIL]
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* restore control word and proceed */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));							// ldmxcsr [ssemodesave]
-	return dst;
+	return op_ftoi8x(drcbe, dst, inst, DRCUML_FMOD_CEIL);
 }
 
 
