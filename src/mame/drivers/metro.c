@@ -5464,8 +5464,8 @@ ROM_START( lastfork )
 	ROM_LOAD16_BYTE( "8f-10", 0x000001, 0x020000, CRC(9696ea39) SHA1(27af0c6399cd7be40aa8a1c1b58e0db8408aff11) )
 
 	ROM_REGION( 0x02c000, REGION_CPU2, 0 )		/* NEC78C10 Code */
-	ROM_LOAD( "7a-12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) ) /* Same as parent set, but different label */
-	ROM_CONTINUE(      0x010000, 0x01c000 )
+	ROM_LOAD( "tr_jb12", 0x000000, 0x004000, CRC(8a8f5fef) SHA1(530b4966ec058cd80a2fc5f9e961239ce59d0b89) )	// (c)1992 Imagetek (11xxxxxxxxxxxxxxx = 0xFF)
+	ROM_CONTINUE(        0x010000, 0x01c000 )
 
 	ROM_REGION( 0x200000, REGION_GFX1, 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "7i-2",  0x000000, 0x040000, CRC(d1fe8d7b) SHA1(88b1973ebb47b91a49f6b4f722c9cc33e5330694) , ROM_SKIP(7))
@@ -5478,7 +5478,7 @@ ROM_START( lastfork )
 	ROMX_LOAD( "14i-7", 0x000007, 0x040000, CRC(0cb38317) SHA1(6e18096f6616aa0d9c4f3a2394561ed3f636731e) , ROM_SKIP(7))
 
 	ROM_REGION( 0x020000, REGION_SOUND1, 0 )	/* Samples */
-	ROM_LOAD( "1e-11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) ) /* Same as parent set, but different label */
+	ROM_LOAD( "tr_jb11", 0x000000, 0x020000, CRC(83786a09) SHA1(910cf0ccf4493f2a80062149f6364dbb6a1c2a5d) )
 ROM_END
 
 /* German version on PCB VG460-(A) */
