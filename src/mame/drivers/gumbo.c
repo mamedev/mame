@@ -355,8 +355,25 @@ ROM_START( gumbo )
 	ROM_LOAD( "u210.bin", 0x00000, 0x40000, CRC(16fbe06b) SHA1(4e40e62341dc886fcabdb07f64217dc086f43c67) )
 
 	ROM_REGION( 0x100000, REGION_GFX1, 0 )
-	ROM_LOAD( "u421.bin", 0x00000, 0x80000, CRC(42445132) SHA1(f29d09d040644c8ef12a1cfdfc0d066e8ed9b82d) )
+	ROM_LOAD( "u421.bin", 0x00000, 0x80000, CRC(42445132) SHA1(f29d09d040644c8ef12a1cfdfc0d066e8ed9b82d) ) /* Nude & semi-nude girls, both real pictures & hand drawn */
 	ROM_LOAD( "u420.bin", 0x80000, 0x80000, CRC(de1f0e2f) SHA1(3f46d19af48392794838a4b54f8c45b809c67d49) )
+
+	ROM_REGION( 0x40000, REGION_GFX2, 0 ) /* BG Tiles */
+	ROM_LOAD( "u512.bin", 0x00000, 0x20000, CRC(97741798) SHA1(3603e14511817da19f6819d5612728d333695e99) )
+	ROM_LOAD( "u511.bin", 0x20000, 0x20000, CRC(1411451b) SHA1(941d5f311f727e3a8d41ecbbe35b687d48cc2cef) )
+ROM_END
+
+ROM_START( mspuzzlg ) /* This version is a clone of Gumbo... NOT the other Miss Puzzle sets */
+	ROM_REGION( 0x80000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "u1", 0x00001, 0x20000, CRC(95218ff1) SHA1(9617d979d026872dbe68eaae21c3ab1f5f9f4bfd) ) /* Korean bootleg / clone / hack??? */
+	ROM_LOAD16_BYTE( "u2", 0x00000, 0x20000, CRC(7ea7d96c) SHA1(17b9afb3214a07b1af5913f1926c7aeac27ea0e8) )
+
+	ROM_REGION( 0x040000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "u210.bin", 0x00000, 0x40000, CRC(16fbe06b) SHA1(4e40e62341dc886fcabdb07f64217dc086f43c67) )
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "u421", 0x100000, 0x80000, CRC(afa06a93) SHA1(5c77b7aafd07d19a1eedf22858a00766a3e37389) ) /* Non-nude graphics, hand drawn girls & animals */
+	ROM_LOAD( "u420", 0x000000, 0x80000, CRC(2b387153) SHA1(c36f93d4f3a7ea8af58babeb33250d726067a35d) )
 
 	ROM_REGION( 0x40000, REGION_GFX2, 0 ) /* BG Tiles */
 	ROM_LOAD( "u512.bin", 0x00000, 0x20000, CRC(97741798) SHA1(3603e14511817da19f6819d5612728d333695e99) )
@@ -456,6 +473,7 @@ ROM_START( dblpoind )
 ROM_END
 
 GAME( 1994, gumbo,    0,        gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Gumbo", 0 )
+GAME( 1994, mspuzzlg, gumbo,    gumbo,    gumbo,    0, ROT0,  "Min Corp.", "Miss Puzzle (Clone of Gumbo)", 0 )
 GAME( 1994, msbingo,  0,        mspuzzle, msbingo,  0, ROT0,  "Min Corp.", "Miss Bingo", 0 )
 GAME( 1994, mspuzzle, 0,        mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle", 0 )
 GAME( 1994, mspuzzln, mspuzzle, mspuzzle, mspuzzle, 0, ROT90, "Min Corp.", "Miss Puzzle (Nudes)", GAME_NOT_WORKING )
