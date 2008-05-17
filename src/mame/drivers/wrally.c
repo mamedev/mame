@@ -80,6 +80,17 @@ Palette related:
 * 2xMS6264A-20NC (8KB SRAM) @ C8 & C9 (palette RAM (xxxxBBBBRRRRGGGG))
 * 2x74HCT273 (octal D-Type flip-flop with clear) @ B8 & B9 (connected to RGB output)
 
+Controls related: (added by Mirko Mattioli) 
+=================
+On the real PCB the optical wheel encoder is connected to 74LS169 ICs (@A16 and @A17)
+via a flip-flop IC mounted in the steering wheel assembly. As a result, the output 
+of the flip-flop generates a signal that contains the information about the steering
+direction; this signal is routed to pin #1 (U/D) at ICs A16 and A17 (high when turn
+left and low when turn right). The second signal of the optical encoder goes directly
+to pin #2 (CLK) at ICs A16 and A17 and it is a clock for the 74LS169 ICs; this clock
+frequency is proportional to the movements of the steering wheel: fast movements
+produces a high clock frequency, slow movements a low freq.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -206,8 +217,11 @@ PORT_START	/* INPUTS, COINSW & STARTSW */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-PORT_START	/* Wheel control? */
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not implemented */
+PORT_START	/* Wheel control */
+	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_RIGHT) PORT_CODE_INC(KEYCODE_LEFT)
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
 PORT_START	/* INPUTS, TEST & SERVICE */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
