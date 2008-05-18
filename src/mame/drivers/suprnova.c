@@ -187,7 +187,7 @@ NEP-16
 #include "deprecat.h"
 #include "sound/ymz280b.h"
 
-#define BIOS_SKIP 0 // Skip Bios as it takes too long and doesn't complete atm.
+#define BIOS_SKIP 1 // Skip Bios as it takes too long and doesn't complete atm.
 
 // Defined in video
 extern void skns_sprite_kludge(int x, int y);
