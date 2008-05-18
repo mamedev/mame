@@ -1834,6 +1834,42 @@ static ADDRESS_MAP_START( tetrisbl_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
 ADDRESS_MAP_END
 
+
+
+static READ16_HANDLER(beautyb_unk1_r)
+{
+
+	return mame_rand(machine);;
+}
+
+
+static READ16_HANDLER(beautyb_unk2_r)
+{
+	return mame_rand(machine);
+}
+
+static ADDRESS_MAP_START( beautyb_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x00ffff) AM_READWRITE(SMH_ROM, SMH_NOP)
+	//AM_RANGE(0x010000, 0x03ffff) AM_WRITE(SMH_NOP)
+
+	AM_RANGE(0x0280D6, 0x0280D7) AM_READ(beautyb_unk2_r)
+	AM_RANGE(0x0280D8, 0x0280D9) AM_READ(beautyb_unk2_r)
+
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_READWRITE(SYS16_MRA16_TILERAM, SYS16_MWA16_TILERAM) AM_BASE(&sys16_tileram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_READWRITE(SYS16_MRA16_TEXTRAM, SYS16_MWA16_TEXTRAM) AM_BASE(&sys16_textram)
+	AM_RANGE(0x418000, 0x41803f) AM_RAM AM_READWRITE(SYS16_MRA16_EXTRAM2, SYS16_MWA16_EXTRAM2) AM_BASE(&sys16_extraram2)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_READWRITE(SYS16_MRA16_SPRITERAM, SYS16_MWA16_SPRITERAM) AM_BASE(&sys16_spriteram)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM AM_READWRITE(SYS16_MRA16_PALETTERAM, SYS16_MWA16_PALETTERAM) AM_BASE(&paletteram16)
+
+	AM_RANGE(0xC41000, 0xC41001) AM_READ(beautyb_unk1_r )
+	AM_RANGE(0xC41002, 0xC41003) AM_READ(beautyb_unk1_r )
+
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(SMH_NOP)
+
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_WRITE(SYS16_MWA16_WORKINGRAM) AM_BASE(&sys16_workingram)
+ADDRESS_MAP_END
+
 /***************************************************************************/
 
 
@@ -1904,6 +1940,17 @@ static MACHINE_DRIVER_START( tetrisbl )
 
 	MDRV_MACHINE_RESET(tetrisbl)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( beautyb )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(system16)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(beautyb_map, 0)
+
+	MDRV_MACHINE_RESET(tetrisbl)
+MACHINE_DRIVER_END
+
 
 /***************************************************************************/
 
@@ -2801,3 +2848,59 @@ GAME( 1988, passht4b, passsht,  passht4b, passht4b, passht4b, ROT270, "bootleg",
 GAME( 1988, tetrisbl, tetris,   tetrisbl, tetris,   tetrisbl, ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 GAME( 1989, tturfbl,  tturf,    tturfbl,  tturf,    tturfbl,  ROT0,   "bootleg", "Tough Turf (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1988, wb3bbl,   wb3,      wb3bbl,   wb3b,     wb3bbl,   ROT0,   "bootleg", "Wonder Boy III - Monster Lair (bootleg)", 0 )
+
+DRIVER_INIT( beautyb )
+{
+	UINT16*rom = (UINT16*)memory_region( REGION_CPU1 );
+	int x;
+
+	for (x=0;x<0x8000;x++)
+	{
+		rom[x] = rom[x] ^ 0x2400;
+
+		if (x&8) rom[x] = BITSWAP16(rom[x],15,14,10,12,  11,13,9,8,
+		                          7,6,5,4,   3,2,1,0 );
+
+	}
+
+	MACHINE_RESET_CALL(sys16_onetime);
+
+}
+
+/* Program Roms contain
+
+Designed and Programmed by A.M.T. Research & Development Department 03/30/1991.
+Copying or Revising for Commercial Use Is Not Permitted.
+
+*/
+
+ROM_START( beautyb )
+	ROM_REGION( 0x010000, REGION_CPU1, ROMREGION_ERASEFF ) /* 68000 code */
+	ROM_LOAD16_BYTE( "b13.u3", 0x00000, 0x8000, CRC(90c4489b) SHA1(240275ad6dfd02feab636ceb620264d339e79b6a) )
+	ROM_LOAD16_BYTE( "b23.u2", 0x00001, 0x8000, CRC(79b8f9ed) SHA1(5926852ea00b60d91684dbea4687b67894a397a1) )
+
+	ROM_REGION( 0x30000, REGION_GFX1, ROMREGION_DISPOSE ) /* tiles */
+	ROM_LOAD( "b43.bin", 0x00000, 0x10000, CRC(67fe3f0c) SHA1(c9479512dd7a80895740c7fbd2133ab4d4c679d6) )
+	ROM_LOAD( "b53.bin", 0x10000, 0x10000, CRC(aca8e330) SHA1(912e636e3c1e238682ea29620e8e2c6089c77209) )
+	ROM_LOAD( "b63.bin", 0x20000, 0x10000, CRC(f2af2fd5) SHA1(0a95ebb5eae7cdc6535533d73d06419c23d01ac3) )
+
+	ROM_REGION( 0x020000, REGION_GFX2, ROMREGION_ERASEFF ) /* sprites */
+	/* no sprites on this */
+
+	ROM_REGION( 0x40000, REGION_CPU2, 0 ) /* sound CPU */
+	ROM_LOAD( "1.bin", 0x0000, 0x8000, CRC(bd9ba01b) SHA1(fafa7dc36cc057a50ae4cdf7a35f3594292336f4) )
+
+	ROM_REGION( 0x0020, REGION_PROMS, 0 )
+	ROM_LOAD( "82s123.2",  0x0000, 0x0020, CRC(58bcf8bd) SHA1(e4d3d179b08c0f3424a6bec0f15058fb1b56f8d8) )
+
+	ROM_REGION( 0x0144, REGION_USER1, 0 )
+	ROM_LOAD( "pal16r4acn.1",  0x0000, 0x0104, CRC(826be9e7) SHA1(893fc49c38aa8e7d6e98f6320157ba627a5d1748) )
+	ROM_LOAD( "pal16r4acn.2",  0x0000, 0x0104, CRC(b3084ffe) SHA1(086ad2f89bdd8524ae358fd49b0803f9bb4aff33) )
+	ROM_LOAD( "pal16r4acn.3",  0x0000, 0x0104, CRC(741cd872) SHA1(d53bdcadcd25d44b6423e0740e88209f85c709bd) )
+	ROM_LOAD( "pal20l8acn",    0x0000, 0x0144, CRC(36e30d71) SHA1(e38f0257f9beedccc9421eec78701a86465d16ad) )
+	ROM_LOAD( "pal16l8ajc.u4", 0x0000, 0x0104, NO_DUMP)
+ROM_END
+
+
+GAME( 1991, beautyb,    0,        beautyb,    tetris,    beautyb, ROT0,  "AMT", "Beauty Block", GAME_NO_SOUND|GAME_NOT_WORKING )
+

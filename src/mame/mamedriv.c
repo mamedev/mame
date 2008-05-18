@@ -3505,6 +3505,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( shinoblb )	/* (c) 1987 (but bootleg) */
 	DRIVER( shinobld )	/* (c) 1987 (but bootleg) */
 	DRIVER( tetrisbl )	/* (c) 1988 (but bootleg) */
+	DRIVER( beautyb )	/* (c) 1991 AMT */
 	DRIVER( tturfbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( wb3bbl )	/* BOOTLEG */
 
