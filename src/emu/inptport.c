@@ -699,7 +699,7 @@ const input_port_config *input_port_by_tag(const input_port_config *portlist, co
 	
 	/* loop over ports until we hit the index or run out */
 	for (port = portlist; port != NULL; port = port->next)
-		if (strcmp(port->tag, tag) == 0)
+		if (port->tag != NULL && strcmp(port->tag, tag) == 0)
 			return port;
 	
 	return NULL;
