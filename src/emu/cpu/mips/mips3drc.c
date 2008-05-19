@@ -1817,7 +1817,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		if (!generate_opcode(block, compiler, desc))
 		{
 			UML_MOV(block, MEM(&mips3.core->pc), IMM(desc->pc));					// mov     [pc],desc->pc
-			UML_CALLC(block, cfunc_unimplemented, (void *)*desc->opptr.l);			// callc   cfunc_unimplemented
+			UML_CALLC(block, cfunc_unimplemented, (void *)(FPTR)*desc->opptr.l);			// callc   cfunc_unimplemented
 		}
 	}
 }
