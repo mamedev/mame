@@ -335,7 +335,7 @@ VIDEO_UPDATE(n64)
 						int r = ((pix >> 11) & 0x1f) << 3;
 						int g = ((pix >> 6) & 0x1f) << 3;
 						int b = ((pix >> 1) & 0x1f) << 3;
-						d[i^1] = (r << 16) | (g << 8) | b;
+						d[BYTE_XOR_BE(i)] = (r << 16) | (g << 8) | b;
 					}
 				}
 			}
