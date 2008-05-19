@@ -1021,7 +1021,7 @@ static void validate_backend(drcuml_state *drcuml)
 		
 		/* reset parameter list and iterate */
 		memset(param, 0, sizeof(param));
-		printf("Executing test %d/%d", tnum + 1, ARRAY_LENGTH(bevalidate_test_list));
+		printf("Executing test %d/%d", tnum + 1, (int)ARRAY_LENGTH(bevalidate_test_list));
 		bevalidate_iterate_over_params(drcuml, handles, test, param, 0);
 		printf("\n");
 	}
