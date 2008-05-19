@@ -217,6 +217,10 @@ const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc)
 			/* allocate a new description and describe this instruction */
 			drcfe->desc_array[curpc - minpc] = curdesc = describe_one(drcfe, curpc);
 
+			/* first instruction in a sequence is always a branch target */
+			if (curpc == curstack->targetpc)
+				curdesc->flags |= OPFLAG_IS_BRANCH_TARGET;
+
 			/* stop if we hit a page fault */
 			if (curdesc->flags & OPFLAG_COMPILER_PAGE_FAULT)
 				break;
@@ -224,10 +228,6 @@ const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc)
 			/* if we are the first instruction in the whole window, we must validate the TLB */
 			if (curpc == startpc && drcfe->pageshift != 0)
 				curdesc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
-
-			/* first instruction in a sequence is always a branch target */
-			if (curpc == curstack->targetpc)
-				curdesc->flags |= OPFLAG_IS_BRANCH_TARGET;
 
 			/* if we are a branch within the block range, add the branch target to our stack */
 			if ((curdesc->flags & OPFLAG_IS_BRANCH) && curdesc->targetpc >= minpc && curdesc->targetpc < maxpc && pcstackptr < &pcstack[MAX_STACK_DEPTH])
@@ -373,8 +373,12 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 			}
 
 			/* start a new sequence if we aren't already in the middle of one */
-			if (seqstart == -1)
+			if (seqstart == -1 && skipsleft == 0)
+			{
+				/* tag all start-of-sequence instructions as needing TLB verification */
+				curdesc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
 				seqstart = descnum;
+			}
 
 			/* if we are the last instruction, indicate end-of-sequence and redispatch */
 			if (nextdesc == NULL)

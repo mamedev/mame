@@ -82,14 +82,14 @@ static const memory_accessors le_memory =
 
 size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int), void *memory)
 {
+	int tlbindex;
+	
 	/* if no memory, return the amount needed */
 	if (memory == NULL)
 		return config->icache + config->dcache + (sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
 
-	/* initialize the state */
-	memset(mips, 0, sizeof(*mips));
-
 	/* initialize based on the config */
+	memset(mips, 0, sizeof(*mips));
 	mips->flavor = flavor;
 	mips->bigendian = bigendian;
 	mips->cpu_clock = clock;
@@ -108,6 +108,16 @@ size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int 
 	mips->icache = memory;
 	mips->dcache = (void *)((UINT8 *)memory + config->icache);
 	mips->tlb_table = (void *)((UINT8 *)memory + config->dcache);
+
+	/* initialize the TLB state */
+	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
+	{
+		mips3_tlb_entry *tlbent = &mips->tlb[tlbindex];
+		tlbent->page_mask = 0;
+		tlbent->entry_hi = 0xffffffff;
+		tlbent->entry_lo[0] = 0xfffffff8;
+		tlbent->entry_lo[1] = 0xfffffff8;
+	}
 
 	/* allocate a timer for the compare interrupt */
 	mips->compare_int_timer = timer_alloc(compare_int_callback, NULL);
@@ -128,6 +138,7 @@ void mips3com_reset(mips3_state *mips)
 	/* initialize the state */
 	mips->pc = 0xbfc00000;
 	mips->cpr[0][COP0_Status] = SR_BEV | SR_ERL;
+	mips->cpr[0][COP0_Wired] = 0;
 	mips->cpr[0][COP0_Compare] = 0xffffffff;
 	mips->cpr[0][COP0_Count] = 0;
 	mips->cpr[0][COP0_Config] = compute_config_register(mips);
@@ -202,8 +213,8 @@ void mips3com_map_tlb_entries(mips3_state *mips)
 	{
 		mips3_tlb_entry *tlbent = &mips->tlb[index];
 
-		/* only process if global or if the ASID matches */
-		if ((tlbent->entry_hi & 0x1000) || valid_asid == (tlbent->entry_hi & 0xff))
+		/* only process if the ASID matches or if global */
+		if (valid_asid == (tlbent->entry_hi & 0xff) || ((tlbent->entry_lo[0] & tlbent->entry_lo[1]) & TLB_GLOBAL))
 		{
 			UINT32 count = (tlbent->page_mask >> 13) & 0x00fff;
 			UINT32 vpn = ((tlbent->entry_hi >> 13) & 0x07ffffff) << 1;
@@ -216,21 +227,17 @@ void mips3com_map_tlb_entries(mips3_state *mips)
 				for (which = 0; which < 2; which++)
 				{
 					UINT64 lo = tlbent->entry_lo[which];
+					UINT32 pfn = (lo >> 6) & 0x00ffffff;
+					UINT32 wp = (lo & 7) | TLB_PRESENT;
+					
+					/* ensure that if the valid bit is clear, the dirty bit is as well */
+					/* this way we can always test dirty for writes, and valid for reads */
+					if (!(wp & TLB_VALID))
+						wp &= ~TLB_DIRTY;
 
-					/* only map if the TLB entry is valid */
-					if (lo & 2)
-					{
-						UINT32 pfn = (lo >> 6) & 0x00ffffff;
-						UINT32 wp = (~lo >> 2) & 1;
-
-						for (i = 0; i <= count; i++, vpn++, pfn++)
-							if (vpn < 0x80000 || vpn >= 0xc0000)
-								mips->tlb_table[vpn] = (pfn << MIPS3_MIN_PAGE_SHIFT) | wp;
-					}
-
-					/* otherwise, advance by the number of pages we would have mapped */
-					else
-						vpn += count + 1;
+					for (i = 0; i <= count; i++, vpn++, pfn++)
+						if (vpn < 0x80000 || vpn >= 0xc0000)
+							mips->tlb_table[vpn] = (pfn << MIPS3_MIN_PAGE_SHIFT) | wp;
 				}
 		}
 	}
@@ -261,7 +268,7 @@ void mips3com_unmap_tlb_entries(mips3_state *mips)
 			for (which = 0; which < 2; which++)
 				for (i = 0; i <= count; i++, vpn++)
 					if (vpn < 0x80000 || vpn >= 0xc0000)
-						mips->tlb_table[vpn] = 0xffffffff;
+						mips->tlb_table[vpn] = 0;
 	}
 }
 
@@ -277,11 +284,11 @@ void mips3com_recompute_tlb_table(mips3_state *mips)
 
 	/* map in the hard-coded spaces */
 	for (addr = 0x80000000; addr < 0xc0000000; addr += MIPS3_MIN_PAGE_SIZE)
-		mips->tlb_table[addr >> MIPS3_MIN_PAGE_SHIFT] = addr & 0x1ffff000;
+		mips->tlb_table[addr >> MIPS3_MIN_PAGE_SHIFT] = (addr & 0x1ffff000) | TLB_PRESENT | TLB_DIRTY | TLB_VALID | TLB_GLOBAL;
 
 	/* reset everything else to unmapped */
-	memset(&mips->tlb_table[0x00000000 >> MIPS3_MIN_PAGE_SHIFT], 0xff, sizeof(mips->tlb_table[0]) * (0x80000000 >> MIPS3_MIN_PAGE_SHIFT));
-	memset(&mips->tlb_table[0xc0000000 >> MIPS3_MIN_PAGE_SHIFT], 0xff, sizeof(mips->tlb_table[0]) * (0x40000000 >> MIPS3_MIN_PAGE_SHIFT));
+	memset(&mips->tlb_table[0x00000000 >> MIPS3_MIN_PAGE_SHIFT], 0, sizeof(mips->tlb_table[0]) * (0x80000000 >> MIPS3_MIN_PAGE_SHIFT));
+	memset(&mips->tlb_table[0xc0000000 >> MIPS3_MIN_PAGE_SHIFT], 0, sizeof(mips->tlb_table[0]) * (0x40000000 >> MIPS3_MIN_PAGE_SHIFT));
 
 	/* remap all the entries in the TLB */
 	mips3com_map_tlb_entries(mips);
@@ -299,7 +306,7 @@ int mips3com_translate_address(mips3_state *mips, int space, offs_t *address)
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
 		UINT32 result = mips->tlb_table[*address >> MIPS3_MIN_PAGE_SHIFT];
-		if (result == 0xffffffff)
+		if (!(result & TLB_PRESENT) || !(result & TLB_VALID))
 			return FALSE;
 		*address = (result & ~MIPS3_MIN_PAGE_MASK) | (*address & MIPS3_MIN_PAGE_MASK);
 	}
@@ -378,7 +385,7 @@ void mips3com_tlbp(mips3_state *mips)
 		if ((tlbent->entry_hi & mask) == (mips->cpr[0][COP0_EntryHi] & mask))
 
 			/* and if we are either global or matching the current ASID, then stop */
-			if ((tlbent->entry_hi & 0x1000) || (tlbent->entry_hi & 0xff) == (mips->cpr[0][COP0_EntryHi] & 0xff))
+			if ((tlbent->entry_hi & 0xff) == (mips->cpr[0][COP0_EntryHi] & 0xff) || ((tlbent->entry_lo[0] & tlbent->entry_lo[1]) & TLB_GLOBAL))
 				break;
 	}
 
@@ -386,13 +393,12 @@ void mips3com_tlbp(mips3_state *mips)
 	vpn = ((mips->cpr[0][COP0_EntryHi] >> 13) & 0x07ffffff) << 1;
 	if (index != ARRAY_LENGTH(mips->tlb))
 	{
-		/* we can't assert this because the TLB entry may not be valid */
-		/* assert(mips->tlb_table[vpn & 0xfffff] != 0xffffffff); */
+		assert(mips->tlb_table[vpn & 0xfffff] & TLB_PRESENT);
 		mips->cpr[0][COP0_Index] = index;
 	}
 	else
 	{
-		assert(mips->tlb_table[vpn & 0xfffff] == 0xffffffff);
+		assert(!(mips->tlb_table[vpn & 0xfffff] & TLB_PRESENT));
 		mips->cpr[0][COP0_Index] = 0x80000000;
 	}
 }
@@ -920,6 +926,6 @@ static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which)
 
 	mame_printf_debug("index=%08X  pagesize=%08X  vaddr=%08X%08X  paddr=%08X%08X  asid=%02X  r=%X  c=%X  dvg=%c%c%c\n",
 			index, pagesize, (UINT32)(vaddr >> 32), (UINT32)vaddr, (UINT32)(paddr >> 32), (UINT32)paddr,
-			asid, r, c, (lo & 4) ? 'd' : '.', (lo & 2) ? 'v' : '.', (hi & 0x1000) ? 'g' : '.');
+			asid, r, c, (lo & 4) ? 'd' : '.', (lo & 2) ? 'v' : '.', (lo & 1) ? 'g' : '.');
 #endif
 }

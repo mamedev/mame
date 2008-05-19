@@ -516,7 +516,7 @@ static int describe_instruction_cop0(mips3_state *mips, UINT32 op, opcode_desc *
 					return TRUE;
 
 				case 0x18:	/* ERET */
-					desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+					desc->flags |= OPFLAG_CAN_CHANGE_MODES | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 					return TRUE;
 			}
 			return FALSE;

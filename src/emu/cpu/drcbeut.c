@@ -14,6 +14,13 @@
 
 
 /***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define LOG_RECOVER			(0)
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -308,6 +315,9 @@ void drcmap_block_begin(drcmap_state *drcmap, drcuml_block *block)
 	/* reset the tailptr and count */
 	drcmap->tailptr = &drcmap->head;
 	drcmap->numvalues = 0;
+
+	/* reset the variable values */
+	memset(drcmap->mapvalue, 0, sizeof(drcmap->mapvalue));
 }
 
 
@@ -317,8 +327,8 @@ void drcmap_block_begin(drcmap_state *drcmap, drcuml_block *block)
 
 void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block)
 {
-	UINT32 curvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0];
-	UINT8 changed[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0];
+	UINT32 curvalue[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
+	UINT8 changed[DRCUML_MAPVAR_END - DRCUML_MAPVAR_M0] = { 0 };
 	drcmap_entry *entry;
 	drccodeptr lastptr;
 	drccodeptr *top;
@@ -342,10 +352,6 @@ void drcmap_block_end(drcmap_state *drcmap, drcuml_block *block)
 	lastptr = drcmap->head->codeptr;
 	*dest = (drccodeptr)dest - lastptr;
 	dest++;
-
-	/* reset the current values */
-	memset(curvalue, 0, sizeof(curvalue));
-	memset(changed, 0, sizeof(changed));
 
 	/* now iterate over entries and store them */
 	for (entry = drcmap->head; entry != NULL; entry = entry->next)
@@ -503,6 +509,8 @@ UINT32 drcmap_get_value(drcmap_state *drcmap, drccodeptr codebase, UINT32 mapvar
 		/* low 4 bits contain the total number of words of data */
 		data += controlword & 0x0f;
 	}
+	if (LOG_RECOVER)
+		printf("recover %d @ %p = %08X\n", mapvar, codebase, result);
 	return result;
 }
 
