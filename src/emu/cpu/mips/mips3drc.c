@@ -891,7 +891,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 
 	/* get a description of this sequence */
 	desclist = drcfe_describe_code(mips3.drcfe, pc);
-	if (LOG_UML)
+	if (LOG_UML || LOG_NATIVE)
 		log_opcode_desc(drcuml, desclist, 0);
 
 	/* if we get an error back, flush the cache and try again */
@@ -3588,7 +3588,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		char buffer[100];
 
 		/* disassemle the current instruction and output it to the log */
-#if LOG_UML
+#if (LOG_UML || LOG_NATIVE)
 		dasmmips3(buffer, desclist->pc, *desclist->opptr.l);
 #else
 		strcpy(buffer, "???");
@@ -4003,7 +4003,7 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
     DISASSEMBLERS
 ***************************************************************************/
 
-#if !defined(MAME_DEBUG) && (LOG_UML)
+#if !defined(MAME_DEBUG) && (LOG_UML || LOG_NATIVE)
 #include "mips3dsm.c"
 #endif
 

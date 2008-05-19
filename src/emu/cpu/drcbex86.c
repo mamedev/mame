@@ -81,6 +81,7 @@
 #undef REG_SP
 #include "x86log.h"
 #include <math.h>
+#include <stddef.h>
 
 
 
@@ -180,6 +181,7 @@ static void drcbex86_reset(drcbe_state *drcbe);
 static int drcbex86_execute(drcbe_state *drcbe, drcuml_codehandle *entry);
 static void drcbex86_generate(drcbe_state *drcbe, drcuml_block *block, const drcuml_instruction *instlist, UINT32 numinst);
 static int drcbex86_hash_exists(drcbe_state *drcbe, UINT32 mode, UINT32 pc);
+static void drcbex86_get_info(drcbe_state *state, drcbe_info *info);
 
 /* private helper functions */
 static void fixup_label(void *parameter, drccodeptr labelcodeptr);
@@ -204,7 +206,8 @@ const drcbe_interface drcbe_x86_be_interface =
 	drcbex86_reset,
 	drcbex86_execute,
 	drcbex86_generate,
-	drcbex86_hash_exists
+	drcbex86_hash_exists,
+	drcbex86_get_info
 };
 
 /* opcode table */
@@ -221,6 +224,7 @@ static UINT8 int_register_map[DRCUML_REG_I_END - DRCUML_REG_I0] =
 
 /* flags mapping tables */
 static UINT8 flags_map[0x1000];
+static UINT32 flags_unmap[0x20];
 
 /* condition mapping table */
 static UINT8 condition_map[DRCUML_COND_MAX - DRCUML_COND_Z] =
@@ -277,6 +281,8 @@ static x86code *op_recover(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 static x86code *op_setfmod(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_getfmod(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_getexp(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 
 static x86code *op_load1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_load1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
@@ -389,6 +395,8 @@ static const opcode_table_entry opcode_table_source[] =
 	{ DRCUML_OP_SETFMOD, op_setfmod },	/* SETFMOD src                    */
 	{ DRCUML_OP_GETFMOD, op_getfmod },	/* GETFMOD dst                    */
 	{ DRCUML_OP_GETEXP,  op_getexp },	/* GETEXP  dst,index              */
+	{ DRCUML_OP_SAVE,    op_save },		/* SAVE    dst,index              */
+	{ DRCUML_OP_RESTORE, op_restore },	/* RESTORE dst,index              */
 
 	/* Integer Operations */
 	{ DRCUML_OP_LOAD1U,  op_load1u },	/* LOAD1U  dst,base,index         */
@@ -590,13 +598,23 @@ static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 		if (entry & 0x800) flags |= DRCUML_FLAG_V;
 		flags_map[entry] = flags;
 	}
+	for (entry = 0; entry < ARRAY_LENGTH(flags_unmap); entry++)
+	{
+		UINT32 flags = 0;
+		if (entry & DRCUML_FLAG_C) flags |= 0x001;
+		if (entry & DRCUML_FLAG_U) flags |= 0x004;
+		if (entry & DRCUML_FLAG_Z) flags |= 0x040;
+		if (entry & DRCUML_FLAG_S) flags |= 0x080;
+		if (entry & DRCUML_FLAG_V) flags |= 0x800;
+		flags_unmap[entry] = flags;
+	}
 
 	/* compute hi pointers for each register */
 	for (regnum = 0; regnum < ARRAY_LENGTH(int_register_map); regnum++)
 		if (int_register_map[regnum] != 0)
 		{
-			drcbe->reglo[int_register_map[regnum]] = &drcbe->state.r[regnum].l;
-			drcbe->reghi[int_register_map[regnum]] = &drcbe->state.r[regnum].h;
+			drcbe->reglo[int_register_map[regnum]] = &drcbe->state.r[regnum].w.l;
+			drcbe->reghi[int_register_map[regnum]] = &drcbe->state.r[regnum].w.h;
 		}
 
 	/* create the log */
@@ -692,6 +710,18 @@ static void drcbex86_reset(drcbe_state *drcbe)
 
 
 /*-------------------------------------------------
+    drcbex86_execute - execute a block of code
+    referenced by the given handle
+-------------------------------------------------*/
+
+static int drcbex86_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
+{
+	/* call our entry point which will jump to the destination */
+	return (*drcbe->entry)((x86code *)drcuml_handle_codeptr(entry));
+}
+
+
+/*-------------------------------------------------
     drcbex86_generate - generate code
 -------------------------------------------------*/
 
@@ -775,14 +805,16 @@ static int drcbex86_hash_exists(drcbe_state *drcbe, UINT32 mode, UINT32 pc)
 
 
 /*-------------------------------------------------
-    drcbec_execute - execute a block of code
-    registered at the given mode/pc
+    drcbex86_get_info - return information about
+    the back-end implementation
 -------------------------------------------------*/
 
-static int drcbex86_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
+static void drcbex86_get_info(drcbe_state *state, drcbe_info *info)
 {
-	/* call our entry point which will jump to the destination */
-	return (*drcbe->entry)((x86code *)drcuml_handle_codeptr(entry));
+	for (info->direct_iregs = 0; info->direct_iregs < DRCUML_REG_I_END - DRCUML_REG_I0; info->direct_iregs++)
+		if (int_register_map[info->direct_iregs] == 0)
+			break;
+	info->direct_fregs = 0;
 }
 
 
@@ -3248,7 +3280,7 @@ static x86code *op_hashjmp(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 	}
 
 	/* in all cases, if there is no code, we return here to generate the exception */
-	emit_mov_m32_p32(drcbe, &dst, MABS(&drcbe->state.exp.l), &pcp);						// mov   [exp],param
+	emit_mov_m32_p32(drcbe, &dst, MABS(&drcbe->state.exp), &pcp);						// mov   [exp],param
 	emit_sub_r32_imm(&dst, REG_ESP, 4);													// sub   esp,4
 	emit_call_m32(&dst, MABS(exp.value));												// call  [exp]
 
@@ -3305,7 +3337,7 @@ static x86code *op_exh(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 	/* perform the exception processing inline if unconditional */
 	if (inst->condflags == DRCUML_COND_ALWAYS)
 	{
-		emit_mov_m32_p32(drcbe, &dst, MABS(&drcbe->state.exp.l), &exp);					// mov   [exp],exp
+		emit_mov_m32_p32(drcbe, &dst, MABS(&drcbe->state.exp), &exp);					// mov   [exp],exp
 		if (*targetptr != NULL)
 			emit_call(&dst, *targetptr);												// call  *targetptr
 		else
@@ -3534,12 +3566,130 @@ static x86code *op_getexp(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* fetch the exception parameter and store to the destination */
 	if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
-		emit_mov_r32_m32(&dst, dstp.value, MABS(&drcbe->state.exp.l));					// mov   reg,[exp]
+		emit_mov_r32_m32(&dst, dstp.value, MABS(&drcbe->state.exp));					// mov   reg,[exp]
 	else
 	{
-		emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.exp.l));						// mov   eax,[exp]
+		emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.exp));						// mov   eax,[exp]
 		emit_mov_m32_r32(&dst, MABS(dstp.value), REG_EAX);								// mov   [dstp],eax
 	}
+
+	return dst;
+}
+
+
+/*-------------------------------------------------
+    op_save - process a SAVE opcode
+-------------------------------------------------*/
+
+static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	drcuml_parameter dstp;
+	int regnum;
+
+	/* validate instruction */
+	assert(inst->size == 4);
+	assert(inst->condflags == DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_1(drcbe, inst, &dstp, PTYPE_M);
+
+	/* copy live state to the destination */
+	emit_mov_r32_imm(&dst, REG_ECX, dstp.value);										// mov    ecx,dstp
+	
+	/* copy flags */
+	emit_pushf(&dst);																	// pushf
+	emit_pop_r32(&dst, REG_EAX);														// pop    eax
+	emit_and_r32_imm(&dst, REG_EAX, 0x8c5);												// and    eax,0x8c5
+	emit_mov_r8_m8(&dst, REG_AL, MBD(REG_EAX, flags_map));								// mov    al,[flags_map]
+	emit_mov_m8_r8(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, flags)), REG_AL);	// mov    state->flags,al
+
+	/* copy fmod and exp */
+	emit_mov_r8_m8(&dst, REG_AL, MABS(&drcbe->state.fmod));								// mov    al,[fmod]
+	emit_mov_m8_r8(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, fmod)), REG_AL);	// mov    state->fmod,al
+	emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.exp));							// mov    eax,[exp]
+	emit_mov_m32_r32(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, exp)), REG_EAX);	// mov    state->exp,eax
+
+	/* copy integer registers */
+	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
+	{
+		if (int_register_map[regnum] != 0)
+			emit_mov_m32_r32(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)), int_register_map[regnum]);
+		else
+		{
+			emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.r[regnum].w.l));
+			emit_mov_m32_r32(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)), REG_EAX);
+		}
+		emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.r[regnum].w.h));
+		emit_mov_m32_r32(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.h)), REG_EAX);
+	}
+
+	/* copy FP registers */
+	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
+	{
+		emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.f[regnum].s.l));
+		emit_mov_m32_r32(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.l)), REG_EAX);
+		emit_mov_r32_m32(&dst, REG_EAX, MABS(&drcbe->state.f[regnum].s.h));
+		emit_mov_m32_r32(&dst, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.h)), REG_EAX);
+	}
+
+	return dst;
+}
+
+
+/*-------------------------------------------------
+    op_restore - process a RESTORE opcode
+-------------------------------------------------*/
+
+static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	drcuml_parameter dstp;
+	int regnum;
+
+	/* validate instruction */
+	assert(inst->size == 4);
+	assert(inst->condflags == DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_1(drcbe, inst, &dstp, PTYPE_M);
+
+	/* copy live state from the destination */
+	emit_mov_r32_imm(&dst, REG_ECX, dstp.value);										// mov    ecx,dstp
+
+	/* copy integer registers */
+	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.r); regnum++)
+	{
+		if (int_register_map[regnum] != 0)
+			emit_mov_r32_m32(&dst, int_register_map[regnum], MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)));
+		else
+		{
+			emit_mov_r32_m32(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.l)));
+			emit_mov_m32_r32(&dst, MABS(&drcbe->state.r[regnum].w.l), REG_EAX);
+		}
+		emit_mov_r32_m32(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, r[regnum].w.h)));
+		emit_mov_m32_r32(&dst, MABS(&drcbe->state.r[regnum].w.h), REG_EAX);
+	}
+
+	/* copy FP registers */
+	for (regnum = 0; regnum < ARRAY_LENGTH(drcbe->state.f); regnum++)
+	{
+		emit_mov_r32_m32(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.l)));
+		emit_mov_m32_r32(&dst, MABS(&drcbe->state.f[regnum].s.l), REG_EAX);
+		emit_mov_r32_m32(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, f[regnum].s.h)));
+		emit_mov_m32_r32(&dst, MABS(&drcbe->state.f[regnum].s.h), REG_EAX);
+	}
+
+	/* copy fmod and exp */
+	emit_movzx_r32_m8(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, fmod)));// movzx eax,state->fmod
+	emit_and_r32_imm(&dst, REG_EAX, 3);													// and    eax,3
+	emit_mov_m8_r8(&dst, MABS(&drcbe->state.fmod), REG_AL);								// mov    [fmod],al
+	emit_fldcw_m16(&dst, MISD(REG_EAX, 2, &fp_control[0]));								// fldcw  fp_control[eax]
+	emit_mov_r32_m32(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, exp)));	// mov    eax,state->exp
+	emit_mov_m32_r32(&dst, MABS(&drcbe->state.exp), REG_EAX);							// mov    [exp],eax
+
+	/* copy flags */
+	emit_movzx_r32_m8(&dst, REG_EAX, MBD(REG_ECX, offsetof(drcuml_machine_state, flags)));// movzx eax,state->flags
+	emit_push_m32(&dst, MISD(REG_EAX, 4, flags_unmap));									// push   flags_unmap[eax*4]
+	emit_popf(&dst);																	// popf
 
 	return dst;
 }

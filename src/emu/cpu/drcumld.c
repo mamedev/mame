@@ -89,6 +89,8 @@ static const drcuml_opdesc opcode_source_table[] =
 	{ DRCUML_OP_SETFMOD,	"setfmod",	{ output_param } },
 	{ DRCUML_OP_GETFMOD,	"getfmod",	{ output_param } },
 	{ DRCUML_OP_GETEXP,		"getexp",	{ output_param } },
+	{ DRCUML_OP_SAVE,		"save",		{ output_param } },
+	{ DRCUML_OP_RESTORE,	"restore",	{ output_param } },
 
 	/* Integer Operations */
 	{ DRCUML_OP_LOAD1U,		"!load1u",	{ output_param, output_param, output_param } },

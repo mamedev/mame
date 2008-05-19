@@ -154,6 +154,7 @@ union _drcbec_instruction
 	float *				pfloat;
 	double *			pdouble;
 	void				(*cfunc)(void *);
+	drcuml_machine_state *state;
 	const drcuml_codehandle *handle;
 	const drcbec_instruction *inst;
 	const drcbec_instruction **pinst;
@@ -172,6 +173,7 @@ static void drcbec_reset(drcbe_state *drcbe);
 static int drcbec_execute(drcbe_state *state, drcuml_codehandle *entry);
 static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcuml_instruction *instlist, UINT32 numinst);
 static int drcbec_hash_exists(drcbe_state *state, UINT32 mode, UINT32 pc);
+static void drcbec_get_info(drcbe_state *state, drcbe_info *info);
 
 /* private helper functions */
 static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, void **immedptr, int size, const drcuml_parameter *param);
@@ -236,7 +238,8 @@ const drcbe_interface drcbe_c_be_interface =
 	drcbec_reset,
 	drcbec_execute,
 	drcbec_generate,
-	drcbec_hash_exists
+	drcbec_hash_exists,
+	drcbec_get_info
 };
 
 
@@ -460,6 +463,18 @@ static int drcbec_hash_exists(drcbe_state *state, UINT32 mode, UINT32 pc)
 }
 
 
+/*-------------------------------------------------
+    drcbec_get_info - return information about
+    the back-end implementation
+-------------------------------------------------*/
+
+static void drcbec_get_info(drcbe_state *state, drcbe_info *info)
+{
+	info->direct_iregs = 0;
+	info->direct_fregs = 0;
+}
+
+
 
 /***************************************************************************
     BACK-END EXECUTION
@@ -513,7 +528,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				if (newinst == NULL)
 				{
 					assert(sp < ARRAY_LENGTH(callstack));
-					drcbe->state.exp.l = PARAM1;
+					drcbe->state.exp = PARAM1;
 					newinst = (const drcbec_instruction *)drcuml_handle_codeptr(inst[2].handle);
 					callstack[sp++] = inst;
 				}
@@ -574,7 +589,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				assert(sp < ARRAY_LENGTH(callstack));
 				newinst = (const drcbec_instruction *)drcuml_handle_codeptr(inst[0].handle);
 				assert_in_cache(drcbe->cache, newinst);
-				drcbe->state.exp.l = PARAM1;
+				drcbe->state.exp = PARAM1;
 				callstack[sp++] = inst;
 				inst = newinst;
 				continue;
@@ -605,7 +620,17 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_GETEXP, 4, 0):		/* GETEXP  dst                    */
-				PARAM0 = drcbe->state.exp.l;
+				PARAM0 = drcbe->state.exp;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SAVE, 4, 0):		/* SAVE    dst                    */
+				*inst[0].state = drcbe->state;
+				inst[0].state->flags = flags;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_RESTORE, 4, 0):	/* RESTORE dst                    */
+				drcbe->state = *inst[0].state;
+				flags = inst[0].state->flags;
 				break;
 
 
@@ -736,7 +761,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADDC, 4, 1):
 				temp32 = PARAM1 + PARAM2 + (flags & DRCUML_FLAG_C);
-				flags = FLAGS32_NZCV_ADD(temp32, PARAM1, PARAM2);
+				if (PARAM2 + 1 != 0)
+					flags = FLAGS32_NZCV_ADD(temp32, PARAM1, PARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS32_NZCV_ADD(temp32, PARAM1 + (flags & DRCUML_FLAG_C), PARAM2);
 				PARAM0 = temp32;
 				break;
 
@@ -756,7 +784,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SUBB, 4, 1):
 				temp32 = PARAM1 - PARAM2 - (flags & DRCUML_FLAG_C);
-				flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2);
+				if (PARAM2 + 1 != 0)
+					flags = FLAGS32_NZCV_SUB(temp32, PARAM1, PARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS32_NZCV_SUB(temp32, PARAM1 - (flags & DRCUML_FLAG_C), PARAM2);
 				PARAM0 = temp32;
 				break;
 
@@ -1136,7 +1167,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADDC, 8, 1):
 				temp64 = DPARAM1 + DPARAM2 + (flags & DRCUML_FLAG_C);
-				flags = FLAGS64_NZCV_ADD(temp64, DPARAM1, DPARAM2);
+				if (DPARAM2 + 1 != 0)
+					flags = FLAGS64_NZCV_ADD(temp64, DPARAM1, DPARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS64_NZCV_ADD(temp64, DPARAM1 + (flags & DRCUML_FLAG_C), DPARAM2);
 				DPARAM0 = temp64;
 				break;
 
@@ -1156,7 +1190,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SUBB, 8, 1):
 				temp64 = DPARAM1 - DPARAM2 - (flags & DRCUML_FLAG_C);
-				flags = FLAGS64_NZCV_SUB(temp64, DPARAM1, DPARAM2);
+				if (DPARAM2 + 1 != 0)
+					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1, DPARAM2 + (flags & DRCUML_FLAG_C));
+				else
+					flags = FLAGS64_NZCV_SUB(temp64, DPARAM1 - (flags & DRCUML_FLAG_C), DPARAM2);
 				DPARAM0 = temp64;
 				break;
 
@@ -1682,7 +1719,7 @@ static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, vo
 		/* int registers point to the appropriate part of the integer register state */
 		case DRCUML_PTYPE_INT_REGISTER:
 			if (size == 4)
-				(dst++)->puint32 = &drcbe->state.r[param->value - DRCUML_REG_I0].l;
+				(dst++)->puint32 = &drcbe->state.r[param->value - DRCUML_REG_I0].w.l;
 			else
 				(dst++)->puint64 = &drcbe->state.r[param->value - DRCUML_REG_I0].d;
 			break;
@@ -1690,7 +1727,7 @@ static void output_parameter(drcbe_state *drcbe, drcbec_instruction **dstptr, vo
 		/* float registers point to the appropriate part of the floating point register state */
 		case DRCUML_PTYPE_FLOAT_REGISTER:
 			if (size == 4)
-				(dst++)->pfloat = &drcbe->state.f[param->value - DRCUML_REG_F0].l;
+				(dst++)->pfloat = &drcbe->state.f[param->value - DRCUML_REG_F0].s.l;
 			else
 				(dst++)->pdouble = &drcbe->state.f[param->value - DRCUML_REG_F0].d;
 			break;

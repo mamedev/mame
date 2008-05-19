@@ -128,12 +128,11 @@
 
 
 /* ----- Internal Register Operations ----- */
-#define UML_SETMODE(block, mode)							do { drcuml_block_append_1(block, DRCUML_OP_SETMODE, 4, IF_ALWAYS,  mode); } while (0)
-#define UML_GETMODE(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETMODE, 4, IF_ALWAYS,  dst); } while (0)
 #define UML_SETFMOD(block, mode)							do { drcuml_block_append_1(block, DRCUML_OP_SETFMOD, 4, IF_ALWAYS,  mode); } while (0)
 #define UML_GETFMOD(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETFMOD, 4, IF_ALWAYS,  dst); } while (0)
-#define UML_SUBICNT(block, delta, param)					do { drcuml_block_append_2(block, DRCUML_OP_SUBICNT, 4, IF_ALWAYS,  delta, param); } while (0)
 #define UML_GETEXP(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETEXP,  4, IF_ALWAYS,  dst); } while (0)
+#define UML_SAVE(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_SAVE,    4, IF_ALWAYS,  MEM(dst)); } while (0)
+#define UML_RESTORE(block, src)								do { drcuml_block_append_1(block, DRCUML_OP_RESTORE, 4, IF_ALWAYS,  MEM(src)); } while (0)
 
 
 /* ----- 32-Bit Integer Operations ----- */

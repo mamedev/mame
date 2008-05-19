@@ -176,6 +176,8 @@ enum _drcuml_opcode
 	DRCUML_OP_SETFMOD,		/* SETFMOD src                    */
 	DRCUML_OP_GETFMOD,		/* GETFMOD dst                    */
 	DRCUML_OP_GETEXP,		/* GETEXP  dst,index              */
+	DRCUML_OP_SAVE,			/* SAVE    mem                    */
+	DRCUML_OP_RESTORE,		/* RESTORE mem                    */
 
 	/* Integer Operations */
 	DRCUML_OP_LOAD1U,		/* LOAD1U  dst,base,index         */
@@ -317,6 +319,53 @@ struct _drcuml_instruction
 };
 
 
+/* an integer register, with low/high parts */
+typedef union _drcuml_ireg drcuml_ireg;
+union _drcuml_ireg
+{
+#ifdef LSB_FIRST
+	struct { UINT32	l,h; } w;			/* 32-bit low, high parts of the register */
+#else
+	struct { UINT32 h,l; } w;			/* 32-bit low, high parts of the register */
+#endif
+	UINT64			d;					/* 64-bit full register */
+};
+
+
+/* a floating-point register, with low/high parts */
+typedef union _drcuml_freg drcuml_freg;
+union _drcuml_freg
+{
+#ifdef LSB_FIRST
+	struct { float l,h; } s;			/* 32-bit low, high parts of the register */
+#else
+	struct { float h,l;	} s;			/* 32-bit low, high parts of the register */
+#endif
+	double			d;					/* 64-bit full register */
+};
+
+
+/* the collected machine state of a system */
+typedef struct _drcuml_machine_state drcuml_machine_state;
+struct _drcuml_machine_state
+{
+	drcuml_ireg		r[DRCUML_REG_I_END - DRCUML_REG_I0];	/* integer registers */
+	drcuml_freg		f[DRCUML_REG_F_END - DRCUML_REG_F0];	/* floating-point registers */
+	UINT32			exp;									/* exception parameter register */
+	UINT8			fmod;									/* fmod (floating-point mode) register */
+	UINT8			flags;									/* flags state */
+};
+
+
+/* hints and information about the back-end */
+typedef struct _drcbe_info drcbe_info;
+struct _drcbe_info
+{
+	UINT8			direct_iregs;							/* number of direct-mapped integer registers */
+	UINT8			direct_fregs;							/* number of direct-mapped floating point registers */
+};
+
+
 /* typedefs for back-end callback functions */
 typedef drcbe_state *(*drcbe_alloc_func)(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
 typedef void (*drcbe_free_func)(drcbe_state *state);
@@ -324,6 +373,7 @@ typedef void (*drcbe_reset_func)(drcbe_state *state);
 typedef int	(*drcbe_execute_func)(drcbe_state *state, drcuml_codehandle *entry);
 typedef void (*drcbe_generate_func)(drcbe_state *state, drcuml_block *block, const drcuml_instruction *instlist, UINT32 numinst);
 typedef int (*drcbe_hash_exists)(drcbe_state *state, UINT32 mode, UINT32 pc);
+typedef void (*drcbe_get_info)(drcbe_state *state, drcbe_info *info);
 
 
 /* interface structure for a back-end */
@@ -336,6 +386,7 @@ struct _drcbe_interface
 	drcbe_execute_func	be_execute;
 	drcbe_generate_func	be_generate;
 	drcbe_hash_exists	be_hash_exists;
+	drcbe_get_info		be_get_info;
 };
 
 
@@ -348,6 +399,9 @@ struct _drcbe_interface
 
 /* allocate state for the code generator and initialize the back-end */
 drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+
+/* return information about the back-end */
+void drcuml_get_backend_info(drcuml_state *drcuml, drcbe_info *info);
 
 /* reset the state completely, flushing the cache and all information */
 void drcuml_reset(drcuml_state *drcuml);

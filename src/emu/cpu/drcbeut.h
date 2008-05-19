@@ -57,43 +57,6 @@ struct _drchash_state
 };
 
 
-/* an integer register, with low/high parts */
-typedef union _drcuml_ireg drcuml_ireg;
-union _drcuml_ireg
-{
-#ifdef LSB_FIRST
-	UINT32			l,h;				/* 32-bit low, high parts of the register */
-#else
-	UINT32			h,l;				/* 32-bit low, high parts of the register */
-#endif
-	UINT64			d;					/* 64-bit full register */
-};
-
-
-/* an floating-point register, with low/high parts */
-typedef union _drcuml_freg drcuml_freg;
-union _drcuml_freg
-{
-#ifdef LSB_FIRST
-	float			l,unused;			/* 32-bit low, high parts of the register */
-#else
-	float			unused,l;			/* 32-bit low, high parts of the register */
-#endif
-	double			d;					/* 64-bit full register */
-};
-
-
-/* the collected machine state of a system */
-typedef struct _drcuml_machine_state drcuml_machine_state;
-struct _drcuml_machine_state
-{
-	drcuml_ireg		r[DRCUML_REG_I_END - DRCUML_REG_I0];	/* integer registers */
-	drcuml_freg		f[DRCUML_REG_F_END - DRCUML_REG_F0];	/* floating-point registers */
-	drcuml_ireg		exp;									/* exception parameter register */
-	UINT8			fmod;									/* fmod (floating-point mode) register */
-};
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
