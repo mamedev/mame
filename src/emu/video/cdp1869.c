@@ -582,42 +582,50 @@ READ8_DEVICE_HANDLER( cdp1869_charram_r )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
+	UINT8 cma = offset & 0x0f;
+	UINT16 pma;
+
 	if (cdp1869->cmem)
 	{
-		UINT16 pma = cdp1869_get_pma(device);
-		UINT8 cma = offset & 0x0f;
-
-		if (cdp1869_get_lines(device) == 8)
-		{
-			cma &= 0x07;
-		}
-
-		return cdp1869->intf->char_ram_r(device, pma, cma);
+		pma = cdp1869_get_pma(device);
 	}
 	else
 	{
-		return 0xff;
+		pma = offset;
 	}
+
+	if (cdp1869->dblpage)
+	{
+		cma &= 0x07;
+	}
+
+	return cdp1869->intf->char_ram_r(device, pma, cma);
 }
 
 WRITE8_DEVICE_HANDLER( cdp1869_charram_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
+	UINT8 cma = offset & 0x0f;
+	UINT16 pma;
+
 	if (cdp1869->cmem)
 	{
-		UINT16 pma = cdp1869_get_pma(device);
-		UINT8 cma = offset & 0x0f;
+		pma = cdp1869_get_pma(device);
+	}
+	else
+	{
+		pma = offset;
+	}
 
-		if (cdp1869_get_lines(device) == 8)
-		{
-			cma &= 0x07;
-		}
+	if (cdp1869->dblpage)
+	{
+		cma &= 0x07;
+	}
 
-		if (cdp1869->intf->char_ram_w)
-		{
-			cdp1869->intf->char_ram_w(device, pma, cma, data);
-		}
+	if (cdp1869->intf->char_ram_w)
+	{
+		cdp1869->intf->char_ram_w(device, pma, cma, data);
 	}
 }
 
