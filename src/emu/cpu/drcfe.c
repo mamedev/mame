@@ -422,9 +422,10 @@ static opcode_desc **build_sequence(drcfe_state *drcfe, opcode_desc **tailptr, i
 				/* loop until all the registers have been accounted for */
 				gprread = gprwrite = 0;
 				fprread = fprwrite = 0;
-				for (backdesc = descnum; backdesc != seqstart - 1; backdesc--)
-					if (drcfe->desc_array[backdesc] != NULL)
-						accumulate_live_info_backwards(drcfe->desc_array[backdesc], &gprread, &gprwrite, &fprread, &fprwrite);
+				if (seqstart != -1)
+					for (backdesc = descnum; backdesc != seqstart - 1; backdesc--)
+						if (drcfe->desc_array[backdesc] != NULL)
+							accumulate_live_info_backwards(drcfe->desc_array[backdesc], &gprread, &gprwrite, &fprread, &fprwrite);
 
 				/* reset the register states */
 				seqstart = -1;
