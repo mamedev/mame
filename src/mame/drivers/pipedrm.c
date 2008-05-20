@@ -534,7 +534,7 @@ static void irqhandler(int irq)
 static const struct YM2608interface ym2608_interface =
 {
 	{
-		AY8910_LEGACY_OUTPUT,
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	},
