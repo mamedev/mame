@@ -7,6 +7,7 @@
      Additional tweaking by Aaron Giles
      Various fixes by Lord Nightmare
      Additional enhancements by Couriersud
+     Sub-interpolation-cycle parameter updating added by Lord Nightmare
 
      Todo:
         - implement CS
@@ -417,7 +418,7 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 {
 	struct tms5110 *tms = chip;
 	int buf_count=0;
-	int i, interp_period;
+	int i, interp_period, bitout;
 	INT16 Y11, cliptemp;
 
 	/* if we're not speaking, fill with nothingness */
@@ -542,28 +543,79 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 					tms->target_k[i] = tms->new_k[i];
 			}
 		}
-		else if (tms->interp_count == 0)
+		else 
 		{
-			/* interpolate (update) values based on step values */
-			/*logerror("\n");*/
-
 			interp_period = tms->sample_count / 25;
-			tms->current_energy += (tms->target_energy - tms->current_energy) / tms->coeff->interp_coeff[interp_period];
-			tms->current_pitch += (tms->target_pitch - tms->current_pitch) / tms->coeff->interp_coeff[interp_period];
-
-			/*logerror("*** Energy = %d\n",current_energy);*/
-
-			for (i = 0; i < tms->coeff->num_k; i++)
+			switch(tms->interp_count)
 			{
-				tms->current_k[i] += (tms->target_k[i] - tms->current_k[i]) / tms->coeff->interp_coeff[interp_period];
+				/*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
+				case 0: /* PC=0, A cycle, nothing happens (calc energy) */
+				break;
+				case 1: /* PC=0, B cycle, nothing happens (update energy) */
+				break;
+				case 2: /* PC=1, A cycle, update energy (calc pitch) */
+				tms->current_energy += ((tms->target_energy - tms->current_energy) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
+				break;
+				case 4: /* PC=2, A cycle, update pitch (calc K1) */
+				tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 5: /* PC=2, B cycle, nothing happens (update K1) */
+				break;
+				case 6: /* PC=3, A cycle, update K1 (calc K2) */
+				tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 7: /* PC=3, B cycle, nothing happens (update K2) */
+				break;
+				case 8: /* PC=4, A cycle, update K2 (calc K3) */
+				tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 9: /* PC=4, B cycle, nothing happens (update K3) */
+				break;
+				case 10: /* PC=5, A cycle, update K3 (calc K4) */
+				tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 11: /* PC=5, B cycle, nothing happens (update K4) */
+				break;
+				case 12: /* PC=6, A cycle, update K4 (calc K5) */
+				tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 13: /* PC=6, B cycle, nothing happens (update K5) */
+				break;
+				case 14: /* PC=7, A cycle, update K5 (calc K6) */
+				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 15: /* PC=7, B cycle, nothing happens (update K6) */
+				break;
+				case 16: /* PC=8, A cycle, update K6 (calc K7) */
+				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 17: /* PC=8, B cycle, nothing happens (update K7) */
+				break;
+				case 18: /* PC=9, A cycle, update K7 (calc K8) */
+				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 19: /* PC=9, B cycle, nothing happens (update K8) */
+				break;
+				case 20: /* PC=10, A cycle, update K8 (calc K9) */
+				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 21: /* PC=10, B cycle, nothing happens (update K9) */
+				break;
+				case 22: /* PC=11, A cycle, update K9 (calc K10) */
+				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
+				case 23: /* PC=11, B cycle, nothing happens (update K10) */
+				break;
+				case 24: /* PC=12, A cycle, update K10 (do nothing) */
+				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
+				break;
 			}
 		}
 
 
-
-
-
-	/* calculate the output */
+		/* calculate the output */
 
 		if (tms->current_energy == 0)
 		{
@@ -572,22 +624,12 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 		}
 		else if (tms->old_pitch == 0)
 		{
-			int bitout, randbit;
-
 			/* generate unvoiced samples here */
 			if (tms->RNG&1)
-				randbit = -64; /* according to the patent it is (either + or -) half of the maximum value in the chirp table */
+				current_val = -64; /* according to the patent it is (either + or -) half of the maximum value in the chirp table */
 			else
-				randbit = 64;
+				current_val = 64;
 
-			bitout = ((tms->RNG>>12)&1) ^
-					 ((tms->RNG>>10)&1) ^
-					 ((tms->RNG>> 9)&1) ^
-					 ((tms->RNG>> 0)&1);
-			tms->RNG >>= 1;
-			tms->RNG |= (bitout<<12);
-
-			current_val = randbit;
 		}
 		else
 		{
@@ -608,6 +650,16 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 			current_val = tms->coeff->chirptable[tms->pitch_count];
 		}
 
+		/* Update LFSR *20* times every sample, like patent shows */
+		for (i=0; i<20; i++)
+		{
+			bitout = ((tms->RNG>>12)&1) ^
+				 ((tms->RNG>>10)&1) ^
+				 ((tms->RNG>> 9)&1) ^
+				 ((tms->RNG>> 0)&1);
+			tms->RNG >>= 1;
+			tms->RNG |= (bitout<<12);
+		}
 
 		/* Lattice filter here */
 

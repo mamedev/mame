@@ -26,6 +26,10 @@
  *
  * Instead,  { 8, 8, 8, 4, 4, 4, 2, 1 }
  * will calculate those coefficients and this has been used below.
+ * LN:
+ * The real chip uses shifters and not true division to achieve those factors,
+ * so they have been replaced by the shifting coefficients:
+ * { 3, 3, 3, 2, 2, 2, 1, 0 }
  */
 
 static const struct tms5100_coeffs pat4209836_coeff =
@@ -85,7 +89,7 @@ static const struct tms5100_coeffs pat4209836_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0 },
 	/* interpolation coefficients */
-	{ 8, 8, 8, 4, 4, 4, 2, 1 }
+	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
 /*
@@ -161,7 +165,7 @@ static const struct tms5100_coeffs pat4403965_coeff =
 	0,0,0
 	 },
 	/* interpolation coefficients */
-	{ 8, 8, 8, 4, 4, 4, 2, 1 }
+	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
 
@@ -228,7 +232,7 @@ static const struct tms5100_coeffs tms5110a_coeff =
 	    1,  0,    0,  0,   0,  0,  0,  0,
 	    0,  0,    0 },
 	/* interpolation coefficients */
-	{ 8, 8, 8, 4, 4, 4, 2, 1 }
+	{ 3, 3, 3, 2, 2, 2, 1, 0 }
 };
 
 
