@@ -10,6 +10,7 @@
      Chirp/excitation table fixes by Lord Nightmare
      Various fixes by Lord Nightmare
      Modularization by Lord Nightmare
+     Sub-interpolation-cycle parameter updating added by Lord Nightmare
 
      Much information regarding these lpc encoding comes from US patent 4,209,844
      US patent 4,331,836 describes the complete 51xx chip
@@ -93,9 +94,9 @@ struct tms5220
 
 	UINT16 previous_energy;         /* needed for lattice filter to match patent */
 
-	UINT8 interp_count;		/* number of interp periods (0-7) */
-	UINT8 sample_count;		/* sample number within interp (0-24) */
-	UINT16 pitch_count;
+	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
+	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
+	UINT16 pitch_count;		/* pitch counter; provides chirp rom address */
 
 	INT32 u[11];
 	INT32 x[10];
@@ -595,28 +596,83 @@ tryagain:
                 }
             }
         }
-        else if (tms->interp_count == 0)
+        else 
         {
-            /* Update values based on step values */
-            /*mame_printf_debug("\n");*/
-
             interp_period = tms->sample_count / 25;
-            tms->current_energy += ((tms->target_energy - tms->current_energy) >> interp_coeff[interp_period]);
-            if (tms->old_pitch != 0)
-                tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> interp_coeff[interp_period]);
-
-            /*mame_printf_debug("*** Energy = %d\n",tms->current_energy);*/
-
-            for (i = 0; i < 10; i++)
-            {
-                tms->current_k[i] += ((tms->target_k[i] - tms->current_k[i]) >> interp_coeff[interp_period]);
-            }
+	    switch(tms->interp_count)
+	    {
+                /*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
+		case 0: /* PC=0, A cycle, nothing happens (calc energy) */
+                  break;
+		case 1: /* PC=0, B cycle, nothing happens (update energy) */
+		  break;
+		case 2: /* PC=1, A cycle, update energy (calc pitch) */
+		  tms->current_energy += ((tms->target_energy - tms->current_energy) >> interp_coeff[interp_period]);
+            	  break;
+                case 3: /* PC=1, B cycle, nothing happens (update pitch) */
+		  break;
+                case 4: /* PC=2, A cycle, update pitch (calc K1) */
+            	  if (tms->old_pitch != 0)
+                  tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> interp_coeff[interp_period]);
+		  break;
+                case 5: /* PC=2, B cycle, nothing happens (update K1) */
+		  break;
+		case 6: /* PC=3, A cycle, update K1 (calc K2) */
+		  tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> interp_coeff[interp_period]);
+            	  break;
+                case 7: /* PC=3, B cycle, nothing happens (update K2) */
+		  break;
+		case 8: /* PC=4, A cycle, update K2 (calc K3) */
+		  tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> interp_coeff[interp_period]);
+            	  break;
+                case 9: /* PC=4, B cycle, nothing happens (update K3) */
+		  break;
+		case 10: /* PC=5, A cycle, update K3 (calc K4) */
+		  tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> interp_coeff[interp_period]);
+            	  break;
+                case 11: /* PC=5, B cycle, nothing happens (update K4) */
+		  break;
+		case 12: /* PC=6, A cycle, update K4 (calc K5) */
+		  tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> interp_coeff[interp_period]);
+            	  break;
+                case 13: /* PC=6, B cycle, nothing happens (update K5) */
+		  break;
+		case 14: /* PC=7, A cycle, update K5 (calc K6) */
+		  tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> interp_coeff[interp_period]);
+            	  break;
+                case 15: /* PC=7, B cycle, nothing happens (update K6) */
+		  break;
+		case 16: /* PC=8, A cycle, update K6 (calc K7) */
+		  tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> interp_coeff[interp_period]);
+            	  break;
+                case 17: /* PC=8, B cycle, nothing happens (update K7) */
+		  break;
+		case 18: /* PC=9, A cycle, update K7 (calc K8) */
+		  tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> interp_coeff[interp_period]);
+            	  break;
+                case 19: /* PC=9, B cycle, nothing happens (update K8) */
+		  break;
+		case 20: /* PC=10, A cycle, update K8 (calc K9) */
+		  tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> interp_coeff[interp_period]);
+            	  break;
+                case 21: /* PC=10, B cycle, nothing happens (update K9) */
+		  break;
+		case 22: /* PC=11, A cycle, update K9 (calc K10) */
+		  tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> interp_coeff[interp_period]);
+            	  break;
+                case 23: /* PC=11, B cycle, nothing happens (update K10) */
+		  break;
+		case 24: /* PC=12, A cycle, update K10 (do nothing) */
+		  tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> interp_coeff[interp_period]);
+            	  break;
+	    }
         }
 
         if (tms->old_energy == 0)
         {
             /* generate silent samples here */
-			tms->excitation_data = 0x00; /* I'm not sure if this is actually RIGHT, the current_energy may be forced to zero when we've just passed a zero energy frame. However, this does work too. May be removed later. */
+			tms->excitation_data = 0x00; /* This is NOT correct, the current_energy is forced to zero when we                         just passed a zero energy frame because thats what the tables hold for that value.
+                        However, this code does no harm. Will be removed later. */
         }
         else if (tms->old_pitch == 0)
         {
@@ -642,13 +698,16 @@ tryagain:
               tms->excitation_data = chirptable[tms->pitch_count];
         }
 
-        /* Update LFSR every clock, like patent shows */
-        bitout = ((tms->RNG >> 12) & 1) ^
-                 ((tms->RNG >> 10) & 1) ^
-                 ((tms->RNG >>  9) & 1) ^
-                 ((tms->RNG >>  0) & 1);
-        tms->RNG >>= 1;
-        tms->RNG |= bitout << 12;
+        /* Update LFSR *20* times every sample, like patent shows */
+	for (i=0; i<20; i++)
+	{
+            bitout = ((tms->RNG >> 12) & 1) ^
+                     ((tms->RNG >> 10) & 1) ^
+                     ((tms->RNG >>  9) & 1) ^
+                     ((tms->RNG >>  0) & 1);
+            tms->RNG >>= 1;
+            tms->RNG |= bitout << 12;
+	}
 
 		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
 
