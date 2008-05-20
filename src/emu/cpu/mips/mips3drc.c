@@ -2820,63 +2820,45 @@ static int generate_regimm(drcuml_block *block, compiler_state *compiler, const 
 
 static int generate_idt(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	fatalerror("Unimplemented IDT instructions");
-#if 0
 	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = op & 0x1f;
+	
+	/* only enabled on IDT processors */
+	if (mips3.core->flavor != MIPS3_TYPE_R4650)
+		return FALSE;
 
 	switch (opswitch)
 	{
 		case 0: /* MAD */
 			if (RSREG != 0 && RTREG != 0)
 			{
-				emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_mov_r32_m32(REG_EDX, REGADDR(RTREG));							// mov  edx,[rtreg]
-				emit_imul_r32(DRCTOP, REG_EDX);										// imul edx
-				emit_add_r32_m32(DRCTOP, LOADDR);									// add  eax,[lo]
-				emit_adc_r32_m32(DRCTOP, HIADDR);									// adc  edx,[hi]
-				emit_mov_r32_r32(DRCTOP, REG_EBX, REG_EDX);							// mov  ebx,edx
-				emit_cdq(DRCTOP);													// cdq
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_EAX);							// mov  [lo],edx:eax
-				emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EBX);							// mov  eax,ebx
-				emit_cdq(DRCTOP);													// cdq
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_EAX);							// mov  [hi],edx:eax
+				UML_MULS(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));			// muls   i0,i1,rsreg,rtreg
+				UML_ADDf(block, FLAGS_C, IREG(0), IREG(0), LO32);					// add    i0,i0,lo
+				UML_ADDC(block, IREG(1), IREG(1), HI32);							// addc   i1,i1,hi
+				UML_DSEXT4(block, LO64, IREG(0));									// dsext4 lo,i0
+				UML_DSEXT4(block, HI64, IREG(1));									// dsext4 hi,i0
 			}
-			return compile_SUCCESSFUL_CP(3,4);
+			return TRUE;
 
 		case 1: /* MADU */
 			if (RSREG != 0 && RTREG != 0)
 			{
-				emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));							// mov  eax,[rsreg]
-				emit_mov_r32_m32(REG_EDX, REGADDR(RTREG));							// mov  edx,[rtreg]
-				emit_mul_r32(DRCTOP, REG_EDX);										// mul  edx
-				emit_add_r32_m32(DRCTOP, LOADDR);									// add  eax,[lo]
-				emit_adc_r32_m32(DRCTOP, HIADDR);									// adc  edx,[hi]
-				emit_mov_r32_r32(DRCTOP, REG_EBX, REG_EDX);							// mov  ebx,edx
-				emit_cdq(DRCTOP);													// cdq
-				emit_mov_m64_r64(DRCTOP, LOADDR, REG_EDX, REG_EAX);					// mov  [lo],edx:eax
-				emit_mov_r32_r32(DRCTOP, REG_EAX, REG_EBX);							// mov  eax,ebx
-				emit_cdq(DRCTOP);													// cdq
-				emit_mov_m64_r64(DRCTOP, HIADDR, REG_EDX, REG_EAX);					// mov  [hi],edx:eax
+				UML_MULU(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));			// mulu   i0,i1,rsreg,rtreg
+				UML_ADDf(block, FLAGS_C, IREG(0), IREG(0), LO32);					// add    i0,i0,lo
+				UML_ADDC(block, IREG(1), IREG(1), HI32);							// addc   i1,i1,hi
+				UML_DSEXT4(block, LO64, IREG(0));									// dsext4 lo,i0
+				UML_DSEXT4(block, HI64, IREG(1));									// dsext4 hi,i0
 			}
-			return compile_SUCCESSFUL_CP(3,4);
+			return TRUE;
 
 		case 2: /* MUL */
 			if (RDREG != 0)
 			{
-				if (RSREG != 0 && RTREG != 0)
-				{
-					emit_mov_r32_m32(REG_EAX, REGADDR(RSREG));						// mov  eax,[rsreg]
-					emit_imul_r32_m32(REG_EAX, REGADDR(RTREG));						// imul eax,[rtreg]
-					emit_cdq(DRCTOP);												// cdq
-					emit_mov_m64_r64(REG_ESI, REGADDR(RDREG), REG_EDX, REG_EAX);	// mov  [rd],edx:eax
-				}
-				else
-					emit_zero_m64(REG_ESI, REGADDR(RDREG));
+				UML_MULS(block, IREG(0), IREG(0), R32(RSREG), R32(RTREG));			// muls   i0,i0,rsreg,rtreg
+				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4 rdreg,i0
 			}
-			return compile_SUCCESSFUL_CP(3,4);
+			return TRUE;
 	}
-#endif
 	return FALSE;
 }
 
