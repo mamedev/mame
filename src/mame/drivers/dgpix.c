@@ -26,6 +26,67 @@
     You could even multiply the PC by the stack pointer if you wanted."
 
 
+ PCB Layout:
+ ---------------------------------------------------------------------------
+ Fishing Maniac 3
+ Saero Entertainment, 2002
+
+ This game runs on hardware that is identical to XFiles and King Of Dynast Gear
+ but with less ROMs and no PIC.
+
+ VRenderO Minus Rev4 dgPIX Entertainment Inc. 1999
+ |-----------------------------------------------------|
+ |TDA1515                C-O-N-N-1                     |
+ |   DA1545A                                       C   |
+ |                                                 O   |
+ |  VOL1    K4E151611                  KS0164      N   |
+ |  VOL2    K4E151611                              N   |
+ |J                                    169NDK19    3   |
+ |A     20MHz                           CONN2          |
+ |M  KA4558                                            |
+ |M                                                    |
+ |A                                          KM6161002 |
+ |          E1-32XT                                    |
+ |                                           KM6161002 |
+ |                                                     |
+ |       ST7705C                             KM6161002 |
+ | B1             XCS05                                |
+ | B2 B3          14.31818MHz  LED           KM6161002 |
+ |-----------------------------------------------------|
+ Notes:
+	ST7705C      - Reset/Watchdog IC (SOIC8)
+	E1-32XT      - Hyperstone E1-32XT CPU (QFP144)
+	169NDK19     - Xtal, 16.9344MHz
+	CONN1,CONN2, - Connectors for joining main board to small sub-board
+	CONN3
+	XCS05        - Xilinx Spartan XCS05 FPGA (QFP100)
+	B1,B2,B3     - Push Buttons for TEST, SERVICE and RESET
+	KS0164       - Samsung Electronics KS0164 General Midi compliant 32-voice Wavetable Synthesizer Chip
+				   with built-in 16bit CPU and MPU-401 compatibility. (QFP100)
+	K4E151611    - Samsung K4E151611C-JC60 1M x16 CMOS EDO DRAM (SOJ44)
+	KM6161002    - Samsung KM6161002CJ-12 64k x16 High-Speed CMOS SRAM (SOJ44)
+
+ Sub-Board
+ ---------
+
+ Flash Module Type-A REV2 dgPIX Entertainment Inc. 1999
+ |---------------------------------------|
+ |            C-O-N-N-1            U100  |
+ |C                FLASH.U3      FLASH.U5|
+ |O        FLASH.U2       FLASH.U4       |
+ |N FLASH.U10                            |
+ |N                                      |
+ |3                FLASH.U7      FLASH.U9|
+ |  CONN2  FLASH.U6       FLASH.U8       |
+ |---------------------------------------|
+ Notes:
+	FLASH        - Intel DA28F320J5 32M x8 StrataFlash surface-mounted FlashROM (SSOP56)
+				   Only U8, U9 & U10 are populated
+	CONN1,CONN2,
+	CONN3        - Connectors for joining small sub-board to main board
+	U100         - Empty 18 pin socket
+
+
 
  driver by Pierpaolo Prazzoli & Tomasz Slanina
 
