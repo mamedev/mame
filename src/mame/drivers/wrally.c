@@ -103,6 +103,7 @@ produces a high clock frequency, slow movements a low freq.
 extern UINT16 *wrally_vregs;
 extern UINT16 *wrally_videoram;
 extern UINT16 *wrally_spriteram;
+static UINT16 *wrally_shareram;
 
 VIDEO_START( wrally );
 VIDEO_UPDATE( wrally );
@@ -135,15 +136,29 @@ static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* Sound muting */
 	AM_RANGE(0x70005a, 0x70005b) AM_WRITE(wrally_flipscreen_w)									/* Flip screen */
 	AM_RANGE(0x70006a, 0x70007b) AM_WRITE(SMH_NOP)												/* ??? */
-	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_SHARE(1)												/* Work RAM (shared with DS5002FP) */
+	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE(&wrally_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
+
+static READ8_HANDLER( dallas_share_r )
+{
+	UINT8 *shareram = (UINT8 *)wrally_shareram;
+
+	return shareram[BYTE_XOR_LE(offset)];
+}
+
+static WRITE8_HANDLER( dallas_share_w )
+{
+	UINT8 *shareram = (UINT8 *)wrally_shareram;
+
+	shareram[BYTE_XOR_LE(offset)] = data;
+}
 
 static ADDRESS_MAP_START( dallas_rom, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* Code in NVRAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dallas_ram, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE(1)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
 /* DS5002FP configuration */
