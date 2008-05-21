@@ -76,8 +76,6 @@
 /* execution semantics */
 #define OPFLAG_READS_MEMORY				0x00080000		/* instruction reads memory */
 #define OPFLAG_WRITES_MEMORY			0x00100000		/* instruction writes memory */
-#define OPFLAG_VARIABLE_SHIFT			0x00200000		/* instruction performs a variable count shift */
-#define OPFLAG_MULTIPLY_DIVIDE			0x00400000		/* instruction performs a multiply/divide */
 
 
 

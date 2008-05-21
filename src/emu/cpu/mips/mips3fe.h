@@ -30,18 +30,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* this defines a branch targetpc that is dynamic at runtime */
-#define BRANCH_TARGET_DYNAMIC			(~0)
-
-
-/* opcode branch flags */
-#define OPFLAG_IS_UNCONDITIONAL_BRANCH	0x00000001		/* instruction is unconditional branch */
-
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
