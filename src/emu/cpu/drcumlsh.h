@@ -86,6 +86,7 @@
 #define FREG(x)				DRCUML_PTYPE_FLOAT_REGISTER, (DRCUML_REG_F0 + (x))
 #define MVAR(x)				DRCUML_PTYPE_MAPVAR, (DRCUML_MAPVAR_M0 + (x))
 #define MEM(x)				DRCUML_PTYPE_MEMORY, (FPTR)(x)
+#define PARAM(t,v)			(t), (v)
 
 
 
