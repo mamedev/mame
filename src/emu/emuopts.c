@@ -119,7 +119,7 @@ const options_entry mame_core_options[] =
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT OPTIONS" },
 	{ "ctrlr",                       NULL,        0,                 "preconfigure for specified controller" },
 	{ "mouse",                       "0",         OPTION_BOOLEAN,    "enable mouse input" },
-	{ "joystick;joy",                "0",         OPTION_BOOLEAN,    "enable joystick input" },
+	{ "joystick;joy",                "1",         OPTION_BOOLEAN,    "enable joystick input" },
 	{ "lightgun;gun",                "0",         OPTION_BOOLEAN,    "enable lightgun input" },
 	{ "multikeyboard;multikey",      "0",         OPTION_BOOLEAN,    "enable separate input from each keyboard device (if present)" },
 	{ "multimouse",                  "0",         OPTION_BOOLEAN,    "enable separate input from each mouse device (if present)" },
