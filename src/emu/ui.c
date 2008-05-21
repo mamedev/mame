@@ -1617,8 +1617,9 @@ static void slider_init(running_machine *machine)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
-				slider_config(&slider_list[slider_count++], -3000, 1000, 3000, 100, slider_crossscale, (void *)field);
-				slider_config(&slider_list[slider_count++], -3000, 0, 3000, 100, slider_crossoffset, (void *)field);
+				void *param = (void *)field;
+				slider_config(&slider_list[slider_count++], -3000, 1000, 3000, 100, slider_crossscale, param);
+				slider_config(&slider_list[slider_count++], -3000, 0, 3000, 100, slider_crossoffset, param);
 			}
 #endif
 }
