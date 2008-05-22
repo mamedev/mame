@@ -7772,7 +7772,8 @@ Other Sun games
 	DRIVER( funybubc )	/* (c) 1999 Comad Industries */
 	DRIVER( dcheese )	/* (c) 1993 HAR */
 	DRIVER( lottof2 )	/* (c) 1993 HAR */
-	DRIVER( fredmem )	/* (c) 1993 HAR */
+	DRIVER( fredmem )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmemj )	/* (c) 1994 Coastal Amusements */
 	DRIVER( f15se )		/* (c) 1991 Microprose */
 	DRIVER( f15se21 )	/* (c) 1991 Microprose */
 	DRIVER( botss )		/* (c) 1992 Microprose */
