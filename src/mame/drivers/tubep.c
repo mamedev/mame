@@ -99,7 +99,6 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -565,14 +564,14 @@ static WRITE8_HANDLER( rjammer_voice_frequency_select_w )
 }
 
 
-static void rjammer_adpcm_vck (int data)
+static void rjammer_adpcm_vck (running_machine *machine, int data)
 {
 	ls74 = (ls74+1) & 1;
 
 	if (ls74==1)
 	{
 		MSM5205_data_w(0, (ls377>>0) & 15 );
-		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE );
+		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE );
 	}
 	else
 	{

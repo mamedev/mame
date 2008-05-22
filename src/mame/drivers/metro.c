@@ -151,11 +151,11 @@ static READ16_HANDLER( metro_irq_cause_r )
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	/*  Get the pending IRQs (only the enabled ones, e.g. where
         irq_enable is *0*)  */
-	UINT16 irq = metro_irq_cause_r(Machine,0,0xffff) & ~*metro_irq_enable;
+	UINT16 irq = metro_irq_cause_r(machine,0,0xffff) & ~*metro_irq_enable;
 
 	if (irq_line == -1)	/* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
@@ -181,7 +181,7 @@ static void update_irq_state(void)
             source by peeking a register (metro_irq_cause_r) */
 
 		int state =	(irq ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(Machine, 0, irq_line, state);
+		cpunum_set_input_line(machine, 0, irq_line, state);
 	}
 }
 
@@ -218,7 +218,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 		if (data & 0x80)	requested_int[7] = 0;
 	}
 
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -228,12 +228,12 @@ static INTERRUPT_GEN( metro_interrupt )
 	{
 		case 0:
 			requested_int[0] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
@@ -243,7 +243,7 @@ static INTERRUPT_GEN( bangball_interrupt )
 {
 	requested_int[0] = 1;	// set scroll regs if a flag is set
 	requested_int[4] = 1;	// clear that flag
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -262,12 +262,12 @@ static INTERRUPT_GEN( karatour_interrupt )
 			requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
 			timer_set(ATTOTIME_IN_USEC(2500), NULL, 0, vblank_end_callback);
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
@@ -277,7 +277,7 @@ static emu_timer *mouja_irq_timer;
 static TIMER_CALLBACK( mouja_irq_callback )
 {
 	requested_int[0] = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
@@ -289,7 +289,7 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 static INTERRUPT_GEN( mouja_interrupt )
 {
 	requested_int[1] = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -299,7 +299,7 @@ static INTERRUPT_GEN( gakusai_interrupt )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
@@ -310,18 +310,18 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 		case 1:	// needed?
 			requested_int[5] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 	}
 }
 
-static void ymf278b_interrupt(int active)
+static void ymf278b_interrupt(running_machine *machine, int active)
 {
-	cpunum_set_input_line(Machine, 0, 2, active);
+	cpunum_set_input_line(machine, 0, 2, active);
 }
 
 /***************************************************************************
@@ -514,9 +514,9 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	portb = data;
 }
 
-static void metro_sound_irq_handler(int state)
+static void metro_sound_irq_handler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =
@@ -679,7 +679,7 @@ static UINT16 *metro_blitter_regs;
 static TIMER_CALLBACK( metro_blit_done )
 {
 	requested_int[blitter_bit] = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 INLINE int blt_read(const UINT8 *ROM, const int offs)
@@ -1939,9 +1939,9 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 	memory_set_bankptr(1, &RAM[bankaddress]);
 }
 
-static void blzntrnd_irqhandler(int irq)
+static void blzntrnd_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface blzntrnd_ym2610_interface =
@@ -4653,22 +4653,22 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 1:
 			requested_int[3] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 2:
 			requested_int[5] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 3:
 			requested_int[2] = 1;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		default:

@@ -20,7 +20,7 @@ struct _ptm6840_interface
 
 	write8_machine_func	out_func[3];	// function to call when output[idx] changes
 
-	void (*irq_func)(int state);	// function called if IRQ line changes
+	void (*irq_func)(running_machine *machine, int state);	// function called if IRQ line changes
 };
 
 void ptm6840_config( int which, const ptm6840_interface *intf);

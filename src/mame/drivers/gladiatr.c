@@ -182,7 +182,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/tait8741.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
@@ -288,10 +287,10 @@ static WRITE8_HANDLER( gladiator_int_control_w )
 	/* bit 0   : ??                    */
 }
 /* YM2203 IRQ */
-static void gladiator_ym_irq(int irq)
+static void gladiator_ym_irq(running_machine *machine, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
@@ -362,9 +361,9 @@ static WRITE8_HANDLER(qx2_w){ }
 
 static WRITE8_HANDLER(qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return mame_rand(Machine); }
+static READ8_HANDLER(qx2_r){ return mame_rand(machine); }
 
-static READ8_HANDLER(qx3_r){ return mame_rand(Machine)&0xf; }
+static READ8_HANDLER(qx3_r){ return mame_rand(machine)&0xf; }
 
 static READ8_HANDLER(qx0_r)
 {
@@ -651,7 +650,7 @@ GFXDECODE_END
 
 static READ8_HANDLER(f1_r)
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static const struct YM2203interface ppking_ym2203_interface =

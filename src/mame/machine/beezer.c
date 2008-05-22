@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 
@@ -13,13 +12,13 @@ static WRITE8_HANDLER( b_via_0_pa_w );
 static WRITE8_HANDLER( b_via_0_pb_w );
 static READ8_HANDLER( b_via_0_ca2_r );
 static WRITE8_HANDLER( b_via_0_ca2_w );
-static void b_via_0_irq (int level);
+static void b_via_0_irq (running_machine *machine, int level);
 
 static READ8_HANDLER( b_via_1_pa_r );
 static READ8_HANDLER( b_via_1_pb_r );
 static WRITE8_HANDLER( b_via_1_pa_w );
 static WRITE8_HANDLER( b_via_1_pb_w );
-static void b_via_1_irq (int level);
+static void b_via_1_irq (running_machine *machine, int level);
 
 static const struct via6522_interface b_via_0_interface =
 {
@@ -48,9 +47,9 @@ static WRITE8_HANDLER( b_via_0_ca2_w )
 {
 }
 
-static void b_via_0_irq (int level)
+static void b_via_0_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, level);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, level);
 }
 
 static READ8_HANDLER( b_via_0_pb_r )
@@ -90,9 +89,9 @@ static WRITE8_HANDLER( b_via_0_pb_w )
 	pbus = data;
 }
 
-static void b_via_1_irq (int level)
+static void b_via_1_irq (running_machine *machine, int level)
 {
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, level);
+	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, level);
 }
 
 static READ8_HANDLER( b_via_1_pa_r )

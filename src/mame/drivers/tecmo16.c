@@ -24,7 +24,6 @@ Notes:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
@@ -426,9 +425,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

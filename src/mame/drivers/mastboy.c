@@ -434,7 +434,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
 
@@ -634,14 +633,14 @@ static WRITE8_HANDLER( mastboy_msm5205_data_w )
 	mastboy_m5205_next = data;
 }
 
-static void mastboy_adpcm_int(int data)
+static void mastboy_adpcm_int(running_machine *machine, int data)
 {
 	MSM5205_data_w (0,mastboy_m5205_next);
 	mastboy_m5205_next>>=4;
 
 	mastboy_m5205_part ^= 1;
 	if(!mastboy_m5205_part)
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

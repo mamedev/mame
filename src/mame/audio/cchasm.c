@@ -6,7 +6,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "cchasm.h"
@@ -132,9 +131,9 @@ READ16_HANDLER( cchasm_io_r )
 static int channel_active[2];
 static int output[2];
 
-static void ctc_interrupt (int state)
+static void ctc_interrupt (running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static WRITE8_HANDLER( ctc_timer_1_w )

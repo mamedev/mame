@@ -28,7 +28,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 
@@ -1023,7 +1022,7 @@ static WRITE8_HANDLER( youmab_extra_bank_w )
 
 static READ8_HANDLER( youmab_8a_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER( youmab_81_w )

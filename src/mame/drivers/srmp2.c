@@ -235,7 +235,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
 }
 
 
-static void srmp2_adpcm_int(int num)
+static void srmp2_adpcm_int(running_machine *machine, int num)
 {
 	UINT8 *ROM = memory_region(REGION_SOUND1);
 

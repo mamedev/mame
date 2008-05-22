@@ -1494,10 +1494,10 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 				{
 					//UINT32 dst = cop_register[0];
 					//UINT32 dst = cop_register[1];
-					//program_write_word(dst,  mame_rand(Machine)/*program_read_word(src)*/);
-					//program_write_word(dst+2,mame_rand(Machine)/*program_read_word(src+2)*/);
-					//program_write_word(dst+4,mame_rand(Machine)/*program_read_word(src+4)*/);
-					//program_write_word(dst+6,mame_rand(Machine)/*program_read_word(src+6)*/);
+					//program_write_word(dst,  mame_rand(machine)/*program_read_word(src)*/);
+					//program_write_word(dst+2,mame_rand(machine)/*program_read_word(src+2)*/);
+					//program_write_word(dst+4,mame_rand(machine)/*program_read_word(src+4)*/);
+					//program_write_word(dst+6,mame_rand(machine)/*program_read_word(src+6)*/);
 					//logerror("%04x\n",cop_register[0]);
 					break;
 				}

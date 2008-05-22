@@ -93,11 +93,11 @@ static WRITE16_HANDLER( hypr_sharedram2_w )
 		COMBINE_DATA(&hypr_sub_sharedram2_2[offset-0x4000/2]);
 }
 
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	int irq = requested_int & ~*hypr_irq_enable;
 
-	cpunum_set_input_line(Machine, 0, 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 3, (irq & int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ16_HANDLER( hyprduel_irq_cause_r )
@@ -114,7 +114,7 @@ static WRITE16_HANDLER( hyprduel_irq_cause_w )
 		else
 			requested_int &= ~(data & *hypr_irq_enable);
 
-		update_irq_state();
+		update_irq_state(machine);
 	}
 }
 
@@ -204,7 +204,7 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		rastersplit = line + 1;
 	}
 
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 static MACHINE_RESET( hyprduel )
@@ -291,7 +291,7 @@ static UINT16 *hyprduel_blitter_regs;
 static TIMER_CALLBACK( hyprduel_blit_done )
 {
 	requested_int |= 1 << blitter_bit;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 INLINE int blt_read(const UINT8 *ROM, const int offs)
@@ -691,9 +691,9 @@ GFXDECODE_END
                             Sound Communication
 ***************************************************************************/
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 1, HOLD_LINE);
+	cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

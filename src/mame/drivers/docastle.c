@@ -159,7 +159,7 @@ TODO:
 
 static int adpcm_pos, adpcm_idle;
 
-static void idsoccer_adpcm_int(int chip)
+static void idsoccer_adpcm_int(running_machine *machine, int chip)
 {
 	static int adpcm_data = -1;
 

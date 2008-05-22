@@ -158,7 +158,6 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/262intf.h"
 #include "sound/ymf278b.h"
 
@@ -586,9 +585,9 @@ static MACHINE_RESET( fuuki32 )
 }
 
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YMF278B_interface ymf278b_interface =

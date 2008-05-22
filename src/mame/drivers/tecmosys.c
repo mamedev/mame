@@ -171,7 +171,6 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68k.h"
 #include "sound/okim6295.h"
@@ -585,10 +584,10 @@ static VIDEO_UPDATE(deroon)
 */
 
 
-static void sound_irq(int irq)
+static void sound_irq(running_machine *machine, int irq)
 {
 	/* IRQ */
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YMF262interface ymf262_interface =

@@ -236,7 +236,7 @@ static READ8_HANDLER( kingball_IN1_r )
        that it's working, doesn't actually use return value, so we can just use
        rand() */
 
-	return (input_port_read_indexed(machine, 1) & ~0x20) | (mame_rand(Machine) & 0x20);
+	return (input_port_read_indexed(machine, 1) & ~0x20) | (mame_rand(machine) & 0x20);
 }
 
 WRITE8_HANDLER( kingball_speech_dip_w )

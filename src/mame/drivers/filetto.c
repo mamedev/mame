@@ -381,7 +381,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static READ8_HANDLER( kludge_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )

@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "ics2115.h"
@@ -91,7 +92,7 @@ static void recalc_irq(struct ics2115 *chip)
 	if(irq != chip->irq_on) {
 		chip->irq_on = irq;
 		if(chip->intf->irq_cb)
-			chip->intf->irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
+			chip->intf->irq_cb(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

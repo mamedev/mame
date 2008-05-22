@@ -5,7 +5,7 @@ void *tms5220_create(int index);
 void tms5220_destroy(void *chip);
 
 void tms5220_reset_chip(void *chip);
-void tms5220_set_irq(void *chip, void (*func)(int));
+void tms5220_set_irq(void *chip, void (*func)(running_machine *, int));
 
 void tms5220_data_write(void *chip, int data);
 int tms5220_status_read(void *chip);

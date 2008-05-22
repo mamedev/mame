@@ -287,9 +287,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void metlclsh_irqhandler(int linestate)
+static void metlclsh_irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 0,M6809_IRQ_LINE,linestate);
+	cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

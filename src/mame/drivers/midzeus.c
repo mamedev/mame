@@ -25,7 +25,6 @@ The Grid         v1.2   10/18/2000
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "includes/midzeus.h"
@@ -540,7 +539,7 @@ static WRITE32_HANDLER( invasn_gun_w )
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
 	gun_irq_state &= ~((gun_control >> 2) & 3);
-	update_gun_irq(Machine);
+	update_gun_irq(machine);
 
 	for (player = 0; player < 2; player++)
 	{

@@ -13,7 +13,6 @@ Currently none of the MCUs' internal roms are dumped so simulation is used
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/kaneko16.h"
 
 #include "kanekotb.h"	// TOYBOX MCU trojaning results
@@ -87,7 +86,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) & 0xffff);
 
 		case 0x14/2:
-			return (mame_rand(Machine) & 0xffff);
+			return (mame_rand(machine) & 0xffff);
 
 		default:
 			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",activecpu_get_pc(),offset<<1);
@@ -218,7 +217,7 @@ READ16_HANDLER(bloodwar_calc_r)
 			return data;
 
 		case 0x14/2:
-			return (mame_rand(Machine) & 0xffff);
+			return (mame_rand(machine) & 0xffff);
 
 		case 0x20/2: return hit.x1p;
 		case 0x22/2: return hit.x1s;
@@ -597,7 +596,7 @@ void bloodwar_mcu_run(running_machine *machine)
 		case 0x02:	// Read from NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
 			{
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -609,7 +608,7 @@ void bloodwar_mcu_run(running_machine *machine)
 		case 0x42:	// Write to NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -712,7 +711,7 @@ void bonkadv_mcu_run(running_machine *machine)
 		case 0x02:	// Read from NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
 			{
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -724,7 +723,7 @@ void bonkadv_mcu_run(running_machine *machine)
 		case 0x42:	// Write to NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -736,7 +735,7 @@ void bonkadv_mcu_run(running_machine *machine)
 		case 0x43:	// Initialize NVRAM - MCU writes Default Data Set directly to NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
 				mame_fwrite(f, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 				mame_fclose(f);
@@ -834,7 +833,7 @@ void gtmr_mcu_run(running_machine *machine)
 		case 0x02:	// Read from NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
 			{
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -845,7 +844,7 @@ void gtmr_mcu_run(running_machine *machine)
 		case 0x42:	// Write to NVRAM
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -861,8 +860,8 @@ void gtmr_mcu_run(running_machine *machine)
 
 		case 0x04:	// TEST (2 versions)
 		{
-			if (strcmp(Machine->gamedrv->name, "gtmr") == 0 ||
-				strcmp(Machine->gamedrv->name, "gtmra") == 0)
+			if (strcmp(machine->gamedrv->name, "gtmr") == 0 ||
+				strcmp(machine->gamedrv->name, "gtmra") == 0)
 			{
 				/* MCU writes the string "MM0525-TOYBOX199" to shared ram */
 				kaneko16_mcu_ram[mcu_offset+0] = 0x4d4d;

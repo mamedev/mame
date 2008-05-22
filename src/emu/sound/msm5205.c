@@ -116,7 +116,7 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 	int val;
 	int new_signal;
 	/* callback user handler and latch next data */
-	if(voice->intf->vclk_callback) (*voice->intf->vclk_callback)(voice->index);
+	if(voice->intf->vclk_callback) (*voice->intf->vclk_callback)(machine, voice->index);
 
 	/* reset check at last hieddge of VCLK */
 	if(voice->reset)

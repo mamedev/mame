@@ -199,9 +199,9 @@ static UINT16 irq_enable;
 static UINT16 *ssv_mainram;
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 static IRQ_CALLBACK(ssv_irq_callback)
@@ -223,7 +223,7 @@ static WRITE16_HANDLER( ssv_irq_ack_w )
 	int level = ((offset * 2) & 0x70) >> 4;
 	requested_int &= ~(1 << level);
 
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 /*
@@ -258,13 +258,13 @@ static INTERRUPT_GEN( ssv_interrupt )
 		if(interrupt_ultrax)
 		{
 			requested_int |= 1 << 1;	// needed by ultrax to coin up, breaks cairblad
-			update_irq_state();
+			update_irq_state(machine);
 		}
 	}
 	else
 	{
 		requested_int |= 1 << 3;	// vblank
-		update_irq_state();
+		update_irq_state(machine);
 	}
 }
 
@@ -273,12 +273,12 @@ static INTERRUPT_GEN( gdfs_interrupt )
 	if (cpu_getiloops())
 	{
 		requested_int |= 1 << 6;	// reads lightgun (4 times for 4 axis)
-		update_irq_state();
+		update_irq_state(machine);
 	}
 	else
 	{
 		requested_int |= 1 << 3;	// vblank
-		update_irq_state();
+		update_irq_state(machine);
 	}
 }
 
@@ -461,7 +461,7 @@ static UINT16 *ssv_input_sel;
 
 static READ16_HANDLER( drifto94_rand_r )
 {
-	return mame_rand(Machine) & 0xffff;
+	return mame_rand(machine) & 0xffff;
 }
 
 static ADDRESS_MAP_START( drifto94_readmem, ADDRESS_SPACE_PROGRAM, 16 )

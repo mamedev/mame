@@ -1,6 +1,7 @@
 /* LSI Logic LSI53C810A PCI to SCSI I/O Processor */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "53c810.h"
 
 #define DMA_MAX_ICOUNT	512		/* Maximum number of DMA Scripts opcodes to run */
@@ -41,7 +42,7 @@ static struct {
 	int halted;
 	int carry;
 	UINT32 (* fetch)(UINT32 dsp);
-	void (* irq_callback)(void);
+	void (* irq_callback)(running_machine *machine);
 	void (* dma_callback)(UINT32, UINT32, int, int);
 } lsi810;
 
@@ -94,7 +95,7 @@ static void dmaop_interrupt(void)
 	lsi810.dstat |= 0x4;	/* SIR (SCRIPTS Interrupt Instruction Received) */
 
 	if(intf->irq_callback != NULL) {
-		intf->irq_callback();
+		intf->irq_callback(Machine);
 	}
 	lsi810.dma_icount = 0;
 	lsi810.halted = 1;
@@ -518,7 +519,7 @@ UINT8 lsi53c810_reg_r(int reg)
 	return 0;
 }
 
-void lsi53c810_reg_w(int reg, UINT8 value)
+void lsi53c810_reg_w(running_machine *machine, int reg, UINT8 value)
 {
 	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", value, reg, reg, activecpu_get_pc());
 	switch(reg)
@@ -614,7 +615,7 @@ void lsi53c810_reg_w(int reg, UINT8 value)
 				lsi810.istat |= 0x3;	/* DMA interrupt pending */
 				lsi810.dstat |= 0x8;	/* SSI (Single Step Interrupt) */
 				if(intf->irq_callback != NULL) {
-					intf->irq_callback();
+					intf->irq_callback(machine);
 				}
 			}
 			else if(lsi810.dcntl & 0x04 && !lsi810.halted)	/* manual start DMA */

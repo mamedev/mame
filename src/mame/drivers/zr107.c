@@ -659,12 +659,12 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static void sound_irq_callback(int irq)
+static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
 static DRIVER_INIT(zr107)

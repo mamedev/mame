@@ -235,7 +235,7 @@ static void wd33c93_read_data(int bytes, UINT8 *pData)
 	}
 }
 
-static void wd33c93_complete_immediate( int status )
+static void wd33c93_complete_immediate( running_machine *machine, int status )
 {
 	/* reset our timer */
 	timer_reset( scsi_data.cmd_timer, attotime_never );
@@ -264,19 +264,19 @@ static void wd33c93_complete_immediate( int status )
 	/* if we have a callback, call it */
 	if (intf && intf->irq_callback)
 	{
-		intf->irq_callback(1);
+		intf->irq_callback(machine, 1);
 	}
 }
 
 static TIMER_CALLBACK(wd33c93_complete_cb)
 {
-	wd33c93_complete_immediate( param );
+	wd33c93_complete_immediate( machine, param );
 }
 
 static TIMER_CALLBACK(wd33c93_service_request)
 {
 	/* issue a message out request */
-	wd33c93_complete_immediate(CSR_SRV_REQ | scsi_data.busphase);
+	wd33c93_complete_immediate(machine, CSR_SRV_REQ | scsi_data.busphase);
 }
 
 static TIMER_CALLBACK(wd33c93_deassert_cip)
@@ -635,7 +635,7 @@ WRITE8_HANDLER(wd33c93_w)
 						}
 
 						/* complete the command */
-						wd33c93_complete_immediate(CSR_XFER_DONE | scsi_data.busphase);
+						wd33c93_complete_immediate(machine, CSR_XFER_DONE | scsi_data.busphase);
 					}
 				}
 				else
@@ -682,7 +682,7 @@ READ8_HANDLER(wd33c93_r)
 
 				if (intf && intf->irq_callback)
 				{
-					intf->irq_callback(0);
+					intf->irq_callback(machine, 0);
 				}
 
 				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_SCSI_STATUS] ));

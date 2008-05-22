@@ -5,7 +5,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "audio/williams.h"
@@ -399,7 +398,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	{
 		if (LOG_DMA && input_code_pressed(KEYCODE_L))
 			logerror("%06X:trigger\n", activecpu_get_pc());
-		process_dma_queue(Machine);
+		process_dma_queue(machine);
 		dma_data_index = 0;
 	}
 	return 0;

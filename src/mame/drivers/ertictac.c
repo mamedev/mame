@@ -27,7 +27,6 @@ TODO:
 
 **********************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/arm/arm.h"
 
 static UINT32 *ertictac_mainram;
@@ -80,7 +79,7 @@ static WRITE32_HANDLER(IRQMSKA_w)
 
 static READ32_HANDLER(IRQRQB_r)
 {
-	return mame_rand(Machine)&IRQMSKB; /* hack  0x20 - controls,  0x02 - ?sound? */
+	return mame_rand(machine)&IRQMSKB; /* hack  0x20 - controls,  0x02 - ?sound? */
 }
 
 static READ32_HANDLER(IRQMSKB_r)

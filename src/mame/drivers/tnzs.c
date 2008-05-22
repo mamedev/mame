@@ -246,7 +246,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8x41/i8x41.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
@@ -560,7 +559,7 @@ WRITE8_HANDLER( jpopnics_palette_w )
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(Machine,offset,r<<4, g<<4, b<<4);
+	palette_set_color_rgb(machine,offset,r<<4, g<<4, b<<4);
 }
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1428,9 +1427,9 @@ static const struct YM2203interface ym2203_interface =
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface kageki_ym2203_interface =

@@ -79,7 +79,7 @@ static emu_timer *ipu_watchdog_timer;
  *
  *************************************/
 
-static void subtract_from_counter(int counter, int count);
+static void subtract_from_counter(running_machine *machine, int counter, int count);
 
 static TIMER_CALLBACK( mcr68_493_callback );
 static TIMER_CALLBACK( zwackery_493_callback );
@@ -87,7 +87,7 @@ static TIMER_CALLBACK( zwackery_493_callback );
 static WRITE8_HANDLER( zwackery_pia_2_w );
 static WRITE8_HANDLER( zwackery_pia_3_w );
 static WRITE8_HANDLER( zwackery_ca2_w );
-static void zwackery_pia_irq(int state);
+static void zwackery_pia_irq(running_machine *machine, int state);
 
 static void reload_count(int counter);
 static TIMER_CALLBACK( counter_fired_callback );
@@ -188,15 +188,15 @@ static const pia6821_interface zwackery_pia_4_intf =
  *
  *************************************/
 
-static void ctc_interrupt(int state)
+static void ctc_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
 
-static void ipu_ctc_interrupt(int state)
+static void ipu_ctc_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 3, 0, state);
+	cpunum_set_input_line(machine, 3, 0, state);
 }
 
 
@@ -453,7 +453,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 {
 	/* update the 6840 VBLANK clock */
 	if (!m6840_state[0].timer_active)
-		subtract_from_counter(0, 1);
+		subtract_from_counter(machine, 0, 1);
 
 	logerror("--- VBLANK ---\n");
 
@@ -471,7 +471,7 @@ INTERRUPT_GEN( mcr68_interrupt )
  *
  *************************************/
 
-static void update_mcr68_interrupts(void)
+static void update_mcr68_interrupts(running_machine *machine)
 {
 	int newstate = 0;
 
@@ -483,23 +483,23 @@ static void update_mcr68_interrupts(void)
 
 	/* set the new state of the IRQ lines */
 	if (newstate)
-		cpunum_set_input_line(Machine, 0, newstate, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( mcr68_493_off_callback )
 {
 	v493_irq_state = 0;
-	update_mcr68_interrupts();
+	update_mcr68_interrupts(machine);
 }
 
 
 static TIMER_CALLBACK( mcr68_493_callback )
 {
 	v493_irq_state = 1;
-	update_mcr68_interrupts();
+	update_mcr68_interrupts(machine);
 	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, mcr68_493_off_callback);
 	logerror("--- (INT1) ---\n");
 }
@@ -605,10 +605,10 @@ WRITE8_HANDLER( zwackery_ca2_w )
 }
 
 
-static void zwackery_pia_irq(int state)
+static void zwackery_pia_irq(running_machine *machine, int state)
 {
 	v493_irq_state = pia_get_irq_a(2) | pia_get_irq_b(2);
-	update_mcr68_interrupts();
+	update_mcr68_interrupts(machine);
 }
 
 
@@ -632,7 +632,7 @@ static TIMER_CALLBACK( zwackery_493_callback )
  *
  *************************************/
 
-INLINE void update_interrupts(void)
+INLINE void update_interrupts(running_machine *machine)
 {
 	m6840_status &= ~0x80;
 
@@ -641,11 +641,11 @@ INLINE void update_interrupts(void)
 	if ((m6840_status & 0x04) && (m6840_state[2].control & 0x40)) m6840_status |= 0x80;
 
 	m6840_irq_state = m6840_status >> 7;
-	update_mcr68_interrupts();
+	update_mcr68_interrupts(machine);
 }
 
 
-static void subtract_from_counter(int counter, int count)
+static void subtract_from_counter(running_machine *machine, int counter, int count)
 {
 	/* dual-byte mode */
 	if (m6840_state[counter].control & 0x04)
@@ -668,7 +668,7 @@ static void subtract_from_counter(int counter, int count)
 			{
 				m6840_status |= 1 << counter;
 				m6840_status_read_since_int &= ~(1 << counter);
-				update_interrupts();
+				update_interrupts(machine);
 				msb = (m6840_state[counter].latch >> 8) + 1;
 				LOG(("** Counter %d fired\n", counter));
 			}
@@ -695,7 +695,7 @@ static void subtract_from_counter(int counter, int count)
 			/* we've expired */
 			m6840_status |= 1 << counter;
 			m6840_status_read_since_int &= ~(1 << counter);
-			update_interrupts();
+			update_interrupts(machine);
 			LOG(("** Counter %d fired\n", counter));
 		}
 
@@ -714,7 +714,7 @@ static TIMER_CALLBACK( counter_fired_callback )
 	m6840_state[counter].timer_active = 0;
 
 	/* subtract it all from the counter; this will generate an interrupt */
-	subtract_from_counter(counter, count);
+	subtract_from_counter(machine, counter, count);
 }
 
 
@@ -827,7 +827,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 			}
 
 			m6840_status = 0;
-			update_interrupts();
+			update_interrupts(machine);
 		}
 
 		/* changing the clock source? (needed for Zwackery) */
@@ -852,7 +852,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 
 		/* clear the interrupt */
 		m6840_status &= ~(1 << counter);
-		update_interrupts();
+		update_interrupts(machine);
 
 		/* reload the count if in an appropriate mode */
 		if (!(m6840_state[counter].control & 0x10))
@@ -886,7 +886,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 		/* clear the interrupt if the status has been read */
 		if (m6840_status_read_since_int & (1 << counter))
 			m6840_status &= ~(1 << counter);
-		update_interrupts();
+		update_interrupts(machine);
 
 		m6840_lsb_buffer = result & 0xff;
 

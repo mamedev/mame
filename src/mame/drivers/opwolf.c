@@ -94,7 +94,6 @@ register. So what is controlling priority.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -311,7 +310,7 @@ static MACHINE_RESET( opwolf )
 	MSM5205_reset_w(1, 1);
 }
 
-static void opwolf_msm5205_vck(int chip)
+static void opwolf_msm5205_vck(running_machine *machine, int chip)
 {
 	static int adpcm_data[2] = { -1, -1 };
 
@@ -537,9 +536,9 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

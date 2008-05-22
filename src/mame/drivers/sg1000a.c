@@ -112,7 +112,6 @@ CN4               CN5
 ******************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/segacrpt.h"
@@ -244,12 +243,12 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( sg100a_interrupt )
 {
-	TMS9928A_interrupt();
+	TMS9928A_interrupt(machine);
 }
 
-static void vdp_interrupt (int state)
+static void vdp_interrupt (running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0,0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0,0, HOLD_LINE);
 }
 
 static const TMS9928a_interface tms9928a_interface =

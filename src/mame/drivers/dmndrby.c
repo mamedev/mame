@@ -36,13 +36,12 @@ DD10 DD14  DD18     H5            DD21
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT8* dderby_vid;
 
 static READ8_HANDLER( dderby_random_reader )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )

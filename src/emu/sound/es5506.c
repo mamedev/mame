@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "es5506.h"
@@ -104,7 +105,7 @@ struct ES5506Chip
 	UINT32 		write_latch;			/* currently accumulated data for write */
 	UINT32 		read_latch;				/* currently accumulated data for read */
 	UINT32 		master_clock;			/* master clock frequency */
-	void 		(*irq_callback)(int);	/* IRQ callback */
+	void 		(*irq_callback)(running_machine *, int);	/* IRQ callback */
 	UINT16		(*port_read)(void);		/* input port read */
 
 	UINT8 		current_page;			/* current register page */
@@ -149,7 +150,7 @@ static void update_irq_state(struct ES5506Chip *chip)
 {
 	/* ES5505/6 irq line has been set high - inform the host */
 	if (chip->irq_callback)
-		(*chip->irq_callback)(1); /* IRQB set high */
+		(*chip->irq_callback)(Machine, 1); /* IRQB set high */
 }
 
 static void update_internal_irq_state(struct ES5506Chip *chip)
@@ -166,7 +167,7 @@ static void update_internal_irq_state(struct ES5506Chip *chip)
 	chip->irqv=0x80;
 
 	if (chip->irq_callback)
-		(*chip->irq_callback)(0); /* IRQB set low */
+		(*chip->irq_callback)(Machine, 0); /* IRQB set low */
 }
 
 /**********************************************************************************************

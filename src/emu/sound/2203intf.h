@@ -6,7 +6,7 @@
 struct YM2203interface
 {
 	const struct AY8910interface ay8910_intf;
-	void (*handler)(int irq);
+	void (*handler)(running_machine *machine, int irq);
 };
 
 

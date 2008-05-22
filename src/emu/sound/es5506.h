@@ -12,7 +12,7 @@ struct ES5505interface
 {
 	int region0;						/* memory region where the sample ROM lives */
 	int region1;						/* memory region where the sample ROM lives */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 	UINT16 (*read_port)(void);			/* input port read */
 };
 
@@ -33,7 +33,7 @@ struct ES5506interface
 	int region1;						/* memory region where the sample ROM lives */
 	int region2;						/* memory region where the sample ROM lives */
 	int region3;						/* memory region where the sample ROM lives */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 	UINT16 (*read_port)(void);			/* input port read */
 };
 

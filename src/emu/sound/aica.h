@@ -12,7 +12,7 @@ struct AICAinterface
 {
 	int region;				/* region of 2M/8M RAM */
 	int roffset;				/* offset in the region */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 
 void AICA_set_ram_base(int which, void *base, int size);

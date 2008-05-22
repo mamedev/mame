@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "262intf.h"
 #include "ymf262.h"
@@ -25,7 +26,7 @@ struct ymf262_info
 static void IRQHandler_262(void *param,int irq)
 {
 	struct ymf262_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(irq);
+	if (info->intf->handler) (info->intf->handler)(Machine, irq);
 }
 
 static TIMER_CALLBACK( timer_callback_262_0 )

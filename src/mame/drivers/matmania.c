@@ -391,9 +391,9 @@ MACHINE_DRIVER_END
 
 
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,1,linestate);
+	cpunum_set_input_line(machine, 1,1,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

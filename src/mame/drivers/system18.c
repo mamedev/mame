@@ -62,7 +62,6 @@ Other notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "system16.h"
 #include "cpu/m68000/m68000.h"
@@ -175,13 +174,13 @@ static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 	sample_buffer = data;
 }
 
-static void shdancbl_msm5205_callback(int data)
+static void shdancbl_msm5205_callback(running_machine *machine, int data)
 {
 	MSM5205_data_w(0, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface shdancbl_msm5205_interface =

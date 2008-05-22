@@ -3902,7 +3902,7 @@ INTERRUPT_GEN( psx_vblank )
 #endif
 
 	m_n_gpustatus ^= ( 1L << 31 );
-	psx_irq_set( 0x0001 );
+	psx_irq_set( machine, 0x0001 );
 }
 
 void psx_gpu_reset( void )

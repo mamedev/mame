@@ -668,9 +668,9 @@ static INTERRUPT_GEN( karnov_interrupt )
 	cpunum_set_input_line(machine, 0,7,HOLD_LINE);	/* VBL */
 }
 
-static void sound_irq(int linestate)
+static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
+	cpunum_set_input_line(machine, 1,0,linestate); /* IRQ */
 }
 
 static const struct YM3526interface ym3526_interface =

@@ -318,9 +318,9 @@ INPUT_PORTS_END
 
 
 
-static void chqflag_ym2151_irq_w(int data)
+static void chqflag_ym2151_irq_w(running_machine *machine, int data)
 {
-	cpunum_set_input_line(Machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

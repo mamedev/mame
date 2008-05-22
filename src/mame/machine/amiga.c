@@ -175,8 +175,8 @@ const char *const amiga_custom_names[0x100] =
 
 static void custom_reset(void);
 static void autoconfig_reset(void);
-static void amiga_cia_0_irq(int state);
-static void amiga_cia_1_irq(int state);
+static void amiga_cia_0_irq(running_machine *machine, int state);
+static void amiga_cia_1_irq(running_machine *machine, int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 static TIMER_CALLBACK( scanline_callback );
@@ -1133,15 +1133,15 @@ WRITE16_HANDLER( amiga_cia_w )
  *
  *************************************/
 
-static void amiga_cia_0_irq(int state)
+static void amiga_cia_0_irq(running_machine *machine, int state)
 {
-	amiga_custom_w(Machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
-static void amiga_cia_1_irq(int state)
+static void amiga_cia_1_irq(running_machine *machine, int state)
 {
-	amiga_custom_w(Machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 

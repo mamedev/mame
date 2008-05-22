@@ -9,7 +9,7 @@
 struct K054539interface {
 	int region;						/* memory regions of sample ROM(s) */
 	void (*apan)(double, double);	/* Callback for analog output mixing levels (0..1 for each channel) */
-	void (*irq)( void );
+	void (*irq)(running_machine *);
 };
 
 

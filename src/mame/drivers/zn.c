@@ -199,7 +199,7 @@ static void sio_znsec0_handler( int n_data )
 	{
 		if( m_b_lastclock )
 		{
-			psx_sio_input( 0, PSX_SIO_IN_DATA, ( znsec_step( 0, ( n_data & PSX_SIO_OUT_DATA ) / PSX_SIO_OUT_DATA ) & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 0, ( n_data & PSX_SIO_OUT_DATA ) / PSX_SIO_OUT_DATA ) & 1 ) * PSX_SIO_IN_DATA );
 		}
 		m_b_lastclock = 0;
 	}
@@ -215,7 +215,7 @@ static void sio_znsec1_handler( int n_data )
 	{
 		if( m_b_lastclock )
 		{
-			psx_sio_input( 0, PSX_SIO_IN_DATA, ( znsec_step( 1, ( n_data & PSX_SIO_OUT_DATA ) / PSX_SIO_OUT_DATA ) & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( znsec_step( 1, ( n_data & PSX_SIO_OUT_DATA ) / PSX_SIO_OUT_DATA ) & 1 ) * PSX_SIO_IN_DATA );
 		}
 		m_b_lastclock = 0;
 	}
@@ -237,7 +237,7 @@ static void sio_pad_handler( int n_data )
 	}
 
 	verboselog( 2, "read pad %04x %04x %02x\n", m_n_znsecsel, m_b_znsecport, n_data );
-	psx_sio_input( 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
+	psx_sio_input( Machine, 0, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR, PSX_SIO_IN_DATA | PSX_SIO_IN_DSR );
 }
 
 static void sio_dip_handler( int n_data )
@@ -247,7 +247,7 @@ static void sio_dip_handler( int n_data )
 		if( m_b_lastclock )
 		{
 			verboselog( 2, "read dip %02x -> %02x\n", n_data, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
-			psx_sio_input( 0, PSX_SIO_IN_DATA, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
+			psx_sio_input( Machine, 0, PSX_SIO_IN_DATA, ( ( input_port_read_indexed(Machine,  7 ) >> m_n_dip_bit ) & 1 ) * PSX_SIO_IN_DATA );
 			m_n_dip_bit++;
 			m_n_dip_bit &= 7;
 		}
@@ -1269,9 +1269,9 @@ static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =
@@ -1653,11 +1653,11 @@ Notes:
       *2                  - Unpopulated DIP28 socket
 */
 
-static void atpsx_interrupt(const device_config *config, int state)
+static void atpsx_interrupt(const device_config *device, int state)
 {
 	if (state)
 	{
-	 	psx_irq_set(0x400);
+	 	psx_irq_set(device->machine, 0x400);
 	}
 }
 
@@ -2117,7 +2117,7 @@ static void jdredd_ide_interrupt(const device_config *device, int state)
 {
 	if (state)
 	{
-	 	psx_irq_set(0x400);
+	 	psx_irq_set(device->machine, 0x400);
 	}
 }
 
@@ -2181,7 +2181,7 @@ static WRITE32_HANDLER( acpsx_10_w )
 static WRITE32_HANDLER( nbajamex_80_w )
 {
 	verboselog( 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psx_irq_set(0x400);
+	psx_irq_set(machine, 0x400);
 }
 
 static READ32_HANDLER( nbajamex_08_r )

@@ -19,7 +19,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
@@ -45,7 +44,7 @@ static UINT32 *	mo_command;
 static void (*protection_w)(offs_t offset, UINT16 data);
 static void (*protection_r)(offs_t offset, UINT16 *data);
 
-static void cage_irq_callback(int reason);
+static void cage_irq_callback(running_machine *machine, int reason);
 
 
 
@@ -88,12 +87,12 @@ static MACHINE_RESET( atarigt )
  *
  *************************************/
 
-static void cage_irq_callback(int reason)
+static void cage_irq_callback(running_machine *machine, int reason)
 {
 	if (reason)
-		atarigen_sound_int_gen(Machine, 0);
+		atarigen_sound_int_gen(machine, 0);
 	else
-		atarigen_sound_int_ack_w(Machine,0,0,0xffff);
+		atarigen_sound_int_ack_w(machine,0,0,0xffff);
 }
 
 

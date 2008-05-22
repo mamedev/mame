@@ -134,9 +134,9 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 ***************************************************************************/
 
-static void duart_irq_handler(UINT8 vector)
+static void duart_irq_handler(running_machine *machine, int vector)
 {
-	cpunum_set_input_line_and_vector(Machine, 0, 4, HOLD_LINE, vector);
+	cpunum_set_input_line_and_vector(machine, 0, 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(int channel, UINT8 data)
@@ -151,7 +151,7 @@ static void duart_tx(int channel, UINT8 data)
 static void microtouch_tx(UINT8 data)
 {
 	//logerror( "microtouch->duart: %02x %c\n", data, (char)data);
-	duart_68681_rx_data(0, data);
+	duart_68681_rx_data(Machine, 0, data);
 }
 
 

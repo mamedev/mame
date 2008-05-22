@@ -121,7 +121,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/arm7/arm7core.h"
 
 enum
@@ -315,7 +314,7 @@ static READ32_HANDLER(PS7500_IO_r)
 	switch(offset)
 	{
 		case MSECR:
-			return mame_rand(Machine);
+			return mame_rand(machine);
 		break;
 
 		case IOLINES: //TODO: eeprom  24c01
@@ -326,7 +325,7 @@ static READ32_HANDLER(PS7500_IO_r)
 		if(flashType==1)
 			return 0;
 		else
-			return mame_rand(Machine);
+			return mame_rand(machine);
 
 		case IRQSTA:
 			return (PS7500_IO[offset]&(~2))|0x80;
@@ -354,7 +353,7 @@ static READ32_HANDLER(PS7500_IO_r)
 		//default:
 			//mame_printf_debug("ior %i @%x\n",offset,activecpu_get_pc());
 	}
-	return mame_rand(Machine);//PS7500_IO[offset];
+	return mame_rand(machine);//PS7500_IO[offset];
 }
 
 static WRITE32_HANDLER(PS7500_IO_w)
@@ -476,17 +475,17 @@ static WRITE32_HANDLER(debug_w)
 
 static READ32_HANDLER(ff4_r)
 {
-	return mame_rand(Machine)&0x20;
+	return mame_rand(machine)&0x20;
 }
 
 static READ32_HANDLER(SIMPLEIO_r)
 {
-	return mame_rand(Machine)&1;
+	return mame_rand(machine)&1;
 }
 
 static READ32_HANDLER(randomized_r)
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( ssfindo_map, ADDRESS_SPACE_PROGRAM, 32 )

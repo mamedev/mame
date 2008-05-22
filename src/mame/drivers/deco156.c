@@ -404,7 +404,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq_gen(int state)
+static void sound_irq_gen(running_machine *machine, int state)
 {
 	logerror("sound irq\n");
 }

@@ -1262,10 +1262,10 @@ static WRITE32_HANDLER( comm_uart_w )
 	}
 }
 
-static void comm_uart_irq_callback(int channel, int value)
+static void comm_uart_irq_callback(running_machine *machine, int channel, int value)
 {
 	// TODO
-	//cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+	//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1413,14 +1413,14 @@ static WRITE32_HANDLER( midi_uart_w )
 	}
 }
 
-static void midi_uart_irq_callback(int channel, int value)
+static void midi_uart_irq_callback(running_machine *machine, int channel, int value)
 {
 	if (channel == 0)
 	{
 		if ((extend_board_irq_enable & 0x02) == 0)
 		{
 			extend_board_irq_active |= 0x02;
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 	}
 	else
@@ -1428,7 +1428,7 @@ static void midi_uart_irq_callback(int channel, int value)
 		if ((extend_board_irq_enable & 0x01) == 0)
 		{
 			extend_board_irq_active |= 0x01;
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 	}
 }
@@ -1483,23 +1483,23 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 				if ((keyboard_state[keyboard] & (1 << i)) != 0 && (kbstate & (1 << i)) == 0)
 				{
 					// key was on, now off -> send Note Off message
-					pc16552d_rx_data(1, uart_channel, 0x80);
-					pc16552d_rx_data(1, uart_channel, kbnote);
-					pc16552d_rx_data(1, uart_channel, 0x7f);
+					pc16552d_rx_data(machine, 1, uart_channel, 0x80);
+					pc16552d_rx_data(machine, 1, uart_channel, kbnote);
+					pc16552d_rx_data(machine, 1, uart_channel, 0x7f);
 				}
 				else if ((keyboard_state[keyboard] & (1 << i)) == 0 && (kbstate & (1 << i)) != 0)
 				{
 					// key was off, now on -> send Note On message
-					pc16552d_rx_data(1, uart_channel, 0x90);
-					pc16552d_rx_data(1, uart_channel, kbnote);
-					pc16552d_rx_data(1, uart_channel, 0x7f);
+					pc16552d_rx_data(machine, 1, uart_channel, 0x90);
+					pc16552d_rx_data(machine, 1, uart_channel, kbnote);
+					pc16552d_rx_data(machine, 1, uart_channel, 0x7f);
 				}
 			}
 		}
 		else
 		{
 			// no messages, send Active Sense message instead
-			pc16552d_rx_data(1, uart_channel, 0xfe);
+			pc16552d_rx_data(machine, 1, uart_channel, 0xfe);
 		}
 
 		keyboard_state[keyboard] = kbstate;
@@ -1790,7 +1790,7 @@ static WRITE8_HANDLER( soundram_w )
 {
 }
 
-static void sound_irq_callback(int state)
+static void sound_irq_callback(running_machine *machine, int state)
 {
 }
 

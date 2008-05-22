@@ -848,7 +848,7 @@ static READ8_HANDLER( chipset_r )
 			val = 0x1;
 
 			/* TODO */
-			update_irqs(Machine);
+			update_irqs(machine);
 			break;
 		}
 		case 0x1C:

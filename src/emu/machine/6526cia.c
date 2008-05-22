@@ -74,7 +74,7 @@ struct _cia_state
 {
 	int				active;
 	cia_type_t		type;
-	void			(*irq_func)(int state);
+	void			(*irq_func)(running_machine *machine, int state);
 	int				clock;
 
 	cia_port		port[2];
@@ -298,7 +298,7 @@ static void cia_update_interrupts(cia_state *cia)
 	{
 		cia->irq = new_irq;
 		if (cia->irq_func)
-			cia->irq_func(cia->irq);
+			cia->irq_func(Machine, cia->irq);
 	}
 }
 

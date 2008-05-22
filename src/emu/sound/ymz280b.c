@@ -89,7 +89,7 @@ struct YMZ280BChip
 	UINT8 irq_enable;				/* current IRQ enable */
 	UINT8 keyon_enable;				/* key on enable */
 	double master_clock;			/* master clock frequency */
-	void (*irq_callback)(int);		/* IRQ callback */
+	void (*irq_callback)(running_machine *, int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
 	read8_machine_func ext_ram_read;		/* external RAM read handler */
@@ -145,14 +145,14 @@ INLINE void update_irq_state(struct YMZ280BChip *chip)
 	{
 		chip->irq_state = 1;
 		if (chip->irq_callback)
-			(*chip->irq_callback)(1);
+			(*chip->irq_callback)(Machine, 1);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 	else if (!irq_bits && chip->irq_state)
 	{
 		chip->irq_state = 0;
 		if (chip->irq_callback)
-			(*chip->irq_callback)(0);
+			(*chip->irq_callback)(Machine, 0);
 		else logerror("YMZ280B: IRQ generated, but no callback specified!");
 	}
 }

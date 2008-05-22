@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( kludge )
 {
-	return mame_rand(Machine) & 0x0700;
+	return mame_rand(machine) & 0x0700;
 }
 
 /* a kludge! */
@@ -246,7 +246,7 @@ static READ16_HANDLER( comad_OKIM6295_status_0_msb_r )
 	UINT16 retvalue;
 
 //  retvalue = OKIM6295_status_0_msb_r(offset,mem_mask); // doesn't work, causes lockups when girls change..
-	retvalue = mame_rand(Machine);
+	retvalue = mame_rand(machine);
 
 	return retvalue;
 }
@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 /*
 READ16_HANDLER( zipzap_random_read )
 {
-    return mame_rand(Machine);
+    return mame_rand(machine);
 }
 */
 static ADDRESS_MAP_START( zipzap_readmem, ADDRESS_SPACE_PROGRAM, 16 )

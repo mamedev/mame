@@ -35,7 +35,6 @@ ROMs
 
 
 #include "driver.h"
-#include "deprecat.h"
 
 static VIDEO_START(steaser)
 {
@@ -48,7 +47,7 @@ static VIDEO_UPDATE(steaser)
 
 static READ16_HANDLER( steaser_bd0000_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )

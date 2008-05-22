@@ -30,7 +30,6 @@ TO DO :
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -357,9 +356,9 @@ static GFXDECODE_START( oneshot )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, oneshot8x8_layout,     0x00, 4  ) /* sprites */
 GFXDECODE_END
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM3812interface ym3812_interface =

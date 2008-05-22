@@ -14,7 +14,6 @@ i8751 protection simluation and other fixes by Bryan McPhail, 15/10/00.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
@@ -278,9 +277,9 @@ GFXDECODE_END
 
 
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

@@ -47,7 +47,7 @@ WRITE16_HANDLER( segaic16_divide_1_w );
 WRITE16_HANDLER( segaic16_divide_2_w );
 
 /* compare/timer chip */
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(void));
+void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(running_machine *));
 int segaic16_compare_timer_clock(int which);
 READ16_HANDLER( segaic16_compare_timer_0_r );
 READ16_HANDLER( segaic16_compare_timer_1_r );

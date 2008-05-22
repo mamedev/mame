@@ -112,17 +112,17 @@ static WRITE8_HANDLER( audio_2_command_w );
  *
  *************************************/
 
-static void main_cpu_irq(int state)
+static void main_cpu_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1) | pia_get_irq_b(2);
 
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void main_cpu_firq(int state)
+static void main_cpu_firq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

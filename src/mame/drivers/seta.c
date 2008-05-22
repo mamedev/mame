@@ -1422,9 +1422,9 @@ static const struct x1_010_interface seta_sound_intf2 =
 	0x1000,		/* address */
 };
 
-static void utoukond_ym3438_interrupt(int linestate)
+static void utoukond_ym3438_interrupt(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, linestate);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
 }
 
 static const struct YM3438interface utoukond_ym3438_intf =

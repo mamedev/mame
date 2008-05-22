@@ -40,7 +40,7 @@ static attotime cage_cpu_h1_clock_period;
 static UINT8 cpu_to_cage_ready;
 static UINT8 cage_to_cpu_ready;
 
-static void (*cage_irqhandler)(int);
+static void (*cage_irqhandler)(running_machine *, int);
 
 static attotime serial_period_per_word;
 
@@ -174,7 +174,7 @@ void cage_init(running_machine *machine, int boot_region, offs_t speedup)
 }
 
 
-void cage_set_irq_handler(void (*irqhandler)(int))
+void cage_set_irq_handler(void (*irqhandler)(running_machine *, int))
 {
 	cage_irqhandler = irqhandler;
 }
@@ -447,7 +447,7 @@ static void update_control_lines(void)
 		if ((cage_control & 2) && cage_to_cpu_ready)
 			reason |= CAGE_IRQ_REASON_DATA_READY;
 
-		(*cage_irqhandler)(reason);
+		(*cage_irqhandler)(Machine, reason);
 	}
 
 	/* set the IOF input lines */

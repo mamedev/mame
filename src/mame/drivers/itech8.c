@@ -453,7 +453,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
@@ -519,7 +518,7 @@ static const pia6821_interface pia_interface =
  *
  *************************************/
 
-static void via_irq(int state);
+static void via_irq(running_machine *machine, int state);
 
 static const struct via6522_interface via_interface =
 {
@@ -596,9 +595,9 @@ static WRITE8_HANDLER( itech8_nmi_ack_w )
 }
 
 
-static void generate_sound_irq(int state)
+static void generate_sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -815,12 +814,12 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static void via_irq(int state)
+static void via_irq(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -869,7 +868,7 @@ static NVRAM_HANDLER( itech8 )
 		mame_fread(file, main_ram, main_ram_size);
 	else
 		for (i = 0; i < main_ram_size; i++)
-			main_ram[i] = mame_rand(Machine);
+			main_ram[i] = mame_rand(machine);
 }
 
 

@@ -34,7 +34,6 @@
 
 #include "driver.h"
 #include "render.h"
-#include "deprecat.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/laserdsc.h"
 #include "machine/z80ctc.h"
@@ -89,9 +88,9 @@ static const UINT8 led_map[16] =
  *
  *************************************/
 
-static void dleuro_interrupt(int state)
+static void dleuro_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
 

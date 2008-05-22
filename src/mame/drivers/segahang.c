@@ -343,9 +343,9 @@ static void sharrier_i8751_sim(running_machine *machine)
  *
  *************************************/
 
-static void sound_irq(int irq)
+static void sound_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

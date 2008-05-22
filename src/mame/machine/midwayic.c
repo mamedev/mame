@@ -74,7 +74,7 @@ struct ioasic_state
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
 	const UINT8 *	shuffle_map;
-	void 	(*irq_callback)(int);
+	void 	(*irq_callback)(running_machine *, int);
 	UINT8	irq_state;
 	UINT16	sound_irq_state;
 	UINT8	auto_ack;
@@ -570,7 +570,7 @@ static UINT16 ioasic_fifo_status_r(void);
 static void ioasic_input_empty(int state);
 static void ioasic_output_full(int state);
 static void update_ioasic_irq(void);
-static void cage_irq_handler(int state);
+static void cage_irq_handler(running_machine *machine, int state);
 
 
 static void ioasic_register_state(void)
@@ -589,7 +589,7 @@ static void ioasic_register_state(void)
 }
 
 
-void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callback)(int))
+void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callback)(running_machine *, int))
 {
 	static const UINT8 shuffle_maps[][16] =
 	{
@@ -685,12 +685,12 @@ static void update_ioasic_irq(void)
 	{
 		ioasic.irq_state = new_state;
 		if (ioasic.irq_callback)
-			(*ioasic.irq_callback)(ioasic.irq_state ? ASSERT_LINE : CLEAR_LINE);
+			(*ioasic.irq_callback)(Machine, ioasic.irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 
-static void cage_irq_handler(int reason)
+static void cage_irq_handler(running_machine *machine, int reason)
 {
 	logerror("CAGE irq handler: %d\n", reason);
 	ioasic.sound_irq_state = 0;

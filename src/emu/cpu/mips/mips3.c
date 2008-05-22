@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "mips3com.h"
 
 

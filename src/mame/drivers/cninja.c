@@ -41,7 +41,6 @@ Note about version levels using Mutant Fighter as the example:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cninja.h"
 #include "cpu/h6280/h6280.h"
 #include "deco16ic.h"
@@ -751,14 +750,14 @@ static MACHINE_RESET( cninja )
 	cninja_irq_mask=0;
 }
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
 }
 
-static void sound_irq2(int state)
+static void sound_irq2(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1,0,state);
+	cpunum_set_input_line(machine, 1,0,state);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

@@ -669,7 +669,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/ds2404.h"
 #include "machine/eeprom.h"
 #include "machine/intelfsh.h"
@@ -1105,12 +1104,12 @@ static WRITE8_HANDLER( flashrom_write )
 	}
 }
 
-static void irqhandler(int state)
+static void irqhandler(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static const struct YMF271interface ymf271_interface =

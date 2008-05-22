@@ -34,7 +34,6 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "sound/2151intf.h"
@@ -336,19 +335,19 @@ WRITE8_HANDLER( seibu_rst18_ack_w )
 	update_irq_lines(machine, RST18_CLEAR);
 }
 
-void seibu_ym3812_irqhandler(int linestate)
+void seibu_ym3812_irqhandler(running_machine *machine, int linestate)
 {
-	update_irq_lines(Machine, linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2151_irqhandler(int linestate)
+void seibu_ym2151_irqhandler(running_machine *machine, int linestate)
 {
-	update_irq_lines(Machine, linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
-void seibu_ym2203_irqhandler(int linestate)
+void seibu_ym2203_irqhandler(running_machine *machine, int linestate)
 {
-	update_irq_lines(Machine, linestate ? RST10_ASSERT : RST10_CLEAR);
+	update_irq_lines(machine, linestate ? RST10_ASSERT : RST10_CLEAR);
 }
 
 /***************************************************************************/

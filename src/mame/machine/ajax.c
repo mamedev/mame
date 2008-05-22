@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "cpu/konami/konami.h"
@@ -113,7 +112,7 @@ READ8_HANDLER( ajax_ls138_f10_r )
 
 	switch ((offset & 0x01c0) >> 6){
 		case 0x00:	/* ??? */
-			data = mame_rand(Machine);
+			data = mame_rand(machine);
 			break;
 		case 0x04:	/* 2P inputs */
 			data = input_port_read_indexed(machine, 5);

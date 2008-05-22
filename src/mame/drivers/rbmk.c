@@ -56,7 +56,6 @@ PIC16F84
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
@@ -67,7 +66,7 @@ static UINT16 tilebank=0;
 
 static READ16_HANDLER( gms_read )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 

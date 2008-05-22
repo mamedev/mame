@@ -440,7 +440,7 @@ static MACHINE_RESET( mpu4 )
 
 
 /* 6809 IRQ handler */
-static void cpu0_irq(int state)
+static void cpu0_irq(running_machine *machine, int state)
 {
 	/* The PIA and PTM IRQ lines are all connected to a common PCB track, leading directly to the 6809 IRQ line. */
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) |
@@ -453,12 +453,12 @@ static void cpu0_irq(int state)
 
 	if (!serial_card_connected)
 	{
-		cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 fint%d \n", combined_state));
 	}
 }

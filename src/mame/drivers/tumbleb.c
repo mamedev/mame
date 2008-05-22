@@ -262,7 +262,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/h6280/h6280.h"
 #include "decocrpt.h"
 #include "sound/2151intf.h"
@@ -719,7 +718,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( semibase_unknown_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 static ADDRESS_MAP_START( htchctch_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
@@ -2154,9 +2153,9 @@ MACHINE_DRIVER_END
 
 
 
-static void semicom_irqhandler(int irq)
+static void semicom_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -130,9 +130,9 @@ static TIMER_CALLBACK( riot_interrupt );
  *
  *************************************/
 
-static void update_irq_state(/* unused */ int state)
+static void update_irq_state(running_machine *machine, /* unused */ int state)
 {
-	cpunum_set_input_line(Machine, 1, M6502_IRQ_LINE, (pia_get_irq_b(1) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, (pia_get_irq_b(1) | riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -415,7 +415,7 @@ static TIMER_CALLBACK( riot_interrupt )
 		/* generate the IRQ */
 		riot_irq_flag |= 0x80;
 		riot_irq_state = riot_timer_irq_enable;
-		update_irq_state(0);
+		update_irq_state(machine, 0);
 
 		/* now start counting clock cycles down */
 		riot_state = RIOT_POST_COUNT;
@@ -493,7 +493,7 @@ static WRITE8_HANDLER( exidy_shriot_w )
 		if (riot_state != RIOT_COUNT)
 			riot_irq_flag &= ~0x80;
 		riot_irq_state = 0;
-		update_irq_state(0);
+		update_irq_state(machine, 0);
 
 		/* set the enable from the offset */
 		riot_timer_irq_enable = (offset & 0x08) ? 1 : 0;
@@ -546,7 +546,7 @@ static READ8_HANDLER( exidy_shriot_r )
 		int temp = riot_irq_flag;
 		riot_irq_flag = 0;
 		riot_irq_state = 0;
-		update_irq_state(0);
+		update_irq_state(machine, 0);
 		return temp;
 	}
 

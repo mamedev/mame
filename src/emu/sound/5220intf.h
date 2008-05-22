@@ -7,7 +7,7 @@
 
 struct TMS5220interface
 {
-	void (*irq)(int state);		/* IRQ callback function */
+	void (*irq)(running_machine *machine, int state);		/* IRQ callback function */
 
 	int (*read)(int count);			/* speech ROM read callback */
 	void (*load_address)(int data);	/* speech ROM load address callback */

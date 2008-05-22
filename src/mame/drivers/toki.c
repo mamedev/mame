@@ -35,7 +35,6 @@ for now. Even at 12 this slowdown still happens a little.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
@@ -73,7 +72,7 @@ static READ16_HANDLER( pip16_r )
 
 static int msm5205next;
 
-static void toki_adpcm_int (int data)
+static void toki_adpcm_int (running_machine *machine, int data)
 {
 	static int toggle=0;
 
@@ -82,7 +81,7 @@ static void toki_adpcm_int (int data)
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( toki_adpcm_control_w )

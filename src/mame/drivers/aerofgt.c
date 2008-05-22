@@ -59,7 +59,6 @@ Verification still needed for the other PCBs.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
@@ -1300,9 +1299,9 @@ static GFXDECODE_START( wbbc97 )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, wbbc97_spritelayout, 1024, 64 )	/* colors 1024-2047 in 4 banks */
 GFXDECODE_END
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

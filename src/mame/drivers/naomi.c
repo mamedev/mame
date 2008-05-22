@@ -510,7 +510,6 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "dc.h"
-#include "deprecat.h"
 
 #define CPU_CLOCK (200000000)
                                  /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
@@ -715,9 +714,9 @@ static READ32_HANDLER( test1 )
 	return -1;
 }
 
-static void aica_irq(int irq)
+static void aica_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )

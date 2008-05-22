@@ -165,7 +165,7 @@ typedef struct
 
 	UINT32		noise_tab[32];			/* 17bit Noise Generator periods */
 
-	void (*irqhandler)(int irq);		/* IRQ function handler */
+	void (*irqhandler)(running_machine *machine, int irq);		/* IRQ function handler */
 	write8_machine_func porthandler;		/* port write function handler */
 
 	unsigned int clock;					/* chip clock in Hz (passed from 2151intf.c) */
@@ -791,7 +791,7 @@ static TIMER_CALLBACK( irqAon_callback )
 
 	chip->irqlinestate |= 1;
 
-	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(1);
+	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(machine, 1);
 }
 
 static TIMER_CALLBACK( irqBon_callback )
@@ -801,7 +801,7 @@ static TIMER_CALLBACK( irqBon_callback )
 
 	chip->irqlinestate |= 2;
 
-	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(1);
+	if (oldstate == 0 && chip->irqhandler) (*chip->irqhandler)(machine, 1);
 }
 
 static TIMER_CALLBACK( irqAoff_callback )
@@ -811,7 +811,7 @@ static TIMER_CALLBACK( irqAoff_callback )
 
 	chip->irqlinestate &= ~1;
 
-	if (oldstate == 1 && chip->irqhandler) (*chip->irqhandler)(0);
+	if (oldstate == 1 && chip->irqhandler) (*chip->irqhandler)(machine, 0);
 }
 
 static TIMER_CALLBACK( irqBoff_callback )
@@ -821,7 +821,7 @@ static TIMER_CALLBACK( irqBoff_callback )
 
 	chip->irqlinestate &= ~2;
 
-	if (oldstate == 2 && chip->irqhandler) (*chip->irqhandler)(0);
+	if (oldstate == 2 && chip->irqhandler) (*chip->irqhandler)(machine, 0);
 }
 
 static TIMER_CALLBACK( timer_callback_a )
@@ -1112,7 +1112,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
-				if ((oldstate==1) && (chip->irqhandler)) (*chip->irqhandler)(0);
+				if ((oldstate==1) && (chip->irqhandler)) (*chip->irqhandler)(machine, 0);
 #endif
 			}
 
@@ -1124,7 +1124,7 @@ void YM2151WriteReg(void *_chip, int r, int v)
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
-				if ((oldstate==2) && (chip->irqhandler)) (*chip->irqhandler)(0);
+				if ((oldstate==2) && (chip->irqhandler)) (*chip->irqhandler)(machine, 0);
 #endif
 			}
 
@@ -2403,7 +2403,7 @@ void YM2151UpdateOne(void *chip, SAMP **buffers, int length)
 			{
 				int oldstate = PSG->status & 3;
 				PSG->status |= 2;
-				if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(1);
+				if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(machine, 1);
 			}
 		}
 	}
@@ -2481,7 +2481,7 @@ void YM2151UpdateOne(void *chip, SAMP **buffers, int length)
 				{
 					int oldstate = PSG->status & 3;
 					PSG->status |= 1;
-					if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(1);
+					if ((!oldstate) && (PSG->irqhandler)) (*PSG->irqhandler)(machine, 1);
 				}
 				if (PSG->irq_enable & 0x80)
 					PSG->csm_req = 2;	/* request KEY ON / KEY OFF sequence */
@@ -2492,7 +2492,7 @@ void YM2151UpdateOne(void *chip, SAMP **buffers, int length)
 	}
 }
 
-void YM2151SetIrqHandler(void *chip, void(*handler)(int irq))
+void YM2151SetIrqHandler(void *chip, void(*handler)(running_machine *machine, int irq))
 {
 	YM2151 *PSG = chip;
 	PSG->irqhandler = handler;

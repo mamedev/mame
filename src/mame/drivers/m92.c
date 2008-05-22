@@ -932,7 +932,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
 	if (state)
 		timer_call_after_resynch(NULL, YM2151_ASSERT, setvector_callback);

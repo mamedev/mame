@@ -138,12 +138,12 @@ static WRITE16_HANDLER( dbz_sound_cause_nmi )
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void dbz_sound_irq(int irq)
+static void dbz_sound_irq(running_machine *machine, int irq)
 {
 	if (irq)
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_readmem, ADDRESS_SPACE_PROGRAM, 16 )

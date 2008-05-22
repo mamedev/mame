@@ -4,14 +4,14 @@
 
 struct YM3812interface
 {
-	void (*handler)(int linestate);
+	void (*handler)(running_machine *machine, int linestate);
 };
 
 #define YM3526interface YM3812interface
 
 struct Y8950interface
 {
-	void (*handler)(int linestate);
+	void (*handler)(running_machine *machine, int linestate);
 
 	int rom_region; /* delta-T ADPCM ROM/RAM region */
 

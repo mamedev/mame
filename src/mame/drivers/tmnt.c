@@ -372,7 +372,7 @@ static READ16_HANDLER( punkshot_kludge_r )
 	/* 0xffffff, and returning 0 causes the game to mess up - locking up in a */
 	/* loop where the ball is continuously bouncing from the basket. Returning */
 	/* a random number seems to prevent that. */
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 
@@ -2285,7 +2285,7 @@ static INPUT_PORTS_START( prmrsocr )
 INPUT_PORTS_END
 
 
-static void cuebrick_irq_handler(int state)
+static void cuebrick_irq_handler(running_machine *machine, int state)
 {
 	cuebrick_snd_irqlatch = state;
 }
@@ -2627,9 +2627,9 @@ static MACHINE_DRIVER_START( glfgreat )
 MACHINE_DRIVER_END
 
 
-static void sound_nmi(void)
+static void sound_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct K054539interface k054539_interface =

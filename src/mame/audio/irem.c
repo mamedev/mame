@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "irem.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/ay8910.h"
@@ -174,9 +173,9 @@ static WRITE8_HANDLER( m62_adpcm_w )
  *
  *************************************/
 
-static void adpcm_int(int data)
+static void adpcm_int(running_machine *machine, int data)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (sndti_exists(SOUND_MSM5205, 1))

@@ -61,7 +61,6 @@ sign is intact, however Credit is spelt incorrectly.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -274,9 +273,9 @@ GFXDECODE_END
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,linestate,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,linestate,0xff);
 }
 
 static const struct YM3526interface ym3526_interface =

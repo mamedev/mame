@@ -46,7 +46,6 @@ Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -374,9 +373,9 @@ static GFXDECODE_START( brkthru )
 GFXDECODE_END
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,M6809_IRQ_LINE,linestate);
+	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,linestate);
 }
 
 static const struct YM3526interface ym3526_interface =

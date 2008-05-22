@@ -77,14 +77,14 @@ static WRITE32_HANDLER( paletteram32_w )
 	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static void voodoo_vblank_0(int param)
+static void voodoo_vblank_0(running_machine *machine, int param)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static void voodoo_vblank_1(int param)
+static void voodoo_vblank_1(running_machine *machine, int param)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hangplt )
@@ -1000,12 +1000,12 @@ ROM_START( hangplt )
         ROM_LOAD32_WORD( "685a14.12w",   0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 ROM_END
 
-static void sound_irq_callback(int irq)
+static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
 static DRIVER_INIT(gticlub)

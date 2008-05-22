@@ -33,7 +33,6 @@ Memo:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/m68kfmly.h"
 #include "machine/z80ctc.h"
 #include "nb1413m3.h"
@@ -185,9 +184,9 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )	{ pio_dir[3] = data; }
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )	{ pio_dir[4] = data; }
 
 
-static void ctc0_interrupt(int state)
+static void ctc0_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static z80ctc_interface ctc_intf =

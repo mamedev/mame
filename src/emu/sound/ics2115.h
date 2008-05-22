@@ -3,7 +3,7 @@
 
 struct ics2115_interface {
 	int region;
-	void (*irq_cb)(int);
+	void (*irq_cb)(running_machine *, int);
 };
 
 READ8_HANDLER( ics2115_r );

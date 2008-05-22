@@ -110,7 +110,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80daisy.h"
 #include "includes/astrocde.h"
 #include "machine/z80ctc.h"
@@ -491,9 +490,9 @@ static WRITE8_HANDLER( demndrgn_sound_w )
  *
  *************************************/
 
-static void ctc_interrupt(int state)
+static void ctc_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 

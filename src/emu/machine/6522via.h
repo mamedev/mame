@@ -48,7 +48,7 @@ struct via6522_interface
 	write8_machine_func out_cb1_func;
 	write8_machine_func out_ca2_func;
 	write8_machine_func out_cb2_func;
-	void (*irq_func)(int state);
+	void (*irq_func)(running_machine *machine, int state);
 };
 
 void via_set_clock(int which,int clck);

@@ -686,7 +686,7 @@ static READ16_HANDLER( pzlbowl_protection_r )
 
 static READ16_HANDLER( pzlbowl_coins_r )
 {
-	return input_port_read_indexed(machine, 4) | (mame_rand(Machine) & 0x80 );
+	return input_port_read_indexed(machine, 4) | (mame_rand(machine) & 0x80 );
 }
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
@@ -1785,7 +1785,7 @@ static INTERRUPT_GEN( seta2_interrupt )
 	{
 		case 0:
 			/* VBlank is connected to INT0 (external interrupts pin 0) */
-			tmp68301_external_interrupt_0();
+			tmp68301_external_interrupt_0(machine);
 			break;
 	}
 }
@@ -1795,10 +1795,10 @@ static INTERRUPT_GEN( samshoot_interrupt )
 	switch ( cpu_getiloops() )
 	{
 		case 0:
-			tmp68301_external_interrupt_0();	// vblank
+			tmp68301_external_interrupt_0(machine);	// vblank
 			break;
 		case 1:
-			tmp68301_external_interrupt_2();	// to do: hook up x1-10 interrupts
+			tmp68301_external_interrupt_2(machine);	// to do: hook up x1-10 interrupts
 			break;
 	}
 }

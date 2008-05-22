@@ -182,7 +182,7 @@ static const int sampleLimits[] =
 static int adpcm_data_offs;
 static int adpcm_data_end;
 
-void stfight_adpcm_int( int data )
+void stfight_adpcm_int( running_machine *machine, int data )
 {
 	static int toggle;
 	UINT8 *SAMPLES = memory_region(REGION_SOUND1);

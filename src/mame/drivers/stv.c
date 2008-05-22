@@ -2646,7 +2646,7 @@ static const struct sh2_config sh2_conf_slave  = { 1 };
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(int irq)
+static void scsp_irq(running_machine *machine, int irq)
 {
 	// don't bother the 68k if it's off
 	if (!en_68k)
@@ -2657,15 +2657,15 @@ static void scsp_irq(int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(Machine, 2, irq, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, irq, ASSERT_LINE);
 	}
 	else if (irq < 0)
 	{
-		cpunum_set_input_line(Machine, 2, -irq, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, -irq, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 2, scsp_last_line, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, scsp_last_line, CLEAR_LINE);
 	}
 }
 

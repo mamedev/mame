@@ -343,10 +343,10 @@ GFXDECODE_END
 /* Sound Interfaces */
 
 // Handler called by the 3526 emulator when the internal timers cause an IRQ
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  cpunum_set_input_line(Machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpunum_set_input_line(machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM3526interface ym3526_interface =

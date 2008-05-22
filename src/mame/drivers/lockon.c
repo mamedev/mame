@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/flt_vol.h"
 #include "lockon.h"
@@ -441,9 +440,9 @@ static WRITE8_HANDLER( sound_vol )
 	flt_volume_set_volume(5, rgain);
 }
 
-static void ym2203_irq(int irq)
+static void ym2203_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, SOUND_CPU, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, SOUND_CPU, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( ym2203_out_b )

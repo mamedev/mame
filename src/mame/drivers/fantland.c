@@ -44,7 +44,6 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 ***************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
@@ -335,7 +334,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 	}
 }
 
-static void borntofi_adpcm_int(int voice)
+static void borntofi_adpcm_int(running_machine *machine, int voice)
 {
 	UINT8 *rom;
 	size_t   len;
@@ -849,9 +848,9 @@ static MACHINE_DRIVER_START( fantland )
 MACHINE_DRIVER_END
 
 
-static void galaxygn_sound_irq(int line)
+static void galaxygn_sound_irq(running_machine *machine, int line)
 {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
+	cpunum_set_input_line_and_vector(machine, 1, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
 static const struct YM2151interface galaxygn_ym2151_interface =
@@ -949,9 +948,9 @@ MACHINE_DRIVER_END
 
 
 
-static void wheelrun_ym3526_irqhandler(int state)
+static void wheelrun_ym3526_irqhandler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, state);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, state);
 }
 
 static const struct YM3526interface wheelrun_ym3526_interface =

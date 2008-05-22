@@ -119,7 +119,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/h6280/h6280.h"
 #include "deco16ic.h"
 #include "sound/2203intf.h"
@@ -532,9 +531,9 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 2,1,state);
+	cpunum_set_input_line(machine, 2,1,state);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

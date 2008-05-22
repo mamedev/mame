@@ -98,7 +98,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/asap/asap.h"
 #include "machine/atarigen.h"
 #include "audio/atarijsa.h"
@@ -226,7 +225,7 @@ static WRITE32_HANDLER( interrupt_control_w )
 		irq_state[0] = irq_state[1] = irq_state[2] = 0;
 
 	/* update the current state */
-	update_interrupts(Machine);
+	update_interrupts(machine);
 }
 
 

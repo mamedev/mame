@@ -18,7 +18,6 @@ Revisions:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "video/konamiic.h"
 #include "sound/3812intf.h"
@@ -311,20 +310,21 @@ static WRITE8_HANDLER( spy_3f90_w )
 	{
 		/* we should handle collision here */
 //AT
-/*
-int i;
+		if (0)
+		{
+			int i;
 
-logerror("collision test:\n");
-for (i = 0;i < 0xfe;i++)
-{
-    logerror("%02x ",pmcram[i]);
-    if (i == 0x0f || (i > 0x10 && (i - 0x10) % 14 == 13))
-        logerror("\n");
-}
-*/
+			logerror("collision test:\n");
+			for (i = 0;i < 0xfe;i++)
+			{
+				logerror("%02x ",pmcram[i]);
+				if (i == 0x0f || (i > 0x10 && (i - 0x10) % 14 == 13))
+				logerror("\n");
+			}
+		}
 		spy_collision();
 //ZT
-		cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 	}
 
 	old = data;
@@ -521,9 +521,9 @@ static const struct K007232_interface k007232_interface_2 =
 };
 
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, linestate);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

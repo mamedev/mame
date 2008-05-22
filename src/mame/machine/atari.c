@@ -40,7 +40,7 @@ static void a600xl_mmu(running_machine *machine, UINT8 new_mmu);
 
 static void pokey_reset(running_machine *machine);
 
-void atari_interrupt_cb(int mask)
+void atari_interrupt_cb(running_machine *machine, int mask)
 {
 
 	if (VERBOSE_POKEY)
@@ -69,7 +69,7 @@ void atari_interrupt_cb(int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	cpunum_set_input_line(Machine, 0, 0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
 /**************************************************************

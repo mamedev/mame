@@ -127,7 +127,6 @@ Dumped by Chackn
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "machine/segacrpt.h"
 #include "sound/2203intf.h"
@@ -533,9 +532,9 @@ static READ8_HANDLER( angelkds_sub_sound_r )
 }
 
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

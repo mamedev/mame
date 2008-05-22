@@ -77,7 +77,7 @@ static int flipscreen;
 
 static int layer_layout;
 
-static void (*update_irq_func)(void);	// some games trigger IRQ at blitter end, some don't
+static void (*update_irq_func)(running_machine *machine);	// some games trigger IRQ at blitter end, some don't
 
 // up to 8 layers, 2 images per layer (interleaved on screen)
 static UINT8 *dynax_pixmap[8][2];
@@ -503,7 +503,7 @@ popmessage("GFXROM OVER %08x",src);
 
 
 
-static void dynax_blitter_start(int flags)
+static void dynax_blitter_start(running_machine *machine, int flags)
 {
 	int blit_newsrc;
 
@@ -528,11 +528,11 @@ static void dynax_blitter_start(int flags)
 	if (update_irq_func)
 	{
 		dynax_blitter_irq = 1;
-		update_irq_func();
+		update_irq_func(machine);
 	}
 }
 
-static void jantouki_blitter_start(int flags)
+static void jantouki_blitter_start(running_machine *machine, int flags)
 {
 	int blit_newsrc;
 
@@ -557,11 +557,11 @@ static void jantouki_blitter_start(int flags)
 	if (update_irq_func)
 	{
 		dynax_blitter_irq = 1;
-		update_irq_func();
+		update_irq_func(machine);
 	}
 }
 
-static void jantouki_blitter2_start(int flags)
+static void jantouki_blitter2_start(running_machine *machine, int flags)
 {
 	int blit2_newsrc;
 
@@ -586,7 +586,7 @@ static void jantouki_blitter2_start(int flags)
 	if (update_irq_func)
 	{
 		dynax_blitter2_irq = 1;
-		update_irq_func();
+		update_irq_func(machine);
 	}
 }
 
@@ -650,7 +650,7 @@ WRITE8_HANDLER( dynax_blitter_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(data); break;
+		case 0: dynax_blitter_start(machine,data); break;
 		case 1:	blit_x		=	data; break;
 		case 2: blit_y		=	data; break;
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
@@ -665,7 +665,7 @@ WRITE8_HANDLER( tenkai_blitter_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(data); break;
+		case 0: dynax_blitter_start(machine,data); break;
 		case 1:	blit_x		=	data; break;
 		case 2: blit_y		=	data; break;
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
@@ -680,7 +680,7 @@ WRITE8_HANDLER( jantouki_blitter_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: jantouki_blitter_start(data); break;
+		case 0: jantouki_blitter_start(machine,data); break;
 		case 1:	blit_x		=	data; break;
 		case 2: blit_y		=	data; break;
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
@@ -694,7 +694,7 @@ WRITE8_HANDLER( jantouki_blitter2_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: jantouki_blitter2_start(data); break;
+		case 0: jantouki_blitter2_start(machine,data); break;
 		case 1:	blit2_x		=	data; break;
 		case 2: blit2_y		=	data; break;
 		case 3:	blit2_src	=	(blit2_src & 0xffff00) | (data << 0); break;

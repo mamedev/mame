@@ -2,7 +2,6 @@
   see DRIVER file for notes */
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 UINT32 *macrossp_scra_videoram, *macrossp_scra_videoregs;
@@ -44,7 +43,7 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 			break;
 
 		default:
-			color = mame_rand(Machine) & 7;
+			color = mame_rand(machine) & 7;
 			break;
 	}
 
@@ -79,7 +78,7 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 			break;
 
 		default:
-			color = mame_rand(Machine) & 7;
+			color = mame_rand(machine) & 7;
 			break;
 	}
 
@@ -114,7 +113,7 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 			break;
 
 		default:
-			color = mame_rand(Machine) & 7;
+			color = mame_rand(machine) & 7;
 			break;
 	}
 
@@ -232,7 +231,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					break;
 
 				default:
-					col = mame_rand(Machine);
+					col = mame_rand(machine);
 					break;
 			}
 

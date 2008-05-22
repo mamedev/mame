@@ -565,7 +565,7 @@ static WRITE32_HANDLER( hng64_videoram_w )
 
 static READ32_HANDLER( hng64_random_read )
 {
-	return mame_rand(Machine)&0xffffffff;
+	return mame_rand(machine)&0xffffffff;
 }
 
 
@@ -620,7 +620,7 @@ static WRITE32_HANDLER( hng64_pal_w )
 	a = ((paletteram32[offset] & 0xff000000) >>24);
 
 	// a sure ain't alpha.
-	// alpha_set_level(mame_rand(Machine)) ;
+	// alpha_set_level(mame_rand(machine)) ;
 	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
 
 	//if (a != 0)
@@ -638,7 +638,7 @@ static READ32_HANDLER( hng64_port_read )
 
 	if(offset==0x85b) return 0x00000010;
 
-	return mame_rand(Machine)&0xffffffff;
+	return mame_rand(machine)&0xffffffff;
 }
 
 
@@ -740,7 +740,7 @@ static READ32_HANDLER( hng64_dualport_r )
 		case 0x600: return no_machine_error_code;
 	}
 
-	return mame_rand(Machine)&0xffffffff;
+	return mame_rand(machine)&0xffffffff;
 	//return hng64_dualport[offset];
 }
 

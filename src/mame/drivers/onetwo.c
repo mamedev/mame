@@ -260,9 +260,9 @@ static VIDEO_UPDATE( onetwo )
 	return 0;
 }
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

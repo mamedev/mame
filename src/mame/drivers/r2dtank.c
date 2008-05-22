@@ -72,12 +72,12 @@ static WRITE8_HANDLER( flipscreen_w );
  *
  *************************************/
 
-static void main_cpu_irq(int state)
+static void main_cpu_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) |
 						 pia_get_irq_a(1) | pia_get_irq_b(1);
 
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

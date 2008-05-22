@@ -521,9 +521,9 @@ READ32_HANDLER(K001604_reg_r)
 
 
 
-static void voodoo_vblank_0(int param)
+static void voodoo_vblank_0(running_machine *machine, int param)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static VIDEO_START( nwktr )
@@ -962,12 +962,12 @@ static void jamma_w(int length)
 	//jamma_jvs_cmd_exec();
 }
 
-static void sound_irq_callback(int irq)
+static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
 static DRIVER_INIT( nwktr )

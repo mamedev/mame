@@ -31,8 +31,8 @@
 #include "drcuml.h"
 #include "drcumlsh.h"
 #include "drcumld.h"
-#include "mame.h"
 #include "deprecat.h"
+#include "mame.h"
 #include <stdarg.h>
 #include <setjmp.h>
 

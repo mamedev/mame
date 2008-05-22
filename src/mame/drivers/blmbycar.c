@@ -24,7 +24,6 @@ Check game speed, it depends on a bit we toggle..
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 /* Variables defined in video: */
@@ -94,7 +93,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
 	return	((pot_wheel & 0x80) ? 0x04 : 0) |
-			(mame_rand(Machine) & 0x08);
+			(mame_rand(machine) & 0x08);
 }
 
 

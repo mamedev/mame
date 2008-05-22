@@ -306,7 +306,7 @@ static READ16_HANDLER( lastfght_c00002_r )
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (mame_rand(Machine) & 0x1c00) | input_port_read_indexed(machine, 0);
+	return (mame_rand(machine) & 0x1c00) | input_port_read_indexed(machine, 0);
 }
 
 static READ16_HANDLER( lastfght_c00004_r )

@@ -33,7 +33,6 @@ Merge with other Video System games ?
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "gstriker.h"
 #include "sound/2610intf.h"
 
@@ -271,12 +270,12 @@ GFXDECODE_END
 
 /*** MORE SOUND RELATED ******************************************************/
 
-static void gs_ym2610_irq(int irq)
+static void gs_ym2610_irq(running_machine *machine, int irq)
 {
 	if (irq)
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

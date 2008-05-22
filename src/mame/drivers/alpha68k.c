@@ -1965,9 +1965,9 @@ static const struct YM2203interface ym2203_interface =
 	}
 };
 
-static void YM3812_irq(int param)
+static void YM3812_irq(running_machine *machine, int param)
 {
-	cpunum_set_input_line(Machine, 1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct YM3812interface ym3812_interface =

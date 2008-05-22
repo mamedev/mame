@@ -631,12 +631,12 @@ static WRITE8_HANDLER( pia_portb_out )
  *
  *************************************/
 
-static void via_irq(int state)
+static void via_irq(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -781,7 +781,7 @@ static NVRAM_HANDLER( itech32 )
 	else
 	{
 		for (i = 0x80; i < main_ram_size; i++)
-			((UINT8 *)main_ram)[i] = mame_rand(Machine);
+			((UINT8 *)main_ram)[i] = mame_rand(machine);
 
 		/* due to accessing uninitialized RAM, we need this hack */
 		if (is_drivedge)
@@ -801,7 +801,7 @@ static NVRAM_HANDLER( itech020 )
 	else
 	{
 		for (i = 0; i < nvram_size; i++)
-			((UINT8 *)nvram)[i] = mame_rand(Machine);
+			((UINT8 *)nvram)[i] = mame_rand(machine);
 	}
 }
 

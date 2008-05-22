@@ -137,7 +137,6 @@ Adder hardware:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 
 #include "video/bfm_adr2.h"
@@ -512,7 +511,7 @@ static INTERRUPT_GEN( timer_irq )
 		watchdog_cnt++;
 		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
-			mame_schedule_soft_reset(Machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
+			mame_schedule_soft_reset(machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
 			on_scorpion2_reset();
 			return;
 		}

@@ -56,7 +56,7 @@
 struct _z80pio
 {
 	UINT8 vector[2];                      /* interrupt vector               */
-	void (*intr)(int which);            /* interrupt callbacks            */
+	void (*intr)(running_machine *, int which);            /* interrupt callbacks            */
 	void (*rdyr[2])(int data);          /* RDY active callback            */
 	read8_machine_func  port_read[2];     /* port read callbacks            */
 	write8_machine_func port_write[2];    /* port write callbacks           */
@@ -103,7 +103,7 @@ static void interrupt_check(int which)
 
 	/* if we have a callback, update it with the current state */
 	if (pio->intr)
-		(*pio->intr)((z80pio_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		(*pio->intr)(Machine, (z80pio_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

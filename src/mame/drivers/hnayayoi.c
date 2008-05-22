@@ -595,10 +595,10 @@ INPUT_PORTS_END
 
 
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
 popmessage("irq");
-//  cpunum_set_input_line(Machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpunum_set_input_line(machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

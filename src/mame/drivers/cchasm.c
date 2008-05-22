@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/vector.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
@@ -58,9 +57,9 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_READWRITE(z80ctc_0_r,z80ctc_0_w)
 ADDRESS_MAP_END
 
-static void cchasm_6840_irq(int state)
+static void cchasm_6840_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, 4, state?ASSERT_LINE:CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, state?ASSERT_LINE:CLEAR_LINE);
 }
 static const ptm6840_interface cchasm_6840_intf =
 {

@@ -26,7 +26,6 @@ To do:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/8255ppi.h"
 #include "machine/eeprom.h"
 #include "sound/3812intf.h"
@@ -427,9 +426,9 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static void soundirq(int state)
+static void soundirq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static const struct YM3812interface lordgun_ym3812_interface =

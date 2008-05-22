@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
@@ -233,9 +232,9 @@ static INPUT_PORTS_START( goal92 )
 INPUT_PORTS_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -248,7 +247,7 @@ static const struct YM2203interface ym2203_interface =
 	irqhandler
 };
 
-static void goal92_adpcm_int(int data)
+static void goal92_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle = 0;
 
@@ -257,7 +256,7 @@ static void goal92_adpcm_int(int data)
 
 	toggle ^= 1;
 	if(toggle)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface msm5205_interface =

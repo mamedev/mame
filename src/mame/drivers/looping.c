@@ -52,7 +52,6 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/5220intf.h"
@@ -330,9 +329,9 @@ static WRITE8_HANDLER( looping_souint_clr )
 }
 
 
-static void looping_spcint(int state)
+static void looping_spcint(running_machine *machine, int state)
 {
-	cpunum_set_input_line_and_vector(Machine, 1, 0, state, 6);
+	cpunum_set_input_line_and_vector(machine, 1, 0, state, 6);
 }
 
 

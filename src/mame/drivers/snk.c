@@ -247,11 +247,11 @@ INTERRUPT_GEN( snk_irq_BA )
 }
 
 // NMI handshakes between CPUs are determined to be much simpler
-READ8_HANDLER ( snk_cpuA_nmi_trigger_r ) { cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
-WRITE8_HANDLER( snk_cpuA_nmi_ack_w ) { cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, CLEAR_LINE); }
+READ8_HANDLER ( snk_cpuA_nmi_trigger_r ) { cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
+WRITE8_HANDLER( snk_cpuA_nmi_ack_w ) { cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE); }
 
-READ8_HANDLER ( snk_cpuB_nmi_trigger_r ) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
-WRITE8_HANDLER( snk_cpuB_nmi_ack_w ) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, CLEAR_LINE); }
+READ8_HANDLER ( snk_cpuB_nmi_trigger_r ) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
+WRITE8_HANDLER( snk_cpuB_nmi_ack_w ) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE); }
 
 /*********************************************************************/
 
@@ -357,11 +357,11 @@ static READ8_HANDLER( snk_sound_register_r ){
 	return snk_sound_register;// | 0x2; /* hack; lets chopper1 play music */
 }
 
-static void snk_sound_callback0_w( int state ){ /* ? */
+static void snk_sound_callback0_w( running_machine *machine, int state ){ /* ? */
 	if( state ) snk_sound_register |= 0x01;
 }
 
-static void snk_sound_callback1_w( int state ){ /* ? */
+static void snk_sound_callback1_w( running_machine *machine, int state ){ /* ? */
 	if( state ) snk_sound_register |= 0x02;
 }
 

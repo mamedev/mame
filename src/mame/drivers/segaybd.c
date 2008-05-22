@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "system16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
@@ -65,7 +64,7 @@ static void yboard_generic_init(void)
  *
  *************************************/
 
-static void update_main_irqs(void)
+static void update_main_irqs(running_machine *machine)
 {
 	int irq = 0;
 
@@ -78,16 +77,16 @@ static void update_main_irqs(void)
 	/* assert the lines that are live, or clear everything if nothing is live */
 	if (irq != 0)
 	{
-		cpunum_set_input_line(Machine, 0, irq, ASSERT_LINE);
-		cpunum_set_input_line(Machine, 1, irq, ASSERT_LINE);
-		cpunum_set_input_line(Machine, 2, irq, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, irq, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, irq, ASSERT_LINE);
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
 	}
 	else
 	{
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 1, 7, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 2, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, 7, CLEAR_LINE);
 	}
 }
 
@@ -161,7 +160,7 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* update IRQs on the main CPU */
-	update_main_irqs();
+	update_main_irqs(machine);
 
 	/* come back at the next appropriate scanline */
 	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
@@ -202,9 +201,9 @@ static MACHINE_RESET( yboard )
  *
  *************************************/
 
-static void sound_cpu_irq(int state)
+static void sound_cpu_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 3, 0, state);
+	cpunum_set_input_line(machine, 3, 0, state);
 }
 
 

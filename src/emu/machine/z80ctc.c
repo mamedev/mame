@@ -80,7 +80,7 @@ struct _z80ctc
 	UINT32 clock;				/* system clock */
 	attotime period16;			/* 16/system clock */
 	attotime period256;		/* 256/system clock */
-	void (*intr)(int which);	/* interrupt callback */
+	void (*intr)(running_machine *machine, int which);	/* interrupt callback */
 	write8_machine_func zc[4];		/* zero crossing callbacks */
 	UINT8 notimer;				/* no timer masks */
 	UINT16 mode[4];				/* current mode */
@@ -111,7 +111,7 @@ static void interrupt_check(int which)
 
 	/* if we have a callback, update it with the current state */
 	if (ctc->intr)
-		(*ctc->intr)((z80ctc_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		(*ctc->intr)(Machine, (z80ctc_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

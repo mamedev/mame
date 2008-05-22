@@ -261,7 +261,7 @@ INLINE void update_interrupts(int which)
 			currptr->status_reg &= ~0x80;
 
 		if (currptr->intf->irq_func)
-			(currptr->intf->irq_func)(currptr->IRQ);
+			(currptr->intf->irq_func)(Machine, currptr->IRQ);
 	}
 }
 

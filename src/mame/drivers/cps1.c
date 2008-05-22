@@ -153,7 +153,6 @@ Stephh's log (2006.09.20) :
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
@@ -3503,9 +3502,9 @@ GFXDECODE_END
 
 
 
-static void cps1_irq_handler_mus(int irq)
+static void cps1_irq_handler_mus(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

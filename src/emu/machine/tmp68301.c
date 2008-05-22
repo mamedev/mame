@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/tmp68301.h"
 
 UINT16 *tmp68301_regs;
@@ -120,7 +119,7 @@ MACHINE_RESET( tmp68301 )
 }
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	int i;
 
@@ -146,7 +145,7 @@ static void update_irq_state(void)
 
 			tmp68301_IE[i] = 0;		// Interrupts are edge triggerred
 
-			cpunum_set_input_line(Machine, 0,level,HOLD_LINE);
+			cpunum_set_input_line(machine, 0,level,HOLD_LINE);
 		}
 	}
 }
@@ -174,7 +173,7 @@ WRITE16_HANDLER( tmp68301_regs_w )
 	}
 }
 
-void tmp68301_external_interrupt_0()	{ tmp68301_IE[0] = 1;	update_irq_state(); }
-void tmp68301_external_interrupt_1()	{ tmp68301_IE[1] = 1;	update_irq_state(); }
-void tmp68301_external_interrupt_2()	{ tmp68301_IE[2] = 1;	update_irq_state(); }
+void tmp68301_external_interrupt_0(running_machine *machine)	{ tmp68301_IE[0] = 1;	update_irq_state(machine); }
+void tmp68301_external_interrupt_1(running_machine *machine)	{ tmp68301_IE[1] = 1;	update_irq_state(machine); }
+void tmp68301_external_interrupt_2(running_machine *machine)	{ tmp68301_IE[2] = 1;	update_irq_state(machine); }
 

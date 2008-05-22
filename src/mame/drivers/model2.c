@@ -1687,12 +1687,12 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(int irq)
+static void scsp_irq(running_machine *machine, int irq)
 {
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(Machine, 1, irq, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, irq, PULSE_LINE);
 	}
 }
 

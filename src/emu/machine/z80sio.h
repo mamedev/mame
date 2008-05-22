@@ -23,7 +23,7 @@ typedef struct _z80sio_interface z80sio_interface;
 struct _z80sio_interface
 {
 	int baseclock;
-	void (*irq_cb)(int state);
+	void (*irq_cb)(running_machine *machine, int state);
 	write8_machine_func dtr_changed_cb;
 	write8_machine_func rts_changed_cb;
 	write8_machine_func break_changed_cb;

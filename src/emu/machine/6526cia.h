@@ -20,7 +20,7 @@ typedef struct _cia6526_interface cia6526_interface;
 struct _cia6526_interface
 {
 	cia_type_t type;
-	void (*irq_func)(int state);
+	void (*irq_func)(running_machine *machine, int state);
 	int clock;
 	int tod_clock;
 

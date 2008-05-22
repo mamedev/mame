@@ -673,7 +673,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 	{
 		case 0:
 			/* VBlank is connected to INT1 (external interrupts pin 1) */
-			tmp68301_external_interrupt_1();
+			tmp68301_external_interrupt_1(machine);
 			break;
 	}
 }

@@ -530,11 +530,11 @@ static WRITE8_HANDLER( csdeluxe_portb_w )
 	if (~z_mask & 0x20)  csdeluxe_status = (csdeluxe_status & ~2) | ((data >> 4) & 2);
 }
 
-static void csdeluxe_irq(int state)
+static void csdeluxe_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
-  	cpunum_set_input_line(Machine, csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+  	cpunum_set_input_line(machine, csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
@@ -653,11 +653,11 @@ static WRITE8_HANDLER( soundsgood_portb_w )
 	if (~z_mask & 0x20)  soundsgood_status = (soundsgood_status & ~2) | ((data >> 4) & 2);
 }
 
-static void soundsgood_irq(int state)
+static void soundsgood_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
 
-  	cpunum_set_input_line(Machine, soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+  	cpunum_set_input_line(machine, soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
@@ -747,11 +747,11 @@ static WRITE8_HANDLER( turbocs_portb_w )
 	turbocs_status = (data >> 4) & 3;
 }
 
-static void turbocs_irq(int state)
+static void turbocs_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
-	cpunum_set_input_line(Machine, turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
@@ -880,11 +880,11 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 	squawkntalk_tms_strobes = data;
 }
 
-static void squawkntalk_irq(int state)
+static void squawkntalk_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
-	cpunum_set_input_line(Machine, squawkntalk_sound_cpu, M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, squawkntalk_sound_cpu, M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )

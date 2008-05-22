@@ -5,7 +5,7 @@
 
 struct YMF278B_interface {
 	int region;			/* memory region of sample ROMs */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 
 READ8_HANDLER( YMF278B_status_port_0_r );

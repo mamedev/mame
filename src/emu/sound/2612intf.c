@@ -31,7 +31,7 @@ struct ym2612_info
 static void IRQHandler(void *param,int irq)
 {
 	struct ym2612_info *info = param;
-	if(info->intf->handler) info->intf->handler(irq);
+	if(info->intf->handler) info->intf->handler(Machine, irq);
 }
 
 /* Timer overflow callback from timer.c */

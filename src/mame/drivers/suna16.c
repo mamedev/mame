@@ -1018,9 +1018,9 @@ MACHINE_DRIVER_END
                             Best Of Best
 ***************************************************************************/
 
-static void bestbest_ym3526_irqhandler(int state)
+static void bestbest_ym3526_irqhandler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_IRQ0, state);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, state);
 }
 
 static const struct YM3526interface bestbest_ym3526_interface =

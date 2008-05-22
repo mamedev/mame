@@ -38,7 +38,6 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/es5506.h"
 
 /*** README INFO **************************************************************
@@ -511,13 +510,13 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
 	logerror("ES5506 irq %d\n",irq);
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-//  cpunum_set_input_line(Machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpunum_set_input_line(machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct ES5506interface es5506_interface =

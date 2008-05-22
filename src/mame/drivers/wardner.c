@@ -124,7 +124,6 @@ out:
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
 #include "sound/3812intf.h"
@@ -443,9 +442,9 @@ static const gfx_layout spritelayout =
 
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

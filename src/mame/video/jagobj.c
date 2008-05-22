@@ -900,7 +900,7 @@ static UINT32 *process_branch(UINT32 *objdata, int vc, int logit)
  *
  *************************************/
 
-static void process_object_list(int vc, UINT16 *_scanline)
+static void process_object_list(running_machine *machine, int vc, UINT16 *_scanline)
 {
 	int done = 0, count = 0;
 	UINT32 *objdata;
@@ -960,7 +960,7 @@ static void process_object_list(int vc, UINT16 *_scanline)
 					fprintf(stderr, "stop int=%d\n", interrupt);
 #endif
 					cpu_irq_state |= 4;
-					update_cpu_irq();
+					update_cpu_irq(machine);
 				}
 				break;
 			}

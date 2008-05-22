@@ -40,8 +40,8 @@ struct _pia6821_interface
 	write8_machine_func out_b_func;
 	write8_machine_func out_ca2_func;
 	write8_machine_func out_cb2_func;
-	void (*irq_a_func)(int state);
-	void (*irq_b_func)(int state);
+	void (*irq_a_func)(running_machine *machine, int state);
+	void (*irq_b_func)(running_machine *machine, int state);
 };
 
 

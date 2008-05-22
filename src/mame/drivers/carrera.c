@@ -42,7 +42,6 @@ Emulation Notes:
 #define MASTER_CLOCK 22118400
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
@@ -266,7 +265,7 @@ static VIDEO_UPDATE(carrera)
 
 static READ8_HANDLER( unknown_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 /* these are set as input, but I have no idea which input port it uses is for the AY */

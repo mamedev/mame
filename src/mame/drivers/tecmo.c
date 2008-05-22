@@ -46,7 +46,6 @@ f80b      ????
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
@@ -98,7 +97,7 @@ static WRITE8_HANDLER( tecmo_adpcm_vol_w )
 {
 	MSM5205_set_volume(0,(data & 0x0f) * 100 / 15);
 }
-static void tecmo_adpcm_int(int num)
+static void tecmo_adpcm_int(running_machine *machine, int num)
 {
 	static int adpcm_data = -1;
 
@@ -545,9 +544,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
 static const struct YM3526interface ym3812_interface =

@@ -465,14 +465,14 @@ static UINT32 cmos_write_enabled;
  *
  *************************************/
 
-static void vblank_assert(int state);
-static void update_vblank_irq(void);
+static void vblank_assert(running_machine *machine, int state);
+static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
 static void galileo_perform_dma(running_machine *machine, int which);
-static void voodoo_stall(int stall);
+static void voodoo_stall(running_machine *machine, int stall);
 static void widget_reset(void);
-static void update_widget_irq(void);
+static void update_widget_irq(running_machine *machine);
 
 
 
@@ -571,7 +571,7 @@ static MACHINE_RESET( seattle )
 	if (board_config == SEATTLE_WIDGET_CONFIG)
 		widget_reset();
 	if (board_config == FLAGSTAFF_CONFIG)
-		smc91c94_reset();
+		smc91c94_reset(machine);
 }
 
 
@@ -595,17 +595,17 @@ static void ide_interrupt(const device_config *device, int state)
  *
  *************************************/
 
-static void ethernet_interrupt(int state)
+static void ethernet_interrupt(running_machine *machine, int state)
 {
 	ethernet_irq_state = state;
 	if (board_config == FLAGSTAFF_CONFIG)
 	{
 		UINT8 assert = ethernet_irq_state && (*interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
 		if (ethernet_irq_num != 0)
-			cpunum_set_input_line(Machine, 0, ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else if (board_config == SEATTLE_WIDGET_CONFIG)
-		update_widget_irq();
+		update_widget_irq(machine);
 }
 
 
@@ -622,9 +622,9 @@ static const struct smc91c9x_interface ethernet_intf =
  *
  *************************************/
 
-static void ioasic_irq(int state)
+static void ioasic_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, IOASIC_IRQ_NUM, state);
+	cpunum_set_input_line(machine, 0, IOASIC_IRQ_NUM, state);
 }
 
 
@@ -690,8 +690,8 @@ static WRITE32_HANDLER( interrupt_config_w )
 	}
 
 	/* update the states */
-	update_vblank_irq();
-	ethernet_interrupt(ethernet_irq_state);
+	update_vblank_irq(machine);
+	ethernet_interrupt(machine, ethernet_irq_state);
 }
 
 
@@ -702,9 +702,9 @@ static WRITE32_HANDLER( seattle_interrupt_enable_w )
 	if (old != *interrupt_enable)
 	{
 		if (vblank_latch)
-			update_vblank_irq();
+			update_vblank_irq(machine);
 		if (ethernet_irq_state)
-			ethernet_interrupt(ethernet_irq_state);
+			ethernet_interrupt(machine, ethernet_irq_state);
 	}
 }
 
@@ -716,7 +716,7 @@ static WRITE32_HANDLER( seattle_interrupt_enable_w )
  *
  *************************************/
 
-static void update_vblank_irq(void)
+static void update_vblank_irq(running_machine *machine)
 {
 	int state = CLEAR_LINE;
 
@@ -727,7 +727,7 @@ static void update_vblank_irq(void)
 	/* if the VBLANK has been latched, and the interrupt is enabled, assert */
 	if (vblank_latch && (*interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
 		state = ASSERT_LINE;
-	cpunum_set_input_line(Machine, 0, vblank_irq_num, state);
+	cpunum_set_input_line(machine, 0, vblank_irq_num, state);
 }
 
 
@@ -735,11 +735,11 @@ static WRITE32_HANDLER( vblank_clear_w )
 {
 	/* clear the latch and update the IRQ */
 	vblank_latch = 0;
-	update_vblank_irq();
+	update_vblank_irq(machine);
 }
 
 
-static void vblank_assert(int state)
+static void vblank_assert(running_machine *machine, int state)
 {
 	/* cache the raw state */
 	vblank_state = state;
@@ -748,7 +748,7 @@ static void vblank_assert(int state)
 	if ((state && !(*interrupt_enable & 0x100)) || (!state && (*interrupt_enable & 0x100)))
 	{
 		vblank_latch = 1;
-		update_vblank_irq();
+		update_vblank_irq(machine);
 	}
 }
 
@@ -881,14 +881,14 @@ static void pci_ide_w(UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static void update_galileo_irqs(void)
+static void update_galileo_irqs(running_machine *machine)
 {
 	int state = CLEAR_LINE;
 
 	/* if any unmasked interrupts are live, we generate */
 	if (galileo.reg[GREG_INT_STATE] & galileo.reg[GREG_INT_MASK])
 		state = ASSERT_LINE;
-	cpunum_set_input_line(Machine, 0, GALILEO_IRQ_NUM, state);
+	cpunum_set_input_line(machine, 0, GALILEO_IRQ_NUM, state);
 
 	if (LOG_GALILEO)
 		logerror("Galileo IRQ %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared");
@@ -916,7 +916,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
 
 	/* trigger the interrupt */
 	galileo.reg[GREG_INT_STATE] |= 1 << (GINT_T0EXP_SHIFT + which);
-	update_galileo_irqs();
+	update_galileo_irqs(machine);
 }
 
 
@@ -942,7 +942,7 @@ static int galileo_dma_fetch_next(int which)
 		if (galileo.reg[GREG_DMA0_CONTROL + which] & 0x400)
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs();
+			update_galileo_irqs(Machine);
 		}
 		galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
@@ -1051,7 +1051,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 		if (!(galileo.reg[GREG_DMA0_CONTROL + which] & 0x400))
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs();
+			update_galileo_irqs(machine);
 		}
 	} while (galileo_dma_fetch_next(which));
 
@@ -1242,7 +1242,7 @@ static WRITE32_HANDLER( galileo_w )
 			if (LOG_GALILEO)
 				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			galileo.reg[offset] = oldata & data;
-			update_galileo_irqs();
+			update_galileo_irqs(machine);
 			break;
 
 		case GREG_CONFIG_DATA:
@@ -1320,7 +1320,7 @@ static WRITE32_HANDLER( seattle_voodoo_w )
 }
 
 
-static void voodoo_stall(int stall)
+static void voodoo_stall(running_machine *machine, int stall)
 {
 	/* set the new state */
 	voodoo_stalled = stall;
@@ -1494,11 +1494,11 @@ static void widget_reset(void)
 	UINT8 saved_irq = widget.irq_num;
 	memset(&widget, 0, sizeof(widget));
 	widget.irq_num = saved_irq;
-	smc91c94_reset();
+	smc91c94_reset(Machine);
 }
 
 
-static void update_widget_irq(void)
+static void update_widget_irq(running_machine *machine)
 {
 	UINT8 state = ethernet_irq_state << WINT_ETHERNET_SHIFT;
 	UINT8 mask = widget.irq_mask;
@@ -1506,7 +1506,7 @@ static void update_widget_irq(void)
 
 	/* update the IRQ state */
 	if (widget.irq_num != 0)
-		cpunum_set_input_line(Machine, 0, widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1553,7 +1553,7 @@ static WRITE32_HANDLER( widget_w )
 
 		case WREG_INTERRUPT:
 			widget.irq_mask = data;
-			update_widget_irq();
+			update_widget_irq(machine);
 			break;
 
 		case WREG_ANALOG:

@@ -194,7 +194,7 @@ struct _SCSP
 	unsigned char *SCSPRAM;
 	UINT32 SCSPRAM_LENGTH;
 	char Master;
-	void (*Int68kCB)(int irq);
+	void (*Int68kCB)(running_machine *machine, int irq);
 	sound_stream * stream;
 
 	INT32 *buffertmpl,*buffertmpr;
@@ -226,7 +226,7 @@ struct _SCSP
 	struct _SCSPDSP DSP;
 };
 
-static void dma_scsp(struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
+static void dma_scsp(running_machine *machine, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
 #define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
 #define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
 #define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
@@ -259,6 +259,8 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 {
 	UINT32 pend=SCSP->udata.data[0x20/2];
 	UINT32 en=SCSP->udata.data[0x1e/2];
+	running_machine *machine = Machine;
+
 	if(SCSP->MidiW!=SCSP->MidiR)
 	{
 		SCSP->udata.data[0x20/2] |= 8;
@@ -269,47 +271,48 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 	if(pend&0x40)
 		if(en&0x40)
 		{
-			SCSP->Int68kCB(SCSP->IrqTimA);
+			SCSP->Int68kCB(machine, SCSP->IrqTimA);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
-			SCSP->Int68kCB(SCSP->IrqTimBC);
+			SCSP->Int68kCB(machine, SCSP->IrqTimBC);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
-			SCSP->Int68kCB(SCSP->IrqTimBC);
+			SCSP->Int68kCB(machine, SCSP->IrqTimBC);
 			return;
 		}
 	if(pend&8)
 		if (en&8)
 		{
-			SCSP->Int68kCB(SCSP->IrqMidi);
+			SCSP->Int68kCB(machine, SCSP->IrqMidi);
 			SCSP->udata.data[0x20/2] &= ~8;
 			return;
 		}
 
-	SCSP->Int68kCB(0);
+	SCSP->Int68kCB(machine, 0);
 }
 
 static void ResetInterrupts(struct _SCSP *SCSP)
 {
 	UINT32 reset = SCSP->udata.data[0x22/2];
+	running_machine *machine = Machine;
 
 	if (reset & 0x40)
 	{
-		SCSP->Int68kCB(-SCSP->IrqTimA);
+		SCSP->Int68kCB(machine, -SCSP->IrqTimA);
 	}
 	if (reset & 0x180)
 	{
-		SCSP->Int68kCB(-SCSP->IrqTimBC);
+		SCSP->Int68kCB(machine, -SCSP->IrqTimBC);
 	}
 	if (reset & 0x8)
 	{
-		SCSP->Int68kCB(-SCSP->IrqMidi);
+		SCSP->Int68kCB(machine, -SCSP->IrqMidi);
 	}
 
 	CheckPendingIRQ(SCSP);
@@ -833,7 +836,7 @@ static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
 				unsigned short v=SCSP->udata.data[0x5/2];
 				v&=0xff00;
 				v|=SCSP->MidiStack[SCSP->MidiR];
-				SCSP[0].Int68kCB(-SCSP->IrqMidi);	// cancel the IRQ
+				SCSP[0].Int68kCB(Machine, -SCSP->IrqMidi);	// cancel the IRQ
 				if(SCSP->MidiR!=SCSP->MidiW)
 				{
 					++SCSP->MidiR;
@@ -1147,7 +1150,7 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 	}
 }
 
-static void dma_scsp(struct _SCSP *SCSP)
+static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 {
 	static UINT16 tmp_dma[3], *scsp_regs;
 
@@ -1195,7 +1198,7 @@ static void dma_scsp(struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-	cpunum_set_input_line(Machine, 2,dma_transfer_end,HOLD_LINE);
+	cpunum_set_input_line(machine, 2,dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1302,7 +1305,7 @@ WRITE16_HANDLER( SCSP_0_w )
 		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(SCSP);
+			dma_scsp(machine, SCSP);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;

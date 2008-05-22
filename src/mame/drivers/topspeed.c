@@ -377,7 +377,7 @@ static READ16_HANDLER( topspeed_motor_r )
 	switch (offset)
 	{
 		case 0x0:
-			return (mame_rand(Machine) &0xff);	/* motor status ?? */
+			return (mame_rand(machine) &0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */
@@ -416,7 +416,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68
 
 static int adpcm_pos;
 
-static void topspeed_msm5205_vck(int chip)
+static void topspeed_msm5205_vck(running_machine *machine, int chip)
 {
 	static int adpcm_data = -1;
 
@@ -657,9 +657,9 @@ GFXDECODE_END
 
 /* handler called by the YM2151 emulator when the internal timers cause an IRQ */
 
-static void irq_handler(int irq)	/* assumes Z80 sandwiched between 68Ks */
+static void irq_handler(running_machine *machine, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

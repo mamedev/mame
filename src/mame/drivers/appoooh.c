@@ -56,7 +56,7 @@ Credits:
 static UINT8 *adpcmptr = 0;
 static int appoooh_adpcm_data;
 
-static void appoooh_adpcm_int(int num)
+static void appoooh_adpcm_int(running_machine *machine, int num)
 {
 	if( adpcmptr )
 	{

@@ -3684,9 +3684,9 @@ static const struct YM2203interface ym2203_nmk004_interface =
 	NMK004_irq
 };
 
-static void ym2203_irqhandler(int irq)
+static void ym2203_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =
@@ -5024,9 +5024,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface afega_ym2151_intf =

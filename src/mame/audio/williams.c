@@ -65,10 +65,10 @@ static UINT8 williams_pianum;
 
 static void init_audio_state(running_machine *machine);
 
-static void cvsd_ym2151_irq(int state);
-static void adpcm_ym2151_irq(int state);
-static void cvsd_irqa(int state);
-static void cvsd_irqb(int state);
+static void cvsd_ym2151_irq(running_machine *machine, int state);
+static void adpcm_ym2151_irq(running_machine *machine, int state);
+static void cvsd_irqa(running_machine *machine, int state);
+static void cvsd_irqb(running_machine *machine, int state);
 
 static WRITE8_HANDLER( cvsd_bank_select_w );
 static READ8_HANDLER( cvsd_pia_r );
@@ -404,21 +404,21 @@ static void init_audio_state(running_machine *machine)
     CVSD IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-static void cvsd_ym2151_irq(int state)
+static void cvsd_ym2151_irq(running_machine *machine, int state)
 {
 	pia_set_input_ca1(williams_pianum, !state);
 }
 
 
-static void cvsd_irqa(int state)
+static void cvsd_irqa(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void cvsd_irqb(int state)
+static void cvsd_irqb(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, sound_cpunum, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -427,9 +427,9 @@ static void cvsd_irqb(int state)
     ADPCM IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-static void adpcm_ym2151_irq(int state)
+static void adpcm_ym2151_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

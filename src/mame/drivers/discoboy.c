@@ -253,7 +253,7 @@ static READ8_HANDLER( rambank2_r )
 		printf( "unk rb2_r\n");
 	}
 
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER( rambank2_w )
@@ -336,7 +336,7 @@ static int adpcm_data = 0x80;
 //  adpcm_data = data;
 //}
 
-static void splash_msm5205_int(int data)
+static void splash_msm5205_int(running_machine *machine, int data)
 {
 	MSM5205_data_w(0,adpcm_data >> 4);
 //  adpcm_data = (adpcm_data << 4) & 0xf0;

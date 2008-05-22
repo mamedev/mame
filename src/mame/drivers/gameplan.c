@@ -64,7 +64,6 @@ TODO:
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6532riot.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
@@ -167,9 +166,9 @@ static const struct via6522_interface via_2_interface =
  *
  *************************************/
 
-static void r6532_irq(int state)
+static void r6532_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 

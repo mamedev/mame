@@ -186,9 +186,9 @@ static INPUT_PORTS_START( agress )
 INPUT_PORTS_END
 
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
-static void blockout_irq_handler(int irq)
+static void blockout_irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line_and_vector(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE,0xff);
+	cpunum_set_input_line_and_vector(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE,0xff);
 }
 
 static const struct YM2151interface ym2151_interface =

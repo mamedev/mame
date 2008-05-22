@@ -20,7 +20,6 @@ Notes:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/z80ctc.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
@@ -487,14 +486,14 @@ static WRITE8_HANDLER( tmpz84c011_1_dir_pd_w )	{ pio_dir[8] = data; }
 static WRITE8_HANDLER( tmpz84c011_1_dir_pe_w )	{ pio_dir[9] = data; }
 
 
-static void ctc0_interrupt(int state)
+static void ctc0_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
-static void ctc1_interrupt(int state)
+static void ctc1_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 /* CTC of main cpu, ch0 trigger is vblank */

@@ -65,7 +65,6 @@ conversion kit which could be applied to a bootleg double dragon :-p?
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
@@ -348,9 +347,9 @@ static WRITE8_HANDLER( ddragon2_sub_irq_w )
 }
 
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -458,7 +457,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 }
 
 
-static void dd_adpcm_int(int chip)
+static void dd_adpcm_int(running_machine *machine, int chip)
 {
 	static int adpcm_data[2] = { -1, -1 };
 

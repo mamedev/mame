@@ -36,6 +36,7 @@
 #include <math.h>
 #include "sndintrf.h"
 #include "cpuintrf.h"
+#include "deprecat.h"
 #include "es5503.h"
 #include "streams.h"
 #include "state.h"
@@ -67,7 +68,7 @@ typedef struct
 	int index;
 	sound_stream * stream;
 
-	void (*irq_callback)(int);	// IRQ callback
+	void (*irq_callback)(running_machine *machine, int);	// IRQ callback
 
 	read8_machine_func adc_read;		// callback for the 5503's built-in analog to digital converter
 
@@ -127,7 +128,7 @@ static void es5503_halt_osc(ES5503Chip *chip, int onum, int type, UINT32 *accumu
 
 		if (chip->irq_callback)
 		{
-			chip->irq_callback(1);
+			chip->irq_callback(Machine, 1);
 		}
 	}
 }
@@ -347,7 +348,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 
 						if (chip->irq_callback)
 						{
-							chip->irq_callback(0);
+							chip->irq_callback(machine, 0);
 						}
 						break;
 					}
@@ -360,7 +361,7 @@ READ8_HANDLER(ES5503_reg_0_r)
 					{
 						if (chip->irq_callback)
 						{
-							chip->irq_callback(1);
+							chip->irq_callback(machine, 1);
 						}
 						break;
 					}

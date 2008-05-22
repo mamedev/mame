@@ -175,7 +175,7 @@ struct _AICA
 	unsigned char *AICARAM;
 	UINT32 AICARAM_LENGTH, RAM_MASK, RAM_MASK16;
 	char Master;
-	void (*IntARMCB)(int irq);
+	void (*IntARMCB)(running_machine *machine, int irq);
 	sound_stream * stream;
 
 	INT32 *buffertmpl, *buffertmpr;
@@ -233,10 +233,12 @@ static void ResetInterrupts(struct _AICA *AICA)
 {
 #if 0
 	UINT32 reset = AICA->udata.data[0xa4/2];
+	running_machine *machine = Machine;
+
 	if (reset & 0x40)
-		AICA->IntARMCB(-AICA->IrqTimA);
+		AICA->IntARMCB(machine, -AICA->IrqTimA);
 	if (reset & 0x180)
-		AICA->IntARMCB(-AICA->IrqTimBC);
+		AICA->IntARMCB(machine, -AICA->IrqTimBC);
 #endif
 }
 
@@ -244,10 +246,12 @@ static void CheckPendingIRQ(struct _AICA *AICA)
 {
 	UINT32 pend=AICA->udata.data[0xa0/2];
 	UINT32 en=AICA->udata.data[0x9c/2];
+	running_machine *machine = Machine;
+
 	if(AICA->MidiW!=AICA->MidiR)
 	{
 		AICA->IRQL = AICA->IrqMidi;
-		AICA->IntARMCB(1);
+		AICA->IntARMCB(machine, 1);
 		return;
 	}
 	if(!pend)
@@ -256,21 +260,21 @@ static void CheckPendingIRQ(struct _AICA *AICA)
 		if(en&0x40)
 		{
 			AICA->IRQL = AICA->IrqTimA;
-			AICA->IntARMCB(1);
+			AICA->IntARMCB(machine, 1);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
 			AICA->IRQL = AICA->IrqTimBC;
-			AICA->IntARMCB(1);
+			AICA->IntARMCB(machine, 1);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
 			AICA->IRQL = AICA->IrqTimBC;
-			AICA->IntARMCB(1);
+			AICA->IntARMCB(machine, 1);
 			return;
 		}
 }
@@ -856,7 +860,7 @@ static void AICA_UpdateRegR(struct _AICA *AICA, int reg)
 				unsigned short v=AICA->udata.data[0x8/2];
 				v&=0xff00;
 				v|=AICA->MidiStack[AICA->MidiR];
-				AICA->IntARMCB(0);	// cancel the IRQ
+				AICA->IntARMCB(Machine, 0);	// cancel the IRQ
 				if(AICA->MidiR!=AICA->MidiW)
 				{
 					++AICA->MidiR;
@@ -922,7 +926,7 @@ static void AICA_w16(struct _AICA *AICA,unsigned int addr,unsigned short val)
 
 			if (val)
 			{
-				AICA->IntARMCB(0);
+				AICA->IntARMCB(Machine, 0);
 			}
 		}
 	}

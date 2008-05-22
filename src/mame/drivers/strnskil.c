@@ -51,7 +51,7 @@ static READ8_HANDLER( pettanp_protection_r )
 		case 0x6066:	res = 0xa5;	break;
 		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x615d:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61b9:	res = 0x60|(mame_rand(Machine)&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61b9:	res = 0x60|(mame_rand(machine)&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6219:	res = 0x77;	break;
 		case 0x626c:	res = 0xb4;	break;
 		default:		res = 0xff; break;
@@ -70,7 +70,7 @@ static READ8_HANDLER( banbam_protection_r )
 		case 0x6094:	res = 0xa5;	break;
 		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
 		case 0x6199:	res = 0x30;	break;	/* bits 0-3 unknown */
-		case 0x61f5:	res = 0x60|(mame_rand(Machine)&0x0f);	break;	/* bits 0-3 unknown */
+		case 0x61f5:	res = 0x60|(mame_rand(machine)&0x0f);	break;	/* bits 0-3 unknown */
 		case 0x6255:	res = 0x77;	break;
 		case 0x62a8:	res = 0xb4;	break;
 		default:		res = 0xff; break;

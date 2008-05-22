@@ -30,7 +30,7 @@ WRITE32_HANDLER( psx_com_delay_w );
 READ32_HANDLER( psx_com_delay_r );
 WRITE32_HANDLER( psx_irq_w );
 READ32_HANDLER( psx_irq_r );
-extern void psx_irq_set( UINT32 );
+extern void psx_irq_set( running_machine *, UINT32 );
 extern void psx_dma_install_read_handler( int, psx_dma_read_handler );
 extern void psx_dma_install_write_handler( int, psx_dma_read_handler );
 WRITE32_HANDLER( psx_dma_w );
@@ -41,7 +41,7 @@ WRITE32_HANDLER( psx_sio_w );
 READ32_HANDLER( psx_sio_r );
 typedef void ( *psx_sio_handler )( int );
 extern void psx_sio_install_handler( int, psx_sio_handler );
-extern void psx_sio_input( int, int, int );
+extern void psx_sio_input( running_machine *, int, int, int );
 
 #define PSX_SIO_OUT_DATA ( 1 )	/* COMMAND */
 #define PSX_SIO_OUT_DTR ( 2 )	/* ATT */

@@ -33,7 +33,6 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
@@ -500,9 +499,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq(int state)
+static void soundirq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static const struct YM3812interface fuuki16_ym3812_intf =

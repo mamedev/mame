@@ -273,7 +273,6 @@
 **************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "audio/dcs.h"
@@ -502,7 +501,7 @@ static struct dynamic_address
  *
  *************************************/
 
-static void vblank_assert(int state);
+static void vblank_assert(running_machine *machine, int state);
 static TIMER_CALLBACK( nile_timer_callback );
 static void ide_interrupt(const device_config *device, int state);
 static void remap_dynamic_addresses(running_machine *machine);
@@ -600,7 +599,7 @@ static MACHINE_RESET( vegas )
 	/* reset subsystems */
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 	voodoo_reset(0);
-	smc91c94_reset();
+	smc91c94_reset(machine);
 
 	/* initialize IRQ states */
 	ide_irq_state = 0;
@@ -892,7 +891,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
  *
  *************************************/
 
-static void update_nile_irqs(void)
+static void update_nile_irqs(running_machine *machine)
 {
 	UINT32 intctll = nile_regs[NREG_INTCTRL+0];
 	UINT32 intctlh = nile_regs[NREG_INTCTRL+1];
@@ -944,12 +943,12 @@ static void update_nile_irqs(void)
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			cpunum_set_input_line(Machine, 0, MIPS3_IRQ0 + i, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			cpunum_set_input_line(Machine, 0, MIPS3_IRQ0 + i, CLEAR_LINE);
+			cpunum_set_input_line(machine, 0, MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");
@@ -977,7 +976,7 @@ static TIMER_CALLBACK( nile_timer_callback )
 	if (which == 3)
 		nile_irq_state |= 1 << 5;
 
-	update_nile_irqs();
+	update_nile_irqs(machine);
 }
 
 
@@ -1119,21 +1118,21 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_INTCTRL+1:	/* Interrupt control */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt control(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs();
+			update_nile_irqs(machine);
 			break;
 
 		case NREG_INTSTAT0+0:	/* Interrupt status 0 */
 		case NREG_INTSTAT0+1:	/* Interrupt status 0 */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 0(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs();
+			update_nile_irqs(machine);
 			break;
 
 		case NREG_INTSTAT1+0:	/* Interrupt status 1 */
 		case NREG_INTSTAT1+1:	/* Interrupt status 1 */
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt status 1/enable(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
-			update_nile_irqs();
+			update_nile_irqs(machine);
 			break;
 
 		case NREG_INTCLR+0:		/* Interrupt clear */
@@ -1141,7 +1140,7 @@ static WRITE32_HANDLER( nile_w )
 			if (LOG_NILE) logerror("%08X:NILE WRITE: interrupt clear(%03X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 			logit = 0;
 			nile_irq_state &= ~(nile_regs[offset] & ~0xf00);
-			update_nile_irqs();
+			update_nile_irqs(machine);
 			break;
 
 		case NREG_INTPPES+0:	/* PCI Interrupt control */
@@ -1216,7 +1215,7 @@ static WRITE32_HANDLER( nile_w )
 			logit = 0;
 			break;
 		case NREG_UARTIER:		/* serial interrupt enable */
-			update_nile_irqs();
+			update_nile_irqs(machine);
 			break;
 
 		case NREG_VID:
@@ -1273,7 +1272,7 @@ static void ide_interrupt(const device_config *device, int state)
 		nile_irq_state |= 0x800;
 	else
 		nile_irq_state &= ~0x800;
-	update_nile_irqs();
+	update_nile_irqs(device->machine);
 }
 
 
@@ -1284,22 +1283,22 @@ static void ide_interrupt(const device_config *device, int state)
  *
  *************************************/
 
-static void update_sio_irqs(void)
+static void update_sio_irqs(running_machine *machine)
 {
 	if (sio_irq_state & sio_irq_enable)
 		nile_irq_state |= 0x400;
 	else
 		nile_irq_state &= ~0x400;
-	update_nile_irqs();
+	update_nile_irqs(machine);
 }
 
 
-static void vblank_assert(int state)
+static void vblank_assert(running_machine *machine, int state)
 {
 	if (!vblank_state && state)
 	{
 		sio_irq_state |= 0x20;
-		update_sio_irqs();
+		update_sio_irqs(machine);
 	}
 	vblank_state = state;
 
@@ -1311,23 +1310,23 @@ static void vblank_assert(int state)
 }
 
 
-static void ioasic_irq(int state)
+static void ioasic_irq(running_machine *machine, int state)
 {
 	if (state)
 		sio_irq_state |= 0x04;
 	else
 		sio_irq_state &= ~0x04;
-	update_sio_irqs();
+	update_sio_irqs(machine);
 }
 
 
-static void ethernet_interrupt(int state)
+static void ethernet_interrupt(running_machine *machine, int state)
 {
 	if (state)
 		sio_irq_state |= 0x10;
 	else
 		sio_irq_state &= ~0x10;
-	update_sio_irqs();
+	update_sio_irqs(machine);
 }
 
 
@@ -1354,7 +1353,7 @@ static WRITE32_HANDLER( sio_irq_clear_w )
 		if (!(data & 0x08))
 		{
 			sio_irq_state &= ~0x20;
-			update_sio_irqs();
+			update_sio_irqs(machine);
 		}
 	}
 }
@@ -1371,7 +1370,7 @@ static WRITE32_HANDLER( sio_irq_enable_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		sio_irq_enable = data;
-		update_sio_irqs();
+		update_sio_irqs(machine);
 	}
 }
 

@@ -41,7 +41,6 @@ COLORRAM (Colors)
 ******************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "sound/2151intf.h"
@@ -513,9 +512,9 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface cabalbl_ym2151_interface =

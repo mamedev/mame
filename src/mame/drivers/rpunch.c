@@ -105,7 +105,6 @@
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
@@ -143,10 +142,10 @@ WRITE16_HANDLER( rpunch_crtc_register_w );
  *
  *************************************/
 
-static void ym2151_irq_gen(int state)
+static void ym2151_irq_gen(running_machine *machine, int state)
 {
 	ym2151_irq = state;
-	cpunum_set_input_line(Machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -61,7 +61,6 @@ This was pointed out by Bart Puype
 *****/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
 
@@ -369,9 +368,9 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static void sound_irq( int irq )
+static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( psikyo_soundlatch_r )
@@ -1662,12 +1661,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(Machine, 1, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 static const struct YMF278B_interface ymf278b_interface =

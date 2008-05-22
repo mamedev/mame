@@ -12,7 +12,6 @@ driver by David Haywood and few bits by Pierpaolo Prazzoli
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 
 static int interrupt_scanline=192;
@@ -258,10 +257,10 @@ static GFXDECODE_START( pkscram )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, tiles8x8_layout, 0, 0x80 )
 GFXDECODE_END
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
 	if(out & 0x10)
-		cpunum_set_input_line(Machine, 0,2,irq ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0,2,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

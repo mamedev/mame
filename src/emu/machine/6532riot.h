@@ -15,7 +15,7 @@ struct riot6532_interface
 	read8_machine_func in_b_func;
 	write8_machine_func out_a_func;
 	write8_machine_func out_b_func;
-	void (*irq_func)(int state);
+	void (*irq_func)(running_machine *machine, int state);
 };
 
 void r6532_set_clock(int which, int clock);

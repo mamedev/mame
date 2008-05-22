@@ -716,9 +716,9 @@ GFXDECODE_END
 #define VBLANK		1 / VSYNC * (40 / 264)
 
 // handler called by the 2203 emulator when the internal timers cause an IRQ
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

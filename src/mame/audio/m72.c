@@ -113,7 +113,7 @@ MACHINE_RESET( m72_sound )
 	state_save_register_global(sample_addr);
 }
 
-void m72_ym2151_irq_handler(int irq)
+void m72_ym2151_irq_handler(running_machine *machine, int irq)
 {
 	if (irq)
 		timer_call_after_resynch(NULL, YM2151_ASSERT,setvector_callback);

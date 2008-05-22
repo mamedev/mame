@@ -75,7 +75,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "decocrpt.h"
@@ -283,9 +282,9 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

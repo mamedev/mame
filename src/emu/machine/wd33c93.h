@@ -11,7 +11,7 @@
 struct WD33C93interface
 {
 	const SCSIConfigTable *scsidevs;		/* SCSI devices */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state); /* irq callback */
 };
 
 extern void wd33c93_init( const struct WD33C93interface *interface );

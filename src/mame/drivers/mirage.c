@@ -31,7 +31,6 @@ MR_01-.3A    [a0b758aa]
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "decocrpt.h"
 #include "decoprot.h"
 #include "deco16ic.h"
@@ -138,7 +137,7 @@ static READ16_HANDLER( mirage_controls_r )
 
 static READ16_HANDLER( random_readers )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ16_HANDLER( mirage_input_r )

@@ -23,7 +23,7 @@ NVRAM_HANDLER( midway_serial_pic2 );
 
 
 /* I/O ASIC connected to 2nd generation PIC */
-void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callback)(int));
+void midway_ioasic_init(int shuffle, int upper, int yearoffs, void (*irq_callback)(running_machine *, int));
 void midway_ioasic_set_auto_ack(int auto_ack);
 void midway_ioasic_set_shuffle_state(int state);
 void midway_ioasic_reset(void);

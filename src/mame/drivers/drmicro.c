@@ -45,7 +45,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static int pcm_adr;
 
-static void pcm_w(int irq)
+static void pcm_w(running_machine *machine, int irq)
 {
 	UINT8 *PCM = memory_region(REGION_SOUND1);
 
@@ -68,7 +68,7 @@ static void pcm_w(int irq)
 static WRITE8_HANDLER( pcm_set_w )
 {
 	pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(0);
+	pcm_w(machine, 0);
 }
 
 /****************************************************************************/

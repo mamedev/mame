@@ -38,7 +38,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 
@@ -263,14 +262,14 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, tile_layout,   0,		16 ) /* tiles */
 GFXDECODE_END
 
-static void shootout_snd_irq(int linestate)
+static void shootout_snd_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static void shootout_snd2_irq(int linestate)
+static void shootout_snd2_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 0,0,linestate);
+	cpunum_set_input_line(machine, 0,0,linestate);
 }
 
 static const struct YM2203interface ym2203_interface =

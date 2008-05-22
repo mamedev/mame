@@ -7,7 +7,6 @@ Driver by Manuel Abadia <manu@teleline.es>
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/vlm5030.h"
@@ -91,7 +90,7 @@ static WRITE8_HANDLER( ddrible_coin_counter_w )
 
 static READ8_HANDLER( ddrible_vlm5030_busy_r )
 {
-	return mame_rand(Machine); /* patch */
+	return mame_rand(machine); /* patch */
 	/* FIXME: remove ? */
 #if 0
 	if (VLM5030_BSY()) return 1;

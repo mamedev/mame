@@ -33,7 +33,6 @@ from 2.bin to 9.bin program eproms
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68kmame.h"
 #include "cps1.h"
 #include "sound/2203intf.h"
@@ -64,16 +63,16 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	memory_set_bankptr(1,&RAM[0x10000 + bankaddr]);
 }
 
-static void m5205_int1(int data)
+static void m5205_int1(running_machine *machine, int data)
 {
 	MSM5205_data_w(0, sample_buffer1 & 0x0F);
 	sample_buffer1 >>= 4;
 	sample_select1 ^= 1;
 	if (sample_select1 == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void m5205_int2(int data)
+static void m5205_int2(running_machine *machine, int data)
 {
 	MSM5205_data_w(1, sample_buffer2 & 0x0F);
 	sample_buffer2 >>= 4;

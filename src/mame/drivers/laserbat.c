@@ -17,7 +17,6 @@ TODO:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/6821pia.h"
 #include "video/s2636.h"
@@ -594,8 +593,8 @@ static const struct SN76477interface sn76477_interface =
 
 /* Cat'N Mouse sound ***********************************/
 
-static void zaccaria_irq0a(int state) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(int state) { cpunum_set_input_line(Machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0a(running_machine *machine, int state) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0b(running_machine *machine, int state) { cpunum_set_input_line(machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a;
 

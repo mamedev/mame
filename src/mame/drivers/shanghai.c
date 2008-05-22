@@ -20,7 +20,6 @@ TS 20050212:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "audio/seibu.h"
 
 /* the on-chip FIFO is 16 bytes long, but we use a larger one to simplify */
@@ -788,7 +787,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER(shanghai_rand_r)
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ16_HANDLER( kothello_HD63484_status_r )

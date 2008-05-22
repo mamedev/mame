@@ -755,28 +755,28 @@ static WRITE64_HANDLER(scsi_w)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
-		lsi53c810_reg_w(reg+0, data >> 56);
+		lsi53c810_reg_w(machine, reg+0, data >> 56);
 	}
 	if (ACCESSING_BITS_48_55) {
-		lsi53c810_reg_w(reg+1, data >> 48);
+		lsi53c810_reg_w(machine, reg+1, data >> 48);
 	}
 	if (ACCESSING_BITS_40_47) {
-		lsi53c810_reg_w(reg+2, data >> 40);
+		lsi53c810_reg_w(machine, reg+2, data >> 40);
 	}
 	if (ACCESSING_BITS_32_39) {
-		lsi53c810_reg_w(reg+3, data >> 32);
+		lsi53c810_reg_w(machine, reg+3, data >> 32);
 	}
 	if (ACCESSING_BITS_24_31) {
-		lsi53c810_reg_w(reg+4, data >> 24);
+		lsi53c810_reg_w(machine, reg+4, data >> 24);
 	}
 	if (ACCESSING_BITS_16_23) {
-		lsi53c810_reg_w(reg+5, data >> 16);
+		lsi53c810_reg_w(machine, reg+5, data >> 16);
 	}
 	if (ACCESSING_BITS_8_15) {
-		lsi53c810_reg_w(reg+6, data >> 8);
+		lsi53c810_reg_w(machine, reg+6, data >> 8);
 	}
 	if (ACCESSING_BITS_0_7) {
-		lsi53c810_reg_w(reg+7, data >> 0);
+		lsi53c810_reg_w(machine, reg+7, data >> 0);
 	}
 }
 
@@ -787,10 +787,10 @@ static UINT32 scsi_fetch(UINT32 dsp)
 	return BYTE_REVERSE32(result);
 }
 
-static void scsi_irq_callback(void)
+static void scsi_irq_callback(running_machine *machine)
 {
 	model3_irq_state |= model3_irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -846,7 +846,7 @@ static WRITE64_HANDLER( real3d_dma_w )
 					real3d_dma_callback(dma_source, dma_dest, length, 1);
 				}
 				dma_irq |= 0x01;
-				scsi_irq_callback();
+				scsi_irq_callback(machine);
 				return;
 			}
 			else if(ACCESSING_BITS_16_23)
@@ -4010,12 +4010,12 @@ ADDRESS_MAP_END
 
 static int scsp_last_line = 0;
 
-static void scsp_irq(int irq)
+static void scsp_irq(running_machine *machine, int irq)
 {
  	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(Machine, 1, irq, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, irq, PULSE_LINE);
 	}
 }
 

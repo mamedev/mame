@@ -205,7 +205,7 @@ static WRITE16_HANDLER( bishjan_sel_w )
 static READ16_HANDLER( bishjan_unk_r )
 {
 	return
-		(mame_rand(Machine) & 0x9800)	|	// bit 7 eeprom?
+		(mame_rand(machine) & 0x9800)	|	// bit 7 eeprom?
 		(((bishjan_sel==0x12) ? 0x40:0x00) << 8) |
 //      (mame_rand() & 0xff);
 //      (((video_screen_get_frame_number(machine->primary_screen)%60)==0)?0x18:0x00);

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "nmk004.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
@@ -997,23 +996,23 @@ static void update_music(running_machine *machine)
 
 
 
-void NMK004_irq(int irq)
+void NMK004_irq(running_machine *machine, int irq)
 {
 	int status;
 
 	if (!irq) return;
 
-	status = YM2203_status_port_0_r(Machine,0);
+	status = YM2203_status_port_0_r(machine,0);
 
 	if (status & 1)	// timer A expired
 	{
-		oki_update_state(Machine);
-		get_command(Machine);
-		update_music(Machine);
+		oki_update_state(machine);
+		get_command(machine);
+		update_music(machine);
 
 		// restart timer
-		YM2203_control_port_0_w(Machine, 0, 0x27);
-		YM2203_write_port_0_w(Machine, 0, 0x15);
+		YM2203_control_port_0_w(machine, 0, 0x27);
+		YM2203_write_port_0_w(machine, 0, 0x15);
 	}
 }
 

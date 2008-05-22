@@ -54,7 +54,7 @@ typedef struct
 {
 	PC16552D_CHANNEL ch[2];
 	int frequency;
-	void (* irq_handler)(int channel, int value);
+	void (* irq_handler)(running_machine *machine, int channel, int value);
 	void (* tx_callback)(int channel, int count, UINT8* data);
 } PC16552D_REGS;
 
@@ -67,7 +67,7 @@ static PC16552D_REGS duart[MAX_PC16552D_CHIPS];
 static const int rx_trigger_level[4] = { 1, 4, 8, 14 };
 
 
-static void check_interrupts(int chip, int channel)
+static void check_interrupts(running_machine *machine, int chip, int channel)
 {
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
 
@@ -80,13 +80,13 @@ static void check_interrupts(int chip, int channel)
 		{
 			if (duart[chip].irq_handler != NULL)
 			{
-				duart[chip].irq_handler(channel, 0);
+				duart[chip].irq_handler(machine, channel, 0);
 			}
 		}
 	}
 }
 
-static void duart_push_rx_fifo(int chip, int channel, UINT8 data)
+static void duart_push_rx_fifo(running_machine *machine, int chip, int channel, UINT8 data)
 {
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
 
@@ -107,11 +107,11 @@ static void duart_push_rx_fifo(int chip, int channel, UINT8 data)
 	{
 		ch->pending_interrupt |= IRQ_RX_DATA_AVAILABLE;		// INT ID: received data available
 
-		check_interrupts(chip, channel);
+		check_interrupts(machine, chip, channel);
 	}
 }
 
-static UINT8 duart_pop_rx_fifo(int chip, int channel)
+static UINT8 duart_pop_rx_fifo(running_machine *machine, int chip, int channel)
 {
 	UINT8 r;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
@@ -133,7 +133,7 @@ static UINT8 duart_pop_rx_fifo(int chip, int channel)
 	{
 		ch->pending_interrupt &= ~IRQ_RX_DATA_AVAILABLE;
 
-		check_interrupts(chip, channel);
+		check_interrupts(machine, chip, channel);
 	}
 
 	return r;
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( tx_fifo_timer_callback )
 
 	// set transmitter empty interrupt
 	ch->pending_interrupt |= IRQ_TX_HOLDING_REG_EMPTY;
-	check_interrupts(chip, channel);
+	check_interrupts(machine, chip, channel);
 
 	timer_adjust_oneshot(duart[chip].ch[channel].tx_fifo_timer, attotime_never, (chip * 2) + channel);
 }
@@ -180,7 +180,7 @@ static UINT8 duart_pop_tx_fifo(int chip, int channel, UINT8 data)
 #endif
 
 
-static UINT8 duart_r(int chip, int reg)
+static UINT8 duart_r(running_machine *machine, int chip, int reg)
 {
 	int channel = (reg >> 3) & 1;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
@@ -202,9 +202,9 @@ static UINT8 duart_r(int chip, int reg)
 				// Receiver Buffer
 				ch->pending_interrupt &= ~IRQ_RX_DATA_AVAILABLE;
 
-				check_interrupts(chip, channel);
+				check_interrupts(machine, chip, channel);
 
-				return duart_pop_rx_fifo(chip, channel);
+				return duart_pop_rx_fifo(machine, chip, channel);
 			}
 		}
 		case 1:
@@ -288,7 +288,7 @@ static UINT8 duart_r(int chip, int reg)
 	return ch->reg[reg];
 }
 
-static void duart_w(int chip, int reg, UINT8 data)
+static void duart_w(running_machine *machine, int chip, int reg, UINT8 data)
 {
 	int channel = (reg >> 3) & 1;
 	PC16552D_CHANNEL *ch = &duart[chip].ch[channel];
@@ -314,7 +314,7 @@ static void duart_w(int chip, int reg, UINT8 data)
 				duart_push_tx_fifo(chip, channel, data);
 
 				ch->pending_interrupt &= ~IRQ_TX_HOLDING_REG_EMPTY;
-				check_interrupts(chip, channel);
+				check_interrupts(machine, chip, channel);
 
 				return;
 			}
@@ -335,7 +335,7 @@ static void duart_w(int chip, int reg, UINT8 data)
 				// Interrupt enable
 				ch->reg[REG_INT_ENABLE] = data;
 
-				check_interrupts(chip, channel);
+				check_interrupts(machine, chip, channel);
 				return;
 			}
 		}
@@ -371,7 +371,7 @@ static void duart_w(int chip, int reg, UINT8 data)
                     // cause transmitter empty IRQ
                     ch->pending_interrupt |= IRQ_TX_HOLDING_REG_EMPTY;
 
-                    check_interrupts(chip, channel);
+                    check_interrupts(machine, chip, channel);
                 }
                 */
 			}
@@ -384,7 +384,7 @@ static void duart_w(int chip, int reg, UINT8 data)
 
 /*****************************************************************************/
 
-void pc16552d_init(int chip, int frequency, void (* irq_handler)(int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
+void pc16552d_init(int chip, int frequency, void (* irq_handler)(running_machine *machine, int channel, int value), void (* tx_callback)(int channel, int count, UINT8* data))
 {
 	memset(&duart[chip], 0, sizeof(PC16552D_REGS));
 
@@ -404,11 +404,11 @@ void pc16552d_init(int chip, int frequency, void (* irq_handler)(int channel, in
 	timer_adjust_oneshot(duart[chip].ch[1].tx_fifo_timer, attotime_never, (chip * 2) + 1);
 }
 
-void pc16552d_rx_data(int chip, int channel, UINT8 data)
+void pc16552d_rx_data(running_machine *machine, int chip, int channel, UINT8 data)
 {
 	if (duart[chip].ch[channel].reg[REG_FIFO_CTRL] & 0x01)	// RCVR & XMIT FIFO enable
 	{
-		duart_push_rx_fifo(chip, channel, data);
+		duart_push_rx_fifo(machine, chip, channel, data);
 	}
 }
 
@@ -417,20 +417,20 @@ void pc16552d_rx_data(int chip, int channel, UINT8 data)
 
 READ8_HANDLER(pc16552d_0_r)
 {
-	return duart_r(0, offset);
+	return duart_r(machine, 0, offset);
 }
 
 WRITE8_HANDLER(pc16552d_0_w)
 {
-	duart_w(0, offset, data);
+	duart_w(machine, 0, offset, data);
 }
 
 READ8_HANDLER(pc16552d_1_r)
 {
-	return duart_r(1, offset);
+	return duart_r(machine, 1, offset);
 }
 
 WRITE8_HANDLER(pc16552d_1_w)
 {
-	duart_w(1, offset, data);
+	duart_w(machine, 1, offset, data);
 }

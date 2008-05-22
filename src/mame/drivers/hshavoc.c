@@ -35,7 +35,6 @@ Unfortunately it's read protected.
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100
@@ -201,7 +200,7 @@ ROM_END
 
 static READ16_HANDLER( vdp_fake_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static DRIVER_INIT(genesis)

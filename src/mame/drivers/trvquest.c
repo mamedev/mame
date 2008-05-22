@@ -152,7 +152,7 @@ static TIMER_CALLBACK( via_irq_delayed )
 	cpunum_set_input_line(machine, 0, 0, param);
 }
 
-static void via_irq(int state)
+static void via_irq(running_machine *machine, int state)
 {
 	// from gameplan.c
 

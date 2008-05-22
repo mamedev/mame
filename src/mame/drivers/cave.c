@@ -69,7 +69,6 @@ Versions known to exist but not dumped:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "machine/nmk112.h"
 #include "cpu/z80/z80.h"
@@ -129,10 +128,10 @@ static INTERRUPT_GEN( cave_interrupt )
 }
 
 /* Called by the YMZ280B to set the IRQ state */
-static void sound_irq_gen(int state)
+static void sound_irq_gen(running_machine *machine, int state)
 {
 	sound_irq = (state != 0);
-	update_irq_state(Machine);
+	update_irq_state(machine);
 }
 
 
@@ -162,7 +161,7 @@ static READ16_HANDLER( cave_irq_cause_r )
 	if (offset == 4/2)	vblank_irq = 0;
 	if (offset == 6/2)	unknown_irq = 0;
 
-	update_irq_state(Machine);
+	update_irq_state(machine);
 
 /*
     sailormn and agallet wait for bit 2 of $b80001 to go 1 -> 0.
@@ -1993,9 +1992,9 @@ static const struct YMZ280Binterface ymz280b_intf =
 	sound_irq_gen
 };
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2151interface ym2151_interface =

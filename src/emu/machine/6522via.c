@@ -185,7 +185,7 @@ logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_activec
     {
 		v->ifr |= INT_ANY;
 		if (v->intf->irq_func)
-			(*v->intf->irq_func)(ASSERT_LINE);
+			(*v->intf->irq_func)(Machine, ASSERT_LINE);
 		else
 			logerror("6522VIA chip %d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
     }
@@ -206,7 +206,7 @@ logerror("6522VIA chip %d: IFR = %02X.  PC: %08X\n", which, v->ifr, safe_activec
 	else
 	{
 		if (v->intf->irq_func)
-			(*v->intf->irq_func)(CLEAR_LINE);
+			(*v->intf->irq_func)(Machine, CLEAR_LINE);
 //      else
 //          logerror("6522VIA chip %d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 	}
@@ -821,7 +821,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_activecpu
 			{
 				v->ifr &= ~INT_ANY;
 				if (v->intf->irq_func)
-					(*v->intf->irq_func)(CLEAR_LINE);
+					(*v->intf->irq_func)(Machine, CLEAR_LINE);
 //              else
 //                  logerror("6522VIA chip %d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 			}
@@ -832,7 +832,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_activecpu
 			{
 				v->ifr |= INT_ANY;
 				if (v->intf->irq_func)
-					(*v->intf->irq_func)(ASSERT_LINE);
+					(*v->intf->irq_func)(Machine, ASSERT_LINE);
 				else
 					logerror("6522VIA chip %d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 			}

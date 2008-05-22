@@ -34,7 +34,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "rocknms.lh"
@@ -265,8 +264,8 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
 	return	( input_port_read(machine, "IN1") &  0xfcff ) |
-			(           mame_rand(Machine) & ~0xfcff ) |
-			(      1 << (8 + (mame_rand(Machine)&1)) );
+			(           mame_rand(machine) & ~0xfcff ) |
+			(      1 << (8 + (mame_rand(machine)&1)) );
 }
 
 

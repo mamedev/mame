@@ -10,7 +10,6 @@ press F1+F3 to see ROM/RAM tests and the final animation
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"
 #include "sound/2608intf.h"
@@ -217,9 +216,9 @@ GFXDECODE_END
 
 
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2608interface ym2608_interface =

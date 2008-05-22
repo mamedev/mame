@@ -417,7 +417,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/s2650/s2650.h"
 #include "machine/atari_vg.h"
 #include "centiped.h"
@@ -621,7 +620,7 @@ static WRITE8_HANDLER( led_w )
 
 static READ8_HANDLER( caterplr_rand_r )
 {
-	return mame_rand(Machine) % 0xff;
+	return mame_rand(machine) % 0xff;
 }
 
 

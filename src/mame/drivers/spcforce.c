@@ -32,7 +32,6 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/i8039/i8039.h"
 #include "sound/sn76496.h"
@@ -69,7 +68,7 @@ static WRITE8_HANDLER( spcforce_SN76496_select_w )
 static READ8_HANDLER( spcforce_t0_r )
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
-	return mame_rand(Machine) & 1;
+	return mame_rand(machine) & 1;
 }
 
 

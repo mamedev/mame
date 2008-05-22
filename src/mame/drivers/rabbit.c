@@ -498,7 +498,7 @@ static READ32_HANDLER( rabbit_tilemap3_r )
 
 static READ32_HANDLER( randomrabbits )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( rabbit_readmem, ADDRESS_SPACE_PROGRAM, 32 )

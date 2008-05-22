@@ -62,7 +62,6 @@ IO ports and memory map changes. Dip switches differ too.
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -403,7 +402,7 @@ static INTERRUPT_GEN( kc_interrupt ) {
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint( int data ) {
+static void msmint( running_machine *machine, int data ) {
 
 	static int counter = 0;
 
@@ -416,7 +415,7 @@ static void msmint( int data ) {
 
 	if ( !( counter ^= 1 ) ) {
 		if ( sound_nmi_enable ) {
-			cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }

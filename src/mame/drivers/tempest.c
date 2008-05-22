@@ -278,7 +278,6 @@ Version 1 for Tempest Analog Vector-Generator PCB Assembly A037383-01 or A037383
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/mathbox.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
@@ -305,7 +304,7 @@ static UINT8 tempest_player_select;
 static WRITE8_HANDLER( wdclr_w )
 {
 	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	watchdog_reset(Machine);
+	watchdog_reset(machine);
 }
 
 /*************************************

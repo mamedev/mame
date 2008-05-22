@@ -185,7 +185,7 @@ struct POKEYregisters
 	read8_machine_func allpot_r;
 	read8_machine_func serin_r;
 	write8_machine_func serout_w;
-	void (*interrupt_cb)(int mask);
+	void (*interrupt_cb)(running_machine *machine, int mask);
     UINT8 AUDF[4];          /* AUDFx (D200, D202, D204, D206) */
 	UINT8 AUDC[4];			/* AUDCx (D201, D203, D205, D207) */
 	UINT8 POTx[8];			/* POTx   (R/D200-D207) */
@@ -698,7 +698,7 @@ static TIMER_CALLBACK( pokey_timer_expire )
 		p->IRQST |= timers;
         /* call back an application supplied function to handle the interrupt */
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(timers);
+			(*p->interrupt_cb)(machine, timers);
     }
 }
 
@@ -761,7 +761,7 @@ static TIMER_CALLBACK( pokey_serin_ready )
 		p->IRQST |= IRQ_SERIN;
 		/* call back an application supplied function to handle the interrupt */
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(IRQ_SERIN);
+			(*p->interrupt_cb)(machine, IRQ_SERIN);
 	}
 }
 
@@ -772,7 +772,7 @@ static TIMER_CALLBACK( pokey_serout_ready )
 	{
 		p->IRQST |= IRQ_SEROR;
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(IRQ_SEROR);
+			(*p->interrupt_cb)(machine, IRQ_SEROR);
 	}
 }
 
@@ -783,7 +783,7 @@ static TIMER_CALLBACK( pokey_serout_complete )
 	{
 		p->IRQST |= IRQ_SEROC;
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(IRQ_SEROC);
+			(*p->interrupt_cb)(machine, IRQ_SEROC);
 	}
 }
 
@@ -1436,7 +1436,7 @@ static void pokey_break_w(int chip, int shift)
 		/* set break IRQ status and call back the interrupt handler */
 		p->IRQST |= IRQ_BREAK;
 		if( p->interrupt_cb )
-			(*p->interrupt_cb)(IRQ_BREAK);
+			(*p->interrupt_cb)(Machine, IRQ_BREAK);
     }
 }
 
@@ -1480,7 +1480,7 @@ static void pokey_kbcode_w(int chip, int kbcode, int make)
 				p->SKSTAT |= SK_KBERR;
 			p->IRQST |= IRQ_KEYBD;
 			if( p->interrupt_cb )
-				(*p->interrupt_cb)(IRQ_KEYBD);
+				(*p->interrupt_cb)(Machine, IRQ_KEYBD);
 		}
 	}
 	else

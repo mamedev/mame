@@ -2,7 +2,6 @@
 /* Nothing else is known about this set / game */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static VIDEO_START(gtipoker)
 {
@@ -16,7 +15,7 @@ static VIDEO_UPDATE(gtipoker)
 
 static READ8_HANDLER( gtipoker_unk_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( gtipoker_memmap, ADDRESS_SPACE_PROGRAM, 8 )

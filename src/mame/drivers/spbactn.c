@@ -126,7 +126,6 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -342,9 +341,9 @@ static GFXDECODE_START( spbactn )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, spritelayout,   0x0000, 16 + 384 )
 GFXDECODE_END
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =

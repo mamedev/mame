@@ -134,7 +134,6 @@ connector, but of course, I can be wrong.
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "genesis.h"
 
 
@@ -297,7 +296,7 @@ ROM_END
 
 static READ16_HANDLER( vdp_fake_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static DRIVER_INIT(topshoot)

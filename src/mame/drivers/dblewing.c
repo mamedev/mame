@@ -271,7 +271,7 @@ static READ16_HANDLER ( dlbewing_prot_r )
 
 	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n",activecpu_get_pc(), offset*2, mem_mask);
 
-	return 0;//mame_rand(Machine);
+	return 0;//mame_rand(machine);
 }
 
 static WRITE16_HANDLER( dblewing_prot_w )
@@ -526,9 +526,9 @@ static INPUT_PORTS_START( dblewing )
 
 INPUT_PORTS_END
 
-static void sound_irq(int irq)
+static void sound_irq(running_machine *machine, int irq)
 {
-//  cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 //  mame_printf_debug("sound irq\n");
 }
 

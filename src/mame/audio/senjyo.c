@@ -6,9 +6,9 @@
 
 
 /* z80 pio */
-static void pio_interrupt(int state)
+static void pio_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static const z80pio_interface pio_intf =
@@ -19,9 +19,9 @@ static const z80pio_interface pio_intf =
 };
 
 /* z80 ctc */
-static void ctc_interrupt (int state)
+static void ctc_interrupt (running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static z80ctc_interface ctc_intf =

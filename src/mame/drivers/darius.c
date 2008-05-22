@@ -515,10 +515,10 @@ static ADDRESS_MAP_START( darius_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static void darius_adpcm_int (int data)
+static void darius_adpcm_int (running_machine *machine, int data)
 {
 	if (nmi_enable)
-		cpunum_set_input_line(Machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface msm5205_interface =
@@ -801,9 +801,9 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-static void irqhandler(int irq)	/* assumes Z80 sandwiched between 68Ks */
+static void irqhandler(running_machine *machine, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface_1 =

@@ -121,7 +121,6 @@ CN1 standard DB15 VGA connector (15KHz)
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 
 
@@ -275,7 +274,7 @@ static WRITE16_HANDLER( pntnpuzl_palette_w )
 #ifdef UNUSED_FUNCTION
 READ16_HANDLER ( pntnpuzl_random_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 #endif
 

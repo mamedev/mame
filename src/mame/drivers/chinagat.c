@@ -69,7 +69,6 @@ Input is unique but has a few similarities to DD2 (the coin inputs)
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8039/i8039.h"
@@ -257,7 +256,7 @@ static READ8_HANDLER( saiyugb1_m5205_irq_r )
 	}
 	return 0;
 }
-static void saiyugb1_m5205_irq_w(int num)
+static void saiyugb1_m5205_irq_w(running_machine *machine, int num)
 {
 	adpcm_sound_irq = 1;
 }
@@ -457,8 +456,9 @@ static GFXDECODE_START( chinagat )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, tilelayout, 256, 8 )	/* 16x16 background tiles */
 GFXDECODE_END
 
-static void chinagat_irq_handler(int irq) {
-	cpunum_set_input_line(Machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+static void chinagat_irq_handler(running_machine *machine, int irq)
+{
+	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

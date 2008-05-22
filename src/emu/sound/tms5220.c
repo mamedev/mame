@@ -20,6 +20,7 @@
 ***********************************************************************************************/
 
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "tms5220.h"
 
 
@@ -70,7 +71,7 @@ struct tms5220
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
-	void (*irq_func)(int state); /* called when the state of the IRQ pin changes */
+	void (*irq_func)(running_machine *machine, int state); /* called when the state of the IRQ pin changes */
 
 
 	/* these contain data describing the current and previous voice frames */
@@ -234,7 +235,7 @@ void tms5220_reset_chip(void *chip)
 	/* initialize the chip state */
 	/* Note that we do not actually clear IRQ on start-up : IRQ is even raised if tms->buffer_empty or tms->buffer_low are 0 */
 	tms->tms5220_speaking = tms->speak_external = tms->talk_status = tms->first_frame = tms->last_frame = tms->irq_pin = 0;
-	if (tms->irq_func) tms->irq_func(0);
+	if (tms->irq_func) tms->irq_func(Machine, 0);
 	tms->buffer_empty = tms->buffer_low = 1;
 
 	tms->RDB_flag = FALSE;
@@ -267,7 +268,7 @@ void tms5220_reset_chip(void *chip)
 
 ***********************************************************************************************/
 
-void tms5220_set_irq(void *chip, void (*func)(int))
+void tms5220_set_irq(void *chip, void (*func)(running_machine *, int))
 {
 	struct tms5220 *tms = chip;
     tms->irq_func = func;
@@ -1171,6 +1172,6 @@ static void check_buffer_low(struct tms5220 *tms)
 static void set_interrupt_state(struct tms5220 *tms, int state)
 {
     if (tms->irq_func && state != tms->irq_pin)
-    	tms->irq_func(state);
+    	tms->irq_func(Machine, state);
     tms->irq_pin = state;
 }

@@ -295,15 +295,15 @@ static void start_interrupt_timers(running_machine *machine)
  *
  *************************************/
 
-static void audio_cpu_irq(int assert)
+static void audio_cpu_irq(running_machine *machine, int assert)
 {
-	cpunum_set_input_line(Machine, 1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void audio_cpu_assert_nmi(void)
+static void audio_cpu_assert_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -566,7 +566,7 @@ static WRITE16_HANDLER( audio_command_w )
 	{
 		soundlatch_w(machine, 0, data >> 8);
 
-		audio_cpu_assert_nmi();
+		audio_cpu_assert_nmi(machine);
 
 		/* boost the interleave to let the audio CPU read the command */
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));

@@ -20,7 +20,6 @@ blocken:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
@@ -487,9 +486,9 @@ static const struct AY8910interface ay8910_interface =
 	NULL
 };
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, linestate);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
 }
 
 static const struct YM3438interface ym3438_interface =

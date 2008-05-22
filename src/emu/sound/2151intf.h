@@ -3,7 +3,7 @@
 
 struct YM2151interface
 {
-	void (*irqhandler)(int irq);
+	void (*irqhandler)(running_machine *machine, int irq);
 	write8_machine_func portwritehandler;
 };
 

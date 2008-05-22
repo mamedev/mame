@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "audio/williams.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
@@ -32,9 +31,9 @@ static UINT8 vram_bank;
 static UINT16 joust2_current_sound_data;
 
 /* older-Williams routines */
-static void williams_main_irq(int state);
-static void williams_main_firq(int state);
-static void williams_snd_irq(int state);
+static void williams_main_irq(running_machine *machine, int state);
+static void williams_main_firq(running_machine *machine, int state);
+static void williams_snd_irq(running_machine *machine, int state);
 static WRITE8_HANDLER( williams_snd_cmd_w );
 static WRITE8_HANDLER( playball_snd_cmd_w );
 
@@ -48,8 +47,8 @@ static READ8_HANDLER( williams_49way_port_0_r );
 
 /* newer-Williams routines */
 static WRITE8_HANDLER( williams2_snd_cmd_w );
-static void mysticm_main_irq(int state);
-static void tshoot_main_irq(int state);
+static void mysticm_main_irq(running_machine *machine, int state);
+static void tshoot_main_irq(running_machine *machine, int state);
 
 /* Lotto Fun-specific code */
 static READ8_HANDLER( lottofun_input_port_0_r );
@@ -297,28 +296,28 @@ static TIMER_CALLBACK( williams_count240_callback )
 }
 
 
-static void williams_main_irq(int state)
+static void williams_main_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void williams_main_firq(int state)
+static void williams_main_firq(running_machine *machine, int state)
 {
 	/* FIRQ to the main CPU */
-	cpunum_set_input_line(Machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void williams_snd_irq(int state)
+static void williams_snd_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(2) | pia_get_irq_b(2);
 
 	/* IRQ to the sound CPU */
-	cpunum_set_input_line(Machine, 1, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -329,21 +328,21 @@ static void williams_snd_irq(int state)
  *
  *************************************/
 
-static void mysticm_main_irq(int state)
+static void mysticm_main_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void tshoot_main_irq(int state)
+static void tshoot_main_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

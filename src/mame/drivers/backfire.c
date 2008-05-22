@@ -14,7 +14,6 @@
 extern void decrypt156(void);
 
 #include "driver.h"
-#include "deprecat.h"
 #include "decocrpt.h"
 #include "deco32.h"
 #include "machine/eeprom.h"
@@ -230,7 +229,7 @@ static VIDEO_UPDATE(backfire)
 static READ32_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
-	int backfire_screen = mame_rand(Machine)&1;
+	int backfire_screen = mame_rand(machine)&1;
 	return ((EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 3)<<16)) ^  (backfire_screen << 26) ;
 }
 
@@ -311,12 +310,12 @@ READ32_HANDLER( backfire_unknown_wheel_r )
 
 READ32_HANDLER( backfire_wheel1_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 READ32_HANDLER( backfire_wheel2_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 #endif
 
@@ -465,7 +464,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-static void sound_irq_gen(int state)
+static void sound_irq_gen(running_machine *machine, int state)
 {
 	logerror("sound irq\n");
 }

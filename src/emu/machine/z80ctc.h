@@ -28,7 +28,7 @@ typedef struct
 {
 	int baseclock;                           /* timer clock */
 	int notimer;                         /* timer disablers */
-	void (*intr)(int which);             /* callback when change interrupt status */
+	void (*intr)(running_machine *machine, int which);             /* callback when change interrupt status */
 	write8_machine_func zc0;   /* ZC/TO0 callback */
 	write8_machine_func zc1;   /* ZC/TO1 callback */
 	write8_machine_func zc2;   /* ZC/TO2 callback */

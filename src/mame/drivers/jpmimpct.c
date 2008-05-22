@@ -154,7 +154,7 @@ static struct
  *
  *************************************/
 
-static void update_irqs(void)
+static void update_irqs(running_machine *machine)
 {
 	int newstate = 0;
 
@@ -164,9 +164,9 @@ static void update_irqs(void)
 		newstate = 5;
 
 	if (newstate)
-		cpunum_set_input_line(Machine, 0, newstate, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -250,7 +250,7 @@ static TIMER_CALLBACK( duart_1_timer_event )
 	duart_1.ISR |= 0x08;
 
 	duart_1_irq = 1;
-	update_irqs();
+	update_irqs(machine);
 }
 
 static READ16_HANDLER( duart_1_r )
@@ -307,7 +307,7 @@ static READ16_HANDLER( duart_1_r )
 		case 0xf:
 		{
 			duart_1_irq = 0;
-			update_irqs();
+			update_irqs(machine);
 			duart_1.ISR |= ~0x8;
 			break;
 		}
@@ -815,7 +815,7 @@ static const struct upd7759_interface upd7759_interface =
 static void jpmimpct_tms_irq(int state)
 {
 	tms_irq = state;
-	update_irqs();
+	update_irqs(Machine);
 }
 
 static const tms34010_config tms_config =

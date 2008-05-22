@@ -15,7 +15,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 
 static tilemap *suprgolf_tilemap;
@@ -92,7 +91,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( suprgolf_random )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -257,9 +256,9 @@ static WRITE8_HANDLER( suprgolf_writeB )
 	mame_printf_debug("ymwA\n");
 }
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-//  cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_interface =

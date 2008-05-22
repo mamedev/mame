@@ -898,9 +898,9 @@ static GFXDECODE_START( popbingo )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, popbingo_tilelayout, 256,  1 )
 GFXDECODE_END
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( unk_r )

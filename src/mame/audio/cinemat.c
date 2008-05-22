@@ -1490,9 +1490,9 @@ static const struct AY8910interface demon_ay8910_interface_3 =
 };
 
 
-static void ctc_interrupt(int state)
+static void ctc_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 

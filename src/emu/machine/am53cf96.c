@@ -87,7 +87,7 @@ static TIMER_CALLBACK( am53cf96_irq )
 {
 	scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 	scsi_regs[REG_STATUS] |= 0x80;	// indicate IRQ
-	intf->irq_callback();
+	intf->irq_callback(machine);
 }
 
 WRITE32_HANDLER( am53cf96_w )

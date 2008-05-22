@@ -13,7 +13,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
@@ -52,7 +51,7 @@ static WRITE8_HANDLER( pcktgal_sound_w )
 
 static int msm5205next;
 
-static void pcktgal_adpcm_int(int data)
+static void pcktgal_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle;
 
@@ -61,7 +60,7 @@ static void pcktgal_adpcm_int(int data)
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpunum_set_input_line(Machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )

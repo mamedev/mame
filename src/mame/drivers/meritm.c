@@ -216,7 +216,7 @@ static void pc16650d_tx_callback(int channel, int count, UINT8* data)
 
 static void meritm_microtouch_tx_callback(UINT8 data)
 {
-	pc16552d_rx_data(0, 0, data);
+	pc16552d_rx_data(Machine, 0, 0, data);
 };
 
 /*************************************
@@ -730,16 +730,16 @@ static const struct AY8910interface ay8910_interface =
  *
  *************************************/
 
-static void meritm_audio_pio_interrupt(int state)
+static void meritm_audio_pio_interrupt(running_machine *machine, int state)
 {
 	//logerror( "PIO(0) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
-static void meritm_io_pio_interrupt(int state)
+static void meritm_io_pio_interrupt(running_machine *machine, int state)
 {
 	//logerror( "PIO(1) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(Machine, 0, 0, state);
+	cpunum_set_input_line(machine, 0, 0, state);
 }
 
 

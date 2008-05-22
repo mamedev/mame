@@ -46,7 +46,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT16 *unkram;
 static UINT16 *mainram;
@@ -73,7 +72,7 @@ static READ16_HANDLER(unk_r)
 	// 40,41,44 = ?
 	// 4a = flags?
 		if(offset==0xc9/2 )//|| offset==0x40 || offset==0x41 || offset==0x44)
-			return mame_rand(Machine);
+			return mame_rand(machine);
 	return unkram[offset];
 }
 

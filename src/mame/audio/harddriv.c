@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/tms32010/tms32010.h"
 #include "sound/dac.h"
 #include "machine/atarigen.h"
@@ -121,7 +120,7 @@ WRITE16_HANDLER( hd68k_snd_reset_w )
 	cpunum_set_input_line(machine, hdcpu_sound, INPUT_LINE_RESET, ASSERT_LINE);
 	cpunum_set_input_line(machine, hdcpu_sound, INPUT_LINE_RESET, CLEAR_LINE);
 	mainflag = soundflag = 0;
-	update_68k_interrupts(Machine);
+	update_68k_interrupts(machine);
 	logerror("%06X:Reset sound\n", activecpu_get_previouspc());
 }
 
@@ -136,7 +135,7 @@ WRITE16_HANDLER( hd68k_snd_reset_w )
 READ16_HANDLER( hdsnd68k_data_r )
 {
 	mainflag = 0;
-	update_68k_interrupts(Machine);
+	update_68k_interrupts(machine);
 	logerror("%06X:sound read from main=%04X\n", activecpu_get_previouspc(), maindata);
 	return maindata;
 }
@@ -240,7 +239,7 @@ WRITE16_HANDLER( hdsnd68k_speech_w )
 WRITE16_HANDLER( hdsnd68k_irqclr_w )
 {
 	irq68k = 0;
-	update_68k_interrupts(Machine);
+	update_68k_interrupts(machine);
 }
 
 
@@ -358,7 +357,7 @@ WRITE16_HANDLER( hdsnddsp_gen68kirq_w )
 {
 	/* generate 68k IRQ */
 	irq68k = 1;
-	update_68k_interrupts(Machine);
+	update_68k_interrupts(machine);
 }
 
 

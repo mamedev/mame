@@ -38,7 +38,6 @@ To do:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
@@ -436,13 +435,13 @@ static WRITE8_HANDLER( oscar_sound_w )
 	cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static void csilver_adpcm_int(int data)
+static void csilver_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle =0;
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(Machine, 2,M6502_IRQ_LINE,HOLD_LINE);
+		cpunum_set_input_line(machine, 2,M6502_IRQ_LINE,HOLD_LINE);
 
 	MSM5205_data_w (0,msm5205next>>4);
 	msm5205next<<=4;
@@ -2010,14 +2009,14 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate); /* M6502_IRQ_LINE */
+	cpunum_set_input_line(machine, 1,0,linestate); /* M6502_IRQ_LINE */
 }
 
-static void oscar_irqhandler(int linestate)
+static void oscar_irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 2,0,linestate); /* M6502_IRQ_LINE */
+	cpunum_set_input_line(machine, 2,0,linestate); /* M6502_IRQ_LINE */
 }
 
 static const struct YM3526interface ym3526_interface =

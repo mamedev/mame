@@ -61,7 +61,7 @@ struct compare_timer_chip
 	UINT16	counter;
 	UINT8	bit;
 	void	(*sound_w)(UINT8);
-	void	(*timer_ack)(void);
+	void	(*timer_ack)(running_machine *);
 };
 
 
@@ -585,7 +585,7 @@ WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(2, offset, data, mem_mask); }
  *
  *************************************/
 
-void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(void))
+void segaic16_compare_timer_init(int which, void (*sound_write_callback)(UINT8), void (*timer_ack_callback)(running_machine *))
 {
 	compare_timer[which].sound_w = sound_write_callback;
 	compare_timer[which].timer_ack = timer_ack_callback;
@@ -644,7 +644,7 @@ static void update_compare(int which, int update_history)
 static void timer_interrupt_ack(int which)
 {
 	if (compare_timer[which].timer_ack)
-		(*compare_timer[which].timer_ack)();
+		(*compare_timer[which].timer_ack)(Machine);
 }
 
 

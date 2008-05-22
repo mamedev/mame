@@ -58,7 +58,7 @@ static TIMER_CALLBACK( r6532_irq_timer_callback )
 	{
 		r6532[which].timer_irq = 1;
 		if (r6532[which].intf->irq_func)
-			(*r6532[which].intf->irq_func)(ASSERT_LINE);
+			(*r6532[which].intf->irq_func)(machine, ASSERT_LINE);
 		else
 			logerror("6532RIOT chip #%d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 	}
@@ -73,7 +73,7 @@ static void r6532_pa7_check(int which){
 		if (r6532[which].pa7_enable)
 		{
 			if (r6532[which].intf->irq_func)
-				(*r6532[which].intf->irq_func)(ASSERT_LINE);
+				(*r6532[which].intf->irq_func)(Machine, ASSERT_LINE);
 			else
 				logerror("6532RIOT chip #%d: Interrupt is asserted but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 		}
@@ -166,7 +166,7 @@ INLINE UINT8 r6532_read_timer(int which)
 		if (timer_cycles_left != -1)
 		{
 			if (r6532[which].intf->irq_func && r6532[which].timer_irq)
-				(*r6532[which].intf->irq_func)(CLEAR_LINE);
+				(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
 			else
 				logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 
@@ -204,7 +204,7 @@ INLINE UINT8 r6532_read_irq_flags(int which)
 		if ( timer_cycles_left < -1 )
 		{
 			if ( r6532[which].intf->irq_func)
-				(*r6532[which].intf->irq_func)(CLEAR_LINE);
+				(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
 			else
 				logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 
@@ -219,7 +219,7 @@ INLINE UINT8 r6532_read_irq_flags(int which)
 		r6532[which].pa7_flag = 0;
 
 		if (r6532[which].intf->irq_func && timer_cycles_left != -1)
-			(*r6532[which].intf->irq_func)(CLEAR_LINE);
+			(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
 		else
 			logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 	}
@@ -300,7 +300,7 @@ void r6532_reset(int which)
 	r6532[which].timer_irq = 0;
 
 	if (r6532[which].intf->irq_func)
-		(*r6532[which].intf->irq_func)(CLEAR_LINE);
+		(*r6532[which].intf->irq_func)(Machine, CLEAR_LINE);
 	else
 		logerror("6532RIOT chip #%d: Interrupt is cleared but there is no callback function.  PC: %08X\n", which, safe_activecpu_get_pc());
 }

@@ -144,9 +144,9 @@ static READ16_HANDLER( ultennis_hack_r )
 	if (activecpu_get_pc() == 0x18c2)
 	{
 		hack_irq = 1;
-		update_irq_state(Machine);
+		update_irq_state(machine);
 		hack_irq = 0;
-		update_irq_state(Machine);
+		update_irq_state(machine);
 	}
 	return input_port_read_indexed(machine, 0);
 }
@@ -401,7 +401,7 @@ static WRITE16_HANDLER( protection_bit_w )
 		prot_bit_index = 0;
 
 		/* update the protection state */
-		(*protection_handler)(Machine);
+		(*protection_handler)(machine);
 	}
 }
 

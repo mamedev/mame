@@ -180,7 +180,7 @@ struct _z80sio
 	sio_channel	chan[2];			/* 2 channels */
 	UINT8		int_state[8];		/* interrupt states */
 
-	void (*irq_cb)(int state);
+	void (*irq_cb)(running_machine *machine, int state);
 	write8_machine_func dtr_changed_cb;
 	write8_machine_func rts_changed_cb;
 	write8_machine_func break_changed_cb;
@@ -265,7 +265,7 @@ INLINE void interrupt_check(z80sio *sio)
 {
 	/* if we have a callback, update it with the current state */
 	if (sio->irq_cb != NULL)
-		(*sio->irq_cb)((z80sio_irq_state(sio - sios) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		(*sio->irq_cb)(Machine, (z80sio_irq_state(sio - sios) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

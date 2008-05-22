@@ -668,10 +668,10 @@ WRITE8_HANDLER( atarigen_6502_irq_ack_w )
     IRQ line.
 ---------------------------------------------------------------*/
 
-void atarigen_ym2151_irq_gen(int irq)
+void atarigen_ym2151_irq_gen(running_machine *machine, int irq)
 {
 	ym2151_int = irq;
-	update_6502_irq(Machine);
+	update_6502_irq(machine);
 }
 
 

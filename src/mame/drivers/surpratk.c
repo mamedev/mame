@@ -9,7 +9,6 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -222,9 +221,9 @@ INPUT_PORTS_END
 
 
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 0,KONAMI_FIRQ_LINE,linestate);
+	cpunum_set_input_line(machine, 0,KONAMI_FIRQ_LINE,linestate);
 }
 
 static const struct YM2151interface ym2151_interface =

@@ -270,7 +270,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 #include "cpu/sh2/sh2.h"
 #include "machine/eeprom.h"
@@ -580,12 +579,12 @@ static ADDRESS_MAP_START( ps5_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&psh_ram)
 ADDRESS_MAP_END
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(Machine, 0, 12, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 12, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 12, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 12, CLEAR_LINE);
 }
 
 static const struct YMF278B_interface ymf278b_interface =

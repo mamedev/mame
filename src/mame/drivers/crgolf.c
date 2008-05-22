@@ -169,7 +169,7 @@ static READ8_HANDLER( sound_to_main_r )
  *
  *************************************/
 
-static void vck_callback(int data)
+static void vck_callback(running_machine *machine, int data)
 {
 	/* only play back if we have data remaining */
 	if (sample_count != 0xff)

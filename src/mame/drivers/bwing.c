@@ -98,7 +98,7 @@ static INTERRUPT_GEN ( bwp3_interrupt ) { if (!bwp3_nmimask) cpunum_set_input_li
 
 static WRITE8_HANDLER( bwp12_sharedram1_w ) { bwp1_sharedram1[offset] = bwp2_sharedram1[offset] = data; }
 static WRITE8_HANDLER( bwp3_u8F_w ) { bwp3_u8F_d = data; } // prepares custom chip for various operations
-static WRITE8_HANDLER( bwp3_nmiack_w ) { cpunum_set_input_line(Machine, 2, INPUT_LINE_NMI, CLEAR_LINE); }
+static WRITE8_HANDLER( bwp3_nmiack_w ) { cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE); }
 static WRITE8_HANDLER( bwp3_nmimask_w ) { bwp3_nmimask = data & 0x80; }
 
 

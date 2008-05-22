@@ -71,7 +71,6 @@ Is there another alt program rom set labeled 9 & 10?
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/kaneko16.h"
 #include "sound/2203intf.h"
@@ -101,12 +100,12 @@ static UINT8 vblank_irq;
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	if (vblank_irq || sprite_irq || unknown_irq)
-		cpunum_set_input_line(Machine, 0, 1, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 }
 
 
@@ -115,14 +114,14 @@ static void update_irq_state(void)
 static INTERRUPT_GEN( sandscrp_interrupt )
 {
 	vblank_irq = 1;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
 static VIDEO_EOF( sandscrp )
 {
 	sprite_irq = 1;
-	update_irq_state();
+	update_irq_state(machine);
 	pandora_eof(machine);
 }
 
@@ -148,7 +147,7 @@ static WRITE16_HANDLER( sandscrp_irq_cause_w )
 		if (data & 0x20)	vblank_irq  = 0;
 	}
 
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
@@ -415,9 +414,9 @@ GFXDECODE_END
 
 /* YM3014B + YM2203C */
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2203interface ym2203_intf_sandscrp =

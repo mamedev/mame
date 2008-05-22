@@ -103,7 +103,6 @@ Few words about protection:
 
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT16 *shared_ram;
 
@@ -230,7 +229,7 @@ static READ16_HANDLER( ddealer_mcu_r )
 	if (resp[respcount]<0)
 	{
 		 respcount = 0;
-		 ddealer_protection(Machine);
+		 ddealer_protection(machine);
 
 	}
 	return res;

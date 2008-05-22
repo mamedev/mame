@@ -77,7 +77,6 @@ Coin B is not used
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
@@ -146,7 +145,7 @@ static READ8_HANDLER(fake_6_r)
 	/* FIXME: earlier attemts to remove ?
     return 1;
     return 0;
-    return mame_rand(Machine);
+    return mame_rand(machine);
     */
 }
 
@@ -290,9 +289,9 @@ static GFXDECODE_START( ashnojoe )
 	GFXDECODE_ENTRY( REGION_GFX5, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER(writeA)
@@ -307,9 +306,9 @@ static WRITE8_HANDLER(writeB)
 	memory_set_bankptr(4, memory_region(REGION_SOUND1) + ((data & 0xf) * 0x8000));
 }
 
-static void ashnojoe_adpcm_int (int data)
+static void ashnojoe_adpcm_int (running_machine *machine, int data)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const struct MSM5205interface msm5205_interface =

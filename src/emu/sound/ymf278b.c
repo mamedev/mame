@@ -118,7 +118,7 @@ typedef struct
 	int irq_line;
 
 	UINT8 port_A, port_B, port_C;
-	void (*irq_callback)(int);
+	void (*irq_callback)(running_machine *, int);
 
 	const UINT8 *rom;
 	int clock;
@@ -336,12 +336,12 @@ static void ymf278b_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	}
 }
 
-static void ymf278b_irq_check(YMF278BChip *chip)
+static void ymf278b_irq_check(running_machine *machine, YMF278BChip *chip)
 {
 	int prev_line = chip->irq_line;
 	chip->irq_line = chip->current_irq ? ASSERT_LINE : CLEAR_LINE;
 	if(chip->irq_line != prev_line && chip->irq_callback)
-		chip->irq_callback(chip->irq_line);
+		chip->irq_callback(machine, chip->irq_line);
 }
 
 static TIMER_CALLBACK( ymf278b_timer_a_tick )
@@ -350,7 +350,7 @@ static TIMER_CALLBACK( ymf278b_timer_a_tick )
 	if(!(chip->enable & 0x40))
 	{
 		chip->current_irq |= 0x40;
-		ymf278b_irq_check(chip);
+		ymf278b_irq_check(machine, chip);
 	}
 }
 
@@ -360,7 +360,7 @@ static TIMER_CALLBACK( ymf278b_timer_b_tick )
 	if(!(chip->enable & 0x20))
 	{
 		chip->current_irq |= 0x20;
-		ymf278b_irq_check(chip);
+		ymf278b_irq_check(machine, chip);
 	}
 }
 
@@ -394,7 +394,7 @@ static void ymf278b_timer_b_reset(YMF278BChip *chip)
 		timer_adjust_oneshot(chip->timer_b, attotime_never, 0);
 }
 
-static void ymf278b_A_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
+static void ymf278b_A_w(running_machine *machine, YMF278BChip *chip, UINT8 reg, UINT8 data)
 {
 	switch(reg)
 	{
@@ -419,7 +419,7 @@ static void ymf278b_A_w(YMF278BChip *chip, UINT8 reg, UINT8 data)
 				if((old_enable ^ data) & 2)
 					ymf278b_timer_b_reset(chip);
 			}
-			ymf278b_irq_check(chip);
+			ymf278b_irq_check(machine, chip);
 			break;
 		default:
 			logerror("YMF278B:  Port A write %02x, %02x\n", reg, data);
@@ -624,10 +624,10 @@ static void ymf278b_control_port_A_w(int num, UINT8 data)
 	chip->port_A = data;
 }
 
-static void ymf278b_data_port_A_w(int num, UINT8 data)
+static void ymf278b_data_port_A_w(running_machine *machine, int num, UINT8 data)
 {
 	YMF278BChip *chip = sndti_token(SOUND_YMF278B, num);
-	ymf278b_A_w(chip, chip->port_A, data);
+	ymf278b_A_w(machine, chip, chip->port_A, data);
 }
 
 static void ymf278b_control_port_B_w(int num, UINT8 data)
@@ -654,7 +654,7 @@ static void ymf278b_data_port_C_w(int num, UINT8 data)
 	ymf278b_C_w(chip, chip->port_C, data);
 }
 
-static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(int), int clock)
+static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machine *, int), int clock)
 {
 	chip->rom = rom;
 	chip->irq_callback = cb;
@@ -720,7 +720,7 @@ WRITE8_HANDLER( YMF278B_control_port_0_A_w )
 
 WRITE8_HANDLER( YMF278B_data_port_0_A_w )
 {
-	ymf278b_data_port_A_w(0, data);
+	ymf278b_data_port_A_w(machine, 0, data);
 }
 
 WRITE8_HANDLER( YMF278B_control_port_0_B_w )
@@ -761,7 +761,7 @@ WRITE8_HANDLER( YMF278B_control_port_1_A_w )
 
 WRITE8_HANDLER( YMF278B_data_port_1_A_w )
 {
-	ymf278b_data_port_A_w(1, data);
+	ymf278b_data_port_A_w(machine, 1, data);
 }
 
 WRITE8_HANDLER( YMF278B_control_port_1_B_w )

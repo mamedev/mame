@@ -12,7 +12,6 @@ segac2.c
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "genesis.h"
 
 #define MASTER_CLOCK		53693100
@@ -140,10 +139,10 @@ INTERRUPT_GEN( genesis_vblank_interrupt )
 
 
 /* interrupt callback to generate the YM3438 interrupt */
-void genesis_irq2_interrupt(int state)
+void genesis_irq2_interrupt(running_machine *machine, int state)
 {
 	irq2_int = state;
-	update_interrupts(Machine);
+	update_interrupts(machine);
 }
 
 

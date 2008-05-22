@@ -19,7 +19,6 @@ dip 1X8
 
 
 #include "driver.h"
-#include "deprecat.h"
 
 static UINT8 *fortecar_ram;
 
@@ -34,7 +33,7 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 READ8_HANDLER( fortecar_read62 )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 #endif
 

@@ -593,10 +593,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void sound_irq(void)
+static void sound_irq(running_machine *machine)
 {
 	if (control & 0x0001)
-		cpunum_set_input_line(Machine, 0, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
 static const struct K054539interface k054539_interface =

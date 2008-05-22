@@ -364,9 +364,9 @@ static INTERRUPT_GEN( wwfwfest_interrupt ) {
  Straight from Ddragon 3 with some adjusted volumes
 *******************************************************************************/
 
-static void dd3_ymirq_handler(int irq)
+static void dd3_ymirq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

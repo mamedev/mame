@@ -15,7 +15,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 
@@ -39,7 +38,7 @@ static READ16_HANDLER( pip )
 
 static READ16_HANDLER( pap )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 

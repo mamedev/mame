@@ -381,10 +381,10 @@ static READ32_HANDLER( dragngun_service_r )
 static READ32_HANDLER( lockload_gun_mirror_r )
 {
 //logerror("%08x:Read gun %d\n",activecpu_get_pc(),offset);
-//return ((mame_rand(Machine)%0xffff)<<16) | mame_rand(Machine)%0xffff;
+//return ((mame_rand(machine)%0xffff)<<16) | mame_rand(machine)%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return input_port_read_indexed(machine, 5) | ((mame_rand(Machine)%0xff)<<16);
-	return input_port_read_indexed(machine, 4) | input_port_read_indexed(machine, 6) | (input_port_read_indexed(machine, 6)<<16) | (input_port_read_indexed(machine, 6)<<24); //((mame_rand(Machine)%0xff)<<16);
+		return input_port_read_indexed(machine, 5) | ((mame_rand(machine)%0xff)<<16);
+	return input_port_read_indexed(machine, 4) | input_port_read_indexed(machine, 6) | (input_port_read_indexed(machine, 6)<<16) | (input_port_read_indexed(machine, 6)<<24); //((mame_rand(machine)%0xff)<<16);
 }
 
 static READ32_HANDLER( dragngun_prot_r )
@@ -1777,19 +1777,19 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
 }
 
-static void sound_irq_nslasher(int state)
+static void sound_irq_nslasher(running_machine *machine, int state)
 {
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)
 		nslasher_sound_irq |= 0x01;
 	else
 		nslasher_sound_irq &= ~0x01;
-	cpunum_set_input_line(Machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

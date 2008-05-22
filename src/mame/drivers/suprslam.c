@@ -81,7 +81,6 @@ EB26IC73.BIN    27C240      /  Main Program
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "sound/2610intf.h"
 
@@ -312,9 +311,9 @@ GFXDECODE_END
 
 /*** MORE SOUND **************************************************************/
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

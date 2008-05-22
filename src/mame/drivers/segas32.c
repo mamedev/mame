@@ -292,7 +292,6 @@ Stadium Cross EPR15093  EPR15094  EPR15018  EPR15019  EPR15192  EPR15020  EPR150
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "rendlay.h"
 #include "segas32.h"
 #include "machine/eeprom.h"
@@ -375,9 +374,9 @@ static void (*system32_prot_vblank)(void);
  *
  *************************************/
 
-static void signal_v60_irq(int data);
+static void signal_v60_irq(running_machine *machine, int data);
 static TIMER_CALLBACK( signal_v60_irq_callback );
-static void signal_sound_irq(int which);
+static void signal_sound_irq(running_machine *machine, int which);
 
 
 
@@ -408,7 +407,7 @@ static MACHINE_RESET( system32 )
  *
  *************************************/
 
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	UINT8 effirq = v60_irq_control[7] & ~v60_irq_control[6] & 0x1f;
 	int vector;
@@ -418,17 +417,17 @@ static void update_irq_state(void)
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(Machine, 0, 0, ASSERT_LINE, vector);
+			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
-static void signal_v60_irq(int which)
+static void signal_v60_irq(running_machine *machine, int which)
 {
 	int i;
 
@@ -436,17 +435,17 @@ static void signal_v60_irq(int which)
 	for (i = 0; i < 5; i++)
 		if (v60_irq_control[i] == which)
 			v60_irq_control[7] |= 1 << i;
-	update_irq_state();
+	update_irq_state(machine);
 }
 
 
 static TIMER_CALLBACK( signal_v60_irq_callback )
 {
-	signal_v60_irq(param);
+	signal_v60_irq(machine, param);
 }
 
 
-static void int_control_w(int offset, UINT8 data)
+static void int_control_w(running_machine *machine, int offset, UINT8 data)
 {
 	int duration;
 
@@ -467,12 +466,12 @@ static void int_control_w(int offset, UINT8 data)
 
 		case 6:			/* mask */
 			v60_irq_control[offset] = data;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 7:			/* acknowledge */
 			v60_irq_control[offset] &= data;
-			update_irq_state();
+			update_irq_state(machine);
 			break;
 
 		case 8:
@@ -501,7 +500,7 @@ static void int_control_w(int offset, UINT8 data)
 		case 13:
 		case 14:
 		case 15:		/* signal IRQ to sound CPU */
-			signal_sound_irq(SOUND_IRQ_V60);
+			signal_sound_irq(machine, SOUND_IRQ_V60);
 			break;
 	}
 }
@@ -528,9 +527,9 @@ static READ16_HANDLER( interrupt_control_16_r )
 static WRITE16_HANDLER( interrupt_control_16_w )
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(offset*2+0, data);
+		int_control_w(machine, offset*2+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(offset*2+1, data >> 8);
+		int_control_w(machine, offset*2+1, data >> 8);
 }
 
 
@@ -551,26 +550,26 @@ static READ32_HANDLER( interrupt_control_32_r )
 static WRITE32_HANDLER( interrupt_control_32_w )
 {
 	if (ACCESSING_BITS_0_7)
-		int_control_w(offset*4+0, data);
+		int_control_w(machine, offset*4+0, data);
 	if (ACCESSING_BITS_8_15)
-		int_control_w(offset*4+1, data >> 8);
+		int_control_w(machine, offset*4+1, data >> 8);
 	if (ACCESSING_BITS_16_23)
-		int_control_w(offset*4+2, data >> 16);
+		int_control_w(machine, offset*4+2, data >> 16);
 	if (ACCESSING_BITS_24_31)
-		int_control_w(offset*4+3, data >> 24);
+		int_control_w(machine, offset*4+3, data >> 24);
 }
 
 
 static TIMER_CALLBACK( end_of_vblank_int )
 {
-	signal_v60_irq(MAIN_IRQ_VBSTOP);
+	signal_v60_irq(machine, MAIN_IRQ_VBSTOP);
 	system32_set_vblank(0);
 }
 
 
 static INTERRUPT_GEN( start_of_vblank_int )
 {
-	signal_v60_irq(MAIN_IRQ_VBSTART);
+	signal_v60_irq(machine, MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
@@ -637,7 +636,7 @@ static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offse
 }
 
 
-static void common_io_chip_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_io_chip_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT8 old;
 
@@ -692,7 +691,7 @@ static void common_io_chip_w(int which, offs_t offset, UINT16 data, UINT16 mem_m
 		case 0x1c/2:
 			system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -706,7 +705,7 @@ static READ16_HANDLER( io_chip_r )
 
 static WRITE16_HANDLER( io_chip_w )
 {
-	common_io_chip_w(0, offset, data, mem_mask);
+	common_io_chip_w(machine, 0, offset, data, mem_mask);
 }
 
 
@@ -720,9 +719,9 @@ static READ32_HANDLER( io_chip_0_r )
 static WRITE32_HANDLER( io_chip_0_w )
 {
 	if (ACCESSING_BITS_0_15)
-		common_io_chip_w(0, offset*2+0, data, mem_mask);
+		common_io_chip_w(machine, 0, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_io_chip_w(0, offset*2+1, data >> 16, mem_mask >> 16);
+		common_io_chip_w(machine, 0, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -736,9 +735,9 @@ static READ32_HANDLER( io_chip_1_r )
 static WRITE32_HANDLER( io_chip_1_w )
 {
 	if (ACCESSING_BITS_0_15)
-		common_io_chip_w(1, offset*2+0, data, mem_mask);
+		common_io_chip_w(machine, 1, offset*2+0, data, mem_mask);
 	if (ACCESSING_BITS_16_31)
-		common_io_chip_w(1, offset*2+1, data >> 16, mem_mask >> 16);
+		common_io_chip_w(machine, 1, offset*2+1, data >> 16, mem_mask >> 16);
 }
 
 
@@ -964,7 +963,7 @@ static WRITE16_HANDLER( random_number_16_w )
 
 static READ16_HANDLER( random_number_16_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE32_HANDLER( random_number_32_w )
@@ -974,7 +973,7 @@ static WRITE32_HANDLER( random_number_32_w )
 
 static READ32_HANDLER( random_number_32_r )
 {
-	return mame_rand(Machine) ^ (mame_rand(Machine) << 16);
+	return mame_rand(machine) ^ (mame_rand(machine) << 16);
 }
 
 
@@ -1027,7 +1026,7 @@ static WRITE32_HANDLER( shared_ram_32_w )
  *
  *************************************/
 
-static void update_sound_irq_state(void)
+static void update_sound_irq_state(running_machine *machine)
 {
 	UINT8 effirq = sound_irq_input & ~sound_irq_control[3] & 0x07;
 	int vector;
@@ -1037,17 +1036,17 @@ static void update_sound_irq_state(void)
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(Machine, 1, 0, ASSERT_LINE, 2 * vector);
+			cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		cpunum_set_input_line(Machine, 1, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
 
-static void signal_sound_irq(int which)
+static void signal_sound_irq(running_machine *machine, int which)
 {
 	int i;
 
@@ -1055,17 +1054,17 @@ static void signal_sound_irq(int which)
 	for (i = 0; i < 3; i++)
 		if (sound_irq_control[i] == which)
 			sound_irq_input |= 1 << i;
-	update_sound_irq_state();
+	update_sound_irq_state(machine);
 }
 
 
-static void clear_sound_irq(int which)
+static void clear_sound_irq(running_machine *machine, int which)
 {
 	int i;
 	for (i = 0; i < 3; i++)
 		if (sound_irq_control[i] == which)
 			sound_irq_input &= ~(1 << i);
-	update_sound_irq_state();
+	update_sound_irq_state(machine);
 }
 
 
@@ -1075,28 +1074,28 @@ static WRITE8_HANDLER( sound_int_control_lo_w )
 	if (offset & 1)
 	{
 		sound_irq_input &= data;
-		update_sound_irq_state();
+		update_sound_irq_state(machine);
 	}
 
 	/* high offsets signal an IRQ to the v60 */
 	if (offset & 4)
-		signal_v60_irq(MAIN_IRQ_SOUND);
+		signal_v60_irq(machine, MAIN_IRQ_SOUND);
 }
 
 
 static WRITE8_HANDLER( sound_int_control_hi_w )
 {
 	sound_irq_control[offset] = data;
-	update_sound_irq_state();
+	update_sound_irq_state(machine);
 }
 
 
-static void ym3438_irq_handler(int state)
+static void ym3438_irq_handler(running_machine *machine, int state)
 {
 	if (state)
-		signal_sound_irq(SOUND_IRQ_YM3438);
+		signal_sound_irq(machine, SOUND_IRQ_YM3438);
 	else
-		clear_sound_irq(SOUND_IRQ_YM3438);
+		clear_sound_irq(machine, SOUND_IRQ_YM3438);
 }
 
 

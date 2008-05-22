@@ -175,7 +175,7 @@ static VIDEO_UPDATE( bmcbowl )
 
 static READ16_HANDLER( bmc_random_read )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ16_HANDLER( bmc_protection_r )
@@ -192,7 +192,7 @@ static READ16_HANDLER( bmc_protection_r )
 			break;
 	}
 	logerror("Protection read @ %X\n",activecpu_get_previouspc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
@@ -245,7 +245,7 @@ static WRITE8_HANDLER(via_ca2_out)
 }
 
 
-static void via_irq(int state)
+static void via_irq(running_machine *machine, int state)
 {
 	//used
 }

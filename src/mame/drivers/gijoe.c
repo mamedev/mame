@@ -37,7 +37,6 @@ Known Issues
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
@@ -199,9 +198,9 @@ static READ16_HANDLER( sound_status_r )
 	return soundlatch2_r(machine,0);
 }
 
-static void sound_nmi(void)
+static void sound_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( gijoe )

@@ -195,8 +195,8 @@ void pia_reset(void)
 		pias[i].in_ca2 = TRUE;
 
 		/* clear the IRQs */
-		if (intf->irq_a_func) (*intf->irq_a_func)(FALSE);
-		if (intf->irq_b_func) (*intf->irq_b_func)(FALSE);
+		if (intf->irq_a_func) (*intf->irq_a_func)(Machine, FALSE);
+		if (intf->irq_b_func) (*intf->irq_b_func)(Machine, FALSE);
 	}
 }
 
@@ -219,7 +219,7 @@ static void update_interrupts(pia6821 *p)
 	{
 		p->irq_a_state = new_state;
 
-		if (p->intf->irq_a_func) (p->intf->irq_a_func)(p->irq_a_state);
+		if (p->intf->irq_a_func) (p->intf->irq_a_func)(Machine, p->irq_a_state);
 	}
 
 	/* then do IRQ B */
@@ -229,7 +229,7 @@ static void update_interrupts(pia6821 *p)
 	{
 		p->irq_b_state = new_state;
 
-		if (p->intf->irq_b_func) (p->intf->irq_b_func)(p->irq_b_state);
+		if (p->intf->irq_b_func) (p->intf->irq_b_func)(Machine, p->irq_b_state);
 	}
 }
 

@@ -59,9 +59,9 @@ enum
  *
  *************************************/
 
-static void ptm_irq(int state)
+static void ptm_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 0, INT_6840PTM, state);
+	cpunum_set_input_line(machine, 0, INT_6840PTM, state);
 }
 
 static const ptm6840_interface ptm_intf =

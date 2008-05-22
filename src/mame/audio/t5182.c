@@ -190,7 +190,7 @@ static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 	timer_call_after_resynch(NULL, CPU_CLEAR,setirq_callback);
 }
 
-static void t5182_ym2151_irq_handler(int irq)
+static void t5182_ym2151_irq_handler(running_machine *machine, int irq)
 {
 	if (irq)
 		timer_call_after_resynch(NULL, YM2151_ASSERT,setirq_callback);

@@ -269,7 +269,7 @@ static MACHINE_RESET( mpu4_vid )
 */
 
 
-static void update_mpu68_interrupts(void)
+static void update_mpu68_interrupts(running_machine *machine)
 {
 	int newstate = 0;
 
@@ -284,12 +284,12 @@ static void update_mpu68_interrupts(void)
 	if (newstate)
 	{
 		LOGSTUFF(("68k IRQ, %x\n", newstate));
-		cpunum_set_input_line(Machine, 1, newstate, ASSERT_LINE);
+		cpunum_set_input_line(machine, 1, newstate, ASSERT_LINE);
 	}
 	else
 	{
 		LOGSTUFF(("68k IRQ Clear, %x\n", newstate));
-		cpunum_set_input_line(Machine, 1, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, 7, CLEAR_LINE);
 	}
 }
 
@@ -307,7 +307,7 @@ static void m68k_acia_irq(int state)
 {
 	m6809_acia_cts = state;
 	m6850_irq_state = state;
-	update_mpu68_interrupts();
+	update_mpu68_interrupts(Machine);
 }
 
 
@@ -337,10 +337,10 @@ static const struct acia6850_interface m68k_acia_if =
 };
 
 
-static void cpu1_ptm_irq(int state)
+static void cpu1_ptm_irq(running_machine *machine, int state)
 {
 	m6840_irq_state = state;
-	update_mpu68_interrupts();
+	update_mpu68_interrupts(machine);
 }
 
 
@@ -794,7 +794,7 @@ static void scn2674_write_command(UINT8 data)
 		{
 			scn2674_irq_state = 1;
 		}
-		update_mpu68_interrupts();
+		update_mpu68_interrupts(Machine);
 	}
 	if ((data&0xe0)==0x80)
 	{
@@ -820,7 +820,7 @@ static void scn2674_write_command(UINT8 data)
 				scn2674_irq_state = 1;
 			}
 		}
-		update_mpu68_interrupts();
+		update_mpu68_interrupts(Machine);
 
 	}
 
@@ -845,7 +845,7 @@ static void scn2674_write_command(UINT8 data)
 				scn2674_irq_state = 1;
 			}
 		}
-		update_mpu68_interrupts();
+		update_mpu68_interrupts(Machine);
 	}
 
 	/* Delayed Commands */
@@ -1353,7 +1353,7 @@ static INTERRUPT_GEN(mpu4_vid_irq)
 			{
 				LOGSTUFF(("vblank irq\n"));
 				scn2674_irq_state = 1;
-				update_mpu68_interrupts();
+				update_mpu68_interrupts(machine);
 
 				scn2674_irq_register |= 0x10;
 			}

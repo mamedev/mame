@@ -8,10 +8,10 @@
 
 extern UINT8 dynax_blitter_irq,	dynax_blitter2_irq;
 
-void sprtmtch_update_irq(void);
-void jantouki_update_irq(void);
-void mjelctrn_update_irq(void);
-void neruton_update_irq(void);
+void sprtmtch_update_irq(running_machine *machine);
+void jantouki_update_irq(running_machine *machine);
+void mjelctrn_update_irq(running_machine *machine);
+void neruton_update_irq(running_machine *machine);
 
 //----------- defined in video/dynax.c -----------
 

@@ -9,7 +9,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 
 static int crtindex;
 static int crtdata[256];
@@ -21,7 +20,7 @@ static int bitmap_offset=0;
 
 static READ8_HANDLER( tetriunk_random_r )
 {
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(crt_index_w)

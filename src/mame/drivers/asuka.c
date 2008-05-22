@@ -213,7 +213,6 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoipt.h"
 #include "video/taitoic.h"
 #include "audio/taitosnd.h"
@@ -268,7 +267,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static int adpcm_pos;
 
-static void asuka_msm5205_vck(int chip)
+static void asuka_msm5205_vck(running_machine *machine, int chip)
 {
 	static int adpcm_data = -1;
 
@@ -754,9 +753,9 @@ GFXDECODE_END
                 SOUND
 **************************************************************/
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

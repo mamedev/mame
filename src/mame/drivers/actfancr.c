@@ -23,7 +23,6 @@
 *******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
@@ -335,9 +334,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(int linestate)
+static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate); /* IRQ */
+	cpunum_set_input_line(machine, 1,0,linestate); /* IRQ */
 }
 
 static const struct YM3812interface ym3812_interface =

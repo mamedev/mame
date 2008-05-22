@@ -38,7 +38,6 @@ A1                   2101            2101
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 static UINT8 *ace_scoreram;
@@ -139,7 +138,7 @@ static WRITE8_HANDLER( ace_characterram_w )
 
 static READ8_HANDLER( unk_r )
 {
-	return mame_rand(Machine)&0xff;
+	return mame_rand(machine)&0xff;
 }
 
 

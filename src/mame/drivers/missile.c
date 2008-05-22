@@ -239,7 +239,6 @@
 ******************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/pokey.h"
 
 
@@ -610,7 +609,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset(Machine);
+		watchdog_reset(machine);
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)

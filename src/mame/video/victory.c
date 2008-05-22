@@ -101,12 +101,12 @@ VIDEO_START( victory )
  *
  *************************************/
 
-static void victory_update_irq(void)
+static void victory_update_irq(running_machine *machine)
 {
 	if (vblank_irq || fgcoll || (bgcoll && (video_control & 0x20)))
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 }
 
 
@@ -114,7 +114,7 @@ INTERRUPT_GEN( victory_vblank_interrupt )
 {
 	vblank_irq = 1;
 
-	victory_update_irq();
+	victory_update_irq(machine);
 }
 
 
@@ -167,7 +167,7 @@ READ8_HANDLER( victory_video_control_r )
 			if (fgcoll)
 			{
 				fgcoll = 0;
-				victory_update_irq();
+				victory_update_irq(machine);
 			}
 			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", activecpu_get_previouspc(), result);
 			return result;
@@ -182,7 +182,7 @@ READ8_HANDLER( victory_video_control_r )
 			if (bgcoll)
 			{
 				bgcoll = 0;
-				victory_update_irq();
+				victory_update_irq(machine);
 			}
 			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", activecpu_get_previouspc(), result);
 			return result;
@@ -321,7 +321,7 @@ WRITE8_HANDLER( victory_video_control_w )
 		case 0x0b:	/* CLRVIRQ */
 			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", activecpu_get_previouspc(), data);
 			vblank_irq = 0;
-			victory_update_irq();
+			victory_update_irq(machine);
 			break;
 
 		default:
@@ -674,7 +674,7 @@ static int command3(void)
 					rram[dstoffs + 0] ^= src >> shift;
 					rram[dstoffs + 1] ^= src << nshift;
 				}
-				if (fgcoll) victory_update_irq();
+				if (fgcoll) victory_update_irq(Machine);
 			}
 		}
 	}
@@ -874,7 +874,7 @@ static int command5(void)
 			}
 			acc &= 0xff;
 		}
-		if (fgcoll) victory_update_irq();
+		if (fgcoll) victory_update_irq(Machine);
 	}
 
 	micro.xp = x;
@@ -1004,7 +1004,7 @@ static int command7(void)
 			rram[addr + 0] ^= micro.r >> shift;
 			rram[addr + 1] ^= micro.r << nshift;
 		}
-		if (fgcoll) victory_update_irq();
+		if (fgcoll) victory_update_irq(Machine);
 	}
 
 	count_states(4);
@@ -1087,7 +1087,7 @@ static TIMER_CALLBACK( bgcoll_irq_callback )
 	bgcollx = param & 0xff;
 	bgcolly = param >> 8;
 	bgcoll = 1;
-	victory_update_irq();
+	victory_update_irq(machine);
 }
 
 

@@ -103,7 +103,7 @@ static WRITE8_HANDLER( YM2203_w )
 
 static int msm5205next;
 
-static void battlera_adpcm_int(int data)
+static void battlera_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle;
 
@@ -112,7 +112,7 @@ static void battlera_adpcm_int(int data)
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpunum_set_input_line(Machine, 1, 1, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlera_adpcm_data_w )

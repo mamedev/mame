@@ -220,7 +220,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
@@ -957,9 +956,9 @@ static GFXDECODE_START( pclubys )
 GFXDECODE_END
 
 
-static void soundirq(int state)
+static void soundirq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 static const struct YM3812interface ym3812_intf =

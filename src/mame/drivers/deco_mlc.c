@@ -96,7 +96,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "sound/ymz280b.h"
 #include "decoprot.h"
@@ -126,7 +125,7 @@ static READ32_HANDLER(test2_r)
 //  if (offset==0)
 //      return input_port_read_indexed(machine, 0); //0xffffffff;
 //   logerror("%08x:  Test2_r %d\n",activecpu_get_pc(),offset);
-	return mame_rand(Machine); //0xffffffff;
+	return mame_rand(machine); //0xffffffff;
 }
 
 static READ32_HANDLER(test3_r)
@@ -136,7 +135,7 @@ static READ32_HANDLER(test3_r)
 
 */
 //if (offset==0)
-//  return mame_rand(Machine)|(mame_rand(Machine)<<16);
+//  return mame_rand(machine)|(mame_rand(machine)<<16);
 //  logerror("%08x:  Test3_r %d\n",activecpu_get_pc(),offset);
 	return 0xffffffff;
 }

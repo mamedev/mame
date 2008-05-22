@@ -136,7 +136,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2610intf.h"
 
 VIDEO_UPDATE( mcatadv );
@@ -478,9 +477,9 @@ GFXDECODE_END
 
 
 /* Stolen from Psikyo.c */
-static void sound_irq( int irq )
+static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static const struct YM2610interface mcatadv_ym2610_interface =
 {

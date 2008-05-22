@@ -3,7 +3,7 @@
 
 struct YM2612interface
 {
-	void (*handler)(int irq);
+	void (*handler)(running_machine *machine, int irq);
 };
 
 
@@ -33,7 +33,7 @@ WRITE8_HANDLER( YM2612_data_port_1_B_w );
 
 struct YM3438interface
 {
-	void (*handler)(int irq);
+	void (*handler)(running_machine *machine, int irq);
 };
 
 

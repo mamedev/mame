@@ -4,7 +4,6 @@
  ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
@@ -191,29 +190,29 @@ READ16_HANDLER ( twincobr_BIO_r )
 }
 
 
-static void twincobr_dsp(int enable)
+static void twincobr_dsp(running_machine *machine, int enable)
 {
 	twincobr_dsp_on = enable;
 	if (enable) {
 		LOG(("Turning DSP on and main CPU off\n"));
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else {
 		LOG(("Turning DSP off\n"));
-		cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
+		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
 static STATE_POSTLOAD( twincobr_restore_dsp )
 {
-	twincobr_dsp(twincobr_dsp_on);
+	twincobr_dsp(machine, twincobr_dsp_on);
 }
 
 
-static void toaplan0_control_w(int offset, int data)
+static void toaplan0_control_w(running_machine *machine, int offset, int data)
 {
 	LOG(("CPU0:%08x  Writing %08x to %08x.\n",activecpu_get_pc(),data,toaplan_port_type[toaplan_main_cpu] - offset));
 
@@ -231,8 +230,8 @@ static void toaplan0_control_w(int offset, int data)
 		case 0x0009: twincobr_bg_ram_bank = 0x1000; break;
 		case 0x000a: twincobr_fg_rom_bank = 0x0000; break;
 		case 0x000b: twincobr_fg_rom_bank = 0x1000; break;
-		case 0x000c: twincobr_dsp(1); break;	 /* Enable the INT line to the DSP */
-		case 0x000d: twincobr_dsp(0); break;	 /* Inhibit the INT line to the DSP */
+		case 0x000c: twincobr_dsp(machine, 1); break;	 /* Enable the INT line to the DSP */
+		case 0x000d: twincobr_dsp(machine, 0); break;	 /* Inhibit the INT line to the DSP */
 		case 0x000e: twincobr_display(0); break; /* Turn display off */
 		case 0x000f: twincobr_display(1); break; /* Turn display on */
 	}
@@ -242,13 +241,13 @@ WRITE16_HANDLER( twincobr_control_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan0_control_w(offset, data & 0xff);
+		toaplan0_control_w(machine, offset, data & 0xff);
 	}
 }
 
 WRITE8_HANDLER( wardner_control_w )
 {
-	toaplan0_control_w(offset, data);
+	toaplan0_control_w(machine, offset, data);
 }
 
 
@@ -266,7 +265,7 @@ WRITE16_HANDLER( twincobr_sharedram_w )
 }
 
 
-static void toaplan0_coin_dsp_w(int offset, int data)
+static void toaplan0_coin_dsp_w(running_machine *machine, int offset, int data)
 {
 	if (data > 1)
 		LOG(("CPU0:%08x  Writing %08x to %08x.\n",activecpu_get_pc(),data,toaplan_port_type[toaplan_main_cpu] - offset));
@@ -282,14 +281,14 @@ static void toaplan0_coin_dsp_w(int offset, int data)
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
-					cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
-					cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
-					cpunum_set_input_line(Machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+					cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+					cpunum_set_input_line(machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
+					cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:	/* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
-					cpunum_set_input_line(Machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
-					cpunum_set_input_line(Machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+					cpunum_set_input_line(machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
+					cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 	}
 }
@@ -299,18 +298,18 @@ WRITE16_HANDLER( fshark_coin_dsp_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan0_coin_dsp_w(offset, data & 0xff);
+		toaplan0_coin_dsp_w(machine, offset, data & 0xff);
 	}
 }
 
 WRITE8_HANDLER( twincobr_coin_w )
 {
-	toaplan0_coin_dsp_w(offset, data);
+	toaplan0_coin_dsp_w(machine, offset, data);
 }
 
 WRITE8_HANDLER( wardner_coin_dsp_w )
 {
-	toaplan0_coin_dsp_w(offset, data);
+	toaplan0_coin_dsp_w(machine, offset, data);
 }
 
 

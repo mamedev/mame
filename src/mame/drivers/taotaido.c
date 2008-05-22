@@ -64,7 +64,6 @@ zooming might be wrong
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2610intf.h"
 
 #define TAOTAIDO_SHOW_ALL_INPUTS	0
@@ -319,9 +318,9 @@ static GFXDECODE_START( taotaido )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, taotaido_layout,  0x300, 256  ) /* bg tiles */
 GFXDECODE_END
 
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "homedata.h"
 
@@ -133,7 +132,7 @@ static void mrokumei_handleblit( running_machine *machine, int rom_base )
 	} /* for(;;) */
 
 finish:
-	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 static void reikaids_handleblit( running_machine *machine, int rom_base )
@@ -233,7 +232,7 @@ static void reikaids_handleblit( running_machine *machine, int rom_base )
 	}
 
 finish:
-	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 static void pteacher_handleblit( running_machine *machine, int rom_base )
@@ -321,7 +320,7 @@ static void pteacher_handleblit( running_machine *machine, int rom_base )
 	} /* for(;;) */
 
 finish:
-	cpunum_set_input_line(Machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+	cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 

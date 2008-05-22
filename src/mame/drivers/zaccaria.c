@@ -34,7 +34,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
@@ -100,8 +99,8 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 }
 
 
-static void zaccaria_irq0a(int state) { cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(int state) { cpunum_set_input_line(Machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0a(running_machine *machine, int state) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0b(running_machine *machine, int state) { cpunum_set_input_line(machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910,port0a,acs;
 
@@ -208,9 +207,9 @@ return counter;
 
 }
 
-static void tms5220_irq_handler(int state)
+static void tms5220_irq_handler(running_machine *machine, int state)
 {
-	pia_1_cb1_w(Machine,0,state ? 0 : 1);
+	pia_1_cb1_w(machine,0,state ? 0 : 1);
 }
 
 

@@ -59,7 +59,7 @@ static UINT8 sound_msb_latch;
  *
  *************************************/
 
-static void update_irq_state(void)
+static void update_irq_state(running_machine *machine)
 {
 	int i;
 
@@ -72,7 +72,7 @@ static void update_irq_state(void)
 		}
 
 	/* otherwise, clear them all */
-	cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -80,7 +80,7 @@ static IRQ_CALLBACK(irq_callback)
 {
 	/* auto-ack the IRQ */
 	irq_state[irqline] = 0;
-	update_irq_state();
+	update_irq_state(machine);
 
 	/* vector is 0x40 + index */
 	return 0x40 + irqline;
@@ -90,7 +90,7 @@ static IRQ_CALLBACK(irq_callback)
 void dcheese_signal_irq(int which)
 {
 	irq_state[which] = 1;
-	update_irq_state();
+	update_irq_state(Machine);
 }
 
 

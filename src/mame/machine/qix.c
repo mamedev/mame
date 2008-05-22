@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6805/m6805.h"
@@ -34,8 +33,8 @@ static WRITE8_HANDLER( pia_5_warning_w );
 static WRITE8_HANDLER( qix_coinctl_w );
 static WRITE8_HANDLER( slither_coinctl_w );
 
-static void qix_pia_sint(int state);
-static void qix_pia_dint(int state);
+static void qix_pia_sint(running_machine *machine, int state);
+static void qix_pia_dint(running_machine *machine, int state);
 
 static WRITE8_HANDLER( slither_76489_0_w );
 static WRITE8_HANDLER( slither_76489_1_w );
@@ -375,21 +374,21 @@ static WRITE8_HANDLER( sync_pia_4_porta_w )
  *
  *************************************/
 
-static void qix_pia_dint(int state)
+static void qix_pia_dint(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(3) | pia_get_irq_b(3);
 
 	/* DINT is connected to the data CPU's IRQ line */
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static void qix_pia_sint(int state)
+static void qix_pia_sint(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(4) | pia_get_irq_b(4);
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	cpunum_set_input_line(Machine, 2, M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

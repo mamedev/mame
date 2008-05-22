@@ -1299,24 +1299,24 @@ static IRQ_CALLBACK(irq_callback)
 	return i;
 }
 
-static void irq_init(void)
+static void irq_init(running_machine *machine)
 {
 	irqreq = 0;
-	cpunum_set_input_line(Machine, 0, 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
 	cpunum_set_irq_callback(0, irq_callback);
 }
 
-static void irq_raise(int level)
+static void irq_raise(running_machine *machine, int level)
 {
 	irqreq |= (1<<level);
-	cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
 
 
 static INTERRUPT_GEN(ms32_interrupt)
 {
-	if( cpu_getiloops() == 0 ) irq_raise(10);
-	if( cpu_getiloops() == 1 ) irq_raise(9);
+	if( cpu_getiloops() == 0 ) irq_raise(machine, 10);
+	if( cpu_getiloops() == 1 ) irq_raise(machine, 9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)
@@ -1325,12 +1325,12 @@ static INTERRUPT_GEN(ms32_interrupt)
        desertwr
        p47aces
        */
-	if( cpu_getiloops() >= 3 && cpu_getiloops() <= 32 ) irq_raise(0);
+	if( cpu_getiloops() >= 3 && cpu_getiloops() <= 32 ) irq_raise(machine, 0);
 }
 
 static MACHINE_RESET( ms32 )
 {
-	irq_init();
+	irq_init(machine);
 }
 
 

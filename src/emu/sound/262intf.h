@@ -4,7 +4,7 @@
 
 struct YMF262interface
 {
-	void (*handler)(int irq);
+	void (*handler)(running_machine *machine, int irq);
 };
 
 

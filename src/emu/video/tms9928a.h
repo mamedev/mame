@@ -27,7 +27,7 @@ typedef struct TMS9928a_interface
 	tms9928a_model model;		/* model: tms9929(a) runs at 50Hz instead of 60Hz */
 	int vram;					/* VRAM size in bytes (4k, 8k or 16k) */
 	int borderx, bordery;		/* number of border pixels to show in each direction */
-	void (*int_callback)(int);	/* callback which is called whenever the state
+	void (*int_callback)(running_machine *, int);	/* callback which is called whenever the state
                                 ** of the INT output of the TMS9918A changes (may be NULL)*/
 } TMS9928a_interface;
 
@@ -64,7 +64,7 @@ extern VIDEO_UPDATE( tms9928a );
 ** This next function must be called 50 (tms9929a) or 60 (tms99x8a) times per second,
 ** to generate the necessary interrupts
 */
-int TMS9928A_interrupt (void);
+int TMS9928A_interrupt (running_machine *machine);
 
 /*
 ** The parameter is a function pointer. This function is called whenever
@@ -80,7 +80,7 @@ void TMS9928A_set_spriteslimit (int);
 /*
 ** After loading a state, call this function
 */
-void TMS9928A_post_load (void);
+void TMS9928A_post_load (running_machine *machine);
 
 /*
 ** MachineDriver video declarations for the TMS9928A chip

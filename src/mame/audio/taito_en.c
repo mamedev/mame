@@ -178,7 +178,7 @@ READ16_HANDLER(es5510_dsp_r)
 */
 //  offset<<=1;
 
-//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(Machine)%0xffff;
+//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(machine)%0xffff;
 
 	if (offset==0x12) return 0;
 

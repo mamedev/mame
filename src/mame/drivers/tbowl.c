@@ -13,7 +13,6 @@ Might be some priority glitches
 ***/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
@@ -197,7 +196,7 @@ static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 	MSM5205_set_volume(offset & 1, (data & 0x7f) * 100 / 0x7f);
 }
 
-static void tbowl_adpcm_int(int num)
+static void tbowl_adpcm_int(running_machine *machine, int num)
 {
 	static int adpcm_data[2] = { -1, -1 };
 
@@ -556,9 +555,9 @@ GFXDECODE_END
 
 */
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 2,0,linestate);
+	cpunum_set_input_line(machine, 2,0,linestate);
 }
 
 static const struct YM3526interface ym3812_interface =

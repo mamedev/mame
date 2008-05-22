@@ -430,7 +430,7 @@ static TIMER_CALLBACK( K054539_irq )
 {
 	struct k054539_info *info = ptr;
 	if(info->regs[0x22f] & 0x20)
-		info->intf->irq ();
+		info->intf->irq(machine);
 }
 
 static void K054539_init_chip(struct k054539_info *info, int clock, int sndindex)

@@ -2114,10 +2114,10 @@ static const struct k005289_interface k005289_interface =
 	REGION_SOUND1	/* prom memory region */
 };
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
-/*cpunum_set_input_line(Machine, 1,0,HOLD_LINE);*/
+/*cpunum_set_input_line(machine, 1,0,HOLD_LINE);*/
 }
 
 static const struct YM2151interface ym2151_interface =

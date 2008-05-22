@@ -518,7 +518,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO | ATAPI_INTREASON_COMMAND;
 	}
 
-	psx_irq_set(0x400);
+	psx_irq_set(machine, 0x400);
 
 	verboselog( 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 }
@@ -568,7 +568,7 @@ static READ32_HANDLER( atapi_r )
 			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-			psx_irq_set(0x400);
+			psx_irq_set(machine, 0x400);
 		}
 
 		if( atapi_data_ptr < atapi_data_len )
@@ -585,7 +585,7 @@ static READ32_HANDLER( atapi_r )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					psx_irq_set(0x400);
+					psx_irq_set(machine, 0x400);
 				}
 			}
 		}
@@ -667,7 +667,7 @@ static WRITE32_HANDLER( atapi_w )
 				SCSIWriteData( inserted_cdrom, atapi_data, atapi_cdata_wait );
 
 				// assert IRQ
-				psx_irq_set(0x400);
+				psx_irq_set(machine, 0x400);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -740,7 +740,7 @@ static WRITE32_HANDLER( atapi_w )
 				}
 
 				// assert IRQ
-				psx_irq_set(0x400);
+				psx_irq_set(machine, 0x400);
 			}
 			else
 			{
@@ -857,7 +857,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					psx_irq_set(0x400);
+					psx_irq_set(machine, 0x400);
 					break;
 
 				case 0xef:	// SET FEATURES
@@ -866,7 +866,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
 
-					psx_irq_set(0x400);
+					psx_irq_set(machine, 0x400);
 					break;
 
 				default:
@@ -1221,7 +1221,7 @@ static TIMER_CALLBACK( root_finished )
 	if( ( m_p_n_root_mode[ n_counter ] & RC_IRQOVERFLOW ) != 0 ||
 		( m_p_n_root_mode[ n_counter ] & RC_IRQTARGET ) != 0 )
 	{
-		psx_irq_set( 0x10 << n_counter );
+		psx_irq_set( machine, 0x10 << n_counter );
 	}
 }
 
@@ -1524,7 +1524,7 @@ static MACHINE_RESET( konami573 )
 	if( chiptype[ 0 ] != 0 )
 	{
 		/* security cart */
-		psx_sio_input( 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
+		psx_sio_input( machine, 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
 	}
 
 	flash_bank = -1;

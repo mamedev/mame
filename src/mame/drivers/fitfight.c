@@ -82,7 +82,6 @@ Stephh's notes :
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/okim6295.h"
 
@@ -234,19 +233,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER(snd_porta_r)
 {
 	//mame_printf_debug("PA R @%x\n",activecpu_get_pc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ8_HANDLER(snd_portb_r)
 {
 	//mame_printf_debug("PB R @%x\n",activecpu_get_pc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ8_HANDLER(snd_portc_r)
 {
 	//mame_printf_debug("PC R @%x\n",activecpu_get_pc());
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static WRITE8_HANDLER(snd_porta_w)

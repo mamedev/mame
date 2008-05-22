@@ -231,7 +231,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoipt.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
@@ -257,7 +256,7 @@ static MACHINE_RESET( othunder )
 	last_irq_level = 0;
 }
 
-static void update_irq(void)
+static void update_irq(running_machine *machine)
 {
 	int curr_level;
 
@@ -270,7 +269,7 @@ static void update_irq(void)
 
 	if (curr_level != last_irq_level)
 	{
-		cpunum_set_input_line(Machine, 0,curr_level,curr_level ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0,curr_level,curr_level ? ASSERT_LINE : CLEAR_LINE);
 		last_irq_level = curr_level;
 	}
 }
@@ -288,19 +287,19 @@ static WRITE16_HANDLER( irq_ack_w )
 			break;
 	}
 
-	update_irq();
+	update_irq(machine);
 }
 
 static INTERRUPT_GEN( vblank_interrupt )
 {
 	vblank_irq = 1;
-	update_irq();
+	update_irq(machine);
 }
 
 static TIMER_CALLBACK( ad_interrupt )
 {
 	ad_irq = 1;
-	update_irq();
+	update_irq(machine);
 }
 
 
@@ -685,9 +684,9 @@ GFXDECODE_END
 **************************************************************/
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-static void irqhandler(int irq)
+static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM2610interface ym2610_interface =

@@ -76,7 +76,7 @@ static WRITE8_HANDLER( spd_adpcm_w )
 	}
 }
 
-static void spd_adpcm_int(int chip)
+static void spd_adpcm_int(running_machine *machine, int chip)
 {
 	static int adpcm_data[2] = { -1, -1 };
 
@@ -412,9 +412,9 @@ static GFXDECODE_START( spdodgeb )
 GFXDECODE_END
 
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine,1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const struct YM3812interface ym3812_interface =

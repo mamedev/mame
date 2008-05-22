@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/atarigen.h"
 #include "sound/dac.h"
 #include "includes/cyberbal.h"
@@ -84,7 +83,7 @@ WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
 	if (!io_68k_int)
 	{
 		io_68k_int = 1;
-		update_sound_68k_interrupts(Machine);
+		update_sound_68k_interrupts(machine);
 	}
 }
 
@@ -127,7 +126,7 @@ WRITE16_HANDLER( cyberbal_io_68k_irq_ack_w )
 	if (io_68k_int)
 	{
 		io_68k_int = 0;
-		update_sound_68k_interrupts(Machine);
+		update_sound_68k_interrupts(machine);
 	}
 }
 
@@ -161,6 +160,6 @@ WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 	if (fast_68k_int)
 	{
 		fast_68k_int = 0;
-		update_sound_68k_interrupts(Machine);
+		update_sound_68k_interrupts(machine);
 	}
 }

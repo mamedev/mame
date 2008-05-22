@@ -212,7 +212,7 @@ static WRITE8_HANDLER( msm_reset_w )
 	MSM5205_reset_w(0,data ? 0 : 1);
 }
 
-static void tehkanwc_adpcm_int (int data)
+static void tehkanwc_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle;
 

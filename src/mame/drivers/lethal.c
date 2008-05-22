@@ -165,7 +165,6 @@ maybe some priority issues / sprite placement issues..
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/hd6309/hd6309.h"
@@ -270,9 +269,9 @@ static READ8_HANDLER( sound_status_r )
 	return 0xf;
 }
 
-static void sound_nmi(void)
+static void sound_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )

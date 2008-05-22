@@ -71,7 +71,7 @@ struct POKEYinterface {
 	read8_machine_func allpot_r;
 	read8_machine_func serin_r;
 	write8_machine_func serout_w;
-	void (*interrupt_cb)(int mask);
+	void (*interrupt_cb)(running_machine *machine, int mask);
 };
 
 

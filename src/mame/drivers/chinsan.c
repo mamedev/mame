@@ -40,7 +40,6 @@ MM63.10N
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/mc8123.h"
 #include "sound/2203intf.h"
 
@@ -153,7 +152,7 @@ static READ8_HANDLER( chinsan_input_port_0_r )
 	}
 
 	printf("chinsan_input_port_0_r unk_r %02x\n", chinsan_port_select);
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 static READ8_HANDLER( chinsan_input_port_1_r )
@@ -182,7 +181,7 @@ static READ8_HANDLER( chinsan_input_port_1_r )
 	}
 
 	printf("chinsan_input_port_1_r unk_r %02x\n", chinsan_port_select);
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 

@@ -1368,7 +1368,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 }
 
 
-static void bbakraid_irqhandler (int state)
+static void bbakraid_irqhandler(running_machine *machine, int state)
 {
 	/* Not used ???  Connected to a test pin (TP082) */
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
@@ -3405,9 +3405,9 @@ static GFXDECODE_START( fixeighb )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, fixeighblayout , 0, 128 )
 GFXDECODE_END
 
-static void irqhandler(int linestate)
+static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(Machine, 1,0,linestate);
+	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
 static const struct YM3812interface ym3812_interface =
@@ -3902,10 +3902,10 @@ MACHINE_RESET(batsugun)
 	#endif
 }
 
-void batsugun_ym2151_irqhandler(int linestate)
+void batsugun_ym2151_irqhandler(running_machine *machine, int linestate)
 {
 	logerror("batsugun_ym2151_irqhandler %02x\n",linestate);
-//  update_irq_lines(Machine, linestate ? assert : clear);
+//  update_irq_lines(machine, linestate ? assert : clear);
 }
 
 const struct YM2151interface batsugun_ym2151_interface =

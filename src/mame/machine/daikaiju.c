@@ -98,7 +98,6 @@ displayed (game) or not (attract mode). Due to above bug message is always displ
 
 ***************************************************************************/
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 
 #define ID_DAIKAIJU 0x5a
@@ -341,7 +340,7 @@ READ8_HANDLER( daikaiju_mcu_status_r )
 {
 	int res = input_port_read_indexed(machine, 3);
 
-	res^=mame_rand(Machine)&3;
+	res^=mame_rand(machine)&3;
 	res |=((lsasquad_sound_pending & 0x02)^2)<<3; //inverted flag
 	lsasquad_sound_pending &= ~0x02;
 	return res;

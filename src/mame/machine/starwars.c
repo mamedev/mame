@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "starwars.h"
 #include "video/avgdvg.h"
 
@@ -414,7 +413,7 @@ READ8_HANDLER( starwars_prng_r )
      */
 
 	/* Use MAME's PRNG for now */
-	return mame_rand(Machine);
+	return mame_rand(machine);
 }
 
 

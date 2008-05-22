@@ -114,7 +114,7 @@ static const char *const ethernet_regname[64] =
 
 struct smc91c94_data
 {
-	void (*irq_handler)(int state);
+	void (*irq_handler)(running_machine *machine, int state);
 
 	/* raw register data and masks */
 	UINT16			reg[64];
@@ -154,7 +154,7 @@ static struct smc91c94_data ethernet;
  *
  *************************************/
 
-static void update_ethernet_irq(void);
+static void update_ethernet_irq(running_machine *machine);
 
 
 
@@ -177,9 +177,9 @@ void smc91c94_init(const struct smc91c9x_interface *config)
  *
  *************************************/
 
-void smc91c94_reset(void)
+void smc91c94_reset(running_machine *machine)
 {
-	void (*saved_handler)(int) = ethernet.irq_handler;
+	void (*saved_handler)(running_machine *machine, int) = ethernet.irq_handler;
 	memset(&ethernet, 0, sizeof(ethernet));
 	ethernet.irq_handler = saved_handler;
 
@@ -215,7 +215,7 @@ void smc91c94_reset(void)
 	ethernet.reg[EREG_REVISION]		= 0x3340;	ethernet.regmask[EREG_REVISION]		= 0x0000;
 	ethernet.reg[EREG_ERCV]			= 0x331f;	ethernet.regmask[EREG_ERCV]			= 0x009f;
 
-	update_ethernet_irq();
+	update_ethernet_irq(machine);
 }
 
 
@@ -226,7 +226,7 @@ void smc91c94_reset(void)
  *
  *************************************/
 
-static void update_ethernet_irq(void)
+static void update_ethernet_irq(running_machine *machine)
 {
 	UINT8 mask = ethernet.reg[EREG_INTERRUPT] >> 8;
 	UINT8 state = ethernet.reg[EREG_INTERRUPT] & 0xff;
@@ -234,7 +234,7 @@ static void update_ethernet_irq(void)
 	/* update the IRQ state */
 	ethernet.irq_state = ((mask & state) != 0);
 	if (ethernet.irq_handler)
-		(*ethernet.irq_handler)(ethernet.irq_state ? ASSERT_LINE : CLEAR_LINE);
+		(*ethernet.irq_handler)(machine, ethernet.irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -260,7 +260,7 @@ static void update_stats(void)
  *
  *************************************/
 
-static void finish_enqueue(int param)
+static void finish_enqueue(running_machine *machine, int param)
 {
 	int is_broadcast = (ethernet.tx[4] == 0xff && ethernet.tx[5] == 0xff && ethernet.tx[6] == 0xff &&
 						ethernet.tx[7] == 0xff && ethernet.tx[8] == 0xff && ethernet.tx[9] == 0xff);
@@ -320,7 +320,7 @@ static void finish_enqueue(int param)
 			ethernet.reg[EREG_INTERRUPT] |= EINT_RCV;
 			ethernet.reg[EREG_FIFO_PORTS] &= ~0x8000;
 		}
-	update_ethernet_irq();
+	update_ethernet_irq(machine);
 }
 
 
@@ -331,7 +331,7 @@ static void finish_enqueue(int param)
  *
  *************************************/
 
-static void process_command(UINT16 data)
+static void process_command(running_machine *machine, UINT16 data)
 {
 	switch ((data >> 5) & 7)
 	{
@@ -346,7 +346,7 @@ static void process_command(UINT16 data)
 			ethernet.reg[EREG_PNR_ARR] &= ~0xff00;
 			ethernet.reg[EREG_PNR_ARR] |= ethernet.alloc_count++ << 8;
 			ethernet.reg[EREG_INTERRUPT] |= 0x0008;
-			update_ethernet_irq();
+			update_ethernet_irq(machine);
 			break;
 
 		case ECMD_RESET_MMU:
@@ -373,7 +373,7 @@ static void process_command(UINT16 data)
 			}
 			else
 				ethernet.reg[EREG_FIFO_PORTS] |= 0x8000;
-			update_ethernet_irq();
+			update_ethernet_irq(machine);
 			ethernet.recd++;
 			update_stats();
 			break;
@@ -386,7 +386,7 @@ static void process_command(UINT16 data)
 		case ECMD_ENQUEUE_PACKET:
 			if (LOG_ETHERNET)
 				logerror("   ENQUEUE TX PACKET\n");
-			finish_enqueue(0);
+			finish_enqueue(machine, 0);
 			break;
 
 		case ECMD_RESET_FIFOS:
@@ -421,7 +421,7 @@ READ16_HANDLER( smc91c94_r )
 			if (ACCESSING_BITS_8_15)
 			{
 				ethernet.reg[EREG_INTERRUPT] &= ~0x0008;
-				update_ethernet_irq();
+				update_ethernet_irq(machine);
 			}
 			break;
 
@@ -490,7 +490,7 @@ WRITE16_HANDLER( smc91c94_w )
 		case EREG_RCR:		/* receive control register */
 			if (LOG_ETHERNET)
 			{
-				if (data & 0x8000) smc91c94_reset();
+				if (data & 0x8000) smc91c94_reset(machine);
 				if (data & 0x8000) logerror("   SOFT RST\n");
 				if (data & 0x4000) logerror("   FILT_CAR\n");
 				if (data & 0x0200) logerror("   STRIP CRC\n");
@@ -540,7 +540,7 @@ WRITE16_HANDLER( smc91c94_w )
 			break;
 
 		case EREG_MMU_COMMAND:	/* command register */
-			process_command(data);
+			process_command(machine, data);
 			break;
 
 		case EREG_DATA_0:	/* data register */
@@ -558,7 +558,7 @@ WRITE16_HANDLER( smc91c94_w )
 
 		case EREG_INTERRUPT:
 			ethernet.reg[EREG_INTERRUPT] &= ~(data & 0x56);
-			update_ethernet_irq();
+			update_ethernet_irq(machine);
 			break;
 	}
 }

@@ -108,7 +108,7 @@ static void draw_mode3 (running_machine *machine, bitmap_t *bitmap, const rectan
 static void draw_mode23 (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void draw_modebogus (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 static void draw_sprites (running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
-static void change_register (int reg, UINT8 data);
+static void change_register (running_machine *machine, int reg, UINT8 data);
 
 static void (*const ModeHandlers[])(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect) = {
         draw_mode0, draw_mode1, draw_mode2,  draw_mode12,
@@ -138,7 +138,7 @@ typedef struct {
     INT32 Addr;
     int colour,pattern,nametbl,spriteattribute,spritepattern;
     int colourmask,patternmask;
-    void (*INTCallback)(int);
+    void (*INTCallback)(running_machine *, int);
     /* memory */
     UINT8 *vMem, *dBackMem;
     bitmap_t *tmpbmp;
@@ -235,15 +235,15 @@ const rectangle *TMS9928A_get_visarea (void)
 }
 
 
-void TMS9928A_post_load (void) {
+void TMS9928A_post_load (running_machine *machine) {
 	int i;
 
 	/* all registers need to be re-written, so tables are recalculated */
 	for (i=0;i<8;i++)
-		change_register (i, tms.Regs[i]);
+		change_register (machine, i, tms.Regs[i]);
 
 	/* make sure the interrupt request is set properly */
-	if (tms.INTCallback) tms.INTCallback (tms.INT);
+	if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
 }
 
 
@@ -273,7 +273,7 @@ READ8_HANDLER (TMS9928A_register_r) {
     tms.StatusReg = 0x1f;
     if (tms.INT) {
         tms.INT = 0;
-        if (tms.INTCallback) tms.INTCallback (tms.INT);
+        if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
     }
     tms.latch = 0;
     return b;
@@ -287,7 +287,7 @@ WRITE8_HANDLER (TMS9928A_register_w) {
             /* register write */
 			reg = data & 7;
 			/*if (tms.FirstByte != tms.Regs[reg])*/ /* Removed to fix ColecoVision MESS Driver*/
-	            change_register (reg, tms.FirstByte);
+	            change_register (machine, reg, tms.FirstByte);
         } else {
             /* set read/write address */
             tms.Addr = ((UINT16)data << 8 | tms.FirstByte) & (tms.vramsize - 1);
@@ -303,7 +303,7 @@ WRITE8_HANDLER (TMS9928A_register_w) {
     }
 }
 
-static void change_register (int reg, UINT8 val) {
+static void change_register (running_machine *machine, int reg, UINT8 val) {
     static const UINT8 Mask[8] =
         { 0x03, 0xfb, 0x0f, 0xff, 0x07, 0x7f, 0x07, 0xff };
     static const char *const modes[] = {
@@ -337,7 +337,7 @@ static void change_register (int reg, UINT8 val) {
         b = (val & 0x20) && (tms.StatusReg & 0x80) ;
         if (b != tms.INT) {
             tms.INT = b;
-            if (tms.INTCallback) tms.INTCallback (tms.INT);
+            if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
         }
         logerror("TMS9928A: %s\n", modes[TMS_MODE]);
         break;
@@ -423,7 +423,7 @@ VIDEO_UPDATE( tms9928a )
 	return 0;
 }
 
-int TMS9928A_interrupt () {
+int TMS9928A_interrupt(running_machine *machine) {
     int b;
 
     /* when skipping frames, calculate sprite collision */
@@ -437,7 +437,7 @@ int TMS9928A_interrupt () {
     b = (tms.Regs[1] & 0x20) != 0;
     if (b != tms.INT) {
         tms.INT = b;
-        if (tms.INTCallback) tms.INTCallback (tms.INT);
+        if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
     }
 
     return b;

@@ -88,7 +88,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
 #include "capbowl.h"
@@ -205,9 +204,9 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
  *
  *************************************/
 
-static void firqhandler(int irq)
+static void firqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

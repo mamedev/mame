@@ -456,10 +456,10 @@ ADDRESS_MAP_END
 */
 
 /* YM2151 IRQ */
-static void megasys1_sound_irq(int irq)
+static void megasys1_sound_irq(running_machine *machine, int irq)
 {
 	if (irq)
-		cpunum_set_input_line(Machine, 1, 4, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
 }
 
 static READ16_HANDLER( oki_status_0_r )
@@ -787,9 +787,9 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

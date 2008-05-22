@@ -978,11 +978,11 @@ static INTERRUPT_GEN(irq_vbl)
 	}
 }
 
-static void irq_ym(int irq)
+static void irq_ym(running_machine *machine, int irq)
 {
 	irq_yms = irq;
-	cpunum_set_input_line(Machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(Machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

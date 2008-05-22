@@ -11,7 +11,7 @@
 struct YMZ280Binterface
 {
 	int region;						/* memory region where the sample ROM lives */
-	void (*irq_callback)(int state);	/* irq callback */
+	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 	read8_machine_func ext_read;			/* external RAM read */
 	write8_machine_func ext_write;		/* external RAM write */
 };

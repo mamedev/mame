@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
@@ -331,9 +330,9 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static void sound_irq(int state)
+static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1,1,state); /* IRQ 2 */
+	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
 }
 
 static const struct YM2151interface ym2151_interface =

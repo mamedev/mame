@@ -50,7 +50,6 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
@@ -335,9 +334,9 @@ static GFXDECODE_START( aquarium )
 	GFXDECODE_ENTRY( REGION_GFX4, 0, char5bpplayout,   0x400, 32 )
 GFXDECODE_END
 
-static void irq_handler(int irq)
+static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(Machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpunum_set_input_line(machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const struct YM2151interface ym2151_interface =

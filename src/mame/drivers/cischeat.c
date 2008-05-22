@@ -505,7 +505,7 @@ UINT16 scudhamm_motor_command;
 
 READ16_HANDLER( scudhamm_motor_status_r )
 {
-//  return 1 << (mame_rand(Machine)&1);         // Motor Status
+//  return 1 << (mame_rand(machine)&1);         // Motor Status
 	return scudhamm_motor_command;	// Motor Status
 }
 

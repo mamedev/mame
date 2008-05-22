@@ -350,7 +350,6 @@ Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taito_f3.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
@@ -455,7 +454,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				//r |= (mame_rand(Machine) & 0xff) << 24;
+				//r |= (mame_rand(machine) & 0xff) << 24;
 			}
 			return r;
 		}

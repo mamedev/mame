@@ -76,7 +76,7 @@ void YM2151WriteReg(void *chip, int r, int v);
 int YM2151ReadStatus(void *chip);
 
 /* set interrupt handler on YM2151 chip number 'n'*/
-void YM2151SetIrqHandler(void *chip, void (*handler)(int irq));
+void YM2151SetIrqHandler(void *chip, void (*handler)(running_machine *machine, int irq));
 
 /* set port write handler on YM2151 chip number 'n'*/
 void YM2151SetPortWriteHandler(void *chip, write8_machine_func handler);

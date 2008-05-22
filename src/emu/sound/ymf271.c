@@ -110,7 +110,7 @@ typedef struct
 	const UINT8 *rom;
 	read8_machine_func ext_mem_read;
 	write8_machine_func ext_mem_write;
-	void (*irq_callback)(int);
+	void (*irq_callback)(running_machine *, int);
 
 	int index;
 	UINT32 clock;
@@ -1356,7 +1356,7 @@ static TIMER_CALLBACK( ymf271_timer_a_tick )
 	if (chip->enable & 4)
 	{
 		chip->irqstate |= 1;
-		if (chip->irq_callback) chip->irq_callback(1);
+		if (chip->irq_callback) chip->irq_callback(machine, 1);
 	}
 }
 
@@ -1369,7 +1369,7 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 	if (chip->enable & 8)
 	{
 		chip->irqstate |= 2;
-		if (chip->irq_callback) chip->irq_callback(1);
+		if (chip->irq_callback) chip->irq_callback(machine, 1);
 	}
 }
 
@@ -1396,6 +1396,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 	int slotnum;
 	YMF271Group *group;
 	attotime period;
+	running_machine *machine = Machine;
 
 	slotnum = fm_tab[chip->timerreg & 0xf];
 	group = &chip->groups[slotnum];
@@ -1453,7 +1454,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->irqstate &= ~1;
 					chip->status &= ~1;
 
-					if (chip->irq_callback) chip->irq_callback(0);
+					if (chip->irq_callback) chip->irq_callback(machine, 0);
 
 					//period = (double)(256.0 - chip->timerAVal ) * ( 384.0 * 4.0 / (double)CLOCK);
 					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * (1024 - chip->timerAVal));
@@ -1465,7 +1466,7 @@ static void ymf271_write_timer(YMF271Chip *chip, int data)
 					chip->irqstate &= ~2;
 					chip->status &= ~2;
 
-					if (chip->irq_callback) chip->irq_callback(0);
+					if (chip->irq_callback) chip->irq_callback(machine, 0);
 
 					period = attotime_mul(ATTOTIME_IN_HZ(chip->clock), 384 * 16 * (256 - chip->timerBVal));
 
@@ -1726,7 +1727,7 @@ static void init_state(YMF271Chip *chip)
 	state_save_register_item("ymf271", chip->index, chip->ext_read);
 }
 
-static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(int), read8_machine_func ext_read, write8_machine_func ext_write)
+static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_machine_func ext_read, write8_machine_func ext_write)
 {
 	chip->timA = timer_alloc(ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(ymf271_timer_b_tick, chip);

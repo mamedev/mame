@@ -199,12 +199,12 @@ static void soft_reset(voodoo_state *v);
 static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotime current_time);
 static void flush_fifos(voodoo_state *v, attotime current_time);
 static TIMER_CALLBACK( stall_cpu_callback );
-static void stall_cpu(voodoo_state *v, int state, attotime current_time);
+static void stall_cpu(running_machine *machine, voodoo_state *v, int state, attotime current_time);
 static TIMER_CALLBACK( vblank_callback );
 static INT32 register_w(voodoo_state *v, offs_t offset, UINT32 data);
 static INT32 lfb_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask, int forcefront);
 static INT32 texture_w(voodoo_state *v, offs_t offset, UINT32 data);
-static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
+static void voodoo_w(running_machine *machine, voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
 static UINT32 voodoo_r(voodoo_state *v, offs_t offset);
 static void banshee_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask);
 static UINT32 banshee_r(voodoo_state *v, offs_t offset, UINT32 mem_mask);
@@ -626,13 +626,13 @@ void voodoo_set_init_enable(int which, UINT32 newval)
 }
 
 
-void voodoo_set_vblank_callback(int which, void (*vblank)(int))
+void voodoo_set_vblank_callback(int which, void (*vblank)(running_machine *, int))
 {
 	voodoo[which]->fbi.vblank_client = vblank;
 }
 
 
-void voodoo_set_stall_callback(int which, void (*stall)(int))
+void voodoo_set_stall_callback(int which, void (*stall)(running_machine *, int))
 {
 	voodoo[which]->pci.stall_callback = stall;
 }
@@ -647,13 +647,13 @@ void voodoo_set_stall_callback(int which, void (*stall)(int))
 
 WRITE32_HANDLER( voodoo_0_w )
 {
-	voodoo_w(voodoo[0], offset, data, mem_mask);
+	voodoo_w(machine, voodoo[0], offset, data, mem_mask);
 }
 
 
 WRITE32_HANDLER( voodoo_1_w )
 {
-	voodoo_w(voodoo[1], offset, data, mem_mask);
+	voodoo_w(machine, voodoo[1], offset, data, mem_mask);
 }
 
 
@@ -1109,7 +1109,7 @@ static TIMER_CALLBACK( vblank_off_callback )
 	/* set internal state and call the client */
 	v->fbi.vblank = FALSE;
 	if (v->fbi.vblank_client)
-		(*v->fbi.vblank_client)(FALSE);
+		(*v->fbi.vblank_client)(machine, FALSE);
 
 	/* go to the end of the next frame */
 	adjust_vblank_timer(v);
@@ -1149,7 +1149,7 @@ static TIMER_CALLBACK( vblank_callback )
 	/* set internal state and call the client */
 	v->fbi.vblank = TRUE;
 	if (v->fbi.vblank_client)
-		(*v->fbi.vblank_client)(TRUE);
+		(*v->fbi.vblank_client)(machine, TRUE);
 }
 
 
@@ -2194,7 +2194,7 @@ static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotim
 
 		/* either call the callback, or trigger the trigger */
 		if (v->pci.stall_callback)
-			(*v->pci.stall_callback)(FALSE);
+			(*v->pci.stall_callback)(machine, FALSE);
 		else
 			cpu_trigger(machine, v->trigger);
 	}
@@ -2207,7 +2207,7 @@ static void check_stalled_cpu(running_machine *machine, voodoo_state *v, attotim
 }
 
 
-static void stall_cpu(voodoo_state *v, int state, attotime current_time)
+static void stall_cpu(running_machine *machine, voodoo_state *v, int state, attotime current_time)
 {
 	/* sanity check */
 	if (!v->pci.op_pending) fatalerror("FIFOs not empty, no op pending!");
@@ -2218,7 +2218,7 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 
 	/* either call the callback, or spin the CPU */
 	if (v->pci.stall_callback)
-		(*v->pci.stall_callback)(TRUE);
+		(*v->pci.stall_callback)(machine, TRUE);
 	else
 		cpu_spinuntil_trigger(v->trigger);
 
@@ -3583,7 +3583,7 @@ static void flush_fifos(voodoo_state *v, attotime current_time)
  *
  *************************************/
 
-static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
+static void voodoo_w(running_machine *machine, voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	int stall = FALSE;
 
@@ -3728,7 +3728,7 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 			fifo_items(&v->fbi.fifo) >= 2 * 32 * FBIINIT0_MEMORY_FIFO_HWM(v->reg[fbiInit0].u))
 		{
 			if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit memory FIFO HWM -- stalling\n", v->index);
-			stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
+			stall_cpu(machine, v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
 		}
 	}
 
@@ -3737,14 +3737,14 @@ static void voodoo_w(voodoo_state *v, offs_t offset, UINT32 data, UINT32 mem_mas
 		fifo_space(&v->pci.fifo) <= 2 * FBIINIT0_PCI_FIFO_LWM(v->reg[fbiInit0].u))
 	{
 		if (LOG_FIFO) logerror("VOODOO.%d.FIFO:voodoo_w hit PCI FIFO free LWM -- stalling\n", v->index);
-		stall_cpu(v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
+		stall_cpu(machine, v, STALLED_UNTIL_FIFO_LWM, timer_get_time());
 	}
 
 	/* if we weren't ready, and this is a non-FIFO access, stall until the FIFOs are clear */
 	if (stall)
 	{
 		if (LOG_FIFO_VERBOSE) logerror("VOODOO.%d.FIFO:voodoo_w wrote non-FIFO register -- stalling until clear\n", v->index);
-		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time());
+		stall_cpu(machine, v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time());
 	}
 
 	profiler_mark(PROFILER_END);

@@ -95,7 +95,7 @@ static void xboard_generic_init(void)
  *
  *************************************/
 
-static void update_main_irqs(void)
+static void update_main_irqs(running_machine *machine)
 {
 	int irq = 0;
 
@@ -111,11 +111,11 @@ static void update_main_irqs(void)
 	/* assert the lines that are live, or clear everything if nothing is live */
 	if (irq != 0)
 	{
-		cpunum_set_input_line(Machine, 0, irq, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 	else
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
 }
 
 
@@ -148,18 +148,18 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* update IRQs on the main CPU */
 	if (update)
-		update_main_irqs();
+		update_main_irqs(machine);
 
 	/* come back in 2 scanlines */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, next_scanline, 0), NULL, next_scanline, scanline_callback);
 }
 
 
-static void timer_ack_callback(void)
+static void timer_ack_callback(running_machine *machine)
 {
 	/* clear the timer IRQ */
 	timer_irq_state = 0;
-	update_main_irqs();
+	update_main_irqs(machine);
 }
 
 
@@ -183,9 +183,9 @@ static void sound_data_w(UINT8 data)
 }
 
 
-static void sound_cpu_irq(int state)
+static void sound_cpu_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 2, 0, state);
+	cpunum_set_input_line(machine, 2, 0, state);
 }
 
 

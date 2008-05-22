@@ -10,6 +10,7 @@
 
 #include <stdarg.h>
 #include "sndintrf.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "psx.h"
@@ -154,7 +155,7 @@ static void PSXSPU_update(void *param, stream_sample_t **inputs, stream_sample_t
 					( chip->m_n_irqaddress * 4 ) >= chip->m_p_n_blockaddress[ n_channel ] &&
 					( chip->m_n_irqaddress * 4 ) <= chip->m_p_n_blockaddress[ n_channel ] + 7 )
 				{
-					chip->intf->irq_set( 0x0200 );
+					chip->intf->irq_set( Machine, 0x0200 );
 				}
 
 				n_shift =   ( chip->m_p_n_spuram[ chip->m_p_n_blockaddress[ n_channel ] ] >> 0 ) & 0x0f;

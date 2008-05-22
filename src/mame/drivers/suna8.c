@@ -1518,9 +1518,9 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static void soundirq(int state)
+static void soundirq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(Machine, 1, 0, state);
+	cpunum_set_input_line(machine, 1, 0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used

@@ -38,7 +38,7 @@ struct ym3812_info
 static void IRQHandler_3812(void *param,int irq)
 {
 	struct ym3812_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
+	if (info->intf->handler) (info->intf->handler)(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_3812_0 )
 {
@@ -207,7 +207,7 @@ struct ym3526_info
 static void IRQHandler_3526(void *param,int irq)
 {
 	struct ym3526_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
+	if (info->intf->handler) (info->intf->handler)(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Timer overflow callback from timer.c */
 static TIMER_CALLBACK( timer_callback_3526_0 )
@@ -374,7 +374,7 @@ struct y8950_info
 static void IRQHandler_8950(void *param,int irq)
 {
 	struct y8950_info *info = param;
-	if (info->intf->handler) (info->intf->handler)(irq ? ASSERT_LINE : CLEAR_LINE);
+	if (info->intf->handler) (info->intf->handler)(Machine, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static TIMER_CALLBACK( timer_callback_8950_0 )
 {

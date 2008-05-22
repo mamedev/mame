@@ -21,7 +21,7 @@
 
 struct _z80pio_interface
 {
-	void (*intr)(int which);    /* callback when change interrupt status */
+	void (*intr)(running_machine *machine, int which);    /* callback when change interrupt status */
 	read8_machine_func portAread;    /* port A read callback */
 	read8_machine_func portBread;    /* port B read callback */
 	write8_machine_func portAwrite;  /* port A write callback */

@@ -1413,13 +1413,13 @@ GFXDECODE_END
 
 
 
-static void spangbl_adpcm_int(int data)
+static void spangbl_adpcm_int(running_machine *machine, int data)
 {
 	MSM5205_data_w(0, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

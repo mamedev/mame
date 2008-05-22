@@ -4,7 +4,6 @@
 ************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "st0016.h"
 
 UINT8 *st0016_charram,*st0016_spriteram,*st0016_paletteram;
@@ -144,7 +143,7 @@ READ8_HANDLER(st0016_vregs_r)
 	{
 		case 0:
 		case 1:
-			return mame_rand(Machine);
+			return mame_rand(machine);
 	}
 
 	return st0016_vregs[offset];
