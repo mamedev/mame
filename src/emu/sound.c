@@ -120,6 +120,7 @@ static TIMER_CALLBACK( sound_update );
 static void start_sound_chips(void);
 static void route_sound(void);
 static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
+static STATE_POSTLOAD( mixer_postload );
 
 
 
@@ -397,6 +398,7 @@ static void route_sound(void)
 		if (info->inputs != 0)
 		{
 			info->mixer_stream = stream_create(info->inputs, 1, Machine->sample_rate, info, mixer_update);
+			state_save_register_postload(Machine, mixer_postload, info->mixer_stream);
 			info->input = auto_malloc(info->inputs * sizeof(*info->input));
 			info->inputs = 0;
 		}
@@ -788,6 +790,18 @@ static void mixer_update(void *param, stream_sample_t **inputs, stream_sample_t 
 			sample += inputs[inp][pos];
 		buffer[0][pos] = sample;
 	}
+}
+
+
+/*-------------------------------------------------
+    mixer_postload - postload function to reset
+    the mixer stream to the proper sample rate
+-------------------------------------------------*/
+
+static STATE_POSTLOAD( mixer_postload )
+{
+	sound_stream *stream = param;
+	stream_set_sample_rate(stream, machine->sample_rate);
 }
 
 
