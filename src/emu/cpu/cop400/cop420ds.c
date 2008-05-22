@@ -216,19 +216,19 @@ offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 			{
 				sprintf(buffer, "LEI %u", next_opcode & 0xF);
 			}
-			else if (next_opcode >= 0x81 && next_opcode <= 0x88)
+			else if (next_opcode >= 0x80 && next_opcode <= 0x8F)
 			{
 				sprintf(buffer, "LBI 0,%u", next_opcode & 0xF);
 			}
-			else if (next_opcode >= 0x91 && next_opcode <= 0x98)
+			else if (next_opcode >= 0x90 && next_opcode <= 0x9F)
 			{
 				sprintf(buffer, "LBI 1,%u", next_opcode & 0xF);
 			}
-			else if (next_opcode >= 0xA1 && next_opcode <= 0xA8)
+			else if (next_opcode >= 0xA0 && next_opcode <= 0xAF)
 			{
 				sprintf(buffer, "LBI 2,%u", next_opcode & 0xF);
 			}
-			else if (next_opcode >= 0xB1 && next_opcode <= 0xB8)
+			else if (next_opcode >= 0xB0 && next_opcode <= 0xBF)
 			{
 				sprintf(buffer, "LBI 3,%u", next_opcode & 0xF);
 			}
@@ -236,10 +236,6 @@ offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 			{
 				switch (next_opcode)
 				{
-				case 0x00:
-					sprintf(buffer, "INIL");
-					break;
-
 				case 0x01:
 					sprintf(buffer, "SKGBZ 0");
 					break;
@@ -262,6 +258,10 @@ offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 
 				case 0x28:
 					sprintf(buffer, "ININ");
+					break;
+
+				case 0x29:
+					sprintf(buffer, "INIL");
 					break;
 
 				case 0x2A:

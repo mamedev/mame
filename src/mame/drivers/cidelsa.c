@@ -12,7 +12,6 @@
     TODO:
 
     - move set_cpu_mode timer call to MDRV
-    - fix COP420 core to get sound in Draco
 
 */
 
@@ -708,7 +707,6 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD(CDP1869, DRACO_CHR2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD(AY8910, DRACO_SND_CHR1)
 	MDRV_SOUND_CONFIG(ay8910_interface)
@@ -764,4 +762,4 @@ ROM_END
 GAME( 1980, destryer, 0, 		destryer, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1980, destryea, destryer, destryea, destryer, 0, ROT90, "Cidelsa", "Destroyer (Cidelsa) (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, altair,   0, 		altair,   altair,   0, ROT90, "Cidelsa", "Altair", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1981, draco,    0, 		draco,    draco,    0, ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, draco,    0, 		draco,    draco,    0, ROT90, "Cidelsa", "Draco", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )

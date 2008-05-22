@@ -403,7 +403,7 @@ INSTRUCTION(jp)
 	{
 		// JSRP
 		UINT8 a = opcode & 0x3f;
-		PUSH(PC + 1);
+		PUSH(PC);
 		PC = 0x80 | a;
 	}
 }
@@ -530,7 +530,7 @@ INSTRUCTION(ld)
 
 INSTRUCTION(lqid)
 {
-	PUSH(PC + 1);
+	PUSH(PC);
 	PC = (PC & 0x300) | (A << 4) | RAM_R(B);
 	WRITE_Q(ROM(PC));
 	POP();
