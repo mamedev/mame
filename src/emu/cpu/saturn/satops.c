@@ -188,9 +188,9 @@ INLINE void saturn_interrupt_on(void)
 {
 	LOG(( "SATURN#%d at %05x: INTON\n", cpu_getactivecpu(), saturn.pc-4 ));
 	saturn.irq_enable=1;
-	if (saturn.irq_state) 
+	if (saturn.irq_state)
 	{
-		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));	
+		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
 		saturn.pending_irq=1;
 	}
 }
@@ -277,8 +277,8 @@ INLINE void saturn_in(int reg)
 {
 	int in = 0;
 	saturn_assert(reg>=0 && reg<9);
-	if (!(saturn.pc&1)) 
-		logerror( "SATURN#%d at %05x: reg=IN opcode at odd addresse\n", 
+	if (!(saturn.pc&1))
+		logerror( "SATURN#%d at %05x: reg=IN opcode at odd addresse\n",
 			  cpu_getactivecpu(), saturn.pc-3 );
 	if (saturn.config&&saturn.config->in) in = saturn.config->in(Machine);
 	S64_WRITE_WORD(reg,in);
@@ -849,7 +849,7 @@ INLINE void saturn_add(int reg, int begin, int count, int right)
 		t=saturn.reg[reg][begin+i];
 		t+=saturn.reg[right][begin+i];
 		t+=saturn.carry;
-		if (t>=base) { 
+		if (t>=base) {
 			saturn.carry=1;
 			t-=base;
 		}
@@ -871,7 +871,7 @@ INLINE void saturn_add_const(int reg, int begin, int count, SaturnNib right)
 		t=saturn.reg[reg][begin+i];
 		t+=(right&0xf);
 		right>>=4;
-		if (t>=base) { 
+		if (t>=base) {
 			right++;
 			t-=base;
 		}
@@ -898,7 +898,7 @@ INLINE void saturn_sub(int reg, int begin, int count, int right)
 		t=saturn.reg[reg][begin+i];
 		t-=saturn.reg[right][begin+i];
 		t-=saturn.carry;
-		if (t<0) { 
+		if (t<0) {
 			saturn.carry=1;
 			t+=base;
 		}
@@ -920,7 +920,7 @@ INLINE void saturn_sub_const(int reg, int begin, int count, int right)
 		t=saturn.reg[reg][begin+i];
 		t-=(right&0xf);
 		right>>=4;
-		if (t<0) { 
+		if (t<0) {
 			right++;
 			t+=base;
 		}
@@ -947,7 +947,7 @@ INLINE void saturn_sub2(int reg, int begin, int count, int right)
 		t=saturn.reg[right][begin+i];
 		t-=saturn.reg[reg][begin+i];
 		t-=saturn.carry;
-		if (t<0) { 
+		if (t<0) {
 			saturn.carry=1;
 			t+=base;
 		}

@@ -583,7 +583,7 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 
 
 /*-------------------------------------------------
-    gfxset_handle_keys - handle keys for the 
+    gfxset_handle_keys - handle keys for the
     graphics viewer
 -------------------------------------------------*/
 

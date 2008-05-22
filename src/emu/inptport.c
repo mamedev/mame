@@ -242,11 +242,11 @@ struct _input_port_private
 	/* types */
 	input_type_state *			typestatelist;		/* list of live type states */
 	input_type_state *			type_to_typestate[__ipt_max][MAX_PLAYERS]; /* map from type/player to type state */
-	
+
 	/* specific special global input states */
 	digital_joystick_state 		joystick_info[MAX_PLAYERS][DIGITAL_JOYSTICKS_PER_PLAYER]; /* joystick states */
 	osd_ticks_t					ui_memory[__ipt_max];/* keypress timing for UI */
-	
+
 	/* frame time tracking */
 	attotime					last_frame_time;	/* time of the last frame callback */
 	attoseconds_t				last_delta_nsec;	/* nanoseconds that passed since the previous callback */
@@ -585,7 +585,7 @@ INLINE int get_port_index(const input_port_config *portlist, const char *tag)
 {
 	const input_port_config *port;
 	int index = 0;
-	
+
 	for (port = portlist; port != NULL; port = port->next)
 	{
 		if (port->tag != NULL && strcmp(tag, port->tag) == 0)
@@ -610,7 +610,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 {
 	input_port_private *portdata;
 	time_t basetime;
-	
+
 	/* allocate memory for our data structure */
 	machine->input_port_data = auto_malloc(sizeof(*machine->input_port_data));
 	memset(machine->input_port_data, 0, sizeof(*machine->input_port_data));
@@ -651,7 +651,7 @@ static void input_port_exit(running_machine *machine)
 	/* close any playback or recording files */
 	playback_end(machine, NULL);
 	record_end(machine, NULL);
-	
+
 	/* free our allocated config */
 	if (machine->portconfig != NULL)
 		input_port_config_free(machine->portconfig);
@@ -664,7 +664,7 @@ static void input_port_exit(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    input_port_config_alloc - allocate a list of 
+    input_port_config_alloc - allocate a list of
     input ports from the given token list
 -------------------------------------------------*/
 
@@ -675,7 +675,7 @@ const input_port_config *input_port_config_alloc(const input_port_token *tokens)
 
 
 /*-------------------------------------------------
-    input_port_config_alloc - free memory 
+    input_port_config_alloc - free memory
     allocated from input_port_alloc
 -------------------------------------------------*/
 
@@ -696,12 +696,12 @@ void input_port_config_free(const input_port_config *portlist)
 const input_port_config *input_port_by_tag(const input_port_config *portlist, const char *tag)
 {
 	const input_port_config *port;
-	
+
 	/* loop over ports until we hit the index or run out */
 	for (port = portlist; port != NULL; port = port->next)
 		if (port->tag != NULL && strcmp(port->tag, tag) == 0)
 			return port;
-	
+
 	return NULL;
 }
 
@@ -715,12 +715,12 @@ const input_port_config *input_port_by_tag(const input_port_config *portlist, co
 const input_port_config *input_port_by_index(const input_port_config *portlist, int index)
 {
 	const input_port_config *port;
-	
+
 	/* loop over ports until we hit the index or run out */
 	for (port = portlist; port != NULL; port = port->next)
 		if (index-- == 0)
 			return port;
-	
+
 	return NULL;
 }
 
@@ -759,14 +759,14 @@ const input_seq *input_field_seq(const input_field_config *field, input_seq_type
 	/* if the field is disabled, return no key */
 	if (field->flags & FIELD_FLAG_UNUSED)
 		return portseq;
-	
+
 	/* select either the live or config state depending on whether we have live state */
 	portseq = (field->state == NULL) ? &field->seq[seqtype] : &field->state->seq[seqtype];
 
 	/* if the portseq is the special default code, return the expanded default value */
 	if (input_seq_get_1(portseq) == SEQCODE_DEFAULT)
 		return input_type_seq(field->port->machine, field->type, field->player, seqtype);
-	
+
 	/* otherwise, return the sequence as-is */
 	return portseq;
 }
@@ -780,18 +780,18 @@ const input_seq *input_field_seq(const input_field_config *field, input_seq_type
 void input_field_get_user_settings(const input_field_config *field, input_field_user_settings *settings)
 {
 	int seqtype;
-	
+
 	/* zap the entire structure */
 	memset(settings, 0, sizeof(*settings));
-	
+
 	/* copy the basics */
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(settings->seq); seqtype++)
 		settings->seq[seqtype] = field->state->seq[seqtype];
-	
+
 	/* if there's a list of settings or we're an adjuster, copy the current value */
 	if (field->settinglist != NULL || field->type == IPT_ADJUSTER)
 		settings->value = field->state->value;
-	
+
 	/* if there's analog data, extract the analog settings */
 	if (field->state->analog != NULL)
 	{
@@ -822,11 +822,11 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 		else
 			field->state->seq[seqtype] = settings->seq[seqtype];
 	}
-	
+
 	/* if there's a list of settings or we're an adjuster, copy the current value */
 	if (field->settinglist != NULL || field->type == IPT_ADJUSTER)
 		field->state->value = settings->value;
-	
+
 	/* if there's analog data, extract the analog settings */
 	if (field->state->analog != NULL)
 	{
@@ -844,7 +844,7 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 ***************************************************************************/
 
 /*-------------------------------------------------
-    input_type_is_analog - return TRUE if 
+    input_type_is_analog - return TRUE if
     the given type represents an analog control
 -------------------------------------------------*/
 
@@ -855,7 +855,7 @@ int input_type_is_analog(int type)
 
 
 /*-------------------------------------------------
-    input_type_name - return the name 
+    input_type_name - return the name
     for the given type/player
 -------------------------------------------------*/
 
@@ -869,7 +869,7 @@ const char *input_type_name(running_machine *machine, int type, int player)
 		if (typestate != NULL)
 			return typestate->typedesc.name;
 	}
-	
+
 	/* if no machine, fall back to brute force searching */
 	else
 	{
@@ -878,14 +878,14 @@ const char *input_type_name(running_machine *machine, int type, int player)
 			if (core_types[typenum].type == type && core_types[typenum].player == player)
 				return core_types[typenum].name;
 	}
-	
+
 	/* if we find nothing, return an invalid group */
 	return "???";
 }
 
 
 /*-------------------------------------------------
-    input_type_group - return the group 
+    input_type_group - return the group
     for the given type/player
 -------------------------------------------------*/
 
@@ -899,7 +899,7 @@ int input_type_group(running_machine *machine, int type, int player)
 		if (typestate != NULL)
 			return typestate->typedesc.group;
 	}
-	
+
 	/* if no machine, fall back to brute force searching */
 	else
 	{
@@ -908,21 +908,21 @@ int input_type_group(running_machine *machine, int type, int player)
 			if (core_types[typenum].type == type && core_types[typenum].player == player)
 				return core_types[typenum].group;
 	}
-	
+
 	/* if we find nothing, return an invalid group */
 	return IPG_INVALID;
 }
 
 
 /*-------------------------------------------------
-    input_type_seq - return the input 
+    input_type_seq - return the input
     sequence for the given type/player
 -------------------------------------------------*/
 
 const input_seq *input_type_seq(running_machine *machine, int type, int player, input_seq_type seqtype)
 {
 	static const input_seq ip_none = SEQ_DEF_0;
-	
+
 	/* if we have a machine, use the live state and quick lookup */
 	if (machine != NULL)
 	{
@@ -931,7 +931,7 @@ const input_seq *input_type_seq(running_machine *machine, int type, int player, 
 		if (typestate != NULL)
 			return &typestate->seq[seqtype];
 	}
-	
+
 	/* if no machine, fall back to brute force searching */
 	else
 	{
@@ -940,14 +940,14 @@ const input_seq *input_type_seq(running_machine *machine, int type, int player, 
 			if (core_types[typenum].type == type && core_types[typenum].player == player)
 				return &core_types[typenum].seq[seqtype];
 	}
-	
+
 	/* if we find nothing, return an empty sequence */
 	return &ip_none;
 }
 
 
 /*-------------------------------------------------
-    input_type_set_seq - change the input 
+    input_type_set_seq - change the input
     sequence for the given type/player
 -------------------------------------------------*/
 
@@ -990,7 +990,7 @@ const input_type_desc *input_type_list(running_machine *machine)
 
 /*-------------------------------------------------
     input_ui_pressed - return TRUE if a key down
-    for the given user interface sequence is 
+    for the given user interface sequence is
     detected
 -------------------------------------------------*/
 
@@ -1002,7 +1002,7 @@ int input_ui_pressed(running_machine *machine, int code)
 
 /*-------------------------------------------------
     input_ui_pressed_r - return TRUE if a key down
-    for the given user interface sequence is 
+    for the given user interface sequence is
     detected, or if autorepeat at the given speed
     is triggered
 -------------------------------------------------*/
@@ -1022,7 +1022,7 @@ profiler_mark(PROFILER_INPUT);
 	if (pressed)
 	{
 		osd_ticks_t tps = osd_ticks_per_second();
-	
+
 		/* if this is the first press, set a 3x delay and leave pressed = 1 */
 		if (portdata->ui_memory[code] == 0)
 			portdata->ui_memory[code] = osd_ticks() + 3 * speed * tps / 60;
@@ -1062,7 +1062,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 	analog_field_state *analog;
 	callback_field_info *custom;
 	input_port_value result;
-	
+
 	/* start with the digital */
 	result = port->state->digital;
 
@@ -1094,7 +1094,7 @@ input_port_value input_port_read_direct(const input_port_config *port)
 		{
 			/* start with the raw value */
 			INT32 value = analog->accum;
-			
+
 			/* interpolate if appropriate and if time has passed since the last update */
 			if (analog->interpolate && !(analog->field->flags & ANALOG_FLAG_RESET) && portdata->last_delta_nsec != 0)
 			{
@@ -1161,7 +1161,7 @@ input_port_value input_port_read_indexed(running_machine *machine, int portnum)
 
 
 /*-------------------------------------------------
-    input_port_read_crosshair - return the 
+    input_port_read_crosshair - return the
     extracted crosshair values for the given
     player
 -------------------------------------------------*/
@@ -1181,14 +1181,14 @@ int input_port_get_crosshair_position(running_machine *machine, int player, floa
 					analog_field_state *analog = field->state->analog;
 					INT32 rawvalue = apply_analog_settings(analog->accum, analog) & (analog->field->mask >> analog->shift);
 					float value = (float)(rawvalue - field->state->analog->adjmin) / (float)(field->state->analog->adjmax - field->state->analog->adjmin);
-					
+
 					/* apply the scale and offset */
 					if (field->crossscale < 0)
 						value = -(1.0 - value) * field->crossscale;
 					else
 						value *= field->crossscale;
 					value += field->crossoffset;
-					
+
 					/* handle X axis */
 					if (field->crossaxis == CROSSHAIR_AXIS_X)
 					{
@@ -1212,7 +1212,7 @@ int input_port_get_crosshair_position(running_machine *machine, int player, floa
 							gotx = TRUE;
 						}
 					}
-					
+
 					/* if we got both, stop */
 					if (gotx && goty)
 						break;
@@ -1223,8 +1223,8 @@ int input_port_get_crosshair_position(running_machine *machine, int player, floa
 
 
 /*-------------------------------------------------
-    input_port_update_defaults - force an update 
-    to the input port values based on current 
+    input_port_update_defaults - force an update
+    to the input port values based on current
     conditions
 -------------------------------------------------*/
 
@@ -1236,7 +1236,7 @@ void input_port_update_defaults(running_machine *machine)
 	for (loopnum = 0; loopnum < 2; loopnum++)
 	{
 		const input_port_config *port;
-		
+
 		/* loop over all input ports */
 		for (port = machine->portconfig; port != NULL; port = port->next)
 		{
@@ -1298,14 +1298,14 @@ static INT32 apply_analog_settings(INT32 value, analog_field_state *analog)
 int input_condition_true(running_machine *machine, const input_condition *condition)
 {
 	input_port_value condvalue;
-	
+
 	/* always condition is always true */
 	if (condition->condition == PORTCOND_ALWAYS)
 		return TRUE;
-	
+
 	/* otherwise, read the referenced port */
 	condvalue = input_port_read(machine, condition->tag);
-	
+
 	/* based on the condition encoded, determine truth */
 	switch (condition->condition)
 	{
@@ -1320,7 +1320,7 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 
 
 /*-------------------------------------------------
-    input_port_string_from_token - convert an 
+    input_port_string_from_token - convert an
     input_port_token to a default string
 -------------------------------------------------*/
 
@@ -1331,7 +1331,7 @@ const char *input_port_string_from_token(const input_port_token token)
 	/* 0 is an invalid index */
 	if (token.i == 0)
 		return NULL;
-	
+
 	/* if the index is greater than the count, assume it to be a pointer */
 	if (token.i >= INPUT_STRING_COUNT)
 		return token.stringptr;
@@ -1346,8 +1346,8 @@ const char *input_port_string_from_token(const input_port_token token)
 
 
 /*-------------------------------------------------
-    input_port_read_handler* - return a memory 
-    handler corresponding to a given input port 
+    input_port_read_handler* - return a memory
+    handler corresponding to a given input port
     tag
 -------------------------------------------------*/
 
@@ -1384,7 +1384,7 @@ read64_machine_func input_port_read_handler64(const input_port_config *portlist,
 ***************************************************************************/
 
 /*-------------------------------------------------
-    init_port_types - initialize the default 
+    init_port_types - initialize the default
     type list
 -------------------------------------------------*/
 
@@ -1395,7 +1395,7 @@ static void init_port_types(running_machine *machine)
 	input_type_state *curtype;
 	input_type_desc *lasttype = NULL;
 	int seqtype, typenum;
-	
+
 	/* convert the array into a list of type states that can be modified */
 	portdata->typestatelist = NULL;
 	stateptr = &portdata->typestatelist;
@@ -1404,13 +1404,13 @@ static void init_port_types(running_machine *machine)
 		/* allocate memory for the state and link it to the end of the list */
 		*stateptr = auto_malloc(sizeof(**stateptr));
 		memset(*stateptr, 0, sizeof(**stateptr));
-		
+
 		/* copy the type description and link the previous description to it */
 		(*stateptr)->typedesc = core_types[typenum];
 		if (lasttype != NULL)
 			lasttype->next = &(*stateptr)->typedesc;
 		lasttype = &(*stateptr)->typedesc;
-		
+
 		/* advance */
 		stateptr = &(*stateptr)->next;
 	}
@@ -1432,7 +1432,7 @@ static void init_port_types(running_machine *machine)
 
 
 /*-------------------------------------------------
-    init_port_state - initialize the live port 
+    init_port_state - initialize the live port
     states based on the tokens
 -------------------------------------------------*/
 
@@ -1450,41 +1450,41 @@ static void init_port_state(running_machine *machine)
 		callback_field_info **custominfotail;
 		callback_field_info **changedinfotail;
 		input_port_state *portstate;
-		
+
 		/* allocate a new input_port_info structure */
 		portstate = auto_malloc(sizeof(*portstate));
 		memset(portstate, 0, sizeof(*portstate));
 		((input_port_config *)port)->state = portstate;
 		((input_port_config *)port)->machine = machine;
-		
+
 		/* start with tail pointers to all the data */
 		analogstatetail = &portstate->analoglist;
 		custominfotail = &portstate->customlist;
 		changedinfotail = &portstate->changedlist;
-		
+
 		/* iterate over fields */
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			input_field_state *fieldstate;
 			int seqtype;
-			
+
 			/* allocate a new input_field_info structure */
 			fieldstate = auto_malloc(sizeof(*fieldstate));
 			memset(fieldstate, 0, sizeof(*fieldstate));
 			((input_field_config *)field)->state = fieldstate;
-			
+
 			/* fill in the basic values */
 			for (seqtype = 0; seqtype < ARRAY_LENGTH(fieldstate->seq); seqtype++)
 				fieldstate->seq[seqtype] = field->seq[seqtype];
 			fieldstate->value = field->defvalue;
-			
+
 			/* if this is an analog field, allocate memory for the analog data */
 			if (field->type >= __ipt_analog_start && field->type <= __ipt_analog_end)
 			{
 				*analogstatetail = fieldstate->analog = init_field_analog_state(field);
 				analogstatetail = &(*analogstatetail)->next;
 			}
-			
+
 			/* if this is a digital joystick field, make a note of it */
 			if (field->type >= __ipt_digital_joystick_start && field->type <= __ipt_digital_joystick_end)
 			{
@@ -1493,14 +1493,14 @@ static void init_port_state(running_machine *machine)
 				fieldstate->joystick->field[fieldstate->joydir] = field;
 				fieldstate->joystick->inuse = TRUE;
 			}
-			
+
 			/* if this entry has custom callback, allocate memory for the tracking structure */
 			if (field->custom != NULL)
 			{
 				*custominfotail = init_field_callback_info(field);
 				custominfotail = &(*custominfotail)->next;
 			}
-			
+
 			/* if this entry has changed callback, allocate memory for the tracking structure */
 			if (field->changed != NULL)
 			{
@@ -1610,7 +1610,7 @@ static callback_field_info *init_field_callback_info(const input_field_config *f
 	info->field = field;
 	for (mask = field->mask; !(mask & 1); mask >>= 1)
 		info->shift++;
-	
+
 	return info;
 }
 
@@ -1779,7 +1779,7 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 	/* compute scale for keypresses */
 	state->keyscalepos = RECIP_SCALE(state->scalepos);
 	state->keyscaleneg = RECIP_SCALE(state->scaleneg);
-	
+
 	return state;
 }
 
@@ -1807,7 +1807,7 @@ static void frame_update_callback(running_machine *machine)
 
 
 /*-------------------------------------------------
-    frame_update - core logic for per-frame input 
+    frame_update - core logic for per-frame input
     port updating
 -------------------------------------------------*/
 
@@ -1852,11 +1852,11 @@ profiler_mark(PROFILER_INPUT);
 				/* accumulate VBLANK bits */
 				if (field->type == IPT_VBLANK)
 					port->state->vblank ^= field->mask;
-				
+
 				/* handle analog inputs */
 				else if (field->state->analog != NULL)
 					frame_update_analog_field(field->state->analog);
-			
+
 				/* handle non-analog types, but only when the UI isn't visible */
 				else if (!ui_visible && frame_get_digital_field_state(field))
 					port->state->digital |= field->mask;
@@ -1879,7 +1879,7 @@ profiler_mark(PROFILER_INPUT);
 				if (oldbits != newbits)
 					(*changed->field->changed)(changed->field, changed->field->changed_param, oldbits, newbits);
 			}
-		
+
 		/* remember the last value */
 		port->state->lastvalue = newvalue;
 	}
@@ -1897,7 +1897,7 @@ profiler_mark(PROFILER_END);
 
 /*-------------------------------------------------
     frame_update_digital_joysticks - update the
-    state of digital joysticks prior to 
+    state of digital joysticks prior to
     accumulating the results in a port
 -------------------------------------------------*/
 
@@ -2132,14 +2132,14 @@ static int frame_get_digital_field_state(const input_field_config *field)
 {
 	int curstate = input_seq_pressed(input_field_seq(field, SEQ_TYPE_STANDARD));
 	int changed = FALSE;
-	
+
 	/* if the state changed, look for switch down/switch up */
 	if (curstate != field->state->last)
 	{
 		field->state->last = curstate;
 		changed = TRUE;
 	}
-	
+
 #ifdef MESS
 	/* (MESS-specific) check for disabled keyboard */
 	if (field->type == IPT_KEYBOARD && osd_keyboard_disabled())
@@ -2159,7 +2159,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
 		return FALSE;
 	}
-	
+
 	/* if this is a switch-down event, handle impulse and toggle */
 	if (changed && curstate)
 	{
@@ -2171,7 +2171,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		if (field->flags & FIELD_FLAG_TOGGLE)
 			field->state->toggle = !field->state->toggle;
 	}
-	
+
 	/* update the current state with the impulse state */
 	if (field->impulse != 0 && field->state->impulse != 0)
 	{
@@ -2190,7 +2190,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		if (!(mask & (1 << field->state->joydir)))
 			curstate = FALSE;
 	}
-	
+
 	return curstate;
 }
 
@@ -2211,7 +2211,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 	input_setting_config *cursetting = NULL;
 	input_field_config *curfield = NULL;
 	input_port_config *curport = NULL;
-	
+
 	/* loop over tokens until we hit the end */
 	while (entrytype != INPUT_TOKEN_END)
 	{
@@ -2253,11 +2253,11 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 			case INPUT_TOKEN_FIELD:
 				if (curport == NULL)
 					fatalerror("INPUT_TOKEN_FIELD encountered with no active port");
-			
+
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, type, 24);
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
-				
+
 				curfield = field_config_alloc(curport, type, defval, mask);
 				cursetting = NULL;
 				break;
@@ -2271,7 +2271,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, condition.condition, 24);
 				TOKEN_GET_UINT64_UNPACK2(ipt, condition.mask, 32, condition.value, 32);
 				condition.tag = TOKEN_GET_STRING(ipt);
-				
+
 				if (cursetting != NULL)
 					cursetting->condition = condition;
 				else
@@ -2348,7 +2348,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
-				
+
 				input_seq_append_or(&curfield->seq[SEQ_TYPE_STANDARD], val);
 				break;
 
@@ -2492,7 +2492,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
-				
+
 				input_seq_append_or(&curfield->seq[SEQ_TYPE_INCREMENT], val);
 				break;
 
@@ -2538,7 +2538,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				
+
 				cursetting = setting_config_alloc(curfield, defval & curfield->mask, input_port_string_from_token(*ipt++));
 				break;
 
@@ -2590,7 +2590,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				
+
 				cursetting = setting_config_alloc(curfield, defval & curfield->mask, input_port_string_from_token(*ipt++));
 				break;
 
@@ -2614,7 +2614,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				
+
 				cursetting = setting_config_alloc(curfield, defval & curfield->mask, input_port_string_from_token(*ipt++));
 				break;
 
@@ -2625,7 +2625,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				TOKEN_UNGET_UINT32(ipt);
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
-				
+
 				curfield = field_config_alloc(curport, IPT_ADJUSTER, defval, 0xff);
 				cursetting = NULL;
 
@@ -2637,7 +2637,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				break;
 		}
 	}
-	
+
 	return listhead;
 }
 
@@ -2652,15 +2652,15 @@ static input_port_config *port_config_alloc(const input_port_config **listhead)
 {
 	const input_port_config * const *tailptr;
 	input_port_config *config;
-	
+
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
-	
+
 	/* add it to the tail */
 	for (tailptr = listhead; *tailptr != NULL; tailptr = &(*tailptr)->next) ;
 	*(input_port_config **)tailptr = config;
-	
+
 	return config;
 }
 
@@ -2673,14 +2673,14 @@ static input_port_config *port_config_alloc(const input_port_config **listhead)
 static void port_config_free(const input_port_config **portptr)
 {
 	input_port_config *port = (input_port_config *)*portptr;
-	
+
 	/* free any field configs first */
 	while (port->fieldlist != NULL)
 		field_config_free((input_field_config **)&port->fieldlist);
-	
+
 	/* remove ourself from the list */
 	*portptr = port->next;
-	
+
 	/* free ourself */
 	free(port);
 }
@@ -2699,7 +2699,7 @@ static input_port_config *port_config_find(const input_port_config *listhead, co
 	for (scanport = listhead; scanport != NULL; scanport = scanport->next)
 		if (scanport->tag != NULL && strcmp(scanport->tag, tag) == 0)
 			return (input_port_config *)scanport;
-	
+
 	/* failure is fatal */
 	fatalerror("port_config_find failed to find a matching port '%s'", tag);
 }
@@ -2729,7 +2729,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 			/* reduce the mask of the field we found */
 			config = (input_field_config *)*scanfieldptr;
 			config->mask &= ~maskbits;
-			
+
 			/* if the new entry fully overrides the previous one, we nuke */
 			if (config->mask == 0)
 			{
@@ -2738,15 +2738,15 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 			}
 		}
 	}
-	
+
 	/* make a mask of just the low bit */
 	lowbit = (maskbits ^ (maskbits - 1)) & maskbits;
-	
+
 	/* scan forward to find where to insert ourselves */
 	for (scanfieldptr = (const input_field_config * const *)&port->fieldlist; *scanfieldptr != NULL; scanfieldptr = &(*scanfieldptr)->next)
 		if ((*scanfieldptr)->mask > lowbit)
 			break;
-	
+
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
@@ -2759,11 +2759,11 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	config->max = maskbits;
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(config->seq); seqtype++)
 		input_seq_set_1(&config->seq[seqtype], SEQCODE_DEFAULT);
-	
+
 	/* insert it into the list */
 	config->next = *scanfieldptr;
 	*(input_field_config **)scanfieldptr = config;
-	
+
 	return config;
 }
 
@@ -2776,16 +2776,16 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 static void field_config_free(input_field_config **fieldptr)
 {
 	input_field_config *field = *fieldptr;
-	
+
 	/* free any settings and DIP locations first */
 	while (field->settinglist != NULL)
 		setting_config_free((input_setting_config **)&field->settinglist);
 	while (field->diploclist != NULL)
 		diplocation_free((input_field_diplocation **)&field->diploclist);
-	
+
 	/* remove ourself from the list */
 	*fieldptr = (input_field_config *)field->next;
-	
+
 	/* free ourself */
 	free(field);
 }
@@ -2801,20 +2801,20 @@ static input_setting_config *setting_config_alloc(input_field_config *field, inp
 {
 	const input_setting_config * const *tailptr;
 	input_setting_config *config;
-	
+
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
-	
+
 	/* fill in the basic setting values */
 	config->field = field;
 	config->value = value;
 	config->name = name;
-	
+
 	/* add it to the tail */
 	for (tailptr = &field->settinglist; *tailptr != NULL; tailptr = &(*tailptr)->next) ;
 	*(input_setting_config **)tailptr = config;
-	
+
 	return config;
 }
 
@@ -2827,10 +2827,10 @@ static input_setting_config *setting_config_alloc(input_field_config *field, inp
 static void setting_config_free(input_setting_config **settingptr)
 {
 	input_setting_config *setting = (input_setting_config *)*settingptr;
-	
+
 	/* remove ourself from the list */
 	*settingptr = (input_setting_config *)setting->next;
-	
+
 	/* free ourself */
 	free(setting);
 }
@@ -2838,7 +2838,7 @@ static void setting_config_free(input_setting_config **settingptr)
 
 /*-------------------------------------------------
     diplocation_expand - expand a string-based
-    DIP location into a linked list of 
+    DIP location into a linked list of
     descriptions
 -------------------------------------------------*/
 
@@ -2861,7 +2861,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 	while (*curentry != 0)
 	{
 		const char *comma, *colon, *number;
-		
+
 		/* allocate a new entry */
 		*tailptr = malloc_or_die(sizeof(**tailptr));
 		memset(*tailptr, 0, sizeof(**tailptr));
@@ -2879,7 +2879,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 		/* first extract the switch name if present */
 		number = tempbuf;
 		colon = strchr(tempbuf, ':');
-		
+
 		/* allocate and copy the name if it is present */
 		if (colon != NULL)
 		{
@@ -2888,7 +2888,7 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 			lastname[colon - tempbuf] = 0;
 			number = colon + 1;
 		}
-		
+
 		/* otherwise, just copy the last name */
 		else
 		{
@@ -2936,14 +2936,14 @@ static const input_field_diplocation *diplocation_list_alloc(const input_field_c
 static void diplocation_free(input_field_diplocation **diplocptr)
 {
 	input_field_diplocation *diploc = (input_field_diplocation *)*diplocptr;
-	
+
 	/* free the name */
 	if (diploc->swname != NULL)
 		free((void *)diploc->swname);
-	
+
 	/* remove ourself from the list */
 	*diplocptr = (input_field_diplocation *)diploc->next;
-	
+
 	/* free ourself */
 	free(diploc);
 }
@@ -3092,7 +3092,7 @@ static void load_config_callback(running_machine *machine, int config_type, xml_
 	{
 		input_type_state *typestate;
 		int seqtype;
-		
+
 		for (typestate = portdata->typestatelist; typestate != NULL; typestate = typestate->next)
 			for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->typedesc.seq); seqtype++)
 				typestate->typedesc.seq[seqtype] = typestate->seq[seqtype];
@@ -3208,14 +3208,14 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 	tag = xml_get_attribute_string(portnode, "port", NULL);
 	mask = xml_get_attribute_int(portnode, "mask", 0);
 	defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
-	
+
 	/* find the port we want; if no tag, search them all */
 	for (port = machine->portconfig; port != NULL; port = port->next)
 		if (tag == NULL || (port->tag != NULL && strcmp(port->tag, tag) == 0))
 			for (field = port->fieldlist; field != NULL; field = field->next)
 
 				/* find the matching mask and defvalue */
-				if (field->type == type && field->player == player && 
+				if (field->type == type && field->player == player &&
 					field->mask == mask && (field->defvalue & mask) == (defvalue & mask))
 				{
 					const char *revstring;
@@ -3256,7 +3256,7 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 ***************************************************************************/
 
 /*-------------------------------------------------
-    save_config_callback - config callback for 
+    save_config_callback - config callback for
     saving input port configuration
 -------------------------------------------------*/
 
@@ -3335,7 +3335,7 @@ static void save_default_inputs(running_machine *machine, xml_data_node *parentn
 		if (save_this_input_field_type(typestate->typedesc.type))
 		{
 			int seqtype;
-			
+
 			/* see if any of the sequences have changed */
 			for (seqtype = 0; seqtype < ARRAY_LENGTH(typestate->seq); seqtype++)
 				if (input_seq_cmp(&typestate->seq[seqtype], &typestate->typedesc.seq[seqtype]) != 0)
@@ -3379,11 +3379,11 @@ static void save_game_inputs(running_machine *machine, xml_data_node *parentnode
 			{
 				int changed = FALSE;
 				int seqtype;
-				
+
 				/* determine if we changed */
 				for (seqtype = 0; seqtype < ARRAY_LENGTH(field->state->seq); seqtype++)
 					changed |= (input_seq_cmp(&field->state->seq[seqtype], &field->seq[seqtype]) != 0);
-				
+
 				/* non-analog changes */
 				if (field->state->analog == NULL)
 					changed |= ((field->state->value & field->mask) != (field->defvalue & field->mask));
@@ -3396,7 +3396,7 @@ static void save_game_inputs(running_machine *machine, xml_data_node *parentnode
 					changed |= (field->state->analog->sensitivity != field->sensitivity);
 					changed |= (field->state->analog->reverse != ((field->flags & ANALOG_FLAG_REVERSE) != 0));
 				}
-				
+
 				/* if we did change, add a new node */
 				if (changed)
 				{

@@ -80,11 +80,11 @@ Palette related:
 * 2xMS6264A-20NC (8KB SRAM) @ C8 & C9 (palette RAM (xxxxBBBBRRRRGGGG))
 * 2x74HCT273 (octal D-Type flip-flop with clear) @ B8 & B9 (connected to RGB output)
 
-Controls related: (added by Mirko Mattioli) 
+Controls related: (added by Mirko Mattioli)
 =================
 When optical wheel is selected (via dipswitch), then gear shift (low/high) is enabled.
 On the real PCB the optical wheel encoder is connected to 74LS169 ICs (@A16 and @A17)
-via a flip-flop IC mounted in the steering wheel assembly. As a result, the output 
+via a flip-flop IC mounted in the steering wheel assembly. As a result, the output
 of the flip-flop generates a signal that contains the information about the steering
 direction; this signal is routed to pin #1 (U/D) at ICs A16 and A17 (high when turn
 left and low when turn right). The second signal of the optical encoder goes directly

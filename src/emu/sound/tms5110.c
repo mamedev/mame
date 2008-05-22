@@ -543,7 +543,7 @@ void tms5110_process(void *chip, INT16 *buffer, unsigned int size)
 					tms->target_k[i] = tms->new_k[i];
 			}
 		}
-		else 
+		else
 		{
 			interp_period = tms->sample_count / 25;
 			switch(tms->interp_count)

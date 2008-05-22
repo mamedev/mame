@@ -597,7 +597,7 @@ tryagain:
                 }
             }
         }
-        else 
+        else
         {
             interp_period = tms->sample_count / 25;
 	    switch(tms->interp_count)

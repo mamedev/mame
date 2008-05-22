@@ -28,7 +28,7 @@
 
  driver by Pierpaolo Prazzoli & Tomasz Slanina
 
- - Pierpaolo Prazzoli 2006.05.06 
+ - Pierpaolo Prazzoli 2006.05.06
     - added Fishing Maniac 3
 
  - Pierpaolo Prazzoli 2006.01.16

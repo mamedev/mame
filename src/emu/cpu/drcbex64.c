@@ -365,10 +365,10 @@ static UINT8 condition_map[DRCUML_COND_MAX - DRCUML_COND_Z] =
 /* rounding mode mapping table */
 static const UINT8 fprnd_map[4] =
 {
-	FPRND_CHOP,		/* DRCUML_FMOD_TRUNC,		truncate */
-	FPRND_NEAR,		/* DRCUML_FMOD_ROUND,		round */
-	FPRND_UP,		/* DRCUML_FMOD_CEIL,		round up */
-	FPRND_DOWN		/* DRCUML_FMOD_FLOOR		round down */
+	FPRND_CHOP,		/* DRCUML_FMOD_TRUNC,       truncate */
+	FPRND_NEAR,		/* DRCUML_FMOD_ROUND,       round */
+	FPRND_UP,		/* DRCUML_FMOD_CEIL,        round up */
+	FPRND_DOWN		/* DRCUML_FMOD_FLOOR        round down */
 };
 
 
@@ -867,7 +867,7 @@ static void drcbex64_reset(drcbe_state *drcbe)
 	emit_mov_r32_r32(dst, REG_EAX, REG_ECX);											// mov   eax,ecx
 	emit_pop_r64(dst, REG_RBX);															// pop   rbx
 	emit_ret(dst);																		// ret
-	
+
 	/* call it to determine if we have SSE4.1 support */
 	drcbe->sse41 = (((*cpuid_ecx_stub)() & 0x80000) != 0);
 
@@ -3566,12 +3566,12 @@ static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 	/* copy live state to the destination */
 	emit_mov_r64_imm(&dst, REG_RCX, dstp.value);										// mov    rcx,dstp
-	
+
 	/* copy flags */
 	emit_pushf(&dst);																	// pushf
 	emit_pop_r64(&dst, REG_RAX);														// pop    rax
 	emit_and_r32_imm(&dst, REG_EAX, 0x8c5);												// and    eax,0x8c5
-	emit_mov_r8_m8(&dst, REG_AL, MBISD(REG_RBP, REG_RAX, 1, offset_from_rbp(drcbe, (FPTR)&drcbe->flagsmap[0])));								
+	emit_mov_r8_m8(&dst, REG_AL, MBISD(REG_RBP, REG_RAX, 1, offset_from_rbp(drcbe, (FPTR)&drcbe->flagsmap[0])));
 																						// mov    al,[flags_map]
 	emit_mov_m8_r8(&dst, MBD(REG_RCX, offsetof(drcuml_machine_state, flags)), REG_AL);	// mov    state->flags,al
 
@@ -7040,7 +7040,7 @@ static x86code *op_ftoi4x(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-	
+
 	/* non-SSE4.1 case */
 	if (!drcbe->sse41 || inst->size == 8)
 	{
@@ -7070,7 +7070,7 @@ static x86code *op_ftoi4x(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// ldmxcsr [ssemodesave]
 	}
-	
+
 	/* SSE4.1 case */
 	else
 	{
@@ -7080,7 +7080,7 @@ static x86code *op_ftoi4x(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 																						// roundss  xmm0,[srcp],mode
 		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
 			emit_roundss_r128_r128_imm(&dst, REG_XMM0, srcp.value, fprnd_map[mode]);	// roundss  xmm0,srcp,mode
-		
+
 		/* store to the destination */
 		if (dstp.type == DRCUML_PTYPE_MEMORY)
 			emit_movd_m32_r128(&dst, MABS(drcbe, dstp.value), REG_XMM0);				// movd     [dstp],xmm0
@@ -7211,7 +7211,7 @@ static x86code *op_ftoi8x(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-	
+
 	/* non-SSE4.1 case */
 	if (!drcbe->sse41 || inst->size == 4)
 	{
@@ -7241,7 +7241,7 @@ static x86code *op_ftoi8x(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// ldmxcsr [ssemodesave]
 	}
-	
+
 	/* SSE4.1 case */
 	else
 	{
@@ -7251,7 +7251,7 @@ static x86code *op_ftoi8x(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 																						// roundsd  xmm0,[srcp],mode
 		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
 			emit_roundsd_r128_r128_imm(&dst, REG_XMM0, srcp.value, fprnd_map[mode]);	// roundsd  xmm0,srcp,mode
-		
+
 		/* store to the destination */
 		if (dstp.type == DRCUML_PTYPE_MEMORY)
 			emit_movq_m64_r128(&dst, MABS(drcbe, dstp.value), REG_XMM0);				// movq     [dstp],xmm0

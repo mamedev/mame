@@ -655,7 +655,7 @@ static INPUT_PORTS_START( tm )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1  )	// "E. Coin 1" (ECA?) tmaster defaults to e. coin,
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2  )	// "E. Coin 2" (ECA?) rather than m. coin
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3  )	// "E. Coin 3" (ECA?) so they're coin1-coin4
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 4" (ECA?) 
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 4" (ECA?)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tmaster )

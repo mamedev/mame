@@ -1732,7 +1732,7 @@ static INT32 slider_adjuster(running_machine *machine, INT32 newval, char *buffe
 {
 	const input_field_config *field = arg;
 	input_field_user_settings settings;
-	
+
 	input_field_get_user_settings(field, &settings);
 	if (buffer != NULL)
 	{

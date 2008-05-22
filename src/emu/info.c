@@ -40,7 +40,7 @@ static void print_game_switches(FILE *out, const game_driver *game, const input_
 {
 	const input_port_config *port;
 	const input_field_config *field;
-	
+
 	/* iterate looking for DIP switches */
 	for (port = portlist; port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)

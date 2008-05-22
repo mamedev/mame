@@ -131,7 +131,7 @@ static void saturn_reset(void)
 {
 	saturn.pc=0;
 	saturn.sleeping = 0;
-	saturn.irq_enable = 0;	
+	saturn.irq_enable = 0;
 	saturn.in_irq = 0;
 	change_pc(saturn.pc);
 }
@@ -160,7 +160,7 @@ INLINE void saturn_take_irq(void)
 	saturn_ICount -= 7;
 	saturn_push(saturn.pc);
 	saturn.pc=IRQ_ADDRESS;
-	
+
 	LOG(("Saturn#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), saturn.pc));
 
 	if (saturn.irq_callback) (*saturn.irq_callback)(SATURN_IRQ_LINE);
@@ -205,7 +205,7 @@ static void saturn_set_nmi_line(int state)
 	if ( state == saturn.nmi_state ) return;
 	saturn.nmi_state = state;
 	if ( state != CLEAR_LINE )
-	{	
+	{
 		LOG(( "SATURN#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 		saturn.pending_irq = 1;
 	}

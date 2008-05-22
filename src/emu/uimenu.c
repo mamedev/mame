@@ -1011,7 +1011,7 @@ static UINT32 menu_input(running_machine *machine, UINT32 state)
 		if (selected != prevsel)
 			record_next = FALSE;
 	}
-	
+
 	/* if the sequence changed, update it */
 	if (changed)
 	{
@@ -1208,7 +1208,7 @@ static UINT32 menu_analog(running_machine *machine, UINT32 state)
 	if (delta != 0 && selected_field != NULL)
 	{
 		input_field_user_settings settings;
-		
+
 		input_field_get_user_settings(selected_field, &settings);
 		switch (selected_item)
 		{
@@ -2098,7 +2098,7 @@ static void switches_menu_select_previous(const input_field_config *field)
 	const input_setting_config *setting, *prevsetting;
 	input_field_user_settings settings;
 	int found_match = FALSE;
-	
+
 	/* get the current configured settings */
 	input_field_get_user_settings(field, &settings);
 
@@ -2115,7 +2115,7 @@ static void switches_menu_select_previous(const input_field_config *field)
 		if (input_condition_true(field->port->machine, &setting->condition))
 			prevsetting = setting;
 	}
-	
+
 	/* if we didn't find a matching value, select the first */
 	if (!found_match)
 	{
@@ -2123,7 +2123,7 @@ static void switches_menu_select_previous(const input_field_config *field)
 			if (input_condition_true(field->port->machine, &prevsetting->condition))
 				break;
 	}
-	
+
 	/* update the value to the previous one */
 	if (prevsetting != NULL)
 		settings.value = prevsetting->value;
@@ -2140,7 +2140,7 @@ static void switches_menu_select_next(const input_field_config *field)
 {
 	const input_setting_config *setting, *nextsetting;
 	input_field_user_settings settings;
-	
+
 	/* get the current configured settings */
 	input_field_get_user_settings(field, &settings);
 
@@ -2149,19 +2149,19 @@ static void switches_menu_select_next(const input_field_config *field)
 	for (setting = field->settinglist; setting != NULL; setting = setting->next)
 		if (setting->value == settings.value)
 			break;
-	
+
 	/* if we found one, scan forward for the next valid one */
 	if (setting != NULL)
 		for (nextsetting = setting->next; nextsetting != NULL; nextsetting = nextsetting->next)
 			if (input_condition_true(field->port->machine, &nextsetting->condition))
 				break;
-	
+
 	/* if we hit the end, search from the beginning */
 	if (nextsetting == NULL)
 		for (nextsetting = field->settinglist; nextsetting != NULL; nextsetting = nextsetting->next)
 			if (input_condition_true(field->port->machine, &nextsetting->condition))
 				break;
-	
+
 	/* update the value to the previous one */
 	if (nextsetting != NULL)
 		settings.value = nextsetting->value;
@@ -2243,7 +2243,7 @@ static void dip_switch_build_model(const input_field_config *field, int item_is_
 	diploc = field->diploclist;
 	if (diploc == NULL || diploc->swname == NULL)
 		return;
-	
+
 	input_field_get_user_settings(field, &settings);
 
 	/* get the entry in the model to work with */

@@ -394,7 +394,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 					modified_inst.param[1].type = DRCUML_PTYPE_IMMEDIATE;
 					inst = &modified_inst;
 				}
-				
+
 				/* determine the operand size for each operand; mostly this is just the instruction size */
 				for (pnum = 0; pnum < inst->numparams; pnum++)
 					psize[pnum] = inst->size;

@@ -83,12 +83,12 @@ typedef enum {
 	CcopyP, PcopyC, sreq, CswapP,
 
 	inton, AloadImm, buscb,
-	clearAbit, setAbit, 
+	clearAbit, setAbit,
 	branchAbitclear, returnAbitclear,
 	branchAbitset, returnAbitset,
-	clearCbit, setCbit, 
-	branchCbitclear, returnCbitclear, 
-	branchCbitset, returnCbitset, 
+	clearCbit, setCbit,
+	branchCbitclear, returnCbitclear,
+	branchCbitset, returnCbitset,
 	PCloadA, buscd, PCloadC, intoff, rsi,
 
 	jumpA, jumpC, PCcopyA, PCcopyC, AcopyPC, CcopyPC,

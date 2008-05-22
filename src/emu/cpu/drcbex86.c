@@ -454,7 +454,7 @@ static const opcode_table_entry opcode_table_source[] =
 	{ DRCUML_OP_TEST,    op_test },		/* TEST    src1,src2[,f]          */
 	{ DRCUML_OP_OR,      op_or },		/* OR      dst,src1,src2[,f]      */
 	{ DRCUML_OP_XOR,     op_xor },		/* XOR     dst,src1,src2[,f]      */
-	{ DRCUML_OP_LZCNT,   op_lzcnt },	/* LZCNT   dst,src	 		      */
+	{ DRCUML_OP_LZCNT,   op_lzcnt },	/* LZCNT   dst,src                */
 	{ DRCUML_OP_SHL,     op_shl },		/* SHL     dst,src,count[,f]      */
 	{ DRCUML_OP_SHR,     op_shr },		/* SHR     dst,src,count[,f]      */
 	{ DRCUML_OP_SAR,     op_sar },		/* SAR     dst,src,count[,f]      */
@@ -675,7 +675,7 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	dst = (x86code **)drccache_begin_codegen(drcbe->cache, 500);
 	if (dst == NULL)
 		fatalerror("Out of cache space after a reset!");
-	
+
 	/* generate a simple CPUID stub */
 	cpuid_ecx_stub = (UINT32 (*)(void))*dst;
 	emit_push_r32(dst, REG_EBX);														// push  ebx
@@ -684,7 +684,7 @@ static void drcbex86_reset(drcbe_state *drcbe)
 	emit_mov_r32_r32(dst, REG_EAX, REG_ECX);											// mov   eax,ecx
 	emit_pop_r32(dst, REG_EBX);															// pop   ebx
 	emit_ret(dst);																		// ret
-	
+
 	/* call it to determine if we have SSE3 support */
 	drcbe->sse3 = (((*cpuid_ecx_stub)() & 1) != 0);
 
@@ -3616,7 +3616,7 @@ static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 	/* copy live state to the destination */
 	emit_mov_r32_imm(&dst, REG_ECX, dstp.value);										// mov    ecx,dstp
-	
+
 	/* copy flags */
 	emit_pushf(&dst);																	// pushf
 	emit_pop_r32(&dst, REG_EAX);														// pop    eax
@@ -7035,7 +7035,7 @@ static x86code *op_ftoi4t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 	/* normalize parameters */
 	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-	
+
 	/* non-SSE3 case */
 	if (!drcbe->sse3)
 	{
@@ -7056,7 +7056,7 @@ static x86code *op_ftoi4t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		/* restore control word and proceed */
 		emit_fldcw_m16(&dst, MABS(&drcbe->fmodesave));									// fldcw [fmodesave]
 	}
-	
+
 	/* SSE3 case */
 	else
 	{
@@ -7242,7 +7242,7 @@ static x86code *op_ftoi8t(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		/* restore control word and proceed */
 		emit_fldcw_m16(&dst, MABS(&drcbe->fmodesave));									// fldcw [fmodesave]
 	}
-	
+
 	/* SSE3 case */
 	else
 	{

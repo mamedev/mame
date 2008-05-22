@@ -155,11 +155,11 @@ UpdatePalette(running_machine *machine, int offset )
 {
 	UINT16 data = paletteram16[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
-	 * sprites can be configured to use an alternate interpretation of palette ram
-	 * (used in-game in Emeraldia)
-	 *
-	 * RRRGGGBB RRRGGGBB
-	 */
+     * sprites can be configured to use an alternate interpretation of palette ram
+     * (used in-game in Emeraldia)
+     *
+     * RRRGGGBB RRRGGGBB
+     */
 	int r = (((data&0x00e0)>>5)+((data&0xe000)>>13)*2)*0xff/(0x7*3);
 	int g = (((data&0x001c)>>2)+((data&0x1c00)>>10)*2)*0xff/(0x7*3);
 	int b = (((data&0x0003)>>0)+((data&0x0300)>>8)*2)*0xff/(0x3*3);

@@ -195,7 +195,7 @@ struct _mips3_regs
 
 	/* internal stuff */
 	UINT8				cache_dirty;				/* true if we need to flush the cache */
-	
+
 	/* register mappings */
 	drcuml_parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
 	drcuml_parameter	regmaplo[34];				/* parameter to register mappings for all 32 integer registers */
@@ -660,7 +660,7 @@ INLINE void alloc_handle(drcuml_state *drcuml, drcuml_codehandle **handleptr, co
 INLINE void load_fast_iregs(drcuml_block *block)
 {
 	int regnum;
-	
+
 	for (regnum = 0; regnum < ARRAY_LENGTH(mips3.regmap); regnum++)
 		if (mips3.regmap[regnum].type == DRCUML_PTYPE_INT_REGISTER)
 			UML_DMOV(block, IREG(mips3.regmap[regnum].value - DRCUML_REG_I0), MEM(&mips3.core->r[regnum]));
@@ -675,7 +675,7 @@ INLINE void load_fast_iregs(drcuml_block *block)
 INLINE void save_fast_iregs(drcuml_block *block)
 {
 	int regnum;
-	
+
 	for (regnum = 0; regnum < ARRAY_LENGTH(mips3.regmap); regnum++)
 		if (mips3.regmap[regnum].type == DRCUML_PTYPE_INT_REGISTER)
 			UML_DMOV(block, MEM(&mips3.core->r[regnum]), IREG(mips3.regmap[regnum].value - DRCUML_REG_I0));
@@ -910,7 +910,7 @@ static offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 static void code_flush_cache(drcuml_state *drcuml)
 {
 	int mode;
-	
+
 	/* empty the transient cache contents */
 	drcuml_reset(drcuml);
 
@@ -1151,7 +1151,7 @@ static void cfunc_printf_probe(void *param)
 
 
 /*-------------------------------------------------
-    cfunc_unimplemented - handler for 
+    cfunc_unimplemented - handler for
     unimplemented opcdes
 -------------------------------------------------*/
 
@@ -1196,7 +1196,7 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 	UML_AND(block, IREG(0), CCR132(31), IMM(3));									// and     i0,ccr1[31],3
 	UML_LOAD1U(block, IREG(0), &mips3.cstate->fpmode[0], IREG(0));					// load1u  i0,fpmode,i0
 	UML_SETFMOD(block, IREG(0));													// setfmod i0
-	
+
 	/* load fast integer registers */
 	load_fast_iregs(block);
 
@@ -1442,14 +1442,14 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	/* add a global entry for this */
 	alloc_handle(drcuml, handleptr, name);
 	UML_HANDLE(block, *handleptr);													// handle  *handleptr
-	
+
 	/* user mode? generate address exception if top bit is set */
 	if (mode == MODE_USER)
 	{
 		UML_TEST(block, IREG(0), IMM(0x80000000));									// test    i0,0x80000000
 		UML_EXHc(block, IF_NZ, exception_addrerr, IREG(0));							// exh     addrerr,i0,nz
 	}
-	
+
 	/* supervisor mode? generate address exception if not in user space or in $C0000000-DFFFFFFF */
 	if (mode == MODE_SUPER)
 	{
@@ -1801,7 +1801,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		save_fast_iregs(block);
 		UML_DEBUG(block, IMM(desc->pc));											// debug   desc->pc
 	}
-	
+
 	/* if we hit an unmapped address, fatal error */
 	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	{
@@ -1820,7 +1820,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 		}
 		UML_EXH(block, mips3.tlb_mismatch, IMM(0));									// exh     tlb_mismatch,0
 	}
-	
+
 	/* validate our TLB entry at this PC; if we fail, we need to handle it */
 	if ((desc->flags & OPFLAG_VALIDATE_TLB) && (desc->pc < 0x80000000 || desc->pc >= 0xc0000000))
 	{
@@ -1836,7 +1836,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 			UML_CMP(block, IREG(0), IMM(mips3.core->tlb_table[desc->pc >> 12]));	// cmp     i0,*tlbentry
 			UML_EXHc(block, IF_NE, mips3.tlb_mismatch, IMM(0));						// exh     tlb_mismatch,0,NE
 		}
-		
+
 		/* otherwise, we generate an unconditional exception */
 		else
 		{
@@ -2857,7 +2857,7 @@ static int generate_idt(drcuml_block *block, compiler_state *compiler, const opc
 {
 	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = op & 0x1f;
-	
+
 	/* only enabled on IDT processors */
 	if (mips3.core->flavor != MIPS3_TYPE_R4650)
 		return FALSE;

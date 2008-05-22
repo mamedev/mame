@@ -957,7 +957,7 @@ static int get_defstr_index(const char *name, const game_driver *driver, int *er
 	UINT32 crc = quark_string_crc(name);
 	quark_entry *entry;
 	int strindex = 0;
-	
+
 	/* scan the quark table of input port strings */
 	for (entry = quark_table_get_first(defstr_table, crc); entry != NULL; entry = entry->next)
 		if (entry->crc == crc && strcmp(name, input_port_string_from_index(entry - defstr_table->entry)) == 0)
@@ -972,13 +972,13 @@ static int get_defstr_index(const char *name, const game_driver *driver, int *er
 		mame_printf_error("%s: %s must use DEF_STR( %s )\n", driver->source_file, driver->name, name);
 		*error = TRUE;
 	}
-	
+
 	return strindex;
 }
 
 
 /*-------------------------------------------------
-    validate_analog_input_field - validate an 
+    validate_analog_input_field - validate an
     analog input field
 -------------------------------------------------*/
 
@@ -1098,12 +1098,12 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 	UINT8 coin_list[INPUT_STRING_1C_9C + 1 - INPUT_STRING_9C_1C] = { 0 };
 	const input_setting_config *setting;
 	int coin_error = FALSE;
-	
+
 	/* iterate through the settings */
 	for (setting = field->settinglist; setting != NULL; setting = setting->next)
 	{
 		int strindex = get_defstr_index(setting->name, driver, error);
-		
+
 		/* note any coinage strings */
 		if (strindex >= INPUT_STRING_9C_1C && strindex <= INPUT_STRING_1C_9C)
 			coin_list[strindex - INPUT_STRING_9C_1C] = 1;
@@ -1164,12 +1164,12 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 			}
 		}
 	}
-	
+
 	/* if we have a coin error, demonstrate the correct way */
 	if (coin_error)
 	{
 		int entry;
-		
+
 		mame_printf_error("%s: %s proper coin sort order should be:\n", driver->source_file, driver->name);
 		for (entry = 0; entry < ARRAY_LENGTH(coin_list); entry++)
 			if (coin_list[entry])
@@ -1225,7 +1225,7 @@ static int validate_inputs(int drivnum, const machine_config *config)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			int strindex = 0;
-			
+
 			/* verify analog inputs */
 			if (input_type_is_analog(field->type))
 				validate_analog_input_field(field, driver, &error);
@@ -1239,11 +1239,11 @@ static int validate_inputs(int drivnum, const machine_config *config)
 					mame_printf_error("%s: %s has a DIP switch name or setting with no name\n", driver->source_file, driver->name);
 					error = TRUE;
 				}
-				
+
 				/* verify the settings list */
 				validate_dip_settings(field, driver, &error);
 			}
-			
+
 			/* look for invalid (0) types which should be mapped to IPT_OTHER */
 			if (field->type == IPT_INVALID)
 			{
@@ -1279,7 +1279,7 @@ static int validate_inputs(int drivnum, const machine_config *config)
 				strindex = get_defstr_index(field->name, driver, &error);
 			}
 		}
-	
+
 	/* free the config */
 	input_port_config_free(portlist);
 	return error;

@@ -1581,7 +1581,7 @@ static void memory_init_populate(running_machine *machine)
 							}
 							space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
 						}
-						
+
 						/* install the write handler if present */
 						if (whandler.generic != NULL)
 						{

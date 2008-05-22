@@ -705,7 +705,7 @@ BOOL wininput_handle_raw(HANDLE device)
 void osd_customize_input_type_list(input_type_desc *typelist)
 {
 	input_type_desc *typedesc;
-	
+
 	// loop over the defaults
 	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
 		switch (typedesc->type)

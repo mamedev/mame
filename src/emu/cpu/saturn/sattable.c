@@ -37,25 +37,25 @@ static const int sub_right[]={B,C,A,C, I,I,I,I, A,B,C,D, B,C,A,C};
 
 void saturn_invalid3( int op1, int op2, int op3 )
 {
-	logerror( "SATURN#%d invalid opcode %x%x%x at %05x\n", 
+	logerror( "SATURN#%d invalid opcode %x%x%x at %05x\n",
 		  cpu_getactivecpu(), op1, op2, op3, saturn.pc-3 );
 }
 
 void saturn_invalid4( int op1, int op2, int op3, int op4 )
 {
-	logerror( "SATURN#%d invalid opcode %x%x%x%x at %05x\n", 
+	logerror( "SATURN#%d invalid opcode %x%x%x%x at %05x\n",
 		  cpu_getactivecpu(), op1, op2, op3, op4, saturn.pc-4 );
 }
 
 void saturn_invalid5( int op1, int op2, int op3, int op4, int op5 )
 {
-	logerror( "SATURN#%d invalid opcode %x%x%x%x%x at %05x\n", 
+	logerror( "SATURN#%d invalid opcode %x%x%x%x%x at %05x\n",
 		  cpu_getactivecpu(), op1, op2, op3, op4, op5, saturn.pc-5 );
 }
 
 void saturn_invalid6( int op1, int op2, int op3, int op4, int op5, int op6 )
 {
-	logerror( "SATURN#%d invalid opcode %x%x%x%x%x%x at %05x\n", 
+	logerror( "SATURN#%d invalid opcode %x%x%x%x%x%x at %05x\n",
 		  cpu_getactivecpu(), op1, op2, op3, op4, op5, op6, saturn.pc-6 );
 }
 
@@ -600,19 +600,19 @@ static void saturn_instruction_8(void)
 			break;
 		}
 		break;
-	case 0xc: 
+	case 0xc:
 		adr=READ_OP_DIS16();
 		saturn_jump((adr+saturn.pc-4)&0xfffff,1);
-		break;		
-	case 0xd: 
+		break;
+	case 0xd:
 		adr=READ_OP_ARG20();
 		saturn_jump(adr,1);
 		break;
-	case 0xe: 
+	case 0xe:
 		adr=READ_OP_DIS16();
 		saturn_call((adr+saturn.pc)&0xfffff);
 		break;
-	case 0xf: 
+	case 0xf:
 		adr=READ_OP_ARG20();
 		saturn_call(adr);
 		break;
@@ -791,7 +791,7 @@ static void saturn_instruction_a(void)
 			break; // a=0 wp
 		case 4: case 5: case 6: case 7:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_copy(reg_right[reg&7], 0, saturn.p+1, reg_left[reg&7]); 
+			saturn_copy(reg_right[reg&7], 0, saturn.p+1, reg_left[reg&7]);
 			break; // a=b wp
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_exchange(reg_left[reg&3], 0, saturn.p+1, reg_right[reg&3]);
@@ -936,14 +936,14 @@ static void saturn_instruction(void)
 	case 2:
 		saturn_load_p();
 		break;
-	case 3: 
+	case 3:
 		saturn_load_reg(C);
 		break; // lc
 	case 4:
 		adr=READ_OP_DIS8();
 		if (adr==0) {
 			saturn_return(saturn.carry);
-		} 
+		}
 		else {
 			saturn_jump((saturn.pc+adr-2)&0xfffff, saturn.carry);
 		}
@@ -952,7 +952,7 @@ static void saturn_instruction(void)
 		adr=READ_OP_DIS8();
 		if (adr==0) {
 			saturn_return(!saturn.carry);
-		} 
+		}
 		else {
 			saturn_jump((saturn.pc+adr-2)&0xfffff,!saturn.carry);
 		}

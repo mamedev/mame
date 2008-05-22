@@ -83,7 +83,7 @@ static const memory_accessors le_memory =
 size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int), void *memory)
 {
 	int tlbindex;
-	
+
 	/* if no memory, return the amount needed */
 	if (memory == NULL)
 		return config->icache + config->dcache + (sizeof(mips->tlb_table[0]) * (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)));
@@ -229,7 +229,7 @@ void mips3com_map_tlb_entries(mips3_state *mips)
 					UINT64 lo = tlbent->entry_lo[which];
 					UINT32 pfn = (lo >> 6) & 0x00ffffff;
 					UINT32 wp = (lo & 7) | TLB_PRESENT;
-					
+
 					/* ensure that if the valid bit is clear, the dirty bit is as well */
 					/* this way we can always test dirty for writes, and valid for reads */
 					if (!(wp & TLB_VALID))

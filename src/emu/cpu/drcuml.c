@@ -331,7 +331,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 
 /*-------------------------------------------------
     size_for_param - given a set of parameter
-    flags and the instruction size, return the 
+    flags and the instruction size, return the
     size of the parameter
 -------------------------------------------------*/
 
@@ -409,7 +409,7 @@ drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbit
 
 
 /*-------------------------------------------------
-    drcuml_get_backend_info - return information 
+    drcuml_get_backend_info - return information
     about the back-end
 -------------------------------------------------*/
 
@@ -428,7 +428,7 @@ void drcuml_reset(drcuml_state *drcuml)
 {
 	drcuml_codehandle *handle;
 	jmp_buf errorbuf;
-	
+
 	/* flush the cache */
 	drccache_flush(drcuml->cache);
 
@@ -981,7 +981,7 @@ static const bevalidate_test bevalidate_test_list[] =
 	TEST_ENTRY_DSSI(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba988, 0,       FLAGS_C | FLAGS_Z)
 	TEST_ENTRY_DSSI(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba987, FLAGS_C, FLAGS_C | FLAGS_Z)
 	TEST_ENTRY_DSSI(ADDC, 4, 0x12345678, 0x12345678, 0xffffffff, FLAGS_C, FLAGS_C)
-	
+
 	TEST_ENTRY_DSSI(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0,       0)
 	TEST_ENTRY_DSSI(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba987654320f, FLAGS_C, 0)
 	TEST_ENTRY_DSSI(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, 0,       FLAGS_V | FLAGS_S)
@@ -1003,19 +1003,19 @@ static void validate_backend(drcuml_state *drcuml)
 {
 	drcuml_codehandle *handles[3];
 	int tnum;
-	
+
 	/* allocate handles for the code */
 	handles[0] = drcuml_handle_alloc(drcuml, "test_entry");
 	handles[1] = drcuml_handle_alloc(drcuml, "code_start");
 	handles[2] = drcuml_handle_alloc(drcuml, "code_end");
-	
+
 	/* iterate over test entries */
 	printf("Backend validation....\n");
 	for (tnum = 0; tnum < ARRAY_LENGTH(bevalidate_test_list); tnum++)
 	{
 		const bevalidate_test *test = &bevalidate_test_list[tnum];
 		drcuml_parameter param[ARRAY_LENGTH(test->param)];
-		
+
 		/* reset parameter list and iterate */
 		memset(param, 0, sizeof(param));
 		printf("Executing test %d/%d", tnum + 1, (int)ARRAY_LENGTH(bevalidate_test_list));
@@ -1036,7 +1036,7 @@ static void validate_backend(drcuml_state *drcuml)
 static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehandle **handles, const bevalidate_test *test, drcuml_parameter *paramlist, int pnum)
 {
 	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
-		
+
 	/* if no parameters, execute now */
 	if (pnum >= ARRAY_LENGTH(opvalid->ptypes) || opvalid->ptypes[pnum] == OV_PARAM_ALLOWED_NONE)
 	{
@@ -1049,7 +1049,7 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 		if (opvalid->ptypes[pnum] & (1 << paramlist[pnum].type))
 		{
 			int pindex, pcount;
-			
+
 			/* mapvars can only do 32-bit tests */
 			if (paramlist[pnum].type == DRCUML_PTYPE_MAPVAR && size_for_param(test->size, opvalid->ptypes[pnum]) == 8)
 				continue;
@@ -1063,16 +1063,16 @@ static void bevalidate_iterate_over_params(drcuml_state *drcuml, drcuml_codehand
 				default:							pcount = 1;										break;
 			}
 
-			/* iterate over possibilities */ 
+			/* iterate over possibilities */
 			for (pindex = 0; pindex < pcount; pindex++)
 			{
 				int skip = FALSE;
 				int pscannum;
-				
+
 				/* for param 0, print a dot */
 				if (pnum == 0)
 					printf(".");
-				
+
 				/* can't duplicate multiple source parameters unless they are immediates */
 				if (paramlist[pnum].type != DRCUML_PTYPE_IMMEDIATE && ((test->destmask >> pnum) & 1) == 0)
 
@@ -1102,7 +1102,7 @@ static void bevalidate_iterate_over_flags(drcuml_state *drcuml, drcuml_codehandl
 	const drcuml_opcode_valid *opvalid = &opcode_valid_table[test->opcode];
 	UINT8 flagmask = opvalid->condflags & 0x1f;
 	UINT8 curmask;
-	
+
 	/* iterate over all possible flag combinations */
 	for (curmask = 0; curmask <= flagmask; curmask++)
 		if ((curmask & flagmask) == curmask)
@@ -1124,7 +1124,7 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	drcuml_block *block;
 	UINT64 *parammem;
 	int numparams;
-	
+
 	/* allocate memory for parameters */
 	parammem = drccache_memory_alloc_near(drcuml->cache, sizeof(UINT64) * ARRAY_LENGTH(test->param));
 
@@ -1134,10 +1134,10 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	/* start a new block */
 	block = drcuml_block_begin(drcuml, 30, NULL);
 	UML_HANDLE(block, handles[0]);
-	
+
 	/* set up a random initial state */
 	bevalidate_initialize_random_state(block, &istate);
-	
+
 	/* then populate the state with the parameters */
 	numparams = bevalidate_populate_state(block, &istate, test, paramlist, params, parammem);
 
@@ -1149,19 +1149,19 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 		case 0:
 			drcuml_block_append_0(block, test->opcode, test->size, flagmask);
 			break;
-		
+
 		case 1:
 			drcuml_block_append_1(block, test->opcode, test->size, flagmask, params[0].type, params[0].value);
 			break;
-		
+
 		case 2:
 			drcuml_block_append_2(block, test->opcode, test->size, flagmask, params[0].type, params[0].value, params[1].type, params[1].value);
 			break;
-		
+
 		case 3:
 			drcuml_block_append_3(block, test->opcode, test->size, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value);
 			break;
-		
+
 		case 4:
 			drcuml_block_append_4(block, test->opcode, test->size, flagmask, params[0].type, params[0].value, params[1].type, params[1].value, params[2].type, params[2].value, params[3].type, params[3].value);
 			break;
@@ -1170,13 +1170,13 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 	UML_HANDLE(block, handles[2]);
 	UML_SAVE(block, &fstate);
 	UML_EXIT(block, IMM(0));
-	
+
 	/* end the block */
 	drcuml_block_end(block);
-	
+
 	/* execute */
 	drcuml_execute(drcuml, handles[0]);
-	
+
 	/* verify the results */
 	bevalidate_verify_state(drcuml, &istate, &fstate, test, params, &testinst, handles[1]->code, handles[2]->code, flagmask);
 
@@ -1186,19 +1186,19 @@ static void bevalidate_execute(drcuml_state *drcuml, drcuml_codehandle **handles
 
 
 /*-------------------------------------------------
-    bevalidate_initialize_random_state - 
+    bevalidate_initialize_random_state -
     initialize the machine state to randomness
 -------------------------------------------------*/
 
 static void bevalidate_initialize_random_state(drcuml_block *block, drcuml_machine_state *state)
 {
 	int regnum;
-	
+
 	/* initialize core state to random values */
 	state->fmod = mame_rand(Machine) & 0x03;
 	state->flags = mame_rand(Machine) & 0x1f;
 	state->exp = mame_rand(Machine);
-	
+
 	/* initialize integer registers to random values */
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
 	{
@@ -1239,10 +1239,10 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 	{
 		int psize = size_for_param(test->size, opvalid->ptypes[pnum]);
 		drcuml_parameter *curparam = &params[pnum];
-		
+
 		/* start with a copy of the parameter from the list */
 		*curparam = paramlist[pnum];
-		
+
 		/* switch off the type */
 		switch (curparam->type)
 		{
@@ -1250,19 +1250,19 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 			case DRCUML_PTYPE_IMMEDIATE:
 				curparam->value = test->param[pnum];
 				break;
-			
+
 			/* register parameters: set the register value in the state and set the parameter value to the register index */
 			case DRCUML_PTYPE_INT_REGISTER:
 				state->r[curparam->value].d = test->param[pnum];
 				curparam->value += DRCUML_REG_I0;
 				break;
-			
+
 			/* register parameters: set the register value in the state and set the parameter value to the register index */
 			case DRCUML_PTYPE_FLOAT_REGISTER:
 				state->f[curparam->value].d = test->param[pnum];
 				curparam->value += DRCUML_REG_F0;
 				break;
-			
+
 			/* memory parameters: set the memory value in the parameter space and set the parameter value to point to it */
 			case DRCUML_PTYPE_MEMORY:
 				curparam->value = (FPTR)&parammem[pnum];
@@ -1271,7 +1271,7 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 				else
 					*(UINT64 *)(FPTR)curparam->value = test->param[pnum];
 				break;
-			
+
 			/* map variables: issue a MAPVAR instruction to set the value and set the parameter value to the mapvar index */
 			case DRCUML_PTYPE_MAPVAR:
 				UML_MAPVAR(block, MVAR(curparam->value), test->param[pnum]);
@@ -1284,7 +1284,7 @@ static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *
 				break;
 		}
 	}
-	
+
 	/* return the total number of parameters */
 	return numparams;
 }
@@ -1306,7 +1306,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 	int pnum, regnum;
 
 	*errend = 0;
-	
+
 	/* check flags */
 	if ((state->flags & flagmask) != (test->flags & flagmask))
 	{
@@ -1323,7 +1323,7 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 			(flagmask & DRCUML_FLAG_C) ? ((test->flags & DRCUML_FLAG_C) ? 'C' : '.') : '-');
 	}
 
-	/* check destination parameters */			
+	/* check destination parameters */
 	for (pnum = 0; pnum < ARRAY_LENGTH(test->param); pnum++)
 		if (test->destmask & (1 << pnum))
 		{
@@ -1339,13 +1339,13 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 					ireg[params[pnum].value - DRCUML_REG_I0] = 1;
 					result = state->r[params[pnum].value - DRCUML_REG_I0].d;
 					break;
-				
+
 				/* float registers fetch from the state */
 				case DRCUML_PTYPE_FLOAT_REGISTER:
 					freg[params[pnum].value - DRCUML_REG_I0] = 1;
 					result = state->f[params[pnum].value - DRCUML_REG_F0].d;
 					break;
-				
+
 				/* memory registers fetch from the memory address */
 				case DRCUML_PTYPE_MEMORY:
 					if (psize == 4)
@@ -1353,11 +1353,11 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 					else
 						result = *(UINT64 *)(FPTR)params[pnum].value;
 					break;
-				
+
 				default:
 					break;
 			}
-			
+
 			/* check against the mask */
 			if ((result & mask) != (test->param[pnum] & mask))
 			{
@@ -1370,29 +1370,29 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 										(UINT32)((test->param[pnum] & mask) >> 32), (UINT32)(test->param[pnum] & mask));
 			}
 		}
-	
+
 	/* check source integer parameters for unexpected alterations */
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->r); regnum++)
 		if (ireg[regnum] == 0 && istate->r[regnum].d != state->r[regnum].d)
 			errend += sprintf(errend, "  Register i%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
 								(UINT32)(state->r[regnum].d >> 32), (UINT32)state->r[regnum].d,
 								(UINT32)(istate->r[regnum].d >> 32), (UINT32)istate->r[regnum].d);
-	
+
 	/* check source float parameters for unexpected alterations */
 	for (regnum = 0; regnum < ARRAY_LENGTH(state->f); regnum++)
 		if (freg[regnum] == 0 && *(UINT64 *)&istate->f[regnum].d != *(UINT64 *)&state->f[regnum].d)
 			errend += sprintf(errend, "  Register f%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
 								(UINT32)(*(UINT64 *)&state->f[regnum].d >> 32), (UINT32)*(UINT64 *)&state->f[regnum].d,
 								(UINT32)(*(UINT64 *)&istate->f[regnum].d >> 32), (UINT32)*(UINT64 *)&istate->f[regnum].d);
-	
+
 	/* output the error if we have one */
 	if (errend != errorbuf)
 	{
 		char disasm[100];
-		
+
 		/* disassemble the test instruction */
 		drcuml_disasm(testinst, disasm);
-		
+
 		/* output a description of what went wrong */
 		printf("\n");
 		printf("----------------------------------------------\n");
@@ -1404,4 +1404,4 @@ static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_st
 		fatalerror("Error during validation");
 	}
 	return errend != errorbuf;
-}	
+}
