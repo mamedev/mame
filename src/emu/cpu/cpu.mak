@@ -1137,7 +1137,7 @@ OBJDIRS += $(CPUOBJ)/powerpc
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
 
 ifdef X86_PPC_DRC
-CPUOBJS += $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
+CPUOBJS += $(CPUOBJ)/powerpc/ppcdrco.o $(DRCOBJ)
 else
 CPUOBJS += $(CPUOBJ)/powerpc/ppc.o
 endif
@@ -1151,7 +1151,7 @@ $(CPUOBJ)/powerpc/ppc.o:	$(CPUSRC)/powerpc/ppc.c \
 							$(CPUSRC)/powerpc/ppc602.c \
 							$(CPUSRC)/powerpc/ppc603.c
 
-$(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
+$(CPUOBJ)/powerpc/ppcdrco.o:$(CPUSRC)/powerpc/ppcdrco.c \
 							$(CPUSRC)/powerpc/ppc.h \
 							$(CPUSRC)/powerpc/drc_ops.c \
 							$(CPUSRC)/powerpc/drc_ops.h \
