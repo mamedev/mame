@@ -33,6 +33,10 @@ sound_prog 27512
 
 COR_x are LN60G resitor packs
 
+-------------------------------------
+
+Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Match-It
+
 */
 
 #include "driver.h"
