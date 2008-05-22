@@ -765,6 +765,7 @@ try_again:
 
 	// set the max texture size
 	render_target_set_max_texture_size(window->target, d3d->texture_max_width, d3d->texture_max_height);
+	mame_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)d3d->texture_max_width, (int)d3d->texture_max_height);
 
 	// set the gamma if we need to
 	if (window->fullscreen)
