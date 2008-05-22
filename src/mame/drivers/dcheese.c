@@ -67,7 +67,7 @@ static void update_irq_state(running_machine *machine)
 	for (i = 4; i >= 0; i--)
 		if (irq_state[i])
 		{
-			cpunum_set_input_line(Machine, 0, i, ASSERT_LINE);
+			cpunum_set_input_line(machine, 0, i, ASSERT_LINE);
 			return;
 		}
 

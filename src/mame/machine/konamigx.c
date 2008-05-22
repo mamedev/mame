@@ -1680,7 +1680,7 @@ void konamigx_mixer(running_machine *machine, bitmap_t *bitmap, const rectangle 
 		}
 		color &= K055555_COLORMASK;
 
-		if (drawmode >= 4) palette_set_shadow_mode(Machine, order & 0x0f);
+		if (drawmode >= 4) palette_set_shadow_mode(machine, order & 0x0f);
 
 		if (!(mixerflags & GXMIX_NOZBUF))
 		{

@@ -935,16 +935,16 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpunum = mame_find_cpu_index(Machine, "dcs2");
+	dcs.cpunum = mame_find_cpu_index(machine, "dcs2");
 	dcs.rev = 2;
 	if ((INT8)dcs.cpunum == -1)
 	{
-		dcs.cpunum = mame_find_cpu_index(Machine, "dsio");
+		dcs.cpunum = mame_find_cpu_index(machine, "dsio");
 		dcs.rev = 3;
 	}
 	if ((INT8)dcs.cpunum == -1)
 	{
-		dcs.cpunum = mame_find_cpu_index(Machine, "denver");
+		dcs.cpunum = mame_find_cpu_index(machine, "denver");
 		dcs.rev = 4;
 	}
 	dcs.channels = 2;
@@ -989,7 +989,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs_register_state();
 
 	/* reset the system */
-	dcs_reset(Machine, NULL, 0);
+	dcs_reset(machine, NULL, 0);
 }
 
 

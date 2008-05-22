@@ -4316,7 +4316,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 
 				case 0xa000: // shadow set, highlight set - not possible
 				case 0xe000: // shadow set, highlight set, normal set, not possible
-					lineptr[x] = megadrive_vdp_palette_lookup_highlight[mame_rand(Machine)&0x3f];
+					lineptr[x] = megadrive_vdp_palette_lookup_highlight[mame_rand(machine)&0x3f];
 					break;
 
 

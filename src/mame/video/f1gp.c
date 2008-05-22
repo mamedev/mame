@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "f1gp.h"
 
@@ -292,7 +291,7 @@ static void f1gpb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 		if((spriteram16[attr_start + 1] & 0x00f0) && (spriteram16[attr_start + 1] & 0x00f0) != 0xc0)
 		{
 			printf("attr %X\n",spriteram16[attr_start + 1] & 0x00f0);
-			code = mame_rand(Machine);
+			code = mame_rand(machine);
 		}
 
 /*

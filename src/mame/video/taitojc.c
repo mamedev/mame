@@ -62,7 +62,7 @@ static void taitojc_tile_update(running_machine *machine)
 			if (taitojc_dirty_map[i])
 			{
 				taitojc_dirty_map[i] = 0;
-				decodechar(Machine->gfx[taitojc_gfx_index], i, (UINT8 *)taitojc_char_ram);
+				decodechar(machine->gfx[taitojc_gfx_index], i, (UINT8 *)taitojc_char_ram);
 			}
 		}
 		tilemap_mark_all_tiles_dirty(taitojc_tilemap);

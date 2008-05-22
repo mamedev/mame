@@ -167,12 +167,12 @@ static void update_irq_state(running_machine *machine)
 		{
 			if (irq & (1 << i))
 			{
-				cpunum_set_input_line(Machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
 				return;
 			}
 			i++;
 		}
-		cpunum_set_input_line(Machine, 0, 0, ASSERT_LINE);
+		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 	}
 	else
 	{

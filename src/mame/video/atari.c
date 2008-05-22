@@ -1523,7 +1523,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 		handle_keyboard(machine);
 
 		/* do nothing new for the rest of the frame */
-		antic.modelines = video_screen_get_height(Machine->primary_screen) - VBL_START;
+		antic.modelines = video_screen_get_height(machine->primary_screen) - VBL_START;
 		antic_renderer = antic_mode_0_xx;
 
 		/* if the CPU want's to be interrupted at vertical blank... */
@@ -1532,7 +1532,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			antic.r.nmist |= VBL_NMI;
-			cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 		}
     }
 

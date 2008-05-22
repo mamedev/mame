@@ -218,7 +218,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			/*   03 - maybe controls halt and reset lines together? */
 			if ((oldval ^ chip->regs[offset]) & 3)
 			{
-				cpunum_set_input_line(Machine, chip->cpunum, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
+				cpunum_set_input_line(machine, chip->cpunum, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 				if ((chip->regs[offset] & 3) == 3)
 					fd1094_machine_init();
 			}
@@ -232,7 +232,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 		case 0x04:
 			/* controls IRQ lines to 68000, negative logic -- write $B to signal IRQ4 */
 			if ((chip->regs[offset] & 7) != 7)
-				cpunum_set_input_line(Machine, chip->cpunum, (~chip->regs[offset] & 7), HOLD_LINE);
+				cpunum_set_input_line(machine, chip->cpunum, (~chip->regs[offset] & 7), HOLD_LINE);
 			break;
 
 		case 0x05:

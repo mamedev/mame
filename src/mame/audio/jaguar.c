@@ -261,13 +261,13 @@ void cojag_sound_init(running_machine *machine)
 		jaguar_wave_rom[0x200 + i] = (int)(32767. * sin(2.0 * M_PI * (double)i / (double)0x80));
 
 		/* F1DA00 = traingle wave with noise */
-		jaguar_wave_rom[0x280 + i] = jaguar_wave_rom[0x000 + i] * (mame_rand(Machine) % 32768) / 32768;
+		jaguar_wave_rom[0x280 + i] = jaguar_wave_rom[0x000 + i] * (mame_rand(machine) % 32768) / 32768;
 
 		/* F1DC00 = spike */
 		jaguar_wave_rom[0x300 + i] = (i == 0x40) ? 32767 : 0;
 
 		/* F1DE00 = white noise */
-		jaguar_wave_rom[0x380 + i] = mame_rand(Machine) % 32768;
+		jaguar_wave_rom[0x380 + i] = mame_rand(machine) % 32768;
 	}
 
 #if ENABLE_SPEEDUP_HACKS

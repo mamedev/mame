@@ -1356,7 +1356,7 @@ static void voodoo_stall(running_machine *machine, int stall)
 
 				/* resume execution */
 				cpuintrf_push_context(0);
-				galileo_perform_dma(Machine, which);
+				galileo_perform_dma(machine, which);
 				cpuintrf_pop_context();
 				break;
 			}
@@ -1366,12 +1366,12 @@ static void voodoo_stall(running_machine *machine, int stall)
 		{
 			/* if the CPU had a pending write, do it now */
 			if (cpu_stalled_on_voodoo)
-				voodoo_0_w(Machine, cpu_stalled_offset, cpu_stalled_data, cpu_stalled_mem_mask);
+				voodoo_0_w(machine, cpu_stalled_offset, cpu_stalled_data, cpu_stalled_mem_mask);
 			cpu_stalled_on_voodoo = FALSE;
 
 			/* resume CPU execution */
 			if (LOG_DMA) logerror("Resuming CPU on voodoo\n");
-			cpu_trigger(Machine, 45678);
+			cpu_trigger(machine, 45678);
 		}
 	}
 }

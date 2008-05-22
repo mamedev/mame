@@ -1054,7 +1054,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	disable_screen_blanking = 0;
 
 	/* see if we have a sound CPU and a UPD7759 chip */
-	has_sound_cpu = (mame_find_cpu_index(Machine, "sound") != -1);
+	has_sound_cpu = (mame_find_cpu_index(machine, "sound") != -1);
 }
 
 

@@ -11,7 +11,6 @@
 *************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "videopin.h"
 #include "videopin.lh"
 #include "sound/discrete.h"
@@ -37,7 +36,7 @@ static void update_plunger(running_machine *machine)
 			time_released = timer_get_time();
 
 			if (!mask)
-				cpunum_set_input_line(Machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
 			time_pushed = timer_get_time();

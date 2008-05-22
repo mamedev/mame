@@ -2453,11 +2453,11 @@ static void memory_init_locate(running_machine *machine)
 					if (entry->baseptr != NULL)
 						*entry->baseptr = entry->memory;
 					if (entry->baseptroffs_plus1 != 0)
-						*(void **)((UINT8 *)Machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
+						*(void **)((UINT8 *)machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
 					if (entry->sizeptr != NULL)
 						*entry->sizeptr = entry->byteend - entry->bytestart + 1;
 					if (entry->sizeptroffs_plus1 != 0)
-						*(size_t *)((UINT8 *)Machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
+						*(size_t *)((UINT8 *)machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
 				}
 			}
 

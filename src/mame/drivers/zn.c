@@ -391,7 +391,7 @@ static void zn_driver_init( running_machine *machine )
 	n_game = 0;
 	while( zn_config_table[ n_game ].s_name != NULL )
 	{
-		if( strcmp( Machine->gamedrv->name, zn_config_table[ n_game ].s_name ) == 0 )
+		if( strcmp( machine->gamedrv->name, zn_config_table[ n_game ].s_name ) == 0 )
 		{
 			znsec_init( 0, zn_config_table[ n_game ].p_n_mainsec );
 			znsec_init( 1, zn_config_table[ n_game ].p_n_gamesec );

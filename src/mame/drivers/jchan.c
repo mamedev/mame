@@ -250,7 +250,7 @@ static void jchan_mcu_run(running_machine *machine)
 					mcu_ram[mcu_offset + 6] = 0x3939; mcu_ram[mcu_offset + 7] = 0x3420;
 					break;
 				case 0x3e:
-					if ( strcmp(Machine->gamedrv->name, "jchan") == 0 ) /* $f72 ($f6a-$fc6) */
+					if ( strcmp(machine->gamedrv->name, "jchan") == 0 ) /* $f72 ($f6a-$fc6) */
 					{
 						/* MCU writes the string "1995/05/24 The kung-Fu Master Jackie Chan   " to shared ram */
 						mcu_ram[mcu_offset +  0] = 0x3139; mcu_ram[mcu_offset +  1] = 0x3935;
@@ -265,7 +265,7 @@ static void jchan_mcu_run(running_machine *machine)
 						mcu_ram[mcu_offset + 18] = 0x2043; mcu_ram[mcu_offset + 19] = 0x6861;
 						mcu_ram[mcu_offset + 20] = 0x6E20; mcu_ram[mcu_offset + 21] = 0x2020;
 					}
-					else if ( strcmp(Machine->gamedrv->name, "jchan2") == 0 )
+					else if ( strcmp(machine->gamedrv->name, "jchan2") == 0 )
 					{
 						/* MCU writes the string "1995/10/24 Fists Of Fire" to shared ram */
 						mcu_ram[mcu_offset +  0] = 0x3139; mcu_ram[mcu_offset +  1] = 0x3935;
@@ -341,7 +341,7 @@ are loaded in RAM then saved with cmd 0x42 (see code @ $5196 & $50d4)
 			mcu_ram[mcu_offset + 63] = 0x0062;
 #endif
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_READ)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
 			{
 				mame_fread(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
@@ -353,7 +353,7 @@ are loaded in RAM then saved with cmd 0x42 (see code @ $5196 & $50d4)
 		case 0x42: /* save game settings to 93C46 EEPROM ($50d4) */
 		{
 			mame_file *f;
-			if ((f = nvram_fopen(Machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
+			if ((f = nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS)) != 0)
 			{
 				mame_fwrite(f,&mcu_ram[mcu_offset], 128);
 				mame_fclose(f);

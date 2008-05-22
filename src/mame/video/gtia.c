@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
@@ -69,7 +68,7 @@ void gtia_init(running_machine *machine, const gtia_interface *intf)
 	memset(&gtia, 0, sizeof(gtia));
 	gtia.intf = *intf;
 
-	add_reset_callback(Machine, gtia_reset);
+	add_reset_callback(machine, gtia_reset);
 
 	/* state saves */
 	gtia_state(machine);
