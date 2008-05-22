@@ -2751,6 +2751,109 @@ ROM_START( cybrcycc )
 	ROM_LOAD( "cb1waveb.1l", 0x800000, 0x200000, CRC(33bf08f6) SHA1(bf9d68b26a8158ea1abfe8428b7454cac25242c5) )
 ROM_END
 
+/*
+Prop Cycle (VER. A)
+Namco, 1995
+
+Hardware platform is Super System 22
+
+1ST PCB
+-------
+PCB NO: SYSTEM SUPER22 CPU PCB (B) 8646962600 (8646972600)
+CPU   : 68EC020FG25
+OSCs  : 40.000MHz, 49.1520MHz
+RAMs  : N341256SJ20 (x6), CY7C182-25VC (x1)
+DIPSW : 8 Position (x1), 4 Position (x1)
+PALs  : PALCE 22V10H-15JC/4 (x3, labelled SS22C1, SS22C2, SS22C4)
+CUSTOM: C352 (100 PIN PQFP) 
+        C405 (176 PIN PQFP)
+        C428 (KEYCUS)
+        137  (28 PIN DIP)
+        C422  (64 PIN PQFP, in same position where C139 would normally be. i.e. PCB position is labelled as C139)                    C383 (100 PIN PQFP)
+        M37710S4BFP (80 PIN PQFP)
+OTHER : AT28C64 (EEPROM)
+ROMs  : pr1data.8k (near C405, 27C4096)
+        pr1wavea.2l (near C352, 32M MASK)
+        pr1waveb.1l (near C352, 32M MASK)
+
+        Tiny ROM PCB labelled PR2 VER. A
+        SYSTEM SUPER22 MPM(F) PCB 8646961600 (8646971600)
+        containing main program ....
+                                     pr2ver-a.1 (INTEL FLASH, TYPE E28F008SA, TSOP40)
+                                     pr2ver-a.2       "
+                                     pr2ver-a.3       "
+                                     pr2ver-a.4       "
+
+
+
+2ND PCB
+-------
+PCB NO: SYSTEM SUPER22 DSP PCB 8646960302 (8646970302)
+OSC   : 40.0000MHz
+PALs  : PALCE20V8H (Labelled SS22D1)
+        PALCE16V8  (x4, Labelled SS22D2, SS22D3, SS22D4B, SS22D5)
+RAMs  : N341256SJ-20 (x9), TC551001BFL-70L (x6)
+CUSTOM: C396 (160 PIN PQFP)
+        C71  (x2, 68 PIN PLCC)
+        C199 (100 PIN PQFP)
+        C353 (120 PIN PQFP)
+        C402 (x2, 144 PIN PQFP)
+        C403 (136 PIN PQFP)
+        C300 (160 PIN PQFP)
+        C342 (160 PIN PQFP)
+        C405 (x2, 176 PIN PQFP)
+        C379 (64 PIN PQFP)
+
+
+
+3RD PCB
+-------
+
+PCB No: SYSTEM SUPER22 MROM PCB 8646960400 (8646970400)
+PALs  : Labelled SS22M3, SS22M2 (x2), SS22M1
+RAMs  : TC551001BFL-70L (x3)
+ROMs  : GFX....MANY, MANY, MANY! All ROMs are surface mounted
+
+                                  Type
+        ----------------------------------
+        pr1ccrl.7b = pr1ccrl.3d   16M SOP44
+        pr1ccrh.5b = pr1ccrh.1d   4M SOP32
+
+        pr1cg0.12b = pr1cg0.8d    16M SOP44
+        pr1cg1.13b = pr1cg1.10d      "
+        pr1cg2.14b = pr1cg2.12d      "
+        pr1cg3.16b = pr1cg3.13d      "
+        pr1cg4.18b = pr1cg4.14d      "
+        pr1cg5.19b = pr1cg5.16d      "
+        pr1cg6.18a = pr1cg6.18d      "
+        pr1cg7.15a = pr1cg7.19d      "
+
+        pr1scg0.12f= pr1scg0.12l  16M SOP44 
+        pr1scg1.10f= pr1scg1.10l     "      
+
+        pr1ptr*                   4M SOP32
+
+
+
+4TH PCB
+-------
+PCB NO: SYSTEM SUPER22 VIDEO (C) 8646962700 (8646972700)
+OSC   : 51.2000MHz
+RAMs  : M514252A-80J (x22), N341256SJ-20 (x9), LC321664J-80 (x1)
+CUSTOM: 304 (x4, 120 PIN PQFP)
+        401 (x4, 64 PIN PQFP)
+        400 (x4, 100 PIN PQFP)
+        399 (160 PIN PQFP)
+        407 (64 PIN PQFP)
+        397 (160 PIN PQFP)
+        381 (x2, 144 PIN PQFP)         
+        406 (120 PIN PQFP)
+        374 (160 PIN PQFP)
+        395 (168 PIN PQFP)
+        404 (208 PIN PQFP) 
+        361 (120 PIN PQFP) 
+        SONY CXD1178Q (48 PIN PQFP)
+*/
 ROM_START( propcycl )
 	ROM_REGION( 0x400000, REGION_CPU1, 0 ) /* main program */
 	ROM_LOAD32_BYTE( "pr2ver-a.1", 0x00003, 0x100000, CRC(3f58594c) SHA1(5fdd8c61b47b51088a201799ce0c2f08c32ef852) )

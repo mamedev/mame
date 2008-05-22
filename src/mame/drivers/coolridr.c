@@ -1,5 +1,5 @@
 /*
-x
+
 Sega System H1
 preliminary
 
@@ -11,59 +11,38 @@ Cool Riders
 -- readme --
 
 Cool Riders by SEGA 1995
-
-SYSTEM H1 CPU Board :
-
+SYSTEM H1 CPU Board
+-------------------
 Processors :
-
 Hitachi SH2 HD6417095
-
 Toshiba TMP68HC000N-16
-
 Hitachi SH7032 HD6417032F20
 
-Eprom : Ep17662.12
+Eprom :
+Ep17662.12
 
 SEGA CUSTOM IC :
-
-315-5687 (x2) (SCSP)
-
+315-5687 (x2)
 315-5757
-
 315-5758
-
 315-5849
-
 315-5800 GAL16V8B
-
 315-5801 GAL16V8B
-
 315-5802 GAL16V8B
 
-SYSTEM H1 VIDEO BOARD :
-
+SYSTEM H1 VIDEO BOARD
+---------------------
 SEGA CUSTOM IC :
-
 315-5648 (x4)
-
 315-5691
-
 315-5692
-
 315-5693 (x2)
-
 315-5694
-
 315-5695 (x2)
-
 315-5696 (x2)
-
 315-5697
-
 315-5698
-
 315-5803 GAL16V8B
-
 315-5864 GAL16V8B
 
 */
