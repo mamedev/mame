@@ -2260,7 +2260,7 @@ GAME( 1983, mplanuk,  mplanets, gottlieb, mplanets, 0,        ROT270, "Gottlieb 
 GAME( 1983, krull,    0,        krull,    krull,    0,        ROT270, "Gottlieb", "Krull", 0 )
 GAME( 1983, kngtmare, 0,        gottlieb, kngtmare, 0,        ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
 GAME( 1983, sqbert,   0,        qbert,    qbert,    0,        ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", 0 )
-GAME( 1983, qbertqub, 0,        qbert,    qbertqub, 0,        ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
+GAME( 1983, qbertqub, 0,        qbert,    qbertqub, 0,        ROT270, "Mylstar", "Q*bert's Qubes", 0 )
 GAME( 1983, mach3,    0,        gottlieb2,mach3,    laserdsc, ROT0,   "Mylstar", "M.A.C.H. 3", GAME_NOT_WORKING )
 GAME( 1983, screwloo, 0,        gottlieb2,screwloo, gottlieb, ROT0,   "Mylstar", "Screw Loose (prototype)", 0 )
 GAME( 1984, cobram3,  0,        gottlieb2,mach3,    laserdsc, ROT0,   "Data East","Cobra Command", GAME_NOT_WORKING )
