@@ -170,6 +170,9 @@
 #define UML_SEXT1(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_SEXT1,   4, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_SEXT2(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_SEXT2,   4, IF_ALWAYS,  dst, src1); } while (0)
 
+#define UML_XTRACT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_XTRACT,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_INSERT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_INSERT,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+
 #define UML_NEG(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_NEG,     4, FLAGS_NONE, dst, src1); } while (0)
 #define UML_NEGf(block, dst, src1, flags)					do { drcuml_block_append_2(block, DRCUML_OP_NEG,     4, flags,      dst, src1); } while (0)
 
@@ -273,6 +276,9 @@
 #define UML_DSEXT1(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT1,   8, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_DSEXT2(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT2,   8, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_DSEXT4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT4,   8, IF_ALWAYS,  dst, src1); } while (0)
+
+#define UML_DXTRACT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_XTRACT,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_DINSERT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_INSERT,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 
 #define UML_DNEG(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_NEG,     8, FLAGS_NONE, dst, src1); } while (0)
 #define UML_DNEGf(block, dst, src1, flags)					do { drcuml_block_append_2(block, DRCUML_OP_NEG,     8, flags,      dst, src1); } while (0)

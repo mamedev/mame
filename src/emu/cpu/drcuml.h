@@ -216,6 +216,8 @@ enum _drcuml_opcode
 	DRCUML_OP_SEXT1,		/* SEXT1   dst,src                */
 	DRCUML_OP_SEXT2,		/* SEXT2   dst,src                */
 	DRCUML_OP_SEXT4,		/* SEXT4   dst,src                */
+	DRCUML_OP_XTRACT,		/* XTRACT  dst,src,shift,mask     */
+	DRCUML_OP_INSERT,		/* INSERT  dst,src,shift,mask     */
 	DRCUML_OP_ADD,			/* ADD     dst,src1,src2[,f]      */
 	DRCUML_OP_ADDC,			/* ADDC    dst,src1,src2[,f]      */
 	DRCUML_OP_SUB,			/* SUB     dst,src1,src2[,f]      */
@@ -229,6 +231,7 @@ enum _drcuml_opcode
 	DRCUML_OP_TEST,			/* TEST    src1,src2[,f]          */
 	DRCUML_OP_OR,			/* OR      dst,src1,src2[,f]      */
 	DRCUML_OP_XOR,			/* XOR     dst,src1,src2[,f]      */
+	DRCUML_OP_LZCNT,		/* LZCNT   dst,src			      */
 	DRCUML_OP_SHL,			/* SHL     dst,src,count[,f]      */
 	DRCUML_OP_SHR,			/* SHR     dst,src,count[,f]      */
 	DRCUML_OP_SAR,			/* SAR     dst,src,count[,f]      */

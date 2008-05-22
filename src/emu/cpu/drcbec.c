@@ -745,6 +745,16 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = (INT16)PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_XTRACT, 4, 0):		/* XTRACT  dst,src,count,mask[,f] */
+				shift = PARAM2 & 31;
+				PARAM0 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_INSERT, 4, 0):		/* INSERT  dst,src,count,mask[,f] */
+				shift = PARAM2 & 31;
+				PARAM0 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADD, 4, 0):		/* ADD     dst,src1,src2[,f]      */
 				PARAM0 = PARAM1 + PARAM2;
 				break;
@@ -892,6 +902,16 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 			case MAKE_OPCODE_SHORT(DRCUML_OP_XOR, 4, 1):
 				temp32 = PARAM1 ^ PARAM2;
 				flags = FLAGS32_NZ(temp32);
+				PARAM0 = temp32;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 0):		/* LZCNT   dst,src[,f]            */
+				PARAM0 = count_leading_zeros(PARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 1):
+				temp32 = count_leading_zeros(PARAM1);
+				flags = (temp32 == 0) ? DRCUML_FLAG_Z : 0;
 				PARAM0 = temp32;
 				break;
 
@@ -1151,6 +1171,16 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				DPARAM0 = (INT32)PARAM1;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_XTRACT, 8, 0):		/* DXTRACT dst,src,count,mask[,f] */
+				shift = DPARAM2 & 63;
+				DPARAM0 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_INSERT, 8, 0):		/* DINSERT dst,src,count,mask[,f] */
+				shift = DPARAM2 & 63;
+				DPARAM0 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_ADD, 8, 0):		/* DADD    dst,src1,src2[,f]      */
 				DPARAM0 = DPARAM1 + DPARAM2;
 				break;
@@ -1289,6 +1319,22 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				temp64 = DPARAM1 ^ DPARAM2;
 				flags = FLAGS64_NZ(temp64);
 				DPARAM0 = temp64;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 0):		/* DLZCNT  dst,src[,f]            */
+				if ((UINT32)(DPARAM1 >> 32) != 0)
+					DPARAM0 = count_leading_zeros(DPARAM1 >> 32);
+				else
+					DPARAM0 = 32 + count_leading_zeros(DPARAM1);
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 1):
+				if ((UINT32)(DPARAM1 >> 32) != 0)
+					temp32 = count_leading_zeros(DPARAM1 >> 32);
+				else
+					temp32 = 32 + count_leading_zeros(DPARAM1);
+				flags = (temp32 == 0) ? DRCUML_FLAG_Z : 0;
+				DPARAM0 = temp32;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SHL, 8, 0):		/* DSHL    dst,src,count[,f]      */

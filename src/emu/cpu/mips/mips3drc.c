@@ -47,8 +47,8 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 #define LOG_UML							(0)
 #define LOG_NATIVE						(0)
 
+#define DISABLE_FAST_REGISTERS			(0)
 #define SINGLE_INSTRUCTION_MODE			(0)
-#define ENABLE_FAST_REGISTERS			(1)
 
 #define PRINTF_EXCEPTIONS				(0)
 #define PRINTF_MMU						(0)
@@ -83,6 +83,7 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 #define EXECUTE_OUT_OF_CYCLES			0
 #define EXECUTE_MISSING_CODE			1
 #define EXECUTE_UNMAPPED_CODE			2
+#define EXECUTE_RESET_CACHE				3
 
 
 
@@ -760,23 +761,23 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 	}
 
 	/* if we have registers to spare, assign r2, r3, r4 to leftovers */
-	if (ENABLE_FAST_REGISTERS)
+	if (!DISABLE_FAST_REGISTERS)
 	{
 		drcuml_get_backend_info(mips3.drcuml, &beinfo);
-		if (beinfo.direct_iregs > 5)
+		if (beinfo.direct_iregs > 4)
 		{
 			mips3.regmap[2].type = mips3.regmaplo[2].type = DRCUML_PTYPE_INT_REGISTER;
-			mips3.regmap[2].value = mips3.regmaplo[2].value = DRCUML_REG_I5;
+			mips3.regmap[2].value = mips3.regmaplo[2].value = DRCUML_REG_I4;
+		}
+		if (beinfo.direct_iregs > 5)
+		{
+			mips3.regmap[3].type = mips3.regmaplo[3].type = DRCUML_PTYPE_INT_REGISTER;
+			mips3.regmap[3].value = mips3.regmaplo[3].value = DRCUML_REG_I5;
 		}
 		if (beinfo.direct_iregs > 6)
 		{
-			mips3.regmap[3].type = mips3.regmaplo[3].type = DRCUML_PTYPE_INT_REGISTER;
-			mips3.regmap[3].value = mips3.regmaplo[3].value = DRCUML_REG_I6;
-		}
-		if (beinfo.direct_iregs > 7)
-		{
 			mips3.regmap[4].type = mips3.regmaplo[4].type = DRCUML_PTYPE_INT_REGISTER;
-			mips3.regmap[4].value = mips3.regmaplo[4].value = DRCUML_REG_I7;
+			mips3.regmap[4].value = mips3.regmaplo[4].value = DRCUML_REG_I6;
 		}
 	}
 
@@ -825,6 +826,8 @@ static int mips3_execute(int cycles)
 			code_compile_block(drcuml, mips3.cstate->mode, mips3.core->pc);
 		else if (execute_result == EXECUTE_UNMAPPED_CODE)
 			fatalerror("Attempted to execute unmapped code at PC=%08X\n", mips3.core->pc);
+		else if (execute_result == EXECUTE_RESET_CACHE)
+			code_flush_cache(drcuml);
 
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
 
@@ -1350,16 +1353,8 @@ static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int
 	block = drcuml_block_begin(drcuml, 1024, &errorbuf);
 
 	/* add a global entry for this */
-	if (recover)
-	{
-		alloc_handle(drcuml, exception_handle, name);
-		UML_HANDLE(block, *exception_handle);										// handle  name
-	}
-	else
-	{
-		alloc_handle(drcuml, exception_handle, name);
-		UML_HANDLE(block, *exception_handle);										// handle  name
-	}
+	alloc_handle(drcuml, exception_handle, name);
+	UML_HANDLE(block, *exception_handle);											// handle  name
 
 	/* exception parameter is expected to be the fault address in this case */
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE || exception == EXCEPTION_ADDRLOAD || exception == EXCEPTION_ADDRSTORE)
@@ -1372,15 +1367,9 @@ static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int
 
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
 	{
-		/* set the upper bits of EntryHi to the fault page */
-		UML_AND(block, IREG(0), IREG(0), IMM(0xffffe000));							// and     i0,i0,0xffffe000
-		UML_AND(block, IREG(1), CPR032(COP0_EntryHi), IMM(0x000000ff));				// and     i1,[EntryHi],0x000000ff
-		UML_OR(block, CPR032(COP0_EntryHi), IREG(0), IREG(1));						// or      [EntryHi],i0,i1
-
-		/* set the lower bits of Context to the fault page */
-		UML_SHR(block, IREG(0), IREG(0), IMM(9));									// shr     i0,i0,9
-		UML_AND(block, IREG(1), CPR032(COP0_Context), IMM(0xff800000));				// and     i1,[Context],0xff800000
-		UML_OR(block, CPR032(COP0_Context), IREG(0), IREG(1));						// or      [Context],i0,i1
+		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
+		UML_INSERT(block, CPR032(COP0_EntryHi), IREG(0), IMM(0), IMM(0xffffe000));	// insert  [EntryHi],i0,0,0xffffe000
+		UML_INSERT(block, CPR032(COP0_Context), IREG(0), IMM(32-9), IMM(0x7fffff));	// insert  [Context],i0,32-9,0x7fffff
 	}
 
 	/* set the EPC and Cause registers */
@@ -1478,9 +1467,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	UML_LOAD4(block, IREG(3), mips3.core->tlb_table, IREG(3));						// load4   i3,[tlb_table],i3
 	UML_TEST(block, IREG(3), IMM(iswrite ? TLB_DIRTY : TLB_VALID));					// test    i3,iswrite ? TLB_DIRTY : TLB_VALID
 	UML_JMPc(block, IF_Z, tlbmiss = label++);										// jmp     tlbmiss,z
-	UML_AND(block, IREG(0), IREG(0), IMM(0xfff));									// and     i0,i0,0xfff
-	UML_AND(block, IREG(3), IREG(3), IMM(~0xfff));									// and     i3,i3,~0xfff
-	UML_OR(block, IREG(0), IREG(0), IREG(3));										// or      i0,i0,i3
+	UML_INSERT(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));					// insert  i0,i3,0,0xfffff000
 
 	for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
 		if (!Machine->debug_mode && mips3.fastram[ramnum].base != NULL && (!iswrite || !mips3.fastram[ramnum].readonly))
@@ -1548,12 +1535,11 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 					if (ismasked)
 					{
 						UML_LOAD4(block, IREG(3), fastbase, IREG(0));				// load4   i3,fastbase,i0
-						UML_AND(block, IREG(1), IREG(1), IREG(2));					// and     i1,i1,i2
-						UML_XOR(block, IREG(2), IREG(2), IMM(0xffffffff));			// xor     i2,i2,0xfffffffff
-						UML_AND(block, IREG(3), IREG(3), IREG(2));					// and     i3,i3,i2
-						UML_OR(block, IREG(1), IREG(1), IREG(3));					// or      i1,i1,i3
+						UML_INSERT(block, IREG(3), IREG(1), IMM(0), IREG(2));		// insert  i3,i1,0,i2
+						UML_STORE4(block, fastbase, IREG(0), IREG(3));				// store4  fastbase,i0,i3
 					}
-					UML_STORE4(block, fastbase, IREG(0), IREG(1));					// store4  fastbase,i0,i1
+					else
+						UML_STORE4(block, fastbase, IREG(0), IREG(1));				// store4  fastbase,i0,i1
 				}
 				else if (size == 8)
 				{
@@ -1565,13 +1551,11 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 						UML_DROR(block, IREG(2), IREG(2), IMM(32 * (mips3.core->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
 																					// dror    i2,i2,32*bytexor
 						UML_DLOAD8(block, IREG(3), fastbase, IREG(0));				// dload8  i3,fastbase,i0
-						UML_DAND(block, IREG(1), IREG(1), IREG(2));					// dand    i1,i1,i2
-						UML_DXOR(block, IREG(2), IREG(2), IMM(U64(0xffffffffffffffff)));
-																					// dxor    i2,i2,0xfffffffffffffffff
-						UML_DAND(block, IREG(3), IREG(3), IREG(2));					// dand    i3,i3,i2
-						UML_DOR(block, IREG(1), IREG(1), IREG(3));					// dor     i1,i1,i3
+						UML_DINSERT(block, IREG(3), IREG(1), IMM(0), IREG(2));		// dinsert i3,i1,0,i2
+						UML_DSTORE8(block, fastbase, IREG(0), IREG(3));				// dstore8 fastbase,i0,i3
 					}
-					UML_DSTORE8(block, fastbase, IREG(0), IREG(1));					// dstore8 fastbase,i0,i1
+					else
+						UML_DSTORE8(block, fastbase, IREG(0), IREG(1));				// dstore8 fastbase,i0,i1
 				}
 				UML_RET(block);														// ret
 			}
@@ -1655,18 +1639,16 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 
 /*-------------------------------------------------
     generate_update_mode - update the mode based
-    on a new SR (in i0); trashes i2 and i3
+    on a new SR (in i0); trashes i2
 -------------------------------------------------*/
 
 static void generate_update_mode(drcuml_block *block)
 {
-	UML_AND(block, IREG(2), IREG(0), IMM(SR_KSU_MASK));								// and     i2,i0,SR_KSU_MASK
-	UML_AND(block, IREG(3), IREG(0), IMM(SR_FR));									// and     i3,i0,SR_FR
-	UML_SHR(block, IREG(2), IREG(2), IMM(2));										// shr     i2,i2,2
-	UML_SHR(block, IREG(3), IREG(3), IMM(26));										// shr     i3,i3,26
+	UML_XTRACT(block, IREG(2), IREG(0), IMM(32-2), IMM(0x06));						// xtract  i2,i0,32-2,0x06
 	UML_TEST(block, IREG(0), IMM(SR_EXL | SR_ERL));									// test    i0,SR_EXL | SR_ERL
 	UML_MOVc(block, IF_NZ, IREG(2), IMM(0));										// mov     i2,0,nz
-	UML_OR(block, MEM(&mips3.cstate->mode), IREG(2), IREG(3));						// or      [mode],i2,i3
+	UML_INSERT(block, IREG(2), IREG(0), IMM(32-26), IMM(0x01));						// insert  i2,i0,32-26,0x01
+	UML_MOV(block, MEM(&mips3.cstate->mode), IREG(2));								// mov     [mode],i2
 }
 
 
@@ -2143,19 +2125,17 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x22:	/* LWL - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
 			if (!mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x18));						// xor     i4,i4,0x18
-			UML_SHR(block, IREG(2), IMM(~0), IREG(4));								// shr     i2,~0,i4
+				UML_XOR(block, IREG(1), IREG(1), IMM(0x18));						// xor     i1,i1,0x18
+			UML_SHR(block, IREG(2), IMM(~0), IREG(1));								// shr     i2,~0,i1
 			UML_CALLH(block, mips3.read32mask[mips3.cstate->mode >> 1]);			// callh   read32mask
 			if (RTREG != 0)
 			{
-				UML_SHL(block, IREG(2), IMM(~0), IREG(4));							// shl     i2,~0,i4
-				UML_XOR(block, IREG(2), IREG(2), IMM(~0));							// xor     i2,i2,~0
-				UML_SHL(block, IREG(0), IREG(0), IREG(4));							// shl     i0,i0,i4
-				UML_AND(block, IREG(2), IREG(2), R32(RTREG));						// and     i2,i2,<rtreg>
-				UML_OR(block, IREG(0), IREG(0), IREG(2));							// or      i0,i0,i2
-				UML_DSEXT4(block, R64(RTREG), IREG(0));								// dsext4  <rtreg>,i0
+				UML_SHL(block, IREG(2), IMM(~0), IREG(1));							// shl     i2,~0,i1
+				UML_MOV(block, IREG(3), R32(RTREG));								// mov     i3,<rtreg>
+				UML_INSERT(block, IREG(3), IREG(0), IREG(1), IREG(2));				// insert  i3,i0,i1,i2
+				UML_DSEXT4(block, R64(RTREG), IREG(3));								// dsext4  <rtreg>,i3
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2163,19 +2143,18 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x26:	/* LWR - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
 			if (mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x18));						// xor     i4,i4,0x18
-			UML_SHL(block, IREG(2), IMM(~0), IREG(4));								// shl     i2,~0,i4
+				UML_XOR(block, IREG(1), IREG(1), IMM(0x18));						// xor     i1,i1,0x18
+			UML_SHL(block, IREG(2), IMM(~0), IREG(1));								// shl     i2,~0,i1
 			UML_CALLH(block, mips3.read32mask[mips3.cstate->mode >> 1]);			// callh   read32mask
 			if (RTREG != 0)
 			{
-				UML_SHR(block, IREG(2), IMM(~0), IREG(4));							// shr     i2,~0,i4
-				UML_XOR(block, IREG(2), IREG(2), IMM(~0));							// xor     i2,i2,~0
-				UML_SHR(block, IREG(0), IREG(0), IREG(4));							// shr     i0,i0,i4
-				UML_AND(block, IREG(2), IREG(2), R32(RTREG));						// and     i2,i2,<rtreg>
-				UML_OR(block, IREG(0), IREG(0), IREG(2));							// or      i0,i0,i2
-				UML_DSEXT4(block, R64(RTREG), IREG(0));								// dsext4  <rtreg>,i0
+				UML_SHR(block, IREG(2), IMM(~0), IREG(1));							// shr     i2,~0,i1
+				UML_SUB(block, IREG(1), IMM(32), IREG(1));							// sub     i1,32,i1
+				UML_MOV(block, IREG(3), R32(RTREG));								// mov     i3,<rtreg>
+				UML_INSERT(block, IREG(3), IREG(0), IREG(1), IREG(2));				// insert  i3,i0,i1,i2
+				UML_DSEXT4(block, R64(RTREG), IREG(3));								// dsext4  <rtreg>,i3
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2183,18 +2162,15 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x1a:	/* LDL - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
 			if (!mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x38));						// xor     i4,i4,0x38
-			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(4));						// dshr    i2,~0,i4
+				UML_XOR(block, IREG(1), IREG(1), IMM(0x38));						// xor     i1,i1,0x38
+			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(1));						// dshr    i2,~0,i1
 			UML_CALLH(block, mips3.read64mask[mips3.cstate->mode >> 1]);			// callh   read64mask
 			if (RTREG != 0)
 			{
-				UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(4));					// dshl    i2,~0,i4
-				UML_DXOR(block, IREG(2), IREG(2), IMM((UINT64)~0));					// dxor    i2,i2,~0
-				UML_DSHL(block, IREG(0), IREG(0), IREG(4));							// dshl    i0,i0,i4
-				UML_DAND(block, IREG(2), IREG(2), R64(RTREG));						// dand    i2,i2,<rtreg>
-				UML_DOR(block, R64(RTREG), IREG(0), IREG(2));						// dor     <rtreg>,i0,i2
+				UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(1));					// dshl    i2,~0,i1
+				UML_DINSERT(block, R64(RTREG), IREG(0), IREG(1), IREG(2));			// dinsert <rtreg>,i0,i1,i2
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2202,18 +2178,16 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x1b:	/* LDR - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(1), IREG(0), IMM(3));								// shl     i1,i0,3
 			if (mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x38));						// xor     i4,i4,0x38
-			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(4));						// dshl    i2,~0,i4
+				UML_XOR(block, IREG(1), IREG(1), IMM(0x38));						// xor     i1,i1,0x38
+			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(1));						// dshl    i2,~0,i1
 			UML_CALLH(block, mips3.read64mask[mips3.cstate->mode >> 1]);			// callh   read64mask
 			if (RTREG != 0)
 			{
-				UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(4));					// dshr    i2,~0,i4
-				UML_DXOR(block, IREG(2), IREG(2), IMM((UINT64)~0));					// dxor    i2,i2,~0
-				UML_DSHR(block, IREG(0), IREG(0), IREG(4));							// dshr    i0,i0,i4
-				UML_DAND(block, IREG(2), IREG(2), R64(RTREG));						// dand    i2,i2,<rtreg>
-				UML_DOR(block, R64(RTREG), IREG(0), IREG(2));						// dor     <rtreg>,i0,i2
+				UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(1));					// dshr    i2,~0,i1
+				UML_SUB(block, IREG(1), IMM(64), IREG(1));							// sub     i1,64,i1
+				UML_DINSERT(block, R64(RTREG), IREG(0), IREG(1), IREG(2));			// dinsert <rtreg>,i0,i1,i2
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2288,12 +2262,12 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x2a:	/* SWL - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			if (!mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x18));						// xor     i4,i4,0x18
-			UML_SHR(block, IREG(2), IMM(~0), IREG(4));								// shr     i2,~0,i4
-			UML_SHR(block, IREG(1), IREG(1), IREG(4));								// shr     i1,i1,i4
+				UML_XOR(block, IREG(3), IREG(3), IMM(0x18));						// xor     i3,i3,0x18
+			UML_SHR(block, IREG(2), IMM(~0), IREG(3));								// shr     i2,~0,i3
+			UML_SHR(block, IREG(1), IREG(1), IREG(3));								// shr     i1,i1,i3
 			UML_CALLH(block, mips3.write32mask[mips3.cstate->mode >> 1]);			// callh   write32mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2301,12 +2275,12 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x2e:	/* SWR - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
 			UML_MOV(block, IREG(1), R32(RTREG));									// mov     i1,<rtreg>
 			if (mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x18));						// xor     i4,i4,0x18
-			UML_SHL(block, IREG(2), IMM(~0), IREG(4));								// shl     i2,~0,i4
-			UML_SHL(block, IREG(1), IREG(1), IREG(4));								// shl     i1,i1,i4
+				UML_XOR(block, IREG(3), IREG(3), IMM(0x18));						// xor     i3,i3,0x18
+			UML_SHL(block, IREG(2), IMM(~0), IREG(3));								// shl     i2,~0,i3
+			UML_SHL(block, IREG(1), IREG(1), IREG(3));								// shl     i1,i1,i3
 			UML_CALLH(block, mips3.write32mask[mips3.cstate->mode >> 1]);			// callh   write32mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2314,12 +2288,12 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x2c:	/* SDL - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
 			UML_DMOV(block, IREG(1), R64(RTREG));									// dmov    i1,<rtreg>
 			if (!mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x38));						// xor     i4,i4,0x38
-			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(4));						// dshr    i2,~0,i4
-			UML_DSHR(block, IREG(1), IREG(1), IREG(4));								// dshr    i1,i1,i4
+				UML_XOR(block, IREG(3), IREG(3), IMM(0x38));						// xor     i3,i3,0x38
+			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(3));						// dshr    i2,~0,i3
+			UML_DSHR(block, IREG(1), IREG(1), IREG(3));								// dshr    i1,i1,i3
 			UML_CALLH(block, mips3.write64mask[mips3.cstate->mode >> 1]);			// callh   write64mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2327,12 +2301,12 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x2d:	/* SDR - MIPS III */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
-			UML_SHL(block, IREG(4), IREG(0), IMM(3));								// shl     i4,i0,3
+			UML_SHL(block, IREG(3), IREG(0), IMM(3));								// shl     i3,i0,3
 			UML_DMOV(block, IREG(1), R64(RTREG));									// dmov    i1,<rtreg>
 			if (mips3.core->bigendian)
-				UML_XOR(block, IREG(4), IREG(4), IMM(0x38));						// xor     i4,i4,0x38
-			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(4));						// dshl    i2,~0,i4
-			UML_DSHL(block, IREG(1), IREG(1), IREG(4));								// dshl    i1,i1,i4
+				UML_XOR(block, IREG(3), IREG(3), IMM(0x38));						// xor     i3,i3,0x38
+			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(3));						// dshl    i2,~0,i3
+			UML_DSHL(block, IREG(1), IREG(1), IREG(3));								// dshl    i1,i1,i3
 			UML_CALLH(block, mips3.write64mask[mips3.cstate->mode >> 1]);			// callh   write64mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2937,9 +2911,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 	switch (reg)
 	{
 		case COP0_Cause:
-			UML_AND(block, IREG(0), IREG(0), IMM(~0xfc00));							// and     i0,i0,~0xfc00
-			UML_AND(block, IREG(1), CPR032(COP0_Cause), IMM(0xfc00));				// and     i1,[Cause],0xfc00
-			UML_OR(block, CPR032(COP0_Cause), IREG(0), IREG(1));					// or      [Cause],i0,i1
+			UML_INSERT(block, CPR032(COP0_Cause), IREG(0), IMM(0), IMM(~0xfc00));	// insert  [Cause],i0,0,~0xfc00
 			compiler->checksoftints = TRUE;
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2972,7 +2944,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 		case COP0_Compare:
 			generate_update_cycles(block, compiler, IMM(desc->pc), !in_delay_slot);	// <subtract cycles>
 			UML_MOV(block, CPR032(COP0_Compare), IREG(0));							// mov     [Compare],i0
-			UML_AND(block, CPR032(COP0_Cause), CPR032(COP0_Cause), IMM(~0x8000));	// and    [Cause],[Cause],~0x8000
+			UML_AND(block, CPR032(COP0_Cause), CPR032(COP0_Cause), IMM(~0x8000));	// and     [Cause],[Cause],~0x8000
 			UML_CALLC(block, mips3com_update_cycle_counting, mips3.core);			// callc   mips3com_update_cycle_counting,mips.core
 			return TRUE;
 
@@ -2980,9 +2952,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			return TRUE;
 
 		case COP0_Config:
-			UML_AND(block, IREG(0), IREG(0), IMM(0x0007));							// and     i0,i0,0x0007
-			UML_AND(block, IREG(1), CPR032(COP0_Config), IMM(~0x0007));				// and     i1,[Config],~0x0007
-			UML_OR(block, CPR032(COP0_Config), IREG(0), IREG(1));					// or      [Config],i0,i1
+			UML_INSERT(block, CPR032(COP0_Config), IREG(0), IMM(0), IMM(0x0007));	// insert  [Config],i0,0,0x0007
 			return TRUE;
 
 		case COP0_EntryHi:

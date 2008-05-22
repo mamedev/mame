@@ -19,12 +19,6 @@
     * Extend registers to 16? Depends on if PPC can use them
 
     * New instructions?
-        - EXTRACT dst,src,shift,mask
-            dst = (src >> shift) & mask
-
-        - INSERT dst,src,shift,mask
-            dst = (dst & ~mask) | ((src << shift) & mask)
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -239,6 +233,8 @@ static const drcuml_opcode_valid opcode_valid_list[] =
 	OPVALID_ENTRY_2(SEXT1,   4|8, NONE,  IRM,   IANY4)
 	OPVALID_ENTRY_2(SEXT2,   4|8, NONE,  IRM,   IANY4)
 	OPVALID_ENTRY_2(SEXT4,     8, NONE,  IRM,   IANY4)
+	OPVALID_ENTRY_4(XTRACT,  4|8, NONE,  IRM,   IANY,  IANY,  IANY)
+	OPVALID_ENTRY_4(INSERT,  4|8, NONE,  IRM,   IANY,  IANY,  IANY)
 	OPVALID_ENTRY_3(ADD,     4|8, SZVC,  IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(ADDC,    4|8, SZVC,  IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(SUB,     4|8, SZVC,  IRM,   IANY,  IANY)
@@ -252,6 +248,7 @@ static const drcuml_opcode_valid opcode_valid_list[] =
 	OPVALID_ENTRY_2(TEST,    4|8, SZ,    IANY,  IANY)
 	OPVALID_ENTRY_3(OR,      4|8, SZ,    IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(XOR,     4|8, SZ,    IRM,   IANY,  IANY)
+	OPVALID_ENTRY_2(LZCNT,   4|8, NONE,  IRM,   IANY)
 	OPVALID_ENTRY_3(SHL,     4|8, SZC,   IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(SHR,     4|8, SZC,   IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(SAR,     4|8, SZC,   IRM,   IANY,  IANY)
