@@ -1095,7 +1095,7 @@ static void validate_dip_settings(const input_field_config *field, const game_dr
 {
 	const char *demo_sounds = input_port_string_from_index(INPUT_STRING_Demo_Sounds);
 	const char *flipscreen = input_port_string_from_index(INPUT_STRING_Flip_Screen);
-	UINT8 coin_list[INPUT_STRING_1C_9C - INPUT_STRING_9C_1C] = { 0 };
+	UINT8 coin_list[INPUT_STRING_1C_9C + 1 - INPUT_STRING_9C_1C] = { 0 };
 	const input_setting_config *setting;
 	int coin_error = FALSE;
 	
