@@ -1640,7 +1640,8 @@ $(MAMEOBJ)/misc.a: \
 # layout dependencies
 #-------------------------------------------------
 
-$(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh
+$(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
+						$(LAYOUT)/shuttlei.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
