@@ -329,7 +329,6 @@ src/emu/cpu/s2650/2650dasm.c svneol=native#text/plain
 src/emu/cpu/s2650/s2650.c svneol=native#text/plain
 src/emu/cpu/s2650/s2650.h svneol=native#text/plain
 src/emu/cpu/s2650/s2650cpu.h svneol=native#text/plain
-src/emu/cpu/saturn/sat.h svneol=native#text/plain
 src/emu/cpu/saturn/satops.c svneol=native#text/plain
 src/emu/cpu/saturn/sattable.c svneol=native#text/plain
 src/emu/cpu/saturn/saturn.c svneol=native#text/plain

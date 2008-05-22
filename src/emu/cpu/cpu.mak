@@ -1328,8 +1328,7 @@ endif
 $(CPUOBJ)/saturn/saturn.o:	$(CPUSRC)/saturn/saturn.c \
 							$(CPUSRC)/saturn/sattable.c \
 							$(CPUSRC)/saturn/satops.c \
-							$(CPUSRC)/saturn/saturn.h \
-							$(CPUSRC)/saturn/sat.h
+							$(CPUSRC)/saturn/saturn.h
 
 
 

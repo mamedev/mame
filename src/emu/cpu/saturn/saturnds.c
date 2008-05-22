@@ -1,10 +1,12 @@
 /*****************************************************************************
  *
- *   saturn.c
+ *   saturnds.c
  *   portable saturn emulator interface
  *   (hp calculators)
  *
  *   Copyright Peter Trauner, all rights reserved.
+ *
+ *   Modified by Antoine Mine'
  *
  *   - This source code is released as freeware for non-commercial purposes.
  *   - You are free to use and redistribute this code in modified or
@@ -24,7 +26,8 @@
 #include "debugger.h"
 
 #include "saturn.h"
-#include "sat.h"
+
+#define SATURN_HP_MNEMONICS
 
 #if defined SATURN_HP_MNEMONICS
 // class/hp mnemonics
@@ -51,7 +54,7 @@ static const char *const adr_af[]=
 { P, WP, XS, X, S, M, B, W, 0, 0, 0, 0, 0, 0, 0, A };
 
 static const char *const adr_a[]=
-{ P, WP, XS, X, S, M, B, W };
+  { P, WP, XS, X, S, M, B, W };
 
 static const char number_2_hex[]=
 { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
@@ -80,8 +83,12 @@ typedef enum {
 	CcopyP, PcopyC, sreq, CswapP,
 
 	inton, AloadImm, buscb,
-	clearAbit, setAbit, Abitclear, Abitset,
-	clearCbit, setCbit, Cbitclear, Cbitset,
+	clearAbit, setAbit, 
+	branchAbitclear, returnAbitclear,
+	branchAbitset, returnAbitset,
+	clearCbit, setCbit, 
+	branchCbitclear, returnCbitclear, 
+	branchCbitset, returnCbitset, 
 	PCloadA, buscd, PCloadC, intoff, rsi,
 
 	jumpA, jumpC, PCcopyA, PCcopyC, AcopyPC, CcopyPC,
@@ -132,7 +139,7 @@ typedef enum {
 	branchDnotgreaterC, returnDnotgreaterC,
 
 	SetHexMode, SetDecMode,
-	PopC, PushC,
+	PushC, PopC,
 
 	D0loadImm2, D0loadImm4, D0loadImm5,
 	D1loadImm2, D1loadImm4, D1loadImm5,
@@ -232,11 +239,15 @@ static const struct {
 	{ { "Abit=0  %x",			"CLRB     %x,A" } },
 	{ { "Abit=1  %x",			"SETB     %x,A" } },
 	{ { "?Abit=0 %x,%05x",		"BRBC     %x,A,%05x" } },
+	{ { "?Abit=0 %x,rtn",		"RETBC    %x,A" } },
 	{ { "?Abit=1 %x,%05x",		"BRBS     %x,A,%05x" } },
+	{ { "?Abit=1 %x,rtn",		"RETBS    %x,A" } },
 	{ { "Cbit=0  %x",			"CLRB     %x,C" } },
 	{ { "Cbit=1  %x",			"SETB     %x,C" } },
 	{ { "?Cbit=0 %x,%05x",		"BRBC     %x,C,%05x" } },
+	{ { "?Cbit=0 %x,rtn",		"RETBC    %x,C" } },
 	{ { "?Cbit=1 %x,%05x",		"BRBS     %x,C,%05x" } },
+	{ { "?Cbit=1 %x,rtn",		"RETBS    %x,C" } },
 	{ { "PC=(A)",               "JUMP.A   @A" } },
 	{ { "!buscd",				"!BUSCD" } },
 	{ { "PC=(C)",				"JUMP.A   @C" } },
@@ -252,83 +263,83 @@ static const struct {
 
 	{ { "HST=0   %x",			"CLRHST   %x" } },
 	{ { "?HST=0  %x,%05x",		"BRBCHST  %x,%05x" } },
-	{ { "?HST=0  %x",			"RETBCHST %x" } },
+	{ { "?HST=0  %x,rtn",			"RETBCHST %x" } },
 	{ { "ST=0    %x",			"CLRB     %x,ST" } },
 	{ { "ST=1    %x",			"SETB     %x,ST" } },
 	{ { "?ST=0   %x,%05x",		"BRBC     ST,%x,%05x" } },
-	{ { "?ST=0   %x",			"RETBC    ST,%x" } },
+	{ { "?ST=0   %x,rtn",			"RETBC    ST,%x" } },
 	{ { "?ST=1   %x,%05x",		"BRBS     ST,%x,%05x" } },
-	{ { "?ST=1   %x",			"RETBS    ST,%x" } },
+	{ { "?ST=1   %x,rtn",			"RETBS    ST,%x" } },
 	{ { "?P#     %x,%05x",		"BRNE     P,%x,%05x" } },
-	{ { "?P#     %x",			"RETNE    P,%x" } },
+	{ { "?P#     %x,rtn",			"RETNE    P,%x" } },
 	{ { "?P=     %x,%05x",		"BREQ     P,%x,%05x" } },
-	{ { "?P=     %x",			"RETEQ    P,%x" } },
+	{ { "?P=     %x,rtn",			"RETEQ    P,%x" } },
 
-	{ { "?A=B    %x,%05x",		"BREQ.%-2s  A,B,%05x" } },
-	{ { "?A=B    %x",			"RETEQ.%-2s A,B" } },
-	{ { "?B=C    %x,%05x",		"BREQ.%-2s  B,C,%05x" } },
-	{ { "?B=C    %x",			"RETEQ.%-2s B,C" } },
-	{ { "?A=C    %x,%05x",		"BREQ.%-2s  A,C,%05x" } },
-	{ { "?A=C    %x",			"RETEQ.%-2s A,C" } },
-	{ { "?C=D    %x,%05x",		"BREQ.%-2s  C,D,%05x" } },
-	{ { "?C=D    %x",			"RETEQ.%-2s C,D" } },
-	{ { "?A#B    %x,%05x",		"BRNE.%-2s  A,B,%05x" } },
-	{ { "?A#B    %x",			"RETNE.%-2s A,B" } },
-	{ { "?B#C    %x,%05x",		"BRNE.%-2s  B,C,%05x" } },
-	{ { "?B#C    %x",			"RETNE.%-2s B,C" } },
-	{ { "?A#C    %x,%05x",		"BRNE.%-2s  A,C,%05x" } },
-	{ { "?A#C    %x",			"RETNE.%-2s A,C" } },
-	{ { "?C#D    %x,%05x",		"BRNE.%-2s  C,D,%05x" } },
-	{ { "?C#D    %x",			"RETNE.%-2s C,D" } },
-	{ { "?A=0    %x,%05x",		"BRZ.%-2s   A,%05x" } },
-	{ { "?A=0    %x",			"RETZ.%-2s  A" } },
-	{ { "?B=0    %x,%05x",		"BRZ.%-2s   B,%05x" } },
-	{ { "?B=0    %x",			"RETZ.%-2s  B" } },
-	{ { "?C=0    %x,%05x",		"BRZ.%-2s   C,%05x" } },
-	{ { "?C=0    %x",			"RETZ.%-2s  C" } },
-	{ { "?D=0    %x,%05x",		"BRZ.%-2s   D,%05x" } },
-	{ { "?D=0    %x",			"RETZ.%-2s  D" } },
-	{ { "?A#0    %x,%05x",		"BRNZ.%-2s  A,%05x" } },
-	{ { "?A#0    %x",			"RETNZ.%-2s A" } },
-	{ { "?B#0    %x,%05x",		"BRNZ.%-2s  B,%05x" } },
-	{ { "?B#0    %x",			"RETNZ.%-2s B" } },
-	{ { "?C#0    %x,%05x",		"BRNZ.%-2s  C,%05x" } },
-	{ { "?C#0    %x",			"RETNZ.%-2s C" } },
-	{ { "?D#0    %x,%05x",		"BRNZ.%-2s  D,%05x" } },
-	{ { "?D#0    %x",			"RETNZ.%-2s D" } },
+	{ { "?A=B    %s,%05x",		"BREQ.%-2s  A,B,%05x" } },
+	{ { "?A=B    %s,rtn",			"RETEQ.%-2s A,B" } },
+	{ { "?B=C    %s,%05x",		"BREQ.%-2s  B,C,%05x" } },
+	{ { "?B=C    %s,rtn",			"RETEQ.%-2s B,C" } },
+	{ { "?A=C    %s,%05x",		"BREQ.%-2s  A,C,%05x" } },
+	{ { "?A=C    %s,rtn",			"RETEQ.%-2s A,C" } },
+	{ { "?C=D    %s,%05x",		"BREQ.%-2s  C,D,%05x" } },
+	{ { "?C=D    %s,rtn",			"RETEQ.%-2s C,D" } },
+	{ { "?A#B    %s,%05x",		"BRNE.%-2s  A,B,%05x" } },
+	{ { "?A#B    %s,rtn",			"RETNE.%-2s A,B" } },
+	{ { "?B#C    %s,%05x",		"BRNE.%-2s  B,C,%05x" } },
+	{ { "?B#C    %s,rtn",			"RETNE.%-2s B,C" } },
+	{ { "?A#C    %s,%05x",		"BRNE.%-2s  A,C,%05x" } },
+	{ { "?A#C    %s,rtn",			"RETNE.%-2s A,C" } },
+	{ { "?C#D    %s,%05x",		"BRNE.%-2s  C,D,%05x" } },
+	{ { "?C#D    %s,rtn",			"RETNE.%-2s C,D" } },
+	{ { "?A=0    %s,%05x",		"BRZ.%-2s   A,%05x" } },
+	{ { "?A=0    %s,rtn",			"RETZ.%-2s  A" } },
+	{ { "?B=0    %s,%05x",		"BRZ.%-2s   B,%05x" } },
+	{ { "?B=0    %s,rtn",			"RETZ.%-2s  B" } },
+	{ { "?C=0    %s,%05x",		"BRZ.%-2s   C,%05x" } },
+	{ { "?C=0    %s,rtn",			"RETZ.%-2s  C" } },
+	{ { "?D=0    %s,%05x",		"BRZ.%-2s   D,%05x" } },
+	{ { "?D=0    %s,rtn",			"RETZ.%-2s  D" } },
+	{ { "?A#0    %s,%05x",		"BRNZ.%-2s  A,%05x" } },
+	{ { "?A#0    %s,rtn",			"RETNZ.%-2s A" } },
+	{ { "?B#0    %s,%05x",		"BRNZ.%-2s  B,%05x" } },
+	{ { "?B#0    %s,rtn",			"RETNZ.%-2s B" } },
+	{ { "?C#0    %s,%05x",		"BRNZ.%-2s  C,%05x" } },
+	{ { "?C#0    %s,rtn",			"RETNZ.%-2s C" } },
+	{ { "?D#0    %s,%05x",		"BRNZ.%-2s  D,%05x" } },
+	{ { "?D#0    %s,rtn",			"RETNZ.%-2s D" } },
 
-	{ { "?A>B    %x,%05x",		"BRGT.%-2s  A,B,%05x" } },
-	{ { "?A>B    %x",			"RETGT.%-2s A,B" } },
-	{ { "?B>C    %x,%05x",		"BRGT.%-2s  B,C,%05x" } },
-	{ { "?B>C    %x",			"RETGT.%-2s B,C" } },
-	{ { "?C>A    %x,%05x",		"BRGT.%-2s  C,A,%05x" } },
-	{ { "?C>A    %x",			"RETGT.%-2s C,A" } },
-	{ { "?D>C    %x,%05x",		"BRGT.%-2s  D,C,%05x" } },
-	{ { "?D>C    %x",			"RETGT.%-2s D,C" } },
-	{ { "?A<B    %x,%05x",		"BRLT.%-2s  A,B,%05x" } },
-	{ { "?A<B    %x",			"RETLT.%-2s A,B" } },
-	{ { "?B<C    %x,%05x",		"BRLT.%-2s  B,C,%05x" } },
-	{ { "?B<C    %x",			"RETLT.%-2s B,C" } },
-	{ { "?C<A    %x,%05x",		"BRLT.%-2s  C,A,%05x" } },
-	{ { "?C<A    %x",			"RETLT.%-2s C,A" } },
-	{ { "?D<C    %x,%05x",		"BRLT.%-2s  D,C,%05x" } },
-	{ { "?D<C    %x",			"RETLT.%-2s D,C" } },
-	{ { "?A>=B   %x,%05x",		"BRGE.%-2s  A,B,%05x" } },
-	{ { "?A>=B   %x",			"RETGE.%-2s A,B" } },
-	{ { "?B>=C   %x,%05x",		"BRGE.%-2s  B,C,%05x" } },
-	{ { "?B>=C   %x",			"RETGE.%-2s B,C" } },
-	{ { "?C>=A   %x,%05x",		"BRGE.%-2s  C,A,%05x" } },
-	{ { "?C>=A   %x",			"RETGE.%-2s C,A" } },
-	{ { "?D>=C   %x,%05x",		"BRGE.%-2s  D,C,%05x" } },
-	{ { "?D>=C   %x",			"RETGE.%-2s D,C" } },
-	{ { "?A<=B   %x,%05x",		"BRLE.%-2s  A,B,%05x" } },
-	{ { "?A<=B   %x",			"RETLE.%-2s A,B" } },
-	{ { "?B<=C   %x,%05x",		"BRLE.%-2s  B,C,%05x" } },
-	{ { "?B<=C   %x",			"RETLE.%-2s B,C" } },
-	{ { "?C<=A   %x,%05x",		"BRLE.%-2s  C,A,%05x" } },
-	{ { "?C<=A   %x",			"RETLE.%-2s C,A" } },
-	{ { "?D<=C   %x,%05x",		"BRLE.%-2s  D,C,%05x" } },
-	{ { "?D<=C   %x",			"RETLE.%-2s D,C" } },
+	{ { "?A>B    %s,%05x",		"BRGT.%-2s  A,B,%05x" } },
+	{ { "?A>B    %s,rtn",			"RETGT.%-2s A,B" } },
+	{ { "?B>C    %s,%05x",		"BRGT.%-2s  B,C,%05x" } },
+	{ { "?B>C    %s,rtn",			"RETGT.%-2s B,C" } },
+	{ { "?C>A    %s,%05x",		"BRGT.%-2s  C,A,%05x" } },
+	{ { "?C>A    %s,rtn",			"RETGT.%-2s C,A" } },
+	{ { "?D>C    %s,%05x",		"BRGT.%-2s  D,C,%05x" } },
+	{ { "?D>C    %s,rtn",			"RETGT.%-2s D,C" } },
+	{ { "?A<B    %s,%05x",		"BRLT.%-2s  A,B,%05x" } },
+	{ { "?A<B    %s,rtn",			"RETLT.%-2s A,B" } },
+	{ { "?B<C    %s,%05x",		"BRLT.%-2s  B,C,%05x" } },
+	{ { "?B<C    %s,rtn",			"RETLT.%-2s B,C" } },
+	{ { "?C<A    %s,%05x",		"BRLT.%-2s  C,A,%05x" } },
+	{ { "?C<A    %s,rtn",			"RETLT.%-2s C,A" } },
+	{ { "?D<C    %s,%05x",		"BRLT.%-2s  D,C,%05x" } },
+	{ { "?D<C    %s,rtn",			"RETLT.%-2s D,C" } },
+	{ { "?A>=B   %s,%05x",		"BRGE.%-2s  A,B,%05x" } },
+	{ { "?A>=B   %s,rtn",			"RETGE.%-2s A,B" } },
+	{ { "?B>=C   %s,%05x",		"BRGE.%-2s  B,C,%05x" } },
+	{ { "?B>=C   %s,rtn",			"RETGE.%-2s B,C" } },
+	{ { "?C>=A   %s,%05x",		"BRGE.%-2s  C,A,%05x" } },
+	{ { "?C>=A   %s,rtn",			"RETGE.%-2s C,A" } },
+	{ { "?D>=C   %s,%05x",		"BRGE.%-2s  D,C,%05x" } },
+	{ { "?D>=C   %s,rtn",			"RETGE.%-2s D,C" } },
+	{ { "?A<=B   %s,%05x",		"BRLE.%-2s  A,B,%05x" } },
+	{ { "?A<=B   %s,rtn",			"RETLE.%-2s A,B" } },
+	{ { "?B<=C   %s,%05x",		"BRLE.%-2s  B,C,%05x" } },
+	{ { "?B<=C   %s,rtn",			"RETLE.%-2s B,C" } },
+	{ { "?C<=A   %s,%05x",		"BRLE.%-2s  C,A,%05x" } },
+	{ { "?C<=A   %s,rtn",			"RETLE.%-2s C,A" } },
+	{ { "?D<=C   %s,%05x",		"BRLE.%-2s  D,C,%05x" } },
+	{ { "?D<=C   %s,rtn",			"RETLE.%-2s D,C" } },
 
 	{ { "sethex",				"SETHEX" } },
 	{ { "setdec",				"SETDEC" } },
@@ -456,19 +467,19 @@ static const struct {
 	{ { "A=A!C   %s",			"OR.%-2s    C,A" } },
 	{ { "C=C!D   %s",			"OR.%-2s    D,C" } },
 
-	{ { "Asrb    %x",			"SRB.%-2s   A" } },
-	{ { "Bsrb    %x",			"SRB.%-2s   B" } },
-	{ { "Csrb    %x",			"SRB.%-2s   C" } },
-	{ { "Dsrb    %x",			"SRB.%-2s   D" } },
+	{ { "Asrb    %s",			"SRB.%-2s   A" } },
+	{ { "Bsrb    %s",			"SRB.%-2s   B" } },
+	{ { "Csrb    %s",			"SRB.%-2s   C" } },
+	{ { "Dsrb    %s",			"SRB.%-2s   D" } },
 
 	{ { "Aslc    %s",			"RLN.%-2s   A" } },
 	{ { "Bslc    %s",			"RLN.%-2s   B" } },
 	{ { "Cslc    %s",			"RLN.%-2s   C" } },
 	{ { "Dslc    %s",			"RLN.%-2s   D" } },
-	{ { "Aslc    %s",			"RRN.%-2s   A" } },
-	{ { "Bslc    %s",			"RRN.%-2s   B" } },
-	{ { "Cslc    %s",			"RRN.%-2s   C" } },
-	{ { "Dslc    %s",			"RRN.%-2s   D" } },
+	{ { "Asrc    %s",			"RRN.%-2s   A" } },
+	{ { "Bsrc    %s",			"RRN.%-2s   B" } },
+	{ { "Csrc    %s",			"RRN.%-2s   C" } },
+	{ { "Dsrc    %s",			"RRN.%-2s   D" } },
 
 	{ { "A=A+B   %s",			"ADD.%-2s   B,A" } },
 	{ { "B=B+C   %s",			"ADD.%-2s   C,B" } },
@@ -566,7 +577,8 @@ typedef struct {
 		xBranchReturn, // address field specified in previous opcode entry
 		Imm, ImmCount, ImmCload, Imm2, Imm4, Imm5,
 		Dis3, Dis3Call, Dis4, Dis4Call, Abs,
-		FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, FieldA
+		FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW, FieldA,
+		AdrImmCount
 	} adr;
 	MNEMONICS mnemonic;
 } OPCODE;
@@ -613,8 +625,8 @@ static const OPCODE opcodes[][0x10]= {
 		{ Complete,		AdrNone,		ReturnClearCarry },
 		{ Complete,		AdrNone,		SetHexMode },
 		{ Complete,		AdrNone,		SetDecMode },
-		{ Complete,		AdrNone,		PopC },
 		{ Complete,		AdrNone,		PushC },
+		{ Complete,		AdrNone,		PopC },
 		{ Complete,		AdrNone,		clearST },
 		{ Complete,		AdrNone,		CcopyST },
 		{ Complete,		AdrNone,		STcopyC },
@@ -817,12 +829,12 @@ static const OPCODE opcodes[][0x10]= {
 		{ Complete,		AdrNone,		buscb },
 		{ Complete,		Imm,			clearAbit },
 		{ Complete,		Imm,			setAbit },
-		{ Complete,		ImmBranch,		Abitclear },
-		{ Complete,		ImmBranch,		Abitset },
+		{ Complete,		TestBranchRet,		branchAbitclear },
+		{ Complete,		TestBranchRet,		branchAbitset },
 		{ Complete,		Imm,			clearCbit },
 		{ Complete,		Imm,			setCbit },
-		{ Complete,		ImmBranch,		Cbitclear },
-		{ Complete,		ImmBranch,		Cbitset },
+		{ Complete,		TestBranchRet,		branchCbitclear },
+		{ Complete,		TestBranchRet,		branchCbitset },
 		{ Complete,		AdrNone,		PCloadA },
 		{ Complete,		AdrNone,		buscd },
 		{ Complete,		AdrNone,		PCloadC },
@@ -833,12 +845,12 @@ static const OPCODE opcodes[][0x10]= {
 	}, { //81
 		{ Complete,		FieldW,			AshiftleftCarry },
 		{ Complete,		FieldW,			BshiftleftCarry },
+		{ Complete,		FieldW,			CshiftleftCarry },
 		{ Complete,		FieldW,			DshiftleftCarry },
-		{ Complete,		FieldW,			DshiftleftCarry },
 		{ Complete,		FieldW,			AshiftrightCarry },
-		{ Complete,		FieldW,			AshiftrightCarry },
-		{ Complete,		FieldW,			AshiftrightCarry },
-		{ Complete,		FieldW,			AshiftrightCarry },
+		{ Complete,		FieldW,			BshiftrightCarry },
+		{ Complete,		FieldW,			CshiftrightCarry },
+		{ Complete,		FieldW,			DshiftrightCarry },
 		{ Opcode818 },
 		{ Opcode819 },
 		{ Opcode81A },
@@ -865,15 +877,22 @@ static const OPCODE opcodes[][0x10]= {
 		{ Illegal },
 		{ Opcode818a,	AdrAF },
 	}, { //818a
-		{ Complete,		AdrNone,		AaddImm },
-		{ Complete,		AdrNone,		BaddImm },
-		{ Complete,		AdrNone,		CaddImm },
-		{ Complete,		AdrNone,		DaddImm },
-		{ Complete,		AdrNone,		AsubImm },
-		{ Complete,		AdrNone,		BsubImm },
-		{ Complete,		AdrNone,		CsubImm },
-		{ Complete,		AdrNone,		DsubImm }
-		//! rest illegal
+		{ Complete,		AdrImmCount,		AaddImm },
+		{ Complete,		AdrImmCount,		BaddImm },
+		{ Complete,		AdrImmCount,	        CaddImm },
+		{ Complete,		AdrImmCount,		DaddImm },
+		{ Illegal },
+		{ Illegal },
+		{ Illegal },
+		{ Illegal },
+		{ Complete,		AdrImmCount,		AsubImm },
+		{ Complete,		AdrImmCount,		BsubImm },
+		{ Complete,		AdrImmCount,		CsubImm },
+		{ Complete,		AdrImmCount,		DsubImm },
+		{ Illegal },
+		{ Illegal },
+		{ Illegal },
+		{ Illegal },
 	}, { //819
 		{ Opcode819a,	AdrAF },
 		{ Opcode819a,	AdrAF },
@@ -1269,7 +1288,7 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 
 	while (cont)
 	{
-		op = oprom[pos++];
+		op = oprom[pos++] & 0xf;
 		level+=op;
 		switch (level->sel) {
 		case Illegal:
@@ -1311,6 +1330,9 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 			case ImmCount:
 				sprintf(dst, mnemonics[level->mnemonic].name[set], oprom[pos++]+1);
 				break;
+			case AdrImmCount:
+				sprintf(dst, mnemonics[level->mnemonic].name[set], field_2_string(adr), oprom[pos++]+1);
+				break;
 			case AdrCount: // mnemonics have string %s for address field
 				snprintf(number,sizeof(number),"%x",oprom[pos++]+1);
 				sprintf(dst, mnemonics[level->mnemonic].name[set], number);
@@ -1336,29 +1358,29 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 				sprintf(dst, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case ImmCload:
-				c=i=oprom[pos++];
+				c=i=oprom[pos++] & 0xf;
 				number[i+1]=0;
-				for (;i>=0; i--) number[i]=number_2_hex[oprom[pos++]];
+				for (;i>=0; i--) number[i]=number_2_hex[oprom[pos++] & 0xf];
 				sprintf(dst, mnemonics[level->mnemonic].name[set], c+1, number);
 				break;
 			case Dis3:
 				SATURN_PEEKOP_DIS12(v);
-				c=(pc+pos-3+v)%0xfffff;
+				c=(pc+pos-3+v)&0xfffff;
 				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Dis3Call:
 				SATURN_PEEKOP_DIS12(v);
-				c=(pc+pos-3+v)%0xfffff;
+				c=(pc+pos+v)&0xfffff;
 				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Dis4:
 				SATURN_PEEKOP_DIS16(v);
-				c=(pc+pos-4+v)%0xfffff;
+				c=(pc+pos-4+v)&0xfffff;
 				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Dis4Call:
 				SATURN_PEEKOP_DIS16(v);
-				c=(pc+pos-4+v)%0xfffff;
+				c=(pc+pos+v)&0xfffff;
 				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Abs:
@@ -1436,13 +1458,13 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 				sprintf(dst, mnemonics[level->mnemonic].name[set], W );
 				break;
 			case AdrA:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_a[oprom[pos++]] );
+				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_a[oprom[pos++] & 0x7] );
 				break;
 			case AdrAF:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_af[oprom[pos++]] );
+				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_af[oprom[pos++] & 0xf] );
 				break;
 			case AdrB:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_b[oprom[pos++]&0x7] );
+				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_b[oprom[pos++] & 0x7] );
 				break;
 			}
 			break;

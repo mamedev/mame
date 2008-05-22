@@ -1,9 +1,11 @@
 static const int adr_a_begin[]={
 -1, -1, BEGIN_XS, BEGIN_X, BEGIN_S, BEGIN_M, BEGIN_B, BEGIN_W,
+-1, -1, -1, -1,  -1, -1, -1, -1,
 };
 
 static const int adr_a_count[]={
 -1, -1, COUNT_XS, COUNT_X, COUNT_S, COUNT_M, COUNT_B, COUNT_W,
+-1, -1, -1, -1,  -1, -1, -1, -1,
 };
 
 static const int adr_b_begin[]={
@@ -26,12 +28,37 @@ static const int adr_af_count[]={
 -1, -1, -1, -1, -1, -1, -1, COUNT_A
 };
 
-static const int reg_left[]={A,B,C,D,B,C,A,C};
-static const int reg_right[]={B,C,A,C,A,B,C,D};
-static const int add_left[]={ A,B,C,D, 0,0,0,0, B,C,A,C };
-static const int add_right[]={ B,C,A,C, 0,0,0,0, A,B,C,D };
-static const int sub_left[]={A,B,C,D, 0,0,0,0, B,C,A,C, A,B,C,D};
-static const int sub_right[]={B,C,A,C, 0,0,0,0, A,B,C,D, A,B,C,D };
+static const int reg_left[] ={A,B,C,D, B,C,A,C, I,I,I,I, I,I,I,I};
+static const int reg_right[]={B,C,A,C, A,B,C,D, I,I,I,I, I,I,I,I};
+static const int add_left[] ={A,B,C,D, I,I,I,I, B,C,A,C, I,I,I,I};
+static const int add_right[]={B,C,A,C, I,I,I,I, A,B,C,D, I,I,I,I};
+static const int sub_left[] ={A,B,C,D, I,I,I,I, B,C,A,C, A,B,C,D};
+static const int sub_right[]={B,C,A,C, I,I,I,I, A,B,C,D, B,C,A,C};
+
+void saturn_invalid3( int op1, int op2, int op3 )
+{
+	logerror( "SATURN#%d invalid opcode %x%x%x at %05x\n", 
+		  cpu_getactivecpu(), op1, op2, op3, saturn.pc-3 );
+}
+
+void saturn_invalid4( int op1, int op2, int op3, int op4 )
+{
+	logerror( "SATURN#%d invalid opcode %x%x%x%x at %05x\n", 
+		  cpu_getactivecpu(), op1, op2, op3, op4, saturn.pc-4 );
+}
+
+void saturn_invalid5( int op1, int op2, int op3, int op4, int op5 )
+{
+	logerror( "SATURN#%d invalid opcode %x%x%x%x%x at %05x\n", 
+		  cpu_getactivecpu(), op1, op2, op3, op4, op5, saturn.pc-5 );
+}
+
+void saturn_invalid6( int op1, int op2, int op3, int op4, int op5, int op6 )
+{
+	logerror( "SATURN#%d invalid opcode %x%x%x%x%x%x at %05x\n", 
+		  cpu_getactivecpu(), op1, op2, op3, op4, op5, op6, saturn.pc-6 );
+}
+
 
 INLINE void saturn_instruction_0e(void)
 {
@@ -68,6 +95,9 @@ INLINE void saturn_instruction_0e(void)
 			break; //A=A!B xs
 		}
 		break;
+	default:
+		saturn_invalid3( 0, 0xe, adr );
+		break;
 	}
 }
 
@@ -84,6 +114,9 @@ static void saturn_instruction_1(void)
 		case 8: case 9: case 0xa: case 0xb: case 0xc:
 			saturn_copy(R0+(reg&7), BEGIN_W, COUNT_W, C);
 			break; // r0=c w
+		default:
+			saturn_invalid3( 1, adr, reg );
+			break;
 		}
 		break;
 	case 1:
@@ -94,6 +127,9 @@ static void saturn_instruction_1(void)
 		case 8: case 9: case 0xa: case 0xb: case 0xc:
 			saturn_copy(C, BEGIN_W, COUNT_W, R0+(reg&7));
 			break; // c=r0 w
+		default:
+			saturn_invalid3( 1, adr, reg );
+			break;
 		}
 		break;
 	case 2:
@@ -104,6 +140,9 @@ static void saturn_instruction_1(void)
 		case 8: case 9: case 0xa: case 0xb: case 0xc:
 			saturn_exchange(C, BEGIN_W, COUNT_W, R0+(reg&7));
 			break; // cr0ex w
+		default:
+			saturn_invalid3( 2, adr, reg );
+			break;
 		}
 		break;
 	case 3:
@@ -159,6 +198,9 @@ static void saturn_instruction_1(void)
 			case 2: case 3: case 4: case 5: case 6: case 7:
 				saturn_store_nibbles(oper&4?C:A,adr_a_begin[adr],adr_a_count[adr],oper&1);
 				break;
+			default:
+				saturn_invalid4( 1, 5, oper, adr );
+				break;
 			}
 			break;
 		case 2: case 3: case 6: case 7:
@@ -172,6 +214,9 @@ static void saturn_instruction_1(void)
 			case 2: case 3: case 4: case 5: case 6: case 7:
 				saturn_load_nibbles(oper&4?C:A,adr_a_begin[adr],adr_a_count[adr],oper&1);
 				break;
+			default:
+				saturn_invalid4( 1, 5, oper, adr );
+				break;
 			}
 			break;
 		case 8: saturn_store_nibbles(A, 0, READ_OP()+1, 0); break;
@@ -184,21 +229,22 @@ static void saturn_instruction_1(void)
 		case 0xf: saturn_load_nibbles(C, 0, READ_OP()+1, 1); break;
 		}
 		break;
-	case 9: saturn_load_adr(0,2);break;
-	case 0xa: saturn_load_adr(0,4);break;
-	case 0xb: saturn_load_adr(0,5);break;
-	case 0xd: saturn_load_adr(1,2);break;
-	case 0xe: saturn_load_adr(1,4);break;
-	case 0xf: saturn_load_adr(1,5);break;
 	case 6: saturn_add_adr(0);break;
 	case 7: saturn_add_adr(1);break;
 	case 8: saturn_sub_adr(0);break;
+	case 9: saturn_load_adr(0,2);break;
+	case 0xa: saturn_load_adr(0,4);break;
+	case 0xb: saturn_load_adr(0,5);break;
 	case 0xc: saturn_sub_adr(1);break;
+	case 0xd: saturn_load_adr(1,2);break;
+	case 0xe: saturn_load_adr(1,4);break;
+	case 0xf: saturn_load_adr(1,5);break;
 	}
 }
 
 static void saturn_instruction_80(void)
 {
+	int op;
 	switch(READ_OP()) {
 	case 0: saturn_out_cs();break;
 	case 1: saturn_out_c();break;
@@ -212,12 +258,13 @@ static void saturn_instruction_80(void)
 		switch(READ_OP()) {
 		case 0: saturn_interrupt_on();break;
 		case 1:
-			switch(READ_OP()) {
+			switch(op=READ_OP()) {
 			case 0: saturn_reset_interrupt();break;
+			default: saturn_invalid5( 8, 0, 8, 1, op ); break;
 			}
 			break;
 		case 2: saturn_load_reg(A);break; //la
-		case 3: saturn_bus_command_c();break;
+		case 3: saturn_bus_command_b();break;
 		case 4: saturn_clear_bit(A);break; // abit=0
 		case 5: saturn_set_bit(A);break; // abit=1
 		case 6: saturn_jump_bit_clear(A);break;
@@ -244,10 +291,10 @@ static void saturn_instruction_80(void)
 
 static void saturn_instruction_81a(void)
 {
-	int reg, adr;
+	int reg, adr,op;
 	switch(adr=READ_OP()) {
 	case 0:
-		switch(READ_OP()) {
+		switch(op=READ_OP()) {
 		case 0:
 			switch(reg=READ_OP()) {
 			case 0: case 1: case 2: case 3: case 4:
@@ -256,6 +303,9 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_copy(R0+(reg&7),saturn.p,1,C);
 				break; //r0=c p
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
 		case 1:
@@ -266,6 +316,9 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_copy(C,saturn.p,1,R0+(reg&7));
 				break; //c=r0 p
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
 		case 2:
@@ -276,12 +329,18 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_exchange(C, saturn.p,1,R0+(reg&7));
 				break; // cr0ex p
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
+			break;
+		default:
+			saturn_invalid5( 8, 1, 0xa, adr, op );
 			break;
 		}
 		break;
 	case 1:
-		switch(READ_OP()) {
+		switch(op=READ_OP()) {
 		case 0:
 			switch(reg=READ_OP()) {
 			case 0: case 1: case 2: case 3: case 4:
@@ -290,6 +349,9 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_copy(R0+(reg&7),0,saturn.p+1,C);
 				break; //r0=c wp
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
 		case 1:
@@ -300,6 +362,9 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_copy(C,0,saturn.p+1,R0+(reg&7));
 				break; //c=r0 wp
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
 		case 2:
@@ -310,12 +375,18 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_exchange(C, 0, saturn.p+1, R0+(reg&7));
 				break; // cr0ex wp
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
+			break;
+		default:
+			saturn_invalid5( 8, 1, 0xa, adr, op );
 			break;
 		}
 		break;
 	case 2: case 3: case 4: case 5: case 6: case 7: case 0xf:
-		switch(READ_OP()) {
+		switch(op=READ_OP()) {
 		case 0:
 			switch(reg=READ_OP()) {
 			case 0: case 1: case 2: case 3: case 4:
@@ -324,6 +395,9 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_copy(R0+(reg&7),adr_af_begin[adr], adr_af_count[adr],C);
 				break; //r0=c xs
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
 		case 1:
@@ -334,6 +408,9 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_copy(C,adr_af_begin[adr],adr_af_count[adr],R0+(reg&7));
 				break; //c=r0 xs
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
 		case 2:
@@ -344,9 +421,18 @@ static void saturn_instruction_81a(void)
 			case 8: case 9: case 0xa: case 0xb: case 0xc:
 				saturn_exchange(C, adr_af_begin[adr], adr_af_count[adr], R0+(reg&7));
 				break; // cr0ex xs
+			default:
+				saturn_invalid6( 8, 1, 0xa, adr, op, reg);
+				break;
 			}
 			break;
+		default:
+			saturn_invalid5( 8, 1, 0xa, adr, op );
+			break;
 		}
+		break;
+	default:
+		saturn_invalid4( 8, 1, 0xa, adr );
 		break;
 	}
 }
@@ -368,17 +454,23 @@ static void saturn_instruction_81(void)
 				saturn_add_const(A+reg, saturn.p, 1, READ_OP()+1);
 				break;
 			case 8: case 9: case 0xa: case 0xb:
-				saturn_sub_const(A+reg, saturn.p, 1, READ_OP()+1);
+				saturn_sub_const(A+(reg&3), saturn.p, 1, READ_OP()+1);
+				break;
+			default:
+				saturn_invalid5( 8, 1, 8, adr, reg );
 				break;
 			}
 			break;
 		case 1:
 			switch (reg=READ_OP()) {
 			case 0: case 1: case 2: case 3:
-				saturn_add_const(A+reg, 1, saturn.p+1, READ_OP()+1);
+				saturn_add_const(A+reg, 0, saturn.p+1, READ_OP()+1);
 				break;
 			case 8: case 9: case 0xa: case 0xb:
-				saturn_sub_const(A+reg, 1, saturn.p+1, READ_OP()+1);
+				saturn_sub_const(A+(reg&3), 0, saturn.p+1, READ_OP()+1);
+				break;
+			default:
+				saturn_invalid5( 8, 1, 8, adr, reg );
 				break;
 			}
 			break;
@@ -388,9 +480,15 @@ static void saturn_instruction_81(void)
 				saturn_add_const(A+reg, adr_af_begin[adr], adr_af_count[adr], READ_OP()+1);
 				break;
 			case 8: case 9: case 0xa: case 0xb:
-				saturn_sub_const(A+reg, adr_af_begin[adr], adr_af_count[adr], READ_OP()+1);
+				saturn_sub_const(A+(reg&3), adr_af_begin[adr], adr_af_count[adr], READ_OP()+1);
+				break;
+			default:
+				saturn_invalid5( 8, 1, 8, adr, reg );
 				break;
 			}
+			break;
+		default:
+			saturn_invalid4( 8, 1, 8, adr );
 			break;
 		}
 		break;
@@ -401,6 +499,9 @@ static void saturn_instruction_81(void)
 			case 0: case 1: case 2: case 3:
 				saturn_shift_right(A+reg,saturn.p,1);
 				break; // asrb p
+			default:
+				saturn_invalid5( 8, 1, 9, adr, reg );
+				break;
 			}
 			break;
 		case 1:
@@ -408,14 +509,23 @@ static void saturn_instruction_81(void)
 			case 0: case 1: case 2: case 3:
 				saturn_shift_right(A+reg, 0,saturn.p+1);
 				break; // asrb wp
+			default:
+				saturn_invalid5( 8, 1, 9, adr, reg );
+				break;
 			}
 			break;
-		case 2: /*case 3:*/ case 4: case 5: case 6:/* case 7:*/case 0xf:
+		case 2: case 3: case 4: case 5: case 6: case 7: case 0xf:
 			switch(reg=READ_OP()){
 			case 0: case 1: case 2: case 3:
 				saturn_shift_right(A+reg, adr_af_begin[adr], adr_af_count[adr]);
 				break; // asrb xs
+			default:
+				saturn_invalid5( 8, 1, 9, adr, reg );
+				break;
 			}
+			break;
+		default:
+			saturn_invalid4( 8, 1, 9, adr );
 			break;
 		}
 		break;
@@ -423,13 +533,14 @@ static void saturn_instruction_81(void)
 		saturn_instruction_81a();
 		break;
 	case 0xb:
-		switch(READ_OP()) {
+		switch(adr=READ_OP()) {
 		case 2: saturn_load_pc(A);break;
 		case 3: saturn_load_pc(C);break;
 		case 4: saturn_store_pc(A);break;
 		case 5: saturn_store_pc(C);break;
 		case 6: saturn_exchange_pc(A);break;
 		case 7: saturn_exchange_pc(C);break;
+		default: saturn_invalid4( 8, 1, reg, adr ); break;
 		}
 		break;
 	case 0xc: case 0xd: case 0xe: case 0xf:
@@ -440,7 +551,7 @@ static void saturn_instruction_81(void)
 
 static void saturn_instruction_8(void)
 {
-	int oper;
+	int oper, adr;
 
 	switch(READ_OP()) {
 	case 0:
@@ -489,10 +600,22 @@ static void saturn_instruction_8(void)
 			break;
 		}
 		break;
-	case 0xc: saturn_jump((READ_OP_DIS16()+saturn.pc-4)&0xfffff,1);break;
-	case 0xd: saturn_jump(READ_OP_ARG20(),1);break;
-	case 0xe: saturn_call((READ_OP_DIS16()+saturn.pc)&0xfffff);break;
-	case 0xf: saturn_call(READ_OP_ARG20());break;
+	case 0xc: 
+		adr=READ_OP_DIS16();
+		saturn_jump((adr+saturn.pc-4)&0xfffff,1);
+		break;		
+	case 0xd: 
+		adr=READ_OP_ARG20();
+		saturn_jump(adr,1);
+		break;
+	case 0xe: 
+		adr=READ_OP_DIS16();
+		saturn_call((adr+saturn.pc)&0xfffff);
+		break;
+	case 0xf: 
+		adr=READ_OP_ARG20();
+		saturn_call(adr);
+		break;
 	}
 }
 
@@ -533,8 +656,7 @@ static void saturn_instruction_9(void)
 			break;
 		}
 		break;
-	case 2: case 3: case 4: case 5:
-	case 6: case 7:
+	case 2: case 3: case 4: case 5: case 6: case 7:
 		switch(oper=READ_OP()) {
 		case 0: case 1: case 2: case 3:
 			saturn_equals(reg_left[oper&3] ,adr_a_begin[adr], adr_a_count[adr], reg_right[oper&3]);
@@ -612,9 +734,8 @@ static void saturn_instruction_a(void)
 		case 8: case 9: case 0xa: case 0xb:
 			saturn_add(add_left[reg], saturn.p, 1, add_right[reg]);
 			break;
-			break;
 		case 4: case 5: case 6: case 7:
-			saturn_shift_left(A+(reg&3), saturn.p, 1);
+			saturn_add(A+(reg&3), saturn.p, 1, A+(reg&3));
 			break;
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_decrement(A+(reg&3), saturn.p, 1);
@@ -625,13 +746,13 @@ static void saturn_instruction_a(void)
 		switch (reg=READ_OP()) {
 		case 0: case 1: case 2: case 3:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_add(add_left[reg], 1, saturn.p+1, add_right[reg]);
+			saturn_add(add_left[reg], 0, saturn.p+1, add_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
-			saturn_shift_left(A+(reg&3), 1, saturn.p+1);
+			saturn_add(A+(reg&3), 0, saturn.p+1, A+(reg&3));
 			break;
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_decrement(A+(reg&3), 1, saturn.p+1);
+			saturn_decrement(A+(reg&3), 0, saturn.p+1);
 			break;
 		}
 		break;
@@ -642,7 +763,7 @@ static void saturn_instruction_a(void)
 			saturn_add(add_left[reg], adr_a_begin[adr], adr_a_count[adr], add_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
-			saturn_shift_left(A+(reg&3), adr_a_begin[adr], adr_a_count[adr]);
+			saturn_add(A+(reg&3), adr_a_begin[adr], adr_a_count[adr], A+(reg&3));
 			break;
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_decrement(A+(reg&3), adr_a_begin[adr], adr_a_count[adr]);
@@ -656,7 +777,7 @@ static void saturn_instruction_a(void)
 			break; // a=0 p
 		case 4: case 5: case 6: case 7:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_copy(reg_right[reg&7], saturn.p,1,reg_left[reg&7]); //!correct
+			saturn_copy(reg_right[reg&7], saturn.p,1,reg_left[reg&7]);
 			break; // a=b p
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_exchange(reg_left[reg&3], saturn.p,1,reg_right[reg&3]);
@@ -670,7 +791,7 @@ static void saturn_instruction_a(void)
 			break; // a=0 wp
 		case 4: case 5: case 6: case 7:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_copy(reg_right[reg&7], 0, saturn.p+1, reg_left[reg&7]); //!correct
+			saturn_copy(reg_right[reg&7], 0, saturn.p+1, reg_left[reg&7]); 
 			break; // a=b wp
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_exchange(reg_left[reg&3], 0, saturn.p+1, reg_right[reg&3]);
@@ -684,12 +805,10 @@ static void saturn_instruction_a(void)
 			break; // a=0 xs
 		case 4: case 5: case 6: case 7:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_copy(reg_right[reg&7], adr_b_begin[adr], adr_b_count[adr],
-						reg_left[reg&7]); //correct
+			saturn_copy(reg_right[reg&7], adr_b_begin[adr], adr_b_count[adr], reg_left[reg&7]);
 			break; // a=b xs
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_exchange(reg_left[reg&3], adr_b_begin[adr], adr_b_count[adr],
-							reg_right[reg&3]);
+			saturn_exchange(reg_left[reg&3], adr_b_begin[adr], adr_b_count[adr], reg_right[reg&3]);
 			break; // abex xs
 		}
 		break;
@@ -705,12 +824,12 @@ static void saturn_instruction_b(void)
 		switch(reg=READ_OP()) {
 		case 0: case 1: case 2: case 3:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_sub(sub_left[reg], saturn.p, 1, S64_READ_P(sub_right[reg]));
+			saturn_sub(sub_left[reg], saturn.p, 1, sub_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
 			saturn_increment(A+(reg&3), saturn.p, 1); break; // a=a+1 p
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_sub2(sub_left[reg], saturn.p, 1, S64_READ_P(sub_right[reg]));
+			saturn_sub2(sub_left[reg], saturn.p, 1, sub_right[reg]);
 			break;
 		}
 		break;
@@ -718,12 +837,12 @@ static void saturn_instruction_b(void)
 		switch(reg=READ_OP()) {
 		case 0: case 1: case 2: case 3:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_sub(sub_left[reg], 1, saturn.p+1, sub_right[reg]);
+			saturn_sub(sub_left[reg], 0, saturn.p+1, sub_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
-			saturn_increment(A+(reg&3), 1, saturn.p+1); break; // a=a+1 wp
+			saturn_increment(A+(reg&3), 0, saturn.p+1); break; // a=a+1 wp
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_sub2(sub_left[reg], 1, saturn.p+1, sub_right[reg]);
+			saturn_sub2(sub_left[reg], 0, saturn.p+1, sub_right[reg]);
 			break;
 		}
 		break;
@@ -731,8 +850,7 @@ static void saturn_instruction_b(void)
 		switch(reg=READ_OP()) {
 		case 0: case 1: case 2: case 3:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_sub(sub_left[reg], adr_a_begin[adr], adr_a_count[adr],
-					   sub_right[reg]);
+			saturn_sub(sub_left[reg], adr_a_begin[adr], adr_a_count[adr], sub_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
 			saturn_increment(A+(reg&3), adr_a_begin[adr], adr_a_count[adr]);
@@ -750,9 +868,9 @@ static void saturn_instruction_b(void)
 		case 4: case 5: case 6: case 7:
 			saturn_shift_nibble_right(A+(reg&3), saturn.p, 1); break; // asr p
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_invert(A+(reg&3), saturn.p, 1); break; // A=-A p
+			saturn_negate(A+(reg&3), saturn.p, 1); break; // A=-A p
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_negate(A+(reg&3), saturn.p, 1); break; // A=-A-1 p
+			saturn_invert(A+(reg&3), saturn.p, 1); break; // A=-A-1 p
 		}
 		break;
 	case 9:
@@ -762,9 +880,9 @@ static void saturn_instruction_b(void)
 		case 4: case 5: case 6: case 7:
 			saturn_shift_nibble_right(A+(reg&3),0,saturn.p+1); break; // asr wp
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_invert(A+(reg&3),0,saturn.p+1); break; // A=-A wp
+			saturn_negate(A+(reg&3),0,saturn.p+1); break; // A=-A wp
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_negate(A+(reg&3),0,saturn.p+1); break; // A=-A-1 wp
+			saturn_invert(A+(reg&3),0,saturn.p+1); break; // A=-A-1 wp
 		}
 		break;
 	case 0xa: case 0xb: case 0xc: case 0xd: case 0xe: case 0xf:
@@ -776,10 +894,10 @@ static void saturn_instruction_b(void)
 			saturn_shift_nibble_right(A+(reg&3), adr_b_begin[adr], adr_b_count[adr]);
 			break;
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_invert(A+(reg&3), adr_b_begin[adr], adr_b_count[adr]);
+			saturn_negate(A+(reg&3), adr_b_begin[adr], adr_b_count[adr]);
 			break;
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_negate(A+(reg&3), adr_b_begin[adr], adr_b_count[adr]);
+			saturn_invert(A+(reg&3), adr_b_begin[adr], adr_b_count[adr]);
 			break;
 		}
 		break;
@@ -806,16 +924,10 @@ static void saturn_instruction(void)
 		case 9: saturn_st_to_c();break;
 		case 0xa: saturn_c_to_st();break;
 		case 0xb: saturn_exchange_c_st();break;
-		case 0xc:
-			saturn_inc_p();
-			break;
-		case 0xd:
-			saturn_dec_p();
-			break;
+		case 0xc: saturn_inc_p();break;
+		case 0xd: saturn_dec_p();break;
+		case 0xe: saturn_instruction_0e();break;
 		case 0xf: saturn_return_interrupt();break;
-		case 0xe:
-			saturn_instruction_0e();
-			break;
 		}
 		break;
 	case 1:
@@ -824,12 +936,15 @@ static void saturn_instruction(void)
 	case 2:
 		saturn_load_p();
 		break;
-	case 3: saturn_load_reg(C);break; // lc
+	case 3: 
+		saturn_load_reg(C);
+		break; // lc
 	case 4:
 		adr=READ_OP_DIS8();
 		if (adr==0) {
 			saturn_return(saturn.carry);
-		} else {
+		} 
+		else {
 			saturn_jump((saturn.pc+adr-2)&0xfffff, saturn.carry);
 		}
 		break;
@@ -837,7 +952,8 @@ static void saturn_instruction(void)
 		adr=READ_OP_DIS8();
 		if (adr==0) {
 			saturn_return(!saturn.carry);
-		} else {
+		} 
+		else {
 			saturn_jump((saturn.pc+adr-2)&0xfffff,!saturn.carry);
 		}
 		break;
@@ -866,7 +982,7 @@ static void saturn_instruction(void)
 			saturn_add(add_left[reg], BEGIN_A, COUNT_A, add_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
-			saturn_shift_left(A+(reg&3), BEGIN_A, COUNT_A);
+			saturn_add(A+(reg&3), BEGIN_A, COUNT_A, A+(reg&3));
 			break;
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_decrement(A+(reg&3), BEGIN_A, COUNT_A);
@@ -880,7 +996,7 @@ static void saturn_instruction(void)
 			break; // a=0 a
 		case 4: case 5: case 6: case 7:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_copy(reg_right[reg&7], BEGIN_A, COUNT_A, reg_left[reg&7]); //correct
+			saturn_copy(reg_right[reg&7], BEGIN_A, COUNT_A, reg_left[reg&7]);
 			break; // a=b a
 		case 0xc: case 0xd: case 0xe: case 0xf:
 			saturn_exchange(reg_left[reg&3], BEGIN_A, COUNT_A, reg_right[reg&3]);
@@ -891,13 +1007,13 @@ static void saturn_instruction(void)
 		switch(reg=READ_OP()) {
 		case 0: case 1: case 2: case 3:
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_sub(sub_left[reg], BEGIN_A, COUNT_A, S64_READ_A(sub_right[reg]));
+			saturn_sub(sub_left[reg], BEGIN_A, COUNT_A, sub_right[reg]);
 			break;
 		case 4: case 5: case 6: case 7:
 			saturn_increment(A+(reg&3), BEGIN_A, COUNT_A);
 			break; // a=a+1 a
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_sub2(sub_left[reg], BEGIN_A, COUNT_A, S64_READ_A(sub_right[reg]));
+			saturn_sub2(sub_left[reg], BEGIN_A, COUNT_A, sub_right[reg]);
 			break;
 		}
 		break;
@@ -910,10 +1026,10 @@ static void saturn_instruction(void)
 			saturn_shift_nibble_right(A+(reg&3),BEGIN_A, COUNT_A);
 			break; // asr a
 		case 8: case 9: case 0xa: case 0xb:
-			saturn_invert(A+(reg&3),BEGIN_A, COUNT_A);
+			saturn_negate(A+(reg&3),BEGIN_A, COUNT_A);
 			break; // A=-A a
 		case 0xc: case 0xd: case 0xe: case 0xf:
-			saturn_negate(A+(reg&3),BEGIN_A, COUNT_A);
+			saturn_invert(A+(reg&3),BEGIN_A, COUNT_A);
 			break; // A=-A-1 a
 		}
 		break;
