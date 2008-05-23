@@ -18,6 +18,7 @@
 #define	COP400_PORT_IN	0x103
 #define	COP400_PORT_SK	0x104
 #define	COP400_PORT_SIO	0x105
+#define	COP400_PORT_CKO	0x106
 
 enum {
 	COP400_PC=1,

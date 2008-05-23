@@ -35,7 +35,8 @@
 
 #define IN_G()			IN(COP400_PORT_G)
 #define IN_L()			IN(COP400_PORT_L)
-#define IN_SI()			IN(COP400_PORT_SIO)
+#define IN_SI()			BIT(IN(COP400_PORT_SIO), 0)
+#define IN_CKO()		BIT(IN(COP400_PORT_CKO), 0)
 #define OUT_G(A)		OUT(COP400_PORT_G, (A) & R.G_mask)
 #define OUT_L(A)		OUT(COP400_PORT_L, (A))
 #define OUT_D(A)		OUT(COP400_PORT_D, (A) & R.D_mask)
@@ -57,19 +58,13 @@ static TIMER_CALLBACK(cop410_serial_tick)
 
 	if (BIT(EN, 0))
 	{
-		/* SIO is a binary counter */
+		/*
 
-		// serial input
-
-		int si = IN_SI();
-
-		if (R.last_si && !si)
-		{
-			SIO--;
-			SIO &= 0x0f;
-		}
-
-		R.last_si = si;
+			SIO is an asynchronous binary counter decrementing its value by one upon each low-going pulse ("1" to "0") occurring on the SI input.
+			Each pulse must remain at each logic level at least two instruction cycles. SK outputs the value of the C upon the execution of an XAS
+			and remains latched until the execution of another XAS instruction. The SO output is equal to the value of EN3.
+	
+		*/
 
 		// serial output
 
@@ -78,10 +73,31 @@ static TIMER_CALLBACK(cop410_serial_tick)
 		// serial clock
 
 		OUT_SK(SKL);
+
+		// serial input
+
+		R.si <<= 1;
+		R.si = (R.si & 0x0e) | IN_SI();
+
+		if ((R.si & 0x0f) == 0x0c) // 1100
+		{
+			SIO--;
+			SIO &= 0x0f;
+		}
 	}
 	else
 	{
-		/* SIO is a shift register */
+		/* 
+		
+			SIO is a serial shift register, shifting continuously left each instruction cycle time. The data present at SI goes into the least
+			significant bit of SIO: SO can be enabled to output the most significant bit of SIO each cycle time. SK output becomes a logic-
+			controlled clock, providing a SYNC signal each instruction time. It will start outputting a SYNC pulse upon the execution of an XAS
+			instruction with C = "1," stopping upon the execution of a subsequent XAS with C = "0".
+
+			If EN0 is changed from "1" to "0" ("0" to "1") the SK output will change from "1" to SYNC (SYNC to "1") without the execution of
+			an XAS instruction.
+
+		*/
 
 		// serial output
 
@@ -94,22 +110,20 @@ static TIMER_CALLBACK(cop410_serial_tick)
 			OUT_SO(0);
 		}
 
-		SIO <<= 1;
-
-		// serial input
-
-		SIO = (SIO & 0x0e) | BIT(IN_SI(), 0);
-
 		// serial clock
 
 		if (SKL)
 		{
-			OUT_SK(1);
+			OUT_SK(1); // SYNC
 		}
 		else
 		{
 			OUT_SK(0);
 		}
+
+		// serial input
+
+		SIO = ((SIO << 1) | IN_SI()) & 0x0f;
 	}
 
 	cpuintrf_pop_context();

@@ -230,7 +230,7 @@ INSTRUCTION(cop402m_inin)
     Hex Code:           33 29
     Binary:
 
-    Data Flow:          IL3,"1","0",IL0 -> A
+    Data Flow:          IL3,CKO,"0",IL0 -> A
 
     Description:        Input IL Latches to A
 
@@ -238,9 +238,9 @@ INSTRUCTION(cop402m_inin)
 
 INSTRUCTION(inil)
 {
-	// NOT PROPERLY IMPLEMENTED
+	A = (IL & 0x09) | IN_CKO() << 2;
 
-	A = (IN_IN() & 0x09) | 0x04;
+	IL = 0;
 }
 
 /*
@@ -260,9 +260,7 @@ INSTRUCTION(inil)
 
 INSTRUCTION(cop421_inil)
 {
-	// NOT PROPERLY IMPLEMENTED
-
-	A = 0;
+	A = IN_CKO() << 2;
 }
 
 /*
