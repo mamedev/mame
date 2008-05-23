@@ -262,11 +262,14 @@ static INPUT_PORTS_START( bking )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	/* continue inputs are labelled in schematics. */
+	/* They are not connected though to any button */
+	
 	PORT_START  /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) /* Continue 1 */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 ) /* Continue 2 */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED ) /* Continue 1 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED ) /* Continue 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED ) /* Not Connected */
