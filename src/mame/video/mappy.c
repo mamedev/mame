@@ -427,14 +427,15 @@ void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			sprite &= ~sizex;
 			sprite &= ~(sizey << 1);
 
+			sy -= 16 * sizey;
+			sy = (sy & 0xff) - 32;	// fix wraparound
+
 			if (flip_screen_get())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
+				sy += 40;
 			}
-
-			sy -= 16 * sizey;
-			sy = (sy & 0xff) - 32;	// fix wraparound
 
 			for (y = 0;y <= sizey;y++)
 			{
@@ -502,14 +503,15 @@ static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 			int sizey = size[(spriteram_3[offs] & 0x30) >> 4];
 			int x,y;
 
+			sy -= 8 * sizey;
+			sy = (sy & 0xff) - 32;	// fix wraparound
+
 			if (flip_screen_get())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
+				sy += 40;
 			}
-
-			sy -= 8 * sizey;
-			sy = (sy & 0xff) - 32;	// fix wraparound
 
 			for (y = 0;y <= sizey;y++)
 			{
@@ -532,6 +534,9 @@ static void phozon_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 VIDEO_UPDATE( superpac )
 {
 	int x,y;
+
+	tilemap_set_scrolldx(bg_tilemap, 0, 96);
+	tilemap_set_scrolldy(bg_tilemap, 0, 0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
@@ -559,6 +564,9 @@ VIDEO_UPDATE( phozon )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(mappy_spriteram[0x1f7f-0x800] & 1);
 
+	tilemap_set_scrolldx(bg_tilemap, 0, 96);
+	tilemap_set_scrolldy(bg_tilemap, 0, 0);
+
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	phozon_draw_sprites(screen->machine,bitmap,cliprect);
@@ -571,6 +579,9 @@ VIDEO_UPDATE( phozon )
 VIDEO_UPDATE( mappy )
 {
 	int offs;
+
+	tilemap_set_scrolldx(bg_tilemap, 0, 96);
+	tilemap_set_scrolldy(bg_tilemap, 0, 0);
 
 	for (offs = 2;offs < 34;offs++)
 		tilemap_set_scrolly(bg_tilemap,offs,mappy_scroll);
