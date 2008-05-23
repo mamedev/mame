@@ -2146,20 +2146,6 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		return FALSE;
 #endif /* MESS */
 
-	/* skip locked-out coin inputs */
-	if (field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
-	{
-		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-		return FALSE;
-	}
-
-	/* skip locked-out service inputs */
-	if (field->type >= IPT_SERVICE1 && field->type <= IPT_SERVICE4 && servicecoinlockedout[field->type - IPT_SERVICE1])
-	{
-		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-		return FALSE;
-	}
-
 	/* if this is a switch-down event, handle impulse and toggle */
 	if (changed && curstate)
 	{
@@ -2191,6 +2177,22 @@ static int frame_get_digital_field_state(const input_field_config *field)
 			curstate = FALSE;
 	}
 
+	/* skip locked-out coin inputs */
+	if (curstate)
+	{
+		if (field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
+		{
+			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
+			return FALSE;
+		}
+	
+		/* skip locked-out service inputs */
+		if (field->type >= IPT_SERVICE1 && field->type <= IPT_SERVICE4 && servicecoinlockedout[field->type - IPT_SERVICE1])
+		{
+			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
+			return FALSE;
+		}
+	}
 	return curstate;
 }
 
