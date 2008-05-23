@@ -1610,7 +1610,7 @@ ROM_START( bmfinal )
 	ROM_LOAD16_BYTE( "c01jaa10.27d", 0x100001, 0x80000, CRC(C9927749) SHA1(c2644877bda483e241381265e723ea8ab8357761) )
 
 	DISK_REGION( REGION_DISKS )			/* IDE HARD DRIVE */
-	DISK_IMAGE( "c01jaa11", 0, NO_DUMP )
+	DISK_IMAGE( "c01jaa11", 0, MD5(ab47c58c0eda12c591d20013e16525f0) SHA1(f7e19e590005201d859f9a4ced8edf7fe88099f6) )	/* ver 1.00 JA */
 	// this image has not been verified
 	//DISK_IMAGE( "c01jaa11", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )    /* ver 1.00 JA */
 ROM_END
@@ -1957,7 +1957,7 @@ GAME( 2000, bmdct,    0,        djmain,   bmdct,     bmdct,     ROT0, "Konami", 
 GAME( 2000, bmcorerm, 0,        djmain,   beatmania, bmcorerm,  ROT0, "Konami", "beatmania CORE REMIX (ver JA-A)", 0 )
 GAME( 2001, bm6thmix, 0,        djmain,   beatmania, bm6thmix,  ROT0, "Konami", "beatmania 6th MIX (ver JA-A)", 0 )
 GAME( 2001, bm7thmix, 0,        djmain,   beatmania, bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
-GAME( 2002, bmfinal,  0,        djmain,   beatmania, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", GAME_NOT_WORKING ) // missing hd
+GAME( 2002, bmfinal,  0,        djmain,   beatmania, bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
 #if 0
 // for reference, these sets have not been verified
