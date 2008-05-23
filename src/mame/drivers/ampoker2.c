@@ -7,22 +7,22 @@
     Company:    Novomatic.
     Year:       1990.
 
-    Original preliminary driver:   Curt Coder.
-    Rewrite and additional work:   Roberto Fresca, with a lot of help of Grull Osgo.
+    Driver by Roberto Fresca, with a lot of help of Grull Osgo.
+    Based on a preliminary work of Curt Coder.
 
 
     --- Supported Sets ---
 
-    Old name | New name | Relation | Description
+    Set Name | Relation | Description
     --------------------------------------------
-    ampokr2b   ampoker2   parent     American Poker II.
-      ----     ampkr2b1   clone      American Poker II (bootleg, set 1).
-    ampokr2a   ampkr2b2   clone      American Poker II (bootleg, set 2).
-    ampoker2   ampkr2b3   clone      American Poker II (bootleg, set 3).
-    ampokr2c   pkrdewin   clone      Poker De Win.
-      ----     ampkr95    clone      American Poker 95.
-      ----     sigmapkr   parent     Sigma Poker.
-      ----     sigma2k    parent     Sigma Poker 2000.
+    ampoker2   parent     American Poker II.
+    ampkr2b1   clone      American Poker II (bootleg, set 1).
+    ampkr2b2   clone      American Poker II (bootleg, set 2).
+    ampkr2b3   clone      American Poker II (bootleg, set 3).
+    pkrdewin   clone      Poker De Win.
+    ampkr95    clone      American Poker 95.
+    sigmapkr   parent     Sigma Poker.
+    sigma2k    parent     Sigma Poker 2000.
 
 
 *********************************************************************************
@@ -102,7 +102,7 @@
 *********************************************************************************
 
 
-    --- Technical Notes (in progress) ---
+    *** Technical Notes (in progress) ***
 
 
 
@@ -140,19 +140,19 @@
     --------------
 
 
-    - CPU:            1x Z80@4MHZ or compatible.
-    - Video:          TTL Logic Raster - 6 Mhz Dot Clock
-    - Osc:            6.000 Mhz Xtal.
+    - CPU:            1x Z80 @ 3 MHz.
+    - Video:          TTL Logic Raster - 6 MHz Dot Clock.
+    - Osc:            6.000 MHz Xtal.
     - RAM:            1x 6116 (4Kx8) Static RAM.
     - VRAM            2x 2016 (4Kx8) Static RAM.
-    - I/O:            8x 74251 ; 8x 74259 (Multiplex 8 Ports > 1 Bit).
-    - PRG ROMs:       1x 27c512 (64Kx8) EPROM or similar.
-    - GFX ROMs:       1x 27c128 (16Kx8) EPROM or similar.
+    - I/O:            8x 74LS251; 8x 74LS259 (Multiplex 8 Ports > 1 Bit).
+    - PRG ROMs:       1x 27C512 (64Kx8) EPROM or similar.
+    - GFX ROMs:       1x 27C128 (16Kx8) EPROM or similar.
     - Color PROM:     1x 82S147AN.
     - Sound:          1x AY-3-8910.
-    - Backup Battery: 1x 3.6 Volt Ni-CD.
-    - DIP Switches:   1x 8 Positions.
-    - Watchdog:       1x TL7705 (Texas Instruments) Refresh: 200 Ms.
+    - Backup Battery: 1x NI-CD 3.6 Volt.
+    - DIP Switches:   1x 8 switches.
+    - Watchdog:       1x TL7705 (Texas Instruments). Refresh: 200 Ms.
 
 
     Taiwanese PCB Layout:
@@ -164,12 +164,12 @@
     | |______|  _________    _________   |______________|   _________   ________  __ |
     |          | 74LS74A |  | DM7407N |  _______________   | 74LS163 | | 74LS00 ||74||
     |          |_________|  |_________| |               |  |_________| |________||LS||
-    |  ___________________   _________  |    27C512     |   _________   ________ |08||
-    | |                   | | MC14020 | |_______________|  | 74LS163 | | 74LS157||__||
-    | |BATTERY NI-CD 3.6V | |_________|                    |_________| |________|    |
-    | |___________________|  ___________   _____________    _________   ________     |
-    |____                   | 74LS244   | |   74LS245   |  | 74LS163 | | 74LS157|    |
-         |                  |___________| |_____________|  |_________| |________|    |
+    | ____________________   _________  |    27C512     |   _________   ________ |08||
+    ||                    | | MC14020 | |_______________|  | 74LS163 | | 74LS157||__||
+    || NI-CD 3.6V BATTERY | |_________|                    |_________| |________|    |
+    ||____________________|  __________    _____________    _________   ________     |
+    |____                   | 74LS244  |  |   74LS245   |  | 74LS163 | | 74LS157|    |
+         |                  |__________|  |_____________|  |_________| |________|    |
      ____|                                                                           |
     |_28_                         ______________________    _________   ________     |
     |____                        |       - Z80A -       |  | 74LS74  | | 74LS157|    |
@@ -180,13 +180,13 @@
     |____                    |___________|  |____________|  ________    __________   |
     |____                     ___________     __________   | 74LS02 |  |D4016CX-20|  |
     |____                    | TD62003AP |   | 74LS251P |  |________|  |__________|  |
-    |____                    |___________|   |__________|   __________________       |
-    |____                     ___________     __________   | AY-3-8910        |      |
-    |____                    | 74LS259N  |   | 74LS251P |  | KC89C72 / YM2149F|      |
-    |____                    |___________|   |__________|  |__________________|      |
-    |____                     ___________     __________    _________   __________   |
-    |____                    | 74LS259N  |   | 74LS251P |  | 82S147AN| | 74LS245  |  |
-    |____                    |___________|   |__________|  |_________| |__________|  |
+    |____                    |___________|   |__________|   ____________________     |
+    |____                     ___________     __________   |AY-3-8910 / YM2149F |    |
+    |____                    | 74LS259N  |   | 74LS251P |  |    or KC89C72      |    |
+    |____                    |___________|   |__________|  |____________________|    |
+    |____                     ___________     __________    __________   _________   |
+    |____                    | 74LS259N  |   | 74LS251P |  | 82S147AN | | 74LS245 |  |
+    |____                    |___________|   |__________|  |__________| |_________|  |
     |____                     ___________     __________    _________                |
     |____                    | 74LS259N  |   | 74LS251P |  | 74LS377 |               |
     |____                    |___________|   |__________|  |_________|               |
@@ -206,39 +206,74 @@
 
 
 
+    The main clock (6 MHz.) is generated with a crystal and 74LS04 inverters. This frequency is
+    used as the pixel clock, then is divided by 2 in a flip-flop (7474) and again to the video
+    stage like DOT/2 (the video hardware uses a 3 MHz clock synchronous to the pixel clock).
 
-*********************************************************************************
+    Once again this 3 MHz clock signal is further divided by 2 through a flip-flop (7474) to get
+    the 1.5 MHz for the AY8910.
+
+    The 4020 is clocked at 1.5 MHz. The Q10 output (pin 14) is approximately 1464.84 Hz. Using
+    an oscilloscope, I measured a value of 60 uS = 1538 Hz. We used a NMI period of 1536 Hz due
+    to a better binary composition (1024+512).
+
+    Inputs/Ouputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
+    from data bus, and there are many devices as addressed ports (8x 74LS251 and 8x 74LS259).
+
+    Input ports are mapped to offsets 0xC410 through 0xC417. Output ports are mapped to 0xC4000
+    to 0xC407 and are polled/updated during NMI.
+
+    These 1-bit controls are relative to buttons, keys, lights and counters. Other output ports
+    like watchdog or PSG (AY8910) are operated directly.
 
 
-    Dumper Notes (old)
-    ------------------
 
-    American Poker
-    WB 5300 IS SAME AS Winbond WF19054 and YM2149F (AY891X?)
-    CPU TMPZ84C00AP OR LH0080A
-    XTAL 6.000
-    1 DIP x 8
-    RAM 6116
-    LH 5116D X2
+    Resistor Network
+	----------------
 
-    ---------------------------------------------
+    The following diagram is related to taiwanese and argentine PCBs.
 
-    Crystal 6.000 MHz
-    CPU         Sharp LH0080B Z80B-CPU 9241 1 B
-    Sound       OKI M5255 9203
-    RAM         2x TMM2015AP-15 (2048x8)
-    PAL         PAL?????16VE??? 022J????  P.M.REG
-    PROM        Philips N82S147AN PTH6708 9518nl
-    EPROM       Intel D27128-4 T8180760S
-                AMD AM27C512-205DC 916LADL
-    Chip?       Sanyo ?????
 
-    7 unmarked chips
+    82S147AN
+   +---------+
+   |         |    470
+   | O1-Pin06|---/\/\/\----+---> BLUE
+   |         |    220      |
+   | O2-Pin07|---/\/\/\----+
+   |         |    1K
+   | O3-Pin08|---/\/\/\----+---> GREEN
+   |         |    470      |
+   | O4-Pin09|---/\/\/\----+
+   |         |    220      |
+   | O5-Pin11|---/\/\/\----+
+   |         |    1K
+   | O6-Pin12|---/\/\/\----+---> RED
+   |         |    470      |
+   | O7-Pin13|---/\/\/\----+
+   |         |    220      |
+   | O8-Pin14|---/\/\/\----+
+   |         |
+   +---------+
+
+
+   All colors are directly routed to the edge connector.
+   There are not pull-up or pull-down resistors.
+
 
 *********************************************************************************
 
 
     --- DRIVER UPDATES ---
+
+
+    [2008-05-23]
+
+    - Reworked the color routines switching to resnet system.
+    - Added a resistor network diagram.
+    - Switch to pre-defined crystal value.
+    - Changed the WATCHDOG_TIME_INIT to be based on miliseconds instead of hertz.
+    - Other minor cleanup/fixes.
+    - Updated technical notes.
 
 
     [2007-11-15]
@@ -289,11 +324,10 @@
     - Analyze the write to port 0x21 after reset.
 
 
-
 *********************************************************************************/
 
 
-#define MASTER_CLOCK	6000000 	/* 6 Mhz */
+#define MASTER_CLOCK	XTAL_6MHz
 
 #include "driver.h"
 #include "sound/ay8910.h"
@@ -494,10 +528,15 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 --------------------------------------------------*/
 {
 	/* watchdog sometimes stop to work */
-	if (( (data >> 3) & 0x01) == 0)		/* check for refresh value (0x08h) */
+
+	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
 		watchdog_reset(machine);
-//      fprintf(stdout,"Watchdog\n");
+//		popmessage("%02x", data);
+	}
+	else
+	{
+//		popmessage("%02x", data);
 	}
 }
 
@@ -536,7 +575,6 @@ static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x39, 0x39) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x3A, 0x3A) AM_READ(AY8910_read_port_0_r)
 ADDRESS_MAP_END
-
 
 
 /*************************
@@ -862,8 +900,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 	MDRV_CPU_PROGRAM_MAP(ampoker2_map, 0)
 	MDRV_CPU_IO_MAP(ampoker2_io_map, 0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
-	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ( 5 ))	/* 200 ms, measured */
-	//MDRV_WATCHDOG_VBLANK_INIT(8)
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_MSEC(200))	/* 200 ms, measured */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -886,7 +923,7 @@ static MACHINE_DRIVER_START( ampoker2 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, verified against the real thing */
+	MDRV_SOUND_ADD(AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
 	MDRV_SOUND_CONFIG(ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END

@@ -58,7 +58,7 @@ enum
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
-	XTAL_6MHz    		= 6000000,
+	XTAL_6MHz    		= 6000000,		/* American Poker II */
 	XTAL_6_144MHz		= 6144000,		/* Used on Alpha Denshi early 80's games sound board */
 	XTAL_7MHz    		= 7000000,		/* Jaleco Mega System PCBs */
 	XTAL_7_15909MHz   	= 7159090,		/* Blood Bros */
