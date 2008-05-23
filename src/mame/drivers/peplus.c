@@ -774,20 +774,15 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( peplus_input_r )
 {
     UINT8 inp_ret = 0x00;
-    const char *port_tag;
+    UINT8 inp_read = input_port_read(field->port->machine, param);
 
-    if (param == 0)
-		port_tag = "IN_BANK1";
-	else
-		port_tag = "IN_BANK2";
-
-    if (input_port_read(field->port->machine, port_tag) & 0x01) inp_ret = 0x01;
-    if (input_port_read(field->port->machine, port_tag) & 0x02) inp_ret = 0x02;
-    if (input_port_read(field->port->machine, port_tag) & 0x04) inp_ret = 0x03;
-    if (input_port_read(field->port->machine, port_tag) & 0x08) inp_ret = 0x04;
-    if (input_port_read(field->port->machine, port_tag) & 0x10) inp_ret = 0x05;
-    if (input_port_read(field->port->machine, port_tag) & 0x20) inp_ret = 0x06;
-    if (input_port_read(field->port->machine, port_tag) & 0x40) inp_ret = 0x07;
+    if (inp_read & 0x01) inp_ret = 0x01;
+    if (inp_read & 0x02) inp_ret = 0x02;
+    if (inp_read & 0x04) inp_ret = 0x03;
+    if (inp_read & 0x08) inp_ret = 0x04;
+    if (inp_read & 0x10) inp_ret = 0x05;
+    if (inp_read & 0x20) inp_ret = 0x06;
+    if (inp_read & 0x40) inp_ret = 0x07;
 
     return inp_ret;
 }
@@ -817,13 +812,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( peplus_schip )
 	PORT_INCLUDE(peplus)
-
-    PORT_START_TAG("IN0")
-    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)0)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-
 	PORT_START_TAG("IN_BANK1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
@@ -841,16 +829,16 @@ static INPUT_PORTS_START( peplus_schip )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
     PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
+
+    PORT_START_TAG("IN0")
+    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( peplus_poker )
 	PORT_INCLUDE(peplus)
-
-    PORT_START_TAG("IN0")
-    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)0)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
 	PORT_START_TAG("IN_BANK1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
@@ -869,16 +857,16 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
     PORT_BIT( 0x40, IP_ACTIVE_HIGH,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+
+    PORT_START_TAG("IN0")
+    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( peplus_bjack )
 	PORT_INCLUDE(peplus)
-
-    PORT_START_TAG("IN0")
-    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)0)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
 	PORT_START_TAG("IN_BANK1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
@@ -897,18 +885,18 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
     PORT_BIT( 0x40, IP_ACTIVE_HIGH,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+
+    PORT_START_TAG("IN0")
+    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( peplus_keno )
 	PORT_INCLUDE(peplus)
 
-    PORT_START_TAG("IN0")
-    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)0)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-
-	PORT_START_TAG("IN_BANK1")
+    PORT_START_TAG("IN_BANK1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Self Test") PORT_CODE(KEYCODE_K)
     PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN  )
@@ -930,16 +918,16 @@ static INPUT_PORTS_START( peplus_keno )
     PORT_BIT( 0xff, 0x08, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0x28) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
     PORT_START_TAG("TOUCH_Y")
 	PORT_BIT( 0xff, 0x08, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0x19) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+
+    PORT_START_TAG("IN0")
+    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
+    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( peplus_slots )
 	PORT_INCLUDE(peplus)
-
-    PORT_START_TAG("IN0")
-    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)0)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 
 	PORT_START_TAG("IN_BANK1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Jackpot Reset") PORT_CODE(KEYCODE_L)
@@ -958,6 +946,12 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Cashout") PORT_CODE(KEYCODE_T)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("Change Request") PORT_CODE(KEYCODE_Y)
     PORT_BIT( 0x40, IP_ACTIVE_HIGH,  IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
+
+    PORT_START_TAG("IN0")
+    PORT_BIT( 0x07, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+    PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+    PORT_BIT( 0x70, IP_ACTIVE_LOW,  IPT_SPECIAL  ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 INPUT_PORTS_END
 
 /* same as peplus_poker with additionnal fake option to enable the "Autohold" feature */
