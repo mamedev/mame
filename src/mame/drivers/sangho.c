@@ -212,9 +212,9 @@ static MACHINE_RESET(sexyboom)
 	sangho_common_machine_reset();
 }
 
-static void msx_vdp_interrupt(int i)
+static void msx_vdp_interrupt(running_machine *machine, int i)
 {
-	cpunum_set_input_line (Machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpunum_set_input_line (machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static INTERRUPT_GEN( sangho_interrupt )

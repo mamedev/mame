@@ -271,7 +271,7 @@ static INTERRUPT_GEN( meritm_interrupt )
 	v9938_interrupt(1);
 }
 
-static void meritm_vdp0_interrupt(int i)
+static void meritm_vdp0_interrupt(running_machine *machine, int i)
 {
 	if ( meritm_interrupt_vdp0_state != i )
 	{
@@ -286,7 +286,7 @@ static void meritm_vdp0_interrupt(int i)
 	}
 }
 
-static void meritm_vdp1_interrupt(int i)
+static void meritm_vdp1_interrupt(running_machine *machine, int i)
 {
 	if ( meritm_interrupt_vdp1_state != i )
 	{

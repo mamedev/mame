@@ -40,7 +40,7 @@ typedef struct {
 	int vram_size;
     /* interrupt */
     UINT8 INT;
-    void (*INTCallback)(int);
+    void (*INTCallback)(running_machine *, int);
 	int scanline;
     /* blinking */
     int blink, blink_count;
@@ -483,7 +483,7 @@ WRITE8_HANDLER (v9938_1_command_w)
 
 ***************************************************************************/
 
-void v9938_init (running_machine *machine, int which, const device_config *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(int) )
+void v9938_init (running_machine *machine, int which, const device_config *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine *, int) )
 {
 	vdp = &vdps[which];
 
@@ -610,7 +610,7 @@ static void v9938_check_int (void)
     ** called; because of this Mr. Ghost, Xevious and SD Snatcher don't
     ** run. As a patch it's called every scanline
     */
-	vdp->INTCallback (n);
+	vdp->INTCallback (Machine, n);
 	}
 
 void v9938_set_sprite_limit (int which, int i)
