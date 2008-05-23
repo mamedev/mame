@@ -516,14 +516,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sizey = (spriteram_3[offs] & 0x08) >> 3;
 		int x,y;
 
+		sy -= 16 * sizey;
+		sy = (sy & 0xff) - 32;	// fix wraparound
+
 		if (flip_screen_get())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
+			sy += 48;
 		}
-
-		sy -= 16 * sizey;
-		sy = (sy & 0xff) - 32;	// fix wraparound
 
 		for (y = 0;y <= sizey;y++)
 		{
