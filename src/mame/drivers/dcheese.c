@@ -589,6 +589,7 @@ ROM_START( fredmem )
 	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
 ROM_END
 
+/* Japan version, has a High Score table instead of tickets */
 ROM_START( fredmemj )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
 	ROM_LOAD16_BYTE( "prog0_japan.104", 0x00000, 0x20000, CRC(4f5e947e) SHA1(14c19832f98a14293a66e64d2d86e8c5cc8a9324) ) /* Program 0 - V2.0 at U104 */
