@@ -755,8 +755,8 @@ static DRIVER_INIT( svolley )
  *
  *************************************/
 
-GAME( 1987, rabiolep, 0,        rpunch,   rabiolep, rabiolep, ROT0, "V-System Co.", "Rabio Lepus (Japan)", 0 )
-GAME( 1987, rpunch,   rabiolep, rpunch,   rpunch,   rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)", 0 )
-GAME( 1989, svolley,  0,        rpunch,   svolley,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Japan)", 0 )
-GAME( 1989, svolleyk, svolley,  rpunch,   svolley,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Korea)", 0 )
-GAME( 1989, svolleyu, svolley,  rpunch,   svolley,  svolley,  ROT0, "V-System Co. (Data East license)", "Super Volleyball (US)", 0 )
+GAME( 1987, rabiolep, 0,        rpunch,   rabiolep, rabiolep, ROT0, "V-System Co.", "Rabio Lepus (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, rpunch,   rabiolep, rpunch,   rpunch,   rabiolep, ROT0, "V-System Co. (Bally/Midway/Sente license)", "Rabbit Punch (US)", GAME_NO_COCKTAIL )
+GAME( 1989, svolley,  0,        rpunch,   svolley,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Japan)", GAME_NO_COCKTAIL )
+GAME( 1989, svolleyk, svolley,  rpunch,   svolley,  svolley,  ROT0, "V-System Co.", "Super Volleyball (Korea)", GAME_NO_COCKTAIL )
+GAME( 1989, svolleyu, svolley,  rpunch,   svolley,  svolley,  ROT0, "V-System Co. (Data East license)", "Super Volleyball (US)", GAME_NO_COCKTAIL )
