@@ -1150,7 +1150,7 @@ ROM_START( gp500 )
         ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
 	ROM_REGION( 0x2000000, REGION_GFX1, 0 )	/* sprite? tilemap? tiles */
-	ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000000, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
+		ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000000, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
         ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000001, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
 
 		/* COMMON FUJII YASUI WAKAO KURE INOUE
@@ -1172,14 +1172,11 @@ ROM_START( gp500 )
 	ROM_REGION32_LE( 0x2000000, REGION_GFX4, 0 )	/* 3D model data */
         ROM_LOAD32_WORD( "5gp1pt0l.7c",  0x0000000, 0x400000, CRC(a0ece0a1) SHA1(b7aab2d78e1525f865214c7de387ccd585de5d34) )
         ROM_LOAD32_WORD( "5gp1pt0h.7a",  0x0000002, 0x400000, CRC(5746a8cd) SHA1(e70fc596ab9360f474f716c73d76cb9851370c76) )
-
         ROM_LOAD32_WORD( "5gp1pt1l.5c",  0x0800000, 0x400000, CRC(80b25ad2) SHA1(e9a03fe5bb4ce925f7218ab426ed2a1ca1a26a62) )
         ROM_LOAD32_WORD( "5gp1pt1h.5a",  0x0800002, 0x400000, CRC(b1feb5df) SHA1(45db259215511ac3e472895956f70204d4575482) )
-
-	ROM_LOAD32_WORD( "5gp1pt2l.4c",  0x1000000, 0x400000, CRC(9289dbeb) SHA1(ec546ad3b1c90609591e599c760c70049ba3b581) )
+		ROM_LOAD32_WORD( "5gp1pt2l.4c",  0x1000000, 0x400000, CRC(9289dbeb) SHA1(ec546ad3b1c90609591e599c760c70049ba3b581) )
         ROM_LOAD32_WORD( "5gp1pt2h.4a",  0x1000002, 0x400000, CRC(9a693771) SHA1(c988e04cd91c3b7e75b91376fd73be4a7da543e7) )
-
-	ROM_LOAD32_WORD( "5gp1pt3l.3c",  0x1800000, 0x400000, CRC(480b120d) SHA1(6c703550faa412095d9633cf508050614e15fbae) )
+		ROM_LOAD32_WORD( "5gp1pt3l.3c",  0x1800000, 0x400000, CRC(480b120d) SHA1(6c703550faa412095d9633cf508050614e15fbae) )
         ROM_LOAD32_WORD( "5gp1pt3h.3a",  0x1800002, 0x400000, CRC(26eaa400) SHA1(0157b76fffe81b40eb970e84c98398807ced92c4) )
 
 	ROM_REGION( 0x1000000, REGION_SOUND1, 0 ) /* C352 PCM samples */
@@ -1207,7 +1204,7 @@ ROM_START( finfurl2 )
         ROM_LOAD( "ffs1cgll.4m",  0x1000000, 0x800000, CRC(171bba76) SHA1(4a63a1f34de8f341a0ef9b499a21e8fec758e1cd) )
         ROM_LOAD( "ffs1cglm.4k",  0x1800000, 0x800000, CRC(48acf207) SHA1(ea902efdd94aba34dadb20762219d2d25441d199) )
 
-	ROM_REGION( 0x600000, REGION_GFX3, 0 )	/* texture tilemap */
+	ROM_REGION( 0x400000, REGION_GFX3, 0 )	/* texture tilemap */
         ROM_LOAD( "ffs1ccrl.7f",  0x000000, 0x200000, CRC(ffbcfec1) SHA1(9ab25f1543da4b72784eec93985abaa2e1dafc83) )
         ROM_LOAD( "ffs1ccrh.7e",  0x200000, 0x200000, CRC(8be4aeb4) SHA1(ec344f6fba42092083e737e436451f5d7be12c15) )
 
@@ -1246,7 +1243,7 @@ ROM_START( finfrl2j )
         ROM_LOAD( "ffs1cgll.4m",  0x1000000, 0x800000, CRC(171bba76) SHA1(4a63a1f34de8f341a0ef9b499a21e8fec758e1cd) )
         ROM_LOAD( "ffs1cglm.4k",  0x1800000, 0x800000, CRC(48acf207) SHA1(ea902efdd94aba34dadb20762219d2d25441d199) )
 
-	ROM_REGION( 0x600000, REGION_GFX3, 0 )	/* texture tilemap */
+	ROM_REGION( 0x400000, REGION_GFX3, 0 )	/* texture tilemap */
         ROM_LOAD( "ffs1ccrl.7f",  0x000000, 0x200000, CRC(ffbcfec1) SHA1(9ab25f1543da4b72784eec93985abaa2e1dafc83) )
         ROM_LOAD( "ffs1ccrh.7e",  0x200000, 0x200000, CRC(8be4aeb4) SHA1(ec344f6fba42092083e737e436451f5d7be12c15) )
 
@@ -1265,9 +1262,290 @@ ROM_START( finfrl2j )
         ROM_LOAD( "ffs1waveh.2a", 0x800000, 0x800000, CRC(178e8bd3) SHA1(8ab1a97003914f70b09e96c5924f3a839fe634c7) )
 ROM_END
 
+/*
+Rapid River
+Namco, 1997
+
+This game runs on hardware called "GORGON". It appears to be similar to
+System 23 but the PCBs are slightly larger.
+
+The system comprises Main PCB, ROM PCB and I/O PCB all located inside
+a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main 
+input power is 115V.
+The game is controlled by rotating a paddle (for thrust) and turning it
+sideways (moves left/right).
+The rotation action is done with a 5K potentiometer whereby the thrust 
+is achieved by moving the pot from full left to full right continuously.
+The left/right turning movement is just another 5K potentiometer connected
+to the column of the paddle center shaft.
+There are also some buttons just for test mode, including SELECT, UP & DOWN
+The player's seat has movement controlled by a compressor and several 
+potentiometers. On bootup, the system tests the seat movement and displays 
+a warning if it's not working. Pressing START allows the game to continue
+and function normally without the seat movement.
+
+
+Main PCB
+--------
+
+8664960102 (8664970102) GORGON MAIN PCB
+|------------------------------------------------------------------------------------------------------|
+|                                   J4                       J5                         J6             |
+|                              |---------|           |---------| |------| |---------|                  |
+|         |---------| |------| |         |           |         | |C401  | |         |HM534251 HM534251 |
+| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  304    |HM534251 HM534251 |
+|         |  C404   | |      | |         |  |C435  | |         | |------| |         |HM534251 HM534251 |
+|         |         | |------| |         |  |      | |         | |------| |         |                  |
+|         |         |          |---------|  |------| |---------| |C400  | |---------|                  |
+|         |---------|     |---------|       |------|             |      | |---------|                  |
+|                         |         |       |C435  |    341256   |------| |         |HM534251 HM534251 |
+|                         |  C397   |       |      |             |------| |  304    |HM534251 HM534251 |
+|  341256 341256  341256  |         |       |------|    341256   |C401  | |         |HM534251 HM534251 |
+|  M5M51008       341256  |         |     |---------|            |      | |         |                  |
+|                         |---------|     |         | |------|   |------| |---------|                  |
+|  M5M51008       341256         |------| |  C403   | |C406  |   |------| |---------|                  |
+|ADM485              |---------| |C379  | |         | |      |   |C400  | |         |HM534251 HM534251 |
+|                    |         | |      | |         | |------|   |      | |  304    |HM534251 HM534251 |
+|    M5M51008        |  C300   | |------| |---------|            |------| |         |HM534251 HM534251 |
+|                    |         | LH540204  LH540204              |------| |         |                  |
+|    M5M51008        |         |341256                 |------|  |C401  | |---------|                  |
+|J1   HCPL0611       |---------|341256                 |C407  |  |      | |---------|                  |
+|         DS8921                  PST575  PST575       |      |  |------| |         |                  |
+|  DS8921                                              |------|  |------| |  304    |HM534251 HM534251 |
+|                 M5M51008                                       |C400  | |         |HM534251 HM534251 |
+|       CY7C128             CY2291S                              |      | |         |                  |
+|         |------|M5M51008  14.31818MHz                          |------| |---------|                  |
+|         |C422  |          J9           M5M5256                 |------| |---------|         3V_BATT  |
+|         |      |341256                                         |C400  | |         |                  |
+|         |------|341256                                         |      | |  C399   |341256  LEDS(8)   |
+|                                   |------|      |--------|     |------| |         |341256            |
+|                                   |C352  |      |ALTERA  |     |------| |         |                  |
+|  ADM485        DSW1(2)   |------| |      |      |EPM7128 |     |C401  | |---------| DSW3(2)   DSW5(8)|
+|    2061ASC               |C416  | |------|      |        |     |      |     |---------| |---------|  |
+|      14.7456MHz          |      |               |--------|     |------|     |         | |NKK      |  |
+|PAL             |-----|   |------|    |------|                   D4516161    |  C413   | |NR4650   |  |
+|                |H8/  |               |C361  |                   D4516161    |         | |LQF-133  |  |
+|                |3002 |               |      |LC321664                       |         | |         |  |
+|  J10           |-----|               |------|    J8                         |---------| |---------|  |
+|------------------------------------------------------------------------------------------------------|
+Notes:
+      NKK NR4650 - R4600-based 64bit RISC CPU (Main CPU, QFP208, clock input source = CY2291S)
+      H8/3002  - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100, running at 14.7456MHz)
+      EPM7128  - Altera EPM7128 FPGA labelled 'GOR-M1' (PLCC84)
+      PAL      - PALCE16V8H stamped 'GOR-M3' (PLCC20)
+      HM534251 - Hitachi HM534251 256k x4 Dynamic Video RAM (SOJ28)
+      N341256  - NKK 32k x8 SRAM (SOJ28)
+      M5M5256  - Mitsubishi 32k x8 SRAM (SOP28)
+      D4516161 - NEC uPD4516161AG5-A80 1M x16 (16MBit) SDRAM (SSOP50)
+      LC321664 - Sanyo 64k x16 EDO DRAM (SOJ40)
+      M5M51008 - Mitsubishi 128k x8 SRAM (SOP32)
+      CY7C128  - Cypress 2k x8 SRAM (SOJ28)
+      LH540204 - Sharp CMOS 4096 x 9 Asynchronous FIFO (PLCC32)
+      2061ASC-1- IC Designs 2061ASC-1 programmable clock generator (SOIC16)
+      DS8921   - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
+      HCPL0611 - Fairchild HCPL0611 High Speed 10MBits/sec Logic Gate Optocoupler (SOIC8)
+      ADM485   - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      PST575   - System Reset IC (SOIC8)
+      CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
+      J1       - 64 pin connector for connection of I/O board
+      J4/J5/J6 \
+      J8/J9    / Custom NAMCO connectors for connection of MEM(M1) PCB
+      J10      - Custom NAMCO connector for MSPM(FR) PCB
+      
+
+      Namco Custom ICs
+      ----------------
+      C300 (QFP160)
+      304  (x4, QFP120)
+      C352 (QFP100)
+      C361 (QFP120)
+      C374 (QFP160)
+      C379 (QFP64)
+      C381 (QFP144)
+      C397 (QFP160)
+      C399 (QFP160)
+      C400 (QFP100)
+      C401 (x4, QFP64)
+      C403 (QFP136)
+      C404 (QFP208)
+      C406 (QFP120)
+      C407 (QFP64)
+      C413 (QFP208)
+      C416 (QFP176)
+      C417 (QFP208)
+      C422 (QFP64)
+      C435 (x2, TQFP144)
+
+
+Program ROM PCB
+---------------
+
+MSPM(FR) PCB 8699015200 (8699015100)
+|--------------------------|
+|            J1            |
+|                          |
+|  IC3               IC1   |
+|                          |
+|                          |
+|                    IC2   |
+|--------------------------|
+Notes:
+      J1 -  Connector to plug into Main PCB
+      IC1 \
+      IC2 / Main Program  (Fujitsu 29F016 16MBit FlashROM, TSOP48)
+      IC3 - Sound Program (Fujitsu 29F400T 4MBit FlashROM, TSOP48)
+
+      Games that use this PCB include...
+
+      Game           Code and revision
+      --------------------------------
+      Rapid River    RD3 Ver.C
+
+
+ROM PCB
+-------
+
+MEM(M1) PCB
+8664960202 (8664970202)
+|--------------------------------------------------------|
+|    J2(TEXTURE)        J3(POINT)           J5(SPRITE)   |
+| PAL1                                                   |
+|                                                        |
+|                                                        |
+|                                                        |
+| CCRL.11A                                               |
+|      CCRL.11E  PT3L.12J PT3H.12L  SPRLL.12P SPRLL.12T  |
+| CCRH.11B                                               |
+|      CCRH.11F                                          |
+|                PT2L.11J PT2H.11L  SPRLM.11P SPRLM.11T  |
+|                                                        |
+|                                                        |
+|                PT1L.10J PT1H.10L  SPRUM.10P SPRUM.10T  |
+|   PAL2        PAL3                                     |
+|                                                        |
+|                PT0L.9J  PT0H.9L   SPRUU.9P  SPRUU.9T   |
+|                                   JP7       JP9        |
+|                                   JP6       JP8        |
+| CGLL.8B     CGLL.8F                                    |
+|                                                        |
+|                                                        |
+| CGLM.7B     CGLM.7F                                    |
+|      JP2    JP4                                        |
+|      JP1    JP3                                        |
+| CGUM.6B     CGUM.6F                                    |
+|                                          J1(WAVE)      |
+|                                                        |
+| CGUU.5B     CGUU.5F                      WAVEH.3S      |
+|                                                        |
+|                    MTBH.5J               WAVEL.2S      |
+|                    MTAH.3J                      JP5    |
+|                    MTBL.2J                             |
+|                    MTAL.1J    KEYCUS                   |
+|                                                        |
+|                    J4(MOTION)                          |
+|--------------------------------------------------------|
+Notes:
+      PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
+      PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+      PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+      KEYCUS - MACH211 CPLD stamped 'KC012' (PLCC44)
+      J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
+      JP1/JP2 \
+      JP3/JP4 |
+      JP5     | Jumpers to set ROM sizes (32M/64M)
+      JP6/JP7 |
+      JP8/JP9 /
+      
+      ROMs
+      ----
+           PT*  - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
+           MT*  - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
+           CG*  - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
+           CCR* - Texture Tilemap ROMs, sizes fixed at 16M (SOP44)
+           SPR* - Sprite ROMs, sizes configurable to either 32M or 64M (SOP44)
+           WAVE*- Wave ROMs, sizes configurable to either 32M or 64M (SOP44)
+           
+I/O PCB
+-------
+
+V187 ASCA-2A PCB 
+2477960102 (2477970102)
+|--------------------------------------------------------|
+|                   J105                                 |
+|                           |-------|        14.7456MHz  |
+|   J104                    |ALTERA |    ADM485   PST592 |
+|                           |EPM7064|     |-------|      |
+|                           |       |     |       |      |
+|                           |-------|     | C78   |      |
+|     LC78815                             |       |      |
+|                                         |-------|      |
+|     MB87078                              |---|         |
+| LA4705                                   |IC1| 62256   |
+|                                          |---|         |
+|         J101                J102                       |
+|--------------------------------------------------------|
+Notes:
+      IC1  - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
+      C78  - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
+      EPM7064 - Altera EPM7064LC68-15 FPGA, labelled 'ASCA DR0' (PLCC68)
+      PST592 - System Reset IC (SOIC4)
+      ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+      LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter (SOIC20)
+      J101 - 34 pin flat cable connector for filter board
+      J102 - 50 pin flat cable connector for filter board
+      J104 - 8 pin power connector (+5V, +12V, +3.3V)
+      J105 - 64 pin connector for connection of Main PCB
+*/
+
+ROM_START( rapriver )
+	ROM_REGION32_BE( 0x400000, REGION_USER1, 0 )	/* 4 megs for main R4650 code */
+        ROM_LOAD16_BYTE( "rd3verc.ic2", 0x000000, 0x200000, CRC(c15c0f30) SHA1(9f529232818f3e184f81f62408a5cad615b05613) )
+        ROM_LOAD16_BYTE( "rd3verc.ic1", 0x000001, 0x200000, CRC(9d7f4411) SHA1(d049efaa539d36ed0f73ca3f50a8f7112e67f865) )
+
+	ROM_REGION( 0x080000, REGION_CPU2, 0 )			/* Hitachi H8/3002 MCU code */
+        ROM_LOAD16_WORD_SWAP( "rd3verc.ic3", 0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
+
+	ROM_REGION( 0x800000, REGION_GFX1, 0 )			/* Motion ROMs */
+        ROM_LOAD16_BYTE( "rd1mtal.1j", 0x0000000, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
+        ROM_LOAD16_BYTE( "rd1mtah.3j", 0x0000001, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
+
+	ROM_REGION( 0x2000000, REGION_GFX2, 0 )			/* Texture ROMs - duplicated at locations .*b */
+        ROM_LOAD( "rd1cguu.5f", 0x0000000, 0x800000, CRC(611bab41) SHA1(84cddb2b63bf8336e92aecb06eddf1b34af73540) )
+        ROM_LOAD( "rd1cgum.6f", 0x0800000, 0x800000, CRC(c50de2ef) SHA1(24758a72b3569ce6a643a5786fce7c34b8aa692d) )
+        ROM_LOAD( "rd1cgll.8f", 0x1000000, 0x800000, CRC(b58b92ac) SHA1(70ee6e0e5347e05817aa30d53d766b8ce0fc44e4) )
+        ROM_LOAD( "rd1cglm.7f", 0x1800000, 0x800000, CRC(447067fa) SHA1(e2052373773594feb303e1924a4a820cf34ab55b) )
+
+	ROM_REGION( 0x400000, REGION_GFX3, 0 )			/* Texture tilemap ROMs - duplicated at locations 11a & 11b */
+		ROM_LOAD( "rd1ccrl.11e", 0x000000, 0x200000, CRC(b0ea2b32) SHA1(0dc45846725b0de619bc6bae69e3eb166ed21bf0) )
+        ROM_LOAD( "rd1ccrh.11f", 0x200000, 0x200000, CRC(fafffb86) SHA1(15b0ba0252b99d0cac29fcb374fb895643f528fe) )
+
+	ROM_REGION32_LE( 0x2000000, REGION_GFX4, 0 )	/* Point ROMs */
+        ROM_LOAD32_WORD( "rd1pt0l.9j",  0x0000000, 0x400000, CRC(47b1c5a5) SHA1(021d4ca7b8674d8ed5daa701bf41b4a7164d992a) )
+        ROM_LOAD32_WORD( "rd1pt0h.9l",  0x0000002, 0x400000, CRC(6f280eff) SHA1(9dd8c8903581d7a412146e50f4009e1d2b743f06) )
+        ROM_LOAD32_WORD( "rd1pt1l.10j", 0x0800000, 0x400000, CRC(91131cb3) SHA1(e42c5e190c719f1cf2d6e91444062ab901be0e73) )
+        ROM_LOAD32_WORD( "rd1pt1h.10l", 0x0800002, 0x400000, CRC(37bd9bdf) SHA1(b26c284024ea4ad4c67b2eefbfdd5ebb35a0118e) )
+		ROM_LOAD32_WORD( "rd1pt2l.11j", 0x1000000, 0x400000, CRC(3423ff9f) SHA1(73823c179c866cbb601a23417acbbf5b3dc97213) )
+        ROM_LOAD32_WORD( "rd1pt2h.11l", 0x1000002, 0x400000, CRC(e82ff66a) SHA1(9e2c951136b26d969d2c9d030b7e0bad8bbbe3fb) )
+        ROM_LOAD32_WORD( "rd1pt3l.12j", 0x1800000, 0x400000, CRC(7216d63e) SHA1(77088ff05c2630996f4bdc87fe466f9b97611467) )
+        ROM_LOAD32_WORD( "rd1pt3h.12l", 0x1800002, 0x400000, CRC(8d450259) SHA1(27cccd1e7dad8880147bb85185982d8d27076e69) )
+
+	ROM_REGION( 0x1000000, REGION_GFX5, 0 )			/* Sprite ROMs - duplicated at locations .*p */
+        ROM_LOAD( "rd1spruu.9t",  0x000000, 0x400000, CRC(f20a9673) SHA1(e5f1d552b0c42e102593ab578ff0b9ff814f8650) )
+        ROM_LOAD( "rd1sprum.10t", 0x400000, 0x400000, CRC(8e08b2c6) SHA1(a17331a4e41f677f604d1b74e7694cf920b03b66) )
+        ROM_LOAD( "rd1sprll.12t", 0x800000, 0x400000, CRC(8d450259) SHA1(27cccd1e7dad8880147bb85185982d8d27076e69) )
+        ROM_LOAD( "rd1sprlm.11t", 0xc00000, 0x400000, CRC(6c8db3a5) SHA1(24d81fa11e9c835cddadec4cbd530738e258346c) )
+
+	ROM_REGION( 0x1000000, REGION_SOUND1, 0 )		/* C352 PCM samples */
+        ROM_LOAD( "rd1wavel.2s", 0x000000, 0x800000, CRC(bf52c08c) SHA1(6745062e078e520484390fad1f723124aa4076d0) )
+        ROM_LOAD( "rd1waveh.3s", 0x800000, 0x800000, CRC(ef0136b5) SHA1(a6d923ededca168fe555e0b86a72f53bec5424cc) )
+ROM_END
+
+
 /* Games */
-//GAME( 199?, downhbkr,  0,         s23, ss23, ss23, ROT0, "Namco",  "Downhill Bikers (DH3 Ver.A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+//GAME( 199?, downhbkr,  0,      s23, ss23, ss23, ROT0, "Namco",  "Downhill Bikers (DH3 Ver.A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1997, rapriver, 0,        ss23, ss23, ss23, ROT0, "Namco", "Rapid River", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, gp500,    0,        ss23, ss23, ss23, ROT0, "Namco", "GP500", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2, 0,        ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfrl2j, finfurl2, ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )

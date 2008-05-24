@@ -859,6 +859,7 @@ const game_driver * const drivers[] =
 
 	/* Namco System 23 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
+	DRIVER( rapriver )  /* (c) 1997 */
 	DRIVER( gp500 )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfrl2j )	/* (c) 1999 */
