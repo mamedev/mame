@@ -150,7 +150,6 @@ src/emu/cpu/i86/host.h svneol=native#text/plain
 src/emu/cpu/i86/i186intf.h svneol=native#text/plain
 src/emu/cpu/i86/i188intf.h svneol=native#text/plain
 src/emu/cpu/i86/i286.c svneol=native#text/plain
-src/emu/cpu/i86/i286.h svneol=native#text/plain
 src/emu/cpu/i86/i286intf.h svneol=native#text/plain
 src/emu/cpu/i86/i86.c svneol=native#text/plain
 src/emu/cpu/i86/i86.h svneol=native#text/plain
