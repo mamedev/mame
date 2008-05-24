@@ -423,7 +423,7 @@ static const struct CPS1config *cps1_game_config;
 #define CPS_B_21_QS3 0x0e,0x0c00,  -1,  -1,  -1,  -1,  0x2c, -1,  -1,   0x12,{0x14,0x16,0x08,0x0a},0x0c, {0x04,0x02,0x20,0x00,0x00}
 #define CPS_B_21_QS4 0x2e,0x0c01,  -1,  -1,  -1,  -1,  0x1c,0x1e,0x08,  0x16,{0x00,0x02,0x28,0x2a},0x2c, {0x04,0x08,0x10,0x00,0x00}
 #define CPS_B_21_QS5 0x1e,0x0c02,  -1,  -1,  -1,  -1,  0x0c, -1,  -1,   0x2a,{0x2c,0x2e,0x30,0x32},0x1c, {0x04,0x08,0x10,0x00,0x00}
-#define HACK_B_1      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x14,{0x12,0x10,0x0e,0x0c},0x1c, {0xff,0xff,0xff,0x00,0x00}
+#define HACK_B_1      -1,   -1,    -1,  -1,  -1,  -1,   -1,  -1,  -1,   0x14,{0x12,0x10,0x0e,0x0c},0x0a, {0x0e,0x0e,0x0e,0x30,0x30}
 
 /*
 CPS_B_21_DEF is CPS-B-21 at default settings (no battery)
@@ -1511,7 +1511,12 @@ READ16_HANDLER( cps1_cps_b_r )
 				cps1_cps_b_regs[cps1_game_config->mult_factor2/2]) >> 16;
 
 	if (offset == cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
-		return input_port_read(machine, "IN2");
+	{
+		if (cps1_game_config->bootleg_kludge == 1)
+			return input_port_read(machine, "IN2") << 8;
+		else
+			return input_port_read(machine, "IN2");
+	}
 
 	if (offset == cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
 		return input_port_read(machine, "IN3");
@@ -1593,7 +1598,8 @@ WRITE16_HANDLER( cps1_cps_b_w )
 			offset != cps1_game_config->priority[2]/2 &&
 			offset != cps1_game_config->priority[3]/2 &&
 			offset != cps1_game_config->palette_control/2 &&
-			offset != cps1_game_config->out2_addr/2)
+			offset != cps1_game_config->out2_addr/2 &&
+			!cps1_game_config->bootleg_kludge)
 		popmessage("CPS-B write %04x to port %02x contact MAMEDEV", data, offset*2);
 }
 
