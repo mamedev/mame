@@ -1772,7 +1772,7 @@ void cps1_get_video_base(void )
 	enablemask = cps1_game_config->layer_enable_mask[0] | cps1_game_config->layer_enable_mask[1]
 			| cps1_game_config->layer_enable_mask[2]
 			| cps1_game_config->layer_enable_mask[3] | cps1_game_config->layer_enable_mask[4];
-	if (((layercontrol & ~enablemask) & 0xc03e) != 0)
+	if (((layercontrol & ~enablemask) & 0x003e) != 0)
 		popmessage("layer %02x contact MAMEDEV",layercontrol&0xc03f);
 }
 
