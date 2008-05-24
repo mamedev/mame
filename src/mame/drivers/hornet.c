@@ -14,8 +14,7 @@
 	Silent Scope                     Konami   1999
 	Silent Scope 2 : Fatal Judgement Konami   2000
 	Silent Scope 2 : Dark Silhouette Konami   2000
-	*Terraburst                      Konami   1998
-	* denotes PCB secured, but not 'archived' yet
+	Terraburst                       Konami   1998
 
     Hardware overview:
 

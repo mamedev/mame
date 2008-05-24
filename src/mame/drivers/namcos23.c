@@ -55,6 +55,7 @@ This document covers all the known Namco System 23 / Super System 23 games, incl
 *Rapid River      Namco, 1997    System 23
 Time Crisis II    Namco, 1997    System 23
 *Underground King Namco, 1998    System 23
+*Downhill Bikers  Namco, 199?    System 23
 GP 500            Namco, 1999    Super System 23
 *Crisis Zone      Namco, 2000    Super System 23
 Final Furlong 2   Namco, 1999    Super System 23

@@ -153,15 +153,15 @@
  * Alpine Racer 1   (C) Namco, 1995
  * Alpine Racer 2   (C) Namco, 1996
  * Alpine Surfer    (C) Namco, 1996
- * *Aqua Jet        (C) Namco, 1996
+ * !Aqua Jet        (C) Namco, 1996
  * *Armidillo Racing(C) Namco, 1997
  * Cyber Cycles     (C) Namco, 1995
  * *Dirt Dash       (C) Namco, 1995
- * *Downhill Bikers (C) Namco, 199?
  * Prop Cycle       (C) Namco, 1996
  * Time Crisis      (C) Namco, 1995
- * *Tokyo Wars      (C) Namco, 1996
+ * !Tokyo Wars      (C) Namco, 1996
  * 
+ * ! - denotes secured but not dumped yet.
  * * - denotes not dumped yet. If you can help with the remaining undumped SS22 games,
  *     please contact http://www.mameworld.net/gurudumps/
  * 
@@ -282,7 +282,6 @@
  *                                          Armidillo Racing =
  *                                          Cyber Cycles     = C389
  *                                          Dirt Dash        =
- *                                          Downhill Bikers  =
  *                                          Prop Cycle       = C428
  *                                          Time Crisis      = C419
  *                                          Tokyo Wars       =
@@ -301,7 +300,6 @@
  *                      Armidillo Racing
  *                      Cyber Cycles       'CB1 DATA B'
  *                      Dirt Dash
- *                      Downhill Bikers
  *                      Prop Cycle         'PR1 DATA'
  *                      Time Crisis        'TS1 DATA'
  *                      Tokyo Wars
@@ -318,7 +316,6 @@
  *                      Armidillo Racing
  *                      Cyber Cycles       'CB1 WAVEA', 'CB1 WAVEB'   , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
  *                      Dirt Dash
- *                      Downhill Bikers
  *                      Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M MASKROM
  *                      Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
  *                      Tokyo Wars
@@ -690,8 +687,6 @@
  *                    CB1PTRL3.14K                   "
  * 
  * Dirt Dash          N/A
- * 
- * Downhill Bikers    N/A
  * 
  * Prop Cycle         PR1CCRH.5B, PR1CCRH.1D      4M SOP32
  *                    PR1CCRL.7B, PR1CCRL.3D     16M SOP44
