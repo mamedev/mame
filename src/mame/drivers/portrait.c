@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( portrait )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD(TMS5220, 640000) // actually it uses a tms5200 chip
+	MDRV_SOUND_ADD(TMS5200, 640000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
