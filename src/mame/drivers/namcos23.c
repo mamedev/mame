@@ -41,6 +41,77 @@
 
 /*
 
+Namco System 23 and Super System 23 Hardware Overview (last updated 27th February, 2006 at 5.26pm)
+Namco, 1997 - 2000
+
+Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
+
+This document covers all the known Namco System 23 / Super System 23 games, including....
+*Angler King      Namco, 1999    System 23
+*Final Furlong    Namco, 1997    System 23
+*Gunmen Wars      Namco, 1998    System 23
+*Motocross Go!    Namco, 1997    System 23
+*Panic Park       Namco, 1998    System 23
+*Rapid River      Namco, 1997    System 23
+Time Crisis II    Namco, 1997    System 23
+*Underground King Namco, 1998    System 23
+GP 500            Namco, 1999    Super System 23
+*Crisis Zone      Namco, 2000    Super System 23
+Final Furlong 2   Namco, 1999    Super System 23
+*Guitar Jam       Namco, 1999    Super System 23
+*Race On!         Namco, 1998    Super System 23
+
+* - denotes not dumped yet (and hardware type not confirmed). If you can help with the remaining undumped S23/SS23 games,
+    please contact me at http://www.mameworld.net/gurudumps/
+
+The system comprises the following main boards....
+- EMI PCB                          Small PCB with some connectors, including power in, video out, network in/out, sound out (to AMP PCB)
+- BASS AMP PCB                     Power AMP PCB for general sounds and bass
+- SYSTEM23 MAIN PCB                Main PCB for System 23        \
+  or SystemSuper23 MAIN(1) PCB     Main PCB for Super System 23  / Note the 2 main boards are similar, but not exactly the same.
+- MSPM(FRA) PCB                    A small plug-in daughterboard that holds FLASHROMs containing Main CPU and Sub CPU programs
+- FCA PCB                          Controls & I/O interface board. Contains mostly transistors, caps, resistors, several connectors and an MCU.
+                                   The MCU is different for EACH game and the FCA PCBs are not interchangeable between different games.
+                                   If the FCA PCB is not connected, the game will not advance past the 3rd screen shown below.
+- SYSTEM23 MEM(M) PCB              Holds MASKROMs for GFX/Sound and associated logic
+                                   Note that in Super System23, the MEM(M) PCB is re-used from System23.
+                                   On Super System23, there is a sticker over the System23 part labelled 'SystemSuper23'
+
+The metal box housing these PCB's is approximately the same size as Super System 22. However, the box is mostly
+empty. All of the CPU/Video/DSP hardware is located on the main PCB which is the same size as the
+Super System 22 CPU board. The ROM PCB is half the size of the Super System22 ROM PCB. The ROM positions on it
+can be configured for either 32MBit or 64MBit SOP44 MASK ROMs with a maximum capacity of 1664MBits.
+The system also uses a dual pipeline graphics bus similar to Super System 22 and has two copies of the graphics ROMs
+on the PCB.
+The System 23 hardware is the first NAMCO system to require an external 3.3V power source. Previously the 3.3volts
+was derived from a 5v to 3.3v regulator on systems such as System10/11/12 etc.
+The KEYCUS chip is the familiar MACH211 PLCC44 IC as used on System12. The sound system is also taken from System12.
+
+On bootup, the following happens (on GP500)...
+
+1st screen - Black screen with white text
+                               "SYSTEM 23 BOOTING     "
+                               "SDRAM CHECKING A0xx000" (xx = slowly counts up to 3F, from 00), then OK ('CHECKING' is in yellow text, 'OK' is in green text)
+   As the SDRAM is being checked, the LEDS 1 to 8 turn off in sequence from 8 to 1.
+
+2nd screen - Black screen with white text
+                               "S.S.23 POWER ON TEST      xxxx"  (xxxx = numbers count up rapidly from 0000)
+                               "(C) NAMCO                     "
+                               "                     VER. 1.16"
+   As these checks happen, the LEDs 1 to 8 flash on/off
+
+3rd screen - Black screen with white text
+                               "S.S.23 POWER ON TEST      xxxx"  (xxxx = numbers count up rapidly from 0000)
+                               "SUBCPU INITIALIZING ....      "
+                               "SUBCPU PROGRAM Ver. 0211      "
+
+   and a PACMAN eating dots along the bottom of the screen from left to right.
+   As these checks happen, the LEDs 1 to 8 simultaneously flash on/off in various patterns.
+
+   - On System23, the bootup sequence is shorter. The screen remains blank while the SDRAM is being checked. LEDS 1-8 turn off in sequence 8-1
+     After that, the bootup sequence is mostly the same as SS23.
+
+
 PCB Layouts
 -----------
 
@@ -86,6 +157,74 @@ SYSTEM23 MAIN PCB 8660962302 8660971105 (8660961105)
 |                                                             *KM681000      |
 |                                                       HM5216165  HM5216165 |
 |----------------------------------------------------------------------------|
+Notes:
+      * - These parts are underneath the PCB.
+
+      Main Parts List:
+
+      CPU
+      ---
+          NKK NR4650 - R4600-based 64bit RISC CPU (Main CPU, QFP208, clock input source = CY2291)
+          H8/3002    - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100, running at 14.7456MHz)
+
+      RAM
+      ---
+          N341256    - NKK 32k x8 SRAM (x9, SOJ28)
+          LC35256    - Sanyo 32k x8 SRAM (SOP28)
+          KM416S1020 - Samsung 1M x16 SDRAM (x2, TSOP48)
+          M5M4V4265  - Mitsubishi 256k x16 DRAM (x2, TSOP40/44)
+          LC321664   - Sanyo 64k x16 EDO DRAM (SOJ40)
+          HM5216165  - Hitachi 1M x16 SDRAM (x2, TSOP48)
+          KM681000   - Samsung 128k x8 SRAM (x2, SOP32)
+          CY7C182    - Cypress 8k x9 SRAM (SOJ28)
+
+      Namco Customs
+      -------------
+                    C352 (QFP100)
+                    C361 (QFP120)
+                    C403 (QFP136)
+                    C404 (QFP208)
+                    C412 (QFP256)
+                    C413 (QFP208)
+                    C416 (QFP176)
+                    C417 (QFP208)
+                    C421 (QFP208)
+                    C422 (QFP64)
+                    C435 (x2, QFP144)
+
+      Other ICs
+      ---------
+               XC95108  - Xilinx XC95108 In-System Programmable CPLD (QFP100, labelled 'S23MA9B')
+               DS8921   - National RS422/423 Differential Line Driver and Receiver Pair (SOIC8)
+               CXD1178Q - SONY CXD1178Q  8-bit RGB 3-channel D/A converter (QFP48)
+               PAL(1)   - PALCE16V8H (PLCC20, stamped 'PAD23')
+               PAL(2)   - PALCE22V10H (PLCC28, stamped 'S23MA5')
+               PAL(3)   - PALCE22V10H (PLCC28, stamped 'SS23MA6B')
+               MAX734   - MAX734 +12V 120mA Flash Memory Programming Supply Switching Regulator (SOIC8)
+               PST575   - PST575 System Reset IC (SOIC4)
+               3414     - NJM3414 70mA Dual Op Amp (x2, SOIC8)
+               LM358    - National LM358 Low Power Dual Operational Amplifier (SOIC8)
+               MB87078  - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+               MB88347  - Fujitsu MB88347 8bit 8 channel D/A converter with OP AMP output buffers (SOIC16)
+               ADM485   - Analog Devices Low Power EIA RS485 transceiver (SOIC8)
+               CXA1779P - SONY CXA1779P TV/Video circuit RGB Pre-Driver (DIP28)
+               CY2291   - Cypress CY2291 Three-PLL General Purpose EPROM Programmable Clock Generator (SOIC20)
+               2061ASC-1- IC Designs 2061ASC-1 clock Generator IC (SOIC16, also found on Namco System 11 PCBs)
+               R4543    - EPSON Real Time Clock Module (SOIC14)
+               IDT7200  - Integrated Devices Technology IDT7200 256 x9 CMOS Asynchronous FIFO
+
+      Misc
+      ----
+          J18   - Connector for MSPM(FRA) PCB
+          J5    - Connector for EMI PCB
+          J12   - 6-pin connector for In-System Programming of the XC95108 IC
+          J14 \
+          J15 \
+          J16 \
+          J17 \ - Connectors for MEM(M) PCB
+          SW2   - 2 position DIP Switch
+          SW3   - 2 position DIP Switch
+          SW4   - 8 position DIP Switch
 
 
 SystemSuper23 MAIN(1) PCB 8672960904 8672960104 (8672970104)
@@ -253,14 +392,21 @@ Notes:
       Game           Code and revision
       --------------------------------
       GP500          5GP3 Ver.C
+Other games dumps with unknown PCB information....
+
+      Game             Code and revision
+      ----------------------------------
+      Final Furlong 2  FFS1 Ver.?
+      Final Furlong 2  FFS2 Ver.?
 
 
 ROM PCB
 -------
 
-Printed on the PCB      - 8660960601 (8660970601) SYSTEM23 MEM(M) PCB
-Sticker (GP500)         - 8672961100
-Sticker (Time Crisis 2) - 8660962302
+Printed on the PCB        - 8660960601 (8660970601) SYSTEM23 MEM(M) PCB
+Sticker (GP500)           - 8672961100
+Sticker (Time Crisis 2)   - 8660962302
+Sticker (Final Furlong 2) - ??????????
 |----------------------------------------------------------------------------|
 | KEYCUS    MTBH.2M      CGLL.4M        CGLL.5M         CCRL.7M       PAL(3) |
 |                                                                            |
@@ -306,20 +452,49 @@ Notes:
       PAL(1)   - PALCE20V8H  (PLCC28, stamped 'SS22M2')  \ Both identical
       PAL(2)   - PALCE20V8H  (PLCC28, stamped 'SS22M2')  /
       PAL(3)   - PALCE16V8H  (PLCC20, stamped 'SS22M1')
-      PAL(4)   - PALCE16V8H  (PLCC20, labelled 'SS23MM1')
+      PAL(4)   - PALCE16V8H  (PLCC20, stamped 'SS23MM1')
                  Note this PAL is not populated when used on Super System 23
 
       All ROMs are SOP44 MaskROMs
       Note: ROMs at locations 7M, 7K, 5M, 5K, 5J & 5F are not included in the archive since they're copies of
-            other ROMs which are included in the archive.
-            Each ROM is stamped with the Namco game code, then the ROM-use code (such as CCRL, CCRH, PT* or MT*).
+            other ROMs which are included in the archive. However, they are populated on the PCB.
+            Each ROM is stamped with the Namco Game Code, then the ROM-use code (such as CCRL, CCRH, PT* or MT*).
 
-                           MaskROM
-            Game           Code     Keycus
-            -------------------------------
-            GP500          5GP1     KC029
-            Time Crisis 2  TSS1     KC010
-        Final Furlong 2 ????     ?????
+                            Game
+            Game            Code     Keycus    Notes
+            ---------------------------------------------------------
+            GP500           5GP1     KC029     -
+            Time Crisis 2   TSS1     KC010     3A and 3C not populated. i.e. PT3L & PT3H is not used.
+            Final Furlong 2 FFS1     KC???     -
+
+
+I/O PCBs
+--------
+
+FCA PCB  8662969102 (8662979102)
+(Used with GP500)
+|---------------------------------------------------|
+| J101                J106                          |
+|            4.9152MHz                              |
+|    DSW(6)                                         |
+| LED2              |-----|                         |
+|                   | MCU |                         |
+|     LEDS3-10      |     |                         |
+|  PIC16F84         |-----|                         |
+|   JP1 LED1                           ADM485       |
+|                                                   |
+|                     J102              J104        |
+|---------------------------------------------------|
+Notes:
+      J101     - 6 pin connector for power input
+      J102     - 60 pin flat cable connector
+      J104     - 5 pin connector
+      J106     - 30 pin flat cable connector
+      JP1      - 3 pin jumper, set to 'NORM'. Alt setting 'WR'
+      3771     - Fujitsu MB3771 System Reset IC (SOIC8)
+      PIC16F84 - Microchip PIC16F84 Programmable Interrupt Controller stamped 'CAP10' (SOIC20)
+      MCU      - Fujitsu MB90F574 Microcontroller, stamped 'FCAF10' (QFP120)
+      ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
 */
 
 
