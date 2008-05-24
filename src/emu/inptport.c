@@ -849,7 +849,7 @@ void input_field_select_previous_setting(const input_field_config *field)
 	int found_match = FALSE;
 	
 	/* only makes sense if we have settings */
-	assert(field->settings != NULL);
+	assert(field->settinglist != NULL);
 
 	/* scan the list of settings looking for a match on the current value */
 	prevsetting = NULL;
@@ -890,7 +890,7 @@ void input_field_select_next_setting(const input_field_config *field)
 	const input_setting_config *setting, *nextsetting;
 
 	/* only makes sense if we have settings */
-	assert(field->settings != NULL);
+	assert(field->settinglist != NULL);
 
 	/* scan the list of settings looking for a match on the current value */
 	nextsetting = NULL;
