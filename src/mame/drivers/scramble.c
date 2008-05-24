@@ -1777,7 +1777,10 @@ static const struct AY8910interface scorpion_ay8910_interface_1 =
 
 static const struct AY8910interface triplep_ay8910_interface =
 {
-	0
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	NULL,
+	NULL,
 };
 
 
@@ -2135,7 +2138,7 @@ static MACHINE_DRIVER_START( triplep )
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("8910.1")
 	MDRV_SOUND_CONFIG(triplep_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_REMOVE("8910.2")
 MACHINE_DRIVER_END
