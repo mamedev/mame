@@ -339,7 +339,9 @@ INLINE int fetch_word(UINT8 *src_data,int src_len,int *bit_addr,int word_len)
 
 INLINE void log_draw_error(int src, int cmd)
 {
+#ifdef MAME_DEBUG
 	popmessage("%06x: warning unknown pixel command %02x",src,cmd);
+#endif
 	logerror("%06x: warning unknown pixel command %02x\n",src,cmd);
 }
 
