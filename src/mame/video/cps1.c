@@ -1514,6 +1514,11 @@ READ16_HANDLER( cps1_cps_b_r )
 
 	if (cps_version == 2)
 	{
+		if (offset == 0x10/2)
+		{
+			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actuallyused
+			return cps1_cps_b_regs[0x10/2];
+		}
 		if (offset == 0x12/2)
 		{
 			return cps1_cps_b_regs[0x12/2];
