@@ -2159,10 +2159,15 @@ static int frame_get_digital_field_state(const input_field_config *field)
 	}
 
 	/* update the current state with the impulse state */
-	if (field->impulse != 0 && field->state->impulse != 0)
+	if (field->impulse != 0)
 	{
-		field->state->impulse--;
-		curstate = TRUE;
+		if (field->state->impulse != 0)
+		{
+			field->state->impulse--;
+			curstate = TRUE;
+		}
+		else
+			curstate = FALSE;
 	}
 
 	/* update the current state with the toggle state */
@@ -2185,7 +2190,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
 			return FALSE;
 		}
-	
+
 		/* skip locked-out service inputs */
 		if (field->type >= IPT_SERVICE1 && field->type <= IPT_SERVICE4 && servicecoinlockedout[field->type - IPT_SERVICE1])
 		{
