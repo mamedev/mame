@@ -1483,6 +1483,10 @@ WRITE16_HANDLER( cps1_cps_a_w )
 	if (offset == CPS1_PALETTE_BASE)
 		cps1_build_palette(machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
 
+	// pzloop2 write to register 24 on startup. This is probably just a bug.
+	if (offset == 0x24/2 && cps_version == 2)
+		return;
+
 	if (offset > CPS1_VIDEOCONTROL)
 		popmessage("write to CPS-A register %02x contact MAMEDEV", offset*2);
 }
