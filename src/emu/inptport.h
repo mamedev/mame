@@ -988,6 +988,11 @@ void input_field_get_user_settings(const input_field_config *field, input_field_
 /* modify the current settings for the given input field */
 void input_field_set_user_settings(const input_field_config *field, const input_field_user_settings *settings);
 
+/* select the previous item for a DIP switch or configuration field */
+void input_field_select_previous_setting(const input_field_config *field);
+
+/* select the next item for a DIP switch or configuration field */
+void input_field_select_next_setting(const input_field_config *field);
 
 
 /* ----- user interface sequence reading ----- */

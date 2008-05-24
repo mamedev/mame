@@ -208,7 +208,6 @@ struct _input_field_state
 	input_port_value			value;				/* current value of this port */
 	UINT8						impulse;			/* counter for impulse controls */
 	UINT8						last;				/* were we pressed last time? */
-	UINT8						toggle;				/* current toggle state */
 	UINT8						joydir;				/* digital joystick direction index */
 };
 
@@ -838,6 +837,86 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 }
 
 
+/*-------------------------------------------------
+    input_field_select_previous_setting - select 
+    the previous item for a DIP switch or 
+    configuration field
+-------------------------------------------------*/
+
+void input_field_select_previous_setting(const input_field_config *field)
+{
+	const input_setting_config *setting, *prevsetting;
+	int found_match = FALSE;
+	
+	/* only makes sense if we have settings */
+	assert(field->settings != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	prevsetting = NULL;
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+		{
+			if (setting->value == field->state->value)
+			{
+				found_match = TRUE;
+				if (prevsetting != NULL)
+					break;
+			}
+			prevsetting = setting;
+		}
+
+	/* if we didn't find a matching value, select the first */
+	if (!found_match)
+	{
+		for (prevsetting = field->settinglist; prevsetting != NULL; prevsetting = prevsetting->next)
+			if (input_condition_true(field->port->machine, &prevsetting->condition))
+				break;
+	}
+
+	/* update the value to the previous one */
+	if (prevsetting != NULL)
+		field->state->value = prevsetting->value;
+}
+
+
+/*-------------------------------------------------
+    input_field_select_next_setting - select the
+    next item for a DIP switch or 
+    configuration field
+-------------------------------------------------*/
+
+void input_field_select_next_setting(const input_field_config *field)
+{
+	const input_setting_config *setting, *nextsetting;
+
+	/* only makes sense if we have settings */
+	assert(field->settings != NULL);
+
+	/* scan the list of settings looking for a match on the current value */
+	nextsetting = NULL;
+	for (setting = field->settinglist; setting != NULL; setting = setting->next)
+		if (input_condition_true(field->port->machine, &setting->condition))
+			if (setting->value == field->state->value)
+				break;
+
+	/* if we found one, scan forward for the next valid one */
+	if (setting != NULL)
+		for (nextsetting = setting->next; nextsetting != NULL; nextsetting = nextsetting->next)
+			if (input_condition_true(field->port->machine, &nextsetting->condition))
+				break;
+
+	/* if we hit the end, search from the beginning */
+	if (nextsetting == NULL)
+		for (nextsetting = field->settinglist; nextsetting != NULL; nextsetting = nextsetting->next)
+			if (input_condition_true(field->port->machine, &nextsetting->condition))
+				break;
+
+	/* update the value to the previous one */
+	if (nextsetting != NULL)
+		field->state->value = nextsetting->value;
+}
+
+
 
 /***************************************************************************
     ACCESSORS FOR INPUT TYPES
@@ -1074,7 +1153,6 @@ input_port_value input_port_read_direct(const input_port_config *port)
 			input_port_value newbits = (*custom->field->custom)(custom->field, custom->field->custom_param);
 			result = (result & ~custom->field->mask) | ((newbits << custom->shift) & custom->field->mask);
 		}
-
 
 	/* update VBLANK bits */
 	if (port->state->vblank != 0)
@@ -2153,9 +2231,14 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		if (field->impulse != 0 && field->state->impulse == 0)
 			field->state->impulse = field->impulse;
 
-		/* toggle controls: flip the toggle state */
+		/* toggle controls: flip the toggle state or advance to the next setting */
 		if (field->flags & FIELD_FLAG_TOGGLE)
-			field->state->toggle = !field->state->toggle;
+		{
+			if (field->settinglist == NULL)
+				field->state->value ^= field->mask;
+			else
+				input_field_select_next_setting(field);
+		}
 	}
 
 	/* update the current state with the impulse state */
@@ -2170,9 +2253,10 @@ static int frame_get_digital_field_state(const input_field_config *field)
 			curstate = FALSE;
 	}
 
-	/* update the current state with the toggle state */
+	/* for toggle switches, the current value is folded into the port's default value */
+	/* so we always return FALSE here */
 	if (field->flags & FIELD_FLAG_TOGGLE)
-		curstate = field->state->toggle;
+		curstate = FALSE;
 
 	/* additional logic to restrict digital joysticks */
 	if (curstate && field->state->joystick != NULL && field->way != 16)

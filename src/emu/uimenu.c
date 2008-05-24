@@ -186,8 +186,6 @@ static int input_menu_get_game_items(running_machine *machine, input_item_data *
 static void input_menu_toggle_none_default(input_seq *selected_seq, input_seq *original_seq, const input_seq *selected_defseq);
 static int input_menu_compare_items(const void *i1, const void *i2);
 static void switches_menu_add_item(ui_menu_item *item, const input_field_config *field);
-static void switches_menu_select_previous(const input_field_config *field);
-static void switches_menu_select_next(const input_field_config *field);
 static void analog_menu_add_item(ui_menu_item *item, const input_field_config *field, const char *append_string, int which_item);
 
 /* DIP switch helpers */
@@ -1090,13 +1088,22 @@ static UINT32 menu_switches(running_machine *machine, UINT32 state)
 	/* handle left/right arrows */
 	if (input_ui_pressed(machine, IPT_UI_LEFT) && (item_list[selected].flags & MENU_FLAG_LEFT_ARROW))
 	{
-		switches_menu_select_previous(selected_field);
+		input_field_select_previous_setting(selected_field);
 		changed = TRUE;
 	}
 	if (input_ui_pressed(machine, IPT_UI_RIGHT) && (item_list[selected].flags & MENU_FLAG_RIGHT_ARROW))
 	{
-		switches_menu_select_next(selected_field);
+		input_field_select_next_setting(selected_field);
 		changed = TRUE;
+	}
+
+	/* select resets to the default value */
+	if (input_ui_pressed(machine, IPT_UI_SELECT))
+	{
+		input_field_user_settings settings;
+		input_field_get_user_settings(selected_field, &settings);
+		settings.value = selected_field->defvalue;
+		input_field_set_user_settings(selected_field, &settings);
 	}
 
 	/* update the selection to match the existing entry in case things got shuffled */
@@ -2085,87 +2092,6 @@ static void switches_menu_add_item(ui_menu_item *item, const input_field_config 
 
 	/* stash our reference */
 	item->ref = (void *)field;
-}
-
-
-/*-------------------------------------------------
-    switches_menu_select_previous - select the
-    previous item in the switches list
--------------------------------------------------*/
-
-static void switches_menu_select_previous(const input_field_config *field)
-{
-	const input_setting_config *setting, *prevsetting;
-	input_field_user_settings settings;
-	int found_match = FALSE;
-
-	/* get the current configured settings */
-	input_field_get_user_settings(field, &settings);
-
-	/* scan the list of settings looking for a match on the current value */
-	prevsetting = NULL;
-	for (setting = field->settinglist; setting != NULL; setting = setting->next)
-	{
-		if (setting->value == settings.value)
-		{
-			found_match = TRUE;
-			if (prevsetting != NULL)
-				break;
-		}
-		if (input_condition_true(field->port->machine, &setting->condition))
-			prevsetting = setting;
-	}
-
-	/* if we didn't find a matching value, select the first */
-	if (!found_match)
-	{
-		for (prevsetting = field->settinglist; prevsetting != NULL; prevsetting = prevsetting->next)
-			if (input_condition_true(field->port->machine, &prevsetting->condition))
-				break;
-	}
-
-	/* update the value to the previous one */
-	if (prevsetting != NULL)
-		settings.value = prevsetting->value;
-	input_field_set_user_settings(field, &settings);
-}
-
-
-/*-------------------------------------------------
-    switches_menu_select_next - select the
-    next item in the switches list
--------------------------------------------------*/
-
-static void switches_menu_select_next(const input_field_config *field)
-{
-	const input_setting_config *setting, *nextsetting;
-	input_field_user_settings settings;
-
-	/* get the current configured settings */
-	input_field_get_user_settings(field, &settings);
-
-	/* scan the list of settings looking for a match on the current value */
-	nextsetting = NULL;
-	for (setting = field->settinglist; setting != NULL; setting = setting->next)
-		if (setting->value == settings.value)
-			break;
-
-	/* if we found one, scan forward for the next valid one */
-	if (setting != NULL)
-		for (nextsetting = setting->next; nextsetting != NULL; nextsetting = nextsetting->next)
-			if (input_condition_true(field->port->machine, &nextsetting->condition))
-				break;
-
-	/* if we hit the end, search from the beginning */
-	if (nextsetting == NULL)
-		for (nextsetting = field->settinglist; nextsetting != NULL; nextsetting = nextsetting->next)
-			if (input_condition_true(field->port->machine, &nextsetting->condition))
-				break;
-
-	/* update the value to the previous one */
-	if (nextsetting != NULL)
-		settings.value = nextsetting->value;
-	input_field_set_user_settings(field, &settings);
 }
 
 
