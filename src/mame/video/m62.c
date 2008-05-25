@@ -664,7 +664,7 @@ VIDEO_START( ldrun4 )
 
 VIDEO_UPDATE( ldrun4 )
 {
-	tilemap_set_scrollx( m62_background, 0, m62_background_hscroll );
+	tilemap_set_scrollx( m62_background, 0, m62_background_hscroll-2 );
 
 	tilemap_draw( bitmap, cliprect, m62_background, 0, 0 );
 	draw_sprites( screen->machine, bitmap, cliprect, 0x1f, 0x00, 0x00 );
