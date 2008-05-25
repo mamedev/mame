@@ -97,7 +97,7 @@ static const UINT8 default_eeprom[128] =
 };
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -111,15 +111,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( overdriv )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
-			EEPROM_set_data(default_eeprom,sizeof(default_eeprom));
+			eeprom_set_data(default_eeprom,sizeof(default_eeprom));
 	}
 }
 
@@ -129,7 +129,7 @@ static READ16_HANDLER( eeprom_r )
 
 //logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
-	res = (EEPROM_read_bit() << 6) | input_port_read_indexed(machine,0);
+	res = (eeprom_read_bit() << 6) | input_port_read_indexed(machine,0);
 
 	return res;
 }
@@ -142,9 +142,9 @@ static WRITE16_HANDLER( eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
 		/* bit 2 is cs (active low) */
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

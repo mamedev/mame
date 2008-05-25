@@ -584,12 +584,6 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static CUSTOM_INPUT( eeprom_bit_r )
-{
-	return EEPROM_read_bit();
-}
-
-
 static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0x1f/2;
@@ -664,9 +658,9 @@ static void common_io_chip_w(running_machine *machine, int which, offs_t offset,
 		case 0x06/2:
 			if (which == 0)
 			{
-				EEPROM_write_bit(data & 0x80);
-				EEPROM_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				EEPROM_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(data & 0x80);
+				eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 /*            coin_lockout_w(1 + 2*which, data & 0x08);
             coin_lockout_w(0 + 2*which, data & 0x04);*/
@@ -681,9 +675,9 @@ static void common_io_chip_w(running_machine *machine, int which, offs_t offset,
 			else
 			{
 				/* multi-32 EEPROM access */
-				EEPROM_write_bit(data & 0x80);
-				EEPROM_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-				EEPROM_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(data & 0x80);
+				eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 
@@ -1161,15 +1155,15 @@ static WRITE8_HANDLER( sound_dummy_w )
 static NVRAM_HANDLER( system32 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else if (system32_default_eeprom != NULL)
-			EEPROM_set_data(system32_default_eeprom, 0x80);
+			eeprom_set_data(system32_default_eeprom, 0x80);
 	}
 }
 

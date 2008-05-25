@@ -38,16 +38,16 @@ static UINT32 *mainram;
 
 static READ32_HANDLER( port2_r )
 {
-	return (EEPROM_read_bit() << 23) | (input_port_read_indexed(machine, 2) & ~(1<<23));
+	return (eeprom_read_bit() << 23) | (input_port_read_indexed(machine, 2) & ~(1<<23));
 }
 
 static WRITE32_HANDLER( eeprom_w )
 {
 	// data & 0x80000 -> video disabled?
 
-	EEPROM_write_bit(data & 0x40000);
-	EEPROM_set_cs_line((data & 0x10000) ? CLEAR_LINE : ASSERT_LINE );
-	EEPROM_set_clock_line((data & 0x20000) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_write_bit(data & 0x40000);
+	eeprom_set_cs_line((data & 0x10000) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_clock_line((data & 0x20000) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE32_HANDLER( limenko_coincounter_w )

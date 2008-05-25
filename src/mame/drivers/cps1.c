@@ -352,7 +352,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 ********************************************************************/
 
 #ifndef MESS
-static const struct EEPROM_interface qsound_eeprom_interface =
+static const eeprom_interface qsound_eeprom_interface =
 {
 	7,		/* address bits */
 	8,		/* data bits */
@@ -361,7 +361,7 @@ static const struct EEPROM_interface qsound_eeprom_interface =
 	"0111"	/* erase command */
 };
 
-static const struct EEPROM_interface pang3_eeprom_interface =
+static const eeprom_interface pang3_eeprom_interface =
 {
 	6,		/* address bits */
 	16,		/* data bits */
@@ -373,33 +373,33 @@ static const struct EEPROM_interface pang3_eeprom_interface =
 static NVRAM_HANDLER( qsound )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&qsound_eeprom_interface);
+		eeprom_init(&qsound_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
 }
 
 static NVRAM_HANDLER( pang3 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&pang3_eeprom_interface);
+		eeprom_init(&pang3_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
 }
 #endif
 
 READ16_HANDLER( cps1_eeprom_port_r )
 {
-	return EEPROM_read_bit();
+	return eeprom_read_bit();
 }
 
 WRITE16_HANDLER( cps1_eeprom_port_w )
@@ -411,9 +411,9 @@ WRITE16_HANDLER( cps1_eeprom_port_w )
         bit 6 = clock
         bit 7 = cs
         */
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

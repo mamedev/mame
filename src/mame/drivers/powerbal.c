@@ -27,7 +27,7 @@ static int bg_yoffset;
 static int xoffset;
 static int yoffset;
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -44,26 +44,26 @@ static NVRAM_HANDLER( magicstk )
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
 		{
 			UINT8 init[128];
 			memset(init,0,128);
-			EEPROM_set_data(init,128);
+			eeprom_set_data(init,128);
 		}
 	}
 }
 
 static READ16_HANDLER( magicstk_port2_r )
 {
-	return (input_port_read_indexed(machine, 2) & 0xfe) | EEPROM_read_bit();
+	return (input_port_read_indexed(machine, 2) & 0xfe) | eeprom_read_bit();
 }
 
 static WRITE16_HANDLER( magicstk_coin_eeprom_w )
@@ -72,9 +72,9 @@ static WRITE16_HANDLER( magicstk_coin_eeprom_w )
 	{
 		coin_counter_w(0,data & 0x20);
 
-		EEPROM_set_cs_line((data & 8) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_write_bit(data & 2);
-		EEPROM_set_clock_line((data & 4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line((data & 8) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(data & 2);
+		eeprom_set_clock_line((data & 4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

@@ -698,7 +698,7 @@ static INTERRUPT_GEN( cps2_interrupt )
  *
  *************************************/
 
-static const struct EEPROM_interface cps2_eeprom_interface =
+static const eeprom_interface cps2_eeprom_interface =
 {
 	6,		/* address bits */
 	16,		/* data bits */
@@ -710,19 +710,14 @@ static const struct EEPROM_interface cps2_eeprom_interface =
 static NVRAM_HANDLER( cps2 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-        EEPROM_init(&cps2_eeprom_interface);
+        eeprom_init(&cps2_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
-}
-
-static CUSTOM_INPUT( cps2_eeprom_port_r )
-{
-    return EEPROM_read_bit();
 }
 
 static WRITE16_HANDLER( cps2_eeprom_port_w )
@@ -739,9 +734,9 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
 	/* EEPROM */
-	EEPROM_write_bit(data & 0x1000);
-	EEPROM_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
-	EEPROM_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_write_bit(data & 0x1000);
+	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -955,7 +950,7 @@ static INPUT_PORTS_START( cps2 )
     PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 
     PORT_START_TAG("IN2")      /* IN2 (0x20) */
-    PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cps2_eeprom_port_r, NULL)
+    PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
     PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
     PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )

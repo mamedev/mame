@@ -116,7 +116,7 @@ static READ32_HANDLER( superchs_input_r )
 	{
 		case 0x00:
 			return (input_port_read_indexed(machine,0) << 16) | input_port_read_indexed(machine,1) |
-				  (EEPROM_read_bit() << 7);
+				  (eeprom_read_bit() << 7);
 
 		case 0x01:
 			return coin_word<<16;
@@ -149,9 +149,9 @@ static WRITE32_HANDLER( superchs_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				EEPROM_write_bit(data & 0x40);
-				EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(data & 0x40);
+				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 
@@ -374,7 +374,7 @@ static MACHINE_RESET( superchs )
 	f3_68681_reset();
 }
 
-static const struct EEPROM_interface superchs_eeprom_interface =
+static const eeprom_interface superchs_eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -399,15 +399,15 @@ static const UINT8 default_eeprom[128]={
 static NVRAM_HANDLER( superchs )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&superchs_eeprom_interface);
+		eeprom_init(&superchs_eeprom_interface);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
-			EEPROM_set_data(default_eeprom,128);  /* Default the wheel setup values */
+			eeprom_set_data(default_eeprom,128);  /* Default the wheel setup values */
 	}
 }
 

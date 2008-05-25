@@ -164,7 +164,7 @@ WRITE16_HANDLER( wrally2_coin_w )
 
 ***************************************************************************/
 
-static const struct EEPROM_interface gaelco2_eeprom_interface =
+static const eeprom_interface gaelco2_eeprom_interface =
 {
 	8,				/* address bits */
 	16,				/* data bits */
@@ -180,11 +180,11 @@ static const struct EEPROM_interface gaelco2_eeprom_interface =
 NVRAM_HANDLER( gaelco2 )
 {
 	if (read_or_write){
-		EEPROM_save(file);
+		eeprom_save(file);
 	} else {
-		EEPROM_init(&gaelco2_eeprom_interface);
+		eeprom_init(&gaelco2_eeprom_interface);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 	}
 }
 
@@ -193,25 +193,25 @@ READ16_HANDLER( gaelco2_eeprom_r )
 	/* bit 6 is EEPROM data (DOUT) */
 	/* bit 7 is EEPROM ready */
 	/* bits 0-5, COINSW, STARTSW & Service */
-	return (1 << 7) | (EEPROM_read_bit() << 6) | (input_port_read_indexed(machine, 2) & 0x3f);
+	return (1 << 7) | (eeprom_read_bit() << 6) | (input_port_read_indexed(machine, 2) & 0x3f);
 }
 
 WRITE16_HANDLER( gaelco2_eeprom_cs_w )
 {
 	/* bit 0 is CS (active low) */
-	EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_HANDLER( gaelco2_eeprom_sk_w )
 {
 	/* bit 0 is SK (active high) */
-	EEPROM_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_HANDLER( gaelco2_eeprom_data_w )
 {
 	/* bit 0 is EEPROM data (DIN) */
-	EEPROM_write_bit(data & 0x01);
+	eeprom_write_bit(data & 0x01);
 }
 
 /***************************************************************************

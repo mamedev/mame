@@ -428,7 +428,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				UINT32 data = EEPROM_read_bit() & 1;
+				UINT32 data = eeprom_read_bit() & 1;
 				data |= input_port_read_indexed(machine, 0) & 0xfe;
 				r |= data << 24;
 			}
@@ -484,9 +484,9 @@ static WRITE32_HANDLER ( jc_control_w )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				EEPROM_set_clock_line(((data >> 24) & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-				EEPROM_write_bit(((data >> 24) & 0x04) ? 1 : 0);
-				EEPROM_set_cs_line(((data >> 24) & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line(((data >> 24) & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(((data >> 24) & 0x04) ? 1 : 0);
+				eeprom_set_cs_line(((data >> 24) & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			}
 			return;
 		}

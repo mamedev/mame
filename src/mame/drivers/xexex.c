@@ -85,7 +85,7 @@ static int suspension_active, resume_trigger;
 static emu_timer *dmadelay_timer;
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -99,15 +99,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( xexex )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -207,7 +207,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
-	res = EEPROM_read_bit() | input_port_read_indexed(machine,1);
+	res = eeprom_read_bit() | input_port_read_indexed(machine,1);
 
 	if (init_eeprom_count)
 	{
@@ -227,9 +227,9 @@ static void parse_control2(void)
 	/* bit 6  is enable irq 5 */
 	/* bit 11 is watchdog */
 
-	EEPROM_write_bit(cur_control2 & 0x01);
-	EEPROM_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(cur_control2 & 0x01);
+	eeprom_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 8 = enable sprite ROM reading */
 	K053246_set_OBJCHA_line((cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);

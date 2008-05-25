@@ -217,7 +217,7 @@ ADDRESS_MAP_END
 static READ32_HANDLER( zeropnt2_coins_r )			{ return (input_port_read(machine, "IN0") << 16) | 0xffff; }
 static READ32_HANDLER( zeropnt2_dsw1_r )			{ return (input_port_read(machine, "DSW1") << 16) | 0xffff; }
 static READ32_HANDLER( zeropnt2_dsw2_r )			{ return (input_port_read(machine, "DSW2") << 16) | 0xffff; }
-static READ32_HANDLER( zeropnt2_buttons_r )			{ return ((input_port_read(machine, "IN7") | ((EEPROM_read_bit() & 0x01) << 7)) << 16) | 0xffff; }
+static READ32_HANDLER( zeropnt2_buttons_r )			{ return ((input_port_read(machine, "IN7") | ((eeprom_read_bit() & 0x01) << 7)) << 16) | 0xffff; }
 
 static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(machine,0,0xffff)-0x0800) << 16; }
 static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(machine,0,0xffff)+0x0800) << 16; }
@@ -262,13 +262,13 @@ static WRITE32_HANDLER( zeropnt2_eeprom_w )
 	if ( ACCESSING_BITS_24_31 )
 	{
 		// latch the bit
-		EEPROM_write_bit(data & 0x04000000);
+		eeprom_write_bit(data & 0x04000000);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -642,7 +642,7 @@ static MACHINE_RESET( unico )
 }
 
 
-static const struct EEPROM_interface zeropnt2_eeprom_interface =
+static const eeprom_interface zeropnt2_eeprom_interface =
 {
 	7,				// address bits 7
 	8,				// data bits    8
@@ -658,11 +658,11 @@ static const struct EEPROM_interface zeropnt2_eeprom_interface =
 static NVRAM_HANDLER( zeropnt2 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&zeropnt2_eeprom_interface);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&zeropnt2_eeprom_interface);
+		if (file)	eeprom_load(file);
 	}
 }
 

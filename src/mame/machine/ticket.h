@@ -28,6 +28,9 @@ READ8_HANDLER( ticket_dispenser_r );
 READ8_HANDLER( ticket_dispenser_0_r );
 READ8_HANDLER( ticket_dispenser_1_r );
 
+CUSTOM_INPUT( ticket_dispenser_0_port_r );
+CUSTOM_INPUT( ticket_dispenser_1_port_r );
+
 
 /***************************************************************************
   ticket_dispenser_w

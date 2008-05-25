@@ -97,7 +97,7 @@ static WRITE16_HANDLER( coinctrl_w )
 
 ***************************************************************************/
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -114,19 +114,19 @@ static NVRAM_HANDLER( wbeachvl )
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
 		{
 			UINT8 init[128];
 			memset(init,0,128);
-			EEPROM_set_data(init,128);
+			eeprom_set_data(init,128);
 		}
 	}
 }
@@ -135,7 +135,7 @@ static READ16_HANDLER( wbeachvl_port0_r )
 {
 	int bit;
 
-	bit = EEPROM_read_bit() << 7;
+	bit = eeprom_read_bit() << 7;
 
 	return (input_port_read_indexed(machine, 0) & 0x7f) | bit;
 }
@@ -144,7 +144,7 @@ static READ16_HANDLER( hotmind_port2_r )
 {
 	int bit;
 
-	bit = EEPROM_read_bit() << 7;
+	bit = eeprom_read_bit() << 7;
 
 	return (input_port_read_indexed(machine, 2) & 0x7f) | bit;
 }
@@ -160,9 +160,9 @@ static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
 		coin_counter_w(3,data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		EEPROM_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_write_bit(data & 0x80);
-		EEPROM_set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(data & 0x80);
+		eeprom_set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -172,9 +172,9 @@ static WRITE16_HANDLER( hotmind_coin_eeprom_w )
 	{
 		coin_counter_w(0,data & 0x20);
 
-		EEPROM_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_write_bit(data & 4);
-		EEPROM_set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(data & 4);
+		eeprom_set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

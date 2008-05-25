@@ -194,7 +194,7 @@ static const UINT8 lethalen_default_eeprom[48] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 };
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,			/* address bits */
 	8,			/* data bits */
@@ -208,20 +208,20 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( lethalen )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
 			init_eeprom_count = 10;
-			EEPROM_set_data(lethalen_default_eeprom,48);
+			eeprom_set_data(lethalen_default_eeprom,48);
 
 		}
 	}
@@ -229,7 +229,7 @@ static NVRAM_HANDLER( lethalen )
 
 static READ8_HANDLER( control2_r )
 {
-	return 0x02 | EEPROM_read_bit() | (input_port_read_indexed(machine, 1) & 0xf0);
+	return 0x02 | eeprom_read_bit() | (input_port_read_indexed(machine, 1) & 0xf0);
 }
 
 static WRITE8_HANDLER( control2_w )
@@ -244,9 +244,9 @@ static WRITE8_HANDLER( control2_w )
 
 	cur_control2 = data;
 
-	EEPROM_write_bit(cur_control2 & 0x01);
-	EEPROM_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(cur_control2 & 0x01);
+	eeprom_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(lethalen_interrupt)

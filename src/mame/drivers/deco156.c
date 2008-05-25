@@ -152,7 +152,7 @@ static VIDEO_UPDATE( wcvol95 )
 
 static READ32_HANDLER(hvysmsh_eeprom_r)
 {
-	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 1)<<16);
 }
 
 static WRITE32_HANDLER(hvysmsh_eeprom_w)
@@ -161,9 +161,9 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 
 		OKIM6295_set_bank_base(1, 0x40000 * (data & 0x7) );
 
-		EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_write_bit(data & 0x10);
-		EEPROM_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x10);
+		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -195,15 +195,15 @@ static WRITE32_HANDLER(hvysmsh_oki_1_w)
 
 static READ32_HANDLER(wcvol95_eeprom_r)
 {
-	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | ((input_port_read_indexed(machine, 1)&0xff)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 0) | ((input_port_read_indexed(machine, 1)&0xff)<<16);
 }
 
 static WRITE32_HANDLER(wcvol95_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_write_bit(data & 0x1);
-		EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x1);
+		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

@@ -365,12 +365,12 @@ static NVRAM_HANDLER( ssv )
 static NVRAM_HANDLER( gdfs )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 		else
 		{
 			/* Set the EEPROM to Factory Defaults */
@@ -491,7 +491,7 @@ static UINT16 *gdfs_blitram;
 
 static READ16_HANDLER( gdfs_eeprom_r )
 {
-	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read_indexed(machine, 5 + gdfs_lightgun_select)) | (EEPROM_read_bit() << 8);
+	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read_indexed(machine, 5 + gdfs_lightgun_select)) | (eeprom_read_bit() << 8);
 }
 
 static WRITE16_HANDLER( gdfs_eeprom_w )
@@ -507,13 +507,13 @@ static WRITE16_HANDLER( gdfs_eeprom_w )
 //      data & 0x0001 ?
 
 		// latch the bit
-		EEPROM_write_bit(data & 0x4000);
+		eeprom_write_bit(data & 0x4000);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
 		if (!(data_old & 0x0800) && (data & 0x0800))	// rising clock
 			gdfs_lightgun_select = (data & 0x0300) >> 8;

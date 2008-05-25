@@ -57,7 +57,7 @@ static int init_eeprom_count;
 static int rng_z80_control;
 static int rng_sound_status;
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,			/* address bits */
 	8,			/* data bits */
@@ -71,15 +71,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( rungun )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -124,7 +124,7 @@ static READ16_HANDLER( rng_sysregs_r )
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = input_port_read_indexed(machine, 1) | EEPROM_read_bit();
+				data = input_port_read_indexed(machine, 1) | eeprom_read_bit();
 
 				if (init_eeprom_count)
 				{
@@ -147,18 +147,18 @@ static WRITE16_HANDLER( rng_sysregs_w )
 	{
 		case 0x08/2:
 			/*
-                bit0  : EEPROM_write_bit
-                bit1  : EEPROM_set_cs_line
-                bit2  : EEPROM_set_clock_line
+                bit0  : eeprom_write_bit
+                bit1  : eeprom_set_cs_line
+                bit2  : eeprom_set_clock_line
                 bit3  : coin counter?
                 bit7  : set before massive memory writes
                 bit10 : IRQ5 ACK
             */
 			if (ACCESSING_BITS_0_7)
 			{
-				EEPROM_write_bit((data & 0x01) ? 1 : 0);
-				EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-				EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit((data & 0x01) ? 1 : 0);
+				eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			}
 
 			if (!(data & 0x40))

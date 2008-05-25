@@ -138,7 +138,7 @@ static VIDEO_UPDATE( hangplt )
 /******************************************************************/
 
 /* 93C56 EEPROM */
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	8,				/* address bits */
 	16,				/* data bits */
@@ -157,15 +157,15 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 	{
 		if (file)
 		{
-			EEPROM_save(file);
+			eeprom_save(file);
 		}
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
@@ -180,7 +180,7 @@ static void eeprom_handler(mame_file *file, int read_or_write)
 				eepdata[0x5] = 0x72;
 			}
 
-			EEPROM_set_data(eepdata, 0x200);
+			eeprom_set_data(eepdata, 0x200);
 		}
 	}
 }
@@ -311,7 +311,7 @@ static READ32_HANDLER( sysreg_r )
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (EEPROM_read_bit() << 1);
+			UINT32 eeprom_bit = (eeprom_read_bit() << 1);
 			UINT32 adc_bit = (adc1038_do_r() << 2);
 			r |= (eeprom_bit | adc_bit) << 24;
 		}
@@ -338,9 +338,9 @@ static WRITE32_HANDLER( sysreg_w )
 		}
 		if( ACCESSING_BITS_0_7 )
 		{
-			EEPROM_write_bit((data & 0x01) ? 1 : 0);
-			EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom_write_bit((data & 0x01) ? 1 : 0);
+			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 		}
 	}
 	if( offset == 1 )

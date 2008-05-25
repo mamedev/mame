@@ -117,7 +117,7 @@ static int mlc_raster_table[9][256];
 
 static READ32_HANDLER( avengrs_control_r )
 {
-	return (input_port_read_indexed(machine, 1)<<16) | (EEPROM_read_bit()<<23) | input_port_read_indexed(machine, 0);
+	return (input_port_read_indexed(machine, 1)<<16) | (eeprom_read_bit()<<23) | input_port_read_indexed(machine, 0);
 }
 
 static READ32_HANDLER(test2_r)
@@ -145,9 +145,9 @@ static WRITE32_HANDLER( avengrs_eprom_w )
 	if (ACCESSING_BITS_8_15) {
 		UINT8 ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
-			EEPROM_set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-			EEPROM_write_bit(ebyte & 0x1);
-			EEPROM_set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom_set_clock_line((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_write_bit(ebyte & 0x1);
+			eeprom_set_cs_line((ebyte & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 //      }
 	}
 	else if (ACCESSING_BITS_0_7) {

@@ -55,7 +55,7 @@ static READ32_HANDLER( f3_control_r )
 	switch (offset)
 	{
 		case 0x0: /* MSW: Test switch, coins, eeprom access, LSW: Player Buttons, Start, Tilt, Service */
-			e=EEPROM_read_bit();
+			e=eeprom_read_bit();
 			e=e|(e<<8);
 			return ((e | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<8))<<16) /* top byte may be mirror of bottom byte??  see bubblem */
 					| input_port_read_indexed(machine, 1);
@@ -98,9 +98,9 @@ static WRITE32_HANDLER( f3_control_w )
 			return;
 		case 0x04: /* Eeprom */
 			if (ACCESSING_BITS_0_7) {
-				EEPROM_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-				EEPROM_write_bit(data & 0x04);
-				EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(data & 0x04);
+				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			}
 			return;
 		case 0x05:	/* Player 3 & 4 coin counters */
@@ -408,7 +408,7 @@ static MACHINE_RESET( f3 )
 static NVRAM_HANDLER( taito_f3 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
 		static const UINT8 recalh_eeprom[128] =	{
@@ -424,13 +424,13 @@ static NVRAM_HANDLER( taito_f3 )
 
 		// RecalH does not initialise it's eeprom on first boot, so we provide one.
 		// Same applies to gseeker.
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else if (f3_game==RECALH)
-			EEPROM_set_data(recalh_eeprom,128);
+			eeprom_set_data(recalh_eeprom,128);
 		else if (f3_game==GSEEKER)
-			EEPROM_set_data(recalh_eeprom,128);
+			eeprom_set_data(recalh_eeprom,128);
 	}
 }
 

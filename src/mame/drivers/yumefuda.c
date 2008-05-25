@@ -139,9 +139,9 @@ static WRITE8_HANDLER( prot_lock_w )
 
 static WRITE8_HANDLER( eeprom_w )
 {
-	EEPROM_write_bit(data & 0x04);
-	EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(data & 0x04);
+	eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( port_c0_w )
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( port_c0_w )
 
 static READ8_HANDLER( eeprom_r )
 {
-	return ((~EEPROM_read_bit()&0x01)<<6) | (0xff&~0x40);
+	return ((~eeprom_read_bit()&0x01)<<6) | (0xff&~0x40);
 }
 
 static UINT8 mux_data;

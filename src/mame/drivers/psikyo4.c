@@ -160,7 +160,7 @@ static GFXDECODE_START( ps4 )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0x000, 0x80 ) // 8bpp tiles
 GFXDECODE_END
 
-static const struct EEPROM_interface eeprom_interface_93C56 =
+static const eeprom_interface eeprom_interface_93C56 =
 {
 	8,		// address bits 8
 	8,		// data bits    8
@@ -177,21 +177,21 @@ static NVRAM_HANDLER(93C56)
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C56);
+		eeprom_init(&eeprom_interface_93C56);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else	// these games want the eeprom all zeros by default
 		{
 			int length;
 			UINT8 *dat;
 
-			dat = EEPROM_get_data_pointer(&length);
+			dat = eeprom_get_data_pointer(&length);
 			memset(dat, 0, length);
 		}
 	}
@@ -201,9 +201,9 @@ static WRITE32_HANDLER( ps4_eeprom_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		EEPROM_write_bit((data & 0x00200000) ? 1 : 0);
-		EEPROM_set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit((data & 0x00200000) ? 1 : 0);
+		eeprom_set_cs_line((data & 0x00800000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -215,7 +215,7 @@ static READ32_HANDLER( ps4_eeprom_r )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return ((EEPROM_read_bit() << 20)); /* EEPROM */
+		return ((eeprom_read_bit() << 20)); /* EEPROM */
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);

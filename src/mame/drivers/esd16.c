@@ -131,7 +131,7 @@ static READ16_HANDLER( esd_eeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return ((EEPROM_read_bit() & 0x01) << 15);
+		return ((eeprom_read_bit() & 0x01) << 15);
 	}
 
 //  logerror("(0x%06x) unk EEPROM read: %04x\n", activecpu_get_pc(), mem_mask);
@@ -143,13 +143,13 @@ static WRITE16_HANDLER( esd_eeprom_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		// data line
-		EEPROM_write_bit((data & 0x0400) >> 6);
+		eeprom_write_bit((data & 0x0400) >> 6);
 
 		// clock line asserted.
-		EEPROM_set_clock_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE );
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x0100) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line((data & 0x0100) ? CLEAR_LINE : ASSERT_LINE );
 	}
 
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", activecpu_get_pc(), data, mem_mask);

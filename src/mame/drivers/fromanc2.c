@@ -174,7 +174,7 @@ static READ16_HANDLER( fromanc2_input_r )
 	cflag = (((fromanc2_subcpu_int_flag & 1) << 4) |
 			 ((fromanc2_subcpu_nmi_flag & 1) << 6) |
 			 ((fromanc2_sndcpu_nmi_flag & 1) << 5));
-	eeprom = (EEPROM_read_bit() & 1) << 7;		// EEPROM DATA
+	eeprom = (eeprom_read_bit() & 1) << 7;		// EEPROM DATA
 	coinsw = input_port_read_indexed(machine, 0) & 0x030f;			// COIN, TEST
 
 	return (cflag | eeprom | coinsw);
@@ -185,7 +185,7 @@ static READ16_HANDLER( fromanc4_input_r )
 	UINT16 cflag, coinsw, eeprom;
 
 	cflag = (fromanc2_sndcpu_nmi_flag & 1) << 5;
-	eeprom = (EEPROM_read_bit() & 1) << 7;		// EEPROM DATA
+	eeprom = (eeprom_read_bit() & 1) << 7;		// EEPROM DATA
 	coinsw = input_port_read_indexed(machine, 0) & 0x001f;			// COIN, TEST
 
 	return (cflag | eeprom | coinsw);
@@ -195,13 +195,13 @@ static WRITE16_HANDLER( fromanc2_eeprom_w )
 {
 	if (ACCESSING_BITS_8_15) {
 		// latch the bit
-		EEPROM_write_bit(data & 0x0100);
+		eeprom_write_bit(data & 0x0100);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x0400) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line((data & 0x0400) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_clock_line((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -211,13 +211,13 @@ static WRITE16_HANDLER( fromancr_eeprom_w )
 		fromancr_gfxbank_w(data & 0xfff8);
 
 		// latch the bit
-		EEPROM_write_bit(data & 0x0001);
+		eeprom_write_bit(data & 0x0001);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x0004) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line((data & 0x0004) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -225,13 +225,13 @@ static WRITE16_HANDLER( fromanc4_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7) {
 		// latch the bit
-		EEPROM_write_bit(data & 0x0004);
+		eeprom_write_bit(data & 0x0004);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

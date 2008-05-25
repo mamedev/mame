@@ -23,7 +23,7 @@ WRITE16_HANDLER( asterix_spritebank_w );
 static UINT8 cur_control2;
 static int init_eeprom_count;
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -37,7 +37,7 @@ static const struct EEPROM_interface eeprom_interface =
 #if 0
 static void eeprom_init(void)
 {
-	EEPROM_init(&eeprom_interface);
+	eeprom_init(&eeprom_intf);
 	init_eeprom_count = 0;
 }
 #endif
@@ -45,15 +45,15 @@ static void eeprom_init(void)
 static NVRAM_HANDLER( asterix )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -67,7 +67,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 8  is EEPROM data */
 	/* bit 9  is EEPROM ready */
 	/* bit 10 is service button */
-	res = (EEPROM_read_bit()<<8) | input_port_read_indexed(machine,1);
+	res = (eeprom_read_bit()<<8) | input_port_read_indexed(machine,1);
 
 	if (init_eeprom_count)
 	{
@@ -96,9 +96,9 @@ static WRITE16_HANDLER( control2_w )
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
 
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 5 is select tile bank */
 		K056832_set_tile_bank((data & 0x20) >> 5);

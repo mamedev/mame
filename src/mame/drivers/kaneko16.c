@@ -320,13 +320,13 @@ static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 
 static READ8_HANDLER( kaneko16_eeprom_r )
 {
-	return EEPROM_read_bit() & 1;
+	return eeprom_read_bit() & 1;
 }
 
 static WRITE8_HANDLER( kaneko16_eeprom_reset_w )
 {
 	// reset line asserted: reset.
-	EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static WRITE16_HANDLER( kaneko16_eeprom_w )
@@ -334,13 +334,13 @@ static WRITE16_HANDLER( kaneko16_eeprom_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		EEPROM_write_bit(data & 0x02);
+		eeprom_write_bit(data & 0x02);
 
 		// reset line asserted: reset.
-//      EEPROM_set_cs_line((data & 0x00) ? CLEAR_LINE : ASSERT_LINE );
+//      eeprom_set_cs_line((data & 0x00) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 	}
 
 	if (ACCESSING_BITS_8_15)

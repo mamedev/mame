@@ -81,6 +81,16 @@ READ8_HANDLER( ticket_dispenser_1_r )
 	return dispenser[1].status;
 }
 
+CUSTOM_INPUT( ticket_dispenser_0_port_r )
+{
+	return dispenser[0].status ? 1 : 0;
+}
+
+CUSTOM_INPUT( ticket_dispenser_1_port_r )
+{
+	return dispenser[1].status ? 1 : 0;
+}
+
 /***************************************************************************
   ticket_dispenser_w
 ***************************************************************************/

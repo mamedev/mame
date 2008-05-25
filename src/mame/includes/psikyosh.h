@@ -10,7 +10,7 @@ VIDEO_START( psikyosh );
 VIDEO_UPDATE( psikyosh );
 VIDEO_EOF( psikyosh );
 
-enum { EEPROM_0=0, EEPROM_DEFAULT=1, EEPROM_DARAKU, EEPROM_S1945III, EEPROM_DRAGNBLZ, EEPROM_GNBARICH, EEPROM_USER1, EEPROM_MJGTASTE };
+enum { eeprom_0=0, eeprom_DEFAULT=1, eeprom_DARAKU, eeprom_S1945III, eeprom_DRAGNBLZ, eeprom_GNBARICH, eeprom_USER1, eeprom_MJGTASTE };
 
 /* Psikyo PS6406B */
 #define FLIPSCREEN (((psikyosh_vidregs[3] & 0x0000c000) == 0x0000c000) ? 1:0)

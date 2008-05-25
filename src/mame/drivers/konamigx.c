@@ -465,15 +465,15 @@ static int init_eeprom_count;
 static NVRAM_HANDLER(konamigx_93C46)
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -489,7 +489,7 @@ static READ32_HANDLER( eeprom_r )
 	//      excpuint stat, objdma stat, eeprom do
 
 	// note: racin' force expects bit 1 of the eeprom port to toggle
-	return(input_port_read_indexed(machine, 6)<<24 | input_port_read_indexed(machine, 7)<<16 | input_port_read_indexed(machine, 0)<<8 | EEPROM_read_bit() | gx_rdport1_3);
+	return(input_port_read_indexed(machine, 6)<<24 | input_port_read_indexed(machine, 7)<<16 | input_port_read_indexed(machine, 0)<<8 | eeprom_read_bit() | gx_rdport1_3);
 }
 
 static WRITE32_HANDLER( eeprom_w )
@@ -510,9 +510,9 @@ static WRITE32_HANDLER( eeprom_w )
           bit 0: eeprom data
         */
 
-		EEPROM_write_bit((odata&0x01) ? 1 : 0);
-		EEPROM_set_cs_line((odata&0x02) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((odata&0x04) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit((odata&0x01) ? 1 : 0);
+		eeprom_set_cs_line((odata&0x02) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((odata&0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 		konamigx_wrport1_0 = odata;
 	}

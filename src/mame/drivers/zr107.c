@@ -191,7 +191,7 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= ((adc083x_sars_read(0) << 5) | (EEPROM_read_bit() << 4)) << 24;
+			r |= ((adc083x_sars_read(0) << 5) | (eeprom_read_bit() << 4)) << 24;
 		}
 	}
 	//mame_printf_debug("sysreg_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
@@ -212,9 +212,9 @@ static WRITE32_HANDLER( sysreg_w )
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			EEPROM_write_bit((data & 0x1) ? 1 : 0);
-			EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-			EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+			eeprom_write_bit((data & 0x1) ? 1 : 0);
+			eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 
 			if (data & 0x10)
 				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);

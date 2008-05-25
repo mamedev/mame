@@ -256,7 +256,7 @@ static const UINT8 default_eeprom[128]=
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-static const struct EEPROM_interface undrfire_eeprom_interface =
+static const eeprom_interface undrfire_eeprom_interface =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -270,13 +270,13 @@ static const struct EEPROM_interface undrfire_eeprom_interface =
 static NVRAM_HANDLER( undrfire )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else {
-		EEPROM_init(&undrfire_eeprom_interface);
+		eeprom_init(&undrfire_eeprom_interface);
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
-			EEPROM_set_data(default_eeprom,128);  /* Default the gun setup values */
+			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
 	}
 }
 
@@ -292,7 +292,7 @@ static READ32_HANDLER( undrfire_input_r )
 		case 0x00:
 		{
 			return (input_port_read_indexed(machine,0) << 16) | input_port_read_indexed(machine,1) |
-				  (EEPROM_read_bit() << 7) | frame_counter;
+				  (eeprom_read_bit() << 7) | frame_counter;
 		}
 
 		case 0x01:
@@ -317,9 +317,9 @@ static WRITE32_HANDLER( undrfire_input_w )
 
 			if (ACCESSING_BITS_0_7)
 			{
-				EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				EEPROM_write_bit(data & 0x40);
-				EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_write_bit(data & 0x40);
+				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				return;
 			}
 

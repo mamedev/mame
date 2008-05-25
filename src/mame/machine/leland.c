@@ -672,7 +672,7 @@ void ataxx_bankswitch(void)
 
 void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type)
 {
-	static const struct EEPROM_interface eeprom_interface =
+	static const eeprom_interface eeprom_intf =
 	{
 		6,
 		16,
@@ -752,7 +752,7 @@ void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offs
 		}
 	}
 
-	EEPROM_init(&eeprom_interface);
+	eeprom_init(&eeprom_intf);
 }
 
 
@@ -765,7 +765,7 @@ void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offs
 
 void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset)
 {
-	static const struct EEPROM_interface eeprom_interface =
+	static const eeprom_interface eeprom_intf =
 	{
 		7,
 		16,
@@ -829,7 +829,7 @@ void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offse
 		eeprom_data[0x7f * 2 + 0] = (sum >> 8) & 0xff;
 		eeprom_data[0x7f * 2 + 1] = sum & 0xff;
 
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 	}
 }
 
@@ -845,7 +845,7 @@ READ8_HANDLER( ataxx_eeprom_r )
 {
 	int port = input_port_read_indexed(machine, 2);
 	if (LOG_EEPROM) logerror("%04X:EE read\n", safe_activecpu_get_pc());
-	return (port & ~0x01) | EEPROM_read_bit();
+	return (port & ~0x01) | eeprom_read_bit();
 }
 
 
@@ -853,9 +853,9 @@ WRITE8_HANDLER( ataxx_eeprom_w )
 {
 	if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_activecpu_get_pc(),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-	EEPROM_write_bit     ((data & 0x10) >> 4);
-	EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-	EEPROM_set_cs_line  ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit     ((data & 0x10) >> 4);
+	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line  ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -896,17 +896,17 @@ NVRAM_HANDLER( leland )
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 		mame_fwrite(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
 	}
 	else if (file)
 	{
-		EEPROM_load(file);
+		eeprom_load(file);
 		mame_fread(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
 	}
 	else
 	{
-		EEPROM_set_data(eeprom_data, 64*2);
+		eeprom_set_data(eeprom_data, 64*2);
 		memset(battery_ram, 0x00, LELAND_BATTERY_RAM_SIZE);
 	}
 }
@@ -916,17 +916,17 @@ NVRAM_HANDLER( ataxx )
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 		mame_fwrite(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
 	}
 	else if (file)
 	{
-		EEPROM_load(file);
+		eeprom_load(file);
 		mame_fread(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
 	}
 	else
 	{
-		EEPROM_set_data(eeprom_data, 128*2);
+		eeprom_set_data(eeprom_data, 128*2);
 		memset(battery_ram, 0x00, LELAND_BATTERY_RAM_SIZE);
 	}
 }
@@ -1170,7 +1170,7 @@ READ8_HANDLER( leland_master_input_r )
 		case 0x11:	/* /GIN1 */
 			result = input_port_read_indexed(machine, 3);
 			if (LOG_EEPROM) logerror("%04X:EE read\n", safe_activecpu_get_pc());
-			result = (result & ~0x01) | EEPROM_read_bit();
+			result = (result & ~0x01) | eeprom_read_bit();
 			break;
 
 		default:
@@ -1193,9 +1193,9 @@ WRITE8_HANDLER( leland_master_output_w )
 
 			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_activecpu_get_pc(),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
-			EEPROM_write_bit     ((data & 0x10) >> 4);
-			EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-			EEPROM_set_cs_line  ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_write_bit     ((data & 0x10) >> 4);
+			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+			eeprom_set_cs_line  ((~data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		case 0x0a:	/* /OGIA */

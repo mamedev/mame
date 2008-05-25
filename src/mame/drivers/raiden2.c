@@ -1927,15 +1927,15 @@ static const UINT8 r2_v33_default_eeprom_type1[32] =
 static NVRAM_HANDLER( rdx_v33 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 		else
 		{
-			EEPROM_set_data(r2_v33_default_eeprom_type1,32);
+			eeprom_set_data(r2_v33_default_eeprom_type1,32);
 		}
 	}
 }
@@ -1945,9 +1945,9 @@ static WRITE16_HANDLER( rdx_v33_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		EEPROM_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_write_bit(data & 0x20);
-		EEPROM_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x20);
+		eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		if (data&0xc7) logerror("eeprom_w extra bits used %04x\n",data);
 	}
@@ -1959,7 +1959,7 @@ static WRITE16_HANDLER( rdx_v33_eeprom_w )
 
 static READ16_HANDLER( rdx_v33_eeprom_r )
 {
-	return input_port_read_indexed(machine, 0) | (EEPROM_read_bit()<<4);
+	return input_port_read_indexed(machine, 0) | (eeprom_read_bit()<<4);
 }
 
 

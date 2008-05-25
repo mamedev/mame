@@ -455,7 +455,7 @@ static WRITE16_HANDLER( ssriders_protection_w )
 static int init_eeprom_count;
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -469,15 +469,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( eeprom )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -507,7 +507,7 @@ static READ16_HANDLER( blswhstl_eeprom_r )
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
-	res = EEPROM_read_bit() | input_port_read_indexed(machine,3);
+	res = eeprom_read_bit() | input_port_read_indexed(machine,3);
 	return res;
 }
 
@@ -520,7 +520,7 @@ static READ16_HANDLER( ssriders_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = EEPROM_read_bit() | input_port_read_indexed(machine,3);
+	res = eeprom_read_bit() | input_port_read_indexed(machine,3);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -539,7 +539,7 @@ static READ16_HANDLER( sunsetbl_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
-	res = EEPROM_read_bit() | input_port_read_indexed(machine,3);
+	res = eeprom_read_bit() | input_port_read_indexed(machine,3);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -556,16 +556,16 @@ static WRITE16_HANDLER( blswhstl_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
 WRITE16_HANDLER( ssriders_eeprom_w );	/* in video/tmnt.c */
 
 
-static const struct EEPROM_interface thndrx2_eeprom_interface =
+static const eeprom_interface thndrx2_eeprom_interface =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -579,15 +579,15 @@ static const struct EEPROM_interface thndrx2_eeprom_interface =
 static NVRAM_HANDLER( thndrx2 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&thndrx2_eeprom_interface);
+		eeprom_init(&thndrx2_eeprom_interface);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -616,7 +616,7 @@ static READ16_HANDLER( thndrx2_eeprom_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = (EEPROM_read_bit() << 8) | input_port_read_indexed(machine,1);
+	res = (eeprom_read_bit() << 8) | input_port_read_indexed(machine,1);
 	toggle ^= 0x0800;
 	return (res ^ toggle);
 }
@@ -630,9 +630,9 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (last == 0 && (data & 0x20) != 0)
@@ -663,7 +663,7 @@ static READ16_HANDLER( prmrsocr_eeprom_r )
 {
 	/* bit 8 is EEPROM data */
 	/* bit 9 is EEPROM ready */
-	return (EEPROM_read_bit() << 8) | input_port_read_indexed(machine,1);
+	return (eeprom_read_bit() << 8) | input_port_read_indexed(machine,1);
 }
 
 static WRITE16_HANDLER( prmrsocr_eeprom_w )
@@ -678,9 +678,9 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 		/* bit 8 is data */
 		/* bit 9 is cs (active low) */
 		/* bit 10 is clock (active high) */
-		EEPROM_write_bit(data & 0x0100);
-		EEPROM_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x0100);
+		eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

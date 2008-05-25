@@ -200,7 +200,7 @@ static VIDEO_UPDATE( darkhors )
 
 ***************************************************************************/
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,				// address bits 7
 	8,				// data bits    8
@@ -217,24 +217,18 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( darkhors )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 		else
 		{
 			// Set the EEPROM to Factory Defaults
-			EEPROM_set_data(memory_region(REGION_USER1),(1<<7));
+			eeprom_set_data(memory_region(REGION_USER1),(1<<7));
 		}
 	}
-}
-
-static READ32_HANDLER( darkhors_eeprom_r )
-{
-	// bit 31?
-	return input_port_read_indexed(machine, 4) | ((EEPROM_read_bit() & 1) << (7+16));
 }
 
 static WRITE32_HANDLER( darkhors_eeprom_w )
@@ -245,13 +239,13 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 	if ( ACCESSING_BITS_24_31 )
 	{
 		// latch the bit
-		EEPROM_write_bit(data & 0x04000000);
+		eeprom_write_bit(data & 0x04000000);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line((data & 0x01000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -315,7 +309,7 @@ static WRITE32_HANDLER( darkhors_unk1_w )
 static ADDRESS_MAP_START( darkhors_readmem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ( SMH_ROM					)
 	AM_RANGE(0x400000, 0x41ffff) AM_READ( SMH_RAM					)
-	AM_RANGE(0x4e0080, 0x4e0083) AM_READ( darkhors_eeprom_r			)
+	AM_RANGE(0x4e0080, 0x4e0083) AM_READ( input_port_4_dword_r		)
 	AM_RANGE(0x580000, 0x580003) AM_READ( input_port_0_dword_r		)
 	AM_RANGE(0x580004, 0x580007) AM_READ( input_port_1_dword_r		)
 	AM_RANGE(0x580008, 0x58000b) AM_READ( darkhors_input_sel_r		)
@@ -390,7 +384,7 @@ static INPUT_PORTS_START( darkhors )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW,  IPT_SERVICE  ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1) // test
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// door 1
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// door 2
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// eeprom
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x01000000, IP_ACTIVE_LOW,  IPT_START1   )	// start
 	PORT_BIT( 0x02000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Payout") PORT_CODE(KEYCODE_LCONTROL)	// payout
 	PORT_BIT( 0x04000000, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("P1 Cancel") PORT_CODE(KEYCODE_LALT)		// cancel

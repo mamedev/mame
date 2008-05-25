@@ -490,21 +490,21 @@ static NVRAM_HANDLER(93C46_gundamex)
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
 			int length;
 			UINT8 *dat;
 
-			dat = EEPROM_get_data_pointer(&length);
+			dat = eeprom_get_data_pointer(&length);
 			dat[0]=0x70;
 			dat[1]=0x08;
 		}
@@ -513,14 +513,14 @@ static NVRAM_HANDLER(93C46_gundamex)
 
 static READ16_HANDLER( gundamex_eeprom_r )
 {
-	return ((EEPROM_read_bit() & 1)) << 3;
+	return ((eeprom_read_bit() & 1)) << 3;
 }
 
 static WRITE16_HANDLER( gundamex_eeprom_w )
 {
-		EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_write_bit(data & 0x1);
-		EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x1);
+		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( gundamex_readmem, ADDRESS_SPACE_PROGRAM, 16 )

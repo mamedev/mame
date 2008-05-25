@@ -157,7 +157,7 @@ static READ16_HANDLER( inufuku_eeprom_r )
 	UINT16 inputport;
 
 	soundflag = pending_command ? 0x0000 : 0x0080;	// bit7
-	eeprom = (EEPROM_read_bit() & 1) << 6;			// bit6
+	eeprom = (eeprom_read_bit() & 1) << 6;			// bit6
 	inputport = input_port_read_indexed(machine, 4) & 0xff3f;			// bit5-0
 
 	return (soundflag | eeprom | inputport);
@@ -166,13 +166,13 @@ static READ16_HANDLER( inufuku_eeprom_r )
 static WRITE16_HANDLER( inufuku_eeprom_w )
 {
 	// latch the bit
-	EEPROM_write_bit(data & 0x0800);
+	eeprom_write_bit(data & 0x0800);
 
 	// reset line asserted: reset.
-	EEPROM_set_cs_line((data & 0x2000) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_cs_line((data & 0x2000) ? CLEAR_LINE : ASSERT_LINE);
 
 	// clock line asserted: write latch or select next bit to read
-	EEPROM_set_clock_line((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_clock_line((data & 0x1000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -67,7 +67,7 @@ static int coin_counter_bit = 0;
 #include "eolithsp.h"
 
 // It's configured for 512 bytes
-static const struct EEPROM_interface eeprom_interface_93C66 =
+static const eeprom_interface eeprom_interface_93C66 =
 {
 	9,				// address bits 9
 	8,				// data bits    8
@@ -83,11 +83,11 @@ static const struct EEPROM_interface eeprom_interface_93C66 =
 static NVRAM_HANDLER( eolith )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C66);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&eeprom_interface_93C66);
+		if (file)	eeprom_load(file);
 	}
 }
 
@@ -104,7 +104,7 @@ static READ32_HANDLER( eolith_custom_r )
     */
 	eolith_speedup_read();
 
-	return (input_port_read_indexed(machine, 0) & ~0x308) | (EEPROM_read_bit() << 3) | (mame_rand(machine) & 0x300);
+	return (input_port_read_indexed(machine, 0) & ~0x308) | (eeprom_read_bit() << 3) | (mame_rand(machine) & 0x300);
 }
 
 static WRITE32_HANDLER( systemcontrol_w )
@@ -113,9 +113,9 @@ static WRITE32_HANDLER( systemcontrol_w )
 	coin_counter_w(0, data & coin_counter_bit);
 	set_led_status(0, data & 1);
 
-	EEPROM_write_bit(data & 0x08);
-	EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(data & 0x08);
+	eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 0x100 and 0x040 ?
 }

@@ -10874,7 +10874,7 @@ static UINT32 ReadData(CheatAction * action)
 					int		length;
 					UINT8	* buf;
 
-					buf = EEPROM_get_data_pointer(&length);
+					buf = eeprom_get_data_pointer(&length);
 
 					if(IsAddressInRange(action, length))
 						return DoMemoryRead(buf, action->address, bytes, swapBytes, &rawCPUInfo);
@@ -10988,7 +10988,7 @@ static void WriteData(CheatAction * action, UINT32 data)
 					int		length;
 					UINT8	* buf;
 
-					buf = EEPROM_get_data_pointer(&length);
+					buf = eeprom_get_data_pointer(&length);
 
 					if(IsAddressInRange(action, length))
 						DoMemoryWrite(data, buf, action->address, bytes, swapBytes, &rawCPUInfo);

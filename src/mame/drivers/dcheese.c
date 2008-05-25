@@ -126,15 +126,9 @@ static MACHINE_START( dcheese )
  *
  *************************************/
 
-static READ16_HANDLER( port_0_r )
+static CUSTOM_INPUT( sound_latch_state_r )
 {
-	return (input_port_read_indexed(machine, 0) & 0xff7f) | (EEPROM_read_bit() << 7);
-}
-
-
-static READ16_HANDLER( port_2_r )
-{
-	return (input_port_read_indexed(machine, 2) & 0xff1f) | (!soundlatch_full << 7) | (ticket_dispenser_r(machine, 0) >> 2);
+	return soundlatch_full;
 }
 
 
@@ -144,9 +138,9 @@ static WRITE16_HANDLER( eeprom_control_w )
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		EEPROM_set_cs_line(~data & 8);
-		EEPROM_write_bit(data & 2);
-		EEPROM_set_clock_line(data & 4);
+		eeprom_set_cs_line(~data & 8);
+		eeprom_write_bit(data & 2);
+		eeprom_set_clock_line(data & 4);
 		ticket_dispenser_w(machine, 0, (data & 1) << 7);
 	}
 }
@@ -222,9 +216,9 @@ static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(port_0_r, watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(input_port_0_word_r, watchdog_reset16_w)
 	AM_RANGE(0x220000, 0x220001) AM_READWRITE(input_port_1_word_r, madmax_blitter_color_w)
-	AM_RANGE(0x240000, 0x240001) AM_READWRITE(port_2_r, eeprom_control_w)
+	AM_RANGE(0x240000, 0x240001) AM_READWRITE(input_port_2_word_r, eeprom_control_w)
 	AM_RANGE(0x260000, 0x26001f) AM_WRITE(madmax_blitter_xparam_w)
 	AM_RANGE(0x280000, 0x28001f) AM_WRITE(madmax_blitter_yparam_w)
 	AM_RANGE(0x2a0000, 0x2a003f) AM_READWRITE(madmax_blitter_vidparam_r, madmax_blitter_vidparam_w)
@@ -265,7 +259,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )		/* says tilt */
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )			/* says test */
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )		/* EEPROM data */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )		/* bump left */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )		/* bump right */
@@ -279,9 +273,9 @@ static INPUT_PORTS_START( dcheese )
 
 	PORT_START	/* 240000 */
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* ticket status */
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, NULL)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* main->sound buffer status (1=empty) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -312,7 +306,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )		/* EEPROM data */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x1f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 )		/* button */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 )		/* ticket */
@@ -325,7 +319,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* ticket status */
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* main->sound buffer status (1=empty) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -355,7 +349,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL )		/* EEPROM data */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x1f00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -367,7 +361,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* ticket status */
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* main->sound buffer status (1=empty) */
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )

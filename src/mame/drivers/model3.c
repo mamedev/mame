@@ -917,7 +917,7 @@ static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap
 /*****************************************************************************/
 
 /* this is a 93C46 but with reset delay that is needed by Lost World */
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -933,11 +933,11 @@ static const struct EEPROM_interface eeprom_interface =
 static void eeprom_handler(mame_file *file,int read_or_write)
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&eeprom_intf);
+		if (file)	eeprom_load(file);
 	}
 }
 
@@ -1057,7 +1057,7 @@ static READ64_HANDLER( model3_ctrl_r )
 			else if (ACCESSING_BITS_24_31)
 			{
 				if(model3_controls_bank & 0x1) {
-					eeprom_bit = EEPROM_read_bit() << 5;
+					eeprom_bit = eeprom_read_bit() << 5;
 					return ((input_port_read_indexed(machine, 1) & ~0x20) | eeprom_bit) << 24;
 				}
 				else {
@@ -1127,9 +1127,9 @@ static WRITE64_HANDLER( model3_ctrl_w )
 			if (ACCESSING_BITS_56_63)
 			{
 				int reg = (data >> 56) & 0xff;
-				EEPROM_write_bit((reg & 0x20) ? 1 : 0);
-				EEPROM_set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-				EEPROM_set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_write_bit((reg & 0x20) ? 1 : 0);
+				eeprom_set_clock_line((reg & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_cs_line((reg & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 				model3_controls_bank = reg & 0xff;
 			}
 			return;

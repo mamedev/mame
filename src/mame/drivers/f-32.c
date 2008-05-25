@@ -45,22 +45,22 @@ static WRITE32_HANDLER( ym2151_register_32bit_w )
 
 static READ32_HANDLER( eeprom_r )
 {
-	return EEPROM_read_bit();
+	return eeprom_read_bit();
 }
 
 static WRITE32_HANDLER( eeprom_bit_w )
 {
-	EEPROM_write_bit(data & 0x01);
+	eeprom_write_bit(data & 0x01);
 }
 
 static WRITE32_HANDLER( eeprom_cs_line_w )
 {
-	EEPROM_set_cs_line( (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_cs_line( (data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 static WRITE32_HANDLER( eeprom_clock_line_w )
 {
-	EEPROM_set_clock_line( (~data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_set_clock_line( (~data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

@@ -468,9 +468,9 @@ WRITE16_HANDLER( ssriders_eeprom_w )
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bits 3-4 control palette dimming */
 		/* 4 = DIMPOL = when set, negate SHAD */

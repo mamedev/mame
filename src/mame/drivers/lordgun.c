@@ -110,7 +110,7 @@ static WRITE8_HANDLER(fake2_w)
 
 static READ8_HANDLER( lordgun_eeprom_r )
 {
-	return input_port_read_indexed(machine, 0) | ((EEPROM_read_bit() & 1) << 7);
+	return input_port_read_indexed(machine, 0) | ((eeprom_read_bit() & 1) << 7);
 }
 
 static WRITE8_HANDLER( lordgun_eeprom_w )
@@ -132,13 +132,13 @@ static WRITE8_HANDLER( lordgun_eeprom_w )
 			lordgun_update_gun(machine, i);
 
 	// latch the bit
-	EEPROM_write_bit(data & 0x40);
+	eeprom_write_bit(data & 0x40);
 
 	// reset line asserted: reset.
-	EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE );
 
 	// clock line asserted: write latch or select next bit to read
-	EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE );
 
 	lordgun_whitescreen = data & 0x80;
 

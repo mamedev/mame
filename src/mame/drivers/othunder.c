@@ -323,7 +323,7 @@ static const UINT8 default_eeprom[128]=
 	0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff
 };
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -337,21 +337,21 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( othunder )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
-			EEPROM_set_data(default_eeprom,128);  /* Default the gun setup values */
+			eeprom_set_data(default_eeprom,128);  /* Default the gun setup values */
 	}
 }
 
 static int eeprom_r(void)
 {
-	return (EEPROM_read_bit() & 0x01)<<7;
+	return (eeprom_read_bit() & 0x01)<<7;
 }
 
 
@@ -378,9 +378,9 @@ static WRITE16_HANDLER( othunder_TC0220IOC_w )
 if (data & 4)
 	popmessage("OBPRI SET!");
 
-				EEPROM_write_bit(data & 0x40);
-				EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_write_bit(data & 0x40);
+				eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			default:

@@ -39,7 +39,7 @@ UINT16 xmen_current_frame;
 static int init_eeprom_count;
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -53,15 +53,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( xmen )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -76,7 +76,7 @@ logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (EEPROM_read_bit() << 6) | input_port_read_indexed(machine,2);
+	res = (eeprom_read_bit() << 6) | input_port_read_indexed(machine,2);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -93,7 +93,7 @@ logerror("%06x xmen6p_eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (EEPROM_read_bit() << 6) | input_port_read_indexed(machine,2);
+	res = (eeprom_read_bit() << 6) | input_port_read_indexed(machine,2);
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
@@ -114,9 +114,9 @@ logerror("%06x: write %04x to 108000\n",activecpu_get_pc(),data);
 		/* bit 2 is data */
 		/* bit 3 is clock (active high) */
 		/* bit 4 is cs (active low) */
-		EEPROM_write_bit(data & 0x04);
-		EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x04);
+		eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 	if (ACCESSING_BITS_8_15)
 	{

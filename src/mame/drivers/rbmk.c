@@ -87,7 +87,7 @@ static WRITE16_HANDLER( gms_write3 )
 
 static READ16_HANDLER( eeprom_r )
 {
-	return (EEPROM_read_bit() << 15)|(input_port_read_indexed(machine,3)&0x7fff);
+	return (eeprom_read_bit() << 15)|(input_port_read_indexed(machine,3)&0x7fff);
 }
 
 static WRITE16_HANDLER( eeprom_w )
@@ -95,10 +95,10 @@ static WRITE16_HANDLER( eeprom_w )
 	//bad ?
 	if( ACCESSING_BITS_0_7 )
 	{
-		EEPROM_write_bit(data & 0x04);
-		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
+		eeprom_write_bit(data & 0x04);
+		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE:ASSERT_LINE );
 
-		EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -480,17 +480,17 @@ static VIDEO_UPDATE(rbmk)
 static NVRAM_HANDLER( syf )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
-			EEPROM_set_data(memory_region(REGION_USER2),128);
+			eeprom_set_data(memory_region(REGION_USER2),128);
 		}
 	}
 }

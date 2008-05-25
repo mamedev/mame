@@ -124,7 +124,7 @@ CN1 standard DB15 VGA connector (15KHz)
 #include "machine/eeprom.h"
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -138,19 +138,19 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( pntnpuzl )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
-			EEPROM_load(file);
+			eeprom_load(file);
 		else
 		{
 			int length;
 			UINT8 *dat;
 
-			dat = EEPROM_get_data_pointer(&length);
+			dat = eeprom_get_data_pointer(&length);
 			memset(dat, 0, length);
 		}
 	}
@@ -161,7 +161,7 @@ static UINT16 pntnpuzl_eeprom;
 static READ16_HANDLER( pntnpuzl_eeprom_r )
 {
 	/* bit 11 is EEPROM data */
-	return (pntnpuzl_eeprom & 0xf4ff) | (EEPROM_read_bit()<<11) | (input_port_read_indexed(machine, 3) & 0x0300);
+	return (pntnpuzl_eeprom & 0xf4ff) | (eeprom_read_bit()<<11) | (input_port_read_indexed(machine, 3) & 0x0300);
 }
 
 static WRITE16_HANDLER( pntnpuzl_eeprom_w )
@@ -172,9 +172,9 @@ static WRITE16_HANDLER( pntnpuzl_eeprom_w )
 	/* bit 13 is clock (active high) */
 	/* bit 14 is cs (active high) */
 
-	EEPROM_write_bit(data & 0x1000);
-	EEPROM_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(data & 0x1000);
+	eeprom_set_cs_line((data & 0x4000) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -1295,7 +1295,7 @@ static const UINT8 bbakraid_unlimited_nvram[512] = {
 
 
 
-static const struct EEPROM_interface eeprom_interface_93C66 =
+static const eeprom_interface eeprom_interface_93C66 =
 {
 	/* Pin 6 of the 93C66 is connected to Gnd!
        So it's configured for 512 bytes */
@@ -1317,16 +1317,16 @@ static NVRAM_HANDLER( bbakraid )
 	/* Pin 6 of 93C66 is connected to Gnd! */
 
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C66);
+		eeprom_init(&eeprom_interface_93C66);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 		else
 		{
 			if (bbakraid_unlimited_ver == 1)
-				EEPROM_set_data(bbakraid_unlimited_nvram, sizeof(bbakraid_unlimited_nvram));
+				eeprom_set_data(bbakraid_unlimited_nvram, sizeof(bbakraid_unlimited_nvram));
 		}
 	}
 }
@@ -1341,7 +1341,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
     */
 
 	int data;
-	data  = ((EEPROM_read_bit() & 0x01) << 4);
+	data  = ((eeprom_read_bit() & 0x01) << 4);
 	data |= ((raizing_Z80_busreq >> 4) & 0x01);	/* Loop BUSRQ to BUSAK */
 
 	return data;
@@ -1356,13 +1356,13 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// chip select
-		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 
 		// latch the bit
-		EEPROM_write_bit( (data & 0x04) >> 2 );
+		eeprom_write_bit( (data & 0x04) >> 2 );
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	raizing_Z80_busreq = data & 0x10;	/* see bbakraid_nvram_r above */
 }

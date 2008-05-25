@@ -447,16 +447,16 @@ static const UINT8 kickgoal_default_eeprom_type1[128] = {
 static NVRAM_HANDLER( kickgoal )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 		else
 		{
 			if (kickgoal_default_eeprom)	/* Sane Defaults */
-				EEPROM_set_data(kickgoal_default_eeprom,kickgoal_default_eeprom_length);
+				eeprom_set_data(kickgoal_default_eeprom,kickgoal_default_eeprom_length);
 		}
 	}
 }
@@ -467,7 +467,7 @@ static READ16_HANDLER( kickgoal_eeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return EEPROM_read_bit();
+		return eeprom_read_bit();
 	}
 	return 0;
 }
@@ -480,13 +480,13 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 		switch (offset)
 		{
 			case 0:
-				EEPROM_set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
+				eeprom_set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 			case 1:
-				EEPROM_set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
+				eeprom_set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 			case 2:
-				EEPROM_write_bit(data & 0x0001);
+				eeprom_write_bit(data & 0x0001);
 				break;
 		}
 	}

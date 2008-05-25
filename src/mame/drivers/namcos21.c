@@ -1087,7 +1087,7 @@ static READ16_HANDLER( NAMCO_C139_SCI_register_r ){ return 0; }
 static ADDRESS_MAP_START( namcos21_68k_master, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
-	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_EEPROM_R) AM_WRITE(NAMCOS2_68K_EEPROM_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
+	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_eeprom_R) AM_WRITE(NAMCOS2_68K_eeprom_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
 ADDRESS_MAP_END
 
@@ -1333,7 +1333,7 @@ static WRITE16_HANDLER( winrun_dspcomram_control_w )
 static ADDRESS_MAP_START( am_master_winrun, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* work RAM */
-	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_EEPROM_R) AM_WRITE(NAMCOS2_68K_EEPROM_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
+	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_eeprom_R) AM_WRITE(NAMCOS2_68K_eeprom_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
 	AM_RANGE(0x250000, 0x25ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE( &winrun_polydata )
 	AM_RANGE(0x260000, 0x26ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unused? */
@@ -1448,7 +1448,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( driveyes_68k_master, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* private work RAM */
-	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_EEPROM_R) AM_WRITE(NAMCOS2_68K_EEPROM_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
+	AM_RANGE(0x180000, 0x183fff) AM_READ(NAMCOS2_68K_eeprom_R) AM_WRITE(NAMCOS2_68K_eeprom_W)// AM_BASE(&namcos2_eeprom) AM_SIZE(&namcos2_eeprom_size)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READ(namcos2_68k_master_C148_r) AM_WRITE(namcos2_68k_master_C148_w)
 ADDRESS_MAP_END
 

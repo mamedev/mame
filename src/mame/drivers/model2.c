@@ -425,9 +425,9 @@ static WRITE32_HANDLER(ctrl0_w)
 {
 	if(ACCESSING_BITS_0_7) {
 		model2_ctrlmode = data & 0x01;
-		EEPROM_write_bit(data & 0x20);
-		EEPROM_set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit(data & 0x20);
+		eeprom_set_clock_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -442,7 +442,7 @@ static READ32_HANDLER(ctrl0_r)
 	else
 	{
 		ret &= ~0x00300000;
-		return ret | 0x00100000 | (EEPROM_read_bit() << 21);
+		return ret | 0x00100000 | (eeprom_read_bit() << 21);
 	}
 }
 static READ32_HANDLER(ctrl1_r)

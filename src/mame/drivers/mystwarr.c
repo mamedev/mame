@@ -55,7 +55,7 @@ static UINT16 *gx_workram;
 static INT32 init_eeprom_count;
 static UINT8 mw_irq_control;
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,			/* address bits */
 	8,			/* data bits */
@@ -68,7 +68,7 @@ static const struct EEPROM_interface eeprom_interface =
 
 /* Gaiapolis and Polygonet Commanders use the ER5911,
    but the command formats are slightly different.  Why? */
-static const struct EEPROM_interface eeprom_interface_gaia =
+static const eeprom_interface eeprom_intf_gaia =
 {
 	7,			/* address bits */
 	8,			/* data bits */
@@ -82,15 +82,15 @@ static const struct EEPROM_interface eeprom_interface_gaia =
 static NVRAM_HANDLER(mystwarr)
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -100,15 +100,15 @@ static NVRAM_HANDLER(mystwarr)
 static NVRAM_HANDLER(gaiapols)
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_gaia);
+		eeprom_init(&eeprom_intf_gaia);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -119,7 +119,7 @@ static READ16_HANDLER( mweeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read_indexed(machine, 1) | EEPROM_read_bit();
+		int res = input_port_read_indexed(machine, 1) | eeprom_read_bit();
 
 		if (init_eeprom_count)
 		{
@@ -139,7 +139,7 @@ static READ16_HANDLER( vseeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read_indexed(machine, 1) | EEPROM_read_bit();
+		int res = input_port_read_indexed(machine, 1) | eeprom_read_bit();
 
 		if (init_eeprom_count)
 		{
@@ -159,9 +159,9 @@ static WRITE16_HANDLER( mweeprom_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		EEPROM_write_bit((data&0x0100) ? 1 : 0);
-		EEPROM_set_cs_line((data&0x0200) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data&0x0400) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit((data&0x0100) ? 1 : 0);
+		eeprom_set_cs_line((data&0x0200) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data&0x0400) ? ASSERT_LINE : CLEAR_LINE);
 		return;
 	}
 
@@ -173,7 +173,7 @@ static READ16_HANDLER( dddeeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return (input_port_read_indexed(machine, 1) | EEPROM_read_bit())<<8;
+		return (input_port_read_indexed(machine, 1) | eeprom_read_bit())<<8;
 	}
 
 	return input_port_read_indexed(machine, 3);
@@ -183,9 +183,9 @@ static WRITE16_HANDLER( mmeeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		EEPROM_write_bit((data&0x01) ? 1 : 0);
-		EEPROM_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit((data&0x01) ? 1 : 0);
+		eeprom_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
 		return;
 	}
 }

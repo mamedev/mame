@@ -139,7 +139,7 @@ static WRITE8_HANDLER( pang_bankswitch_w )
 
 ***************************************************************************/
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,		/* address bits */
 	16,		/* data bits */
@@ -156,18 +156,18 @@ static NVRAM_HANDLER( mitchell )
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);					/* EEPROM */
+		eeprom_save(file);					/* EEPROM */
 		if (nvram_size)	/* Super Pang, Block Block */
 			mame_fwrite(file,nvram,nvram_size);	/* NVRAM */
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);					/* EEPROM */
+			eeprom_load(file);					/* EEPROM */
 			if (nvram_size)	/* Super Pang, Block Block */
 				mame_fread(file,nvram,nvram_size);	/* NVRAM */
 		}
@@ -180,7 +180,7 @@ static READ8_HANDLER( pang_port5_r )
 {
 	int bit;
 
-	bit = EEPROM_read_bit() << 7;
+	bit = eeprom_read_bit() << 7;
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler. */
 	/* Maybe they are vblank related, but I'm not sure. */
@@ -198,17 +198,17 @@ static READ8_HANDLER( pang_port5_r )
 
 static WRITE8_HANDLER( eeprom_cs_w )
 {
-	EEPROM_set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_cs_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( eeprom_clock_w )
 {
-	EEPROM_set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line(data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( eeprom_serial_w )
 {
-	EEPROM_write_bit(data);
+	eeprom_write_bit(data);
 }
 
 

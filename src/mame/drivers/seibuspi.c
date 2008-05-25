@@ -883,9 +883,9 @@ static WRITE32_HANDLER( eeprom_w )
 	// tile banks
 	if( ACCESSING_BITS_16_23 ) {
 		rf2_set_layer_banks(data >> 16);
-		EEPROM_write_bit((data & 0x800000) ? 1 : 0);
-		EEPROM_set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_set_cs_line((data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_write_bit((data & 0x800000) ? 1 : 0);
+		eeprom_set_clock_line((data & 0x400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_cs_line((data & 0x200000) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// oki banking
@@ -930,7 +930,7 @@ static READ32_HANDLER( spi_controls1_r )
 static READ32_HANDLER( spi_controls2_r )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		return ((input_port_read_indexed(machine, 2) | 0xffffff00) & ~0x40) | (EEPROM_read_bit() << 6);
+		return ((input_port_read_indexed(machine, 2) | 0xffffff00) & ~0x40) | (eeprom_read_bit() << 6);
 	}
 	return 0xffffffff;
 }
@@ -1700,7 +1700,7 @@ static NVRAM_HANDLER( spi )
 }
 
 /* this is a 93C46 but with reset delay */
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -1716,12 +1716,12 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( sxx2f )
 {
 	if( read_or_write ) {
-		EEPROM_save(file);
+		eeprom_save(file);
 	} else {
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if(file)
-			EEPROM_load(file);
+			eeprom_load(file);
 	}
 }
 

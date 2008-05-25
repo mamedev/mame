@@ -147,7 +147,7 @@ static READ32_HANDLER( port0_r )
 
 static READ32_HANDLER( port1_r )
 {
-	return (input_port_read_indexed(machine, 1) << 16) | (EEPROM_read_bit() << 29);
+	return (input_port_read_indexed(machine, 1) << 16) | (eeprom_read_bit() << 29);
 }
 
 
@@ -180,9 +180,9 @@ static WRITE32_HANDLER( control_w )
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
 	{
-		EEPROM_write_bit(data & 0x00800000);
-		EEPROM_set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x00800000);
+		eeprom_set_cs_line((data & 0x00200000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x00400000) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* toggling BSMT off then on causes a reset */
@@ -269,7 +269,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static const struct EEPROM_interface eeprom_interface_policetr =
+static const eeprom_interface eeprom_interface_policetr =
 {
 	8,				// address bits 8
 	16,				// data bits    16
@@ -284,11 +284,11 @@ static const struct EEPROM_interface eeprom_interface_policetr =
 static NVRAM_HANDLER( policetr )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_policetr);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&eeprom_interface_policetr);
+		if (file)	eeprom_load(file);
 	}
 }
 

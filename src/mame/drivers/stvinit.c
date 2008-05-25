@@ -146,16 +146,16 @@ static int stv_default_eeprom_length;
 NVRAM_HANDLER( stv )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 
-		if (file) EEPROM_load(file);
+		if (file) eeprom_load(file);
 		else
 		{
 			if (stv_default_eeprom)	/* Set the EEPROM to Factory Defaults */
-				EEPROM_set_data(stv_default_eeprom,stv_default_eeprom_length);
+				eeprom_set_data(stv_default_eeprom,stv_default_eeprom_length);
 		}
 	}
 }

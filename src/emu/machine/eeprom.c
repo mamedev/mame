@@ -7,7 +7,7 @@
 #define SERIAL_BUFFER_LENGTH 40
 #define MEMORY_SIZE 1024
 
-static const struct EEPROM_interface *intf;
+static const eeprom_interface *intf;
 
 static int serial_count;
 static UINT8 serial_buffer[SERIAL_BUFFER_LENGTH];
@@ -20,7 +20,7 @@ static int locked;
 static int reset_delay;
 
 /*
-    EEPROM_command_match:
+    eeprom_command_match:
 
     Try to match the first (len) digits in the EEPROM serial buffer
     string (*buf) with  an EEPROM command string (*cmd).
@@ -35,7 +35,7 @@ static int reset_delay;
 
     Note: (cmd) may be NULL. Return 0 (no match) in this case.
 */
-static int EEPROM_command_match(const char *buf, const char *cmd, int len)
+static int eeprom_command_match(const char *buf, const char *cmd, int len)
 {
 	if ( cmd == 0 )	return 0;
 	if ( len == 0 )	return 0;
@@ -77,7 +77,7 @@ static int EEPROM_command_match(const char *buf, const char *cmd, int len)
 }
 
 
-const struct EEPROM_interface eeprom_interface_93C46 =
+const eeprom_interface eeprom_interface_93C46 =
 {
 	6,				// address bits 6
 	16,				// data bits    16
@@ -91,7 +91,7 @@ const struct EEPROM_interface eeprom_interface_93C46 =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-const struct EEPROM_interface eeprom_interface_93C66B =
+const eeprom_interface eeprom_interface_93C66B =
 {
 	8,				/* address bits */
 	16,				/* data bits */
@@ -108,26 +108,26 @@ const struct EEPROM_interface eeprom_interface_93C66B =
 NVRAM_HANDLER( 93C46 )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&eeprom_interface_93C46);
+		if (file)	eeprom_load(file);
 	}
 }
 
 NVRAM_HANDLER( 93C66B )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C66B);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&eeprom_interface_93C66B);
+		if (file)	eeprom_load(file);
 	}
 }
 
-void EEPROM_init(const struct EEPROM_interface *interface)
+void eeprom_init(const eeprom_interface *interface)
 {
 	intf = interface;
 
@@ -159,7 +159,7 @@ void EEPROM_init(const struct EEPROM_interface *interface)
 	state_save_register_global(eeprom_read_address);
 }
 
-static void EEPROM_write(int bit)
+static void eeprom_write(int bit)
 {
 	LOG(("EEPROM write bit %d\n",bit));
 
@@ -173,7 +173,7 @@ static void EEPROM_write(int bit)
 	serial_buffer[serial_count] = 0;	/* nul terminate so we can treat it as a string */
 
 	if ( (serial_count > intf->address_bits) &&
-	      EEPROM_command_match((char*)serial_buffer,intf->cmd_read,strlen((char*)serial_buffer)-intf->address_bits) )
+	      eeprom_command_match((char*)serial_buffer,intf->cmd_read,strlen((char*)serial_buffer)-intf->address_bits) )
 	{
 		int i,address;
 
@@ -194,7 +194,7 @@ static void EEPROM_write(int bit)
 logerror("EEPROM read %04x from address %02x\n",eeprom_data_bits,address);
 	}
 	else if ( (serial_count > intf->address_bits) &&
-	           EEPROM_command_match((char*)serial_buffer,intf->cmd_erase,strlen((char*)serial_buffer)-intf->address_bits) )
+	           eeprom_command_match((char*)serial_buffer,intf->cmd_erase,strlen((char*)serial_buffer)-intf->address_bits) )
 	{
 		int i,address;
 
@@ -220,7 +220,7 @@ logerror("Error: EEPROM is locked\n");
 		serial_count = 0;
 	}
 	else if ( (serial_count > (intf->address_bits + intf->data_bits)) &&
-	           EEPROM_command_match((char*)serial_buffer,intf->cmd_write,strlen((char*)serial_buffer)-(intf->address_bits + intf->data_bits)) )
+	           eeprom_command_match((char*)serial_buffer,intf->cmd_write,strlen((char*)serial_buffer)-(intf->address_bits + intf->data_bits)) )
 	{
 		int i,address,data;
 
@@ -251,13 +251,13 @@ logerror("EEPROM write %04x to address %02x\n",data,address);
 logerror("Error: EEPROM is locked\n");
 		serial_count = 0;
 	}
-	else if ( EEPROM_command_match((char*)serial_buffer,intf->cmd_lock,strlen((char*)serial_buffer)) )
+	else if ( eeprom_command_match((char*)serial_buffer,intf->cmd_lock,strlen((char*)serial_buffer)) )
 	{
 logerror("EEPROM lock\n");
 		locked = 1;
 		serial_count = 0;
 	}
-	else if ( EEPROM_command_match((char*)serial_buffer,intf->cmd_unlock,strlen((char*)serial_buffer)) )
+	else if ( eeprom_command_match((char*)serial_buffer,intf->cmd_unlock,strlen((char*)serial_buffer)) )
 	{
 logerror("EEPROM unlock\n");
 		locked = 0;
@@ -265,7 +265,7 @@ logerror("EEPROM unlock\n");
 	}
 }
 
-static void EEPROM_reset(void)
+static void eeprom_reset(void)
 {
 if (serial_count)
 	logerror("EEPROM reset, buffer = %s\n",serial_buffer);
@@ -276,13 +276,13 @@ if (serial_count)
 }
 
 
-void EEPROM_write_bit(int bit)
+void eeprom_write_bit(int bit)
 {
 	LOG(("write bit %d\n",bit));
 	latch = bit;
 }
 
-int EEPROM_read_bit(void)
+int eeprom_read_bit(void)
 {
 	int res;
 
@@ -305,16 +305,21 @@ int EEPROM_read_bit(void)
 	return res;
 }
 
-void EEPROM_set_cs_line(int state)
+CUSTOM_INPUT( eeprom_bit_r )
+{
+	return eeprom_read_bit();
+}
+
+void eeprom_set_cs_line(int state)
 {
 	LOG(("set reset line %d\n",state));
 	reset_line = state;
 
 	if (reset_line != CLEAR_LINE)
-		EEPROM_reset();
+		eeprom_reset();
 }
 
-void EEPROM_set_clock_line(int state)
+void eeprom_set_clock_line(int state)
 {
 	LOG(("set clock line %d\n",state));
 	if (state == PULSE_LINE || (clock_line == CLEAR_LINE && state != CLEAR_LINE))
@@ -337,7 +342,7 @@ logerror("EEPROM read %04x from address %02x\n",eeprom_data_bits,eeprom_read_add
 				eeprom_clock_count++;
 			}
 			else
-				EEPROM_write(latch);
+				eeprom_write(latch);
 		}
 	}
 
@@ -345,22 +350,22 @@ logerror("EEPROM read %04x from address %02x\n",eeprom_data_bits,eeprom_read_add
 }
 
 
-void EEPROM_load(mame_file *f)
+void eeprom_load(mame_file *f)
 {
 	mame_fread(f,eeprom_data,(1 << intf->address_bits) * intf->data_bits / 8);
 }
 
-void EEPROM_save(mame_file *f)
+void eeprom_save(mame_file *f)
 {
 	mame_fwrite(f,eeprom_data,(1 << intf->address_bits) * intf->data_bits / 8);
 }
 
-void EEPROM_set_data(const UINT8 *data, int length)
+void eeprom_set_data(const UINT8 *data, int length)
 {
 	memcpy(eeprom_data, data, length);
 }
 
-UINT8 * EEPROM_get_data_pointer(int * length)
+UINT8 * eeprom_get_data_pointer(int * length)
 {
 	if(length)
 		*length = MEMORY_SIZE;

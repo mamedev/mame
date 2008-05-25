@@ -86,16 +86,16 @@ WRITE16_HANDLER( stlforce_bg_videoram_w );
 
 static READ16_HANDLER( stlforce_input_port_1_r )
 {
-	return (input_port_read_indexed(machine, 1) & ~0x40) | (EEPROM_read_bit() << 6);
+	return (input_port_read_indexed(machine, 1) & ~0x40) | (eeprom_read_bit() << 6);
 }
 
 static WRITE16_HANDLER( eeprom_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		EEPROM_write_bit(data & 0x01);
-		EEPROM_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
-		EEPROM_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_write_bit(data & 0x01);
+		eeprom_set_cs_line((data & 0x02) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_clock_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
@@ -223,17 +223,17 @@ static const UINT8 twinbrat_default_eeprom[128] = {
 static NVRAM_HANDLER( stlforce )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 		{
-			EEPROM_set_data(default_eeprom,128);
+			eeprom_set_data(default_eeprom,128);
 		}
 	}
 }

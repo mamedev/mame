@@ -649,14 +649,14 @@ static NVRAM_HANDLER( naomi_eeproms )
 	static UINT8 eeprom_romboard[20+48] = {0x19,0x00,0xaa,0x55,0,0,0,0,0,0,0,0,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d};
 
 	if (read_or_write)
-		/*EEPROM_save(file)*/;
+		/*eeprom_save(file)*/;
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C46);
+		eeprom_init(&eeprom_interface_93C46);
 		/*if (file)
-            EEPROM_load(file);
+            eeprom_load(file);
         else*/
-		EEPROM_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
+		eeprom_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
 		x76f100_init( 0, eeprom_romboard );
 		memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);
 	}
@@ -667,7 +667,7 @@ static READ64_HANDLER( eeprom_93c46a_r )
 	int res;
 
 	/* bit 3 is EEPROM data */
-	res = EEPROM_read_bit() << 4;
+	res = eeprom_read_bit() << 4;
 	return res;
 }
 
@@ -676,9 +676,9 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 	/* bit 4 is data */
 	/* bit 2 is clock */
 	/* bit 5 is cs */
-	EEPROM_write_bit(data & 0x8);
-	EEPROM_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(data & 0x8);
+	eeprom_set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )

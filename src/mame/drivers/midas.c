@@ -180,7 +180,7 @@ static VIDEO_UPDATE( livequiz )
 
 static READ16_HANDLER( livequiz_eeprom_r )
 {
-	return input_port_read_indexed(machine, 2) | (EEPROM_read_bit() << 3);
+	return input_port_read_indexed(machine, 2) | (eeprom_read_bit() << 3);
 }
 
 static WRITE16_HANDLER( livequiz_eeprom_w )
@@ -188,13 +188,13 @@ static WRITE16_HANDLER( livequiz_eeprom_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		// latch the bit
-		EEPROM_write_bit(data & 0x04);
+		eeprom_write_bit(data & 0x04);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

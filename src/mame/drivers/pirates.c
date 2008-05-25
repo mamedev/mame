@@ -103,7 +103,7 @@ VIDEO_UPDATE(pirates);
 
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	6,				/* address bits */
 	16,				/* data bits */
@@ -116,11 +116,11 @@ static const struct EEPROM_interface eeprom_interface =
 
 static NVRAM_HANDLER( pirates )
 {
-	if (read_or_write) EEPROM_save(file);
+	if (read_or_write) eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
-		if (file) EEPROM_load(file);
+		eeprom_init(&eeprom_intf);
+		if (file) eeprom_load(file);
 	}
 }
 
@@ -129,9 +129,9 @@ static WRITE16_HANDLER( pirates_out_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-2 control EEPROM */
-		EEPROM_write_bit(data & 0x04);
-		EEPROM_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x04);
+		eeprom_set_cs_line((data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
 		OKIM6295_set_bank_base(0, (data & 0x40) ? 0x40000 : 0x00000);
@@ -170,7 +170,7 @@ static READ16_HANDLER( pirates_in1_r )
 		bit = 1;
 
 	/* bit 4 is EEPROM data, bit 7 is protection */
-	return input_port_read_indexed(machine,1) | (EEPROM_read_bit() << 4) | (bit << 7);
+	return input_port_read_indexed(machine,1) | (eeprom_read_bit() << 4) | (bit << 7);
 }
 
 

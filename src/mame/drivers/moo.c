@@ -60,7 +60,7 @@ static UINT16 protram[16];
 static UINT16 cur_control2;
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,			/* address bits */
 	8,			/* data bits */
@@ -74,15 +74,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( moo )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 10;
@@ -97,7 +97,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
 	/* bits 4-7 are DIP switches */
-	res = EEPROM_read_bit() | input_port_read_indexed(machine, 1);
+	res = eeprom_read_bit() | input_port_read_indexed(machine, 1);
 
 	if (init_eeprom_count)
 	{
@@ -125,9 +125,9 @@ static WRITE16_HANDLER( control2_w )
 
 	COMBINE_DATA(&cur_control2);
 
-	EEPROM_write_bit(cur_control2 & 0x01);
-	EEPROM_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(cur_control2 & 0x01);
+	eeprom_set_cs_line((cur_control2 & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((cur_control2 & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x100)
 	{

@@ -311,7 +311,7 @@ static WRITE16_HANDLER(reg_e80000_w)
 
 static READ16_HANDLER( eeprom_r )
 {
-	 return ((EEPROM_read_bit() & 0x01) << 11);
+	 return ((eeprom_read_bit() & 0x01) << 11);
 }
 
 
@@ -339,9 +339,9 @@ static WRITE16_HANDLER( eeprom_w )
 {
 	if ( ACCESSING_BITS_8_15 )
 	{
-		EEPROM_write_bit(data & 0x0800);
-		EEPROM_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
-		EEPROM_set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
+		eeprom_write_bit(data & 0x0800);
+		eeprom_set_cs_line((data & 0x0200) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_clock_line((data & 0x0400) ? CLEAR_LINE: ASSERT_LINE );
 	}
 }
 

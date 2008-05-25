@@ -138,33 +138,28 @@ static NVRAM_HANDLER( konamigv_93C46 )
 {
 	if( read_or_write )
 	{
-		EEPROM_save( file );
+		eeprom_save( file );
 	}
 	else
 	{
-		EEPROM_init( &eeprom_interface_93C46 );
+		eeprom_init( &eeprom_interface_93C46 );
 
 		if( file )
 		{
-			EEPROM_load( file );
+			eeprom_load( file );
 		}
 		else
 		{
-			EEPROM_set_data( memory_region( REGION_USER2 ), memory_region_length( REGION_USER2 ) );
+			eeprom_set_data( memory_region( REGION_USER2 ), memory_region_length( REGION_USER2 ) );
 		}
 	}
-}
-
-static CUSTOM_INPUT( eeprom_bit_r )
-{
-	return EEPROM_read_bit();
 }
 
 static WRITE32_HANDLER( eeprom_w )
 {
-	EEPROM_write_bit((data&0x01) ? 1 : 0);
-	EEPROM_set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
-	EEPROM_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_write_bit((data&0x01) ? 1 : 0);
+	eeprom_set_clock_line((data&0x04) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line((data&0x02) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( mb89371_w )

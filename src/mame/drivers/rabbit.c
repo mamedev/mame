@@ -450,7 +450,7 @@ static READ32_HANDLER( rabbit_input_r )
 
 	rv = (input_port_read_indexed(machine, 1)<<16)|(input_port_read_indexed(machine, 0));
 	rv &= ~1;
-	rv |= EEPROM_read_bit();	// as per code at 4d932
+	rv |= eeprom_read_bit();	// as per code at 4d932
 	return rv;
 }
 
@@ -460,7 +460,7 @@ static READ32_HANDLER( tmmjprd_input_r )
 
 	rv = (input_port_read_indexed(machine, 1)<<16)|(input_port_read_indexed(machine, 0));
 	rv &= ~0x80;
-	rv |= (EEPROM_read_bit()<<7);	// as per code at 778
+	rv |= (eeprom_read_bit()<<7);	// as per code at 778
 	return rv;
 }
 
@@ -725,13 +725,13 @@ static WRITE32_HANDLER( rabbit_eeprom_write )
 	if (mem_mask == 0xff000000)
 	{
 		// latch the bit
-		EEPROM_write_bit(data & 0x01000000);
+		eeprom_write_bit(data & 0x01000000);
 
 		// reset line asserted: reset.
-		EEPROM_set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
+		eeprom_set_cs_line((data & 0x04000000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

@@ -457,7 +457,7 @@ ADDRESS_MAP_END
 
 // NVRAM
 
-static const struct EEPROM_interface galgames_eeprom_interface =
+static const eeprom_interface galgames_eeprom_interface =
 {
 	10,					// address bits 10
 	8,					// data bits    8
@@ -472,7 +472,7 @@ static const struct EEPROM_interface galgames_eeprom_interface =
 
 static READ16_HANDLER( galgames_eeprom_r )
 {
-	return EEPROM_read_bit() ? 0x80 : 0x00;
+	return eeprom_read_bit() ? 0x80 : 0x00;
 }
 
 static WRITE16_HANDLER( galgames_eeprom_w )
@@ -483,21 +483,21 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 	if ( ACCESSING_BITS_0_7 )
 	{
 		// latch the bit
-		EEPROM_write_bit(data & 0x0001);
+		eeprom_write_bit(data & 0x0001);
 
 		// clock line asserted: write latch or select next bit to read
-		EEPROM_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
+		eeprom_set_clock_line((data & 0x0002) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
 static NVRAM_HANDLER( galgames )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&galgames_eeprom_interface);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&galgames_eeprom_interface);
+		if (file)	eeprom_load(file);
 	}
 }
 
@@ -548,7 +548,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 
 	// 7 resets the eeprom
 	if (ACCESSING_BITS_0_7)
-		EEPROM_set_cs_line(((data&0xff) == 0x07) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_set_cs_line(((data&0xff) == 0x07) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ16_HANDLER( galgames_cart_clock_r )

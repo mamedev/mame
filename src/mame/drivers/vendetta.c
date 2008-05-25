@@ -112,7 +112,7 @@ VIDEO_UPDATE( vendetta );
 static int init_eeprom_count;
 
 
-static const struct EEPROM_interface eeprom_interface =
+static const eeprom_interface eeprom_intf =
 {
 	7,				/* address bits */
 	8,				/* data bits */
@@ -126,15 +126,15 @@ static const struct EEPROM_interface eeprom_interface =
 static NVRAM_HANDLER( vendetta )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface);
+		eeprom_init(&eeprom_intf);
 
 		if (file)
 		{
 			init_eeprom_count = 0;
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else
 			init_eeprom_count = 1000;
@@ -145,7 +145,7 @@ static READ8_HANDLER( vendetta_eeprom_r )
 {
 	int res;
 
-	res = EEPROM_read_bit();
+	res = eeprom_read_bit();
 
 	res |= 0x02;//konami_eeprom_ack() << 5; /* add the ack */
 
@@ -176,9 +176,9 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 		return;
 
 	/* EEPROM */
-	EEPROM_write_bit(data & 0x20);
-	EEPROM_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
-	EEPROM_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_write_bit(data & 0x20);
+	eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 	irq_enabled = ( data >> 6 ) & 1;
 

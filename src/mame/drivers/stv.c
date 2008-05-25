@@ -521,7 +521,7 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 		return_data = input_port_read_indexed(machine, 0);
 
 	if (offset == 0x77)//PDR2 read
-		return_data=  (0xfe | EEPROM_read_bit());
+		return_data=  (0xfe | eeprom_read_bit());
 
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read_indexed(machine, 7);
@@ -545,9 +545,9 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 	if(offset == 0x75)
 	{
-		EEPROM_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_write_bit(data & 0x10);
-		EEPROM_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x10);
+		eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 
 
 //      if (data & 0x01)

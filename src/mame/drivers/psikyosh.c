@@ -318,7 +318,7 @@ static GFXDECODE_START( psikyosh )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x8, 0x000, 0x100 ) // 8bpp tiles
 GFXDECODE_END
 
-static const struct EEPROM_interface eeprom_interface_93C56 =
+static const eeprom_interface eeprom_interface_93C56 =
 {
 	8,		// address bits 8
 	8,		// data bits    8
@@ -335,24 +335,24 @@ static NVRAM_HANDLER(93C56)
 {
 	if (read_or_write)
 	{
-		EEPROM_save(file);
+		eeprom_save(file);
 	}
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C56);
+		eeprom_init(&eeprom_interface_93C56);
 		if (file)
 		{
-			EEPROM_load(file);
+			eeprom_load(file);
 		}
 		else	// these games want the eeprom all zeros by default
 		{
 			int length;
 			UINT8 *dat;
 
-			dat = EEPROM_get_data_pointer(&length);
+			dat = eeprom_get_data_pointer(&length);
 			memset(dat, 0, length);
 
- 			if (use_factory_eeprom!=EEPROM_0) /* Set the EEPROM to Factory Defaults for games needing them*/
+ 			if (use_factory_eeprom!=eeprom_0) /* Set the EEPROM to Factory Defaults for games needing them*/
  			{
 				UINT8 eeprom_data[0x100];
 				int i;
@@ -361,25 +361,25 @@ static NVRAM_HANDLER(93C56)
 
 				memcpy(eeprom_data, factory_eeprom, 0x10);
 
-  				if (use_factory_eeprom==EEPROM_DARAKU) /* Daraku, replace top 10 bytes with defaults (different to other games) */
+  				if (use_factory_eeprom==eeprom_DARAKU) /* Daraku, replace top 10 bytes with defaults (different to other games) */
  					memcpy(eeprom_data, daraku_eeprom, 0x10);
 
-				if (use_factory_eeprom==EEPROM_S1945III) /* S1945iii suffers from corruption on highscore unless properly initialised at the end of the eeprom */
+				if (use_factory_eeprom==eeprom_S1945III) /* S1945iii suffers from corruption on highscore unless properly initialised at the end of the eeprom */
  					memcpy(eeprom_data+0xf0, s1945iii_eeprom, 0x10);
 
- 				if (use_factory_eeprom==EEPROM_DRAGNBLZ) /* Dragnblz too */
+ 				if (use_factory_eeprom==eeprom_DRAGNBLZ) /* Dragnblz too */
  					memcpy(eeprom_data+0xf0, dragnblz_eeprom, 0x10);
 
- 				if (use_factory_eeprom==EEPROM_GNBARICH) /* Might as well do Gnbarich as well, otherwise the highscore is incorrect */
+ 				if (use_factory_eeprom==eeprom_GNBARICH) /* Might as well do Gnbarich as well, otherwise the highscore is incorrect */
  					memcpy(eeprom_data+0xf0, gnbarich_eeprom, 0x10);
 
- 				if (use_factory_eeprom==EEPROM_MJGTASTE) /* We don't emulate the Mahjong panel yet, so default it to joystick */
+ 				if (use_factory_eeprom==eeprom_MJGTASTE) /* We don't emulate the Mahjong panel yet, so default it to joystick */
 				{
  					memcpy(eeprom_data+0x00, mjgtaste_eeprom, 0x10);
 					memcpy(eeprom_data+0xf0, mjgtaste_eeprom, 0x10);
 				}
 
-				EEPROM_set_data(eeprom_data,0x100);
+				eeprom_set_data(eeprom_data,0x100);
 			}
 		}
 	}
@@ -389,9 +389,9 @@ static WRITE32_HANDLER( psh_eeprom_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		EEPROM_write_bit((data & 0x20000000) ? 1 : 0);
-		EEPROM_set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
-		EEPROM_set_clock_line((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit((data & 0x20000000) ? 1 : 0);
+		eeprom_set_cs_line((data & 0x80000000) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
 
 		return;
 	}
@@ -403,7 +403,7 @@ static READ32_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return ((EEPROM_read_bit() << 28) | (input_port_read_indexed(machine, 4) << 24)); /* EEPROM | Region */
+		return ((eeprom_read_bit() << 28) | (input_port_read_indexed(machine, 4) << 24)); /* EEPROM | Region */
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -1230,13 +1230,13 @@ static READ32_HANDLER( mjgtaste_speedup_r )
 static DRIVER_INIT( soldivid )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
-	use_factory_eeprom=EEPROM_0;
+	use_factory_eeprom=eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
-	use_factory_eeprom=EEPROM_DEFAULT;
+	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( daraku )
@@ -1244,13 +1244,13 @@ static DRIVER_INIT( daraku )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
-	use_factory_eeprom=EEPROM_DARAKU;
+	use_factory_eeprom=eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
-	use_factory_eeprom=EEPROM_DEFAULT;
+	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( gunbird2 )
@@ -1258,7 +1258,7 @@ static DRIVER_INIT( gunbird2 )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
-	use_factory_eeprom=EEPROM_DEFAULT;
+	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( s1945iii )
@@ -1266,25 +1266,25 @@ static DRIVER_INIT( s1945iii )
 	UINT8 *RAM = memory_region(REGION_CPU1);
 	memory_set_bankptr(1,&RAM[0x100000]);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
-	use_factory_eeprom=EEPROM_S1945III;
+	use_factory_eeprom=eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
-	use_factory_eeprom=EEPROM_DRAGNBLZ;
+	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
-	use_factory_eeprom=EEPROM_GNBARICH;
+	use_factory_eeprom=eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
-	use_factory_eeprom=EEPROM_MJGTASTE;
+	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }
 

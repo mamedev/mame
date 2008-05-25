@@ -200,7 +200,7 @@ static int sda_dir = 0;
 
 /* Static Variables */
 #define CMOS_NVRAM_SIZE     0x2000
-#define EEPROM_NVRAM_SIZE   0x200 // 4k Bit
+#define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
 
 /*****************
@@ -1045,7 +1045,7 @@ static void peplus_init(void)
 	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
 
     /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
-	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, EEPROM_NVRAM_SIZE, NULL);
+	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE, NULL);
 
 	/* default : no address to patch in program RAM to enable autohold feature */
 	autohold_addr = 0;

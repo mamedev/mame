@@ -230,20 +230,20 @@ static READ32_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
 	int backfire_screen = mame_rand(machine)&1;
-	return ((EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 3)<<16)) ^  (backfire_screen << 26) ;
+	return ((eeprom_read_bit()<<24) | input_port_read_indexed(machine, 0) | (input_port_read_indexed(machine, 3)<<16)) ^  (backfire_screen << 26) ;
 }
 
 static READ32_HANDLER(backfire_control2_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
-	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 1)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 1)<<16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
-	return (EEPROM_read_bit()<<24) | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<16);
+	return (eeprom_read_bit()<<24) | input_port_read_indexed(machine, 2) | (input_port_read_indexed(machine, 2)<<16);
 }
 #endif
 
@@ -252,9 +252,9 @@ static WRITE32_HANDLER(backfire_eeprom_w)
 {
 	logerror("%08x:write eprom %08x (%08x) %08x\n",activecpu_get_pc(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7) {
-		EEPROM_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
-		EEPROM_write_bit(data & 0x1);
-		EEPROM_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
+		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
+		eeprom_write_bit(data & 0x1);
+		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

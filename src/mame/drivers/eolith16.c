@@ -19,7 +19,7 @@ static UINT16 *vram;
 static int vbuffer = 0;
 
 // It's configured for 512 bytes
-static const struct EEPROM_interface eeprom_interface_93C66 =
+static const eeprom_interface eeprom_interface_93C66 =
 {
 	9,				// address bits 9
 	8,				// data bits    8
@@ -35,9 +35,9 @@ static WRITE16_HANDLER( eeprom_w )
 	vbuffer = (data & 0x80) >> 7;
 	coin_counter_w(0, data & 1);
 
-	EEPROM_write_bit(data & 0x40);
-	EEPROM_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-	EEPROM_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	eeprom_write_bit(data & 0x40);
+	eeprom_set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	//data & 0x100 and data & 0x004 always set
 }
@@ -45,7 +45,7 @@ static WRITE16_HANDLER( eeprom_w )
 static READ16_HANDLER( eolith16_custom_r )
 {
 	eolith_speedup_read();
-	return (input_port_read_indexed(machine, 0) & ~0x10) | (EEPROM_read_bit() << 4);
+	return (input_port_read_indexed(machine, 0) & ~0x10) | (eeprom_read_bit() << 4);
 }
 
 
@@ -129,11 +129,11 @@ static VIDEO_UPDATE( eolith16 )
 static NVRAM_HANDLER( eolith16_eeprom )
 {
 	if (read_or_write)
-		EEPROM_save(file);
+		eeprom_save(file);
 	else
 	{
-		EEPROM_init(&eeprom_interface_93C66);
-		if (file)	EEPROM_load(file);
+		eeprom_init(&eeprom_interface_93C66);
+		if (file)	eeprom_load(file);
 	}
 }
 
