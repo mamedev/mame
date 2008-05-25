@@ -70,6 +70,7 @@ extern UINT16 *aerofgt_bg1videoram,*aerofgt_bg2videoram;
 extern UINT16 *aerofgt_spriteram1,*aerofgt_spriteram2,*aerofgt_spriteram3;
 extern UINT16 *wbbc97_bitmapram;
 extern size_t aerofgt_spriteram1_size,aerofgt_spriteram2_size,aerofgt_spriteram3_size;
+extern UINT16 *spikes91_tx_tilemap_ram;
 
 WRITE16_HANDLER( aerofgt_bg1videoram_w );
 WRITE16_HANDLER( aerofgt_bg2videoram_w );
@@ -200,7 +201,10 @@ static ADDRESS_MAP_START( spikes91_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(&aerofgt_spriteram1) AM_SIZE(&aerofgt_spriteram1_size)
 	AM_RANGE(0xc04000, 0xc04001) AM_WRITENOP
 	AM_RANGE(0xff8000, 0xff8fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_BASE(&aerofgt_bg1videoram)
-	AM_RANGE(0xffc000, 0xffcbff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
+
+	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_BASE(&spikes91_tx_tilemap_ram)
+
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_BASE(&aerofgt_spriteram3) AM_SIZE(&aerofgt_spriteram3_size)
 	//AM_RANGE(0xffd200, 0xffd201) AM_WRITE(pspikesb_gfxbank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM AM_BASE(&aerofgt_rasterram)	/* bg1 scroll registers */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)

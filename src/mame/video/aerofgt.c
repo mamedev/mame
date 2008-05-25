@@ -6,6 +6,7 @@ UINT16 *aerofgt_bg1videoram,*aerofgt_bg2videoram;
 UINT16 *aerofgt_spriteram1,*aerofgt_spriteram2,*aerofgt_spriteram3;
 UINT16 *wbbc97_bitmapram;
 size_t aerofgt_spriteram1_size,aerofgt_spriteram2_size,aerofgt_spriteram3_size;
+UINT16 *spikes91_tx_tilemap_ram;
 
 static UINT8 gfxbank[8];
 static UINT16 bg1scrollx,bg1scrolly,bg2scrollx,bg2scrolly,wbbc97_bitmap_enable;
@@ -15,7 +16,6 @@ static int charpalettebank,spritepalettebank;
 static tilemap *bg1_tilemap,*bg2_tilemap;
 static int sprite_gfx;
 static int spikes91_lookup;
-
 
 /***************************************************************************
 
@@ -737,6 +737,9 @@ VIDEO_UPDATE( pspikesb )
 VIDEO_UPDATE( spikes91 )
 {
 	int i,scrolly;
+	int y,x;
+	int count;
+	const gfx_element *gfx = screen->machine->gfx[0];
 
 	tilemap_set_scroll_rows(bg1_tilemap,256);
 	scrolly = bg1scrolly;
@@ -747,6 +750,28 @@ VIDEO_UPDATE( spikes91 )
 
 	tilemap_draw(bitmap,cliprect,bg1_tilemap,0,0);
 	spikes91_draw_sprites(screen->machine,bitmap,cliprect);
+
+	/* we could use a tilemap, but it's easier to just do it here */
+	count = 0;
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			UINT16 tileno = spikes91_tx_tilemap_ram[count]&0x1fff;
+			UINT16 colour = spikes91_tx_tilemap_ram[count]&0xe000;
+			drawgfx(bitmap,gfx,
+					tileno,
+					colour>>13,
+					0,0,
+					(x*8)+24,(y*8)+8,
+					cliprect,TRANSPARENCY_PEN,15);
+
+			count++;
+
+		}
+
+	}
+
 	return 0;
 }
 
