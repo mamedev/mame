@@ -487,6 +487,7 @@ static input_port_config *port_config_alloc(const input_port_config **listhead);
 static void port_config_free(const input_port_config **portptr);
 static input_port_config *port_config_find(const input_port_config *listhead, const char *tag);
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits);
+static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen);
 static void field_config_free(input_field_config **fieldptr);
 static input_setting_config *setting_config_alloc(input_field_config *field, input_port_value value, const char *name);
 static void setting_config_free(input_setting_config **settingptr);
@@ -614,6 +615,17 @@ INLINE void *error_buf_append(char *errorbuf, int errorbuflen, const char *forma
 	va_end(va);
 	
 	return NULL;
+}
+
+
+/*-------------------------------------------------
+    condition_equal - TRUE if two conditions are
+    equivalent
+-------------------------------------------------*/
+
+INLINE int condition_equal(const input_condition *cond1, const input_condition *cond2)
+{
+	return (cond1->mask == cond2->mask && cond1->value == cond2->value && cond1->condition == cond2->condition && strcmp(cond1->tag, cond2->tag) == 0);
 }
 
 
@@ -2367,23 +2379,39 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 			/* including */
 			case INPUT_TOKEN_INCLUDE:
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				maskbits = 0;
+
 				listhead = port_config_detokenize(listhead, TOKEN_GET_PTR(ipt, tokenptr), errorbuf, errorbuflen);
+				curport = NULL;
+				curfield = NULL;
+				cursetting = NULL;
 				break;
 
 			/* start of a new input port */
 			case INPUT_TOKEN_START:
 			case INPUT_TOKEN_START_TAG:
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				maskbits = 0;
+
 				curport = port_config_alloc((const input_port_config **)&listhead);
 				if (entrytype == INPUT_TOKEN_START_TAG)
 					curport->tag = TOKEN_GET_STRING(ipt);
 				curfield = NULL;
 				cursetting = NULL;
-				maskbits = 0;
 				break;
 
 			/* modify an existing port */
 			case INPUT_TOKEN_MODIFY:
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				maskbits = 0;
+
 				curport = port_config_find(listhead, TOKEN_GET_STRING(ipt));
+				curfield = NULL;
+				cursetting = NULL;
 				break;
 
 			/* input field definition */
@@ -2394,10 +2422,9 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				if (curport == NULL)
 					return error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD encountered with no active port (mask=%X defval=%X)\n", mask, defval);
-				if ((maskbits & mask) != 0)
-					error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD specifies duplicate port bits (mask=%X)\n", mask);
-				maskbits |= mask;
 
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, type, defval, mask);
 				cursetting = NULL;
 				break;
@@ -2720,8 +2747,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				input_seq_append_or(&curfield->seq[SEQ_TYPE_INCREMENT], val);
 				break;
 
-			/* analog wraps flag */
-
+			/* analog full turn count */
 			case INPUT_TOKEN_FULL_TURN_COUNT:
 				TOKEN_UNGET_UINT32(ipt);
 				if (curfield == NULL)
@@ -2764,6 +2790,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					break;
 				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_DIPSWITCH, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
@@ -2798,6 +2826,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 						TOKEN_SKIP_STRING(ipt);
 					break;
 				}
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_DIPSWITCH, defval, mask);
 				cursetting = NULL;
 
@@ -2827,6 +2857,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					break;
 				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_CONFIG, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
@@ -2856,6 +2888,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					break;
 				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_CATEGORY, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
@@ -2886,6 +2920,8 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					break;
 				}
 				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, defval, 32);
+				if (curfield != NULL)
+					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, IPT_ADJUSTER, defval, 0xff);
 				cursetting = NULL;
 				curfield->name = TOKEN_GET_STRING(ipt);
@@ -2896,6 +2932,10 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				break;
 		}
 	}
+	
+	/* insert any pending fields */
+	if (curfield != NULL)
+		field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 
 	return listhead;
 }
@@ -2966,46 +3006,14 @@ static input_port_config *port_config_find(const input_port_config *listhead, co
 
 /*-------------------------------------------------
     field_config_alloc - allocate a new input
-    port field config, replacing any intersecting
-    fields already present and inserting at the
-    correct sorted location
+    port field config
 -------------------------------------------------*/
 
 static input_field_config *field_config_alloc(input_port_config *port, int type, input_port_value defvalue, input_port_value maskbits)
 {
-	const input_field_config * const *scanfieldptr;
-	const input_field_config * const *scanfieldnextptr;
 	input_field_config *config;
-	input_port_value lowbit;
 	int seqtype;
-
-	/* first modify/nuke any entries that intersect our maskbits */
-	for (scanfieldptr = &port->fieldlist; *scanfieldptr != NULL; scanfieldptr = scanfieldnextptr)
-	{
-		scanfieldnextptr = &(*scanfieldptr)->next;
-		if (((*scanfieldptr)->mask & maskbits) != 0)
-		{
-			/* reduce the mask of the field we found */
-			config = (input_field_config *)*scanfieldptr;
-			config->mask &= ~maskbits;
-
-			/* if the new entry fully overrides the previous one, we nuke */
-			if (config->mask == 0)
-			{
-				field_config_free((input_field_config **)scanfieldptr);
-				scanfieldnextptr = scanfieldptr;
-			}
-		}
-	}
-
-	/* make a mask of just the low bit */
-	lowbit = (maskbits ^ (maskbits - 1)) & maskbits;
-
-	/* scan forward to find where to insert ourselves */
-	for (scanfieldptr = (const input_field_config * const *)&port->fieldlist; *scanfieldptr != NULL; scanfieldptr = &(*scanfieldptr)->next)
-		if ((*scanfieldptr)->mask > lowbit)
-			break;
-
+	
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
@@ -3019,11 +3027,62 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 	for (seqtype = 0; seqtype < ARRAY_LENGTH(config->seq); seqtype++)
 		input_seq_set_1(&config->seq[seqtype], SEQCODE_DEFAULT);
 
-	/* insert it into the list */
-	config->next = *scanfieldptr;
-	*(input_field_config **)scanfieldptr = config;
-
 	return config;
+}
+
+
+/*-------------------------------------------------
+    field_config_insert - insert an allocated
+    input port field config, replacing any 
+    intersecting fields already present and 
+    inserting at the correct sorted location
+-------------------------------------------------*/
+
+static void field_config_insert(input_field_config *field, input_port_value *disallowedbits, char *errorbuf, int errorbuflen)
+{
+	const input_field_config * const *scanfieldptr;
+	const input_field_config * const *scanfieldnextptr;
+	input_field_config *config;
+	input_port_value lowbit;
+
+	/* verify against the disallowed bits, but only if we are condition-free */
+	if (field->condition.condition == PORTCOND_ALWAYS)
+	{
+		if ((field->mask & *disallowedbits) != 0)
+			error_buf_append(errorbuf, errorbuflen, "INPUT_TOKEN_FIELD specifies duplicate port bits (mask=%X)\n", field->mask);
+		*disallowedbits |= field->mask;
+	}
+
+	/* first modify/nuke any entries that intersect our maskbits */
+	for (scanfieldptr = &field->port->fieldlist; *scanfieldptr != NULL; scanfieldptr = scanfieldnextptr)
+	{
+		scanfieldnextptr = &(*scanfieldptr)->next;
+		if (((*scanfieldptr)->mask & field->mask) != 0 && (field->condition.condition == PORTCOND_ALWAYS || condition_equal(&(*scanfieldptr)->condition, &field->condition)))
+		{
+			/* reduce the mask of the field we found */
+			config = (input_field_config *)*scanfieldptr;
+			config->mask &= ~field->mask;
+
+			/* if the new entry fully overrides the previous one, we nuke */
+			if (config->mask == 0)
+			{
+				field_config_free((input_field_config **)scanfieldptr);
+				scanfieldnextptr = scanfieldptr;
+			}
+		}
+	}
+
+	/* make a mask of just the low bit */
+	lowbit = (field->mask ^ (field->mask - 1)) & field->mask;
+
+	/* scan forward to find where to insert ourselves */
+	for (scanfieldptr = (const input_field_config * const *)&field->port->fieldlist; *scanfieldptr != NULL; scanfieldptr = &(*scanfieldptr)->next)
+		if ((*scanfieldptr)->mask > lowbit)
+			break;
+
+	/* insert it into the list */
+	field->next = *scanfieldptr;
+	*(input_field_config **)scanfieldptr = field;
 }
 
 
