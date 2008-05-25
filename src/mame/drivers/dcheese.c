@@ -813,4 +813,4 @@ GAME( 1994, fredmemj, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusem
 GAME( 1994, fredmemc, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmesp, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, cecmatch,  0,      fredmem, fredmem, dcheese, ROT0, "Coastal Amusements", "CheeseECheese's Match Game", GAME_SUPPORTS_SAVE )
+GAME( 1993, cecmatch,  0,      fredmem, fredmem, dcheese, ROT0, "Coastal Amusements", "ChuckECheese's Match Game", GAME_SUPPORTS_SAVE )
