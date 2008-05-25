@@ -32,46 +32,6 @@ static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which);
 
 
 /***************************************************************************
-    PRIVATE GLOBAL VARIABLES
-***************************************************************************/
-
-static const memory_accessors be_memory =
-{
-	program_read_byte_32be,
-	program_read_word_32be,
-	program_read_dword_32be,
-	program_read_dword_masked_32be,
-	program_read_qword_32be,
-	program_read_qword_masked_32be,
-
-	program_write_byte_32be,
-	program_write_word_32be,
-	program_write_dword_32be,
-	program_write_dword_masked_32be,
-	program_write_qword_32be,
-	program_write_qword_masked_32be
-};
-
-static const memory_accessors le_memory =
-{
-	program_read_byte_32le,
-	program_read_word_32le,
-	program_read_dword_32le,
-	program_read_dword_masked_32le,
-	program_read_qword_32le,
-	program_read_qword_masked_32le,
-
-	program_write_byte_32le,
-	program_write_word_32le,
-	program_write_dword_32le,
-	program_write_dword_masked_32le,
-	program_write_qword_32le,
-	program_write_qword_masked_32le
-};
-
-
-
-/***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
@@ -99,10 +59,7 @@ size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int 
 	mips->system_clock = config->system_clock;
 
 	/* set up the endianness */
-	if (mips->bigendian)
-		mips->memory = be_memory;
-	else
-		mips->memory = le_memory;
+	mips->memory = *memory_get_accessors(ADDRESS_SPACE_PROGRAM, 32, mips->bigendian ? CPU_IS_BE : CPU_IS_LE);
 
 	/* allocate memory */
 	mips->icache = memory;

@@ -3025,15 +3025,14 @@ static int generate_cop0(drcuml_block *block, compiler_state *compiler, const op
 {
 	UINT32 op = *desc->opptr.l;
 	UINT8 opswitch = RSREG;
-	drcuml_codelabel okay;
 	int skip;
 
-	/* generate an exception if COP0 is disabled or we are not in kernel mode */
-	UML_TEST(block, CPR032(COP0_Status), IMM(SR_KSU_MASK));							// test    [Status],SR_KSU_MASK
-	UML_JMPc(block, IF_Z, okay = compiler->labelnum++);								// jmp     okay,Z
-	UML_TEST(block, CPR032(COP0_Status), IMM(SR_COP0));								// test    [Status],SR_COP0
-	UML_EXHc(block, IF_Z, mips3.exception[EXCEPTION_BADCOP], IMM(0));				// exh     cop,0,Z
-	UML_LABEL(block, okay);														// okay:
+	/* generate an exception if COP0 is disabled unless we are in kernel mode */
+	if ((mips3.cstate->mode >> 1) != MODE_KERNEL)
+	{
+		UML_TEST(block, CPR032(COP0_Status), IMM(SR_COP0));							// test    [Status],SR_COP0
+		UML_EXHc(block, IF_Z, mips3.exception[EXCEPTION_BADCOP], IMM(0));			// exh     cop,0,Z
+	}
 
 	switch (opswitch)
 	{

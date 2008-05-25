@@ -22,6 +22,7 @@
 #define MIPS3_MIN_PAGE_SIZE			(1 << MIPS3_MIN_PAGE_SHIFT)
 #define MIPS3_MIN_PAGE_MASK			(MIPS3_MIN_PAGE_SIZE - 1)
 #define MIPS3_MAX_PADDR_SHIFT		32
+#define MIPS3_TLB_ENTRIES			48
 
 /* cycle parameters */
 #define MIPS3_COUNT_READ_CYCLES		250
@@ -159,25 +160,6 @@ typedef enum _mips3_flavor mips3_flavor;
     STRUCTURES & TYPEDEFS
 ***************************************************************************/
 
-/* memory access function table */
-typedef struct _memory_accessors memory_accessors;
-struct _memory_accessors
-{
-	UINT8			(*readbyte)(offs_t);
-	UINT16			(*readhalf)(offs_t);
-	UINT32			(*readword)(offs_t);
-	UINT32			(*readword_masked)(offs_t, UINT32);
-	UINT64			(*readdouble)(offs_t);
-	UINT64			(*readdouble_masked)(offs_t, UINT64);
-	void			(*writebyte)(offs_t, UINT8);
-	void			(*writehalf)(offs_t, UINT16);
-	void			(*writeword)(offs_t, UINT32);
-	void			(*writeword_masked)(offs_t, UINT32, UINT32);
-	void			(*writedouble)(offs_t, UINT64);
-	void			(*writedouble_masked)(offs_t, UINT64, UINT64);
-};
-
-
 /* MIPS3 TLB entry */
 typedef struct _mips3_tlb_entry mips3_tlb_entry;
 struct _mips3_tlb_entry
@@ -212,7 +194,7 @@ struct _mips3_state
 
 	/* memory accesses */
 	UINT8			bigendian;
-	memory_accessors memory;
+	data_accessors	memory;
 
 	/* cache memory */
 	UINT32 *		icache;
@@ -221,7 +203,7 @@ struct _mips3_state
 	size_t			dcache_size;
 
 	/* MMU */
-	mips3_tlb_entry tlb[48];
+	mips3_tlb_entry tlb[MIPS3_TLB_ENTRIES];
 	UINT32 *		tlb_table;
 };
 

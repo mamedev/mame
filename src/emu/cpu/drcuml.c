@@ -17,6 +17,8 @@
         - checks behavior of all opcodes
 
     * Extend registers to 16? Depends on if PPC can use them
+    
+    * Support for FPU exceptions
 
     * New instructions?
         - VALID opcode_desc,handle,param

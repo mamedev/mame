@@ -56,22 +56,23 @@
 #define OPFLAG_CAN_EXPOSE_EXTERNAL_INT	0x00000040		/* instruction can expose an external interrupt */
 #define OPFLAG_CAN_CAUSE_EXCEPTION		0x00000080		/* instruction may generate exception */
 #define OPFLAG_WILL_CAUSE_EXCEPTION		0x00000100		/* instruction will generate exception */
+#define OPFLAG_PRIVILEGED				0x00000200		/* instruction is privileged */
 
 /* opcode virtual->physical translation flags */
-#define OPFLAG_VALIDATE_TLB				0x00000200		/* instruction must validate TLB before execution */
-#define OPFLAG_MODIFIES_TRANSLATION		0x00000400		/* instruction modifies the TLB */
-#define OPFLAG_COMPILER_PAGE_FAULT		0x00000800		/* compiler hit a page fault when parsing */
-#define OPFLAG_COMPILER_UNMAPPED		0x00001000		/* compiler hit unmapped memory when parsing */
+#define OPFLAG_VALIDATE_TLB				0x00000400		/* instruction must validate TLB before execution */
+#define OPFLAG_MODIFIES_TRANSLATION		0x00000800		/* instruction modifies the TLB */
+#define OPFLAG_COMPILER_PAGE_FAULT		0x00001000		/* compiler hit a page fault when parsing */
+#define OPFLAG_COMPILER_UNMAPPED		0x00002000		/* compiler hit unmapped memory when parsing */
 
 /* opcode flags */
-#define OPFLAG_INVALID_OPCODE			0x00002000		/* instruction is invalid */
-#define OPFLAG_VIRTUAL_NOOP				0x00004000		/* instruction is a virtual no-op */
+#define OPFLAG_INVALID_OPCODE			0x00004000		/* instruction is invalid */
+#define OPFLAG_VIRTUAL_NOOP				0x00008000		/* instruction is a virtual no-op */
 
 /* opcode sequence flow flags */
-#define OPFLAG_REDISPATCH				0x00008000		/* instruction must redispatch after completion */
-#define OPFLAG_RETURN_TO_START			0x00010000		/* instruction must jump back to the beginning after completion */
-#define OPFLAG_END_SEQUENCE				0x00020000		/* this is the last instruction in a sequence */
-#define OPFLAG_CAN_CHANGE_MODES			0x00040000		/* instruction can change modes */
+#define OPFLAG_REDISPATCH				0x00010000		/* instruction must redispatch after completion */
+#define OPFLAG_RETURN_TO_START			0x00020000		/* instruction must jump back to the beginning after completion */
+#define OPFLAG_END_SEQUENCE				0x00040000		/* this is the last instruction in a sequence */
+#define OPFLAG_CAN_CHANGE_MODES			0x00080000		/* instruction can change modes */
 
 /* execution semantics */
 #define OPFLAG_READS_MEMORY				0x00080000		/* instruction reads memory */
