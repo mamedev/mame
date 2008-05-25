@@ -206,6 +206,7 @@ const game_driver driver_##NAME =					\
 
 /* this allows to leave the INIT field empty in the GAME() macro call */
 #define driver_init_0 0
+#define ipt_0 0
 
 
 

@@ -49,17 +49,6 @@ MACHINE_DRIVER_END
 
 /*************************************
  *
- *  Input ports
- *
- *************************************/
-
-static INPUT_PORTS_START( empty )
-INPUT_PORTS_END
-
-
-
-/*************************************
- *
  *  ROM definitions
  *
  *************************************/
@@ -76,4 +65,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2007, empty, 0, empty, empty, 0, ROT0, "MAME", "No Driver Loaded", 0 )
+GAME( 2007, empty, 0, empty, 0, 0, ROT0, "MAME", "No Driver Loaded", 0 )
