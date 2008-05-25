@@ -583,6 +583,71 @@ ROM_START( fredmem )
 	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
 ROM_END
 
+
+ROM_START( fredmeus )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "u104.us.hiscore", 0x00000, 0x20000, CRC(4460c690) SHA1(08fec2704baac4b83add8f1d5936f15336a67599) ) /* Program 0 - V2.0 at U104 */
+	ROM_LOAD16_BYTE( "u103.us.hiscore", 0x00001, 0x20000, CRC(ff5bfdc3) SHA1(c38b856d6a74df68bfc6fb15b521180f78742d45) ) /* Program 1 - V2.0 at U103 */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* M6809 */
+	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
+	ROM_LOAD( "art-rom.125", 0x080000, 0x80000, CRC(8181e154) SHA1(4d16b84ad52d8e3d3bcad3fdf5f8da23df198d46) ) /* Graphics / Art at U125 */
+	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
+	ROM_LOAD( "art-rom.129", 0x180000, 0x80000, CRC(d5715a02) SHA1(b7d9d29f2fc5d74adff1fefce312e6472c0f7565) ) /* Graphics / Art at U129 */
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
+	ROM_LOAD( "arom0", 0x000000, 0x80000, CRC(3b85ea34) SHA1(0a68e7df20a2c36e230c7935415dd5068c338669) )
+	ROM_RELOAD(        0x080000, 0x80000 )
+	ROM_LOAD( "arom1", 0x100000, 0x80000, CRC(405df3d4) SHA1(190b928789a879408beadd1647136bd85b018c63) )
+	ROM_RELOAD(        0x180000, 0x80000 )
+	ROM_LOAD( "arom2", 0x200000, 0x80000, CRC(48ecd5c9) SHA1(6aad371db7b658454c5feed548ffd19b81a8fcf4) )
+	ROM_RELOAD(        0x280000, 0x80000 )
+	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
+	ROM_RELOAD(        0x380000, 0x80000 )
+
+	ROM_REGION16_LE( 0x20000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Pallette - 0 at U144 */
+	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Pallette - 1 at U145 */
+
+	ROM_REGION( 0x100, REGION_USER2, 0 )
+	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
+ROM_END
+
+ROM_START( fredmeuk )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "u104.uk", 0x00000, 0x20000, CRC(e810daab) SHA1(99be21eb5df49fd8b665935c774798be270e0f27) ) /* Program 0 - V2.0 at U104 */
+	ROM_LOAD16_BYTE( "u103.uk", 0x00001, 0x20000, CRC(0f2e65fb) SHA1(533a45d2de0ee3c306197d2559355c3193f9ac6b) ) /* Program 1 - V2.0 at U103 */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* M6809 */
+	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
+	ROM_LOAD( "art-rom.125", 0x080000, 0x80000, CRC(8181e154) SHA1(4d16b84ad52d8e3d3bcad3fdf5f8da23df198d46) ) /* Graphics / Art at U125 */
+	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
+	ROM_LOAD( "art-rom.129", 0x180000, 0x80000, CRC(d5715a02) SHA1(b7d9d29f2fc5d74adff1fefce312e6472c0f7565) ) /* Graphics / Art at U129 */
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
+	ROM_LOAD( "arom0", 0x000000, 0x80000, CRC(3b85ea34) SHA1(0a68e7df20a2c36e230c7935415dd5068c338669) )
+	ROM_RELOAD(        0x080000, 0x80000 )
+	ROM_LOAD( "arom1", 0x100000, 0x80000, CRC(405df3d4) SHA1(190b928789a879408beadd1647136bd85b018c63) )
+	ROM_RELOAD(        0x180000, 0x80000 )
+	ROM_LOAD( "arom2", 0x200000, 0x80000, CRC(48ecd5c9) SHA1(6aad371db7b658454c5feed548ffd19b81a8fcf4) )
+	ROM_RELOAD(        0x280000, 0x80000 )
+	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
+	ROM_RELOAD(        0x380000, 0x80000 )
+
+	ROM_REGION16_LE( 0x20000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Pallette - 0 at U144 */
+	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Pallette - 1 at U145 */
+
+	ROM_REGION( 0x100, REGION_USER2, 0 )
+	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
+ROM_END
+
 /* Japan version, has a High Score table instead of tickets */
 ROM_START( fredmemj )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
@@ -616,6 +681,108 @@ ROM_START( fredmemj )
 	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
 ROM_END
 
+ROM_START( fredmemc )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "u104.mandarin", 0x00000, 0x20000, CRC(f46e4af6) SHA1(3bc5a7e7db7bcf86e4e8ab5df0c8bff89398d8c5) ) /* Program 0 - V2.0 at U104 */
+	ROM_LOAD16_BYTE( "u103.mandarin", 0x00001, 0x20000, CRC(160a7f47) SHA1(14704d1618320b2155c6387d03ac006b3b64fc58) ) /* Program 1 - V2.0 at U103 */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* M6809 */
+	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
+	ROM_LOAD( "art-rom.125.mandarin", 0x080000, 0x80000, CRC(780c06fa) SHA1(34aa420fb8a628b8cb92b0975e602d8c676c608a) ) /* Graphics / Art at U125 */
+	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
+	ROM_LOAD( "art-rom.129.mandarin", 0x180000, 0x80000, CRC(31444b3f) SHA1(dd3930fd784e685a05b7fc8039e6542710861ae5) ) /* Graphics / Art at U129 */
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
+	ROM_LOAD( "arom0", 0x000000, 0x80000, CRC(3b85ea34) SHA1(0a68e7df20a2c36e230c7935415dd5068c338669) )
+	ROM_RELOAD(        0x080000, 0x80000 )
+	ROM_LOAD( "arom1", 0x100000, 0x80000, CRC(405df3d4) SHA1(190b928789a879408beadd1647136bd85b018c63) )
+	ROM_RELOAD(        0x180000, 0x80000 )
+	ROM_LOAD( "arom2", 0x200000, 0x80000, CRC(48ecd5c9) SHA1(6aad371db7b658454c5feed548ffd19b81a8fcf4) )
+	ROM_RELOAD(        0x280000, 0x80000 )
+	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
+	ROM_RELOAD(        0x380000, 0x80000 )
+
+	ROM_REGION16_LE( 0x20000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Pallette - 0 at U144 */
+	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Pallette - 1 at U145 */
+
+	ROM_REGION( 0x100, REGION_USER2, 0 )
+	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
+ROM_END
+
+ROM_START( fredmesp )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "u104.spanish", 0x00000, 0x20000, CRC(ba150de6) SHA1(57aedc2c96309d6b5b67090e24e1e672404d34bf) ) /* Program 0 - V2.0 at U104 */
+	ROM_LOAD16_BYTE( "u103.spanish", 0x00001, 0x20000, CRC(4af72eb0) SHA1(c0addfc2900fb41c24ecf9b052ef1854206a4cba) ) /* Program 1 - V2.0 at U103 */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* M6809 */
+	ROM_LOAD( "prog.102", 0x00000, 0x10000, CRC(b1526a1a) SHA1(456c44a0a908b3cd054b7c6741d7a1033c9b12fb) ) /* Sound Program 6809 code at U102 */
+
+	ROM_REGION( 0x200000, REGION_GFX1, 0 )
+	ROM_LOAD( "art-rom.123", 0x000000, 0x80000, CRC(48133505) SHA1(60f69b053e67256928db57e0a5335bbd5a72ddfc) ) /* Graphics / Art at U123 */
+	ROM_LOAD( "art-rom.125.spanish", 0x080000, 0x80000, CRC(3ee88ec8) SHA1(24f3d548fe47b92d68904e1cd6233f75b109772c) ) /* Graphics / Art at U125 */
+	ROM_LOAD( "art-rom.127", 0x100000, 0x80000, CRC(93095f3b) SHA1(de746829e04bf153024e94e6ef0ceffb1eae2b14) ) /* Graphics / Art at U127 */
+	ROM_LOAD( "art-rom.129.spanish", 0x180000, 0x80000, CRC(8f0fa246) SHA1(10eef16f41c82224d369fd6b7c2fa9212e22fb42) ) /* Graphics / Art at U129 */
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
+	ROM_LOAD( "arom0", 0x000000, 0x80000, CRC(3b85ea34) SHA1(0a68e7df20a2c36e230c7935415dd5068c338669) )
+	ROM_RELOAD(        0x080000, 0x80000 )
+	ROM_LOAD( "arom1", 0x100000, 0x80000, CRC(405df3d4) SHA1(190b928789a879408beadd1647136bd85b018c63) )
+	ROM_RELOAD(        0x180000, 0x80000 )
+	ROM_LOAD( "arom2", 0x200000, 0x80000, CRC(48ecd5c9) SHA1(6aad371db7b658454c5feed548ffd19b81a8fcf4) )
+	ROM_RELOAD(        0x280000, 0x80000 )
+	ROM_LOAD( "arom3", 0x300000, 0x80000, CRC(411900b0) SHA1(ddc5b387c89baab0fd5c654f3768c6e27972c06a) )
+	ROM_RELOAD(        0x380000, 0x80000 )
+
+	ROM_REGION16_LE( 0x20000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(793c4bda) SHA1(5a8a2981b48922f4d9e617a9bf9ef6a47ab702b7) ) /* Pallette - 0 at U144 */
+	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(fe2c3521) SHA1(896e53427c7831620ca565be9c0b76aabc36b9f4) ) /* Pallette - 1 at U145 */
+
+	ROM_REGION( 0x100, REGION_USER2, 0 )
+	ROM_LOAD16_BYTE( "93c46.u158", 0x00000, 0x0080, CRC(a40a7b87) SHA1(3632b7538b3bf41ee0cbe7541a0f5951f70b4a9b) ) /* EEPROM data at U158 */
+ROM_END
+
+
+ROM_START( cecmatch )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68k */
+	ROM_LOAD16_BYTE( "prog0.104", 0x00000, 0x20000, CRC(b13585e2) SHA1(dbf6db79e319157b5ac540471348682b45508c1f) ) /* Program 0 - V2.0 at U104 */
+	ROM_LOAD16_BYTE( "prog1.103", 0x00001, 0x20000, CRC(5baf4f50) SHA1(e7529a4cffa292a491093a74f9ea49f59e41617f) ) /* Program 1 - V2.0 at U103 */
+
+	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* M6809 */
+	ROM_LOAD( "prog.102", 0x00000, 0x8000, CRC(d452ccf4) SHA1(7de9a4f39bf0ba448fe4ebeb459e98a1910a66be) ) /* Sound Program 6809 code at U102 */
+	ROM_RELOAD(0x8000,0x8000)
+	
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_ERASEFF )
+	ROM_LOAD( "art-rom.123", 0x000000, 0x40000, CRC(1bab1a52) SHA1(f713ba1bc755c41d38d9846444d753c9c7fb1f9d) ) /* Graphics / Art at U123 */
+	ROM_LOAD( "art-rom.125", 0x080000, 0x40000, CRC(7abe18d9) SHA1(c5a582ded7c1b0a02847b342111c64ac0ccb70c2) ) /* Graphics / Art at U125 */
+	ROM_LOAD( "art-rom.127", 0x040000, 0x40000, CRC(dc9be2ca) SHA1(d5059a49a3aad309e242c9c4791d10aa5ecd5d1a) ) /* Graphics / Art at U127 */
+
+	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
+	ROM_LOAD( "arom0", 0x000000, 0x40000, CRC(82129830) SHA1(2fa3a32ac4f81dd9c2ab11f34257df4074447f3a))
+	ROM_RELOAD(        0x040000, 0x40000 )
+	ROM_RELOAD(        0x080000, 0x40000 )
+	ROM_RELOAD(        0x0c0000, 0x40000 )
+	ROM_LOAD( "arom1", 0x100000, 0x40000, CRC(0d07ac31) SHA1(f1721c34d076a1695f01b90e99428736471cae49) )
+	ROM_RELOAD(        0x140000, 0x40000 )
+	ROM_RELOAD(        0x180000, 0x40000 )
+	ROM_RELOAD(        0x1c0000, 0x40000 )
+	ROM_LOAD( "arom2", 0x200000, 0x40000, CRC(625f3bf5) SHA1(e6a2ca8e105327d8f6a8245483dab29fe1b513fa) )
+	ROM_RELOAD(        0x240000, 0x40000 )
+	ROM_RELOAD(        0x280000, 0x40000 )
+	ROM_RELOAD(        0x2c0000, 0x40000 )
+	ROM_LOAD( "arom3", 0x300000, 0x40000, CRC(f3c9d554) SHA1(55daf85cec511010832d1d65bc734ec0c19b7c3f) )
+	ROM_RELOAD(        0x340000, 0x40000 )
+	ROM_RELOAD(        0x380000, 0x40000 )
+	ROM_RELOAD(        0x3c0000, 0x40000 )
+
+	ROM_REGION16_LE( 0x20000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "0.144", 0x00000, 0x10000, CRC(69b3cc85) SHA1(05f7204ac961274b5d2f42cc6c0d06e5fa146aef)) /* Pallette - 0 at U144 */
+	ROM_LOAD16_BYTE( "1.145", 0x00001, 0x10000, CRC(e64a8511) SHA1(0e3a1fe936c841b8acfb150bf63e564b1dec2363) ) /* Pallette - 1 at U145 */
+ROM_END
+
 /*************************************
  *
  *  Driver configuration
@@ -638,4 +805,10 @@ static DRIVER_INIT( dcheese )
 GAME( 1993, dcheese,  0,       dcheese, dcheese, dcheese, ROT90, "HAR", "Double Cheese", GAME_SUPPORTS_SAVE )
 GAME( 1993, lottof2,  0,       dcheese, lottof2, dcheese, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmem,  0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmeus, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmeuk, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmemj, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmemc, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
+GAME( 1994, fredmesp, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )
+
+GAME( 1993, cecmatch,  0,      fredmem, fredmem, dcheese, ROT0, "Coastal Amusements", "CheeseECheese's Match Game", GAME_SUPPORTS_SAVE )

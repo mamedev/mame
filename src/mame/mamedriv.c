@@ -7776,7 +7776,12 @@ Other Sun games
 	DRIVER( dcheese )	/* (c) 1993 HAR */
 	DRIVER( lottof2 )	/* (c) 1993 HAR */
 	DRIVER( fredmem )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmeus )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmeuk )  /* (c) 1994 Coastal Amusements */
 	DRIVER( fredmemj )	/* (c) 1994 Coastal Amusements */
+	DRIVER( fredmemc )  /* (c) 1994 Coastal Amusements */
+	DRIVER( fredmesp )  /* (c) 1994 Coastal Amusements */
+	DRIVER( cecmatch )  /* (c) 1993 Coastal Amusements */
 	DRIVER( f15se )		/* (c) 1991 Microprose */
 	DRIVER( f15se21 )	/* (c) 1991 Microprose */
 	DRIVER( botss )		/* (c) 1992 Microprose */
