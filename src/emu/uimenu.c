@@ -431,7 +431,7 @@ int ui_menu_draw(const ui_menu_item *items, int numitems, int selected, const me
 		}
 
 		/* if we're just a divider, draw a line */
-		else if (strcmp(itemtext, "-") == 0)
+		else if (strcmp(itemtext, MENU_SEPARATOR_ITEM) == 0)
 			render_ui_add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		/* if we don't have a subitem, just draw the string centered */

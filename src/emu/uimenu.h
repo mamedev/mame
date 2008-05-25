@@ -26,6 +26,9 @@
 #define MENU_FLAG_RIGHT_ARROW	(1 << 1)
 #define MENU_FLAG_INVERT		(1 << 2)
 
+/* special menu item for separators */
+#define MENU_SEPARATOR_ITEM		"---"
+
 
 
 /***************************************************************************
