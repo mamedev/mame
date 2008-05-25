@@ -3772,10 +3772,10 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( vf2b )		/* 1995 */
 	DRIVER( vf2o )		/* 1995 */
 	DRIVER( vcop2 )		/* 1995 */
-	DRIVER( dynamcop )	/* 1996 */
-	DRIVER( dyndeka2 )	/* 1996 */
 	DRIVER( doaa )		/* 1996 */
 	DRIVER( zeroguna )	/* 1997 */
+	DRIVER( dynamcop )	/* 1998 */
+	DRIVER( dyndeka2 )	/* 1998 */
 	DRIVER( pltkidsa )	/* 1998 */
 
 	/* Model 2B-CRX (SHARC, SCSP sound board) */
@@ -3785,7 +3785,6 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( gunblade )	/* 1995 */
 	DRIVER( indy500 )	/* 1995 */
 	DRIVER( skytargt )	/* 1995 */
-	DRIVER( dynmcopb )	/* 1996 */
 	DRIVER( schamp )	/* 1996 */
 	DRIVER( lastbrnx )	/* 1996 */
 	DRIVER( lastbrnj )	/* 1996 */
@@ -3794,9 +3793,10 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( von )		/* 1996 */
 	DRIVER( vonusa )	/* 1996 */
 	DRIVER( dynabb )	/* 1996 */
-	DRIVER( dyndek2b )	/* 1996 */
 	DRIVER( zerogun )	/* 1997 */
 	DRIVER( zerogunj )	/* 1997 */
+	DRIVER( dynmcopb )	/* 1998 */
+	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
@@ -3806,6 +3806,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( overrev )	/* 1997 */
 	DRIVER( topskatr )	/* 1997 */
 	DRIVER( bel )		/* 1998 */
+	DRIVER( dynmcopc )	/* 1998 */
 
 	/* Sega Model 3 Games */
 
