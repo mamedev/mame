@@ -573,7 +573,7 @@ static void spikes91_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 		if (!code) continue;
 
-		xpos = (aerofgt_spriteram3[i + 2] & 0x01ff) - 13;
+		xpos = (aerofgt_spriteram3[i + 2] & 0x01ff) - 16;
 		ypos = 256 - (aerofgt_spriteram3[i + 1] & 0x00ff) - 26;
 		flipy = 0;
 		flipx = aerofgt_spriteram3[i + 3] & 0x8000;
