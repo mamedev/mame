@@ -209,6 +209,7 @@ struct _input_field_state
 	UINT8						impulse;			/* counter for impulse controls */
 	UINT8						last;				/* were we pressed last time? */
 	UINT8						joydir;				/* digital joystick direction index */
+	char *						name;				/* overridden name */
 };
 
 
@@ -737,6 +738,8 @@ const input_port_config *input_port_by_index(const input_port_config *portlist, 
 const char *input_field_name(const input_field_config *field)
 {
 	/* if we have a non-default name, use that */
+	if ((field->state != NULL) && (field->state->name != NULL))
+		return field->state->name;
 	if (field->name != NULL)
 		return field->name;
 
@@ -1585,6 +1588,19 @@ static void init_port_state(running_machine *machine)
 				*changedinfotail = init_field_callback_info(field);
 				changedinfotail = &(*changedinfotail)->next;
 			}
+
+#ifdef MESS
+			/* MESS-specific code to name keyboard key names */
+			if ((field->type == IPT_KEYBOARD) && (field->name == NULL))
+			{
+				astring *name = mess_get_keyboard_key_name(field);
+				if (name != NULL)
+				{
+					field->state->name = auto_strdup(astring_c(name));
+					astring_free(name);
+				}
+			}
+#endif /* MESS */
 		}
 	}
 
