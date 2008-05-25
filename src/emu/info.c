@@ -846,7 +846,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 	/* temporary hook until MESS device transition is complete */
 	mess_devices_setup(config, game);
 #endif /* MESS */
-	portconfig = input_port_config_alloc(game->ipt);
+	portconfig = input_port_config_alloc(game->ipt, NULL, 0);
 
 	/* print the header and the game name */
 	fprintf(out, "\t<" XML_TOP);

@@ -936,7 +936,7 @@ time_t input_port_init(running_machine *machine, const input_port_token *tokens)
 /* ----- port configurations ----- */
 
 /* allocate a list of input ports from the given token list */
-const input_port_config *input_port_config_alloc(const input_port_token *tokens);
+const input_port_config *input_port_config_alloc(const input_port_token *tokens, char *errorbuf, int errorbuflen);
 
 /* free memory allocated from input_port_alloc */
 void input_port_config_free(const input_port_config *portlist);

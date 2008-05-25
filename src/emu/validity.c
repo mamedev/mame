@@ -1190,6 +1190,7 @@ static int validate_inputs(int drivnum, const machine_config *config)
 	const input_field_config *field;
 	const game_driver *driver = drivers[drivnum];
 	int empty_string_found = FALSE;
+	char errorbuf[1024];
 	quark_entry *entry;
 	int error = FALSE;
 	UINT32 crc;
@@ -1208,7 +1209,9 @@ static int validate_inputs(int drivnum, const machine_config *config)
 	quark_add(inputs_table, drivnum, crc);
 
 	/* allocate the input ports */
-	portlist = input_port_config_alloc(driver->ipt);
+	portlist = input_port_config_alloc(driver->ipt, errorbuf, sizeof(errorbuf));
+	if (errorbuf[0] != 0)
+		mame_printf_error("%s: %s has input port errors:\n%s\n", driver->source_file, driver->name, errorbuf);
 
 	/* check for duplicate tags */
 	for (port = portlist; port != NULL; port = port->next)

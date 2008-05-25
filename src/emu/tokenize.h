@@ -128,6 +128,12 @@
 #define TOKEN_UNGET_UINT32(tp)		((tp)--)
 #define TOKEN_UNGET_UINT64(tp)		((tp) -= 8 / sizeof(FPTR))
 
+/* token skip primitives */
+#define TOKEN_SKIP_PTR(tp)			((tp)++)
+#define TOKEN_SKIP_STRING(tp)		((tp)++)
+#define TOKEN_SKIP_UINT32(tp)		((tp)++)
+#define TOKEN_SKIP_UINT64(tp)		((tp) += 8 / sizeof(FPTR))
+
 /* extract a value from a fixed number of bits; if bits is negative, treat it as a signed value */
 #define UNSHIFT_AND_MASK32(src, val, bits, shift)	do { \
 	if ((bits) < 0) \
