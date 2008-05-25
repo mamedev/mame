@@ -117,7 +117,8 @@ static WRITE8_HANDLER( namcos1_3dcs_w )
 
 
 
-static int key_id,key_reg,key_rng,key_swap4_arg,key_swap4,key_bottom4,key_top4;
+static int key_id, key_reg, key_rng, key_swap4_arg, key_swap4, key_bottom4, key_top4;
+static unsigned int key_quotient, key_reminder, key_numerator_high_word;
 static UINT8 key[8];
 
 
@@ -276,7 +277,10 @@ static WRITE8_HANDLER( key_type1_w )
 
   Key custom type 2 (CUS151 - CUS155)
 
-  16/16 bit division + key no.
+  16/16 or 32/16 bit division + key no.
+
+  it's not entirely understood how the 32/16 division works. Only galaga88
+  seems to use it.
 
 *****************************************************************************/
 
@@ -313,7 +317,7 @@ CPU #1 PC cbe8: keychip read 0002
 CPU #1 PC cbe8: keychip read 0003
 
 mmaze: (CUS152)
-CPU #0 PC 60f3: keychip write 0004=5b
+CPU #0 PC 60f3: keychip write 0004=5b [operating mode?]
 CPU #0 PC 60fe: keychip write 0000=00
 CPU #0 PC 60fe: keychip write 0001=01
 CPU #0 PC 6101: keychip write 0002=00
@@ -361,7 +365,19 @@ CPU #0 PC db22: keychip read 0000
 CPU #0 PC db22: keychip read 0001
 CPU #0 PC db2b: keychip read 0002
 CPU #0 PC db2b: keychip read 0003
-CPU #0 PC e136: keychip write 0004=0c
+CPU #0 PC e136: keychip write 0004=0c [operating mode?]
+
+then a 32/16 bit division is used to calculate the hit ratio at the end of the game:
+CPU #0 PC ef6f: keychip write 0004=2d [operating mode?]
+CPU #0 PC ef76: keychip write 0000=01 \ denominator
+CPU #0 PC ef76: keychip write 0001=37 /
+CPU #0 PC ef7c: keychip write 0002=00 \ numerator high word
+CPU #0 PC ef7c: keychip write 0003=03 /
+CPU #0 PC ef81: keychip write 0004=0c [operating mode?]
+CPU #0 PC ef87: keychip write 0002=b1 \ numerator low word
+CPU #0 PC ef87: keychip write 0003=50 /
+CPU #0 PC ef8a: keychip read 0002
+CPU #0 PC ef8a: keychip read 0003
 
 ws: (CUS154)
 CPU #0 PC e052: keychip write 0004=d3 [operating mode?]
@@ -378,7 +394,7 @@ CPU #0 PC db5a: keychip read 0000
 CPU #0 PC db5a: keychip read 0001
 CPU #0 PC db63: keychip read 0002
 CPU #0 PC db63: keychip read 0003
-CPU #0 PC db70: keychip write 0004=0b
+CPU #0 PC db70: keychip write 0004=0b [operating mode?]
 CPU #0 PC db77: keychip write 0000=ff
 CPU #0 PC db77: keychip write 0001=ff
 CPU #0 PC db7e: keychip write 0002=ff
@@ -387,7 +403,7 @@ CPU #0 PC db82: keychip read 0000
 CPU #0 PC db82: keychip read 0001
 CPU #0 PC db8b: keychip read 0002
 CPU #0 PC db8b: keychip read 0003
-CPU #0 PC db95: keychip write 0004=03
+CPU #0 PC db95: keychip write 0004=03 [operating mode?]
 CPU #0 PC e552: keychip read 0004     [AND #$3F = key no.]
 CPU #0 PC e560: keychip write 0000=00
 CPU #0 PC e560: keychip write 0001=73
@@ -404,27 +420,14 @@ static READ8_HANDLER( key_type2_r )
 {
 //  logerror("CPU #%d PC %04x: keychip read %04x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
 
+	key_numerator_high_word = 0;
+
 	if (offset < 4)
 	{
-		int d = (key[0] << 8) | key[1];
-		int n = (key[2] << 8) | key[3];
-		int q,r;
-
-		if (d)
-		{
-			q = n / d;
-			r = n % d;
-		}
-		else
-		{
-			q = 0xffff;
-			r = 0x00;
-		}
-
-		if (offset == 0) return r >> 8;
-		if (offset == 1) return r & 0xff;
-		if (offset == 2) return q >> 8;
-		if (offset == 3) return q & 0xff;
+		if (offset == 0) return key_reminder >> 8;
+		if (offset == 1) return key_reminder & 0xff;
+		if (offset == 2) return key_quotient >> 8;
+		if (offset == 3) return key_quotient & 0xff;
 	}
 	else if (offset == 4)
 		return key_id;
@@ -437,7 +440,30 @@ static WRITE8_HANDLER( key_type2_w )
 //  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset,data);
 
 	if (offset < 5)
+	{
 		key[offset] = data;
+
+		if (offset == 3)
+		{
+			unsigned int d = (key[0] << 8) | key[1];
+			unsigned int n = (key_numerator_high_word << 16) | (key[2] << 8) | key[3];
+
+			if (d)
+			{
+				key_quotient = n / d;
+				key_reminder = n % d;
+			}
+			else
+			{
+				key_quotient = 0xffff;
+				key_reminder = 0x0000;
+			}
+
+//  logerror("calculating division: %08x / %04x = %04x, %04x\n", n, d, key_quotient, key_reminder);
+
+			key_numerator_high_word = (key[2] << 8) | key[3];
+		}
+	}
 }
 
 
