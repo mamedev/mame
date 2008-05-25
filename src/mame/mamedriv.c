@@ -1356,6 +1356,7 @@ const game_driver * const drivers[] =
 	DRIVER( shtridra )	/* (c) 1984 Seibu Kaihatsu */
 	DRIVER( wilytowr )	/* M63 (c) 1984 */
 	DRIVER( atomboy )	/* M63 (c) 1985 Irem + Memetron license */
+	DRIVER( atomboya )	/* M63 (c) 1985 Irem + Memetron license */
 	DRIVER( fghtbskt )	/* (c) 1984 Paradise Co. Ltd. */
 	/* M62 */
 	DRIVER( kungfum )	/* (c) 1984 */

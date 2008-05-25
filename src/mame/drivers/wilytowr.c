@@ -506,12 +506,12 @@ static const struct Samplesinterface fghtbskt_samples_interface =
 static MACHINE_DRIVER_START( wilytowr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80,4000000)	/* 4 MHz ???? */
+	MDRV_CPU_ADD(Z80,12000000/4)     /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(wilytowr_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* audio CPU */
-	MDRV_CPU_ADD(I8039,8000000)	/* ????? */
+	MDRV_CPU_ADD(I8039,12000000/4)	/* ????? */
 	MDRV_CPU_PROGRAM_MAP(i8039_map,0)
 	MDRV_CPU_IO_MAP(i8039_port_map,0)
 
@@ -635,6 +635,46 @@ ROM_START( atomboy )
 	ROM_LOAD( "wt_a-4m.bin",  0x8000, 0x2000, CRC(c1f8a7d5) SHA1(4307e7604aec728a1f5b0e6a0d6c9f4d37084da3) )
 	ROM_LOAD( "wt_a-4n.bin",  0xa000, 0x2000, CRC(b212f7d2) SHA1(dd1c35559982e8bbcb0e778c733a3afb5b6611df) )
 
+	ROM_REGION( 0x2000, REGION_CPU2, 0 )	/* 8039 */
+	ROM_LOAD( "wt_a-4d-b.bin",  0x0000, 0x2000, CRC(793ea53f) SHA1(9dbff5e011a1f1f48aad68f8e5b02bcdb86c182a) ) /* 2764 ROM, Also had a red dot on label */
+
+	ROM_REGION( 0x2000, REGION_GFX1, ROMREGION_DISPOSE )
+	/* '3' character is bad, but ROMs have been verified on four boards */
+	ROM_LOAD( "wt_b-5e.bin",  0x0000, 0x1000, CRC(fe45df43) SHA1(9586a5728069e0c293bd17d4663305ce5758ca01) )
+	ROM_LOAD( "wt_b-5f.bin",  0x1000, 0x1000, CRC(87a17eff) SHA1(cee2ba2889baf08dc6ee1c8e9150bd277f343be9) )
+
+	ROM_REGION( 0x6000, REGION_GFX2, ROMREGION_DISPOSE )
+	ROM_LOAD( "wt_b-5a.bin",  0x0000, 0x2000, CRC(da22c452) SHA1(bd921baa12087e996d07625e05eda00981608655) )
+	ROM_LOAD( "wt_b-5b.bin",  0x2000, 0x2000, CRC(4fb25a1f) SHA1(0f90fb3b373760c33ba9be3b56b917eca92c9700) )
+	ROM_LOAD( "wt_b-5d.bin",  0x4000, 0x2000, CRC(75be2604) SHA1(fe1f110e188aa34a04a9f43412a8308240391fcf) )
+
+	ROM_REGION( 0xc000, REGION_GFX3, ROMREGION_DISPOSE )
+	ROM_LOAD( "wt_a-3j-b.bin",  0x0000, 0x2000, CRC(996470f1) SHA1(c0c787a73535917d1314bb2e1e9056aea9859205) ) /* All these ROMs are 2764 type/size */
+	ROM_LOAD( "wt_a-3k-b.bin",  0x2000, 0x2000, CRC(8f4ec45c) SHA1(525393e0555e1aa24df74e8095da216f02fe3c65) )
+	ROM_LOAD( "wt_a-3m-b.bin",  0x4000, 0x2000, CRC(4ac40358) SHA1(c71bd62ef1e8d008abd468c193e67b278599a5f3) )
+	ROM_LOAD( "wt_a-3n-b.bin",  0x6000, 0x2000, CRC(709eef5b) SHA1(95beadcf876a2549836329521f1293634413e983) )
+	ROM_LOAD( "wt_a-3p-b.bin",  0x8000, 0x2000, CRC(3018b840) SHA1(77df9d4f1c8d76d30c435d03d51ef9e7509fab9c) )
+	ROM_LOAD( "wt_a-3s-b.bin",  0xa000, 0x2000, CRC(05a251d4) SHA1(1cd9102871507ab988d5fe799024d63b93807448) )
+
+	ROM_REGION( 0x1000, REGION_USER1, 0 )	/* unknown; sound? */
+	ROM_LOAD( "wt_a-6d.bin",  0x0000, 0x1000, CRC(a5dde29b) SHA1(8f7545d2022da7c98d47112179dce717f6c3c5e2) )
+
+	ROM_REGION( 0x0320, REGION_PROMS, 0 )
+	ROM_LOAD( "wt_a-5s-b.bpr", 0x0000, 0x0100, CRC(991e2a04) SHA1(a70525948ad85ad898e0d8a25fb6d1639a4ec133) )	/* red    TBP24S10 (read as 82s129) */
+	ROM_LOAD( "wt_a-5r-b.bpr", 0x0100, 0x0100, CRC(fb3822b7) SHA1(bb1ecdd0156acc16bef3c9072e496e4f544b5d9d) )	/* green  TBP24S10 (read as 82s129) */
+	ROM_LOAD( "wt_a-5p-b.bpr", 0x0200, 0x0100, CRC(95849f7d) SHA1(ad031d6035045b19c1cd65ac6a78c5aa4b647cd6) )	/* blue   TBP24S10 (read as 82s129) */
+	ROM_LOAD( "wt_b-9l-.bpr",  0x0300, 0x0020, CRC(d2728744) SHA1(e6b1a570854ca90326414874432ab03ec85b9c8e) )	/* char palette */
+ROM_END
+
+ROM_START( atomboya )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "wt_a-4e.bin",  0x0000, 0x2000, CRC(f7978185) SHA1(6a108d1e9b1a81cedf865aba3998748dcf1d55ef) )
+	ROM_LOAD( "wt_a-4h.bin",  0x2000, 0x2000, CRC(0ca9950b) SHA1(d6583fcdf17d16a8884932695caa9c5587a20795) )
+	ROM_LOAD( "wt_a-4j.bin",  0x4000, 0x2000, CRC(1badbc65) SHA1(e0768f2cd7bbe8908fd68ff6d54dbef84cc7de4c) )
+	ROM_LOAD( "wt_a-4k.bin",  0x6000, 0x2000, CRC(5a341f75) SHA1(9e1a180e37aaa0afbf8ff45219be40d3f75fe60a) )
+	ROM_LOAD( "wt_a-4m.bin",  0x8000, 0x2000, CRC(c1f8a7d5) SHA1(4307e7604aec728a1f5b0e6a0d6c9f4d37084da3) )
+	ROM_LOAD( "wt_a-4n.bin",  0xa000, 0x2000, CRC(b212f7d2) SHA1(dd1c35559982e8bbcb0e778c733a3afb5b6611df) )
+
 	ROM_REGION( 0x1000, REGION_CPU2, 0 )	/* 8039 */
 	ROM_LOAD( "wt_a-4d.bin",  0x0000, 0x1000, CRC(3d43361e) SHA1(2977df9f90d9d214909c56ab44c40ab45fd90675) )
 
@@ -721,5 +761,6 @@ static DRIVER_INIT( fghtbskt )
 }
 
 GAME( 1984, wilytowr, 0,        wilytowr, wilytowr, wilytowr, ROT180, "Irem",                    "Wily Tower", GAME_NO_SOUND )
-GAME( 1985, atomboy,  wilytowr, wilytowr, wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy", GAME_NO_SOUND )
+GAME( 1985, atomboy,  wilytowr, wilytowr, wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", GAME_NO_SOUND )
+GAME( 1985, atomboya, wilytowr, wilytowr, wilytowr, wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision A)", GAME_NO_SOUND )
 GAME( 1984, fghtbskt, 0,        fghtbskt, fghtbskt, fghtbskt, ROT0,   "Paradise Co. Ltd.",       "Fighting Basketball", GAME_IMPERFECT_SOUND )
