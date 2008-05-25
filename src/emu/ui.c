@@ -1572,9 +1572,6 @@ static void slider_init(running_machine *machine)
 		numitems = cpu_gettotalcpu();
 		for (item = 0; item < numitems; item++)
 			slider_config(&slider_list[slider_count++], 10, 1000, 2000, 1, slider_overclock, (void *)(FPTR)item);
-
-		/* add refresh rate tweaker */
-		slider_config(&slider_list[slider_count++], -10000, 0, 10000, 1000, slider_refresh, NULL);
 	}
 
 	for (item = 0; item < numscreens; item++)
@@ -1586,6 +1583,10 @@ static void slider_init(running_machine *machine)
 		int defxoffset = floor(scrconfig->xoffset * 1000.0f + 0.5f);
 		int defyoffset = floor(scrconfig->yoffset * 1000.0f + 0.5f);
 		void *param = (void *)screen;
+
+		/* add refresh rate tweaker */
+		if (options_get_bool(mame_options(), OPTION_CHEAT))
+			slider_config(&slider_list[slider_count++], -10000, 0, 10000, 1000, slider_refresh, param);
 
 		/* add standard brightness/contrast/gamma controls per-screen */
 		slider_config(&slider_list[slider_count++], 100, 1000, 2000, 10, slider_brightness, param);
