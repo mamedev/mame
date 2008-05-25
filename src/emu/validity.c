@@ -1280,6 +1280,11 @@ static int validate_inputs(int drivnum, const machine_config *config)
 			}
 		}
 
+#ifdef MESS
+	if (mess_validate_input_ports(drivnum, config, portlist))
+		error = TRUE;
+#endif /* MESS */
+
 	/* free the config */
 	input_port_config_free(portlist);
 	return error;

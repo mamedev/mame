@@ -1942,7 +1942,7 @@ profiler_mark(PROFILER_INPUT);
 
 #ifdef MESS
 		/* hook for MESS's natural keyboard support */
-		mess_input_port_update_hook(machine, port, &portinfo->digital);
+		mess_input_port_update_hook(machine, port, &port->state->digital);
 #endif /* MESS */
 
 		/* call changed handlers */
@@ -2482,7 +2482,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					fatalerror("INPUT_TOKEN_CHAR encountered with no active field");
 
 				TOKEN_UNGET_UINT32(ipt);
-				TOKEN_GET_UINT32_UNPACK2(ipt, entrytype, 8, val, 24);
+				TOKEN_GET_UINT64_UNPACK2(ipt, entrytype, 8, val, 32);
 
 				for (index = 0; index < ARRAY_LENGTH(curfield->chars); index++)
 					if (curfield->chars[index] == 0)
