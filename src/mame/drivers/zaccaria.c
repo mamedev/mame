@@ -686,7 +686,9 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
-	MDRV_SOUND_ADD(TMS5200, 565000)	/* measured on pcb */
+	/* 565kHz measured on pin 6, however this likely interfered with the RC oscillator. */
+	/* Waiting for proper measure to be taken on pin 3. */
+	MDRV_SOUND_ADD(TMS5200, 640000)
 	MDRV_SOUND_CONFIG(tms5220_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
