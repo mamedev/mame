@@ -6472,10 +6472,11 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 			if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
 		}
 
-#if 0	/* whatever this code was meant to do, it isn't working, it causes a crash in gijoe (attract mode) when
-            K056832_get_tile_info(machine, tileinfo, line, page);
-            is called with
-            tile_data *tileinfo = {0}; */
+#if 0	/* this code is broken.. really broken .. gijoe uses it for some line/column scroll style effects (lift level of attract mode)
+            we REALLY shouldn't be writing directly back into the pixmap, surely this should
+            be done when rendering instead
+
+        */
 		{
 
 
@@ -6507,13 +6508,17 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 			src_base   = src_gfx->gfxdata;
 			src_pitch  = src_gfx->line_modulo;
 			src_modulo = src_gfx->char_modulo;
-			xpr_ptr    = (UINT8*)xprmap->base + LINE_WIDTH;
-			dst_ptr    = (UINT16*)pixmap->base + LINE_WIDTH;
 			dst_pitch  = pixmap->rowpixels;
 
-			for (line=0; line<256; xpr_ptr+=dst_pitch, dst_ptr+=dst_pitch, line++)
+			for (line=0; line<256; line++)
 			{
-				tile_data *tileinfo = {0};
+
+
+				tile_data tileinfo = {0};
+
+				dst_ptr = BITMAP_ADDR16(pixmap, line, 0);
+				xpr_ptr = BITMAP_ADDR8(xprmap, line, 0);
+
 				if (!all_dirty)
 				{
 					offs = line >> 5;
@@ -6522,15 +6527,15 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 					dirty[offs] ^= mask;
 				}
 
-				K056832_get_tile_info(machine, tileinfo, line, page);
-				src_ptr = tileinfo->pen_data;//src_base + ((tileinfo->tile_number & ~7) << 6);
-				basepen = tileinfo->palette_base;
-				code_transparent = tileinfo->category;
-				code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
-				count = -LINE_WIDTH;
-
-				do
+				for (count = 0; count < LINE_WIDTH; count+=8)
 				{
+					K056832_get_tile_info(machine, &tileinfo, line, page);
+					basepen = tileinfo.palette_base;
+					code_transparent = tileinfo.category;
+					code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
+
+					src_ptr = tileinfo.pen_data + count*8;//src_base + ((tileinfo.tile_number & ~7) << 6);
+
 					DRAW_PIX(0)
 					DRAW_PIX(1)
 					DRAW_PIX(2)
@@ -6539,10 +6544,7 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 					DRAW_PIX(5)
 					DRAW_PIX(6)
 					DRAW_PIX(7)
-
-					src_ptr += 8;
 				}
-				while (count += 8);
 			}
 
 			#undef LINE_WIDTH
