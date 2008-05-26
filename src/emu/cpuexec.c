@@ -777,7 +777,7 @@ static void on_vblank(const device_config *device, int vblank_state)
 
 			/* start the interrupt counter */
 			if (!(cpu[cpunum].suspend & SUSPEND_REASON_DISABLE))
-				cpu[cpunum].iloops = config->vblank_interrupts_per_frame - 1;
+				cpu[cpunum].iloops = 0;
 			else
 				cpu[cpunum].iloops = -1;
 
@@ -799,7 +799,7 @@ static void on_vblank(const device_config *device, int vblank_state)
 				if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 				{
 					cpuintrf_push_context(cpunum);
-					(*device->machine->config->cpu[cpunum].vblank_interrupt)(device->machine, cpunum);
+					(*config->vblank_interrupt)(device->machine, cpunum);
 					cpuintrf_pop_context();
 				}
 
@@ -824,6 +824,10 @@ static void on_vblank(const device_config *device, int vblank_state)
 static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 {
 	int cpunum = param;
+	const cpu_config *config = machine->config->cpu + cpunum;
+
+	if (cpu[cpunum].iloops == 0)
+		cpu[cpunum].iloops = config->vblank_interrupts_per_frame;
 
 	cpu[cpunum].iloops--;
 
@@ -831,12 +835,12 @@ static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 	if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
 		cpuintrf_push_context(cpunum);
-		(*machine->config->cpu[cpunum].vblank_interrupt)(machine, cpunum);
+		(*config->vblank_interrupt)(machine, cpunum);
 		cpuintrf_pop_context();
 	}
 
 	/* more? */
-	if (cpu[cpunum].iloops > 0)
+	if (cpu[cpunum].iloops > 1)
 		timer_adjust_oneshot(cpu[cpunum].partial_frame_timer, cpu[cpunum].partial_frame_period, cpunum);
 }
 
