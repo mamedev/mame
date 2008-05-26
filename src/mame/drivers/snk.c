@@ -889,7 +889,7 @@ static MACHINE_DRIVER_START( athena )
 
 	MDRV_PALETTE_INIT(aso)
 	MDRV_VIDEO_START(snk)
-	MDRV_VIDEO_UPDATE(tnk3)
+	MDRV_VIDEO_UPDATE(athena)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
