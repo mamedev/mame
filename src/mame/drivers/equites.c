@@ -146,6 +146,10 @@ TODO:
   Sprite y scaling is slightly wrong and leaves gaps in tall objects.
   Note that sprites are 30x30 instead of 32x32.
 
+- The "road" background in splndrbt is slightly wrong. Apparently, the black lines
+  visible in some parts of the background should never disappear in the distance.
+  Currently, they may or may not disappear depending on the X position.
+
 - Need to use different default volumes for various games, especially gekisou
   where the car noise is really unpleasant with the default settings.
 
