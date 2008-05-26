@@ -6434,109 +6434,125 @@ WRITE32_HANDLER( K056832_b_long_w )
 
 static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, int page, int flags)
 {
-#define LINE_WIDTH 512
-
-#define DRAW_PIX(N) \
-	pen = src_ptr[N]; \
-	if (pen) \
-	{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
-	{ xpr_ptr[count+N] = 0; }
-
-	rectangle zerorect;
-	tilemap *tmap;
-	bitmap_t *pixmap, *xprmap;
-	UINT8 *xprdata;
-	const gfx_element *src_gfx;
-
-	UINT32 *dirty;
-	int all_dirty, line;
-	int offs, mask;
-
-	const pen_t *pal_ptr;
-	const UINT8  *src_base, *src_ptr;
-	UINT8  *xpr_ptr;
-	UINT16 *dst_ptr;
-	UINT16 pen, basepen;
-	int count, src_pitch, src_modulo;
-	int	dst_pitch;
-
-	UINT8 code_transparent, code_opaque;
 
 	if (K056832_PageTileMode[page]) return(0);
 	if (!K056832_linemap_enabled) return(1);
 
-	tmap = K056832_tilemap[page];
-	pixmap  = K056832_pixmap[page];
-	xprmap  = tilemap_get_flagsmap(tmap);
-	xprdata = tilemap_get_tile_flags(tmap);
 
-	dirty = K056832_LineDirty[page];
-	all_dirty = K056832_AllLinesDirty[page];
-
-	if (all_dirty)
 	{
-		dirty[7]=dirty[6]=dirty[5]=dirty[4]=dirty[3]=dirty[2]=dirty[1]=dirty[0] = 0;
-		K056832_AllLinesDirty[page] = 0;
 
-		// force tilemap into a clean, static state
-		// *really ugly but it minimizes alteration to tilemap.c
-		memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
-		tilemap_draw(bitmap, &zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
-		fillbitmap(xprmap, 0, 0);						// reset pixel transparency_bitmap;
-		memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
-	}
-	else
-	{
-		if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
-	}
+		rectangle zerorect;
+		tilemap *tmap;
+		UINT32 *dirty;
+		int all_dirty;
+		bitmap_t* xprmap;
+		UINT8 *xprdata;
 
-	pal_ptr    = machine->pens;
-	src_gfx    = machine->gfx[K056832_gfxnum];
-	src_base   = src_gfx->gfxdata;
-	src_pitch  = src_gfx->line_modulo;
-	src_modulo = src_gfx->char_modulo;
-	xpr_ptr    = (UINT8*)xprmap->base + LINE_WIDTH;
-	dst_ptr    = (UINT16*)pixmap->base + LINE_WIDTH;
-	dst_pitch  = pixmap->rowpixels;
+		tmap = K056832_tilemap[page];
+		xprmap  = tilemap_get_flagsmap(tmap);
+		xprdata = tilemap_get_tile_flags(tmap);
 
-	for (line=0; line<256; xpr_ptr+=dst_pitch, dst_ptr+=dst_pitch, line++)
-	{
-		tile_data *tileinfo = {0};
-		if (!all_dirty)
+		dirty = K056832_LineDirty[page];
+		all_dirty = K056832_AllLinesDirty[page];
+
+		if (all_dirty)
 		{
-			offs = line >> 5;
-			mask = 1 << (line & 0x1f);
-			if (!(dirty[offs] & mask)) continue;
-			dirty[offs] ^= mask;
+			dirty[7]=dirty[6]=dirty[5]=dirty[4]=dirty[3]=dirty[2]=dirty[1]=dirty[0] = 0;
+			K056832_AllLinesDirty[page] = 0;
+
+			// force tilemap into a clean, static state
+			// *really ugly but it minimizes alteration to tilemap.c
+			memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
+			tilemap_draw(bitmap, &zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
+			fillbitmap(xprmap, 0, 0);						// reset pixel transparency_bitmap;
+			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
+		}
+		else
+		{
+			if (!(dirty[0]|dirty[1]|dirty[2]|dirty[3]|dirty[4]|dirty[5]|dirty[6]|dirty[7])) return(0);
 		}
 
-		K056832_get_tile_info(machine, tileinfo, line, page);
-		src_ptr = tileinfo->pen_data;//src_base + ((tileinfo->tile_number & ~7) << 6);
-		basepen = tileinfo->palette_base;
-		code_transparent = tileinfo->category;
-		code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
-		count = -LINE_WIDTH;
-
-		do
+#if 0	/* whatever this code was meant to do, it isn't working, it causes a crash in gijoe (attract mode) when
+            K056832_get_tile_info(machine, tileinfo, line, page);
+            is called with
+            tile_data *tileinfo = {0}; */
 		{
-			DRAW_PIX(0)
-			DRAW_PIX(1)
-			DRAW_PIX(2)
-			DRAW_PIX(3)
-			DRAW_PIX(4)
-			DRAW_PIX(5)
-			DRAW_PIX(6)
-			DRAW_PIX(7)
 
-			src_ptr += 8;
+
+			bitmap_t *pixmap;
+
+			UINT8 code_transparent, code_opaque;
+			const pen_t *pal_ptr;
+			const UINT8  *src_base, *src_ptr;
+			UINT8  *xpr_ptr;
+			UINT16 *dst_ptr;
+			UINT16 pen, basepen;
+			int count, src_pitch, src_modulo;
+			int	dst_pitch;
+			int line;
+			const gfx_element *src_gfx;
+			int offs, mask;
+
+			#define LINE_WIDTH 512
+
+			#define DRAW_PIX(N) \
+				pen = src_ptr[N]; \
+				if (pen) \
+				{ pen += basepen; xpr_ptr[count+N] = TILEMAP_PIXEL_LAYER0; dst_ptr[count+N] = pen; } else \
+				{ xpr_ptr[count+N] = 0; }
+
+			pixmap  = K056832_pixmap[page];
+			pal_ptr    = machine->pens;
+			src_gfx    = machine->gfx[K056832_gfxnum];
+			src_base   = src_gfx->gfxdata;
+			src_pitch  = src_gfx->line_modulo;
+			src_modulo = src_gfx->char_modulo;
+			xpr_ptr    = (UINT8*)xprmap->base + LINE_WIDTH;
+			dst_ptr    = (UINT16*)pixmap->base + LINE_WIDTH;
+			dst_pitch  = pixmap->rowpixels;
+
+			for (line=0; line<256; xpr_ptr+=dst_pitch, dst_ptr+=dst_pitch, line++)
+			{
+				tile_data *tileinfo = {0};
+				if (!all_dirty)
+				{
+					offs = line >> 5;
+					mask = 1 << (line & 0x1f);
+					if (!(dirty[offs] & mask)) continue;
+					dirty[offs] ^= mask;
+				}
+
+				K056832_get_tile_info(machine, tileinfo, line, page);
+				src_ptr = tileinfo->pen_data;//src_base + ((tileinfo->tile_number & ~7) << 6);
+				basepen = tileinfo->palette_base;
+				code_transparent = tileinfo->category;
+				code_opaque = code_transparent | TILEMAP_PIXEL_LAYER0;
+				count = -LINE_WIDTH;
+
+				do
+				{
+					DRAW_PIX(0)
+					DRAW_PIX(1)
+					DRAW_PIX(2)
+					DRAW_PIX(3)
+					DRAW_PIX(4)
+					DRAW_PIX(5)
+					DRAW_PIX(6)
+					DRAW_PIX(7)
+
+					src_ptr += 8;
+				}
+				while (count += 8);
+			}
+
+			#undef LINE_WIDTH
+			#undef DRAW_PIX
 		}
-		while (count += 8);
+#endif
+
 	}
 
 	return(0);
-
-#undef LINE_WIDTH
-#undef DRAW_PIX
 }
 
 void K056832_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer, int flags, UINT32 priority)
