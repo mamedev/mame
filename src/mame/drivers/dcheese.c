@@ -8,6 +8,7 @@
         * Double Cheese
         * Lotto Fun 2
         * Fred Flintstones' Memory Match
+        * ChuckECheese's Match Game
 
     Known bugs:
         * Test/tilt buttons seem to be swapped compared to test mode
@@ -20,7 +21,7 @@
       allow the wheel to start spinning.  This is most likely to stop
       people from rigging the game.
 
-    [fredmem]
+    [fredmem / cecmatch]
     * Controls are set up as a 3 x 3 matrix of buttons that match the 9
       positions on the screen.
 
@@ -754,11 +755,11 @@ ROM_START( cecmatch )
 	ROM_REGION( 0x10000, REGION_CPU2, 0 ) /* M6809 */
 	ROM_LOAD( "prog.102", 0x00000, 0x8000, CRC(d452ccf4) SHA1(7de9a4f39bf0ba448fe4ebeb459e98a1910a66be) ) /* Sound Program 6809 code at U102 */
 	ROM_RELOAD(0x8000,0x8000)
-	
+
 	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_ERASEFF )
 	ROM_LOAD( "art-rom.123", 0x000000, 0x40000, CRC(1bab1a52) SHA1(f713ba1bc755c41d38d9846444d753c9c7fb1f9d) ) /* Graphics / Art at U123 */
-	ROM_LOAD( "art-rom.125", 0x080000, 0x40000, CRC(7abe18d9) SHA1(c5a582ded7c1b0a02847b342111c64ac0ccb70c2) ) /* Graphics / Art at U125 */
 	ROM_LOAD( "art-rom.127", 0x040000, 0x40000, CRC(dc9be2ca) SHA1(d5059a49a3aad309e242c9c4791d10aa5ecd5d1a) ) /* Graphics / Art at U127 */
+	ROM_LOAD( "art-rom.125", 0x080000, 0x40000, CRC(7abe18d9) SHA1(c5a582ded7c1b0a02847b342111c64ac0ccb70c2) ) /* Graphics / Art at U125 */
 
 	ROM_REGION( 0x400000, REGION_SOUND1, 0 )
 	ROM_LOAD( "arom0", 0x000000, 0x40000, CRC(82129830) SHA1(2fa3a32ac4f81dd9c2ab11f34257df4074447f3a))
@@ -806,6 +807,7 @@ static DRIVER_INIT( dcheese )
 
 GAME( 1993, dcheese,  0,       dcheese, dcheese, dcheese, ROT90, "HAR", "Double Cheese", GAME_SUPPORTS_SAVE )
 GAME( 1993, lottof2,  0,       dcheese, lottof2, dcheese, ROT0,  "HAR", "Lotto Fun 2", GAME_SUPPORTS_SAVE )
+GAME( 1993, cecmatch, 0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmem,  0,       fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmeus, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmeuk, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", GAME_SUPPORTS_SAVE )
@@ -813,4 +815,3 @@ GAME( 1994, fredmemj, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusem
 GAME( 1994, fredmemc, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", GAME_SUPPORTS_SAVE )
 GAME( 1994, fredmesp, fredmem, fredmem, fredmem, dcheese, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, cecmatch,  0,      fredmem, fredmem, dcheese, ROT0, "Coastal Amusements", "ChuckECheese's Match Game", GAME_SUPPORTS_SAVE )
