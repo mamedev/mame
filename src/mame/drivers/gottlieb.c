@@ -664,8 +664,7 @@ static INPUT_PORTS_START( qbert )
 	PORT_DIPNAME( 0x80, 0x00, "SW8" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-/* 0x40 must be connected to the IP16 line */
+	/* 0x40 must be connected to the IP16 line */
 
 	PORT_START_TAG("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
