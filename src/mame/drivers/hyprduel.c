@@ -11,7 +11,7 @@ OSC:  4.0000MHz, 20.0000MHz, 26.6660MHz
 Imagetek Inc 14220 071
 
 
-Search for the Magical Error
+Magical Error wo Sagase
 (c)1993? Technosoft / Jaleco
 TEC5000(Japan)
 
@@ -880,4 +880,4 @@ ROM_END
 GAME( 1993, hyprduel, 0,        hyprduel, hyprduel, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 1)", 0 )
 GAME( 1993, hyprdelj, hyprduel, hyprduel, hyprduel, hyprduel, ROT0, "Technosoft", "Hyper Duel (Japan set 2)", 0 )
 
-GAME( 199?, magerror, 0,        magerror, hyprduel, hyprduel, ROT0, "Technosoft / Jaleco", "Search for the Magical Error", GAME_NOT_WORKING )
+GAME( 199?, magerror, 0,        magerror, hyprduel, hyprduel, ROT0, "Technosoft / Jaleco", "Magical Error wo Sagase", GAME_NOT_WORKING )
