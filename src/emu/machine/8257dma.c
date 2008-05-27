@@ -4,6 +4,11 @@
 
     For datasheet http://www.threedee.com/jcm/library/index.html
 
+    2008/05     Miodrag Milanovic
+    	
+    	- added support for autoload mode
+    	- fixed bug in calculating count
+    	
     2007/11     couriersud
 
         - architecture copied from 8237 DMA
@@ -165,6 +170,12 @@ static int dma8257_do_operation(int which, int channel)
 	}
 	if (done)
 	{
+		if ((channel==2) && DMA_MODE_AUTOLOAD(dma[which].mode)) {
+			/* in case of autoload at the end channel 3 info is */
+			/* copied to channel 2 info							*/
+			dma[which].registers[4] = dma[which].registers[6];
+			dma[which].registers[5] = dma[which].registers[7];		
+		}
 		if (dma[which].intf->out_tc_func[channel])
 			dma[which].intf->out_tc_func[channel](CLEAR_LINE);
 	}
@@ -305,13 +316,25 @@ static void dma8257_write(int which, offs_t offset, UINT8 data)
 			dma[which].registers[offset] |= ((UINT16) data) << 8;
 		else
 			dma[which].registers[offset] = data;
+
+		if (DMA_MODE_AUTOLOAD(dma[which].mode)) {
+			/* in case of autoload when inserting channel 2 info */
+			/* it is automaticaly copied to channel 3 info		 */
+			switch(offset) {
+				case 4:
+				case 5:
+					if (dma[which].msb)
+						dma[which].registers[offset+2] |= ((UINT16) data) << 8;
+					else
+						dma[which].registers[offset+2] = data;
+			}
+		}
+			
 		prepare_msb_flip(which);
 		break;
 
 	case 8:
 		/* DMA mode register */
-		if (DMA_MODE_AUTOLOAD(data)	)
-			fatalerror("8257: Autoload not supported!\n");
 		dma[which].mode = data;
 		break;
 
@@ -334,7 +357,7 @@ static TIMER_CALLBACK( dma8257_drq_write_callback )
 	{
 		dma[which].drq |= 0x01 << channel;
 		dma[which].address[channel] =  dma[which].registers[channel * 2];
-		dma[which].count[channel] =  dma[which].registers[channel * 2 + 1] & 0x3FF;
+		dma[which].count[channel] =  dma[which].registers[channel * 2 + 1] & 0x3FFF;
 		dma[which].rwmode[channel] =  dma[which].registers[channel * 2 + 1] >> 14;
 		/* clear channel TC */
 		dma[which].status &= ~(0x01 << channel);
