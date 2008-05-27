@@ -20,8 +20,6 @@ XTAL        :   18.432 MHz
 #include "driver.h"
 #include "sound/custom.h"
 
-static UINT8 *clshroad_sharedram;
-
 /* Variables & functions defined in video: */
 
 extern UINT8 *clshroad_vram_0, *clshroad_vram_1;
@@ -49,11 +47,6 @@ static MACHINE_RESET( clshroad )
 }
 
 
-/* Shared RAM with the sound CPU */
-
-static READ8_HANDLER ( clshroad_sharedram_r )	{	return clshroad_sharedram[offset];	}
-static WRITE8_HANDLER( clshroad_sharedram_w )	{	clshroad_sharedram[offset] = data;	}
-
 static READ8_HANDLER( clshroad_input_r )
 {
 	return	((~input_port_read(machine, "IN0") & (1 << offset)) ? 1 : 0) |
@@ -63,40 +56,25 @@ static READ8_HANDLER( clshroad_input_r )
 }
 
 
-static ADDRESS_MAP_START( clshroad_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0x95ff) AM_READ(SMH_RAM				)	// Work   RAM
-	AM_RANGE(0x9600, 0x97ff) AM_READ(clshroad_sharedram_r	)	// Shared RAM
-	AM_RANGE(0x9800, 0x9dff) AM_READ(SMH_RAM				)	// Work   RAM
-	AM_RANGE(0x9e00, 0x9fff) AM_READ(SMH_RAM				)	// Sprite RAM
-	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r		)	// Inputs
-	AM_RANGE(0xa800, 0xafff) AM_READ(SMH_RAM				)	// Layer  1
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM				)	// Layers 0
+static ADDRESS_MAP_START( clshroad_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x95ff) AM_RAM
+	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x9800, 0x9dff) AM_RAM
+	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// ? Interrupt related
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(clshroad_flipscreen_w)
+	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(clshroad_vram_1_w) AM_BASE(&clshroad_vram_1)	// Layer 1
+	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_BASE(&clshroad_vregs)	// Scroll
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(clshroad_vram_0_w) AM_BASE(&clshroad_vram_0)	// Layer 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( clshroad_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM									)	// ROM
-	AM_RANGE(0x8000, 0x95ff) AM_WRITE(SMH_RAM									)	// Work   RAM
-	AM_RANGE(0x9600, 0x97ff) AM_WRITE(clshroad_sharedram_w) AM_BASE(&clshroad_sharedram	)	// Shared RAM
-	AM_RANGE(0x9800, 0x9dff) AM_WRITE(SMH_RAM									)	// Work   RAM
-	AM_RANGE(0x9e00, 0x9fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size		)	// Sprite RAM
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(SMH_NOP									)	// ? Interrupt related
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(clshroad_flipscreen_w						)	// Flip Screen
-	AM_RANGE(0xa800, 0xafff) AM_WRITE(clshroad_vram_1_w) AM_BASE(&clshroad_vram_1		)	// Layer 1
-	AM_RANGE(0xb000, 0xb003) AM_WRITE(SMH_RAM) AM_BASE(&clshroad_vregs					)	// Scroll
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(clshroad_vram_0_w) AM_BASE(&clshroad_vram_0		)	// Layers 0
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( clshroad_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x9600, 0x97ff) AM_READ(clshroad_sharedram_r	)	// Shared RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( clshroad_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM				)	// ROM
+static ADDRESS_MAP_START( clshroad_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(wiping_sound_w) AM_BASE(&wiping_soundregs)
-	AM_RANGE(0x9600, 0x97ff) AM_WRITE(clshroad_sharedram_w	)	// Shared RAM
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(SMH_NOP				)	// ? Interrupt related
+	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ? Interrupt related
 ADDRESS_MAP_END
 
 
@@ -282,14 +260,14 @@ static const gfx_layout layout_16x16x4 =
 
 static GFXDECODE_START( firebatl )
 	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,   0, 16 ) // [0] Sprites
-	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,	 16,  1 ) // [1] Layer 0
+	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4,  16,  1 ) // [1] Layer 0
 	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x2,   512, 64 ) // [2] Layer 1
 GFXDECODE_END
 
 static GFXDECODE_START( clshroad )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4, 0, 16 ) // [0] Sprites
+	GFXDECODE_ENTRY( REGION_GFX1, 0, layout_16x16x4,    0, 16 ) // [0] Sprites
 	GFXDECODE_ENTRY( REGION_GFX2, 0, layout_16x16x4, 0x90,  1 ) // [1] Layer 0
-	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,   0, 16 ) // [2] Layer 1
+	GFXDECODE_ENTRY( REGION_GFX3, 0, layout_8x8x4,      0, 16 ) // [2] Layer 1
 GFXDECODE_END
 
 
@@ -305,12 +283,12 @@ static MACHINE_DRIVER_START( firebatl )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD(Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_readmem,clshroad_writemem)
+	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_CPU_ADD(Z80, 3000000)	/* ? */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(clshroad_sound_readmem,clshroad_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
@@ -341,13 +319,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( clshroad )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(Z80, 18432000/6)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_readmem,clshroad_writemem)
+	MDRV_CPU_ADD(Z80, 18432000/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
+	MDRV_CPU_PROGRAM_MAP(clshroad_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_CPU_ADD(Z80, 18432000/6)	/* ? */
 	/* audio CPU */
-	MDRV_CPU_PROGRAM_MAP(clshroad_sound_readmem,clshroad_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ, no NMI */
 
 	MDRV_MACHINE_RESET(clshroad)
