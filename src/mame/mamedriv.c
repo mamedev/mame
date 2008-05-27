@@ -7933,7 +7933,6 @@ Other Sun games
 	DRIVER( attckufo )	/* (c) 1980 Ryoto Electric Co. */
 	DRIVER( fortecar )
 	DRIVER( jackpool )	/* (c) 1997 Electronic Projects */
-	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
 	DRIVER( murogem )	/* ??? */
 	DRIVER( murogema )	/* ??? */
 	DRIVER( lasvegas )	/* hack */
@@ -7944,6 +7943,7 @@ Other Sun games
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
+	DRIVER( suprpool )	/* (c) 1997 Nazionale Elettronica Giochi S.A.S. */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */

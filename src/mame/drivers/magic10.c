@@ -463,6 +463,52 @@ ROM_START( magic102 )
 	ROM_LOAD( "7.u32",        0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 ROM_END
 
+/*
+
+Super Pool
+  
+ABM (Nazionale Elettronica Giochi S.A.S.), 1998.  
+9743 Rev.01  
+
+1x MC68HC000P10
+1x ACTEL A1020B-PL84C
+1x HD6473308CP10 (label says: do not remove version 1.2)
+1x U6295 (sound)
+1x LM358N (sound)
+1x TDA2003 (sound)
+1x oscillator 20.000MHz
+1x oscillator 30.0000MHz
+1x blu resonator 1000J (close to sound)  
+
+1x M27C2001 (1) (Sound)
+2x TMS27C010A (2,3) (main)
+4x TMS27C010A (4,5,6,7) (gfx)
+1x PALCE22V10H (not dumped)
+1x PALCE16V8H (not dumped)  
+
+1x 28x2 JAMMA edge connector
+1x 12 legs connector (J1)
+1x trimmer (volume)
+1x 8x2 switches dip
+1x lithium battery
+
+*/ 
+
+ROM_START( suprpool )
+	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "2-1.22a.u3", 0x00000, 0x20000,CRC(5d15037a) SHA1(74cab79a1b08910267262a4c6b501126a4df6cda) )
+	ROM_LOAD16_BYTE( "3-1.22a.u2", 0x00001, 0x20000,CRC(c762cd1c) SHA1(ee05a9e8147d613eb14333e6e7b743fc05982e7c) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, 0 ) /* Sprites */
+	ROM_LOAD( "7.u35", 0x00000, 0x20000,  CRC(357d145f) SHA1(9fea0d0c5d6c27bf520c4f81eb0f48a65ff60142) )
+	ROM_LOAD( "6.u36", 0x20000, 0x20000,  CRC(c4448813) SHA1(6e168eb8503b852179f2d743f1cba935592e0a60) )
+	ROM_LOAD( "5.u37", 0x40000, 0x20000,  CRC(6e99af07) SHA1(85e7a76724fd9ce8d07b5088cb6e0d933fd95692) )
+	ROM_LOAD( "4.u38", 0x60000, 0x20000,  CRC(0660a169) SHA1(1cb34b3da4b144028519a3c5b32ef7da44af0624) )
+
+	ROM_REGION( 0x080000, REGION_SOUND1, 0 ) /* Samples */
+	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
+ROM_END
+
 static DRIVER_INIT( magic10 )
 {
 	layer2_offset[0] = 32;
@@ -475,6 +521,7 @@ static DRIVER_INIT( magic102 )
 	layer2_offset[1] = 20;
 }
 
-GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.55)", 0 )
-GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.45)", 0 )
-GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Magic's 10 2 (ver 1.1)", GAME_NOT_WORKING )
+GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.55)",  0 )
+GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.45)",  0 )
+GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Magic's 10 2 (ver 1.1)",   GAME_NOT_WORKING )
+GAME( 1997, suprpool,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Super Pool (9743 Rev.01)", GAME_NOT_WORKING )
