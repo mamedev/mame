@@ -5,13 +5,13 @@
     driver by Phil Bennett
 
     Games supported:
+        * Coronation Street Quiz Game
         * Cluedo (3 sets)
         * Hangman
         * Scrabble
         * Trivial Pursuit
 
     ROMS wanted:
-        * Coronation Street
         * Snakes and Ladders
 
     Known issues:
@@ -735,6 +735,28 @@ static INPUT_PORTS_START( hngmnjpm )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "'1'" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( coronatn )
+	IMPACT_STANDARD
+
+	PORT_START_TAG("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_NAME( "Coin: 1 pound" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_NAME( "Coin: 50p" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(1) PORT_NAME( "Coin: 20p" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(1) PORT_NAME( "Coin: 10p" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_IMPULSE(1) PORT_NAME( "Token: 20" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_IMPULSE(1) PORT_NAME( "Coin: 5p" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START_TAG("SW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Ask Ken" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Collect" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "'1'" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "'2'" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "'3'" )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( cluedo )
 	IMPACT_STANDARD
 
@@ -966,6 +988,28 @@ ROM_START( trivialp )
 	ROM_LOAD( "tp-snd.bin", 0x000000, 0x80000, CRC(7e2cb00a) SHA1(670ee5dd5c60313676b9271901b4df9e6ebd5955) )
 ROM_END
 
+ROM_START( scrabble )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "1562.bin", 0x000000, 0x080000, CRC(d7303b98) SHA1(46e8ed04c8fdc092b7d8910d3e3f6cc62f691646) )
+	ROM_LOAD16_BYTE( "1563.bin", 0x000001, 0x080000, CRC(77f61ba1) SHA1(276dc8b2c23880740309c456d4e4b2eae249cdde) )
+	ROM_FILL(                    0x100000, 0x100000, 0xff )
+
+	ROM_LOAD16_BYTE( "scra-q1.bin", 0xc00000, 0x080000, CRC(bcbc6328) SHA1(cbf8901e80e7bc1f82f6f7d4d5f6a658af98a6f9) )
+	ROM_LOAD16_BYTE( "scra-q2.bin", 0xc00001, 0x080000, CRC(c2147999) SHA1(f21dc0f3f4ba0d6304801bc492a759534447d747) )
+	ROM_LOAD16_BYTE( "scra-q3.bin", 0xd00000, 0x080000, CRC(622cebb9) SHA1(9b7c2204462d4912462bad6c4dcf096abe1381bb) )
+	ROM_LOAD16_BYTE( "scra-q4.bin", 0xd00001, 0x080000, CRC(fd4b587b) SHA1(e29512a075fbc511271d6902c8900a9b0261355c) )
+	ROM_LOAD16_BYTE( "scra-q5.bin", 0xe00000, 0x080000, CRC(fbc28978) SHA1(ce2549da858888d49677ec982ab3c21cf292939b) )
+	ROM_LOAD16_BYTE( "scra-q6.bin", 0xe00001, 0x080000, CRC(8b792c9c) SHA1(9a5cc6c4d7e807cbabd174ab7454cdaa93dc3cec) )
+	ROM_FILL(                       0xf00000, 0x100000, 0xff )
+
+	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )
+	ROM_LOAD16_BYTE( "scra-g1.bin", 0x000000, 0x100000, CRC(04a17df9) SHA1(c215c90d8add3ff608c24aac242369874f6bf9d7) )
+	ROM_LOAD16_BYTE( "scra-g2.bin", 0x000001, 0x100000, CRC(724375e6) SHA1(709211a2d7b86f4e83c94a37010fe61ef9a734de) )
+
+	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
+	ROM_LOAD( "scra-snd.bin", 0x000000, 0x80000, CRC(287759ef) SHA1(bd37500689b7b2fb4fbc65056e92486c0c00ff61) )
+ROM_END
+
 ROM_START( hngmnjpm )
 	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
 	ROM_LOAD16_BYTE( "20264.bin", 0x000000, 0x080000, CRC(50074528) SHA1(8128b2270518af873df4b94d50c5c9849dda3e42) )
@@ -998,28 +1042,26 @@ ROM_START( hngmnjpm )
 	ROM_LOAD( "mem-2.bin", 0x0000, 0x0157, CRC(92832445) SHA1(b6edcc6d4f721f0e91e9fcf322163db017afaee1) )
 ROM_END
 
-ROM_START( scrabble )
+ROM_START( coronatn )
 	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
-	ROM_LOAD16_BYTE( "1562.bin", 0x000000, 0x080000, CRC(d7303b98) SHA1(46e8ed04c8fdc092b7d8910d3e3f6cc62f691646) )
-	ROM_LOAD16_BYTE( "1563.bin", 0x000001, 0x080000, CRC(77f61ba1) SHA1(276dc8b2c23880740309c456d4e4b2eae249cdde) )
-	ROM_FILL(                    0x100000, 0x100000, 0xff )
+	ROM_LOAD16_BYTE( "20824.bin", 0x000000, 0x080000, CRC(f5cc07cb) SHA1(45b83829ba9bd5f22c2978bbde9c0e25c476e719) )
+	ROM_LOAD16_BYTE( "20825.bin", 0x000001, 0x080000, CRC(2e749edf) SHA1(12b24836a71085aef8ca1bc61e6671f8d6e1908c) )
+	ROM_FILL(                     0x100000, 0x100000, 0xff )
 
-	ROM_LOAD16_BYTE( "scra-q1.bin", 0xc00000, 0x080000, CRC(bcbc6328) SHA1(cbf8901e80e7bc1f82f6f7d4d5f6a658af98a6f9) )
-	ROM_LOAD16_BYTE( "scra-q2.bin", 0xc00001, 0x080000, CRC(c2147999) SHA1(f21dc0f3f4ba0d6304801bc492a759534447d747) )
-	ROM_LOAD16_BYTE( "scra-q3.bin", 0xd00000, 0x080000, CRC(622cebb9) SHA1(9b7c2204462d4912462bad6c4dcf096abe1381bb) )
-	ROM_LOAD16_BYTE( "scra-q4.bin", 0xd00001, 0x080000, CRC(fd4b587b) SHA1(e29512a075fbc511271d6902c8900a9b0261355c) )
-	ROM_LOAD16_BYTE( "scra-q5.bin", 0xe00000, 0x080000, CRC(fbc28978) SHA1(ce2549da858888d49677ec982ab3c21cf292939b) )
-	ROM_LOAD16_BYTE( "scra-q6.bin", 0xe00001, 0x080000, CRC(8b792c9c) SHA1(9a5cc6c4d7e807cbabd174ab7454cdaa93dc3cec) )
-	ROM_FILL(                       0xf00000, 0x100000, 0xff )
+	ROM_LOAD16_BYTE( "cs-q1.bin", 0xc00000, 0x080000, CRC(beef496a) SHA1(6089ee8b0821d5b8cb8f724748888a0915083622) )
+	ROM_LOAD16_BYTE( "cs-q2.bin", 0xc00001, 0x080000, CRC(16f88f36) SHA1(78c829d837cc09fdd1119ba73168d272843f7f50) )
+	ROM_LOAD16_BYTE( "cs-q3.bin", 0xd00000, 0x080000, CRC(1d412b03) SHA1(2400fa776effeb2ab21234a6ecf183ed0cffa92e) )
+	ROM_LOAD16_BYTE( "cs-q4.bin", 0xd00001, 0x080000, CRC(55c23ab9) SHA1(0eaa8c88315ef4544f1d1ef2fec2c6edc3589db3) )
+	ROM_LOAD16_BYTE( "cs-q5.bin", 0xe00000, 0x080000, CRC(289f4db0) SHA1(8eca9df9e278bf77be4b2aad4c80ea6a1880fe96) )
+	ROM_LOAD16_BYTE( "cs-q6.bin", 0xe00001, 0x080000, CRC(791d9d39) SHA1(44f3dcbfe8523118d52785844e103a480e8e13b5) )
 
 	ROM_REGION16_LE( 0x200000, REGION_USER1, 0 )
-	ROM_LOAD16_BYTE( "scra-g1.bin", 0x000000, 0x100000, CRC(04a17df9) SHA1(c215c90d8add3ff608c24aac242369874f6bf9d7) )
-	ROM_LOAD16_BYTE( "scra-g2.bin", 0x000001, 0x100000, CRC(724375e6) SHA1(709211a2d7b86f4e83c94a37010fe61ef9a734de) )
+	ROM_LOAD16_BYTE( "cs-ag1.bin", 0x000000, 0x100000, CRC(7ce449cc) SHA1(408e1405c80e623ee120cea65760ca9a8554cc29) )
+	ROM_LOAD16_BYTE( "cs-ag2.bin", 0x000001, 0x100000, CRC(7026df0c) SHA1(a000d72c06ad37879673324880fb0e715f55788e) )
 
 	ROM_REGION( 0x80000, REGION_SOUND1, 0 )
-	ROM_LOAD( "scra-snd.bin", 0x000000, 0x80000, CRC(287759ef) SHA1(bd37500689b7b2fb4fbc65056e92486c0c00ff61) )
+	ROM_LOAD( "cs-sound.bin", 0x000000, 0x80000, CRC(96ea4e9f) SHA1(a5443d893f38f3e279f2eb9f4500547e7b8efa37) )
 ROM_END
-
 
 /*************************************
  *
@@ -1027,9 +1069,10 @@ ROM_END
  *
  *************************************/
 
-GAME( 1995, cluedo,   0,      jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2D)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1995, cluedo2c, cluedo, jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2C)",          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1995, cluedo2,  cluedo, jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2)",         	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1996, trivialp, 0,      jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (prod. 1D)", GAME_SUPPORTS_SAVE )
-GAME( 1997, scrabble, 0,      jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev. F)",          GAME_SUPPORTS_SAVE )
-GAME( 1998, hngmnjpm, 0,      jpmimpct, hngmnjpm, 0, ROT0, "JPM", "Hangman (JPM)",              GAME_SUPPORTS_SAVE )
+GAME( 1995, cluedo,   0,      jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2D)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, cluedo2c, cluedo, jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2C)",           GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1995, cluedo2,  cluedo, jpmimpct, cluedo,   0, ROT0, "JPM", "Cluedo (prod. 2)",         	 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1996, trivialp, 0,      jpmimpct, trivialp, 0, ROT0, "JPM", "Trivial Pursuit (prod. 1D)",  GAME_SUPPORTS_SAVE )
+GAME( 1997, scrabble, 0,      jpmimpct, scrabble, 0, ROT0, "JPM", "Scrabble (rev. F)",           GAME_SUPPORTS_SAVE )
+GAME( 1998, hngmnjpm, 0,      jpmimpct, hngmnjpm, 0, ROT0, "JPM", "Hangman (JPM)",               GAME_SUPPORTS_SAVE )
+GAME( 1999, coronatn, 0,      jpmimpct, coronatn, 0, ROT0, "JPM", "Coronation Street Quiz Game", GAME_SUPPORTS_SAVE )

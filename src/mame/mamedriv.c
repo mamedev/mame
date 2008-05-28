@@ -7546,6 +7546,7 @@ Other Sun games
 	DRIVER( trivialp )	/* (c) 1996 */
 	DRIVER( scrabble )	/* (c) 1997 */
 	DRIVER( hngmnjpm )	/* (c) 1998 */
+	DRIVER( coronatn )	/* (c) 1999 */
 
 	/* Other Games */
 	DRIVER( astinvad )	/* (c) 1980 Stern */
