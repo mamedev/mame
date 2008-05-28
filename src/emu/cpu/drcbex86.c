@@ -4963,7 +4963,7 @@ static x86code *op_mov(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 		}
 
 		/* immediate to memory */
-		else if (dstp.type == DRCUML_PTYPE_MEMORY && srcp.type == DRCUML_PTYPE_INT_REGISTER)
+		else if (dstp.type == DRCUML_PTYPE_MEMORY && srcp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
 			emit_mov_m32_imm(&dst, MABS(dstp.value), srcp.value);						// mov   [dstp],srcp
 			emit_mov_m32_imm(&dst, MABS(dstp.value + 4), srcp.value >> 32);				// mov   [dstp+4],srcp >> 32
