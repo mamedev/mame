@@ -11759,8 +11759,10 @@ static void LoadCheatCode(running_machine *machine, char * fileName)
 #ifdef MESS
 			/* check name */
 			if(TEST_FIELD(cheatOptions, SharedCode) && strcmp(machine->gamedrv->parent, "0"))
+			{
 				if(strcmp(name, machine->gamedrv->parent))
 					break;
+			}
 			else
 #endif
 			if(strcmp(name, machine->gamedrv->name))
