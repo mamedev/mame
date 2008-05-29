@@ -13,10 +13,32 @@
     * Ten Balls (Ver 1.05),  unknown, 1997.
 
 
+***********************************************************************************
+
+
+    Resistor Network for all PCBs:
+
+  
+     74LS373
+    +-------+
+    |     02|--> 1  KOhms resistor --> \
+    |     05|--> 470 Ohms resistor -->  > 100 Ohms pull-down resistor --> RED
+    |     06|--> 220 Ohms resistor --> /
+    |       |
+    |     09|--> 1  KOhms resistor --> \
+    |     12|--> 470 Ohms resistor -->  > 100 Ohms pull-down resistor --> BLUE
+    |     15|--> 220 Ohms resistor --> /
+    |       |
+    |     16|--> 470 Ohms resistor --> \  100 Ohms pull-down resistor --> GREEN
+    |     19|--> 220 Ohms resistor --> /
+    +-------+
+
+
 **********************************************************************************/
 
 
 #include "driver.h"
+#include "video/resnet.h"
 
 static tilemap *bg_tilemap;
 
@@ -33,32 +55,40 @@ WRITE8_HANDLER( snookr10_colorram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
+
 PALETTE_INIT( snookr10 )
 {
-	int i;
-
 	/* GGBBBRRR */
-	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	int i;
+	static const int resistances_rb[3] = { 1000, 470, 220 };
+	static const int resistances_g [2] = { 470, 220 };
+	double weights_r[3], weights_b[3], weights_g[2];
+
+	compute_resistor_weights(0,	255,	-1.0,
+			3,	resistances_rb,	weights_r,	100,	0,
+			3,	resistances_rb,	weights_b,	100,	0,
+			2,	resistances_g,	weights_g,	100,	0);
+
+
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = combine_3_weights(weights_r, bit0, bit1, bit2);
 		/* blue component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		b = combine_3_weights(weights_b, bit0, bit1, bit2);
 		/* green component */
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		g = combine_2_weights(weights_g, bit0, bit1);
 
 		palette_set_color(machine, i, MAKE_RGB(r,g,b));
 	}
@@ -79,37 +109,45 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-/*********************************************************
-* Apple10 color and tile matrix are encrypted/scrambled. *
-*     For more information, see the driver notes.        *
-*********************************************************/
+
+/**********************************************************
+* Apple10 colors and tile matrix are encrypted/scrambled. *
+*     For more information, see the driver notes.         *
+**********************************************************/
 
 PALETTE_INIT( apple10 )
 {
-	int i;
-
 	/* GGBBBRRR */
-	if (color_prom == 0) return;
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	int i, cn;
+	static const int resistances_rb[3] = { 1000, 470, 220 };
+	static const int resistances_g [2] = { 470, 220 };
+	double weights_r[3], weights_b[3], weights_g[2];
+
+	compute_resistor_weights(0,	255,	-1.0,
+			3,	resistances_rb,	weights_r,	100,	0,
+			3,	resistances_rb,	weights_b,	100,	0,
+			2,	resistances_g,	weights_g,	100,	0);
+
+
+	for (i = 0; i < machine->config->total_colors; i++)
 	{
-		int bit0,bit1,bit2,r,g,b,cn;
+		int bit0, bit1, bit2, r, g, b;
 
 		/* red component */
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		r = combine_3_weights(weights_r, bit0, bit1, bit2);
 		/* blue component */
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		b = combine_3_weights(weights_b, bit0, bit1, bit2);
 		/* green component */
-		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		g = combine_2_weights(weights_g, bit0, bit1);
 
 		/* encrypted color matrix */
 		cn = BITSWAP8(i,4,5,6,7,2,3,0,1);
@@ -132,6 +170,7 @@ static TILE_GET_INFO( apple10_get_bg_tile_info )
 
 	SET_TILE_INFO(0, code, color, 0);
 }
+
 
 VIDEO_START( snookr10 )
 {
