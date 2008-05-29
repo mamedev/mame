@@ -60,11 +60,11 @@ static TIMER_CALLBACK(cop410_serial_tick)
 	{
 		/*
 
-			SIO is an asynchronous binary counter decrementing its value by one upon each low-going pulse ("1" to "0") occurring on the SI input.
-			Each pulse must remain at each logic level at least two instruction cycles. SK outputs the value of the C upon the execution of an XAS
-			and remains latched until the execution of another XAS instruction. The SO output is equal to the value of EN3.
-	
-		*/
+            SIO is an asynchronous binary counter decrementing its value by one upon each low-going pulse ("1" to "0") occurring on the SI input.
+            Each pulse must remain at each logic level at least two instruction cycles. SK outputs the value of the C upon the execution of an XAS
+            and remains latched until the execution of another XAS instruction. The SO output is equal to the value of EN3.
+
+        */
 
 		// serial output
 
@@ -87,17 +87,17 @@ static TIMER_CALLBACK(cop410_serial_tick)
 	}
 	else
 	{
-		/* 
-		
-			SIO is a serial shift register, shifting continuously left each instruction cycle time. The data present at SI goes into the least
-			significant bit of SIO: SO can be enabled to output the most significant bit of SIO each cycle time. SK output becomes a logic-
-			controlled clock, providing a SYNC signal each instruction time. It will start outputting a SYNC pulse upon the execution of an XAS
-			instruction with C = "1," stopping upon the execution of a subsequent XAS with C = "0".
+		/*
 
-			If EN0 is changed from "1" to "0" ("0" to "1") the SK output will change from "1" to SYNC (SYNC to "1") without the execution of
-			an XAS instruction.
+            SIO is a serial shift register, shifting continuously left each instruction cycle time. The data present at SI goes into the least
+            significant bit of SIO: SO can be enabled to output the most significant bit of SIO each cycle time. SK output becomes a logic-
+            controlled clock, providing a SYNC signal each instruction time. It will start outputting a SYNC pulse upon the execution of an XAS
+            instruction with C = "1," stopping upon the execution of a subsequent XAS with C = "0".
 
-		*/
+            If EN0 is changed from "1" to "0" ("0" to "1") the SK output will change from "1" to SYNC (SYNC to "1") without the execution of
+            an XAS instruction.
+
+        */
 
 		// serial output
 

@@ -2219,40 +2219,40 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 	astring *fname = astring_alloc();
 	file_error filerr;
 	int index;
-	
+
 	/* handle defaults */
 	if (snapname == NULL || snapname[0] == 0)
 		snapname = "%g/%i";
 	astring_cpyc(snapstr, snapname);
-	
+
 	/* strip any extension in the provided name and add our own */
 	index = astring_rchr(snapstr, 0, '.');
 	if (index != -1)
 		astring_substr(snapstr, 0, index);
 	astring_catc(snapstr, ".");
 	astring_catc(snapstr, extension);
-	
+
 	/* substitute path and gamename up front */
 	astring_replacec(snapstr, 0, "/", PATH_SEPARATOR);
 	astring_replacec(snapstr, 0, "%g", machine->basename);
-	
+
 	/* determine if the template has an index; if not, we always use the same name */
 	if (astring_findc(snapstr, 0, "%i") == -1)
 		astring_cpy(fname, snapstr);
-	
+
 	/* otherwise, we scan for the next available filename */
 	else
 	{
 		int seq;
-		
+
 		/* try until we succeed */
 		for (seq = 0; ; seq++)
 		{
 			char seqtext[10];
-			
+
 			/* make text for the sequence number */
 			sprintf(seqtext, "%04d", seq);
-			
+
 			/* build up the filename */
 			astring_cpy(fname, snapstr);
 			astring_replacec(fname, 0, "%i", seqtext);

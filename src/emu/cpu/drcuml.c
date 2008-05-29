@@ -17,16 +17,16 @@
         - checks behavior of all opcodes
 
     * Extend registers to 16? Depends on if PPC can use them
-    
+
     * Support for FPU exceptions
 
     * New instructions?
-		- FDRNDS dst,src
-			round to single-precision
+        - FDRNDS dst,src
+            round to single-precision
 
-		- FCOPYI, ICOPYF
-			copy raw between float and integer registers
-			
+        - FCOPYI, ICOPYF
+            copy raw between float and integer registers
+
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param

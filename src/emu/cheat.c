@@ -120,7 +120,7 @@ enum
 	DEFINE_BITFIELD_ENUM(RegionFlag,				7,	7),		// 0 = cpu, 1 = non-cpu
 
 	/* old code */
-//	DEFINE_BITFIELD_ENUM(OneShot,					0,	0),
+//  DEFINE_BITFIELD_ENUM(OneShot,                   0,  0),
 	DEFINE_BITFIELD_ENUM(Type,						1,	2),
 	DEFINE_BITFIELD_ENUM(Operation,					3,	4),
 	DEFINE_BITFIELD_ENUM(TypeParameter,				5,	7),
@@ -393,7 +393,7 @@ enum		// entry flags
 	kCheatFlag_HasWrongCode =			1 << 12,
 
 	/* true if the cheat has been edited or is a new cheat
-	   checked at auto-save then save the code if true */
+       checked at auto-save then save the code if true */
 	kCheatFlag_Dirty =					1 << 13,
 
 	/* masks */
@@ -1039,16 +1039,16 @@ static const UINT32 kIncrementDecTable[] =
 
 static const char *const kRegionNames[] = {
 	"INVALID",
-	"CPU1",		"CPU2",		"CPU3",		"CPU4",		"CPU5",		"CPU6",		"CPU7",		"CPU8",		// 01-08	[01-08]	: CPU
-	"GFX1",		"GFX2",		"GFX3",		"GFX4",		"GFX5",		"GFX6",		"GFX7",		"GFX8",		// 09-16	[08-10]	: GFX
-	"PROMS",																						// 17		[11]	: PROMS
-	"SOUND1",	"SOUND2",	"SOUND3",	"SOUND4",	"SOUND5",	"SOUND6",	"SOUND7",	"SOUND8",	// 18-25	[12-19]	: SOUND
-	"USER1",	"USER2",	"USER3",	"USER4",	"USER5",	"USER6",	"USER7",	"USER8",	// 26-45	[1A-2D]	: USER
+	"CPU1",		"CPU2",		"CPU3",		"CPU4",		"CPU5",		"CPU6",		"CPU7",		"CPU8",		// 01-08    [01-08] : CPU
+	"GFX1",		"GFX2",		"GFX3",		"GFX4",		"GFX5",		"GFX6",		"GFX7",		"GFX8",		// 09-16    [08-10] : GFX
+	"PROMS",																						// 17       [11]    : PROMS
+	"SOUND1",	"SOUND2",	"SOUND3",	"SOUND4",	"SOUND5",	"SOUND6",	"SOUND7",	"SOUND8",	// 18-25    [12-19] : SOUND
+	"USER1",	"USER2",	"USER3",	"USER4",	"USER5",	"USER6",	"USER7",	"USER8",	// 26-45    [1A-2D] : USER
 	/* USER9 - PLDS are undefined in old format */
 	"USER9",	"USER10",	"USER11",	"USER12",	"USER13",	"USER14",	"USER15",	"USER16",
 	"USER17",	"USER18",	"USER19",	"USER20",
-	"DISKS",																						// 46		[2E]	: DISKS
-	"PLDS" };																						// 47		[2F]	: PLDS
+	"DISKS",																						// 46       [2E]    : DISKS
+	"PLDS" };																						// 47       [2F]    : PLDS
 
 static const char *const kNumbersTable[] = {
 	"0",	"1",	"2",	"3",	"4",	"5",	"6",	"7",
@@ -1437,12 +1437,12 @@ static int ShiftKeyPressed(void)
 {
 	return (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT));
 }
- 
+
 static int ControlKeyPressed(void)
 {
 	return (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL));
 }
- 
+
 static int AltKeyPressed(void)
 {
 	return (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT));
@@ -4736,31 +4736,31 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		switch(info->fieldType)
 		{
-/*			case kType_ActivationKey1:
-			case kType_ActivationKey2:
-				if(info->fieldType == kType_ActivationKey1)
-				{
-					entry->activationKey1--;
+/*          case kType_ActivationKey1:
+            case kType_ActivationKey2:
+                if(info->fieldType == kType_ActivationKey1)
+                {
+                    entry->activationKey1--;
 
-				if(entry->activationKey1 < 0)
-						entry->activationKey1 = __code_max - 1;
-					if(entry->activationKey1 >= __code_max)
-						entry->activationKey1 = 0;
+                if(entry->activationKey1 < 0)
+                        entry->activationKey1 = __code_max - 1;
+                    if(entry->activationKey1 >= __code_max)
+                        entry->activationKey1 = 0;
 
-					entry->flags |= kCheatFlag_HasActivationKey1;
-				}
-				else
-				{
-					entry->activationKey2--;
+                    entry->flags |= kCheatFlag_HasActivationKey1;
+                }
+                else
+                {
+                    entry->activationKey2--;
 
-					if(entry->activationKey2 < 0)
-						entry->activationKey2 = __code_max - 1;
-					if(entry->activationKey2 >= __code_max)
-						entry->activationKey2 = 0;
+                    if(entry->activationKey2 < 0)
+                        entry->activationKey2 = __code_max - 1;
+                    if(entry->activationKey2 >= __code_max)
+                        entry->activationKey2 = 0;
 
-					entry->flags |= kCheatFlag_HasActivationKey2;
-				}
-				break;
+                    entry->flags |= kCheatFlag_HasActivationKey2;
+                }
+                break;
 */
 			case kType_Link:
 				TOGGLE_MASK_FIELD(action->type, LinkEnable);
@@ -5036,31 +5036,31 @@ static int edit_cheat_menu(running_machine *machine, cheat_menu_stack *menu)
 
 		switch(info->fieldType)
 		{
-/*			case kType_ActivationKey1:
-			case kType_ActivationKey2:
-				if(info->fieldType == kType_ActivationKey1)
-				{
-					entry->activationKey1++;
+/*          case kType_ActivationKey1:
+            case kType_ActivationKey2:
+                if(info->fieldType == kType_ActivationKey1)
+                {
+                    entry->activationKey1++;
 
-					if(entry->activationKey1 < 0)
-						entry->activationKey1 = __code_max - 1;
-					if(entry->activationKey1 >= __code_max)
-						entry->activationKey1 = 0;
+                    if(entry->activationKey1 < 0)
+                        entry->activationKey1 = __code_max - 1;
+                    if(entry->activationKey1 >= __code_max)
+                        entry->activationKey1 = 0;
 
-					entry->flags |= kCheatFlag_HasActivationKey1;
-				}
-				else
-				{
-					entry->activationKey2++;
+                    entry->flags |= kCheatFlag_HasActivationKey1;
+                }
+                else
+                {
+                    entry->activationKey2++;
 
-					if(entry->activationKey2 < 0)
-						entry->activationKey2 = __code_max - 1;
-					if(entry->activationKey2 >= __code_max)
-						entry->activationKey2 = 0;
+                    if(entry->activationKey2 < 0)
+                        entry->activationKey2 = __code_max - 1;
+                    if(entry->activationKey2 >= __code_max)
+                        entry->activationKey2 = 0;
 
-					entry->flags |= kCheatFlag_HasActivationKey2;
-				}
-				break;
+                    entry->flags |= kCheatFlag_HasActivationKey2;
+                }
+                break;
 */
 			case kType_Link:
 				TOGGLE_MASK_FIELD(action->type, LinkEnable);
@@ -6224,8 +6224,8 @@ static int search_minimum_menu(running_machine *machine, cheat_menu_stack *menu)
 	const char		* menuSubItem[kMenu_Max + 1]	= { 0 };
 	char			flagBuf[kMenu_Max + 1]			= { 0 };
 	char			cpuBuf[4];
-	char			valueBuf[32];		// "FFFFFFF[F] (4294967295)"	23 chars
-	char			timerBuf[32];		// "-FFFFFFF[F] (4294967295)"	24 chars
+	char			valueBuf[32];		// "FFFFFFF[F] (4294967295)"    23 chars
+	char			timerBuf[32];		// "-FFFFFFF[F] (4294967295)"   24 chars
 	char			numResultsBuf[16];
 	char			* stringsBuf;
 	search_info		*search = get_current_search();
@@ -7824,7 +7824,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 	}
 	else
 	{
-		/* in case of no SearchRegion */ 
+		/* in case of no SearchRegion */
 		menuItem[total] = "No Search Region";
 		menuSubItem[total++] = NULL;
 	}
@@ -7903,7 +7903,7 @@ static int select_search_region_menu(running_machine *machine, cheat_menu_stack 
 		{
 			/* SHIFT + CHEAT DELETE = invalidate selected region */
 			invalidate_entire_region(search, region);
-//			ui_popup_time(1, "region invalidated - %d results remain", search->num_results);
+//          ui_popup_time(1, "region invalidated - %d results remain", search->num_results);
 		}
 	}
 	else if(input_ui_pressed(machine, IPT_UI_RELOAD_CHEAT))
@@ -8328,7 +8328,7 @@ static int choose_watch_menu(running_machine *machine, cheat_menu_stack *menu)
 	UINT8			total			= 0;
 	const char		** menuItem;
 	char			** buf;
-	char			* stringsBuf;	// "USER20 FFFFFFFF (99:32 Bit)"	27 chars
+	char			* stringsBuf;	// "USER20 FFFFFFFF (99:32 Bit)"    27 chars
 	WatchInfo		* watch;
 
 	/* first setting : NONE */
@@ -10476,7 +10476,7 @@ static void ResizeCheatActionListNoDispose(CheatEntry * entry, UINT32 newLength)
 
 /*----------------------------------------------------------------
   AddActionBefore - Insert empty Action
-                    This function is only called in EditCheat() 
+                    This function is only called in EditCheat()
 ----------------------------------------------------------------*/
 
 static void AddActionBefore(CheatEntry * entry, UINT32 idx)
@@ -11025,7 +11025,7 @@ static UINT32 read_region_data(search_region *region, UINT32 offset, UINT8 size,
 				UINT8 * buf = (UINT8 *)region->cached_pointer;
 
 				if(buf)
-/*					return DoMemoryRead(region->cached_pointer, address, size, swap, &raw_cpu_info); */
+/*                  return DoMemoryRead(region->cached_pointer, address, size, swap, &raw_cpu_info); */
 					return DoMemoryRead(buf, address, size, cpu_needs_swap(region->target_idx) ^ swap, get_cpu_info(region->target_idx));
 				else
 					return 0;
@@ -15011,7 +15011,7 @@ static void BuildLabelIndexTable(CheatEntry *entry)
 
 	//logerror("Cheat - Finish building index table for %s (length = %x)\n", entry->name, entry->labelIndexLength);
 	//for(i = 0; i < entry->labelIndexLength; i++)
-	//	logerror("IndexTable[%x] = %x\n",i,entry->labelIndex[i]);
+	//  logerror("IndexTable[%x] = %x\n",i,entry->labelIndex[i]);
 
 }
 

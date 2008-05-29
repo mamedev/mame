@@ -142,12 +142,12 @@
  *
  *  RR1.GAM (for Ridge Racer 1/2, Rave Racer)
  **********************************************************************************************************
- * 
+ *
  * Namco Super System 22 Hardware Overview (last updated 22-01-2006 at 1:30am)
  * ---------------------------------------
- * 
+ *
  * Note! This document will be updated from time to time when more dumps are available.
- * 
+ *
  * This document covers all the known Namco Super System 22 games, including....
  * Air Combat 22    (C) Namco, 1995
  * Alpine Racer 1   (C) Namco, 1995
@@ -160,15 +160,15 @@
  * Prop Cycle       (C) Namco, 1996
  * Time Crisis      (C) Namco, 1995
  * !Tokyo Wars      (C) Namco, 1996
- * 
+ *
  * ! - denotes secured but not dumped yet.
  * * - denotes not dumped yet. If you can help with the remaining undumped SS22 games,
  *     please contact http://www.mameworld.net/gurudumps/
- * 
+ *
  * The Namco Super System 22 System comprises 4 PCB's plugged into a motherboard. The motherboard contains only
  * some slots and connectors. The 4 PCB's are housed in a metal box with a large fan on the side. The fan mostly cools
  * the video board as these are known to run hot and commonly fail, especially now the system is 10 years+ old.
- * 
+ *
  * CPU PCB   - There are three known revisions of this PCB. Two of them have an extra connector for an
  *             auxillary PCB. One of the others doesnt have that connector but they are otherwise identical.
  *             All PCBs can be swapped to any game and it will work. However, ALL required IC's must be swapped.
@@ -187,7 +187,7 @@
  *             The differences are very minor, just the amount of connectors on the PCB. The Mother PCB is swappable to
  *             any game as long as the required connectors for that game are present on the PCB. (all dumped games tested
  *             and worked fine)
- * 
+ *
  * Each game has a 2 or 3 digit letter code assigned to it. Then a number 1 or 2, Then a Rev. A/B/C/D which denotes the
  * software revision.
  * The 1 denotes a Japanese version. 2 denotes a World version. So far there are no other numbers used other than 1 or 2.
@@ -195,15 +195,15 @@
  * There is one exception so far. The World version of Alpine Racer 2, which uses a World version DATA ROM, and also one
  * of the WAVE ROMs is a World version, but one Japanese WAVE ROM is also used.
  * See the CPU PCB, Program ROM Daughterboard and MROM PCB texts below for more details on ROM usage.
- * 
+ *
  * CPU PCB
  * -------
  * 1st Revision
  * SYSTEM SUPER22 CPU PCB 8646960102 (8646970102)
- * 
+ *
  * 2nd Revision
  * SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972600)
- * 
+ *
  * 3rd Revision
  * SYSTEM SUPER22 CPU(B) PCB 8646962600 (8646972601) <-- very minor?
  * |--------------------------------------------------------------|
@@ -237,7 +237,7 @@
  * |      WAVEB.1L                LC78815M      LC78815M          |
  * |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- * 
+ *
  * Notes:
  *       J6           : Custom Namco connector for plug-in program ROM PCB
  *       J11          : Custom Namco connector for optional plug-in WAVE ROM PCB (holds some SOP44 MASKROMs)
@@ -285,7 +285,7 @@
  *                                          Prop Cycle       = C428
  *                                          Time Crisis      = C419
  *                                          Tokyo Wars       =
- * 
+ *
  *      *1            : Unpopulated position for PAL16V8 (PLCC20)
  *      *2            : Unpopulated position for Fujitsu MB86601 (QFP100)
  *      *3            : Unpopulated position for 32MHz OSC
@@ -303,7 +303,7 @@
  *                      Prop Cycle         'PR1 DATA'
  *                      Time Crisis        'TS1 DATA'
  *                      Tokyo Wars
- * 
+ *
  *      WAVEA.2L   \
  *      WAVEB.1L   /  : 16M/32M WAVE MASKROMs. If 32MBit DIP42, they're programmed in BYTE mode (DIP42/SOP44)
  *                      Game                Wave A        Wave B        Type
@@ -319,9 +319,9 @@
  *                      Prop Cycle         'PR1 WAVE A', 'PR1 WAVE B' , both DIP42 32M MASKROM
  *                      Time Crisis        'TS1 WAVE A', 'TS1 WAVE B' , WAVE A DIP42 32M MASKROM, WAVE B DIP42 16M MASKROM
  *                      Tokyo Wars
- * 
- * 
- * 
+ *
+ *
+ *
  * PROGRAM ROM Daughterboard PCB
  * -----------------------------
  * This PCB holds the main program ROMs. There is a small sticker on each PCB stating the game code and software revision.
@@ -329,7 +329,7 @@
  * There are 4 known types of program daughterboards used on SS22 games (so far). The most common is the first type.
  * The PCB is very small (approx 2" x 3") containing one custom connector and some FlashROMs, and a PAL (in some cases).
  * The ones that contain a PAL are approx 3" x 3".
- * 
+ *
  * Type 1
  * SYSTEM SUPER22 MPM(F) PCB 8646961600 (8646971600)
  * |-------------------------|
@@ -343,7 +343,7 @@
  * |-------------------------|
  * Notes:
  *       ROMx: Intel E28F008SA 8MBit FlashROM (x4, TSOP40)
- * 
+ *
  *       This PCB is used on:
  *                           Game          Software revision
  *                           -------------------------------
@@ -353,7 +353,7 @@
  *                           Cyber Cycles  'CB2 Ver.C'
  *                           Prop Cycle    'PR2 Ver.A'
  *                           Time Crisis   'TS2 Ver.B'
- * 
+ *
  * Type 2
  * SYSTEM SUPER22 MPM(F16) PCB 8646962500 (8646972500)
  * |-------------------------|
@@ -368,12 +368,12 @@
  * |-------------------------|
  * Notes:
  *       ROMx: Intel E28F016SA 16MBit FlashROMs (x2, TSOP56)
- * 
+ *
  *       This PCB is used on:
  *                           Game          Software revision
  *                           -------------------------------
  *                           Time Crisis   'TS2 Ver.A'
- * 
+ *
  * Type 3
  * SYSTEM SUPER22 MPM(F16X4) PCB 8646962901 (8646972901)
  * |-------------------------|
@@ -391,12 +391,12 @@
  * Notes:
  *       ICx*   : Intel E28F016SA 16MBit FlashROMs (x4, TSOP56)
  *       SS22P1B: PALCE16V8H (PLCC20, labelled 'SS22P1B')
- * 
+ *
  *        This PCB is used on:
  *                            Game           Software revision
  *                            -------------------------------
  *                            Alpine Racer 2 'ARS2 Ver.B'
- * 
+ *
  * Type 4
  * SYSTEM SUPER22 MPM(F16X4F) PCB 8646963500 (8646973500)
  * |-------------------------|
@@ -421,15 +421,15 @@
  *                  That pin traces to pin 6 (OUTPUT Y) of a 74F08 at 15F on the CPU board
  *                  Pins 4 (INPUT A) & 5 (INPUT B) of the 74F08 at 15F trace to Namco custom
  *                  IC C383 pins 53 (A INPUT) & 52 (B INPUT)
- * 
- * 
+ *
+ *
  *        This PCB is used on:
  *                            Game          Software revision
  *                            -------------------------------
  *                            Alpine Surfer 'AF2 Ver.A'
- * 
- * 
- * 
+ *
+ *
+ *
  * Auxillary PCB (connector JC410 on the CPU PCB is used only on Time Crisis so far)
  * -------------
  * V159 GUN POINT PCB 244790102 (2447970102)
@@ -456,9 +456,9 @@
  *       J1 : Connector joining Gun PCB to a connector on the metal box (which joins to the gun interface PCB in the
  *            cab which supplies 24V for the soleniod in the guns)
  *       J2 : Connector joining to the CPU PCB (to JC410)
- * 
- * 
- * 
+ *
+ *
+ *
  * DSP PCB
  * -------
  * SYSTEM SUPER22 DSP PCB 8646960302 (8646970302)
@@ -493,7 +493,7 @@
  *   |   |-----|  |---------|                                       |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- * 
+ *
  * Notes:
  *       JD3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known as a
  *                      'DHD harness'
@@ -515,9 +515,9 @@
  *       SS22D4B      : PALCE 16V8H (PLCC20, labelled 'SS22D4B')
  *       SS22D5       : PALCE 16V8H (PLCC20, labelled 'SS22D5')
  *       LEDS         : 8 red LEDs flash (in various pretty patterns) when the DSP PCB is active.
- * 
- * 
- * 
+ *
+ *
+ *
  * ROM PCB
  * -------
  * SYSTEM SUPER22 MROM PCB 8646960400 (8646970400)
@@ -552,11 +552,11 @@
  *   |   SCG6.1L               SCG6.1F                              |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- * 
+ *
  * Notes:
  *       Namco SS22 MROM PCBs have 2 identical sets of CG*, SCG* and CCR-L/CCR-H ROMs on the PCB.
  *       The Japanese region code '1' is appended to all game codes on all MROMs.
- * 
+ *
  *       JR3, JR4     : Custom Namco connector joining this PCB to the VIDEO & DSP PCBs with a special flat cable known
  *                      as a 'DHD harness'
  *       SS22M1       : PALCE 16V8H (PLCC20, labelled 'SS22M1')
@@ -568,7 +568,7 @@
  *       JP7, JP8, JP9: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
  *    JP10, JP11, JP12: Jumpers to configure SCG* ROMs. Hardwired to '16M' on the PCB. Alt. setting '32M'
  *       JP13         : Jumper  to configure PTR* ROMs. Hardwired to '4M'  on the PCB. Alt. setting '8M'
- * 
+ *
  * Game               ROMs populated
  * ---------------------------------------------------------
  * Air Combat 22      ACS1CCRH.5B, ACS1CCRH.1D    4M SOP32
@@ -595,7 +595,7 @@
  *                    ACS1PTRL1.16K                  "
  *                    ACS1PTRL2.15K                  "
  *                    ACS1PTRL3.14K                  "
- * 
+ *
  * Alpine Racer 1     AR1CCRH.5B, AR1CCRH.1D      4M SOP32
  *                    AR1CCRL.7B, AR1CCRL.3D     16M SOP44
  *                    AR1CG0.12B, AR1CG0.8D          "
@@ -620,7 +620,7 @@
  *                    AR1PTRL1.16K                   "
  *                    AR1PTRL2.15K                   "
  *                    AR1PTRL3.14K                   "
- * 
+ *
  * Alpine Racer 2     ARS1CCRH.5B, ARS1CCRH.1D    4M SOP32
  *                    ARS1CCRL.7B, ARS1CCRL.3D   16M SOP44
  *                    ARS1CG0.12B, ARS1CG0.8D        "
@@ -642,7 +642,7 @@
  *                    ARS1PTRL1.16K                  "
  *                    ARS1PTRL2.15K                  "
  *                    ARS1PTRL3.14K                  "
- * 
+ *
  * Alpine Surfer      AF1CCRH.5B, AF1CCRH.1D      4M SOP32
  *                    AF1CCRL.7B, AF1CCRL.3D     16M SOP44
  *                    AF1CG0.12B, AF1CG0.8D          "
@@ -657,11 +657,11 @@
  *                    AF1PTRM1.16J                   "
  *                    AF1PTRL0.18K                   "
  *                    AF1PTRL1.16K                   "
- * 
+ *
  * Aqua Jet           N/A
- * 
+ *
  * Armidillo Racing   N/A
- * 
+ *
  * Cyber Cycles       CB1CCRH.5B, CB1CCRH.1D      4M SOP32
  *                    CB1CCRL.7B, CB1CCRL.3D     16M SOP44
  *                    CB1CG0.12B, CB1CG0.8D          "
@@ -685,9 +685,9 @@
  *                    CB1PTRL1.16K                   "
  *                    CB1PTRL2.15K                   "
  *                    CB1PTRL3.14K                   "
- * 
+ *
  * Dirt Dash          N/A
- * 
+ *
  * Prop Cycle         PR1CCRH.5B, PR1CCRH.1D      4M SOP32
  *                    PR1CCRL.7B, PR1CCRL.3D     16M SOP44
  *                    PR1CG0.12B, PR1CG0.8D          "
@@ -709,7 +709,7 @@
  *                    PR1PTRL0.18K                   "
  *                    PR1PTRL1.16K                   "
  *                    PR1PTRL2.15K                   "
- * 
+ *
  * Time Crisis        TS1CCRH.5B, TS1CCRH.1D      4M SOP32
  *                    TS1CCRL.7B, TS1CCRL.3D     16M SOP44
  *                    TS1CG0.12B, TS1CG0.8D          "
@@ -735,19 +735,19 @@
  *                    TS1PTRL0.18K                   "
  *                    TS1PTRL1.16K                   "
  *                    TS1PTRL2.15K                   "
- * 
+ *
  * Tokyo Wars         N/A
- * 
- * 
- * 
+ *
+ *
+ *
  * VIDEO PCB
  * ---------
  * 1st Revision
  * SYSTEM SUPER22 VIDEO 8646960204 (8646970204)
- * 
+ *
  * 2nd Revision
  * SYSTEM SUPER22 VIDEO(B) 8646961200 (8646971200)
- * 
+ *
  * 3rd Revision (PCB layout shown below)
  * SYSTEM SUPER22 VIDEO(C) 8646962700 (8646972700)
  *   |--------------------------------------------------------------|
@@ -781,7 +781,7 @@
  *   |  |---------| |---------| N341256                    CXD1178Q |
  *   |--------------------------------------------------------------|
  * (logic chips omitted from the PCB layout)
- * 
+ *
  * Notes:
  *       JV3          : Custom Namco connector joining this PCB to the MROM PCB with a special flat cable known
  *                      as a 'DHD harness'
@@ -809,16 +809,16 @@
  *                                                      video faults on Namco Super System 22 PCBs.
  *                                                      (Second reasons for video faults are most likely attributed
  *                                                      to failure of RAM on this PCB)
- * 
- * 
+ *
+ *
  * Motherboard PCB
  * ---------------
  * 1st Revision
  * SYSTEM SUPER22 MOTHER PCB 8646960602 (8646970602)
- * 
+ *
  * 2nd Revision
  * SYSTEM SUPER22 MOTHER(B) PCB (number not known)
- * 
+ *
  * 3rd Revision
  * SYSTEM SUPER22 MOTHER(C) PCB 8646960602 (8646970602)
  * |------------------------------------------------------------------|
@@ -841,12 +841,12 @@
  * Notes:
  *       IC1     : LB1233 (DIP8)
  *       IC2, IC3: LB1235 (DIP8)
- * 
+ *
  *       JC1, JC2: Connectors to plug in CPU PCB
  *       JD1, JD2: Connectors to plug in DSP PCB
  *       JR1     : Connector  to plug in MROM PCB
  *       JV1, JV2: Connectors to plug in VIDEO PCB
- * 
+ *
  *       J1 : 9 pin power input socket   Pin  Use
  *                                      -----------
  *                                       1   +5V
@@ -858,7 +858,7 @@
  *                                       7   Ground
  *                                       8   NC
  *                                       9   +12V
- * 
+ *
  *       J2 : 9 pin link connector   Pin  Use
  *                                   --------------
  *                                   1   Ring In+
@@ -870,7 +870,7 @@
  *                                   7   /TXD  (NC)
  *                                   8   GND   (NC)
  *                                   9   +5V   (NC)
- * 
+ *
  *       J3 : 9 pin socket   Pin  Use
  *                           -------------------
  *                            1   Service Credit
@@ -882,7 +882,7 @@
  *                            7   Ground
  *                            8   Coin Sw
  *                            9   NC
- * 
+ *
  *       J4 : 8 pin connector  Pin  Use
  *                             -------------------------------------
  *                              1   Start
@@ -893,7 +893,7 @@
  *                              6   NC
  *                              7   Ground
  *                              8   Ground
- * 
+ *
  *       J5 : 15 pin socket   Pin  Use
  *                            ---------------
  *                            1   Relay1
@@ -911,7 +911,7 @@
  *                            13  +12V
  *                            14  +5V
  *                            15  NC
- * 
+ *
  *       J6 : 12 pin audio output connector  Pin  Use
  *                                           ----------
  *                                            1   SPKL+
@@ -926,7 +926,7 @@
  *                                            10  NC
  *                                            11  NC
  *                                            12  NC
- * 
+ *
  *       J7 : 12 pin analog controls socket   Pin  Use
  *                                            ---------------------------
  *                                             1   +5V
@@ -941,9 +941,9 @@
  *                                             10  NC
  *                                             11  NC
  *                                             12  NC
- * 
+ *
  *       J8 : 10 pin connector (not used?)
- * 
+ *
  *       J9 : 6 pin video output socket   Pin  Use
  *                                        ---------
  *                                         1   Red
@@ -952,11 +952,11 @@
  *                                         4   Composite Sync (VSync 15kHz interlaced)
  *                                         5   Ground
  *                                         6   NC
- * 
+ *
  *       J10: 16 pin flat cable connector (only populated on Mother(C) PCB, use not known)
- * 
- * 
- * 
+ *
+ *
+ *
  * AMP PCB
  * -------
  * SYSTEM SUPER22 AMP(4) PCB 8647960100 (8647970100) (sticker 'AMP(2) PCB 8647961100')
@@ -971,14 +971,14 @@
  *                                           1   +12V
  *                                           2   Ground
  *                                           3   NC
- * 
+ *
  *       J2    : 4 pin dual speaker output socket   Pin  Use
  *                                                  ---------
  *                                                   1   SP1+
  *                                                   2   SP1-
  *                                                   3   SP2+
  *                                                   4   SP2-
- * 
+ *
  *       J3    : 8 pin sound data input connector from Mother PCB J6   Pin  Use
  *                                                                     ----------
  *                                                                      1   SPKL+
@@ -989,7 +989,7 @@
  *                                                                      6   NC
  *                                                                      7   NC
  *                                                                      8   NC
- * 
+ *
  *       *1    : Unpopulated position for a 2nd LA4705 Power Amp
  *       *2    : J4 - Unpopulated position for another 4 pin dual speaker output socket
  *       J5    : 2 pin connector used for sound mute  Pin  Use

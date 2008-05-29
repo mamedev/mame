@@ -466,9 +466,9 @@ ROM_END
 /*
 
 Super Pool
-  
-ABM (Nazionale Elettronica Giochi S.A.S.), 1998.  
-9743 Rev.01  
+
+ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
+9743 Rev.01
 
 1x MC68HC000P10
 1x ACTEL A1020B-PL84C
@@ -478,13 +478,13 @@ ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
 1x TDA2003 (sound)
 1x oscillator 20.000MHz
 1x oscillator 30.0000MHz
-1x blu resonator 1000J (close to sound)  
+1x blu resonator 1000J (close to sound)
 
 1x M27C2001 (1) (Sound)
 2x TMS27C010A (2,3) (main)
 4x TMS27C010A (4,5,6,7) (gfx)
 1x PALCE22V10H (not dumped)
-1x PALCE16V8H (not dumped)  
+1x PALCE16V8H (not dumped)
 
 1x 28x2 JAMMA edge connector
 1x 12 legs connector (J1)
@@ -492,7 +492,7 @@ ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
 1x 8x2 switches dip
 1x lithium battery
 
-*/ 
+*/
 
 ROM_START( suprpool )
 	ROM_REGION( 0x40000, REGION_CPU1, 0 ) /* 68000 Code */

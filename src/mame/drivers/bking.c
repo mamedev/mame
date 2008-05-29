@@ -264,7 +264,7 @@ static INPUT_PORTS_START( bking )
 
 	/* continue inputs are labelled in schematics. */
 	/* They are not connected though to any button */
-	
+
 	PORT_START  /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )

@@ -149,7 +149,7 @@ static CUSTOM_INPUT( tomahawk_controls_r )
 
 	/* on a cocktail cabinet, two sets of controls are
        multiplexed on a single set of inputs
-		 (not verified on pcb) */
+         (not verified on pcb) */
 
 	if (flipscreen)
 		ret = input_port_read(field->port->machine, "P2");

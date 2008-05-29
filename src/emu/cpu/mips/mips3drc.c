@@ -11,7 +11,7 @@
 ****************************************************************************
 
     Future improvements/changes:
-    
+
     * Add DRC option to flush PC before calling memory handlers
 
     * Constant tracking? (hasn't bought us much in the past)
@@ -926,7 +926,7 @@ static void mips3_set_info(UINT32 state, cpuinfo *info)
 
 
 /*-------------------------------------------------
-    mips3_get_info - return information about a 
+    mips3_get_info - return information about a
     given CPU instance
 -------------------------------------------------*/
 
@@ -1110,7 +1110,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 			UML_HASHJMP(block, MEM(&mips3->impstate->mode), IMM(nextpc), mips3->impstate->nocode);
 																					// hashjmp <mode>,nextpc,nocode
 		else if (seqlast->next == NULL || seqlast->next->pc != nextpc)
-			UML_HASHJMP(block, IMM(mips3->impstate->mode), IMM(nextpc), mips3->impstate->nocode);	
+			UML_HASHJMP(block, IMM(mips3->impstate->mode), IMM(nextpc), mips3->impstate->nocode);
 																					// hashjmp <mode>,nextpc,nocode
 	}
 
@@ -1964,7 +1964,7 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 	{
 		generate_update_cycles(block, &compiler_temp, R32(RSREG), TRUE);
 																					// <subtract cycles>
-		UML_HASHJMP(block, IMM(mips3->impstate->mode), R32(RSREG), mips3->impstate->nocode);		
+		UML_HASHJMP(block, IMM(mips3->impstate->mode), R32(RSREG), mips3->impstate->nocode);
 																					// hashjmp <mode>,<rsreg>,nocode
 	}
 
@@ -2061,7 +2061,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (mips3->impstate->drcoptions & MIPS3DRC_CHECK_OVERFLOWS)
 			{
 				UML_ADDf(block, IREG(0), R32(RSREG), IMM(SIMMVAL), FLAGS_V);		// add     i0,<rsreg>,SIMMVAL,V
-				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));	
+				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh    overflow,0
 			}
 			else
@@ -2082,7 +2082,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (mips3->impstate->drcoptions & MIPS3DRC_CHECK_OVERFLOWS)
 			{
 				UML_DADDf(block, IREG(0), R64(RSREG), IMM(SIMMVAL), FLAGS_V);		// dadd    i0,<rsreg>,SIMMVAL,V
-				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));	
+				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh    overflow,0
 			}
 			else
@@ -2115,7 +2115,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (RTREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
-				UML_DFLAGS(block, R64(RTREG), (UINT64)~0, mips3->impstate->slt_table);	
+				UML_DFLAGS(block, R64(RTREG), (UINT64)~0, mips3->impstate->slt_table);
 																					// dflags  <rtreg>,~0,slt_table
 			}
 			return TRUE;
@@ -2220,7 +2220,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x18));						// xor     i1,i1,0x18
 			UML_SHL(block, IREG(2), IMM(~0), IREG(1));								// shl     i2,~0,i1
-			UML_CALLH(block, mips3->impstate->read32mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->read32mask[mips3->impstate->mode >> 1]);
 																					// callh   read32mask
 			if (RTREG != 0)
 			{
@@ -2240,7 +2240,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (!mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x38));						// xor     i1,i1,0x38
 			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(1));						// dshr    i2,~0,i1
-			UML_CALLH(block, mips3->impstate->read64mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->read64mask[mips3->impstate->mode >> 1]);
 																					// callh   read64mask
 			if (RTREG != 0)
 			{
@@ -2257,7 +2257,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (mips3->bigendian)
 				UML_XOR(block, IREG(1), IREG(1), IMM(0x38));						// xor     i1,i1,0x38
 			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(1));						// dshl    i2,~0,i1
-			UML_CALLH(block, mips3->impstate->read64mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->read64mask[mips3->impstate->mode >> 1]);
 																					// callh   read64mask
 			if (RTREG != 0)
 			{
@@ -2344,7 +2344,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x18));						// xor     i3,i3,0x18
 			UML_SHR(block, IREG(2), IMM(~0), IREG(3));								// shr     i2,~0,i3
 			UML_SHR(block, IREG(1), IREG(1), IREG(3));								// shr     i1,i1,i3
-			UML_CALLH(block, mips3->impstate->write32mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->write32mask[mips3->impstate->mode >> 1]);
 																					// callh   write32mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2358,7 +2358,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x18));						// xor     i3,i3,0x18
 			UML_SHL(block, IREG(2), IMM(~0), IREG(3));								// shl     i2,~0,i3
 			UML_SHL(block, IREG(1), IREG(1), IREG(3));								// shl     i1,i1,i3
-			UML_CALLH(block, mips3->impstate->write32mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->write32mask[mips3->impstate->mode >> 1]);
 																					// callh   write32mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2372,7 +2372,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x38));						// xor     i3,i3,0x38
 			UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(3));						// dshr    i2,~0,i3
 			UML_DSHR(block, IREG(1), IREG(1), IREG(3));								// dshr    i1,i1,i3
-			UML_CALLH(block, mips3->impstate->write64mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->write64mask[mips3->impstate->mode >> 1]);
 																					// callh   write64mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2386,7 +2386,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 				UML_XOR(block, IREG(3), IREG(3), IMM(0x38));						// xor     i3,i3,0x38
 			UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(3));						// dshl    i2,~0,i3
 			UML_DSHL(block, IREG(1), IREG(1), IREG(3));								// dshl    i1,i1,i3
-			UML_CALLH(block, mips3->impstate->write64mask[mips3->impstate->mode >> 1]);			
+			UML_CALLH(block, mips3->impstate->write64mask[mips3->impstate->mode >> 1]);
 																					// callh   write64mask
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2575,7 +2575,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (mips3->impstate->drcoptions & MIPS3DRC_CHECK_OVERFLOWS)
 			{
 				UML_ADDf(block, IREG(0), R32(RSREG), R32(RTREG), FLAGS_V);			// add     i0,<rsreg>,<rtreg>,V
-				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));	
+				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh     overflow,0,V
 				if (RDREG != 0)
 					UML_DSEXT4(block, R64(RDREG), IREG(0));							// dsext4  <rdreg>,i0
@@ -2599,7 +2599,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (mips3->impstate->drcoptions & MIPS3DRC_CHECK_OVERFLOWS)
 			{
 				UML_DADDf(block, IREG(0), R64(RSREG), R64(RTREG), FLAGS_V);			// dadd    i0,<rsreg>,<rtreg>,V
-				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));	
+				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh     overflow,0,V
 				if (RDREG != 0)
 					UML_DMOV(block, R64(RDREG), IREG(0));							// dmov    <rdreg>,i0
@@ -2617,7 +2617,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (mips3->impstate->drcoptions & MIPS3DRC_CHECK_OVERFLOWS)
 			{
 				UML_SUBf(block, IREG(0), R32(RSREG), R32(RTREG), FLAGS_V);			// sub     i0,<rsreg>,<rtreg>,V
-				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));	
+				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh     overflow,0,V
 				if (RDREG != 0)
 					UML_DSEXT4(block, R64(RDREG), IREG(0));							// dsext4  <rdreg>,i0
@@ -2641,7 +2641,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (mips3->impstate->drcoptions & MIPS3DRC_CHECK_OVERFLOWS)
 			{
 				UML_DSUBf(block, IREG(0), R64(RSREG), R64(RTREG), FLAGS_V);			// dsub    i0,<rsreg>,<rtreg>,V
-				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));	
+				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh     overflow,0,V
 				if (RDREG != 0)
 					UML_DMOV(block, R64(RDREG), IREG(0));							// dmov    <rdreg>,i0

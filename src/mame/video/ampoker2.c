@@ -29,7 +29,7 @@
 
 
     Resistor Network
-	----------------
+    ----------------
 
     The following diagram is related to taiwanese and argentine PCBs.
 

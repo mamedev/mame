@@ -523,8 +523,8 @@ int astring_findc(const astring *str, int start, const char *search)
 
 
 /*-------------------------------------------------
-    astring_replace - search in an astring for 
-    another astring, replacing all instances with 
+    astring_replace - search in an astring for
+    another astring, replacing all instances with
     a third and returning the number of matches
 -------------------------------------------------*/
 
@@ -535,8 +535,8 @@ int astring_replace(astring *str, int start, const astring *search, const astrin
 
 
 /*-------------------------------------------------
-    astring_replacec - search in an astring for a 
-    C string, replacing all instances with another 
+    astring_replacec - search in an astring for a
+    C string, replacing all instances with another
     C string and returning the number of matches
 -------------------------------------------------*/
 
@@ -546,7 +546,7 @@ int astring_replacec(astring *str, int start, const char *search, const char *re
 	int replacelen = strlen(replace);
 	int matches = 0;
 	int curindex;
-	
+
 	for (curindex = astring_findc(str, start, search); curindex != -1; curindex = astring_findc(str, curindex + replacelen, search))
 	{
 		matches++;

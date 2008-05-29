@@ -209,7 +209,7 @@ struct _mips3_state
 	/* MMU */
 	mips3_tlb_entry tlb[MIPS3_TLB_ENTRIES];
 	UINT32 *		tlb_table;
-	
+
 	/* for use by specific implementations */
 	mips3imp_state *impstate;
 };

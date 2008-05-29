@@ -4906,14 +4906,14 @@ static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 			emit_clc(&dst);
 		return dst;
 	}
-	
+
 	/* load non-immediate bit numbers into a register */
 	if (bitp.type != DRCUML_PTYPE_IMMEDIATE)
 	{
 		emit_mov_r32_p32(drcbe, &dst, REG_ECX, &bitp);
 		emit_and_r32_imm(&dst, REG_ECX, inst->size * 8 - 1);
 	}
-	
+
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
@@ -4932,7 +4932,7 @@ static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 				emit_bt_r32_r32(&dst, srcp.value, REG_ECX);								// bt     [srcp],ecx
 		}
 	}
-	
+
 	/* 64-bit form */
 	else
 	{

@@ -10,11 +10,11 @@ This hardware is 3DO-based with two IBM Power PC CPUs.
 
 There were only 5 known games on this hardware. They include....
 
-Game                                                 Year    CD Codes     Konami Part# 
+Game                                                 Year    CD Codes     Konami Part#
 --------------------------------------------------------------------------------------
 Battle Tryst                                         1998    636JAC02
 Evil Night                                           1998    810UBA02
-Hell Night ((alt. Region title, same as Evil Night)  1998    810EAA02 
+Hell Night ((alt. Region title, same as Evil Night)  1998    810EAA02
 Heat Of Eleven '98                                   1998    703EAA02
 Polystars                                            1997    623JAA02     003894
 Total Vice                                           1997    639AAB01
@@ -153,7 +153,7 @@ Notes:
       This PCB is used on Total Vice only.
       639JAA02.xx - 8MBit Sound data ROM (DIP42)
       PAL         - PAL16V8H stampd '       '
-      
+
 
 PWB0000047043 (C) 1998 KONAMI CO., LTD.
 |-----------------------------------------|

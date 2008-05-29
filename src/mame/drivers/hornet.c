@@ -2,19 +2,19 @@
     Driver by Ville Linde
 
 
-	Konami 'Hornet' Hardware
-	Konami, 1997-1999
+    Konami 'Hornet' Hardware
+    Konami, 1997-1999
 
-	Known games on this hardware include....
+    Known games on this hardware include....
 
-	Game                             (C)      Year
-	----------------------------------------------
-	Gradius 4 : Fukkatsu             Konami   1999
-	NBA Play by Play                 Konami   1998
-	Silent Scope                     Konami   1999
-	Silent Scope 2 : Fatal Judgement Konami   2000
-	Silent Scope 2 : Dark Silhouette Konami   2000
-	Terraburst                       Konami   1998
+    Game                             (C)      Year
+    ----------------------------------------------
+    Gradius 4 : Fukkatsu             Konami   1999
+    NBA Play by Play                 Konami   1998
+    Silent Scope                     Konami   1999
+    Silent Scope 2 : Fatal Judgement Konami   2000
+    Silent Scope 2 : Dark Silhouette Konami   2000
+    Terraburst                       Konami   1998
 
     Hardware overview:
 
@@ -42,185 +42,185 @@
         3DFX 500-0010-01 (Voodoo 2) TMU with 4MB RAM
 
 
-	Hardware configurations:
-	------------------------
+    Hardware configurations:
+    ------------------------
 
-	Game              KONAMI ID  CPU PCB    GFX Board(s)  LAN PCB
-	--------------------------------------------------------------
-	Gradius 4         GX837      GN715(A)   GN715(B)
-	NBA Play By Play  GX778      GN715(A)   GN715(B)
-	Silent Scope      GQ830      GN715(A)   2x GN715(B)
-	Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H)
-
-
-	PCB Layouts
-	-----------
-
-	Top Board
-	GN715 PWB(A)A
-	|--------------------------------------------------------------|
-	| SP485CS CN10       CN11        CN9          JP8 JP9 JP10 JP11|
-	|CN19                                                    PAL1  |
-	|CN21       JP13 PAL2             68EC000          EPROM.7S    |
-	|   NE5532       PAL3                                      CN12|
-	|           JP12  JP16    DRM1M4SJ8                        CN13|
-	|   NE5532                            MASKROM.9P    MASKROM.9T |
-	|     SM5877 JP15         RF5C400                              |
-	|CN18                                 MASKROM.12P   MASKROM.12T|
-	|     SM5877     16.9344MHz                                    |
-	|CN14            SRAM256K             MASKROM.14P   MASKROM.14T|
-	|                                                              |
-	|CN16            SRAM256K             MASKROM.16P   MASKROM.16T|
-	|  ADC12138                                                    |
-	|             056800            JP5                            |
-	|                               JP4                            |
-	|                      MACH111  JP3                |---------| |
-	|   TEST_SW                         EPROM.22P      |         | |
-	|CN1                   DRAM16X16                   |PPC403GA | |
-	|                                   EPROM.25P      |         | |
-	|                                                  |         | |
-	|                      DRAM16X16    EPROM.27P      |---------| |
-	| 4AK16                                                     JP6|
-	|                                                              |
-	|CN3                                                           |
-	| 0038323  PAL4                                       7.3728MHz|
-	| E9825    058232           CN2                                |
-	|                                                     50.000MHz|
-	|    RESET_SW               CN5                    JP1  JP2    |
-	|M48T58Y-70PC1  CN4                 CN6               64.000MHz|
-	|--------------------------------------------------------------|
-	Notes:
-		  DRM1M4SJ8 - Fujitsu 81C4256 256Kx4 DRAM (SOJ24)
-		   SRAM256K - Cypress CY7C199 32kx8 SRAM (SOJ28)
-		  DRAM16X16 - Fujitsu 8118160A-60 16megx16 DRAM (SOJ42)
-	  0038323 E9825 - SOIC8 (Secured PIC?). I've seen a similar chip in the security cart of System573
-	  M48T58Y-70PC1 - ST Timekeeper RAM
-			RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz
-			 056800 - Konami Custom (QFP80)
-			 058232 - Konami Custom Ceramic Package (SIL14)
-		   ADC12138 - National Semiconductor ADC12138 A/D Converter, 12-bit + Serial I/O With MUX (SOP28)
-			MACH111 - AMD MACH111 CPLD (Stamped 'N676A1', PLCC44)
-			68EC000 - Motorola MC68EC000, running at 16.0MHz (64/4)
-		   PPC403GA - IBM PowerPC 403GA CPU, clock input 32.0MHz (QFP160)
-		   SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter (SOIC24)
-			  4AK16 - Hitachi 4AK16 Silicon N-Channel Power MOS FET Array (SIL10)
-		   NE5532AN - Philips, Dual Low-Noise High-Speed Audio OP Amp (DIP8)
-			SP485CS - Sipex SP485CS Low Power Half Duplex RS485 Transceiver (DIP8)
-			   PAL1 - AMD PALCE16V8 (stamped 'N676A4', DIP20)
-			   PAL2 - AMD PALCE16V8 (stamped 'N676A2', DIP20)
-			   PAL3 - AMD PALCE16V8 (stamped 'N676A3', DIP20)
-			   PAL4 - AMD PALCE16V8 (stamped 'N676A5', DIP20)
-				JP1 -       25M O O-O 32M
-				JP2 -       25M O O-O 32M
-				JP3 -        RW O O O RO
-				JP4 - PROG  32M O O-O 16M
-				JP5 - DATA  32M O-O O 16M
-				JP6 - BOOT   16 O-O O 32
-				JP7 - SRC DOUT2 O O-O 0
-				JP8 -   64M&32M O-O O 16M
-				JP9 -       64M O O-O 32M&16M
-			   JP10 -   64M&32M O-O O 16M
-			   JP11 -       64M O O-O 32M&16M
-			   JP12 -      THRU O-O O SP
-			   JP13 -      THRU O-O O SP
-			   JP14 - WDT       O O
-			   JP15 -      MONO O-O O SURR
-			   JP16 -      HIGH O O O MID (N/C LOW)
-	   CN1 THRU CN3 - Multi-pin Flat Cable Connector
-				CN4 - Multi-pin Connector for Network PCB
-				CN5 - Multi-pin Flat Cable Connector
-				CN6 - 96-Pin To Lower PCB, Joining Connector
-	   CN7 THRU CN8 - Not used
-	  CN9 THRU CN11 - 6-Pin Power Connectors
-			   CN19 - USB Connector
-			   CN21 - 5-Pin Analog Controls Connector (Tied to USB Connector via the Filter Board)
-			   CN18 - RCA Mono Audio OUT
-		CN14 & CN16 - RCA Stereo Audio OUT
+    Game              KONAMI ID  CPU PCB    GFX Board(s)  LAN PCB
+    --------------------------------------------------------------
+    Gradius 4         GX837      GN715(A)   GN715(B)
+    NBA Play By Play  GX778      GN715(A)   GN715(B)
+    Silent Scope      GQ830      GN715(A)   2x GN715(B)
+    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H)
 
 
-	ROM Usage
-	---------
-				 |------------------------------- ROM Locations ----------------------------------|
-	Game         27P     25P  22P   16P     14P     12P     9P      16T     14T     12T  9T  7S
-	-----------------------------------------------------------------------------------------------
-	Gradius 4    837C01  -    -     837A09  837A10  -       778A12  837A04  837A05  -    -   837A08
-	NBA P/Play   778A01  -    -     778A09  778A10  778A11  778A12  778A04  778A05  -    -   778A08
-	S/Scope      830B01  -    -     830A09  830A10  -       -       -       -       -    -   830A08
-	S/Scope 2    931D01  -    -     931A09  931A10  931A11  -       931A04  -       -    -   931A08
-	Terraburst
+    PCB Layouts
+    -----------
+
+    Top Board
+    GN715 PWB(A)A
+    |--------------------------------------------------------------|
+    | SP485CS CN10       CN11        CN9          JP8 JP9 JP10 JP11|
+    |CN19                                                    PAL1  |
+    |CN21       JP13 PAL2             68EC000          EPROM.7S    |
+    |   NE5532       PAL3                                      CN12|
+    |           JP12  JP16    DRM1M4SJ8                        CN13|
+    |   NE5532                            MASKROM.9P    MASKROM.9T |
+    |     SM5877 JP15         RF5C400                              |
+    |CN18                                 MASKROM.12P   MASKROM.12T|
+    |     SM5877     16.9344MHz                                    |
+    |CN14            SRAM256K             MASKROM.14P   MASKROM.14T|
+    |                                                              |
+    |CN16            SRAM256K             MASKROM.16P   MASKROM.16T|
+    |  ADC12138                                                    |
+    |             056800            JP5                            |
+    |                               JP4                            |
+    |                      MACH111  JP3                |---------| |
+    |   TEST_SW                         EPROM.22P      |         | |
+    |CN1                   DRAM16X16                   |PPC403GA | |
+    |                                   EPROM.25P      |         | |
+    |                                                  |         | |
+    |                      DRAM16X16    EPROM.27P      |---------| |
+    | 4AK16                                                     JP6|
+    |                                                              |
+    |CN3                                                           |
+    | 0038323  PAL4                                       7.3728MHz|
+    | E9825    058232           CN2                                |
+    |                                                     50.000MHz|
+    |    RESET_SW               CN5                    JP1  JP2    |
+    |M48T58Y-70PC1  CN4                 CN6               64.000MHz|
+    |--------------------------------------------------------------|
+    Notes:
+          DRM1M4SJ8 - Fujitsu 81C4256 256Kx4 DRAM (SOJ24)
+           SRAM256K - Cypress CY7C199 32kx8 SRAM (SOJ28)
+          DRAM16X16 - Fujitsu 8118160A-60 16megx16 DRAM (SOJ42)
+      0038323 E9825 - SOIC8 (Secured PIC?). I've seen a similar chip in the security cart of System573
+      M48T58Y-70PC1 - ST Timekeeper RAM
+            RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz
+             056800 - Konami Custom (QFP80)
+             058232 - Konami Custom Ceramic Package (SIL14)
+           ADC12138 - National Semiconductor ADC12138 A/D Converter, 12-bit + Serial I/O With MUX (SOP28)
+            MACH111 - AMD MACH111 CPLD (Stamped 'N676A1', PLCC44)
+            68EC000 - Motorola MC68EC000, running at 16.0MHz (64/4)
+           PPC403GA - IBM PowerPC 403GA CPU, clock input 32.0MHz (QFP160)
+           SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter (SOIC24)
+              4AK16 - Hitachi 4AK16 Silicon N-Channel Power MOS FET Array (SIL10)
+           NE5532AN - Philips, Dual Low-Noise High-Speed Audio OP Amp (DIP8)
+            SP485CS - Sipex SP485CS Low Power Half Duplex RS485 Transceiver (DIP8)
+               PAL1 - AMD PALCE16V8 (stamped 'N676A4', DIP20)
+               PAL2 - AMD PALCE16V8 (stamped 'N676A2', DIP20)
+               PAL3 - AMD PALCE16V8 (stamped 'N676A3', DIP20)
+               PAL4 - AMD PALCE16V8 (stamped 'N676A5', DIP20)
+                JP1 -       25M O O-O 32M
+                JP2 -       25M O O-O 32M
+                JP3 -        RW O O O RO
+                JP4 - PROG  32M O O-O 16M
+                JP5 - DATA  32M O-O O 16M
+                JP6 - BOOT   16 O-O O 32
+                JP7 - SRC DOUT2 O O-O 0
+                JP8 -   64M&32M O-O O 16M
+                JP9 -       64M O O-O 32M&16M
+               JP10 -   64M&32M O-O O 16M
+               JP11 -       64M O O-O 32M&16M
+               JP12 -      THRU O-O O SP
+               JP13 -      THRU O-O O SP
+               JP14 - WDT       O O
+               JP15 -      MONO O-O O SURR
+               JP16 -      HIGH O O O MID (N/C LOW)
+       CN1 THRU CN3 - Multi-pin Flat Cable Connector
+                CN4 - Multi-pin Connector for Network PCB
+                CN5 - Multi-pin Flat Cable Connector
+                CN6 - 96-Pin To Lower PCB, Joining Connector
+       CN7 THRU CN8 - Not used
+      CN9 THRU CN11 - 6-Pin Power Connectors
+               CN19 - USB Connector
+               CN21 - 5-Pin Analog Controls Connector (Tied to USB Connector via the Filter Board)
+               CN18 - RCA Mono Audio OUT
+        CN14 & CN16 - RCA Stereo Audio OUT
 
 
-	Bottom Board
-	GN715 PWB(B)A
-	|--------------------------------------------------------------|
-	|CN4        CN2    CN8               CN6                    CN5|
-	|JP1                 |---------|              4M_EDO   4M_EDO  |
-	|                    |         |     |----------|              |
-	|  4M_EDO 4M_EDO     | TEXELFX |     |          |              |
-	|                    |         |     | PIXELFX  |       4M_EDO |
-	|  4M_EDO 4M_EDO     |         |     |          |       4M_EDO |
-	|                    |---------|     |          | |--------|   |
-	|  4M_EDO 4M_EDO                     |----------| |KONAMI  |   |
-	|CN3                                50MHz JP7     |33906   |   |
-	|  4M_EDO 4M_EDO                          JP6     |        |   |
-	|                       256KSRAM 256KSRAM         |--------|   |
-	|CN7                                                           |
-	|         AV9170                     1MSRAM 1MSRAM             |
-	| MC44200                                                      |
-	|                       256KSRAM 256KSRAM                      |
-	|                                    1MSRAM 1MSRAM             |
-	|  |-------|                                    MASKROM.24U    |
-	|  |KONAMI |  MACH111  |-------------|              MASKROM.24V|
-	|  |37122  |           |ANALOG       |   1MSRAM 1MSRAM         |
-	|  |       |           |DEVICES      |                         |
-	|  |-------|       JP5 |ADSP-21062   |   36.00MHz              |
-	|1MSRAM                |SHARC        |   1MSRAM 1MSRAM         |
-	|                      |             |                         |
-	|1MSRAM                |             |                         |
-	|           256KSRAM   |-------------|          MASKROM.32U    |
-	|1MSRAM     256KSRAM                                MASKROM.32V|
-	|           256KSRAM     PAL1  PAL2            JP4             |
-	|1MSRAM                                                        |
-	|           JP2                 CN1            JP3             |
-	|--------------------------------------------------------------|
-	Notes:
-		  4M_EDO - Silicon Magic SM81C256K16CJ-35 EDO DRAM 66MHz (SOJ40)
-		  1MSRAM - Cypress CY7C109-25VC 1Meg SRAM (SOJ32)
-		256KSRAM - Winbond W24257AJ-15 256K SRAM (SOJ28)
-		 TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
-		 PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
-	  0000037122 - Konami Custom (QFP208)
-	   MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
-		 MACH111 - AMD MACH111 CPLD (Stamped 'N715B1', PLCC44)
-		  AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
-			PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)
-			PAL2 - AMD PALCE16V8 (stamped 'N676B5', DIP20)
-			 JP1 -    SCR O O-O TWN
-			 JP2 - MASTER O-O O SLAVE
-			 JP3 -    16M O O-O 32M
-			 JP4 -    32M O-O O 16M
-			 JP5 -  ASYNC O O-O SYNC
-			 JP6 -    DSP O O-O ADCK
-			 JP7 -    MCK O-O O SCK
-			 CN1 - 96 Pin To Lower PCB, Joining Connector
-			 CN2 - 8-Pin RGB OUT
-			 CN3 - 15-Pin DSUB VGA Video MAIN OUT
-			 CN4 - 6-Pin Power Connector
-			 CN5 - 4-Pin Power Connector
-			 CN6 - 2-Pin Connector (Not Used)
-			 CN7 - 15-Pin DSUB VGA Video MAIN OUT
-			 CN8 - 6-Pin Connector (Not Used)
+    ROM Usage
+    ---------
+                 |------------------------------- ROM Locations ----------------------------------|
+    Game         27P     25P  22P   16P     14P     12P     9P      16T     14T     12T  9T  7S
+    -----------------------------------------------------------------------------------------------
+    Gradius 4    837C01  -    -     837A09  837A10  -       778A12  837A04  837A05  -    -   837A08
+    NBA P/Play   778A01  -    -     778A09  778A10  778A11  778A12  778A04  778A05  -    -   778A08
+    S/Scope      830B01  -    -     830A09  830A10  -       -       -       -       -    -   830A08
+    S/Scope 2    931D01  -    -     931A09  931A10  931A11  -       931A04  -       -    -   931A08
+    Terraburst
 
-	ROM Usage
-	---------
-				 |------ ROM Locations -------|
-	Game         24U     24V     32U     32V
-	-------------------------------------------
-	Gradius 4    837A13  837A15  837A14  837A16
-	NBA P/Play   778A13  778A15  778A14  778A16
-	S/Scope      -       -       -       -          (no ROMs, not used)
-	S/Scope 2    -       -       -       -          (no ROMs, not used)
-	Terraburst
+
+    Bottom Board
+    GN715 PWB(B)A
+    |--------------------------------------------------------------|
+    |CN4        CN2    CN8               CN6                    CN5|
+    |JP1                 |---------|              4M_EDO   4M_EDO  |
+    |                    |         |     |----------|              |
+    |  4M_EDO 4M_EDO     | TEXELFX |     |          |              |
+    |                    |         |     | PIXELFX  |       4M_EDO |
+    |  4M_EDO 4M_EDO     |         |     |          |       4M_EDO |
+    |                    |---------|     |          | |--------|   |
+    |  4M_EDO 4M_EDO                     |----------| |KONAMI  |   |
+    |CN3                                50MHz JP7     |33906   |   |
+    |  4M_EDO 4M_EDO                          JP6     |        |   |
+    |                       256KSRAM 256KSRAM         |--------|   |
+    |CN7                                                           |
+    |         AV9170                     1MSRAM 1MSRAM             |
+    | MC44200                                                      |
+    |                       256KSRAM 256KSRAM                      |
+    |                                    1MSRAM 1MSRAM             |
+    |  |-------|                                    MASKROM.24U    |
+    |  |KONAMI |  MACH111  |-------------|              MASKROM.24V|
+    |  |37122  |           |ANALOG       |   1MSRAM 1MSRAM         |
+    |  |       |           |DEVICES      |                         |
+    |  |-------|       JP5 |ADSP-21062   |   36.00MHz              |
+    |1MSRAM                |SHARC        |   1MSRAM 1MSRAM         |
+    |                      |             |                         |
+    |1MSRAM                |             |                         |
+    |           256KSRAM   |-------------|          MASKROM.32U    |
+    |1MSRAM     256KSRAM                                MASKROM.32V|
+    |           256KSRAM     PAL1  PAL2            JP4             |
+    |1MSRAM                                                        |
+    |           JP2                 CN1            JP3             |
+    |--------------------------------------------------------------|
+    Notes:
+          4M_EDO - Silicon Magic SM81C256K16CJ-35 EDO DRAM 66MHz (SOJ40)
+          1MSRAM - Cypress CY7C109-25VC 1Meg SRAM (SOJ32)
+        256KSRAM - Winbond W24257AJ-15 256K SRAM (SOJ28)
+         TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
+         PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
+      0000037122 - Konami Custom (QFP208)
+       MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
+         MACH111 - AMD MACH111 CPLD (Stamped 'N715B1', PLCC44)
+          AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
+            PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)
+            PAL2 - AMD PALCE16V8 (stamped 'N676B5', DIP20)
+             JP1 -    SCR O O-O TWN
+             JP2 - MASTER O-O O SLAVE
+             JP3 -    16M O O-O 32M
+             JP4 -    32M O-O O 16M
+             JP5 -  ASYNC O O-O SYNC
+             JP6 -    DSP O O-O ADCK
+             JP7 -    MCK O-O O SCK
+             CN1 - 96 Pin To Lower PCB, Joining Connector
+             CN2 - 8-Pin RGB OUT
+             CN3 - 15-Pin DSUB VGA Video MAIN OUT
+             CN4 - 6-Pin Power Connector
+             CN5 - 4-Pin Power Connector
+             CN6 - 2-Pin Connector (Not Used)
+             CN7 - 15-Pin DSUB VGA Video MAIN OUT
+             CN8 - 6-Pin Connector (Not Used)
+
+    ROM Usage
+    ---------
+                 |------ ROM Locations -------|
+    Game         24U     24V     32U     32V
+    -------------------------------------------
+    Gradius 4    837A13  837A15  837A14  837A16
+    NBA P/Play   778A13  778A15  778A14  778A16
+    S/Scope      -       -       -       -          (no ROMs, not used)
+    S/Scope 2    -       -       -       -          (no ROMs, not used)
+    Terraburst
 
 
 
