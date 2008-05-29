@@ -599,6 +599,29 @@ INLINE int get_port_index(const input_port_config *portlist, const char *tag)
 
 
 /*-------------------------------------------------
+    get_port_tag - return a guaranteed tag for
+    a port
+-------------------------------------------------*/
+
+INLINE const char *get_port_tag(const input_port_config *port, char *tempbuffer)
+{
+	const input_port_config *curport;
+	int index = 0;
+
+	if (port->tag != NULL)
+		return port->tag;
+	for (curport = port->machine->portconfig; curport != NULL; curport = curport->next)
+	{
+		if (curport == port)
+			break; 
+		index++;
+	}
+	sprintf(tempbuffer, "(PORT#%d)", index);
+	return tempbuffer;
+}
+
+
+/*-------------------------------------------------
     error_buf_append - append text to an error
     buffer
 -------------------------------------------------*/
@@ -613,7 +636,7 @@ INLINE void *error_buf_append(char *errorbuf, int errorbuflen, const char *forma
 	if (strlen(format) + 25 < bytesleft)
 		vsprintf(&errorbuf[curlen], format, va);
 	va_end(va);
-
+	
 	return NULL;
 }
 
@@ -881,8 +904,8 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 
 
 /*-------------------------------------------------
-    input_field_select_previous_setting - select
-    the previous item for a DIP switch or
+    input_field_select_previous_setting - select 
+    the previous item for a DIP switch or 
     configuration field
 -------------------------------------------------*/
 
@@ -890,7 +913,7 @@ void input_field_select_previous_setting(const input_field_config *field)
 {
 	const input_setting_config *setting, *prevsetting;
 	int found_match = FALSE;
-
+	
 	/* only makes sense if we have settings */
 	assert(field->settinglist != NULL);
 
@@ -924,7 +947,7 @@ void input_field_select_previous_setting(const input_field_config *field)
 
 /*-------------------------------------------------
     input_field_select_next_setting - select the
-    next item for a DIP switch or
+    next item for a DIP switch or 
     configuration field
 -------------------------------------------------*/
 
@@ -2323,13 +2346,10 @@ static int frame_get_digital_field_state(const input_field_config *field)
 	}
 
 	/* skip locked-out coin inputs */
-	if (curstate)
+	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
 	{
-		if (field->type >= IPT_COIN1 && field->type <= IPT_COIN8 && coinlockedout[field->type - IPT_COIN1])
-		{
-			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-			return FALSE;
-		}
+		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
+		return FALSE;
 	}
 	return curstate;
 }
@@ -2925,7 +2945,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				break;
 		}
 	}
-
+	
 	/* insert any pending fields */
 	if (curfield != NULL)
 		field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
@@ -3006,7 +3026,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 {
 	input_field_config *config;
 	int seqtype;
-
+	
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
@@ -3026,8 +3046,8 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 
 /*-------------------------------------------------
     field_config_insert - insert an allocated
-    input port field config, replacing any
-    intersecting fields already present and
+    input port field config, replacing any 
+    intersecting fields already present and 
     inserting at the correct sorted location
 -------------------------------------------------*/
 
@@ -3517,16 +3537,17 @@ static int load_game_config(running_machine *machine, xml_data_node *portnode, i
 	input_port_value mask, defvalue;
 	const input_field_config *field;
 	const input_port_config *port;
+	char tempbuffer[20];
 	const char *tag;
 
 	/* read the mask, index, and defvalue attributes */
-	tag = xml_get_attribute_string(portnode, "tag", NULL);
+	tag = xml_get_attribute_string(portnode, "port", NULL);
 	mask = xml_get_attribute_int(portnode, "mask", 0);
 	defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
 
 	/* find the port we want; if no tag, search them all */
 	for (port = machine->portconfig; port != NULL; port = port->next)
-		if (tag == NULL || (port->tag != NULL && strcmp(port->tag, tag) == 0))
+		if (tag == NULL || strcmp(get_port_tag(port, tempbuffer), tag) == 0)
 			for (field = port->fieldlist; field != NULL; field = field->next)
 
 				/* find the matching mask and defvalue */
@@ -3719,8 +3740,10 @@ static void save_game_inputs(running_machine *machine, xml_data_node *parentnode
 					xml_data_node *portnode = xml_add_child(parentnode, "port", NULL);
 					if (portnode != NULL)
 					{
+						char tempbuffer[20];
+						
 						/* add the identifying information and attributes */
-						xml_set_attribute(portnode, "tag", port->tag);
+						xml_set_attribute(portnode, "tag", get_port_tag(port, tempbuffer));
 						xml_set_attribute(portnode, "type", input_field_type_to_token(machine, field->type, field->player));
 						xml_set_attribute_int(portnode, "mask", field->mask);
 						xml_set_attribute_int(portnode, "defvalue", field->defvalue & field->mask);
