@@ -12,8 +12,6 @@
 
     Future improvements/changes:
     
-    * Move context to a pointer to reduce context switch times
-
     * Add DRC option to flush PC before calling memory handlers
 
     * Constant tracking? (hasn't bought us much in the past)
