@@ -470,13 +470,13 @@ static WRITE8_HANDLER( zaxxon_coin_enable_w )
 static INPUT_CHANGED( zaxxon_coin_inserted )
 {
 	if (newval)
-		coin_status[(int)param] = coin_enable[(int)param];
+		coin_status[(int)(FPTR)param] = coin_enable[(int)(FPTR)param];
 }
 
 
 static CUSTOM_INPUT( zaxxon_coin_r )
 {
-	return coin_status[(int)param];
+	return coin_status[(int)(FPTR)param];
 }
 
 
