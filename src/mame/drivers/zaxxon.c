@@ -342,6 +342,8 @@
  *************************************/
 
 static UINT8 int_enabled;
+static UINT8 coin_status[3];
+static UINT8 coin_enable[3];
 
 static UINT8 razmataz_dial_pos[2];
 static UINT16 razmataz_counter;
@@ -388,6 +390,8 @@ static MACHINE_START( zaxxon )
 {
 	/* register for save states */
 	state_save_register_global(int_enabled);
+	state_save_register_global_array(coin_status);
+	state_save_register_global_array(coin_enable);
 }
 
 
@@ -453,14 +457,27 @@ static WRITE8_HANDLER( zaxxon_coin_counter_w )
 }
 
 
-static WRITE8_HANDLER( zaxxon_coin_lockout_w )
+// There is no external coin lockout circuitry; instead, the pcb simply latches
+// the coin input, which then needs to be explicitly cleared by the game.
+static WRITE8_HANDLER( zaxxon_coin_enable_w )
 {
-	if (offset < 2)
-		coin_lockout_w(offset, ~data & 0x01);
-	else
-		service_coin_lockout_w(offset, ~data & 0x01);
+	coin_enable[offset] = data & 1;
+	if (!coin_enable[offset])
+		coin_status[offset] = 0;
 }
 
+
+static INPUT_CHANGED( zaxxon_coin_inserted )
+{
+	if (newval)
+		coin_status[(int)param] = coin_enable[(int)param];
+}
+
+
+static CUSTOM_INPUT( zaxxon_coin_r )
+{
+	return coin_status[(int)param];
+}
 
 
 
@@ -481,7 +498,7 @@ static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
-	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_lockout_w)
+	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
 	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
 	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
@@ -504,7 +521,7 @@ static ADDRESS_MAP_START( congo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("SW100")
-	AM_RANGE(0xc018, 0xc01a) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_lockout_w)
+	AM_RANGE(0xc018, 0xc01a) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_enable_w)
 	AM_RANGE(0xc01b, 0xc01c) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc01d, 0xc01d) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_bg_enable_w)
 	AM_RANGE(0xc01e, 0xc01e) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_flipscreen_w)
@@ -558,9 +575,14 @@ static INPUT_PORTS_START( zaxxon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)2)
+
+	PORT_START_TAG("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(zaxxon_coin_inserted, (void *)2)
 
 	PORT_START_TAG("SERVICESW")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED(service_switch, 0)
@@ -742,9 +764,14 @@ static INPUT_PORTS_START( razmataz )
 
 	PORT_START_TAG("SW100")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)2)
+
+	PORT_START_TAG("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(zaxxon_coin_inserted, (void *)2)
 
 	PORT_START_TAG("SERVICESW")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )

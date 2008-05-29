@@ -24,7 +24,6 @@
 UINT32 dispensed_tickets;
 UINT32 coin_count[COIN_COUNTERS];
 UINT32 coinlockedout[COIN_COUNTERS];
-UINT32 servicecoinlockedout[COIN_COUNTERS];
 static UINT32 lastcoin[COIN_COUNTERS];
 
 /* generic NVRAM */
@@ -70,13 +69,11 @@ void generic_machine_init(running_machine *machine)
 	{
 		lastcoin[counternum] = 0;
 		coinlockedout[counternum] = 0;
-		servicecoinlockedout[counternum] = 0;
 	}
 
 	/* register coin save state */
 	state_save_register_item_array("coin", 0, coin_count);
 	state_save_register_item_array("coin", 0, coinlockedout);
-	state_save_register_item_array("coin", 0, servicecoinlockedout);
 	state_save_register_item_array("coin", 0, lastcoin);
 
 	/* reset NVRAM size and pointers */
@@ -208,18 +205,6 @@ void coin_lockout_w(int num,int on)
 	if (num >= COIN_COUNTERS) return;
 
 	coinlockedout[num] = on;
-}
-
-
-/*-------------------------------------------------
-    service_coin_lockout_w - locks out one coin input
--------------------------------------------------*/
-
-void service_coin_lockout_w(int num,int on)
-{
-	if (num >= COIN_COUNTERS) return;
-
-	servicecoinlockedout[num] = on;
 }
 
 

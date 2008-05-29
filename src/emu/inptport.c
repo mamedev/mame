@@ -613,7 +613,7 @@ INLINE void *error_buf_append(char *errorbuf, int errorbuflen, const char *forma
 	if (strlen(format) + 25 < bytesleft)
 		vsprintf(&errorbuf[curlen], format, va);
 	va_end(va);
-	
+
 	return NULL;
 }
 
@@ -881,8 +881,8 @@ void input_field_set_user_settings(const input_field_config *field, const input_
 
 
 /*-------------------------------------------------
-    input_field_select_previous_setting - select 
-    the previous item for a DIP switch or 
+    input_field_select_previous_setting - select
+    the previous item for a DIP switch or
     configuration field
 -------------------------------------------------*/
 
@@ -890,7 +890,7 @@ void input_field_select_previous_setting(const input_field_config *field)
 {
 	const input_setting_config *setting, *prevsetting;
 	int found_match = FALSE;
-	
+
 	/* only makes sense if we have settings */
 	assert(field->settinglist != NULL);
 
@@ -924,7 +924,7 @@ void input_field_select_previous_setting(const input_field_config *field)
 
 /*-------------------------------------------------
     input_field_select_next_setting - select the
-    next item for a DIP switch or 
+    next item for a DIP switch or
     configuration field
 -------------------------------------------------*/
 
@@ -2330,13 +2330,6 @@ static int frame_get_digital_field_state(const input_field_config *field)
 			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
 			return FALSE;
 		}
-
-		/* skip locked-out service inputs */
-		if (field->type >= IPT_SERVICE1 && field->type <= IPT_SERVICE4 && servicecoinlockedout[field->type - IPT_SERVICE1])
-		{
-			ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
-			return FALSE;
-		}
 	}
 	return curstate;
 }
@@ -2932,7 +2925,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 				break;
 		}
 	}
-	
+
 	/* insert any pending fields */
 	if (curfield != NULL)
 		field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
@@ -3013,7 +3006,7 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 {
 	input_field_config *config;
 	int seqtype;
-	
+
 	/* allocate memory */
 	config = malloc_or_die(sizeof(*config));
 	memset(config, 0, sizeof(*config));
@@ -3033,8 +3026,8 @@ static input_field_config *field_config_alloc(input_port_config *port, int type,
 
 /*-------------------------------------------------
     field_config_insert - insert an allocated
-    input port field config, replacing any 
-    intersecting fields already present and 
+    input port field config, replacing any
+    intersecting fields already present and
     inserting at the correct sorted location
 -------------------------------------------------*/
 
