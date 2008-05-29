@@ -4859,14 +4859,14 @@ static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		if (bitp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
 			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_bt_m32_imm(&dst, MABS(srcp.value), bitp.value);					// bt     [srcp],bitp
+				emit_bt_m32_imm(&dst, MABS(drcbe, srcp.value), bitp.value);				// bt     [srcp],bitp
 			else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
 				emit_bt_r32_imm(&dst, srcp.value, bitp.value);							// bt     srcp,bitp
 		}
 		else
 		{
 			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_bt_m32_r32(&dst, MABS(srcp.value), REG_ECX);						// bt     [srcp],ecx
+				emit_bt_m32_r32(&dst, MABS(drcbe, srcp.value), REG_ECX);				// bt     [srcp],ecx
 			else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
 				emit_bt_r32_r32(&dst, srcp.value, REG_ECX);								// bt     srcp,ecx
 		}
@@ -4878,14 +4878,14 @@ static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		if (bitp.type == DRCUML_PTYPE_IMMEDIATE)
 		{
 			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_bt_m64_imm(&dst, MABS(srcp.value), bitp.value);					// bt     [srcp],bitp
+				emit_bt_m64_imm(&dst, MABS(drcbe, srcp.value), bitp.value);				// bt     [srcp],bitp
 			else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
 				emit_bt_r64_imm(&dst, srcp.value, bitp.value);							// bt     srcp,bitp
 		}
 		else
 		{
 			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_bt_m64_r64(&dst, MABS(srcp.value), REG_ECX);						// bt     [srcp],ecx
+				emit_bt_m64_r64(&dst, MABS(drcbe, srcp.value), REG_ECX);				// bt     [srcp],ecx
 			else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
 				emit_bt_r64_r64(&dst, srcp.value, REG_ECX);								// bt     srcp,ecx
 		}
