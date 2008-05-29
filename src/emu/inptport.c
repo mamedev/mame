@@ -628,7 +628,7 @@ INLINE const char *get_port_tag(const input_port_config *port, char *tempbuffer)
 
 INLINE void *error_buf_append(char *errorbuf, int errorbuflen, const char *format, ...)
 {
-	int curlen = strlen(errorbuf);
+	int curlen = (errorbuf != NULL) ? strlen(errorbuf) : 0;
 	int bytesleft = errorbuflen - curlen;
 	va_list va;
 
