@@ -90,7 +90,7 @@ static WRITE8_HANDLER( tank8_attract_w )
 
 static WRITE8_HANDLER( tank8_motor_w )
 {
-	discrete_sound_w(machine, TANK8_MOTOR1_EN+offset, data);
+	discrete_sound_w(machine, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
 static ADDRESS_MAP_START( tank8_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )

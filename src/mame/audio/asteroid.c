@@ -308,7 +308,7 @@ WRITE8_HANDLER( asteroid_thump_w )
 
 WRITE8_HANDLER( asteroid_sounds_w )
 {
-	discrete_sound_w(machine, ASTEROID_SAUCER_SND_EN + offset, data & 0x80);
+	discrete_sound_w(machine, NODE_RELATIVE(ASTEROID_SAUCER_SND_EN, offset), data & 0x80);
 }
 
 WRITE8_HANDLER( astdelux_sounds_w )

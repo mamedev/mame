@@ -3781,6 +3781,8 @@ enum {
 #error "DISCRETE_MAX_NODE_OUTPUTS != 8"
 #endif
 
+#define NODE_RELATIVE(_x, _y) (NODE(NODE_INDEX(_x) + (_y)))
+
 #define NODE_NC  NODE_00
 #define NODE_SPECIAL  NODE(DISCRETE_MAX_NODES)
 

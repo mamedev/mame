@@ -170,7 +170,7 @@ static WRITE8_HANDLER( skydiver_sound_enable_w )
 
 static WRITE8_HANDLER( skydiver_whistle_w )
 {
-	discrete_sound_w(machine, SKYDIVER_WHISTLE1_EN + (offset >> 1), offset & 0x01);
+	discrete_sound_w(machine, NODE_RELATIVE(SKYDIVER_WHISTLE1_EN, (offset >> 1)), offset & 0x01);
 }
 
 
