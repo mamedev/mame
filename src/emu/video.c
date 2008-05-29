@@ -2214,28 +2214,63 @@ static void create_snapshot_bitmap(const device_config *screen)
 
 static file_error mame_fopen_next(running_machine *machine, const char *pathoption, const char *extension, mame_file **file)
 {
+	const char *snapname = options_get_string(mame_options(), OPTION_SNAPNAME);
+	astring *snapstr = astring_alloc();
+	astring *fname = astring_alloc();
 	file_error filerr;
-	char *fname;
-	int seq;
-
-	/* allocate temp space for the name */
-	fname = malloc_or_die(strlen(machine->basename) + 1 + 10 + strlen(extension) + 1);
-
-	/* try until we succeed */
-	for (seq = 0; ; seq++)
+	int index;
+	
+	/* handle defaults */
+	if (snapname == NULL || snapname[0] == 0)
+		snapname = "%g/%i";
+	astring_cpyc(snapstr, snapname);
+	
+	/* strip any extension in the provided name and add our own */
+	index = astring_rchr(snapstr, 0, '.');
+	if (index != -1)
+		astring_substr(snapstr, 0, index);
+	astring_catc(snapstr, ".");
+	astring_catc(snapstr, extension);
+	
+	/* substitute path and gamename up front */
+	astring_replacec(snapstr, 0, "/", PATH_SEPARATOR);
+	astring_replacec(snapstr, 0, "%g", machine->basename);
+	
+	/* determine if the template has an index; if not, we always use the same name */
+	if (astring_findc(snapstr, 0, "%i") == -1)
+		astring_cpy(fname, snapstr);
+	
+	/* otherwise, we scan for the next available filename */
+	else
 	{
-		sprintf(fname, "%s" PATH_SEPARATOR "%04d.%s", machine->basename, seq, extension);
-		filerr = mame_fopen(pathoption, fname, OPEN_FLAG_READ, file);
-		if (filerr != FILERR_NONE)
-			break;
-		mame_fclose(*file);
+		int seq;
+		
+		/* try until we succeed */
+		for (seq = 0; ; seq++)
+		{
+			char seqtext[10];
+			
+			/* make text for the sequence number */
+			sprintf(seqtext, "%04d", seq);
+			
+			/* build up the filename */
+			astring_cpy(fname, snapstr);
+			astring_replacec(fname, 0, "%i", seqtext);
+
+			/* try to open the file; stop when we fail */
+			filerr = mame_fopen(pathoption, astring_c(fname), OPEN_FLAG_READ, file);
+			if (filerr != FILERR_NONE)
+				break;
+			mame_fclose(*file);
+		}
 	}
 
 	/* create the final file */
-    filerr = mame_fopen(pathoption, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, file);
+    filerr = mame_fopen(pathoption, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, file);
 
     /* free the name and get out */
-    free(fname);
+    astring_free(fname);
+    astring_free(snapstr);
     return filerr;
 }
 

@@ -453,6 +453,20 @@ Core state/playback options
 	(.cfg), NVRAM (.nv), and memory card files deleted. The default is
 	NULL (no recording).
 
+-snapname <name>
+
+	Describes how MAME should name files for snapshots. <name> is a string
+	that provides a template that is used to generate a filename. Three
+	simple substitutions are provided: the / character represents the
+	path separator on any target platform (even Windows); the string %g
+	represents the driver name of the current game; and the string %i
+	represents an incrementing index. If %i is omitted, then each
+	snapshot taken will overwrite the previous one; otherwise, MAME will
+	find the next empty value for %i and use that for a filename. The
+	default is %g/%i, which creates a separate folder for each game,
+	and names the snapshots under it starting with 0000 and increasing
+	from there.
+
 -mngwrite <filename>
 
 	Writes each video frame to the given <filename> in MNG format,

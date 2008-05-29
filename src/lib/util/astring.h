@@ -69,6 +69,9 @@ astring *astring_inssubstr(astring *dst, int insbefore, const astring *src, int 
 /* extract a substring of ourself, removing everything else */
 astring *astring_substr(astring *str, int start, int count);
 
+/* delete a substring from ourself, keeping everything else */
+astring *astring_del(astring *str, int start, int count);
+
 /* formatted printf to an astring */
 int astring_printf(astring *dst, const char *format, ...) ATTR_PRINTF(2,3);
 
@@ -117,6 +120,12 @@ int astring_find(const astring *str, int start, const astring *search);
 
 /* search in an astring for a C string, returning offset or -1 if not found */
 int astring_findc(const astring *str, int start, const char *search);
+
+/* search in an astring for another astring, replacing all instances with a third and returning the number of matches */
+int astring_replace(astring *str, int start, const astring *search, const astring *replace);
+
+/* search in an astring for a C string, replacing all instances with another C string and returning the number of matches */
+int astring_replacec(astring *str, int start, const char *search, const char *replace);
 
 
 

@@ -63,6 +63,7 @@
 #define OPTION_AUTOSAVE				"autosave"
 #define OPTION_PLAYBACK				"playback"
 #define OPTION_RECORD				"record"
+#define OPTION_SNAPNAME				"snapname"
 #define OPTION_MNGWRITE				"mngwrite"
 #define OPTION_AVIWRITE				"aviwrite"
 #define OPTION_WAVWRITE				"wavwrite"
