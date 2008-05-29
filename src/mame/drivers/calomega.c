@@ -1868,11 +1868,13 @@ ROM_START( elgrande )
 	ROM_REGION( 0x1800, REGION_GFX2, ROMREGION_DISPOSE )
 	ROM_LOAD( "d1.u70",	0x0000, 0x0800, CRC(4f12d424) SHA1(c43f1df757ac7dd76875245e73d47451d1f7f6f2) )
 	ROM_LOAD( "d1.u69",	0x0800, 0x0800, CRC(ed3c83b7) SHA1(93e2134de3d9f79a6cff0391c1a32fccd3840c3f) )
-	ROM_LOAD( "d1.u68",	0x1000, 0x0800, BAD_DUMP CRC(3ab70570) SHA1(5ff84015a78d15a5207499f84ce637e49bca136f) ) /* bad bits */
+	ROM_LOAD( "d1.u68",	0x1000, 0x0800, BAD_DUMP CRC(81d07f12) SHA1(c14226f8bc1d08fcdfc5cb71fcaf6e070fa2d4a8) ) /* some bad bits */
 
 	ROM_REGION( 0x400, REGION_PROMS, 0 )
-	ROM_LOAD( "d1.u28",		0x0000, 0x0200, CRC(a6d43709) SHA1(cbff2cb60137462dc0b7c7719a64574218d96c62) )
-	ROM_RELOAD(				0x0200, 0x0200 )
+	ROM_LOAD( "d1.u28",		0x0000, 0x0100, CRC(a26a8fae) SHA1(d570fe9443a0912bd34b81ac4c3e4c5f8901f523) )
+	ROM_RELOAD(				0x0100, 0x0100 )
+	ROM_RELOAD(				0x0200, 0x0100 )
+	ROM_RELOAD(				0x0300, 0x0100 )
 ROM_END
 
 ROM_START( jjpoker )	/* tuni-83 */
@@ -2021,7 +2023,6 @@ static DRIVER_INIT( elgrande )
 {
 	int x;
 	UINT8 *BPR = memory_region( REGION_PROMS );
-	UINT8 *ROM = memory_region( REGION_GFX2 );
 
 	/* Palette transformed by PLDs? */
 	for (x=0x0000;x<0x0400;x++)
@@ -2029,13 +2030,6 @@ static DRIVER_INIT( elgrande )
 		if (BPR[x] == 0x07)
 			BPR[x] = 0x00; /* black background */
 	}
-
-	/* Temporary patch to fix some bad bits in ROM d1.u68 till a correct dump appear */
-	ROM[0x171c] = 0xff;
-	ROM[0x171d] = 0xff;
-	ROM[0x171e] = 0xff;
-	ROM[0x1737] = 0xff;
-	ROM[0x173d] = 0xff;
 
 	/* Initializing PIAs... */
 	pia_config(0, &pia0_intf);
