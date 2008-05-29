@@ -2338,13 +2338,13 @@ static void set_irq_line(int irqline, int state)
 }
 
 /* logical to physical address translation */
-static int z180_translate(int space, offs_t *addr)
+static int z180_translate(int space, int intention, offs_t *addr)
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
 		*addr = MMU_REMAP_ADDR(*addr);
 	}
-	return 1;
+	return TRUE;
 }
 
 /**************************************************************************

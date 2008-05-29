@@ -208,6 +208,7 @@ enum _drcuml_opcode
 	DRCUML_OP_WRIT4M,		/* WRIT4M  space,dst,mask,src1    */
 	DRCUML_OP_WRITE8,		/* WRITE8  space,dst,src1         */
 	DRCUML_OP_WRIT8M,		/* WRIT8M  space,dst,mask,src1    */
+	DRCUML_OP_SETC,			/* SETC    src,bitnum             */
 	DRCUML_OP_FLAGS,		/* FLAGS   dst,mask,table         */
 	DRCUML_OP_MOV,			/* MOV     dst,src[,c]            */
 	DRCUML_OP_ZEXT1,		/* ZEXT1   dst,src                */
@@ -232,6 +233,7 @@ enum _drcuml_opcode
 	DRCUML_OP_OR,			/* OR      dst,src1,src2[,f]      */
 	DRCUML_OP_XOR,			/* XOR     dst,src1,src2[,f]      */
 	DRCUML_OP_LZCNT,		/* LZCNT   dst,src                */
+	DRCUML_OP_BSWAP,		/* BSWAP   dst,src                */
 	DRCUML_OP_SHL,			/* SHL     dst,src,count[,f]      */
 	DRCUML_OP_SHR,			/* SHR     dst,src,count[,f]      */
 	DRCUML_OP_SAR,			/* SAR     dst,src,count[,f]      */

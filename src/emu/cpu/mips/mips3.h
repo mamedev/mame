@@ -204,7 +204,8 @@ enum
     STRUCTURES
 ***************************************************************************/
 
-struct mips3_config
+typedef struct _mips3_config mips3_config;
+struct _mips3_config
 {
 	size_t		icache;							/* code cache size */
 	size_t		dcache;							/* data cache size */
@@ -250,13 +251,12 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info);
 
 /* fix me -- how do we make this work?? */
 #define MIPS3DRC_STRICT_VERIFY		0x0001			/* verify all instructions */
-#define MIPS3DRC_STRICT_COP0		0x0002			/* validate all COP0 instructions */
-#define MIPS3DRC_STRICT_COP1		0x0004			/* validate all COP1 instructions */
-#define MIPS3DRC_STRICT_COP2		0x0008			/* validate all COP2 instructions */
-#define MIPS3DRC_FLUSH_PC			0x0020			/* flush the PC value before each memory access */
-#define MIPS3DRC_CHECK_OVERFLOWS	0x0040			/* actually check overflows on add/sub instructions */
+#define MIPS3DRC_STRICT_COP1		0x0002			/* validate all COP1 instructions */
+#define MIPS3DRC_STRICT_COP2		0x0004			/* validate all COP2 instructions */
+#define MIPS3DRC_FLUSH_PC			0x0008			/* flush the PC value before each memory access */
+#define MIPS3DRC_CHECK_OVERFLOWS	0x0010			/* actually check overflows on add/sub instructions */
 
-#define MIPS3DRC_COMPATIBLE_OPTIONS	(MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP0 | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
+#define MIPS3DRC_COMPATIBLE_OPTIONS	(MIPS3DRC_STRICT_VERIFY | MIPS3DRC_STRICT_COP1 | MIPS3DRC_STRICT_COP2 | MIPS3DRC_FLUSH_PC)
 #define MIPS3DRC_FASTEST_OPTIONS	(0)
 
 

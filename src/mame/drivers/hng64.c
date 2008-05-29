@@ -1422,7 +1422,7 @@ static DRIVER_INIT(hng64_race)
 
 
 /* ?? */
-static const struct mips3_config config =
+static const mips3_config config =
 {
 	16384,				/* code cache size */
 	16384				/* data cache size */

@@ -21,6 +21,12 @@
     * Support for FPU exceptions
 
     * New instructions?
+		- FDRNDS dst,src
+			round to single-precision
+
+		- FCOPYI, ICOPYF
+			copy raw between float and integer registers
+			
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -228,6 +234,7 @@ static const drcuml_opcode_valid opcode_valid_list[] =
 	OPVALID_ENTRY_3(WRITE8,    8, NONE,  IMV4,  IANY4, IANY)
 	OPVALID_ENTRY_4(WRIT8M,    8, NONE,  IMV4,  IANY4, IANY,  IANY)
 	OPVALID_ENTRY_3(FLAGS,   4|8, NONE,  IRM,   IMV,   MEM)
+	OPVALID_ENTRY_2(SETC,    4|8, NONE,  IANY,  IANY)
 	OPVALID_ENTRY_2(MOV,     4|8, COND,  IRM,   IANY)
 	OPVALID_ENTRY_2(ZEXT1,   4|8, NONE,  IRM,   IANY4)
 	OPVALID_ENTRY_2(ZEXT2,   4|8, NONE,  IRM,   IANY4)
@@ -251,6 +258,7 @@ static const drcuml_opcode_valid opcode_valid_list[] =
 	OPVALID_ENTRY_3(OR,      4|8, SZ,    IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(XOR,     4|8, SZ,    IRM,   IANY,  IANY)
 	OPVALID_ENTRY_2(LZCNT,   4|8, NONE,  IRM,   IANY)
+	OPVALID_ENTRY_2(BSWAP,   4|8, NONE,  IRM,   IANY)
 	OPVALID_ENTRY_3(SHL,     4|8, SZC,   IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(SHR,     4|8, SZC,   IRM,   IANY,  IANY)
 	OPVALID_ENTRY_3(SAR,     4|8, SZC,   IRM,   IANY,  IANY)

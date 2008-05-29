@@ -122,10 +122,10 @@ struct _debug_cpu_info
 	UINT32			pc_history_index;			/* current history index */
 	int				hotspot_count;				/* number of hotspots */
 	int				hotspot_threshhold;			/* threshhold for the number of hits to print */
-	int				(*translate)(int space, offs_t *address);/* address translation routine */
-	int 			(*read)(int space, UINT32 offset, int size, UINT64 *value); /* memory read routine */
-	int				(*write)(int space, UINT32 offset, int size, UINT64 value); /* memory write routine */
-	int				(*readop)(UINT32 offset, int size, UINT64 *value);	/* opcode read routine */
+	cpu_translate_func translate;				/* address translation routine */
+	cpu_read_func	read; 						/* memory read routine */
+	cpu_write_func	write;						/* memory write routine */
+	cpu_readop_func	readop;						/* opcode read routine */
 	int				(*instrhook)(offs_t pc);	/* per-instruction callback hook */
 };
 

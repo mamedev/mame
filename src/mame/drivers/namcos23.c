@@ -1012,7 +1012,7 @@ static GFXDECODE_START( namcos23 )
 	GFXDECODE_ENTRY( 0, 0, namcos23_cg_layout,  0, 0x80 )
 GFXDECODE_END
 
-static const struct mips3_config config =
+static const mips3_config config =
 {
 	8192,				/* code cache size - VERIFIED */
 	8192				/* data cache size - VERIFIED */

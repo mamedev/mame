@@ -8,6 +8,19 @@
     Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
+****************************************************************************
+
+    Future improvements/changes:
+
+	* change from detecting live to detecting unnecessary
+		- at the end of sequence: mustupdate.all = TRUE;
+		- scan backwards:
+			inst.mustupdate = inst.update & mustupdate;
+			if (inst.modified.reg) mustupdate.reg = FALSE;
+			if (inst.used.reg) mustupdate.reg = TRUE;
+
+	 * rename UINT64 gpr, fpr to UINT32 reg[4]
+
 ***************************************************************************/
 
 #include <stddef.h>
@@ -175,8 +188,8 @@ void drcfe_exit(drcfe_state *drcfe)
 
 const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc)
 {
-	offs_t minpc = startpc - drcfe->window_start;
-	offs_t maxpc = startpc + drcfe->window_end;
+	offs_t minpc = startpc - MIN(drcfe->window_start, startpc);
+	offs_t maxpc = startpc + MIN(drcfe->window_end, 0xffffffff - startpc);
 	pc_stack_entry pcstack[MAX_STACK_DEPTH];
 	pc_stack_entry *pcstackptr = &pcstack[0];
 	opcode_desc **tailptr;
@@ -274,7 +287,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 	desc->targetpc = BRANCH_TARGET_DYNAMIC;
 
 	/* compute the physical PC */
-	if (drcfe->translate != NULL && !(*drcfe->translate)(ADDRESS_SPACE_PROGRAM, &desc->physpc))
+	if (drcfe->translate != NULL && !(*drcfe->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
 	{
 		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
 		/* mark as needing to validate; otherwise, just end the sequence here */

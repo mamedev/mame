@@ -379,11 +379,11 @@ WRITE8_HANDLER( H6280_timer_w )
 	}
 }
 
-static int h6280_translate(int space, offs_t *addr)
+static int h6280_translate(int space, int intention, offs_t *addr)
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 		*addr = TRANSLATED(*addr);
-	return 1;
+	return TRUE;
 }
 
 UINT8 h6280io_get_buffer()

@@ -40,7 +40,7 @@ static void tlb_entry_log_half(mips3_tlb_entry *tlbent, int index, int which);
     structure based on the configured type
 -------------------------------------------------*/
 
-size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int), void *memory)
+size_t mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int), void *memory)
 {
 	int tlbindex;
 
@@ -257,7 +257,7 @@ void mips3com_recompute_tlb_table(mips3_state *mips)
     from logical to physical
 -------------------------------------------------*/
 
-int mips3com_translate_address(mips3_state *mips, int space, offs_t *address)
+int mips3com_translate_address(mips3_state *mips, int space, int intention, offs_t *address)
 {
 	/* only applies to the program address space */
 	if (space == ADDRESS_SPACE_PROGRAM)

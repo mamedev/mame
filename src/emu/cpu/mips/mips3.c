@@ -290,10 +290,10 @@ static void mips3_reset(void)
 }
 
 
-static int mips3_translate(int space, offs_t *address)
+static int mips3_translate(int space, int intention, offs_t *address)
 {
 	/* common translate */
-	return mips3com_translate_address(&mips3.core, space, address);
+	return mips3com_translate_address(&mips3.core, space, intention, address);
 }
 
 

@@ -371,11 +371,11 @@ static ADDRESS_MAP_START(m4510_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(m4510_read_0000, m4510_write_0000)
 ADDRESS_MAP_END
 
-static int m4510_translate(int space, offs_t *addr)
+static int m4510_translate(int space, int intention, offs_t *addr)
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 		*addr = M4510_MEM(*addr);
-	return 1;
+	return TRUE;
 }
 
 /**************************************************************************

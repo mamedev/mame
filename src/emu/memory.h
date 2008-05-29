@@ -786,14 +786,14 @@ union _addrmap64_token
 
 /* common shortcuts */
 #define AM_READWRITE(_read,_write)			AM_READ(_read) AM_WRITE(_write)
-#define AM_READWRITE8(_read,_write,_shift)	AM_READ8(_read,_shift) AM_WRITE8(_write,_shift)
-#define AM_READWRITE16(_read,_write,_shift)	AM_READ16(_read,_shift) AM_WRITE16(_write,_shift)
-#define AM_READWRITE32(_read,_write,_shift)	AM_READ32(_read,_shift) AM_WRITE32(_write,_shift)
+#define AM_READWRITE8(_read,_write,_mask)	AM_READ8(_read,_mask) AM_WRITE8(_write,_mask)
+#define AM_READWRITE16(_read,_write,_mask)	AM_READ16(_read,_mask) AM_WRITE16(_write,_mask)
+#define AM_READWRITE32(_read,_write,_mask)	AM_READ32(_read,_mask) AM_WRITE32(_write,_mask)
 
 #define AM_DEVREADWRITE(_type,_tag,_read,_write) AM_DEVREAD(_type,_tag,_read) AM_DEVWRITE(_type,_tag,_write)
-#define AM_DEVREADWRITE8(_type,_tag,_read,_write,_shift) AM_DEVREAD8(_type,_tag,_read,_shift) AM_DEVWRITE8(_type,_tag,_write,_shift)
-#define AM_DEVREADWRITE16(_type,_tag,_read,_write,_shift) AM_DEVREAD16(_type,_tag,_read,_shift) AM_DEVWRITE16(_type,_tag,_write,_shift)
-#define AM_DEVREADWRITE32(_type,_tag,_read,_write,_shift) AM_DEVREAD32(_type,_tag,_read,_shift) AM_DEVWRITE32(_type,_tag,_write,_shift)
+#define AM_DEVREADWRITE8(_type,_tag,_read,_write,_mask) AM_DEVREAD8(_type,_tag,_read,_mask) AM_DEVWRITE8(_type,_tag,_write,_mask)
+#define AM_DEVREADWRITE16(_type,_tag,_read,_write,_mask) AM_DEVREAD16(_type,_tag,_read,_mask) AM_DEVWRITE16(_type,_tag,_write,_mask)
+#define AM_DEVREADWRITE32(_type,_tag,_read,_write,_mask) AM_DEVREAD32(_type,_tag,_read,_mask) AM_DEVWRITE32(_type,_tag,_write,_mask)
 
 #define AM_ROM								AM_READ(SMH_ROM)
 #define AM_ROMBANK(_bank)					AM_READ(SMH_BANK(_bank))

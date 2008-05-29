@@ -729,7 +729,7 @@ static int i386_execute(int num_cycles)
 
 /*************************************************************************/
 
-static int translate_address_cb(int space, offs_t *addr)
+static int translate_address_cb(int space, int intention, offs_t *addr)
 {
 	int result = 1;
 	if (space == ADDRESS_SPACE_PROGRAM)

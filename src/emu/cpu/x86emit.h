@@ -1568,6 +1568,8 @@ INLINE void emit_nop(x86code **emitptr)    { emit_op_simple(emitptr, OP_NOP, OP_
 INLINE void emit_int_3(x86code **emitptr)  { emit_op_simple(emitptr, OP_INT_3, OP_32BIT); }
 INLINE void emit_ret(x86code **emitptr)    { emit_op_simple(emitptr, OP_RETN, OP_32BIT); }
 INLINE void emit_cdq(x86code **emitptr)    { emit_op_simple(emitptr, OP_CDQ, OP_32BIT); }
+INLINE void emit_clc(x86code **emitptr)    { emit_op_simple(emitptr, OP_CLC, OP_32BIT); }
+INLINE void emit_stc(x86code **emitptr)    { emit_op_simple(emitptr, OP_STC, OP_32BIT); }
 INLINE void emit_cmc(x86code **emitptr)    { emit_op_simple(emitptr, OP_CMC, OP_32BIT); }
 INLINE void emit_pushf(x86code **emitptr)  { emit_op_simple(emitptr, OP_PUSHF_Fv, OP_32BIT); }
 INLINE void emit_popf(x86code **emitptr)   { emit_op_simple(emitptr, OP_POPF_Fv, OP_32BIT); }

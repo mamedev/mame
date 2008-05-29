@@ -1359,7 +1359,7 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
 
 			/* get the disassembly, but only if mapped */
 			instlen = 1;
-			if (!cpuinfo->translate || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, &pcbyte))
+			if (cpuinfo->translate == NULL || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &pcbyte))
 				instlen = activecpu_dasm(dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
 
 			/* count this one */
@@ -1537,7 +1537,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (!cpuinfo->translate || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, &tempaddr))
+		if (cpuinfo->translate == NULL || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
@@ -2770,7 +2770,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "   ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 								len += sprintf(&data[len], "%02X ", memory_read_byte(memdata, addrbyte + i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "** ");
@@ -2784,7 +2784,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "      ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 								len += sprintf(&data[len], " %04X ", memory_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], " **** ");
@@ -2798,7 +2798,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "            ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 								len += sprintf(&data[len], "  %08X  ", memory_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "  ********  ");
@@ -2812,7 +2812,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "                        ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 							{
 								UINT64 qword = memory_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
 								len += sprintf(&data[len], "    %08X%08X    ", (UINT32)(qword >> 32), (UINT32)qword);
@@ -2866,7 +2866,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "   ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 								len += sprintf(&data[len], "%02X ", memory_read_byte(memdata, addrbyte + i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "** ");
@@ -2880,7 +2880,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "      ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 								len += sprintf(&data[len], " %04X ", memory_read_word(memdata, addrbyte + 2 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], " **** ");
@@ -2894,7 +2894,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "            ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 								len += sprintf(&data[len], "  %08X  ", memory_read_dword(memdata, addrbyte + 4 * i, !memdata->no_translation));
 							else
 								len += sprintf(&data[len], "  ********  ");
@@ -2908,7 +2908,7 @@ static void memory_update(debug_view *view)
 							if (curaddr > maxaddr)
 								len += sprintf(&data[len], "                        ");
 							else if (memdata->raw_base != NULL || memdata->no_translation ||
-									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, &curaddr))
+									 cpuinfo->translate == NULL || (*cpuinfo->translate)(memdata->spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 							{
 								UINT64 qword = memory_read_qword(memdata, addrbyte + 8 * i, !memdata->no_translation);
 								len += sprintf(&data[len], "    %08X%08X    ", (UINT32)(qword >> 32), (UINT32)qword);

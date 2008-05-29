@@ -408,7 +408,7 @@ static INPUT_PORTS_START( starsldr )
 INPUT_PORTS_END
 
 /* ?? */
-static const struct mips3_config config =
+static const mips3_config config =
 {
 	16384,				/* code cache size */
 	8192,				/* data cache size */

@@ -11,6 +11,8 @@
 ****************************************************************************
 
     Future improvements/changes:
+    
+    * Move context to a pointer to reduce context switch times
 
     * Add DRC option to flush PC before calling memory handlers
 
@@ -691,7 +693,7 @@ INLINE void save_fast_iregs(drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock, const struct mips3_config *config, int (*irqcallback)(int))
+static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int))
 {
 	drcfe_config feconfig =
 	{
@@ -878,9 +880,9 @@ static void mips3_set_context(void *src)
     address translation
 -------------------------------------------------*/
 
-static int mips3_translate(int space, offs_t *address)
+static int mips3_translate(int space, int intention, offs_t *address)
 {
-	return mips3com_translate_address(mips3.core, space, address);
+	return mips3com_translate_address(mips3.core, space, intention, address);
 }
 
 
@@ -895,6 +897,72 @@ static offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 }
 #endif /* ENABLE_DEBUGGER */
 
+
+
+/*-------------------------------------------------
+    mips3_set_info - set information about a given
+    CPU instance
+-------------------------------------------------*/
+
+static void mips3_set_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are set as 64-bit signed integers --- */
+		case CPUINFO_INT_MIPS3_DRC_OPTIONS:				mips3.drcoptions = info->i;				break;
+
+		case CPUINFO_INT_MIPS3_FASTRAM_SELECT:			if (info->i >= 0 && info->i < MIPS3_MAX_FASTRAM) mips3.fastram_select = info->i; mips3.cache_dirty = TRUE; break;
+		case CPUINFO_INT_MIPS3_FASTRAM_START:			mips3.fastram[mips3.fastram_select].start = info->i; mips3.cache_dirty = TRUE; break;
+		case CPUINFO_INT_MIPS3_FASTRAM_END:				mips3.fastram[mips3.fastram_select].end = info->i; mips3.cache_dirty = TRUE; break;
+		case CPUINFO_INT_MIPS3_FASTRAM_READONLY:		mips3.fastram[mips3.fastram_select].readonly = info->i; mips3.cache_dirty = TRUE; break;
+
+		case CPUINFO_INT_MIPS3_HOTSPOT_SELECT:			if (info->i >= 0 && info->i < MIPS3_MAX_HOTSPOTS) mips3.hotspot_select = info->i; mips3.cache_dirty = TRUE; break;
+		case CPUINFO_INT_MIPS3_HOTSPOT_PC:				mips3.hotspot[mips3.hotspot_select].pc = info->i; mips3.cache_dirty = TRUE; break;
+		case CPUINFO_INT_MIPS3_HOTSPOT_OPCODE:			mips3.hotspot[mips3.hotspot_select].opcode = info->i; mips3.cache_dirty = TRUE; break;
+		case CPUINFO_INT_MIPS3_HOTSPOT_CYCLES:			mips3.hotspot[mips3.hotspot_select].cycles = info->i; mips3.cache_dirty = TRUE; break;
+
+		/* --- the following bits of info are set as pointers to data or functions --- */
+		case CPUINFO_PTR_MIPS3_FASTRAM_BASE:			mips3.fastram[mips3.fastram_select].base = info->p;	break;
+
+		/* --- everything else is handled generically --- */
+		default:										mips3com_set_info(mips3.core, state, info);	break;
+	}
+}
+
+
+/*-------------------------------------------------
+    mips3_get_info - return information about a 
+    given CPU instance
+-------------------------------------------------*/
+
+static void mips3_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mips3);				break;
+		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = mips3_set_info;			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mips3_get_context;	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mips3_set_context;	break;
+		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
+		case CPUINFO_PTR_RESET:							info->reset = mips3_reset;				break;
+		case CPUINFO_PTR_EXIT:							info->exit = mips3_exit;				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = mips3_execute;			break;
+#ifdef ENABLE_DEBUGGER
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
+#endif /* ENABLE_DEBUGGER */
+		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
+
+		/* --- everything else is handled generically --- */
+		default:										mips3com_get_info(mips3.core, state, info); break;
+	}
+}
 
 
 
@@ -3749,67 +3817,6 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 		/* at the end of a sequence add a dividing line */
 		if (desclist->flags & OPFLAG_END_SEQUENCE)
 			drcuml_log_printf(drcuml, "-----\n");
-	}
-}
-
-
-
-/***************************************************************************
-    GENERIC GET/SET INFO
-***************************************************************************/
-
-static void mips3_set_info(UINT32 state, cpuinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_MIPS3_DRC_OPTIONS:				mips3.drcoptions = info->i;				break;
-
-		case CPUINFO_INT_MIPS3_FASTRAM_SELECT:			if (info->i >= 0 && info->i < MIPS3_MAX_FASTRAM) mips3.fastram_select = info->i; mips3.cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_FASTRAM_START:			mips3.fastram[mips3.fastram_select].start = info->i; mips3.cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_FASTRAM_END:				mips3.fastram[mips3.fastram_select].end = info->i; mips3.cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_FASTRAM_READONLY:		mips3.fastram[mips3.fastram_select].readonly = info->i; mips3.cache_dirty = TRUE; break;
-
-		case CPUINFO_INT_MIPS3_HOTSPOT_SELECT:			if (info->i >= 0 && info->i < MIPS3_MAX_HOTSPOTS) mips3.hotspot_select = info->i; mips3.cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_HOTSPOT_PC:				mips3.hotspot[mips3.hotspot_select].pc = info->i; mips3.cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_HOTSPOT_OPCODE:			mips3.hotspot[mips3.hotspot_select].opcode = info->i; mips3.cache_dirty = TRUE; break;
-		case CPUINFO_INT_MIPS3_HOTSPOT_CYCLES:			mips3.hotspot[mips3.hotspot_select].cycles = info->i; mips3.cache_dirty = TRUE; break;
-
-		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_MIPS3_FASTRAM_BASE:			mips3.fastram[mips3.fastram_select].base = info->p;	break;
-
-		/* --- everything else is handled generically --- */
-		default:										mips3com_set_info(mips3.core, state, info);	break;
-	}
-}
-
-
-static void mips3_get_info(UINT32 state, cpuinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mips3);				break;
-		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mips3_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mips3_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mips3_set_context;	break;
-		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
-		case CPUINFO_PTR_RESET:							info->reset = mips3_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = mips3_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mips3_execute;			break;
-#ifdef ENABLE_DEBUGGER
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
-#endif /* ENABLE_DEBUGGER */
-		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-
-		/* --- everything else is handled generically --- */
-		default:										mips3com_get_info(mips3.core, state, info); break;
 	}
 }
 

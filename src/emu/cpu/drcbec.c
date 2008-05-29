@@ -720,6 +720,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = (PARAM0 & ~PARAM1) | (inst[2].puint32[flags & 0x1f] & PARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SETC, 4, 0):		/* SETC    src,bitnum             */
+				flags = (flags & ~DRCUML_FLAG_C) | ((PARAM0 >> (PARAM1 & 31)) & DRCUML_FLAG_C);
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_MOV, 4, 1):		/* MOV     dst,src[,c]            */
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
@@ -905,14 +909,13 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = temp32;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 0):		/* LZCNT   dst,src[,f]            */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 0):		/* LZCNT   dst,src                */
 				PARAM0 = count_leading_zeros(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 4, 1):
-				temp32 = count_leading_zeros(PARAM1);
-				flags = (temp32 == 0) ? DRCUML_FLAG_Z : 0;
-				PARAM0 = temp32;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_BSWAP, 4, 0):		/* BSWAP   dst,src                */
+				temp32 = PARAM1;
+				PARAM0 = FLIPENDIAN_INT32(temp32);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SHL, 4, 0):		/* SHL     dst,src,count[,f]      */
@@ -1138,6 +1141,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				DPARAM0 = (DPARAM0 & ~DPARAM1) | (inst[2].puint64[flags & 0x0f] & DPARAM1);
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SETC, 8, 0):		/* DSETC   src,bitnum             */
+				flags = (flags & ~DRCUML_FLAG_C) | ((DPARAM0 >> (DPARAM1 & 63)) & DRCUML_FLAG_C);
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_MOV, 8, 1):		/* DMOV    dst,src[,c]            */
 				if (OPCODE_FAIL_CONDITION(opcode, flags))
 					break;
@@ -1321,20 +1328,16 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				DPARAM0 = temp64;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 0):		/* DLZCNT  dst,src[,f]            */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 0):		/* DLZCNT  dst,src                */
 				if ((UINT32)(DPARAM1 >> 32) != 0)
 					DPARAM0 = count_leading_zeros(DPARAM1 >> 32);
 				else
 					DPARAM0 = 32 + count_leading_zeros(DPARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LZCNT, 8, 1):
-				if ((UINT32)(DPARAM1 >> 32) != 0)
-					temp32 = count_leading_zeros(DPARAM1 >> 32);
-				else
-					temp32 = 32 + count_leading_zeros(DPARAM1);
-				flags = (temp32 == 0) ? DRCUML_FLAG_Z : 0;
-				DPARAM0 = temp32;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_BSWAP, 8, 0):		/* DBSWAP  dst,src                */
+				temp64 = DPARAM1;
+				DPARAM0 = FLIPENDIAN_INT64(temp64);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SHL, 8, 0):		/* DSHL    dst,src,count[,f]      */

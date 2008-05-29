@@ -1490,7 +1490,7 @@ static void execute_dump(int ref, int params, const char *param[])
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (!info->translate || (*info->translate)(spacenum, &curaddr))
+						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ, &curaddr))
 						{
 							UINT8 byte = debug_read_byte(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %02X", byte);
@@ -1509,7 +1509,7 @@ static void execute_dump(int ref, int params, const char *param[])
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (!info->translate || (*info->translate)(spacenum, &curaddr))
+						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 						{
 							UINT16 word = debug_read_word(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %04X", word);
@@ -1528,7 +1528,7 @@ static void execute_dump(int ref, int params, const char *param[])
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (!info->translate || (*info->translate)(spacenum, &curaddr))
+						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 						{
 							UINT32 dword = debug_read_dword(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X", dword);
@@ -1547,7 +1547,7 @@ static void execute_dump(int ref, int params, const char *param[])
 					if (i + j <= endoffset)
 					{
 						offs_t curaddr = i + j;
-						if (!info->translate || (*info->translate)(spacenum, &curaddr))
+						if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 						{
 							UINT64 qword = debug_read_qword(ref, i + j, TRUE);
 							outdex += sprintf(&output[outdex], " %08X%08X", (UINT32)(qword >> 32), (UINT32)qword);
@@ -1568,7 +1568,7 @@ static void execute_dump(int ref, int params, const char *param[])
 			for (j = 0; j < 16 && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
-				if (!info->translate || (*info->translate)(spacenum, &curaddr))
+				if (info->translate == NULL || (*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &curaddr))
 				{
 					UINT8 byte = debug_read_byte(ref, i + j, TRUE);
 					outdex += sprintf(&output[outdex], "%c", (byte >= 32 && byte < 128) ? byte : '.');
@@ -1759,7 +1759,7 @@ static void execute_dasm(int ref, int params, const char *param[])
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
-		if (!info->translate || (*info->translate)(ADDRESS_SPACE_PROGRAM, &tempaddr))
+		if (info->translate == NULL || (*info->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &tempaddr))
 		{
 			UINT8 opbuf[64], argbuf[64];
 
@@ -2063,9 +2063,9 @@ static void execute_map(int ref, int params, const char *param[])
 
 	/* do the translation first */
 	taddress = ADDR2BYTE_MASKED(address, info, spacenum);
-	if (info->translate)
+	if (info->translate != NULL)
 	{
-		if ((*info->translate)(spacenum, &taddress))
+		if ((*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &taddress))
 			debug_console_printf("%08X logical -> %08X physical\n", (UINT32)address, BYTE2ADDR(taddress, info, spacenum));
 		else
 		{
