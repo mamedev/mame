@@ -483,15 +483,17 @@ static VIDEO_UPDATE(deroon)
 
 		x = tecmosys_spriteram[i+0] & 0x1ff;
 		y = tecmosys_spriteram[i+1] & 0x1ff;
-		address =  tecmosys_spriteram[i+5]*256;
+		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
+
+		address*=256;
 		y -= 128;
  		x -= 64;
 
 		//xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
 		//ysize = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
 
-		ysize =  ((tecmosys_spriteram[i+6] & 0x000f))*16;
-		xsize =  (((tecmosys_spriteram[i+6] & 0x0f00)>>8))*16;
+		ysize =  ((tecmosys_spriteram[i+6] & 0x00ff))*16;
+		xsize =  (((tecmosys_spriteram[i+6] & 0xff00)>>8))*16;
 
 		colour =  ((tecmosys_spriteram[i+4] & 0x3f00))>>8;
 
