@@ -1407,7 +1407,7 @@ $(MAMEOBJ)/tehkan.a: \
 	$(DRIVERS)/tbowl.o $(VIDEO)/tbowl.o \
 	$(DRIVERS)/tecmo.o $(VIDEO)/tecmo.o \
 	$(DRIVERS)/tecmo16.o $(VIDEO)/tecmo16.o \
-	$(DRIVERS)/tecmosys.o \
+	$(DRIVERS)/tecmosys.o $(MACHINE)/tecmosys.o \
 	$(DRIVERS)/tehkanwc.o $(VIDEO)/tehkanwc.o \
 	$(DRIVERS)/wc90.o $(VIDEO)/wc90.o \
 	$(DRIVERS)/wc90b.o $(VIDEO)/wc90b.o \

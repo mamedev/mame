@@ -11,6 +11,15 @@ T.Slanina 20040530 :
  - added hacks to see more gfx (press Z or X)
  - palette (press X in angel eyes to see 'color bar chack'(!))
  - watchdog (?) simulation
+
+ 20080528
+ - Removed ROM patches and debug keypresses
+ - Added protection simulation in machine/tecmosys.c
+ - Fixed inputs
+ - Added watchdog
+
+   To enter test mode, you have to press the test switch before you insert any coins.
+
 */
 
 
@@ -172,12 +181,15 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 #include "driver.h"
 #include "machine/eeprom.h"
+#include "tecmosys.h"
 #include "cpu/m68000/m68k.h"
 #include "sound/okim6295.h"
 #include "sound/262intf.h"
 #include "sound/ymz280b.h"
 
-static int gametype;
+UINT16* tecmosys_spriteram;
+
+static MACHINE_RESET( deroon );
 
 static tilemap *txt_tilemap;
 static TILE_GET_INFO( get_tile_info )
@@ -191,122 +203,52 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
-
-static UINT16* protram;
-
-static UINT8 device[0x10000];
-static UINT32 device_read_ptr = 0;
-static UINT32 device_write_ptr = 0;
-
-enum DEV_STATUS
+// It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
+static READ16_HANDLER( sound_r )
 {
-	DS_CMD,
-	DS_WRITE,
-	DS_WRITE_ACK,
-	DS_READ,
-	DS_READ_ACK
-};
-
-static UINT8 device_status = DS_CMD;
-
-static READ16_HANDLER(reg_f80000_r)
-{
-	UINT16 dt;
-	// 0 means ok, no errors. -1 means error
-	if (device_status == DS_CMD)
-		return 0;
-
-	if (device_status == DS_WRITE_ACK)
+	if (ACCESSING_BITS_0_7)
 	{
-		// Notice, this is the maximum. I think the device lets 68k just writes 4/5 bytes,
-		// they contain "LUNA". Then, it starts sending to the 68k a bunch of stuff, including
-		// 68k code.
-		if (device_write_ptr == 0x10000)
-		{
-//          logerror("DEVICE write finished\n");
-			device_status = DS_READ_ACK;
-			device_write_ptr = 0;
-			device_read_ptr = 0;
-		}
-		else
-			device_status = DS_WRITE;
-
-		return 0;
-	}
-
-	if (device_status == DS_WRITE)
-	{
-		logerror("UNEXPECTED read DS_WRITE (write ptr %x)\n", device_write_ptr);
-		return 0;
-	}
-
-
-	if (device_status == DS_READ_ACK)
-	{
-//      logerror("Read ACK\n");
-		device_status = DS_READ;
-		return 0;
-	}
-
-	dt = device[device_read_ptr];
-
-//  logerror("DEVICE read %x: %x (at %x)\n", device_read_ptr, dt, cpunum_get_pc(0));
-
-	device_read_ptr++;
-	device_read_ptr &= 0xFFFF;
-
-	device_status = DS_READ_ACK;
-
-	return dt<<8;
-}
-
-// Write 0x13
-// Read something (acknowledge? If -1, write -1 and restart)
-// Write data
-// Read value (!=1 is ok)
-
-static READ16_HANDLER(reg_b80000_r)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		// Bit 7: 0 = ready to write
-		// Bit 6: 0 = ready to read
-		return 0;
+		return soundlatch2_r( machine,  0 );
 	}
 
 	return 0;
 }
 
-static WRITE16_HANDLER(reg_e80000_w)
+static WRITE16_HANDLER( sound_w )
 {
-	// Only LSB
-	data >>= 8;
-
-	if (device_status == DS_CMD)
+	if (ACCESSING_BITS_0_7)
 	{
-		switch (data)
-		{
-		case 0x13:
-//          logerror("DEVICE mode WRITE (cmd 0x13)\n");
-			device_status = DS_WRITE;
-			device_write_ptr = 0;
+		soundlatch_w(machine,0x00,data & 0xff);
+		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	}
+}
+
+/*
+	880000 and 880002 might be video related,
+	see sub @ 68k:002e5e where they are written if the screen is set to inverted.
+	Also, irq code at 22c4 :
+	- 880000 & 00, execute irq code
+	- 880000 & 01, scroll?
+	- 880000 & 03, crash
+*/
+static WRITE16_HANDLER( unk880000_w )
+{
+	switch( offset )
+	{
+		case 0x22/2:
+			watchdog_reset( machine );
 			break;
-		}
 
-		return;
+		default:
+			//logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, activecpu_get_pc() );
+			break;
 	}
+}
 
-	// @@@ Should skip the writes while in read mode?
-	if (device_status == DS_READ || device_status == DS_READ_ACK)
-	{
-//      logerror("EEPROM write %x: %x\n", device_write_ptr, data);
-		return;
-	}
-
-	device[device_write_ptr] = (UINT8)data;
-	device_write_ptr++;
-	device_status = DS_WRITE_ACK;
-
+static READ16_HANDLER( unk880000_r )
+{
+	//logerror( "unk880000_r( %06x ) @ %06x\n", (offset * 2 ) +0x880000, activecpu_get_pc() );
+	return 0;
 }
 
 static READ16_HANDLER( eeprom_r )
@@ -317,22 +259,23 @@ static READ16_HANDLER( eeprom_r )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_RAM)
-	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x880000, 0x880001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x880002, 0x880007) AM_READ(input_port_1_word_r) /* test */
-	AM_RANGE(0x900000, 0x907fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x980000, 0x980fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb80000, 0xb80001) AM_READ(reg_b80000_r)
-	AM_RANGE(0xd00000, 0xd80003) AM_READ(SMH_RAM)
+	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) // work ram
+	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_NOP) // single byte overflow on stack defined as 0x210000
+	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram
+	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM) // bg1 ram
+	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM) // bg2 ram
+	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM) // fix ram   (all these names from test screen)
+	AM_RANGE(0x800000, 0x80ffff) AM_READ(SMH_RAM) // obj ram
+	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
+	AM_RANGE(0x900000, 0x907fff) AM_READ(SMH_RAM) // obj pal
+	AM_RANGE(0x980000, 0x9807ff) AM_READ(SMH_RAM) // bg pal
+	AM_RANGE(0x980800, 0x980fff) AM_READ(SMH_RAM) // fix pal
+	AM_RANGE(0xb80000, 0xb80001) AM_READ(prot_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xd00002, 0xd00003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(SMH_RAM)
-	AM_RANGE(0xf80000, 0xf80001) AM_READ(reg_f80000_r)
-
+	AM_RANGE(0xf00000, 0xf00001) AM_READ( sound_r )
+	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( eeprom_w )
@@ -347,45 +290,69 @@ static WRITE16_HANDLER( eeprom_w )
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&protram)
-	AM_RANGE(0x300000, 0x3013ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x400000, 0x4013ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram16)
-	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x900000, 0x907fff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
+	AM_RANGE(0x300000, 0x3013ff) AM_WRITE(SMH_RAM) // bg0 ram
+	AM_RANGE(0x400000, 0x4013ff) AM_WRITE(SMH_RAM) // bg1 ram
+	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM) // bg2 ram
+	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram16) // fix ram
+	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
+	AM_RANGE(0x900000, 0x907fff) AM_WRITE(SMH_RAM) // obj pal
+
+	//AM_RANGE(0x980000, 0x9807ff) AM_WRITE(SMH_RAM) // bg pal
+	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // fix pal
+	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
 	AM_RANGE(0x980000, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)
 
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE(SMH_RAM )
+	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w )	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xb80000, 0xb80005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_RAM )
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(reg_e80000_w)
+	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	)	// a80000-3 scroll? a80004 inverted ? 3 : 0
+	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
+	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(prot_status_w)
+	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	)	// c00000-3 scroll? c00004 inverted ? 13 : 10
+	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	)	// c80000-3 scrool? c80004 inverted ? 3 : 0
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( deroon )
 	PORT_START
-	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT(  0x0002, IP_ACTIVE_HIGH,IPT_UNKNOWN )
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )		PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )			PORT_PLAYER(1)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )			PORT_PLAYER(1)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )			PORT_PLAYER(1)
+	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) 		PORT_PLAYER(1)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START
+	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )		PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )	PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )			PORT_PLAYER(2)
+	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )			PORT_PLAYER(2)
+	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )			PORT_PLAYER(2)
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_BIT(  0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(  0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 )			PORT_PLAYER(2)
+	PORT_BIT(  0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x1000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout gfxlayout =
@@ -416,9 +383,9 @@ static const gfx_layout gfxlayout2 =
 static GFXDECODE_START( tecmosys )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x40*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout2,   0, 16 )
+
 GFXDECODE_END
-
-
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
@@ -429,7 +396,6 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
 	AM_RANGE(0xe000, 0xf7ff) AM_READ(SMH_RAM)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -437,13 +403,11 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-
-
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(YMF262_status_0_r)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	//AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
+	AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -458,14 +422,11 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 
-	//AM_RANGE(0x50, 0x50) AM_WRITE(to_main_cpu_latch_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
 
 	AM_RANGE(0x60, 0x60) AM_WRITE(YMZ280B_register_0_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(YMZ280B_data_0_w)
 ADDRESS_MAP_END
-
-
 
 static VIDEO_START(deroon)
 {
@@ -473,79 +434,72 @@ static VIDEO_START(deroon)
 	tilemap_set_transparent_pen(txt_tilemap,0);
 }
 
-
-
-
 static VIDEO_UPDATE(deroon)
 {
+	int i;
+	//const gfx_element *gfx = Machine->gfx[0];
+	//UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
 
-
-
-#if 0
-/* simulate sound commands writes here ... to test OPL3 emulator */
-	int j;
-	char buf[64];
-	static int command_data=0;
-
-	if (input_code_pressed_once(KEYCODE_Q))
-	{
-		command_data++;
-	}
-	if (input_code_pressed_once(KEYCODE_A))
-	{
-		command_data--;
-	}
-	command_data &= 0xff;
-
-	sprintf(buf,"keys: Q,A and C\ncommand code: %2x", command_data);
-	ui_draw_text(buf,10,20);
-
-	if (input_code_pressed_once(KEYCODE_C))
-	{
-		soundlatch_w(0,command_data);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-		popmessage("command write=%2x",command_data);
-	}
-#endif
-
-
-
-
-	// bg color , to see text in deroon
-	if(!gametype)
-			palette_set_color(screen->machine,0x800,MAKE_RGB(0x80,0x80,0x80));
-	else
-			palette_set_color(screen->machine,0x800,MAKE_RGB(0x0,0x0,0x0));
 
 	fillbitmap(bitmap,0x800,cliprect);
 
 	tilemap_mark_all_tiles_dirty(txt_tilemap);
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
 
-
-//hacks
-
-	if(input_code_pressed_once(KEYCODE_Z))
+	for (i=0;i<0x10000/2;i+=8)
 	{
-		if(!gametype)
-			cpunum_set_reg(0, M68K_PC, 0x23ae8); /* deroon */
-		else
+		int xcnt,ycnt;
+		int drawx, drawy;
+		UINT16* dstptr;
+
+		int x, y;
+		int address;
+		int xsize = 16;
+		int ysize = 16;
+
+		x = tecmosys_spriteram[i+0] & 0x1ff;
+		y = tecmosys_spriteram[i+1] & 0x1ff;
+		address =  tecmosys_spriteram[i+5]<<5;
+		y -= 128;
+ 		x -= 64;
+
+		xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
+		ysize = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
+
+
+		//drawgfx(bitmap,gfx,mame_rand(Machine)&0xffff,0x10,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
+
+		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
-			UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-			ROM[0x3aaa/2] = 0x4e73; // rte (trap 0)
-			cpunum_set_reg(0, M68K_PC, 0x182a0); /* angel eyes */
+			drawy = y + ycnt;
+
+			if ((drawy < 0) || (drawy > 240)) continue;
+
+			for (xcnt = 0; xcnt < xsize; xcnt+=2)
+			{
+				drawx = x + xcnt;
+
+				if ((drawx < 0) || (drawx > 320)) continue;
+				dstptr = BITMAP_ADDR16(bitmap, drawy, drawx);
+
+				dstptr[0] = 0x401;// mame_rand(Machine);//((gfxsrc[address] & 0xf0) >> 4) + 0x10;
+
+				drawx++;
+
+				if ((drawx < 0) || (drawx > 320)) continue;
+				dstptr = BITMAP_ADDR16(bitmap, drawy, drawx);
+
+				dstptr[0] = 0x401;// mame_rand(Machine);//((gfxsrc[address] & 0x0f) >> 0) + 0x10;
+
+
+				address++;
+
+			}
 		}
+
 	}
 
-	if(input_code_pressed_once(KEYCODE_X))
-	{
-		if(gametype)
-		{
-			UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-			ROM[0x3aaa/2] = 0x4e73; // rte (trap 0)
-			cpunum_set_reg(0, M68K_PC, 0x17d2a); /* angel eyes */
-		}
-	}
+
 	return 0;
 }
 
@@ -603,12 +557,13 @@ static const struct YMZ280Binterface ymz280b_interface =
 };
 
 static MACHINE_DRIVER_START( deroon )
-	MDRV_CPU_ADD(M68000, 16000000/8) /* the /8 divider is here only for OPL3 testing */
+	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+	MDRV_WATCHDOG_VBLANK_INIT(5) // guess
 
-	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
 	/* audio CPU */
+	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 
@@ -628,6 +583,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_PALETTE_LENGTH(0x800+1)
 
 	MDRV_VIDEO_START(deroon)
+	MDRV_MACHINE_RESET(deroon)
 	MDRV_VIDEO_UPDATE(deroon)
 
 	/* sound hardware */
@@ -650,7 +606,6 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 MACHINE_DRIVER_END
-
 
 ROM_START( deroon )
 	ROM_REGION( 0x100000, REGION_CPU1, 0 ) // Main Program
@@ -718,47 +673,22 @@ ROM_START( tkdensho )
 	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static TIMER_CALLBACK( reset_callback )
+static MACHINE_RESET( deroon )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	device_read_ptr = 0;
+	device_status = DS_IDLE;
 }
-
 
 static DRIVER_INIT( deroon )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-	ROM[0x39C2/2] = 0x0001;
-	ROM[0x0448/2] = 0x4E71;
-	ROM[0x044A/2] = 0x4E71;
-	ROM[0x04bc/2] = 0x0000;
-	ROM[0x302c/2] = 0x60a4;
-	timer_set(ATTOTIME_IN_SEC(2), NULL,0,reset_callback);
-	gametype=0;
+	device_data = &deroon_data;
 }
 
 static DRIVER_INIT( tkdensho )
 {
-	UINT16 *ROM = (UINT16 *)memory_region(REGION_CPU1);
-	ROM[0x222c/2] = 0x4E71;
-	ROM[0x222c/2] = 0x4E71;
-
-	/* interrupt vector */
-	ROM[0x64/2] = 0x0000;
-	ROM[0x66/2] = 0x22c4;
-
-	/* protection ? */
-	ROM[0x3a3c/2] = 0x4E71;
-	ROM[0x3a84/2] = 0x4E71;
-
-	ROM[0x1759a/2] = 0x4E71; //trap 0
-	ROM[0x04822/2] = 0x4E71;
-	ROM[0x04862/2] = 0x4E71;
-
-	timer_set(ATTOTIME_IN_SEC(2), NULL,0,reset_callback);
-	gametype=1;
-
+	device_data = &tkdensho_data;
 }
 
-GAME( 1996, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1996, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 
