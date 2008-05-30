@@ -1454,6 +1454,13 @@ static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int
 	UML_MOVc(block, IF_Z, CPR032(COP0_EPC), IREG(0));								// mov     [EPC],i0,Z
 	UML_OR(block, CPR032(COP0_Cause), IREG(2), IMM(exception << 2));				// or      [Cause],i2,exception << 2
 
+	/* for BADCOP exceptions, we use the exception parameter to know which COP */
+	if (exception == EXCEPTION_BADCOP)
+	{
+		UML_GETEXP(block, IREG(0));													// getexp  i0
+		UML_INSERT(block, CPR032(COP0_Cause), IREG(0), IMM(28), IMM(0x30000000));	// insert  [Cause],i0,28,0x30000000
+	}
+
 	/* set EXL in the SR */
 	UML_OR(block, IREG(0), CPR032(COP0_Status), IMM(SR_EXL));						// or      i0,[Status],SR_EXL
 	UML_MOV(block, CPR032(COP0_Status), IREG(0));									// mov     [Status],i0
@@ -3240,7 +3247,7 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 	if (mips3->impstate->drcoptions & MIPS3DRC_STRICT_COP1)
 	{
 		UML_TEST(block, CPR032(COP0_Status), IMM(SR_COP1));							// test    [Status],SR_COP1
-		UML_EXHc(block, IF_Z, mips3->impstate->exception[EXCEPTION_BADCOP], IMM(0));// exh     cop,0,Z
+		UML_EXHc(block, IF_Z, mips3->impstate->exception[EXCEPTION_BADCOP], IMM(1));// exh     cop,1,Z
 	}
 
 	switch (RSREG)
@@ -3595,7 +3602,7 @@ static int generate_cop1x(drcuml_block *block, compiler_state *compiler, const o
 	if (mips3->impstate->drcoptions & MIPS3DRC_STRICT_COP1)
 	{
 		UML_TEST(block, CPR032(COP0_Status), IMM(SR_COP1));							// test    [Status],SR_COP1
-		UML_EXHc(block, IF_Z, mips3->impstate->exception[EXCEPTION_BADCOP], IMM(0));// exh     cop,0,Z
+		UML_EXHc(block, IF_Z, mips3->impstate->exception[EXCEPTION_BADCOP], IMM(1));// exh     cop,1,Z
 	}
 
 	switch (op & 0x3f)
