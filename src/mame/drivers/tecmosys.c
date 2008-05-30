@@ -188,6 +188,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 #include "sound/ymz280b.h"
 
 UINT16* tecmosys_spriteram;
+UINT16* tilemap_paletteram16;
 
 static MACHINE_RESET( deroon );
 
@@ -198,8 +199,8 @@ static TILE_GET_INFO( get_tile_info )
 	SET_TILE_INFO(
 			0,
 			videoram16[2*tile_index+1],
-			videoram16[2*tile_index]&0xf,
-			0);
+			(videoram16[2*tile_index]&0x3f),
+			TILE_FLIPYX((videoram16[2*tile_index]&0xc0)>>6));
 }
 
 
@@ -288,6 +289,19 @@ static WRITE16_HANDLER( eeprom_w )
 	}
 }
 
+INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+{
+	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+}
+
+
+WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
+{
+	COMBINE_DATA(&tilemap_paletteram16[offset]);
+	set_color_555(offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
+}
+
+
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
@@ -301,7 +315,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITE(SMH_RAM) // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) //AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x980000, 0x980fff) AM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
 
 	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w )	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
@@ -379,35 +393,12 @@ static const gfx_layout gfxlayout2 =
 	128*8
 };
 
-static const gfx_layout gfxlayout3 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7  },
-	{ 0*4, 1*8, 2*8, 3*8,
-
-
-	  4*8, 5*8, 6*8, 7*8,
-
-	  8*8,9*8,10*8,11*8,
-	  12*8,13*8,14*8,15*8,
-	 },
-
-
-	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
-
-		128*16
-
-	};
 
 
 
 static GFXDECODE_START( tecmosys )
-	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x40*16, 16 )
-	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout3,   0, 16 )
-
+	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x4400, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,  0x4000, 0x40 )
 GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
@@ -464,10 +455,8 @@ static VIDEO_UPDATE(deroon)
 	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
 
 
-	fillbitmap(bitmap,0x800,cliprect);
+	fillbitmap(bitmap,0x000,cliprect);
 
-	tilemap_mark_all_tiles_dirty(txt_tilemap);
-	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
 
 	for (i=0;i<0x10000/2;i+=8)
 	{
@@ -481,8 +470,12 @@ static VIDEO_UPDATE(deroon)
 		int ysize = 16;
 		int colour;
 
-		x = tecmosys_spriteram[i+0] & 0x1ff;
-		y = tecmosys_spriteram[i+1] & 0x1ff;
+		x = tecmosys_spriteram[i+0] & 0x3ff;
+		y = tecmosys_spriteram[i+1] & 0x3ff;
+
+	//	if (x&0x200) x-=0x400;
+	//	if (y&0x200) y-=0x400;
+
 		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
 
 		address*=256;
@@ -512,7 +505,7 @@ static VIDEO_UPDATE(deroon)
 			{
 				drawx = x + xcnt;
 
-				if ((drawx>0 && drawx<320) && (drawy>0 && drawy<240))
+				if ((drawx>0 && drawx<336) && (drawy>0 && drawy<256))
 				{
 					UINT8 data;
 
@@ -534,6 +527,8 @@ static VIDEO_UPDATE(deroon)
 
 	}
 
+	tilemap_mark_all_tiles_dirty(txt_tilemap);
+	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
 
 	return 0;
 }
@@ -681,16 +676,16 @@ ROM_START( tkdensho )
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 
-	ROM_REGION( 0x3000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
 	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
 	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
 	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
 	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
 	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
 	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
-	ROM_LOAD16_BYTE( "ae104.el1",     0x1800001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
-	ROM_LOAD16_BYTE( "ae105.fl1",     0x2000001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
-	ROM_LOAD16_BYTE( "ae106.gl1",     0x2800001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+	ROM_LOAD16_BYTE( "ae104.el1",     0x2000001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
 	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
@@ -700,7 +695,7 @@ ROM_START( tkdensho )
 	ROM_LOAD( "ae201w75.bb1",  0x100000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
 	ROM_LOAD( "ae202w76.bc1",  0x200000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
-	ROM_REGION( 0x400000, REGION_SOUND1, 0 ) // YMZ280B Samples
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
