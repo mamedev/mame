@@ -3,7 +3,7 @@
     Seibu Sound System v1.02, designed 1986 by Seibu Kaihatsu
 
     The Seibu sound system comprises of a Z80A, a YM3812, a YM3931*, and
-    an Oki MSM6205.  As well as sound the Z80 can controls coins and pass
+    an Oki MSM6295.  As well as sound the Z80 can controls coins and pass
     data to the main cpu.  There are a few little quirks that make it
     worthwhile emulating in a seperate file:
 

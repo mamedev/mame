@@ -392,7 +392,7 @@ static INPUT_PORTS_START( wilytowr )
 	PORT_DIPNAME( 0x10, 0x00, "Stop Mode (Cheat)")		PORT_DIPLOCATION("SW2:!5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW2:!6" )		/* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW2:!6" )		/* Listed as "Unused" */
 	PORT_DIPNAME( 0x40, 0x00, "Invulnerability (Cheat)") PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
