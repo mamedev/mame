@@ -296,12 +296,12 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM) // bg2 ram
 	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram16) // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
-	AM_RANGE(0x900000, 0x907fff) AM_WRITE(SMH_RAM) // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // AM_WRITE(SMH_RAM) // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITE(SMH_RAM) // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x980000, 0x980fff) //AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w )	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
@@ -379,11 +379,34 @@ static const gfx_layout gfxlayout2 =
 	128*8
 };
 
+static const gfx_layout gfxlayout3 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0, 1, 2, 3, 4, 5, 6, 7  },
+	{ 0*4, 1*8, 2*8, 3*8,
+
+
+	  4*8, 5*8, 6*8, 7*8,
+
+	  8*8,9*8,10*8,11*8,
+	  12*8,13*8,14*8,15*8,
+	 },
+
+
+	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
+
+		128*16
+
+	};
+
+
 
 static GFXDECODE_START( tecmosys )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x40*16, 16 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,   0, 16 )
-	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout2,   0, 16 )
+	GFXDECODE_ENTRY( REGION_GFX1, 0, gfxlayout3,   0, 16 )
 
 GFXDECODE_END
 
@@ -438,7 +461,7 @@ static VIDEO_UPDATE(deroon)
 {
 	int i;
 	//const gfx_element *gfx = Machine->gfx[0];
-	//UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
+	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
 
 
 	fillbitmap(bitmap,0x800,cliprect);
@@ -456,16 +479,25 @@ static VIDEO_UPDATE(deroon)
 		int address;
 		int xsize = 16;
 		int ysize = 16;
+		int colour;
 
 		x = tecmosys_spriteram[i+0] & 0x1ff;
 		y = tecmosys_spriteram[i+1] & 0x1ff;
-		address =  tecmosys_spriteram[i+5]<<5;
+		address =  tecmosys_spriteram[i+5]*256;
 		y -= 128;
  		x -= 64;
 
-		xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
-		ysize = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
+		//xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
+		//ysize = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
 
+		ysize =  ((tecmosys_spriteram[i+6] & 0x000f))*16;
+		xsize =  (((tecmosys_spriteram[i+6] & 0x0f00)>>8))*16;
+
+		colour =  ((tecmosys_spriteram[i+4] & 0x3f00))>>8;
+
+
+
+		if (tecmosys_spriteram[i+4] & 0x8000) continue;
 
 		//drawgfx(bitmap,gfx,mame_rand(Machine)&0xffff,0x10,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
 
@@ -473,23 +505,24 @@ static VIDEO_UPDATE(deroon)
 		{
 			drawy = y + ycnt;
 
-			if ((drawy < 0) || (drawy > 240)) continue;
 
-			for (xcnt = 0; xcnt < xsize; xcnt+=2)
+			for (xcnt = 0; xcnt < xsize; xcnt++)
 			{
 				drawx = x + xcnt;
 
-				if ((drawx < 0) || (drawx > 320)) continue;
-				dstptr = BITMAP_ADDR16(bitmap, drawy, drawx);
+				if ((drawx>0 && drawx<320) && (drawy>0 && drawy<240))
+				{
+					UINT8 data;
 
-				dstptr[0] = 0x401;// mame_rand(Machine);//((gfxsrc[address] & 0xf0) >> 4) + 0x10;
+					dstptr = BITMAP_ADDR16(bitmap, drawy, drawx);
 
-				drawx++;
 
-				if ((drawx < 0) || (drawx > 320)) continue;
-				dstptr = BITMAP_ADDR16(bitmap, drawy, drawx);
+					data =  (gfxsrc[address]);
 
-				dstptr[0] = 0x401;// mame_rand(Machine);//((gfxsrc[address] & 0x0f) >> 0) + 0x10;
+
+					if(data) dstptr[0] = data + (colour*0x100);
+				}
+
 
 
 				address++;
@@ -580,7 +613,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x800+1)
+	MDRV_PALETTE_LENGTH(0x4000+0x800)
 
 	MDRV_VIDEO_START(deroon)
 	MDRV_MACHINE_RESET(deroon)
@@ -616,11 +649,11 @@ ROM_START( deroon )
 	ROM_LOAD( "t003uz1.bin", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
 	ROM_CONTINUE(            0x010000, 0x038000 ) /* banked part */
 
-	ROM_REGION( 0x800000, REGION_GFX1, 0 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD( "t101uah1.j66", 0x000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
-	ROM_LOAD( "t102ual1.j67", 0x200000, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
-	ROM_LOAD( "t103ubl1.j08", 0x400000, 0x200000, CRC(75431ec5) SHA1(c03e724c15e1fe7a0a385332f849e9ac9d149887) )
-	ROM_LOAD( "t104ucl1.j68", 0x600000, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
+	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_LOAD16_BYTE( "t101uah1.j66", 0x000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
+	ROM_LOAD16_BYTE( "t102ual1.j67", 0x000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
+	ROM_LOAD16_BYTE( "t103ubl1.j08", 0x800001, 0x200000, CRC(75431ec5) SHA1(c03e724c15e1fe7a0a385332f849e9ac9d149887) )
+	ROM_LOAD16_BYTE( "t104ucl1.j68", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "t301ubd1.w63", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
@@ -646,16 +679,16 @@ ROM_START( tkdensho )
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
 
-	ROM_REGION( 0x1e00000, REGION_GFX1, 0 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
-	ROM_LOAD( "ae100.al1",     0x0400000, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
-	ROM_LOAD( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
-	ROM_LOAD( "ae101.bl1",     0x0c00000, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
-	ROM_LOAD( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
-	ROM_LOAD( "ae102.cl1",     0x1200000, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
-	ROM_LOAD( "ae104.el1",     0x1400000, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
-	ROM_LOAD( "ae105.fl1",     0x1800000, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
-	ROM_LOAD( "ae106.gl1",     0x1c00000, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+	ROM_REGION( 0x3000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
+	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
+	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
+	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
+	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
+	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
+	ROM_LOAD16_BYTE( "ae104.el1",     0x1800001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD16_BYTE( "ae105.fl1",     0x2000001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD16_BYTE( "ae106.gl1",     0x2800001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
 
 	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
@@ -679,13 +712,41 @@ static MACHINE_RESET( deroon )
 	device_status = DS_IDLE;
 }
 
+void tecmosys_decramble(void)
+{
+	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
+	size_t  srcsize = memory_region_length( REGION_GFX1 );
+	int i;
+
+	for (i=0; i < srcsize; i+=4)
+	{
+		UINT8 tmp[4];
+
+		tmp[2] = ((gfxsrc[i+0]&0xf0)>>0) | ((gfxsrc[i+1]&0xf0)>>4); //  0,1,2,3  8,9,10, 11
+		tmp[3] = ((gfxsrc[i+0]&0x0f)<<4) | ((gfxsrc[i+1]&0x0f)<<0); // 4,5,6,7, 12,13,14,15
+		tmp[0] = ((gfxsrc[i+2]&0xf0)>>0) | ((gfxsrc[i+3]&0xf0)>>4);// 16,17,18,19,24,25,26,27
+		tmp[1] = ((gfxsrc[i+2]&0x0f)<<4) | ((gfxsrc[i+3]&0x0f)>>0);// 20,21,22,23, 28,29,30,31
+
+		gfxsrc[i+0] = tmp[0];
+		gfxsrc[i+1] = tmp[1];
+		gfxsrc[i+2] = tmp[2];
+		gfxsrc[i+3] = tmp[3];
+
+	}
+
+}
+
 static DRIVER_INIT( deroon )
 {
+	tecmosys_decramble();
+
 	device_data = &deroon_data;
 }
 
 static DRIVER_INIT( tkdensho )
 {
+	tecmosys_decramble();
+
 	device_data = &tkdensho_data;
 }
 
