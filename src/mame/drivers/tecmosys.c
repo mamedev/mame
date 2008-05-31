@@ -588,12 +588,10 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 		int colour;
 		int flipx, flipy;
 		int priority;
+		int zoomx, zoomy;
 
-		x = tecmosys_spriteram[i+0] & 0x3ff;
-		y = tecmosys_spriteram[i+1] & 0x3ff;
-
-	//	if (x&0x200) x-=0x400;
-	//	if (y&0x200) y-=0x400;
+		x = tecmosys_spriteram[i+0] & 0x1ff;
+		y = tecmosys_spriteram[i+1] & 0x1ff;
 
 		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
 
@@ -606,8 +604,10 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 
  		x -= 96;
 
-		//xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
-		//ysize = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
+		zoomx = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
+		zoomy = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
+
+		if ((!zoomx) || (!zoomy)) continue;
 
 		ysize =  ((tecmosys_spriteram[i+6] & 0x00ff))*16;
 		xsize =  (((tecmosys_spriteram[i+6] & 0xff00)>>8))*16;
@@ -617,20 +617,24 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 		priority = ((tecmosys_spriteram[i+4] & 0x0030))>>4;
 
 
-
 		if (tecmosys_spriteram[i+4] & 0x8000) continue;
 
 		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
+			int actualycnt = (ycnt * zoomy) >> 4;
+			int actualysize = ((ysize>>4)*zoomy);
 
-			if (flipy) drawy = y + (ysize-1) - ycnt;
-			else drawy = y + ycnt;
+			if (flipy) drawy = y + (actualysize-1) - actualycnt;
+			else drawy = y + actualycnt;
 
 
 			for (xcnt = 0; xcnt < xsize; xcnt++)
 			{
-				if (flipx) drawx = x + (xsize-1) - xcnt;
-				else drawx = x + xcnt;
+				int actualxcnt = (xcnt * zoomx) >> 4;
+				int actualxsize = ((xsize>>4)*zoomx);
+
+				if (flipx) drawx = x + (actualxsize-1) - actualxcnt;
+				else drawx = x + actualxcnt;
 
 				if ((drawx>=0 && drawx<320) && (drawy>=0 && drawy<240))
 				{
@@ -675,7 +679,7 @@ static void tecmosys_copy_spritebitmap_priority(bitmap_t *bitmap, UINT16 primask
 static VIDEO_UPDATE(deroon)
 {
 
-	fillbitmap(bitmap,0x000,cliprect);
+	fillbitmap(bitmap,0x4000,cliprect);
 
 	tecmosys_render_sprites_to_bitmap(bitmap);
 
