@@ -8,12 +8,12 @@
 
     Games running on this hardware:
 
-    * Card Games??,  1983, Game-A-Tron.
-    * Slots Game??,  1983, Game-A-Tron.
+    * Poker 4-1,  1983, Game-A-Tron.
+    * Pull Tabs,  1983, Game-A-Tron.
 
 
-    The names of both games are unknown. Only were arbitrary called "Card Games"
-    and "Slot Game" till we can find some evidence of the real names.
+    The names of both games are not confirmed. We are calling them "Poker 4-1"
+    and "Pull Tabs" till we can find some evidence of the real names.
 
 
 *******************************************************************************
@@ -23,7 +23,7 @@
     ---------------
 
 
-    * PCB1: SLOTS GAME?.
+    * PCB1: PULL TABS.
 
     Board silkscreend:
 
@@ -50,7 +50,7 @@
 
 
 
-    * PCB2: CARD GAMES?.
+    * PCB2: POKER 4-1.
 
     Board silkscreend:
 
@@ -89,7 +89,7 @@
     You must to RESET (F3) the machine to initialize the NVRAM properly.
 
 
-    * Card Games:
+    * Poker 4-1:
 
     Pressing SERVICE 1 (key 9) you enter the Test/Setting Mode. You can test
     inputs there, and change all the game settings. Press "DISCARD 1" (key Z)
@@ -120,7 +120,7 @@
     The rest of buttons are self-explanatory.
 
 
-    * Slots Game:
+    * Pull Tabs:
 
     Pressing SERVICE 1 (key 9) you enter the Test/Setting Mode. You can test
     inputs there, and change all the game settings. Press "SUPER STAR TICKET"
@@ -159,6 +159,16 @@
 
     DRIVER UPDATES:
 
+
+    [2008-05-31]
+
+    - Renamed the games to "Poker 4-1" and "Pull Tabs"
+      as shown in the ROMs stickers.
+    - Renamed the ROMs in each set according to their own stickers.
+    - Moved the driver into gametron.a group.
+    - Added the missing input port C to 8255 PPI I/O chip.
+      Poker41 and pulltabs don't make use of it, but is present in the Test/Setting Mode.
+    - Updated technical notes.
 
     [2008-05-10]
 
@@ -242,7 +252,7 @@ static const ppi8255_interface ppi8255_intf =
 {
 	input_port_0_r,	/* Port A read */
 	input_port_1_r,	/* Port B read */
-	NULL,			/* Port C read */
+	input_port_2_r,	/* Port C read */
 	NULL,			/* Port A write */
 	NULL,			/* Port B write */
 	NULL,			/* Port C write */
@@ -292,7 +302,7 @@ ADDRESS_MAP_END
 *      Input Ports       *
 *************************/
 
-static INPUT_PORTS_START( gatcards )
+static INPUT_PORTS_START( poker41 )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Discard 4") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet/Ante") PORT_CODE(KEYCODE_N)
@@ -312,9 +322,19 @@ static INPUT_PORTS_START( gatcards )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service 1 (Test/Settings)") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Discard 1") PORT_CODE(KEYCODE_Z)
+
+	PORT_START_TAG("IN2")	/* disabled */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gatslots )
+static INPUT_PORTS_START( pulltabs )
 	PORT_START_TAG("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Ante") PORT_CODE(KEYCODE_1)
@@ -334,6 +354,16 @@ static INPUT_PORTS_START( gatslots )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service 1 (Test/Settings)") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Super Star Ticket") PORT_CODE(KEYCODE_Z)
+
+	PORT_START_TAG("IN2")	/* disabled */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -405,25 +435,25 @@ MACHINE_DRIVER_END
 *        Rom Load        *
 *************************/
 
-ROM_START( gatcards )
+ROM_START( poker41 )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "gat1.0",		0x0000, 0x2000, CRC(8361fccd) SHA1(4faae6bb3104c1f4a0939d613966085d7e34c1df))
-	ROM_LOAD( "gat1.8",		0x2000, 0x1000, CRC(61e71f31) SHA1(b8d162a47752cff7412b3920ec9dd7a469e81e62) )
+	ROM_LOAD( "poker.u00",		0x0000, 0x2000, CRC(8361fccd) SHA1(4faae6bb3104c1f4a0939d613966085d7e34c1df))
+	ROM_LOAD( "poker-4-1.u08",	0x2000, 0x1000, CRC(61e71f31) SHA1(b8d162a47752cff7412b3920ec9dd7a469e81e62) )
 
 	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "gat1.33",		0x0000, 0x1000, CRC(3f8a2d59) SHA1(d61dce33aa8637105905830e2f37c1052c441194) )
-	ROM_LOAD( "gat1.32",		0x1000, 0x1000, CRC(3e7772b2) SHA1(c7499ff148e5a9cbf0958820c41ea09a843ab355) )
-	ROM_LOAD( "gat1.31",		0x2000, 0x1000, CRC(18d090ec) SHA1(3504f18b3984d16545dbe61a03fbf6b8e2027150) )
+	ROM_LOAD( "black.u33",		0x0000, 0x1000, CRC(3f8a2d59) SHA1(d61dce33aa8637105905830e2f37c1052c441194) )
+	ROM_LOAD( "poker-g.u32",	0x1000, 0x1000, CRC(3e7772b2) SHA1(c7499ff148e5a9cbf0958820c41ea09a843ab355) )
+	ROM_LOAD( "poker-r.u31",	0x2000, 0x1000, CRC(18d090ec) SHA1(3504f18b3984d16545dbe61a03fbf6b8e2027150) )
 ROM_END
 
-ROM_START( gatslots )
+ROM_START( pulltabs )
 	ROM_REGION( 0x10000, REGION_CPU1, 0 )
-	ROM_LOAD( "gat.0",		0x0000, 0x2000, CRC(7cfd490d) SHA1(8eb360f8f4806a4281dae12236d30aa86d00993d) )
+	ROM_LOAD( "pull-tabs-1-90.u00",	0x0000, 0x2000, CRC(7cfd490d) SHA1(8eb360f8f4806a4281dae12236d30aa86d00993d) )
 
 	ROM_REGION( 0x3000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "gat.33",		0x0000, 0x1000, CRC(3505cec1) SHA1(98ab0383c4be382aea81ab93433f2f29a075f65d) )
-	ROM_LOAD( "gat.32",		0x1000, 0x1000, CRC(4a3f4f36) SHA1(3dc29f78b7df1a433d0b39bfeaa227615e70ceed) )
-	ROM_LOAD( "gat.31",		0x2000, 0x1000, CRC(6d1b80f4) SHA1(f2da4b4ae1eb05f9ea02e7495ee8110698cc5d1b) )
+	ROM_LOAD( "pt-3b-v.u33",	0x0000, 0x1000, CRC(3505cec1) SHA1(98ab0383c4be382aea81ab93433f2f29a075f65d) )
+	ROM_LOAD( "pt-2g-v.u32",	0x1000, 0x1000, CRC(4a3f4f36) SHA1(3dc29f78b7df1a433d0b39bfeaa227615e70ceed) )
+	ROM_LOAD( "pt-1r-v.u31",	0x2000, 0x1000, CRC(6d1b80f4) SHA1(f2da4b4ae1eb05f9ea02e7495ee8110698cc5d1b) )
 ROM_END
 
 
@@ -432,5 +462,5 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE  INPUT     INIT  ROT    COMPANY        FULLNAME      FLAGS */
-GAME( 1983, gatcards, 0,      gat,     gatcards, 0,    ROT0, "Game-A-Tron", "Card Games?", GAME_NO_SOUND )
-GAME( 1983, gatslots, 0,      gat,     gatslots, 0,    ROT0, "Game-A-Tron", "Slots Game?", GAME_NO_SOUND )
+GAME( 1983, poker41,  0,      gat,     poker41,  0,    ROT0, "Game-A-Tron", "Poker 4-1",   GAME_NO_SOUND )
+GAME( 1983, pulltabs, 0,      gat,     pulltabs, 0,    ROT0, "Game-A-Tron", "Pull Tabs",   GAME_NO_SOUND )

@@ -7911,8 +7911,8 @@ Other Sun games
 	DRIVER( gotya )		/* (c) 1981 Game-A-Tron */
 	DRIVER( sbugger )	/* (c) 1981 Game-A-Tron */
 	DRIVER( sbuggera )	/* (c) 1981 Game-A-Tron */
-	DRIVER( gatcards )	/* (c) 1983 Game-A-Tron */
-	DRIVER( gatslots )	/* (c) 1983 Game-A-Tron */
+	DRIVER( poker41 )	/* (c) 1983 Game-A-Tron */
+	DRIVER( pulltabs )	/* (c) 1983 Game-A-Tron */
 
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
