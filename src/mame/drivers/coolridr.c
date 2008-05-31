@@ -97,8 +97,7 @@ static ADDRESS_MAP_START( system_h1_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(SCSP_1_r, SCSP_1_w)
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( coolridr )
-INPUT_PORTS_END
+
 
 static const gfx_layout tiles8x8_layout =
 {
@@ -225,4 +224,4 @@ ROM_START( coolridr )
 	ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )
 ROM_END
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr,    0, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, coolridr,    0, coolridr,    0,    0, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )

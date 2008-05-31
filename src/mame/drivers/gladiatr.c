@@ -468,11 +468,6 @@ ADDRESS_MAP_END
 
 
 
-static INPUT_PORTS_START( ppking )
-
-INPUT_PORTS_END
-
-
 static INPUT_PORTS_START( gladiatr )
 	PORT_START_TAG("DSW1")		/* (8741-0 parallel port)*/
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
@@ -552,7 +547,6 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* COINS */
 
@@ -1054,7 +1048,7 @@ static DRIVER_INIT(ppking)
 
 
 
-GAME( 1985, ppking,   0,        ppking,   ppking,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", GAME_NOT_WORKING)
+GAME( 1985, ppking,   0,        ppking,   0,        ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", GAME_NOT_WORKING)
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr, ROT0,  "Taito America Corporation", "Gladiator (US)", 0 )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr, ROT0,  "Taito Corporation", "Ohgon no Siro (Japan)", 0 )
 GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr, ROT0,  "Taito Corporation", "Great Gurianos (Japan?)", 0 )
