@@ -186,6 +186,7 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 #include "sound/okim6295.h"
 #include "sound/262intf.h"
 #include "sound/ymz280b.h"
+#include "deprecat.h"
 
 UINT16* tecmosys_spriteram;
 UINT16* tilemap_paletteram16;
