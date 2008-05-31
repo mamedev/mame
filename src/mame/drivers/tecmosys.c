@@ -1,7 +1,6 @@
 /* Tecmo System
- Driver by Farfetch & David Haywood
-
-can't do anything with this, its protected and expects to read back 68k code :-(
+ Driver by Farfetch, David Haywood & Tomasz Slanina
+  Protection simulation by nuapete
 
 T.Slanina 20040530 :
  - preliminary gfx decode,
@@ -35,30 +34,30 @@ PCB Layout
 
 TECMO SYSTEM BOARD A
 |-------------------------------------------------------------------------|
-|  LM324  UPC452C      16.9MHz        |--------|    |--------|  6264  |
-| TA8205 LM324  YAC513  YMF262 YMZ280B  |TECMO  |    |TECMO  |  6264  |
-|        LM324  M6295  UPC452C          |AA03-8431    |AA02-1927        |
-|                      YAC512          |        |    |        |        |
-|                                        |--------|    |--------|        |
-|        Z80  6264 28MHz 14.31818MHz                  |--------|        |
-|                    16MHz              62256          |TECMO  |        |
-|            TA8030                    62256          |AA02-1927  6264  |
-|                                                      |        |  6264  |
-|J  93C46                              |--------|    |--------|        |
-|A                                      |TECMO  |    |--------|        |
-|M                                      |AA03-8431    |TECMO  |        |
-|M          68000                        |        |    |AA02-1927        |
-|A                                      |--------|    |        |  6264  |
-|                  PAL              6116              |--------|  6264  |
-|                                    6116              |--------|        |
-|  |--------|                                          |TECMO  |        |
-|  |TECMO  |                      PAL                |AA02-1927        |
-|  |AA03-8431  62256                                  |        |  6264  |
-|  |        |  62256                                  |--------|  6264  |
-|  |--------|                                |---------|                |
+|  LM324  UPC452C      16.9MHz          |--------|    |--------|    6264  |
+| TA8205 LM324  YAC513 YMF262 YMZ280B   |TECMO   |    |TECMO   |    6264  |
+|        LM324  M6295  UPC452C          |AA03-8431    |AA02-1927          |
+|                      YAC512           |        |    |        |          |
+|                                       |--------|    |--------|          |
+|        Z80  6264 28MHz 14.31818MHz                  |--------|          |
+|                    16MHz             62256          |TECMO   |          |
+|            TA8030                    62256          |AA02-1927    6264  |
+|                                                     |        |    6264  |
+|J  93C46                               |--------|    |--------|          |
+|A                                      |TECMO   |    |--------|          |
+|M                                      |AA03-8431    |TECMO   |          |
+|M          68000                       |        |    |AA02-1927          |
+|A                                      |--------|    |        |    6264  |
+|                  PAL              6116              |--------|    6264  |
+|                                    6116             |--------|          |
+|  |--------|                                         |TECMO   |          |
+|  |TECMO   |                     PAL                 |AA02-1927          |
+|  |AA03-8431  62256                                  |        |    6264  |
+|  |        |  62256                                  |--------|    6264  |
+|  |--------|                                  |---------|                |
 |                                              |TECMO    |                |
 |                                              |AA03-8431|                |
-|                                              |        |                |
+|                                              |         |                |
 |                                              |---------|          424260|
 |                                              62256 62256          424260|
 |-------------------------------------------------------------------------|
@@ -74,24 +73,25 @@ Game Board
 
 TECMO SYSTEM BOARD B2
 |-------------------------------------------------------------------------|
-|    T201_DIP42_MASK.UBB1                                                |
+|    T201_DIP42_MASK.UBB1                                                 |
 | |----|                                              T202_DIP42_MASK.UBC1|
-| |*  |                                                                  |
+| |*   |                                                                  |
 | |----|                                                                  |
-|                                                                        |
-|  T003_2M_EPROM.UZ1                        T101_SOP44.UAH1            |
-|                                                                        |
-|                                            T301_DIP42_MASK.UBD1        |
-|                                                                        |
-|                                                                        |
-|                                                                        |
-|  T401_DIP42_MASK.UYA1      T104_SOP44.UCL1    T001_4M_EPROM.UPAU1    |
+|                                                                         |
+|  T003_2M_EPROM.UZ1                        T101_SOP44.UAH1               |
+|                                                                         |
+|                                            T301_DIP42_MASK.UBD1         |
+|                                                                         |
+|                                                                         |
+|                                                                         |
+|  T401_DIP42_MASK.UYA1      T104_SOP44.UCL1    T001_4M_EPROM.UPAU1       |
 |                              T103_SOP44.UBL1                            |
-|  T501_DIP32_MASK.UAD1      T102_SOP44.UAL1                            |
+|  T501_DIP32_MASK.UAD1      T102_SOP44.UAL1                              |
 |                                                  T002_4M_EPROM.UPAL1    |
 |-------------------------------------------------------------------------|
 Notes:
-      * - Unknown QFP64 microcontroller marked 'TECMO SC432146FU E23D 185 SSAB9540B'
+      * - QFP64 microcontroller marked 'TECMO SC432146FU E23D 185 SSAB9540B'
+          believed to be a 68HC11A8 with 8k ROM, 512 bytes EEPROM and 256 bytes on-chip RAM.
           Clocks: pin 33 - 8MHz, pin 31: 8MHz, pin 29 - 2MHz
           GND on pins 49, 23, 24, 27
           Power on pins 55, 25
@@ -194,8 +194,15 @@ static UINT16* bg2tilemap_ram;
 static UINT16* bg1tilemap_ram;
 static UINT16* bg0tilemap_ram;
 static UINT16* fgtilemap_ram;
-static int tecmosys_spritelist;
 
+static UINT16* tecmosys_a80000regs;
+static UINT16* tecmosys_b00000regs;
+
+static UINT16* tecmosys_c00000regs;
+static UINT16* tecmosys_c80000regs;
+static UINT16* tecmosys_880000regs;
+static int tecmosys_spritelist;
+static int tecmosys_spritey_hack; // should be a register..
 
 static MACHINE_RESET( deroon );
 
@@ -273,8 +280,12 @@ static WRITE16_HANDLER( sound_w )
 	- 880000 & 01, scroll?
 	- 880000 & 03, crash
 */
+
+
 static WRITE16_HANDLER( unk880000_w )
 {
+	COMBINE_DATA(&tecmosys_880000regs[offset]);
+
 	switch( offset )
 	{
 		case 0x08/2:
@@ -294,6 +305,8 @@ static WRITE16_HANDLER( unk880000_w )
 
 static READ16_HANDLER( unk880000_r )
 {
+	// see note above, this seems to have something to do with our missing scroll values..
+
 	//logerror( "unk880000_r( %06x ) @ %06x\n", (offset * 2 ) +0x880000, activecpu_get_pc() );
 	return 0;
 }
@@ -364,13 +377,13 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
 	AM_RANGE(0x980000, 0x980fff) AM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
 
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w )	// 10 byte dta@88000c, 880022=watchdog?
+	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE(&tecmosys_880000regs)	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(eeprom_w	)
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	)	// a80000-3 scroll? a80004 inverted ? 3 : 0
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
+	AM_RANGE(0xa80000, 0xa80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
+	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(prot_status_w)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	)	// c00000-3 scroll? c00004 inverted ? 13 : 10
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	)	// c80000-3 scrool? c80004 inverted ? 3 : 0
+	AM_RANGE(0xc00000, 0xc00005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
+	AM_RANGE(0xc80000, 0xc80005) AM_WRITE(SMH_RAM	) AM_BASE(&tecmosys_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
 ADDRESS_MAP_END
@@ -542,6 +555,7 @@ static VIDEO_UPDATE(deroon)
 		int xsize = 16;
 		int ysize = 16;
 		int colour;
+		int flipx, flipy;
 
 		x = tecmosys_spriteram[i+0] & 0x3ff;
 		y = tecmosys_spriteram[i+1] & 0x3ff;
@@ -552,7 +566,12 @@ static VIDEO_UPDATE(deroon)
 		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
 
 		address<<=8;
-		y -= 128;
+
+		flipx = (tecmosys_spriteram[i+4]&0x0040)>>6;
+		flipy = 0;// find a test location
+
+		y -= tecmosys_spritey_hack;
+
  		x -= 96;
 
 		//xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
@@ -569,12 +588,15 @@ static VIDEO_UPDATE(deroon)
 
 		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
-			drawy = y + ycnt;
+
+			if (flipy) drawy = y + (ysize-1) - ycnt;
+			else drawy = y + ycnt;
 
 
 			for (xcnt = 0; xcnt < xsize; xcnt++)
 			{
-				drawx = x + xcnt;
+				if (flipx) drawx = x + (xsize-1) - xcnt;
+				else drawx = x + xcnt;
 
 				if ((drawx>=0 && drawx<320) && (drawy>=0 && drawy<240))
 				{
@@ -604,6 +626,17 @@ static VIDEO_UPDATE(deroon)
 
 	tilemap_mark_all_tiles_dirty(txt_tilemap);
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
+
+
+//	popmessage("%04x %04x %04x | %04x %04x %04x",
+//	  tecmosys_c00000regs[0], 	  tecmosys_c00000regs[1],  	  tecmosys_c00000regs[2],
+//	  tecmosys_c80000regs[0], 	  tecmosys_c80000regs[1],  	  tecmosys_c80000regs[2]);
+
+//	popmessage("%04x %04x %04x | %04x %04x %04x",
+//	  tecmosys_b00000regs[0], 	  tecmosys_b00000regs[1],  	  tecmosys_b00000regs[2],
+//	  tecmosys_a80000regs[0], 	  tecmosys_a80000regs[1],  	  tecmosys_a80000regs[2]);
+
+
 
 	return 0;
 }
@@ -680,7 +713,7 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
@@ -696,10 +729,10 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_SOUND_ADD(YMF262, 14318180)
 	MDRV_SOUND_CONFIG(ymf262_interface)
-	MDRV_SOUND_ROUTE(0, "left", 1.0)
-	MDRV_SOUND_ROUTE(1, "right", 1.0)
-	MDRV_SOUND_ROUTE(2, "left", 1.0)
-	MDRV_SOUND_ROUTE(3, "right", 1.0)
+	MDRV_SOUND_ROUTE(0, "left", 1.00)
+	MDRV_SOUND_ROUTE(1, "right", 1.00)
+	MDRV_SOUND_ROUTE(2, "left", 1.00)
+	MDRV_SOUND_ROUTE(3, "right", 1.00)
 
 	MDRV_SOUND_ADD(OKIM6295, 14318180/2048*132)
 	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
@@ -824,14 +857,14 @@ void tecmosys_decramble(void)
 static DRIVER_INIT( deroon )
 {
 	tecmosys_decramble();
-
+	tecmosys_spritey_hack = 128;
 	device_data = &deroon_data;
 }
 
 static DRIVER_INIT( tkdensho )
 {
 	tecmosys_decramble();
-
+	tecmosys_spritey_hack = 272;
 	device_data = &tkdensho_data;
 }
 
