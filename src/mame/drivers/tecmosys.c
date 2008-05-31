@@ -8,8 +8,8 @@
   Priorities
   Redump GFX rom for Deroon Dero Dero
   Fix Sound (are the sound roms good?)
-  
-  
+
+
 T.Slanina 20040530 :
  - preliminary gfx decode,
  - Angel Eyes - patched interrupt level1 vector
@@ -212,6 +212,8 @@ static UINT16* tecmosys_880000regs;
 static int tecmosys_spritelist;
 static int tecmosys_spritey_hack; // should be a register..
 
+static bitmap_t *sprite_bitmap;
+
 static MACHINE_RESET( deroon );
 
 static tilemap *bg0tilemap;
@@ -352,7 +354,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) // work ram
 	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_NOP) // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram	
+	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram
 	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM) // bg1 ram
 	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM) // bg2 ram
 	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM) // fix ram   (all these names from test screen)
@@ -398,7 +400,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
 	AM_RANGE(0x300000, 0x300fff) AM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
 	AM_RANGE(0x301000, 0x3013ff) AM_WRITE(SMH_RAM) // bg0 linescroll? (guess)
-	
+
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
 	AM_RANGE(0x401000, 0x4013ff) AM_WRITE(SMH_RAM) // bg1 linescroll? (guess)
 
@@ -544,6 +546,10 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
+	sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	fillbitmap(sprite_bitmap, 0x0000, NULL);
+
+
 	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
 	tilemap_set_transparent_pen(txt_tilemap,0);
 
@@ -561,26 +567,14 @@ static VIDEO_START(deroon)
 
 }
 
-static VIDEO_UPDATE(deroon)
+static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 {
-	int i;
-	//const gfx_element *gfx = Machine->gfx[0];
 	UINT8 *gfxsrc    = memory_region       ( REGION_GFX1 );
+	int i;
 
-
-	fillbitmap(bitmap,0x000,cliprect);
-
-
-//	tilemap_mark_all_tiles_dirty(bg1tilemap);
-	tilemap_draw(bitmap,cliprect,bg1tilemap,0,0);
-
-//	tilemap_mark_all_tiles_dirty(bg0tilemap);
-	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
-
+	/* render sprites (with priority information) to temp bitmap */
+	fillbitmap(sprite_bitmap, 0x0000, NULL);
 	/* there are multiple spritelists in here, to allow for buffering */
-
-
-
 	for (i=(tecmosys_spritelist*0x4000)/2;i<((tecmosys_spritelist+1)*0x4000)/2;i+=8)
 	{
 		int xcnt,ycnt;
@@ -593,6 +587,7 @@ static VIDEO_UPDATE(deroon)
 		int ysize = 16;
 		int colour;
 		int flipx, flipy;
+		int priority;
 
 		x = tecmosys_spriteram[i+0] & 0x3ff;
 		y = tecmosys_spriteram[i+1] & 0x3ff;
@@ -619,6 +614,8 @@ static VIDEO_UPDATE(deroon)
 
 		colour =  ((tecmosys_spriteram[i+4] & 0x3f00))>>8;
 
+		priority = ((tecmosys_spriteram[i+4] & 0x0030))>>4;
+
 
 
 		if (tecmosys_spriteram[i+4] & 0x8000) continue;
@@ -639,13 +636,13 @@ static VIDEO_UPDATE(deroon)
 				{
 					UINT8 data;
 
-					dstptr = BITMAP_ADDR16(bitmap, drawy, drawx);
+					dstptr = BITMAP_ADDR16(sprite_bitmap, drawy, drawx);
 
 
 					data =  (gfxsrc[address]);
 
 
-					if(data) dstptr[0] = data + (colour*0x100);
+					if(data) dstptr[0] = (data + (colour*0x100)) | (priority << 14);
 				}
 
 
@@ -656,13 +653,41 @@ static VIDEO_UPDATE(deroon)
 		}
 
 	}
+}
 
-//	tilemap_mark_all_tiles_dirty(bg2tilemap);
-	tilemap_draw(bitmap,cliprect,bg2tilemap,0,0);
+static void tecmosys_copy_spritebitmap_priority(bitmap_t *bitmap, UINT16 primask)
+{
+	int y,x;
+	UINT16 *srcptr, *dstptr;
+	for (y=0;y<240;y++)
+	{
+		srcptr = BITMAP_ADDR16(sprite_bitmap, y, 0);
+		dstptr = BITMAP_ADDR16(bitmap, y, 0);
+		for (x=0;x<320;x++)
+		{
+			if (srcptr[x])
+				if ((srcptr[x] & 0xc000) == primask)
+					dstptr[x] = srcptr[x]&0x3fff;
+		}
+	}
+}
+
+static VIDEO_UPDATE(deroon)
+{
+
+	fillbitmap(bitmap,0x000,cliprect);
+
+	tecmosys_render_sprites_to_bitmap(bitmap);
 
 
-//	tilemap_mark_all_tiles_dirty(txt_tilemap);
+	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
+	tecmosys_copy_spritebitmap_priority(bitmap, 0x0000);
+	tilemap_draw(bitmap,cliprect,bg1tilemap,0,0);
+	tecmosys_copy_spritebitmap_priority(bitmap, 0x4000);
+	tilemap_draw(bitmap,cliprect,bg2tilemap,0,0); // should be drawn with blending / alpha in deroon?
+	tecmosys_copy_spritebitmap_priority(bitmap, 0x8000);
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
+	tecmosys_copy_spritebitmap_priority(bitmap, 0xc000);
 
 
 //	popmessage("%04x %04x %04x | %04x %04x %04x",
