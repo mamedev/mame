@@ -188,10 +188,49 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 #include "sound/ymz280b.h"
 #include "deprecat.h"
 
-UINT16* tecmosys_spriteram;
-UINT16* tilemap_paletteram16;
+static UINT16* tecmosys_spriteram;
+static UINT16* tilemap_paletteram16;
+static UINT16* bg2tilemap_ram;
+static UINT16* bg1tilemap_ram;
+static UINT16* bg0tilemap_ram;
+static UINT16* fgtilemap_ram;
+
 
 static MACHINE_RESET( deroon );
+
+static tilemap *bg0tilemap;
+static TILE_GET_INFO( get_bg0tile_info )
+{
+
+	SET_TILE_INFO(
+			1,
+			bg0tilemap_ram[2*tile_index+1],
+			(bg0tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((bg0tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static tilemap *bg1tilemap;
+static TILE_GET_INFO( get_bg1tile_info )
+{
+
+	SET_TILE_INFO(
+			2,
+			bg1tilemap_ram[2*tile_index+1],
+			(bg1tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((bg1tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static tilemap *bg2tilemap;
+static TILE_GET_INFO( get_bg2tile_info )
+{
+
+	SET_TILE_INFO(
+			3,
+			bg2tilemap_ram[2*tile_index+1],
+			(bg2tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((bg2tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
 
 static tilemap *txt_tilemap;
 static TILE_GET_INFO( get_tile_info )
@@ -199,9 +238,9 @@ static TILE_GET_INFO( get_tile_info )
 
 	SET_TILE_INFO(
 			0,
-			videoram16[2*tile_index+1],
-			(videoram16[2*tile_index]&0x3f),
-			TILE_FLIPYX((videoram16[2*tile_index]&0xc0)>>6));
+			fgtilemap_ram[2*tile_index+1],
+			(fgtilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((fgtilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
 
@@ -290,6 +329,7 @@ static WRITE16_HANDLER( eeprom_w )
 	}
 }
 
+
 INLINE void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette_set_color_rgb(Machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
@@ -306,10 +346,10 @@ WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
-	AM_RANGE(0x300000, 0x3013ff) AM_WRITE(SMH_RAM) // bg0 ram
-	AM_RANGE(0x400000, 0x4013ff) AM_WRITE(SMH_RAM) // bg1 ram
-	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM) // bg2 ram
-	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram16) // fix ram
+	AM_RANGE(0x300000, 0x3013ff) AM_WRITE(SMH_RAM) AM_BASE(&bg0tilemap_ram) // bg0 ram
+	AM_RANGE(0x400000, 0x4013ff) AM_WRITE(SMH_RAM) AM_BASE(&bg1tilemap_ram) // bg1 ram
+	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM) AM_BASE(&bg2tilemap_ram) // bg2 ram
+	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&fgtilemap_ram) // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
 	AM_RANGE(0x900000, 0x907fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // AM_WRITE(SMH_RAM) // obj pal
 
@@ -400,6 +440,9 @@ static const gfx_layout gfxlayout2 =
 static GFXDECODE_START( tecmosys )
 	GFXDECODE_ENTRY( REGION_GFX2, 0, gfxlayout,   0x4400, 0x40 )
 	GFXDECODE_ENTRY( REGION_GFX3, 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX4, 0, gfxlayout2,  0x4000, 0x40 )
+	GFXDECODE_ENTRY( REGION_GFX5, 0, gfxlayout2,  0x4000, 0x40 )
+
 GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
@@ -447,6 +490,19 @@ static VIDEO_START(deroon)
 {
 	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
 	tilemap_set_transparent_pen(txt_tilemap,0);
+
+//	bg0tilemap = tilemap_create(get_bg0tile_info,tilemap_scan_rows,16,16,32,40);
+	bg0tilemap = tilemap_create(get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(bg0tilemap,0);
+
+//	bg1tilemap = tilemap_create(get_bg1tile_info,tilemap_scan_rows,16,16,32,40);
+	bg1tilemap = tilemap_create(get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(bg1tilemap,0);
+
+//	bg2tilemap = tilemap_create(get_bg2tile_info,tilemap_scan_rows,16,16,32,40);
+	bg2tilemap = tilemap_create(get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(bg2tilemap,0);
+
 }
 
 static VIDEO_UPDATE(deroon)
@@ -457,6 +513,14 @@ static VIDEO_UPDATE(deroon)
 
 
 	fillbitmap(bitmap,0x000,cliprect);
+
+
+	tilemap_mark_all_tiles_dirty(bg1tilemap);
+	tilemap_draw(bitmap,cliprect,bg1tilemap,0,0);
+
+	tilemap_mark_all_tiles_dirty(bg0tilemap);
+	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
+
 
 
 	for (i=0;i<0x10000/2;i+=8)
@@ -479,9 +543,9 @@ static VIDEO_UPDATE(deroon)
 
 		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
 
-		address*=256;
+		address<<=8;
 		y -= 128;
- 		x -= 64;
+ 		x -= 96;
 
 		//xsize = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
 		//ysize = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
@@ -495,8 +559,6 @@ static VIDEO_UPDATE(deroon)
 
 		if (tecmosys_spriteram[i+4] & 0x8000) continue;
 
-		//drawgfx(bitmap,gfx,mame_rand(Machine)&0xffff,0x10,0,0,x,y,cliprect,TRANSPARENCY_PEN,0);
-
 		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
 			drawy = y + ycnt;
@@ -506,7 +568,7 @@ static VIDEO_UPDATE(deroon)
 			{
 				drawx = x + xcnt;
 
-				if ((drawx>0 && drawx<336) && (drawy>0 && drawy<256))
+				if ((drawx>=0 && drawx<320) && (drawy>=0 && drawy<240))
 				{
 					UINT8 data;
 
@@ -528,6 +590,10 @@ static VIDEO_UPDATE(deroon)
 
 	}
 
+	tilemap_mark_all_tiles_dirty(bg2tilemap);
+	tilemap_draw(bitmap,cliprect,bg2tilemap,0,0);
+
+
 	tilemap_mark_all_tiles_dirty(txt_tilemap);
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
 
@@ -535,7 +601,7 @@ static VIDEO_UPDATE(deroon)
 }
 
 /*
->>> Richard wrote:
+>>> R.Belmont wrote:
 > Here's the sound info (I got it playing in M1, I
 > didn't bother "porting" it since the main game doesn't
 > even boot).
@@ -609,7 +675,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
 	MDRV_PALETTE_LENGTH(0x4000+0x800)
 
@@ -647,19 +713,28 @@ ROM_START( deroon )
 	ROM_LOAD( "t003uz1.bin", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
 	ROM_CONTINUE(            0x010000, 0x038000 ) /* banked part */
 
-	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
-	ROM_LOAD16_BYTE( "t101uah1.j66", 0x000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
-	ROM_LOAD16_BYTE( "t102ual1.j67", 0x000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
-	ROM_LOAD16_BYTE( "t103ubl1.j08", 0x800001, 0x200000, CRC(75431ec5) SHA1(c03e724c15e1fe7a0a385332f849e9ac9d149887) )
+	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_ERASE00 ) // Sprites (non-tile based)
+	/* all these roms need verifying, they could be half size */
+
+	ROM_LOAD16_BYTE( "t101uah1.j66", 0x0000000, 0x200000, CRC(74baf845) SHA1(935d2954ba227a894542be492654a2750198e1bc) )
+	ROM_LOAD16_BYTE( "t102ual1.j67", 0x0000001, 0x200000, CRC(1a02c4a3) SHA1(5155eeaef009fc9a9f258e3e54ca2a7f78242df5) )
+
+	ROM_LOAD16_BYTE( "t103ubl1.j08", 0x0800001, 0x200000, BAD_DUMP CRC(75431ec5) SHA1(c03e724c15e1fe7a0a385332f849e9ac9d149887) ) // half size?
+	/* game attempts to draw sprites from 0xc00000 region on screen after you press start */
+
 	ROM_LOAD16_BYTE( "t104ucl1.j68", 0x1000001, 0x200000, CRC(66eb611a) SHA1(64435d35677fea3c06fdb03c670f3f63ee481c02) )
 
 	ROM_REGION( 0x100000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "t301ubd1.w63", 0x000000, 0x100000, CRC(8b026177) SHA1(3887856bdaec4d9d3669fe3bc958ef186fbe9adb) )
 
-	ROM_REGION( 0x300000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
-	ROM_LOAD( "t201ubb1.w61", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
-	ROM_LOAD( "t202ubc1.w62", 0x100000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_ERASE00) // 16x16 4bpp tiles
+	/* not used? */
 
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_LOAD( "t201ubb1.w61", 0x000000, 0x100000, CRC(d5a087ac) SHA1(5098160ce7719d93e3edae05f6edd317d4c61f0d) )
+
+	ROM_REGION( 0x100000, REGION_GFX5, ROMREGION_ERASE00 ) // 16x16 4bpp tiles
+	ROM_LOAD( "t202ubc1.w62", 0x000000, 0x100000, CRC(f051dae1) SHA1(f5677c07fe644b3838657370f0309fb09244c619) )
 
 	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) // YMZ280B Samples
 	ROM_LOAD( "t401uya1.w16", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
@@ -691,10 +766,14 @@ ROM_START( tkdensho )
 	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
 	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
 
-	ROM_REGION( 0x300000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
 	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
-	ROM_LOAD( "ae201w75.bb1",  0x100000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
-	ROM_LOAD( "ae202w76.bc1",  0x200000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
+
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
+
+	ROM_REGION( 0x100000, REGION_GFX5, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
 
 	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // YMZ280B Samples
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
