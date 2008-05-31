@@ -2,6 +2,14 @@
  Driver by Farfetch, David Haywood & Tomasz Slanina
   Protection simulation by nuapete
 
+ ToDo:
+  Tilemap scroll regs (protection related?, they don't seem to get written with valid values)
+  Sprite Zoom
+  Priorities
+  Redump GFX rom for Deroon Dero Dero
+  Fix Sound (are the sound roms good?)
+  
+  
 T.Slanina 20040530 :
  - preliminary gfx decode,
  - Angel Eyes - patched interrupt level1 vector
@@ -217,6 +225,12 @@ static TILE_GET_INFO( get_bg0tile_info )
 			TILE_FLIPYX((bg0tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
+static WRITE16_HANDLER( bg0_tilemap_w )
+{
+	COMBINE_DATA(&bg0tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(bg0tilemap,offset/2);
+}
+
 static tilemap *bg1tilemap;
 static TILE_GET_INFO( get_bg1tile_info )
 {
@@ -226,6 +240,12 @@ static TILE_GET_INFO( get_bg1tile_info )
 			bg1tilemap_ram[2*tile_index+1],
 			(bg1tilemap_ram[2*tile_index]&0x3f),
 			TILE_FLIPYX((bg1tilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static WRITE16_HANDLER( bg1_tilemap_w )
+{
+	COMBINE_DATA(&bg1tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(bg1tilemap,offset/2);
 }
 
 static tilemap *bg2tilemap;
@@ -239,6 +259,11 @@ static TILE_GET_INFO( get_bg2tile_info )
 			TILE_FLIPYX((bg2tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
+static WRITE16_HANDLER( bg2_tilemap_w )
+{
+	COMBINE_DATA(&bg2tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(bg2tilemap,offset/2);
+}
 
 static tilemap *txt_tilemap;
 static TILE_GET_INFO( get_tile_info )
@@ -249,6 +274,12 @@ static TILE_GET_INFO( get_tile_info )
 			fgtilemap_ram[2*tile_index+1],
 			(fgtilemap_ram[2*tile_index]&0x3f),
 			TILE_FLIPYX((fgtilemap_ram[2*tile_index]&0xc0)>>6));
+}
+
+static WRITE16_HANDLER( fg_tilemap_w )
+{
+	COMBINE_DATA(&fgtilemap_ram[offset]);
+	tilemap_mark_tile_dirty(txt_tilemap,offset/2);
 }
 
 
@@ -321,7 +352,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_READ(SMH_RAM) // work ram
 	AM_RANGE(0x210000, 0x210001) AM_READ(SMH_NOP) // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram
+	AM_RANGE(0x300000, 0x3013ff) AM_READ(SMH_RAM) // bg0 ram	
 	AM_RANGE(0x400000, 0x4013ff) AM_READ(SMH_RAM) // bg1 ram
 	AM_RANGE(0x500000, 0x5013ff) AM_READ(SMH_RAM) // bg2 ram
 	AM_RANGE(0x700000, 0x703fff) AM_READ(SMH_RAM) // fix ram   (all these names from test screen)
@@ -365,10 +396,16 @@ WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
-	AM_RANGE(0x300000, 0x3013ff) AM_WRITE(SMH_RAM) AM_BASE(&bg0tilemap_ram) // bg0 ram
-	AM_RANGE(0x400000, 0x4013ff) AM_WRITE(SMH_RAM) AM_BASE(&bg1tilemap_ram) // bg1 ram
-	AM_RANGE(0x500000, 0x5013ff) AM_WRITE(SMH_RAM) AM_BASE(&bg2tilemap_ram) // bg2 ram
-	AM_RANGE(0x700000, 0x703fff) AM_WRITE(SMH_RAM) AM_BASE(&fgtilemap_ram) // fix ram
+	AM_RANGE(0x300000, 0x300fff) AM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
+	AM_RANGE(0x301000, 0x3013ff) AM_WRITE(SMH_RAM) // bg0 linescroll? (guess)
+	
+	AM_RANGE(0x400000, 0x400fff) AM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
+	AM_RANGE(0x401000, 0x4013ff) AM_WRITE(SMH_RAM) // bg1 linescroll? (guess)
+
+	AM_RANGE(0x500000, 0x500fff) AM_WRITE(bg2_tilemap_w) AM_BASE(&bg2tilemap_ram) // bg2 ram
+	AM_RANGE(0x501000, 0x5013ff) AM_WRITE(SMH_RAM) // bg2 linescroll? (guess)
+
+	AM_RANGE(0x700000, 0x703fff) AM_WRITE(fg_tilemap_w) AM_BASE(&fgtilemap_ram) // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
 	AM_RANGE(0x900000, 0x907fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // AM_WRITE(SMH_RAM) // obj pal
 
@@ -534,10 +571,10 @@ static VIDEO_UPDATE(deroon)
 	fillbitmap(bitmap,0x000,cliprect);
 
 
-	tilemap_mark_all_tiles_dirty(bg1tilemap);
+//	tilemap_mark_all_tiles_dirty(bg1tilemap);
 	tilemap_draw(bitmap,cliprect,bg1tilemap,0,0);
 
-	tilemap_mark_all_tiles_dirty(bg0tilemap);
+//	tilemap_mark_all_tiles_dirty(bg0tilemap);
 	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
 
 	/* there are multiple spritelists in here, to allow for buffering */
@@ -620,11 +657,11 @@ static VIDEO_UPDATE(deroon)
 
 	}
 
-	tilemap_mark_all_tiles_dirty(bg2tilemap);
+//	tilemap_mark_all_tiles_dirty(bg2tilemap);
 	tilemap_draw(bitmap,cliprect,bg2tilemap,0,0);
 
 
-	tilemap_mark_all_tiles_dirty(txt_tilemap);
+//	tilemap_mark_all_tiles_dirty(txt_tilemap);
 	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
 
 
