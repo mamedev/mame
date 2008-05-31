@@ -194,6 +194,7 @@ static UINT16* bg2tilemap_ram;
 static UINT16* bg1tilemap_ram;
 static UINT16* bg0tilemap_ram;
 static UINT16* fgtilemap_ram;
+static int tecmosys_spritelist;
 
 
 static MACHINE_RESET( deroon );
@@ -276,12 +277,17 @@ static WRITE16_HANDLER( unk880000_w )
 {
 	switch( offset )
 	{
+		case 0x08/2:
+			tecmosys_spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
+			break;
+
 		case 0x22/2:
 			watchdog_reset( machine );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, activecpu_get_pc() );
 			break;
 
 		default:
-			//logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, activecpu_get_pc() );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, activecpu_get_pc() );
 			break;
 	}
 }
@@ -521,9 +527,11 @@ static VIDEO_UPDATE(deroon)
 	tilemap_mark_all_tiles_dirty(bg0tilemap);
 	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
 
+	/* there are multiple spritelists in here, to allow for buffering */
 
 
-	for (i=0;i<0x10000/2;i+=8)
+
+	for (i=(tecmosys_spritelist*0x4000)/2;i<((tecmosys_spritelist+1)*0x4000)/2;i+=8)
 	{
 		int xcnt,ycnt;
 		int drawx, drawy;
