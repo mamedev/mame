@@ -33,9 +33,7 @@
 #include "sound/ay8910.h"
 #include "epos.h"
 
-
-static int counter = 0;
-
+static int counter;
 static MACHINE_RESET( dealer );
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
@@ -50,6 +48,8 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 //  logerror("PC %08x: ctr=%04x\n",activecpu_get_pc(),counter);
 
 	memory_set_bankptr(1, rom + 0x10000 * counter);
+
+	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
 
 
@@ -73,7 +73,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dealer_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x6fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x0000, 0x5fff) AM_READ(SMH_BANK1)
+	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x7000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -120,6 +121,17 @@ static ADDRESS_MAP_START( dealer_writeport, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
+/*
+   ROMs U01-U03 are checked with the same code in a loop.
+   There's a separate ROM check for banked U04 at 30F3.
+   It looks like dealer/revenger uses ppi8255 to control bankswitching.
+*/
+static WRITE8_HANDLER( write_prtc )
+{
+	UINT8 *rom = memory_region(REGION_CPU1);
+	memory_set_bankptr(2, rom + 0x6000 + (0x1000 * (data & 1)));
+}
+
 static const ppi8255_interface ppi8255_intf =
 {
 	input_port_2_r,	/* Port A read */
@@ -127,7 +139,7 @@ static const ppi8255_interface ppi8255_intf =
 	NULL,			/* Port C read */
 	NULL,			/* Port A write */
 	NULL,			/* Port B write */
-	NULL,			/* Port C write */
+	write_prtc,		/* Port C write */
 };
 
 /*************************************
@@ -332,8 +344,8 @@ static INPUT_PORTS_START( dealer )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) //play
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) //coin in
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) //coin in
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 INPUT_PORTS_END
 
 
@@ -520,7 +532,7 @@ ROM_START( dealer )
 	ROM_LOAD( "u1.bin",			0x0000, 0x2000, CRC(e06f3563) SHA1(0d58cd1f2e1ca89adb9c64d7dd520bb1f2d50f1a) )
 	ROM_LOAD( "u2.bin",			0x2000, 0x2000, CRC(726bbbd6) SHA1(3538f3d655899c2a0f984c43fb7545ea4be1b231) )
 	ROM_LOAD( "u3.bin",			0x4000, 0x2000, CRC(ab721455) SHA1(a477da0590e0431172baae972e765473e19dcbff) )
-	ROM_LOAD( "u4.bin",			0x6000, 0x2000, BAD_DUMP CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
+	ROM_LOAD( "u4.bin",			0x6000, 0x2000, CRC(ddb903e4) SHA1(4c06a2048b1c6989c363b110a17c33180025b9c8) )
 
 	ROM_REGION( 0x0020, REGION_PROMS, 0 )
 	ROM_LOAD( "82s123.u66",		0x0000, 0x0020, NO_DUMP )	/* missing */
@@ -559,7 +571,9 @@ ROM_END
 
 static MACHINE_RESET( dealer )
 {
+	counter = 0;
 	memory_set_bankptr(1, memory_region(REGION_CPU1));
+	memory_set_bankptr(2, ((UINT8*)memory_region(REGION_CPU1)) + 0x6000);
 }
 
 static DRIVER_INIT( dealer )
@@ -616,5 +630,5 @@ GAME( 1983, theglob,  suprglob, epos,   suprglob, 0,	     ROT270, "Epos Corporat
 GAME( 1983, theglob2, suprglob, epos,   suprglob, 0,	     ROT270, "Epos Corporation", "The Glob (earlier)", 0 )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, 0,	     ROT270, "Epos Corporation", "The Glob (set 3)", 0 )
 GAME( 1984, igmo,     0,        epos,   igmo,     0,	     ROT270, "Epos Corporation", "IGMO", GAME_WRONG_COLORS )
-GAME( 19??, dealer,   0,        dealer, dealer,   dealer,   ROT270, "Epos Corporation", "The Dealer", GAME_NOT_WORKING)
-GAME( 1984, revenger, 0,        dealer, dealer,   dealer,   ROT270, "Epos Corporation", "Revenger", GAME_NOT_WORKING)
+GAME( 1984, dealer,   0,        dealer, dealer,   dealer,   ROT270, "Epos Corporation", "The Dealer", GAME_WRONG_COLORS )
+GAME( 1984, revenger, 0,        dealer, dealer,   dealer,   ROT270, "Epos Corporation", "Revenger", GAME_NOT_WORKING )
