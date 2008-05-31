@@ -8040,6 +8040,7 @@ Other Sun games
 	DRIVER( good )		/* (c) 1983 Kiwako */
 	DRIVER( filetto )
 	DRIVER( quizo )		/* (c) 1985 Seoul Coin Corp. */
+	DRIVER( quizoa )	/* (c) 1985 Seoul Coin Corp. */
 	DRIVER( gstream )	/* (c) 2002, Oriental Soft Japan */
 	DRIVER( miniboy7 )	/* (c) 1983, Bonanza Enterprises */
 	DRIVER( 39in1 )		/* MAME based bootleg */

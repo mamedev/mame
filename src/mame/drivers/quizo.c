@@ -141,10 +141,6 @@ static INPUT_PORTS_START( quizo )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -230,9 +226,27 @@ ROM_START( quizo )
 	ROM_LOAD( "82s123",   0x0000, 0x0020, CRC(c3f15914) SHA1(19fd8e6f2a1256ae51c500a3bf1d7358810ef97e) )
 ROM_END
 
+ROM_START( quizoa )
+	ROM_REGION( 0x10000, REGION_CPU1, 0 )
+	ROM_LOAD( "7.bin",   0x0000, 0x4000, CRC(1579ae31) SHA1(b23539413d108223001a9fe827ea151d20682b7b) )
+
+	ROM_REGION( 0x18000, REGION_USER1, 0 )
+	ROM_LOAD( "6.bin",   0x00000, 0x4000, CRC(f00f6356) SHA1(f306ec26ddbb503214e266cc9b74304af86bdbc6) )
+	ROM_LOAD( "5.bin",   0x04000, 0x4000, CRC(39e577e3) SHA1(430d9fe916dfeecdb94c23be89f79a6408ff444e) )
+	ROM_LOAD( "4.bin",   0x08000, 0x4000, CRC(a977bd3a) SHA1(22f1158253a31cf5513eed3537a6096b993b0919) )
+	ROM_LOAD( "3.bin",   0x0c000, 0x4000, CRC(4411bcff) SHA1(2f6692e082b335c3af8b92108f757d333599dd29) )
+	ROM_LOAD( "2.bin",   0x10000, 0x4000, CRC(4a0df776) SHA1(4a7dc2347b33843c0a6bb497be56ccae1af1dae0) )
+	ROM_LOAD( "1.bin",   0x14000, 0x4000, CRC(d9566c1a) SHA1(2495c071d077e5a359c2d7541d8b7c175b398b56) )
+
+	ROM_REGION( 0x0020,  REGION_PROMS, 0 )
+	ROM_LOAD( "82s123",   0x0000, 0x0020, CRC(c3f15914) SHA1(19fd8e6f2a1256ae51c500a3bf1d7358810ef97e) )
+ROM_END
+
+
 static DRIVER_INIT(quizo)
 {
 	videoram=auto_malloc(0x4000*2);
 }
 
-GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic", 0 )
+GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )
+GAME( 1985, quizoa, quizo,   quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 2)", 0 )
