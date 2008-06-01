@@ -198,6 +198,9 @@ static UINT16* bg2tilemap_ram;
 static UINT16* bg1tilemap_ram;
 static UINT16* bg0tilemap_ram;
 static UINT16* fgtilemap_ram;
+static UINT16* bg0tilemap_lineram;
+static UINT16* bg1tilemap_lineram;
+static UINT16* bg2tilemap_lineram;
 
 static UINT16* tecmosys_a80000regs;
 static UINT16* tecmosys_b00000regs;
@@ -408,18 +411,36 @@ WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 	set_color_555(offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
 }
 
+static WRITE16_HANDLER( bg0_tilemap_lineram_w )
+{
+	COMBINE_DATA(&bg0tilemap_lineram[offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg0 lineram %04x %04x",offset,data);
+}
+
+static WRITE16_HANDLER( bg1_tilemap_lineram_w )
+{
+	COMBINE_DATA(&bg1tilemap_lineram[offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg1 lineram %04x %04x",offset,data);
+}
+
+static WRITE16_HANDLER( bg2_tilemap_lineram_w )
+{
+	COMBINE_DATA(&bg2tilemap_lineram[offset]);
+	if (data!=0x0000) popmessage("non 0 write to bg2 lineram %04x %04x",offset,data);
+}
+
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) // work ram
 	AM_RANGE(0x300000, 0x300fff) AM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
-	AM_RANGE(0x301000, 0x3013ff) AM_WRITE(SMH_RAM) // bg0 linescroll? (guess)
+	AM_RANGE(0x301000, 0x3013ff) AM_WRITE(bg0_tilemap_lineram_w) AM_BASE(&bg0tilemap_lineram)// bg0 linescroll? (guess)
 
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
-	AM_RANGE(0x401000, 0x4013ff) AM_WRITE(SMH_RAM) // bg1 linescroll? (guess)
+	AM_RANGE(0x401000, 0x4013ff) AM_WRITE(bg1_tilemap_lineram_w) AM_BASE(&bg1tilemap_lineram)// bg1 linescroll? (guess)
 
 	AM_RANGE(0x500000, 0x500fff) AM_WRITE(bg2_tilemap_w) AM_BASE(&bg2tilemap_ram) // bg2 ram
-	AM_RANGE(0x501000, 0x5013ff) AM_WRITE(SMH_RAM) // bg2 linescroll? (guess)
+	AM_RANGE(0x501000, 0x5013ff) AM_WRITE(bg2_tilemap_lineram_w) AM_BASE(&bg2tilemap_lineram) // bg2 linescroll? (guess)
 
 	AM_RANGE(0x700000, 0x703fff) AM_WRITE(fg_tilemap_w) AM_BASE(&fgtilemap_ram) // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITE(SMH_RAM) AM_BASE(&tecmosys_spriteram) // obj ram
@@ -601,7 +622,7 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 		int priority;
 		int zoomx, zoomy;
 
-		x = tecmosys_spriteram[i+0]&0x1ff;
+		x = tecmosys_spriteram[i+0];
 		y = (tecmosys_spriteram[i+1]+1)&0x1ff;
 
 		x-= extrax;
@@ -701,16 +722,15 @@ static VIDEO_UPDATE(deroon)
 
 	fillbitmap(bitmap,0x4000,cliprect);
 
-	tecmosys_render_sprites_to_bitmap(bitmap, -2, tecmosys_880000regs[0x1]);
 
 	tilemap_set_scrolly( bg0tilemap, 0, tecmosys_c80000regs[1]+16);
 	tilemap_set_scrollx( bg0tilemap, 0, tecmosys_c80000regs[0]+104);
 
-	tilemap_set_scrolly( bg1tilemap, 0, tecmosys_a80000regs[1]+16);
-	tilemap_set_scrollx( bg1tilemap, 0, tecmosys_a80000regs[0]+104);
+	tilemap_set_scrolly( bg1tilemap, 0, tecmosys_a80000regs[1]+17);
+	tilemap_set_scrollx( bg1tilemap, 0, tecmosys_a80000regs[0]+106);
 
-	tilemap_set_scrolly( bg2tilemap, 0, tecmosys_b00000regs[1]+16);
-	tilemap_set_scrollx( bg2tilemap, 0, tecmosys_b00000regs[0]+104);
+	tilemap_set_scrolly( bg2tilemap, 0, tecmosys_b00000regs[1]+17);
+	tilemap_set_scrollx( bg2tilemap, 0, tecmosys_b00000regs[0]+106);
 
 	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
 	tecmosys_copy_spritebitmap_priority(bitmap, 0x0000);
@@ -735,10 +755,12 @@ static VIDEO_UPDATE(deroon)
 //	  tecmosys_c00000regs[0], 	  tecmosys_c00000regs[1],  	  tecmosys_c00000regs[2],
 //	  tecmosys_c80000regs[0], 	  tecmosys_c80000regs[1],  	  tecmosys_c80000regs[2]);
 
-	popmessage("%04x %04x %04x | %04x %04x %04x",
-	  tecmosys_b00000regs[0], 	  tecmosys_b00000regs[1],  	  tecmosys_b00000regs[2],
-	  tecmosys_a80000regs[0], 	  tecmosys_a80000regs[1],  	  tecmosys_a80000regs[2]);
+//	popmessage("%04x %04x %04x | %04x %04x %04x",
+//	  tecmosys_b00000regs[0], 	  tecmosys_b00000regs[1],  	  tecmosys_b00000regs[2],
+//	  tecmosys_a80000regs[0], 	  tecmosys_a80000regs[1],  	  tecmosys_a80000regs[2]);
 
+	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
+	tecmosys_render_sprites_to_bitmap(bitmap, 0, tecmosys_880000regs[0x1]);
 
 
 	return 0;
