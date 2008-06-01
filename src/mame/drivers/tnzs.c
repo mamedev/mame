@@ -2354,14 +2354,14 @@ ROM_END
 ROM_START( insectx )
 	ROM_REGION( 0x30000, REGION_CPU1, 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b97-03.u32", 0x00000, 0x08000, CRC(18eef387) SHA1(b22633930d39be1e72fbd5b080972122da3cb3ef) )
-	ROM_CONTINUE(             0x18000, 0x18000 )		/* banked at 8000-bfff */
+	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
 
 	ROM_REGION( 0x18000, REGION_CPU2, 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "b97-07.u38", 0x00000, 0x08000, CRC(324b28c9) SHA1(db77a4ac60196d0f0f35dbc5c951ec29d6392463) )
-	ROM_CONTINUE(             0x10000, 0x08000 )		/* banked at 8000-9fff */
+	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
 
-	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE )
-	ROM_LOAD( "b97-02.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
+	ROM_REGION( 0x100000, REGION_GFX1, ROMREGION_DISPOSE ) /* Mask roms */
+	ROM_LOAD( "b97-01.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
 	ROM_LOAD( "b97-02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
 ROM_END
 
