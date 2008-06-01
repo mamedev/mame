@@ -598,7 +598,8 @@ Note: If you set the dipswitch to service mode and reset the game within Mame.
       checksums printed on the ROM labels... this seems wierd to me.
       However, this has been verified to happen on a real PCB
 
-      There was a PCB on eBay that used mask roms for the program roms with the following CRC16 values:
+      There was a PCB on eBay that used mask roms for the program roms with the following checksum
+      values printed on the labels
 
       U110  050C
       u111  F343
