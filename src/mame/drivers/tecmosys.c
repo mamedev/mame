@@ -99,7 +99,7 @@ TECMO SYSTEM BOARD B2
 |-------------------------------------------------------------------------|
 Notes:
       * - QFP64 microcontroller marked 'TECMO SC432146FU E23D 185 SSAB9540B'
-          believed to be a 68HC11A8 with 8k ROM, 512 bytes EEPROM and 256 bytes on-chip RAM.
+          this is a 68HC11A8 with 8k ROM, 512 bytes EEPROM and 256 bytes on-chip RAM.
           Clocks: pin 33 - 8MHz, pin 31: 8MHz, pin 29 - 2MHz
           GND on pins 49, 23, 24, 27
           Power on pins 55, 25
@@ -598,14 +598,14 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 		address<<=8;
 
 		flipx = (tecmosys_spriteram[i+4]&0x0040)>>6;
-		flipy = 0;// find a test location
+		flipy = (tecmosys_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
 
 		y -= tecmosys_spritey_hack;
 
  		x -= 96;
 
-		zoomx = (tecmosys_spriteram[i+2] & 0x0ff0)>>4; // zoom?
-		zoomy = (tecmosys_spriteram[i+3] & 0x0ff0)>>4; // zoom?
+		zoomx = (tecmosys_spriteram[i+2] & 0x0fff)>>0; // zoom?
+		zoomy = (tecmosys_spriteram[i+3] & 0x0fff)>>0; // zoom?
 
 		if ((!zoomx) || (!zoomy)) continue;
 
@@ -621,8 +621,8 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 
 		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
-			int actualycnt = (ycnt * zoomy) >> 4;
-			int actualysize = ((ysize>>4)*zoomy);
+			int actualycnt = (ycnt * zoomy) >> 8;
+			int actualysize = (ysize * zoomy) >> 8;
 
 			if (flipy) drawy = y + (actualysize-1) - actualycnt;
 			else drawy = y + actualycnt;
@@ -630,8 +630,8 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap)
 
 			for (xcnt = 0; xcnt < xsize; xcnt++)
 			{
-				int actualxcnt = (xcnt * zoomx) >> 4;
-				int actualxsize = ((xsize>>4)*zoomx);
+				int actualxcnt = (xcnt * zoomx) >> 8;
+				int actualxsize = (xsize *zoomx) >> 8;
 
 				if (flipx) drawx = x + (actualxsize-1) - actualxcnt;
 				else drawx = x + actualxcnt;
