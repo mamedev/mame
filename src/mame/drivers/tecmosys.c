@@ -3,10 +3,10 @@
   Protection simulation by nuapete
 
  ToDo:
-  Tilemap scroll regs (protection related?, they don't seem to get written with valid values)
-  Sprite Zoom
-  Priorities
-  Redump GFX rom for Deroon Dero Dero
+  Is tilemap scroll / sprite scroll 100% correct - seems to be protection releated
+  Fix Angel Eyes resets (due to code to allow tilemap scroll regs to be written)
+  Dump / Decap MCUs to allow for proper protection emulation.
+  Alpha Blending? (should the backround of the 'pit' in Deroon be blended?)
   Fix Sound (are the sound roms good?)
 
 
@@ -209,7 +209,6 @@ static UINT16* tecmosys_c00000regs;
 static UINT16* tecmosys_c80000regs;
 static UINT16* tecmosys_880000regs;
 static int tecmosys_spritelist;
-static int tecmosys_spritey_hack; // should be a register..
 
 static bitmap_t *sprite_bitmap;
 
@@ -623,7 +622,7 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 		int zoomx, zoomy;
 
 		x = tecmosys_spriteram[i+0];
-		y = (tecmosys_spriteram[i+1]+1)&0x1ff;
+		y = (tecmosys_spriteram[i+1]+1);
 
 		x-= extrax;
 		y-= extray;
@@ -640,8 +639,6 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 
 		flipx = (tecmosys_spriteram[i+4]&0x0040)>>6;
 		flipy = (tecmosys_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
-
-		//y -= tecmosys_spritey_hack;
 
  		x -= 96;
 
@@ -880,6 +877,10 @@ ROM_START( deroon )
 	ROM_LOAD( "t003.uz1", 0x000000, 0x008000, CRC(8bdfafa0) SHA1(c0cf3eb7a65d967958fe2aace171859b0faf7753) )
 	ROM_CONTINUE(         0x010000, 0x038000 ) /* banked part */
 
+	ROM_REGION( 0x2200, REGION_CPU3, 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "deroon_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "deroon_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
+
 	ROM_REGION( 0x2000000, REGION_GFX1, ROMREGION_ERASE00 ) // Sprites (non-tile based)
 	/* all these roms need verifying, they could be half size */
 
@@ -917,6 +918,10 @@ ROM_START( tkdensho )
 	ROM_REGION( 0x038000, REGION_CPU2, 0 ) // Sound Porgram
 	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
 	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
+
+	ROM_REGION( 0x2200, REGION_CPU3, 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
 
 	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
 	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
@@ -982,17 +987,15 @@ void tecmosys_decramble(void)
 static DRIVER_INIT( deroon )
 {
 	tecmosys_decramble();
-	tecmosys_spritey_hack = 128;
 	device_data = &deroon_data;
 }
 
 static DRIVER_INIT( tkdensho )
 {
 	tecmosys_decramble();
-	tecmosys_spritey_hack = 264;
 	device_data = &tkdensho_data;
 }
 
-GAME( 1996, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
+GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
