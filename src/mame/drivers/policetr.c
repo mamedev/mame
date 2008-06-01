@@ -597,6 +597,16 @@ Note: If you set the dipswitch to service mode and reset the game within Mame.
       instead of green.  But, the listed checksums on the screen match the
       checksums printed on the ROM labels... this seems wierd to me.
       However, this has been verified to happen on a real PCB
+
+      There was a PCB on eBay that used mask roms for the program roms with the following CRC16 values:
+
+      U110  050C
+      u111  F343
+      U112  201D
+      U113  FB4x (x maybe 0, 6 or 8.  The picture wasn't clear for this last number)
+
+      These are different then the current set and might have the checksum test corrected.
+
 */
 	ROM_LOAD32_BYTE( "ptb-u113.v13", 0x00000, 0x20000, CRC(d636c00d) SHA1(ef989eb85b51a64ca640297c1286514c8d7f8f76) )
 	ROM_LOAD32_BYTE( "ptb-u112.v13", 0x00001, 0x20000, CRC(86f0497e) SHA1(d177023f7cb2e01de60ef072212836dc94759c1a) )
