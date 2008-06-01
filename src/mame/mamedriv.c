@@ -8078,6 +8078,9 @@ Other Sun games
 	DRIVER( paranoia )
 	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
+	DRIVER( laperla )
+	DRIVER( capunc )
+	DRIVER( capcor )
 
 	/* Astro Corp. */
 	DRIVER( showhand )

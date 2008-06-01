@@ -1548,6 +1548,7 @@ src/mame/drivers/ironhors.c svneol=native#text/plain
 src/mame/drivers/istellar.c svneol=native#text/plain
 src/mame/drivers/itech32.c svneol=native#text/plain
 src/mame/drivers/itech8.c svneol=native#text/plain
+src/mame/drivers/itgamble.c svneol=native#text/plain
 src/mame/drivers/jack.c svneol=native#text/plain
 src/mame/drivers/jackal.c svneol=native#text/plain
 src/mame/drivers/jackpool.c svneol=native#text/plain
