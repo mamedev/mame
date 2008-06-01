@@ -351,7 +351,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_START	/* Fake IN5 (misc) */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VBLANK )                  /* guess */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
-	PORT_BIT( 0xec, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START	/* Fake IN6 (DIP1) */
 	PORT_DIPNAME( 0x01, 0x01, "Unused DIP 1-1" )
