@@ -3,11 +3,10 @@
   Protection simulation by nuapete
 
  ToDo:
-  Is tilemap scroll / sprite scroll 100% correct - seems to be protection releated
-  Fix Angel Eyes resets (due to code to allow tilemap scroll regs to be written)
   Dump / Decap MCUs to allow for proper protection emulation.
   Alpha Blending? (should the backround of the 'pit' in Deroon be blended?)
-  Fix Sound (are the sound roms good?)
+  Fix Sound (sound roms should be good, do they need descrambling, or is our sound core bad?
+     some YMZ280B samples sound -terrible-)
 
 
 T.Slanina 20040530 :
@@ -339,20 +338,17 @@ static WRITE16_HANDLER( unk880000_w )
 
 static READ16_HANDLER( unk880000_r )
 {
-	// see note above, this seems to have something to do with our missing scroll values..
-	UINT16 ret = tecmosys_880000regs[offset];
+	//UINT16 ret = tecmosys_880000regs[offset];
 
 	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, activecpu_get_pc(), tecmosys_880000regs[offset] );
-
-	// return 0;
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 
 	switch( offset )
 	{
 		case 0:
-			tecmosys_880000regs[offset] = 0;
-			return ret;
+			if ( video_screen_get_vpos(machine->primary_screen) >= 240) return 0;
+			else return 1;
 
 		default:
 			return 0;
@@ -997,5 +993,5 @@ static DRIVER_INIT( tkdensho )
 }
 
 GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
-GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", 0 )
 
