@@ -95,7 +95,7 @@ static void dmaop_interrupt(void)
 	lsi810.dstat |= 0x4;	/* SIR (SCRIPTS Interrupt Instruction Received) */
 
 	if(intf->irq_callback != NULL) {
-		intf->irq_callback(Machine);
+		intf->irq_callback(Machine, 1);
 	}
 	lsi810.dma_icount = 0;
 	lsi810.halted = 1;
@@ -478,6 +478,12 @@ UINT8 lsi53c810_reg_r(int reg)
 		case 0x13:		/* DSA [31-24] */
 			return (lsi810.dsa >> 24) & 0xff;
 		case 0x14:		/* ISTAT */
+			// clear the interrupt on service
+			if(intf->irq_callback != NULL) 
+			{
+				intf->irq_callback(Machine, 0);
+			}
+
 			return lsi810.istat;
 		case 0x2c:		/* DSP [7-0] */
 			return lsi810.dsp & 0xff;
@@ -615,7 +621,7 @@ void lsi53c810_reg_w(running_machine *machine, int reg, UINT8 value)
 				lsi810.istat |= 0x3;	/* DMA interrupt pending */
 				lsi810.dstat |= 0x8;	/* SSI (Single Step Interrupt) */
 				if(intf->irq_callback != NULL) {
-					intf->irq_callback(machine);
+					intf->irq_callback(machine, 1);
 				}
 			}
 			else if(lsi810.dcntl & 0x04 && !lsi810.halted)	/* manual start DMA */

@@ -787,10 +787,17 @@ static UINT32 scsi_fetch(UINT32 dsp)
 	return BYTE_REVERSE32(result);
 }
 
-static void scsi_irq_callback(running_machine *machine)
+static void scsi_irq_callback(running_machine *machine, int state)
 {
-	model3_irq_state |= model3_irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	if (state)
+	{
+		model3_irq_state |= model3_irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
+		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	}
+	else
+	{
+		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+	}
 }
 
 /*****************************************************************************/
@@ -846,13 +853,14 @@ static WRITE64_HANDLER( real3d_dma_w )
 					real3d_dma_callback(dma_source, dma_dest, length, 1);
 				}
 				dma_irq |= 0x01;
-				scsi_irq_callback(machine);
+				scsi_irq_callback(machine, 1);
 				return;
 			}
 			else if(ACCESSING_BITS_16_23)
 			{
 				if(data & 0x10000) {
 					dma_irq &= ~0x1;
+					scsi_irq_callback(machine, 0);
 				}
 				return;
 			}
