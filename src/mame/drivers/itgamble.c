@@ -1,4 +1,4 @@
-/* azionale Elettronica + others (mostly Italian) Gambling games.
+/* Nazionale Elettronica + others (mostly Italian) Gambling games.
 .
   These all use MCUs with internal ROM for their programs,
    they can't be dumped easily, and thus we can't emulate
@@ -124,6 +124,7 @@ static MACHINE_DRIVER_START( itgamble )
 	MDRV_VIDEO_UPDATE( itgamble )
 MACHINE_DRIVER_END
 
+
 /*
 CPU
 
@@ -158,6 +159,54 @@ ROM_START( laperla )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) // M6295 samples
+ROM_END
+
+/*
+
+CPU
+
+1x HD64F3048F16 (main)(ic1)(not dumped)
+1x ispLSI2064-80LJ (ic12)(not dumped)
+1x AD-65 (equivalent to M6295) (ic24)(sound)
+1x oscillator 30.00MHz (close to main)
+1x red resonator ZTB1000J (close to sound)
+
+ROMs
+
+1x M27C2001 (1)
+2x M27C4001 (2,3)
+
+Note
+
+1x 28x2 edge connector
+1x 12 legs connector
+1x 50 legs flat cable connector
+1x 12x2 jumper
+1x trimmer (volume)
+1x trimmer (spark)
+
+---------------------------------------------
+
+laperla vs. laperlag
+
+3 and 3 files
+3jolly.ic17             ic17-laperlanera            11.018181%
+2jolly.ic18             ic18-laperlanera            10.766602%
+1.ic25                                          NO MATCH
+                        ic25-uno.bin            NO MATCH
+
+*/
+
+ROM_START( laperlag )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
+	ROM_LOAD( "laperlag_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP ) // all the program code is in here
+
+	ROM_REGION( 0x100000, REGION_GFX1, 0 )
+	ROM_LOAD( "ic18-laperlaneragold2.bin", 0x000000, 0x80000, CRC(ae37de44) SHA1(089f97678fa39aee1885d7c63c4bc7c88e7fe553) )
+	ROM_LOAD( "ic17-laperlaneragold3.bin", 0x080000, 0x80000, CRC(86da6d11) SHA1(e6b7f9ccbf2e91a60fdf38067ec7ac7e73dea8cd) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 )
+	ROM_LOAD( "ic25-uno.bin", 0x00000, 0x20000, CRC(e6a0854b) SHA1(394e01bb24abd1e0d2c447b4d620fc5d02257d8a) ) // M6295 samples
 ROM_END
 
 /*
@@ -224,6 +273,15 @@ Note
 1x trimmer (volume)
 1x trimmer (spark)
 
+
+The differences between this set and the alternate one, are only 4 bytes
+in the samples ROM header. Replaced the sound ROM with the clean one.
+
+3 and 3 files
+2.ic18                  2.ic18                  IDENTICAL
+3.ic17                  3.ic17                  IDENTICAL
+1.ic25                  1.ic25                  99.998474%
+
 */
 
 ROM_START( capcor )
@@ -235,9 +293,100 @@ ROM_START( capcor )
 	ROM_LOAD( "3.ic17", 0x080000, 0x80000, CRC(ac530eff) SHA1(7c3a6e322311a1cd93801639a0498d5947fb14f2) )
 
 	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) // M6295 samples
+ROM_END
+
+/*
+CPU
+
+1x HD64F3048F16 (main)(ic1)(not dumped)
+1x ispLSI2064-80LJ (ic12)(not dumped)
+1x AD-65 (equivalent to M6295) (ic24)(sound)
+1x oscillator 30MHz (close to main)
+1x blu resonator 1000J (close to sound)
+
+ROMs
+
+3x M27C2001 (1,2,3)
+2x M27C4001 (4,5)
+
+Note
+
+1x 28x2 edge connector
+1x 12 legs connector
+1x 50 legs flat cable connector
+1x 12x2 switches dip
+1x trimmer (volume)
+1x trimmer (spark)
+
+*/
+
+ROM_START( euro2k2 )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
+	ROM_LOAD( "euro2k2_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP ) // all the program code is in here
+
+	ROM_REGION( 0x180000, REGION_GFX1, 0 )
+	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
+	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
+	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
+	ROM_LOAD( "3a.ic19", 0x140000, 0x40000, CRC(8b29cd56) SHA1(8a09e307271bceef6e9f863153d0f7a9bc6dc6bd) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
 	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(b9b1aff0) SHA1(35622d7d099a10e5c6bcae152fded1f50692f740) ) // M6295 samples
 ROM_END
 
+/*
+CPU
+
+1x HD64F3048F16 (main)(ic1)(not dumped)
+1x ispLSI2064-80LJ (ic12)(not dumped)
+1x U6295 (equivalent to M6295) (ic24)(sound)
+1x oscillator 30.00MHz (close to main)
+1x orange resonator ZTB1000J (close to sound)
+
+ROMs
+
+2x M27C2001 (1,2)
+3x M27C4001 (3,4,5)
+
+Note
+
+1x 28x2 edge connector
+1x 12 legs connector
+1x 50 legs flat cable connector
+1x 12x2 switches dip
+1x trimmer (volume) 
+1x trimmer (spark)  
+
+---------------------------------------
+
+euro2k2 vs. euro2k2a
+
+5 and 5 files
+4a.ic18                                         FIXED BITS (xxxxxxx0)
+                        3a.ic19                 1ST AND 2ND HALF IDENTICAL
+                        4a.ic18                 FIXED BITS (xxxxxxx0)
+2a.ic20                 2a.ic20                 IDENTICAL
+4a.ic18                 4a.ic18                 IDENTICAL
+5a.ic17                 5a.ic17                 IDENTICAL
+1.ic25                  1.ic25                  99.998474%
+3a.ic19                                         NO MATCH
+                        3a.ic19                 NO MATCH
+*/
+
+ROM_START( euro2k2a )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 )
+	ROM_LOAD( "euro2k2a_ver2.0_hd64f3048f16.mcu", 0x00000, 0x4000, NO_DUMP ) // all the program code is in here
+
+	ROM_REGION( 0x1c0000, REGION_GFX1, 0 )
+	ROM_LOAD( "4a.ic18", 0x000000, 0x80000, CRC(5decae2d) SHA1(d918aad0e2a1249b18677833f743c92fb678050a) )
+	ROM_LOAD( "5a.ic17", 0x080000, 0x80000, CRC(8f1bbbf3) SHA1(5efcf77674f8737fc1b98881acebacb26b10adc1) )
+	ROM_LOAD( "2a.ic20", 0x100000, 0x40000, CRC(f9bffb07) SHA1(efba175189d99a4548739a72f8a1f03c2782a3d0) )
+	ROM_LOAD( "3a.ic19", 0x140000, 0x80000, CRC(56c8a73d) SHA1(49b44e5604cd8675d8f9770e5fb68dad4394e11d) ) // identical halves
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )
+	ROM_LOAD( "1.ic25", 0x00000, 0x40000, CRC(4fe79e43) SHA1(7c154cb00e9b64fbdcc218280f2183b816cef20b) ) // M6295 samples
+ROM_END
 
 
 /***************************************************************************
@@ -246,6 +395,9 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 2000,  capunc,  0, itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001,  capcor,  0, itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2002,  laperla, 0, itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2000,  capunc,   0,       itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "Capitan Uncino (Ver 1.2)",      GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001,  capcor,   0,       itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "Capitani Coraggiosi (Ver 1.3)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2002,  laperla,  0,       itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "La Perla Nera (Ver 2.0)",       GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001,  laperlag, 0,       itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "La Perla Nera Gold (Ver 2.0)",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001,  euro2k2,  0,       itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 1)",  GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001,  euro2k2a, euro2k2, itgamble, itgamble, 0, ROT0, "Nazionale Elettronica", "Europa 2002 (Ver 2.0, set 2)",  GAME_NO_SOUND | GAME_NOT_WORKING )
