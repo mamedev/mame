@@ -556,6 +556,23 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
 ADDRESS_MAP_END
 
+// strange use of bits.. maybe it can control pin 7 too?
+static WRITE8_HANDLER( tecmosys_oki_bank_w )
+{
+	if (data==0x10)
+	{
+		OKIM6295_set_bank_base(0,0x00000);
+	}
+	else if (data==0x32)
+	{
+		OKIM6295_set_bank_base(0,0x40000);
+	}
+	else
+	{
+		popmessage("oki bank %02x\n",data);
+	}
+}
+
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YMF262_register_A_0_w)
@@ -564,7 +581,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(YMF262_data_B_0_w)
 
 	AM_RANGE(0x10, 0x10) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x20, 0x20) AM_NOP
+	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
 
