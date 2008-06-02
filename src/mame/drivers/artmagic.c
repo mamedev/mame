@@ -148,7 +148,7 @@ static READ16_HANDLER( ultennis_hack_r )
 		hack_irq = 0;
 		update_irq_state(machine);
 	}
-	return input_port_read_indexed(machine, 0);
+	return input_port_read(machine, "300000");
 }
 
 
@@ -378,7 +378,7 @@ static void stonebal_protection(running_machine *machine)
 
 static READ16_HANDLER( special_port5_r )
 {
-	return input_port_read_indexed(machine, 5) | prot_output_bit;
+	return input_port_read(machine, "300008") | prot_output_bit;
 }
 
 

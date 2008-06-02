@@ -198,7 +198,7 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
 		{
 			const char *biosname = ROM_GETHASHDATA(rom);
 			int bios_flags = ROM_GETBIOSFLAGS(rom);
-			char bios_number[3];
+			char bios_number[20];
 
 			/* Allow '-bios n' to still be used */
 			sprintf(bios_number, "%d", bios_flags - 1);

@@ -108,23 +108,24 @@ static WRITE8_HANDLER( ajax_lamps_w )
 
 READ8_HANDLER( ajax_ls138_f10_r )
 {
-	int data = 0;
+	int data = 0, index;
+	char port[5];
 
-	switch ((offset & 0x01c0) >> 6){
+	switch ((offset & 0x01c0) >> 6)
+	{
 		case 0x00:	/* ??? */
 			data = mame_rand(machine);
 			break;
 		case 0x04:	/* 2P inputs */
-			data = input_port_read_indexed(machine, 5);
+			data = input_port_read(machine, "IN2");
 			break;
 		case 0x06:	/* 1P inputs + DIPSW #1 & #2 */
-			if (offset & 0x02)
-				data = input_port_read_indexed(machine, offset & 0x01);
-			else
-				data = input_port_read_indexed(machine, 3 + (offset & 0x01));
+			index = offset & 0x01;
+			sprintf(port, "%s%d", (offset & 0x02) ? "DSW" : "IN", (offset & 0x02) ? index+1 : index);
+			data = input_port_read(machine, port);
 			break;
 		case 0x07:	/* DIPSW #3 */
-			data = input_port_read_indexed(machine, 2);
+			data = input_port_read(machine, "DSW3");
 			break;
 
 		default:

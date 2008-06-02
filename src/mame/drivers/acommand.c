@@ -281,7 +281,7 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance Thru Tests)
             */
-			return input_port_read_indexed(machine,0);
+			return input_port_read(machine, "IN0");
 		case 0x0014/2:
 			/*
                 write 0x40,read (~0x08)
@@ -315,7 +315,7 @@ static READ16_HANDLER(ac_devices_r)
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_read_indexed(machine,1);
+			return input_port_read(machine, "IN1");
 	}
 	return ac_devram[offset];
 }
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( acommand, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )
-	PORT_START
+	PORT_START_TAG("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( acommand )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START
+	PORT_START_TAG("IN1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

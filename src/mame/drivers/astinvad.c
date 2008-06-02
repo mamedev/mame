@@ -280,7 +280,7 @@ static WRITE8_HANDLER( astinvad_sound2_w )
 	if (bits_gone_hi & 0x08) sample_start(5, SND_FLEET4, 0);
 	if (bits_gone_hi & 0x10) sample_start(4, SND_UFOHIT, 0);
 
-	screen_flip = (input_port_read_indexed(machine, 3) & data & 0x20) ? 0xff : 0x00;
+	screen_flip = (input_port_read(machine, "IN3") & data & 0x20) ? 0xff : 0x00;
 }
 
 
@@ -311,7 +311,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
 
 	if (bits_gone_hi & 0x04) sample_start(3, SND_INVADERHIT, 0);
 
-	screen_flip = (input_port_read_indexed(machine, 3) & data & 0x80) ? 0xff : 0x00;
+	screen_flip = (input_port_read(machine, "IN3") & data & 0x80) ? 0xff : 0x00;
 }
 
 

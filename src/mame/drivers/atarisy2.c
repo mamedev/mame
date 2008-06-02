@@ -374,7 +374,7 @@ static STATE_POSTLOAD( bankselect_postload )
 
 static READ16_HANDLER( switch_r )
 {
-	int result = input_port_read_indexed(machine, 1) | (input_port_read_indexed(machine, 2) << 8);
+	int result = input_port_read(machine, "1800") | (input_port_read(machine, "1801") << 8);
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x20;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x10;
@@ -385,12 +385,12 @@ static READ16_HANDLER( switch_r )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	int result = input_port_read_indexed(machine, 0);
+	int result = input_port_read(machine, "1840");
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x01;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x02;
 	if (!has_tms5220 || tms5220_ready_r()) result ^= 0x04;
-	if (!(input_port_read_indexed(machine, 2) & 0x80)) result ^= 0x10;
+	if (!(input_port_read(machine, "1801") & 0x80)) result ^= 0x10;
 
 	return result;
 }
@@ -423,15 +423,20 @@ static WRITE16_HANDLER( adc_strobe_w )
 
 static READ16_HANDLER( adc_r )
 {
+	char port[5];
+	
+	sprintf(port, "ADC%d", which_adc);
 	if (which_adc < pedal_count)
-		return ~input_port_read_indexed(machine, 3 + which_adc);
+		return ~input_port_read(machine, port);
 
-	return input_port_read_indexed(machine, 3 + which_adc) | 0xff00;
+	return input_port_read(machine, port) | 0xff00;
 }
 
 
 static READ8_HANDLER( leta_r )
 {
+	char port[6];
+	
     if (pedal_count == -1)   /* 720 */
 	{
 		/* special thanks to MAME Analog+ for the mapping code */
@@ -443,8 +448,8 @@ static READ8_HANDLER( leta_r )
 				static double last_angle;
 				static int rotations;
 
-				int analogx = input_port_read_indexed(machine, 7) - 128;
-				int analogy = input_port_read_indexed(machine, 8) - 128;
+				int analogx = input_port_read(machine, "LETA0") - 128;
+				int analogy = input_port_read(machine, "LETA1") - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
@@ -480,7 +485,8 @@ static READ8_HANDLER( leta_r )
 		}
 	}
 
-	return input_port_read_indexed(machine, 7 + (offset & 3));
+	sprintf(port, "LETA%d", (offset & 3));
+	return input_port_read(machine, port);
 }
 
 

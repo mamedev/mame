@@ -83,7 +83,7 @@ static MACHINE_RESET( atarig42 )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int temp = input_port_read_indexed(machine, 2);
+	int temp = input_port_read(machine, "IN2");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -93,7 +93,10 @@ static READ16_HANDLER( special_port2_r )
 
 static WRITE16_HANDLER( a2d_select_w )
 {
-	analog_data = input_port_read_indexed(machine, 4 + (offset != 0));
+	char port[5];
+	
+	sprintf(port, "A2D%d", (offset != 0));
+	analog_data = input_port_read(machine, port);
 }
 
 
@@ -381,17 +384,17 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( roadriot )
-	PORT_START		/* e00000 */
+	PORT_START_TAG("IN0")		/* e00000 */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* e00002 */
+	PORT_START_TAG("IN1")      /* e00002 */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START		/* e00010 */
+	PORT_START_TAG("IN2")		/* e00010 */
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -399,16 +402,16 @@ static INPUT_PORTS_START( roadriot )
 
 	JSA_III_PORT	/* audio board port */
 
-	PORT_START		/* analog 0 */
+	PORT_START_TAG("A2D0")		/* analog 0 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START      /* analog 1 */
+	PORT_START_TAG("A2D1")		/* analog 1 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( guardian )
-	PORT_START		/* e00000 */
+	PORT_START_TAG("IN0")		/* e00000 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -426,7 +429,7 @@ static INPUT_PORTS_START( guardian )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START      /* e00002 */
+	PORT_START_TAG("IN1")      /* e00002 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -442,7 +445,7 @@ static INPUT_PORTS_START( guardian )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START		/* e00010 */
+	PORT_START_TAG("IN2")		/* e00010 */
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_VBLANK )
@@ -450,10 +453,10 @@ static INPUT_PORTS_START( guardian )
 
 	JSA_III_PORT	/* audio board port */
 
-	PORT_START		/* analog 0 */
+	PORT_START_TAG("A2D0")		/* analog 0 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START      /* analog 1 */
+	PORT_START_TAG("A2D1")		/* analog 1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

@@ -574,7 +574,6 @@ static void allocate_graphics(running_machine *machine, const gfx_decode_entry *
 static void decode_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo)
 {
 	int totalgfx = 0, curgfx = 0;
-	char buffer[200];
 	int i;
 
 	/* count total graphics elements */
@@ -596,6 +595,7 @@ static void decode_graphics(running_machine *machine, const gfx_decode_entry *gf
 				/* now decode the actual graphics */
 				for (j = 0; j < gfx->total_elements; j += 1024)
 				{
+					char buffer[200];
 					int num_to_decode = (j + 1024 < gfx->total_elements) ? 1024 : (gfx->total_elements - j);
 					decodegfx(gfx, region_base + gfxdecodeinfo[i].start, j, num_to_decode);
 					curgfx += num_to_decode;

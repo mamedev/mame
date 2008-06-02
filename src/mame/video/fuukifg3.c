@@ -257,7 +257,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 #if 0
 if (input_code_pressed(KEYCODE_X))
 {	/* Display some info on each sprite */
-	char buf[10];
+	char buf[40];
 	sprintf(buf, "%Xx%X %X",xnum,ynum,(attr>>6)&3);
 	ui_draw_text(buf, sx, sy);
 }

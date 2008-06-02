@@ -133,6 +133,7 @@ static READ8_HANDLER( custom_cpu_r )
 	/* alternate CPU's RAM space while the CPU is running. If the CPU is not     */
 	/* running (i.e., the /SRES line is low), it needs to look like RAM to pass  */
 	/* the self-tests */
+	char port[5];
 
 	/* if the CPU reset line is being held down, just return RAM */
 	if (custom_cpu_reset)
@@ -148,7 +149,8 @@ static READ8_HANDLER( custom_cpu_r )
 		case 3:
 		case 4:
 		case 5:
-			return input_port_read_indexed(machine, 2 + offset);
+			sprintf(port, "COM%d", offset);
+			return input_port_read(machine, port);
 
 		/* busy flag; this is polled to check the custom CPU's readiness */
 		/* we just toggle it on and off until the main CPU gets the result */

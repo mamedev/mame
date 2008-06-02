@@ -154,9 +154,11 @@ WRITE8_HANDLER( pang_gfxctrl_w )
 {
 logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 {
+#if 0
 	char baf[40];
 	sprintf(baf,"%02x",data);
-//  popmessage(baf);
+	popmessage(baf);
+#endif
 }
 
 	/* bit 0 is unknown (used, maybe back color enable?) */

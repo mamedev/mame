@@ -180,16 +180,24 @@ these make the game a bit easier for testing purposes
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	int fake = input_port_read_indexed(machine, 6+offset);
+	int fake; 
+	char port1[4], port2[6];
+	
+	sprintf(port1, "I8%d", 1 + offset);
+	sprintf(port2, "FAKE%d", 1 + offset);
+	fake = input_port_read(machine, port2);
 
-	return ((fake & 0x01) ? fake  : input_port_read_indexed(machine, 4+offset));
+	return ((fake & 0x01) ? fake  : input_port_read(machine, port1));
 }
 
 #else
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	return input_port_read_indexed(machine, 4+offset);
+	char port[4];
+
+	sprintf(port, "I8%d", 1 + offset);
+	return input_port_read(machine, port);
 }
 
 #endif
@@ -235,10 +243,10 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) // 00 on start-up, not again
 	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
 	AM_RANGE(0x43, 0x43) AM_WRITE(SMH_NOP) // 9a on start-up, not again
-	AM_RANGE(0x40, 0x40) AM_READ(input_port_0_r)	/* "Coinage" Dip Switches */
-	AM_RANGE(0x41, 0x41) AM_READ(input_port_1_r)	/* Other Dip Switches */
-	AM_RANGE(0x42, 0x42) AM_READ(input_port_2_r)	/* Players inputs (not needed ?) */
-	AM_RANGE(0x80, 0x80) AM_READ(input_port_3_r)	/* System inputs */
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("I40")	/* "Coinage" Dip Switches */
+	AM_RANGE(0x41, 0x41) AM_READ_PORT("I41")	/* Other Dip Switches */
+	AM_RANGE(0x42, 0x42) AM_READ_PORT("I42")	/* Players inputs (not needed ?) */
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("I80")	/* System inputs */
 	AM_RANGE(0x81, 0x82) AM_READ(angelkds_input_r)	/* Players inputs */
 	AM_RANGE(0x83, 0x83) AM_WRITE(SMH_NOP) // 9b on start-up, not again
 	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points

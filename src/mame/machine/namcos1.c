@@ -1330,7 +1330,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 		if (inp == 4) res = input_port_read(machine, "CONTROL0");
 		else
 		{
-			char portname[4];
+			char portname[40];
 
 #ifdef PRESSURE_SENSITIVE
 			static int counter[4];

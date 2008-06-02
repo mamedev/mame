@@ -328,7 +328,7 @@ static void select_controller(UINT8 data)
 
 static CUSTOM_INPUT( multiplexed_controller_r )
 {
-	char tag[6];
+	char tag[40];
 
 	sprintf(tag, "IN%s-%d", (const char *)param, controller_select & 0x01);
 

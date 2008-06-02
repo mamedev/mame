@@ -321,7 +321,6 @@ static int at_keyboard_charqueue_empty(void);
 void at_keyboard_init(AT_KEYBOARD_TYPE type)
 {
 	int i;
-	char buf[32];
 
 	memset(&keyboard, 0, sizeof(keyboard));
 	keyboard.type = type;
@@ -342,6 +341,7 @@ void at_keyboard_init(AT_KEYBOARD_TYPE type)
 	/* locate the keyboard ports */
 	for (i = 0; i < sizeof(keyboard.ports) / sizeof(keyboard.ports[0]); i++)
 	{
+		char buf[40];
 		sprintf(buf, "pc_keyboard_%d", i);
 		keyboard.ports[i] = input_port_by_tag(Machine->portconfig, buf);
 	}

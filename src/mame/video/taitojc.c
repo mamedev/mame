@@ -282,7 +282,7 @@ VIDEO_UPDATE( taitojc )
 	taitojc_tile_update(screen->machine);
 	tilemap_draw(bitmap, cliprect, taitojc_tilemap, 0,0);
 
-	/*
+#if 0
     if (debug_tex_pal > 0)
     {
         int j;
@@ -309,7 +309,7 @@ VIDEO_UPDATE( taitojc )
             popmessage("%s", string);
         }
     }
-    */
+#endif
 
 	return 0;
 }

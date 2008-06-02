@@ -80,10 +80,12 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 	/* other bits unused/unknown */
 	if (data & 0xf8)
 	{
+#if 0
 		char baf[40];
-		logerror("%04x: (ccount) write %02x\n",activecpu_get_pc(), data);
 		sprintf(baf,"ccnt = %02x", data);
-//      popmessage(baf);
+		popmessage(baf);
+#endif
+		logerror("%04x: (ccount) write %02x\n",activecpu_get_pc(), data);
 	}
 }
 

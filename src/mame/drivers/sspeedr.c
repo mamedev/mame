@@ -81,7 +81,7 @@ static WRITE8_HANDLER( sspeedr_time_w )
 
 static WRITE8_HANDLER( sspeedr_score_w )
 {
-	char buf[10];
+	char buf[20];
 	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
 	output_set_digit_value(offset, ls48_map[data]);

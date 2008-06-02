@@ -273,7 +273,7 @@ static READ16_HANDLER( control_1_r )
 	if (invert_controls)
 		return ~(input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 
-	return (input_port_read_indexed(machine, 0) + (input_port_read_indexed(machine, 1) << 8));
+	return (input_port_read(machine, "IN0") + (input_port_read(machine, "IN1") << 8));
 }
 
 static READ16_HANDLER( control_2_r )

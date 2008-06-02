@@ -47,16 +47,16 @@ static UINT8 *actfancr_ram;
 
 static READ8_HANDLER( actfan_control_0_r )
 {
-	return input_port_read_indexed(machine, 2); /* VBL */
+	return input_port_read(machine, "IN2"); /* VBL */
 }
 
 static READ8_HANDLER( actfan_control_1_r )
 {
 	switch (offset) {
-		case 0: return input_port_read_indexed(machine, 0); /* Player 1 */
-		case 1: return input_port_read_indexed(machine, 1); /* Player 2 */
-		case 2: return input_port_read_indexed(machine, 3); /* Dip 1 */
-		case 3: return input_port_read_indexed(machine, 4); /* Dip 2 */
+		case 0: return input_port_read(machine, "IN0"); /* Player 1 */
+		case 1: return input_port_read(machine, "IN1"); /* Player 2 */
+		case 2: return input_port_read(machine, "DSW1"); /* Dip 1 */
+		case 3: return input_port_read(machine, "DSW2"); /* Dip 2 */
 	}
 	return 0xff;
 }
