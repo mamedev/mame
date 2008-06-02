@@ -812,6 +812,7 @@ static const struct YMZ280Binterface ymz280b_interface =
 	0	/* irq */
 };
 
+
 static MACHINE_DRIVER_START( deroon )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
@@ -852,8 +853,8 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SOUND_ROUTE(2, "left", 1.00)
 	MDRV_SOUND_ROUTE(3, "right", 1.00)
 
-	MDRV_SOUND_ADD(OKIM6295, 14318180/2048*132)
-	MDRV_SOUND_CONFIG(okim6295_interface_region_1_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD(OKIM6295, 16000000/8)
+	MDRV_SOUND_CONFIG(okim6295_interface_region_2_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 
