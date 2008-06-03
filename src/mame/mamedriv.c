@@ -7479,6 +7479,8 @@ Other Sun games
 	DRIVER( crysbios )
 	DRIVER( crysking )	/* 2001 Brezzasoft. Crystal of the kings */
 	DRIVER( evosocc )	/* 2001 Evoga. Evolution Soccer */
+	DRIVER( topbladv )
+	DRIVER( officeye )
 
 	/* Bell Fruit Cobra Hardware */
 	DRIVER( inquiztr )	/* 1989 BFM */

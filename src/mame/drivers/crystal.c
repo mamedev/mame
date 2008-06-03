@@ -866,6 +866,28 @@ ROM_START( evosocc )
 	ROM_REGION( 0x10000, REGION_USER2,	ROMREGION_ERASEFF )	//Unmapped flash
 ROM_END
 
+ROM_START( topbladv )
+	ROM_REGION( 0x20000, REGION_CPU1, 0 ) // bios
+	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
+
+	ROM_REGION32_LE( 0x1000000, REGION_USER1, 0 ) // Flash
+	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
+
+	ROM_REGION( 0x10000, REGION_USER2,	ROMREGION_ERASEFF )	//Unmapped flash
+ROM_END
+
+
+ROM_START( officeye )
+	ROM_REGION( 0x20000, REGION_CPU1, 0 ) // bios (not the standard one)
+	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
+
+	ROM_REGION32_LE( 0x2000000, REGION_USER1, 0 ) // Flash
+	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
+	ROM_LOAD("flash.u2",  0x1000000, 0x1000000, CRC(e4f85d0a) SHA1(2ddfa6b3a30e69754aa9d96434ff3d37784bfa57) )
+
+	ROM_REGION( 0x10000, REGION_USER2,	ROMREGION_ERASEFF )	//Unmapped flash
+ROM_END
+
 
 static DRIVER_INIT(crysking)
 {
@@ -907,3 +929,8 @@ static DRIVER_INIT(evosocc)
 GAME( 2001, crysbios,        0, crystal, crystal,        0, ROT0, "Brezzasoft", "Crystal System BIOS", GAME_IS_BIOS_ROOT )
 GAME( 2001, crysking, crysbios, crystal, crystal, crysking, ROT0, "Brezzasoft", "The Crystal of Kings", 0 )
 GAME( 2001, evosocc,  crysbios, crystal, crystal,  evosocc, ROT0, "Evoga", "Evolution Soccer", 0 )
+GAME( 2001, topbladv, crysbios, crystal, crystal,  0,       ROT0, "unknown", "Top Blade V", GAME_NOT_WORKING ) // protection
+
+GAME( 2001, officeye,        0, crystal, crystal,  0,       ROT0, "unknown", "Office Yeo ln Cheon Ha", GAME_NOT_WORKING ) // protection
+
+
