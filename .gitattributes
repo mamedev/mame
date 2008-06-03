@@ -1252,6 +1252,7 @@ src/mame/drivers/bionicc.c svneol=native#text/plain
 src/mame/drivers/bishi.c svneol=native#text/plain
 src/mame/drivers/bishjan.c svneol=native#text/plain
 src/mame/drivers/bking.c svneol=native#text/plain
+src/mame/drivers/blackt96.c svneol=native#text/plain
 src/mame/drivers/bladestl.c svneol=native#text/plain
 src/mame/drivers/blktiger.c svneol=native#text/plain
 src/mame/drivers/blmbycar.c svneol=native#text/plain

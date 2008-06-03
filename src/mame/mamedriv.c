@@ -8087,6 +8087,7 @@ Other Sun games
 	DRIVER( capcor )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
+	DRIVER( blackt96 )
 
 	/* Astro Corp. */
 	DRIVER( showhand )
