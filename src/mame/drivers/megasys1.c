@@ -1278,6 +1278,74 @@ ROM_START( phantasm )
 	ROM_LOAD( "ph.bin",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
 ROM_END
 
+/*
+
+Monky Elf
+
+PCB Layout
+----------
+
+|---------------------------------------------|
+|     1   62256   62256  62256  62256     8   |
+|     2    3      4                           |
+| M6295     68000                         9   |
+| M6295                                       |
+|YM2151                                   10  |
+|                                             |
+|J  6116                                      |
+|A  6116                                      |
+|M                                       12MHz|
+|M                                            |
+|A                                            |
+|                                             |
+|                                             |
+|                                  62256      |
+|     62256   62256                62256      |
+|      5        6    6264                     |
+|DSW1    68000       6264                     |
+|                                  62256      |
+|DSW2         16MHz      7         62256      |
+|---------------------------------------------|
+Notes:
+     68000 clocks 8.000MHz [16/2]
+     YM2151 clock 3.000MHz [12/4]
+     M6295 clocks 3.000MHz [12/4] pin 7 high
+
+*/
+
+ROM_START( monkelf )
+	ROM_REGION( 0xc0000, REGION_CPU1, 0 )		/* Main CPU Code: 00000-3ffff & 80000-bffff */
+	ROM_LOAD16_BYTE( "6",  0x000000, 0x020000, CRC(40b80914) SHA1(103dd3531b6b270e0d756801ff5ac69db5c6b82f) )
+	ROM_CONTINUE (                   0x080000, 0x020000 )
+	ROM_LOAD16_BYTE(  "5", 0x000001, 0x020000, CRC(6c45465d) SHA1(ae30c3f14617ffe99622a019eb64880ac14bf7cf) )
+	ROM_CONTINUE (                   0x080001, 0x020000 )
+
+	ROM_REGION( 0x40000, REGION_CPU2, 0 )		/* Sound CPU Code */
+	ROM_LOAD16_BYTE( "4",  0x000000, 0x020000, CRC(d02ec045) SHA1(465b61d89ca06e7e0a42c42efb6919c964ad0f93) )
+	ROM_LOAD16_BYTE( "3",  0x000001, 0x020000, CRC(30213390) SHA1(9334978d3568b36215ed29789501f7cbaf6651ea) )
+
+	ROM_REGION( 0x80000, REGION_GFX1, ROMREGION_DISPOSE ) /* Scroll 0 */
+	ROM_LOAD( "8",  0x000000, 0x080000, CRC(728335d4) SHA1(bbf13378ac0bff5e732eb30081b421ed89d12fa2) )
+
+	ROM_REGION( 0x80000, REGION_GFX2, ROMREGION_DISPOSE ) /* Scroll 1 */
+	ROM_LOAD( "9",  0x000000, 0x080000, CRC(7896f6b0) SHA1(f09c1592aaa34eb5b7fe096ad4ccdcb155a5cadd) )
+
+	ROM_REGION( 0x20000, REGION_GFX3, ROMREGION_DISPOSE ) /* Scroll 2 */
+	ROM_LOAD( "10",  0x000000, 0x020000, CRC(0c37edf7) SHA1(4074377f756b231b905b9b6a087c6d6ad3d49f52) )
+
+	ROM_REGION( 0x80000, REGION_GFX4, ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD( "7",  0x000000, 0x080000, CRC(2b1180b3) SHA1(6d62b6bd73b9dd23670a0683f28609be29ac1d98) )
+
+	ROM_REGION( 0x40000, REGION_SOUND1, 0 )		/* Samples */
+	ROM_LOAD( "1",  0x000000, 0x040000, CRC(13be9979) SHA1(828ae745867e25834e51d08308b4ab5d8e80f2c8) )
+
+	ROM_REGION( 0x40000, REGION_SOUND2, 0 )		/* Samples */
+	ROM_LOAD( "2",  0x000000, 0x040000, CRC(05bc04d9) SHA1(b903edf39393cad2b4b6b58b10651304793aaa3e) )
+
+	ROM_REGION( 0x0200, REGION_PROMS, 0 )		/* Priority PROM */
+	ROM_LOAD( "ph.bin",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
+ROM_END
+
 
 static INPUT_PORTS_START( avspirit )
 	COINS
@@ -3927,6 +3995,7 @@ static DRIVER_INIT( soldam )
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
+
 static DRIVER_INIT( stdragon )
 {
 	UINT16 *RAM;
@@ -3935,6 +4004,22 @@ static DRIVER_INIT( stdragon )
 
 	RAM  = (UINT16 *) memory_region(REGION_CPU1);
 	RAM[0x00045e/2] = 0x0098;	// protection
+}
+
+static READ16_HANDLER( monkelf_input_r )
+{
+	return 0xffff;
+}
+
+static DRIVER_INIT( monkelf )
+{
+	UINT16 *ROM = (UINT16*)memory_region(REGION_CPU1);
+	ROM[0x00744/2] = 0x4e71;
+
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
+
+	megasys1_ram += 0x10000/2;
+
 }
 
 
@@ -3959,6 +4044,7 @@ GAME( 1990, rodlandj, rodland,  system_A,          rodland,  rodlandj, ROT0,   "
 GAME( 1990, rodlndjb, rodland,  system_A,          rodland,  0,        ROT0,   "Jaleco", "Rod-Land (Japan bootleg)", 0 )
 GAME( 1991, avspirit, 0,        system_B,          avspirit, avspirit, ROT0,   "Jaleco", "Avenging Spirit", 0 )
 GAME( 1990, phantasm, avspirit, system_A,          avspirit, phantasm, ROT0,   "Jaleco", "Phantasm (Japan)", 0 )
+GAME( 1990, monkelf,  avspirit, system_B,          avspirit, monkelf,  ROT0,   "bootleg", "Monky Elf (Korean bootleg of Avenging Spirit)", GAME_NOT_WORKING )
 GAME( 1991, edf,      0,        system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force", 0 )
 GAME( 1991, edfu,     edf,      system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
 GAME( 1991, 64street, 0,        system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
