@@ -4,7 +4,6 @@
 
  ToDo:
   Dump / Decap MCUs to allow for proper protection emulation.
-  Alpha Blending? (should the backround of the 'pit' in Deroon be blended?)
   Fix Sound (sound roms should be good, do they need descrambling, or is our sound core bad?
      some YMZ280B samples sound -terrible-)
 
@@ -210,6 +209,9 @@ static UINT16* tecmosys_880000regs;
 static int tecmosys_spritelist;
 
 static bitmap_t *sprite_bitmap;
+static bitmap_t *tmp_tilemap_composebitmap;
+static bitmap_t *tmp_tilemap_renderbitmap;
+
 
 static MACHINE_RESET( deroon );
 
@@ -318,8 +320,11 @@ static WRITE16_HANDLER( unk880000_w )
 
 	switch( offset )
 	{
+		case 0x00/2:
+			break; // global x scroll for sprites?
+
 		case 0x02/2:
-			break; // global y scroll for sprites?
+			break; // global y scroll for sprites
 
 		case 0x08/2:
 			tecmosys_spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
@@ -556,21 +561,15 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_READ(YMZ280B_status_0_r)
 ADDRESS_MAP_END
 
-// strange use of bits.. maybe it can control pin 7 too?
+
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
-	if (data==0x10)
-	{
-		OKIM6295_set_bank_base(0,0x00000);
-	}
-	else if (data==0x32)
-	{
-		OKIM6295_set_bank_base(0,0x40000);
-	}
-	else
-	{
-		popmessage("oki bank %02x\n",data);
-	}
+	UINT8 upperbank = (data & 0x30) >> 4;
+	UINT8 lowerbank = (data & 0x03) >> 0;
+	UINT8* region = memory_region(REGION_SOUND2);
+
+	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
+	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
 }
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -593,8 +592,14 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
-	sprite_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	fillbitmap(sprite_bitmap, 0x0000, NULL);
+	sprite_bitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	fillbitmap(sprite_bitmap, 0x4000, NULL);
+
+	tmp_tilemap_composebitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+	tmp_tilemap_renderbitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
+
+	fillbitmap(tmp_tilemap_composebitmap, 0x0000, NULL);
+	fillbitmap(tmp_tilemap_renderbitmap, 0x0000, NULL);
 
 
 	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
@@ -634,7 +639,7 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 		int priority;
 		int zoomx, zoomy;
 
-		x = tecmosys_spriteram[i+0];
+		x = tecmosys_spriteram[i+0]+386;
 		y = (tecmosys_spriteram[i+1]+1);
 
 		x-= extrax;
@@ -653,7 +658,6 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 		flipx = (tecmosys_spriteram[i+4]&0x0040)>>6;
 		flipy = (tecmosys_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
 
- 		x -= 96;
 
 		zoomx = (tecmosys_spriteram[i+2] & 0x0fff)>>0; // zoom?
 		zoomy = (tecmosys_spriteram[i+3] & 0x0fff)>>0; // zoom?
@@ -710,19 +714,91 @@ static void tecmosys_render_sprites_to_bitmap(bitmap_t *bitmap, UINT16 extrax, U
 	}
 }
 
-static void tecmosys_copy_spritebitmap_priority(bitmap_t *bitmap, UINT16 primask)
+void tecmosys_tilemap_copy_to_compose(UINT16 pri)
 {
 	int y,x;
-	UINT16 *srcptr, *dstptr;
+	UINT16 *srcptr;
+	UINT16 *dstptr;
 	for (y=0;y<240;y++)
 	{
-		srcptr = BITMAP_ADDR16(sprite_bitmap, y, 0);
-		dstptr = BITMAP_ADDR16(bitmap, y, 0);
+		srcptr = BITMAP_ADDR16(tmp_tilemap_renderbitmap, y, 0);
+		dstptr = BITMAP_ADDR16(tmp_tilemap_composebitmap, y, 0);
 		for (x=0;x<320;x++)
 		{
-			if (srcptr[x])
-				if ((srcptr[x] & 0xc000) == primask)
-					dstptr[x] = srcptr[x]&0x3fff;
+			if ((srcptr[x]&0xf)!=0x0)
+			    dstptr[x] =  (srcptr[x]&0x7ff) | pri;
+		}
+	}
+}
+
+void tecmosys_do_final_mix(bitmap_t* bitmap)
+{
+	const pen_t *paldata = Machine->pens;
+	int y,x;
+	UINT16 *srcptr;
+	UINT16 *srcptr2;
+	UINT32 *dstptr;
+
+
+	for (y=0;y<240;y++)
+	{
+
+		srcptr = BITMAP_ADDR16(tmp_tilemap_composebitmap, y, 0);
+		srcptr2 = BITMAP_ADDR16(sprite_bitmap, y, 0);
+
+
+		dstptr = BITMAP_ADDR32(bitmap, y, 0);
+		for (x=0;x<320;x++)
+		{
+			UINT16 pri, pri2;
+			UINT16 penvalue;
+			UINT16 penvalue2;
+			UINT32 colour;
+			UINT32 colour2;
+
+			pri = srcptr[x] & 0xc000;
+			pri2 = srcptr2[x] & 0xc000;
+
+			penvalue = tilemap_paletteram16[srcptr[x]&0x7ff];
+			colour =   paldata[(srcptr[x]&0x7ff) | 0x4000];
+
+			if (srcptr2[x]&0x3fff)
+			{
+				penvalue2 = paletteram16[srcptr2[x]&0x3fff];
+				colour2 = paldata[srcptr2[x]&0x3fff];
+			}
+			else
+			{
+				penvalue2 = tilemap_paletteram16[srcptr[x]&0x7ff];
+				colour2 =   paldata[(srcptr[x]&0x7ff) | 0x4000];
+			}
+
+			if ((penvalue & 0x8000) && (penvalue2 & 0x8000)) // blend
+			{
+				int r,g,b;
+				int r2,g2,b2;
+				b = (colour & 0x000000ff) >> 0;
+				g = (colour & 0x0000ff00) >> 8;
+				r = (colour & 0x00ff0000) >> 16;
+
+				b2 = (colour2 & 0x000000ff) >> 0;
+				g2 = (colour2 & 0x0000ff00) >> 8;
+				r2 = (colour2 & 0x00ff0000) >> 16;
+
+				r = (r + r2) >> 1;
+				g = (g + g2) >> 1;
+				b = (b + b2) >> 1;
+
+				dstptr[x] = b | (g<<8) | (r<<16);
+			}
+			else if (pri2 >= pri)
+			{
+				dstptr[x] = colour2;
+			}
+			else
+			{
+				dstptr[x] = colour;
+			}
 		}
 	}
 }
@@ -730,7 +806,7 @@ static void tecmosys_copy_spritebitmap_priority(bitmap_t *bitmap, UINT16 primask
 static VIDEO_UPDATE(deroon)
 {
 
-	fillbitmap(bitmap,0x4000,cliprect);
+	fillbitmap(bitmap,Machine->pens[0x4000],cliprect);
 
 
 	tilemap_set_scrolly( bg0tilemap, 0, tecmosys_c80000regs[1]+16);
@@ -742,14 +818,26 @@ static VIDEO_UPDATE(deroon)
 	tilemap_set_scrolly( bg2tilemap, 0, tecmosys_b00000regs[1]+17);
 	tilemap_set_scrollx( bg2tilemap, 0, tecmosys_b00000regs[0]+106);
 
-	tilemap_draw(bitmap,cliprect,bg0tilemap,0,0);
-	tecmosys_copy_spritebitmap_priority(bitmap, 0x0000);
-	tilemap_draw(bitmap,cliprect,bg1tilemap,0,0);
-	tecmosys_copy_spritebitmap_priority(bitmap, 0x4000);
-	tilemap_draw(bitmap,cliprect,bg2tilemap,0,0); // should be drawn with blending / alpha in deroon?
-	tecmosys_copy_spritebitmap_priority(bitmap, 0x8000);
-	tilemap_draw(bitmap,cliprect,txt_tilemap,0,0);
-	tecmosys_copy_spritebitmap_priority(bitmap, 0xc000);
+	fillbitmap(tmp_tilemap_composebitmap,0,cliprect);
+
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg0tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0x0000);
+
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg1tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0x4000);
+
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg2tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0x8000);
+
+	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,txt_tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(0xc000);
+
+
+	tecmosys_do_final_mix(bitmap);
 
 /*
 	popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",
@@ -770,7 +858,7 @@ static VIDEO_UPDATE(deroon)
 //	  tecmosys_a80000regs[0], 	  tecmosys_a80000regs[1],  	  tecmosys_a80000regs[2]);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(bitmap, 0, tecmosys_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(bitmap, tecmosys_880000regs[0x0], tecmosys_880000regs[0x1]);
 
 
 	return 0;
@@ -850,7 +938,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3000))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
@@ -920,8 +1008,8 @@ ROM_START( deroon )
 	ROM_REGION( 0x200000, REGION_SOUND1, 0 ) // YMZ280B Samples
 	ROM_LOAD( "t401.uya1", 0x000000, 0x200000, CRC(92111992) SHA1(ae27e11ae76dec0b9892ad32e1a8bf6ab11f2e6c) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) // M6295 Samples
-	ROM_LOAD( "t501.uad1", 0x000000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) // M6295 Samples
+	ROM_LOAD( "t501.uad1", 0x080000, 0x080000, CRC(2fbcfe27) SHA1(f25c830322423f0959a36955edb563a6150f2142) )
 ROM_END
 
 ROM_START( tkdensho )
@@ -964,8 +1052,8 @@ ROM_START( tkdensho )
 	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
 	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
 
-	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) // M6295 Samples
-	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
+	ROM_REGION( 0x100000, REGION_SOUND2, 0 ) // M6295 Samples
+	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
 ROM_START( tkdensha )
