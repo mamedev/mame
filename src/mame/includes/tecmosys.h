@@ -35,6 +35,7 @@ extern UINT8 device_status;
 extern struct prot_data* device_data;
 extern struct prot_data deroon_data;
 extern struct prot_data tkdensho_data;
+extern struct prot_data tkdensha_data;
 
 
 

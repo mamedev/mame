@@ -834,7 +834,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_CPU_ADD(M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
-	MDRV_WATCHDOG_VBLANK_INIT(50) // guess
+	MDRV_WATCHDOG_VBLANK_INIT(400) // guess
 
 	/* audio CPU */
 	MDRV_CPU_ADD(Z80, 16000000/2 )	/* 8 MHz ??? */
@@ -968,6 +968,50 @@ ROM_START( tkdensho )
 	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
+ROM_START( tkdensha )
+	ROM_REGION( 0x600000, REGION_CPU1, 0 )
+	ROM_LOAD16_BYTE( "aeprge.pal", 0x00000, 0x80000, CRC(17a209ff) SHA1(b5dbea9868cbb89d4e27bf19fdb616ac256985b4) )
+	ROM_LOAD16_BYTE( "aeprgo.pau", 0x00001, 0x80000, CRC(d265e6a1) SHA1(f39d8ce115f197a660f5210b2483108854eb12a9) )
+
+	ROM_REGION( 0x038000, REGION_CPU2, 0 ) // Sound Porgram
+	ROM_LOAD( "aesprg-2.z1", 0x000000, 0x008000, CRC(43550ab6) SHA1(2580129ef8ebd9295249175de4ba985c752e06fe) )
+	ROM_CONTINUE(            0x010000, 0x018000 ) /* banked part */
+
+	ROM_REGION( 0x2200, REGION_CPU3, 0 ) // MCU is a 68HC11A8 with 8k ROM, 512 bytes EEPROM
+	ROM_LOAD( "tkdensho_68hc11a8.rom",    0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "tkdensho_68hc11a8.eeprom", 0x2000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x4000000, REGION_GFX1, ROMREGION_ERASE00 ) // Graphics - mostly (maybe all?) not tile based
+	ROM_LOAD16_BYTE( "ae100h.ah1",    0x0000000, 0x0400000, CRC(06be252b) SHA1(08d1bb569fd2e66e2c2f47da7780b31945232e62) )
+	ROM_LOAD16_BYTE( "ae100.al1",     0x0000001, 0x0400000, CRC(009cdff4) SHA1(fd88f07313d14fd4429b09a1e8d6b595df3b98e5) )
+	ROM_LOAD16_BYTE( "ae101h.bh1",    0x0800000, 0x0400000, CRC(f2469eff) SHA1(ba49d15cc7949437ba9f56d9b425a5f0e62137df) )
+	ROM_LOAD16_BYTE( "ae101.bl1",     0x0800001, 0x0400000, CRC(db7791bb) SHA1(1fe40b747b7cee7a9200683192b1d60a735a0446) )
+	ROM_LOAD16_BYTE( "ae102h.ch1",    0x1000000, 0x0200000, CRC(f9d2a343) SHA1(d141ac0b20be587e77a576ef78f15d269d9c84e5) )
+	ROM_LOAD16_BYTE( "ae102.cl1",     0x1000001, 0x0200000, CRC(681be889) SHA1(8044ca7cbb325e6dcadb409f91e0c01b88a1bca7) )
+	ROM_LOAD16_BYTE( "ae104.el1",     0x2000001, 0x0400000, CRC(e431b798) SHA1(c2c24d4f395bba8c78a45ecf44009a830551e856) )
+	ROM_LOAD16_BYTE( "ae105.fl1",     0x2800001, 0x0400000, CRC(b7f9ebc1) SHA1(987f664072b43a578b39fa6132aaaccc5fe5bfc2) )
+	ROM_LOAD16_BYTE( "ae106.gl1",     0x3000001, 0x0200000, CRC(7c50374b) SHA1(40865913125230122072bb13f46fb5fb60c088ea) )
+
+	ROM_REGION( 0x080000, REGION_GFX2, ROMREGION_DISPOSE ) // 8x8 4bpp tiles
+	ROM_LOAD( "ae300w36.bd1",  0x000000, 0x0080000, CRC(e829f29e) SHA1(e56bfe2669ed1d1ae394c644def426db129d97e3) )
+
+	ROM_REGION( 0x100000, REGION_GFX3, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae200w74.ba1",  0x000000, 0x0100000, CRC(c1645041) SHA1(323670a6aa2a4524eb968cc0b4d688098ffeeb12) )
+
+	ROM_REGION( 0x100000, REGION_GFX4, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae201w75.bb1",  0x000000, 0x0100000, CRC(3f63bdff) SHA1(0d3d57fdc0ec4bceef27c11403b3631d23abadbf) )
+
+	ROM_REGION( 0x100000, REGION_GFX5, ROMREGION_DISPOSE ) // 16x16 4bpp tiles
+	ROM_LOAD( "ae202w76.bc1",  0x000000, 0x0100000, CRC(5cc857ca) SHA1(2553fb5220433acc15dfb726dc064fe333e51d88) )
+
+	ROM_REGION( 0x800000, REGION_SOUND1, 0 ) // YMZ280B Samples
+	ROM_LOAD( "ae400t23.ya1", 0x000000, 0x200000, CRC(c6ffb043) SHA1(e0c6c5f6b840f63c9a685a2c3be66efa4935cbeb) )
+	ROM_LOAD( "ae401t24.yb1", 0x200000, 0x200000, CRC(d83f1a73) SHA1(412b7ac9ff09a984c28b7d195330d78c4aac3dc5) )
+
+	ROM_REGION( 0x080000, REGION_SOUND2, 0 ) // M6295 Samples
+	ROM_LOAD( "ae500w07.ad1", 0x000000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
+ROM_END
+
 static MACHINE_RESET( deroon )
 {
 	device_read_ptr = 0;
@@ -1010,6 +1054,12 @@ static DRIVER_INIT( tkdensho )
 	device_data = &tkdensho_data;
 }
 
+static DRIVER_INIT( tkdensha )
+{
+	tecmosys_decramble();
+	device_data = &tkdensha_data;
+}
 GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
-GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes-", 0 )
+GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
+GAME( 1996, tkdensha,    tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )
 

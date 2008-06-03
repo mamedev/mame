@@ -4437,6 +4437,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ginkun )	/* (c) 1995 Tecmo */
 	DRIVER( deroon )	/* (c) 1996 Tecmo */
 	DRIVER( tkdensho )	/* (c) 1996 Tecmo */
+	DRIVER( tkdensha )	/* (c) 1996 Tecmo */
 
 	/* Konami bitmap games */
 	DRIVER( tutankhm )	/* GX350 (c) 1982 Konami */
