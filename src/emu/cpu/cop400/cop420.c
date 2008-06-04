@@ -302,7 +302,7 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 
 	/* set clock divider */
 
-	activecpu_set_info_int(CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
+	cpunum_set_info_int(index, CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
 
 	/* allocate serial timer */
 
