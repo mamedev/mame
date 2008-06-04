@@ -7,7 +7,6 @@ Notes:
       a COP404L - A ROMless COP420 with 1k of RAM.  I wonder which one is correct?
 
 Todo:
-    Add SIO to the cop420 core.
     Fix up my poor interpretation of the hard-to-read schematics.
     Write a real SC-01 (SSI-263) emulator for MAME.
     Convert to tilemaps.
@@ -293,18 +292,46 @@ static WRITE8_HANDLER(cop_d_write)
 	}
 }
 
-static WRITE8_HANDLER(cop_sk_write)
+static int kb_bit;
+
+static READ8_HANDLER(cop_si_r)
 {
-	/* I think this data falls off into a black hole - the pins aren't hooked up.
-       The COP400 XAS instruction writes to both SK and SIO, that's why the CPU writes data here at all. */
+	UINT8 data;
+	char port[4];
+	int row = kb_bit / 8;
+	int col = kb_bit % 8;
+
+	sprintf(port, "R%d", row);
+
+	switch (col)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 3:
+		data = input_port_read(machine, port);
+		return BIT(data, col);
+
+	case 4:
+		return (row == 9);
+
+	default:
+		return 1;
+	}
 }
 
-static WRITE8_HANDLER(cop_sio_write)
+static WRITE8_HANDLER(cop_so_w)
 {
-	/* This data is sent to the CLK pin of the keyboard handling logic.  We don't need to emulate it here. */
+	if (data)
+	{
+		kb_bit++;
+
+		if (kb_bit == 80)
+		{
+			kb_bit = 0;
+		}
+	}
 }
-
-
 
 /* PROGRAM MAPS */
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -342,10 +369,9 @@ static ADDRESS_MAP_START( copio, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_L,  COP400_PORT_L)   AM_READWRITE(cop_l_read,cop_l_write)
 	AM_RANGE(COP400_PORT_G,  COP400_PORT_G)   AM_READWRITE(cop_g_read,cop_g_write)
 	AM_RANGE(COP400_PORT_D,  COP400_PORT_D)   AM_WRITE(cop_d_write)
-	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK)  AM_WRITE(cop_sk_write)
-	AM_RANGE(COP400_PORT_SIO,COP400_PORT_SIO) AM_READ_PORT("THAYERS_LETTERS") AM_WRITE(cop_sio_write)	/* Unemulated in COP40x core, so nothing happens ATM */
-ADDRESS_MAP_END																										/* This is also very wrong.  The keyboard interface needs to
-                                                                                                                       be understood much better than what I have here */
+	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK)  AM_WRITENOP
+	AM_RANGE(COP400_PORT_SIO,COP400_PORT_SIO) AM_READ(cop_si_r) AM_WRITE(cop_so_w)
+ADDRESS_MAP_END
 
 /* PORTS */
 static INPUT_PORTS_START( thayers )
@@ -388,10 +414,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_command_r, 0 )	/* Enter pin on LD player */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_status_r, 0 )	/* Ready pin on LD player */
 
-	/* The following 3 port definitions can be combined into one (thus making this scheme work) if the port bit limit is raised from 32 to 64 */
-	/* But maybe there's a better way to do it than what I have here? */
-	/* Or maybe this doesn't even work at all :) */
 	/* "Scan codes" heisted from Daphne - need to be tested! */
+/*
 	PORT_START_TAG("THAYERS_ACTIONS")
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( DEF_STR( No ) ) PORT_CODE( KEYCODE_DEL_PAD )
 	PORT_BIT( 0x31, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE( KEYCODE_0_PAD )
@@ -437,13 +461,71 @@ static INPUT_PORTS_START( thayers )
 	PORT_BIT( 0x81, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_RCONTROL )
 	PORT_BIT( 0x82, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "3 - Enter" ) PORT_CODE( KEYCODE_ENTER )
 	PORT_BIT( 0x83, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "4 - Space" ) PORT_CODE( KEYCODE_SPACE )
-INPUT_PORTS_END
+*/
+	PORT_START_TAG("R0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
 
+	PORT_START_TAG("R1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+
+	PORT_START_TAG("R9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
+INPUT_PORTS_END
 
 static MACHINE_START( thayers )
 {
 	discinfo = laserdisc_init(LASERDISC_TYPE_LDV1000, get_disk_handle(0), 0);
-	return;
 }
 
 static INTERRUPT_GEN( vblank_callback_thayers )
@@ -451,6 +533,12 @@ static INTERRUPT_GEN( vblank_callback_thayers )
 	laserdisc_vsync(discinfo);
 }
 
+static COP400_INTERFACE( thayers_cop_intf )
+{
+	COP400_CKI_DIVISOR_16, // ???
+	COP400_CKO_OSCILLATOR_OUTPUT, // ???
+	COP400_MICROBUS_DISABLED
+};
 
 /* DRIVER */
 static MACHINE_DRIVER_START( thayers )
@@ -466,6 +554,7 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_CPU_ADD(COP420, SCHEMATIC_CLOCK/2/8)		/* Can't read the schematics, but this is what daphne says */
 	MDRV_CPU_PROGRAM_MAP(copmem,0)
 	MDRV_CPU_IO_MAP(copio,0)
+	MDRV_CPU_CONFIG(thayers_cop_intf)
 
 /*  video */
 

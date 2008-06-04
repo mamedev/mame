@@ -141,7 +141,13 @@ INLINE void WRITE_Q(UINT8 data)
 
 INLINE void WRITE_G(UINT8 data)
 {
+	if (R.intf->microbus == COP400_MICROBUS_ENABLED)
+	{
+		data = (data & 0x0e) | R.microbus_int;
+	}
+
 	G = data;
+
 	OUT_G(G);
 }
 
@@ -484,6 +490,24 @@ INSTRUCTION(retsk)
 	skip = 1;
 }
 
+/*
+
+	Processor:			COP410C/COP411C
+
+    Mnemonic:           HALT
+
+    Hex Code:           33 38
+    Binary:             0 0 1 1 0 0 1 1 0 0 1 1 1 0 0 0
+
+    Description:        Halt processor
+
+*/
+
+INSTRUCTION(halt)
+{
+	R.halt = 1;
+}
+
 /* Memory Reference Instructions */
 
 /*
@@ -502,7 +526,45 @@ INSTRUCTION(retsk)
 
 INSTRUCTION(camq)
 {
-	WRITE_Q((A << 4) | RAM_R(B));
+	/*
+
+		Excerpt from the COP410L data sheet:
+
+		False states may be generated on L0-L7 during the execution of the CAMQ instruction. 
+		The L-ports should not be used as clocks for edge sensitive devices such as flip-flops,
+		counters, shift registers, etc. the following short program that illustrates this situation.
+
+		START:
+			CLRA		;ENABLE THE Q
+			LEI 4		;REGISTER TO L LINES
+			LBI TEST
+			STII 3
+			AISC 12
+		LOOP:
+			LBI TEST	;LOAD Q WITH X'C3
+			CAMQ
+			JP LOOP
+
+		In this program the internal Q register is enabled onto the L lines and a steady bit 
+		pattern of logic highs is output on L0,	L1, L6, L7, and logic lows on L2-L5 via the 
+		two-byte CAMQ instruction. Timing constraints on the device are such that the Q 
+		register may be temporarily loaded with the second byte of the CAMQ opcode (3C) prior
+		to receiving the valid data pattern. If this occurs, the opcode will ripple onto the L
+		lines and cause negative-going glitches on L0, L1, L6, L7, and positive glitches on 
+		L2-L5. Glitch durations are under 2 ms, although the exact value may vary due to data 
+		patterns, processing parameters, and L line loading. These false states are peculiar 
+		only to the CAMQ instruction and the L lines.
+
+	*/
+
+	UINT8 data = (A << 4) | RAM_R(B);
+
+	WRITE_Q(data);
+
+#ifdef CAMQ_BUG
+	WRITE_Q(0x3c);
+	WRITE_Q(data);
+#endif
 }
 
 /*

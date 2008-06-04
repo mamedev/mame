@@ -231,6 +231,10 @@ offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 					sprintf(buffer, "INL");
 					break;
 
+				case 0x38:
+					sprintf(buffer, "HALT");
+					break;
+
 				case 0x3A:
 					sprintf(buffer, "OMG");
 					break;

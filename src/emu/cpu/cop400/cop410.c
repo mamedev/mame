@@ -13,8 +13,10 @@
 
     TODO:
 
+    - run interrupt test suite
+    - run production test suite
+	- run microbus test suite
     - remove LBIops
-    - run all test suites
 
 */
 
@@ -35,6 +37,8 @@ typedef struct {
 
 typedef struct
 {
+	const cop400_interface *intf;
+
 	UINT9 	PC;
 	UINT9	PREVPC;
 	UINT4	A;
@@ -50,6 +54,8 @@ typedef struct
 	UINT8	G_mask;
 	UINT8	D_mask;
 	UINT8	si;
+	int		microbus_int;
+	int		halt;
 } COP410_Regs;
 
 static COP410_Regs R;
@@ -119,7 +125,7 @@ static const s_opcode opcode_33_map[256]=
 	{1, illegal 	},{1, skgz 		},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, ing	 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, inl	 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
-	{1, illegal 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
+	{1, halt	 	},{1, illegal 	},{1, omg	 	},{1, illegal 	},{1, camq	 	},{1, illegal 	},{1, obd	 	},{1, illegal 	},
 
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
@@ -197,7 +203,7 @@ static const s_opcode opcode_map[256]=
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cop410_internal_rom, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( cop410_internal_rom, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -213,21 +219,40 @@ static void cop410_init(int index, int clock, const void *config, int (*irqcallb
 	int i;
 
 	memset(&R, 0, sizeof(R));
-	R.G_mask = 0x0F;
-	R.D_mask = 0x0F;
+
+	R.intf = (cop400_interface *) config;
+
+	assert(R.intf != NULL);
+
+	/* set output pin masks */
+
+	R.G_mask = 0x0f;
+	R.D_mask = 0x0f;
+
+	/* set clock divider */
+
+	activecpu_set_info_int(CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
+
+	/* allocate serial timer */
 
 	cop410_serial_timer = timer_alloc(cop410_serial_tick, NULL);
 	timer_adjust_periodic(cop410_serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
+	/* initialize instruction length array */
+
 	for (i=0; i<256; i++) InstLen[i]=1;
 
 	InstLen[0x60] = InstLen[0x61] = InstLen[0x68] = InstLen[0x69] = InstLen[0x33] = InstLen[0x23] = 2;
+
+	/* initialize LBI opcode array */
 
 	for (i=0; i<256; i++) LBIops[i] = 0;
 	for (i=0x08; i<0x10; i++) LBIops[i] = 1;
 	for (i=0x18; i<0x20; i++) LBIops[i] = 1;
 	for (i=0x28; i<0x30; i++) LBIops[i] = 1;
 	for (i=0x38; i<0x40; i++) LBIops[i] = 1;
+
+	/* register for state saving */
 
 	state_save_register_item("cop410", index, PC);
 	state_save_register_item("cop410", index, R.PREVPC);
@@ -246,6 +271,8 @@ static void cop410_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop410", index, R.G_mask);
 	state_save_register_item("cop410", index, R.D_mask);
 	state_save_register_item("cop410", index, R.si);
+	state_save_register_item("cop410", index, R.microbus_int);
+	state_save_register_item("cop410", index, R.halt);
 }
 
 static void cop411_init(int index, int clock, const void *config, int (*irqcallback)(int))
@@ -269,6 +296,8 @@ static void cop410_reset(void)
 	OUT_D(0);
 	EN = 0;
 	WRITE_G(0);
+
+	R.halt = 0;
 }
 
 /****************************************************************************
@@ -285,6 +314,13 @@ static int cop410_execute(int cycles)
 		prevPC = PC;
 
 		CALL_DEBUGGER(PC);
+
+		if (R.intf->cko == COP400_CKO_HALT_IO_PORT)
+		{
+			R.halt = IN_CKO();
+		}
+
+		if (R.halt) continue;
 
 		opcode = ROM(PC);
 
@@ -470,7 +506,7 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 
 void cop411_get_info(UINT32 state, cpuinfo *info)
 {
-	// COP411 is a 20-pin package version of the COP410, lacking some ports
+	// COP411 is a 20-pin package version of the COP410, missing D2/D3/G3/CKO
 
 	switch (state)
 	{

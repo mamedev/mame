@@ -289,6 +289,15 @@ static CDP1852_INTERFACE( draco_cdp1852_out1_intf )
 	NULL
 };
 
+/* COP400 Interface */
+
+static COP400_INTERFACE( draco_cop_intf )
+{
+	COP400_CKI_DIVISOR_16, // ???
+	COP400_CKO_OSCILLATOR_OUTPUT, // ???
+	COP400_MICROBUS_DISABLED
+};
+
 /* Memory Maps */
 
 // Destroyer
@@ -683,6 +692,7 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_CPU_ADD(COP420, DRACO_SND_CHR1) // COP402N
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
 	MDRV_CPU_IO_MAP(draco_sound_io_map, 0)
+	MDRV_CPU_CONFIG(draco_cop_intf)
 
 	// input/output hardware
 

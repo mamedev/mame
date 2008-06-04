@@ -13,9 +13,12 @@
 
     TODO:
 
+	- when is the microbus int cleared?
     - run interrupt test suite
     - run production test suite
+	- run microbus test suite
     - remove LBIops
+	- move cop440 stuff to cop440.c
 
 */
 
@@ -36,6 +39,8 @@ typedef struct {
 
 typedef struct
 {
+	const cop400_interface *intf;
+
 	UINT10 	PC;
 	UINT10	PREVPC;
 	UINT4	A;
@@ -56,6 +61,8 @@ typedef struct
 	UINT4	in[4];
 	UINT8	si;
 	int		last_skip;
+	int		microbus_int;
+	int		halt;
 } COP420_Regs;
 
 static COP420_Regs R;
@@ -68,6 +75,7 @@ static int LBIops33[256];
 static emu_timer *cop420_serial_timer;
 static emu_timer *cop420_counter_timer;
 static emu_timer *cop420_inil_timer;
+static emu_timer *cop420_microbus_timer;
 
 #include "420ops.c"
 
@@ -206,20 +214,12 @@ static const s_opcode opcode_map[256]=
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( cop420_internal_rom, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( cop420_internal_rom, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cop420_internal_ram, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x00, 0x3f) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cop444_internal_rom, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cop444_internal_ram, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
 /* Binary Counter */
@@ -253,6 +253,35 @@ static TIMER_CALLBACK(cop420_inil_tick)
 	}
 }
 
+/* Microbus */
+
+static TIMER_CALLBACK(cop420_microbus_tick)
+{
+	UINT8 in = IN_IN();
+
+	if (!BIT(in, 2))
+	{
+		// chip select
+
+		if (!BIT(in, 1))
+		{
+			// read strobe
+
+			OUT_L(Q);
+
+			R.microbus_int = 1;
+		}
+		else if (!BIT(in, 3))
+		{
+			// write strobe
+
+			Q = IN_L();
+
+			R.microbus_int = 0;
+		}
+	}
+}
+
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
@@ -261,23 +290,52 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	int i;
 
 	memset(&R, 0, sizeof(R));
-	R.G_mask = 0x0F;
-	R.D_mask = 0x0F;
+
+	R.intf = (cop400_interface *) config;
+
+	assert(R.intf != NULL);
+
+	/* set output pin masks */
+
+	R.G_mask = 0x0f;
+	R.D_mask = 0x0f;
+
+	/* set clock divider */
+
+	activecpu_set_info_int(CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
+
+	/* allocate serial timer */
 
 	cop420_serial_timer = timer_alloc(cop410_serial_tick, NULL);
 	timer_adjust_periodic(cop420_serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
+	/* allocate counter timer */
+
 	cop420_counter_timer = timer_alloc(cop420_counter_tick, NULL);
 	timer_adjust_periodic(cop420_counter_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
+	/* allocate IN latch timer */
+
 	cop420_inil_timer = timer_alloc(cop420_inil_tick, NULL);
 	timer_adjust_periodic(cop420_inil_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
+
+	/* allocate Microbus timer */
+
+	if (R.intf->microbus == COP400_MICROBUS_ENABLED)
+	{
+		cop420_microbus_timer = timer_alloc(cop420_microbus_tick, NULL);
+		timer_adjust_periodic(cop420_microbus_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
+	}
+
+	/* initialize instruction length array */
 
 	for (i=0; i<256; i++) InstLen[i]=1;
 
 	InstLen[0x60] = InstLen[0x61] = InstLen[0x62] = InstLen[0x63] =
 	InstLen[0x68] = InstLen[0x69] = InstLen[0x6a] = InstLen[0x6b] =
 	InstLen[0x33] = InstLen[0x23] = 2;
+
+	/* initialize LBI opcode array */
 
 	for (i=0; i<256; i++) LBIops[i] = 0;
 	for (i=0x08; i<0x10; i++) LBIops[i] = 1;
@@ -287,6 +345,8 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 
 	for (i=0; i<256; i++) LBIops33[i] = 0;
 	for (i=0x80; i<0xc0; i++) LBIops33[i] = 1;
+
+	/* register for state saving */
 
 	state_save_register_item("cop420", index, PC);
 	state_save_register_item("cop420", index, R.PREVPC);
@@ -310,6 +370,8 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop420", index, R.si);
 	state_save_register_item("cop420", index, R.last_skip);
 	state_save_register_item_array("cop420", index, R.in);
+	state_save_register_item("cop420", index, R.microbus_int);
+	state_save_register_item("cop420", index, R.halt);
 }
 
 static void cop422_init(int index, int clock, const void *config, int (*irqcallback)(int))
@@ -318,14 +380,6 @@ static void cop422_init(int index, int clock, const void *config, int (*irqcallb
 
 	R.G_mask = 0x0e; // only G2, G3 available
 	R.D_mask = 0x0e; // only D2, D3 available
-}
-
-static void cop445_init(int index, int clock, const void *config, int (*irqcallback)(int))
-{
-	cop420_init(index, clock, config, irqcallback);
-
-	R.G_mask = 0x07;
-	R.D_mask = 0x03;
 }
 
 /****************************************************************************
@@ -340,6 +394,9 @@ static void cop420_reset(void)
 	OUT_D(0);
 	EN = 0;
 	WRITE_G(0);
+
+	R.counter = 0;
+	R.timerlatch = 1;
 }
 
 /****************************************************************************
@@ -406,7 +463,7 @@ static int cop420_execute(int cycles)
 					skip = 0;
 
 					// push next PC
-					PUSH(PC + 1);
+					PUSH(PC);
 
 					// jump to interrupt service routine
 					PC = 0x0ff;
@@ -630,10 +687,42 @@ void cop402_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+/* COP44x */
+
+static void cop426_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	cop420_init(index, clock, config, irqcallback);
+
+	R.G_mask = 0x0e; // only G2, G3 available
+	R.D_mask = 0x0e; // only D2, D3 available
+}
+
+static void cop445_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	cop420_init(index, clock, config, irqcallback);
+
+	R.G_mask = 0x07;
+	R.D_mask = 0x03;
+}
+
+static ADDRESS_MAP_START( cop424_internal_rom, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cop424_internal_ram, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x3f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cop444_internal_rom, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x000, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cop444_internal_ram, ADDRESS_SPACE_DATA, 8 )
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
 void cop444_get_info(UINT32 state, cpuinfo *info)
 {
-	// COP444 is functionally equivalent to COP420, but with twice the RAM/ROM
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -667,9 +756,60 @@ void cop445_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+void cop424_get_info(UINT32 state, cpuinfo *info)
+{
+	// COP424 is functionally equivalent to COP444, with only 1K ROM and 64x4 bytes RAM
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
+ 			info->internal_map8 = address_map_cop424_internal_rom;								break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
+ 			info->internal_map8 = address_map_cop424_internal_ram;								break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP424");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS"); break;
+
+		default: cop444_get_info(state, info); break;
+	}
+}
+
+void cop425_get_info(UINT32 state, cpuinfo *info)
+{
+	// COP425 is a 24-pin package version of the COP424, lacking the IN ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP425");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS"); break;
+
+		default: cop444_get_info(state, info); break;
+	}
+}
+
+void cop426_get_info(UINT32 state, cpuinfo *info)
+{
+	// COP426 is a 20-pin package version of the COP424, with only L0-L7, G2-G3, D2-D3 ports
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_INIT:							info->init = cop426_init;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:							strcpy(info->s, "COP426");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS"); break;
+
+		default: cop444_get_info(state, info); break;
+	}
+}
+
 void cop404_get_info(UINT32 state, cpuinfo *info)
 {
-	// COP404 is a ROMless version of the COP444
+	// COP404 is a ROMless version of the COP444, which can emulate a COP410 or a COP424
 
 	switch (state)
 	{

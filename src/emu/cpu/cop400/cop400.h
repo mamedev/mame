@@ -2,7 +2,7 @@
 
     cop400.h
 
-    National Semiconductor COP400 Emulator.
+    National Semiconductor COPS Emulator.
 
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -35,16 +35,62 @@ enum {
     COP400_SKL
 };
 
+typedef enum _cop400_cki_bond cop400_cki_bond;
+enum _cop400_cki_bond {
+	COP400_CKI_DIVISOR_4 = 4,
+	COP400_CKI_DIVISOR_8 = 8,
+	COP400_CKI_DIVISOR_16 = 16
+};
+
+typedef enum _cop400_cko_bond cop400_cko_bond;
+enum _cop400_cko_bond {
+	COP400_CKO_OSCILLATOR_OUTPUT = 0,
+	COP400_CKO_HALT_IO_PORT,
+	COP400_CKO_GENERAL_PURPOSE_INPUT
+};
+
+typedef enum _cop400_microbus cop400_microbus;
+enum _cop400_microbus {
+	COP400_MICROBUS_DISABLED = 0,
+	COP400_MICROBUS_ENABLED
+};
+
+/* interface */
+typedef struct _cop400_interface cop400_interface;
+struct _cop400_interface
+{
+	cop400_cki_bond		cki;			/* CKI bonding option */
+	cop400_cko_bond		cko;			/* CKO bonding option */
+	cop400_microbus		microbus;		/* microbus option */
+};
+#define COP400_INTERFACE(name) const cop400_interface (name) =
+
+/*
+
+	Prefix		Temperature Range
+
+	COP4xx		0C to 70C
+	COP3xx		-40C to +85C
+	COP2xx		-55C to +125C
+
+*/
+
+/* COP 41x */
 extern void cop401_get_info(UINT32 state, cpuinfo *info);
 extern void cop410_get_info(UINT32 state, cpuinfo *info);
 extern void cop411_get_info(UINT32 state, cpuinfo *info);
 
+/* COP 42x */
 extern void cop402_get_info(UINT32 state, cpuinfo *info);
 extern void cop420_get_info(UINT32 state, cpuinfo *info);
 extern void cop421_get_info(UINT32 state, cpuinfo *info);
 extern void cop422_get_info(UINT32 state, cpuinfo *info);
 
+/* COP 44x */
 extern void cop404_get_info(UINT32 state, cpuinfo *info);
+extern void cop424_get_info(UINT32 state, cpuinfo *info);
+extern void cop425_get_info(UINT32 state, cpuinfo *info);
+extern void cop426_get_info(UINT32 state, cpuinfo *info);
 extern void cop444_get_info(UINT32 state, cpuinfo *info);
 extern void cop445_get_info(UINT32 state, cpuinfo *info);
 

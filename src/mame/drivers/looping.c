@@ -56,6 +56,7 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "sound/dac.h"
 #include "sound/5220intf.h"
 #include "video/resnet.h"
+#include "cpu/cop400/cop400.h"
 
 
 /*************************************
@@ -570,7 +571,12 @@ static const struct AY8910interface ay8910_interface =
 	NULL
 };
 
-
+static COP400_INTERFACE( looping_cop_intf )
+{
+	COP400_CKI_DIVISOR_16, // ???
+	COP400_CKO_OSCILLATOR_OUTPUT, // ???
+	COP400_MICROBUS_DISABLED
+};
 
 /*************************************
  *
@@ -594,6 +600,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_CPU_ADD(COP420, COP_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(looping_cop_map,0)
 	MDRV_CPU_DATA_MAP(looping_cop_data_map,0)
+	MDRV_CPU_CONFIG(looping_cop_intf)
 
 	MDRV_MACHINE_START(looping)
 
