@@ -121,14 +121,14 @@ OP(6D) { /* illegal instruction? */ }
 OP(6E) { regs.SP = rdop16(); }
 OP(6F) { /* illegal instruction? */ }
 
-OP(70) { UINT8 ofs8 = rdop(); regs.BA = RD( regs.SP + ofs8 ); }
-OP(71) { UINT8 ofs8 = rdop(); regs.HL = RD( regs.SP + ofs8 ); }
-OP(72) { UINT8 ofs8 = rdop(); regs.X = RD( regs.SP + ofs8 ); }
-OP(73) { UINT8 ofs8 = rdop(); regs.Y = RD( regs.SP + ofs8 ); }
-OP(74) { UINT8 ofs8 = rdop(); WR( regs.SP + ofs8, regs.BA ); }
-OP(75) { UINT8 ofs8 = rdop(); WR( regs.SP + ofs8, regs.HL ); }
-OP(76) { UINT8 ofs8 = rdop(); WR( regs.SP + ofs8, regs.X ); }
-OP(77) { UINT8 ofs8 = rdop(); WR( regs.SP + ofs8, regs.Y ); }
+OP(70) { UINT8 ofs8 = rdop(); regs.BA = rd16( regs.SP + ofs8 ); }
+OP(71) { UINT8 ofs8 = rdop(); regs.HL = rd16( regs.SP + ofs8 ); }
+OP(72) { UINT8 ofs8 = rdop(); regs.X = rd16( regs.SP + ofs8 ); }
+OP(73) { UINT8 ofs8 = rdop(); regs.Y = rd16( regs.SP + ofs8 ); }
+OP(74) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.BA ); }
+OP(75) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.HL ); }
+OP(76) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.X ); }
+OP(77) { UINT8 ofs8 = rdop(); wr16( regs.SP + ofs8, regs.Y ); }
 OP(78) { AD2_I16; regs.SP = rd16( addr2 ); }
 OP(79) { /* illegal instruction? */ }
 OP(7A) { /* illegal instruction? */ }

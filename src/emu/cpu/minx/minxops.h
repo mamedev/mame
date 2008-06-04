@@ -75,7 +75,7 @@ OP(41) { regs.BA = ( regs.BA & 0xFF00 ) | ( regs.BA >> 8 ); }
 OP(42) { regs.BA = ( regs.BA & 0xFF00 ) | ( regs.HL & 0x00FF); }
 OP(43) { regs.BA = ( regs.BA & 0xFF00 ) | ( regs.HL >> 8 ); }
 OP(44) { AD2_IN8; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
-OP(45) { AD2_I16; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
+OP(45) { AD2_IHL; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
 OP(46) { AD2_XIX; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
 OP(47) { AD2_YIY; regs.BA = ( regs.BA & 0xFF00 ) | RD( addr2 ); }
 OP(48) { regs.BA = ( regs.BA & 0x00FF ) | ( ( regs.BA & 0x00FF) << 8 ); }
@@ -83,7 +83,7 @@ OP(49) { regs.BA = ( regs.BA & 0x00FF ) | ( ( regs.BA >> 8 ) << 8 ); }
 OP(4A) { regs.BA = ( regs.BA & 0x00FF ) | ( ( regs.HL & 0x00FF) << 8 ); }
 OP(4B) { regs.BA = ( regs.BA & 0x00FF ) | ( ( regs.HL >> 8 ) << 8 ); }
 OP(4C) { AD2_IN8; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(4D) { AD2_I16; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(4D) { AD2_IHL; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
 OP(4E) { AD2_XIX; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
 OP(4F) { AD2_YIY; regs.BA = ( regs.BA & 0x00FF ) | ( RD( addr2 ) << 8 ); }
 
@@ -92,7 +92,7 @@ OP(51) { regs.HL = ( regs.HL & 0xFF00 ) | ( regs.BA >> 8 ); }
 OP(52) { regs.HL = ( regs.HL & 0xFF00 ) | ( regs.HL & 0x00FF); }
 OP(53) { regs.HL = ( regs.HL & 0xFF00 ) | ( regs.HL >> 8 ); }
 OP(54) { AD2_IN8; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
-OP(55) { AD2_I16; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
+OP(55) { AD2_IHL; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
 OP(56) { AD2_XIX; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
 OP(57) { AD2_YIY; regs.HL = ( regs.HL & 0xFF00 ) | RD( addr2 ); }
 OP(58) { regs.HL = ( regs.HL & 0x00FF ) | ( ( regs.BA & 0x00FF) << 8 ); }
@@ -100,7 +100,7 @@ OP(59) { regs.HL = ( regs.HL & 0x00FF ) | ( ( regs.BA >> 8 ) << 8 ); }
 OP(5A) { regs.HL = ( regs.HL & 0x00FF ) | ( ( regs.HL & 0x00FF) << 8 ); }
 OP(5B) { regs.HL = ( regs.HL & 0x00FF ) | ( ( regs.HL >> 8 ) << 8 ); }
 OP(5C) { AD2_IN8; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
-OP(5D) { AD2_I16; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
+OP(5D) { AD2_IHL; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
 OP(5E) { AD2_XIX; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
 OP(5F) { AD2_YIY; regs.HL = ( regs.HL & 0x00FF ) | ( RD( addr2 ) << 8 ); }
 
@@ -194,9 +194,9 @@ OP(B1) { UINT8 op = rdop(); regs.BA = ( regs.BA & 0x00FF ) | ( op << 8 ); }
 OP(B2) { UINT8 op = rdop(); regs.HL = ( regs.HL & 0xFF00 ) | op; }
 OP(B3) { UINT8 op = rdop(); regs.HL = ( regs.HL & 0x00FF ) | ( op << 8 ); }
 OP(B4) { UINT8 op = rdop(); regs.N = op; }
-OP(B5) { UINT8 op = rdop(); WR( ( regs.I << 16 ) | regs.HL, op); }
-OP(B6) { UINT8 op = rdop(); WR( ( regs.X << 16 ), op ); }
-OP(B7) { UINT8 op = rdop(); WR( ( regs.Y << 16 ), op ); }
+OP(B5) { AD1_IHL; UINT8 op = rdop(); WR( addr1, op); }
+OP(B6) { AD1_XIX; UINT8 op = rdop(); WR( addr1, op ); }
+OP(B7) { AD1_YIY; UINT8 op = rdop(); WR( addr1, op ); }
 OP(B8) { AD2_I16; regs.BA = rd16( addr2 ); }
 OP(B9) { AD2_I16; regs.HL = rd16( addr2 ); }
 OP(BA) { AD2_I16; regs.X = rd16( addr2 ); }
@@ -269,8 +269,8 @@ OP(F8) { regs.PC = POP16(); regs.V = POP8(); }
 OP(F9) { regs.F = POP8(); regs.PC = POP16(); regs.V = POP8(); }
 OP(FA) { regs.PC = POP16() + 2; regs.V = POP8(); }
 OP(FB) { AD1_I16; CALL( rd16( addr1 ) ); }
-OP(FC) { UINT16 i = rdop(); CALL( rd16(i) ); PUSH8( regs.F ); }
-OP(FD) { UINT16 i = rdop() << 1; JMP( i ); /* PUSH8( regs.F );?? */ }
+OP(FC) { UINT8 i = rdop() & 0xFE; CALL( rd16(i) ); PUSH8( regs.F ); }
+OP(FD) { UINT8 i = rdop() & 0xFE; JMP( rd16(i) ); /* PUSH8( regs.F );?? */ }
 OP(FE) { /* illegal operation? */ }
 OP(FF) { }
 
