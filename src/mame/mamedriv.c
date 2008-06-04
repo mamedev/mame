@@ -5822,6 +5822,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ddragonb )	/* bootleg */
 	DRIVER( ddragnba )	/* bootleg */
 	DRIVER( ddgn6809 )	/* bootleg */
+	DRIVER( dd6809a )	/* bootleg */
 	DRIVER( spdodgeb )	/* TA-0022 (c) 1987 */
 	DRIVER( nkdodge )	/* TA-0022 (c) 1987 (Japan) */
 	DRIVER( nkdodgeb )	/* TA-0022 (c) 1987 (Japan) */
