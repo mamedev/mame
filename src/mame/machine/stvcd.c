@@ -44,6 +44,7 @@ static void cd_playdata(void);
 
 #define MAX_FILTERS	(24)
 #define MAX_BLOCKS	(200)
+#define MAX_DIR_SIZE	(16384)
 
 typedef struct
 {
@@ -309,7 +310,7 @@ static void cd_free_block(blockT *blktofree)
 {
 	INT32 i;
 
-	CDROM_LOG(("cd_free_block: %x\n", (UINT32)blktofree))
+	CDROM_LOG(("cd_free_block: %x\n", (UINT32)(FPTR)blktofree))
 
 	for (i = 0; i < 200; i++)
 	{
@@ -1464,7 +1465,7 @@ static void read_new_dir(UINT32 fileno)
 			curroot.name[i] = '\0';	// terminate
 
 			// easy to fix, but make sure we *need* to first
-			if (curroot.length > 14336)
+			if (curroot.length > MAX_DIR_SIZE)
 			{
 				mame_printf_error("ERROR: root directory too big (%d)\n", curroot.length);
 			}
@@ -1475,7 +1476,7 @@ static void read_new_dir(UINT32 fileno)
 	}
 	else
 	{
-		if (curdir[fileno].length > 14336)
+		if (curdir[fileno].length > MAX_DIR_SIZE)
 		{
 			mame_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
 		}
@@ -1488,10 +1489,10 @@ static void make_dir_current(UINT32 fad)
 {
 	int i;
 	UINT32 nextent, numentries;
-	UINT8 sect[14336];
+	UINT8 sect[MAX_DIR_SIZE];
 	direntryT *curentry;
 
-	memset(sect, 0, 14336);
+	memset(sect, 0, MAX_DIR_SIZE);
 	for (i = 0; i < (curroot.length/2048); i++)
 	{
 		cd_readblock(fad+i, &sect[2048*i]);
@@ -1499,7 +1500,7 @@ static void make_dir_current(UINT32 fad)
 
 	nextent = 0;
 	numentries = 0;
-	while (nextent < 14336)
+	while (nextent < MAX_DIR_SIZE)
 	{
 		if (sect[nextent])
 		{
@@ -1508,7 +1509,7 @@ static void make_dir_current(UINT32 fad)
 		}
 		else
 		{
-			nextent = 14336;
+			nextent = MAX_DIR_SIZE;
 		}
 	}
 
