@@ -1558,6 +1558,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/istellar.o \
+	$(DRIVERS)/itgambl2.o \
 	$(DRIVERS)/itgamble.o \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jongkyo.o \

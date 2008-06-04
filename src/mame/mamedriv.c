@@ -8082,13 +8082,25 @@ Other Sun games
 	DRIVER( paranoia )
 	DRIVER( vcombat )   /* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )  /* (c) 1989 Sega? */
+	DRIVER( blackt96 )
+
+	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */
 	DRIVER( laperlag )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( capunc )	/* (c) 2000 Nazionale Elettronica */
 	DRIVER( capcor )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2 )	/* (c) 2001 Nazionale Elettronica */
 	DRIVER( euro2k2a )	/* (c) 2001 Nazionale Elettronica */
-	DRIVER( blackt96 )
+
+	/* H8/3337 italian gambling games */
+	DRIVER( laser2k1 )	/* 200? unknown */
+	DRIVER( mdrink )	/* 200? unknown */
+	DRIVER( ntcash )	/* 200? unknown */
+	DRIVER( wizard )	/* 200? unknown */
+	DRIVER( te0144 )	/* 200? unknown */
+	DRIVER( cmagica )	/* 200? unknown */
+	DRIVER( millsun )	/* 200? unknown */
+	DRIVER( sspac2k1 )	/* 200? unknown */
 
 	/* Astro Corp. */
 	DRIVER( showhand )
