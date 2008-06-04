@@ -16,6 +16,9 @@ Tilemap flip flags were reversed
 
 #include "driver.h"
 
+static bitmap_t *sprite_bitmap;
+
+
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
 
 extern UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
@@ -761,6 +764,9 @@ VIDEO_START(skns)
 	skns_tilemap_B = tilemap_create(get_tilemap_B_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(skns_tilemap_B,0);
 
+	sprite_bitmap = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+
+
 	machine->gfx[2]->color_granularity=256;
 	machine->gfx[3]->color_granularity=256;
 }
@@ -962,8 +968,60 @@ VIDEO_UPDATE(skns)
 
 	}
 
+	fillbitmap(sprite_bitmap, 0x0000, cliprect);
+	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
 
-	skns_draw_sprites(screen->machine, bitmap, cliprect);
+	{
+		int x,y;
+		const pen_t *paldata = screen->machine->pens;
+
+		for (y=0;y<240;y++)
+		{
+			UINT16* src;
+			UINT32* dst;
+
+			src = BITMAP_ADDR16(sprite_bitmap,y,0);
+			dst = BITMAP_ADDR32(bitmap,y,0);
+
+			for (x=0;x<320;x++)
+			{
+				UINT16 pen = src[x]&0x7fff;
+				UINT16 palvalue = skns_palette_ram[pen];
+
+				if (palvalue&0x8000)
+				{
+					//UINT8 alpha = 0x00 & 0xff;
+					UINT32 srccolour = dst[x];
+					UINT32 dstcolour = paldata[pen];
+
+					int r,g,b;
+					int r2,g2,b2;
+
+					r = (srccolour & 0x000000ff)>> 0;
+					g = (srccolour & 0x0000ff00)>> 8;
+					b = (srccolour & 0x00ff0000)>> 16;
+
+					r2 = (dstcolour & 0x000000ff)>> 0;
+					g2 = (dstcolour & 0x0000ff00)>> 8;
+					b2 = (dstcolour & 0x00ff0000)>> 16;
+
+					r = (r+r2) / 2;
+					g = (g+g2) / 2;
+					b = (b+b2) / 2;
+
+					if (pen) dst[x] = (r << 0) | (g << 8) | (b << 16);
+
+				}
+				else
+				{
+					if (pen) dst[x] = paldata[pen];
+				}
+
+			}
+		}
+
+	}
+
 	return 0;
 }
 
