@@ -4446,6 +4446,77 @@ ROM_START( inca )
 	ROM_LOAD( "n82s147n.1",  0x200, 0x200, CRC(618dbeb3) SHA1(10c8a558430fd1c2cabf9133d3e4f0a5f80eab83) )
 ROM_END
 
+/*
+
+Black Touch
+
+
+PCB Layout
+----------
+
+YANG GI CO LTD
+432605-0003
+|----------------------------------------|
+|      DSW1    DSW2   DIP40              |
+|      YM2203                            |
+|                 41264  41264           |
+| 82S147          41264  41264           |
+| 82S147          41264  41264           |
+|       22.1184MHz                       |
+|J        Z80                            |
+|A        10D                            |
+|M        8D           DIP40             |
+|M        6264                           |
+|A                                       |
+|         GM68B45S                       |
+|                                        |
+|                                        |
+|                                        |
+|                                        |
+|                        G1   H1    I1   |
+|----------------------------------------|
+Notes:
+      Z80 clock 5.5296MHz [22.1184/4]
+      YM2203 clock 2.7648MHz [22.1184/8]
+      DIP40 - surface scratched, unknown
+
+ */
+
+ROM_START( blktouch )
+	ROM_REGION( 0x90000, REGION_CPU1, 0 )	// Z80 Code
+	ROM_LOAD( "u43_d8",  0x00000, 0x10000, CRC(0972ab8c) SHA1(ff751fbb37562f216a4fddebd9190acee1f357c8) )
+	ROM_LOAD( "u45_d10", 0x28000, 0x10000, CRC(5745424a) SHA1(d244d9a9b4c49d255f114842147ba0a795a3e9ac) )
+
+	ROM_REGION( 0xc0000, REGION_GFX1, 0 )
+	ROM_LOAD( "u33_g1", 0x80000, 0x40000, CRC(88737a8b) SHA1(9d812ee732f6cc43c78d8585dabf1b51ed4b89ba) )
+	ROM_LOAD( "u34_h1", 0x40000, 0x40000, CRC(07216e11) SHA1(402b201c665503a2c9bb1b2f74da0c3db5c3f660) )
+	ROM_LOAD( "u35_i1", 0x00000, 0x40000, CRC(4ae52ccb) SHA1(84c9466e6f574ec99947084a2e8a336935ad4186) )
+
+	ROM_REGION( 0x400, REGION_PROMS, ROMREGION_DISPOSE )	// Color PROMs
+	ROM_LOAD( "u12",  0x200, 0x200, CRC(80d282ff) SHA1(3ad8dc61fe098ceac3a4be8742c1b360dfa7223a) )
+	ROM_LOAD( "u13",  0x000, 0x200, CRC(6984aaa9) SHA1(91645cd944cb21266edd13e55a8dc846f6edc419) )
+ROM_END
+
+static DRIVER_INIT( blktouch )
+{
+	// fearsome encryption ;-)
+	UINT8	*src = (UINT8 *)memory_region(REGION_CPU1);
+	int i;
+
+	for (i=0;i<0x90000;i++)
+	{
+		src[i] = BITSWAP8(src[i],7,6,5,3,4,2,1,0);
+
+	}
+
+	src = (UINT8 *)memory_region(REGION_GFX1);
+
+	for (i=0;i<0xc0000;i++)
+	{
+		src[i] = BITSWAP8(src[i],7,6,5,3,4,2,1,0);
+
+	}
+}
 
 static DRIVER_INIT( maya )
 {
@@ -6078,6 +6149,11 @@ GAME( 1989, hnkochou, hanamai,  hanamai,  hnkochou, 0,        ROT180, "Dynax",  
 GAME( 1989, hnoridur, 0,        hnoridur, hnoridur, 0,        ROT180, "Dynax",                    "Hana Oriduru (Japan)",                                         0 )
 GAME( 1989, drgpunch, 0,        sprtmtch, sprtmtch, 0,        ROT0,   "Dynax",                    "Dragon Punch (Japan)",                                         0 )
 GAME( 1989, sprtmtch, drgpunch, sprtmtch, sprtmtch, 0,        ROT0,   "Dynax (Fabtek license)",   "Sports Match",                                                 0 )
+/* these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match */
+GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya",                                                         0 )
+GAME( 199?, inca,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",                "Inca",                                                         0 )
+GAME( 199?, blktouch, 0,        sprtmtch, sprtmtch, blktouch, ROT0,   "Yang Gi Co Ltd.",          "Black Touch (Korea)",                                          0 )
+
 GAME( 1989, mjfriday, 0,        mjfriday, mjfriday, 0,        ROT180, "Dynax",                    "Mahjong Friday (Japan)",                                       0 )
 GAME( 1990, mcnpshnt, 0,        mcnpshnt, mcnpshnt, 0,        ROT0,   "Dynax",                    "Mahjong Campus Hunting (Japan)",                               0 )
 GAME( 1990, 7jigen,   0,        nanajign, nanajign, 0,        ROT180, "Dynax",                    "7jigen no Youseitachi - Mahjong 7 Dimensions (Japan)",         GAME_IMPERFECT_GRAPHICS )
@@ -6085,8 +6161,6 @@ GAME( 1991, mjdialq2, 0,        mjdialq2, mjdialq2, 0,        ROT180, "Dynax",  
 GAME( 1991, yarunara, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Yarunara (Japan)",                                     0 )
 GAME( 1991, mjangels, 0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Angels - Comic Theater Vol.2 (Japan)",                 0 )
 GAME( 1992, quiztvqq, 0,        yarunara, quiztvqq, 0,        ROT180, "Dynax",                    "Quiz TV Gassyuukoku Q&Q (Japan)",                              0 )
-GAME( 1994, maya,     0,        sprtmtch, sprtmtch, maya,     ROT0,   "Promat",                   "Maya",                                                         0 )
-GAME( 199?, inca,     maya,     sprtmtch, sprtmtch, maya,     ROT0,   "<unknown>",                "Inca",                                                         0 )
 GAME( 1990, jantouki, 0,        jantouki, jantouki, 0,        ROT0,   "Dynax",                    "Jong Tou Ki (Japan)",                                          0 )
 GAME( 1993, mjelctrn, 0,        mjelctrn, mjelctrn, mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 4, Japan)",                   0 )
 GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, Japan)",                   0 )
