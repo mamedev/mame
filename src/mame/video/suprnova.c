@@ -35,6 +35,10 @@ static int old_depthB=0, depthB=0;
 static int sprite_kludge_x=0, sprite_kludge_y=0;
 static int use_spc_bright, use_v3_bright;
 static UINT8 bright_spc_b=0x00, bright_spc_g=0x00, bright_spc_r=0x00;
+
+static UINT8 bright_spc_b_trans=0x00, bright_spc_g_trans=0x00, bright_spc_r_trans=0x00;
+
+
 static UINT8 bright_v3_b=0x00,  bright_v3_g=0x00,  bright_v3_r=0x00;
 
 
@@ -59,18 +63,26 @@ WRITE32_HANDLER ( skns_pal_regs_w )
 			bright_spc_g = data&0xff;
 			spc_changed = 1;
 		}
+		bright_spc_g_trans = (data>>8) &0xff;
+
+
 		break;
 	case (0x08/4): // RWRA2
 		if( bright_spc_r != (data&0xff) ) {
 			bright_spc_r = data&0xff;
 			spc_changed = 1;
 		}
+		bright_spc_r_trans = (data>>8) &0xff;
+
 		break;
 	case (0x0C/4): // RWRA3
 		if( bright_spc_b != (data&0xff) ) {
 			bright_spc_b = data&0xff;
 			spc_changed = 1;
 		}
+		bright_spc_b_trans = (data>>8)&0xff;
+
+
 		break;
 
 	case (0x10/4): // RWRB0
@@ -990,7 +1002,6 @@ VIDEO_UPDATE(skns)
 
 				if (palvalue&0x8000)
 				{
-					//UINT8 alpha = 0x00 & 0xff;
 					UINT32 srccolour = dst[x];
 					UINT32 dstcolour = paldata[pen];
 
@@ -1005,9 +1016,18 @@ VIDEO_UPDATE(skns)
 					g2 = (dstcolour & 0x0000ff00)>> 8;
 					b2 = (dstcolour & 0x00ff0000)>> 16;
 
-					r = (r+r2) / 2;
-					g = (g+g2) / 2;
-					b = (b+b2) / 2;
+					r2 = (r2 * bright_spc_r_trans) >> 8;
+					g2 = (g2 * bright_spc_g_trans) >> 8;
+					b2 = (b2 * bright_spc_b_trans) >> 8;
+
+					r = (r+r2);
+					if (r>255) r = 255;
+
+					g = (g+g2);
+					if (g>255) g = 255;
+
+					b = (b+b2);
+					if (b>255) b = 255;
 
 					if (pen) dst[x] = (r << 0) | (g << 8) | (b << 16);
 
