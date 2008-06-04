@@ -53,13 +53,23 @@ INLINE UINT16 ADDC16( UINT16 arg1, UINT16 arg2 )
 
 INLINE UINT8 INC8( UINT8 arg )
 {
-	return ADD8( arg, 1 );
+	UINT8 old_F = regs.F;
+	UINT8 res = ADD8( arg, 1 );
+	regs.F = ( old_F & ~ ( FLAG_Z ) )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
+	return res;
 }
 
 
 INLINE UINT16 INC16( UINT16 arg )
 {
-	return ADD16( arg, 1 );
+	UINT8 old_F = regs.F;
+	UINT16 res = ADD16( arg, 1 );
+	regs.F = ( old_F & ~ ( FLAG_Z ) )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
+	return res;
 }
 
 
@@ -117,19 +127,33 @@ INLINE UINT16 SUBC16( UINT16 arg1, UINT16 arg2 )
 
 INLINE UINT8 DEC8( UINT8 arg )
 {
-	return SUB8( arg, 1 );
+	UINT8 old_F = regs.F;
+	UINT8 res = SUB8( arg, 1 );
+	regs.F = ( old_F & ~ ( FLAG_Z ) )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
+	return res;
 }
 
 
 INLINE UINT16 DEC16( UINT16 arg )
 {
-	return SUB16( arg, 1 );
+	UINT8 old_F = regs.F;
+	UINT16 res = SUB16( arg, 1 );
+	regs.F = ( old_F & ~ ( FLAG_Z ) )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
+	return res;
 }
 
 
 INLINE UINT8 AND8( UINT8 arg1, UINT8 arg2 )
 {
 	UINT8 res = arg1 & arg2;
+	regs.F = ( regs.F & ~ ( FLAG_S | FLAG_Z ) )
+		| ( ( res & 0x80 ) ? FLAG_S : 0 )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
 	return res;
 }
 
@@ -137,6 +161,10 @@ INLINE UINT8 AND8( UINT8 arg1, UINT8 arg2 )
 INLINE UINT8 OR8( UINT8 arg1, UINT8 arg2 )
 {
 	UINT8 res = arg1 | arg2;
+	regs.F = ( regs.F & ~ ( FLAG_S | FLAG_Z ) )
+		| ( ( res & 0x80 ) ? FLAG_S : 0 )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
 	return res;
 }
 
@@ -144,6 +172,10 @@ INLINE UINT8 OR8( UINT8 arg1, UINT8 arg2 )
 INLINE UINT8 XOR8( UINT8 arg1, UINT8 arg2 )
 {
 	UINT8 res = arg1 ^ arg2;
+	regs.F = ( regs.F & ~ ( FLAG_S | FLAG_Z ) )
+		| ( ( res & 0x80 ) ? FLAG_S : 0 )
+		| ( ( res ) ? 0 : FLAG_Z )
+	;
 	return res;
 }
 
