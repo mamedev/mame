@@ -96,6 +96,17 @@ INLINE input_code input_seq_get_last(const input_seq *seq)
 	return (length == 0) ? SEQCODE_END : seq->code[length - 1];
 }
 
+/*-------------------------------------------------
+    input_seq_get_last_but_one - return the 
+    last_but_one code in a sequence
+-------------------------------------------------*/
+
+INLINE input_code input_seq_get_last_but_one(const input_seq *seq)
+{
+	int length = input_seq_length(seq);
+	return (length < 2) ? SEQCODE_END : seq->code[length - 2];
+}
+
 
 /*-------------------------------------------------
     input_seq_backspace - "backspace" over the
@@ -302,6 +313,7 @@ void input_seq_poll_start(input_item_class itemclass, const input_seq *startseq)
 int input_seq_poll(input_seq *finalseq)
 {
 	input_code lastcode = input_seq_get_last(&record_seq);
+	int has_or = FALSE;
 	input_code newcode;
 
 	/* switch case: see if we have a new code to process */
@@ -328,6 +340,11 @@ int input_seq_poll(input_seq *finalseq)
 	/* absolute/relative case: see if we have an analog change of sufficient amount */
 	else
 	{
+		if (lastcode == SEQCODE_OR)
+		{
+			lastcode = input_seq_get_last_but_one(&record_seq);
+			has_or = TRUE;
+		}
 		newcode = input_code_poll_axes(FALSE);
 
 		/* if the last code doesn't match absolute/relative of this code, ignore the new one */
@@ -339,6 +356,7 @@ int input_seq_poll(input_seq *finalseq)
 		{
 			/* if code is duplicate and an absolute control, toggle to half axis */
 			if (input_seq_length(&record_seq) > 0 && INPUT_CODE_ITEMCLASS(newcode) == ITEM_CLASS_ABSOLUTE)
+			{
 				if (newcode == INPUT_CODE_SET_MODIFIER(lastcode, ITEM_MODIFIER_NONE))
 				{
 					/* increment the modifier, wrapping back to none */
@@ -347,8 +365,11 @@ int input_seq_poll(input_seq *finalseq)
 					newcode = INPUT_CODE_SET_MODIFIER(newcode, newmod);
 
 					/* back up over the previous code so we can re-append */
+					if (has_or)
+						input_seq_backspace(&record_seq);
 					input_seq_backspace(&record_seq);
 				}
+			}
 		}
 	}
 
@@ -360,7 +381,7 @@ int input_seq_poll(input_seq *finalseq)
 	}
 
 	/* if we're recorded at least one item and the RECORD_TIME has passed, we're done */
-	if (record_last != 0 && osd_ticks() > record_last + RECORD_TIME)
+	if (record_last != 0 && (osd_ticks() > record_last + RECORD_TIME))
 	{
 		/* if the final result is invalid, reset to nothing */
 		if (!input_seq_is_valid(&record_seq))
