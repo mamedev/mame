@@ -108,6 +108,17 @@ To Do:
 
 /***************************************************************************
 
+                                 General
+
+***************************************************************************/
+
+static struct
+{
+	const device_config *duart68681;
+} tmaster_devices;
+
+/***************************************************************************
+
                                    Sound
 
 ***************************************************************************/
@@ -134,24 +145,22 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 ***************************************************************************/
 
-static void duart_irq_handler(running_machine *machine, int vector)
+static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpunum_set_input_line_and_vector(machine, 0, 4, HOLD_LINE, vector);
+	cpunum_set_input_line_and_vector(device->machine, 0, 4, HOLD_LINE, vector);
 };
 
-static void duart_tx(int channel, UINT8 data)
+static void duart_tx(const device_config *device, int channel, UINT8 data)
 {
 	if ( channel == 0 )
 	{
-		//logerror( "duart->microtouch: %02x %c\n", data, (char)data);
 		microtouch_rx(1, &data);
 	}
 };
 
 static void microtouch_tx(UINT8 data)
 {
-	//logerror( "microtouch->duart: %02x %c\n", data, (char)data);
-	duart_68681_rx_data(Machine, 0, data);
+	duart68681_rx_data(tmaster_devices.duart68681, 0, data);
 }
 
 
@@ -432,7 +441,7 @@ static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x300010, 0x300011 ) AM_READ( tmaster_coins_r )
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_READWRITE( duart_68681_r, duart_68681_w )
+	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 
 	AM_RANGE( 0x300040, 0x300041 ) AM_WRITE( tmaster_oki_bank_w )
 
@@ -736,8 +745,12 @@ INPUT_PORTS_END
 
 static MACHINE_START( tmaster )
 {
-	duart_68681_init(0, duart_irq_handler, duart_tx);
 	microtouch_init(microtouch_tx, 0);
+}
+
+static MACHINE_RESET( tmaster )
+{
+	tmaster_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
 }
 
 static INTERRUPT_GEN( tm3k_interrupt )
@@ -750,12 +763,26 @@ static INTERRUPT_GEN( tm3k_interrupt )
 	}
 }
 
+static const duart68681_config tmaster_duart68681_config =
+{
+	XTAL_8_664MHz / 2, //??
+	duart_irq_handler,
+	duart_tx,
+	NULL,
+	NULL
+};
+
 static MACHINE_DRIVER_START( tm3k )
 	MDRV_CPU_ADD_TAG("main", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(tmaster_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+20) // ??
 
 	MDRV_MACHINE_START(tmaster)
+	MDRV_MACHINE_RESET(tmaster)
+
+	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
+	MDRV_DEVICE_CONFIG( tmaster_duart68681_config )
+
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 

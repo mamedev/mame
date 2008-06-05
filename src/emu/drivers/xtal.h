@@ -64,6 +64,7 @@ enum
 	XTAL_7_15909MHz   	= 7159090,		/* Blood Bros */
 	XTAL_7_3728MHz   	= 7372800,
 	XTAL_8MHz    		= 8000000,		/* Extremely common, used on 100's of PCBs */
+	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
