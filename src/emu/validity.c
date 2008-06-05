@@ -28,6 +28,19 @@
 
 
 /***************************************************************************
+    COMPILE-TIME VALIDATION
+***************************************************************************/
+
+/* if the following lines error during compile, your PTR64 switch is set incorrectly in the makefile */
+#ifdef PTR64
+UINT8 your_ptr64_flag_is_wrong[(int)(sizeof(void *) - 7)];
+#else
+UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
+#endif
+
+
+
+/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
