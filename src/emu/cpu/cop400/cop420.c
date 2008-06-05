@@ -226,6 +226,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(cop420_counter_tick)
 {
+	cpuintrf_push_context(param);
 	R.counter++;
 
 	if (R.counter == 1024)
@@ -233,15 +234,18 @@ static TIMER_CALLBACK(cop420_counter_tick)
 		R.counter = 0;
 		R.timerlatch = 1;
 	}
+	cpuintrf_pop_context();
 }
 
 /* IN Latches */
 
 static TIMER_CALLBACK(cop420_inil_tick)
 {
-	UINT8 in = IN_IN();
+	UINT8 in;
 	int i;
 
+	cpuintrf_push_context(param);
+	in = IN_IN();
 	for (i = 0; i < 4; i++)
 	{
 		R.in[i] = (R.in[i] << 1) | BIT(in, i);
@@ -251,14 +255,17 @@ static TIMER_CALLBACK(cop420_inil_tick)
 			IL |= (1 << i);
 		}
 	}
+	cpuintrf_pop_context();
 }
 
 /* Microbus */
 
 static TIMER_CALLBACK(cop420_microbus_tick)
 {
-	UINT8 in = IN_IN();
+	UINT8 in;
 
+	cpuintrf_push_context(param);
+	in = IN_IN();
 	if (!BIT(in, 2))
 	{
 		// chip select
@@ -280,6 +287,7 @@ static TIMER_CALLBACK(cop420_microbus_tick)
 			R.microbus_int = 0;
 		}
 	}
+	cpuintrf_pop_context();
 }
 
 /****************************************************************************
