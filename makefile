@@ -111,9 +111,6 @@ endif
 # a native backend
 # FORCE_DRC_C_BACKEND = 1
 
-# uncomment next line to use DRC PowerPC engine
-X86_PPC_DRC = 1
-
 
 
 #-------------------------------------------------
@@ -158,11 +155,6 @@ BUILD_ZLIB = 1
 #-------------------------------------------------
 # sanity check the configuration
 #-------------------------------------------------
-
-# disable DRC cores for 64-bit builds
-ifdef PTR64
-X86_PPC_DRC =
-endif
 
 # specify a default optimization level if none explicitly stated
 ifndef OPTIMIZE

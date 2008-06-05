@@ -297,7 +297,7 @@ exception:
 }
 
 #if (HAS_PPC602||HAS_PPC603)
-static int ppc_translate_address_cb(int space, int intention, offs_t *addr)
+static int ppc_translate_address_cb(int space, offs_t *addr)
 {
 	int success = 1;
 

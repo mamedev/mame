@@ -132,49 +132,29 @@
 #define UML_SETFMOD(block, mode)							do { drcuml_block_append_1(block, DRCUML_OP_SETFMOD, 4, IF_ALWAYS,  mode); } while (0)
 #define UML_GETFMOD(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETFMOD, 4, IF_ALWAYS,  dst); } while (0)
 #define UML_GETEXP(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_GETEXP,  4, IF_ALWAYS,  dst); } while (0)
+#define UML_GETFLGS(block, dst, flags)						do { drcuml_block_append_1(block, DRCUML_OP_GETFLGS, 4, flags,      dst); } while (0)
 #define UML_SAVE(block, dst)								do { drcuml_block_append_1(block, DRCUML_OP_SAVE,    4, IF_ALWAYS,  MEM(dst)); } while (0)
 #define UML_RESTORE(block, src)								do { drcuml_block_append_1(block, DRCUML_OP_RESTORE, 4, IF_ALWAYS,  MEM(src)); } while (0)
 
 
 /* ----- 32-Bit Integer Operations ----- */
-#define UML_LOAD1U(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_LOAD1U,  4, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_LOAD1S(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_LOAD1S,  4, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_LOAD2U(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_LOAD2U,  4, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_LOAD2S(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_LOAD2S,  4, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_LOAD4(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_LOAD4U,  4, IF_ALWAYS,  dst, MEM(base), index); } while (0)
+#define UML_LOAD(block, dst, base, index, size)				do { drcuml_block_append_4(block, DRCUML_OP_LOAD,    4, IF_ALWAYS,  dst, MEM(base), index, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_LOADS(block, dst, base, index, size)			do { drcuml_block_append_4(block, DRCUML_OP_LOADS,   4, IF_ALWAYS,  dst, MEM(base), index, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_STORE(block, base, index, src1, size)			do { drcuml_block_append_4(block, DRCUML_OP_STORE,   4, IF_ALWAYS,  MEM(base), index, src1, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_READ(block, dst, src1, spsize)					do { drcuml_block_append_3(block, DRCUML_OP_READ,    4, IF_ALWAYS,  dst, src1, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
+#define UML_READM(block, dst, src1, mask, spsize)			do { drcuml_block_append_4(block, DRCUML_OP_READM,   4, IF_ALWAYS,  dst, src1, mask, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
+#define UML_WRITE(block, dst, src1, spsize)					do { drcuml_block_append_3(block, DRCUML_OP_WRITE,   4, IF_ALWAYS,  dst, src1, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
+#define UML_WRITEM(block, dst, src1, mask, spsize)			do { drcuml_block_append_4(block, DRCUML_OP_WRITEM,  4, IF_ALWAYS,  dst, src1, mask, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
 
-#define UML_STORE1(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE1,  4, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-#define UML_STORE2(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE2,  4, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-#define UML_STORE4(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE4,  4, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-
-#define UML_READ1U(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_READ1U,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_READ1S(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_READ1S,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_READ2U(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_READ2U,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_READ2S(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_READ2S,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_READ2M(block, dst, space, src1, mask)			do { drcuml_block_append_4(block, DRCUML_OP_READ2M,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1, mask); } while (0)
-#define UML_READ4(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_READ4U,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_READ4M(block, dst, space, src1, mask)			do { drcuml_block_append_4(block, DRCUML_OP_READ4M,  4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1, mask); } while (0)
-
-#define UML_WRITE1(block, space, dst, src1)					do { drcuml_block_append_3(block, DRCUML_OP_WRITE1,  4, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_WRITE2(block, space, dst, src1)					do { drcuml_block_append_3(block, DRCUML_OP_WRITE2,  4, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_WRIT2M(block, space, dst, mask, src1)			do { drcuml_block_append_4(block, DRCUML_OP_WRIT2M,  4, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, mask, src1); } while (0)
-#define UML_WRITE4(block, space, dst, src1)					do { drcuml_block_append_3(block, DRCUML_OP_WRITE4,  4, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_WRIT4M(block, space, dst, mask, src1)			do { drcuml_block_append_4(block, DRCUML_OP_WRIT4M,  4, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, mask, src1); } while (0)
-
-#define UML_FLAGS(block, dst, mask, table)					do { drcuml_block_append_3(block, DRCUML_OP_FLAGS,   4, IF_ALWAYS,  dst, IMM(mask), MEM(table)); } while (0)
-#define UML_SETC(block, src, bitnum)						do { drcuml_block_append_2(block, DRCUML_OP_SETC,    4, IF_ALWAYS,  src, bitnum); } while (0)
+#define UML_CARRY(block, src, bitnum)						do { drcuml_block_append_2(block, DRCUML_OP_CARRY,   4, IF_ALWAYS,  src, bitnum); } while (0)
+#define UML_SETc(block, cond, dst)							do { drcuml_block_append_1(block, DRCUML_OP_SET,     4, cond,       dst); } while (0)
 
 #define UML_MOV(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_MOV,     4, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_MOVc(block, cond, dst, src1)					do { drcuml_block_append_2(block, DRCUML_OP_MOV,     4, cond,       dst, src1); } while (0)
+#define UML_SEXT(block, dst, src1, size)					do { drcuml_block_append_3(block, DRCUML_OP_SEXT,    4, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size)); } while (0)
 
-#define UML_ZEXT1(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_ZEXT1,   4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_ZEXT2(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_ZEXT2,   4, IF_ALWAYS,  dst, src1); } while (0)
-
-#define UML_SEXT1(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_SEXT1,   4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_SEXT2(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_SEXT2,   4, IF_ALWAYS,  dst, src1); } while (0)
-
-#define UML_XTRACT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_XTRACT,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
-#define UML_INSERT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_INSERT,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_ROLAND(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_ROLAND,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_ROLINS(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_ROLINS,  4, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 
 #define UML_NEG(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_NEG,     4, FLAGS_NONE, dst, src1); } while (0)
 #define UML_NEGf(block, dst, src1, flags)					do { drcuml_block_append_2(block, DRCUML_OP_NEG,     4, flags,      dst, src1); } while (0)
@@ -238,53 +218,23 @@
 
 
 /* ----- 64-Bit Integer Operations ----- */
-#define UML_DLOAD1U(block, dst, base, index)				do { drcuml_block_append_3(block, DRCUML_OP_LOAD1U,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_DLOAD1S(block, dst, base, index)				do { drcuml_block_append_3(block, DRCUML_OP_LOAD1S,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_DLOAD2U(block, dst, base, index)				do { drcuml_block_append_3(block, DRCUML_OP_LOAD2U,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_DLOAD2S(block, dst, base, index)				do { drcuml_block_append_3(block, DRCUML_OP_LOAD2S,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_DLOAD4U(block, dst, base, index)				do { drcuml_block_append_3(block, DRCUML_OP_LOAD4U,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_DLOAD4S(block, dst, base, index)				do { drcuml_block_append_3(block, DRCUML_OP_LOAD4S,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
-#define UML_DLOAD8(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_LOAD8U,  8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
+#define UML_DLOAD(block, dst, base, index, size)			do { drcuml_block_append_4(block, DRCUML_OP_LOAD,    8, IF_ALWAYS,  dst, MEM(base), index, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_DLOADS(block, dst, base, index, size)			do { drcuml_block_append_4(block, DRCUML_OP_LOADS,   8, IF_ALWAYS,  dst, MEM(base), index, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_DSTORE(block, base, index, src1, size)			do { drcuml_block_append_4(block, DRCUML_OP_STORE,   8, IF_ALWAYS,  MEM(base), index, src1, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_DREAD(block, dst, src1, spsize)					do { drcuml_block_append_3(block, DRCUML_OP_READ,    8, IF_ALWAYS,  dst, src1, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
+#define UML_DREADM(block, dst, src1, mask, spsize)			do { drcuml_block_append_4(block, DRCUML_OP_READM,   8, IF_ALWAYS,  dst, src1, mask, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
+#define UML_DWRITE(block, dst, src1, spsize)				do { drcuml_block_append_3(block, DRCUML_OP_WRITE,   8, IF_ALWAYS,  dst, src1, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
+#define UML_DWRITEM(block, dst, src1, mask, spsize)			do { drcuml_block_append_4(block, DRCUML_OP_WRITEM,  8, IF_ALWAYS,  dst, src1, mask, IMM(DRCUML_SPSIZE_##spsize)); } while (0)
 
-#define UML_DSTORE1(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE1,  8, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-#define UML_DSTORE2(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE2,  8, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-#define UML_DSTORE4(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE4,  8, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-#define UML_DSTORE8(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_STORE8,  8, IF_ALWAYS,  MEM(base), index, src1); } while (0)
-
-#define UML_DREAD1U(block, dst, space, src1)				do { drcuml_block_append_3(block, DRCUML_OP_READ1U,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD1S(block, dst, space, src1)				do { drcuml_block_append_3(block, DRCUML_OP_READ1S,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD2U(block, dst, space, src1)				do { drcuml_block_append_3(block, DRCUML_OP_READ2U,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD2S(block, dst, space, src1)				do { drcuml_block_append_3(block, DRCUML_OP_READ2S,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD2M(block, dst, space, src1, mask)			do { drcuml_block_append_4(block, DRCUML_OP_READ2M,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1, mask); } while (0)
-#define UML_DREAD4U(block, dst, space, src1)				do { drcuml_block_append_3(block, DRCUML_OP_READ4U,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD4S(block, dst, space, src1)				do { drcuml_block_append_3(block, DRCUML_OP_READ4S,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD4M(block, dst, space, src1, mask)			do { drcuml_block_append_4(block, DRCUML_OP_READ4M,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1, mask); } while (0)
-#define UML_DREAD8(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_READ8U,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_DREAD8M(block, dst, space, src1, mask)			do { drcuml_block_append_4(block, DRCUML_OP_READ8M,  8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1, mask); } while (0)
-
-#define UML_DWRITE1(block, space, dst, src1)				do { drcuml_block_append_3(block, DRCUML_OP_WRITE1,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_DWRITE2(block, space, dst, src1)				do { drcuml_block_append_3(block, DRCUML_OP_WRITE2,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_DWRIT2M(block, space, dst, mask, src1)			do { drcuml_block_append_4(block, DRCUML_OP_WRIT2M,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, mask, src1); } while (0)
-#define UML_DWRITE4(block, space, dst, src1)				do { drcuml_block_append_3(block, DRCUML_OP_WRITE4,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_DWRIT4M(block, space, dst, mask, src1)			do { drcuml_block_append_4(block, DRCUML_OP_WRIT4M,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, mask, src1); } while (0)
-#define UML_DWRITE8(block, space, dst, src1)				do { drcuml_block_append_3(block, DRCUML_OP_WRITE8,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
-#define UML_DWRIT8M(block, space, dst, mask, src1)			do { drcuml_block_append_4(block, DRCUML_OP_WRIT8M,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, mask, src1); } while (0)
-
-#define UML_DFLAGS(block, dst, mask, table)					do { drcuml_block_append_3(block, DRCUML_OP_FLAGS,   8, IF_ALWAYS,  dst, IMM(mask), MEM(table)); } while (0)
+#define UML_DCARRY(block, src, bitnum)						do { drcuml_block_append_2(block, DRCUML_OP_CARRY,   8, IF_ALWAYS,  src, bitnum); } while (0)
+#define UML_DSETc(block, cond, dst)							do { drcuml_block_append_1(block, DRCUML_OP_SET,     8, cond,       dst); } while (0)
 
 #define UML_DMOV(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_MOV,     8, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_DMOVc(block, cond, dst, src1)					do { drcuml_block_append_2(block, DRCUML_OP_MOV,     8, cond,       dst, src1); } while (0)
+#define UML_DSEXT(block, dst, src1, size)					do { drcuml_block_append_3(block, DRCUML_OP_SEXT,    8, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size)); } while (0)
 
-#define UML_DZEXT1(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_ZEXT1,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_DZEXT2(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_ZEXT2,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_DZEXT4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_ZEXT4,   8, IF_ALWAYS,  dst, src1); } while (0)
-
-#define UML_DSEXT1(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT1,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_DSEXT2(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT2,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_DSEXT4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_SEXT4,   8, IF_ALWAYS,  dst, src1); } while (0)
-
-#define UML_DXTRACT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_XTRACT,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
-#define UML_DINSERT(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_INSERT,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_DROLAND(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_ROLAND,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
+#define UML_DROLINS(block, dst, src, shift, mask)			do { drcuml_block_append_4(block, DRCUML_OP_ROLINS,  8, IF_ALWAYS,  dst, src, shift, mask); } while (0)
 
 #define UML_DNEG(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_NEG,     8, FLAGS_NONE, dst, src1); } while (0)
 #define UML_DNEGf(block, dst, src1, flags)					do { drcuml_block_append_2(block, DRCUML_OP_NEG,     8, flags,      dst, src1); } while (0)
@@ -348,26 +298,15 @@
 #define UML_FSLOAD(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_FLOAD,   4, IF_ALWAYS,  dst, MEM(base), index); } while (0)
 #define UML_FSSTORE(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_FSTORE,  4, IF_ALWAYS,  MEM(base), index, src1); } while (0)
 
-#define UML_FSREAD(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_FREAD,   4, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_FSWRITE(block, space, dst, src1)				do { drcuml_block_append_3(block, DRCUML_OP_FWRITE,  4, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
+#define UML_FSREAD(block, dst, src1, space)					do { drcuml_block_append_3(block, DRCUML_OP_FREAD,   4, IF_ALWAYS,  dst, src1, IMM(ADDRESS_SPACE_##space)); } while (0)
+#define UML_FSWRITE(block, dst, src1, space)				do { drcuml_block_append_3(block, DRCUML_OP_FWRITE,  4, IF_ALWAYS,  dst, src1, IMM(ADDRESS_SPACE_##space)); } while (0)
 
 #define UML_FSMOV(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_FMOV,    4, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_FSMOVc(block, cond, dst, src1)					do { drcuml_block_append_2(block, DRCUML_OP_FMOV,    4, cond,       dst, src1); } while (0)
 
-#define UML_FSTOI4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4,   4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI4T(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4T,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI4R(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4R,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI4C(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4C,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI4F(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4F,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI8(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8,   4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI8T(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8T,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI8R(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8R,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI8C(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8C,  4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSTOI8F(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8F,  4, IF_ALWAYS,  dst, src1); } while (0)
-
-#define UML_FSFRFD(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FFRFD,   4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSFRI4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FFRI4,   4, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FSFRI8(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FFRI8,   4, IF_ALWAYS,  dst, src1); } while (0)
+#define UML_FSTOINT(block, dst, src1, size, round)			do { drcuml_block_append_4(block, DRCUML_OP_FTOINT,  4, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size), IMM(DRCUML_FMOD_##round)); } while (0)
+#define UML_FSFRINT(block, dst, src1, size)					do { drcuml_block_append_3(block, DRCUML_OP_FFRINT,  4, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_FSFRFLT(block, dst, src1, size)					do { drcuml_block_append_3(block, DRCUML_OP_FFRFLT,  4, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size)); } while (0)
 
 #define UML_FSADD(block, dst, src1, src2)					do { drcuml_block_append_3(block, DRCUML_OP_FADD,    4, FLAGS_NONE, dst, src1, src2); } while (0)
 #define UML_FSSUB(block, dst, src1, src2)					do { drcuml_block_append_3(block, DRCUML_OP_FSUB,    4, FLAGS_NONE, dst, src1, src2); } while (0)
@@ -385,26 +324,17 @@
 #define UML_FDLOAD(block, dst, base, index)					do { drcuml_block_append_3(block, DRCUML_OP_FLOAD,   8, IF_ALWAYS,  dst, MEM(base), index); } while (0)
 #define UML_FDSTORE(block, base, index, src1)				do { drcuml_block_append_3(block, DRCUML_OP_FSTORE,  8, IF_ALWAYS,  MEM(base), index, src1); } while (0)
 
-#define UML_FDREAD(block, dst, space, src1)					do { drcuml_block_append_3(block, DRCUML_OP_FREAD,   8, IF_ALWAYS,  dst, IMM(ADDRESS_SPACE_##space), src1); } while (0)
-#define UML_FDWRITE(block, space, dst, src1)				do { drcuml_block_append_3(block, DRCUML_OP_FWRITE,  8, IF_ALWAYS,  IMM(ADDRESS_SPACE_##space), dst, src1); } while (0)
+#define UML_FDREAD(block, dst, src1, space)					do { drcuml_block_append_3(block, DRCUML_OP_FREAD,   8, IF_ALWAYS,  dst, src1, IMM(ADDRESS_SPACE_##space)); } while (0)
+#define UML_FDWRITE(block, dst, src1, space)				do { drcuml_block_append_3(block, DRCUML_OP_FWRITE,  8, IF_ALWAYS,  dst, src1, IMM(ADDRESS_SPACE_##space)); } while (0)
 
 #define UML_FDMOV(block, dst, src1)							do { drcuml_block_append_2(block, DRCUML_OP_FMOV,    8, IF_ALWAYS,  dst, src1); } while (0)
 #define UML_FDMOVc(block, cond, dst, src1)					do { drcuml_block_append_2(block, DRCUML_OP_FMOV,    8, cond,       dst, src1); } while (0)
 
-#define UML_FDTOI4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI4T(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4T,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI4R(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4R,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI4C(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4C,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI4F(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI4F,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI8(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI8T(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8T,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI8R(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8R,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI8C(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8C,  8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDTOI8F(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FTOI8F,  8, IF_ALWAYS,  dst, src1); } while (0)
+#define UML_FDTOINT(block, dst, src1, size, round)			do { drcuml_block_append_4(block, DRCUML_OP_FTOINT,  8, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size), IMM(DRCUML_FMOD_##round)); } while (0)
+#define UML_FDFRINT(block, dst, src1, size)					do { drcuml_block_append_3(block, DRCUML_OP_FFRINT,  8, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size)); } while (0)
+#define UML_FDFRFLT(block, dst, src1, size)					do { drcuml_block_append_3(block, DRCUML_OP_FFRFLT,  8, IF_ALWAYS,  dst, src1, IMM(DRCUML_SIZE_##size)); } while (0)
 
-#define UML_FDFRFS(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FFRFS,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDFRI4(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FFRI4,   8, IF_ALWAYS,  dst, src1); } while (0)
-#define UML_FDFRI8(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FFRI8,   8, IF_ALWAYS,  dst, src1); } while (0)
+#define UML_FDRNDS(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FRNDS,   8, FLAGS_NONE, dst, src1); } while (0)
 
 #define UML_FDADD(block, dst, src1, src2)					do { drcuml_block_append_3(block, DRCUML_OP_FADD,    8, FLAGS_NONE, dst, src1, src2); } while (0)
 #define UML_FDSUB(block, dst, src1, src2)					do { drcuml_block_append_3(block, DRCUML_OP_FSUB,    8, FLAGS_NONE, dst, src1, src2); } while (0)

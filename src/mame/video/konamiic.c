@@ -5367,18 +5367,18 @@ static int K056832_rom_half;
 
 // locally cached values
 static int K056832_LayerAssociatedWithPage[K056832_PAGE_COUNT];
-static int K056832_LayerOffset[4][2];
-static int K056832_LSRAMPage[4][2];
-static INT32 K056832_X[4];	// 0..3 left
-static INT32 K056832_Y[4];	// 0..3 top
-static INT32 K056832_W[4];	// 0..3 width  -> 1..4 pages
-static INT32 K056832_H[4];	// 0..3 height -> 1..4 pages
-static INT32 K056832_dx[4];	// scroll
-static INT32 K056832_dy[4];	// scroll
+static int K056832_LayerOffset[8][2];
+static int K056832_LSRAMPage[8][2];
+static INT32 K056832_X[8];	// 0..3 left
+static INT32 K056832_Y[8];	// 0..3 top
+static INT32 K056832_W[8];	// 0..3 width  -> 1..4 pages
+static INT32 K056832_H[8];	// 0..3 height -> 1..4 pages
+static INT32 K056832_dx[8];	// scroll
+static INT32 K056832_dy[8];	// scroll
 static UINT32 K056832_LineDirty[K056832_PAGE_COUNT][8];
 static UINT8 K056832_AllLinesDirty[K056832_PAGE_COUNT];
 static UINT8 K056832_PageTileMode[K056832_PAGE_COUNT];
-static UINT8 K056832_LayerTileMode[4];
+static UINT8 K056832_LayerTileMode[8];
 static int K056832_DefaultLayerAssociation;
 static int K056832_LayerAssociation;
 static int K056832_ActiveLayer;

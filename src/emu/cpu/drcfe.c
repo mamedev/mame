@@ -63,6 +63,7 @@ struct _drcfe_state
 	/* CPU parameters */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 	cpu_translate_func	translate;					/* pointer to translation function */
+	offs_t				codexor;					/* XOR to reach code */
 
 	/* opcode descriptor arrays */
 	opcode_desc *		desc_live_list;				/* head of list of live descriptions */
@@ -149,6 +150,12 @@ drcfe_state *drcfe_init(const drcfe_config *config, void *param)
 	/* initialize the state */
 	drcfe->pageshift = activecpu_page_shift(ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)activecpu_get_info_fct(CPUINFO_PTR_TRANSLATE);
+#ifdef LSB_FIRST
+	if (activecpu_endianness() == CPU_IS_BE)
+#else
+	if (activecpu_endianness() == CPU_IS_LE)
+#endif
+		drcfe->codexor = (activecpu_databus_width(ADDRESS_SPACE_PROGRAM) / 8 / activecpu_min_instruction_bytes() - 1) * activecpu_min_instruction_bytes();
 
 	return drcfe;
 }
@@ -225,7 +232,7 @@ const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc)
 		}
 
 		/* loop until we exit the block */
-		for (curpc = curstack->targetpc; curpc < maxpc && drcfe->desc_array[curpc - minpc] == NULL; curpc += drcfe->desc_array[curpc - minpc]->length)
+		for (curpc = curstack->targetpc; curpc >= minpc && curpc < maxpc && drcfe->desc_array[curpc - minpc] == NULL; curpc += drcfe->desc_array[curpc - minpc]->length)
 		{
 			/* allocate a new description and describe this instruction */
 			drcfe->desc_array[curpc - minpc] = curdesc = describe_one(drcfe, curpc);
@@ -297,7 +304,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc)
 
 	/* get a pointer to the physical address */
 	memory_set_opbase(desc->physpc);
-	desc->opptr.v = cpu_opptr(desc->physpc);
+	desc->opptr.v = cpu_opptr(desc->physpc ^ drcfe->codexor);
 	assert(desc->opptr.v != NULL);
 	if (desc->opptr.v == NULL)
 	{

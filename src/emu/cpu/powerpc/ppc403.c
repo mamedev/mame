@@ -434,7 +434,7 @@ static void ppc403_set_irq_line(int irqline, int state)
 			ppc.exisr &= ~mask;
 		}
 	}
-	else if (irqline == PPC403_SPU_RX)
+	else if (irqline == PPC_IRQ_SPU_RX)
 	{
 		UINT32 mask = 0x08000000;
 		if (state) {
@@ -444,7 +444,7 @@ static void ppc403_set_irq_line(int irqline, int state)
 			}
 		}
 	}
-	else if (irqline == PPC403_SPU_TX)
+	else if (irqline == PPC_IRQ_SPU_TX)
 	{
 		UINT32 mask = 0x04000000;
 		if (state) {
@@ -454,7 +454,7 @@ static void ppc403_set_irq_line(int irqline, int state)
 			}
 		}
 	}
-	else if (irqline == PPC403_CRITICAL_IRQ)
+	else if (irqline == PPC_IRQ_CRITICAL)
 	{
 		if (state) {
 			if (EXIER & 0x80000000) {
@@ -661,9 +661,9 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 					ppc.spu.spls = 0x80;
 
 #ifndef PPC_DRC
-					ppc403_set_irq_line(PPC403_SPU_RX, ASSERT_LINE);
+					ppc403_set_irq_line(PPC_IRQ_SPU_RX, ASSERT_LINE);
 #else
-					ppcdrc403_set_irq_line(PPC403_SPU_RX, ASSERT_LINE);
+					ppcdrc403_set_irq_line(PPC_IRQ_SPU_RX, ASSERT_LINE);
 #endif
 				}
 			}
@@ -698,9 +698,9 @@ void ppc403_spu_rx(UINT8 data)
 	/* generate interrupt if DMA is disabled and RBR interrupt is enabled */
 	if (((ppc.spu.sprc >> 5) & 0x3) == 0x01) {
 #ifndef PPC_DRC
-		ppc403_set_irq_line(PPC403_SPU_RX, ASSERT_LINE);
+		ppc403_set_irq_line(PPC_IRQ_SPU_RX, ASSERT_LINE);
 #else
-		ppcdrc403_set_irq_line(PPC403_SPU_RX, ASSERT_LINE);
+		ppcdrc403_set_irq_line(PPC_IRQ_SPU_RX, ASSERT_LINE);
 #endif
 	}
 }
@@ -722,9 +722,9 @@ static TIMER_CALLBACK( ppc403_spu_tx_callback )
 		/* generate interrupt if DMA is disabled and TBR interrupt is enabled */
 		if (((ppc.spu.sptc >> 5) & 0x3) == 0x01) {
 #ifndef PPC_DRC
-			ppc403_set_irq_line(PPC403_SPU_TX, ASSERT_LINE);
+			ppc403_set_irq_line(PPC_IRQ_SPU_TX, ASSERT_LINE);
 #else
-			ppcdrc403_set_irq_line(PPC403_SPU_TX, ASSERT_LINE);
+			ppcdrc403_set_irq_line(PPC_IRQ_SPU_TX, ASSERT_LINE);
 #endif
 		}
 	}
@@ -826,9 +826,9 @@ static void ppc403_dma_exec(int ch)
 						}
 
 #ifndef PPC_DRC
-						ppc403_set_irq_line(PPC403_SPU_TX, ASSERT_LINE);
+						ppc403_set_irq_line(PPC_IRQ_SPU_TX, ASSERT_LINE);
 #else
-						ppcdrc403_set_irq_line(PPC403_SPU_TX, ASSERT_LINE);
+						ppcdrc403_set_irq_line(PPC_IRQ_SPU_TX, ASSERT_LINE);
 #endif
 					}
 					else {

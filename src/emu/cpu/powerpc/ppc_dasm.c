@@ -15,96 +15,7 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
-
-/*
- * Masks
- *
- * These masks isolate fields in an instruction word.
- */
-
-#define M_LI    0x03fffffc
-#define M_AA    0x00000002
-#define M_LK    0x00000001
-#define M_BO    0x03e00000
-#define M_BI    0x001f0000
-#define M_BD    0x0000fffc
-#define M_RT    0x03e00000
-#define M_RA    0x001f0000
-#define M_RB    0x0000f800
-#define M_CRFD  0x03800000
-#define M_L     0x00200000
-#define M_TO    0x03e00000
-#define M_D     0x0000ffff
-#define M_SIMM  0x0000ffff
-#define M_UIMM  0x0000ffff
-#define M_NB    0x0000f800
-#define M_SR    0x000f0000
-#define M_SH    0x0000f800
-#define M_CRFS  0x001c0000
-#define M_IMM   0x0000f000
-#define M_CRBD  0x03e00000
-#define M_RC    0x00000001
-#define M_CRBA  0x001f0000
-#define M_CRBB  0x0000f800
-#define M_SPR   0x001FF800
-#define M_TBR   0x001FF800
-#define M_CRM   0x000FF000
-#define M_DCR	0x001FF800
-#define M_FM    0x01FE0000
-#define M_OE    0x00000400
-#define M_REGC  0x000007c0
-#define M_MB    0x000007c0
-#define M_ME    0x0000003e
-#define M_XO    0x000007fe
-
-/*
- * Field Defining Macros
- *
- * These macros generate instruction words with their associated fields filled
- * in with the passed value.
- */
-
-#define D_OP(op)    ((op & 0x3f) << 26)
-#define D_XO(xo)    ((xo & 0x3ff) << 1)
-#define D_RT(r)     ((r & 0x1f) << (31 - 10))
-#define D_RA(r)		((r & 0x1f) << (31 - 15))
-#define D_UIMM(u)	(u & 0xffff)
-
-/*
- * Macros to Get Field Values
- *
- * These macros return the values of fields in an opcode. They all return
- * unsigned values and do not perform any sign extensions.
- */
-
-#define G_RT(op)    ((op & M_RT) >> (31 - 10))
-#define G_RA(op)    ((op & M_RA) >> (31 - 15))
-#define G_RB(op)    ((op & M_RB) >> (31 - 20))
-#define G_SIMM(op)  (op & M_SIMM)
-#define G_UIMM(op)  (op & M_UIMM)
-#define G_LI(op)    ((op & M_LI) >> 2)
-#define G_BO(op)    ((op & M_BO) >> (31 - 10))
-#define G_BI(op)    ((op & M_BI) >> (31 - 15))
-#define G_BD(op)    ((op & M_BD) >> 2)
-#define G_CRFD(op)  ((op & M_CRFD) >> (31 - 8))
-#define G_L(op)     ((op & M_L) >> (31 - 10))
-#define G_CRBD(op)  ((op & M_CRBD) >> (31 - 10))
-#define G_CRBA(op)  ((op & M_CRBA) >> (31 - 15))
-#define G_CRBB(op)  ((op & M_CRBB) >> (31 - 20))
-#define G_REGC(op)  ((op & M_REGC) >> (31 - 25))
-#define G_D(op)     (op & M_D)
-#define G_NB(op)    ((op & M_NB) >> (31 - 20))
-#define G_CRFS(op)  ((op & M_CRFS) >> (31 - 13))
-#define G_SPR(op)   ((op & M_SPR) >> (31 - 20))
-#define G_DCR(op)   ((op & M_DCR) >> (31 - 20))
-#define G_SR(op)    ((op & M_SR) >> (31 - 15))
-#define G_CRM(op)   ((op & M_CRM) >> (31 - 19))
-#define G_FM(op)    ((op & M_FM) >> (31 - 14))
-#define G_IMM(op)   ((op & M_IMM) >> (31 - 19))
-#define G_SH(op)    ((op & M_SH) >> (31 - 20))
-#define G_MB(op)    ((op & M_MB) >> (31 - 25))
-#define G_ME(op)    ((op & M_ME) >> 1)
-#define G_TO(op)    ((op & M_TO) >> (31 - 10))
+#include "ppccom.h"
 
 /*
  * Operand Formats
@@ -227,10 +138,14 @@ static const IDESCR itab[] =
     { "bc",     D_OP(16),           M_BO|M_BI|M_BD|M_AA|M_LK,   F_BCx,          FL_AA|FL_LK },
     { "bcctr",  D_OP(19)|D_XO(528), M_BO|M_BI|M_LK,             F_BO_BI,        FL_LK       },
     { "bclr",   D_OP(19)|D_XO(16),  M_BO|M_BI|M_LK,             F_BO_BI,        FL_LK|FL_SO },
-    { "cmp",    D_OP(31)|D_XO(0),   M_CRFD|M_L|M_RA|M_RB,       F_CMP,          0           },
-    { "cmpi",   D_OP(11),           M_CRFD|M_L|M_RA|M_SIMM,     F_CMP_SIMM,     0           },
-    { "cmpl",   D_OP(31)|D_XO(32),  M_CRFD|M_L|M_RA|M_RB,       F_CMP,          0           },
-    { "cmpli",  D_OP(10),           M_CRFD|M_L|M_RA|M_UIMM,     F_CMP_UIMM,     0           },
+    { "cmp",    D_OP(31)|D_XO(0),   M_CRFD|M_RA|M_RB,           F_CMP,          0           },
+    { "cmpd",   D_OP(31)|D_XO(0)|M_L,M_CRFD|M_RA|M_RB,          F_CMP,          0           },
+    { "cmpi",   D_OP(11),           M_CRFD|M_RA|M_SIMM,         F_CMP_SIMM,     0           },
+    { "cmpdi",  D_OP(11)|M_L,       M_CRFD|M_RA|M_SIMM,         F_CMP_SIMM,     0           },
+    { "cmpl",   D_OP(31)|D_XO(32),  M_CRFD|M_RA|M_RB,           F_CMP,          0           },
+    { "cmpld",  D_OP(31)|D_XO(32)|M_L,M_CRFD|M_RA|M_RB,         F_CMP,          0           },
+    { "cmpli",  D_OP(10),           M_CRFD|M_RA|M_UIMM,         F_CMP_UIMM,     0           },
+    { "cmpldi", D_OP(10)|M_L,       M_CRFD|M_RA|M_UIMM,         F_CMP_UIMM,     0           },
     { "cntlzw", D_OP(31)|D_XO(26),  M_RT|M_RA|M_RC,             F_RA_RT,        FL_RC       },
     { "crand",  D_OP(19)|D_XO(257), M_CRBD|M_CRBA|M_CRBB,       F_CRBD_CRBA_CRBB,   0       },
     { "crandc", D_OP(19)|D_XO(129), M_CRBD|M_CRBA|M_CRBB,       F_CRBD_CRBA_CRBB,   0       },
@@ -424,6 +339,7 @@ static const IDESCR itab[] =
  */
 
 static const char *const crbit[4] = { "lt", "gt", "eq", "so" };
+static const char *const crnbit[4] = { "ge", "le", "ne", "nso" };
 
 
 /*
@@ -450,61 +366,88 @@ static void SPR(char *dest, int spr_field)
 
 	switch (spr)
 	{
-		case 1:		strcat(dest, "xer");	break;
-		case 8:		strcat(dest, "lr");		break;
-		case 9:		strcat(dest, "ctr");	break;
-		case 18:	strcat(dest, "dsisr");	break;
-		case 19:	strcat(dest, "dar");	break;
-		case 22:	strcat(dest, "dec");	break;
-		case 25:	strcat(dest, "sdr1");	break;
-		case 26:	strcat(dest, "srr0");	break;
-		case 27:	strcat(dest, "srr1");	break;
-		case 272:	strcat(dest, "sprg0");	break;
-		case 273:	strcat(dest, "sprg1");	break;
-		case 274:	strcat(dest, "sprg2");	break;
-		case 275:	strcat(dest, "sprg3");	break;
-		case 282:	strcat(dest, "ear");	break;
-		case 287:	strcat(dest, "pvr");	break;
-		case 528:	strcat(dest, "ibat0u");	break;
-		case 529:	strcat(dest, "ibat0l");	break;
-		case 530:	strcat(dest, "ibat1u");	break;
-		case 531:	strcat(dest, "ibat1l");	break;
-		case 532:	strcat(dest, "ibat2u");	break;
-		case 533:	strcat(dest, "ibat2l");	break;
-		case 534:	strcat(dest, "ibat3u");	break;
-		case 535:	strcat(dest, "ibat3l");	break;
-		case 536:	strcat(dest, "dbat0u");	break;
-		case 537:	strcat(dest, "dbat0l");	break;
-		case 538:	strcat(dest, "dbat1u");	break;
-		case 539:	strcat(dest, "dbat1l");	break;
-		case 540:	strcat(dest, "dbat2u");	break;
-		case 541:	strcat(dest, "dbat2l");	break;
-		case 542:	strcat(dest, "dbat3u");	break;
-		case 543:	strcat(dest, "dbat3l");	break;
-		case 1013:	strcat(dest, "dabr");	break;  // unsupported on 603e/EC603e
+		/* UISA SPR register indexes */
+		case SPR_XER:		strcat(dest, "xer");	break;
+		case SPR_LR:		strcat(dest, "lr");		break;
+		case SPR_CTR:		strcat(dest, "ctr");	break;
 
-		/*
-         * Some PowerPC implementations may implement MFTB and MFSPR identically,
-         * therefore TBR registers are also decoded here
-         */
+		/* VEA SPR register indexes */
+		case SPRVEA_TBL_R:	strcat(dest, "tbl");	break;
+		case SPRVEA_TBU_R:	strcat(dest, "tbu");	break;
 
-		case 268:	strcat(dest, "tbl");	break;
-		case 269:	strcat(dest, "tbu");	break;
+		/* OEA SPR register indexes */
+		case SPROEA_DSISR:	strcat(dest, "dsisr");	break;
+		case SPROEA_DAR:	strcat(dest, "dar");	break;
+		case SPROEA_DEC:	strcat(dest, "dec");	break;
+		case SPROEA_SDR1:	strcat(dest, "sdr1");	break;
+		case SPROEA_SRR0:	strcat(dest, "srr0");	break;
+		case SPROEA_SRR1:	strcat(dest, "srr1");	break;
+		case SPROEA_SPRG0:	strcat(dest, "sprg0");	break;
+		case SPROEA_SPRG1:	strcat(dest, "sprg1");	break;
+		case SPROEA_SPRG2:	strcat(dest, "sprg2");	break;
+		case SPROEA_SPRG3:	strcat(dest, "sprg3");	break;
+		case SPROEA_ASR:	strcat(dest, "asr");	break;
+		case SPROEA_EAR:	strcat(dest, "ear");	break;
+		case SPROEA_PVR:	strcat(dest, "pvr");	break;
+		case SPROEA_IBAT0U:	strcat(dest, "ibat0u");	break;
+		case SPROEA_IBAT0L:	strcat(dest, "ibat0l");	break;
+		case SPROEA_IBAT1U:	strcat(dest, "ibat1u");	break;
+		case SPROEA_IBAT1L:	strcat(dest, "ibat1l");	break;
+		case SPROEA_IBAT2U:	strcat(dest, "ibat2u");	break;
+		case SPROEA_IBAT2L:	strcat(dest, "ibat2l");	break;
+		case SPROEA_IBAT3U:	strcat(dest, "ibat3u");	break;
+		case SPROEA_IBAT3L:	strcat(dest, "ibat3l");	break;
+		case SPROEA_DBAT0U:	strcat(dest, "dbat0u");	break;
+		case SPROEA_DBAT0L:	strcat(dest, "dbat0l");	break;
+		case SPROEA_DBAT1U:	strcat(dest, "dbat1u");	break;
+		case SPROEA_DBAT1L:	strcat(dest, "dbat1l");	break;
+		case SPROEA_DBAT2U:	strcat(dest, "dbat2u");	break;
+		case SPROEA_DBAT2L:	strcat(dest, "dbat2l");	break;
+		case SPROEA_DBAT3U:	strcat(dest, "dbat3u");	break;
+		case SPROEA_DBAT3L:	strcat(dest, "dbat3l");	break;
+		case SPROEA_DABR:	strcat(dest, "dabr/iac2");	break;  // unsupported on 603e/EC603e
 
-		/*
-         * PowerPC 603e/EC603e-specific registers
-         */
+		/* PowerPC 603E SPR register indexes */
+		case SPR603_HID0:	strcat(dest, "hid0/dbsr");	break;
+		case SPR603_HID1:	strcat(dest, "hid1");	break;
+		case SPR603_DMISS:	strcat(dest, "dmiss");	break;
+		case SPR603_DCMP:	strcat(dest, "dcmp");	break;
+		case SPR603_HASH1:	strcat(dest, "hash1");	break;
+		case SPR603_HASH2:	strcat(dest, "hash2/icdbdr");	break;
+		case SPR603_IMISS:	strcat(dest, "imiss");	break;
+		case SPR603_ICMP:	strcat(dest, "icmp/dear");	break;
+		case SPR603_RPA:	strcat(dest, "rpa/evpr");	break;
+		case SPR603_IABR:	strcat(dest, "iabr/dbcr");	break;
 
-		case 1008:	strcat(dest, "hid0");	break;
-		case 1009:	strcat(dest, "hid1");	break;
-		case 976:	strcat(dest, "dmiss");	break;
-		case 977:	strcat(dest, "dcmp");	break;
-		case 978:	strcat(dest, "hash2");	break;
-		case 979:	strcat(dest, "hash2");	break;
-		case 980:	strcat(dest, "imiss");	break;
-		case 981:	strcat(dest, "icmp");	break;
-		case 982:	strcat(dest, "rpa");	break;
-		case 1010:	strcat(dest, "iabr");	break;
+		/* PowerPC 4XX SPR register indexes */
+		case SPR4XX_SGR:	strcat(dest, "sgr");	break;
+		case SPR4XX_DCWR:	strcat(dest, "dcwr");	break;
+		case SPR4XX_PID:	strcat(dest, "pid");	break;
+		case SPR4XX_TBHU:	strcat(dest, "tbhu");	break;
+		case SPR4XX_TBLU:	strcat(dest, "tblu");	break;
+//		case SPR4XX_ICDBDR:	strcat(dest, "icdbdr");	break;	// same as SPR603E_HASH2
+//		case SPR4XX_DEAR:	strcat(dest, "dear");	break;	// same as SPR603E_ICMP
+//		case SPR4XX_EVPR:	strcat(dest, "evpr");	break;	// same as SPR603E_RPA
+		case SPR4XX_CDBCR:	strcat(dest, "cdbcr");	break;
+		case SPR4XX_TSR:	strcat(dest, "tsr");	break;
+		case SPR4XX_TCR:	strcat(dest, "tcr");	break;
+		case SPR4XX_PIT:	strcat(dest, "pit");	break;
+		case SPR4XX_TBHI:	strcat(dest, "tbhi");	break;
+		case SPR4XX_TBLO:	strcat(dest, "tblo");	break;
+		case SPR4XX_SRR2:	strcat(dest, "srr2");	break;
+		case SPR4XX_SRR3:	strcat(dest, "srr3");	break;
+//		case SPR4XX_DBSR:	strcat(dest, "dbsr");	break;	// same as SPR603E_HID0
+//		case SPR4XX_DBCR:	strcat(dest, "dbcr");	break;	// same as SPR603E_IABR
+		case SPR4XX_IAC1:	strcat(dest, "iac1");	break;
+//		case SPR4XX_IAC2:	strcat(dest, "iac2");	break;	// same as SPROEA_DABR
+		case SPR4XX_DAC1:	strcat(dest, "dac1");	break;
+		case SPR4XX_DAC2:	strcat(dest, "dac2");	break;
+		case SPR4XX_DCCR:	strcat(dest, "dccr");	break;
+		case SPR4XX_ICCR:	strcat(dest, "iccr");	break;
+		case SPR4XX_PBL1:	strcat(dest, "pbl1");	break;
+		case SPR4XX_PBU1:	strcat(dest, "pbu1");	break;
+		case SPR4XX_PBL2:	strcat(dest, "pbl2");	break;
+		case SPR4XX_PBU2:	strcat(dest, "pbu2");	break;
 
 		default:	sprintf(dest, "%s%d", dest, spr); break;
 	}
@@ -805,17 +748,23 @@ static int Simplified(UINT32 op, UINT32 vpc, char *signed16, char *mnem, char *o
 
 		switch (G_BO(op))
 		{
-			case 0x04:  // branch if condition is false
-			case 0x05:
-			case 0x06:
-			case 0x07:
-				strcat(mnem, "bf");
+			case 0x04:	case 0x05:	case 0x06:	case 0x07:
+				strcat(mnem, "b");
+				strcat(mnem, crnbit[G_BI(op) & 3]);
 				break;
-			case 0x0c:
-			case 0x0d:
-			case 0x0e:
-			case 0x0f:
-				strcat(mnem, "bt");
+			case 0x0c:	case 0x0d:	case 0x0e:	case 0x0f:
+				strcat(mnem, "b");
+				strcat(mnem, crbit[G_BI(op) & 3]);
+				break;
+			case 0x10:	case 0x11:	case 0x18:	case 0x19:
+				strcat(mnem, "bdnz");
+				break;
+			case 0x12:	case 0x13:	case 0x1a:	case 0x1b:
+				strcat(mnem, "bdz");
+				break;
+			case 0x14:	case 0x15:	case 0x16:	case 0x17:
+			case 0x1c:	case 0x1d:	case 0x1e:	case 0x1f:
+				strcat(mnem, "b");
 				break;
 			default:
 				return 0;
@@ -824,7 +773,43 @@ static int Simplified(UINT32 op, UINT32 vpc, char *signed16, char *mnem, char *o
 		if (op & M_LK)  strcat(mnem, "l");
 		if (op & M_AA)  strcat(mnem, "a");
 
-		sprintf(oprs, "cr%d[%s],0x%08X", G_BI(op) / 4, crbit[G_BI(op) & 3], disp + ((op & M_AA) ? 0 : vpc));
+		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
+			sprintf(oprs, "cr%d,0x%08X", G_BI(op) / 4, disp + ((op & M_AA) ? 0 : vpc));
+		else
+			sprintf(oprs, "0x%08X", disp + ((op & M_AA) ? 0 : vpc));
+	}
+	else if ((op & ~(M_BO|M_BI|M_LK)) == (D_OP(19)|D_XO(528)) || (op & ~(M_BO|M_BI|M_LK)) == (D_OP(19)|D_XO(16)))
+	{
+		switch (G_BO(op))
+		{
+			case 0x04:	case 0x05:	case 0x06:	case 0x07:
+				strcat(mnem, "b");
+				strcat(mnem, crnbit[G_BI(op) & 3]);
+				break;
+			case 0x0c:	case 0x0d:	case 0x0e:	case 0x0f:
+				strcat(mnem, "b");
+				strcat(mnem, crbit[G_BI(op) & 3]);
+				break;
+			case 0x10:	case 0x11:	case 0x18:	case 0x19:
+				strcat(mnem, "bdnz");
+				break;
+			case 0x12:	case 0x13:	case 0x1a:	case 0x1b:
+				strcat(mnem, "bdz");
+				break;
+			case 0x14:	case 0x15:	case 0x16:	case 0x17:
+			case 0x1c:	case 0x1d:	case 0x1e:	case 0x1f:
+				strcat(mnem, "b");
+				break;
+			default:
+				return 0;
+		}
+
+		strcat(mnem, (G_XO(op) == 528) ? "ctr" : "lr");
+		if (op & M_LK)  strcat(mnem, "l");
+		if (op & M_AA)  strcat(mnem, "a");
+
+		if (!(G_BO(op) & 0x10) && G_BI(op) / 4 != 0)
+			sprintf(oprs, "cr%d", G_BI(op) / 4);
 	}
 	else if ((op & ~(M_RT|M_RA|M_RB|M_OE|M_RC)) == (D_OP(31)|D_XO(40)))
 	{
@@ -961,15 +946,30 @@ offs_t ppc_dasm_one(char *buffer, UINT32 pc, UINT32 op)
 				break;
 
 			case F_CMP:
-				sprintf(oprs, "cr%d,%d,r%d,r%d", G_CRFD(op), G_L(op), G_RA(op), G_RB(op));
+				if (G_L(op))
+					strcat(mnem, "d");
+				if (G_CRFD(op) == 0)
+					sprintf(oprs, "r%d,r%d", G_RA(op), G_RB(op));
+				else
+					sprintf(oprs, "cr%d,r%d,r%d", G_CRFD(op), G_RA(op), G_RB(op));
 				break;
 
 			case F_CMP_SIMM:
-				sprintf(oprs, "cr%d,%d,r%d,%s", G_CRFD(op), G_L(op), G_RA(op), signed16);
+				if (G_L(op))
+					strcat(mnem, "d");
+				if (G_CRFD(op) == 0)
+					sprintf(oprs, "r%d,%s", G_RA(op), signed16);
+				else
+					sprintf(oprs, "cr%d,r%d,%s", G_CRFD(op), G_RA(op), signed16);
 				break;
 
 			case F_CMP_UIMM:
-				sprintf(oprs, "cr%d,%d,r%d,0x%04X", G_CRFD(op), G_L(op), G_RA(op), G_UIMM(op));
+				if (G_L(op))
+					strcat(mnem, "d");
+				if (G_CRFD(op) == 0)
+					sprintf(oprs, "r%d,0x%04X", G_RA(op), G_UIMM(op));
+				else
+					sprintf(oprs, "cr%d,r%d,0x%04X", G_CRFD(op), G_RA(op), G_UIMM(op));
 				break;
 
 			case F_RA_RT:

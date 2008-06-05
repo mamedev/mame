@@ -18,6 +18,8 @@
 
     * Identify common pairs and optimize output
 
+    * Convert AND 0xff/0xffff to movzx
+
 ****************************************************************************
 
     -------------------------
@@ -396,48 +398,23 @@ static x86code *op_recover(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 static x86code *op_setfmod(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_getfmod(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_getexp(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_save(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 
-static x86code *op_load1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_load1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_load2u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_load2s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_load4u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_load4s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_load8u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_store1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_store2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_store4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_store8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read2u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read2s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read2m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read4u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read4s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read4m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read8u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_read8m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_write1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_write2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_writ2m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_write4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_writ4m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_write8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_writ8m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_flags(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_carry(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_set(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_mov(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_zext1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_zext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_zext4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_sext1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_sext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_sext4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_xtract(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_insert(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_roland(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_rolins(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_add(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_addc(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_sub(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
@@ -466,20 +443,10 @@ static x86code *op_fstore(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_fmov(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi4t(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi4r(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi4f(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi4c(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi8t(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi8r(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi8f(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ftoi8c(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ffrfs(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ffrfd(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ffri4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
-static x86code *op_ffri8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_ftoint(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_ffrint(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_ffrflt(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
+static x86code *op_frnds(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_fadd(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_fsub(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
 static x86code *op_fcmp(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst);
@@ -514,50 +481,25 @@ static const opcode_table_entry opcode_table_source[] =
 	/* Internal Register Operations */
 	{ DRCUML_OP_SETFMOD, op_setfmod },	/* SETFMOD src                    */
 	{ DRCUML_OP_GETFMOD, op_getfmod },	/* GETFMOD dst                    */
-	{ DRCUML_OP_GETEXP,  op_getexp },	/* GETEXP  dst,index              */
-	{ DRCUML_OP_SAVE,    op_save },		/* SAVE    dst,index              */
-	{ DRCUML_OP_RESTORE, op_restore },	/* RESTORE dst,index              */
+	{ DRCUML_OP_GETEXP,  op_getexp },	/* GETEXP  dst                    */
+	{ DRCUML_OP_GETFLGS, op_getflgs },	/* GETFLGS dst[,f]                */
+	{ DRCUML_OP_SAVE,    op_save },		/* SAVE    dst                    */
+	{ DRCUML_OP_RESTORE, op_restore },	/* RESTORE dst                    */
 
 	/* Integer Operations */
-	{ DRCUML_OP_LOAD1U,  op_load1u },	/* LOAD1U  dst,base,index         */
-	{ DRCUML_OP_LOAD1S,  op_load1s },	/* LOAD1S  dst,base,index         */
-	{ DRCUML_OP_LOAD2U,  op_load2u },	/* LOAD2U  dst,base,index         */
-	{ DRCUML_OP_LOAD2S,  op_load2s },	/* LOAD2S  dst,base,index         */
-	{ DRCUML_OP_LOAD4U,  op_load4u },	/* LOAD4U  dst,base,index         */
-	{ DRCUML_OP_LOAD4S,  op_load4s },	/* LOAD4S  dst,base,index         */
-	{ DRCUML_OP_LOAD8U,  op_load8u },	/* LOAD8U  dst,base,index         */
-	{ DRCUML_OP_STORE1,  op_store1 },	/* STORE1  base,index,src         */
-	{ DRCUML_OP_STORE2,  op_store2 },	/* STORE2  base,index,src         */
-	{ DRCUML_OP_STORE4,  op_store4 },	/* STORE4  base,index,src         */
-	{ DRCUML_OP_STORE8,  op_store8 },	/* STORE8  base,index,src         */
-	{ DRCUML_OP_READ1U,  op_read1u },	/* READ1U  dst,space,src1         */
-	{ DRCUML_OP_READ1S,  op_read1s },	/* READ1S  dst,space,src1         */
-	{ DRCUML_OP_READ2U,  op_read2u },	/* READ2U  dst,space,src1         */
-	{ DRCUML_OP_READ2S,  op_read2s },	/* READ2S  dst,space,src1         */
-	{ DRCUML_OP_READ2M,  op_read2m },	/* READ2M  dst,space,src1,mask    */
-	{ DRCUML_OP_READ4U,  op_read4u },	/* READ4U  dst,space,src1         */
-	{ DRCUML_OP_READ4S,  op_read4s },	/* READ4S  dst,space,src1         */
-	{ DRCUML_OP_READ4M,  op_read4m },	/* READ4M  dst,space,src1,mask    */
-	{ DRCUML_OP_READ8U,  op_read8u },	/* READ8U  dst,space,src1         */
-	{ DRCUML_OP_READ8M,  op_read8m },	/* READ8M  dst,space,src1,mask    */
-	{ DRCUML_OP_WRITE1,  op_write1 },	/* WRITE1  space,dst,src1         */
-	{ DRCUML_OP_WRITE2,  op_write2 },	/* WRITE2  space,dst,src1         */
-	{ DRCUML_OP_WRIT2M,  op_writ2m },	/* WRIT2M  space,dst,src1         */
-	{ DRCUML_OP_WRITE4,  op_write4 },	/* WRITE4  space,dst,src1         */
-	{ DRCUML_OP_WRIT4M,  op_writ4m },	/* WRIT4M  space,dst,mask,src1    */
-	{ DRCUML_OP_WRITE8,  op_write8 },	/* WRITE8  space,dst,src1         */
-	{ DRCUML_OP_WRIT8M,  op_writ8m },	/* WRIT8M  space,dst,mask,src1    */
-	{ DRCUML_OP_FLAGS,   op_flags },	/* FLAGS   dst,mask,table         */
-	{ DRCUML_OP_SETC,    op_setc },		/* FLAGS   src,bitnum             */
+	{ DRCUML_OP_LOAD,    op_load },		/* LOAD    dst,base,index,size    */
+	{ DRCUML_OP_LOADS,   op_loads },	/* LOADS   dst,base,index,size    */
+	{ DRCUML_OP_STORE,   op_store },	/* STORE   base,index,src,size    */
+	{ DRCUML_OP_READ,    op_read },		/* READ    dst,src1,spacesize     */
+	{ DRCUML_OP_READM,   op_readm },	/* READM   dst,src1,mask,spacesize */
+	{ DRCUML_OP_WRITE,   op_write },	/* WRITE   dst,src1,spacesize     */
+	{ DRCUML_OP_WRITEM,  op_writem },	/* WRITEM  dst,src1,spacesize     */
+	{ DRCUML_OP_CARRY,   op_carry },	/* CARRY   src,bitnum             */
+	{ DRCUML_OP_SET,     op_set },		/* SET     dst,c                  */
 	{ DRCUML_OP_MOV,     op_mov },		/* MOV     dst,src[,c]            */
-	{ DRCUML_OP_ZEXT1,   op_zext1 },	/* ZEXT1   dst,src                */
-	{ DRCUML_OP_ZEXT2,   op_zext2 },	/* ZEXT2   dst,src                */
-	{ DRCUML_OP_ZEXT4,   op_zext4 },	/* ZEXT4   dst,src                */
-	{ DRCUML_OP_SEXT1,   op_sext1 },	/* SEXT1   dst,src                */
-	{ DRCUML_OP_SEXT2,   op_sext2 },	/* SEXT2   dst,src                */
-	{ DRCUML_OP_SEXT4,   op_sext4 },	/* SEXT4   dst,src                */
-	{ DRCUML_OP_XTRACT,  op_xtract },	/* XTRACT  dst,src1,src2,src3     */
-	{ DRCUML_OP_INSERT,  op_insert },	/* INSERT  dst,src1,src2,src3     */
+	{ DRCUML_OP_SEXT,    op_sext },		/* SEXT    dst,src                */
+	{ DRCUML_OP_ROLAND,  op_roland },	/* ROLAND  dst,src1,src2,src3     */
+	{ DRCUML_OP_ROLINS,  op_rolins },	/* ROLINS  dst,src1,src2,src3     */
 	{ DRCUML_OP_ADD,     op_add },		/* ADD     dst,src1,src2[,f]      */
 	{ DRCUML_OP_ADDC,    op_addc },		/* ADDC    dst,src1,src2[,f]      */
 	{ DRCUML_OP_SUB,     op_sub },		/* SUB     dst,src1,src2[,f]      */
@@ -587,20 +529,10 @@ static const opcode_table_entry opcode_table_source[] =
 	{ DRCUML_OP_FREAD,   op_fread },	/* FREAD   dst,space,src1         */
 	{ DRCUML_OP_FWRITE,  op_fwrite },	/* FWRITE  space,dst,src1         */
 	{ DRCUML_OP_FMOV,    op_fmov },		/* FMOV    dst,src1[,c]           */
-	{ DRCUML_OP_FTOI4,   op_ftoi4 },	/* FTOI4   dst,src1               */
-	{ DRCUML_OP_FTOI4T,  op_ftoi4t },	/* FTOI4T  dst,src1               */
-	{ DRCUML_OP_FTOI4R,  op_ftoi4r },	/* FTOI4R  dst,src1               */
-	{ DRCUML_OP_FTOI4F,  op_ftoi4f },	/* FTOI4F  dst,src1               */
-	{ DRCUML_OP_FTOI4C,  op_ftoi4c },	/* FTOI4C  dst,src1               */
-	{ DRCUML_OP_FTOI8,   op_ftoi8 },	/* FTOI8   dst,src1               */
-	{ DRCUML_OP_FTOI8T,  op_ftoi8t },	/* FTOI8T  dst,src1               */
-	{ DRCUML_OP_FTOI8R,  op_ftoi8r },	/* FTOI8R  dst,src1               */
-	{ DRCUML_OP_FTOI8F,  op_ftoi8f },	/* FTOI8F  dst,src1               */
-	{ DRCUML_OP_FTOI8C,  op_ftoi8c },	/* FTOI8C  dst,src1               */
-	{ DRCUML_OP_FFRFS,   op_ffrfs },	/* FFRFS   dst,src1               */
-	{ DRCUML_OP_FFRFD,   op_ffrfd },	/* FFRFD   dst,src1               */
-	{ DRCUML_OP_FFRI4,   op_ffri4 },	/* FFRI4   dst,src1               */
-	{ DRCUML_OP_FFRI8,   op_ffri8 },	/* FFRI8   dst,src1               */
+	{ DRCUML_OP_FTOINT,  op_ftoint },	/* FTOINT  dst,src1,size,round    */
+	{ DRCUML_OP_FFRINT,  op_ffrint },	/* FFRINT  dst,src1,size          */
+	{ DRCUML_OP_FFRFLT,  op_ffrflt },	/* FFRFLT  dst,src1,size          */
+	{ DRCUML_OP_FRNDS,   op_frnds },	/* FRNDS   dst,src1               */
 	{ DRCUML_OP_FADD,    op_fadd },		/* FADD    dst,src1,src2          */
 	{ DRCUML_OP_FSUB,    op_fsub },		/* FSUB    dst,src1,src2          */
 	{ DRCUML_OP_FCMP,    op_fcmp },		/* FCMP    src1,src2              */
@@ -3553,6 +3485,133 @@ static x86code *op_getexp(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
+    op_getflgs - process a GETFLGS opcode
+-------------------------------------------------*/
+
+static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	drcuml_parameter dstp;
+	int dstreg;
+
+	/* validate instruction */
+	assert(inst->size == 4);
+	assert(inst->condflags != DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_1(drcbe, inst, &dstp, PTYPE_MR);
+	
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+
+	switch (inst->condflags)
+	{
+		/* single flags only */
+		case DRCUML_FLAG_C:
+			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
+			emit_movzx_r32_r8(&dst, dstreg, REG_AL);									// movzx  dstreg,al
+			break;
+
+		case DRCUML_FLAG_V:
+			emit_setcc_r8(&dst, COND_O, REG_AL);										// seto   al
+			emit_movzx_r32_r8(&dst, dstreg, REG_AL);									// movzx  dstreg,al
+			emit_shl_r32_imm(&dst, dstreg, 1);											// shl    dstreg,1
+			break;
+
+		case DRCUML_FLAG_Z:
+			emit_setcc_r8(&dst, COND_Z, REG_AL);										// setz   al
+			emit_movzx_r32_r8(&dst, dstreg, REG_AL);									// movzx  dstreg,al
+			emit_shl_r32_imm(&dst, dstreg, 2);											// shl    dstreg,2
+			break;
+
+		case DRCUML_FLAG_S:
+			emit_setcc_r8(&dst, COND_S, REG_AL);										// sets   al
+			emit_movzx_r32_r8(&dst, dstreg, REG_AL);									// movzx  dstreg,al
+			emit_shl_r32_imm(&dst, dstreg, 3);											// shl    dstreg,3
+			break;
+
+		case DRCUML_FLAG_U:
+			emit_setcc_r8(&dst, COND_P, REG_AL);										// setp   al
+			emit_movzx_r32_r8(&dst, dstreg, REG_AL);									// movzx  dstreg,al
+			emit_shl_r32_imm(&dst, dstreg, 4);											// shl    dstreg,4
+			break;
+		
+		/* carry plus another flag */
+		case DRCUML_FLAG_C | DRCUML_FLAG_V:
+			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
+			emit_setcc_r8(&dst, COND_O, REG_CL);										// seto   cl
+			emit_movzx_r32_r8(&dst, REG_EAX, REG_AL);									// movzx  eax,al
+			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
+			break;
+		
+		case DRCUML_FLAG_C | DRCUML_FLAG_Z:
+			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
+			emit_setcc_r8(&dst, COND_Z, REG_CL);										// setz   cl
+			emit_movzx_r32_r8(&dst, REG_EAX, REG_AL);									// movzx  eax,al
+			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 4, 0));				// lea    dstreg,[eax+ecx*4]
+			break;
+		
+		case DRCUML_FLAG_C | DRCUML_FLAG_S:
+			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
+			emit_setcc_r8(&dst, COND_S, REG_CL);										// sets   cl
+			emit_movzx_r32_r8(&dst, REG_EAX, REG_AL);									// movzx  eax,al
+			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 8, 0));				// lea    dstreg,[eax+ecx*8]
+			break;
+		
+		/* overflow plus another flag */
+		case DRCUML_FLAG_V | DRCUML_FLAG_Z:
+			emit_setcc_r8(&dst, COND_O, REG_AL);										// seto   al
+			emit_setcc_r8(&dst, COND_Z, REG_CL);										// setz   cl
+			emit_movzx_r32_r8(&dst, REG_EAX, REG_AL);									// movzx  eax,al
+			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
+			emit_shl_r32_imm(&dst, dstreg, 1);											// shl    dstreg,1
+			break;
+		
+		case DRCUML_FLAG_V | DRCUML_FLAG_S:
+			emit_setcc_r8(&dst, COND_O, REG_AL);										// seto   al
+			emit_setcc_r8(&dst, COND_S, REG_CL);										// sets   cl
+			emit_movzx_r32_r8(&dst, REG_EAX, REG_AL);									// movzx  eax,al
+			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 4, 0));				// lea    dstreg,[eax+ecx*4]
+			emit_shl_r32_imm(&dst, dstreg, 1);											// shl    dstreg,1
+			break;
+		
+		/* zero plus another flag */
+		case DRCUML_FLAG_Z | DRCUML_FLAG_S:
+			emit_setcc_r8(&dst, COND_Z, REG_AL);										// setz   al
+			emit_setcc_r8(&dst, COND_S, REG_CL);										// sets   cl
+			emit_movzx_r32_r8(&dst, REG_EAX, REG_AL);									// movzx  eax,al
+			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
+			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
+			emit_shl_r32_imm(&dst, dstreg, 2);											// shl    dstreg,2
+			break;
+		
+		/* default cases */
+		default:
+			emit_pushf(&dst);															// pushf
+			emit_pop_r64(&dst, REG_EAX);												// pop    eax
+			emit_and_r32_imm(&dst, REG_EAX, 0x8c5);										// and    eax,0x8c5
+			emit_movzx_r32_m8(&dst, dstreg, MBISD(REG_RBP, REG_RAX, 1, offset_from_rbp(drcbe, (FPTR)&drcbe->flagsmap[0])));
+																						// movzx  dstreg,[flags_map]
+			break;
+	}
+		
+	/* 32-bit form */
+	if (inst->size == 4)
+		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+	
+	/* 64-bit form */
+	else if (inst->size == 8)
+		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+
+	return dst;
+}
+
+
+/*-------------------------------------------------
     op_save - process a SAVE opcode
 -------------------------------------------------*/
 
@@ -3680,12 +3739,12 @@ static x86code *op_restore(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 ***************************************************************************/
 
 /*-------------------------------------------------
-    op_load1u - process a LOAD1U opcode
+    op_load - process a LOAD opcode
 -------------------------------------------------*/
 
-static x86code *op_load1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_load(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp;
+	drcuml_parameter dstp, basep, indp, sizep;
 	int basereg, dstreg;
 	INT32 baseoffs;
 
@@ -3694,30 +3753,46 @@ static x86code *op_load1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &sizep, PTYPE_I);
 
 	/* determine the pointer base */
 	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
 
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+
 	/* immediate index */
 	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-		emit_movzx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));			// movzx dstreg,[basep + 1*indp]
+	{
+		if (sizep.value == DRCUML_SIZE_BYTE)
+			emit_movzx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));		// movzx dstreg,[basep + 1*indp]
+		else if (sizep.value == DRCUML_SIZE_WORD)
+			emit_movzx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));	// movzx dstreg,[basep + 2*indp]
+		else if (sizep.value == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));		// mov   dstreg,[basep + 4*indp]
+		else if (sizep.value == DRCUML_SIZE_QWORD)
+			emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + 8*indp.value));		// mov   dstreg,[basep + 8*indp]
+	}
 
 	/* other index */
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		emit_movzx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));			// movzx dstreg,[basep + 1*indp]
+		if (sizep.value == DRCUML_SIZE_BYTE)
+			emit_movzx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));		// movzx dstreg,[basep + 1*indp]
+		else if (sizep.value == DRCUML_SIZE_WORD)
+			emit_movzx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));		// movzx dstreg,[basep + 2*indp]
+		else if (sizep.value == DRCUML_SIZE_DWORD)
+			emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));		// mov   dstreg,[basep + 4*indp]
+		else if (sizep.value == DRCUML_SIZE_QWORD)
+			emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, 8, baseoffs));		// mov   dstreg,[basep + 8*indp]
 	}
 
-	/* store to appropriate target size */
+	/* store result */
 	if (inst->size == 4)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	else if (inst->size == 8)
+	else
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 
 	return dst;
@@ -3725,12 +3800,12 @@ static x86code *op_load1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_load1s - process a LOAD1S opcode
+    op_loads - process a LOADS opcode
 -------------------------------------------------*/
 
-static x86code *op_load1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_loads(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp;
+	drcuml_parameter dstp, basep, indp, sizep;
 	int basereg, dstreg;
 	INT32 baseoffs;
 
@@ -3739,94 +3814,70 @@ static x86code *op_load1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI, &sizep, PTYPE_I);
 
 	/* determine the pointer base */
 	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
 
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		/* immediate index */
-		if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_movsx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));		// movsx eax,[basep + 1*indp]
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
-		/* other index */
-		else
+	/* immediate index */
+	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
+	{
+		if (inst->size == 4)
 		{
-			int indreg = param_select_register(REG_ECX, &indp, NULL);
-			emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-			emit_movsx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));		// movsx eax,[basep + 1*indp]
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r32_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));	// movsx dstreg,[basep + 1*indp]
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));// movsx dstreg,[basep + 2*indp]
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));	// mov   dstreg,[basep + 4*indp]
 		}
-
-		/* general case */
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	}
-
-	/* 64-bit form */
-	else
-	{
-		/* immediate index */
-		if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_movsx_r64_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));		// movsx rax,[basep + 1*indp]
-
-		/* other index */
-		else
+		else if (inst->size == 8)
 		{
-			int indreg = param_select_register(REG_ECX, &indp, NULL);
-			emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-			emit_movsx_r64_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));		// movsx rax,[basep + 1*indp]
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r64_m8(&dst, dstreg, MBD(basereg, baseoffs + 1*indp.value));	// movzx dstreg,[basep + 1*indp]
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r64_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));// movzx dstreg,[basep + 2*indp]
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_movsxd_r64_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));// movsxd dstreg,[basep + 4*indp]
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+				emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + 8*indp.value));	// mov   dstreg,[basep + 8*indp]
 		}
-
-		/* general case */
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_load2u - process a LOAD2U opcode
--------------------------------------------------*/
-
-static x86code *op_load2u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, basep, indp;
-	int basereg, dstreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* immediate index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-		emit_movzx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));		// movzx dstreg,[basep + 2*indp]
 
 	/* other index */
 	else
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		emit_movzx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));			// movzx dstreg,[basep + 2*indp]
+		if (inst->size == 4)
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r32_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));	// movsx dstreg,[basep + 1*indp]
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));	// movsx dstreg,[basep + 2*indp]
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));	// mov   dstreg,[basep + 4*indp]
+		}
+		else if (inst->size == 8)
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r64_m8(&dst, dstreg, MBISD(basereg, indreg, 1, baseoffs));	// movsx dstreg,[basep + 1*indp]
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r64_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));	// movsx dstreg,[basep + 2*indp]
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_movsxd_r64_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));	// movsxd dstreg,[basep + 4*indp]
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+				emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, 8, baseoffs));	// mov   dstreg,[basep + 8*indp]
+		}
 	}
 
-	/* store to appropriate target size */
+	/* store result */
 	if (inst->size == 4)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	else if (inst->size == 8)
+	else
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 
 	return dst;
@@ -3834,13 +3885,13 @@ static x86code *op_load2u(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_load2s - process a LOAD2S opcode
+    op_store - process a STORE opcode
 -------------------------------------------------*/
 
-static x86code *op_load2s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, basep, indp;
-	int basereg, dstreg;
+	drcuml_parameter srcp, basep, indp, sizep;
+	int srcreg, basereg;
 	INT32 baseoffs;
 
 	/* validate instruction */
@@ -3848,216 +3899,54 @@ static x86code *op_load2s(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+	param_normalize_4(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
 
 	/* determine the pointer base */
 	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		/* immediate index */
-		if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_movsx_r32_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));	// movsx eax,[basep + 2*indp]
-
-		/* other index */
-		else
-		{
-			int indreg = param_select_register(REG_ECX, &indp, NULL);
-			emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-			emit_movsx_r32_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));		// movsx eax,[basep + 2*indp]
-		}
-
-		/* general case */
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	}
-
-	/* 64-bit form */
-	else
-	{
-		/* immediate index */
-		if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_movsx_r64_m16(&dst, dstreg, MBD(basereg, baseoffs + 2*indp.value));	// movsx rax,[basep + 2*indp]
-
-		/* other index */
-		else
-		{
-			int indreg = param_select_register(REG_ECX, &indp, NULL);
-			emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-			emit_movsx_r64_m16(&dst, dstreg, MBISD(basereg, indreg, 2, baseoffs));		// movsx rax,[basep + 2*indp]
-		}
-
-		/* general case */
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_load4u - process a LOAD4U opcode
--------------------------------------------------*/
-
-static x86code *op_load4u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, basep, indp;
-	int basereg, dstreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* immediate index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-		emit_mov_r32_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));			// mov   dstreg,[basep + 4*indp]
-
-	/* other index */
-	else
-	{
-		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		emit_mov_r32_m32(&dst, dstreg, MBISD(basereg, indreg, 4, baseoffs));			// mov   dstreg,[basep + 4*indp]
-	}
-
-	/* store to appropriate target size */
-	if (inst->size == 4)
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	else if (inst->size == 8)
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_load4s - process a LOAD4S opcode
--------------------------------------------------*/
-
-static x86code *op_load4s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, basep, indp;
-	int basereg, dstreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* immediate index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-		emit_movsxd_r64_m32(&dst, dstreg, MBD(basereg, baseoffs + 4*indp.value));		// mov   dstreg,[basep + 4*indp]
-
-	/* other index */
-	else
-	{
-		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		emit_movsxd_r64_m32(&dst, dstreg, MISD(indreg, 4, basep.value));				// movsx dstreg,[basep + 4*indp]
-	}
-
-	/* general case */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_load8u - process a LOAD8U opcode
--------------------------------------------------*/
-
-static x86code *op_load8u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, basep, indp;
-	int basereg, dstreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &basep, PTYPE_M, &indp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* immediate index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-		emit_mov_r64_m64(&dst, dstreg, MBD(basereg, baseoffs + 8*indp.value));			// mov   dstreg,[basep + 8*indp]
-
-	/* other index */
-	else
-	{
-		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);
-		emit_mov_r64_m64(&dst, dstreg, MBISD(basereg, indreg, 8, baseoffs));			// mov   dstreg,[basep + 8*indp]
-	}
-
-	/* general case */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,edx:dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_store1 - process a STORE1 opcode
--------------------------------------------------*/
-
-static x86code *op_store1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter srcp, basep, indp;
-	int basereg, srcreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI);
 
 	/* pick a source register for the general case */
 	srcreg = param_select_register(REG_EAX, &srcp, NULL);
 
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
 	/* degenerate case: constant index */
 	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
 	{
+		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_mov_m8_imm(&dst, MBD(basereg, baseoffs + 1*indp.value), srcp.value);	// mov   [basep + 1*indp],srcp
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_mov_m8_imm(&dst, MBD(basereg, baseoffs + 1*indp.value), srcp.value);	// mov   [basep + 1*indp],srcp
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_mov_m16_imm(&dst, MBD(basereg, baseoffs + 2*indp.value), srcp.value);	// mov   [basep + 2*indp],srcp
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 4*indp.value), srcp.value);	// mov   [basep + 4*indp],srcp
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+			{
+				if (short_immediate(srcp.value))
+					emit_mov_m64_imm(&dst, MBD(basereg, baseoffs + 8*indp.value), srcp.value);// mov   [basep + 8*indp],srcp
+				else
+				{
+					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value), srcp.value);// mov   [basep + 8*indp],srcp
+					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value + 4), srcp.value >> 32);	
+																						// mov   [basep + 8*indp + 4],srcp >> 32
+				}
+			}
+		}
+		
+		/* variable source */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m8_r8(&dst, MBD(basereg, baseoffs + 1*indp.value), srcreg);		// mov   [basep + 1*indp],srcreg
+			if (sizep.value != DRCUML_SIZE_QWORD)
+				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
+			else
+				emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_mov_m8_r8(&dst, MBD(basereg, baseoffs + 1*indp.value), srcreg);	// mov   [basep + 1*indp],srcreg
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_mov_m16_r16(&dst, MBD(basereg, baseoffs + 2*indp.value), srcreg);	// mov   [basep + 2*indp],srcreg
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_m32_r32(&dst, MBD(basereg, baseoffs + 4*indp.value), srcreg);	// mov   [basep + 4*indp],srcreg
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+				emit_mov_m64_r64(&dst, MBD(basereg, baseoffs + 8*indp.value), srcreg);	// mov   [basep + 8*indp],srcreg
 		}
 	}
 
@@ -4066,12 +3955,44 @@ static x86code *op_store1(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	{
 		int indreg = param_select_register(REG_ECX, &indp, NULL);
 		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
+
+		/* immediate source */
 		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_mov_m8_imm(&dst, MBISD(basereg, indreg, 1, baseoffs), srcp.value);		// mov   [basep + 1*ecx],srcp
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_mov_m8_imm(&dst, MBISD(basereg, indreg, 1, baseoffs), srcp.value);	// mov   [basep + 1*ecx],srcp
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_mov_m16_imm(&dst, MBISD(basereg, indreg, 2, baseoffs), srcp.value);// mov   [basep + 2*ecx],srcp
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 4, baseoffs), srcp.value);// mov   [basep + 4*ecx],srcp
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+			{
+				if (short_immediate(srcp.value))
+					emit_mov_m64_imm(&dst, MBISD(basereg, indreg, 8, baseoffs), srcp.value);// mov   [basep + 8*indp],srcp
+				else
+				{
+					emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 8, baseoffs), srcp.value);// mov   [basep + 8*ecx],srcp
+					emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 8, baseoffs + 4), srcp.value >> 32);
+																						// mov   [basep + 8*ecx + 4],srcp >> 32
+				}
+			}
+		}
+
+		/* variable source */
 		else
 		{
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m8_r8(&dst, MBISD(basereg, indreg, 1, baseoffs), srcreg);			// mov   [basep + 1*ecx],srcreg
+			if (sizep.value != DRCUML_SIZE_QWORD)
+				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov   srcreg,srcp
+			else
+				emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);							// mov   edx:srcreg,srcp
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_mov_m8_r8(&dst, MBISD(basereg, indreg, 1, baseoffs), srcreg);		// mov   [basep + 1*ecx],srcreg
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_mov_m16_r16(&dst, MBISD(basereg, indreg, 2, baseoffs), srcreg);	// mov   [basep + 2*ecx],srcreg
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_m32_r32(&dst, MBISD(basereg, indreg, 4, baseoffs), srcreg);	// mov   [basep + 4*ecx],srcreg
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+				emit_mov_m64_r64(&dst, MBISD(basereg, indreg, 8, baseoffs), srcreg);	// mov   [basep + 8*ecx],srcreg
 		}
 	}
 	return dst;
@@ -4079,168 +4000,12 @@ static x86code *op_store1(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_store2 - process a STORE2 opcode
+    op_read - process a READ opcode
 -------------------------------------------------*/
 
-static x86code *op_store2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter srcp, basep, indp;
-	int basereg, srcreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* pick a source register for the general case */
-	srcreg = param_select_register(REG_EAX, &srcp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* degenerate case: constant index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_mov_m16_imm(&dst, MBD(basereg, baseoffs + 2*indp.value), srcp.value);	// mov   [basep + 2*indp],srcp
-		else
-		{
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m16_r16(&dst, MBD(basereg, baseoffs + 2*indp.value), srcreg);		// mov   [basep + 2*indp],srcreg
-		}
-	}
-
-	/* normal case: variable index */
-	else
-	{
-		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
-		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_mov_m16_imm(&dst, MBISD(basereg, indreg, 2, baseoffs), srcp.value);	// mov   [basep + 2*ecx],srcp
-		else
-		{
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m16_r16(&dst, MBISD(basereg, indreg, 2, baseoffs), srcreg);		// mov   [basep + 2*ecx],srcreg
-		}
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_store4 - process a STORE4 opcode
--------------------------------------------------*/
-
-static x86code *op_store4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter srcp, basep, indp;
-	int basereg, srcreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* pick a source register for the general case */
-	srcreg = param_select_register(REG_EAX, &srcp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* degenerate case: constant index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 4*indp.value), srcp.value);	// mov   [basep + 4*indp],srcp
-		else
-		{
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m32_r32(&dst, MBD(basereg, baseoffs + 4*indp.value), srcreg);		// mov   [basep + 4*indp],srcreg
-		}
-	}
-
-	/* normal case: variable index */
-	else
-	{
-		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
-		if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-			emit_mov_m32_imm(&dst, MBISD(basereg, indreg, 4, baseoffs), srcp.value);	// mov   [basep + 4*ecx],srcp
-		else
-		{
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m32_r32(&dst, MBISD(basereg, indreg, 4, baseoffs), srcreg);		// mov   [basep + 4*ecx],srcreg
-		}
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_store8 - process a STORE8 opcode
--------------------------------------------------*/
-
-static x86code *op_store8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter srcp, basep, indp;
-	int basereg, srcreg;
-	INT32 baseoffs;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &basep, PTYPE_M, &indp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* pick a source register for the general case */
-	srcreg = param_select_register(REG_EAX, &srcp, NULL);
-
-	/* determine the pointer base */
-	basereg = get_base_register_and_offset(drcbe, &dst, basep.value, REG_RDX, &baseoffs);
-
-	/* degenerate case: constant index */
-	if (indp.type == DRCUML_PTYPE_IMMEDIATE)
-	{
-		if (srcp.type == DRCUML_PTYPE_IMMEDIATE && short_immediate(srcp.value))
-			emit_mov_m64_imm(&dst, MBD(basereg, baseoffs + 8*indp.value), srcp.value);	// mov   [basep + 8*indp],srcp
-		else
-		{
-			emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m64_r64(&dst, MBD(basereg, baseoffs + 8*indp.value), srcreg);		// mov   [basep + 8*indp],srcreg
-		}
-	}
-
-	/* normal case: variable index */
-	else
-	{
-		int indreg = param_select_register(REG_ECX, &indp, NULL);
-		emit_mov_r32_p32(drcbe, &dst, indreg, &indp);									// mov   indreg,indp
-		if (srcp.type == DRCUML_PTYPE_IMMEDIATE && short_immediate(srcp.value))
-			emit_mov_m64_imm(&dst, MBISD(basereg, indreg, 8, baseoffs), srcp.value);	// mov   [basep + 8*ecx],srcp
-		else
-		{
-			emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);								// mov   srcreg,srcp
-			emit_mov_m64_r64(&dst, MBISD(basereg, indreg, 8, baseoffs), srcreg);		// mov   [basep + 8*ecx],srcreg
-		}
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read1u - process a READ1U opcode
--------------------------------------------------*/
-
-static x86code *op_read1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp;
+	drcuml_parameter dstp, addrp, spacesizep;
 	int dstreg;
 
 	/* validate instruction */
@@ -4248,20 +4013,44 @@ static x86code *op_read1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
+	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &addrp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_byte);// call   read_byte
-	emit_movzx_r32_r8(&dst, dstreg, REG_AL);											// movzx  dstreg,al
+	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
+	{
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_byte);
+																						// call   read_byte
+		emit_movzx_r32_r8(&dst, dstreg, REG_AL);										// movzx  dstreg,al
+	}
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
+	{
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_word);
+																						// call   read_word
+		emit_movzx_r32_r16(&dst, dstreg, REG_AX);										// movzx  dstreg,ax
+	}
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
+	{
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_dword);
+																						// call   read_dword
+		if (dstreg != REG_EAX || inst->size == 8)
+			emit_mov_r32_r32(&dst, dstreg, REG_EAX);									// mov    dstreg,eax
+	}
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
+	{
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_qword);
+																						// call   read_qword
+		if (dstreg != REG_RAX)
+			emit_mov_r64_r64(&dst, dstreg, REG_RAX);									// mov    dstreg,rax
+	}
 
-	/* store to appropriate target size */
+	/* store result */
 	if (inst->size == 4)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	else if (inst->size == 8)
+	else
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 
 	return dst;
@@ -4269,12 +4058,12 @@ static x86code *op_read1u(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_read1s - process a READ1S opcode
+    op_readm - process a READM opcode
 -------------------------------------------------*/
 
-static x86code *op_read1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, spacep, addrp;
+	drcuml_parameter dstp, addrp, maskp, spacesizep;
 	int dstreg;
 
 	/* validate instruction */
@@ -4282,62 +4071,42 @@ static x86code *op_read1s(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_byte);// call   read_byte
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		/* general case */
-		emit_movsx_r32_r8(&dst, dstreg, REG_AL);										// movsx  dstreg,al
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov    dstp,dstreg
-	}
-
-	/* 64-bit form */
+	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &maskp);								// mov    param2,maskp
 	else
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &maskp);								// mov    param2,maskp
+	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 	{
-		/* general case */
-		emit_movsx_r64_r8(&dst, dstreg, REG_AL);										// movsx  dstreg,al
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov    dstp,dstreg
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_word_masked);
+																						// call   read_word_masked
+		emit_movzx_r32_r16(&dst, dstreg, REG_AX);										// movzx  dstreg,ax
 	}
-	return dst;
-}
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
+	{
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_dword_masked);
+																						// call   read_dword_masked
+		if (dstreg != REG_EAX || inst->size == 8)
+			emit_mov_r32_r32(&dst, dstreg, REG_EAX);									// mov    dstreg,eax
+	}
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
+	{
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_qword_masked);
+																						// call   read_qword_masked
+		if (dstreg != REG_RAX)
+			emit_mov_r64_r64(&dst, dstreg, REG_RAX);									// mov    dstreg,rax
+	}
 
-
-/*-------------------------------------------------
-    op_read2u - process a READ2U opcode
--------------------------------------------------*/
-
-static x86code *op_read2u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* set up a call to the read word handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_word);// call   read_word
-	emit_movzx_r32_r16(&dst, dstreg, REG_AX);											// movzx  dstreg,ax
-
-	/* store to appropriate target size */
+	/* store result */
 	if (inst->size == 4)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	else if (inst->size == 8)
+	else
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 
 	return dst;
@@ -4345,487 +4114,87 @@ static x86code *op_read2u(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_read2s - process a READ2S opcode
+    op_write - process a WRITE opcode
 -------------------------------------------------*/
 
-static x86code *op_read2s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, spacep, addrp;
-	int dstreg;
+	drcuml_parameter addrp, srcp, spacesizep;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* set up a call to the read word handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_word);// call   read_word
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		/* general case */
-		emit_movsx_r32_r16(&dst, dstreg, REG_AX);										// movsx  dstreg,ax
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov    dstp,dstreg
-	}
-
-	/* 64-bit form */
-	else
-	{
-		/* general case */
-		emit_movsx_r64_r16(&dst, dstreg, REG_AX);										// movsx  dstreg,ax
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov    dstp,dstreg
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read2m - process a READ2M opcode
--------------------------------------------------*/
-
-static x86code *op_read2m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp, maskp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* set up a call to the read dword masked handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &maskp);									// mov    param1,maskp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_word_masked);// call   read_word_masked
-	emit_movzx_r32_r16(&dst, dstreg, REG_AX);											// movzx  dstreg,ax
-
-	/* store to appropriate target size */
-	if (inst->size == 4)
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	else if (inst->size == 8)
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read4u - process a READ4U opcode
--------------------------------------------------*/
-
-static x86code *op_read4u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
-
-	/* set up a call to the read dword handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_dword);// call   read_dword
-
-	/* store to appropriate target size */
-	if (inst->size == 4)
-		emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);									// mov   dstp,eax
-	else if (inst->size == 8)
-		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);									// mov   dstp,rax
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read4s - process a READ4S opcode
--------------------------------------------------*/
-
-static x86code *op_read4s(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* set up a call to the read dword handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_dword);// call   read_dword
-
-	/* 64-bit form */
-	emit_movsxd_r64_r32(&dst, dstreg, REG_EAX);											// movsxd dstreg,eax
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read4m - process a READ4M opcode
--------------------------------------------------*/
-
-static x86code *op_read4m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp, maskp;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI);
-
-	/* set up a call to the read dword masked handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &maskp);									// mov    param2,maskp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_dword_masked);// call   read_dword_masked
-
-	/* store to appropriate target size */
-	if (inst->size == 4)
-		emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);									// mov   dstp,eax
-	else if (inst->size == 8)
-		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);									// mov   dstp,rax
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read8u - process a READ8U opcode
--------------------------------------------------*/
-
-static x86code *op_read8u(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
-
-	/* set up a call to the read qword handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_qword);// call   read_qword
-
-	/* 64-bit form */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);										// mov   dstp,rax
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_read8m - process a READ8M opcode
--------------------------------------------------*/
-
-static x86code *op_read8m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, spacep, addrp, maskp;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI);
-
-	/* set up a call to the read qword masked handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &maskp);									// mov    param2,maskp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_qword_masked);// call   read_qword_masked
-
-	/* 64-bit form */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);										// mov   dstp,rax
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_write1 - process a WRITE1 opcode
--------------------------------------------------*/
-
-static x86code *op_write1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter spacep, addrp, srcp;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI);
+	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_byte);// call   write_byte
-
+	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param1,srcp
+	else
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param1,srcp
+	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_byte);
+																						// call   write_byte
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_word);
+																						// call   write_word
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_dword);
+																						// call   write_dword
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
+		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_qword);
+																						// call   write_qword
 	return dst;
 }
 
 
 /*-------------------------------------------------
-    op_write2 - process a WRITE2 opcode
+    op_writem - process a WRITEM opcode
 -------------------------------------------------*/
 
-static x86code *op_write2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter spacep, addrp, srcp;
+	drcuml_parameter addrp, srcp, maskp, spacesizep;
 
 	/* validate instruction */
 	assert(inst->size == 4 || inst->size == 8);
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI);
+	param_normalize_4(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &maskp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
-	/* set up a call to the write word handler */
+	/* set up a call to the write byte handler */
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_word);// call   write_word
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_writ2m - process a WRIT2M opcode
--------------------------------------------------*/
-
-static x86code *op_writ2m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter spacep, addrp, maskp, srcp;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* set up a call to the write word handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &maskp);									// mov    param3,maskp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_word_masked);// call   write_word_masked
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_write4 - process a WRITE4 opcode
--------------------------------------------------*/
-
-static x86code *op_write4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter spacep, addrp, srcp;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* set up a call to the write dword handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_dword);// call   write_dword
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_writ4m - process a WRIT4M opcode
--------------------------------------------------*/
-
-static x86code *op_writ4m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter spacep, addrp, maskp, srcp;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* set up a call to the write word handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &maskp);									// mov    param3,maskp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_dword_masked);// call   write_dword_masked
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_write8 - process a WRITE8 opcode
--------------------------------------------------*/
-
-static x86code *op_write8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter spacep, addrp, srcp;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* set up a call to the write qword handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_qword);// call   write_qword
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_writ8m - process a WRIT8M opcode
--------------------------------------------------*/
-
-static x86code *op_writ8m(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter spacep, addrp, maskp, srcp;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_4(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &maskp, PTYPE_MRI, &srcp, PTYPE_MRI);
-
-	/* set up a call to the write word handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
-	emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &srcp);									// mov    param2,srcp
-	emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &maskp);									// mov    param3,maskp
-	emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_qword_masked);// call   write_qword_masked
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_flags - process a FLAGS opcode
--------------------------------------------------*/
-
-static x86code *op_flags(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, maskp, tablep;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &maskp, PTYPE_I, &tablep, PTYPE_M);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_ECX, &dstp, NULL);
-
-	/* translate live flags into UML flags */
-	emit_pushf(&dst);																	// pushf
-	emit_pop_r64(&dst, REG_RAX);														// pop    rax
-	emit_and_r32_imm(&dst, REG_EAX, 0x8c5);												// and    eax,0x8c5
-	emit_movzx_r32_m8(&dst, REG_EAX, MBISD(REG_RBP, REG_RAX, 1, offset_from_rbp(drcbe, (FPTR)&drcbe->flagsmap[0])));
-																						// movzx  eax,[flags_map]
-
-	/* 32-bit form */
-	if (inst->size == 4)
+	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
 	{
-		/* no masking */
-		if (maskp.value == 0xffffffff)
-		{
-			emit_mov_r32_m32(&dst, dstreg, MBISD(REG_RBP, REG_EAX, 4, offset_from_rbp(drcbe, tablep.value)));
-																						// mov    dstreg,[eax*4+table]
-			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov    dstp,dstreg
-		}
-
-		/* general case */
-		else
-		{
-			emit_mov_r32_p32(drcbe, &dst, dstreg, &dstp);								// mov    dstreg,dstp
-			emit_mov_r32_m32(&dst, REG_EDX, MBISD(REG_RBP, REG_EAX, 4, offset_from_rbp(drcbe, tablep.value)));
-																						// mov    edx,[eax*4+table]
-			emit_and_r32_imm(&dst, dstreg, ~maskp.value);								// and    dstreg,~mask
-			emit_and_r32_imm(&dst, REG_EDX, maskp.value);								// and    edx,mask
-			emit_or_r32_r32(&dst, dstreg, REG_EDX);										// or     dstreg,edx
-			emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);								// mov    dstp,dstreg
-		}
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param2,srcp
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
 	}
-
-	/* 64-bit form */
 	else
 	{
-		/* no masking */
-		if (maskp.value == U64(0xffffffffffffffff))
-		{
-			emit_mov_r64_m64(&dst, dstreg, MBISD(REG_RBP, REG_EAX, 8, offset_from_rbp(drcbe, tablep.value)));
-																						// mov    dstreg,[eax*8+table]
-			emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);								// mov    dstp,dstreg
-		}
-
-		/* general case */
-		else
-		{
-			emit_mov_r64_p64(drcbe, &dst, dstreg, &dstp);								// mov    dstreg,dstp
-			emit_mov_r64_m64(&dst, REG_EDX, MBISD(REG_RBP, REG_EAX, 8, offset_from_rbp(drcbe, tablep.value)));
-																						// mov    edx,[eax*84+table]
-			if (short_immediate(~maskp.value))
-				emit_and_r64_imm(&dst, dstreg, ~maskp.value);							// and    dstreg,~mask
-			else
-			{
-				emit_mov_r64_imm(&dst, REG_R11, ~maskp.value);							// mov    r11,~mask
-				emit_and_r64_r64(&dst, dstreg, REG_R11);								// and    dstreg,r11
-			}
-			if (short_immediate(maskp.value))
-				emit_and_r64_imm(&dst, REG_EDX, maskp.value);							// and    edx,mask
-			else
-			{
-				emit_mov_r64_imm(&dst, REG_R11, maskp.value);							// mov    r11,mask
-				emit_and_r64_r64(&dst, REG_EDX, REG_R11);								// and    edx,r11
-			}
-			emit_or_r64_r64(&dst, dstreg, REG_EDX);										// or     dstreg,edx
-			emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);								// mov    dstp,dstreg
-		}
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param2,srcp
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
 	}
+	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
+		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_word_masked);
+																						// call   write_word_masked
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
+		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_dword_masked);
+																						// call   write_dword_masked
+	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
+		emit_call(&dst, (x86code *)drcbe->accessors[spacesizep.value / 16].write_qword_masked);
+																						// call   write_qword_masked
 	return dst;
 }
 
 
 /*-------------------------------------------------
-    op_setc - process a SETC opcode
+    op_carry - process a CARRY opcode
 -------------------------------------------------*/
 
-static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_carry(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter srcp, bitp;
 
@@ -4890,6 +4259,41 @@ static x86code *op_setc(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 				emit_bt_r64_r64(&dst, srcp.value, REG_ECX);								// bt     srcp,ecx
 		}
 	}
+	return dst;
+}
+
+
+/*-------------------------------------------------
+    op_set - process a SET opcode
+-------------------------------------------------*/
+
+static x86code *op_set(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	drcuml_parameter dstp;
+	int dstreg;
+
+	/* validate instruction */
+	assert(inst->size == 4 || inst->size == 8);
+	assert(inst->condflags >= DRCUML_COND_Z && inst->condflags < DRCUML_COND_MAX);
+
+	/* normalize parameters */
+	param_normalize_1(drcbe, inst, &dstp, PTYPE_MR);
+
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_EAX, &dstp, NULL);
+	
+	/* set to AL */
+	emit_setcc_r8(&dst, X86_CONDITION(inst->condflags), REG_AL);						// setcc  al
+	emit_movzx_r32_r8(&dst, dstreg, REG_AL);											// movzx  dstreg,al
+	
+	/* 32-bit form */
+	if (inst->size == 4)
+		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+	
+	/* 64-bit form */
+	else if (inst->size == 8)
+		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+
 	return dst;
 }
 
@@ -5012,12 +4416,12 @@ static x86code *op_mov(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 
 /*-------------------------------------------------
-    op_zext1 - process a ZEXT1 opcode
+    op_sext - process a SEXT opcode
 -------------------------------------------------*/
 
-static x86code *op_zext1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_sext(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
+	drcuml_parameter dstp, srcp, sizep;
 	int dstreg;
 
 	/* validate instruction */
@@ -5025,182 +4429,18 @@ static x86code *op_zext1(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
+	param_normalize_3(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
 
 	/* degenerate cases -- convert to a move */
 	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT8)srcp.value);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* general case */
-	if (srcp.type == DRCUML_PTYPE_MEMORY)
-		emit_movzx_r32_m8(&dst, dstreg, MABS(drcbe, srcp.value));						// movzx dstreg,[srcp]
-	else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-		emit_movzx_r32_r8(&dst, dstreg, srcp.value);									// movzx dstreg,srcp
-
-	/* 32-bit form */
-	if (inst->size == 4)
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_zext2 - process a ZEXT2 opcode
--------------------------------------------------*/
-
-static x86code *op_zext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT16)srcp.value);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* general case */
-	if (srcp.type == DRCUML_PTYPE_MEMORY)
-		emit_movzx_r32_m16(&dst, dstreg, MABS(drcbe, srcp.value));						// movzx dstreg,[srcp]
-	else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-		emit_movzx_r32_r16(&dst, dstreg, srcp.value);									// movzx dstreg,srcp
-
-	/* 32-bit form */
-	if (inst->size == 4)
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_zext4 - process a ZEXT4 opcode
--------------------------------------------------*/
-
-static x86code *op_zext4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (UINT32)srcp.value);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* general case */
-	if (srcp.type == DRCUML_PTYPE_MEMORY)
-		emit_mov_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));						// mov   dstreg,[srcp]
-	else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-		emit_mov_r32_r32(&dst, dstreg, srcp.value);										// mov   dstreg,srcp
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_sext1 - process a SEXT1 opcode
--------------------------------------------------*/
-
-static x86code *op_sext1(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT8)srcp.value);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* convert 8-bit source registers */
-	if (srcp.type == DRCUML_PTYPE_INT_REGISTER && (srcp.value & 4))
 	{
-		emit_mov_r32_r32(&dst, REG_EAX, srcp.value);									// mov   eax,srcp
-		srcp.value = REG_EAX;
+		if (sizep.value == DRCUML_SIZE_BYTE)
+			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT8)srcp.value);
+		else if (sizep.value == DRCUML_SIZE_WORD)
+			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT16)srcp.value);
+		else if (sizep.value == DRCUML_SIZE_DWORD)
+			return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)srcp.value);
 	}
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		/* general case */
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_movsx_r32_m8(&dst, dstreg, MABS(drcbe, srcp.value));					// movsx dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movsx_r32_r8(&dst, dstreg, srcp.value);								// movsx dstreg,srcp
-		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		/* general case */
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_movsx_r64_m8(&dst, dstreg, MABS(drcbe, srcp.value));					// movsx dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movsx_r64_r8(&dst, dstreg, srcp.value);								// movsx dstreg,srcp
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_sext2 - process a SEXT2 opcode
--------------------------------------------------*/
-
-static x86code *op_sext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT16)srcp.value);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
@@ -5210,9 +4450,23 @@ static x86code *op_sext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		/* general case */
 		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_movsx_r32_m16(&dst, dstreg, MABS(drcbe, srcp.value));					// movsx dstreg,[srcp]
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r32_m8(&dst, dstreg, MABS(drcbe, srcp.value));				// movsx dstreg,[srcp]
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r32_m16(&dst, dstreg, MABS(drcbe, srcp.value));				// movsx dstreg,[srcp]
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// mov   dstreg,[srcp]
+		}
 		else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movsx_r32_r16(&dst, dstreg, srcp.value);								// movsx dstreg,srcp
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r32_r8(&dst, dstreg, srcp.value);							// movsx dstreg,srcp
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r32_r16(&dst, dstreg, srcp.value);							// movsx dstreg,srcp
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_mov_r32_r32(&dst, dstreg, srcp.value);								// mov   dstreg,srcp
+		}
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 
@@ -5221,9 +4475,27 @@ static x86code *op_sext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	{
 		/* general case */
 		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_movsx_r64_m16(&dst, dstreg, MABS(drcbe, srcp.value));					// movsx dstreg,[srcp]
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r64_m8(&dst, dstreg, MABS(drcbe, srcp.value));				// movsx dstreg,[srcp]
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r64_m16(&dst, dstreg, MABS(drcbe, srcp.value));				// movsx dstreg,[srcp]
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_movsxd_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// movsxd dstreg,[srcp]
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+				emit_mov_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// mov   dstreg,[srcp]
+		}
 		else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movsx_r64_r16(&dst, dstreg, srcp.value);								// movsx dstreg,srcp
+		{
+			if (sizep.value == DRCUML_SIZE_BYTE)
+				emit_movsx_r64_r8(&dst, dstreg, srcp.value);							// movsx dstreg,srcp
+			else if (sizep.value == DRCUML_SIZE_WORD)
+				emit_movsx_r64_r16(&dst, dstreg, srcp.value);							// movsx dstreg,srcp
+			else if (sizep.value == DRCUML_SIZE_DWORD)
+				emit_movsxd_r64_r32(&dst, dstreg, srcp.value);							// movsxd dstreg,srcp
+			else if (sizep.value == DRCUML_SIZE_QWORD)
+				emit_mov_r64_r64(&dst, dstreg, srcp.value);								// mov   dstreg,srcp
+		}
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
 	}
 	return dst;
@@ -5231,47 +4503,10 @@ static x86code *op_sext2(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 
 /*-------------------------------------------------
-    op_sext4 - process a SEXT4 opcode
+    op_roland - process an ROLAND opcode
 -------------------------------------------------*/
 
-static x86code *op_sext4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MRI);
-
-	/* degenerate cases -- convert to a move */
-	if (srcp.type == DRCUML_PTYPE_IMMEDIATE)
-		return convert_to_mov_imm(drcbe, dst, inst, &dstp, (INT32)srcp.value);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* 64-bit form */
-	if (inst->size == 8)
-	{
-		/* general case */
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_movsxd_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));					// movsxd dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movsxd_r64_r32(&dst, dstreg, srcp.value);								// movsxd dstreg,srcp
-		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_xtract - process an XTRACT opcode
--------------------------------------------------*/
-
-static x86code *op_xtract(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_roland(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp, srcp, shiftp, maskp;
 	int dstreg;
@@ -5333,10 +4568,10 @@ static x86code *op_xtract(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 
 
 /*-------------------------------------------------
-    op_insert - process an INSERT opcode
+    op_rolins - process an ROLINS opcode
 -------------------------------------------------*/
 
-static x86code *op_insert(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_rolins(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp, srcp, shiftp, maskp;
 	int dstreg;
@@ -5753,6 +4988,27 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);									// mov   dstp,eax
 		if (compute_hi)
 			emit_mov_p32_r32(drcbe, &dst, &edstp, REG_EDX);								// mov   edstp,edx
+		
+		/* compute flags */
+		if (inst->condflags != 0)
+		{
+			if (compute_hi)
+			{
+				if (inst->condflags == DRCUML_FLAG_Z)
+					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
+				else if (inst->condflags == DRCUML_FLAG_S)
+					emit_test_r32_r32(&dst, REG_EDX, REG_EDX);							// test  edx,edx
+				else
+				{
+					emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);							// movzx ecx,ax
+					emit_shr_r32_imm(&dst, REG_EAX, 16);								// shr   eax,16
+					emit_or_r32_r32(&dst, REG_EDX, REG_ECX);							// or    edx,ecx
+					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
+				}
+			}
+			else
+				emit_test_r32_r32(&dst, REG_EAX, REG_EAX);								// test  eax,eax
+		}
 	}
 
 	/* 64-bit form */
@@ -5772,6 +5028,27 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);									// mov   dstp,rax
 		if (compute_hi)
 			emit_mov_p64_r64(drcbe, &dst, &edstp, REG_RDX);								// mov   edstp,rdx
+		
+		/* compute flags */
+		if (inst->condflags != 0)
+		{
+			if (compute_hi)
+			{
+				if (inst->condflags == DRCUML_FLAG_Z)
+					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
+				else if (inst->condflags == DRCUML_FLAG_S)
+					emit_test_r64_r64(&dst, REG_RDX, REG_RDX);							// test  rdx,rdx
+				else
+				{
+					emit_mov_r32_r32(&dst, REG_ECX, REG_EAX);							// mov   ecx,eax
+					emit_shr_r64_imm(&dst, REG_RAX, 32);								// shr   rax,32
+					emit_or_r64_r64(&dst, REG_RDX, REG_RCX);							// or    rdx,rcx
+					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
+				}
+			}
+			else
+				emit_test_r64_r64(&dst, REG_RAX, REG_RAX);								// test  rax,rax
+		}
 	}
 	return dst;
 }
@@ -5850,6 +5127,27 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 			emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);								// mov   dstp,eax
 			emit_mov_p32_r32(drcbe, &dst, &edstp, REG_EDX);								// mov   edstp,edx
 		}
+
+		/* compute flags */
+		if (inst->condflags != 0)
+		{
+			if (compute_hi)
+			{
+				if (inst->condflags == DRCUML_FLAG_Z)
+					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
+				else if (inst->condflags == DRCUML_FLAG_S)
+					emit_test_r32_r32(&dst, REG_EDX, REG_EDX);							// test  edx,edx
+				else
+				{
+					emit_movzx_r32_r16(&dst, REG_ECX, REG_AX);							// movzx ecx,ax
+					emit_shr_r32_imm(&dst, REG_EAX, 16);								// shr   eax,16
+					emit_or_r32_r32(&dst, REG_EDX, REG_ECX);							// or    edx,ecx
+					emit_or_r32_r32(&dst, REG_EDX, REG_EAX);							// or    edx,eax
+				}
+			}
+			else
+				emit_test_r32_r32(&dst, REG_EAX, REG_EAX);								// test  eax,eax
+		}
 	}
 
 	/* 64-bit form */
@@ -5891,6 +5189,27 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 			}
 			emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);								// mov   dstp,rax
 			emit_mov_p64_r64(drcbe, &dst, &edstp, REG_RDX);								// mov   edstp,rdx
+		}
+		
+		/* compute flags */
+		if (inst->condflags != 0)
+		{
+			if (compute_hi)
+			{
+				if (inst->condflags == DRCUML_FLAG_Z)
+					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
+				else if (inst->condflags == DRCUML_FLAG_S)
+					emit_test_r64_r64(&dst, REG_RDX, REG_RDX);							// test  rdx,rdx
+				else
+				{
+					emit_mov_r32_r32(&dst, REG_ECX, REG_EAX);							// mov   ecx,eax
+					emit_shr_r64_imm(&dst, REG_RAX, 32);								// shr   rax,32
+					emit_or_r64_r64(&dst, REG_RDX, REG_RCX);							// or    rdx,rcx
+					emit_or_r64_r64(&dst, REG_RDX, REG_RAX);							// or    rdx,rax
+				}
+			}
+			else
+				emit_test_r64_r64(&dst, REG_RAX, REG_RAX);								// test  rax,rax
 		}
 	}
 	return dst;
@@ -6945,7 +6264,7 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &spacep, PTYPE_I, &addrp, PTYPE_MRI);
+	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &addrp, PTYPE_MRI, &spacep, PTYPE_I);
 
 	/* set up a call to the read dword/qword handler */
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
@@ -6986,7 +6305,7 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_3(drcbe, inst, &spacep, PTYPE_I, &addrp, PTYPE_MRI, &srcp, PTYPE_MF);
+	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MF, &spacep, PTYPE_I);
 
 	/* general case */
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
@@ -7061,12 +6380,12 @@ static x86code *op_fmov(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 
 
 /*-------------------------------------------------
-    op_ftoi4 - process a FTOI4 opcode
+    op_ftoint - process a FTOINT opcode
 -------------------------------------------------*/
 
-static x86code *op_ftoi4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_ftoint(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
-	drcuml_parameter dstp, srcp;
+	drcuml_parameter dstp, srcp, sizep, roundp;
 	int dstreg;
 
 	/* validate instruction */
@@ -7074,339 +6393,247 @@ static x86code *op_ftoi4(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	assert(inst->condflags == DRCUML_COND_ALWAYS);
 
 	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
+	param_normalize_4(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF, &sizep, PTYPE_I, &roundp, PTYPE_I);
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
-	/* 32-bit form */
-	if (inst->size == 4)
+	/* set rounding mode if necessary */
+	if (roundp.value != DRCUML_FMOD_DEFAULT && roundp.value != DRCUML_FMOD_TRUNC)
 	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* general case */
-	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ftoi4t - process a FTOI4T opcode
--------------------------------------------------*/
-
-static x86code *op_ftoi4t(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvttss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvttss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvttss2si_r32_r128(&dst, dstreg, srcp.value);							// cvttss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvttsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvttsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvttsd2si_r32_r128(&dst, dstreg, srcp.value);							// cvttsd2si dstreg,srcp
-	}
-
-	/* general case */
-	emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ftoi4x - process a FTOI4R/F/C opcode
--------------------------------------------------*/
-
-static x86code *op_ftoi4x(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, int mode)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* non-SSE4.1 case */
-	if (!drcbe->sse41 || inst->size == 8)
-	{
-		/* save and set the control word */
 		emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// stmxcsr [ssemodesave]
-		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[mode]));					// ldmxcsr fpcontrol[mode]
-
-		/* 32-bit form */
-		if (inst->size == 4)
+		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[roundp.value]));			// ldmxcsr fpcontrol[mode]
+	}
+	
+	/* 32-bit form */
+	if (inst->size == 4)
+	{
+		/* 32-bit integer source */
+		if (sizep.value == DRCUML_SIZE_DWORD)
 		{
 			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtss2si dstreg,[srcp]
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));		// cvtss2si dstreg,[srcp]
+				else
+					emit_cvttss2si_r32_m32(&dst, dstreg, MABS(drcbe, srcp.value));		// cvttss2si dstreg,[srcp]
+			}
 			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-				emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);						// cvtss2si dstreg,srcp
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtss2si_r32_r128(&dst, dstreg, srcp.value);					// cvtss2si dstreg,srcp
+				else
+					emit_cvttss2si_r32_r128(&dst, dstreg, srcp.value);					// cvttss2si dstreg,srcp
+			}
 		}
-
-		/* 64-bit form */
-		else if (inst->size == 8)
+		
+		/* 64-bit integer source */
+		else if (sizep.value == DRCUML_SIZE_QWORD)
 		{
 			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsd2si dstreg,[srcp]
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));		// cvtss2si dstreg,[srcp]
+				else
+					emit_cvttss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));		// cvttss2si dstreg,[srcp]
+			}
 			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-				emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);						// cvtsd2si dstreg,srcp
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);					// cvtss2si dstreg,srcp
+				else
+					emit_cvttss2si_r64_r128(&dst, dstreg, srcp.value);					// cvttss2si dstreg,srcp
+			}
 		}
+	}
 
-		/* restore control word and proceed */
+	/* 64-bit form */
+	else if (inst->size == 8)
+	{
+		/* 32-bit integer source */
+		if (sizep.value == DRCUML_SIZE_DWORD)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));		// cvtsd2si dstreg,[srcp]
+				else
+					emit_cvttsd2si_r32_m64(&dst, dstreg, MABS(drcbe, srcp.value));		// cvttsd2si dstreg,[srcp]
+			}
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtsd2si_r32_r128(&dst, dstreg, srcp.value);					// cvtsd2si dstreg,srcp
+				else
+					emit_cvttsd2si_r32_r128(&dst, dstreg, srcp.value);					// cvttsd2si dstreg,srcp
+			}
+		}
+		
+		/* 64-bit integer source */
+		else if (sizep.value == DRCUML_SIZE_QWORD)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));		// cvtsd2si dstreg,[srcp]
+				else
+					emit_cvttsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));		// cvttsd2si dstreg,[srcp]
+			}
+			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+			{
+				if (roundp.value != DRCUML_FMOD_TRUNC)
+					emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);					// cvtsd2si dstreg,srcp
+				else
+					emit_cvttsd2si_r64_r128(&dst, dstreg, srcp.value);					// cvttsd2si dstreg,srcp
+			}
+		}
+	}
+
+	/* general case */
+	if (sizep.value == DRCUML_SIZE_DWORD)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// ldmxcsr [ssemodesave]
-	}
-
-	/* SSE4.1 case */
 	else
-	{
-		/* 32-bit form */
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_roundss_r128_m32_imm(&dst, REG_XMM0, MABS(drcbe, srcp.value), fprnd_map[mode]);
-																						// roundss  xmm0,[srcp],mode
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_roundss_r128_r128_imm(&dst, REG_XMM0, srcp.value, fprnd_map[mode]);	// roundss  xmm0,srcp,mode
-
-		/* store to the destination */
-		if (dstp.type == DRCUML_PTYPE_MEMORY)
-			emit_movd_m32_r128(&dst, MABS(drcbe, dstp.value), REG_XMM0);				// movd     [dstp],xmm0
-		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movd_r32_r128(&dst, dstp.value, REG_XMM0);								// movd     dstp,xmm0
-	}
-	return dst;
-
-}
-
-static x86code *op_ftoi4r(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	return op_ftoi4x(drcbe, dst, inst, DRCUML_FMOD_ROUND);
-}
-
-static x86code *op_ftoi4f(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	return op_ftoi4x(drcbe, dst, inst, DRCUML_FMOD_FLOOR);
-}
-
-static x86code *op_ftoi4c(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	return op_ftoi4x(drcbe, dst, inst, DRCUML_FMOD_CEIL);
-}
-
-
-/*-------------------------------------------------
-    op_ftoi8 - process a FTOI8 opcode
--------------------------------------------------*/
-
-static x86code *op_ftoi8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);							// cvtss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);							// cvtsd2si dstreg,srcp
-	}
-
-	/* general case */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ftoi8t - process a FTOI8T opcode
--------------------------------------------------*/
-
-static x86code *op_ftoi8t(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvttss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvttss2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvttss2si_r64_r128(&dst, dstreg, srcp.value);							// cvttss2si dstreg,srcp
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvttsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvttsd2si dstreg,[srcp]
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_cvttsd2si_r64_r128(&dst, dstreg, srcp.value);							// cvttsd2si dstreg,srcp
-	}
-
-	/* general case */
-	emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);										// mov   dstp,dstreg
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ftoi8x - process a FTOI8R/F/C opcode
--------------------------------------------------*/
-
-static x86code *op_ftoi8x(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst, int mode)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MR, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-
-	/* non-SSE4.1 case */
-	if (!drcbe->sse41 || inst->size == 4)
-	{
-		/* save and set the control word */
-		emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// stmxcsr [ssemodesave]
-		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[mode]));					// ldmxcsr fpcontrol[mode]
-
-		/* 32-bit form */
-		if (inst->size == 4)
-		{
-			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_cvtss2si_r64_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtss2si dstreg,[srcp]
-			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-				emit_cvtss2si_r64_r128(&dst, dstreg, srcp.value);						// cvtss2si dstreg,srcp
-		}
-
-		/* 64-bit form */
-		else if (inst->size == 8)
-		{
-			if (srcp.type == DRCUML_PTYPE_MEMORY)
-				emit_cvtsd2si_r64_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsd2si dstreg,[srcp]
-			else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-				emit_cvtsd2si_r64_r128(&dst, dstreg, srcp.value);						// cvtsd2si dstreg,srcp
-		}
-
-		/* restore control word and proceed */
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
+
+	/* restore rounding mode */
+	if (roundp.value != DRCUML_FMOD_DEFAULT && roundp.value != DRCUML_FMOD_TRUNC)
 		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// ldmxcsr [ssemodesave]
-	}
 
-	/* SSE4.1 case */
-	else
-	{
-		/* 64-bit form */
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_roundsd_r128_m64_imm(&dst, REG_XMM0, MABS(drcbe, srcp.value), fprnd_map[mode]);
-																						// roundsd  xmm0,[srcp],mode
-		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_roundsd_r128_r128_imm(&dst, REG_XMM0, srcp.value, fprnd_map[mode]);	// roundsd  xmm0,srcp,mode
-
-		/* store to the destination */
-		if (dstp.type == DRCUML_PTYPE_MEMORY)
-			emit_movq_m64_r128(&dst, MABS(drcbe, dstp.value), REG_XMM0);				// movq     [dstp],xmm0
-		else if (dstp.type == DRCUML_PTYPE_INT_REGISTER)
-			emit_movq_r64_r128(&dst, dstp.value, REG_XMM0);								// movq     dstp,xmm0
-	}
 	return dst;
-
-}
-
-static x86code *op_ftoi8r(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	return op_ftoi8x(drcbe, dst, inst, DRCUML_FMOD_ROUND);
-}
-
-static x86code *op_ftoi8f(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	return op_ftoi8x(drcbe, dst, inst, DRCUML_FMOD_FLOOR);
-}
-
-static x86code *op_ftoi8c(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	return op_ftoi8x(drcbe, dst, inst, DRCUML_FMOD_CEIL);
 }
 
 
 /*-------------------------------------------------
-    op_ffrfs - process a FFRFS opcode
+    op_ffrint - process a FFRINT opcode
 -------------------------------------------------*/
 
-static x86code *op_ffrfs(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+static x86code *op_ffrint(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	drcuml_parameter dstp, srcp, sizep;
+	int dstreg;
+
+	/* validate instruction */
+	assert(inst->size == 4 || inst->size == 8);
+	assert(inst->condflags == DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &srcp, PTYPE_MRI, &sizep, PTYPE_I);
+
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_XMM0, &dstp, NULL);
+
+	/* 32-bit form */
+	if (inst->size == 4)
+	{
+		/* 32-bit integer source */
+		if (sizep.value == DRCUML_SIZE_DWORD)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsi2ss_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsi2ss dstreg,[srcp]
+			else
+			{
+				int srcreg = param_select_register(REG_EAX, &srcp, NULL);
+				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov      srcreg,srcp
+				emit_cvtsi2ss_r128_r32(&dst, dstreg, srcreg);							// cvtsi2ss dstreg,srcreg
+			}
+		}
+		
+		/* 64-bit integer source */
+		else
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsi2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsi2ss dstreg,[srcp]
+			else
+			{
+				int srcreg = param_select_register(REG_RAX, &srcp, NULL);
+				emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);							// mov      srcreg,srcp
+				emit_cvtsi2ss_r128_r64(&dst, dstreg, srcreg);							// cvtsi2ss dstreg,srcreg
+			}
+		}
+		emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);								// movss    dstp,dstreg
+	}
+
+	/* 64-bit form */
+	else if (inst->size == 8)
+	{
+		/* 32-bit integer source */
+		if (sizep.value == DRCUML_SIZE_DWORD)
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsi2sd_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsi2sd dstreg,[srcp]
+			else
+			{
+				int srcreg = param_select_register(REG_EAX, &srcp, NULL);
+				emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);							// mov      srcreg,srcp
+				emit_cvtsi2sd_r128_r32(&dst, dstreg, srcreg);							// cvtsi2sd dstreg,srcreg
+			}
+		}
+		
+		/* 64-bit integer source */
+		else
+		{
+			if (srcp.type == DRCUML_PTYPE_MEMORY)
+				emit_cvtsi2sd_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));			// cvtsi2sd dstreg,[srcp]
+			else
+			{
+				int srcreg = param_select_register(REG_EAX, &srcp, NULL);
+				emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);							// mov      srcreg,srcp
+				emit_cvtsi2sd_r128_r64(&dst, dstreg, srcreg);							// cvtsi2sd dstreg,srcreg
+			}
+		}
+		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd    dstp,dstreg
+	}
+	return dst;
+}
+
+
+/*-------------------------------------------------
+    op_ffrflt - process a FFRFLT opcode
+-------------------------------------------------*/
+
+static x86code *op_ffrflt(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
+{
+	drcuml_parameter dstp, srcp, sizep;
+	int dstreg;
+
+	/* validate instruction */
+	assert(inst->size == 4 || inst->size == 8);
+	assert(inst->condflags == DRCUML_COND_ALWAYS);
+
+	/* normalize parameters */
+	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &srcp, PTYPE_MF, &sizep, PTYPE_I);
+
+	/* pick a target register for the general case */
+	dstreg = param_select_register(REG_XMM0, &dstp, NULL);
+
+	/* single-to-double */
+	if (inst->size == 8 && sizep.value == DRCUML_SIZE_DWORD)
+	{
+		if (srcp.type == DRCUML_PTYPE_MEMORY)
+			emit_cvtss2sd_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtss2sd dstreg,[srcp]
+		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+			emit_cvtss2sd_r128_r128(&dst, dstreg, srcp.value);							// cvtss2sd dstreg,srcp
+		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd    dstp,dstreg
+	}
+	
+	/* double-to-single */
+	else if (inst->size == 4 && sizep.value == DRCUML_SIZE_QWORD)
+	{
+		if (srcp.type == DRCUML_PTYPE_MEMORY)
+			emit_cvtsd2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsd2ss dstreg,[srcp]
+		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
+			emit_cvtsd2ss_r128_r128(&dst, dstreg, srcp.value);							// cvtsd2ss dstreg,srcp
+		emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);								// movss    dstp,dstreg
+	}
+	return dst;
+}
+
+
+/*-------------------------------------------------
+    op_frnds - process a FRNDS opcode
+-------------------------------------------------*/
+
+static x86code *op_frnds(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
 {
 	drcuml_parameter dstp, srcp;
 	int dstreg;
@@ -7421,143 +6648,13 @@ static x86code *op_ffrfs(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_XMM0, &dstp, NULL);
 
-	/* general case */
-	if (srcp.type == DRCUML_PTYPE_MEMORY)
-		emit_cvtss2sd_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));					// cvtss2sd dstreg,[srcp]
-	else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-		emit_cvtss2sd_r128_r128(&dst, dstreg, srcp.value);								// cvtss2sd dstreg,srcp
-	emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);									// movsd    dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ffrfd - process a FFRFD opcode
--------------------------------------------------*/
-
-static x86code *op_ffrfd(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MF, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_XMM0, &dstp, NULL);
-
-	/* general case */
+	/* 64-bit form */
 	if (srcp.type == DRCUML_PTYPE_MEMORY)
 		emit_cvtsd2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));					// cvtsd2ss dstreg,[srcp]
 	else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
 		emit_cvtsd2ss_r128_r128(&dst, dstreg, srcp.value);								// cvtsd2ss dstreg,srcp
-	emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);									// movss    dstp,dstreg
-
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ffri4 - process a FFRI4 opcode
--------------------------------------------------*/
-
-static x86code *op_ffri4(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MF, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_XMM0, &dstp, NULL);
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsi2ss_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsi2ss dstreg,[srcp]
-		else
-		{
-			int srcreg = param_select_register(REG_EAX, &srcp, NULL);
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov      srcreg,srcp
-			emit_cvtsi2ss_r128_r32(&dst, dstreg, srcreg);								// cvtsi2ss dstreg,srcreg
-		}
-		emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);								// movss    dstp,dstreg
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsi2sd_r128_m32(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsi2sd dstreg,[srcp]
-		else
-		{
-			int srcreg = param_select_register(REG_EAX, &srcp, NULL);
-			emit_mov_r32_p32(drcbe, &dst, srcreg, &srcp);								// mov      srcreg,srcp
-			emit_cvtsi2sd_r128_r32(&dst, dstreg, srcreg);								// cvtsi2sd dstreg,srcreg
-		}
-		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd    dstp,dstreg
-	}
-	return dst;
-}
-
-
-/*-------------------------------------------------
-    op_ffri8 - process a FFRI8 opcode
--------------------------------------------------*/
-
-static x86code *op_ffri8(drcbe_state *drcbe, x86code *dst, const drcuml_instruction *inst)
-{
-	drcuml_parameter dstp, srcp;
-	int dstreg;
-
-	/* validate instruction */
-	assert(inst->size == 4 || inst->size == 8);
-	assert(inst->condflags == DRCUML_COND_ALWAYS);
-
-	/* normalize parameters */
-	param_normalize_2(drcbe, inst, &dstp, PTYPE_MF, &srcp, PTYPE_MF);
-
-	/* pick a target register for the general case */
-	dstreg = param_select_register(REG_XMM0, &dstp, NULL);
-
-	/* 32-bit form */
-	if (inst->size == 4)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsi2ss_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsi2ss dstreg,[srcp]
-		else
-		{
-			int srcreg = param_select_register(REG_EAX, &srcp, NULL);
-			emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);								// mov      srcreg,srcp
-			emit_cvtsi2ss_r128_r64(&dst, dstreg, srcreg);								// cvtsi2ss dstreg,srcreg
-		}
-		emit_movss_p32_r128(drcbe, &dst, &dstp, dstreg);								// movss    dstp,dstreg
-	}
-
-	/* 64-bit form */
-	else if (inst->size == 8)
-	{
-		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_cvtsi2sd_r128_m64(&dst, dstreg, MABS(drcbe, srcp.value));				// cvtsi2sd dstreg,[srcp]
-		else
-		{
-			int srcreg = param_select_register(REG_EAX, &srcp, NULL);
-			emit_mov_r64_p64(drcbe, &dst, srcreg, &srcp);								// mov      srcreg,srcp
-			emit_cvtsi2sd_r128_r64(&dst, dstreg, srcreg);								// cvtsi2sd dstreg,srcreg
-		}
-		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd    dstp,dstreg
-	}
+	emit_cvtss2sd_r128_r128(&dst, dstreg, dstreg);										// cvtss2sd dstreg,dstreg
+	emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);									// movsd    dstp,dstreg
 	return dst;
 }
 

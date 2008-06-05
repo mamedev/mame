@@ -207,11 +207,6 @@ static NVRAM_HANDLER(ultrsprt)
 	eeprom_handler(file, read_or_write);
 }
 
-static const ppc_config ultrsprt_ppc_cfg =
-{
-	PPC_MODEL_403GA
-};
-
 static const struct K054539interface k054539_interface =
 {
 	REGION_SOUND1
@@ -225,8 +220,7 @@ static INTERRUPT_GEN( ultrsprt_vblank )
 
 static MACHINE_DRIVER_START( ultrsprt )
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 25000000)		/* PowerPC 403GA 25MHz */
-	MDRV_CPU_CONFIG(ultrsprt_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map, 0)
 	MDRV_CPU_VBLANK_INT("main", ultrsprt_vblank)
 

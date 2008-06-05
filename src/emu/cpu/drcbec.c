@@ -47,6 +47,58 @@
 #define LEBIT			(0x1000 << (DRCUML_COND_LE & 15))
 
 
+/* internal opcodes */
+enum
+{
+	DRCUML_OP_LOAD1 = DRCUML_OP_MAX,
+	DRCUML_OP_LOAD2,
+	DRCUML_OP_LOAD4,
+	DRCUML_OP_LOAD8,
+	DRCUML_OP_LOADS1,
+	DRCUML_OP_LOADS2,
+	DRCUML_OP_LOADS4,
+	DRCUML_OP_LOADS8,
+	DRCUML_OP_STORE1,
+	DRCUML_OP_STORE2,
+	DRCUML_OP_STORE4,
+	DRCUML_OP_STORE8,
+	DRCUML_OP_READ1,
+	DRCUML_OP_READ2,
+	DRCUML_OP_READ4,
+	DRCUML_OP_READ8,
+	DRCUML_OP_READM1,
+	DRCUML_OP_READM2,
+	DRCUML_OP_READM4,
+	DRCUML_OP_READM8,
+	DRCUML_OP_WRITE1,
+	DRCUML_OP_WRITE2,
+	DRCUML_OP_WRITE4,
+	DRCUML_OP_WRITE8,
+	DRCUML_OP_WRITEM1,
+	DRCUML_OP_WRITEM2,
+	DRCUML_OP_WRITEM4,
+	DRCUML_OP_WRITEM8,
+	DRCUML_OP_SEXT1,
+	DRCUML_OP_SEXT2,
+	DRCUML_OP_SEXT4,
+	DRCUML_OP_SEXT8,
+	DRCUML_OP_FTOI4T,
+	DRCUML_OP_FTOI4R,
+	DRCUML_OP_FTOI4C,
+	DRCUML_OP_FTOI4F,
+	DRCUML_OP_FTOI4,
+	DRCUML_OP_FTOI8T,
+	DRCUML_OP_FTOI8R,
+	DRCUML_OP_FTOI8C,
+	DRCUML_OP_FTOI8F,
+	DRCUML_OP_FTOI8,
+	DRCUML_OP_FFRI4,
+	DRCUML_OP_FFRI8,
+	DRCUML_OP_FFRFS,
+	DRCUML_OP_FFRFD,
+};
+
+
 
 /***************************************************************************
     MACROS
@@ -337,10 +389,11 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 		UINT8 psize[ARRAY_LENGTH(instlist->param)];
 		drcuml_instruction modified_inst;
 		int immedbytes, immedwords, pnum;
+		drcuml_opcode opcode = inst->opcode;
 		void *immed;
 
 		/* handle most instructions generally, but a few special cases */
-		switch (inst->opcode)
+		switch (opcode)
 		{
 			/* when we hit a HANDLE opcode, register the current pointer for the handle */
 			case DRCUML_OP_HANDLE:
@@ -378,7 +431,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 			case DRCUML_OP_JMP:
 				assert(inst->numparams == 1);
 				assert(inst->param[0].type == DRCUML_PTYPE_IMMEDIATE);
-				(dst++)->i = MAKE_OPCODE_FULL(inst->opcode, inst->size, inst->condflags, 1);
+				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condflags, 1);
 				dst->inst = (drcbec_instruction *)drclabel_get_codeptr(drcbe->labels, inst->param[0].value, fixup_label, dst);
 				dst++;
 				break;
@@ -387,7 +440,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 			default:
 
 				/* for RECOVER opcodes, we need to fixup the second parameter into an immediate */
-				if (inst->opcode == DRCUML_OP_RECOVER)
+				if (opcode == DRCUML_OP_RECOVER)
 				{
 					assert(inst->param[1].type == DRCUML_PTYPE_MAPVAR);
 					modified_inst = *inst;
@@ -398,22 +451,44 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				/* determine the operand size for each operand; mostly this is just the instruction size */
 				for (pnum = 0; pnum < inst->numparams; pnum++)
 					psize[pnum] = inst->size;
-				if ((inst->opcode >= DRCUML_OP_LOAD1U && inst->opcode <= DRCUML_OP_LOAD8U) || inst->opcode == DRCUML_OP_FLOAD)
+				if (opcode == DRCUML_OP_LOAD || opcode == DRCUML_OP_FLOAD)
 					psize[2] = 4;
-				if ((inst->opcode >= DRCUML_OP_STORE1 && inst->opcode <= DRCUML_OP_STORE8) || inst->opcode == DRCUML_OP_FSTORE)
+				if (opcode == DRCUML_OP_STORE || opcode == DRCUML_OP_FSTORE)
 					psize[1] = 4;
-				if ((inst->opcode >= DRCUML_OP_READ1U && inst->opcode <= DRCUML_OP_READ8M) || inst->opcode == DRCUML_OP_FREAD)
-					psize[1] = psize[2] = 4;
-				if ((inst->opcode >= DRCUML_OP_WRITE1 && inst->opcode <= DRCUML_OP_WRIT8M) || inst->opcode == DRCUML_OP_FWRITE)
+				if (opcode == DRCUML_OP_READ || opcode == DRCUML_OP_READM || opcode == DRCUML_OP_FREAD)
 					psize[0] = psize[1] = 4;
-				if (inst->opcode >= DRCUML_OP_FTOI4 && inst->opcode <= DRCUML_OP_FTOI4C)
-					psize[0] = 4;
-				if (inst->opcode >= DRCUML_OP_FTOI8 && inst->opcode <= DRCUML_OP_FTOI8C)
-					psize[0] = 8;
-				if ((inst->opcode >= DRCUML_OP_ZEXT1 && inst->opcode <= DRCUML_OP_SEXT4) || inst->opcode == DRCUML_OP_FFRFS || inst->opcode == DRCUML_OP_FFRI4)
+				if (opcode == DRCUML_OP_WRITE || opcode == DRCUML_OP_WRITEM || opcode == DRCUML_OP_FWRITE)
+					psize[0] = psize[1] = 4;
+				if (opcode == DRCUML_OP_SEXT && inst->param[2].value != DRCUML_SIZE_QWORD)
 					psize[1] = 4;
-				if (inst->opcode == DRCUML_OP_FFRFD || inst->opcode == DRCUML_OP_FFRI8)
-					psize[1] = 8;
+				if (opcode == DRCUML_OP_FTOINT)
+					psize[0] = 1 << inst->param[2].value;
+				if (opcode == DRCUML_OP_FFRINT || opcode == DRCUML_OP_FFRFLT)
+					psize[1] = 1 << inst->param[2].value;
+				
+				/* pre-expand opcodes that encode size in them */
+				if (opcode == DRCUML_OP_LOAD)
+					opcode = DRCUML_OP_LOAD1 + (inst->param[3].value & 3);
+				if (opcode == DRCUML_OP_LOADS)
+					opcode = DRCUML_OP_LOADS1 + (inst->param[3].value & 3);
+				if (opcode == DRCUML_OP_STORE)
+					opcode = DRCUML_OP_STORE1 + (inst->param[3].value & 3);
+				if (opcode == DRCUML_OP_READ)
+					opcode = DRCUML_OP_READ1 + (inst->param[2].value & 3);
+				if (opcode == DRCUML_OP_READM)
+					opcode = DRCUML_OP_READM1 + (inst->param[3].value & 3);
+				if (opcode == DRCUML_OP_WRITE)
+					opcode = DRCUML_OP_WRITE1 + (inst->param[2].value & 3);
+				if (opcode == DRCUML_OP_WRITEM)
+					opcode = DRCUML_OP_WRITEM1 + (inst->param[3].value & 3);
+				if (opcode == DRCUML_OP_SEXT)
+					opcode = DRCUML_OP_SEXT1 + (inst->param[2].value & 3);
+				if (opcode == DRCUML_OP_FTOINT)
+					opcode = DRCUML_OP_FTOI4T + 5 * ((inst->param[2].value & 3) - 2) + inst->param[3].value;
+				if (opcode == DRCUML_OP_FFRINT)
+					opcode = DRCUML_OP_FFRI4 + ((inst->param[2].value & 3) - 2);
+				if (opcode == DRCUML_OP_FFRFLT)
+					opcode = DRCUML_OP_FFRFS + ((inst->param[2].value & 3) - 2);
 
 				/* count how many bytes of immediates we need */
 				immedbytes = 0;
@@ -426,7 +501,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 				immedwords = (immedbytes + sizeof(drcbec_instruction) - 1) / sizeof(drcbec_instruction);
 
 				/* first item is the opcode, size, condition flags and length */
-				(dst++)->i = MAKE_OPCODE_FULL(inst->opcode, inst->size, inst->condflags, inst->numparams + immedwords);
+				(dst++)->i = MAKE_OPCODE_FULL(opcode, inst->size, inst->condflags, inst->numparams + immedwords);
 
 				/* immediates start after parameters */
 				immed = dst + inst->numparams;
@@ -504,6 +579,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 	while (TRUE)
 	{
 		UINT32 opcode = (inst++)->i;
+
 		switch (OPCODE_GET_SHORT(opcode))
 		{
 			/* ----------------------- Control Flow Operations ----------------------- */
@@ -623,6 +699,11 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = drcbe->state.exp;
 				break;
 
+			case MAKE_OPCODE_SHORT(DRCUML_OP_GETFLGS, 4, 0):	/* GETFLGS dst[,f]                */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_GETFLGS, 4, 1):	/* GETFLGS dst[,f]                */
+				PARAM0 = flags;
+				break;
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SAVE, 4, 0):		/* SAVE    dst                    */
 				*inst[0].state = drcbe->state;
 				inst[0].state->flags = flags;
@@ -636,91 +717,83 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			/* ----------------------- 32-Bit Integer Operations ----------------------- */
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD1U, 4, 0):		/* LOAD1U  dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD1, 4, 0):		/* LOAD    dst,base,index,BYTE    */
 				PARAM0 = inst[1].puint8[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD1S, 4, 0):		/* LOAD1S  dst,base,index         */
-				PARAM0 = inst[1].pint8[PARAM2];
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD2U, 4, 0):		/* LOAD2U  dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD2, 4, 0):		/* LOAD    dst,base,index,WORD    */
 				PARAM0 = inst[1].puint16[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD2S, 4, 0):		/* LOAD2S  dst,base,index         */
-				PARAM0 = inst[1].pint16[PARAM2];
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD4U, 4, 0):		/* LOAD4U  dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD4, 4, 0):		/* LOAD    dst,base,index,DWORD   */
 				PARAM0 = inst[1].puint32[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE1, 4, 0):		/* STORE1  dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS1, 4, 0):		/* LOADS   dst,base,index,BYTE    */
+				PARAM0 = inst[1].pint8[PARAM2];
+				break;
+				
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS2, 4, 0):		/* LOADS   dst,base,index,WORD    */
+				PARAM0 = inst[1].pint16[PARAM2];
+				break;
+				
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS4, 4, 0):		/* LOADS   dst,base,index,DWORD   */
+				PARAM0 = inst[1].pint32[PARAM2];
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE1, 4, 0):		/* STORE   dst,base,index,BYTE    */
 				inst[0].puint8[PARAM1] = PARAM2;
 				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE2, 4, 0):		/* STORE2  dst,base,index         */
+				
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE2, 4, 0):		/* STORE   dst,base,index,WORD    */
 				inst[0].puint16[PARAM1] = PARAM2;
 				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE4, 4, 0):		/* STORE4  dst,base,index         */
+				
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE4, 4, 0):		/* STORE   dst,base,index,DWORD   */
 				inst[0].puint32[PARAM1] = PARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1U, 4, 0):		/* READ1U  dst,space,src1         */
-				PARAM0 = (UINT8)(*active_address_space[PARAM1].accessors->read_byte)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1, 4, 0):		/* READ    dst,src1,space_BYTE    */
+				PARAM0 = (UINT8)(*active_address_space[PARAM2 / 16].accessors->read_byte)(PARAM1);	
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1S, 4, 0):		/* READ1S  dst,space,src1         */
-				PARAM0 = (INT8)(*active_address_space[PARAM1].accessors->read_byte)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2, 4, 0):		/* READ    dst,src1,space_WORD    */
+				PARAM0 = (UINT16)(*active_address_space[PARAM2 / 16].accessors->read_word)(PARAM1);	
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2U, 4, 0):		/* READ2U  dst,space,src1         */
-				PARAM0 = (UINT16)(*active_address_space[PARAM1].accessors->read_word)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4, 4, 0):		/* READ    dst,src1,space_DWORD   */
+				PARAM0 = (UINT32)(*active_address_space[PARAM2 / 16].accessors->read_dword)(PARAM1);	
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2S, 4, 0):		/* READ2S  dst,space,src1         */
-				PARAM0 = (INT16)(*active_address_space[PARAM1].accessors->read_word)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READM2, 4, 0):		/* READM   dst,src1,mask,space_WORD */
+				PARAM0 = (UINT16)(*active_address_space[PARAM3 / 16].accessors->read_word_masked)(PARAM1, PARAM2);	
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2M, 4, 0):		/* READ2M  dst,space,src1,mask    */
-				PARAM0 = (UINT16)(*active_address_space[PARAM1].accessors->read_word_masked)(PARAM2, PARAM3);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READM4, 4, 0):		/* READM   dst,src1,mask,space_DWORD */
+				PARAM0 = (UINT32)(*active_address_space[PARAM3 / 16].accessors->read_dword_masked)(PARAM1, PARAM2);	
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4U, 4, 0):		/* READ4U  dst,space,src1         */
-				PARAM0 = (UINT32)(*active_address_space[PARAM1].accessors->read_dword)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 4, 0):		/* WRITE   dst,src1,space_BYTE     */
+				(*active_address_space[PARAM2 / 16].accessors->write_byte)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4M, 4, 0):		/* READ4M  dst,space,src1,mask    */
-				PARAM0 = (UINT32)(*active_address_space[PARAM1].accessors->read_dword_masked)(PARAM2, PARAM3);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE2, 4, 0):		/* WRITE   dst,src1,space_WORD     */
+				(*active_address_space[PARAM2 / 16].accessors->write_word)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 4, 0):		/* WRITE1  space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_byte)(PARAM1, PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE4, 4, 0):		/* WRITE   dst,src1,space_DWORD    */
+				(*active_address_space[PARAM2 / 16].accessors->write_dword)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE2, 4, 0):		/* WRITE2  space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_word)(PARAM1, PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM2, 4, 0):	/* WRITEM  dst,src1,mask,space_WORD */
+				(*active_address_space[PARAM3 / 16].accessors->write_word_masked)(PARAM0, PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRIT2M, 4, 0):		/* WRIT2M  space,dst,mask,src1    */
-				(*active_address_space[PARAM0].accessors->write_word_masked)(PARAM1, PARAM2, PARAM3);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM4, 4, 0):	/* WRITEM  dst,src1,mask,space_DWORD */
+				(*active_address_space[PARAM3 / 16].accessors->write_dword_masked)(PARAM0, PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE4, 4, 0):		/* WRITE4  space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_dword)(PARAM1, PARAM2);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRIT4M, 4, 0):		/* WRIT4M  space,dst,mask,src1    */
-				(*active_address_space[PARAM0].accessors->write_dword_masked)(PARAM1, PARAM2, PARAM3);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FLAGS, 4, 0):		/* FLAGS   dst,mask,table         */
-				PARAM0 = (PARAM0 & ~PARAM1) | (inst[2].puint32[flags & 0x1f] & PARAM1);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_SETC, 4, 0):		/* SETC    src,bitnum             */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_CARRY, 4, 0):		/* CARRY   src,bitnum             */
 				flags = (flags & ~DRCUML_FLAG_C) | ((PARAM0 >> (PARAM1 & 31)) & DRCUML_FLAG_C);
 				break;
 
@@ -733,12 +806,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = PARAM1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT1, 4, 0):		/* ZEXT1   dst,src                */
-				PARAM0 = (UINT8)PARAM1;
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT2, 4, 0):		/* ZEXT2   dst,src                */
-				PARAM0 = (UINT16)PARAM1;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SET, 4, 1):		/* SET     dst,c                  */
+				PARAM0 = OPCODE_FAIL_CONDITION(opcode, flags) ? 0 : 1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT1, 4, 0):		/* SEXT1   dst,src                */
@@ -749,12 +818,12 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				PARAM0 = (INT16)PARAM1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_XTRACT, 4, 0):		/* XTRACT  dst,src,count,mask[,f] */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLAND, 4, 0):		/* ROLAND  dst,src,count,mask[,f] */
 				shift = PARAM2 & 31;
 				PARAM0 = ((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_INSERT, 4, 0):		/* INSERT  dst,src,count,mask[,f] */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLINS, 4, 0):		/* ROLINS  dst,src,count,mask[,f] */
 				shift = PARAM2 & 31;
 				PARAM0 = (PARAM0 & ~PARAM3) | (((PARAM1 << shift) | (PARAM1 >> (32 - shift))) & PARAM3);
 				break;
@@ -1025,123 +1094,107 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			/* ----------------------- 64-Bit Integer Operations ----------------------- */
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD1U, 8, 0):		/* DLOAD1U dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD1, 8, 0):		/* DLOAD   dst,base,index,BYTE    */
 				DPARAM0 = inst[1].puint8[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD1S, 8, 0):		/* DLOAD1S dst,base,index         */
-				DPARAM0 = inst[1].pint8[PARAM2];
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD2U, 8, 0):		/* DLOAD2U dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD2, 8, 0):		/* DLOAD   dst,base,index,WORD    */
 				DPARAM0 = inst[1].puint16[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD2S, 8, 0):		/* DLOAD2S dst,base,index         */
-				DPARAM0 = inst[1].pint16[PARAM2];
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD4U, 8, 0):		/* DLOAD4U dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD4, 8, 0):		/* DLOAD   dst,base,index,DWORD   */
 				DPARAM0 = inst[1].puint32[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD4S, 8, 0):		/* DLOAD4S dst,base,index         */
-				DPARAM0 = inst[1].pint32[PARAM2];
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD8U, 8, 0):		/* DLOAD8U dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOAD8, 8, 0):		/* DLOAD   dst,base,index,QWORD   */
 				DPARAM0 = inst[1].puint64[PARAM2];
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE1, 8, 0):		/* DSTORE1 dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS1, 8, 0):		/* DLOADS  dst,base,index,BYTE    */
+				DPARAM0 = inst[1].pint8[PARAM2];
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS2, 8, 0):		/* DLOADS  dst,base,index,WORD    */
+				DPARAM0 = inst[1].pint16[PARAM2];
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS4, 8, 0):		/* DLOADS  dst,base,index,DWORD   */
+				DPARAM0 = inst[1].pint32[PARAM2];
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE1, 8, 0):		/* DSTORE  dst,base,index,BYTE    */
 				inst[0].puint8[PARAM1] = DPARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE2, 8, 0):		/* DSTORE2 dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE2, 8, 0):		/* DSTORE  dst,base,index,WORD    */
 				inst[0].puint16[PARAM1] = DPARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE4, 8, 0):		/* DSTORE4 dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE4, 8, 0):		/* DSTORE  dst,base,index,DWORD   */
 				inst[0].puint32[PARAM1] = DPARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE8, 8, 0):		/* DSTORE8 dst,base,index         */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE8, 8, 0):		/* DSTORE  dst,base,index,QWORD   */
 				inst[0].puint64[PARAM1] = DPARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1U, 8, 0):		/* DREAD1U dst,space,src1         */
-				DPARAM0 = (UINT8)(*active_address_space[PARAM1].accessors->read_byte)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1, 8, 0):		/* DREAD   dst,src1,space_BYTE    */
+				DPARAM0 = (UINT8)(*active_address_space[PARAM2 / 16].accessors->read_byte)(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1S, 8, 0):		/* DREAD1S dst,space,src1         */
-				DPARAM0 = (INT8)(*active_address_space[PARAM1].accessors->read_byte)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2, 8, 0):		/* DREAD   dst,src1,space_WORD    */
+				DPARAM0 = (UINT16)(*active_address_space[PARAM2 / 16].accessors->read_word)(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2U, 8, 0):		/* DREAD2U dst,space,src1         */
-				DPARAM0 = (UINT16)(*active_address_space[PARAM1].accessors->read_word)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4, 8, 0):		/* DREAD   dst,src1,space_DWORD   */
+				DPARAM0 = (UINT32)(*active_address_space[PARAM2 / 16].accessors->read_dword)(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2S, 8, 0):		/* DREAD2S dst,space,src1         */
-				DPARAM0 = (INT16)(*active_address_space[PARAM1].accessors->read_word)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READ8, 8, 0):		/* DREAD   dst,src1,space_QOWRD   */
+				DPARAM0 = (UINT64)(*active_address_space[PARAM2 / 16].accessors->read_qword)(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2M, 8, 0):		/* DREAD2M dst,space,src1,mask    */
-				DPARAM0 = (UINT16)(*active_address_space[PARAM1].accessors->read_word_masked)(PARAM2, DPARAM3);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READM2, 8, 0):		/* DREADM  dst,src1,mask,space_WORD */
+				DPARAM0 = (UINT16)(*active_address_space[PARAM3 / 16].accessors->read_word_masked)(PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4U, 8, 0):		/* DREAD4U dst,space,src1         */
-				DPARAM0 = (UINT32)(*active_address_space[PARAM1].accessors->read_dword)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READM4, 8, 0):		/* DREADM  dst,src1,mask,space_DWORD */
+				DPARAM0 = (UINT32)(*active_address_space[PARAM3 / 16].accessors->read_dword_masked)(PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4S, 8, 0):		/* DREAD4S dst,space,src1         */
-				DPARAM0 = (INT32)(*active_address_space[PARAM1].accessors->read_dword)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_READM8, 8, 0):		/* DREADM  dst,src1,mask,space_QWORD */
+				DPARAM0 = (UINT64)(*active_address_space[PARAM3 / 16].accessors->read_qword_masked)(PARAM1, PARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4M, 8, 0):		/* DREAD4M dst,space,src1,mask    */
-				DPARAM0 = (UINT32)(*active_address_space[PARAM1].accessors->read_dword_masked)(PARAM2, DPARAM3);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 8, 0):		/* DWRITE  dst,src1,space_BYTE    */
+				(*active_address_space[PARAM2 / 16].accessors->write_byte)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ8U, 8, 0):		/* DREAD8U dst,space,src1         */
-				DPARAM0 = (UINT64)(*active_address_space[PARAM1].accessors->read_qword)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE2, 8, 0):		/* DWRITE  dst,src1,space_WORD    */
+				(*active_address_space[PARAM2 / 16].accessors->write_word)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_READ8M, 8, 0):		/* DREAD8M dst,space,src1,mask    */
-				DPARAM0 = (UINT64)(*active_address_space[PARAM1].accessors->read_qword_masked)(PARAM2, DPARAM3);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE4, 8, 0):		/* DWRITE  dst,src1,space_DWORD   */
+				(*active_address_space[PARAM2 / 16].accessors->write_dword)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 8, 0):		/* DWRITE1 space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_byte)(PARAM1, DPARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE8, 8, 0):		/* DWRITE  dst,src1,space_QWORD   */
+				(*active_address_space[PARAM2 / 16].accessors->write_qword)(PARAM0, PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE2, 8, 0):		/* DWRITE2 space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_word)(PARAM1, DPARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM2, 8, 0):	/* DWRITEM dst,src1,mask,space_WORD */
+				(*active_address_space[PARAM3 / 16].accessors->write_word_masked)(PARAM0, DPARAM1, DPARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRIT2M, 8, 0):		/* DWRIT2M space,dst,mask,src1    */
-				(*active_address_space[PARAM0].accessors->write_word_masked)(PARAM1, DPARAM3, DPARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM4, 8, 0):	/* DWRITEM dst,src1,mask,space_DWORD */
+				(*active_address_space[PARAM3 / 16].accessors->write_dword_masked)(PARAM0, DPARAM1, DPARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE4, 8, 0):		/* DWRITE4 space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_dword)(PARAM1, DPARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM8, 8, 0):	/* DWRITEM dst,src1,mask,space_QWORD */
+				(*active_address_space[PARAM3 / 16].accessors->write_qword_masked)(PARAM0, DPARAM1, DPARAM2);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRIT4M, 8, 0):		/* DWRIT4M space,dst,mask,src1    */
-				(*active_address_space[PARAM0].accessors->write_dword_masked)(PARAM1, DPARAM3, DPARAM2);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE8, 8, 0):		/* DWRITE8 space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_qword)(PARAM1, DPARAM2);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_WRIT8M, 8, 0):		/* DWRIT8M space,dst,mask,src1    */
-				(*active_address_space[PARAM0].accessors->write_qword_masked)(PARAM1, DPARAM3, DPARAM2);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FLAGS, 8, 0):		/* DFLAGS  dst,mask,table         */
-				DPARAM0 = (DPARAM0 & ~DPARAM1) | (inst[2].puint64[flags & 0x0f] & DPARAM1);
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_SETC, 8, 0):		/* DSETC   src,bitnum             */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_CARRY, 8, 0):		/* DCARRY  src,bitnum             */
 				flags = (flags & ~DRCUML_FLAG_C) | ((DPARAM0 >> (DPARAM1 & 63)) & DRCUML_FLAG_C);
 				break;
 
@@ -1154,36 +1207,28 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				DPARAM0 = DPARAM1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT1, 8, 0):		/* DZEXT1  dst,src                */
-				DPARAM0 = (UINT8)PARAM1;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SET, 8, 1):		/* DSET    dst,c                  */
+				DPARAM0 = OPCODE_FAIL_CONDITION(opcode, flags) ? 0 : 1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT2, 8, 0):		/* DZEXT2  dst,src                */
-				DPARAM0 = (UINT16)PARAM1;
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_ZEXT4, 8, 0):		/* DZEXT4  dst,src                */
-				DPARAM0 = (UINT32)PARAM1;
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT1, 8, 0):		/* DSEXT1  dst,src                */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT1, 8, 0):		/* DSEXT   dst,src,BYTE           */
 				DPARAM0 = (INT8)PARAM1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 8, 0):		/* DSEXT2  dst,src                */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT2, 8, 0):		/* DSEXT   dst,src,WORD           */
 				DPARAM0 = (INT16)PARAM1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT4, 8, 0):		/* DSEXT4  dst,src                */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_SEXT4, 8, 0):		/* DSEXT   dst,src,DWORD          */
 				DPARAM0 = (INT32)PARAM1;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_XTRACT, 8, 0):		/* DXTRACT dst,src,count,mask[,f] */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLAND, 8, 0):		/* DROLAND dst,src,count,mask[,f] */
 				shift = DPARAM2 & 63;
 				DPARAM0 = ((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_INSERT, 8, 0):		/* DINSERT dst,src,count,mask[,f] */
+			case MAKE_OPCODE_SHORT(DRCUML_OP_ROLINS, 8, 0):		/* DROLINS dst,src,count,mask[,f] */
 				shift = DPARAM2 & 63;
 				DPARAM0 = (DPARAM0 & ~DPARAM3) | (((DPARAM1 << shift) | (DPARAM1 >> (64 - shift))) & DPARAM3);
 				break;
@@ -1455,12 +1500,12 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				inst[0].pfloat[PARAM1] = FSPARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 4, 0):		/* FSREAD  dst,space,src1         */
-				PARAM0 = (UINT32)(*active_address_space[PARAM1].accessors->read_dword)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 4, 0):		/* FSREAD  dst,src1,space         */
+				PARAM0 = (UINT32)(*active_address_space[PARAM2].accessors->read_dword)(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 4, 0):		/* FSWRITE space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_dword)(PARAM1, PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 4, 0):		/* FSWRITE dst,src1,space         */
+				(*active_address_space[PARAM2].accessors->write_dword)(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 4, 1):		/* FSMOV   dst,src[,c]            */
@@ -1470,10 +1515,6 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 4, 0):
 				FSPARAM0 = FSPARAM1;
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI4, 4, 0):		/* FSTOI4  dst,src1               */
-				*inst[0].pint32 = FSPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI4T, 4, 0):		/* FSTOI4T dst,src1               */
@@ -1498,8 +1539,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				*inst[0].pint32 = ceil(FSPARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI8, 4, 0):		/* FSTOI8  dst,src1               */
-				*inst[0].pint64 = FSPARAM1;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI4, 4, 0):		/* FSTOI4  dst,src1               */
+				*inst[0].pint32 = FSPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI8T, 4, 0):		/* FSTOI8T dst,src1               */
@@ -1524,8 +1565,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				*inst[0].pint64 = ceil(FSPARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRFD, 4, 0):		/* FSFRFD  dst,src1               */
-				FSPARAM0 = FDPARAM1;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI8, 4, 0):		/* FSTOI8  dst,src1               */
+				*inst[0].pint64 = FSPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRI4, 4, 0):		/* FSFRI4  dst,src1               */
@@ -1534,6 +1575,10 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRI8, 4, 0):		/* FSFRI8  dst,src1               */
 				FSPARAM0 = *inst[1].pint64;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRFD, 4, 0):		/* FSFRFD  dst,src1               */
+				FSPARAM0 = FDPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FADD, 4, 0):		/* FSADD   dst,src1,src2          */
@@ -1590,12 +1635,12 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				inst[0].pdouble[PARAM1] = FDPARAM2;
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 8, 0):		/* FDREAD  dst,space,src1         */
-				DPARAM0 = (UINT64)(*active_address_space[PARAM1].accessors->read_qword)(PARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 8, 0):		/* FDREAD  dst,src1,space         */
+				DPARAM0 = (UINT64)(*active_address_space[PARAM2].accessors->read_qword)(PARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 8, 0):		/* FDWRITE space,dst,src1         */
-				(*active_address_space[PARAM0].accessors->write_qword)(PARAM1, DPARAM2);
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 8, 0):		/* FDWRITE dst,src1,space         */
+				(*active_address_space[PARAM2].accessors->write_qword)(PARAM0, DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 8, 1):		/* FDMOV   dst,src[,c]            */
@@ -1605,10 +1650,6 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 8, 0):
 				FDPARAM0 = FDPARAM1;
-				break;
-
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI4, 8, 0):		/* FDTOI4  dst,src1               */
-				*inst[0].pint32 = FDPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI4T, 8, 0):		/* FDTOI4T dst,src1               */
@@ -1633,8 +1674,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				*inst[0].pint32 = ceil(FDPARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI8, 8, 0):		/* FDTOI8  dst,src1               */
-				*inst[0].pint64 = FDPARAM1;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI4, 8, 0):		/* FDTOI4  dst,src1               */
+				*inst[0].pint32 = FDPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI8T, 8, 0):		/* FDTOI8T dst,src1               */
@@ -1659,8 +1700,8 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				*inst[0].pint64 = ceil(FDPARAM1);
 				break;
 
-			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRFS, 8, 0):		/* FDFRFS  dst,src1               */
-				FDPARAM0 = FSPARAM1;
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FTOI8, 8, 0):		/* FDTOI8  dst,src1               */
+				*inst[0].pint64 = FDPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRI4, 8, 0):		/* FDFRI4  dst,src1               */
@@ -1669,6 +1710,14 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRI8, 8, 0):		/* FDFRI8  dst,src1               */
 				FDPARAM0 = *inst[1].pint64;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FFRFS, 8, 0):		/* FDFRFS  dst,src1               */
+				FDPARAM0 = FSPARAM1;
+				break;
+
+			case MAKE_OPCODE_SHORT(DRCUML_OP_FRNDS, 8, 0):		/* FDRNDS  dst,src1               */
+				FDPARAM0 = (float)FDPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FADD, 8, 0):		/* FDADD   dst,src1,src2          */

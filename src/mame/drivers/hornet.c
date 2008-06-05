@@ -683,71 +683,52 @@ static VIDEO_UPDATE( hornet_2board )
 }
 
 /*****************************************************************************/
+static UINT32 *workram;
 
-static READ32_HANDLER( sysreg_r )
+static READ8_HANDLER( sysreg_r )
 {
-	UINT32 r = 0;
-	if (offset == 0)
+	UINT8 r = 0;
+	
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
-		{
-			//printf("read sysreg 0\n");
-			r |= input_port_read_indexed(machine, 0) << 24;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			r |= input_port_read_indexed(machine, 1) << 16;
-		}
-		if (ACCESSING_BITS_8_15)
-		{
-			r |= input_port_read_indexed(machine, 2) << 8;
-		}
-		if (ACCESSING_BITS_0_7)
-		{
-			r |= 0xf7;
-		}
-	}
-	else if (offset == 1)
-	{
-		if (ACCESSING_BITS_24_31)
-		{
-			r |= input_port_read_indexed(machine, 3) << 24;
-		}
+		case 0:
+		case 1:
+		case 2:
+			r = input_port_read_indexed(machine, offset);
+			break;
+		
+		case 3:
+			r = 0xf7;
+			break;
+		
+		case 4:
+			r = input_port_read_indexed(machine, 3);
+			break;
 	}
 	return r;
 }
 
-static WRITE32_HANDLER( sysreg_w )
+static WRITE8_HANDLER( sysreg_w )
 {
-	if( offset == 0 ) {
-		if (ACCESSING_BITS_24_31)
-		{
-			led_reg0 = (data >> 24) & 0xff;
-		}
-		if (ACCESSING_BITS_16_23)
-		{
-			led_reg1 = (data >> 16) & 0xff;
-		}
-		return;
-	}
-	if( offset == 1 )
+	switch (offset)
 	{
-		if (ACCESSING_BITS_24_31)
-		{
-		}
-		if (ACCESSING_BITS_0_7)
-		{
+		case 0:
+			led_reg0 = data;
+			break;
+		
+		case 1:
+			led_reg1 = data;
+			break;
+		
+		case 7:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-			{
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
-			}
+
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-			{
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
-			}
+
 			set_cgboard_id((data >> 4) & 0x3);
-		}
-		return;
+			break;
 	}
 }
 
@@ -778,14 +759,14 @@ static READ32_HANDLER( comm0_unk_r )
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM AM_BASE(&workram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_reg_r, K037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_sram_r, K037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_READWRITE(K037122_char_r, K037122_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7d000000, 0x7d00ffff) AM_MIRROR(0x80000000) AM_READ(sysreg_r)
-	AM_RANGE(0x7d010000, 0x7d01ffff) AM_MIRROR(0x80000000) AM_WRITE(sysreg_w)
+	AM_RANGE(0x7d000000, 0x7d00ffff) AM_MIRROR(0x80000000) AM_READ8(sysreg_r, 0xffffffff)
+	AM_RANGE(0x7d010000, 0x7d01ffff) AM_MIRROR(0x80000000) AM_WRITE8(sysreg_w, 0xffffffff)
 	AM_RANGE(0x7d020000, 0x7d021fff) AM_MIRROR(0x80000000) AM_READWRITE(timekeeper_0_32be_r, timekeeper_0_32be_w)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d030007) AM_MIRROR(0x80000000) AM_READWRITE(K056800_host_r, K056800_host_w)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_MIRROR(0x80000000) AM_RAM				/* COMM BOARD 0 */
@@ -963,11 +944,6 @@ static const struct RF5C400interface rf5c400_interface =
 	REGION_SOUND1
 };
 
-static const ppc_config hornet_ppc_cfg =
-{
-	PPC_MODEL_403GA
-};
-
 static sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
@@ -983,6 +959,19 @@ static sharc_config sharc_cfg =
 
 */
 
+static MACHINE_START( hornet )
+{
+	/* set conservative DRC options */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+
+	/* configure fast RAM regions for DRC */
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x80000000);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x803fffff);
+	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+}
+
 static MACHINE_RESET( hornet )
 {
 	if (memory_region(REGION_USER3))
@@ -996,8 +985,7 @@ static MACHINE_RESET( hornet )
 static MACHINE_DRIVER_START( hornet )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main", PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_CONFIG(hornet_ppc_cfg)
+	MDRV_CPU_ADD_TAG("main", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(hornet_map, 0)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
@@ -1009,6 +997,7 @@ static MACHINE_DRIVER_START( hornet )
 
 	MDRV_INTERLEAVE(100)
 
+	MDRV_MACHINE_START( hornet )
 	MDRV_MACHINE_RESET( hornet )
 
 	MDRV_NVRAM_HANDLER( timekeeper_0 )
@@ -1079,25 +1068,34 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
+static void jamma_jvs_cmd_exec(void);
+
 static UINT8 jvs_rdata[1024];
 static UINT8 jvs_sdata[1024];
 
 static int jvs_rdata_ptr = 0;
 static int jvs_sdata_ptr = 0;
+static int jvs_rdata_count = 0;
 
-static UINT8 jamma_jvs_r(void)
+static int jamma_jvs_r(UINT8 *data)
 {
-	UINT8 r;
-	r = jvs_rdata[jvs_rdata_ptr];
-	jvs_rdata_ptr++;
-
-	return r;
+	if (jvs_rdata_ptr < jvs_rdata_count)
+	{
+		*data = jvs_rdata[jvs_rdata_ptr++];
+		return TRUE;
+	}
+	return FALSE;
 }
 
 static void jamma_jvs_w(UINT8 data)
 {
+	if (jvs_sdata_ptr == 0 && data != 0xe0)
+		return;
 	jvs_sdata[jvs_sdata_ptr] = data;
 	jvs_sdata_ptr++;
+	
+	if (jvs_sdata_ptr >= 3 && jvs_sdata_ptr >= 3 + jvs_sdata[2])
+		jamma_jvs_cmd_exec();
 }
 
 static int jvs_encode_data(UINT8 *in, UINT8 *out, int length)
@@ -1160,13 +1158,7 @@ static void jamma_jvs_cmd_exec(void)
 	sync = jvs_sdata[0];
 	node = jvs_sdata[1];
 	byte_num = jvs_sdata[2];
-
-	if (sync != 0xe0)
-	{
-		printf("jamma_jvs_cmd_exec: SYNC byte not found! (%02X)\n", sync);
-		return;
-	}
-
+	
 	length = jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
 
 	/*
@@ -1231,36 +1223,13 @@ static void jamma_jvs_cmd_exec(void)
 	// write sum
 	jvs_rdata[3+length] = (UINT8)(sum-1);
 
+	jvs_rdata_count = length + 4;
 	jvs_rdata_ptr = 0;
 	jvs_sdata_ptr = 0;
 }
 
 /*****************************************************************************/
 
-
-static UINT8 jamma_rdata[1024];
-static void jamma_r(int length)
-{
-	int i;
-//  printf("jamma_r %d\n", length);
-	for (i=0; i < length; i++)
-	{
-		jamma_rdata[i] = jamma_jvs_r();
-	}
-}
-
-static UINT8 jamma_wdata[1024];
-static void jamma_w(int length)
-{
-	int i;
-//  printf("jamma_w %d\n", length);
-	for (i=0; i < length; i++)
-	{
-		jamma_jvs_w(jamma_wdata[i]);
-	}
-
-	jamma_jvs_cmd_exec();
-}
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
@@ -1283,8 +1252,8 @@ static void init_hornet(running_machine *machine)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	ppc403_install_spu_tx_dma_handler(jamma_w, jamma_wdata);
-	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);
+	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 }
 
 static void init_hornet_2board(running_machine *machine)
@@ -1301,8 +1270,8 @@ static void init_hornet_2board(running_machine *machine)
 
 	timekeeper_init(0, TIMEKEEPER_M48T58, backup_ram);
 
-	ppc403_install_spu_tx_dma_handler(jamma_w, jamma_wdata);
-	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);
+	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 }
 
 static DRIVER_INIT(gradius4)

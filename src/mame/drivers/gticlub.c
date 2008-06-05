@@ -366,9 +366,9 @@ static WRITE32_HANDLER( sysreg_w )
 }
 
 /* Konami K056230 (LANC) */
-static UINT8 K056230_r(int reg)
+READ8_HANDLER( K056230_r )
 {
-	switch (reg)
+	switch (offset)
 	{
 		case 0:		// Status register
 		{
@@ -376,14 +376,19 @@ static UINT8 K056230_r(int reg)
 		}
 	}
 
-//  mame_printf_debug("K056230_r: %d at %08X\n", reg, activecpu_get_pc());
+//  mame_printf_debug("K056230_r: %d at %08X\n", offset, activecpu_get_pc());
 
 	return 0;
 }
 
-static void K056230_w(int reg, UINT8 data)
+TIMER_CALLBACK( network_irq_gen )
 {
-	switch (reg)
+	cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+}
+
+WRITE8_HANDLER( K056230_w )
+{
+	switch (offset)
 	{
 		case 0:		// Mode register
 		{
@@ -396,9 +401,12 @@ static void K056230_w(int reg, UINT8 data)
 				// Thunder Hurricane breaks otherwise...
 				if (mame_stricmp(Machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+//					timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, network_irq_gen);
+//					cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
 				}
 			}
+			else
+				cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -406,54 +414,7 @@ static void K056230_w(int reg, UINT8 data)
 			break;
 		}
 	}
-//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", reg, data, activecpu_get_pc());
-}
-
-READ32_HANDLER( lanc_r )
-{
-	UINT32 r = 0;
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= K056230_r(reg+0) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= K056230_r(reg+1) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= K056230_r(reg+2) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= K056230_r(reg+3) << 0;
-	}
-
-	return r;
-}
-
-WRITE32_HANDLER( lanc_w )
-{
-	int reg = offset * 4;
-
-	if (ACCESSING_BITS_24_31)
-	{
-		K056230_w(reg+0, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		K056230_w(reg+1, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		K056230_w(reg+2, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		K056230_w(reg+3, (data >> 0) & 0xff);
-	}
+//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, activecpu_get_pc());
 }
 
 static UINT32 lanc_ram[0x2000/4];
@@ -482,7 +443,7 @@ static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE(sysreg_r, sysreg_w)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_r, lanc_w)
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)		// Hang Pilot
@@ -747,11 +708,6 @@ static INTERRUPT_GEN( gticlub_vblank )
 }
 
 
-static const ppc_config gticlub_ppc_cfg =
-{
-	PPC_MODEL_403GA
-};
-
 static const sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
@@ -770,8 +726,7 @@ static MACHINE_RESET( gticlub )
 static MACHINE_DRIVER_START( gticlub )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_CONFIG(gticlub_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
 	MDRV_CPU_VBLANK_INT("main", gticlub_vblank)
 
@@ -816,8 +771,7 @@ static MACHINE_RESET( hangplt )
 static MACHINE_DRIVER_START( hangplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_CONFIG(gticlub_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(gticlub_map, 0)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
@@ -1043,7 +997,7 @@ static DRIVER_INIT(slrasslt)
 	DRIVER_INIT_CALL(gticlub);
 
 	// enable self-modifying code checks
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_OPTIONS_CHECK_SELFMOD_CODE);
+	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_STRICT_VERIFY);
 }
 
 /*************************************************************************/

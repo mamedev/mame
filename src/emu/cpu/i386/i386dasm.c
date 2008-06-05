@@ -1764,7 +1764,7 @@ static void handle_fpu(char *s, UINT8 op1, UINT8 op2)
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: sprintf(s, "fild    dword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
+					case 1: sprintf(s, "fisttp  dword ptr %s", modrm_string); break;
 					case 2: sprintf(s, "fist    dword ptr %s", modrm_string); break;
 					case 3: sprintf(s, "fistp   dword ptr %s", modrm_string); break;
 					case 4: sprintf(s, "??? (FPU)"); break;
@@ -1861,7 +1861,7 @@ static void handle_fpu(char *s, UINT8 op1, UINT8 op2)
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: sprintf(s, "fld     qword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
+					case 1: sprintf(s, "fisttp  qword ptr %s", modrm_string); break;
 					case 2: sprintf(s, "fst     qword ptr %s", modrm_string); break;
 					case 3: sprintf(s, "fstp    qword ptr %s", modrm_string); break;
 					case 4: sprintf(s, "frstor  %s", modrm_string); break;
@@ -1954,7 +1954,7 @@ static void handle_fpu(char *s, UINT8 op1, UINT8 op2)
 				switch ((op2 >> 3) & 0x7)
 				{
 					case 0: sprintf(s, "fild    word ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
+					case 1: sprintf(s, "fisttp  word ptr %s", modrm_string); break;
 					case 2: sprintf(s, "fist    word ptr %s", modrm_string); break;
 					case 3: sprintf(s, "fistp   word ptr %s", modrm_string); break;
 					case 4: sprintf(s, "fbld    %s", modrm_string); break;

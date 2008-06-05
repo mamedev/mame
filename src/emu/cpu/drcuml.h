@@ -142,10 +142,41 @@ enum
 /* floating point modes */
 enum
 {
-	DRCUML_FMOD_TRUNC,		/* truncate */
+	DRCUML_FMOD_TRUNC = 0,	/* truncate */
 	DRCUML_FMOD_ROUND,		/* round */
 	DRCUML_FMOD_CEIL,		/* round up */
-	DRCUML_FMOD_FLOOR		/* round down */
+	DRCUML_FMOD_FLOOR,		/* round down */
+	DRCUML_FMOD_DEFAULT
+};
+
+
+/* sizes */
+enum
+{
+	DRCUML_SIZE_BYTE = 0,	/* 1-byte */
+	DRCUML_SIZE_WORD,		/* 2-byte */
+	DRCUML_SIZE_DWORD,		/* 4-byte */
+	DRCUML_SIZE_QWORD,		/* 8-byte */
+	DRCUML_SIZE_SHORT = DRCUML_SIZE_DWORD,
+	DRCUML_SIZE_DOUBLE = DRCUML_SIZE_QWORD
+};
+
+
+/* size/space combinations */
+enum
+{
+	DRCUML_SPSIZE_PROGRAM_BYTE = (ADDRESS_SPACE_PROGRAM * 16) + DRCUML_SIZE_BYTE,
+	DRCUML_SPSIZE_PROGRAM_WORD = (ADDRESS_SPACE_PROGRAM * 16) + DRCUML_SIZE_WORD,
+	DRCUML_SPSIZE_PROGRAM_DWORD = (ADDRESS_SPACE_PROGRAM * 16) + DRCUML_SIZE_DWORD,
+	DRCUML_SPSIZE_PROGRAM_QWORD = (ADDRESS_SPACE_PROGRAM * 16) + DRCUML_SIZE_QWORD,
+	DRCUML_SPSIZE_DATA_BYTE = (ADDRESS_SPACE_DATA * 16) + DRCUML_SIZE_BYTE,
+	DRCUML_SPSIZE_DATA_WORD = (ADDRESS_SPACE_DATA * 16) + DRCUML_SIZE_WORD,
+	DRCUML_SPSIZE_DATA_DWORD = (ADDRESS_SPACE_DATA * 16) + DRCUML_SIZE_DWORD,
+	DRCUML_SPSIZE_DATA_QWORD = (ADDRESS_SPACE_DATA * 16) + DRCUML_SIZE_QWORD,
+	DRCUML_SPSIZE_IO_BYTE = (ADDRESS_SPACE_IO * 16) + DRCUML_SIZE_BYTE,
+	DRCUML_SPSIZE_IO_WORD = (ADDRESS_SPACE_IO * 16) + DRCUML_SIZE_WORD,
+	DRCUML_SPSIZE_IO_DWORD = (ADDRESS_SPACE_IO * 16) + DRCUML_SIZE_DWORD,
+	DRCUML_SPSIZE_IO_QWORD = (ADDRESS_SPACE_IO * 16) + DRCUML_SIZE_QWORD
 };
 
 
@@ -175,50 +206,25 @@ enum _drcuml_opcode
 	/* Internal Register Operations */
 	DRCUML_OP_SETFMOD,		/* SETFMOD src                    */
 	DRCUML_OP_GETFMOD,		/* GETFMOD dst                    */
-	DRCUML_OP_GETEXP,		/* GETEXP  dst,index              */
+	DRCUML_OP_GETEXP,		/* GETEXP  dst                    */
+	DRCUML_OP_GETFLGS,		/* GETFLGS dst[,f]                */
 	DRCUML_OP_SAVE,			/* SAVE    mem                    */
 	DRCUML_OP_RESTORE,		/* RESTORE mem                    */
 
 	/* Integer Operations */
-	DRCUML_OP_LOAD1U,		/* LOAD1U  dst,base,index         */
-	DRCUML_OP_LOAD1S,		/* LOAD1S  dst,base,index         */
-	DRCUML_OP_LOAD2U,		/* LOAD2U  dst,base,index         */
-	DRCUML_OP_LOAD2S,		/* LOAD2S  dst,base,index         */
-	DRCUML_OP_LOAD4U,		/* LOAD4U  dst,base,index         */
-	DRCUML_OP_LOAD4S,		/* LOAD4S  dst,base,index         */
-	DRCUML_OP_LOAD8U,		/* LOAD8U  dst,base,index         */
-	DRCUML_OP_STORE1,		/* STORE1  base,index,src         */
-	DRCUML_OP_STORE2,		/* STORE2  base,index,src         */
-	DRCUML_OP_STORE4,		/* STORE4  base,index,src         */
-	DRCUML_OP_STORE8,		/* STORE8  base,index,src         */
-	DRCUML_OP_READ1U,		/* READ1U  dst,space,src1         */
-	DRCUML_OP_READ1S,		/* READ1S  dst,space,src1         */
-	DRCUML_OP_READ2U,		/* READ2U  dst,space,src1         */
-	DRCUML_OP_READ2S,		/* READ2S  dst,space,src1         */
-	DRCUML_OP_READ2M,		/* READ2M  dst,space,src1,mask    */
-	DRCUML_OP_READ4U,		/* READ4U  dst,space,src1         */
-	DRCUML_OP_READ4S,		/* READ4S  dst,space,src1         */
-	DRCUML_OP_READ4M,		/* READ4M  dst,space,src1,mask    */
-	DRCUML_OP_READ8U,		/* READ8U  dst,space,src1         */
-	DRCUML_OP_READ8M,		/* READ8M  dst,space,src1,mask    */
-	DRCUML_OP_WRITE1,		/* WRITE1  space,dst,src1         */
-	DRCUML_OP_WRITE2,		/* WRITE2  space,dst,src1         */
-	DRCUML_OP_WRIT2M,		/* WRIT2M  space,dst,mask,src1    */
-	DRCUML_OP_WRITE4,		/* WRITE4  space,dst,src1         */
-	DRCUML_OP_WRIT4M,		/* WRIT4M  space,dst,mask,src1    */
-	DRCUML_OP_WRITE8,		/* WRITE8  space,dst,src1         */
-	DRCUML_OP_WRIT8M,		/* WRIT8M  space,dst,mask,src1    */
-	DRCUML_OP_SETC,			/* SETC    src,bitnum             */
-	DRCUML_OP_FLAGS,		/* FLAGS   dst,mask,table         */
+	DRCUML_OP_LOAD,			/* LOAD    dst,base,index,size    */
+	DRCUML_OP_LOADS,		/* LOADS   dst,base,index,size    */
+	DRCUML_OP_STORE,		/* STORE   base,index,src,size    */
+	DRCUML_OP_READ,			/* READ    dst,src1,space/size    */
+	DRCUML_OP_READM,		/* READM   dst,src1,mask,space/size */
+	DRCUML_OP_WRITE,		/* WRITE   dst,src1,space/size    */
+	DRCUML_OP_WRITEM,		/* WRITEM  dst,mask,src1,space/size */
+	DRCUML_OP_CARRY,		/* CARRY   src,bitnum             */
+	DRCUML_OP_SET,			/* SET     dst,c                  */
 	DRCUML_OP_MOV,			/* MOV     dst,src[,c]            */
-	DRCUML_OP_ZEXT1,		/* ZEXT1   dst,src                */
-	DRCUML_OP_ZEXT2,		/* ZEXT2   dst,src                */
-	DRCUML_OP_ZEXT4,		/* ZEXT4   dst,src                */
-	DRCUML_OP_SEXT1,		/* SEXT1   dst,src                */
-	DRCUML_OP_SEXT2,		/* SEXT2   dst,src                */
-	DRCUML_OP_SEXT4,		/* SEXT4   dst,src                */
-	DRCUML_OP_XTRACT,		/* XTRACT  dst,src,shift,mask     */
-	DRCUML_OP_INSERT,		/* INSERT  dst,src,shift,mask     */
+	DRCUML_OP_SEXT,			/* SEXT    dst,src,size           */
+	DRCUML_OP_ROLAND,		/* ROLAND  dst,src,shift,mask     */
+	DRCUML_OP_ROLINS,		/* ROLINS  dst,src,shift,mask     */
 	DRCUML_OP_ADD,			/* ADD     dst,src1,src2[,f]      */
 	DRCUML_OP_ADDC,			/* ADDC    dst,src1,src2[,f]      */
 	DRCUML_OP_SUB,			/* SUB     dst,src1,src2[,f]      */
@@ -247,21 +253,11 @@ enum _drcuml_opcode
 	DRCUML_OP_FSTORE,		/* FSTORE  base,index,src         */
 	DRCUML_OP_FREAD,		/* FREAD   dst,space,src1         */
 	DRCUML_OP_FWRITE,		/* FWRITE  space,dst,src1         */
-	DRCUML_OP_FMOV,			/* FSMOV   dst,src1[,c]           */
-	DRCUML_OP_FTOI4,		/* FTOI4   dst,src1               */
-	DRCUML_OP_FTOI4T,		/* FTOI4T  dst,src1               */
-	DRCUML_OP_FTOI4R,		/* FTOI4R  dst,src1               */
-	DRCUML_OP_FTOI4F,		/* FTOI4F  dst,src1               */
-	DRCUML_OP_FTOI4C,		/* FTOI4C  dst,src1               */
-	DRCUML_OP_FTOI8,		/* FTOI8   dst,src1               */
-	DRCUML_OP_FTOI8T,		/* FTOI8T  dst,src1               */
-	DRCUML_OP_FTOI8R,		/* FTOI8R  dst,src1               */
-	DRCUML_OP_FTOI8F,		/* FTOI8F  dst,src1               */
-	DRCUML_OP_FTOI8C,		/* FTOI8C  dst,src1               */
-	DRCUML_OP_FFRFS,		/* FFRFS   dst,src1               */
-	DRCUML_OP_FFRFD,		/* FFRFD   dst,src1               */
-	DRCUML_OP_FFRI4,		/* FFRI4   dst,src1               */
-	DRCUML_OP_FFRI8,		/* FFRI8   dst,src1               */
+	DRCUML_OP_FMOV,			/* FMOV    dst,src1[,c]           */
+	DRCUML_OP_FTOINT,		/* FTOINT  dst,src1,size,round    */
+	DRCUML_OP_FFRINT,		/* FFRINT  dst,src1,size          */
+	DRCUML_OP_FFRFLT,		/* FFRFLT  dst,src1,size          */
+	DRCUML_OP_FRNDS,		/* FRNDS   dst,src1               */
 	DRCUML_OP_FADD,			/* FADD    dst,src1,src2          */
 	DRCUML_OP_FSUB,			/* FSUB    dst,src1,src2          */
 	DRCUML_OP_FCMP,			/* FCMP    src1,src2              */

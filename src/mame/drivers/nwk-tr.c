@@ -881,11 +881,6 @@ static const struct RF5C400interface rf5c400_interface =
 	REGION_SOUND1
 };
 
-static const ppc_config nwktr_ppc_cfg =
-{
-	PPC_MODEL_403GA
-};
-
 static const sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
@@ -899,8 +894,7 @@ static MACHINE_RESET( nwktr )
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_CONFIG(nwktr_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(nwktr_map, 0)
 
 	MDRV_CPU_ADD(M68000, 64000000/4)	/* 16MHz */
@@ -938,30 +932,6 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static UINT8 jamma_rdata[1024];
-static void jamma_r(int length)
-{
-	int i;
-	//printf("jamma_r %d\n", length);
-	for (i=0; i < length; i++)
-	{
-		jamma_rdata[i] = 0;
-	}
-}
-
-static UINT8 jamma_wdata[1024];
-static void jamma_w(int length)
-{
-	int i;
-	//printf("jamma_w %d\n", length);
-	for (i=0; i < length; i++)
-	{
-		//jamma_jvs_w(jamma_wdata[i]);
-	}
-
-	//jamma_jvs_cmd_exec();
-}
-
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
@@ -981,8 +951,8 @@ static DRIVER_INIT( nwktr )
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
-	ppc403_install_spu_tx_dma_handler(jamma_w, jamma_wdata);
-	ppc403_install_spu_rx_dma_handler(jamma_r, jamma_rdata);
+//	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+//	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 
 	adc1213x_init(0, adc12138_input_callback);
 }

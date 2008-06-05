@@ -365,8 +365,10 @@ ALL VROM ROMs are 16M MASK
 #include "machine/53c810.h"
 #include "sound/scsp.h"
 
-static int model3_irq_enable;
-int model3_irq_state;
+static UINT8 irq_enable;
+static UINT8 irq_state;
+static UINT8 scsi_irq_state;
+
 int model3_step;
 UINT32 *model3_vrom;
 
@@ -411,6 +413,25 @@ void real3d_polygon_ram_dma(UINT32 src, UINT32 dst, int length, int byteswap);
 static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap);
 
 static UINT16 *model3_soundram;
+
+
+static void update_irq_state(running_machine *machine)
+{
+	if ((irq_enable & irq_state) || scsi_irq_state)
+		cpunum_set_input_line(machine, 0, PPC_IRQ, ASSERT_LINE);
+	else
+		cpunum_set_input_line(machine, 0, PPC_IRQ, CLEAR_LINE);
+}
+
+void model3_set_irq_line(running_machine *machine, UINT8 bit, int state)
+{
+	if (state != CLEAR_LINE)
+		irq_state |= bit;
+	else
+		irq_state &= ~bit;
+	update_irq_state(machine);
+}
+
 
 #define BYTE_REVERSE32(x)		(((x >> 24) & 0xff) | \
 								((x >> 8) & 0xff00) | \
@@ -789,15 +810,9 @@ static UINT32 scsi_fetch(UINT32 dsp)
 
 static void scsi_irq_callback(running_machine *machine, int state)
 {
-	if (state)
-	{
-		model3_irq_state |= model3_irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
-	}
-	else
-	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
-	}
+	scsi_irq_state = state;
+//	model3_irq_state |= irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
+	update_irq_state(machine);
 }
 
 /*****************************************************************************/
@@ -1244,12 +1259,12 @@ static READ64_HANDLER( model3_sys_r )
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return (model3_irq_enable<<24);
+				return (irq_enable<<24);
 			}
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-			return (UINT64)model3_irq_state<<56 | 0xff000000;
+			return (UINT64)irq_state<<56 | 0xff000000;
 			break;
 	}
 
@@ -1264,7 +1279,7 @@ static WRITE64_HANDLER( model3_sys_w )
 		case 0x10/8:
 			if (ACCESSING_BITS_24_31)
 			{
-				model3_irq_enable = (data>>24)&0xff;
+				irq_enable = (data>>24)&0xff;
 			}
 			else logerror("m3_sys: unknown mask on IRQen write\n");
 			break;
@@ -1328,7 +1343,7 @@ static READ64_HANDLER(model3_sound_r)
 
 static WRITE64_HANDLER(model3_sound_w)
 {
-	model3_irq_state &= ~0x40;
+	model3_set_irq_line(machine, 0x40, CLEAR_LINE);
 
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
@@ -1598,8 +1613,8 @@ static INPUT_PORTS_START( scud )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* View Button 3 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* View Button 4 */
-	PORT_BIT( 0x50, IP_ACTIVE_LOW, IPT_BUTTON5 )	/* Shift 1 */
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Shift 2 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 )	/* Shift 1 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Shift 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )	/* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )	/* Shift 4 */
 
@@ -1692,8 +1707,8 @@ static INPUT_PORTS_START( daytona2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* View Button 2 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* View Button 3 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )	/* View Button 4 */
-	PORT_BIT( 0x50, IP_ACTIVE_LOW, IPT_BUTTON5 )	/* Shift 1 */
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Shift 2 */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 )	/* Shift 1 */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 )	/* Shift 2 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 )	/* Shift 3 */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 )	/* Shift 4 */
 
@@ -1743,8 +1758,8 @@ static INPUT_PORTS_START( eca )
 	PORT_START
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	/* View Change */
 	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x50, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* Shift Up */
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* Shift Down */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* Shift Up */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )	/* Shift Down */
 
 	PORT_START
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -4043,52 +4058,48 @@ static const struct SCSPinterface scsp2_interface =
 
 /* IRQs */
 /*
-    0x80: Unused ?
+    0x80: Unknown (no clearing logic in scud)
     0x40: SCSP
-    0x20: Unused ?
+    0x20: Unknown (no clearing logic in scud)
     0x10: Network
-    0x08: V-blank end ?
-    0x04: ???
-    0x02: V-blank start
-    0x01: Unused ?
+    0x08: Video (unknown -- has callback hook in scud)
+    0x04: Video (unknown -- has callback hook in scud)
+    0x02: Video (VBLANK start?)
+    0x01: Video (unused?)
 */
 static int model3_vblank = 0;
 static INTERRUPT_GEN(model3_interrupt)
 {
 	if (model3_vblank == 0) {
-		model3_irq_state = 0x42;
+		model3_set_irq_line(machine, 0x42, ASSERT_LINE);
 	} else {
-		model3_irq_state = 0x0d;
+		model3_set_irq_line(machine, 0x0d, ASSERT_LINE);
 	}
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
 
 	model3_vblank++;
 	model3_vblank &= 1;
 }
 
-static const ppc_config model3_10 =
+static const powerpc_config model3_10 =
 {
-	PPC_MODEL_603E,		/* 603e, Stretch, 1.3 */
-	0x10,				/* Multiplier 1, Bus = 66MHz, Core = 66MHz */
-	BUS_FREQUENCY_66MHZ
+	/* 603e, Stretch, 1.3 */
+	66000000		/* Multiplier 1, Bus = 66MHz, Core = 66MHz */
 };
 
-static const ppc_config model3_15 =
+static const powerpc_config model3_15 =
 {
-	PPC_MODEL_603E,		/* 603e, Stretch, 1.3 */
-	0x15,				/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
-	BUS_FREQUENCY_66MHZ
+	/* 603e, Stretch, 1.3 */
+	66000000		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 };
 
-static const ppc_config model3_2x =
+static const powerpc_config model3_2x =
 {
-	PPC_MODEL_603R,		/* 603e-PID7t, Goldeneye, 2.1 */
-	0x25,				/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
-	BUS_FREQUENCY_66MHZ
+	/* 603e-PID7t, Goldeneye, 2.1 */
+	66000000		/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 };
 
 static MACHINE_DRIVER_START( model3_10 )
-	MDRV_CPU_ADD(PPC603, 66000000)
+	MDRV_CPU_ADD(PPC603E, 66000000)
 	MDRV_CPU_CONFIG(model3_10)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
  	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
@@ -4128,7 +4139,7 @@ static MACHINE_DRIVER_START( model3_10 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model3_15 )
-	MDRV_CPU_ADD(PPC603, 100000000)
+	MDRV_CPU_ADD(PPC603E, 100000000)
 	MDRV_CPU_CONFIG(model3_15)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
  	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
@@ -4166,7 +4177,7 @@ static MACHINE_DRIVER_START( model3_15 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model3_20 )
-	MDRV_CPU_ADD(PPC603, 166000000)
+	MDRV_CPU_ADD(PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
  	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)
@@ -4203,7 +4214,7 @@ static MACHINE_DRIVER_START( model3_20 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( model3_21 )
-	MDRV_CPU_ADD(PPC603, 166000000)
+	MDRV_CPU_ADD(PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem, 0)
  	MDRV_CPU_VBLANK_INT_HACK(model3_interrupt,2)

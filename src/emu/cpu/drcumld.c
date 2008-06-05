@@ -43,7 +43,10 @@ static char *output_flags_cmptest(char *dest, int size, const drcuml_parameter *
 static char *output_param(char *dest, int size, const drcuml_parameter *param);
 static char *output_param_string(char *dest, int size, const drcuml_parameter *param);
 static char *output_param_handle(char *dest, int size, const drcuml_parameter *param);
+static char *output_param_size(char *dest, int size, const drcuml_parameter *param);
 static char *output_param_space(char *dest, int size, const drcuml_parameter *param);
+static char *output_param_space_size(char *dest, int size, const drcuml_parameter *param);
+static char *output_param_round(char *dest, int size, const drcuml_parameter *param);
 
 
 
@@ -89,49 +92,24 @@ static const drcuml_opdesc opcode_source_table[] =
 	{ DRCUML_OP_SETFMOD,	"setfmod",	{ output_param } },
 	{ DRCUML_OP_GETFMOD,	"getfmod",	{ output_param } },
 	{ DRCUML_OP_GETEXP,		"getexp",	{ output_param } },
+	{ DRCUML_OP_GETFLGS,	"getflgs",	{ output_param, output_flags } },
 	{ DRCUML_OP_SAVE,		"save",		{ output_param } },
 	{ DRCUML_OP_RESTORE,	"restore",	{ output_param } },
 
 	/* Integer Operations */
-	{ DRCUML_OP_LOAD1U,		"!load1u",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_LOAD1S,		"!load1s",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_LOAD2U,		"!load2u",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_LOAD2S,		"!load2s",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_LOAD4U,		"!load4u",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_LOAD4S,		"!load4s",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_LOAD8U,		"!load8u",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_STORE1,		"!store1",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_STORE2,		"!store2",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_STORE4,		"!store4",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_STORE8,		"!store8",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_READ1U,		"!read1u",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ1S,		"!read1s",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ2U,		"!read2u",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ2S,		"!read2s",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ2M,		"!read2m",	{ output_param, output_param_space, output_param, output_param } },
-	{ DRCUML_OP_READ4U,		"!read4u",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ4S,		"!read4s",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ4M,		"!read4m",	{ output_param, output_param_space, output_param, output_param } },
-	{ DRCUML_OP_READ8U,		"!read8u",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_READ8M,		"!read8m",	{ output_param, output_param_space, output_param, output_param } },
-	{ DRCUML_OP_WRITE1,		"!write1",	{ output_param_space, output_param, output_param } },
-	{ DRCUML_OP_WRITE2,		"!write2",	{ output_param_space, output_param, output_param } },
-	{ DRCUML_OP_WRIT2M,		"!writ2m",	{ output_param_space, output_param, output_param, output_param } },
-	{ DRCUML_OP_WRITE4,		"!write4",	{ output_param_space, output_param, output_param } },
-	{ DRCUML_OP_WRIT4M,		"!writ4m",	{ output_param_space, output_param, output_param, output_param } },
-	{ DRCUML_OP_WRITE8,		"!write8",	{ output_param_space, output_param, output_param } },
-	{ DRCUML_OP_WRIT8M,		"!writ8m",	{ output_param_space, output_param, output_param, output_param } },
-	{ DRCUML_OP_FLAGS,		"!flags",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_SETC,		"!setc",	{ output_param, output_param } },
+	{ DRCUML_OP_LOAD,		"!load",	{ output_param, output_param, output_param, output_param_size } },
+	{ DRCUML_OP_LOADS,		"!loads",	{ output_param, output_param, output_param, output_param_size } },
+	{ DRCUML_OP_STORE,		"!store",	{ output_param, output_param, output_param, output_param_size } },
+	{ DRCUML_OP_READ,		"!read",	{ output_param, output_param, output_param_space_size } },
+	{ DRCUML_OP_READM,		"!readm",	{ output_param, output_param, output_param, output_param_space_size } },
+	{ DRCUML_OP_WRITE,		"!write",	{ output_param, output_param, output_param_space_size } },
+	{ DRCUML_OP_WRITEM,		"!writem",	{ output_param, output_param, output_param, output_param_space_size } },
+	{ DRCUML_OP_CARRY,		"!carry",	{ output_param, output_param } },
+	{ DRCUML_OP_SET,		"!set",		{ output_param, output_cond } },
 	{ DRCUML_OP_MOV,		"!mov",		{ output_param, output_param, output_cond } },
-	{ DRCUML_OP_ZEXT1,		"!zext1",	{ output_param, output_param } },
-	{ DRCUML_OP_ZEXT2,		"!zext2",	{ output_param, output_param } },
-	{ DRCUML_OP_ZEXT4,		"!zext4",	{ output_param, output_param } },
-	{ DRCUML_OP_SEXT1,		"!sext1",	{ output_param, output_param } },
-	{ DRCUML_OP_SEXT2,		"!sext2",	{ output_param, output_param } },
-	{ DRCUML_OP_SEXT4,		"!sext4",	{ output_param, output_param } },
-	{ DRCUML_OP_XTRACT,		"!xtract",	{ output_param, output_param, output_param, output_param } },
-	{ DRCUML_OP_INSERT,		"!insert",	{ output_param, output_param, output_param, output_param } },
+	{ DRCUML_OP_SEXT,		"!sext",	{ output_param, output_param, output_param_size } },
+	{ DRCUML_OP_ROLAND,		"!roland",	{ output_param, output_param, output_param, output_param } },
+	{ DRCUML_OP_ROLINS,		"!rolins",	{ output_param, output_param, output_param, output_param } },
 	{ DRCUML_OP_ADD,		"!add",		{ output_param, output_param, output_param, output_flags } },
 	{ DRCUML_OP_ADDC,		"!addc",	{ output_param, output_param, output_param, output_flags } },
 	{ DRCUML_OP_SUB,		"!sub",		{ output_param, output_param, output_param, output_flags } },
@@ -158,23 +136,13 @@ static const drcuml_opdesc opcode_source_table[] =
 	/* Floating-Point Operations */
 	{ DRCUML_OP_FLOAD,		"f!load",	{ output_param, output_param, output_param } },
 	{ DRCUML_OP_FSTORE,		"f!store",	{ output_param, output_param, output_param } },
-	{ DRCUML_OP_FREAD,		"f!read",	{ output_param, output_param_space, output_param } },
-	{ DRCUML_OP_FWRITE,		"f!write",	{ output_param_space, output_param, output_param } },
+	{ DRCUML_OP_FREAD,		"f!read",	{ output_param, output_param, output_param_space } },
+	{ DRCUML_OP_FWRITE,		"f!write",	{ output_param, output_param, output_param_space } },
 	{ DRCUML_OP_FMOV,		"f!mov",	{ output_param, output_param, output_cond } },
-	{ DRCUML_OP_FTOI4,		"f!toi4",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI4T,		"f!toi4t",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI4R,		"f!toi4r",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI4F,		"f!toi4f",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI4C,		"f!toi4c",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI8,		"f!toi8",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI8T,		"f!toi8t",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI8R,		"f!toi8r",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI8F,		"f!toi8f",	{ output_param, output_param } },
-	{ DRCUML_OP_FTOI8C,		"f!toi8c",	{ output_param, output_param } },
-	{ DRCUML_OP_FFRFS,		"f!frfs",	{ output_param, output_param } },
-	{ DRCUML_OP_FFRFD,		"f!frfd",	{ output_param, output_param } },
-	{ DRCUML_OP_FFRI4,		"f!fri4",	{ output_param, output_param } },
-	{ DRCUML_OP_FFRI8,		"f!fri8",	{ output_param, output_param } },
+	{ DRCUML_OP_FTOINT,		"f!toint",	{ output_param, output_param, output_param_size, output_param_round } },
+	{ DRCUML_OP_FFRINT,		"f!frint",	{ output_param, output_param, output_param_size } },
+	{ DRCUML_OP_FFRFLT,		"f!frflt",	{ output_param, output_param, output_param_size } },
+	{ DRCUML_OP_FRNDS,		"f!rnds",	{ output_param, output_param } },
 	{ DRCUML_OP_FADD,		"f!add",	{ output_param, output_param, output_param } },
 	{ DRCUML_OP_FSUB,		"f!sub",	{ output_param, output_param, output_param } },
 	{ DRCUML_OP_FCMP,		"f!cmp",	{ output_param, output_param, output_flags_cmptest } },
@@ -448,6 +416,22 @@ static char *output_param_handle(char *dest, int size, const drcuml_parameter *p
 
 
 /*-------------------------------------------------
+    output_param_size - output parameter 0,
+    assuming it is size
+-------------------------------------------------*/
+
+static char *output_param_size(char *dest, int size, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE)
+	{
+		static const char *strings[] = { "byte", "word", "dword", "qword" };
+		return dest + sprintf(dest, "%s", strings[param->value & 3]);
+	}
+	return output_param(dest, size, param);
+}
+
+
+/*-------------------------------------------------
     output_param_space - output parameter 0,
     assuming it is an address space
 -------------------------------------------------*/
@@ -456,5 +440,38 @@ static char *output_param_space(char *dest, int size, const drcuml_parameter *pa
 {
 	if (param->type == DRCUML_PTYPE_IMMEDIATE && param->value >= ADDRESS_SPACE_PROGRAM && param->value <= ADDRESS_SPACE_IO)
 		return dest + sprintf(dest, "%s", address_space_names[param->value]);
+	return output_param(dest, size, param);
+}
+
+
+/*-------------------------------------------------
+    output_param_space_size - output parameter 0,
+    assuming it is an address space/size combo
+-------------------------------------------------*/
+
+static char *output_param_space_size(char *dest, int size, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE && param->value / 16 >= ADDRESS_SPACE_PROGRAM && param->value / 16 <= ADDRESS_SPACE_IO)
+	{
+		dest += sprintf(dest, "%s_", address_space_names[param->value / 16]);
+		return output_param_size(dest, size, param);
+	}
+		
+	return output_param(dest, size, param);
+}
+
+
+/*-------------------------------------------------
+    output_param_round - output parameter 0,
+    assuming it is a rounding mode
+-------------------------------------------------*/
+
+static char *output_param_round(char *dest, int size, const drcuml_parameter *param)
+{
+	if (param->type == DRCUML_PTYPE_IMMEDIATE && param->value >= DRCUML_FMOD_TRUNC && param->value <= DRCUML_FMOD_DEFAULT)
+	{
+		static const char *strings[] = { "trunc", "round", "ceil", "floor", "default" };
+		return dest + sprintf(dest, "%s", strings[param->value]);
+	}
 	return output_param(dest, size, param);
 }

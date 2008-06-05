@@ -117,7 +117,8 @@ extern unsigned dasmmips3(char *buffer, unsigned pc, UINT32 op);
 #define CPR264(reg)				MEM(&mips3->cpr[2][reg])
 #define CCR264(reg)				MEM(&mips3->ccr[2][reg])
 
-#define FCCMASK(which)			fcc_mask[(mips3->flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]
+#define FCCMASK(which)			((UINT32)(1 << fcc_shift[(mips3->flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]))
+#define FCCSHIFT(which)			fcc_shift[(mips3->flavor < MIPS3_TYPE_MIPS_IV) ? 0 : ((which) & 7)]
 
 
 
@@ -177,15 +178,6 @@ struct _mips3imp_state
 
 	/* tables */
 	UINT8				fpmode[4];					/* FPU mode table */
-	UINT64				slt_table[32];				/* FLAGS table for slt */
-	UINT64				sltu_table[32];				/* FLAGS table for sltu */
-	UINT32				c_un_table[32];				/* FLAGS table for c_un */
-	UINT32				c_eq_table[32];				/* FLAGS table for c_eq */
-	UINT32				c_ueq_table[32];			/* FLAGS table for c_ueq */
-	UINT32				c_olt_table[32];			/* FLAGS table for c_olt */
-	UINT32				c_ult_table[32];			/* FLAGS table for c_ult */
-	UINT32				c_ole_table[32];			/* FLAGS table for c_ole */
-	UINT32				c_ule_table[32];			/* FLAGS table for c_ule */
 
 	/* register mappings */
 	drcuml_parameter	regmap[34];					/* parameter to register mappings for all 32 integer registers */
@@ -270,7 +262,7 @@ static mips3_state *mips3;
 
 
 /* bit indexes for various FCCs */
-static const UINT32 fcc_mask[8] = { 1 << 23, 1 << 25, 1 << 26, 1 << 27, 1 << 28, 1 << 29, 1 << 30, 1 << 31 };
+static const UINT8 fcc_shift[8] = { 23, 25, 26, 27, 28, 29, 30, 31 };
 
 /* lookup table for FP modes */
 static const UINT8 fpmode_source[4] =
@@ -279,339 +271,6 @@ static const UINT8 fpmode_source[4] =
 	DRCUML_FMOD_TRUNC,
 	DRCUML_FMOD_CEIL,
 	DRCUML_FMOD_FLOOR
-};
-
-/* flag lookup table for SLT */
-static const UINT64 slt_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	0,
-	/* ...V. */	1,
-	/* ...VC */	1,
-	/* ..Z.. */	0,
-	/* ..Z.C */	0,
-	/* ..ZV. */	1,
-	/* ..ZVC */	1,
-	/* .S... */	1,
-	/* .S..C */	1,
-	/* .S.V. */	0,
-	/* .S.VC */	0,
-	/* .SZ.. */	1,
-	/* .SZ.C */	1,
-	/* .SZV. */	0,
-	/* .SZVC */	0,
-	/* U.... */	0,
-	/* U...C */	0,
-	/* U..V. */	1,
-	/* U..VC */	1,
-	/* U.Z.. */	0,
-	/* U.Z.C */	0,
-	/* U.ZV. */	1,
-	/* U.ZVC */	1,
-	/* US... */	1,
-	/* US..C */	1,
-	/* US.V. */	0,
-	/* US.VC */	0,
-	/* USZ.. */	1,
-	/* USZ.C */	1,
-	/* USZV. */	0,
-	/* USZVC */	0
-};
-
-/* flag lookup table for SLTU */
-static const UINT64 sltu_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	1,
-	/* ...V. */	0,
-	/* ...VC */	1,
-	/* ..Z.. */	0,
-	/* ..Z.C */	1,
-	/* ..ZV. */	0,
-	/* ..ZVC */	1,
-	/* .S... */	0,
-	/* .S..C */	1,
-	/* .S.V. */	0,
-	/* .S.VC */	1,
-	/* .SZ.. */	0,
-	/* .SZ.C */	1,
-	/* .SZV. */	0,
-	/* .SZVC */	1,
-	/* U.... */	0,
-	/* U...C */	1,
-	/* U..V. */	0,
-	/* U..VC */	1,
-	/* U.Z.. */	0,
-	/* U.Z.C */	1,
-	/* U.ZV. */	0,
-	/* U.ZVC */	1,
-	/* US... */	0,
-	/* US..C */	1,
-	/* US.V. */	0,
-	/* US.VC */	1,
-	/* USZ.. */	0,
-	/* USZ.C */	1,
-	/* USZV. */	0,
-	/* USZVC */	1
-};
-
-/* flag lookup table for C.UN */
-static const UINT32 c_un_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	0,
-	/* ...V. */	0,
-	/* ...VC */	0,
-	/* ..Z.. */	0,
-	/* ..Z.C */	0,
-	/* ..ZV. */	0,
-	/* ..ZVC */	0,
-	/* .S... */	0,
-	/* .S..C */	0,
-	/* .S.V. */	0,
-	/* .S.VC */	0,
-	/* .SZ.. */	0,
-	/* .SZ.C */	0,
-	/* .SZV. */	0,
-	/* .SZVC */	0,
-	/* U.... */	~0,
-	/* U...C */	~0,
-	/* U..V. */	~0,
-	/* U..VC */	~0,
-	/* U.Z.. */	~0,
-	/* U.Z.C */	~0,
-	/* U.ZV. */	~0,
-	/* U.ZVC */	~0,
-	/* US... */	~0,
-	/* US..C */	~0,
-	/* US.V. */	~0,
-	/* US.VC */	~0,
-	/* USZ.. */	~0,
-	/* USZ.C */	~0,
-	/* USZV. */	~0,
-	/* USZVC */	~0
-};
-
-/* flag lookup table for C.EQ */
-static const UINT32 c_eq_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	0,
-	/* ...V. */	0,
-	/* ...VC */	0,
-	/* ..Z.. */	~0,
-	/* ..Z.C */	~0,
-	/* ..ZV. */	~0,
-	/* ..ZVC */	~0,
-	/* .S... */	0,
-	/* .S..C */	0,
-	/* .S.V. */	0,
-	/* .S.VC */	0,
-	/* .SZ.. */	~0,
-	/* .SZ.C */	~0,
-	/* .SZV. */	~0,
-	/* .SZVC */	~0,
-	/* U.... */	0,
-	/* U...C */	0,
-	/* U..V. */	0,
-	/* U..VC */	0,
-	/* U.Z.. */	0,
-	/* U.Z.C */	0,
-	/* U.ZV. */	0,
-	/* U.ZVC */	0,
-	/* US... */	0,
-	/* US..C */	0,
-	/* US.V. */	0,
-	/* US.VC */	0,
-	/* USZ.. */	0,
-	/* USZ.C */	0,
-	/* USZV. */	0,
-	/* USZVC */	0
-};
-
-/* flag lookup table for C.UEQ */
-static const UINT32 c_ueq_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	0,
-	/* ...V. */	0,
-	/* ...VC */	0,
-	/* ..Z.. */	~0,
-	/* ..Z.C */	~0,
-	/* ..ZV. */	~0,
-	/* ..ZVC */	~0,
-	/* .S... */	0,
-	/* .S..C */	0,
-	/* .S.V. */	0,
-	/* .S.VC */	0,
-	/* .SZ.. */	~0,
-	/* .SZ.C */	~0,
-	/* .SZV. */	~0,
-	/* .SZVC */	~0,
-	/* U.... */	~0,
-	/* U...C */	~0,
-	/* U..V. */	~0,
-	/* U..VC */	~0,
-	/* U.Z.. */	~0,
-	/* U.Z.C */	~0,
-	/* U.ZV. */	~0,
-	/* U.ZVC */	~0,
-	/* US... */	~0,
-	/* US..C */	~0,
-	/* US.V. */	~0,
-	/* US.VC */	~0,
-	/* USZ.. */	~0,
-	/* USZ.C */	~0,
-	/* USZV. */	~0,
-	/* USZVC */	~0
-};
-
-/* flag lookup table for C.OLT */
-static const UINT32 c_olt_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	~0,
-	/* ...V. */	0,
-	/* ...VC */	~0,
-	/* ..Z.. */	0,
-	/* ..Z.C */	~0,
-	/* ..ZV. */	0,
-	/* ..ZVC */	~0,
-	/* .S... */	0,
-	/* .S..C */	~0,
-	/* .S.V. */	0,
-	/* .S.VC */	~0,
-	/* .SZ.. */	0,
-	/* .SZ.C */	~0,
-	/* .SZV. */	0,
-	/* .SZVC */	~0,
-	/* U.... */	0,
-	/* U...C */	0,
-	/* U..V. */	0,
-	/* U..VC */	0,
-	/* U.Z.. */	0,
-	/* U.Z.C */	0,
-	/* U.ZV. */	0,
-	/* U.ZVC */	0,
-	/* US... */	0,
-	/* US..C */	0,
-	/* US.V. */	0,
-	/* US.VC */	0,
-	/* USZ.. */	0,
-	/* USZ.C */	0,
-	/* USZV. */	0,
-	/* USZVC */	0
-};
-
-/* flag lookup table for C.ULT */
-static const UINT32 c_ult_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	~0,
-	/* ...V. */	0,
-	/* ...VC */	~0,
-	/* ..Z.. */	0,
-	/* ..Z.C */	~0,
-	/* ..ZV. */	0,
-	/* ..ZVC */	~0,
-	/* .S... */	0,
-	/* .S..C */	~0,
-	/* .S.V. */	0,
-	/* .S.VC */	~0,
-	/* .SZ.. */	0,
-	/* .SZ.C */	~0,
-	/* .SZV. */	0,
-	/* .SZVC */	~0,
-	/* U.... */	~0,
-	/* U...C */	~0,
-	/* U..V. */	~0,
-	/* U..VC */	~0,
-	/* U.Z.. */	~0,
-	/* U.Z.C */	~0,
-	/* U.ZV. */	~0,
-	/* U.ZVC */	~0,
-	/* US... */	~0,
-	/* US..C */	~0,
-	/* US.V. */	~0,
-	/* US.VC */	~0,
-	/* USZ.. */	~0,
-	/* USZ.C */	~0,
-	/* USZV. */	~0,
-	/* USZVC */	~0
-};
-
-/* flag lookup table for C.OLE */
-static const UINT32 c_ole_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	~0,
-	/* ...V. */	0,
-	/* ...VC */	~0,
-	/* ..Z.. */	~0,
-	/* ..Z.C */	~0,
-	/* ..ZV. */	~0,
-	/* ..ZVC */	~0,
-	/* .S... */	0,
-	/* .S..C */	~0,
-	/* .S.V. */	0,
-	/* .S.VC */	~0,
-	/* .SZ.. */	~0,
-	/* .SZ.C */	~0,
-	/* .SZV. */	~0,
-	/* .SZVC */	~0,
-	/* U.... */	0,
-	/* U...C */	0,
-	/* U..V. */	0,
-	/* U..VC */	0,
-	/* U.Z.. */	0,
-	/* U.Z.C */	0,
-	/* U.ZV. */	0,
-	/* U.ZVC */	0,
-	/* US... */	0,
-	/* US..C */	0,
-	/* US.V. */	0,
-	/* US.VC */	0,
-	/* USZ.. */	0,
-	/* USZ.C */	0,
-	/* USZV. */	0,
-	/* USZVC */	0
-};
-
-/* flag lookup table for C.ULE */
-static const UINT32 c_ule_table_source[32] =
-{
-	/* ..... */	0,
-	/* ....C */	~0,
-	/* ...V. */	0,
-	/* ...VC */	~0,
-	/* ..Z.. */	~0,
-	/* ..Z.C */	~0,
-	/* ..ZV. */	~0,
-	/* ..ZVC */	~0,
-	/* .S... */	0,
-	/* .S..C */	~0,
-	/* .S.V. */	0,
-	/* .S.VC */	~0,
-	/* .SZ.. */	~0,
-	/* .SZ.C */	~0,
-	/* .SZV. */	~0,
-	/* .SZVC */	~0,
-	/* U.... */	~0,
-	/* U...C */	~0,
-	/* U..V. */	~0,
-	/* U..VC */	~0,
-	/* U.Z.. */	~0,
-	/* U.Z.C */	~0,
-	/* U.ZV. */	~0,
-	/* U.ZVC */	~0,
-	/* US... */	~0,
-	/* US..C */	~0,
-	/* US.V. */	~0,
-	/* US.VC */	~0,
-	/* USZ.. */	~0,
-	/* USZ.C */	~0,
-	/* USZV. */	~0,
-	/* USZVC */	~0
 };
 
 
@@ -738,15 +397,6 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(mips3->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
-	memcpy(mips3->impstate->slt_table, slt_table_source, sizeof(slt_table_source));
-	memcpy(mips3->impstate->sltu_table, sltu_table_source, sizeof(sltu_table_source));
-	memcpy(mips3->impstate->c_un_table, c_un_table_source, sizeof(c_un_table_source));
-	memcpy(mips3->impstate->c_eq_table, c_eq_table_source, sizeof(c_eq_table_source));
-	memcpy(mips3->impstate->c_ueq_table, c_ueq_table_source, sizeof(c_ueq_table_source));
-	memcpy(mips3->impstate->c_olt_table, c_olt_table_source, sizeof(c_olt_table_source));
-	memcpy(mips3->impstate->c_ult_table, c_ult_table_source, sizeof(c_ult_table_source));
-	memcpy(mips3->impstate->c_ole_table, c_ole_table_source, sizeof(c_ole_table_source));
-	memcpy(mips3->impstate->c_ule_table, c_ule_table_source, sizeof(c_ule_table_source));
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 34; regnum++)
@@ -1259,7 +909,7 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 
 	/* reset the FPU mode */
 	UML_AND(block, IREG(0), CCR132(31), IMM(3));									// and     i0,ccr1[31],3
-	UML_LOAD1U(block, IREG(0), &mips3->impstate->fpmode[0], IREG(0));				// load1u  i0,fpmode,i0
+	UML_LOAD(block, IREG(0), &mips3->impstate->fpmode[0], IREG(0), BYTE);			// load    i0,fpmode,i0,byte
 	UML_SETFMOD(block, IREG(0));													// setfmod i0
 
 	/* load fast integer registers */
@@ -1370,7 +1020,7 @@ static void static_generate_tlb_mismatch(drcuml_state *drcuml)
 	UML_RECOVER(block, IREG(0), MAPVAR_PC);											// recover i0,PC
 	UML_MOV(block, MEM(&mips3->pc), IREG(0));										// mov     <pc>,i0
 	UML_SHR(block, IREG(1), IREG(0), IMM(12));										// shr     i1,i0,12
-	UML_LOAD4(block, IREG(1), mips3->tlb_table, IREG(1));							// load4   i1,[tlb_table],i1
+	UML_LOAD(block, IREG(1), mips3->tlb_table, IREG(1), DWORD);						// load    i1,[tlb_table],i1,dword
 	if (PRINTF_MMU)
 	{
 		UML_MOV(block, MEM(&mips3->impstate->arg0), IREG(0));						// mov     [arg0],i0
@@ -1433,8 +1083,8 @@ static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int
 	if (exception == EXCEPTION_TLBLOAD || exception == EXCEPTION_TLBSTORE)
 	{
 		/* set the upper bits of EntryHi and the lower bits of Context to the fault page */
-		UML_INSERT(block, CPR032(COP0_EntryHi), IREG(0), IMM(0), IMM(0xffffe000));	// insert  [EntryHi],i0,0,0xffffe000
-		UML_INSERT(block, CPR032(COP0_Context), IREG(0), IMM(32-9), IMM(0x7fffff));	// insert  [Context],i0,32-9,0x7fffff
+		UML_ROLINS(block, CPR032(COP0_EntryHi), IREG(0), IMM(0), IMM(0xffffe000));	// rolins  [EntryHi],i0,0,0xffffe000
+		UML_ROLINS(block, CPR032(COP0_Context), IREG(0), IMM(32-9), IMM(0x7fffff));	// rolins  [Context],i0,32-9,0x7fffff
 	}
 
 	/* set the EPC and Cause registers */
@@ -1458,7 +1108,7 @@ static void static_generate_exception(drcuml_state *drcuml, UINT8 exception, int
 	if (exception == EXCEPTION_BADCOP)
 	{
 		UML_GETEXP(block, IREG(0));													// getexp  i0
-		UML_INSERT(block, CPR032(COP0_Cause), IREG(0), IMM(28), IMM(0x30000000));	// insert  [Cause],i0,28,0x30000000
+		UML_ROLINS(block, CPR032(COP0_Cause), IREG(0), IMM(28), IMM(0x30000000));	// rolins  [Cause],i0,28,0x30000000
 	}
 
 	/* set EXL in the SR */
@@ -1536,10 +1186,10 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 
 	/* general case: assume paging and perform a translation */
 	UML_SHR(block, IREG(3), IREG(0), IMM(12));										// shr     i3,i0,12
-	UML_LOAD4(block, IREG(3), mips3->tlb_table, IREG(3));							// load4   i3,[tlb_table],i3
+	UML_LOAD(block, IREG(3), mips3->tlb_table, IREG(3), DWORD);						// load    i3,[tlb_table],i3,dword
 	UML_TEST(block, IREG(3), IMM(iswrite ? TLB_DIRTY : TLB_VALID));					// test    i3,iswrite ? TLB_DIRTY : TLB_VALID
 	UML_JMPc(block, IF_Z, tlbmiss = label++);										// jmp     tlbmiss,z
-	UML_INSERT(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));					// insert  i0,i3,0,0xfffff000
+	UML_ROLINS(block, IREG(0), IREG(3), IMM(0), IMM(0xfffff000));					// rolins  i0,i3,0,0xfffff000
 
 	for (ramnum = 0; ramnum < MIPS3_MAX_FASTRAM; ramnum++)
 		if (!Machine->debug_mode && mips3->impstate->fastram[ramnum].base != NULL && (!iswrite || !mips3->impstate->fastram[ramnum].readonly))
@@ -1563,24 +1213,24 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				{
 					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)));
 																					// xor     i0,i0,bytexor
-					UML_LOAD1U(block, IREG(0), fastbase, IREG(0));					// load1u  i0,fastbase,i0
+					UML_LOAD(block, IREG(0), fastbase, IREG(0), BYTE);				// load    i0,fastbase,i0,byte
 				}
 				else if (size == 2)
 				{
 					UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
 					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
 																					// xor     i0,i0,bytexor
-					UML_LOAD2U(block, IREG(0), fastbase, IREG(0));					// load2u  i0,fastbase,i0
+					UML_LOAD(block, IREG(0), fastbase, IREG(0), WORD);				// load    i0,fastbase,i0,word
 				}
 				else if (size == 4)
 				{
 					UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
-					UML_LOAD4(block, IREG(0), fastbase, IREG(0));					// load4   i0,fastbase,i0
+					UML_LOAD(block, IREG(0), fastbase, IREG(0), DWORD);				// load    i0,fastbase,i0,dword
 				}
 				else if (size == 8)
 				{
 					UML_SHR(block, IREG(0), IREG(0), IMM(3));						// shr     i0,i0,3
-					UML_DLOAD8(block, IREG(0), fastbase, IREG(0));					// dload8  i0,fastbase,i0
+					UML_DLOAD(block, IREG(0), fastbase, IREG(0), QWORD);			// dload   i0,fastbase,i0,qword
 					UML_DROR(block, IREG(0), IREG(0), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
 																					// dror    i0,i0,32*bytexor
 				}
@@ -1592,26 +1242,26 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 				{
 					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0)));
 																					// xor     i0,i0,bytexor
-					UML_STORE1(block, fastbase, IREG(0), IREG(1));					// store1  fastbase,i0,i1
+					UML_STORE(block, fastbase, IREG(0), IREG(1), BYTE);				// store   fastbase,i0,i1,byte
 				}
 				else if (size == 2)
 				{
 					UML_SHR(block, IREG(0), IREG(0), IMM(1));						// shr     i0,i0,1
 					UML_XOR(block, IREG(0), IREG(0), IMM(mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0)));
 																					// xor     i0,i0,bytexor
-					UML_STORE2(block, fastbase, IREG(0), IREG(1));					// store2  fastbase,i0,i1
+					UML_STORE(block, fastbase, IREG(0), IREG(1), WORD);				// store   fastbase,i0,i1,word
 				}
 				else if (size == 4)
 				{
 					UML_SHR(block, IREG(0), IREG(0), IMM(2));						// shr     i0,i0,2
 					if (ismasked)
 					{
-						UML_LOAD4(block, IREG(3), fastbase, IREG(0));				// load4   i3,fastbase,i0
-						UML_INSERT(block, IREG(3), IREG(1), IMM(0), IREG(2));		// insert  i3,i1,0,i2
-						UML_STORE4(block, fastbase, IREG(0), IREG(3));				// store4  fastbase,i0,i3
+						UML_LOAD(block, IREG(3), fastbase, IREG(0), DWORD);			// load    i3,fastbase,i0,dword
+						UML_ROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// rolins  i3,i1,0,i2
+						UML_STORE(block, fastbase, IREG(0), IREG(3), DWORD);		// store   fastbase,i0,i3,dword
 					}
 					else
-						UML_STORE4(block, fastbase, IREG(0), IREG(1));				// store4  fastbase,i0,i1
+						UML_STORE(block, fastbase, IREG(0), IREG(1), DWORD);		// store   fastbase,i0,i1,dword
 				}
 				else if (size == 8)
 				{
@@ -1622,12 +1272,12 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 					{
 						UML_DROR(block, IREG(2), IREG(2), IMM(32 * (mips3->bigendian ? BYTE_XOR_BE(0) : BYTE_XOR_LE(0))));
 																					// dror    i2,i2,32*bytexor
-						UML_DLOAD8(block, IREG(3), fastbase, IREG(0));				// dload8  i3,fastbase,i0
-						UML_DINSERT(block, IREG(3), IREG(1), IMM(0), IREG(2));		// dinsert i3,i1,0,i2
-						UML_DSTORE8(block, fastbase, IREG(0), IREG(3));				// dstore8 fastbase,i0,i3
+						UML_DLOAD(block, IREG(3), fastbase, IREG(0), QWORD);		// dload   i3,fastbase,i0,qword
+						UML_DROLINS(block, IREG(3), IREG(1), IMM(0), IREG(2));		// drolins i3,i1,0,i2
+						UML_DSTORE(block, fastbase, IREG(0), IREG(3), QWORD);		// dstore  fastbase,i0,i3,qword
 					}
 					else
-						UML_DSTORE8(block, fastbase, IREG(0), IREG(1));				// dstore8 fastbase,i0,i1
+						UML_DSTORE(block, fastbase, IREG(0), IREG(1), QWORD);		// dstore  fastbase,i0,i1,qword
 				}
 				UML_RET(block);														// ret
 			}
@@ -1639,32 +1289,32 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	{
 		case 1:
 			if (iswrite)
-				UML_WRITE1(block, PROGRAM, IREG(0), IREG(1));						// write1  i0,i1
+				UML_WRITE(block, IREG(0), IREG(1), PROGRAM_BYTE);					// write   i0,i1,program_byte
 			else
-				UML_READ1U(block, IREG(0), PROGRAM, IREG(0));						// read1u  i0,i0
+				UML_READ(block, IREG(0), IREG(0), PROGRAM_BYTE);					// read    i0,i0,program_byte
 			break;
 
 		case 2:
 			if (iswrite)
-				UML_WRITE2(block, PROGRAM, IREG(0), IREG(1));						// write2  i0,i1
+				UML_WRITE(block, IREG(0), IREG(1), PROGRAM_WORD);					// write   i0,i1,program_word
 			else
-				UML_READ2U(block, IREG(0), PROGRAM, IREG(0));						// read2u  i0,i0
+				UML_READ(block, IREG(0), IREG(0), PROGRAM_WORD);					// read    i0,i0,program_word
 			break;
 
 		case 4:
 			if (iswrite)
 			{
 				if (!ismasked)
-					UML_WRITE4(block, PROGRAM, IREG(0), IREG(1));					// write4  PROGRAM,i0,i1
+					UML_WRITE(block, IREG(0), IREG(1), PROGRAM_DWORD);				// write   i0,i1,program_dword
 				else
-					UML_WRIT4M(block, PROGRAM, IREG(0), IREG(2), IREG(1));			// writ4m  PROGRAM,i0,i2,i1
+					UML_WRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_DWORD);	// writem  i0,i2,i1,program_dword
 			}
 			else
 			{
 				if (!ismasked)
-					UML_READ4(block, IREG(0), PROGRAM, IREG(0));					// read4   i0,PROGRAM,i0
+					UML_READ(block, IREG(0), IREG(0), PROGRAM_DWORD);				// read    i0,i0,program_dword
 				else
-					UML_READ4M(block, IREG(0), PROGRAM, IREG(0), IREG(2));			// read4m  i0,PROGRAM,i0,i2
+					UML_READM(block, IREG(0), IREG(0), IREG(2), PROGRAM_DWORD);		// readm   i0,i0,i2,program_dword
 			}
 			break;
 
@@ -1672,16 +1322,16 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 			if (iswrite)
 			{
 				if (!ismasked)
-					UML_DWRITE8(block, PROGRAM, IREG(0), IREG(1));					// dwrite8 PROGRAM,i0,i1
+					UML_DWRITE(block, IREG(0), IREG(1), PROGRAM_QWORD);				// dwrite  i0,i1,program_qword
 				else
-					UML_DWRIT8M(block, PROGRAM, IREG(0), IREG(2), IREG(1));			// dwrit8m PROGRAM,i0,i2,i1
+					UML_DWRITEM(block, IREG(0), IREG(2), IREG(1), PROGRAM_QWORD);	// dwritem i0,i2,i1,program_qword
 			}
 			else
 			{
 				if (!ismasked)
-					UML_DREAD8(block, IREG(0), PROGRAM, IREG(0));					// dread8  i0,PROGRAM,i0
+					UML_DREAD(block, IREG(0), IREG(0), PROGRAM_QWORD);				// dread   i0,i0,program_qword
 				else
-					UML_DREAD8M(block, IREG(0), PROGRAM, IREG(0), IREG(2));			// dread8m i0,PROGRAM,i0,i2
+					UML_DREADM(block, IREG(0), IREG(0), IREG(2), PROGRAM_QWORD);	// dreadm  i0,i0,i2,program_qword
 			}
 			break;
 	}
@@ -1717,10 +1367,10 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 
 static void generate_update_mode(drcuml_block *block)
 {
-	UML_XTRACT(block, IREG(2), IREG(0), IMM(32-2), IMM(0x06));						// xtract  i2,i0,32-2,0x06
+	UML_ROLAND(block, IREG(2), IREG(0), IMM(32-2), IMM(0x06));						// roland  i2,i0,32-2,0x06
 	UML_TEST(block, IREG(0), IMM(SR_EXL | SR_ERL));									// test    i0,SR_EXL | SR_ERL
 	UML_MOVc(block, IF_NZ, IREG(2), IMM(0));										// mov     i2,0,nz
-	UML_INSERT(block, IREG(2), IREG(0), IMM(32-26), IMM(0x01));						// insert  i2,i0,32-26,0x01
+	UML_ROLINS(block, IREG(2), IREG(0), IMM(32-26), IMM(0x01));						// rolins  i2,i0,32-26,0x01
 	UML_MOV(block, MEM(&mips3->impstate->mode), IREG(2));							// mov     [mode],i2
 }
 
@@ -1797,7 +1447,7 @@ static void generate_checksum_block(drcuml_block *block, compiler_state *compile
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			UML_LOAD4(block, IREG(0), seqhead->opptr.l, IMM(0));					// load4   i0,*opptr
+			UML_LOAD(block, IREG(0), seqhead->opptr.l, IMM(0), DWORD);				// load    i0,*opptr,0,dword
 			UML_CMP(block, IREG(0), IMM(*seqhead->opptr.l));						// cmp     i0,*opptr
 			UML_EXHc(block, IF_NE, mips3->impstate->nocode, IMM(epc(seqhead)));		// exne    nocode,seqhead->pc
 		}
@@ -1810,18 +1460,18 @@ static void generate_checksum_block(drcuml_block *block, compiler_state *compile
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				UML_LOAD4(block, IREG(0), curdesc->opptr.l, IMM(0));				// load4   i0,*opptr
+				UML_LOAD(block, IREG(0), curdesc->opptr.l, IMM(0), DWORD);			// load    i0,*opptr,0,dword
 				UML_CMP(block, IREG(0), IMM(*curdesc->opptr.l));					// cmp     i0,*opptr
 				UML_EXHc(block, IF_NE, mips3->impstate->nocode, IMM(epc(seqhead)));	// exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		UML_LOAD4(block, IREG(0), seqhead->opptr.l, IMM(0));						// load4   i0,*opptr
+		UML_LOAD(block, IREG(0), seqhead->opptr.l, IMM(0), DWORD);					// load    i0,*opptr,0,dword
 		sum += *seqhead->opptr.l;
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				UML_LOAD4(block, IREG(1), curdesc->opptr.l, IMM(0));				// load4   i1,*opptr
+				UML_LOAD(block, IREG(1), curdesc->opptr.l, IMM(0), DWORD);			// load    i1,*opptr,dword
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
 				sum += *curdesc->opptr.l;
 			}
@@ -1906,7 +1556,7 @@ static void generate_sequence_instruction(drcuml_block *block, compiler_state *c
 				UML_MOV(block, MEM(&mips3->impstate->arg0), IMM(desc->pc));			// mov     [arg0],desc->pc
 				UML_CALLC(block, cfunc_printf_debug, "Checking TLB at @ %08X\n");	// callc   printf_debug
 			}
-			UML_LOAD4(block, IREG(0), &mips3->tlb_table[desc->pc >> 12], IMM(0));	// load4   i0,tlb_table[desc->pc >> 12]
+			UML_LOAD(block, IREG(0), &mips3->tlb_table[desc->pc >> 12], IMM(0), DWORD);// load i0,tlb_table[desc->pc >> 12],0,dword
 			UML_CMP(block, IREG(0), IMM(mips3->tlb_table[desc->pc >> 12]));			// cmp     i0,*tlbentry
 			UML_EXHc(block, IF_NE, mips3->impstate->tlb_mismatch, IMM(0));			// exh     tlb_mismatch,0,NE
 		}
@@ -1951,7 +1601,7 @@ static void generate_delay_slot_and_branch(drcuml_block *block, compiler_state *
 
 	/* set the link if needed */
 	if (linkreg != 0)
-		UML_DSEXT4(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));				// dsext4  <linkreg>,desc->pc + 8
+		UML_DMOV(block, R64(linkreg), IMM((INT32)(desc->pc + 8)));					// dmov    <linkreg>,desc->pc + 8
 
 	/* compile the delay slot using temporary compiler state */
 	assert(desc->delay != NULL);
@@ -2061,7 +1711,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 
 		case 0x0f:	/* LUI - MIPS I */
 			if (RTREG != 0)
-				UML_DSEXT4(block, R64(RTREG), IMM(SIMMVAL << 16));					// dsext4  <rtreg>,SIMMVAL << 16
+				UML_DMOV(block, R64(RTREG), IMM(SIMMVAL << 16));					// dmov    <rtreg>,SIMMVAL << 16
 			return TRUE;
 
 		case 0x08:	/* ADDI - MIPS I */
@@ -2074,14 +1724,14 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			else
 				UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));					// add     i0,<rsreg>,SIMMVAL
 			if (RTREG != 0)
-				UML_DSEXT4(block, R64(RTREG), IREG(0));								// dsext4  <rtreg>,i0
+				UML_DSEXT(block, R64(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
 			return TRUE;
 
 		case 0x09:	/* ADDIU - MIPS I */
 			if (RTREG != 0)
 			{
 				UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));					// add     i0,<rsreg>,SIMMVAL,V
-				UML_DSEXT4(block, R64(RTREG), IREG(0));								// dsext4  <rtreg>,i0
+				UML_DSEXT(block, R64(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2122,8 +1772,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (RTREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
-				UML_DFLAGS(block, R64(RTREG), (UINT64)~0, mips3->impstate->slt_table);
-																					// dflags  <rtreg>,~0,slt_table
+				UML_DSETc(block, IF_L, R64(RTREG));									// dset    <rtreg>,l
 			}
 			return TRUE;
 
@@ -2131,8 +1780,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (RTREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), IMM(SIMMVAL));							// dcmp    <rsreg>,SIMMVAL
-				UML_DFLAGS(block, R64(RTREG), (UINT64)~0, mips3->impstate->sltu_table);
-																					// dflags  <rtreg>,~0,sltu_table
+				UML_DSETc(block, IF_B, R64(RTREG));									// dset    <rtreg>,b
 			}
 			return TRUE;
 
@@ -2143,7 +1791,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read8[mips3->impstate->mode >> 1]);	// callh   read8
 			if (RTREG != 0)
-				UML_DSEXT1(block, R64(RTREG), IREG(0));								// dsext1  <rtreg>,i0
+				UML_DSEXT(block, R64(RTREG), IREG(0), BYTE);						// dsext   <rtreg>,i0,byte
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2152,7 +1800,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read16[mips3->impstate->mode >> 1]);	// callh   read16
 			if (RTREG != 0)
-				UML_DSEXT2(block, R64(RTREG), IREG(0));								// dsext2  <rtreg>,i0
+				UML_DSEXT(block, R64(RTREG), IREG(0), WORD);						// dsext   <rtreg>,i0,word
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2161,7 +1809,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read32[mips3->impstate->mode >> 1]);	// callh   read32
 			if (RTREG != 0)
-				UML_DSEXT4(block, R64(RTREG), IREG(0));								// dsext4  <rtreg>,i0
+				UML_DSEXT(block, R64(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2170,7 +1818,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read8[mips3->impstate->mode >> 1]);	// callh   read8
 			if (RTREG != 0)
-				UML_DZEXT1(block, R64(RTREG), IREG(0));								// dzext1  <rtreg>,i0
+				UML_DAND(block, R64(RTREG), IREG(0), IMM(0xff));					// dand    <rtreg>,i0,0xff
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2179,7 +1827,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read16[mips3->impstate->mode >> 1]);	// callh   read16
 			if (RTREG != 0)
-				UML_DZEXT2(block, R64(RTREG), IREG(0));								// dzext2  <rtreg>,i0
+				UML_DAND(block, R64(RTREG), IREG(0), IMM(0xffff));					// dand    <rtreg>,i0,0xffff
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2188,7 +1836,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read32[mips3->impstate->mode >> 1]);	// callh   read32
 			if (RTREG != 0)
-				UML_DZEXT4(block, R64(RTREG), IREG(0));								// dzext4  <rtreg>,i0
+				UML_DAND(block, R64(RTREG), IREG(0), IMM(0xffffffff));				// dand    <rtreg>,i0,0xffffffff
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2214,8 +1862,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			{
 				UML_SHL(block, IREG(2), IMM(~0), IREG(1));							// shl     i2,~0,i1
 				UML_MOV(block, IREG(3), R32(RTREG));								// mov     i3,<rtreg>
-				UML_INSERT(block, IREG(3), IREG(0), IREG(1), IREG(2));				// insert  i3,i0,i1,i2
-				UML_DSEXT4(block, R64(RTREG), IREG(3));								// dsext4  <rtreg>,i3
+				UML_ROLINS(block, IREG(3), IREG(0), IREG(1), IREG(2));				// rolins  i3,i0,i1,i2
+				UML_DSEXT(block, R64(RTREG), IREG(3), DWORD);						// dsext   <rtreg>,i3,dword
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2234,8 +1882,8 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 				UML_SHR(block, IREG(2), IMM(~0), IREG(1));							// shr     i2,~0,i1
 				UML_SUB(block, IREG(1), IMM(32), IREG(1));							// sub     i1,32,i1
 				UML_MOV(block, IREG(3), R32(RTREG));								// mov     i3,<rtreg>
-				UML_INSERT(block, IREG(3), IREG(0), IREG(1), IREG(2));				// insert  i3,i0,i1,i2
-				UML_DSEXT4(block, R64(RTREG), IREG(3));								// dsext4  <rtreg>,i3
+				UML_ROLINS(block, IREG(3), IREG(0), IREG(1), IREG(2));				// rolins  i3,i0,i1,i2
+				UML_DSEXT(block, R64(RTREG), IREG(3), DWORD);						// dsext   <rtreg>,i3,dword
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2252,7 +1900,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			if (RTREG != 0)
 			{
 				UML_DSHL(block, IREG(2), IMM((UINT64)~0), IREG(1));					// dshl    i2,~0,i1
-				UML_DINSERT(block, R64(RTREG), IREG(0), IREG(1), IREG(2));			// dinsert <rtreg>,i0,i1,i2
+				UML_DROLINS(block, R64(RTREG), IREG(0), IREG(1), IREG(2));			// drolins <rtreg>,i0,i1,i2
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2270,7 +1918,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			{
 				UML_DSHR(block, IREG(2), IMM((UINT64)~0), IREG(1));					// dshr    i2,~0,i1
 				UML_SUB(block, IREG(1), IMM(64), IREG(1));							// sub     i1,64,i1
-				UML_DINSERT(block, R64(RTREG), IREG(0), IREG(1), IREG(2));			// dinsert <rtreg>,i0,i1,i2
+				UML_DROLINS(block, R64(RTREG), IREG(0), IREG(1), IREG(2));			// drolins <rtreg>,i0,i1,i2
 			}
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -2295,7 +1943,7 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 		case 0x32:	/* LWC2 - MIPS I */
 			UML_ADD(block, IREG(0), R32(RSREG), IMM(SIMMVAL));						// add     i0,<rsreg>,SIMMVAL
 			UML_CALLH(block, mips3->impstate->read32[mips3->impstate->mode >> 1]);	// callh   read32
-			UML_DZEXT4(block, CPR264(RTREG), IREG(0));								// dzext4  <cpr2_rt>,i0
+			UML_DAND(block, CPR264(RTREG), IREG(0), IMM(0xffffffff));				// dand    <cpr2_rt>,i0,0xffffffff
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
 			return TRUE;
@@ -2486,7 +2134,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SHL(block, IREG(0), R32(RTREG), IMM(SHIFT));					// shl     i0,<rtreg>,<shift>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2494,7 +2142,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SHR(block, IREG(0), R32(RTREG), IMM(SHIFT));					// shr     i0,<rtreg>,<shift>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2502,7 +2150,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SAR(block, IREG(0), R32(RTREG), IMM(SHIFT));					// sar     i0,<rtreg>,<shift>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2510,7 +2158,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SHL(block, IREG(0), R32(RTREG), R32(RSREG));					// shl     i0,<rtreg>,<rsreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2518,7 +2166,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SHR(block, IREG(0), R32(RTREG), R32(RSREG));					// shr     i0,<rtreg>,<rsreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2526,7 +2174,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SAR(block, IREG(0), R32(RTREG), R32(RSREG));					// sar     i0,<rtreg>,<rsreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2585,12 +2233,12 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh     overflow,0,V
 				if (RDREG != 0)
-					UML_DSEXT4(block, R64(RDREG), IREG(0));							// dsext4  <rdreg>,i0
+					UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);					// dsext   <rdreg>,i0,dword
 			}
 			else if (RDREG != 0)
 			{
 				UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2598,7 +2246,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_ADD(block, IREG(0), R32(RSREG), R32(RTREG));					// add     i0,<rsreg>,<rtreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2627,12 +2275,12 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 				UML_EXHc(block, IF_V, mips3->impstate->exception[EXCEPTION_OVERFLOW], IMM(0));
 																					// exh     overflow,0,V
 				if (RDREG != 0)
-					UML_DSEXT4(block, R64(RDREG), IREG(0));							// dsext4  <rdreg>,i0
+					UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);					// dsext   <rdreg>,i0,dword
 			}
 			else if (RDREG != 0)
 			{
 				UML_SUB(block, IREG(0), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2640,7 +2288,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_SUB(block, IREG(0), R32(RSREG), R32(RTREG));					// sub     i0,<rsreg>,<rtreg>
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4  <rdreg>,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext   <rdreg>,i0,dword
 			}
 			return TRUE;
 
@@ -2664,14 +2312,14 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 
 		case 0x18:	/* MULT - MIPS I */
 			UML_MULS(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));				// muls    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT4(block, LO64, IREG(0));										// dsext4  lo,i0
-			UML_DSEXT4(block, HI64, IREG(1));										// dsext4  hi,i1
+			UML_DSEXT(block, LO64, IREG(0), DWORD);									// dsext   lo,i0,dword
+			UML_DSEXT(block, HI64, IREG(1), DWORD);									// dsext   hi,i1,dword
 			return TRUE;
 
 		case 0x19:	/* MULTU - MIPS I */
 			UML_MULU(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));				// mulu    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT4(block, LO64, IREG(0));										// dsext4  lo,i0
-			UML_DSEXT4(block, HI64, IREG(1));										// dsext4  hi,i1
+			UML_DSEXT(block, LO64, IREG(0), DWORD);									// dsext   lo,i0,dword
+			UML_DSEXT(block, HI64, IREG(1), DWORD);									// dsext   hi,i1,dword
 			return TRUE;
 
 		case 0x1c:	/* DMULT - MIPS III */
@@ -2684,14 +2332,14 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 
 		case 0x1a:	/* DIV - MIPS I */
 			UML_DIVS(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));				// divs    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT4(block, LO64, IREG(0));										// dsext4  lo,i0
-			UML_DSEXT4(block, HI64, IREG(1));										// dsext4  hi,i1
+			UML_DSEXT(block, LO64, IREG(0), DWORD);									// dsext   lo,i0,dword
+			UML_DSEXT(block, HI64, IREG(1), DWORD);									// dsext   hi,i1,dword
 			return TRUE;
 
 		case 0x1b:	/* DIVU - MIPS I */
 			UML_DIVU(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));				// divu    i0,i1,<rsreg>,<rtreg>
-			UML_DSEXT4(block, LO64, IREG(0));										// dsext4  lo,i0
-			UML_DSEXT4(block, HI64, IREG(1));										// dsext4  hi,i1
+			UML_DSEXT(block, LO64, IREG(0), DWORD);									// dsext   lo,i0,dword
+			UML_DSEXT(block, HI64, IREG(1), DWORD);									// dsext   hi,i1,dword
 			return TRUE;
 
 		case 0x1e:	/* DDIV - MIPS III */
@@ -2735,7 +2383,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), R64(RTREG));							// dcmp    <rsreg>,<rtreg>
-				UML_DFLAGS(block, R64(RDREG), (UINT64)~0, mips3->impstate->slt_table);// dflags  <rdreg>,~0,slt_table
+				UML_DSETc(block, IF_L, R64(RDREG));									// dset    <rdreg>,l
 			}
 			return TRUE;
 
@@ -2743,7 +2391,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 			if (RDREG != 0)
 			{
 				UML_DCMP(block, R64(RSREG), R64(RTREG));							// dcmp    <rsreg>,<rtreg>
-				UML_DFLAGS(block, R64(RDREG), (UINT64)~0, mips3->impstate->sltu_table);// dflags  <rdreg>,~0,sltu_table
+				UML_DSETc(block, IF_B, R64(RDREG));									// dset    <rdreg>,b
 			}
 			return TRUE;
 
@@ -2802,7 +2450,7 @@ static int generate_special(drcuml_block *block, compiler_state *compiler, const
 		case 0x01:	/* MOVF/MOVT - MIPS IV */
 			if (RDREG != 0)
 			{
-				UML_TEST(block, CCR132(31), IMM(fcc_mask[(op >> 18) & 7]));			// test    ccr31,fcc_mask[x]
+				UML_TEST(block, CCR132(31), IMM(FCCMASK(op >> 18)));				// test    ccr31,fcc_mask[x]
 				UML_DMOVc(block, ((op >> 16) & 1) ? IF_NZ : IF_Z, R64(RDREG), R64(RSREG));
 																					// mov     <rdreg>,<rsreg>,NZ/Z
 			}
@@ -2961,8 +2609,8 @@ static int generate_idt(drcuml_block *block, compiler_state *compiler, const opc
 				UML_MULS(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));			// muls   i0,i1,rsreg,rtreg
 				UML_ADDf(block, FLAGS_C, IREG(0), IREG(0), LO32);					// add    i0,i0,lo
 				UML_ADDC(block, IREG(1), IREG(1), HI32);							// addc   i1,i1,hi
-				UML_DSEXT4(block, LO64, IREG(0));									// dsext4 lo,i0
-				UML_DSEXT4(block, HI64, IREG(1));									// dsext4 hi,i0
+				UML_DSEXT(block, LO64, IREG(0), DWORD);								// dsext   lo,i0,dword
+				UML_DSEXT(block, HI64, IREG(1), DWORD);								// dsext   hi,i1,dword
 			}
 			return TRUE;
 
@@ -2972,8 +2620,8 @@ static int generate_idt(drcuml_block *block, compiler_state *compiler, const opc
 				UML_MULU(block, IREG(0), IREG(1), R32(RSREG), R32(RTREG));			// mulu   i0,i1,rsreg,rtreg
 				UML_ADDf(block, FLAGS_C, IREG(0), IREG(0), LO32);					// add    i0,i0,lo
 				UML_ADDC(block, IREG(1), IREG(1), HI32);							// addc   i1,i1,hi
-				UML_DSEXT4(block, LO64, IREG(0));									// dsext4 lo,i0
-				UML_DSEXT4(block, HI64, IREG(1));									// dsext4 hi,i0
+				UML_DSEXT(block, LO64, IREG(0), DWORD);								// dsext   lo,i0,dword
+				UML_DSEXT(block, HI64, IREG(1), DWORD);								// dsext   hi,i1,dword
 			}
 			return TRUE;
 
@@ -2981,7 +2629,7 @@ static int generate_idt(drcuml_block *block, compiler_state *compiler, const opc
 			if (RDREG != 0)
 			{
 				UML_MULS(block, IREG(0), IREG(0), R32(RSREG), R32(RTREG));			// muls   i0,i0,rsreg,rtreg
-				UML_DSEXT4(block, R64(RDREG), IREG(0));								// dsext4 rdreg,i0
+				UML_DSEXT(block, R64(RDREG), IREG(0), DWORD);						// dsext  rdreg,i0,dword
 			}
 			return TRUE;
 	}
@@ -3002,7 +2650,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 	switch (reg)
 	{
 		case COP0_Cause:
-			UML_INSERT(block, CPR032(COP0_Cause), IREG(0), IMM(0), IMM(~0xfc00));	// insert  [Cause],i0,0,~0xfc00
+			UML_ROLINS(block, CPR032(COP0_Cause), IREG(0), IMM(0), IMM(~0xfc00));	// rolins  [Cause],i0,0,~0xfc00
 			compiler->checksoftints = TRUE;
 			if (!in_delay_slot)
 				generate_update_cycles(block, compiler, IMM(desc->pc + 4), TRUE);
@@ -3025,7 +2673,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			generate_update_cycles(block, compiler, IMM(desc->pc), !in_delay_slot);	// <subtract cycles>
 			UML_MOV(block, CPR032(COP0_Count), IREG(0));							// mov     [Count],i0
 			UML_CALLC(block, cfunc_get_cycles, &mips3->impstate->numcycles);		// callc   cfunc_get_cycles,&mips3->impstate->numcycles
-			UML_DZEXT4(block, IREG(0), IREG(0));									// dzext4  i0,i0
+			UML_DAND(block, IREG(0), IREG(0), IMM(0xffffffff));						// and     i0,i0,0xffffffff
 			UML_DADD(block, IREG(0), IREG(0), IREG(0));								// dadd    i0,i0,i0
 			UML_DSUB(block, MEM(&mips3->count_zero_time), MEM(&mips3->impstate->numcycles), IREG(0));
 																					// dsub    [count_zero_time],[mips3->impstate->numcycles],i0
@@ -3043,7 +2691,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			return TRUE;
 
 		case COP0_Config:
-			UML_INSERT(block, CPR032(COP0_Config), IREG(0), IMM(0), IMM(0x0007));	// insert  [Config],i0,0,0x0007
+			UML_ROLINS(block, CPR032(COP0_Config), IREG(0), IMM(0), IMM(0x0007));	// rolins  [Config],i0,0,0x0007
 			return TRUE;
 
 		case COP0_EntryHi:
@@ -3080,7 +2728,7 @@ static int generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			UML_DSUB(block, IREG(0), MEM(&mips3->impstate->numcycles), MEM(&mips3->count_zero_time));
 																					// dsub    i0,[numcycles],[count_zero_time]
 			UML_DSHR(block, IREG(0), IREG(0), IMM(1));								// dshr    i0,i0,1
-			UML_DSEXT4(block, IREG(0), IREG(0));									// dsext4  i0,i0
+			UML_DSEXT(block, IREG(0), IREG(0), DWORD);								// dsext   i0,i0,dword
 			return TRUE;
 
 		case COP0_Random:
@@ -3091,18 +2739,18 @@ static int generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 			UML_AND(block, IREG(1), CPR032(COP0_Wired), IMM(0x3f));					// and     i1,[Wired],0x3f
 			UML_SUBf(block, IREG(2), IMM(48), IREG(1), FLAGS_BE);					// sub     i2,48,i1,ALL
 			UML_JMPc(block, IF_BE, link1 = compiler->labelnum++);					// jmp     link1,BE
-			UML_DZEXT4(block, IREG(2), IREG(2));									// dzext4  i2,i2
+			UML_DAND(block, IREG(2), IREG(2), IMM(0xffffffff));						// dand    i2,i2,0xffffffff
 			UML_DDIVU(block, IREG(0), IREG(2), IREG(0), IREG(2));					// ddivu   i0,i2,i0,i2
 			UML_ADD(block, IREG(0), IREG(2), IREG(1));								// add     i0,i2,i1
 			UML_DAND(block, IREG(0), IREG(0), IMM(0x3f));							// dand    i0,i0,0x3f
 			UML_JMP(block, link2 = compiler->labelnum++);							// jmp     link2
 			UML_LABEL(block, link1);											// link1:
-			UML_DSEXT4(block, IREG(0), IMM(47));									// dsext4  i0,47
+			UML_DMOV(block, IREG(0), IMM(47));										// dmov    i0,47
 			UML_LABEL(block, link2);											// link2:
 			return TRUE;
 
 		default:
-			UML_DSEXT4(block, IREG(0), CPR032(reg));								// dsext4  i0,cpr0[reg]
+			UML_DSEXT(block, IREG(0), CPR032(reg), DWORD);							// dsext   i0,cpr0[reg],dword
 			return TRUE;
 	}
 }
@@ -3131,7 +2779,7 @@ static int generate_cop0(drcuml_block *block, compiler_state *compiler, const op
 			if (RTREG != 0)
 			{
 				generate_get_cop0_reg(block, compiler, desc, RDREG);				// <get cop0 reg>
-				UML_DSEXT4(block, R64(RTREG), IREG(0));								// dsext4  <rtreg>,i0
+				UML_DSEXT(block, R64(RTREG), IREG(0), DWORD);						// dsext   <rtreg>,i0,dword
 			}
 			return TRUE;
 
@@ -3145,11 +2793,11 @@ static int generate_cop0(drcuml_block *block, compiler_state *compiler, const op
 
 		case 0x02:	/* CFCz */
 			if (RTREG != 0)
-				UML_DSEXT4(block, R64(RTREG), CCR032(RDREG));						// dsext4  <rtreg>,ccr0[rdreg]
+				UML_DSEXT(block, R64(RTREG), CCR032(RDREG), DWORD);					// dsext   <rtreg>,ccr0[rdreg],dword
 			return TRUE;
 
 		case 0x04:	/* MTCz */
-			UML_DSEXT4(block, IREG(0), R32(RTREG));									// dsext4  i0,<rtreg>
+			UML_DSEXT(block, IREG(0), R32(RTREG), DWORD);							// dsext   i0,<rtreg>,dword
 			generate_set_cop0_reg(block, compiler, desc, RDREG);					// <set cop0 reg>
 			return TRUE;
 
@@ -3159,7 +2807,7 @@ static int generate_cop0(drcuml_block *block, compiler_state *compiler, const op
 			return TRUE;
 
 		case 0x06:	/* CTCz */
-			UML_DSEXT4(block, CCR064(RDREG), R32(RTREG));							// dsext4  ccr0[rdreg],<rtreg>
+			UML_DSEXT(block, CCR064(RDREG), R32(RTREG), DWORD);						// dsext   ccr0[rdreg],<rtreg>,dword
 			return TRUE;
 
 		case 0x10:
@@ -3254,7 +2902,7 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 	{
 		case 0x00:	/* MFCz - MIPS I */
 			if (RTREG != 0)
-				UML_DSEXT4(block, R64(RTREG), FPR32(RDREG));						// dsext4  <rtreg>,fpr[rdreg]
+				UML_DSEXT(block, R64(RTREG), FPR32(RDREG), DWORD);					// dsext   <rtreg>,fpr[rdreg],dword
 			return TRUE;
 
 		case 0x01:	/* DMFCz - MIPS III */
@@ -3264,7 +2912,7 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 
 		case 0x02:	/* CFCz - MIPS I */
 			if (RTREG != 0)
-				UML_DSEXT4(block, R64(RTREG), CCR132(RDREG));						// dsext4  <rtreg>,ccr132[rdreg]
+				UML_DSEXT(block, R64(RTREG), CCR132(RDREG), DWORD);					// dsext   <rtreg>,ccr132[rdreg],dword
 			return TRUE;
 
 		case 0x04:	/* MTCz - MIPS I */
@@ -3277,15 +2925,15 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 
 		case 0x06:	/* CTCz - MIPS I */
 			if (RDREG != 31)
-				UML_DSEXT4(block, CCR164(RDREG), R32(RTREG));						// dsext4  ccr1[rdreg],<rtreg>
+				UML_DSEXT(block, CCR164(RDREG), R32(RTREG), DWORD);					// dsext   ccr1[rdreg],<rtreg>,dword
 			else
 			{
 				UML_XOR(block, IREG(0), CCR132(31), R32(RTREG));					// xor     i0,ccr1[31],<rtreg>
-				UML_DSEXT4(block, CCR164(31), R32(RTREG));							// dsext4  ccr1[31],<rtreg>
+				UML_DSEXT(block, CCR164(31), R32(RTREG), DWORD);					// dsext   ccr1[31],<rtreg>,dword
 				UML_TEST(block, IREG(0), IMM(3));									// test    i0,3
 				UML_JMPc(block, IF_Z, skip = compiler->labelnum++);					// jmp     skip,Z
 				UML_AND(block, IREG(0), CCR132(31), IMM(3));						// and     i0,ccr1[31],3
-				UML_LOAD1U(block, IREG(0), &mips3->impstate->fpmode[0], IREG(0));	// load1u  i0,fpmode,i0
+				UML_LOAD(block, IREG(0), &mips3->impstate->fpmode[0], IREG(0), BYTE);// load   i0,fpmode,i0,byte
 				UML_SETFMOD(block, IREG(0));										// setfmod i0
 				UML_LABEL(block, skip);											// skip:
 			}
@@ -3373,58 +3021,58 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 
 				case 0x08:
 					if (IS_SINGLE(op))	/* ROUND.L.S - MIPS III */
-						UML_FSTOI8R(block, FPR64(FDREG), FPR32(FSREG));				// fstoi8r <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), QWORD, ROUND);// fstoint <fdreg>,<fsreg>,qword,round
 					else				/* ROUND.L.D - MIPS III */
-						UML_FDTOI8R(block, FPR64(FDREG), FPR64(FSREG));				// fdtoi8r <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), QWORD, ROUND);// fdtoint <fdreg>,<fsreg>,qword,round
 					return TRUE;
 
 				case 0x09:
 					if (IS_SINGLE(op))	/* TRUNC.L.S - MIPS III */
-						UML_FSTOI8T(block, FPR64(FDREG), FPR32(FSREG));				// fstoi8t <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), QWORD, TRUNC);// fstoint <fdreg>,<fsreg>,qword,trunc
 					else				/* TRUNC.L.D - MIPS III */
-						UML_FDTOI8T(block, FPR64(FDREG), FPR64(FSREG));				// fdtoi8t <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), QWORD, TRUNC);// fdtoint <fdreg>,<fsreg>,qword,trunc
 					return TRUE;
 
 				case 0x0a:
 					if (IS_SINGLE(op))	/* CEIL.L.S - MIPS III */
-						UML_FSTOI8C(block, FPR64(FDREG), FPR32(FSREG));				// fstoi8c <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), QWORD, CEIL);// fstoint <fdreg>,<fsreg>,qword,ceil
 					else				/* CEIL.L.D - MIPS III */
-						UML_FDTOI8C(block, FPR64(FDREG), FPR64(FSREG));				// fdtoi8c <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), QWORD, CEIL);// fdtoint <fdreg>,<fsreg>,qword,ceil
 					return TRUE;
 
 				case 0x0b:
 					if (IS_SINGLE(op))	/* FLOOR.L.S - MIPS III */
-						UML_FSTOI8F(block, FPR64(FDREG), FPR32(FSREG));				// fstoi8f <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), QWORD, FLOOR);// fstoint <fdreg>,<fsreg>,qword,floor
 					else				/* FLOOR.L.D - MIPS III */
-						UML_FDTOI8F(block, FPR64(FDREG), FPR64(FSREG));				// fdtoi8f <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), QWORD, FLOOR);// fdtoint <fdreg>,<fsreg>,qword,floor
 					return TRUE;
 
 				case 0x0c:
 					if (IS_SINGLE(op))	/* ROUND.W.S - MIPS II */
-						UML_FSTOI4R(block, FPR32(FDREG), FPR32(FSREG));				// fstoi4r <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), DWORD, ROUND);// fstoint <fdreg>,<fsreg>,dword,round
 					else				/* ROUND.W.D - MIPS II */
-						UML_FDTOI4R(block, FPR32(FDREG), FPR64(FSREG));				// fdtoi4r <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), DWORD, ROUND);// fdtoint <fdreg>,<fsreg>,dword,round
 					return TRUE;
 
 				case 0x0d:
 					if (IS_SINGLE(op))	/* TRUNC.W.S - MIPS II */
-						UML_FSTOI4T(block, FPR32(FDREG), FPR32(FSREG));				// fstoi4t <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), DWORD, TRUNC);// fstoint <fdreg>,<fsreg>,dword,trunc
 					else				/* TRUNC.W.D - MIPS II */
-						UML_FDTOI4T(block, FPR32(FDREG), FPR64(FSREG));				// fdtoi4t <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), DWORD, TRUNC);// fdtoint <fdreg>,<fsreg>,dword,trunc
 					return TRUE;
 
 				case 0x0e:
 					if (IS_SINGLE(op))	/* CEIL.W.S - MIPS II */
-						UML_FSTOI4C(block, FPR32(FDREG), FPR32(FSREG));				// fstoi4c <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), DWORD, CEIL);// fstoint <fdreg>,<fsreg>,dword,ceil
 					else				/* CEIL.W.D - MIPS II */
-						UML_FDTOI4C(block, FPR32(FDREG), FPR64(FSREG));				// fdtoi4c <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), DWORD, CEIL);// fdtoint <fdreg>,<fsreg>,dword,ceil
 					return TRUE;
 
 				case 0x0f:
 					if (IS_SINGLE(op))	/* FLOOR.W.S - MIPS II */
-						UML_FSTOI4F(block, FPR32(FDREG), FPR32(FSREG));				// fstoi4f <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), DWORD, FLOOR);// fstoint <fdreg>,<fsreg>,dword,floor
 					else				/* FLOOR.W.D - MIPS II */
-						UML_FDTOI4F(block, FPR32(FDREG), FPR64(FSREG));				// fdtoi4f <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), DWORD, FLOOR);// fdtoint <fdreg>,<fsreg>,dword,floor
 					return TRUE;
 
 				case 0x11:
@@ -3470,38 +3118,38 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 					if (IS_INTEGRAL(op))
 					{
 						if (IS_SINGLE(op))	/* CVT.S.W - MIPS I */
-							UML_FSFRI4(block, FPR32(FDREG), FPR32(FSREG));			// fsfri4  <fdreg>,<fsreg>
+							UML_FSFRINT(block, FPR32(FDREG), FPR32(FSREG), DWORD);	// fsfrint <fdreg>,<fsreg>,dword
 						else				/* CVT.S.L - MIPS I */
-							UML_FSFRI8(block, FPR32(FDREG), FPR64(FSREG));			// fsfri8  <fdreg>,<fsreg>
+							UML_FSFRINT(block, FPR32(FDREG), FPR64(FSREG), QWORD);	// fsfrint <fdreg>,<fsreg>,qword
 					}
 					else					/* CVT.S.D - MIPS I */
-						UML_FSFRFD(block, FPR32(FDREG), FPR64(FSREG));				// fsfrfd  <fdreg>,<fsreg>
+						UML_FSFRFLT(block, FPR32(FDREG), FPR64(FSREG), QWORD);		// fsfrflt <fdreg>,<fsreg>,qword
 					return TRUE;
 
 				case 0x21:
 					if (IS_INTEGRAL(op))
 					{
 						if (IS_SINGLE(op))	/* CVT.D.W - MIPS I */
-							UML_FDFRI4(block, FPR64(FDREG), FPR32(FSREG));			// fdfri4  <fdreg>,<fsreg>
+							UML_FDFRINT(block, FPR64(FDREG), FPR32(FSREG), DWORD);	// fdfrint <fdreg>,<fsreg>,dword
 						else				/* CVT.D.L - MIPS I */
-							UML_FDFRI8(block, FPR64(FDREG), FPR64(FSREG));			// fdfri8  <fdreg>,<fsreg>
+							UML_FDFRINT(block, FPR64(FDREG), FPR64(FSREG), QWORD);	// fdfrint <fdreg>,<fsreg>,qword
 					}
 					else					/* CVT.D.S - MIPS I */
-						UML_FDFRFS(block, FPR64(FDREG), FPR32(FSREG));				// fdfrfs  <fdreg>,<fsreg>
+						UML_FDFRFLT(block, FPR64(FDREG), FPR32(FSREG), DWORD);		// fdfrflt <fdreg>,<fsreg>,dword
 					return TRUE;
 
 				case 0x24:
 					if (IS_SINGLE(op))	/* CVT.W.S - MIPS I */
-						UML_FSTOI4(block, FPR32(FDREG), FPR32(FSREG));				// fstoi4  <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR32(FDREG), FPR32(FSREG), DWORD, DEFAULT);// fstoint <fdreg>,<fsreg>,dword,default
 					else				/* CVT.W.D - MIPS I */
-						UML_FDTOI4(block, FPR32(FDREG), FPR64(FSREG));				// fdtoi4  <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR32(FDREG), FPR64(FSREG), DWORD, DEFAULT);// fdtoint <fdreg>,<fsreg>,dword,default
 					return TRUE;
 
 				case 0x25:
 					if (IS_SINGLE(op))	/* CVT.L.S - MIPS I */
-						UML_FSTOI8(block, FPR64(FDREG), FPR32(FSREG));				// fstoi8  <fdreg>,<fsreg>
+						UML_FSTOINT(block, FPR64(FDREG), FPR32(FSREG), QWORD, DEFAULT);// fstoint <fdreg>,<fsreg>,qword,default
 					else				/* CVT.L.D - MIPS I */
-						UML_FDTOI8(block, FPR64(FDREG), FPR64(FSREG));				// fdtoi8  <fdreg>,<fsreg>
+						UML_FDTOINT(block, FPR64(FDREG), FPR64(FSREG), QWORD, DEFAULT);// fdtoint <fdreg>,<fsreg>,qword,default
 					return TRUE;
 
 				case 0x30:
@@ -3515,8 +3163,9 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.UN.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_un_table);
-																					// flags   ccr31,fccmask[op],c_eq_table
+					UML_SETc(block, IF_U, IREG(0));									// set     i0,u
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 
 				case 0x32:
@@ -3525,8 +3174,9 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.EQ.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_eq_table);
-																					// flags   ccr31,fccmask[op],c_eq_table
+					UML_SETc(block, IF_E, IREG(0));									// set     i0,e
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 
 				case 0x33:
@@ -3535,8 +3185,11 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.UEQ.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_ueq_table);
-																					// flags   ccr31,fccmask[op],c_eq_table
+					UML_SETc(block, IF_U, IREG(0));									// set     i0,u
+					UML_SETc(block, IF_E, IREG(1));									// set     i1,e
+					UML_OR(block, IREG(0), IREG(0), IREG(1));						// or      i0,i0,i1
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 
 				case 0x34:
@@ -3545,8 +3198,9 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.OLT.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_olt_table);
-																					// flags   ccr31,fccmask[op],c_lt_table
+					UML_SETc(block, IF_B, IREG(0));									// set     i0,b
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 
 				case 0x35:
@@ -3555,8 +3209,11 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.ULT.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_ult_table);
-																					// flags   ccr31,fccmask[op],c_lt_table
+					UML_SETc(block, IF_U, IREG(0));									// set     i0,u
+					UML_SETc(block, IF_B, IREG(1));									// set     i1,b
+					UML_OR(block, IREG(0), IREG(0), IREG(1));						// or      i0,i0,i1
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 
 				case 0x36:
@@ -3565,8 +3222,9 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.OLE.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_ole_table);
-																					// flags   ccr31,fccmask[op],c_le_table
+					UML_SETc(block, IF_BE, IREG(0));								// set     i0,be
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 
 				case 0x37:
@@ -3575,8 +3233,11 @@ static int generate_cop1(drcuml_block *block, compiler_state *compiler, const op
 						UML_FSCMP(block, FPR32(FSREG), FPR32(FTREG));				// fscmp   <fsreg>,<ftreg>
 					else				/* C.ULE.D - MIPS I */
 						UML_FDCMP(block, FPR64(FSREG), FPR64(FTREG));				// fdcmp   <fsreg>,<ftreg>
-					UML_FLAGS(block, CCR132(31), FCCMASK(op >> 8), mips3->impstate->c_ule_table);
-																					// flags   ccr31,fccmask[op],c_le_table
+					UML_SETc(block, IF_U, IREG(0));									// set     i0,u
+					UML_SETc(block, IF_BE, IREG(1));								// set     i1,be
+					UML_OR(block, IREG(0), IREG(0), IREG(1));						// or      i0,i0,i1
+					UML_ROLINS(block, CCR132(31), IREG(0), IMM(FCCSHIFT(op >> 8)), IMM(FCCMASK(op >> 8)));
+																					// rolins  ccr31,i0,fccshift,fcc
 					return TRUE;
 			}
 			break;

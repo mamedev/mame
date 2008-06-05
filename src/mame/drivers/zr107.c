@@ -56,8 +56,8 @@ static UINT8 led_reg0 = 0x7f, led_reg1 = 0x7f;
 
 
 // defined in drivers/gticlub.c
-extern READ32_HANDLER(lanc_r);
-extern WRITE32_HANDLER(lanc_w);
+extern READ8_HANDLER(K056230_r);
+extern WRITE8_HANDLER(K056230_w);
 extern READ32_HANDLER(lanc_ram_r);
 extern WRITE32_HANDLER(lanc_ram_w);
 
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE(sysreg_r, sysreg_w)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_r, lanc_w)				/* LANC registers */
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( jetwave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE(sysreg_r, sysreg_w)
-	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_r, lanc_w)				/* LANC registers */
+	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_READWRITE8(K056230_r, K056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_READWRITE(lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7e00c008, 0x7e00c00f) AM_MIRROR(0x80000000) AM_READ(K056800_host_r)
@@ -541,11 +541,6 @@ static INPUT_PORTS_START( jetwave )
 
 INPUT_PORTS_END
 
-static const ppc_config zr107_ppc_cfg =
-{
-	PPC_MODEL_403GA
-};
-
 static sharc_config sharc_cfg =
 {
 	BOOT_MODE_EPROM
@@ -570,8 +565,7 @@ static MACHINE_RESET( zr107 )
 static MACHINE_DRIVER_START( zr107 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_CONFIG(zr107_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(zr107_map, 0)
 	MDRV_CPU_VBLANK_INT("main", zr107_vblank)
 
@@ -615,8 +609,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( jetwave )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 64000000/2)	/* PowerPC 403GA 32MHz */
-	MDRV_CPU_CONFIG(zr107_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
 	MDRV_CPU_PROGRAM_MAP(jetwave_map, 0)
 	MDRV_CPU_VBLANK_INT("main", zr107_vblank)
 

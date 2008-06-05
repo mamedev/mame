@@ -75,7 +75,8 @@ static void draw_viewport(int pri, UINT32 address);
 
 /*****************************************************************************/
 
-extern int model3_irq_state;
+/* in drivers/model3.c */
+void model3_set_irq_line(running_machine *machine, UINT8 bit, int state);
 
 extern int model3_step;
 
@@ -476,7 +477,7 @@ WRITE64_HANDLER(model3_vid_reg_w)
 	{
 		case 0x00/8:	logerror("vid_reg0: %08X%08X\n", (UINT32)(data>>32),(UINT32)(data)); vid_reg0 = data; break;
 		case 0x08/8:	break;		/* ??? */
-		case 0x10/8:	model3_irq_state &= ~(data >> 56); break;		/* VBL IRQ Ack */
+		case 0x10/8:	model3_set_irq_line(machine, (data >> 56) & 0x0f, CLEAR_LINE); break;		/* VBL IRQ Ack */
 
 		case 0x20/8:	model3_layer_enable = (data >> 52);	break;
 

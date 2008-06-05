@@ -172,10 +172,13 @@ void h8_3044_get_info(UINT32 state, cpuinfo *info);
 void v810_get_info(UINT32 state, cpuinfo *info);
 void m37702_get_info(UINT32 state, cpuinfo *info);
 void m37710_get_info(UINT32 state, cpuinfo *info);
-void ppc403_get_info(UINT32 state, cpuinfo *info);
+void ppc403ga_get_info(UINT32 state, cpuinfo *info);
+void ppc403gcx_get_info(UINT32 state, cpuinfo *info);
 void ppc601_get_info(UINT32 state, cpuinfo *info);
 void ppc602_get_info(UINT32 state, cpuinfo *info);
 void ppc603_get_info(UINT32 state, cpuinfo *info);
+void ppc603e_get_info(UINT32 state, cpuinfo *info);
+void ppc603r_get_info(UINT32 state, cpuinfo *info);
 void ppc604_get_info(UINT32 state, cpuinfo *info);
 void mpc8240_get_info(UINT32 state, cpuinfo *info);
 void SE3208_get_info(UINT32 state, cpuinfo *info);
@@ -709,8 +712,11 @@ static const struct
 #if (HAS_M37710)
 	{ CPU_M37710, m37710_get_info },
 #endif
-#if (HAS_PPC403)
-	{ CPU_PPC403, ppc403_get_info },
+#if (HAS_PPC403GA)
+	{ CPU_PPC403GA, ppc403ga_get_info },
+#endif
+#if (HAS_PPC403GCX)
+	{ CPU_PPC403GCX, ppc403gcx_get_info },
 #endif
 #if (HAS_PPC601)
 	{ CPU_PPC601, ppc601_get_info },
@@ -720,6 +726,12 @@ static const struct
 #endif
 #if (HAS_PPC603)
 	{ CPU_PPC603, ppc603_get_info },
+#endif
+#if (HAS_PPC603E)
+	{ CPU_PPC603E, ppc603e_get_info },
+#endif
+#if (HAS_PPC603R)
+	{ CPU_PPC603R, ppc603r_get_info },
 #endif
 #if (HAS_PPC604)
 	{ CPU_PPC604, ppc604_get_info },

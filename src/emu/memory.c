@@ -3164,7 +3164,7 @@ static WRITE32_HANDLER( stub_write8_from_32 )
 	while (subunits-- != 0)
 	{
 		int shift = *subshift++;
-		if ((UINT8)(mem_mask >> shift) != 0xff)
+		if ((UINT8)(mem_mask >> shift) != 0)
 			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
 		offset++;
 	}

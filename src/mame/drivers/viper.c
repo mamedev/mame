@@ -611,11 +611,9 @@ ADDRESS_MAP_END
 
 
 
-static const ppc_config viper_ppc_cfg =
+static const powerpc_config viper_ppc_cfg =
 {
-	PPC_MODEL_MPC8240,
-	0x30,
-	BUS_FREQUENCY_66MHZ
+	66000000
 };
 
 static INTERRUPT_GEN(viper_vblank)

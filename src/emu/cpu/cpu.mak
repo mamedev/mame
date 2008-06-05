@@ -41,13 +41,10 @@ ifdef PTR64
 
 DRCOBJ += \
 	$(CPUOBJ)/drcbex64.o \
-	$(CPUOBJ)/x64drc.o \
-	$(CPUOBJ)/x86log.o \
+	$(CPUOBJ)/x86log.o
 
 DRCDEPS += \
-	$(CPUSRC)/x86emit.h \
-	$(CPUSRC)/x64drc.c \
-	$(CPUSRC)/x64drc.h \
+	$(CPUSRC)/x86emit.h
 
 DEFS += -DNATIVE_DRC=drcbe_x64_be_interface
 
@@ -55,13 +52,10 @@ else
 
 DRCOBJ += \
 	$(CPUOBJ)/drcbex86.o \
-	$(CPUOBJ)/x86drc.o \
-	$(CPUOBJ)/x86log.o \
+	$(CPUOBJ)/x86log.o
 
 DRCDEPS += \
-	$(CPUSRC)/x86emit.h \
-	$(CPUSRC)/x86drc.c \
-	$(CPUSRC)/x86drc.h \
+	$(CPUSRC)/x86emit.h
 
 DEFS += -DNATIVE_DRC=drcbe_x86_be_interface
 
@@ -839,7 +833,7 @@ CPUDEFS += -DHAS_RM7000=$(if $(filter RM7000,$(CPUS)),1,0)
 
 ifneq ($(filter R4600 R4650 R4700 R5000 QED5271 RM7000,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
-CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3drc.o $(CPUOBJ)/mips/mips3fe.o $(DRCOBJ)
+CPUOBJS += $(CPUOBJ)/mips/mips3com.o $(CPUOBJ)/mips/mips3fe.o $(CPUOBJ)/mips/mips3drc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/mips/mips3dsm.o
 endif
 
@@ -1125,41 +1119,26 @@ $(CPUOBJ)/pdp1/pdp1.o:	$(CPUSRC)/pdp1/pdp1.c \
 # Motorola PowerPC series
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_PPC403=$(if $(filter PPC403,$(CPUS)),1,0)
+CPUDEFS += -DHAS_PPC403GA=$(if $(filter PPC403GA,$(CPUS)),1,0)
+CPUDEFS += -DHAS_PPC403GCX=$(if $(filter PPC403GCX,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC601=$(if $(filter PPC601,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC602=$(if $(filter PPC602,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC603=$(if $(filter PPC603,$(CPUS)),1,0)
+CPUDEFS += -DHAS_PPC603E=$(if $(filter PPC603E,$(CPUS)),1,0)
+CPUDEFS += -DHAS_PPC603R=$(if $(filter PPC603R,$(CPUS)),1,0)
 CPUDEFS += -DHAS_PPC604=$(if $(filter PPC604,$(CPUS)),1,0)
 CPUDEFS += -DHAS_MPC8240=$(if $(filter MPC8240,$(CPUS)),1,0)
 
-ifneq ($(filter PPC403 PPC601 PPC602 PPC603 PPC604 MPC8240,$(CPUS)),)
+ifneq ($(filter PPC403GA PPC403GCX PPC601 PPC602 PPC603 PPC603E PPC603R PPC604 MPC8240,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/powerpc
+CPUOBJS += $(CPUOBJ)/powerpc/ppccom.o $(CPUOBJ)/powerpc/ppcfe.o $(CPUOBJ)/powerpc/ppcdrc.o $(DRCOBJ)
 DBGOBJS += $(CPUOBJ)/powerpc/ppc_dasm.o
-
-ifdef X86_PPC_DRC
-CPUOBJS += $(CPUOBJ)/powerpc/ppcdrco.o $(DRCOBJ)
-else
-CPUOBJS += $(CPUOBJ)/powerpc/ppc.o
-endif
 endif
 
-$(CPUOBJ)/powerpc/ppc.o:	$(CPUSRC)/powerpc/ppc.c \
+$(CPUOBJ)/powerpc/ppcdrc.o:	$(CPUSRC)/powerpc/ppcdrc.c \
 							$(CPUSRC)/powerpc/ppc.h \
-							$(CPUSRC)/powerpc/ppc_ops.c \
-							$(CPUSRC)/powerpc/ppc_mem.c \
-							$(CPUSRC)/powerpc/ppc403.c \
-							$(CPUSRC)/powerpc/ppc602.c \
-							$(CPUSRC)/powerpc/ppc603.c
-
-$(CPUOBJ)/powerpc/ppcdrco.o:$(CPUSRC)/powerpc/ppcdrco.c \
-							$(CPUSRC)/powerpc/ppc.h \
-							$(CPUSRC)/powerpc/drc_ops.c \
-							$(CPUSRC)/powerpc/drc_ops.h \
-							$(CPUSRC)/powerpc/ppc_ops.c \
-							$(CPUSRC)/powerpc/ppc_mem.c \
-							$(CPUSRC)/powerpc/ppc403.c \
-							$(CPUSRC)/powerpc/ppc602.c \
-							$(CPUSRC)/powerpc/ppc603.c \
+							$(CPUSRC)/powerpc/ppccom.h \
+							$(CPUSRC)/powerpc/ppcfe.h \
 							$(DRCDEPS)
 
 

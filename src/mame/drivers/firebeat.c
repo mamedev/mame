@@ -1985,16 +1985,10 @@ static MACHINE_RESET( firebeat )
 	cdda_set_cdrom(0, cd);
 }
 
-static const ppc_config firebeat_ppc_cfg =
-{
-	PPC_MODEL_403GCX
-};
-
 static MACHINE_DRIVER_START(firebeat)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 66000000)
-	MDRV_CPU_CONFIG(firebeat_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("main", firebeat_interrupt)
 
@@ -2032,8 +2026,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START(firebeat2)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(PPC403, 66000000)
-	MDRV_CPU_CONFIG(firebeat_ppc_cfg)
+	MDRV_CPU_ADD(PPC403GCX, 66000000)
 	MDRV_CPU_PROGRAM_MAP(firebeat_map, 0)
 	MDRV_CPU_VBLANK_INT("left", firebeat_interrupt)
 
@@ -2232,9 +2225,7 @@ static void security_w(UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-	{
-		ppc403_spu_rx(r & 0xff);
-	}
+		cpunum_set_info_int(0, CPUINFO_INT_PPC_RX_DATA, r & 0xff);
 }
 
 /*****************************************************************************/
@@ -2269,7 +2260,7 @@ static void init_firebeat(running_machine *machine)
 
 	cur_cab_data = cab_data;
 
-	ppc403_install_spu_tx_handler(security_w);
+	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)security_w);
 
 	set_ibutton(rom);
 
