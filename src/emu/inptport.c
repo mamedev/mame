@@ -1854,9 +1854,9 @@ static analog_field_state *init_field_analog_state(const input_field_config *fie
 		/* set each position to be 512 units */
 		case IPT_POSITIONAL:
 		case IPT_POSITIONAL_V:
-			state->positionalscale = COMPUTE_SCALE(state->adjmax, INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
+			state->positionalscale = COMPUTE_SCALE(field->max, INPUT_ABSOLUTE_MAX - INPUT_ABSOLUTE_MIN);
 			state->adjmin = 0;
-			state->adjmax--;
+			state->adjmax = field->max - 1;
 			state->wraps = ((field->flags & ANALOG_FLAG_WRAPS) != 0);
 			state->autocenter = !state->wraps;
 			break;
