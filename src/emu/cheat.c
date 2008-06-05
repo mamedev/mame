@@ -11665,14 +11665,14 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 #ifdef MESS
 		int		crc;
 #endif
-		int		type;
-		int		address;
-		int		data;
-		int		extend_data;
-		int		arguments_matched;
+		int		type = 0;
+		int		address = 0;
+		int		data = 0;
+		int		extend_data = 0;
+		int		arguments_matched = 0;
 		int		format_level = 0;
-		int		cpu;
-		int		code;
+		int		cpu = 0;
+		int		code = 0;
 		char	name[16] = { 0 };
 		char	pre_type[16] = { 0 };
 		char	pre_data[16] = { 0 };
@@ -13665,7 +13665,7 @@ static void WriteData(cheat_action *action, UINT32 data)
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							return DoMemoryWrite(data, *buf, relativeAddress, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness), get_cpu_info(cpu));
+							DoMemoryWrite(data, *buf, relativeAddress, bytes, cpu_needs_swap(cpu) ^ EXTRACT_FIELD(action->type, Endianness), get_cpu_info(cpu));
 						}
 					}
 					break;
@@ -13691,7 +13691,7 @@ static void WriteData(cheat_action *action, UINT32 data)
 									action->flags |= kActionFlag_IsFirst;
 							}
 
-							return DoMemoryWrite(data, buf, address, bytes, 0, &raw_cpu_info);
+							DoMemoryWrite(data, buf, address, bytes, 0, &raw_cpu_info);
 						}
 					}
 					break;
@@ -13716,7 +13716,7 @@ static void WriteData(cheat_action *action, UINT32 data)
 						action->flags |= kActionFlag_IsFirst;
 				}
 
-				return DoMemoryWrite(data, buf, address, bytes, region_needs_swap(action->region) ^ EXTRACT_FIELD(action->type, Endianness), get_region_info(action->region));
+				DoMemoryWrite(data, buf, address, bytes, region_needs_swap(action->region) ^ EXTRACT_FIELD(action->type, Endianness), get_region_info(action->region));
 			}
 		}
 	}
