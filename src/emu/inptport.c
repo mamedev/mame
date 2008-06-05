@@ -731,6 +731,8 @@ static void input_port_exit(running_machine *machine)
 
 const input_port_config *input_port_config_alloc(const input_port_token *tokens, char *errorbuf, int errorbuflen)
 {
+	if (tokens == NULL)
+		return NULL;
 	if (errorbuf != NULL)
 		*errorbuf = 0;
 	return port_config_detokenize(NULL, tokens, errorbuf, errorbuflen);
