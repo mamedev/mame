@@ -11741,19 +11741,19 @@ static void load_cheat_code(running_machine *machine, char *file_name)
 				/* check length */
 				if(strlen(pre_type) != format->type_matched)
 				{
-					logerror("cheat: [load code] %s has invalid type field length (%X)\n", description, strlen(pre_type));
+					logerror("cheat: [load code] %s has invalid type field length (%X)\n", description, (int)strlen(pre_type));
 					is_error++;
 				}
 
 				if(strlen(pre_data) != format->data_matched)
 				{
-					logerror("cheat: [load code] %s has invalid data field length (%X)\n", description, strlen(pre_type));
+					logerror("cheat: [load code] %s has invalid data field length (%X)\n", description, (int)strlen(pre_type));
 					is_error++;
 				}
 
 				if(strlen(pre_extend_data) != format->data_matched)
 				{
-					logerror("cheat: [load code] %s has invalid extend data field length (%X)\n", description, strlen(pre_extend_data));
+					logerror("cheat: [load code] %s has invalid extend data field length (%X)\n", description, (int)strlen(pre_extend_data));
 					is_error++;
 				}
 
