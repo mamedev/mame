@@ -469,12 +469,12 @@ static GFXDECODE_START( cshooter )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( cshooter )
-	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(s_readmem,s_writemem)
 	MDRV_CPU_IO_MAP(s_readport,s_writeport)
 
@@ -495,15 +495,17 @@ static MACHINE_DRIVER_START( cshooter )
 	MDRV_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
+	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( airraid )
-	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(arreadmem,arwritemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
-	MDRV_CPU_ADD(Z80,6000000)		 /* ? MHz */
+	MDRV_CPU_ADD(Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(s2_readmem,s2_writemem)
 	MDRV_CPU_IO_MAP(s_readport,s_writeport)
 
@@ -524,6 +526,7 @@ static MACHINE_DRIVER_START( airraid )
 	MDRV_VIDEO_UPDATE(cshooter)
 
 	/* sound hardware */
+	/* YM2151 and ym3931 seibu custom cpu running at XTAL_14_31818MHz/4 */
 MACHINE_DRIVER_END
 
 
