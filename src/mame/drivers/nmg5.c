@@ -561,9 +561,9 @@ static INPUT_PORTS_START( pclubys )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "1P Vs 2P Rounds" )       PORT_DIPLOCATION("SW1:6")     // See notes
+	PORT_DIPNAME( 0x0004, 0x0004, "1P Vs 2P Rounds" )       PORT_DIPLOCATION("SW1:6")     // See notes
 	PORT_DIPSETTING(      0x0000, "Best of 1" )             /* 1 winning round needed */
-	PORT_DIPSETTING(      0x0020, "Best of 3" )             /* 2 winning rounds needed */
+	PORT_DIPSETTING(      0x0004, "Best of 3" )             /* 2 winning rounds needed */
 	PORT_DIPNAME( 0x0008, 0x0000, "Nudity" )                PORT_DIPLOCATION("SW1:5")     // See notes
 	PORT_DIPSETTING(      0x0008, "Soft only" )
 	PORT_DIPSETTING(      0x0000, "Soft and Hard" )

@@ -311,11 +311,9 @@ static INPUT_PORTS_START( sbagman )
 	PORT_INCLUDE( bagman )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* double-function button, start and shoot */
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL /* double-function button, start and shoot */
 INPUT_PORTS_END
 

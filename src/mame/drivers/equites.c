@@ -373,7 +373,7 @@ D                                                                               
 #include "equites.h"
 
 #define HVOLTAGE_DEBUG	0
-#define EASY_TEST_MODE	1
+#define EASY_TEST_MODE	0
 
 #define FRQ_ADJUSTER_TAG	"FRQ"
 

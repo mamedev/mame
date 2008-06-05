@@ -1423,7 +1423,7 @@ static INPUT_PORTS_START( machridj )
 	PORT_BIT ( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )	/* bit 0 of dsw goes here */
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )	/* bit 1 of dsw goes here */
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT ( 0x60, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START /* DSW0 - bit 0 and 1 read from bit 3 and 4 on $4016, rest of the bits read on $4017 */
