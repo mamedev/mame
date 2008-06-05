@@ -10,8 +10,7 @@
 #include "driver.h"
 
 UINT16 *nmk_bgvideoram,*nmk_fgvideoram,*nmk_txvideoram;
-UINT16 *gunnail_scrollram;
-static UINT16 gunnail_scrolly;
+UINT16 *gunnail_scrollram, *gunnail_scrollramy;
 
 static int redraw_bitmap;
 
@@ -403,16 +402,6 @@ WRITE16_HANDLER( bioship_bank_w )
 	}
 }
 
-WRITE16_HANDLER( gunnail_scrollx_w )
-{
-	COMBINE_DATA(&gunnail_scrollram[offset]);
-}
-
-WRITE16_HANDLER( gunnail_scrolly_w )
-{
-	COMBINE_DATA(&gunnail_scrolly);
-}
-
 /***************************************************************************
 
   Display refresh
@@ -746,15 +735,41 @@ VIDEO_UPDATE( tharrier )
 
 VIDEO_UPDATE( gunnail )
 {
-	int i;
+	int y1, i;
+	rectangle bgclip = *cliprect;
 
-	for (i = 0;i < 256;i++)
+	// the hardware supports per-scanline X *and* Y scroll which isn't
+	// supported by tilemaps so we have to draw the tilemap one line at a time
+	y1 = cliprect->min_y;
+	while (y1 <= cliprect->max_y)
 	{
-		tilemap_set_scrollx(bg_tilemap,(i+gunnail_scrolly) & 0x1ff,gunnail_scrollram[0] + gunnail_scrollram[i] - videoshift);
-	}
-	tilemap_set_scrolly(bg_tilemap,0,gunnail_scrolly);
+		int const yscroll = gunnail_scrollramy[0] + gunnail_scrollramy[y1];
+		int y2;
 
-	VIDEO_UPDATE_CALL(macross);
+		// group all consecutive lines with the same y scroll to reduce overhead
+		y2 = y1+1;
+		while (y2 <= cliprect->max_y && gunnail_scrollramy[y2] == gunnail_scrollramy[y1])
+			y2++;
+
+		bgclip.min_y = y1;
+		bgclip.max_y = y2-1;
+
+		tilemap_set_scrolly(bg_tilemap, 0, yscroll);
+		for (i = y1; i < y2; i++)
+			tilemap_set_scrollx(bg_tilemap,(i + yscroll) & 0x1ff, gunnail_scrollram[0] + gunnail_scrollram[i] - videoshift);
+
+		tilemap_draw(bitmap,&bgclip,bg_tilemap,0,0);
+
+		y1 = y2;
+	}
+
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,3);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,2);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,1);
+	nmk16_draw_sprites(screen->machine, bitmap,cliprect,0);
+
+	tilemap_set_scrollx(tx_tilemap,0,-videoshift);
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	return 0;
 }
 

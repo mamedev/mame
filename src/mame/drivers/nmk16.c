@@ -201,7 +201,7 @@ static WRITE16_HANDLER( nmk16_mainram_strange_w )
 }
 
 extern UINT16 *nmk_bgvideoram,*nmk_fgvideoram,*nmk_txvideoram;
-extern UINT16 *gunnail_scrollram;
+extern UINT16 *gunnail_scrollram, *gunnail_scrollramy;
 
 READ16_HANDLER( nmk_bgvideoram_r );
 WRITE16_HANDLER( nmk_bgvideoram_w );
@@ -212,8 +212,6 @@ WRITE16_HANDLER( nmk_txvideoram_w );
 WRITE16_HANDLER( nmk_scroll_w );
 WRITE16_HANDLER( nmk_scroll_2_w );
 WRITE16_HANDLER( nmk_scroll_3_w );
-WRITE16_HANDLER( gunnail_scrollx_w );
-WRITE16_HANDLER( gunnail_scrolly_w );
 WRITE16_HANDLER( nmk_flipscreen_w );
 WRITE16_HANDLER( nmk_tilebank_w );
 WRITE16_HANDLER( bioship_scroll_w );
@@ -991,33 +989,24 @@ static ADDRESS_MAP_START( macross_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x09c000, 0x09c7ff) AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunnail_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( gunnail_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x080002, 0x080003) AM_READ(input_port_1_word_r)
 	AM_RANGE(0x080008, 0x080009) AM_READ(input_port_2_word_r)
 	AM_RANGE(0x08000a, 0x08000b) AM_READ(input_port_3_word_r)
 	AM_RANGE(0x08000e, 0x08000f) AM_READ(NMK004_r)
-	AM_RANGE(0x088000, 0x0887ff) AM_READ(SMH_RAM) /* palette ram */
-	AM_RANGE(0x090000, 0x093fff) AM_READ(nmk_bgvideoram_r)
-	AM_RANGE(0x09c000, 0x09cfff) AM_READ(nmk_txvideoram_r)
-	AM_RANGE(0x09d000, 0x09dfff) AM_READ(nmk_txvideoram_r)	/* mirror */
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gunnail_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
 	AM_RANGE(0x080016, 0x080017) AM_WRITE(SMH_NOP)	/* IRQ enable? */
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
-	AM_RANGE(0x088000, 0x0887ff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x08c000, 0x08c1ff) AM_RAM_WRITE(gunnail_scrollx_w) AM_BASE(&gunnail_scrollram)
-	AM_RANGE(0x08c200, 0x08c201) AM_WRITE(gunnail_scrolly_w)
-	AM_RANGE(0x08c202, 0x08c7ff) AM_RAM // extra scroll registers (used after a boss is killed and in level 5)
-	AM_RANGE(0x090000, 0x093fff) AM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
-	AM_RANGE(0x09c000, 0x09cfff) AM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x09d000, 0x09dfff) AM_WRITE(nmk_txvideoram_w)	/* mirror */
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_BASE(&gunnail_scrollram)
+	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE(&gunnail_scrollramy)
+	AM_RANGE(0x08c400, 0x08c7ff) AM_WRITEONLY	// unknown
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram_w) AM_BASE(&nmk_bgvideoram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(nmk_txvideoram_w) AM_MIRROR(0x001000) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -4352,8 +4341,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gunnail )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M68000, 10000000) /* 10 MHz? */
-	MDRV_CPU_PROGRAM_MAP(gunnail_readmem,gunnail_writemem)
+	MDRV_CPU_ADD(M68000, 12000000) /* 12 MHz? */
+	MDRV_CPU_PROGRAM_MAP(gunnail_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold,112)
 
@@ -4362,7 +4351,7 @@ static MACHINE_DRIVER_START( gunnail )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
@@ -5973,6 +5962,16 @@ ROM_START( macross )
 	ROM_LOAD( "921a10",      0x0200, 0x0020, CRC(8371e42d) SHA1(6cfd70dfa00e85ec1df8832d41df331cc3e3733a) )	/* unknown */
 ROM_END
 
+/*
+Gunnail (JPN Ver.)
+(c)1992 NMK
+AK92077
+
+CPU  :MC68000P12
+Sound:YM2203C,OKI M6295 x2
+OSC  :12.0000MHz,16.0000MHz,10.0000MHz
+Other:NMK 111 x3,214 x2,901,903 x2,902,005,004,215,008,009 x2
+*/
 ROM_START( gunnail )
 	ROM_REGION( 0x80000, REGION_CPU1, 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "3e.bin",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
