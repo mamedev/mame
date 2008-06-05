@@ -8103,6 +8103,7 @@ Other Sun games
 	DRIVER( cmagica )	/* 200? unknown */
 	DRIVER( millsun )	/* 200? unknown */
 	DRIVER( sspac2k1 )	/* 200? unknown */
+	DRIVER( elvis )		/* 200? unknown */
 
 	/* Astro Corp. */
 	DRIVER( showhand )

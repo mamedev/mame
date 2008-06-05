@@ -53,6 +53,7 @@
 
 #include "driver.h"
 #include "cpu/h83002/h83002.h"
+#include "sound/upd7759.h"
 
 
 /*************************
@@ -148,7 +149,7 @@ static const gfx_layout gfxlayout_8x8x8 =
 	8,8,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64 },
 	8*64
@@ -176,13 +177,23 @@ MACHINE_RESET( itgambl2 )
 
 
 /**************************
+*     Sound Interface     *
+**************************/
+
+static const struct upd7759_interface upd7759_interface =
+{
+	REGION_SOUND1
+};
+
+
+/**************************
 *     Machine Drivers     *
 **************************/
 
 static MACHINE_DRIVER_START( itgambl2 )
 
     /* basic machine hardware */
-	MDRV_CPU_ADD_TAG("main",H83044, MAIN_CLOCK/4)	/* wrong CPU, but we have not a H8/3337 core ATM */
+	MDRV_CPU_ADD_TAG("main", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
 	MDRV_CPU_PROGRAM_MAP(itgambl2_map,0)
 
     /* video hardware */
@@ -198,6 +209,12 @@ static MACHINE_DRIVER_START( itgambl2 )
 	MDRV_PALETTE_LENGTH(0x200)
 	MDRV_VIDEO_START( itgambl2 )
 	MDRV_VIDEO_UPDATE( itgambl2 )
+
+    /* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(UPD7759, UPD7759_STANDARD_CLOCK)
+	MDRV_SOUND_CONFIG(upd7759_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 
@@ -213,13 +230,13 @@ CPU:
 2x ispLSI1032E-70JL (PLD)
 1x NEC D7759GC (sound)
 1x TDA2003 (audio amp)
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x M27C1001 (0)
-4x M27C4001 (1,2,3,4)
+4x M27C4001 (1, 2, 3, 4)
 
 Note:
 
@@ -256,13 +273,13 @@ CPU:
 2x ispLSI1032E-70JL (PLD)
 1x NEC D7759GC (sound)
 1x TDA2003 (audio amp)
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x 27C2000 (s)
-3x M27C4001 (1,2,3)
+3x M27C4001 (1, 2, 3)
   
 Note:
 
@@ -298,13 +315,13 @@ CPU:
 2x ispLSI1032E-70JL (PLD)
 1x NEC D7759GC (sound)
 1x TDA2003 (audio amp)
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x M27C1001 (0)
-4x M27C4001 (1,2,3,4)
+4x M27C4001 (1, 2, 3, 4)
 
 Note:
 
@@ -341,13 +358,13 @@ CPU:
 2x ispLSI1032E-70JL (PLD)
 1x NEC D7759GC (sound)
 1x TDA2003 (audio amp)
-1x oscillator 14.318180MHz
-1x oscillator 16.000000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x M27C1001 (0)
-4x M27C4001 (1,2,3,4)
+4x M27C4001 (1, 2, 3, 4)
 
 Note:
 
@@ -383,14 +400,14 @@ CPU
 1x H8/3337-HDY1A3-64F3337F16 (main)
 1x NEC D7759GC-0124XY007 (sound)
 2x ispLSI1032E-70LJ-C110AA02 (main)
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs
 
 1x M27C1001 (0)
 1x 27C4000 (1)
-3x M27C4001 (2,3,4)
+3x M27C4001 (2, 3, 4)
 
 Note
 
@@ -437,13 +454,13 @@ CPU:
 1x NEC D7759GC (sound)
 1x TDA2003 (sound)
 2x ispLSI1032E-70LJ-E011J02
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x 27C1001 or similar (0)
-3x 27C4001 or similar (1,2,3)
+3x 27C4001 or similar (1, 2, 3)
 
 Note:
 
@@ -486,13 +503,13 @@ CPU:
 1x maybe NEC D7759GC (sound)
 1x TDA2003 (audio amp)
 2x ispLSI1032E-70LJ
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x 27C1001 or similar (msg0)
-4x 27C4001 or similar (ep1,ep2,ep3)
+4x 27C4001 or similar (ep1, ep2, ep3)
 
 Note:
 
@@ -535,13 +552,13 @@ CPU:
 1x maybe NEC D7759GC (sound)
 1x TDA2003 (audio amp)
 2x ispLSI1032E-70LJ
-1x oscillator 14.318180MHz
-1x oscillator 16.000
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
 
 ROMs:
 
 1x 27C1001 or similar (msg0)
-4x 27C4001 or similar (ep1,ep2,ep3)
+4x 27C4001 or similar (ep1, ep2, ep3)
 
 Note:
 
@@ -576,16 +593,64 @@ ROM_START( sspac2k1 )
 ROM_END
 
 
+/* Elvis?
+
+CPU:
+
+1x H8/3337-HD64F3337CP16
+1x NEC D7759GC (sound)
+1x TDA2003 (audio amp)
+2x ispLSI1032E-70LJ
+1x oscillator 14.318180 MHz
+1x oscillator 16.000 MHz
+
+ROMs:
+
+1x 27C1001 or similar (0)
+3x 27C4001 or similar (1, 2, 3)
+
+Note:
+
+1x 28x2 edge connector (not JAMMA)
+1x RS232 connector
+1x 14 legs connector
+2x 8 DIP switches
+1x battery
+1x trimmer (volume)
+1x trimmer (unknown)
+
+--------------------------
+
+Silkscreened on PCB:
+"2-0250"
+
+*/
+
+ROM_START( elvis )
+	ROM_REGION( 0x1000000, REGION_CPU1, 0 ) /* all the program code is in here */
+	ROM_LOAD( "elvis_hd64f3337cp16.mcu", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION( 0x180000, REGION_GFX1, 0 )
+	ROM_LOAD( "1.bin", 0x000000, 0x80000, CRC(9e15983f) SHA1(272673ac9685cf0f5cc8a9263c91e4f93c30197f) )
+	ROM_LOAD( "2.bin", 0x080000, 0x80000, CRC(c420af73) SHA1(fb0e03456a4b2f18c35d5ee2efeb29e3f2f26eae) )
+	ROM_LOAD( "3.bin", 0x100000, 0x80000, CRC(bc10b1b6) SHA1(ef25f974cd0b44b91a8db215ff8d2dd3f4313bd8) )
+
+	ROM_REGION( 0x20000, REGION_SOUND1, 0 ) /* NEC D7759GC samples */
+	ROM_LOAD( "0.bin", 0x00000, 0x20000, CRC(833c5be5) SHA1(89110cb52265ee5bfdf73c0af343b7ce2356e394) )
+ROM_END
+
+
 /*************************
 *      Game Drivers      *
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT ROT    COMPANY    FULLNAME                          FLAGS  */
-GAME( 2001, laser2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Laser 2001 (Ver 1.2)",            GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, mdrink,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Magic Drink (Ver 1.2)",           GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, ntcash,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "NtCash",                          GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, wizard,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Wizard (Ver 1.0)",                GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2001, te0144,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Unknown italian gambling game",   GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?, cmagica,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Carta Magica (Ver 1.8)",          GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?, millsun,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Millennium Sun",                  GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Space 2001",                GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 2001, laser2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Laser 2001 (Ver 1.2)",            GAME_NOT_WORKING )
+GAME( 2001, mdrink,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Magic Drink (Ver 1.2)",           GAME_NOT_WORKING )
+GAME( 2001, ntcash,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "NtCash",                          GAME_NOT_WORKING )
+GAME( 2001, wizard,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Wizard (Ver 1.0)",                GAME_NOT_WORKING )
+GAME( 2001, te0144,   0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Unknown italian gambling game",   GAME_NOT_WORKING )
+GAME( 200?, cmagica,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Carta Magica (Ver 1.8)",          GAME_NOT_WORKING )
+GAME( 200?, millsun,  0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Millennium Sun",                  GAME_NOT_WORKING )
+GAME( 200?, sspac2k1, 0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Super Space 2001",                GAME_NOT_WORKING )
+GAME( 200?, elvis,    0,      itgambl2, itgambl2, 0,   ROT0, "Unknown", "Elvis?",                          GAME_NOT_WORKING )
