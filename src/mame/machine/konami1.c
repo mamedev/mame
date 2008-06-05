@@ -6,11 +6,10 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "konami1.h"
 
 
-UINT8 *konami1_decrypted;
-
-UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
+static UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 {
 /*
 >
@@ -41,27 +40,18 @@ UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 
 
 
-static void decode(int cpu)
+UINT8 *konami1_decode(int cpu)
 {
-	UINT8 *rom = memory_region(REGION_CPU1+cpu);
+	const UINT8 *rom = memory_region(REGION_CPU1+cpu);
 	int size = memory_region_length(REGION_CPU1+cpu);
 	int A;
 
-	konami1_decrypted = auto_malloc(size);
-	memory_set_decrypted_region(cpu, 0x0000, 0xffff, konami1_decrypted);
+	UINT8 *decrypted = auto_malloc(size);
+	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypted);
 
 	for (A = 0;A < size;A++)
 	{
-		konami1_decrypted[A] = konami1_decodebyte(rom[A],A);
+		decrypted[A] = konami1_decodebyte(rom[A],A);
 	}
-}
-
-void konami1_decode(void)
-{
-	decode(0);
-}
-
-void konami1_decode_cpu2(void)
-{
-	decode(1);
+	return decrypted;
 }
