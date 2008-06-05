@@ -30,7 +30,7 @@
 
   ROMs:  1x (up to) 27C2001 or similar (sound).
          2x or more 27C4001 or similar (graphics).
-  
+
   Timekeeping: 1x Dallas DS1302 Trickle Charge Timekeeping Chip (optional).
 
   Connectors: 1x 28x2 edge connector.
@@ -446,8 +446,8 @@ Note:
 1x 12 legs connector
 1x 50 legs flat cable connector
 1x 12x2 switches dip
-1x trimmer (volume) 
-1x trimmer (spark)  
+1x trimmer (volume)
+1x trimmer (spark)
 
 ---------------------------------------
 

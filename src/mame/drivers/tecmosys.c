@@ -305,12 +305,12 @@ static WRITE16_HANDLER( sound_w )
 }
 
 /*
-	880000 and 880002 might be video related,
-	see sub @ 68k:002e5e where they are written if the screen is set to inverted.
-	Also, irq code at 22c4 :
-	- 880000 & 00, execute irq code
-	- 880000 & 01, scroll?
-	- 880000 & 03, crash
+    880000 and 880002 might be video related,
+    see sub @ 68k:002e5e where they are written if the screen is set to inverted.
+    Also, irq code at 22c4 :
+    - 880000 & 00, execute irq code
+    - 880000 & 01, scroll?
+    - 880000 & 03, crash
 */
 
 
@@ -840,22 +840,22 @@ static VIDEO_UPDATE(deroon)
 	tecmosys_do_final_mix(bitmap);
 
 /*
-	popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",
-		tecmosys_880000regs[0x0],  tecmosys_880000regs[0x1],  tecmosys_880000regs[0x2],  tecmosys_880000regs[0x3],
-		tecmosys_880000regs[0x4],  tecmosys_880000regs[0x5],  tecmosys_880000regs[0x6],  tecmosys_880000regs[0x7],
-		tecmosys_880000regs[0x8],  tecmosys_880000regs[0x9],  tecmosys_880000regs[0xa],  tecmosys_880000regs[0xb],
-		tecmosys_880000regs[0xc],  tecmosys_880000regs[0xd],  tecmosys_880000regs[0xe],  tecmosys_880000regs[0xf],
-		tecmosys_880000regs[0x10], tecmosys_880000regs[0x11], tecmosys_880000regs[0x12], tecmosys_880000regs[0x13],
-		tecmosys_880000regs[0x14], tecmosys_880000regs[0x15], tecmosys_880000regs[0x16], tecmosys_880000regs[0x17]);
+    popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",
+        tecmosys_880000regs[0x0],  tecmosys_880000regs[0x1],  tecmosys_880000regs[0x2],  tecmosys_880000regs[0x3],
+        tecmosys_880000regs[0x4],  tecmosys_880000regs[0x5],  tecmosys_880000regs[0x6],  tecmosys_880000regs[0x7],
+        tecmosys_880000regs[0x8],  tecmosys_880000regs[0x9],  tecmosys_880000regs[0xa],  tecmosys_880000regs[0xb],
+        tecmosys_880000regs[0xc],  tecmosys_880000regs[0xd],  tecmosys_880000regs[0xe],  tecmosys_880000regs[0xf],
+        tecmosys_880000regs[0x10], tecmosys_880000regs[0x11], tecmosys_880000regs[0x12], tecmosys_880000regs[0x13],
+        tecmosys_880000regs[0x14], tecmosys_880000regs[0x15], tecmosys_880000regs[0x16], tecmosys_880000regs[0x17]);
 */
 
-//	popmessage("%04x %04x %04x | %04x %04x %04x",
-//	  tecmosys_c00000regs[0], 	  tecmosys_c00000regs[1],  	  tecmosys_c00000regs[2],
-//	  tecmosys_c80000regs[0], 	  tecmosys_c80000regs[1],  	  tecmosys_c80000regs[2]);
+//  popmessage("%04x %04x %04x | %04x %04x %04x",
+//    tecmosys_c00000regs[0],     tecmosys_c00000regs[1],     tecmosys_c00000regs[2],
+//    tecmosys_c80000regs[0],     tecmosys_c80000regs[1],     tecmosys_c80000regs[2]);
 
-//	popmessage("%04x %04x %04x | %04x %04x %04x",
-//	  tecmosys_b00000regs[0], 	  tecmosys_b00000regs[1],  	  tecmosys_b00000regs[2],
-//	  tecmosys_a80000regs[0], 	  tecmosys_a80000regs[1],  	  tecmosys_a80000regs[2]);
+//  popmessage("%04x %04x %04x | %04x %04x %04x",
+//    tecmosys_b00000regs[0],     tecmosys_b00000regs[1],     tecmosys_b00000regs[2],
+//    tecmosys_a80000regs[0],     tecmosys_a80000regs[1],     tecmosys_a80000regs[2]);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
 	tecmosys_render_sprites_to_bitmap(bitmap, tecmosys_880000regs[0x0], tecmosys_880000regs[0x1]);

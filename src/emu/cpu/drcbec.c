@@ -465,7 +465,7 @@ static void drcbec_generate(drcbe_state *drcbe, drcuml_block *block, const drcum
 					psize[0] = 1 << inst->param[2].value;
 				if (opcode == DRCUML_OP_FFRINT || opcode == DRCUML_OP_FFRFLT)
 					psize[1] = 1 << inst->param[2].value;
-				
+
 				/* pre-expand opcodes that encode size in them */
 				if (opcode == DRCUML_OP_LOAD)
 					opcode = DRCUML_OP_LOAD1 + (inst->param[3].value & 3);
@@ -732,11 +732,11 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS1, 4, 0):		/* LOADS   dst,base,index,BYTE    */
 				PARAM0 = inst[1].pint8[PARAM2];
 				break;
-				
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS2, 4, 0):		/* LOADS   dst,base,index,WORD    */
 				PARAM0 = inst[1].pint16[PARAM2];
 				break;
-				
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_LOADS4, 4, 0):		/* LOADS   dst,base,index,DWORD   */
 				PARAM0 = inst[1].pint32[PARAM2];
 				break;
@@ -744,33 +744,33 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE1, 4, 0):		/* STORE   dst,base,index,BYTE    */
 				inst[0].puint8[PARAM1] = PARAM2;
 				break;
-				
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE2, 4, 0):		/* STORE   dst,base,index,WORD    */
 				inst[0].puint16[PARAM1] = PARAM2;
 				break;
-				
+
 			case MAKE_OPCODE_SHORT(DRCUML_OP_STORE4, 4, 0):		/* STORE   dst,base,index,DWORD   */
 				inst[0].puint32[PARAM1] = PARAM2;
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1, 4, 0):		/* READ    dst,src1,space_BYTE    */
-				PARAM0 = (UINT8)(*active_address_space[PARAM2 / 16].accessors->read_byte)(PARAM1);	
+				PARAM0 = (UINT8)(*active_address_space[PARAM2 / 16].accessors->read_byte)(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2, 4, 0):		/* READ    dst,src1,space_WORD    */
-				PARAM0 = (UINT16)(*active_address_space[PARAM2 / 16].accessors->read_word)(PARAM1);	
+				PARAM0 = (UINT16)(*active_address_space[PARAM2 / 16].accessors->read_word)(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4, 4, 0):		/* READ    dst,src1,space_DWORD   */
-				PARAM0 = (UINT32)(*active_address_space[PARAM2 / 16].accessors->read_dword)(PARAM1);	
+				PARAM0 = (UINT32)(*active_address_space[PARAM2 / 16].accessors->read_dword)(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM2, 4, 0):		/* READM   dst,src1,mask,space_WORD */
-				PARAM0 = (UINT16)(*active_address_space[PARAM3 / 16].accessors->read_word_masked)(PARAM1, PARAM2);	
+				PARAM0 = (UINT16)(*active_address_space[PARAM3 / 16].accessors->read_word_masked)(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM4, 4, 0):		/* READM   dst,src1,mask,space_DWORD */
-				PARAM0 = (UINT32)(*active_address_space[PARAM3 / 16].accessors->read_dword_masked)(PARAM1, PARAM2);	
+				PARAM0 = (UINT32)(*active_address_space[PARAM3 / 16].accessors->read_dword_masked)(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 4, 0):		/* WRITE   dst,src1,space_BYTE     */

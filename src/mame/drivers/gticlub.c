@@ -401,8 +401,8 @@ WRITE8_HANDLER( K056230_w )
 				// Thunder Hurricane breaks otherwise...
 				if (mame_stricmp(Machine->gamedrv->name, "thunderh") != 0)
 				{
-//					timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, network_irq_gen);
-//					cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+//                  timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, network_irq_gen);
+//                  cpunum_set_input_line(Machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
 				}
 			}
 			else

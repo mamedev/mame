@@ -688,7 +688,7 @@ static UINT32 *workram;
 static READ8_HANDLER( sysreg_r )
 {
 	UINT8 r = 0;
-	
+
 	switch (offset)
 	{
 		case 0:
@@ -696,11 +696,11 @@ static READ8_HANDLER( sysreg_r )
 		case 2:
 			r = input_port_read_indexed(machine, offset);
 			break;
-		
+
 		case 3:
 			r = 0xf7;
 			break;
-		
+
 		case 4:
 			r = input_port_read_indexed(machine, 3);
 			break;
@@ -715,11 +715,11 @@ static WRITE8_HANDLER( sysreg_w )
 		case 0:
 			led_reg0 = data;
 			break;
-		
+
 		case 1:
 			led_reg1 = data;
 			break;
-		
+
 		case 7:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
 				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
@@ -1099,7 +1099,7 @@ static void jamma_jvs_w(UINT8 data)
 		return;
 	jvs_sdata[jvs_sdata_ptr] = data;
 	jvs_sdata_ptr++;
-	
+
 	if (jvs_sdata_ptr >= 3 && jvs_sdata_ptr >= 3 + jvs_sdata[2])
 		jamma_jvs_cmd_exec();
 }
@@ -1164,7 +1164,7 @@ static void jamma_jvs_cmd_exec(void)
 	sync = jvs_sdata[0];
 	node = jvs_sdata[1];
 	byte_num = jvs_sdata[2];
-	
+
 	length = jvs_decode_data(&jvs_sdata[3], data, byte_num-1);
 
 	/*

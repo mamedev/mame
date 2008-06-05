@@ -68,7 +68,7 @@ INLINE int page_access_allowed(int transtype, UINT8 key, UINT8 protbits)
 INLINE void tlb_entry_free(powerpc_state *ppc, int entrynum)
 {
 	int oldentry = ppc->tlb_entries[entrynum];
-	
+
 	/* if we're mapped to something, free the entry in the table */
 	if (oldentry != 0)
 	{
@@ -94,13 +94,13 @@ INLINE int tlb_entry_allocate(powerpc_state *ppc, int entrynum, offs_t address, 
 	{
 		/* if there's already a TLB entry at the current index, zap it */
 		tlb_entry_free(ppc, entrynum);
-		
+
 		/* allocate a new entry and advance to the next one */
 		ppc->tlb_entries[entrynum] = (address >> 12) + 1;
 		allocated = TRUE;
 	}
 	*entry = value;
-	
+
 	return allocated;
 }
 
@@ -127,7 +127,7 @@ INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 
 
 /*-------------------------------------------------
-    get_decremeter - return the current 
+    get_decremeter - return the current
     decrementer value
 -------------------------------------------------*/
 
@@ -199,7 +199,7 @@ size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_
 	/* allocate a timer for the compare interrupt */
 	if (cap & PPCCAP_OEA)
 		ppc->decrementer_int_timer = timer_alloc(decrementer_int_callback, ppc);
-	
+
 	/* and for the 4XX interrupts if needed */
 	if (cap & PPCCAP_4XX)
 	{
@@ -207,7 +207,7 @@ size_t ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_
 		ppc->pit_timer = timer_alloc(ppc4xx_pit_callback, ppc);
 		ppc->spu.timer = timer_alloc(ppc4xx_spu_callback, ppc);
 	}
-	
+
 	/* reset the state */
 	ppccom_reset(ppc);
 	return 0;
@@ -227,30 +227,30 @@ void ppccom_reset(powerpc_state *ppc)
 		/* PC to the reset vector; MSR has IP set to start */
 		ppc->pc = 0xfff00100;
 		ppc->msr = MSROEA_IP;
-		
+
 		/* reset the decrementer */
 		ppc->dec_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
 		decrementer_int_callback(Machine, ppc, 0);
 	}
-	
+
 	/* initialize the 4XX state */
 	if (ppc->cap & PPCCAP_4XX)
 	{
 		/* PC to the last word; MSR to 0 */
 		ppc->pc = 0xfffffffc;
 		ppc->msr = 0;
-		
+
 		/* reset the SPU status */
 		ppc->spr[SPR4XX_TCR] &= ~PPC4XX_TCR_WRC_MASK;
 		ppc->spu.regs[SPU4XX_LINE_STATUS] = 0x06;
 	}
-	
+
 	/* time base starts here */
 	ppc->tb_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
 
 	/* clear interrupts */
 	ppc->irq_pending = 0;
-	
+
 	/* flush the TLB */
 	ppc->tlb_index = 0;
 	memset(ppc->tlb_entries, 0, sizeof(ppc->tlb_entries[0]) * (POWERPC_TLB_ENTRIES + PPC603_FIXED_TLB_ENTRIES));
@@ -280,7 +280,7 @@ offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *opr
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ppccom_translate_address_internal - translate 
+    ppccom_translate_address_internal - translate
     an address from logical to physical; shared
     between external requests and internal TLB
     filling
@@ -297,22 +297,22 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	/* only applies if we support the OEA */
 	if (!(ppc->cap & PPCCAP_OEA))
 		return 0x001;
-	
+
 	/* also no translation necessary if translation is disabled */
 	if ((transtype == TRANSLATE_FETCH && (ppc->msr & MSROEA_IR) == 0) || (transtype != TRANSLATE_FETCH && (ppc->msr & MSROEA_DR) == 0))
 		return 0x001;
-	
+
 	/* first scan the appropriate BAT */
 	batbase = (transtype == TRANSLATE_FETCH) ? SPROEA_IBAT0U : SPROEA_DBAT0U;
 	for (batnum = 0; batnum < 4; batnum++)
 	{
 		UINT32 upper = ppc->spr[batbase + 2*batnum + 0];
-		
+
 		/* check user/supervisor valid bit */
 		if ((upper >> transpriv) & 0x01)
 		{
 			UINT32 mask = (~upper << 15) & 0xfffe0000;
-			
+
 			/* check for a hit against this bucket */
 			if ((*address & mask) == (upper & mask))
 			{
@@ -321,24 +321,24 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 				/* verify protection; if we fail, return false and indicate a protection violation */
 				if (!page_access_allowed(transtype, 1, lower & 3))
 					return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
-				
+
 				/* otherwise we're good */
 				*address = (lower & mask) | (*address & ~mask);
 				return 0x001;
 			}
 		}
 	}
-	
+
 	/* look up the segment register */
 	segreg = ppc->sr[*address >> 28];
 	if (transtype == TRANSLATE_FETCH && (segreg & 0x10000000))
 		return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
-	
+
 	/* get hash table information from SD1 */
 	hashbase = ppc->spr[SPROEA_SDR1] & 0xffff0000;
 	hashmask = ((ppc->spr[SPROEA_SDR1] & 0x1ff) << 16) | 0xffff;
 	hash = (segreg & 0x7ffff) ^ ((*address >> 12) & 0xffff);
-	
+
 	/* if we're simulating the 603 MMU, fill in the data and stop here */
 	if (ppc->cap & PPCCAP_603_MMU)
 	{
@@ -353,23 +353,23 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
 		UINT32 *ptegptr = memory_get_read_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, ptegaddr);
-		
+
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)
 		{
 			UINT32 targetupper = 0x80000000 | ((segreg & 0xffffff) << 7) | (hashnum << 6) | ((*address >> 22) & 0x3f);
 			int ptenum;
-			
+
 			/* scan PTEs */
 			for (ptenum = 0; ptenum < 8; ptenum++)
 				if (ptegptr[BYTE_XOR_BE(ptenum * 2)] == targetupper)
 				{
 					UINT32 pteglower = ptegptr[BYTE_XOR_BE(ptenum * 2 + 1)];
-					
+
 					/* verify protection; if we fail, return false and indicate a protection violation */
 					if (!page_access_allowed(transtype, (segreg >> (29 + transpriv)) & 1, pteglower & 3))
 						return DSISR_PROTECTED | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
-					
+
 					/* update page table bits */
 					if (!(intention & TRANSLATE_DEBUG_MASK))
 					{
@@ -378,21 +378,21 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 							pteglower |= 0x080;
 						ptegptr[BYTE_XOR_BE(ptenum * 2 + 1)] = pteglower;
 					}
-					
+
 					/* otherwise we're good */
 					*address = (pteglower & 0xfffff000) | (*address & 0x00000fff);
 					return (pteglower >> 7) & 1;
 				}
 		}
-			
+
 		/* invert the hash after the first round */
 		hash = ~hash;
 	}
-	
+
 	/* we failed to find any match: not found */
 	return DSISR_NOT_FOUND | ((transtype == TRANSLATE_WRITE) ? DSISR_STORE : 0);
-}	
-	
+}
+
 
 /*-------------------------------------------------
     ppccom_translate_address - translate an address
@@ -421,11 +421,11 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 	int transtype = ppc->param1;
 	offs_t transaddr = address;
 	UINT32 entryval;
-	
+
 	/* allow for an implementation-specific override */
 	if (ppc->tlb_fill != NULL && (*ppc->tlb_fill)(ppc))
 		return;
-	
+
 	/* if we can't translate the address, just return (and fail) */
 	ppc->param0 = ppccom_translate_address_internal(ppc, transtype | transuser, &transaddr);
 	if (PRINTF_TLB_FILL)
@@ -454,7 +454,7 @@ void ppccom_tlb_fill(powerpc_state *ppc)
 void ppccom_tlb_flush(powerpc_state *ppc)
 {
 	int entnum;
-	
+
 	/* iterate over entries and invalidate them */
 	for (entnum = 0; entnum < POWERPC_TLB_ENTRIES; entnum++)
 		tlb_entry_free(ppc, entnum);
@@ -474,7 +474,7 @@ void ppccom_tlb_flush(powerpc_state *ppc)
 void ppccom_execute_tlbie(powerpc_state *ppc)
 {
 	offs_t address = ppc->param0;
-	
+
 	/* just nuke it in the table; we may have spare entries referencing it, but no harm */
 	ppc->tlb_table[address >> 12] = 0;
 }
@@ -501,7 +501,7 @@ void ppccom_execute_tlbl(powerpc_state *ppc)
 	UINT32 address = ppc->param0;
 	int isitlb = ppc->param1;
 	UINT32 entrynum, entryval;
-	
+
 	/* determine entry number; we use rand() for associativity */
 	entrynum = ((address >> 12) & 0x1f) | (mame_rand(Machine) & 0x20) | (isitlb ? 0x40 : 0);
 
@@ -574,14 +574,14 @@ void ppccom_execute_mfspr(powerpc_state *ppc)
 			case SPROEA_DABR:
 				ppc->param1 = ppc->spr[ppc->param0];
 				return;
-			
+
 			/* decrementer */
 			case SPROEA_DEC:
 				ppc->param1 = get_decrementer(ppc);
 				return;
 		}
 	}
-	
+
 	/* handle 603 SPRs */
 	if (ppc->cap & PPCCAP_603_MMU)
 	{
@@ -611,7 +611,7 @@ void ppccom_execute_mfspr(powerpc_state *ppc)
 				return;
 		}
 	}
-	
+
 	/* handle 4XX SPRs */
 	if (ppc->cap & PPCCAP_4XX)
 	{
@@ -692,14 +692,14 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 				ppc->spr[ppc->param0] = ppc->param1;
 				ppccom_tlb_flush(ppc);
 				return;
-			
+
 			/* decrementer */
 			case SPROEA_DEC:
 				set_decrementer(ppc, ppc->param1);
 				return;
 		}
 	}
-	
+
 	/* handle 603 SPRs */
 	if (ppc->cap & PPCCAP_603_MMU)
 	{
@@ -722,7 +722,7 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR603_HID2:
 				ppc->spr[ppc->param0] = ppc->param1;
 				return;
-		
+
 			/* timebase */
 			case SPR603_TBL_W:
 				set_timebase(ppc, (get_timebase(ppc) & ~U64(0xffffffff00000000)) | ppc->param1);
@@ -732,7 +732,7 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 				return;
 		}
 	}
-	
+
 	/* handle 4XX SPRs */
 	if (ppc->cap & PPCCAP_4XX)
 	{
@@ -750,7 +750,7 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 			case SPR4XX_SRR3:
 				ppc->spr[ppc->param0] = ppc->param1;
 				return;
-			
+
 			/* timer control register */
 			case SPR4XX_TCR:
 				ppc->spr[SPR4XX_TCR] = ppc->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
@@ -759,20 +759,20 @@ void ppccom_execute_mtspr(powerpc_state *ppc)
 				if ((oldval ^ ppc->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
 					ppc4xx_pit_callback(Machine, ppc, FALSE);
 				return;
-		
+
 			/* timer status register */
 			case SPR4XX_TSR:
 				ppc->spr[SPR4XX_TSR] &= ~ppc->param1;
 				ppc4xx_set_irq_line(ppc, 0, 0);
 				return;
-			
+
 			/* PIT */
 			case SPR4XX_PIT:
 				ppc->spr[SPR4XX_PIT] = ppc->param1;
 				ppc->pit_reload = ppc->param1;
 				ppc4xx_pit_callback(Machine, ppc, FALSE);
 				return;
-		
+
 			/* timebase */
 			case SPR4XX_TBLO:
 				set_timebase(ppc, (get_timebase(ppc) & ~U64(0x00ffffff00000000)) | ppc->param1);
@@ -850,7 +850,7 @@ void ppccom_execute_mfdcr(powerpc_state *ppc)
 void ppccom_execute_mtdcr(powerpc_state *ppc)
 {
 	UINT8 oldval;
-	
+
 	/* handle various DCRs */
 	switch (ppc->param0)
 	{
@@ -882,25 +882,25 @@ void ppccom_execute_mtdcr(powerpc_state *ppc)
 		case DCR4XX_DMACC3:
 			ppc->dcr[ppc->param0] = ppc->param1;
 			return;
-		
+
 		/* DMA status */
 		case DCR4XX_DMASR:
 			ppc->dcr[DCR4XX_DMASR] &= ~(ppc->param1 & 0xfff80070);
 			ppc4xx_dma_update_irq_states(ppc);
 			return;
-		
+
 		/* interrupt enables */
 		case DCR4XX_EXIER:
 			ppc->dcr[DCR4XX_EXIER] = ppc->param1;
 			ppc4xx_set_irq_line(ppc, 0, 0);
 			return;
-	
+
 		/* interrupt clear */
 		case DCR4XX_EXISR:
 			ppc->dcr[ppc->param0] &= ~ppc->param1;
 			ppc4xx_set_irq_line(ppc, 0, 0);
 			return;
-		
+
 		/* DMA controls */
 		case DCR4XX_DMACR0:
 		case DCR4XX_DMACR1:
@@ -1207,11 +1207,11 @@ static void ppc4xx_set_irq_line(powerpc_state *ppc, UINT32 bitmask, int state)
 		ppc->irqstate |= bitmask;
 	else
 		ppc->irqstate &= ~bitmask;
-	
+
 	/* if the state changed to on, edge trigger the interrupt */
 	if (((ppc->irqstate ^ oldstate) & bitmask) && (ppc->irqstate & bitmask))
 		ppc->dcr[DCR4XX_EXISR] |= bitmask;
-	
+
 	/* pass through all level-triggered interrupts */
 	levelmask = PPC4XX_IRQ_BIT_CRITICAL | PPC4XX_IRQ_BIT_SPUR | PPC4XX_IRQ_BIT_SPUT;
 	levelmask |= PPC4XX_IRQ_BIT_JTAGR | PPC4XX_IRQ_BIT_JTAGT;
@@ -1222,7 +1222,7 @@ static void ppc4xx_set_irq_line(powerpc_state *ppc, UINT32 bitmask, int state)
 	if (!(ppc->dcr[DCR4XX_IOCR] & 0x02000000)) levelmask |= PPC4XX_IRQ_BIT_EXT3;
 	if (!(ppc->dcr[DCR4XX_IOCR] & 0x00800000)) levelmask |= PPC4XX_IRQ_BIT_EXT4;
 	ppc->dcr[DCR4XX_EXISR] = (ppc->dcr[DCR4XX_EXISR] & ~levelmask) | (ppc->irqstate & levelmask);
-	
+
 	/* update the IRQ status */
 	ppc->irq_pending = ((ppc->dcr[DCR4XX_EXISR] & ppc->dcr[DCR4XX_EXIER]) != 0);
 	if ((ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_FIE) && (ppc->spr[SPR4XX_TSR] & PPC4XX_TSR_FIS))
@@ -1251,7 +1251,7 @@ static int ppc4xx_get_irq_line(powerpc_state *ppc, UINT32 bitmask)
 static void ppc4xx_dma_update_irq_states(powerpc_state *ppc)
 {
 	int dmachan;
-	
+
 	/* update the IRQ state for each DMA channel */
 	for (dmachan = 0; dmachan < 4; dmachan++)
 		if ((ppc->dcr[DCR4XX_DMACR0 + 8 * dmachan] & PPC4XX_DMACR_CIE) && (ppc->dcr[DCR4XX_DMASR] & (1 << (27 - dmachan))))
@@ -1273,11 +1273,11 @@ static int ppc4xx_dma_decrement_count(powerpc_state *ppc, int dmachan)
 
 	/* decrement the counter */
 	dmaregs[DCR4XX_DMACT0]--;
-	
+
 	/* if non-zero, we keep going */
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) != 0)
 		return FALSE;
-	
+
 	/* set the complete bit and handle interrupts */
 	ppc->dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
 	ppc4xx_dma_update_irq_states(ppc);
@@ -1297,11 +1297,11 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 	/* if the channel is not enabled, fail */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CE))
 		return FALSE;
-	
+
 	/* if no transfers remaining, fail */
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) == 0)
 		return FALSE;
-	
+
 	/* fetch the data */
 	cpuintrf_push_context(ppc->cpunum);
 	*byte = program_read_byte(dmaregs[DCR4XX_DMADA0]++);
@@ -1323,11 +1323,11 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 	/* if the channel is not enabled, fail */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CE))
 		return FALSE;
-	
+
 	/* if no transfers remaining, fail */
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) == 0)
 		return FALSE;
-	
+
 	/* store the data */
 	cpuintrf_push_context(ppc->cpunum);
 	program_write_byte(dmaregs[DCR4XX_DMADA0]++, byte);
@@ -1348,7 +1348,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 	UINT32 *dmaregs = &ppc->dcr[8 * dmachan];
 	INT32 destinc, srcinc;
 	UINT8 width;
-	
+
 	/* skip if not enabled */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CE))
 		return;
@@ -1438,14 +1438,14 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 static TIMER_CALLBACK( ppc4xx_fit_callback )
 {
 	powerpc_state *ppc = ptr;
-	
+
 	/* if this is a real callback and we are enabled, signal an interrupt */
 	if (param)
 	{
 		ppc->spr[SPR4XX_TSR] |= PPC4XX_TSR_FIS;
 		ppc4xx_set_irq_line(ppc, 0, 0);
 	}
-	
+
 	/* update ourself for the next interval if we are enabled */
 	if (ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_FIE)
 	{
@@ -1454,7 +1454,7 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 		UINT32 target = (timebase + interval) & ~(interval - 1);
 		timer_adjust_oneshot(ppc->fit_timer, ATTOTIME_IN_CYCLES((target + 1 - timebase) / ppc->tb_divisor, ppc->cpunum), TRUE);
 	}
-	
+
 	/* otherwise, turn ourself off */
 	else
 		timer_adjust_oneshot(ppc->fit_timer, attotime_never, FALSE);
@@ -1468,16 +1468,16 @@ static TIMER_CALLBACK( ppc4xx_fit_callback )
 static TIMER_CALLBACK( ppc4xx_pit_callback )
 {
 	powerpc_state *ppc = ptr;
-	
+
 	/* if this is a real callback and we are enabled, signal an interrupt */
 	if (param)
 	{
 		ppc->spr[SPR4XX_TSR] |= PPC4XX_TSR_PIS;
 		ppc4xx_set_irq_line(ppc, 0, 0);
 	}
-	
+
 	/* update ourself for the next interval if we are enabled and we are either being
-	   forced to update, or we are in auto-reload mode */
+       forced to update, or we are in auto-reload mode */
 	if ((ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_PIE) && ppc->pit_reload != 0 && (!param || (ppc->spr[SPR4XX_TCR] & PPC4XX_TCR_ARE)))
 	{
 		UINT32 timebase = get_timebase(ppc);
@@ -1485,7 +1485,7 @@ static TIMER_CALLBACK( ppc4xx_pit_callback )
 		UINT32 target = timebase + interval;
 		timer_adjust_oneshot(ppc->pit_timer, ATTOTIME_IN_CYCLES((target + 1 - timebase) / ppc->tb_divisor, ppc->cpunum), TRUE);
 	}
-	
+
 	/* otherwise, turn ourself off */
 	else
 		timer_adjust_oneshot(ppc->pit_timer, attotime_never, FALSE);
@@ -1543,7 +1543,7 @@ static void ppc4xx_spu_rx_data(powerpc_state *ppc, UINT8 data)
 static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 {
 	UINT8 enabled = (ppc->spu.regs[SPU4XX_RX_COMMAND] | ppc->spu.regs[SPU4XX_TX_COMMAND]) & 0x80;
-	
+
 	/* if we're enabled, reset at the current baud rate */
 	if (enabled)
 	{
@@ -1555,7 +1555,7 @@ static void ppc4xx_spu_timer_reset(powerpc_state *ppc)
 		if (PRINTF_SPU)
 			mame_printf_debug("ppc4xx_spu_timer_reset: baud rate = %.0f\n", ATTOSECONDS_TO_HZ(charperiod.attoseconds) * bpc);
 	}
-	
+
 	/* otherwise, disable the timer */
 	else
 		timer_adjust_oneshot(ppc->spu.timer, attotime_never, 0);
@@ -1571,7 +1571,7 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 {
 	powerpc_state *ppc = ptr;
 	UINT8 rxbyte;
-	
+
 	/* transmit enabled? */
 	if (ppc->spu.regs[SPU4XX_TX_COMMAND] & 0x80)
 	{
@@ -1583,12 +1583,12 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 			/* if we have a transmit handler, send it that way */
 			if (ppc->spu.tx_handler != NULL)
 				(*ppc->spu.tx_handler)(ppc->spu.txbuf);
-			
+
 			/* indicate that we have moved it to the shift register */
 			ppc->spu.regs[SPU4XX_LINE_STATUS] |= 0x04;
 			ppc->spu.regs[SPU4XX_LINE_STATUS] &= ~0x02;
 		}
-		
+
 		/* otherwise, clear the shift register */
 		else if (!(ppc->spu.regs[SPU4XX_LINE_STATUS] & 0x02))
 			ppc->spu.regs[SPU4XX_LINE_STATUS] |= 0x02;
@@ -1610,7 +1610,7 @@ static TIMER_CALLBACK( ppc4xx_spu_callback )
 				ppc->spu.rxbuf = rxbyte;
 				ppc->spu.regs[SPU4XX_LINE_STATUS] |= 0x80;
 			}
-			
+
 			/* otherwise signal an overrun */
 			else
 			{
@@ -1637,14 +1637,14 @@ static READ8_HANDLER( ppc4xx_spu_r )
 {
 	powerpc_state *ppc = activecpu_get_info_ptr(CPUINFO_PTR_CONTEXT);
 	UINT8 result = 0xff;
-	
+
 	switch (offset)
 	{
 		case SPU4XX_BUFFER:
 			result = ppc->spu.rxbuf;
 			ppc->spu.regs[SPU4XX_LINE_STATUS] &= ~0x80;
 			break;
-		
+
 		default:
 			if (offset < ARRAY_LENGTH(ppc->spu.regs))
 				result = ppc->spu.regs[offset];
@@ -1664,7 +1664,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
 {
 	powerpc_state *ppc = activecpu_get_info_ptr(CPUINFO_PTR_CONTEXT);
 	UINT8 oldstate, newstate;
-	
+
 	if (PRINTF_SPU)
 		mame_printf_debug("spu_w(%d) = %02X\n", offset, data);
 	switch (offset)
@@ -1685,7 +1685,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
 				ppc4xx_spu_timer_reset(ppc);
 			ppc4xx_spu_update_irq_states(ppc);
 			break;
-		
+
 		/* if the divisor changes, we need to update the timer */
 		case SPU4XX_BAUD_DIVISOR_H:
 		case SPU4XX_BAUD_DIVISOR_L:
@@ -1695,7 +1695,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
 				ppc4xx_spu_timer_reset(ppc);
 			}
 			break;
-		
+
 		/* if the number of data bits or stop bits changes, we need to update the timer */
 		case SPU4XX_CONTROL:
 			oldstate = ppc->spu.regs[offset];
@@ -1711,7 +1711,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
 			ppc->spu.txbuf = data;
 			ppc->spu.regs[SPU4XX_LINE_STATUS] &= ~0x04;
 			break;
-		
+
 		default:
 			if (offset < ARRAY_LENGTH(ppc->spu.regs))
 				ppc->spu.regs[offset] = data;

@@ -1,31 +1,31 @@
 /* tecmosys protection related functions */
 
 /*
-	The device validates a password,
-	then uploads the size of a code upload followed by the code upload itself.
-	After that, it uploads 4 ranges of code to checksum, followed by the 4 checksums.
-	The 68K does the checksumming, and returns the results to the protection device.
+    The device validates a password,
+    then uploads the size of a code upload followed by the code upload itself.
+    After that, it uploads 4 ranges of code to checksum, followed by the 4 checksums.
+    The 68K does the checksumming, and returns the results to the protection device.
 
-	Apart from inital protection calls and code upload, the vblank in both games writes
-	info to the protection but they seem to ignore the returned data.
-	Maybe the protection is tied to something else, or maybe it was preliminary work on
-	further security.
-	This is what happens in the vblank:
-	- prot_w( 0xff )
-	- val = prot_r()
-	- prot_w( checksum1[val] )
-	(The area following checksum1 is the code upload in deroon, and active RAM in tkdensho,
-	so the value sent may be meaningless.)
+    Apart from inital protection calls and code upload, the vblank in both games writes
+    info to the protection but they seem to ignore the returned data.
+    Maybe the protection is tied to something else, or maybe it was preliminary work on
+    further security.
+    This is what happens in the vblank:
+    - prot_w( 0xff )
+    - val = prot_r()
+    - prot_w( checksum1[val] )
+    (The area following checksum1 is the code upload in deroon, and active RAM in tkdensho,
+    so the value sent may be meaningless.)
 
-	There is provision for calling the protection read/write functions from two of the trap 0xf switch
-	statements in the 68K, but I don't see it being used anywhere.
+    There is provision for calling the protection read/write functions from two of the trap 0xf switch
+    statements in the 68K, but I don't see it being used anywhere.
 
-	It looks like the code upload is very plain, it can only be 0xff bytes long, and not contain the byte 0xff.
-	The checksum ranges can't contain 0xff either, although the checksum values can.
-	I'd be very interested in putting some trojan ROMs together if anyone has a board to run them on.
-	It might be possible to use one set of ROMs to get the checksum ranges,
-	and another set with dump code places outside those ranges.
-	You can get me at nuapete@hotmail.com
+    It looks like the code upload is very plain, it can only be 0xff bytes long, and not contain the byte 0xff.
+    The checksum ranges can't contain 0xff either, although the checksum values can.
+    I'd be very interested in putting some trojan ROMs together if anyone has a board to run them on.
+    It might be possible to use one set of ROMs to get the checksum ranges,
+    and another set with dump code places outside those ranges.
+    You can get me at nuapete@hotmail.com
 */
 
 #include "driver.h"

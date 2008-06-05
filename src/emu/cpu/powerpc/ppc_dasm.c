@@ -425,9 +425,9 @@ static void SPR(char *dest, int spr_field)
 		case SPR4XX_PID:	strcat(dest, "pid");	break;
 		case SPR4XX_TBHU:	strcat(dest, "tbhu");	break;
 		case SPR4XX_TBLU:	strcat(dest, "tblu");	break;
-//		case SPR4XX_ICDBDR:	strcat(dest, "icdbdr");	break;	// same as SPR603E_HASH2
-//		case SPR4XX_DEAR:	strcat(dest, "dear");	break;	// same as SPR603E_ICMP
-//		case SPR4XX_EVPR:	strcat(dest, "evpr");	break;	// same as SPR603E_RPA
+//      case SPR4XX_ICDBDR: strcat(dest, "icdbdr"); break;  // same as SPR603E_HASH2
+//      case SPR4XX_DEAR:   strcat(dest, "dear");   break;  // same as SPR603E_ICMP
+//      case SPR4XX_EVPR:   strcat(dest, "evpr");   break;  // same as SPR603E_RPA
 		case SPR4XX_CDBCR:	strcat(dest, "cdbcr");	break;
 		case SPR4XX_TSR:	strcat(dest, "tsr");	break;
 		case SPR4XX_TCR:	strcat(dest, "tcr");	break;
@@ -436,10 +436,10 @@ static void SPR(char *dest, int spr_field)
 		case SPR4XX_TBLO:	strcat(dest, "tblo");	break;
 		case SPR4XX_SRR2:	strcat(dest, "srr2");	break;
 		case SPR4XX_SRR3:	strcat(dest, "srr3");	break;
-//		case SPR4XX_DBSR:	strcat(dest, "dbsr");	break;	// same as SPR603E_HID0
-//		case SPR4XX_DBCR:	strcat(dest, "dbcr");	break;	// same as SPR603E_IABR
+//      case SPR4XX_DBSR:   strcat(dest, "dbsr");   break;  // same as SPR603E_HID0
+//      case SPR4XX_DBCR:   strcat(dest, "dbcr");   break;  // same as SPR603E_IABR
 		case SPR4XX_IAC1:	strcat(dest, "iac1");	break;
-//		case SPR4XX_IAC2:	strcat(dest, "iac2");	break;	// same as SPROEA_DABR
+//      case SPR4XX_IAC2:   strcat(dest, "iac2");   break;  // same as SPROEA_DABR
 		case SPR4XX_DAC1:	strcat(dest, "dac1");	break;
 		case SPR4XX_DAC2:	strcat(dest, "dac2");	break;
 		case SPR4XX_DCCR:	strcat(dest, "dccr");	break;

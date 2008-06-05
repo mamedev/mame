@@ -951,8 +951,8 @@ static DRIVER_INIT( nwktr )
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
-//	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-//	cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+//  cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+//  cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 
 	adc1213x_init(0, adc12138_input_callback);
 }

@@ -97,7 +97,7 @@ INLINE input_code input_seq_get_last(const input_seq *seq)
 }
 
 /*-------------------------------------------------
-    input_seq_get_last_but_one - return the 
+    input_seq_get_last_but_one - return the
     last_but_one code in a sequence
 -------------------------------------------------*/
 

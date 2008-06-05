@@ -456,7 +456,7 @@ static char *output_param_space_size(char *dest, int size, const drcuml_paramete
 		dest += sprintf(dest, "%s_", address_space_names[param->value / 16]);
 		return output_param_size(dest, size, param);
 	}
-		
+
 	return output_param(dest, size, param);
 }
 

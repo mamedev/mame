@@ -529,7 +529,7 @@ struct _powerpc_state
 	UINT32			sr[16];
 	UINT32			spr[1024];
 	UINT32			dcr[256];
-	
+
 	/* parameters for calls */
 	UINT32			param0;
 	UINT32			param1;
@@ -555,7 +555,7 @@ struct _powerpc_state
 	emu_timer *		wdog_timer;
 	UINT32			pit_reload;
 	UINT32			irqstate;
-	
+
 	/* PowerPC 603-specific state */
 	UINT32			mmu603_cmp;
 	UINT32			mmu603_hash[2];
@@ -570,7 +570,7 @@ struct _powerpc_state
 	UINT64			tb_zero_cycles;
 	UINT64			dec_zero_cycles;
 	emu_timer *		decrementer_int_timer;
-	
+
 	/* for use by specific implementations */
 	ppcimp_state *	impstate;
 };

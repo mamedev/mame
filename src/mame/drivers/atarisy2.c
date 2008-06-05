@@ -424,7 +424,7 @@ static WRITE16_HANDLER( adc_strobe_w )
 static READ16_HANDLER( adc_r )
 {
 	char port[5];
-	
+
 	sprintf(port, "ADC%d", which_adc);
 	if (which_adc < pedal_count)
 		return ~input_port_read(machine, port);
@@ -436,7 +436,7 @@ static READ16_HANDLER( adc_r )
 static READ8_HANDLER( leta_r )
 {
 	char port[6];
-	
+
     if (pedal_count == -1)   /* 720 */
 	{
 		/* special thanks to MAME Analog+ for the mapping code */

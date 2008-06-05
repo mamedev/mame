@@ -126,7 +126,7 @@ static WRITE16_HANDLER( a2d_select_w )
 static READ16_HANDLER( a2d_data_r )
 {
 	char port[5];
-	
+
 	/* Pit Fighter has no A2D, just another input port */
 	if (atarig1_pitfight)
 		return input_port_read(machine, "ADC0");
@@ -137,7 +137,7 @@ static READ16_HANDLER( a2d_data_r )
 		sprintf(port, "ADC%d", which_input);
 		return input_port_read(machine, port) << 8;
 	}
-	
+
 	return 0;
 }
 

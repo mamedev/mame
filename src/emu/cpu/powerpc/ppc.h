@@ -16,7 +16,7 @@
     REGISTER ENUMERATION
 ***************************************************************************/
 
-enum 
+enum
 {
 	PPC_PC = 1,
 	PPC_R0,
@@ -87,14 +87,14 @@ enum
 	CPUINFO_INT_PPC_HOTSPOT_PC,
 	CPUINFO_INT_PPC_HOTSPOT_OPCODE,
 	CPUINFO_INT_PPC_HOTSPOT_CYCLES,
-	
+
 	CPUINFO_INT_PPC_RX_DATA,
 
 	CPUINFO_PTR_PPC_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC,
 
 	CPUINFO_PTR_SPU_RX_HANDLER,
 	CPUINFO_PTR_SPU_TX_HANDLER,
-	
+
 	CPUINFO_PTR_CONTEXT			/* temporary */
 };
 

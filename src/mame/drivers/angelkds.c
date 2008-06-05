@@ -180,9 +180,9 @@ these make the game a bit easier for testing purposes
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	int fake; 
+	int fake;
 	char port1[4], port2[6];
-	
+
 	sprintf(port1, "I8%d", 1 + offset);
 	sprintf(port2, "FAKE%d", 1 + offset);
 	fake = input_port_read(machine, port2);

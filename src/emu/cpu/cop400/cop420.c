@@ -13,12 +13,12 @@
 
     TODO:
 
-	- when is the microbus int cleared?
+    - when is the microbus int cleared?
     - run interrupt test suite
     - run production test suite
-	- run microbus test suite
+    - run microbus test suite
     - remove LBIops
-	- move cop440 stuff to cop440.c
+    - move cop440 stuff to cop440.c
 
 */
 

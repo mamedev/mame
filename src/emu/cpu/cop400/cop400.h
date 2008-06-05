@@ -67,11 +67,11 @@ struct _cop400_interface
 
 /*
 
-	Prefix		Temperature Range
+    Prefix      Temperature Range
 
-	COP4xx		0C to 70C
-	COP3xx		-40C to +85C
-	COP2xx		-55C to +125C
+    COP4xx      0C to 70C
+    COP3xx      -40C to +85C
+    COP2xx      -55C to +125C
 
 */
 

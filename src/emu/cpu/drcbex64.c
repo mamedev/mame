@@ -3499,7 +3499,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 
 	/* normalize parameters */
 	param_normalize_1(drcbe, inst, &dstp, PTYPE_MR);
-	
+
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
@@ -3534,7 +3534,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_movzx_r32_r8(&dst, dstreg, REG_AL);									// movzx  dstreg,al
 			emit_shl_r32_imm(&dst, dstreg, 4);											// shl    dstreg,4
 			break;
-		
+
 		/* carry plus another flag */
 		case DRCUML_FLAG_C | DRCUML_FLAG_V:
 			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
@@ -3543,7 +3543,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
 			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
 			break;
-		
+
 		case DRCUML_FLAG_C | DRCUML_FLAG_Z:
 			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
 			emit_setcc_r8(&dst, COND_Z, REG_CL);										// setz   cl
@@ -3551,7 +3551,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
 			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 4, 0));				// lea    dstreg,[eax+ecx*4]
 			break;
-		
+
 		case DRCUML_FLAG_C | DRCUML_FLAG_S:
 			emit_setcc_r8(&dst, COND_C, REG_AL);										// setc   al
 			emit_setcc_r8(&dst, COND_S, REG_CL);										// sets   cl
@@ -3559,7 +3559,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_movzx_r32_r8(&dst, REG_ECX, REG_CL);									// movzx  ecx,al
 			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 8, 0));				// lea    dstreg,[eax+ecx*8]
 			break;
-		
+
 		/* overflow plus another flag */
 		case DRCUML_FLAG_V | DRCUML_FLAG_Z:
 			emit_setcc_r8(&dst, COND_O, REG_AL);										// seto   al
@@ -3569,7 +3569,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
 			emit_shl_r32_imm(&dst, dstreg, 1);											// shl    dstreg,1
 			break;
-		
+
 		case DRCUML_FLAG_V | DRCUML_FLAG_S:
 			emit_setcc_r8(&dst, COND_O, REG_AL);										// seto   al
 			emit_setcc_r8(&dst, COND_S, REG_CL);										// sets   cl
@@ -3578,7 +3578,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 4, 0));				// lea    dstreg,[eax+ecx*4]
 			emit_shl_r32_imm(&dst, dstreg, 1);											// shl    dstreg,1
 			break;
-		
+
 		/* zero plus another flag */
 		case DRCUML_FLAG_Z | DRCUML_FLAG_S:
 			emit_setcc_r8(&dst, COND_Z, REG_AL);										// setz   al
@@ -3588,7 +3588,7 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 			emit_lea_r32_m32(&dst, dstreg, MBISD(REG_EAX, REG_ECX, 2, 0));				// lea    dstreg,[eax+ecx*2]
 			emit_shl_r32_imm(&dst, dstreg, 2);											// shl    dstreg,2
 			break;
-		
+
 		/* default cases */
 		default:
 			emit_pushf(&dst);															// pushf
@@ -3598,11 +3598,11 @@ static x86code *op_getflgs(drcbe_state *drcbe, x86code *dst, const drcuml_instru
 																						// movzx  dstreg,[flags_map]
 			break;
 	}
-		
+
 	/* 32-bit form */
 	if (inst->size == 4)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	
+
 	/* 64-bit form */
 	else if (inst->size == 8)
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
@@ -3926,12 +3926,12 @@ static x86code *op_store(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 				else
 				{
 					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value), srcp.value);// mov   [basep + 8*indp],srcp
-					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value + 4), srcp.value >> 32);	
+					emit_mov_m32_imm(&dst, MBD(basereg, baseoffs + 8*indp.value + 4), srcp.value >> 32);
 																						// mov   [basep + 8*indp + 4],srcp >> 32
 				}
 			}
 		}
-		
+
 		/* variable source */
 		else
 		{
@@ -4281,15 +4281,15 @@ static x86code *op_set(drcbe_state *drcbe, x86code *dst, const drcuml_instructio
 
 	/* pick a target register for the general case */
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
-	
+
 	/* set to AL */
 	emit_setcc_r8(&dst, X86_CONDITION(inst->condflags), REG_AL);						// setcc  al
 	emit_movzx_r32_r8(&dst, dstreg, REG_AL);											// movzx  dstreg,al
-	
+
 	/* 32-bit form */
 	if (inst->size == 4)
 		emit_mov_p32_r32(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
-	
+
 	/* 64-bit form */
 	else if (inst->size == 8)
 		emit_mov_p64_r64(drcbe, &dst, &dstp, dstreg);									// mov   dstp,dstreg
@@ -4988,7 +4988,7 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		emit_mov_p32_r32(drcbe, &dst, &dstp, REG_EAX);									// mov   dstp,eax
 		if (compute_hi)
 			emit_mov_p32_r32(drcbe, &dst, &edstp, REG_EDX);								// mov   edstp,edx
-		
+
 		/* compute flags */
 		if (inst->condflags != 0)
 		{
@@ -5028,7 +5028,7 @@ static x86code *op_mulu(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 		emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);									// mov   dstp,rax
 		if (compute_hi)
 			emit_mov_p64_r64(drcbe, &dst, &edstp, REG_RDX);								// mov   edstp,rdx
-		
+
 		/* compute flags */
 		if (inst->condflags != 0)
 		{
@@ -5190,7 +5190,7 @@ static x86code *op_muls(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 			emit_mov_p64_r64(drcbe, &dst, &dstp, REG_RAX);								// mov   dstp,rax
 			emit_mov_p64_r64(drcbe, &dst, &edstp, REG_RDX);								// mov   edstp,rdx
 		}
-		
+
 		/* compute flags */
 		if (inst->condflags != 0)
 		{
@@ -6404,7 +6404,7 @@ static x86code *op_ftoint(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		emit_stmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssemodesave));						// stmxcsr [ssemodesave]
 		emit_ldmxcsr_m32(&dst, MABS(drcbe, &drcbe->ssecontrol[roundp.value]));			// ldmxcsr fpcontrol[mode]
 	}
-	
+
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
@@ -6426,7 +6426,7 @@ static x86code *op_ftoint(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 					emit_cvttss2si_r32_r128(&dst, dstreg, srcp.value);					// cvttss2si dstreg,srcp
 			}
 		}
-		
+
 		/* 64-bit integer source */
 		else if (sizep.value == DRCUML_SIZE_QWORD)
 		{
@@ -6468,7 +6468,7 @@ static x86code *op_ftoint(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 					emit_cvttsd2si_r32_r128(&dst, dstreg, srcp.value);					// cvttsd2si dstreg,srcp
 			}
 		}
-		
+
 		/* 64-bit integer source */
 		else if (sizep.value == DRCUML_SIZE_QWORD)
 		{
@@ -6537,7 +6537,7 @@ static x86code *op_ffrint(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 				emit_cvtsi2ss_r128_r32(&dst, dstreg, srcreg);							// cvtsi2ss dstreg,srcreg
 			}
 		}
-		
+
 		/* 64-bit integer source */
 		else
 		{
@@ -6568,7 +6568,7 @@ static x86code *op_ffrint(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 				emit_cvtsi2sd_r128_r32(&dst, dstreg, srcreg);							// cvtsi2sd dstreg,srcreg
 			}
 		}
-		
+
 		/* 64-bit integer source */
 		else
 		{
@@ -6615,7 +6615,7 @@ static x86code *op_ffrflt(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 			emit_cvtss2sd_r128_r128(&dst, dstreg, srcp.value);							// cvtss2sd dstreg,srcp
 		emit_movsd_p64_r128(drcbe, &dst, &dstp, dstreg);								// movsd    dstp,dstreg
 	}
-	
+
 	/* double-to-single */
 	else if (inst->size == 4 && sizep.value == DRCUML_SIZE_QWORD)
 	{

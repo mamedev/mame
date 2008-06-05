@@ -479,7 +479,7 @@ UINT8 lsi53c810_reg_r(int reg)
 			return (lsi810.dsa >> 24) & 0xff;
 		case 0x14:		/* ISTAT */
 			// clear the interrupt on service
-			if(intf->irq_callback != NULL) 
+			if(intf->irq_callback != NULL)
 			{
 				intf->irq_callback(Machine, 0);
 			}

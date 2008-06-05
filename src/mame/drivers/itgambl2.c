@@ -34,7 +34,7 @@
 
   ROMs:  1x (up to) 27C2000 or similar (sound).
          3x or 4x 27C4001 or similar (graphics).
-  
+
   Connectors: 1x 28x2 edge connector.
               1x RS232 connector.
               1x 14 legs connector.
@@ -280,7 +280,7 @@ ROMs:
 
 1x 27C2000 (s)
 3x M27C4001 (1, 2, 3)
-  
+
 Note:
 
 1x 28x2 edge connector

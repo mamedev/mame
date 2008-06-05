@@ -811,7 +811,7 @@ static UINT32 scsi_fetch(UINT32 dsp)
 static void scsi_irq_callback(running_machine *machine, int state)
 {
 	scsi_irq_state = state;
-//	model3_irq_state |= irq_enable & ~0x60;	/* FIXME: enable only SCSI interrupt */
+//  model3_irq_state |= irq_enable & ~0x60; /* FIXME: enable only SCSI interrupt */
 	update_irq_state(machine);
 }
 

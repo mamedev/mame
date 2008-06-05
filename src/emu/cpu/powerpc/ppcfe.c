@@ -54,12 +54,12 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 		case 0x3a:	/* 0x3a group - 64-bit only */
 		case 0x3e:	/* 0x3e group - 64-bit only */
 			return FALSE;
-		
+
 		case 0x03:	/* TWI */
 			desc->gpr.used |= REGFLAG_R(G_RA(op));
 			desc->flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			return TRUE;
-	
+
 		case 0x07:	/* MULLI */
 			desc->gpr.used |= REGFLAG_R(G_RA(op));
 			desc->gpr.modified |= REGFLAG_R(G_RD(op));
@@ -70,24 +70,24 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->gpr.used |= REGFLAG_RZ(G_RA(op));
 			desc->gpr.modified |= REGFLAG_R(G_RD(op));
 			return TRUE;
-	
+
 		case 0x0a:	/* CMPLI */
 		case 0x0b:	/* CMPI */
 			desc->gpr.used |= REGFLAG_R(G_RA(op)) | REGFLAG_XER;
 			desc->gpr.modified |= REGFLAG_CR(G_CRFD(op));
 			return TRUE;
-	
+
 		case 0x08:	/* SUBFIC */
 		case 0x0c:	/* ADDIC */
 			desc->gpr.used |= REGFLAG_R(G_RA(op));
 			desc->gpr.modified |= REGFLAG_R(G_RD(op)) | REGFLAG_XER;
 			return TRUE;
-	
+
 		case 0x0d:	/* ADDIC. */
 			desc->gpr.used |= REGFLAG_R(G_RA(op)) | REGFLAG_XER;
 			desc->gpr.modified |= REGFLAG_R(G_RT(op)) | REGFLAG_CR(0) | REGFLAG_XER;
 			return TRUE;
-	
+
 		case 0x10:	/* BCx */
 			desc->gpr.used |= REGFLAG_CR(G_BI(op) / 4);
 			if (op & M_LK) desc->gpr.modified |= REGFLAG_LR;
@@ -102,22 +102,22 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 				desc->flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
 			desc->targetpc = (INT16)(G_BD(op) << 2) + ((op & M_AA) ? 0 : desc->pc);
 			return TRUE;
-	
+
 		case 0x11:	/* SC */
 			if (!(ppc->cap & (PPCCAP_OEA | PPCCAP_4XX)))
 				return FALSE;
 			desc->flags |= OPFLAG_WILL_CAUSE_EXCEPTION;
 			return TRUE;
-	
+
 		case 0x12:	/* Bx */
 			if (op & M_LK) desc->gpr.modified |= REGFLAG_LR;
 			desc->flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc->targetpc = ((INT32)(G_LI(op) << 8) >> 6) + ((op & M_AA) ? 0 : desc->pc);
 			return TRUE;
-		
+
 		case 0x13:	/* 0x13 group */
 			return describe_instruction_13(ppc, op, desc);
-			
+
 		case 0x14:	/* RLWIMIx */
 			desc->gpr.used |= REGFLAG_R(G_RS(op)) | REGFLAG_R(G_RA(op));
 			desc->gpr.modified |= REGFLAG_R(G_RA(op));
@@ -127,7 +127,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 				desc->gpr.modified |= REGFLAG_CR(0);
 			}
 			return TRUE;
-		
+
 		case 0x15:	/* RLWINMx */
 			desc->gpr.used |= REGFLAG_R(G_RS(op));
 			desc->gpr.modified |= REGFLAG_R(G_RA(op));
@@ -137,7 +137,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 				desc->gpr.modified |= REGFLAG_CR(0);
 			}
 			return TRUE;
-		
+
 		case 0x17:	/* RLWNMx */
 			desc->gpr.used |= REGFLAG_R(G_RS(op)) | REGFLAG_R(G_RB(op));
 			desc->gpr.modified |= REGFLAG_R(G_RA(op));
@@ -147,7 +147,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 				desc->gpr.modified |= REGFLAG_CR(0);
 			}
 			return TRUE;
-		
+
 		case 0x18:	/* ORI */
 		case 0x19:	/* ORIS */
 		case 0x1a:	/* XORI */
@@ -155,16 +155,16 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->gpr.used |= REGFLAG_R(G_RS(op));
 			desc->gpr.modified |= REGFLAG_R(G_RA(op));
 			return TRUE;
-	
+
 		case 0x1c:	/* ANDI. */
 		case 0x1d:	/* ANDIS. */
 			desc->gpr.used |= REGFLAG_R(G_RS(op)) | REGFLAG_XER;
 			desc->gpr.modified |= REGFLAG_R(G_RA(op)) | REGFLAG_CR(0);
 			return TRUE;
-		
+
 		case 0x1f:	/* 0x1f group */
 			return describe_instruction_1f(ppc, op, desc);
-		
+
 		case 0x20:	/* LWZ */
 		case 0x22:	/* LBZ */
 		case 0x28:	/* LHZ */
@@ -173,7 +173,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->gpr.modified |= REGFLAG_R(G_RD(op));
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-		
+
 		case 0x21:	/* LWZU */
 		case 0x23:	/* LBZU */
 		case 0x29:	/* LHZU */
@@ -184,14 +184,14 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->gpr.modified |= REGFLAG_R(G_RD(op)) | REGFLAG_R(G_RA(op));
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-		
+
 		case 0x24:	/* STW */
 		case 0x26:	/* STB */
 		case 0x2c:	/* STH */
 			desc->gpr.used |= REGFLAG_RZ(G_RA(op)) | REGFLAG_R(G_RS(op));
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x25:	/* STWU */
 		case 0x27:	/* STBU */
 		case 0x2d:	/* STHU */
@@ -201,18 +201,18 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->gpr.modified |= REGFLAG_R(G_RA(op));
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x2e:	/* LMW */
 			desc->gpr.used |= REGFLAG_RZ(G_RA(op));
 			desc->gpr.modified |= ((REGFLAG_R(31) << 1) - 1) & ~(REGFLAG_R(G_RD(op)) - 1);
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-		
+
 		case 0x2f:	/* STMW */
 			desc->gpr.used |= REGFLAG_RZ(G_RA(op)) | (((REGFLAG_R(31) << 1) - 1) & ~(REGFLAG_R(G_RS(op)) - 1));
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x30:	/* LFS */
 		case 0x32:	/* LFD */
 			if (!(ppc->cap & PPCCAP_FPU))
@@ -221,7 +221,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->fpr.modified |= REGFLAG_R(G_RD(op));
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-		
+
 		case 0x31:	/* LFSU */
 		case 0x33:	/* LFDU */
 			if (!(ppc->cap & PPCCAP_FPU))
@@ -231,7 +231,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->fpr.modified |= REGFLAG_R(G_RD(op));
 			desc->flags |= OPFLAG_READS_MEMORY;
 			return TRUE;
-		
+
 		case 0x34:	/* STFS */
 		case 0x36:	/* STFD */
 			if (!(ppc->cap & PPCCAP_FPU))
@@ -240,7 +240,7 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->fpr.used |= REGFLAG_R(G_RS(op));
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x35:	/* STFSU */
 		case 0x37:	/* STFDU */
 			if (!(ppc->cap & PPCCAP_FPU))
@@ -250,10 +250,10 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 			desc->fpr.used |= REGFLAG_R(G_RS(op));
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x3b:	/* 0x3b group */
 			return describe_instruction_3b(ppc, op, desc);
-		
+
 		case 0x3f:	/* 0x3f group */
 			return describe_instruction_3f(ppc, op, desc);
 	}
@@ -271,14 +271,14 @@ int ppcfe_describe(void *param, opcode_desc *desc)
 static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
 {
 	UINT32 opswitch = (op >> 1) & 0x3ff;
-	
+
 	switch (opswitch)
 	{
 		case 0x000:	/* MTCRF */
 			desc->gpr.used |= REGFLAG_CR(G_CRFS(op));
 			desc->gpr.modified |= REGFLAG_CR(G_CRFD(op));
 			return TRUE;
-			
+
 		case 0x010:	/* BCLRx */
 			desc->gpr.used |= REGFLAG_CR(G_BI(op) / 4) | REGFLAG_LR;
 			if (op & M_LK) desc->gpr.modified |= REGFLAG_LR;
@@ -305,26 +305,26 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			desc->gpr.used |= REGFLAG_CR(G_CRBA(op) / 4) | REGFLAG_CR(G_CRBB(op) / 4);
 			desc->gpr.modified |= REGFLAG_CR(G_CRBD(op) / 4);
 			return TRUE;
-			
+
 		case 0x032:	/* RFI */
 			if (!(ppc->cap & (PPCCAP_OEA | PPCCAP_4XX)))
 				return FALSE;
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CHANGE_MODES | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
 			desc->targetpc = BRANCH_TARGET_DYNAMIC;
 			return TRUE;
-			
+
 		case 0x033:	/* RFCI */
 			if (!(ppc->cap & PPCCAP_4XX))
 				return FALSE;
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CHANGE_MODES | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
 			desc->targetpc = BRANCH_TARGET_DYNAMIC;
 			return TRUE;
-			
+
 		case 0x096:	/* ISYNC */
 			if (!(ppc->cap & (PPCCAP_VEA | PPCCAP_4XX)))
 				return FALSE;
 			return TRUE;
-			
+
 		case 0x210:	/* BCCTRx */
 			desc->gpr.used |= REGFLAG_CR(G_BI(op) / 4) | REGFLAG_CTR;
 			if (op & M_LK) desc->gpr.modified |= REGFLAG_LR;
@@ -349,7 +349,7 @@ static int describe_instruction_13(powerpc_state *ppc, UINT32 op, opcode_desc *d
 static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
 {
 	UINT32 opswitch = (op >> 1) & 0x3ff;
-	
+
 	switch (opswitch)
 	{
 		case 0x009:	/* MULHDUx - 64-bit only */
@@ -441,7 +441,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			desc->gpr.used |= ((REGFLAG_CR(7) << 1) - 1) & ~(REGFLAG_CR(0) - 1);
 			desc->gpr.modified |= REGFLAG_R(G_RD(op));
 			return TRUE;
-			
+
 		case 0x136:	/* ECIWX */
 			if (!(ppc->cap & PPCCAP_VEA))
 				return FALSE;
@@ -528,7 +528,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				return FALSE;
 			desc->gpr.modified |= REGFLAG_R(G_RD(op));
 			return TRUE;
-			
+
 		case 0x068:	/* NEGx */
 			desc->gpr.used |= REGFLAG_R(G_RA(op));
 			desc->gpr.modified |= REGFLAG_R(G_RD(op));
@@ -560,7 +560,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			if (G_CRM(op) & 0x40) desc->gpr.modified |= REGFLAG_CR(6);
 			if (G_CRM(op) & 0x80) desc->gpr.modified |= REGFLAG_CR(7);
 			return TRUE;
-			
+
 		case 0x092:	/* MTMSR */
 			desc->gpr.used |= REGFLAG_R(G_RS(op));
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_CAN_CHANGE_MODES | OPFLAG_END_SEQUENCE;
@@ -619,7 +619,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				return FALSE;
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION;
 			return TRUE;
-		
+
 		case 0x3d2:	/* TLBLD */
 		case 0x3f2:	/* TLBLI */
 			if (!(ppc->cap & PPCCAP_603_MMU))
@@ -652,7 +652,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 				return FALSE;
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION;
 			return TRUE;
-			
+
 		case 0x256:	/* SYNC */
 			return TRUE;
 
@@ -660,7 +660,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			if (!(ppc->cap & PPCCAP_VEA))
 				return FALSE;
 			return TRUE;
-			
+
 		case 0x237:	/* LFSUX */
 		case 0x277:	/* LFDUX */
 			if (!(ppc->cap & PPCCAP_FPU))
@@ -714,7 +714,7 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			desc->gpr.used |= REGFLAG_RZ(G_RA(op)) | REGFLAG_R(G_RB(op));
 			desc->flags |= OPFLAG_WRITES_MEMORY;
 			return TRUE;
-		
+
 		case 0x106:	/* ICBT */
 		case 0x1c6:	/* DCCCI */
 		case 0x3c6:	/* ICCCI */
@@ -746,14 +746,14 @@ static int describe_instruction_1f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			desc->gpr.used |= REGFLAG_R(G_RS(op));
 			desc->flags |= OPFLAG_PRIVILEGED | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_CAN_EXPOSE_EXTERNAL_INT;
 			return TRUE;
-		
+
 		case 0x083:	/* WRTEE */
 			if (!(ppc->cap & PPCCAP_4XX))
 				return FALSE;
 			desc->gpr.used |= REGFLAG_R(G_RS(op));
 			desc->flags |= OPFLAG_CAN_EXPOSE_EXTERNAL_INT;
 			return TRUE;
-		
+
 		case 0x0a3:	/* WRTEEI */
 			if (!(ppc->cap & PPCCAP_4XX))
 				return FALSE;
@@ -778,7 +778,7 @@ static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *d
 
 	if (!(ppc->cap & PPCCAP_FPU))
 		return FALSE;
-	
+
 	switch (opswitch)
 	{
 		case 0x12:	/* FDIVSx */
@@ -832,7 +832,7 @@ static int describe_instruction_3b(powerpc_state *ppc, UINT32 op, opcode_desc *d
 static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *desc)
 {
 	UINT32 opswitch = (op >> 1) & 0x3ff;
-	
+
 	if (!(ppc->cap & PPCCAP_FPU))
 		return FALSE;
 
@@ -916,7 +916,7 @@ static int describe_instruction_3f(powerpc_state *ppc, UINT32 op, opcode_desc *d
 			case 0x046:	/* MTFSB0x */
 				desc->fpr.modified |= REGFLAG_FPSCR;
 				return TRUE;
-			
+
 			case 0x040:	/* MCRFS */
 				desc->fpr.used |= REGFLAG_FPSCR;
 				desc->gpr.modified |= REGFLAG_CR(G_CRFD(op));

@@ -15,7 +15,7 @@
 
     - run interrupt test suite
     - run production test suite
-	- run microbus test suite
+    - run microbus test suite
     - remove LBIops
 
 */

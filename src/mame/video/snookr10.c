@@ -18,7 +18,7 @@
 
     Resistor Network for all PCBs:
 
-  
+
      74LS373
     +-------+
     |     02|--> 1  KOhms resistor --> \

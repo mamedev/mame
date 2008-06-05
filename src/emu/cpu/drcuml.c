@@ -12,11 +12,11 @@
 
     Future improvements/changes:
 
-	* UML optimizer:
-		- detects constant operations, converts to MOV
-		- eliminates no-ops (add i0,i0,0)
-		- determines flags automatically
-		- constant folding
+    * UML optimizer:
+        - detects constant operations, converts to MOV
+        - eliminates no-ops (add i0,i0,0)
+        - determines flags automatically
+        - constant folding
 
     * Write a back-end validator:
         - checks all combinations of memory/register/immediate on all params
